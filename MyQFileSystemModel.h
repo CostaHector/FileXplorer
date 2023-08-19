@@ -4,9 +4,9 @@
 #include <QFileSystemModel>
 #include <QSettings>
 #include <QMap>
+#include <QObject>
 
-class MyQFileSystemModel : public QFileSystemModel
-{
+class MyQFileSystemModel : public QFileSystemModel {
 public:
     explicit MyQFileSystemModel(QObject *parent = nullptr);
 

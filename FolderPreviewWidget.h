@@ -18,7 +18,7 @@ public:
     void subscribe();
 
     void CustomContextMenuEvent(const QPoint& pnt);
-
+    QSize sizeHint() const override;
 signals:
     void showANewPath(const QString&);
 

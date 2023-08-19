@@ -5,15 +5,13 @@ RightClickableToolBar::RightClickableToolBar(const QString& title):
     SHOW_TOOL_BUTTON_TEXT(new QAction(QString("Show tool button only text [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonTextOnly)), this)),
     SHOW_TOOL_BUTTON_ICON(new QAction(QString("Show tool button only icon [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonIconOnly)), this)),
     SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON(new QAction(QString("Show tool button text beside icon [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonTextBesideIcon)), this)),
+    textIconActionGroup(new QActionGroup(this)),
     menuQWidget(new QMenu(this))
 
 {
 //    qDebug("%s", QString("Show tool button only text [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonTextOnly)).toStdString().c_str());
 
     setObjectName(title);
-    setAcceptDrops(true);
-    setOrientation(Qt::Vertical);
-    setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
 
     QAction* UNPIN = new QAction("Unpin", this);
     connect(UNPIN, &QAction::triggered, this, &RightClickableToolBar::_unpin);
@@ -21,7 +19,6 @@ RightClickableToolBar::RightClickableToolBar(const QString& title):
     QAction* UNPIN_ALL = new QAction("Unpin All", this);
     connect(UNPIN_ALL, &QAction::triggered, this, &RightClickableToolBar::_unpinAll);
 
-    QActionGroup* textIconActionGroup = new QActionGroup(this);
     textIconActionGroup->addAction(SHOW_TOOL_BUTTON_TEXT);
     textIconActionGroup->addAction(SHOW_TOOL_BUTTON_ICON);
     textIconActionGroup->addAction(SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON);
@@ -30,13 +27,18 @@ RightClickableToolBar::RightClickableToolBar(const QString& title):
         act->setCheckable(true);
         act->setChecked(PreferenceSettings().value(SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON->text(), true).toBool());
     }
-    connect(textIconActionGroup, &QActionGroup::triggered, this, &RightClickableToolBar::_switchTextBesideIcon);
-
     menuQWidget->addAction(UNPIN);
     menuQWidget->addActions(textIconActionGroup->actions());
     menuQWidget->addAction(UNPIN_ALL);
+
     setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, &QToolBar::customContextMenuRequested, this, &RightClickableToolBar::CustomContextMenuEvent);
+
+    setOrientation(Qt::Vertical);
+    setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+    setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
+    setMaximumWidth(100);
+    setAcceptDrops(true);
+
     readSettings();
 }
 
@@ -59,7 +61,14 @@ void RightClickableToolBar::dropEvent(QDropEvent* event)
         if (not fi.isDir()){
             continue;
         }
-        folderName2AbsPath[fi.completeBaseName()] = fi.absoluteFilePath();
+        QString showName;
+        if (fi.isRoot()){
+            showName = fi.absoluteFilePath();
+        }else{
+            showName = fi.completeBaseName();
+        }
+        folderName2AbsPath[showName] = fi.absoluteFilePath();
+
     }
     qDebug("drop cnt[%d]", folderName2AbsPath.size());
     AppendExtraActions(folderName2AbsPath);
@@ -165,5 +174,7 @@ bool RightClickableToolBar::subscribe(T_IntoNewPath IntoNewPath){
         }
         IntoNewPath(extraShownText2Path[act->text()], true, true);
     });
+    connect(textIconActionGroup, &QActionGroup::triggered, this, &RightClickableToolBar::_switchTextBesideIcon);
+    connect(this, &QToolBar::customContextMenuRequested, this, &RightClickableToolBar::CustomContextMenuEvent);
     return true;
 }

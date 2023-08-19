@@ -18,16 +18,7 @@
 class RightClickableToolBar : public QToolBar
 {
 public:
-    QActionGroup* extraAG;
-    QMap<QString, QString> extraShownText2Path;
-    QPoint rightClickedPos;
-    QAction* SHOW_TOOL_BUTTON_TEXT;
-    QAction* SHOW_TOOL_BUTTON_ICON;
-    QAction* SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON;
-    QMenu* menuQWidget;
-
     RightClickableToolBar(const QString& title);
-
     void dragEnterEvent(QDragEnterEvent* event) override;
 
     void dropEvent(QDropEvent* event) override;
@@ -49,10 +40,18 @@ public:
 
     void alighLeft();
 
-
     void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
 
     bool subscribe(T_IntoNewPath IntoNewPath = nullptr);
+
+    QActionGroup* extraAG;
+    QMap<QString, QString> extraShownText2Path;
+    QPoint rightClickedPos;
+    QAction* SHOW_TOOL_BUTTON_TEXT;
+    QAction* SHOW_TOOL_BUTTON_ICON;
+    QAction* SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON;
+    QActionGroup* textIconActionGroup;
+    QMenu* menuQWidget;
 };
 
 #endif // RIGHTCLICKABLETOOLBAR_H

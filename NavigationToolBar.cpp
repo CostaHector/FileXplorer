@@ -24,8 +24,9 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_):
     addActions(fixedAG->actions());
     addSeparator();
     addWidget(extraAppendTB);
-    setOrientation(Qt::Vertical);
+
     setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
+    setOrientation(Qt::Vertical);
 
     if (not isShow_){
         hide();

@@ -11,6 +11,8 @@ SOURCES += \
     ClickableAddressWidget.cpp \
     ContentPane.cpp \
     DragDropTableView.cpp \
+    FileExplorerEvent.cpp \
+    FileLeafAction.cpp \
     FolderPreviewComponent/FolderListView.cpp \
     FolderPreviewComponent/ImagesFileSystemModel.cpp \
     FolderPreviewComponent/ImagesListPreview.cpp \
@@ -23,6 +25,7 @@ SOURCES += \
     MyQFileSystemModel.cpp \
     NavigationAndAddressBar.cpp \
     NavigationToolBar.cpp \
+    OfficeStyleMenu.cpp \
     PathUndoRedoer.cpp \
     PublicVariable.cpp \
     RightClickableToolBar.cpp \
@@ -33,7 +36,9 @@ HEADERS += \
     ClickableAddressWidget.h \
     ContentPane.h \
     DragDropTableView.h \
+    FileExplorerEvent.h \
     FileExplorerReadOnly.h \
+    FileLeafAction.h \
     FolderPreviewComponent/FolderListView.h \
     FolderPreviewComponent/ImagesFileSystemModel.h \
     FolderPreviewComponent/ImagesListPreview.h \
@@ -46,6 +51,7 @@ HEADERS += \
     MyQFileSystemModel.h \
     NavigationAndAddressBar.h \
     NavigationToolBar.h \
+    OfficeStyleMenu.h \
     PathUndoRedoer.h \
     PublicVariable.h \
     RightClickableToolBar.h

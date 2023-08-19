@@ -1,4 +1,5 @@
 #include "PublicVariable.h"
+
 auto TextReader(const QString& textPath) -> QString{
     if (not QFileInfo(textPath).isFile()){
         qDebug("TextReader [%s] not exists", textPath.toStdString().c_str());

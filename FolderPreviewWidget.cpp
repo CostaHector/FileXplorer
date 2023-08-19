@@ -6,6 +6,7 @@
 #include <QDesktopServices>
 
 #include <QMenu>
+#include "PublicVariable.h"
 
 FolderPreviewWidget::FolderPreviewWidget(QWidget* parent) :
     QWidget(parent),
@@ -54,6 +55,13 @@ void FolderPreviewWidget::subscribe() {
 void FolderPreviewWidget::CustomContextMenuEvent(const QPoint &pnt)
 {
     m_folderPreviewMenu->popup(mapToGlobal(pnt));
+}
+
+QSize FolderPreviewWidget::sizeHint() const
+{
+    auto w = PreferenceSettings().value("mainWindowWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
+    auto h = PreferenceSettings().value("mainWindowHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
+    return QSize(w, h);
 }
 
 

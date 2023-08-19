@@ -6,10 +6,12 @@
 
 #include <QPushButton>
 
+#include "MyQFileSystemModel.h"
+
 class DragDropTableView : public QTableView
 {
 public:
-    DragDropTableView(QFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn);
+    DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn);
 
     void mouseMoveEvent(QMouseEvent* event) override{
         //mouseMoveEventCore(event);//
@@ -19,6 +21,8 @@ public:
     auto InitViewSettings()->void;
 
     virtual void mousePressEvent(QMouseEvent* event) override;
+
+    void dragMoveEvent(QDragMoveEvent* event) override;
 
 private:
     QPushButton* backwardBtn; // will not takeover

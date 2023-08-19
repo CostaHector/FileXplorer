@@ -21,8 +21,7 @@
 #include <QDockWidget>
 #include "FolderPreviewHTML.h"
 
-const QRect FileExplorerReadOnly::DEFAULT_GEOMETRY = QRect(0, 0, 1024, 768);
-const QRect FileExplorerReadOnly::DOCKER_DEFAULT_GEOMETRY = QRect(1024/2, 0, 1024/2, 768);
+
 const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 
 FileExplorerReadOnly::FileExplorerReadOnly(QWidget *parent, const QString& initialPath)
@@ -31,7 +30,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(QWidget *parent, const QString& initi
       previewHtml(new FolderPreviewHTML),
       previewWidget(new FolderPreviewWidget),
       explorerCentralWidget(nullptr),
-      _navigationToolBar(new NavigationToolBar)
+      _navigationToolBar(new NavigationToolBar),
+      osm(new OfficeStyleMenu)
 {
     const QString& defaultPath = ReadSettings(initialPath);
     explorerCentralWidget = new ContentPane(nullptr, defaultPath, previewHtml, previewWidget);
@@ -43,6 +43,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(QWidget *parent, const QString& initi
 
     addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
     addToolBar(Qt::ToolBarArea::LeftToolBarArea, _navigationToolBar);
+    setMenuWidget(osm);
 
     subscribe();
 }
@@ -54,6 +55,8 @@ FileExplorerReadOnly::~FileExplorerReadOnly()
 
 void FileExplorerReadOnly::closeEvent(QCloseEvent *event){
     PreferenceSettings().setValue("geometry", saveGeometry());
+    PreferenceSettings().setValue("mainWindowWidth", height());
+    PreferenceSettings().setValue("mainWindowHeight", width());
     qDebug("closeEvent CurrentPath=[%s].", explorerCentralWidget->CurrentPath().toStdString().c_str());
     PreferenceSettings().setValue("defaultOpenPath", explorerCentralWidget->CurrentPath());
     return QMainWindow::closeEvent(event);
@@ -63,7 +66,7 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath)->QString{
     if (PreferenceSettings().contains("geometry")){
         restoreGeometry(PreferenceSettings().value("geometry").toByteArray());
     }else{
-        setGeometry(FileExplorerReadOnly::DEFAULT_GEOMETRY);
+        setGeometry(DEFAULT_GEOMETRY);
     }
 
     QString openPath;

@@ -4,6 +4,8 @@
 #include <QDebug>
 
 #include "PublicVariable.h"
+#include "FileExplorerEvent.h"
+
 #define RUN_MAIN_FILE 1
 #ifdef RUN_MAIN_FILE
 
@@ -18,7 +20,12 @@ int main(int argc, char *argv[])
         qDebug("argc[%d]<=1.", argc);
         fileExplorer = new FileExplorerReadOnly();
     }
+
     fileExplorer->show();
+
+    FileExplorerEvent fee(nullptr, fileExplorer->explorerCentralWidget->fileSysModel, fileExplorer->explorerCentralWidget->view);
+    fee.subscribe();
+
     a.exec();
     delete fileExplorer;
     return 0;

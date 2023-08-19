@@ -34,8 +34,7 @@ public:
     auto on_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) -> bool;
 signals:
 
-
-private:
+public:
     struct Anchor{
         int row;
         int col;

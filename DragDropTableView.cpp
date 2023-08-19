@@ -3,7 +3,7 @@
 #include <QHeaderView>
 #include <QMouseEvent>
 #include "PublicVariable.h"
-#include "MyQFileSystemModel.h"
+
 
 
 void onSortIndicatorChanged(int logicalIndex, Qt::SortOrder order){
@@ -29,7 +29,7 @@ auto MouseSidekeyBackwardForwardCore(Qt::MouseButton mousebutton, QPushButton* b
     return false;
 }
 
-DragDropTableView::DragDropTableView(QFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn):
+DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn):
     backwardBtn(mouseSideKeyBackwardBtn),
     forwardBtn(mouseSideKeyForwardBtn)
 {
@@ -71,4 +71,16 @@ void DragDropTableView::mousePressEvent(QMouseEvent* event){
         return;
     }
     return QTableView::mousePressEvent(event);
+}
+
+void DragDropTableView::dragMoveEvent(QDragMoveEvent *event)
+{
+    auto* fsmModel = dynamic_cast<MyQFileSystemModel* >(model());
+    if (fsmModel->rootPath().isEmpty()){
+        event->ignore();
+        qDebug("You cannot drag on root path");
+        return;
+    }
+    qDebug("\tdragMoveEvent");
+    event->accept();
 }
