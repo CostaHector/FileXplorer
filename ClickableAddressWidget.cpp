@@ -70,8 +70,7 @@ auto ClickableAddressWidget::EditMode()->void{
     }
 }
 
-void ClickableAddressWidget::focusOutEvent(QFocusEvent *event)
-{
+void ClickableAddressWidget::focusOutEvent(QFocusEvent *event){
     if(addressCB->hasFocus()){
         qDebug("Drop down menu");
         return;
@@ -145,15 +144,14 @@ auto ClickableAddressWidget::subscribe()->void{
 auto ClickableAddressWidget::UpdatePath(QString pth)->void{
     addressTB->clear();
     m_pth = ClickableAddressWidget::PathProcess(pth);
-    QActionGroup ag(addressTB);
     for(const QString& pt: m_pth.split('/')){
-        ag.addAction(new QAction(pt));
+        addressTB->addAction(new QAction(pt));
+        addressTB->addSeparator();
     }
-    addressTB->addActions(ag.actions());
 
     if (not addressCB->hasFocus()){  // in disp mode
-        addressCB->insertItem(0, m_pth);}
-    else{  // in edit mode, when return pressed it would auto append one text to the back
+        addressCB->insertItem(0, m_pth);
+    }else{  // in edit mode, when return pressed it would auto append one text to the back
         addressCB->insertItem(0, m_pth);
         addressCB->removeItem(addressCB->count() - 1);
     }
