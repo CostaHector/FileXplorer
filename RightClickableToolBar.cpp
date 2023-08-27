@@ -61,13 +61,13 @@ void RightClickableToolBar::dropEvent(QDropEvent* event)
         if (not fi.isDir()){
             continue;
         }
-        QString showName;
+        QString nameShown;
         if (fi.isRoot()){
-            showName = fi.absoluteFilePath();
+            nameShown = fi.absoluteFilePath();
         }else{
-            showName = fi.completeBaseName();
+            nameShown = fi.completeBaseName();
         }
-        folderName2AbsPath[showName] = fi.absoluteFilePath();
+        folderName2AbsPath[nameShown] = fi.absoluteFilePath();
 
     }
     qDebug("drop cnt[%d]", folderName2AbsPath.size());

@@ -16,9 +16,6 @@ NavigationAndAddressBar::NavigationAndAddressBar(T_IntoNewPath IntoNewPath,
     searchLE(new QLineEdit)
 
 {
-    bool showButtonText = false;
-    backToBtn->setFixedHeight(CONTROL_HEIGHT);
-    forwardToBtn->setFixedHeight(CONTROL_HEIGHT);
     backToBtn->setStyleSheet("border-left: 1px solid gray;"
                              "border-right: 1px dotted gray;"
                              "border-top: 1px solid gray;"
@@ -29,6 +26,8 @@ NavigationAndAddressBar::NavigationAndAddressBar(T_IntoNewPath IntoNewPath,
     upToBtn->setStyleSheet("border-right: 1px solid gray;"
                            "border-top: 1px solid gray;"
                            "border-bottom: 1px solid gray;");
+    backToBtn->setFixedHeight(CONTROL_HEIGHT);
+    forwardToBtn->setFixedHeight(CONTROL_HEIGHT);
     upToBtn->setFixedHeight(CONTROL_HEIGHT);
     backToBtn->setFlat(true);
     forwardToBtn->setFlat(true);

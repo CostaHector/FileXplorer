@@ -22,6 +22,7 @@ ClickableAddressWidget::ClickableAddressWidget(QWidget *parent) :
                              "};");
     addressCB->setFixedHeight(CONTROL_HEIGHT);
     addressTB->setFixedHeight(CONTROL_HEIGHT);
+
     addressLE->setFixedHeight(CONTROL_HEIGHT);
 
 #ifdef _WIN32
@@ -145,8 +146,7 @@ auto ClickableAddressWidget::UpdatePath(QString pth)->void{
     addressTB->clear();
     m_pth = ClickableAddressWidget::PathProcess(pth);
     for(const QString& pt: m_pth.split('/')){
-        addressTB->addAction(new QAction(pt));
-        addressTB->addSeparator();
+        addressTB->addAction(new QAction(pt, addressTB));
     }
 
     if (not addressCB->hasFocus()){  // in disp mode
