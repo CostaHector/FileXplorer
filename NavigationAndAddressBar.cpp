@@ -12,7 +12,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(T_IntoNewPath IntoNewPath,
     backToBtn(new QPushButton(QIcon(":/themes/PATH_BACK_TO"), "")),
     forwardToBtn(new QPushButton(QIcon(":/themes/PATH_FORWARD_TO"), "")),
     upToBtn(new QPushButton(QIcon(":/themes/PATH_UP_TO"), "")),
-    winAddress(new ClickableAddressWidget),
+    winAddress(new AddressELineEdit),
     searchLE(new QLineEdit)
 
 {

@@ -57,7 +57,7 @@ auto ContentPane::IntoNewPath(QString newPath, bool isNewPath, bool isF5Force) -
         return false;
     }
     view->setRootIndex(fileSysModel->setRootPath(newPath));
-    addressBar->winAddress->UpdatePath(newPath);
+    addressBar->winAddress->pathChangeTo(newPath);
     view->selectionModel()->clearCurrentIndex();
     view->selectionModel()->clearSelection();
     if (isNewPath) {  // only new path will back to/forwar to

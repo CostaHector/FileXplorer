@@ -8,7 +8,7 @@
 #include "PathUndoRedoer.h"
 #include <QPushButton>
 #include <QLineEdit>
-#include "ClickableAddressWidget.h"
+#include "AddressELineEdit.h"
 #include "PublicVariable.h"
 
 class NavigationAndAddressBar : public QHBoxLayout
@@ -25,7 +25,7 @@ public:
         upToBtn->disconnect(SIGNAL(&QPushButton::clicked), this);
         searchLE->disconnect(SIGNAL(&QLineEdit::textChanged), this);
         searchLE->disconnect(SIGNAL(&QLineEdit::returnPressed), this);
-        winAddress->disconnect(SIGNAL(&ClickableAddressWidget::intoAPath_active), this);
+        winAddress->disconnect(SIGNAL(&AddressELineEdit::intoAPath_active), this);
     }
 
 
@@ -39,7 +39,7 @@ public:
         connect(searchLE, &QLineEdit::returnPressed, this, [this]()->void{
             m_on_searchEnterKey(searchLE->text());
         });
-        connect(winAddress, &ClickableAddressWidget::intoAPath_active, [this](const QString& pth)->void{
+        connect(winAddress, &AddressELineEdit::intoAPath_active, [this](const QString& pth)->void{
             m_IntoNewPath(pth, true, false);
         });
 
@@ -66,7 +66,7 @@ public:
         return m_IntoNewPath(winAddress->dirname(), true, false);
     }
 
-    ClickableAddressWidget* winAddress;
+    AddressELineEdit* winAddress;
     PathUndoRedoer pathRD;
     QPushButton* backToBtn;
     QPushButton* forwardToBtn;
