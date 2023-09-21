@@ -55,9 +55,8 @@ FileExplorerReadOnly::~FileExplorerReadOnly()
 
 void FileExplorerReadOnly::closeEvent(QCloseEvent *event){
     PreferenceSettings().setValue("geometry", saveGeometry());
-    PreferenceSettings().setValue("dockerWidgetWidth", height());
-    PreferenceSettings().setValue("dockerWidgetHeight", width());
-    qDebug("closeEvent CurrentPath=[%s].", explorerCentralWidget->CurrentPath().toStdString().c_str());
+    PreferenceSettings().setValue("dockerWidgetWidth", previewWidget->width());
+    PreferenceSettings().setValue("dockerWidgetHeight", previewWidget->height());
     PreferenceSettings().setValue("defaultOpenPath", explorerCentralWidget->CurrentPath());
     return QMainWindow::closeEvent(event);
 }

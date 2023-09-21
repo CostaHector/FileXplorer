@@ -94,8 +94,7 @@ auto AddressELineEdit::onPathActionTriggered(const QAction* clkAct)->void{
     }
     QString fullPth = AddressELineEdit::PathProcess(rawPath);
     qDebug("now[%s]", fullPth.toStdString().c_str());
-
-    emit pathComboBoxFocusWatcher->focusChanged(false);
+    onReturnPressed(fullPth);
 }
 
 auto AddressELineEdit::onReturnPressed(const QString& path)->bool{
