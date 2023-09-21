@@ -55,8 +55,8 @@ FileExplorerReadOnly::~FileExplorerReadOnly()
 
 void FileExplorerReadOnly::closeEvent(QCloseEvent *event){
     PreferenceSettings().setValue("geometry", saveGeometry());
-    PreferenceSettings().setValue("mainWindowWidth", height());
-    PreferenceSettings().setValue("mainWindowHeight", width());
+    PreferenceSettings().setValue("dockerWidgetWidth", height());
+    PreferenceSettings().setValue("dockerWidgetHeight", width());
     qDebug("closeEvent CurrentPath=[%s].", explorerCentralWidget->CurrentPath().toStdString().c_str());
     PreferenceSettings().setValue("defaultOpenPath", explorerCentralWidget->CurrentPath());
     return QMainWindow::closeEvent(event);
@@ -72,18 +72,18 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath)->QString{
     QString openPath;
     QString inputPath(initialPath.endsWith('"')? initialPath.chopped(1): initialPath);
     const QFileInfo inputFi = QFileInfo(inputPath);
-    if (inputFi.exists()){ // input valid
+    if (not inputFi.exists()){ // input valid
+        openPath = PreferenceSettings().value("defaultOpenPath", FileExplorerReadOnly::DEFAULT_PATH).toString();
+    }else{ // when input invalid, use last time path
         if (inputFi.isFile()){
             openPath = inputFi.absolutePath();
         }else{
             openPath = inputFi.absoluteFilePath();
         }
-    }else{ // when input invalid, use last time path
-        openPath = PreferenceSettings().value("defaultOpenPath", FileExplorerReadOnly::DEFAULT_PATH).toString();
     }
     setWindowTitle("File Explorer");
     setWindowIcon(QIcon(":/themes/APP_ICON_PATH"));
-    qDebug("ReadSettings defaultPath=[%s]", openPath.toStdString().c_str());
+    qDebug("ReadSettings openPath=[%s]", openPath.toStdString().c_str());
     return openPath;
 }
 
