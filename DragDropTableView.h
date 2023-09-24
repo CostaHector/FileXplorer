@@ -11,7 +11,7 @@
 class DragDropTableView : public QTableView
 {
 public:
-    DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn);
+    DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* mouseSideKeyBackwardBtn, QPushButton* mouseSideKeyForwardBtn);
 
     void mouseMoveEvent(QMouseEvent* event) override{
         //mouseMoveEventCore(event);//
