@@ -22,18 +22,47 @@ typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
 
 
+
+namespace MainKey{
+constexpr int Name = 0;
+constexpr int Size = 1;
+constexpr int Type = 2;
+constexpr int DateModified = 3;
+const QStringList EXPLORER_COLUMNS_TITLE{"Name", "Size", "Type", "DateModified"};
+
+const int NAME_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Name");
+const int TYPE_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Type");
+const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
+}
+
+
+namespace HEADERVIEW_SORT_INDICATOR_ORDER{
+class OrderClass{
+public:
+    QString name;
+    Qt::SortOrder value;
+};
+const OrderClass AscendingOrder{"AscendingOrder", Qt::SortOrder::AscendingOrder};
+const OrderClass DescendingOrder{"DescendingOrder", Qt::SortOrder::DescendingOrder};
+const QMap<QString, Qt::SortOrder> string2SortOrderEnumListTable={{AscendingOrder.name,AscendingOrder.value},
+                                                                  {DescendingOrder.name,DescendingOrder.value}};
+const QStringList HEADERVIEW_SORT_INDICATOR_ORDER_STR = string2SortOrderEnumListTable.keys();
+QString SortOrderEnum2String(const Qt::SortOrder orderEnum);
+}
+
+
 class GVar{
 public:
-    explicit GVar(QVariant v_): v(v_){
-    };
+    explicit GVar(const QString& name_, const QVariant& v_): name(name_), v(v_){};
     virtual bool checker() = 0;
     QVariant v;
+    QString name;
 };
 
 class GVarBool:public GVar{
 public:
-    explicit GVarBool(bool v_):
-        GVar(v_){
+    explicit GVarBool(const QString& name_, bool v_):
+        GVar(name_, v_){
     }
 
     bool checker() override{
@@ -43,8 +72,8 @@ public:
 
 class GVarInt:public GVar{
 public:
-    explicit GVarInt(int v_, int minV_=INT32_MIN, int maxV_=INT32_MAX):
-        GVar(v_), minV(minV_), maxV(maxV_){
+    explicit GVarInt(const QString& name_, int v_, int minV_=INT32_MIN, int maxV_=INT32_MAX):
+        GVar(name_, v_), minV(minV_), maxV(maxV_){
     }
 
     bool checker() override{
@@ -56,8 +85,8 @@ public:
 
 class GVarStr:public GVar{
 public:
-    explicit GVarStr(QString v_, const QStringList& candidatePool_={}):
-        GVar(v_), candidatePool(candidatePool_){
+    explicit GVarStr(const QString& name_, QString v_, const QStringList& candidatePool_={}):
+        GVar(name_, v_), candidatePool(candidatePool_){
     }
 
     bool checker() override{
@@ -68,8 +97,8 @@ public:
 
 class GVarStrFile:public GVar{
 public:
-    explicit GVarStrFile(QString v_, const QStringList& candidateSuffixPool_={"exe"}):
-        GVar(v_), candidateSuffixPool(candidateSuffixPool_){
+    explicit GVarStrFile(const QString& name_, QString v_, const QStringList& candidateSuffixPool_={"exe"}):
+        GVar(name_, v_), candidateSuffixPool(candidateSuffixPool_){
     }
 
     bool checker() override{
@@ -81,8 +110,8 @@ public:
 
 class GVarStrFolder:public GVar{
 public:
-    explicit GVarStrFolder(QString v_):
-        GVar(v_){
+    explicit GVarStrFolder(const QString& name_, QString v_):
+        GVar(name_, v_){
     }
 
     bool checker() override{
@@ -92,8 +121,8 @@ public:
 
 class GVarListStr:public GVar{
 public:
-    explicit GVarListStr(QStringList v_):
-        GVar(v_){
+    explicit GVarListStr(const QString& name_, QStringList v_):
+        GVar(name_, v_){
     }
 
     bool checker() override{
@@ -103,12 +132,18 @@ public:
 
 
 namespace MemoryKey {
-extern GVarStrFile BACKGROUND_IMAGE;
-extern GVarBool SHOW_BACKGOUND_IMAGE;
-extern GVarStrFolder PATH_LAST_TIME_COPY_TO;
-extern GVarBool SHOW_FOLDER_PREVIEW_HTML;
-extern GVarBool SHOW_FOLDER_PREVIEW_WIDGET;
-extern GVarBool SHOW_FOLDER_PREVIEW_IMAGE;
-extern GVarBool SHOW_FOLDER_PREVIEW_JSON_EDITOR;
+const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
+const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
+const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
+const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
+const GVarBool SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true);
+const GVarBool SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false);
+const GVarBool SHOW_FOLDER_PREVIEW_JSON_EDITOR("SHOW_FOLDER_PREVIEW_JSON_EDITOR", false);
+const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
+const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
+const GVarStr HEARVIEW_SORT_INDICATOR_ORDER("HEARVIEW_SORT_INDICATOR_ORDER",
+                                            HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
+                                            HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR);
+const GVarInt ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, 8, 25);
 }
 #endif // PUBLICVARIABLE_H

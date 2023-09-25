@@ -88,7 +88,7 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath)->QString{
 
 #include <functional>
 
-bool FileExplorerReadOnly::subscribe() {
+void FileExplorerReadOnly::subscribe() {
     if (_navigationToolBar and explorerCentralWidget){
         using std::placeholders::_1;
         using std::placeholders::_2;

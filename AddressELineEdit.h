@@ -10,6 +10,9 @@
 
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QKeyEvent>
+
+constexpr int CONTROL_HEIGHT = 28;
 
 class FocusEventWatch : public QObject
 {
@@ -34,21 +37,9 @@ class AddressELineEdit : public QToolBar
 public:
     explicit AddressELineEdit(QWidget *parent = nullptr);
 
-    auto text()->QString{
+    inline auto text()->QString{
         return pathLineEdit->text();
     }
-
-    static inline auto PathProcess(const QString&path) -> QString;
-    auto onFocusChange(bool hasFocus) -> void;
-
-    virtual void mousePressEvent(QMouseEvent *event) override;
-
-    auto clickMode()->void;
-    auto inputMode()->void;
-    auto subscribe()->void;
-    auto onPathActionTriggered(const QAction* clkAct)->void;
-    auto onReturnPressed(const QString& path)->bool;
-
     inline auto dirname() -> QString{
         QFileInfo fi(text());
         if (fi.isRoot()){
@@ -57,6 +48,17 @@ public:
         return fi.absolutePath();
     }
 
+    static inline auto PathProcess(const QString&path) -> QString;
+    auto onFocusChange(bool hasFocus) -> void;
+
+    auto clickMode()->void;
+    auto inputMode()->void;
+    auto subscribe()->void;
+    auto onPathActionTriggered(const QAction* clkAct)->void;
+    auto onReturnPressed(const QString& path)->bool;
+
+    void mousePressEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent* e) override;
 
 signals:
     void intoAPath_active(const QString&);
@@ -74,8 +76,6 @@ private:
 
     QAction* addressCBActH;
 };
-
-constexpr int CONTROL_HEIGHT = 28;
 
 
 class TestAddressELineEdit: public QWidget{

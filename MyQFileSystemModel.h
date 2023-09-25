@@ -10,13 +10,11 @@ class MyQFileSystemModel : public QFileSystemModel {
 public:
     explicit MyQFileSystemModel(QObject *parent = nullptr);
 
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+
 public slots:
     void whenRootPathChanged(const QString& newpath);
-
     void whenDirectoryLoaded(const QString& path);
-
-    static QString SortOrderEnum2String(Qt::SortOrder orderEnum);
-    static const QMap<QString, Qt::SortOrder> string2SortOrderEnumListTable;
 
 
 protected:

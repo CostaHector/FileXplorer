@@ -1,0 +1,81 @@
+#include "View/DragDropTableView.h"
+
+#include <QHeaderView>
+#include <QMouseEvent>
+#include "PublicVariable.h"
+
+
+DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn):
+    QTableView(), View(),
+    backwardBtn(mouseSideKeyBackwardBtn),
+    forwardBtn(mouseSideKeyForwardBtn)
+{
+    setModel(fsmModel);
+    InitViewSettings();
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
+    setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
+    setDragDropMode(QAbstractItemView::DragDrop);
+    setAcceptDrops(true);
+    setDragEnabled(true);
+    setDropIndicatorShown(true);
+
+    DragDropTableView::subscribe();
+}
+
+void DragDropTableView::subscribe(){
+    connect(horizontalHeader(), &QHeaderView::sectionResized, this, &View::on_sectionResized);
+    connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
+}
+
+auto DragDropTableView::InitViewSettings()->void{
+    setShowGrid(false);
+    setAlternatingRowColors(true);
+    setSortingEnabled(true);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    verticalHeader()->setVisible(false);
+    verticalHeader()->setDefaultSectionSize(ROW_SECTION_HEIGHT);
+    verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+
+    horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
+    horizontalHeader()->setStretchLastSection(false);
+    horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
+    DragDropTableView::SetViewColumnWidth();
+    DragDropTableView::UpdateItemViewFontSize();
+}
+
+auto DragDropTableView::SetViewColumnWidth()->void{
+    const auto columnWidth = PreferenceSettings().value(MemoryKey::NAME_COLUMN_WIDTH.name, MemoryKey::NAME_COLUMN_WIDTH.v).toInt();
+    setColumnWidth(MainKey::NAME_COLUMN, columnWidth);
+}
+
+auto DragDropTableView::UpdateItemViewFontSize()->void{
+    View::UpdateItemViewFontSizeCore(this);
+}
+
+void DragDropTableView::dropEvent(QDropEvent* event){
+    View::dropEventCore(this, event);
+    return QTableView::dropEvent(event);
+}
+
+void DragDropTableView::dragEnterEvent(QDragEnterEvent* event){
+    View::dragEnterEventCore(this, event);
+    return QTableView::dragEnterEvent(event);
+}
+
+void DragDropTableView::dragMoveEvent(QDragMoveEvent* event){
+    View::dragMoveEventCore(this, event);
+}
+
+void DragDropTableView::mouseMoveEvent(QMouseEvent *event) {
+    View::mouseMoveEventCore(this, event);
+}
+
+void DragDropTableView::mousePressEvent(QMouseEvent* event){
+    if (View::onMouseSidekeyBackwardForward(event->button(), backwardBtn, forwardBtn)){
+        return;
+    }
+    return QTableView::mousePressEvent(event);
+}

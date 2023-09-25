@@ -20,7 +20,7 @@ public:
 
 
     auto ReadSettings(const QString& initialPath)->QString;
-    bool subscribe();
+    void subscribe();
 
     const static QString DEFAULT_PATH;
     QDockWidget* previewHtmlDock;

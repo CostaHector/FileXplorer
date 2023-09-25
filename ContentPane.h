@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "MyQFileSystemModel.h"
 #include "NavigationAndAddressBar.h"
-#include "DragDropTableView.h"
+#include "View/DragDropTableView.h"
 #include "FolderPreviewHTML.h"
 #include "FolderPreviewWidget.h"
 

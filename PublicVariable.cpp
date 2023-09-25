@@ -16,13 +16,18 @@ auto TextReader(const QString& textPath) -> QString{
     return contents;
 }
 
-namespace MemoryKey {
-GVarStrFile BACKGROUND_IMAGE("");
-GVarBool SHOW_BACKGOUND_IMAGE(false);
-GVarStrFolder PATH_LAST_TIME_COPY_TO("");
-GVarBool SHOW_FOLDER_PREVIEW_HTML(true);
-GVarBool SHOW_FOLDER_PREVIEW_WIDGET(true);
-GVarBool SHOW_FOLDER_PREVIEW_IMAGE(false);
-GVarBool SHOW_FOLDER_PREVIEW_JSON_EDITOR(false);
+namespace HEADERVIEW_SORT_INDICATOR_ORDER{
+QString SortOrderEnum2String(const Qt::SortOrder orderEnum){
+    if (string2SortOrderEnumListTable.isEmpty()){
+        qDebug("[Error] string2SortOrderListTable is empty");
+        return "";
+    }
+    for (auto it=string2SortOrderEnumListTable.cbegin();it!=string2SortOrderEnumListTable.cend();++it){
+        if (it.value() == orderEnum){
+            return it.key();
+        }
+    }
+    return string2SortOrderEnumListTable.cbegin().key();
+}
 }
 

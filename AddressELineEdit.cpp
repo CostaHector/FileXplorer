@@ -6,6 +6,42 @@
 #include<Qt>
 #include<QDesktopServices>
 
+FocusEventWatch::FocusEventWatch(QObject *parent): mouseButtonPressedBefore(false)
+{
+    if (parent == nullptr){
+        qDebug("Focus Event not works for a nullptr.");
+        return;
+    }
+    parent->installEventFilter(this);
+}
+
+bool FocusEventWatch::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::Type::MouseButtonPress){
+        qDebug("MouseButtonPress");
+        mouseButtonPressedBefore = true;
+    }else if (event->type() == QEvent::Type::MouseButtonRelease){
+        ;
+    }
+    else if (event->type() == QEvent::Type::FocusOut){
+        if (not mouseButtonPressedBefore){  // block until next time focus out
+            qDebug("1");
+            emit focusChanged(false);
+        }
+        qDebug("2");
+        mouseButtonPressedBefore = false;
+    }
+    else if (event->type() == QEvent::Type::FocusIn){
+        if (not mouseButtonPressedBefore){  // block until next time focus out
+            qDebug("3");
+            emit focusChanged(true);
+        }
+        qDebug("4");
+        mouseButtonPressedBefore = false;
+    }
+    return QObject::eventFilter(watched, event);
+}
+
 AddressELineEdit::AddressELineEdit(QWidget *parent):
     QToolBar(parent),
     pathActionsGroup(new QActionGroup(this)),
@@ -54,47 +90,24 @@ inline auto AddressELineEdit::PathProcess(const QString&path) -> QString{
     return path;
 }
 
-auto AddressELineEdit::onFocusChange(bool hasFocus) -> void{
-    if (hasFocus){
-        inputMode();
+auto AddressELineEdit::pathChangeTo(const QString& newPath)->void{
+    QString fullpath = AddressELineEdit::PathProcess(newPath);
+    pathLineEdit->setText(fullpath);
+    for (QAction* action: pathActionsGroup->actions()){
+        pathActionsGroup->removeAction(action);
+        removeAction(action);
     }
-    else{
-        clickMode();
+    for(const QString& pt: fullpath.split('/')){
+        pathActionsGroup->addAction(new QAction(pt));
     }
-}
+    addActions(pathActionsGroup->actions());
 
-auto AddressELineEdit::clickMode()->void{
-    if (not pathActionsGroup->isVisible()){
-        pathActionsGroup->setVisible(true);
+    if (not pathComboBox->hasFocus()){  // in disp mode
+        pathComboBox->insertItem(0, fullpath);
+    }else{  // in edit mode, when return pressed it would auto append one text to the back
+        pathComboBox->insertItem(0, fullpath);
+        pathComboBox->removeItem(pathComboBox->count() - 1);
     }
-    addressCBActH->setVisible(false);
-}
-
-auto AddressELineEdit::inputMode()->void{
-    pathActionsGroup->setVisible(false);
-    if (not addressCBActH->isVisible()){
-        addressCBActH->setVisible(true);
-    }
-}
-
-void AddressELineEdit::mousePressEvent(QMouseEvent *event){
-    emit pathComboBoxFocusWatcher->focusChanged(true);
-    pathLineEdit->setFocus();
-    pathLineEdit->selectAll();
-}
-
-
-auto AddressELineEdit::onPathActionTriggered(const QAction* clkAct)->void{
-    QString rawPath;
-    for(const auto* act: pathActionsGroup->actions()){
-        rawPath += (act->text() + '/');
-        if (act == clkAct){
-            break;
-        }
-    }
-    QString fullPth = AddressELineEdit::PathProcess(rawPath);
-    qDebug("now[%s]", fullPth.toStdString().c_str());
-    onReturnPressed(fullPth);
 }
 
 auto AddressELineEdit::onReturnPressed(const QString& path)->bool{
@@ -125,64 +138,53 @@ auto AddressELineEdit::subscribe()->void{
     connect(pathComboBoxFocusWatcher, &FocusEventWatch::focusChanged, this, &AddressELineEdit::onFocusChange);
 }
 
-auto AddressELineEdit::pathChangeTo(const QString& newPath)->void{
-    QString fullpath = AddressELineEdit::PathProcess(newPath);
-    pathLineEdit->setText(fullpath);
-    for (QAction* action: pathActionsGroup->actions()){
-        pathActionsGroup->removeAction(action);
-        removeAction(action);
-    }
-    for(const QString& pt: fullpath.split('/')){
-        pathActionsGroup->addAction(new QAction(pt));
-    }
-    addActions(pathActionsGroup->actions());
-
-    if (not pathComboBox->hasFocus()){  // in disp mode
-        pathComboBox->insertItem(0, fullpath);
-    }else{  // in edit mode, when return pressed it would auto append one text to the back
-        pathComboBox->insertItem(0, fullpath);
-        pathComboBox->removeItem(pathComboBox->count() - 1);
-    }
-}
-
-
-FocusEventWatch::FocusEventWatch(QObject *parent): mouseButtonPressedBefore(false)
-{
-    if (parent == nullptr){
-        qDebug("Focus Event not works for a nullptr.");
-        return;
-    }
-    parent->installEventFilter(this);
-}
-
-bool FocusEventWatch::eventFilter(QObject *watched, QEvent *event)
-{
-    if (event->type() == QEvent::Type::MouseButtonPress){
-        qDebug("MouseButtonPress");
-        mouseButtonPressedBefore = true;
-    }else if (event->type() == QEvent::Type::MouseButtonRelease){
-        ;
-    }
-    else if (event->type() == QEvent::Type::FocusOut){
-        if (not mouseButtonPressedBefore){  // block until next time focus out
-            qDebug("1");
-            emit focusChanged(false);
+auto AddressELineEdit::onPathActionTriggered(const QAction* clkAct)->void{
+    QString rawPath;
+    for(const auto* act: pathActionsGroup->actions()){
+        rawPath += (act->text() + '/');
+        if (act == clkAct){
+            break;
         }
-        qDebug("2");
-        mouseButtonPressedBefore = false;
     }
-    else if (event->type() == QEvent::Type::FocusIn){
-        if (not mouseButtonPressedBefore){  // block until next time focus out
-            qDebug("3");
-            emit focusChanged(true);
-        }
-        qDebug("4");
-        mouseButtonPressedBefore = false;
-    }
-    return QObject::eventFilter(watched, event);
+    QString fullPth = AddressELineEdit::PathProcess(rawPath);
+    qDebug("now[%s]", fullPth.toStdString().c_str());
+    onReturnPressed(fullPth);
 }
 
+auto AddressELineEdit::onFocusChange(bool hasFocus) -> void{
+    if (hasFocus){
+        inputMode();
+    }
+    else{
+        clickMode();
+    }
+}
 
+auto AddressELineEdit::clickMode()->void{
+    if (not pathActionsGroup->isVisible()){
+        pathActionsGroup->setVisible(true);
+    }
+    addressCBActH->setVisible(false);
+}
+
+auto AddressELineEdit::inputMode()->void{
+    pathActionsGroup->setVisible(false);
+    if (not addressCBActH->isVisible()){
+        addressCBActH->setVisible(true);
+    }
+}
+
+void AddressELineEdit::mousePressEvent(QMouseEvent *event){
+    emit pathComboBoxFocusWatcher->focusChanged(true);
+    pathLineEdit->setFocus();
+    pathLineEdit->selectAll();
+}
+
+void AddressELineEdit::keyPressEvent(QKeyEvent* e){
+    if (e->key() == Qt::Key_Escape){
+        emit pathComboBoxFocusWatcher->focusChanged(false);
+    }
+}
 
 //#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
