@@ -10,6 +10,7 @@ CONFIG += c++11
 SOURCES += \
     AddressELineEdit.cpp \
     ContentPane.cpp \
+    FileOperation/FileOperation.cpp \
     View/DragDropTableView.cpp \
     FileExplorerEvent.cpp \
     FileLeafAction.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
 HEADERS += \
     AddressELineEdit.h \
     ContentPane.h \
+    FileOperation/FileOperation.h \
     View/DragDropTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
