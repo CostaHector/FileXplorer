@@ -50,6 +50,7 @@ private slots:
     void test_touch_an_existed_folder_in_direct_path();
     void test_touch_an_existed_folder_in_relative_path();
 
+    void test_link_a_file();
 };
 
 
@@ -491,7 +492,30 @@ void FileOperationTest::test_touch_an_existed_folder_in_relative_path(){
     QVERIFY(QDir(TEST_DIR).exists("a/a1"));
 }
 
+void FileOperationTest::test_link_a_file(){
+    QVERIFY2(QDir(TEST_DIR).exists("a.txt"), "Precondition not required.");
 
-//QTEST_MAIN(FileOperationTest)
+    FileOperation::RETURN_TYPE retEle = FileOperation::link(TEST_DIR, "a.txt");
+    auto ret = retEle.first;
+    auto aBatch = retEle.second;
+
+    QCOMPARE(ret, ErrorCode::OK);
+
+    QVERIFY(QDir(TEST_DIR).exists("a.txt"));
+    QVERIFY(QDir(SystemPath::starredPath).exists("a.txt.lnk"));
+    QVERIFY(not aBatch.isEmpty());
+
+    QList<QStringList> srcCommand;
+    const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
+    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto recoverRet = exeRetEle.first;
+    QVERIFY(recoverRet);
+    QVERIFY(QDir(TEST_DIR).exists("a.txt"));
+    QVERIFY(not QDir(SystemPath::starredPath).exists("a.txt.lnk"));
+}
+
+
+
+QTEST_MAIN(FileOperationTest)
 
 #include "FileOperationTest.moc"

@@ -45,7 +45,7 @@ public:
 const OrderClass AscendingOrder{"AscendingOrder", Qt::SortOrder::AscendingOrder};
 const OrderClass DescendingOrder{"DescendingOrder", Qt::SortOrder::DescendingOrder};
 const QMap<QString, Qt::SortOrder> string2SortOrderEnumListTable={{AscendingOrder.name,AscendingOrder.value},
-                                                                  {DescendingOrder.name,DescendingOrder.value}};
+                                                                    {DescendingOrder.name,DescendingOrder.value}};
 const QStringList HEADERVIEW_SORT_INDICATOR_ORDER_STR = string2SortOrderEnumListTable.keys();
 QString SortOrderEnum2String(const Qt::SortOrder orderEnum);
 }
@@ -130,7 +130,6 @@ public:
     }
 };
 
-
 namespace MemoryKey {
 const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
 const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
@@ -146,4 +145,19 @@ const GVarStr HEARVIEW_SORT_INDICATOR_ORDER("HEARVIEW_SORT_INDICATOR_ORDER",
                                             HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR);
 const GVarInt ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, 8, 25);
 }
+
+
+#include <QDir>
+namespace SystemPath {
+const QString drivePath = "";
+const QString desktopPath = QDir(QDir::homePath()).absoluteFilePath("Desktop");
+const QString documentPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
+const QString downloadPath = QDir(QDir::homePath()).absoluteFilePath("Downloads");
+const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
+const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
+const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
+const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
+
+}
+
 #endif // PUBLICVARIABLE_H

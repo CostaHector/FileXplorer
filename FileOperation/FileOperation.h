@@ -32,12 +32,15 @@ constexpr int UNKNOWN_ERROR = -1;
 
 #include <functional>
 #include <QMap>
+#include <QDir>
+#include "PublicVariable.h"
 
 class FileOperation {
 public:
     using BATCH_COMMAND_LIST_TYPE = QList<QStringList>;
     using RETURN_TYPE = QPair<int, BATCH_COMMAND_LIST_TYPE>;
     using EXECUTE_RETURN_TYPE = QPair<bool, BATCH_COMMAND_LIST_TYPE>;
+
 
     static inline QPair<QString, QString> SplitDirName(const QString& fullPath){
         auto ind = fullPath.lastIndexOf('/');
@@ -318,7 +321,7 @@ public:
         const QString& pth = QDir(pre).absoluteFilePath(rel);
         QFile textFile(pth);
         if (textFile.exists()){
-                return {ErrorCode::OK, {}};  // after all it exists
+            return {ErrorCode::OK, {}};  // after all it exists
         }
         FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
         const QString& prePath = QFileInfo(pth).absolutePath();
@@ -372,48 +375,86 @@ public:
         }
         // in-place reverse
         return {failedCommandCnt == 0, QList<QStringList>(recoverList.crbegin(), recoverList.crend())};
-}
-    //        static inline auto link(const QString& pre, const QString& rel, const QString& to = SystemPath.starredPath) -> tuple[bool, BATCH_COMMAND_LIST_TYPE]:
-    //            const QString pth = QDir(pre).absoluteFilePath(rel)
-    //            if not QFile::exists(pth){
-    //                return {ErrorCode::SRC_INEXIST, {}};
-    //            if (not QDir(to).exists()){
-    //                return {ErrorCode::DST_DIR_INEXIST, {}};
-    //            toPath: str = QDir(to).absoluteFilePath(rel) + ".lnk"
-    //            toFile = QFile(toPath)
+    }
 
-    //            cmds: FileOperation::BATCH_COMMAND_LIST_TYPE = {}
-    //            if toFile.exists(){
-    //                if not QFile(toPath).moveToTrash(){
-    //                    return ErrorCode::CANNOT_REMOVE_FILE, cmds
-    //                cmds.append(("rename", "", toFile.fileName(), "", toPath))
 
-    //            prePath = QFileInfo(toPath).absolutePath()
-    //            if not QDir(prePath).exists(){
-    //                prePathRet = QDir().mkpath(prePath)
-    //                if not prePathRet:
-    //                    return ErrorCode::DST_PRE_DIR_CANNOT_MAKE, cmds
-    //                cmds.append(("rmpath", "", prePath))
+    static inline auto linkAgent(const QStringList& parms) -> RETURN_TYPE{
+        if (parms.size() != 2 and parms.size() != 3){
+            return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
+        }
+        const QString& pre = parms[0];
+        const QString& rel = parms[1];
+        if (parms.size() == 2){
+            return FileOperation::link(pre, rel);
+        }
+        const QString& to = parms[2];
+        return FileOperation::link(pre, rel, to);
+    }
 
-    //            if not QFile.link(pth, toPath){
-    //                return ErrorCode::CANNOT_MAKE_LINK, cmds
-    //            cmds.append(("unlink", pre, rel + ".lnk", to))
-    //            return ErrorCode::OK, cmds
-    //    }
-    //        static inline auto unlink(const QString& pre, const QString& rel, const QString& to = SystemPath.starredPath) -> bool:
-    //            cmds: FileOperation::BATCH_COMMAND_LIST_TYPE = {}
-    //            toPath = QDir(to).absoluteFilePath(rel)
-    //            if not QFile::exists(toPath){
-    //                return ErrorCode::OK, cmds  # after all it not exist
+    static inline auto link(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath) -> RETURN_TYPE{
+        const QString pth = QDir(pre).absoluteFilePath(rel);
+        if (not QFile::exists(pth)){
+            return {ErrorCode::SRC_INEXIST, {}};
+        }
+        if (not QDir(to).exists()){
+            return {ErrorCode::DST_DIR_INEXIST, {}};
+        }
+        QString toPath(QDir(to).absoluteFilePath(rel) + ".lnk");
+        QFile toFile(toPath);
 
-    //            ret = QDir().remove(toPath)
-    //            if not ret:
-    //                return ErrorCode::CANNOT_REMOVE_LINK, cmds
-    //            cmds.append(("link", pre, rel[:-4], to))  # move the trailing ".lnk"
-    //            return ErrorCode::OK, cmds
-    //    }
+        FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+        if (toFile.exists()){
+            if (not QFile(toPath).moveToTrash()){
+                return {ErrorCode::CANNOT_REMOVE_FILE, cmds};
+            }
+            cmds.append({"rename", "", toFile.fileName(), "", toPath});
+        }
 
-/*    LambdaTable: dict[
+        QString prePath(QFileInfo(toPath).absolutePath());
+        if (not QDir(prePath).exists()){
+            const auto prePathRet = QDir().mkpath(prePath);
+            if (not prePathRet){
+                return {ErrorCode::DST_PRE_DIR_CANNOT_MAKE, cmds};
+            }
+            cmds.append({"rmpath", "", prePath});
+        }
+        if (not QFile::link(pth, toPath)){
+            return {ErrorCode::CANNOT_MAKE_LINK, cmds};
+        }
+
+        cmds.append({"unlink", pre, rel + ".lnk", to});
+        return {ErrorCode::OK, cmds};
+    }
+
+    static inline auto unlinkAgent(const QStringList& parms) -> RETURN_TYPE{
+        if (parms.size() != 2 and parms.size() != 3){
+            return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
+        }
+        const QString& pre = parms[0];
+        const QString& rel = parms[1];
+        if (parms.size() == 2){
+            return FileOperation::unlink(pre, rel);
+        }
+        const QString& to = parms[2];
+        return FileOperation::unlink(pre, rel, to);
+    }
+
+    static inline auto unlink(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath) -> RETURN_TYPE{
+        FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+        QString toPath(QDir(to).absoluteFilePath(rel));
+        if (not QFile::exists(toPath)){
+            return {ErrorCode::OK, cmds};  // after all it not exist
+        }
+
+        const auto ret = QDir().remove(toPath);
+        if (not ret){
+            return {ErrorCode::CANNOT_REMOVE_LINK, cmds};
+        }
+        cmds.append({"link", pre, rel.left(rel.size()-4), to});  // move the trailing ".lnk"
+        return {ErrorCode::OK, cmds};
+    }
+
+    /*    LambdaTable: dict[
         str, Callable[[], tuple[ErrorCode, list[tuple]]]] = \
         {"rmfile": rmfile, "rmpath": rmpath, "rmdir": rmdir, "moveToTrash": moveToTrash,
          "touch": touch, "mkpath": mkpath,

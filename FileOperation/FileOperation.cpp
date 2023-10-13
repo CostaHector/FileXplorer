@@ -4,5 +4,6 @@ const QMap<QString, std::function<FileOperation::RETURN_TYPE(const QStringList&)
                                   {"rmdir",rmdirAgent}, {"moveToTrash",moveToTrashAgent},
                                   {"touch",touchAgent}, {"mkpath",mkpathAgent},
                                   {"rename",renameAgent},
-                                  {"cpfile",cpfileAgent}, {"cpdir",cpdirAgent}};
+                                  {"cpfile",cpfileAgent}, {"cpdir",cpdirAgent},
+                                  {"link", linkAgent}, {"unlink", unlinkAgent}};
 

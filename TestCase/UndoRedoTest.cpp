@@ -131,6 +131,6 @@ void UndoRedoTest::cleanupTestCase()
 }
 
 
-QTEST_MAIN(UndoRedoTest)
+//QTEST_MAIN(UndoRedoTest)
 
 #include "UndoRedoTest.moc"
