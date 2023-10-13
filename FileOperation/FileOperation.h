@@ -37,6 +37,8 @@ class FileOperation {
 public:
     using BATCH_COMMAND_LIST_TYPE = QList<QStringList>;
     using RETURN_TYPE = QPair<int, BATCH_COMMAND_LIST_TYPE>;
+    using EXECUTE_RETURN_TYPE = QPair<bool, BATCH_COMMAND_LIST_TYPE>;
+
     static inline QPair<QString, QString> SplitDirName(const QString& fullPath){
         auto ind = fullPath.lastIndexOf('/');
         if (ind == -1){
@@ -334,7 +336,7 @@ public:
         cmds.append({"rmfile", pre, rel});
         return {ErrorCode::OK, cmds};
     }
-    static auto executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) -> QPair<bool, BATCH_COMMAND_LIST_TYPE>{
+    static auto executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) -> EXECUTE_RETURN_TYPE{
         FileOperation::BATCH_COMMAND_LIST_TYPE recoverList;
         int failedCommandCnt = 0;
         for (int i=0; i<aBatch.size(); ++i){
