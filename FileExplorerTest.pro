@@ -7,10 +7,15 @@ TEMPLATE = app
 
 SOURCES += TestCase/SomeTestTemplate.cpp \
     FileOperation/FileOperation.cpp \
-    TestCase/FileOperationTest.cpp
+    PublicTool.cpp \
+    TestCase/FileOperationTest.cpp \
+    TestCase/UndoRedoTest.cpp \
+    UndoRedo.cpp
 
 HEADERS += \
-    FileOperation/FileOperation.h
+    FileOperation/FileOperation.h \
+    PublicTool.h \
+    UndoRedo.h
 
 DISTFILES += \
     FileOperation/test/FileOperationTestEnv/DONT_CHANGE/a.txt \
@@ -74,4 +79,5 @@ DISTFILES += \
     FileOperation/test/TextEnv_NameStringSectionSwapper/DONT_CHANGE/A-B-C.txt \
     FileOperation/test/TextEnv_NameStringSectionSwapper/DONT_CHANGE/A/A - B - C - D - 0.txt \
     FileOperation/test/TextEnv_NameStringSectionSwapper/DONT_CHANGE/A/A - B - C - D 1.txt \
-    FileOperation/test/TextEnv_NameStringSectionSwapper/DONT_CHANGE/A/A.txt
+    FileOperation/test/TextEnv_NameStringSectionSwapper/DONT_CHANGE/A/A.txt \
+    TestCase/test/TestEnv_UndoRedo/DONT_CHANGE/012.txt

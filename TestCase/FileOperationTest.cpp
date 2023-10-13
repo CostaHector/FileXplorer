@@ -5,48 +5,14 @@
 #include "FileOperation/FileOperation.h"
 
 #include <QFileInfo>
+#include "PublicTool.h"
 
 class FileOperationTest : public QObject
 {
     Q_OBJECT
 
 public:
-    static bool copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExist=false) {
-        QDir sourceDir(fromDir);
-        QDir targetDir(toDir);
-        if(!targetDir.exists()){    /* if directory don't exists, build it */
-            if(!targetDir.mkdir(targetDir.absolutePath()))
-                return false;
-        }
 
-        QFileInfoList fileInfoList = sourceDir.entryInfoList();
-        for(const QFileInfo& fileInfo:fileInfoList){
-            if(fileInfo.fileName() == "." || fileInfo.fileName() == "..")
-                continue;
-
-            if(fileInfo.isDir()){    /* if it is directory, copy recursively*/
-                if(copyDirectoryFiles(fileInfo.filePath(), targetDir.filePath(fileInfo.fileName()), coverFileIfExist)){
-                    continue;
-                }
-                return false;
-            }
-            /* if coverFileIfExist == true, remove old file first */
-
-            if (targetDir.exists(fileInfo.fileName())){
-                if(coverFileIfExist){
-                    targetDir.remove(fileInfo.fileName());
-                    qDebug("%s/%s is covered by file under [%s]", targetDir.absolutePath().toStdString().c_str(), fileInfo.fileName().toStdString().c_str(), fromDir.toStdString().c_str());
-                }else{
-                    qDebug("%s/[%s] was kept", targetDir.absolutePath().toStdString().c_str(), fileInfo.fileName().toStdString().c_str());
-                }
-            }
-            // files copy
-            if(!QFile::copy(fileInfo.filePath(), targetDir.filePath(fileInfo.fileName()))){
-                return false;
-            }
-        }
-        return true;
-    }
 
 private slots:
     void initTestCase();
@@ -63,7 +29,6 @@ private slots:
 
 
     void test_file_copy();
-
 
     void test_inexist_file_copy();
     void test_folder_copy_including_its_articles();
@@ -96,7 +61,7 @@ void FileOperationTest::init(){
     if (QDir(TEST_DIR).exists()){
         QDir(TEST_DIR).removeRecursively();
     }
-    auto ret = copyDirectoryFiles(TEST_SRC_DIR, TEST_DIR);
+    auto ret = PublicTool::copyDirectoryFiles(TEST_SRC_DIR, TEST_DIR);
     assert(ret); // should copied ok
 }
 void FileOperationTest::cleanup(){
@@ -139,10 +104,10 @@ void FileOperationTest::testSplitDirName()
 void FileOperationTest::test_file_remove()
 {
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
-    FileOperation::RETURN_TYPE retPr = FileOperation::rmfile(TEST_DIR, "a.txt");
-    QCOMPARE(retPr.first, ErrorCode::OK);
+    FileOperation::RETURN_TYPE retEle = FileOperation::rmfile(TEST_DIR, "a.txt");
+    QCOMPARE(retEle.first, ErrorCode::OK);
     QVERIFY(not QDir(TEST_DIR).exists("a.txt"));
-    QVERIFY(retPr.second.isEmpty());
+    QVERIFY(retEle.second.isEmpty());
 }
 
 void FileOperationTest::test_folder_remove() {
@@ -527,6 +492,6 @@ void FileOperationTest::test_touch_an_existed_folder_in_relative_path(){
 }
 
 
-QTEST_MAIN(FileOperationTest)
+//QTEST_MAIN(FileOperationTest)
 
 #include "FileOperationTest.moc"

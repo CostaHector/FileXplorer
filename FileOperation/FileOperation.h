@@ -371,7 +371,7 @@ public:
             qDebug("Above %d command(s) failed.", failedCommandCnt);
         }
         // in-place reverse
-        return {failedCommandCnt == 0, QList<QStringList>(recoverList.crend(), recoverList.crbegin())};
+        return {failedCommandCnt == 0, QList<QStringList>(recoverList.crbegin(), recoverList.crend())};
 }
     //        static inline auto link(const QString& pre, const QString& rel, const QString& to = SystemPath.starredPath) -> tuple[bool, BATCH_COMMAND_LIST_TYPE]:
     //            const QString pth = QDir(pre).absoluteFilePath(rel)

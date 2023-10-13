@@ -11,6 +11,7 @@ SOURCES += \
     AddressELineEdit.cpp \
     ContentPane.cpp \
     FileOperation/FileOperation.cpp \
+    PublicTool.cpp \
     View/DragDropTableView.cpp \
     FileExplorerEvent.cpp \
     FileLeafAction.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     AddressELineEdit.h \
     ContentPane.h \
     FileOperation/FileOperation.h \
+    PublicTool.h \
     View/DragDropTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
