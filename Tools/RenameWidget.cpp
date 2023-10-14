@@ -108,7 +108,7 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList &replaceeList) {
 }
 
 
-//#define __NAME__EQ__MAIN__ 1
+#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -121,14 +121,19 @@ int main(int argc, char *argv[]){
     RenameWidget_Replace winR;
     RenameWidget_Delete winD;
     RenameWidget_Numerize winN;
+    RenameWidget_Case winC;
+
     winI.init();
     winR.init();
     winD.init();
     winN.init();
+    winC.init();
+
     winI.InitTextContent(dir.absolutePath(), rels);
     winR.InitTextContent(dir.absolutePath(), rels);
     winD.InitTextContent(dir.absolutePath(), rels);
     winN.InitTextContent(dir.absolutePath(), rels);
+    winC.InitTextContent(dir.absolutePath(), rels);
     // winR.InitTextContent(pre, rels)
     // winD.InitTextContent(pre, rels)
     // winN.InitTextContent(pre, rels)
@@ -136,6 +141,7 @@ int main(int argc, char *argv[]){
     winR.show();
     winD.show();
     winN.show();
+    winC.show();
     return a.exec();
 }
 #endif
