@@ -8,6 +8,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Actions/FileBasicOperationsActions.cpp \
     Actions/RenameActions.cpp \
     AddressELineEdit.cpp \
     Component/StateLabel.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
     FileExplorerReadOnly.cpp
 
 HEADERS += \
+    Actions/FileBasicOperationsActions.h \
     Actions/RenameActions.h \
     AddressELineEdit.h \
     Component/StateLabel.h \

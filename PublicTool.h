@@ -22,7 +22,9 @@ public:
     static bool copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExist=false);
 };
 
+#include <QAction>
+#include <QActionGroup>
 
-
+auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction*;
 
 #endif // PUBLICTOOL_H

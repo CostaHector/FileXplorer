@@ -92,3 +92,16 @@ OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool
     }
     return {relToNames, completeNames, suffixs, isFiles};
 }
+
+
+auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction*{
+    if (ag == nullptr){
+        return nullptr;
+    }
+    for (QAction* act: ag->actions()){
+        if (act->text() == actionName){
+            return act;
+        }
+    }
+    return nullptr;
+}

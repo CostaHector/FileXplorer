@@ -144,6 +144,9 @@ const GVarStr HEARVIEW_SORT_INDICATOR_ORDER("HEARVIEW_SORT_INDICATOR_ORDER",
                                             HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
                                             HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR);
 const GVarInt ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, 8, 25);
+const GVarStr DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE", "Rename (ith)", {"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"});
+
+
 }
 
 
@@ -161,6 +164,11 @@ const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents")
 }
 
 extern const char* SUBMIT_BTN_STYLE;
+
+
+constexpr int TABS_ICON_IN_MENU_3x1 = 16;
+constexpr int TABS_ICON_IN_MENU_2x1 = 24;
+constexpr int TABS_ICON_IN_MENU_1x1 = 48;
 
 
 #endif // PUBLICVARIABLE_H

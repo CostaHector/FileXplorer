@@ -107,8 +107,85 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList &replaceeList) {
     return numerizedNames;
 }
 
+auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList{
+    if (replaceeList.isEmpty()){
+        return replaceeList;
+    }
+    QAction* caseAct = caseAG->checkedAction();
+    if (caseAct == nullptr){
+        return replaceeList;
+    }
+    QStringList replacedList;
+    if (TRAILING_UNDERLINE->checkState() == Qt::Checked) {
+        if (caseAct->text() == "Upper"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(nm.toUpper()+" ");
+            }
+        } else if (caseAct->text() == "Lower"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(nm.toLower()+" ");
+            }
+        } else if (caseAct->text() == "Capitalize weak"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(capitalise_each_word(nm)+" ");
+            }
+        } else if (caseAct->text() == "Capitalize strong"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(capitalise_each_word(nm)+" ");
+            }
+        } else if (caseAct->text() == "Swapcase"){
+            return replacedList;
+        }
+    }else{
+        if (caseAct->text() == "Upper"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(nm.trimmed());
+            }
+        } else if (caseAct->text() == "Lower"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(nm.trimmed());
+            }
+        } else if (caseAct->text() == "Capitalize weak"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(nm.trimmed());
+            }
+        } else if (caseAct->text() == "Capitalize strong"){
+            for(const QString& nm: replaceeList){
+                replacedList.append(nm.trimmed());
+            }
+        } else if (caseAct->text() == "Swapcase"){
+            return replacedList;
+        }
+    }
+    return replacedList;
+}
 
-#define __NAME__EQ__MAIN__ 1
+auto RenameWidget_SwapSection::RenameCore(const QStringList& replaceeList) -> QStringList{
+    if (replaceeList.isEmpty()){
+        return replaceeList;
+    }
+    QAction* caseAct = caseAG->checkedAction();
+    if (caseAct == nullptr) {
+        return replaceeList;
+    }
+    int f = caseAct->text().left(1).toInt();
+    int s = caseAct->text().right(1).toInt();
+    QStringList sectionSwapped;
+    for (const QString nm: replaceeList){
+        QStringList secList = nm.split('-');
+        if (secList.size() > s){  // swap element at f, s index;
+            std::swap(secList[f], secList[s]);
+            sectionSwapped.append(secList.join('-'));
+        }
+        else{
+            sectionSwapped.append(nm);
+        }
+    }
+    return sectionSwapped;
+}
+
+
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

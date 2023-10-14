@@ -529,59 +529,56 @@ public:
         return words.join(" ");
     }
 
-    auto RenameCore(const QStringList& replaceeList) -> QStringList override{
-        if (replaceeList.isEmpty()){
-            return replaceeList;
-        }
-        QAction* caseAct = caseAG->checkedAction();
-        if (caseAct == nullptr){
-            return replaceeList;
-        }
-        QStringList replacedList;
-        if (TRAILING_UNDERLINE->checkState() == Qt::Checked) {
-            if (caseAct->text() == "Upper"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(nm.toUpper()+" ");
-                }
-            } else if (caseAct->text() == "Lower"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(nm.toLower()+" ");
-                }
-            } else if (caseAct->text() == "Capitalize weak"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(capitalise_each_word(nm)+" ");
-                }
-            } else if (caseAct->text() == "Capitalize strong"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(capitalise_each_word(nm)+" ");
-                }
-            } else if (caseAct->text() == "Swapcase"){
-                return replacedList;
-            }
-        }else{
-            if (caseAct->text() == "Upper"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(nm.trimmed());
-                }
-            } else if (caseAct->text() == "Lower"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(nm.trimmed());
-                }
-            } else if (caseAct->text() == "Capitalize weak"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(nm.trimmed());
-                }
-            } else if (caseAct->text() == "Capitalize strong"){
-                for(const QString& nm: replaceeList){
-                    replacedList.append(nm.trimmed());
-                }
-            } else if (caseAct->text() == "Swapcase"){
-                return replacedList;
-            }
-        }
-        return replacedList;
-    }
+    auto RenameCore(const QStringList& replaceeList) -> QStringList override;
 };
+
+class RenameWidget_SwapSection: public RenameWidget{
+public:
+    QToolBar* swapTB;
+    QActionGroup* caseAG;
+
+    explicit RenameWidget_SwapSection(QWidget* parent = nullptr): RenameWidget(parent),
+        swapTB(new QToolBar), caseAG(new QActionGroup(this)){
+        includingSuffix->setChecked(false);
+    }
+    auto InitExtraCommonVariable() -> void override{
+        windowTitleFormat = "Swap section name string | %1 item(s) under [%2]";
+        setWindowTitle(windowTitleFormat);
+        setWindowIcon(QIcon(":/themes/NAME_STR_SWAPPER_PATH"));
+    }
+    auto InitControlTB() -> QToolBar* override{
+        QToolBar* replaceControl(new QToolBar);
+        replaceControl->addWidget(new QLabel("Swap:"));
+        replaceControl->addWidget(swapTB);
+        replaceControl->addSeparator();
+        replaceControl->addWidget(includingSub);
+        return replaceControl;
+    }
+    auto extraSubscribe() -> void override{
+        connect(swapTB, &QToolBar::actionTriggered, this, &RenameWidget::OnlyTriggerRenameCore);
+    }
+    auto InitExtraMemberWidget() -> void{
+        QAction* section12 = new QAction("1 <> 2");
+        QAction* section23 = new QAction("2 <> 3");
+        QAction* section01 = new QAction("0 <> 1");
+
+
+        caseAG->addAction(section12);
+        caseAG->addAction(section23);
+        caseAG->addAction(section01);
+
+        caseAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
+        for (QAction* act:caseAG->actions()){
+            act->setCheckable(true);
+        }
+        section12->setChecked(true);
+
+        swapTB->addActions(caseAG->actions());
+        swapTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    }
+    auto RenameCore(const QStringList& replaceeList) -> QStringList override;
+};
+
 
 
 #endif // RENAMEWIDGET_H
