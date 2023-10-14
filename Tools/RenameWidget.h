@@ -478,4 +478,91 @@ public:
     }
     auto RenameCore(const QStringList& replaceeList) -> QStringList override;
 };
+
+//class RenameWidget_Case: public RenameWidget{
+//public:
+//    explicit RenameWidget_Case(QWidget* parent = nullptr):RenameWidget(parent){
+//        if not g_renameAg{
+//            g_renameAg.InitActGroup();
+
+//}
+//    auto InitExtraCommonVariable() -> void override{
+//        windowTitleFormat = "Case name string | %1 item(s) under [%2]";
+//        setWindowTitle(windowTitleFormat);
+//        setWindowIcon(QIcon(":/themes/NAME_STR_CASE"));
+//}
+//    auto InitControlTB() -> QToolBar* override{
+//        QToolBar* replaceControl(new QToolBar);
+//        replaceControl->addWidget(new QLabel("Case:"));
+//        replaceControl->addWidget(caseTB);
+//        replaceControl->addSeparator();
+//        replaceControl->addWidget(includingSuffix);
+//        replaceControl->addWidget(includingSub);
+//        return replaceControl;
+//}
+//    auto extraSubscribe() -> void override{
+//        caseTB.actionTriggered[QAction].connect(OnlyTriggerRenameCore);
+//        TRAILING_UNDERLINE.stateChanged[int].connect(OnlyTriggerRenameCore);
+//}
+//    auto InitExtraMemberWidget(self) -> void{
+//        caseAG = g_renameAg.NAME_CASE;
+
+//        TRAILING_UNDERLINE = QCheckBox(text="Trailing underline (append or rstrip)");
+//        TRAILING_UNDERLINE.setToolTip("In Windows system, file/folder name is <b>case-insensitive</b>.");
+//        TRAILING_UNDERLINE.setChecked(True);
+
+//        caseTB = QToolBar();
+//        caseTB.addActions(caseAG->actions());
+//        caseTB.addSeparator();
+//        caseTB.addWidget(TRAILING_UNDERLINE);
+//        caseTB.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred);
+//        return;
+
+//    FIRST_LETTER_OF_EACH_WORD_COMP = re.compile("(^|\s)(\S)");
+//}
+//    auto RenameCore(const QStringList& replaceeList) -> QStringList override{
+//        if not replaceeList{
+//            return replaceeList;
+//        caseAct: QAction = caseAG->checkedAction();
+//        if caseAct is None{
+//            return replaceeList;
+//        }
+//        auto convert_into_uppercase(sentence){
+//            return sentence.group(1) + sentence.group(2).upper();
+//        }
+
+//        if (TRAILING_UNDERLINE.checkState() == Qt::Checked) {
+//            if caseAct.text() == "Upper"{
+//                return [nm.upper() + '_' for nm in replaceeList];
+//            } else if (caseAct.text() == "Lower"){
+//                return [nm.lower() + '_' for nm in replaceeList];
+//            } else if (caseAct.text() == "Capitalize weak"){
+//                return [RenameWidget_Case.FIRST_LETTER_OF_EACH_WORD_COMP.sub(convert_into_uppercase, sen) + '_' for sen in replaceeList];
+//            } else if (caseAct.text() == "Capitalize strong"){
+//                return [nm.capitalize() + '_' for nm in replaceeList];
+//            } else if (caseAct.text() == "Swapcase"){
+//                return [nm.swapcase() + '_' for nm in replaceeList];
+//        else{
+//            if (caseAct.text() == "Upper"){
+//                return [nm.upper().rstrip('_') for nm in replaceeList];
+//            } else if (caseAct.text() == "Lower"{
+//                return [nm.lower().rstrip('_') for nm in replaceeList];
+//            } else if (caseAct.text() == "Capitalize weak"{
+//                return [RenameWidget_Case.FIRST_LETTER_OF_EACH_WORD_COMP.sub(convert_into_uppercase, sen).rstrip('_') for sen in replaceeList];
+//            } else if (caseAct.text() == "Capitalize strong"{
+//                return [nm.capitalize().rstrip('_') for nm in replaceeList];
+//            } else if (caseAct.text() == "Swapcase"{
+//                return [nm.swapcase().rstrip('_') for nm in replaceeList];
+//        return replaceeList;
+//}
+//    auto PushPopTrailingDot(trailDot: Qt::CheckState) -> QStringList override{
+//        newCompleteNames: list[str] = newCompleteName.toPlainText().split(sep='\n');
+//        if trailDot == Qt::Checked{
+//            return [new + '_' for new in newCompleteNames];
+//        }else{
+//            return [new[:-1] for new in newCompleteNames];
+//            }
+//}
+
+
 #endif // RENAMEWIDGET_H

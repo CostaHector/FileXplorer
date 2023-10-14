@@ -8,7 +8,7 @@
 
 #include "ContentPane.h"
 #include "NavigationToolBar.h"
-#include "OfficeStyleMenu.h"
+#include "RibbonMenu.h"
 class FileExplorerReadOnly : public QMainWindow
 {
     Q_OBJECT
@@ -28,6 +28,6 @@ public:
     FolderPreviewWidget* previewWidget;
     ContentPane* explorerCentralWidget;
     NavigationToolBar* _navigationToolBar;
-    OfficeStyleMenu* osm;
+    RibbonMenu* osm;
 };
 #endif // FILEEXPLORERREADONLY_H

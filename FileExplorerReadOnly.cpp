@@ -31,7 +31,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(QWidget *parent, const QString& initi
       previewWidget(new FolderPreviewWidget),
       explorerCentralWidget(nullptr),
       _navigationToolBar(new NavigationToolBar),
-      osm(new OfficeStyleMenu)
+    osm(new RibbonMenu)
 {
     const QString& defaultPath = ReadSettings(initialPath);
     explorerCentralWidget = new ContentPane(nullptr, defaultPath, previewHtml, previewWidget);

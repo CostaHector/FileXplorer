@@ -1,6 +1,6 @@
-#include "OfficeStyleMenu.h"
+#include "RibbonMenu.h"
 
-OfficeStyleMenu::OfficeStyleMenu():
+RibbonMenu::RibbonMenu():
     leafFileWid(LeafFile()),
     leafHomeWid(LeafHome()),
     leafShareWid(LeafShare()),
@@ -18,7 +18,7 @@ OfficeStyleMenu::OfficeStyleMenu():
     setCurrentWidget(leafFileWid);
 }
 #include "FileLeafAction.h"
-QToolBar *OfficeStyleMenu::LeafFile() const
+QToolBar *RibbonMenu::LeafFile() const
 {
     QToolBar* leafFileWid(new QToolBar);
     leafFileWid->addActions(FileLeafAction::ag()->actions());
@@ -26,27 +26,27 @@ QToolBar *OfficeStyleMenu::LeafFile() const
     return leafFileWid;
 }
 
-QToolBar *OfficeStyleMenu::LeafHome() const
+QToolBar *RibbonMenu::LeafHome() const
 {
     return new QToolBar();
 }
 
-QToolBar *OfficeStyleMenu::LeafShare() const
+QToolBar *RibbonMenu::LeafShare() const
 {
     return new QToolBar();
 }
 
-QToolBar *OfficeStyleMenu::LeafView() const
+QToolBar *RibbonMenu::LeafView() const
 {
     return new QToolBar();
 }
 
-QToolBar *OfficeStyleMenu::LeafDatabase() const
+QToolBar *RibbonMenu::LeafDatabase() const
 {
     return new QToolBar();
 }
 
-QToolBar *OfficeStyleMenu::LeafMediaTools() const
+QToolBar *RibbonMenu::LeafMediaTools() const
 {
     return new QToolBar();
 }

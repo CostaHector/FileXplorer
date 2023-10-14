@@ -8,12 +8,14 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Actions/RenameActions.cpp \
     AddressELineEdit.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPane.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
+    RibbonMenu.cpp \
     Tools/RenameWidget.cpp \
     UndoRedo.cpp \
     View/DragDropTableView.cpp \
@@ -31,7 +33,6 @@ SOURCES += \
     MyQFileSystemModel.cpp \
     NavigationAndAddressBar.cpp \
     NavigationToolBar.cpp \
-    OfficeStyleMenu.cpp \
     PathUndoRedoer.cpp \
     PublicVariable.cpp \
     RightClickableToolBar.cpp \
@@ -39,12 +40,14 @@ SOURCES += \
     FileExplorerReadOnly.cpp
 
 HEADERS += \
+    Actions/RenameActions.h \
     AddressELineEdit.h \
     Component/StateLabel.h \
     Component/Toaster.h \
     ContentPane.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
+    RibbonMenu.h \
     Tools/RenameWidget.h \
     UndoRedo.h \
     View/DragDropTableView.h \
@@ -63,7 +66,6 @@ HEADERS += \
     MyQFileSystemModel.h \
     NavigationAndAddressBar.h \
     NavigationToolBar.h \
-    OfficeStyleMenu.h \
     PathUndoRedoer.h \
     PublicVariable.h \
     RightClickableToolBar.h

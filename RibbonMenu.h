@@ -1,13 +1,13 @@
-#ifndef OFFICESTYLEMENU_H
-#define OFFICESTYLEMENU_H
+#ifndef RIBBONMENU_H
+#define RIBBONMENU_H
 
 #include <QTabWidget>
 #include <QToolBar>
 
-class OfficeStyleMenu : public QTabWidget
+class RibbonMenu : public QTabWidget
 {
 public:
-    OfficeStyleMenu();
+    RibbonMenu();
     QToolBar* LeafFile()const;
     QToolBar* LeafHome()const;
     QToolBar* LeafShare()const;
@@ -23,4 +23,4 @@ private:
     QToolBar* leafMediaWid;
 };
 
-#endif // OFFICESTYLEMENU_H
+#endif // RIBBONMENU_H
