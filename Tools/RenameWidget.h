@@ -21,6 +21,9 @@
 
 #include "Component/StateLabel.h"
 #include "Component/Toaster.h"
+#include "UndoRedo.h"
+
+UndoRedo& UndoRedoIns();
 
 class RenameWidget : public QDialog
 {
@@ -204,8 +207,11 @@ public:
         }
 
         // skip mediate tempR;
-        QList<QStringList> cmds;
+        FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
         for (int i = 0; i < olds.size(); ++i){
+            if (olds[i] == news[i]){
+                continue;
+            }
             cmds.append({"rename", pre, olds[i], pre, news[i]});
         }
 
@@ -220,16 +226,16 @@ public:
             te->show();
             return true;
         }
-        return true;
-        //                bool isAllSuccess = g_undoRedo.Do(cmds);
-        //                if (isInterative) {
-        //                    if (isAllSuccess) {
-        //                        close();
-        //                        (new Toaster(this, QString("%1 command(s).").arg(cmds.size())), isAllSuccess))->exec_();
-        //                }
-        //                return isAllSuccess;
+        bool isAllSuccess = g_UndoRedo.Do(cmds);
+        if (isInterative) {
+            if (isAllSuccess) {
+                (new Toaster(this, QString("%1 command(s).").arg(cmds.size()), isAllSuccess))->exec();
+            }
+        }
+        close();
+        return isAllSuccess;
     }
-    auto onRegex(const Qt::CheckState regexState) -> void{
+    auto onRegex(const int regexState) -> void{
         // regexState;
         OnlyTriggerRenameCore();
     }
@@ -256,7 +262,7 @@ public:
         const auto& suffixs = osWalkerRet.suffixs;
         isFiles = osWalkerRet.isFiles;
 
-        setWindowTitle(windowTitleFormat.arg(pre).arg(completeNames.size()));
+        setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(pre));
 
         relName->setPlainText(relToNames.join('\n'));
 
@@ -339,29 +345,137 @@ public:
         insertAtCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
         insertAtCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
     }
-    auto RenameCore(const QStringList& replaceeList) -> QStringList override{
-        if (replaceeList.isEmpty()){
-            return replaceeList;
-        }
-        const QString& insertString = insertStr->text();
-        if (insertString.isEmpty()){
-            return replaceeList;
-        }
-        const QString& insertAtStr = insertAt->text();
+    auto RenameCore(const QStringList& replaceeList) -> QStringList override;
+};
 
-        bool isInt=false;
-        int insertAt = insertAtStr.toInt(&isInt);
-        if (not isInt){
-            qDebug("insert index is not number[%s]", insertAtStr.toStdString().c_str());
-            return replaceeList;
-        }
 
-        QStringList afterInsert;
-        for(const QString& replacee: replaceeList){
-            int realInsertAt = (insertAt > replacee.size())? replacee.size():insertAt;
-            afterInsert.append(replacee.left(realInsertAt) + insertString + replacee.mid(realInsertAt));
-        }
-        return afterInsert;
+class RenameWidget_Replace: public RenameWidget{
+public:
+    QLineEdit* oldStr;
+    QComboBox* oldStrCB;
+    QLineEdit* newStr;
+    QComboBox* newStrCB;
+    QCheckBox* regex;
+    RenameWidget_Replace(QWidget* parent = nullptr):RenameWidget(parent),
+        oldStr(new QLineEdit),
+        oldStrCB(new QComboBox),
+        newStr(new QLineEdit),
+        newStrCB(new QComboBox),
+        regex(new QCheckBox("Regex")) {
     }
+
+
+    auto InitExtraCommonVariable() -> void override{
+        windowTitleFormat = QString("Replace name string | %1 item(s) under [%2]");
+        setWindowTitle(windowTitleFormat);
+        setWindowIcon(QIcon(":/themes/NAME_STR_REPLACER_PATH"));
+    }
+
+    auto InitControlTB() -> QToolBar* override{
+        QToolBar* replaceControl = new QToolBar;
+        replaceControl->addWidget(new QLabel("Old:"));
+        replaceControl->addWidget(oldStrCB);
+        replaceControl->addWidget(new QLabel("New:"));
+        replaceControl->addWidget(newStrCB);
+        replaceControl->addSeparator();
+        replaceControl->addWidget(regex);
+        replaceControl->addWidget(includingSuffix);
+        replaceControl->addWidget(includingSub);
+        replaceControl->addSeparator();
+        replaceControl->addWidget(regexValidLabel);
+        return replaceControl;
+    }
+    auto extraSubscribe() -> void override {
+        connect(oldStr, &QLineEdit::textChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
+        connect(regex, &QCheckBox::stateChanged, this, &RenameWidget_Replace::onRegex);
+        connect(newStr, &QLineEdit::textChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
+    }
+
+    auto InitExtraMemberWidget() -> void override{
+        oldStrCB->addItems({" BB ", " BB", " - 1080p", " - 4K", " - FHD", " - UHD"});
+        oldStrCB->setLineEdit(oldStr);
+        oldStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
+        oldStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+        oldStr->selectAll();
+
+        newStrCB->addItems({" ", "", " - 1080p"});
+        newStrCB->setLineEdit(newStr);
+        newStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+        newStr->selectAll();
+
+        regex->setToolTip("Regular expression enable switch");
+    }
+
+    auto RenameCore(const QStringList& replaceeList) -> QStringList override;
+};
+
+
+
+class RenameWidget_Delete: public RenameWidget_Replace{
+public:
+    RenameWidget_Delete(QWidget* parent = nullptr):RenameWidget_Replace(parent){
+        newStr->setText("");
+        newStrCB->setEnabled(false);
+        newStrCB->setToolTip("New str is identically equal to empty str");
+    }
+
+    auto InitExtraCommonVariable() -> void override{
+        windowTitleFormat = "Delete name string | %1 item(s) under [%2]";
+        setWindowTitle(windowTitleFormat);
+        setWindowIcon(QIcon(":/themes/NAME_STR_DELETER_PATH"));
+    }
+    auto extraSubscribe() -> void override{
+        connect(oldStr, &QLineEdit::textChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
+        connect(regex, &QCheckBox::stateChanged, this, &RenameWidget_Replace::onRegex);
+    }
+    auto InitControlTB() -> QToolBar* override{
+        QToolBar* replaceControl(new QToolBar);
+        replaceControl->addWidget(new QLabel("Old:"));
+        replaceControl->addWidget(oldStrCB);
+        replaceControl->addSeparator();
+        replaceControl->addWidget(regex);
+        replaceControl->addWidget(includingSuffix);
+        replaceControl->addWidget(includingSub);
+        replaceControl->addSeparator();
+        replaceControl->addWidget(regexValidLabel);
+        return replaceControl;
+    }
+};
+
+
+class RenameWidget_Numerize: public RenameWidget{
+public:
+    QLineEdit* startNo;
+    QLineEdit* completeBaseName;
+
+    explicit RenameWidget_Numerize(QWidget* parent = nullptr):RenameWidget(parent),
+        startNo(new QLineEdit("0")),
+        completeBaseName(new QLineEdit)
+    {
+        includingSuffix->setChecked(false);
+        includingSub->setChecked(false);
+    }
+    auto InitExtraCommonVariable() -> void override{
+        windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
+        setWindowTitle(windowTitleFormat);
+        setWindowIcon(QIcon(":/themes/NAME_STR_NUMERIZER_PATH"));
+    }
+    auto InitControlTB() -> QToolBar* override{
+        QToolBar* replaceControl(new QToolBar);
+        replaceControl->addWidget(new QLabel("Complete base name"));
+        replaceControl->addWidget(completeBaseName);
+        replaceControl->addWidget(new QLabel("Start No:"));
+        replaceControl->addWidget(startNo);
+        return replaceControl;
+    }
+    auto extraSubscribe() -> void override{
+        connect(startNo, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
+        connect(completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
+    }
+    auto InitExtraMemberWidget() -> void{
+        QLineEdit* startNo(new QLineEdit("0"));
+        QLineEdit* completeBaseName(new QLineEdit);
+    }
+    auto RenameCore(const QStringList& replaceeList) -> QStringList override;
 };
 #endif // RENAMEWIDGET_H

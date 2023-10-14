@@ -7,8 +7,10 @@ public:
     FileOperation::BATCH_COMMAND_LIST_TYPE doCmd;
     FileOperation::BATCH_COMMAND_LIST_TYPE recoverCmd;
 };
+
 #include<QStack>
 #include<QPair>
+
 class UndoRedo {
 public:
     using UNDO_REDO_RETURN = QPair<bool, OperationStream>;
@@ -61,9 +63,9 @@ public:
         redoList.swap(emptyRedoList);
     }
 
-
     QStack<OperationStream> undoList;
     QStack<OperationStream> redoList;
 };
 
+extern UndoRedo g_UndoRedo;
 #endif // UNDOREDO_H

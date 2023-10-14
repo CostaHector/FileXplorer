@@ -15,6 +15,7 @@ SOURCES += \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     Tools/RenameWidget.cpp \
+    UndoRedo.cpp \
     View/DragDropTableView.cpp \
     FileExplorerEvent.cpp \
     FileLeafAction.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     FileOperation/FileOperation.h \
     PublicTool.h \
     Tools/RenameWidget.h \
+    UndoRedo.h \
     View/DragDropTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
