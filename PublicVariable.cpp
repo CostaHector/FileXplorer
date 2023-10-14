@@ -31,3 +31,15 @@ QString SortOrderEnum2String(const Qt::SortOrder orderEnum){
 }
 }
 
+const char* SUBMIT_BTN_STYLE=
+    "QPushButton{"
+    "    color: #fff;"
+    "    background-color: DodgerBlue;"
+    "    border-color: DodgerBlue;"
+    "}"
+    "QPushButton:hover {"
+    "    color: #fff;"
+    "    background-color: rgb(36, 118, 199);"
+    "    border-color: rgb(36, 118, 199);"
+    "}";
+

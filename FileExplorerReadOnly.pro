@@ -9,9 +9,12 @@ CONFIG += c++11
 
 SOURCES += \
     AddressELineEdit.cpp \
+    Component/StateLabel.cpp \
+    Component/Toaster.cpp \
     ContentPane.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
+    Tools/RenameWidget.cpp \
     View/DragDropTableView.cpp \
     FileExplorerEvent.cpp \
     FileLeafAction.cpp \
@@ -36,9 +39,12 @@ SOURCES += \
 
 HEADERS += \
     AddressELineEdit.h \
+    Component/StateLabel.h \
+    Component/Toaster.h \
     ContentPane.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
+    Tools/RenameWidget.h \
     View/DragDropTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \

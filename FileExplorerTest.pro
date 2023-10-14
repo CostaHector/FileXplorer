@@ -4,13 +4,15 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
-
-SOURCES += TestCase/SomeTestTemplate.cpp \
+SOURCES += \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
+    TestCase/QStringFunctionTest.cpp \
+    TestCase/RenameWidgetTest.cpp \
     TestCase/FileOperationTest.cpp \
     TestCase/UndoRedoTest.cpp \
     UndoRedo.cpp
+
 
 HEADERS += \
     FileOperation/FileOperation.h \

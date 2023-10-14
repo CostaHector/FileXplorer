@@ -160,4 +160,7 @@ const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents")
 
 }
 
+extern const char* SUBMIT_BTN_STYLE;
+
+
 #endif // PUBLICVARIABLE_H

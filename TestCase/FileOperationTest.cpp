@@ -537,6 +537,6 @@ void FileOperationTest::test_link_a_relative_file(){
     QVERIFY(not QDir(SystemPath::starredPath).exists("a/a1.txt.lnk"));
 }
 
-QTEST_MAIN(FileOperationTest)
+//QTEST_MAIN(FileOperationTest)
 
 #include "FileOperationTest.moc"
