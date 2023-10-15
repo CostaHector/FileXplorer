@@ -5,9 +5,6 @@
 #include <QString>
 
 #include "FolderPreviewComponent/FolderListView.h"
-#include "FolderPreviewComponent/VideosListPreview.h"
-#include "FolderPreviewComponent/ImagesListPreview.h"
-#include "FolderPreviewComponent/OtherItemsListPreview.h"
 
 class FolderPreviewWidget : public QWidget
 {

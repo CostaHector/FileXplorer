@@ -9,7 +9,7 @@
 #include <QTabBar>
 
 RibbonMenu::RibbonMenu():
-    framelessTB(InitFramelessToolBar()),
+    menuRibbonCornerWid(GetMenuRibbonCornerWid()),
     leafFileWid(LeafFile()),
     leafHomeWid(LeafHome()),
     leafShareWid(LeafShare()),
@@ -24,24 +24,26 @@ RibbonMenu::RibbonMenu():
     addTab(leafDatabaseWid, "&Database");
     addTab(leafMediaWid, "&Media");
 
-    setCornerWidget(framelessTB, Qt::Corner::TopRightCorner);
+    setCornerWidget(menuRibbonCornerWid, Qt::Corner::TopRightCorner);
     setCurrentWidget(leafFileWid);
 
     Subscribe();
 
 }
 
-QToolBar *RibbonMenu::InitFramelessToolBar(QWidget *attached) {
-    QToolBar* framelessTB = new QToolBar("Frameless window menu bar", attached);
-    framelessTB->addAction(g_framelessWindowAg()._EXPAND_RIBBONS);
-    framelessTB->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
-    return framelessTB;
+QToolBar *RibbonMenu::GetMenuRibbonCornerWid(QWidget *attached) {
+    QToolBar* menuRibbonCornerWid = new QToolBar("Frameless window menu bar", attached);
+    menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+    menuRibbonCornerWid->addSeparator();
+    menuRibbonCornerWid->addAction(g_framelessWindowAg()._EXPAND_RIBBONS);
+    menuRibbonCornerWid->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    return menuRibbonCornerWid;
 }
-#include "FileLeafAction.h"
+#include "Actions/FileLeafAction.h"
 QToolBar *RibbonMenu::LeafFile() const
 {
     QToolBar* leafFileWid(new QToolBar);
-    leafFileWid->addActions(FileLeafAction::ag()->actions());
+    leafFileWid->addActions(g_fileLeafActions().LEAF_FILE->actions());
     leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
     return leafFileWid;
 }
@@ -242,7 +244,7 @@ public:
 };
 
 
-#define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

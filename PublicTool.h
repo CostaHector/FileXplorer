@@ -3,7 +3,9 @@
 
 #include <QString>
 #include <QFileInfo>
-
+#include <QAction>
+#include <QActionGroup>
+#include <QLayout>
 
 class OSWalker_RETURN{
 public:
@@ -21,10 +23,6 @@ public:
 
     static bool copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExist=false);
 };
-
-#include <QAction>
-#include <QActionGroup>
-#include <QLayout>
 
 auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction*;
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);

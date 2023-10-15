@@ -1,4 +1,9 @@
 #include "FolderPreviewWidget.h"
+
+#include "FolderPreviewComponent/VideosListPreview.h"
+#include "FolderPreviewComponent/ImagesListPreview.h"
+#include "FolderPreviewComponent/OtherItemsListPreview.h"
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
@@ -7,6 +12,7 @@
 
 #include <QMenu>
 #include "PublicVariable.h"
+
 
 FolderPreviewWidget::FolderPreviewWidget(QWidget* parent) :
     QWidget(parent),
@@ -38,7 +44,6 @@ FolderPreviewWidget::FolderPreviewWidget(QWidget* parent) :
 
 bool FolderPreviewWidget::operator()(const QString &path){
     if (not QFileInfo(path).isDir()){
-        qDebug("path [%s] not exist", path.toStdString().c_str());
         return true;
     }
     (*m_vidsPreview)(path);

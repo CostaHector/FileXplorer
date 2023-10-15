@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2023-10-14T20:09:52. -->
+<!-- Written by QtCreator 11.0.2, 2023-10-15T18:21:07. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -69,10 +69,6 @@
     <value type="bool" key="AutoTest.Framework.QtTest">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="AutoTest.CheckStates">
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/FileOperationTest.cpp:cleanup">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/FileOperationTest.cpp:cleanupTestCase">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/FileOperationTest.cpp:init">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/FileOperationTest.cpp:initTestCase">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/QStringFunctionTest.cpp:cleanupTestCase">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/QStringFunctionTest.cpp:initTestCase">Unchecked</value>
    </valuemap>
@@ -114,7 +110,7 @@
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
-      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">true</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
       <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
      </valuemap>
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">

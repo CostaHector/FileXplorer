@@ -73,7 +73,7 @@ auto ContentPane::on_searchTextChanged(const QString& targetStr)->bool{
         fileSysModel->setNameFilters({});
         return true;
     }
-    qDebug("*[%s]*", targetStr.toStdString().c_str());
+    qDebug("search pattern: [*%s*].", targetStr.toStdString().c_str());
     fileSysModel->setNameFilters({"*"+targetStr+"*"});
     return true;
 }

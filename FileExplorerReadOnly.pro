@@ -11,6 +11,7 @@ SOURCES += \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/RenameActions.cpp \
+    Actions/FileLeafAction.cpp \
     AddressELineEdit.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
@@ -18,11 +19,11 @@ SOURCES += \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
+    Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
     UndoRedo.cpp \
     View/DragDropTableView.cpp \
     FileExplorerEvent.cpp \
-    FileLeafAction.cpp \
     FolderPreviewComponent/FolderListView.cpp \
     FolderPreviewComponent/ImagesFileSystemModel.cpp \
     FolderPreviewComponent/ImagesListPreview.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
     Actions/RenameActions.h \
+    Actions/FileLeafAction.h \
     AddressELineEdit.h \
     Component/StateLabel.h \
     Component/Toaster.h \
@@ -52,12 +54,12 @@ HEADERS += \
     FileOperation/FileOperation.h \
     PublicTool.h \
     RibbonMenu.h \
+    Tools/PlayVideo.h \
     Tools/RenameWidget.h \
     UndoRedo.h \
     View/DragDropTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
-    FileLeafAction.h \
     FolderPreviewComponent/FolderListView.h \
     FolderPreviewComponent/ImagesFileSystemModel.h \
     FolderPreviewComponent/ImagesListPreview.h \

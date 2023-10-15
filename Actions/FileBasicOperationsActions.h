@@ -13,7 +13,6 @@ class FileBasicOperationsActions : public QObject
 public:
     explicit FileBasicOperationsActions(QObject *parent = nullptr);
 
-
     auto GetDeleteActions() -> QActionGroup*{
         QAction* MOVE_TO_TRASHBIN = new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Recycle");
         MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
@@ -85,12 +84,12 @@ public:
         QAction* UNDO_OPERATION = new QAction(QIcon(":/themes/UNDO"), "Undo");
         UNDO_OPERATION->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Z));
         UNDO_OPERATION->setShortcutVisibleInContextMenu(true);
-        UNDO_OPERATION->setToolTip(QString("(%1)").arg(UNDO_OPERATION->shortcut().toString()));
+        UNDO_OPERATION->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(UNDO_OPERATION->text(), UNDO_OPERATION->shortcut().toString()));
 
         QAction* REDO_OPERATION = new QAction(QIcon(":/themes/REDO"), "Redo");
         REDO_OPERATION->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Y));
         REDO_OPERATION->setShortcutVisibleInContextMenu(true);
-        REDO_OPERATION->setToolTip(QString("(%1)").arg(REDO_OPERATION->shortcut().toString()));
+        REDO_OPERATION->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(REDO_OPERATION->text(), REDO_OPERATION->shortcut().toString()));
 
         QActionGroup* actionGroup = new QActionGroup(this);
         actionGroup->addAction(UNDO_OPERATION);
@@ -103,7 +102,7 @@ public:
     }
     auto Get_SELECTION_RIBBON_Action() -> QActionGroup*{
         QAction* SELECT_ALL = new QAction(QIcon(":/themes/SELECT_ALL"), "Select all");
-        SELECT_ALL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_A));
+//        SELECT_ALL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_A));
         SELECT_ALL->setShortcutVisibleInContextMenu(true);
         SELECT_ALL->setToolTip(QString("<b>%1 (%2)</b><br/> Select all item(s) in this view.").arg
                                (SELECT_ALL->text(), SELECT_ALL->shortcut().toString()));
@@ -137,7 +136,13 @@ public:
         PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the absolute file name of the selected item(s) to the clipboard.").arg
                                 (PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
 
-        QAction* _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "&Reveal in Explorer");
+        QAction* _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in Explorer");
+        _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
+        _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
+        _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%0 (%1)</b><br/> Reveal items in system file explorer.").arg
+                                        (_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
+        _REVEAL_IN_EXPLORER->setCheckable(false);
+
 
         QAction* OPEN_IN_TERMINAL = new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), "Open in Terminal");
 

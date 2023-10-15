@@ -3,7 +3,7 @@
 #include <QHeaderView>
 #include <QMouseEvent>
 #include "PublicVariable.h"
-
+#include "Actions/FileBasicOperationsActions.h"
 
 DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn):
     QTableView(), View(),
@@ -27,6 +27,11 @@ DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*m
 void DragDropTableView::subscribe(){
     connect(horizontalHeader(), &QHeaderView::sectionResized, this, &View::on_sectionResized);
     connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
+    addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+    addActions(g_fileBasicOperationsActions().OPEN->actions());
+    addActions(g_fileBasicOperationsActions().NEW->actions());
+    addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+    addActions(g_fileBasicOperationsActions().MOVE_COPY->actions());
 }
 
 auto DragDropTableView::InitViewSettings()->void{

@@ -1,2 +1,2 @@
 #include "UndoRedo.h"
-UndoRedo g_UndoRedo;
+UndoRedo g_undoRedo;

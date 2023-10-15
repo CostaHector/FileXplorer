@@ -36,7 +36,7 @@ public:
         // compromise method: when pass the do_cmd list into it
         return qMakePair<bool, OperationStream>(isAllSucceed, ele);
     }
-    auto Redo() -> UNDO_REDO_RETURN{
+    inline auto Redo() -> UNDO_REDO_RETURN{
         if (not redoAvailable()){
             qDebug("Skip Cannot redo");
             return qMakePair<bool, OperationStream>(true, OperationStream());
@@ -67,5 +67,5 @@ public:
     QStack<OperationStream> redoList;
 };
 
-extern UndoRedo g_UndoRedo;
+extern UndoRedo g_undoRedo;
 #endif // UNDOREDO_H
