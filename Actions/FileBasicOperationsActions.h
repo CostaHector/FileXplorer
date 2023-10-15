@@ -265,8 +265,11 @@ public:
         _ADVANCE_SEARCH->setToolTip(QString("<b>%1 (%2)</b><br/> Search by file name or file contents.").arg
                                     (_ADVANCE_SEARCH->text(), _ADVANCE_SEARCH->shortcut().toString()));
         _ADVANCE_SEARCH->setCheckable(true);
+
         QActionGroup* actionGroup = new QActionGroup(this);
         actionGroup->addAction(_ADVANCE_SEARCH);
+
+        actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
         return actionGroup;
     }
 

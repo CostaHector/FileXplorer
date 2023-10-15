@@ -80,9 +80,9 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList &replaceeList) {
     QMap<QString, int> sufCntMap;
     for (const QString& suf: suffixs){
         if (sufCntMap.contains(suf)){
-            sufCntMap[suf] = 1;
-        }else{
             ++sufCntMap[suf];
+        }else{
+            sufCntMap[suf] = 1;
         }
     }
     QMap<QString, int> sufCurIndex;
@@ -93,7 +93,7 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList &replaceeList) {
     }
     QStringList numerizedNames;
     for (const QString& suf : suffixs){
-        if (not sufCntMap.contains(suf)){
+        if (not sufCurIndex.contains(suf)){
             numerizedNames.append(completeBaseNameString);
             continue;
         }

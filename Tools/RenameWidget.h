@@ -229,7 +229,7 @@ public:
         bool isAllSuccess = g_undoRedo.Do(cmds);
         if (isInterative) {
             if (isAllSuccess) {
-                (new Toaster(this, QString("%1 command(s).").arg(cmds.size()), isAllSuccess))->exec();
+                new Toaster(this, QString("%1 command(s).").arg(cmds.size()), isAllSuccess);
             }
         }
         close();

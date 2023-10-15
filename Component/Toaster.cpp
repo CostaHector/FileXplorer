@@ -16,10 +16,10 @@ public:
         toasterLayout->addWidget(desktopToast);
         toasterLayout->addWidget(desktopToastWarning);
         connect(desktopToast, &QPushButton::clicked, this, [this]()->void{
-            (new Toaster(this, desktopToast->text(), true))->exec();
+            new Toaster(this, desktopToast->text(), true);
         });
         connect(desktopToastWarning, &QPushButton::clicked, this, [this]()->void{
-            (new Toaster(this, desktopToastWarning->text(), false))->exec();
+            new Toaster(this, desktopToastWarning->text(), false);
         });
         setLayout(toasterLayout);
     }

@@ -17,6 +17,14 @@ public:
     FileExplorerEvent(QObject *parent = nullptr, QFileSystemModel *fileSysModel_ = nullptr, QTableView *view_ = nullptr);
     void subscribe();
 
+    auto onRenamePre() -> QPair<QString, QStringList>{
+        QStringList preNames;
+        for (QModelIndex ind: selectedIndexes()){
+            preNames.append(fileSysModel->fileName(ind));
+        }
+        return {fileSysModel->rootPath(), preNames};
+    }
+
     auto selectedIndexes() -> QModelIndexList {
         // ignore other column, keep the first column
         if (view == nullptr) {
