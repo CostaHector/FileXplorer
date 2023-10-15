@@ -25,7 +25,7 @@ public:
         return {fileSysModel->rootPath(), preNames};
     }
 
-    auto selectedIndexes() -> QModelIndexList {
+    auto selectedIndexes() const -> QModelIndexList {
         // ignore other column, keep the first column
         if (view == nullptr) {
             return {};
@@ -66,7 +66,16 @@ public:
     auto on_SelectNone() -> void;
     auto on_SelectInvert() -> void;
 
-    auto on_PlayVideo() -> bool;
+    auto on_PlayVideo() const -> bool;
+
+
+    auto on_copyFullPath() const -> bool;
+    auto on_copyFullPathFolderNameAndAppendImageSuffix() const -> bool;
+    auto on_copyDirPath() const -> bool;
+    auto on_copyName() const -> bool;
+    auto PathCopyTriple(const QStringList lst, const QString& opName) const -> bool;
+
+
 
     QFileSystemModel *fileSysModel;
     QTableView *view;
