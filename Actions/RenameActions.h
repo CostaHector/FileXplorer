@@ -4,7 +4,7 @@
 #include <QAction>
 #include <QActionGroup>
 
-class RenameActions : public QAction
+class RenameActions : public QObject
 {
 public:
     explicit RenameActions(QObject *parent = nullptr);

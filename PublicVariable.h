@@ -130,6 +130,8 @@ public:
     }
 };
 
+constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
+
 namespace MemoryKey {
 const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
 const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
@@ -138,15 +140,22 @@ const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
 const GVarBool SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true);
 const GVarBool SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false);
 const GVarBool SHOW_FOLDER_PREVIEW_JSON_EDITOR("SHOW_FOLDER_PREVIEW_JSON_EDITOR", false);
+
+const GVarBool SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true);
+const GVarBool SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true);
+const GVarBool EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true);
+
 const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
 const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
 const GVarStr HEARVIEW_SORT_INDICATOR_ORDER("HEARVIEW_SORT_INDICATOR_ORDER",
                                             HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
                                             HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR);
 const GVarInt ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, 8, 25);
+const GVarStr DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", "New folder", {"New folder", "New text", "New json", "New folder html"});
+const GVarStr DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", {"Copy fullpath", "Copy path", "Copy name", "Copy the path"});
 const GVarStr DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE", "Rename (ith)", {"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"});
-
-
+const GVarStr MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", {});
+const GVarStr COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", {});
 }
 
 

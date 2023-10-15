@@ -105,3 +105,12 @@ auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionG
     }
     return nullptr;
 }
+
+
+void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align){
+    for (int i=0; i<lay->count();++i){
+        lay->itemAt(i)->setAlignment(align);
+    }
+    // Only QToolBar and QToolButton need to set alignment. (QWidget like QSeperator not need)
+}
+

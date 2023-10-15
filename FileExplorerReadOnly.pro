@@ -9,6 +9,7 @@ CONFIG += c++11
 
 SOURCES += \
     Actions/FileBasicOperationsActions.cpp \
+    Actions/FramelessWindowActions.cpp \
     Actions/RenameActions.cpp \
     AddressELineEdit.cpp \
     Component/StateLabel.cpp \
@@ -42,6 +43,7 @@ SOURCES += \
 
 HEADERS += \
     Actions/FileBasicOperationsActions.h \
+    Actions/FramelessWindowActions.h \
     Actions/RenameActions.h \
     AddressELineEdit.h \
     Component/StateLabel.h \

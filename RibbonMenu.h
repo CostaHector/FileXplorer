@@ -8,12 +8,17 @@ class RibbonMenu : public QTabWidget
 {
 public:
     RibbonMenu();
+    QToolBar* InitFramelessToolBar(QWidget* attached=nullptr);
+
     QToolBar* LeafFile()const;
     QToolBar* LeafHome()const;
     QToolBar* LeafShare()const;
     QToolBar* LeafView()const;
     QToolBar* LeafDatabase()const;
     QToolBar* LeafMediaTools()const;
+
+    void Subscribe();
+
 private:
     QToolBar* leafFileWid;
     QToolBar* leafHomeWid;
@@ -21,6 +26,9 @@ private:
     QToolBar* leafViewWid;
     QToolBar* leafDatabaseWid;
     QToolBar* leafMediaWid;
+    QToolBar* framelessTB;
+
+    static constexpr int MAX_WIDGET_HEIGHT = 400;
 };
 
 #endif // RIBBONMENU_H

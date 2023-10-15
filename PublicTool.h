@@ -24,7 +24,8 @@ public:
 
 #include <QAction>
 #include <QActionGroup>
+#include <QLayout>
 
 auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction*;
-
+void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 #endif // PUBLICTOOL_H

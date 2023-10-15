@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone="no"?>
+<svg width="800px" height="800px" viewBox="0 0 800 800"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+  <g font-family="Verdana" font-size="400" >
+    <text x="70" y="500" fill="gray" font-size="400" >
+      <tspan font-weight="bold" fill="red" >P</tspan>/.
+    </text>
+  </g>
+
+</svg>

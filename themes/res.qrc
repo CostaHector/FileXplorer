@@ -2,9 +2,9 @@
     <qresource prefix="themes">
         <file alias="APP_ICON_PATH">AppIcons/REVEAL_IN_EXPLORER.ico</file>
         <file alias="LE_PARSER_APP">AppIcons/LE_PARSER.ico</file>
-        
+
         <file alias="ITEMS_ORGANIZER.svg">Media/ITEMS_ORGANIZER.svg</file>
-        
+
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
@@ -25,7 +25,7 @@
         <file alias="SETTINGS">TopSideToolBarIcons/SETTINGS.svg</file>
         <file alias="MOVE_TO_TRASH_BIN">TopSideToolBarIcons/MOVE_TO_TRASH_BIN.ico</file>
         <file alias="DELETE_ITEMS_PERMANENTLY">TopSideToolBarIcons/DELETE_ITEMS_PERMANENTLY.svg</file>
-        
+
         <file alias="ABOUT">TopSideToolBarIcons/ABOUT.svg</file>
 
         <file alias="SELECT_ALL">TopSideToolBarIcons/SELECT_ALL.ico</file>
@@ -49,9 +49,15 @@
         <file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.png</file>
         <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.png</file>
 
+        <file alias="MUSIC_PLAYER">Flat/MUSIC_PLAYER.svg</file>
+        <file alias="PLAY_BUTTON_ROUND">Flat/PLAY_BUTTON_ROUND.svg</file>
+        <file alias="PLAY_BUTTON_TRIANGLE">Flat/PLAY_BUTTON_TRIANGLE.svg</file>
+        <file alias="STAR">Flat/STAR.svg</file>
+
         <file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
         <file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.ico</file>
-        <file alias="FOLDER_MERGE_PATH">RightClickIcon/folderMerge.png</file>
+        <file alias="FOLDER_MERGE_TO_FIRST">RightClickIcon/FOLDER_MERGE_TO_FIRST.svg</file>
+        <file alias="FOLDER_MERGE_TO_LAST">RightClickIcon/FOLDER_MERGE_TO_LAST.svg</file>
         <file alias="REMOVE_HTML_PATH">RightClickIcon/REMOVE_HTML_CACHE.png</file>
         <file alias="NEW_FILE_FOLDER_PATH">RightClickIcon/NEW.svg</file>
         <file alias="NEW_FOLDER_PATH">RightClickIcon/NEW_FOLDER.svg</file>
@@ -64,10 +70,14 @@
         <file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
         <file alias="MERGE_TEXT_FILE">RightClickIcon/mergeTextFile.png</file>
         <file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH.ico</file>
-        <file alias="COPY_PATH_PATH">RightClickIcon/CopyPath.png</file>
-        <file alias="COPY_PATH">RightClickIcon/COPY.png</file>
-        <file alias="CUT_PATH">RightClickIcon/CUT.png</file>
-        <file alias="PASTE_PATH">RightClickIcon/PASTE.png</file>
+        <file alias="COPY_FULL_PATH">RightClickIcon/COPY_FULL_PATH.png</file>
+        <file alias="COPY_PATH">RightClickIcon/COPY_PATH.svg</file>
+        <file alias="COPY_NAME">RightClickIcon/COPY_NAME.svg</file>
+        <file alias="COPY_THE_PATH">RightClickIcon/COPY_THE_PATH.svg</file>
+
+        <file alias="COPY_ITEM">RightClickIcon/COPY.png</file>
+        <file alias="CUT_ITEM">RightClickIcon/CUT.png</file>
+        <file alias="PASTE_ITEM">RightClickIcon/PASTE.png</file>
         <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5FileIdentifier.png</file>
 
         <file alias="HTML_PREVIEW_FILTER">RightClickIcon/HTML_PREVIEW_FILTER.svg</file>
@@ -92,7 +102,7 @@
 
         <file alias="RENAME_PATH">NameStrIcon/Renamer.png</file>
         <file alias="NAME_STANDARDLIZER_PATH">NameStrIcon/NAME_STANDARDLIZER.svg</file>
-        
+
         <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.png</file>
         <file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/Numerizer.svg</file>
         <file alias="NAME_STR_SWAPPER_PATH">NameStrIcon/NAME_SWAPPER.png</file>
@@ -110,12 +120,26 @@
         <file alias="MEDIUM">PreferenceIcons/MEDIUM.png</file>
         <file alias="LARGE">PreferenceIcons/LARGE.png</file>
         <file alias="EXTRA_LARGE">PreferenceIcons/EXTRA_LARGE.png</file>
+        <file alias="ICON_SIZE">PreferenceIcons/ICON_SIZE.svg</file>
+
+        <file alias="FONT_SIZE">PreferenceIcons/FONT_SIZE.svg</file>
+        <file alias="ALTER_ROW_COLORS">PreferenceIcons/ALTER_ROW_COLORS.svg</file>
+        <file alias="DRAG_DROP">PreferenceIcons/DRAG_DROP.svg</file>
+        <file alias="NO_DRAG_DROP">PreferenceIcons/NO_DRAG_DROP.svg</file>
+        <file alias="DRAG_DROP_INTERNAL_MOVE">PreferenceIcons/DRAG_DROP_INTERNAL_MOVE.svg</file>
+        <file alias="VIEW_GRID_ON">PreferenceIcons/VIEW_GRID_ON.svg</file>
         <file alias="ICON_MODE">PreferenceIcons/ICON_MODE.png</file>
         <file alias="LIST_MODE">PreferenceIcons/LIST_MODE.png</file>
         <file alias="LIST_VIEW">PreferenceIcons/LIST_VIEW.png</file>
         <file alias="TABLE_VIEW">PreferenceIcons/TABLE_VIEW.png</file>
         <file alias="LEFT_TO_RIGHT">PreferenceIcons/LEFT_TO_RIGHT.png</file>
         <file alias="TOP_TO_BOTTOM">PreferenceIcons/TOP_TO_BOTTOM.png</file>
+        <file alias="PLAIN_THEME">PreferenceIcons/PLAIN_THEME.svg</file>
+        <file alias="DARK_THEME_MOON_FOG">PreferenceIcons/DARK_THEME_MOON_FOG.svg</file>
+        <file alias="LIGHT_THEME_SUN">PreferenceIcons/LIGHT_THEME_SUN.svg</file>
+        <file alias="SERVICE_REGISTERED">PreferenceIcons/SERVICE_REGISTERED.svg</file>
+        <file alias="SERVICE_UNREGISTERED">PreferenceIcons/SERVICE_UNREGISTERED.svg</file>
+        <file alias="SERVICE_SUSPENDED">PreferenceIcons/SERVICE_SUSPENDED.svg</file>
 
         <file alias="UNDO">View/UNDO.svg</file>
         <file alias="REDO">View/REDO.svg</file>
