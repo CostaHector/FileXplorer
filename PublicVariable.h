@@ -156,6 +156,8 @@ const GVarStr DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", {"Copy
 const GVarStr DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE", "Rename (ith)", {"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"});
 const GVarStr MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", {});
 const GVarStr COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", {});
+
+const GVarInt MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, 0);
 }
 
 

@@ -25,10 +25,10 @@ RibbonMenu::RibbonMenu():
     addTab(leafMediaWid, "&Media");
 
     setCornerWidget(menuRibbonCornerWid, Qt::Corner::TopRightCorner);
-    setCurrentWidget(leafFileWid);
 
     Subscribe();
 
+    setCurrentIndex(PreferenceSettings().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
 }
 
 QToolBar *RibbonMenu::GetMenuRibbonCornerWid(QWidget *attached) {
@@ -220,6 +220,11 @@ void RibbonMenu::Subscribe() {
     connect(g_framelessWindowAg()._EXPAND_RIBBONS, &QAction::triggered, this, on_officeStyleWidget);
 
     emit g_framelessWindowAg()._EXPAND_RIBBONS->triggered(g_framelessWindowAg()._EXPAND_RIBBONS->isChecked());
+
+    auto on_currentTabChanged = [](int tabInd)->void{
+        PreferenceSettings().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabInd);
+    };
+    connect(this, &QTabWidget::currentChanged, on_currentTabChanged);
 }
 
 
