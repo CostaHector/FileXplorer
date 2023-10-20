@@ -189,4 +189,16 @@ const QStringList JSON_TYPE_SET = {"*.json"};
 const QStringList TEXT_TYPE_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat"};
 }
 
+enum class CCMMode{
+    ERROR = -1,
+    MERGE = 0,
+    COPY = 1,
+    CUT = 2,
+    LINK = 3,
+};
+
+static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE, "MERGE"},
+                                                       {CCMMode::COPY, "COPY"},
+                                                       {CCMMode::CUT, "CUT"},
+                                                       {CCMMode::LINK, "LINK"}};
 #endif // PUBLICVARIABLE_H

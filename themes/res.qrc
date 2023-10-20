@@ -159,5 +159,13 @@
         <file alias="SHOW_DATABASE">Database/SHOW_DATABASE.svg</file>
 
         <file alias="ZIP">Share/ZIP.ico</file>
+
+        <file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.svg</file>
+        <file alias="MIRROR_REVERT">RenameConflictIcons/MIRROR_REVERT.svg</file>
+        <file alias="RESET">RenameConflictIcons/RESET.svg</file>
+        <file alias="TIME_AXIS">RenameConflictIcons/TIME_AXIS.svg</file>
+        <file alias="CONFLICT">RenameConflictIcons/CONFLICT.svg</file>
+        <file alias="RECYCLE">RenameConflictIcons/RECYCLE.svg</file>
+        <file alias="RESTORE">RenameConflictIcons/RESTORE.svg</file>
     </qresource>
 </RCC>

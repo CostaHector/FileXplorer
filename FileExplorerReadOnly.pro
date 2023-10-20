@@ -13,12 +13,14 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     AddressELineEdit.cpp \
+    Component/RenameConflicts.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPane.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
+    Tools/ConflictsItemHelper.cpp \
     Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
     UndoRedo.cpp \
@@ -48,12 +50,14 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     AddressELineEdit.h \
+    Component/RenameConflicts.h \
     Component/StateLabel.h \
     Component/Toaster.h \
     ContentPane.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     RibbonMenu.h \
+    Tools/ConflictsItemHelper.h \
     Tools/PlayVideo.h \
     Tools/RenameWidget.h \
     UndoRedo.h \

@@ -23,8 +23,6 @@
 #include "Component/Toaster.h"
 #include "UndoRedo.h"
 
-UndoRedo& UndoRedoIns();
-
 class RenameWidget : public QDialog
 {
 public:

@@ -6,8 +6,7 @@ PublicTool::PublicTool()
 
 }
 
-bool PublicTool::copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExist)
-{
+bool PublicTool::copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExist) {
     QDir sourceDir(fromDir);
     QDir targetDir(toDir);
     if(!targetDir.exists()){    /* if directory don't exists, build it */
@@ -106,7 +105,6 @@ auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionG
     return nullptr;
 }
 
-
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align){
     for (int i=0; i<lay->count();++i){
         lay->itemAt(i)->setAlignment(align);
@@ -114,3 +112,31 @@ void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align){
     // Only QToolBar and QToolButton need to set alignment. (QWidget like QSeperator not need)
 }
 
+auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList{
+    int n1 = -1;
+    QString pre;
+    if (not preUserInput.isEmpty()){
+        const QString& preNative = QDir::fromNativeSeparators(preUserInput);
+        pre = QDir(preNative).absolutePath();
+        n1 = pre.size() + 1;
+    } else {  // please do it manually in explorer;
+        n1 = 0;
+    }
+    QDir preDir(pre);
+    QStringList relFullNames;
+
+    for (const QString& rel: rels){
+        QFileInfo fileInfo(preDir.absoluteFilePath(rel));
+        const QString& relPath = fileInfo.absoluteFilePath().mid(n1);
+        if (fileInfo.isDir()){  // folders;
+            QDirIterator it(fileInfo.absoluteFilePath(), {}, QDir::Filter::NoDotAndDotDot | QDir::Filter::AllEntries,
+                              QDirIterator::IteratorFlag::Subdirectories);
+            while (it.hasNext()){
+                it.next();
+                relFullNames.append(it.filePath().mid(n1));
+            }
+        }
+        relFullNames.append(relPath);
+    }
+    return {relFullNames.crbegin(), relFullNames.crend()};
+}

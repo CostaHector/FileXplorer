@@ -26,4 +26,6 @@ public:
 
 auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction*;
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
+
+auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList;
 #endif // PUBLICTOOL_H
