@@ -7,6 +7,7 @@
 #include "View/DragDropTableView.h"
 #include "FolderPreviewHTML.h"
 #include "FolderPreviewWidget.h"
+#include "Component/CustomStatusBar.h"
 
 class ContentPane : public QWidget
 {
@@ -15,7 +16,8 @@ public:
     explicit ContentPane(QWidget *parent = nullptr,
                          const QString& defaultPath="",
                          FolderPreviewHTML* previewHtml_=nullptr,
-                         FolderPreviewWidget* previewWidget_=nullptr);
+                         FolderPreviewWidget* previewWidget_=nullptr,
+                         CustomStatusBar* _statusBar=nullptr);
     auto CurrentPath()->QString{
         if (!fileSysModel){
             qDebug("[Error] fileSysModel is nullptr");
@@ -45,6 +47,7 @@ public:
     DragDropTableView* view;
     FolderPreviewHTML* previewHtml;
     FolderPreviewWidget* previewWidget;
+    CustomStatusBar* logger;
 };
 
 #endif // CONTENTPANE_H

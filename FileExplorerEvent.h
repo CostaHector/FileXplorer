@@ -28,7 +28,7 @@ public:
         return {fileSysModel->rootPath(), preNames};
     }
 
-    auto  __CanNewItem() -> bool{
+    auto  __CanNewItem() const -> bool{
         if (fileSysModel->rootPath().isEmpty()){
             qDebug("New item only available on non-empty path[%s]", fileSysModel->rootPath().toStdString().c_str());
             return false;

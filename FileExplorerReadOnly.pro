@@ -13,6 +13,7 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     AddressELineEdit.cpp \
+    Component/CustomStatusBar.cpp \
     Component/RenameConflicts.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     AddressELineEdit.h \
+    Component/CustomStatusBar.h \
     Component/RenameConflicts.h \
     Component/StateLabel.h \
     Component/Toaster.h \

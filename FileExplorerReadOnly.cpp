@@ -28,9 +28,10 @@ FileExplorerReadOnly::FileExplorerReadOnly(QWidget* parent, const QString& initi
     , explorerCentralWidget(nullptr)
     , _navigationToolBar(new NavigationToolBar)
     , osm(new RibbonMenu)
+    , _statusBar(new CustomStatusBar)
 {
     const QString& defaultPath = ReadSettings(initialPath);
-    explorerCentralWidget = new ContentPane(nullptr, defaultPath, previewHtml, previewWidget);
+    explorerCentralWidget = new ContentPane(nullptr, defaultPath, previewHtml, previewWidget, _statusBar);
     this->setCentralWidget(explorerCentralWidget);
 
     //    previewHtmlDock->setWidget(previewHtml);
@@ -41,7 +42,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(QWidget* parent, const QString& initi
     addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
     addToolBar(Qt::ToolBarArea::LeftToolBarArea, _navigationToolBar);
     setMenuWidget(osm);
-
+    setStatusBar(_statusBar);
     subscribe();
 }
 

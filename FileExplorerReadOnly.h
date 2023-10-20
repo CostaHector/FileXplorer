@@ -9,6 +9,8 @@
 #include "ContentPane.h"
 #include "NavigationToolBar.h"
 #include "RibbonMenu.h"
+#include "Component/CustomStatusBar.h"
+
 class FileExplorerReadOnly : public QMainWindow
 {
     Q_OBJECT
@@ -29,5 +31,6 @@ public:
     ContentPane* explorerCentralWidget;
     NavigationToolBar* _navigationToolBar;
     RibbonMenu* osm;
+    CustomStatusBar* _statusBar;
 };
 #endif // FILEEXPLORERREADONLY_H

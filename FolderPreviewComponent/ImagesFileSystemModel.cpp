@@ -1,7 +1,7 @@
 #include "ImagesFileSystemModel.h"
 
 ImagesFileSystemModel::ImagesFileSystemModel(QObject *parent, bool showThumbnails_) :
-    MyQFileSystemModel(parent), m_showThumbnails(showThumbnails_)
+    MyQFileSystemModel(nullptr, parent), m_showThumbnails(showThumbnails_)
 {
     setNameFilters({"*.jpeg", "*.jpg", "*.png", "*.tiff", "*.jfif", "*.gif", "*.webp", "*.ico", "*.svg"});
 }

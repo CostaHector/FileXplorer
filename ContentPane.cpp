@@ -26,16 +26,18 @@ using std::placeholders::_3;
 
 ContentPane::ContentPane(QWidget *parent, const QString& defaultPath,
                          FolderPreviewHTML* previewHtml_,
-                         FolderPreviewWidget* previewWidget_) :
+                         FolderPreviewWidget* previewWidget_,
+                         CustomStatusBar* _statusBar) :
     QWidget(parent),
-    fileSysModel(new MyQFileSystemModel(nullptr)),
+    fileSysModel(new MyQFileSystemModel(_statusBar, nullptr)),
     addressBar(new
                NavigationAndAddressBar(std::bind(&ContentPane::IntoNewPath, this, _1,_2,_3),
                                        std::bind(&ContentPane::on_searchTextChanged, this, _1),
                                        std::bind(&ContentPane::on_searchEnterKey, this, _1))),
     view(new DragDropTableView(fileSysModel, addressBar->backToBtn, addressBar->forwardToBtn)),
     previewHtml(previewHtml_),
-    previewWidget(previewWidget_)
+    previewWidget(previewWidget_),
+    logger(_statusBar)
 {
     QVBoxLayout* contentPaneLayout = new QVBoxLayout();
     contentPaneLayout->addLayout(addressBar);
@@ -64,7 +66,7 @@ auto ContentPane::IntoNewPath(QString newPath, bool isNewPath, bool isF5Force) -
         addressBar->pathRD(newPath);
     }
     fileSysModel->whenRootPathChanged(newPath);
-    //    on_selectionChanged();
+//        on_selectionChanged();
     return true;
 }
 
@@ -140,10 +142,10 @@ auto ContentPane::on_selectionChanged(const QItemSelection &selected, const QIte
     // if isinstance(view, QListView):
         // self.view.selectionModel().selectedIndexes()
     // else: self.view.selectionModel().selectedRows() # Table or Tree
-
-//    selectedCnt = len(selectedRowsIndex)
-//    self.logger.pathInfoChanged.emit(selectedCnt, 1)
-
+    if (logger){
+        const auto selectedCnt = selectedRowsIndex.size();
+        logger->pathInfo(selectedCnt, 1);
+    }
     QFileSystemModel* _model = static_cast<QFileSystemModel*>(view->model());
     const QModelIndex& firstIndex = selectedRowsIndex.front();
     const QFileInfo& firstFileInfo = _model->fileInfo(firstIndex);

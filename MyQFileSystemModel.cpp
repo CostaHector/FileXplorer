@@ -12,8 +12,10 @@ constexpr int MyQFileSystemModel::cacheHeight;
 constexpr int MyQFileSystemModel::IMAGES_SIZE_LOADDABLE_MAX;
 constexpr int MyQFileSystemModel::IMAGES_COUNT_LOAD_ONCE_MAX;
 
-MyQFileSystemModel::MyQFileSystemModel(QObject *parent) :
-                                                          QFileSystemModel(parent), m_imagesSizeLoaded(0)
+MyQFileSystemModel::MyQFileSystemModel(CustomStatusBar* _statusBar, QObject *parent) :
+                                                          QFileSystemModel(parent),
+                                                          logger(_statusBar),
+                                                          m_imagesSizeLoaded(0)
 {
   setRootPath("");  // C and D Disk
   setFilter(QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot);
@@ -115,7 +117,7 @@ void MyQFileSystemModel::whenRootPathChanged(const QString& newpath){
 void MyQFileSystemModel::whenDirectoryLoaded(const QString& path){
   QModelIndex currentIndex(index(path));
   int rowCnt = rowCount(currentIndex);
-  //    if(logger){
-  //        emit self.logger.pathInfoChanged(rowCnt, 0)
-  //    }
+  if(logger){
+      logger->pathInfo(rowCnt, 0);
+  }
 }
