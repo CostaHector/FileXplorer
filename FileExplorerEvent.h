@@ -1,6 +1,8 @@
 #ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
 #include "UndoRedo.h"
+#include "Tools/PlayVideo.h"
+
 #include <QAbstractItemModel>
 #include <QFileInfo>
 #include <QFileSystemModel>
@@ -9,7 +11,8 @@
 #include <QProcess>
 #include <QTableView>
 #include <QItemSelectionModel>
-#include "Tools/PlayVideo.h"
+#include <QDateTime>
+#include <QTextStream>
 
 class FileExplorerEvent : public QObject {
     Q_OBJECT
@@ -24,6 +27,29 @@ public:
         }
         return {fileSysModel->rootPath(), preNames};
     }
+
+    auto  __CanNewItem() -> bool{
+        if (fileSysModel->rootPath().isEmpty()){
+            qDebug("New item only available on non-empty path[%s]", fileSysModel->rootPath().toStdString().c_str());
+            return false;
+        }
+        return true;
+    }
+
+    auto __FocusNewItem(const QString& itemPath) -> bool{
+        const QModelIndex ind = fileSysModel->index(itemPath);
+        if (not ind.isValid()){
+            qDebug("Target Lose");
+            return false;
+        }
+        view->clearSelection();
+        view->setCurrentIndex(ind);
+        return true;
+    }
+
+    auto on_NewTextFile(QString newTextName, const QString& contents) -> bool;
+    auto on_NewJsonFile() -> bool;
+    auto on_NewFolder() -> bool;
 
     auto selectedIndexes() const -> QModelIndexList {
         // ignore other column, keep the first column
