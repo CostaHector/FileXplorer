@@ -21,6 +21,7 @@ SOURCES += \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
+    Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/MimeDataCX.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     FileOperation/FileOperation.h \
     PublicTool.h \
     RibbonMenu.h \
+    Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/MimeDataCX.h \
