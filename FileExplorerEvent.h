@@ -2,6 +2,7 @@
 #define FILEEXPLOREREVENT_H
 #include "Component/CustomStatusBar.h"
 #include "Component/RenameConflicts.h"
+#include "Tools/Categorizer.h"
 #include "Tools/FilesNameBatchStandardizer.h"
 #include "Tools/MimeDataCX.h"
 #include "Tools/PlayVideo.h"
@@ -140,6 +141,8 @@ public:
         return urls.size();
     }
     auto on_NameStandardize() -> bool;
+    auto on_FileClassify() -> bool;
+
     //    auto on_MoveCopyEventSkeleton(const QString& operationName, const QString& folderDst) -> bool{
     //        if (not view->selectionModel()->hasSelection()){
     //            if (logger) logger->msg(QString("To %s, select Some File/Folder First").arg(operationName), STATUS_STR_TYPE::NORMAL);
