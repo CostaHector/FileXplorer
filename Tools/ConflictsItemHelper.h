@@ -9,6 +9,35 @@
 #include <QString>
 #include <QStringList>
 
+static auto GetLAndRels(const QStringList& lAbsPathList) -> QPair<QString, QStringList> {
+  if (lAbsPathList.isEmpty()) {
+    return {"", lAbsPathList};
+  }
+  if (lAbsPathList.size() == 1) {
+    return {QFileInfo(lAbsPathList[0]).absolutePath(), {QFileInfo(lAbsPathList[0]).fileName()}};
+  }
+  const QStringList& first = lAbsPathList.front().split('/');
+  const QStringList& last = lAbsPathList.back().split('/');
+  int comparedCharsLength = std::min(first.size(), last.size());
+  QString maxCommonPrepath;
+  for (int i = 0; i < comparedCharsLength; ++i) {
+    if (first[i] == last[i]) {
+      maxCommonPrepath += (first[i] + '/');  // including trailing '/';
+    }
+  }
+  if (maxCommonPrepath.isEmpty()) {
+    return {"", lAbsPathList};
+  }
+
+  QStringList lRels;
+  const int N = maxCommonPrepath.size();
+  for (const QString& lAbsPath : lAbsPathList) {
+    lRels.append(lAbsPath.mid(N));
+  }
+  return {maxCommonPrepath.chopped(1), lRels};  // remove the trailing '/'
+}
+
+
 class Finder {
  public:
   static auto FindAllItems(const QString& l, const QStringList& lRels, bool isMove = true) -> QStringList {
@@ -94,33 +123,6 @@ class ConflictsItemHelper {
   explicit ConflictsItemHelper(const QString& l_, const QString& r_)
       : ConflictsItemHelper(l_, r_, QDir(l_, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList()) {}
 
-  static auto GetLAndRels(const QStringList& lAbsPathList) -> QPair<QString, QStringList> {
-    if (lAbsPathList.isEmpty()) {
-      return {"", lAbsPathList};
-    }
-    if (lAbsPathList.size() == 1) {
-      return {QFileInfo(lAbsPathList[0]).absolutePath(), {QFileInfo(lAbsPathList[0]).fileName()}};
-    }
-    const QStringList& first = lAbsPathList.front().split('/');
-    const QStringList& last = lAbsPathList.back().split('/');
-    int comparedCharsLength = std::min(first.size(), last.size());
-    QString maxCommonPrepath;
-    for (int i = 0; i < comparedCharsLength; ++i) {
-      if (first[i] == last[i]) {
-        maxCommonPrepath += (first[i] + '/');  // including trailing '/';
-      }
-    }
-    if (maxCommonPrepath.isEmpty()) {
-      return {"", lAbsPathList};
-    }
-
-    QStringList lRels;
-    const int N = maxCommonPrepath.size();
-    for (const QString& lAbsPath : lAbsPathList) {
-      lRels.append(lAbsPath.mid(N));
-    }
-    return {maxCommonPrepath.chopped(1), lRels};  // remove the trailing '/'
-  }
   explicit ConflictsItemHelper(const QStringList& lAbsPathList, const QString& r_) : ConflictsItemHelper(GetLAndRels(lAbsPathList), r_) {}
   auto GetLeftRelPathList(const bool isMove) const -> QStringList { return Finder::FindAllItems(l, lRels, isMove); }
 };

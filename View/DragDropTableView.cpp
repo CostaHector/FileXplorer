@@ -2,6 +2,7 @@
 
 #include <QHeaderView>
 #include <QMouseEvent>
+#include "Actions/RenameActions.h"
 #include "PublicVariable.h"
 #include "Actions/FileBasicOperationsActions.h"
 
@@ -27,11 +28,18 @@ DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*m
 void DragDropTableView::subscribe(){
     connect(horizontalHeader(), &QHeaderView::sectionResized, this, &View::on_sectionResized);
     connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
-    addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
     addActions(g_fileBasicOperationsActions().OPEN->actions());
+
     addActions(g_fileBasicOperationsActions().NEW->actions());
+    addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
+    addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
+    addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
+    addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+
+    addActions(g_renameAg().RENAME_RIBBONS->actions());
+
+    addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
     addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
-    addActions(g_fileBasicOperationsActions().MOVE_COPY->actions());
 }
 
 auto DragDropTableView::InitViewSettings()->void{

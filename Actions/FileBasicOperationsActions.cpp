@@ -2,7 +2,7 @@
 
 FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
     : QObject(parent),
-      MOVE_COPY(GetMOVE_COPY_TO_DELETEActions()),
+      MOVE_COPY_TO(GetMOVE_COPY_TO_DELETEActions()),
       MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
       COPY_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY)),
 
@@ -35,7 +35,7 @@ class FileOperationActionIllustration : public QToolBar {
     addActions(g_fileBasicOperationsActions().COPY_PATH->actions());
     addActions(g_fileBasicOperationsActions().NEW->actions());
     addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
-    addActions(g_fileBasicOperationsActions().MOVE_COPY->actions());
+    addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
     addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   }
 };

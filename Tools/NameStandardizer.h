@@ -52,7 +52,7 @@ class NameStandardizer
 
     //Get standard Name
     auto barIndex = fileName.indexOf('-');
-    if (barIndex == -1){
+    if (barIndex == -1 or barIndex == 0){
         return fileName;
     }
     auto studioName = fileName;

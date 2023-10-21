@@ -7,6 +7,10 @@
 #include <QFileInfo>
 #include "PublicTool.h"
 
+const QString TEST_SRC_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOperation/DONT_CHANGE");
+const QString TEST_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOperation/COPY_REMOVABLE");
+
+
 class FileOperationTest : public QObject
 {
     Q_OBJECT
@@ -53,10 +57,6 @@ private slots:
     void test_link_a_file();
     void test_link_a_relative_file();
 };
-
-
-const QString TEST_SRC_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOperation/DONT_CHANGE");
-const QString TEST_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOperation/COPY_REMOVABLE");
 
 
 void FileOperationTest::init(){

@@ -22,6 +22,8 @@ SOURCES += \
     PublicTool.cpp \
     RibbonMenu.cpp \
     Tools/ConflictsItemHelper.cpp \
+    Tools/FilesNameBatchStandardizer.cpp \
+    Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
     Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
@@ -61,6 +63,8 @@ HEADERS += \
     PublicTool.h \
     RibbonMenu.h \
     Tools/ConflictsItemHelper.h \
+    Tools/FilesNameBatchStandardizer.h \
+    Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
     Tools/PlayVideo.h \
     Tools/RenameWidget.h \

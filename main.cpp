@@ -6,7 +6,7 @@
 #include "FileExplorerEvent.h"
 #include "PublicVariable.h"
 
-//#define RUN_MAIN_FILE 1
+#define RUN_MAIN_FILE 1
 #ifdef RUN_MAIN_FILE
 
 int main(int argc, char* argv[]) {
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 
   fileExplorer->show();
 
-  FileExplorerEvent fee(nullptr, fileExplorer->explorerCentralWidget->fileSysModel, fileExplorer->explorerCentralWidget->view);
+  FileExplorerEvent fee(nullptr, fileExplorer->explorerCentralWidget->fileSysModel, fileExplorer->explorerCentralWidget->view, fileExplorer->_statusBar);
   fee.subscribe();
 
   a.exec();

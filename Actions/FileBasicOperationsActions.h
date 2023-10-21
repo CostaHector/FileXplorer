@@ -275,7 +275,7 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
 
-  QActionGroup* MOVE_COPY;
+  QActionGroup* MOVE_COPY_TO;
   QActionGroup* MOVE_TO_PATH_HISTORY;
   QActionGroup* COPY_TO_PATH_HISTORY;
 

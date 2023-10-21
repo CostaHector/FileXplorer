@@ -10,48 +10,58 @@
 #include "View/DragDropTableView.h"
 
 class ContentPane : public QWidget {
-  Q_OBJECT
- public:
-  explicit ContentPane(QWidget* parent = nullptr,
-                       const QString& defaultPath = "",
-                       FolderPreviewHTML* previewHtml_ = nullptr,
-                       FolderPreviewWidget* previewWidget_ = nullptr,
-                       CustomStatusBar* _statusBar = nullptr);
-  auto CurrentPath() -> QString {
-    if (!fileSysModel) {
-      qDebug("[Error] fileSysModel is nullptr");
-      return "";
+    Q_OBJECT
+public:
+    explicit ContentPane(QWidget* parent = nullptr,
+                         const QString& defaultPath = "",
+                         FolderPreviewHTML* previewHtml_ = nullptr,
+                         FolderPreviewWidget* previewWidget_ = nullptr,
+                         CustomStatusBar* _statusBar = nullptr);
+    auto CurrentPath() -> QString {
+        if (!fileSysModel) {
+            qDebug("[Error] fileSysModel is nullptr");
+            return "";
+        }
+        return QFileInfo(fileSysModel->rootPath()).absoluteFilePath();
     }
-    return QFileInfo(fileSysModel->rootPath()).absoluteFilePath();
-  }
 
-  auto IntoNewPath(QString newPath,
-                   bool isNewPath = true,
-                   bool isF5Force = false) -> bool;
+    auto IntoNewPath(QString newPath,
+                     bool isNewPath = true,
+                     bool isF5Force = false) -> bool;
 
-  auto on_searchTextChanged(const QString& targetStr) -> bool;
-  auto on_searchEnterKey(const QString& targetStr) -> bool;
+    auto on_searchTextChanged(const QString& targetStr) -> bool;
+    auto on_searchEnterKey(const QString& targetStr) -> bool;
 
-  auto subscribe() -> void;
-  auto on_cellDoubleClicked(QModelIndex clickedIndex) -> bool;
-  auto on_selectionChanged(const QItemSelection& selected,
-                           const QItemSelection& deselected) -> bool;
-  auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
+    auto subscribe() -> void;
+    auto on_cellDoubleClicked(QModelIndex clickedIndex) -> bool;
+    auto on_selectionChanged(const QItemSelection& selected,
+                             const QItemSelection& deselected) -> bool;
+    auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
 
- signals:
+    auto keyPressEvent(QKeyEvent* e) -> void{
+        if (e->key() == Qt::Key_Backspace) {
+            addressBar->onBackspaceEvent();
+            return;
+        } else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
+            on_cellDoubleClicked(view->currentIndex());
+            return;
+        }
+    }
 
- public:
-  struct Anchor {
-    int row;
-    int col;
-  };
-  QMap<QString, Anchor> m_anchorTags;
-  MyQFileSystemModel* fileSysModel;
-  NavigationAndAddressBar* addressBar;
-  DragDropTableView* view;
-  FolderPreviewHTML* previewHtml;
-  FolderPreviewWidget* previewWidget;
-  CustomStatusBar* logger;
+signals:
+
+public:
+    struct Anchor {
+        int row;
+        int col;
+    };
+    QMap<QString, Anchor> m_anchorTags;
+    MyQFileSystemModel* fileSysModel;
+    NavigationAndAddressBar* addressBar;
+    DragDropTableView* view;
+    FolderPreviewHTML* previewHtml;
+    FolderPreviewWidget* previewWidget;
+    CustomStatusBar* logger;
 };
 
 #endif  // CONTENTPANE_H

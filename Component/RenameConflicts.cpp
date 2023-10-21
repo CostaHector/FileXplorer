@@ -133,9 +133,9 @@ auto RenameConflicts::NoConflictOperation(const QStringList& selectedItems, cons
         continue;
       }
       if (QFileInfo(leftFolderPath, nm).isDir()){
-        cmds.append({"cpfile", leftFolderPath, nm, rightFolderPath});
+          cmds.append({"mkpath", rightFolderPath, nm});
       } else {
-        cmds.append({"mkpath", rightFolderPath, nm});
+          cmds.append({"cpfile", leftFolderPath, nm, rightFolderPath});
       }
     }
   } else if (OP == CCMMode::LINK){
