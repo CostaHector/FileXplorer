@@ -1,37 +1,37 @@
 #include "PublicVariable.h"
 
-auto TextReader(const QString& textPath) -> QString{
-    if (not QFileInfo(textPath).isFile()){
-        qDebug("TextReader [%s] not exists", textPath.toStdString().c_str());
-        return "";
-    }
-    QFile file(textPath);
-    if (not file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        return "";
-    }
-    QTextStream stream(&file);
-    stream.setCodec("UTF-8");
-    QString contents(stream.readAll());
-    file.close();
-    return contents;
+auto TextReader(const QString& textPath) -> QString {
+  if (not QFileInfo(textPath).isFile()) {
+    qDebug("TextReader [%s] not exists", textPath.toStdString().c_str());
+    return "";
+  }
+  QFile file(textPath);
+  if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    return "";
+  }
+  QTextStream stream(&file);
+  stream.setCodec("UTF-8");
+  QString contents(stream.readAll());
+  file.close();
+  return contents;
 }
 
-namespace HEADERVIEW_SORT_INDICATOR_ORDER{
-QString SortOrderEnum2String(const Qt::SortOrder orderEnum){
-    if (string2SortOrderEnumListTable.isEmpty()){
-        qDebug("[Error] string2SortOrderListTable is empty");
-        return "";
+namespace HEADERVIEW_SORT_INDICATOR_ORDER {
+QString SortOrderEnum2String(const Qt::SortOrder orderEnum) {
+  if (string2SortOrderEnumListTable.isEmpty()) {
+    qDebug("[Error] string2SortOrderListTable is empty");
+    return "";
+  }
+  for (auto it = string2SortOrderEnumListTable.cbegin(); it != string2SortOrderEnumListTable.cend(); ++it) {
+    if (it.value() == orderEnum) {
+      return it.key();
     }
-    for (auto it=string2SortOrderEnumListTable.cbegin();it!=string2SortOrderEnumListTable.cend();++it){
-        if (it.value() == orderEnum){
-            return it.key();
-        }
-    }
-    return string2SortOrderEnumListTable.cbegin().key();
+  }
+  return string2SortOrderEnumListTable.cbegin().key();
 }
-}
+}  // namespace HEADERVIEW_SORT_INDICATOR_ORDER
 
-const char* SUBMIT_BTN_STYLE=
+const char* SUBMIT_BTN_STYLE =
     "QPushButton{"
     "    color: #fff;"
     "    background-color: DodgerBlue;"
@@ -42,4 +42,3 @@ const char* SUBMIT_BTN_STYLE=
     "    background-color: rgb(36, 118, 199);"
     "    border-color: rgb(36, 118, 199);"
     "}";
-

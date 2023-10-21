@@ -3,11 +3,10 @@
 
 #include "FolderListView.h"
 
-class OtherItemsListPreview : public FolderListView
-{
-public:
-    OtherItemsListPreview();
-    auto InitViewSettings()->void override;
+class OtherItemsListPreview : public FolderListView {
+ public:
+  OtherItemsListPreview();
+  auto InitViewSettings() -> void override;
 };
 
-#endif // OTHERITEMLISTPREVIEW_H
+#endif  // OTHERITEMLISTPREVIEW_H

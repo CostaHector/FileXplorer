@@ -3,10 +3,9 @@
 
 #include <MyQFileSystemModel.h>
 
-class VideosFileSystemModel : public MyQFileSystemModel
-{
-public:
-    explicit VideosFileSystemModel(QObject *parent = nullptr, bool showThumbnails_=false);
+class VideosFileSystemModel : public MyQFileSystemModel {
+ public:
+  explicit VideosFileSystemModel(QObject* parent = nullptr, bool showThumbnails_ = false);
 };
 
-#endif // VIDEOSFILESYSTEMMODEL_H
+#endif  // VIDEOSFILESYSTEMMODEL_H

@@ -4,31 +4,30 @@
 #include <QTabWidget>
 #include <QToolBar>
 
-class RibbonMenu : public QTabWidget
-{
-public:
-    RibbonMenu();
-    QToolBar* GetMenuRibbonCornerWid(QWidget* attached=nullptr);
+class RibbonMenu : public QTabWidget {
+ public:
+  RibbonMenu();
+  QToolBar* GetMenuRibbonCornerWid(QWidget* attached = nullptr);
 
-    QToolBar* LeafFile()const;
-    QToolBar* LeafHome()const;
-    QToolBar* LeafShare()const;
-    QToolBar* LeafView()const;
-    QToolBar* LeafDatabase()const;
-    QToolBar* LeafMediaTools()const;
+  QToolBar* LeafFile() const;
+  QToolBar* LeafHome() const;
+  QToolBar* LeafShare() const;
+  QToolBar* LeafView() const;
+  QToolBar* LeafDatabase() const;
+  QToolBar* LeafMediaTools() const;
 
-    void Subscribe();
+  void Subscribe();
 
-private:
-    QToolBar* leafFileWid;
-    QToolBar* leafHomeWid;
-    QToolBar* leafShareWid;
-    QToolBar* leafViewWid;
-    QToolBar* leafDatabaseWid;
-    QToolBar* leafMediaWid;
-    QToolBar* menuRibbonCornerWid;
+ private:
+  QToolBar* leafFileWid;
+  QToolBar* leafHomeWid;
+  QToolBar* leafShareWid;
+  QToolBar* leafViewWid;
+  QToolBar* leafDatabaseWid;
+  QToolBar* leafMediaWid;
+  QToolBar* menuRibbonCornerWid;
 
-    static constexpr int MAX_WIDGET_HEIGHT = 400;
+  static constexpr int MAX_WIDGET_HEIGHT = 400;
 };
 
-#endif // RIBBONMENU_H
+#endif  // RIBBONMENU_H

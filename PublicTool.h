@@ -1,31 +1,30 @@
 #ifndef PUBLICTOOL_H
 #define PUBLICTOOL_H
 
-#include <QString>
-#include <QFileInfo>
 #include <QAction>
 #include <QActionGroup>
+#include <QFileInfo>
 #include <QLayout>
+#include <QString>
 
-class OSWalker_RETURN{
-public:
-    QStringList relToNames;
-    QStringList completeNames;
-    QStringList suffixs;
-    QList<bool> isFiles;
+class OSWalker_RETURN {
+ public:
+  QStringList relToNames;
+  QStringList completeNames;
+  QStringList suffixs;
+  QList<bool> isFiles;
 };
 OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool includingSub = false, const bool includingSuffix = false);
 
-class PublicTool
-{
-public:
-    PublicTool();
+class PublicTool {
+ public:
+  PublicTool();
 
-    static bool copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExist=false);
+  static bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 };
 
 auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction*;
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 
 auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList;
-#endif // PUBLICTOOL_H
+#endif  // PUBLICTOOL_H

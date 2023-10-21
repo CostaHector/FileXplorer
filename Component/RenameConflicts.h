@@ -1,69 +1,68 @@
 #ifndef RENAMECONFLICTS_H
 #define RENAMECONFLICTS_H
 
-#include <QApplication>
-#include <QWidget>
-#include <QTableWidget>
-#include <QHeaderView>
-#include <QTableWidgetItem>
-#include <QLineEdit>
-#include <QLabel>
-#include <QRadioButton>
-#include <QToolBar>
-#include <QAction>
-#include <QDialog>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QDialogButtonBox>
 #include <QAbstractItemView>
-#include <QMenu>
-#include <QSizePolicy>
-#include <QTableWidgetSelectionRange>
-#include <QMessageBox>
-#include <QFileIconProvider>
-#include <QScrollBar>
-#include <Qt>
-#include <QFileInfo>
-#include <QSize>
-#include <QFile>
-#include <QDir>
-#include <QPoint>
-#include <QModelIndex>
-#include <QItemSelectionModel>
-#include <QObject>
-#include <QEvent>
-#include <QUrl>
-#include <QDirIterator>
-#include <QIcon>
+#include <QAction>
+#include <QApplication>
 #include <QCloseEvent>
-#include <QCursor>
 #include <QColor>
-#include <QKeyEvent>
-#include <QDesktopServices>
+#include <QCursor>
 #include <QDateTime>
+#include <QDesktopServices>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDir>
+#include <QDirIterator>
+#include <QEvent>
+#include <QFile>
+#include <QFileIconProvider>
+#include <QFileInfo>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QIcon>
+#include <QItemSelectionModel>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMessageBox>
+#include <QModelIndex>
+#include <QObject>
+#include <QPoint>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QScrollBar>
+#include <QSize>
+#include <QSizePolicy>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QTableWidgetSelectionRange>
+#include <QToolBar>
+#include <QUrl>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <Qt>
 
 #include "Component/Toaster.h"
-#include "PublicVariable.h"
 #include "FileOperation/FileOperation.h"
-#include "UndoRedo.h"
 #include "PublicTool.h"
+#include "PublicVariable.h"
 #include "Tools/ConflictsItemHelper.h"
+#include "UndoRedo.h"
 
 const QColor LIGHT_GREEN_COLOR(245, 245, 220);
 const QColor TOMATO_COLOR(244, 164, 96);
 const QColor TRANSPARENT_COLOR(Qt::GlobalColor::color0);
 
-
-class FileInfoType{
-public:
+class FileInfoType {
+ public:
   QString name;
   QString size;
   QString dateModified;
 };
 
-class RenameConflicts:public QDialog {
-public:
+class RenameConflicts : public QDialog {
+ public:
   const ConflictsItemHelper& itemIF;
   const QString leftFolderPath;
   const QString rightFolderPath;
@@ -81,38 +80,34 @@ public:
   QDialogButtonBox* buttonBox;
 
   QAction* RECYCL_LEFT;
-  QAction* RECYCL_RIGHT ;
-  QAction* RESTORE_LEFT ;
+  QAction* RECYCL_RIGHT;
+  QAction* RESTORE_LEFT;
   QAction* RESTORE_RIGHT;
 
   static constexpr int CONFLICT_NAME_COLUMN_INDEX = 2;
   static const QStringList COLUMNS_NAME_LIST;
   static const int COLUMNS_NAME_LIST_LEN;
 
-  RenameConflicts(const ConflictsItemHelper& itemIF_,
-                  const CCMMode& operation = CCMMode::MERGE,
-                  QWidget* parent = nullptr):
-                                               QDialog(parent),
-                                               itemIF(itemIF_),
-                                               leftFolderPath(itemIF.l),
-                                               rightFolderPath(itemIF.r),
-                                               ROW_COUNT(itemIF.commonList.size()),
-                                               OP(operation),
-                                               lCommonInfo(GetCommonInfo(itemIF.l)),
-                                               rCommonInfo(GetCommonInfo(itemIF.r)),
-                                               leftFolderBtn(new QPushButton(leftFolderPath)),
-                                               rightFolderBtn(new QPushButton(rightFolderPath)),
-                                               leftConflict(TableWidgetGetter()),
-                                               rightConflict(TableWidgetGetter()),
-                                               leftRestore(TableWidgetGetter()),
-                                               rightRestore(TableWidgetGetter()),
-                                               buttonBox(new QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel)),
-                                               RECYCL_LEFT(new QAction(QIcon(":/themes/RECYCLE"), "Recycle", leftConflict)),
-                                               RECYCL_RIGHT(new QAction(QIcon(":/themes/RECYCLE"), "Recycle", rightConflict)),
-                                               RESTORE_LEFT(new QAction(QIcon(":/themes/RESTORE"), "Restore", leftRestore)),
-                                               RESTORE_RIGHT(new QAction(QIcon(":/themes/RESTORE"), "Restore", rightRestore))
-  {
-
+  RenameConflicts(const ConflictsItemHelper& itemIF_, const CCMMode& operation = CCMMode::MERGE, QWidget* parent = nullptr)
+      : QDialog(parent),
+        itemIF(itemIF_),
+        leftFolderPath(itemIF.l),
+        rightFolderPath(itemIF.r),
+        ROW_COUNT(itemIF.commonList.size()),
+        OP(operation),
+        lCommonInfo(GetCommonInfo(itemIF.l)),
+        rCommonInfo(GetCommonInfo(itemIF.r)),
+        leftFolderBtn(new QPushButton(leftFolderPath)),
+        rightFolderBtn(new QPushButton(rightFolderPath)),
+        leftConflict(TableWidgetGetter()),
+        rightConflict(TableWidgetGetter()),
+        leftRestore(TableWidgetGetter()),
+        rightRestore(TableWidgetGetter()),
+        buttonBox(new QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel)),
+        RECYCL_LEFT(new QAction(QIcon(":/themes/RECYCLE"), "Recycle", leftConflict)),
+        RECYCL_RIGHT(new QAction(QIcon(":/themes/RECYCLE"), "Recycle", rightConflict)),
+        RESTORE_LEFT(new QAction(QIcon(":/themes/RESTORE"), "Restore", leftRestore)),
+        RESTORE_RIGHT(new QAction(QIcon(":/themes/RESTORE"), "Restore", rightRestore)) {
     leftConflict->setColumnHidden(COLUMNS_NAME_LIST_LEN - 1, true);
     leftRestore->setColumnHidden(COLUMNS_NAME_LIST_LEN - 1, true);
 
@@ -148,7 +143,7 @@ public:
   }
   auto GetQuickControlToolBar() -> QToolBar*;
   auto TableWidgetGetter() const -> QTableWidget*;
-  auto ConflictTableEvent(QAction* RECYCLE, QTableWidget* conflictTw, QTableWidget* recycleTw, QTableWidget* opsiteConflictTW)->void;
+  auto ConflictTableEvent(QAction* RECYCLE, QTableWidget* conflictTw, QTableWidget* recycleTw, QTableWidget* opsiteConflictTW) -> void;
   auto RecycleTableEvent(QAction* RESTORE, QTableWidget* recycleTw, QTableWidget* conflictTw, QTableWidget* opositeConflictTw) -> void;
   static auto getHorizontalSpacer() -> QWidget* {
     auto* spacer = new QWidget;
@@ -156,32 +151,32 @@ public:
     return spacer;
   }
 
-  auto GetCommonInfo(const QString& prePath) -> QList<FileInfoType>{
-    static auto infos = [](const QString& rel, const QString& nm) -> FileInfoType{
+  auto GetCommonInfo(const QString& prePath) -> QList<FileInfoType> {
+    static auto infos = [](const QString& rel, const QString& nm) -> FileInfoType {
       QFileInfo fileInfo(QDir(rel).absoluteFilePath(nm));
       return {nm, QString::number(fileInfo.size()), fileInfo.lastModified().toString("yyyyMMdd hhmmss")};
     };
     QList<FileInfoType> commonInfo;
-    for (const auto& nm: itemIF.commonList){
+    for (const auto& nm : itemIF.commonList) {
       commonInfo.append(infos(prePath, nm));
     }
     return commonInfo;
   }
 
-  static auto FindListCommon(const QStringList& lLst, const QStringList& rLst) -> QStringList{
+  static auto FindListCommon(const QStringList& lLst, const QStringList& rLst) -> QStringList {
     const QStringList* longerLst = nullptr;
     const QStringList* shortLst = nullptr;
     if (lLst.size() > rLst.size()) {
       longerLst = &lLst;
       shortLst = &rLst;
-    }else{
+    } else {
       shortLst = &lLst;
       longerLst = &rLst;
     }
     QStringList commonList;  // setA.intersection(setB) is not stable
     QSet<QString> largeSpaceSet(longerLst->cbegin(), longerLst->cend());
-    for (const QString& nm: *shortLst){
-      if (largeSpaceSet.contains(nm)){
+    for (const QString& nm : *shortLst) {
+      if (largeSpaceSet.contains(nm)) {
         commonList.append(nm);
       }
     }
@@ -194,11 +189,11 @@ public:
   auto on_Check() -> QPair<QList<int>, QList<int>> {
     QList<int> invalidLineList;
     QList<int> bothRemoveLineList;
-    for (auto r=0; r < ROW_COUNT; ++r){
-      int nonElementCnt = (leftConflict->item(r, 0) == nullptr) + (rightConflict->item(r, 0)== nullptr);
-      if (nonElementCnt == 0){
+    for (auto r = 0; r < ROW_COUNT; ++r) {
+      int nonElementCnt = (leftConflict->item(r, 0) == nullptr) + (rightConflict->item(r, 0) == nullptr);
+      if (nonElementCnt == 0) {
         invalidLineList.append(r + 1);  // "the (r+1)th line";
-      }else if (nonElementCnt == 2){
+      } else if (nonElementCnt == 2) {
         bothRemoveLineList.append(r + 1);
       }
     }
@@ -206,10 +201,10 @@ public:
   }
   static inline QString QIntStr2QString(const QList<int>& list) {
     QString joinedStr;
-    for(int i=0; i<list.size(); i++){
+    for (int i = 0; i < list.size(); i++) {
       joinedStr += QString::number(list[i]);
-      if (i<list.size()-1){
-        joinedStr += "," ;
+      if (i < list.size() - 1) {
+        joinedStr += ",";
       }
     }
     return joinedStr;
@@ -219,14 +214,10 @@ public:
 
   auto on_Submit() -> bool;
   auto Subscribe() -> void;
-  auto on_OpenButtonTextFolder(const QPushButton* btn) -> bool{
-    return QDesktopServices::openUrl(QUrl::fromLocalFile(btn->text()));
-  }
+  auto on_OpenButtonTextFolder(const QPushButton* btn) -> bool { return QDesktopServices::openUrl(QUrl::fromLocalFile(btn->text())); }
   auto on_Open(const QModelIndex index) -> bool;
   auto eventFilter(QObject* obj, QEvent* event) -> bool override;
 
-  auto sizeHint() const -> QSize override{
-    return QSize(1024, 768);
-  }
+  auto sizeHint() const -> QSize override { return QSize(1024, 768); }
 };
-#endif // RENAMECONFLICTS_H
+#endif  // RENAMECONFLICTS_H

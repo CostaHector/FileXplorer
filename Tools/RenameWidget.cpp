@@ -3,223 +3,217 @@
 const QString RenameWidget::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> RenameWidget::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
 
-QStringList RenameWidget_Insert::RenameCore(const QStringList &replaceeList){
-    if (replaceeList.isEmpty()){
-        return replaceeList;
-    }
-    const QString& insertString = insertStr->text();
-    if (insertString.isEmpty()){
-        return replaceeList;
-    }
-    const QString& insertAtStr = insertAt->text();
+QStringList RenameWidget_Insert::RenameCore(const QStringList& replaceeList) {
+  if (replaceeList.isEmpty()) {
+    return replaceeList;
+  }
+  const QString& insertString = insertStr->text();
+  if (insertString.isEmpty()) {
+    return replaceeList;
+  }
+  const QString& insertAtStr = insertAt->text();
 
-    bool isnumeric=false;
-    int insertAt = insertAtStr.toInt(&isnumeric);
-    if (not isnumeric){
-        qDebug("insert index is not number[%s]", insertAtStr.toStdString().c_str());
-        return replaceeList;
-    }
+  bool isnumeric = false;
+  int insertAt = insertAtStr.toInt(&isnumeric);
+  if (not isnumeric) {
+    qDebug("insert index is not number[%s]", insertAtStr.toStdString().c_str());
+    return replaceeList;
+  }
 
-    QStringList afterInsert;
-    for(const QString& replacee: replaceeList){
-        int realInsertAt = (insertAt > replacee.size())? replacee.size():insertAt;
-        afterInsert.append(replacee.left(realInsertAt) + insertString + replacee.mid(realInsertAt));
-    }
-    return afterInsert;
+  QStringList afterInsert;
+  for (const QString& replacee : replaceeList) {
+    int realInsertAt = (insertAt > replacee.size()) ? replacee.size() : insertAt;
+    afterInsert.append(replacee.left(realInsertAt) + insertString + replacee.mid(realInsertAt));
+  }
+  return afterInsert;
 }
 
-QStringList RenameWidget_Replace::RenameCore(const QStringList &replaceeList) {
-    const QString& oldString = oldStr->text();
-    const QString& newString = newStr->text();
-    auto regexEnable = regex->isChecked();
-    if (oldString.isEmpty()){
-        return replaceeList;
-    }
-    if (not regexEnable){
-        QStringList replacedLst(replaceeList);
-        for (QString& s:replacedLst){
-            s.replace(oldString, newString);
-        }
-        return replacedLst;
-    }
-
-    QRegExp repRegex(oldString);
-    if (not repRegex.isValid()){
-        const QString& msg = QString("invalid regex[%1]").arg(oldString);
-        qDebug(msg.toStdString().c_str());
-        regexValidLabel->ToNotSaved();
-        return replaceeList;
-    }
-    regexValidLabel->ToSaved();
+QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
+  const QString& oldString = oldStr->text();
+  const QString& newString = newStr->text();
+  auto regexEnable = regex->isChecked();
+  if (oldString.isEmpty()) {
+    return replaceeList;
+  }
+  if (not regexEnable) {
     QStringList replacedLst(replaceeList);
-    for (QString& s: replacedLst){
-        s.replace(repRegex, newString);
+    for (QString& s : replacedLst) {
+      s.replace(oldString, newString);
     }
     return replacedLst;
+  }
+
+  QRegExp repRegex(oldString);
+  if (not repRegex.isValid()) {
+    const QString& msg = QString("invalid regex[%1]").arg(oldString);
+    qDebug(msg.toStdString().c_str());
+    regexValidLabel->ToNotSaved();
+    return replaceeList;
+  }
+  regexValidLabel->ToSaved();
+  QStringList replacedLst(replaceeList);
+  for (QString& s : replacedLst) {
+    s.replace(repRegex, newString);
+  }
+  return replacedLst;
 }
 
+QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
+  QString startNoStr = startNo->text();
 
-QStringList RenameWidget_Numerize::RenameCore(const QStringList &replaceeList) {
-    QString startNoStr = startNo->text();
+  bool isnumeric = false;
+  int startNo = startNoStr.toInt(&isnumeric);
+  if (not isnumeric) {
+    qDebug("start index is not number[%s]", startNoStr.toStdString().c_str());
+    return replaceeList;
+  }
 
-    bool isnumeric = false;
-    int startNo = startNoStr.toInt(&isnumeric);
-    if (not isnumeric){
-        qDebug("start index is not number[%s]", startNoStr.toStdString().c_str());
-        return replaceeList;
-    }
+  if (completeBaseName->text().isEmpty()) {
+    // set default complete basename
+    completeBaseName->setText(replaceeList[0]);
+    completeBaseName->selectAll();
+  }
+  const QString& completeBaseNameString = completeBaseName->text();
+  const QStringList& suffixs = oldSuffix->toPlainText().split('\n');
 
-    if (completeBaseName->text().isEmpty()){
-        // set default complete basename
-        completeBaseName->setText(replaceeList[0]);
-        completeBaseName->selectAll();
+  QMap<QString, int> sufCntMap;
+  for (const QString& suf : suffixs) {
+    if (sufCntMap.contains(suf)) {
+      ++sufCntMap[suf];
+    } else {
+      sufCntMap[suf] = 1;
     }
-    const QString& completeBaseNameString = completeBaseName->text();
-    const QStringList& suffixs = oldSuffix->toPlainText().split('\n');
-
-    QMap<QString, int> sufCntMap;
-    for (const QString& suf: suffixs){
-        if (sufCntMap.contains(suf)){
-            ++sufCntMap[suf];
-        }else{
-            sufCntMap[suf] = 1;
-        }
+  }
+  QMap<QString, int> sufCurIndex;
+  for (const QString& suf : sufCntMap.keys()) {
+    if (sufCntMap[suf] > 1) {
+      sufCurIndex[suf] = startNo;
     }
-    QMap<QString, int> sufCurIndex;
-    for (const QString& suf : sufCntMap.keys()){
-        if (sufCntMap[suf] > 1){
-            sufCurIndex[suf] = startNo;
-        }
+  }
+  QStringList numerizedNames;
+  for (const QString& suf : suffixs) {
+    if (not sufCurIndex.contains(suf)) {
+      numerizedNames.append(completeBaseNameString);
+      continue;
     }
-    QStringList numerizedNames;
-    for (const QString& suf : suffixs){
-        if (not sufCurIndex.contains(suf)){
-            numerizedNames.append(completeBaseNameString);
-            continue;
-        }
-        const QString& newBaseName = QString("%1%2(%3)").
-                                     arg(completeBaseNameString).
-                                     arg(completeBaseNameString.isEmpty()? "":" ").
-                                     arg(sufCurIndex[suf]);
-        numerizedNames.append(newBaseName);
-        sufCurIndex[suf] += 1;
-    }
-    return numerizedNames;
+    const QString& newBaseName =
+        QString("%1%2(%3)").arg(completeBaseNameString).arg(completeBaseNameString.isEmpty() ? "" : " ").arg(sufCurIndex[suf]);
+    numerizedNames.append(newBaseName);
+    sufCurIndex[suf] += 1;
+  }
+  return numerizedNames;
 }
 
-auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList{
-    if (replaceeList.isEmpty()){
-        return replaceeList;
+auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
+  if (replaceeList.isEmpty()) {
+    return replaceeList;
+  }
+  QAction* caseAct = caseAG->checkedAction();
+  if (caseAct == nullptr) {
+    return replaceeList;
+  }
+  QStringList replacedList;
+  if (TRAILING_UNDERLINE->checkState() == Qt::Checked) {
+    if (caseAct->text() == "Upper") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(nm.toUpper() + " ");
+      }
+    } else if (caseAct->text() == "Lower") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(nm.toLower() + " ");
+      }
+    } else if (caseAct->text() == "Capitalize weak") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(capitalise_each_word(nm) + " ");
+      }
+    } else if (caseAct->text() == "Capitalize strong") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(capitalise_each_word(nm) + " ");
+      }
+    } else if (caseAct->text() == "Swapcase") {
+      return replacedList;
     }
-    QAction* caseAct = caseAG->checkedAction();
-    if (caseAct == nullptr){
-        return replaceeList;
+  } else {
+    if (caseAct->text() == "Upper") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(nm.trimmed());
+      }
+    } else if (caseAct->text() == "Lower") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(nm.trimmed());
+      }
+    } else if (caseAct->text() == "Capitalize weak") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(nm.trimmed());
+      }
+    } else if (caseAct->text() == "Capitalize strong") {
+      for (const QString& nm : replaceeList) {
+        replacedList.append(nm.trimmed());
+      }
+    } else if (caseAct->text() == "Swapcase") {
+      return replacedList;
     }
-    QStringList replacedList;
-    if (TRAILING_UNDERLINE->checkState() == Qt::Checked) {
-        if (caseAct->text() == "Upper"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(nm.toUpper()+" ");
-            }
-        } else if (caseAct->text() == "Lower"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(nm.toLower()+" ");
-            }
-        } else if (caseAct->text() == "Capitalize weak"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(capitalise_each_word(nm)+" ");
-            }
-        } else if (caseAct->text() == "Capitalize strong"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(capitalise_each_word(nm)+" ");
-            }
-        } else if (caseAct->text() == "Swapcase"){
-            return replacedList;
-        }
-    }else{
-        if (caseAct->text() == "Upper"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(nm.trimmed());
-            }
-        } else if (caseAct->text() == "Lower"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(nm.trimmed());
-            }
-        } else if (caseAct->text() == "Capitalize weak"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(nm.trimmed());
-            }
-        } else if (caseAct->text() == "Capitalize strong"){
-            for(const QString& nm: replaceeList){
-                replacedList.append(nm.trimmed());
-            }
-        } else if (caseAct->text() == "Swapcase"){
-            return replacedList;
-        }
-    }
-    return replacedList;
+  }
+  return replacedList;
 }
 
-auto RenameWidget_SwapSection::RenameCore(const QStringList& replaceeList) -> QStringList{
-    if (replaceeList.isEmpty()){
-        return replaceeList;
+auto RenameWidget_SwapSection::RenameCore(const QStringList& replaceeList) -> QStringList {
+  if (replaceeList.isEmpty()) {
+    return replaceeList;
+  }
+  QAction* caseAct = caseAG->checkedAction();
+  if (caseAct == nullptr) {
+    return replaceeList;
+  }
+  int f = caseAct->text().left(1).toInt();
+  int s = caseAct->text().right(1).toInt();
+  QStringList sectionSwapped;
+  for (const QString nm : replaceeList) {
+    QStringList secList = nm.split('-');
+    if (secList.size() > s) {  // swap element at f, s index;
+      std::swap(secList[f], secList[s]);
+      sectionSwapped.append(secList.join('-'));
+    } else {
+      sectionSwapped.append(nm);
     }
-    QAction* caseAct = caseAG->checkedAction();
-    if (caseAct == nullptr) {
-        return replaceeList;
-    }
-    int f = caseAct->text().left(1).toInt();
-    int s = caseAct->text().right(1).toInt();
-    QStringList sectionSwapped;
-    for (const QString nm: replaceeList){
-        QStringList secList = nm.split('-');
-        if (secList.size() > s){  // swap element at f, s index;
-            std::swap(secList[f], secList[s]);
-            sectionSwapped.append(secList.join('-'));
-        }
-        else{
-            sectionSwapped.append(nm);
-        }
-    }
-    return sectionSwapped;
+  }
+  return sectionSwapped;
 }
 
-
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
-int main(int argc, char *argv[]){
-    QDir dir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath());
-    QStringList rels  = dir.entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsFirst);
+int main(int argc, char* argv[]) {
+  QDir dir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath());
+  QStringList rels = dir.entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsFirst);
 
-    QApplication a(argc, argv);
-    RenameWidget_Insert winI;
-    RenameWidget_Replace winR;
-    RenameWidget_Delete winD;
-    RenameWidget_Numerize winN;
-    RenameWidget_Case winC;
+  QApplication a(argc, argv);
+  RenameWidget_Insert winI;
+  RenameWidget_Replace winR;
+  RenameWidget_Delete winD;
+  RenameWidget_Numerize winN;
+  RenameWidget_Case winC;
 
-    winI.init();
-    winR.init();
-    winD.init();
-    winN.init();
-    winC.init();
+  winI.init();
+  winR.init();
+  winD.init();
+  winN.init();
+  winC.init();
 
-    winI.InitTextContent(dir.absolutePath(), rels);
-    winR.InitTextContent(dir.absolutePath(), rels);
-    winD.InitTextContent(dir.absolutePath(), rels);
-    winN.InitTextContent(dir.absolutePath(), rels);
-    winC.InitTextContent(dir.absolutePath(), rels);
-    // winR.InitTextContent(pre, rels)
-    // winD.InitTextContent(pre, rels)
-    // winN.InitTextContent(pre, rels)
-    winI.show();
-    winR.show();
-    winD.show();
-    winN.show();
-    winC.show();
-    return a.exec();
+  winI.InitTextContent(dir.absolutePath(), rels);
+  winR.InitTextContent(dir.absolutePath(), rels);
+  winD.InitTextContent(dir.absolutePath(), rels);
+  winN.InitTextContent(dir.absolutePath(), rels);
+  winC.InitTextContent(dir.absolutePath(), rels);
+  // winR.InitTextContent(pre, rels)
+  // winD.InitTextContent(pre, rels)
+  // winN.InitTextContent(pre, rels)
+  winI.show();
+  winR.show();
+  winD.show();
+  winN.show();
+  winC.show();
+  return a.exec();
 }
 #endif
-

@@ -1,26 +1,23 @@
 #ifndef PLAYVIDEO_H
 #define PLAYVIDEO_H
 
-
 class PlayVideo {
-public:
-    PlayVideo();
+ public:
+  PlayVideo();
 };
 
-#include <QString>
+#include <QDesktopServices>
+#include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QProcess>
-#include <QFile>
-#include <QDir>
-#include <QDesktopServices>
+#include <QString>
 #include <QUrl>
 
 #include "PublicVariable.h"
 
 bool PlayADir(const QString& dirPath);
 
-
 bool on_ShiftEnterPlayVideo(QString& path);
 
-
-#endif // PLAYVIDEO_H
+#endif  // PLAYVIDEO_H

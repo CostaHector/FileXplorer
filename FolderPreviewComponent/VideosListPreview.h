@@ -3,11 +3,10 @@
 
 #include "FolderListView.h"
 
-class VideosListPreview : public FolderListView
-{
-public:
-    explicit VideosListPreview();
-    auto InitViewSettings()->void override;
+class VideosListPreview : public FolderListView {
+ public:
+  explicit VideosListPreview();
+  auto InitViewSettings() -> void override;
 };
 
-#endif // VIDEOSLISTPREVIEW_H
+#endif  // VIDEOSLISTPREVIEW_H
