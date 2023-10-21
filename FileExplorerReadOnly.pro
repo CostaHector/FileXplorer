@@ -22,6 +22,7 @@ SOURCES += \
     PublicTool.cpp \
     RibbonMenu.cpp \
     Tools/ConflictsItemHelper.cpp \
+    Tools/NameStandardizer.cpp \
     Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
     UndoRedo.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     PublicTool.h \
     RibbonMenu.h \
     Tools/ConflictsItemHelper.h \
+    Tools/NameStandardizer.h \
     Tools/PlayVideo.h \
     Tools/RenameWidget.h \
     UndoRedo.h \
@@ -92,3 +94,6 @@ RESOURCES += \
 
 DISTFILES += \
     readme.md
+
+QMAKE_POST_LINK +=
+    \

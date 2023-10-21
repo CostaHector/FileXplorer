@@ -7,6 +7,7 @@
 #include <QSize>
 #include <QTextStream>
 
+const QString PROJECT_PATH = QFileInfo(__FILE__).absolutePath();
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
 
@@ -51,8 +52,8 @@ class GVar {
  public:
   explicit GVar(const QString& name_, const QVariant& v_) : name(name_), v(v_){};
   virtual bool checker() = 0;
-  QVariant v;
   QString name;
+  QVariant v;
 };
 
 class GVarBool : public GVar {

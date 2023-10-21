@@ -47,6 +47,6 @@ void QStringFunctionTest::test_regexReplace(){
 }
 
 
-QTEST_MAIN(QStringFunctionTest)
+//QTEST_MAIN(QStringFunctionTest)
 
 #include "QStringFunctionTest.moc"

@@ -9,16 +9,19 @@ TEMPLATE = app
 SOURCES += \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
+    TestCase/MovieNameStandardizerTest.cpp \
     TestCase/QStringFunctionTest.cpp \
     TestCase/RenameWidgetTest.cpp \
     TestCase/FileOperationTest.cpp \
     TestCase/UndoRedoTest.cpp \
+    Tools/NameStandardizer.cpp \
     UndoRedo.cpp
 
 
 HEADERS += \
     FileOperation/FileOperation.h \
     PublicTool.h \
+    Tools/NameStandardizer.h \
     UndoRedo.h
 
 DISTFILES += \
@@ -85,3 +88,6 @@ DISTFILES += \
     FileOperation/test/TextEnv_NameStringSectionSwapper/DONT_CHANGE/A/A - B - C - D 1.txt \
     FileOperation/test/TextEnv_NameStringSectionSwapper/DONT_CHANGE/A/A.txt \
     TestCase/test/TestEnv_UndoRedo/DONT_CHANGE/012.txt
+
+RESOURCES += \
+    themes/res.qrc

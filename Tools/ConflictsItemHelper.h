@@ -17,7 +17,6 @@ class Finder {
     }
     if (isMove) {
       return lRels;
-      ;
     }
 
     const int n = l.size();

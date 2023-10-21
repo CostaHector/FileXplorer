@@ -71,9 +71,9 @@ auto RenameConflicts::ConflictTableEvent(QAction* RECYCLE, QTableWidget* conflic
             continue;
           }
           recycleTw->setItem(r, c, conflictTw->takeItem(r, c));
-          recycleTw->item(r, c)->setBackgroundColor(TRANSPARENT_COLOR);
+          recycleTw->item(r, c)->setBackground(TRANSPARENT_COLOR);
           if (opsiteConflictTW->item(r, c) != nullptr) {
-            opsiteConflictTW->item(r, c)->setBackgroundColor(LIGHT_GREEN_COLOR);
+            opsiteConflictTW->item(r, c)->setBackground(LIGHT_GREEN_COLOR);
           }
         }
       }
@@ -105,10 +105,10 @@ auto RenameConflicts::RecycleTableEvent(QAction* RESTORE, QTableWidget* recycleT
           }
           conflictTw->setItem(r, c, recycleTw->takeItem(r, c));
           if (opositeConflictTw->item(r, c) == nullptr){
-            conflictTw->item(r, c)->setBackgroundColor(LIGHT_GREEN_COLOR);
+            conflictTw->item(r, c)->setBackground(LIGHT_GREEN_COLOR);
           }else{
-            conflictTw->item(r, c)->setBackgroundColor(TOMATO_COLOR);
-            opositeConflictTw->item(r, c)->setBackgroundColor(TOMATO_COLOR);
+            conflictTw->item(r, c)->setBackground(TOMATO_COLOR);
+            opositeConflictTw->item(r, c)->setBackground(TOMATO_COLOR);
           }
         }
       }
