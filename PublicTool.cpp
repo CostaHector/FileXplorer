@@ -1,4 +1,6 @@
 #include "PublicTool.h"
+#include "PublicVariable.h"
+
 #include <QDir>
 
 PublicTool::PublicTool() {}
@@ -133,4 +135,43 @@ auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList
     relFullNames.append(relPath);
   }
   return {relFullNames.crbegin(), relFullNames.crend()};
+}
+
+auto ChooseCopyDestination(QString defaultPath, QWidget *parent) -> QString {
+  if (not QFileInfo(defaultPath).isDir()) {
+    defaultPath = PreferenceSettings().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
+  }
+  const auto selectPath = QFileDialog::getExistingDirectory(parent, "Choose location", defaultPath);
+  QFileInfo dstFi(selectPath);
+  if (not dstFi.isDir()) {
+    return "";
+  }
+  PreferenceSettings().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
+  return dstFi.absoluteFilePath();
+}
+
+auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* oldAG) -> QString {
+  if (!oldAG){
+    qDebug("[Err] oldAG nullptr");
+    return "";
+  }
+  static constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
+  QString i_1_path = first_path;        // first and (i-1) path
+  for (auto* act : oldAG->actions()) {  // i path
+    QString i_path = act->text();
+    if (i_path == first_path) {
+      act->setText(i_1_path);  // finish
+      break;
+    }
+    act->setText(i_1_path);
+    i_1_path = i_path;
+  }
+  QString actionsStr;
+  for (auto* act : oldAG->actions()) {
+    actionsStr += (act->text() + '/');
+  }
+  if (not actionsStr.isEmpty()){
+    actionsStr.chop(1);
+  }
+  return actionsStr;
 }

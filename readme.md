@@ -14,6 +14,8 @@ QSize FolderPreviewWidget::sizeHint() const
 
 ### isRoot
 
+"C:/" is Root; "C:" is not Root; "" is not Root
+
 ```cpp
 qDebug() << QDir("C:/").isRoot() << QDir("C:").isRoot();
 const auto& itemsInEmptyStringList = QDir("").entryList(QDir::AllEntries|QDir::NoDotAndDotDot);
@@ -23,11 +25,7 @@ for (const auto& s: itemsInEmptyStringList){
 }
 ```
 
-> "C:/" is Root
 
-> "C:" is not Root
-
-> "" is not Root
 ```sh
 ".qmake.stash"
 ".qtc_clangd"
