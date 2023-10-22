@@ -9,7 +9,8 @@
 DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*mouseSideKeyBackwardBtn, QPushButton*mouseSideKeyForwardBtn):
     QTableView(), View(),
     backwardBtn(mouseSideKeyBackwardBtn),
-    forwardBtn(mouseSideKeyForwardBtn)
+    forwardBtn(mouseSideKeyForwardBtn),
+    menu(new RightClickMenu("Right click menu", this))
 {
     setModel(fsmModel);
     InitViewSettings();
@@ -24,6 +25,8 @@ DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton*m
 
     DragDropTableView::subscribe();
 }
+
+
 
 void DragDropTableView::subscribe(){
     connect(horizontalHeader(), &QHeaderView::sectionResized, this, &View::on_sectionResized);
@@ -40,6 +43,8 @@ void DragDropTableView::subscribe(){
 
     addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
     addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+
+    connect(this, &QTableView::customContextMenuRequested, this, &DragDropTableView::on_ShowContextMenu);
 }
 
 auto DragDropTableView::InitViewSettings()->void{
@@ -84,6 +89,10 @@ void DragDropTableView::dragMoveEvent(QDragMoveEvent* event){
 
 void DragDropTableView::mouseMoveEvent(QMouseEvent *event) {
     View::mouseMoveEventCore(this, event);
+}
+
+void DragDropTableView::on_ShowContextMenu(const QPoint pnt) {
+  menu->popup(this->mapToGlobal(pnt));  // or QCursor::pos()
 }
 
 void DragDropTableView::mousePressEvent(QMouseEvent* event){

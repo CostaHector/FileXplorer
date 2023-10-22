@@ -1,4 +1,4 @@
-#include "ContentPane.h"
+#include "ContentPanel.h"
 #include <QLineEdit>
 #include <QTableView>
 #include <QVBoxLayout>
@@ -24,7 +24,7 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 using std::placeholders::_3;
 
-ContentPane::ContentPane(QWidget* parent,
+ContentPanel::ContentPanel(QWidget* parent,
                          const QString& defaultPath,
                          FolderPreviewHTML* previewHtml_,
                          FolderPreviewWidget* previewWidget_,
@@ -32,9 +32,9 @@ ContentPane::ContentPane(QWidget* parent,
     : QWidget(parent),
       fileSysModel(new MyQFileSystemModel(_statusBar, nullptr)),
       addressBar(new NavigationAndAddressBar(
-          std::bind(&ContentPane::IntoNewPath, this, _1, _2, _3),
-          std::bind(&ContentPane::on_searchTextChanged, this, _1),
-          std::bind(&ContentPane::on_searchEnterKey, this, _1))),
+          std::bind(&ContentPanel::IntoNewPath, this, _1, _2, _3),
+          std::bind(&ContentPanel::on_searchTextChanged, this, _1),
+          std::bind(&ContentPanel::on_searchEnterKey, this, _1))),
       view(new DragDropTableView(fileSysModel,
                                  addressBar->backToBtn,
                                  addressBar->forwardToBtn)),
@@ -53,7 +53,7 @@ ContentPane::ContentPane(QWidget* parent,
   contentPaneLayout->setSpacing(0);
 }
 
-auto ContentPane::IntoNewPath(QString newPath, bool isNewPath, bool isF5Force)
+auto ContentPanel::IntoNewPath(QString newPath, bool isNewPath, bool isF5Force)
     -> bool {
   // isNewPath: bool Only differs in undo and redo operation.
   // True means newPath would be push into undo.
@@ -72,7 +72,7 @@ auto ContentPane::IntoNewPath(QString newPath, bool isNewPath, bool isF5Force)
   return true;
 }
 
-auto ContentPane::on_searchTextChanged(const QString& targetStr) -> bool {
+auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
   if (targetStr.isEmpty()) {
     fileSysModel->setNameFilters({});
     return true;
@@ -82,7 +82,7 @@ auto ContentPane::on_searchTextChanged(const QString& targetStr) -> bool {
   return true;
 }
 
-auto ContentPane::on_searchEnterKey(const QString& targetStr) -> bool {
+auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
   fileSysModel->setNameFilters({});
   QString rootPth = CurrentPath();
   int n =
@@ -101,16 +101,21 @@ auto ContentPane::on_searchEnterKey(const QString& targetStr) -> bool {
   return true;
 }
 
-void ContentPane::subscribe() {
+void ContentPanel::subscribe() {
+  QList<QAction*> OPENList = g_fileBasicOperationsActions().OPEN->actions();
+  auto* OPEN_RUN = OPENList[0];
+  connect(OPEN_RUN, &QAction::triggered, this, [this](){
+    on_cellDoubleClicked(view->currentIndex());
+  });
   connect(view, &QTableView::doubleClicked, this,
-          &ContentPane::on_cellDoubleClicked);
+          &ContentPanel::on_cellDoubleClicked);
   connect(view->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-          &ContentPane::on_selectionChanged);
+          &ContentPanel::on_selectionChanged);
   connect(fileSysModel, &MyQFileSystemModel::directoryLoaded, this,
-          &ContentPane::onAfterDirectoryLoaded);
+          &ContentPanel::onAfterDirectoryLoaded);
 }
 
-auto ContentPane::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
+auto ContentPanel::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
   if (not clickedIndex.isValid()) {
     return false;
   }
@@ -145,7 +150,7 @@ auto ContentPane::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
   return true;
 }
 
-auto ContentPane::on_selectionChanged(const QItemSelection& selected,
+auto ContentPanel::on_selectionChanged(const QItemSelection& selected,
                                       const QItemSelection& deselected)
     -> bool {
   if (selected.isEmpty()) {
@@ -171,7 +176,7 @@ auto ContentPane::on_selectionChanged(const QItemSelection& selected,
   return true;
 }
 
-bool ContentPane::onAfterDirectoryLoaded(const QString& loadedPath) {
+bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
   view->setFocus();
   const QModelIndex rootIndex = view->rootIndex();
   if (not m_anchorTags.contains(loadedPath)) {

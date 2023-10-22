@@ -112,31 +112,25 @@ class FileExplorerEvent : public QObject {
   auto on_copyName() const -> bool;
   auto PathCopyTriple(const QStringList lst, const QString& opName) const -> bool;
 
-  auto on_CopyItemToClipboard() -> int {
-    const QString& pth = fileSysModel->rootPath();
-    auto urlsCnt = this->FillMimeDataIntoClipboard(CCMMode::COPY, pth);
-    return urlsCnt;
-  }
-
   auto on_Merge(const bool reverse = false) -> bool;
   auto on_Copy() -> bool;
   auto on_Cut() -> bool;
   auto on_Paste() -> bool;
 
   auto FillMimeDataIntoClipboard(const CCMMode cutCopy = CCMMode::ERROR, const QString& fromPath = "") -> int {
-    QStringList mixed;
+    QStringList lRels;
     QList<QUrl> urls;
     for (const QModelIndex ind : selectedIndexes()) {
-      mixed.append(fileSysModel->filePath(ind));
-      urls.append(QUrl::fromLocalFile(mixed.back()));
+      lRels.append(fileSysModel->fileName(ind));
+      urls.append(QUrl::fromLocalFile(lRels.back()));
     }
-    if (mixed.isEmpty()) {
+    if (lRels.isEmpty()) {
       return 0;
     }
-    MimeDataCX* mimedata = new MimeDataCX(fromPath, mixed, cutCopy);
+    MimeDataCX* mimedata = new MimeDataCX(fromPath, lRels, cutCopy);
     mimedata->setUrls(urls);
 
-    mimedata->setText(mixed.join('\n'));
+    mimedata->setText(lRels.join('\n'));
     this->clipboard->setMimeData(mimedata);
     return urls.size();
   }

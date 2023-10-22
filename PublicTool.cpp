@@ -155,7 +155,6 @@ auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* old
     qDebug("[Err] oldAG nullptr");
     return "";
   }
-  static constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
   QString i_1_path = first_path;        // first and (i-1) path
   for (auto* act : oldAG->actions()) {  // i path
     QString i_path = act->text();
@@ -166,9 +165,10 @@ auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* old
     act->setText(i_1_path);
     i_1_path = i_path;
   }
+  static constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
   QString actionsStr;
   for (auto* act : oldAG->actions()) {
-    actionsStr += (act->text() + '/');
+    actionsStr += (act->text() + MOVE_COPT_TO_PATH_STR_SEPERATOR);
   }
   if (not actionsStr.isEmpty()){
     actionsStr.chop(1);

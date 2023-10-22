@@ -7,7 +7,7 @@
 #include <QSettings>
 
 #include "Component/CustomStatusBar.h"
-#include "ContentPane.h"
+#include "ContentPanel.h"
 #include "NavigationToolBar.h"
 #include "RibbonMenu.h"
 
@@ -26,7 +26,7 @@ class FileExplorerReadOnly : public QMainWindow {
   QDockWidget* previewHtmlDock;
   FolderPreviewHTML* previewHtml;
   FolderPreviewWidget* previewWidget;
-  ContentPane* explorerCentralWidget;
+  ContentPanel* explorerCentralWidget;
   NavigationToolBar* _navigationToolBar;
   RibbonMenu* osm;
   CustomStatusBar* _statusBar;

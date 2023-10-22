@@ -30,7 +30,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(QWidget* parent, const QString& initi
       osm(new RibbonMenu),
       _statusBar(new CustomStatusBar) {
   const QString& defaultPath = ReadSettings(initialPath);
-  explorerCentralWidget = new ContentPane(nullptr, defaultPath, previewHtml, previewWidget, _statusBar);
+  explorerCentralWidget = new ContentPanel(nullptr, defaultPath, previewHtml, previewWidget, _statusBar);
   this->setCentralWidget(explorerCentralWidget);
 
   //    previewHtmlDock->setWidget(previewHtml);
@@ -86,7 +86,7 @@ void FileExplorerReadOnly::subscribe() {
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
-    auto intoNewPath = std::bind(&ContentPane::IntoNewPath, explorerCentralWidget, _1, _2, _3);
+    auto intoNewPath = std::bind(&ContentPanel::IntoNewPath, explorerCentralWidget, _1, _2, _3);
     _navigationToolBar->subscribe(intoNewPath);
   }
 }

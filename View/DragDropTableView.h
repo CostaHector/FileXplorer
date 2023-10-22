@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QListView>
 
+#include "Component/RightClickMenu.h"
 #include "MyQFileSystemModel.h"
 #include "PublicVariable.h"
 
@@ -259,9 +260,12 @@ public:
     void mousePressEvent(QMouseEvent* event) override;
 
     void mouseMoveEvent(QMouseEvent* event) override;
+
+    void on_ShowContextMenu(const QPoint pnt);
 private:
     QPushButton* backwardBtn; // will not takeover
     QPushButton* forwardBtn;// will not takeover
+    RightClickMenu* menu;
 };
 
 #endif // DRAGDROPTABLEVIEW_H

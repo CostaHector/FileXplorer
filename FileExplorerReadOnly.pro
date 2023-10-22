@@ -15,9 +15,10 @@ SOURCES += \
     AddressELineEdit.cpp \
     Component/CustomStatusBar.cpp \
     Component/RenameConflicts.cpp \
+    Component/RightClickMenu.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
-    ContentPane.cpp \
+    ContentPanel.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
@@ -57,9 +58,10 @@ HEADERS += \
     AddressELineEdit.h \
     Component/CustomStatusBar.h \
     Component/RenameConflicts.h \
+    Component/RightClickMenu.h \
     Component/StateLabel.h \
     Component/Toaster.h \
-    ContentPane.h \
+    ContentPanel.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     RibbonMenu.h \

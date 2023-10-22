@@ -1,5 +1,5 @@
-#ifndef CONTENTPANE_H
-#define CONTENTPANE_H
+#ifndef CONTENTPANEL_H
+#define CONTENTPANEL_H
 
 #include <QWidget>
 #include "Component/CustomStatusBar.h"
@@ -9,10 +9,10 @@
 #include "NavigationAndAddressBar.h"
 #include "View/DragDropTableView.h"
 
-class ContentPane : public QWidget {
+class ContentPanel : public QWidget {
     Q_OBJECT
 public:
-    explicit ContentPane(QWidget* parent = nullptr,
+    explicit ContentPanel(QWidget* parent = nullptr,
                          const QString& defaultPath = "",
                          FolderPreviewHTML* previewHtml_ = nullptr,
                          FolderPreviewWidget* previewWidget_ = nullptr,
@@ -64,4 +64,4 @@ public:
     CustomStatusBar* logger;
 };
 
-#endif  // CONTENTPANE_H
+#endif  // CONTENTPANEL_H
