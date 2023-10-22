@@ -38,7 +38,7 @@ public:
                              const QItemSelection& deselected) -> bool;
     auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
 
-    auto keyPressEvent(QKeyEvent* e) -> void{
+    auto keyPressEvent(QKeyEvent* e) -> void override{
         if (e->key() == Qt::Key_Backspace) {
             addressBar->onBackspaceEvent();
             return;
@@ -46,6 +46,7 @@ public:
             on_cellDoubleClicked(view->currentIndex());
             return;
         }
+        QWidget::keyPressEvent(e);
     }
 
 signals:

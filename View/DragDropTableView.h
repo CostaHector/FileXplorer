@@ -262,6 +262,15 @@ public:
     void mouseMoveEvent(QMouseEvent* event) override;
 
     void on_ShowContextMenu(const QPoint pnt);
+
+    auto keyPressEvent(QKeyEvent* e) -> void override{
+        if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete){
+            emit menu->MOVE_TO_TRASHBIN->trigger();
+            return;
+        }
+        QTableView::keyPressEvent(e);
+    }
+
 private:
     QPushButton* backwardBtn; // will not takeover
     QPushButton* forwardBtn;// will not takeover

@@ -7,7 +7,10 @@
 
 class RightClickMenu : public QMenu {
  public:
-  explicit RightClickMenu(const QString& title, QWidget* parent = nullptr) : QMenu(title, parent) {
+  QAction* MOVE_TO_TRASHBIN;
+  explicit RightClickMenu(const QString& title, QWidget* parent = nullptr) : QMenu(title, parent),
+        MOVE_TO_TRASHBIN(g_fileBasicOperationsActions().DELETE_ACTIONS->actions()[0]){
+
     setToolTipsVisible(true);
 
     auto* NEW_MENU = GetNewMenu();
