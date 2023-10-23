@@ -57,6 +57,6 @@ private slots:
 
 
 
-//QTEST_MAIN(FilesNameBatchStandardizerTest)
+QTEST_MAIN(FilesNameBatchStandardizerTest)
 
 #include "FilesNameBatchStandardizerTest.moc"

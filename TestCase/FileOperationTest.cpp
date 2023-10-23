@@ -56,6 +56,10 @@ private slots:
 
     void test_link_a_file();
     void test_link_a_relative_file();
+
+
+    void test_rename_a_txt_To_A_TXT_Not_Exists();
+    void test_rename_b_txt_To_A_TXT_Already_Exists();
 };
 
 
@@ -535,6 +539,27 @@ void FileOperationTest::test_link_a_relative_file(){
     QVERIFY(recoverRet);
     QVERIFY(QDir(TEST_DIR).exists("a/a1.txt"));
     QVERIFY(not QDir(SystemPath::starredPath).exists("a/a1.txt.lnk"));
+}
+
+void FileOperationTest::test_rename_a_txt_To_A_TXT_Not_Exists(){
+    const QString lowerCaseName = "a.txt";
+    QVERIFY2(QDir(TEST_DIR).entryList(QDir::Filter::AllEntries).contains(lowerCaseName), "Environment should met first");
+
+    const QString upperCaseName = "A.TXT";
+    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, lowerCaseName, TEST_DIR, upperCaseName);
+    QCOMPARE(retEle.first, ErrorCode::OK);
+    QVERIFY2(QDir(TEST_DIR).entryList(QDir::Filter::AllEntries).contains(upperCaseName), "a.txt should be renamed to A.TXT");
+}
+
+void FileOperationTest::test_rename_b_txt_To_A_TXT_Already_Exists(){
+    QVERIFY2(QDir(TEST_DIR).entryList(QDir::Filter::AllEntries).contains("b.txt"), "Environment should met first");
+    QVERIFY2(QDir(TEST_DIR).entryList(QDir::Filter::AllEntries).contains("a.txt"), "Environment should met first");
+    // rename b.txt -> A.TXT while {a.txt} already exist in destination
+    const QString onlyCaseDifferName = "A.TXT";
+
+    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "b.txt", TEST_DIR, onlyCaseDifferName);
+    QVERIFY2(retEle.first != ErrorCode::OK, "should reject this rename and override operation");
+
 }
 
 //QTEST_MAIN(FileOperationTest)

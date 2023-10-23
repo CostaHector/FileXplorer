@@ -113,46 +113,24 @@ auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringLi
     return replaceeList;
   }
   QStringList replacedList;
-  if (TRAILING_UNDERLINE->checkState() == Qt::Checked) {
-    if (caseAct->text() == "Upper") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(nm.toUpper() + " ");
-      }
-    } else if (caseAct->text() == "Lower") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(nm.toLower() + " ");
-      }
-    } else if (caseAct->text() == "Capitalize weak") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(capitalise_each_word(nm) + " ");
-      }
-    } else if (caseAct->text() == "Capitalize strong") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(capitalise_each_word(nm) + " ");
-      }
-    } else if (caseAct->text() == "Swapcase") {
-      return replacedList;
+  if (caseAct->text() == "Upper") {
+    for (const QString& nm : replaceeList) {
+      replacedList.append(nm.toUpper());
     }
-  } else {
-    if (caseAct->text() == "Upper") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(nm.trimmed());
-      }
-    } else if (caseAct->text() == "Lower") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(nm.trimmed());
-      }
-    } else if (caseAct->text() == "Capitalize weak") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(nm.trimmed());
-      }
-    } else if (caseAct->text() == "Capitalize strong") {
-      for (const QString& nm : replaceeList) {
-        replacedList.append(nm.trimmed());
-      }
-    } else if (caseAct->text() == "Swapcase") {
-      return replacedList;
+  } else if (caseAct->text() == "Lower") {
+    for (const QString& nm : replaceeList) {
+      replacedList.append(nm.toLower());
     }
+  } else if (caseAct->text() == "Capitalize weak") {
+    for (const QString& nm : replaceeList) {
+      replacedList.append(capitalise_each_word(nm));
+    }
+  } else if (caseAct->text() == "Capitalize strong") {
+    for (const QString& nm : replaceeList) {
+      replacedList.append(capitalise_each_word(nm));
+    }
+  } else if (caseAct->text() == "Swapcase") {
+    return replacedList;
   }
   return replacedList;
 }
