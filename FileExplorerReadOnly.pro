@@ -12,6 +12,7 @@ SOURCES += \
     Actions/FramelessWindowActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
+    Actions/RightClickMenuActions.cpp \
     AddressELineEdit.cpp \
     Component/CustomStatusBar.cpp \
     Component/RenameConflicts.cpp \
@@ -55,6 +56,7 @@ HEADERS += \
     Actions/FramelessWindowActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
+    Actions/RightClickMenuActions.h \
     AddressELineEdit.h \
     Component/CustomStatusBar.h \
     Component/RenameConflicts.h \

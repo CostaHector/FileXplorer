@@ -1,16 +1,13 @@
 #ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
 #include "Component/CustomStatusBar.h"
-#include "Component/RenameConflicts.h"
-#include "Tools/Categorizer.h"
-#include "Tools/FilesNameBatchStandardizer.h"
 #include "Tools/MimeDataCX.h"
-#include "Tools/PlayVideo.h"
 #include "UndoRedo.h"
 
 #include <QAbstractButton>
 #include <QAbstractItemModel>
 #include <QClipboard>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QFileInfo>
 #include <QFileSystemModel>
@@ -72,6 +69,26 @@ class FileExplorerEvent : public QObject {
       return view->selectionModel()->selectedIndexes();
     }
     return view->selectionModel()->selectedRows();
+  }
+
+  static QString getMd5(const QString& filepath) {
+    QFile file(filepath);
+    file.open(QIODevice::ReadOnly);
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    while (!file.atEnd()) {
+      md5.addData(file.read(8192));
+    }
+    QString Md5Str = md5.result().toHex();
+    file.close();
+    return Md5Str;
+  }
+
+  bool on_calcMD5() const {
+    for (const QModelIndex ind : selectedIndexes()) {
+      const QString& pth = fileSysModel->filePath(ind);
+      qDebug(getMd5(pth).toStdString().c_str());
+    }
+    return true;
   }
 
   bool on_revealInExplorer() const;
