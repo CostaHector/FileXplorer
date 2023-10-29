@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -8,19 +8,23 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Actions/DataBaseActions.cpp \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
     AddressELineEdit.cpp \
+    AllQtLearning/Learning_Database.cpp \
     Component/CustomStatusBar.cpp \
+    Component/DatabaseToolBar.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanel.cpp \
     FileOperation/FileOperation.cpp \
+    MyQSqlTableModel.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
     Tools/Categorizer.cpp \
@@ -30,7 +34,9 @@ SOURCES += \
     Tools/NameStandardizer.cpp \
     Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
+    Tools/SubscribeDatabase.cpp \
     UndoRedo.cpp \
+    View/DatabaseTableView.cpp \
     View/DragDropTableView.cpp \
     FileExplorerEvent.cpp \
     FolderPreviewComponent/FolderListView.cpp \
@@ -52,19 +58,23 @@ SOURCES += \
     FileExplorerReadOnly.cpp
 
 HEADERS += \
+    Actions/DataBaseActions.h \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
     AddressELineEdit.h \
+    AllQtLearning/Learning_Database.h \
     Component/CustomStatusBar.h \
+    Component/DatabaseToolBar.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
     Component/StateLabel.h \
     Component/Toaster.h \
     ContentPanel.h \
     FileOperation/FileOperation.h \
+    MyQSqlTableModel.h \
     PublicTool.h \
     RibbonMenu.h \
     Tools/Categorizer.h \
@@ -74,7 +84,9 @@ HEADERS += \
     Tools/NameStandardizer.h \
     Tools/PlayVideo.h \
     Tools/RenameWidget.h \
+    Tools/SubscribeDatabase.h \
     UndoRedo.h \
+    View/DatabaseTableView.h \
     View/DragDropTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \

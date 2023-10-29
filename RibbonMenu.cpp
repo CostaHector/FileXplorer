@@ -6,6 +6,7 @@
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
+#include "Component/DatabaseToolBar.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
 
@@ -15,6 +16,7 @@ RibbonMenu::RibbonMenu()
       leafHomeWid(LeafHome()),
       leafShareWid(LeafShare()),
       leafViewWid(LeafView()),
+      sqlSearchLE(nullptr),
       leafDatabaseWid(LeafDatabase()),
       leafMediaWid(LeafMediaTools()) {
     addTab(leafFileWid, "&File");
@@ -188,8 +190,10 @@ QToolBar* RibbonMenu::LeafView() const {
     return new QToolBar();
 }
 
-QToolBar* RibbonMenu::LeafDatabase() const {
-    return new QToolBar();
+QToolBar* RibbonMenu::LeafDatabase() {
+    auto* databaseToolBar = new DatabaseToolBar("Database Leaf", this);
+    sqlSearchLE = databaseToolBar->sqlSearchLE;
+    return databaseToolBar;
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {

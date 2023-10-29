@@ -2,12 +2,13 @@
 #define PUBLICVARIABLE_H
 
 #include <QFileInfo>
+#include <QDir>
 #include <QRect>
 #include <QSettings>
 #include <QSize>
 #include <QTextStream>
+#include <qDebug>
 
-const QString PROJECT_PATH = QFileInfo(__FILE__).absolutePath();
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
 
@@ -33,6 +34,27 @@ const int NAME_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Name");
 const int TYPE_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Type");
 const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
 }  // namespace MainKey
+
+
+namespace DB_HEADER_KEY{
+const QString Name = "Name";
+const QString Size = "Size";
+const QString Type = "Type";
+const QString DateModified = "DateModified";
+
+const QString Performers = "Performers";
+const QString Tags = "Tags";
+const QString Rate = "Rate";
+const QString Driver = "Driver";
+const QString Prepath = "Prepath";
+const QString Extra = "Extra";
+
+const QStringList DB_HEADER{Name, Size, Type, DateModified, Performers, Tags, Rate, Driver, Prepath, Extra};
+const int DB_PREPATH_INDEX = DB_HEADER.indexOf(Prepath);
+const int DB_NAME_INDEX = DB_HEADER.indexOf(Name);
+const int SIZE_COLUMN = DB_HEADER.indexOf(Size);
+const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
+}
 
 namespace HEADERVIEW_SORT_INDICATOR_ORDER {
 class OrderClass {
@@ -120,6 +142,7 @@ const GVarBool SHOW_FOLDER_PREVIEW_JSON_EDITOR("SHOW_FOLDER_PREVIEW_JSON_EDITOR"
 const GVarBool SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true);
 const GVarBool SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true);
 const GVarBool EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true);
+const GVarBool SHOW_DATABASE("SHOW_DATABASE", false);
 
 const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
 const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
@@ -148,7 +171,7 @@ const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
 const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
 const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
-
+const QString FILE_INFO_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FILE_INFO_DATABASE");
 }  // namespace SystemPath
 
 extern const char* SUBMIT_BTN_STYLE;

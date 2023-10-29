@@ -20,18 +20,26 @@
 
 const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 
-FileExplorerReadOnly::FileExplorerReadOnly(QWidget* parent, const QString& initialPath)
+FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
     : QMainWindow(parent),
       previewHtmlDock(new QDockWidget("Preview HTML")),
       previewHtml(new FolderPreviewHTML),
       previewWidget(new FolderPreviewWidget),
-      explorerCentralWidget(nullptr),
+      fsmView(nullptr),
+      dbView(nullptr),
+      stackCentralWidget(new QStackedWidget(this)),
       _navigationToolBar(new NavigationToolBar),
       osm(new RibbonMenu),
       _statusBar(new CustomStatusBar) {
+  const QString& initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
-  explorerCentralWidget = new ContentPanel(nullptr, defaultPath, previewHtml, previewWidget, _statusBar);
-  this->setCentralWidget(explorerCentralWidget);
+  fsmView = new ContentPanel(nullptr, defaultPath, previewHtml, previewWidget, _statusBar);
+  dbView = new DatabaseTableView;
+
+  stackCentralWidget->addWidget(fsmView);
+  stackCentralWidget->addWidget(dbView);
+  this->HotUpdate();
+  this->setCentralWidget(stackCentralWidget);
 
   //    previewHtmlDock->setWidget(previewHtml);
   previewHtmlDock->setWidget(previewWidget);
@@ -50,7 +58,7 @@ void FileExplorerReadOnly::closeEvent(QCloseEvent* event) {
   PreferenceSettings().setValue("geometry", saveGeometry());
   PreferenceSettings().setValue("dockerWidgetWidth", previewWidget->width());
   PreferenceSettings().setValue("dockerWidgetHeight", previewWidget->height());
-  PreferenceSettings().setValue("defaultOpenPath", explorerCentralWidget->CurrentPath());
+  PreferenceSettings().setValue("defaultOpenPath", fsmView->CurrentPath());
   return QMainWindow::closeEvent(event);
 }
 
@@ -82,11 +90,21 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
 #include <functional>
 
 void FileExplorerReadOnly::subscribe() {
-  if (_navigationToolBar and explorerCentralWidget) {
+  if (_navigationToolBar and fsmView) {
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
-    auto intoNewPath = std::bind(&ContentPanel::IntoNewPath, explorerCentralWidget, _1, _2, _3);
+    auto intoNewPath = std::bind(&ContentPanel::IntoNewPath, fsmView, _1, _2, _3);
     _navigationToolBar->subscribe(intoNewPath);
   }
+}
+
+void FileExplorerReadOnly::HotUpdate() {
+  if (PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool()) {
+    stackCentralWidget->setCurrentWidget(dbView);
+    previewHtmlDock->setVisible(false);
+    return;
+  }
+  stackCentralWidget->setCurrentWidget(fsmView);
+  previewHtmlDock->setVisible(true);
 }
