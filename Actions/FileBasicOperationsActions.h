@@ -5,7 +5,6 @@
 #include <QActionGroup>
 #include <QObject>
 
-#include "PublicTool.h"
 #include "PublicVariable.h"
 
 class FileBasicOperationsActions : public QObject {

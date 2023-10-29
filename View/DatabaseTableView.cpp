@@ -1,12 +1,17 @@
 #include "DatabaseTableView.h"
+
+#include "Tools/PlayVideo.h"
+#include "View/ViewHelper.h"
+
+#include "Component/DatabaseToolBar.h"
+#include "PublicTool.h"
+#include "PublicVariable.h"
+
 #include <QDesktopServices>
 #include <QHeaderView>
-#include "Component/DatabaseToolBar.h"
-#include "PublicVariable.h"
-#include "Tools/SubscribeDatabase.h"
-#include "View/DragDropTableView.h"
+#include <QProcess>
 
-DatabaseTableView::DatabaseTableView() : dbModel(nullptr) {
+DatabaseTableView::DatabaseTableView() : dbModel(nullptr), menu(new DBRightClickMenu("Database Right click menu", this)) {
   setContextMenuPolicy(Qt::CustomContextMenu);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
@@ -15,7 +20,9 @@ DatabaseTableView::DatabaseTableView() : dbModel(nullptr) {
   QSqlDatabase con = GetSqlDB();
 
   dbModel = new MyQSqlTableModel(this, con);
-  dbModel->setTable(TABLE_NAME);
+  if (con.tables().contains(TABLE_NAME)) {
+    dbModel->setTable(TABLE_NAME);
+  }
   dbModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
   dbModel->select();
 
@@ -54,7 +61,18 @@ auto DatabaseTableView::UpdateItemViewFontSize() -> void {
 }
 
 void DatabaseTableView::subscribe() {
+  {
+    const QList<QAction*>& DB_RIGHT_CLICK_MENU_AG = g_dbAct().DB_RIGHT_CLICK_MENU_AG->actions();
+    auto* OPEN_RUN = DB_RIGHT_CLICK_MENU_AG[0];
+    auto* PLAY_VIDEOS = DB_RIGHT_CLICK_MENU_AG[1];
+    auto* _REVEAL_IN_EXPLORER = DB_RIGHT_CLICK_MENU_AG[2];
+    connect(OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
+    connect(PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
+    connect(_REVEAL_IN_EXPLORER, &QAction::triggered, this, &DatabaseTableView::on_revealInExplorer);
+  }
+
   connect(this, &QTableView::doubleClicked, this, &DatabaseTableView::on_cellDoubleClicked);
+  connect(this, &QTableView::customContextMenuRequested, this, &DatabaseTableView::on_ShowContextMenu);
 }
 
 auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
@@ -87,6 +105,70 @@ auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
   return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 }
 
+auto DatabaseTableView::on_revealInExplorer() const -> bool {
+  // hasSelection: reveal with selection
+  // noSelection: folder -> open, file -> open its dir
+  QModelIndex curIndex = selectionModel()->currentIndex();
+  QStringList args;
+  if (not curIndex.isValid()) {
+    QString reveal_path = dbModel->rootPath();
+    args = QStringList{QDir::toNativeSeparators(reveal_path)};
+  } else {
+    QFileInfo fi(dbModel->fileInfo(curIndex));
+    if (not fi.exists()) {
+      qDebug("Path[%s] not exists", fi.absoluteFilePath().toStdString().c_str());
+      return false;
+    }
+    QString reveal_path(fi.absoluteFilePath());
+    args = QStringList{"/e,", "/select,", QDir::toNativeSeparators(reveal_path)};
+  }
+
+  QProcess process;
+#ifdef WIN32
+  process.setProgram("explorer");
+  process.setArguments(args);
+#else
+  process.setProgram(r "xdg-open");
+  if (not QFileInfo(revealPath).isDir()) {
+#is not dir = > reveal its dirname
+    revealPath = QFileInfo(revealPath).absolutePath();
+  }
+  process.setArguments({revealPath});
+#endif
+  process.startDetached();  // Start the process in detached mode instead of start
+  return true;
+}
+
+auto DatabaseTableView::on_PlayVideo() const -> bool {
+  // select an item or select nothing
+  const int selectedCnt = selectedIndexes().size();
+  QString playPath;
+  if (selectedCnt == 0) {
+    if (dbModel->rootDirectory().isRoot()) {
+      qDebug("root path is so large range. skip");
+      return true;
+    }
+    playPath = dbModel->rootPath();
+  } else if (selectedCnt == 1) {
+    QModelIndex curIndex = selectionModel()->currentIndex();
+    QFileInfo selectedFi = dbModel->fileInfo(curIndex);
+    if (selectedFi.isDir()) {
+      if (QDir(selectedFi.absoluteFilePath()).isRoot()) {
+        qDebug("root path is so large range. skip");
+        return true;
+      }
+    }
+    playPath = selectedFi.absoluteFilePath();
+  } else {
+    qDebug("Select nothing MyQFileSystemModel or JUST Select 1");
+    return true;
+  }
+
+  auto ret = on_ShiftEnterPlayVideo(playPath);
+  qDebug(ret ? "Playing ..." : "Nothing to play");
+  return ret;
+}
+
 #include <QMainWindow>
 class MoviesDatabase : public QMainWindow {
  public:
@@ -98,19 +180,21 @@ class MoviesDatabase : public QMainWindow {
     this->addToolBar(Qt::ToolBarArea::TopToolBarArea, databaseTB);
     this->setCentralWidget(this->view);
     this->setWindowTitle("QTableView Example");
-    this->resize(1400, 768);
+    this->setWindowIcon(QIcon(":/themes/SHOW_DATABASE"));
   }
+  QSize sizeHint() const override { return QSize(1400, 768); }
 };
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
+#include "Tools/SubscribeDatabase.h"
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
-//  QWidget widget;
-//  QMessageBox::warning(&widget, "FILE_INFO_DATABASE path", SystemPath::FILE_INFO_DATABASE);
-//  widget.show();
+  //  QWidget widget;
+  //  QMessageBox::warning(&widget, "FILE_INFO_DATABASE path", SystemPath::FILE_INFO_DATABASE);
+  //  widget.show();
   MoviesDatabase win;
   win.show();
   auto* eventImplementer = new SubscribeDatabase(win.view, win.view->dbModel, win.databaseTB->sqlSearchLE);

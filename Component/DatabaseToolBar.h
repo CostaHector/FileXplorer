@@ -1,11 +1,11 @@
 #ifndef DATABASETOOLBAR_H
 #define DATABASETOOLBAR_H
 
-#include <QLineEdit>
 #include <QComboBox>
 #include <QLabel>
-#include <QToolBar>
+#include <QLineEdit>
 #include <QPushButton>
+#include <QToolBar>
 
 #include "Actions/DataBaseActions.h"
 #include "PublicVariable.h"
@@ -20,7 +20,24 @@ class DatabaseToolBar : public QToolBar {
   QToolBar* functionsTB;
   QToolBar* dbViewHideShow;
 
-  DatabaseToolBar(const QString& title, QWidget* parent = nullptr);
+  DatabaseToolBar(const QString& title, QWidget* parent = nullptr)
+      : QToolBar(parent),
+        sqlSearchLE(new QLineEdit),
+        dbControlTB(GetDatabaseControlTB()),
+        driveSelectionTB(GetTableSelectionTB()),
+        sqlSearchTB(GetDBSearchTB()),
+        functionsTB(GetFunctionsTB()),
+        dbViewHideShow(GetHideShowToolButton()) {
+    addWidget(dbControlTB);
+    addSeparator();
+    addWidget(driveSelectionTB);
+    addSeparator();
+    addWidget(sqlSearchTB);
+    addSeparator();
+    addWidget(functionsTB);
+    addSeparator();
+    addWidget(dbViewHideShow);
+  }
 
   auto GetHideShowToolButton() -> QToolBar* {
     QToolBar* showHideDB = new QToolBar("show/hide Database view", this);
@@ -71,13 +88,12 @@ class DatabaseToolBar : public QToolBar {
     return databaseControlTB;
   }
 
-  auto GetFunctionsTB() -> QToolBar*{
+  auto GetFunctionsTB() -> QToolBar* {
     QToolBar* functionsTB = new QToolBar("Function", this);
     functionsTB->setOrientation(Qt::Orientation::Vertical);
     functionsTB->addActions(g_dbAct().DB_FUNCTIONS->actions());
     return functionsTB;
   }
-
 };
 
 #endif  // DATABASETOOLBAR_H

@@ -175,3 +175,15 @@ auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* old
   }
   return actionsStr;
 }
+
+auto GetSqlDB() -> QSqlDatabase {
+  QSqlDatabase con;
+  if (QSqlDatabase::connectionNames().contains("custom_connection")) {
+    con = QSqlDatabase::database("custom_connection", false);
+  } else {
+    con = QSqlDatabase::addDatabase("QSQLITE", "custom_connection");
+  }
+  con.setDatabaseName(SystemPath::FILE_INFO_DATABASE);
+  con.open();
+  return con;
+}

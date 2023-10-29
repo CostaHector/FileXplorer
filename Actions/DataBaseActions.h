@@ -1,7 +1,6 @@
 #ifndef DATABASEACTIONS_H
 #define DATABASEACTIONS_H
 
-#include "PublicVariable.h"
 #include <QAction>
 #include <QActionGroup>
 #include <QIcon>
@@ -9,8 +8,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
-
-const QString TABLE_NAME = "movies_info";
+#include "PublicVariable.h"
 
 class DataBaseActions : public QObject {
  public:
@@ -19,6 +17,7 @@ class DataBaseActions : public QObject {
   QActionGroup* DB_CONTROL_ACTIONS;
   QAction* DB_VIEW_CLOSE_SHOW;
   QActionGroup* DB_FUNCTIONS;
+  QActionGroup* DB_RIGHT_CLICK_MENU_AG;
 
   explicit DataBaseActions(QObject* parent = nullptr)
       : QObject{parent},
@@ -26,7 +25,8 @@ class DataBaseActions : public QObject {
         DRIVE_BATCH_SELECTION_AG(Get_DRIVE_BATCH_SELECTION_AG()),
         DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),
         DB_VIEW_CLOSE_SHOW(Get_DB_VIEW_CLOSE_SHOW_Action()),
-        DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()){}
+        DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()),
+        DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()) {}
 
   auto Get_DRIVE_SEPERATE_SELECTION_AG() -> QActionGroup* {
     QSqlDatabase con;
@@ -115,7 +115,7 @@ class DataBaseActions : public QObject {
     return showDatabase;
   }
 
-  auto Get_DB_FUNCTIONS_Action() -> QActionGroup*{
+  auto Get_DB_FUNCTIONS_Action() -> QActionGroup* {
     QAction* COUNT = new QAction(QIcon(), "COUNT", this);
     COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
 
@@ -137,6 +137,34 @@ class DataBaseActions : public QObject {
     return databaseFunctionsAG;
   }
 
+  auto Get_DB_RIGHT_CLICK_MENU_AG() -> QActionGroup* {
+    QAction* OPEN_RUN = new QAction("&Open");
+    OPEN_RUN->setShortcutVisibleInContextMenu(true);
+
+    QAction* PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play Videos");
+    PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
+    PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
+    PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play videos")
+                                .arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
+
+    QAction* _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in Explorer");
+    _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
+    _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
+    _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%0 (%1)</b><br/> Reveal items in system file explorer.")
+                                        .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
+    _REVEAL_IN_EXPLORER->setCheckable(false);
+
+    QAction* DELETE_BY_DRIVER = new QAction(QIcon(), "Delete by driver");
+    QAction* DELETE_BY_PREPATH = new QAction(QIcon(), "Delete by prepath");
+
+    QActionGroup* dbRightClickMenuAG = new QActionGroup(this);
+    dbRightClickMenuAG->addAction(OPEN_RUN);
+    dbRightClickMenuAG->addAction(PLAY_VIDEOS);
+    dbRightClickMenuAG->addAction(_REVEAL_IN_EXPLORER);
+    dbRightClickMenuAG->addAction(DELETE_BY_DRIVER);
+    dbRightClickMenuAG->addAction(DELETE_BY_PREPATH);
+    return dbRightClickMenuAG;
+  }
 
  signals:
 };

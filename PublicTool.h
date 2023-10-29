@@ -32,4 +32,7 @@ auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList
 
 auto ChooseCopyDestination(QString defaultPath, QWidget *parent=nullptr) -> QString;
 auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* oldAG) -> QString;
+
+#include <QSqlDatabase>
+auto GetSqlDB() -> QSqlDatabase;
 #endif  // PUBLICTOOL_H

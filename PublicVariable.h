@@ -22,6 +22,8 @@ auto TextReader(const QString& textPath) -> QString;
 typedef std::function<bool(QString, bool, bool)> T_IntoNewPath;
 typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
+typedef std::function<void()> T_HotUpdate;
+
 
 namespace MainKey {
 constexpr int Name = 0;
@@ -34,7 +36,6 @@ const int NAME_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Name");
 const int TYPE_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Type");
 const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
 }  // namespace MainKey
-
 
 namespace DB_HEADER_KEY{
 const QString Name = "Name";
@@ -50,9 +51,10 @@ const QString Prepath = "Prepath";
 const QString Extra = "Extra";
 
 const QStringList DB_HEADER{Name, Size, Type, DateModified, Performers, Tags, Rate, Driver, Prepath, Extra};
+const int DB_DRIVER_INDEX = DB_HEADER.indexOf(Driver);
 const int DB_PREPATH_INDEX = DB_HEADER.indexOf(Prepath);
 const int DB_NAME_INDEX = DB_HEADER.indexOf(Name);
-const int SIZE_COLUMN = DB_HEADER.indexOf(Size);
+const int DB_SIZE_COLUMN = DB_HEADER.indexOf(Size);
 const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
 }
 
@@ -173,6 +175,7 @@ const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
 const QString FILE_INFO_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FILE_INFO_DATABASE");
 }  // namespace SystemPath
+const QString TABLE_NAME = "movies_info";
 
 extern const char* SUBMIT_BTN_STYLE;
 

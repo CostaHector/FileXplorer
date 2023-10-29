@@ -17,6 +17,7 @@ SOURCES += \
     AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
     Component/CustomStatusBar.cpp \
+    Component/DBRightClickMenu.cpp \
     Component/DatabaseToolBar.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
@@ -54,6 +55,7 @@ SOURCES += \
     PathUndoRedoer.cpp \
     PublicVariable.cpp \
     RightClickableToolBar.cpp \
+    View/ViewHelper.cpp \
     main.cpp \
     FileExplorerReadOnly.cpp
 
@@ -67,6 +69,7 @@ HEADERS += \
     AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
     Component/CustomStatusBar.h \
+    Component/DBRightClickMenu.h \
     Component/DatabaseToolBar.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
@@ -104,7 +107,8 @@ HEADERS += \
     NavigationToolBar.h \
     PathUndoRedoer.h \
     PublicVariable.h \
-    RightClickableToolBar.h
+    RightClickableToolBar.h \
+    View/ViewHelper.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
