@@ -32,10 +32,10 @@ class SubscribeDatabase : public QObject {
   MyQSqlTableModel* dbModel;
   QLineEdit* sqlSearchLE;
   QString currentSearchColumnName;
-  T_HotUpdate hotUpdate;
+  T_SwitchStackWidget switchStackWidget;
 
-  explicit SubscribeDatabase(QTableView* view_, MyQSqlTableModel* dbModel_, QLineEdit* sqlSearchLE_, T_HotUpdate hotUpdate_ = T_HotUpdate())
-      : QObject(), view(view_), dbModel(dbModel_), sqlSearchLE(sqlSearchLE_), currentSearchColumnName("Name"), hotUpdate(hotUpdate_) {
+  explicit SubscribeDatabase(QTableView* view_, MyQSqlTableModel* dbModel_, QLineEdit* sqlSearchLE_, T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget())
+      : QObject(), view(view_), dbModel(dbModel_), sqlSearchLE(sqlSearchLE_), currentSearchColumnName("Name"), switchStackWidget(switchStackWidget_) {
     this->subscribe();
   }
 
@@ -59,13 +59,13 @@ class SubscribeDatabase : public QObject {
   auto onSelectBatch(const QAction* act) -> void;
   auto onShowOrCloseDatabase(const bool isVisible) -> void {
     PreferenceSettings().setValue(MemoryKey::SHOW_DATABASE.name, isVisible);
-    if (not hotUpdate) {
+    if (not switchStackWidget) {
       if (view->isVisible() != isVisible) {
         view->setVisible(isVisible);
       }
       return;
     }
-    hotUpdate();
+    switchStackWidget();
   }
 };
 

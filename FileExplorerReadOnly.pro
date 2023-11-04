@@ -11,14 +11,18 @@ SOURCES += \
     Actions/DataBaseActions.cpp \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
+    Actions/JsonEditorActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
+    Actions/ViewActions.cpp \
     AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
     Component/CustomStatusBar.cpp \
     Component/DBRightClickMenu.cpp \
     Component/DatabaseToolBar.cpp \
+    Component/JsonEditor.cpp \
+    Component/PerformersManager.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
     Component/StateLabel.cpp \
@@ -31,6 +35,7 @@ SOURCES += \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
+    Tools/JsonFileHelper.cpp \
     Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
     Tools/PlayVideo.cpp \
@@ -63,14 +68,18 @@ HEADERS += \
     Actions/DataBaseActions.h \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
+    Actions/JsonEditorActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
+    Actions/ViewActions.h \
     AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
     Component/CustomStatusBar.h \
     Component/DBRightClickMenu.h \
     Component/DatabaseToolBar.h \
+    Component/JsonEditor.h \
+    Component/PerformersManager.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
     Component/StateLabel.h \
@@ -83,6 +92,7 @@ HEADERS += \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
     Tools/FilesNameBatchStandardizer.h \
+    Tools/JsonFileHelper.h \
     Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
     Tools/PlayVideo.h \

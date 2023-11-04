@@ -8,6 +8,7 @@
 #include <QStackedWidget>
 
 #include "Component/CustomStatusBar.h"
+#include "Component/JsonEditor.h"
 #include "ContentPanel.h"
 #include "NavigationToolBar.h"
 #include "RibbonMenu.h"
@@ -24,7 +25,9 @@ class FileExplorerReadOnly : public QMainWindow {
   auto ReadSettings(const QString& initialPath) -> QString;
   void subscribe();
 
-  void HotUpdate();
+  void SwitchStackWidget();
+  void InitComponentVisibility();
+  void UpdateComponentVisibility();
 
   const static QString DEFAULT_PATH;
   QDockWidget* previewHtmlDock;
@@ -36,5 +39,7 @@ class FileExplorerReadOnly : public QMainWindow {
   NavigationToolBar* _navigationToolBar;
   RibbonMenu* osm;
   CustomStatusBar* _statusBar;
+
+  JsonEditor* m_jsonEditor;
 };
 #endif  // FILEEXPLORERREADONLY_H

@@ -1,6 +1,7 @@
 #ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
 #include "Component/CustomStatusBar.h"
+#include "Component/JsonEditor.h"
 #include "Tools/MimeDataCX.h"
 #include "UndoRedo.h"
 
@@ -26,7 +27,9 @@ class FileExplorerEvent : public QObject {
   FileExplorerEvent(QObject* parent = nullptr,
                     QFileSystemModel* fileSysModel_ = nullptr,
                     QTableView* view_ = nullptr,
-                    CustomStatusBar* _statusBar = nullptr);
+                    CustomStatusBar* _statusBar = nullptr,
+                    JsonEditor* jsonEditor_ = nullptr,
+                    T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
   void subscribe();
 
   auto onRenamePre() -> QPair<QString, QStringList> {
@@ -162,6 +165,8 @@ class FileExplorerEvent : public QObject {
   QTableView* view;
   CustomStatusBar* logger;
   QClipboard* clipboard;
+  JsonEditor* jsonEditor;
+  T_UpdateComponentVisibility updateComponentVisibility;
  signals:
  private:
   auto QueryCopyOrCut() -> CCMMode;

@@ -30,7 +30,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       stackCentralWidget(new QStackedWidget(this)),
       _navigationToolBar(new NavigationToolBar),
       osm(new RibbonMenu),
-      _statusBar(new CustomStatusBar) {
+      _statusBar(new CustomStatusBar),
+      m_jsonEditor(new JsonEditor) {
   const QString& initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
   fsmView = new ContentPanel(nullptr, defaultPath, previewHtml, previewWidget, _statusBar);
@@ -38,7 +39,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
 
   stackCentralWidget->addWidget(fsmView);
   stackCentralWidget->addWidget(dbView);
-  this->HotUpdate();
+
   this->setCentralWidget(stackCentralWidget);
 
   //    previewHtmlDock->setWidget(previewHtml);
@@ -50,6 +51,9 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
   setMenuWidget(osm);
   setStatusBar(_statusBar);
   subscribe();
+
+  SwitchStackWidget();
+  InitComponentVisibility();
 }
 
 FileExplorerReadOnly::~FileExplorerReadOnly() {}
@@ -99,12 +103,37 @@ void FileExplorerReadOnly::subscribe() {
   }
 }
 
-void FileExplorerReadOnly::HotUpdate() {
+void FileExplorerReadOnly::SwitchStackWidget() {
   if (PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool()) {
     stackCentralWidget->setCurrentWidget(dbView);
-    previewHtmlDock->setVisible(false);
-    return;
+  } else {
+    stackCentralWidget->setCurrentWidget(fsmView);
   }
-  stackCentralWidget->setCurrentWidget(fsmView);
-  previewHtmlDock->setVisible(true);
+}
+
+void FileExplorerReadOnly::InitComponentVisibility() {
+  if (not PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()) {
+    _navigationToolBar->setVisible(false);
+  }
+
+  if (not PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool()) {
+    previewHtmlDock->setVisible(false);
+  }
+  // floating out window
+  m_jsonEditor->setVisible(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name, MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.v).toBool());
+}
+
+void FileExplorerReadOnly::UpdateComponentVisibility() {
+  const auto b1 = PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool();
+  if (_navigationToolBar->isVisible() != b1) {
+    _navigationToolBar->setVisible(b1);
+  }
+  const auto b2 = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool();
+  if (previewHtmlDock->isVisible() != b2) {
+    previewHtmlDock->setVisible(b2);
+  }
+  const auto b3 = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name, MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.v).toBool();
+  if (m_jsonEditor->isVisible() != b3) {
+    m_jsonEditor->setVisible(b3);
+  }
 }

@@ -1,7 +1,7 @@
 #include "FileExplorerReadOnly.h"
 
 #include <QApplication>
-#include <QDebug>
+#include <qDebug>
 
 #include "FileExplorerEvent.h"
 #include "Tools/SubscribeDatabase.h"
@@ -17,11 +17,11 @@ int main(int argc, char* argv[]) {
   } else {
     qDebug("argc[%d]<=1.", argc);
   }
-  fileExplorer.show();
-  FileExplorerEvent fee(nullptr, fileExplorer.fsmView->fileSysModel, fileExplorer.fsmView->view, fileExplorer._statusBar);
+  FileExplorerEvent fee(nullptr, fileExplorer.fsmView->fileSysModel, fileExplorer.fsmView->view, fileExplorer._statusBar, fileExplorer.m_jsonEditor, std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
   auto* eventImplementer = new SubscribeDatabase(fileExplorer.dbView, fileExplorer.dbView->dbModel, fileExplorer.osm->sqlSearchLE,
-                                                 std::bind(&FileExplorerReadOnly::HotUpdate, &fileExplorer));
+                                                 std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
+  fileExplorer.show();
   a.exec();
   return 0;
 }
