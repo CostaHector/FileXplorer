@@ -3,12 +3,13 @@
 
 #include "Component/DBRightClickMenu.h"
 #include "MyQSqlTableModel.h"
+#include <QComboBox>
 #include <QTableView>
 #include <QKeyEvent>
 
 class DatabaseTableView : public QTableView {
  public:
-  MyQSqlTableModel* dbModel;
+  MyQSqlTableModel* m_dbModel;
 
   DatabaseTableView();
 
@@ -34,6 +35,14 @@ class DatabaseTableView : public QTableView {
 
  private:
     DBRightClickMenu* menu;
+};
+
+class DatabasePanel: public QWidget{
+   public:
+    explicit DatabasePanel(QWidget* parent=nullptr);
+    QLineEdit* m_searchLE;
+    QComboBox* m_searchCB;
+    DatabaseTableView* m_dbView;
 };
 
 #endif  // DATABASETABLEVIEW_H

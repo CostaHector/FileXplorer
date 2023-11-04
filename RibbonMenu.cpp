@@ -17,7 +17,6 @@ RibbonMenu::RibbonMenu()
       leafHomeWid(LeafHome()),
       leafShareWid(LeafShare()),
       leafViewWid(LeafView()),
-      sqlSearchLE(nullptr),
       leafDatabaseWid(LeafDatabase()),
       leafMediaWid(LeafMediaTools()) {
   addTab(leafFileWid, "&File");
@@ -214,7 +213,8 @@ QToolBar* RibbonMenu::LeafView() const {
 
 QToolBar* RibbonMenu::LeafDatabase() {
   auto* databaseToolBar = new DatabaseToolBar("Database Leaf", this);
-  sqlSearchLE = databaseToolBar->sqlSearchLE;
+  databaseToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));
+  databaseToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return databaseToolBar;
 }
 

@@ -12,9 +12,6 @@
 
 class DatabaseToolBar : public QToolBar {
  public:
-  QLineEdit* sqlSearchLE;
-  QToolBar* sqlSearchTB;
-
   QToolBar* dbControlTB;
   QToolBar* driveSelectionTB;
   QToolBar* functionsTB;
@@ -22,17 +19,13 @@ class DatabaseToolBar : public QToolBar {
 
   DatabaseToolBar(const QString& title, QWidget* parent = nullptr)
       : QToolBar(parent),
-        sqlSearchLE(new QLineEdit),
         dbControlTB(GetDatabaseControlTB()),
         driveSelectionTB(GetTableSelectionTB()),
-        sqlSearchTB(GetDBSearchTB()),
         functionsTB(GetFunctionsTB()),
         dbViewHideShow(GetHideShowToolButton()) {
     addWidget(dbControlTB);
     addSeparator();
     addWidget(driveSelectionTB);
-    addSeparator();
-    addWidget(sqlSearchTB);
     addSeparator();
     addWidget(functionsTB);
     addSeparator();
@@ -59,27 +52,7 @@ class DatabaseToolBar : public QToolBar {
     driveSelectionTB->setOrientation(Qt::Orientation::Vertical);
     return driveSelectionTB;
   }
-  auto GetDBSearchTB() -> QToolBar* {
-    sqlSearchLE->setClearButtonEnabled(true);
-    sqlSearchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
 
-    auto* sqlSearchCB = new QComboBox;
-    for (const auto& headerName : DB_HEADER_KEY::DB_HEADER) {
-      sqlSearchCB->addItem(headerName);
-    }
-    sqlSearchCB->setLineEdit(sqlSearchLE);
-    sqlSearchCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
-
-    auto* searchHintLabel = new QLabel("e.g. Name not like \"_a%B\"; Type in (\"ts\", \"avi\"); Size between 0 AND 1000000");
-    searchHintLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-
-    auto* dbSearchTB = new QToolBar("Database search", this);
-    dbSearchTB->setOrientation(Qt::Orientation::Vertical);
-    dbSearchTB->addWidget(searchHintLabel);
-    dbSearchTB->addWidget(sqlSearchCB);
-    dbSearchTB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-    return dbSearchTB;
-  }
   auto GetDatabaseControlTB() -> QToolBar* {
     QToolBar* databaseControlTB = new QToolBar("Database control", this);
     databaseControlTB->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));

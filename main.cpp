@@ -17,9 +17,11 @@ int main(int argc, char* argv[]) {
   } else {
     qDebug("argc[%d]<=1.", argc);
   }
-  FileExplorerEvent fee(nullptr, fileExplorer.fsmView->fileSysModel, fileExplorer.fsmView->view, fileExplorer._statusBar, fileExplorer.m_jsonEditor, std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
+  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->fileSysModel, fileExplorer.m_fsPanel->view, fileExplorer._statusBar, fileExplorer.m_jsonEditor, std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
-  auto* eventImplementer = new SubscribeDatabase(fileExplorer.dbView, fileExplorer.dbView->dbModel, fileExplorer.osm->sqlSearchLE,
+  auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView,
+                                                 fileExplorer.m_dbPanel->m_dbView->m_dbModel,
+                                                 fileExplorer.m_dbPanel->m_searchLE,
                                                  std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
   fileExplorer.show();
   a.exec();

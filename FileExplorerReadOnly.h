@@ -33,8 +33,8 @@ class FileExplorerReadOnly : public QMainWindow {
   QDockWidget* previewHtmlDock;
   FolderPreviewHTML* previewHtml;
   FolderPreviewWidget* previewWidget;
-  ContentPanel* fsmView;
-  DatabaseTableView* dbView;
+  ContentPanel* m_fsPanel;
+  DatabasePanel* m_dbPanel;
   QStackedWidget* stackCentralWidget;
   NavigationToolBar* _navigationToolBar;
   RibbonMenu* osm;

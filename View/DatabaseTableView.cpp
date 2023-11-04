@@ -11,7 +11,7 @@
 #include <QHeaderView>
 #include <QProcess>
 
-DatabaseTableView::DatabaseTableView() : dbModel(nullptr), menu(new DBRightClickMenu("Database Right click menu", this)) {
+DatabaseTableView::DatabaseTableView() : m_dbModel(nullptr), menu(new DBRightClickMenu("Database Right click menu", this)) {
   setContextMenuPolicy(Qt::CustomContextMenu);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
@@ -19,14 +19,14 @@ DatabaseTableView::DatabaseTableView() : dbModel(nullptr), menu(new DBRightClick
 
   QSqlDatabase con = GetSqlDB();
 
-  dbModel = new MyQSqlTableModel(this, con);
+  m_dbModel = new MyQSqlTableModel(this, con);
   if (con.tables().contains(TABLE_NAME)) {
-    dbModel->setTable(TABLE_NAME);
+    m_dbModel->setTable(TABLE_NAME);
   }
-  dbModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
-  dbModel->select();
+  m_dbModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
+  m_dbModel->select();
 
-  this->setModel(dbModel);
+  this->setModel(m_dbModel);
 
   this->InitViewSettings();
   subscribe();
@@ -79,11 +79,11 @@ auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
   if (not clickedIndex.isValid()) {
     return false;
   }
-  if (not dbModel) {
+  if (not m_dbModel) {
     return false;
   }
 
-  QFileInfo fi = dbModel->fileInfo(clickedIndex);
+  QFileInfo fi = m_dbModel->fileInfo(clickedIndex);
   qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), fi.fileName().toStdString().c_str());
   if (not fi.exists()) {
     qDebug("[path inexists] %s", fi.absoluteFilePath().toStdString().c_str());
@@ -111,10 +111,10 @@ auto DatabaseTableView::on_revealInExplorer() const -> bool {
   QModelIndex curIndex = selectionModel()->currentIndex();
   QStringList args;
   if (not curIndex.isValid()) {
-    QString reveal_path = dbModel->rootPath();
+    QString reveal_path = m_dbModel->rootPath();
     args = QStringList{QDir::toNativeSeparators(reveal_path)};
   } else {
-    QFileInfo fi(dbModel->fileInfo(curIndex));
+    QFileInfo fi(m_dbModel->fileInfo(curIndex));
     if (not fi.exists()) {
       qDebug("Path[%s] not exists", fi.absoluteFilePath().toStdString().c_str());
       return false;
@@ -144,14 +144,14 @@ auto DatabaseTableView::on_PlayVideo() const -> bool {
   const int selectedCnt = selectedIndexes().size();
   QString playPath;
   if (selectedCnt == 0) {
-    if (dbModel->rootDirectory().isRoot()) {
+    if (m_dbModel->rootDirectory().isRoot()) {
       qDebug("root path is so large range. skip");
       return true;
     }
-    playPath = dbModel->rootPath();
+    playPath = m_dbModel->rootPath();
   } else if (selectedCnt == 1) {
     QModelIndex curIndex = selectionModel()->currentIndex();
-    QFileInfo selectedFi = dbModel->fileInfo(curIndex);
+    QFileInfo selectedFi = m_dbModel->fileInfo(curIndex);
     if (selectedFi.isDir()) {
       if (QDir(selectedFi.absoluteFilePath()).isRoot()) {
         qDebug("root path is so large range. skip");
@@ -169,23 +169,41 @@ auto DatabaseTableView::on_PlayVideo() const -> bool {
   return ret;
 }
 
+DatabasePanel::DatabasePanel(QWidget* parent)
+    : QWidget(parent), m_searchLE(new QLineEdit), m_searchCB(new QComboBox), m_dbView(new DatabaseTableView) {
+  m_searchLE->setClearButtonEnabled(true);
+  m_searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+  m_searchCB->setLineEdit(m_searchLE);
+
+  m_searchCB->addItem(QString("%1 not like \"_a%B\"").arg(DB_HEADER_KEY::Name));
+  m_searchCB->addItem(QString("%1 in (\"ts\", \"avi\")").arg(DB_HEADER_KEY::Type));
+  m_searchCB->addItem(QString("%1 between 0 AND 1000000").arg(DB_HEADER_KEY::Size));
+  m_searchCB->addItem(QString("%1 = \"E:/\"").arg(DB_HEADER_KEY::Driver));
+
+  QVBoxLayout* panelLo = new QVBoxLayout;
+  panelLo->setContentsMargins(0, 0, 0, 0);
+  panelLo->setSpacing(0);
+  panelLo->addWidget(m_searchCB);
+  panelLo->addWidget(m_dbView);
+  setLayout(panelLo);
+}
+
 #include <QMainWindow>
 class MoviesDatabase : public QMainWindow {
  public:
-  DatabaseToolBar* databaseTB;
-  MyQSqlTableModel* dbModel;
-  DatabaseTableView* view;
+  DatabaseToolBar* m_databaseTB;
+  DatabasePanel* m_dbPanel;
   explicit MoviesDatabase(QWidget* parent = nullptr)
-      : QMainWindow(parent), databaseTB(new DatabaseToolBar("Movies Database Toolbar", this)), dbModel(nullptr), view(new DatabaseTableView) {
-    this->addToolBar(Qt::ToolBarArea::TopToolBarArea, databaseTB);
-    this->setCentralWidget(this->view);
+      : QMainWindow(parent), m_databaseTB(new DatabaseToolBar("Movies Database Toolbar", this)), m_dbPanel(new DatabasePanel) {
+    this->addToolBar(Qt::ToolBarArea::TopToolBarArea, m_databaseTB);
+    this->setCentralWidget(m_dbPanel);
     this->setWindowTitle("QTableView Example");
     this->setWindowIcon(QIcon(":/themes/SHOW_DATABASE"));
   }
   QSize sizeHint() const override { return QSize(1400, 768); }
 };
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 #include "Tools/SubscribeDatabase.h"
@@ -197,7 +215,7 @@ int main(int argc, char* argv[]) {
   //  widget.show();
   MoviesDatabase win;
   win.show();
-  auto* eventImplementer = new SubscribeDatabase(win.view, win.view->dbModel, win.databaseTB->sqlSearchLE);
+  auto* eventImplementer = new SubscribeDatabase(win.m_dbPanel->m_dbView, win.m_dbPanel->m_dbView->m_dbModel, win.m_dbPanel->m_searchLE);
   return a.exec();
 }
 #endif

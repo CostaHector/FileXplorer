@@ -19,8 +19,6 @@ class RibbonMenu : public QTabWidget {
 
   void Subscribe();
 
-
-  QLineEdit* sqlSearchLE;
  private:
   QToolBar* leafFileWid;
   QToolBar* leafHomeWid;
