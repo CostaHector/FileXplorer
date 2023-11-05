@@ -75,7 +75,10 @@ void JsonEditor::next() {
   qDebug("next curRow %d", curRow);
 }
 
-void JsonEditor::onAutoSkip() {
+void JsonEditor::onAutoSkipSwitch(const bool checked) {
+  if (not checked) {
+    return;
+  }
   bool okClicked = false;
   const int PAUSE_CNT = PreferenceSettings()
                             .value(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.v)
@@ -207,7 +210,7 @@ void JsonEditor::subscribe() {
     }
   });
 
-  connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, this, &JsonEditor::onAutoSkip);
+  connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, this, &JsonEditor::onAutoSkipSwitch);
 
   connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);  // (.json, save former .backup for recover)
   connect(g_jsonEditorActions()._CANCEL, &QAction::triggered, this, &JsonEditor::onResetChanges);
@@ -256,7 +259,7 @@ bool JsonEditor::onStageChanges() {
     if (keyName == "Performers" or keyName == "Tags") {
       QJsonArray arr;
       if (not valueStr.isEmpty()) {
-        for (const QString& perfRaw : valueStr.split(sepComp)) {
+        for (const QString& perfRaw : valueStr.split(SEPERATOR_COMP)) {
           const QJsonValue& perf = perfRaw.trimmed();
           if (not arr.contains(perf)) {
             arr << perf;
@@ -418,7 +421,7 @@ bool JsonEditor::formatter() {
     if (keyName == "Performers" or keyName == "Tags") {
       auto* lineWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
       QString keyValue = lineWidget->text();
-      keyValue.replace(sepComp, ", ");
+      keyValue.replace(SEPERATOR_COMP, ", ");
       lineWidget->setText(keyValue.trimmed());
     }
   }

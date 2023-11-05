@@ -14,7 +14,7 @@
 #include <QWidget>
 #include <QMenu>
 
-const QRegExp sepComp(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
+const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 
 #include <QDir>
 #include <QFile>
@@ -33,7 +33,7 @@ class JsonEditor : public QMainWindow {
   auto last() -> void;
   auto hasNext() const -> bool;
   auto next() -> void;
-  auto onAutoSkip() -> void;
+  auto onAutoSkipSwitch(const bool checked) -> void;
   void autoNext();
   auto load(const QString& path) -> bool;
   auto refreshEditPanel() -> void;
