@@ -152,9 +152,9 @@ void JsonEditor::subscribe() {
   connect(jsonListPanel, &QListView::customContextMenuRequested, ShowContextMenu);
 
   connect(g_jsonEditorActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this,
-          [this]() { QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(jsonListPanel->currentItem()->text()).absolutePath())); });
+          [this]() { if (jsonListPanel->currentItem()) QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(jsonListPanel->currentItem()->text()).absolutePath())); });
   connect(g_jsonEditorActions()._OPEN_THIS_FILE, &QAction::triggered, this,
-          [this]() { QDesktopServices::openUrl(QUrl::fromLocalFile(jsonListPanel->currentItem()->text())); });
+          [this]() { if (jsonListPanel->currentItem()) QDesktopServices::openUrl(QUrl::fromLocalFile(jsonListPanel->currentItem()->text())); });
 
   connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
   connect(g_jsonEditorActions()._RELOAD_FROM_JSON_FILE, &QAction::triggered, this, &JsonEditor::refreshEditPanel);

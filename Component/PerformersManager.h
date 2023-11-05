@@ -10,9 +10,10 @@ class PerformersManager {
   auto loadExistedPerformers() -> QSet<QString>;
   auto LearningFromAPath(const QString& path) -> int;
   static PerformersManager& getIns();
+  QStringList MovieNameWordsSplit(QString sentence) const;
+  QStringList PeformersFilterOut(const QStringList& words) const;
 
   QSet<QString> performers;
-
  private:
   PerformersManager();
 };

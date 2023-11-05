@@ -1,8 +1,8 @@
 #ifndef PUBLICVARIABLE_H
 #define PUBLICVARIABLE_H
 
-#include <QFileInfo>
 #include <QDir>
+#include <QFileInfo>
 #include <QRect>
 #include <QSettings>
 #include <QSize>
@@ -11,6 +11,7 @@
 
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
+const QString PROJECT_PATH{"../FileExplorerReadOnly"};
 
 static inline QSettings& PreferenceSettings() {
   static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", "FileExplorerReadOnly");
@@ -37,7 +38,7 @@ const int TYPE_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Type");
 const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
 }  // namespace MainKey
 
-namespace DB_HEADER_KEY{
+namespace DB_HEADER_KEY {
 const QString Name = "Name";
 const QString Size = "Size";
 const QString Type = "Type";
@@ -56,7 +57,7 @@ const int DB_PREPATH_INDEX = DB_HEADER.indexOf(Prepath);
 const int DB_NAME_INDEX = DB_HEADER.indexOf(Name);
 const int DB_SIZE_COLUMN = DB_HEADER.indexOf(Size);
 const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
-}
+}  // namespace DB_HEADER_KEY
 
 namespace HEADERVIEW_SORT_INDICATOR_ORDER {
 class OrderClass {
