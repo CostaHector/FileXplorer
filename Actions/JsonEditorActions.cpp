@@ -16,7 +16,8 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       JSON_EDITOR_ACTIONS(new QActionGroup(this)),
       _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "reveal", this)),
       _OPEN_THIS_FILE(new QAction("open", this)),
-      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), "capitalize each word", this)),
+      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), "Capitalize word", this)),
+      _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/LOWERCASE_EACH_WORD"), "Lowercase word", this)),
       _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "hint", this)),
       _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), "Learn performers", this)) {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
@@ -83,6 +84,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
 
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setToolTip(QString("<b>%1 (%2)</b><br/> Capitalize first letter of each word").arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text()).arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
+
+  _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
+  _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentense.").arg(_LOWER_ALL_WORDS->text()).arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
   _HINT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _HINT->setToolTip(QString("<b>%1 (%2)</b><br/> Give you performers list hint").arg(_HINT->text()).arg(_HINT->shortcut().toString()));

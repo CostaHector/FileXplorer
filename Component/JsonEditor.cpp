@@ -25,6 +25,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   tb->addAction(g_jsonEditorActions()._OPEN_THIS_FILE);
   tb->addSeparator();
   tb->addAction(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
+  tb->addAction(g_jsonEditorActions()._LOWER_ALL_WORDS);
   tb->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
   tb->addAction(g_jsonEditorActions()._HINT);
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
@@ -236,6 +237,7 @@ void JsonEditor::subscribe() {
   });
   connect(g_jsonEditorActions()._EMPTY, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
 
+  connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
@@ -336,6 +338,36 @@ bool JsonEditor::onSubmitAllChanges() {
 }
 
 #include <QTextCursor>
+auto JsonEditor::onLowercaseEachWord() -> void {
+  static auto lowercaseSentense = [](const QString& sentence) -> QString { return sentence.toLower(); };
+  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
+    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
+    if (not key2ValueType.contains(keyName)) {
+      if (keyName == "Detail") {
+        QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
+        if (not detailEditWidget->textCursor().hasSelection()) {
+          continue;
+        }
+        const QString& before = detailEditWidget->textCursor().selectedText();
+        detailEditWidget->textCursor().removeSelectedText();
+        const QString& after = lowercaseSentense(before);
+        detailEditWidget->textCursor().insertText(after);
+        continue;
+      }
+      QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
+      if (not lineEditWidget->hasSelectedText()) {
+        continue;
+      }
+      const QString& before = lineEditWidget->selectedText();
+      const QString& after = lowercaseSentense(before);
+      const QString& beforeFullText = lineEditWidget->text();
+      const QString& afterFullText =
+          QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
+      lineEditWidget->setText(afterFullText);
+    }
+  }
+}
+
 auto JsonEditor::onCapitalizeEachWord() -> void {
   static auto capitalizeEachWord = [](QString sentence) -> QString {
     if (not sentence.isEmpty()) {

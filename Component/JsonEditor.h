@@ -8,11 +8,11 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMainWindow>
+#include <QMenu>
 #include <QMessageBox>
 #include <QRegExp>
 #include <QTextEdit>
 #include <QWidget>
-#include <QMenu>
 
 const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 
@@ -45,8 +45,8 @@ class JsonEditor : public QMainWindow {
   auto onStageChanges() -> bool;
   auto onResetChanges() -> bool;
   auto onSubmitAllChanges() -> bool;
-
-  auto onCapitalizeEachWord()->void;
+  auto onLowercaseEachWord() -> void;
+  auto onCapitalizeEachWord() -> void;
   auto onLearnPerfomersFromJsonFile() -> bool;
   auto onPerformersHint() -> QStringList;
 

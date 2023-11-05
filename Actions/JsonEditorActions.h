@@ -28,6 +28,7 @@ class JsonEditorActions : public QObject {
   QAction* _OPEN_THIS_FILE;
 
   QAction* _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD;
+  QAction* _LOWER_ALL_WORDS;
   QAction* _HINT;
   QAction* _LEARN_PERFORMERS_FROM_JSON;
 };
