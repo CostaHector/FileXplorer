@@ -18,7 +18,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _OPEN_THIS_FILE(new QAction("open", this)),
       _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "hint", this)),
       _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), "Learn performers", this)) {
-  _FORMATTER->setShortcut(QKeySequence(Qt::Key::Key_F5));
+  _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.")
                              .arg(_FORMATTER->text())
                              .arg(_FORMATTER->shortcut().toString()));

@@ -229,8 +229,11 @@ bool JsonEditor::onStageChanges() {
     if (keyName == "Performers" or keyName == "Tags") {
       QJsonArray arr;
       if (not valueStr.isEmpty()) {
-        for (const QString& s : valueStr.split(sepComp)) {
-          arr << s;
+        for (const QString& perfRaw : valueStr.split(sepComp)) {
+          const QJsonValue& perf = perfRaw.trimmed();
+          if (not arr.contains(perf)){
+            arr << perf;
+          }
         }
       }
       dict.insert(keyName, arr);
@@ -342,7 +345,7 @@ bool JsonEditor::formatter() {
       auto* lineWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
       QString keyValue = lineWidget->text();
       keyValue.replace(sepComp, ", ");
-      lineWidget->setText(keyValue);
+      lineWidget->setText(keyValue.trimmed());
     }
   }
 }
