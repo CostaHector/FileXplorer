@@ -6,6 +6,7 @@
 #include <QDesktopServices>
 #include <QDirIterator>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QTableWidgetItem>
 #include <QToolBar>
 
@@ -23,6 +24,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   tb->addAction(g_jsonEditorActions()._REVEAL_IN_EXPLORER);
   tb->addAction(g_jsonEditorActions()._OPEN_THIS_FILE);
   tb->addSeparator();
+  tb->addAction(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
   tb->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
   tb->addAction(g_jsonEditorActions()._HINT);
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
@@ -73,8 +75,27 @@ void JsonEditor::next() {
   qDebug("next curRow %d", curRow);
 }
 
+void JsonEditor::onAutoSkip() {
+  bool okClicked = false;
+  const int PAUSE_CNT = PreferenceSettings()
+                            .value(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.v)
+                            .toInt();
+  const QString& pauseCntStr =
+      QInputDialog::getItem(this, "Auto Skip when perforers count < ?", MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name,
+                            {QString::number(PAUSE_CNT), "1", "2", "3", "4", "5"}, 0, false, &okClicked);
+  if (not okClicked or pauseCntStr.isEmpty()) {
+    qDebug("Cancel");
+    return;
+  }
+  PreferenceSettings().setValue(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, pauseCntStr.toInt());
+}
+
 void JsonEditor::autoNext() {
   const auto reverseCondition = g_jsonEditorActions()._CONDITION_NOT->isChecked();
+  const int PAUSE_CNT = PreferenceSettings()
+                            .value(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.v)
+                            .toInt();
+
   for (auto curRow = jsonListPanel->currentRow() + 1; curRow < jsonListPanel->count(); ++curRow) {
     const QString& curJsonPath = jsonListPanel->item(curRow)->text();
     const auto& dict = JsonFileHelper::MovieJsonLoader(curJsonPath);
@@ -82,7 +103,7 @@ void JsonEditor::autoNext() {
       continue;
     }
     qDebug("len(performers)=%d, [%s]", dict["Performers"].toArray().size(), curJsonPath.toStdString().c_str());
-    if ((dict["Performers"].toArray().size() == 0) == not reverseCondition) {
+    if ((dict["Performers"].toArray().size() < PAUSE_CNT) == not reverseCondition) {
       jsonListPanel->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
       jsonListPanel->setCurrentRow(curRow);
       return;
@@ -183,6 +204,8 @@ void JsonEditor::subscribe() {
     }
   });
 
+  connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, this, &JsonEditor::onAutoSkip);
+
   connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);  // (.json, save former .backup for recover)
   connect(g_jsonEditorActions()._CANCEL, &QAction::triggered, this, &JsonEditor::onResetChanges);
   connect(g_jsonEditorActions()._SUBMIT, &QAction::triggered, this, [this]() {
@@ -207,6 +230,7 @@ void JsonEditor::subscribe() {
   });
   connect(g_jsonEditorActions()._EMPTY, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
 
+  connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 }
@@ -231,7 +255,7 @@ bool JsonEditor::onStageChanges() {
       if (not valueStr.isEmpty()) {
         for (const QString& perfRaw : valueStr.split(sepComp)) {
           const QJsonValue& perf = perfRaw.trimmed();
-          if (not arr.contains(perf)){
+          if (not arr.contains(perf)) {
             arr << perf;
           }
         }
@@ -297,6 +321,47 @@ bool JsonEditor::onSubmitAllChanges() {
   }
   qDebug("%d/%d succeed", succeedCnt, succeedCnt + failCnt);
   return failCnt == 0;
+}
+
+#include <QTextCursor>
+auto JsonEditor::onCapitalizeEachWord() -> void {
+  static auto capitalizeEachWord = [](QString sentence) -> QString {
+    if (not sentence.isEmpty()) {
+      sentence[0] = sentence[0].toTitleCase();
+    }
+    for (int i = 1; i < sentence.size(); ++i) {
+      if (sentence[i - 1] == '.' or sentence[i - 1] == ' ') {
+        sentence[i] = sentence[i].toTitleCase();
+      }
+    }
+    return sentence;
+  };
+  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
+    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
+    if (not key2ValueType.contains(keyName)) {
+      if (keyName == "Detail") {
+        QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
+        if (not detailEditWidget->textCursor().hasSelection()) {
+          continue;
+        }
+        const QString& before = detailEditWidget->textCursor().selectedText();
+        detailEditWidget->textCursor().removeSelectedText();
+        const QString& after = capitalizeEachWord(before);
+        detailEditWidget->textCursor().insertText(after);
+        continue;
+      }
+      QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
+      if (not lineEditWidget->hasSelectedText()) {
+        continue;
+      }
+      const QString& before = lineEditWidget->selectedText();
+      const QString& after = capitalizeEachWord(before);
+      const QString& beforeFullText = lineEditWidget->text();
+      const QString& afterFullText =
+          QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
+      lineEditWidget->setText(afterFullText);
+    }
+  }
 }
 
 bool JsonEditor::onLearnPerfomersFromJsonFile() {
@@ -369,7 +434,7 @@ bool JsonEditor::load(const QString& path) {
   return true;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

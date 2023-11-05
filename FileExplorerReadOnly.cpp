@@ -31,7 +31,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       _navigationToolBar(new NavigationToolBar),
       osm(new RibbonMenu),
       _statusBar(new CustomStatusBar),
-      m_jsonEditor(new JsonEditor) {
+      m_jsonEditor(new JsonEditor(this)) {
   const QString& initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
 

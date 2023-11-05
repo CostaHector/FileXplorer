@@ -33,6 +33,7 @@ class JsonEditor : public QMainWindow {
   auto last() -> void;
   auto hasNext() const -> bool;
   auto next() -> void;
+  auto onAutoSkip() -> void;
   void autoNext();
   auto load(const QString& path) -> bool;
   auto refreshEditPanel() -> void;
@@ -45,6 +46,7 @@ class JsonEditor : public QMainWindow {
   auto onResetChanges() -> bool;
   auto onSubmitAllChanges() -> bool;
 
+  auto onCapitalizeEachWord()->void;
   auto onLearnPerfomersFromJsonFile() -> bool;
   auto onPerformersHint() -> QStringList;
 

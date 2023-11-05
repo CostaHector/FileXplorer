@@ -188,7 +188,7 @@ bool SubscribeDatabase::onDeleteFromTable(const QString& clause) {
   QString whereClause = clause;
   if (clause.isEmpty()) {
     bool okClicked = false;
-    whereClause = QInputDialog::getItem(this->view, QString("Where clause"), "DELETE FROM \"%1\" WHERE \t\t\t\t\t\t\t\t", deleteDriverChoicePool, 0,
+    whereClause = QInputDialog::getItem(this->view, "Where clause", "DELETE FROM \"%1\" WHERE \t\t\t\t\t\t\t\t", deleteDriverChoicePool, 0,
                                         true, &okClicked);
     if (not okClicked or whereClause.isEmpty()) {
       qDebug("Cancel");
