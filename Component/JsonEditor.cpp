@@ -117,6 +117,9 @@ void JsonEditor::autoNext() {
 
 void JsonEditor::refreshEditPanel() {
   const auto curRow = jsonListPanel->currentRow();
+  if (curRow == -1) {
+    return;
+  }
   const QString& curJsonPath = jsonListPanel->item(curRow)->text();
   qDebug("refreshEditPanel %s", curJsonPath.toStdString().c_str());
   const auto& jsonDict = JsonFileHelper::MovieJsonLoader(curJsonPath);
@@ -276,6 +279,9 @@ bool JsonEditor::onStageChanges() {
   }
 
   const auto curRow = jsonListPanel->currentRow();
+  if (curRow == -1) {
+    return true;
+  }
   const QString& curJsonPath = jsonListPanel->item(curRow)->text();
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (QFile::exists(backupJsonPath)) {
@@ -297,6 +303,9 @@ bool JsonEditor::onStageChanges() {
 
 bool JsonEditor::onResetChanges() {
   const auto curRow = jsonListPanel->currentRow();
+  if (curRow == -1) {
+    return true;
+  }
   const QString& curJsonPath = jsonListPanel->item(curRow)->text();
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (not QFile::exists(backupJsonPath)) {
