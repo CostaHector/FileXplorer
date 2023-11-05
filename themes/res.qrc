@@ -103,6 +103,8 @@
         <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
         <file alias="LOAD_A_PATH">JsonEditor/LOAD_A_PATH.svg</file>
         <file alias="RELOAD_JOSN_FROM_FILE">JsonEditor/RELOAD_JOSN_FROM_FILE.svg</file>
+        <file alias="PERFORMERS_LIST_HINT">JsonEditor/PERFORMERS_LIST_HINT.svg</file>
+        <file alias="LEARN_PERFORMERS_FROM_JSON">JsonEditor/LEARN_PERFORMERS_FROM_JSON.svg</file>
 
         <file alias="FOLDER_OPEN">Parser/FOLDER_OPEN.svg</file>
         <file alias="SELECT_FOLDER">Parser/SELECT_FOLDER.svg</file>

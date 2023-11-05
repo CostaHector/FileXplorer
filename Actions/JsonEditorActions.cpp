@@ -15,7 +15,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _RELOAD_FROM_JSON_FILE(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "Refresh", this)),
       JSON_EDITOR_ACTIONS(new QActionGroup(this)),
       _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "reveal", this)),
-      _OPEN_THIS_FILE(new QAction("open", this)) {
+      _OPEN_THIS_FILE(new QAction("open", this)),
+      _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "hint", this)),
+      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), "Learn performers", this)) {
   _FORMATTER->setShortcut(QKeySequence(Qt::Key::Key_F5));
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.")
                              .arg(_FORMATTER->text())
@@ -41,8 +43,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _LOAD->setToolTip(QString("<b>%1 (%2)</b><br/> Load json from a path.").arg(_LOAD->text()).arg(_LOAD->shortcut().toString()));
 
   _RELOAD_FROM_JSON_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
-  _RELOAD_FROM_JSON_FILE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Reload json file from local path.").arg(_RELOAD_FROM_JSON_FILE->text()).arg(_RELOAD_FROM_JSON_FILE->shortcut().toString()));
+  _RELOAD_FROM_JSON_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from local path.")
+                                         .arg(_RELOAD_FROM_JSON_FILE->text())
+                                         .arg(_RELOAD_FROM_JSON_FILE->shortcut().toString()));
 
   _AUTO_SKIP->setCheckable(true);
   _AUTO_SKIP->setChecked(true);
@@ -75,6 +78,14 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
   _OPEN_THIS_FILE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
+
+  _HINT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
+  _HINT->setToolTip(QString("<b>%1 (%2)</b><br/> Give you performers list hint").arg(_HINT->text()).arg(_HINT->shortcut().toString()));
+
+  _LEARN_PERFORMERS_FROM_JSON->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Learn performers from value of key \"Performers\" in json file. \n Improve its performers hint capability.")
+          .arg(_LEARN_PERFORMERS_FROM_JSON->text())
+          .arg(_LEARN_PERFORMERS_FROM_JSON->shortcut().toString()));
 }
 
 JsonEditorActions& g_jsonEditorActions() {

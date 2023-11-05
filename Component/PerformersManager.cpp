@@ -77,7 +77,7 @@ QStringList PerformersManager::MovieNameWordsSplit(QString sentence) const {
   static QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
   static QRegExp continousSpace("\\s+");
   QString valuableString = sentence.replace(keepComp, "");
-  QString noActionString = valuableString.replace(andComp, "");
+  QString noActionString = valuableString.replace(andComp, " ");
   QString noResolutionString = noActionString.replace(resolutionComp, "");
   return noResolutionString.split(continousSpace);
 }

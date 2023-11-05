@@ -26,6 +26,9 @@ class JsonEditorActions : public QObject {
 
   QAction* _REVEAL_IN_EXPLORER;
   QAction* _OPEN_THIS_FILE;
+
+  QAction* _HINT;
+  QAction* _LEARN_PERFORMERS_FROM_JSON;
 };
 
 JsonEditorActions& g_jsonEditorActions();

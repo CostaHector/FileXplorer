@@ -45,6 +45,9 @@ class JsonEditor : public QMainWindow {
   auto onResetChanges() -> bool;
   auto onSubmitAllChanges() -> bool;
 
+  auto onLearnPerfomersFromJsonFile() -> bool;
+  auto onPerformersHint() -> QStringList;
+
   auto sizeHint() const -> QSize override { return QSize(1024, 768); }
  signals:
 

@@ -1,5 +1,6 @@
 #include "JsonEditor.h"
 #include "Actions/JsonEditorActions.h"
+#include "Component/PerformersManager.h"
 #include "Tools/JsonFileHelper.h"
 
 #include <QDesktopServices>
@@ -21,6 +22,9 @@ JsonEditor::JsonEditor(QWidget* parent)
   tb->addSeparator();
   tb->addAction(g_jsonEditorActions()._REVEAL_IN_EXPLORER);
   tb->addAction(g_jsonEditorActions()._OPEN_THIS_FILE);
+  tb->addSeparator();
+  tb->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
+  tb->addAction(g_jsonEditorActions()._HINT);
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, tb);
 
@@ -151,10 +155,14 @@ void JsonEditor::subscribe() {
   };
   connect(jsonListPanel, &QListView::customContextMenuRequested, ShowContextMenu);
 
-  connect(g_jsonEditorActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this,
-          [this]() { if (jsonListPanel->currentItem()) QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(jsonListPanel->currentItem()->text()).absolutePath())); });
-  connect(g_jsonEditorActions()._OPEN_THIS_FILE, &QAction::triggered, this,
-          [this]() { if (jsonListPanel->currentItem()) QDesktopServices::openUrl(QUrl::fromLocalFile(jsonListPanel->currentItem()->text())); });
+  connect(g_jsonEditorActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this, [this]() {
+    if (jsonListPanel->currentItem())
+      QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(jsonListPanel->currentItem()->text()).absolutePath()));
+  });
+  connect(g_jsonEditorActions()._OPEN_THIS_FILE, &QAction::triggered, this, [this]() {
+    if (jsonListPanel->currentItem())
+      QDesktopServices::openUrl(QUrl::fromLocalFile(jsonListPanel->currentItem()->text()));
+  });
 
   connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
   connect(g_jsonEditorActions()._RELOAD_FROM_JSON_FILE, &QAction::triggered, this, &JsonEditor::refreshEditPanel);
@@ -189,7 +197,7 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._LOAD, &QAction::triggered, this, [this]() {
     const QString& loadFromDefaultPath =
         PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
-    const auto loadFromPath = QFileDialog::getExistingDirectory(this, "Choose location", loadFromDefaultPath);
+    const auto loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", loadFromDefaultPath);
     QFileInfo loadFromFi(loadFromPath);
     if (not loadFromFi.isDir()) {
       return "";
@@ -198,6 +206,9 @@ void JsonEditor::subscribe() {
     load(loadFromFi.absoluteFilePath());
   });
   connect(g_jsonEditorActions()._EMPTY, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
+
+  connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
+  connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 }
 
 bool JsonEditor::onStageChanges() {
@@ -285,6 +296,45 @@ bool JsonEditor::onSubmitAllChanges() {
   return failCnt == 0;
 }
 
+bool JsonEditor::onLearnPerfomersFromJsonFile() {
+  const QString& loadFromDefaultPath =
+      PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
+  const auto loadFromPath = QFileDialog::getExistingDirectory(this, "Choose location", loadFromDefaultPath);
+  QFileInfo loadFromFi(loadFromPath);
+  if (not loadFromFi.isDir()) {
+    QMessageBox::information(this, "Cancel Learning", QString("Path[%1] not directory").arg(loadFromFi.absoluteFilePath()));
+    return false;
+  }
+  PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
+  static PerformersManager& pm = PerformersManager::getIns();
+  const int newLearnedCnt = pm.LearningFromAPath(loadFromFi.absoluteFilePath());
+  QMessageBox::information(this, "Learning succeed", QString("New Learned Performers Count:%1").arg(newLearnedCnt));
+  return newLearnedCnt >= 0;
+}
+
+QStringList JsonEditor::onPerformersHint() {
+  static PerformersManager& pm = PerformersManager::getIns();
+  QLineEdit* perfWidget = nullptr;
+  QString sentence;
+  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
+    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
+    if (keyName == "Name") {
+      auto* nameWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
+      sentence += nameWidget->text();
+    } else if (keyName == "Detail") {
+      auto* textEditWidget = qobject_cast<QTextEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
+      sentence += (" " + textEditWidget->toPlainText());
+    } else if (keyName == "Performers") {
+      perfWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
+    }
+  }
+  const QStringList perfsList = pm(sentence);
+  if (perfWidget and not perfsList.isEmpty()) {
+    perfWidget->setText(perfsList.join(", "));
+  }
+  return perfsList;
+}
+
 bool JsonEditor::formatter() {
   for (auto r = 0; r != editorPanel->rowCount(); ++r) {
     const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
@@ -316,7 +366,7 @@ bool JsonEditor::load(const QString& path) {
   return true;
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

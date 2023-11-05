@@ -12,7 +12,9 @@ class PerformersManager {
   static PerformersManager& getIns();
   QStringList MovieNameWordsSplit(QString sentence) const;
   QStringList PeformersFilterOut(const QStringList& words) const;
-
+  auto operator()(const QString& sentence) const -> QStringList{
+    return PeformersFilterOut(MovieNameWordsSplit(sentence));
+  }
   QSet<QString> performers;
  private:
   PerformersManager();
