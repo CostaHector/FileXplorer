@@ -6,8 +6,11 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QJsonValue>
+#include "PublicVariable.h"
 
 #include <QFile>
+
+const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 
 class JsonFileHelper {
  public:
@@ -56,22 +59,26 @@ class JsonFileHelper {
   }
 
   static auto MapToOrderedList(const QHash<QString, QJsonValue>& in) -> QList<QPair<QString, QJsonValue>> {
-    static const QHash<QString, QString> sorterPri = {
-        {"Name", QString(QChar(0))},     {"Performers", QString(QChar(1))}, {"ProductionStudio", QString(QChar(2))},
-        {"Uploaded", QString(QChar(3))}, {"Tags", QString(QChar(4))},       {"Rate", QString(QChar(5))},
-        {"Size", QString(QChar(6))},     {"Resolution", QString(QChar(7))}, {"Bitrate", QString(QChar(8))},
-        {"Detail", QString(QChar(9))}};
-    static const auto sorter = [](const QPair<QString, QJsonValue>& l, QPair<QString, QJsonValue>& r) -> bool {
-      const QString& lValue = sorterPri.contains(l.first) ? sorterPri[l.first] : l.first;
-      const QString& rValue = sorterPri.contains(r.first) ? sorterPri[r.first] : r.first;
-      return lValue < rValue;
-    };
     QList<QPair<QString, QJsonValue>> out;
     for (auto it = in.cbegin(); it != in.cend(); ++it) {
       out.append(qMakePair(it.key(), it.value()));
     }
-    std::sort(out.begin(), out.end(), sorter);
+    std::sort(out.begin(), out.end(), JSONKey::KeySorter);
     return out;
+  }
+
+  static auto PerformersString2JsonArry(const QString& valueStr) -> QJsonArray {
+    if (valueStr.isEmpty()) {
+      return {};
+    }
+    QJsonArray arr;
+    for (const QString& perfRaw : valueStr.split(SEPERATOR_COMP)) {
+      const QJsonValue& perf = perfRaw.trimmed();
+      if (not arr.contains(perf)) {
+        arr << perf;
+      }
+    }
+    return arr;
   }
 };
 

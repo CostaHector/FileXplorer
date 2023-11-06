@@ -13,9 +13,6 @@
 #include <QRegExp>
 #include <QTextEdit>
 #include <QWidget>
-
-const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
-
 #include <QDir>
 #include <QFile>
 
@@ -59,8 +56,10 @@ class JsonEditor : public QMainWindow {
   auto formatter() -> bool;
 
   QListWidget* jsonListPanel;
+  QHash<QString, QWidget*> freqJsonKeyValue;
   QFormLayout* editorPanel;
-
+  QFormLayout* extraEditorPanel; // no so frequently used key-value pair
+  QSet<QString> jsonKeySetMet;
   QMenu* jsonListPanelMenu;
 
   static const QMap<QString, QString> key2ValueType;

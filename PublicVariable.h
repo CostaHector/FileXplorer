@@ -8,6 +8,7 @@
 #include <QSize>
 #include <QTextStream>
 #include <qDebug>
+#include <QJsonValue>
 
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
@@ -25,6 +26,29 @@ typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
 typedef std::function<void()> T_SwitchStackWidget;
 typedef std::function<void()> T_UpdateComponentVisibility;
+
+namespace JSONKey {
+static const QString Name = "Name";
+static const QString Performers = "Performers";
+static const QString ProductionStudio = "ProductionStudio";
+static const QString Uploaded = "Uploaded";
+static const QString Tags = "Tags";
+static const QString Rate = "Rate";
+static const QString Size = "Size";
+static const QString Resolution = "Resolution";
+static const QString Bitrate = "Bitrate";
+static const QString Detail = "Detail";
+static const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Detail};
+static const QHash<QString, QString> JsonKeyPri = {{Name, QString(QChar(0))},     {Performers, QString(QChar(1))}, {ProductionStudio, QString(QChar(2))},
+                                           {Uploaded, QString(QChar(3))}, {Tags, QString(QChar(4))},       {Rate, QString(QChar(5))},
+                                           {Size, QString(QChar(6))},     {Resolution, QString(QChar(7))}, {Bitrate, QString(QChar(8))},
+                                           {Detail, QString(QChar(9))}};
+static const auto KeySorter = [](const QPair<QString, QJsonValue>& l, const QPair<QString, QJsonValue>& r) -> bool {
+  const QString& lValue = JsonKeyPri.contains(l.first) ? JsonKeyPri[l.first] : l.first;
+  const QString& rValue = JsonKeyPri.contains(r.first) ? JsonKeyPri[r.first] : r.first;
+  return lValue < rValue;
+};
+};  // namespace JSONKey
 
 namespace MainKey {
 constexpr int Name = 0;

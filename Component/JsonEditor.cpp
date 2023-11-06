@@ -17,7 +17,15 @@ const QColor JsonEditor::MEET_CONDITION_COLOR(150, 150, 150);
 const QColor JsonEditor::NOT_MEET_CONDITION_COLOR(255, 0, 0);
 
 JsonEditor::JsonEditor(QWidget* parent)
-    : QMainWindow{parent}, jsonListPanel(new QListWidget), editorPanel(new QFormLayout), jsonListPanelMenu(getListPanelRightClickMenu()) {
+    : QMainWindow{parent},
+      jsonListPanel(new QListWidget),
+      freqJsonKeyValue{{JSONKey::Name, new QLineEdit},     {JSONKey::Performers, new QLineEdit}, {JSONKey::ProductionStudio, new QLineEdit},
+                       {JSONKey::Uploaded, new QLineEdit}, {JSONKey::Tags, new QLineEdit},       {JSONKey::Rate, new QLineEdit},
+                       {JSONKey::Size, new QLineEdit},     {JSONKey::Resolution, new QLineEdit}, {JSONKey::Bitrate, new QLineEdit},
+                       {JSONKey::Detail, new QTextEdit}},
+      editorPanel(new QFormLayout),
+      extraEditorPanel(new QFormLayout),
+      jsonListPanelMenu(getListPanelRightClickMenu()) {
   QToolBar* tb = new QToolBar("json editor actions", this);
   tb->addActions(g_jsonEditorActions().JSON_EDITOR_ACTIONS->actions());
   tb->addSeparator();
@@ -31,8 +39,15 @@ JsonEditor::JsonEditor(QWidget* parent)
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, tb);
 
+  for (const QString& jsonKey : JSONKey::JsonKeyListOrder) {
+    editorPanel->addRow(jsonKey, freqJsonKeyValue[jsonKey]);
+  }
+  editorPanel->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
+  editorPanel->setRowWrapPolicy(QFormLayout::RowWrapPolicy::WrapLongRows);
+
   auto* mainLo = new QHBoxLayout;
   mainLo->addLayout(editorPanel);
+  mainLo->addLayout(extraEditorPanel);
   mainLo->addWidget(jsonListPanel);
 
   QWidget* mainWidget = new QWidget;
@@ -120,57 +135,68 @@ void JsonEditor::autoNext() {
 }
 
 void JsonEditor::refreshEditPanel() {
+  jsonKeySetMet.clear();
   const auto curRow = jsonListPanel->currentRow();
   if (curRow == -1) {
     return;
   }
+
   const QString& curJsonPath = jsonListPanel->item(curRow)->text();
   qDebug("refreshEditPanel %s", curJsonPath.toStdString().c_str());
   const auto& jsonDict = JsonFileHelper::MovieJsonLoader(curJsonPath);
   const QList<QPair<QString, QJsonValue>>& jsonItem = JsonFileHelper::MapToOrderedList(jsonDict);
 
-  for (int r = editorPanel->rowCount() - 1; r > -1; r--) {
-    editorPanel->removeRow(r);
+  for (int r = extraEditorPanel->rowCount() - 1; r > -1; r--) {
+    extraEditorPanel->removeRow(r);
   }
   if (jsonItem.isEmpty()) {
     return;
   }
+
   for (auto it = jsonItem.cbegin(); it != jsonItem.cend(); ++it) {
     const QString& keyName = it->first;
+    jsonKeySetMet.insert(keyName);
     const QJsonValue& v = it->second;
-    if (not key2ValueType.contains(keyName)) {
+
+    QString valueStr = "";
+    if (key2ValueType.contains(keyName)) {
+      if (key2ValueType[keyName] == "QStringList") {
+        if (not v.isArray()) {
+          qDebug("%s is not array", keyName.toStdString().c_str());
+          continue;
+        }
+        QStringList sl;
+        for (const auto& element : v.toArray()) {
+          sl.append(element.toString());
+        }
+        valueStr = sl.join(", ");
+      }
+      if (key2ValueType[keyName] == "int") {
+        if (not v.isDouble()) {
+          qDebug("%s is not double", keyName.toStdString().c_str());
+          continue;
+        }
+        valueStr = QString::number(static_cast<int>(v.toDouble()));
+      }
+    } else {
       if (not v.isString()) {
         qDebug("%s is not string", keyName.toStdString().c_str());
         continue;
       }
-      if (keyName == "Detail") {
-        editorPanel->addRow(keyName, new QTextEdit(v.toString()));
-        continue;
-      }
-      editorPanel->addRow(keyName, new QLineEdit(v.toString()));
+      valueStr = v.toString();
+    }
+
+    if (keyName == JSONKey::Detail) {
+      qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail])->setText(valueStr);
       continue;
     }
-    if (key2ValueType[keyName] == "QStringList") {
-      if (not v.isArray()) {
-        qDebug("%s is not array", keyName.toStdString().c_str());
-        continue;
-      }
-      QStringList sl;
-      for (const auto& element : v.toArray()) {
-        sl.append(element.toString());
-      }
-      editorPanel->addRow(keyName, new QLineEdit(sl.join(", ")));
+    if (freqJsonKeyValue.contains(keyName)) {
+      qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->setText(valueStr);
       continue;
     }
-    if (key2ValueType[keyName] == "int") {
-      if (not v.isDouble()) {
-        qDebug("%s is not double", keyName.toStdString().c_str());
-        continue;
-      }
-      editorPanel->addRow(keyName, new QLineEdit(QString::number(static_cast<int>(v.toDouble()))));
-    }
+    extraEditorPanel->addRow(keyName, new QLineEdit(valueStr));
   }
-  qobject_cast<QLineEdit*>(editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget())->setFocus();
+  editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
 
 void JsonEditor::subscribe() {
@@ -245,33 +271,26 @@ void JsonEditor::subscribe() {
 
 bool JsonEditor::onStageChanges() {
   QVariantMap dict;
-  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
-    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
-    if (not key2ValueType.contains(keyName)) {
-      if (keyName == "Detail") {
-        const QString& valueStr = qobject_cast<QTextEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->toHtml();
-        dict.insert(keyName, valueStr);
-        continue;
-      }
-      const QString& valueStr = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->text();
-      dict.insert(keyName, valueStr);
+  for (auto r = 0; r != extraEditorPanel->rowCount(); ++r) {
+    const QString& keyName = qobject_cast<QLabel*>(extraEditorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
+    const QString& valueStr = qobject_cast<QLineEdit*>(extraEditorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->text();
+    dict.insert(keyName, valueStr);
+  }
+
+  for (const QString& keyName : jsonKeySetMet) {
+    if (keyName == JSONKey::Detail) {
+      dict.insert(keyName, qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail])->toPlainText());
       continue;
     }
-    const QString& valueStr = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->text();
-    if (keyName == "Performers" or keyName == "Tags") {
-      QJsonArray arr;
-      if (not valueStr.isEmpty()) {
-        for (const QString& perfRaw : valueStr.split(SEPERATOR_COMP)) {
-          const QJsonValue& perf = perfRaw.trimmed();
-          if (not arr.contains(perf)) {
-            arr << perf;
-          }
-        }
-      }
+    if (not freqJsonKeyValue.contains(keyName)) {
+      continue;
+    }
+
+    const QString& valueStr = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->text();
+    if (keyName == JSONKey::Performers or keyName == JSONKey::Tags) {
+      const auto& arr = JsonFileHelper::PerformersString2JsonArry(valueStr);
       dict.insert(keyName, arr);
-      continue;
-    }
-    if (keyName == "Rate") {
+    } else if (keyName == JSONKey::Rate) {
       bool isOk = false;
       int rateNumer = valueStr.toInt(&isOk);
       if (not isOk) {
@@ -279,7 +298,8 @@ bool JsonEditor::onStageChanges() {
         continue;
       }
       dict.insert(keyName, rateNumer);
-      continue;
+    } else {
+      dict.insert(keyName, valueStr);
     }
   }
 
@@ -340,31 +360,28 @@ bool JsonEditor::onSubmitAllChanges() {
 #include <QTextCursor>
 auto JsonEditor::onLowercaseEachWord() -> void {
   static auto lowercaseSentense = [](const QString& sentence) -> QString { return sentence.toLower(); };
-  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
-    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
-    if (not key2ValueType.contains(keyName)) {
-      if (keyName == "Detail") {
-        QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-        if (not detailEditWidget->textCursor().hasSelection()) {
-          continue;
-        }
-        const QString& before = detailEditWidget->textCursor().selectedText();
-        detailEditWidget->textCursor().removeSelectedText();
-        const QString& after = lowercaseSentense(before);
-        detailEditWidget->textCursor().insertText(after);
+  for (const QString& keyName : jsonKeySetMet) {
+    if (keyName == JSONKey::Detail) {
+      QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+      if (not detailEditWidget->textCursor().hasSelection()) {
         continue;
       }
-      QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-      if (not lineEditWidget->hasSelectedText()) {
-        continue;
-      }
-      const QString& before = lineEditWidget->selectedText();
+      const QString& before = detailEditWidget->textCursor().selectedText();
+      detailEditWidget->textCursor().removeSelectedText();
       const QString& after = lowercaseSentense(before);
-      const QString& beforeFullText = lineEditWidget->text();
-      const QString& afterFullText =
-          QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
-      lineEditWidget->setText(afterFullText);
+      detailEditWidget->textCursor().insertText(after);
+      continue;
     }
+    QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName]);
+    if (not lineEditWidget->hasSelectedText()) {
+      continue;
+    }
+    const QString& before = lineEditWidget->selectedText();
+    const QString& after = lowercaseSentense(before);
+    const QString& beforeFullText = lineEditWidget->text();
+    const QString& afterFullText =
+        QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
+    lineEditWidget->setText(afterFullText);
   }
 }
 
@@ -380,31 +397,28 @@ auto JsonEditor::onCapitalizeEachWord() -> void {
     }
     return sentence;
   };
-  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
-    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
-    if (not key2ValueType.contains(keyName)) {
-      if (keyName == "Detail") {
-        QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-        if (not detailEditWidget->textCursor().hasSelection()) {
-          continue;
-        }
-        const QString& before = detailEditWidget->textCursor().selectedText();
-        detailEditWidget->textCursor().removeSelectedText();
-        const QString& after = capitalizeEachWord(before);
-        detailEditWidget->textCursor().insertText(after);
+  for (const QString& keyName : jsonKeySetMet) {
+    if (keyName == JSONKey::Detail) {
+      QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+      if (not detailEditWidget->textCursor().hasSelection()) {
         continue;
       }
-      QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-      if (not lineEditWidget->hasSelectedText()) {
-        continue;
-      }
-      const QString& before = lineEditWidget->selectedText();
+      const QString& before = detailEditWidget->textCursor().selectedText();
+      detailEditWidget->textCursor().removeSelectedText();
       const QString& after = capitalizeEachWord(before);
-      const QString& beforeFullText = lineEditWidget->text();
-      const QString& afterFullText =
-          QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
-      lineEditWidget->setText(afterFullText);
+      detailEditWidget->textCursor().insertText(after);
+      continue;
     }
+    QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName]);
+    if (not lineEditWidget->hasSelectedText()) {
+      continue;
+    }
+    const QString& before = lineEditWidget->selectedText();
+    const QString& after = capitalizeEachWord(before);
+    const QString& beforeFullText = lineEditWidget->text();
+    const QString& afterFullText =
+        QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
+    lineEditWidget->setText(afterFullText);
   }
 }
 
@@ -426,36 +440,33 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
 
 QStringList JsonEditor::onPerformersHint() {
   static PerformersManager& pm = PerformersManager::getIns();
-  QLineEdit* perfWidget = nullptr;
   QString sentence;
-  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
-    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
-    if (keyName == "Name") {
-      auto* nameWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-      sentence += nameWidget->text();
-    } else if (keyName == "Detail") {
-      auto* textEditWidget = qobject_cast<QTextEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-      sentence += (" " + textEditWidget->toPlainText());
-    } else if (keyName == "Performers") {
-      perfWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-    }
+  if (jsonKeySetMet.contains(JSONKey::Name)) {
+    sentence += qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name])->text();
   }
-  const QStringList perfsList = pm(sentence);
-  if (perfWidget and not perfsList.isEmpty()) {
-    perfWidget->setText(perfsList.join(", "));
+  if (jsonKeySetMet.contains(JSONKey::Detail)) {
+    sentence += " " + qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail])->toPlainText();
   }
+  if (not jsonKeySetMet.contains(JSONKey::Performers)) {
+    return {};
+  }
+  const QStringList& perfsList = pm(sentence);
+  qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers])->setText(perfsList.join(", "));
   return perfsList;
 }
 
 bool JsonEditor::formatter() {
-  for (auto r = 0; r != editorPanel->rowCount(); ++r) {
-    const QString& keyName = qobject_cast<QLabel*>(editorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
-    if (keyName == "Performers" or keyName == "Tags") {
-      auto* lineWidget = qobject_cast<QLineEdit*>(editorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget());
-      QString keyValue = lineWidget->text();
-      keyValue.replace(SEPERATOR_COMP, ", ");
-      lineWidget->setText(keyValue.trimmed());
-    }
+  if (jsonKeySetMet.contains(JSONKey::Performers)) {
+    auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
+    QString valueStr = lineWidget->text();
+    valueStr.replace(SEPERATOR_COMP, ", ");
+    lineWidget->setText(valueStr.trimmed());
+  }
+  if (jsonKeySetMet.contains(JSONKey::Tags)) {
+    auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Tags]);
+    QString valueStr = lineWidget->text();
+    valueStr.replace(SEPERATOR_COMP, ", ");
+    lineWidget->setText(valueStr.trimmed());
   }
 }
 
@@ -478,7 +489,7 @@ bool JsonEditor::load(const QString& path) {
   return true;
 }
 
-// #define __NAME__EQ__MAIN__ 1
+#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
