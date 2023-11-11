@@ -36,6 +36,8 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   m_sliderTB->addAction(g_videoPlayerActions()._PLAY_PAUSE);
   m_sliderTB->addAction(g_videoPlayerActions()._JUMP_NEXT_HOT_SCENE);
   m_sliderTB->addWidget(m_slider);
+  m_sliderTB->addAction(g_videoPlayerActions()._LAST_10_SECONDS);
+  m_sliderTB->addAction(g_videoPlayerActions()._NEXT_10_SECONDS);
 
   auto* spacer = new QWidget;
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -56,6 +58,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   m_controlTB->addSeparator();
   m_controlTB->addWidget(spacer);
   m_controlTB->addSeparator();
+  m_controlTB->addAction(g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO);
   m_controlTB->addAction(g_videoPlayerActions()._CLEAR_VIDEOS_LIST);
   m_controlTB->addAction(g_videoPlayerActions()._LOAD_A_PATH);
   m_controlTB->addAction(g_videoPlayerActions()._VIDEOS_LIST_MENU);
@@ -176,6 +179,10 @@ void VideoPlayer::subscribe() {
 
   connect(g_videoPlayerActions()._JUMP_NEXT_HOT_SCENE, &QAction::triggered, this, &VideoPlayer::onJumpToNextHotScene);
   connect(g_videoPlayerActions()._JUMP_LAST_HOT_SCENE, &QAction::triggered, this, &VideoPlayer::onJumpToLastHotScene);
+
+  connect(g_videoPlayerActions()._LAST_10_SECONDS, &QAction::triggered, this, [this]() { onPositionAdd(-10 * 1000); });
+  connect(g_videoPlayerActions()._NEXT_10_SECONDS, &QAction::triggered, this, [this]() { onPositionAdd(10 * 1000); });
+
   connect(g_videoPlayerActions()._RATE_AG, &QActionGroup::triggered, this, &VideoPlayer::onRateForThisMovie);
 
   connect(g_videoPlayerActions()._MARK_HOT_SCENE, &QAction::triggered, this, &VideoPlayer::onMarkHotScenes);
@@ -190,9 +197,11 @@ void VideoPlayer::subscribe() {
 
   connect(g_videoPlayerActions()._NEXT_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayNextVideo);
   connect(g_videoPlayerActions()._LAST_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayLastVideo);
+  connect(g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO, &QAction::triggered,
+          [](const bool checked) { PreferenceSettings().setValue(MemoryKey::AUTO_PLAY_NEXT_VIDEO.name, checked); });
 
-  connect(g_videoPlayerActions()._OPEN_A_VIDEO, &QAction::triggered, this, [this](){openFile();});
-  connect(g_videoPlayerActions()._LOAD_A_PATH, &QAction::triggered, this, [this](){openAFolder();});
+  connect(g_videoPlayerActions()._OPEN_A_VIDEO, &QAction::triggered, this, [this]() { openFile(); });
+  connect(g_videoPlayerActions()._LOAD_A_PATH, &QAction::triggered, this, [this]() { openAFolder(); });
 
   connect(g_videoPlayerActions()._PLAY_PAUSE, &QAction::triggered, this, &VideoPlayer::play);
 
@@ -261,10 +270,10 @@ bool VideoPlayer::onModPerformers() {
   if (jsonPath.isEmpty()) {
     return false;
   }
-  if (not m_performerWid){
+  if (not m_performerWid) {
     m_performerWid = new PerformersWidget(this);
   }
-  if (not m_performerWid){
+  if (not m_performerWid) {
     qDebug("performer widget is nullptr");
     return false;
   }
@@ -351,6 +360,26 @@ auto VideoPlayer::onJumpToLastHotScene() -> bool {
   }
   qDebug("no last hot scene before %d seconds", tar);
   return false;
+}
+
+bool VideoPlayer::onPositionAdd(const int ms) {
+  auto after = m_mediaPlayer->position() + ms;
+  const bool autoNextEnabled = g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked();
+  if (after < 0) {
+    if (autoNextEnabled) {
+      onPlayLastVideo();
+      return true;
+    }
+    after = 0;
+  } else if (after >= m_mediaPlayer->duration()) {
+    if (autoNextEnabled) {
+      onPlayNextVideo();
+      return true;
+    }
+    after = m_mediaPlayer->duration();
+  }
+  m_mediaPlayer->setPosition(after);
+  return true;
 }
 
 auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {

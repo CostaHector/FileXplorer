@@ -14,6 +14,9 @@ class VideoPlayerActions : public QObject
 
   QAction* _JUMP_LAST_HOT_SCENE;
   QAction* _JUMP_NEXT_HOT_SCENE;
+  QAction* _LAST_10_SECONDS;
+  QAction* _NEXT_10_SECONDS;
+  QAction* _AUTO_PLAY_NEXT_VIDEO;
 
   QAction* _PLAY_PAUSE;
 

@@ -1,9 +1,13 @@
 #include "VideoPlayerActions.h"
+#include "PublicVariable.h"
 
 VideoPlayerActions::VideoPlayerActions(QObject* parent)
     : QObject{parent},
       _JUMP_LAST_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_LAST_HOT_SCENE"), "last hot scene", this)),
       _JUMP_NEXT_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_NEXT_HOT_SCENE"), "next hot scene", this)),
+      _LAST_10_SECONDS(new QAction("-", this)),
+      _NEXT_10_SECONDS(new QAction("+", this)),
+      _AUTO_PLAY_NEXT_VIDEO(new QAction("auto", this)),
       _PLAY_PAUSE(new QAction(QIcon(":/themes/PLAY_VIDEO"), "play/pause", this)),
       _LAST_VIDEO(new QAction(QIcon(":/themes/LAST_VIDEO"), "last video", this)),
       _NEXT_VIDEO(new QAction(QIcon(":/themes/NEXT_VIDEO"), "next video", this)),
@@ -18,6 +22,17 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
       _RATE_AG(GetRateActionGroups()),
       _RATE_LEVEL_COUNT(_RATE_AG->actions().size()),
       _REVEAL_IN_EXPLORER(new QAction(QIcon(), "reveal in explorer", this)) {
+  _LAST_10_SECONDS->setShortcut(QKeySequence(Qt::Key_Left));
+  _LAST_10_SECONDS->setShortcutVisibleInContextMenu(true);
+  _LAST_10_SECONDS->setToolTip(QString("<b>%0 (%1)</b><br/> -10s").arg(_LAST_10_SECONDS->text(), _LAST_10_SECONDS->shortcut().toString()));
+
+  _NEXT_10_SECONDS->setShortcut(QKeySequence(Qt::Key_Right));
+  _NEXT_10_SECONDS->setShortcutVisibleInContextMenu(true);
+  _NEXT_10_SECONDS->setToolTip(QString("<b>%0 (%1)</b><br/> +10s").arg(_NEXT_10_SECONDS->text(), _NEXT_10_SECONDS->shortcut().toString()));
+
+  _AUTO_PLAY_NEXT_VIDEO->setCheckable(true);
+  _AUTO_PLAY_NEXT_VIDEO->setChecked(PreferenceSettings().value(MemoryKey::AUTO_PLAY_NEXT_VIDEO.name, MemoryKey::AUTO_PLAY_NEXT_VIDEO.v).toBool());
+
   _PLAY_PAUSE->setEnabled(false);
   _PLAY_PAUSE->setShortcutVisibleInContextMenu(true);
   _PLAY_PAUSE->setShortcut(QKeySequence(Qt::Key_Space));

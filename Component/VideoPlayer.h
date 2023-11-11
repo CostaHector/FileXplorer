@@ -39,6 +39,8 @@ class VideoPlayer : public QMainWindow {
 
   auto onJumpToNextHotScene() -> bool;
   auto onJumpToLastHotScene() -> bool;
+  auto onPositionAdd(const int ms = 10*1000)->bool;
+
   auto onRateForThisMovie(const QAction* checkedAction) -> bool;
   void onPlayLastVideo();
   void onPlayNextVideo();
