@@ -20,7 +20,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_probe(new QVideoProbe),
       m_playListWid(new QListWidget),
       m_playlistDock(new QDockWidget("playlist", this)),
-      m_performerWid(new PerformersWidget(this)),
+      m_performerWid(nullptr),
       m_playListMenu(new QMenu("playList", this)) {
   m_mediaPlayer = new QMediaPlayer(this, QMediaPlayer::LowLatency);
   m_mediaPlayer->setVideoOutput(m_videoWidget);
@@ -259,6 +259,13 @@ bool VideoPlayer::onModeName() {
 bool VideoPlayer::onModPerformers() {
   const QString& jsonPath = JsonFileValidCheck("mod performers");
   if (jsonPath.isEmpty()) {
+    return false;
+  }
+  if (not m_performerWid){
+    m_performerWid = new PerformersWidget(this);
+  }
+  if (not m_performerWid){
+    qDebug("performer widget is nullptr");
     return false;
   }
   m_performerWid->reloadPerformersFromJsonFile(jsonPath, m_dict);
