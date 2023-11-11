@@ -3,6 +3,7 @@
 
 #include <QSet>
 #include <QString>
+#include <QCompleter>
 
 class PerformersManager {
  public:
@@ -16,6 +17,7 @@ class PerformersManager {
     return PeformersFilterOut(MovieNameWordsSplit(sentence));
   }
   QSet<QString> performers;
+  QCompleter perfsCompleter;
  private:
   PerformersManager();
 };

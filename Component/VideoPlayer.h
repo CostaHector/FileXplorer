@@ -1,0 +1,88 @@
+#ifndef VIDEOPLAYER_H
+#define VIDEOPLAYER_H
+
+#include <QMainWindow>
+#include <QMediaPlayer>
+#include <QToolBar>
+#include <QVideoProbe>
+#include <QWidget>
+#include <QListWidget>
+#include <QDockWidget>
+
+#include "Component/ClickableSlider.h"
+#include "Component/PerformersWidget.h"
+
+QT_BEGIN_NAMESPACE
+class QAbstractButton;
+class QLabel;
+class QUrl;
+QT_END_NAMESPACE
+
+class VideoPlayer : public QMainWindow {
+  Q_OBJECT
+ public:
+  VideoPlayer(QWidget* parent = nullptr);
+  ~VideoPlayer();
+
+  void setUrl(const QUrl& url);
+  auto sizeHint() const -> QSize override { return QSize(720, 480); }
+  auto subscribe() -> void;
+
+  auto onModeName()->bool;
+  auto onModPerformers() -> bool;
+
+  auto onGrabAFrame(const QVideoFrame& frame) -> bool;
+  auto onMarkHotScenes() -> bool;
+
+  auto onJumpToNextHotScene() -> bool;
+  auto onJumpToLastHotScene() -> bool;
+  auto onRateForThisMovie(const QAction* checkedAction) -> bool;
+  void onPlayLastVideo();
+  void onPlayNextVideo();
+
+  void onShowPlaylist();
+  void onClearPlaylist();
+  void openAFolder();
+
+ public slots:
+  void openFile();
+  void play();
+
+ private slots:
+  void mediaStateChanged(QMediaPlayer::State state);
+  void positionChanged(qint64 position);
+  void durationChanged(qint64 duration);
+  void setPosition(int position);
+  void handleError();
+
+ private:
+  QString GetJsonFilePath(const QString& vidsPath) const;
+  auto loadHotSceneList() -> void;
+  auto loadVideoRate() -> void;
+  inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;
+
+  QMediaPlayer* m_mediaPlayer;
+  ClickableSlider* m_slider;
+  QLabel* m_timeLabel;
+  QLabel* m_errorLabel;
+  QVideoWidget* m_videoWidget;
+  QVideoProbe* m_probe;
+
+  static constexpr int DURATION_PLACEHOLDER_LENGTH = 5;
+
+  QList<int> m_hotSceneList;
+  constexpr static int MICROSECOND = 1000;
+
+  QListWidget* m_playListWid;
+  QDockWidget* m_playlistDock;
+
+  static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
+
+
+  PerformersWidget* m_performerWid;
+  QVariantHash m_dict;
+
+  QMenu* m_playListMenu;
+};
+
+#endif  // VIDEOPLAYER_H

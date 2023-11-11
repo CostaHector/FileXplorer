@@ -15,9 +15,8 @@ const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|
 class JsonFileHelper {
  public:
   JsonFileHelper();
-
-  static auto MovieJsonDumper(const QVariantMap& dict, const QString& movieJsonItemPath) -> bool {
-    auto jsonObject = QJsonObject::fromVariantMap(dict);
+  static auto MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath) -> bool {
+    auto jsonObject = QJsonObject::fromVariantHash(dict);
     QJsonDocument document;
     document.setObject(jsonObject);
     const auto& byteArray = document.toJson(QJsonDocument::JsonFormat::Indented);
@@ -33,33 +32,28 @@ class JsonFileHelper {
     return true;
   }
 
-  static auto MovieJsonLoader(const QString& movieJsonItemPath) -> QHash<QString, QJsonValue> {
+  static auto MovieJsonLoader(const QString& movieJsonItemPath) -> QVariantHash {
     QFile jsonFile(movieJsonItemPath);
     QString json_string;
-    QHash<QString, QJsonValue> movieJson;
     if (jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
       json_string = jsonFile.readAll();
       jsonFile.close();
     } else {
-      qDebug("file not found");
-      return movieJson;
+      qDebug("[Nomarl] json file not found");
+      return {};
     }
     QJsonParseError jsonErr;
     QJsonDocument json_doc = QJsonDocument::fromJson(json_string.toUtf8(), &jsonErr);
     if (jsonErr.error != QJsonParseError::NoError) {
       qDebug("Error when parse");
-      return movieJson;
+      return {};
     }
-    QJsonObject rootObj = json_doc.object();
-    for (const QString& k : rootObj.keys()) {
-      const auto& v = rootObj.value(k);
-      movieJson.insert(k, rootObj.value(k));
-    }
-    return movieJson;
+    const QJsonObject& rootObj = json_doc.object();
+    return rootObj.toVariantHash();
   }
 
-  static auto MapToOrderedList(const QHash<QString, QJsonValue>& in) -> QList<QPair<QString, QJsonValue>> {
-    QList<QPair<QString, QJsonValue>> out;
+  static auto MapToOrderedList(const QVariantHash& in) -> QList<QPair<QString, QVariant>> {
+    QList<QPair<QString, QVariant>> out;
     for (auto it = in.cbegin(); it != in.cend(); ++it) {
       out.append(qMakePair(it.key(), it.value()));
     }
@@ -67,18 +61,65 @@ class JsonFileHelper {
     return out;
   }
 
-  static auto PerformersString2JsonArry(const QString& valueStr) -> QJsonArray {
+  static auto PerformersString2StringList(const QString& valueStr) -> QStringList {
     if (valueStr.isEmpty()) {
       return {};
     }
-    QJsonArray arr;
+    QStringList arr;
     for (const QString& perfRaw : valueStr.split(SEPERATOR_COMP)) {
-      const QJsonValue& perf = perfRaw.trimmed();
+      const QString& perf = perfRaw.trimmed();
       if (not arr.contains(perf)) {
         arr << perf;
       }
     }
     return arr;
+  }
+
+  static auto HotSceneString2IntList(const QString& valueStr) -> QList<QVariant> {
+    const QString& s = valueStr.trimmed();
+    if (s.isEmpty()) {
+      return {};
+    }
+    decltype(HotSceneString2IntList("")) arr;
+    for (const QString& perfRaw : s.split(SEPERATOR_COMP)) {
+      const QString& perf = perfRaw.trimmed();
+      bool isOk = false;
+      int hot = perf.toInt(&isOk);
+      if (not isOk) {
+        qDebug("Hot scene position[%s] is not a number", perf.toStdString().c_str());
+        continue;
+      }
+      arr.append(hot);
+    }
+    return arr;
+  }
+
+  static const QMap<QString, QString> key2ValueType;
+  static auto GetJsonValueString(const QString& keyName, const QVariant& v) -> QString {
+    QString valueStr;
+    if (key2ValueType.contains(keyName)) {
+      if (key2ValueType[keyName] == "QStringList") {
+        valueStr = v.toStringList().join(", ");
+      } else if (key2ValueType[keyName] == "QIntList") {
+        QStringList hotSceneSL;
+        for (QVariant ivariant : v.toList()) {
+          bool isInt = false;
+          int hot = ivariant.toInt(&isInt);
+          if (not isInt) {
+            continue;
+          }
+          hotSceneSL.append(QString::number(hot));
+        }
+        valueStr = hotSceneSL.join(", ");
+      } else if (key2ValueType[keyName] == "int") {
+        valueStr = QString::number(v.toInt());
+      } else {
+        qDebug("type(map[%s]) cannot be processed", keyName.toStdString().c_str());
+      }
+    } else {
+      valueStr = v.toString();
+    }
+    return valueStr;
   }
 };
 

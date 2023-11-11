@@ -11,8 +11,6 @@
 #include <QToolBar>
 
 const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [%1/%2]";
-const QMap<QString, QString> JsonEditor::key2ValueType = {{"Performers", "QStringList"}, {"Tags", "QStringList"}, {"Rate", "int"}};
-
 const QColor JsonEditor::MEET_CONDITION_COLOR(150, 150, 150);
 const QColor JsonEditor::NOT_MEET_CONDITION_COLOR(255, 0, 0);
 
@@ -22,7 +20,7 @@ JsonEditor::JsonEditor(QWidget* parent)
       freqJsonKeyValue{{JSONKey::Name, new QLineEdit},     {JSONKey::Performers, new QLineEdit}, {JSONKey::ProductionStudio, new QLineEdit},
                        {JSONKey::Uploaded, new QLineEdit}, {JSONKey::Tags, new QLineEdit},       {JSONKey::Rate, new QLineEdit},
                        {JSONKey::Size, new QLineEdit},     {JSONKey::Resolution, new QLineEdit}, {JSONKey::Bitrate, new QLineEdit},
-                       {JSONKey::Detail, new QTextEdit}},
+                       {JSONKey::Hot, new QLineEdit},      {JSONKey::Detail, new QTextEdit}},
       editorPanel(new QFormLayout),
       extraEditorPanel(new QFormLayout),
       jsonListPanelMenu(getListPanelRightClickMenu()) {
@@ -58,7 +56,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   setWindowTitle(TITLE_TEMPLATE);
   setWindowIcon(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"));
 
-  mainWidget->setStyleSheet(QString("QTextEdit {font-size: %1pt} \r\n QLineEdit {font-size: %1pt};").arg(14));
+  mainWidget->setStyleSheet(QString("QTextEdit {font-size: %1pt} \r\n QLineEdit {font-size: %1pt};").arg(13));
   jsonListPanel->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
@@ -121,8 +119,8 @@ void JsonEditor::autoNext() {
     if (dict.isEmpty()) {
       continue;
     }
-    qDebug("len(performers)=%d, [%s]", dict["Performers"].toArray().size(), curJsonPath.toStdString().c_str());
-    if ((dict["Performers"].toArray().size() < PAUSE_CNT) == not reverseCondition) {
+    qDebug("len(performers)=%d, [%s]", dict["Performers"].toJsonArray().size(), curJsonPath.toStdString().c_str());
+    if ((dict["Performers"].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
       jsonListPanel->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
       jsonListPanel->setCurrentRow(curRow);
       return;
@@ -134,19 +132,35 @@ void JsonEditor::autoNext() {
   }
 }
 
+void JsonEditor::onNext() {
+  if (g_jsonEditorActions()._AUTO_SKIP->isChecked()) {
+    autoNext();
+    return;
+  }
+  if (hasNext()) {
+    next();
+  }
+}
+
+void JsonEditor::onLast() {
+  if (hasLast()) {
+    last();
+  }
+}
+
 void JsonEditor::refreshEditPanel() {
   jsonKeySetMet.clear();
-  const auto curRow = jsonListPanel->currentRow();
-  if (curRow == -1) {
+  if (not jsonListPanel->currentItem()) {
+    qDebug("skip refresh edit panel");
     return;
   }
 
-  const QString& curJsonPath = jsonListPanel->item(curRow)->text();
+  const QString& curJsonPath = jsonListPanel->currentItem()->text();
   qDebug("refreshEditPanel %s", curJsonPath.toStdString().c_str());
   const auto& jsonDict = JsonFileHelper::MovieJsonLoader(curJsonPath);
-  const QList<QPair<QString, QJsonValue>>& jsonItem = JsonFileHelper::MapToOrderedList(jsonDict);
+  const QList<QPair<QString, QVariant>>& jsonItem = JsonFileHelper::MapToOrderedList(jsonDict);
 
-  for (int r = extraEditorPanel->rowCount() - 1; r > -1; r--) {
+  for (int r = extraEditorPanel->rowCount() - 1; r > -1; --r) {
     extraEditorPanel->removeRow(r);
   }
   if (jsonItem.isEmpty()) {
@@ -155,47 +169,28 @@ void JsonEditor::refreshEditPanel() {
 
   for (auto it = jsonItem.cbegin(); it != jsonItem.cend(); ++it) {
     const QString& keyName = it->first;
+    const QVariant& v = it->second;
     jsonKeySetMet.insert(keyName);
-    const QJsonValue& v = it->second;
-
-    QString valueStr = "";
-    if (key2ValueType.contains(keyName)) {
-      if (key2ValueType[keyName] == "QStringList") {
-        if (not v.isArray()) {
-          qDebug("%s is not array", keyName.toStdString().c_str());
-          continue;
-        }
-        QStringList sl;
-        for (const auto& element : v.toArray()) {
-          sl.append(element.toString());
-        }
-        valueStr = sl.join(", ");
-      }
-      if (key2ValueType[keyName] == "int") {
-        if (not v.isDouble()) {
-          qDebug("%s is not double", keyName.toStdString().c_str());
-          continue;
-        }
-        valueStr = QString::number(static_cast<int>(v.toDouble()));
-      }
-    } else {
-      if (not v.isString()) {
-        qDebug("%s is not string", keyName.toStdString().c_str());
-        continue;
-      }
-      valueStr = v.toString();
-    }
-
-    if (keyName == JSONKey::Detail) {
-      qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail])->setText(valueStr);
-      continue;
-    }
+    QString valueStr = JsonFileHelper::GetJsonValueString(keyName, v);
     if (freqJsonKeyValue.contains(keyName)) {
-      qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->setText(valueStr);
+      if (keyName == JSONKey::Detail) {
+        qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail])->setText(valueStr);
+      } else {
+        qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->setText(valueStr);
+      }
       continue;
     }
     extraEditorPanel->addRow(keyName, new QLineEdit(valueStr));
   }
+  if (not jsonKeySetMet.contains(JSONKey::Hot)) {
+    jsonKeySetMet.insert(JSONKey::Hot);
+    qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Hot])->setText("");
+  }
+  if (not jsonKeySetMet.contains(JSONKey::Rate)) {
+    jsonKeySetMet.insert(JSONKey::Rate);
+    qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Rate])->setText("-1");
+  }
+
   editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
 
@@ -221,21 +216,8 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
   connect(g_jsonEditorActions()._RELOAD_FROM_JSON_FILE, &QAction::triggered, this, &JsonEditor::refreshEditPanel);
 
-  connect(g_jsonEditorActions()._NEXT, &QAction::triggered, this, [this]() {
-    if (g_jsonEditorActions()._AUTO_SKIP->isChecked()) {
-      autoNext();
-      return;
-    }
-    if (hasNext()) {
-      next();
-    }
-  });
-
-  connect(g_jsonEditorActions()._LAST, &QAction::triggered, this, [this]() {
-    if (hasLast()) {
-      last();
-    }
-  });
+  connect(g_jsonEditorActions()._NEXT, &QAction::triggered, this, &JsonEditor::onNext);
+  connect(g_jsonEditorActions()._LAST, &QAction::triggered, this, &JsonEditor::onLast);
 
   connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, this, &JsonEditor::onAutoSkipSwitch);
 
@@ -270,7 +252,7 @@ void JsonEditor::subscribe() {
 }
 
 bool JsonEditor::onStageChanges() {
-  QVariantMap dict;
+  QVariantHash dict;
   for (auto r = 0; r != extraEditorPanel->rowCount(); ++r) {
     const QString& keyName = qobject_cast<QLabel*>(extraEditorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
     const QString& valueStr = qobject_cast<QLineEdit*>(extraEditorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->text();
@@ -288,14 +270,17 @@ bool JsonEditor::onStageChanges() {
 
     const QString& valueStr = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->text();
     if (keyName == JSONKey::Performers or keyName == JSONKey::Tags) {
-      const auto& arr = JsonFileHelper::PerformersString2JsonArry(valueStr);
+      const auto& arr = JsonFileHelper::PerformersString2StringList(valueStr);
+      dict.insert(keyName, arr);
+    } else if (keyName == JSONKey::Hot) {
+      const auto& arr = JsonFileHelper::HotSceneString2IntList(valueStr);
       dict.insert(keyName, arr);
     } else if (keyName == JSONKey::Rate) {
       bool isOk = false;
       int rateNumer = valueStr.toInt(&isOk);
       if (not isOk) {
-        qDebug("Rate %s is not a number", valueStr.toStdString().c_str());
-        continue;
+        qDebug("Rate[%s] is not a number, will use default value -1", valueStr.toStdString().c_str());
+        rateNumer = -1;
       }
       dict.insert(keyName, rateNumer);
     } else {
@@ -489,7 +474,7 @@ bool JsonEditor::load(const QString& path) {
   return true;
 }
 
-#define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -497,7 +482,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   JsonEditor jsonEditor;
   jsonEditor.show();
-  jsonEditor.load("E:/115/test");
+  jsonEditor.load("E:/Leaked And Loaded");
   a.exec();
   return 0;
 }

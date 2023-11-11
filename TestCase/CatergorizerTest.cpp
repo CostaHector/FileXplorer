@@ -67,8 +67,18 @@ class CatergorizerTest : public QObject {
     QCOMPARE(fL.size(), 1);  // only one folder;
     QVERIFY(fL.contains("xx"));
   }
+
+  void test_GrabbedImageVidsScene(){
+    // "xx.mp4" "xx.jpeg" "xx 00001.jpg" "xx 99999.jpeg"
+    const QString& SUB_TEST_DIR = QDir(TEST_DIR).absoluteFilePath("GrabbedImageVidScene");
+    categorizer(SUB_TEST_DIR);
+
+    const auto& fL = QDir(SUB_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
+    QCOMPARE(fL.size(), 1);  // only one folder;
+    QVERIFY(fL.contains("xx"));
+  }
 };
 
-//QTEST_MAIN(CatergorizerTest)
+QTEST_MAIN(CatergorizerTest)
 
 #include "CatergorizerTest.moc"

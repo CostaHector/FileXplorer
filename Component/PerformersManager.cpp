@@ -4,7 +4,9 @@
 
 #include <QDir>
 #include <QDirIterator>
-PerformersManager::PerformersManager() : performers(loadExistedPerformers()) {}
+PerformersManager::PerformersManager() : performers(loadExistedPerformers()), perfsCompleter(performers.values()) { perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
+  perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
+}
 
 QSet<QString> PerformersManager::loadExistedPerformers() {
   QFile performersFi(":/PERFORMERS_TABLE");
@@ -33,17 +35,14 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
-    const QHash<QString, QJsonValue>& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
+    const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
     if (not dict.contains("Performers")) {
       continue;
     }
-    const QJsonValue& v = dict["Performers"];
-    if (not v.isArray()) {
-      continue;
-    }
-    for (const QJsonValue& performer : v.toArray()) {
-      if (performer.isString() and not performers.contains(performer.toString())) {
-        performers.insert(performer.toString().toLower());
+    const QVariant& v = dict["Performers"];
+    for (const QString& performer : v.toStringList()) {
+      if (not performers.contains(performer)) {
+        performers.insert(performer.toLower());
       }
     }
   }

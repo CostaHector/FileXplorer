@@ -1,4 +1,4 @@
-QT       += core gui sql
+QT       += core gui sql multimedia multimediawidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -15,18 +15,22 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
+    Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
     AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
+    Component/ClickableSlider.cpp \
     Component/CustomStatusBar.cpp \
     Component/DBRightClickMenu.cpp \
     Component/DatabaseToolBar.cpp \
     Component/JsonEditor.cpp \
     Component/PerformersManager.cpp \
+    Component/PerformersWidget.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
+    Component/VideoPlayer.cpp \
     ContentPanel.cpp \
     FileOperation/FileOperation.cpp \
     MyQSqlTableModel.cpp \
@@ -72,18 +76,22 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
+    Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
     AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
+    Component/ClickableSlider.h \
     Component/CustomStatusBar.h \
     Component/DBRightClickMenu.h \
     Component/DatabaseToolBar.h \
     Component/JsonEditor.h \
     Component/PerformersManager.h \
+    Component/PerformersWidget.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    Component/VideoPlayer.h \
     ContentPanel.h \
     FileOperation/FileOperation.h \
     MyQSqlTableModel.h \

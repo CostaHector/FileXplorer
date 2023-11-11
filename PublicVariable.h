@@ -3,12 +3,12 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QJsonValue>
 #include <QRect>
 #include <QSettings>
 #include <QSize>
 #include <QTextStream>
 #include <qDebug>
-#include <QJsonValue>
 
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
@@ -37,13 +37,21 @@ static const QString Rate = "Rate";
 static const QString Size = "Size";
 static const QString Resolution = "Resolution";
 static const QString Bitrate = "Bitrate";
+static const QString Hot = "Hot";
 static const QString Detail = "Detail";
-static const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Detail};
-static const QHash<QString, QString> JsonKeyPri = {{Name, QString(QChar(0))},     {Performers, QString(QChar(1))}, {ProductionStudio, QString(QChar(2))},
-                                           {Uploaded, QString(QChar(3))}, {Tags, QString(QChar(4))},       {Rate, QString(QChar(5))},
-                                           {Size, QString(QChar(6))},     {Resolution, QString(QChar(7))}, {Bitrate, QString(QChar(8))},
-                                           {Detail, QString(QChar(9))}};
-static const auto KeySorter = [](const QPair<QString, QJsonValue>& l, const QPair<QString, QJsonValue>& r) -> bool {
+static const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
+static const QHash<QString, QString> JsonKeyPri = {{Name, QString(QChar(JsonKeyListOrder.indexOf(Name)))},
+                                                   {Performers, QString(QChar(JsonKeyListOrder.indexOf(Performers)))},
+                                                   {ProductionStudio, QString(QChar(JsonKeyListOrder.indexOf(ProductionStudio)))},
+                                                   {Uploaded, QString(QChar(JsonKeyListOrder.indexOf(Uploaded)))},
+                                                   {Tags, QString(QChar(JsonKeyListOrder.indexOf(Tags)))},
+                                                   {Rate, QString(QChar(JsonKeyListOrder.indexOf(Rate)))},
+                                                   {Size, QString(QChar(JsonKeyListOrder.indexOf(Size)))},
+                                                   {Resolution, QString(QChar(JsonKeyListOrder.indexOf(Resolution)))},
+                                                   {Bitrate, QString(QChar(JsonKeyListOrder.indexOf(Bitrate)))},
+                                                   {Hot, QString(QChar(JsonKeyListOrder.indexOf(Hot)))},
+                                                   {Detail, QString(QChar(JsonKeyListOrder.indexOf(Detail)))}};
+static const auto KeySorter = [](const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) -> bool {
   const QString& lValue = JsonKeyPri.contains(l.first) ? JsonKeyPri[l.first] : l.first;
   const QString& rValue = JsonKeyPri.contains(r.first) ? JsonKeyPri[r.first] : r.first;
   return lValue < rValue;
@@ -162,6 +170,7 @@ const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
 const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
 const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
 const GVarStrFolder PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "");
+const GVarStrFolder PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./");
 const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
 const GVarBool SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true);
 const GVarBool SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false);

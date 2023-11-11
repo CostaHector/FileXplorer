@@ -27,11 +27,17 @@ class JsonEditor : public QMainWindow {
   auto getListPanelRightClickMenu() -> QMenu*;
 
   auto hasLast() const -> bool;
-  auto last() -> void;
   auto hasNext() const -> bool;
+
+  auto last() -> void;
   auto next() -> void;
+
   auto onAutoSkipSwitch(const bool checked) -> void;
   void autoNext();
+
+  auto onNext() -> void;
+  auto onLast() -> void;
+
   auto load(const QString& path) -> bool;
   auto refreshEditPanel() -> void;
 
@@ -62,7 +68,6 @@ class JsonEditor : public QMainWindow {
   QSet<QString> jsonKeySetMet;
   QMenu* jsonListPanelMenu;
 
-  static const QMap<QString, QString> key2ValueType;
   static const QString TITLE_TEMPLATE;
 
   static const QColor MEET_CONDITION_COLOR;

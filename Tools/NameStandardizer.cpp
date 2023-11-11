@@ -18,7 +18,7 @@ auto NameStandardizer::jsonLoader() -> QMap<QString, QString> {
     json_string = countries_file.readAll();
     countries_file.close();
   } else {
-    qDebug("file not found");
+    qDebug("[Error] Performers table file not found");
     return name2standardName;
   }
   QJsonParseError jsonErr;
