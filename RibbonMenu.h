@@ -20,6 +20,8 @@ class RibbonMenu : public QTabWidget {
   void Subscribe();
 
  private:
+  QToolBar* menuRibbonCornerWid;
+
   QToolBar* leafFileWid;
   QToolBar* leafHomeWid;
   QToolBar* leafShareWid;
@@ -27,7 +29,6 @@ class RibbonMenu : public QTabWidget {
   QToolBar* leafDatabaseWid;
 
   QToolBar* leafMediaWid;
-  QToolBar* menuRibbonCornerWid;
 
   static constexpr int MAX_WIDGET_HEIGHT = 400;
 };

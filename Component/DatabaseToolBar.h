@@ -36,7 +36,6 @@ class DatabaseToolBar : public QToolBar {
     QToolBar* showHideDB = new QToolBar("show/hide Database view", this);
     showHideDB->addAction(g_dbAct().DB_VIEW_CLOSE_SHOW);
     showHideDB->setOrientation(Qt::Orientation::Horizontal);
-    showHideDB->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));
     showHideDB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
     return showHideDB;
   }
@@ -50,14 +49,14 @@ class DatabaseToolBar : public QToolBar {
     driveSelectionTB->addWidget(driveBatchSelectionTB);
     driveSelectionTB->addWidget(driveSingleSelectionTB);
     driveSelectionTB->setOrientation(Qt::Orientation::Vertical);
+    driveSelectionTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextOnly);
     return driveSelectionTB;
   }
 
   auto GetDatabaseControlTB() -> QToolBar* {
     QToolBar* databaseControlTB = new QToolBar("Database control", this);
-    databaseControlTB->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));
-    databaseControlTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
     databaseControlTB->addActions(g_dbAct().DB_CONTROL_ACTIONS->actions());
+    databaseControlTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
     return databaseControlTB;
   }
 

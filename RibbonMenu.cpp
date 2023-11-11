@@ -6,8 +6,8 @@
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
-#include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
+#include "Actions/FileLeafAction.h"
 #include "Component/DatabaseToolBar.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
@@ -42,7 +42,7 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   menuRibbonCornerWid->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
   return menuRibbonCornerWid;
 }
-#include "Actions/FileLeafAction.h"
+
 QToolBar* RibbonMenu::LeafFile() const {
   QToolBar* leafFileWid(new QToolBar);
   leafFileWid->addActions(g_fileLeafActions().LEAF_FILE->actions());
@@ -211,7 +211,6 @@ QToolBar* RibbonMenu::LeafView() const {
   embeddedPlayerTB->addActions({VIDEO_PLAYER_PANE});
   embeddedPlayerTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   embeddedPlayerTB->setStyleSheet("QToolBar { max-width: 256px; }");
-  embeddedPlayerTB->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));
   SetLayoutAlightment(embeddedPlayerTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
 
@@ -224,15 +223,12 @@ QToolBar* RibbonMenu::LeafView() const {
 
 QToolBar* RibbonMenu::LeafDatabase() {
   auto* databaseToolBar = new DatabaseToolBar("Database Leaf", this);
-  databaseToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));
-  databaseToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return databaseToolBar;
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
   auto* archiveVidsTB = new QToolBar("Achive vid/img/json files");
   archiveVidsTB->addActions(g_fileBasicOperationsActions().FOLDER_FILE_PROCESS->actions());
-  archiveVidsTB->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
