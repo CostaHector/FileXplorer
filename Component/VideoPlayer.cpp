@@ -14,6 +14,8 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_slider(new ClickableSlider),
       m_timeLabel(new QLabel("00000")),
       m_errorLabel(new QLabel),
+      m_sliderTB(new QToolBar("slider", this)),
+      m_controlTB(new QToolBar("play control", this)),
       m_videoWidget(new QVideoWidget),
       m_probe(new QVideoProbe),
       m_playListWid(new QListWidget),
@@ -30,40 +32,38 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   m_slider->setRange(0, 0);
   m_slider->reg(std::bind(&QMediaPlayer::setPosition, m_mediaPlayer, std::placeholders::_1));
 
-  auto* sliderTB = new QToolBar("slider");
-  sliderTB->addAction(g_videoPlayerActions()._JUMP_LAST_HOT_SCENE);
-  sliderTB->addAction(g_videoPlayerActions()._PLAY_PAUSE);
-  sliderTB->addAction(g_videoPlayerActions()._JUMP_NEXT_HOT_SCENE);
-  sliderTB->addWidget(m_slider);
+  m_sliderTB->addAction(g_videoPlayerActions()._JUMP_LAST_HOT_SCENE);
+  m_sliderTB->addAction(g_videoPlayerActions()._PLAY_PAUSE);
+  m_sliderTB->addAction(g_videoPlayerActions()._JUMP_NEXT_HOT_SCENE);
+  m_sliderTB->addWidget(m_slider);
 
   auto* spacer = new QWidget;
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-  auto* controlTB = new QToolBar("play control");
-  controlTB->addAction(g_videoPlayerActions()._LAST_VIDEO);
-  controlTB->addAction(g_videoPlayerActions()._NEXT_VIDEO);
-  controlTB->addAction(g_videoPlayerActions()._OPEN_A_VIDEO);
-  controlTB->addSeparator();
-  controlTB->addWidget(m_timeLabel);
-  controlTB->addSeparator();
-  controlTB->addAction(g_videoPlayerActions()._MARK_HOT_SCENE);
-  controlTB->addAction(g_videoPlayerActions()._GRAB_FRAME);
-  controlTB->addSeparator();
-  controlTB->addAction(g_videoPlayerActions()._RENAME_VIDEO);
-  controlTB->addAction(g_videoPlayerActions()._MOD_PERFORMERS);
-  controlTB->addSeparator();
-  controlTB->addActions(g_videoPlayerActions()._RATE_AG->actions());
-  controlTB->addSeparator();
-  controlTB->addWidget(spacer);
-  controlTB->addSeparator();
-  controlTB->addAction(g_videoPlayerActions()._CLEAR_VIDEOS_LIST);
-  controlTB->addAction(g_videoPlayerActions()._LOAD_A_PATH);
-  controlTB->addAction(g_videoPlayerActions()._VIDEOS_LIST_MENU);
-  controlTB->setContentsMargins(0, 0, 0, 0);
+  m_controlTB->addAction(g_videoPlayerActions()._LAST_VIDEO);
+  m_controlTB->addAction(g_videoPlayerActions()._NEXT_VIDEO);
+  m_controlTB->addAction(g_videoPlayerActions()._OPEN_A_VIDEO);
+  m_controlTB->addSeparator();
+  m_controlTB->addWidget(m_timeLabel);
+  m_controlTB->addSeparator();
+  m_controlTB->addAction(g_videoPlayerActions()._MARK_HOT_SCENE);
+  m_controlTB->addAction(g_videoPlayerActions()._GRAB_FRAME);
+  m_controlTB->addSeparator();
+  m_controlTB->addAction(g_videoPlayerActions()._RENAME_VIDEO);
+  m_controlTB->addAction(g_videoPlayerActions()._MOD_PERFORMERS);
+  m_controlTB->addSeparator();
+  m_controlTB->addActions(g_videoPlayerActions()._RATE_AG->actions());
+  m_controlTB->addSeparator();
+  m_controlTB->addWidget(spacer);
+  m_controlTB->addSeparator();
+  m_controlTB->addAction(g_videoPlayerActions()._CLEAR_VIDEOS_LIST);
+  m_controlTB->addAction(g_videoPlayerActions()._LOAD_A_PATH);
+  m_controlTB->addAction(g_videoPlayerActions()._VIDEOS_LIST_MENU);
+  m_controlTB->setContentsMargins(0, 0, 0, 0);
 
-  addToolBar(Qt::ToolBarArea::BottomToolBarArea, controlTB);
+  addToolBar(Qt::ToolBarArea::BottomToolBarArea, m_controlTB);
   addToolBarBreak(Qt::ToolBarArea::BottomToolBarArea);
-  addToolBar(Qt::ToolBarArea::BottomToolBarArea, sliderTB);
+  addToolBar(Qt::ToolBarArea::BottomToolBarArea, m_sliderTB);
 
   auto* _sb = new QStatusBar(this);
   _sb->addWidget(m_errorLabel);

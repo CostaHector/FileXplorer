@@ -2,6 +2,7 @@
 #define VIDEOPLAYER_H
 
 #include <QDockWidget>
+#include <QKeyEvent>
 #include <QListWidget>
 #include <QMainWindow>
 #include <QMediaPlayer>
@@ -46,9 +47,24 @@ class VideoPlayer : public QMainWindow {
   void onClearPlaylist();
   void openAFolder(const QString& folderPath = "");
 
-  auto closeEvent(QCloseEvent *event) -> void override{
+  auto closeEvent(QCloseEvent* event) -> void override {
     setUrl({});
     QMainWindow::closeEvent(event);
+  }
+
+  auto keyPressEvent(QKeyEvent* e) -> void override {
+    if (e->modifiers() == Qt::ControlModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
+      m_playlistDock->hide();
+      m_controlTB->hide();
+      setWindowState(Qt::WindowMaximized);
+      return;
+    } else if (e->key() == Qt::Key_Escape) {
+      m_playlistDock->show();
+      m_controlTB->show();
+      setWindowState(Qt::WindowMaximized);
+      return;
+    }
+    QWidget::keyPressEvent(e);
   }
 
  public slots:
@@ -72,6 +88,10 @@ class VideoPlayer : public QMainWindow {
   ClickableSlider* m_slider;
   QLabel* m_timeLabel;
   QLabel* m_errorLabel;
+
+  QToolBar* m_sliderTB;
+  QToolBar* m_controlTB;
+
   QVideoWidget* m_videoWidget;
   QVideoProbe* m_probe;
 
