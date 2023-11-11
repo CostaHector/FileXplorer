@@ -1,13 +1,13 @@
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
 
+#include <QDockWidget>
+#include <QListWidget>
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QToolBar>
 #include <QVideoProbe>
 #include <QWidget>
-#include <QListWidget>
-#include <QDockWidget>
 
 #include "Component/ClickableSlider.h"
 #include "Component/PerformersWidget.h"
@@ -21,14 +21,16 @@ QT_END_NAMESPACE
 class VideoPlayer : public QMainWindow {
   Q_OBJECT
  public:
-  VideoPlayer(QWidget* parent = nullptr);
+  explicit VideoPlayer(QWidget* parent = nullptr);
   ~VideoPlayer();
+
+  auto operator()(const QString& path) -> bool;
 
   void setUrl(const QUrl& url);
   auto sizeHint() const -> QSize override { return QSize(720, 480); }
   auto subscribe() -> void;
 
-  auto onModeName()->bool;
+  auto onModeName() -> bool;
   auto onModPerformers() -> bool;
 
   auto onGrabAFrame(const QVideoFrame& frame) -> bool;
@@ -42,10 +44,15 @@ class VideoPlayer : public QMainWindow {
 
   void onShowPlaylist();
   void onClearPlaylist();
-  void openAFolder();
+  void openAFolder(const QString& folderPath = "");
+
+  auto closeEvent(QCloseEvent *event) -> void override{
+    setUrl({});
+    QMainWindow::closeEvent(event);
+  }
 
  public slots:
-  void openFile();
+  void openFile(const QString& filePath = "");
   void play();
 
  private slots:
@@ -77,7 +84,6 @@ class VideoPlayer : public QMainWindow {
   QDockWidget* m_playlistDock;
 
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
-
 
   PerformersWidget* m_performerWid;
   QVariantHash m_dict;

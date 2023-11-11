@@ -21,14 +21,14 @@ class ViewActions : public QObject {
         (PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString())));
     PREVIEW_PANE_HTML->setCheckable(true);
 
-    auto* PREVIEW_PANE_JSON = new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW"), "Folder preview");
-    PREVIEW_PANE_JSON->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name).toBool());
-    PREVIEW_PANE_JSON->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_J));
-    PREVIEW_PANE_JSON->setToolTip(QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(
-                                  (PREVIEW_PANE_JSON->text(), PREVIEW_PANE_JSON->shortcut().toString())));
-    PREVIEW_PANE_JSON->setCheckable(true);
+    auto* JSON_EDITOR_PANE = new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), "Json editor");
+    JSON_EDITOR_PANE->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name).toBool());
+    JSON_EDITOR_PANE->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_J));
+    JSON_EDITOR_PANE->setToolTip(QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(
+                                  (JSON_EDITOR_PANE->text(), JSON_EDITOR_PANE->shortcut().toString())));
+    JSON_EDITOR_PANE->setCheckable(true);
 
-    auto* ADD_TO_JSON_POOL = new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), "Add to json edit pool");
+    auto* ADD_TO_JSON_POOL = new QAction(QIcon(), "Add to json edit pool");
     ADD_TO_JSON_POOL->setCheckable(false);
     ADD_TO_JSON_POOL->setToolTip(QString("<b>%1 (%2)</b><br/>Add to json path into TOBE edit pool.").arg(
         (ADD_TO_JSON_POOL->text(), ADD_TO_JSON_POOL->shortcut().toString())));
@@ -36,13 +36,13 @@ class ViewActions : public QObject {
     auto* actionGroup = new QActionGroup(this);
     actionGroup->addAction(NAVIGATION_PANE);
     actionGroup->addAction(PREVIEW_PANE_HTML);
-    actionGroup->addAction(PREVIEW_PANE_JSON);
+    actionGroup->addAction(JSON_EDITOR_PANE);
     actionGroup->addAction(ADD_TO_JSON_POOL);
     actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
     NAVIGATION_PANE->setChecked(PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
     PREVIEW_PANE_HTML->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name).toBool());
-    PREVIEW_PANE_JSON->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name).toBool());
+    JSON_EDITOR_PANE->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name).toBool());
     return actionGroup;
   }
 

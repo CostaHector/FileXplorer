@@ -82,21 +82,35 @@ VideoPlayer::VideoPlayer(QWidget* parent)
 
 VideoPlayer::~VideoPlayer() {}
 
-void VideoPlayer::openFile() {
-  QFileDialog fileDialog(
-      this, "Open Movie",
-      PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString());
-  fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
-  QStringList supportedMimeTypes = m_mediaPlayer->supportedMimeTypes();
-  if (!supportedMimeTypes.isEmpty()) {
-    fileDialog.setMimeTypeFilters(supportedMimeTypes);
+bool VideoPlayer::operator()(const QString& path) {
+  QFileInfo fi(path);
+  if (fi.isFile()) {
+    openFile(path);
+  } else if (fi.isDir()) {
+    openAFolder(path);
+  } else {
+    return false;
   }
+  return true;
+}
 
-  if (fileDialog.exec() != QDialog::Accepted) {
-    return;
+void VideoPlayer::openFile(const QString& filePath) {
+  QUrl fileUrl = QUrl::fromLocalFile(filePath);
+  if (not QFileInfo(filePath).isFile()) {
+    QFileDialog fileDialog(
+        this, "Open Movie",
+        PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString());
+    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+    QStringList supportedMimeTypes = m_mediaPlayer->supportedMimeTypes();
+    if (!supportedMimeTypes.isEmpty()) {
+      fileDialog.setMimeTypeFilters(supportedMimeTypes);
+    }
+    if (fileDialog.exec() != QDialog::Accepted) {
+      return;
+    }
+    fileUrl = fileDialog.selectedUrls().constFirst();
   }
-  const QUrl& fileUrl = fileDialog.selectedUrls().constFirst();
-  PreferenceSettings().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, fileDialog.directory().absolutePath());
+  PreferenceSettings().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, QFileInfo(fileUrl.toLocalFile()).absolutePath());
   m_playListWid->addItem(fileUrl.toLocalFile());
   setUrl(fileUrl);
   play();
@@ -177,8 +191,8 @@ void VideoPlayer::subscribe() {
   connect(g_videoPlayerActions()._NEXT_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayNextVideo);
   connect(g_videoPlayerActions()._LAST_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayLastVideo);
 
-  connect(g_videoPlayerActions()._OPEN_A_VIDEO, &QAction::triggered, this, &VideoPlayer::openFile);
-  connect(g_videoPlayerActions()._LOAD_A_PATH, &QAction::triggered, this, &VideoPlayer::openAFolder);
+  connect(g_videoPlayerActions()._OPEN_A_VIDEO, &QAction::triggered, this, [this](){openFile();});
+  connect(g_videoPlayerActions()._LOAD_A_PATH, &QAction::triggered, this, [this](){openAFolder();});
 
   connect(g_videoPlayerActions()._PLAY_PAUSE, &QAction::triggered, this, &VideoPlayer::play);
 
@@ -384,10 +398,13 @@ void VideoPlayer::onClearPlaylist() {
   m_playListWid->clear();
 }
 
-void VideoPlayer::openAFolder() {
-  const QString& loadFromDefaultPath =
-      PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
-  const auto loadFromPath = QFileDialog::getExistingDirectory(this, "load videos from a folder", loadFromDefaultPath);
+void VideoPlayer::openAFolder(const QString& folderPath) {
+  QString loadFromPath;
+  if (not QFileInfo(folderPath).isDir()) {
+    const QString& loadFromDefaultPath =
+        PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
+    loadFromPath = QFileDialog::getExistingDirectory(this, "load videos from a folder", loadFromDefaultPath);
+  }
   QFileInfo loadFromFi(loadFromPath);
   if (not loadFromFi.isDir()) {
     return;
@@ -454,7 +471,7 @@ QString VideoPlayer::GetJsonFilePath(const QString& vidsPath) const {
   return jsonPath;
 }
 
-#define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -462,7 +479,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   VideoPlayer player;
   player.show();
-  player.setUrl(QUrl::fromLocalFile("E:/Leaked And Loaded/Leaked And Loaded - Billy Santoro, Gage Santoro.ts"));
+  player("E:/Leaked And Loaded/Leaked And Loaded - Billy Santoro, Gage Santoro.ts");
   a.exec();
   return 0;
 }

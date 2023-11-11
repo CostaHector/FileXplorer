@@ -2,6 +2,7 @@
 #define FILEEXPLOREREVENT_H
 #include "Component/CustomStatusBar.h"
 #include "Component/JsonEditor.h"
+#include "Component/VideoPlayer.h"
 #include "Tools/MimeDataCX.h"
 #include "UndoRedo.h"
 
@@ -29,6 +30,7 @@ class FileExplorerEvent : public QObject {
                     QTableView* view_ = nullptr,
                     CustomStatusBar* _statusBar = nullptr,
                     JsonEditor* jsonEditor_ = nullptr,
+                    VideoPlayer* videoPlayer_ = nullptr,
                     T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
   void subscribe();
 
@@ -124,6 +126,7 @@ class FileExplorerEvent : public QObject {
   auto on_SelectNone() -> void;
   auto on_SelectInvert() -> void;
 
+  auto on_OpenInVideoPlayer() const -> bool;
   auto on_PlayVideo() const -> bool;
 
   auto on_copyFullPath() const -> bool;
@@ -166,6 +169,7 @@ class FileExplorerEvent : public QObject {
   CustomStatusBar* logger;
   QClipboard* clipboard;
   JsonEditor* jsonEditor;
+  VideoPlayer* videoPlayer;
   T_UpdateComponentVisibility updateComponentVisibility;
  signals:
  private:

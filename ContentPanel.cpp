@@ -90,9 +90,6 @@ auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
 }
 
 void ContentPanel::subscribe() {
-  QList<QAction*> OPENList = g_fileBasicOperationsActions().OPEN->actions();
-  auto* OPEN_RUN = OPENList[0];
-  connect(OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(view->currentIndex()); });
   connect(view, &QTableView::doubleClicked, this, &ContentPanel::on_cellDoubleClicked);
   connect(view->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
   connect(fileSysModel, &MyQFileSystemModel::directoryLoaded, this, &ContentPanel::onAfterDirectoryLoaded);

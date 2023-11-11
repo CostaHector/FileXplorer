@@ -6,7 +6,7 @@
 #include "FileExplorerEvent.h"
 #include "Tools/SubscribeDatabase.h"
 
-//#define RUN_MAIN_FILE 1
+#define RUN_MAIN_FILE 1
 #ifdef RUN_MAIN_FILE
 
 int main(int argc, char* argv[]) {
@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
   } else {
     qDebug("argc[%d]<=1.", argc);
   }
-  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->fileSysModel, fileExplorer.m_fsPanel->view, fileExplorer._statusBar, fileExplorer.m_jsonEditor, std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
+  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->fileSysModel, fileExplorer.m_fsPanel->view, fileExplorer._statusBar, fileExplorer.m_jsonEditor, fileExplorer.m_videoPlayer, std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
   auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView,
                                                  fileExplorer.m_dbPanel->m_dbView->m_dbModel,

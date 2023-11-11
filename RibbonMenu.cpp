@@ -6,6 +6,7 @@
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
+#include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Component/DatabaseToolBar.h"
 #include "PublicTool.h"
@@ -54,7 +55,7 @@ QToolButton* DropListToolButton(QAction* defaultAction,
                                 QToolButton::ToolButtonPopupMode popupMode = QToolButton::ToolButtonPopupMode::InstantPopup,
                                 const QString& updateToolTip = "",
                                 const Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
-                                const int iconSide = TABS_ICON_IN_MENU_1x1) {
+                                const int iconSize = TABS_ICON_IN_MENU_1x1) {
   QToolButton* tb = new QToolButton();
   if (dropdownActions.isEmpty()) {
     return nullptr;
@@ -70,8 +71,8 @@ QToolButton* DropListToolButton(QAction* defaultAction,
   tb->setPopupMode(popupMode);
   tb->setToolButtonStyle(toolButtonStyle);
   tb->setAutoRaise(true);
-  tb->setStyleSheet("QToolButton { max-width: 128px; }");
-  tb->setIconSize(QSize(iconSide, iconSide));
+  tb->setStyleSheet("QToolButton { max-width: 256px; }");
+  tb->setIconSize(QSize(iconSize, iconSize));
 
   QMenu* mn = new QMenu(tb);
   mn->addActions(dropdownActions);
@@ -190,7 +191,7 @@ QToolBar* RibbonMenu::LeafView() const {
   const auto PANES_RIBBONSList = g_viewActions().PANES_RIBBONS->actions();
   auto* NAVIGATION_PANE = PANES_RIBBONSList[0];
   auto* PREVIEW_PANE_HTML = PANES_RIBBONSList[1];
-  auto* PREVIEW_PANE_JSON = PANES_RIBBONSList[2];
+  auto* JSON_EDITOR_PANE = PANES_RIBBONSList[2];
   auto* ADD_TO_JSON_POOL = PANES_RIBBONSList[3];
 
   auto* viewPaneToolBar = new QToolBar("View Pane Group");
@@ -202,12 +203,22 @@ QToolBar* RibbonMenu::LeafView() const {
   SetLayoutAlightment(viewPaneToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto* jsonEditorTB =
-      DropListToolButton(PREVIEW_PANE_JSON, {ADD_TO_JSON_POOL}, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+      DropListToolButton(JSON_EDITOR_PANE, {ADD_TO_JSON_POOL}, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+
+  auto* VIDEO_PLAYER_PANE = g_fileBasicOperationsActions().OPEN->actions()[0];
+  auto* embeddedPlayerTB = new QToolBar("Embedded player toolbar");
+  embeddedPlayerTB->setOrientation(Qt::Orientation::Horizontal);
+  embeddedPlayerTB->addActions({VIDEO_PLAYER_PANE});
+  embeddedPlayerTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  embeddedPlayerTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  embeddedPlayerTB->setIconSize(QSize(TABS_ICON_IN_MENU_1x1, TABS_ICON_IN_MENU_1x1));
+  SetLayoutAlightment(embeddedPlayerTB->layout(), Qt::AlignmentFlag::AlignLeft);
+
 
   auto* leafViewWid = new QToolBar("Leaf View");
   leafViewWid->addWidget(viewPaneToolBar);
   leafViewWid->addWidget(jsonEditorTB);
-
+  leafViewWid->addWidget(embeddedPlayerTB);
   return leafViewWid;
 }
 

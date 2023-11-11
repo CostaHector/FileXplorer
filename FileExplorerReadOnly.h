@@ -9,6 +9,7 @@
 
 #include "Component/CustomStatusBar.h"
 #include "Component/JsonEditor.h"
+#include "Component/VideoPlayer.h"
 #include "ContentPanel.h"
 #include "NavigationToolBar.h"
 #include "RibbonMenu.h"
@@ -41,5 +42,6 @@ class FileExplorerReadOnly : public QMainWindow {
   CustomStatusBar* _statusBar;
 
   JsonEditor* m_jsonEditor;
+  VideoPlayer* m_videoPlayer;
 };
 #endif  // FILEEXPLORERREADONLY_H
