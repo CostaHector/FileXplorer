@@ -268,7 +268,7 @@ bool JsonEditor::onStageChanges() {
       continue;
     }
 
-    const QString& valueStr = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->text();
+    const QString& valueStr = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->text().trimmed();
     if (keyName == JSONKey::Performers or keyName == JSONKey::Tags) {
       const auto& arr = JsonFileHelper::PerformersString2StringList(valueStr);
       dict.insert(keyName, arr);
