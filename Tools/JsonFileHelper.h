@@ -25,9 +25,9 @@ class JsonFileHelper {
       jsonFile.close();
       return false;
     }
-    QTextStream in(&jsonFile);
-    in.setCodec("UTF-8");
-    in << byteArray;
+    QTextStream out(&jsonFile);
+    out.setCodec("UTF-8");
+    out << byteArray;
     jsonFile.close();
     return true;
   }
@@ -36,7 +36,9 @@ class JsonFileHelper {
     QFile jsonFile(movieJsonItemPath);
     QString json_string;
     if (jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      json_string = jsonFile.readAll();
+      QTextStream in(&jsonFile);
+      in.setCodec("UTF-8");
+      json_string = in.readAll();
       jsonFile.close();
     } else {
       qDebug("[Nomarl] json file not found");
