@@ -42,10 +42,10 @@ JsonEditor::JsonEditor(QWidget* parent)
   }
   editorPanel->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
   editorPanel->setRowWrapPolicy(QFormLayout::RowWrapPolicy::WrapLongRows);
+  editorPanel->addRow(extraEditorPanel);
 
   auto* mainLo = new QHBoxLayout;
   mainLo->addLayout(editorPanel);
-  mainLo->addLayout(extraEditorPanel);
   mainLo->addWidget(jsonListPanel);
 
   QWidget* mainWidget = new QWidget;
