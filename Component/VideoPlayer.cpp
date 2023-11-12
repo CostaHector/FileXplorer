@@ -435,8 +435,8 @@ void VideoPlayer::onClearPlaylist() {
 }
 
 void VideoPlayer::openAFolder(const QString& folderPath) {
-  QString loadFromPath;
-  if (not QFileInfo(folderPath).isDir()) {
+  QString loadFromPath = folderPath;
+  if (not QFileInfo(loadFromPath).isDir()) {
     const QString& loadFromDefaultPath =
         PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
     loadFromPath = QFileDialog::getExistingDirectory(this, "load videos from a folder", loadFromDefaultPath);
