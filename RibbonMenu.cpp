@@ -3,11 +3,11 @@
 #include <QTabBar>
 #include <QToolButton>
 #include "Actions/FileBasicOperationsActions.h"
+#include "Actions/FileLeafAction.h"
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "Actions/ViewActions.h"
-#include "Actions/FileLeafAction.h"
 #include "Component/DatabaseToolBar.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
@@ -192,7 +192,10 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* NAVIGATION_PANE = PANES_RIBBONSList[0];
   auto* PREVIEW_PANE_HTML = PANES_RIBBONSList[1];
   auto* JSON_EDITOR_PANE = PANES_RIBBONSList[2];
-  auto* ADD_TO_JSON_POOL = PANES_RIBBONSList[3];
+  auto* LOAD_JSONS_FROM_CURRENT_FOLDER = PANES_RIBBONSList[3];
+  auto* CONSTRUCT_JSONS_FOR_VIDS = PANES_RIBBONSList[4];
+  auto* JSON_ADD_PERFORMERS = PANES_RIBBONSList[5];
+  auto* JSON_SET_PRODUCTION_STUDIO = PANES_RIBBONSList[6];
 
   auto* viewPaneToolBar = new QToolBar("View Pane Group");
   viewPaneToolBar->setOrientation(Qt::Orientation::Vertical);
@@ -202,8 +205,9 @@ QToolBar* RibbonMenu::LeafView() const {
   viewPaneToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
   SetLayoutAlightment(viewPaneToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  auto* jsonEditorTB =
-      DropListToolButton(JSON_EDITOR_PANE, {ADD_TO_JSON_POOL}, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE,
+                                          {LOAD_JSONS_FROM_CURRENT_FOLDER, CONSTRUCT_JSONS_FOR_VIDS, JSON_ADD_PERFORMERS, JSON_SET_PRODUCTION_STUDIO},
+                                          QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 
   auto* VIDEO_PLAYER_PANE = g_fileBasicOperationsActions().OPEN->actions()[0];
   auto* embeddedPlayerTB = new QToolBar("Embedded player toolbar");
@@ -212,7 +216,6 @@ QToolBar* RibbonMenu::LeafView() const {
   embeddedPlayerTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   embeddedPlayerTB->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(embeddedPlayerTB->layout(), Qt::AlignmentFlag::AlignLeft);
-
 
   auto* leafViewWid = new QToolBar("Leaf View");
   leafViewWid->addWidget(viewPaneToolBar);

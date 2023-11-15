@@ -81,7 +81,6 @@ class VideoPlayer : public QMainWindow {
   void handleError();
 
  private:
-  QString GetJsonFilePath(const QString& vidsPath) const;
   auto loadHotSceneList() -> void;
   auto loadVideoRate() -> void;
   inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;

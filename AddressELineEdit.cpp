@@ -102,6 +102,9 @@ auto AddressELineEdit::pathChangeTo(const QString& newPath) -> void {
     pathComboBox->insertItem(0, fullpath);
     pathComboBox->removeItem(pathComboBox->count() - 1);
   }
+  if (pathComboBox->count() != 0) {
+    pathComboBox->setCurrentIndex(0);
+  }
 }
 
 auto AddressELineEdit::onReturnPressed(const QString& path) -> bool {

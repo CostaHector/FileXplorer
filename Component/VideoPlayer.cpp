@@ -124,7 +124,7 @@ void VideoPlayer::setUrl(const QUrl& url) {
   if (url.isLocalFile()) {
     const QString& vidsPath = url.toLocalFile();
     setWindowFilePath(vidsPath);
-    const QString& jsonPath = GetJsonFilePath(vidsPath);
+    const QString& jsonPath = JsonFileHelper::GetJsonFilePath(vidsPath);
     m_dict = JsonFileHelper::MovieJsonLoader(jsonPath);
   } else {
     m_dict.clear();
@@ -155,7 +155,7 @@ QString VideoPlayer::JsonFileValidCheck(const QString& op) {
     qDebug("current item is nullptr, cannot %s", op.toStdString().c_str());
     return {};
   }
-  const QString& jsonPath = GetJsonFilePath(m_playListWid->currentItem()->text());
+  const QString& jsonPath = JsonFileHelper::GetJsonFilePath(m_playListWid->currentItem()->text());
   if (not QFile::exists(jsonPath)) {
     qDebug("json file[%s] not exists. cannot %s", jsonPath.toStdString().c_str(), op.toStdString().c_str());
     return {};
@@ -223,7 +223,7 @@ bool VideoPlayer::onModeName() {
     return true;
   }
   const QFileInfo vidFi(m_playListWid->currentItem()->text());
-  const QFileInfo jsonFi(GetJsonFilePath(vidFi.absoluteFilePath()));
+  const QFileInfo jsonFi(JsonFileHelper::GetJsonFilePath(vidFi.absoluteFilePath()));
   if (not vidFi.exists()) {
     return true;
   }
@@ -250,7 +250,7 @@ bool VideoPlayer::onModeName() {
     setUrl(QUrl::fromLocalFile(vidFi.absoluteFilePath()));
   } else {
     if (jsonFi.exists()) {
-      const QString& newJsonAbsPath = GetJsonFilePath(newFileAbsPath);
+      const QString& newJsonAbsPath = JsonFileHelper::GetJsonFilePath(newFileAbsPath);
       const bool renameJsonResult = QFile::rename(jsonFi.absoluteFilePath(), newJsonAbsPath);
       if (not renameJsonResult) {
         const QString& msg = QString("Rename Json [%1] -> [%2] failed").arg(vidFi.fileName()).arg(newFileName);
@@ -499,12 +499,6 @@ void VideoPlayer::handleError() {
   else
     message += errorString;
   m_errorLabel->setText(message);
-}
-
-QString VideoPlayer::GetJsonFilePath(const QString& vidsPath) const {
-  const int sufLen = vidsPath.lastIndexOf('.');
-  const QString& jsonPath = vidsPath.left(sufLen) + ".json";
-  return jsonPath;
 }
 
 //#define __NAME__EQ__MAIN__ 1
