@@ -79,6 +79,34 @@
         <file alias="DESCENDING_ORDER">sorting/descendingOrder.png</file>
         <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
         <file alias="SAVED">JsonEditor/SAVED.svg</file>
+        <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
+        <file alias="FORMAT">JsonEditor/FORMAT.svg</file>
+        <file alias="SUBMIT">JsonEditor/SUBMIT.svg</file>
+        <file alias="NEXT">JsonEditor/NEXT.svg</file>
+        <file alias="LAST">JsonEditor/LAST.svg</file>
+        <file alias="CONDITION_NOT">JsonEditor/CONDITION_NOT.svg</file>
+        <file alias="CAPITALIZE_EACH_WORD">JsonEditor/CAPITALIZE_EACH_WORD.svg</file>
+        <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
+        <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
+        <file alias="LOAD_JSONS_FROM_CURRENT_PATH">JsonEditor/LOAD_JSONS_FROM_CURRENT_PATH.svg</file>
+        <file alias="RELOAD_JOSN_FROM_FILE">JsonEditor/RELOAD_JOSN_FROM_FILE.svg</file>
+        <file alias="PERFORMERS_LIST_HINT">JsonEditor/PERFORMERS_LIST_HINT.svg</file>
+        <file alias="LEARN_PERFORMERS_FROM_JSON">JsonEditor/LEARN_PERFORMERS_FROM_JSON.svg</file>
+        <file alias="CLEAR_VIDEOS_LIST">VideoPlayer/CLEAR_VIDEOS_LIST.svg</file>
+        <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
+        <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
+        <file alias="JUMP_NEXT_HOT_SCENE">VideoPlayer/JUMP_NEXT_HOT_SCENE.svg</file>
+        <file alias="LAST_VIDEO">VideoPlayer/LAST_VIDEO.svg</file>
+        <file alias="MARK_HOT_SCENE_POSITION">VideoPlayer/MARK_HOT_SCENE_POSITION.svg</file>
+        <file alias="NEXT_VIDEO">VideoPlayer/NEXT_VIDEO.svg</file>
+        <file alias="OPEN_A_FOLDER">VideoPlayer/OPEN_A_FOLDER.svg</file>
+        <file alias="OPEN_A_VIDEO">VideoPlayer/OPEN_A_VIDEO.svg</file>
+        <file alias="PAUSE_VIDEO">VideoPlayer/PAUSE_VIDEO.svg</file>
+        <file alias="PLAY_VIDEO">VideoPlayer/PLAY_VIDEO.svg</file>
+        <file alias="RENAME_PERFORMERS">VideoPlayer/RENAME_PERFORMERS.svg</file>
+        <file alias="RENAME_VIDEO">VideoPlayer/RENAME_VIDEO.svg</file>
+        <file alias="VIDEO_PLAYER">VideoPlayer/VIDEO_PLAYER.svg</file>
+        <file alias="VIDEOS_LIST_MENU">VideoPlayer/VIDEOS_LIST_MENU.svg</file>
         <file alias="FOLDER_OPEN">Parser/FOLDER_OPEN.svg</file>
         <file alias="SELECT_FOLDER">Parser/SELECT_FOLDER.svg</file>
         <file alias="JSON_AND_HTML">Parser/JSON_AND_HTML.svg</file>
@@ -145,5 +173,6 @@
     </qresource>
     <qresource prefix="/">
         <file alias="STANDARD_STUDIO_NAME_JSON">../bin/StandardStudioName.json</file>
+        <file alias="PERFORMERS_TABLE">../bin/PERFORMERS_TABLE.txt</file>
     </qresource>
 </RCC>

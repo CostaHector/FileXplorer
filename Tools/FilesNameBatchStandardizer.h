@@ -45,12 +45,7 @@ public:
             if (oldNm == newNm){
                 continue;
             }
-            if (oldNm.toLower() == newNm.toLower()){
-                cmds.append({"rename", pathList[i], oldNm, pathList[i], '#'+newNm});
-                cmds.append({"rename", pathList[i], '#'+newNm, pathList[i], newNm});
-            }else{
-                cmds.append({"rename", pathList[i], oldNm, pathList[i], newNm});
-            }
+            cmds.append({"rename", pathList[i], oldNm, pathList[i], newNm});
         }
         auto isAllSuccess = g_undoRedo.Do(cmds);
         return isAllSuccess;

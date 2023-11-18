@@ -26,12 +26,11 @@ protected:
   CustomStatusBar *logger;
   int m_imagesSizeLoaded = 0;
 
-  static QMap<QString, QPixmap> previews;
+  static int previewsCnt;
   static constexpr int cacheWidth = 256;
   static constexpr int cacheHeight = 256;
 
-  static constexpr int IMAGES_SIZE_LOADDABLE_MAX = 2 * 1024 * 1024; // 2MB
-  static constexpr int IMAGES_COUNT_LOAD_ONCE_MAX = 10;             // 10 pics
+  static constexpr int IMAGES_COUNT_LOAD_ONCE_MAX = 3;             // 10 pics
 };
 
 #endif // MYQFILESYSTEMMODEL_H

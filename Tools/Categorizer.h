@@ -28,11 +28,13 @@ public:
         if (not isNumber){  // AA - 1.mp4, 1984 is a specified year here;
             return nm; // delete sequence;
         }
+        // 10 hour = 36000s
+        // 0 second = 00000s
         if (1800 <= numInt and numInt <= 2300){  // AA - 1984.mp4, 1984 is a specified year here;
             return nm; // keep years;
         }
-        QString rnm = nm.left(spaceInd).trimmed();// AA - 1.mp4;
-        if (rnm.back() != '-'){  // AA -;
+        QString rnm = nm.left(spaceInd).trimmed();// AA - 1.mp4
+        if (rnm.back() != '-'){  // AA -
             return rnm;
         }
         rnm.chop(1);

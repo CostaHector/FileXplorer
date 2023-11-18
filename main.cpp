@@ -1,32 +1,30 @@
 #include "FileExplorerReadOnly.h"
 
 #include <QApplication>
-#include <QDebug>
+#include <qDebug>
 
 #include "FileExplorerEvent.h"
-#include "PublicVariable.h"
+#include "Tools/SubscribeDatabase.h"
 
 #define RUN_MAIN_FILE 1
 #ifdef RUN_MAIN_FILE
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
-  FileExplorerReadOnly* fileExplorer = nullptr;
+  FileExplorerReadOnly fileExplorer(argc, argv, nullptr);
   if (argc > 1) {
     qDebug("argc[%d]>1. argv[1][%s].", argc, argv[1]);
-    fileExplorer = new FileExplorerReadOnly(nullptr, argv[1]);
   } else {
     qDebug("argc[%d]<=1.", argc);
-    fileExplorer = new FileExplorerReadOnly();
   }
-
-  fileExplorer->show();
-
-  FileExplorerEvent fee(nullptr, fileExplorer->explorerCentralWidget->fileSysModel, fileExplorer->explorerCentralWidget->view, fileExplorer->_statusBar);
+  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->fileSysModel, fileExplorer.m_fsPanel->view, fileExplorer._statusBar, fileExplorer.m_jsonEditor, fileExplorer.m_videoPlayer, std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
-
+  auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView,
+                                                 fileExplorer.m_dbPanel->m_dbView->m_dbModel,
+                                                 fileExplorer.m_dbPanel->m_searchLE,
+                                                 std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
+  fileExplorer.show();
   a.exec();
-  delete fileExplorer;
   return 0;
 }
 #endif

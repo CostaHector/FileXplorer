@@ -1,15 +1,18 @@
 #ifndef PUBLICVARIABLE_H
 #define PUBLICVARIABLE_H
 
+#include <QDir>
 #include <QFileInfo>
+#include <QJsonValue>
 #include <QRect>
 #include <QSettings>
 #include <QSize>
 #include <QTextStream>
+#include <qDebug>
 
-const QString PROJECT_PATH = QFileInfo(__FILE__).absolutePath();
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
+const QString PROJECT_PATH{"../FileExplorerReadOnly"};
 
 static inline QSettings& PreferenceSettings() {
   static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", "FileExplorerReadOnly");
@@ -21,6 +24,39 @@ auto TextReader(const QString& textPath) -> QString;
 typedef std::function<bool(QString, bool, bool)> T_IntoNewPath;
 typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
+typedef std::function<void()> T_SwitchStackWidget;
+typedef std::function<void()> T_UpdateComponentVisibility;
+
+namespace JSONKey {
+static const QString Name = "Name";
+static const QString Performers = "Performers";
+static const QString ProductionStudio = "ProductionStudio";
+static const QString Uploaded = "Uploaded";
+static const QString Tags = "Tags";
+static const QString Rate = "Rate";
+static const QString Size = "Size";
+static const QString Resolution = "Resolution";
+static const QString Bitrate = "Bitrate";
+static const QString Hot = "Hot";
+static const QString Detail = "Detail";
+static const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
+static const QHash<QString, QString> JsonKeyPri = {{Name, QString(QChar(JsonKeyListOrder.indexOf(Name)))},
+                                                   {Performers, QString(QChar(JsonKeyListOrder.indexOf(Performers)))},
+                                                   {ProductionStudio, QString(QChar(JsonKeyListOrder.indexOf(ProductionStudio)))},
+                                                   {Uploaded, QString(QChar(JsonKeyListOrder.indexOf(Uploaded)))},
+                                                   {Tags, QString(QChar(JsonKeyListOrder.indexOf(Tags)))},
+                                                   {Rate, QString(QChar(JsonKeyListOrder.indexOf(Rate)))},
+                                                   {Size, QString(QChar(JsonKeyListOrder.indexOf(Size)))},
+                                                   {Resolution, QString(QChar(JsonKeyListOrder.indexOf(Resolution)))},
+                                                   {Bitrate, QString(QChar(JsonKeyListOrder.indexOf(Bitrate)))},
+                                                   {Hot, QString(QChar(JsonKeyListOrder.indexOf(Hot)))},
+                                                   {Detail, QString(QChar(JsonKeyListOrder.indexOf(Detail)))}};
+static const auto KeySorter = [](const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) -> bool {
+  const QString& lValue = JsonKeyPri.contains(l.first) ? JsonKeyPri[l.first] : l.first;
+  const QString& rValue = JsonKeyPri.contains(r.first) ? JsonKeyPri[r.first] : r.first;
+  return lValue < rValue;
+};
+};  // namespace JSONKey
 
 namespace MainKey {
 constexpr int Name = 0;
@@ -33,6 +69,27 @@ const int NAME_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Name");
 const int TYPE_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf("Type");
 const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
 }  // namespace MainKey
+
+namespace DB_HEADER_KEY {
+const QString Name = "Name";
+const QString Size = "Size";
+const QString Type = "Type";
+const QString DateModified = "DateModified";
+
+const QString Performers = "Performers";
+const QString Tags = "Tags";
+const QString Rate = "Rate";
+const QString Driver = "Driver";
+const QString Prepath = "Prepath";
+const QString Extra = "Extra";
+
+const QStringList DB_HEADER{Name, Size, Type, DateModified, Performers, Tags, Rate, Driver, Prepath, Extra};
+const int DB_DRIVER_INDEX = DB_HEADER.indexOf(Driver);
+const int DB_PREPATH_INDEX = DB_HEADER.indexOf(Prepath);
+const int DB_NAME_INDEX = DB_HEADER.indexOf(Name);
+const int DB_SIZE_COLUMN = DB_HEADER.indexOf(Size);
+const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
+}  // namespace DB_HEADER_KEY
 
 namespace HEADERVIEW_SORT_INDICATOR_ORDER {
 class OrderClass {
@@ -112,6 +169,9 @@ namespace MemoryKey {
 const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
 const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
 const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
+const GVarStrFolder PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "");
+const GVarStrFolder PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./");
+const GVarBool AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false);
 const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
 const GVarBool SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true);
 const GVarBool SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false);
@@ -120,6 +180,7 @@ const GVarBool SHOW_FOLDER_PREVIEW_JSON_EDITOR("SHOW_FOLDER_PREVIEW_JSON_EDITOR"
 const GVarBool SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true);
 const GVarBool SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true);
 const GVarBool EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true);
+const GVarBool SHOW_DATABASE("SHOW_DATABASE", false);
 
 const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
 const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
@@ -136,6 +197,7 @@ const GVarStr MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", {});
 const GVarStr COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", {});
 
 const GVarInt MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, 0);
+const GVarInt AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN("AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN", 2);
 }  // namespace MemoryKey
 
 #include <QDir>
@@ -148,8 +210,9 @@ const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
 const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
 const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
-
+const QString FILE_INFO_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FILE_INFO_DATABASE");
 }  // namespace SystemPath
+const QString TABLE_NAME = "movies_info";
 
 extern const char* SUBMIT_BTN_STYLE;
 

@@ -1,6 +1,7 @@
 #include "CustomStatusBar.h"
 
 #include <QMainWindow>
+#include <QFileInfo>
 class CustomStatusBarIll : public QMainWindow {
  public:
   CustomStatusBar* statusBar;
@@ -9,10 +10,11 @@ class CustomStatusBarIll : public QMainWindow {
     statusBar->pathInfo(1, 0);
     statusBar->pathInfo(255, 1);
     statusBar->msg("Process Finished");
+    setWindowTitle(QFileInfo(__FILE__).absoluteFilePath()); // PROJECT_NAME/
   }
 };
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

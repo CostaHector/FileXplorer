@@ -4,6 +4,8 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QFileInfo>
+#include <QDir>
+#include <QFileDialog>
 #include <QLayout>
 #include <QString>
 
@@ -27,4 +29,10 @@ auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionG
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 
 auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList;
+
+auto ChooseCopyDestination(QString defaultPath, QWidget *parent=nullptr) -> QString;
+auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* oldAG) -> QString;
+
+#include <QSqlDatabase>
+auto GetSqlDB() -> QSqlDatabase;
 #endif  // PUBLICTOOL_H

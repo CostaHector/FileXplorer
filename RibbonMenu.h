@@ -3,6 +3,7 @@
 
 #include <QTabWidget>
 #include <QToolBar>
+#include <QLineEdit>
 
 class RibbonMenu : public QTabWidget {
  public:
@@ -13,19 +14,21 @@ class RibbonMenu : public QTabWidget {
   QToolBar* LeafHome() const;
   QToolBar* LeafShare() const;
   QToolBar* LeafView() const;
-  QToolBar* LeafDatabase() const;
+  QToolBar* LeafDatabase();
   QToolBar* LeafMediaTools() const;
 
   void Subscribe();
 
  private:
+  QToolBar* menuRibbonCornerWid;
+
   QToolBar* leafFileWid;
   QToolBar* leafHomeWid;
   QToolBar* leafShareWid;
   QToolBar* leafViewWid;
   QToolBar* leafDatabaseWid;
+
   QToolBar* leafMediaWid;
-  QToolBar* menuRibbonCornerWid;
 
   static constexpr int MAX_WIDGET_HEIGHT = 400;
 };

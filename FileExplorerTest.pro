@@ -2,16 +2,19 @@ QT += testlib
 QT += gui
 QT += core
 QT += widgets
+QT += sql
 CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
 SOURCES += \
+    Component/PerformersManager.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     TestCase/CatergorizerTest.cpp \
     TestCase/FilesNameBatchStandardizerTest.cpp \
     TestCase/MovieNameStandardizerTest.cpp \
+    TestCase/PerformersManagerTest.cpp \
     TestCase/QStringFunctionTest.cpp \
     TestCase/RenameWidgetTest.cpp \
     TestCase/FileOperationTest.cpp \
@@ -23,6 +26,7 @@ SOURCES += \
 
 
 HEADERS += \
+    Component/PerformersManager.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     Tools/Categorizer.h \

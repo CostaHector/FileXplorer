@@ -179,14 +179,19 @@ class FileOperation {
   }
 
   static auto rename(const QString& pre, const QString& rel, const QString& to, const QString& toRel) -> RETURN_TYPE {
+    // a/b -> a/b skip
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QFile::exists(pth)) {
       return {ErrorCode::SRC_INEXIST, {}};
     }
     const QString& absNewPath = QDir(to).absoluteFilePath(toRel);
-    if (QFile(absNewPath).exists()) {
+
+    const bool isOnlyCaseDiffer = rel != toRel and rel.toLower() == toRel.toLower();
+    if (QFile(absNewPath).exists() and not isOnlyCaseDiffer) {
+      // rename item -> FILE. but there is {file} already. Reject to rename to avoid override {file}
       return {ErrorCode::DST_FILE_OR_PATH_ALREADY_EXIST, {}};
     }
+
     FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
     const QString& preNewPathFolder = QFileInfo(absNewPath).absolutePath();
     if (not QDir(preNewPathFolder).exists()) {

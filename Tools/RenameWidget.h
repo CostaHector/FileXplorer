@@ -471,13 +471,11 @@ class RenameWidget_Numerize : public RenameWidget {
 class RenameWidget_Case : public RenameWidget {
  public:
   QActionGroup* caseAG;
-  QCheckBox* TRAILING_UNDERLINE;
   QToolBar* caseTB;
 
   explicit RenameWidget_Case(QWidget* parent = nullptr)
       : RenameWidget(parent),
         caseAG(g_renameAg().NAME_CASE),
-        TRAILING_UNDERLINE(new QCheckBox("Trailing underline (append or rstrip)")),
         caseTB(new QToolBar) {}
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Case name string | %1 item(s) under [%2]";
@@ -495,15 +493,9 @@ class RenameWidget_Case : public RenameWidget {
   }
   auto extraSubscribe() -> void override {
     connect(caseTB, &QToolBar::actionTriggered, this, &RenameWidget::OnlyTriggerRenameCore);
-    connect(TRAILING_UNDERLINE, &QCheckBox::stateChanged, this, &RenameWidget::OnlyTriggerRenameCore);
   }
   auto InitExtraMemberWidget() -> void {
-    TRAILING_UNDERLINE->setToolTip("In Windows system, file/folder name is <b>case-insensitive</b>.");
-    TRAILING_UNDERLINE->setChecked(true);
-
     caseTB->addActions(caseAG->actions());
-    caseTB->addSeparator();
-    caseTB->addWidget(TRAILING_UNDERLINE);
     caseTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     return;
   }

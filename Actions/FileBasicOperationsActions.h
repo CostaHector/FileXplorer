@@ -5,7 +5,6 @@
 #include <QActionGroup>
 #include <QObject>
 
-#include "PublicTool.h"
 #include "PublicVariable.h"
 
 class FileBasicOperationsActions : public QObject {
@@ -128,13 +127,15 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto GetOPENActions() -> QActionGroup* {
-    QAction* OPEN_RUN = new QAction("&Open");
-    OPEN_RUN->setShortcutVisibleInContextMenu(true);
+    QAction* VIDEO_PLAYER_PANE = new QAction(QIcon(":/themes/VIDEO_PLAYER"), "&Video Player");
+    VIDEO_PLAYER_PANE->setShortcutVisibleInContextMenu(true);
+    VIDEO_PLAYER_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.")
+                                .arg(VIDEO_PLAYER_PANE->text(), VIDEO_PLAYER_PANE->shortcut().toString()));
 
     QAction* PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play Videos");
     PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
     PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
-    PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the absolute file name of the selected item(s) to the clipboard.")
+    PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play the selected item(s) in third part player.")
                                 .arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
 
     QAction* _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in Explorer");
@@ -147,7 +148,7 @@ class FileBasicOperationsActions : public QObject {
     QAction* OPEN_IN_TERMINAL = new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), "Open in Terminal");
 
     QActionGroup* actionGroup = new QActionGroup(this);
-    actionGroup->addAction(OPEN_RUN);
+    actionGroup->addAction(VIDEO_PLAYER_PANE);
     actionGroup->addAction(PLAY_VIDEOS);
     actionGroup->addAction(_REVEAL_IN_EXPLORER);
     actionGroup->addAction(OPEN_IN_TERMINAL);
