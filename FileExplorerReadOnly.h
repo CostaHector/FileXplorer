@@ -30,6 +30,15 @@ class FileExplorerReadOnly : public QMainWindow {
   void InitComponentVisibility();
   void UpdateComponentVisibility();
 
+  void keyPressEvent(QKeyEvent* ev){
+    if (ev->key() == Qt::Key_F3){  // F3 Search
+      m_fsPanel->addressBar->searchLE->setFocus();
+      m_fsPanel->addressBar->searchLE->selectAll();
+      return;
+    }
+    QMainWindow::keyPressEvent(ev);
+  }
+
   const static QString DEFAULT_PATH;
   QDockWidget* previewHtmlDock;
   FolderPreviewHTML* previewHtml;

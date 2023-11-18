@@ -57,6 +57,7 @@ public:
   PathUndoRedoer pathRD;
   QPushButton *backToBtn;
   QPushButton *forwardToBtn;
+  QLineEdit *searchLE;
 
 signals:
 
@@ -66,7 +67,6 @@ private:
   std::function<void(QString)> m_on_searchEnterKey;
 
   QPushButton *upToBtn;
-  QLineEdit *searchLE;
 };
 
 #endif // NAVIGATIONANDADDRESSBAR_H
