@@ -23,7 +23,7 @@ const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
     : QMainWindow(parent),
       previewHtmlDock(new QDockWidget("Preview HTML")),
-      previewHtml(new FolderPreviewHTML),
+      previewHtml(new FolderPreviewHTML(previewHtmlDock)),
       previewWidget(new FolderPreviewWidget),
       m_fsPanel(nullptr),
       m_dbPanel(nullptr),
@@ -33,10 +33,10 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       _statusBar(new CustomStatusBar),
       m_jsonEditor(new JsonEditor(this)),
       m_videoPlayer(new VideoPlayer(this)){
-  const QString& initialPath = (argc > 1) ? argv[1] : "";
+  QString initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
 
-  m_fsPanel = new ContentPanel(nullptr, defaultPath, previewHtml, previewWidget, _statusBar);
+  m_fsPanel = new ContentPanel(nullptr, defaultPath, previewHtml, nullptr, _statusBar);
   m_dbPanel = new DatabasePanel;
 
   stackCentralWidget->addWidget(m_fsPanel);
@@ -44,8 +44,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
 
   this->setCentralWidget(stackCentralWidget);
 
-  //    previewHtmlDock->setWidget(previewHtml);
-  previewHtmlDock->setWidget(previewWidget);
+      previewHtmlDock->setWidget(previewHtml);
+//  previewHtmlDock->setWidget(previewWidget);
   previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
 
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);

@@ -6,10 +6,9 @@
 #include <QMimeData>
 #include <QUrl>
 
-QMap<QString, QPixmap> MyQFileSystemModel::previews;
+int MyQFileSystemModel::previewsCnt = 0;
 constexpr int MyQFileSystemModel::cacheWidth;
 constexpr int MyQFileSystemModel::cacheHeight;
-constexpr int MyQFileSystemModel::IMAGES_SIZE_LOADDABLE_MAX;
 constexpr int MyQFileSystemModel::IMAGES_COUNT_LOAD_ONCE_MAX;
 
 MyQFileSystemModel::MyQFileSystemModel(CustomStatusBar *_statusBar, QObject *parent)
@@ -96,7 +95,7 @@ Qt::DropActions MyQFileSystemModel::supportedDragActions() const { return Qt::Mo
 #include "PublicVariable.h"
 
 void MyQFileSystemModel::whenRootPathChanged(const QString &newpath) {
-  previews.clear();
+  previewsCnt = 0;
   int logicalIndex =
       PreferenceSettings().value(MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.v).toInt();
   const QString &orderString(

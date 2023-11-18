@@ -1,34 +1,24 @@
 #include "ImagesFileSystemModel.h"
 
 ImagesFileSystemModel::ImagesFileSystemModel(QObject* parent, bool showThumbnails_)
-    : MyQFileSystemModel(nullptr, parent), m_showThumbnails(showThumbnails_) {
-  setNameFilters({"*.jpeg", "*.jpg", "*.png", "*.tiff", "*.jfif", "*.gif", "*.webp", "*.ico", "*.svg"});
+    : MyQFileSystemModel(nullptr, parent), m_showThumbnails(showThumbnails_), IMG_NAME_FILTERS(GetImgNameFiltersList()) {
+  setNameFilters(IMG_NAME_FILTERS);
 }
 
 QVariant ImagesFileSystemModel::getPreview(QModelIndex index) const {
   QString itemName = QFileSystemModel::data(index, Qt::DisplayRole).toString();
-  if (!previews.contains(itemName)) {
-    if (previews.size() >= IMAGES_COUNT_LOAD_ONCE_MAX) {
-      return QFileSystemModel::data(index, Qt::DecorationRole);
+  QPixmap qpm(rootDirectory().absoluteFilePath(itemName));
+  if (qpm.isNull()) {
+    QIcon ico = QFileSystemModel::data(index, Qt::DecorationRole).value<QIcon>();
+    if (not ico.isNull()) {  // QIcon
+      qpm = ico.pixmap(cacheWidth, cacheHeight);
     }
-    QString itemAbsPath(rootPath() + "/" + itemName);
-    if (QFile(itemAbsPath).size() >= IMAGES_SIZE_LOADDABLE_MAX) {
-      return QFileSystemModel::data(index, Qt::DecorationRole);
-    }
-    QPixmap qpm(itemAbsPath);
-    if (qpm.isNull()) {
-      QIcon ico = QFileSystemModel::data(index, Qt::DecorationRole).value<QIcon>();
-      if (not ico.isNull()) {  // QIcon
-        qpm = ico.pixmap(cacheWidth, cacheHeight);
-      }
-      return qpm;
-    }
-    if (not qpm.isNull()) {
-      qpm = qpm.scaledToHeight(cacheHeight, Qt::FastTransformation);
-    }
-    previews[itemName] = qpm;
+    return qpm;
   }
-  return previews[itemName];
+  if (not qpm.isNull()) {
+    qpm = qpm.scaledToHeight(cacheHeight, Qt::FastTransformation);
+  }
+  return qpm;
 }
 
 QVariant ImagesFileSystemModel::data(const QModelIndex& index, int role) const {
@@ -39,4 +29,12 @@ QVariant ImagesFileSystemModel::data(const QModelIndex& index, int role) const {
   } else {
     return QFileSystemModel::data(index, role);
   }
+}
+
+QStringList ImagesFileSystemModel::GetImgNameFiltersList() const {
+  QStringList IMG_NAME_FILTERS;
+  for (int i = 0; i < IMAGES_COUNT_LOAD_ONCE_MAX; ++i) {
+    IMG_NAME_FILTERS += {QString("* %1.jpg").arg(i), QString("* %1.jpg").arg(i), QString("* %1.png").arg(i), QString("* %1.webp").arg(i)};
+  }
+  return IMG_NAME_FILTERS;
 }

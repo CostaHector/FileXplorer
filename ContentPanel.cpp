@@ -146,7 +146,12 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
   const QString& pth = _model->rootPath();
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
   qDebug("\t\t Anchor of path [%s] target to [%d,%d]", pth.toStdString().c_str(), m_anchorTags[pth].row, m_anchorTags[pth].col);
-  emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
+  if (previewWidget){
+    emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
+  }
+  if (previewHtml){
+    previewHtml->operator()(firstFileInfo.absoluteFilePath());
+  }
   return true;
 }
 

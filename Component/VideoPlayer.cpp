@@ -1,6 +1,5 @@
 #include "VideoPlayer.h"
 #include "Actions/VideoPlayerActions.h"
-#include "PublicVariable.h"
 #include "Tools/JsonFileHelper.h"
 
 #include <QVideoWidget>
@@ -81,11 +80,14 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   subscribe();
 
   setWindowIcon(QIcon(":/themes/VIDEO_PLAYER"));
+  updateWindowsSize();
 }
 
 VideoPlayer::~VideoPlayer() {}
 
 bool VideoPlayer::operator()(const QString& path) {
+  updateWindowsSize();
+
   QFileInfo fi(path);
   if (fi.isFile()) {
     openFile(path);
@@ -445,6 +447,7 @@ void VideoPlayer::openAFolder(const QString& folderPath) {
   if (not loadFromFi.isDir()) {
     return;
   }
+  const int playIndex = m_playListWid->count();
   PreferenceSettings().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, loadFromFi.absoluteFilePath());
   QDirIterator it(loadFromPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
@@ -452,6 +455,13 @@ void VideoPlayer::openAFolder(const QString& folderPath) {
     m_playListWid->addItem(it.filePath());
   }
   m_playlistDock->setWindowTitle(PLAYLIST_DOCK_TITLE_TEMPLATE.arg(m_playListWid->count()));
+
+  if (playIndex >= m_playListWid->count()) {
+    qDebug("No vids find in path[%s]", loadFromPath.toStdString().c_str());
+    return;
+  }
+  setUrl(QUrl::fromLocalFile(m_playListWid->item(playIndex)->text()));
+  play();
 }
 
 void VideoPlayer::play() {
@@ -501,7 +511,7 @@ void VideoPlayer::handleError() {
   m_errorLabel->setText(message);
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

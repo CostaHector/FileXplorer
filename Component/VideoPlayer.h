@@ -12,6 +12,7 @@
 
 #include "Component/ClickableSlider.h"
 #include "Component/PerformersWidget.h"
+#include "PublicVariable.h"
 
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
@@ -28,7 +29,6 @@ class VideoPlayer : public QMainWindow {
   auto operator()(const QString& path) -> bool;
 
   void setUrl(const QUrl& url);
-  auto sizeHint() const -> QSize override { return QSize(720, 480); }
   auto subscribe() -> void;
 
   auto onModeName() -> bool;
@@ -39,7 +39,7 @@ class VideoPlayer : public QMainWindow {
 
   auto onJumpToNextHotScene() -> bool;
   auto onJumpToLastHotScene() -> bool;
-  auto onPositionAdd(const int ms = 10*1000)->bool;
+  auto onPositionAdd(const int ms = 10 * 1000) -> bool;
 
   auto onRateForThisMovie(const QAction* checkedAction) -> bool;
   void onPlayLastVideo();
@@ -49,8 +49,18 @@ class VideoPlayer : public QMainWindow {
   void onClearPlaylist();
   void openAFolder(const QString& folderPath = "");
 
+  auto updateWindowsSize() -> void {
+    if (PreferenceSettings().contains("VideoPlayerGeometry")) {
+      restoreGeometry(PreferenceSettings().value("VideoPlayerGeometry").toByteArray());
+    } else {
+      setGeometry(QRect(0, 0, 600, 400));
+    }
+  }
+
   auto closeEvent(QCloseEvent* event) -> void override {
     setUrl({});
+    PreferenceSettings().setValue("VideoPlayerGeometry", saveGeometry());
+    qDebug("Resize Video Player to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
     QMainWindow::closeEvent(event);
   }
 
