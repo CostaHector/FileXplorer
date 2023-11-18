@@ -102,8 +102,8 @@ class FileExplorerEvent : public QObject {
     }
     QMessageBox msgBox(this->view);
     msgBox.setWindowIcon(g_rightClickActions()._CALC_MD5_ACT->icon());
-    msgBox.setWindowTitle(QString("MD5 of %1 items").arg(inds.size()));
-    msgBox.setText("Click show Detail to see md5 lists\n" + QString(256, '_'));
+    msgBox.setWindowTitle(QString("MD5 of selected %1 item(s)").arg(inds.size()));
+    msgBox.setText("Click Show Detail to see md5 lists\n" + QString(256, '_'));
     msgBox.setDetailedText(md5NameLst.join('\n'));
     msgBox.exec();
     return true;
@@ -111,11 +111,13 @@ class FileExplorerEvent : public QObject {
 
   bool on_properties() const {
     const auto& inds = selectedIndexes();
+    int fileCnt = 0;
     qint64 total = 0;
     for (const QModelIndex ind : inds) {
       QFileInfo fi(fileSysModel->fileInfo(ind));
       if (fi.isFile()) {
         total += fi.size();
+        ++fileCnt;
         continue;
       }
       if (fi.isDir()) {
@@ -123,17 +125,22 @@ class FileExplorerEvent : public QObject {
         while (it.hasNext()) {
           it.next();
           total += it.fileInfo().size();
+          ++fileCnt;
         }
       }
     }
-    QMessageBox msgBox(this->view);
-    msgBox.setWindowIcon(g_rightClickActions()._PROPERTIES->icon());
-    msgBox.setWindowTitle(QString("Size of %1 items").arg(inds.size()));
     const qint64 xGiB = total / (1 << 30);
     const qint64 xMiB = total % (1 << 30) / (1 << 20);
     const qint64 xkiB = total % (1 << 30) % (1 << 20) / (1 << 10);
     const qint64 xB = total % (1 << 30) % (1 << 20) % (1 << 10);
-    msgBox.setText(QString("%1GiB+%2MiB+%3KiB+%4Byte\t=\t%5B").arg(xGiB).arg(xMiB).arg(xkiB).arg(xB).arg(total));
+    const QString sizeMsg = QString("%1GiB+%2MiB+%3KiB+%4Byte\t=\t%5B").arg(xGiB).arg(xMiB).arg(xkiB).arg(xB).arg(total);
+    const QString cntMsg = QString("%1 File(s)").arg(fileCnt);
+
+    QMessageBox msgBox(this->view);
+    msgBox.setWindowIcon(g_rightClickActions()._PROPERTIES->icon());
+    msgBox.setWindowTitle(QString("Size of selected %1 item(s)").arg(inds.size()));
+
+    msgBox.setText(sizeMsg + "\n" + cntMsg);
     msgBox.exec();
     return true;
   }
