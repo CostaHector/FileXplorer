@@ -463,7 +463,8 @@ void VideoPlayer::openAFolder(const QString& folderPath) {
     qDebug("No vids find in path[%s]", loadFromPath.toStdString().c_str());
     return;
   }
-  setUrl(QUrl::fromLocalFile(m_playListWid->item(playIndex)->text()));
+  m_playListWid->setCurrentRow(playIndex);
+  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
   play();
 }
 
