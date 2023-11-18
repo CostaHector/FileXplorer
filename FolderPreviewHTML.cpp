@@ -41,7 +41,7 @@ bool FolderPreviewHTML::operator()(const QString& path) {
   }
 
   if (m_parent) {
-    m_parent->setWindowTitle("CNT" + QString::number(vidCnt));
+    m_parent->setWindowTitle(QString::number(vidCnt) + "vid(s)");
   }
 
   QString htmlSrc;
