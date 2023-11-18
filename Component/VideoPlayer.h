@@ -65,15 +65,23 @@ class VideoPlayer : public QMainWindow {
   }
 
   auto keyPressEvent(QKeyEvent* e) -> void override {
-    if (e->modifiers() == Qt::ControlModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
+    if (e->modifiers() == Qt::AltModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
       m_playlistDock->hide();
+      m_sliderTB->show();
       m_controlTB->hide();
       setWindowState(Qt::WindowMaximized);
       return;
     } else if (e->key() == Qt::Key_Escape) {
       m_playlistDock->show();
+      m_sliderTB->show();
       m_controlTB->show();
       setWindowState(Qt::WindowMaximized);
+      return;
+    } else if (e->key() == Qt::Key_F11) {
+      m_playlistDock->hide();
+      m_sliderTB->hide();
+      m_controlTB->hide();
+      setWindowState(Qt::WindowFullScreen);
       return;
     }
     QWidget::keyPressEvent(e);

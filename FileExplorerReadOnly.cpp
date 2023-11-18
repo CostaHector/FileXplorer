@@ -24,7 +24,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
     : QMainWindow(parent),
       previewHtmlDock(new QDockWidget("Preview HTML")),
       previewHtml(new FolderPreviewHTML(previewHtmlDock)),
-      previewWidget(new FolderPreviewWidget),
+//      previewWidget(new FolderPreviewWidget),
+      previewWidget(nullptr),
       m_fsPanel(nullptr),
       m_dbPanel(nullptr),
       stackCentralWidget(new QStackedWidget(this)),
@@ -32,7 +33,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       osm(new RibbonMenu),
       _statusBar(new CustomStatusBar),
       m_jsonEditor(new JsonEditor(this)),
-      m_videoPlayer(new VideoPlayer(this)){
+      m_videoPlayer(new VideoPlayer(this)) {
   QString initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
 
@@ -44,8 +45,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
 
   this->setCentralWidget(stackCentralWidget);
 
-      previewHtmlDock->setWidget(previewHtml);
-//  previewHtmlDock->setWidget(previewWidget);
+  previewHtmlDock->setWidget(previewHtml);
+  //  previewHtmlDock->setWidget(previewWidget);
   previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
 
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
@@ -62,8 +63,10 @@ FileExplorerReadOnly::~FileExplorerReadOnly() {}
 
 void FileExplorerReadOnly::closeEvent(QCloseEvent* event) {
   PreferenceSettings().setValue("geometry", saveGeometry());
-  PreferenceSettings().setValue("dockerWidgetWidth", previewWidget->width());
-  PreferenceSettings().setValue("dockerWidgetHeight", previewWidget->height());
+  if (previewWidget) {
+    PreferenceSettings().setValue("dockerWidgetWidth", previewWidget->width());
+    PreferenceSettings().setValue("dockerWidgetHeight", previewWidget->height());
+  }
   PreferenceSettings().setValue("defaultOpenPath", m_fsPanel->CurrentPath());
   return QMainWindow::closeEvent(event);
 }
