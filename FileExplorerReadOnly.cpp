@@ -24,7 +24,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
     : QMainWindow(parent),
       previewHtmlDock(new QDockWidget("Preview HTML")),
       previewHtml(new FolderPreviewHTML(previewHtmlDock)),
-//      previewWidget(new FolderPreviewWidget),
+      //      previewWidget(new FolderPreviewWidget),
       previewWidget(nullptr),
       m_fsPanel(nullptr),
       m_dbPanel(nullptr),
@@ -66,6 +66,10 @@ void FileExplorerReadOnly::closeEvent(QCloseEvent* event) {
   if (previewWidget) {
     PreferenceSettings().setValue("dockerWidgetWidth", previewWidget->width());
     PreferenceSettings().setValue("dockerWidgetHeight", previewWidget->height());
+  }
+  if (previewHtml) {
+    PreferenceSettings().setValue("dockerHtmlWidth", previewHtml->width());
+    PreferenceSettings().setValue("dockerHtmlHeight", previewHtml->height());
   }
   PreferenceSettings().setValue("defaultOpenPath", m_fsPanel->CurrentPath());
   return QMainWindow::closeEvent(event);

@@ -19,6 +19,12 @@ class FolderPreviewHTML : public QTextBrowser {
     connect(this, &QTextBrowser::anchorClicked, this, &FolderPreviewHTML::onAnchorClicked);
   };
 
+  QSize sizeHint() const {
+    auto w = PreferenceSettings().value("dockerHtmlWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
+    auto h = PreferenceSettings().value("dockerHtmlHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
+    return QSize(w, h);
+  }
+
   bool onAnchorClicked(const QUrl& url) {
     if (not url.isLocalFile()) {
       return false;
