@@ -25,13 +25,10 @@ JsonEditor::JsonEditor(QWidget* parent)
       extraEditorPanel(new QFormLayout),
       jsonListPanelMenu(getListPanelRightClickMenu()) {
   QToolBar* tb = new QToolBar("json editor actions", this);
-  tb->addActions(g_jsonEditorActions().JSON_EDITOR_ACTIONS->actions());
+  tb->addActions(g_jsonEditorActions().FILES_ACTIONS->actions());
   tb->addSeparator();
-  tb->addAction(g_jsonEditorActions()._REVEAL_IN_EXPLORER);
-  tb->addAction(g_jsonEditorActions()._OPEN_THIS_FILE);
+  tb->addActions(g_jsonEditorActions().EDIT_ACTIONS->actions());
   tb->addSeparator();
-  tb->addAction(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
-  tb->addAction(g_jsonEditorActions()._LOWER_ALL_WORDS);
   tb->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
   tb->addAction(g_jsonEditorActions()._HINT);
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
@@ -214,7 +211,7 @@ void JsonEditor::subscribe() {
   });
 
   connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
-  connect(g_jsonEditorActions()._RELOAD_FROM_JSON_FILE, &QAction::triggered, this, &JsonEditor::refreshEditPanel);
+  connect(g_jsonEditorActions()._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, this, &JsonEditor::refreshEditPanel);
 
   connect(g_jsonEditorActions()._NEXT, &QAction::triggered, this, &JsonEditor::onNext);
   connect(g_jsonEditorActions()._LAST, &QAction::triggered, this, &JsonEditor::onLast);
@@ -232,23 +229,30 @@ void JsonEditor::subscribe() {
     }
   });
 
-  connect(g_jsonEditorActions()._LOAD, &QAction::triggered, this, [this]() {
-    const QString& loadFromDefaultPath =
-        PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
-    const auto loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", loadFromDefaultPath);
-    QFileInfo loadFromFi(loadFromPath);
-    if (not loadFromFi.isDir()) {
-      return "";
-    }
-    PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
-    load(loadFromFi.absoluteFilePath());
-  });
-  connect(g_jsonEditorActions()._EMPTY, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
+  connect(g_jsonEditorActions()._SELECT_A_FOLDER_AND_LOAD_JSON, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
+  connect(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
 
   connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
+}
+
+bool JsonEditor::onLoadASelectedPath(const QString& folderPath) {
+  QString loadFromPath = folderPath;
+  if (folderPath.isEmpty()) {
+    const QString& defaultOpenDir =
+        PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
+    loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
+  }
+  QFileInfo loadFromFi(loadFromPath);
+  if (not loadFromFi.isDir()) {
+    QMessageBox::warning(this, "Failed when Load json from a folder", QString("Not a folder:\n%1").arg(folderPath));
+    qDebug("Failed when Load json from a folder. Not a folder:\n%s", folderPath.toStdString().c_str());
+    return false;
+  }
+  PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
+  load(loadFromFi.absoluteFilePath());
 }
 
 bool JsonEditor::onStageChanges() {
@@ -474,7 +478,7 @@ bool JsonEditor::load(const QString& path) {
   return true;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

@@ -16,8 +16,6 @@
 #include <QDir>
 #include <QFile>
 
-#include "PublicVariable.h"
-
 #include <QVariantMap>
 
 class JsonEditor : public QMainWindow {
@@ -45,6 +43,8 @@ class JsonEditor : public QMainWindow {
 
   auto subscribe() -> void;
 
+  auto onLoadASelectedPath(const QString& folderPath="") -> bool;
+
   auto onStageChanges() -> bool;
   auto onResetChanges() -> bool;
   auto onSubmitAllChanges() -> bool;
@@ -54,6 +54,7 @@ class JsonEditor : public QMainWindow {
   auto onPerformersHint() -> QStringList;
 
   auto sizeHint() const -> QSize override { return QSize(1024, 768); }
+
  signals:
 
  private:

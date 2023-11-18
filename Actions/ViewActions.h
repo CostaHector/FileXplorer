@@ -12,42 +12,42 @@ class ViewActions : public QObject {
   auto Get_NAVIGATION_PANE_Actions() -> QActionGroup* {
     auto* NAVIGATION_PANE = new QAction(QIcon(":/themes/NAVIGATION_PANE"), "Navigate pane");
     NAVIGATION_PANE->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg((NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString())));
+        QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
     NAVIGATION_PANE->setCheckable(true);
 
     auto* PREVIEW_PANE_HTML = new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), "HTML preview");
     PREVIEW_PANE_HTML->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_P));
     PREVIEW_PANE_HTML->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg((PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString())));
+        QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString()));
     PREVIEW_PANE_HTML->setCheckable(true);
 
     auto* JSON_EDITOR_PANE = new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), "Json editor");
     JSON_EDITOR_PANE->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name).toBool());
     JSON_EDITOR_PANE->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_J));
     JSON_EDITOR_PANE->setToolTip(
-        QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg((JSON_EDITOR_PANE->text(), JSON_EDITOR_PANE->shortcut().toString())));
+        QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(JSON_EDITOR_PANE->text(), JSON_EDITOR_PANE->shortcut().toString()));
     JSON_EDITOR_PANE->setCheckable(true);
 
-    auto* LOAD_JSONS_FROM_CURRENT_FOLDER = new QAction(QIcon(), "Load jsons");
+    auto* LOAD_JSONS_FROM_CURRENT_FOLDER = new QAction(QIcon(":/themes/LOAD_JSONS_FROM_CURRENT_PATH"), "Load jsons");
     LOAD_JSONS_FROM_CURRENT_FOLDER->setCheckable(false);
     LOAD_JSONS_FROM_CURRENT_FOLDER->setToolTip(
-        QString("<b>%1 (%2)</b><br/>Load json files from current folder.")
-            .arg((LOAD_JSONS_FROM_CURRENT_FOLDER->text(), LOAD_JSONS_FROM_CURRENT_FOLDER->shortcut().toString())));
+        QString("<b>%1 (%2)</b><br/>Load json files from current view root path.")
+            .arg(LOAD_JSONS_FROM_CURRENT_FOLDER->text(), LOAD_JSONS_FROM_CURRENT_FOLDER->shortcut().toString()));
 
     auto* CONSTRUCT_JSONS_FOR_VIDS = new QAction(QIcon(), "Construct jsons");
     CONSTRUCT_JSONS_FOR_VIDS->setCheckable(false);
     CONSTRUCT_JSONS_FOR_VIDS->setToolTip(QString("<b>%1 (%2)</b><br/>Construct json file for each vids under current path, if vids.json not exists.")
-                                             .arg((CONSTRUCT_JSONS_FOR_VIDS->text(), CONSTRUCT_JSONS_FOR_VIDS->shortcut().toString())));
+                                             .arg(CONSTRUCT_JSONS_FOR_VIDS->text(), CONSTRUCT_JSONS_FOR_VIDS->shortcut().toString()));
 
-    auto* JSON_ADD_PERFORMERS = new QAction(QIcon(), "Json add performers");
+    auto* JSON_ADD_PERFORMERS = new QAction(QIcon(), "Add performers");
     JSON_ADD_PERFORMERS->setCheckable(false);
     JSON_ADD_PERFORMERS->setToolTip(QString("<b>%1 (%2)</b><br/>Add performers to json file under this current path.")
-                                        .arg((JSON_ADD_PERFORMERS->text(), JSON_ADD_PERFORMERS->shortcut().toString())));
+                                        .arg(JSON_ADD_PERFORMERS->text(), JSON_ADD_PERFORMERS->shortcut().toString()));
 
-    auto* JSON_SET_PRODUCTION_STUDIO = new QAction(QIcon(), "Json set production studio");
+    auto* JSON_SET_PRODUCTION_STUDIO = new QAction(QIcon(), "Set production studio");
     JSON_SET_PRODUCTION_STUDIO->setCheckable(false);
     JSON_SET_PRODUCTION_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Set production name for json file under this current path.")
-                                               .arg((JSON_SET_PRODUCTION_STUDIO->text(), JSON_SET_PRODUCTION_STUDIO->shortcut().toString())));
+                                               .arg(JSON_SET_PRODUCTION_STUDIO->text(), JSON_SET_PRODUCTION_STUDIO->shortcut().toString()));
 
     auto* actionGroup = new QActionGroup(this);
     actionGroup->addAction(NAVIGATION_PANE);

@@ -1,25 +1,30 @@
 #include "JsonEditorActions.h"
+#include <QApplication>
+#include <QStyle>
 
 JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
-      _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), "format", this)),
-      _LAST(new QAction(QIcon(":/themes/LAST"), "last", this)),
-      _NEXT(new QAction(QIcon(":/themes/NEXT"), "next", this)),
-      _AUTO_SKIP(new QAction(QIcon(":/themes/AUTO_SKIP"), "auto skip", this)),
-      _CONDITION_NOT(new QAction(QIcon(":/themes/CONDITION_NOT"), "!=", this)),
-      _SUBMIT(new QAction(QIcon(":/themes/SUBMIT"), "submit", this)),
+      _SELECT_A_FOLDER_AND_LOAD_JSON(new QAction(QIcon(":/themes/SELECT_A_FOLDER_AND_LOAD_JSON"), "Load", this)),
+      _EMPTY_JSONS_LISTWIDGET(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), "Empty", this)),
+      _LAST(new QAction(QIcon(":/themes/LAST"), "Last", this)),
+      _NEXT(new QAction(QIcon(":/themes/NEXT"), "Next", this)),
+      _AUTO_SKIP(new QAction(QIcon(":/themes/AUTO_SKIP"), "Autoskip", this)),
+      _CONDITION_NOT(new QAction(QIcon(":/themes/CONDITION_NOT"), "WhenNot", this)),
+      FILES_ACTIONS(new QActionGroup(this)),
+
+      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), "Capitalize", this)),
+      _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/NAME_STR_CASE_LOWER_PATH"), "lowercase", this)),
+      _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), "Format", this)),
+      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "From Disk", this)),
       _SAVE(new QAction(QIcon(":/themes/SAVED"), "save", this)),
       _CANCEL(new QAction(QIcon(":/themes/NOT_SAVED"), "cancel", this)),
-      _LOAD(new QAction(QIcon(":/themes/LOAD_A_PATH"), "Load", this)),
-      _EMPTY(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), "Empty", this)),
-      _RELOAD_FROM_JSON_FILE(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "Refresh", this)),
-      JSON_EDITOR_ACTIONS(new QActionGroup(this)),
-      _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "reveal", this)),
-      _OPEN_THIS_FILE(new QAction("open", this)),
-      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), "Capitalize word", this)),
-      _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/LOWERCASE_EACH_WORD"), "Lowercase word", this)),
-      _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "hint", this)),
-      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), "Learn performers", this)) {
+      _SUBMIT(new QAction(QIcon(":/themes/SUBMIT"), "submit", this)),
+      EDIT_ACTIONS(new QActionGroup(this)),
+
+      _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal", this)),
+      _OPEN_THIS_FILE(new QAction("Open", this)),
+      _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "Hint", this)),
+      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), "+Lib", this)) {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.")
                              .arg(_FORMATTER->text())
@@ -41,34 +46,46 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _CANCEL->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_R));
   _CANCEL->setToolTip(QString("<b>%1 (%2)</b><br/> Cancel current changes").arg(_CANCEL->text()).arg(_CANCEL->shortcut().toString()));
 
-  _LOAD->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_O));
-  _LOAD->setToolTip(QString("<b>%1 (%2)</b><br/> Load json from a path.").arg(_LOAD->text()).arg(_LOAD->shortcut().toString()));
+  _SELECT_A_FOLDER_AND_LOAD_JSON->setShortcut(
+      QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_O));
+  _SELECT_A_FOLDER_AND_LOAD_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Select a folder and load json from it")
+                                                 .arg(_SELECT_A_FOLDER_AND_LOAD_JSON->text())
+                                                 .arg(_SELECT_A_FOLDER_AND_LOAD_JSON->shortcut().toString()));
 
-  _RELOAD_FROM_JSON_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
-  _RELOAD_FROM_JSON_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from local path.")
-                                         .arg(_RELOAD_FROM_JSON_FILE->text())
-                                         .arg(_RELOAD_FROM_JSON_FILE->shortcut().toString()));
+  _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
+  _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from disk")
+                                              .arg(_RELOAD_JSON_FROM_FROM_DISK->text())
+                                              .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
   _AUTO_SKIP->setCheckable(true);
   _AUTO_SKIP->setChecked(true);
   _CONDITION_NOT->setCheckable(true);
 
-  JSON_EDITOR_ACTIONS->addAction(_LOAD);
-  JSON_EDITOR_ACTIONS->addAction(_EMPTY);
+  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
+  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setToolTip(QString("<b>%1 (%2)</b><br/> Capitalize first letter of each word in a sentence.")
+                                                        .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text())
+                                                        .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
 
-  JSON_EDITOR_ACTIONS->addAction(_LAST);
-  JSON_EDITOR_ACTIONS->addAction(_NEXT);
+  _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
+  _LOWER_ALL_WORDS->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Lowercase a sentense.").arg(_LOWER_ALL_WORDS->text()).arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
-  JSON_EDITOR_ACTIONS->addAction(_AUTO_SKIP);
-  JSON_EDITOR_ACTIONS->addAction(_CONDITION_NOT);
+  FILES_ACTIONS->addAction(_SELECT_A_FOLDER_AND_LOAD_JSON);
+  FILES_ACTIONS->addAction(_EMPTY_JSONS_LISTWIDGET);
+  FILES_ACTIONS->addAction(_LAST);
+  FILES_ACTIONS->addAction(_NEXT);
+  FILES_ACTIONS->addAction(_AUTO_SKIP);
+  FILES_ACTIONS->addAction(_CONDITION_NOT);
+  FILES_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  JSON_EDITOR_ACTIONS->addAction(_SAVE);
-  JSON_EDITOR_ACTIONS->addAction(_CANCEL);
-  JSON_EDITOR_ACTIONS->addAction(_FORMATTER);
-  JSON_EDITOR_ACTIONS->addAction(_RELOAD_FROM_JSON_FILE);
-  JSON_EDITOR_ACTIONS->addAction(_SUBMIT);
-
-  JSON_EDITOR_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
+  EDIT_ACTIONS->addAction(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
+  EDIT_ACTIONS->addAction(_LOWER_ALL_WORDS);
+  EDIT_ACTIONS->addAction(_SAVE);
+  EDIT_ACTIONS->addAction(_CANCEL);
+  EDIT_ACTIONS->addAction(_FORMATTER);
+  EDIT_ACTIONS->addAction(_RELOAD_JSON_FROM_FROM_DISK);
+  EDIT_ACTIONS->addAction(_SUBMIT);
+  EDIT_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
@@ -80,13 +97,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
   _OPEN_THIS_FILE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
-
-
-  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
-  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setToolTip(QString("<b>%1 (%2)</b><br/> Capitalize first letter of each word").arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text()).arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
-
-  _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
-  _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentense.").arg(_LOWER_ALL_WORDS->text()).arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
   _HINT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _HINT->setToolTip(QString("<b>%1 (%2)</b><br/> Give you performers list hint").arg(_HINT->text()).arg(_HINT->shortcut().toString()));
