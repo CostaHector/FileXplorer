@@ -67,6 +67,9 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   addToolBarBreak(Qt::ToolBarArea::BottomToolBarArea);
   addToolBar(Qt::ToolBarArea::BottomToolBarArea, m_sliderTB);
 
+  addActions(m_sliderTB->actions());
+  addActions(m_controlTB->actions());
+
   auto* _sb = new QStatusBar(this);
   _sb->addWidget(m_errorLabel);
   _sb->setVisible(false);
