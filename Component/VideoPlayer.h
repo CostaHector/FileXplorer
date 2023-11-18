@@ -105,6 +105,7 @@ class VideoPlayer : public QMainWindow {
 
   QMediaPlayer* m_mediaPlayer;
   ClickableSlider* m_slider;
+  QString m_timeTemplate;
   QLabel* m_timeLabel;
   QLabel* m_errorLabel;
 

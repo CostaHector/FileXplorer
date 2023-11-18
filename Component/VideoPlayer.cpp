@@ -11,7 +11,8 @@ const QString VideoPlayer::PLAYLIST_DOCK_TITLE_TEMPLATE{"playlist: %1"};
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QMainWindow(parent),
       m_slider(new ClickableSlider),
-      m_timeLabel(new QLabel("00000")),
+      m_timeTemplate("%1/%2"),
+      m_timeLabel(new QLabel(m_timeTemplate)),
       m_errorLabel(new QLabel),
       m_sliderTB(new QToolBar("slider", this)),
       m_controlTB(new QToolBar("play control", this)),
@@ -120,7 +121,8 @@ void VideoPlayer::openFile(const QString& filePath) {
   }
   PreferenceSettings().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, QFileInfo(fileUrl.toLocalFile()).absolutePath());
   m_playListWid->addItem(fileUrl.toLocalFile());
-  setUrl(fileUrl);
+  m_playListWid->setCurrentRow(m_playListWid->count() - 1);
+  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
   play();
 }
 
@@ -410,7 +412,7 @@ void VideoPlayer::onPlayLastVideo() {
     lastRow = m_playListWid->count() - 1;
   }
   m_playListWid->setCurrentRow(lastRow);
-  setUrl(QUrl::fromLocalFile(m_playListWid->item(lastRow)->text()));
+  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
   play();
 }
 
@@ -424,7 +426,7 @@ void VideoPlayer::onPlayNextVideo() {
     nextRow = 0;
   }
   m_playListWid->setCurrentRow(nextRow);
-  setUrl(QUrl::fromLocalFile(m_playListWid->item(nextRow)->text()));
+  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
   play();
 }
 
@@ -491,13 +493,17 @@ void VideoPlayer::mediaStateChanged(QMediaPlayer::State state) {
 }
 
 void VideoPlayer::positionChanged(qint64 position) {
-  m_timeLabel->setText(QString("%1").arg(position / MICROSECOND, DURATION_PLACEHOLDER_LENGTH, 10, QChar(' ')));
+  m_timeLabel->setText(m_timeTemplate.arg(position / MICROSECOND));
   m_slider->setValue(position);
+  if (position > 0 and position == m_slider->maximum() and g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked()) {
+    onPositionAdd(1);
+  }
 }
 
 void VideoPlayer::durationChanged(qint64 duration) {
   qDebug("Duration changed to %d", duration);
   m_slider->setRange(0, duration);
+  m_timeTemplate = "%1/" + QString::number(duration / MICROSECOND);
 }
 
 void VideoPlayer::setPosition(int position) {

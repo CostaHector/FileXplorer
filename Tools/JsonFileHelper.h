@@ -41,7 +41,7 @@ class JsonFileHelper {
       json_string = in.readAll();
       jsonFile.close();
     } else {
-      qDebug("[Nomarl] json file not found");
+      qDebug("[Normal] json file not found");
       return {};
     }
     QJsonParseError jsonErr;
