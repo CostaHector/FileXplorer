@@ -187,6 +187,10 @@ void JsonEditor::refreshEditPanel() {
     jsonKeySetMet.insert(JSONKey::Rate);
     qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Rate])->setText("-1");
   }
+  if (not jsonKeySetMet.contains(JSONKey::Performers)){
+    jsonKeySetMet.insert(JSONKey::Performers);
+    onPerformersHint();
+  }
 
   editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
