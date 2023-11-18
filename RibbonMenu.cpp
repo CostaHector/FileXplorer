@@ -106,9 +106,10 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolBar* propertiesTB = new QToolBar("Properties");
   propertiesTB->addWidget(copyTB);
   propertiesTB->addAction(g_rightClickActions()._CALC_MD5_ACT);
+  propertiesTB->addAction(g_rightClickActions()._PROPERTIES);
   propertiesTB->setOrientation(Qt::Orientation::Vertical);
   propertiesTB->setStyleSheet("QToolBar { max-width: 256px; }");
-  propertiesTB->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
+  propertiesTB->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
   propertiesTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
 

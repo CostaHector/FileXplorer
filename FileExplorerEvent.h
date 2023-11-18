@@ -1,5 +1,6 @@
 #ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
+#include "Actions/RightClickMenuActions.h"
 #include "Component/CustomStatusBar.h"
 #include "Component/JsonEditor.h"
 #include "Component/VideoPlayer.h"
@@ -89,10 +90,51 @@ class FileExplorerEvent : public QObject {
   }
 
   bool on_calcMD5() const {
-    for (const QModelIndex ind : selectedIndexes()) {
-      const QString& pth = fileSysModel->filePath(ind);
-      qDebug(getMd5(pth).toStdString().c_str());
+    const auto& inds = selectedIndexes();
+    QStringList md5NameLst;
+    md5NameLst.reserve(inds.size());
+    for (const QModelIndex ind : inds) {
+      QFileInfo fi(fileSysModel->fileInfo(ind));
+      if (not fi.isFile()) {
+        continue;
+      }
+      md5NameLst.append(getMd5(fi.absoluteFilePath()) + "\t" + fi.fileName());
     }
+    QMessageBox msgBox(this->view);
+    msgBox.setWindowIcon(g_rightClickActions()._CALC_MD5_ACT->icon());
+    msgBox.setWindowTitle(QString("MD5 of %1 items").arg(inds.size()));
+    msgBox.setText("Click show Detail to see md5 lists\n" + QString(256, '_'));
+    msgBox.setDetailedText(md5NameLst.join('\n'));
+    msgBox.exec();
+    return true;
+  }
+
+  bool on_properties() const {
+    const auto& inds = selectedIndexes();
+    qint64 total = 0;
+    for (const QModelIndex ind : inds) {
+      QFileInfo fi(fileSysModel->fileInfo(ind));
+      if (fi.isFile()) {
+        total += fi.size();
+        continue;
+      }
+      if (fi.isDir()) {
+        QDirIterator it(fi.absoluteFilePath(), QDir::Filter::Files, QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+          it.next();
+          total += it.fileInfo().size();
+        }
+      }
+    }
+    QMessageBox msgBox(this->view);
+    msgBox.setWindowIcon(g_rightClickActions()._PROPERTIES->icon());
+    msgBox.setWindowTitle(QString("Size of %1 items").arg(inds.size()));
+    const qint64 xGiB = total / (1 << 30);
+    const qint64 xMiB = total % (1 << 30) / (1 << 20);
+    const qint64 xkiB = total % (1 << 30) % (1 << 20) / (1 << 10);
+    const qint64 xB = total % (1 << 30) % (1 << 20) % (1 << 10);
+    msgBox.setText(QString("%1GiB+%2MiB+%3KiB+%4Byte\t=\t%5B").arg(xGiB).arg(xMiB).arg(xkiB).arg(xB).arg(total));
+    msgBox.exec();
     return true;
   }
 
