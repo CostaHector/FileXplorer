@@ -23,16 +23,17 @@ int ProductionStudioManager::LearningFromAPath(const QString& path) {
       continue;
     }
     const QString& v = dict[JSONKey::ProductionStudio].toString();
-    if (v.isEmpty() or m_prodStudioMap.contains(v.toLower())){
+    if (v.isEmpty() or m_prodStudioMap.contains(v.toLower())) {
       continue;
     }
-    m_prodStudioMap.insert(v.toLower(), v);
+    for (const QString& psFrom: StandardProductionStudioFrom(v)){
+      m_prodStudioMap.insert(psFrom, v);
+    }
   }
-
   const int increCnt = int(m_prodStudioMap.size()) - beforePerformersCnt;
   qDebug("Learn extra %d production studios, now %u production studios in total", increCnt, m_prodStudioMap.size());
 
-  const bool dumpRes = JsonFileHelper::MovieJsonDumper(m_prodStudioMap, PROJECT_PATH + "/bin/STANDARD_STUDIO_NAME_JSON.txt");
+  const bool dumpRes = JsonFileHelper::MovieJsonDumper(m_prodStudioMap, PROJECT_PATH + "/bin/STANDARD_STUDIO_NAME_JSON.json");
   return increCnt;
 }
 
@@ -42,10 +43,18 @@ ProductionStudioManager& ProductionStudioManager::getIns() {
   return ins;
 }
 
+using namespace JSON_RENAME_REGEX;
+QStringList ProductionStudioManager::StandardProductionStudioFrom(QString standardPs) const {
+  // Both "lucas entertainment" and "lucasentertainment" should get "LucasEntertainment"
+  // so, "LucasEntertainment" is from "lucas entertainment" or "lucasentertainment"
+  const QString& pslower = standardPs.toLower();
+  const QString& psWithSpace = standardPs.replace(SPLIT_BY_UPPERCASE, " \\1").trimmed();
+  return {pslower, psWithSpace.toLower()};
+}
+
 auto ProductionStudioManager::operator()(QString sentence) const -> QString {
-  using namespace JSON_RENAME_REGEX;
-  sentence.remove(leadingStrComp); // remove [FFL], [FL], [GT]
-  sentence.remove(leadingOpenBracketComp); // remove open braces [({
+  sentence.remove(leadingStrComp);          // remove [FFL], [FL], [GT]
+  sentence.remove(leadingOpenBracketComp);  // remove open braces [({
   sentence.replace(closedBracketComp, "-");
 
   QString prodStudioSection = sentence.split("-")[0];
@@ -54,13 +63,13 @@ auto ProductionStudioManager::operator()(QString sentence) const -> QString {
   return this->operator[](inputStr);
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 
 int main(int argc, char* argv[]) {
   auto& performersIns = ProductionStudioManager::getIns();
   //  qDebug() << performersIns.m_prodStudioMap;
-//  qDebug() << performersIns("[FFL] Lucas Entertainment - ABC.mp4");
+  //  qDebug() << performersIns("[FFL] Lucas Entertainment - ABC.mp4");
   qDebug() << performersIns("[BaitBus] 2008 - Part.mp4");
   return 0;
 }

@@ -263,6 +263,8 @@ const QRegExp keepComp("[^A-Z0-9._@# ']", Qt::CaseInsensitive);
 const QRegExp andComp(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
 const QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
 const QRegExp continousSpace("\\s+");
+
+const QRegExp SPLIT_BY_UPPERCASE("([A-Z])", Qt::CaseSensitive);
 }  // namespace JSON_RENAME_REGEX
 
 #endif  // PUBLICVARIABLE_H

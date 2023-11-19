@@ -16,6 +16,7 @@ SOURCES += \
     TestCase/FilesNameBatchStandardizerTest.cpp \
     TestCase/MovieNameStandardizerTest.cpp \
     TestCase/PerformersManagerTest.cpp \
+    TestCase/ProductionStudioManagerTest.cpp \
     TestCase/QStringFunctionTest.cpp \
     TestCase/RenameWidgetTest.cpp \
     TestCase/FileOperationTest.cpp \

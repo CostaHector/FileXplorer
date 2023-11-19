@@ -4,7 +4,6 @@
 #include <QRegExp>
 #include <QSet>
 #include <QVariantHash>
-#include "PublicVariable.h"
 
 class ProductionStudioManager {
  public:
@@ -12,6 +11,8 @@ class ProductionStudioManager {
   auto LearningFromAPath(const QString& path) -> int;
   static ProductionStudioManager& getIns();
   QString ProductionStudioFilterOut(const QString& words) const;
+
+  QStringList StandardProductionStudioFrom(QString standardPs) const;
 
   auto operator()(QString sentence) const -> QString;
   auto operator[](const QString& nm) const -> QString {
