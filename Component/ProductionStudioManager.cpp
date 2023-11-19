@@ -23,7 +23,7 @@ int ProductionStudioManager::LearningFromAPath(const QString& path) {
       continue;
     }
     const QString& v = dict[JSONKey::ProductionStudio].toString();
-    if (m_prodStudioMap.contains(v.toLower())){
+    if (v.isEmpty() or m_prodStudioMap.contains(v.toLower())){
       continue;
     }
     m_prodStudioMap.insert(v.toLower(), v);
