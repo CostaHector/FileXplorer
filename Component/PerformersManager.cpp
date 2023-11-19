@@ -4,7 +4,8 @@
 
 #include <QDir>
 #include <QDirIterator>
-PerformersManager::PerformersManager() : performers(loadExistedPerformers()), perfsCompleter(performers.values()) { perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
+PerformersManager::PerformersManager() : performers(loadExistedPerformers()), perfsCompleter(performers.values()) {
+  perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
   perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
 }
 
@@ -19,6 +20,9 @@ QSet<QString> PerformersManager::loadExistedPerformers() {
   QSet<QString> st;
   while (not stream.atEnd()) {
     st.insert(stream.readLine().toLower());
+  }
+  if (st.contains("")){
+    st.remove("");
   }
   performersFi.close();
   qDebug("Load %d performers succeed", st.size());
@@ -41,9 +45,10 @@ int PerformersManager::LearningFromAPath(const QString& path) {
     }
     const QVariant& v = dict["Performers"];
     for (const QString& performer : v.toStringList()) {
-      if (not performers.contains(performer)) {
-        performers.insert(performer.toLower());
+      if (performer.isEmpty() or performers.contains(performer)) {
+        continue;
       }
+      performers.insert(performer.toLower());
     }
   }
 
@@ -108,7 +113,7 @@ QStringList PerformersManager::PeformersFilterOut(const QStringList& words) cons
       }
     }
     const QString& w1 = words[i];
-    if (performers.contains(w1.toLower())) {
+    if (not w1.isEmpty() and performers.contains(w1.toLower())) {
       if (not performersList.contains(w1))
         performersList.append(w1);
       i += 1;

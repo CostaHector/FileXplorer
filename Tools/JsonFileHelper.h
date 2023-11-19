@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QJsonValue>
+#include "Component/PerformersManager.h"
 #include "PublicVariable.h"
 
 #include <QDirIterator>
@@ -175,6 +176,39 @@ class JsonFileHelper {
     }
     return succeedCnt;
   }
+
+  static int JsonPerformersKeyValuePairAdd(const QString& path) {
+    if (not QFileInfo(path).isDir()) {
+      return -1;
+    }
+    int succeedCnt = 0;
+    int tryKVPairCnt = 0;
+
+    static PerformersManager& pm = PerformersManager::getIns();
+
+    QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+    while (it.hasNext()) {
+      it.next();
+      const QString& jsonPath = it.filePath();
+      QVariantHash dict = MovieJsonLoader(jsonPath);
+      if (dict.contains(JSONKey::Performers) and not dict[JSONKey::Performers].toStringList().isEmpty()){
+        continue;
+      }
+
+      const QString& sentence = dict.contains(JSONKey::Name)? dict[JSONKey::Name].toString():"";
+      QStringList perfL = pm(sentence);
+      perfL.removeDuplicates();
+      dict.insert(JSONKey::Performers, perfL);
+
+      succeedCnt += MovieJsonDumper(dict, jsonPath);
+      ++tryKVPairCnt;
+    }
+    if (tryKVPairCnt != succeedCnt) {
+      qDebug("%d/%d json add performer key-value pair succeed", succeedCnt, tryKVPairCnt);
+    }
+    return succeedCnt;
+  }
+
   static int JsonValuePerformersAdder(const QString& path, const QString& performers) {
     const QStringList& performerList = performers.trimmed().split(SEPERATOR_COMP);
     if (performerList.isEmpty() or not QFileInfo(path).isDir()) {
@@ -199,6 +233,7 @@ class JsonFileHelper {
     }
     return succeedCnt;
   }
+
   static int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio) {
     const QString& productionStudio = _productionStudio.trimmed();
     if (not QFileInfo(path).isDir()) {

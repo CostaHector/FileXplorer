@@ -1,5 +1,6 @@
 #include "FolderPreviewHTML.h"
 #include "PublicVariable.h"
+#include "Actions/FileBasicOperationsActions.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -8,19 +9,13 @@
 
 const QString FolderPreviewHTML::HTML_IMG_TEMPLATE = "<img src=\"%1\" alt=\"%2\" width=\"%3\"><br/>\n";
 
-QString FolderPreviewHTML::InsertImgs(const QString& dirPath) {
-  QString imgSrc;
-  QDir dir(dirPath, {}, QDir::SortFlag::Name, QDir::Filter::Files);
-  if (not dir.exists()) {
-    return imgSrc;
-  }
-  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
-  m_imgsLst = dir.entryList();
-  for (int i = 0; i < m_firstSightImgCnt and i < m_imgsLst.size(); ++i) {
-    const QString& imgName = m_imgsLst[i];
-    imgSrc += HTML_IMG_TEMPLATE.arg(dir.absoluteFilePath(imgName)).arg(imgName).arg(600);
-  }
-  return imgSrc;
+FolderPreviewHTML::FolderPreviewHTML(QWidget* parent)
+    : m_scrollAtEndBefore(false), m_parent(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN->actions()[0]) {
+  setReadOnly(true);
+  setOpenLinks(false);
+  setOpenExternalLinks(true);
+
+  subscribe();
 }
 
 bool FolderPreviewHTML::operator()(const QString& path) {
@@ -55,6 +50,47 @@ bool FolderPreviewHTML::operator()(const QString& path) {
   htmlSrc += std::move(imgSrc);
   htmlSrc += "</body>\n</html>\n";
   setHtml(htmlSrc);
+  return true;
+}
+
+void FolderPreviewHTML::subscribe() {
+  connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &FolderPreviewHTML::ShowAllImages);
+  connect(this, &QTextBrowser::anchorClicked, this, &FolderPreviewHTML::onAnchorClicked);
+}
+
+QSize FolderPreviewHTML::sizeHint() const{
+  auto w = PreferenceSettings().value("dockerHtmlWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
+  auto h = PreferenceSettings().value("dockerHtmlHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
+  return QSize(w, h);
+}
+
+QString FolderPreviewHTML::InsertImgs(const QString& dirPath) {
+  QString imgSrc;
+  QDir dir(dirPath, {}, QDir::SortFlag::Name, QDir::Filter::Files);
+  if (not dir.exists()) {
+    return imgSrc;
+  }
+  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  m_imgsLst = dir.entryList();
+  for (int i = 0; i < m_firstSightImgCnt and i < m_imgsLst.size(); ++i) {
+    const QString& imgName = m_imgsLst[i];
+    imgSrc += HTML_IMG_TEMPLATE.arg(dir.absoluteFilePath(imgName)).arg(imgName).arg(600);
+  }
+  return imgSrc;
+}
+
+bool FolderPreviewHTML::onAnchorClicked(const QUrl& url) {
+  if (not url.isLocalFile()) {
+    return false;
+  }
+  QFileInfo fi(url.toLocalFile());
+  if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + fi.suffix()) or fi.isDir()) {
+    if (m_PLAY_ACTION) {
+      emit m_PLAY_ACTION->triggered(false);
+    }
+    return true;
+  }
+  QDesktopServices::openUrl(url);
   return true;
 }
 

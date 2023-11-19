@@ -24,7 +24,15 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal", this)),
       _OPEN_THIS_FILE(new QAction("Open", this)),
       _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "Hint", this)),
-      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), "+Lib", this)) {
+      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), "+Lib", this)),
+
+      LOAD_JSONS_FROM_CURRENT_FOLDER{new QAction(QIcon(":/themes/LOAD_JSONS_FROM_CURRENT_PATH"), "Load jsons")},
+      CONSTRUCT_JSONS_FOR_VIDS{new QAction(QIcon(), "Construct jsons")},
+      JSON_ADD_PERFORMERS{new QAction(QIcon(), "Add performers")},
+      JSON_SET_PRODUCTION_STUDIO{new QAction(QIcon(), "Set production studio")},
+      JSON_ADD_PERFORMER_KEY_VALUE_PAIR{new QAction(QIcon(), "Add performer k-v pair")},
+      BATCH_FILES_ACTIONS(new QActionGroup(this))
+{
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.")
                              .arg(_FORMATTER->text())
@@ -105,6 +113,34 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       QString("<b>%1 (%2)</b><br/> Learn performers from value of key \"Performers\" in json file. \n Improve its performers hint capability.")
           .arg(_LEARN_PERFORMERS_FROM_JSON->text())
           .arg(_LEARN_PERFORMERS_FROM_JSON->shortcut().toString()));
+
+
+  LOAD_JSONS_FROM_CURRENT_FOLDER->setCheckable(false);
+  LOAD_JSONS_FROM_CURRENT_FOLDER->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Load json files from current view root path.")
+          .arg(LOAD_JSONS_FROM_CURRENT_FOLDER->text(), LOAD_JSONS_FROM_CURRENT_FOLDER->shortcut().toString()));
+
+  CONSTRUCT_JSONS_FOR_VIDS->setCheckable(false);
+  CONSTRUCT_JSONS_FOR_VIDS->setToolTip(QString("<b>%1 (%2)</b><br/>Construct json file for each vids under current path, if vids.json not exists.")
+                                           .arg(CONSTRUCT_JSONS_FOR_VIDS->text(), CONSTRUCT_JSONS_FOR_VIDS->shortcut().toString()));
+
+  JSON_ADD_PERFORMERS->setCheckable(false);
+  JSON_ADD_PERFORMERS->setToolTip(QString("<b>%1 (%2)</b><br/>Add performers to json file under this current path.")
+                                      .arg(JSON_ADD_PERFORMERS->text(), JSON_ADD_PERFORMERS->shortcut().toString()));
+
+  JSON_SET_PRODUCTION_STUDIO->setCheckable(false);
+  JSON_SET_PRODUCTION_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Set production name for json file under this current path.")
+                                             .arg(JSON_SET_PRODUCTION_STUDIO->text(), JSON_SET_PRODUCTION_STUDIO->shortcut().toString()));
+
+  JSON_ADD_PERFORMER_KEY_VALUE_PAIR->setCheckable(false);
+  JSON_ADD_PERFORMER_KEY_VALUE_PAIR->setToolTip(QString("<b>%1 (%2)</b><br/>Add key-value pair for json file not contain performers key under this current path.")
+                                                    .arg(JSON_ADD_PERFORMER_KEY_VALUE_PAIR->text(), JSON_ADD_PERFORMER_KEY_VALUE_PAIR->shortcut().toString()));
+
+  BATCH_FILES_ACTIONS->addAction(LOAD_JSONS_FROM_CURRENT_FOLDER);
+  BATCH_FILES_ACTIONS->addAction(CONSTRUCT_JSONS_FOR_VIDS);
+  BATCH_FILES_ACTIONS->addAction(JSON_ADD_PERFORMERS);
+  BATCH_FILES_ACTIONS->addAction(JSON_SET_PRODUCTION_STUDIO);
+  BATCH_FILES_ACTIONS->addAction(JSON_ADD_PERFORMER_KEY_VALUE_PAIR);
 }
 
 JsonEditorActions& g_jsonEditorActions() {

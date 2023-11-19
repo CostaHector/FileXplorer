@@ -438,10 +438,13 @@ QStringList JsonEditor::onPerformersHint() {
     sentence += qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name])->text();
   }
   if (jsonKeySetMet.contains(JSONKey::Detail)) {
-    sentence += " " + qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail])->toPlainText();
+    const auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+    if (te->textCursor().hasSelection()){
+      sentence += " " + te->textCursor().selectedText();
+    }
   }
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
-    return {};
+    jsonKeySetMet.insert(JSONKey::Performers);
   }
   const QStringList& perfsList = pm(sentence);
   qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers])->setText(perfsList.join(", "));
