@@ -172,7 +172,7 @@
         <file alias="RESTORE">RenameConflictIcons/RESTORE.svg</file>
     </qresource>
     <qresource prefix="/">
-        <file alias="STANDARD_STUDIO_NAME_JSON">../bin/StandardStudioName.json</file>
+        <file alias="STANDARD_STUDIO_NAME_JSON">../bin/STANDARD_STUDIO_NAME_JSON.json</file>
         <file alias="PERFORMERS_TABLE">../bin/PERFORMERS_TABLE.txt</file>
     </qresource>
 </RCC>

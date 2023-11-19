@@ -16,7 +16,7 @@ class PerformersManager {
   auto operator()(const QString& sentence) const -> QStringList{
     return PeformersFilterOut(MovieNameWordsSplit(sentence));
   }
-  QSet<QString> performers;
+  QSet<QString> m_performers;
   QCompleter perfsCompleter;
  private:
   PerformersManager();

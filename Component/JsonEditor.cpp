@@ -1,6 +1,7 @@
 #include "JsonEditor.h"
 #include "Actions/JsonEditorActions.h"
 #include "Component/PerformersManager.h"
+#include "Component/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 
 #include <QDesktopServices>
@@ -179,11 +180,11 @@ void JsonEditor::refreshEditPanel() {
     }
     extraEditorPanel->addRow(keyName, new QLineEdit(valueStr));
   }
-  if (not jsonKeySetMet.contains(JSONKey::Performers)){
+  if (not jsonKeySetMet.contains(JSONKey::Performers)) {
     jsonKeySetMet.insert(JSONKey::Performers);
     onPerformersHint();
   }
-  if (not jsonKeySetMet.contains(JSONKey::ProductionStudio)){
+  if (not jsonKeySetMet.contains(JSONKey::ProductionStudio)) {
     jsonKeySetMet.insert(JSONKey::ProductionStudio);
     qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::ProductionStudio])->setText("");
   }
@@ -428,30 +429,57 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
+
   static PerformersManager& pm = PerformersManager::getIns();
   const int newLearnedCnt = pm.LearningFromAPath(loadFromFi.absoluteFilePath());
-  QMessageBox::information(this, "Learning succeed", QString("New Learned Performers Count:%1").arg(newLearnedCnt));
-  return newLearnedCnt >= 0;
+
+  static ProductionStudioManager& psm = ProductionStudioManager::getIns();
+  const int newLearnedProdStudioCnt = psm.LearningFromAPath(loadFromFi.absoluteFilePath());
+
+  QMessageBox::information(
+      this, "Learning succeed",
+      QString("New Learned:\n Performers Count:%1\n Production Studios Count:%2").arg(newLearnedCnt).arg(newLearnedProdStudioCnt));
+
+  return newLearnedCnt >= 0 or newLearnedProdStudioCnt >= 0;
 }
 
 QStringList JsonEditor::onPerformersHint() {
   static PerformersManager& pm = PerformersManager::getIns();
+  static ProductionStudioManager& psm = ProductionStudioManager::getIns();
+
+  QString nameText;
+
   QString sentence;
   if (jsonKeySetMet.contains(JSONKey::Name)) {
-    sentence += qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name])->text();
+    nameText = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name])->text();
+    sentence += nameText;
   }
   if (jsonKeySetMet.contains(JSONKey::Detail)) {
     const auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
-    if (te->textCursor().hasSelection()){
+    if (te->textCursor().hasSelection()) {
       sentence += " " + te->textCursor().selectedText();
     }
   }
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
     jsonKeySetMet.insert(JSONKey::Performers);
   }
-  const QStringList& perfsList = pm(sentence);
-  qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers])->setText(perfsList.join(", "));
-  return perfsList;
+  auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
+  const QStringList& newPerfsList = pm(sentence);
+  const QStringList& beforePerfsList = p->text().split(SEPERATOR_COMP);
+  if (beforePerfsList.size() <= newPerfsList.size()) {
+    p->setText(newPerfsList.join(", "));
+  }
+
+  if (not jsonKeySetMet.contains(JSONKey::ProductionStudio)) {
+    jsonKeySetMet.insert(JSONKey::ProductionStudio);
+  }
+
+  auto* ps = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::ProductionStudio]);
+  const QString newProdStudioName = psm(nameText);
+  if (not newProdStudioName.isEmpty()) {
+    ps->setText(newProdStudioName);
+  }
+  return newPerfsList;
 }
 
 bool JsonEditor::formatter() {

@@ -26,6 +26,7 @@ SOURCES += \
     Component/JsonEditor.cpp \
     Component/PerformersManager.cpp \
     Component/PerformersWidget.cpp \
+    Component/ProductionStudioManager.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
     Component/StateLabel.cpp \
@@ -87,6 +88,7 @@ HEADERS += \
     Component/JsonEditor.h \
     Component/PerformersManager.h \
     Component/PerformersWidget.h \
+    Component/ProductionStudioManager.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
     Component/StateLabel.h \
@@ -137,6 +139,8 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
+    bin/PERFORMERS_TABLE.txt \
+    bin/STANDARD_STUDIO_NAME_JSON.json \
     readme.md
 
 QMAKE_POST_LINK +=

@@ -31,6 +31,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       JSON_ADD_PERFORMERS{new QAction(QIcon(), "Add performers")},
       JSON_SET_PRODUCTION_STUDIO{new QAction(QIcon(), "Set production studio")},
       JSON_ADD_PERFORMER_KEY_VALUE_PAIR{new QAction(QIcon(), "Add performer k-v pair")},
+      JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR{new QAction(QIcon(), "Add production studio k-v pair")},
       BATCH_FILES_ACTIONS(new QActionGroup(this))
 {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
@@ -141,6 +142,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   BATCH_FILES_ACTIONS->addAction(JSON_ADD_PERFORMERS);
   BATCH_FILES_ACTIONS->addAction(JSON_SET_PRODUCTION_STUDIO);
   BATCH_FILES_ACTIONS->addAction(JSON_ADD_PERFORMER_KEY_VALUE_PAIR);
+  BATCH_FILES_ACTIONS->addAction(JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR);
 }
 
 JsonEditorActions& g_jsonEditorActions() {

@@ -9,6 +9,7 @@ TEMPLATE = app
 
 SOURCES += \
     Component/PerformersManager.cpp \
+    Component/ProductionStudioManager.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     TestCase/CatergorizerTest.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 
 HEADERS += \
     Component/PerformersManager.h \
+    Component/ProductionStudioManager.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     Tools/Categorizer.h \

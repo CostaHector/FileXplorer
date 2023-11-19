@@ -11,7 +11,7 @@ class PerformersManagerTest : public QObject {
   PerformersManager& pm;
 
  private slots:
-  void test_performersDictNotEmpty() { QVERIFY2(not pm.performers.isEmpty(), "performers list should not be empty"); }
+  void test_performersDictNotEmpty() { QVERIFY2(not pm.m_performers.isEmpty(), "performers list should not be empty"); }
   void test_sentenseSplit() {
     const auto& wordsList = pm.MovieNameWordsSplit("Production Name - Movie Core Name - Nice & Devin Franco BB 4K");
     QVERIFY2(not wordsList.isEmpty(), "words list should not empty");

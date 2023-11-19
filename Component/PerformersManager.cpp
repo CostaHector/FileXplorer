@@ -4,7 +4,8 @@
 
 #include <QDir>
 #include <QDirIterator>
-PerformersManager::PerformersManager() : performers(loadExistedPerformers()), perfsCompleter(performers.values()) {
+
+PerformersManager::PerformersManager() : m_performers(loadExistedPerformers()), perfsCompleter(m_performers.values()) {
   perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
   perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
 }
@@ -21,7 +22,7 @@ QSet<QString> PerformersManager::loadExistedPerformers() {
   while (not stream.atEnd()) {
     st.insert(stream.readLine().toLower());
   }
-  if (st.contains("")){
+  if (st.contains("")) {
     st.remove("");
   }
   performersFi.close();
@@ -34,7 +35,7 @@ int PerformersManager::LearningFromAPath(const QString& path) {
     return 0;
   }
 
-  const int beforePerformersCnt = performers.size();
+  const int beforePerformersCnt = m_performers.size();
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
@@ -45,21 +46,21 @@ int PerformersManager::LearningFromAPath(const QString& path) {
     }
     const QVariant& v = dict["Performers"];
     for (const QString& performer : v.toStringList()) {
-      if (performer.isEmpty() or performers.contains(performer)) {
+      if (performer.isEmpty() or m_performers.contains(performer)) {
         continue;
       }
-      performers.insert(performer.toLower());
+      m_performers.insert(performer.toLower());
     }
   }
 
-  const int increCnt = int(performers.size()) - beforePerformersCnt;
-  qDebug("Learn extra %d performers, now %u performers in total", increCnt, performers.size());
+  const int increCnt = int(m_performers.size()) - beforePerformersCnt;
+  qDebug("Learn extra %d performers, now %u performers in total", increCnt, m_performers.size());
 
   QFile performersFi(PROJECT_PATH + "/bin/PERFORMERS_TABLE.txt");
   if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qDebug("file cannot open. learned performers will not update to %s.", performersFi.fileName().toStdString().c_str());
   }
-  QStringList perfsLst(performers.cbegin(), performers.cend());
+  QStringList perfsLst(m_performers.cbegin(), m_performers.cend());
   QTextStream stream(&performersFi);
   stream.setCodec("UTF-8");
   stream << perfsLst.join("\n");
@@ -76,12 +77,9 @@ QStringList PerformersManager::MovieNameWordsSplit(QString sentence) const {
   if (sentence.isEmpty()) {
     return {};
   }
-  static QRegExp keepComp("[^A-Z0-9._@# ']", Qt::CaseInsensitive);
-  static QRegExp andComp(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
-  static QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
-  static QRegExp continousSpace("\\s+");
+  using namespace JSON_RENAME_REGEX;
   QString valuableString = sentence.replace(keepComp, "");
-  QString noActionString = valuableString.replace(andComp, "&");
+  QString noActionString = valuableString.replace(andComp, " & ");
   QString noResolutionString = noActionString.replace(resolutionComp, "");
   return noResolutionString.split(continousSpace);
 }
@@ -93,10 +91,21 @@ QStringList PerformersManager::PeformersFilterOut(const QStringList& words) cons
   QStringList performersList;
   int i = 0;
   const int N = words.size();
+
+  static const auto rmvBelong = [](const QString& word) -> QString {
+    QString s = word.trimmed();
+    if (s.endsWith("'s")) {
+      s.chop(2);
+    } else if (s.endsWith("'")) {
+      s.chop(1);
+    }
+    return s;
+  };
+
   while (i < N) {
     if (i < N - 2) {
-      const QString& w3 = words[i] + " " + words[i + 1] + " " + words[i + 2];
-      if (performers.contains(w3.toLower())) {
+      const QString& w3 = words[i] + " " + words[i + 1] + " " + rmvBelong(words[i + 2]);
+      if (m_performers.contains(w3.toLower())) {
         if (not performersList.contains(w3))
           performersList.append(w3);
         i += 3;
@@ -104,16 +113,17 @@ QStringList PerformersManager::PeformersFilterOut(const QStringList& words) cons
       }
     }
     if (i < N - 1) {
-      const QString& w2 = words[i] + " " + words[i + 1];
-      if (performers.contains(w2.toLower())) {
-        if (not performersList.contains(w2))
+      const QString& w2 = words[i] + " " + rmvBelong(words[i + 1]);
+      if (m_performers.contains(w2.toLower())) {
+        if (not performersList.contains(w2)) {
           performersList.append(w2);
+        }
         i += 2;
         continue;
       }
     }
-    const QString& w1 = words[i];
-    if (not w1.isEmpty() and performers.contains(w1.toLower())) {
+    const QString& w1 = rmvBelong(words[i]);
+    if (not w1.isEmpty() and m_performers.contains(w1.toLower())) {
       if (not performersList.contains(w1))
         performersList.append(w1);
       i += 1;
@@ -121,6 +131,7 @@ QStringList PerformersManager::PeformersFilterOut(const QStringList& words) cons
     }
     ++i;
   }
+  performersList.removeDuplicates();
   return performersList;
 }
 

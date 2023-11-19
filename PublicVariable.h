@@ -239,4 +239,30 @@ static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE, "MERGE"}
                                                        {CCMMode::COPY, "COPY"},
                                                        {CCMMode::CUT, "CUT"},
                                                        {CCMMode::LINK, "LINK"}};
+
+#include <QRegExp>
+
+namespace JSON_RENAME_REGEX {
+const QRegExp invalidCharPat("[\\#\\\\/\\:\\*\\?\\<\\>\\|]");  // #\/:*?<>
+const QRegExp invalidQuotePat("[’“”\"]");                      //'
+
+const QRegExp leadingStrComp("^((\\[FL\\])|(\\[FFL\\])|(\\[GT\\]))", Qt::CaseInsensitive);  // delete it
+const QRegExp leadingOpenBracketComp("^[\[\{\(]");                                          //-
+const QRegExp closedBracketComp("[\\(\\]\\{]");                                               //-
+
+const QRegExp continuousSpaceComp("\\s\\s+");  //' '
+
+const QRegExp leadingBracketComp("[\(\{\\[\\)\\}\\]–]");  //-
+const QRegExp spaceBarSpaceComp("\\s*-\\s*");             //-
+const QRegExp continousHypenComp("--+");                  //-
+
+const QRegExp hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
+const QRegExp trailingHypenComp("-$");                      // delete it
+
+const QRegExp keepComp("[^A-Z0-9._@# ']", Qt::CaseInsensitive);
+const QRegExp andComp(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
+const QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
+const QRegExp continousSpace("\\s+");
+}  // namespace JSON_RENAME_REGEX
+
 #endif  // PUBLICVARIABLE_H
