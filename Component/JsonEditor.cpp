@@ -179,6 +179,14 @@ void JsonEditor::refreshEditPanel() {
     }
     extraEditorPanel->addRow(keyName, new QLineEdit(valueStr));
   }
+  if (not jsonKeySetMet.contains(JSONKey::Performers)){
+    jsonKeySetMet.insert(JSONKey::Performers);
+    onPerformersHint();
+  }
+  if (not jsonKeySetMet.contains(JSONKey::ProductionStudio)){
+    jsonKeySetMet.insert(JSONKey::ProductionStudio);
+    qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::ProductionStudio])->setText("");
+  }
   if (not jsonKeySetMet.contains(JSONKey::Hot)) {
     jsonKeySetMet.insert(JSONKey::Hot);
     qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Hot])->setText("");
@@ -187,11 +195,6 @@ void JsonEditor::refreshEditPanel() {
     jsonKeySetMet.insert(JSONKey::Rate);
     qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Rate])->setText("-1");
   }
-  if (not jsonKeySetMet.contains(JSONKey::Performers)){
-    jsonKeySetMet.insert(JSONKey::Performers);
-    onPerformersHint();
-  }
-
   editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
 
