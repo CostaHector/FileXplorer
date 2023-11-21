@@ -247,12 +247,11 @@ const QRegExp invalidCharPat("[\\#\\\\/\\:\\*\\?\\<\\>\\|]");  // #\/:*?<>
 const QRegExp invalidQuotePat("[’“”\"]");                      //'
 
 const QRegExp leadingStrComp("^((\\[FL\\])|(\\[FFL\\])|(\\[GT\\]))", Qt::CaseInsensitive);  // delete it
-const QRegExp leadingOpenBracketComp("^[\[\{\(]");                                          //-
-const QRegExp closedBracketComp("[\\(\\]\\{]");                                               //-
+const QRegExp leadingOpenBracketComp("^[\[\{\(]");                                          //-                                         //-
 
 const QRegExp continuousSpaceComp("\\s\\s+");  //' '
 
-const QRegExp leadingBracketComp("[\(\{\\[\\)\\}\\]–]");  //-
+const QRegExp nonLeadingBracketComp("[\\(\\{\\[\\)\\}\\]–]");  //-
 const QRegExp spaceBarSpaceComp("\\s*-\\s*");             //-
 const QRegExp continousHypenComp("--+");                  //-
 
@@ -264,7 +263,7 @@ const QRegExp andComp(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsen
 const QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
 const QRegExp continousSpace("\\s+");
 
-const QRegExp SPLIT_BY_UPPERCASE("([A-Z])", Qt::CaseSensitive);
+const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
 }  // namespace JSON_RENAME_REGEX
 
 #endif  // PUBLICVARIABLE_H

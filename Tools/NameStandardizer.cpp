@@ -23,7 +23,7 @@ auto NameStandardizer::operator()(QString aFileName) -> QString{
 
   auto noLeadingBracket = noLeadingStr.trimmed().remove(leadingOpenBracketComp);
 
-  auto noBracket = noLeadingBracket.replace(leadingBracketComp, "-");
+  auto noBracket = noLeadingBracket.replace(nonLeadingBracketComp, "-");
   auto standardStr = noBracket.replace(spaceBarSpaceComp, "-");
   auto noContinousHypen = standardStr.replace(continousHypenComp, "-");
 

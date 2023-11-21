@@ -6,8 +6,7 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QJsonValue>
-#include "Component/PerformersManager.h"
-#include "Component/ProductionStudioManager.h"
+
 #include "PublicVariable.h"
 
 #include <QDirIterator>
@@ -16,7 +15,7 @@ const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|
 
 class JsonFileHelper {
  public:
-  JsonFileHelper();
+  JsonFileHelper() = default;
   static auto MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath) -> bool {
     auto jsonObject = QJsonObject::fromVariantHash(dict);
     QJsonDocument document;
@@ -154,140 +153,17 @@ class JsonFileHelper {
     return jsonPath;
   }
 
-  static int ConstructJsonForVids(const QString& path, const QString& productionStudio = "", const QString& performersListStr = "") {
-    if (not QFileInfo(path).isDir()) {
-      return -1;
-    }
-    int succeedCnt = 0;
-    int tryConstuctCnt = 0;
-    QDirIterator it(path, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-    while (it.hasNext()) {
-      it.next();
-      const QString& vidPath = it.filePath();
-      const QString& jsonPath = GetJsonFilePath(vidPath);
-      if (QFile::exists(jsonPath)) {
-        continue;
-      }
-      const auto& dict = GetInitJsonFile(vidPath, performersListStr, productionStudio);
-      succeedCnt += MovieJsonDumper(dict, jsonPath);
-      ++tryConstuctCnt;
-    }
-    if (tryConstuctCnt != succeedCnt) {
-      qDebug("%d/%d json contructed succeed", succeedCnt, tryConstuctCnt);
-    }
-    return succeedCnt;
-  }
+  static int ConstructJsonForVids(const QString& path, const QString& productionStudio = "", const QString& performersListStr = "");
 
-  static int JsonPerformersKeyValuePairAdd(const QString& path) {
-    if (not QFileInfo(path).isDir()) {
-      return -1;
-    }
-    int succeedCnt = 0;
-    int tryKVPairCnt = 0;
+  static int JsonPerformersKeyValuePairAdd(const QString& path);
 
-    static PerformersManager& pm = PerformersManager::getIns();
+  static int JsonProductionStudiosKeyValuePairAdd(const QString& path);
 
-    QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-    while (it.hasNext()) {
-      it.next();
-      const QString& jsonPath = it.filePath();
-      QVariantHash dict = MovieJsonLoader(jsonPath);
-      if (dict.contains(JSONKey::Performers) and not dict[JSONKey::Performers].toStringList().isEmpty()){
-        continue;
-      }
+  static int JsonValuePerformersProductionStudiosCleaner(const QString& path);
 
-      const QString& sentence = dict.contains(JSONKey::Name)? dict[JSONKey::Name].toString():"";
-      QStringList perfL = pm(sentence);
-      perfL.removeDuplicates();
-      dict.insert(JSONKey::Performers, perfL);
+  static int JsonValuePerformersAdder(const QString& path, const QString& performers);
 
-      succeedCnt += MovieJsonDumper(dict, jsonPath);
-      ++tryKVPairCnt;
-    }
-    if (tryKVPairCnt != succeedCnt) {
-      qDebug("%d/%d json add performer key-value pair succeed", succeedCnt, tryKVPairCnt);
-    }
-    return succeedCnt;
-  }
-
-  static int JsonProductionStudiosKeyValuePairAdd(const QString& path) {
-    if (not QFileInfo(path).isDir()) {
-      return -1;
-    }
-    int succeedCnt = 0;
-    int tryKVPairCnt = 0;
-
-    static ProductionStudioManager& psm = ProductionStudioManager::getIns();
-
-    QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-    while (it.hasNext()) {
-      it.next();
-      const QString& jsonPath = it.filePath();
-      QVariantHash dict = MovieJsonLoader(jsonPath);
-      if (dict.contains(JSONKey::ProductionStudio) and not dict[JSONKey::ProductionStudio].toString().isEmpty()){
-        continue;
-      }
-      const QString& sentence = dict.contains(JSONKey::Name)? dict[JSONKey::Name].toString():"";
-      dict.insert(JSONKey::ProductionStudio, psm(sentence));
-      succeedCnt += MovieJsonDumper(dict, jsonPath);
-      ++tryKVPairCnt;
-    }
-    if (tryKVPairCnt != succeedCnt) {
-      qDebug("%d/%d json add production studio key-value pair succeed", succeedCnt, tryKVPairCnt);
-    }
-    return succeedCnt;
-  }
-
-  static int JsonValuePerformersAdder(const QString& path, const QString& performers) {
-    const QStringList& performerList = performers.trimmed().split(SEPERATOR_COMP);
-    if (performerList.isEmpty() or not QFileInfo(path).isDir()) {
-      return -1;
-    }
-    int succeedCnt = 0;
-    int tryConstuctCnt = 0;
-
-    QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-    while (it.hasNext()) {
-      it.next();
-      const QString& jsonPath = it.filePath();
-      QVariantHash dict = MovieJsonLoader(jsonPath);
-      QStringList perfL = dict[JSONKey::Performers].toStringList() + performerList;
-      perfL.removeDuplicates();
-      dict[JSONKey::Performers] = perfL;
-      succeedCnt += MovieJsonDumper(dict, jsonPath);
-      ++tryConstuctCnt;
-    }
-    if (tryConstuctCnt != succeedCnt) {
-      qDebug("%d/%d json add performer succeed", succeedCnt, tryConstuctCnt);
-    }
-    return succeedCnt;
-  }
-
-  static int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio) {
-    const QString& productionStudio = _productionStudio.trimmed();
-    if (not QFileInfo(path).isDir()) {
-      return -1;
-    }
-    int succeedCnt = 0;
-    int tryConstuctCnt = 0;
-
-    QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-    while (it.hasNext()) {
-      it.next();
-      const QString& jsonPath = it.filePath();
-      QVariantHash dict = MovieJsonLoader(jsonPath);
-      if (dict[JSONKey::ProductionStudio].toString() == productionStudio) {
-        continue;
-      }
-      dict[JSONKey::ProductionStudio] = productionStudio;
-      succeedCnt += MovieJsonDumper(dict, jsonPath);
-      ++tryConstuctCnt;
-    }
-    if (tryConstuctCnt != succeedCnt) {
-      qDebug("%d/%d json add productionStudio set succeed", succeedCnt, tryConstuctCnt);
-    }
-    return succeedCnt;
-  }
+  static int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio);
 
   static const QMap<QString, QString> key2ValueType;
 };

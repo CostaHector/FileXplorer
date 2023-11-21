@@ -1,6 +1,6 @@
 #include "FolderPreviewHTML.h"
-#include "PublicVariable.h"
 #include "Actions/FileBasicOperationsActions.h"
+#include "PublicVariable.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -58,7 +58,7 @@ void FolderPreviewHTML::subscribe() {
   connect(this, &QTextBrowser::anchorClicked, this, &FolderPreviewHTML::onAnchorClicked);
 }
 
-QSize FolderPreviewHTML::sizeHint() const{
+QSize FolderPreviewHTML::sizeHint() const {
   auto w = PreferenceSettings().value("dockerHtmlWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
   auto h = PreferenceSettings().value("dockerHtmlHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
   return QSize(w, h);
@@ -66,12 +66,20 @@ QSize FolderPreviewHTML::sizeHint() const{
 
 QString FolderPreviewHTML::InsertImgs(const QString& dirPath) {
   QString imgSrc;
-  QDir dir(dirPath, {}, QDir::SortFlag::Name, QDir::Filter::Files);
+  QDir dir(dirPath);
   if (not dir.exists()) {
     return imgSrc;
   }
   dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
-  m_imgsLst = dir.entryList();
+  m_imgsLst = dir.entryList(QDir::Filter::Files);
+  static const auto imgHumanSorter = [](const QString& lhs, const QString& rhs) -> bool {
+    if (lhs.size() != rhs.size()) {
+      return lhs.size() < rhs.size();
+    }
+    return lhs < rhs;
+  };
+  std::sort(m_imgsLst.begin(), m_imgsLst.end(), imgHumanSorter);
+  // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
   for (int i = 0; i < m_firstSightImgCnt and i < m_imgsLst.size(); ++i) {
     const QString& imgName = m_imgsLst[i];
     imgSrc += HTML_IMG_TEMPLATE.arg(dir.absoluteFilePath(imgName)).arg(imgName).arg(600);
@@ -101,7 +109,7 @@ bool FolderPreviewHTML::ShowAllImages(const int val) {
   m_scrollAtEndBefore = true;
   QDir dir(dirPath);
   QString insertHtmlSrc;
-  for (int i = m_firstSightImgCnt + 1; i < m_imgsLst.size(); ++i) {
+  for (int i = m_firstSightImgCnt; i < m_imgsLst.size(); ++i) {
     const QString& imgName = m_imgsLst[i];
     insertHtmlSrc += HTML_IMG_TEMPLATE.arg(dir.absoluteFilePath(imgName)).arg(imgName).arg(600);
   }

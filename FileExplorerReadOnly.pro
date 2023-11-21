@@ -145,3 +145,5 @@ DISTFILES += \
 
 QMAKE_POST_LINK +=
     \
+
+FORMS +=

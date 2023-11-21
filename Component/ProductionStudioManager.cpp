@@ -23,10 +23,10 @@ int ProductionStudioManager::LearningFromAPath(const QString& path) {
       continue;
     }
     const QString& v = dict[JSONKey::ProductionStudio].toString();
-    if (v.isEmpty() or m_prodStudioMap.contains(v.toLower())) {
-      continue;
-    }
     for (const QString& psFrom: StandardProductionStudioFrom(v)){
+      if (psFrom.isEmpty() or m_prodStudioMap.contains(psFrom)) {
+        continue;
+      }
       m_prodStudioMap.insert(psFrom, v);
     }
   }
@@ -55,7 +55,7 @@ QStringList ProductionStudioManager::StandardProductionStudioFrom(QString standa
 auto ProductionStudioManager::operator()(QString sentence) const -> QString {
   sentence.remove(leadingStrComp);          // remove [FFL], [FL], [GT]
   sentence.remove(leadingOpenBracketComp);  // remove open braces [({
-  sentence.replace(closedBracketComp, "-");
+  sentence.replace(nonLeadingBracketComp, "-");
 
   QString prodStudioSection = sentence.split("-")[0];
   QString noInvalidStr = prodStudioSection.remove(keepComp);

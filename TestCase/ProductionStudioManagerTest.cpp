@@ -15,8 +15,21 @@ class ProductionStudioManagerTest : public QObject {
   void test_standardProdStudioNameFrom(){
     const QStringList& fromLst = psm.StandardProductionStudioFrom("LucasEntertainment");
     QVERIFY2(fromLst.contains("lucasentertainment"), "only lowercase edition");
-    QVERIFY2(fromLst.contains("lucas entertainment"), "split by A-Z and join by space");
+    QVERIFY2(fromLst.contains("lucas entertainment"), "split by A-Z0-9 and join by space");
+
+    const QStringList& fromLstWithADigit = psm.StandardProductionStudioFrom("My9Inches");
+    QVERIFY2(fromLstWithADigit.contains("my 9 inches"), "only lowercase edition");
+    QVERIFY2(fromLstWithADigit.contains("my9inches"), "split by A-Z0-9 and join by space");
+
+    const QStringList& fromLstWithNumber = psm.StandardProductionStudioFrom("Studio2000");
+    QVERIFY2(fromLstWithNumber.contains("studio2000"), "only lowercase edition");
+    QVERIFY2(fromLstWithNumber.contains("studio 2000"), "split by A-Z0-9 and join by space");
+
+    const QStringList& fromLstFullCapitalizer = psm.StandardProductionStudioFrom("MEN");
+    QVERIFY2(fromLstFullCapitalizer.contains("men"), "only lowercase edition");
+    QVERIFY2(fromLstFullCapitalizer.contains("m e n"), "split by A-Z0-9 and join by space");
   }
+
   void test_filterProdStudioNameOut(){
     QCOMPARE(psm("[FFL] Lucas Entertainment - ABC.mp4"), "LucasEntertainment");
     QCOMPARE(psm("[FFL] LucasEntertainment - ABC.mp4"), "LucasEntertainment");

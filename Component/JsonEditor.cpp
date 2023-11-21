@@ -466,7 +466,7 @@ QStringList JsonEditor::onPerformersHint() {
   auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
   const QStringList& newPerfsList = pm(sentence);
   const QStringList& beforePerfsList = p->text().split(SEPERATOR_COMP);
-  if (beforePerfsList.size() <= newPerfsList.size()) {
+  if (beforePerfsList.size() < newPerfsList.size()) {
     p->setText(newPerfsList.join(", "));
   }
 
