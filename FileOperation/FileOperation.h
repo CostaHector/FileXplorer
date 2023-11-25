@@ -358,7 +358,7 @@ class FileOperation {
       BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
       if (ret != ErrorCode::OK) {
         ++failedCommandCnt;
-        qDebug("%s(%d parm(s))", k.toStdString().c_str(), vals.size());
+        qDebug("Fail: %s(%s) [%d parm(s)]", k.toStdString().c_str(), vals.join(",").toStdString().c_str(), vals.size());
       }
       if (k == "moveToTrash" and not srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
         if (recover.size() > 1) {

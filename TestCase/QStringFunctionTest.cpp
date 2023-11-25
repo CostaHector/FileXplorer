@@ -15,6 +15,7 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
     void test_regexReplace();
+    void test_folderDirname();
 };
 
 void QStringFunctionTest::initTestCase()
@@ -46,7 +47,22 @@ void QStringFunctionTest::test_regexReplace(){
     QCOMPARE(afterFileName, expectFileName);
 }
 
+void QStringFunctionTest::test_folderDirname() {
+#ifdef _WIN32
+    QFileInfo cUsers("C:/Users");
+    QVERIFY2(not cUsers.isRoot(), "[C:/Users] is not root.");
 
-//QTEST_MAIN(QStringFunctionTest)
+    QFileInfo cDisk("C:/");
+    QVERIFY2(cDisk.isRoot(), "[C:/] is root.");
+    QCOMPARE(cDisk.absolutePath(), QString("C:/"));
+#else
+    QFileInfo linuxHomePath("/home/path");
+    QVERIFY2(not linuxHomePath.isRoot(), "[/home/path] is not root.");
+    QCOMPARE(linuxHomePath.absolutePath(), QString("/home"));
+#endif
+}
+
+
+QTEST_MAIN(QStringFunctionTest)
 
 #include "QStringFunctionTest.moc"

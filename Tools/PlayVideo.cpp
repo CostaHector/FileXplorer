@@ -10,7 +10,7 @@ bool PlayADir(const QString& dirPath) {
   const QString& exePath = "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe";
   QFileInfo playerFi(exePath);
   QProcess process;
-#ifdef WIN32
+#ifdef _WIN32
   process.setProgram(playerFi.absoluteFilePath());
   process.setArguments({QFileInfo(dirPath).absoluteFilePath()});
   process.startDetached();  // Start the process in detached mode instead of start

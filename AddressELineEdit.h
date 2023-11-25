@@ -11,6 +11,7 @@
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QMimeData>
 
 constexpr int CONTROL_HEIGHT = 28;
 
@@ -33,16 +34,30 @@ class AddressELineEdit : public QToolBar {
  public:
   explicit AddressELineEdit(QWidget* parent = nullptr);
 
-  inline auto text() -> QString { return pathLineEdit->text(); }
-  inline auto dirname() -> QString {
-    QFileInfo fi(text());
-    if (fi.isRoot()) {
-      return "";
+  inline auto text() const -> QString { return pathLineEdit->text(); }
+  inline auto textFromActions() const -> QString {
+    QString path;
+    for (QAction* action : pathActionsGroup->actions()) {
+      path += action->text() + "/";
     }
-    return fi.absolutePath();
+    return PathProcess(path);
+  }
+  inline auto textFromCurrentCursor(const QAction* cursorAt) const -> QString {
+    QString path;
+    for (QAction* action : pathActionsGroup->actions()) {
+      path += action->text() + "/";
+      if (action == cursorAt) {
+        break;
+      }
+    }
+    return PathProcess(path);
   }
 
-  static inline auto PathProcess(const QString& path) -> QString;
+  inline auto dirname() const -> QString {
+    const QFileInfo fi(textFromActions());
+    return fi.isRoot() ? "" : fi.absolutePath();
+  }
+
   auto onFocusChange(bool hasFocus) -> void;
 
   auto clickMode() -> void;
@@ -54,6 +69,11 @@ class AddressELineEdit : public QToolBar {
   void mousePressEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* e) override;
 
+  void dragEnterEvent(QDragEnterEvent* event) override;
+
+  void dropEvent(QDropEvent* event) override;
+  void dragMoveEvent(QDragMoveEvent* event) override;
+
  signals:
   void intoAPath_active(const QString&);
 
@@ -61,13 +81,18 @@ class AddressELineEdit : public QToolBar {
   void pathChangeTo(const QString& newPath);
 
  private:
+  inline auto PathProcess(const QString& path) const -> QString {
+    // drive letter will be kept while trailing path seperator will be trunc
+    // i.e., "XX:/" -> "XX:/" and "/home/user/" ->"/home/user"
+    return (path.size() > 2 and path[path.size() - 2] != ':' and path.back() == '/') ? path.chopped(1) : path;
+  }
+
   QActionGroup* pathActionsGroup;
 
   QLineEdit* pathLineEdit;
 
   QComboBox* pathComboBox;
   FocusEventWatch* pathComboBoxFocusWatcher;
-
   QAction* addressCBActH;
 };
 

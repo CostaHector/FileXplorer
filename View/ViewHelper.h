@@ -18,9 +18,9 @@
 
 constexpr int ROW_SECTION_HEIGHT = 10;
 const QPoint TOOLTIP_MSG_PNG_DEV(70, 0);
-const QString TOOLTIP_MSG_LINK("LINK:<font color=\"gray\" size=\"14\">%1</font>");
-const QString TOOLTIP_MSG_CP("CP:<font color=\"gray\" size=\"14\">%1</font>");
-const QString TOOLTIP_MSG_MV("MV:<font color=\"gray\" size=\"14\">%1</font>");
+const QString TOOLTIP_MSG_LINK("LINK:<font color=\"blue\">%1</font>");
+const QString TOOLTIP_MSG_CP("CP:<font color=\"red\">%1</font>");
+const QString TOOLTIP_MSG_MV("MV:<p style=\"color:green\">%1</p>");
 
 class View {
  public:
@@ -91,13 +91,13 @@ class View {
   static void changeDropAction(QDropEvent* event, QPoint pnt, const QString& name, QWidget* w) {
     if (event->keyboardModifiers().testFlag(Qt::AltModifier)) {
       event->setDropAction(Qt::DropAction::LinkAction);
-      QToolTip::showText(pnt, TOOLTIP_MSG_LINK.arg(name), w);
+      if (not name.isEmpty()) QToolTip::showText(pnt, TOOLTIP_MSG_LINK.arg(name), w);
     } else if (event->keyboardModifiers() & Qt::ControlModifier) {
       event->setDropAction(Qt::DropAction::CopyAction);
-      QToolTip::showText(pnt, TOOLTIP_MSG_CP.arg(name), w);
+      if (not name.isEmpty()) QToolTip::showText(pnt, TOOLTIP_MSG_CP.arg(name), w);
     } else {
       event->setDropAction(Qt::DropAction::MoveAction);
-      QToolTip::showText(pnt, TOOLTIP_MSG_MV.arg(name), w, QRect());
+      if (not name.isEmpty()) QToolTip::showText(pnt, TOOLTIP_MSG_MV.arg(name), w, QRect());
     }
   }
 

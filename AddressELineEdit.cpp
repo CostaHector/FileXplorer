@@ -1,9 +1,15 @@
 #include "AddressELineEdit.h"
+#include "Component/RenameConflicts.h"
+#include "Tools/ConflictsItemHelper.h"
+#include "View/ViewHelper.h"
+
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QList>
+#include <QMessageBox>
+#include <QToolTip>
 #include <Qt>
 
 FocusEventWatch::FocusEventWatch(QObject* parent) : mouseButtonPressedBefore(false) {
@@ -65,7 +71,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   setStyleSheet(
       "QToolBar{"
-      "border-left: 1px solid gray;"
+      "border-left: 1px solid black;"
       "border-right: 1px solid gray;"
       "border-top: 1px solid gray;"
       "border-bottom: 1px solid gray;"
@@ -73,15 +79,8 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
-}
 
-inline auto AddressELineEdit::PathProcess(const QString& path) -> QString {
-  if (path.size() > 2 and path[path.size() - 2] != ':' and path[path.size() - 1] == '/') {
-    return path.left(path.size() - 1);
-    // drive letter will be kept while trailing path seperator will be trunc
-    // i.e., "XX:/" -> "XX:/" and "XX/" - >"XX"
-  }
-  return path;
+  setAcceptDrops(true);
 }
 
 auto AddressELineEdit::pathChangeTo(const QString& newPath) -> void {
@@ -111,7 +110,10 @@ auto AddressELineEdit::onReturnPressed(const QString& path) -> bool {
   QString pth = QDir::fromNativeSeparators(path);
   QFileInfo fi(pth);
   if ((not QDir(pth).exists()) and (not fi.exists())) {
-    qDebug("Inexist path [%s]", pth.toStdString().c_str());
+    const QString pathInexist = QString("cannot into inexist path[%1]").arg(pth);
+    qDebug("%s", pathInexist.toStdString().c_str());
+    QMessageBox::warning(this, "Into path failed", pathInexist);
+    pathLineEdit->setText(textFromActions());
     return false;
   }
 
@@ -177,6 +179,66 @@ void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
   if (e->key() == Qt::Key_Escape) {
     emit pathComboBoxFocusWatcher->focusChanged(false);
   }
+}
+
+void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
+  View::changeDropAction(event, event->pos(), "", this);
+  event->accept();
+}
+
+void AddressELineEdit::dropEvent(QDropEvent* event) {
+  QStringList selectedItems;
+  for (const QUrl& url : event->mimeData()->urls()) {
+    if (url.isLocalFile()) {
+      selectedItems.append(url.toLocalFile());
+    }
+  }
+  if (selectedItems.isEmpty()) {
+    qDebug("nothing selected to drop");
+    return;
+  }
+  View::changeDropAction(event, event->pos(), "", this);
+
+  auto urlsLst = event->mimeData()->urls();
+  const auto action = event->dropAction();
+  qDebug("dropMimeData. action=[%d]", int(action));
+  CCMMode opMode = CCMMode::ERROR;
+  if (action == Qt::DropAction::CopyAction) {
+    opMode = CCMMode::COPY;
+  } else if (action == Qt::DropAction::MoveAction) {
+    opMode = CCMMode::CUT;
+  } else if (action == Qt::DropAction::LinkAction) {
+    opMode = CCMMode::LINK;
+  } else {
+    qDebug("[Err] Unknown action[%d]", int(action));
+    return;
+  }
+
+  const QString& to = textFromCurrentCursor(actionAt(event->pos()));
+  ConflictsItemHelper conflictIF(selectedItems, to);
+  auto* tfm = new RenameConflicts(conflictIF, opMode);
+
+  if (to == conflictIF.l and opMode != CCMMode::LINK) {  // skip
+    return;
+  }
+
+  if (not conflictIF) {  // conflict
+    tfm->on_Submit();
+  } else {
+    tfm->exec();
+  }
+  QToolBar::dropEvent(event);
+}
+
+void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
+  if (not event->mimeData()->hasUrls()) {
+    qDebug("no urls dragMoveEvent");
+    return;
+  }
+  const QString& droppedPath = textFromCurrentCursor(actionAt(event->pos()));
+  qDebug("release to drop here [%s]", droppedPath.toStdString().c_str());
+  View::changeDropAction(event, event->pos(), droppedPath, this);
+  return QToolBar::dragMoveEvent(event);
 }
 
 // #define __NAME__EQ__MAIN__ 1

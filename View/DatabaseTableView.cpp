@@ -124,7 +124,7 @@ auto DatabaseTableView::on_revealInExplorer() const -> bool {
   }
 
   QProcess process;
-#ifdef WIN32
+#ifdef _WIN32
   process.setProgram("explorer");
   process.setArguments(args);
 #else
