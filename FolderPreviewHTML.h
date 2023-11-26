@@ -15,8 +15,11 @@ class FolderPreviewHTML : public QTextBrowser {
   QSize sizeHint() const override;
 
   bool onAnchorClicked(const QUrl& url);
-  auto ShowAllImages(const int val) -> bool;
-  QString InsertImgs(const QString& dirPath);
+
+  QStringList InitImgsList(const QString& dirPath) const;
+  bool hasNextImgs() const;
+  QString nextImgsHTMLSrc();
+  auto ShowRemainImages(const int val) -> bool;
 
   static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 50, INT_MAX}; // never remove last element "INT_MAX"
   static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(SHOW_IMGS_CNT_LIST[0]);
@@ -26,7 +29,10 @@ class FolderPreviewHTML : public QTextBrowser {
   QStringList m_imgsLst;
   QWidget* m_parent;
   QAction* m_PLAY_ACTION;
+  static const QString HTML_H1_TEMPLATE;
+  static const QString HTML_H1_WITH_VIDS_TEMPLATE;
   static const QString HTML_IMG_TEMPLATE;
+  static constexpr int HTML_IMG_FIXED_WIDTH = 600;
 };
 
 #endif  // FOLDERPREVIEWHTML_H
