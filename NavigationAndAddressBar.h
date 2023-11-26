@@ -58,6 +58,7 @@ public:
   QPushButton *backToBtn;
   QPushButton *forwardToBtn;
   QLineEdit *searchLE;
+  QPushButton *upToBtn;
 
 signals:
 
@@ -65,8 +66,6 @@ private:
   std::function<bool(QString, bool, bool)> m_IntoNewPath;
   std::function<void(QString)> m_on_searchTextChanged;
   std::function<void(QString)> m_on_searchEnterKey;
-
-  QPushButton *upToBtn;
 };
 
 #endif // NAVIGATIONANDADDRESSBAR_H

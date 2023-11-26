@@ -18,10 +18,12 @@ class FolderPreviewHTML : public QTextBrowser {
   auto ShowAllImages(const int val) -> bool;
   QString InsertImgs(const QString& dirPath);
 
-  int m_firstSightImgCnt = 3;
+  static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 50, INT_MAX}; // never remove last element "INT_MAX"
+  static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(SHOW_IMGS_CNT_LIST[0]);
+  int m_curImgCntIndex = 0;
+
   QString dirPath;
   QStringList m_imgsLst;
-  bool m_scrollAtEndBefore;
   QWidget* m_parent;
   QAction* m_PLAY_ACTION;
   static const QString HTML_IMG_TEMPLATE;

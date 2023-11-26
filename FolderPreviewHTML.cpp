@@ -8,19 +8,19 @@
 #include <QTextStream>
 
 const QString FolderPreviewHTML::HTML_IMG_TEMPLATE = "<img src=\"%1\" alt=\"%2\" width=\"%3\"><br/>\n";
+constexpr int FolderPreviewHTML::SHOW_IMGS_CNT_LIST[];
+constexpr int FolderPreviewHTML::N_SHOW_IMGS_CNT_LIST;
 
-FolderPreviewHTML::FolderPreviewHTML(QWidget* parent)
-    : m_scrollAtEndBefore(false), m_parent(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN->actions()[0]) {
+FolderPreviewHTML::FolderPreviewHTML(QWidget* parent) : m_parent(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN->actions()[0]) {
   setReadOnly(true);
   setOpenLinks(false);
   setOpenExternalLinks(true);
-
   subscribe();
 }
 
 bool FolderPreviewHTML::operator()(const QString& path) {
   QFileInfo fi(path);
-  m_scrollAtEndBefore = false;
+  m_curImgCntIndex = 0;
   dirPath = path;
   m_imgsLst.clear();
 
@@ -80,10 +80,12 @@ QString FolderPreviewHTML::InsertImgs(const QString& dirPath) {
   };
   std::sort(m_imgsLst.begin(), m_imgsLst.end(), imgHumanSorter);
   // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
-  for (int i = 0; i < m_firstSightImgCnt and i < m_imgsLst.size(); ++i) {
+
+  for (int i = SHOW_IMGS_CNT_LIST[m_curImgCntIndex]; i < m_imgsLst.size() and i < SHOW_IMGS_CNT_LIST[m_curImgCntIndex + 1]; ++i) {
     const QString& imgName = m_imgsLst[i];
     imgSrc += HTML_IMG_TEMPLATE.arg(dir.absoluteFilePath(imgName)).arg(imgName).arg(600);
   }
+  ++m_curImgCntIndex;
   return imgSrc;
 }
 
@@ -103,16 +105,18 @@ bool FolderPreviewHTML::onAnchorClicked(const QUrl& url) {
 }
 
 bool FolderPreviewHTML::ShowAllImages(const int val) {
-  if (m_scrollAtEndBefore or this->verticalScrollBar()->maximum() != val) {
+  if (m_curImgCntIndex >= N_SHOW_IMGS_CNT_LIST - 1 or this->verticalScrollBar()->maximum() != val) {
     return false;
   }
-  m_scrollAtEndBefore = true;
+
   QDir dir(dirPath);
   QString insertHtmlSrc;
-  for (int i = m_firstSightImgCnt; i < m_imgsLst.size(); ++i) {
+  for (int i = SHOW_IMGS_CNT_LIST[m_curImgCntIndex]; i < m_imgsLst.size() and i < SHOW_IMGS_CNT_LIST[m_curImgCntIndex + 1]; ++i) {
     const QString& imgName = m_imgsLst[i];
     insertHtmlSrc += HTML_IMG_TEMPLATE.arg(dir.absoluteFilePath(imgName)).arg(imgName).arg(600);
   }
+  ++m_curImgCntIndex;
+
   if (insertHtmlSrc.isEmpty()) {
     return true;
   }

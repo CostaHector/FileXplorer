@@ -13,6 +13,8 @@
 #include <QKeyEvent>
 #include <QMimeData>
 
+#include <QStackedWidget>
+
 constexpr int CONTROL_HEIGHT = 28;
 
 class FocusEventWatch : public QObject {
@@ -29,7 +31,7 @@ class FocusEventWatch : public QObject {
   bool mouseButtonPressedBefore = false;
 };
 
-class AddressELineEdit : public QToolBar {
+class AddressELineEdit : public QStackedWidget {
   Q_OBJECT
  public:
   explicit AddressELineEdit(QWidget* parent = nullptr);
@@ -37,21 +39,28 @@ class AddressELineEdit : public QToolBar {
   inline auto text() const -> QString { return pathLineEdit->text(); }
   inline auto textFromActions() const -> QString {
     QString path;
-    for (QAction* action : pathActionsGroup->actions()) {
-      path += action->text() + "/";
+    for (QAction* action : m_pathActionsTB->actions()) {
+      path += action->text() + PATH_SEP_CHAR;
     }
     return PathProcess(path);
   }
-  inline auto textFromCurrentCursor(const QAction* cursorAt) const -> QString {
+  inline auto textFromCurrentCursor(const QAction* cursorAtAction) const -> QString {
     QString path;
-    for (QAction* action : pathActionsGroup->actions()) {
-      path += action->text() + "/";
-      if (action == cursorAt) {
+    for (QAction* action : m_pathActionsTB->actions()) {
+      path += action->text() + PATH_SEP_CHAR;
+      if (action == cursorAtAction) {
         break;
       }
     }
     return PathProcess(path);
   }
+  auto onPathActionTriggered(const QAction* clkAct) -> void {
+    const QString& rawPath = textFromCurrentCursor(clkAct);
+    const QString& fullPth = AddressELineEdit::PathProcess(rawPath);
+    qDebug("path clicked [%s]", fullPth.toStdString().c_str());
+    onReturnPressed(fullPth);
+  }
+  auto onReturnPressed(const QString& path) -> bool;
 
   inline auto dirname() const -> QString {
     const QFileInfo fi(textFromActions());
@@ -63,8 +72,6 @@ class AddressELineEdit : public QToolBar {
   auto clickMode() -> void;
   auto inputMode() -> void;
   auto subscribe() -> void;
-  auto onPathActionTriggered(const QAction* clkAct) -> void;
-  auto onReturnPressed(const QString& path) -> bool;
 
   void mousePressEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* e) override;
@@ -84,16 +91,14 @@ class AddressELineEdit : public QToolBar {
   inline auto PathProcess(const QString& path) const -> QString {
     // drive letter will be kept while trailing path seperator will be trunc
     // i.e., "XX:/" -> "XX:/" and "/home/user/" ->"/home/user"
-    return (path.size() > 2 and path[path.size() - 2] != ':' and path.back() == '/') ? path.chopped(1) : path;
+    return (path.size() > 2 and path[path.size() - 2] != ':' and path.back() == PATH_SEP_CHAR) ? path.chopped(1) : path;
   }
-
-  QActionGroup* pathActionsGroup;
+  static constexpr char PATH_SEP_CHAR = '/';
+  QToolBar* m_pathActionsTB;
 
   QLineEdit* pathLineEdit;
-
   QComboBox* pathComboBox;
   FocusEventWatch* pathComboBoxFocusWatcher;
-  QAction* addressCBActH;
 };
 
 class TestAddressELineEdit : public QWidget {

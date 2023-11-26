@@ -44,13 +44,14 @@ bool FocusEventWatch::eventFilter(QObject* watched, QEvent* event) {
   return QObject::eventFilter(watched, event);
 }
 
+constexpr char AddressELineEdit::PATH_SEP_CHAR;
+
 AddressELineEdit::AddressELineEdit(QWidget* parent)
-    : QToolBar(parent),
-      pathActionsGroup(new QActionGroup(this)),
+    : QStackedWidget(parent),
+      m_pathActionsTB(new QToolBar(this)),
       pathLineEdit(new QLineEdit),
       pathComboBox(new QComboBox),
-      pathComboBoxFocusWatcher(new FocusEventWatch(pathComboBox)),
-      addressCBActH(nullptr) {
+      pathComboBoxFocusWatcher(new FocusEventWatch(pathComboBox)) {
 #ifdef _WIN32
   const QFileInfoList& drives = QDir::drives();
   for (const auto& d : drives) {
@@ -59,7 +60,8 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
 #endif
   pathComboBox->setLineEdit(pathLineEdit);
 
-  addressCBActH = addWidget(pathComboBox);
+  addWidget(m_pathActionsTB);
+  addWidget(pathComboBox);
 
   clickMode();
   subscribe();
@@ -84,16 +86,13 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
 }
 
 auto AddressELineEdit::pathChangeTo(const QString& newPath) -> void {
-  QString fullpath = AddressELineEdit::PathProcess(newPath);
+  m_pathActionsTB->clear();
+
+  const QString& fullpath = AddressELineEdit::PathProcess(newPath);
   pathLineEdit->setText(fullpath);
-  for (QAction* action : pathActionsGroup->actions()) {
-    pathActionsGroup->removeAction(action);
-    removeAction(action);
+  for (const QString& pt : fullpath.split(PATH_SEP_CHAR)) {
+    m_pathActionsTB->addAction(new QAction(pt));
   }
-  for (const QString& pt : fullpath.split('/')) {
-    pathActionsGroup->addAction(new QAction(pt));
-  }
-  addActions(pathActionsGroup->actions());
 
   if (not pathComboBox->hasFocus()) {  // in disp mode
     pathComboBox->insertItem(0, fullpath);
@@ -107,44 +106,34 @@ auto AddressELineEdit::pathChangeTo(const QString& newPath) -> void {
 }
 
 auto AddressELineEdit::onReturnPressed(const QString& path) -> bool {
-  QString pth = QDir::fromNativeSeparators(path);
-  QFileInfo fi(pth);
-  if ((not QDir(pth).exists()) and (not fi.exists())) {
-    const QString pathInexist = QString("cannot into inexist path[%1]").arg(pth);
+  const QString& pth = QDir::fromNativeSeparators(path);
+  if (not QFile::exists(pth)) {
+    const QString& pathInexist = QString("Return pressed with inexist path [%1].").arg(pth);
     qDebug("%s", pathInexist.toStdString().c_str());
     QMessageBox::warning(this, "Into path failed", pathInexist);
     pathLineEdit->setText(textFromActions());
     return false;
   }
-
-  if (fi.isDir()) {
-    emit intoAPath_active(pth);
-    pathChangeTo(pth);
-  } else if (fi.isFile()) {
-    auto openRet = QDesktopServices::openUrl(pth);
-    qDebug("Opening [%s]", pth.toStdString().c_str());
+  const QFileInfo fi(pth);
+  if (fi.isFile()) {
+    const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
+    qDebug("Direct open file [%s]: [%d]", pth.toStdString().c_str(), openRet);
+    pathLineEdit->setText(textFromActions());
+    return true;
   }
-  emit pathComboBoxFocusWatcher->focusChanged(false);
-  return true;
+  if (fi.isDir()) {
+    pathChangeTo(pth);
+    emit intoAPath_active(pth);
+    emit pathComboBoxFocusWatcher->focusChanged(false);
+    return true;
+  }
+  return false;
 }
 
 auto AddressELineEdit::subscribe() -> void {
-  connect(pathActionsGroup, &QActionGroup::triggered, this, &AddressELineEdit::onPathActionTriggered);
+  connect(m_pathActionsTB, &QToolBar::actionTriggered, this, &AddressELineEdit::onPathActionTriggered);
   connect(pathLineEdit, &QLineEdit::returnPressed, this, [this]() -> void { onReturnPressed(text()); });
   connect(pathComboBoxFocusWatcher, &FocusEventWatch::focusChanged, this, &AddressELineEdit::onFocusChange);
-}
-
-auto AddressELineEdit::onPathActionTriggered(const QAction* clkAct) -> void {
-  QString rawPath;
-  for (const auto* act : pathActionsGroup->actions()) {
-    rawPath += (act->text() + '/');
-    if (act == clkAct) {
-      break;
-    }
-  }
-  QString fullPth = AddressELineEdit::PathProcess(rawPath);
-  qDebug("now[%s]", fullPth.toStdString().c_str());
-  onReturnPressed(fullPth);
 }
 
 auto AddressELineEdit::onFocusChange(bool hasFocus) -> void {
@@ -156,17 +145,11 @@ auto AddressELineEdit::onFocusChange(bool hasFocus) -> void {
 }
 
 auto AddressELineEdit::clickMode() -> void {
-  if (not pathActionsGroup->isVisible()) {
-    pathActionsGroup->setVisible(true);
-  }
-  addressCBActH->setVisible(false);
+  setCurrentWidget(m_pathActionsTB);
 }
 
 auto AddressELineEdit::inputMode() -> void {
-  pathActionsGroup->setVisible(false);
-  if (not addressCBActH->isVisible()) {
-    addressCBActH->setVisible(true);
-  }
+  setCurrentWidget(pathComboBox);
 }
 
 void AddressELineEdit::mousePressEvent(QMouseEvent* event) {
@@ -182,7 +165,7 @@ void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
 }
 
 void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
-  View::changeDropAction(event, event->pos(), "", this);
+  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), "", this);
   event->accept();
 }
 
@@ -197,7 +180,7 @@ void AddressELineEdit::dropEvent(QDropEvent* event) {
     qDebug("nothing selected to drop");
     return;
   }
-  View::changeDropAction(event, event->pos(), "", this);
+  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), "", this);
 
   auto urlsLst = event->mimeData()->urls();
   const auto action = event->dropAction();
@@ -214,7 +197,7 @@ void AddressELineEdit::dropEvent(QDropEvent* event) {
     return;
   }
 
-  const QString& to = textFromCurrentCursor(actionAt(event->pos()));
+  const QString& to = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
   ConflictsItemHelper conflictIF(selectedItems, to);
   auto* tfm = new RenameConflicts(conflictIF, opMode);
 
@@ -227,7 +210,7 @@ void AddressELineEdit::dropEvent(QDropEvent* event) {
   } else {
     tfm->exec();
   }
-  QToolBar::dropEvent(event);
+  QStackedWidget::dropEvent(event);
 }
 
 void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
@@ -235,10 +218,10 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
     qDebug("no urls dragMoveEvent");
     return;
   }
-  const QString& droppedPath = textFromCurrentCursor(actionAt(event->pos()));
+  const QString& droppedPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
   qDebug("release to drop here [%s]", droppedPath.toStdString().c_str());
-  View::changeDropAction(event, event->pos(), droppedPath, this);
-  return QToolBar::dragMoveEvent(event);
+  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), droppedPath, this);
+  return QStackedWidget::dragMoveEvent(event);
 }
 
 // #define __NAME__EQ__MAIN__ 1
