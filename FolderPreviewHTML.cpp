@@ -23,18 +23,17 @@ FolderPreviewHTML::FolderPreviewHTML(QWidget* parent) : m_parent(parent), m_PLAY
 }
 
 bool FolderPreviewHTML::operator()(const QString& path) {
-  QFileInfo fi(path);
+  dirPath = QDir::fromNativeSeparators(path);
   m_curImgCntIndex = 0;
-  dirPath = path;
   m_imgsLst.clear();
 
+  QFileInfo fi(dirPath);
   int vidCnt = 0;
-
   if (fi.isDir()) {
-    QDir vidDir(path, {}, QDir::NoSort, QDir::Filter::Files);
+    QDir vidDir(dirPath, {}, QDir::NoSort, QDir::Filter::Files);
     vidDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
     vidCnt = vidDir.entryList().size();
-    m_imgsLst = InitImgsList(path);
+    m_imgsLst = InitImgsList(dirPath);
   }
   const QString& headLine = fi.isDir() ? HTML_H1_WITH_VIDS_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName())
                                        : HTML_H1_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName());

@@ -18,6 +18,7 @@
 #include <QDateTime>
 #include <QStorageInfo>
 
+#include "Component/PerformersManagerWidget.h"
 #include "MyQSqlTableModel.h"
 #include "PublicVariable.h"
 
@@ -33,9 +34,20 @@ class SubscribeDatabase : public QObject {
   QLineEdit* sqlSearchLE;
   QString currentSearchColumnName;
   T_SwitchStackWidget switchStackWidget;
+  QWidget* performerManger;
 
-  explicit SubscribeDatabase(QTableView* view_, MyQSqlTableModel* dbModel_, QLineEdit* sqlSearchLE_, T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget())
-      : QObject(), view(view_), dbModel(dbModel_), sqlSearchLE(sqlSearchLE_), currentSearchColumnName("Name"), switchStackWidget(switchStackWidget_) {
+  explicit SubscribeDatabase(QTableView* view_,
+                             MyQSqlTableModel* dbModel_,
+                             QLineEdit* sqlSearchLE_,
+                             T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget(),
+                             QWidget* performerManger_ = nullptr)
+      : QObject(),
+        view(view_),
+        dbModel(dbModel_),
+        sqlSearchLE(sqlSearchLE_),
+        currentSearchColumnName("Name"),
+        switchStackWidget(switchStackWidget_),
+        performerManger(performerManger_) {
     this->subscribe();
   }
 
@@ -59,13 +71,15 @@ class SubscribeDatabase : public QObject {
   auto onSelectBatch(const QAction* act) -> void;
   auto onShowOrCloseDatabase(const bool isVisible) -> void {
     PreferenceSettings().setValue(MemoryKey::SHOW_DATABASE.name, isVisible);
-    if (not switchStackWidget) {
-      if (view->isVisible() != isVisible) {
-        view->setVisible(isVisible);
-      }
-      return;
-    }
     switchStackWidget();
+  }
+
+  auto onShowOrHidePerformerManger(const bool isVisible) -> void {
+    PreferenceSettings().setValue(MemoryKey::SHOW_PERFORMERS_MANGER_DATABASE.name, isVisible);
+    if (!performerManger) {
+      performerManger = new PerformersManagerWidget(this->view);
+    }
+    performerManger->setVisible(isVisible);
   }
 };
 

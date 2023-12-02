@@ -46,7 +46,7 @@ bool PerformersWidget::appendAPerformer() {
   const QString& stdPerf = stdPerfL.join(' ');
 
   const QString& perfs = text();
-  QStringList perfsL = (perfs.isEmpty() ? QStringList() : perfs.split(SEPERATOR_COMP));
+  QStringList perfsL = (perfs.isEmpty() ? QStringList() : perfs.split(JSON_RENAME_REGEX::SEPERATOR_COMP));
 
   if (perfsL.contains(stdPerf)) {
     return false;
@@ -61,7 +61,7 @@ void PerformersWidget::uniquePerformers() {
   if (perfs.isEmpty()) {
     return;
   }
-  QStringList perfL = perfs.split(SEPERATOR_COMP);
+  QStringList perfL = perfs.split(JSON_RENAME_REGEX::SEPERATOR_COMP);
   perfL.removeDuplicates();
   m_perfsList->setText(perfL.join(", "));
 }

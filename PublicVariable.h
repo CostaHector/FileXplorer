@@ -171,6 +171,8 @@ const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
 const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
 const GVarStrFolder PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "");
 const GVarStrFolder PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./");
+const GVarStrFolder PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./");
+
 const GVarBool AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false);
 const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
 const GVarBool SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true);
@@ -181,6 +183,7 @@ const GVarBool SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", 
 const GVarBool SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true);
 const GVarBool EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true);
 const GVarBool SHOW_DATABASE("SHOW_DATABASE", false);
+const GVarBool SHOW_PERFORMERS_MANGER_DATABASE("SHOW_PERFORMERS_MANGER_DATABASE", false);
 
 const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
 const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
@@ -198,6 +201,11 @@ const GVarStr COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", {});
 
 const GVarInt MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, 0);
 const GVarInt AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN("AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN", 2);
+
+const GVarInt PERFORMER_IMAGE_FIXED_HEIGHT("PERFORMER_IMAGE_FIXED_HEIGHT", 200, 0);
+const GVarInt PERFORMER_TABLE_DEFAULT_SECTION_SIZE("PERFORMER_TABLE_DEFAULT_SECTION_SIZE", 24, 0);
+const GVarStr PERFORMER_COLUMN_SHOW_SWITCH("PERFORMER_COLUMN_SHOW_SWITCH", QString(20, '1'), {});
+const GVarBool PERFORMER_STRETCH_LAST_SECTION("PERFORMER_STRETCH_LAST_SECTION", true);
 }  // namespace MemoryKey
 
 #include <QDir>
@@ -210,10 +218,12 @@ const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
 const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
 const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
-const QString FILE_INFO_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FILE_INFO_DATABASE");
+const QString FILE_INFO_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FILE_INFO_DATABASE.db");
+const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("PERFORMERS_DATABASE.db");
+const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("PRODUCTION_STUDIOS_DATABASE.db");
 }  // namespace SystemPath
 const QString TABLE_NAME = "movies_info";
-
+const QString PERFORMERS_TABLE_NAME = "PERFORMER_TABLE";
 extern const char* SUBMIT_BTN_STYLE;
 
 constexpr int TABS_ICON_IN_MENU_3x1 = 16;
@@ -252,8 +262,8 @@ const QRegExp leadingOpenBracketComp("^[\[\{\(]");                              
 const QRegExp continuousSpaceComp("\\s\\s+");  //' '
 
 const QRegExp nonLeadingBracketComp("[\\(\\{\\[\\)\\}\\]–]");  //-
-const QRegExp spaceBarSpaceComp("\\s*-\\s*");             //-
-const QRegExp continousHypenComp("--+");                  //-
+const QRegExp spaceBarSpaceComp("\\s*-\\s*");                  //-
+const QRegExp continousHypenComp("--+");                       //-
 
 const QRegExp hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
 const QRegExp trailingHypenComp("-$");                      // delete it
@@ -264,6 +274,8 @@ const QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsens
 const QRegExp continousSpace("\\s+");
 
 const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
+
+const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 }  // namespace JSON_RENAME_REGEX
 
 #endif  // PUBLICVARIABLE_H

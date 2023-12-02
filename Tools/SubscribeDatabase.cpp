@@ -1,5 +1,6 @@
 #include "SubscribeDatabase.h"
 #include "Actions/DataBaseActions.h"
+#include "Actions/PerformersManagerActions.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
 
@@ -34,6 +35,10 @@ void SubscribeDatabase::subscribe() {
   });
 
   connect(g_dbAct().DB_VIEW_CLOSE_SHOW, &QAction::triggered, this, &SubscribeDatabase::onShowOrCloseDatabase);
+  connect(g_performersManagerActions().SHOW_PERFORMER_MANAGER, &QAction::triggered, this, &SubscribeDatabase::onShowOrHidePerformerManger);
+  if (g_performersManagerActions().SHOW_PERFORMER_MANAGER->isChecked()) {
+    onShowOrHidePerformerManger(true);
+  }
 
   {
     const QList<QAction*>& DB_CONTROL_ACTIONS = g_dbAct().DB_CONTROL_ACTIONS->actions();
@@ -188,8 +193,8 @@ bool SubscribeDatabase::onDeleteFromTable(const QString& clause) {
   QString whereClause = clause;
   if (clause.isEmpty()) {
     bool okClicked = false;
-    whereClause = QInputDialog::getItem(this->view, "Where clause", "DELETE FROM \"%1\" WHERE \t\t\t\t\t\t\t\t", deleteDriverChoicePool, 0,
-                                        true, &okClicked);
+    whereClause =
+        QInputDialog::getItem(this->view, "Where clause", "DELETE FROM \"%1\" WHERE \t\t\t\t\t\t\t\t", deleteDriverChoicePool, 0, true, &okClicked);
     if (not okClicked or whereClause.isEmpty()) {
       qDebug("Cancel");
       return false;
@@ -277,7 +282,7 @@ bool SubscribeDatabase::onInsertIntoTable() {
     qDebug("Cancel [%s]", msgBox->text().toStdString().c_str());
     return true;
   }
-  const QString& insertTemplate = QString("INSERT INTO `%1` (%2) VALUES").arg(TABLE_NAME).arg(DB_HEADER_KEY::DB_HEADER.join(",")) +
+  const QString& insertTemplate = QString("INSERT INTO `%1` (%2) VALUES").arg(TABLE_NAME).arg(DB_HEADER_KEY::DB_HEADER.join(',')) +
                                   QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\", %7, \"%8\", \"%9\", \"%10\");");
 
   int totalItemCnt = 0;

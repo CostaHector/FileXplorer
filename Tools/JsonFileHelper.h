@@ -11,7 +11,6 @@
 
 #include <QDirIterator>
 #include <QFile>
-const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 
 class JsonFileHelper {
  public:
@@ -69,7 +68,7 @@ class JsonFileHelper {
       return {};
     }
     QStringList arr;
-    for (const QString& perfRaw : valueStr.split(SEPERATOR_COMP)) {
+    for (const QString& perfRaw : valueStr.split(JSON_RENAME_REGEX::SEPERATOR_COMP)) {
       const QString& perf = perfRaw.trimmed();
       if (not arr.contains(perf)) {
         arr << perf;
@@ -84,7 +83,7 @@ class JsonFileHelper {
       return {};
     }
     decltype(HotSceneString2IntList("")) arr;
-    for (const QString& perfRaw : s.split(SEPERATOR_COMP)) {
+    for (const QString& perfRaw : s.split(JSON_RENAME_REGEX::SEPERATOR_COMP)) {
       const QString& perf = perfRaw.trimmed();
       bool isOk = false;
       int hot = perf.toInt(&isOk);
@@ -128,7 +127,7 @@ class JsonFileHelper {
     QStringList performersList;
     const QString& ps = performersListStr.trimmed();
     if (not ps.isEmpty()) {
-      performersList = ps.split(SEPERATOR_COMP);
+      performersList = ps.split(JSON_RENAME_REGEX::SEPERATOR_COMP);
     }
 
     QFileInfo fi(fileAbsPath);

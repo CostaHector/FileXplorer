@@ -8,7 +8,7 @@
 #include <QToolBar>
 
 #include "Actions/DataBaseActions.h"
-#include "PublicVariable.h"
+#include "Actions/PerformersManagerActions.h"
 
 class DatabaseToolBar : public QToolBar {
  public:
@@ -35,6 +35,7 @@ class DatabaseToolBar : public QToolBar {
   auto GetHideShowToolButton() -> QToolBar* {
     QToolBar* showHideDB = new QToolBar("show/hide Database view", this);
     showHideDB->addAction(g_dbAct().DB_VIEW_CLOSE_SHOW);
+    showHideDB->addAction(g_performersManagerActions().SHOW_PERFORMER_MANAGER);
     showHideDB->setOrientation(Qt::Orientation::Horizontal);
     showHideDB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
     return showHideDB;

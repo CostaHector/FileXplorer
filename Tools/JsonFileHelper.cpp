@@ -118,7 +118,7 @@ int JsonFileHelper::JsonValuePerformersProductionStudiosCleaner(const QString& p
 }
 
 int JsonFileHelper::JsonValuePerformersAdder(const QString& path, const QString& performers) {
-  const QStringList& performerList = performers.trimmed().split(SEPERATOR_COMP);
+  const QStringList& performerList = performers.trimmed().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
   if (performerList.isEmpty() or not QFileInfo(path).isDir()) {
     return -1;
   }

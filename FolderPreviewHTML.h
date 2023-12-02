@@ -9,7 +9,7 @@
 
 class FolderPreviewHTML : public QTextBrowser {
  public:
-  FolderPreviewHTML(QWidget* parent = nullptr);
+  explicit FolderPreviewHTML(QWidget* parent = nullptr);
   auto operator()(const QString& path) -> bool;
   void subscribe();
   QSize sizeHint() const override;

@@ -465,7 +465,7 @@ QStringList JsonEditor::onPerformersHint() {
   }
   auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
   const QStringList& newPerfsList = pm(sentence);
-  const QStringList& beforePerfsList = p->text().split(SEPERATOR_COMP);
+  const QStringList& beforePerfsList = p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
   if (beforePerfsList.size() < newPerfsList.size()) {
     p->setText(newPerfsList.join(", "));
   }
@@ -486,13 +486,13 @@ bool JsonEditor::formatter() {
   if (jsonKeySetMet.contains(JSONKey::Performers)) {
     auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
     QString valueStr = lineWidget->text();
-    valueStr.replace(SEPERATOR_COMP, ", ");
+    valueStr.replace(JSON_RENAME_REGEX::SEPERATOR_COMP, ", ");
     lineWidget->setText(valueStr.trimmed());
   }
   if (jsonKeySetMet.contains(JSONKey::Tags)) {
     auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Tags]);
     QString valueStr = lineWidget->text();
-    valueStr.replace(SEPERATOR_COMP, ", ");
+    valueStr.replace(JSON_RENAME_REGEX::SEPERATOR_COMP, ", ");
     lineWidget->setText(valueStr.trimmed());
   }
 }

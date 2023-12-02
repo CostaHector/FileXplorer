@@ -22,7 +22,8 @@ int main(int argc, char* argv[]) {
   auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView,
                                                  fileExplorer.m_dbPanel->m_dbView->m_dbModel,
                                                  fileExplorer.m_dbPanel->m_searchLE,
-                                                 std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
+                                                 std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer),
+                                                 fileExplorer.m_performerManager);
   fileExplorer.show();
   a.exec();
   return 0;
