@@ -4,6 +4,8 @@
 
 PerformersManagerActions::PerformersManagerActions(QObject* parent)
     : QObject{parent},
+      REFRESH_ALL_RECORDS_VIDS(new QAction("Refresh all record(s) vid", this)),
+      REFRESH_SELECTED_RECORDS_VIDS(new QAction("Refresh selected record(s) vid", this)),
       OPEN_RECORD_IN_FILE_SYSTEM(new QAction("Open record", this)),
       LOAD_FROM_PJSON_PATH(new QAction("Load from pjson", this)),
       LOAD_FROM_FILE_SYSTEM_STRUCTURE(new QAction("Load from file-system structure", this)),
@@ -84,6 +86,8 @@ QMenuBar* PerformersManagerActions::GetMenuBar() const {
   fileMenu->addActions({LOAD_FROM_PJSON_PATH, LOAD_FROM_FILE_SYSTEM_STRUCTURE, LOAD_FROM_PERFORMERS_LIST});
   fileMenu->addSeparator();
   fileMenu->addActions({DUMP_ALL_RECORDS_INTO_PJSON_FILE, DUMP_SELECTED_RECORDS_INTO_PJSON_FILE});
+  fileMenu->addSeparator();
+  fileMenu->addActions({REFRESH_ALL_RECORDS_VIDS, REFRESH_SELECTED_RECORDS_VIDS});
   fileMenu->addSeparator();
   fileMenu->addAction(OPEN_WITH_LOCAL_APP);
   fileMenu->addSeparator();

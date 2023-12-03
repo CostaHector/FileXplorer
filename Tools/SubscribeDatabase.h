@@ -29,7 +29,6 @@ class SubscribeDatabase : public QObject {
   static auto GetSelectionByDriveClause(const QList<QAction*>& selectByDriveActs) -> QString;
 
   QTableView* view;
-  QWidget* contentPane;
   MyQSqlTableModel* dbModel;
   QLineEdit* sqlSearchLE;
   QString currentSearchColumnName;
@@ -53,34 +52,22 @@ class SubscribeDatabase : public QObject {
 
   auto subscribe() -> void;
 
-  auto onCountRow() -> int;
+  //  static auto onInitDataBase() -> bool;
 
-  static auto onInitDataBase() -> bool;
+  //  auto onInitATable() -> void;
 
-  auto onInitATable() -> void;
+  //  auto onDropATable() -> bool;
 
-  auto onDropATable() -> bool;
+  //  auto onDeleteFromTable(const QString& clause = "") -> bool;
+  //  auto on_DeleteByDrive() -> bool;
+  //  auto on_DeleteByPrepath() -> bool;
 
-  auto onDeleteFromTable(const QString& clause = "") -> bool;
-  auto on_DeleteByDrive() -> bool;
-  auto on_DeleteByPrepath() -> bool;
+  //  auto onInsertIntoTable() -> bool;
+  //  auto onSearchDataBase(const QString& searchText) -> bool;
+  //  auto onSelectBatch(const QAction* act) -> void;
 
-  auto onInsertIntoTable() -> bool;
-  auto onSearchDataBase(const QString& searchText) -> bool;
-  auto onSelectSingleDriver() -> void { this->onSearchDataBase(this->sqlSearchLE->text()); }
-  auto onSelectBatch(const QAction* act) -> void;
-  auto onShowOrCloseDatabase(const bool isVisible) -> void {
-    PreferenceSettings().setValue(MemoryKey::SHOW_DATABASE.name, isVisible);
-    switchStackWidget();
-  }
-
-  auto onShowOrHidePerformerManger(const bool isVisible) -> void {
-    PreferenceSettings().setValue(MemoryKey::SHOW_PERFORMERS_MANGER_DATABASE.name, isVisible);
-    if (!performerManger) {
-      performerManger = new PerformersManagerWidget(this->view);
-    }
-    performerManger->setVisible(isVisible);
-  }
+  inline auto onShowOrCloseDatabase(const bool isVisible) -> void;
+  inline auto onShowOrHidePerformerManger(const bool isVisible) -> void;
 };
 
 #endif  // SUBSCRIBEDATABASE_H

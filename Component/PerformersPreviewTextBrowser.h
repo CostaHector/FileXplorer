@@ -33,11 +33,10 @@ class PerformersPreviewTextBrowser : public QTextBrowser {
 
   QString dirPath;
   QStringList m_imgsLst;
-  QAction* m_PLAY_ACTION;
 
   static const QString HTML_IMG_TEMPLATE;
   static constexpr int HTML_IMG_FIXED_WIDTH = 600;
-
+  static const QString VID_LINK_TEMPLATE;
   static const QString PERFORMER_HTML_TEMPLATE;
   static const QRegExp IMG_VID_SEP_COMP;
 };

@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QLayout>
 #include <QString>
+#include <QSqlDatabase>
 
 class OSWalker_RETURN {
  public:
@@ -33,6 +34,6 @@ auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList
 auto ChooseCopyDestination(QString defaultPath, QWidget *parent=nullptr) -> QString;
 auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* oldAG) -> QString;
 
-#include <QSqlDatabase>
-auto GetSqlDB() -> QSqlDatabase;
+
+auto GetSqlVidsDB() -> QSqlDatabase;
 #endif  // PUBLICTOOL_H

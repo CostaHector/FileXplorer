@@ -44,12 +44,15 @@ PerformersManagerWidget::PerformersManagerWidget(QWidget* parent)
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, performerPreviewDoct);
 
   setMenuBar(g_performersManagerActions().m_menuBar);
-  m_performerTableMenu->addActions(
-      {g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM, g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE});
-  m_verticalHeaderMenu->addActions(g_performersManagerActions().VERTICAL_HEADER_AGS->actions());
-  m_horizontalHeaderMenu->addActions(g_performersManagerActions().HORIZONTAL_HEADER_AGS->actions());
+  m_performerTableMenu->addAction(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS);
+  m_performerTableMenu->addSeparator();
+  m_performerTableMenu->addAction(g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM);
+  m_performerTableMenu->addSeparator();
+  m_performerTableMenu->addAction(g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE);
   m_performerTableMenu->setToolTipsVisible(true);
+  m_verticalHeaderMenu->addActions(g_performersManagerActions().VERTICAL_HEADER_AGS->actions());
   m_verticalHeaderMenu->setToolTipsVisible(true);
+  m_horizontalHeaderMenu->addActions(g_performersManagerActions().HORIZONTAL_HEADER_AGS->actions());
   m_horizontalHeaderMenu->setToolTipsVisible(true);
 
   QSqlDatabase con = GetSqlDB();
@@ -135,6 +138,9 @@ void PerformersManagerWidget::subscribe() {
   connect(g_performersManagerActions().RESIZE_ROWS_TO_CONTENT, &QAction::triggered, this, &PerformersManagerWidget::onResizeRowToContents);
   connect(g_performersManagerActions().RESIZE_ROWS_DEFAULT_SECTION_SIZE, &QAction::triggered, this,
           &PerformersManagerWidget::onResizeRowDefaultSectionSize);
+
+  connect(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersManagerWidget::onForceRefreshRecordsVids);
+  connect(g_performersManagerActions().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersManagerWidget::onForceRefreshAllRecordsVids);
 }
 
 auto PerformersManagerWidget::closeEvent(QCloseEvent* event) -> void {
@@ -550,6 +556,68 @@ int PerformersManagerWidget::onDumpIntoPJsonFile() {
   return succeedCnt;
 }
 
+int PerformersManagerWidget::onForceRefreshAllRecordsVids() {
+  QMessageBox::information(this, QString("Oops function not support now"),
+                           QString("But you could selected all record(s) and then force refresh instead."));
+  return 0;
+}
+
+int PerformersManagerWidget::onForceRefreshRecordsVids() {
+  if (not m_performersListView->selectionModel()->hasSelection()) {
+    qDebug("Nothing was selected. Select some records to refresh");
+    QMessageBox::warning(this, "Nothing was selected", "Select some row to refresh");
+    return 0;
+  }
+  QSqlDatabase con = ::GetSqlVidsDB();
+  if (not con.isOpen()) {
+    qDebug("con cannot open [%s]");
+    return 0;
+  }
+
+  static const auto GetQueryClause = [](const QList<QStringList>& perfAkas) {
+    QStringList conditionGroup;
+    for (const QStringList& perfs : perfAkas) {
+      QStringList perfsOr;
+      for (const QString& perf : perfs) {
+        perfsOr << QString("%1 like \"%%%2%%\"").arg(DB_HEADER_KEY::Name, perf);
+      }
+      conditionGroup << perfsOr.join(" OR ");
+    }
+    const QString& searchText = conditionGroup.join(" AND ");
+    const QString search = QString("SELECT * from %1 where %2").arg(TABLE_NAME).arg(searchText);
+    return search;
+  };
+
+  QSqlQuery qur(con);
+  int recordsCnt = 0;
+  int vidsCnt = 0;
+  for (auto indr : m_performersListView->selectionModel()->selectedRows()) {
+    const int r = indr.row();
+    auto record = m_perfsDBModel->record(r);
+    const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
+    const QString& akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
+    QStringList searchName = {name};
+    if (not akas.isEmpty()) {
+      searchName += akas.split('\n');
+    }
+    const QString& search = GetQueryClause({searchName});
+
+    QStringList vidPath;
+    qur.exec(search);
+    while (qur.next()) {
+      vidPath << qur.value(DB_HEADER_KEY::DB_PREPATH_INDEX).toString() + '/' + qur.value(DB_HEADER_KEY::DB_NAME_INDEX).toString();
+    }
+    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidPath.join('\n'));
+    m_perfsDBModel->setRecord(r, record);  // update back
+
+    vidsCnt += vidPath.size();
+    ++recordsCnt;
+  }
+  qDebug("Selected %d record(s) updated %d vid(s).", recordsCnt, vidsCnt);
+  QMessageBox::information(this, QString("Selected %1 record(s) updated.").arg(recordsCnt), QString("%1 vid(s)").arg(vidsCnt));
+  return recordsCnt;
+}
+
 bool PerformersManagerWidget::onOpenRecordInFileSystem() const {
   if (not QDir(m_imageHostPath).exists()) {
     qDebug("m_imageHostPath [%s] not exists", m_imageHostPath.toStdString().c_str());
@@ -639,7 +707,7 @@ void PerformersManagerWidget::onResizeRowDefaultSectionSize() {
   PreferenceSettings().setValue(MemoryKey::PERFORMER_TABLE_DEFAULT_SECTION_SIZE.name, size);
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 int main(int argc, char* argv[]) {

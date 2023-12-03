@@ -66,6 +66,8 @@ class PerformersManagerWidget : public QMainWindow {
   int onLoadFromPJsonDirectory();
   int onDumpAllIntoPJsonFile();
   int onDumpIntoPJsonFile();
+  int onForceRefreshAllRecordsVids();
+  int onForceRefreshRecordsVids();
   bool onOpenRecordInFileSystem() const;
 
   QTableView* m_performersListView;

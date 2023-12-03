@@ -1,5 +1,6 @@
 #include "PerformersPreviewTextBrowser.h"
 #include "Actions/FileBasicOperationsActions.h"
+#include "PublicTool.h"
 #include "PublicVariable.h"
 #include "Tools/PerformerJsonFileHelper.h"
 
@@ -8,6 +9,7 @@
 #include <QIODevice>
 #include <QKeyEvent>
 #include <QSqlField>
+#include <QSqlQuery>
 #include <QTextStream>
 
 constexpr int PerformersPreviewTextBrowser::SHOW_IMGS_CNT_LIST[];
@@ -16,11 +18,12 @@ constexpr int PerformersPreviewTextBrowser::N_SHOW_IMGS_CNT_LIST;
 const QString PerformersPreviewTextBrowser::HTML_IMG_TEMPLATE = "<a href=\"file:///%1\"><img src=\"%1\" alt=\"%2\" width=\"%3\"></a><br/>\n";
 constexpr int PerformersPreviewTextBrowser::HTML_IMG_FIXED_WIDTH;
 
+const QString PerformersPreviewTextBrowser::VID_LINK_TEMPLATE = "<a href=\"file:///%1\">%1</a>";
+
 const QString PerformersPreviewTextBrowser::PERFORMER_HTML_TEMPLATE = TextReader(QFileInfo(":/PERFORMER_HTML_TEMPLATE").absoluteFilePath());
 const QRegExp PerformersPreviewTextBrowser::IMG_VID_SEP_COMP("\\||\r\n|\n");
 
-PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent)
-    : m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN->actions()[0]) {
+PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent) {
   setReadOnly(true);
   setOpenLinks(false);
   setOpenExternalLinks(true);
@@ -34,23 +37,30 @@ bool PerformersPreviewTextBrowser::operator()(const QSqlRecord& record, const QS
   const QString& tags = record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString();
   const QString& ori = record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString();
   const QString& imgs = record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString();
-  QString vids = record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString();
-  QString details = record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString();
-  vids.replace(IMG_VID_SEP_COMP, "<br/>");  // for display in html. don't mix toString().replace() together
+  const QString& vids = record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString();
+  QString details = record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString();  // for display in html. don't mix toString().replace() together
   details.replace(IMG_VID_SEP_COMP, "<br/>");
 
   m_imgsLst = InitImgsList(imgs);
 
+  QString vidsLinks;
+  for (const QString& vidPath : vids.split(IMG_VID_SEP_COMP)) {
+    vidsLinks += (VID_LINK_TEMPLATE.arg(vidPath) + "<br/>");
+  }
+
   dirPath = m_imageHostPath + '/' + ori + '/' + name;
   m_curImgCntIndex = 0;
   const QString& firstImgPath = m_imgsLst.isEmpty() ? "" : dirPath + '/' + m_imgsLst.front();
-  const QString& htmlSrc =
-      PERFORMER_HTML_TEMPLATE.arg(name).arg(firstImgPath).arg(m_performerImageHeight).arg(rates).arg(akas).arg(tags).arg(ori).arg(vids).arg(details);
+  const QString& htmlSrc = PERFORMER_HTML_TEMPLATE.arg(name)
+                               .arg(firstImgPath)
+                               .arg(m_performerImageHeight)
+                               .arg(rates)
+                               .arg(akas)
+                               .arg(tags)
+                               .arg(ori)
+                               .arg(vidsLinks)
+                               .arg(details);
   setHtml(htmlSrc);
-
-
-  // TODO:
-  // Update Videos List From Database
   return true;
 }
 
@@ -109,13 +119,6 @@ QString PerformersPreviewTextBrowser::nextImgsHTMLSrc() {
 bool PerformersPreviewTextBrowser::onAnchorClicked(const QUrl& url) {
   if (not url.isLocalFile()) {
     return false;
-  }
-  QFileInfo fi(url.toLocalFile());
-  if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + fi.suffix()) or fi.isDir()) {
-    if (m_PLAY_ACTION) {
-      emit m_PLAY_ACTION->triggered(false);
-    }
-    return true;
   }
   QDesktopServices::openUrl(url);
   return true;

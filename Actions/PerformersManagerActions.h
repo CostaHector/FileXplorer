@@ -1,16 +1,17 @@
 #ifndef PERFORMERSMANAGERACTIONS_H
 #define PERFORMERSMANAGERACTIONS_H
 
-#include <QObject>
 #include <QAction>
 #include <QMenuBar>
+#include <QObject>
 
-class PerformersManagerActions : public QObject
-{
+class PerformersManagerActions : public QObject {
   Q_OBJECT
  public:
-  explicit PerformersManagerActions(QObject *parent = nullptr);
+  explicit PerformersManagerActions(QObject* parent = nullptr);
 
+  QAction* REFRESH_ALL_RECORDS_VIDS;
+  QAction* REFRESH_SELECTED_RECORDS_VIDS;
   QAction* OPEN_RECORD_IN_FILE_SYSTEM;
 
   QAction* LOAD_FROM_PJSON_PATH;
@@ -45,6 +46,7 @@ class PerformersManagerActions : public QObject
   QAction* SHOW_PERFORMER_MANAGER;
 
   QMenuBar* m_menuBar;
+
  private:
   QMenuBar* GetMenuBar() const;
 
@@ -53,4 +55,4 @@ class PerformersManagerActions : public QObject
 
 PerformersManagerActions& g_performersManagerActions();
 
-#endif // PERFORMERSMANAGERACTIONS_H
+#endif  // PERFORMERSMANAGERACTIONS_H
