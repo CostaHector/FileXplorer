@@ -165,6 +165,8 @@
         <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
         <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
         <file alias="SHOW_DATABASE">Database/SHOW_DATABASE.svg</file>
+        <file alias="WHERE_CLAUSE_HISTORY">Database/WHERE_CLAUSE_HISTORY.svg</file>
+
         <file alias="ZIP">Share/ZIP.ico</file>
         <file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.svg</file>
         <file alias="MIRROR_REVERT">RenameConflictIcons/MIRROR_REVERT.svg</file>

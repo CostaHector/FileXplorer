@@ -503,9 +503,7 @@ void DatabasePanel::subscribe() {
     connect(DELETE_BY_PREPATH, &QAction::triggered, this, &DatabasePanel::on_DeleteByPrepath);
   }
 
-  {
-    connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &DatabasePanel::onQuickWhereClause);
-  }
+  { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &DatabasePanel::onQuickWhereClause); }
 }
 
 void DatabasePanel::onQuickWhereClause() {
@@ -514,8 +512,10 @@ void DatabasePanel::onQuickWhereClause() {
   if (retCode != QDialog::DialogCode::Accepted) {
     return;
   }
-  qDebug("Quick where clause: [%s]", qwc->m_whereLineEdit->text().toStdString().c_str());
-  m_searchLE->setText(qwc->m_whereLineEdit->text());
+  const QString& where = qwc->GetWhereString();
+  qDebug("Quick where clause: [%s]", where.toStdString().c_str());
+  m_searchLE->setText(where);
+  emit m_searchLE->returnPressed();
 }
 
 #include <QMainWindow>

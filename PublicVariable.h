@@ -198,6 +198,7 @@ const GVarStr DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
                                     {"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"});
 const GVarStr MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", {});
 const GVarStr COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", {});
+const GVarStr WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", {});
 
 const GVarInt MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, 0);
 const GVarInt AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN("AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN", 2);

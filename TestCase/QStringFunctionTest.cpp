@@ -63,6 +63,6 @@ void QStringFunctionTest::test_folderDirname() {
 }
 
 
-QTEST_MAIN(QStringFunctionTest)
+//QTEST_MAIN(QStringFunctionTest)
 
 #include "QStringFunctionTest.moc"

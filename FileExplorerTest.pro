@@ -10,6 +10,7 @@ TEMPLATE = app
 SOURCES += \
     Component/PerformersManager.cpp \
     Component/ProductionStudioManager.cpp \
+    Component/QuickWhereClause.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     TestCase/CatergorizerTest.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
     TestCase/PerformersManagerTest.cpp \
     TestCase/ProductionStudioManagerTest.cpp \
     TestCase/QStringFunctionTest.cpp \
+    TestCase/QuickWhereClauseTest.cpp \
     TestCase/RenameWidgetTest.cpp \
     TestCase/FileOperationTest.cpp \
     TestCase/UndoRedoTest.cpp \
@@ -30,6 +32,7 @@ SOURCES += \
 HEADERS += \
     Component/PerformersManager.h \
     Component/ProductionStudioManager.h \
+    Component/QuickWhereClause.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     Tools/Categorizer.h \
