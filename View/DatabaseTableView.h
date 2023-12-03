@@ -113,6 +113,8 @@ class DatabasePanel : public QWidget {
 
   void subscribe();
 
+  void onQuickWhereClause();
+
   QLineEdit* m_searchLE;
   QComboBox* m_searchCB;
   DatabaseTableView* m_dbView;

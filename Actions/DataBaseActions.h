@@ -18,6 +18,7 @@ class DataBaseActions : public QObject {
   QAction* DB_VIEW_CLOSE_SHOW;
   QActionGroup* DB_FUNCTIONS;
   QActionGroup* DB_RIGHT_CLICK_MENU_AG;
+  QAction* QUICK_WHERE_CLAUSE;
 
   explicit DataBaseActions(QObject* parent = nullptr)
       : QObject{parent},
@@ -26,7 +27,10 @@ class DataBaseActions : public QObject {
         DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),
         DB_VIEW_CLOSE_SHOW(Get_DB_VIEW_CLOSE_SHOW_Action()),
         DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()),
-        DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()) {}
+        DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()),
+        QUICK_WHERE_CLAUSE{new QAction(QIcon(":/themes/QUICK_WHERE_CLAUSE"), "Where clause", this)} {
+    QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
+  }
 
   auto Get_DRIVE_SEPERATE_SELECTION_AG() -> QActionGroup* {
     QSqlDatabase con;
@@ -119,15 +123,11 @@ class DataBaseActions : public QObject {
     QAction* COUNT = new QAction(QIcon(), "COUNT", this);
     COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
 
-    QAction* AVG = new QAction(QIcon(), "AVG", this);
-    AVG->setToolTip("SELECT AVG(COLUMN) FROM TABLE WHERE 1;");
-
     QAction* SUM = new QAction(QIcon(), "SUM", this);
     SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
 
     QActionGroup* databaseFunctionsAG = new QActionGroup(this);
     databaseFunctionsAG->addAction(COUNT);
-    databaseFunctionsAG->addAction(AVG);
     databaseFunctionsAG->addAction(SUM);
     databaseFunctionsAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
@@ -144,8 +144,7 @@ class DataBaseActions : public QObject {
     QAction* PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play Videos");
     PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
     PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
-    PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play videos")
-                                .arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
+    PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play videos").arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
 
     QAction* _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in Explorer");
     _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));

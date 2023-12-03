@@ -1,5 +1,6 @@
 #include "DatabaseTableView.h"
 
+#include "Component/QuickWhereClause.h"
 #include "Tools/PlayVideo.h"
 #include "View/ViewHelper.h"
 
@@ -78,8 +79,7 @@ void DatabaseTableView::subscribe() {
   {
     const QList<QAction*>& DB_FUNCTIONS_ACTIONS = g_dbAct().DB_FUNCTIONS->actions();
     QAction* COUNT = DB_FUNCTIONS_ACTIONS[0];
-    QAction* AVG = DB_FUNCTIONS_ACTIONS[1];
-    QAction* SUM = DB_FUNCTIONS_ACTIONS[2];
+    QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
     connect(COUNT, &QAction::triggered, this, &DatabaseTableView::onCountRow);
   }
 }
@@ -502,6 +502,20 @@ void DatabasePanel::subscribe() {
     connect(DELETE_BY_DRIVER, &QAction::triggered, this, &DatabasePanel::on_DeleteByDrive);
     connect(DELETE_BY_PREPATH, &QAction::triggered, this, &DatabasePanel::on_DeleteByPrepath);
   }
+
+  {
+    connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &DatabasePanel::onQuickWhereClause);
+  }
+}
+
+void DatabasePanel::onQuickWhereClause() {
+  auto* qwc = new QuickWhereClause(this);
+  auto retCode = qwc->exec();
+  if (retCode != QDialog::DialogCode::Accepted) {
+    return;
+  }
+  qDebug("Quick where clause: [%s]", qwc->m_whereLineEdit->text().toStdString().c_str());
+  m_searchLE->setText(qwc->m_whereLineEdit->text());
 }
 
 #include <QMainWindow>

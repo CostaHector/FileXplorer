@@ -3,6 +3,7 @@
         <file alias="APP_ICON_PATH">AppIcons/REVEAL_IN_EXPLORER.ico</file>
         <file alias="LE_PARSER_APP">AppIcons/LE_PARSER.ico</file>
         <file alias="PERFORMER_MANAGER">AppIcons/PERFORMER_MANAGER.svg</file>
+        <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
 
         <file alias="ITEMS_ORGANIZER.svg">Media/ITEMS_ORGANIZER.svg</file>
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>

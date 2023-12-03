@@ -31,6 +31,7 @@ SOURCES += \
     Component/PerformersPreviewTextBrowser.cpp \
     Component/PerformersWidget.cpp \
     Component/ProductionStudioManager.cpp \
+    Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
@@ -99,6 +100,7 @@ HEADERS += \
     Component/PerformersPreviewTextBrowser.h \
     Component/PerformersWidget.h \
     Component/ProductionStudioManager.h \
+    Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \

@@ -23,7 +23,7 @@ const QString PerformersPreviewTextBrowser::VID_LINK_TEMPLATE = "<a href=\"file:
 const QString PerformersPreviewTextBrowser::PERFORMER_HTML_TEMPLATE = TextReader(QFileInfo(":/PERFORMER_HTML_TEMPLATE").absoluteFilePath());
 const QRegExp PerformersPreviewTextBrowser::IMG_VID_SEP_COMP("\\||\r\n|\n");
 
-PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent) {
+PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent) : QTextBrowser(parent) {
   setReadOnly(true);
   setOpenLinks(false);
   setOpenExternalLinks(true);

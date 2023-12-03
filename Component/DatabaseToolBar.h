@@ -34,8 +34,12 @@ class DatabaseToolBar : public QToolBar {
 
   auto GetHideShowToolButton() -> QToolBar* {
     QToolBar* showHideDB = new QToolBar("show/hide Database view", this);
+    showHideDB->addAction(g_dbAct().QUICK_WHERE_CLAUSE);
+    showHideDB->addSeparator();
     showHideDB->addAction(g_dbAct().DB_VIEW_CLOSE_SHOW);
+    showHideDB->addSeparator();
     showHideDB->addAction(g_performersManagerActions().SHOW_PERFORMER_MANAGER);
+    showHideDB->addSeparator();
     showHideDB->setOrientation(Qt::Orientation::Horizontal);
     showHideDB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
     return showHideDB;
