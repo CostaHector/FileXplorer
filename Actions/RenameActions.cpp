@@ -1,12 +1,10 @@
 #include "RenameActions.h"
 
 RenameActions::RenameActions(QObject* parent) : QObject(parent), RENAME_RIBBONS(Get_Rename_Actions()), NAME_CASE(Get_CASE_Actions()) {
-  qDebug("constructor RENAME_RIBBONS[%d] NAME_CASE[%d]", RENAME_RIBBONS->actions().size(), NAME_CASE->actions().size());
 }
 
 RenameActions& g_renameAg() {
   static RenameActions renameActions;
-  qDebug("RENAME_RIBBONS[%d] NAME_CASE[%d]", renameActions.RENAME_RIBBONS->actions().size(), renameActions.NAME_CASE->actions().size());
   return renameActions;
 }
 

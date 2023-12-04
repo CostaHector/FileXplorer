@@ -16,7 +16,10 @@ class QuickWhereClause : public QDialog {
   QSize sizeHint() const override { return QSize(600, 200); }
   virtual void accept() override;
 
+  void onClauseSave();
   void onClauseChanged();
+  void onClauseClear();
+  void onAkaHint();
 
   static QString PlainLogicSentence2FuzzySqlWhere(const QString& tokens, const QString& keyName = DB_HEADER_KEY::Name);
   static QString PlainRelation2SqlWhere(const QString& plainText);
@@ -26,9 +29,14 @@ class QuickWhereClause : public QDialog {
  private:
   QAction* RESET_CONDITION;
   QAction* SAVE_WHERE;
-  QAction* CLEAR_ALL_WHERE;
-  QAction* SHOW_HISTORY;
   QToolButton* HIST_WHERE;
+  QAction* SHOW_HISTORY;
+  QAction* CLEAR_ALL_WHERE;
+  QAction* AKA_COMPLETER;
+  QAction* APPLY_AND_CLOSE;
+
+  QMenu* m_histMenu;
+
   QToolBar* m_helperTB;
   QLineEdit* m_name;
   QLineEdit* m_perf;
@@ -40,6 +48,9 @@ class QuickWhereClause : public QDialog {
   QStringList m_whereAndClause;
   QLineEdit* m_whereLineEdit;
   QDialogButtonBox* dbb;
+
+  static QHash<QString, QString> akaPerf;
+  static QHash<QString, QString> GetAkaPerf();
 };
 
 #endif  // QUICKWHERECLAUSE_H
