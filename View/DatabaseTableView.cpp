@@ -179,7 +179,11 @@ auto DatabaseTableView::on_PlayVideo() const -> bool {
 }
 
 DatabasePanel::DatabasePanel(QWidget* parent)
-    : QWidget(parent), m_searchLE(new QLineEdit), m_searchCB(new QComboBox), m_dbView(new DatabaseTableView) {
+    : QWidget(parent),
+      m_searchLE(new QLineEdit),
+      m_searchCB(new QComboBox),
+      m_dbView(new DatabaseTableView),
+      m_quickWhereClause{new QuickWhereClause(this)} {
   m_searchLE->setClearButtonEnabled(true);
   m_searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
   m_searchCB->setLineEdit(m_searchLE);
@@ -507,12 +511,11 @@ void DatabasePanel::subscribe() {
 }
 
 void DatabasePanel::onQuickWhereClause() {
-  auto* qwc = new QuickWhereClause(this);
-  auto retCode = qwc->exec();
+  auto retCode = m_quickWhereClause->exec();
   if (retCode != QDialog::DialogCode::Accepted) {
     return;
   }
-  const QString& where = qwc->GetWhereString();
+  const QString& where = m_quickWhereClause->GetWhereString();
   qDebug("Quick where clause: [%s]", where.toStdString().c_str());
   m_searchLE->setText(where);
   emit m_searchLE->returnPressed();

@@ -2,6 +2,7 @@
 #define DATABASETABLEVIEW_H
 
 #include "Component/DBRightClickMenu.h"
+#include "Component/QuickWhereClause.h"
 #include "MyQSqlTableModel.h"
 #include "PublicTool.h"
 
@@ -118,6 +119,8 @@ class DatabasePanel : public QWidget {
   QLineEdit* m_searchLE;
   QComboBox* m_searchCB;
   DatabaseTableView* m_dbView;
+
+  QuickWhereClause* m_quickWhereClause;
 };
 
 #endif  // DATABASETABLEVIEW_H
