@@ -86,11 +86,21 @@ class DatabaseTableView : public QTableView {
     QMessageBox::information(this, countCmd, QString("%1").arg(rowCnt));
     return rowCnt;
   }
+  bool ShowOrHideColumnCore();
+  bool onHideThisColumn();
+  bool onShowAllColumn();
+  void onStretchLastSection(const bool checked);
 
   MyQSqlTableModel* m_dbModel;
 
  private:
   DBRightClickMenu* m_vidsDBMenu;
+
+  QAction* SHOW_ALL_COLUMNS;
+  QAction* HIDE_THIS_COLUMN;
+  QAction* STRETCH_DETAIL_SECTION;
+  QMenu* m_horizontalHeaderMenu;
+  QString m_columnsShowSwitch;
 };
 
 class DatabasePanel : public QWidget {

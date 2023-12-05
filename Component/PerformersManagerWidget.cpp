@@ -644,12 +644,18 @@ bool PerformersManagerWidget::onOpenRecordInFileSystem() const {
 }
 
 bool PerformersManagerWidget::onHideThisColumn() {
-  if (not m_performersListView->currentIndex().isValid()) {
+  const int c = m_performersListView->currentIndex().column();
+  if (c < 0) {
     qDebug("No column selected. Select a column to hide");
     QMessageBox::warning(this, "No column selected", "Select a column to hide");
     return false;
   }
-  m_columnsShowSwitch[m_performersListView->currentIndex().column()] = '0';
+  if (m_columnsShowSwitch[c] == '0') {
+    qDebug("Column[%d] already hide. Select another column to hide", c);
+    QMessageBox::warning(this, QString("Column[%1] already hide").arg(c), "Select another column to hide");
+    return true;
+  }
+  m_columnsShowSwitch[c] = '0';
   return ShowOrHideColumnCore();
 }
 

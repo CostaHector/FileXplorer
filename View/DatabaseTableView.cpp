@@ -13,14 +13,20 @@
 #include <QProcess>
 #include <QStorageInfo>
 
-DatabaseTableView::DatabaseTableView() : m_dbModel(nullptr), m_vidsDBMenu(new DBRightClickMenu("Database Right click menu", this)) {
+DatabaseTableView::DatabaseTableView()
+    : m_dbModel(nullptr),
+      m_vidsDBMenu(new DBRightClickMenu("Database Right click menu", this)),
+      SHOW_ALL_COLUMNS(new QAction("show all columns", this)),
+      HIDE_THIS_COLUMN(new QAction("hide this column", this)),
+      STRETCH_DETAIL_SECTION(new QAction("stretch last column", this)),
+      m_horizontalHeaderMenu(new QMenu(this)),
+      m_columnsShowSwitch(PreferenceSettings().value(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, MemoryKey::VIDS_COLUMN_SHOW_SWITCH.v).toString()) {
   setContextMenuPolicy(Qt::CustomContextMenu);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::DragDropMode::NoDragDrop);
 
   QSqlDatabase con = GetSqlVidsDB();
-
   m_dbModel = new MyQSqlTableModel(this, con);
   if (con.tables().contains(TABLE_NAME)) {
     m_dbModel->setTable(TABLE_NAME);
@@ -29,6 +35,13 @@ DatabaseTableView::DatabaseTableView() : m_dbModel(nullptr), m_vidsDBMenu(new DB
   m_dbModel->select();
 
   this->setModel(m_dbModel);
+
+  STRETCH_DETAIL_SECTION->setCheckable(true);
+  STRETCH_DETAIL_SECTION->setChecked(
+      PreferenceSettings().value(MemoryKey::VIDS_STRETCH_LAST_SECTION.name, MemoryKey::VIDS_STRETCH_LAST_SECTION.v).toBool());
+
+  m_horizontalHeaderMenu->addActions({SHOW_ALL_COLUMNS, HIDE_THIS_COLUMN, STRETCH_DETAIL_SECTION});
+  m_horizontalHeaderMenu->setToolTipsVisible(true);
 
   this->InitViewSettings();
   subscribe();
@@ -45,11 +58,14 @@ auto DatabaseTableView::InitViewSettings() -> void {
   verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
   horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-  horizontalHeader()->setStretchLastSection(false);
   horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
+  horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
+  horizontalHeader()->setStretchLastSection(STRETCH_DETAIL_SECTION->isChecked());
 
   DatabaseTableView::SetViewColumnWidth();
   DatabaseTableView::UpdateItemViewFontSize();
+
+  ShowOrHideColumnCore();
 }
 
 auto DatabaseTableView::SetViewColumnWidth() -> void {
@@ -82,6 +98,48 @@ void DatabaseTableView::subscribe() {
     QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
     connect(COUNT, &QAction::triggered, this, &DatabaseTableView::onCountRow);
   }
+
+  connect(HIDE_THIS_COLUMN, &QAction::triggered, this, &DatabaseTableView::onHideThisColumn);
+  connect(SHOW_ALL_COLUMNS, &QAction::triggered, this, &DatabaseTableView::onShowAllColumn);
+  connect(STRETCH_DETAIL_SECTION, &QAction::triggered, this, &DatabaseTableView::onStretchLastSection);
+
+  connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this,
+          [this](const QPoint pnt) { m_horizontalHeaderMenu->popup(mapToGlobal(pnt)); });
+}
+
+bool DatabaseTableView::ShowOrHideColumnCore() {
+  const int headColumnCntMin = std::min({m_dbModel->columnCount(), DB_HEADER_KEY::DB_HEADER.size()});
+  for (int c = 0; c < headColumnCntMin; ++c) {
+    setColumnHidden(c, m_columnsShowSwitch[c] == '0');
+  }
+  PreferenceSettings().setValue(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, m_columnsShowSwitch);
+  return true;
+}
+
+bool DatabaseTableView::onHideThisColumn() {
+  const int c = currentIndex().column();
+  if (c < 0) {
+    qDebug("No column selected. Select a column to hide");
+    QMessageBox::warning(this, "No column selected", "Select a column to hide");
+    return false;
+  }
+  if (m_columnsShowSwitch[c] == '0') {
+    qDebug("Column[%d] already hide. Select another column to hide", c);
+    QMessageBox::warning(this, QString("Column[%1] already hide").arg(c), "Select another column to hide");
+    return true;
+  }
+  m_columnsShowSwitch[c] = '0';
+  return ShowOrHideColumnCore();
+}
+
+bool DatabaseTableView::onShowAllColumn() {
+  m_columnsShowSwitch.replace('0', '1');
+  return ShowOrHideColumnCore();
+}
+
+void DatabaseTableView::onStretchLastSection(const bool checked) {
+  horizontalHeader()->setStretchLastSection(checked);
+  PreferenceSettings().setValue(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, checked);
 }
 
 auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
