@@ -103,8 +103,10 @@ void DatabaseTableView::subscribe() {
   connect(SHOW_ALL_COLUMNS, &QAction::triggered, this, &DatabaseTableView::onShowAllColumn);
   connect(STRETCH_DETAIL_SECTION, &QAction::triggered, this, &DatabaseTableView::onStretchLastSection);
 
-  connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this,
-          [this](const QPoint pnt) { m_horizontalHeaderMenu->popup(mapToGlobal(pnt)); });
+  connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this, [this](const QPoint pnt) {
+    m_horizontalHeaderSectionClicked = horizontalHeader()->logicalIndexAt(pnt);
+    m_horizontalHeaderMenu->popup(mapToGlobal(pnt));
+  });
 }
 
 bool DatabaseTableView::ShowOrHideColumnCore() {
@@ -117,8 +119,8 @@ bool DatabaseTableView::ShowOrHideColumnCore() {
 }
 
 bool DatabaseTableView::onHideThisColumn() {
-  const int c = currentIndex().column();
-  if (c < 0) {
+  const int c = m_horizontalHeaderSectionClicked;
+  if (c < 0 or c >= m_columnsShowSwitch.size()) {
     qDebug("No column selected. Select a column to hide");
     QMessageBox::warning(this, "No column selected", "Select a column to hide");
     return false;

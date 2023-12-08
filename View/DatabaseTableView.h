@@ -100,6 +100,7 @@ class DatabaseTableView : public QTableView {
   QAction* HIDE_THIS_COLUMN;
   QAction* STRETCH_DETAIL_SECTION;
   QMenu* m_horizontalHeaderMenu;
+  int m_horizontalHeaderSectionClicked = -1;
   QString m_columnsShowSwitch;
 };
 

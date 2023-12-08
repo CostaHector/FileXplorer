@@ -126,8 +126,10 @@ void PerformersManagerWidget::subscribe() {
   connect(m_performersListView->verticalHeader(), &QHeaderView::customContextMenuRequested, this,
           [this](const QPoint pnt) { m_verticalHeaderMenu->popup(m_performersListView->mapToGlobal(pnt)); });
 
-  connect(m_performersListView->horizontalHeader(), &QHeaderView::customContextMenuRequested, this,
-          [this](const QPoint pnt) { m_horizontalHeaderMenu->popup(m_performersListView->mapToGlobal(pnt)); });
+  connect(m_performersListView->horizontalHeader(), &QHeaderView::customContextMenuRequested, this, [this](const QPoint pnt) {
+    m_horizontalHeaderSectionClicked = m_performersListView->horizontalHeader()->logicalIndexAt(pnt);
+    m_horizontalHeaderMenu->popup(m_performersListView->mapToGlobal(pnt));
+  });
 
   connect(g_performersManagerActions().DELETE_RECORDS, &QAction::triggered, this, &PerformersManagerWidget::onDeleteRecords);
 
@@ -644,8 +646,8 @@ bool PerformersManagerWidget::onOpenRecordInFileSystem() const {
 }
 
 bool PerformersManagerWidget::onHideThisColumn() {
-  const int c = m_performersListView->currentIndex().column();
-  if (c < 0) {
+  const int c = m_horizontalHeaderSectionClicked;
+  if (c < 0 or c >= m_columnsShowSwitch.size()) {
     qDebug("No column selected. Select a column to hide");
     QMessageBox::warning(this, "No column selected", "Select a column to hide");
     return false;
