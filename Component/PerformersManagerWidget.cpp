@@ -57,8 +57,8 @@ PerformersManagerWidget::PerformersManagerWidget(QWidget* parent)
 
   QSqlDatabase con = GetSqlDB();
   m_perfsDBModel = new RatingSqlTableModel(this, con);
-  if (con.tables().contains(PERFORMERS_TABLE_NAME)) {
-    m_perfsDBModel->setTable(PERFORMERS_TABLE_NAME);
+  if (con.tables().contains(DB_TABLE::PERFORMERS)) {
+    m_perfsDBModel->setTable(DB_TABLE::PERFORMERS);
   }
   m_perfsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 
@@ -191,20 +191,20 @@ void PerformersManagerWidget::onInitATable() {
     return;
   }
 
-  if (con.tables().contains(PERFORMERS_TABLE_NAME)) {
-    qDebug("Table[%s] already exists in database[%s]", PERFORMERS_TABLE_NAME.toStdString().c_str(), con.databaseName().toStdString().c_str());
+  if (con.tables().contains(DB_TABLE::PERFORMERS)) {
+    qDebug("Table[%s] already exists in database[%s]", DB_TABLE::PERFORMERS.toStdString().c_str(), con.databaseName().toStdString().c_str());
     return;
   }
 
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
-  const QString& createTableSQL = PerformerJsonFileHelper::CreatePerformerTableSQL(PERFORMERS_TABLE_NAME);
+  const QString& createTableSQL = PerformerJsonFileHelper::CreatePerformerTableSQL(DB_TABLE::PERFORMERS);
   QSqlQuery createTableQuery(con);
   const auto ret = createTableQuery.exec(createTableSQL);
   if (not ret) {
-    qDebug("Create table[%s] failed.", PERFORMERS_TABLE_NAME.toStdString().c_str());
+    qDebug("Create table[%s] failed.", DB_TABLE::PERFORMERS.toStdString().c_str());
     return;
   }
-  m_perfsDBModel->setTable(PERFORMERS_TABLE_NAME);
+  m_perfsDBModel->setTable(DB_TABLE::PERFORMERS);
   m_perfsDBModel->submitAll();
   qDebug("Table create succeed");
 }
@@ -215,8 +215,8 @@ bool PerformersManagerWidget::onInsertIntoTable() {
     qDebug("con cannot open");
     return false;
   }
-  if (not con.tables().contains(PERFORMERS_TABLE_NAME)) {
-    const QString& tablesNotExistsMsg = QString("Cannot insert, table[%1] not exist.").arg(PERFORMERS_TABLE_NAME);
+  if (not con.tables().contains(DB_TABLE::PERFORMERS)) {
+    const QString& tablesNotExistsMsg = QString("Cannot insert, table[%1] not exist.").arg(DB_TABLE::PERFORMERS);
     qDebug("Table [%s] not exists", tablesNotExistsMsg.toStdString().c_str());
     QMessageBox::warning(this, "Abort", tablesNotExistsMsg);
     return false;
@@ -226,7 +226,7 @@ bool PerformersManagerWidget::onInsertIntoTable() {
     QMessageBox::warning(this, "Name is Empty", "Name cannot be empty");
     return false;
   }
-  const QString& insertCmd = QString("INSERT INTO `%1` (%2) VALUES(\"%3\");").arg(PERFORMERS_TABLE_NAME, PERFORMER_DB_HEADER_KEY::Name, name);
+  const QString& insertCmd = QString("INSERT INTO `%1` (%2) VALUES(\"%3\");").arg(DB_TABLE::PERFORMERS, PERFORMER_DB_HEADER_KEY::Name, name);
   QSqlQuery insertTableQuery(con);
   const bool insertResult = insertTableQuery.exec(insertCmd);
   if (not insertResult) {
@@ -245,10 +245,10 @@ bool PerformersManagerWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelet
   QString sqlCmd;
   switch (dropOrDelete) {
     case DROP_OR_DELETE::DROP:
-      sqlCmd = QString("DROP TABLE `%1`;").arg(PERFORMERS_TABLE_NAME);
+      sqlCmd = QString("DROP TABLE `%1`;").arg(DB_TABLE::PERFORMERS);
       break;
     case DROP_OR_DELETE::DELETE:;
-      sqlCmd = QString("DELETE FROM `%1`;").arg(PERFORMERS_TABLE_NAME);
+      sqlCmd = QString("DELETE FROM `%1`;").arg(DB_TABLE::PERFORMERS);
       break;
     default:
       qDebug("invalid choice");
@@ -264,8 +264,8 @@ bool PerformersManagerWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelet
     qDebug("con cannot open");
     return false;
   }
-  if (not con.tables().contains(PERFORMERS_TABLE_NAME)) {
-    qDebug("Table[%s] not exists", PERFORMERS_TABLE_NAME.toStdString().c_str());
+  if (not con.tables().contains(DB_TABLE::PERFORMERS)) {
+    qDebug("Table[%s] not exists", DB_TABLE::PERFORMERS.toStdString().c_str());
     return true;
   }
 
@@ -292,7 +292,7 @@ int PerformersManagerWidget::onLoadFromFileSystemStructure() {
     return false;
   }
   const QString& insertTemplate = QString("INSERT INTO `%1` (%2,%3,%4) VALUES")
-                                      .arg(PERFORMERS_TABLE_NAME)
+                                      .arg(DB_TABLE::PERFORMERS)
                                       .arg(PERFORMER_DB_HEADER_KEY::Name)
                                       .arg(PERFORMER_DB_HEADER_KEY::Orientation)
                                       .arg(PERFORMER_DB_HEADER_KEY::Imgs) +
@@ -371,7 +371,7 @@ int PerformersManagerWidget::onLoadFromPerformersList() {
   }
 
   const QString& insertTemplate =
-      QString("INSERT INTO `%1` (%2,%3) VALUES").arg(PERFORMERS_TABLE_NAME).arg(PERFORMER_DB_HEADER_KEY::Name).arg(PERFORMER_DB_HEADER_KEY::AKA) +
+      QString("INSERT INTO `%1` (%2,%3) VALUES").arg(DB_TABLE::PERFORMERS).arg(PERFORMER_DB_HEADER_KEY::Name).arg(PERFORMER_DB_HEADER_KEY::AKA) +
       QString("(\"%1\", \"%2\") ON CONFLICT(%3) DO UPDATE SET %4 = \"%2\"");
 
   QSqlDatabase con = GetSqlDB();
@@ -491,7 +491,7 @@ int PerformersManagerWidget::onLoadFromPJsonDirectory() {
     while (it.hasNext()) {
       it.next();
       const QVariantHash& pJson = JsonFileHelper::MovieJsonLoader(it.filePath());
-      const QString& currentInsert = PerformerJsonFileHelper::PerformerInsertSQL(PERFORMERS_TABLE_NAME, pJson);
+      const QString& currentInsert = PerformerJsonFileHelper::PerformerInsertSQL(DB_TABLE::PERFORMERS, pJson);
       bool ret = insertTableQuery.exec(currentInsert);
       succeedCnt += ret;
       ++loadCnt;
@@ -586,7 +586,7 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
       conditionGroup << perfsOr.join(" OR ");
     }
     const QString& searchText = conditionGroup.join(" AND ");
-    const QString search = QString("SELECT * from %1 where %2").arg(TABLE_NAME).arg(searchText);
+    const QString search = QString("SELECT * from %1 where %2").arg(DB_TABLE::VIDS).arg(searchText);
     return search;
   };
 

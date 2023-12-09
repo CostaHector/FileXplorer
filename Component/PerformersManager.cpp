@@ -11,7 +11,7 @@ PerformersManager::PerformersManager() : m_performers(loadExistedPerformers()), 
 }
 
 QSet<QString> PerformersManager::loadExistedPerformers() {
-  QFile performersFi(":/PERFORMERS_TABLE");
+  QFile performersFi(SystemPath::PERFORMERS_TABLE_TXT);
   if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("file[%s] not found. loadExistedPerformers abort", performersFi.fileName().toStdString().c_str());
     return {};
@@ -56,7 +56,7 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   const int increCnt = int(m_performers.size()) - beforePerformersCnt;
   qDebug("Learn extra %d performers, now %u performers in total", increCnt, m_performers.size());
 
-  QFile performersFi(PROJECT_PATH + "/bin/PERFORMERS_TABLE.txt");
+  QFile performersFi(SystemPath::PERFORMERS_TABLE_TXT);
   if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qDebug("file cannot open. learned performers will not update to %s.", performersFi.fileName().toStdString().c_str());
   }

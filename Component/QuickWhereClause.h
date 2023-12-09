@@ -18,8 +18,6 @@ class QuickWhereClause : public QDialog {
 
   void onClauseSave();
   void onClauseChanged();
-  void onClauseClear();
-  void onAkaHint(const bool autoCompleteAkaSwitch);
 
   static QString PlainLogicSentence2FuzzySqlWhere(const QString& tokens,
                                                   const QString& keyName = DB_HEADER_KEY::Name,
@@ -30,17 +28,7 @@ class QuickWhereClause : public QDialog {
   QString GetWhereString() const { return m_whereLineEdit->text(); }
 
  private:
-  QAction* RESET_CONDITION;
-  QAction* SAVE_WHERE;
-  QToolButton* HIST_WHERE;
-  QAction* SHOW_HISTORY;
-  QAction* CLEAR_ALL_WHERE;
-  QAction* AUTO_COMPLETE_AKA_SWITCH;
-  QAction* APPLY_AND_CLOSE;
 
-  QMenu* m_histMenu;
-
-  QToolBar* m_helperTB;
   QLineEdit* m_name;
   QLineEdit* m_perf;
   QLineEdit* m_size;
@@ -54,7 +42,7 @@ class QuickWhereClause : public QDialog {
   QDialogButtonBox* dbb;
 
   static QHash<QString, QString> akaPerf;
-  static QHash<QString, QString> GetAkaPerf();
+  static int UpdateAKAHash(const bool isForce = false);
 };
 
 #endif  // QUICKWHERECLAUSE_H

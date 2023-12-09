@@ -190,8 +190,6 @@
     </qresource>
     <qresource prefix="/">
         <file alias="STANDARD_STUDIO_NAME_JSON">../bin/STANDARD_STUDIO_NAME_JSON.json</file>
-        <file alias="PERFORMERS_TABLE">../bin/PERFORMERS_TABLE.txt</file>
         <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>
-        <file alias="AKA_PERFORMERS">../bin/AKA_PERFORMERS.txt</file>
     </qresource>
 </RCC>

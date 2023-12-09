@@ -1,4 +1,4 @@
-#include "PerformersWidget.h"
+#include "PerformersListInputer.h"
 #include <QFile>
 #include <QFormLayout>
 #include <QHBoxLayout>
@@ -6,16 +6,13 @@
 #include <QPushButton>
 #include "Component/PerformersManager.h"
 #include "Tools/JsonFileHelper.h"
-PerformerLineEditor::PerformerLineEditor(QWidget* parent) : QLineEdit(parent) {
-  setCompleter(&PerformersManager::getIns().perfsCompleter);
-}
-
-PerformersWidget::PerformersWidget(QWidget* parent, Qt::WindowFlags f)
+PerformersListInputer::PerformersListInputer(QWidget* parent, Qt::WindowFlags f)
     : QDialog{parent, f},
-      m_onePerf(new PerformerLineEditor),
+      m_onePerf(new QLineEdit),
       m_perfsList(new QLineEdit),
       buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel)),
       p_dict(nullptr) {
+  m_onePerf->setCompleter(&PerformersManager::getIns().perfsCompleter);
   m_onePerf->addAction(QIcon(":/themes/RENAME_PERFORMERS"), QLineEdit::LeadingPosition);
   m_onePerf->setClearButtonEnabled(true);
   m_perfsList->setClearButtonEnabled(true);
@@ -31,7 +28,7 @@ PerformersWidget::PerformersWidget(QWidget* parent, Qt::WindowFlags f)
   setWindowTitle("mod performers");
 }
 
-bool PerformersWidget::appendAPerformer() {
+bool PerformersListInputer::appendAPerformer() {
   const QString& perf = m_onePerf->text().trimmed();
   if (perf.isEmpty()) {
     return true;
@@ -56,7 +53,7 @@ bool PerformersWidget::appendAPerformer() {
   return true;
 }
 
-void PerformersWidget::uniquePerformers() {
+void PerformersListInputer::uniquePerformers() {
   const QString& perfs = text();
   if (perfs.isEmpty()) {
     return;
@@ -66,7 +63,7 @@ void PerformersWidget::uniquePerformers() {
   m_perfsList->setText(perfL.join(", "));
 }
 
-bool PerformersWidget::submitPerformersListToJsonFile() {
+bool PerformersListInputer::submitPerformersListToJsonFile() {
   const QString& jsonFilePath = windowFilePath();
   if (not p_dict) {
     qDebug("Cannot submit. dict is nullptr");
@@ -81,7 +78,7 @@ bool PerformersWidget::submitPerformersListToJsonFile() {
   return JsonFileHelper::MovieJsonDumper(dict, jsonFilePath);
 }
 
-bool PerformersWidget::reloadPerformersFromJsonFile(const QString& jsonFilePath, QVariantHash& dict) {
+bool PerformersListInputer::reloadPerformersFromJsonFile(const QString& jsonFilePath, QVariantHash& dict) {
   p_dict = &dict;
   if (not QFile::exists(jsonFilePath)) {
     setWindowFilePath("");
@@ -104,14 +101,14 @@ bool PerformersWidget::reloadPerformersFromJsonFile(const QString& jsonFilePath,
   m_perfsList->setText(perfL.join(", "));
 }
 
-void PerformersWidget::subscribe() {
-  connect(m_onePerf, &QLineEdit::editingFinished, this, &PerformersWidget::appendAPerformer);
+void PerformersListInputer::subscribe() {
+  connect(m_onePerf, &QLineEdit::editingFinished, this, &PerformersListInputer::appendAPerformer);
   connect(buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, [this]() {
-    bool ret = PerformersWidget::submitPerformersListToJsonFile();
+    bool ret = PerformersListInputer::submitPerformersListToJsonFile();
     qDebug("Save mod performers result: %d", ret);
     hide();
   });
-  connect(buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &PerformersWidget::hide);
+  connect(buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &PerformersListInputer::hide);
 }
 
 // #define __NAME__EQ__MAIN__ 1
@@ -120,7 +117,7 @@ void PerformersWidget::subscribe() {
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
-  PerformersWidget pw;
+  PerformersListInputer pw;
   pw.show();
   a.exec();
   return 0;

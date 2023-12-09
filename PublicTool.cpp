@@ -184,7 +184,7 @@ auto GetSqlVidsDB() -> QSqlDatabase {
   } else {
     con = QSqlDatabase::addDatabase("QSQLITE", "custom_connection");
   }
-  con.setDatabaseName(SystemPath::FILE_INFO_DATABASE);
+  con.setDatabaseName(SystemPath::VIDS_DATABASE);
   if (not con.open()) {
     qDebug("%s", con.lastError().text().toStdString().c_str());
   }

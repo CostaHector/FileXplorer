@@ -39,7 +39,7 @@ class DataBaseActions : public QObject {
     } else {
       con = QSqlDatabase::addDatabase("QSQLITE", "custom_connection");
     }
-    con.setDatabaseName(SystemPath::FILE_INFO_DATABASE);
+    con.setDatabaseName(SystemPath::VIDS_DATABASE);
     con.open();
     if (not con.isOpen()) {
       qDebug("con cannot open");
@@ -48,7 +48,7 @@ class DataBaseActions : public QObject {
 
     QActionGroup* singleDriveSelectAG = new QActionGroup(this);
     QSqlQuery getDrivers(con);
-    getDrivers.exec(QString("SELECT DISTINCT Driver from %1;").arg(TABLE_NAME));
+    getDrivers.exec(QString("SELECT DISTINCT Driver from %1;").arg(DB_TABLE::VIDS));
     while (getDrivers.next()) {
       const QString& driveFullName = getDrivers.value("Driver").toString();
       QAction* action = new QAction(driveFullName, this);
@@ -84,19 +84,19 @@ class DataBaseActions : public QObject {
     INIT_A_DATABASE->setToolTip("CREATE DATABASE `DB_NAME`;");
 
     QAction* INIT_A_TABLE = new QAction(QIcon(":/themes/CREATE_TABLE"), "Create Table", this);
-    INIT_A_TABLE->setToolTip("CREATE TABLE IF NOT EXISTS `TABLE_NAME`(`COLUMN_NAME` TEXT NOT NULL, PRIMARY KEY (COLUMN_NAME));");
+    INIT_A_TABLE->setToolTip("CREATE TABLE IF NOT EXISTS `DB_TABLE::VIDS`(`COLUMN_NAME` TEXT NOT NULL, PRIMARY KEY (COLUMN_NAME));");
 
     QAction* DROP_A_DATABASE = new QAction(QIcon(":/themes/DROP_DATABASE"), "Drop Database", this);
     DROP_A_DATABASE->setToolTip("DROP DATABASE `DB_NAME`;");
 
     QAction* DROP_A_TABLE = new QAction(QIcon(":/themes/DROP_TABLE"), "Drop Table", this);
-    DROP_A_TABLE->setToolTip("DROP TABLE `TABLE_NAME`;");
+    DROP_A_TABLE->setToolTip("DROP TABLE `DB_TABLE::VIDS`;");
 
     QAction* INSERT_A_PATH = new QAction(QIcon(":/themes/INSERT_INTO_TABLE"), "Insert into", this);
-    INSERT_A_PATH->setToolTip("INSERT INTO `TABLE_NAME`(COLUMN_NAME) VALUES (VALUE);");
+    INSERT_A_PATH->setToolTip("INSERT INTO `DB_TABLE::VIDS`(COLUMN_NAME) VALUES (VALUE);");
 
     QAction* DELETE_FROM_TABLE = new QAction(QIcon(":/themes/DELETE_FROM_TABLE"), "Delete from", this);
-    DELETE_FROM_TABLE->setToolTip("DELETE FROM `TABLE_NAME` WHERE CLAUSE");
+    DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::VIDS` WHERE CLAUSE");
 
     QActionGroup* databaseControlAG = new QActionGroup(this);
     databaseControlAG->addAction(INSERT_A_PATH);

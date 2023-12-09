@@ -13,6 +13,7 @@ SOURCES += \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
     Actions/PerformersManagerActions.cpp \
+    Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
@@ -29,7 +30,7 @@ SOURCES += \
     Component/PerformersManager.cpp \
     Component/PerformersManagerWidget.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
-    Component/PerformersWidget.cpp \
+    Component/PerformersListInputer.cpp \
     Component/ProductionStudioManager.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
     Actions/PerformersManagerActions.h \
+    Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
@@ -98,7 +100,7 @@ HEADERS += \
     Component/PerformersManager.h \
     Component/PerformersManagerWidget.h \
     Component/PerformersPreviewTextBrowser.h \
-    Component/PerformersWidget.h \
+    Component/PerformersListInputer.h \
     Component/ProductionStudioManager.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
@@ -153,7 +155,6 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
-    bin/PERFORMERS_TABLE.txt \
     bin/PerformerHtmlTemplate.html \
     bin/STANDARD_STUDIO_NAME_JSON.json \
     readme.md

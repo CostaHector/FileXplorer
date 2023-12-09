@@ -7,16 +7,10 @@
 #include <QWidget>
 #include <QDialogButtonBox>
 
-class PerformerLineEditor : public QLineEdit {
+class PerformersListInputer : public QDialog {
   Q_OBJECT
  public:
-  explicit PerformerLineEditor(QWidget* parent = nullptr);
-};
-
-class PerformersWidget : public QDialog {
-  Q_OBJECT
- public:
-  explicit PerformersWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  explicit PerformersListInputer(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   QString text() const { return m_perfsList->text(); }
 
   bool appendAPerformer();
@@ -31,7 +25,7 @@ class PerformersWidget : public QDialog {
   }
 
  private:
-  PerformerLineEditor* m_onePerf;
+  QLineEdit* m_onePerf;
   QLineEdit* m_perfsList;
   QDialogButtonBox *buttonBox;
 

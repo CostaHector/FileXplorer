@@ -213,7 +213,6 @@ const GVarStr VIDS_COLUMN_SHOW_SWITCH("VIDS_COLUMN_SHOW_SWITCH", QString(20, '1'
 const GVarBool VIDS_STRETCH_LAST_SECTION("VIDS_STRETCH_LAST_SECTION", true);
 }  // namespace MemoryKey
 
-#include <QDir>
 namespace SystemPath {
 const QString drivePath = "";
 const QString desktopPath = QDir(QDir::homePath()).absoluteFilePath("Desktop");
@@ -223,12 +222,18 @@ const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
 const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
 const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
-const QString FILE_INFO_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FILE_INFO_DATABASE.db");
-const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("PERFORMERS_DATABASE.db");
-const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("PRODUCTION_STUDIOS_DATABASE.db");
+const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/VIDS_DATABASE.db");
+const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
+const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PRODUCTION_STUDIOS_DATABASE.db");
+const QString AKA_PERFORMERS_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/AKA_PERFORMERS.txt");
+const QString PERFORMERS_TABLE_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_TABLE.txt");
 }  // namespace SystemPath
-const QString TABLE_NAME = "movies_info";
-const QString PERFORMERS_TABLE_NAME = "PERFORMER_TABLE";
+
+namespace DB_TABLE {
+const QString VIDS = "movies_info";
+const QString PERFORMERS = "PERFORMER_TABLE";
+}  // namespace DB_TABLE
+
 extern const char* SUBMIT_BTN_STYLE;
 
 constexpr int TABS_ICON_IN_MENU_3x1 = 16;

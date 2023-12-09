@@ -84,7 +84,7 @@ class PerformersManagerWidget : public QMainWindow {
   int m_performerImageHeight;
   int m_defaultTableRowCount;
   QString m_columnsShowSwitch;
-
+  int m_horizontalHeaderSectionClicked = -1;
  private:
   bool ShowOrHideColumnCore();
 };
