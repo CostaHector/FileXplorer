@@ -1,6 +1,7 @@
 #include "PerformersManagerWidget.h"
 
 #include "Actions/PerformersManagerActions.h"
+#include "Component/QuickWhereClause.h"
 #include "Component/RatingSqlTableModel.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
@@ -18,6 +19,9 @@
 #include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlRecord>
+
+constexpr char PerformersManagerWidget::PERFS_VIDS_IMGS_SPLIT_CHAR;
+constexpr char PerformersManagerWidget::LOGIC_OR_CHAR;
 
 PerformersManagerWidget::PerformersManagerWidget(QWidget* parent)
     : QMainWindow{parent},
@@ -324,7 +328,7 @@ int PerformersManagerWidget::onLoadFromFileSystemStructure() {
     for (auto mpIt = name2Ori.cbegin(); mpIt != name2Ori.cend(); ++mpIt) {
       const QString& perf = mpIt.key();
       const QString& ori = mpIt.value();
-      const QString& imgs = name2Imgs[perf].join('\n');  // img seperated by \n
+      const QString& imgs = name2Imgs[perf].join(PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
       const QString& currentInsert = insertTemplate.arg(perf, ori, imgs);
       bool ret = insertTableQuery.exec(currentInsert);
       succeedCnt += ret;
@@ -357,7 +361,7 @@ int PerformersManagerWidget::onLoadFromPerformersList() {
     return 0;
   }
   QMap<QString, QString> perfs;
-  for (const QString& line : perfsText.split('\n')) {
+  for (const QString& line : perfsText.split(PERFS_VIDS_IMGS_SPLIT_CHAR)) {
     if (line.isEmpty()) {
       continue;
     }
@@ -570,24 +574,31 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
     QMessageBox::warning(this, "Nothing was selected", "Select some row to refresh");
     return 0;
   }
-  QSqlDatabase con = ::GetSqlVidsDB();
+  QSqlDatabase con = ::GetSqlVidsDB();  // videos table
   if (not con.isOpen()) {
-    qDebug("con cannot open [%s]");
+    qDebug("con cannot open [%s]", SystemPath::VIDS_DATABASE.toStdString().c_str());
     return 0;
   }
 
-  static const auto GetQueryClause = [](const QList<QStringList>& perfAkas) {
-    QStringList conditionGroup;
-    for (const QStringList& perfs : perfAkas) {
-      QStringList perfsOr;
-      for (const QString& perf : perfs) {
-        perfsOr << QString("%1 like \"%%%2%%\"").arg(DB_HEADER_KEY::Name, perf);
-      }
-      conditionGroup << perfsOr.join(" OR ");
+  static auto GetVidsListFromVidsTable = [](const QSqlRecord& record, QSqlQuery& qur) -> QStringList {
+    QString perfs = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
+    QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
+    if (not akas.isEmpty()) {
+      perfs += (LOGIC_OR_CHAR + akas.replace(PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR));
     }
-    const QString& searchText = conditionGroup.join(" AND ");
-    const QString search = QString("SELECT * from %1 where %2").arg(DB_TABLE::VIDS).arg(searchText);
-    return search;
+    const QString& whereClause = QuickWhereClause::PlainLogicSentence2FuzzySqlWhere(perfs, DB_HEADER_KEY::ForSearch, false);
+    // videos table
+    const QString& searchCommand = QString("SELECT `%1` from %2 where %3").arg(DB_HEADER_KEY::ForSearch, DB_TABLE::VIDS, whereClause);
+    bool ret = qur.exec(searchCommand);
+    if (not ret) {
+      qDebug("Failed when[%s]", searchCommand.toStdString().c_str());
+      return {};
+    }
+    QStringList vidPath;
+    while (qur.next()) {
+      vidPath << qur.value(DB_HEADER_KEY::ForSearch).toString();
+    }
+    return vidPath;
   };
 
   QSqlQuery qur(con);
@@ -596,23 +607,10 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
   for (auto indr : m_performersListView->selectionModel()->selectedRows()) {
     const int r = indr.row();
     auto record = m_perfsDBModel->record(r);
-    const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
-    const QString& akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
-    QStringList searchName = {name};
-    if (not akas.isEmpty()) {
-      searchName += akas.split('\n');
-    }
-    const QString& search = GetQueryClause({searchName});
-
-    QStringList vidPath;
-    qur.exec(search);
-    while (qur.next()) {
-      vidPath << qur.value(DB_HEADER_KEY::DB_PREPATH_INDEX).toString() + '/' + qur.value(DB_HEADER_KEY::DB_NAME_INDEX).toString();
-    }
-    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidPath.join('\n'));
+    const QStringList& vidsList = GetVidsListFromVidsTable(record, qur);
+    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(PERFS_VIDS_IMGS_SPLIT_CHAR));
     m_perfsDBModel->setRecord(r, record);  // update back
-
-    vidsCnt += vidPath.size();
+    vidsCnt += vidsList.size();
     ++recordsCnt;
   }
   qDebug("Selected %d record(s) updated %d vid(s).", recordsCnt, vidsCnt);

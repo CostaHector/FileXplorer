@@ -83,12 +83,15 @@ const QString Driver = "Driver";
 const QString Prepath = "Prepath";
 const QString Extra = "Extra";
 
-const QStringList DB_HEADER{Name, Size, Type, DateModified, Performers, Tags, Rate, Driver, Prepath, Extra};
+const QString ForSearch = "ForSearch";
+
+const QStringList DB_HEADER{Name, Size, Type, DateModified, Performers, Tags, Rate, Driver, Prepath, Extra, ForSearch};
 const int DB_DRIVER_INDEX = DB_HEADER.indexOf(Driver);
 const int DB_PREPATH_INDEX = DB_HEADER.indexOf(Prepath);
 const int DB_NAME_INDEX = DB_HEADER.indexOf(Name);
 const int DB_SIZE_COLUMN = DB_HEADER.indexOf(Size);
 const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
+const int DB_FOR_SEARCH_INDEX = DB_HEADER.indexOf(ForSearch);
 }  // namespace DB_HEADER_KEY
 
 namespace HEADERVIEW_SORT_INDICATOR_ORDER {
@@ -172,6 +175,7 @@ const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
 const GVarStrFolder PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "");
 const GVarStrFolder PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./");
 const GVarStrFolder PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./");
+const GVarStrFolder PATH_DB_INSERT_VIDS_FROM("PATH_DB_INSERT_VIDS_FROM", "./");
 
 const GVarBool AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false);
 const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
@@ -279,9 +283,9 @@ const QRegExp hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
 const QRegExp trailingHypenComp("-$");                      // delete it
 
 const QRegExp DISCRAD_LETTER_COMP("[^A-Zãáéíóúüñ¿,¡0-9._@# ']", Qt::CaseInsensitive);
-const QRegExp andComp(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
-const QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
-const QRegExp continousSpace("\\s+");
+const QRegExp AND_COMP(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
+const QRegExp RESOLUTION_COMP("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
+const QRegExp CONTINOUS_SPACE("\\s+");
 
 const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
 

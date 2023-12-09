@@ -36,7 +36,7 @@ class QuickWhereClause : public QDialog {
   QLineEdit* m_dateModified;
   QLineEdit* m_tags;
   QLineEdit* m_rate;
-  QLineEdit* m_prePath;
+  QLineEdit* m_forSearch;
   QStringList m_whereAndClause;
   QLineEdit* m_whereLineEdit;
   QDialogButtonBox* dbb;

@@ -288,19 +288,18 @@ void DatabasePanel::onInitATable() {
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
   const QString& createTableSQL = QString(
                                       "CREATE TABLE IF NOT EXISTS `%1`("
-                                      "   `%2` TEXT NOT NULL,"
-                                      "   `%3` INT,"
-                                      "   `%4` TEXT NOT NULL,"
-                                      "   `%5` TEXT,"
-                                      "   `%6` TEXT,"
-                                      "   `%7` TEXT,"
-                                      "   `%8` INT,"
-                                      "   `%9` TEXT,"
-                                      "   `%10` TEXT NOT NULL,"
-                                      "   `%11` TEXT,"
-                                      "    PRIMARY KEY (%9, %10, "
-                                      "                %2, %4,"
-                                      "                %6, %7)"
+                                      "   `%2` TEXT NOT NULL,"   // Name
+                                      "   `%3` INT DEFAULT 0,"   // Size
+                                      "   `%4` TEXT,"            // Type
+                                      "   `%5` TEXT,"            // DateModified
+                                      "   `%6` TEXT,"            // Performers
+                                      "   `%7` TEXT,"            // Tags
+                                      "   `%8` INT DEFAULT 0,"   // Rate
+                                      "   `%9` TEXT,"            // Driver
+                                      "   `%10` TEXT NOT NULL,"  // Prepath
+                                      "   `%11` TEXT,"           // Extra
+                                      "   `%12` TEXT NOT NULL,"  // ForSearch
+                                      "    PRIMARY KEY (%2, %10, %12)"
                                       "    );")
                                       .arg(DB_TABLE::VIDS)
                                       .arg(DB_HEADER_KEY::Name)
@@ -312,7 +311,8 @@ void DatabasePanel::onInitATable() {
                                       .arg(DB_HEADER_KEY::Rate)
                                       .arg(DB_HEADER_KEY::Driver)
                                       .arg(DB_HEADER_KEY::Prepath)
-                                      .arg(DB_HEADER_KEY::Extra);
+                                      .arg(DB_HEADER_KEY::Extra)
+                                      .arg(DB_HEADER_KEY::ForSearch);
   QSqlQuery createTableQuery(con);
   const auto ret = createTableQuery.exec(createTableSQL);
   if (not ret) {
@@ -439,45 +439,48 @@ bool DatabasePanel::onInsertIntoTable() {
     QMessageBox::warning(m_dbView, "Insert abort", tablesNotExistsMsg);
     return false;
   }
-
-  const QString& selectPath = QFileDialog::getExistingDirectory(m_dbView, "Choose a path");
+  const QString& selectPath = QFileDialog::getExistingDirectory(
+      m_dbView, "Choose a path",
+      PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString());
   if (selectPath.isEmpty()) {
     qDebug("Path[%s] is not directory", selectPath.toStdString().c_str());
     return false;
   }
-
-  if (QMessageBox::question(this, QString("Confirm? INSERT INTO %1 () VALUES ();").arg(DB_TABLE::VIDS), selectPath) != QMessageBox::StandardButton::Yes) {
-    qDebug("User cancel insert", selectPath.toStdString().c_str());
+  PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
+  if (QMessageBox::question(this, "Confirm?", QString("insert[%1] into table[%2]?").arg(selectPath, DB_TABLE::VIDS)) !=
+      QMessageBox::StandardButton::Yes) {
+    qDebug("User cancel insert[%s]", selectPath.toStdString().c_str());
     return true;
   }
+
+  const QString CURRENT_DRIVE_LETTER = QStorageInfo(selectPath).rootPath();
+
+  static const QString& insertTemplate = QString("REPLACE INTO `%1` (%2) VALUES").arg(DB_TABLE::VIDS).arg(DB_HEADER_KEY::DB_HEADER.join(',')) +
+                                         QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\", %7, \"%8\", \"%9\", \"%10\", \"%11\");");
 
   if (not con.transaction()) {
     qDebug() << "Failed to start transaction mode";
     return 0;
   }
-
-  static const QString& insertTemplate = QString("INSERT INTO `%1` (%2) VALUES").arg(DB_TABLE::VIDS).arg(DB_HEADER_KEY::DB_HEADER.join(',')) +
-                                         QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\", %7, \"%8\", \"%9\", \"%10\");");
+  QSqlQuery insertTableQuery(con);
 
   int totalItemCnt = 0;
   int succeedItemCnt = 0;
-  QSqlQuery insertTableQuery(con);
-
   QDirIterator it(selectPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  const QString CURRENT_DRIVE_LETTER = QStorageInfo(selectPath).rootPath();
   while (it.hasNext()) {
     it.next();
     const QFileInfo& fi = it.fileInfo();
     const QString& currentInsert = insertTemplate.arg(fi.fileName())
                                        .arg(fi.size())
                                        .arg(fi.suffix())
-                                       .arg(fi.lastModified().toString("yyyy-MM-dd HH:mm:ss.zzz"))
+                                       .arg(fi.lastModified().toString("yyyy/MM/dd HH:mm:ss"))
                                        .arg("")
                                        .arg("")
                                        .arg(0)
                                        .arg(CURRENT_DRIVE_LETTER)
                                        .arg(fi.absolutePath())
-                                       .arg("");
+                                       .arg("")
+                                       .arg(fi.absoluteFilePath());
     const bool insertResult = insertTableQuery.exec(currentInsert);
     succeedItemCnt += int(insertResult);
     if (not insertResult) {

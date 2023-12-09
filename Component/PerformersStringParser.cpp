@@ -1,16 +1,16 @@
-#include "PerformersManager.h"
+#include "PerformersStringParser.h"
 #include "PublicVariable.h"
 #include "Tools/JsonFileHelper.h"
 
 #include <QDir>
 #include <QDirIterator>
 
-PerformersManager::PerformersManager() : m_performers(loadExistedPerformers()), perfsCompleter(m_performers.values()) {
+PerformersStringParser::PerformersStringParser() : m_performers(loadExistedPerformers()), perfsCompleter(m_performers.values()) {
   perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
   perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
 }
 
-QSet<QString> PerformersManager::loadExistedPerformers() {
+QSet<QString> PerformersStringParser::loadExistedPerformers() {
   QFile performersFi(SystemPath::PERFORMERS_TABLE_TXT);
   if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("file[%s] not found. loadExistedPerformers abort", performersFi.fileName().toStdString().c_str());
@@ -30,7 +30,7 @@ QSet<QString> PerformersManager::loadExistedPerformers() {
   return st;
 }
 
-int PerformersManager::LearningFromAPath(const QString& path) {
+int PerformersStringParser::LearningFromAPath(const QString& path) {
   if (not QDir(path).exists()) {
     return 0;
   }
@@ -41,10 +41,10 @@ int PerformersManager::LearningFromAPath(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    if (not dict.contains("Performers")) {
+    if (not dict.contains(DB_HEADER_KEY::Performers)) {
       continue;
     }
-    const QVariant& v = dict["Performers"];
+    const QVariant& v = dict[DB_HEADER_KEY::Performers];
     for (const QString& performer : v.toStringList()) {
       if (performer.isEmpty() or m_performers.contains(performer)) {
         continue;
@@ -67,44 +67,43 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   return increCnt;
 }
 
-PerformersManager& PerformersManager::getIns() {
-  static PerformersManager ins;
+PerformersStringParser& PerformersStringParser::getIns() {
+  static PerformersStringParser ins;
   qDebug("PerformersManager::getIns()");
   return ins;
 }
 
-QStringList PerformersManager::MovieNameWordsSplit(QString sentence) const {
+QStringList PerformersStringParser::SplitSentence(QString sentence) {
   if (sentence.isEmpty()) {
     return {};
   }
   using namespace JSON_RENAME_REGEX;
   sentence.replace(DISCRAD_LETTER_COMP, " ");
-  sentence.replace(andComp, " & ");
-  sentence.replace(resolutionComp, "");
-  return sentence.split(continousSpace);
+  sentence.replace(AND_COMP, " & ");
+  sentence.remove(RESOLUTION_COMP);
+  return sentence.split(CONTINOUS_SPACE);
 }
 
-QStringList PerformersManager::PeformersFilterOut(const QStringList& words) const {
+auto PerformersStringParser::RmvBelongLetter(const QString& word) -> QString {
+  QString s = word.trimmed();
+  if (s.endsWith("'s")) {
+    s.chop(2);
+  } else if (s.endsWith("'")) {
+    s.chop(1);
+  }
+  return s;
+};
+
+QStringList PerformersStringParser::FilterPerformersOut(const QStringList& words) const {
   if (words.isEmpty()) {
     return {};
   }
   QStringList performersList;
   int i = 0;
   const int N = words.size();
-
-  static const auto rmvBelong = [](const QString& word) -> QString {
-    QString s = word.trimmed();
-    if (s.endsWith("'s")) {
-      s.chop(2);
-    } else if (s.endsWith("'")) {
-      s.chop(1);
-    }
-    return s;
-  };
-
   while (i < N) {
     if (i < N - 2) {
-      const QString& w3 = words[i] + " " + words[i + 1] + " " + rmvBelong(words[i + 2]);
+      const QString& w3 = words[i] + " " + words[i + 1] + " " + RmvBelongLetter(words[i + 2]);
       if (m_performers.contains(w3.toLower())) {
         if (not performersList.contains(w3))
           performersList.append(w3);
@@ -113,7 +112,7 @@ QStringList PerformersManager::PeformersFilterOut(const QStringList& words) cons
       }
     }
     if (i < N - 1) {
-      const QString& w2 = words[i] + " " + rmvBelong(words[i + 1]);
+      const QString& w2 = words[i] + " " + RmvBelongLetter(words[i + 1]);
       if (m_performers.contains(w2.toLower())) {
         if (not performersList.contains(w2)) {
           performersList.append(w2);
@@ -122,7 +121,7 @@ QStringList PerformersManager::PeformersFilterOut(const QStringList& words) cons
         continue;
       }
     }
-    const QString& w1 = rmvBelong(words[i]);
+    const QString& w1 = RmvBelongLetter(words[i]);
     if (not w1.isEmpty() and m_performers.contains(w1.toLower())) {
       if (not performersList.contains(w1))
         performersList.append(w1);
@@ -135,15 +134,15 @@ QStringList PerformersManager::PeformersFilterOut(const QStringList& words) cons
   return performersList;
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 
 int main(int argc, char* argv[]) {
-  auto& performersIns = PerformersManager::getIns();
+  auto& performersIns = PerformersStringParser::getIns();
   //  performersIns.LearningFromAPath("E:/115/test");
   const auto& wordsList =
-      performersIns.MovieNameWordsSplit("Next Door Originals - Rivals Waiter vs Waiter - Theo Brady & Devin Franco flip-fuck BB 1080p");
-  const auto& perfsList = performersIns.PeformersFilterOut(wordsList);
+      performersIns.SplitSentence("Next Door Originals - Rivals Waiter vs Waiter - Theo Brady & Devin Franco flip-fuck BB 1080p");
+  const auto& perfsList = performersIns.FilterPerformersOut(wordsList);
   qDebug() << perfsList;
   return 0;
 }

@@ -1,7 +1,6 @@
 #include "SubscribeDatabase.h"
 #include "Actions/DataBaseActions.h"
 #include "Actions/PerformersManagerActions.h"
-#include "PublicTool.h"
 #include "PublicVariable.h"
 
 #include <QAbstractItemView>

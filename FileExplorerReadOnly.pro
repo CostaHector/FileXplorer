@@ -28,9 +28,9 @@ SOURCES += \
     Component/DatabaseToolBar.cpp \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
-    Component/PerformersManager.cpp \
     Component/PerformersManagerWidget.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
+    Component/PerformersStringParser.cpp \
     Component/ProductionStudioManager.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
@@ -98,9 +98,9 @@ HEADERS += \
     Component/DatabaseToolBar.h \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
-    Component/PerformersManager.h \
     Component/PerformersManagerWidget.h \
     Component/PerformersPreviewTextBrowser.h \
+    Component/PerformersStringParser.h \
     Component/ProductionStudioManager.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \

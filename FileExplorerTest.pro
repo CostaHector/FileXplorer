@@ -9,7 +9,7 @@ TEMPLATE = app
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
-    Component/PerformersManager.cpp \
+    Component/PerformersStringParser.cpp \
     Component/ProductionStudioManager.cpp \
     Component/QuickWhereClause.cpp \
     FileOperation/FileOperation.cpp \
@@ -18,7 +18,7 @@ SOURCES += \
     TestCase/CatergorizerTest.cpp \
     TestCase/FilesNameBatchStandardizerTest.cpp \
     TestCase/MovieNameStandardizerTest.cpp \
-    TestCase/PerformersManagerTest.cpp \
+    TestCase/PerformersStringParserTest.cpp \
     TestCase/ProductionStudioManagerTest.cpp \
     TestCase/QStringFunctionTest.cpp \
     TestCase/QuickWhereClauseTest.cpp \
@@ -33,7 +33,7 @@ SOURCES += \
 
 HEADERS += \
     Actions/QuickWhereActions.h \
-    Component/PerformersManager.h \
+    Component/PerformersStringParser.h \
     Component/ProductionStudioManager.h \
     Component/QuickWhereClause.h \
     FileOperation/FileOperation.h \

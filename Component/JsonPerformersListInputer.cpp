@@ -4,7 +4,7 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QPushButton>
-#include "Component/PerformersManager.h"
+#include "Component/PerformersStringParser.h"
 #include "Tools/JsonFileHelper.h"
 JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)
     : QDialog{parent, f},
@@ -12,7 +12,7 @@ JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::Window
       m_perfsList(new QLineEdit),
       buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel)),
       p_dict(nullptr) {
-  m_onePerf->setCompleter(&PerformersManager::getIns().perfsCompleter);
+  m_onePerf->setCompleter(&PerformersStringParser::getIns().perfsCompleter);
   m_onePerf->addAction(QIcon(":/themes/RENAME_PERFORMERS"), QLineEdit::LeadingPosition);
   m_onePerf->setClearButtonEnabled(true);
   m_perfsList->setClearButtonEnabled(true);
@@ -89,7 +89,7 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
   if (not dict.contains(JSONKey::Performers)) {
     return false;
   }
-  static PerformersManager& pm = PerformersManager::getIns();
+  static PerformersStringParser& pm = PerformersStringParser::getIns();
   QStringList perfL = dict[JSONKey::Performers].toStringList();
   if (perfL.isEmpty()) {
     if (dict.contains(JSONKey::Name)) {

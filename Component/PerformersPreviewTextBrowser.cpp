@@ -18,7 +18,7 @@ constexpr int PerformersPreviewTextBrowser::N_SHOW_IMGS_CNT_LIST;
 const QString PerformersPreviewTextBrowser::HTML_IMG_TEMPLATE = "<a href=\"file:///%1\"><img src=\"%1\" alt=\"%2\" width=\"%3\"></a><br/>\n";
 constexpr int PerformersPreviewTextBrowser::HTML_IMG_FIXED_WIDTH;
 
-const QString PerformersPreviewTextBrowser::VID_LINK_TEMPLATE = "<a href=\"file:///%1\">%1</a>";
+const QString PerformersPreviewTextBrowser::VID_LINK_TEMPLATE = "<a href=\"file:///%1\">&#9654;%1</a>";
 
 const QString PerformersPreviewTextBrowser::PERFORMER_HTML_TEMPLATE = TextReader(QFileInfo(":/PERFORMER_HTML_TEMPLATE").absoluteFilePath());
 const QRegExp PerformersPreviewTextBrowser::IMG_VID_SEP_COMP("\\||\r\n|\n");
@@ -44,8 +44,10 @@ bool PerformersPreviewTextBrowser::operator()(const QSqlRecord& record, const QS
   m_imgsLst = InitImgsList(imgs);
 
   QString vidsLinks;
-  for (const QString& vidPath : vids.split(IMG_VID_SEP_COMP)) {
-    vidsLinks += (VID_LINK_TEMPLATE.arg(vidPath) + "<br/>");
+  if (not vids.isEmpty()) {
+    for (const QString& vidPath : vids.split(IMG_VID_SEP_COMP)) {
+      vidsLinks += (VID_LINK_TEMPLATE.arg(vidPath) + "<br/>");
+    }
   }
 
   dirPath = m_imageHostPath + '/' + ori + '/' + name;
@@ -67,7 +69,6 @@ bool PerformersPreviewTextBrowser::operator()(const QSqlRecord& record, const QS
 void PerformersPreviewTextBrowser::subscribe() {
   connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &PerformersPreviewTextBrowser::ShowRemainImages);
   //  connect(this->verticalScrollBar(), &QScrollBar::actionTriggered, this, &PerformersPreviewTextBrowser::onVerticalScrollBarAction);
-
   connect(this, &QTextBrowser::anchorClicked, this, &PerformersPreviewTextBrowser::onAnchorClicked);
 }
 

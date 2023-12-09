@@ -1,7 +1,7 @@
 #include "JsonEditor.h"
 #include "Actions/JsonEditorActions.h"
 #include "Actions/QuickWhereActions.h"
-#include "Component/PerformersManager.h"
+#include "Component/PerformersStringParser.h"
 #include "Component/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 
@@ -120,8 +120,8 @@ void JsonEditor::autoNext() {
     if (dict.isEmpty()) {
       continue;
     }
-    qDebug("len(performers)=%d, [%s]", dict["Performers"].toJsonArray().size(), curJsonPath.toStdString().c_str());
-    if ((dict["Performers"].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
+    qDebug("len(performers)=%d, [%s]", dict[DB_HEADER_KEY::Performers].toJsonArray().size(), curJsonPath.toStdString().c_str());
+    if ((dict[DB_HEADER_KEY::Performers].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
       jsonListPanel->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
       jsonListPanel->setCurrentRow(curRow);
       return;
@@ -435,7 +435,7 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
 
-  static PerformersManager& pm = PerformersManager::getIns();
+  static PerformersStringParser& pm = PerformersStringParser::getIns();
   const int newLearnedCnt = pm.LearningFromAPath(loadFromFi.absoluteFilePath());
 
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
@@ -449,7 +449,7 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
 }
 
 QStringList JsonEditor::onPerformersHint() {
-  static PerformersManager& pm = PerformersManager::getIns();
+  static PerformersStringParser& pm = PerformersStringParser::getIns();
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
 
   QString nameText;
@@ -490,7 +490,7 @@ QStringList JsonEditor::onPerformersHint() {
 }
 
 bool JsonEditor::onSelectedTextAppendToPerformers() {
-  static PerformersManager& pm = PerformersManager::getIns();
+  static PerformersStringParser& pm = PerformersStringParser::getIns();
 
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
     jsonKeySetMet.insert(JSONKey::Performers);

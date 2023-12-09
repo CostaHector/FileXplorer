@@ -29,43 +29,15 @@ class SubscribeDatabase : public QObject {
   static auto GetSelectionByDriveClause(const QList<QAction*>& selectByDriveActs) -> QString;
 
   QTableView* view;
-  MyQSqlTableModel* dbModel;
-  QLineEdit* sqlSearchLE;
-  QString currentSearchColumnName;
   T_SwitchStackWidget switchStackWidget;
   QWidget* performerManger;
 
-  explicit SubscribeDatabase(QTableView* view_,
-                             MyQSqlTableModel* dbModel_,
-                             QLineEdit* sqlSearchLE_,
-                             T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget(),
-                             QWidget* performerManger_ = nullptr)
-      : QObject(),
-        view(view_),
-        dbModel(dbModel_),
-        sqlSearchLE(sqlSearchLE_),
-        currentSearchColumnName("Name"),
-        switchStackWidget(switchStackWidget_),
-        performerManger(performerManger_) {
+  explicit SubscribeDatabase(QTableView* view_, T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget(), QWidget* performerManger_ = nullptr)
+      : QObject(), view(view_), switchStackWidget(switchStackWidget_), performerManger(performerManger_) {
     this->subscribe();
   }
 
   auto subscribe() -> void;
-
-  //  static auto onInitDataBase() -> bool;
-
-  //  auto onInitATable() -> void;
-
-  //  auto onDropATable() -> bool;
-
-  //  auto onDeleteFromTable(const QString& clause = "") -> bool;
-  //  auto on_DeleteByDrive() -> bool;
-  //  auto on_DeleteByPrepath() -> bool;
-
-  //  auto onInsertIntoTable() -> bool;
-  //  auto onSearchDataBase(const QString& searchText) -> bool;
-  //  auto onSelectBatch(const QAction* act) -> void;
-
   inline auto onShowOrCloseDatabase(const bool isVisible) -> void;
   inline auto onShowOrHidePerformerManger(const bool isVisible) -> void;
 };
