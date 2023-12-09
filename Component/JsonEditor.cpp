@@ -1,5 +1,6 @@
 #include "JsonEditor.h"
 #include "Actions/JsonEditorActions.h"
+#include "Actions/QuickWhereActions.h"
 #include "Component/PerformersManager.h"
 #include "Component/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
@@ -32,6 +33,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   tb->addSeparator();
   tb->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
   tb->addAction(g_jsonEditorActions()._HINT);
+  tb->addAction(g_quickWhereAg().OPEN_AKA_TEXT);
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, tb);
 
