@@ -22,6 +22,7 @@ class JsonEditorActions : public QObject {
   QAction* _LOWER_ALL_WORDS;
   QAction* _FORMATTER;
   QAction* _RELOAD_JSON_FROM_FROM_DISK;
+  QAction* _ADD_SELECTED_PERFORMER;
   QAction* _SAVE;
   QAction* _CANCEL;
   QAction* _SUBMIT;

@@ -16,6 +16,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/NAME_STR_CASE_LOWER_PATH"), "lowercase", this)),
       _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), "Format", this)),
       _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "From Disk", this)),
+      _ADD_SELECTED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), "Add", this)),
       _SAVE(new QAction(QIcon(":/themes/SAVED"), "save", this)),
       _CANCEL(new QAction(QIcon(":/themes/NOT_SAVED"), "cancel", this)),
       _SUBMIT(new QAction(QIcon(":/themes/SUBMIT"), "submit", this)),
@@ -48,6 +49,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _SUBMIT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_S));
   _SUBMIT->setToolTip(
       QString("<b>%1 (%2)</b><br/> (CANNOT RECOVER!) Submit all staged changes").arg(_SUBMIT->text()).arg(_SUBMIT->shortcut().toString()));
+
+  _ADD_SELECTED_PERFORMER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
+  _ADD_SELECTED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Add selected text to performer").arg(_ADD_SELECTED_PERFORMER->text()).arg(_ADD_SELECTED_PERFORMER->shortcut().toString()));
 
   _SAVE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
   _SAVE->setToolTip(QString("<b>%1 (%2)</b><br/> Stage current changes").arg(_SAVE->text()).arg(_SAVE->shortcut().toString()));
@@ -93,6 +97,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   EDIT_ACTIONS->addAction(_CANCEL);
   EDIT_ACTIONS->addAction(_FORMATTER);
   EDIT_ACTIONS->addAction(_RELOAD_JSON_FROM_FROM_DISK);
+  EDIT_ACTIONS->addAction(_ADD_SELECTED_PERFORMER);
   EDIT_ACTIONS->addAction(_SUBMIT);
   EDIT_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 

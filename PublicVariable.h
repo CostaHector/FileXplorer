@@ -278,7 +278,7 @@ const QRegExp continousHypenComp("--+");                       //-
 const QRegExp hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
 const QRegExp trailingHypenComp("-$");                      // delete it
 
-const QRegExp keepComp("[^A-Z0-9._@# ']", Qt::CaseInsensitive);
+const QRegExp DISCRAD_LETTER_COMP("[^A-Zãáéíóúüñ¿,¡0-9._@# ']", Qt::CaseInsensitive);
 const QRegExp andComp(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
 const QRegExp resolutionComp("1080p|720p|480p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
 const QRegExp continousSpace("\\s+");

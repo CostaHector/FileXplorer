@@ -60,6 +60,6 @@ void QuickWhereClauseTest::SearchThreePerfsABC() {
   QCOMPARE(whereClause, "((Name like \"%A%\" AND Name like \"%B%\") AND Name like \"%C%\")");
 }
 
-QTEST_MAIN(QuickWhereClauseTest)
+//QTEST_MAIN(QuickWhereClauseTest)
 
 #include "QuickWhereClauseTest.moc"

@@ -58,7 +58,7 @@ auto ProductionStudioManager::operator()(QString sentence) const -> QString {
   sentence.replace(nonLeadingBracketComp, "-");
 
   QString prodStudioSection = sentence.split("-")[0];
-  QString noInvalidStr = prodStudioSection.remove(keepComp);
+  QString noInvalidStr = prodStudioSection.remove(DISCRAD_LETTER_COMP);
   const QString& inputStr = noInvalidStr.trimmed();
   return this->operator[](inputStr);
 }

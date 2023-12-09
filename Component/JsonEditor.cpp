@@ -11,6 +11,7 @@
 #include <QInputDialog>
 #include <QTableWidgetItem>
 #include <QToolBar>
+#include <QTextDocumentFragment>
 
 const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [%1/%2]";
 const QColor JsonEditor::MEET_CONDITION_COLOR(150, 150, 150);
@@ -239,6 +240,8 @@ void JsonEditor::subscribe() {
     }
   });
 
+  connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
+
   connect(g_jsonEditorActions()._SELECT_A_FOLDER_AND_LOAD_JSON, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
   connect(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
 
@@ -365,7 +368,7 @@ auto JsonEditor::onLowercaseEachWord() -> void {
       if (not detailEditWidget->textCursor().hasSelection()) {
         continue;
       }
-      const QString& before = detailEditWidget->textCursor().selectedText();
+      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
       detailEditWidget->textCursor().removeSelectedText();
       const QString& after = lowercaseSentense(before);
       detailEditWidget->textCursor().insertText(after);
@@ -402,7 +405,7 @@ auto JsonEditor::onCapitalizeEachWord() -> void {
       if (not detailEditWidget->textCursor().hasSelection()) {
         continue;
       }
-      const QString& before = detailEditWidget->textCursor().selectedText();
+      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
       detailEditWidget->textCursor().removeSelectedText();
       const QString& after = capitalizeEachWord(before);
       detailEditWidget->textCursor().insertText(after);
@@ -450,16 +453,15 @@ QStringList JsonEditor::onPerformersHint() {
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
 
   QString nameText;
-
   QString sentence;
   if (jsonKeySetMet.contains(JSONKey::Name)) {
     nameText = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name])->text();
     sentence += nameText;
   }
   if (jsonKeySetMet.contains(JSONKey::Detail)) {
-    const auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+    auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
     if (te->textCursor().hasSelection()) {
-      sentence += " " + te->textCursor().selectedText();
+      sentence += " " + te->textCursor().selection().toPlainText();
     }
   }
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
@@ -467,7 +469,10 @@ QStringList JsonEditor::onPerformersHint() {
   }
   auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
   const QStringList& newPerfsList = pm(sentence);
-  const QStringList& beforePerfsList = p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+  QStringList beforePerfsList;
+  if (not p->text().isEmpty()) {
+    beforePerfsList = p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+  }
   if (beforePerfsList.size() < newPerfsList.size()) {
     p->setText(newPerfsList.join(", "));
   }
@@ -482,6 +487,36 @@ QStringList JsonEditor::onPerformersHint() {
     ps->setText(newProdStudioName);
   }
   return newPerfsList;
+}
+
+bool JsonEditor::onSelectedTextAppendToPerformers() {
+  static PerformersManager& pm = PerformersManager::getIns();
+
+  if (not jsonKeySetMet.contains(JSONKey::Performers)) {
+    jsonKeySetMet.insert(JSONKey::Performers);
+  }
+
+  QStringList perfs;
+  auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
+  if (not p->text().isEmpty()) {
+    perfs += p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+  }
+
+  if (jsonKeySetMet.contains(JSONKey::Name)) {
+    const auto* le = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name]);
+    if (le->hasSelectedText()) {
+      perfs << le->selectedText();
+    }
+  }
+  if (jsonKeySetMet.contains(JSONKey::Detail)) {
+    const auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+    if (te->textCursor().hasSelection()) {
+      perfs << te->textCursor().selection().toPlainText();
+    }
+  }
+  perfs.removeDuplicates();
+  p->setText(perfs.join(", "));
+  return true;
 }
 
 bool JsonEditor::formatter() {

@@ -78,10 +78,10 @@ QStringList PerformersManager::MovieNameWordsSplit(QString sentence) const {
     return {};
   }
   using namespace JSON_RENAME_REGEX;
-  QString valuableString = sentence.replace(keepComp, "");
-  QString noActionString = valuableString.replace(andComp, " & ");
-  QString noResolutionString = noActionString.replace(resolutionComp, "");
-  return noResolutionString.split(continousSpace);
+  sentence.replace(DISCRAD_LETTER_COMP, " ");
+  sentence.replace(andComp, " & ");
+  sentence.replace(resolutionComp, "");
+  return sentence.split(continousSpace);
 }
 
 QStringList PerformersManager::PeformersFilterOut(const QStringList& words) const {

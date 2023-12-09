@@ -34,8 +34,18 @@ class PerformersManagerTest : public QObject {
     QVERIFY2(perfsList.size() >= 1, "perfs list should contains >= 1 performers");
   }
 
+  void test_sentenseWithNewLineSeperator() {
+    const auto& wordsList = pm.MovieNameWordsSplit("britishtwunk\r\nCraig Kennedy\nGabriel Clark");
+    QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
+
+    const auto& perfsList = pm.PeformersFilterOut(wordsList);
+    const QSet<QString>& perfsSet{perfsList.cbegin(), perfsList.cend()};
+    QVERIFY2(perfsList.size() >= 1, "perfs list should contains >= 1 performers");
+  }
+
+
 };
 
-//QTEST_MAIN(PerformersManagerTest)
+QTEST_MAIN(PerformersManagerTest)
 
 #include "PerformersManagerTest.moc"
