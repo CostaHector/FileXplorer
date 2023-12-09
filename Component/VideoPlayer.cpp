@@ -278,7 +278,7 @@ bool VideoPlayer::onModPerformers() {
     return false;
   }
   if (not m_performerWid) {
-    m_performerWid = new PerformersListInputer(this);
+    m_performerWid = new JsonPerformersListInputer(this);
   }
   if (not m_performerWid) {
     qDebug("performer widget is nullptr");

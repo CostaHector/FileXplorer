@@ -7,10 +7,10 @@
 #include <QWidget>
 #include <QDialogButtonBox>
 
-class PerformersListInputer : public QDialog {
+class JsonPerformersListInputer : public QDialog {
   Q_OBJECT
  public:
-  explicit PerformersListInputer(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  explicit JsonPerformersListInputer(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   QString text() const { return m_perfsList->text(); }
 
   bool appendAPerformer();

@@ -33,8 +33,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       JSON_ADD_PERFORMER_KEY_VALUE_PAIR{new QAction(QIcon(), "Add performer k-v pair")},
       JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR{new QAction(QIcon(), "Add production studio k-v pair")},
       JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME{new QAction(QIcon(), "Clear performers and prod studio")},
-      BATCH_FILES_ACTIONS(new QActionGroup(this))
-{
+      BATCH_FILES_ACTIONS(new QActionGroup(this)) {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.")
                              .arg(_FORMATTER->text())
@@ -116,30 +115,30 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
           .arg(_LEARN_PERFORMERS_FROM_JSON->text())
           .arg(_LEARN_PERFORMERS_FROM_JSON->shortcut().toString()));
 
-
   LOAD_JSONS_FROM_CURRENT_FOLDER->setCheckable(false);
-  LOAD_JSONS_FROM_CURRENT_FOLDER->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Load json files from current view root path.")
-          .arg(LOAD_JSONS_FROM_CURRENT_FOLDER->text(), LOAD_JSONS_FROM_CURRENT_FOLDER->shortcut().toString()));
-
+  LOAD_JSONS_FROM_CURRENT_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/>Load json files from current view root path.")
+                                                 .arg(LOAD_JSONS_FROM_CURRENT_FOLDER->text(), LOAD_JSONS_FROM_CURRENT_FOLDER->shortcut().toString()));
 
   CONSTRUCT_JSONS_FOR_VIDS->setToolTip(QString("<b>%1 (%2)</b><br/>Construct json file for each vids under current path if json not exists.")
                                            .arg(CONSTRUCT_JSONS_FOR_VIDS->text(), CONSTRUCT_JSONS_FOR_VIDS->shortcut().toString()));
 
-  JSON_ADD_PERFORMERS->setToolTip(QString("<b>%1 (%2)</b><br/>Add performers to json file")
+  JSON_ADD_PERFORMERS->setToolTip(QString("<b>%1 (%2)</b><br/>Input and Add performers to json file")
                                       .arg(JSON_ADD_PERFORMERS->text(), JSON_ADD_PERFORMERS->shortcut().toString()));
 
-  JSON_SET_PRODUCTION_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Set production name for json file")
+  JSON_SET_PRODUCTION_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Input and Set production name for json file")
                                              .arg(JSON_SET_PRODUCTION_STUDIO->text(), JSON_SET_PRODUCTION_STUDIO->shortcut().toString()));
 
-  JSON_ADD_PERFORMER_KEY_VALUE_PAIR->setToolTip(QString("<b>%1 (%2)</b><br/>Add performers key-value pair for json file if key not exists. \n Otherwise init its values.")
-                                                    .arg(JSON_ADD_PERFORMER_KEY_VALUE_PAIR->text(), JSON_ADD_PERFORMER_KEY_VALUE_PAIR->shortcut().toString()));
+  JSON_ADD_PERFORMER_KEY_VALUE_PAIR->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Add performers key-value pair for json file if key not exists. \n Otherwise init its values.")
+          .arg(JSON_ADD_PERFORMER_KEY_VALUE_PAIR->text(), JSON_ADD_PERFORMER_KEY_VALUE_PAIR->shortcut().toString()));
 
-  JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR->setToolTip(QString("<b>%1 (%2)</b><br/>Add production studio key-value pair for json file if key not exists. \n Otherwise init its values.")
-                                                    .arg(JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR->text(), JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR->shortcut().toString()));
+  JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Add production studio key-value pair for json file if key not exists. \n Otherwise init its values.")
+          .arg(JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR->text(), JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR->shortcut().toString()));
 
-  JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME->setToolTip(QString("<b>%1 (%2)</b><br/>Clear both performers and production studio values for json file.")
-                                                            .arg(JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME->text(), JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME->shortcut().toString()));
+  JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Clear both performers and production studio values for json file.")
+          .arg(JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME->text(), JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME->shortcut().toString()));
 
   BATCH_FILES_ACTIONS->addAction(LOAD_JSONS_FROM_CURRENT_FOLDER);
   BATCH_FILES_ACTIONS->addAction(CONSTRUCT_JSONS_FOR_VIDS);
