@@ -113,7 +113,7 @@ class DataBaseActions : public QObject {
     return databaseControlAG;
   }
   auto Get_DB_VIEW_CLOSE_SHOW_Action() -> QAction* {
-    QAction* showDatabase = new QAction(QIcon(":/themes/SHOW_DATABASE"), "show db", this);
+    QAction* showDatabase = new QAction(QIcon(":/themes/SHOW_DATABASE"), "Movies", this);
     showDatabase->setCheckable(true);
     showDatabase->setChecked(PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool());
     return showDatabase;

@@ -288,17 +288,17 @@ void DatabasePanel::onInitATable() {
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
   const QString& createTableSQL = QString(
                                       "CREATE TABLE IF NOT EXISTS `%1`("
-                                      "   `%2` TEXT NOT NULL,"   // Name
-                                      "   `%3` INT DEFAULT 0,"   // Size
-                                      "   `%4` TEXT,"            // Type
-                                      "   `%5` TEXT,"            // DateModified
-                                      "   `%6` TEXT,"            // Performers
-                                      "   `%7` TEXT,"            // Tags
-                                      "   `%8` INT DEFAULT 0,"   // Rate
-                                      "   `%9` TEXT,"            // Driver
-                                      "   `%10` TEXT NOT NULL,"  // Prepath
-                                      "   `%11` TEXT,"           // Extra
-                                      "   `%12` TEXT NOT NULL,"  // ForSearch
+                                      "   `%2` NCHAR(256) NOT NULL,"   // Name
+                                      "   `%3` INT DEFAULT 0,"         // Size
+                                      "   `%4` CHAR(10),"              // Type
+                                      "   `%5` CHAR(20),"              // DateModified
+                                      "   `%6` NCHAR(40),"             // Performers
+                                      "   `%7` CHAR(40),"              // Tags
+                                      "   `%8` INT DEFAULT 0,"         // Rate
+                                      "   `%9` CHAR(20),"              // Driver
+                                      "   `%10` NCHAR(256) NOT NULL,"  // Prepath
+                                      "   `%11` CHAR(128),"            // Extra
+                                      "   `%12` NCHAR(512) NOT NULL,"  // ForSearch
                                       "    PRIMARY KEY (%2, %10, %12)"
                                       "    );")
                                       .arg(DB_TABLE::MOVIES)

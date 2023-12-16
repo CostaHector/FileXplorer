@@ -34,7 +34,7 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
       RESIZE_ROWS_DEFAULT_SECTION_SIZE(new QAction("adjust default rows section size", this)),
       VERTICAL_HEADER_AGS(new QActionGroup(this)),
 
-      SHOW_PERFORMER_MANAGER(new QAction(QIcon(":/themes/PERFORMERS_MANAGER"), "Performers Manager", this)),
+      SHOW_PERFORMER_MANAGER(new QAction(QIcon(":/themes/PERFORMERS_MANAGER"), "Perfs", this)),
       m_menuBar(GetMenuBar()) {
   InitActionsTooltips();
 }

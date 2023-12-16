@@ -11,7 +11,7 @@ TorrentsManagerActions::TorrentsManagerActions(QObject* parent)
       DELETE_FROM_TABLE(new QAction("Delete from table", this)),
       DROP_TABLE(new QAction("Drop table(complete table))", this)),
       SUBMIT(new QAction("Submit", this)),
-      SHOW_TORRENTS_MANAGER(new QAction(QIcon(":/themes/TORRENTS_MANAGER"), "Torrents Manager", this)),
+      SHOW_TORRENTS_MANAGER(new QAction(QIcon(":/themes/TORRENTS_MANAGER"), "Torrents", this)),
       m_menuBar(GetMenuBar()) {
   InitActionsTooltips();
 }
