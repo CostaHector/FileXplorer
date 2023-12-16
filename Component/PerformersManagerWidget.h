@@ -87,9 +87,6 @@ class PerformersManagerWidget : public QMainWindow {
   int m_horizontalHeaderSectionClicked = -1;
  private:
   bool ShowOrHideColumnCore();
-
-  static constexpr char PERFS_VIDS_IMGS_SPLIT_CHAR = '\n';
-  static constexpr char LOGIC_OR_CHAR = '|';
 };
 
 #endif  // PERFORMERSMANAGERWIDGET_H

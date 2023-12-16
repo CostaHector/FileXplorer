@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
                         std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
   auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView, std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer),
-                                                 fileExplorer.m_performerManager);
+                                                 fileExplorer.m_performerManager, fileExplorer.m_torrentsManager);
   fileExplorer.show();
   a.exec();
   return 0;

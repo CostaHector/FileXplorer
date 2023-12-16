@@ -1,6 +1,10 @@
 #include "SubscribeDatabase.h"
 #include "Actions/DataBaseActions.h"
 #include "Actions/PerformersManagerActions.h"
+#include "Actions/TorrentsManagerActions.h"
+
+#include "Component/PerformersManagerWidget.h"
+#include "Component/TorrentsManagerWidget.h"
 #include "PublicVariable.h"
 
 #include <QAbstractItemView>
@@ -14,6 +18,10 @@ void SubscribeDatabase::subscribe() {
   if (g_performersManagerActions().SHOW_PERFORMER_MANAGER->isChecked()) {
     onShowOrHidePerformerManger(true);
   }
+  connect(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER, &QAction::triggered, this, &SubscribeDatabase::onShowOrHideTorrentsManager);
+  if (g_torrentsManagerActions().SHOW_TORRENTS_MANAGER->isChecked()) {
+    onShowOrHideTorrentsManager(true);
+  }
 }
 
 auto SubscribeDatabase::onShowOrCloseDatabase(const bool isVisible) -> void {
@@ -22,9 +30,17 @@ auto SubscribeDatabase::onShowOrCloseDatabase(const bool isVisible) -> void {
 }
 
 auto SubscribeDatabase::onShowOrHidePerformerManger(const bool isVisible) -> void {
-  PreferenceSettings().setValue(MemoryKey::SHOW_PERFORMERS_MANGER_DATABASE.name, isVisible);
-  if (!performerManger) {
-    performerManger = new PerformersManagerWidget(this->view);
+  PreferenceSettings().setValue(MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.name, isVisible);
+  if (!performerManager) {
+    performerManager = new PerformersManagerWidget(this->view);
   }
-  performerManger->setVisible(isVisible);
+  performerManager->setVisible(isVisible);
+}
+
+auto SubscribeDatabase::onShowOrHideTorrentsManager(const bool isVisible) -> void {
+  PreferenceSettings().setValue(MemoryKey::SHOW_TORRENTS_MANAGER_DATABASE.name, isVisible);
+  if (!torrentsManager) {
+    torrentsManager = new TorrentsManagerWidget(this->view);
+  }
+  torrentsManager->setVisible(isVisible);
 }

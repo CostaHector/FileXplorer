@@ -1,13 +1,20 @@
 #include "RightClickableToolBar.h"
+#include <QHash>
+
+const QHash<QString, Qt::ToolButtonStyle> TOOL_BTN_STYLE_MAP = {{"ToolButtonTextOnly", Qt::ToolButtonStyle::ToolButtonTextOnly},
+                                                                {"ToolButtonIconOnly", Qt::ToolButtonStyle::ToolButtonIconOnly},
+                                                                {"ToolButtonTextBesideIcon", Qt::ToolButtonStyle::ToolButtonTextBesideIcon}};
+const QHash<Qt::ToolButtonStyle, QString> TOOL_BTN_STYLE_REV_MAP = {{Qt::ToolButtonStyle::ToolButtonTextOnly, "ToolButtonTextOnly"},
+                                                                    {Qt::ToolButtonStyle::ToolButtonIconOnly, "ToolButtonIconOnly"},
+                                                                    {Qt::ToolButtonStyle::ToolButtonTextBesideIcon, "ToolButtonTextBesideIcon"}};
 
 RightClickableToolBar::RightClickableToolBar(const QString& title)
     : QToolBar(title),
       extraAG(new QActionGroup(this)),
       rightClickedPos(-1, -1),
-      SHOW_TOOL_BUTTON_TEXT(new QAction(QString("Show tool button only text [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonTextOnly)), this)),
-      SHOW_TOOL_BUTTON_ICON(new QAction(QString("Show tool button only icon [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonIconOnly)), this)),
-      SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON(
-          new QAction(QString("Show tool button text beside icon [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonTextBesideIcon)), this)),
+      SHOW_TOOL_BUTTON_TEXT(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextOnly], this)),
+      SHOW_TOOL_BUTTON_ICON(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonIconOnly], this)),
+      SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextBesideIcon], this)),
       textIconActionGroup(new QActionGroup(this)),
       menuQWidget(new QMenu(this))
 
@@ -26,10 +33,15 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
   textIconActionGroup->addAction(SHOW_TOOL_BUTTON_ICON);
   textIconActionGroup->addAction(SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON);
   textIconActionGroup->setExclusive(true);
+
+  const int _style = PreferenceSettings().value(MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.name, MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.v).toInt();
   for (QAction* act : textIconActionGroup->actions()) {
     act->setCheckable(true);
-    act->setChecked(PreferenceSettings().value(SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON->text(), true).toBool());
+    if (int(TOOL_BTN_STYLE_MAP[act->text()]) == _style) {
+      act->setChecked(true);
+    }
   }
+
   menuQWidget->addAction(UNPIN);
   menuQWidget->addActions(textIconActionGroup->actions());
   menuQWidget->addAction(UNPIN_ALL);
@@ -128,14 +140,9 @@ void RightClickableToolBar::_unpinAll() {
 }
 
 void RightClickableToolBar::_switchTextBesideIcon(const QAction* act) {
-  QString txt = act->text();
-  int bIndex = txt.lastIndexOf('[');
-  int eIndex = txt.lastIndexOf(']');
-  if (bIndex + 1 >= eIndex) {
-    return;
-  }
-  int styleIndex = txt.midRef(bIndex + 1, eIndex - (bIndex + 1)).toInt();
-  setToolButtonStyle(Qt::ToolButtonStyle(styleIndex));
+  const Qt::ToolButtonStyle styleEnum = TOOL_BTN_STYLE_MAP[act->text()];
+  setToolButtonStyle(styleEnum);
+  PreferenceSettings().setValue(MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.name, styleEnum);
 }
 
 void RightClickableToolBar::CustomContextMenuEvent(const QPoint& pnt) {

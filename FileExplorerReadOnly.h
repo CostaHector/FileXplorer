@@ -58,5 +58,6 @@ class FileExplorerReadOnly : public QMainWindow {
   VideoPlayer* m_videoPlayer;
 
   QWidget* m_performerManager;
+  QWidget* m_torrentsManager;
 };
 #endif  // FILEEXPLORERREADONLY_H

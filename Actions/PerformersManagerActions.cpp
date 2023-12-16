@@ -34,7 +34,7 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
       RESIZE_ROWS_DEFAULT_SECTION_SIZE(new QAction("adjust default rows section size", this)),
       VERTICAL_HEADER_AGS(new QActionGroup(this)),
 
-      SHOW_PERFORMER_MANAGER(new QAction(QIcon(":/themes/PERFORMER_MANAGER"), "Performers Manager", this)),
+      SHOW_PERFORMER_MANAGER(new QAction(QIcon(":/themes/PERFORMERS_MANAGER"), "Performers Manager", this)),
       m_menuBar(GetMenuBar()) {
   InitActionsTooltips();
 }
@@ -61,7 +61,7 @@ void PerformersManagerActions::InitActionsTooltips() {
 
   SHOW_PERFORMER_MANAGER->setCheckable(true);
   SHOW_PERFORMER_MANAGER->setChecked(
-      PreferenceSettings().value(MemoryKey::SHOW_PERFORMERS_MANGER_DATABASE.name, MemoryKey::SHOW_PERFORMERS_MANGER_DATABASE.v).toBool());
+      PreferenceSettings().value(MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.name, MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.v).toBool());
 
   const QString& heightStr =
       QString::number(PreferenceSettings().value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v).toInt());

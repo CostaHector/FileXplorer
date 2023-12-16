@@ -4,7 +4,7 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QPushButton>
-#include "Component/PerformersStringParser.h"
+#include "Tools/PerformersStringParser.h"
 #include "Tools/JsonFileHelper.h"
 JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)
     : QDialog{parent, f},

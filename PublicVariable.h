@@ -176,6 +176,7 @@ const GVarStrFolder PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "")
 const GVarStrFolder PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./");
 const GVarStrFolder PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./");
 const GVarStrFolder PATH_DB_INSERT_VIDS_FROM("PATH_DB_INSERT_VIDS_FROM", "./");
+const GVarStrFolder PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./");
 
 const GVarBool AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false);
 const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
@@ -187,7 +188,8 @@ const GVarBool SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", 
 const GVarBool SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true);
 const GVarBool EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true);
 const GVarBool SHOW_DATABASE("SHOW_DATABASE", false);
-const GVarBool SHOW_PERFORMERS_MANGER_DATABASE("SHOW_PERFORMERS_MANGER_DATABASE", false);
+const GVarBool SHOW_PERFORMERS_MANAGER_DATABASE("SHOW_PERFORMERS_MANAGER_DATABASE", false);
+const GVarBool SHOW_TORRENTS_MANAGER_DATABASE("SHOW_TORRENTS_MANAGER_DATABASE", false);
 const GVarBool QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false);
 
 const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
@@ -215,6 +217,7 @@ const GVarBool PERFORMER_STRETCH_LAST_SECTION("PERFORMER_STRETCH_LAST_SECTION", 
 
 const GVarStr VIDS_COLUMN_SHOW_SWITCH("VIDS_COLUMN_SHOW_SWITCH", QString(20, '1'), {});
 const GVarBool VIDS_STRETCH_LAST_SECTION("VIDS_STRETCH_LAST_SECTION", true);
+const GVarInt RIGHT_CLICK_TOOLBUTTON_STYLE("RIGHT_CLICK_TOOLBUTTON_STYLE", 0);
 }  // namespace MemoryKey
 
 namespace SystemPath {
@@ -228,14 +231,16 @@ const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
 const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/VIDS_DATABASE.db");
 const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
+const QString TORRENTS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/TORRENTS_DATABASE.db");
 const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PRODUCTION_STUDIOS_DATABASE.db");
 const QString AKA_PERFORMERS_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/AKA_PERFORMERS.txt");
 const QString PERFORMERS_TABLE_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_TABLE.txt");
 }  // namespace SystemPath
 
 namespace DB_TABLE {
-const QString VIDS = "movies_info";
-const QString PERFORMERS = "PERFORMER_TABLE";
+const QString MOVIES = "MOVIES";
+const QString PERFORMERS = "PERFORMERS";
+const QString TORRENTS = "TORRENTS";
 }  // namespace DB_TABLE
 
 extern const char* SUBMIT_BTN_STYLE;

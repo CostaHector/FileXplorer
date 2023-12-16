@@ -13,9 +13,9 @@ class MyQSqlTableModel : public QSqlTableModel {
 
   auto rootPath(const QString& placeHolder = "" /* no use */) -> QString { return placeHolder; }
 
-  auto driver(QModelIndex curIndex) -> QString{
-    QModelIndex preIndex = index(curIndex.row(), DB_HEADER_KEY::DB_DRIVER_INDEX, curIndex.parent());
-    return data(preIndex, Qt::ItemDataRole::DisplayRole).toString();
+  auto driver(QModelIndex curIndex) -> QString {
+    QModelIndex driverIndex = index(curIndex.row(), DB_HEADER_KEY::DB_DRIVER_INDEX, curIndex.parent());
+    return data(driverIndex, Qt::ItemDataRole::DisplayRole).toString();
   }
 
   auto absolutePath(QModelIndex curIndex) -> QString {

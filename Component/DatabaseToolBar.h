@@ -9,6 +9,7 @@
 
 #include "Actions/DataBaseActions.h"
 #include "Actions/PerformersManagerActions.h"
+#include "Actions/TorrentsManagerActions.h"
 
 class DatabaseToolBar : public QToolBar {
  public:
@@ -39,6 +40,8 @@ class DatabaseToolBar : public QToolBar {
     showHideDB->addAction(g_dbAct().DB_VIEW_CLOSE_SHOW);
     showHideDB->addSeparator();
     showHideDB->addAction(g_performersManagerActions().SHOW_PERFORMER_MANAGER);
+    showHideDB->addSeparator();
+    showHideDB->addAction(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER);
     showHideDB->addSeparator();
     showHideDB->setOrientation(Qt::Orientation::Horizontal);
     showHideDB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);

@@ -1,10 +1,10 @@
 #include "PerformersManagerWidget.h"
 
 #include "Actions/PerformersManagerActions.h"
-#include "Component/QuickWhereClause.h"
 #include "Component/RatingSqlTableModel.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
+#include "Tools/DBTableMoviesHelper.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 
@@ -19,9 +19,6 @@
 #include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlRecord>
-
-constexpr char PerformersManagerWidget::PERFS_VIDS_IMGS_SPLIT_CHAR;
-constexpr char PerformersManagerWidget::LOGIC_OR_CHAR;
 
 PerformersManagerWidget::PerformersManagerWidget(QWidget* parent)
     : QMainWindow{parent},
@@ -82,7 +79,7 @@ PerformersManagerWidget::PerformersManagerWidget(QWidget* parent)
   ShowOrHideColumnCore();
   subscribe();
   setWindowTitle("Performers Manager Widget");
-  setWindowIcon(QIcon(":/themes/PERFORMER_MANAGER"));
+  setWindowIcon(QIcon(":/themes/PERFORMERS_MANAGER"));
   updateWindowsSize();
 }
 
@@ -328,7 +325,7 @@ int PerformersManagerWidget::onLoadFromFileSystemStructure() {
     for (auto mpIt = name2Ori.cbegin(); mpIt != name2Ori.cend(); ++mpIt) {
       const QString& perf = mpIt.key();
       const QString& ori = mpIt.value();
-      const QString& imgs = name2Imgs[perf].join(PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
+      const QString& imgs = name2Imgs[perf].join(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
       const QString& currentInsert = insertTemplate.arg(perf, ori, imgs);
       bool ret = insertTableQuery.exec(currentInsert);
       succeedCnt += ret;
@@ -361,7 +358,7 @@ int PerformersManagerWidget::onLoadFromPerformersList() {
     return 0;
   }
   QMap<QString, QString> perfs;
-  for (const QString& line : perfsText.split(PERFS_VIDS_IMGS_SPLIT_CHAR)) {
+  for (const QString& line : perfsText.split(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR)) {
     if (line.isEmpty()) {
       continue;
     }
@@ -581,14 +578,7 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
   }
 
   static auto GetVidsListFromVidsTable = [](const QSqlRecord& record, QSqlQuery& qur) -> QStringList {
-    QString perfs = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
-    QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
-    if (not akas.isEmpty()) {
-      perfs += (LOGIC_OR_CHAR + akas.replace(PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR));
-    }
-    const QString& whereClause = QuickWhereClause::PlainLogicSentence2FuzzySqlWhere(perfs, DB_HEADER_KEY::ForSearch, false);
-    // videos table
-    const QString& searchCommand = QString("SELECT `%1` from %2 where %3").arg(DB_HEADER_KEY::ForSearch, DB_TABLE::VIDS, whereClause);
+    const QString& searchCommand = DBTableMoviesHelper::GetMovieTablePerformerSelectCommand(record);
     bool ret = qur.exec(searchCommand);
     if (not ret) {
       qDebug("Failed when[%s]", searchCommand.toStdString().c_str());
@@ -608,7 +598,7 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
     const int r = indr.row();
     auto record = m_perfsDBModel->record(r);
     const QStringList& vidsList = GetVidsListFromVidsTable(record, qur);
-    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(PERFS_VIDS_IMGS_SPLIT_CHAR));
+    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR));
     m_perfsDBModel->setRecord(r, record);  // update back
     vidsCnt += vidsList.size();
     ++recordsCnt;

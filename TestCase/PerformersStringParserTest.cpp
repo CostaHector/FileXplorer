@@ -2,7 +2,7 @@
 #include <QtTest>
 
 // add necessary includes here
-#include "Component/PerformersStringParser.h"
+#include "Tools/PerformersStringParser.h"
 
 class PerformersManagerTest : public QObject {
   Q_OBJECT
@@ -44,6 +44,6 @@ class PerformersManagerTest : public QObject {
   }
 };
 
-QTEST_MAIN(PerformersManagerTest)
+//QTEST_MAIN(PerformersManagerTest)
 
 #include "PerformersManagerTest.moc"

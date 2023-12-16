@@ -1,7 +1,7 @@
 #include "JsonEditor.h"
 #include "Actions/JsonEditorActions.h"
 #include "Actions/QuickWhereActions.h"
-#include "Component/PerformersStringParser.h"
+#include "Tools/PerformersStringParser.h"
 #include "Component/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 

@@ -9,7 +9,6 @@ TEMPLATE = app
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
-    Component/PerformersStringParser.cpp \
     Component/ProductionStudioManager.cpp \
     Component/QuickWhereClause.cpp \
     FileOperation/FileOperation.cpp \
@@ -26,22 +25,25 @@ SOURCES += \
     TestCase/FileOperationTest.cpp \
     TestCase/UndoRedoTest.cpp \
     Tools/Categorizer.cpp \
+    Tools/DBTableMoviesHelper.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/NameStandardizer.cpp \
+    Tools/PerformersStringParser.cpp \
     UndoRedo.cpp
 
 
 HEADERS += \
     Actions/QuickWhereActions.h \
-    Component/PerformersStringParser.h \
     Component/ProductionStudioManager.h \
     Component/QuickWhereClause.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     PublicVariable.h \
     Tools/Categorizer.h \
+    Tools/DBTableMoviesHelper.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/NameStandardizer.h \
+    Tools/PerformersStringParser.h \
     UndoRedo.h
 
 DISTFILES += \

@@ -76,7 +76,7 @@ class DatabaseTableView : public QTableView {
       qDebug("Cannot open connection");
       return -1;
     }
-    const QString& countCmd = QString("SELECT COUNT(%1) FROM %2;").arg(DB_HEADER_KEY::Name).arg(DB_TABLE::VIDS);
+    const QString& countCmd = QString("SELECT COUNT(%1) FROM %2;").arg(DB_HEADER_KEY::Name).arg(DB_TABLE::MOVIES);
 
     QSqlQuery queryCount(con);
     queryCount.exec(countCmd);

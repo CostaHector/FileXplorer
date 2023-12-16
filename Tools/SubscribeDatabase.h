@@ -18,8 +18,6 @@
 #include <QDateTime>
 #include <QStorageInfo>
 
-#include "Component/PerformersManagerWidget.h"
-#include "MyQSqlTableModel.h"
 #include "PublicVariable.h"
 
 auto InitDataBase() -> bool;
@@ -30,16 +28,21 @@ class SubscribeDatabase : public QObject {
 
   QTableView* view;
   T_SwitchStackWidget switchStackWidget;
-  QWidget* performerManger;
+  QWidget* performerManager;
+  QWidget* torrentsManager;
 
-  explicit SubscribeDatabase(QTableView* view_, T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget(), QWidget* performerManger_ = nullptr)
-      : QObject(), view(view_), switchStackWidget(switchStackWidget_), performerManger(performerManger_) {
+  explicit SubscribeDatabase(QTableView* view_,
+                             T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget(),
+                             QWidget* performerManger_ = nullptr,
+                             QWidget* torrentsManager_ = nullptr)
+      : QObject(), view(view_), switchStackWidget(switchStackWidget_), performerManager(performerManger_), torrentsManager(torrentsManager_) {
     this->subscribe();
   }
 
   auto subscribe() -> void;
   inline auto onShowOrCloseDatabase(const bool isVisible) -> void;
   inline auto onShowOrHidePerformerManger(const bool isVisible) -> void;
+  inline auto onShowOrHideTorrentsManager(const bool isVisible) -> void;
 };
 
 #endif  // SUBSCRIBEDATABASE_H
