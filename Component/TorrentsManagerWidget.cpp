@@ -234,8 +234,6 @@ bool TorrentsManagerWidget::onDeleteFromTable() {
 
 auto TorrentsManagerWidget::closeEvent(QCloseEvent* event) -> void {
   PreferenceSettings().setValue("TorrentsManagerWidgetGeometry", saveGeometry());
-  PreferenceSettings().setValue("TorrentsManagerWidgetDockerWidth", width());
-  PreferenceSettings().setValue("TorrentsManagerWidgetDockerHeight", height());
   QMainWindow::closeEvent(event);
 }
 

@@ -39,6 +39,7 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
     act->setCheckable(true);
     if (int(TOOL_BTN_STYLE_MAP[act->text()]) == _style) {
       act->setChecked(true);
+      _switchTextBesideIcon(act);
     }
   }
 
@@ -49,7 +50,6 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
   setContextMenuPolicy(Qt::CustomContextMenu);
 
   setOrientation(Qt::Vertical);
-  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
   setMaximumWidth(100);
   setAcceptDrops(true);
