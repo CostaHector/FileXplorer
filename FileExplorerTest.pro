@@ -15,6 +15,7 @@ SOURCES += \
     PublicTool.cpp \
     PublicVariable.cpp \
     TestCase/CatergorizerTest.cpp \
+    TestCase/DuplicateImagesRemoverTest.cpp \
     TestCase/FilesNameBatchStandardizerTest.cpp \
     TestCase/MovieNameStandardizerTest.cpp \
     TestCase/PerformersStringParserTest.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
     TestCase/UndoRedoTest.cpp \
     Tools/Categorizer.cpp \
     Tools/DBTableMoviesHelper.cpp \
+    Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/NameStandardizer.cpp \
     Tools/PerformersStringParser.cpp \
@@ -41,6 +43,7 @@ HEADERS += \
     PublicVariable.h \
     Tools/Categorizer.h \
     Tools/DBTableMoviesHelper.h \
+    Tools/DuplicateImagesRemover.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/NameStandardizer.h \
     Tools/PerformersStringParser.h \

@@ -48,6 +48,7 @@ SOURCES += \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/DBTableMoviesHelper.cpp \
+    Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/JsonFileHelper.cpp \
     Tools/MimeDataCX.cpp \
@@ -122,6 +123,7 @@ HEADERS += \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
     Tools/DBTableMoviesHelper.h \
+    Tools/DuplicateImagesRemover.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/JsonFileHelper.h \
     Tools/MimeDataCX.h \

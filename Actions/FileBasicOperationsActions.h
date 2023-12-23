@@ -250,15 +250,18 @@ class FileBasicOperationsActions : public QObject {
     QAction* _NAME_STANDARDLIZER = new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), "Name Ruler");
     QAction* _CLASSIFIER = new QAction(QIcon(":/themes/CATEGORIZER"), "Categorizer");
     QAction* _ITEM_ORGANIZER = new QAction(QIcon(":/themes/ITEMS_ORGANIZER"), "Organizer");
+    QAction* _DUPLICATE_IMAGE_REMOVER = new QAction("Remove duplicate images");
 
-    _NAME_STANDARDLIZER->setToolTip(QString("Rename\n [A..mp4, A (1).jpg, A -- 2.json] to\n [A.mp4, A - 1.jpg, A - 2.json]"));
-    _CLASSIFIER->setToolTip(QString("Category\n [A.mp4, A.jpg, A.json] to\n Folder A"));
-    _ITEM_ORGANIZER->setToolTip(QString("Organize\n [A - B.mp4, A - C.mp4, A - D.mp4] to\n Folder A"));
+    _NAME_STANDARDLIZER->setToolTip("Rename\n [A..mp4, A (1).jpg, A -- 2.json] to\n [A.mp4, A - 1.jpg, A - 2.json]");
+    _CLASSIFIER->setToolTip("Category\n [A.mp4, A.jpg, A.json] to\n Folder A");
+    _ITEM_ORGANIZER->setToolTip("Organize\n [A - B.mp4, A - C.mp4, A - D.mp4] to\n Folder A");
+    _DUPLICATE_IMAGE_REMOVER->setToolTip("A - 480p, A - 720p, A - 1080p, A - 4K");
 
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(_NAME_STANDARDLIZER);
     actionGroup->addAction(_CLASSIFIER);
     actionGroup->addAction(_ITEM_ORGANIZER);
+    actionGroup->addAction(_DUPLICATE_IMAGE_REMOVER);
     return actionGroup;
   }
   auto Get_Advance_Search_Actions() -> QActionGroup* {
