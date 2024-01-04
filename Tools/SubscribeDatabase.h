@@ -14,8 +14,6 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-
-#include <QDateTime>
 #include <QStorageInfo>
 
 #include "PublicVariable.h"

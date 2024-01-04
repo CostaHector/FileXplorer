@@ -7,7 +7,6 @@
 #include <QCloseEvent>
 #include <QColor>
 #include <QCursor>
-#include <QDateTime>
 #include <QDesktopServices>
 #include <QDialog>
 #include <QDialogButtonBox>

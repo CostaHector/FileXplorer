@@ -4,7 +4,6 @@
 #include <QVBoxLayout>
 
 #include <QAbstractItemModel>
-#include <QDateTime>
 #include <QStandardItem>
 
 #include <QDesktopServices>

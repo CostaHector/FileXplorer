@@ -235,6 +235,7 @@ const QString TORRENTS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileE
 const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PRODUCTION_STUDIOS_DATABASE.db");
 const QString AKA_PERFORMERS_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/AKA_PERFORMERS.txt");
 const QString PERFORMERS_TABLE_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_TABLE.txt");
+const QString RUNLOGS = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/runlog");
 }  // namespace SystemPath
 
 namespace DB_TABLE {

@@ -64,6 +64,7 @@ int PerformersStringParser::LearningFromAPath(const QString& path) {
   QTextStream stream(&performersFi);
   stream.setCodec("UTF-8");
   stream << perfsLst.join("\n");
+  performersFi.close();
   return increCnt;
 }
 

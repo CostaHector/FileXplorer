@@ -343,9 +343,13 @@ class FileOperation {
     cmds.append({"rmfile", pre, rel});
     return {ErrorCode::OK, cmds};
   }
+
+  static auto WriteIntoLogFile(const QString& msg) -> bool;
+
   static auto executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) -> EXECUTE_RETURN_TYPE {
     FileOperation::BATCH_COMMAND_LIST_TYPE recoverList;
     int failedCommandCnt = 0;
+    QString log;
     for (int i = 0; i < aBatch.size(); ++i) {
       const QStringList& cmds = aBatch[i];
       if (cmds.isEmpty()) {
@@ -358,7 +362,9 @@ class FileOperation {
       BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
       if (ret != ErrorCode::OK) {
         ++failedCommandCnt;
-        qDebug("Fail: %s(%s) [%d parm(s)]", k.toStdString().c_str(), vals.join(",").toStdString().c_str(), vals.size());
+        const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]\n").arg(k).arg(vals.join(",")).arg(vals.size());
+        qDebug("%s", msg.toStdString().c_str());
+        log += msg;
       }
       if (k == "moveToTrash" and not srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
         if (recover.size() > 1) {
@@ -376,6 +382,8 @@ class FileOperation {
 
     if (failedCommandCnt != 0) {
       qDebug("Above %d command(s) failed.", failedCommandCnt);
+      log += QString("Above %1 command(s) failed.\n").arg(failedCommandCnt);
+      WriteIntoLogFile(log);
     }
     // in-place reverse
     return {failedCommandCnt == 0, QList<QStringList>(recoverList.crbegin(), recoverList.crend())};
