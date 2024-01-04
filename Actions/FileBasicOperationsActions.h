@@ -130,13 +130,13 @@ class FileBasicOperationsActions : public QObject {
     QAction* VIDEO_PLAYER_PANE = new QAction(QIcon(":/themes/VIDEO_PLAYER"), "&Video Player");
     VIDEO_PLAYER_PANE->setShortcutVisibleInContextMenu(true);
     VIDEO_PLAYER_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.")
-                                .arg(VIDEO_PLAYER_PANE->text(), VIDEO_PLAYER_PANE->shortcut().toString()));
+                                      .arg(VIDEO_PLAYER_PANE->text(), VIDEO_PLAYER_PANE->shortcut().toString()));
 
     QAction* PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play Videos");
     PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
     PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
-    PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play the selected item(s) in third part player.")
-                                .arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
+    PLAY_VIDEOS->setToolTip(
+        QString("<b>%1 (%2)</b><br/> Play the selected item(s) in third part player.").arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
 
     QAction* _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in Explorer");
     _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
@@ -255,7 +255,11 @@ class FileBasicOperationsActions : public QObject {
     _NAME_STANDARDLIZER->setToolTip("Rename\n [A..mp4, A (1).jpg, A -- 2.json] to\n [A.mp4, A - 1.jpg, A - 2.json]");
     _CLASSIFIER->setToolTip("Category\n [A.mp4, A.jpg, A.json] to\n Folder A");
     _ITEM_ORGANIZER->setToolTip("Organize\n [A - B.mp4, A - C.mp4, A - D.mp4] to\n Folder A");
-    _DUPLICATE_IMAGE_REMOVER->setToolTip("A - 480p, A - 720p, A - 1080p, A - 4K");
+    _DUPLICATE_IMAGE_REMOVER->setToolTip(
+        "Not Only work for images.\n"
+        "It work for any file name meet following resolution pattern.\n"
+        "Given: A - 480p, A - 720p, A - 1080p, A - 2160p, A - 4K\n."
+        "Only A - 2160p will be kept, others will moved to trashbin.");
 
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(_NAME_STANDARDLIZER);

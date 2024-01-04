@@ -4,7 +4,6 @@
 #include "Component/DBRightClickMenu.h"
 #include "Component/QuickWhereClause.h"
 #include "MyQSqlTableModel.h"
-#include "PublicTool.h"
 
 #include <QComboBox>
 #include <QInputDialog>
@@ -36,56 +35,11 @@ class DatabaseTableView : public QTableView {
     m_vidsDBMenu->popup(this->mapToGlobal(pnt));  // or QCursor::pos()
   }
 
-  auto GetSelectionByDriveClause(const QList<QAction*>& selectByDriveActs) -> QString {
-    QStringList clauseLst;
-    for (QAction* act : selectByDriveActs) {
-      if (act->isChecked()) {
-        clauseLst << QString("Driver=\"%1\"").arg(act->text());
-      }
-    }
-    if (clauseLst.size() == selectByDriveActs.size()) {  // select all driver
-      return "";
-    }
-    return clauseLst.join(" OR ");
-  }
-
   bool onSearchDataBase(const QString& searchText) {
-    QStringList conditionGroup;
-    if (not searchText.isEmpty()) {
-      conditionGroup << searchText;
-    }
-
-    const QString& driverWhereClause = this->GetSelectionByDriveClause(g_dbAct().DRIVE_SEPERATE_SELECTION_AG->actions());
-    if (not driverWhereClause.isEmpty()) {
-      conditionGroup << driverWhereClause;
-    }
-
-    if (conditionGroup.isEmpty()) {
-      m_dbModel->setFilter("");
-      return true;
-    }
-
-    const QString& whereClause = conditionGroup.join(" AND ");
-    m_dbModel->setFilter(whereClause);
+    m_dbModel->setFilter(searchText);
     return true;
   }
 
-  int onCountRow() {
-    auto con = GetSqlVidsDB();
-    if (not con.isOpen()) {
-      qDebug("Cannot open connection");
-      return -1;
-    }
-    const QString& countCmd = QString("SELECT COUNT(%1) FROM %2;").arg(DB_HEADER_KEY::Name).arg(DB_TABLE::MOVIES);
-
-    QSqlQuery queryCount(con);
-    queryCount.exec(countCmd);
-    queryCount.next();
-    const int rowCnt = queryCount.value(0).toInt();
-
-    QMessageBox::information(this, countCmd, QString("%1").arg(rowCnt));
-    return rowCnt;
-  }
   bool ShowOrHideColumnCore();
   bool onHideThisColumn();
   bool onShowAllColumn();
@@ -108,11 +62,15 @@ class DatabasePanel : public QWidget {
  public:
   explicit DatabasePanel(QWidget* parent = nullptr);
 
+  bool InitMoviesTables();
+  bool setCurrentMovieTable(const QString& movieTableName);
+
   bool onSearchDataBase(const QString& searchText);
-  auto onSelectSingleDriver() -> void { m_dbView->onSearchDataBase(m_searchLE->text()); }
+
+  bool onUnionTables();
 
   bool onInitDataBase();
-  void onInitATable();
+  void onCreateATable();
   bool onDropATable();
   bool onDeleteFromTable(const QString& clause = "");
 
@@ -127,6 +85,10 @@ class DatabasePanel : public QWidget {
 
   void onQuickWhereClause();
 
+
+  int onCountRow();
+
+  QComboBox* m_tables;
   QLineEdit* m_searchLE;
   QComboBox* m_searchCB;
   DatabaseTableView* m_dbView;

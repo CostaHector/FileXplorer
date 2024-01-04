@@ -12,8 +12,6 @@
 
 class DataBaseActions : public QObject {
  public:
-  QActionGroup* DRIVE_SEPERATE_SELECTION_AG;
-  QActionGroup* DRIVE_BATCH_SELECTION_AG;
   QActionGroup* DB_CONTROL_ACTIONS;
   QAction* DB_VIEW_CLOSE_SHOW;
   QActionGroup* DB_FUNCTIONS;
@@ -22,61 +20,12 @@ class DataBaseActions : public QObject {
 
   explicit DataBaseActions(QObject* parent = nullptr)
       : QObject{parent},
-        DRIVE_SEPERATE_SELECTION_AG(Get_DRIVE_SEPERATE_SELECTION_AG()),
-        DRIVE_BATCH_SELECTION_AG(Get_DRIVE_BATCH_SELECTION_AG()),
         DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),
         DB_VIEW_CLOSE_SHOW(Get_DB_VIEW_CLOSE_SHOW_Action()),
         DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()),
         DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()),
         QUICK_WHERE_CLAUSE{new QAction(QIcon(":/themes/QUICK_WHERE_CLAUSE"), "Where clause", this)} {
     QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
-  }
-
-  auto Get_DRIVE_SEPERATE_SELECTION_AG() -> QActionGroup* {
-    QSqlDatabase con;
-    if (QSqlDatabase::connectionNames().contains("custom_connection")) {
-      con = QSqlDatabase::database("custom_connection", false);
-    } else {
-      con = QSqlDatabase::addDatabase("QSQLITE", "custom_connection");
-    }
-    con.setDatabaseName(SystemPath::VIDS_DATABASE);
-    con.open();
-    if (not con.isOpen()) {
-      qDebug("con cannot open");
-      return nullptr;
-    }
-
-    QActionGroup* singleDriveSelectAG = new QActionGroup(this);
-    QSqlQuery getDrivers(con);
-    getDrivers.exec(QString("SELECT DISTINCT Driver from %1;").arg(DB_TABLE::MOVIES));
-    while (getDrivers.next()) {
-      const QString& driveFullName = getDrivers.value("Driver").toString();
-      QAction* action = new QAction(driveFullName, this);
-      singleDriveSelectAG->addAction(action);
-    }
-    getDrivers.finish();
-
-    singleDriveSelectAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-    for (QAction* act : singleDriveSelectAG->actions()) {
-      act->setCheckable(true);
-      act->setChecked(true);
-    }
-    return singleDriveSelectAG;
-  }
-  auto Get_DRIVE_BATCH_SELECTION_AG() -> QActionGroup* {
-    QAction* selectAll = new QAction("all", this);
-    QAction* deselectAll = new QAction("none", this);
-    QAction* selectOnline = new QAction("online", this);
-
-    QActionGroup* onBatchDriveSelect = new QActionGroup(this);
-    onBatchDriveSelect->addAction(selectAll);
-    onBatchDriveSelect->addAction(deselectAll);
-    onBatchDriveSelect->addAction(selectOnline);
-    onBatchDriveSelect->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-    for (QAction* act : onBatchDriveSelect->actions()) {
-      act->setCheckable(false);
-    }
-    return onBatchDriveSelect;
   }
 
   auto Get_DB_CONTROL_ACTIONS() -> QActionGroup* {
@@ -98,6 +47,9 @@ class DataBaseActions : public QObject {
     QAction* DELETE_FROM_TABLE = new QAction(QIcon(":/themes/DELETE_FROM_TABLE"), "Delete from", this);
     DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::MOVIES` WHERE CLAUSE");
 
+    QAction* UNION_TABLE = new QAction("Union", this);
+    UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
+
     QActionGroup* databaseControlAG = new QActionGroup(this);
     databaseControlAG->addAction(INSERT_A_PATH);
     databaseControlAG->addAction(DELETE_FROM_TABLE);
@@ -105,6 +57,7 @@ class DataBaseActions : public QObject {
     databaseControlAG->addAction(INIT_A_TABLE);
     databaseControlAG->addAction(DROP_A_DATABASE);
     databaseControlAG->addAction(DROP_A_TABLE);
+    databaseControlAG->addAction(UNION_TABLE);
     databaseControlAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
     for (QAction* act : databaseControlAG->actions()) {

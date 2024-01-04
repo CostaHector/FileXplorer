@@ -92,13 +92,6 @@ void DatabaseTableView::subscribe() {
   connect(this, &QTableView::doubleClicked, this, &DatabaseTableView::on_cellDoubleClicked);
   connect(this, &QTableView::customContextMenuRequested, this, &DatabaseTableView::on_ShowContextMenu);
 
-  {
-    const QList<QAction*>& DB_FUNCTIONS_ACTIONS = g_dbAct().DB_FUNCTIONS->actions();
-    QAction* COUNT = DB_FUNCTIONS_ACTIONS[0];
-    QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
-    connect(COUNT, &QAction::triggered, this, &DatabaseTableView::onCountRow);
-  }
-
   connect(HIDE_THIS_COLUMN, &QAction::triggered, this, &DatabaseTableView::onHideThisColumn);
   connect(SHOW_ALL_COLUMNS, &QAction::triggered, this, &DatabaseTableView::onShowAllColumn);
   connect(STRETCH_DETAIL_SECTION, &QAction::triggered, this, &DatabaseTableView::onStretchLastSection);
@@ -240,6 +233,7 @@ auto DatabaseTableView::on_PlayVideo() const -> bool {
 
 DatabasePanel::DatabasePanel(QWidget* parent)
     : QWidget(parent),
+      m_tables(new QComboBox),
       m_searchLE(new QLineEdit),
       m_searchCB(new QComboBox),
       m_dbView(new DatabaseTableView),
@@ -253,14 +247,83 @@ DatabasePanel::DatabasePanel(QWidget* parent)
   m_searchCB->addItem(QString("%1 between 0 AND 1000000").arg(DB_HEADER_KEY::Size));
   m_searchCB->addItem(QString("%1 = \"E:/\"").arg(DB_HEADER_KEY::Driver));
 
+  QHBoxLayout* searchHLayout = new QHBoxLayout;
+  searchHLayout->addWidget(m_tables, 2);
+  searchHLayout->addWidget(m_searchCB, 8);
+
   QVBoxLayout* panelLo = new QVBoxLayout;
   panelLo->setContentsMargins(0, 0, 0, 0);
   panelLo->setSpacing(0);
-  panelLo->addWidget(m_searchCB);
+  panelLo->addLayout(searchHLayout);
   panelLo->addWidget(m_dbView);
   setLayout(panelLo);
 
   subscribe();
+  InitMoviesTables();
+}
+
+bool DatabasePanel::InitMoviesTables() {
+  QSqlDatabase con = GetSqlVidsDB();
+  if (not con.isOpen() and not con.open()) {
+    qDebug("con cannot open");
+    return false;
+  }
+  if (m_tables == nullptr) {
+    qDebug("m_tables is nullptr");
+    return false;
+  }
+  m_tables->clear();
+  m_tables->addItems(con.tables());
+  return true;
+}
+
+bool DatabasePanel::setCurrentMovieTable(const QString& movieTableName) {
+  m_tables->setCurrentText(movieTableName);
+  m_dbView->m_dbModel->setTable(movieTableName);
+  m_dbView->m_dbModel->submitAll();
+  return true;
+}
+
+bool DatabasePanel::onUnionTables() {
+  QSqlDatabase con = GetSqlVidsDB();
+  if (not con.isOpen() and not con.open()) {
+    qDebug("Con cannot open");
+    return false;
+  }
+
+  const QStringList& tbs = con.tables();
+  if (not con.tables().contains(DB_TABLE::MOVIES)) {
+    QMessageBox::warning(this, DB_TABLE::MOVIES, "Destination table not exist. Create it at first");
+    return false;
+  }
+  const int SRC_TABLE_CNT = tbs.size() - 1;
+  if (SRC_TABLE_CNT < 1) {
+    qDebug("nothing to union");
+    return true;
+  }
+  QStringList unionSrcTbs;
+  for (const QString& srcTable : tbs) {
+    if (srcTable == DB_TABLE::MOVIES) {
+      continue;
+    }
+    unionSrcTbs << QString("SELECT * FROM `%1`").arg(srcTable);
+  }
+  // REPLACE INTO `MOVIES` SELECT * FROM `A568` UNION SELECT * FROM `AASAD`;
+  const QString& unionStr = unionSrcTbs.join(" UNION ");
+  const QString& unionCmd = QString("REPLACE INTO `%1` %2").arg(DB_TABLE::MOVIES).arg(unionStr);
+  QSqlQuery unionTableQry(con);
+  const auto ret = unionTableQry.exec(unionCmd);
+  if (not ret) {
+    qDebug("%s. \nUnion %d table(s) into [%s] failed. \n%s", unionCmd.toStdString().c_str(), SRC_TABLE_CNT, DB_TABLE::MOVIES.toStdString().c_str(),
+           unionTableQry.lastError().text().toStdString().c_str());
+    QMessageBox::warning(this, DB_TABLE::MOVIES,
+                         unionCmd + QString("\nUnion %1 table(s) failed.\n").arg(SRC_TABLE_CNT) + unionTableQry.lastError().text());
+    con.rollback();
+    return false;
+  }
+  unionTableQry.finish();
+  QMessageBox::information(this, DB_TABLE::MOVIES, "Union into Finish");
+  return true;
 }
 
 bool DatabasePanel::onInitDataBase() {
@@ -273,15 +336,28 @@ bool DatabasePanel::onInitDataBase() {
   return true;
 }
 
-void DatabasePanel::onInitATable() {
+void DatabasePanel::onCreateATable() {
   QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen()) {
-    qDebug("con cannot open");
+  if (not con.isOpen() and not con.open()) {
+    qDebug("Con cannot open");
     return;
   }
 
-  if (con.tables().contains(DB_TABLE::MOVIES)) {
-    qDebug("Table[%s] already exists in database[%s]", DB_TABLE::MOVIES.toStdString().c_str(), con.databaseName().toStdString().c_str());
+  QStringList tbs = con.tables();
+  if (not tbs.contains(DB_TABLE::MOVIES)) {
+    tbs << DB_TABLE::MOVIES;
+  }
+
+  const QString& inputTableName = QInputDialog::getItem(this, "Input an unique table name", "current tables", tbs, tbs.size() - 1, true);
+  if (inputTableName.isEmpty() or con.tables().contains(inputTableName)) {
+    qDebug("Table name[%s] is empty or already occupied", inputTableName.toStdString().c_str());
+    QMessageBox::warning(this, inputTableName, "Table name is empty or already occupied");
+    return;
+  }
+
+  if (inputTableName.contains(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER)) {
+    qDebug("Table name[%s] contains invalid letter", inputTableName.toStdString().c_str());
+    QMessageBox::warning(this, inputTableName, "Table name contains invalid letter");
     return;
   }
 
@@ -301,7 +377,7 @@ void DatabasePanel::onInitATable() {
                                       "   `%12` NCHAR(512) NOT NULL,"  // ForSearch
                                       "    PRIMARY KEY (%2, %10, %12)"
                                       "    );")
-                                      .arg(DB_TABLE::MOVIES)
+                                      .arg(inputTableName)
                                       .arg(DB_HEADER_KEY::Name)
                                       .arg(DB_HEADER_KEY::Size)
                                       .arg(DB_HEADER_KEY::Type)
@@ -316,78 +392,83 @@ void DatabasePanel::onInitATable() {
   QSqlQuery createTableQuery(con);
   const auto ret = createTableQuery.exec(createTableSQL);
   if (not ret) {
-    qDebug("Create table[%s] failed.", DB_TABLE::MOVIES.toStdString().c_str());
+    qDebug("Create table[%s] failed.", inputTableName.toStdString().c_str());
+    QMessageBox::warning(this, inputTableName, "Create table[%s] failed");
     return;
   }
-
-  m_dbView->m_dbModel->setTable(DB_TABLE::MOVIES);
-  m_dbView->m_dbModel->submitAll();
+  m_tables->addItem(inputTableName);
+  m_tables->setCurrentText(inputTableName);
   qDebug("Table create succeed");
 }
 
 bool DatabasePanel::onDropATable() {
-  const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(DB_TABLE::MOVIES);
-  auto retBtn = QMessageBox::warning(this, "CONFIRM DROP?", "(NOT recoverable)\n" + sqlCmd,
-                                     QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
-  if (retBtn != QMessageBox::StandardButton::Yes) {
-    qDebug("User Cancel");
-    return true;
-  }
-
   QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen()) {
+  if (not con.isOpen() and not con.open()) {
     qDebug("con cannot open");
     return false;
   }
-  if (not con.tables().contains(DB_TABLE::MOVIES)) {
-    qDebug("Table[%s] already not exists", DB_TABLE::MOVIES.toStdString().c_str());
+  const QStringList& tables = con.tables();
+  if (tables.isEmpty()){
+    qDebug("No table find now");
     return true;
   }
 
-  QSqlQuery dropQry(con);
-  const auto dropTableRet = dropQry.exec(sqlCmd);
-  if (not dropTableRet) {
-    qDebug("Drop Table[%s] failed. %s", DB_TABLE::MOVIES.toStdString().c_str(), con.lastError().databaseText().toStdString().c_str());
+  bool okUserSelect = false;
+  const QString& dropTableName = QInputDialog::getItem(this, "CONFIRM DROP?", "Choose a table to drop (NOT RECOVERABLE)", tables,
+                                                       tables.indexOf(m_tables->currentText()), false, &okUserSelect);
+  if (not okUserSelect) {
+    qDebug("User cancel drop table");
+    return true;
   }
+
+  const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(dropTableName);
+
+  QSqlQuery dropQry(con);
+  const bool dropTableRet = dropQry.exec(sqlCmd);
   dropQry.finish();
-  m_dbView->m_dbModel->submitAll();
-  QMessageBox::information(this, "Table been Dropped", DB_TABLE::MOVIES);
-  return dropTableRet;
+  if (not dropTableRet) {
+    qDebug("Drop Table[%s] failed. %s", dropTableName.toStdString().c_str(), con.lastError().databaseText().toStdString().c_str());
+    QMessageBox::information(this, dropTableName, "Table drop failed");
+    return false;
+  }
+  InitMoviesTables();
+  QMessageBox::information(this, dropTableName, "Table has been Dropped");
+  return true;
 }
 
 bool DatabasePanel::onDeleteFromTable(const QString& clause) {
   QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen()) {
+  if (not con.isOpen() and not con.open()) {
     qDebug("con cannot open");
     return false;
   }
 
-  QStringList deleteDriverChoicePool;
-  for (const QAction* act : g_dbAct().DRIVE_SEPERATE_SELECTION_AG->actions()) {
-    deleteDriverChoicePool.append(QString("\"%1\"=\"%2\"").arg(DB_HEADER_KEY::Driver, act->text()));
-  }
-  deleteDriverChoicePool.append(QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Prepath));
-
-  if (deleteDriverChoicePool.isEmpty()) {
-    qDebug("Cancel [No need to delete rows from drive]");
-    return true;
-  }
+  const QString& deleteFromTable = m_tables->currentText();
   QString whereClause = clause;
   if (clause.isEmpty()) {
+    static const QStringList deleteDriverChoicePool{QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Name), QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Size),
+                                                    QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Driver),
+                                                    QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Prepath)};
+
     bool okClicked = false;
-    whereClause =
-        QInputDialog::getItem(m_dbView, "Input where clause below", QString("DELETE FROM \"%1\" WHERE \t\t\t\t\t\t\t\t").arg(DB_TABLE::MOVIES),
-                              deleteDriverChoicePool, 0, true, &okClicked);
+    whereClause = QInputDialog::getItem(m_dbView, "Delete where", QString("DELETE FROM \"%1\" WHERE").arg(deleteFromTable), deleteDriverChoicePool, 0,
+                                        true, &okClicked);
     if (not okClicked or whereClause.isEmpty()) {
       qDebug("User Cancel delete row");
-      return false;
+      return true;
     }
   }
-  const QString& deleteCmd = QString("DELETE FROM \"%1\" WHERE %2").arg(DB_TABLE::MOVIES, whereClause);
+
+  const QString& deleteCmd = QString("DELETE FROM \"%1\" WHERE %2").arg(deleteFromTable, whereClause);
+  if (QMessageBox::question(this, "Confirm Delete(NOT recoverable)?", deleteCmd, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) !=
+      QMessageBox::Yes) {
+    qDebug("User Cancel delete row");
+    return true;
+  }
 
   QSqlQuery seleteQry(con);
-  const auto deleteRes = seleteQry.exec(deleteCmd);
-  qDebug("delete from result %d", deleteRes);
+  const bool deleteRes = seleteQry.exec(deleteCmd);
+  qDebug("delete from result: %d", deleteRes);
   m_dbView->m_dbModel->submitAll();
   return deleteRes;
 }
@@ -416,9 +497,6 @@ bool DatabasePanel::on_DeleteByDrive() {
 }
 
 bool DatabasePanel::on_DeleteByPrepath() {
-  const QList<QAction*>& DB_CONTROL_ACTIONS = g_dbAct().DB_CONTROL_ACTIONS->actions();
-  QAction* DELETE_FROM_TABLE = DB_CONTROL_ACTIONS[1];
-
   QSet<QString> prepathSet;
   for (const auto rowIndex : m_dbView->selectionModel()->selectedRows()) {
     const QString& prepath = m_dbView->m_dbModel->absolutePath(rowIndex);
@@ -438,35 +516,34 @@ bool DatabasePanel::on_DeleteByPrepath() {
 
 bool DatabasePanel::onInsertIntoTable() {
   QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen()) {
+  if (not con.isOpen() and not con.open()) {
     qDebug("con cannot open");
     return false;
   }
-  if (not con.tables().contains(DB_TABLE::MOVIES)) {
-    const QString& tablesNotExistsMsg = QString("Cannot insert, table[%1] not exist.").arg(DB_TABLE::MOVIES);
-    qDebug("%s", tablesNotExistsMsg.toStdString().c_str());
-    QMessageBox::warning(m_dbView, "Table NOT exist. ABORT insert", tablesNotExistsMsg);
+  const QString& insertIntoTable = m_tables->currentText();
+  if (not con.tables().contains(insertIntoTable)) {
+    qDebug("Cannot insert into inexist table[%s]", insertIntoTable.toStdString().c_str());
+    QMessageBox::warning(m_dbView, insertIntoTable, "Table NOT exist. ABORT insert");
     return false;
   }
   const QString& selectPath = QFileDialog::getExistingDirectory(
-      m_dbView, "Choose a path",
-      PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString());
+      m_dbView, "Choose a path into table: " + insertIntoTable,
+      PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString(),
+      QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
     qDebug("Path[%s] is not directory", selectPath.toStdString().c_str());
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
-  if (QMessageBox::question(this, "CONFIRM insert?",
-                            QString("Item(s) under [%1] will be insert into table[%2]?").arg(selectPath, DB_TABLE::MOVIES)) !=
-      QMessageBox::StandardButton::Yes) {
+  if (QMessageBox::question(this, "CONFIRM INSERT?", selectPath + "/* =>" + insertIntoTable) != QMessageBox::StandardButton::Yes) {
     qDebug("User cancel insert[%s]", selectPath.toStdString().c_str());
     return true;
   }
 
   const QString CURRENT_DRIVE_LETTER = QStorageInfo(selectPath).rootPath();
 
-  static const QString& insertTemplate = QString("REPLACE INTO `%1` (%2) VALUES").arg(DB_TABLE::MOVIES).arg(DB_HEADER_KEY::DB_HEADER.join(',')) +
-                                         QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\", %7, \"%8\", \"%9\", \"%10\", \"%11\");");
+  const QString& insertTemplate = QString("REPLACE INTO `%1` (%2) VALUES").arg(insertIntoTable).arg(DB_HEADER_KEY::DB_HEADER.join(',')) +
+                                  QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\", %7, \"%8\", \"%9\", \"%10\", \"%11\");");
 
   if (not con.transaction()) {
     qDebug() << "Failed to start transaction mode";
@@ -499,59 +576,26 @@ bool DatabasePanel::onInsertIntoTable() {
     ++totalItemCnt;
   }
 
+  insertTableQuery.finish();
   if (!con.commit()) {
     qDebug() << "Failed to commit, all will be rollback";
     con.rollback();
     succeedItemCnt = 0;
+    return false;
   }
-  insertTableQuery.finish();
-  const QString& msg = QString("%1/%2 item(s) add succeed. %3").arg(succeedItemCnt).arg(totalItemCnt).arg(selectPath);
-  qDebug("%s", msg.toStdString().c_str());
-  QMessageBox::information(m_dbView, QString("Finish insert into table[%1]").arg(DB_TABLE::MOVIES), msg.toStdString().c_str());
+  qDebug("%d/%d item(s) add succeed. [%s]", succeedItemCnt, totalItemCnt, selectPath.toStdString().c_str());
+  QMessageBox::information(m_dbView, QString("%1/%2 succeed").arg(succeedItemCnt).arg(totalItemCnt), selectPath);
   m_dbView->m_dbModel->submitAll();
   return true;
 }
 
-void DatabasePanel::onSelectBatch(const QAction* act) {
-  bool changed = false;
-  if (act->text() == "all") {
-    for (auto* driveAct : g_dbAct().DRIVE_SEPERATE_SELECTION_AG->actions()) {
-      if (not driveAct->isChecked()) {
-        changed = true;
-        driveAct->setChecked(true);
-      }
-    }
-  } else if (act->text() == "none") {
-    for (auto* driveAct : g_dbAct().DRIVE_SEPERATE_SELECTION_AG->actions()) {
-      if (driveAct->isChecked()) {
-        changed = true;
-        driveAct->setChecked(false);
-      }
-    }
-  } else if (act->text() == "online") {
-    for (auto* driveAct : g_dbAct().DRIVE_SEPERATE_SELECTION_AG->actions()) {
-      const bool exiDir = QFile::exists(act->text());
-      if (driveAct->isChecked() != exiDir) {
-        changed = true;
-        driveAct->setChecked(exiDir);
-      }
-    }
-  }
-  if (not changed) {
-    qDebug("[Normal] No need to change model filter(batch selection checked same).");
-    return;
-  }
-  m_dbView->onSearchDataBase(m_searchLE->text());
-}
-
 void DatabasePanel::subscribe() {
-  connect(g_dbAct().DRIVE_BATCH_SELECTION_AG, &QActionGroup::triggered, this, &DatabasePanel::onSelectBatch);
-  connect(g_dbAct().DRIVE_SEPERATE_SELECTION_AG, &QActionGroup::triggered, this, &DatabasePanel::onSelectSingleDriver);
-
   connect(m_searchLE, &QLineEdit::returnPressed, this, [this]() {
     const QString& searchPattern = m_searchLE->text();
     m_dbView->onSearchDataBase(searchPattern);
   });
+
+  connect(m_tables, &QComboBox::currentTextChanged, this, &DatabasePanel::setCurrentMovieTable);
 
   {
     const QList<QAction*>& DB_CONTROL_ACTIONS = g_dbAct().DB_CONTROL_ACTIONS->actions();
@@ -562,14 +606,17 @@ void DatabasePanel::subscribe() {
     QAction* INIT_A_TABLE = DB_CONTROL_ACTIONS[3];
     QAction* DROP_A_DATABASE = DB_CONTROL_ACTIONS[4];
     QAction* DROP_A_TABLE = DB_CONTROL_ACTIONS[5];
+    QAction* UNION_TABLE = DB_CONTROL_ACTIONS[6];
 
     connect(INIT_A_DATABASE, &QAction::triggered, this, &DatabasePanel::onInitDataBase);
     connect(DROP_A_DATABASE, &QAction::triggered, this, [this]() { QMessageBox::warning(m_dbView, "Too danger", "Cancel drop database"); });
 
-    connect(INIT_A_TABLE, &QAction::triggered, this, &DatabasePanel::onInitATable);
+    connect(INIT_A_TABLE, &QAction::triggered, this, &DatabasePanel::onCreateATable);
     connect(DROP_A_TABLE, &QAction::triggered, this, &DatabasePanel::onDropATable);
     connect(INSERT_A_PATH, &QAction::triggered, this, &DatabasePanel::onInsertIntoTable);
     connect(DELETE_FROM_TABLE, &QAction::triggered, this, [this]() { this->onDeleteFromTable(); });
+
+    connect(UNION_TABLE, &QAction::triggered, this, &DatabasePanel::onUnionTables);
   }
 
   {
@@ -581,6 +628,13 @@ void DatabasePanel::subscribe() {
   }
 
   { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &DatabasePanel::onQuickWhereClause); }
+
+  {
+    const QList<QAction*>& DB_FUNCTIONS_ACTIONS = g_dbAct().DB_FUNCTIONS->actions();
+    QAction* COUNT = DB_FUNCTIONS_ACTIONS[0];
+    QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
+    connect(COUNT, &QAction::triggered, this, &DatabasePanel::onCountRow);
+  }
 }
 
 void DatabasePanel::onQuickWhereClause() {
@@ -592,6 +646,28 @@ void DatabasePanel::onQuickWhereClause() {
   qDebug("Quick where clause: [%s]", where.toStdString().c_str());
   m_searchLE->setText(where);
   emit m_searchLE->returnPressed();
+}
+
+int DatabasePanel::onCountRow() {
+  auto con = GetSqlVidsDB();
+  if (not con.isOpen() and not con.open()) {
+    qDebug("Cannot open connection");
+    return -1;
+  }
+
+  QString countCmd = QString("SELECT COUNT(%1) FROM %2").arg(DB_HEADER_KEY::Name).arg(m_tables->currentText());
+  if (not m_searchLE->text().isEmpty()) {
+    countCmd += ("WHERE " + m_searchLE->text());
+  }
+
+  QSqlQuery queryCount(con);
+  queryCount.exec(countCmd);
+  queryCount.next();
+
+  const int rowCnt = queryCount.value(0).toInt();
+  QMessageBox::information(this, countCmd, QString("Count=%1").arg(rowCnt));
+  qDebug("%d: %s", rowCnt, countCmd.toStdString().c_str());
+  return rowCnt;
 }
 
 #include <QMainWindow>
