@@ -47,6 +47,7 @@ SOURCES += \
     RibbonMenu.cpp \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
+    Tools/CopyItemPropertiesToClipboardIF.cpp \
     Tools/DBTableMoviesHelper.cpp \
     Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
@@ -122,6 +123,7 @@ HEADERS += \
     RibbonMenu.h \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
+    Tools/CopyItemPropertiesToClipboardIF.h \
     Tools/DBTableMoviesHelper.h \
     Tools/DuplicateImagesRemover.h \
     Tools/FilesNameBatchStandardizer.h \

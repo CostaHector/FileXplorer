@@ -229,10 +229,10 @@ class RenameWidget : public QDialog {
       te->show();
       return true;
     }
-    bool isAllSuccess = g_undoRedo.Do(cmds);
+    bool isAllSuccess = g_undoRedo.Do(reversedcmds);
     if (isInterative) {
       if (isAllSuccess) {
-        new Toaster(this, QString("%1 command(s).").arg(cmds.size()), isAllSuccess);
+        new Toaster(this, QString("%1 command(s).").arg(reversedcmds.size()), isAllSuccess);
       }
     }
     close();

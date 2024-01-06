@@ -178,12 +178,6 @@ class FileExplorerEvent : public QObject {
   auto on_OpenInVideoPlayer() const -> bool;
   auto on_PlayVideo() const -> bool;
 
-  auto on_copyFullPath() const -> bool;
-  auto on_copyFullPathFolderNameAndAppendImageSuffix() const -> bool;
-  auto on_copyDirPath() const -> bool;
-  auto on_copyName() const -> bool;
-  auto PathCopyTriple(const QStringList lst, const QString& opName) const -> bool;
-
   auto on_Merge(const bool reverse = false) -> bool;
   auto on_Copy() -> bool;
   auto on_Cut() -> bool;

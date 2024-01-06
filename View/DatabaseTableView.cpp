@@ -1,6 +1,7 @@
 #include "DatabaseTableView.h"
 
 #include "Component/QuickWhereClause.h"
+#include "Tools/CopyItemPropertiesToClipboardIF.h"
 #include "Tools/PlayVideo.h"
 #include "View/ViewHelper.h"
 
@@ -80,13 +81,12 @@ auto DatabaseTableView::UpdateItemViewFontSize() -> void {
 
 void DatabaseTableView::subscribe() {
   {
-    const QList<QAction*>& DB_RIGHT_CLICK_MENU_AG = g_dbAct().DB_RIGHT_CLICK_MENU_AG->actions();
-    auto* OPEN_RUN = DB_RIGHT_CLICK_MENU_AG[0];
-    auto* PLAY_VIDEOS = DB_RIGHT_CLICK_MENU_AG[1];
-    auto* _REVEAL_IN_EXPLORER = DB_RIGHT_CLICK_MENU_AG[2];
-    connect(OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
-    connect(PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
-    connect(_REVEAL_IN_EXPLORER, &QAction::triggered, this, &DatabaseTableView::on_revealInExplorer);
+    connect(g_dbAct().OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
+    connect(g_dbAct().PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
+    connect(g_dbAct()._REVEAL_IN_EXPLORER, &QAction::triggered, this, &DatabaseTableView::on_revealInExplorer);
+    connect(g_dbAct().COPY_DB_ITEM_NAME, &QAction::triggered, this, [this]() { CopyItemPropertiesToClipboardIF::on_copyName(this, m_dbModel); });
+    connect(g_dbAct().COPY_DB_ITEM_FULL_PATH, &QAction::triggered, this,
+            [this]() { CopyItemPropertiesToClipboardIF::on_copySelectedItemFullPath(this, m_dbModel); });
   }
 
   connect(this, &QTableView::doubleClicked, this, &DatabaseTableView::on_cellDoubleClicked);
@@ -242,7 +242,7 @@ DatabasePanel::DatabasePanel(QWidget* parent)
   m_searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
   m_searchCB->setLineEdit(m_searchLE);
 
-  m_searchCB->addItem(QString("%1 not like \"_a%B\"").arg(DB_HEADER_KEY::Name));
+  m_searchCB->addItem(QString("%1 like \"%\"").arg(DB_HEADER_KEY::ForSearch));
   m_searchCB->addItem(QString("%1 in (\"ts\", \"avi\")").arg(DB_HEADER_KEY::Type));
   m_searchCB->addItem(QString("%1 between 0 AND 1000000").arg(DB_HEADER_KEY::Size));
   m_searchCB->addItem(QString("%1 = \"E:/\"").arg(DB_HEADER_KEY::Driver));
@@ -408,7 +408,7 @@ bool DatabasePanel::onDropATable() {
     return false;
   }
   const QStringList& tables = con.tables();
-  if (tables.isEmpty()){
+  if (tables.isEmpty()) {
     qDebug("No table find now");
     return true;
   }
@@ -474,9 +474,6 @@ bool DatabasePanel::onDeleteFromTable(const QString& clause) {
 }
 
 bool DatabasePanel::on_DeleteByDrive() {
-  const QList<QAction*>& DB_CONTROL_ACTIONS = g_dbAct().DB_CONTROL_ACTIONS->actions();
-  QAction* DELETE_FROM_TABLE = DB_CONTROL_ACTIONS[1];
-
   QSet<QString> driversSet;
 
   for (const auto rowIndex : m_dbView->selectionModel()->selectedRows()) {
@@ -620,11 +617,8 @@ void DatabasePanel::subscribe() {
   }
 
   {
-    const QList<QAction*>& DB_RIGHT_CLICK_MENU_AG = g_dbAct().DB_RIGHT_CLICK_MENU_AG->actions();
-    auto* DELETE_BY_DRIVER = DB_RIGHT_CLICK_MENU_AG[3];
-    auto* DELETE_BY_PREPATH = DB_RIGHT_CLICK_MENU_AG[4];
-    connect(DELETE_BY_DRIVER, &QAction::triggered, this, &DatabasePanel::on_DeleteByDrive);
-    connect(DELETE_BY_PREPATH, &QAction::triggered, this, &DatabasePanel::on_DeleteByPrepath);
+    connect(g_dbAct().DELETE_BY_DRIVER, &QAction::triggered, this, &DatabasePanel::on_DeleteByDrive);
+    connect(g_dbAct().DELETE_BY_PREPATH, &QAction::triggered, this, &DatabasePanel::on_DeleteByPrepath);
   }
 
   { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &DatabasePanel::onQuickWhereClause); }
