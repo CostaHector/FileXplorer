@@ -7,7 +7,6 @@
 #include <QCloseEvent>
 #include <QColor>
 #include <QCursor>
-#include <QDateTime>
 #include <QDesktopServices>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -63,7 +62,7 @@ class FileInfoType {
 
 class RenameConflicts : public QDialog {
  public:
-  const ConflictsItemHelper& itemIF;
+  const ConflictsItemHelper itemIF; // dont user reference. object point to will be release after statement
   const QString leftFolderPath;
   const QString rightFolderPath;
   const int ROW_COUNT;

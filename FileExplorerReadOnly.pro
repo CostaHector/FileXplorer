@@ -12,24 +12,33 @@ SOURCES += \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
+    Actions/PerformersManagerActions.cpp \
+    Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
+    Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
     AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
+    Component/AdvanceSearchWindow.cpp \
     Component/ClickableSlider.cpp \
     Component/CustomStatusBar.cpp \
     Component/DBRightClickMenu.cpp \
     Component/DatabaseToolBar.cpp \
     Component/JsonEditor.cpp \
-    Component/PerformersManager.cpp \
-    Component/PerformersWidget.cpp \
+    Component/JsonPerformersListInputer.cpp \
+    Component/PerformersManagerWidget.cpp \
+    Component/PerformersPreviewTextBrowser.cpp \
+    Component/ProductionStudioManager.cpp \
+    Component/QuickWhereClause.cpp \
+    Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
+    Component/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
     FileOperation/FileOperation.cpp \
@@ -38,13 +47,19 @@ SOURCES += \
     RibbonMenu.cpp \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
+    Tools/CopyItemPropertiesToClipboardIF.cpp \
+    Tools/DBTableMoviesHelper.cpp \
+    Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/JsonFileHelper.cpp \
     Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
+    Tools/PerformerJsonFileHelper.cpp \
+    Tools/PerformersStringParser.cpp \
     Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
     Tools/SubscribeDatabase.cpp \
+    Tools/TorrentsDatabaseHelper.cpp \
     UndoRedo.cpp \
     View/DatabaseTableView.cpp \
     View/DragDropTableView.cpp \
@@ -73,24 +88,33 @@ HEADERS += \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
+    Actions/PerformersManagerActions.h \
+    Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
+    Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
     AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
+    Component/AdvanceSearchWindow.h \
     Component/ClickableSlider.h \
     Component/CustomStatusBar.h \
     Component/DBRightClickMenu.h \
     Component/DatabaseToolBar.h \
     Component/JsonEditor.h \
-    Component/PerformersManager.h \
-    Component/PerformersWidget.h \
+    Component/JsonPerformersListInputer.h \
+    Component/PerformersManagerWidget.h \
+    Component/PerformersPreviewTextBrowser.h \
+    Component/ProductionStudioManager.h \
+    Component/QuickWhereClause.h \
+    Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    Component/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
     FileOperation/FileOperation.h \
@@ -99,13 +123,19 @@ HEADERS += \
     RibbonMenu.h \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
+    Tools/CopyItemPropertiesToClipboardIF.h \
+    Tools/DBTableMoviesHelper.h \
+    Tools/DuplicateImagesRemover.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/JsonFileHelper.h \
     Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
+    Tools/PerformerJsonFileHelper.h \
+    Tools/PerformersStringParser.h \
     Tools/PlayVideo.h \
     Tools/RenameWidget.h \
     Tools/SubscribeDatabase.h \
+    Tools/TorrentsDatabaseHelper.h \
     UndoRedo.h \
     View/DatabaseTableView.h \
     View/DragDropTableView.h \
@@ -137,7 +167,11 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
+    bin/PerformerHtmlTemplate.html \
+    bin/STANDARD_STUDIO_NAME_JSON.json \
     readme.md
 
 QMAKE_POST_LINK +=
     \
+
+FORMS +=

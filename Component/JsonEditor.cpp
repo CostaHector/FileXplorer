@@ -1,6 +1,8 @@
 #include "JsonEditor.h"
 #include "Actions/JsonEditorActions.h"
-#include "Component/PerformersManager.h"
+#include "Actions/QuickWhereActions.h"
+#include "Tools/PerformersStringParser.h"
+#include "Component/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 
 #include <QDesktopServices>
@@ -9,6 +11,7 @@
 #include <QInputDialog>
 #include <QTableWidgetItem>
 #include <QToolBar>
+#include <QTextDocumentFragment>
 
 const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [%1/%2]";
 const QColor JsonEditor::MEET_CONDITION_COLOR(150, 150, 150);
@@ -31,6 +34,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   tb->addSeparator();
   tb->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
   tb->addAction(g_jsonEditorActions()._HINT);
+  tb->addAction(g_quickWhereAg().OPEN_AKA_TEXT);
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, tb);
 
@@ -116,8 +120,8 @@ void JsonEditor::autoNext() {
     if (dict.isEmpty()) {
       continue;
     }
-    qDebug("len(performers)=%d, [%s]", dict["Performers"].toJsonArray().size(), curJsonPath.toStdString().c_str());
-    if ((dict["Performers"].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
+    qDebug("len(performers)=%d, [%s]", dict[DB_HEADER_KEY::Performers].toJsonArray().size(), curJsonPath.toStdString().c_str());
+    if ((dict[DB_HEADER_KEY::Performers].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
       jsonListPanel->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
       jsonListPanel->setCurrentRow(curRow);
       return;
@@ -179,6 +183,14 @@ void JsonEditor::refreshEditPanel() {
     }
     extraEditorPanel->addRow(keyName, new QLineEdit(valueStr));
   }
+  if (not jsonKeySetMet.contains(JSONKey::Performers)) {
+    jsonKeySetMet.insert(JSONKey::Performers);
+    onPerformersHint();
+  }
+  if (not jsonKeySetMet.contains(JSONKey::ProductionStudio)) {
+    jsonKeySetMet.insert(JSONKey::ProductionStudio);
+    qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::ProductionStudio])->setText("");
+  }
   if (not jsonKeySetMet.contains(JSONKey::Hot)) {
     jsonKeySetMet.insert(JSONKey::Hot);
     qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Hot])->setText("");
@@ -187,7 +199,6 @@ void JsonEditor::refreshEditPanel() {
     jsonKeySetMet.insert(JSONKey::Rate);
     qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Rate])->setText("-1");
   }
-
   editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
 
@@ -228,6 +239,8 @@ void JsonEditor::subscribe() {
       onSubmitAllChanges();
     }
   });
+
+  connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
 
   connect(g_jsonEditorActions()._SELECT_A_FOLDER_AND_LOAD_JSON, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
   connect(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
@@ -355,7 +368,7 @@ auto JsonEditor::onLowercaseEachWord() -> void {
       if (not detailEditWidget->textCursor().hasSelection()) {
         continue;
       }
-      const QString& before = detailEditWidget->textCursor().selectedText();
+      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
       detailEditWidget->textCursor().removeSelectedText();
       const QString& after = lowercaseSentense(before);
       detailEditWidget->textCursor().insertText(after);
@@ -392,7 +405,7 @@ auto JsonEditor::onCapitalizeEachWord() -> void {
       if (not detailEditWidget->textCursor().hasSelection()) {
         continue;
       }
-      const QString& before = detailEditWidget->textCursor().selectedText();
+      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
       detailEditWidget->textCursor().removeSelectedText();
       const QString& after = capitalizeEachWord(before);
       detailEditWidget->textCursor().insertText(after);
@@ -421,40 +434,102 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
-  static PerformersManager& pm = PerformersManager::getIns();
+
+  static PerformersStringParser& pm = PerformersStringParser::getIns();
   const int newLearnedCnt = pm.LearningFromAPath(loadFromFi.absoluteFilePath());
-  QMessageBox::information(this, "Learning succeed", QString("New Learned Performers Count:%1").arg(newLearnedCnt));
-  return newLearnedCnt >= 0;
+
+  static ProductionStudioManager& psm = ProductionStudioManager::getIns();
+  const int newLearnedProdStudioCnt = psm.LearningFromAPath(loadFromFi.absoluteFilePath());
+
+  QMessageBox::information(
+      this, "Learning succeed",
+      QString("New Learned:\n Performers Count:%1\n Production Studios Count:%2").arg(newLearnedCnt).arg(newLearnedProdStudioCnt));
+
+  return newLearnedCnt >= 0 or newLearnedProdStudioCnt >= 0;
 }
 
 QStringList JsonEditor::onPerformersHint() {
-  static PerformersManager& pm = PerformersManager::getIns();
+  static PerformersStringParser& pm = PerformersStringParser::getIns();
+  static ProductionStudioManager& psm = ProductionStudioManager::getIns();
+
+  QString nameText;
   QString sentence;
   if (jsonKeySetMet.contains(JSONKey::Name)) {
-    sentence += qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name])->text();
+    nameText = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name])->text();
+    sentence += nameText;
   }
   if (jsonKeySetMet.contains(JSONKey::Detail)) {
-    sentence += " " + qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail])->toPlainText();
+    auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+    if (te->textCursor().hasSelection()) {
+      sentence += " " + te->textCursor().selection().toPlainText();
+    }
   }
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
-    return {};
+    jsonKeySetMet.insert(JSONKey::Performers);
   }
-  const QStringList& perfsList = pm(sentence);
-  qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers])->setText(perfsList.join(", "));
-  return perfsList;
+  auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
+  const QStringList& newPerfsList = pm(sentence);
+  QStringList beforePerfsList;
+  if (not p->text().isEmpty()) {
+    beforePerfsList = p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+  }
+  if (beforePerfsList.size() < newPerfsList.size()) {
+    p->setText(newPerfsList.join(", "));
+  }
+
+  if (not jsonKeySetMet.contains(JSONKey::ProductionStudio)) {
+    jsonKeySetMet.insert(JSONKey::ProductionStudio);
+  }
+
+  auto* ps = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::ProductionStudio]);
+  const QString newProdStudioName = psm(nameText);
+  if (not newProdStudioName.isEmpty()) {
+    ps->setText(newProdStudioName);
+  }
+  return newPerfsList;
+}
+
+bool JsonEditor::onSelectedTextAppendToPerformers() {
+  static PerformersStringParser& pm = PerformersStringParser::getIns();
+
+  if (not jsonKeySetMet.contains(JSONKey::Performers)) {
+    jsonKeySetMet.insert(JSONKey::Performers);
+  }
+
+  QStringList perfs;
+  auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
+  if (not p->text().isEmpty()) {
+    perfs += p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+  }
+
+  if (jsonKeySetMet.contains(JSONKey::Name)) {
+    const auto* le = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name]);
+    if (le->hasSelectedText()) {
+      perfs << le->selectedText();
+    }
+  }
+  if (jsonKeySetMet.contains(JSONKey::Detail)) {
+    const auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+    if (te->textCursor().hasSelection()) {
+      perfs << te->textCursor().selection().toPlainText();
+    }
+  }
+  perfs.removeDuplicates();
+  p->setText(perfs.join(", "));
+  return true;
 }
 
 bool JsonEditor::formatter() {
   if (jsonKeySetMet.contains(JSONKey::Performers)) {
     auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
     QString valueStr = lineWidget->text();
-    valueStr.replace(SEPERATOR_COMP, ", ");
+    valueStr.replace(JSON_RENAME_REGEX::SEPERATOR_COMP, ", ");
     lineWidget->setText(valueStr.trimmed());
   }
   if (jsonKeySetMet.contains(JSONKey::Tags)) {
     auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Tags]);
     QString valueStr = lineWidget->text();
-    valueStr.replace(SEPERATOR_COMP, ", ");
+    valueStr.replace(JSON_RENAME_REGEX::SEPERATOR_COMP, ", ");
     lineWidget->setText(valueStr.trimmed());
   }
 }

@@ -17,10 +17,11 @@
 #include <QToolTip>
 
 constexpr int ROW_SECTION_HEIGHT = 10;
-const QPoint TOOLTIP_MSG_PNG_DEV(70, 0);
-const QString TOOLTIP_MSG_LINK("LINK:<font color=\"gray\" size=\"14\">%1</font>");
-const QString TOOLTIP_MSG_CP("CP:<font color=\"gray\" size=\"14\">%1</font>");
-const QString TOOLTIP_MSG_MV("MV:<font color=\"gray\" size=\"14\">%1</font>");
+const QPoint TOOLTIP_MSG_PNG_DEV(48, 0);
+
+const QString TOOLTIP_MSG_LINK("<font color=\"blue\">LINK---------------------------------------------------: <br/>%1</font>");
+const QString TOOLTIP_MSG_CP("<font color=\"red\">CP---------------------------------------------------: <br/>%1</font>");
+const QString TOOLTIP_MSG_MV("<font color=\"green\">MV---------------------------------------------------: <br/>%1</font>");
 
 class View {
  public:
@@ -91,13 +92,16 @@ class View {
   static void changeDropAction(QDropEvent* event, QPoint pnt, const QString& name, QWidget* w) {
     if (event->keyboardModifiers().testFlag(Qt::AltModifier)) {
       event->setDropAction(Qt::DropAction::LinkAction);
-      QToolTip::showText(pnt, TOOLTIP_MSG_LINK.arg(name), w);
+      if (not name.isEmpty())
+        QToolTip::showText(pnt, TOOLTIP_MSG_LINK.arg(name), w);
     } else if (event->keyboardModifiers() & Qt::ControlModifier) {
       event->setDropAction(Qt::DropAction::CopyAction);
-      QToolTip::showText(pnt, TOOLTIP_MSG_CP.arg(name), w);
+      if (not name.isEmpty())
+        QToolTip::showText(pnt, TOOLTIP_MSG_CP.arg(name), w);
     } else {
       event->setDropAction(Qt::DropAction::MoveAction);
-      QToolTip::showText(pnt, TOOLTIP_MSG_MV.arg(name), w, QRect());
+      if (not name.isEmpty())
+        QToolTip::showText(pnt, TOOLTIP_MSG_MV.arg(name), w);
     }
   }
 
@@ -189,8 +193,8 @@ class View {
   }
 
   static QPixmap PaintDraggedFilesFolders(const int selectedCnt) {
-    QPixmap folderPixmap = QPixmap(":/themes/DRAG_FOLDERS").scaled(QSize(64, 64));
-    QPixmap filesPixmap = QPixmap(":/themes/DRAG_FILES").scaled(QSize(64, 64));
+    QPixmap folderPixmap = QPixmap(":/themes/DRAG_FOLDERS").scaled(QSize(48, 48));
+    static const QPixmap filesPixmap = QPixmap(":/themes/DRAG_FILES").scaled(QSize(48, 48));
 
     QPainter painter(&folderPixmap);  // TODO Visual Experience not work
     painter.drawPixmap(QPoint(8, 8), filesPixmap);
@@ -200,7 +204,7 @@ class View {
       font.setPointSize(18);
       font.setBold(true);
       painter.setFont(font);
-      painter.drawText(QRect(0, 0, 64, 64), Qt::AlignHCenter | Qt::AlignVCenter, QString::number(selectedCnt));
+      painter.drawText(QRect(0, 0, 48, 48), Qt::AlignHCenter | Qt::AlignVCenter, QString::number(selectedCnt));
       painter.end();
     }
     return folderPixmap;
@@ -210,23 +214,19 @@ class View {
     if (event->buttons() != Qt::MouseButton::LeftButton) {
       return;
     }
-    //            if isinstance(view->model(), QSqlTableModel): // TODOFunction
-    //                return
-    QModelIndexList mixed = View::selectedIndexes(view);
-    int nCnt = mixed.size();
+    const QModelIndexList& mixed = View::selectedIndexes(view);
     if (mixed.isEmpty()) {
       event->ignore();
       return;
     }
 
-    QMimeData* mime = new QMimeData;
     auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
     if (_model == nullptr) {
-      qDebug("_model is nullptr");
+      qDebug("[mouseMove] _model is nullptr");
       return;
     }
     if (_model->rootPath().isEmpty()) {
-      qDebug("Ignore. You cannot mouse move into the path[%s]", _model->rootPath().toStdString().c_str());
+      qDebug("Ignore. Disk move is disabled[C:/,D:/,E:/]");
       return;
     }
 
@@ -234,16 +234,17 @@ class View {
     for (const auto& ind : mixed) {
       localFilesLst.append(QUrl::fromLocalFile(_model->filePath(ind)));
     }
+    QMimeData* mime = new QMimeData;
     mime->setUrls(localFilesLst);
 
     QDrag drag(view);
     drag.setMimeData(mime);
 
-    QPixmap folderPixmap = View::PaintDraggedFilesFolders(nCnt);
+    const QPixmap folderPixmap = View::PaintDraggedFilesFolders(mixed.size());
     drag.setPixmap(folderPixmap);
     drag.setHotSpot(folderPixmap.rect().center());
     drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
   }
 };
 
-#endif // VIEWHELPER_H
+#endif  // VIEWHELPER_H

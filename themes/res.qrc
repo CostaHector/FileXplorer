@@ -2,6 +2,10 @@
     <qresource prefix="/themes">
         <file alias="APP_ICON_PATH">AppIcons/REVEAL_IN_EXPLORER.ico</file>
         <file alias="LE_PARSER_APP">AppIcons/LE_PARSER.ico</file>
+        <file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
+        <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
+        <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
+
         <file alias="ITEMS_ORGANIZER.svg">Media/ITEMS_ORGANIZER.svg</file>
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
@@ -162,6 +166,8 @@
         <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
         <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
         <file alias="SHOW_DATABASE">Database/SHOW_DATABASE.svg</file>
+        <file alias="WHERE_CLAUSE_HISTORY">Database/WHERE_CLAUSE_HISTORY.svg</file>
+
         <file alias="ZIP">Share/ZIP.ico</file>
         <file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.svg</file>
         <file alias="MIRROR_REVERT">RenameConflictIcons/MIRROR_REVERT.svg</file>
@@ -170,9 +176,21 @@
         <file alias="CONFLICT">RenameConflictIcons/CONFLICT.svg</file>
         <file alias="RECYCLE">RenameConflictIcons/RECYCLE.svg</file>
         <file alias="RESTORE">RenameConflictIcons/RESTORE.svg</file>
+
+        <file alias="RATE0">PerformersManager/0.png</file>
+        <file alias="RATE1">PerformersManager/1.png</file>
+        <file alias="RATE2">PerformersManager/2.png</file>
+        <file alias="RATE3">PerformersManager/3.png</file>
+        <file alias="RATE4">PerformersManager/4.png</file>
+        <file alias="RATE5">PerformersManager/5.png</file>
+        <file alias="RATE6">PerformersManager/6.png</file>
+        <file alias="RATE7">PerformersManager/7.png</file>
+        <file alias="RATE8">PerformersManager/8.png</file>
+        <file alias="RATE9">PerformersManager/9.png</file>
+        <file alias="RATE10">PerformersManager/10.png</file>
     </qresource>
     <qresource prefix="/">
-        <file alias="STANDARD_STUDIO_NAME_JSON">../bin/StandardStudioName.json</file>
-        <file alias="PERFORMERS_TABLE">../bin/PERFORMERS_TABLE.txt</file>
+        <file alias="STANDARD_STUDIO_NAME_JSON">../bin/STANDARD_STUDIO_NAME_JSON.json</file>
+        <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>
     </qresource>
 </RCC>

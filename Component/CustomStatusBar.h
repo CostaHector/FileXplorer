@@ -5,6 +5,7 @@
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QToolBar>
+#include "PublicVariable.h"
 
 enum class STATUS_STR_TYPE { NORMAL = 0, ABNORMAL = 1 };
 
@@ -14,23 +15,28 @@ class CustomStatusBar : public QStatusBar {
   QToolBar* tb;
   QProgressBar* process;
   QList<QLabel*> labelLst;
+  QLabel* m_clickMe;
 
   explicit CustomStatusBar(QWidget* parent = nullptr)
       : QStatusBar(parent),
         tb(new QToolBar("triple view switch")),
         process(new QProgressBar),
-        labelLst{new QLabel("items"), new QLabel("selected"), new QLabel("")} {
+        labelLst{new QLabel("items"), new QLabel("selected"), new QLabel("")},
+        m_clickMe{new QLabel("click me")} {
     process->setRange(0, 100);
     process->setValue(0);
 
-    //        tb->addActions(g_viewActions.TRIPLE_VIEW.actions());
-    //        tb->addAction(g_dbAct.DB_VIEW_CLOSE_SHOW);
     tb->setIconSize(QSize(CustomStatusBar::STATUS_BAR_ICON_SIZE, CustomStatusBar::STATUS_BAR_ICON_SIZE));
+
+    m_clickMe->setText(QString("<a href=\"file:///%1\">click me</a>").arg(SystemPath::RUNLOGS));
+    m_clickMe->setToolTip("click me to see the logs. under path:\n" + SystemPath::RUNLOGS);
+    m_clickMe->setOpenExternalLinks(true);
 
     // [QSizeGrip, Here is 1st~(n-1)th Widget, QHBoxLayout, here is nth widget];
     addPermanentWidget(labelLst[0]);     // start=1, dev=0
     addPermanentWidget(labelLst[1]);     // start=1, dev=1
     addPermanentWidget(labelLst[2], 1);  // 1+3
+    addPermanentWidget(m_clickMe);
     addPermanentWidget(process);
     addPermanentWidget(tb);  // -1
     setContentsMargins(0, 0, 0, 0);

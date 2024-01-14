@@ -52,7 +52,7 @@ class JsonEditor : public QMainWindow {
   auto onCapitalizeEachWord() -> void;
   auto onLearnPerfomersFromJsonFile() -> bool;
   auto onPerformersHint() -> QStringList;
-
+  auto onSelectedTextAppendToPerformers() -> bool;
   auto sizeHint() const -> QSize override { return QSize(1024, 768); }
 
  signals:

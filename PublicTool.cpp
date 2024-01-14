@@ -2,6 +2,7 @@
 #include "PublicVariable.h"
 
 #include <QDir>
+#include <QSqlError>
 
 PublicTool::PublicTool() {}
 
@@ -137,7 +138,7 @@ auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList
   return {relFullNames.crbegin(), relFullNames.crend()};
 }
 
-auto ChooseCopyDestination(QString defaultPath, QWidget *parent) -> QString {
+auto ChooseCopyDestination(QString defaultPath, QWidget* parent) -> QString {
   if (not QFileInfo(defaultPath).isDir()) {
     defaultPath = PreferenceSettings().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
   }
@@ -151,7 +152,7 @@ auto ChooseCopyDestination(QString defaultPath, QWidget *parent) -> QString {
 }
 
 auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* oldAG) -> QString {
-  if (!oldAG){
+  if (!oldAG) {
     qDebug("[Err] oldAG nullptr");
     return "";
   }
@@ -170,20 +171,22 @@ auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* old
   for (auto* act : oldAG->actions()) {
     actionsStr += (act->text() + MOVE_COPT_TO_PATH_STR_SEPERATOR);
   }
-  if (not actionsStr.isEmpty()){
+  if (not actionsStr.isEmpty()) {
     actionsStr.chop(1);
   }
   return actionsStr;
 }
 
-auto GetSqlDB() -> QSqlDatabase {
+auto GetSqlVidsDB() -> QSqlDatabase {
   QSqlDatabase con;
   if (QSqlDatabase::connectionNames().contains("custom_connection")) {
     con = QSqlDatabase::database("custom_connection", false);
   } else {
     con = QSqlDatabase::addDatabase("QSQLITE", "custom_connection");
   }
-  con.setDatabaseName(SystemPath::FILE_INFO_DATABASE);
-  con.open();
+  con.setDatabaseName(SystemPath::VIDS_DATABASE);
+  if (not con.open()) {
+    qDebug("%s", con.lastError().text().toStdString().c_str());
+  }
   return con;
 }

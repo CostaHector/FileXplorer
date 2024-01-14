@@ -79,6 +79,6 @@ class CatergorizerTest : public QObject {
   }
 };
 
-QTEST_MAIN(CatergorizerTest)
+//QTEST_MAIN(CatergorizerTest)
 
 #include "CatergorizerTest.moc"

@@ -22,7 +22,7 @@ const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 
 FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
     : QMainWindow(parent),
-      previewHtmlDock(new QDockWidget("Preview HTML")),
+      previewHtmlDock(new QDockWidget("Preview HTML", this)),
       previewHtml(new FolderPreviewHTML(previewHtmlDock)),
       //      previewWidget(new FolderPreviewWidget),
       previewWidget(nullptr),
@@ -33,7 +33,9 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       osm(new RibbonMenu),
       _statusBar(new CustomStatusBar),
       m_jsonEditor(new JsonEditor(this)),
-      m_videoPlayer(new VideoPlayer(this)) {
+      m_videoPlayer(new VideoPlayer(this)),
+      m_performerManager(nullptr),
+      m_torrentsManager(nullptr) {
   QString initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
 
@@ -48,8 +50,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
   previewHtmlDock->setWidget(previewHtml);
   //  previewHtmlDock->setWidget(previewWidget);
   previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
-
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
+
   addToolBar(Qt::ToolBarArea::LeftToolBarArea, _navigationToolBar);
   setMenuWidget(osm);
   setStatusBar(_statusBar);

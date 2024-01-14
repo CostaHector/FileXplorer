@@ -80,7 +80,6 @@ class RenameActions : public QObject {
       act->setCheckable(false);
       act->setShortcutVisibleInContextMenu(true);
     };
-    qDebug("when %d", actionGroup->actions().size());
     return actionGroup;
   }
   QActionGroup* RENAME_RIBBONS;

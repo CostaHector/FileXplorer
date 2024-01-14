@@ -2,24 +2,31 @@
 
 #include <QHBoxLayout>
 #include <functional>
-NavigationAndAddressBar::NavigationAndAddressBar(T_IntoNewPath IntoNewPath, T_on_searchTextChanged on_searchTextChanged,
+NavigationAndAddressBar::NavigationAndAddressBar(T_IntoNewPath IntoNewPath,
+                                                 T_on_searchTextChanged on_searchTextChanged,
                                                  T_on_searchEnterKey on_searchEnterKey)
-    : m_IntoNewPath(IntoNewPath), m_on_searchTextChanged(on_searchTextChanged), m_on_searchEnterKey(on_searchEnterKey),
-
-      backToBtn(new QPushButton(QIcon(":/themes/PATH_BACK_TO"), "")), forwardToBtn(new QPushButton(QIcon(":/themes/PATH_FORWARD_TO"), "")),
-      upToBtn(new QPushButton(QIcon(":/themes/PATH_UP_TO"), "")), winAddress(new AddressELineEdit), searchLE(new QLineEdit)
-
+    : winAddress(new AddressELineEdit),
+      backToBtn(new QPushButton(QIcon(":/themes/PATH_BACK_TO"), "")),
+      forwardToBtn(new QPushButton(QIcon(":/themes/PATH_FORWARD_TO"), "")),
+      searchLE(new QLineEdit),
+      upToBtn(new QPushButton(QIcon(":/themes/PATH_UP_TO"), "")),
+      m_IntoNewPath(IntoNewPath),
+      m_on_searchTextChanged(on_searchTextChanged),
+      m_on_searchEnterKey(on_searchEnterKey)
 {
-  backToBtn->setStyleSheet("border-left: 1px solid gray;"
-                           "border-right: 1px dotted gray;"
-                           "border-top: 1px solid gray;"
-                           "border-bottom: 1px solid gray;");
-  forwardToBtn->setStyleSheet("border-right: 1px dotted gray;"
-                              "border-top: 1px solid gray;"
-                              "border-bottom: 1px solid gray;");
-  upToBtn->setStyleSheet("border-right: 1px solid gray;"
-                         "border-top: 1px solid gray;"
-                         "border-bottom: 1px solid gray;");
+  backToBtn->setStyleSheet(
+      "border-left: 1px solid gray;"
+      "border-right: 1px dotted gray;"
+      "border-top: 1px solid gray;"
+      "border-bottom: 1px solid gray;");
+  forwardToBtn->setStyleSheet(
+      "border-right: 1px dotted gray;"
+      "border-top: 1px solid gray;"
+      "border-bottom: 1px solid gray;");
+  upToBtn->setStyleSheet(
+      "border-right: 1px solid gray;"
+      "border-top: 1px solid gray;"
+      "border-bottom: 1px solid gray;");
   backToBtn->setFixedHeight(CONTROL_HEIGHT);
   forwardToBtn->setFixedHeight(CONTROL_HEIGHT);
   upToBtn->setFixedHeight(CONTROL_HEIGHT);
@@ -53,7 +60,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(T_IntoNewPath IntoNewPath, T_on
 #include <QApplication>
 
 class IntoNewPathMockClass {
-public:
+ public:
   bool IntoNewPath(QString a, bool b, bool c) {
     qDebug("IntoNewPath: %s, %d, %d", a.toStdString().c_str(), b, c);
     return true;
@@ -68,7 +75,7 @@ public:
   }
 };
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   using std::placeholders::_1;
   using std::placeholders::_2;
   using std::placeholders::_3;

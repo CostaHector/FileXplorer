@@ -6,52 +6,33 @@
 #include <QTextBrowser>
 #include <QTextCursor>
 #include <QTextEdit>
-#include "Actions/FileBasicOperationsActions.h"
+
 class FolderPreviewHTML : public QTextBrowser {
  public:
-  FolderPreviewHTML(QWidget* parent = nullptr)
-      : m_scrollAtEndBefore(false), m_parent(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN->actions()[0]) {
-    setReadOnly(true);
-    setOpenLinks(false);
-    setOpenExternalLinks(true);
-
-    connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &FolderPreviewHTML::ShowAllImages);
-    connect(this, &QTextBrowser::anchorClicked, this, &FolderPreviewHTML::onAnchorClicked);
-  };
-
-  QSize sizeHint() const {
-    auto w = PreferenceSettings().value("dockerHtmlWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
-    auto h = PreferenceSettings().value("dockerHtmlHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
-    return QSize(w, h);
-  }
-
-  bool onAnchorClicked(const QUrl& url) {
-    if (not url.isLocalFile()) {
-      return false;
-    }
-    QFileInfo fi(url.toLocalFile());
-    if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + fi.suffix()) or fi.isDir()) {
-      if (m_PLAY_ACTION) {
-        emit m_PLAY_ACTION->triggered(false);
-      }
-      return true;
-    }
-    QDesktopServices::openUrl(url);
-    return true;
-  }
-
+  explicit FolderPreviewHTML(QWidget* parent = nullptr);
   auto operator()(const QString& path) -> bool;
-  auto ShowAllImages(const int val) -> bool;
-  QString InsertImgs(const QString& dirPath);
+  void subscribe();
+  QSize sizeHint() const override;
 
-  int m_firstSightImgCnt = 3;
+  bool onAnchorClicked(const QUrl& url);
+
+  QStringList InitImgsList(const QString& dirPath) const;
+  bool hasNextImgs() const;
+  QString nextImgsHTMLSrc();
+  auto ShowRemainImages(const int val) -> bool;
+
+  static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 50, INT_MAX}; // never remove last element "INT_MAX"
+  static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(SHOW_IMGS_CNT_LIST[0]);
+  int m_curImgCntIndex = 0;
+
   QString dirPath;
   QStringList m_imgsLst;
-  bool m_scrollAtEndBefore;
   QWidget* m_parent;
-
   QAction* m_PLAY_ACTION;
+  static const QString HTML_H1_TEMPLATE;
+  static const QString HTML_H1_WITH_VIDS_TEMPLATE;
   static const QString HTML_IMG_TEMPLATE;
+  static constexpr int HTML_IMG_FIXED_WIDTH = 600;
 };
 
 #endif  // FOLDERPREVIEWHTML_H

@@ -46,7 +46,7 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
   QRegExp repRegex(oldString);
   if (not repRegex.isValid()) {
     const QString& msg = QString("invalid regex[%1]").arg(oldString);
-    qDebug(msg.toStdString().c_str());
+    qDebug("%s", msg.toStdString().c_str());
     regexValidLabel->ToNotSaved();
     return replaceeList;
   }

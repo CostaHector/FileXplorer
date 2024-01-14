@@ -9,34 +9,36 @@
 #include <QJsonParseError>
 #include <QJsonValue>
 #include "PublicVariable.h"
+#include "Component/ProductionStudioManager.h"
 
-auto NameStandardizer::jsonLoader() -> QMap<QString, QString> {
-  QFile countries_file(":/STANDARD_STUDIO_NAME_JSON");
-  QString json_string;
-  QMap<QString, QString> name2standardName;
-  if (countries_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    json_string = countries_file.readAll();
-    countries_file.close();
-  } else {
-    qDebug("[Error] Performers table file not found");
-    return name2standardName;
+using namespace JSON_RENAME_REGEX;
+auto NameStandardizer::operator()(QString aFileName) -> QString{
+  auto noInvalidChar = aFileName.replace(invalidCharPat, " ");
+  auto noContiousSpace = noInvalidChar.replace(continuousSpaceComp, " ");
+  auto noInvalidQuote = noContiousSpace.replace(invalidQuotePat, "'");
+
+          //non-standard character
+
+  auto noLeadingStr = noInvalidQuote.remove(leadingStrComp);
+
+  auto noLeadingBracket = noLeadingStr.trimmed().remove(leadingOpenBracketComp);
+
+  auto noBracket = noLeadingBracket.replace(nonLeadingBracketComp, "-");
+  auto standardStr = noBracket.replace(spaceBarSpaceComp, "-");
+  auto noContinousHypen = standardStr.replace(continousHypenComp, "-");
+
+  auto isloatedDot = noContinousHypen.replace(hypenOrSpaceFollowedWithDotPat, ".");
+  auto noHypenEnds = isloatedDot.remove(trailingHypenComp);
+  auto fileName = noHypenEnds.replace('-', " - ").trimmed();
+
+          //Get standard Name
+  auto barIndex = fileName.indexOf('-');
+  if (barIndex == -1 or barIndex == 0){
+    return fileName;
   }
-  QJsonParseError jsonErr;
-  QJsonDocument json_doc = QJsonDocument::fromJson(json_string.toUtf8(), &jsonErr);
-  if (jsonErr.error != QJsonParseError::NoError) {
-    qDebug("Error when parse");
-    return name2standardName;
-  }
-  QJsonObject rootObj = json_doc.object();
-  for (const QString& k : rootObj.keys()) {
-    const auto& v = rootObj.value(k);
-    if (not v.isString()) {
-      qDebug("Check value of key[%s], it may not be a string", k.toStdString().c_str());
-      continue;
-    }
-    name2standardName[k] = rootObj.value(k).toString();
-  }
-  return name2standardName;
+  static auto& psm = ProductionStudioManager::getIns();
+  const QString& studioName = fileName.left(barIndex - 1);
+  return psm[studioName] + fileName.mid(barIndex - 1);
 }
 
 //#define __NAME__EQ__MAIN__ 1

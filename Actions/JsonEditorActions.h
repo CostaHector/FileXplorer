@@ -22,6 +22,7 @@ class JsonEditorActions : public QObject {
   QAction* _LOWER_ALL_WORDS;
   QAction* _FORMATTER;
   QAction* _RELOAD_JSON_FROM_FROM_DISK;
+  QAction* _ADD_SELECTED_PERFORMER;
   QAction* _SAVE;
   QAction* _CANCEL;
   QAction* _SUBMIT;
@@ -31,6 +32,15 @@ class JsonEditorActions : public QObject {
   QAction* _OPEN_THIS_FILE;
   QAction* _HINT;
   QAction* _LEARN_PERFORMERS_FROM_JSON;
+
+  QAction* LOAD_JSONS_FROM_CURRENT_FOLDER;
+  QAction* CONSTRUCT_JSONS_FOR_VIDS;
+  QAction* JSON_ADD_PERFORMERS;
+  QAction* JSON_SET_PRODUCTION_STUDIO;
+  QAction* JSON_ADD_PERFORMER_KEY_VALUE_PAIR;
+  QAction* JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR;
+  QAction* JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME;
+  QActionGroup* BATCH_FILES_ACTIONS;
 };
 
 JsonEditorActions& g_jsonEditorActions();

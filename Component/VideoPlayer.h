@@ -11,7 +11,7 @@
 #include <QWidget>
 
 #include "Component/ClickableSlider.h"
-#include "Component/PerformersWidget.h"
+#include "Component/JsonPerformersListInputer.h"
 #include "PublicVariable.h"
 
 QT_BEGIN_NAMESPACE
@@ -125,7 +125,7 @@ class VideoPlayer : public QMainWindow {
 
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
 
-  PerformersWidget* m_performerWid;
+  JsonPerformersListInputer* m_performerWid;
   QVariantHash m_dict;
 
   QMenu* m_playListMenu;

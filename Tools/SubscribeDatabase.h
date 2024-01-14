@@ -14,11 +14,8 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-
-#include <QDateTime>
 #include <QStorageInfo>
 
-#include "MyQSqlTableModel.h"
 #include "PublicVariable.h"
 
 auto InitDataBase() -> bool;
@@ -28,45 +25,22 @@ class SubscribeDatabase : public QObject {
   static auto GetSelectionByDriveClause(const QList<QAction*>& selectByDriveActs) -> QString;
 
   QTableView* view;
-  QWidget* contentPane;
-  MyQSqlTableModel* dbModel;
-  QLineEdit* sqlSearchLE;
-  QString currentSearchColumnName;
   T_SwitchStackWidget switchStackWidget;
+  QWidget* performerManager;
+  QWidget* torrentsManager;
 
-  explicit SubscribeDatabase(QTableView* view_, MyQSqlTableModel* dbModel_, QLineEdit* sqlSearchLE_, T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget())
-      : QObject(), view(view_), dbModel(dbModel_), sqlSearchLE(sqlSearchLE_), currentSearchColumnName("Name"), switchStackWidget(switchStackWidget_) {
+  explicit SubscribeDatabase(QTableView* view_,
+                             T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget(),
+                             QWidget* performerManger_ = nullptr,
+                             QWidget* torrentsManager_ = nullptr)
+      : QObject(), view(view_), switchStackWidget(switchStackWidget_), performerManager(performerManger_), torrentsManager(torrentsManager_) {
     this->subscribe();
   }
 
   auto subscribe() -> void;
-
-  auto onCountRow() -> int;
-
-  static auto onInitDataBase() -> bool;
-
-  auto onInitATable() -> void;
-
-  auto onDropATable() -> bool;
-
-  auto onDeleteFromTable(const QString& clause = "") -> bool;
-  auto on_DeleteByDrive() -> bool;
-  auto on_DeleteByPrepath() -> bool;
-
-  auto onInsertIntoTable() -> bool;
-  auto onSearchDataBase(const QString& searchText) -> bool;
-  auto onSelectSingleDriver() -> void { this->onSearchDataBase(this->sqlSearchLE->text()); }
-  auto onSelectBatch(const QAction* act) -> void;
-  auto onShowOrCloseDatabase(const bool isVisible) -> void {
-    PreferenceSettings().setValue(MemoryKey::SHOW_DATABASE.name, isVisible);
-    if (not switchStackWidget) {
-      if (view->isVisible() != isVisible) {
-        view->setVisible(isVisible);
-      }
-      return;
-    }
-    switchStackWidget();
-  }
+  inline auto onShowOrCloseDatabase(const bool isVisible) -> void;
+  inline auto onShowOrHidePerformerManger(const bool isVisible) -> void;
+  inline auto onShowOrHideTorrentsManager(const bool isVisible) -> void;
 };
 
 #endif  // SUBSCRIBEDATABASE_H

@@ -83,12 +83,15 @@ const QString Driver = "Driver";
 const QString Prepath = "Prepath";
 const QString Extra = "Extra";
 
-const QStringList DB_HEADER{Name, Size, Type, DateModified, Performers, Tags, Rate, Driver, Prepath, Extra};
+const QString ForSearch = "ForSearch";
+
+const QStringList DB_HEADER{Name, Size, Type, DateModified, Performers, Tags, Rate, Driver, Prepath, Extra, ForSearch};
 const int DB_DRIVER_INDEX = DB_HEADER.indexOf(Driver);
 const int DB_PREPATH_INDEX = DB_HEADER.indexOf(Prepath);
 const int DB_NAME_INDEX = DB_HEADER.indexOf(Name);
 const int DB_SIZE_COLUMN = DB_HEADER.indexOf(Size);
 const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
+const int DB_FOR_SEARCH_INDEX = DB_HEADER.indexOf(ForSearch);
 }  // namespace DB_HEADER_KEY
 
 namespace HEADERVIEW_SORT_INDICATOR_ORDER {
@@ -171,6 +174,10 @@ const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
 const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
 const GVarStrFolder PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "");
 const GVarStrFolder PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./");
+const GVarStrFolder PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./");
+const GVarStrFolder PATH_DB_INSERT_VIDS_FROM("PATH_DB_INSERT_VIDS_FROM", "./");
+const GVarStrFolder PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./");
+
 const GVarBool AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false);
 const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
 const GVarBool SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true);
@@ -181,6 +188,9 @@ const GVarBool SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", 
 const GVarBool SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true);
 const GVarBool EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true);
 const GVarBool SHOW_DATABASE("SHOW_DATABASE", false);
+const GVarBool SHOW_PERFORMERS_MANAGER_DATABASE("SHOW_PERFORMERS_MANAGER_DATABASE", false);
+const GVarBool SHOW_TORRENTS_MANAGER_DATABASE("SHOW_TORRENTS_MANAGER_DATABASE", false);
+const GVarBool QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false);
 
 const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
 const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
@@ -195,12 +205,21 @@ const GVarStr DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
                                     {"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"});
 const GVarStr MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", {});
 const GVarStr COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", {});
+const GVarStr WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", {});
 
 const GVarInt MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, 0);
 const GVarInt AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN("AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN", 2);
+
+const GVarInt PERFORMER_IMAGE_FIXED_HEIGHT("PERFORMER_IMAGE_FIXED_HEIGHT", 200, 0);
+const GVarInt PERFORMER_TABLE_DEFAULT_SECTION_SIZE("PERFORMER_TABLE_DEFAULT_SECTION_SIZE", 24, 0);
+const GVarStr PERFORMER_COLUMN_SHOW_SWITCH("PERFORMER_COLUMN_SHOW_SWITCH", QString(20, '1'), {});
+const GVarBool PERFORMER_STRETCH_LAST_SECTION("PERFORMER_STRETCH_LAST_SECTION", true);
+
+const GVarStr VIDS_COLUMN_SHOW_SWITCH("VIDS_COLUMN_SHOW_SWITCH", QString(20, '1'), {});
+const GVarBool VIDS_STRETCH_LAST_SECTION("VIDS_STRETCH_LAST_SECTION", true);
+const GVarInt RIGHT_CLICK_TOOLBUTTON_STYLE("RIGHT_CLICK_TOOLBUTTON_STYLE", 0);
 }  // namespace MemoryKey
 
-#include <QDir>
 namespace SystemPath {
 const QString drivePath = "";
 const QString desktopPath = QDir(QDir::homePath()).absoluteFilePath("Desktop");
@@ -210,9 +229,20 @@ const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
 const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
 const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
-const QString FILE_INFO_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FILE_INFO_DATABASE");
+const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/VIDS_DATABASE.db");
+const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
+const QString TORRENTS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/TORRENTS_DATABASE.db");
+const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PRODUCTION_STUDIOS_DATABASE.db");
+const QString AKA_PERFORMERS_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/AKA_PERFORMERS.txt");
+const QString PERFORMERS_TABLE_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_TABLE.txt");
+const QString RUNLOGS = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/runlog");
 }  // namespace SystemPath
-const QString TABLE_NAME = "movies_info";
+
+namespace DB_TABLE {
+const QString MOVIES = "MOVIES";
+const QString PERFORMERS = "PERFORMERS";
+const QString TORRENTS = "TORRENTS";
+}  // namespace DB_TABLE
 
 extern const char* SUBMIT_BTN_STYLE;
 
@@ -239,4 +269,34 @@ static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE, "MERGE"}
                                                        {CCMMode::COPY, "COPY"},
                                                        {CCMMode::CUT, "CUT"},
                                                        {CCMMode::LINK, "LINK"}};
+
+#include <QRegExp>
+
+namespace JSON_RENAME_REGEX {
+const QRegExp invalidCharPat("[\\#\\\\/\\:\\*\\?\\<\\>\\|]");  // #\/:*?<>
+const QRegExp invalidQuotePat("[’“”\"]");                      //'
+
+const QRegExp leadingStrComp("^((\\[FL\\])|(\\[FFL\\])|(\\[GT\\]))", Qt::CaseInsensitive);  // delete it
+const QRegExp leadingOpenBracketComp("^[\[\{\(]");                                          //-                                         //-
+
+const QRegExp continuousSpaceComp("\\s\\s+");  //' '
+
+const QRegExp nonLeadingBracketComp("[\\(\\{\\[\\)\\}\\]–]");  //-
+const QRegExp spaceBarSpaceComp("\\s*-\\s*");                  //-
+const QRegExp continousHypenComp("--+");                       //-
+
+const QRegExp hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
+const QRegExp trailingHypenComp("-$");                      // delete it
+
+const QRegExp DISCRAD_LETTER_COMP("[^A-Zãáéíóúüñ¿,¡0-9._@# ']", Qt::CaseInsensitive);
+const QRegExp INVALID_TABLE_NAME_LETTER("[^A-Z0-9_]", Qt::CaseInsensitive);
+const QRegExp AND_COMP(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
+const QRegExp RESOLUTION_COMP("2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
+const QRegExp CONTINOUS_SPACE("\\s+");
+
+const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
+
+const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
+}  // namespace JSON_RENAME_REGEX
+
 #endif  // PUBLICVARIABLE_H
