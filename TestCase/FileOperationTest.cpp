@@ -564,4 +564,4 @@ void FileOperationTest::test_rename_b_txt_To_A_TXT_Already_Exists(){
 
 //QTEST_MAIN(FileOperationTest)
 
-#include "FileOperationTest.moc"
+// #include "FileOperationTest.moc"

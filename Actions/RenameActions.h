@@ -13,16 +13,14 @@ class RenameActions : public QObject {
     QAction* LOWER_CASE = new QAction(QIcon(":/themes/NAME_STR_CASE_LOWER_PATH"), "Lower", this);
     QAction* CAPITALIZE_W = new QAction(QIcon(":/themes/NAME_STR_CASE_CAPITALIZE_WEAK"), "Capitalize weak", this);
     CAPITALIZE_W->setToolTip(
-        "Only capitalize first char of each word and dismiss any other "
-        "char.<br/>e.g.<br/>"
-        "    1. NBA USA Wi-Fi<br/>"
-        "    2. Universal Serial Bus (<b>USB</b>) Is An Industry Standard.");
+        "Weak. Only capitalize first char of each word and skip others.<br/>e.g.<br/>"
+        "   1. henry->Henry<br/>"
+        "   2. HENRY->HENRY;USA->USA;");
     QAction* CAPITALIZE_S = new QAction(QIcon(":/themes/NAME_STR_CASE_CAPITALIZE_STRONG"), "Capitalize strong", this);
     CAPITALIZE_S->setToolTip(
-        "Capitalize first char of each word and lower others.<br/>e.g. <br/>"
-        "1. Nba Usa Usb Wi-fi<br/>"
-        "2. Universal Serial Bus (<b>Usb</b>) Is An Industry Standard.");
-    // All above case operation may fail because in not case sensitive system;
+        "Strong. Capitalize first char of each word and lower others.<br/>e.g. <br/>"
+        "   1. henry->Henry<br/>"
+        "   2. HENRY->Henry; NBA->Nba");
     QAction* CASE_SWAP = new QAction(QIcon(":/themes/NAME_STR_CASE_TOGGLER_PATH"), "Swapcase", this);
 
     QActionGroup* caseAG = new QActionGroup(this);

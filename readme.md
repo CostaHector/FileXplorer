@@ -1,3 +1,21 @@
+## Usage
+
+### Create environment for a new laptop
+Create file `AKA_PERFORMERS.txt`, `PERFORMERS_TABLE.txt` and folder `runlog` in the `QDir::homePath()`. 
+e.g., `QDir::homepath()` can be get by 
+
+```bash
+echo "$PWD"
+/home/ariel/FileExplorerReadOnly
+```
+
+Assure that you are in this path. execute the following commands:
+```bash
+touch AKA_PERFORMERS.txt
+touch PERFORMERS_TABLE.txt
+mkdir runlog
+```
+
 # properties
 ## DockWidget recommend initial size
 

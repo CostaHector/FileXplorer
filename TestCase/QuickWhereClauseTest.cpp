@@ -61,5 +61,4 @@ void QuickWhereClauseTest::SearchThreePerfsABC() {
 }
 
 //QTEST_MAIN(QuickWhereClauseTest)
-
-#include "QuickWhereClauseTest.moc"
+// #include "QuickWhereClauseTest.moc"

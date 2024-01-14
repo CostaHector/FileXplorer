@@ -20,7 +20,7 @@ constexpr int PerformersPreviewTextBrowser::HTML_IMG_FIXED_WIDTH;
 
 const QString PerformersPreviewTextBrowser::VID_LINK_TEMPLATE = "<a href=\"file:///%1\">&#9654;%1</a>";
 
-const QString PerformersPreviewTextBrowser::PERFORMER_HTML_TEMPLATE = TextReader(QFileInfo(":/PERFORMER_HTML_TEMPLATE").absoluteFilePath());
+QString PerformersPreviewTextBrowser::PERFORMER_HTML_TEMPLATE;
 const QRegExp PerformersPreviewTextBrowser::IMG_VID_SEP_COMP("\\||\r\n|\n");
 
 PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent) : QTextBrowser(parent) {
@@ -53,6 +53,9 @@ bool PerformersPreviewTextBrowser::operator()(const QSqlRecord& record, const QS
   dirPath = m_imageHostPath + '/' + ori + '/' + name;
   m_curImgCntIndex = 0;
   const QString& firstImgPath = m_imgsLst.isEmpty() ? "" : dirPath + '/' + m_imgsLst.front();
+  if (PERFORMER_HTML_TEMPLATE.isEmpty()){
+      PERFORMER_HTML_TEMPLATE = TextReader(":/PERFORMER_HTML_TEMPLATE");
+  }
   const QString& htmlSrc = PERFORMER_HTML_TEMPLATE.arg(name)
                                .arg(firstImgPath)
                                .arg(m_performerImageHeight)
