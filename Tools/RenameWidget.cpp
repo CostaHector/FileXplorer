@@ -118,23 +118,23 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
     return {};
   }
   QStringList replacedList;
-  if (caseRuleName == "Upper") {
+  if (caseRuleName == "Upper Case") {
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toUpper());
     }
-  } else if (caseRuleName == "Lower") {
+  } else if (caseRuleName == "Lower Case") {
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toLower());
     }
-  } else if (caseRuleName == "Capitalize weak") {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
+  } else if (caseRuleName == "Loose Capitalize") {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
     for (const QString& nm : replaceeList) {
       replacedList.append(CapitaliseEachWordFirstLetterOnly(nm));
     }
-  } else if (caseRuleName == "Capitalize strong") {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
+  } else if (caseRuleName == "Strict Capitalize") {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
     for (const QString& nm : replaceeList) {
       replacedList.append(CapitaliseEachWordFirstLetterLowercaseOthers(nm));
     }
-  } else if (caseRuleName == "Swapcase") {
+  } else if (caseRuleName == "Swap Case") {
     for (const QString& nm : replaceeList) {
       replacedList.append(ToggleSentenceCase(nm));
     }

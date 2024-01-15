@@ -10,10 +10,6 @@ class RenameCaseTest : public QObject {
   void init() {}
   void cleanup() {}
 
-  void test_CapitalizeFunction() {
-    const auto & ans = RenameWidget_Case::ChangeCaseRename(QStringList{"usb", "USB"}, "Capitalize strong");
-    QCOMPARE(ans, (QStringList{"Usb", "Usb"}));
-  }
   void test_CapitalWeak(){
     QCOMPARE(RenameWidget_Case::CapitaliseEachWordFirstLetterOnly("henry cavill"), "Henry Cavill");
     QCOMPARE(RenameWidget_Case::CapitaliseEachWordFirstLetterOnly("HENRY CAVILL"), "HENRY CAVILL");

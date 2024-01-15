@@ -217,13 +217,25 @@ class FileBasicOperationsActions : public QObject {
         QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
     NEW_JSON_FILE->setCheckable(false);
 
-    QAction* NEW_FOLDER_HTML_PREVIEW = new QAction(QIcon(":/themes/HTML_FOR_A_FOLDER"), "New folder html");
+    QAction* BATCH_NEW_FILES = new QAction("Batch New Files");
+    BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
+                                "Create a batch of files by pattern specified.<br/>"
+                                "e.g. Given pattern:<br/>"
+                                "\"Page %03d.txt$1$10\"<br/>"
+                                "it will create ten text documents numbered by Page 001,002,...,009 respectively.");
+    QAction* BATCH_NEW_FOLDERS = new QAction("Batch New Folders");
+    BATCH_NEW_FOLDERS->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FOLDERS->text(), BATCH_NEW_FOLDERS->shortcut().toString()) +
+                                          "Create a batch of folders by pattern specified.<br/>"
+                                          "e.g. Given pattern:<br/>"
+                                          "\"Page %03d$1$10\"<br/>"
+                                          "it will create ten folders numbered by Page 001,002,...,009 respectively.");
 
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(NEW_FOLDER);
     actionGroup->addAction(NEW_TEXT_FILE);
     actionGroup->addAction(NEW_JSON_FILE);
-    actionGroup->addAction(NEW_FOLDER_HTML_PREVIEW);
+    actionGroup->addAction(BATCH_NEW_FILES);
+    actionGroup->addAction(BATCH_NEW_FOLDERS);
 
     connect(actionGroup, &QActionGroup::triggered, this,
             [](QAction* act) -> void { PreferenceSettings().setValue(MemoryKey::DEFAULT_NEW_CHOICE.name, act->text()); });

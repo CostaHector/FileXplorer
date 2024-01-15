@@ -62,9 +62,11 @@ class FileExplorerEvent : public QObject {
     return true;
   }
 
-  auto on_NewTextFile(QString newTextName, const QString& contents) -> bool;
+  auto on_NewTextFile(QString newTextName = "", const QString& contents = "") -> bool;
   auto on_NewJsonFile() -> bool;
   auto on_NewFolder() -> bool;
+  auto on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false) -> bool;
+  auto on_BatchNewFilesOrFolders(bool isFolder = false) -> bool;
 
   auto selectedIndexes() const -> QModelIndexList {
     // ignore other column, keep the first column
