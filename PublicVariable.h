@@ -8,7 +8,7 @@
 #include <QSettings>
 #include <QSize>
 #include <QTextStream>
-#include <qDebug>
+#include <QDebug>
 
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());

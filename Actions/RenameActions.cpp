@@ -1,7 +1,6 @@
 #include "RenameActions.h"
 
-RenameActions::RenameActions(QObject* parent) : QObject(parent), RENAME_RIBBONS(Get_Rename_Actions()), NAME_CASE(Get_CASE_Actions()) {
-}
+RenameActions::RenameActions(QObject* parent) : QObject(parent), RENAME_RIBBONS(Get_Rename_Actions()), NAME_CASE(Get_CASE_Actions()) {}
 
 RenameActions& g_renameAg() {
   static RenameActions renameActions;

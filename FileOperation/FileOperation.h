@@ -22,7 +22,7 @@ constexpr int CANNOT_REMOVE_LINK = 14;
 constexpr int OPERATION_NOT_AVAILABLE = 15;
 constexpr int OPERATION_PARMS_NOT_MATCH = 16;
 constexpr int UNKNOWN_ERROR = -1;
-};  // namespace ErrorCode
+}  // namespace ErrorCode
 
 #include <QDir>
 #include <QDirIterator>

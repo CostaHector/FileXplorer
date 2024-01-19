@@ -11,6 +11,7 @@ SOURCES += \
     Actions/QuickWhereActions.cpp \
     Component/ProductionStudioManager.cpp \
     Component/QuickWhereClause.cpp \
+    Component/StateLabel.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     PublicVariable.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/NameStandardizer.cpp \
     Tools/PerformersStringParser.cpp \
+    Tools/RenameWidget.cpp \
     UndoRedo.cpp
 
 
@@ -38,6 +40,7 @@ HEADERS += \
     Actions/QuickWhereActions.h \
     Component/ProductionStudioManager.h \
     Component/QuickWhereClause.h \
+    Component/StateLabel.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     PublicVariable.h \
@@ -47,6 +50,7 @@ HEADERS += \
     Tools/FilesNameBatchStandardizer.h \
     Tools/NameStandardizer.h \
     Tools/PerformersStringParser.h \
+    Tools/RenameWidget.h \
     UndoRedo.h
 
 DISTFILES += \

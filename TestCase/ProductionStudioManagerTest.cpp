@@ -42,6 +42,5 @@ class ProductionStudioManagerTest : public QObject {
   }
 };
 
-//QTEST_MAIN(ProductionStudioManagerTest)
-
-#include "ProductionStudioManagerTest.moc"
+// QTEST_MAIN(ProductionStudioManagerTest)
+// #include "ProductionStudioManagerTest.moc"

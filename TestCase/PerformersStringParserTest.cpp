@@ -44,6 +44,5 @@ class PerformersManagerTest : public QObject {
   }
 };
 
-//QTEST_MAIN(PerformersManagerTest)
-
-#include "PerformersManagerTest.moc"
+// QTEST_MAIN(PerformersManagerTest)
+#include "PerformersStringParserTest.moc"

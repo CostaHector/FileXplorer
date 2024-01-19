@@ -473,10 +473,7 @@ class RenameWidget_Case : public RenameWidget {
   QActionGroup* caseAG;
   QToolBar* caseTB;
 
-  explicit RenameWidget_Case(QWidget* parent = nullptr)
-      : RenameWidget(parent),
-        caseAG(g_renameAg().NAME_CASE),
-        caseTB(new QToolBar) {}
+  explicit RenameWidget_Case(QWidget* parent = nullptr) : RenameWidget(parent), caseAG(g_renameAg().NAME_CASE), caseTB(new QToolBar) {}
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Case name string | %1 item(s) under [%2]";
     setWindowTitle(windowTitleFormat);
@@ -491,9 +488,7 @@ class RenameWidget_Case : public RenameWidget {
     replaceControl->addWidget(includingSub);
     return replaceControl;
   }
-  auto extraSubscribe() -> void override {
-    connect(caseTB, &QToolBar::actionTriggered, this, &RenameWidget::OnlyTriggerRenameCore);
-  }
+  auto extraSubscribe() -> void override { connect(caseTB, &QToolBar::actionTriggered, this, &RenameWidget::OnlyTriggerRenameCore); }
   auto InitExtraMemberWidget() -> void {
     caseTB->addActions(caseAG->actions());
     caseTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -501,15 +496,33 @@ class RenameWidget_Case : public RenameWidget {
   }
   //    FIRST_LETTER_OF_EACH_WORD_COMP = re.compile("(^|\s)(\S)");
 
-  static QString capitalise_each_word(const QString& sentence) {
-    QStringList words = sentence.split(" ", Qt::SkipEmptyParts);
+  static QString CapitaliseEachWordFirstLetterOnly(const QString& sentence) {
+    QStringList words = sentence.split(' ', Qt::SkipEmptyParts);
     for (QString& word : words) {
       word.front() = word.front().toUpper();
     }
     return words.join(" ");
   }
+  static QString CapitaliseEachWordFirstLetterLowercaseOthers(QString sentence) {
+    const QString& sentenceInLowercase = sentence.toLower();
+    return CapitaliseEachWordFirstLetterOnly(sentenceInLowercase);
+  }
+
+  static QString ToggleSentenceCase(const QString& sentence) {
+    QString toggled;
+    for (QChar c : sentence) {
+      if (c.isLetter()) {
+        toggled += (c.toLatin1() ^ 0x20); // trick upper to lower case by bitwise operator
+      } else {
+        toggled += c;
+      }
+    }
+    return toggled;
+  }
 
   auto RenameCore(const QStringList& replaceeList) -> QStringList override;
+
+  static QStringList ChangeCaseRename(const QStringList& replaceeList, const QString& caseRuleName);
 };
 
 class RenameWidget_SwapSection : public RenameWidget {

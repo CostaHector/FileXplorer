@@ -172,8 +172,9 @@ auto DatabaseTableView::on_revealInExplorer() const -> bool {
   // noSelection: folder -> open, file -> open its dir
   QModelIndex curIndex = selectionModel()->currentIndex();
   QStringList args;
+  QString reveal_path;
   if (not curIndex.isValid()) {
-    QString reveal_path = m_dbModel->rootPath();
+    reveal_path = m_dbModel->rootPath();
     args = QStringList{QDir::toNativeSeparators(reveal_path)};
   } else {
     QFileInfo fi(m_dbModel->fileInfo(curIndex));
@@ -181,7 +182,7 @@ auto DatabaseTableView::on_revealInExplorer() const -> bool {
       qDebug("Path[%s] not exists", fi.absoluteFilePath().toStdString().c_str());
       return false;
     }
-    QString reveal_path(fi.absoluteFilePath());
+    reveal_path = fi.absoluteFilePath();
     args = QStringList{"/e,", "/select,", QDir::toNativeSeparators(reveal_path)};
   }
 
@@ -190,12 +191,12 @@ auto DatabaseTableView::on_revealInExplorer() const -> bool {
   process.setProgram("explorer");
   process.setArguments(args);
 #else
-  process.setProgram(r "xdg-open");
-  if (not QFileInfo(revealPath).isDir()) {
-#is not dir = > reveal its dirname
-    revealPath = QFileInfo(revealPath).absolutePath();
+  process.setProgram("xdg-open");
+  if (not QFileInfo(reveal_path).isDir()) {
+//is not dir = > reveal its dirname
+    reveal_path = QFileInfo(reveal_path).absolutePath();
   }
-  process.setArguments({revealPath});
+  process.setArguments(QStringList{reveal_path});
 #endif
   process.startDetached();  // Start the process in detached mode instead of start
   return true;

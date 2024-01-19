@@ -36,6 +36,6 @@ class DuplicateImagesRemoverTest : public QObject {
   }
 };
 
-QTEST_MAIN(DuplicateImagesRemoverTest)
+// QTEST_MAIN(DuplicateImagesRemoverTest)
 
-#include "DuplicateImagesRemoverTest.moc"
+// #include "DuplicateImagesRemoverTest.moc"

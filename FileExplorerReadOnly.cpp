@@ -98,7 +98,7 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
   }
   setWindowTitle("File Explorer");
   setWindowIcon(QIcon(":/themes/APP_ICON_PATH"));
-  qDebug("ReadSettings openPath=[%s]", openPath.toStdString().c_str());
+  qDebug("File Explorer read preference settings from[%s].", openPath.toStdString().c_str());
   return openPath;
 }
 
