@@ -21,7 +21,7 @@ PropertiesWindow::PropertiesWindow(const QStringList& items, QWidget* parent)
   m_showMore->setToolTip("Display videos duration of each *mp4 file");
   m_showMD5->setCheckable(true);
   m_showMD5->setToolTip("Display MD5 of each file");
-
+  m_propertiesInfoTextEdit->setFont(QFont(tr("Consolas")));
   m_extraToolbar->addActions({m_showMore, m_showMD5});
   m_extraToolbar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   m_extraToolbar->setOrientation(Qt::Orientation::Horizontal);
