@@ -10,7 +10,7 @@ class FileSystemItemFilter {
   struct ItemStatistic {
     int fileCnt = 0;
     int folderCnt = 0;
-    int fileSize = 0;
+    qint64 fileSize = 0;
   };
 
   static ItemStatistic ItemCounter(const QStringList& items) {

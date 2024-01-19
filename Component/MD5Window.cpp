@@ -5,7 +5,6 @@
 #include <QTextStream>
 #include <QVBoxLayout>
 
-#include "PublicVariable.h"
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
 
@@ -22,6 +21,7 @@ MD5Window::MD5Window(const QString& root, const QStringList& items, QWidget* par
       m_fullRefresh(new QAction(QIcon(":/themes/FULL_CALCULATE"), "Full Calc", this)),
       m_md5InfoTB(new QToolBar("Extra Info", this)) {
   m_md5TextEdit->setReadOnly(true);
+  m_md5TextEdit->setFont(QFont(tr("Consolas")));
 
   m_md5InfoTB->setToolTip("Here you can choose to save/load the MD5 results into/from files. Or Recalculate MD5 Fully/Incrementally ");
   m_incrementRefresh->setToolTip("Only Calculate modified file or new added file MD5 since the last calculate");
