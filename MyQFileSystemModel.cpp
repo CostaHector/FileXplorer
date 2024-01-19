@@ -65,7 +65,7 @@ bool MyQFileSystemModel::dropMimeData(const QMimeData *data, Qt::DropAction acti
   } else if (action == Qt::DropAction::MoveAction) { // move or merge or link
     opMode = CCMMode::CUT;
   } else if (action == Qt::DropAction::LinkAction) {
-    opMode = CCMMode::LINK;
+    opMode = CCMMode::LINK; // should not conflict
   } else {
     qDebug("[Err] Unknown action[%d]", int(action));
     return false;

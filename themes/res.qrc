@@ -53,9 +53,11 @@
         <file alias="FOLDER_MERGE_TO_LAST">RightClickIcon/FOLDER_MERGE_TO_LAST.svg</file>
         <file alias="REMOVE_HTML_PATH">RightClickIcon/REMOVE_HTML_CACHE.png</file>
         <file alias="NEW_FILE_FOLDER_PATH">RightClickIcon/NEW.svg</file>
-        <file alias="NEW_FOLDER_PATH">RightClickIcon/NEW_FOLDER.svg</file>
-        <file alias="NEW_TEXT_FILE_PATH">RightClickIcon/NEW_TEXT_DOCUMENT.svg</file>
-        <file alias="NEW_JSON_FILE_PATH">RightClickIcon/NEW_JSON_FILE.svg</file>
+        <file alias="NEW_FOLDER">RightClickIcon/NEW_FOLDER.svg</file>
+        <file alias="NEW_FOLDERS">RightClickIcon/NEW_FOLDERS.svg</file>
+        <file alias="NEW_TEXT_DOCUMENT">RightClickIcon/NEW_TEXT_DOCUMENT.svg</file>
+        <file alias="NEW_TEXT_DOCUMENTS">RightClickIcon/NEW_TEXT_DOCUMENTS.svg</file>
+        <file alias="NEW_JSON_FILE">RightClickIcon/NEW_JSON_FILE.svg</file>
         <file alias="CATEGORIZER">RightClickIcon/CATEGORIZER.svg</file>
         <file alias="RENAME">RightClickIcon/RENAME.ico</file>
         <file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
@@ -187,6 +189,9 @@
         <file alias="RATE8">PerformersManager/8.png</file>
         <file alias="RATE9">PerformersManager/9.png</file>
         <file alias="RATE10">PerformersManager/10.png</file>
+
+        <file alias="FULL_CALCULATE">MD5Window/FULL_CALCULATE.png</file>
+        <file alias="INCREMENTAL_CALCULATE">MD5Window/INCREMENTAL_CALCULATE.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="STANDARD_STUDIO_NAME_JSON">../bin/STANDARD_STUDIO_NAME_JSON.json</file>
