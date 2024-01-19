@@ -3,7 +3,7 @@
 #include <QAction>
 #include <QObject>
 #include <QWidget>
-#include <qDebug>
+#include <QDebug>
 
 #include <QFileSystemModel>
 #include <QLineEdit>

@@ -105,32 +105,42 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
 }
 
 auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
-  if (replaceeList.isEmpty()) {
+  auto* caseAct = caseAG->checkedAction();
+  if (caseAct == nullptr) {
+    qDebug("No rule enabled");
     return replaceeList;
   }
-  QAction* caseAct = caseAG->checkedAction();
-  if (caseAct == nullptr) {
-    return replaceeList;
+  return RenameWidget_Case::ChangeCaseRename(replaceeList, caseAct->text());
+}
+
+QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList, const QString& caseRuleName) {
+  if (replaceeList.isEmpty()) {
+    return {};
   }
   QStringList replacedList;
-  if (caseAct->text() == "Upper") {
+  if (caseRuleName == "Upper Case") {
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toUpper());
     }
-  } else if (caseAct->text() == "Lower") {
+  } else if (caseRuleName == "Lower Case") {
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toLower());
     }
-  } else if (caseAct->text() == "Capitalize weak") {
+  } else if (caseRuleName == "Loose Capitalize") {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
     for (const QString& nm : replaceeList) {
-      replacedList.append(capitalise_each_word(nm));
+      replacedList.append(CapitaliseEachWordFirstLetterOnly(nm));
     }
-  } else if (caseAct->text() == "Capitalize strong") {
+  } else if (caseRuleName == "Strict Capitalize") {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
     for (const QString& nm : replaceeList) {
-      replacedList.append(capitalise_each_word(nm));
+      replacedList.append(CapitaliseEachWordFirstLetterLowercaseOthers(nm));
     }
-  } else if (caseAct->text() == "Swapcase") {
-    return replacedList;
+  } else if (caseRuleName == "Swap Case") {
+    for (const QString& nm : replaceeList) {
+      replacedList.append(ToggleSentenceCase(nm));
+    }
+  } else {
+    qDebug("Case rule[%s] not supported", caseRuleName.toStdString().c_str());
+    return {};
   }
   return replacedList;
 }

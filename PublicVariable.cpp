@@ -1,12 +1,13 @@
 #include "PublicVariable.h"
 
 auto TextReader(const QString& textPath) -> QString {
-  if (not QFileInfo(textPath).isFile()) {
-    qDebug("TextReader [%s] not exists", textPath.toStdString().c_str());
+  QFile file(textPath);
+  if (file.exists()) {
+    qDebug("File[%s] not found", textPath.toStdString().c_str());
     return "";
   }
-  QFile file(textPath);
-  if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+  if (not file.open(QIODevice::ReadOnly)) {
+    qDebug("File[%s] open for read failed", textPath.toStdString().c_str());
     return "";
   }
   QTextStream stream(&file);

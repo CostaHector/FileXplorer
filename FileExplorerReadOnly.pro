@@ -29,9 +29,11 @@ SOURCES += \
     Component/DatabaseToolBar.cpp \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
+    Component/MD5Window.cpp \
     Component/PerformersManagerWidget.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
     Component/ProductionStudioManager.cpp \
+    Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
@@ -50,8 +52,11 @@ SOURCES += \
     Tools/CopyItemPropertiesToClipboardIF.cpp \
     Tools/DBTableMoviesHelper.cpp \
     Tools/DuplicateImagesRemover.cpp \
+    Tools/FileSystemItemFilter.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/JsonFileHelper.cpp \
+    Tools/MD5Calculator.cpp \
+    Tools/MP4DurationGetter.cpp \
     Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
     Tools/PerformerJsonFileHelper.cpp \
@@ -105,9 +110,11 @@ HEADERS += \
     Component/DatabaseToolBar.h \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
+    Component/MD5Window.h \
     Component/PerformersManagerWidget.h \
     Component/PerformersPreviewTextBrowser.h \
     Component/ProductionStudioManager.h \
+    Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
@@ -126,8 +133,11 @@ HEADERS += \
     Tools/CopyItemPropertiesToClipboardIF.h \
     Tools/DBTableMoviesHelper.h \
     Tools/DuplicateImagesRemover.h \
+    Tools/FileSystemItemFilter.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/JsonFileHelper.h \
+    Tools/MD5Calculator.h \
+    Tools/MP4DurationGetter.h \
     Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
     Tools/PerformerJsonFileHelper.h \

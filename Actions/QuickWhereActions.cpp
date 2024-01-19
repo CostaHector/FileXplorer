@@ -13,7 +13,7 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
       AUTO_COMPLETE_AKA_SWITCH(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "Completer", this)),
       APPLY_AND_CLOSE(new QAction(QIcon(":/themes/SAVED"), "Apply", this)),
       UPDATE_AKA(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "Update AKA", this)),
-      OPEN_AKA_TEXT(new QAction(QIcon(":/themes/NEW_TEXT_FILE_PATH"), "Open AKA", this)),
+      OPEN_AKA_TEXT(new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENT"), "Open AKA", this)),
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {
   m_historyWhereClauseMenu->setToolTipsVisible(true);

@@ -53,11 +53,12 @@
         <file alias="FOLDER_MERGE_TO_LAST">RightClickIcon/FOLDER_MERGE_TO_LAST.svg</file>
         <file alias="REMOVE_HTML_PATH">RightClickIcon/REMOVE_HTML_CACHE.png</file>
         <file alias="NEW_FILE_FOLDER_PATH">RightClickIcon/NEW.svg</file>
-        <file alias="NEW_FOLDER_PATH">RightClickIcon/NEW_FOLDER.svg</file>
-        <file alias="NEW_TEXT_FILE_PATH">RightClickIcon/NEW_TEXT_DOCUMENT.svg</file>
-        <file alias="NEW_JSON_FILE_PATH">RightClickIcon/NEW_JSON_FILE.svg</file>
+        <file alias="NEW_FOLDER">RightClickIcon/NEW_FOLDER.svg</file>
+        <file alias="NEW_FOLDERS">RightClickIcon/NEW_FOLDERS.svg</file>
+        <file alias="NEW_TEXT_DOCUMENT">RightClickIcon/NEW_TEXT_DOCUMENT.svg</file>
+        <file alias="NEW_TEXT_DOCUMENTS">RightClickIcon/NEW_TEXT_DOCUMENTS.svg</file>
+        <file alias="NEW_JSON_FILE">RightClickIcon/NEW_JSON_FILE.svg</file>
         <file alias="CATEGORIZER">RightClickIcon/CATEGORIZER.svg</file>
-        <file alias="HTML_FOR_A_FOLDER">RightClickIcon/HTML_FOR_A_FOLDER.svg</file>
         <file alias="RENAME">RightClickIcon/RENAME.ico</file>
         <file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
         <file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
@@ -120,11 +121,11 @@
         <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.png</file>
         <file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/Numerizer.svg</file>
         <file alias="NAME_STR_SWAPPER_PATH">NameStrIcon/NAME_SWAPPER.png</file>
-        <file alias="NAME_STR_CASE_LOWER_PATH">NameStrIcon/CaseLower.png</file>
-        <file alias="NAME_STR_CASE_UPPER_PATH">NameStrIcon/CaseUpper.png</file>
-        <file alias="NAME_STR_CASE_CAPITALIZE_WEAK">NameStrIcon/CAPITALIZE_WEAK_USB.svg</file>
-        <file alias="NAME_STR_CASE_CAPITALIZE_STRONG">NameStrIcon/CAPITALIZE_STRONG_Usb.svg</file>
-        <file alias="NAME_STR_CASE_TOGGLER_PATH">NameStrIcon/CaseToggler.svg</file>
+        <file alias="RENAME_LOWER_CASE">NameStrIcon/CaseLower.png</file>
+        <file alias="RENAME_UPPER_CASE">NameStrIcon/CaseUpper.png</file>
+        <file alias="RENAME_LOOSE_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_WEAK_USB.svg</file>
+        <file alias="RENAME_STRICT_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_STRONG_Usb.svg</file>
+        <file alias="RENAME_TOGGLE_CASE">NameStrIcon/CaseToggler.svg</file>
         <file alias="NAME_STR_INSERTER_PATH">NameStrIcon/Inserter.png</file>
         <file alias="NAME_STR_DELETER_PATH">NameStrIcon/Deleter.png</file>
         <file alias="NAME_STR_REPLACER_PATH">NameStrIcon/Replacer.png</file>
@@ -188,6 +189,9 @@
         <file alias="RATE8">PerformersManager/8.png</file>
         <file alias="RATE9">PerformersManager/9.png</file>
         <file alias="RATE10">PerformersManager/10.png</file>
+
+        <file alias="FULL_CALCULATE">MD5Window/FULL_CALCULATE.png</file>
+        <file alias="INCREMENTAL_CALCULATE">MD5Window/INCREMENTAL_CALCULATE.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="STANDARD_STUDIO_NAME_JSON">../bin/STANDARD_STUDIO_NAME_JSON.json</file>

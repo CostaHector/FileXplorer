@@ -52,7 +52,7 @@ class FileBasicOperationsActions : public QObject {
     QStringList historyList = historyStr.split(MOVE_COPT_TO_PATH_STR_SEPERATOR);
     QActionGroup* actionGroup = new QActionGroup(this);
     for (const QString& path : historyList) {
-      QAction* tempPath = new QAction(QIcon(":/themes/NEW_FOLDER_PATH"), path);
+      QAction* tempPath = new QAction(QIcon(":/themes/DRAG_FOLDERS"), path);
       tempPath->setCheckable(false);
       actionGroup->addAction(tempPath);
     }
@@ -196,34 +196,46 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto GetNEWActions() -> QActionGroup* {
-    QAction* NEW_FOLDER = new QAction(QIcon(":/themes/NEW_FOLDER_PATH"), "New folder");
+    QAction* NEW_FOLDER = new QAction(QIcon(":/themes/NEW_FOLDER"), "New folder");
     NEW_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_N));
     NEW_FOLDER->setShortcutVisibleInContextMenu(true);
     NEW_FOLDER->setToolTip(
         QString("<b>%1 (%2)</b><br/> Create a new folder in current view.").arg(NEW_FOLDER->text(), NEW_FOLDER->shortcut().toString()));
     NEW_FOLDER->setCheckable(false);
 
-    QAction* NEW_TEXT_FILE = new QAction(QIcon(":/themes/NEW_TEXT_FILE_PATH"), "New text");
+    QAction* NEW_TEXT_FILE = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENT"), "New text");
     NEW_TEXT_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_T));
     NEW_TEXT_FILE->setShortcutVisibleInContextMenu(true);
     NEW_TEXT_FILE->setToolTip(
         QString("<b>%1 (%2)</b><br/> Create a new text document in current view.").arg(NEW_TEXT_FILE->text(), NEW_TEXT_FILE->shortcut().toString()));
     NEW_TEXT_FILE->setCheckable(false);
 
-    QAction* NEW_JSON_FILE = new QAction(QIcon(":/themes/NEW_JSON_FILE_PATH"), "New json");
+    QAction* NEW_JSON_FILE = new QAction(QIcon(":/themes/NEW_JSON_FILE"), "New json");
     NEW_JSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_J));
     NEW_JSON_FILE->setShortcutVisibleInContextMenu(true);
     NEW_JSON_FILE->setToolTip(
         QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
     NEW_JSON_FILE->setCheckable(false);
 
-    QAction* NEW_FOLDER_HTML_PREVIEW = new QAction(QIcon(":/themes/HTML_FOR_A_FOLDER"), "New folder html");
+    QAction* BATCH_NEW_FILES = new QAction(QIcon(":/themes/NEW_FOLDERS"), "Batch New Files");
+    BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
+                                "Create a batch of files by pattern specified.<br/>"
+                                "e.g. Given pattern:<br/>"
+                                "\"Page %03d.txt$1$10\"<br/>"
+                                "it will create ten text documents numbered by Page 001,002,...,009 respectively.");
+    QAction* BATCH_NEW_FOLDERS = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), "Batch New Folders");
+    BATCH_NEW_FOLDERS->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FOLDERS->text(), BATCH_NEW_FOLDERS->shortcut().toString()) +
+                                  "Create a batch of folders by pattern specified.<br/>"
+                                  "e.g. Given pattern:<br/>"
+                                  "\"Page %03d$1$10\"<br/>"
+                                  "it will create ten folders numbered by Page 001,002,...,009 respectively.");
 
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(NEW_FOLDER);
     actionGroup->addAction(NEW_TEXT_FILE);
     actionGroup->addAction(NEW_JSON_FILE);
-    actionGroup->addAction(NEW_FOLDER_HTML_PREVIEW);
+    actionGroup->addAction(BATCH_NEW_FILES);
+    actionGroup->addAction(BATCH_NEW_FOLDERS);
 
     connect(actionGroup, &QActionGroup::triggered, this,
             [](QAction* act) -> void { PreferenceSettings().setValue(MemoryKey::DEFAULT_NEW_CHOICE.name, act->text()); });

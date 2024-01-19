@@ -13,7 +13,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       FILES_ACTIONS(new QActionGroup(this)),
 
       _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), "Capitalize", this)),
-      _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/NAME_STR_CASE_LOWER_PATH"), "lowercase", this)),
+      _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/RENAME_LOWER_CASE"), "lowercase", this)),
       _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), "Format", this)),
       _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "From Disk", this)),
       _ADD_SELECTED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), "Add", this)),

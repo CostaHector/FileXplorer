@@ -1,7 +1,7 @@
 #include "FileExplorerReadOnly.h"
 
 #include <QApplication>
-#include <qDebug>
+#include <QDebug>
 
 #include "FileExplorerEvent.h"
 #include "Tools/SubscribeDatabase.h"

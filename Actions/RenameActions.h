@@ -3,39 +3,38 @@
 
 #include <QAction>
 #include <QActionGroup>
+#include <QHash>
 
 class RenameActions : public QObject {
  public:
   explicit RenameActions(QObject* parent = nullptr);
 
   auto Get_CASE_Actions() -> QActionGroup* {
-    QAction* UPPER_CASE = new QAction(QIcon(":/themes/NAME_STR_CASE_UPPER_PATH"), "Upper", this);
-    QAction* LOWER_CASE = new QAction(QIcon(":/themes/NAME_STR_CASE_LOWER_PATH"), "Lower", this);
-    QAction* CAPITALIZE_W = new QAction(QIcon(":/themes/NAME_STR_CASE_CAPITALIZE_WEAK"), "Capitalize weak", this);
-    CAPITALIZE_W->setToolTip(
-        "Only capitalize first char of each word and dismiss any other "
-        "char.<br/>e.g.<br/>"
-        "    1. NBA USA Wi-Fi<br/>"
-        "    2. Universal Serial Bus (<b>USB</b>) Is An Industry Standard.");
-    QAction* CAPITALIZE_S = new QAction(QIcon(":/themes/NAME_STR_CASE_CAPITALIZE_STRONG"), "Capitalize strong", this);
-    CAPITALIZE_S->setToolTip(
-        "Capitalize first char of each word and lower others.<br/>e.g. <br/>"
-        "1. Nba Usa Usb Wi-fi<br/>"
-        "2. Universal Serial Bus (<b>Usb</b>) Is An Industry Standard.");
-    // All above case operation may fail because in not case sensitive system;
-    QAction* CASE_SWAP = new QAction(QIcon(":/themes/NAME_STR_CASE_TOGGLER_PATH"), "Swapcase", this);
+    QAction* UPPER_CASE = new QAction(QIcon(":/themes/RENAME_UPPER_CASE"), "Upper Case", this);
+    QAction* LOWER_CASE = new QAction(QIcon(":/themes/RENAME_LOWER_CASE"), "Lower Case", this);
+    QAction* LOOSE_CAPITALIZE = new QAction(QIcon(":/themes/RENAME_LOOSE_CAPITALIZE_CASE"), "Loose Capitalize", this);
+    LOOSE_CAPITALIZE->setToolTip(
+        "Weak. Only capitalize first char of each word and skip others.<br/>e.g.<br/>"
+        "   1. henry->Henry<br/>"
+        "   2. HENRY->HENRY;USA->USA;");
+    QAction* STRICT_CAPITALIZE = new QAction(QIcon(":/themes/RENAME_STRICT_CAPITALIZE_CASE"), "Strict Capitalize", this);
+    STRICT_CAPITALIZE->setToolTip(
+        "Strong. Capitalize first char of each word and lower others.<br/>e.g. <br/>"
+        "   1. henry->Henry<br/>"
+        "   2. HENRY->Henry; NBA->Nba");
+    QAction* SWAP_CASE = new QAction(QIcon(":/themes/RENAME_TOGGLE_CASE"), "Swap Case", this);
 
     QActionGroup* caseAG = new QActionGroup(this);
     caseAG->addAction(UPPER_CASE);
     caseAG->addAction(LOWER_CASE);
-    caseAG->addAction(CAPITALIZE_W);
-    caseAG->addAction(CAPITALIZE_S);
-    caseAG->addAction(CASE_SWAP);
+    caseAG->addAction(LOOSE_CAPITALIZE);
+    caseAG->addAction(STRICT_CAPITALIZE);
+    caseAG->addAction(SWAP_CASE);
     caseAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
     for (QAction* act : caseAG->actions()) {
       act->setCheckable(true);
     }
-    CAPITALIZE_W->setChecked(true);
+    STRICT_CAPITALIZE->setChecked(true);
     return caseAG;
   }
   auto Get_Rename_Actions() -> QActionGroup* {
