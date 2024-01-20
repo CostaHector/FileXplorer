@@ -59,7 +59,7 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
 }
 
 QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
-  QString startNoStr = startNo->text();
+  QString startNoStr = m_startNo->text();
 
   bool isnumeric = false;
   int startNo = startNoStr.toInt(&isnumeric);
@@ -68,12 +68,12 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
     return replaceeList;
   }
 
-  if (completeBaseName->text().isEmpty()) {
+  if (m_completeBaseName->text().isEmpty()) {
     // set default complete basename
-    completeBaseName->setText(replaceeList[0]);
-    completeBaseName->selectAll();
+    m_completeBaseName->setText(replaceeList[0]);
+    m_completeBaseName->selectAll();
   }
-  const QString& completeBaseNameString = completeBaseName->text();
+  const QString& completeBaseNameString = m_completeBaseName->text();
   const QStringList& suffixs = oldSuffix->toPlainText().split('\n');
 
   QMap<QString, int> sufCntMap;

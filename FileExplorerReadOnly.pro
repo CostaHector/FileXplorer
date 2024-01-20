@@ -42,6 +42,7 @@ SOURCES += \
     Component/Toaster.cpp \
     Component/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
+    Component/notificator.cpp \
     ContentPanel.cpp \
     FileOperation/FileOperation.cpp \
     MyQSqlTableModel.cpp \
@@ -123,6 +124,8 @@ HEADERS += \
     Component/Toaster.h \
     Component/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
+    Component/notificator.h \
+    Component/notificator_p.h \
     ContentPanel.h \
     FileOperation/FileOperation.h \
     MyQSqlTableModel.h \

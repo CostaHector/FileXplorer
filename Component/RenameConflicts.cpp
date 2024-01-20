@@ -1,5 +1,7 @@
 #include "RenameConflicts.h"
+#include "Component/notificator.h"
 #include "PublicTool.h"
+#include "UndoRedo.h"
 
 const QStringList RenameConflicts::COLUMNS_NAME_LIST = {"DateModified", "Size", "Name"};
 const int RenameConflicts::COLUMNS_NAME_LIST_LEN = COLUMNS_NAME_LIST.size();
@@ -32,11 +34,11 @@ auto RenameConflicts::GetQuickControlToolBar() -> QToolBar* {
   return conflictsControlBar;
 }
 
-auto RenameConflicts::TableWidgetGetter() const -> QTableWidget*{
+auto RenameConflicts::TableWidgetGetter() const -> QTableWidget* {
   auto* tw = new QTableWidget;
   tw->setRowCount(0);
   tw->setColumnCount(RenameConflicts::COLUMNS_NAME_LIST.size());
-  for (int headIndex = 0; headIndex < RenameConflicts::COLUMNS_NAME_LIST.size(); ++headIndex){
+  for (int headIndex = 0; headIndex < RenameConflicts::COLUMNS_NAME_LIST.size(); ++headIndex) {
     tw->setHorizontalHeaderItem(headIndex, new QTableWidgetItem(RenameConflicts::COLUMNS_NAME_LIST[headIndex]));
   }
   tw->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Interactive);
@@ -50,24 +52,23 @@ auto RenameConflicts::TableWidgetGetter() const -> QTableWidget*{
   return tw;
 }
 
-auto RenameConflicts::ConflictTableEvent(QAction* RECYCLE, QTableWidget* conflictTw, QTableWidget* recycleTw, QTableWidget* opsiteConflictTW)->void{
+auto RenameConflicts::ConflictTableEvent(QAction* RECYCLE, QTableWidget* conflictTw, QTableWidget* recycleTw, QTableWidget* opsiteConflictTW)
+    -> void {
   auto* menuQWidget = new QMenu(conflictTw);
   menuQWidget->addAction(RECYCLE);
 
-  auto on_RightClick = [menuQWidget]()->void{
-    menuQWidget->popup(QCursor::pos());
-  };
-  auto on_Recycle = [conflictTw, recycleTw, opsiteConflictTW]()->void{
+  auto on_RightClick = [menuQWidget]() -> void { menuQWidget->popup(QCursor::pos()); };
+  auto on_Recycle = [conflictTw, recycleTw, opsiteConflictTW]() -> void {
     const QList<QTableWidgetSelectionRange>& indexes = conflictTw->selectedRanges();
-    if (indexes.isEmpty()){
+    if (indexes.isEmpty()) {
       qDebug("please select something first");
       return;
     }
     qDebug("%d range(s) will be recycle", indexes.size());
-    for (const auto& rng: indexes){
-      for (auto r = rng.topRow(); r < rng.bottomRow()+1; ++r){
-        for (auto c=0;c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
-          if (conflictTw->item(r, c)== nullptr){
+    for (const auto& rng : indexes) {
+      for (auto r = rng.topRow(); r < rng.bottomRow() + 1; ++r) {
+        for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
+          if (conflictTw->item(r, c) == nullptr) {
             continue;
           }
           recycleTw->setItem(r, c, conflictTw->takeItem(r, c));
@@ -82,31 +83,30 @@ auto RenameConflicts::ConflictTableEvent(QAction* RECYCLE, QTableWidget* conflic
   connect(conflictTw, &QTableWidget::customContextMenuRequested, on_RightClick);
   connect(RECYCLE, &QAction::triggered, on_Recycle);
 }
-auto RenameConflicts::RecycleTableEvent(QAction* RESTORE, QTableWidget* recycleTw, QTableWidget* conflictTw, QTableWidget* opositeConflictTw) -> void{
+auto RenameConflicts::RecycleTableEvent(QAction* RESTORE, QTableWidget* recycleTw, QTableWidget* conflictTw, QTableWidget* opositeConflictTw)
+    -> void {
   auto* menuQWidget = new QMenu(recycleTw);
   menuQWidget->addAction(RESTORE);
 
-  auto on_RightClick = [menuQWidget]()->void{
-    menuQWidget->popup(QCursor::pos());
-  };
+  auto on_RightClick = [menuQWidget]() -> void { menuQWidget->popup(QCursor::pos()); };
 
-  auto on_Restore = [recycleTw, conflictTw, opositeConflictTw]() -> void{
+  auto on_Restore = [recycleTw, conflictTw, opositeConflictTw]() -> void {
     const QList<QTableWidgetSelectionRange>& indexes = recycleTw->selectedRanges();
-    if (indexes.isEmpty()){
+    if (indexes.isEmpty()) {
       qDebug("please select something first");
       return;
     }
     qDebug("%d range(s) will be recycle", indexes.size());
-    for (const auto& rng: indexes){
-      for (auto r = rng.topRow(); r < rng.bottomRow()+1; ++r){
-        for (auto c=0;c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
-          if (recycleTw->item(r, c)== nullptr){
+    for (const auto& rng : indexes) {
+      for (auto r = rng.topRow(); r < rng.bottomRow() + 1; ++r) {
+        for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
+          if (recycleTw->item(r, c) == nullptr) {
             continue;
           }
           conflictTw->setItem(r, c, recycleTw->takeItem(r, c));
-          if (opositeConflictTw->item(r, c) == nullptr){
+          if (opositeConflictTw->item(r, c) == nullptr) {
             conflictTw->item(r, c)->setBackground(LIGHT_GREEN_COLOR);
-          }else{
+          } else {
             conflictTw->item(r, c)->setBackground(TOMATO_COLOR);
             opositeConflictTw->item(r, c)->setBackground(TOMATO_COLOR);
           }
@@ -118,27 +118,28 @@ auto RenameConflicts::RecycleTableEvent(QAction* RESTORE, QTableWidget* recycleT
   connect(RESTORE, &QAction::triggered, on_Restore);
 }
 
-auto RenameConflicts::NoConflictOperation(const QStringList& selectedItems, const QSet<QString>& leftDeleteSet) const -> FileOperation::BATCH_COMMAND_LIST_TYPE{
+auto RenameConflicts::NoConflictOperation(const QStringList& selectedItems, const QSet<QString>& leftDeleteSet) const
+    -> FileOperation::BATCH_COMMAND_LIST_TYPE {
   FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
-  if (OP == CCMMode::CUT or OP == CCMMode::MERGE){
-    for (const QString& nm : selectedItems){
+  if (OP == CCMMode::CUT or OP == CCMMode::MERGE) {
+    for (const QString& nm : selectedItems) {
       if (leftDeleteSet.contains(nm)) {
         continue;
       }
       cmds.append({"rename", leftFolderPath, nm, rightFolderPath, nm});
     }
   } else if (OP == CCMMode::COPY) {
-    for (const QString& nm : selectedItems){
+    for (const QString& nm : selectedItems) {
       if (leftDeleteSet.contains(nm)) {
         continue;
       }
-      if (QFileInfo(leftFolderPath, nm).isDir()){
-          cmds.append({"mkpath", rightFolderPath, nm});
+      if (QFileInfo(leftFolderPath, nm).isDir()) {
+        cmds.append({"mkpath", rightFolderPath, nm});
       } else {
-          cmds.append({"cpfile", leftFolderPath, nm, rightFolderPath});
+        cmds.append({"cpfile", leftFolderPath, nm, rightFolderPath});
       }
     }
-  } else if (OP == CCMMode::LINK){
+  } else if (OP == CCMMode::LINK) {
     for (const QString& nm : selectedItems) {
       if (leftDeleteSet.contains(nm)) {
         continue;
@@ -146,26 +147,26 @@ auto RenameConflicts::NoConflictOperation(const QStringList& selectedItems, cons
       cmds.append({"link", leftFolderPath, nm, rightFolderPath});
     }
   }
-  if (OP == CCMMode::MERGE){
+  if (OP == CCMMode::MERGE) {
     cmds.append({"rmpath", "", leftFolderPath});  // when merge A to B, folder A need to removed
   }
   return cmds;
 }
 
-auto RenameConflicts::on_Submit() -> bool{
+auto RenameConflicts::on_Submit() -> bool {
   const auto& invalidPair = on_Check();
   const auto& invalidLineList = invalidPair.first;
   const auto& bothRemoveLineList = invalidPair.second;
-  if (not invalidLineList.isEmpty()){
+  if (not invalidLineList.isEmpty()) {
     QMessageBox::critical(this, "Submit Fail (Conflict Still Exists)",
                           QString("Please solve the following conflict lines first:\n %1").arg(QIntStr2QString(invalidLineList)));
     return false;
   }
-  if (not bothRemoveLineList.isEmpty()){
+  if (not bothRemoveLineList.isEmpty()) {
     auto ret = QMessageBox::warning(this, "Both Remove Confirm",
                                     QString("The following lines will be remove:\n %1").arg(QIntStr2QString(bothRemoveLineList)),
                                     QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
-    if (ret == QMessageBox::StandardButton::Cancel){
+    if (ret == QMessageBox::StandardButton::Cancel) {
       qDebug("Both Remove Confirm: Cancel");
       return false;
     }
@@ -173,25 +174,25 @@ auto RenameConflicts::on_Submit() -> bool{
   }
   QSet<QString> leftDeleteSet;
   FileOperation::BATCH_COMMAND_LIST_TYPE removeCmds;
-  for (int r = 0; r < ROW_COUNT; ++r){
+  for (int r = 0; r < ROW_COUNT; ++r) {
     auto leftItem = leftRestore->item(r, RenameConflicts::CONFLICT_NAME_COLUMN_INDEX);
     auto rightItem = rightRestore->item(r, RenameConflicts::CONFLICT_NAME_COLUMN_INDEX);
-    if (leftItem != nullptr){
+    if (leftItem != nullptr) {
       const QString& nm = leftItem->text();
       leftDeleteSet.insert(nm);
       removeCmds.append({"moveToTrash", leftFolderPath, nm});
     }
-    if (rightItem != nullptr){
+    if (rightItem != nullptr) {
       removeCmds.append({"moveToTrash", rightFolderPath, rightItem->text()});
     }
   }
 
   QString msg;
-  if (not removeCmds.isEmpty()){
+  if (not removeCmds.isEmpty()) {
     auto isRmvAllSucceed = g_undoRedo.Do(removeCmds);
     qDebug("Submit result: isRmvAllSucceed:%d", isRmvAllSucceed);
     msg += QString("%1 rmv cmd(s): %2.\n").arg(removeCmds.size()).arg(isRmvAllSucceed);
-    if (not isRmvAllSucceed){
+    if (not isRmvAllSucceed) {
       return false;
     }
   }
@@ -199,25 +200,25 @@ auto RenameConflicts::on_Submit() -> bool{
   const QStringList& leftItems = itemIF.GetLeftRelPathList(OP == CCMMode::CUT or OP == CCMMode::MERGE);
   decltype(removeCmds) renameCmds = NoConflictOperation(leftItems, leftDeleteSet);
 
-  if (not renameCmds.isEmpty()){
+  if (not renameCmds.isEmpty()) {
     auto isRenameAllSucceed = g_undoRedo.Do(renameCmds);
     qDebug("Submit is Rename and post remove operation all succeed:%d", isRenameAllSucceed);
     msg += QString("%1 cmd(s) including mv + 0|trailing rmpath cmd: %2.").arg(renameCmds.size()).arg(isRenameAllSucceed);
-    if (not isRenameAllSucceed){
+    if (not isRenameAllSucceed) {
       return false;
     }
   }
 
-  new Toaster(this, msg, true);
+  Notificator::information("Rename conflicts submit", msg);
   close();
   return true;
 }
 
 auto RenameConflicts::Subscribe() -> void {
-  connect(buttonBox->button(QDialogButtonBox::StandardButton::Ok),&QPushButton::clicked, this, &RenameConflicts::on_Submit);
-  connect(buttonBox->button(QDialogButtonBox::StandardButton::Cancel),&QPushButton::clicked, this, &RenameConflicts::close);
-  connect(leftFolderBtn,&QPushButton::clicked, this, [this](){on_OpenButtonTextFolder(leftFolderBtn);});
-  connect(rightFolderBtn,&QPushButton::clicked, this, [this](){on_OpenButtonTextFolder(rightFolderBtn);});
+  connect(buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &RenameConflicts::on_Submit);
+  connect(buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &RenameConflicts::close);
+  connect(leftFolderBtn, &QPushButton::clicked, this, [this]() { on_OpenButtonTextFolder(leftFolderBtn); });
+  connect(rightFolderBtn, &QPushButton::clicked, this, [this]() { on_OpenButtonTextFolder(rightFolderBtn); });
 
   connect(leftConflict, &QTableWidget::doubleClicked, this, &RenameConflicts::on_Open);
   connect(rightConflict, &QTableWidget::doubleClicked, this, &RenameConflicts::on_Open);
@@ -225,16 +226,14 @@ auto RenameConflicts::Subscribe() -> void {
   connect(leftConflict->verticalScrollBar(), &QScrollBar::valueChanged, rightConflict->verticalScrollBar(), &QScrollBar::setValue);
   connect(rightConflict->verticalScrollBar(), &QScrollBar::valueChanged, leftConflict->verticalScrollBar(), &QScrollBar::setValue);
 
-
   connect(leftRestore->verticalScrollBar(), &QScrollBar::valueChanged, rightRestore->verticalScrollBar(), &QScrollBar::setValue);
   connect(rightRestore->verticalScrollBar(), &QScrollBar::valueChanged, leftRestore->verticalScrollBar(), &QScrollBar::setValue);
 
-  if (OP == CCMMode::COPY) { // disable left table delete action when copy
+  if (OP == CCMMode::COPY) {  // disable left table delete action when copy
     disconnect(RECYCL_LEFT, &QAction::triggered, nullptr, nullptr);
     disconnect(RESTORE_LEFT, &QAction::triggered, nullptr, nullptr);
   }
 }
-
 
 auto RenameConflicts::InitData() -> void {
   leftConflict->setRowCount(0);
@@ -249,7 +248,7 @@ auto RenameConflicts::InitData() -> void {
 
   int r = 0;
   QFileIconProvider iconProvider;
-  for (int r = 0; r < ROW_COUNT; ++r){
+  for (int r = 0; r < ROW_COUNT; ++r) {
     leftConflict->setItem(r, 0, new QTableWidgetItem(lCommonInfo[r].dateModified));
     leftConflict->setItem(r, 1, new QTableWidgetItem(lCommonInfo[r].size));
     leftConflict->setItem(r, 2, new QTableWidgetItem(lCommonInfo[r].name));
@@ -260,122 +259,120 @@ auto RenameConflicts::InitData() -> void {
     const QString& nm = rCommonInfo[r].name;
     rightConflict->setItem(r, 0, new QTableWidgetItem(rCommonInfo[r].dateModified));
     rightConflict->setItem(r, 1, new QTableWidgetItem(rCommonInfo[r].size));
-    rightConflict->setItem(r, 2, new QTableWidgetItem(
-                                     iconProvider.icon(QFileInfo(rightFolderPath + '/' + nm)), nm));
+    rightConflict->setItem(r, 2, new QTableWidgetItem(iconProvider.icon(QFileInfo(rightFolderPath + '/' + nm)), nm));
     rightConflict->item(r, 0)->setBackground(TOMATO_COLOR);
     rightConflict->item(r, 1)->setBackground(TOMATO_COLOR);
     rightConflict->item(r, 2)->setBackground(TOMATO_COLOR);
   }
 }
 
-
 auto RenameConflicts::on_Size() -> void {
   auto leftSelectionModel = leftConflict->selectionModel();
   auto rightSelectionModel = rightConflict->selectionModel();
   auto leftModel = leftConflict->model();
   auto rightModel = rightConflict->model();
-  for (auto r=0; r < ROW_COUNT; ++r){
-    if ((leftConflict->item(r, 0)== nullptr) or (rightConflict->item(r, 0)== nullptr)){
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+  for (auto r = 0; r < ROW_COUNT; ++r) {
+    if ((leftConflict->item(r, 0) == nullptr) or (rightConflict->item(r, 0) == nullptr)) {
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         leftSelectionModel->select(leftModel->index(r, c), QItemSelectionModel::Deselect);
         rightSelectionModel->select(rightModel->index(r, c), QItemSelectionModel::Deselect);
       }
       continue;
     }
     if (leftConflict->item(r, 1)->text().toInt() < rightConflict->item(r, 1)->text().toInt()) {
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         leftSelectionModel->select(leftModel->index(r, c), QItemSelectionModel::Select);
         rightSelectionModel->select(rightModel->index(r, c), QItemSelectionModel::Deselect);
       }
-    }else{
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+    } else {
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         leftSelectionModel->select(leftModel->index(r, c), QItemSelectionModel::Deselect);
         rightSelectionModel->select(rightModel->index(r, c), QItemSelectionModel::Select);
       }
     }
   }
 }
-auto RenameConflicts::on_Date() -> void{
+auto RenameConflicts::on_Date() -> void {
   auto* leftSelectionModel = leftConflict->selectionModel();
   auto* rightSelectionModel = rightConflict->selectionModel();
   auto* leftModel = leftConflict->model();
   auto* rightModel = rightConflict->model();
-  for (auto r=0; r < ROW_COUNT; ++r){
-    if ((leftConflict->item(r, 0)== nullptr) or (rightConflict->item(r, 0)== nullptr)){
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+  for (auto r = 0; r < ROW_COUNT; ++r) {
+    if ((leftConflict->item(r, 0) == nullptr) or (rightConflict->item(r, 0) == nullptr)) {
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         leftSelectionModel->select(leftModel->index(r, c), QItemSelectionModel::Deselect);
         rightSelectionModel->select(rightModel->index(r, c), QItemSelectionModel::Deselect);
       }
       continue;
     }
-    if (leftConflict->item(r, 0)->text() < rightConflict->item(r, 0)->text()){
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+    if (leftConflict->item(r, 0)->text() < rightConflict->item(r, 0)->text()) {
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         leftSelectionModel->select(leftModel->index(r, c), QItemSelectionModel::Select);
         rightSelectionModel->select(rightModel->index(r, c), QItemSelectionModel::Deselect);
       }
-    }else{
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+    } else {
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         leftSelectionModel->select(leftModel->index(r, c), QItemSelectionModel::Deselect);
         rightSelectionModel->select(rightModel->index(r, c), QItemSelectionModel::Select);
       }
     }
   }
 }
-auto RenameConflicts::on_Revert() -> void{
+auto RenameConflicts::on_Revert() -> void {
   auto* leftSelectionModel = leftConflict->selectionModel();
   auto* rightSelectionModel = rightConflict->selectionModel();
   auto* leftModel = leftConflict->model();
   auto* rightModel = rightConflict->model();
-  for (auto r=0; r < ROW_COUNT; ++r){
-    if (leftConflict->item(r, 0) != nullptr){
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+  for (auto r = 0; r < ROW_COUNT; ++r) {
+    if (leftConflict->item(r, 0) != nullptr) {
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         leftSelectionModel->select(leftModel->index(r, c), QItemSelectionModel::Toggle);
       }
     }
-    if (rightConflict->item(r, 0) != nullptr){
-      for (auto c=0; c<RenameConflicts::COLUMNS_NAME_LIST_LEN;++c){
+    if (rightConflict->item(r, 0) != nullptr) {
+      for (auto c = 0; c < RenameConflicts::COLUMNS_NAME_LIST_LEN; ++c) {
         rightSelectionModel->select(rightModel->index(r, c), QItemSelectionModel::Toggle);
       }
     }
   }
 }
 
-auto RenameConflicts::on_Open(const QModelIndex index) -> bool{
+auto RenameConflicts::on_Open(const QModelIndex index) -> bool {
   QString pth;
-  if (leftConflict->hasFocus()){
+  if (leftConflict->hasFocus()) {
     auto item = leftConflict->item(index.row(), RenameConflicts::CONFLICT_NAME_COLUMN_INDEX);
-    if (item == nullptr){
+    if (item == nullptr) {
       return true;
     }
     const QString& nm = item->text();
     pth = QDir(leftFolderPath).absoluteFilePath(nm);
-  }else if (rightConflict->hasFocus()){
+  } else if (rightConflict->hasFocus()) {
     auto item = rightConflict->item(index.row(), RenameConflicts::CONFLICT_NAME_COLUMN_INDEX);
-    if (item== nullptr){
+    if (item == nullptr) {
       return true;
     }
     const QString& nm = item->text();
     pth = QDir(rightFolderPath).absoluteFilePath(nm);
-  }else{
+  } else {
     return true;
   }
   return QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
 }
 
-auto RenameConflicts::eventFilter(QObject* obj, QEvent* event) -> bool{
-  if (event->type() == QEvent::KeyPress){
+auto RenameConflicts::eventFilter(QObject* obj, QEvent* event) -> bool {
+  if (event->type() == QEvent::KeyPress) {
     auto* e = dynamic_cast<QKeyEvent*>(event);
-    if (e->key() == Qt::Key_Delete){
-      if (leftConflict->hasFocus()){
+    if (e->key() == Qt::Key_Delete) {
+      if (leftConflict->hasFocus()) {
         emit RECYCL_LEFT->triggered(false);
         return true;
-      }else if (rightConflict->hasFocus()){
+      } else if (rightConflict->hasFocus()) {
         emit RECYCL_RIGHT->triggered(false);
         return true;
-      }else if (leftRestore->hasFocus()){
+      } else if (leftRestore->hasFocus()) {
         emit RESTORE_LEFT->triggered(false);
         return true;
-      }else if (rightRestore->hasFocus()){
+      } else if (rightRestore->hasFocus()) {
         emit RESTORE_RIGHT->triggered(false);
         return true;
       }
@@ -384,41 +381,39 @@ auto RenameConflicts::eventFilter(QObject* obj, QEvent* event) -> bool{
   return QDialog::eventFilter(obj, event);
 }
 
-
-
-class RenameConflictsIllu: public QWidget{
-public:
+class RenameConflictsIllu : public QWidget {
+ public:
   static const QString& DONT_CHANGE_SRC;
   static const QString& ENV_PATH;
 
-  auto startEvent() -> bool{
-    if (QFile::exists(ENV_PATH)){
+  auto startEvent() -> bool {
+    if (QFile::exists(ENV_PATH)) {
       auto ret = QDir(ENV_PATH).removeRecursively();
-      if (not ret){
+      if (not ret) {
         qDebug("[Error] when clear environment folder");
         return false;
       }
     }
     auto ret = PublicTool::copyDirectoryFiles(DONT_CHANGE_SRC, ENV_PATH);
-    if (not ret){
+    if (not ret) {
       qDebug("Copy environment folder failed");
       return false;
     }
     return true;
   }
 
-  auto closeEvent(QCloseEvent* event) -> void override{
-    if (QFile::exists(ENV_PATH)){
+  auto closeEvent(QCloseEvent* event) -> void override {
+    if (QFile::exists(ENV_PATH)) {
       auto ret = QDir(ENV_PATH).removeRecursively();
-      if (not ret){
+      if (not ret) {
         qDebug("[Error] when clear environment folder");
       }
     }
     return QWidget::closeEvent(event);
   }
 
-  explicit RenameConflictsIllu(QWidget* parent=nullptr): QWidget(parent){
-    if (not startEvent()){
+  explicit RenameConflictsIllu(QWidget* parent = nullptr) : QWidget(parent) {
+    if (not startEvent()) {
       qDebug("Environment not met");
       return;
     }
@@ -432,15 +427,16 @@ public:
     setWindowTitle("close me will also close RenameConflicts");
   }
 };
-const QString& RenameConflictsIllu::DONT_CHANGE_SRC = QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_FileSystemEnv/DONT_CHANGE");
-const QString& RenameConflictsIllu::ENV_PATH = QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_FileSystemEnv/CHANGABLE");
+const QString& RenameConflictsIllu::DONT_CHANGE_SRC =
+    QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_FileSystemEnv/DONT_CHANGE");
+const QString& RenameConflictsIllu::ENV_PATH =
+    QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_FileSystemEnv/CHANGABLE");
 
-
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
-int main(int argc, char *argv[]){
+int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   RenameConflictsIllu wid;
   wid.show();
