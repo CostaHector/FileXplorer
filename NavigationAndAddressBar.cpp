@@ -62,15 +62,15 @@ NavigationAndAddressBar::NavigationAndAddressBar(T_IntoNewPath IntoNewPath,
 class IntoNewPathMockClass {
  public:
   bool IntoNewPath(QString a, bool b, bool c) {
-    qDebug("IntoNewPath: %s, %d, %d", a.toStdString().c_str(), b, c);
+    qDebug("IntoNewPath: %s, %d, %d", qPrintable(a), b, c);
     return true;
   }
   bool on_searchTextChanged(QString a) {
-    qDebug("on_searchTextChanged: %s, %d", a.toStdString().c_str());
+    qDebug("on_searchTextChanged: %s, %d", qPrintable(a));
     return true;
   }
   bool on_searchEnterKey(QString a) {
-    qDebug("on_searchEnterKey: %s, %d", a.toStdString().c_str());
+    qDebug("on_searchEnterKey: %s, %d", qPrintable(a));
     return true;
   }
 };

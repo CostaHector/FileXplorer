@@ -159,12 +159,12 @@ auto VideoPlayer::loadVideoRate() -> void {
 
 QString VideoPlayer::JsonFileValidCheck(const QString& op) {
   if (not m_playListWid->currentItem()) {
-    qDebug("current item is nullptr, cannot %s", op.toStdString().c_str());
+    qDebug("current item is nullptr, cannot %s", qPrintable(op));
     return {};
   }
   const QString& jsonPath = JsonFileHelper::GetJsonFilePath(m_playListWid->currentItem()->text());
   if (not QFile::exists(jsonPath)) {
-    qDebug("json file[%s] not exists. cannot %s", jsonPath.toStdString().c_str(), op.toStdString().c_str());
+    qDebug("json file[%s] not exists. cannot %s", qPrintable(jsonPath), qPrintable(op));
     return {};
   }
   return jsonPath;
@@ -252,7 +252,7 @@ bool VideoPlayer::onModeName() {
 
   if (not renameResult) {
     const QString& msg = QString("Rename [%1] -> [%2] failed").arg(vidFi.fileName()).arg(newFileName);
-    qDebug("%s", msg.toStdString().c_str());
+    qDebug("%s", qPrintable(msg));
     QMessageBox::warning(this, "Rename failed", msg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
     setUrl(QUrl::fromLocalFile(vidFi.absoluteFilePath()));
   } else {
@@ -304,7 +304,7 @@ bool VideoPlayer::onGrabAFrame(const QVideoFrame& frame) {
   const QFileInfo fi(m_playListWid->currentItem()->text());
   const QString& imgAbsPath =
       QString("%1/%2 %3.png").arg(fi.absolutePath()).arg(fi.completeBaseName()).arg(seconds, DURATION_PLACEHOLDER_LENGTH, 10, QChar('0'));
-  qDebug("Grabbed image named: %s", imgAbsPath.toStdString().c_str());
+  qDebug("Grabbed image named: %s", qPrintable(imgAbsPath));
   const auto& outputImage = img.mirrored(false, true);
   const bool ret = outputImage.save(imgAbsPath);
   qDebug("Grab succeed %d", ret);
@@ -462,7 +462,7 @@ void VideoPlayer::openAFolder(const QString& folderPath) {
   m_playlistDock->setWindowTitle(PLAYLIST_DOCK_TITLE_TEMPLATE.arg(m_playListWid->count()));
 
   if (playIndex >= m_playListWid->count()) {
-    qDebug("No vids find in path[%s]", loadFromPath.toStdString().c_str());
+    qDebug("No vids find in path[%s]", qPrintable(loadFromPath));
     return;
   }
   m_playListWid->setCurrentRow(playIndex);

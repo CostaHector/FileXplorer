@@ -54,7 +54,7 @@ class CustomStatusBar : public QStatusBar {
     } else {  // normal;
       labelLst[2]->setStyleSheet("");
     }
-    qDebug(msg.toStdString().c_str());
+    qDebug(qPrintable(msg));
     labelLst[2]->setText(msg);
   }
 };

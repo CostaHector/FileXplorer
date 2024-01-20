@@ -30,6 +30,7 @@ SOURCES += \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
     Component/MD5Window.cpp \
+    Component/NotificatorFrame.cpp \
     Component/PerformersManagerWidget.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
     Component/ProductionStudioManager.cpp \
@@ -42,7 +43,6 @@ SOURCES += \
     Component/Toaster.cpp \
     Component/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
-    Component/notificator.cpp \
     ContentPanel.cpp \
     FileOperation/FileOperation.cpp \
     MyQSqlTableModel.cpp \
@@ -112,6 +112,8 @@ HEADERS += \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
     Component/MD5Window.h \
+    Component/NotificatorFrame.h \
+    Component/NotificatorFrame_p.h \
     Component/PerformersManagerWidget.h \
     Component/PerformersPreviewTextBrowser.h \
     Component/ProductionStudioManager.h \
@@ -124,8 +126,6 @@ HEADERS += \
     Component/Toaster.h \
     Component/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
-    Component/notificator.h \
-    Component/notificator_p.h \
     ContentPanel.h \
     FileOperation/FileOperation.h \
     MyQSqlTableModel.h \

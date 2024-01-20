@@ -1,5 +1,5 @@
-#ifndef NOTIFICATOR_P_H
-#define NOTIFICATOR_P_H
+#ifndef NOTIFICATORFRAME_P_H
+#define NOTIFICATORFRAME_P_H
 
 
 #include <QtGui/QIcon>
@@ -40,4 +40,4 @@ class NotificatorPrivate
   QProgressBar* m_progress;
 };
 
-#endif // NOTIFICATOR_P_H
+#endif // NOTIFICATORFRAME_P_H

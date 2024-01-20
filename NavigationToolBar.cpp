@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
   NavigationToolBar* naviTB = new NavigationToolBar();
   naviTB->subscribe([](const QString& path, bool isNewPath, bool isForce) -> bool {
-    qDebug("%s,%d,%d", path.toStdString().c_str(), isNewPath, isForce);
+    qDebug("%s,%d,%d", qPrintable(path), isNewPath, isForce);
     return true;
   });
   auto* appendPins = new QPushButton("append pins");

@@ -120,7 +120,7 @@ void JsonEditor::autoNext() {
     if (dict.isEmpty()) {
       continue;
     }
-    qDebug("len(performers)=%d, [%s]", dict[DB_HEADER_KEY::Performers].toJsonArray().size(), curJsonPath.toStdString().c_str());
+    qDebug("len(performers)=%d, [%s]", dict[DB_HEADER_KEY::Performers].toJsonArray().size(), qPrintable(curJsonPath));
     if ((dict[DB_HEADER_KEY::Performers].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
       jsonListPanel->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
       jsonListPanel->setCurrentRow(curRow);
@@ -157,7 +157,7 @@ void JsonEditor::refreshEditPanel() {
   }
 
   const QString& curJsonPath = jsonListPanel->currentItem()->text();
-  qDebug("refreshEditPanel %s", curJsonPath.toStdString().c_str());
+  qDebug("refreshEditPanel %s", qPrintable(curJsonPath));
   const auto& jsonDict = JsonFileHelper::MovieJsonLoader(curJsonPath);
   const QList<QPair<QString, QVariant>>& jsonItem = JsonFileHelper::MapToOrderedList(jsonDict);
 
@@ -261,7 +261,7 @@ bool JsonEditor::onLoadASelectedPath(const QString& folderPath) {
   QFileInfo loadFromFi(loadFromPath);
   if (not loadFromFi.isDir()) {
     QMessageBox::warning(this, "Failed when Load json from a folder", QString("Not a folder:\n%1").arg(folderPath));
-    qDebug("Failed when Load json from a folder. Not a folder:\n%s", folderPath.toStdString().c_str());
+    qDebug("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(folderPath));
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
@@ -296,7 +296,7 @@ bool JsonEditor::onStageChanges() {
       bool isOk = false;
       int rateNumer = valueStr.toInt(&isOk);
       if (not isOk) {
-        qDebug("Rate[%s] is not a number, will use default value -1", valueStr.toStdString().c_str());
+        qDebug("Rate[%s] is not a number, will use default value -1", qPrintable(valueStr));
         rateNumer = -1;
       }
       dict.insert(keyName, rateNumer);
@@ -314,15 +314,15 @@ bool JsonEditor::onStageChanges() {
   if (QFile::exists(backupJsonPath)) {
     const auto rmRet = QFile::remove(backupJsonPath);
     if (not rmRet) {
-      qDebug("cannot rm json file[%s]", backupJsonPath.toStdString().c_str());
+      qDebug("cannot rm json file[%s]", qPrintable(backupJsonPath));
       return false;
     }
   }
   const auto copyRet = QFile::copy(curJsonPath, backupJsonPath);
 
-  qDebug("result:%d, changes->%s, backup: %s", int(copyRet), curJsonPath.toStdString().c_str(), backupJsonPath.toStdString().c_str());
+  qDebug("result:%d, changes->%s, backup: %s", int(copyRet), qPrintable(curJsonPath), qPrintable(backupJsonPath));
   if (not copyRet) {
-    qDebug("cannot copy json file[%s]", backupJsonPath.toStdString().c_str());
+    qDebug("cannot copy json file[%s]", qPrintable(backupJsonPath));
     return false;
   }
   return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
@@ -336,7 +336,7 @@ bool JsonEditor::onResetChanges() {
   const QString& curJsonPath = jsonListPanel->item(curRow)->text();
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (not QFile::exists(backupJsonPath)) {
-    qDebug("cannot reset. backup file[%s] not exist", backupJsonPath.toStdString().c_str());
+    qDebug("cannot reset. backup file[%s] not exist", qPrintable(backupJsonPath));
     return false;
   }
   return QFile::rename(curJsonPath, curJsonPath + "mv") and QFile::rename(backupJsonPath, curJsonPath) and

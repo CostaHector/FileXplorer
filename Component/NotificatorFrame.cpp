@@ -1,5 +1,5 @@
-#include "notificator.h"
-#include "notificator_p.h"
+#include "NotificatorFrame.h"
+#include "NotificatorFrame_p.h"
 
 #include <QApplication>
 #include <QDesktopWidget>

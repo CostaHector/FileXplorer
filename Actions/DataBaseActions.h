@@ -17,7 +17,7 @@ class DataBaseActions : public QObject {
   QActionGroup* DB_FUNCTIONS;
 
   QAction* OPEN_RUN = nullptr;
-  QAction* PLAY_VIDEOS = nullptr;
+  QAction* _PLAY_VIDEOS = nullptr;
   QAction* _REVEAL_IN_EXPLORER = nullptr;
   QAction* COPY_DB_ITEM_NAME = nullptr;
   QAction* COPY_DB_ITEM_FULL_PATH = nullptr;
@@ -103,10 +103,10 @@ class DataBaseActions : public QObject {
     OPEN_RUN = new QAction("&Open");
     OPEN_RUN->setShortcutVisibleInContextMenu(true);
 
-    PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play Videos");
-    PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
-    PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
-    PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play videos").arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
+    _PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play Videos");
+    _PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
+    _PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
+    _PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play videos").arg(_PLAY_VIDEOS->text(), _PLAY_VIDEOS->shortcut().toString()));
 
     _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in Explorer");
     _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
@@ -123,7 +123,7 @@ class DataBaseActions : public QObject {
 
     QActionGroup* dbRightClickMenuAG = new QActionGroup(this);
     dbRightClickMenuAG->addAction(OPEN_RUN);
-    dbRightClickMenuAG->addAction(PLAY_VIDEOS);
+    dbRightClickMenuAG->addAction(_PLAY_VIDEOS);
     dbRightClickMenuAG->addAction(_REVEAL_IN_EXPLORER);
     dbRightClickMenuAG->addAction(COPY_DB_ITEM_NAME);
     dbRightClickMenuAG->addAction(COPY_DB_ITEM_FULL_PATH);

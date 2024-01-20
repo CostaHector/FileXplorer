@@ -66,7 +66,7 @@ auto DatabaseTableView::UpdateItemViewFontSize() -> void {
 void DatabaseTableView::subscribe() {
   {
     connect(g_dbAct().OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
-    connect(g_dbAct().PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
+    connect(g_dbAct()._PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
     connect(g_dbAct()._REVEAL_IN_EXPLORER, &QAction::triggered, this, &DatabaseTableView::on_revealInExplorer);
     connect(g_dbAct().COPY_DB_ITEM_NAME, &QAction::triggered, this, [this]() { CopyItemPropertiesToClipboardIF::on_copyName(this, m_dbModel); });
     connect(g_dbAct().COPY_DB_ITEM_FULL_PATH, &QAction::triggered, this,
@@ -322,7 +322,7 @@ bool DatabasePanel::onUnionTables() {
   QSqlQuery unionTableQry(con);
   const auto ret = unionTableQry.exec(unionCmd);
   if (not ret) {
-    qDebug("%s. \nUnion %d table(s) into [%s] failed. \n%s", unionCmd.toStdString().c_str(), SRC_TABLE_CNT, DB_TABLE::MOVIES.toStdString().c_str(),
+    qDebug("%s. \nUnion %d table(s) into [%s] failed. \n%s", qPrintable(unionCmd), SRC_TABLE_CNT, qPrintable(DB_TABLE::MOVIES),
            unionTableQry.lastError().text().toStdString().c_str());
     QMessageBox::warning(this, DB_TABLE::MOVIES,
                          unionCmd + QString("\nUnion %1 table(s) failed.\n").arg(SRC_TABLE_CNT) + unionTableQry.lastError().text());
@@ -358,13 +358,13 @@ void DatabasePanel::onCreateATable() {
 
   const QString& inputTableName = QInputDialog::getItem(this, "Input an unique table name", "current tables", tbs, tbs.size() - 1, true);
   if (inputTableName.isEmpty() or con.tables().contains(inputTableName)) {
-    qDebug("Table name[%s] is empty or already occupied", inputTableName.toStdString().c_str());
+    qDebug("Table name[%s] is empty or already occupied", qPrintable(inputTableName));
     QMessageBox::warning(this, inputTableName, "Table name is empty or already occupied");
     return;
   }
 
   if (inputTableName.contains(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER)) {
-    qDebug("Table name[%s] contains invalid letter", inputTableName.toStdString().c_str());
+    qDebug("Table name[%s] contains invalid letter", qPrintable(inputTableName));
     QMessageBox::warning(this, inputTableName, "Table name contains invalid letter");
     return;
   }
@@ -400,7 +400,7 @@ void DatabasePanel::onCreateATable() {
   QSqlQuery createTableQuery(con);
   const auto ret = createTableQuery.exec(createTableSQL);
   if (not ret) {
-    qDebug("Create table[%s] failed.", inputTableName.toStdString().c_str());
+    qDebug("Create table[%s] failed.", qPrintable(inputTableName));
     QMessageBox::warning(this, inputTableName, "Create table[%s] failed");
     return;
   }
@@ -435,7 +435,7 @@ bool DatabasePanel::onDropATable() {
   const bool dropTableRet = dropQry.exec(sqlCmd);
   dropQry.finish();
   if (not dropTableRet) {
-    qDebug("Drop Table[%s] failed. %s", dropTableName.toStdString().c_str(), con.lastError().databaseText().toStdString().c_str());
+    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), con.lastError().databaseText().toStdString().c_str());
     QMessageBox::information(this, dropTableName, "Table drop failed");
     return false;
   }
@@ -494,7 +494,7 @@ bool DatabasePanel::on_DeleteByDrive() {
     const QString& whereClause = QString("\"%1\"=\"%2\"").arg(DB_HEADER_KEY::Driver, curDriver);
     const auto ret = onDeleteFromTable(whereClause);
     if (not ret) {
-      qDebug("Error when %s", whereClause.toStdString().c_str());
+      qDebug("Error when %s", qPrintable(whereClause));
       return false;
     }
   }
@@ -512,7 +512,7 @@ bool DatabasePanel::on_DeleteByPrepath() {
     const QString& whereClause = QString("\"%1\"=\"%2\"").arg(DB_HEADER_KEY::Prepath, prepath);
     const auto ret = onDeleteFromTable(whereClause);
     if (not ret) {
-      qDebug("Error when %s", whereClause.toStdString().c_str());
+      qDebug("Error when %s", qPrintable(whereClause));
       return false;
     }
   }
@@ -527,7 +527,7 @@ bool DatabasePanel::onInsertIntoTable() {
   }
   const QString& insertIntoTable = m_tables->currentText();
   if (not con.tables().contains(insertIntoTable)) {
-    qDebug("Cannot insert into inexist table[%s]", insertIntoTable.toStdString().c_str());
+    qDebug("Cannot insert into inexist table[%s]", qPrintable(insertIntoTable));
     QMessageBox::warning(m_dbView, insertIntoTable, "Table NOT exist. ABORT insert");
     return false;
   }
@@ -536,12 +536,12 @@ bool DatabasePanel::onInsertIntoTable() {
       PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString(),
       QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
-    qDebug("Path[%s] is not directory", selectPath.toStdString().c_str());
+    qDebug("Path[%s] is not directory", qPrintable(selectPath));
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
   if (QMessageBox::question(this, "CONFIRM INSERT?", selectPath + "/* =>" + insertIntoTable) != QMessageBox::StandardButton::Yes) {
-    qDebug("User cancel insert[%s]", selectPath.toStdString().c_str());
+    qDebug("User cancel insert[%s]", qPrintable(selectPath));
     return true;
   }
 
@@ -576,7 +576,7 @@ bool DatabasePanel::onInsertIntoTable() {
     const bool insertResult = insertTableQuery.exec(currentInsert);
     succeedItemCnt += int(insertResult);
     if (not insertResult) {
-      qDebug("Error [%s]: %s", currentInsert.toStdString().c_str(), insertTableQuery.lastError().text().toStdString().c_str());
+      qDebug("Error [%s]: %s", qPrintable(currentInsert), insertTableQuery.lastError().text().toStdString().c_str());
     }
     ++totalItemCnt;
   }
@@ -588,7 +588,7 @@ bool DatabasePanel::onInsertIntoTable() {
     succeedItemCnt = 0;
     return false;
   }
-  qDebug("%d/%d item(s) add succeed. [%s]", succeedItemCnt, totalItemCnt, selectPath.toStdString().c_str());
+  qDebug("%d/%d item(s) add succeed. [%s]", succeedItemCnt, totalItemCnt, qPrintable(selectPath));
   QMessageBox::information(m_dbView, QString("%1/%2 succeed").arg(succeedItemCnt).arg(totalItemCnt), selectPath);
   m_dbView->m_dbModel->submitAll();
   return true;
@@ -645,7 +645,7 @@ void DatabasePanel::onQuickWhereClause() {
     return;
   }
   const QString& where = m_quickWhereClause->GetWhereString();
-  qDebug("Quick where clause: [%s]", where.toStdString().c_str());
+  qDebug("Quick where clause: [%s]", qPrintable(where));
   m_searchLE->setText(where);
   emit m_searchLE->returnPressed();
 }
@@ -668,7 +668,7 @@ int DatabasePanel::onCountRow() {
 
   const int rowCnt = queryCount.value(0).toInt();
   QMessageBox::information(this, countCmd, QString("Count=%1").arg(rowCnt));
-  qDebug("%d: %s", rowCnt, countCmd.toStdString().c_str());
+  qDebug("%d: %s", rowCnt, qPrintable(countCmd));
   return rowCnt;
 }
 

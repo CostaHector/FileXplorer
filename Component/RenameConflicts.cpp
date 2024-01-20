@@ -1,5 +1,5 @@
 #include "RenameConflicts.h"
-#include "Component/notificator.h"
+#include "Component/NotificatorFrame.h"
 #include "PublicTool.h"
 #include "UndoRedo.h"
 

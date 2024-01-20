@@ -16,7 +16,7 @@ QStringList RenameWidget_Insert::RenameCore(const QStringList& replaceeList) {
   bool isnumeric = false;
   int insertAt = insertAtStr.toInt(&isnumeric);
   if (not isnumeric) {
-    qDebug("insert index is not number[%s]", insertAtStr.toStdString().c_str());
+    qDebug("insert index is not number[%s]", qPrintable(insertAtStr));
     return replaceeList;
   }
 
@@ -46,7 +46,7 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
   QRegExp repRegex(oldString);
   if (not repRegex.isValid()) {
     const QString& msg = QString("invalid regex[%1]").arg(oldString);
-    qDebug("%s", msg.toStdString().c_str());
+    qDebug("%s", qPrintable(msg));
     regexValidLabel->ToNotSaved();
     return replaceeList;
   }
@@ -64,7 +64,7 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
   bool isnumeric = false;
   int startNo = startNoStr.toInt(&isnumeric);
   if (not isnumeric) {
-    qDebug("start index is not number[%s]", startNoStr.toStdString().c_str());
+    qDebug("start index is not number[%s]", qPrintable(startNoStr));
     return replaceeList;
   }
 
@@ -139,7 +139,7 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
       replacedList.append(ToggleSentenceCase(nm));
     }
   } else {
-    qDebug("Case rule[%s] not supported", caseRuleName.toStdString().c_str());
+    qDebug("Case rule[%s] not supported", qPrintable(caseRuleName));
     return {};
   }
   return replacedList;

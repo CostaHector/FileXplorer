@@ -16,7 +16,7 @@ class RightClickMenu : public QMenu {
     auto* NEW_MENU = GetNewMenu();
     auto* VIEW_MENU = GetViewMenu();
 
-    addActions(g_fileBasicOperationsActions().OPEN->actions());
+    addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
     addSeparator();
     addActions(g_fileBasicOperationsActions().COPY_PATH->actions());
     addSeparator();
