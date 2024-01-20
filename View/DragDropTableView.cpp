@@ -27,7 +27,9 @@ DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* 
 }
 
 void DragDropTableView::subscribe() {
-  connect(horizontalHeader(), &QHeaderView::sectionResized, this, &View::on_sectionResized);
+  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
+          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
+
   connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
   addActions(g_fileBasicOperationsActions().OPEN->actions());
 
@@ -58,13 +60,9 @@ auto DragDropTableView::InitViewSettings() -> void {
   horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
   horizontalHeader()->setStretchLastSection(false);
   horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
-  DragDropTableView::SetViewColumnWidth();
-  DragDropTableView::UpdateItemViewFontSize();
-}
 
-auto DragDropTableView::SetViewColumnWidth() -> void {
-  const auto columnWidth = PreferenceSettings().value(MemoryKey::NAME_COLUMN_WIDTH.name, MemoryKey::NAME_COLUMN_WIDTH.v).toInt();
-  setColumnWidth(MainKey::NAME_COLUMN, columnWidth);
+  horizontalHeader()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY").toByteArray());
+  DragDropTableView::UpdateItemViewFontSize();
 }
 
 auto DragDropTableView::UpdateItemViewFontSize() -> void {
