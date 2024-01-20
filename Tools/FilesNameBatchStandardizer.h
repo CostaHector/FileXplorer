@@ -28,7 +28,7 @@ public:
             pathList.append(it.filePath().chopped(oldName.size()+1));
             const QString& absPath = it.filePath();
             if (uniqueAbsPathSet.contains(absPath)){
-                qDebug("%s will duplicate", oldName.toStdString().c_str());
+                qDebug("%s will duplicate", qPrintable(oldName));
                 continue;
             }
             uniqueAbsPathSet.insert(it.filePath());

@@ -3,11 +3,11 @@
 auto TextReader(const QString& textPath) -> QString {
   QFile file(textPath);
   if (file.exists()) {
-    qDebug("File[%s] not found", textPath.toStdString().c_str());
+    qDebug("File[%s] not found", qPrintable(textPath));
     return "";
   }
   if (not file.open(QIODevice::ReadOnly)) {
-    qDebug("File[%s] open for read failed", textPath.toStdString().c_str());
+    qDebug("File[%s] open for read failed", qPrintable(textPath));
     return "";
   }
   QTextStream stream(&file);

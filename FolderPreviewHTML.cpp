@@ -15,7 +15,7 @@ const QString FolderPreviewHTML::HTML_H1_WITH_VIDS_TEMPLATE = "<a href=\"file://
 const QString FolderPreviewHTML::HTML_IMG_TEMPLATE = "<a href=\"file:///%1\"><img src=\"%1\" alt=\"%2\" width=\"%3\"></a><br/>\n";
 constexpr int FolderPreviewHTML::HTML_IMG_FIXED_WIDTH;
 
-FolderPreviewHTML::FolderPreviewHTML(QWidget* parent) : m_parent(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN->actions()[0]) {
+FolderPreviewHTML::FolderPreviewHTML(QWidget* parent) : m_parent(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN_AG->actions()[0]) {
   setReadOnly(true);
   setOpenLinks(false);
   setOpenExternalLinks(true);

@@ -193,7 +193,7 @@ void PerformersManagerWidget::onInitATable() {
   }
 
   if (con.tables().contains(DB_TABLE::PERFORMERS)) {
-    qDebug("Table[%s] already exists in database[%s]", DB_TABLE::PERFORMERS.toStdString().c_str(), con.databaseName().toStdString().c_str());
+    qDebug("Table[%s] already exists in database[%s]", qPrintable(DB_TABLE::PERFORMERS), con.databaseName().toStdString().c_str());
     return;
   }
 
@@ -202,7 +202,7 @@ void PerformersManagerWidget::onInitATable() {
   QSqlQuery createTableQuery(con);
   const auto ret = createTableQuery.exec(createTableSQL);
   if (not ret) {
-    qDebug("Create table[%s] failed.", DB_TABLE::PERFORMERS.toStdString().c_str());
+    qDebug("Create table[%s] failed.", qPrintable(DB_TABLE::PERFORMERS));
     return;
   }
   m_perfsDBModel->setTable(DB_TABLE::PERFORMERS);
@@ -218,7 +218,7 @@ bool PerformersManagerWidget::onInsertIntoTable() {
   }
   if (not con.tables().contains(DB_TABLE::PERFORMERS)) {
     const QString& tablesNotExistsMsg = QString("Cannot insert, table[%1] not exist.").arg(DB_TABLE::PERFORMERS);
-    qDebug("Table [%s] not exists", tablesNotExistsMsg.toStdString().c_str());
+    qDebug("Table [%s] not exists", qPrintable(tablesNotExistsMsg));
     QMessageBox::warning(this, "Abort", tablesNotExistsMsg);
     return false;
   }
@@ -232,7 +232,7 @@ bool PerformersManagerWidget::onInsertIntoTable() {
   const bool insertResult = insertTableQuery.exec(insertCmd);
   if (not insertResult) {
     const QString& errorMsg = insertTableQuery.lastError().text();
-    qDebug("[Command Failed] [%s]. %s", insertCmd.toStdString().c_str(), errorMsg.toStdString().c_str());
+    qDebug("[Command Failed] [%s]. %s", qPrintable(insertCmd), qPrintable(errorMsg));
     QMessageBox::warning(this, "Command Failed", insertCmd + '\n' + errorMsg);
     con.rollback();
     return false;
@@ -266,14 +266,14 @@ bool PerformersManagerWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelet
     return false;
   }
   if (not con.tables().contains(DB_TABLE::PERFORMERS)) {
-    qDebug("Table[%s] not exists", DB_TABLE::PERFORMERS.toStdString().c_str());
+    qDebug("Table[%s] not exists", qPrintable(DB_TABLE::PERFORMERS));
     return true;
   }
 
   QSqlQuery dropQry(con);
   const auto dropTableRet = dropQry.exec(sqlCmd);
   if (not dropTableRet) {
-    qDebug("[Drop Table Failed] [%s]. Reason: %s", sqlCmd.toStdString().c_str(), dropQry.lastError().text().toStdString().c_str());
+    qDebug("[Drop Table Failed] [%s]. Reason: %s", qPrintable(sqlCmd), dropQry.lastError().text().toStdString().c_str());
   }
   dropQry.finish();
   m_perfsDBModel->submitAll();
@@ -284,7 +284,7 @@ bool PerformersManagerWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelet
 int PerformersManagerWidget::onLoadFromFileSystemStructure() {
   if (not QDir(m_imageHostPath).exists()) {
     QMessageBox::warning(this, "Path[file-system structure] not exist", m_imageHostPath);
-    qDebug("file-system structure [%s] not exists", m_imageHostPath.toStdString().c_str());
+    qDebug("file-system structure [%s] not exists", qPrintable(m_imageHostPath));
     return false;
   }
   if (m_perfsDBModel->isDirty()) {
@@ -332,7 +332,7 @@ int PerformersManagerWidget::onLoadFromFileSystemStructure() {
       ++loadCnt;
       if (not ret) {
         const QString& errorMsg = insertTableQuery.lastError().text();
-        qDebug("[Command Failed] [%s]. Reason: %s", currentInsert.toStdString().c_str(), errorMsg.toStdString().c_str());
+        qDebug("[Command Failed] [%s]. Reason: %s", qPrintable(currentInsert), qPrintable(errorMsg));
       }
     }
 
@@ -384,7 +384,7 @@ int PerformersManagerWidget::onLoadFromPerformersList() {
           insertTemplate.arg(it.key()).arg(it.value()).arg(PERFORMER_DB_HEADER_KEY::Name).arg(PERFORMER_DB_HEADER_KEY::AKA);
       bool ret = insertTableQuery.exec(currentInsert);
       if (not ret) {
-        qDebug("[Failed] %s", currentInsert.toStdString().c_str());
+        qDebug("[Failed] %s", qPrintable(currentInsert));
       }
     }
     if (!con.commit()) {
@@ -474,7 +474,7 @@ bool PerformersManagerWidget::on_selectionChanged(const QItemSelection& selected
 int PerformersManagerWidget::onLoadFromPJsonDirectory() {
   if (not QDir(m_imageHostPath).exists()) {
     QMessageBox::warning(this, "Path[pjson load from] not exist", m_imageHostPath);
-    qDebug("*.pjson path load from [%s] not exists", m_imageHostPath.toStdString().c_str());
+    qDebug("*.pjson path load from [%s] not exists", qPrintable(m_imageHostPath));
     return false;
   }
   if (m_perfsDBModel->isDirty()) {
@@ -497,7 +497,7 @@ int PerformersManagerWidget::onLoadFromPJsonDirectory() {
       succeedCnt += ret;
       ++loadCnt;
       if (not ret) {
-        qDebug("[Command Failed] [%s]. Reason: %s", currentInsert.toStdString().c_str(), insertTableQuery.lastError().text().toStdString().c_str());
+        qDebug("[Command Failed] [%s]. Reason: %s", qPrintable(currentInsert), insertTableQuery.lastError().text().toStdString().c_str());
       }
     }
     if (!con.commit()) {
@@ -516,7 +516,7 @@ int PerformersManagerWidget::onLoadFromPJsonDirectory() {
 
 int PerformersManagerWidget::onDumpAllIntoPJsonFile() {
   if (not QDir(m_imageHostPath).exists()) {
-    qDebug("*.pjson path dump to [%s] not exists", m_imageHostPath.toStdString().c_str());
+    qDebug("*.pjson path dump to [%s] not exists", qPrintable(m_imageHostPath));
     QMessageBox::warning(this, "Path[pjson dump to] not exist", m_imageHostPath);
     return 0;
   }
@@ -535,7 +535,7 @@ int PerformersManagerWidget::onDumpAllIntoPJsonFile() {
 
 int PerformersManagerWidget::onDumpIntoPJsonFile() {
   if (not QDir(m_imageHostPath).exists()) {
-    qDebug("*.pjson path dump to [%s] not exists", m_imageHostPath.toStdString().c_str());
+    qDebug("*.pjson path dump to [%s] not exists", qPrintable(m_imageHostPath));
     QMessageBox::warning(this, "Path[pjson dump to] not exist", m_imageHostPath);
     return 0;
   }
@@ -573,7 +573,7 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
   }
   QSqlDatabase con = ::GetSqlVidsDB();  // videos table
   if (not con.isOpen()) {
-    qDebug("con cannot open [%s]", SystemPath::VIDS_DATABASE.toStdString().c_str());
+    qDebug("con cannot open [%s]", qPrintable(SystemPath::VIDS_DATABASE));
     return 0;
   }
 
@@ -581,7 +581,7 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
     const QString& searchCommand = DBTableMoviesHelper::GetMovieTablePerformerSelectCommand(record);
     bool ret = qur.exec(searchCommand);
     if (not ret) {
-      qDebug("Failed when[%s]", searchCommand.toStdString().c_str());
+      qDebug("Failed when[%s]", qPrintable(searchCommand));
       return {};
     }
     QStringList vidPath;
@@ -610,7 +610,7 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
 
 bool PerformersManagerWidget::onOpenRecordInFileSystem() const {
   if (not QDir(m_imageHostPath).exists()) {
-    qDebug("m_imageHostPath [%s] not exists", m_imageHostPath.toStdString().c_str());
+    qDebug("m_imageHostPath [%s] not exists", qPrintable(m_imageHostPath));
     return false;
   }
   if (not m_performersListView->selectionModel()->hasSelection()) {
@@ -627,7 +627,7 @@ bool PerformersManagerWidget::onOpenRecordInFileSystem() const {
     folderPath += QString("/%1.pjson").arg(record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString());
   }
   if (not QFile::exists(folderPath)) {
-    qDebug("Path[%s] not exists", folderPath.toStdString().c_str());
+    qDebug("Path[%s] not exists", qPrintable(folderPath));
     return false;
   }
   return QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));

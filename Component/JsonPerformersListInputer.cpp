@@ -82,7 +82,7 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
   p_dict = &dict;
   if (not QFile::exists(jsonFilePath)) {
     setWindowFilePath("");
-    qDebug("error path[%s] not exist", jsonFilePath.toStdString().c_str());
+    qDebug("error path[%s] not exist", qPrintable(jsonFilePath));
     return false;
   }
   setWindowFilePath(jsonFilePath);

@@ -140,7 +140,7 @@ QList<unsigned long> MP4DurationGetter::getBatchVideosDuration(const QStringList
     if (not fi.exists() or fi.suffix().toLower() != "mp4") {
       continue;
     }
-    durationLst << videoinfo_duration((char*)path.toStdString().c_str());
+    durationLst << videoinfo_duration((char*)qPrintable(path));
   }
   return durationLst;
 }

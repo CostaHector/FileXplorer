@@ -31,7 +31,8 @@ void DragDropTableView::subscribe() {
           [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
 
   connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
-  addActions(g_fileBasicOperationsActions().OPEN->actions());
+  addActions(g_fileBasicOperationsActions().PLAY_AG->actions());
+  addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());
   addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());

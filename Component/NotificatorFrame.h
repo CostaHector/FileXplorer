@@ -1,8 +1,11 @@
-#ifndef NOTIFICATOR_H
-#define NOTIFICATOR_H
+#ifndef NOTIFICATORFRAME_H
+#define NOTIFICATORFRAME_H
+/* from https://gist.github.com/dimkanovikov/7cf62ff0fdf833512d33b1134d434de5
+ * by dimkanovikov/notificator.cpp
+ */
 
 #include <QFrame>
-#include "notificator_p.h"
+#include "NotificatorFrame_p.h"
 
 class QLabel;
 class QIcon;
@@ -45,4 +48,4 @@ class Notificator : public QFrame {
   static QList<Notificator*> instances;
 };
 
-#endif  // NOTIFICATOR_H
+#endif  // NOTIFICATORFRAME_H

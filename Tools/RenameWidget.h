@@ -19,7 +19,7 @@
 #include <QWidget>
 
 #include "Component/StateLabel.h"
-#include "Component/notificator.h"
+#include "Component/NotificatorFrame.h"
 #include "UndoRedo.h"
 
 class RenameWidget : public QDialog {
@@ -158,7 +158,7 @@ class RenameWidget : public QDialog {
       const QString& invalidFileNameStr = invalidFileNames.join('\n');
       const QString& msg = QString("Check Failed [invalid new name]. %1 invalid name(s) find:\n%2")
                                .arg(invalidFileNames.size())
-                               .arg(invalidFileNameStr.toStdString().c_str());
+                               .arg(qPrintable(invalidFileNameStr));
       qDebug("%s", qPrintable(msg));
       QMessageBox::warning(this, "Check Failed [invalid new name]", msg);
       return false;
@@ -188,7 +188,7 @@ class RenameWidget : public QDialog {
     auto itEmpty = std::find_if(newCompleteNameList.cbegin(), newCompleteNameList.cend(), [](const QString& s) -> bool { return s.isEmpty(); });
     if (itEmpty != newCompleteNameList.cend()) {
       const QString& msg("File name cannot be empty");
-      qDebug("Check Failed some complete filename is empty, %s", msg.toStdString().c_str());
+      qDebug("Check Failed some complete filename is empty, %s", qPrintable(msg));
       QMessageBox::warning(this, "Check Failed some complete filename is empty", msg);
       return false;
     }
