@@ -1,6 +1,7 @@
 #ifndef PUBLICVARIABLE_H
 #define PUBLICVARIABLE_H
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QJsonValue>
@@ -8,7 +9,6 @@
 #include <QSettings>
 #include <QSize>
 #include <QTextStream>
-#include <QDebug>
 
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
@@ -192,7 +192,6 @@ const GVarBool SHOW_PERFORMERS_MANAGER_DATABASE("SHOW_PERFORMERS_MANAGER_DATABAS
 const GVarBool SHOW_TORRENTS_MANAGER_DATABASE("SHOW_TORRENTS_MANAGER_DATABASE", false);
 const GVarBool QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false);
 
-const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
 const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
 const GVarStr HEARVIEW_SORT_INDICATOR_ORDER("HEARVIEW_SORT_INDICATOR_ORDER",
                                             HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,

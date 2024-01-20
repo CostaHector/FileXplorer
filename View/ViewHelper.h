@@ -29,15 +29,7 @@ class View {
 
   virtual void InitViewSettings() = 0;
 
-  virtual void SetViewColumnWidth() = 0;
-
   virtual void UpdateItemViewFontSize() = 0;
-
-  static void on_sectionResized(const int logicalIndex, const int /* oldSize */, const int newSize) {
-    if (logicalIndex == MainKey::NAME_COLUMN) {
-      PreferenceSettings().setValue(MemoryKey::NAME_COLUMN_WIDTH.name, newSize);
-    }
-  }
 
   static void onSortIndicatorChanged(int logicalIndex, Qt::SortOrder order) {
     PreferenceSettings().setValue(MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, logicalIndex);
