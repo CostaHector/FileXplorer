@@ -94,6 +94,19 @@ const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
 const int DB_FOR_SEARCH_INDEX = DB_HEADER.indexOf(ForSearch);
 }  // namespace DB_HEADER_KEY
 
+namespace SearchKey {
+const QString Name = "Name";
+const QString Size = "Size";
+const QString Type = "Type";
+const QString DateModified = "DateModified";
+const QString RelPath = "RelPath";
+const QStringList EXPLORER_COLUMNS_TITLE{Name, Size, Type, DateModified, RelPath};
+const int NAME_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf(Name);
+const int TYPE_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf(Type);
+const int RELPATH_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf(RelPath);
+const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
+}  // namespace SearchKey
+
 namespace HEADERVIEW_SORT_INDICATOR_ORDER {
 class OrderClass {
  public:
@@ -221,6 +234,11 @@ const GVarInt RIGHT_CLICK_TOOLBUTTON_STYLE("RIGHT_CLICK_TOOLBUTTON_STYLE", 0);
 
 const GVarStr NAME_PATTERN_USED_CREATE_BATCH_FILES("NAME_PATTERN_USED_CREATE_BATCH_FILES", "Page %03d%1$1$11.html", {});
 const GVarStr NAME_PATTERN_USED_CREATE_BATCH_FOLDERS("NAME_PATTERN_USED_CREATE_BATCH_FOLDERS", "Page %03d%1$1$11", {});
+
+const GVarStrFolder SEARCH_MODEL_ROOT_PATH("SEARCH_MODEL_ROOT_PATH", "./");
+const GVarStr SEARCH_MODEL_DIR_FILTER("SEARCH_MODEL_DIR_FILTER", "Files|Dirs", {});
+const GVarStr SEARCH_MODEL_TYPE_FILTER("SEARCH_MODEL_TYPE_FILTER", "*.mp4", {});
+const GVarStr SEARCH_MODEL_NAME_FILTER("SEARCH_MODEL_NAME_FILTER", "*", {});
 }  // namespace MemoryKey
 
 namespace SystemPath {
