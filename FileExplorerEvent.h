@@ -112,30 +112,6 @@ class FileExplorerEvent : public QObject {
 
   auto on_deletePermanently() -> bool;
 
-  bool on_Undo() const {
-    if (not g_undoRedo.undoAvailable()) {
-      qInfo("[skip] Nothing to undo");
-      return true;
-    }
-    const bool isAllSucceed = g_undoRedo.Undo().first;
-    const char* undoMsg = isAllSucceed ? "All undo succeed" : "Some undo failed.";
-    qDebug("%s", undoMsg);
-    Notificator::information("Undo", undoMsg);
-    return isAllSucceed;
-  }
-
-  bool on_Redo() const {
-    if (not g_undoRedo.redoAvailable()) {
-      qInfo("[skip] Nothing to redo");
-      return true;
-    }
-    const bool isAllSucceed = g_undoRedo.Redo().first;
-    const char* redoMsg = isAllSucceed ? "All redo succeed" : "Some redo failed.";
-    qDebug("%s", redoMsg);
-    Notificator::information("Redo", redoMsg);
-    return isAllSucceed;
-  }
-
   auto on_SelectAll() -> void;
   auto on_SelectNone() -> void;
   auto on_SelectInvert() -> void;

@@ -45,6 +45,17 @@ class VideoPlayer : public QMainWindow {
   void onPlayLastVideo();
   void onPlayNextVideo();
 
+  void onListWidgetDoubleClicked(QListWidgetItem* item);
+  void onUpdatePlayableList();
+
+  void onRecycleSelectedItems();
+  bool on_Undo() const;
+  bool on_Redo() const;
+
+  void onScrollToAnotherFolder(int inc = 1);
+  void onScrollToNextFolder() { onScrollToAnotherFolder(1); }
+  void onScrollToLastFolder() { onScrollToAnotherFolder(-1); }
+
   void onShowPlaylist();
   void onClearPlaylist();
   void openAFolder(const QString& folderPath = "");
@@ -124,6 +135,7 @@ class VideoPlayer : public QMainWindow {
   QDockWidget* m_playlistDock;
 
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
+  static const QColor RECYCLED_ITEM_COLOR;
 
   JsonPerformersListInputer* m_performerWid;
   QVariantHash m_dict;

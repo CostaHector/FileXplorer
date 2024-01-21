@@ -1,12 +1,16 @@
 #include "VideoPlayer.h"
 #include "Actions/VideoPlayerActions.h"
+#include "Component/NotificatorFrame.h"
+#include "FileOperation/FileOperation.h"
 #include "Tools/JsonFileHelper.h"
+#include "UndoRedo.h"
 
 #include <QVideoWidget>
 #include <QtWidgets>
 
 constexpr int VideoPlayer::MICROSECOND;
 const QString VideoPlayer::PLAYLIST_DOCK_TITLE_TEMPLATE{"playlist: %1"};
+const QColor VideoPlayer::RECYCLED_ITEM_COLOR(255, 0, 0);
 
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QMainWindow(parent),
@@ -27,6 +31,11 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   m_probe->setSource(m_mediaPlayer);  // Returns true, hopefully.
 
   m_playListWid->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_playListWid->setAlternatingRowColors(true);
+  m_playListWid->setSortingEnabled(true);
+  m_playListWid->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_playListWid->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+
   m_playListMenu->addAction(g_videoPlayerActions()._REVEAL_IN_EXPLORER);
 
   m_slider->setRange(0, 0);
@@ -59,9 +68,18 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   m_controlTB->addWidget(spacer);
   m_controlTB->addSeparator();
   m_controlTB->addAction(g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO);
+  m_controlTB->addSeparator();
+  m_controlTB->addAction(g_videoPlayerActions()._SCROLL_TO_LAST_FOLDER);
+  m_controlTB->addAction(g_videoPlayerActions()._SCROLL_TO_NEXT_FOLDER);
+  m_controlTB->addSeparator();
   m_controlTB->addAction(g_videoPlayerActions()._CLEAR_VIDEOS_LIST);
   m_controlTB->addAction(g_videoPlayerActions()._LOAD_A_PATH);
   m_controlTB->addAction(g_videoPlayerActions()._VIDEOS_LIST_MENU);
+  m_controlTB->addAction(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE);
+  m_controlTB->addSeparator();
+  m_controlTB->addAction(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN);
+  m_controlTB->addAction(g_videoPlayerActions()._UNDO_RECYLE);
+  m_controlTB->addAction(g_videoPlayerActions()._REDO_RECYLE);
   m_controlTB->setContentsMargins(0, 0, 0, 0);
 
   addToolBar(Qt::ToolBarArea::BottomToolBarArea, m_controlTB);
@@ -179,10 +197,7 @@ void VideoPlayer::subscribe() {
     m_playListMenu->popup(m_playListWid->mapToGlobal(pnt));  // or QCursor::pos()
   });
 
-  connect(m_playListWid, &QListWidget::itemDoubleClicked, this, [this](const QListWidgetItem* item) {
-    setUrl(QUrl::fromLocalFile(item->text()));
-    play();
-  });
+  connect(m_playListWid, &QListWidget::itemDoubleClicked, this, &VideoPlayer::onListWidgetDoubleClicked);
 
   connect(g_videoPlayerActions()._JUMP_NEXT_HOT_SCENE, &QAction::triggered, this, &VideoPlayer::onJumpToNextHotScene);
   connect(g_videoPlayerActions()._JUMP_LAST_HOT_SCENE, &QAction::triggered, this, &VideoPlayer::onJumpToLastHotScene);
@@ -196,7 +211,7 @@ void VideoPlayer::subscribe() {
 
   connect(g_videoPlayerActions()._GRAB_FRAME, &QAction::triggered, this, [this]() -> void {
     connect(m_probe, &QVideoProbe::videoFrameProbed, this, &VideoPlayer::onGrabAFrame);
-    qDebug("current %d (ms)", m_mediaPlayer->position());
+    qDebug("current %lld (ms)", m_mediaPlayer->position());
   });
 
   connect(g_videoPlayerActions()._RENAME_VIDEO, &QAction::triggered, this, &VideoPlayer::onModeName);
@@ -222,11 +237,18 @@ void VideoPlayer::subscribe() {
 
   connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &VideoPlayer::durationChanged);
   connect(m_mediaPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &VideoPlayer::handleError);
+
+  connect(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN, &QAction::triggered, this, &VideoPlayer::onRecycleSelectedItems);
+  connect(g_videoPlayerActions()._UNDO_RECYLE, &QAction::triggered, this, &UndoRedo::on_Undo);
+  connect(g_videoPlayerActions()._REDO_RECYLE, &QAction::triggered, this, &UndoRedo::on_Redo);
+  connect(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE, &QAction::triggered, this, &VideoPlayer::onUpdatePlayableList);
+  connect(g_videoPlayerActions()._SCROLL_TO_LAST_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToLastFolder);
+  connect(g_videoPlayerActions()._SCROLL_TO_NEXT_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToNextFolder);
 }
 
 bool VideoPlayer::onModeName() {
   if (not m_playListWid->currentItem()) {
-    qDebug("cannot rename nothing select");
+    qInfo("Skip nothing was selected to rename");
     return true;
   }
   const QFileInfo vidFi(m_playListWid->currentItem()->text());
@@ -238,7 +260,7 @@ bool VideoPlayer::onModeName() {
   bool okClicked = false;
   const QString& newFileName = QInputDialog::getItem(this, "Rename Videos", vidFi.absolutePath(), {vidFi.fileName()}, 0, true, &okClicked);
   if (not okClicked or newFileName.isEmpty()) {
-    qDebug("Cancel rename");
+    qInfo("Skip User cancel rename");
     return false;
   }
   if (vidFi.fileName() == newFileName) {
@@ -252,7 +274,7 @@ bool VideoPlayer::onModeName() {
 
   if (not renameResult) {
     const QString& msg = QString("Rename [%1] -> [%2] failed").arg(vidFi.fileName()).arg(newFileName);
-    qDebug("%s", qPrintable(msg));
+    qDebug("Result: %s", qPrintable(msg));
     QMessageBox::warning(this, "Rename failed", msg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
     setUrl(QUrl::fromLocalFile(vidFi.absoluteFilePath()));
   } else {
@@ -292,12 +314,12 @@ bool VideoPlayer::onModPerformers() {
 bool VideoPlayer::onGrabAFrame(const QVideoFrame& frame) {
   disconnect(m_probe, &QVideoProbe::videoFrameProbed, nullptr, nullptr);
   if (not m_playListWid->currentItem()) {
-    qDebug("nothing select to grab image");
+    qInfo("[Skip] Nothing select to grab an image");
     return false;
   }
   const auto& img = frame.image();
   if (img.isNull()) {
-    qDebug("image is null");
+    qWarning("image is null");
     return false;
   }
   const int seconds = m_slider->value() / MICROSECOND;
@@ -339,7 +361,7 @@ auto VideoPlayer::loadHotSceneList() -> void {
 
 auto VideoPlayer::onJumpToNextHotScene() -> bool {
   if (m_hotSceneList.isEmpty()) {
-    qDebug("empty hot scenes list");
+    qInfo("[Skip] Hot scenes list is empty");
     return false;
   }
   int tar = m_mediaPlayer->position();
@@ -404,6 +426,7 @@ auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {
 
 void VideoPlayer::onPlayLastVideo() {
   if (m_playListWid->count() == 0) {
+    qDebug("playlist is empty");
     return;
   }
   int lastRow = m_playListWid->currentRow() - 1;
@@ -412,12 +435,12 @@ void VideoPlayer::onPlayLastVideo() {
     lastRow = m_playListWid->count() - 1;
   }
   m_playListWid->setCurrentRow(lastRow);
-  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
-  play();
+  onListWidgetDoubleClicked(m_playListWid->item(lastRow));
 }
 
 void VideoPlayer::onPlayNextVideo() {
   if (m_playListWid->count() == 0) {
+    qDebug("playlist is empty");
     return;
   }
   int nextRow = m_playListWid->currentRow() + 1;
@@ -426,8 +449,87 @@ void VideoPlayer::onPlayNextVideo() {
     nextRow = 0;
   }
   m_playListWid->setCurrentRow(nextRow);
-  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
+  onListWidgetDoubleClicked(m_playListWid->item(nextRow));
+}
+
+void VideoPlayer::onListWidgetDoubleClicked(QListWidgetItem* item) {
+  if (not QFile::exists(item->text())) {
+    qDebug("Cannot play. Video[%s] not exists", qPrintable(item->text()));
+    Notificator::warning("Cannot play", QString("Video[%1] not exists").arg(item->text()));
+    item->setForeground(RECYCLED_ITEM_COLOR);
+    return;
+  }
+  item->setForeground(QColor());
+  setUrl(QUrl::fromLocalFile(item->text()));
   play();
+}
+
+void VideoPlayer::onUpdatePlayableList() {
+  static const auto updateColor = [](QListWidgetItem* widgetItem) {
+    if (QFile::exists(widgetItem->text())) {
+      widgetItem->setForeground(QColor());
+    } else {
+      widgetItem->setForeground(RECYCLED_ITEM_COLOR);
+    }
+  };
+  if (not m_playListWid->selectedItems().isEmpty()) {
+    for (auto* widgetItem : m_playListWid->selectedItems()) {
+      updateColor(widgetItem);
+    }
+  }
+  for (int i = 0; i < m_playListWid->count(); ++i) {
+    auto* widgetItem = m_playListWid->item(i);
+    updateColor(widgetItem);
+  }
+}
+
+void VideoPlayer::onRecycleSelectedItems() {
+  FileOperation::BATCH_COMMAND_LIST_TYPE recycleCmds;
+  for (auto* widgetItem : m_playListWid->selectedItems()) {
+    QFileInfo fi(widgetItem->text());
+    if (fi.exists()) {
+      recycleCmds.append({"moveToTrash", fi.absolutePath(), fi.fileName()});
+      widgetItem->setForeground(RECYCLED_ITEM_COLOR);
+    }
+  }
+  bool recycleRet = g_undoRedo.Do(recycleCmds);
+  if (recycleRet) {
+    qDebug("Recycle succeed. %d files", recycleCmds.size());
+    Notificator::information("Recycle succeed", QString("%1 files").arg(recycleCmds.size()));
+  } else {
+    qDebug("Some recycle failed. %d files", recycleCmds.size());
+    Notificator::warning("Some Recycle Failed", QString("%1 files").arg(recycleCmds.size()));
+  }
+}
+
+void VideoPlayer::onScrollToAnotherFolder(int inc) {
+  if (m_playListWid->count() == 0) {
+    qDebug("playlist is empty");
+    return;
+  }
+  static auto getDirName = [](const QString& filePath) -> QString { return QFileInfo(QFileInfo(filePath).absolutePath()).fileName(); };
+
+  const QString& beforeDirName = getDirName(m_playListWid->currentItem()->text());
+  for (int i = m_playListWid->currentRow() + inc; 0 <= i and i < m_playListWid->count(); i += inc) {
+    const QString& newDirName = getDirName(m_playListWid->item(i)->text());
+    if (newDirName != beforeDirName) {
+      auto* curItem = m_playListWid->item(i);
+      m_playListWid->setCurrentItem(curItem);
+      m_playListWid->scrollToItem(curItem);
+      onListWidgetDoubleClicked(curItem);
+      qDebug("Scroll to the %dth item, a folder named [%s]", i, qPrintable(newDirName));
+      return;
+    }
+  }
+  if (inc > 0) {
+    m_playListWid->scrollToTop();
+    qDebug("[%s] is already the first folder", qPrintable(beforeDirName));
+    Notificator::information("Scroll <<", QString("[%s] is already the first folder").arg(beforeDirName));
+  } else if (inc < 0) {
+    m_playListWid->scrollToBottom();
+    qDebug("[%s] is already the last folder", qPrintable(beforeDirName));
+    Notificator::information("Scroll >>", QString("[%s] is already the last folder").arg(beforeDirName));
+  }
 }
 
 void VideoPlayer::onShowPlaylist() {
@@ -466,8 +568,7 @@ void VideoPlayer::openAFolder(const QString& folderPath) {
     return;
   }
   m_playListWid->setCurrentRow(playIndex);
-  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
-  play();
+  onListWidgetDoubleClicked(m_playListWid->item(playIndex));
 }
 
 void VideoPlayer::play() {
