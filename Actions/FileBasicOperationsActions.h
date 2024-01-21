@@ -233,7 +233,7 @@ class FileBasicOperationsActions : public QObject {
     _ADVANCE_SEARCH->setShortcutVisibleInContextMenu(true);
     _ADVANCE_SEARCH->setToolTip(
         QString("<b>%1 (%2)</b><br/> Search by file name or file contents.").arg(_ADVANCE_SEARCH->text(), _ADVANCE_SEARCH->shortcut().toString()));
-    _ADVANCE_SEARCH->setCheckable(true);
+    _ADVANCE_SEARCH->setCheckable(false);
 
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(_ADVANCE_SEARCH);
