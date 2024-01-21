@@ -24,12 +24,9 @@ class FileBasicOperationsActions : public QObject {
     DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
                                        .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
-    QAction* CLEAR_HTML_CACHE = new QAction(QIcon(":/themes/REMOVE_HTML_PATH"), "-Clear html");
-
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(MOVE_TO_TRASHBIN);
     actionGroup->addAction(DELETE_PERMANENTLY);
-    actionGroup->addAction(CLEAR_HTML_CACHE);
     return actionGroup;
   }
   auto GetMOVE_COPY_TOActions() -> QActionGroup* {
