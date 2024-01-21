@@ -1,17 +1,17 @@
 #include "JsonEditor.h"
 #include "Actions/JsonEditorActions.h"
 #include "Actions/QuickWhereActions.h"
-#include "Tools/PerformersStringParser.h"
 #include "Component/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
+#include "Tools/PerformersStringParser.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QTableWidgetItem>
-#include <QToolBar>
 #include <QTextDocumentFragment>
+#include <QToolBar>
 
 const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [%1/%2]";
 const QColor JsonEditor::MEET_CONDITION_COLOR(150, 150, 150);
