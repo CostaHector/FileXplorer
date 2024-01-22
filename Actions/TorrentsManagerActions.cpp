@@ -19,7 +19,7 @@ TorrentsManagerActions::TorrentsManagerActions(QObject* parent)
 void TorrentsManagerActions::InitActionsTooltips() {
   OPEN_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
   OPEN_WITH_LOCAL_APP->setToolTip(
-      QString("<b>%0 (%1)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
+      QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
           .arg(OPEN_WITH_LOCAL_APP->text(), OPEN_WITH_LOCAL_APP->shortcut().toString()));
 
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));

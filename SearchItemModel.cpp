@@ -82,11 +82,11 @@ bool SearchItemModel::ChangeRootPathOrFilter(const QString& rootPath,
     const QFileInfo& fi = it.fileInfo();
     const QString& relPath = fi.absoluteFilePath().mid(PRE_PATH_LEN + 1);
     FileProperty fp;
-    strcpy_s(fp.name, sizeof(fp.name), fi.fileName().toStdString().c_str());
+    strncpy(fp.name, fi.fileName().toStdString().c_str(), sizeof(fp.name));
     fp.size = fi.size();
-    strcpy_s(fp.type, sizeof(fp.type), fi.suffix().toStdString().c_str());
+    strncpy(fp.type, fi.suffix().toStdString().c_str(), sizeof(fp.name));
     fp.createdTime = fi.birthTime().toMSecsSinceEpoch();
-    strcpy_s(fp.relPath, sizeof(fp.relPath), relPath.toStdString().c_str());
+    strncpy(fp.relPath, relPath.toStdString().c_str(), sizeof(fp.relPath));
 
     indexData_[m_Key] << fp;
   }

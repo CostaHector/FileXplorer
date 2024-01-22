@@ -61,6 +61,7 @@ SOURCES += \
     Tools/MP4DurationGetter.cpp \
     Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
+    Tools/PathTool.cpp \
     Tools/PerformerJsonFileHelper.cpp \
     Tools/PerformersStringParser.cpp \
     Tools/PlayVideo.cpp \
@@ -146,6 +147,7 @@ HEADERS += \
     Tools/MP4DurationGetter.h \
     Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
+    Tools/PathTool.h \
     Tools/PerformerJsonFileHelper.h \
     Tools/PerformersStringParser.h \
     Tools/PlayVideo.h \
