@@ -28,7 +28,7 @@ FolderListView::FolderListView(MyQFileSystemModel* fileSystemModel_, const QStri
 
 bool FolderListView::operator()(const QString& path) {
   if (not QFileInfo(path).isDir()) {
-    qDebug("path[%s] not exist", path.toStdString().c_str());
+    qDebug("path[%s] not exist", qPrintable(path));
     return true;
   }
   setRootIndex(m_fileSystemPreview->setRootPath(path));

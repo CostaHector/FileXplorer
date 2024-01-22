@@ -140,7 +140,7 @@ QList<unsigned long> MP4DurationGetter::getBatchVideosDuration(const QStringList
     if (not fi.exists() or fi.suffix().toLower() != "mp4") {
       continue;
     }
-    durationLst << videoinfo_duration((char*)path.toStdString().c_str());
+    durationLst << videoinfo_duration((char*)qPrintable(path));
   }
   return durationLst;
 }
@@ -169,7 +169,7 @@ QString MP4DurationGetter::DisplayVideosDuration(const QList<unsigned long>& dur
     totalLength += durationLst[i];
     dispMsg += (QString::number(durationLst[i]) + '\t' + fileNames[i] + '\t' + fileDirs[i] + '\n');
   }
-  return QString("Total duration:\n%1(ms) of %2 video(s)\n").arg(totalLength).arg(durationLst.size()) + dispMsg;
+  return QString("Total duration:\n%1(s) of %2 video(s)\n").arg(totalLength).arg(durationLst.size()) + dispMsg;
 }
 
 QString MP4DurationGetter::DisplayVideosDuration(const QStringList& fileAbsPaths) {

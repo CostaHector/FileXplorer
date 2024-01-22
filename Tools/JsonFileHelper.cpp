@@ -1,6 +1,6 @@
 #include "JsonFileHelper.h"
-#include "Tools/PerformersStringParser.h"
 #include "Component/ProductionStudioManager.h"
+#include "Tools/PerformersStringParser.h"
 
 const QMap<QString, QString> JsonFileHelper::key2ValueType = {{JSONKey::Performers, "QStringList"},
                                                               {JSONKey::Tags, "QStringList"},
@@ -37,7 +37,7 @@ int JsonFileHelper::JsonPerformersKeyValuePairAdd(const QString& path) {
   }
   int succeedCnt = 0;
   int tryKVPairCnt = 0;
-  
+
   static PerformersStringParser& pm = PerformersStringParser::getIns();
 
   QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);

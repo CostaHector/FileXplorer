@@ -1,11 +1,11 @@
 #ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
-#include "Actions/RightClickMenuActions.h"
 #include "Component/CustomStatusBar.h"
 #include "Component/JsonEditor.h"
 #include "Component/MD5Window.h"
 #include "Component/PropertiesWindow.h"
 #include "Component/VideoPlayer.h"
+#include "Component/NotificatorFrame.h"
 
 #include "Tools/MimeDataCX.h"
 #include "UndoRedo.h"
@@ -48,7 +48,8 @@ class FileExplorerEvent : public QObject {
 
   auto __CanNewItem() const -> bool {
     if (fileSysModel->rootPath().isEmpty()) {
-      qDebug("New item only available on non-empty path[%s]", fileSysModel->rootPath().toStdString().c_str());
+      qDebug("Reject. don't create item here[%s]", qPrintable(fileSysModel->rootPath()));
+      Notificator::warning("Reject", QString("Don't create item here[%s]").arg(fileSysModel->rootPath()));
       return false;
     }
     return true;
@@ -110,26 +111,6 @@ class FileExplorerEvent : public QObject {
   auto on_moveToTrashBin() -> bool;
 
   auto on_deletePermanently() -> bool;
-
-  bool on_Undo() const {
-    if (not g_undoRedo.undoAvailable()) {
-      qDebug("[skip] Nothing to undo");
-      return true;
-    }
-    const bool isAllSucceed = g_undoRedo.Undo().first;
-    qDebug(isAllSucceed ? "All undo succeed" : "Some undo failed.");
-    return isAllSucceed;
-  }
-
-  bool on_Redo() const {
-    if (not g_undoRedo.redoAvailable()) {
-      qDebug("[skip] Nothing to redo");
-      return true;
-    }
-    const bool isAllSucceed = g_undoRedo.Redo().first;
-    qDebug(isAllSucceed ? "All redo succeed" : "Some redo failed.");
-    return isAllSucceed;
-  }
 
   auto on_SelectAll() -> void;
   auto on_SelectNone() -> void;

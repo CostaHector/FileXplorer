@@ -31,7 +31,7 @@ bool PublicTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir
       if (coverFileIfExist) {
         targetDir.remove(fileInfo.fileName());
         qDebug("%s/%s is covered by file under [%s]", targetDir.absolutePath().toStdString().c_str(), fileInfo.fileName().toStdString().c_str(),
-               fromDir.toStdString().c_str());
+               qPrintable(fromDir));
       } else {
         qDebug("%s/[%s] was kept", targetDir.absolutePath().toStdString().c_str(), fileInfo.fileName().toStdString().c_str());
       }

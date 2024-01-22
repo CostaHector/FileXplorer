@@ -19,7 +19,7 @@
 #include <QWidget>
 
 #include "Component/StateLabel.h"
-#include "Component/Toaster.h"
+#include "Component/NotificatorFrame.h"
 #include "UndoRedo.h"
 
 class RenameWidget : public QDialog {
@@ -136,20 +136,20 @@ class RenameWidget : public QDialog {
   auto Checker(const QStringList& olds, const QStringList& news) -> bool {
     if (olds.size() != news.size()) {
       const QString& msg = QString("Check failed [length inequal], but left[%1]!=right[%2]").arg(olds.size()).arg(news.size());
-      qDebug(msg.toStdString().c_str());
+      qDebug("%s", qPrintable(msg));
       QMessageBox::warning(this, "Check failed [length inequal]", msg);
       return false;
     }
     QSet<QString> selfDupLst(news.cbegin(), news.cend());
     if (selfDupLst.size() < news.size()) {
       const QString& msg = QString("Check failed [new name not unique], news[%1], unique[%2]").arg(selfDupLst.size()).arg(news.size());
-      qDebug(msg.toStdString().c_str());
+      qDebug("%s", qPrintable(msg));
       QMessageBox::warning(this, "Check failed [new name not unique]", msg);
       return false;
     }
 
     QStringList invalidFileNames;
-    for (const QString fileName : news) {
+    for (const QString& fileName : news) {
       if (not IsFileNameValid(fileName)) {
         invalidFileNames.append(fileName);
       }
@@ -158,8 +158,8 @@ class RenameWidget : public QDialog {
       const QString& invalidFileNameStr = invalidFileNames.join('\n');
       const QString& msg = QString("Check Failed [invalid new name]. %1 invalid name(s) find:\n%2")
                                .arg(invalidFileNames.size())
-                               .arg(invalidFileNameStr.toStdString().c_str());
-      qDebug(msg.toStdString().c_str());
+                               .arg(qPrintable(invalidFileNameStr));
+      qDebug("%s", qPrintable(msg));
       QMessageBox::warning(this, "Check Failed [invalid new name]", msg);
       return false;
     }
@@ -188,7 +188,7 @@ class RenameWidget : public QDialog {
     auto itEmpty = std::find_if(newCompleteNameList.cbegin(), newCompleteNameList.cend(), [](const QString& s) -> bool { return s.isEmpty(); });
     if (itEmpty != newCompleteNameList.cend()) {
       const QString& msg("File name cannot be empty");
-      qDebug("Check Failed some complete filename is empty, %s", msg.toStdString().c_str());
+      qDebug("Check Failed some complete filename is empty, %s", qPrintable(msg));
       QMessageBox::warning(this, "Check Failed some complete filename is empty", msg);
       return false;
     }
@@ -204,7 +204,7 @@ class RenameWidget : public QDialog {
     }
     if (not Checker(olds, news)) {
       if (isInterative) {
-        (new Toaster(this, QString("Checked failed | %1").arg(olds.size()), false))->exec();
+        Notificator::warning("[Abort] Name conflicts", QString("olds[%1], news[%2]").arg(olds.size()).arg(news.size()));
       }
       return false;
     }
@@ -232,7 +232,7 @@ class RenameWidget : public QDialog {
     bool isAllSuccess = g_undoRedo.Do(reversedcmds);
     if (isInterative) {
       if (isAllSuccess) {
-        new Toaster(this, QString("%1 command(s).").arg(reversedcmds.size()), isAllSuccess);
+        Notificator::information("Batch rename", QString("%1 command(s).").arg(reversedcmds.size()));
       }
     }
     close();
@@ -289,7 +289,7 @@ class RenameWidget : public QDialog {
 
   static inline auto IsFileNameValid(const QString& filename) -> bool {
     QSet<QChar> nameSet(filename.cbegin(), filename.cend());
-    return nameSet.intersect(RenameWidget::INVALID_FILE_NAME_CHAR_SET).isEmpty();
+    return nameSet.intersects(RenameWidget::INVALID_FILE_NAME_CHAR_SET);
   }
 };
 
@@ -436,10 +436,10 @@ class RenameWidget_Delete : public RenameWidget_Replace {
 
 class RenameWidget_Numerize : public RenameWidget {
  public:
-  QLineEdit* startNo;
-  QLineEdit* completeBaseName;
+  QLineEdit* m_startNo;
+  QLineEdit* m_completeBaseName;
 
-  explicit RenameWidget_Numerize(QWidget* parent = nullptr) : RenameWidget(parent), startNo(new QLineEdit("0")), completeBaseName(new QLineEdit) {
+  explicit RenameWidget_Numerize(QWidget* parent = nullptr) : RenameWidget(parent), m_startNo(new QLineEdit("0")), m_completeBaseName(new QLineEdit) {
     includingSuffix->setChecked(false);
     includingSub->setChecked(false);
   }
@@ -451,18 +451,18 @@ class RenameWidget_Numerize : public RenameWidget {
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl(new QToolBar);
     replaceControl->addWidget(new QLabel("Complete base name"));
-    replaceControl->addWidget(completeBaseName);
+    replaceControl->addWidget(m_completeBaseName);
     replaceControl->addWidget(new QLabel("Start No:"));
-    replaceControl->addWidget(startNo);
+    replaceControl->addWidget(m_startNo);
     return replaceControl;
   }
   auto extraSubscribe() -> void override {
-    connect(startNo, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
-    connect(completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
+    connect(m_startNo, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
+    connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
   }
-  auto InitExtraMemberWidget() -> void {
-    QLineEdit* startNo(new QLineEdit("0"));
-    QLineEdit* completeBaseName(new QLineEdit);
+  auto InitExtraMemberWidget() -> void override {
+    m_startNo = new QLineEdit("0");
+    m_completeBaseName = new QLineEdit;
   }
   auto RenameCore(const QStringList& replaceeList) -> QStringList override;
 };
@@ -489,7 +489,7 @@ class RenameWidget_Case : public RenameWidget {
     return replaceControl;
   }
   auto extraSubscribe() -> void override { connect(caseTB, &QToolBar::actionTriggered, this, &RenameWidget::OnlyTriggerRenameCore); }
-  auto InitExtraMemberWidget() -> void {
+  auto InitExtraMemberWidget() -> void override {
     caseTB->addActions(caseAG->actions());
     caseTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     return;
@@ -512,7 +512,7 @@ class RenameWidget_Case : public RenameWidget {
     QString toggled;
     for (QChar c : sentence) {
       if (c.isLetter()) {
-        toggled += (c.toLatin1() ^ 0x20); // trick upper to lower case by bitwise operator
+        toggled += (c.toLatin1() ^ 0x20);  // trick upper to lower case by bitwise operator
       } else {
         toggled += c;
       }
@@ -547,7 +547,7 @@ class RenameWidget_SwapSection : public RenameWidget {
     return replaceControl;
   }
   auto extraSubscribe() -> void override { connect(swapTB, &QToolBar::actionTriggered, this, &RenameWidget::OnlyTriggerRenameCore); }
-  auto InitExtraMemberWidget() -> void {
+  auto InitExtraMemberWidget() -> void override {
     QAction* section12 = new QAction("1 <> 2");
     QAction* section23 = new QAction("2 <> 3");
     QAction* section01 = new QAction("0 <> 1");

@@ -88,7 +88,7 @@ class JsonFileHelper {
       bool isOk = false;
       int hot = perf.toInt(&isOk);
       if (not isOk) {
-        qDebug("Hot scene position[%s] is not a number", perf.toStdString().c_str());
+        qDebug("Hot scene position[%s] is not a number", qPrintable(perf));
         continue;
       }
       arr.append(hot);
@@ -115,7 +115,7 @@ class JsonFileHelper {
       } else if (key2ValueType[keyName] == "int") {
         valueStr = QString::number(v.toInt());
       } else {
-        qDebug("type(map[%s]) cannot be processed", keyName.toStdString().c_str());
+        qDebug("type(map[%s]) cannot be processed", qPrintable(keyName));
       }
     } else {
       valueStr = v.toString();

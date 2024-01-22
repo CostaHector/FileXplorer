@@ -30,6 +30,7 @@ SOURCES += \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
     Component/MD5Window.cpp \
+    Component/NotificatorFrame.cpp \
     Component/PerformersManagerWidget.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
     Component/ProductionStudioManager.cpp \
@@ -47,6 +48,7 @@ SOURCES += \
     MyQSqlTableModel.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
+    SearchItemModel.cpp \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/CopyItemPropertiesToClipboardIF.cpp \
@@ -84,6 +86,7 @@ SOURCES += \
     PathUndoRedoer.cpp \
     PublicVariable.cpp \
     RightClickableToolBar.cpp \
+    View/SearchItemTableView.cpp \
     View/ViewHelper.cpp \
     main.cpp \
     FileExplorerReadOnly.cpp
@@ -111,6 +114,8 @@ HEADERS += \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
     Component/MD5Window.h \
+    Component/NotificatorFrame.h \
+    Component/NotificatorFrame_p.h \
     Component/PerformersManagerWidget.h \
     Component/PerformersPreviewTextBrowser.h \
     Component/ProductionStudioManager.h \
@@ -128,6 +133,7 @@ HEADERS += \
     MyQSqlTableModel.h \
     PublicTool.h \
     RibbonMenu.h \
+    SearchItemModel.h \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
     Tools/CopyItemPropertiesToClipboardIF.h \
@@ -166,6 +172,7 @@ HEADERS += \
     PathUndoRedoer.h \
     PublicVariable.h \
     RightClickableToolBar.h \
+    View/SearchItemTableView.h \
     View/ViewHelper.h
 
 # Default rules for deployment.
