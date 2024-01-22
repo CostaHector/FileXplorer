@@ -24,27 +24,25 @@ class FileBasicOperationsActions : public QObject {
     DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
                                        .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
-    QAction* CLEAR_HTML_CACHE = new QAction(QIcon(":/themes/REMOVE_HTML_PATH"), "-Clear html");
-
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(MOVE_TO_TRASHBIN);
     actionGroup->addAction(DELETE_PERMANENTLY);
-    actionGroup->addAction(CLEAR_HTML_CACHE);
     return actionGroup;
   }
-  auto GetMOVE_COPY_TO_DELETEActions() -> QActionGroup* {
-    QAction* MOVE_TO = new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), "Move to");
-    MOVE_TO->setShortcutVisibleInContextMenu(true);
-    MOVE_TO->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location you choose.").arg(MOVE_TO->text(), MOVE_TO->shortcut().toString()));
+  auto GetMOVE_COPY_TOActions() -> QActionGroup* {
+    _MOVE_TO = new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), "Move to");
+    _MOVE_TO->setShortcutVisibleInContextMenu(true);
+    _MOVE_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location one specified later")
+                             .arg(_MOVE_TO->text(), _MOVE_TO->shortcut().toString()));
 
-    QAction* COPY_TO = new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), "Copy to");
-    COPY_TO->setShortcutVisibleInContextMenu(true);
-    COPY_TO->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location you choose.").arg(COPY_TO->text(), COPY_TO->shortcut().toString()));
+    _COPY_TO = new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), "Copy to");
+    _COPY_TO->setShortcutVisibleInContextMenu(true);
+    _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later")
+                             .arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
+
     QActionGroup* actionGroup = new QActionGroup(this);
-    actionGroup->addAction(MOVE_TO);
-    actionGroup->addAction(COPY_TO);
+    actionGroup->addAction(_MOVE_TO);
+    actionGroup->addAction(_COPY_TO);
     return actionGroup;
   }
   auto GetMOVE_COPY_TO_PATH_HistoryActions(GVarStr memoryKey) -> QActionGroup* {
@@ -126,40 +124,10 @@ class FileBasicOperationsActions : public QObject {
     }
     return actionGroup;
   }
-  auto GetOPENActions() -> QActionGroup* {
-    QAction* VIDEO_PLAYER_PANE = new QAction(QIcon(":/themes/VIDEO_PLAYER"), "&Video Player");
-    VIDEO_PLAYER_PANE->setShortcutVisibleInContextMenu(true);
-    VIDEO_PLAYER_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.")
-                                      .arg(VIDEO_PLAYER_PANE->text(), VIDEO_PLAYER_PANE->shortcut().toString()));
 
-    QAction* PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play Videos");
-    PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
-    PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
-    PLAY_VIDEOS->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Play the selected item(s) in third part player.").arg(PLAY_VIDEOS->text(), PLAY_VIDEOS->shortcut().toString()));
+  auto GetPLAYActions() -> QActionGroup*;
 
-    QAction* _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in Explorer");
-    _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
-    _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-    _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%0 (%1)</b><br/> Reveal items in system file explorer.")
-                                        .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
-    _REVEAL_IN_EXPLORER->setCheckable(false);
-
-    QAction* OPEN_IN_TERMINAL = new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), "Open in Terminal");
-
-    QActionGroup* actionGroup = new QActionGroup(this);
-    actionGroup->addAction(VIDEO_PLAYER_PANE);
-    actionGroup->addAction(PLAY_VIDEOS);
-    actionGroup->addAction(_REVEAL_IN_EXPLORER);
-    actionGroup->addAction(OPEN_IN_TERMINAL);
-
-    actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-    for (QAction* act : actionGroup->actions()) {
-      act->setCheckable(false);
-    }
-    return actionGroup;
-  }
+  auto GetOPENActions() -> QActionGroup*;
   auto GetCOPY_PATHActions() -> QActionGroup* {
     QAction* COPY_FULL_PATH = new QAction(QIcon(":/themes/COPY_FULL_PATH"), "Copy fullpath");
     COPY_FULL_PATH->setToolTip(
@@ -217,15 +185,15 @@ class FileBasicOperationsActions : public QObject {
         QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
     NEW_JSON_FILE->setCheckable(false);
 
-    QAction* BATCH_NEW_FILES = new QAction(QIcon(":/themes/NEW_FOLDERS"), "Batch New Files");
+    QAction* BATCH_NEW_FILES = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), "Batch New Files");
     BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
-                                "Create a batch of files by pattern specified.<br/>"
+                                "Create a batch of files by specified pattern.<br/>"
                                 "e.g. Given pattern:<br/>"
                                 "\"Page %03d.txt$1$10\"<br/>"
                                 "it will create ten text documents numbered by Page 001,002,...,009 respectively.");
-    QAction* BATCH_NEW_FOLDERS = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), "Batch New Folders");
+    QAction* BATCH_NEW_FOLDERS = new QAction(QIcon(":/themes/NEW_FOLDERS"), "Batch New Folders");
     BATCH_NEW_FOLDERS->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FOLDERS->text(), BATCH_NEW_FOLDERS->shortcut().toString()) +
-                                  "Create a batch of folders by pattern specified.<br/>"
+                                  "Create a batch of folders by specified pattern.<br/>"
                                   "e.g. Given pattern:<br/>"
                                   "\"Page %03d$1$10\"<br/>"
                                   "it will create ten folders numbered by Page 001,002,...,009 respectively.");
@@ -236,9 +204,6 @@ class FileBasicOperationsActions : public QObject {
     actionGroup->addAction(NEW_JSON_FILE);
     actionGroup->addAction(BATCH_NEW_FILES);
     actionGroup->addAction(BATCH_NEW_FOLDERS);
-
-    connect(actionGroup, &QActionGroup::triggered, this,
-            [](QAction* act) -> void { PreferenceSettings().setValue(MemoryKey::DEFAULT_NEW_CHOICE.name, act->text()); });
     return actionGroup;
   }
   auto FolderMergeActions() -> QActionGroup* {
@@ -258,35 +223,14 @@ class FileBasicOperationsActions : public QObject {
     actionGroup->addAction(MERGE_REVERSE);
     return actionGroup;
   }
-  auto FolderFileCategoryProcess() -> QActionGroup* {
-    QAction* _NAME_STANDARDLIZER = new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), "Name Ruler");
-    QAction* _CLASSIFIER = new QAction(QIcon(":/themes/CATEGORIZER"), "Categorizer");
-    QAction* _ITEM_ORGANIZER = new QAction(QIcon(":/themes/ITEMS_ORGANIZER"), "Organizer");
-    QAction* _DUPLICATE_IMAGE_REMOVER = new QAction("Remove duplicate images");
-
-    _NAME_STANDARDLIZER->setToolTip("Rename\n [A..mp4, A (1).jpg, A -- 2.json] to\n [A.mp4, A - 1.jpg, A - 2.json]");
-    _CLASSIFIER->setToolTip("Category\n [A.mp4, A.jpg, A.json] to\n Folder A");
-    _ITEM_ORGANIZER->setToolTip("Organize\n [A - B.mp4, A - C.mp4, A - D.mp4] to\n Folder A");
-    _DUPLICATE_IMAGE_REMOVER->setToolTip(
-        "Not Only work for images.\n"
-        "It work for any file name meet following resolution pattern.\n"
-        "Given: A - 480p, A - 720p, A - 1080p, A - 2160p, A - 4K\n."
-        "Only A - 2160p will be kept, others will moved to trashbin.");
-
-    QActionGroup* actionGroup = new QActionGroup(this);
-    actionGroup->addAction(_NAME_STANDARDLIZER);
-    actionGroup->addAction(_CLASSIFIER);
-    actionGroup->addAction(_ITEM_ORGANIZER);
-    actionGroup->addAction(_DUPLICATE_IMAGE_REMOVER);
-    return actionGroup;
-  }
+  auto FolderFileCategoryProcess() -> QActionGroup*;
   auto Get_Advance_Search_Actions() -> QActionGroup* {
     QAction* _ADVANCE_SEARCH = new QAction(QIcon(":/themes/SEARCH"), "Advance search");
     _ADVANCE_SEARCH->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_F));
     _ADVANCE_SEARCH->setShortcutVisibleInContextMenu(true);
     _ADVANCE_SEARCH->setToolTip(
         QString("<b>%1 (%2)</b><br/> Search by file name or file contents.").arg(_ADVANCE_SEARCH->text(), _ADVANCE_SEARCH->shortcut().toString()));
-    _ADVANCE_SEARCH->setCheckable(true);
+    _ADVANCE_SEARCH->setCheckable(false);
 
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(_ADVANCE_SEARCH);
@@ -295,6 +239,8 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
 
+  QAction* _MOVE_TO = nullptr;
+  QAction* _COPY_TO = nullptr;
   QActionGroup* MOVE_COPY_TO;
   QActionGroup* MOVE_TO_PATH_HISTORY;
   QActionGroup* COPY_TO_PATH_HISTORY;
@@ -306,7 +252,11 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* FOLDER_MERGE;
   QActionGroup* SELECTION_RIBBONS;
 
-  QActionGroup* OPEN;
+  QAction *_VIDEO_PLAYER_EMBEDDED, *_PLAY_VIDEOS = nullptr;
+  QActionGroup* PLAY_AG;
+
+  QAction *_REVEAL_IN_EXPLORER, *_OPEN_IN_TERMINAL = nullptr;
+  QActionGroup* OPEN_AG;
   QActionGroup* COPY_PATH;
   QActionGroup* NEW;
   QActionGroup* FOLDER_FILE_PROCESS;

@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
   QString rootPath = QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath();
   QString testDir = QDir(rootPath).absoluteFilePath("test");
 
-  qDebug("%s", testDir.toStdString().c_str());
+  qDebug("%s", qPrintable(testDir));
   tb->setRootIndex(fsm->setRootPath(testDir));
 
   QHBoxLayout* lo = new QHBoxLayout;

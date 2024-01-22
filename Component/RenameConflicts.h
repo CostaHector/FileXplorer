@@ -42,12 +42,9 @@
 #include <QWidget>
 #include <Qt>
 
-#include "Component/Toaster.h"
 #include "FileOperation/FileOperation.h"
-#include "PublicTool.h"
 #include "PublicVariable.h"
 #include "Tools/ConflictsItemHelper.h"
-#include "UndoRedo.h"
 
 const QColor LIGHT_GREEN_COLOR(245, 245, 220);
 const QColor TOMATO_COLOR(244, 164, 96);
@@ -62,7 +59,7 @@ class FileInfoType {
 
 class RenameConflicts : public QDialog {
  public:
-  const ConflictsItemHelper itemIF; // dont user reference. object point to will be release after statement
+  const ConflictsItemHelper itemIF;  // dont user reference. object point to will be release after statement
   const QString leftFolderPath;
   const QString rightFolderPath;
   const int ROW_COUNT;

@@ -16,7 +16,6 @@ class DatabaseTableView : public QTableView {
   DatabaseTableView();
 
   auto InitViewSettings() -> void;
-  auto SetViewColumnWidth() -> void;
   auto UpdateItemViewFontSize() -> void;
   void subscribe();
   auto on_cellDoubleClicked(QModelIndex clickedIndex) -> bool;

@@ -1,6 +1,7 @@
 #ifndef PUBLICVARIABLE_H
 #define PUBLICVARIABLE_H
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QJsonValue>
@@ -8,7 +9,6 @@
 #include <QSettings>
 #include <QSize>
 #include <QTextStream>
-#include <QDebug>
 
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
@@ -93,6 +93,19 @@ const int DB_SIZE_COLUMN = DB_HEADER.indexOf(Size);
 const int DB_TYPE_INDEX = DB_HEADER.indexOf(Type);
 const int DB_FOR_SEARCH_INDEX = DB_HEADER.indexOf(ForSearch);
 }  // namespace DB_HEADER_KEY
+
+namespace SearchKey {
+const QString Name = "Name";
+const QString Size = "Size";
+const QString Type = "Type";
+const QString DateModified = "DateModified";
+const QString RelPath = "RelPath";
+const QStringList EXPLORER_COLUMNS_TITLE{Name, Size, Type, DateModified, RelPath};
+const int NAME_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf(Name);
+const int TYPE_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf(Type);
+const int RELPATH_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf(RelPath);
+const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
+}  // namespace SearchKey
 
 namespace HEADERVIEW_SORT_INDICATOR_ORDER {
 class OrderClass {
@@ -192,12 +205,12 @@ const GVarBool SHOW_PERFORMERS_MANAGER_DATABASE("SHOW_PERFORMERS_MANAGER_DATABAS
 const GVarBool SHOW_TORRENTS_MANAGER_DATABASE("SHOW_TORRENTS_MANAGER_DATABASE", false);
 const GVarBool QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false);
 
-const GVarInt NAME_COLUMN_WIDTH("NAME_COLUMN_WIDTH", 400, 0, 2048);
 const GVarInt HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
 const GVarStr HEARVIEW_SORT_INDICATOR_ORDER("HEARVIEW_SORT_INDICATOR_ORDER",
                                             HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
                                             HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR);
 const GVarInt ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, 8, 25);
+const GVarStr DEFAULT_VIDEO_PLAYER("DEFAULT_VIDEO_PLAYER", "Play", {"Play in embedded player", "Play"});
 const GVarStr DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", "New folder", {"New folder", "New text", "New json", "New folder html"});
 const GVarStr DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", {"Copy fullpath", "Copy path", "Copy name", "Copy the path"});
 const GVarStr DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
@@ -218,6 +231,14 @@ const GVarBool PERFORMER_STRETCH_LAST_SECTION("PERFORMER_STRETCH_LAST_SECTION", 
 const GVarStr VIDS_COLUMN_SHOW_SWITCH("VIDS_COLUMN_SHOW_SWITCH", QString(20, '1'), {});
 const GVarBool VIDS_STRETCH_LAST_SECTION("VIDS_STRETCH_LAST_SECTION", true);
 const GVarInt RIGHT_CLICK_TOOLBUTTON_STYLE("RIGHT_CLICK_TOOLBUTTON_STYLE", 0);
+
+const GVarStr NAME_PATTERN_USED_CREATE_BATCH_FILES("NAME_PATTERN_USED_CREATE_BATCH_FILES", "Page %03d%1$1$11.html", {});
+const GVarStr NAME_PATTERN_USED_CREATE_BATCH_FOLDERS("NAME_PATTERN_USED_CREATE_BATCH_FOLDERS", "Page %03d%1$1$11", {});
+
+const GVarStrFolder SEARCH_MODEL_ROOT_PATH("SEARCH_MODEL_ROOT_PATH", "./");
+const GVarStr SEARCH_MODEL_DIR_FILTER("SEARCH_MODEL_DIR_FILTER", "Files|Dirs", {});
+const GVarStr SEARCH_MODEL_TYPE_FILTER("SEARCH_MODEL_TYPE_FILTER", "*.mp4", {});
+const GVarStr SEARCH_MODEL_NAME_FILTER("SEARCH_MODEL_NAME_FILTER", "*", {});
 }  // namespace MemoryKey
 
 namespace SystemPath {

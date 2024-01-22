@@ -29,14 +29,14 @@ class CopyItemPropertiesToClipboardIF {
 
   static auto PathCopyTriple(const QStringList& lst, const QString& opName) -> bool {
     if (lst.isEmpty()) {
-      qDebug("NOTHING %s copied. clipboard state kept.", opName.toStdString().c_str());
+      qDebug("NOTHING %s copied. clipboard state kept.", qPrintable(opName));
       return true;
     }
     const QString& msg = QString("[%1] letter(s) has been [%2].").arg(lst.size()).arg(opName);
     const QString& copiedStr = lst.join('\n');
     auto* cb = QApplication::clipboard();
     cb->setText(copiedStr, QClipboard::Mode::Clipboard);
-    qDebug("%s", msg.toStdString().c_str());
+    qDebug("%s", qPrintable(msg));
     return true;
   }
 

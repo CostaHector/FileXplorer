@@ -109,7 +109,7 @@ auto AddressELineEdit::onReturnPressed(const QString& path) -> bool {
   const QString& pth = QDir::fromNativeSeparators(path);
   if (not QFile::exists(pth)) {
     const QString& pathInexist = QString("Return pressed with inexist path [%1].").arg(pth);
-    qDebug("%s", pathInexist.toStdString().c_str());
+    qDebug("%s", qPrintable(pathInexist));
     QMessageBox::warning(this, "Into path failed", pathInexist);
     pathLineEdit->setText(textFromActions());
     return false;
@@ -117,7 +117,7 @@ auto AddressELineEdit::onReturnPressed(const QString& path) -> bool {
   const QFileInfo fi(pth);
   if (fi.isFile()) {
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
-    qDebug("Direct open file [%s]: [%d]", pth.toStdString().c_str(), openRet);
+    qDebug("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
     pathLineEdit->setText(textFromActions());
     return true;
   }
@@ -219,7 +219,7 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
     return;
   }
   const QString& droppedPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
-  qDebug("release to drop here [%s]", droppedPath.toStdString().c_str());
+  qDebug("release to drop here [%s]", qPrintable(droppedPath));
   View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), droppedPath, this);
   return QStackedWidget::dragMoveEvent(event);
 }

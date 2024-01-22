@@ -68,7 +68,7 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
     fileSysModel->setNameFilters({});
     return true;
   }
-  qDebug("search pattern: [*%s*].", targetStr.toStdString().c_str());
+  qDebug("search pattern: [*%s*].", qPrintable(targetStr));
   fileSysModel->setNameFilters({"*" + targetStr + "*"});
   return true;
 }
@@ -144,7 +144,7 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
   const QFileInfo& firstFileInfo = _model->fileInfo(firstIndex);
   const QString& pth = _model->rootPath();
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
-  qDebug("\t\t Anchor of path [%s] target to [%d,%d]", pth.toStdString().c_str(), m_anchorTags[pth].row, m_anchorTags[pth].col);
+  qDebug("\t\t Anchor of path [%s] target to [%d,%d]", qPrintable(pth), m_anchorTags[pth].row, m_anchorTags[pth].col);
   if (previewWidget){
     emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
   }
@@ -158,12 +158,12 @@ bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
   view->setFocus();
   const QModelIndex rootIndex = view->rootIndex();
   if (not m_anchorTags.contains(loadedPath)) {
-    qDebug("anchorTags[%s] not exist. scroll abort", loadedPath.toStdString().c_str());
+    qDebug("anchorTags[%s] not exist. scroll abort", qPrintable(loadedPath));
     return false;
   }
   const QModelIndex qmodelIndex = fileSysModel->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
   if (not qmodelIndex.isValid()) {
-    qDebug("anchorTags[%s] index invalid. scroll abort", loadedPath.toStdString().c_str());
+    qDebug("anchorTags[%s] index invalid. scroll abort", qPrintable(loadedPath));
     m_anchorTags.remove(loadedPath);
     return false;
   }

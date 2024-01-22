@@ -81,7 +81,7 @@ class Categorizer {
 
   auto operator()(const QString& rootDir) const -> bool {
     if (QDir(rootDir).isRoot() or not QFile::exists(rootDir)) {
-      qDebug("[Folder is root or not exists error] %s", rootDir.toStdString().c_str());
+      qDebug("[Folder is root or not exists error] %s", qPrintable(rootDir));
       return false;
     }
     FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
@@ -104,7 +104,7 @@ class Categorizer {
           continue;  // skip move dir
         }
         if (underDir.exists(fileName)) {
-          qDebug("%s Already Exist in %s", fileName.toStdString().c_str(), underPath.toStdString().c_str());
+          qDebug("%s Already Exist in %s", qPrintable(fileName), qPrintable(underPath));
           continue;
         }
         cmds.append({"rename", rootDir, fileName, underPath, fileName});

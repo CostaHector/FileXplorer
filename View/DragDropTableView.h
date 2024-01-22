@@ -11,7 +11,6 @@ class DragDropTableView : public QTableView, public View {
   void subscribe() override;
 
   auto InitViewSettings() -> void override;
-  auto SetViewColumnWidth() -> void override;
   auto UpdateItemViewFontSize() -> void override;
 
   void dropEvent(QDropEvent* event) override;

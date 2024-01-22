@@ -6,7 +6,9 @@
         <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
         <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
 
-        <file alias="ITEMS_ORGANIZER.svg">Media/ITEMS_ORGANIZER.svg</file>
+        <file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
+        <file alias="DEDUPLICATE">Media/DEDUPLICATE.png</file>
+
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>

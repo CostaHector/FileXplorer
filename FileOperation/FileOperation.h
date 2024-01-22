@@ -272,7 +272,7 @@ class FileOperation {
     FileOperation::BATCH_COMMAND_LIST_TYPE recoverList;
     auto mkRootPthRet = QDir(to).mkpath(rel);
     if (not mkRootPthRet) {
-      qDebug("Failed QDir(%s).mkpath(%s)", to.toStdString().c_str(), rel.toStdString().c_str());
+      qDebug("Failed QDir(%s).mkpath(%s)", qPrintable(to), qPrintable(rel));
       return {ErrorCode::UNKNOWN_ERROR, recoverList};
     }
     recoverList.append({"rmpath", to, rel});
@@ -293,14 +293,14 @@ class FileOperation {
         }
         auto mkpthRet = QDir(toPth).mkpath(toRel);
         if (not mkpthRet) {
-          qDebug("Failed QDir(%s).mkpath(%s)", toPth.toStdString().c_str(), toRel.toStdString().c_str());
+          qDebug("Failed QDir(%s).mkpath(%s)", qPrintable(toPth), qPrintable(toRel));
           return {ErrorCode::UNKNOWN_ERROR, recoverList};
         }
         recoverList.append({"rmpath", toPth, toRel});
       } else {  // file
         auto cpRet = QFile(fromPth).copy(toPath);
         if (not cpRet) {
-          qDebug("Failed QFile(%s).copy(%s)", fromPth.toStdString().c_str(), toPath.toStdString().c_str());
+          qDebug("Failed QFile(%s).copy(%s)", qPrintable(fromPth), qPrintable(toPath));
           return {ErrorCode::UNKNOWN_ERROR, recoverList};
         }
         recoverList.append({"rmfile", toPth, toRel});
@@ -363,7 +363,7 @@ class FileOperation {
       if (ret != ErrorCode::OK) {
         ++failedCommandCnt;
         const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]\n").arg(k).arg(vals.join(",")).arg(vals.size());
-        qDebug("%s", msg.toStdString().c_str());
+        qDebug("%s", qPrintable(msg));
         log += msg;
       }
       if (k == "moveToTrash" and not srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
