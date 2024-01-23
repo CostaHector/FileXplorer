@@ -15,6 +15,7 @@ const QColor VideoPlayer::RECYCLED_ITEM_COLOR(255, 0, 0);
 
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QMainWindow(parent),
+      m_mediaPlayer(new QMediaPlayer(this, QMediaPlayer::LowLatency)),
       m_slider(new ClickableSlider),
       m_timeTemplate("%1/%2"),
       m_timeLabel(new QLabel(m_timeTemplate)),
@@ -27,8 +28,6 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_playlistSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
       m_performerWid(nullptr),
       m_playListMenu(new QMenu("playList", this)) {
-  m_mediaPlayer = new QMediaPlayer(this, QMediaPlayer::LowLatency);
-  m_mediaPlayer->setVideoOutput(m_videoWidget);
   m_probe->setSource(m_mediaPlayer);  // Returns true, hopefully.
 
   m_playListWid->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -108,8 +107,6 @@ VideoPlayer::VideoPlayer(QWidget* parent)
 VideoPlayer::~VideoPlayer() {}
 
 bool VideoPlayer::operator()(const QString& path) {
-  updateWindowsSize();
-
   QFileInfo fi(path);
   if (fi.isFile()) {
     openFile(path);
@@ -158,6 +155,11 @@ void VideoPlayer::setUrl(const QUrl& url) {
   loadHotSceneList();
   g_videoPlayerActions()._PLAY_PAUSE->setEnabled(url.isLocalFile());
   m_mediaPlayer->setMedia(url);
+  if (not m_mediaPlayer->isVideoAvailable()) {
+    // This property holds the video availability status for the current media.
+    // If available, the QVideoWidget class can be used to view the video.
+    m_mediaPlayer->setVideoOutput(m_videoWidget);
+  }
 }
 
 auto VideoPlayer::loadVideoRate() -> void {
@@ -243,10 +245,7 @@ void VideoPlayer::subscribe() {
   connect(g_videoPlayerActions()._SCROLL_TO_LAST_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToLastFolder);
   connect(g_videoPlayerActions()._SCROLL_TO_NEXT_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToNextFolder);
 
-
-  connect(m_playlistSplitter, &QSplitter::splitterMoved, this, [](int pos, int index)->void{
-    qDebug("pos %d, index %d", pos, index);
-  });
+  connect(m_playlistSplitter, &QSplitter::splitterMoved, this, [](int pos, int index) -> void { qDebug("pos %d, index %d", pos, index); });
 }
 
 bool VideoPlayer::onModeName() {
