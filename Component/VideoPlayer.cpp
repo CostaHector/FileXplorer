@@ -154,12 +154,12 @@ void VideoPlayer::setUrl(const QUrl& url) {
   loadVideoRate();
   loadHotSceneList();
   g_videoPlayerActions()._PLAY_PAUSE->setEnabled(url.isLocalFile());
-  m_mediaPlayer->setMedia(url);
   if (not m_mediaPlayer->isVideoAvailable()) {
     // This property holds the video availability status for the current media.
     // If available, the QVideoWidget class can be used to view the video.
     m_mediaPlayer->setVideoOutput(m_videoWidget);
   }
+  m_mediaPlayer->setMedia(url);
 }
 
 auto VideoPlayer::loadVideoRate() -> void {
