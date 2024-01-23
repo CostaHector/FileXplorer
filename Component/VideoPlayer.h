@@ -3,11 +3,11 @@
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
 
-#include <QDockWidget>
 #include <QKeyEvent>
 #include <QListWidget>
 #include <QMainWindow>
 #include <QMediaPlayer>
+#include <QSplitter>
 #include <QToolBar>
 #include <QVideoProbe>
 #include <QWidget>
@@ -51,8 +51,6 @@ class VideoPlayer : public QMainWindow {
   void onUpdatePlayableList();
 
   void onRecycleSelectedItems();
-  bool on_Undo() const;
-  bool on_Redo() const;
 
   void onScrollToAnotherFolder(int inc = 1);
   void onScrollToNextFolder() { onScrollToAnotherFolder(1); }
@@ -68,30 +66,32 @@ class VideoPlayer : public QMainWindow {
     } else {
       setGeometry(QRect(0, 0, 600, 400));
     }
+    m_playlistSplitter->restoreState(PreferenceSettings().value("VideoPlayerSplitterState", QByteArray()).toByteArray());
   }
 
   auto closeEvent(QCloseEvent* event) -> void override {
     setUrl({});
     PreferenceSettings().setValue("VideoPlayerGeometry", saveGeometry());
-    qDebug("Resize Video Player to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
+    qDebug("Video Player geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
+    PreferenceSettings().setValue("VideoPlayerSplitterState", m_playlistSplitter->saveState());
     QMainWindow::closeEvent(event);
   }
 
   auto keyPressEvent(QKeyEvent* e) -> void override {
     if (e->modifiers() == Qt::AltModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
-      m_playlistDock->hide();
+      m_playListWid->hide();
       m_sliderTB->show();
       m_controlTB->hide();
       setWindowState(Qt::WindowMaximized);
       return;
     } else if (e->key() == Qt::Key_Escape) {
-      m_playlistDock->show();
+      m_playListWid->show();
       m_sliderTB->show();
       m_controlTB->show();
       setWindowState(Qt::WindowMaximized);
       return;
     } else if (e->key() == Qt::Key_F11) {
-      m_playlistDock->hide();
+      m_playListWid->hide();
       m_sliderTB->hide();
       m_controlTB->hide();
       setWindowState(Qt::WindowFullScreen);
@@ -134,7 +134,7 @@ class VideoPlayer : public QMainWindow {
   constexpr static int MICROSECOND = 1000;
 
   QListWidget* m_playListWid;
-  QDockWidget* m_playlistDock;
+  QSplitter* m_playlistSplitter;
 
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
   static const QColor RECYCLED_ITEM_COLOR;
