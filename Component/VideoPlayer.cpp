@@ -24,7 +24,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_videoWidget(new QVideoWidget),
       m_probe(new QVideoProbe),
       m_playListWid(new QListWidget),
-      m_playlistDock(new QDockWidget("playlist", this)),
+      m_playlistSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
       m_performerWid(nullptr),
       m_playListMenu(new QMenu("playList", this)) {
   m_mediaPlayer = new QMediaPlayer(this, QMediaPlayer::LowLatency);
@@ -94,10 +94,10 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   _sb->setVisible(false);
   setStatusBar(_sb);
 
-  m_playlistDock->setWidget(m_playListWid);
-  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_playlistDock);
-
-  setCentralWidget(m_videoWidget);
+  m_playlistSplitter->setOpaqueResize(false);
+  m_playlistSplitter->addWidget(m_videoWidget);
+  m_playlistSplitter->addWidget(m_playListWid);
+  setCentralWidget(m_playlistSplitter);
 
   subscribe();
 
@@ -242,6 +242,11 @@ void VideoPlayer::subscribe() {
   connect(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE, &QAction::triggered, this, &VideoPlayer::onUpdatePlayableList);
   connect(g_videoPlayerActions()._SCROLL_TO_LAST_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToLastFolder);
   connect(g_videoPlayerActions()._SCROLL_TO_NEXT_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToNextFolder);
+
+
+  connect(m_playlistSplitter, &QSplitter::splitterMoved, this, [](int pos, int index)->void{
+    qDebug("pos %d, index %d", pos, index);
+  });
 }
 
 bool VideoPlayer::onModeName() {
@@ -531,10 +536,10 @@ void VideoPlayer::onScrollToAnotherFolder(int inc) {
 }
 
 void VideoPlayer::onShowPlaylist() {
-  if (g_videoPlayerActions()._VIDEOS_LIST_MENU->isChecked() == m_playlistDock->isVisible()) {
+  if (g_videoPlayerActions()._VIDEOS_LIST_MENU->isChecked() == m_playListWid->isVisible()) {
     return;
   }
-  m_playlistDock->setVisible(g_videoPlayerActions()._VIDEOS_LIST_MENU->isChecked());
+  m_playListWid->setVisible(g_videoPlayerActions()._VIDEOS_LIST_MENU->isChecked());
 }
 
 void VideoPlayer::onClearPlaylist() {
@@ -559,7 +564,6 @@ void VideoPlayer::openAFolder(const QString& folderPath) {
     it.next();
     m_playListWid->addItem(it.filePath());
   }
-  m_playlistDock->setWindowTitle(PLAYLIST_DOCK_TITLE_TEMPLATE.arg(m_playListWid->count()));
 
   if (playIndex >= m_playListWid->count()) {
     qDebug("No vids find in path[%s]", qPrintable(loadFromPath));
