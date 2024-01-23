@@ -41,12 +41,12 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
 
 void PerformersManagerActions::InitActionsTooltips() {
   LOAD_FROM_PJSON_PATH->setToolTip(
-      QString("<b>%0 (%1)</b><br/> Load *.pjson from ImageHost.<br/>Update each column value by new one if primary key conflicts.")
+      QString("<b>%1 (%2)</b><br/> Load *.pjson from ImageHost.<br/>Update each column value by new one if primary key conflicts.")
           .arg(LOAD_FROM_PJSON_PATH->text(), LOAD_FROM_PJSON_PATH->shortcut().toString()));
 
   OPEN_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
   OPEN_WITH_LOCAL_APP->setToolTip(
-      QString("<b>%0 (%1)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
+      QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
           .arg(OPEN_WITH_LOCAL_APP->text(), OPEN_WITH_LOCAL_APP->shortcut().toString()));
   LOCATE_IMAGEHOST->setToolTip(
       PreferenceSettings().value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v).toString());
@@ -56,7 +56,7 @@ void PerformersManagerActions::InitActionsTooltips() {
 
   RESIZE_ROWS_TO_CONTENT->setCheckable(true);
   RESIZE_ROWS_TO_CONTENT->setChecked(false);
-  RESIZE_ROWS_TO_CONTENT->setToolTip(QString("<b>%0 (%1)</b><br/> Resize row to content when enabled. row height interactive when disabled")
+  RESIZE_ROWS_TO_CONTENT->setToolTip(QString("<b>%1 (%2)</b><br/> Resize row to content when enabled. row height interactive when disabled")
                                          .arg(RESIZE_ROWS_TO_CONTENT->text(), RESIZE_ROWS_TO_CONTENT->shortcut().toString()));
 
   SHOW_PERFORMER_MANAGER->setCheckable(true);

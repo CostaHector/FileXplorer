@@ -1,4 +1,5 @@
 #include "VideoPlayer.h"
+#include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Component/NotificatorFrame.h"
 #include "FileOperation/FileOperation.h"
@@ -78,8 +79,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   m_controlTB->addAction(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE);
   m_controlTB->addSeparator();
   m_controlTB->addAction(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN);
-  m_controlTB->addAction(g_videoPlayerActions()._UNDO_RECYLE);
-  m_controlTB->addAction(g_videoPlayerActions()._REDO_RECYLE);
+  m_controlTB->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
   m_controlTB->setContentsMargins(0, 0, 0, 0);
 
   addToolBar(Qt::ToolBarArea::BottomToolBarArea, m_controlTB);
@@ -239,8 +239,6 @@ void VideoPlayer::subscribe() {
   connect(m_mediaPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &VideoPlayer::handleError);
 
   connect(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN, &QAction::triggered, this, &VideoPlayer::onRecycleSelectedItems);
-  connect(g_videoPlayerActions()._UNDO_RECYLE, &QAction::triggered, this, &UndoRedo::on_Undo);
-  connect(g_videoPlayerActions()._REDO_RECYLE, &QAction::triggered, this, &UndoRedo::on_Redo);
   connect(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE, &QAction::triggered, this, &VideoPlayer::onUpdatePlayableList);
   connect(g_videoPlayerActions()._SCROLL_TO_LAST_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToLastFolder);
   connect(g_videoPlayerActions()._SCROLL_TO_NEXT_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToNextFolder);
@@ -524,11 +522,11 @@ void VideoPlayer::onScrollToAnotherFolder(int inc) {
   if (inc > 0) {
     m_playListWid->scrollToTop();
     qDebug("[%s] is already the first folder", qPrintable(beforeDirName));
-    Notificator::information("Scroll <<", QString("[%s] is already the first folder").arg(beforeDirName));
+    Notificator::information("Scroll <<", QString("[%1] is already the first folder").arg(beforeDirName));
   } else if (inc < 0) {
     m_playListWid->scrollToBottom();
     qDebug("[%s] is already the last folder", qPrintable(beforeDirName));
-    Notificator::information("Scroll >>", QString("[%s] is already the last folder").arg(beforeDirName));
+    Notificator::information("Scroll >>", QString("[%1] is already the last folder").arg(beforeDirName));
   }
 }
 

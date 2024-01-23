@@ -5,10 +5,8 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
     : QObject{parent},
       _UPDATE_ITEM_PLAYABLE(new QAction(QIcon(":/themes/REFRESH_THIS_PATH"), "Update", this)),
       _MOVE_SELECTED_ITEMS_TO_TRASHBIN(new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Trashbin", this)),
-      _UNDO_RECYLE(new QAction("Undo", this)),
-      _REDO_RECYLE(new QAction("Redo", this)),
-      _SCROLL_TO_NEXT_FOLDER(new QAction(">>", this)),
-      _SCROLL_TO_LAST_FOLDER(new QAction("<<", this)),
+      _SCROLL_TO_NEXT_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_NEXT_VIDEO_FOLDER"), "Nxt folder", this)),
+      _SCROLL_TO_LAST_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_LAST_VIDEO_FOLDER"), "Lst folder", this)),
       _JUMP_LAST_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_LAST_HOT_SCENE"), "last hot scene", this)),
       _JUMP_NEXT_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_NEXT_HOT_SCENE"), "next hot scene", this)),
       _LAST_10_SECONDS(new QAction("-", this)),
@@ -39,22 +37,12 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
       QString("<b>%1 (%2)</b><br/> Move selected items to trashbin")
           .arg(_MOVE_SELECTED_ITEMS_TO_TRASHBIN->text(), _MOVE_SELECTED_ITEMS_TO_TRASHBIN->shortcut().toString()));
 
-  _UNDO_RECYLE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Z));
-  _UNDO_RECYLE->setShortcutVisibleInContextMenu(true);
-  _UNDO_RECYLE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Undo move selected items to trashbin").arg(_UNDO_RECYLE->text(), _UNDO_RECYLE->shortcut().toString()));
-
-  _REDO_RECYLE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Y));
-  _REDO_RECYLE->setShortcutVisibleInContextMenu(true);
-  _REDO_RECYLE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Redo move selected items to trashbin").arg(_REDO_RECYLE->text(), _REDO_RECYLE->shortcut().toString()));
-
-  _SCROLL_TO_NEXT_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Comma));
+  _SCROLL_TO_NEXT_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Period));
   _SCROLL_TO_NEXT_FOLDER->setShortcutVisibleInContextMenu(true);
   _SCROLL_TO_NEXT_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Scroll to next folder first item and play it")
                                          .arg(_SCROLL_TO_NEXT_FOLDER->text(), _SCROLL_TO_NEXT_FOLDER->shortcut().toString()));
 
-  _SCROLL_TO_LAST_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Period));
+  _SCROLL_TO_LAST_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Comma));
   _SCROLL_TO_LAST_FOLDER->setShortcutVisibleInContextMenu(true);
   _SCROLL_TO_LAST_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Scroll to last folder last item and play it")
                                          .arg(_SCROLL_TO_LAST_FOLDER->text(), _SCROLL_TO_LAST_FOLDER->shortcut().toString()));
