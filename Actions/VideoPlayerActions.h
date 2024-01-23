@@ -14,8 +14,6 @@ class VideoPlayerActions : public QObject
 
   QAction* _UPDATE_ITEM_PLAYABLE;
   QAction* _MOVE_SELECTED_ITEMS_TO_TRASHBIN;
-  QAction* _UNDO_RECYLE;
-  QAction* _REDO_RECYLE;
 
   QAction* _SCROLL_TO_NEXT_FOLDER;
   QAction* _SCROLL_TO_LAST_FOLDER;

@@ -99,6 +99,8 @@
         <file alias="RELOAD_JOSN_FROM_FILE">JsonEditor/RELOAD_JOSN_FROM_FILE.svg</file>
         <file alias="PERFORMERS_LIST_HINT">JsonEditor/PERFORMERS_LIST_HINT.svg</file>
         <file alias="LEARN_PERFORMERS_FROM_JSON">JsonEditor/LEARN_PERFORMERS_FROM_JSON.svg</file>
+        <file alias="SCROLL_TO_NEXT_VIDEO_FOLDER">VideoPlayer/SCROLL_TO_NEXT_VIDEO_FOLDER.svg</file>
+        <file alias="SCROLL_TO_LAST_VIDEO_FOLDER">VideoPlayer/SCROLL_TO_LAST_VIDEO_FOLDER.svg</file>
         <file alias="CLEAR_VIDEOS_LIST">VideoPlayer/CLEAR_VIDEOS_LIST.svg</file>
         <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
         <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>

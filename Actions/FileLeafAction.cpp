@@ -11,7 +11,7 @@ QActionGroup *FileLeafActions::GetLeafTabActions() {
   _PREFERENCE_SETTING->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
   _PREFERENCE_SETTING->setShortcutVisibleInContextMenu(true);
   _PREFERENCE_SETTING->setToolTip(
-      QString("<b>%0 (%1)</b><br/> Show Preference Settings Window.").arg(_PREFERENCE_SETTING->text(), _PREFERENCE_SETTING->shortcut().toString()));
+      QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_PREFERENCE_SETTING->text(), _PREFERENCE_SETTING->shortcut().toString()));
   _PREFERENCE_SETTING->setCheckable(false);
 
   LEAF_FILE->addAction(_PREFERENCE_SETTING);

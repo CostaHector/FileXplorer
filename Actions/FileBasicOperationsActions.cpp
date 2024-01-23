@@ -48,7 +48,7 @@ auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
   _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in explorer");
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%0 (%1)</b><br/> Reveal items in system file explorer")
+  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer")
                                       .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
   _REVEAL_IN_EXPLORER->setCheckable(false);
 
