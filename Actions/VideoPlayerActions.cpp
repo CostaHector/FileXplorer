@@ -17,7 +17,7 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
       _NEXT_VIDEO(new QAction(QIcon(":/themes/NEXT_VIDEO"), "next video", this)),
       _OPEN_A_VIDEO(new QAction(QIcon(":/themes/OPEN_A_VIDEO"), "open a video", this)),
       _LOAD_A_PATH(new QAction(QIcon(":/themes/OPEN_A_FOLDER"), "load a path", this)),
-      _CLEAR_VIDEOS_LIST(new QAction(QIcon(":/themes/CLEAR_VIDEOS_LIST"), "clear playlist", this)),
+      _CLEAR_VIDEOS_LIST(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), "clear playlist", this)),
       _VIDEOS_LIST_MENU(new QAction(QIcon(":/themes/VIDEOS_LIST_MENU"), "show playlist", this)),
       _MARK_HOT_SCENE(new QAction(QIcon(":/themes/MARK_HOT_SCENE_POSITION"), "mark", this)),
       _GRAB_FRAME(new QAction(QIcon(":/themes/GRAB_FRAME"), "grab", this)),

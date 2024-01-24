@@ -6,8 +6,8 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
       _SELECT_A_FOLDER_AND_LOAD_JSON(new QAction(QIcon(":/themes/SELECT_A_FOLDER_AND_LOAD_JSON"), "Load", this)),
       _EMPTY_JSONS_LISTWIDGET(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), "Empty", this)),
-      _LAST(new QAction(QIcon(":/themes/LAST"), "Last", this)),
-      _NEXT(new QAction(QIcon(":/themes/NEXT"), "Next", this)),
+      _LAST_JSON(new QAction(QIcon(":/themes/LAST_JSON"), "Last", this)),
+      _NEXT_JSON(new QAction(QIcon(":/themes/NEXT_JSON"), "Next", this)),
       _AUTO_SKIP(new QAction(QIcon(":/themes/AUTO_SKIP"), "Autoskip", this)),
       _CONDITION_NOT(new QAction(QIcon(":/themes/CONDITION_NOT"), "WhenNot", this)),
       FILES_ACTIONS(new QActionGroup(this)),
@@ -40,11 +40,11 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                              .arg(_FORMATTER->text())
                              .arg(_FORMATTER->shortcut().toString()));
 
-  _NEXT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Period));
-  _NEXT->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)").arg(_NEXT->text()).arg(_NEXT->shortcut().toString()));
+  _NEXT_JSON->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Period));
+  _NEXT_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)").arg(_NEXT_JSON->text()).arg(_NEXT_JSON->shortcut().toString()));
 
-  _LAST->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Comma));
-  _LAST->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)").arg(_LAST->text()).arg(_LAST->shortcut().toString()));
+  _LAST_JSON->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Comma));
+  _LAST_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)").arg(_LAST_JSON->text()).arg(_LAST_JSON->shortcut().toString()));
 
   _SUBMIT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_S));
   _SUBMIT->setToolTip(
@@ -85,8 +85,8 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
 
   FILES_ACTIONS->addAction(_SELECT_A_FOLDER_AND_LOAD_JSON);
   FILES_ACTIONS->addAction(_EMPTY_JSONS_LISTWIDGET);
-  FILES_ACTIONS->addAction(_LAST);
-  FILES_ACTIONS->addAction(_NEXT);
+  FILES_ACTIONS->addAction(_LAST_JSON);
+  FILES_ACTIONS->addAction(_NEXT_JSON);
   FILES_ACTIONS->addAction(_AUTO_SKIP);
   FILES_ACTIONS->addAction(_CONDITION_NOT);
   FILES_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
