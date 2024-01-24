@@ -186,6 +186,7 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
+    bin/JsonExample/StudioName - Movie Name - Performer 1, Performer 2.json \
     bin/PerformerHtmlTemplate.html \
     bin/STANDARD_STUDIO_NAME_JSON.json \
     readme.md
