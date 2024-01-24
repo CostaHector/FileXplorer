@@ -1,8 +1,9 @@
 #ifndef JSONEDITOR_H
 #define JSONEDITOR_H
 
+#include <QDir>
+#include <QFile>
 #include <QFormLayout>
-#include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
@@ -11,10 +12,10 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QRegExp>
+#include <QSplitter>
 #include <QTextEdit>
 #include <QWidget>
-#include <QDir>
-#include <QFile>
+#include "PublicVariable.h"
 
 #include <QVariantMap>
 
@@ -43,7 +44,7 @@ class JsonEditor : public QMainWindow {
 
   auto subscribe() -> void;
 
-  auto onLoadASelectedPath(const QString& folderPath="") -> bool;
+  auto onLoadASelectedPath(const QString& folderPath = "") -> bool;
 
   auto onStageChanges() -> bool;
   auto onResetChanges() -> bool;
@@ -53,21 +54,41 @@ class JsonEditor : public QMainWindow {
   auto onLearnPerfomersFromJsonFile() -> bool;
   auto onPerformersHint() -> QStringList;
   auto onSelectedTextAppendToPerformers() -> bool;
-  auto sizeHint() const -> QSize override { return QSize(1024, 768); }
 
- signals:
+  auto updateWindowsSize() -> void {
+    if (PreferenceSettings().contains("JsonEditorGeometry")) {
+      restoreGeometry(PreferenceSettings().value("JsonEditorGeometry").toByteArray());
+    } else {
+      setGeometry(QRect(0, 0, 600, 400));
+    }
+    m_editorAndListSplitter->restoreState(PreferenceSettings().value("JsonEditorSplitterState", QByteArray()).toByteArray());
+  }
+
+  auto closeEvent(QCloseEvent* event) -> void override {
+    PreferenceSettings().setValue("JsonEditorGeometry", saveGeometry());
+    qDebug("Json Editor geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
+    PreferenceSettings().setValue("JsonEditorSplitterState", m_editorAndListSplitter->saveState());
+    QMainWindow::closeEvent(event);
+  }
 
  private:
   static inline auto getBackupJsonFile(const QString& origin) -> QString { return origin + ".bkp"; }
 
   auto formatter() -> bool;
 
-  QListWidget* jsonListPanel;
   QHash<QString, QWidget*> freqJsonKeyValue;
-  QFormLayout* editorPanel;
-  QFormLayout* extraEditorPanel; // no so frequently used key-value pair
+
+  QFormLayout* m_editorPanel;
+  QFormLayout* m_extraEditorPanel;  // no so frequently used key-value pair
+  QWidget* m_editorWidget;
+
+  QListWidget* m_jsonList;
+  QMenu* m_listMenu;
+
+  QSplitter* m_editorAndListSplitter;
+  QToolBar* m_editorToolBar;
+
   QSet<QString> jsonKeySetMet;
-  QMenu* jsonListPanelMenu;
 
   static const QString TITLE_TEMPLATE;
 
