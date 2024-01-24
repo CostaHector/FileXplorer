@@ -19,46 +19,56 @@ const QColor JsonEditor::NOT_MEET_CONDITION_COLOR(255, 0, 0);
 
 JsonEditor::JsonEditor(QWidget* parent)
     : QMainWindow{parent},
-      jsonListPanel(new QListWidget),
       freqJsonKeyValue{{JSONKey::Name, new QLineEdit},     {JSONKey::Performers, new QLineEdit}, {JSONKey::ProductionStudio, new QLineEdit},
                        {JSONKey::Uploaded, new QLineEdit}, {JSONKey::Tags, new QLineEdit},       {JSONKey::Rate, new QLineEdit},
                        {JSONKey::Size, new QLineEdit},     {JSONKey::Resolution, new QLineEdit}, {JSONKey::Bitrate, new QLineEdit},
                        {JSONKey::Hot, new QLineEdit},      {JSONKey::Detail, new QTextEdit}},
-      editorPanel(new QFormLayout),
-      extraEditorPanel(new QFormLayout),
-      jsonListPanelMenu(getListPanelRightClickMenu()) {
-  QToolBar* tb = new QToolBar("json editor actions", this);
-  tb->addActions(g_jsonEditorActions().FILES_ACTIONS->actions());
-  tb->addSeparator();
-  tb->addActions(g_jsonEditorActions().EDIT_ACTIONS->actions());
-  tb->addSeparator();
-  tb->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
-  tb->addAction(g_jsonEditorActions()._HINT);
-  tb->addAction(g_quickWhereAg().OPEN_AKA_TEXT);
-  tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  addToolBar(Qt::ToolBarArea::TopToolBarArea, tb);
+      m_editorPanel(new QFormLayout),
+      m_extraEditorPanel(new QFormLayout),
+      m_editorWidget(new QWidget(this)),
+
+      m_jsonList(new QListWidget),
+      m_listMenu(getListPanelRightClickMenu()),
+
+      m_editorAndListSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
+      m_editorToolBar(new QToolBar("json editor actions", this)) {
+  m_jsonList->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_jsonList->setAlternatingRowColors(true);
+  m_jsonList->setSortingEnabled(true);
+  m_jsonList->setDragDropMode(QAbstractItemView::NoDragDrop);
+  m_jsonList->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+
+  m_editorToolBar->addActions(g_jsonEditorActions().FILES_ACTIONS->actions());
+  m_editorToolBar->addSeparator();
+  m_editorToolBar->addActions(g_jsonEditorActions().EDIT_ACTIONS->actions());
+  m_editorToolBar->addSeparator();
+  m_editorToolBar->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
+  m_editorToolBar->addAction(g_jsonEditorActions()._HINT);
+  m_editorToolBar->addAction(g_quickWhereAg().OPEN_AKA_TEXT);
+  m_editorToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_editorToolBar);
 
   for (const QString& jsonKey : JSONKey::JsonKeyListOrder) {
-    editorPanel->addRow(jsonKey, freqJsonKeyValue[jsonKey]);
+    m_editorPanel->addRow(jsonKey, freqJsonKeyValue[jsonKey]);
   }
-  editorPanel->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
-  editorPanel->setRowWrapPolicy(QFormLayout::RowWrapPolicy::WrapLongRows);
-  editorPanel->addRow(extraEditorPanel);
+  m_editorPanel->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
+  m_editorPanel->setRowWrapPolicy(QFormLayout::RowWrapPolicy::WrapLongRows);
+  m_editorPanel->addRow(m_extraEditorPanel);
 
-  auto* mainLo = new QHBoxLayout;
-  mainLo->addLayout(editorPanel);
-  mainLo->addWidget(jsonListPanel);
+  m_editorWidget->setLayout(m_editorPanel);
 
-  QWidget* mainWidget = new QWidget;
-  mainWidget->setLayout(mainLo);
-  setCentralWidget(mainWidget);
+  m_editorAndListSplitter->addWidget(m_editorWidget);
+  m_editorAndListSplitter->addWidget(m_jsonList);
+
+  setCentralWidget(m_editorAndListSplitter);
+  m_editorAndListSplitter->setStyleSheet(QString("QTextEdit {font-size: %1pt} \r\n QLineEdit {font-size: %1pt};").arg(13));
 
   subscribe();
+
   setWindowTitle(TITLE_TEMPLATE);
   setWindowIcon(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"));
 
-  mainWidget->setStyleSheet(QString("QTextEdit {font-size: %1pt} \r\n QLineEdit {font-size: %1pt};").arg(13));
-  jsonListPanel->setContextMenuPolicy(Qt::CustomContextMenu);
+  updateWindowsSize();
 }
 
 auto JsonEditor::getListPanelRightClickMenu() -> QMenu* {
@@ -69,24 +79,24 @@ auto JsonEditor::getListPanelRightClickMenu() -> QMenu* {
 }
 
 bool JsonEditor::hasLast() const {
-  const auto curRow = jsonListPanel->currentRow();
+  const auto curRow = m_jsonList->currentRow();
   return curRow - 1 >= 0;
 }
 
 void JsonEditor::last() {
-  const auto curRow = jsonListPanel->currentRow() - 1;
-  jsonListPanel->setCurrentRow(curRow);
+  const auto curRow = m_jsonList->currentRow() - 1;
+  m_jsonList->setCurrentRow(curRow);
   qDebug("last curRow %d", curRow);
 }
 
 bool JsonEditor::hasNext() const {
-  const auto curRow = jsonListPanel->currentRow();
-  return curRow + 1 < jsonListPanel->count();
+  const auto curRow = m_jsonList->currentRow();
+  return curRow + 1 < m_jsonList->count();
 }
 
 void JsonEditor::next() {
-  const auto curRow = jsonListPanel->currentRow() + 1;
-  jsonListPanel->setCurrentRow(curRow);
+  const auto curRow = m_jsonList->currentRow() + 1;
+  m_jsonList->setCurrentRow(curRow);
   qDebug("next curRow %d", curRow);
 }
 
@@ -114,22 +124,22 @@ void JsonEditor::autoNext() {
                             .value(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.v)
                             .toInt();
 
-  for (auto curRow = jsonListPanel->currentRow() + 1; curRow < jsonListPanel->count(); ++curRow) {
-    const QString& curJsonPath = jsonListPanel->item(curRow)->text();
+  for (auto curRow = m_jsonList->currentRow() + 1; curRow < m_jsonList->count(); ++curRow) {
+    const QString& curJsonPath = m_jsonList->item(curRow)->text();
     const auto& dict = JsonFileHelper::MovieJsonLoader(curJsonPath);
     if (dict.isEmpty()) {
       continue;
     }
     qDebug("len(performers)=%d, [%s]", dict[DB_HEADER_KEY::Performers].toJsonArray().size(), qPrintable(curJsonPath));
     if ((dict[DB_HEADER_KEY::Performers].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
-      jsonListPanel->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
-      jsonListPanel->setCurrentRow(curRow);
+      m_jsonList->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
+      m_jsonList->setCurrentRow(curRow);
       return;
     }
-    jsonListPanel->item(curRow)->setForeground(MEET_CONDITION_COLOR);
+    m_jsonList->item(curRow)->setForeground(MEET_CONDITION_COLOR);
   }
-  if (jsonListPanel->count() > 0) {
-    jsonListPanel->setCurrentRow(jsonListPanel->count() - 1);
+  if (m_jsonList->count() > 0) {
+    m_jsonList->setCurrentRow(m_jsonList->count() - 1);
   }
 }
 
@@ -151,18 +161,18 @@ void JsonEditor::onLast() {
 
 void JsonEditor::refreshEditPanel() {
   jsonKeySetMet.clear();
-  if (not jsonListPanel->currentItem()) {
+  if (not m_jsonList->currentItem()) {
     qDebug("skip refresh edit panel");
     return;
   }
 
-  const QString& curJsonPath = jsonListPanel->currentItem()->text();
+  const QString& curJsonPath = m_jsonList->currentItem()->text();
   qDebug("refreshEditPanel %s", qPrintable(curJsonPath));
   const auto& jsonDict = JsonFileHelper::MovieJsonLoader(curJsonPath);
   const QList<QPair<QString, QVariant>>& jsonItem = JsonFileHelper::MapToOrderedList(jsonDict);
 
-  for (int r = extraEditorPanel->rowCount() - 1; r > -1; --r) {
-    extraEditorPanel->removeRow(r);
+  for (int r = m_extraEditorPanel->rowCount() - 1; r > -1; --r) {
+    m_extraEditorPanel->removeRow(r);
   }
   if (jsonItem.isEmpty()) {
     return;
@@ -181,7 +191,7 @@ void JsonEditor::refreshEditPanel() {
       }
       continue;
     }
-    extraEditorPanel->addRow(keyName, new QLineEdit(valueStr));
+    m_extraEditorPanel->addRow(keyName, new QLineEdit(valueStr));
   }
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
     jsonKeySetMet.insert(JSONKey::Performers);
@@ -199,33 +209,33 @@ void JsonEditor::refreshEditPanel() {
     jsonKeySetMet.insert(JSONKey::Rate);
     qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Rate])->setText("-1");
   }
-  editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
+  m_editorPanel->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
 
 void JsonEditor::subscribe() {
-  connect(jsonListPanel, &QListWidget::itemSelectionChanged, this, &JsonEditor::refreshEditPanel);
-  connect(jsonListPanel, &QListWidget::itemDoubleClicked, this,
+  connect(m_jsonList, &QListWidget::itemSelectionChanged, this, &JsonEditor::refreshEditPanel);
+  connect(m_jsonList, &QListWidget::itemDoubleClicked, this,
           [this](const QListWidgetItem* item) { QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(item->text()).absolutePath())); });
 
   auto ShowContextMenu = [this](const QPoint pnt) {
-    jsonListPanelMenu->popup(jsonListPanel->mapToGlobal(pnt));  // or QCursor::pos()
+    m_listMenu->popup(m_jsonList->mapToGlobal(pnt));  // or QCursor::pos()
   };
-  connect(jsonListPanel, &QListView::customContextMenuRequested, ShowContextMenu);
+  connect(m_jsonList, &QListView::customContextMenuRequested, ShowContextMenu);
 
   connect(g_jsonEditorActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this, [this]() {
-    if (jsonListPanel->currentItem())
-      QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(jsonListPanel->currentItem()->text()).absolutePath()));
+    if (m_jsonList->currentItem())
+      QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(m_jsonList->currentItem()->text()).absolutePath()));
   });
   connect(g_jsonEditorActions()._OPEN_THIS_FILE, &QAction::triggered, this, [this]() {
-    if (jsonListPanel->currentItem())
-      QDesktopServices::openUrl(QUrl::fromLocalFile(jsonListPanel->currentItem()->text()));
+    if (m_jsonList->currentItem())
+      QDesktopServices::openUrl(QUrl::fromLocalFile(m_jsonList->currentItem()->text()));
   });
 
   connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
   connect(g_jsonEditorActions()._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, this, &JsonEditor::refreshEditPanel);
 
-  connect(g_jsonEditorActions()._NEXT, &QAction::triggered, this, &JsonEditor::onNext);
-  connect(g_jsonEditorActions()._LAST, &QAction::triggered, this, &JsonEditor::onLast);
+  connect(g_jsonEditorActions()._NEXT_JSON, &QAction::triggered, this, &JsonEditor::onNext);
+  connect(g_jsonEditorActions()._LAST_JSON, &QAction::triggered, this, &JsonEditor::onLast);
 
   connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, this, &JsonEditor::onAutoSkipSwitch);
 
@@ -243,7 +253,7 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
 
   connect(g_jsonEditorActions()._SELECT_A_FOLDER_AND_LOAD_JSON, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
-  connect(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET, &QAction::triggered, this->jsonListPanel, &QListWidget::clear);
+  connect(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET, &QAction::triggered, this->m_jsonList, &QListWidget::clear);
 
   connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
@@ -270,9 +280,9 @@ bool JsonEditor::onLoadASelectedPath(const QString& folderPath) {
 
 bool JsonEditor::onStageChanges() {
   QVariantHash dict;
-  for (auto r = 0; r != extraEditorPanel->rowCount(); ++r) {
-    const QString& keyName = qobject_cast<QLabel*>(extraEditorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
-    const QString& valueStr = qobject_cast<QLineEdit*>(extraEditorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->text();
+  for (auto r = 0; r != m_extraEditorPanel->rowCount(); ++r) {
+    const QString& keyName = qobject_cast<QLabel*>(m_extraEditorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
+    const QString& valueStr = qobject_cast<QLineEdit*>(m_extraEditorPanel->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->text();
     dict.insert(keyName, valueStr);
   }
 
@@ -305,11 +315,11 @@ bool JsonEditor::onStageChanges() {
     }
   }
 
-  const auto curRow = jsonListPanel->currentRow();
+  const auto curRow = m_jsonList->currentRow();
   if (curRow == -1) {
     return true;
   }
-  const QString& curJsonPath = jsonListPanel->item(curRow)->text();
+  const QString& curJsonPath = m_jsonList->item(curRow)->text();
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (QFile::exists(backupJsonPath)) {
     const auto rmRet = QFile::remove(backupJsonPath);
@@ -329,11 +339,11 @@ bool JsonEditor::onStageChanges() {
 }
 
 bool JsonEditor::onResetChanges() {
-  const auto curRow = jsonListPanel->currentRow();
+  const auto curRow = m_jsonList->currentRow();
   if (curRow == -1) {
     return true;
   }
-  const QString& curJsonPath = jsonListPanel->item(curRow)->text();
+  const QString& curJsonPath = m_jsonList->item(curRow)->text();
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (not QFile::exists(backupJsonPath)) {
     qDebug("cannot reset. backup file[%s] not exist", qPrintable(backupJsonPath));
@@ -346,8 +356,8 @@ bool JsonEditor::onResetChanges() {
 bool JsonEditor::onSubmitAllChanges() {
   int succeedCnt = 0;
   int failCnt = 0;
-  for (auto r = 0; r < jsonListPanel->count(); ++r) {
-    const QString& curJsonPath = jsonListPanel->item(r)->text();
+  for (auto r = 0; r < m_jsonList->count(); ++r) {
+    const QString& curJsonPath = m_jsonList->item(r)->text();
     const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
     if (QFile::exists(backupJsonPath)) {
       const auto ret = QFile::remove(backupJsonPath);
@@ -541,19 +551,19 @@ bool JsonEditor::load(const QString& path) {
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
-    if (jsonListPanel->findItems(it.filePath(), Qt::MatchFlag::MatchExactly).isEmpty()) {
-      jsonListPanel->addItem(it.filePath());
+    if (m_jsonList->findItems(it.filePath(), Qt::MatchFlag::MatchExactly).isEmpty()) {
+      m_jsonList->addItem(it.filePath());
     }
   }
-  setWindowTitle(TITLE_TEMPLATE.arg(0).arg(jsonListPanel->count()));
-  if (jsonListPanel->count() == 0) {
+  setWindowTitle(TITLE_TEMPLATE.arg(0).arg(m_jsonList->count()));
+  if (m_jsonList->count() == 0) {
     return true;
   }
-  jsonListPanel->setCurrentRow(0);
+  m_jsonList->setCurrentRow(0);
   return true;
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -561,7 +571,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   JsonEditor jsonEditor;
   jsonEditor.show();
-  jsonEditor.load("E:/Leaked And Loaded");
+  jsonEditor.load("../FileExplorerReadOnly/bin/JsonExample");
   a.exec();
   return 0;
 }

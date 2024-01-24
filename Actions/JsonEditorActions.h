@@ -12,8 +12,8 @@ class JsonEditorActions : public QObject {
  signals:
   QAction* _SELECT_A_FOLDER_AND_LOAD_JSON;
   QAction* _EMPTY_JSONS_LISTWIDGET;
-  QAction* _LAST;
-  QAction* _NEXT;
+  QAction* _LAST_JSON;
+  QAction* _NEXT_JSON;
   QAction* _AUTO_SKIP;
   QAction* _CONDITION_NOT;
   QActionGroup* FILES_ACTIONS;
