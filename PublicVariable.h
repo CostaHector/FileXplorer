@@ -27,37 +27,6 @@ typedef std::function<bool(QString)> T_on_searchEnterKey;
 typedef std::function<void()> T_SwitchStackWidget;
 typedef std::function<void()> T_UpdateComponentVisibility;
 
-namespace JSONKey {
-static const QString Name = "Name";
-static const QString Performers = "Performers";
-static const QString ProductionStudio = "ProductionStudio";
-static const QString Uploaded = "Uploaded";
-static const QString Tags = "Tags";
-static const QString Rate = "Rate";
-static const QString Size = "Size";
-static const QString Resolution = "Resolution";
-static const QString Bitrate = "Bitrate";
-static const QString Hot = "Hot";
-static const QString Detail = "Detail";
-static const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
-static const QHash<QString, QString> JsonKeyPri = {{Name, QString(QChar(JsonKeyListOrder.indexOf(Name)))},
-                                                   {Performers, QString(QChar(JsonKeyListOrder.indexOf(Performers)))},
-                                                   {ProductionStudio, QString(QChar(JsonKeyListOrder.indexOf(ProductionStudio)))},
-                                                   {Uploaded, QString(QChar(JsonKeyListOrder.indexOf(Uploaded)))},
-                                                   {Tags, QString(QChar(JsonKeyListOrder.indexOf(Tags)))},
-                                                   {Rate, QString(QChar(JsonKeyListOrder.indexOf(Rate)))},
-                                                   {Size, QString(QChar(JsonKeyListOrder.indexOf(Size)))},
-                                                   {Resolution, QString(QChar(JsonKeyListOrder.indexOf(Resolution)))},
-                                                   {Bitrate, QString(QChar(JsonKeyListOrder.indexOf(Bitrate)))},
-                                                   {Hot, QString(QChar(JsonKeyListOrder.indexOf(Hot)))},
-                                                   {Detail, QString(QChar(JsonKeyListOrder.indexOf(Detail)))}};
-static const auto KeySorter = [](const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) -> bool {
-  const QString& lValue = JsonKeyPri.contains(l.first) ? JsonKeyPri[l.first] : l.first;
-  const QString& rValue = JsonKeyPri.contains(r.first) ? JsonKeyPri[r.first] : r.first;
-  return lValue < rValue;
-};
-};  // namespace JSONKey
-
 namespace MainKey {
 constexpr int Name = 0;
 constexpr int Size = 1;
@@ -254,9 +223,6 @@ const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplo
 const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
 const QString TORRENTS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/TORRENTS_DATABASE.db");
 const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PRODUCTION_STUDIOS_DATABASE.db");
-const QString AKA_PERFORMERS_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/AKA_PERFORMERS.txt");
-const QString PERFORMERS_TABLE_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_TABLE.txt");
-const QString RUNLOGS = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/runlog");
 }  // namespace SystemPath
 
 namespace DB_TABLE {

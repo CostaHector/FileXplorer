@@ -4,6 +4,12 @@
 
 JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
+      _EDIT_STUDIOS(new QAction("Edit Studios", this)),
+      _RELOAD_STUDIOS(new QAction("Reload Studios", this)),
+
+      _RELOAD_PERF_AKA(new QAction("Reload AKA", this)),
+      _EDIT_PERF_AKA(new QAction(QIcon(":/themes/EDIT_AKA_FILE"), "Edit AKA", this)),
+
       _SELECT_A_FOLDER_AND_LOAD_JSON(new QAction(QIcon(":/themes/SELECT_A_FOLDER_AND_LOAD_JSON"), "Load", this)),
       _EMPTY_JSONS_LISTWIDGET(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), "Empty", this)),
       _LAST_JSON(new QAction(QIcon(":/themes/LAST_JSON"), "Last", this)),
@@ -15,7 +21,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), "Capitalize", this)),
       _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/RENAME_LOWER_CASE"), "lowercase", this)),
       _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), "Format", this)),
-      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "From Disk", this)),
+      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_JSON_FROM_FILE"), "From Disk", this)),
       _ADD_SELECTED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), "Add", this)),
       _SAVE(new QAction(QIcon(":/themes/SAVED"), "save", this)),
       _CANCEL(new QAction(QIcon(":/themes/NOT_SAVED"), "cancel", this)),
@@ -51,7 +57,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       QString("<b>%1 (%2)</b><br/> (CANNOT RECOVER!) Submit all staged changes").arg(_SUBMIT->text()).arg(_SUBMIT->shortcut().toString()));
 
   _ADD_SELECTED_PERFORMER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
-  _ADD_SELECTED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Add selected text to performer").arg(_ADD_SELECTED_PERFORMER->text()).arg(_ADD_SELECTED_PERFORMER->shortcut().toString()));
+  _ADD_SELECTED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Add selected text to performer")
+                                          .arg(_ADD_SELECTED_PERFORMER->text())
+                                          .arg(_ADD_SELECTED_PERFORMER->shortcut().toString()));
 
   _SAVE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
   _SAVE->setToolTip(QString("<b>%1 (%2)</b><br/> Stage current changes").arg(_SAVE->text()).arg(_SAVE->shortcut().toString()));

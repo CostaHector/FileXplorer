@@ -18,6 +18,9 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
       _OPEN_A_VIDEO(new QAction(QIcon(":/themes/OPEN_A_VIDEO"), "open a video", this)),
       _LOAD_A_PATH(new QAction(QIcon(":/themes/OPEN_A_FOLDER"), "load a path", this)),
       _CLEAR_VIDEOS_LIST(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), "clear playlist", this)),
+      _PLAY_CURRENT_PATH(new QAction(QIcon(":/themes/OPEN_A_FOLDER"), "Play current path", this)),
+      _PLAY_SELECTION(new QAction("Play selection", this)),
+      _BATCH_VIDEO_ACTIONS(new QActionGroup(this)),
       _VIDEOS_LIST_MENU(new QAction(QIcon(":/themes/VIDEOS_LIST_MENU"), "show playlist", this)),
       _MARK_HOT_SCENE(new QAction(QIcon(":/themes/MARK_HOT_SCENE_POSITION"), "mark", this)),
       _GRAB_FRAME(new QAction(QIcon(":/themes/GRAB_FRAME"), "grab", this)),
@@ -92,6 +95,9 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
   _REVEAL_IN_EXPLORER->setToolTip(
       QString("<b>%1 (%2)</b><br/> Reveal file in explorer").arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
+
+  _BATCH_VIDEO_ACTIONS->addAction(_PLAY_CURRENT_PATH);
+  _BATCH_VIDEO_ACTIONS->addAction(_PLAY_SELECTION);
 }
 
 QActionGroup* VideoPlayerActions::GetRateActionGroups() {

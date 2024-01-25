@@ -12,9 +12,41 @@
 #include <QDirIterator>
 #include <QFile>
 
+namespace JSONKey {
+static const QString Name = "Name";
+static const QString Performers = "Performers";
+static const QString ProductionStudio = "ProductionStudio";
+static const QString Uploaded = "Uploaded";
+static const QString Tags = "Tags";
+static const QString Rate = "Rate";
+static const QString Size = "Size";
+static const QString Resolution = "Resolution";
+static const QString Bitrate = "Bitrate";
+static const QString Hot = "Hot";
+static const QString Detail = "Detail";
+static const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
+static const QHash<QString, QString> JsonKeyPri = {{Name, QString(QChar(JsonKeyListOrder.indexOf(Name)))},
+                                                   {Performers, QString(QChar(JsonKeyListOrder.indexOf(Performers)))},
+                                                   {ProductionStudio, QString(QChar(JsonKeyListOrder.indexOf(ProductionStudio)))},
+                                                   {Uploaded, QString(QChar(JsonKeyListOrder.indexOf(Uploaded)))},
+                                                   {Tags, QString(QChar(JsonKeyListOrder.indexOf(Tags)))},
+                                                   {Rate, QString(QChar(JsonKeyListOrder.indexOf(Rate)))},
+                                                   {Size, QString(QChar(JsonKeyListOrder.indexOf(Size)))},
+                                                   {Resolution, QString(QChar(JsonKeyListOrder.indexOf(Resolution)))},
+                                                   {Bitrate, QString(QChar(JsonKeyListOrder.indexOf(Bitrate)))},
+                                                   {Hot, QString(QChar(JsonKeyListOrder.indexOf(Hot)))},
+                                                   {Detail, QString(QChar(JsonKeyListOrder.indexOf(Detail)))}};
+static const auto KeySorter = [](const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) -> bool {
+  const QString& lValue = JsonKeyPri.contains(l.first) ? JsonKeyPri[l.first] : l.first;
+  const QString& rValue = JsonKeyPri.contains(r.first) ? JsonKeyPri[r.first] : r.first;
+  return lValue < rValue;
+};
+}  // namespace JSONKey
+
 class JsonFileHelper {
  public:
   JsonFileHelper() = default;
+
   static auto MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath) -> bool {
     auto jsonObject = QJsonObject::fromVariantHash(dict);
     QJsonDocument document;
@@ -123,28 +155,9 @@ class JsonFileHelper {
     return valueStr;
   }
 
-  static QVariantHash GetInitJsonFile(const QString& fileAbsPath, const QString& performersListStr = "", const QString& productionStudio = "") {
-    QStringList performersList;
-    const QString& ps = performersListStr.trimmed();
-    if (not ps.isEmpty()) {
-      performersList = ps.split(JSON_RENAME_REGEX::SEPERATOR_COMP);
-    }
+  static QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath, const QString& performersListStr = "", const QString& productionStudio = "");
 
-    QFileInfo fi(fileAbsPath);
-    QList<QVariant> hotSceneList = HotSceneString2IntList("");
-    QVariantHash dict = {{JSONKey::Name, fi.fileName()},
-                         {JSONKey::Performers, performersList},
-                         {JSONKey::ProductionStudio, productionStudio},
-                         {JSONKey::Uploaded, fi.birthTime().toString("yyyyMMdd")},
-                         {JSONKey::Tags, QStringList()},
-                         {JSONKey::Rate, -1},
-                         {JSONKey::Size, QString::number(fi.size())},
-                         {JSONKey::Resolution, ""},
-                         {JSONKey::Bitrate, ""},
-                         {JSONKey::Hot, hotSceneList},
-                         {JSONKey::Detail, ""}};
-    return dict;
-  }
+  static QVariantHash GetDefaultJsonFile(const QString& fileName = "");
 
   static QString GetJsonFilePath(const QString& vidsPath) {
     const int sufLen = vidsPath.lastIndexOf('.');
