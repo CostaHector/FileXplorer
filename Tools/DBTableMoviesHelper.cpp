@@ -6,8 +6,6 @@ const QHash<QChar, QString> DBTableMoviesHelper::op2Str = {{'&', "AND"}, {'|', "
 constexpr char DBTableMoviesHelper::LOGIC_OR_CHAR;
 constexpr char DBTableMoviesHelper::LOGIC_AND_CHAR;
 
-DBTableMoviesHelper::DBTableMoviesHelper() {}
-
 void DBTableMoviesHelper::OperatorJoinOperands(QStack<QString>& values, QStack<QChar>& ops) {
   QString val2 = values.top();
   values.pop();
@@ -44,7 +42,7 @@ QString DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(const QString& tok
     return 0;  // like open bracket '('
   };
 
-  QStack<QString> values; // reverse poland expr
+  QStack<QString> values;  // reverse poland expr
   QStack<QChar> ops;
 
   for (int i = 0; i < tokens.size(); ++i) {
@@ -101,13 +99,13 @@ int DBTableMoviesHelper::UpdateAKAHash(const bool isForce) {
   if (not(akaPerf.isEmpty() or isForce)) {  // update when empty or force
     return 0;
   }
-  QFile file(SystemPath::AKA_PERFORMERS_TXT);
+  QFile file(PROJECT_PATH + "/bin/AKA_PERFORMERS.txt");
   if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("File not found: %s.", file.fileName().toStdString().c_str());
     return -1;
   }
 
-  int succeedCnt = 0;
+  int beforeCnt = akaPerf.size();
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
   static const QRegExp PERF_SPLIT("\\s*,\\s*");
@@ -117,10 +115,9 @@ int DBTableMoviesHelper::UpdateAKAHash(const bool isForce) {
     for (const QString& perf : line.split('|')) {
       akaPerf.insert(perf, line);
     }
-    ++succeedCnt;
   }
   file.close();
-  return succeedCnt;
+  return akaPerf.size() - beforeCnt;
 }
 
 QString DBTableMoviesHelper::GetMovieTablePerformerSelectCommand(const QSqlRecord& record) {

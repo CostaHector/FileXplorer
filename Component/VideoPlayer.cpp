@@ -32,7 +32,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
 
   m_playListWid->setContextMenuPolicy(Qt::CustomContextMenu);
   m_playListWid->setAlternatingRowColors(true);
-  m_playListWid->setSortingEnabled(true);
+  //  m_playListWid->setSortingEnabled(true);
   m_playListWid->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_playListWid->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
@@ -118,6 +118,31 @@ bool VideoPlayer::operator()(const QString& path) {
   return true;
 }
 
+auto VideoPlayer::PlaySelections(const QStringList& fileAbsPathList) -> bool {
+  const int playIndex = m_playListWid->count();
+  for (const auto& file : fileAbsPathList) {
+    QFileInfo fi(file);
+    if (not fi.isFile()) {
+      continue;
+    }
+    if (not TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + fi.suffix())) {
+      continue;
+    }
+    m_playListWid->addItem(fi.absoluteFilePath());
+  }
+
+  if (playIndex >= m_playListWid->count()) {
+    qDebug("No playable vid(s) find in %d item(s) selectied", fileAbsPathList.size());
+    Notificator::warning("No playable vid(s) find", QString("%1 item(s) selectied").arg(fileAbsPathList.size()));
+    return true;
+  }
+  m_playListWid->clearSelection();
+  m_playListWid->setCurrentRow(playIndex);
+  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
+  play();
+  return true;
+}
+
 void VideoPlayer::openFile(const QString& filePath) {
   QUrl fileUrl = QUrl::fromLocalFile(filePath);
   if (not QFileInfo(filePath).isFile()) {
@@ -136,7 +161,37 @@ void VideoPlayer::openFile(const QString& filePath) {
   }
   PreferenceSettings().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, QFileInfo(fileUrl.toLocalFile()).absolutePath());
   m_playListWid->addItem(fileUrl.toLocalFile());
+  m_playListWid->clearSelection();
   m_playListWid->setCurrentRow(m_playListWid->count() - 1);
+  setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
+  play();
+}
+
+void VideoPlayer::openAFolder(const QString& folderPath) {
+  QString loadFromPath = folderPath;
+  if (not QFileInfo(loadFromPath).isDir()) {
+    const QString& loadFromDefaultPath =
+        PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
+    loadFromPath = QFileDialog::getExistingDirectory(this, "load videos from a folder", loadFromDefaultPath);
+  }
+  QFileInfo loadFromFi(loadFromPath);
+  if (not loadFromFi.isDir()) {
+    return;
+  }
+  const int playIndex = m_playListWid->count();
+  PreferenceSettings().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, loadFromFi.absoluteFilePath());
+  QDirIterator it(loadFromPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+  while (it.hasNext()) {
+    it.next();
+    m_playListWid->addItem(it.filePath());
+  }
+
+  if (playIndex >= m_playListWid->count()) {
+    qDebug("No vids find in path[%s]", qPrintable(loadFromPath));
+    return;
+  }
+  m_playListWid->clearSelection();
+  m_playListWid->setCurrentRow(playIndex);
   setUrl(QUrl::fromLocalFile(m_playListWid->currentItem()->text()));
   play();
 }
@@ -543,33 +598,6 @@ void VideoPlayer::onShowPlaylist() {
 
 void VideoPlayer::onClearPlaylist() {
   m_playListWid->clear();
-}
-
-void VideoPlayer::openAFolder(const QString& folderPath) {
-  QString loadFromPath = folderPath;
-  if (not QFileInfo(loadFromPath).isDir()) {
-    const QString& loadFromDefaultPath =
-        PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
-    loadFromPath = QFileDialog::getExistingDirectory(this, "load videos from a folder", loadFromDefaultPath);
-  }
-  QFileInfo loadFromFi(loadFromPath);
-  if (not loadFromFi.isDir()) {
-    return;
-  }
-  const int playIndex = m_playListWid->count();
-  PreferenceSettings().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, loadFromFi.absoluteFilePath());
-  QDirIterator it(loadFromPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    m_playListWid->addItem(it.filePath());
-  }
-
-  if (playIndex >= m_playListWid->count()) {
-    qDebug("No vids find in path[%s]", qPrintable(loadFromPath));
-    return;
-  }
-  m_playListWid->setCurrentRow(playIndex);
-  onListWidgetDoubleClicked(m_playListWid->item(playIndex));
 }
 
 void VideoPlayer::play() {

@@ -33,6 +33,10 @@ class VideoPlayerActions : public QObject
   QAction* _LOAD_A_PATH;
   QAction* _CLEAR_VIDEOS_LIST;
 
+  QAction* _PLAY_CURRENT_PATH;
+  QAction* _PLAY_SELECTION;
+  QActionGroup* _BATCH_VIDEO_ACTIONS;
+
   QAction* _VIDEOS_LIST_MENU;
 
   QAction* _MARK_HOT_SCENE;

@@ -7,7 +7,7 @@
 #include <QDirIterator>
 #include <QTextStream>
 
-ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(JsonFileHelper::MovieJsonLoader(":/STANDARD_STUDIO_NAME_JSON")) {}
+ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(JsonFileHelper::MovieJsonLoader(PROJECT_PATH+"/bin/STANDARD_STUDIO_NAME_JSON.json")) {}
 
 int ProductionStudioManager::LearningFromAPath(const QString& path) {
   if (not QDir(path).exists()) {

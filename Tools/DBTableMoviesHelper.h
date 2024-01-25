@@ -9,7 +9,6 @@
 
 class DBTableMoviesHelper {
  public:
-  DBTableMoviesHelper();
   static QString PlainLogicSentence2FuzzySqlWhere(const QString& tokens,
                                                   const QString& keyName = DB_HEADER_KEY::Name,
                                                   const bool autoCompleteAka = false,

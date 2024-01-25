@@ -29,6 +29,7 @@ class VideoPlayer : public QMainWindow {
   ~VideoPlayer();
 
   auto operator()(const QString& path) -> bool;
+  auto PlaySelections(const QStringList& fileAbsPathList) -> bool;
 
   void setUrl(const QUrl& url);
   auto subscribe() -> void;

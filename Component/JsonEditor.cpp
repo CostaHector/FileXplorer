@@ -1,7 +1,11 @@
 #include "JsonEditor.h"
+
 #include "Actions/JsonEditorActions.h"
-#include "Actions/QuickWhereActions.h"
+
+#include "Component/NotificatorFrame.h"
 #include "Component/ProductionStudioManager.h"
+
+#include "Tools/DBTableMoviesHelper.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformersStringParser.h"
 
@@ -9,6 +13,7 @@
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QMenuBar>
 #include <QTableWidgetItem>
 #include <QTextDocumentFragment>
 #include <QToolBar>
@@ -31,7 +36,30 @@ JsonEditor::JsonEditor(QWidget* parent)
       m_listMenu(getListPanelRightClickMenu()),
 
       m_editorAndListSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
-      m_editorToolBar(new QToolBar("json editor actions", this)) {
+      m_editorToolBar(new QToolBar("json editor actions", this)),
+      m_menuBar(new QMenuBar(this)) {
+  QMenu* fileMenu = new QMenu("File", m_menuBar);
+  fileMenu->addAction(g_jsonEditorActions()._SELECT_A_FOLDER_AND_LOAD_JSON);
+  fileMenu->addAction(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET);
+  fileMenu->addAction(g_jsonEditorActions()._AUTO_SKIP);
+  m_menuBar->addMenu(fileMenu);
+
+  QMenu* editMenu = new QMenu("Edit", m_menuBar);
+  editMenu->addAction(g_jsonEditorActions()._SUBMIT);
+  m_menuBar->addMenu(editMenu);
+
+  QMenu* productionStudioMenu = new QMenu("Studio", m_menuBar);
+  productionStudioMenu->addAction(g_jsonEditorActions()._EDIT_STUDIOS);
+  productionStudioMenu->addAction(g_jsonEditorActions()._RELOAD_STUDIOS);
+  m_menuBar->addMenu(productionStudioMenu);
+
+  QMenu* performerMenu = new QMenu("Performer", m_menuBar);
+  performerMenu->addAction(g_jsonEditorActions()._EDIT_PERF_AKA);
+  performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERF_AKA);
+  m_menuBar->addMenu(performerMenu);
+
+  setMenuBar(m_menuBar);
+
   m_jsonList->setContextMenuPolicy(Qt::CustomContextMenu);
   m_jsonList->setAlternatingRowColors(true);
   m_jsonList->setSortingEnabled(true);
@@ -44,7 +72,6 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_editorToolBar->addSeparator();
   m_editorToolBar->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
   m_editorToolBar->addAction(g_jsonEditorActions()._HINT);
-  m_editorToolBar->addAction(g_quickWhereAg().OPEN_AKA_TEXT);
   m_editorToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_editorToolBar);
 
@@ -215,7 +242,7 @@ void JsonEditor::refreshEditPanel() {
 void JsonEditor::subscribe() {
   connect(m_jsonList, &QListWidget::itemSelectionChanged, this, &JsonEditor::refreshEditPanel);
   connect(m_jsonList, &QListWidget::itemDoubleClicked, this,
-          [this](const QListWidgetItem* item) { QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(item->text()).absolutePath())); });
+          [](const QListWidgetItem* item) { QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(item->text()).absolutePath())); });
 
   auto ShowContextMenu = [this](const QPoint pnt) {
     m_listMenu->popup(m_jsonList->mapToGlobal(pnt));  // or QCursor::pos()
@@ -259,6 +286,21 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
+
+  connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this,
+          []() { QDesktopServices::openUrl(QUrl::fromLocalFile(PROJECT_PATH + "/bin/AKA_PERFORMERS.txt")); });
+  connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
+    auto ret = DBTableMoviesHelper::UpdateAKAHash(true);
+    qDebug("Update AKA %d item(s) added", ret);
+    Notificator::information("Update AKA", QString("%1 item(s) added").arg(ret));
+  });
+
+  connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this,
+          []() { QDesktopServices::openUrl(QUrl::fromLocalFile(PROJECT_PATH + "/bin/STANDARD_STUDIO_NAME_JSON.json")); });
+  connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
+    qDebug("TODO, please reopen it to update");
+    Notificator::warning("TODO", "please reopen it to update");
+  });
 }
 
 bool JsonEditor::onLoadASelectedPath(const QString& folderPath) {
@@ -563,7 +605,7 @@ bool JsonEditor::load(const QString& path) {
   return true;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -571,7 +613,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   JsonEditor jsonEditor;
   jsonEditor.show();
-  jsonEditor.load("../FileExplorerReadOnly/bin/JsonExample");
+  jsonEditor.load(PROJECT_PATH + "/bin/JsonExample");
   a.exec();
   return 0;
 }

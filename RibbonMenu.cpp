@@ -8,6 +8,7 @@
 #include "Actions/JsonEditorActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
+#include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Component/DatabaseToolBar.h"
 #include "PublicTool.h"
@@ -223,14 +224,8 @@ QToolBar* RibbonMenu::LeafView() const {
 
   auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions().BATCH_FILES_ACTIONS->actions(), QToolButton::MenuButtonPopup, "",
                                           Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-
-  auto* embeddedPlayerTB = new QToolBar("Embedded player toolbar");
-  embeddedPlayerTB->setOrientation(Qt::Orientation::Horizontal);
-  embeddedPlayerTB->addAction(g_fileBasicOperationsActions()._VIDEO_PLAYER_EMBEDDED);
-  embeddedPlayerTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  embeddedPlayerTB->setStyleSheet("QToolBar { max-width: 256px; }");
-  embeddedPlayerTB->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
-  SetLayoutAlightment(embeddedPlayerTB->layout(), Qt::AlignmentFlag::AlignLeft);
+  auto* embeddedPlayerTB = DropListToolButton(g_viewActions()._VIDEO_PLAYER_EMBEDDED, g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(),
+                                              QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 
   auto* leafViewWid = new QToolBar("Leaf View");
   leafViewWid->setToolTip("View Leaf");

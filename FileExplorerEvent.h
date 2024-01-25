@@ -3,9 +3,9 @@
 #include "Component/CustomStatusBar.h"
 #include "Component/JsonEditor.h"
 #include "Component/MD5Window.h"
+#include "Component/NotificatorFrame.h"
 #include "Component/PropertiesWindow.h"
 #include "Component/VideoPlayer.h"
-#include "Component/NotificatorFrame.h"
 
 #include "Tools/MimeDataCX.h"
 #include "UndoRedo.h"
@@ -116,7 +116,9 @@ class FileExplorerEvent : public QObject {
   auto on_SelectNone() -> void;
   auto on_SelectInvert() -> void;
 
-  auto on_OpenInVideoPlayer() const -> bool;
+  auto on_PlaySelectedItemsInView() const -> bool;
+  auto on_PlayCurrentPathOfView() const -> bool;
+
   auto on_PlayVideo() const -> bool;
 
   auto on_Merge(const bool reverse = false) -> bool;

@@ -96,7 +96,7 @@
         <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
         <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
         <file alias="LOAD_JSONS_FROM_CURRENT_PATH">JsonEditor/LOAD_JSONS_FROM_CURRENT_PATH.svg</file>
-        <file alias="RELOAD_JOSN_FROM_FILE">JsonEditor/RELOAD_JOSN_FROM_FILE.svg</file>
+        <file alias="RELOAD_JSON_FROM_FILE">JsonEditor/RELOAD_JSON_FROM_FILE.svg</file>
         <file alias="PERFORMERS_LIST_HINT">JsonEditor/PERFORMERS_LIST_HINT.svg</file>
         <file alias="LEARN_PERFORMERS_FROM_JSON">JsonEditor/LEARN_PERFORMERS_FROM_JSON.svg</file>
         <file alias="EDIT_AKA_FILE">JsonEditor/EDIT_AKA_FILE.svg</file>
@@ -199,7 +199,6 @@
         <file alias="INCREMENTAL_CALCULATE">MD5Window/INCREMENTAL_CALCULATE.png</file>
     </qresource>
     <qresource prefix="/">
-        <file alias="STANDARD_STUDIO_NAME_JSON">../bin/STANDARD_STUDIO_NAME_JSON.json</file>
         <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>
     </qresource>
 </RCC>

@@ -9,6 +9,7 @@ class ProductionStudioManager {
  public:
   ProductionStudioManager(const ProductionStudioManager& rhs) noexcept = delete;
   auto LearningFromAPath(const QString& path) -> int;
+
   static ProductionStudioManager& getIns();
   QString ProductionStudioFilterOut(const QString& words) const;
 

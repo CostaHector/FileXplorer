@@ -22,11 +22,6 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
       ADVANCE_SEARCH_RIBBON(Get_Advance_Search_Actions()) {}
 
 auto FileBasicOperationsActions::GetPLAYActions() -> QActionGroup* {
-  _VIDEO_PLAYER_EMBEDDED = new QAction(QIcon(":/themes/VIDEO_PLAYER"), "Play in embedded player");
-  _VIDEO_PLAYER_EMBEDDED->setShortcutVisibleInContextMenu(true);
-  _VIDEO_PLAYER_EMBEDDED->setToolTip(QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.")
-                                         .arg(_VIDEO_PLAYER_EMBEDDED->text(), _VIDEO_PLAYER_EMBEDDED->shortcut().toString()));
-
   _PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play");
   _PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
   _PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
@@ -34,7 +29,6 @@ auto FileBasicOperationsActions::GetPLAYActions() -> QActionGroup* {
                                    "Play the selected item(s) in default system player.")
                                .arg(_PLAY_VIDEOS->text(), _PLAY_VIDEOS->shortcut().toString()));
   QActionGroup* actionGroup = new QActionGroup(this);
-  actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
   actionGroup->addAction(_PLAY_VIDEOS);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 

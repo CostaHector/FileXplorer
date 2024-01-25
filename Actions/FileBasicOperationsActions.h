@@ -252,10 +252,10 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* FOLDER_MERGE;
   QActionGroup* SELECTION_RIBBONS;
 
-  QAction *_VIDEO_PLAYER_EMBEDDED, *_PLAY_VIDEOS = nullptr;
+  QAction* _PLAY_VIDEOS = nullptr;
   QActionGroup* PLAY_AG;
 
-  QAction *_REVEAL_IN_EXPLORER, *_OPEN_IN_TERMINAL = nullptr;
+  QAction *_REVEAL_IN_EXPLORER = nullptr, *_OPEN_IN_TERMINAL = nullptr;
   QActionGroup* OPEN_AG;
   QActionGroup* COPY_PATH;
   QActionGroup* NEW;
