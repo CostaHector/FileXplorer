@@ -12,6 +12,9 @@ class VideoPlayerActions : public QObject
 
   QActionGroup* GetRateActionGroups();
 
+  QAction* _VOLUME_CTRL_MUTE;
+  QAction* _VOLUME_CTRL_MAX;
+
   QAction* _UPDATE_ITEM_PLAYABLE;
   QAction* _MOVE_SELECTED_ITEMS_TO_TRASHBIN;
 

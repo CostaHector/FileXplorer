@@ -118,7 +118,8 @@ class VideoPlayer : public QMainWindow {
   inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;
 
   QMediaPlayer* m_mediaPlayer;
-  ClickableSlider* m_slider;
+  ClickableSlider* m_timeSlider;
+  QSlider* m_volumnSlider;
   QString m_timeTemplate;
   QLabel* m_timeLabel;
   QLabel* m_errorLabel;

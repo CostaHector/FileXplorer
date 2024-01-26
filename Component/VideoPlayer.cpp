@@ -16,7 +16,8 @@ const QColor VideoPlayer::RECYCLED_ITEM_COLOR(255, 0, 0);
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QMainWindow(parent),
       m_mediaPlayer(new QMediaPlayer(this, QMediaPlayer::LowLatency)),
-      m_slider(new ClickableSlider),
+      m_timeSlider(new ClickableSlider),
+      m_volumnSlider(new QSlider(Qt::Orientation::Horizontal, this)),
       m_timeTemplate("%1/%2"),
       m_timeLabel(new QLabel(m_timeTemplate)),
       m_errorLabel(new QLabel),
@@ -32,21 +33,31 @@ VideoPlayer::VideoPlayer(QWidget* parent)
 
   m_playListWid->setContextMenuPolicy(Qt::CustomContextMenu);
   m_playListWid->setAlternatingRowColors(true);
-  //  m_playListWid->setSortingEnabled(true);
   m_playListWid->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_playListWid->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
   m_playListMenu->addAction(g_videoPlayerActions()._REVEAL_IN_EXPLORER);
 
-  m_slider->setRange(0, 0);
-  m_slider->reg(std::bind(&QMediaPlayer::setPosition, m_mediaPlayer, std::placeholders::_1));
+  m_timeSlider->setRange(0, 0);
+  m_timeSlider->reg(std::bind(&QMediaPlayer::setPosition, m_mediaPlayer, std::placeholders::_1));
+  m_volumnSlider->setRange(0, 100);
+  m_volumnSlider->setMaximumWidth(60);
+
+  const int defaultVolume = PreferenceSettings().value(MemoryKey::VIDEO_PLAYER_VOLUME.name, MemoryKey::VIDEO_PLAYER_VOLUME.v).toInt();
+  m_volumnSlider->setValue(defaultVolume);
+  m_mediaPlayer->setVolume(defaultVolume);
 
   m_sliderTB->addAction(g_videoPlayerActions()._JUMP_LAST_HOT_SCENE);
   m_sliderTB->addAction(g_videoPlayerActions()._PLAY_PAUSE);
   m_sliderTB->addAction(g_videoPlayerActions()._JUMP_NEXT_HOT_SCENE);
-  m_sliderTB->addWidget(m_slider);
+  m_sliderTB->addSeparator();
+  m_sliderTB->addWidget(m_timeSlider);
   m_sliderTB->addAction(g_videoPlayerActions()._LAST_10_SECONDS);
   m_sliderTB->addAction(g_videoPlayerActions()._NEXT_10_SECONDS);
+  m_sliderTB->addSeparator();
+  m_sliderTB->addAction(g_videoPlayerActions()._VOLUME_CTRL_MUTE);
+  m_sliderTB->addWidget(m_volumnSlider);
+  m_sliderTB->addAction(g_videoPlayerActions()._VOLUME_CTRL_MAX);
 
   auto* spacer = new QWidget;
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -246,6 +257,23 @@ QString VideoPlayer::JsonFileValidCheck(const QString& op) {
 }
 
 void VideoPlayer::subscribe() {
+  connect(g_videoPlayerActions()._VOLUME_CTRL_MAX, &QAction::triggered, this, [this]() {
+    const auto maxVolume = m_volumnSlider->maximum();
+    m_volumnSlider->setValue(maxVolume);
+  });
+  connect(g_videoPlayerActions()._VOLUME_CTRL_MUTE, &QAction::triggered, this, [this]() {
+    const auto minVolume = m_volumnSlider->minimum();
+    m_volumnSlider->setValue(minVolume);
+  });
+  connect(m_volumnSlider, &QSlider::valueChanged, this, [this](int volumeSliderValue) {
+    // Set slider axis is logarithmic scale while videoplayer use linear scale
+    qreal linearVolume = 100 * QAudio::convertVolume(volumeSliderValue / qreal(100.0), QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
+    m_mediaPlayer->setVolume(linearVolume);
+    qDebug("linear:%d, logarithmic:%f", volumeSliderValue, linearVolume);
+    QToolTip::showText(cursor().pos(), "Volume:" + QString::number(linearVolume));
+    PreferenceSettings().setValue(MemoryKey::VIDEO_PLAYER_VOLUME.name, linearVolume);
+  });
+
   connect(g_videoPlayerActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this, [this]() {
     if (m_playListWid->currentItem())
       QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(m_playListWid->currentItem()->text()).absolutePath()));
@@ -287,7 +315,7 @@ void VideoPlayer::subscribe() {
   connect(g_videoPlayerActions()._VIDEOS_LIST_MENU, &QAction::triggered, this, &VideoPlayer::onShowPlaylist);
   connect(g_videoPlayerActions()._CLEAR_VIDEOS_LIST, &QAction::triggered, this, &VideoPlayer::onClearPlaylist);
 
-  connect(m_slider, &QAbstractSlider::sliderMoved, this, &VideoPlayer::setPosition);
+  connect(m_timeSlider, &QAbstractSlider::sliderMoved, this, &VideoPlayer::setPosition);
 
   connect(m_mediaPlayer, &QMediaPlayer::stateChanged, this, &VideoPlayer::mediaStateChanged);
   connect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, &VideoPlayer::positionChanged);
@@ -379,7 +407,7 @@ bool VideoPlayer::onGrabAFrame(const QVideoFrame& frame) {
     qWarning("image is null");
     return false;
   }
-  const int seconds = m_slider->value() / MICROSECOND;
+  const int seconds = m_timeSlider->value() / MICROSECOND;
   const QFileInfo fi(m_playListWid->currentItem()->text());
   const QString& imgAbsPath =
       QString("%1/%2 %3.png").arg(fi.absolutePath()).arg(fi.completeBaseName()).arg(seconds, DURATION_PLACEHOLDER_LENGTH, 10, QChar('0'));
@@ -624,15 +652,15 @@ void VideoPlayer::mediaStateChanged(QMediaPlayer::State state) {
 
 void VideoPlayer::positionChanged(qint64 position) {
   m_timeLabel->setText(m_timeTemplate.arg(position / MICROSECOND));
-  m_slider->setValue(position);
-  if (position > 0 and position == m_slider->maximum() and g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked()) {
+  m_timeSlider->setValue(position);
+  if (position > 0 and position == m_timeSlider->maximum() and g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked()) {
     onPositionAdd(1);
   }
 }
 
 void VideoPlayer::durationChanged(qint64 duration) {
-  qDebug("Duration changed to %d", duration);
-  m_slider->setRange(0, duration);
+  qDebug("Duration changed to %lld", duration);
+  m_timeSlider->setRange(0, duration);
   m_timeTemplate = "%1/" + QString::number(duration / MICROSECOND);
 }
 
@@ -651,7 +679,7 @@ void VideoPlayer::handleError() {
   m_errorLabel->setText(message);
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

@@ -117,6 +117,8 @@
         <file alias="RENAME_VIDEO">VideoPlayer/RENAME_VIDEO.svg</file>
         <file alias="VIDEO_PLAYER">VideoPlayer/VIDEO_PLAYER.svg</file>
         <file alias="VIDEOS_LIST_MENU">VideoPlayer/VIDEOS_LIST_MENU.svg</file>
+        <file alias="VOLUME">VideoPlayer/VOLUME.svg</file>
+        <file alias="VOLUME_MUTE">VideoPlayer/VOLUME_MUTE.svg</file>
         <file alias="FOLDER_OPEN">Parser/FOLDER_OPEN.svg</file>
         <file alias="SELECT_FOLDER">Parser/SELECT_FOLDER.svg</file>
         <file alias="JSON_AND_HTML">Parser/JSON_AND_HTML.svg</file>
