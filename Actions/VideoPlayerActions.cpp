@@ -3,6 +3,8 @@
 
 VideoPlayerActions::VideoPlayerActions(QObject* parent)
     : QObject{parent},
+      _VOLUME_CTRL_MUTE(new QAction(QIcon(":/themes/VOLUME_MUTE"), tr("Mute"), this)),
+      _VOLUME_CTRL_MAX(new QAction(QIcon(":/themes/VOLUME"), tr("Volume max"), this)),
       _UPDATE_ITEM_PLAYABLE(new QAction(QIcon(":/themes/REFRESH_THIS_PATH"), "Update", this)),
       _MOVE_SELECTED_ITEMS_TO_TRASHBIN(new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Trashbin", this)),
       _SCROLL_TO_NEXT_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_NEXT_VIDEO_FOLDER"), "Nxt folder", this)),
