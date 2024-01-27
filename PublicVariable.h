@@ -151,6 +151,7 @@ class GVarListStr : public GVar {
 constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 
 namespace MemoryKey {
+const GVarBool LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false);
 const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
 const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
 const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");

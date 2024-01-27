@@ -15,13 +15,13 @@ MD5Window::MD5Window(const QString& root, const QStringList& items, QWidget* par
       m_md5FileName(QFileInfo(m_root).fileName() + ".md5"),
       m_md5TextEdit(new QPlainTextEdit(this)),
       m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Orientation::Horizontal, this)),
-      m_incrementRefresh(new QAction(QIcon(":/themes/INCREMENTAL_CALCULATE"), "Incremental Calc", this)),
-      m_reloadFromFile(new QAction("Reload", this)),
-      m_dumpMD5IntoFile(new QAction("Dump", this)),
-      m_fullRefresh(new QAction(QIcon(":/themes/FULL_CALCULATE"), "Full Calc", this)),
+      m_incrementRefresh(new QAction(QIcon(":/themes/INCREMENTAL_CALCULATE"), tr("Incremental Calc"), this)),
+      m_reloadFromFile(new QAction(tr("Reload"), this)),
+      m_dumpMD5IntoFile(new QAction(tr("Dump"), this)),
+      m_fullRefresh(new QAction(QIcon(":/themes/FULL_CALCULATE"), tr("Full Calc"), this)),
       m_md5InfoTB(new QToolBar("Extra Info", this)) {
   m_md5TextEdit->setReadOnly(true);
-  m_md5TextEdit->setFont(QFont(tr("Consolas")));
+  m_md5TextEdit->setFont(QFont("Consolas"));
 
   m_md5InfoTB->setToolTip("Here you can choose to save/load the MD5 results into/from files. Or Recalculate MD5 Fully/Incrementally ");
   m_incrementRefresh->setToolTip("Only Calculate modified file or new added file MD5 since the last calculate");

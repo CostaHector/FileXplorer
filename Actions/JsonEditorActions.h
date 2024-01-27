@@ -6,6 +6,7 @@
 #include <QObject>
 
 class JsonEditorActions : public QObject {
+  Q_OBJECT
  public:
   explicit JsonEditorActions(QObject* parent = nullptr);
 
