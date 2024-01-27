@@ -177,6 +177,13 @@ HEADERS += \
     View/SearchItemTableView.h \
     View/ViewHelper.h
 
+TRANSLATIONS += \
+    FileExplorerReadOnly_zh_CN.ts
+
+CONFIG += lupdate
+CONFIG += lrelease
+CONFIG += embed_translations
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -186,6 +193,7 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
+    FileExplorerReadOnly_zh_CN.ts \
     bin/AKA_PERFORMERS.txt \
     bin/PERFORMERS_TABLE.txt \
     bin/PerformerHtmlTemplate.html \

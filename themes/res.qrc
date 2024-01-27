@@ -12,6 +12,8 @@
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
+
+        <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
         <file alias="OPEN_IN_TERMINAL">TopSideToolBarIcons/OPEN_IN_TERMINAL2.png</file>
         <file alias="CLOSE_WINDOW">TopSideToolBarIcons/CLOSE_WINDOW.svg</file>
         <file alias="NAVIGATION_PANE">TopSideToolBarIcons/NAVIGATION_PANE.ico</file>
