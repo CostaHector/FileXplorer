@@ -3,8 +3,7 @@
 
 VideoPlayerActions::VideoPlayerActions(QObject* parent)
     : QObject{parent},
-      _VOLUME_CTRL_MUTE(new QAction(QIcon(":/themes/VOLUME_MUTE"), tr("Mute"), this)),
-      _VOLUME_CTRL_MAX(new QAction(QIcon(":/themes/VOLUME"), tr("Volume max"), this)),
+      _VOLUME_CTRL_MUTE(new QAction(tr("Mute"), this)),
       _UPDATE_ITEM_PLAYABLE(new QAction(QIcon(":/themes/REFRESH_THIS_PATH"), "Update", this)),
       _MOVE_SELECTED_ITEMS_TO_TRASHBIN(new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Trashbin", this)),
       _SCROLL_TO_NEXT_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_NEXT_VIDEO_FOLDER"), "Nxt folder", this)),
@@ -31,6 +30,14 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
       _RATE_AG(GetRateActionGroups()),
       _RATE_LEVEL_COUNT(_RATE_AG->actions().size()),
       _REVEAL_IN_EXPLORER(new QAction(QIcon(), "reveal in explorer", this)) {
+  _VOLUME_CTRL_MUTE->setCheckable(true);
+  _VOLUME_CTRL_MUTE->setChecked(PreferenceSettings().value(MemoryKey::VIDEO_PLAYER_MUTE.name, MemoryKey::VIDEO_PLAYER_MUTE.v).toBool());
+  if (_VOLUME_CTRL_MUTE->isChecked()) {
+    _VOLUME_CTRL_MUTE->setIcon(QIcon(":/themes/VOLUME_MUTE"));
+  } else {
+    _VOLUME_CTRL_MUTE->setIcon(QIcon(":/themes/VOLUME_UNMUTE"));
+  }
+
   _UPDATE_ITEM_PLAYABLE->setShortcut(QKeySequence(Qt::Key_F5));
   _UPDATE_ITEM_PLAYABLE->setShortcutVisibleInContextMenu(true);
   _UPDATE_ITEM_PLAYABLE->setToolTip(

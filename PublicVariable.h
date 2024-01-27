@@ -210,6 +210,7 @@ const GVarStr SEARCH_MODEL_TYPE_FILTER("SEARCH_MODEL_TYPE_FILTER", "*.mp4", {});
 const GVarStr SEARCH_MODEL_NAME_FILTER("SEARCH_MODEL_NAME_FILTER", "*", {});
 
 const GVarInt VIDEO_PLAYER_VOLUME("VIDEO_PLAYER_VOLUME", 100, 0, 101);
+const GVarBool VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false);
 }  // namespace MemoryKey
 
 namespace SystemPath {
