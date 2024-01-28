@@ -216,12 +216,12 @@ const GVarBool VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false);
 const GVarStrFile WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
 const GVarStrFile WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
 const GVarStrFile WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", {"json"});
-const GVarStrFolder WIN32_RUNLOG("WIN32_RUNLOG", "../bin/runlog");
+const GVarStrFolder WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG");
 
 const GVarStrFile LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
-const GVarStrFile LINUX_AKA_PERFORMERS("LINUX_PERFORMERS_TABLE", "../bin/AKA_PERFORMERS.txt", {"txt"});
-const GVarStrFile LINUX_STANDARD_STUDIO_NAME("LINUX_PERFORMERS_TABLE", "../bin/STANDARD_STUDIO_NAME.txt", {"txt"});
-const GVarStrFolder LINUX_RUNLOG("LINUX_RUNLOG", "../bin/runlog");
+const GVarStrFile LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
+const GVarStrFile LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", {"txt"});
+const GVarStrFolder LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG");
 }  // namespace MemoryKey
 
 namespace SystemPath {

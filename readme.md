@@ -13,7 +13,7 @@ Assure that you are in this path. execute the following commands:
 ```bash
 touch AKA_PERFORMERS.txt
 touch PERFORMERS_TABLE.txt
-mkdir runlog
+mkdir RUNLOG
 ```
 
 # properties
