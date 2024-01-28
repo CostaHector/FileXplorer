@@ -29,17 +29,17 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       EDIT_ACTIONS(new QActionGroup(this)),
 
       _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal"), this)),
-      _OPEN_THIS_FILE(new QAction("Open", this)),
-      _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "Hint", this)),
+      _OPEN_THIS_FILE(new QAction(tr("Open"), this)),
+      _HINT(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), tr("Hint"), this)),
       _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), tr("+Lib"), this)),
 
       LOAD_JSONS_FROM_CURRENT_FOLDER{new QAction(QIcon(":/themes/LOAD_JSONS_FROM_CURRENT_PATH"), tr("Load jsons"))},
-      CONSTRUCT_JSONS_FOR_VIDS{new QAction("Construct jsons")},
-      JSON_ADD_PERFORMERS{new QAction("Add performers")},
-      JSON_SET_PRODUCTION_STUDIO{new QAction("Set production studio")},
-      JSON_ADD_PERFORMER_KEY_VALUE_PAIR{new QAction("Add performer k-v pair")},
-      JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR{new QAction("Add production studio k-v pair")},
-      JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME{new QAction("Clear performers and prod studio")},
+      CONSTRUCT_JSONS_FOR_VIDS{new QAction(tr("Construct jsons"))},
+      JSON_ADD_PERFORMERS{new QAction(tr("Add performers"))},
+      JSON_SET_PRODUCTION_STUDIO{new QAction(tr("Set production studio"))},
+      JSON_ADD_PERFORMER_KEY_VALUE_PAIR{new QAction(tr("Add performer k-v pair"))},
+      JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR{new QAction(tr("Add production studio k-v pair"))},
+      JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME{new QAction(tr("Clear performers and prod studio"))},
       BATCH_FILES_ACTIONS(new QActionGroup(this)) {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.")

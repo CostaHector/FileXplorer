@@ -85,8 +85,8 @@ QToolButton* DropListToolButton(QAction* defaultAction,
 
 QToolBar* RibbonMenu::LeafHome() const {
   const QString& _defPlayActName = PreferenceSettings().value(MemoryKey::DEFAULT_VIDEO_PLAYER.name, MemoryKey::DEFAULT_VIDEO_PLAYER.v).toString();
-  QAction* _defPlayAct = FindQActionFromQActionGroupByActionName(_defPlayActName, g_fileBasicOperationsActions().PLAY_AG);
-  QToolButton* playTB = DropListToolButton(_defPlayAct, g_fileBasicOperationsActions().PLAY_AG->actions(), QToolButton::MenuButtonPopup, "",
+  QAction* _defPlayAct = FindQActionFromQActionGroupByActionName(_defPlayActName, g_viewActions()._VIDEO_PLAYERS);
+  QToolButton* playTB = DropListToolButton(_defPlayAct, g_viewActions()._VIDEO_PLAYERS->actions(), QToolButton::MenuButtonPopup, "",
                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   {
     auto onDefPlayActChanged = [playTB](QAction* triggeredAct) -> void {

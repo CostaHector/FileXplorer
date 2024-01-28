@@ -13,30 +13,12 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
       FOLDER_MERGE(FolderMergeActions()),
       SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()),
 
-      PLAY_AG(GetPLAYActions()),
       OPEN_AG(GetOPENActions()),
       COPY_PATH(GetCOPY_PATHActions()),
       NEW(GetNEWActions()),
       FOLDER_FILE_PROCESS(FolderFileCategoryProcess()),
 
       ADVANCE_SEARCH_RIBBON(Get_Advance_Search_Actions()) {}
-
-auto FileBasicOperationsActions::GetPLAYActions() -> QActionGroup* {
-  _PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), tr("Play"));
-  _PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
-  _PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
-  _PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/>"
-                                   "Play the selected item(s) in default system player.")
-                               .arg(_PLAY_VIDEOS->text(), _PLAY_VIDEOS->shortcut().toString()));
-  QActionGroup* actionGroup = new QActionGroup(this);
-  actionGroup->addAction(_PLAY_VIDEOS);
-  actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  for (QAction* act : actionGroup->actions()) {
-    act->setCheckable(false);
-  }
-  return actionGroup;
-}
 
 auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
   _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"));
