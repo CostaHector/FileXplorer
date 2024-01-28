@@ -99,7 +99,7 @@ int DBTableMoviesHelper::UpdateAKAHash(const bool isForce) {
   if (not(akaPerf.isEmpty() or isForce)) {  // update when empty or force
     return 0;
   }
-  QFile file(PROJECT_PATH + "/bin/AKA_PERFORMERS.txt");
+  QFile file(":/AKA_PERFORMERS");
   if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("File not found: %s.", file.fileName().toStdString().c_str());
     return -1;
