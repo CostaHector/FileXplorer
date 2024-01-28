@@ -198,7 +198,7 @@ DISTFILES += \
     bin/PERFORMERS_TABLE.txt \
     bin/PerformerHtmlTemplate.html \
     bin/JsonExample/StudioName - Movie Name - Performer 1, Performer 2.json \
-    bin/STANDARD_STUDIO_NAME_JSON.json \
+    bin/STANDARD_STUDIO_NAME.txt \
     readme.md
 
 QMAKE_POST_LINK +=

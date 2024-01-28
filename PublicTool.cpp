@@ -3,6 +3,8 @@
 
 #include <QDir>
 #include <QSqlError>
+#include <QDirIterator>
+#include <QCoreApplication>
 
 PublicTool::PublicTool() {}
 
@@ -44,8 +46,6 @@ bool PublicTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir
   return true;
 }
 
-#include <QDir>
-#include <QDirIterator>
 
 OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool includingSub, const bool includingSuffix) {
   // Reverse the return value, One can get bottom To Top result like os.walk
@@ -189,4 +189,28 @@ auto GetSqlVidsDB() -> QSqlDatabase {
     qDebug("%s", con.lastError().text().toStdString().c_str());
   }
   return con;
+}
+
+void LoadCNLanguagePack(QTranslator& translator) {
+  qDebug("Load Chinese pack");
+  const QString baseName = "FileExplorerReadOnly_zh_CN";
+  if (translator.load(":/i18n/" + baseName)) {
+    qDebug("Load language pack succeed %s", qPrintable(baseName));
+    QCoreApplication::installTranslator(&translator);
+  }
+}
+
+void LoadSysLanaguagePack(QTranslator& translator) {
+  qDebug("Load System Language pack");
+  const QStringList uiLanguages = QLocale::system().uiLanguages();
+  for (const QString& locale : uiLanguages) {
+    const QString baseName = "FileExplorerReadOnly" + QLocale(locale).name();
+    if (translator.load(":/i18n/" + baseName)) {
+      qDebug("Load language pack succeed %s", qPrintable(baseName));
+      QCoreApplication::installTranslator(&translator);
+      break;
+    } else {
+      qDebug("No need to load language pack %s", qPrintable(baseName));
+    }
+  }
 }

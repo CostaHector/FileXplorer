@@ -3,12 +3,12 @@
 
 #include <QAction>
 #include <QActionGroup>
-#include <QFileInfo>
-#include <QDir>
 #include <QFileDialog>
 #include <QLayout>
 #include <QString>
 #include <QSqlDatabase>
+#include <QTranslator>
+
 
 class OSWalker_RETURN {
  public:
@@ -36,4 +36,10 @@ auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* old
 
 
 auto GetSqlVidsDB() -> QSqlDatabase;
+
+
+void LoadCNLanguagePack(QTranslator& translator);
+
+void LoadSysLanaguagePack(QTranslator& translator);
+
 #endif  // PUBLICTOOL_H
