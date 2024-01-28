@@ -72,8 +72,9 @@ bool PropertiesWindow::operator()(const QStringList& items) {
 
     propertiesMsg += QString("Contents:\n%1 file(s), %2 folder(s), totalling:\n%3\n").arg(itemStatic.fileCnt).arg(itemStatic.folderCnt).arg(sizeMsg);
     propertiesMsg += QString(40, '-');
-    const QStringList& mp4Files = FileSystemItemFilter::MP4Out(items);
-    propertiesMsg += MP4DurationGetter::DisplayVideosDuration(mp4Files);
+    // lag here
+    // const QStringList& mp4Files = FileSystemItemFilter::MP4Out(items);
+    // propertiesMsg += MP4DurationGetter::DisplayVideosDuration(mp4Files);
   }
   if (m_showMD5->isChecked()) {
     propertiesMsg += QString(40, '-');
