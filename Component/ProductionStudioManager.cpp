@@ -7,7 +7,7 @@
 #include <QDirIterator>
 #include <QTextStream>
 
-ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(JsonFileHelper::MovieJsonLoader(PROJECT_PATH+"/bin/STANDARD_STUDIO_NAME_JSON.json")) {}
+ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(JsonFileHelper::MovieJsonLoader(":/STANDARD_STUDIO_NAME_JSON")) {}
 
 int ProductionStudioManager::LearningFromAPath(const QString& path) {
   if (not QDir(path).exists()) {
@@ -33,7 +33,7 @@ int ProductionStudioManager::LearningFromAPath(const QString& path) {
   const int increCnt = int(m_prodStudioMap.size()) - beforePerformersCnt;
   qDebug("Learn extra %d production studios, now %u production studios in total", increCnt, m_prodStudioMap.size());
 
-  const bool dumpRes = JsonFileHelper::MovieJsonDumper(m_prodStudioMap, PROJECT_PATH + "/bin/STANDARD_STUDIO_NAME_JSON.json");
+  const bool dumpRes = JsonFileHelper::MovieJsonDumper(m_prodStudioMap, ":/STANDARD_STUDIO_NAME_JSON");
   return increCnt;
 }
 

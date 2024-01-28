@@ -5,14 +5,11 @@
         <file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
         <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
         <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
-
         <file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
         <file alias="DEDUPLICATE">Media/DEDUPLICATE.png</file>
-
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
-
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
         <file alias="OPEN_IN_TERMINAL">TopSideToolBarIcons/OPEN_IN_TERMINAL2.png</file>
         <file alias="CLOSE_WINDOW">TopSideToolBarIcons/CLOSE_WINDOW.svg</file>
@@ -102,7 +99,6 @@
         <file alias="PERFORMERS_LIST_HINT">JsonEditor/PERFORMERS_LIST_HINT.svg</file>
         <file alias="LEARN_PERFORMERS_FROM_JSON">JsonEditor/LEARN_PERFORMERS_FROM_JSON.svg</file>
         <file alias="EDIT_AKA_FILE">JsonEditor/EDIT_AKA_FILE.svg</file>
-
         <file alias="SCROLL_TO_NEXT_VIDEO_FOLDER">VideoPlayer/SCROLL_TO_NEXT_VIDEO_FOLDER.svg</file>
         <file alias="SCROLL_TO_LAST_VIDEO_FOLDER">VideoPlayer/SCROLL_TO_LAST_VIDEO_FOLDER.svg</file>
         <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
@@ -177,7 +173,6 @@
         <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
         <file alias="SHOW_DATABASE">Database/SHOW_DATABASE.svg</file>
         <file alias="WHERE_CLAUSE_HISTORY">Database/WHERE_CLAUSE_HISTORY.svg</file>
-
         <file alias="ZIP">Share/ZIP.ico</file>
         <file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.svg</file>
         <file alias="MIRROR_REVERT">RenameConflictIcons/MIRROR_REVERT.svg</file>
@@ -186,7 +181,6 @@
         <file alias="CONFLICT">RenameConflictIcons/CONFLICT.svg</file>
         <file alias="RECYCLE">RenameConflictIcons/RECYCLE.svg</file>
         <file alias="RESTORE">RenameConflictIcons/RESTORE.svg</file>
-
         <file alias="RATE0">PerformersManager/0.png</file>
         <file alias="RATE1">PerformersManager/1.png</file>
         <file alias="RATE2">PerformersManager/2.png</file>
@@ -198,11 +192,13 @@
         <file alias="RATE8">PerformersManager/8.png</file>
         <file alias="RATE9">PerformersManager/9.png</file>
         <file alias="RATE10">PerformersManager/10.png</file>
-
         <file alias="FULL_CALCULATE">MD5Window/FULL_CALCULATE.png</file>
         <file alias="INCREMENTAL_CALCULATE">MD5Window/INCREMENTAL_CALCULATE.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>
+        <file alias="PERFORMERS_TABLE">../bin/PERFORMERS_TABLE.txt</file>
+        <file alias="AKA_PERFORMERS">../bin/AKA_PERFORMERS.txt</file>
+        <file alias="STANDARD_STUDIO_NAME_JSON">../bin/STANDARD_STUDIO_NAME_JSON.json</file>
     </qresource>
 </RCC>
