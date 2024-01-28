@@ -27,37 +27,6 @@ typedef std::function<bool(QString)> T_on_searchEnterKey;
 typedef std::function<void()> T_SwitchStackWidget;
 typedef std::function<void()> T_UpdateComponentVisibility;
 
-namespace JSONKey {
-static const QString Name = "Name";
-static const QString Performers = "Performers";
-static const QString ProductionStudio = "ProductionStudio";
-static const QString Uploaded = "Uploaded";
-static const QString Tags = "Tags";
-static const QString Rate = "Rate";
-static const QString Size = "Size";
-static const QString Resolution = "Resolution";
-static const QString Bitrate = "Bitrate";
-static const QString Hot = "Hot";
-static const QString Detail = "Detail";
-static const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
-static const QHash<QString, QString> JsonKeyPri = {{Name, QString(QChar(JsonKeyListOrder.indexOf(Name)))},
-                                                   {Performers, QString(QChar(JsonKeyListOrder.indexOf(Performers)))},
-                                                   {ProductionStudio, QString(QChar(JsonKeyListOrder.indexOf(ProductionStudio)))},
-                                                   {Uploaded, QString(QChar(JsonKeyListOrder.indexOf(Uploaded)))},
-                                                   {Tags, QString(QChar(JsonKeyListOrder.indexOf(Tags)))},
-                                                   {Rate, QString(QChar(JsonKeyListOrder.indexOf(Rate)))},
-                                                   {Size, QString(QChar(JsonKeyListOrder.indexOf(Size)))},
-                                                   {Resolution, QString(QChar(JsonKeyListOrder.indexOf(Resolution)))},
-                                                   {Bitrate, QString(QChar(JsonKeyListOrder.indexOf(Bitrate)))},
-                                                   {Hot, QString(QChar(JsonKeyListOrder.indexOf(Hot)))},
-                                                   {Detail, QString(QChar(JsonKeyListOrder.indexOf(Detail)))}};
-static const auto KeySorter = [](const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) -> bool {
-  const QString& lValue = JsonKeyPri.contains(l.first) ? JsonKeyPri[l.first] : l.first;
-  const QString& rValue = JsonKeyPri.contains(r.first) ? JsonKeyPri[r.first] : r.first;
-  return lValue < rValue;
-};
-};  // namespace JSONKey
-
 namespace MainKey {
 constexpr int Name = 0;
 constexpr int Size = 1;
@@ -182,6 +151,7 @@ class GVarListStr : public GVar {
 constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 
 namespace MemoryKey {
+const GVarBool LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false);
 const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
 const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
 const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
@@ -239,6 +209,19 @@ const GVarStrFolder SEARCH_MODEL_ROOT_PATH("SEARCH_MODEL_ROOT_PATH", "./");
 const GVarStr SEARCH_MODEL_DIR_FILTER("SEARCH_MODEL_DIR_FILTER", "Files|Dirs", {});
 const GVarStr SEARCH_MODEL_TYPE_FILTER("SEARCH_MODEL_TYPE_FILTER", "*.mp4", {});
 const GVarStr SEARCH_MODEL_NAME_FILTER("SEARCH_MODEL_NAME_FILTER", "*", {});
+
+const GVarInt VIDEO_PLAYER_VOLUME("VIDEO_PLAYER_VOLUME", 100, 0, 101);
+const GVarBool VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false);
+
+const GVarStrFile WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
+const GVarStrFile WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
+const GVarStrFile WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", {"json"});
+const GVarStrFolder WIN32_RUNLOG("WIN32_RUNLOG", "../bin/runlog");
+
+const GVarStrFile LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
+const GVarStrFile LINUX_AKA_PERFORMERS("LINUX_PERFORMERS_TABLE", "../bin/AKA_PERFORMERS.txt", {"txt"});
+const GVarStrFile LINUX_STANDARD_STUDIO_NAME("LINUX_PERFORMERS_TABLE", "../bin/STANDARD_STUDIO_NAME.txt", {"txt"});
+const GVarStrFolder LINUX_RUNLOG("LINUX_RUNLOG", "../bin/runlog");
 }  // namespace MemoryKey
 
 namespace SystemPath {
@@ -254,9 +237,6 @@ const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplo
 const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
 const QString TORRENTS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/TORRENTS_DATABASE.db");
 const QString PRODUCTION_STUDIOS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PRODUCTION_STUDIOS_DATABASE.db");
-const QString AKA_PERFORMERS_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/AKA_PERFORMERS.txt");
-const QString PERFORMERS_TABLE_TXT = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_TABLE.txt");
-const QString RUNLOGS = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/runlog");
 }  // namespace SystemPath
 
 namespace DB_TABLE {
@@ -319,5 +299,10 @@ const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
 
 const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 }  // namespace JSON_RENAME_REGEX
+
+bool VerifyOneFilePath(const QString& fileKey);
+bool VerifyOneFolderPath(const QString& fileKey);
+
+bool InitOutterPlainTextPath();
 
 #endif  // PUBLICVARIABLE_H

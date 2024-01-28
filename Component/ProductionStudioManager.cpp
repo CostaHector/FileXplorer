@@ -7,7 +7,16 @@
 #include <QDirIterator>
 #include <QTextStream>
 
-ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(JsonFileHelper::MovieJsonLoader(":/STANDARD_STUDIO_NAME_JSON")) {}
+ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(MovieJsonLoaderAgent()) {}
+
+QVariantHash ProductionStudioManager::MovieJsonLoaderAgent() const {
+#ifdef _WIN32
+  const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
+#else
+  const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
+#endif
+  return JsonFileHelper::MovieJsonLoader(stdStudiosFilePath);
+}
 
 int ProductionStudioManager::LearningFromAPath(const QString& path) {
   if (not QDir(path).exists()) {
@@ -23,7 +32,7 @@ int ProductionStudioManager::LearningFromAPath(const QString& path) {
       continue;
     }
     const QString& v = dict[JSONKey::ProductionStudio].toString();
-    for (const QString& psFrom: StandardProductionStudioFrom(v)){
+    for (const QString& psFrom : StandardProductionStudioFrom(v)) {
       if (psFrom.isEmpty() or m_prodStudioMap.contains(psFrom)) {
         continue;
       }
@@ -33,7 +42,13 @@ int ProductionStudioManager::LearningFromAPath(const QString& path) {
   const int increCnt = int(m_prodStudioMap.size()) - beforePerformersCnt;
   qDebug("Learn extra %d production studios, now %u production studios in total", increCnt, m_prodStudioMap.size());
 
-  const bool dumpRes = JsonFileHelper::MovieJsonDumper(m_prodStudioMap, PROJECT_PATH + "/bin/STANDARD_STUDIO_NAME_JSON.json");
+#ifdef _WIN32
+  const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
+#else
+  const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
+#endif
+
+  const bool dumpRes = JsonFileHelper::MovieJsonDumper(m_prodStudioMap, stdStudiosFilePath);
   return increCnt;
 }
 

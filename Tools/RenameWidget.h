@@ -150,7 +150,7 @@ class RenameWidget : public QDialog {
 
     QStringList invalidFileNames;
     for (const QString& fileName : news) {
-      if (not IsFileNameValid(fileName)) {
+      if (IsFileNameInvalid(fileName)) {
         invalidFileNames.append(fileName);
       }
     }
@@ -287,7 +287,7 @@ class RenameWidget : public QDialog {
   virtual void extraSubscribe() = 0;
   virtual auto RenameCore(const QStringList& replaceeList) -> QStringList = 0;
 
-  static inline auto IsFileNameValid(const QString& filename) -> bool {
+  static inline auto IsFileNameInvalid(const QString& filename) -> bool {
     QSet<QChar> nameSet(filename.cbegin(), filename.cend());
     return nameSet.intersects(RenameWidget::INVALID_FILE_NAME_CHAR_SET);
   }

@@ -8,17 +8,18 @@
 #include "PublicVariable.h"
 
 class FileBasicOperationsActions : public QObject {
+  Q_OBJECT
  public:
   explicit FileBasicOperationsActions(QObject* parent = nullptr);
 
   auto GetDeleteActions() -> QActionGroup* {
-    QAction* MOVE_TO_TRASHBIN = new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Recycle");
+    QAction* MOVE_TO_TRASHBIN = new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), tr("Recycle"));
     MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
     MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
     MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.")
                                      .arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
 
-    QAction* DELETE_PERMANENTLY = new QAction(QIcon(":/themes/DELETE_ITEMS_PERMANENTLY"), "Delete permanently");
+    QAction* DELETE_PERMANENTLY = new QAction(QIcon(":/themes/DELETE_ITEMS_PERMANENTLY"), tr("Delete permanently"));
     DELETE_PERMANENTLY->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Delete));
     DELETE_PERMANENTLY->setShortcutVisibleInContextMenu(true);
     DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
@@ -30,12 +31,12 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto GetMOVE_COPY_TOActions() -> QActionGroup* {
-    _MOVE_TO = new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), "Move to");
+    _MOVE_TO = new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), tr("Move to"));
     _MOVE_TO->setShortcutVisibleInContextMenu(true);
     _MOVE_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location one specified later")
                              .arg(_MOVE_TO->text(), _MOVE_TO->shortcut().toString()));
 
-    _COPY_TO = new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), "Copy to");
+    _COPY_TO = new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), tr("Copy to"));
     _COPY_TO->setShortcutVisibleInContextMenu(true);
     _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later")
                              .arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
@@ -57,17 +58,17 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto Get_CUT_COPY_PASTE_OPERATIONS_Actions() -> QActionGroup* {
-    QAction* CUT = new QAction(QIcon(":/themes/CUT_ITEM"), "Cut");
+    QAction* CUT = new QAction(QIcon(":/themes/CUT_ITEM"), tr("Cut"));
     CUT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_X));
     CUT->setShortcutVisibleInContextMenu(true);
     CUT->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the clipboard.").arg(CUT->text(), CUT->shortcut().toString()));
 
-    QAction* COPY = new QAction(QIcon(":/themes/COPY_ITEM"), "Copy");
+    QAction* COPY = new QAction(QIcon(":/themes/COPY_ITEM"), tr("Copy"));
     COPY->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_C));
     COPY->setShortcutVisibleInContextMenu(true);
     COPY->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the clipboard.").arg(COPY->text(), COPY->shortcut().toString()));
 
-    QAction* PASTE = new QAction(QIcon(":/themes/PASTE_ITEM"), "Paste");
+    QAction* PASTE = new QAction(QIcon(":/themes/PASTE_ITEM"), tr("Paste"));
     PASTE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_V));
     PASTE->setShortcutVisibleInContextMenu(true);
     PASTE->setToolTip(
@@ -80,12 +81,12 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto Get_UNDO_REDO_OPERATIONS_Actions() -> QActionGroup* {
-    QAction* UNDO_OPERATION = new QAction(QIcon(":/themes/UNDO"), "Undo");
+    QAction* UNDO_OPERATION = new QAction(QIcon(":/themes/UNDO"), tr("Undo"));
     UNDO_OPERATION->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Z));
     UNDO_OPERATION->setShortcutVisibleInContextMenu(true);
     UNDO_OPERATION->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(UNDO_OPERATION->text(), UNDO_OPERATION->shortcut().toString()));
 
-    QAction* REDO_OPERATION = new QAction(QIcon(":/themes/REDO"), "Redo");
+    QAction* REDO_OPERATION = new QAction(QIcon(":/themes/REDO"), tr("Redo"));
     REDO_OPERATION->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Y));
     REDO_OPERATION->setShortcutVisibleInContextMenu(true);
     REDO_OPERATION->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(REDO_OPERATION->text(), REDO_OPERATION->shortcut().toString()));
@@ -100,17 +101,17 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto Get_SELECTION_RIBBON_Action() -> QActionGroup* {
-    QAction* SELECT_ALL = new QAction(QIcon(":/themes/SELECT_ALL"), "Select all");
+    QAction* SELECT_ALL = new QAction(QIcon(":/themes/SELECT_ALL"), tr("Select all"));
     //        SELECT_ALL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_A));
     SELECT_ALL->setShortcutVisibleInContextMenu(true);
     SELECT_ALL->setToolTip(
         QString("<b>%1 (%2)</b><br/> Select all item(s) in this view.").arg(SELECT_ALL->text(), SELECT_ALL->shortcut().toString()));
 
-    QAction* SELECT_NONE = new QAction(QIcon(":/themes/SELECT_NONE"), "Select none");
+    QAction* SELECT_NONE = new QAction(QIcon(":/themes/SELECT_NONE"), tr("Select none"));
     SELECT_NONE->setShortcutVisibleInContextMenu(true);
     SELECT_NONE->setToolTip(QString("<b>%1 (%2)</b><br/> Clear all your selections.").arg(SELECT_NONE->text(), SELECT_NONE->shortcut().toString()));
 
-    QAction* SELECT_INVERT = new QAction(QIcon(":/themes/SELECT_INVERT"), "Invert selection");
+    QAction* SELECT_INVERT = new QAction(QIcon(":/themes/SELECT_INVERT"), tr("Invert selection"));
     SELECT_INVERT->setShortcutVisibleInContextMenu(true);
     SELECT_INVERT->setToolTip(QString("<b>%1 </b><br/> Reverse the current selections.").arg(SELECT_INVERT->text()));
 
@@ -125,27 +126,25 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
 
-  auto GetPLAYActions() -> QActionGroup*;
-
   auto GetOPENActions() -> QActionGroup*;
   auto GetCOPY_PATHActions() -> QActionGroup* {
-    QAction* COPY_FULL_PATH = new QAction(QIcon(":/themes/COPY_FULL_PATH"), "Copy fullpath");
+    QAction* COPY_FULL_PATH = new QAction(QIcon(":/themes/COPY_FULL_PATH"), tr("Copy fullpath"));
     COPY_FULL_PATH->setToolTip(
         QString("<b>%1 (%2)</b><br/>. <b>path/name</b> <br/>Copy the absolute file name of the selected item(s) to the clipboard.")
             .arg(COPY_FULL_PATH->text(), COPY_FULL_PATH->shortcut().toString()));
     COPY_FULL_PATH->setShortcutVisibleInContextMenu(true);
 
-    QAction* COPY_PATH = new QAction(QIcon(":/themes/COPY_PATH"), "Copy path");
+    QAction* COPY_PATH = new QAction(QIcon(":/themes/COPY_PATH"), tr("Copy path"));
     COPY_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>path</b>/name <br/>Copy the directory of the selected item(s) to the clipboard.")
                               .arg(COPY_PATH->text(), COPY_PATH->shortcut().toString()));
     COPY_PATH->setShortcutVisibleInContextMenu(true);
 
-    QAction* COPY_NAME = new QAction(QIcon(":/themes/COPY_NAME"), "Copy name");
+    QAction* COPY_NAME = new QAction(QIcon(":/themes/COPY_NAME"), tr("Copy name"));
     COPY_NAME->setToolTip(QString("<b>%1 (%2)</b><br/> path/<b>name</b> <br/>Copy the name of the selected item(s) to the clipboard.")
                               .arg(COPY_NAME->text(), COPY_NAME->shortcut().toString()));
     COPY_NAME->setShortcutVisibleInContextMenu(true);
 
-    QAction* COPY_THE_PATH = new QAction(QIcon(":/themes/COPY_THE_PATH"), "Copy the path");
+    QAction* COPY_THE_PATH = new QAction(QIcon(":/themes/COPY_THE_PATH"), tr("Copy the path"));
     COPY_THE_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>pth/itemName.jpg</b> <br/>Given current selected item named 'itemName' and its path "
                                       "'pth', <br/>'pth/itemName.jpg' is copied to the clipboard.")
                                   .arg(COPY_THE_PATH->text(), COPY_THE_PATH->shortcut().toString()));
@@ -164,34 +163,34 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto GetNEWActions() -> QActionGroup* {
-    QAction* NEW_FOLDER = new QAction(QIcon(":/themes/NEW_FOLDER"), "New folder");
+    QAction* NEW_FOLDER = new QAction(QIcon(":/themes/NEW_FOLDER"), tr("New folder"));
     NEW_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_N));
     NEW_FOLDER->setShortcutVisibleInContextMenu(true);
     NEW_FOLDER->setToolTip(
         QString("<b>%1 (%2)</b><br/> Create a new folder in current view.").arg(NEW_FOLDER->text(), NEW_FOLDER->shortcut().toString()));
     NEW_FOLDER->setCheckable(false);
 
-    QAction* NEW_TEXT_FILE = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENT"), "New text");
+    QAction* NEW_TEXT_FILE = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENT"), tr("New text"));
     NEW_TEXT_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_T));
     NEW_TEXT_FILE->setShortcutVisibleInContextMenu(true);
     NEW_TEXT_FILE->setToolTip(
         QString("<b>%1 (%2)</b><br/> Create a new text document in current view.").arg(NEW_TEXT_FILE->text(), NEW_TEXT_FILE->shortcut().toString()));
     NEW_TEXT_FILE->setCheckable(false);
 
-    QAction* NEW_JSON_FILE = new QAction(QIcon(":/themes/NEW_JSON_FILE"), "New json");
+    QAction* NEW_JSON_FILE = new QAction(QIcon(":/themes/NEW_JSON_FILE"), tr("New json"));
     NEW_JSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_J));
     NEW_JSON_FILE->setShortcutVisibleInContextMenu(true);
     NEW_JSON_FILE->setToolTip(
         QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
     NEW_JSON_FILE->setCheckable(false);
 
-    QAction* BATCH_NEW_FILES = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), "Batch New Files");
+    QAction* BATCH_NEW_FILES = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), tr("Batch New Files"));
     BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
                                 "Create a batch of files by specified pattern.<br/>"
                                 "e.g. Given pattern:<br/>"
                                 "\"Page %03d.txt$1$10\"<br/>"
                                 "it will create ten text documents numbered by Page 001,002,...,009 respectively.");
-    QAction* BATCH_NEW_FOLDERS = new QAction(QIcon(":/themes/NEW_FOLDERS"), "Batch New Folders");
+    QAction* BATCH_NEW_FOLDERS = new QAction(QIcon(":/themes/NEW_FOLDERS"), tr("Batch New Folders"));
     BATCH_NEW_FOLDERS->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FOLDERS->text(), BATCH_NEW_FOLDERS->shortcut().toString()) +
                                   "Create a batch of folders by specified pattern.<br/>"
                                   "e.g. Given pattern:<br/>"
@@ -207,12 +206,12 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
   auto FolderMergeActions() -> QActionGroup* {
-    QAction* MERGE = new QAction(QIcon(":/themes/FOLDER_MERGE_TO_FIRST"), "Merge into first folder");
+    QAction* MERGE = new QAction(QIcon(":/themes/FOLDER_MERGE_TO_FIRST"), tr("Merge into first folder"));
     MERGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_M));
     MERGE->setShortcutVisibleInContextMenu(true);
     MERGE->setToolTip(QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE->text(), MERGE->shortcut().toString()));
 
-    QAction* MERGE_REVERSE = new QAction(QIcon(":/themes/FOLDER_MERGE_TO_LAST"), "Merge into last folder");
+    QAction* MERGE_REVERSE = new QAction(QIcon(":/themes/FOLDER_MERGE_TO_LAST"), tr("Merge into last folder"));
     MERGE_REVERSE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_M));
     MERGE_REVERSE->setShortcutVisibleInContextMenu(true);
     MERGE_REVERSE->setToolTip(
@@ -225,7 +224,7 @@ class FileBasicOperationsActions : public QObject {
   }
   auto FolderFileCategoryProcess() -> QActionGroup*;
   auto Get_Advance_Search_Actions() -> QActionGroup* {
-    QAction* _ADVANCE_SEARCH = new QAction(QIcon(":/themes/SEARCH"), "Advance search");
+    QAction* _ADVANCE_SEARCH = new QAction(QIcon(":/themes/SEARCH"), tr("Advance search"));
     _ADVANCE_SEARCH->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_F));
     _ADVANCE_SEARCH->setShortcutVisibleInContextMenu(true);
     _ADVANCE_SEARCH->setToolTip(
@@ -252,10 +251,7 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* FOLDER_MERGE;
   QActionGroup* SELECTION_RIBBONS;
 
-  QAction *_VIDEO_PLAYER_EMBEDDED, *_PLAY_VIDEOS = nullptr;
-  QActionGroup* PLAY_AG;
-
-  QAction *_REVEAL_IN_EXPLORER, *_OPEN_IN_TERMINAL = nullptr;
+  QAction *_REVEAL_IN_EXPLORER = nullptr, *_OPEN_IN_TERMINAL = nullptr;
   QActionGroup* OPEN_AG;
   QActionGroup* COPY_PATH;
   QActionGroup* NEW;

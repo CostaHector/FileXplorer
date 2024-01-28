@@ -6,7 +6,12 @@ const QMap<QString, std::function<FileOperation::RETURN_TYPE(const QStringList&)
     {"cpdir", cpdirAgent},   {"link", linkAgent},     {"unlink", unlinkAgent}};
 
 auto FileOperation::WriteIntoLogFile(const QString& msg) -> bool {
-  QFile logFi(QString("%1/%2.log").arg(SystemPath::RUNLOGS).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd")));
+#ifdef _WIN32
+  QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
+#else
+  QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
+#endif
+  QFile logFi(QString("%1/%2.log").arg(logPrePath).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd")));
   if (not logFi.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
     qDebug("log file cannot open. ", logFi.fileName().toStdString().c_str());
     return false;

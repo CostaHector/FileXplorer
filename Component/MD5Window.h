@@ -9,6 +9,7 @@
 #include <QMap>
 
 class MD5Window : public QDialog {
+  Q_OBJECT
  public:
   explicit MD5Window(const QString& root, const QStringList& items, QWidget* parent = nullptr);
   QSize sizeHint() const { return QSize(600, 400); }

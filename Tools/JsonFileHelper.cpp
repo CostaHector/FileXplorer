@@ -7,6 +7,44 @@ const QMap<QString, QString> JsonFileHelper::key2ValueType = {{JSONKey::Performe
                                                               {JSONKey::Hot, "QIntList"},
                                                               {JSONKey::Rate, "int"}};
 
+QVariantHash JsonFileHelper::GetMovieFileJsonDict(const QString& fileAbsPath, const QString& performersListStr, const QString& productionStudio) {
+  QStringList performersList;
+  const QString& ps = performersListStr.trimmed();
+  if (not ps.isEmpty()) {
+    performersList = ps.split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+  }
+
+  QFileInfo fi(fileAbsPath);
+  QList<QVariant> hotSceneList = HotSceneString2IntList("");
+  QVariantHash dict = {{JSONKey::Name, fi.fileName()},
+                       {JSONKey::Performers, performersList},
+                       {JSONKey::ProductionStudio, productionStudio},
+                       {JSONKey::Uploaded, fi.birthTime().toString("yyyyMMdd")},
+                       {JSONKey::Tags, QStringList()},
+                       {JSONKey::Rate, -1},
+                       {JSONKey::Size, QString::number(fi.size())},
+                       {JSONKey::Resolution, ""},
+                       {JSONKey::Bitrate, ""},
+                       {JSONKey::Hot, hotSceneList},
+                       {JSONKey::Detail, ""}};
+  return dict;
+}
+
+QVariantHash JsonFileHelper::GetDefaultJsonFile(const QString& fileName) {
+  QVariantHash dict = {{JSONKey::Name, fileName},
+                       {JSONKey::Performers, QStringList()},
+                       {JSONKey::ProductionStudio, ""},
+                       {JSONKey::Uploaded, ""},
+                       {JSONKey::Tags, QStringList()},
+                       {JSONKey::Rate, -1},
+                       {JSONKey::Size, QString::number(0)},
+                       {JSONKey::Resolution, ""},
+                       {JSONKey::Bitrate, ""},
+                       {JSONKey::Hot, QList<QVariant>()},
+                       {JSONKey::Detail, ""}};
+  return dict;
+}
+
 int JsonFileHelper::ConstructJsonForVids(const QString& path, const QString& productionStudio, const QString& performersListStr) {
   if (not QFileInfo(path).isDir()) {
     return -1;
@@ -21,7 +59,7 @@ int JsonFileHelper::ConstructJsonForVids(const QString& path, const QString& pro
     if (QFile::exists(jsonPath)) {
       continue;
     }
-    const auto& dict = GetInitJsonFile(vidPath, performersListStr, productionStudio);
+    const auto& dict = GetMovieFileJsonDict(vidPath, performersListStr, productionStudio);
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryConstuctCnt;
   }

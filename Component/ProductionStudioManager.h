@@ -9,6 +9,7 @@ class ProductionStudioManager {
  public:
   ProductionStudioManager(const ProductionStudioManager& rhs) noexcept = delete;
   auto LearningFromAPath(const QString& path) -> int;
+
   static ProductionStudioManager& getIns();
   QString ProductionStudioFilterOut(const QString& words) const;
 
@@ -18,6 +19,8 @@ class ProductionStudioManager {
   auto operator[](const QString& nm) const -> QString {
     return m_prodStudioMap.contains(nm.toLower()) ? m_prodStudioMap[nm.toLower()].toString() : nm;
   }
+
+  QVariantHash MovieJsonLoaderAgent() const;
 
   QVariantHash m_prodStudioMap;
 

@@ -29,6 +29,7 @@ class VideoPlayer : public QMainWindow {
   ~VideoPlayer();
 
   auto operator()(const QString& path) -> bool;
+  auto PlaySelections(const QStringList& fileAbsPathList) -> bool;
 
   void setUrl(const QUrl& url);
   auto subscribe() -> void;
@@ -50,6 +51,7 @@ class VideoPlayer : public QMainWindow {
   void onListWidgetDoubleClicked(QListWidgetItem* item);
   void onUpdatePlayableList();
 
+  void onRevealInSystemExplorer();
   void onRecycleSelectedItems();
 
   void onScrollToAnotherFolder(int inc = 1);
@@ -59,6 +61,9 @@ class VideoPlayer : public QMainWindow {
   void onShowPlaylist();
   void onClearPlaylist();
   void openAFolder(const QString& folderPath = "");
+
+  void onVolumeMute(const bool isMute);
+  void onVolumeValueChange(const int logScaleValue);
 
   auto updateWindowsSize() -> void {
     if (PreferenceSettings().contains("VideoPlayerGeometry")) {
@@ -106,9 +111,9 @@ class VideoPlayer : public QMainWindow {
 
  private slots:
   void mediaStateChanged(QMediaPlayer::State state);
-  void positionChanged(qint64 position);
+  void onPlayerPositionChanged(qint64 position);
   void durationChanged(qint64 duration);
-  void setPosition(int position);
+  void onSetPlayerPosition(int position);
   void handleError();
 
  private:
@@ -117,7 +122,8 @@ class VideoPlayer : public QMainWindow {
   inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;
 
   QMediaPlayer* m_mediaPlayer;
-  ClickableSlider* m_slider;
+  ClickableSlider* m_timeSlider;
+  QSlider* m_volumnSlider;
   QString m_timeTemplate;
   QLabel* m_timeLabel;
   QLabel* m_errorLabel;

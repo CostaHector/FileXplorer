@@ -45,6 +45,6 @@ auto NameStandardizer::operator()(QString aFileName) -> QString{
 #ifdef __NAME__EQ__MAIN__
 int main(int argc, char* argv[]) {
   const auto& mp = NameStandardizer::jsonLoader();
-  qDebug("STANDARD_STUDIO_NAME_JSON size=%d", mp.size());
+  qDebug("STANDARD_STUDIO_NAME size=%d", mp.size());
 }
 #endif

@@ -6,10 +6,16 @@
 #include <QObject>
 
 class JsonEditorActions : public QObject {
+  Q_OBJECT
  public:
   explicit JsonEditorActions(QObject* parent = nullptr);
 
- signals:
+  QAction* _EDIT_STUDIOS;
+  QAction* _RELOAD_STUDIOS;
+
+  QAction* _RELOAD_PERF_AKA;
+  QAction* _EDIT_PERF_AKA;
+
   QAction* _SELECT_A_FOLDER_AND_LOAD_JSON;
   QAction* _EMPTY_JSONS_LISTWIDGET;
   QAction* _LAST_JSON;

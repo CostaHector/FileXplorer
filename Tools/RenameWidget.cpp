@@ -105,7 +105,7 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
 }
 
 auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
-  auto* caseAct = caseAG->checkedAction();
+  auto* caseAct = caseAG->checkedAction();  // todo checked
   if (caseAct == nullptr) {
     qDebug("No rule enabled");
     return replaceeList;
@@ -117,24 +117,26 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
   if (replaceeList.isEmpty()) {
     return {};
   }
+  qDebug("Case rule: %s", qPrintable(caseRuleName));
   QStringList replacedList;
-  if (caseRuleName == "Upper Case") {
+
+  if (g_renameAg()._UPPER_CASE->isChecked()) {
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toUpper());
     }
-  } else if (caseRuleName == "Lower Case") {
+  } else if (g_renameAg()._LOWER_CASE->isChecked()) {
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toLower());
     }
-  } else if (caseRuleName == "Loose Capitalize") {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
+  } else if (g_renameAg()._LOOSE_CAPITALIZE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
     for (const QString& nm : replaceeList) {
       replacedList.append(CapitaliseEachWordFirstLetterOnly(nm));
     }
-  } else if (caseRuleName == "Strict Capitalize") {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
+  } else if (g_renameAg()._STRICT_CAPITALIZE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
     for (const QString& nm : replaceeList) {
       replacedList.append(CapitaliseEachWordFirstLetterLowercaseOthers(nm));
     }
-  } else if (caseRuleName == "Swap Case") {
+  } else if (g_renameAg()._SWAP_CASE->isChecked()) {
     for (const QString& nm : replaceeList) {
       replacedList.append(ToggleSentenceCase(nm));
     }
