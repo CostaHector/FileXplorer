@@ -11,7 +11,13 @@ PerformersStringParser::PerformersStringParser() : m_performers(loadExistedPerfo
 }
 
 QSet<QString> PerformersStringParser::loadExistedPerformers() {
-  QFile performersFi(":/PERFORMERS_TABLE.txt");
+#ifdef _WIN32
+  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
+#else
+  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
+#endif
+
+  QFile performersFi(perfFilePath);
   if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("file[%s] not found. loadExistedPerformers abort", performersFi.fileName().toStdString().c_str());
     return {};

@@ -287,32 +287,14 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 
-  connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, []() {
-    QString fileAbsPath = QFileInfo(PROJECT_PATH + "/bin/AKA_PERFORMERS.txt").absoluteFilePath();
-    if (not QFile::exists(fileAbsPath)) {
-      qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-      Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
-      return;
-    }
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-    Notificator::information("Work after rebuild", "changes not work now");
-  });
+  connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, &JsonEditor::onEditAkaPerformer);
   connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
     auto ret = DBTableMoviesHelper::UpdateAKAHash(true);
     qDebug("Update AKA %d item(s) added", ret);
     Notificator::information("Update AKA", QString("%1 item(s) added").arg(ret));
   });
 
-  connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, []() {
-    QString fileAbsPath = QFileInfo(PROJECT_PATH + "/bin/STANDARD_STUDIO_NAME_JSON.json").absoluteFilePath();
-    if (not QFile::exists(fileAbsPath)) {
-      qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-      Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
-      return;
-    }
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-    Notificator::information("Work after rebuild", "changes not work now");
-  });
+  connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, &JsonEditor::onEditStudios);
   connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
     qDebug("TODO, please reopen it to update");
     Notificator::warning("TODO", "please reopen it to update");
@@ -585,6 +567,36 @@ bool JsonEditor::onSelectedTextAppendToPerformers() {
   perfs.removeDuplicates();
   p->setText(perfs.join(", "));
   return true;
+}
+
+void JsonEditor::onEditAkaPerformer() {
+#ifdef _WIN32
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name).toString();
+#else
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name).toString();
+#endif
+  if (not QFile::exists(fileAbsPath)) {
+    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
+    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    return;
+  }
+  QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
+  Notificator::information("Work after reopen", "changes not work now");
+}
+
+void JsonEditor::onEditStudios() {
+#ifdef _WIN32
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
+#else
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
+#endif
+  if (not QFile::exists(fileAbsPath)) {
+    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
+    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    return;
+  }
+  QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
+  Notificator::information("Work after rebuild", "changes not work now");
 }
 
 bool JsonEditor::formatter() {

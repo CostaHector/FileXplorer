@@ -54,6 +54,9 @@ class JsonEditor : public QMainWindow {
   auto onPerformersHint() -> QStringList;
   auto onSelectedTextAppendToPerformers() -> bool;
 
+  void onEditAkaPerformer();
+  void onEditStudios();
+
   auto updateWindowsSize() -> void {
     if (PreferenceSettings().contains("JsonEditorGeometry")) {
       restoreGeometry(PreferenceSettings().value("JsonEditorGeometry").toByteArray());

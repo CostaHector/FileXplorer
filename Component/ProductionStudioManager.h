@@ -20,6 +20,8 @@ class ProductionStudioManager {
     return m_prodStudioMap.contains(nm.toLower()) ? m_prodStudioMap[nm.toLower()].toString() : nm;
   }
 
+  QVariantHash MovieJsonLoaderAgent() const;
+
   QVariantHash m_prodStudioMap;
 
  private:
