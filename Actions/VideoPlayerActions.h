@@ -12,6 +12,8 @@ class VideoPlayerActions : public QObject
 
   QActionGroup* GetRateActionGroups();
 
+  QAction* _VOLUME_CTRL_MUTE;
+
   QAction* _UPDATE_ITEM_PLAYABLE;
   QAction* _MOVE_SELECTED_ITEMS_TO_TRASHBIN;
 
@@ -32,6 +34,10 @@ class VideoPlayerActions : public QObject
   QAction* _OPEN_A_VIDEO;
   QAction* _LOAD_A_PATH;
   QAction* _CLEAR_VIDEOS_LIST;
+
+  QAction* _PLAY_CURRENT_PATH;
+  QAction* _PLAY_SELECTION;
+  QActionGroup* _BATCH_VIDEO_ACTIONS;
 
   QAction* _VIDEOS_LIST_MENU;
 

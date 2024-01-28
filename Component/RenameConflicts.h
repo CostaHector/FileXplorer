@@ -58,6 +58,7 @@ class FileInfoType {
 };
 
 class RenameConflicts : public QDialog {
+  Q_OBJECT
  public:
   const ConflictsItemHelper itemIF;  // dont user reference. object point to will be release after statement
   const QString leftFolderPath;

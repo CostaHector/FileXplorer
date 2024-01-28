@@ -11,7 +11,13 @@ PerformersStringParser::PerformersStringParser() : m_performers(loadExistedPerfo
 }
 
 QSet<QString> PerformersStringParser::loadExistedPerformers() {
-  QFile performersFi(SystemPath::PERFORMERS_TABLE_TXT);
+#ifdef _WIN32
+  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
+#else
+  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
+#endif
+
+  QFile performersFi(perfFilePath);
   if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("file[%s] not found. loadExistedPerformers abort", performersFi.fileName().toStdString().c_str());
     return {};
@@ -56,7 +62,7 @@ int PerformersStringParser::LearningFromAPath(const QString& path) {
   const int increCnt = int(m_performers.size()) - beforePerformersCnt;
   qDebug("Learn extra %d performers, now %u performers in total", increCnt, m_performers.size());
 
-  QFile performersFi(SystemPath::PERFORMERS_TABLE_TXT);
+  QFile performersFi(PROJECT_PATH + "/bin/PERFORMERS_TABLE.txt");
   if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qDebug("file cannot open. learned performers will not update to %s.", performersFi.fileName().toStdString().c_str());
   }
@@ -135,14 +141,13 @@ QStringList PerformersStringParser::FilterPerformersOut(const QStringList& words
   return performersList;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 
 int main(int argc, char* argv[]) {
   auto& performersIns = PerformersStringParser::getIns();
   //  performersIns.LearningFromAPath("E:/115/test");
-  const auto& wordsList =
-      performersIns.SplitSentence("Next Door Originals - Rivals Waiter vs Waiter - Theo Brady & Devin Franco flip-fuck BB 1080p");
+  const auto& wordsList = performersIns.SplitSentence("Next Door Originals - Rivals Waiter vs Waiter - Theo Brady & Devin Franco flip-fuck BB 1080p");
   const auto& perfsList = performersIns.FilterPerformersOut(wordsList);
   qDebug() << perfsList;
   return 0;

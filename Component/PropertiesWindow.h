@@ -7,6 +7,7 @@
 #include <QPlainTextEdit>
 #include <QToolBar>
 class PropertiesWindow : public QDialog {
+  Q_OBJECT
  public:
   explicit PropertiesWindow(const QStringList& items, QWidget* parent = nullptr);
   QSize sizeHint() const { return QSize(600, 400); }

@@ -1,8 +1,8 @@
 #ifndef JSONEDITOR_H
 #define JSONEDITOR_H
 
-#include <QDir>
-#include <QFile>
+#include "PublicVariable.h"
+
 #include <QFormLayout>
 #include <QKeyEvent>
 #include <QLabel>
@@ -15,7 +15,6 @@
 #include <QSplitter>
 #include <QTextEdit>
 #include <QWidget>
-#include "PublicVariable.h"
 
 #include <QVariantMap>
 
@@ -55,6 +54,9 @@ class JsonEditor : public QMainWindow {
   auto onPerformersHint() -> QStringList;
   auto onSelectedTextAppendToPerformers() -> bool;
 
+  void onEditAkaPerformer();
+  void onEditStudios();
+
   auto updateWindowsSize() -> void {
     if (PreferenceSettings().contains("JsonEditorGeometry")) {
       restoreGeometry(PreferenceSettings().value("JsonEditorGeometry").toByteArray());
@@ -87,6 +89,8 @@ class JsonEditor : public QMainWindow {
 
   QSplitter* m_editorAndListSplitter;
   QToolBar* m_editorToolBar;
+
+  QMenuBar* m_menuBar;
 
   QSet<QString> jsonKeySetMet;
 

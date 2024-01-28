@@ -13,7 +13,6 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
       FOLDER_MERGE(FolderMergeActions()),
       SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()),
 
-      PLAY_AG(GetPLAYActions()),
       OPEN_AG(GetOPENActions()),
       COPY_PATH(GetCOPY_PATHActions()),
       NEW(GetNEWActions()),
@@ -21,38 +20,15 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
 
       ADVANCE_SEARCH_RIBBON(Get_Advance_Search_Actions()) {}
 
-auto FileBasicOperationsActions::GetPLAYActions() -> QActionGroup* {
-  _VIDEO_PLAYER_EMBEDDED = new QAction(QIcon(":/themes/VIDEO_PLAYER"), "Play in embedded player");
-  _VIDEO_PLAYER_EMBEDDED->setShortcutVisibleInContextMenu(true);
-  _VIDEO_PLAYER_EMBEDDED->setToolTip(QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.")
-                                         .arg(_VIDEO_PLAYER_EMBEDDED->text(), _VIDEO_PLAYER_EMBEDDED->shortcut().toString()));
-
-  _PLAY_VIDEOS = new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), "Play");
-  _PLAY_VIDEOS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
-  _PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
-  _PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/>"
-                                   "Play the selected item(s) in default system player.")
-                               .arg(_PLAY_VIDEOS->text(), _PLAY_VIDEOS->shortcut().toString()));
-  QActionGroup* actionGroup = new QActionGroup(this);
-  actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
-  actionGroup->addAction(_PLAY_VIDEOS);
-  actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  for (QAction* act : actionGroup->actions()) {
-    act->setCheckable(false);
-  }
-  return actionGroup;
-}
-
 auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
-  _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in explorer");
+  _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"));
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
   _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer")
                                       .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
   _REVEAL_IN_EXPLORER->setCheckable(false);
 
-  _OPEN_IN_TERMINAL = new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), "Open in terminal");
+  _OPEN_IN_TERMINAL = new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), tr("Open in terminal"));
   _OPEN_IN_TERMINAL->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                         "Open current view path in terminal")
                                     .arg(_OPEN_IN_TERMINAL->text(), _OPEN_IN_TERMINAL->shortcut().toString()));
@@ -68,10 +44,10 @@ auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
 }
 
 auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
-  QAction* _NAME_STANDARDLIZER = new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), "Name Ruler");
-  QAction* _CLASSIFIER = new QAction(QIcon(":/themes/CATEGORIZER"), "Categorizer");
-  QAction* _ITEM_ORGANIZER = new QAction(QIcon(":/themes/ITEMS_ORGANIZER"), "Organizer");
-  QAction* _DUPLICATE_ITEMS_REMOVER = new QAction(QIcon(":/themes/DEDUPLICATE"), "Deduplicator");
+  QAction* _NAME_STANDARDLIZER = new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), tr("Name Ruler"));
+  QAction* _CLASSIFIER = new QAction(QIcon(":/themes/CATEGORIZER"), tr("Categorizer"));
+  QAction* _ITEM_ORGANIZER = new QAction(QIcon(":/themes/ITEMS_ORGANIZER"), tr("Organizer"));
+  QAction* _DUPLICATE_ITEMS_REMOVER = new QAction(QIcon(":/themes/DEDUPLICATE"), tr("Deduplicator"));
 
   _NAME_STANDARDLIZER->setToolTip(
       "<b>Rename</b><br/>"

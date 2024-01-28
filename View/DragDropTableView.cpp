@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
+#include "Actions/ViewActions.h"
 #include "PublicVariable.h"
 
 DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* mouseSideKeyBackwardBtn, QPushButton* mouseSideKeyForwardBtn)
@@ -31,7 +32,7 @@ void DragDropTableView::subscribe() {
           [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
 
   connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
-  addActions(g_fileBasicOperationsActions().PLAY_AG->actions());
+  addActions(g_viewActions()._VIDEO_PLAYERS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());

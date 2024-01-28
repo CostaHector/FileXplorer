@@ -27,9 +27,13 @@ class CustomStatusBar : public QStatusBar {
     process->setValue(0);
 
     tb->setIconSize(QSize(CustomStatusBar::STATUS_BAR_ICON_SIZE, CustomStatusBar::STATUS_BAR_ICON_SIZE));
-
-    m_clickMe->setText(QString("<a href=\"file:///%1\">click me</a>").arg(SystemPath::RUNLOGS));
-    m_clickMe->setToolTip("click me to see the logs. under path:\n" + SystemPath::RUNLOGS);
+#ifdef _WIN32
+    QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
+#else
+    QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
+#endif
+    m_clickMe->setText(QString("<a href=\"file:///%1\">click me</a>").arg(logPrePath));
+    m_clickMe->setToolTip("click me to see the logs. under path:\n" + logPrePath);
     m_clickMe->setOpenExternalLinks(true);
 
     // [QSizeGrip, Here is 1st~(n-1)th Widget, QHBoxLayout, here is nth widget];

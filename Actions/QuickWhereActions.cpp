@@ -12,8 +12,6 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
       CLEAR_ALL_WHERE(new QAction(QIcon(":/themes/CLEAR_VIDEOS_LIST"), "Clear", this)),
       AUTO_COMPLETE_AKA_SWITCH(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "Completer", this)),
       APPLY_AND_CLOSE(new QAction(QIcon(":/themes/SAVED"), "Apply", this)),
-      UPDATE_AKA(new QAction(QIcon(":/themes/RELOAD_JOSN_FROM_FILE"), "Update AKA", this)),
-      OPEN_AKA_TEXT(new QAction(QIcon(":/themes/EDIT_AKA_FILE"), "Edit AKA", this)),
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {
   m_historyWhereClauseMenu->setToolTipsVisible(true);
@@ -36,10 +34,6 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
   HIST_WHERE->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   HIST_WHERE->setMenu(m_historyWhereClauseMenu);
 
-  OPEN_AKA_TEXT->setToolTip("Open and edit AKA file");
-
-  m_whereClauseTB->addAction(OPEN_AKA_TEXT);
-  m_whereClauseTB->addAction(UPDATE_AKA);
   m_whereClauseTB->addAction(AUTO_COMPLETE_AKA_SWITCH);
   m_whereClauseTB->addSeparator();
   m_whereClauseTB->addAction(CLEAR_ALL_WHERE);
@@ -52,7 +46,6 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
 
   connect(CLEAR_ALL_WHERE, &QAction::triggered, this, &QuickWhereActions::onClauseClear);
   connect(AUTO_COMPLETE_AKA_SWITCH, &QAction::triggered, this, &QuickWhereActions::onAkaHint);
-  connect(OPEN_AKA_TEXT, &QAction::triggered, this, []() { QDesktopServices::openUrl(QUrl::fromLocalFile(SystemPath::AKA_PERFORMERS_TXT)); });
 }
 
 void QuickWhereActions::onClauseClear() {

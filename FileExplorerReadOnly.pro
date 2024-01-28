@@ -177,6 +177,13 @@ HEADERS += \
     View/SearchItemTableView.h \
     View/ViewHelper.h
 
+TRANSLATIONS += \
+    FileExplorerReadOnly_zh_CN.ts
+
+CONFIG += lupdate
+CONFIG += lrelease
+CONFIG += embed_translations
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -186,9 +193,12 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
-    bin/JsonExample/StudioName - Movie Name - Performer 1, Performer 2.json \
+    FileExplorerReadOnly_zh_CN.ts \
+    bin/AKA_PERFORMERS.txt \
+    bin/PERFORMERS_TABLE.txt \
     bin/PerformerHtmlTemplate.html \
-    bin/STANDARD_STUDIO_NAME_JSON.json \
+    bin/JsonExample/StudioName - Movie Name - Performer 1, Performer 2.json \
+    bin/STANDARD_STUDIO_NAME.txt \
     readme.md
 
 QMAKE_POST_LINK +=

@@ -17,6 +17,7 @@
 
 #include <QDockWidget>
 #include "FolderPreviewHTML.h"
+#include <QFileInfo>
 
 const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 
@@ -36,6 +37,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       m_videoPlayer(new VideoPlayer(this)),
       m_performerManager(nullptr),
       m_torrentsManager(nullptr) {
+  qDebug("FileExplorerReadOnly Current path [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
   QString initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
 

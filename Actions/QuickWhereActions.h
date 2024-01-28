@@ -26,9 +26,6 @@ class QuickWhereActions : public QObject {
   QAction* AUTO_COMPLETE_AKA_SWITCH;
   QAction* APPLY_AND_CLOSE;
 
-  QAction* UPDATE_AKA;
-  QAction* OPEN_AKA_TEXT;
-
   QMenu* m_historyWhereClauseMenu;
   QToolBar* m_whereClauseTB;
 
