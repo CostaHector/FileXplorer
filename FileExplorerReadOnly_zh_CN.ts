@@ -160,11 +160,11 @@
     </message>
     <message>
         <source>Merge into first folder</source>
-        <translation>合并到前者文件夹j中</translation>
+        <translation>合并到前者文件夹中</translation>
     </message>
     <message>
         <source>Merge into last folder</source>
-        <translation>合并到后者文件夹j中</translation>
+        <translation>合并到后者文件夹中</translation>
     </message>
     <message>
         <source>Advance search</source>
@@ -172,7 +172,7 @@
     </message>
     <message>
         <source>Play</source>
-        <translation>播放</translation>
+        <translation type="vanished">播放</translation>
     </message>
     <message>
         <source>Reveal in explorer</source>
@@ -300,6 +300,38 @@
         <source>Load jsons</source>
         <translation>载入jsons文件</translation>
     </message>
+    <message>
+        <source>Open</source>
+        <translation>打开Json</translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <source>Construct jsons</source>
+        <translation>构造json</translation>
+    </message>
+    <message>
+        <source>Add performers</source>
+        <translation>添加演员</translation>
+    </message>
+    <message>
+        <source>Set production studio</source>
+        <translation>设置厂家</translation>
+    </message>
+    <message>
+        <source>Add performer k-v pair</source>
+        <translation>添加演员k-v对</translation>
+    </message>
+    <message>
+        <source>Add production studio k-v pair</source>
+        <translation>添加厂家k-v对</translation>
+    </message>
+    <message>
+        <source>Clear performers and prod studio</source>
+        <translation>清理Json文件演员和厂家值</translation>
+    </message>
 </context>
 <context>
     <name>MD5Window</name>
@@ -398,10 +430,44 @@
     </message>
 </context>
 <context>
+    <name>RightClickMenuActions</name>
+    <message>
+        <source>MD5 (File Indentifier)</source>
+        <translation>哈希（身份）</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation>属性</translation>
+    </message>
+</context>
+<context>
     <name>VideoPlayerActions</name>
     <message>
         <source>Mute</source>
         <translation>静音</translation>
+    </message>
+</context>
+<context>
+    <name>ViewActions</name>
+    <message>
+        <source>Navigate pane</source>
+        <translation>导航面板</translation>
+    </message>
+    <message>
+        <source>HTML preview</source>
+        <translation>HTML预览</translation>
+    </message>
+    <message>
+        <source>Json editor</source>
+        <translation>Json编辑器</translation>
+    </message>
+    <message>
+        <source>Embedded player</source>
+        <translation>内置播放器</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">播放</translation>
     </message>
 </context>
 </TS>

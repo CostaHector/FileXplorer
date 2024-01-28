@@ -4,24 +4,24 @@
 #include <QMenu>
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
+#include "Actions/ViewActions.h"
 
 class RightClickMenu : public QMenu {
  public:
   QAction* MOVE_TO_TRASHBIN;
-  explicit RightClickMenu(const QString& title, QWidget* parent = nullptr) : QMenu(title, parent),
-        MOVE_TO_TRASHBIN(g_fileBasicOperationsActions().DELETE_ACTIONS->actions()[0]){
-
+  explicit RightClickMenu(const QString& title, QWidget* parent = nullptr)
+      : QMenu(title, parent), MOVE_TO_TRASHBIN(g_fileBasicOperationsActions().DELETE_ACTIONS->actions()[0]) {
     setToolTipsVisible(true);
 
     auto* NEW_MENU = GetNewMenu();
     auto* VIEW_MENU = GetViewMenu();
 
+    addActions(g_viewActions()._VIDEO_PLAYERS->actions());
     addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
     addSeparator();
     addActions(g_fileBasicOperationsActions().COPY_PATH->actions());
     addSeparator();
 
-    addSeparator();
     addMenu(NEW_MENU);
     addMenu(VIEW_MENU);
     addSeparator();

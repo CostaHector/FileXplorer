@@ -126,8 +126,6 @@ class FileBasicOperationsActions : public QObject {
     return actionGroup;
   }
 
-  auto GetPLAYActions() -> QActionGroup*;
-
   auto GetOPENActions() -> QActionGroup*;
   auto GetCOPY_PATHActions() -> QActionGroup* {
     QAction* COPY_FULL_PATH = new QAction(QIcon(":/themes/COPY_FULL_PATH"), tr("Copy fullpath"));
@@ -252,9 +250,6 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* CUT_COPY_MERGE_PASTE;
   QActionGroup* FOLDER_MERGE;
   QActionGroup* SELECTION_RIBBONS;
-
-  QAction* _PLAY_VIDEOS = nullptr;
-  QActionGroup* PLAY_AG;
 
   QAction *_REVEAL_IN_EXPLORER = nullptr, *_OPEN_IN_TERMINAL = nullptr;
   QActionGroup* OPEN_AG;

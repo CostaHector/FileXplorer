@@ -6,14 +6,17 @@
 #include "PublicVariable.h"
 
 class ViewActions : public QObject {
+  Q_OBJECT
  public:
   explicit ViewActions(QObject* parent = nullptr)
       : QObject{parent},
-        NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), "Navigate pane")},
-        PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), "HTML preview")},
-        JSON_EDITOR_PANE{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), "Json editor")},
-        _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":/themes/VIDEO_PLAYER"), "Embedded player")},
-        PANES_RIBBONS(Get_NAVIGATION_PANE_Actions()) {}
+        NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), tr("Navigate pane"))},
+        PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("HTML preview"))},
+        JSON_EDITOR_PANE{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), tr("Json editor"))},
+        _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":/themes/VIDEO_PLAYER"), tr("Embedded player"))},
+        PANES_RIBBONS(Get_NAVIGATION_PANE_Actions()),
+        _SYS_VIDEO_PLAYERS(new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
+        _VIDEO_PLAYERS(GetPlayersActions()) {}
 
   auto Get_NAVIGATION_PANE_Actions() -> QActionGroup* {
     NAVIGATION_PANE->setToolTip(
@@ -48,12 +51,31 @@ class ViewActions : public QObject {
     return actionGroup;
   }
 
+  QActionGroup* GetPlayersActions() {
+    _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
+    _SYS_VIDEO_PLAYERS->setShortcutVisibleInContextMenu(true);
+    _SYS_VIDEO_PLAYERS->setToolTip(QString("<b>%1 (%2)</b><br/>"
+                                           "Play the selected item(s) in default system player.")
+                                       .arg(_SYS_VIDEO_PLAYERS->text(), _SYS_VIDEO_PLAYERS->shortcut().toString()));
+    QActionGroup* actionGroup = new QActionGroup(this);
+    actionGroup->addAction(_SYS_VIDEO_PLAYERS);
+    actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
+    actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
+
+    for (QAction* act : actionGroup->actions()) {
+      act->setCheckable(false);
+    }
+    return actionGroup;
+  }
+
   QAction* NAVIGATION_PANE = nullptr;
   QAction* PREVIEW_PANE_HTML = nullptr;
   QAction* JSON_EDITOR_PANE = nullptr;
   QAction* _VIDEO_PLAYER_EMBEDDED = nullptr;
-
   QActionGroup* PANES_RIBBONS;
+
+  QAction* _SYS_VIDEO_PLAYERS = nullptr;
+  QActionGroup* _VIDEO_PLAYERS;
 };
 
 ViewActions& g_viewActions();

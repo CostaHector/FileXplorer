@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QAction>
-class RightClickMenuActions : public QObject
-{
+class RightClickMenuActions : public QObject {
+  Q_OBJECT
  public:
   explicit RightClickMenuActions(QObject *parent = nullptr);
 
