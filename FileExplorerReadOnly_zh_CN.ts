@@ -152,11 +152,11 @@
     </message>
     <message>
         <source>Batch New Files</source>
-        <translation>批量新建文件</translation>
+        <translation type="vanished">批量新建文件</translation>
     </message>
     <message>
         <source>Batch New Folders</source>
-        <translation>批量新建文件夹</translation>
+        <translation type="vanished">批量新建文件夹</translation>
     </message>
     <message>
         <source>Merge into first folder</source>
@@ -197,6 +197,14 @@
     <message>
         <source>Deduplicator</source>
         <translation>去重器</translation>
+    </message>
+    <message>
+        <source>New Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Folders</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

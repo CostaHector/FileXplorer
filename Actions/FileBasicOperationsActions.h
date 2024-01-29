@@ -184,13 +184,13 @@ class FileBasicOperationsActions : public QObject {
         QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
     NEW_JSON_FILE->setCheckable(false);
 
-    QAction* BATCH_NEW_FILES = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), tr("Batch New Files"));
+    QAction* BATCH_NEW_FILES = new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), tr("New Files"));
     BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
                                 "Create a batch of files by specified pattern.<br/>"
                                 "e.g. Given pattern:<br/>"
                                 "\"Page %03d.txt$1$10\"<br/>"
                                 "it will create ten text documents numbered by Page 001,002,...,009 respectively.");
-    QAction* BATCH_NEW_FOLDERS = new QAction(QIcon(":/themes/NEW_FOLDERS"), tr("Batch New Folders"));
+    QAction* BATCH_NEW_FOLDERS = new QAction(QIcon(":/themes/NEW_FOLDERS"), tr("New Folders"));
     BATCH_NEW_FOLDERS->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FOLDERS->text(), BATCH_NEW_FOLDERS->shortcut().toString()) +
                                   "Create a batch of folders by specified pattern.<br/>"
                                   "e.g. Given pattern:<br/>"

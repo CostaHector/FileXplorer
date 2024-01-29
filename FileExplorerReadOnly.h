@@ -50,7 +50,7 @@ class FileExplorerReadOnly : public QMainWindow {
   ContentPanel* m_fsPanel;
   DatabasePanel* m_dbPanel;
   QStackedWidget* stackCentralWidget;
-  NavigationToolBar* _navigationToolBar;
+  NavigationToolBar* m_navigationToolBar;
   RibbonMenu* osm;
   CustomStatusBar* _statusBar;
 
