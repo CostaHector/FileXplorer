@@ -7,6 +7,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _EDIT_STUDIOS(new QAction(tr("Edit Studios"), this)),
       _RELOAD_STUDIOS(new QAction(tr("Reload Studios"), this)),
 
+      _EDIT_PERFS(new QAction(tr("Edit Performers"), this)),
+      _RELOAD_PERFS(new QAction(tr("Reload Performers"), this)),
+
       _RELOAD_PERF_AKA(new QAction(tr("Reload AKA"), this)),
       _EDIT_PERF_AKA(new QAction(QIcon(":/themes/EDIT_AKA_FILE"), tr("Edit AKA"), this)),
 
