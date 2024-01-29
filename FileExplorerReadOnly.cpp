@@ -16,8 +16,8 @@
 #include "PublicVariable.h"
 
 #include <QDockWidget>
-#include "FolderPreviewHTML.h"
 #include <QFileInfo>
+#include "FolderPreviewHTML.h"
 
 const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 
@@ -30,7 +30,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       m_fsPanel(nullptr),
       m_dbPanel(nullptr),
       stackCentralWidget(new QStackedWidget(this)),
-      _navigationToolBar(new NavigationToolBar),
+      m_navigationToolBar(new NavigationToolBar),
       osm(new RibbonMenu),
       _statusBar(new CustomStatusBar),
       m_jsonEditor(new JsonEditor(this)),
@@ -54,7 +54,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
   previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
 
-  addToolBar(Qt::ToolBarArea::LeftToolBarArea, _navigationToolBar);
+  addToolBar(Qt::ToolBarArea::LeftToolBarArea, m_navigationToolBar);
   setMenuWidget(osm);
   setStatusBar(_statusBar);
   subscribe();
@@ -107,12 +107,12 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
 #include <functional>
 
 void FileExplorerReadOnly::subscribe() {
-  if (_navigationToolBar and m_fsPanel) {
+  if (m_navigationToolBar and m_fsPanel) {
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
     auto intoNewPath = std::bind(&ContentPanel::IntoNewPath, m_fsPanel, _1, _2, _3);
-    _navigationToolBar->subscribe(intoNewPath);
+    m_navigationToolBar->subscribe(intoNewPath);
   }
 }
 
@@ -127,23 +127,19 @@ void FileExplorerReadOnly::SwitchStackWidget() {
 
 void FileExplorerReadOnly::InitComponentVisibility() {
   if (not PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()) {
-    _navigationToolBar->setVisible(false);
+    m_navigationToolBar->setVisible(false);
   }
 
   const bool showDB = PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool();
   if (showDB or not PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool()) {
     previewHtmlDock->setVisible(false);
   }
-
-  // floating out window
-  m_jsonEditor->setVisible(
-      PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name, MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.v).toBool());
 }
 
 void FileExplorerReadOnly::UpdateComponentVisibility() {
   const auto b1 = PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool();
-  if (_navigationToolBar->isVisible() != b1) {
-    _navigationToolBar->setVisible(b1);
+  if (m_navigationToolBar->isVisible() != b1) {
+    m_navigationToolBar->setVisible(b1);
   }
 
   const bool showDB = PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool();
@@ -151,10 +147,5 @@ void FileExplorerReadOnly::UpdateComponentVisibility() {
   const bool shouldShow = not showDB and b2;
   if (previewHtmlDock->isVisible() != shouldShow) {
     previewHtmlDock->setVisible(b2);
-  }
-
-  const auto b3 = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.name, MemoryKey::SHOW_FOLDER_PREVIEW_JSON_EDITOR.v).toBool();
-  if (m_jsonEditor->isVisible() != b3) {
-    m_jsonEditor->setVisible(b3);
   }
 }
