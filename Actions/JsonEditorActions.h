@@ -13,6 +13,9 @@ class JsonEditorActions : public QObject {
   QAction* _EDIT_STUDIOS;
   QAction* _RELOAD_STUDIOS;
 
+  QAction* _EDIT_PERFS;
+  QAction* _RELOAD_PERFS;
+
   QAction* _RELOAD_PERF_AKA;
   QAction* _EDIT_PERF_AKA;
 

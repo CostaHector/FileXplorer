@@ -54,6 +54,9 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_menuBar->addMenu(productionStudioMenu);
 
   QMenu* performerMenu = new QMenu("Performer", m_menuBar);
+  performerMenu->addAction(g_jsonEditorActions()._EDIT_PERFS);
+  performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERFS);
+  performerMenu->addSeparator();
   performerMenu->addAction(g_jsonEditorActions()._EDIT_PERF_AKA);
   performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERF_AKA);
   m_menuBar->addMenu(performerMenu);
@@ -286,6 +289,8 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
+
+  connect(g_jsonEditorActions()._EDIT_PERFS, &QAction::triggered, this, &JsonEditor::onEditPerformers);
 
   connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, &JsonEditor::onEditAkaPerformer);
   connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
@@ -567,6 +572,21 @@ bool JsonEditor::onSelectedTextAppendToPerformers() {
   perfs.removeDuplicates();
   p->setText(perfs.join(", "));
   return true;
+}
+
+void JsonEditor::onEditPerformers() {
+#ifdef _WIN32
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
+#else
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
+#endif
+  if (not QFile::exists(fileAbsPath)) {
+    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
+    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    return;
+  }
+  QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
+  Notificator::information("Work after reopen", "changes not work now");
 }
 
 void JsonEditor::onEditAkaPerformer() {
