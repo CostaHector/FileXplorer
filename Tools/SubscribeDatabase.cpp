@@ -3,7 +3,7 @@
 #include "Actions/PerformersManagerActions.h"
 #include "Actions/TorrentsManagerActions.h"
 
-#include "Component/PerformersManagerWidget.h"
+#include "Component/PerformersWidget.h"
 #include "Component/TorrentsManagerWidget.h"
 #include "PublicVariable.h"
 
@@ -37,7 +37,7 @@ auto SubscribeDatabase::onShowOrCloseDatabase(const bool isVisible) -> void {
 auto SubscribeDatabase::onShowOrHidePerformerManger(const bool isVisible) -> void {
   PreferenceSettings().setValue(MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.name, isVisible);
   if (!performerManager) {
-    performerManager = new PerformersManagerWidget(this->view);
+    performerManager = new PerformersWidget(this->view);
   }
   performerManager->setVisible(isVisible);
 }

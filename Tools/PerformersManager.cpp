@@ -1,16 +1,22 @@
-#include "PerformersStringParser.h"
+#include "PerformersManager.h"
 #include "PublicVariable.h"
 #include "Tools/JsonFileHelper.h"
 
 #include <QDir>
 #include <QDirIterator>
 
-PerformersStringParser::PerformersStringParser() : m_performers(loadExistedPerformers()), perfsCompleter(m_performers.values()) {
+PerformersManager::PerformersManager() : m_performers(ReadOutPerformers()), perfsCompleter(m_performers.values()) {
   perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
   perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
 }
 
-QSet<QString> PerformersStringParser::loadExistedPerformers() {
+PerformersManager& PerformersManager::getIns() {
+  static PerformersManager ins;
+  qDebug("PerformersManager::getIns()");
+  return ins;
+}
+
+QSet<QString> PerformersManager::ReadOutPerformers() {
 #ifdef _WIN32
   const QString& perfFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
 #else
@@ -19,24 +25,32 @@ QSet<QString> PerformersStringParser::loadExistedPerformers() {
 
   QFile performersFi(perfFilePath);
   if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("file[%s] not found. loadExistedPerformers abort", performersFi.fileName().toStdString().c_str());
+    qDebug("file[%s] not found.", performersFi.fileName().toStdString().c_str());
     return {};
   }
   QTextStream stream(&performersFi);
   stream.setCodec("UTF-8");
-  QSet<QString> st;
+  decltype(m_performers) perfSet;
   while (not stream.atEnd()) {
-    st.insert(stream.readLine().toLower());
+    perfSet.insert(stream.readLine().toLower());
   }
-  if (st.contains("")) {
-    st.remove("");
+  if (perfSet.contains("")) {
+    perfSet.remove("");
   }
   performersFi.close();
-  qDebug("Load %d performers succeed", st.size());
-  return st;
+  qDebug("%d performers read out", perfSet.size());
+  return perfSet;
 }
 
-int PerformersStringParser::LearningFromAPath(const QString& path) {
+int PerformersManager::ForceReloadPerformers() {
+  int beforeStudioNameCnt = m_performers.size();
+  m_performers = PerformersManager::ReadOutPerformers();
+  int afterStudioNameCnt = m_performers.size();
+  qDebug("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
+  return afterStudioNameCnt - beforeStudioNameCnt;
+}
+
+int PerformersManager::LearningFromAPath(const QString& path) {
   if (not QDir(path).exists()) {
     return 0;
   }
@@ -74,13 +88,7 @@ int PerformersStringParser::LearningFromAPath(const QString& path) {
   return increCnt;
 }
 
-PerformersStringParser& PerformersStringParser::getIns() {
-  static PerformersStringParser ins;
-  qDebug("PerformersManager::getIns()");
-  return ins;
-}
-
-QStringList PerformersStringParser::SplitSentence(QString sentence) {
+QStringList PerformersManager::SplitSentence(QString sentence) {
   if (sentence.isEmpty()) {
     return {};
   }
@@ -91,7 +99,7 @@ QStringList PerformersStringParser::SplitSentence(QString sentence) {
   return sentence.split(CONTINOUS_SPACE);
 }
 
-auto PerformersStringParser::RmvBelongLetter(const QString& word) -> QString {
+auto PerformersManager::RmvBelongLetter(const QString& word) -> QString {
   QString s = word.trimmed();
   if (s.endsWith("'s")) {
     s.chop(2);
@@ -101,7 +109,7 @@ auto PerformersStringParser::RmvBelongLetter(const QString& word) -> QString {
   return s;
 };
 
-QStringList PerformersStringParser::FilterPerformersOut(const QStringList& words) const {
+QStringList PerformersManager::FilterPerformersOut(const QStringList& words) const {
   if (words.isEmpty()) {
     return {};
   }
