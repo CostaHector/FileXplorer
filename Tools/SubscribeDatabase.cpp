@@ -12,6 +12,11 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+SubscribeDatabase::SubscribeDatabase(QTableView* view_, T_SwitchStackWidget switchStackWidget_)
+    : QObject(), view(view_), switchStackWidget(switchStackWidget_), performerManager(nullptr), torrentsManager(nullptr) {
+  this->subscribe();
+}
+
 void SubscribeDatabase::subscribe() {
   connect(g_dbAct().DB_VIEW_CLOSE_SHOW, &QAction::triggered, this, &SubscribeDatabase::onShowOrCloseDatabase);
   connect(g_performersManagerActions().SHOW_PERFORMER_MANAGER, &QAction::triggered, this, &SubscribeDatabase::onShowOrHidePerformerManger);

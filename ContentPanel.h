@@ -60,6 +60,8 @@ class ContentPanel : public QWidget {
   FolderPreviewHTML* previewHtml;
   FolderPreviewWidget* previewWidget;
   CustomStatusBar* logger;
+
+  QWidget* m_parent;
 };
 
 #endif  // CONTENTPANEL_H

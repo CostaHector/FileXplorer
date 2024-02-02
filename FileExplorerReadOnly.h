@@ -8,8 +8,6 @@
 #include <QStackedWidget>
 
 #include "Component/CustomStatusBar.h"
-#include "Component/JsonEditor.h"
-#include "Component/VideoPlayer.h"
 #include "ContentPanel.h"
 #include "NavigationToolBar.h"
 #include "RibbonMenu.h"
@@ -53,11 +51,5 @@ class FileExplorerReadOnly : public QMainWindow {
   NavigationToolBar* m_navigationToolBar;
   RibbonMenu* osm;
   CustomStatusBar* _statusBar;
-
-  JsonEditor* m_jsonEditor;
-  VideoPlayer* m_videoPlayer;
-
-  QWidget* m_performerManager;
-  QWidget* m_torrentsManager;
 };
 #endif  // FILEEXPLORERREADONLY_H
