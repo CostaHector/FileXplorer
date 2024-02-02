@@ -1,23 +1,13 @@
 #include "FileExplorerReadOnly.h"
 
-#include <QAction>
-#include <QLineEdit>
-
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-
-#include <QTableView>
-
-#include <QMap>
 #include <QString>
-#include <QVector>
-
-#include <QFileInfo>
-#include "PublicVariable.h"
 
 #include <QDockWidget>
 #include <QFileInfo>
+#include <functional>
+
 #include "FolderPreviewHTML.h"
+#include "PublicVariable.h"
 
 const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 
@@ -32,16 +22,12 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       stackCentralWidget(new QStackedWidget(this)),
       m_navigationToolBar(new NavigationToolBar),
       osm(new RibbonMenu),
-      _statusBar(new CustomStatusBar),
-      m_jsonEditor(new JsonEditor(this)),
-      m_videoPlayer(new VideoPlayer(this)),
-      m_performerManager(nullptr),
-      m_torrentsManager(nullptr) {
+      _statusBar(new CustomStatusBar) {
   qDebug("FileExplorerReadOnly Current path [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
   QString initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
 
-  m_fsPanel = new ContentPanel(nullptr, defaultPath, previewHtml, nullptr, _statusBar);
+  m_fsPanel = new ContentPanel(this, defaultPath, previewHtml, nullptr, _statusBar);
   m_dbPanel = new DatabasePanel;
 
   stackCentralWidget->addWidget(m_fsPanel);
@@ -104,8 +90,6 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
   return openPath;
 }
 
-#include <functional>
-
 void FileExplorerReadOnly::subscribe() {
   if (m_navigationToolBar and m_fsPanel) {
     using std::placeholders::_1;
@@ -126,26 +110,27 @@ void FileExplorerReadOnly::SwitchStackWidget() {
 }
 
 void FileExplorerReadOnly::InitComponentVisibility() {
-  if (not PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()) {
+  const bool showNavi =
+      PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool();
+  if (not showNavi) {
     m_navigationToolBar->setVisible(false);
   }
 
   const bool showDB = PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool();
-  if (showDB or not PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool()) {
+  const bool showFolderPrev = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool();
+  const bool showPrev = not showDB and showFolderPrev;
+  if (not showPrev) {
     previewHtmlDock->setVisible(false);
   }
 }
 
 void FileExplorerReadOnly::UpdateComponentVisibility() {
-  const auto b1 = PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool();
-  if (m_navigationToolBar->isVisible() != b1) {
-    m_navigationToolBar->setVisible(b1);
-  }
+  const bool showNavi =
+      PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool();
+  m_navigationToolBar->setVisible(showNavi);
 
   const bool showDB = PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool();
-  const auto b2 = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool();
-  const bool shouldShow = not showDB and b2;
-  if (previewHtmlDock->isVisible() != shouldShow) {
-    previewHtmlDock->setVisible(b2);
-  }
+  const bool showFolderPrev = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool();
+  const bool showPrev = not showDB and showFolderPrev;
+  previewHtmlDock->setVisible(showPrev);
 }
