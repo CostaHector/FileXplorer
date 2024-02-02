@@ -5,9 +5,9 @@
 #include "Component/NotificatorFrame.h"
 #include "Component/ProductionStudioManager.h"
 
-#include "Tools/DBTableMoviesHelper.h"
 #include "Tools/JsonFileHelper.h"
-#include "Tools/PerformersStringParser.h"
+#include "Tools/PerformersAkaManager.h"
+#include "Tools/PerformersManager.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -291,18 +291,24 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 
   connect(g_jsonEditorActions()._EDIT_PERFS, &QAction::triggered, this, &JsonEditor::onEditPerformers);
+  connect(g_jsonEditorActions()._RELOAD_PERFS, &QAction::triggered, this, []() {
+    static auto& pm = PerformersManager::getIns();
+    int itemsCntChanged = pm.ForceReloadPerformers();
+    Notificator::information("Reload performers", QString("+/- %1 item(s)").arg(itemsCntChanged));
+  });
 
   connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, &JsonEditor::onEditAkaPerformer);
   connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
-    auto ret = DBTableMoviesHelper::UpdateAKAHash(true);
-    qDebug("Update AKA %d item(s) added", ret);
-    Notificator::information("Update AKA", QString("%1 item(s) added").arg(ret));
+    static auto& dbTM = PerformersAkaManager::getIns();
+    int itemsCntChanged = dbTM.ForceReloadAkaName();
+    Notificator::information("Reload AKA", QString("+/- %1 item(s)").arg(itemsCntChanged));
   });
 
   connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, &JsonEditor::onEditStudios);
   connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
-    qDebug("TODO, please reopen it to update");
-    Notificator::warning("TODO", "please reopen it to update");
+    static auto& psm = ProductionStudioManager::getIns();
+    int itemsCntChanged = psm.ForceReloadStdStudioName();
+    Notificator::information("Reload standard studio name", QString("+/- %1 items").arg(itemsCntChanged));
   });
 }
 
@@ -490,7 +496,7 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
 
-  static PerformersStringParser& pm = PerformersStringParser::getIns();
+  static PerformersManager& pm = PerformersManager::getIns();
   const int newLearnedCnt = pm.LearningFromAPath(loadFromFi.absoluteFilePath());
 
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
@@ -504,7 +510,7 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
 }
 
 QStringList JsonEditor::onPerformersHint() {
-  static PerformersStringParser& pm = PerformersStringParser::getIns();
+  static PerformersManager& pm = PerformersManager::getIns();
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
 
   QString nameText;
@@ -545,7 +551,7 @@ QStringList JsonEditor::onPerformersHint() {
 }
 
 bool JsonEditor::onSelectedTextAppendToPerformers() {
-  static PerformersStringParser& pm = PerformersStringParser::getIns();
+  static PerformersManager& pm = PerformersManager::getIns();
 
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
     jsonKeySetMet.insert(JSONKey::Performers);
@@ -586,7 +592,7 @@ void JsonEditor::onEditPerformers() {
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Work after reopen", "changes not work now");
+  Notificator::information("Remember to reload", "don't forget it");
 }
 
 void JsonEditor::onEditAkaPerformer() {

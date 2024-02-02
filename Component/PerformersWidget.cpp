@@ -1,10 +1,10 @@
-#include "PerformersManagerWidget.h"
+#include "PerformersWidget.h"
 
 #include "Actions/PerformersManagerActions.h"
 #include "Component/RatingSqlTableModel.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
-#include "Tools/DBTableMoviesHelper.h"
+#include "Tools/PerformersAkaManager.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 
@@ -20,7 +20,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
-PerformersManagerWidget::PerformersManagerWidget(QWidget* parent)
+PerformersWidget::PerformersWidget(QWidget* parent)
     : QMainWindow{parent},
       m_performersListView(new QTableView),
       m_introductionTextEdit(new PerformersPreviewTextBrowser),
@@ -83,7 +83,7 @@ PerformersManagerWidget::PerformersManagerWidget(QWidget* parent)
   updateWindowsSize();
 }
 
-void PerformersManagerWidget::subscribe() {
+void PerformersWidget::subscribe() {
   connect(g_performersManagerActions().OPEN_WITH_LOCAL_APP, &QAction::triggered, this, [this]() {
     if (not QFile::exists(SystemPath::PEFORMERS_DATABASE)) {
       QMessageBox::information(this, "open failed", QString("[%1] not exists. \nCreate it first").arg(SystemPath::PEFORMERS_DATABASE));
@@ -92,33 +92,33 @@ void PerformersManagerWidget::subscribe() {
     QDesktopServices::openUrl(QUrl::fromLocalFile(SystemPath::PEFORMERS_DATABASE));
   });
 
-  connect(g_performersManagerActions().INIT_DATABASE, &QAction::triggered, this, &PerformersManagerWidget::onInitDataBase);
-  connect(g_performersManagerActions().INIT_TABLE, &QAction::triggered, this, &PerformersManagerWidget::onInitATable);
-  connect(g_performersManagerActions().INSERT_INTO_TABLE, &QAction::triggered, this, &PerformersManagerWidget::onInsertIntoTable);
+  connect(g_performersManagerActions().INIT_DATABASE, &QAction::triggered, this, &PerformersWidget::onInitDataBase);
+  connect(g_performersManagerActions().INIT_TABLE, &QAction::triggered, this, &PerformersWidget::onInitATable);
+  connect(g_performersManagerActions().INSERT_INTO_TABLE, &QAction::triggered, this, &PerformersWidget::onInsertIntoTable);
   connect(g_performersManagerActions().DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DROP_OR_DELETE::DROP); });
   connect(g_performersManagerActions().DELETE_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DROP_OR_DELETE::DELETE); });
 
-  connect(g_performersManagerActions().SUBMIT, &QAction::triggered, this, &PerformersManagerWidget::onSubmit);
+  connect(g_performersManagerActions().SUBMIT, &QAction::triggered, this, &PerformersWidget::onSubmit);
 
-  connect(g_performersManagerActions().LOCATE_IMAGEHOST, &QAction::triggered, this, &PerformersManagerWidget::onLocateImageHost);
+  connect(g_performersManagerActions().LOCATE_IMAGEHOST, &QAction::triggered, this, &PerformersWidget::onLocateImageHost);
 
   connect(g_performersManagerActions().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT, &QAction::triggered, this,
-          &PerformersManagerWidget::onChangePerformerImageHeight);
+          &PerformersWidget::onChangePerformerImageHeight);
 
-  connect(g_performersManagerActions().COLUMNS_VISIBILITY, &QAction::triggered, this, &PerformersManagerWidget::onShowHideColumn);
+  connect(g_performersManagerActions().COLUMNS_VISIBILITY, &QAction::triggered, this, &PerformersWidget::onShowHideColumn);
 
   connect(g_performersManagerActions().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this,
-          &PerformersManagerWidget::onLoadFromFileSystemStructure);
-  connect(g_performersManagerActions().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &PerformersManagerWidget::onLoadFromPerformersList);
-  connect(g_performersManagerActions().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &PerformersManagerWidget::onLoadFromPJsonDirectory);
+          &PerformersWidget::onLoadFromFileSystemStructure);
+  connect(g_performersManagerActions().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &PerformersWidget::onLoadFromPerformersList);
+  connect(g_performersManagerActions().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &PerformersWidget::onLoadFromPJsonDirectory);
 
-  connect(g_performersManagerActions().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersManagerWidget::onDumpAllIntoPJsonFile);
+  connect(g_performersManagerActions().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpAllIntoPJsonFile);
   connect(g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this,
-          &PerformersManagerWidget::onDumpIntoPJsonFile);
+          &PerformersWidget::onDumpIntoPJsonFile);
 
-  connect(g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &PerformersManagerWidget::onOpenRecordInFileSystem);
+  connect(g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &PerformersWidget::onOpenRecordInFileSystem);
 
-  connect(m_performersListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PerformersManagerWidget::on_selectionChanged);
+  connect(m_performersListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PerformersWidget::on_selectionChanged);
 
   connect(m_performersListView, &QListView::customContextMenuRequested, this, [this](const QPoint pnt) {
     m_performerTableMenu->popup(m_performersListView->mapToGlobal(pnt));  // or QCursor::pos()
@@ -132,28 +132,28 @@ void PerformersManagerWidget::subscribe() {
     m_horizontalHeaderMenu->popup(m_performersListView->mapToGlobal(pnt));
   });
 
-  connect(g_performersManagerActions().DELETE_RECORDS, &QAction::triggered, this, &PerformersManagerWidget::onDeleteRecords);
+  connect(g_performersManagerActions().DELETE_RECORDS, &QAction::triggered, this, &PerformersWidget::onDeleteRecords);
 
-  connect(g_performersManagerActions().HIDE_THIS_COLUMN, &QAction::triggered, this, &PerformersManagerWidget::onHideThisColumn);
-  connect(g_performersManagerActions().SHOW_ALL_COLUMNS, &QAction::triggered, this, &PerformersManagerWidget::onShowAllColumn);
+  connect(g_performersManagerActions().HIDE_THIS_COLUMN, &QAction::triggered, this, &PerformersWidget::onHideThisColumn);
+  connect(g_performersManagerActions().SHOW_ALL_COLUMNS, &QAction::triggered, this, &PerformersWidget::onShowAllColumn);
 
-  connect(g_performersManagerActions().STRETCH_DETAIL_SECTION, &QAction::triggered, this, &PerformersManagerWidget::onStretchLastSection);
-  connect(g_performersManagerActions().RESIZE_ROWS_TO_CONTENT, &QAction::triggered, this, &PerformersManagerWidget::onResizeRowToContents);
+  connect(g_performersManagerActions().STRETCH_DETAIL_SECTION, &QAction::triggered, this, &PerformersWidget::onStretchLastSection);
+  connect(g_performersManagerActions().RESIZE_ROWS_TO_CONTENT, &QAction::triggered, this, &PerformersWidget::onResizeRowToContents);
   connect(g_performersManagerActions().RESIZE_ROWS_DEFAULT_SECTION_SIZE, &QAction::triggered, this,
-          &PerformersManagerWidget::onResizeRowDefaultSectionSize);
+          &PerformersWidget::onResizeRowDefaultSectionSize);
 
-  connect(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersManagerWidget::onForceRefreshRecordsVids);
-  connect(g_performersManagerActions().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersManagerWidget::onForceRefreshAllRecordsVids);
+  connect(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshRecordsVids);
+  connect(g_performersManagerActions().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshAllRecordsVids);
 }
 
-auto PerformersManagerWidget::closeEvent(QCloseEvent* event) -> void {
+auto PerformersWidget::closeEvent(QCloseEvent* event) -> void {
   PreferenceSettings().setValue("PerformersManagerWidgetGeometry", saveGeometry());
   PreferenceSettings().setValue("PerformersManagerWidgetDockerWidth", m_performersListView->width());
   PreferenceSettings().setValue("PerformersManagerWidgetDockerHeight", m_performersListView->height());
   QMainWindow::closeEvent(event);
 }
 
-void PerformersManagerWidget::updateWindowsSize() {
+void PerformersWidget::updateWindowsSize() {
   if (PreferenceSettings().contains("PerformersManagerWidgetGeometry")) {
     restoreGeometry(PreferenceSettings().value("PerformersManagerWidgetGeometry").toByteArray());
   } else {
@@ -161,7 +161,7 @@ void PerformersManagerWidget::updateWindowsSize() {
   }
 }
 
-QSqlDatabase PerformersManagerWidget::GetSqlDB() const {
+QSqlDatabase PerformersWidget::GetSqlDB() const {
   QSqlDatabase con;
   if (QSqlDatabase::connectionNames().contains("perfs_connection")) {
     con = QSqlDatabase::database("perfs_connection", false);
@@ -175,7 +175,7 @@ QSqlDatabase PerformersManagerWidget::GetSqlDB() const {
   return con;
 }
 
-bool PerformersManagerWidget::onInitDataBase() {
+bool PerformersWidget::onInitDataBase() {
   QSqlDatabase con = GetSqlDB();
   if (not con.isOpen()) {
     qDebug("con cannot open");
@@ -185,7 +185,7 @@ bool PerformersManagerWidget::onInitDataBase() {
   return true;
 }
 
-void PerformersManagerWidget::onInitATable() {
+void PerformersWidget::onInitATable() {
   QSqlDatabase con = GetSqlDB();
   if (not con.isOpen()) {
     qDebug("con cannot open");
@@ -210,7 +210,7 @@ void PerformersManagerWidget::onInitATable() {
   qDebug("Table create succeed");
 }
 
-bool PerformersManagerWidget::onInsertIntoTable() {
+bool PerformersWidget::onInsertIntoTable() {
   QSqlDatabase con = GetSqlDB();
   if (not con.isOpen()) {
     qDebug("con cannot open");
@@ -242,7 +242,7 @@ bool PerformersManagerWidget::onInsertIntoTable() {
   return true;
 }
 
-bool PerformersManagerWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelete) {
+bool PerformersWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelete) {
   QString sqlCmd;
   switch (dropOrDelete) {
     case DROP_OR_DELETE::DROP:
@@ -281,7 +281,7 @@ bool PerformersManagerWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelet
   return dropTableRet;
 }
 
-int PerformersManagerWidget::onLoadFromFileSystemStructure() {
+int PerformersWidget::onLoadFromFileSystemStructure() {
   if (not QDir(m_imageHostPath).exists()) {
     QMessageBox::warning(this, "Path[file-system structure] not exist", m_imageHostPath);
     qDebug("file-system structure [%s] not exists", qPrintable(m_imageHostPath));
@@ -350,7 +350,7 @@ int PerformersManagerWidget::onLoadFromFileSystemStructure() {
   return 0;
 }
 
-int PerformersManagerWidget::onLoadFromPerformersList() {
+int PerformersWidget::onLoadFromPerformersList() {
   bool ok = false;
   const QString& perfsText =
       QInputDialog::getMultiLineText(this, "Performers List", "Example:\nA(a1, a2)\r\nB(b1, b2))\n...\nseperated by \\r\\n.", "", &ok);
@@ -399,7 +399,7 @@ int PerformersManagerWidget::onLoadFromPerformersList() {
   return perfs.size();
 }
 
-bool PerformersManagerWidget::onLocateImageHost() {
+bool PerformersWidget::onLocateImageHost() {
   const QString& locatePath = QFileDialog::getExistingDirectory(this, "Locate imagehost folder", m_imageHostPath);
   if (not QFile::exists(locatePath)) {
     qDebug("locate path not exist");
@@ -410,7 +410,7 @@ bool PerformersManagerWidget::onLocateImageHost() {
   return true;
 }
 
-bool PerformersManagerWidget::onChangePerformerImageHeight() {
+bool PerformersWidget::onChangePerformerImageHeight() {
   bool ok = false;
   int height = QInputDialog::getInt(this, "Performer image height(px)", QString("default: %1").arg(m_performerImageHeight), m_performerImageHeight, 0,
                                     INT_MAX, 1, &ok);
@@ -423,7 +423,7 @@ bool PerformersManagerWidget::onChangePerformerImageHeight() {
   return true;
 }
 
-bool PerformersManagerWidget::ShowOrHideColumnCore() {
+bool PerformersWidget::ShowOrHideColumnCore() {
   if (not m_performersListView) {
     return false;
   }
@@ -435,7 +435,7 @@ bool PerformersManagerWidget::ShowOrHideColumnCore() {
   return true;
 }
 
-bool PerformersManagerWidget::onShowHideColumn() {
+bool PerformersWidget::onShowHideColumn() {
   bool ok = false;
   const QString& showHideSwitchArray = QInputDialog::getText(
       this, "Performer table column visibility(0:hide, 1:show)",
@@ -453,7 +453,7 @@ bool PerformersManagerWidget::onShowHideColumn() {
   return true;
 }
 
-inline bool PerformersManagerWidget::onSubmit() {
+inline bool PerformersWidget::onSubmit() {
   if (not m_perfsDBModel->isDirty()) {
     qDebug("No need to submit");
     return true;
@@ -461,7 +461,7 @@ inline bool PerformersManagerWidget::onSubmit() {
   return m_perfsDBModel->submitAll();
 }
 
-bool PerformersManagerWidget::on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
+bool PerformersWidget::on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
   if (not m_performersListView->currentIndex().isValid()) {
     m_introductionTextEdit->setText("");
     return true;
@@ -471,7 +471,7 @@ bool PerformersManagerWidget::on_selectionChanged(const QItemSelection& selected
   return true;
 }
 
-int PerformersManagerWidget::onLoadFromPJsonDirectory() {
+int PerformersWidget::onLoadFromPJsonDirectory() {
   if (not QDir(m_imageHostPath).exists()) {
     QMessageBox::warning(this, "Path[pjson load from] not exist", m_imageHostPath);
     qDebug("*.pjson path load from [%s] not exists", qPrintable(m_imageHostPath));
@@ -514,7 +514,7 @@ int PerformersManagerWidget::onLoadFromPJsonDirectory() {
   return 0;
 }
 
-int PerformersManagerWidget::onDumpAllIntoPJsonFile() {
+int PerformersWidget::onDumpAllIntoPJsonFile() {
   if (not QDir(m_imageHostPath).exists()) {
     qDebug("*.pjson path dump to [%s] not exists", qPrintable(m_imageHostPath));
     QMessageBox::warning(this, "Path[pjson dump to] not exist", m_imageHostPath);
@@ -533,7 +533,7 @@ int PerformersManagerWidget::onDumpAllIntoPJsonFile() {
   return succeedCnt;
 }
 
-int PerformersManagerWidget::onDumpIntoPJsonFile() {
+int PerformersWidget::onDumpIntoPJsonFile() {
   if (not QDir(m_imageHostPath).exists()) {
     qDebug("*.pjson path dump to [%s] not exists", qPrintable(m_imageHostPath));
     QMessageBox::warning(this, "Path[pjson dump to] not exist", m_imageHostPath);
@@ -559,13 +559,13 @@ int PerformersManagerWidget::onDumpIntoPJsonFile() {
   return succeedCnt;
 }
 
-int PerformersManagerWidget::onForceRefreshAllRecordsVids() {
+int PerformersWidget::onForceRefreshAllRecordsVids() {
   QMessageBox::information(this, QString("Oops function not support now"),
                            QString("But you could selected all record(s) and then force refresh instead."));
   return 0;
 }
 
-int PerformersManagerWidget::onForceRefreshRecordsVids() {
+int PerformersWidget::onForceRefreshRecordsVids() {
   if (not m_performersListView->selectionModel()->hasSelection()) {
     qDebug("Nothing was selected. Select some records to refresh");
     QMessageBox::warning(this, "Nothing was selected", "Select some row to refresh");
@@ -577,8 +577,9 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
     return 0;
   }
 
+  static auto& dbTM = PerformersAkaManager::getIns();
   static auto GetVidsListFromVidsTable = [](const QSqlRecord& record, QSqlQuery& qur) -> QStringList {
-    const QString& searchCommand = DBTableMoviesHelper::GetMovieTablePerformerSelectCommand(record);
+    const QString& searchCommand = dbTM.GetMovieTablePerformerSelectCommand(record);
     bool ret = qur.exec(searchCommand);
     if (not ret) {
       qDebug("Failed when[%s]", qPrintable(searchCommand));
@@ -608,7 +609,7 @@ int PerformersManagerWidget::onForceRefreshRecordsVids() {
   return recordsCnt;
 }
 
-bool PerformersManagerWidget::onOpenRecordInFileSystem() const {
+bool PerformersWidget::onOpenRecordInFileSystem() const {
   if (not QDir(m_imageHostPath).exists()) {
     qDebug("m_imageHostPath [%s] not exists", qPrintable(m_imageHostPath));
     return false;
@@ -633,7 +634,7 @@ bool PerformersManagerWidget::onOpenRecordInFileSystem() const {
   return QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 }
 
-bool PerformersManagerWidget::onHideThisColumn() {
+bool PerformersWidget::onHideThisColumn() {
   const int c = m_horizontalHeaderSectionClicked;
   if (c < 0 or c >= m_columnsShowSwitch.size()) {
     qDebug("No column selected. Select a column to hide");
@@ -649,12 +650,12 @@ bool PerformersManagerWidget::onHideThisColumn() {
   return ShowOrHideColumnCore();
 }
 
-bool PerformersManagerWidget::onShowAllColumn() {
+bool PerformersWidget::onShowAllColumn() {
   m_columnsShowSwitch.replace('0', '1');
   return ShowOrHideColumnCore();
 }
 
-int PerformersManagerWidget::onDeleteRecords() {
+int PerformersWidget::onDeleteRecords() {
   if (not m_performersListView->selectionModel()->hasSelection()) {
     qDebug("Nothing was selected. Select some row(s) to delete");
     QMessageBox::warning(this, "Nothing was selected", "Select some row(s) to delete");
@@ -677,12 +678,12 @@ int PerformersManagerWidget::onDeleteRecords() {
   return succeedCnt;
 }
 
-void PerformersManagerWidget::onStretchLastSection(const bool checked) {
+void PerformersWidget::onStretchLastSection(const bool checked) {
   m_performersListView->horizontalHeader()->setStretchLastSection(checked);
   PreferenceSettings().setValue(MemoryKey::PERFORMER_STRETCH_LAST_SECTION.name, checked);
 }
 
-void PerformersManagerWidget::onResizeRowToContents(const bool checked) {
+void PerformersWidget::onResizeRowToContents(const bool checked) {
   if (checked) {
     m_performersListView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
   } else {
@@ -691,7 +692,7 @@ void PerformersManagerWidget::onResizeRowToContents(const bool checked) {
   }
 }
 
-void PerformersManagerWidget::onResizeRowDefaultSectionSize() {
+void PerformersWidget::onResizeRowDefaultSectionSize() {
   const int size = QInputDialog::getInt(this, "Resize Row Default Section size >=0 ", QString("default size:%1").arg(m_defaultTableRowCount),
                                         m_defaultTableRowCount);
   if (size < 0) {
