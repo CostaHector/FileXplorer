@@ -16,7 +16,7 @@ QVariantHash ProductionStudioManager::ReadOutStdStudioName() {
   const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
 #endif
   auto stdStudioNameDict = JsonFileHelper::MovieJsonLoader(stdStudiosFilePath);
-  qDebug("%d aka name(s) read out", stdStudioNameDict.size());
+  qDebug("%d studio name(s) read out", stdStudioNameDict.size());
   return stdStudioNameDict;
 }
 

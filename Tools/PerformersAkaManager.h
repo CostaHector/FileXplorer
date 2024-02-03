@@ -24,6 +24,11 @@ class PerformersAkaManager {
   QHash<QString, QString> akaPerf;
   QString GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const;
 
+  inline int count() const{
+    return akaPerf.size();
+  }
+
+
  private:
   PerformersAkaManager();
 

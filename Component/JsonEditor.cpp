@@ -51,14 +51,17 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_menuBar->addMenu(editMenu);
 
   QMenu* productionStudioMenu = new QMenu("Studio", m_menuBar);
+  productionStudioMenu->addAction(g_jsonEditorActions()._STUDIO_INFORMATION);
   productionStudioMenu->addAction(g_jsonEditorActions()._EDIT_STUDIOS);
   productionStudioMenu->addAction(g_jsonEditorActions()._RELOAD_STUDIOS);
   m_menuBar->addMenu(productionStudioMenu);
 
   QMenu* performerMenu = new QMenu("Performer", m_menuBar);
+  performerMenu->addAction(g_jsonEditorActions()._PERFORMERS_INFORMATION);
   performerMenu->addAction(g_jsonEditorActions()._EDIT_PERFS);
   performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERFS);
   performerMenu->addSeparator();
+  performerMenu->addAction(g_jsonEditorActions()._AKA_PERFORMERS_INFORMATION);
   performerMenu->addAction(g_jsonEditorActions()._EDIT_PERF_AKA);
   performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERF_AKA);
   m_menuBar->addMenu(performerMenu);
@@ -76,6 +79,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_editorToolBar->addActions(g_jsonEditorActions().EDIT_ACTIONS->actions());
   m_editorToolBar->addSeparator();
   m_editorToolBar->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
+  m_editorToolBar->addSeparator();
   m_editorToolBar->addAction(g_jsonEditorActions()._HINT);
   m_editorToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_editorToolBar);
@@ -292,6 +296,21 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 
+  connect(g_jsonEditorActions()._STUDIO_INFORMATION, &QAction::triggered, this, [this]() {
+    static auto& psm = ProductionStudioManager::getIns();
+    QMessageBox::information(this, "Studios Count", QString::number(psm.count()));
+  });
+  connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, &JsonEditor::onEditStudios);
+  connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
+    static auto& psm = ProductionStudioManager::getIns();
+    int itemsCntChanged = psm.ForceReloadStdStudioName();
+    Notificator::information("Reload standard studio name", QString("+/- %1 items").arg(itemsCntChanged));
+  });
+
+  connect(g_jsonEditorActions()._PERFORMERS_INFORMATION, &QAction::triggered, this, [this]() {
+    static auto& pm = PerformersManager::getIns();
+    QMessageBox::information(this, "Performers Count", QString::number(pm.count()));
+  });
   connect(g_jsonEditorActions()._EDIT_PERFS, &QAction::triggered, this, &JsonEditor::onEditPerformers);
   connect(g_jsonEditorActions()._RELOAD_PERFS, &QAction::triggered, this, []() {
     static auto& pm = PerformersManager::getIns();
@@ -299,18 +318,15 @@ void JsonEditor::subscribe() {
     Notificator::information("Reload performers", QString("+/- %1 item(s)").arg(itemsCntChanged));
   });
 
+  connect(g_jsonEditorActions()._AKA_PERFORMERS_INFORMATION, &QAction::triggered, this, [this]() {
+    static auto& dbTM = PerformersAkaManager::getIns();
+    QMessageBox::information(this, "Aka Performers Count", QString::number(dbTM.count()));
+  });
   connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, &JsonEditor::onEditAkaPerformer);
   connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
     static auto& dbTM = PerformersAkaManager::getIns();
     int itemsCntChanged = dbTM.ForceReloadAkaName();
     Notificator::information("Reload AKA", QString("+/- %1 item(s)").arg(itemsCntChanged));
-  });
-
-  connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, &JsonEditor::onEditStudios);
-  connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
-    static auto& psm = ProductionStudioManager::getIns();
-    int itemsCntChanged = psm.ForceReloadStdStudioName();
-    Notificator::information("Reload standard studio name", QString("+/- %1 items").arg(itemsCntChanged));
   });
 }
 

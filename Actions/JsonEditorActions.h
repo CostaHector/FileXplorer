@@ -10,14 +10,17 @@ class JsonEditorActions : public QObject {
  public:
   explicit JsonEditorActions(QObject* parent = nullptr);
 
+  QAction* _STUDIO_INFORMATION;
   QAction* _EDIT_STUDIOS;
   QAction* _RELOAD_STUDIOS;
 
+  QAction* _PERFORMERS_INFORMATION;
   QAction* _EDIT_PERFS;
   QAction* _RELOAD_PERFS;
 
-  QAction* _RELOAD_PERF_AKA;
+  QAction* _AKA_PERFORMERS_INFORMATION;
   QAction* _EDIT_PERF_AKA;
+  QAction* _RELOAD_PERF_AKA;
 
   QAction* _SELECT_A_FOLDER_AND_LOAD_JSON;
   QAction* _EMPTY_JSONS_LISTWIDGET;

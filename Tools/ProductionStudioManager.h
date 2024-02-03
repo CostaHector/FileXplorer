@@ -23,6 +23,10 @@ class ProductionStudioManager {
 
   int ForceReloadStdStudioName();
 
+  inline int count() const{
+    return m_prodStudioMap.size();
+  }
+
  protected:
   static QVariantHash ReadOutStdStudioName();
   QVariantHash m_prodStudioMap;

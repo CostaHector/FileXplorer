@@ -4,14 +4,17 @@
 
 JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
+      _STUDIO_INFORMATION(new QAction(tr("Studios info"), this)),
       _EDIT_STUDIOS(new QAction(tr("Edit Studios"), this)),
       _RELOAD_STUDIOS(new QAction(tr("Reload Studios"), this)),
 
+      _PERFORMERS_INFORMATION(new QAction(tr("Performers info"), this)),
       _EDIT_PERFS(new QAction(tr("Edit Performers"), this)),
       _RELOAD_PERFS(new QAction(tr("Reload Performers"), this)),
 
-      _RELOAD_PERF_AKA(new QAction(tr("Reload AKA"), this)),
+      _AKA_PERFORMERS_INFORMATION(new QAction(tr("Aka Performers info"), this)),
       _EDIT_PERF_AKA(new QAction(QIcon(":/themes/EDIT_AKA_FILE"), tr("Edit AKA"), this)),
+      _RELOAD_PERF_AKA(new QAction(tr("Reload AKA"), this)),
 
       _SELECT_A_FOLDER_AND_LOAD_JSON(new QAction(QIcon(":/themes/SELECT_A_FOLDER_AND_LOAD_JSON"), tr("Load"), this)),
       _EMPTY_JSONS_LISTWIDGET(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), tr("Empty"), this)),
