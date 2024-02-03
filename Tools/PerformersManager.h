@@ -22,6 +22,10 @@ class PerformersManager {
   QSet<QString> m_performers;
   QCompleter perfsCompleter;
 
+  inline int count() const{
+    return m_performers.size();
+  }
+
  private:
   PerformersManager();
 };
