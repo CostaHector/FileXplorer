@@ -1,5 +1,5 @@
 #include "JsonFileHelper.h"
-#include "Component/ProductionStudioManager.h"
+#include "Tools/ProductionStudioManager.h"
 #include "Tools/PerformersManager.h"
 
 const QMap<QString, QString> JsonFileHelper::key2ValueType = {{JSONKey::Performers, "QStringList"},

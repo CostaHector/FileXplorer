@@ -9,7 +9,7 @@ TEMPLATE = app
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
-    Component/ProductionStudioManager.cpp \
+    Tools/ProductionStudioManager.cpp \
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     FileOperation/FileOperation.cpp \
@@ -38,7 +38,7 @@ SOURCES += \
 
 HEADERS += \
     Actions/QuickWhereActions.h \
-    Component/ProductionStudioManager.h \
+    Tools/ProductionStudioManager.h \
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
     FileOperation/FileOperation.h \

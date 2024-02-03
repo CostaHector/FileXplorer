@@ -3,11 +3,12 @@
 #include "Actions/JsonEditorActions.h"
 
 #include "Component/NotificatorFrame.h"
-#include "Component/ProductionStudioManager.h"
+#include "Tools/ProductionStudioManager.h"
 
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/PerformersManager.h"
+#include "Tools/StringEditHelper.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -15,6 +16,7 @@
 #include <QInputDialog>
 #include <QMenuBar>
 #include <QTableWidgetItem>
+#include <QTextCursor>
 #include <QTextDocumentFragment>
 #include <QToolBar>
 
@@ -420,68 +422,27 @@ bool JsonEditor::onSubmitAllChanges() {
   return failCnt == 0;
 }
 
-#include <QTextCursor>
 auto JsonEditor::onLowercaseEachWord() -> void {
-  static auto lowercaseSentense = [](const QString& sentence) -> QString { return sentence.toLower(); };
   for (const QString& keyName : jsonKeySetMet) {
     if (keyName == JSONKey::Detail) {
       QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
-      if (not detailEditWidget->textCursor().hasSelection()) {
-        continue;
-      }
-      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
-      detailEditWidget->textCursor().removeSelectedText();
-      const QString& after = lowercaseSentense(before);
-      detailEditWidget->textCursor().insertText(after);
+      StringEditHelper::ReplaceAndUpdateSelection(detailEditWidget, StringEditHelper::lowercaseSentense);
       continue;
     }
     QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName]);
-    if (not lineEditWidget->hasSelectedText()) {
-      continue;
-    }
-    const QString& before = lineEditWidget->selectedText();
-    const QString& after = lowercaseSentense(before);
-    const QString& beforeFullText = lineEditWidget->text();
-    const QString& afterFullText =
-        QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
-    lineEditWidget->setText(afterFullText);
+    StringEditHelper::ReplaceAndUpdateSelection(lineEditWidget, StringEditHelper::lowercaseSentense);
   }
 }
 
 auto JsonEditor::onCapitalizeEachWord() -> void {
-  static auto capitalizeEachWord = [](QString sentence) -> QString {
-    if (not sentence.isEmpty()) {
-      sentence[0] = sentence[0].toTitleCase();
-    }
-    for (int i = 1; i < sentence.size(); ++i) {
-      if (sentence[i - 1] == '.' or sentence[i - 1] == ' ') {
-        sentence[i] = sentence[i].toTitleCase();
-      }
-    }
-    return sentence;
-  };
   for (const QString& keyName : jsonKeySetMet) {
     if (keyName == JSONKey::Detail) {
       QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
-      if (not detailEditWidget->textCursor().hasSelection()) {
-        continue;
-      }
-      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
-      detailEditWidget->textCursor().removeSelectedText();
-      const QString& after = capitalizeEachWord(before);
-      detailEditWidget->textCursor().insertText(after);
+      StringEditHelper::ReplaceAndUpdateSelection(detailEditWidget, StringEditHelper::capitalizeEachWord);
       continue;
     }
     QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName]);
-    if (not lineEditWidget->hasSelectedText()) {
-      continue;
-    }
-    const QString& before = lineEditWidget->selectedText();
-    const QString& after = capitalizeEachWord(before);
-    const QString& beforeFullText = lineEditWidget->text();
-    const QString& afterFullText =
-        QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
-    lineEditWidget->setText(afterFullText);
+    StringEditHelper::ReplaceAndUpdateSelection(lineEditWidget, StringEditHelper::capitalizeEachWord);
   }
 }
 
