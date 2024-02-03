@@ -2,7 +2,7 @@
 
 auto TextReader(const QString& textPath) -> QString {
   QFile file(textPath);
-  if (file.exists()) {
+  if (not file.exists()) {
     qDebug("File[%s] not found", qPrintable(textPath));
     return "";
   }

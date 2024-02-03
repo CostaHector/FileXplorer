@@ -4,9 +4,9 @@
 #include "Component/RatingSqlTableModel.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
-#include "Tools/PerformersAkaManager.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
+#include "Tools/PerformersAkaManager.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -76,6 +76,11 @@ PerformersWidget::PerformersWidget(QWidget* parent)
   m_performersListView->verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
   m_performersListView->verticalHeader()->setDefaultSectionSize(m_defaultTableRowCount);
 
+  const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
+  QFont defaultFont(m_performersListView->font());
+  defaultFont.setPointSize(fontSize);
+  m_performersListView->setFont(defaultFont);
+
   ShowOrHideColumnCore();
   subscribe();
   setWindowTitle("Performers Manager Widget");
@@ -107,14 +112,12 @@ void PerformersWidget::subscribe() {
 
   connect(g_performersManagerActions().COLUMNS_VISIBILITY, &QAction::triggered, this, &PerformersWidget::onShowHideColumn);
 
-  connect(g_performersManagerActions().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this,
-          &PerformersWidget::onLoadFromFileSystemStructure);
+  connect(g_performersManagerActions().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &PerformersWidget::onLoadFromFileSystemStructure);
   connect(g_performersManagerActions().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &PerformersWidget::onLoadFromPerformersList);
   connect(g_performersManagerActions().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &PerformersWidget::onLoadFromPJsonDirectory);
 
   connect(g_performersManagerActions().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpAllIntoPJsonFile);
-  connect(g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this,
-          &PerformersWidget::onDumpIntoPJsonFile);
+  connect(g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpIntoPJsonFile);
 
   connect(g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &PerformersWidget::onOpenRecordInFileSystem);
 
@@ -139,8 +142,7 @@ void PerformersWidget::subscribe() {
 
   connect(g_performersManagerActions().STRETCH_DETAIL_SECTION, &QAction::triggered, this, &PerformersWidget::onStretchLastSection);
   connect(g_performersManagerActions().RESIZE_ROWS_TO_CONTENT, &QAction::triggered, this, &PerformersWidget::onResizeRowToContents);
-  connect(g_performersManagerActions().RESIZE_ROWS_DEFAULT_SECTION_SIZE, &QAction::triggered, this,
-          &PerformersWidget::onResizeRowDefaultSectionSize);
+  connect(g_performersManagerActions().RESIZE_ROWS_DEFAULT_SECTION_SIZE, &QAction::triggered, this, &PerformersWidget::onResizeRowDefaultSectionSize);
 
   connect(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshRecordsVids);
   connect(g_performersManagerActions().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshAllRecordsVids);
