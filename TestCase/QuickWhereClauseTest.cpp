@@ -1,13 +1,14 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "PublicVariable.h"
 
 // add necessary includes here
-#include "Tools/DBTableMoviesHelper.h"
+#include "Tools/PerformersAkaManager.h"
 class QuickWhereClauseTest : public QObject {
   Q_OBJECT
 
  public:
+  QuickWhereClauseTest() : dbTM(PerformersAkaManager::getIns()) {}
+  PerformersAkaManager& dbTM;
  private slots:
   void test_SearchSpaceString();
   void test_SearchEmptyString();
@@ -20,45 +21,45 @@ class QuickWhereClauseTest : public QObject {
 
 void QuickWhereClauseTest::test_SearchSpaceString() {
   const QString& sSpace = "  ";
-  const QString& whereClause = DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(sSpace);
+  const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere(sSpace);
   QCOMPARE(whereClause, "Name like \"%  %\"");
 }
 
 void QuickWhereClauseTest::test_SearchEmptyString() {
   const QString& sEmpty = "";
-  const QString& whereClause = DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(sEmpty);
+  const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere(sEmpty);
   QCOMPARE(whereClause, "");
 }
 
 void QuickWhereClauseTest::test_SearchOnePerf() {
   const QString& s1 = "(Ricky Martin)";
-  const QString& whereClause = DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(s1);
+  const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere(s1);
   QCOMPARE(whereClause, "Name like \"%Ricky Martin%\"");
 }
 
 void QuickWhereClauseTest::SearchTwoPerfAAndB() {
   const QString& s2 = "Ricky Martin&Darin Zanyar";
-  const QString& whereClause = DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(s2);
+  const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere(s2);
   QCOMPARE(whereClause, "(Name like \"%Ricky Martin%\" AND Name like \"%Darin Zanyar%\")");
 }
 
 void QuickWhereClauseTest::SearchTwoPerfAOrB() {
   const QString& s2 = "Ricky Martin|Darin Zanyar";
-  const QString& whereClause = DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(s2);
+  const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere(s2);
   QCOMPARE(whereClause, "(Name like \"%Ricky Martin%\" OR Name like \"%Darin Zanyar%\")");
 }
 
 void QuickWhereClauseTest::SearchTwoPerfA1AkaA2OrB() {
   const QString& s2 = "(Ricky Martin|Ricky)&Darin Zanyar";
-  const QString& whereClause = DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(s2);
+  const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere(s2);
   QCOMPARE(whereClause, "((Name like \"%Ricky Martin%\" OR Name like \"%Ricky%\") AND Name like \"%Darin Zanyar%\")");
 }
 
 void QuickWhereClauseTest::SearchThreePerfsABC() {
   const QString& s3 = "A&B&C";
-  const QString& whereClause = DBTableMoviesHelper::PlainLogicSentence2FuzzySqlWhere(s3);
+  const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere(s3);
   QCOMPARE(whereClause, "((Name like \"%A%\" AND Name like \"%B%\") AND Name like \"%C%\")");
 }
 
-//QTEST_MAIN(QuickWhereClauseTest)
-// #include "QuickWhereClauseTest.moc"
+// QTEST_MAIN(QuickWhereClauseTest)
+//  #include "QuickWhereClauseTest.moc"
