@@ -7,10 +7,11 @@
 
 class ProductionStudioManager {
  public:
+  static ProductionStudioManager& getIns();
   ProductionStudioManager(const ProductionStudioManager& rhs) noexcept = delete;
+
   auto LearningFromAPath(const QString& path) -> int;
 
-  static ProductionStudioManager& getIns();
   QString ProductionStudioFilterOut(const QString& words) const;
 
   QStringList StandardProductionStudioFrom(QString standardPs) const;
@@ -20,8 +21,10 @@ class ProductionStudioManager {
     return m_prodStudioMap.contains(nm.toLower()) ? m_prodStudioMap[nm.toLower()].toString() : nm;
   }
 
-  QVariantHash MovieJsonLoaderAgent() const;
+  int ForceReloadStdStudioName();
 
+ protected:
+  static QVariantHash ReadOutStdStudioName();
   QVariantHash m_prodStudioMap;
 
  private:

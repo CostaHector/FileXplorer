@@ -33,8 +33,6 @@ class FileExplorerEvent : public QObject {
                     QFileSystemModel* fileSysModel_ = nullptr,
                     QTableView* view_ = nullptr,
                     CustomStatusBar* _statusBar = nullptr,
-                    JsonEditor* jsonEditor_ = nullptr,
-                    VideoPlayer* videoPlayer_ = nullptr,
                     T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
   void subscribe();
 
@@ -116,8 +114,8 @@ class FileExplorerEvent : public QObject {
   auto on_SelectNone() -> void;
   auto on_SelectInvert() -> void;
 
-  auto on_PlaySelectedItemsInView() const -> bool;
-  auto on_PlayCurrentPathOfView() const -> bool;
+  auto on_PlaySelectedItemsInView() -> bool;
+  auto on_PlayCurrentPathOfView() -> bool;
 
   auto on_PlayVideo() const -> bool;
 

@@ -31,9 +31,8 @@ SOURCES += \
     Component/JsonPerformersListInputer.cpp \
     Component/MD5Window.cpp \
     Component/NotificatorFrame.cpp \
-    Component/PerformersManagerWidget.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
-    Component/ProductionStudioManager.cpp \
+    Component/PerformersWidget.cpp \
     Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
@@ -52,7 +51,6 @@ SOURCES += \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/CopyItemPropertiesToClipboardIF.cpp \
-    Tools/DBTableMoviesHelper.cpp \
     Tools/DuplicateImagesRemover.cpp \
     Tools/FileSystemItemFilter.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
@@ -63,9 +61,12 @@ SOURCES += \
     Tools/NameStandardizer.cpp \
     Tools/PathTool.cpp \
     Tools/PerformerJsonFileHelper.cpp \
-    Tools/PerformersStringParser.cpp \
+    Tools/PerformersAkaManager.cpp \
+    Tools/PerformersManager.cpp \
+    Tools/ProductionStudioManager.cpp \
     Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
+    Tools/StringEditHelper.cpp \
     Tools/SubscribeDatabase.cpp \
     Tools/TorrentsDatabaseHelper.cpp \
     UndoRedo.cpp \
@@ -117,9 +118,8 @@ HEADERS += \
     Component/MD5Window.h \
     Component/NotificatorFrame.h \
     Component/NotificatorFrame_p.h \
-    Component/PerformersManagerWidget.h \
     Component/PerformersPreviewTextBrowser.h \
-    Component/ProductionStudioManager.h \
+    Component/PerformersWidget.h \
     Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
@@ -138,7 +138,6 @@ HEADERS += \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
     Tools/CopyItemPropertiesToClipboardIF.h \
-    Tools/DBTableMoviesHelper.h \
     Tools/DuplicateImagesRemover.h \
     Tools/FileSystemItemFilter.h \
     Tools/FilesNameBatchStandardizer.h \
@@ -149,9 +148,12 @@ HEADERS += \
     Tools/NameStandardizer.h \
     Tools/PathTool.h \
     Tools/PerformerJsonFileHelper.h \
-    Tools/PerformersStringParser.h \
+    Tools/PerformersAkaManager.h \
+    Tools/PerformersManager.h \
+    Tools/ProductionStudioManager.h \
     Tools/PlayVideo.h \
     Tools/RenameWidget.h \
+    Tools/StringEditHelper.h \
     Tools/SubscribeDatabase.h \
     Tools/TorrentsDatabaseHelper.h \
     UndoRedo.h \

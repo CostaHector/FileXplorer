@@ -7,15 +7,25 @@
 #include <QDirIterator>
 #include <QTextStream>
 
-ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(MovieJsonLoaderAgent()) {}
+ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(ReadOutStdStudioName()) {}
 
-QVariantHash ProductionStudioManager::MovieJsonLoaderAgent() const {
+QVariantHash ProductionStudioManager::ReadOutStdStudioName() {
 #ifdef _WIN32
   const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
 #else
   const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
 #endif
-  return JsonFileHelper::MovieJsonLoader(stdStudiosFilePath);
+  auto stdStudioNameDict = JsonFileHelper::MovieJsonLoader(stdStudiosFilePath);
+  qDebug("%d aka name(s) read out", stdStudioNameDict.size());
+  return stdStudioNameDict;
+}
+
+int ProductionStudioManager::ForceReloadStdStudioName() {
+  int beforeStudioNameCnt = m_prodStudioMap.size();
+  m_prodStudioMap = ProductionStudioManager::ReadOutStdStudioName();
+  int afterStudioNameCnt = m_prodStudioMap.size();
+  qDebug("%d standard studio names added/removed", afterStudioNameCnt - beforeStudioNameCnt);
+  return afterStudioNameCnt - beforeStudioNameCnt;
 }
 
 int ProductionStudioManager::LearningFromAPath(const QString& path) {

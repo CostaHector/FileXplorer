@@ -32,7 +32,8 @@ ContentPanel::ContentPanel(QWidget* parent,
       view(new DragDropTableView(fileSysModel, addressBar->backToBtn, addressBar->forwardToBtn)),
       previewHtml(previewHtml_),
       previewWidget(previewWidget_),
-      logger(_statusBar) {
+      logger(_statusBar),
+      m_parent(parent) {
   QVBoxLayout* contentPaneLayout = new QVBoxLayout();
   contentPaneLayout->addLayout(addressBar);
   contentPaneLayout->addWidget(view);
@@ -58,6 +59,9 @@ auto ContentPanel::IntoNewPath(QString newPath, bool isNewPath, bool isF5Force) 
   view->selectionModel()->clearSelection();
   if (isNewPath) {  // only new path will back to/forwar to
     addressBar->pathRD(newPath);
+  }
+  if (m_parent != nullptr) {
+    m_parent->setWindowTitle(newPath);
   }
   fileSysModel->whenRootPathChanged(newPath);
   return true;
@@ -136,7 +140,7 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
   // self.view.selectionModel().selectedIndexes()
   // else: self.view.selectionModel().selectedRows() # Table or Tree
   if (logger) {
-    const auto selectedCnt = selectedRowsIndex.size()/4;  // for table
+    const auto selectedCnt = selectedRowsIndex.size() / 4;  // for table
     logger->pathInfo(selectedCnt, 1);
   }
   QFileSystemModel* _model = static_cast<QFileSystemModel*>(view->model());
@@ -145,10 +149,10 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
   const QString& pth = _model->rootPath();
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
   qDebug("\t\t Anchor of path [%s] target to [%d,%d]", qPrintable(pth), m_anchorTags[pth].row, m_anchorTags[pth].col);
-  if (previewWidget){
+  if (previewWidget) {
     emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
   }
-  if (previewHtml){
+  if (previewHtml) {
     previewHtml->operator()(firstFileInfo.absoluteFilePath());
   }
   return true;

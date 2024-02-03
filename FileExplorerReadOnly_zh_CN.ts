@@ -200,11 +200,11 @@
     </message>
     <message>
         <source>New Files</source>
-        <translation type="unfinished"></translation>
+        <translation>批量新建文件</translation>
     </message>
     <message>
         <source>New Folders</source>
-        <translation type="unfinished"></translation>
+        <translation>批量新建文件夹</translation>
     </message>
 </context>
 <context>
@@ -339,6 +339,14 @@
     <message>
         <source>Clear performers and prod studio</source>
         <translation>清理Json文件演员和厂家值</translation>
+    </message>
+    <message>
+        <source>Edit Performers</source>
+        <translation>编辑演员表</translation>
+    </message>
+    <message>
+        <source>Reload Performers</source>
+        <translation>重新载入演员表</translation>
     </message>
 </context>
 <context>
@@ -475,7 +483,7 @@
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">播放</translation>
+        <translation>播放</translation>
     </message>
 </context>
 </TS>
