@@ -2,7 +2,7 @@
 #include <QtTest>
 
 // add necessary includes here
-#include "Component/ProductionStudioManager.h"
+#include "Tools/ProductionStudioManager.h"
 
 class ProductionStudioManagerTest : public QObject {
   Q_OBJECT

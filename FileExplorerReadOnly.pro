@@ -66,6 +66,7 @@ SOURCES += \
     Tools/ProductionStudioManager.cpp \
     Tools/PlayVideo.cpp \
     Tools/RenameWidget.cpp \
+    Tools/StringEditHelper.cpp \
     Tools/SubscribeDatabase.cpp \
     Tools/TorrentsDatabaseHelper.cpp \
     UndoRedo.cpp \
@@ -152,6 +153,7 @@ HEADERS += \
     Tools/ProductionStudioManager.h \
     Tools/PlayVideo.h \
     Tools/RenameWidget.h \
+    Tools/StringEditHelper.h \
     Tools/SubscribeDatabase.h \
     Tools/TorrentsDatabaseHelper.h \
     UndoRedo.h \
