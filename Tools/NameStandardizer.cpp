@@ -9,7 +9,7 @@
 #include <QJsonParseError>
 #include <QJsonValue>
 #include "PublicVariable.h"
-#include "Component/ProductionStudioManager.h"
+#include "Tools/ProductionStudioManager.h"
 
 using namespace JSON_RENAME_REGEX;
 auto NameStandardizer::operator()(QString aFileName) -> QString{

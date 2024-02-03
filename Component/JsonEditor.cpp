@@ -3,11 +3,12 @@
 #include "Actions/JsonEditorActions.h"
 
 #include "Component/NotificatorFrame.h"
-#include "Component/ProductionStudioManager.h"
+#include "Tools/ProductionStudioManager.h"
 
-#include "Tools/DBTableMoviesHelper.h"
 #include "Tools/JsonFileHelper.h"
-#include "Tools/PerformersStringParser.h"
+#include "Tools/PerformersAkaManager.h"
+#include "Tools/PerformersManager.h"
+#include "Tools/StringEditHelper.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -15,6 +16,7 @@
 #include <QInputDialog>
 #include <QMenuBar>
 #include <QTableWidgetItem>
+#include <QTextCursor>
 #include <QTextDocumentFragment>
 #include <QToolBar>
 
@@ -54,6 +56,9 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_menuBar->addMenu(productionStudioMenu);
 
   QMenu* performerMenu = new QMenu("Performer", m_menuBar);
+  performerMenu->addAction(g_jsonEditorActions()._EDIT_PERFS);
+  performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERFS);
+  performerMenu->addSeparator();
   performerMenu->addAction(g_jsonEditorActions()._EDIT_PERF_AKA);
   performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERF_AKA);
   m_menuBar->addMenu(performerMenu);
@@ -287,17 +292,25 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 
+  connect(g_jsonEditorActions()._EDIT_PERFS, &QAction::triggered, this, &JsonEditor::onEditPerformers);
+  connect(g_jsonEditorActions()._RELOAD_PERFS, &QAction::triggered, this, []() {
+    static auto& pm = PerformersManager::getIns();
+    int itemsCntChanged = pm.ForceReloadPerformers();
+    Notificator::information("Reload performers", QString("+/- %1 item(s)").arg(itemsCntChanged));
+  });
+
   connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, &JsonEditor::onEditAkaPerformer);
   connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
-    auto ret = DBTableMoviesHelper::UpdateAKAHash(true);
-    qDebug("Update AKA %d item(s) added", ret);
-    Notificator::information("Update AKA", QString("%1 item(s) added").arg(ret));
+    static auto& dbTM = PerformersAkaManager::getIns();
+    int itemsCntChanged = dbTM.ForceReloadAkaName();
+    Notificator::information("Reload AKA", QString("+/- %1 item(s)").arg(itemsCntChanged));
   });
 
   connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, &JsonEditor::onEditStudios);
   connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
-    qDebug("TODO, please reopen it to update");
-    Notificator::warning("TODO", "please reopen it to update");
+    static auto& psm = ProductionStudioManager::getIns();
+    int itemsCntChanged = psm.ForceReloadStdStudioName();
+    Notificator::information("Reload standard studio name", QString("+/- %1 items").arg(itemsCntChanged));
   });
 }
 
@@ -409,68 +422,27 @@ bool JsonEditor::onSubmitAllChanges() {
   return failCnt == 0;
 }
 
-#include <QTextCursor>
 auto JsonEditor::onLowercaseEachWord() -> void {
-  static auto lowercaseSentense = [](const QString& sentence) -> QString { return sentence.toLower(); };
   for (const QString& keyName : jsonKeySetMet) {
     if (keyName == JSONKey::Detail) {
       QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
-      if (not detailEditWidget->textCursor().hasSelection()) {
-        continue;
-      }
-      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
-      detailEditWidget->textCursor().removeSelectedText();
-      const QString& after = lowercaseSentense(before);
-      detailEditWidget->textCursor().insertText(after);
+      StringEditHelper::ReplaceAndUpdateSelection(detailEditWidget, StringEditHelper::lowercaseSentense);
       continue;
     }
     QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName]);
-    if (not lineEditWidget->hasSelectedText()) {
-      continue;
-    }
-    const QString& before = lineEditWidget->selectedText();
-    const QString& after = lowercaseSentense(before);
-    const QString& beforeFullText = lineEditWidget->text();
-    const QString& afterFullText =
-        QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
-    lineEditWidget->setText(afterFullText);
+    StringEditHelper::ReplaceAndUpdateSelection(lineEditWidget, StringEditHelper::lowercaseSentense);
   }
 }
 
 auto JsonEditor::onCapitalizeEachWord() -> void {
-  static auto capitalizeEachWord = [](QString sentence) -> QString {
-    if (not sentence.isEmpty()) {
-      sentence[0] = sentence[0].toTitleCase();
-    }
-    for (int i = 1; i < sentence.size(); ++i) {
-      if (sentence[i - 1] == '.' or sentence[i - 1] == ' ') {
-        sentence[i] = sentence[i].toTitleCase();
-      }
-    }
-    return sentence;
-  };
   for (const QString& keyName : jsonKeySetMet) {
     if (keyName == JSONKey::Detail) {
       QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
-      if (not detailEditWidget->textCursor().hasSelection()) {
-        continue;
-      }
-      const QString& before = detailEditWidget->textCursor().selection().toPlainText();
-      detailEditWidget->textCursor().removeSelectedText();
-      const QString& after = capitalizeEachWord(before);
-      detailEditWidget->textCursor().insertText(after);
+      StringEditHelper::ReplaceAndUpdateSelection(detailEditWidget, StringEditHelper::capitalizeEachWord);
       continue;
     }
     QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName]);
-    if (not lineEditWidget->hasSelectedText()) {
-      continue;
-    }
-    const QString& before = lineEditWidget->selectedText();
-    const QString& after = capitalizeEachWord(before);
-    const QString& beforeFullText = lineEditWidget->text();
-    const QString& afterFullText =
-        QString("%1%2%3").arg(beforeFullText.left(lineEditWidget->selectionStart()), after, beforeFullText.mid(lineEditWidget->selectionEnd()));
-    lineEditWidget->setText(afterFullText);
+    StringEditHelper::ReplaceAndUpdateSelection(lineEditWidget, StringEditHelper::capitalizeEachWord);
   }
 }
 
@@ -485,7 +457,7 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
 
-  static PerformersStringParser& pm = PerformersStringParser::getIns();
+  static PerformersManager& pm = PerformersManager::getIns();
   const int newLearnedCnt = pm.LearningFromAPath(loadFromFi.absoluteFilePath());
 
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
@@ -499,7 +471,7 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
 }
 
 QStringList JsonEditor::onPerformersHint() {
-  static PerformersStringParser& pm = PerformersStringParser::getIns();
+  static PerformersManager& pm = PerformersManager::getIns();
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
 
   QString nameText;
@@ -540,7 +512,7 @@ QStringList JsonEditor::onPerformersHint() {
 }
 
 bool JsonEditor::onSelectedTextAppendToPerformers() {
-  static PerformersStringParser& pm = PerformersStringParser::getIns();
+  static PerformersManager& pm = PerformersManager::getIns();
 
   if (not jsonKeySetMet.contains(JSONKey::Performers)) {
     jsonKeySetMet.insert(JSONKey::Performers);
@@ -567,6 +539,21 @@ bool JsonEditor::onSelectedTextAppendToPerformers() {
   perfs.removeDuplicates();
   p->setText(perfs.join(", "));
   return true;
+}
+
+void JsonEditor::onEditPerformers() {
+#ifdef _WIN32
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
+#else
+  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
+#endif
+  if (not QFile::exists(fileAbsPath)) {
+    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
+    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    return;
+  }
+  QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
+  Notificator::information("Remember to reload", "don't forget it");
 }
 
 void JsonEditor::onEditAkaPerformer() {

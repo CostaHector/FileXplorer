@@ -31,12 +31,10 @@ int main(int argc, char* argv[]) {
   FileExplorerReadOnly fileExplorer(argc, argv, nullptr);
 
   FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->fileSysModel, fileExplorer.m_fsPanel->view, fileExplorer._statusBar,
-                        fileExplorer.m_jsonEditor, fileExplorer.m_videoPlayer,
                         std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
 
-  auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView, std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer),
-                                                 fileExplorer.m_performerManager, fileExplorer.m_torrentsManager);
+  auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView, std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
   fileExplorer.show();
 
   a.exec();

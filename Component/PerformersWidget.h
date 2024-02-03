@@ -1,5 +1,5 @@
-#ifndef PERFORMERSMANAGERWIDGET_H
-#define PERFORMERSMANAGERWIDGET_H
+#ifndef PERFORMERSWIDGET_H
+#define PERFORMERSWIDGET_H
 
 #include "Component/PerformersPreviewTextBrowser.h"
 
@@ -19,9 +19,9 @@
 #include <QMenu>
 #include <QMenuBar>
 
-class PerformersManagerWidget : public QMainWindow {
+class PerformersWidget : public QMainWindow {
  public:
-  explicit PerformersManagerWidget(QWidget* parent = nullptr);
+  explicit PerformersWidget(QWidget* parent = nullptr);
   auto closeEvent(QCloseEvent* event) -> void override;
 
   void updateWindowsSize();
@@ -89,4 +89,4 @@ class PerformersManagerWidget : public QMainWindow {
   bool ShowOrHideColumnCore();
 };
 
-#endif  // PERFORMERSMANAGERWIDGET_H
+#endif  // PERFORMERSWIDGET_H

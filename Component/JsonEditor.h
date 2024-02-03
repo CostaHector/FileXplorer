@@ -54,6 +54,7 @@ class JsonEditor : public QMainWindow {
   auto onPerformersHint() -> QStringList;
   auto onSelectedTextAppendToPerformers() -> bool;
 
+  void onEditPerformers();
   void onEditAkaPerformer();
   void onEditStudios();
 
