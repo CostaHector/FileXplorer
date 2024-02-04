@@ -20,7 +20,7 @@
 #include <QTextDocumentFragment>
 #include <QToolBar>
 
-const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [%1/%2]";
+const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 const QColor JsonEditor::MEET_CONDITION_COLOR(150, 150, 150);
 const QColor JsonEditor::NOT_MEET_CONDITION_COLOR(255, 0, 0);
 
@@ -286,7 +286,7 @@ void JsonEditor::subscribe() {
   });
 }
 
-bool JsonEditor::onLoadASelectedPath(const QString& folderPath) {
+int JsonEditor::onLoadASelectedPath(const QString& folderPath) {
   QString loadFromPath = folderPath;
   if (folderPath.isEmpty()) {
     const QString& defaultOpenDir =
@@ -297,10 +297,10 @@ bool JsonEditor::onLoadASelectedPath(const QString& folderPath) {
   if (not loadFromFi.isDir()) {
     QMessageBox::warning(this, "Failed when Load json from a folder", QString("Not a folder:\n%1").arg(folderPath));
     qDebug("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(folderPath));
-    return false;
+    return 0;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
-  load(loadFromFi.absoluteFilePath());
+  return load(loadFromFi.absoluteFilePath());
 }
 
 bool JsonEditor::onStageChanges() {
@@ -573,10 +573,11 @@ bool JsonEditor::formatter() {
   }
 }
 
-bool JsonEditor::load(const QString& path) {
+int JsonEditor::load(const QString& path) {
   if (not QDir(path).exists()) {
-    return false;
+    return 0;
   }
+  const int beforeJsonFileCnt = m_jsonList->count();
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
@@ -584,12 +585,14 @@ bool JsonEditor::load(const QString& path) {
       m_jsonList->addItem(it.filePath());
     }
   }
-  setWindowTitle(TITLE_TEMPLATE.arg(0).arg(m_jsonList->count()));
-  if (m_jsonList->count() == 0) {
-    return true;
+  const int afterJsonFileCnt = m_jsonList->count();
+  const int deltaFile = afterJsonFileCnt - beforeJsonFileCnt;
+
+  setWindowTitle(TITLE_TEMPLATE.arg(deltaFile).arg(m_jsonList->count()));
+  if (deltaFile != 0) {
+    m_jsonList->setCurrentRow(beforeJsonFileCnt);
   }
-  m_jsonList->setCurrentRow(0);
-  return true;
+  return deltaFile;
 }
 
 // #define __NAME__EQ__MAIN__ 1

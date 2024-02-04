@@ -56,7 +56,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _SET_STUDIO{new QAction(QIcon(":/themes/PRODUCTION_STUDIOS"), tr("Set production studio"))},
       _CONSTRUCT_PERFORMER_KVP{new QAction(QIcon(":/themes/PERFORMERS"), tr("Construct performers k-v pair"))},
       _CONSTRUCT_STUDIO_KVP{new QAction(QIcon(":/themes/PRODUCTION_STUDIOS"), tr("Construct studio k-v pair"))},
-      _DESTRUCT_PERFORMERS_STUDIO_KVP{new QAction(tr("Destruct performers and studio k-v pair"))},
+      _CLR_PERFORMERS_STUDIO_VALUE{new QAction(tr("Clear performers and studio values"))},
       _BATCH_EDIT_TOOL_ACTIONS{new QActionGroup(this)} {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setShortcutVisibleInContextMenu(true);
@@ -199,9 +199,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       QString("<b>%1 (%2)</b><br/>Add production studio key-value pair for json file if key not exists. \n Otherwise init its values.")
           .arg(_CONSTRUCT_STUDIO_KVP->text(), _CONSTRUCT_STUDIO_KVP->shortcut().toString()));
 
-  _DESTRUCT_PERFORMERS_STUDIO_KVP->setToolTip(
+  _CLR_PERFORMERS_STUDIO_VALUE->setToolTip(
       QString("<b>%1 (%2)</b><br/>Clear both performers and production studio values for json file.")
-          .arg(_DESTRUCT_PERFORMERS_STUDIO_KVP->text(), _DESTRUCT_PERFORMERS_STUDIO_KVP->shortcut().toString()));
+          .arg(_CLR_PERFORMERS_STUDIO_VALUE->text(), _CLR_PERFORMERS_STUDIO_VALUE->shortcut().toString()));
 
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_SELECT_CURRENT_FOLDER);
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_CONSTRUCT_JSONS_FOR_VIDS);
@@ -209,7 +209,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_SET_STUDIO);
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_CONSTRUCT_PERFORMER_KVP);
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_CONSTRUCT_STUDIO_KVP);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_DESTRUCT_PERFORMERS_STUDIO_KVP);
+  _BATCH_EDIT_TOOL_ACTIONS->addAction(_CLR_PERFORMERS_STUDIO_VALUE);
 }
 
 QMenuBar* JsonEditorActions::GetJsonMenuBar(QWidget* parent) {

@@ -34,14 +34,14 @@ class JsonEditor : public QMainWindow {
   auto onNext() -> void;
   auto onLast() -> void;
 
-  auto load(const QString& path) -> bool;
+  auto load(const QString& path) -> int;
   auto refreshEditPanel() -> void;
 
   auto currentJsonString() const -> QString;
 
   auto subscribe() -> void;
 
-  auto onLoadASelectedPath(const QString& folderPath = "") -> bool;
+  auto onLoadASelectedPath(const QString& folderPath = "") -> int;
 
   auto onStageChanges() -> bool;
   auto onResetChanges() -> bool;
