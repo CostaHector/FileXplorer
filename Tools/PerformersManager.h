@@ -2,8 +2,10 @@
 #define PERFORMERSMANAGER_H
 
 #include <QCompleter>
+#include <QMessageBox>
 #include <QSet>
 #include <QString>
+#include <QWidget>
 
 class PerformersManager {
  public:
@@ -22,9 +24,8 @@ class PerformersManager {
   QSet<QString> m_performers;
   QCompleter perfsCompleter;
 
-  inline int count() const{
-    return m_performers.size();
-  }
+  inline int count() const { return m_performers.size(); }
+  inline void DisplayStatistic(QWidget* parent) { QMessageBox::information(parent, "Performers Count", QString::number(count())); }
 
  private:
   PerformersManager();

@@ -22,8 +22,6 @@ class JsonEditor : public QMainWindow {
  public:
   explicit JsonEditor(QWidget* parent = nullptr);
 
-  auto getListPanelRightClickMenu() -> QMenu*;
-
   auto hasLast() const -> bool;
   auto hasNext() const -> bool;
 
@@ -84,14 +82,13 @@ class JsonEditor : public QMainWindow {
   QFormLayout* m_editorPanel;
   QFormLayout* m_extraEditorPanel;  // no so frequently used key-value pair
   QWidget* m_editorWidget;
-
   QListWidget* m_jsonList;
+
+  QMenuBar* m_menuBar;
+  QToolBar* m_editorToolBar;
   QMenu* m_listMenu;
 
   QSplitter* m_editorAndListSplitter;
-  QToolBar* m_editorToolBar;
-
-  QMenuBar* m_menuBar;
 
   QSet<QString> jsonKeySetMet;
 
