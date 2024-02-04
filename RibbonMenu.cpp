@@ -211,7 +211,7 @@ QToolBar* RibbonMenu::LeafShare() const {
 QToolBar* RibbonMenu::LeafView() const {
   auto* NAVIGATION_PANE = g_viewActions().NAVIGATION_PANE;
   auto* PREVIEW_PANE_HTML = g_viewActions().PREVIEW_PANE_HTML;
-  auto* JSON_EDITOR_PANE = g_viewActions().JSON_EDITOR_PANE;
+  auto* JSON_EDITOR_PANE = g_viewActions()._JSON_EDITOR_PANE;
 
   auto* viewPaneToolBar = new QToolBar("View Pane Group");
   viewPaneToolBar->setOrientation(Qt::Orientation::Vertical);

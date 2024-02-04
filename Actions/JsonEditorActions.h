@@ -68,7 +68,7 @@ class JsonEditorActions : public QObject {
   QAction* _SET_STUDIO;
   QAction* _CONSTRUCT_PERFORMER_KVP;
   QAction* _CONSTRUCT_STUDIO_KVP;
-  QAction* _DESTRUCT_PERFORMERS_STUDIO_KVP;
+  QAction* _CLR_PERFORMERS_STUDIO_VALUE;
   QActionGroup* _BATCH_EDIT_TOOL_ACTIONS;
 };
 
