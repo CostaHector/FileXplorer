@@ -3,56 +3,73 @@
 
 #include <QAction>
 #include <QActionGroup>
+#include <QMenuBar>
+#include <QMenu>
 #include <QObject>
+#include <QToolBar>
 
 class JsonEditorActions : public QObject {
   Q_OBJECT
  public:
   explicit JsonEditorActions(QObject* parent = nullptr);
 
+  QMenuBar* GetJsonMenuBar(QWidget* parent);
+  QToolBar* GetJsonToolBar(QWidget* parent);
+  QMenu* GetJsonToBeEdittedListMenu(QWidget* parent);
+
   QAction* _STUDIO_INFORMATION;
   QAction* _EDIT_STUDIOS;
   QAction* _RELOAD_STUDIOS;
+  QActionGroup* _STUDIO_ACTIONS;
 
   QAction* _PERFORMERS_INFORMATION;
   QAction* _EDIT_PERFS;
   QAction* _RELOAD_PERFS;
+  QActionGroup* _PERFS_ACTIONS;
 
   QAction* _AKA_PERFORMERS_INFORMATION;
   QAction* _EDIT_PERF_AKA;
   QAction* _RELOAD_PERF_AKA;
+  QActionGroup* _PERFS_AKA_ACTIONS;
 
-  QAction* _SELECT_A_FOLDER_AND_LOAD_JSON;
-  QAction* _EMPTY_JSONS_LISTWIDGET;
-  QAction* _LAST_JSON;
-  QAction* _NEXT_JSON;
+  QAction* _BROWSE_AND_SELECT_THE_FOLDER;
+  QAction* _CLR_TO_BE_EDITED_LIST;
+  QActionGroup* _FILE_LOAD_ACTIONS;
+
+  QAction* _LAST_FILE;
+  QAction* _NEXT_FILE;
   QAction* _AUTO_SKIP;
   QAction* _CONDITION_NOT;
-  QActionGroup* FILES_ACTIONS;
+  QActionGroup* _QUICK_EDIT_ACTIONS;
 
   QAction* _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD;
   QAction* _LOWER_ALL_WORDS;
   QAction* _FORMATTER;
   QAction* _RELOAD_JSON_FROM_FROM_DISK;
   QAction* _ADD_SELECTED_PERFORMER;
+  QActionGroup* _TEXT_EDIT_ACTIONS;
+
   QAction* _SAVE;
   QAction* _CANCEL;
   QAction* _SUBMIT;
-  QActionGroup* EDIT_ACTIONS;
+  QActionGroup* _FILE_SAVE_ACTIONS;
 
   QAction* _REVEAL_IN_EXPLORER;
   QAction* _OPEN_THIS_FILE;
-  QAction* _HINT;
-  QAction* _LEARN_PERFORMERS_FROM_JSON;
+  QActionGroup* _SYSTEM_ACTIONS;
 
-  QAction* LOAD_JSONS_FROM_CURRENT_FOLDER;
-  QAction* CONSTRUCT_JSONS_FOR_VIDS;
-  QAction* JSON_ADD_PERFORMERS;
-  QAction* JSON_SET_PRODUCTION_STUDIO;
-  QAction* JSON_ADD_PERFORMER_KEY_VALUE_PAIR;
-  QAction* JSON_ADD_PRODUCTION_STUDIO_KEY_VALUE_PAIR;
-  QAction* JSON_CLEAR_PERFORMERS_PROD_STUDIO_NAME;
-  QActionGroup* BATCH_FILES_ACTIONS;
+  QAction* _AI_HINT;
+  QAction* _LEARN_PERFORMERS_FROM_JSON;
+  QActionGroup* _AI_ACTIONS;
+
+  QAction* _SELECT_CURRENT_FOLDER;
+  QAction* _CONSTRUCT_JSONS_FOR_VIDS;
+  QAction* _APPEND_PERFORMERS;
+  QAction* _SET_STUDIO;
+  QAction* _CONSTRUCT_PERFORMER_KVP;
+  QAction* _CONSTRUCT_STUDIO_KVP;
+  QAction* _DESTRUCT_PERFORMERS_STUDIO_KVP;
+  QActionGroup* _BATCH_EDIT_TOOL_ACTIONS;
 };
 
 JsonEditorActions& g_jsonEditorActions();

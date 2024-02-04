@@ -33,56 +33,20 @@ JsonEditor::JsonEditor(QWidget* parent)
       m_editorPanel(new QFormLayout),
       m_extraEditorPanel(new QFormLayout),
       m_editorWidget(new QWidget(this)),
+      m_jsonList(new QListWidget(this)),
 
-      m_jsonList(new QListWidget),
-      m_listMenu(getListPanelRightClickMenu()),
-
-      m_editorAndListSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
-      m_editorToolBar(new QToolBar("json editor actions", this)),
-      m_menuBar(new QMenuBar(this)) {
-  QMenu* fileMenu = new QMenu("File", m_menuBar);
-  fileMenu->addAction(g_jsonEditorActions()._SELECT_A_FOLDER_AND_LOAD_JSON);
-  fileMenu->addAction(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET);
-  fileMenu->addAction(g_jsonEditorActions()._AUTO_SKIP);
-  m_menuBar->addMenu(fileMenu);
-
-  QMenu* editMenu = new QMenu("Edit", m_menuBar);
-  editMenu->addAction(g_jsonEditorActions()._SUBMIT);
-  m_menuBar->addMenu(editMenu);
-
-  QMenu* productionStudioMenu = new QMenu("Studio", m_menuBar);
-  productionStudioMenu->addAction(g_jsonEditorActions()._STUDIO_INFORMATION);
-  productionStudioMenu->addAction(g_jsonEditorActions()._EDIT_STUDIOS);
-  productionStudioMenu->addAction(g_jsonEditorActions()._RELOAD_STUDIOS);
-  m_menuBar->addMenu(productionStudioMenu);
-
-  QMenu* performerMenu = new QMenu("Performer", m_menuBar);
-  performerMenu->addAction(g_jsonEditorActions()._PERFORMERS_INFORMATION);
-  performerMenu->addAction(g_jsonEditorActions()._EDIT_PERFS);
-  performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERFS);
-  performerMenu->addSeparator();
-  performerMenu->addAction(g_jsonEditorActions()._AKA_PERFORMERS_INFORMATION);
-  performerMenu->addAction(g_jsonEditorActions()._EDIT_PERF_AKA);
-  performerMenu->addAction(g_jsonEditorActions()._RELOAD_PERF_AKA);
-  m_menuBar->addMenu(performerMenu);
-
+      m_menuBar(g_jsonEditorActions().GetJsonMenuBar(this)),
+      m_editorToolBar(g_jsonEditorActions().GetJsonToolBar(this)),
+      m_listMenu(g_jsonEditorActions().GetJsonToBeEdittedListMenu(this)),
+      m_editorAndListSplitter(new QSplitter(Qt::Orientation::Horizontal, this)) {
   setMenuBar(m_menuBar);
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_editorToolBar);
 
   m_jsonList->setContextMenuPolicy(Qt::CustomContextMenu);
   m_jsonList->setAlternatingRowColors(true);
   m_jsonList->setSortingEnabled(true);
   m_jsonList->setDragDropMode(QAbstractItemView::NoDragDrop);
   m_jsonList->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-
-  m_editorToolBar->addActions(g_jsonEditorActions().FILES_ACTIONS->actions());
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addActions(g_jsonEditorActions().EDIT_ACTIONS->actions());
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON);
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(g_jsonEditorActions()._HINT);
-  m_editorToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_editorToolBar);
 
   for (const QString& jsonKey : JSONKey::JsonKeyListOrder) {
     m_editorPanel->addRow(jsonKey, freqJsonKeyValue[jsonKey]);
@@ -95,9 +59,8 @@ JsonEditor::JsonEditor(QWidget* parent)
 
   m_editorAndListSplitter->addWidget(m_editorWidget);
   m_editorAndListSplitter->addWidget(m_jsonList);
-
-  setCentralWidget(m_editorAndListSplitter);
   m_editorAndListSplitter->setStyleSheet(QString("QTextEdit {font-size: %1pt} \r\n QLineEdit {font-size: %1pt};").arg(13));
+  setCentralWidget(m_editorAndListSplitter);
 
   subscribe();
 
@@ -105,13 +68,6 @@ JsonEditor::JsonEditor(QWidget* parent)
   setWindowIcon(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"));
 
   updateWindowsSize();
-}
-
-auto JsonEditor::getListPanelRightClickMenu() -> QMenu* {
-  auto* menu = new QMenu("json list right click menu", this);
-  menu->addAction(g_jsonEditorActions()._REVEAL_IN_EXPLORER);
-  menu->addAction(g_jsonEditorActions()._OPEN_THIS_FILE);
-  return menu;
 }
 
 bool JsonEditor::hasLast() const {
@@ -270,8 +226,8 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
   connect(g_jsonEditorActions()._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, this, &JsonEditor::refreshEditPanel);
 
-  connect(g_jsonEditorActions()._NEXT_JSON, &QAction::triggered, this, &JsonEditor::onNext);
-  connect(g_jsonEditorActions()._LAST_JSON, &QAction::triggered, this, &JsonEditor::onLast);
+  connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, this, &JsonEditor::onNext);
+  connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, this, &JsonEditor::onLast);
 
   connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, this, &JsonEditor::onAutoSkipSwitch);
 
@@ -288,45 +244,45 @@ void JsonEditor::subscribe() {
 
   connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
 
-  connect(g_jsonEditorActions()._SELECT_A_FOLDER_AND_LOAD_JSON, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
-  connect(g_jsonEditorActions()._EMPTY_JSONS_LISTWIDGET, &QAction::triggered, this->m_jsonList, &QListWidget::clear);
+  connect(g_jsonEditorActions()._BROWSE_AND_SELECT_THE_FOLDER, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
+  connect(g_jsonEditorActions()._CLR_TO_BE_EDITED_LIST, &QAction::triggered, this->m_jsonList, &QListWidget::clear);
 
   connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
-  connect(g_jsonEditorActions()._HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
+  connect(g_jsonEditorActions()._AI_HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 
   connect(g_jsonEditorActions()._STUDIO_INFORMATION, &QAction::triggered, this, [this]() {
     static auto& psm = ProductionStudioManager::getIns();
-    QMessageBox::information(this, "Studios Count", QString::number(psm.count()));
+    psm.DisplayStatistic(this);
   });
   connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, &JsonEditor::onEditStudios);
   connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
     static auto& psm = ProductionStudioManager::getIns();
     int itemsCntChanged = psm.ForceReloadStdStudioName();
-    Notificator::information("Reload standard studio name", QString("+/- %1 items").arg(itemsCntChanged));
+    Notificator::information("Reload standard studio name", QString("delta %1 items").arg(itemsCntChanged));
   });
 
   connect(g_jsonEditorActions()._PERFORMERS_INFORMATION, &QAction::triggered, this, [this]() {
     static auto& pm = PerformersManager::getIns();
-    QMessageBox::information(this, "Performers Count", QString::number(pm.count()));
+    pm.DisplayStatistic(this);
   });
   connect(g_jsonEditorActions()._EDIT_PERFS, &QAction::triggered, this, &JsonEditor::onEditPerformers);
   connect(g_jsonEditorActions()._RELOAD_PERFS, &QAction::triggered, this, []() {
     static auto& pm = PerformersManager::getIns();
     int itemsCntChanged = pm.ForceReloadPerformers();
-    Notificator::information("Reload performers", QString("+/- %1 item(s)").arg(itemsCntChanged));
+    Notificator::information("Reload performers", QString("delta %1 item(s)").arg(itemsCntChanged));
   });
 
   connect(g_jsonEditorActions()._AKA_PERFORMERS_INFORMATION, &QAction::triggered, this, [this]() {
     static auto& dbTM = PerformersAkaManager::getIns();
-    QMessageBox::information(this, "Aka Performers Count", QString::number(dbTM.count()));
+    dbTM.DisplayStatistic(this);
   });
   connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, &JsonEditor::onEditAkaPerformer);
   connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
     static auto& dbTM = PerformersAkaManager::getIns();
     int itemsCntChanged = dbTM.ForceReloadAkaName();
-    Notificator::information("Reload AKA", QString("+/- %1 item(s)").arg(itemsCntChanged));
+    Notificator::information("Reload AKA performers", QString("delta %1 item(s)").arg(itemsCntChanged));
   });
 }
 

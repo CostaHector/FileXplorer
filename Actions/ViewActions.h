@@ -14,7 +14,7 @@ class ViewActions : public QObject {
         PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("HTML preview"))},
         JSON_EDITOR_PANE{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), tr("Json editor"))},
         _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":/themes/VIDEO_PLAYER"), tr("Embedded player"))},
-        PANES_RIBBONS(Get_NAVIGATION_PANE_Actions()),
+        _VIEW_ACRIONS(Get_NAVIGATION_PANE_Actions()),
         _SYS_VIDEO_PLAYERS(new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
         _VIDEO_PLAYERS(GetPlayersActions()) {}
 
@@ -28,7 +28,6 @@ class ViewActions : public QObject {
         QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString()));
     PREVIEW_PANE_HTML->setCheckable(true);
 
-    JSON_EDITOR_PANE->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_J));
     JSON_EDITOR_PANE->setToolTip(
         QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(JSON_EDITOR_PANE->text(), JSON_EDITOR_PANE->shortcut().toString()));
 
@@ -65,11 +64,11 @@ class ViewActions : public QObject {
     return actionGroup;
   }
 
-  QAction* NAVIGATION_PANE = nullptr;
-  QAction* PREVIEW_PANE_HTML = nullptr;
-  QAction* JSON_EDITOR_PANE = nullptr;
-  QAction* _VIDEO_PLAYER_EMBEDDED = nullptr;
-  QActionGroup* PANES_RIBBONS;
+  QAction* NAVIGATION_PANE;
+  QAction* PREVIEW_PANE_HTML;
+  QAction* JSON_EDITOR_PANE;
+  QAction* _VIDEO_PLAYER_EMBEDDED;
+  QActionGroup* _VIEW_ACRIONS;
 
   QAction* _SYS_VIDEO_PLAYERS = nullptr;
   QActionGroup* _VIDEO_PLAYERS;

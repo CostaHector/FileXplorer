@@ -220,8 +220,8 @@ QToolBar* RibbonMenu::LeafView() const {
   viewPaneToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
   viewPaneToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
   SetLayoutAlightment(viewPaneToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-
-  auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions().BATCH_FILES_ACTIONS->actions(), QToolButton::MenuButtonPopup, "",
+  
+  auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions()._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup, "",
                                           Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   auto* embeddedPlayerTB = DropListToolButton(g_viewActions()._VIDEO_PLAYER_EMBEDDED, g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(),
                                               QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
