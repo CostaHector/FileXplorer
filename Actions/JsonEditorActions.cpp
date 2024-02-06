@@ -7,17 +7,17 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
       _STUDIO_INFORMATION(new QAction(QIcon(":/themes/STATS"), tr("Studios statistics"), this)),
       _EDIT_STUDIOS(new QAction(QIcon(":/themes/PRODUCTION_STUDIOS"), tr("Edit Studios map"), this)),
-      _RELOAD_STUDIOS(new QAction(tr("Reload Studios"), this)),
+      _RELOAD_STUDIOS(new QAction(QIcon(":/themes/RELOAD_FROM_DISK"), tr("Reload Studios"), this)),
       _STUDIO_ACTIONS{new QActionGroup(this)},
 
       _PERFORMERS_INFORMATION(new QAction(QIcon(":/themes/STATS"), tr("Performers statistics"), this)),
       _EDIT_PERFS(new QAction(QIcon(":/themes/PERFORMERS"), tr("Edit Performers list"), this)),
-      _RELOAD_PERFS(new QAction(tr("Reload Performers"), this)),
+      _RELOAD_PERFS(new QAction(QIcon(":/themes/RELOAD_FROM_DISK"), tr("Reload Performers"), this)),
       _PERFS_ACTIONS{new QActionGroup(this)},
 
       _AKA_PERFORMERS_INFORMATION(new QAction(QIcon(":/themes/STATS"), tr("Aka Performers statistics"), this)),
       _EDIT_PERF_AKA(new QAction(QIcon(":/themes/EDIT_AKA_FILE"), tr("Edit AKA perf file"), this)),
-      _RELOAD_PERF_AKA(new QAction(tr("Reload AKA perf"), this)),
+      _RELOAD_PERF_AKA(new QAction(QIcon(":/themes/RELOAD_FROM_DISK"), tr("Reload AKA perf"), this)),
       _PERFS_AKA_ACTIONS{new QActionGroup(this)},
 
       _BROWSE_AND_SELECT_THE_FOLDER(new QAction(QIcon(":/themes/SELECT_A_FOLDER_AND_LOAD_JSON"), tr("browse"), this)),
@@ -33,7 +33,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), tr("Capitalize"), this)),
       _LOWER_ALL_WORDS(new QAction(QIcon(":/themes/RENAME_LOWER_CASE"), tr("lowercase"), this)),
       _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), tr("Formatter"), this)),
-      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_JSON_FROM_FILE"), tr("Reload now"), this)),
+      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_FROM_DISK"), tr("Reload now"), this)),
       _ADD_SELECTED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), tr("Append to perfs"), this)),
       _TEXT_EDIT_ACTIONS{new QActionGroup(this)},
 
@@ -47,10 +47,10 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _SYSTEM_ACTIONS{new QActionGroup(this)},
 
       _AI_HINT(new QAction(QIcon(":/themes/AI_IDEA"), tr("AI Hint"), this)),
-      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/LEARN_PERFORMERS_FROM_JSON"), tr(">>AI Library"), this)),
+      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/AI_LEARN"), tr(">>AI Library"), this)),
       _AI_ACTIONS{new QActionGroup(this)},
 
-      _SELECT_CURRENT_FOLDER{new QAction(QIcon(":/themes/LOAD_JSONS_FROM_CURRENT_PATH"), tr("Select Current folder and load from it"))},
+      _SELECT_CURRENT_FOLDER{new QAction(QIcon(":/themes/LOAD_JSONS_FROM_CURRENT_PATH"), tr("Select Current path"))},
       _CONSTRUCT_JSONS_FOR_VIDS{new QAction(tr("Construct jsons by file properties"))},
       _APPEND_PERFORMERS{new QAction(QIcon(":/themes/APPEND_PERFORMERS"), tr("Append performers"))},
       _SET_STUDIO{new QAction(QIcon(":/themes/PRODUCTION_STUDIOS"), tr("Set production studio"))},
@@ -185,23 +185,22 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _CONSTRUCT_JSONS_FOR_VIDS->setToolTip(QString("<b>%1 (%2)</b><br/>Construct json file for each vids under current path if json not exists.")
                                             .arg(_CONSTRUCT_JSONS_FOR_VIDS->text(), _CONSTRUCT_JSONS_FOR_VIDS->shortcut().toString()));
 
-  _APPEND_PERFORMERS->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Input and Add performers to json file").arg(_APPEND_PERFORMERS->text(), _APPEND_PERFORMERS->shortcut().toString()));
+  _APPEND_PERFORMERS->setToolTip(QString("<b>%1 (%2)</b><br/>Input performers and append them json files under current path")
+                                     .arg(_APPEND_PERFORMERS->text(), _APPEND_PERFORMERS->shortcut().toString()));
 
-  _SET_STUDIO->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Input and Set production name for json file").arg(_SET_STUDIO->text(), _SET_STUDIO->shortcut().toString()));
+  _SET_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Input and set studio for json files under current path")
+                              .arg(_SET_STUDIO->text(), _SET_STUDIO->shortcut().toString()));
 
-  _CONSTRUCT_PERFORMER_KVP->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Add performers key-value pair for json file if key not exists. \n Otherwise init its values.")
-          .arg(_CONSTRUCT_PERFORMER_KVP->text(), _CONSTRUCT_PERFORMER_KVP->shortcut().toString()));
+  _CONSTRUCT_PERFORMER_KVP->setToolTip(QString("<b>%1 (%2)</b><br/>Add and construct performers key-value pair for json files under current path."
+                                               "For performer value is non-empty, the json file will be skipped.")
+                                           .arg(_CONSTRUCT_PERFORMER_KVP->text(), _CONSTRUCT_PERFORMER_KVP->shortcut().toString()));
 
-  _CONSTRUCT_STUDIO_KVP->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Add production studio key-value pair for json file if key not exists. \n Otherwise init its values.")
-          .arg(_CONSTRUCT_STUDIO_KVP->text(), _CONSTRUCT_STUDIO_KVP->shortcut().toString()));
+  _CONSTRUCT_STUDIO_KVP->setToolTip(QString("<b>%1 (%2)</b><br/>Add production studio key-value pair for json files under current path."
+                                            "For studio value is non-empty, the json file will be skipped.")
+                                        .arg(_CONSTRUCT_STUDIO_KVP->text(), _CONSTRUCT_STUDIO_KVP->shortcut().toString()));
 
-  _CLR_PERFORMERS_STUDIO_VALUE->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Clear both performers and production studio values for json file.")
-          .arg(_CLR_PERFORMERS_STUDIO_VALUE->text(), _CLR_PERFORMERS_STUDIO_VALUE->shortcut().toString()));
+  _CLR_PERFORMERS_STUDIO_VALUE->setToolTip(QString("<b>%1 (%2)</b><br/>Clear both performers and studio values for json files under current path.")
+                                               .arg(_CLR_PERFORMERS_STUDIO_VALUE->text(), _CLR_PERFORMERS_STUDIO_VALUE->shortcut().toString()));
 
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_SELECT_CURRENT_FOLDER);
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_CONSTRUCT_JSONS_FOR_VIDS);

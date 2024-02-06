@@ -129,6 +129,7 @@ class FileBasicOperationsActions : public QObject {
   auto GetOPENActions() -> QActionGroup*;
   auto GetCOPY_PATHActions() -> QActionGroup* {
     QAction* COPY_FULL_PATH = new QAction(QIcon(":/themes/COPY_FULL_PATH"), tr("Copy fullpath"));
+    COPY_FULL_PATH->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_Insert));
     COPY_FULL_PATH->setToolTip(
         QString("<b>%1 (%2)</b><br/>. <b>path/name</b> <br/>Copy the absolute file name of the selected item(s) to the clipboard.")
             .arg(COPY_FULL_PATH->text(), COPY_FULL_PATH->shortcut().toString()));
@@ -140,6 +141,7 @@ class FileBasicOperationsActions : public QObject {
     COPY_PATH->setShortcutVisibleInContextMenu(true);
 
     QAction* COPY_NAME = new QAction(QIcon(":/themes/COPY_NAME"), tr("Copy name"));
+    COPY_NAME->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_Insert));
     COPY_NAME->setToolTip(QString("<b>%1 (%2)</b><br/> path/<b>name</b> <br/>Copy the name of the selected item(s) to the clipboard.")
                               .arg(COPY_NAME->text(), COPY_NAME->shortcut().toString()));
     COPY_NAME->setShortcutVisibleInContextMenu(true);
