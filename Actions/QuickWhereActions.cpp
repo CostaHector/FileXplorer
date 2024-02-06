@@ -5,13 +5,13 @@
 
 QuickWhereActions::QuickWhereActions(QObject* parent)
     : QObject{parent},
-      RESET_CONDITION(new QAction(QIcon(":/themes/RESET"), "Reset", this)),
-      SAVE_WHERE(new QAction(QIcon(":/themes/PATH_BACK_TO"), "Save", this)),
+      RESET_CONDITION(new QAction(QIcon(":/themes/RESET"), tr("Reset"), this)),
+      SAVE_WHERE(new QAction(QIcon(":/themes/PATH_BACK_TO"), tr("Save"), this)),
       HIST_WHERE(new QToolButton),
-      SHOW_HISTORY(new QAction(QIcon(":/themes/WHERE_CLAUSE_HISTORY"), "HIST", this)),
-      CLEAR_ALL_WHERE(new QAction(QIcon(":/themes/CLEAR_VIDEOS_LIST"), "Clear", this)),
-      AUTO_COMPLETE_AKA_SWITCH(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), "Completer", this)),
-      APPLY_AND_CLOSE(new QAction(QIcon(":/themes/SAVED"), "Apply", this)),
+      SHOW_HISTORY(new QAction(QIcon(":/themes/WHERE_CLAUSE_HISTORY"), tr("HIST"), this)),
+      CLEAR_ALL_WHERE(new QAction(QIcon(":/themes/CLEAR_VIDEOS_LIST"), tr("Clear"), this)),
+      AUTO_COMPLETE_AKA_SWITCH(new QAction(QIcon(":/themes/PERFORMERS_LIST_HINT"), tr("Completer"), this)),
+      APPLY_AND_CLOSE(new QAction(QIcon(":/themes/SAVED"), tr("Apply"), this)),
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {
   m_historyWhereClauseMenu->setToolTipsVisible(true);

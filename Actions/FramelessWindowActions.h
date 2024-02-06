@@ -16,7 +16,7 @@ class FramelessWindowActions : public QObject {
   explicit FramelessWindowActions(QObject* parent = nullptr);
 
   auto Get_FRAMELESS_MENU_Actions() -> QActionGroup* {
-    _EXPAND_RIBBONS = new QAction(QIcon(":/themes/EXPAND_RIBBON"), "Expand/Hide Commands");
+    _EXPAND_RIBBONS = new QAction(QIcon(":/themes/EXPAND_RIBBON"), tr("Expand/Hide Commands"));
     _EXPAND_RIBBONS->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_1));
     _EXPAND_RIBBONS->setToolTip(QString("<b>%1 (%2)</b><br/> Show tabs with visible commands when enabled, or show tabs with hidden commands")
                                     .arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
@@ -24,7 +24,7 @@ class FramelessWindowActions : public QObject {
     _EXPAND_RIBBONS->setChecked(
         PreferenceSettings().value(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.v).toBool());
 
-    QAction* _FRAMELESS = new QAction(QIcon(":/themes/FRAMELESS_WINDOW"), "Frameless Window");
+    QAction* _FRAMELESS = new QAction(QIcon(":/themes/FRAMELESS_WINDOW"), tr("Frameless Window"));
     _FRAMELESS->setCheckable(true);
     _FRAMELESS->setShortcut(QKeySequence(Qt::Key::Key_F10));
     _FRAMELESS->setToolTip(QString("<b>%1 (%2)</b><br/> Set window framless or not.").arg(_FRAMELESS->text(), _FRAMELESS->shortcut().toString()));

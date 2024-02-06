@@ -18,7 +18,7 @@ class DatabaseToolBar : public QToolBar {
   QToolBar* dbViewHideShow;
 
   DatabaseToolBar(const QString& title, QWidget* parent = nullptr)
-      : QToolBar(parent),
+      : QToolBar(title, parent),
         dbControlTB(GetDatabaseControlTB()),
         functionsTB(GetFunctionsTB()),
         dbViewHideShow(GetHideShowToolButton()) {
@@ -55,6 +55,7 @@ class DatabaseToolBar : public QToolBar {
     QToolBar* functionsTB = new QToolBar("Function", this);
     functionsTB->setOrientation(Qt::Orientation::Vertical);
     functionsTB->addActions(g_dbAct().DB_FUNCTIONS->actions());
+    functionsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     return functionsTB;
   }
 };

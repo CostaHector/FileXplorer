@@ -4,14 +4,14 @@
 
 TorrentsManagerActions::TorrentsManagerActions(QObject* parent)
     : QObject{parent},
-      OPEN_WITH_LOCAL_APP(new QAction("Open with", this)),
+      OPEN_WITH_LOCAL_APP(new QAction(tr("Open with"), this)),
       INIT_DATABASE(new QAction(QString("Init Database [%1]").arg(SystemPath::TORRENTS_DATABASE), this)),
       INIT_TABLE(new QAction(QString("Create table [%1]").arg(DB_TABLE::TORRENTS), this)),
       INSERT_INTO_TABLE(new QAction(QString("insert into table [%1]").arg(DB_TABLE::TORRENTS), this)),
-      DELETE_FROM_TABLE(new QAction("Delete from table", this)),
-      DROP_TABLE(new QAction("Drop table(complete table))", this)),
-      SUBMIT(new QAction("Submit", this)),
-      SHOW_TORRENTS_MANAGER(new QAction(QIcon(":/themes/TORRENTS_MANAGER"), "Torrents", this)),
+      DELETE_FROM_TABLE(new QAction(tr("Delete from table"), this)),
+      DROP_TABLE(new QAction(tr("Drop table(complete table))"), this)),
+      SUBMIT(new QAction(tr("Submit"), this)),
+      SHOW_TORRENTS_MANAGER(new QAction(QIcon(":/themes/TORRENTS_MANAGER"), tr("Torrents"), this)),
       m_menuBar(GetMenuBar()) {
   InitActionsTooltips();
 }
