@@ -5,51 +5,19 @@
 #include <QActionGroup>
 #include <QApplication>
 #include <QObject>
-#include <QStyle>
-#include "PublicVariable.h"
 
 class FramelessWindowActions : public QObject {
  public:
   QAction* _EXPAND_RIBBONS;
+  QAction* _FRAMELESS;
+  QAction* _MINIMIZE;
+  QAction* _MAXIMIZE;
+  QAction* _CLOSE;
   QActionGroup* FRAMELESS_MENU_RIBBONS;
 
   explicit FramelessWindowActions(QObject* parent = nullptr);
 
-  auto Get_FRAMELESS_MENU_Actions() -> QActionGroup* {
-    _EXPAND_RIBBONS = new QAction(QIcon(":/themes/EXPAND_RIBBON"), tr("Expand/Hide Commands"));
-    _EXPAND_RIBBONS->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_1));
-    _EXPAND_RIBBONS->setToolTip(QString("<b>%1 (%2)</b><br/> Show tabs with visible commands when enabled, or show tabs with hidden commands")
-                                    .arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
-    _EXPAND_RIBBONS->setCheckable(true);
-    _EXPAND_RIBBONS->setChecked(
-        PreferenceSettings().value(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.v).toBool());
-
-    QAction* _FRAMELESS = new QAction(QIcon(":/themes/FRAMELESS_WINDOW"), tr("Frameless Window"));
-    _FRAMELESS->setCheckable(true);
-    _FRAMELESS->setShortcut(QKeySequence(Qt::Key::Key_F10));
-    _FRAMELESS->setToolTip(QString("<b>%1 (%2)</b><br/> Set window framless or not.").arg(_FRAMELESS->text(), _FRAMELESS->shortcut().toString()));
-    _FRAMELESS->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FRAMELESS_WINDOW.name, MemoryKey::SHOW_FRAMELESS_WINDOW.v).toBool());
-
-    QAction* _MINIMIZE = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMinButton), "Minimize Window");
-    _MINIMIZE->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Shows the widget minimized, as an icon.").arg(_MINIMIZE->text(), _MINIMIZE->shortcut().toString()));
-
-    QAction* _MAXIMIZE = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMaxButton), "Maximize/Normalize window");
-    _MAXIMIZE->setCheckable(true);
-    _MAXIMIZE->setToolTip(QString("<b>%1 (%2)</b><br/> Shows the widget maximized or Restores the widget after it has been maximized or minimized.")
-                              .arg(_MAXIMIZE->text(), _MAXIMIZE->shortcut().toString()));
-
-    QAction* _CLOSE = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton), "X");
-
-    QActionGroup* actionGroup = new QActionGroup(this);
-    actionGroup->addAction(_EXPAND_RIBBONS);
-    actionGroup->addAction(_FRAMELESS);
-    actionGroup->addAction(_MINIMIZE);
-    actionGroup->addAction(_MAXIMIZE);
-    actionGroup->addAction(_CLOSE);
-    actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-    return actionGroup;
-  }
+  auto Get_FRAMELESS_MENU_Actions() -> QActionGroup*;
 };
 
 FramelessWindowActions& g_framelessWindowAg();

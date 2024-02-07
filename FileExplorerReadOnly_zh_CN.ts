@@ -268,12 +268,13 @@
 <context>
     <name>FramelessWindowActions</name>
     <message>
-        <location filename="Actions/FramelessWindowActions.h" line="19"/>
-        <source>Expand/Hide Commands</source>
+        <location filename="Actions/FramelessWindowActions.cpp" line="7"/>
+        <source>Expand or Hide Commands</source>
+        <oldsource>Expand/Hide Commands</oldsource>
         <translation>展开或隐藏</translation>
     </message>
     <message>
-        <location filename="Actions/FramelessWindowActions.h" line="27"/>
+        <location filename="Actions/FramelessWindowActions.cpp" line="8"/>
         <source>Frameless Window</source>
         <translation>无边框</translation>
     </message>
@@ -412,7 +413,8 @@
     </message>
     <message>
         <location filename="Actions/JsonEditorActions.cpp" line="50"/>
-        <source>&gt;&gt;AI Library</source>
+        <source>AI Library</source>
+        <oldsource>&gt;&gt;AI Library</oldsource>
         <translation>供AI学习</translation>
     </message>
     <message>
