@@ -47,7 +47,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _SYSTEM_ACTIONS{new QActionGroup(this)},
 
       _AI_HINT(new QAction(QIcon(":/themes/AI_IDEA"), tr("AI Hint"), this)),
-      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/AI_LEARN"), tr(">>AI Library"), this)),
+      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/AI_LEARN"), tr("AI Library"), this)),
       _AI_ACTIONS{new QActionGroup(this)},
 
       _SELECT_CURRENT_FOLDER{new QAction(QIcon(":/themes/LOAD_JSONS_FROM_CURRENT_PATH"), tr("Select Current path"))},
