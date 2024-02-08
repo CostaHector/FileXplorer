@@ -2,13 +2,13 @@
 #include <QtTest>
 
 // add necessary includes here
-#include "Tools/PerformersStringParser.h"
+#include "Tools/PerformersManager.h"
 
 class PerformersManagerTest : public QObject {
   Q_OBJECT
  public:
-  explicit PerformersManagerTest(QObject* parent = nullptr) : QObject(parent), pm(PerformersStringParser::getIns()) {}
-  PerformersStringParser& pm;
+  explicit PerformersManagerTest(QObject* parent = nullptr) : QObject(parent), pm(PerformersManager::getIns()) {}
+  PerformersManager& pm;
 
  private slots:
   void test_performersDictNotEmpty() { QVERIFY2(not pm.m_performers.isEmpty(), "performers list should not be empty"); }
@@ -16,6 +16,7 @@ class PerformersManagerTest : public QObject {
     const auto& wordsList = pm.SplitSentence("Production Name - Movie Core Name - Nice & Devin Franco BB 4K");
     QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
   }
+
   void test_filterOutNameFromWordsList() {
     const auto& wordsList = pm.SplitSentence({"Jesse Theo Brady Devin Franco Vincent O'Reilly Topher Di Maggio Aspen"});
     const auto& perfsList = pm.FilterPerformersOut(wordsList);
@@ -25,6 +26,16 @@ class PerformersManagerTest : public QObject {
     const QSet<QString>& realPerfs{{"Jesse"}, {"Theo Brady"}, {"Devin Franco"}, {"Vincent O'Reilly"}, {"Topher Di Maggio"}, {"Aspen"}};
     QCOMPARE(perfsSet, realPerfs);
   }
+
+  void test_OneLetterXNameCommaAddSep(){
+    const auto& wordsList = pm.SplitSentence({"Gabriel Clark, Cutler X + Theo Brady"});
+    const auto& perfsList = pm.FilterPerformersOut(wordsList);
+    const QSet<QString>& perfsSet{perfsList.cbegin(), perfsList.cend()};
+    QVERIFY2(perfsList.contains("Gabriel Clark"), "comma sep");
+    QVERIFY2(perfsList.contains("Cutler X"), "add sep");
+    QVERIFY2(perfsList.contains("Theo Brady"), "\\0 sep");
+  }
+
   void test_sentenseWithPerfsAtLast() {
     const auto& wordsList = pm.SplitSentence("britishtwunk fucked by Craig Kennedy");
     QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
@@ -44,5 +55,5 @@ class PerformersManagerTest : public QObject {
   }
 };
 
-// QTEST_MAIN(PerformersManagerTest)
+QTEST_MAIN(PerformersManagerTest)
 #include "PerformersStringParserTest.moc"

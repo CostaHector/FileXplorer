@@ -11,8 +11,8 @@ class ProductionStudioManagerTest : public QObject {
   ProductionStudioManager& psm;
 
  private slots:
-  void test_performersDictNotEmpty() { QVERIFY2(not psm.m_prodStudioMap.isEmpty(), "production studio hash table should not be empty"); }
-  void test_standardProdStudioNameFrom(){
+  void test_performersDictNotEmpty() { QVERIFY2(psm.count() > 0, "production studio hash table should not be empty"); }
+  void test_standardProdStudioNameFrom() {
     const QStringList& fromLst = psm.StandardProductionStudioFrom("LucasEntertainment");
     QVERIFY2(fromLst.contains("lucasentertainment"), "only lowercase edition");
     QVERIFY2(fromLst.contains("lucas entertainment"), "split by A-Z0-9 and join by space");
@@ -30,7 +30,7 @@ class ProductionStudioManagerTest : public QObject {
     QVERIFY2(fromLstFullCapitalizer.contains("m e n"), "split by A-Z0-9 and join by space");
   }
 
-  void test_filterProdStudioNameOut(){
+  void test_filterProdStudioNameOut() {
     QCOMPARE(psm("[FFL] Lucas Entertainment - ABC.mp4"), "LucasEntertainment");
     QCOMPARE(psm("[FFL] LucasEntertainment - ABC.mp4"), "LucasEntertainment");
     QCOMPARE(psm("[FFL] lucas entertainment - ABC.mp4"), "LucasEntertainment");

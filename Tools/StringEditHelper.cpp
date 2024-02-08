@@ -3,9 +3,11 @@
 
 bool StringEditHelper::ReplaceAndUpdateSelection(QTextEdit* detailEditWidget, std::function<QString (QString)> fTrans) {
   if (detailEditWidget == nullptr) {
+    qDebug("lineEditWidget is nullptr");
     return false;
   }
   if (not fTrans) {
+    qDebug("fTrans is null");
     return false;
   }
   if (not detailEditWidget->textCursor().hasSelection()) {
@@ -31,9 +33,11 @@ bool StringEditHelper::ReplaceAndUpdateSelection(QTextEdit* detailEditWidget, st
 
 bool StringEditHelper::ReplaceAndUpdateSelection(QLineEdit* lineEditWidget, std::function<QString (QString)> fTrans) {
   if (lineEditWidget == nullptr) {
+    qDebug("lineEditWidget is nullptr");
     return false;
   }
   if (not fTrans) {
+    qDebug("fTrans is null");
     return false;
   }
   if (not lineEditWidget->hasSelectedText()) {

@@ -2,9 +2,11 @@
 #define PERFORMERSAKAMANAGER_H
 
 #include <QHash>
+#include <QMessageBox>
 #include <QSqlRecord>
 #include <QStack>
 #include <QString>
+#include <QWidget>
 #include "PublicVariable.h"
 
 class PerformersAkaManager {
@@ -23,6 +25,9 @@ class PerformersAkaManager {
   static int UpdateAKAHash(const bool isForce = false);
   QHash<QString, QString> akaPerf;
   QString GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const;
+
+  inline int count() const { return akaPerf.size(); }
+  inline void DisplayStatistic(QWidget* parent) { QMessageBox::information(parent, "Performers AKA Count", QString::number(count())); }
 
  private:
   PerformersAkaManager();

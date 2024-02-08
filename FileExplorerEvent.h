@@ -105,6 +105,7 @@ class FileExplorerEvent : public QObject {
   }
 
   bool on_revealInExplorer() const;
+  bool on_OpenInTerminal() const;
 
   auto on_moveToTrashBin() -> bool;
 

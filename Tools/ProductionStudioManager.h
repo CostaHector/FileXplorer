@@ -1,9 +1,11 @@
 #ifndef PRODUCTIONSTUDIOMANAGER_H
 #define PRODUCTIONSTUDIOMANAGER_H
 
+#include <QMessageBox>
 #include <QRegExp>
 #include <QSet>
 #include <QVariantHash>
+#include <QWidget>
 
 class ProductionStudioManager {
  public:
@@ -22,6 +24,9 @@ class ProductionStudioManager {
   }
 
   int ForceReloadStdStudioName();
+
+  inline int count() const { return m_prodStudioMap.size(); }
+  inline void DisplayStatistic(QWidget* parent) { QMessageBox::information(parent, "Studios Count", QString::number(count())); }
 
  protected:
   static QVariantHash ReadOutStdStudioName();

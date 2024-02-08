@@ -34,7 +34,7 @@ class DataBaseActions : public QObject {
         DB_VIEW_CLOSE_SHOW(Get_DB_VIEW_CLOSE_SHOW_Action()),
         DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()),
         DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()),
-        QUICK_WHERE_CLAUSE{new QAction(QIcon(":/themes/QUICK_WHERE_CLAUSE"), "Where clause", this)} {
+        QUICK_WHERE_CLAUSE{new QAction(QIcon(":/themes/QUICK_WHERE_CLAUSE"), tr("Where clause"), this)} {
     QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
   }
 
@@ -57,7 +57,7 @@ class DataBaseActions : public QObject {
     QAction* DELETE_FROM_TABLE = new QAction(QIcon(":/themes/DELETE_FROM_TABLE"), tr("Delete from"), this);
     DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::MOVIES` WHERE CLAUSE");
 
-    QAction* UNION_TABLE = new QAction(tr("Union"), this);
+    QAction* UNION_TABLE = new QAction(QIcon(":/themes/UNION"), tr("Union"), this);
     UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
 
     QActionGroup* databaseControlAG = new QActionGroup(this);
@@ -83,10 +83,10 @@ class DataBaseActions : public QObject {
   }
 
   auto Get_DB_FUNCTIONS_Action() -> QActionGroup* {
-    QAction* COUNT = new QAction(QIcon(), tr("COUNT"), this);
+    QAction* COUNT = new QAction(QIcon(":/themes/COUNTER"), tr("COUNT"), this);
     COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
 
-    QAction* SUM = new QAction(QIcon(), tr("SUM"), this);
+    QAction* SUM = new QAction(QIcon(":/themes/SUM"), tr("SUM"), this);
     SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
 
     QActionGroup* databaseFunctionsAG = new QActionGroup(this);

@@ -2,7 +2,7 @@
 
 auto TextReader(const QString& textPath) -> QString {
   QFile file(textPath);
-  if (file.exists()) {
+  if (not file.exists()) {
     qDebug("File[%s] not found", qPrintable(textPath));
     return "";
   }
@@ -44,7 +44,7 @@ const char* SUBMIT_BTN_STYLE =
     "    border-color: rgb(36, 118, 199);"
     "}";
 
-bool VerifyOneFilePath(const QString& fileKey) {
+bool VerifyOneFilePath(const QString& fileKey, const QString& fileType) {
   // fileKey:
   // WIN32_PERFORMERS_TABLE
   // WIN32_AKA_PERFORMERS
@@ -53,7 +53,7 @@ bool VerifyOneFilePath(const QString& fileKey) {
   // LINUX_AKA_PERFORMERS
   // LINUX_STANDARD_STUDIO_NAME
   constexpr int SYS_TYPE_PREFIX_LEN = 6;
-  const QString relPath = QString("%1/bin/%2.txt").arg(PROJECT_PATH, fileKey.mid(SYS_TYPE_PREFIX_LEN));
+  const QString relPath = QString("%1/bin/%2.%3").arg(PROJECT_PATH, fileKey.mid(SYS_TYPE_PREFIX_LEN), fileType);
   if (not PreferenceSettings().contains(fileKey)) {
     PreferenceSettings().setValue(fileKey, QFileInfo(relPath).absoluteFilePath());
   }
@@ -98,11 +98,13 @@ bool InitOutterPlainTextPath() {
   initOk = VerifyOneFilePath(MemoryKey::WIN32_AKA_PERFORMERS.name) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::WIN32_PERFORMERS_TABLE.name) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name) and initOk;
+  initOk = VerifyOneFilePath(MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.name, "bat") and initOk;
   initOk = VerifyOneFolderPath(MemoryKey::WIN32_RUNLOG.name) and initOk;
 #else
   initOk = VerifyOneFilePath(MemoryKey::LINUX_AKA_PERFORMERS.name) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::LINUX_PERFORMERS_TABLE.name) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name) and initOk;
+  initOk = VerifyOneFilePath(MemoryKey::LINUX_TERMINAL_OPEN_BATCH_FILE_PATH.name, "sh") and initOk;
   initOk = VerifyOneFolderPath(MemoryKey::LINUX_RUNLOG.name) and initOk;
 #endif
   return initOk;

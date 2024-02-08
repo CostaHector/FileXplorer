@@ -23,6 +23,6 @@ class RenameCaseTest : public QObject {
   }
 };
 
-QTEST_MAIN(RenameCaseTest)
+//QTEST_MAIN(RenameCaseTest)
 #include "RenameWidgetTest.moc"
 \

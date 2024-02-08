@@ -108,8 +108,8 @@ QToolBar* RibbonMenu::LeafHome() const {
   }
 
   const QString& defaultCopyActionName = PreferenceSettings().value(MemoryKey::DEFAULT_COPY_CHOICE.name, MemoryKey::DEFAULT_COPY_CHOICE.v).toString();
-  QAction* defaultCopyAction = FindQActionFromQActionGroupByActionName(defaultCopyActionName, g_fileBasicOperationsActions().COPY_PATH);
-  QToolButton* copyTB = DropListToolButton(defaultCopyAction, g_fileBasicOperationsActions().COPY_PATH->actions(), QToolButton::MenuButtonPopup, "",
+  QAction* defaultCopyAction = FindQActionFromQActionGroupByActionName(defaultCopyActionName, g_fileBasicOperationsActions().COPY_PATH_AG);
+  QToolButton* copyTB = DropListToolButton(defaultCopyAction, g_fileBasicOperationsActions().COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, "",
                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   {
     auto onDefCopyActChanged = [copyTB](QAction* triggeredAct) -> void {
@@ -211,7 +211,7 @@ QToolBar* RibbonMenu::LeafShare() const {
 QToolBar* RibbonMenu::LeafView() const {
   auto* NAVIGATION_PANE = g_viewActions().NAVIGATION_PANE;
   auto* PREVIEW_PANE_HTML = g_viewActions().PREVIEW_PANE_HTML;
-  auto* JSON_EDITOR_PANE = g_viewActions().JSON_EDITOR_PANE;
+  auto* JSON_EDITOR_PANE = g_viewActions()._JSON_EDITOR_PANE;
 
   auto* viewPaneToolBar = new QToolBar("View Pane Group");
   viewPaneToolBar->setOrientation(Qt::Orientation::Vertical);
@@ -220,8 +220,8 @@ QToolBar* RibbonMenu::LeafView() const {
   viewPaneToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
   viewPaneToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
   SetLayoutAlightment(viewPaneToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-
-  auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions().BATCH_FILES_ACTIONS->actions(), QToolButton::MenuButtonPopup, "",
+  
+  auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions()._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup, "",
                                           Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   auto* embeddedPlayerTB = DropListToolButton(g_viewActions()._VIDEO_PLAYER_EMBEDDED, g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(),
                                               QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
