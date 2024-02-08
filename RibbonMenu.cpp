@@ -108,8 +108,8 @@ QToolBar* RibbonMenu::LeafHome() const {
   }
 
   const QString& defaultCopyActionName = PreferenceSettings().value(MemoryKey::DEFAULT_COPY_CHOICE.name, MemoryKey::DEFAULT_COPY_CHOICE.v).toString();
-  QAction* defaultCopyAction = FindQActionFromQActionGroupByActionName(defaultCopyActionName, g_fileBasicOperationsActions().COPY_PATH);
-  QToolButton* copyTB = DropListToolButton(defaultCopyAction, g_fileBasicOperationsActions().COPY_PATH->actions(), QToolButton::MenuButtonPopup, "",
+  QAction* defaultCopyAction = FindQActionFromQActionGroupByActionName(defaultCopyActionName, g_fileBasicOperationsActions().COPY_PATH_AG);
+  QToolButton* copyTB = DropListToolButton(defaultCopyAction, g_fileBasicOperationsActions().COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, "",
                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   {
     auto onDefCopyActChanged = [copyTB](QAction* triggeredAct) -> void {
