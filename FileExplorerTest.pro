@@ -9,6 +9,7 @@ TEMPLATE = app
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
+    Actions/RenameActions.cpp \
     Tools/ProductionStudioManager.cpp \
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
@@ -27,17 +28,18 @@ SOURCES += \
     TestCase/FileOperationTest.cpp \
     TestCase/UndoRedoTest.cpp \
     Tools/Categorizer.cpp \
-    Tools/DBTableMoviesHelper.cpp \
+    Tools/PerformersAkaManager.cpp \
     Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/NameStandardizer.cpp \
-    Tools/PerformersStringParser.cpp \
+    Tools/PerformersManager.cpp \
     Tools/RenameWidget.cpp \
     UndoRedo.cpp
 
 
 HEADERS += \
     Actions/QuickWhereActions.h \
+    Actions/RenameActions.h \
     Tools/ProductionStudioManager.h \
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
@@ -45,11 +47,11 @@ HEADERS += \
     PublicTool.h \
     PublicVariable.h \
     Tools/Categorizer.h \
-    Tools/DBTableMoviesHelper.h \
+    Tools/PerformersAkaManager.h \
     Tools/DuplicateImagesRemover.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/NameStandardizer.h \
-    Tools/PerformersStringParser.h \
+    Tools/PerformersManager.h \
     Tools/RenameWidget.h \
     UndoRedo.h
 

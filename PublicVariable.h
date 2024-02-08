@@ -215,11 +215,13 @@ const GVarBool VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false);
 const GVarStrFile WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
 const GVarStrFile WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
 const GVarStrFile WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", {"json"});
+const GVarStrFile WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH", "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat", {"bat"});
 const GVarStrFolder WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG");
 
 const GVarStrFile LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
 const GVarStrFile LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
 const GVarStrFile LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", {"txt"});
+const GVarStrFile LINUX_TERMINAL_OPEN_BATCH_FILE_PATH("LINUX_TERMINAL_OPEN_BATCH_FILE_PATH", "../bin/LINUX_TERMINAL_OPEN_BATCH_FILE_PATH.sh", {"sh"});
 const GVarStrFolder LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG");
 }  // namespace MemoryKey
 
@@ -288,7 +290,7 @@ const QRegExp continousHypenComp("--+");                       //-
 const QRegExp hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
 const QRegExp trailingHypenComp("-$");                      // delete it
 
-const QRegExp DISCRAD_LETTER_COMP("[^A-Zãáéíóúüñ¿,¡0-9._@# ']", Qt::CaseInsensitive);
+const QRegExp DISCRAD_LETTER_COMP("[^A-Zãáéíóúüñ¿¡0-9._@# ']", Qt::CaseInsensitive);
 const QRegExp INVALID_TABLE_NAME_LETTER("[^A-Z0-9_]", Qt::CaseInsensitive);
 const QRegExp AND_COMP(" and | fucked by | fucked | fucks | fuck ", Qt::CaseInsensitive);
 const QRegExp RESOLUTION_COMP("2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
@@ -299,7 +301,7 @@ const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
 const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 }  // namespace JSON_RENAME_REGEX
 
-bool VerifyOneFilePath(const QString& fileKey);
+bool VerifyOneFilePath(const QString& fileKey, const QString& fileType = "txt");
 bool VerifyOneFolderPath(const QString& fileKey);
 
 bool InitOutterPlainTextPath();

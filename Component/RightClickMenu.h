@@ -19,7 +19,7 @@ class RightClickMenu : public QMenu {
     addActions(g_viewActions()._VIDEO_PLAYERS->actions());
     addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
     addSeparator();
-    addActions(g_fileBasicOperationsActions().COPY_PATH->actions());
+    addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
     addSeparator();
 
     addMenu(NEW_MENU);
