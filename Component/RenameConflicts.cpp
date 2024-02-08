@@ -8,16 +8,13 @@ const int RenameConflicts::COLUMNS_NAME_LIST_LEN = COLUMNS_NAME_LIST.size();
 
 auto RenameConflicts::GetQuickControlToolBar() -> QToolBar* {
   auto* SIZE_ACT(new QAction(QIcon(":/themes/FILESIZE_SCALE"), tr("Size Smaller"), this));
+  auto* DATE_ACT(new QAction(QIcon(":/themes/TIME_AXIS"), tr("Date Newer"), this));
+  auto* REVERT_ACT(new QAction(QIcon(":/themes/MIRROR_REVERT"), tr("Revert Selection"), this));
+  auto* RESET_ACT(new QAction(QIcon(":/themes/RESET"), tr("Reset Table"), this));
 
   connect(SIZE_ACT, &QAction::triggered, this, &RenameConflicts::on_Size);
-
-  auto* DATE_ACT(new QAction(QIcon(":/themes/TIME_AXIS"), tr("Date Newer"), this));
   connect(DATE_ACT, &QAction::triggered, this, &RenameConflicts::on_Date);
-
-  auto* REVERT_ACT(new QAction(QIcon(":/themes/MIRROR_REVERT"), tr("Revert Selection"), this));
   connect(REVERT_ACT, &QAction::triggered, this, &RenameConflicts::on_Revert);
-
-  auto* RESET_ACT(new QAction(QIcon(":/themes/RESET"), tr("Reset Table"), this));
   connect(RESET_ACT, &QAction::triggered, this, &RenameConflicts::InitData);
 
   auto* conflictsControlBar = new QToolBar;

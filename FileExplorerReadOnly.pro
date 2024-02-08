@@ -68,6 +68,7 @@ SOURCES += \
     Tools/RenameWidget.cpp \
     Tools/StringEditHelper.cpp \
     Tools/SubscribeDatabase.cpp \
+    Tools/SysTerminal.cpp \
     Tools/TorrentsDatabaseHelper.cpp \
     UndoRedo.cpp \
     View/DatabaseTableView.cpp \
@@ -155,6 +156,7 @@ HEADERS += \
     Tools/RenameWidget.h \
     Tools/StringEditHelper.h \
     Tools/SubscribeDatabase.h \
+    Tools/SysTerminal.h \
     Tools/TorrentsDatabaseHelper.h \
     UndoRedo.h \
     View/DatabaseTableView.h \
@@ -197,6 +199,8 @@ RESOURCES += \
 DISTFILES += \
     FileExplorerReadOnly_zh_CN.ts \
     bin/AKA_PERFORMERS.txt \
+    bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
+    bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \
     bin/PERFORMERS_TABLE.txt \
     bin/PerformerHtmlTemplate.html \
     bin/JsonExample/StudioName - Movie Name - Performer 1, Performer 2.json \
