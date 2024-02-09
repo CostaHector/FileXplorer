@@ -46,6 +46,7 @@
         <file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.png</file>
         <file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.png</file>
         <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.png</file>
+        <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
         <file alias="MUSIC_PLAYER">Flat/MUSIC_PLAYER.svg</file>
         <file alias="PLAY_BUTTON_ROUND">Flat/PLAY_BUTTON_ROUND.svg</file>
         <file alias="PLAY_BUTTON_TRIANGLE">Flat/PLAY_BUTTON_TRIANGLE.svg</file>
