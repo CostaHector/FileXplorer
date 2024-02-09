@@ -120,11 +120,12 @@ auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
   _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer")
                                       .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
 
+  _OPEN_IN_TERMINAL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::AltModifier | Qt::Key_T));
+  _OPEN_IN_TERMINAL->setShortcutVisibleInContextMenu(true);
+
   _OPEN_IN_TERMINAL->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                         "Open current view path in terminal")
                                     .arg(_OPEN_IN_TERMINAL->text(), _OPEN_IN_TERMINAL->shortcut().toString()));
-  _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::AltModifier | Qt::Key_T));
-  _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
 
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_REVEAL_IN_EXPLORER);
@@ -228,13 +229,8 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
 }
 
 auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
-  QAction* _NAME_STANDARDLIZER = new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), tr("Name Ruler"));
-  QAction* _CLASSIFIER = new QAction(QIcon(":/themes/CATEGORIZER"), tr("Categorizer"));
-  QAction* _ITEM_ORGANIZER = new QAction(QIcon(":/themes/ITEMS_ORGANIZER"), tr("Organizer"));
-  QAction* _DUPLICATE_ITEMS_REMOVER = new QAction(QIcon(":/themes/DEDUPLICATE"), tr("Deduplicator"));
-
   _NAME_STANDARDLIZER->setToolTip(
-      "<b>Rename</b><br/>"
+      "<b>Name Rules</b><br/>"
       "Given: [A..mp4, A (1).jpg, A -- 2.json]<br/>"
       "Result: [A.mp4, A - 1.jpg, A - 2.json]");
   _CLASSIFIER->setToolTip(
@@ -252,11 +248,21 @@ auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
       "Given: [A - 480p, A - 720p, A - 1080p, A - 2160p, A - 4K]<br/>"
       "Result: only A - 2160p will be kept, and others will moved to trashbin.");
 
+  _REMOVE_REDUNDANT_ITEMS->setToolTip(
+      "<b>Remove redundant items</b><br/>"
+      "A folder with no item or only one item<br/>"
+      "move the file (if it exists) to its upper level folder. And erase the redundant folder");
+  _REMOVE_EMPTY_FOLDER->setToolTip(
+      "<b>Remove Empty folders</b>"
+      "Only Empty folder will be removed");
+
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_NAME_STANDARDLIZER);
   actionGroup->addAction(_CLASSIFIER);
   actionGroup->addAction(_ITEM_ORGANIZER);
   actionGroup->addAction(_DUPLICATE_ITEMS_REMOVER);
+  actionGroup->addAction(_REMOVE_REDUNDANT_ITEMS);
+  actionGroup->addAction(_REMOVE_EMPTY_FOLDER);
   return actionGroup;
 }
 

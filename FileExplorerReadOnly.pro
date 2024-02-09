@@ -66,6 +66,7 @@ SOURCES += \
     Tools/PerformersManager.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PlayVideo.cpp \
+    Tools/RedundantFolderRemove.cpp \
     Tools/RenameWidget.cpp \
     Tools/StringEditHelper.cpp \
     Tools/SubscribeDatabase.cpp \
@@ -155,6 +156,7 @@ HEADERS += \
     Tools/PerformersManager.h \
     Tools/ProductionStudioManager.h \
     Tools/PlayVideo.h \
+    Tools/RedundantFolderRemove.h \
     Tools/RenameWidget.h \
     Tools/StringEditHelper.h \
     Tools/SubscribeDatabase.h \
