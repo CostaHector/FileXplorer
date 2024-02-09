@@ -45,6 +45,11 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   m_torrentsListView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
   m_torrentsListView->verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
 
+  const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
+  QFont defaultFont(m_torrentsListView->font());
+  defaultFont.setPointSize(fontSize);
+  m_torrentsListView->setFont(defaultFont);
+
   subscribe();
 
   updateWindowsSize();
