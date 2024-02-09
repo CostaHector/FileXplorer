@@ -7,23 +7,23 @@
 
 NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)
     : QToolBar(title),
-      fixedAG(new QActionGroup(this)),
-      labelsLst{
-          NavigationLabel{"Home", QDir::homePath(), new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirHomeIcon), "")},
-          NavigationLabel{"Desktop", QString("%1/%2").arg(QDir::homePath(), "Desktop"),
-                          new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "")},
-          NavigationLabel{"Documents", QString("%1/%2").arg(QDir::homePath(), "Documents"), new QAction(QIcon(":/themes/FOLDER_OF_DOCUMENTS"), "")},
-          NavigationLabel{"Downloads", QString("%1/%2").arg(QDir::homePath(), "Downloads"), new QAction(QIcon(":/themes/FOLDER_OF_DOWNLOADS"), "")},
-          NavigationLabel{"Pictures", QString("%1/%2").arg(QDir::homePath(), "Pictures"), new QAction(QIcon(":/themes/FOLDER_OF_PICTURES"), "")},
-          NavigationLabel{"Videos", QString("%1/%2").arg(QDir::homePath(), "Videos"), new QAction(QIcon(":/themes/FOLDER_OF_VIDEOS"), "")},
-          NavigationLabel{"Starred", "", new QAction(QIcon(":/themes/FOLDER_OF_FAVORITE"), "")},
-          NavigationLabel{"Computer", "", new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "")}},
-      extraAppendTB(new RightClickableToolBar("ExtraNavigation")) {
+      m_fixedAG(new QActionGroup(this)),
+      m_labelsLst{
+          NavigationLabel{QDir::homePath(), new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirHomeIcon), "Home")},
+          NavigationLabel{QString("%1/%2").arg(QDir::homePath(), "Desktop"),
+                          new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop")},
+          NavigationLabel{QString("%1/%2").arg(QDir::homePath(), "Documents"), new QAction(QIcon(":/themes/FOLDER_OF_DOCUMENTS"), "Documents")},
+          NavigationLabel{QString("%1/%2").arg(QDir::homePath(), "Downloads"), new QAction(QIcon(":/themes/FOLDER_OF_DOWNLOADS"), "Downloads")},
+          NavigationLabel{QString("%1/%2").arg(QDir::homePath(), "Pictures"), new QAction(QIcon(":/themes/FOLDER_OF_PICTURES"), "Pictures")},
+          NavigationLabel{QString("%1/%2").arg(QDir::homePath(), "Videos"), new QAction(QIcon(":/themes/FOLDER_OF_VIDEOS"), "Videos")},
+          NavigationLabel{"", new QAction(QIcon(":/themes/FOLDER_OF_FAVORITE"), "Starred")},
+          NavigationLabel{"", new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer")}},
+      m_extraAppendTB(new RightClickableToolBar("ExtraNavigation")) {
   setObjectName(title);
   GetFixedActions();
-  addActions(fixedAG->actions());
+  addActions(m_fixedAG->actions());
   addSeparator();
-  addWidget(extraAppendTB);
+  addWidget(m_extraAppendTB);
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   setOrientation(Qt::Vertical);
@@ -34,11 +34,10 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)
 }
 
 void NavigationToolBar::GetFixedActions() {
-  for (NavigationLabel& lb : labelsLst) {
-    lb.action->setText(lb.name);
+  for (NavigationLabel& lb : m_labelsLst) {
     lb.action->setCheckable(false);
-    fixedAG->addAction(lb.action);
-    shownText2Path[lb.name] = lb.path;
+    lb.action->setToolTip(lb.path);
+    m_fixedAG->addAction(lb.action);
   }
 }
 
@@ -48,9 +47,9 @@ bool NavigationToolBar::subscribe(T_IntoNewPath IntoNewPath) {
       qDebug("RightClickableToolBar, IntoNewPath is nullptr");
       return;
     }
-    IntoNewPath(shownText2Path[act->text()], true, true);
+    IntoNewPath(act->toolTip(), true, true);
   });
-  extraAppendTB->subscribe(IntoNewPath);
+  m_extraAppendTB->bindIntoNewPath(IntoNewPath);
   return true;
 }
 
@@ -58,7 +57,7 @@ void NavigationToolBar::AppendExtraActions(const QMap<QString, QString>& folderN
   if (folderName2AbsPath.isEmpty()) {
     return;
   }
-  extraAppendTB->AppendExtraActions(folderName2AbsPath);
+  m_extraAppendTB->AppendExtraActions(folderName2AbsPath);
 }
 
 // #define __MAIN__EQ__NAME__ 1

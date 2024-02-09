@@ -752,6 +752,19 @@
     </message>
 </context>
 <context>
+    <name>RightClickableToolBar</name>
+    <message>
+        <location filename="RightClickableToolBar.cpp" line="15"/>
+        <source>Unpin</source>
+        <translation>断开链接</translation>
+    </message>
+    <message>
+        <location filename="RightClickableToolBar.cpp" line="16"/>
+        <source>Unpin All</source>
+        <translation>断开所有链接</translation>
+    </message>
+</context>
+<context>
     <name>TorrentsManagerActions</name>
     <message>
         <location filename="Actions/TorrentsManagerActions.cpp" line="7"/>

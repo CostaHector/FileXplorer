@@ -40,8 +40,7 @@ AlertSystem::AlertSystem(QWidget* parent)
   m_alertsTable->setAlternatingRowColors(true);
   m_alertsTable->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
   m_alertsTable->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-  m_alertsTable->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked |
-                                 QAbstractItemView::EditKeyPressed);  // only F2 works. QAbstractItemView::NoEditTriggers;
+  m_alertsTable->setEditTriggers(QAbstractItemView::EditKeyPressed);  // only F2 works. QAbstractItemView::NoEditTriggers;
   m_alertsTable->setDragDropMode(QAbstractItemView::NoDragDrop);
   m_alertsTable->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -76,7 +75,7 @@ AlertSystem::AlertSystem(QWidget* parent)
   m_alertsTable->setItem(r, NUMBER_INDEX, new QTableWidgetItem(QString::number(r)));
   m_alertsTable->setItem(r, NAME_INDEX, new QTableWidgetItem(fileKey.name));
   m_alertsTable->setItem(r, VALUE_INDEX, new QTableWidgetItem(iconProvider.icon(QFileInfo(fileVal)), fileVal));
-  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in Json Editor to guest studio name."));
+  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in Json Editor to guess studio name."));
   ++r;
   m_alertsTable->insertRow(r);
   fileKey = MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH;
@@ -117,7 +116,7 @@ AlertSystem::AlertSystem(QWidget* parent)
   m_alertsTable->setItem(r, NUMBER_INDEX, new QTableWidgetItem(QString::number(r)));
   m_alertsTable->setItem(r, NAME_INDEX, new QTableWidgetItem(fileKey.name));
   m_alertsTable->setItem(r, VALUE_INDEX, new QTableWidgetItem(iconProvider.icon(QFileInfo(fileVal)), fileVal));
-  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in Json Editor to guest studio name."));
+  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in Json Editor to guess studio name."));
   ++r;
   m_alertsTable->insertRow(r);
   auto folderKey = MemoryKey::LINUX_RUNLOG;
@@ -141,8 +140,8 @@ AlertSystem::AlertSystem(QWidget* parent)
   lo->addWidget(m_recheckButtonBox);
   setLayout(lo);
 
-  // cellChanged
   connect(m_alertsTable, &QTableWidget::cellChanged, this, &AlertSystem::on_cellChanged);
+  connect(m_alertsTable, &QTableWidget::cellDoubleClicked, this, &AlertSystem::on_cellDoubleClicked);
   connect(m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QDialog::accept);
   connect(m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open), &QPushButton::clicked, this, &AlertSystem::onEditPreferenceSetting);
 }
@@ -220,6 +219,10 @@ bool AlertSystem::RefreshLineColor(const int row) {
     m_alertsTable->item(row, c)->setBackground(color);
   }
   return isPass;
+}
+
+bool AlertSystem::on_cellDoubleClicked(const int row, const int column) const {
+  return QDesktopServices::openUrl(QUrl::fromLocalFile(m_alertsTable->item(row, VALUE_INDEX)->text()));
 }
 
 bool AlertSystem::on_cellChanged(const int row, const int column) {
