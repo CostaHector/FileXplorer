@@ -106,7 +106,6 @@ bool InitOutterPlainTextPath() {
   initOk = VerifyOneFilePath(MemoryKey::LINUX_AKA_PERFORMERS) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::LINUX_PERFORMERS_TABLE) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::LINUX_STANDARD_STUDIO_NAME, "json") and initOk;
-  initOk = VerifyOneFilePath(MemoryKey::LINUX_TERMINAL_OPEN_BATCH_FILE_PATH, "sh") and initOk;
   initOk = VerifyOneFolderPath(MemoryKey::LINUX_RUNLOG) and initOk;
 #endif
   return initOk;

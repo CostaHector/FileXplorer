@@ -120,14 +120,6 @@ AlertSystem::AlertSystem(QWidget* parent)
   m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in Json Editor to guest studio name."));
   ++r;
   m_alertsTable->insertRow(r);
-  fileKey = MemoryKey::LINUX_TERMINAL_OPEN_BATCH_FILE_PATH;
-  fileVal = PreferenceSettings().value(fileKey.name, fileKey.v).toString();
-  m_alertsTable->setItem(r, NUMBER_INDEX, new QTableWidgetItem(QString::number(r)));
-  m_alertsTable->setItem(r, NAME_INDEX, new QTableWidgetItem(fileKey.name));
-  m_alertsTable->setItem(r, VALUE_INDEX, new QTableWidgetItem(iconProvider.icon(QFileInfo(fileVal)), fileVal));
-  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in reveal in terminal."));
-  ++r;
-  m_alertsTable->insertRow(r);
   auto folderKey = MemoryKey::LINUX_RUNLOG;
   fileVal = PreferenceSettings().value(folderKey.name, folderKey.v).toString();
   m_alertsTable->setItem(r, NUMBER_INDEX, new QTableWidgetItem(QString::number(r)));
@@ -191,8 +183,6 @@ bool AlertSystem::isRowItemPass(const int row) const {
     isPass = MemoryKey::LINUX_AKA_PERFORMERS.checker(keyValue);
   } else if (keyName == MemoryKey::LINUX_STANDARD_STUDIO_NAME.name) {
     isPass = MemoryKey::LINUX_STANDARD_STUDIO_NAME.checker(keyValue);
-  } else if (keyName == MemoryKey::LINUX_TERMINAL_OPEN_BATCH_FILE_PATH.name) {
-    isPass = MemoryKey::LINUX_TERMINAL_OPEN_BATCH_FILE_PATH.checker(keyValue);
   } else if (keyName == MemoryKey::LINUX_RUNLOG.name) {
     isPass = MemoryKey::LINUX_RUNLOG.checker(keyValue);
   }

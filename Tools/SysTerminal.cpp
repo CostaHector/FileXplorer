@@ -7,13 +7,7 @@
 #include <QTextStream>
 #include <QUrl>
 
-SysTerminal::SysTerminal() {
-#ifdef _WIN32
-  m_BAT_FILE_PATH = PreferenceSettings().value(MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.name).toString();
-#else
-  m_BAT_FILE_PATH = PreferenceSettings().value(MemoryKey::LINUX_TERMINAL_OPEN_BATCH_FILE_PATH.name).toString();
-#endif
-}
+SysTerminal::SysTerminal() : m_BAT_FILE_PATH{PreferenceSettings().value(MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.name).toString()} {}
 
 bool SysTerminal::WriteIntoBatchFile(const QString& command) {
   QFile fi(m_BAT_FILE_PATH);
@@ -28,27 +22,30 @@ bool SysTerminal::WriteIntoBatchFile(const QString& command) {
   fi.close();
   return QDesktopServices::openUrl(QUrl::fromLocalFile(m_BAT_FILE_PATH));
 }
-
+#include <QProcess>
 bool SysTerminal::operator()(const QString& path) {
-#ifdef _WIN32
   QFileInfo fi(path);
   if (not fi.exists()) {
     qDebug("path[%s] not exist", qPrintable(path));
     return false;
   }
   QString containerPath = fi.isFile() ? fi.absolutePath() : fi.absoluteFilePath();
+#ifdef _WIN32
   const int colonIndex = containerPath.indexOf(':');
   QString command;
   if (colonIndex != -1) {
     QString diskPart = path.left(colonIndex + 1);
-    command = QString("cmd.exe /K \"%1 && cd %2\"").arg(diskPart, path);
+    command = QString("cmd.exe /K \"%1 && cd %2\"").arg(diskPart, containerPath);
   } else {
-    command = QString("cmd.exe /K \"%1\"").arg(path);
+    command = QString("cmd.exe /K \"%1\"").arg(containerPath);
   }
   return WriteIntoBatchFile(command);
 #else
-  qDebug("Only Support in WINDOWS NOW");
-  return false;
+  QProcess process;
+  process.setProgram("gnome-terminal");
+  process.setArguments({"--working-directory=" + containerPath});
+  process.startDetached();  // Start the process in detached mode instead of start
+  return true;
 #endif
 }
 
@@ -64,7 +61,7 @@ class AwakeSystemTerminal : public QLineEdit {
   QSize sizeHint() const override { return QSize(1024, 768); }
 };
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
