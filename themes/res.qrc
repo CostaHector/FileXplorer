@@ -205,9 +205,15 @@
         <file alias="RATE10">PerformersManager/10.png</file>
         <file alias="FULL_CALCULATE">MD5Window/FULL_CALCULATE.png</file>
         <file alias="INCREMENTAL_CALCULATE">MD5Window/INCREMENTAL_CALCULATE.png</file>
+
+        <file alias="ALERT">AlertSystem/ALERT.svg</file>
+        <file alias="ALERT_ACTIVE">AlertSystem/ALERT_ACTIVE.svg</file>
+        <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
+        <file alias="FAILED">AlertSystem/FAILED.svg</file>
+        <file alias="PASS">AlertSystem/PASS.svg</file>
+        <file alias="RECHECK">AlertSystem/RECHECK.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>
-        <file alias="STANDARD_STUDIO_NAME">../bin/STANDARD_STUDIO_NAME.txt</file>
     </qresource>
 </RCC>

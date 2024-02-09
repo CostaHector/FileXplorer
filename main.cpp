@@ -11,14 +11,12 @@
 
 int main(int argc, char* argv[]) {
   if (not InitOutterPlainTextPath()) {
-    qFatal("Init plain text path failed. Force quit now!");
-    return -1;
+    qWarning("Init plain text path failed. Some json/where clause function may not work");
   }
-
   if (argc > 1) {
-    qDebug("argc[%d]>1. argv[1][%s].", argc, argv[1]);
+    qInfo("argc[%d]>1. argv[1][%s].", argc, argv[1]);
   } else {
-    qDebug("argc[%d]<=1.", argc);
+    qInfo("argc[%d]<=1.", argc);
   }
 
   QApplication a(argc, argv);
@@ -34,7 +32,8 @@ int main(int argc, char* argv[]) {
                         std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
 
-  auto* eventImplementer = new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView, std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
+  auto* eventImplementer =
+      new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView, std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
   fileExplorer.show();
 
   a.exec();
