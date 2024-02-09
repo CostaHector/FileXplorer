@@ -19,6 +19,7 @@ class AlertSystem : public QDialog {
   bool InitLineColor(const int row);
   bool RefreshLineColor(const int row);
   bool on_cellChanged(const int row, const int column);
+  bool on_cellDoubleClicked(const int row, const int column) const;
 
   void onEditPreferenceSetting() const;
 

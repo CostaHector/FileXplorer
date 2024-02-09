@@ -9,7 +9,6 @@
 
 struct NavigationLabel {
  public:
-  QString name;
   QString path;
   QAction* action;
 };
@@ -22,10 +21,9 @@ class NavigationToolBar : public QToolBar {
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
 
  protected:
-  QActionGroup* fixedAG;
-  QMap<QString, QString> shownText2Path;
-  QList<NavigationLabel> labelsLst;
-  RightClickableToolBar* extraAppendTB;
+  QActionGroup* m_fixedAG;
+  QList<NavigationLabel> m_labelsLst;
+  RightClickableToolBar* m_extraAppendTB;
 };
 
 #endif  // NAVIGATIONTOOLBAR_H
