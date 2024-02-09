@@ -12,6 +12,10 @@ class FileBasicOperationsActions : public QObject {
  public:
   explicit FileBasicOperationsActions(QObject* parent = nullptr)
       : QObject(parent),
+        _REVEAL_IN_EXPLORER{new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"), this)},
+        _OPEN_IN_TERMINAL{new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), tr("Open in terminal"), this)},
+        OPEN_AG(GetOPENActions()),
+
         COPY_FULL_PATH{new QAction(QIcon(":/themes/COPY_FULL_PATH"), tr("Copy fullpath"))},
         COPY_PATH{new QAction(QIcon(":/themes/COPY_PATH"), tr("Copy path"))},
         COPY_NAME{new QAction(QIcon(":/themes/COPY_NAME"), tr("Copy name"))},
@@ -26,26 +30,28 @@ class FileBasicOperationsActions : public QObject {
 
         BATCH_NEW_FOLDERS{new QAction(QIcon(":/themes/NEW_FOLDERS"), tr("New Folders"))},
         NEW(GetNEWActions()),
+
+        _NAME_STANDARDLIZER{new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), tr("Name Ruler"))},
+        _CLASSIFIER{new QAction(QIcon(":/themes/CATEGORIZER"), tr("Categorizer"))},
+        _ITEM_ORGANIZER{new QAction(QIcon(":/themes/ITEMS_ORGANIZER"), tr("Organizer"))},
+        _DUPLICATE_ITEMS_REMOVER{new QAction(QIcon(":/themes/DEDUPLICATE"), tr("Deduplicator"))},
+        _REMOVE_REDUNDANT_ITEMS{new QAction(QIcon(":/themes/ONE_FILE_IN_ONE_FOLDER"), tr("Rmv Redundancy"))},
+        _REMOVE_EMPTY_FOLDER{new QAction(QIcon(":/themes/EMPTY_FOLDER"), tr("Rmv Empty"))},
+        FOLDER_FILE_PROCESS(FolderFileCategoryProcess()),
         MOVE_COPY_TO(GetMOVE_COPY_TOActions()),
 
         MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
         COPY_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY)),
         MOVE_TO_TRASHBIN{new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), tr("Recycle"))},
-
         DELETE_PERMANENTLY{new QAction(QIcon(":/themes/DELETE_ITEMS_PERMANENTLY"), tr("Delete permanently"))},
         DELETE_ACTIONS(GetDeleteActions()),
         UNDO_OPERATION{new QAction(QIcon(":/themes/UNDO"), tr("Undo"), this)},
+
         REDO_OPERATION{new QAction(QIcon(":/themes/REDO"), tr("Redo"), this)},
         UNDO_REDO_RIBBONS(Get_UNDO_REDO_OPERATIONS_Actions()),
-
         CUT_COPY_MERGE_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
         FOLDER_MERGE(FolderMergeActions()),
         SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()),
-        _REVEAL_IN_EXPLORER{new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"), this)},
-        _OPEN_IN_TERMINAL{new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), tr("Open in terminal"), this)},
-        OPEN_AG(GetOPENActions()),
-
-        FOLDER_FILE_PROCESS(FolderFileCategoryProcess()),
 
         ADVANCE_SEARCH_RIBBON(Get_Advance_Search_Actions()) {}
 
@@ -57,6 +63,8 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* Get_SELECTION_RIBBON_Action();
 
   QActionGroup* GetOPENActions();
+  QAction *_REVEAL_IN_EXPLORER, *_OPEN_IN_TERMINAL;
+  QActionGroup* OPEN_AG;
 
   QActionGroup* GetCOPY_PATHActions();
   QAction *COPY_FULL_PATH, *COPY_PATH, *COPY_NAME, *COPY_THE_PATH;
@@ -68,7 +76,10 @@ class FileBasicOperationsActions : public QObject {
 
   QActionGroup* Get_Advance_Search_Actions();
   QActionGroup* FolderMergeActions();
+
   QActionGroup* FolderFileCategoryProcess();
+  QAction *_NAME_STANDARDLIZER, *_CLASSIFIER, *_ITEM_ORGANIZER, *_DUPLICATE_ITEMS_REMOVER, *_REMOVE_REDUNDANT_ITEMS, *_REMOVE_EMPTY_FOLDER;
+  QActionGroup* FOLDER_FILE_PROCESS;
 
   QAction *_MOVE_TO, *_COPY_TO;
   QActionGroup* MOVE_COPY_TO;
@@ -84,11 +95,6 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* CUT_COPY_MERGE_PASTE;
   QActionGroup* FOLDER_MERGE;
   QActionGroup* SELECTION_RIBBONS;
-
-  QAction *_REVEAL_IN_EXPLORER, *_OPEN_IN_TERMINAL;
-  QActionGroup* OPEN_AG;
-
-  QActionGroup* FOLDER_FILE_PROCESS;
 
   QActionGroup* ADVANCE_SEARCH_RIBBON;
 };
