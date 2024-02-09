@@ -5,7 +5,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
-#include <QColor>
 #include <QCursor>
 #include <QDesktopServices>
 #include <QDialog>
@@ -45,10 +44,6 @@
 #include "FileOperation/FileOperation.h"
 #include "PublicVariable.h"
 #include "Tools/ConflictsItemHelper.h"
-
-const QColor LIGHT_GREEN_COLOR(245, 245, 220);
-const QColor TOMATO_COLOR(244, 164, 96);
-const QColor TRANSPARENT_COLOR(Qt::GlobalColor::color0);
 
 class FileInfoType {
  public:

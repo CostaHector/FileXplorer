@@ -93,7 +93,7 @@ QString SortOrderEnum2String(const Qt::SortOrder orderEnum);
 class GVar {
  public:
   explicit GVar(const QString& name_, const QVariant& v_) : name(name_), v(v_){};
-  virtual bool checker() = 0;
+  virtual bool checker() const = 0;
   QString name;
   QVariant v;
 };
@@ -102,14 +102,14 @@ class GVarBool : public GVar {
  public:
   explicit GVarBool(const QString& name_, bool v_) : GVar(name_, v_) {}
 
-  bool checker() override { return true; }
+  bool checker() const override { return true; }
 };
 
 class GVarInt : public GVar {
  public:
   explicit GVarInt(const QString& name_, int v_, int minV_ = INT32_MIN, int maxV_ = INT32_MAX) : GVar(name_, v_), minV(minV_), maxV(maxV_) {}
 
-  bool checker() override { return minV <= v.toInt() and v.toInt() < maxV; }
+  bool checker() const override { return minV <= v.toInt() and v.toInt() < maxV; }
   int minV;
   int maxV;
 };
@@ -118,7 +118,7 @@ class GVarStr : public GVar {
  public:
   explicit GVarStr(const QString& name_, QString v_, const QStringList& candidatePool_ = {}) : GVar(name_, v_), candidatePool(candidatePool_) {}
 
-  bool checker() override { return candidatePool.isEmpty() or candidatePool.contains(v.toString()); }
+  bool checker() const override { return candidatePool.isEmpty() or candidatePool.contains(v.toString()); }
   QStringList candidatePool;
 };
 
@@ -126,11 +126,14 @@ class GVarStrFile : public GVar {
  public:
   explicit GVarStrFile(const QString& name_, QString v_, const QStringList& candidateSuffixPool_ = {"exe"})
       : GVar(name_, v_), candidateSuffixPool(candidateSuffixPool_) {}
+  using GVar::checker;
+  bool checker() const override { return GVarStrFile::checker(v.toString()); }
 
-  bool checker() override {
-    QFileInfo fi(v.toString());
+  bool checker(const QString& path) const {
+    QFileInfo fi(path);
     return fi.isFile() and (candidateSuffixPool.isEmpty() or candidateSuffixPool.contains(fi.suffix()));
   }
+
   QStringList candidateSuffixPool;
 };
 
@@ -138,14 +141,16 @@ class GVarStrFolder : public GVar {
  public:
   explicit GVarStrFolder(const QString& name_, QString v_) : GVar(name_, v_) {}
 
-  bool checker() override { return QFileInfo(v.toString()).isDir(); }
+  using GVar::checker;
+  bool checker() const override { return GVarStrFolder::checker(v.toString()); }
+  bool checker(const QString& path) const { return QFileInfo(path).isDir(); }
 };
 
 class GVarListStr : public GVar {
  public:
   explicit GVarListStr(const QString& name_, QStringList v_) : GVar(name_, v_) {}
 
-  bool checker() override { return true; }
+  bool checker() const override { return true; }
 };
 
 constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
@@ -214,13 +219,15 @@ const GVarBool VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false);
 
 const GVarStrFile WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
 const GVarStrFile WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
-const GVarStrFile WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", {"json"});
-const GVarStrFile WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH", "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat", {"bat"});
+const GVarStrFile WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.json", {"json"});
+const GVarStrFile WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH",
+                                                      "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
+                                                      {"bat"});
 const GVarStrFolder WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG");
 
 const GVarStrFile LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
 const GVarStrFile LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
-const GVarStrFile LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", {"txt"});
+const GVarStrFile LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.json", {"json"});
 const GVarStrFile LINUX_TERMINAL_OPEN_BATCH_FILE_PATH("LINUX_TERMINAL_OPEN_BATCH_FILE_PATH", "../bin/LINUX_TERMINAL_OPEN_BATCH_FILE_PATH.sh", {"sh"});
 const GVarStrFolder LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG");
 }  // namespace MemoryKey
@@ -301,8 +308,15 @@ const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
 const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&", Qt::CaseInsensitive);
 }  // namespace JSON_RENAME_REGEX
 
-bool VerifyOneFilePath(const QString& fileKey, const QString& fileType = "txt");
-bool VerifyOneFolderPath(const QString& fileKey);
+#include <QColor>
+namespace STATUS_COLOR {
+const QColor LIGHT_GREEN_COLOR(245, 245, 220);
+const QColor TOMATO_COLOR(244, 164, 96);
+const QColor TRANSPARENT_COLOR(Qt::GlobalColor::color0);
+}  // namespace STATUS_COLOR
+
+bool VerifyOneFilePath(const GVarStrFile& kv, const QString& fileType = "txt");
+bool VerifyOneFolderPath(const GVarStrFolder& kv);
 
 bool InitOutterPlainTextPath();
 

@@ -23,6 +23,7 @@ SOURCES += \
     AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
     Component/AdvanceSearchWindow.cpp \
+    Component/AlertSystem.cpp \
     Component/ClickableSlider.cpp \
     Component/CustomStatusBar.cpp \
     Component/DBRightClickMenu.cpp \
@@ -110,6 +111,7 @@ HEADERS += \
     AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
     Component/AdvanceSearchWindow.h \
+    Component/AlertSystem.h \
     Component/ClickableSlider.h \
     Component/CustomStatusBar.h \
     Component/DBRightClickMenu.h \
@@ -198,13 +200,10 @@ RESOURCES += \
 
 DISTFILES += \
     FileExplorerReadOnly_zh_CN.ts \
-    bin/AKA_PERFORMERS.txt \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \
-    bin/PERFORMERS_TABLE.txt \
     bin/PerformerHtmlTemplate.html \
     bin/JsonExample/StudioName - Movie Name - Performer 1, Performer 2.json \
-    bin/STANDARD_STUDIO_NAME.txt \
     readme.md
 
 QMAKE_POST_LINK +=

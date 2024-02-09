@@ -3,6 +3,8 @@
 #include "PublicTool.h"
 #include "UndoRedo.h"
 
+using namespace STATUS_COLOR;
+
 const QStringList RenameConflicts::COLUMNS_NAME_LIST = {"DateModified", "Size", "Name"};
 const int RenameConflicts::COLUMNS_NAME_LIST_LEN = COLUMNS_NAME_LIST.size();
 
