@@ -8,6 +8,7 @@
 
 #include "FolderPreviewHTML.h"
 #include "PublicVariable.h"
+#include "Tools/ActionWithPath.h"
 
 const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 
@@ -91,13 +92,11 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
 }
 
 void FileExplorerReadOnly::subscribe() {
-  if (m_navigationToolBar and m_fsPanel) {
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    using std::placeholders::_3;
-    auto intoNewPath = std::bind(&ContentPanel::IntoNewPath, m_fsPanel, _1, _2, _3);
-    m_navigationToolBar->subscribe(intoNewPath);
-  }
+  using std::placeholders::_1;
+  using std::placeholders::_2;
+  using std::placeholders::_3;
+  auto intoNewPath = std::bind(&ContentPanel::IntoNewPath, m_fsPanel, _1, _2, _3);
+  ActionWithPath::BindIntoNewPath(intoNewPath);
 }
 
 void FileExplorerReadOnly::SwitchStackWidget() {

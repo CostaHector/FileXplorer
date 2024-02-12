@@ -49,6 +49,7 @@ SOURCES += \
     PublicTool.cpp \
     RibbonMenu.cpp \
     SearchItemModel.cpp \
+    Tools/ActionWithPath.cpp \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/CopyItemPropertiesToClipboardIF.cpp \
@@ -139,6 +140,7 @@ HEADERS += \
     PublicTool.h \
     RibbonMenu.h \
     SearchItemModel.h \
+    Tools/ActionWithPath.h \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
     Tools/CopyItemPropertiesToClipboardIF.h \

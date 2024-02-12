@@ -1,5 +1,6 @@
 #include "RightClickableToolBar.h"
 #include <QHash>
+#include "Tools/ActionWithPath.h"
 
 const QHash<QString, Qt::ToolButtonStyle> TOOL_BTN_STYLE_MAP = {{"ToolButtonTextOnly", Qt::ToolButtonStyle::ToolButtonTextOnly},
                                                                 {"ToolButtonIconOnly", Qt::ToolButtonStyle::ToolButtonIconOnly},
@@ -159,21 +160,13 @@ void RightClickableToolBar::AppendExtraActions(const QMap<QString, QString>& fol
   for (auto it = folderName2AbsPath.cbegin(); it != folderName2AbsPath.cend(); ++it) {
     const QString& folderName = it.key();
     const QString& absPath = it.value();
-    QAction* TEMP_ACTIONS = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), folderName, this);
-    TEMP_ACTIONS->setToolTip(absPath);
+    QAction* TEMP_ACTIONS = new ActionWithPath(absPath, QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), folderName, this);
     addAction(TEMP_ACTIONS);
   }
   alighLeft();
 }
 
 bool RightClickableToolBar::subscribe() {
-  connect(this, &QToolBar::actionTriggered, this, [this](const QAction* act) {
-    if (not this->m_IntoNewPath) {
-      qDebug("RightClickableToolBar, IntoNewPath is nullptr");
-      return;
-    }
-    this->m_IntoNewPath(act->toolTip(), true, true);
-  });
   connect(textIconActionGroup, &QActionGroup::triggered, this, &RightClickableToolBar::_switchTextBesideIcon);
   connect(this, &QToolBar::customContextMenuRequested, this, &RightClickableToolBar::CustomContextMenuEvent);
 
