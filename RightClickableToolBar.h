@@ -44,8 +44,6 @@ class RightClickableToolBar : public QToolBar {
 
   bool subscribe();
 
-  bool bindIntoNewPath(T_IntoNewPath IntoNewPath = nullptr) { m_IntoNewPath = IntoNewPath; }
-
   QActionGroup* extraAG;
   QPoint rightClickedPos;
 
@@ -55,7 +53,6 @@ class RightClickableToolBar : public QToolBar {
   QAction* SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON;
   QActionGroup* textIconActionGroup;
 
-  T_IntoNewPath m_IntoNewPath;
   QMenu* menuQWidget;
 };
 
