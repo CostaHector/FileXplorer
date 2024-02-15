@@ -47,17 +47,14 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(GV
 }
 
 QActionGroup* FileBasicOperationsActions::Get_CUT_COPY_PASTE_OPERATIONS_Actions() {
-  QAction* CUT = new QAction(QIcon(":/themes/CUT_ITEM"), tr("Cut"));
   CUT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_X));
   CUT->setShortcutVisibleInContextMenu(true);
   CUT->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the clipboard.").arg(CUT->text(), CUT->shortcut().toString()));
 
-  QAction* COPY = new QAction(QIcon(":/themes/COPY_ITEM"), tr("Copy"));
   COPY->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_C));
   COPY->setShortcutVisibleInContextMenu(true);
   COPY->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the clipboard.").arg(COPY->text(), COPY->shortcut().toString()));
 
-  QAction* PASTE = new QAction(QIcon(":/themes/PASTE_ITEM"), tr("Paste"));
   PASTE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_V));
   PASTE->setShortcutVisibleInContextMenu(true);
   PASTE->setToolTip(
@@ -90,16 +87,13 @@ QActionGroup* FileBasicOperationsActions::Get_UNDO_REDO_OPERATIONS_Actions() {
 }
 
 QActionGroup* FileBasicOperationsActions::Get_SELECTION_RIBBON_Action() {
-  QAction* SELECT_ALL = new QAction(QIcon(":/themes/SELECT_ALL"), tr("Select all"));
   //        SELECT_ALL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_A));
   SELECT_ALL->setShortcutVisibleInContextMenu(true);
   SELECT_ALL->setToolTip(QString("<b>%1 (%2)</b><br/> Select all item(s) in this view.").arg(SELECT_ALL->text(), SELECT_ALL->shortcut().toString()));
 
-  QAction* SELECT_NONE = new QAction(QIcon(":/themes/SELECT_NONE"), tr("Select none"));
   SELECT_NONE->setShortcutVisibleInContextMenu(true);
   SELECT_NONE->setToolTip(QString("<b>%1 (%2)</b><br/> Clear all your selections.").arg(SELECT_NONE->text(), SELECT_NONE->shortcut().toString()));
 
-  QAction* SELECT_INVERT = new QAction(QIcon(":/themes/SELECT_INVERT"), tr("Invert selection"));
   SELECT_INVERT->setShortcutVisibleInContextMenu(true);
   SELECT_INVERT->setToolTip(QString("<b>%1 </b><br/> Reverse the current selections.").arg(SELECT_INVERT->text()));
 
@@ -211,12 +205,10 @@ QActionGroup* FileBasicOperationsActions::GetNEWActions() {
 }
 
 QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
-  QAction* MERGE = new QAction(QIcon(":/themes/FOLDER_MERGE_TO_FIRST"), tr("Merge into first folder"));
   MERGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_M));
   MERGE->setShortcutVisibleInContextMenu(true);
   MERGE->setToolTip(QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE->text(), MERGE->shortcut().toString()));
 
-  QAction* MERGE_REVERSE = new QAction(QIcon(":/themes/FOLDER_MERGE_TO_LAST"), tr("Merge into last folder"));
   MERGE_REVERSE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_M));
   MERGE_REVERSE->setShortcutVisibleInContextMenu(true);
   MERGE_REVERSE->setToolTip(
@@ -230,11 +222,11 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
 
 auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
   _NAME_STANDARDLIZER->setToolTip(
-      "<b>Name Rules</b><br/>"
+      "<b>Standardized Files/Folders Name under current view path</b><br/>"
       "Given: [A..mp4, A (1).jpg, A -- 2.json]<br/>"
       "Result: [A.mp4, A - 1.jpg, A - 2.json]");
   _CLASSIFIER->setToolTip(
-      "<b>Category</b><br/>"
+      "<b>Category Files/Folders Name under current view path</b><br/>"
       "Move [A.mp4, A.jpg, A.json]<br/>"
       "To Folder A");
   _ITEM_ORGANIZER->setToolTip(
@@ -242,18 +234,18 @@ auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
       "Move [A - B.mp4, A - C.mp4, A - D.mp4]<br/>"
       "To Folder A");
   _DUPLICATE_ITEMS_REMOVER->setToolTip(
-      "<b>Remove duplicates for item with pattern</b>:<br/>"
+      "<b>Remove Files/Folders whose names with a certern pattern under current view path</b>:<br/>"
       "\"NAME - {$resolution}.FILETYPE\"<br/>"
       "It work for any file name meet following resolution pattern.<br/>"
       "Given: [A - 480p, A - 720p, A - 1080p, A - 2160p, A - 4K]<br/>"
       "Result: only A - 2160p will be kept, and others will moved to trashbin.");
 
   _REMOVE_REDUNDANT_ITEMS->setToolTip(
-      "<b>Remove redundant items</b><br/>"
+      "<b>Remove redundant Files/Folders under current view path </b><br/>"
       "A folder with no item or only one item<br/>"
       "move the file (if it exists) to its upper level folder. And erase the redundant folder");
   _REMOVE_EMPTY_FOLDER->setToolTip(
-      "<b>Remove Empty folders</b>"
+      "<b>Remove Empty folders under current view path </b>"
       "Only Empty folder will be removed");
 
   QActionGroup* actionGroup = new QActionGroup(this);

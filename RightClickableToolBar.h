@@ -8,7 +8,6 @@
 #include <QToolBar>
 
 #include <QFileInfo>
-#include "PublicVariable.h"
 
 #include <QApplication>
 #include <QLayout>
@@ -16,6 +15,7 @@
 #include <QStyle>
 
 class RightClickableToolBar : public QToolBar {
+  Q_OBJECT
  public:
   RightClickableToolBar(const QString& title);
 

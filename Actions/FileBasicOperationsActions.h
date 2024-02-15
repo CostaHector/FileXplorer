@@ -42,15 +42,27 @@ class FileBasicOperationsActions : public QObject {
 
         MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
         COPY_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY)),
+
         MOVE_TO_TRASHBIN{new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), tr("Recycle"))},
         DELETE_PERMANENTLY{new QAction(QIcon(":/themes/DELETE_ITEMS_PERMANENTLY"), tr("Delete permanently"))},
         DELETE_ACTIONS(GetDeleteActions()),
-        UNDO_OPERATION{new QAction(QIcon(":/themes/UNDO"), tr("Undo"), this)},
 
+        UNDO_OPERATION{new QAction(QIcon(":/themes/UNDO"), tr("Undo"), this)},
         REDO_OPERATION{new QAction(QIcon(":/themes/REDO"), tr("Redo"), this)},
         UNDO_REDO_RIBBONS(Get_UNDO_REDO_OPERATIONS_Actions()),
+
+        CUT{new QAction(QIcon(":/themes/CUT_ITEM"), tr("Cut"))},
+        COPY{new QAction(QIcon(":/themes/COPY_ITEM"), tr("Copy"))},
+        PASTE{new QAction(QIcon(":/themes/PASTE_ITEM"), tr("Paste"))},
         CUT_COPY_MERGE_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
+
+        MERGE{new QAction(QIcon(":/themes/FOLDER_MERGE_TO_FIRST"), tr("Merged to front"))},
+        MERGE_REVERSE{new QAction(QIcon(":/themes/FOLDER_MERGE_TO_LAST"), tr("Merge to back"))},
         FOLDER_MERGE(FolderMergeActions()),
+
+        SELECT_ALL{new QAction(QIcon(":/themes/SELECT_ALL"), tr("Select all"))},
+        SELECT_NONE{new QAction(QIcon(":/themes/SELECT_NONE"), tr("Select none"))},
+        SELECT_INVERT{new QAction(QIcon(":/themes/SELECT_INVERT"), tr("Invert selection"))},
         SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()),
 
         ADVANCE_SEARCH_RIBBON(Get_Advance_Search_Actions()) {}
@@ -92,8 +104,13 @@ class FileBasicOperationsActions : public QObject {
   QAction *UNDO_OPERATION, *REDO_OPERATION;
   QActionGroup* UNDO_REDO_RIBBONS;
 
+  QAction *CUT, *COPY, *PASTE;
   QActionGroup* CUT_COPY_MERGE_PASTE;
+
+  QAction *MERGE, *MERGE_REVERSE;
   QActionGroup* FOLDER_MERGE;
+
+  QAction *SELECT_ALL, *SELECT_NONE, *SELECT_INVERT;
   QActionGroup* SELECTION_RIBBONS;
 
   QActionGroup* ADVANCE_SEARCH_RIBBON;

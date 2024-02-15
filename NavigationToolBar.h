@@ -11,7 +11,6 @@ class NavigationToolBar : public QToolBar {
  public:
   NavigationToolBar(const QString& title = "NavigationToolBar", bool isShow_ = true);
   void InitFixedActions();
-  bool subscribe(T_IntoNewPath IntoNewPath);
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
  protected:
   RightClickableToolBar* m_extraAppendTB;
