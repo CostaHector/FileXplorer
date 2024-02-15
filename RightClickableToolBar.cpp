@@ -1,6 +1,7 @@
 #include "RightClickableToolBar.h"
 #include <QHash>
 #include "Tools/ActionWithPath.h"
+#include "PublicVariable.h"
 
 const QHash<QString, Qt::ToolButtonStyle> TOOL_BTN_STYLE_MAP = {{"ToolButtonTextOnly", Qt::ToolButtonStyle::ToolButtonTextOnly},
                                                                 {"ToolButtonIconOnly", Qt::ToolButtonStyle::ToolButtonIconOnly},
