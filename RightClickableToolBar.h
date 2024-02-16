@@ -8,7 +8,6 @@
 #include <QToolBar>
 
 #include <QFileInfo>
-#include "PublicVariable.h"
 
 #include <QApplication>
 #include <QLayout>
@@ -16,8 +15,10 @@
 #include <QStyle>
 
 class RightClickableToolBar : public QToolBar {
+  Q_OBJECT
  public:
   RightClickableToolBar(const QString& title);
+
   void dragEnterEvent(QDragEnterEvent* event) override;
 
   void dropEvent(QDropEvent* event) override;
@@ -41,15 +42,17 @@ class RightClickableToolBar : public QToolBar {
 
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
 
-  bool subscribe(T_IntoNewPath IntoNewPath = nullptr);
+  bool subscribe();
 
   QActionGroup* extraAG;
-  QMap<QString, QString> extraShownText2Path;
   QPoint rightClickedPos;
+
+  QAction *UNPIN, *UNPIN_ALL;
   QAction* SHOW_TOOL_BUTTON_TEXT;
   QAction* SHOW_TOOL_BUTTON_ICON;
   QAction* SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON;
   QActionGroup* textIconActionGroup;
+
   QMenu* menuQWidget;
 };
 

@@ -7,6 +7,7 @@
 #include <QObject>
 
 class FramelessWindowActions : public QObject {
+  Q_OBJECT
  public:
   QAction* _EXPAND_RIBBONS;
   QAction* _FRAMELESS;

@@ -7,6 +7,8 @@
         <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
         <file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
         <file alias="DEDUPLICATE">Media/DEDUPLICATE.png</file>
+        <file alias="EMPTY_FOLDER">Media/EMPTY_FOLDER.svg</file>
+        <file alias="ONE_FILE_IN_ONE_FOLDER">Media/ONE_FILE_IN_ONE_FOLDER.svg</file>
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
@@ -44,6 +46,7 @@
         <file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.png</file>
         <file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.png</file>
         <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.png</file>
+        <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
         <file alias="MUSIC_PLAYER">Flat/MUSIC_PLAYER.svg</file>
         <file alias="PLAY_BUTTON_ROUND">Flat/PLAY_BUTTON_ROUND.svg</file>
         <file alias="PLAY_BUTTON_TRIANGLE">Flat/PLAY_BUTTON_TRIANGLE.svg</file>
