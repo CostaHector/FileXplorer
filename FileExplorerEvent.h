@@ -8,7 +8,7 @@
 #include "Component/VideoPlayer.h"
 
 #include "Tools/MimeDataCX.h"
-#include "UndoRedo.h"
+#include "Tools/RedundantFolderRemove.h"
 
 #include <QAbstractButton>
 #include <QAbstractItemModel>
@@ -145,6 +145,7 @@ class FileExplorerEvent : public QObject {
   auto on_NameStandardize() -> bool;
   auto on_FileClassify() -> bool;
   auto on_RemoveDuplicateImages() -> bool;
+  auto on_RemoveRedundantItem(RedundantRmv* remover) -> bool;
 
   auto on_MoveCopyEventSkeleton(const CCMMode operationName, QString r) -> bool;
   auto on_MoveTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::CUT, r); }

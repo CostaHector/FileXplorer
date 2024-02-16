@@ -4,27 +4,14 @@
 #include <QFileInfo>
 #include <QMap>
 #include <QStyle>
+#include "Tools/ActionWithPath.h"
 
 NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)
-    : QToolBar(title),
-      fixedAG(new QActionGroup(this)),
-      labelsLst{
-          NavigationLabel{"Home", QDir::homePath(), new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirHomeIcon), "")},
-          NavigationLabel{"Desktop", QString("%1/%2").arg(QDir::homePath(), "Desktop"),
-                          new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "")},
-          NavigationLabel{"Documents", QString("%1/%2").arg(QDir::homePath(), "Documents"), new QAction(QIcon(":/themes/FOLDER_OF_DOCUMENTS"), "")},
-          NavigationLabel{"Downloads", QString("%1/%2").arg(QDir::homePath(), "Downloads"), new QAction(QIcon(":/themes/FOLDER_OF_DOWNLOADS"), "")},
-          NavigationLabel{"Pictures", QString("%1/%2").arg(QDir::homePath(), "Pictures"), new QAction(QIcon(":/themes/FOLDER_OF_PICTURES"), "")},
-          NavigationLabel{"Videos", QString("%1/%2").arg(QDir::homePath(), "Videos"), new QAction(QIcon(":/themes/FOLDER_OF_VIDEOS"), "")},
-          NavigationLabel{"Starred", "", new QAction(QIcon(":/themes/FOLDER_OF_FAVORITE"), "")},
-          NavigationLabel{"Computer", "", new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "")}},
-      extraAppendTB(new RightClickableToolBar("ExtraNavigation")) {
+    : QToolBar(title), m_extraAppendTB(new RightClickableToolBar("ExtraNavigation")) {
   setObjectName(title);
-  GetFixedActions();
-  addActions(fixedAG->actions());
+  InitFixedActions();
   addSeparator();
-  addWidget(extraAppendTB);
-
+  addWidget(m_extraAppendTB);
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   setOrientation(Qt::Vertical);
 
@@ -33,32 +20,22 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)
   }
 }
 
-void NavigationToolBar::GetFixedActions() {
-  for (NavigationLabel& lb : labelsLst) {
-    lb.action->setText(lb.name);
-    lb.action->setCheckable(false);
-    fixedAG->addAction(lb.action);
-    shownText2Path[lb.name] = lb.path;
-  }
-}
-
-bool NavigationToolBar::subscribe(T_IntoNewPath IntoNewPath) {
-  connect(this, &QToolBar::actionTriggered, this, [this, IntoNewPath](const QAction* act) {
-    if (!IntoNewPath) {
-      qDebug("RightClickableToolBar, IntoNewPath is nullptr");
-      return;
-    }
-    IntoNewPath(shownText2Path[act->text()], true, true);
-  });
-  extraAppendTB->subscribe(IntoNewPath);
-  return true;
+void NavigationToolBar::InitFixedActions() {
+  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Desktop"),
+                                        QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop"));
+  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Documents"), QIcon(":/themes/FOLDER_OF_DOCUMENTS"), "Documents"));
+  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Downloads"), QIcon(":/themes/FOLDER_OF_DOWNLOADS"), "Downloads"));
+  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Pictures"), QIcon(":/themes/FOLDER_OF_PICTURES"), "Pictures"));
+  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Videos"), QIcon(":/themes/FOLDER_OF_VIDEOS"), "Videos"));
+  this->addAction(new ActionWithPath("", QIcon(":/themes/FOLDER_OF_FAVORITE"), "Starred"));
+  this->addAction(new ActionWithPath("", QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer"));
 }
 
 void NavigationToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
   if (folderName2AbsPath.isEmpty()) {
     return;
   }
-  extraAppendTB->AppendExtraActions(folderName2AbsPath);
+  m_extraAppendTB->AppendExtraActions(folderName2AbsPath);
 }
 
 // #define __MAIN__EQ__NAME__ 1

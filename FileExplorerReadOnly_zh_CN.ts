@@ -97,152 +97,171 @@
 <context>
     <name>FileBasicOperationsActions</name>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.cpp" line="24"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="15"/>
         <source>Reveal in explorer</source>
         <translation>在资源管理器中显示</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.cpp" line="31"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="16"/>
         <source>Open in terminal</source>
         <translation>在终端中打开</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.cpp" line="47"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="34"/>
         <source>Name Ruler</source>
         <translation>命名之尺</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.cpp" line="48"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="35"/>
         <source>Categorizer</source>
         <translation>电影文件分类器</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.cpp" line="49"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="36"/>
         <source>Organizer</source>
         <translation>组织器</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.cpp" line="50"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="37"/>
         <source>Deduplicator</source>
         <translation>去重器</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="16"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="38"/>
+        <source>Rmv Redundancy</source>
+        <translatorcomment>仅有一个文件或没有文件的文件夹定义为冗余文件夹</translatorcomment>
+        <translation>去除冗余文件夹</translation>
+    </message>
+    <message>
+        <location filename="Actions/FileBasicOperationsActions.h" line="39"/>
+        <source>Rmv Empty</source>
+        <translation>去除空文件夹</translation>
+    </message>
+    <message>
+        <location filename="Actions/FileBasicOperationsActions.h" line="46"/>
         <source>Recycle</source>
         <translation>回收</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="22"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="47"/>
         <source>Delete permanently</source>
         <translation>永久删除</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="34"/>
+        <location filename="Actions/FileBasicOperationsActions.cpp" line="21"/>
         <source>Move to</source>
         <translation>移动到</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="39"/>
+        <location filename="Actions/FileBasicOperationsActions.cpp" line="26"/>
         <source>Copy to</source>
         <translation>复制到</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="61"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="54"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="66"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="55"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="71"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="56"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="84"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="50"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="89"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="51"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="104"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="59"/>
+        <source>Merged to front</source>
+        <translation>合并到前者中</translation>
+    </message>
+    <message>
+        <location filename="Actions/FileBasicOperationsActions.h" line="60"/>
+        <source>Merge to back</source>
+        <translation>合并到后者中</translation>
+    </message>
+    <message>
+        <location filename="Actions/FileBasicOperationsActions.h" line="63"/>
         <source>Select all</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="110"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="64"/>
         <source>Select none</source>
         <translation>空选</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="114"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="65"/>
         <source>Invert selection</source>
         <translation>反选</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="131"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="19"/>
         <source>Copy fullpath</source>
         <translation>拷贝全路径</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="138"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="20"/>
         <source>Copy path</source>
         <translation>拷贝前置路径</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="143"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="21"/>
         <source>Copy name</source>
         <translation>拷贝名称</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="149"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="23"/>
         <source>Copy the path</source>
         <translation>拷贝拼接路径</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="168"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="25"/>
         <source>New folder</source>
         <translation>新建文件夹</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="175"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="27"/>
         <source>New text</source>
         <translation>新建文本文档</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="182"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="28"/>
         <source>New json</source>
         <translation>新建Json文件</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="189"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="29"/>
         <source>New Files</source>
         <translation>批量新建文件</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="195"/>
+        <location filename="Actions/FileBasicOperationsActions.h" line="31"/>
         <source>New Folders</source>
         <translation>批量新建文件夹</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="211"/>
         <source>Merge into first folder</source>
-        <translation>前者(合并两个文件夹到)</translation>
+        <translation type="vanished">前者(合并两个文件夹到)</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="216"/>
         <source>Merge into last folder</source>
-        <translation>后者(合并两个文件夹到)</translation>
+        <translation type="vanished">后者(合并两个文件夹到)</translation>
     </message>
     <message>
-        <location filename="Actions/FileBasicOperationsActions.h" line="229"/>
+        <location filename="Actions/FileBasicOperationsActions.cpp" line="262"/>
         <source>Advance search</source>
         <translation>高级搜索</translation>
     </message>
@@ -707,22 +726,22 @@
 <context>
     <name>RenameConflicts</name>
     <message>
-        <location filename="Component/RenameConflicts.cpp" line="10"/>
+        <location filename="Component/RenameConflicts.cpp" line="12"/>
         <source>Size Smaller</source>
         <translation>选择文件较小者</translation>
     </message>
     <message>
-        <location filename="Component/RenameConflicts.cpp" line="14"/>
+        <location filename="Component/RenameConflicts.cpp" line="13"/>
         <source>Date Newer</source>
         <translation>选择文件较新者</translation>
     </message>
     <message>
-        <location filename="Component/RenameConflicts.cpp" line="17"/>
+        <location filename="Component/RenameConflicts.cpp" line="14"/>
         <source>Revert Selection</source>
         <translation>反选文件</translation>
     </message>
     <message>
-        <location filename="Component/RenameConflicts.cpp" line="20"/>
+        <location filename="Component/RenameConflicts.cpp" line="15"/>
         <source>Reset Table</source>
         <translation>重置选择</translation>
     </message>
@@ -738,6 +757,19 @@
         <location filename="Actions/RightClickMenuActions.cpp" line="6"/>
         <source>Properties</source>
         <translation>属性</translation>
+    </message>
+</context>
+<context>
+    <name>RightClickableToolBar</name>
+    <message>
+        <location filename="RightClickableToolBar.cpp" line="17"/>
+        <source>Unpin</source>
+        <translation>断开链接</translation>
+    </message>
+    <message>
+        <location filename="RightClickableToolBar.cpp" line="18"/>
+        <source>Unpin All</source>
+        <translation>断开所有链接</translation>
     </message>
 </context>
 <context>

@@ -51,6 +51,7 @@ auto ContentPanel::IntoNewPath(QString newPath, bool isNewPath, bool isF5Force) 
   // True means newPath would be push into undo.
   // false not
   if (not(newPath.isEmpty() or QFileInfo(newPath).isDir())) {
+    qDebug("Path[%s] is not [empty or existed directory].", qPrintable(newPath));
     return false;
   }
   view->setRootIndex(fileSysModel->setRootPath(newPath));

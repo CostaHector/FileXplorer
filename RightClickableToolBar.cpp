@@ -1,5 +1,7 @@
 #include "RightClickableToolBar.h"
 #include <QHash>
+#include "Tools/ActionWithPath.h"
+#include "PublicVariable.h"
 
 const QHash<QString, Qt::ToolButtonStyle> TOOL_BTN_STYLE_MAP = {{"ToolButtonTextOnly", Qt::ToolButtonStyle::ToolButtonTextOnly},
                                                                 {"ToolButtonIconOnly", Qt::ToolButtonStyle::ToolButtonIconOnly},
@@ -12,6 +14,8 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
     : QToolBar(title),
       extraAG(new QActionGroup(this)),
       rightClickedPos(-1, -1),
+      UNPIN{new QAction(QIcon(":/themes/UNPIN"), tr("Unpin"), this)},
+      UNPIN_ALL{new QAction(tr("Unpin All"), this)},
       SHOW_TOOL_BUTTON_TEXT(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextOnly], this)),
       SHOW_TOOL_BUTTON_ICON(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonIconOnly], this)),
       SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextBesideIcon], this)),
@@ -19,15 +23,7 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
       menuQWidget(new QMenu(this))
 
 {
-  //    qDebug("%s", QString("Show tool button only text [%1]").arg(int(Qt::ToolButtonStyle::ToolButtonTextOnly)).toStdString().c_str());
-
   setObjectName(title);
-
-  QAction* UNPIN = new QAction("Unpin", this);
-  connect(UNPIN, &QAction::triggered, this, &RightClickableToolBar::_unpin);
-
-  QAction* UNPIN_ALL = new QAction("Unpin All", this);
-  connect(UNPIN_ALL, &QAction::triggered, this, &RightClickableToolBar::_unpinAll);
 
   textIconActionGroup->addAction(SHOW_TOOL_BUTTON_TEXT);
   textIconActionGroup->addAction(SHOW_TOOL_BUTTON_ICON);
@@ -44,7 +40,9 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
   }
 
   menuQWidget->addAction(UNPIN);
+  menuQWidget->addSeparator();
   menuQWidget->addActions(textIconActionGroup->actions());
+  menuQWidget->addSeparator();
   menuQWidget->addAction(UNPIN_ALL);
 
   setContextMenuPolicy(Qt::CustomContextMenu);
@@ -55,6 +53,8 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
   setAcceptDrops(true);
 
   readSettings();
+
+  subscribe();
 }
 
 void RightClickableToolBar::dragEnterEvent(QDragEnterEvent* event) {
@@ -85,6 +85,7 @@ void RightClickableToolBar::dropEvent(QDropEvent* event) {
   }
   qDebug("drop cnt[%d]", folderName2AbsPath.size());
   AppendExtraActions(folderName2AbsPath);
+  _save();
   return QToolBar::dropEvent(event);
 }
 
@@ -97,14 +98,13 @@ void RightClickableToolBar::dragMoveEvent(QDragMoveEvent* event) {
 }
 
 void RightClickableToolBar::_save() {
-  PreferenceSettings().beginWriteArray("ExtraNavigationDict", extraShownText2Path.size());
+  const QList<QAction*>& actsList = this->actions();
+  PreferenceSettings().beginWriteArray("ExtraNavigationDict", actsList.size());
   int extraIndex = 0;
-  for (auto it = extraShownText2Path.begin(); it != extraShownText2Path.cend(); ++it) {
-    const QString& folderName = it.key();
-    const QString& absPath = it.value();
+  for (const QAction* act : actsList) {
     PreferenceSettings().setArrayIndex(extraIndex);
-    PreferenceSettings().setValue("folderName", folderName);
-    PreferenceSettings().setValue("absPath", absPath);
+    PreferenceSettings().setValue("folderName", act->text());
+    PreferenceSettings().setValue("absPath", act->toolTip());
     ++extraIndex;
   }
   PreferenceSettings().endArray();
@@ -126,7 +126,6 @@ void RightClickableToolBar::_unpin() {
   QAction* act = actionAt(rightClickedPos);
   if (actions().contains(act)) {
     removeAction(act);
-    extraShownText2Path.remove(act->text());
   }
   _save();
 }
@@ -135,7 +134,6 @@ void RightClickableToolBar::_unpinAll() {
   for (QAction* act : actions()) {
     removeAction(act);
   }
-  extraShownText2Path.clear();
   _save();
 }
 
@@ -161,25 +159,19 @@ void RightClickableToolBar::AppendExtraActions(const QMap<QString, QString>& fol
     return;
   }
   for (auto it = folderName2AbsPath.cbegin(); it != folderName2AbsPath.cend(); ++it) {
-    const QString shownText = it.key();
-    const QString path = it.value();
-    QAction* TEMP_ACTIONS = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), shownText, this);
-    extraShownText2Path[shownText] = path;
+    const QString& folderName = it.key();
+    const QString& absPath = it.value();
+    QAction* TEMP_ACTIONS = new ActionWithPath(absPath, QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), folderName, this);
     addAction(TEMP_ACTIONS);
   }
   alighLeft();
-  _save();
 }
 
-bool RightClickableToolBar::subscribe(T_IntoNewPath IntoNewPath) {
-  connect(this, &QToolBar::actionTriggered, this, [this, IntoNewPath](const QAction* act) {
-    if (!IntoNewPath) {
-      qDebug("RightClickableToolBar, IntoNewPath is nullptr");
-      return;
-    }
-    IntoNewPath(extraShownText2Path[act->text()], true, true);
-  });
+bool RightClickableToolBar::subscribe() {
   connect(textIconActionGroup, &QActionGroup::triggered, this, &RightClickableToolBar::_switchTextBesideIcon);
   connect(this, &QToolBar::customContextMenuRequested, this, &RightClickableToolBar::CustomContextMenuEvent);
+
+  connect(UNPIN, &QAction::triggered, this, &RightClickableToolBar::_unpin);
+  connect(UNPIN_ALL, &QAction::triggered, this, &RightClickableToolBar::_unpinAll);
   return true;
 }
