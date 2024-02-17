@@ -3,6 +3,7 @@
 
 #include <QComboBox>
 #include <QToolBar>
+#include <QLabel>
 #include <QWidget>
 
 #include <QAction>
@@ -45,6 +46,7 @@ class AddressELineEdit : public QStackedWidget {
     return PathProcess(path);
   }
   inline auto textFromCurrentCursor(const QAction* cursorAtAction) const -> QString {
+    // if cursor at NOTHING, should return the full path
     QString path;
     for (QAction* action : m_pathActionsTB->actions()) {
       path += action->text() + PATH_SEP_CHAR;
@@ -81,6 +83,8 @@ class AddressELineEdit : public QStackedWidget {
   void dropEvent(QDropEvent* event) override;
   void dragMoveEvent(QDragMoveEvent* event) override;
 
+  void dragLeaveEvent(QDragLeaveEvent* event) override;
+
  signals:
   void intoAPath_active(const QString&);
 
@@ -95,9 +99,11 @@ class AddressELineEdit : public QStackedWidget {
   }
   static constexpr char PATH_SEP_CHAR = '/';
   QToolBar* m_pathActionsTB;
-
   QLineEdit* pathLineEdit;
   QComboBox* pathComboBox;
+  static const QString DRAG_HINT_MSG;
+  static const QString RELEASE_HINT_MSG;
+  QLabel* m_dropPanel;
   FocusEventWatch* pathComboBoxFocusWatcher;
 };
 
