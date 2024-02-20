@@ -105,6 +105,7 @@ class View {
     }
     const QPoint& pnt = event->pos();
     const QModelIndex& ind = view->indexAt(pnt);
+    _model->DragRelease(ind);
     if (_model->rootPath().isEmpty()) {
       qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
       event->ignore();
@@ -133,6 +134,7 @@ class View {
     }
     const QPoint& pnt = event->pos();
     const QModelIndex& ind = view->indexAt(pnt);
+    _model->DragHover(ind);
     if (_model->rootPath().isEmpty()) {
       qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
       event->ignore();
@@ -161,6 +163,7 @@ class View {
     }
     const QPoint& pnt = event->pos();
     const QModelIndex& ind = view->indexAt(pnt);
+    _model->DragHover(ind);
     if (_model->rootPath().isEmpty()) {
       qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
       event->ignore();
@@ -184,23 +187,17 @@ class View {
     qDebug("\tdragMoveEvent [%d]", int(event->dropAction()));
   }
 
-  static QPixmap PaintDraggedFilesFolders(const int selectedCnt) {
-    QPixmap folderPixmap = QPixmap(":/themes/DRAG_FOLDERS").scaled(QSize(48, 48));
-    static const QPixmap filesPixmap = QPixmap(":/themes/DRAG_FILES").scaled(QSize(48, 48));
-
-    QPainter painter(&folderPixmap);  // TODO Visual Experience not work
-    painter.drawPixmap(QPoint(8, 8), filesPixmap);
-
-    if (selectedCnt > 1) {
-      QFont font;
-      font.setPointSize(18);
-      font.setBold(true);
-      painter.setFont(font);
-      painter.drawText(QRect(0, 0, 48, 48), Qt::AlignHCenter | Qt::AlignVCenter, QString::number(selectedCnt));
-      painter.end();
-    }
-    return folderPixmap;
+  static void dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
+      auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
+      if (_model == nullptr) {
+        qDebug("_model is nullptr");
+        return;
+      }
+      _model->DragRelease();
+      event->accept();
   }
+
+  static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
 
   static void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
     if (event->buttons() != Qt::MouseButton::LeftButton) {
@@ -222,19 +219,19 @@ class View {
       return;
     }
 
-    QList<QUrl> localFilesLst;
+    QList<QUrl> urls;
+    urls.reserve(mixed.size());
     for (const auto& ind : mixed) {
-      localFilesLst.append(QUrl::fromLocalFile(_model->filePath(ind)));
+      urls.append(QUrl::fromLocalFile(_model->filePath(ind)));
     }
-    QMimeData* mime = new QMimeData;
-    mime->setUrls(localFilesLst);
 
+    QMimeData* mime = new QMimeData;
+    mime->setUrls(urls);
     QDrag drag(view);
     drag.setMimeData(mime);
 
-    const QPixmap folderPixmap = View::PaintDraggedFilesFolders(mixed.size());
-    drag.setPixmap(folderPixmap);
-    drag.setHotSpot(folderPixmap.rect().center());
+    const QPixmap dragPixmap = View::PaintDraggedFilesFolders(urls[0].toLocalFile(), mixed.size());
+    drag.setPixmap(dragPixmap);
     drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
   }
 };
