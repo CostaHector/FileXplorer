@@ -85,7 +85,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
       "};");
   m_dropPanel->setStyleSheet(
       "QLabel{"
-      "border: 3px solid blue;"
+      "border: 3px solid cyan;"
       "};");
 
   layout()->setSpacing(0);
@@ -183,6 +183,8 @@ void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
 }
 
 void AddressELineEdit::dropEvent(QDropEvent* event) {
+  setCurrentWidget(m_pathActionsTB);
+
   QStringList selectedItems;
   for (const QUrl& url : event->mimeData()->urls()) {
     if (url.isLocalFile()) {
