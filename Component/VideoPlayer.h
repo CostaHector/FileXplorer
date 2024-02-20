@@ -22,6 +22,7 @@ class QLabel;
 class QUrl;
 QT_END_NAMESPACE
 
+
 class VideoPlayer : public QMainWindow {
   Q_OBJECT
  public:

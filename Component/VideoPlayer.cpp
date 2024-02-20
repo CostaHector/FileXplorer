@@ -5,10 +5,28 @@
 #include "FileOperation/FileOperation.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PathTool.h"
+#include "Tools/VideoPlayerWatcher.h"
+
 #include "UndoRedo.h"
 
 #include <QVideoWidget>
 #include <QtWidgets>
+
+class ReturnToPlayListWidget : public QListWidget {
+ public:
+  explicit ReturnToPlayListWidget(QWidget* parent = nullptr) : QListWidget(parent) {}
+  void keyPressEvent(QKeyEvent* event) override;
+};
+
+void ReturnToPlayListWidget::keyPressEvent(QKeyEvent* event) {
+  if (this->hasFocus() and (event->key() == Qt::Key_Return or event->key() == Qt::Key_Enter)) {
+    if (this->currentIndex().isValid()) {
+      emit this->doubleClicked(this->currentIndex());
+    }
+    return;
+  }
+  QListWidget::keyPressEvent(event);
+}
 
 constexpr int VideoPlayer::MICROSECOND;
 const QString VideoPlayer::PLAYLIST_DOCK_TITLE_TEMPLATE{"playlist: %1"};
@@ -26,7 +44,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_controlTB(new QToolBar("play control", this)),
       m_videoWidget(new QVideoWidget),
       m_probe(new QVideoProbe),
-      m_playListWid(new QListWidget),
+      m_playListWid(new ReturnToPlayListWidget),
       m_playlistSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
       m_performerWid(nullptr),
       m_playListMenu(new QMenu("playList", this)) {
@@ -115,6 +133,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   setCentralWidget(m_playlistSplitter);
 
   subscribe();
+  auto* w = new VideoPlayerWatcher(this, m_videoWidget, m_playListWid);
 
   setWindowIcon(QIcon(":/themes/VIDEO_PLAYER"));
   updateWindowsSize();

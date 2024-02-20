@@ -73,6 +73,7 @@ SOURCES += \
     Tools/SubscribeDatabase.cpp \
     Tools/SysTerminal.cpp \
     Tools/TorrentsDatabaseHelper.cpp \
+    Tools/VideoPlayerWatcher.cpp \
     UndoRedo.cpp \
     View/DatabaseTableView.cpp \
     View/DragDropTableView.cpp \
@@ -164,6 +165,7 @@ HEADERS += \
     Tools/SubscribeDatabase.h \
     Tools/SysTerminal.h \
     Tools/TorrentsDatabaseHelper.h \
+    Tools/VideoPlayerWatcher.h \
     UndoRedo.h \
     View/DatabaseTableView.h \
     View/DragDropTableView.h \
