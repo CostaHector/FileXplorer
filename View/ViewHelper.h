@@ -105,6 +105,7 @@ class View {
     }
     const QPoint& pnt = event->pos();
     const QModelIndex& ind = view->indexAt(pnt);
+    _model->DragRelease(ind);
     if (_model->rootPath().isEmpty()) {
       qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
       event->ignore();
@@ -133,6 +134,7 @@ class View {
     }
     const QPoint& pnt = event->pos();
     const QModelIndex& ind = view->indexAt(pnt);
+    _model->DragHover(ind);
     if (_model->rootPath().isEmpty()) {
       qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
       event->ignore();
@@ -161,6 +163,7 @@ class View {
     }
     const QPoint& pnt = event->pos();
     const QModelIndex& ind = view->indexAt(pnt);
+    _model->DragHover(ind);
     if (_model->rootPath().isEmpty()) {
       qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
       event->ignore();
@@ -182,6 +185,16 @@ class View {
 
     event->accept();
     qDebug("\tdragMoveEvent [%d]", int(event->dropAction()));
+  }
+
+  static void dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
+      auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
+      if (_model == nullptr) {
+        qDebug("_model is nullptr");
+        return;
+      }
+      _model->DragRelease();
+      event->accept();
   }
 
   static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
@@ -207,6 +220,7 @@ class View {
     }
 
     QList<QUrl> urls;
+    urls.reserve(mixed.size());
     for (const auto& ind : mixed) {
       urls.append(QUrl::fromLocalFile(_model->filePath(ind)));
     }

@@ -85,6 +85,11 @@ void DragDropTableView::dragMoveEvent(QDragMoveEvent* event) {
   View::dragMoveEventCore(this, event);
 }
 
+void DragDropTableView::dragLeaveEvent(QDragLeaveEvent* event) {
+  View::dragLeaveEventCore(this, event);
+}
+
+
 void DragDropTableView::mouseMoveEvent(QMouseEvent* event) {
   View::mouseMoveEventCore(this, event);
 }

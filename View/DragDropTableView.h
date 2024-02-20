@@ -19,6 +19,8 @@ class DragDropTableView : public QTableView, public View {
 
   void dragMoveEvent(QDragMoveEvent* event) override;
 
+  void dragLeaveEvent(QDragLeaveEvent* event) override;
+
   void mousePressEvent(QMouseEvent* event) override;
 
   void mouseMoveEvent(QMouseEvent* event) override;
