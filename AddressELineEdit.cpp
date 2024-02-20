@@ -46,11 +46,15 @@ bool FocusEventWatch::eventFilter(QObject* watched, QEvent* event) {
 
 constexpr char AddressELineEdit::PATH_SEP_CHAR;
 
+const QString AddressELineEdit::DRAG_HINT_MSG = "Drag some files/folders here";
+const QString AddressELineEdit::RELEASE_HINT_MSG = "Drop item(s) to [%1]";
+
 AddressELineEdit::AddressELineEdit(QWidget* parent)
     : QStackedWidget(parent),
       m_pathActionsTB(new QToolBar(this)),
       pathLineEdit(new QLineEdit),
       pathComboBox(new QComboBox),
+      m_dropPanel(new QLabel(DRAG_HINT_MSG)),
       pathComboBoxFocusWatcher(new FocusEventWatch(pathComboBox)) {
 #ifdef _WIN32
   const QFileInfoList& drives = QDir::drives();
@@ -62,6 +66,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
 
   addWidget(m_pathActionsTB);
   addWidget(pathComboBox);
+  addWidget(m_dropPanel);
 
   clickMode();
   subscribe();
@@ -71,12 +76,16 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
 
   setFixedHeight(CONTROL_HEIGHT);
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  setStyleSheet(
+  m_pathActionsTB->setStyleSheet(
       "QToolBar{"
       "border-left: 1px solid black;"
       "border-right: 1px solid gray;"
       "border-top: 1px solid gray;"
       "border-bottom: 1px solid gray;"
+      "};");
+  m_dropPanel->setStyleSheet(
+      "QLabel{"
+      "border: 3px solid blue;"
       "};");
 
   layout()->setSpacing(0);
@@ -165,7 +174,11 @@ void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
 }
 
 void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
-  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), "", this);
+  const QString& draggedEnterPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
+  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), draggedEnterPath, this);
+  qDebug("dragged enter[%s]", qPrintable(draggedEnterPath));
+  m_dropPanel->setText(RELEASE_HINT_MSG.arg(draggedEnterPath));
+  setCurrentWidget(m_dropPanel);
   event->accept();
 }
 
@@ -180,9 +193,10 @@ void AddressELineEdit::dropEvent(QDropEvent* event) {
     qDebug("nothing selected to drop");
     return;
   }
-  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), "", this);
 
-  auto urlsLst = event->mimeData()->urls();
+  const QString& to = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
+  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), to, this);
+
   const auto action = event->dropAction();
   qDebug("dropMimeData. action=[%d]", int(action));
   CCMMode opMode = CCMMode::ERROR;
@@ -197,7 +211,6 @@ void AddressELineEdit::dropEvent(QDropEvent* event) {
     return;
   }
 
-  const QString& to = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
   ConflictsItemHelper conflictIF(selectedItems, to);
   auto* tfm = new RenameConflicts(conflictIF, opMode);
 
@@ -219,9 +232,16 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
     return;
   }
   const QString& droppedPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
+  m_dropPanel->setText(RELEASE_HINT_MSG.arg(droppedPath));
   qDebug("release to drop here [%s]", qPrintable(droppedPath));
   View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), droppedPath, this);
-  return QStackedWidget::dragMoveEvent(event);
+  QStackedWidget::dragMoveEvent(event);
+}
+
+void AddressELineEdit::dragLeaveEvent(QDragLeaveEvent* event) {
+  m_dropPanel->setText(DRAG_HINT_MSG);
+  setCurrentWidget(m_pathActionsTB);
+  QStackedWidget::dragLeaveEvent(event);
 }
 
 // #define __NAME__EQ__MAIN__ 1
