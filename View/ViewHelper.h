@@ -81,121 +81,15 @@ class View {
     return view->selectionModel()->selectedRows();
   }
 
-  static void changeDropAction(QDropEvent* event, QPoint pnt, const QString& name, QWidget* w) {
-    if (event->keyboardModifiers().testFlag(Qt::AltModifier)) {
-      event->setDropAction(Qt::DropAction::LinkAction);
-      if (not name.isEmpty())
-        QToolTip::showText(pnt, TOOLTIP_MSG_LINK.arg(name), w);
-    } else if (event->keyboardModifiers() & Qt::ControlModifier) {
-      event->setDropAction(Qt::DropAction::CopyAction);
-      if (not name.isEmpty())
-        QToolTip::showText(pnt, TOOLTIP_MSG_CP.arg(name), w);
-    } else {
-      event->setDropAction(Qt::DropAction::MoveAction);
-      if (not name.isEmpty())
-        QToolTip::showText(pnt, TOOLTIP_MSG_MV.arg(name), w);
-    }
-  }
+  static void changeDropAction(QDropEvent* event, QPoint pnt=QPoint(), const QString& name="", QWidget* w=nullptr);
 
-  static void dropEventCore(QAbstractItemView* view, QDropEvent* event) {
-    auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-    if (_model == nullptr) {
-      qDebug("_model is nullptr");
-      return;
-    }
-    const QPoint& pnt = event->pos();
-    const QModelIndex& ind = view->indexAt(pnt);
-    _model->DragRelease(ind);
-    if (_model->rootPath().isEmpty()) {
-      qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
-      event->ignore();
-      return;
-    }
-    if (not(_model->flags(ind).testFlag(Qt::ItemIsDropEnabled))) {
-      qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
-      event->ignore();
-      return;
-    }
-    QPoint tooltipPosition = view->mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV);
-    QString destinationPath;
-    if (ind.isValid()) {  // drop into the rootpath of current view model
-      destinationPath = _model->fileInfo(ind).fileName();
-    } else {  // drop into the rootpath of current view model
-      destinationPath = _model->rootPath();
-    }
-    View::changeDropAction(event, tooltipPosition, destinationPath, view);
-  }
+  static void dropEventCore(QAbstractItemView* view, QDropEvent* event);
 
-  static void dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
-    auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-    if (_model == nullptr) {
-      qDebug("_model is nullptr");
-      return;
-    }
-    const QPoint& pnt = event->pos();
-    const QModelIndex& ind = view->indexAt(pnt);
-    _model->DragHover(ind);
-    if (_model->rootPath().isEmpty()) {
-      qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
-      event->ignore();
-      return;
-    }
-    if (not(_model->flags(ind).testFlag(Qt::ItemIsDropEnabled))) {
-      qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
-      event->ignore();
-      return;
-    }
-    QPoint tooltipPosition = view->mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV);
-    QString destinationPath;
-    if (ind.isValid()) {  // drop into the rootpath of current view model
-      destinationPath = _model->fileInfo(ind).fileName();
-    } else {  // drop into the rootpath of current view model
-      destinationPath = _model->rootPath();
-    }
-    View::changeDropAction(event, tooltipPosition, destinationPath, view);
-  }
+  static void dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event);
 
-  static void dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
-    auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-    if (_model == nullptr) {
-      qDebug("_model is nullptr");
-      return;
-    }
-    const QPoint& pnt = event->pos();
-    const QModelIndex& ind = view->indexAt(pnt);
-    _model->DragHover(ind);
-    if (_model->rootPath().isEmpty()) {
-      qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
-      event->ignore();
-      return;
-    }
-    if (not(_model->flags(ind).testFlag(Qt::ItemIsDropEnabled))) {
-      qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
-      event->ignore();
-      return;
-    }
-    QPoint tooltipPosition = view->mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV);
-    QString destinationPath;
-    if (ind.isValid()) {  // drop into the rootpath of current view model
-      destinationPath = _model->fileInfo(ind).fileName();
-    } else {  // drop into the rootpath of current view model
-      destinationPath = _model->rootPath();
-    }
-    View::changeDropAction(event, tooltipPosition, destinationPath, view);
+  static void dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event);
 
-    event->accept();
-    qDebug("\tdragMoveEvent [%d]", int(event->dropAction()));
-  }
-
-  static void dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
-      auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-      if (_model == nullptr) {
-        qDebug("_model is nullptr");
-        return;
-      }
-      _model->DragRelease();
-      event->accept();
-  }
+  static void dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event);
 
   static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
 

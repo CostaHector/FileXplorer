@@ -78,3 +78,7 @@ QString PATHTOOL::commonPrefix(const QString& path1, const QString& path2) {
 QString PATHTOOL::commonPath(const QString& path1, const QString& path2) {
   return "";
 }
+
+bool PATHTOOL::isRootOrEmpty(const QString& path) {
+  return path.isEmpty() or path == "/";
+}
