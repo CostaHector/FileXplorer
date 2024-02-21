@@ -4,6 +4,7 @@
 #include <QMimeData>
 #include <QUrl>
 #include "FileOperation/FileOperation.h"
+#include "Tools/PathTool.h"
 #include "UndoRedo.h"
 
 int MyQFileSystemModel::previewsCnt = 0;
@@ -29,7 +30,10 @@ Qt::ItemFlags MyQFileSystemModel::flags(const QModelIndex& index) const {
   if (not index.isValid()) {
     return Qt::ItemFlag::ItemIsDropEnabled | defaultFlags;
   }
-  const QFileInfo& itemFi = fileInfo(index);
+  const QFileInfo itemFi = fileInfo(index);
+  if (PATHTOOL::isRootOrEmpty(itemFi.absoluteFilePath())){
+    return defaultFlags;
+  }
   if (itemFi.isDir()) {  // folders should be be drag/drop enabled
     return Qt::ItemFlag::ItemIsDragEnabled | Qt::ItemFlag::ItemIsDropEnabled | defaultFlags;
   } else if (itemFi.isFile()) {  // files should *not* be drop enabled
