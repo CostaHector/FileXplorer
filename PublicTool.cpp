@@ -6,8 +6,6 @@
 #include <QDirIterator>
 #include <QCoreApplication>
 
-PublicTool::PublicTool() {}
-
 bool PublicTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
   QDir sourceDir(fromDir);
   QDir targetDir(toDir);
