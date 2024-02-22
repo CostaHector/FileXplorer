@@ -21,8 +21,6 @@ OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool
 
 class PublicTool {
  public:
-  PublicTool();
-
   static bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 };
 

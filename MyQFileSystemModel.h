@@ -54,6 +54,7 @@ class MyQFileSystemModel : public QFileSystemModel {
     }
     m_cutMap[rootPath()] += cutIndexes;
   }
+
   void CopiedSomething(const QModelIndexList& copiedIndexes, bool appendMode = false) {
     if (not appendMode) {
       ClearCopiedDict();
@@ -74,9 +75,13 @@ class MyQFileSystemModel : public QFileSystemModel {
     m_draggedHoverIndex = index;
   }
 
-  void DragRelease(const QModelIndex index = QModelIndex()) {
-    emit dataChanged(m_draggedHoverIndex, m_draggedHoverIndex, {Qt::ItemDataRole::BackgroundRole});
+  void DragRelease() {
+    if (not m_draggedHoverIndex.isValid()){
+      return; // already invalid index
+    }
+    QModelIndex tmpIndex = m_draggedHoverIndex;
     m_draggedHoverIndex = QModelIndex();
+    emit dataChanged(tmpIndex, tmpIndex, {Qt::ItemDataRole::BackgroundRole});
   }
 
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
