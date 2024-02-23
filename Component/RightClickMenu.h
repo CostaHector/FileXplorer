@@ -7,10 +7,10 @@
 #include "Actions/ViewActions.h"
 
 class RightClickMenu : public QMenu {
+  Q_OBJECT
  public:
-  QAction* MOVE_TO_TRASHBIN;
   explicit RightClickMenu(const QString& title, QWidget* parent = nullptr)
-      : QMenu(title, parent), MOVE_TO_TRASHBIN(g_fileBasicOperationsActions().DELETE_ACTIONS->actions()[0]) {
+      : QMenu(title, parent) {
     setToolTipsVisible(true);
 
     auto* NEW_MENU = GetNewMenu();
@@ -37,14 +37,14 @@ class RightClickMenu : public QMenu {
     addMenu(GetRenameMenu());
   }
   auto GetNewMenu() -> QMenu* {
-    auto* _newMenuLevel2 = new QMenu("New", this);
+    auto* _newMenuLevel2 = new QMenu(tr("&New"), this);
     _newMenuLevel2->setIcon(QIcon(":/themes/NEW_FILE_FOLDER_PATH"));
     _newMenuLevel2->setToolTipsVisible(true);
     _newMenuLevel2->addActions(g_fileBasicOperationsActions().NEW->actions());
     return _newMenuLevel2;
   }
   auto GetViewMenu() -> QMenu* {
-    auto* viewMenuL2 = new QMenu("&View", this);
+    auto* viewMenuL2 = new QMenu(tr("&View"), this);
     viewMenuL2->setIcon(QIcon(":/themes/SORTING_FILE_FOLDER"));
     viewMenuL2->setToolTipsVisible(true);
     //  viewMenuL2->addActions(g_viewActions().SORT_INDICATOR_ORDER->actions());
@@ -63,7 +63,7 @@ class RightClickMenu : public QMenu {
   }
 
   auto GetRenameMenu() -> QMenu* {
-    auto* renameMenuLevel2 = new QMenu("Rename", this);
+    auto* renameMenuLevel2 = new QMenu(tr("&Rename"), this);
     renameMenuLevel2->setIcon(QIcon(":/themes/RENAME_PATH"));
     renameMenuLevel2->addActions(g_renameAg().RENAME_RIBBONS->actions());
     return renameMenuLevel2;

@@ -184,47 +184,8 @@ void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
 
 void AddressELineEdit::dropEvent(QDropEvent* event) {
   setCurrentWidget(m_pathActionsTB);
-
-  QStringList selectedItems;
-  for (const QUrl& url : event->mimeData()->urls()) {
-    if (url.isLocalFile()) {
-      selectedItems.append(url.toLocalFile());
-    }
-  }
-  if (selectedItems.isEmpty()) {
-    qDebug("nothing selected to drop");
-    return;
-  }
-
   const QString& to = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
-  View::changeDropAction(event);
-
-  const auto action = event->dropAction();
-  qDebug("dropMimeData. action=[%d]", int(action));
-  CCMMode opMode = CCMMode::ERROR;
-  if (action == Qt::DropAction::CopyAction) {
-    opMode = CCMMode::COPY;
-  } else if (action == Qt::DropAction::MoveAction) {
-    opMode = CCMMode::CUT;
-  } else if (action == Qt::DropAction::LinkAction) {
-    opMode = CCMMode::LINK;
-  } else {
-    qDebug("[Err] Unknown action[%d]", int(action));
-    return;
-  }
-
-  ConflictsItemHelper conflictIF(selectedItems, to);
-  auto* tfm = new RenameConflicts(conflictIF, opMode);
-
-  if (to == conflictIF.l and opMode != CCMMode::LINK) {  // skip
-    return;
-  }
-
-  if (not conflictIF) {  // conflict
-    tfm->on_Submit();
-  } else {
-    tfm->exec();
-  }
+  View::onDropMimeData(event->mimeData(), event->dropAction(), to);
   QStackedWidget::dropEvent(event);
 }
 

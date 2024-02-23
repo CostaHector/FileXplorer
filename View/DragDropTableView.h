@@ -27,13 +27,7 @@ class DragDropTableView : public QTableView, public View {
 
   void on_ShowContextMenu(const QPoint pnt);
 
-  auto keyPressEvent(QKeyEvent* e) -> void override {
-    if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
-      emit menu->MOVE_TO_TRASHBIN->triggered();
-      return;
-    }
-    QTableView::keyPressEvent(e);
-  }
+  auto keyPressEvent(QKeyEvent* e) -> void override;
 
  private:
   QPushButton* backwardBtn;  // will not takeover
