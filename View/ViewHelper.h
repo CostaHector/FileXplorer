@@ -17,11 +17,6 @@
 #include <QToolTip>
 
 constexpr int ROW_SECTION_HEIGHT = 10;
-const QPoint TOOLTIP_MSG_PNG_DEV(48, 0);
-
-const QString TOOLTIP_MSG_LINK("<font color=\"blue\">LINK---------------------------------------------------: <br/>%1</font>");
-const QString TOOLTIP_MSG_CP("<font color=\"red\">CP---------------------------------------------------: <br/>%1</font>");
-const QString TOOLTIP_MSG_MV("<font color=\"green\">MV---------------------------------------------------: <br/>%1</font>");
 
 class View {
  public:
@@ -74,26 +69,25 @@ class View {
     view->setFont(defaultFont);
   }
 
-  static QModelIndexList selectedIndexes(QAbstractItemView* view) {  // ignore other column, keep the first column
-    if (qobject_cast<QListView*>(view) != nullptr) {                 // TODO check here
+  static inline QModelIndexList selectedIndexes(QAbstractItemView* view) {  // ignore other column, keep the first column
+    if (dynamic_cast<QListView*>(view) != nullptr) {
       return view->selectionModel()->selectedIndexes();
     }
     return view->selectionModel()->selectedRows();
   }
 
+  static bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to);
+
   static void changeDropAction(QDropEvent* event);
 
-  static void dropEventCore(QAbstractItemView* view, QDropEvent* event);
-
   static void dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event);
-
   static void dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event);
-
+  static void dropEventCore(QAbstractItemView* view, QDropEvent* event);
   static void dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event);
 
-  static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
-
   static void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
+
+  static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
 };
 
 #endif  // VIEWHELPER_H

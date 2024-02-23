@@ -73,13 +73,10 @@ auto DragDropTableView::UpdateItemViewFontSize() -> void {
 
 void DragDropTableView::dropEvent(QDropEvent* event) {
   View::dropEventCore(this, event);
-  QTableView::dropEvent(event);
-  qDebug() << "after QTableView::dropEvent" << event->dropAction();
 }
 
 void DragDropTableView::dragEnterEvent(QDragEnterEvent* event) {
   View::dragEnterEventCore(this, event);
-  return QTableView::dragEnterEvent(event);
 }
 
 void DragDropTableView::dragMoveEvent(QDragMoveEvent* event) {
@@ -94,6 +91,14 @@ void DragDropTableView::on_ShowContextMenu(const QPoint pnt) {
   menu->popup(this->mapToGlobal(pnt));  // or QCursor::pos()
 }
 
+auto DragDropTableView::keyPressEvent(QKeyEvent* e) -> void {
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
+    emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
+    return;
+  }
+  QTableView::keyPressEvent(e);
+}
+
 void DragDropTableView::mousePressEvent(QMouseEvent* event) {
   if (View::onMouseSidekeyBackwardForward(event->button(), backwardBtn, forwardBtn)) {
     return;
@@ -101,7 +106,10 @@ void DragDropTableView::mousePressEvent(QMouseEvent* event) {
   return QTableView::mousePressEvent(event);
 }
 
-void DragDropTableView::mouseMoveEvent(QMouseEvent* event)
-{
-  View::mouseMoveEventCore(this, event);
+void DragDropTableView::mouseMoveEvent(QMouseEvent* event) {
+  if (event->buttons() == Qt::MouseButton::LeftButton) {
+    View::mouseMoveEventCore(this, event);
+    return;
+  }
+  return QTableView::mouseMoveEvent(event);
 }
