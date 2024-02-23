@@ -6,5 +6,5 @@ FileExplorerReadOnly_zh_CN.ts
 FileExplorerTest.pro.user
 FileExplorerTest.pro.user.187c1f8
 FileExplorerTest.pro.user.f225af0
-bin/runlog/*.log
+bin/RUNLOG/*.log
 ./*.json
