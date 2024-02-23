@@ -42,6 +42,22 @@ Qt::ItemFlags MyQFileSystemModel::flags(const QModelIndex& index) const {
   return defaultFlags;
 }
 
+bool MyQFileSystemModel::canItemsBeDragged(const QModelIndex& index) const
+{
+  return index.isValid() and not PATHTOOL::isRootOrEmpty(filePath(index));
+}
+
+bool MyQFileSystemModel::canItemsDroppedHere(const QModelIndex& index) const
+{
+  if (rootPath().isEmpty()){
+    return false;
+  }
+  if (not index.isValid()){
+    return true;
+  }
+  return QFileInfo(filePath(index)).isDir();
+}
+
 bool MyQFileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) const {
   if ((action & supportedDropActions()) and data->hasUrls()) {
     return true;
@@ -53,6 +69,7 @@ bool MyQFileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction a
 
 bool MyQFileSystemModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) {
   QStringList selectedItems;
+  selectedItems.reserve(data->urls().size());
   for (const QUrl& url : data->urls()) {
     if (url.isLocalFile()) {
       selectedItems.append(url.toLocalFile());
@@ -62,7 +79,7 @@ bool MyQFileSystemModel::dropMimeData(const QMimeData* data, Qt::DropAction acti
     return true;
   }
 
-  qDebug("dropMimeData. action=[%d]", int(action));
+  qDebug() << "dropMimeData. action:" << action;
   CCMMode opMode = CCMMode::ERROR;
   if (action == Qt::DropAction::CopyAction) {
     opMode = CCMMode::COPY;
