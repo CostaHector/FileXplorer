@@ -2,6 +2,49 @@
 
 #include <QFileIconProvider>
 
+#include "Component/RenameConflicts.h"
+
+bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to) {
+  const unsigned URLS_SIZE = data->urls().size();
+  if (URLS_SIZE == 0) {
+    return true;
+  }
+  qDebug() << action << QString("%1 item(s) and dropped in [%2]").arg(URLS_SIZE).arg(to);
+  QStringList selectedItems;
+  selectedItems.reserve(URLS_SIZE);
+  for (const QUrl& url : data->urls()) {
+    if (url.isLocalFile()) {
+      selectedItems.append(url.toLocalFile());
+    }
+  }
+  CCMMode opMode = CCMMode::ERROR;
+  switch (action) {
+    case Qt::DropAction::CopyAction:
+      opMode = CCMMode::COPY;
+      break;
+    case Qt::DropAction::MoveAction:
+      opMode = CCMMode::CUT;
+      break;
+    case Qt::DropAction::LinkAction:
+      opMode = CCMMode::LINK;
+      break;  // should not conflict
+    default:
+      qWarning() << "[Err] Unknown action:" << action;
+      return false;
+  }
+  ConflictsItemHelper conflictIF(selectedItems, to);
+  auto* tfm = new RenameConflicts(conflictIF, opMode);
+  if (to == conflictIF.l and opMode != CCMMode::LINK) {
+    return false;
+  }
+  if (not conflictIF) {  // conflict
+    tfm->on_Submit();
+  } else {
+    tfm->exec();
+  }
+  return true;
+}
+
 QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt) {
   static QFileIconProvider iconPro;
   QIcon ico = iconPro.icon(firstSelectedAbsPath);
@@ -11,47 +54,15 @@ QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, cons
     static QFont font("arial", 18, QFont::Weight::ExtraBold, true);
     QPainter painter(&pixmap);
     painter.setFont(font);
+#ifdef _WIN32
+    painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN * 2, DRGA_PIXMAP_SIDE_LEN * 2), Qt::AlignRight | Qt::AlignBottom,
+                     QString("x%1").arg(selectedCnt));
+#else
     painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN), Qt::AlignRight | Qt::AlignBottom, QString("x%1").arg(selectedCnt));
+#endif
     painter.end();
   }
   return pixmap;
-}
-
-void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
-  if (event->buttons() != Qt::MouseButton::LeftButton) {
-    return;
-  }
-  const QModelIndexList& mixed = View::selectedIndexes(view);
-  if (mixed.isEmpty()) {
-    event->ignore();
-    return;
-  }
-
-  auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-  if (_model == nullptr) {
-    qDebug("[mouseMove] _model is nullptr");
-    return;
-  }
-  if (_model->rootPath().isEmpty()) {
-    qDebug("Ignore. Disk move is disabled[C:/,D:/,E:/]");
-    return;
-  }
-
-  QList<QUrl> urls;
-  urls.reserve(mixed.size());
-  for (const auto& ind : mixed) {
-    urls.append(QUrl::fromLocalFile(_model->filePath(ind)));
-  }
-
-  QMimeData* mime = new QMimeData;
-  mime->setUrls(urls);
-  QDrag drag(view);
-  drag.setMimeData(mime);
-
-  const QPixmap dragPixmap = View::PaintDraggedFilesFolders(urls[0].toLocalFile(), mixed.size());
-  drag.setPixmap(dragPixmap);
-  qDebug("mouseMoveEventCore urls.size() = %d", urls.size());
-  drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
 }
 
 void View::changeDropAction(QDropEvent* event) {
@@ -64,68 +75,101 @@ void View::changeDropAction(QDropEvent* event) {
   }
 }
 
-void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
-  auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-  if (_model == nullptr) {
-    qDebug("_model is nullptr");
-    return;
-  }
-  _model->DragRelease();
-  const QPoint& pnt = event->pos();
-  const QModelIndex& ind = view->indexAt(pnt);
-  // can dropped and not contains
-  if (not(_model->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
-    qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
-    event->ignore();
-    return;
-  }
-  View::changeDropAction(event);
-}
-
 void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
-  auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-  if (_model == nullptr) {
-    qDebug("_model is nullptr");
+  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  if (m_fsm == nullptr) {
+    qDebug("m_fsm is nullptr");
     return;
   }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-  if (not(_model->canItemsBeDragged(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
-    qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
-    _model->DragRelease();
+  if (not(m_fsm->canItemsBeDragged(ind) or m_fsm->canItemsDroppedHere(ind))) {
+    qDebug("reject drag/drop not allowed.");
+    m_fsm->DragRelease();
     event->ignore();
     return;
   }
-  _model->DragHover(ind);
+  m_fsm->DragHover(ind);
   View::changeDropAction(event);
+  event->accept();
 }
 
 void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
-  auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-  if (_model == nullptr) {
-    qDebug("_model is nullptr");
+  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  if (m_fsm == nullptr) {
+    qDebug("m_fsm is nullptr");
     return;
   }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-  if (not(_model->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
-    qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
-    _model->DragRelease();
+  if (not(m_fsm->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
+    qDebug("reject drag and move. not allowed or self drop");
+    m_fsm->DragRelease();
     event->ignore();
     return;
   }
-  _model->DragHover(ind);
+  m_fsm->DragHover(ind);
   View::changeDropAction(event);
   event->accept();
-  qDebug("\tdragMoveEvent [%d]", int(event->dropAction()));
+}
+
+void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
+  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  if (m_fsm == nullptr) {
+    qDebug("m_fsm is nullptr");
+    return;
+  }
+  m_fsm->DragRelease();
+  const QPoint& pnt = event->pos();
+  const QModelIndex& ind = view->indexAt(pnt);
+  // allowed dropped and not contains
+  if (not(m_fsm->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
+    qDebug("reject drop here. not allowed or self drop");
+    event->ignore();
+    return;
+  }
+  // ignore here and False return here to allow further processing
+  // otherwise. accept() and True return here
+  onDropMimeData(event->mimeData(), event->dropAction(), ind.isValid() ? m_fsm->filePath(ind) : m_fsm->rootPath());
+  event->accept();
+  qDebug("drop event finished with %d url(s)", event->mimeData()->urls().size());
 }
 
 void View::dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
-  auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-  if (_model == nullptr) {
-    qDebug("_model is nullptr");
+  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  if (m_fsm == nullptr) {
+    qDebug("m_fsm is nullptr");
     return;
   }
-  _model->DragRelease();
+  m_fsm->DragRelease();
   event->accept();
+}
+
+void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
+  event->accept();
+  const QModelIndexList& rows = View::selectedIndexes(view);
+  if (rows.isEmpty()) {
+    return;
+  }
+  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  if (m_fsm == nullptr) {
+    qDebug("[mouseMove] m_fsm is nullptr");
+    return;
+  }
+  event->accept();
+  QList<QUrl> urls;
+  urls.reserve(rows.size());
+  for (const auto& ind : rows) {
+    urls.append(QUrl::fromLocalFile(m_fsm->filePath(ind)));
+  }
+  qDebug("drags %d rows", urls.size());
+
+  QMimeData* mime = new QMimeData;
+  mime->setUrls(urls);
+
+  QDrag drag(view);
+  drag.setMimeData(mime);
+  const QPixmap dragPixmap = View::PaintDraggedFilesFolders(urls[0].toLocalFile(), urls.size());
+  drag.setPixmap(dragPixmap);
+  drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
 }

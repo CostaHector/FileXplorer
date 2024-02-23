@@ -747,6 +747,24 @@
     </message>
 </context>
 <context>
+    <name>RightClickMenu</name>
+    <message>
+        <location filename="Component/RightClickMenu.h" line="40"/>
+        <source>&amp;New</source>
+        <translation>新建</translation>
+    </message>
+    <message>
+        <location filename="Component/RightClickMenu.h" line="47"/>
+        <source>&amp;View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Component/RightClickMenu.h" line="66"/>
+        <source>&amp;Rename</source>
+        <translation>重命名</translation>
+    </message>
+</context>
+<context>
     <name>RightClickMenuActions</name>
     <message>
         <location filename="Actions/RightClickMenuActions.cpp" line="5"/>
