@@ -175,7 +175,7 @@ void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
 
 void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
   const QString& draggedEnterPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
-  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), draggedEnterPath, this);
+  View::changeDropAction(event);
   qDebug("dragged enter[%s]", qPrintable(draggedEnterPath));
   m_dropPanel->setText(RELEASE_HINT_MSG.arg(draggedEnterPath));
   setCurrentWidget(m_dropPanel);
@@ -197,7 +197,7 @@ void AddressELineEdit::dropEvent(QDropEvent* event) {
   }
 
   const QString& to = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
-  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), to, this);
+  View::changeDropAction(event);
 
   const auto action = event->dropAction();
   qDebug("dropMimeData. action=[%d]", int(action));
@@ -236,7 +236,7 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
   const QString& droppedPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
   m_dropPanel->setText(RELEASE_HINT_MSG.arg(droppedPath));
   qDebug("release to drop here [%s]", qPrintable(droppedPath));
-  View::changeDropAction(event, mapToGlobal(event->pos() + TOOLTIP_MSG_PNG_DEV), droppedPath, this);
+  View::changeDropAction(event);
   QStackedWidget::dragMoveEvent(event);
 }
 

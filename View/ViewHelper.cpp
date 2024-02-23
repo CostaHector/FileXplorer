@@ -1,7 +1,6 @@
 #include "ViewHelper.h"
 
 #include <QFileIconProvider>
-#include "Tools/PathTool.h"
 
 QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt) {
   static QFileIconProvider iconPro;
@@ -18,19 +17,50 @@ QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, cons
   return pixmap;
 }
 
-void View::changeDropAction(QDropEvent* event, QPoint pnt, const QString& name, QWidget* w) {
+void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
+  if (event->buttons() != Qt::MouseButton::LeftButton) {
+    return;
+  }
+  const QModelIndexList& mixed = View::selectedIndexes(view);
+  if (mixed.isEmpty()) {
+    event->ignore();
+    return;
+  }
+
+  auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
+  if (_model == nullptr) {
+    qDebug("[mouseMove] _model is nullptr");
+    return;
+  }
+  if (_model->rootPath().isEmpty()) {
+    qDebug("Ignore. Disk move is disabled[C:/,D:/,E:/]");
+    return;
+  }
+
+  QList<QUrl> urls;
+  urls.reserve(mixed.size());
+  for (const auto& ind : mixed) {
+    urls.append(QUrl::fromLocalFile(_model->filePath(ind)));
+  }
+
+  QMimeData* mime = new QMimeData;
+  mime->setUrls(urls);
+  QDrag drag(view);
+  drag.setMimeData(mime);
+
+  const QPixmap dragPixmap = View::PaintDraggedFilesFolders(urls[0].toLocalFile(), mixed.size());
+  drag.setPixmap(dragPixmap);
+  qDebug("mouseMoveEventCore urls.size() = %d", urls.size());
+  drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
+}
+
+void View::changeDropAction(QDropEvent* event) {
   if (event->keyboardModifiers().testFlag(Qt::AltModifier)) {
     event->setDropAction(Qt::DropAction::LinkAction);
-    if (not name.isEmpty())
-      QToolTip::showText(pnt, TOOLTIP_MSG_LINK.arg(name), w);
   } else if (event->keyboardModifiers() & Qt::ControlModifier) {
     event->setDropAction(Qt::DropAction::CopyAction);
-    if (not name.isEmpty())
-      QToolTip::showText(pnt, TOOLTIP_MSG_CP.arg(name), w);
   } else {
     event->setDropAction(Qt::DropAction::MoveAction);
-    if (not name.isEmpty())
-      QToolTip::showText(pnt, TOOLTIP_MSG_MV.arg(name), w);
   }
 }
 
@@ -41,16 +71,10 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
     return;
   }
   _model->DragRelease();
-  if (PATHTOOL::isRootOrEmpty(_model->rootPath())) {
-    qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
-    _model->DragRelease();
-    event->ignore();
-    return;
-  }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-
-  if (not(_model->flags(ind).testFlag(Qt::ItemIsDropEnabled))) {
+  // can dropped and not contains
+  if (not(_model->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
     qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
     event->ignore();
     return;
@@ -64,20 +88,9 @@ void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
     qDebug("_model is nullptr");
     return;
   }
-
-  if (PATHTOOL::isRootOrEmpty(_model->rootPath())) {
-    qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
-    event->ignore();
-    return;
-  }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-  if (not ind.isValid() or view->selectionModel()->selectedIndexes().contains(ind) or ind.column() != MainKey::Name) {
-    _model->DragRelease();
-    event->ignore();
-    return;
-  }
-  if (not(_model->flags(ind).testFlag(Qt::ItemIsDropEnabled))) {
+  if (not(_model->canItemsBeDragged(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
     qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
     _model->DragRelease();
     event->ignore();
@@ -93,19 +106,9 @@ void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
     qDebug("_model is nullptr");
     return;
   }
-  if (PATHTOOL::isRootOrEmpty(_model->rootPath())) {
-    qDebug("Ignore. You cannot drag move/drag enter/drop into the path[%s]", _model->rootPath().toStdString().c_str());
-    event->ignore();
-    return;
-  }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-  if (not ind.isValid() or view->selectionModel()->selectedIndexes().contains(ind) or ind.column() != MainKey::Name) {
-    _model->DragRelease();
-    event->ignore();
-    return;
-  }
-  if (not(_model->flags(ind).testFlag(Qt::ItemIsDropEnabled))) {
+  if (not(_model->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
     qDebug("Ignore. Flags(ind)[%d] NOT Meet [%d].", int(_model->flags(ind)), int(Qt::ItemIsDropEnabled));
     _model->DragRelease();
     event->ignore();

@@ -73,7 +73,8 @@ auto DragDropTableView::UpdateItemViewFontSize() -> void {
 
 void DragDropTableView::dropEvent(QDropEvent* event) {
   View::dropEventCore(this, event);
-  return QTableView::dropEvent(event);
+  QTableView::dropEvent(event);
+  qDebug() << "after QTableView::dropEvent" << event->dropAction();
 }
 
 void DragDropTableView::dragEnterEvent(QDragEnterEvent* event) {
@@ -89,11 +90,6 @@ void DragDropTableView::dragLeaveEvent(QDragLeaveEvent* event) {
   View::dragLeaveEventCore(this, event);
 }
 
-
-void DragDropTableView::mouseMoveEvent(QMouseEvent* event) {
-  View::mouseMoveEventCore(this, event);
-}
-
 void DragDropTableView::on_ShowContextMenu(const QPoint pnt) {
   menu->popup(this->mapToGlobal(pnt));  // or QCursor::pos()
 }
@@ -103,4 +99,9 @@ void DragDropTableView::mousePressEvent(QMouseEvent* event) {
     return;
   }
   return QTableView::mousePressEvent(event);
+}
+
+void DragDropTableView::mouseMoveEvent(QMouseEvent* event)
+{
+  View::mouseMoveEventCore(this, event);
 }

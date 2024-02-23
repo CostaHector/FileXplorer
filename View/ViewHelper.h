@@ -81,7 +81,7 @@ class View {
     return view->selectionModel()->selectedRows();
   }
 
-  static void changeDropAction(QDropEvent* event, QPoint pnt=QPoint(), const QString& name="", QWidget* w=nullptr);
+  static void changeDropAction(QDropEvent* event);
 
   static void dropEventCore(QAbstractItemView* view, QDropEvent* event);
 
@@ -93,41 +93,7 @@ class View {
 
   static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
 
-  static void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
-    if (event->buttons() != Qt::MouseButton::LeftButton) {
-      return;
-    }
-    const QModelIndexList& mixed = View::selectedIndexes(view);
-    if (mixed.isEmpty()) {
-      event->ignore();
-      return;
-    }
-
-    auto* _model = dynamic_cast<MyQFileSystemModel*>(view->model());
-    if (_model == nullptr) {
-      qDebug("[mouseMove] _model is nullptr");
-      return;
-    }
-    if (_model->rootPath().isEmpty()) {
-      qDebug("Ignore. Disk move is disabled[C:/,D:/,E:/]");
-      return;
-    }
-
-    QList<QUrl> urls;
-    urls.reserve(mixed.size());
-    for (const auto& ind : mixed) {
-      urls.append(QUrl::fromLocalFile(_model->filePath(ind)));
-    }
-
-    QMimeData* mime = new QMimeData;
-    mime->setUrls(urls);
-    QDrag drag(view);
-    drag.setMimeData(mime);
-
-    const QPixmap dragPixmap = View::PaintDraggedFilesFolders(urls[0].toLocalFile(), mixed.size());
-    drag.setPixmap(dragPixmap);
-    drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
-  }
+  static void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
 };
 
 #endif  // VIEWHELPER_H
