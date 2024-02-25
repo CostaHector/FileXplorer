@@ -42,3 +42,6 @@ Above 2 command(s) failed.
 2024-02-23 08:39:06
 Fail: rename(/home/ariel/Downloads/Ruben Dias,video-library-svgrepo-com.svg,/,video-library-svgrepo-com.svg) [4 parm(s)]
 Above 1 command(s) failed.
+2024-02-23 23:00:39
+Fail: rename(D:/,,E:/,) [4 parm(s)]
+Above 1 command(s) failed.

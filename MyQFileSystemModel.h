@@ -94,10 +94,10 @@ class MyQFileSystemModel : public QFileSystemModel {
         return QBrush(Qt::green);
       }
       if (m_cutMap.contains(rootPath()) and m_cutMap[rootPath()].contains(index)) {
-        return QBrush(Qt::GlobalColor::yellow);
+        return QBrush(Qt::GlobalColor::darkGray, Qt::BrushStyle::Dense4Pattern);
       }
       if (m_copiedMap.contains(rootPath()) and m_copiedMap[rootPath()].contains(index)) {
-        return QBrush(Qt::GlobalColor::magenta);
+        return QBrush(Qt::GlobalColor::yellow, Qt::BrushStyle::CrossPattern);
       }
       return QBrush(Qt::transparent);
     }

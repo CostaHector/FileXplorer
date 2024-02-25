@@ -128,11 +128,12 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
     event->ignore();
     return;
   }
+  event->accept();
   // ignore here and False return here to allow further processing
   // otherwise. accept() and True return here
+  View::changeDropAction(event);
   onDropMimeData(event->mimeData(), event->dropAction(), ind.isValid() ? m_fsm->filePath(ind) : m_fsm->rootPath());
-  event->accept();
-  qDebug("drop event finished with %d url(s)", event->mimeData()->urls().size());
+  qDebug() << event->dropAction() << QString("DropEvent Finished with %1 url(s)").arg(event->mimeData()->urls().size());
 }
 
 void View::dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
