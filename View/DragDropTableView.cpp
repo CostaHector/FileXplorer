@@ -7,6 +7,28 @@
 #include "Actions/ViewActions.h"
 #include "PublicVariable.h"
 
+const QString TABLEVIEW_STYLESHEET = "QTableView {"\
+    "    show-decoration-selected: 1;"\
+    "}"\
+    "QTableView::item:alternate {"\
+    "}"\
+    "QTableView::item:selected {"\
+    "    border-bottom: 1px inherit #FFFFFF;"\
+    "}"\
+    "QTableView::item:selected:!active {"\
+    "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EEEEEE, stop: 1 #999999);"\
+    "    color: #000000;"\
+    "}"\
+    "QTableView::item:selected:active {"\
+    "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);"\
+    "    color: #000000;"\
+    "    border-top: 2px solid #CCEBFF;"\
+    "    border-bottom: 2px solid #CCEBFF;"\
+    "}"\
+    "QTableView::item:hover {"\
+    "    background: #CCEBFF;"\
+    "}";
+
 DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* mouseSideKeyBackwardBtn, QPushButton* mouseSideKeyForwardBtn)
     : QTableView(),
       View(),
@@ -25,6 +47,8 @@ DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* 
   setDropIndicatorShown(true);
 
   DragDropTableView::subscribe();
+
+  setStyleSheet(TABLEVIEW_STYLESHEET);
 }
 
 void DragDropTableView::subscribe() {
