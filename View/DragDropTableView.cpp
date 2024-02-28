@@ -34,11 +34,10 @@ DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* 
       View(),
       backwardBtn(mouseSideKeyBackwardBtn),
       forwardBtn(mouseSideKeyForwardBtn),
-      menu(new RightClickMenu("Right click menu", this)) {
+      m_menu(new RightClickMenu("Right click menu", this)) {
   setModel(fsmModel);
   InitViewSettings();
 
-  setContextMenuPolicy(Qt::CustomContextMenu);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::DragDrop);
@@ -69,8 +68,6 @@ void DragDropTableView::subscribe() {
 
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
-
-  connect(this, &QTableView::customContextMenuRequested, this, &DragDropTableView::on_ShowContextMenu);
 }
 
 auto DragDropTableView::InitViewSettings() -> void {
@@ -109,10 +106,6 @@ void DragDropTableView::dragMoveEvent(QDragMoveEvent* event) {
 
 void DragDropTableView::dragLeaveEvent(QDragLeaveEvent* event) {
   View::dragLeaveEventCore(this, event);
-}
-
-void DragDropTableView::on_ShowContextMenu(const QPoint pnt) {
-  menu->popup(this->mapToGlobal(pnt));  // or QCursor::pos()
 }
 
 auto DragDropTableView::keyPressEvent(QKeyEvent* e) -> void {

@@ -25,14 +25,16 @@ class DragDropTableView : public QTableView, public View {
 
   void mouseMoveEvent(QMouseEvent* event) override;
 
-  void on_ShowContextMenu(const QPoint pnt);
+  auto keyPressEvent(QKeyEvent* event) -> void override;
 
-  auto keyPressEvent(QKeyEvent* e) -> void override;
+  void contextMenuEvent(QContextMenuEvent *event) override{
+    m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+  }
 
  private:
   QPushButton* backwardBtn;  // will not takeover
   QPushButton* forwardBtn;   // will not takeover
-  RightClickMenu* menu;
+  RightClickMenu* m_menu;
 };
 
 #endif  // DRAGDROPTABLEVIEW_H
