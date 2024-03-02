@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 
   FileExplorerReadOnly fileExplorer(argc, argv, nullptr);
 
-  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->m_fsm, fileExplorer.m_fsPanel, fileExplorer._statusBar,
+  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel->m_dbModel, fileExplorer.m_fsPanel, fileExplorer._statusBar,
                         std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
 

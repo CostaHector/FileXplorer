@@ -39,7 +39,7 @@ void NavigationAndAddressBar::subscribe(T_IntoNewPath IntoNewPath,
 auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {
   connect(g_addressBarActions()._BACK_TO, &QAction::triggered, this, &NavigationAndAddressBar::onBackward);
   connect(g_addressBarActions()._FORWARD_TO, &QAction::triggered, this, &NavigationAndAddressBar::onForward);
-  connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onBackspaceEvent);
+  connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onUpTo);
 
   connect(searchLE, &QLineEdit::textChanged, this, [this]() -> void {
     if (m_on_searchTextChanged)
@@ -67,7 +67,7 @@ auto NavigationAndAddressBar::onForward() -> bool {
   return true;
 }
 
-auto NavigationAndAddressBar::onBackspaceEvent() -> bool {
+auto NavigationAndAddressBar::onUpTo() -> bool {
   if (m_IntoNewPath) {
     return m_IntoNewPath(_addressLine->dirname(), true, false);
   }

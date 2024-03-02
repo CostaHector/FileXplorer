@@ -16,13 +16,12 @@
 
 class DatabaseTableView : public QTableView {
  public:
-  DatabaseTableView(DatabaseSearchToolBar* dbSearchBar);
+  DatabaseTableView(DatabaseSearchToolBar* dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent=nullptr);
 
   auto InitViewSettings() -> void;
   auto UpdateItemViewFontSize() -> void;
   void subscribe();
   auto on_cellDoubleClicked(QModelIndex clickedIndex) -> bool;
-  auto on_revealInExplorer() const -> bool;
   auto on_PlayVideo() const -> bool;
 
   auto keyPressEvent(QKeyEvent* e) -> void override {
@@ -38,7 +37,7 @@ class DatabaseTableView : public QTableView {
   }
 
   bool onSearchDataBase(const QString& searchText) {
-    m_dbModel->setFilter(searchText);
+    _dbModel->setFilter(searchText);
     return true;
   }
 
@@ -71,7 +70,7 @@ class DatabaseTableView : public QTableView {
   int onCountRow();
 
 
-  MyQSqlTableModel* m_dbModel;
+  MyQSqlTableModel* _dbModel;
 
  private:
   DBRightClickMenu* m_vidsDBMenu;
@@ -84,9 +83,9 @@ class DatabaseTableView : public QTableView {
   QString m_columnsShowSwitch;
 
   DatabaseSearchToolBar* _dbSearchBar;
-  QComboBox* m_tables;
-  QLineEdit* m_searchLE;
-  QComboBox* m_searchCB;
+  QComboBox* _tables;
+  QLineEdit* _searchLE;
+  QComboBox* _searchCB;
 
   QuickWhereClause* m_quickWhereClause;
 };

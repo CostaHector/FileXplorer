@@ -1,4 +1,5 @@
 #include "NavigationViewSwitcher.h"
+#include "PublicTool.h"
 #include "Tools/ActionWithPath.h"
 
 using std::placeholders::_1;
@@ -37,7 +38,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
   int viewIndex = -1;
   if (viewType == "table") {
     if (_view->m_fsView == nullptr) {
-      _view->m_fsView = new FileSystemTableView(_view->m_fsm, _view->m_menu);
+      _view->m_fsView = new FileSystemTableView(_view->m_fsModel, _view->m_menu);
       ContentPanel::connect(_view->m_fsView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       ContentPanel::connect(_view->m_fsView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsView);
@@ -45,7 +46,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "list") {
     if (_view->m_fsListView == nullptr) {
-      _view->m_fsListView = new FileSystemListView(_view->m_fsm, _view->m_menu);
+      _view->m_fsListView = new FileSystemListView(_view->m_fsModel, _view->m_menu);
       ContentPanel::connect(_view->m_fsListView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       ContentPanel::connect(_view->m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsListView);
@@ -53,7 +54,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "tree") {
     if (_view->m_fsTreeView == nullptr) {
-      _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsm, _view->m_menu);
+      _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel, _view->m_menu);
       ContentPanel::connect(_view->m_fsTreeView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       ContentPanel::connect(_view->m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsTreeView);
@@ -61,7 +62,8 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "movie") {
     if (_view->m_dbPanel == nullptr) {
-      _view->m_dbPanel = new DatabaseTableView(_view->_dbSearchBar);
+      _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
+      _view->m_dbPanel = new DatabaseTableView(_view->_dbSearchBar, _view->m_dbModel, _view);
       _view->AddView(viewType, _view->m_dbPanel);
     }
     viewIndex = _view->m_name2ViewIndex[viewType];
