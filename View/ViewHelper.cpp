@@ -51,8 +51,11 @@ QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, cons
   constexpr int DRGA_PIXMAP_SIDE_LEN = 128;
   QPixmap pixmap = ico.pixmap(DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN);
   if (selectedCnt > 1) {
-    static QFont font("arial", 18, QFont::Weight::ExtraBold, true);
     QPainter painter(&pixmap);
+    static QBrush brush(Qt::GlobalColor::darkGray, Qt::Dense4Pattern);
+    painter.setBrush(brush);
+    painter.drawRoundRect(0, 0, DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN);
+    static QFont font("arial", 18, QFont::Weight::ExtraBold, true);
     painter.setFont(font);
 #ifdef _WIN32
     painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN * 2, DRGA_PIXMAP_SIDE_LEN * 2), Qt::AlignRight | Qt::AlignBottom,
