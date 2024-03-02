@@ -1,7 +1,7 @@
 #include "FileExplorerEvent.h"
 #include "FileExplorerReadOnly.h"
 #include "PublicTool.h"
-#include "Tools/SubscribeDatabase.h"
+#include "Tools/ExtraViewVisibilityControl.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -28,12 +28,11 @@ int main(int argc, char* argv[]) {
 
   FileExplorerReadOnly fileExplorer(argc, argv, nullptr);
 
-  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->fileSysModel, fileExplorer.m_fsPanel->view, fileExplorer._statusBar,
+  FileExplorerEvent fee(nullptr, fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel->m_dbModel, fileExplorer.m_fsPanel, fileExplorer._statusBar,
                         std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
   fee.subscribe();
 
-  auto* eventImplementer =
-      new SubscribeDatabase(fileExplorer.m_dbPanel->m_dbView, std::bind(&FileExplorerReadOnly::SwitchStackWidget, &fileExplorer));
+  auto* extraViewVisibility = new ExtraViewVisibilityControl(fileExplorer.centralWidget());
   fileExplorer.show();
 
   a.exec();

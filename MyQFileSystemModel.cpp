@@ -1,19 +1,17 @@
 #include "MyQFileSystemModel.h"
+#include "Tools/PathTool.h"
 
 #include <QFileIconProvider>
 #include <QMimeData>
 #include <QUrl>
-#include "FileOperation/FileOperation.h"
-#include "Tools/PathTool.h"
-#include "UndoRedo.h"
 
 int MyQFileSystemModel::previewsCnt = 0;
 constexpr int MyQFileSystemModel::cacheWidth;
 constexpr int MyQFileSystemModel::cacheHeight;
 constexpr int MyQFileSystemModel::IMAGES_COUNT_LOAD_ONCE_MAX;
 
-MyQFileSystemModel::MyQFileSystemModel(CustomStatusBar* _statusBar, QObject* parent)
-    : QFileSystemModel(parent), logger(_statusBar), m_imagesSizeLoaded(0) {
+MyQFileSystemModel::MyQFileSystemModel(QObject* parent)
+    : QFileSystemModel(parent), _logger(nullptr), m_imagesSizeLoaded(0) {
   setRootPath("");  // C and D Disk
   setFilter(QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot);
 
@@ -23,6 +21,14 @@ MyQFileSystemModel::MyQFileSystemModel(CustomStatusBar* _statusBar, QObject* par
 
   connect(this, &MyQFileSystemModel::rootPathChanged, this, &MyQFileSystemModel::whenRootPathChanged);
   connect(this, &MyQFileSystemModel::directoryLoaded, this, &MyQFileSystemModel::whenDirectoryLoaded);
+}
+
+void MyQFileSystemModel::BindLogger(CustomStatusBar* logger){
+  if (logger == nullptr){
+    qWarning("Bind logger failed. nullptr passed here");
+    return;
+  }
+  _logger = logger;
 }
 
 Qt::ItemFlags MyQFileSystemModel::flags(const QModelIndex& index) const {
@@ -86,7 +92,7 @@ void MyQFileSystemModel::whenRootPathChanged(const QString& newpath) {
 void MyQFileSystemModel::whenDirectoryLoaded(const QString& path) {
   QModelIndex currentIndex(index(path));
   int rowCnt = rowCount(currentIndex);
-  if (logger) {
-    logger->pathInfo(rowCnt, 0);
+  if (_logger) {
+    _logger->pathInfo(rowCnt, 0);
   }
 }

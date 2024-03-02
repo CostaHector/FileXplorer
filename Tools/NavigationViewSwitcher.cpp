@@ -1,0 +1,80 @@
+#include "NavigationViewSwitcher.h"
+#include "PublicTool.h"
+#include "Tools/ActionWithPath.h"
+
+using std::placeholders::_1;
+using std::placeholders::_2;
+using std::placeholders::_3;
+
+NavigationViewSwitcher::NavigationViewSwitcher(StackedToolBar* navigation, ContentPanel* view, QObject* parent)
+    : QObject(parent), _navigation(navigation), _view(view) {}
+
+void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
+  const QSet<QString> fileSystemView{"list", "table", "tree"};
+  int naviIndex = -1;
+  if (fileSystemView.contains(viewType)) {
+    if (_navigation->m_addressBar == nullptr) {
+      _navigation->m_addressBar = new NavigationAndAddressBar;
+      _navigation->AddToolBar("NavigationAddress", _navigation->m_addressBar);
+      _view->BindNavigationAddressBar(_navigation->m_addressBar);
+
+      auto F_IntoNewPath = std::bind(&ContentPanel::onActionAndViewNavigate, _view, _1, _2, _3);
+      _navigation->m_addressBar->subscribe(F_IntoNewPath, std::bind(&ContentPanel::on_searchTextChanged, _view, _1),
+                                           std::bind(&ContentPanel::on_searchEnterKey, _view, _1));
+      ActionWithPath::BindIntoNewPath(F_IntoNewPath);
+    }
+    naviIndex = _navigation->m_name2StackIndex["NavigationAddress"];
+  } else {
+    if (_navigation->m_dbSearchBar == nullptr) {
+      _navigation->m_dbSearchBar = new DatabaseSearchToolBar;
+      _navigation->AddToolBar("DatabaseSearch", _navigation->m_dbSearchBar);
+
+      _view->BindDatabaseSearchToolBar(_navigation->m_dbSearchBar);
+    }
+    naviIndex = _navigation->m_name2StackIndex["DatabaseSearch"];
+  }
+  _navigation->m_stackedToolBar->setCurrentIndex(naviIndex);
+
+  int viewIndex = -1;
+  if (viewType == "table") {
+    if (_view->m_fsView == nullptr) {
+      _view->m_fsView = new FileSystemTableView(_view->m_fsModel, _view->m_menu);
+      ContentPanel::connect(_view->m_fsView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_fsView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
+      _view->AddView(viewType, _view->m_fsView);
+    }
+    viewIndex = _view->m_name2ViewIndex[viewType];
+  } else if (viewType == "list") {
+    if (_view->m_fsListView == nullptr) {
+      _view->m_fsListView = new FileSystemListView(_view->m_fsModel, _view->m_menu);
+      ContentPanel::connect(_view->m_fsListView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
+      _view->AddView(viewType, _view->m_fsListView);
+    }
+    viewIndex = _view->m_name2ViewIndex[viewType];
+  } else if (viewType == "tree") {
+    if (_view->m_fsTreeView == nullptr) {
+      _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel, _view->m_menu);
+      ContentPanel::connect(_view->m_fsTreeView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
+      _view->AddView(viewType, _view->m_fsTreeView);
+    }
+    viewIndex = _view->m_name2ViewIndex[viewType];
+  } else if (viewType == "movie") {
+    if (_view->m_dbPanel == nullptr) {
+      _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
+      _view->m_dbPanel = new DatabaseTableView(_view->_dbSearchBar, _view->m_dbModel, _view);
+      _view->AddView(viewType, _view->m_dbPanel);
+    }
+    viewIndex = _view->m_name2ViewIndex[viewType];
+  }
+  _view->setCurrentIndex(viewIndex);
+  if (fileSystemView.contains(viewType) and _view->_addressBar) {
+    _view->onActionAndViewNavigate(_view->_addressBar->_addressLine->pathFromLineEdit(), false);
+  }
+}
+
+void NavigationViewSwitcher::onSwitchByViewAction(const QAction* activatedAction) {
+  const QString& viewType = activatedAction->text();
+  onSwitchByViewType(viewType);
+}

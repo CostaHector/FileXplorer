@@ -1,0 +1,101 @@
+#include "FileSystemTreeView.h"
+#include "View/ViewHelper.h"
+#include "View/ViewStyleSheet.h"
+
+#include <QHeaderView>
+#include <QMouseEvent>
+#include "Actions/FileBasicOperationsActions.h"
+#include "Actions/RenameActions.h"
+#include "Actions/ViewActions.h"
+
+FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu) : QTreeView(), _menu(menu) {
+  setModel(fsmModel);
+  InitViewSettings();
+
+  setSelectionMode(QAbstractItemView::ExtendedSelection);
+  setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
+  setDragDropMode(QAbstractItemView::DragDrop);
+  setAcceptDrops(true);
+  setDragEnabled(true);
+  setDropIndicatorShown(true);
+
+  FileSystemTreeView::subscribe();
+
+  setStyleSheet(ViewStyleSheet::TREEVIEW_STYLESHEET);
+}
+
+void FileSystemTreeView::subscribe() {
+  connect(header(), &QHeaderView::sectionResized, this,
+          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
+  connect(header(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
+
+  addActions(g_viewActions()._VIEW_ACRIONS->actions());
+  addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
+
+  addActions(g_fileBasicOperationsActions().NEW->actions());
+  addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
+  addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
+  addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
+  addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+
+  addActions(g_renameAg().RENAME_RIBBONS->actions());
+
+  addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
+  addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+}
+
+auto FileSystemTreeView::InitViewSettings() -> void {
+  //  setShowGrid(false);
+  setAlternatingRowColors(true);
+  setSortingEnabled(true);
+  setSelectionBehavior(QAbstractItemView::SelectRows);
+
+  if (PreferenceSettings().contains("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW")) {
+    header()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW").toByteArray());
+  }
+  sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
+  FileSystemTreeView::UpdateItemViewFontSize();
+}
+
+auto FileSystemTreeView::UpdateItemViewFontSize() -> void {
+  View::UpdateItemViewFontSizeCore(this);
+}
+
+void FileSystemTreeView::dropEvent(QDropEvent* event) {
+  View::dropEventCore(this, event);
+}
+
+void FileSystemTreeView::dragEnterEvent(QDragEnterEvent* event) {
+  View::dragEnterEventCore(this, event);
+}
+
+void FileSystemTreeView::dragMoveEvent(QDragMoveEvent* event) {
+  View::dragMoveEventCore(this, event);
+}
+
+void FileSystemTreeView::dragLeaveEvent(QDragLeaveEvent* event) {
+  View::dragLeaveEventCore(this, event);
+}
+
+auto FileSystemTreeView::keyPressEvent(QKeyEvent* e) -> void {
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
+    emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
+    return;
+  }
+  QTreeView::keyPressEvent(e);
+}
+
+void FileSystemTreeView::mousePressEvent(QMouseEvent* event) {
+  if (View::onMouseSidekeyBackwardForward(event->button())) {
+    return;
+  }
+  return QTreeView::mousePressEvent(event);
+}
+
+void FileSystemTreeView::mouseMoveEvent(QMouseEvent* event) {
+  if (event->buttons() == Qt::MouseButton::LeftButton) {
+    View::mouseMoveEventCore(this, event);
+    return;
+  }
+  return QTreeView::mouseMoveEvent(event);
+}

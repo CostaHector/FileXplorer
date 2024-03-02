@@ -5,7 +5,7 @@ ViewActions& g_viewActions() {
   return ins;
 }
 
-QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions(){
+QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   NAVIGATION_PANE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
   NAVIGATION_PANE->setCheckable(true);
@@ -48,5 +48,33 @@ QActionGroup* ViewActions::GetPlayersActions() {
   for (QAction* act : actionGroup->actions()) {
     act->setCheckable(false);
   }
+  return actionGroup;
+}
+
+QActionGroup* ViewActions::GetListTableTreeActions() {
+  _LIST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_2));
+  _LIST_VIEW->setShortcutVisibleInContextMenu(true);
+  _LIST_VIEW->setToolTip(QString("Displays items by using large thumbnails. (%1)").arg(_LIST_VIEW->shortcut().toString()));
+  _LIST_VIEW->setCheckable(true);
+
+  _TABLE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_6));
+  _TABLE_VIEW->setShortcutVisibleInContextMenu(true);
+  _TABLE_VIEW->setToolTip(QString("Displays information about each in the window. (%1)").arg(_TABLE_VIEW->shortcut().toString()));
+  _TABLE_VIEW->setCheckable(true);
+  _TABLE_VIEW->setChecked(true);
+
+  _TREE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_9));
+  _TREE_VIEW->setShortcutVisibleInContextMenu(true);
+  _TREE_VIEW->setToolTip(QString("Display files and folders achitecures. (%1)").arg(_TREE_VIEW->shortcut().toString()));
+  _TREE_VIEW->setCheckable(true);
+
+  _MOVIE_VIEW->setCheckable(true);
+
+  QActionGroup* actionGroup = new QActionGroup(this);
+  actionGroup->addAction(_LIST_VIEW);
+  actionGroup->addAction(_TABLE_VIEW);
+  actionGroup->addAction(_TREE_VIEW);
+  actionGroup->addAction(_MOVIE_VIEW);
+  actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
   return actionGroup;
 }

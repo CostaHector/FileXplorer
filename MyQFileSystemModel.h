@@ -10,7 +10,9 @@
 
 class MyQFileSystemModel : public QFileSystemModel {
  public:
-  explicit MyQFileSystemModel(CustomStatusBar* _statusBar = nullptr, QObject* parent = nullptr);
+  explicit MyQFileSystemModel(QObject* parent = nullptr);
+
+  void BindLogger(CustomStatusBar* logger);
 
   Qt::ItemFlags flags(const QModelIndex& index) const override;
 
@@ -109,7 +111,7 @@ class MyQFileSystemModel : public QFileSystemModel {
   void whenDirectoryLoaded(const QString& path);
 
  protected:
-  CustomStatusBar* logger;
+  CustomStatusBar* _logger;
   int m_imagesSizeLoaded = 0;
 
   static int previewsCnt;

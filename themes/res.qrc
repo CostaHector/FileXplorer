@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/themes">
-        <file alias="APP_ICON_PATH">AppIcons/REVEAL_IN_EXPLORER.ico</file>
-        <file alias="LE_PARSER_APP">AppIcons/LE_PARSER.ico</file>
+        <file alias="APP_ICON_PATH">AppIcons/FOLDER_OF_PICTURES.png</file>
         <file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
         <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
         <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
@@ -76,11 +75,6 @@
         <file alias="CUT_ITEM">RightClickIcon/CUT.png</file>
         <file alias="PASTE_ITEM">RightClickIcon/PASTE.png</file>
         <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5FileIdentifier.png</file>
-        <file alias="HTML_PREVIEW_FILTER">RightClickIcon/HTML_PREVIEW_FILTER.svg</file>
-        <file alias="HTML_PREVIEW_BLACKLIST_ADD">RightClickIcon/HTML_PREVIEW_BLACKLIST_ADD.svg</file>
-        <file alias="HTML_PREVIEW_BLACKLIST_REMOVE">RightClickIcon/HTML_PREVIEW_BLACKLIST_REMOVE.svg</file>
-        <file alias="HTML_PREVIEW_WHITELIST_ADD">RightClickIcon/HTML_PREVIEW_WHITELIST_ADD.svg</file>
-        <file alias="HTML_PREVIEW_WHITELIST_REMOVE">RightClickIcon/HTML_PREVIEW_WHITELIST_REMOVE.svg</file>
         <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
         <file alias="SORT_BY">sorting/SORT_BY.ico</file>
         <file alias="SORTING_FILE_FOLDER">sorting/sorting.png</file>
