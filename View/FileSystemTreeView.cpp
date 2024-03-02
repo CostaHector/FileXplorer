@@ -1,4 +1,5 @@
-#include "View/DragDropTableView.h"
+#include "FileSystemTreeView.h"
+#include "View/ViewHelper.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>
@@ -7,34 +8,31 @@
 #include "Actions/ViewActions.h"
 #include "PublicVariable.h"
 
-const QString TABLEVIEW_STYLESHEET = "QTableView {"\
+const QString TABLEVIEW_STYLESHEET = "QTreeView {"\
     "    show-decoration-selected: 1;"\
     "}"\
-    "QTableView::item:alternate {"\
+    "QTreeView::item:alternate {"\
     "}"\
-    "QTableView::item:selected {"\
+    "QTreeView::item:selected {"\
     "    border-bottom: 1px inherit #FFFFFF;"\
     "}"\
-    "QTableView::item:selected:!active {"\
+    "QTreeView::item:selected:!active {"\
     "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EEEEEE, stop: 1 #999999);"\
     "    color: #000000;"\
     "}"\
-    "QTableView::item:selected:active {"\
+    "QTreeView::item:selected:active {"\
     "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);"\
     "    color: #000000;"\
     "    border-top: 2px solid #CCEBFF;"\
     "    border-bottom: 2px solid #CCEBFF;"\
     "}"\
-    "QTableView::item:hover {"\
+    "QTreeView::item:hover {"\
     "    background: #CCEBFF;"\
     "}";
 
-DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* mouseSideKeyBackwardBtn, QPushButton* mouseSideKeyForwardBtn)
-    : QTableView(),
-      View(),
-      backwardBtn(mouseSideKeyBackwardBtn),
-      forwardBtn(mouseSideKeyForwardBtn),
-      m_menu(new RightClickMenu("Right click menu", this)) {
+FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu)
+    : QTreeView(),
+      _menu(menu){
   setModel(fsmModel);
   InitViewSettings();
 
@@ -45,16 +43,16 @@ DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* 
   setDragEnabled(true);
   setDropIndicatorShown(true);
 
-  DragDropTableView::subscribe();
+  FileSystemTreeView::subscribe();
 
   setStyleSheet(TABLEVIEW_STYLESHEET);
 }
 
-void DragDropTableView::subscribe() {
-  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
-          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
+void FileSystemTreeView::subscribe() {
+//  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
+//          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
 
-  connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
+//  connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
@@ -70,63 +68,63 @@ void DragDropTableView::subscribe() {
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
 }
 
-auto DragDropTableView::InitViewSettings() -> void {
-  setShowGrid(false);
+auto FileSystemTreeView::InitViewSettings() -> void {
+//  setShowGrid(false);
   setAlternatingRowColors(true);
   setSortingEnabled(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  verticalHeader()->setVisible(false);
-  verticalHeader()->setDefaultSectionSize(ROW_SECTION_HEIGHT);
-  verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+//  verticalHeader()->setVisible(false);
+//  verticalHeader()->setDefaultSectionSize(ROW_SECTION_HEIGHT);
+//  verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
-  horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-  horizontalHeader()->setStretchLastSection(false);
-  horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
+//  horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
+//  horizontalHeader()->setStretchLastSection(false);
+//  horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
-  horizontalHeader()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY").toByteArray());
-  DragDropTableView::UpdateItemViewFontSize();
+//  horizontalHeader()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY").toByteArray());
+  FileSystemTreeView::UpdateItemViewFontSize();
 }
 
-auto DragDropTableView::UpdateItemViewFontSize() -> void {
+auto FileSystemTreeView::UpdateItemViewFontSize() -> void {
   View::UpdateItemViewFontSizeCore(this);
 }
 
-void DragDropTableView::dropEvent(QDropEvent* event) {
+void FileSystemTreeView::dropEvent(QDropEvent* event) {
   View::dropEventCore(this, event);
 }
 
-void DragDropTableView::dragEnterEvent(QDragEnterEvent* event) {
+void FileSystemTreeView::dragEnterEvent(QDragEnterEvent* event) {
   View::dragEnterEventCore(this, event);
 }
 
-void DragDropTableView::dragMoveEvent(QDragMoveEvent* event) {
+void FileSystemTreeView::dragMoveEvent(QDragMoveEvent* event) {
   View::dragMoveEventCore(this, event);
 }
 
-void DragDropTableView::dragLeaveEvent(QDragLeaveEvent* event) {
+void FileSystemTreeView::dragLeaveEvent(QDragLeaveEvent* event) {
   View::dragLeaveEventCore(this, event);
 }
 
-auto DragDropTableView::keyPressEvent(QKeyEvent* e) -> void {
+auto FileSystemTreeView::keyPressEvent(QKeyEvent* e) -> void {
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
     emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
     return;
   }
-  QTableView::keyPressEvent(e);
+  QTreeView::keyPressEvent(e);
 }
 
-void DragDropTableView::mousePressEvent(QMouseEvent* event) {
-  if (View::onMouseSidekeyBackwardForward(event->button(), backwardBtn, forwardBtn)) {
+void FileSystemTreeView::mousePressEvent(QMouseEvent* event) {
+  if (View::onMouseSidekeyBackwardForward(event->button())) {
     return;
   }
-  return QTableView::mousePressEvent(event);
+  return QTreeView::mousePressEvent(event);
 }
 
-void DragDropTableView::mouseMoveEvent(QMouseEvent* event) {
+void FileSystemTreeView::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::MouseButton::LeftButton) {
     View::mouseMoveEventCore(this, event);
     return;
   }
-  return QTableView::mouseMoveEvent(event);
+  return QTreeView::mouseMoveEvent(event);
 }

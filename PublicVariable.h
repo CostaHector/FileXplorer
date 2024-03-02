@@ -319,4 +319,6 @@ bool VerifyOneFolderPath(const GVarStrFolder& kv);
 
 bool InitOutterPlainTextPath();
 
+
+constexpr int CONTROL_TOOLBAR_HEIGHT = 28;
 #endif  // PUBLICVARIABLE_H

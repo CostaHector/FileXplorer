@@ -1,5 +1,17 @@
 #include "PathTool.h"
 
+QString PATHTOOL::StripTrailingSlash(QString path) {
+  // drive letter will be kept while trailing path seperator will be trunc
+  // i.e.,
+  // "XX:/A/"  -> "XX:/A" and "XX:/" -> same
+  // "/home/user/" ->"/home/user" and "/" -> same
+#ifdef WIN32
+  return (path.size() > 2 and path[path.size() - 2] != ':' and path.back() == PATH_SEP_CHAR) ? path.chopped(1) : path;
+#else
+  return (path.size() > 1 and path.back() == PATH_SEP_CHAR) ? path.chopped(1) : path;
+#endif
+}
+
 QString PATHTOOL::linkPath(const QString& localPath) {
   return "file:///" + localPath;
 }
@@ -18,7 +30,7 @@ QString PATHTOOL::normPath(QString fullPath) {
 }
 QString PATHTOOL::absolutePath(const QString& fullPath) {
   int end = fullPath.lastIndexOf('/');
-  return end != -1 ? fullPath.left(end) : fullPath;
+  return end != -1 ? fullPath.left(end) : "";
 }
 QString PATHTOOL::relativePath(const QString& fullPath, const int rootpathLen) {
   return fullPath.mid(rootpathLen + 1);

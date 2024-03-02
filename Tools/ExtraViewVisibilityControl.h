@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBEDATABASE_H
-#define SUBSCRIBEDATABASE_H
+#ifndef EXTRAVIEWVISIBILITYCONTROL_H
+#define EXTRAVIEWVISIBILITYCONTROL_H
 #include <QAction>
 #include <QObject>
 #include <QWidget>
@@ -16,25 +16,19 @@
 #include <QMessageBox>
 #include <QStorageInfo>
 
-#include "PublicVariable.h"
-
 auto InitDataBase() -> bool;
 
-class SubscribeDatabase : public QObject {
+class ExtraViewVisibilityControl : public QObject {
  public:
-  static auto GetSelectionByDriveClause(const QList<QAction*>& selectByDriveActs) -> QString;
-  explicit SubscribeDatabase(QTableView* view_,
-                             T_SwitchStackWidget switchStackWidget_ = T_SwitchStackWidget());
+  explicit ExtraViewVisibilityControl(QWidget* parent);
 
   auto subscribe() -> void;
-  inline auto onShowOrCloseDatabase(const bool isVisible) -> void;
   inline auto onShowOrHidePerformerManger(const bool isVisible) -> void;
   inline auto onShowOrHideTorrentsManager(const bool isVisible) -> void;
 
-  QTableView* view;
-  T_SwitchStackWidget switchStackWidget;
+  QWidget* _parent;
   QWidget* performerManager;
   QWidget* torrentsManager;
 };
 
-#endif  // SUBSCRIBEDATABASE_H
+#endif  // EXTRAVIEWVISIBILITYCONTROL_H
