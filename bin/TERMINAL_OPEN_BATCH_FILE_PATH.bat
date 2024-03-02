@@ -1,1 +1,1 @@
-cmd.exe /K "C: && cd C:\home\Ariel\qtcpp\FileExplorerReadOnly\bin"
+cmd.exe /K "C: && cd C:/"

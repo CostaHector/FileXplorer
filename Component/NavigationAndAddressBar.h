@@ -24,8 +24,8 @@ class NavigationAndAddressBar : public QToolBar {
   auto onBackward() -> bool;
 
   auto onForward() -> bool;
-
-  auto onBackspaceEvent() -> bool;
+  
+  auto onUpTo() -> bool;
 
   AddressELineEdit* _addressLine;
   PathUndoRedoer pathRD;

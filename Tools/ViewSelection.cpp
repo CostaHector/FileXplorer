@@ -13,7 +13,7 @@ auto ViewSelection::selectedIndexes(const QAbstractItemView* view) -> QModelInde
   }
   auto* _viewList = dynamic_cast<const QListView*>(view);
   if (_viewList != nullptr) {
-    return _viewList->selectionModel()->selectedIndexes();
+    return _viewList->selectionModel()->selectedRows();
   }
   auto* _viewTree = dynamic_cast<const QTreeView*>(view);
   if (_viewTree != nullptr) {

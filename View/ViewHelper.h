@@ -17,8 +17,6 @@
 #include <QPainter>
 #include <QToolTip>
 
-constexpr int ROW_SECTION_HEIGHT = 10;
-
 class View {
  public:
   virtual void subscribe() = 0;

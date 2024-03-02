@@ -1,13 +1,13 @@
 #ifndef COPYITEMPROPERTIESTOCLIPBOARDIF_H
 #define COPYITEMPROPERTIESTOCLIPBOARDIF_H
 
-#include <QFileSystemModel>
 
 #include <QListView>
 #include <QTableView>
 #include <QTreeView>
 
-#include "MyQSqlTableModel.h"
+#include <QAbstractItemModel>
+
 
 class CopyItemPropertiesToClipboardIF {
  public:
@@ -15,17 +15,13 @@ class CopyItemPropertiesToClipboardIF {
 
   static auto PathCopyTriple(const QStringList& lst, const QString& opName) -> bool;
 
-  static bool on_copySelectedItemFullPath(const QAbstractItemView* view, QFileSystemModel* fileSysModel);
-  static bool on_copySelectedItemFullPath(const QAbstractItemView* view, MyQSqlTableModel* fileSysModel);
+  static bool on_copySelectedItemFullPath(const QAbstractItemView* view);
 
-  static auto on_copyFullPathFolderNameAndAppendImageSuffix(const QAbstractItemView* view, QFileSystemModel* fileSysModel) -> bool;
-  static auto on_copyFullPathFolderNameAndAppendImageSuffix(const QAbstractItemView* view, MyQSqlTableModel* fileSysModel) -> bool;
+  static auto on_copyFullPathFolderNameAndAppendImageSuffix(const QAbstractItemView* view) -> bool;
 
-  static auto on_copyDirPath(const QAbstractItemView* view, QFileSystemModel* fileSysModel) -> bool;
-  static auto on_copyDirPath(const QAbstractItemView* view, MyQSqlTableModel* fileSysModel) -> bool;
+  static auto on_copyDirPath(const QAbstractItemView* view) -> bool;
 
-  static auto on_copyName(const QAbstractItemView* view, QFileSystemModel* fileSysModel) -> bool;
-  static auto on_copyName(const QAbstractItemView* view, MyQSqlTableModel* fileSysModel) -> bool;
+  static auto on_copyName(const QAbstractItemView* view) -> bool;
 };
 
 #endif  // COPYITEMPROPERTIESTOCLIPBOARDIF_H
