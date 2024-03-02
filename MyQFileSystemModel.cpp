@@ -1,11 +1,9 @@
 #include "MyQFileSystemModel.h"
+#include "Tools/PathTool.h"
 
 #include <QFileIconProvider>
 #include <QMimeData>
 #include <QUrl>
-#include "FileOperation/FileOperation.h"
-#include "Tools/PathTool.h"
-#include "UndoRedo.h"
 
 int MyQFileSystemModel::previewsCnt = 0;
 constexpr int MyQFileSystemModel::cacheWidth;

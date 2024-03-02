@@ -33,7 +33,7 @@ ContentPanel::ContentPanel(FolderPreviewHTML* previewHtml_, FolderPreviewWidget*
       previewWidget(previewWidget_),
       _logger(nullptr),
       m_parent(parent) {
-//  onSwitch2ViewType("table");
+  //  onSwitch2ViewType("table");
   layout()->setContentsMargins(0, 0, 0, 0);
   layout()->setSpacing(0);
   subscribe();
@@ -77,6 +77,11 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     }
   }
   m_fsModel->whenRootPathChanged(newPath);
+#ifdef WIN32
+  if (newPath.isEmpty()){
+    onAfterDirectoryLoaded(newPath);
+  }
+#endif
   return true;
 }
 
@@ -128,7 +133,7 @@ void ContentPanel::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar)
   _dbSearchBar = dbSearchBar;
 }
 
-void ContentPanel::BindCustomStatusBar(CustomStatusBar* logger){
+void ContentPanel::BindCustomStatusBar(CustomStatusBar* logger) {
   if (logger == nullptr) {
     qWarning("Bind CustomStatusBar for contentPanel and FileSystemModel failed. nullptr passed here");
     return;
@@ -199,6 +204,7 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
 
 bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
   m_fsView->setFocus();
+  qDebug("onAfterDirectoryLoaded[%s]", qPrintable(loadedPath));
   const QModelIndex rootIndex = m_fsView->rootIndex();
   if (not m_anchorTags.contains(loadedPath)) {
     qDebug("anchorTags[%s] not exist. scroll abort", qPrintable(loadedPath));
