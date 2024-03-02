@@ -18,9 +18,6 @@ class DataBaseActions : public QObject {
 
   QAction* OPEN_RUN = nullptr;
   QAction* _PLAY_VIDEOS = nullptr;
-  QAction* _REVEAL_IN_EXPLORER = nullptr;
-  QAction* COPY_DB_ITEM_NAME = nullptr;
-  QAction* COPY_DB_ITEM_FULL_PATH = nullptr;
   QAction* DELETE_BY_DRIVER = nullptr;
   QAction* DELETE_BY_PREPATH = nullptr;
   QActionGroup* DB_RIGHT_CLICK_MENU_AG;
@@ -101,25 +98,12 @@ class DataBaseActions : public QObject {
     _PLAY_VIDEOS->setShortcutVisibleInContextMenu(true);
     _PLAY_VIDEOS->setToolTip(QString("<b>%1 (%2)</b><br/> Play videos").arg(_PLAY_VIDEOS->text(), _PLAY_VIDEOS->shortcut().toString()));
 
-    _REVEAL_IN_EXPLORER = new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal in Explorer"));
-    _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
-    _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-    _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer.")
-                                        .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
-    _REVEAL_IN_EXPLORER->setCheckable(false);
-
-    COPY_DB_ITEM_NAME = new QAction(QIcon(), tr("Copy item name"));
-    COPY_DB_ITEM_FULL_PATH = new QAction(QIcon(), tr("Copy item full path to clipboard"));
-
     DELETE_BY_DRIVER = new QAction(QIcon(), tr("Delete by driver"));
     DELETE_BY_PREPATH = new QAction(QIcon(), tr("Delete by prepath"));
 
     QActionGroup* dbRightClickMenuAG = new QActionGroup(this);
     dbRightClickMenuAG->addAction(OPEN_RUN);
     dbRightClickMenuAG->addAction(_PLAY_VIDEOS);
-    dbRightClickMenuAG->addAction(_REVEAL_IN_EXPLORER);
-    dbRightClickMenuAG->addAction(COPY_DB_ITEM_NAME);
-    dbRightClickMenuAG->addAction(COPY_DB_ITEM_FULL_PATH);
     dbRightClickMenuAG->addAction(DELETE_BY_DRIVER);
     dbRightClickMenuAG->addAction(DELETE_BY_PREPATH);
     return dbRightClickMenuAG;

@@ -1,38 +1,14 @@
 #include "FileSystemTreeView.h"
 #include "View/ViewHelper.h"
+#include "View/ViewStyleSheet.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
-#include "PublicVariable.h"
 
-const QString TABLEVIEW_STYLESHEET = "QTreeView {"\
-    "    show-decoration-selected: 1;"\
-    "}"\
-    "QTreeView::item:alternate {"\
-    "}"\
-    "QTreeView::item:selected {"\
-    "    border-bottom: 1px inherit #FFFFFF;"\
-    "}"\
-    "QTreeView::item:selected:!active {"\
-    "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EEEEEE, stop: 1 #999999);"\
-    "    color: #000000;"\
-    "}"\
-    "QTreeView::item:selected:active {"\
-    "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);"\
-    "    color: #000000;"\
-    "    border-top: 2px solid #CCEBFF;"\
-    "    border-bottom: 2px solid #CCEBFF;"\
-    "}"\
-    "QTreeView::item:hover {"\
-    "    background: #CCEBFF;"\
-    "}";
-
-FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu)
-    : QTreeView(),
-      _menu(menu){
+FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu) : QTreeView(), _menu(menu) {
   setModel(fsmModel);
   InitViewSettings();
 
@@ -45,14 +21,14 @@ FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu
 
   FileSystemTreeView::subscribe();
 
-  setStyleSheet(TABLEVIEW_STYLESHEET);
+  setStyleSheet(ViewStyleSheet::TREEVIEW_STYLESHEET);
 }
 
 void FileSystemTreeView::subscribe() {
-//  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
-//          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
+  connect(header(), &QHeaderView::sectionResized, this,
+          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
+  connect(header(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
 
-//  connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
@@ -69,20 +45,15 @@ void FileSystemTreeView::subscribe() {
 }
 
 auto FileSystemTreeView::InitViewSettings() -> void {
-//  setShowGrid(false);
+  //  setShowGrid(false);
   setAlternatingRowColors(true);
   setSortingEnabled(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
 
-//  verticalHeader()->setVisible(false);
-//  verticalHeader()->setDefaultSectionSize(ROW_SECTION_HEIGHT);
-//  verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-
-//  horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-//  horizontalHeader()->setStretchLastSection(false);
-//  horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
-
-//  horizontalHeader()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY").toByteArray());
+  if (PreferenceSettings().contains("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW")) {
+    header()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW").toByteArray());
+  }
+  sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
   FileSystemTreeView::UpdateItemViewFontSize();
 }
 

@@ -30,18 +30,18 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       osm(new RibbonMenu),
 
       _statusBar(new CustomStatusBar{m_views, this}) {
-  qDebug("FileExplorerReadOnly Current path [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
-  QString initialPath = (argc > 1) ? argv[1] : "";
-  const QString& defaultPath = ReadSettings(initialPath);
+  m_views->addActions(g_viewActions()._TRIPLE_VIEW->actions());
 
   m_fsPanel = new ContentPanel(previewHtml, nullptr, this);
   m_fsPanel->BindCustomStatusBar(_statusBar);
-  m_fsPanel->onActionAndViewNavigate(defaultPath, true);
 
   m_viewSwitcher = new NavigationViewSwitcher{m_stackedBar, m_fsPanel};
   m_viewSwitcher->onSwitchByViewType("table");
 
-  m_views->addActions(g_viewActions()._TRIPLE_VIEW->actions());
+  qDebug("FileExplorerReadOnly Current path [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
+  QString initialPath = (argc > 1) ? argv[1] : "";
+  const QString& defaultPath = ReadSettings(initialPath);
+  m_fsPanel->onActionAndViewNavigate(defaultPath, true);
 
   setCentralWidget(m_fsPanel);
 

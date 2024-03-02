@@ -33,6 +33,7 @@ class FileExplorerEvent : public QObject {
  public:
   FileExplorerEvent(QObject* parent = nullptr,
                     MyQFileSystemModel* fsm = nullptr,
+                    MyQSqlTableModel* dbModel = nullptr,
                     ContentPanel* view = nullptr,
                     CustomStatusBar* logger = nullptr,
                     T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
@@ -149,6 +150,8 @@ class FileExplorerEvent : public QObject {
   auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY, r); }
 
   MyQFileSystemModel* _fileSysModel;
+  MyQSqlTableModel* _dbModel;
+
   ContentPanel* _contentPane;
   CustomStatusBar* _logger;
   QClipboard* clipboard;

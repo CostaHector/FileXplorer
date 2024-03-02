@@ -1,5 +1,6 @@
 #include "ContentPanel.h"
 #include "Component/RightClickMenu.h"
+#include "PublicTool.h"
 
 #include <QLineEdit>
 #include <QTableView>
@@ -21,7 +22,8 @@ ContentPanel::ContentPanel(FolderPreviewHTML* previewHtml_, FolderPreviewWidget*
     : QStackedWidget(parent),
       _addressBar(nullptr),
       _dbSearchBar(nullptr),
-      m_fsm(new MyQFileSystemModel(this)),
+      m_fsModel(new MyQFileSystemModel(this)),
+      m_dbModel(new MyQSqlTableModel(this, GetSqlVidsDB())),
       m_menu(new RightClickMenu("Right click menu", this)),
       m_fsView(nullptr),
       m_fsListView(nullptr),
@@ -63,7 +65,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     qWarning("not FileSystemView");
     return false;
   }
-  fsView->setRootIndex(m_fsm->setRootPath(newPath));
+  fsView->setRootIndex(m_fsModel->setRootPath(newPath));
   fsView->selectionModel()->clearCurrentIndex();
   fsView->selectionModel()->clearSelection();
   if (m_parent != nullptr) {
@@ -74,22 +76,22 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
       _addressBar->pathRD(newPath);
     }
   }
-  m_fsm->whenRootPathChanged(newPath);
+  m_fsModel->whenRootPathChanged(newPath);
   return true;
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
   if (targetStr.isEmpty()) {
-    m_fsm->setNameFilters({});
+    m_fsModel->setNameFilters({});
     return true;
   }
   qDebug("search pattern: [*%s*].", qPrintable(targetStr));
-  m_fsm->setNameFilters({"*" + targetStr + "*"});
+  m_fsModel->setNameFilters({"*" + targetStr + "*"});
   return true;
 }
 
 auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
-  m_fsm->setNameFilters({});
+  m_fsModel->setNameFilters({});
   //  QString rootPth = CurrentPath();
   //  int n = rootPth.size() + int(not rootPth.isEmpty() and rootPth[rootPth.size() - 1] != "/");  // (pre, rel) rel should not startswith /
   // "C:/" -> n = len = 3
@@ -105,7 +107,7 @@ auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
 }
 
 void ContentPanel::subscribe() {
-  connect(m_fsm, &MyQFileSystemModel::directoryLoaded, this, &ContentPanel::onAfterDirectoryLoaded);
+  connect(m_fsModel, &MyQFileSystemModel::directoryLoaded, this, &ContentPanel::onAfterDirectoryLoaded);
 }
 
 void ContentPanel::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
@@ -132,14 +134,14 @@ void ContentPanel::BindCustomStatusBar(CustomStatusBar* logger){
     return;
   }
   _logger = logger;
-  m_fsm->BindLogger(_logger);
+  m_fsModel->BindLogger(_logger);
 }
 
 auto ContentPanel::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
   if (not clickedIndex.isValid()) {
     return false;
   }
-  QFileInfo fi = m_fsm->fileInfo(clickedIndex);
+  QFileInfo fi = m_fsModel->fileInfo(clickedIndex);
   qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), fi.fileName().toStdString().c_str());
   if (not fi.exists()) {
     qDebug("[path inexists] %s", fi.absoluteFilePath().toStdString().c_str());
@@ -202,7 +204,7 @@ bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
     qDebug("anchorTags[%s] not exist. scroll abort", qPrintable(loadedPath));
     return false;
   }
-  const QModelIndex qmodelIndex = m_fsm->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
+  const QModelIndex qmodelIndex = m_fsModel->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
   if (not qmodelIndex.isValid()) {
     qDebug("anchorTags[%s] index invalid. scroll abort", qPrintable(loadedPath));
     m_anchorTags.remove(loadedPath);

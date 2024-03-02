@@ -18,8 +18,9 @@ class ContentPanel : public QStackedWidget {
   Q_OBJECT
  public:
   friend class NavigationViewSwitcher;
+
   explicit ContentPanel(FolderPreviewHTML* previewHtml_ = nullptr, FolderPreviewWidget* previewWidget_ = nullptr, QWidget* parent = nullptr);
-  inline QString CurrentPath() { return m_fsm->rootPath(); }
+  inline QString CurrentPath() { return m_fsModel->rootPath(); }
   inline bool isFSView() const {
     auto* p = currentWidget();
     return p != nullptr and (p == m_fsView or p == m_fsListView or p == m_fsTreeView);
@@ -45,7 +46,7 @@ class ContentPanel : public QStackedWidget {
   auto keyPressEvent(QKeyEvent* e) -> void override {
     if (e->modifiers() == Qt::NoModifier and e->key() == Qt::Key_Backspace) {
       if (_addressBar) {
-        _addressBar->onBackspaceEvent();
+        _addressBar->onUpTo();
       }
       return;
     } else if (e->modifiers() == Qt::NoModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
@@ -74,7 +75,8 @@ class ContentPanel : public QStackedWidget {
   NavigationAndAddressBar* _addressBar;
   DatabaseSearchToolBar* _dbSearchBar;
 
-  MyQFileSystemModel* m_fsm;
+  MyQFileSystemModel* m_fsModel;
+  MyQSqlTableModel* m_dbModel;
   QMenu* m_menu;
 
   FileSystemTableView* m_fsView;

@@ -102,6 +102,7 @@ SOURCES += \
     View/FileSystemTreeView.cpp \
     View/SearchItemTableView.cpp \
     View/ViewHelper.cpp \
+    View/ViewStyleSheet.cpp \
     main.cpp \
     FileExplorerReadOnly.cpp
 
@@ -201,7 +202,8 @@ HEADERS += \
     View/FileSystemTableView.h \
     View/FileSystemTreeView.h \
     View/SearchItemTableView.h \
-    View/ViewHelper.h
+    View/ViewHelper.h \
+    View/ViewStyleSheet.h
 
 TRANSLATIONS += \
     Translate/FileExplorerReadOnly_zh_CN.ts

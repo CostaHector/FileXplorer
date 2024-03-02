@@ -29,8 +29,25 @@ QString PATHTOOL::normPath(QString fullPath) {
   return fullPath.replace('\\', '/');
 }
 QString PATHTOOL::absolutePath(const QString& fullPath) {
-  int end = fullPath.lastIndexOf('/');
-  return end != -1 ? fullPath.left(end) : "";
+  // "C:/A/" => "C:/" => ""
+  // same as "C:/A"
+  // "/home/to/" => "/home" => "/" => ""
+  // same as "/home/to"
+  if (fullPath.isEmpty()) {
+    return fullPath;
+  }
+  QString noSingleTrailingSlash = fullPath;
+  if (fullPath.size() > 1 and fullPath.back() == '/') {
+    noSingleTrailingSlash.chop(1);
+  }
+#ifdef WIN32
+  int end = noSingleTrailingSlash.lastIndexOf('/');
+  return end == -1 ? "" : noSingleTrailingSlash.left(end);
+#else
+  int end = noSingleTrailingSlash.lastIndexOf('/');
+  return end == 0 or end == -1 ? "/" : noSingleTrailingSlash.left(end);
+
+#endif
 }
 QString PATHTOOL::relativePath(const QString& fullPath, const int rootpathLen) {
   return fullPath.mid(rootpathLen + 1);
