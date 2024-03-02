@@ -22,92 +22,88 @@
 <context>
     <name>DataBaseActions</name>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="37"/>
+        <location filename="../Actions/DataBaseActions.h" line="32"/>
         <source>Where clause</source>
         <translation>Where助手</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="42"/>
+        <location filename="../Actions/DataBaseActions.h" line="37"/>
         <source>Create Database</source>
         <translation>创建电影数据库</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="45"/>
+        <location filename="../Actions/DataBaseActions.h" line="40"/>
         <source>Create Table</source>
         <translation>创建电影收录表</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="48"/>
+        <location filename="../Actions/DataBaseActions.h" line="43"/>
         <source>Drop Database</source>
         <translation>删除电影数据库</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="51"/>
+        <location filename="../Actions/DataBaseActions.h" line="46"/>
         <source>Drop Table</source>
         <translation>删除电影收录表</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="54"/>
+        <location filename="../Actions/DataBaseActions.h" line="49"/>
         <source>Insert into</source>
         <translation>插入记录</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="57"/>
+        <location filename="../Actions/DataBaseActions.h" line="52"/>
         <source>Delete from</source>
         <translation>删除记录</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="60"/>
+        <location filename="../Actions/DataBaseActions.h" line="55"/>
         <source>Union</source>
         <translation>联表查询</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="79"/>
         <source>Movies</source>
-        <translation>电影窗体</translation>
+        <translation type="vanished">电影窗体</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="86"/>
+        <location filename="../Actions/DataBaseActions.h" line="75"/>
         <source>COUNT</source>
         <translation>计数</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="89"/>
+        <location filename="../Actions/DataBaseActions.h" line="78"/>
         <source>SUM</source>
         <translation>求和</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="104"/>
+        <location filename="../Actions/DataBaseActions.h" line="93"/>
         <source>&amp;Open</source>
         <translation>打开(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="107"/>
+        <location filename="../Actions/DataBaseActions.h" line="96"/>
         <source>Play Videos</source>
         <translation>播放</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="112"/>
         <source>Reveal in Explorer</source>
-        <translation>资源管理器中显示</translation>
+        <translation type="vanished">资源管理器中显示</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="119"/>
         <source>Copy item name</source>
-        <translation>复制名称</translation>
+        <translation type="vanished">复制名称</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="120"/>
         <source>Copy item full path to clipboard</source>
-        <translation>复制全路径</translation>
+        <translation type="vanished">复制全路径</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="122"/>
+        <location filename="../Actions/DataBaseActions.h" line="101"/>
         <source>Delete by driver</source>
         <translation>按驱动删除</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="123"/>
+        <location filename="../Actions/DataBaseActions.h" line="102"/>
         <source>Delete by prepath</source>
         <translation>按前置路径删除</translation>
     </message>
@@ -115,7 +111,7 @@
 <context>
     <name>DatabaseSearchToolBar</name>
     <message>
-        <location filename="../Component/DatabaseSearchToolBar.h" line="14"/>
+        <location filename="../Component/DatabaseSearchToolBar.h" line="11"/>
         <source>Database Search Toolbar</source>
         <translation>数据库查询工具条</translation>
     </message>
@@ -864,26 +860,31 @@
     <name>ViewActions</name>
     <message>
         <location filename="../Actions/ViewActions.h" line="13"/>
+        <source>movie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Actions/ViewActions.h" line="19"/>
         <source>Navigate pane</source>
         <translation>导航面板</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="14"/>
+        <location filename="../Actions/ViewActions.h" line="20"/>
         <source>HTML preview</source>
         <translation>网页预览</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="15"/>
+        <location filename="../Actions/ViewActions.h" line="21"/>
         <source>Json editor</source>
         <translation>Json编辑器</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="16"/>
+        <location filename="../Actions/ViewActions.h" line="22"/>
         <source>Embedded player</source>
         <translation>内置播放器</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="18"/>
+        <location filename="../Actions/ViewActions.h" line="24"/>
         <source>Play</source>
         <translation>播放</translation>
     </message>
