@@ -10,6 +10,7 @@
 #include "Actions/DataBaseActions.h"
 #include "Actions/PerformersManagerActions.h"
 #include "Actions/TorrentsManagerActions.h"
+#include "Actions/ViewActions.h"
 
 class DatabaseToolBar : public QToolBar {
  public:
@@ -33,7 +34,7 @@ class DatabaseToolBar : public QToolBar {
     QToolBar* showHideDB = new QToolBar("show/hide Database view", this);
     showHideDB->addAction(g_dbAct().QUICK_WHERE_CLAUSE);
     showHideDB->addSeparator();
-    showHideDB->addAction(g_dbAct().DB_VIEW_CLOSE_SHOW);
+    showHideDB->addAction(g_viewActions()._MOVIE_VIEW);
     showHideDB->addSeparator();
     showHideDB->addAction(g_performersManagerActions().SHOW_PERFORMER_MANAGER);
     showHideDB->addSeparator();

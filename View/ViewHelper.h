@@ -7,6 +7,7 @@
 #include <QListView>
 #include <QPushButton>
 
+#include "Actions/AddressBarActions.h"
 #include "MyQFileSystemModel.h"
 #include "PublicVariable.h"
 
@@ -41,17 +42,13 @@ class View {
                              .c_str());
   }
 
-  static auto onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton, QPushButton* backwardBtn, QPushButton* forwardBtn) -> bool {
+  static auto onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton) -> bool {
     switch (mousebutton) {
       case Qt::MouseButton::BackButton:
-        if (backwardBtn) {
-          emit backwardBtn->clicked();
-        }
+        g_addressBarActions()._BACK_TO->triggered();
         return true;
       case Qt::MouseButton::ForwardButton:
-        if (forwardBtn) {
-          emit forwardBtn->clicked();
-        }
+        g_addressBarActions()._FORWARD_TO->triggered();
         return true;
       default:
         return false;

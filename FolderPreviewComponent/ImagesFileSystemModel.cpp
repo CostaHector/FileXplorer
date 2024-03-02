@@ -1,7 +1,7 @@
 #include "ImagesFileSystemModel.h"
 
 ImagesFileSystemModel::ImagesFileSystemModel(QObject* parent, bool showThumbnails_)
-    : MyQFileSystemModel(nullptr, parent), m_showThumbnails(showThumbnails_), IMG_NAME_FILTERS(GetImgNameFiltersList()) {
+    : MyQFileSystemModel(parent), m_showThumbnails(showThumbnails_), IMG_NAME_FILTERS(GetImgNameFiltersList()) {
   setNameFilters(IMG_NAME_FILTERS);
 }
 

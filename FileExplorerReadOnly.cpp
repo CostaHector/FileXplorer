@@ -6,7 +6,9 @@
 #include <QFileInfo>
 #include <functional>
 
-#include "FolderPreviewHTML.h"
+#include "Actions/ViewActions.h"
+#include "Component/FolderPreviewHTML.h"
+#include "Component/NavigationAndAddressBar.h"
 #include "PublicVariable.h"
 #include "Tools/ActionWithPath.h"
 
@@ -17,37 +19,45 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       previewHtmlDock(new QDockWidget("Preview HTML", this)),
       previewHtml(new FolderPreviewHTML(previewHtmlDock)),
       //      previewWidget(new FolderPreviewWidget),
-      previewWidget(nullptr),
-      m_fsPanel(nullptr),
-      m_dbPanel(nullptr),
-      stackCentralWidget(new QStackedWidget(this)),
+      previewWidget{nullptr},
+
+      m_fsPanel{nullptr},
+      m_stackedBar{new StackedToolBar},
+      m_viewSwitcher{nullptr},
+
+      m_views{new QToolBar("views switch", this)},
       m_navigationToolBar(new NavigationToolBar),
       osm(new RibbonMenu),
-      _statusBar(new CustomStatusBar) {
+
+      _statusBar(new CustomStatusBar{m_views, this}) {
   qDebug("FileExplorerReadOnly Current path [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
   QString initialPath = (argc > 1) ? argv[1] : "";
   const QString& defaultPath = ReadSettings(initialPath);
 
-  m_fsPanel = new ContentPanel(this, defaultPath, previewHtml, nullptr, _statusBar);
-  m_dbPanel = new DatabasePanel;
+  m_fsPanel = new ContentPanel(previewHtml, nullptr, this);
+  m_fsPanel->BindCustomStatusBar(_statusBar);
+  m_fsPanel->onActionAndViewNavigate(defaultPath, true);
 
-  stackCentralWidget->addWidget(m_fsPanel);
-  stackCentralWidget->addWidget(m_dbPanel);
+  m_viewSwitcher = new NavigationViewSwitcher{m_stackedBar, m_fsPanel};
+  m_viewSwitcher->onSwitchByViewType("table");
 
-  this->setCentralWidget(stackCentralWidget);
+  m_views->addActions(g_viewActions()._TRIPLE_VIEW->actions());
+
+  setCentralWidget(m_fsPanel);
 
   previewHtmlDock->setWidget(previewHtml);
   //  previewHtmlDock->setWidget(previewWidget);
   previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
 
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
   addToolBar(Qt::ToolBarArea::LeftToolBarArea, m_navigationToolBar);
   setMenuWidget(osm);
   setStatusBar(_statusBar);
-  subscribe();
 
-  SwitchStackWidget();
   InitComponentVisibility();
+
+  connect(m_views, &QToolBar::actionTriggered, m_viewSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
 }
 
 FileExplorerReadOnly::~FileExplorerReadOnly() {}
@@ -89,23 +99,6 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
   setWindowIcon(QIcon(":/themes/APP_ICON_PATH"));
   qDebug("File Explorer read preference settings from[%s].", qPrintable(openPath));
   return openPath;
-}
-
-void FileExplorerReadOnly::subscribe() {
-  using std::placeholders::_1;
-  using std::placeholders::_2;
-  using std::placeholders::_3;
-  auto intoNewPath = std::bind(&ContentPanel::IntoNewPath, m_fsPanel, _1, _2, _3);
-  ActionWithPath::BindIntoNewPath(intoNewPath);
-}
-
-void FileExplorerReadOnly::SwitchStackWidget() {
-  const bool showDB = PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool();
-  if (showDB) {
-    stackCentralWidget->setCurrentWidget(m_dbPanel);
-  } else {
-    stackCentralWidget->setCurrentWidget(m_fsPanel);
-  }
 }
 
 void FileExplorerReadOnly::InitComponentVisibility() {
