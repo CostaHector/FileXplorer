@@ -859,11 +859,6 @@
 <context>
     <name>ViewActions</name>
     <message>
-        <location filename="../Actions/ViewActions.h" line="13"/>
-        <source>movie</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../Actions/ViewActions.h" line="19"/>
         <source>Navigate pane</source>
         <translation>导航面板</translation>
