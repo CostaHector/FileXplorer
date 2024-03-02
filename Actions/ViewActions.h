@@ -10,6 +10,12 @@ class ViewActions : public QObject {
  public:
   explicit ViewActions(QObject* parent = nullptr)
       : QObject{parent},
+        _MOVIE_VIEW{new QAction(QIcon(":/themes/SHOW_DATABASE"), tr("movie"))},
+        _LIST_VIEW{new QAction(QIcon(":/themes/DISPLAY_LARGE_THUMBNAILS"), "list")},
+        _TABLE_VIEW{new QAction(QIcon(":/themes/DISPLAY_DETAIL_INFOMATIONS"), "table")},
+        _TREE_VIEW{new QAction(QIcon(":/themes/DISPLAY_ACHITECTURE"), "tree")},
+        _TRIPLE_VIEW{GetListTableTreeActions()},
+
         NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), tr("Navigate pane"))},
         PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("HTML preview"))},
         _JSON_EDITOR_PANE{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), tr("Json editor"))},
@@ -21,6 +27,10 @@ class ViewActions : public QObject {
   QActionGroup* Get_NAVIGATION_PANE_Actions();
 
   QActionGroup* GetPlayersActions();
+
+  QActionGroup* GetListTableTreeActions();
+  QAction *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW;
+  QActionGroup* _TRIPLE_VIEW;
 
   QAction* NAVIGATION_PANE;
   QAction* PREVIEW_PANE_HTML;

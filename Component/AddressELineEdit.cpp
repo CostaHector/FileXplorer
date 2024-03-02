@@ -1,6 +1,4 @@
 #include "AddressELineEdit.h"
-#include "Component/RenameConflicts.h"
-#include "Tools/ConflictsItemHelper.h"
 #include "View/ViewHelper.h"
 
 #include <QDesktopServices>
@@ -44,8 +42,6 @@ bool FocusEventWatch::eventFilter(QObject* watched, QEvent* event) {
   return QObject::eventFilter(watched, event);
 }
 
-constexpr char AddressELineEdit::PATH_SEP_CHAR;
-
 const QString AddressELineEdit::DRAG_HINT_MSG = "Drag some files/folders here";
 const QString AddressELineEdit::RELEASE_HINT_MSG = "Drop item(s) to [%1]";
 
@@ -71,10 +67,10 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
   clickMode();
   subscribe();
 
-  pathComboBox->setFixedHeight(CONTROL_HEIGHT);
+  pathComboBox->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  setFixedHeight(CONTROL_HEIGHT);
+  setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_pathActionsTB->setStyleSheet(
       "QToolBar{"
@@ -94,12 +90,25 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
   setAcceptDrops(true);
 }
 
-auto AddressELineEdit::pathChangeTo(const QString& newPath) -> void {
-  m_pathActionsTB->clear();
+auto AddressELineEdit::onPathActionTriggered(const QAction* cursorAt) -> void {
+  const QString& rawPath = pathFromCursorAction(cursorAt);
+  const QString& fullPth = PATHTOOL::StripTrailingSlash(rawPath);
+  qDebug("Path triggered [%s]", qPrintable(fullPth));
+  ChangePath(fullPth);
+}
 
-  const QString& fullpath = AddressELineEdit::PathProcess(newPath);
-  pathLineEdit->setText(fullpath);
-  for (const QString& pt : fullpath.split(PATH_SEP_CHAR)) {
+void AddressELineEdit::onReturnPressed() {
+  ChangePath(pathFromLineEdit());
+}
+
+auto AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) -> void {
+  m_pathActionsTB->clear();
+  const QString& fullpath = PATHTOOL::StripTrailingSlash(PATHTOOL::normPath(newPath));
+  if (fullpath != pathLineEdit->text()) {
+    pathLineEdit->setText(fullpath);
+  }
+  qDebug("set Path [%s]", qPrintable(fullpath));
+  for (const QString& pt : fullpath.split(PATHTOOL::PATH_SEP_CHAR)) {
     m_pathActionsTB->addAction(new QAction(pt));
   }
 
@@ -114,25 +123,25 @@ auto AddressELineEdit::pathChangeTo(const QString& newPath) -> void {
   }
 }
 
-auto AddressELineEdit::onReturnPressed(const QString& path) -> bool {
+auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   const QString& pth = QDir::fromNativeSeparators(path);
   if (not QFile::exists(pth)) {
     const QString& pathInexist = QString("Return pressed with inexist path [%1].").arg(pth);
     qDebug("%s", qPrintable(pathInexist));
     QMessageBox::warning(this, "Into path failed", pathInexist);
-    pathLineEdit->setText(textFromActions());
+    pathLineEdit->setText(pathFromFullActions());
     return false;
   }
   const QFileInfo fi(pth);
   if (fi.isFile()) {
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
     qDebug("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
-    pathLineEdit->setText(textFromActions());
+    pathLineEdit->setText(pathFromFullActions());
     return true;
   }
   if (fi.isDir()) {
-    pathChangeTo(pth);
-    emit intoAPath_active(pth);
+    updateAddressToolBarPathActions(pth);
+    emit pathActionsTriggeredOrLineEditReturnPressed(pth);
     emit pathComboBoxFocusWatcher->focusChanged(false);
     return true;
   }
@@ -141,7 +150,7 @@ auto AddressELineEdit::onReturnPressed(const QString& path) -> bool {
 
 auto AddressELineEdit::subscribe() -> void {
   connect(m_pathActionsTB, &QToolBar::actionTriggered, this, &AddressELineEdit::onPathActionTriggered);
-  connect(pathLineEdit, &QLineEdit::returnPressed, this, [this]() -> void { onReturnPressed(text()); });
+  connect(pathLineEdit, &QLineEdit::returnPressed, this, &AddressELineEdit::onReturnPressed);
   connect(pathComboBoxFocusWatcher, &FocusEventWatch::focusChanged, this, &AddressELineEdit::onFocusChange);
 }
 
@@ -174,7 +183,7 @@ void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
 }
 
 void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
-  const QString& draggedEnterPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
+  const QString& draggedEnterPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   View::changeDropAction(event);
   qDebug("dragged enter[%s]", qPrintable(draggedEnterPath));
   m_dropPanel->setText(RELEASE_HINT_MSG.arg(draggedEnterPath));
@@ -184,7 +193,7 @@ void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
 
 void AddressELineEdit::dropEvent(QDropEvent* event) {
   setCurrentWidget(m_pathActionsTB);
-  const QString& to = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
+  const QString& to = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   View::onDropMimeData(event->mimeData(), event->dropAction(), to);
   QStackedWidget::dropEvent(event);
 }
@@ -194,7 +203,7 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
     qDebug("no urls dragMoveEvent");
     return;
   }
-  const QString& droppedPath = textFromCurrentCursor(m_pathActionsTB->actionAt(event->pos()));
+  const QString& droppedPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   m_dropPanel->setText(RELEASE_HINT_MSG.arg(droppedPath));
   qDebug("release to drop here [%s]", qPrintable(droppedPath));
   View::changeDropAction(event);
@@ -206,6 +215,31 @@ void AddressELineEdit::dragLeaveEvent(QDragLeaveEvent* event) {
   setCurrentWidget(m_pathActionsTB);
   QStackedWidget::dragLeaveEvent(event);
 }
+
+class TestAddressELineEdit : public QWidget {
+  Q_OBJECT
+ public:
+  explicit TestAddressELineEdit(QWidget* parent = nullptr) : QWidget(parent) {
+    AddressELineEdit* add = new AddressELineEdit;
+
+    QLineEdit* searchLe = new QLineEdit("Search here");
+    searchLe->setClearButtonEnabled(true);
+
+    searchLe->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+    searchLe->setPlaceholderText("Search...");
+
+    QHBoxLayout* lo = new QHBoxLayout;
+    lo->addWidget(add);
+    lo->addWidget(searchLe);
+    setLayout(lo);
+
+    add->setMinimumWidth(400);
+    searchLe->setMinimumWidth(100);
+
+    add->updateAddressToolBarPathActions(QFileInfo(__FILE__).absolutePath());
+  }
+ signals:
+};
 
 // #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__

@@ -14,7 +14,6 @@ class DataBaseActions : public QObject {
   Q_OBJECT
  public:
   QActionGroup* DB_CONTROL_ACTIONS;
-  QAction* DB_VIEW_CLOSE_SHOW;
   QActionGroup* DB_FUNCTIONS;
 
   QAction* OPEN_RUN = nullptr;
@@ -31,7 +30,6 @@ class DataBaseActions : public QObject {
   explicit DataBaseActions(QObject* parent = nullptr)
       : QObject{parent},
         DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),
-        DB_VIEW_CLOSE_SHOW(Get_DB_VIEW_CLOSE_SHOW_Action()),
         DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()),
         DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()),
         QUICK_WHERE_CLAUSE{new QAction(QIcon(":/themes/QUICK_WHERE_CLAUSE"), tr("Where clause"), this)} {
@@ -74,12 +72,6 @@ class DataBaseActions : public QObject {
       act->setCheckable(false);
     }
     return databaseControlAG;
-  }
-  auto Get_DB_VIEW_CLOSE_SHOW_Action() -> QAction* {
-    QAction* showDatabase = new QAction(QIcon(":/themes/SHOW_DATABASE"), tr("Movies"), this);
-    showDatabase->setCheckable(true);
-    showDatabase->setChecked(PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool());
-    return showDatabase;
   }
 
   auto Get_DB_FUNCTIONS_Action() -> QActionGroup* {
