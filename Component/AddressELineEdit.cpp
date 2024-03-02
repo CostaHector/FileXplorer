@@ -128,7 +128,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
 #ifdef WIN32
   if (not pth.isEmpty() and not QFile::exists(pth)) {
 #else
-  if (QFile::exists(pth)) {
+  if (not QFile::exists(pth)) {
 #endif
     const QString& pathInexist = QString("Return pressed with inexist path [%1].").arg(pth);
     qDebug("%s", qPrintable(pathInexist));
