@@ -8,6 +8,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Actions/AddressBarActions.cpp \
     Actions/DataBaseActions.cpp \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
@@ -20,7 +21,7 @@ SOURCES += \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
-    AddressELineEdit.cpp \
+    Component/AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
     Component/AdvanceSearchWindow.cpp \
     Component/AlertSystem.cpp \
@@ -39,11 +40,13 @@ SOURCES += \
     Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
+    Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     Component/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
+    Component/DatabaseSearchToolBar.cpp \
     FileOperation/FileOperation.cpp \
     MyQSqlTableModel.cpp \
     PublicTool.cpp \
@@ -54,6 +57,7 @@ SOURCES += \
     Tools/ConflictsItemHelper.cpp \
     Tools/CopyItemPropertiesToClipboardIF.cpp \
     Tools/DuplicateImagesRemover.cpp \
+    Tools/ExtraViewVisibilityControl.cpp \
     Tools/FileSystemItemFilter.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/JsonFileHelper.cpp \
@@ -61,6 +65,7 @@ SOURCES += \
     Tools/MP4DurationGetter.cpp \
     Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
+    Tools/NavigationViewSwitcher.cpp \
     Tools/PathTool.cpp \
     Tools/PerformerJsonFileHelper.cpp \
     Tools/PerformersAkaManager.cpp \
@@ -70,13 +75,12 @@ SOURCES += \
     Tools/RedundantFolderRemove.cpp \
     Tools/RenameWidget.cpp \
     Tools/StringEditHelper.cpp \
-    Tools/SubscribeDatabase.cpp \
     Tools/SysTerminal.cpp \
     Tools/TorrentsDatabaseHelper.cpp \
     Tools/VideoPlayerWatcher.cpp \
+    Tools/ViewSelection.cpp \
     UndoRedo.cpp \
     View/DatabaseTableView.cpp \
-    View/DragDropTableView.cpp \
     FileExplorerEvent.cpp \
     FolderPreviewComponent/FolderListView.cpp \
     FolderPreviewComponent/ImagesFileSystemModel.cpp \
@@ -85,20 +89,25 @@ SOURCES += \
     FolderPreviewComponent/OtherItemsListPreview.cpp \
     FolderPreviewComponent/VideosFileSystemModel.cpp \
     FolderPreviewComponent/VideosListPreview.cpp \
-    FolderPreviewHTML.cpp \
-    FolderPreviewWidget.cpp \
+    Component/FolderPreviewHTML.cpp \
+    Component/FolderPreviewWidget.cpp \
     MyQFileSystemModel.cpp \
-    NavigationAndAddressBar.cpp \
-    NavigationToolBar.cpp \
+    Component/NavigationAndAddressBar.cpp \
+    Component/NavigationToolBar.cpp \
     PathUndoRedoer.cpp \
     PublicVariable.cpp \
-    RightClickableToolBar.cpp \
+    Component/RightClickableToolBar.cpp \
+    View/FileSystemListView.cpp \
+    View/FileSystemTableView.cpp \
+    View/FileSystemTreeView.cpp \
     View/SearchItemTableView.cpp \
     View/ViewHelper.cpp \
+    View/ViewStyleSheet.cpp \
     main.cpp \
     FileExplorerReadOnly.cpp
 
 HEADERS += \
+    Actions/AddressBarActions.h \
     Actions/DataBaseActions.h \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
@@ -111,7 +120,7 @@ HEADERS += \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
-    AddressELineEdit.h \
+    Component/AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
     Component/AdvanceSearchWindow.h \
     Component/AlertSystem.h \
@@ -131,11 +140,13 @@ HEADERS += \
     Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
+    Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
     Component/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
+    Component/DatabaseSearchToolBar.h \
     FileOperation/FileOperation.h \
     MyQSqlTableModel.h \
     PublicTool.h \
@@ -146,6 +157,7 @@ HEADERS += \
     Tools/ConflictsItemHelper.h \
     Tools/CopyItemPropertiesToClipboardIF.h \
     Tools/DuplicateImagesRemover.h \
+    Tools/ExtraViewVisibilityControl.h \
     Tools/FileSystemItemFilter.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/JsonFileHelper.h \
@@ -153,6 +165,7 @@ HEADERS += \
     Tools/MP4DurationGetter.h \
     Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
+    Tools/NavigationViewSwitcher.h \
     Tools/PathTool.h \
     Tools/PerformerJsonFileHelper.h \
     Tools/PerformersAkaManager.h \
@@ -162,13 +175,12 @@ HEADERS += \
     Tools/RedundantFolderRemove.h \
     Tools/RenameWidget.h \
     Tools/StringEditHelper.h \
-    Tools/SubscribeDatabase.h \
     Tools/SysTerminal.h \
     Tools/TorrentsDatabaseHelper.h \
     Tools/VideoPlayerWatcher.h \
+    Tools/ViewSelection.h \
     UndoRedo.h \
     View/DatabaseTableView.h \
-    View/DragDropTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
     FolderPreviewComponent/FolderListView.h \
@@ -178,19 +190,23 @@ HEADERS += \
     FolderPreviewComponent/OtherItemsListPreview.h \
     FolderPreviewComponent/VideosFileSystemModel.h \
     FolderPreviewComponent/VideosListPreview.h \
-    FolderPreviewHTML.h \
-    FolderPreviewWidget.h \
+    Component/FolderPreviewHTML.h \
+    Component/FolderPreviewWidget.h \
     MyQFileSystemModel.h \
-    NavigationAndAddressBar.h \
-    NavigationToolBar.h \
+    Component/NavigationAndAddressBar.h \
+    Component/NavigationToolBar.h \
     PathUndoRedoer.h \
     PublicVariable.h \
-    RightClickableToolBar.h \
+    Component/RightClickableToolBar.h \
+    View/FileSystemListView.h \
+    View/FileSystemTableView.h \
+    View/FileSystemTreeView.h \
     View/SearchItemTableView.h \
-    View/ViewHelper.h
+    View/ViewHelper.h \
+    View/ViewStyleSheet.h
 
 TRANSLATIONS += \
-    FileExplorerReadOnly_zh_CN.ts
+    Translate/FileExplorerReadOnly_zh_CN.ts
 
 CONFIG += lupdate
 CONFIG += lrelease
@@ -205,7 +221,7 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
-    FileExplorerReadOnly_zh_CN.ts \
+    Translate/FileExplorerReadOnly_zh_CN.ts \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \
     bin/PerformerHtmlTemplate.html \

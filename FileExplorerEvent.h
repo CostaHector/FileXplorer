@@ -10,6 +10,8 @@
 #include "Tools/MimeDataCX.h"
 #include "Tools/RedundantFolderRemove.h"
 
+#include "ContentPanel.h"
+
 #include <QAbstractButton>
 #include <QAbstractItemModel>
 #include <QClipboard>
@@ -23,38 +25,43 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QProcess>
-#include <QTableView>
 #include <QTextStream>
+
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
  public:
   FileExplorerEvent(QObject* parent = nullptr,
-                    QFileSystemModel* fileSysModel_ = nullptr,
-                    QTableView* view_ = nullptr,
-                    CustomStatusBar* _statusBar = nullptr,
+                    MyQFileSystemModel* fsm = nullptr,
+                    MyQSqlTableModel* dbModel = nullptr,
+                    ContentPanel* view = nullptr,
+                    CustomStatusBar* logger = nullptr,
                     T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
   void subscribe();
 
-  auto onRenamePre() -> QPair<QString, QStringList> {
+  auto onRenamePre() const -> QPair<QString, QStringList> {
     QStringList preNames;
     for (QModelIndex ind : selectedIndexes()) {
-      preNames.append(fileSysModel->fileName(ind));
+      preNames.append(_fileSysModel->fileName(ind));
     }
-    return {fileSysModel->rootPath(), preNames};
+    return {_fileSysModel->rootPath(), preNames};
   }
 
   auto __CanNewItem() const -> bool {
-    if (fileSysModel->rootPath().isEmpty()) {
-      qDebug("Reject. don't create item here[%s]", qPrintable(fileSysModel->rootPath()));
-      Notificator::warning("Reject", QString("Don't create item here[%s]").arg(fileSysModel->rootPath()));
+    if (_fileSysModel->rootPath().isEmpty()) {
+      qDebug("Reject. don't create item here[%s]", qPrintable(_fileSysModel->rootPath()));
+      Notificator::warning("Reject", QString("Don't create item here[%s]").arg(_fileSysModel->rootPath()));
       return false;
     }
     return true;
   }
 
   auto __FocusNewItem(const QString& itemPath) -> bool {
-    const QModelIndex ind = fileSysModel->index(itemPath);
+    if (_contentPane->isFSView()){
+      return false;
+    }
+    auto* view = _contentPane->GetView();
+    const QModelIndex ind = _fileSysModel->index(itemPath);
     if (not ind.isValid()) {
       qDebug("Target Lose");
       return false;
@@ -70,36 +77,27 @@ class FileExplorerEvent : public QObject {
   auto on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false) -> bool;
   auto on_BatchNewFilesOrFolders(bool isFolder = false) -> bool;
 
-  auto selectedIndexes() const -> QModelIndexList {
-    // ignore other column, keep the first column
-    if (view == nullptr) {
-      return {};
-    }
-    if (qobject_cast<QListView*>(view) != nullptr) {
-      return view->selectionModel()->selectedIndexes();
-    }
-    return view->selectionModel()->selectedRows();
-  }
+  auto selectedIndexes() const -> QModelIndexList;
   auto selectedItems() const -> QStringList {
     const auto& inds = selectedIndexes();
     QStringList filePaths;
     filePaths.reserve(inds.size());
     for (const QModelIndex ind : inds) {
-      filePaths << fileSysModel->filePath(ind);
+      filePaths << _fileSysModel->filePath(ind);
     }
     return filePaths;
   }
 
   bool on_calcMD5() const {
     const QStringList& items = selectedItems();
-    auto* md5W = new MD5Window(fileSysModel->rootPath(), items, this->view);
+    auto* md5W = new MD5Window(_fileSysModel->rootPath(), items, this->_contentPane);
     md5W->show();
     return true;
   }
 
   bool on_properties() const {
     const QStringList& items = selectedItems();
-    auto* pW = new PropertiesWindow(items, this->view);
+    auto* pW = new PropertiesWindow(items, this->_contentPane);
     pW->show();
     return true;
   }
@@ -129,7 +127,7 @@ class FileExplorerEvent : public QObject {
     QStringList lRels;
     QList<QUrl> urls;
     for (const QModelIndex ind : selectedIndexes()) {
-      lRels.append(fileSysModel->fileName(ind));
+      lRels.append(_fileSysModel->fileName(ind));
       urls.append(QUrl::fromLocalFile(lRels.back()));
     }
     if (lRels.isEmpty()) {
@@ -151,9 +149,11 @@ class FileExplorerEvent : public QObject {
   auto on_MoveTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::CUT, r); }
   auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY, r); }
 
-  QFileSystemModel* fileSysModel;
-  QTableView* view;
-  CustomStatusBar* logger;
+  MyQFileSystemModel* _fileSysModel;
+  MyQSqlTableModel* _dbModel;
+
+  ContentPanel* _contentPane;
+  CustomStatusBar* _logger;
   QClipboard* clipboard;
   JsonEditor* jsonEditor;
   VideoPlayer* videoPlayer;
