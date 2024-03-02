@@ -1,11 +1,11 @@
 #include "DatabaseTableView.h"
 
 #include "Component/QuickWhereClause.h"
-#include "Tools/CopyItemPropertiesToClipboardIF.h"
+
 #include "Tools/PlayVideo.h"
 #include "View/ViewHelper.h"
+#include "View/ViewStyleSheet.h"
 
-#include "Component/DatabaseToolBar.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
 
@@ -14,16 +14,21 @@
 #include <QProcess>
 #include <QStorageInfo>
 
-DatabaseTableView::DatabaseTableView()
-    : m_dbModel(new MyQSqlTableModel(this, GetSqlVidsDB())),
+DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent)
+    : QTableView(parent),
+      _dbModel(dbModel),
       m_vidsDBMenu(new DBRightClickMenu("Database Right click menu", this)),
       SHOW_ALL_COLUMNS(new QAction("show all columns", this)),
       HIDE_THIS_COLUMN(new QAction("hide this column", this)),
       STRETCH_DETAIL_SECTION(new QAction("stretch last column", this)),
       m_horizontalHeaderMenu(new QMenu(this)),
-      m_columnsShowSwitch(PreferenceSettings().value(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, MemoryKey::VIDS_COLUMN_SHOW_SWITCH.v).toString()) {
-  m_dbModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
-  setModel(m_dbModel);
+      m_columnsShowSwitch(PreferenceSettings().value(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, MemoryKey::VIDS_COLUMN_SHOW_SWITCH.v).toString()),
+      _dbSearchBar{_dbSearchBar},
+      _tables{_dbSearchBar->m_tables},
+      _searchLE{_dbSearchBar->m_searchLE},
+      _searchCB{_dbSearchBar->m_searchCB},
+      m_quickWhereClause{new QuickWhereClause(this)} {
+  setModel(_dbModel);
 
   setContextMenuPolicy(Qt::CustomContextMenu);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -41,6 +46,11 @@ DatabaseTableView::DatabaseTableView()
 
   InitViewSettings();
   subscribe();
+
+  InitMoviesTables();
+  setCurrentMovieTable(_tables->currentText());
+
+  setStyleSheet(ViewStyleSheet::TABLEVIEW_STYLESHEET);
 }
 
 auto DatabaseTableView::InitViewSettings() -> void {
@@ -48,7 +58,7 @@ auto DatabaseTableView::InitViewSettings() -> void {
   setAlternatingRowColors(true);
 
   verticalHeader()->setVisible(false);
-  verticalHeader()->setDefaultSectionSize(ROW_SECTION_HEIGHT);
+  verticalHeader()->setDefaultSectionSize(ViewStyleSheet::ROW_SECTION_HEIGHT);
   verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
   horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
@@ -67,10 +77,6 @@ void DatabaseTableView::subscribe() {
   {
     connect(g_dbAct().OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
     connect(g_dbAct()._PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
-    connect(g_dbAct()._REVEAL_IN_EXPLORER, &QAction::triggered, this, &DatabaseTableView::on_revealInExplorer);
-    connect(g_dbAct().COPY_DB_ITEM_NAME, &QAction::triggered, this, [this]() { CopyItemPropertiesToClipboardIF::on_copyName(this, m_dbModel); });
-    connect(g_dbAct().COPY_DB_ITEM_FULL_PATH, &QAction::triggered, this,
-            [this]() { CopyItemPropertiesToClipboardIF::on_copySelectedItemFullPath(this, m_dbModel); });
   }
 
   connect(horizontalHeader(), &QHeaderView::sectionResized, this,
@@ -87,10 +93,53 @@ void DatabaseTableView::subscribe() {
     m_horizontalHeaderSectionClicked = horizontalHeader()->logicalIndexAt(pnt);
     m_horizontalHeaderMenu->popup(mapToGlobal(pnt));
   });
+
+  connect(_searchLE, &QLineEdit::returnPressed, this, [this]() {
+    const QString& searchPattern = _searchLE->text();
+    onSearchDataBase(searchPattern);
+  });
+
+  connect(_tables, &QComboBox::currentTextChanged, this, &DatabaseTableView::setCurrentMovieTable);
+
+  {
+    const QList<QAction*>& DB_CONTROL_ACTIONS = g_dbAct().DB_CONTROL_ACTIONS->actions();
+
+    QAction* INSERT_A_PATH = DB_CONTROL_ACTIONS[0];
+    QAction* DELETE_FROM_TABLE = DB_CONTROL_ACTIONS[1];
+    QAction* INIT_A_DATABASE = DB_CONTROL_ACTIONS[2];
+    QAction* INIT_A_TABLE = DB_CONTROL_ACTIONS[3];
+    QAction* DROP_A_DATABASE = DB_CONTROL_ACTIONS[4];
+    QAction* DROP_A_TABLE = DB_CONTROL_ACTIONS[5];
+    QAction* UNION_TABLE = DB_CONTROL_ACTIONS[6];
+
+    connect(INIT_A_DATABASE, &QAction::triggered, this, &DatabaseTableView::onInitDataBase);
+    connect(DROP_A_DATABASE, &QAction::triggered, this, [this]() { QMessageBox::warning(this, "Too danger", "Cancel drop database"); });
+
+    connect(INIT_A_TABLE, &QAction::triggered, this, &DatabaseTableView::onCreateATable);
+    connect(DROP_A_TABLE, &QAction::triggered, this, &DatabaseTableView::onDropATable);
+    connect(INSERT_A_PATH, &QAction::triggered, this, &DatabaseTableView::onInsertIntoTable);
+    connect(DELETE_FROM_TABLE, &QAction::triggered, this, [this]() { this->onDeleteFromTable(); });
+
+    connect(UNION_TABLE, &QAction::triggered, this, &DatabaseTableView::onUnionTables);
+  }
+
+  {
+    connect(g_dbAct().DELETE_BY_DRIVER, &QAction::triggered, this, &DatabaseTableView::on_DeleteByDrive);
+    connect(g_dbAct().DELETE_BY_PREPATH, &QAction::triggered, this, &DatabaseTableView::on_DeleteByPrepath);
+  }
+
+  { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &DatabaseTableView::onQuickWhereClause); }
+
+  {
+    const QList<QAction*>& DB_FUNCTIONS_ACTIONS = g_dbAct().DB_FUNCTIONS->actions();
+    QAction* COUNT = DB_FUNCTIONS_ACTIONS[0];
+    QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
+    connect(COUNT, &QAction::triggered, this, &DatabaseTableView::onCountRow);
+  }
 }
 
 bool DatabaseTableView::ShowOrHideColumnCore() {
-  if (m_dbModel->tableName().isEmpty()) {
+  if (_dbModel->tableName().isEmpty()) {
     qDebug("TableName not set now");
     return false;
   }
@@ -101,9 +150,9 @@ bool DatabaseTableView::ShowOrHideColumnCore() {
     headerStateSet = true;
   }
 
-  const int headColumnCntMin = std::min({m_dbModel->columnCount(), DB_HEADER_KEY::DB_HEADER.size(), m_columnsShowSwitch.size()});
+  const int headColumnCntMin = std::min({_dbModel->columnCount(), DB_HEADER_KEY::DB_HEADER.size(), m_columnsShowSwitch.size()});
   if (headColumnCntMin <= 0) {
-    qDebug("Empty header columnCnt[%d], headerTypeCnt[%d], columnsShowSwitchCnt[%d]", m_dbModel->columnCount(), DB_HEADER_KEY::DB_HEADER.size(),
+    qDebug("Empty header columnCnt[%d], headerTypeCnt[%d], columnsShowSwitchCnt[%d]", _dbModel->columnCount(), DB_HEADER_KEY::DB_HEADER.size(),
            m_columnsShowSwitch.size());
     return false;
   }
@@ -145,11 +194,11 @@ auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
   if (not clickedIndex.isValid()) {
     return false;
   }
-  if (not m_dbModel) {
+  if (not _dbModel) {
     return false;
   }
 
-  QFileInfo fi = m_dbModel->fileInfo(clickedIndex);
+  QFileInfo fi = _dbModel->fileInfo(clickedIndex);
   qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), fi.fileName().toStdString().c_str());
   if (not fi.exists()) {
     qDebug("[path inexists] %s", fi.absoluteFilePath().toStdString().c_str());
@@ -171,54 +220,19 @@ auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
   return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 }
 
-auto DatabaseTableView::on_revealInExplorer() const -> bool {
-  // hasSelection: reveal with selection
-  // noSelection: folder -> open, file -> open its dir
-  QModelIndex curIndex = selectionModel()->currentIndex();
-  QStringList args;
-  QString reveal_path;
-  if (not curIndex.isValid()) {
-    reveal_path = m_dbModel->rootPath();
-    args = QStringList{QDir::toNativeSeparators(reveal_path)};
-  } else {
-    QFileInfo fi(m_dbModel->fileInfo(curIndex));
-    if (not fi.exists()) {
-      qDebug("Path[%s] not exists", fi.absoluteFilePath().toStdString().c_str());
-      return false;
-    }
-    reveal_path = fi.absoluteFilePath();
-    args = QStringList{"/e,", "/select,", QDir::toNativeSeparators(reveal_path)};
-  }
-
-  QProcess process;
-#ifdef _WIN32
-  process.setProgram("explorer");
-  process.setArguments(args);
-#else
-  process.setProgram("xdg-open");
-  if (not QFileInfo(reveal_path).isDir()) {
-    // is not dir = > reveal its dirname
-    reveal_path = QFileInfo(reveal_path).absolutePath();
-  }
-  process.setArguments(QStringList{reveal_path});
-#endif
-  process.startDetached();  // Start the process in detached mode instead of start
-  return true;
-}
-
 auto DatabaseTableView::on_PlayVideo() const -> bool {
   // select an item or select nothing
   const int selectedCnt = selectedIndexes().size();
   QString playPath;
   if (selectedCnt == 0) {
-    if (m_dbModel->rootDirectory().isRoot()) {
+    if (_dbModel->rootDirectory().isRoot()) {
       qDebug("root path is so large range. skip");
       return true;
     }
-    playPath = m_dbModel->rootPath();
+    playPath = _dbModel->rootPath();
   } else if (selectedCnt == 1) {
     QModelIndex curIndex = selectionModel()->currentIndex();
-    QFileInfo selectedFi = m_dbModel->fileInfo(curIndex);
+    QFileInfo selectedFi = _dbModel->fileInfo(curIndex);
     if (selectedFi.isDir()) {
       if (QDir(selectedFi.absoluteFilePath()).isRoot()) {
         qDebug("root path is so large range. skip");
@@ -236,63 +250,31 @@ auto DatabaseTableView::on_PlayVideo() const -> bool {
   return ret;
 }
 
-DatabasePanel::DatabasePanel(QWidget* parent)
-    : QWidget(parent),
-      m_tables(new QComboBox),
-      m_searchLE(new QLineEdit),
-      m_searchCB(new QComboBox),
-      m_dbView(new DatabaseTableView),
-      m_quickWhereClause{new QuickWhereClause(this)} {
-  m_searchLE->setClearButtonEnabled(true);
-  m_searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
-  m_searchCB->setLineEdit(m_searchLE);
-
-  m_searchCB->addItem(QString("%1 like \"%\"").arg(DB_HEADER_KEY::ForSearch));
-  m_searchCB->addItem(QString("%1 in (\"ts\", \"avi\")").arg(DB_HEADER_KEY::Type));
-  m_searchCB->addItem(QString("%1 between 0 AND 1000000").arg(DB_HEADER_KEY::Size));
-  m_searchCB->addItem(QString("%1 = \"E:/\"").arg(DB_HEADER_KEY::Driver));
-
-  QHBoxLayout* searchHLayout = new QHBoxLayout;
-  searchHLayout->addWidget(m_tables, 2);
-  searchHLayout->addWidget(m_searchCB, 8);
-
-  QVBoxLayout* panelLo = new QVBoxLayout;
-  panelLo->setContentsMargins(0, 0, 0, 0);
-  panelLo->setSpacing(0);
-  panelLo->addLayout(searchHLayout);
-  panelLo->addWidget(m_dbView);
-  setLayout(panelLo);
-
-  InitMoviesTables();
-  setCurrentMovieTable(m_tables->currentText());
-  subscribe();
-}
-
-bool DatabasePanel::InitMoviesTables() {
+bool DatabaseTableView::InitMoviesTables() {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
     qDebug("con cannot open");
     return false;
   }
-  if (m_tables == nullptr) {
+  if (_tables == nullptr) {
     qDebug("m_tables is nullptr");
     return false;
   }
-  m_tables->clear();
-  m_tables->addItems(con.tables());
+  _tables->clear();
+  _tables->addItems(con.tables());
   //  m_tables->setCurrentText();
   return true;
 }
 
-bool DatabasePanel::setCurrentMovieTable(const QString& movieTableName) {
-  m_tables->setCurrentText(movieTableName);
-  m_dbView->m_dbModel->setTable(movieTableName);
-  m_dbView->m_dbModel->submitAll();
-  m_dbView->ShowOrHideColumnCore();
+bool DatabaseTableView::setCurrentMovieTable(const QString& movieTableName) {
+  _tables->setCurrentText(movieTableName);
+  _dbModel->setTable(movieTableName);
+  _dbModel->submitAll();
+  ShowOrHideColumnCore();
   return true;
 }
 
-bool DatabasePanel::onUnionTables() {
+bool DatabaseTableView::onUnionTables() {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
     qDebug("Con cannot open");
@@ -334,7 +316,7 @@ bool DatabasePanel::onUnionTables() {
   return true;
 }
 
-bool DatabasePanel::onInitDataBase() {
+bool DatabaseTableView::onInitDataBase() {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen()) {
     qDebug("con cannot open");
@@ -344,7 +326,7 @@ bool DatabasePanel::onInitDataBase() {
   return true;
 }
 
-void DatabasePanel::onCreateATable() {
+void DatabaseTableView::onCreateATable() {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
     qDebug("Con cannot open");
@@ -404,12 +386,12 @@ void DatabasePanel::onCreateATable() {
     QMessageBox::warning(this, inputTableName, "Create table[%s] failed");
     return;
   }
-  m_tables->addItem(inputTableName);
-  m_tables->setCurrentText(inputTableName);
+  _tables->addItem(inputTableName);
+  _tables->setCurrentText(inputTableName);
   qDebug("Table create succeed");
 }
 
-bool DatabasePanel::onDropATable() {
+bool DatabaseTableView::onDropATable() {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
     qDebug("con cannot open");
@@ -423,7 +405,7 @@ bool DatabasePanel::onDropATable() {
 
   bool okUserSelect = false;
   const QString& dropTableName = QInputDialog::getItem(this, "CONFIRM DROP?", "Choose a table to drop (NOT RECOVERABLE)", tables,
-                                                       tables.indexOf(m_tables->currentText()), false, &okUserSelect);
+                                                       tables.indexOf(_tables->currentText()), false, &okUserSelect);
   if (not okUserSelect) {
     qDebug("User cancel drop table");
     return true;
@@ -444,14 +426,14 @@ bool DatabasePanel::onDropATable() {
   return true;
 }
 
-bool DatabasePanel::onDeleteFromTable(const QString& clause) {
+bool DatabaseTableView::onDeleteFromTable(const QString& clause) {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
     qDebug("con cannot open");
     return false;
   }
 
-  const QString& deleteFromTable = m_tables->currentText();
+  const QString& deleteFromTable = _tables->currentText();
   QString whereClause = clause;
   if (clause.isEmpty()) {
     static const QStringList deleteDriverChoicePool{QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Name), QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Size),
@@ -459,7 +441,7 @@ bool DatabasePanel::onDeleteFromTable(const QString& clause) {
                                                     QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Prepath)};
 
     bool okClicked = false;
-    whereClause = QInputDialog::getItem(m_dbView, "Delete where", QString("DELETE FROM \"%1\" WHERE").arg(deleteFromTable), deleteDriverChoicePool, 0,
+    whereClause = QInputDialog::getItem(this, "Delete where", QString("DELETE FROM \"%1\" WHERE").arg(deleteFromTable), deleteDriverChoicePool, 0,
                                         true, &okClicked);
     if (not okClicked or whereClause.isEmpty()) {
       qDebug("User Cancel delete row");
@@ -477,15 +459,15 @@ bool DatabasePanel::onDeleteFromTable(const QString& clause) {
   QSqlQuery seleteQry(con);
   const bool deleteRes = seleteQry.exec(deleteCmd);
   qDebug("delete from result: %d", deleteRes);
-  m_dbView->m_dbModel->submitAll();
+  _dbModel->submitAll();
   return deleteRes;
 }
 
-bool DatabasePanel::on_DeleteByDrive() {
+bool DatabaseTableView::on_DeleteByDrive() {
   QSet<QString> driversSet;
 
-  for (const auto rowIndex : m_dbView->selectionModel()->selectedRows()) {
-    const QString& curDriver = m_dbView->m_dbModel->driver(rowIndex);  // TODO:driver
+  for (const auto rowIndex : selectionModel()->selectedRows()) {
+    const QString& curDriver = _dbModel->driver(rowIndex);  // TODO:driver
     if (driversSet.contains(curDriver)) {
       continue;
     }
@@ -501,10 +483,10 @@ bool DatabasePanel::on_DeleteByDrive() {
   return true;
 }
 
-bool DatabasePanel::on_DeleteByPrepath() {
+bool DatabaseTableView::on_DeleteByPrepath() {
   QSet<QString> prepathSet;
-  for (const auto rowIndex : m_dbView->selectionModel()->selectedRows()) {
-    const QString& prepath = m_dbView->m_dbModel->absolutePath(rowIndex);
+  for (const auto rowIndex : selectionModel()->selectedRows()) {
+    const QString& prepath = _dbModel->absolutePath(rowIndex);
     if (prepathSet.contains(prepath)) {
       continue;
     }
@@ -519,20 +501,20 @@ bool DatabasePanel::on_DeleteByPrepath() {
   return true;
 }
 
-bool DatabasePanel::onInsertIntoTable() {
+bool DatabaseTableView::onInsertIntoTable() {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
     qDebug("con cannot open");
     return false;
   }
-  const QString& insertIntoTable = m_tables->currentText();
+  const QString& insertIntoTable = _tables->currentText();
   if (not con.tables().contains(insertIntoTable)) {
     qDebug("Cannot insert into inexist table[%s]", qPrintable(insertIntoTable));
-    QMessageBox::warning(m_dbView, insertIntoTable, "Table NOT exist. ABORT insert");
+    QMessageBox::warning(this, insertIntoTable, "Table NOT exist. ABORT insert");
     return false;
   }
   const QString& selectPath = QFileDialog::getExistingDirectory(
-      m_dbView, "Choose a path into table: " + insertIntoTable,
+      this, "Choose a path into table: " + insertIntoTable,
       PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString(),
       QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
@@ -589,77 +571,32 @@ bool DatabasePanel::onInsertIntoTable() {
     return false;
   }
   qDebug("%d/%d item(s) add succeed. [%s]", succeedItemCnt, totalItemCnt, qPrintable(selectPath));
-  QMessageBox::information(m_dbView, QString("%1/%2 succeed").arg(succeedItemCnt).arg(totalItemCnt), selectPath);
-  m_dbView->m_dbModel->submitAll();
+  QMessageBox::information(this, QString("%1/%2 succeed").arg(succeedItemCnt).arg(totalItemCnt), selectPath);
+  _dbModel->submitAll();
   return true;
 }
 
-void DatabasePanel::subscribe() {
-  connect(m_searchLE, &QLineEdit::returnPressed, this, [this]() {
-    const QString& searchPattern = m_searchLE->text();
-    m_dbView->onSearchDataBase(searchPattern);
-  });
-
-  connect(m_tables, &QComboBox::currentTextChanged, this, &DatabasePanel::setCurrentMovieTable);
-
-  {
-    const QList<QAction*>& DB_CONTROL_ACTIONS = g_dbAct().DB_CONTROL_ACTIONS->actions();
-
-    QAction* INSERT_A_PATH = DB_CONTROL_ACTIONS[0];
-    QAction* DELETE_FROM_TABLE = DB_CONTROL_ACTIONS[1];
-    QAction* INIT_A_DATABASE = DB_CONTROL_ACTIONS[2];
-    QAction* INIT_A_TABLE = DB_CONTROL_ACTIONS[3];
-    QAction* DROP_A_DATABASE = DB_CONTROL_ACTIONS[4];
-    QAction* DROP_A_TABLE = DB_CONTROL_ACTIONS[5];
-    QAction* UNION_TABLE = DB_CONTROL_ACTIONS[6];
-
-    connect(INIT_A_DATABASE, &QAction::triggered, this, &DatabasePanel::onInitDataBase);
-    connect(DROP_A_DATABASE, &QAction::triggered, this, [this]() { QMessageBox::warning(m_dbView, "Too danger", "Cancel drop database"); });
-
-    connect(INIT_A_TABLE, &QAction::triggered, this, &DatabasePanel::onCreateATable);
-    connect(DROP_A_TABLE, &QAction::triggered, this, &DatabasePanel::onDropATable);
-    connect(INSERT_A_PATH, &QAction::triggered, this, &DatabasePanel::onInsertIntoTable);
-    connect(DELETE_FROM_TABLE, &QAction::triggered, this, [this]() { this->onDeleteFromTable(); });
-
-    connect(UNION_TABLE, &QAction::triggered, this, &DatabasePanel::onUnionTables);
-  }
-
-  {
-    connect(g_dbAct().DELETE_BY_DRIVER, &QAction::triggered, this, &DatabasePanel::on_DeleteByDrive);
-    connect(g_dbAct().DELETE_BY_PREPATH, &QAction::triggered, this, &DatabasePanel::on_DeleteByPrepath);
-  }
-
-  { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &DatabasePanel::onQuickWhereClause); }
-
-  {
-    const QList<QAction*>& DB_FUNCTIONS_ACTIONS = g_dbAct().DB_FUNCTIONS->actions();
-    QAction* COUNT = DB_FUNCTIONS_ACTIONS[0];
-    QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
-    connect(COUNT, &QAction::triggered, this, &DatabasePanel::onCountRow);
-  }
-}
-
-void DatabasePanel::onQuickWhereClause() {
+void DatabaseTableView::onQuickWhereClause() {
   auto retCode = m_quickWhereClause->exec();
   if (retCode != QDialog::DialogCode::Accepted) {
     return;
   }
   const QString& where = m_quickWhereClause->GetWhereString();
   qDebug("Quick where clause: [%s]", qPrintable(where));
-  m_searchLE->setText(where);
-  emit m_searchLE->returnPressed();
+  _searchLE->setText(where);
+  emit _searchLE->returnPressed();
 }
 
-int DatabasePanel::onCountRow() {
+int DatabaseTableView::onCountRow() {
   auto con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
     qDebug("Cannot open connection");
     return -1;
   }
 
-  QString countCmd = QString("SELECT COUNT(%1) FROM %2").arg(DB_HEADER_KEY::Name).arg(m_tables->currentText());
-  if (not m_searchLE->text().isEmpty()) {
-    countCmd += ("WHERE " + m_searchLE->text());
+  QString countCmd = QString("SELECT COUNT(%1) FROM %2").arg(DB_HEADER_KEY::Name).arg(_tables->currentText());
+  if (not _searchLE->text().isEmpty()) {
+    countCmd += ("WHERE " + _searchLE->text());
   }
 
   QSqlQuery queryCount(con);
@@ -672,20 +609,20 @@ int DatabasePanel::onCountRow() {
   return rowCnt;
 }
 
-#include <QMainWindow>
-class MoviesDatabase : public QMainWindow {
- public:
-  DatabaseToolBar* m_databaseTB;
-  DatabasePanel* m_dbPanel;
-  explicit MoviesDatabase(QWidget* parent = nullptr)
-      : QMainWindow(parent), m_databaseTB(new DatabaseToolBar("Movies Database Toolbar", this)), m_dbPanel(new DatabasePanel) {
-    this->addToolBar(Qt::ToolBarArea::TopToolBarArea, m_databaseTB);
-    this->setCentralWidget(m_dbPanel);
-    this->setWindowTitle("QTableView Example");
-    this->setWindowIcon(QIcon(":/themes/SHOW_DATABASE"));
-  }
-  QSize sizeHint() const override { return QSize(1400, 768); }
-};
+// #include <QMainWindow>
+// class MoviesDatabase : public QMainWindow {
+//  public:
+//   DatabaseToolBar* m_databaseTB;
+//   DatabaseTableView* m_dbPanel;
+//   explicit MoviesDatabase(QWidget* parent = nullptr)
+//       : QMainWindow(parent), m_databaseTB(new DatabaseToolBar("Movies Database Toolbar", this)), m_dbPanel(new DatabaseTableView) {
+//     this->addToolBar(Qt::ToolBarArea::TopToolBarArea, m_databaseTB);
+//     this->setCentralWidget(m_dbPanel);
+//     this->setWindowTitle("QTableView Example");
+//     this->setWindowIcon(QIcon(":/themes/SHOW_DATABASE"));
+//   }
+//   QSize sizeHint() const override { return QSize(1400, 768); }
+// };
 
 // #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__

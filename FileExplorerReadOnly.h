@@ -8,10 +8,13 @@
 #include <QStackedWidget>
 
 #include "Component/CustomStatusBar.h"
+#include "Component/StackedToolBar.h"
+#include "Component/NavigationToolBar.h"
+
+#include "Tools/NavigationViewSwitcher.h"
+
 #include "ContentPanel.h"
-#include "NavigationToolBar.h"
 #include "RibbonMenu.h"
-#include "View/DatabaseTableView.h"
 
 class FileExplorerReadOnly : public QMainWindow {
   Q_OBJECT
@@ -22,20 +25,17 @@ class FileExplorerReadOnly : public QMainWindow {
   virtual void closeEvent(QCloseEvent* event);
 
   auto ReadSettings(const QString& initialPath) -> QString;
-  void subscribe();
-
-  void SwitchStackWidget();
   void InitComponentVisibility();
   void UpdateComponentVisibility();
 
   void keyPressEvent(QKeyEvent* ev){
     if (ev->key() == Qt::Key_F3){  // F3 Search
-      m_fsPanel->addressBar->searchLE->setFocus();
-      m_fsPanel->addressBar->searchLE->selectAll();
+      m_fsPanel->_addressBar->searchLE->setFocus();
+      m_fsPanel->_addressBar->searchLE->selectAll();
       return;
     }else if (ev->key() == Qt::Key_Escape){
-      m_fsPanel->view->clearSelection();
-      m_fsPanel->view->setFocus();
+      m_fsPanel->m_fsView->clearSelection();
+      m_fsPanel->m_fsView->setFocus();
       return;
     }
     QMainWindow::keyPressEvent(ev);
@@ -45,9 +45,13 @@ class FileExplorerReadOnly : public QMainWindow {
   QDockWidget* previewHtmlDock;
   FolderPreviewHTML* previewHtml;
   FolderPreviewWidget* previewWidget;
+
   ContentPanel* m_fsPanel;
-  DatabasePanel* m_dbPanel;
-  QStackedWidget* stackCentralWidget;
+  StackedToolBar* m_stackedBar;
+
+  NavigationViewSwitcher* m_viewSwitcher;
+  QToolBar* m_views;
+
   NavigationToolBar* m_navigationToolBar;
   RibbonMenu* osm;
   CustomStatusBar* _statusBar;

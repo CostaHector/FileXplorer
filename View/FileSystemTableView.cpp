@@ -1,4 +1,6 @@
-#include "View/DragDropTableView.h"
+#include "View/FileSystemTableView.h"
+#include "View/ViewHelper.h"
+#include "View/ViewStyleSheet.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>
@@ -7,27 +9,24 @@
 #include "Actions/ViewActions.h"
 #include "PublicVariable.h"
 
-DragDropTableView::DragDropTableView(MyQFileSystemModel* fsmModel, QPushButton* mouseSideKeyBackwardBtn, QPushButton* mouseSideKeyForwardBtn)
+FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu)
     : QTableView(),
-      View(),
-      backwardBtn(mouseSideKeyBackwardBtn),
-      forwardBtn(mouseSideKeyForwardBtn),
-      menu(new RightClickMenu("Right click menu", this)) {
+      _menu(menu){
   setModel(fsmModel);
   InitViewSettings();
 
-  setContextMenuPolicy(Qt::CustomContextMenu);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::DragDrop);
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
-
-  DragDropTableView::subscribe();
+  
+  FileSystemTableView::subscribe();
+  setStyleSheet(ViewStyleSheet::TABLEVIEW_STYLESHEET);
 }
 
-void DragDropTableView::subscribe() {
+void FileSystemTableView::subscribe() {
   connect(horizontalHeader(), &QHeaderView::sectionResized, this,
           [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
 
@@ -45,18 +44,16 @@ void DragDropTableView::subscribe() {
 
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
-
-  connect(this, &QTableView::customContextMenuRequested, this, &DragDropTableView::on_ShowContextMenu);
 }
 
-auto DragDropTableView::InitViewSettings() -> void {
+auto FileSystemTableView::InitViewSettings() -> void {
   setShowGrid(false);
   setAlternatingRowColors(true);
   setSortingEnabled(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
 
   verticalHeader()->setVisible(false);
-  verticalHeader()->setDefaultSectionSize(ROW_SECTION_HEIGHT);
+  verticalHeader()->setDefaultSectionSize(ViewStyleSheet::ROW_SECTION_HEIGHT);
   verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
   horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
@@ -64,34 +61,30 @@ auto DragDropTableView::InitViewSettings() -> void {
   horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
   horizontalHeader()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY").toByteArray());
-  DragDropTableView::UpdateItemViewFontSize();
+  FileSystemTableView::UpdateItemViewFontSize();
 }
 
-auto DragDropTableView::UpdateItemViewFontSize() -> void {
+auto FileSystemTableView::UpdateItemViewFontSize() -> void {
   View::UpdateItemViewFontSizeCore(this);
 }
 
-void DragDropTableView::dropEvent(QDropEvent* event) {
+void FileSystemTableView::dropEvent(QDropEvent* event) {
   View::dropEventCore(this, event);
 }
 
-void DragDropTableView::dragEnterEvent(QDragEnterEvent* event) {
+void FileSystemTableView::dragEnterEvent(QDragEnterEvent* event) {
   View::dragEnterEventCore(this, event);
 }
 
-void DragDropTableView::dragMoveEvent(QDragMoveEvent* event) {
+void FileSystemTableView::dragMoveEvent(QDragMoveEvent* event) {
   View::dragMoveEventCore(this, event);
 }
 
-void DragDropTableView::dragLeaveEvent(QDragLeaveEvent* event) {
+void FileSystemTableView::dragLeaveEvent(QDragLeaveEvent* event) {
   View::dragLeaveEventCore(this, event);
 }
 
-void DragDropTableView::on_ShowContextMenu(const QPoint pnt) {
-  menu->popup(this->mapToGlobal(pnt));  // or QCursor::pos()
-}
-
-auto DragDropTableView::keyPressEvent(QKeyEvent* e) -> void {
+auto FileSystemTableView::keyPressEvent(QKeyEvent* e) -> void {
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
     emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
     return;
@@ -99,14 +92,14 @@ auto DragDropTableView::keyPressEvent(QKeyEvent* e) -> void {
   QTableView::keyPressEvent(e);
 }
 
-void DragDropTableView::mousePressEvent(QMouseEvent* event) {
-  if (View::onMouseSidekeyBackwardForward(event->button(), backwardBtn, forwardBtn)) {
+void FileSystemTableView::mousePressEvent(QMouseEvent* event) {
+  if (View::onMouseSidekeyBackwardForward(event->button())) {
     return;
   }
   return QTableView::mousePressEvent(event);
 }
 
-void DragDropTableView::mouseMoveEvent(QMouseEvent* event) {
+void FileSystemTableView::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::MouseButton::LeftButton) {
     View::mouseMoveEventCore(this, event);
     return;

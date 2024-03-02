@@ -4,6 +4,7 @@
 #include <QString>
 
 namespace PATHTOOL {
+QString StripTrailingSlash(QString path);
 QString linkPath(const QString& localPath);
 QString localPath(const QString& linkPath);
 QString sysPath(QString fullPath);
@@ -18,6 +19,8 @@ QString driver(const QString& fullPath);
 QString commonPrefix(const QString& path1, const QString& path2);
 QString commonPath(const QString& path1, const QString& path2);
 bool isRootOrEmpty(const QString& path);
+
+constexpr char PATH_SEP_CHAR = '/';
 }  // namespace PATHTOOL
 
 #endif  // PATHTOOL_H
