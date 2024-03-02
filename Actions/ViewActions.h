@@ -3,14 +3,14 @@
 
 #include <QAction>
 #include <QActionGroup>
-#include "PublicVariable.h"
+
 
 class ViewActions : public QObject {
   Q_OBJECT
  public:
   explicit ViewActions(QObject* parent = nullptr)
       : QObject{parent},
-        _MOVIE_VIEW{new QAction(QIcon(":/themes/SHOW_DATABASE"), tr("movie"))},
+        _MOVIE_VIEW{new QAction(QIcon(":/themes/SHOW_DATABASE"), "movie")},
         _LIST_VIEW{new QAction(QIcon(":/themes/DISPLAY_LARGE_THUMBNAILS"), "list")},
         _TABLE_VIEW{new QAction(QIcon(":/themes/DISPLAY_DETAIL_INFOMATIONS"), "table")},
         _TREE_VIEW{new QAction(QIcon(":/themes/DISPLAY_ACHITECTURE"), "tree")},
