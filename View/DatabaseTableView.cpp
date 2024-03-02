@@ -45,12 +45,17 @@ DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSql
   m_horizontalHeaderMenu->setToolTipsVisible(true);
 
   InitViewSettings();
-  subscribe();
 
   InitMoviesTables();
+  const QString defaultTableName = PreferenceSettings().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString();
+  int defaultTableIndex = _tables->findText(defaultTableName, Qt::MatchExactly);
+  if (defaultTableIndex != -1){
+    _tables->setCurrentIndex(defaultTableIndex);
+  }
   setCurrentMovieTable(_tables->currentText());
-
   setStyleSheet(ViewStyleSheet::TABLEVIEW_STYLESHEET);
+
+  subscribe();
 }
 
 auto DatabaseTableView::InitViewSettings() -> void {
@@ -262,7 +267,6 @@ bool DatabaseTableView::InitMoviesTables() {
   }
   _tables->clear();
   _tables->addItems(con.tables());
-  //  m_tables->setCurrentText();
   return true;
 }
 
@@ -271,6 +275,7 @@ bool DatabaseTableView::setCurrentMovieTable(const QString& movieTableName) {
   _dbModel->setTable(movieTableName);
   _dbModel->submitAll();
   ShowOrHideColumnCore();
+  PreferenceSettings().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
   return true;
 }
 
