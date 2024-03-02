@@ -125,7 +125,11 @@ auto AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) -
 
 auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   const QString& pth = QDir::fromNativeSeparators(path);
-  if (not QFile::exists(pth)) {
+#ifdef WIN32
+  if (not pth.isEmpty() and not QFile::exists(pth)) {
+#else
+  if (QFile::exists(pth)) {
+#endif
     const QString& pathInexist = QString("Return pressed with inexist path [%1].").arg(pth);
     qDebug("%s", qPrintable(pathInexist));
     QMessageBox::warning(this, "Into path failed", pathInexist);
@@ -137,15 +141,12 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
     qDebug("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
     pathLineEdit->setText(pathFromFullActions());
-    return true;
-  }
-  if (fi.isDir()) {
+  } else {
     updateAddressToolBarPathActions(pth);
     emit pathActionsTriggeredOrLineEditReturnPressed(pth);
     emit pathComboBoxFocusWatcher->focusChanged(false);
-    return true;
   }
-  return false;
+  return true;
 }
 
 auto AddressELineEdit::subscribe() -> void {
