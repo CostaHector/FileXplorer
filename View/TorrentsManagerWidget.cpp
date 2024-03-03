@@ -16,7 +16,7 @@
 TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
     : QMainWindow{parent},
       m_searchLE{new QLineEdit(QString("%1 like \"%\"").arg(TORRENTS_DB_HEADER_KEY::Name))},
-      m_torrentsListView(new QTableView),
+      m_torrentsListView(new CustomTableView("TORRENT_TABLE", parent)),
       m_torrentsCentralWidget(new QWidget),
       m_torrentsDBModel(nullptr) {
   auto* mainLo = new QVBoxLayout;
@@ -24,7 +24,7 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   mainLo->addWidget(m_torrentsListView);
   m_torrentsCentralWidget->setLayout(mainLo);
 
-  setMenuBar(g_torrentsManagerActions().m_menuBar);
+  setMenuBar(g_torrentsManagerActions().GetMenuBar());
   setCentralWidget(m_torrentsCentralWidget);
 
   QSqlDatabase con = GetSqlDB();
@@ -33,28 +33,17 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
     m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
   }
   m_torrentsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
+  m_torrentsDBModel->submitAll();
 
   m_torrentsListView->setModel(m_torrentsDBModel);
-  m_torrentsListView->setAlternatingRowColors(true);
-  m_torrentsListView->setSortingEnabled(true);
-  m_torrentsListView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-  m_torrentsListView->setDragDropMode(QAbstractItemView::NoDragDrop);
-  m_torrentsListView->setEditTriggers(QAbstractItemView::EditKeyPressed);
 
-  m_torrentsListView->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_torrentsListView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_torrentsListView->verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-
-  const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
-  QFont defaultFont(m_torrentsListView->font());
-  defaultFont.setPointSize(fontSize);
-  m_torrentsListView->setFont(defaultFont);
+  m_torrentsListView->InitTableView();
 
   subscribe();
 
-  updateWindowsSize();
   setWindowTitle("Torrents Manager Widget");
   setWindowIcon(QIcon(":/themes/TORRENTS_MANAGER"));
+  updateWindowsSize();
 }
 
 void TorrentsManagerWidget::subscribe() {

@@ -1,4 +1,5 @@
 #include "ViewActions.h"
+#include "PublicVariable.h"
 
 ViewActions& g_viewActions() {
   static ViewActions ins;

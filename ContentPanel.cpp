@@ -46,7 +46,7 @@ auto ContentPanel::onActionAndViewNavigate(QString newPath, bool isNewPath, bool
     return false;
   }
   if (_addressBar) {
-    _addressBar->_addressLine->updateAddressToolBarPathActions(newPath);
+    _addressBar->m_addressLine->updateAddressToolBarPathActions(newPath);
   }
   return true;
 }
@@ -73,10 +73,9 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
   }
   if (isNewPath) {
     if (_addressBar) {
-      _addressBar->pathRD(newPath);
+      _addressBar->m_pathRD(newPath);
     }
   }
-  m_fsModel->whenRootPathChanged(newPath);
 #ifdef WIN32
   if (newPath.isEmpty()){
     onAfterDirectoryLoaded(newPath);
@@ -121,7 +120,7 @@ void ContentPanel::BindNavigationAddressBar(NavigationAndAddressBar* addressBar)
     return;
   }
   _addressBar = addressBar;
-  connect(_addressBar->_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed,
+  connect(_addressBar->m_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed,
           [this](const QString& newPath) { onAddressToolbarPathChanged(newPath, true); });
 }
 

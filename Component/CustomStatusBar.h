@@ -5,7 +5,7 @@
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QToolBar>
-#include "PublicVariable.h"
+
 
 enum class STATUS_STR_TYPE { NORMAL = 0, ABNORMAL = 1 };
 

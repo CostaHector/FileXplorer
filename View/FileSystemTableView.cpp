@@ -1,36 +1,26 @@
 #include "View/FileSystemTableView.h"
 #include "View/ViewHelper.h"
-#include "View/ViewStyleSheet.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
-#include "PublicVariable.h"
 
-FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu)
-    : QTableView(),
-      _menu(menu){
+FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu, QWidget* parent) : CustomTableView("FILE_SYSTEM", parent) {
   setModel(fsmModel);
-  InitViewSettings();
 
-  setSelectionMode(QAbstractItemView::ExtendedSelection);
-  setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::DragDrop);
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
-  
-  FileSystemTableView::subscribe();
-  setStyleSheet(ViewStyleSheet::TABLEVIEW_STYLESHEET);
+
+  subscribe();
+
+  InitTableView();
 }
 
 void FileSystemTableView::subscribe() {
-  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
-          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
-
-  connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
@@ -44,28 +34,6 @@ void FileSystemTableView::subscribe() {
 
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
-}
-
-auto FileSystemTableView::InitViewSettings() -> void {
-  setShowGrid(false);
-  setAlternatingRowColors(true);
-  setSortingEnabled(true);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  verticalHeader()->setVisible(false);
-  verticalHeader()->setDefaultSectionSize(ViewStyleSheet::ROW_SECTION_HEIGHT);
-  verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-
-  horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-  horizontalHeader()->setStretchLastSection(false);
-  horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
-
-  horizontalHeader()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY").toByteArray());
-  FileSystemTableView::UpdateItemViewFontSize();
-}
-
-auto FileSystemTableView::UpdateItemViewFontSize() -> void {
-  View::UpdateItemViewFontSizeCore(this);
 }
 
 void FileSystemTableView::dropEvent(QDropEvent* event) {
@@ -106,3 +74,39 @@ void FileSystemTableView::mouseMoveEvent(QMouseEvent* event) {
   }
   return QTableView::mouseMoveEvent(event);
 }
+
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+#include <QApplication>
+#include <QMainWindow>
+
+class TestVerticalHeaderTable : public QMainWindow {
+ public:
+  explicit TestVerticalHeaderTable(QWidget* parent = nullptr) : QMainWindow(parent), m_fsm(new QFileSystemModel) {
+    auto* tv = new CustomTableView("tmm_");
+
+    tv->setModel(m_fsm);
+    tv->setRootIndex(m_fsm->setRootPath("E:/MovieImages/hetero/Babes - Preston & Black Cock Guy"));
+
+    tv->verticalHeader()->setDefaultAlignment(Qt::AlignmentFlag::AlignRight);
+    tv->horizontalHeader()->setDefaultAlignment(Qt::AlignmentFlag::AlignRight);
+
+    connect(tv->horizontalHeader(), &QHeaderView::sortIndicatorChanged, this,
+            [](int logicalIndex, Qt::SortOrder order) { qDebug() << "Index:" << logicalIndex << "Order:" << order; });
+
+    //    tv->setSortingEnabled(true);
+
+    setCentralWidget(tv);
+
+    setMinimumSize(1024, 768);
+  }
+  QFileSystemModel* m_fsm;
+};
+
+int main(int argc, char* argv[]) {
+  QApplication a(argc, argv);
+  TestVerticalHeaderTable tvh;
+  tvh.show();
+  return a.exec();
+}
+#endif

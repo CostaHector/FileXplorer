@@ -10,6 +10,9 @@
 
 #include <QLineEdit>
 #include <QPushButton>
+#include <QToolButton>
+#include <QMenu>
+
 #include <functional>
 
 class NavigationAndAddressBar : public QToolBar {
@@ -27,9 +30,22 @@ class NavigationAndAddressBar : public QToolBar {
   
   auto onUpTo() -> bool;
 
-  AddressELineEdit* _addressLine;
-  PathUndoRedoer pathRD;
-  QLineEdit* searchLE;
+  AddressELineEdit* m_addressLine;
+  PathUndoRedoer m_pathRD;
+  QLineEdit* m_searchLE;
+
+  QAction* _FILE = new QAction(QIcon(":/themes/FILE"), tr("file"));
+  QAction* _FOLDER  = new QAction(QIcon(":/themes/FOLDER"), tr("folder"));
+  QAction* _HIDDEN = new QAction(QIcon(":/themes/HIDDEN"), tr("hidden"));
+  QAction* _DOTDOT = new QAction(QIcon(":/themes/DOT_DOT"), tr("dotdot"));
+  QAction* _IMAGES = new QAction(QIcon(":/themes/IMAGE"), tr("image"));
+  QAction* _VIDEOS = new QAction(QIcon(":/themes/VIDEO"), tr("video"));
+  QAction* _PLAIN_TEXT = new QAction(QIcon(":/themes/PLAIN_TEXT"), tr("plain Text"));
+  QAction* _DOCUMENT = new QAction(QIcon(":/themes/DOCUMENT"), tr("document"));
+  QAction* _EXE = new QAction(QIcon(":/themes/EXE"), tr("executable"));
+
+  QMenu* m_itemTypeMenu;
+  QToolButton* m_fsFilter;
 
  private:
   std::function<bool(QString, bool, bool)> m_IntoNewPath;

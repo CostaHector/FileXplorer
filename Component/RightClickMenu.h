@@ -64,7 +64,7 @@ class RightClickMenu : public QMenu {
 
   auto GetRenameMenu() -> QMenu* {
     auto* renameMenuLevel2 = new QMenu(tr("&Rename"), this);
-    renameMenuLevel2->setIcon(QIcon(":/themes/RENAME_PATH"));
+    renameMenuLevel2->setIcon(QIcon(":/themes/RENAME"));
     renameMenuLevel2->addActions(g_renameAg().RENAME_RIBBONS->actions());
     return renameMenuLevel2;
   }
