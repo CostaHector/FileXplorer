@@ -10,19 +10,17 @@
 FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu, QWidget* parent) : CustomTableView("FILE_SYSTEM", parent) {
   setModel(fsmModel);
 
-  setSortingEnabled(true);
-
   setDragDropMode(QAbstractItemView::DragDrop);
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
 
   subscribe();
+
   InitTableView();
 }
 
 void FileSystemTableView::subscribe() {
-  connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
@@ -85,13 +83,18 @@ void FileSystemTableView::mouseMoveEvent(QMouseEvent* event) {
 class TestVerticalHeaderTable : public QMainWindow {
  public:
   explicit TestVerticalHeaderTable(QWidget* parent = nullptr) : QMainWindow(parent), m_fsm(new QFileSystemModel) {
-    auto* tv = new QTableView;
+    auto* tv = new CustomTableView("tmm_");
 
     tv->setModel(m_fsm);
-    tv->setRootIndex(m_fsm->setRootPath("E:/MovieImages"));
+    tv->setRootIndex(m_fsm->setRootPath("E:/MovieImages/hetero/Babes - Preston & Black Cock Guy"));
 
     tv->verticalHeader()->setDefaultAlignment(Qt::AlignmentFlag::AlignRight);
     tv->horizontalHeader()->setDefaultAlignment(Qt::AlignmentFlag::AlignRight);
+
+    connect(tv->horizontalHeader(), &QHeaderView::sortIndicatorChanged, this,
+            [](int logicalIndex, Qt::SortOrder order) { qDebug() << "Index:" << logicalIndex << "Order:" << order; });
+
+    //    tv->setSortingEnabled(true);
 
     setCentralWidget(tv);
 

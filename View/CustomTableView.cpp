@@ -16,6 +16,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
       m_defaultSectionSizeKey{m_name + "_DEFAULT_SECTION_SIZE"},
       m_horizontalHeaderStateKey{m_name + "_HEADER_GEOMETRY"},
       m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"},
+      m_sortByColumnSwitchKey{m_name + "_SORT_BY_COLUMN_SWITCH"},
       m_defaultTableRowHeight{MemoryKey::TABLE_DEFAULT_SECTION_SIZE.v.toInt()},
       m_columnsShowSwitch{"11111,11111,11111,11111,11111,11111"} {
   if (isNameExists(m_name)) {
@@ -50,6 +51,12 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
   horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
 
+  ENABLE_COLUMN_SORT->setCheckable(true);
+  ENABLE_COLUMN_SORT->setChecked(PreferenceSettings().value(m_sortByColumnSwitchKey, true).toBool());
+  ENABLE_COLUMN_SORT->setToolTip(QString("<b>%1 (%2)</b><br/> Enable/Disable sort by click on horizontal header")
+                                     .arg(ENABLE_COLUMN_SORT->text(), ENABLE_COLUMN_SORT->shortcut().toString()));
+  setSortingEnabled(ENABLE_COLUMN_SORT->isChecked());
+
   SHOW_VERTICAL_HEADER->setCheckable(true);
   SHOW_VERTICAL_HEADER->setChecked(PreferenceSettings().value(m_showVerticalHeaderKey, true).toBool());
   SHOW_VERTICAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide or Show the number vertical header")
@@ -64,12 +71,13 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   connect(HIDE_THIS_COLUMN, &QAction::triggered, this, &CustomTableView::onHideThisColumn);
   connect(SHOW_ALL_COLUMNS, &QAction::triggered, this, &CustomTableView::onShowAllColumn);
   connect(STRETCH_DETAIL_SECTION, &QAction::triggered, this, &CustomTableView::onStretchLastSection);
+  connect(ENABLE_COLUMN_SORT, &QAction::triggered, this, &CustomTableView::onEnableColumnSort);
 
   connect(SHOW_VERTICAL_HEADER, &QAction::triggered, this, &CustomTableView::onShowVerticalHeader);
   connect(RESIZE_ROWS_TO_CONTENT, &QAction::triggered, this, &CustomTableView::onResizeRowToContents);
   connect(RESIZE_ROWS_DEFAULT_SECTION_SIZE, &QAction::triggered, this, &CustomTableView::onResizeRowDefaultSectionSize);
 
-  m_horMenu->addActions({SHOW_VERTICAL_HEADER, HIDE_THIS_COLUMN, COLUMNS_VISIBILITY, SHOW_ALL_COLUMNS, STRETCH_DETAIL_SECTION});
+  m_horMenu->addActions({SHOW_VERTICAL_HEADER, HIDE_THIS_COLUMN, COLUMNS_VISIBILITY, SHOW_ALL_COLUMNS, STRETCH_DETAIL_SECTION, ENABLE_COLUMN_SORT});
   m_horMenu->setToolTipsVisible(true);
   m_verMenu->addActions({SHOW_VERTICAL_HEADER, RESIZE_ROWS_DEFAULT_SECTION_SIZE, RESIZE_ROWS_TO_CONTENT});
   m_verMenu->setToolTipsVisible(true);
@@ -86,6 +94,8 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   });
   connect(horizontalHeader(), &QHeaderView::sectionResized, this,
           [this]() { PreferenceSettings().setValue(m_horizontalHeaderStateKey, horizontalHeader()->saveState()); });
+
+  connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &CustomTableView::onSortIndicatorChanged);
 
   setStyleSheet(ViewStyleSheet::TABLEVIEW_STYLESHEET);
 }
@@ -141,7 +151,6 @@ bool CustomTableView::ShowOrHideColumnCore() {
   for (int c = 0; c < tableColumnsCount; ++c) {
     setColumnHidden(c, isColumnithHidden(c));
   }
-
   PreferenceSettings().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
   return true;
 }
@@ -193,6 +202,10 @@ void CustomTableView::onStretchLastSection(const bool checked) {
   horizontalHeader()->setStretchLastSection(checked);
   PreferenceSettings().setValue(m_stretchLastSectionKey, checked);
 }
+void CustomTableView::onEnableColumnSort(const bool enableChecked) {
+  setSortingEnabled(enableChecked);
+  PreferenceSettings().setValue(m_sortByColumnSwitchKey, enableChecked);
+}
 
 void CustomTableView::onResizeRowToContents(const bool checked) {
   if (checked) {
@@ -220,11 +233,24 @@ void CustomTableView::onShowVerticalHeader(bool showChecked) {
   PreferenceSettings().setValue(m_showVerticalHeaderKey, showChecked);
 }
 
+void CustomTableView::onSortIndicatorChanged(int logicalIndex, Qt::SortOrder order) {
+  if (not isIndicatorHoldByRestoredStateTrustable) {
+    qInfo(
+        "At first time, QHeaderView.restoreState() would restore state with bugs(always being descending) "
+        "and triggered indicator changed. So instead, we trust value more from PreferenceSetting.");
+    return;
+  }
+  PreferenceSettings().setValue(MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, logicalIndex);
+  PreferenceSettings().setValue(MemoryKey::HEADVIEW_SORT_INDICATOR_ORDER.name, HEADERVIEW_SORT_INDICATOR_ORDER::SortOrderEnum2String(order));
+  qDebug() << "logicalIndex" << logicalIndex << "order" << order;
+}
+
 void CustomTableView::InitTableView() {
   verticalHeader()->setVisible(SHOW_VERTICAL_HEADER->isChecked());
   verticalHeader()->setDefaultSectionSize(m_defaultTableRowHeight);
   verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-  horizontalHeader()->restoreState(PreferenceSettings().value(m_horizontalHeaderStateKey, QByteArray()).toByteArray());
   // when table changed. the header may changed at same time. at a factor of that, call this func again
+  horizontalHeader()->restoreState(PreferenceSettings().value(m_horizontalHeaderStateKey, QByteArray()).toByteArray());
   ShowOrHideColumnCore();
+  isIndicatorHoldByRestoredStateTrustable = true;
 }

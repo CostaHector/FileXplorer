@@ -29,8 +29,6 @@ FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QMenu* menu
 void FileSystemListView::subscribe() {
   //  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
   //          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
-
-  //  connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
@@ -47,9 +45,7 @@ void FileSystemListView::subscribe() {
 }
 
 auto FileSystemListView::InitViewSettings() -> void {
-  //  setShowGrid(false);
   setAlternatingRowColors(true);
-  //  setSortingEnabled(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
 
   this->sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);

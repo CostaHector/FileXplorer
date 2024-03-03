@@ -27,7 +27,6 @@ FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu
 void FileSystemTreeView::subscribe() {
   connect(header(), &QHeaderView::sectionResized, this,
           [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
-  connect(header(), &QHeaderView::sortIndicatorChanged, this, &View::onSortIndicatorChanged);
 
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
