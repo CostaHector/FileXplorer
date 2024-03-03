@@ -1,10 +1,8 @@
 #include "DatabaseTableView.h"
 
 #include "Component/QuickWhereClause.h"
-
+#include "Component/DBRightClickMenu.h"
 #include "Tools/PlayVideo.h"
-#include "View/ViewHelper.h"
-#include "View/ViewStyleSheet.h"
 
 #include "PublicTool.h"
 #include "PublicVariable.h"
@@ -13,91 +11,43 @@
 #include <QHeaderView>
 #include <QProcess>
 #include <QStorageInfo>
+#include <QDirIterator>
 
 DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent)
-    : QTableView(parent),
+    : CustomTableView("MOVIE_TABLE", parent),
       _dbModel(dbModel),
-      m_vidsDBMenu(new DBRightClickMenu("Database Right click menu", this)),
-      SHOW_ALL_COLUMNS(new QAction("show all columns", this)),
-      HIDE_THIS_COLUMN(new QAction("hide this column", this)),
-      STRETCH_DETAIL_SECTION(new QAction("stretch last column", this)),
-      m_horizontalHeaderMenu(new QMenu(this)),
-      m_columnsShowSwitch(PreferenceSettings().value(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, MemoryKey::VIDS_COLUMN_SHOW_SWITCH.v).toString()),
       _dbSearchBar{_dbSearchBar},
       _tables{_dbSearchBar->m_tables},
       _searchLE{_dbSearchBar->m_searchLE},
       _searchCB{_dbSearchBar->m_searchCB},
       m_quickWhereClause{new QuickWhereClause(this)} {
+  BindMenu(new DBRightClickMenu("Database Right click menu", this));
+
   setModel(_dbModel);
 
-  setContextMenuPolicy(Qt::CustomContextMenu);
-  setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
-  setDragDropMode(QAbstractItemView::DragDropMode::NoDragDrop);
   setSortingEnabled(true);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  STRETCH_DETAIL_SECTION->setCheckable(true);
-  STRETCH_DETAIL_SECTION->setChecked(
-      PreferenceSettings().value(MemoryKey::VIDS_STRETCH_LAST_SECTION.name, MemoryKey::VIDS_STRETCH_LAST_SECTION.v).toBool());
-
-  m_horizontalHeaderMenu->addActions({SHOW_ALL_COLUMNS, HIDE_THIS_COLUMN, STRETCH_DETAIL_SECTION});
-  m_horizontalHeaderMenu->setToolTipsVisible(true);
-
-  InitViewSettings();
 
   InitMoviesTables();
   const QString defaultTableName = PreferenceSettings().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString();
   int defaultTableIndex = _tables->findText(defaultTableName, Qt::MatchExactly);
-  if (defaultTableIndex != -1){
+  if (defaultTableIndex != -1) {
     _tables->setCurrentIndex(defaultTableIndex);
   }
   setCurrentMovieTable(_tables->currentText());
-  setStyleSheet(ViewStyleSheet::TABLEVIEW_STYLESHEET);
 
+  InitTableView();
   subscribe();
 }
 
-auto DatabaseTableView::InitViewSettings() -> void {
-  setShowGrid(false);
-  setAlternatingRowColors(true);
-
-  verticalHeader()->setVisible(false);
-  verticalHeader()->setDefaultSectionSize(ViewStyleSheet::ROW_SECTION_HEIGHT);
-  verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-
-  horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-  horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
-  horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-  horizontalHeader()->setStretchLastSection(STRETCH_DETAIL_SECTION->isChecked());
-
-  DatabaseTableView::UpdateItemViewFontSize();
-}
-
-auto DatabaseTableView::UpdateItemViewFontSize() -> void {
-  View::UpdateItemViewFontSizeCore(this);
-}
-
 void DatabaseTableView::subscribe() {
-  {
-    connect(g_dbAct().OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
-    connect(g_dbAct()._PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
-  }
+  connect(g_dbAct().OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
+  connect(g_dbAct()._PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
 
   connect(horizontalHeader(), &QHeaderView::sectionResized, this,
           [this]() { PreferenceSettings().setValue("DATABASE_TABLEVIEW_HERDER_GEOMETRY", horizontalHeader()->saveState()); });
 
   connect(this, &QTableView::doubleClicked, this, &DatabaseTableView::on_cellDoubleClicked);
-  connect(this, &QTableView::customContextMenuRequested, this, &DatabaseTableView::on_ShowContextMenu);
-
-  connect(HIDE_THIS_COLUMN, &QAction::triggered, this, &DatabaseTableView::onHideThisColumn);
-  connect(SHOW_ALL_COLUMNS, &QAction::triggered, this, &DatabaseTableView::onShowAllColumn);
-  connect(STRETCH_DETAIL_SECTION, &QAction::triggered, this, &DatabaseTableView::onStretchLastSection);
-
-  connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this, [this](const QPoint pnt) {
-    m_horizontalHeaderSectionClicked = horizontalHeader()->logicalIndexAt(pnt);
-    m_horizontalHeaderMenu->popup(mapToGlobal(pnt));
-  });
 
   connect(_searchLE, &QLineEdit::returnPressed, this, [this]() {
     const QString& searchPattern = _searchLE->text();
@@ -141,58 +91,6 @@ void DatabaseTableView::subscribe() {
     QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
     connect(COUNT, &QAction::triggered, this, &DatabaseTableView::onCountRow);
   }
-}
-
-bool DatabaseTableView::ShowOrHideColumnCore() {
-  if (_dbModel->tableName().isEmpty()) {
-    qDebug("TableName not set now");
-    return false;
-  }
-  // only work after table is set
-  static bool headerStateSet = false;
-  if (not headerStateSet) {
-    horizontalHeader()->restoreState(PreferenceSettings().value("DATABASE_TABLEVIEW_HERDER_GEOMETRY").toByteArray());
-    headerStateSet = true;
-  }
-
-  const int headColumnCntMin = std::min({_dbModel->columnCount(), DB_HEADER_KEY::DB_HEADER.size(), m_columnsShowSwitch.size()});
-  if (headColumnCntMin <= 0) {
-    qDebug("Empty header columnCnt[%d], headerTypeCnt[%d], columnsShowSwitchCnt[%d]", _dbModel->columnCount(), DB_HEADER_KEY::DB_HEADER.size(),
-           m_columnsShowSwitch.size());
-    return false;
-  }
-  for (int c = 0; c < headColumnCntMin; ++c) {
-    // only work after table is set
-    setColumnHidden(c, m_columnsShowSwitch.at(c) == '0');
-  }
-  PreferenceSettings().setValue(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, m_columnsShowSwitch);
-  return true;
-}
-
-bool DatabaseTableView::onHideThisColumn() {
-  const int c = m_horizontalHeaderSectionClicked;
-  if (c < 0 or c >= m_columnsShowSwitch.size()) {
-    qDebug("No column selected. Select a column to hide");
-    QMessageBox::warning(this, "No column selected", "Select a column to hide");
-    return false;
-  }
-  if (m_columnsShowSwitch[c] == '0' and not isColumnHidden(c)) {
-    qDebug("Column[%d] already hide. Select another column to hide", c);
-    QMessageBox::warning(this, QString("Column[%1] ALREADY been hide").arg(c), "Select another column to hide");
-    return true;
-  }
-  m_columnsShowSwitch[c] = '0';
-  return ShowOrHideColumnCore();
-}
-
-bool DatabaseTableView::onShowAllColumn() {
-  m_columnsShowSwitch.replace('0', '1');
-  return ShowOrHideColumnCore();
-}
-
-void DatabaseTableView::onStretchLastSection(const bool checked) {
-  horizontalHeader()->setStretchLastSection(checked);
-  PreferenceSettings().setValue(MemoryKey::VIDS_COLUMN_SHOW_SWITCH.name, checked);
 }
 
 auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
@@ -274,7 +172,7 @@ bool DatabaseTableView::setCurrentMovieTable(const QString& movieTableName) {
   _tables->setCurrentText(movieTableName);
   _dbModel->setTable(movieTableName);
   _dbModel->submitAll();
-  ShowOrHideColumnCore();
+  InitTableView();
   PreferenceSettings().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
   return true;
 }

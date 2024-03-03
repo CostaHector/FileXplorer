@@ -170,12 +170,12 @@
         <translation>永久删除</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.cpp" line="21"/>
+        <location filename="../Actions/FileBasicOperationsActions.cpp" line="23"/>
         <source>Move to</source>
         <translation>移动到</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.cpp" line="26"/>
+        <location filename="../Actions/FileBasicOperationsActions.cpp" line="28"/>
         <source>Copy to</source>
         <translation>复制到</translation>
     </message>
@@ -283,7 +283,7 @@
         <translation type="vanished">后者(合并两个文件夹到)</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.cpp" line="262"/>
+        <location filename="../Actions/FileBasicOperationsActions.cpp" line="264"/>
         <source>Advance search</source>
         <translation>高级搜索</translation>
     </message>
@@ -521,9 +521,59 @@
 <context>
     <name>NavigationAndAddressBar</name>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="18"/>
+        <location filename="../Component/NavigationAndAddressBar.h" line="21"/>
         <source>Address Toolbar</source>
         <translation>地址工具条</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="37"/>
+        <source>file</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="38"/>
+        <source>folder</source>
+        <translation>文件夹</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="39"/>
+        <source>hidden</source>
+        <translation>隐藏项目</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="40"/>
+        <source>dotdot</source>
+        <translation>点路径</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="41"/>
+        <source>image</source>
+        <translation>图像</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="42"/>
+        <source>video</source>
+        <translation>视频</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="43"/>
+        <source>plain Text</source>
+        <translation>文本文件</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="44"/>
+        <source>document</source>
+        <translation>文档</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.h" line="45"/>
+        <source>executable</source>
+        <translation>可执行文件</translation>
+    </message>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.cpp" line="10"/>
+        <source>Filter</source>
+        <translation>文件类型过滤</translation>
     </message>
 </context>
 <context>
@@ -639,17 +689,17 @@
         <translation>演职员库</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="85"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="80"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="97"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="92"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="105"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="100"/>
         <source>View</source>
         <translation>视图</translation>
     </message>
@@ -823,14 +873,26 @@
 <context>
     <name>TorrentsManagerActions</name>
     <message>
-        <location filename="../Actions/TorrentsManagerActions.cpp" line="7"/>
         <source>Open with</source>
-        <translation>用本地APP打开</translation>
+        <translation type="vanished">用本地APP打开</translation>
+    </message>
+    <message>
+        <source>&amp;Open with</source>
+        <translation type="vanished">打开(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Delete from table</source>
+        <translation type="vanished">从表中删除</translation>
+    </message>
+    <message>
+        <location filename="../Actions/TorrentsManagerActions.cpp" line="7"/>
+        <source>&amp;Open with local app</source>
+        <translation>用本地文件打开(&amp;O)</translation>
     </message>
     <message>
         <location filename="../Actions/TorrentsManagerActions.cpp" line="11"/>
-        <source>Delete from table</source>
-        <translation>从表中删除</translation>
+        <source>&amp;Delete from table</source>
+        <translation>从表中删除(&amp;D)</translation>
     </message>
     <message>
         <location filename="../Actions/TorrentsManagerActions.cpp" line="12"/>
@@ -839,13 +901,39 @@
     </message>
     <message>
         <location filename="../Actions/TorrentsManagerActions.cpp" line="13"/>
-        <source>Submit</source>
-        <translation>提交</translation>
+        <source>&amp;Submit</source>
+        <translation>提交(&amp;S)</translation>
     </message>
     <message>
         <location filename="../Actions/TorrentsManagerActions.cpp" line="14"/>
+        <source>&amp;Torrents</source>
+        <translation>种子(&amp;T)</translation>
+    </message>
+    <message>
+        <location filename="../Actions/TorrentsManagerActions.cpp" line="29"/>
+        <source>&amp;File</source>
+        <translation>文件(&amp;F)</translation>
+    </message>
+    <message>
+        <location filename="../Actions/TorrentsManagerActions.cpp" line="33"/>
+        <source>&amp;Edit</source>
+        <translation>编辑(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Submit</source>
+        <translation type="vanished">提交</translation>
+    </message>
+    <message>
         <source>Torrents</source>
-        <translation>种子数据库</translation>
+        <translation type="vanished">种子数据库</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="vanished">文件</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="vanished">编辑</translation>
     </message>
 </context>
 <context>

@@ -36,6 +36,19 @@
         <file alias="SEARCH">AddressControl/SEARCH.svg</file>
         <file alias="SERACH_FILENAMES">AddressControl/SERACH_FILENAMES.svg</file>
         <file alias="SEARCH_FILENAMES_AND_CONTENTS">AddressControl/SEARCH_FILENAMES_AND_CONTENTS.svg</file>
+
+        <file alias="FILE_SYSTEM_FILTER">AddressControl/FILTER.svg</file>
+        <file alias="FILE">FILTER_TYPE/FILE.svg</file>
+        <file alias="FOLDER">FILTER_TYPE/FOLDER.png</file>
+        <file alias="HIDDEN">FILTER_TYPE/HIDDEN.png</file>
+        <file alias="DOT_DOT">FILTER_TYPE/DOT_DOT.svg</file>
+        <file alias="IMAGE">FILTER_TYPE/IMAGE.png</file>
+        <file alias="PLAIN_TEXT">FILTER_TYPE/PLAIN_TEXT.ico</file>
+        <file alias="VIDEO">FILTER_TYPE/VIDEO.png</file>
+        <file alias="EXE">FILTER_TYPE/EXE.png</file>
+        <file alias="COMPRESSED">FILTER_TYPE/COMPRESSED.webp</file>
+        <file alias="DOCUMENT">FILTER_TYPE/DOCUMENT.png</file>
+
         <file alias="HOME">LeftSideToolBarIcons/HOME.png</file>
         <file alias="FOLDER_OF_DESKTOP">LeftSideToolBarIcons/FOLDER_OF_DESKTOP.png</file>
         <file alias="FOLDER_OF_DOCUMENTS">LeftSideToolBarIcons/FOLDER_OF_DOCUMENTS.png</file>
@@ -62,7 +75,6 @@
         <file alias="NEW_TEXT_DOCUMENTS">RightClickIcon/NEW_TEXT_DOCUMENTS.svg</file>
         <file alias="NEW_JSON_FILE">RightClickIcon/NEW_JSON_FILE.svg</file>
         <file alias="CATEGORIZER">RightClickIcon/CATEGORIZER.svg</file>
-        <file alias="RENAME">RightClickIcon/RENAME.ico</file>
         <file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
         <file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
         <file alias="MERGE_TEXT_FILE">RightClickIcon/mergeTextFile.png</file>
@@ -123,10 +135,9 @@
         <file alias="VOLUME_UNMUTE">VideoPlayer/VOLUME_UNMUTE.svg</file>
         <file alias="VOLUME_MUTE">VideoPlayer/VOLUME_MUTE.svg</file>
         <file alias="FOLDER_OPEN">Parser/FOLDER_OPEN.svg</file>
-        <file alias="SELECT_FOLDER">Parser/SELECT_FOLDER.svg</file>
         <file alias="JSON_AND_HTML">Parser/JSON_AND_HTML.svg</file>
         <file alias="IMAGE">Parser/IMAGE.svg</file>
-        <file alias="RENAME_PATH">NameStrIcon/Renamer.png</file>
+        <file alias="RENAME">NameStrIcon/RENAME.png</file>
         <file alias="NAME_STANDARDLIZER_PATH">NameStrIcon/NAME_STANDARDLIZER.svg</file>
         <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.png</file>
         <file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/Numerizer.svg</file>
@@ -168,8 +179,6 @@
         <file alias="DISPLAY_DETAIL_INFOMATIONS">View/DISPLAY_DETAIL_INFOMATIONS.png</file>
         <file alias="DISPLAY_LARGE_THUMBNAILS">View/DISPLAY_LARGE_THUMBNAILS.png</file>
         <file alias="DISPLAY_ACHITECTURE">View/DISPLAY_ACHITECTURE.webp</file>
-        <file alias="DRAG_FILES">RightClickIcon/DRAG_FILES.ico</file>
-        <file alias="DRAG_FOLDERS">RightClickIcon/DRAG_FOLDERS.ico</file>
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
         <file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
         <file alias="DROP_DATABASE">Database/DROP_DATABASE.svg</file>

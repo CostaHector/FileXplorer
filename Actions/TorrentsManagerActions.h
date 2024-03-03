@@ -9,6 +9,7 @@ class TorrentsManagerActions : public QObject {
   Q_OBJECT
  public:
   explicit TorrentsManagerActions(QObject* parent = nullptr);
+
   QAction* OPEN_WITH_LOCAL_APP;
 
   QAction* INIT_DATABASE;
@@ -21,12 +22,7 @@ class TorrentsManagerActions : public QObject {
 
   QAction* SHOW_TORRENTS_MANAGER;
 
-  QMenuBar* m_menuBar;
-
- private:
   QMenuBar* GetMenuBar() const;
-
-  void InitActionsTooltips();
 };
 
 TorrentsManagerActions& g_torrentsManagerActions();

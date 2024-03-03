@@ -1,4 +1,6 @@
 #include "FileBasicOperationsActions.h"
+#include <QApplication>
+#include <QStyle>
 
 QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
   MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
@@ -39,7 +41,7 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(GV
   QStringList historyList = historyStr.split(MOVE_COPT_TO_PATH_STR_SEPERATOR);
   QActionGroup* actionGroup = new QActionGroup(this);
   for (const QString& path : historyList) {
-    QAction* tempPath = new QAction(QIcon(":/themes/DRAG_FOLDERS"), path);
+    QAction* tempPath = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), path);
     tempPath->setCheckable(false);
     actionGroup->addAction(tempPath);
   }
