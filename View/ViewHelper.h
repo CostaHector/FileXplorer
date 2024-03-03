@@ -24,21 +24,6 @@ class View {
 
   virtual void UpdateItemViewFontSize() = 0;
 
-  static void onSortIndicatorChanged(int logicalIndex, Qt::SortOrder order) {
-    PreferenceSettings().setValue(MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, logicalIndex);
-    PreferenceSettings().setValue(MemoryKey::HEARVIEW_SORT_INDICATOR_ORDER.name, HEADERVIEW_SORT_INDICATOR_ORDER::SortOrderEnum2String(order));
-
-    qDebug("sort logicalIndex [%d]",
-           PreferenceSettings()
-               .value(MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.v)
-               .toInt());
-    qDebug("order [%s]", PreferenceSettings()
-                             .value(MemoryKey::HEARVIEW_SORT_INDICATOR_ORDER.name, MemoryKey::HEARVIEW_SORT_INDICATOR_ORDER.v)
-                             .toString()
-                             .toStdString()
-                             .c_str());
-  }
-
   static auto onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton) -> bool {
     switch (mousebutton) {
       case Qt::MouseButton::BackButton:

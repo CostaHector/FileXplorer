@@ -76,7 +76,6 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
       _addressBar->m_pathRD(newPath);
     }
   }
-  m_fsModel->whenRootPathChanged(newPath);
 #ifdef WIN32
   if (newPath.isEmpty()){
     onAfterDirectoryLoaded(newPath);

@@ -20,6 +20,59 @@
     </message>
 </context>
 <context>
+    <name>CustomTableView</name>
+    <message>
+        <location filename="../View/CustomTableView.h" line="46"/>
+        <source>Performer table column visibility</source>
+        <translation>演员表列可见性</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="47"/>
+        <source>hide this column</source>
+        <translation>隐藏此列</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="48"/>
+        <source>show all columns</source>
+        <translation>显示所有列</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="49"/>
+        <source>stretch last column</source>
+        <translation>延展最后一列</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="50"/>
+        <source>enable column sort</source>
+        <translation>允许列排序</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="52"/>
+        <source>show vertical header</source>
+        <translation>显示垂直表头</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="53"/>
+        <source>resize rows to content</source>
+        <translation>自适应行高</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="54"/>
+        <source>adjust default rows section size</source>
+        <translation>调节行高</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="75"/>
+        <source>vertical header menu</source>
+        <translation>垂直表头</translation>
+    </message>
+    <message>
+        <location filename="../View/CustomTableView.h" line="76"/>
+        <source>horizontal header menu</source>
+        <translation>水平表头</translation>
+    </message>
+</context>
+<context>
     <name>DataBaseActions</name>
     <message>
         <location filename="../Actions/DataBaseActions.h" line="32"/>
@@ -654,54 +707,62 @@
         <translation>修改演员图片固定宽度(像素)</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="27"/>
-        <source>hide this column</source>
-        <translation>隐藏此列</translation>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="94"/>
+        <source>performer table right click menu</source>
+        <translation>演员表右键菜单</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="28"/>
+        <source>hide this column</source>
+        <translation type="vanished">隐藏此列</translation>
+    </message>
+    <message>
         <source>show all columns</source>
-        <translation>显示所有列</translation>
+        <translation type="vanished">显示所有列</translation>
+    </message>
+    <message>
+        <source>stretch last column</source>
+        <translation type="vanished">延展最后一列</translation>
     </message>
     <message>
         <location filename="../Actions/PerformersManagerActions.cpp" line="29"/>
-        <source>stretch last column</source>
-        <translation>延展最后一列</translation>
-    </message>
-    <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="32"/>
         <source>delete record(s)</source>
         <translation>删除记录</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="33"/>
         <source>resize rows to content</source>
-        <translation>自适应行高</translation>
+        <translation type="vanished">自适应行高</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="34"/>
         <source>adjust default rows section size</source>
-        <translation>调节默认行高</translation>
+        <translation type="vanished">调节默认行高</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="37"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="32"/>
         <source>Perfs</source>
         <translation>演职员库</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="80"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="62"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="92"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="74"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="100"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="82"/>
         <source>View</source>
         <translation>视图</translation>
+    </message>
+</context>
+<context>
+    <name>PerformersWidget</name>
+    <message>
+        <location filename="../Component/PerformersWidget.cpp" line="27"/>
+        <source>Overview</source>
+        <translation>全览</translation>
     </message>
 </context>
 <context>
