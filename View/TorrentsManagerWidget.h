@@ -6,8 +6,6 @@
 #include <QToolBar>
 #include <QWidget>
 
-#include <QListView>
-#include <QTableView>
 #include <QTextBrowser>
 
 #include <QVBoxLayout>
@@ -19,6 +17,8 @@
 #include <QMenuBar>
 
 #include <QLineEdit>
+
+#include "CustomTableView.h"
 
 class TorrentsManagerWidget : public QMainWindow {
  public:
@@ -47,7 +47,7 @@ class TorrentsManagerWidget : public QMainWindow {
 
  signals:
   QLineEdit* m_searchLE;
-  QTableView* m_torrentsListView;  
+  CustomTableView* m_torrentsListView;
   QWidget* m_torrentsCentralWidget;
   QSqlTableModel* m_torrentsDBModel;
 };

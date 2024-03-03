@@ -1,9 +1,8 @@
 #include "ViewHelper.h"
+#include "Component/RenameConflicts.h"
+#include "MyQFileSystemModel.h"
 
 #include <QFileIconProvider>
-
-#include "Component/RenameConflicts.h"
-
 bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to) {
   const unsigned URLS_SIZE = data->urls().size();
   if (URLS_SIZE == 0) {
@@ -52,9 +51,6 @@ QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, cons
   QPixmap pixmap = ico.pixmap(DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN);
   if (selectedCnt > 1) {
     QPainter painter(&pixmap);
-    static QBrush brush(Qt::GlobalColor::darkGray, Qt::Dense4Pattern);
-    painter.setBrush(brush);
-    painter.drawRoundRect(0, 0, DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN);
     static QFont font("arial", 18, QFont::Weight::ExtraBold, true);
     painter.setFont(font);
 #ifdef _WIN32

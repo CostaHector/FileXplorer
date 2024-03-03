@@ -70,7 +70,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
   }
   _view->setCurrentIndex(viewIndex);
   if (fileSystemView.contains(viewType) and _view->_addressBar) {
-    _view->onActionAndViewNavigate(_view->_addressBar->_addressLine->pathFromLineEdit(), false);
+    _view->onActionAndViewNavigate(_view->_addressBar->m_addressLine->pathFromLineEdit(), false);
   }
 }
 

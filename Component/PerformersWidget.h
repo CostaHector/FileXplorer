@@ -2,6 +2,7 @@
 #define PERFORMERSWIDGET_H
 
 #include "Component/PerformersPreviewTextBrowser.h"
+#include "View/PerformersTableView.h"
 
 #include <QMainWindow>
 #include <QToolBar>
@@ -25,7 +26,6 @@ class PerformersWidget : public QMainWindow {
   auto closeEvent(QCloseEvent* event) -> void override;
 
   void updateWindowsSize();
-
   void subscribe();
 
  signals:
@@ -36,13 +36,7 @@ class PerformersWidget : public QMainWindow {
   bool onInitDataBase();
   void onInitATable();
   bool onInsertIntoTable();
-  bool onHideThisColumn();
-  bool onShowAllColumn();
   int onDeleteRecords();
-
-  void onStretchLastSection(const bool checked);
-  void onResizeRowToContents(const bool checked);
-  void onResizeRowDefaultSectionSize();
 
   enum class DROP_OR_DELETE {
     DROP = 0,
@@ -56,7 +50,6 @@ class PerformersWidget : public QMainWindow {
 
   bool onLocateImageHost();
   bool onChangePerformerImageHeight();
-  bool onShowHideColumn();
 
   bool onSubmit();
 
@@ -70,23 +63,13 @@ class PerformersWidget : public QMainWindow {
   int onForceRefreshRecordsVids();
   bool onOpenRecordInFileSystem() const;
 
-  QTableView* m_performersListView;
+  PerformersTableView* m_performersListView;
   PerformersPreviewTextBrowser* m_introductionTextEdit;
-
-  QWidget* m_performerCentralWidget;
+  QDockWidget* performerPreviewDock;
   QSqlTableModel* m_perfsDBModel;
-
-  QMenu* m_performerTableMenu;
-  QMenu* m_verticalHeaderMenu;
-  QMenu* m_horizontalHeaderMenu;
 
   QString m_imageHostPath;
   int m_performerImageHeight;
-  int m_defaultTableRowCount;
-  QString m_columnsShowSwitch;
-  int m_horizontalHeaderSectionClicked = -1;
- private:
-  bool ShowOrHideColumnCore();
 };
 
 #endif  // PERFORMERSWIDGET_H
