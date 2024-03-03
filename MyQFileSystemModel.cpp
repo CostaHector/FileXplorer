@@ -81,9 +81,13 @@ void MyQFileSystemModel::whenRootPathChanged(const QString& newpath) {
   previewsCnt = 0;
   int logicalIndex =
       PreferenceSettings().value(MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.v).toInt();
+  if (logicalIndex < 0 or columnCount() <= logicalIndex) {
+    qInfo("Skip. column index[%d] out of table column range[0, %d)", logicalIndex, columnCount());
+    return;
+  }
   const QString& orderString(
       PreferenceSettings().value(MemoryKey::HEADVIEW_SORT_INDICATOR_ORDER.name, MemoryKey::HEADVIEW_SORT_INDICATOR_ORDER.v).toString());
-  qDebug() << "FileSystemModel start to sort";
+  qDebug() << "FileSystemModel start to sort index:" << logicalIndex << "order:" << orderString;
   if (HEADERVIEW_SORT_INDICATOR_ORDER::string2SortOrderEnumListTable.contains(orderString)) {
     sort(logicalIndex, HEADERVIEW_SORT_INDICATOR_ORDER::string2SortOrderEnumListTable[orderString]);
   }
