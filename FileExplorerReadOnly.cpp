@@ -8,9 +8,7 @@
 
 #include "Actions/ViewActions.h"
 #include "Component/FolderPreviewHTML.h"
-#include "Component/NavigationAndAddressBar.h"
 #include "PublicVariable.h"
-#include "Tools/ActionWithPath.h"
 
 const QString FileExplorerReadOnly::DEFAULT_PATH = "";
 

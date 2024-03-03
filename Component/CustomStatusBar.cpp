@@ -1,4 +1,6 @@
 #include "CustomStatusBar.h"
+#include "PublicVariable.h"
+
 CustomStatusBar::CustomStatusBar(QToolBar* views, QWidget* parent)
     : QStatusBar(parent),
       _views(views),

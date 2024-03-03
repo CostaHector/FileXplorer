@@ -22,70 +22,35 @@
 
 PerformersWidget::PerformersWidget(QWidget* parent)
     : QMainWindow{parent},
-      m_performersListView(new QTableView),
+      m_performersListView{new PerformersTableView(nullptr)},
       m_introductionTextEdit(new PerformersPreviewTextBrowser),
-      m_performerCentralWidget(new QWidget),
+      performerPreviewDock{new QDockWidget(tr("Overview"), this)},
       m_perfsDBModel(nullptr),
-      m_performerTableMenu(new QMenu(this)),
-      m_verticalHeaderMenu(new QMenu(this)),
-      m_horizontalHeaderMenu(new QMenu(this)),
       m_imageHostPath(
           PreferenceSettings().value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v).toString()),
       m_performerImageHeight(
-          PreferenceSettings().value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v).toInt()),
-      m_defaultTableRowCount(PreferenceSettings()
-                                 .value(MemoryKey::PERFORMER_TABLE_DEFAULT_SECTION_SIZE.name, MemoryKey::PERFORMER_TABLE_DEFAULT_SECTION_SIZE.v)
-                                 .toInt()),
-      m_columnsShowSwitch(
-          PreferenceSettings().value(MemoryKey::PERFORMER_COLUMN_SHOW_SWITCH.name, MemoryKey::PERFORMER_COLUMN_SHOW_SWITCH.v).toString()) {
-  setCentralWidget(m_performersListView);
-
-  auto* performerPreviewDoct = new QDockWidget("Overview", this);
-  performerPreviewDoct->setWidget(m_introductionTextEdit);
-  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, performerPreviewDoct);
-
-  setMenuBar(g_performersManagerActions().m_menuBar);
-  m_performerTableMenu->addAction(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS);
-  m_performerTableMenu->addSeparator();
-  m_performerTableMenu->addAction(g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM);
-  m_performerTableMenu->addSeparator();
-  m_performerTableMenu->addAction(g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE);
-  m_performerTableMenu->setToolTipsVisible(true);
-  m_verticalHeaderMenu->addActions(g_performersManagerActions().VERTICAL_HEADER_AGS->actions());
-  m_verticalHeaderMenu->setToolTipsVisible(true);
-  m_horizontalHeaderMenu->addActions(g_performersManagerActions().HORIZONTAL_HEADER_AGS->actions());
-  m_horizontalHeaderMenu->setToolTipsVisible(true);
-
+          PreferenceSettings().value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v).toInt()) {
   QSqlDatabase con = GetSqlDB();
   m_perfsDBModel = new RatingSqlTableModel(this, con);
   if (con.tables().contains(DB_TABLE::PERFORMERS)) {
     m_perfsDBModel->setTable(DB_TABLE::PERFORMERS);
+    m_perfsDBModel->submitAll();
   }
-  m_perfsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
-
   m_performersListView->setModel(m_perfsDBModel);
-  m_performersListView->setAlternatingRowColors(true);
-  m_performersListView->setSortingEnabled(true);
-  m_performersListView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-  m_performersListView->setDragDropMode(QAbstractItemView::NoDragDrop);
-  m_performersListView->setEditTriggers(QAbstractItemView::EditKeyPressed);
+  setCentralWidget(m_performersListView);
 
-  m_performersListView->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_performersListView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_performersListView->horizontalHeader()->setStretchLastSection(g_performersManagerActions().STRETCH_DETAIL_SECTION->isChecked());
-  m_performersListView->verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_performersListView->verticalHeader()->setDefaultSectionSize(m_defaultTableRowCount);
+  performerPreviewDock->setWidget(m_introductionTextEdit);
+  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, performerPreviewDock);
 
-  const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
-  QFont defaultFont(m_performersListView->font());
-  defaultFont.setPointSize(fontSize);
-  m_performersListView->setFont(defaultFont);
+  setMenuBar(g_performersManagerActions().GetMenuBar());
 
-  ShowOrHideColumnCore();
+  m_performersListView->InitTableView();
+
   subscribe();
+
+  updateWindowsSize();
   setWindowTitle("Performers Manager Widget");
   setWindowIcon(QIcon(":/themes/PERFORMERS_MANAGER"));
-  updateWindowsSize();
 }
 
 void PerformersWidget::subscribe() {
@@ -110,8 +75,6 @@ void PerformersWidget::subscribe() {
   connect(g_performersManagerActions().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT, &QAction::triggered, this,
           &PerformersWidget::onChangePerformerImageHeight);
 
-  connect(g_performersManagerActions().COLUMNS_VISIBILITY, &QAction::triggered, this, &PerformersWidget::onShowHideColumn);
-
   connect(g_performersManagerActions().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &PerformersWidget::onLoadFromFileSystemStructure);
   connect(g_performersManagerActions().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &PerformersWidget::onLoadFromPerformersList);
   connect(g_performersManagerActions().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &PerformersWidget::onLoadFromPJsonDirectory);
@@ -123,41 +86,22 @@ void PerformersWidget::subscribe() {
 
   connect(m_performersListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PerformersWidget::on_selectionChanged);
 
-  connect(m_performersListView, &QListView::customContextMenuRequested, this, [this](const QPoint pnt) {
-    m_performerTableMenu->popup(m_performersListView->mapToGlobal(pnt));  // or QCursor::pos()
-  });
-
-  connect(m_performersListView->verticalHeader(), &QHeaderView::customContextMenuRequested, this,
-          [this](const QPoint pnt) { m_verticalHeaderMenu->popup(m_performersListView->mapToGlobal(pnt)); });
-
-  connect(m_performersListView->horizontalHeader(), &QHeaderView::customContextMenuRequested, this, [this](const QPoint pnt) {
-    m_horizontalHeaderSectionClicked = m_performersListView->horizontalHeader()->logicalIndexAt(pnt);
-    m_horizontalHeaderMenu->popup(m_performersListView->mapToGlobal(pnt));
-  });
-
   connect(g_performersManagerActions().DELETE_RECORDS, &QAction::triggered, this, &PerformersWidget::onDeleteRecords);
-
-  connect(g_performersManagerActions().HIDE_THIS_COLUMN, &QAction::triggered, this, &PerformersWidget::onHideThisColumn);
-  connect(g_performersManagerActions().SHOW_ALL_COLUMNS, &QAction::triggered, this, &PerformersWidget::onShowAllColumn);
-
-  connect(g_performersManagerActions().STRETCH_DETAIL_SECTION, &QAction::triggered, this, &PerformersWidget::onStretchLastSection);
-  connect(g_performersManagerActions().RESIZE_ROWS_TO_CONTENT, &QAction::triggered, this, &PerformersWidget::onResizeRowToContents);
-  connect(g_performersManagerActions().RESIZE_ROWS_DEFAULT_SECTION_SIZE, &QAction::triggered, this, &PerformersWidget::onResizeRowDefaultSectionSize);
 
   connect(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshRecordsVids);
   connect(g_performersManagerActions().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshAllRecordsVids);
 }
 
 auto PerformersWidget::closeEvent(QCloseEvent* event) -> void {
-  PreferenceSettings().setValue("PerformersManagerWidgetGeometry", saveGeometry());
-  PreferenceSettings().setValue("PerformersManagerWidgetDockerWidth", m_performersListView->width());
-  PreferenceSettings().setValue("PerformersManagerWidgetDockerHeight", m_performersListView->height());
+  PreferenceSettings().setValue("PerformersWidgetGeometry", saveGeometry());
+  PreferenceSettings().setValue("PerformersWidgetDockerWidth", performerPreviewDock->width());
+  PreferenceSettings().setValue("PerformersWidgetDockerHeight", performerPreviewDock->height());
   QMainWindow::closeEvent(event);
 }
 
 void PerformersWidget::updateWindowsSize() {
-  if (PreferenceSettings().contains("PerformersManagerWidgetGeometry")) {
-    restoreGeometry(PreferenceSettings().value("PerformersManagerWidgetGeometry").toByteArray());
+  if (PreferenceSettings().contains("PerformersWidgetGeometry")) {
+    restoreGeometry(PreferenceSettings().value("PerformersWidgetGeometry").toByteArray());
   } else {
     setGeometry(QRect(0, 0, 1024, 768));
   }
@@ -425,36 +369,6 @@ bool PerformersWidget::onChangePerformerImageHeight() {
   return true;
 }
 
-bool PerformersWidget::ShowOrHideColumnCore() {
-  if (not m_performersListView) {
-    return false;
-  }
-  const int headColumnCntMin = std::min({m_perfsDBModel->columnCount(), PERFORMER_DB_HEADER_KEY::DB_HEADER.size()});
-  for (int c = 0; c < headColumnCntMin; ++c) {
-    m_performersListView->setColumnHidden(c, m_columnsShowSwitch[c] == '0');
-  }
-  PreferenceSettings().setValue(MemoryKey::PERFORMER_COLUMN_SHOW_SWITCH.name, m_columnsShowSwitch);
-  return true;
-}
-
-bool PerformersWidget::onShowHideColumn() {
-  bool ok = false;
-  const QString& showHideSwitchArray = QInputDialog::getText(
-      this, "Performer table column visibility(0:hide, 1:show)",
-      PERFORMER_DB_HEADER_KEY::DB_HEADER.join(',') + "\nExtra element will be dismissed simply", QLineEdit::Normal, m_columnsShowSwitch, &ok);
-  if (not ok) {
-    return false;
-  }
-  if (showHideSwitchArray.size() < PERFORMER_DB_HEADER_KEY::DB_HEADER.size()) {
-    QMessageBox::warning(this, "[Cancel] Columns count invalid",
-                         QString("Condition: length[%1] >= %2.").arg(showHideSwitchArray.size()).arg(PERFORMER_DB_HEADER_KEY::DB_HEADER.size()));
-    return false;
-  }
-  m_columnsShowSwitch = showHideSwitchArray;
-  ShowOrHideColumnCore();
-  return true;
-}
-
 inline bool PerformersWidget::onSubmit() {
   if (not m_perfsDBModel->isDirty()) {
     qDebug("No need to submit");
@@ -604,6 +518,9 @@ int PerformersWidget::onForceRefreshRecordsVids() {
     record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR));
     m_perfsDBModel->setRecord(r, record);  // update back
     vidsCnt += vidsList.size();
+    if (recordsCnt == 0){
+      m_introductionTextEdit->operator()(record, m_imageHostPath, m_performerImageHeight);
+    }
     ++recordsCnt;
   }
   qDebug("Selected %d record(s) updated %d vid(s).", recordsCnt, vidsCnt);
@@ -636,27 +553,6 @@ bool PerformersWidget::onOpenRecordInFileSystem() const {
   return QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 }
 
-bool PerformersWidget::onHideThisColumn() {
-  const int c = m_horizontalHeaderSectionClicked;
-  if (c < 0 or c >= m_columnsShowSwitch.size()) {
-    qDebug("No column selected. Select a column to hide");
-    QMessageBox::warning(this, "No column selected", "Select a column to hide");
-    return false;
-  }
-  if (m_columnsShowSwitch[c] == '0') {
-    qDebug("Column[%d] already hide. Select another column to hide", c);
-    QMessageBox::warning(this, QString("Column[%1] already hide").arg(c), "Select another column to hide");
-    return true;
-  }
-  m_columnsShowSwitch[c] = '0';
-  return ShowOrHideColumnCore();
-}
-
-bool PerformersWidget::onShowAllColumn() {
-  m_columnsShowSwitch.replace('0', '1');
-  return ShowOrHideColumnCore();
-}
-
 int PerformersWidget::onDeleteRecords() {
   if (not m_performersListView->selectionModel()->hasSelection()) {
     qDebug("Nothing was selected. Select some row(s) to delete");
@@ -678,32 +574,6 @@ int PerformersWidget::onDeleteRecords() {
   qDebug("delete records succeed: %d/%d.", succeedCnt, deleteCnt);
   QMessageBox::information(this, "delete records result", QString("%1/%2 succeed").arg(succeedCnt).arg(deleteCnt));
   return succeedCnt;
-}
-
-void PerformersWidget::onStretchLastSection(const bool checked) {
-  m_performersListView->horizontalHeader()->setStretchLastSection(checked);
-  PreferenceSettings().setValue(MemoryKey::PERFORMER_STRETCH_LAST_SECTION.name, checked);
-}
-
-void PerformersWidget::onResizeRowToContents(const bool checked) {
-  if (checked) {
-    m_performersListView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
-  } else {
-    m_performersListView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-    m_performersListView->verticalHeader()->setDefaultSectionSize(m_defaultTableRowCount);
-  }
-}
-
-void PerformersWidget::onResizeRowDefaultSectionSize() {
-  const int size = QInputDialog::getInt(this, "Resize Row Default Section size >=0 ", QString("default size:%1").arg(m_defaultTableRowCount),
-                                        m_defaultTableRowCount);
-  if (size < 0) {
-    qDebug("Cancel resize");
-    return;
-  }
-  m_defaultTableRowCount = size;
-  m_performersListView->verticalHeader()->setDefaultSectionSize(size);
-  PreferenceSettings().setValue(MemoryKey::PERFORMER_TABLE_DEFAULT_SECTION_SIZE.name, size);
 }
 
 // #define __NAME__EQ__MAIN__ 1

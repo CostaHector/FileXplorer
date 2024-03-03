@@ -30,8 +30,8 @@ class FileExplorerReadOnly : public QMainWindow {
 
   void keyPressEvent(QKeyEvent* ev){
     if (ev->key() == Qt::Key_F3){  // F3 Search
-      m_fsPanel->_addressBar->searchLE->setFocus();
-      m_fsPanel->_addressBar->searchLE->selectAll();
+      m_fsPanel->_addressBar->m_searchLE->setFocus();
+      m_fsPanel->_addressBar->m_searchLE->selectAll();
       return;
     }else if (ev->key() == Qt::Key_Escape){
       m_fsPanel->m_fsView->clearSelection();

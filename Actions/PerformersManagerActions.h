@@ -33,24 +33,19 @@ class PerformersManagerActions : public QObject {
   QAction* COLUMNS_VISIBILITY;
   QAction* CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT;
 
-  QAction* HIDE_THIS_COLUMN;
-  QAction* SHOW_ALL_COLUMNS;
-  QAction* STRETCH_DETAIL_SECTION;
   QActionGroup* HORIZONTAL_HEADER_AGS;
 
   QAction* DELETE_RECORDS;
-  QAction* RESIZE_ROWS_TO_CONTENT;
-  QAction* RESIZE_ROWS_DEFAULT_SECTION_SIZE;
   QActionGroup* VERTICAL_HEADER_AGS;
 
   QAction* SHOW_PERFORMER_MANAGER;
 
-  QMenuBar* m_menuBar;
-
- private:
   QMenuBar* GetMenuBar() const;
 
-  void InitActionsTooltips();
+  QMenu* GetRightClickMenu() const;
+
+  QActionGroup* GetVerAGS() const;
+  QActionGroup* GetHorAGS() const;
 };
 
 PerformersManagerActions& g_performersManagerActions();

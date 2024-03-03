@@ -8,7 +8,7 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
       REFRESH_SELECTED_RECORDS_VIDS(new QAction(tr("Refresh selected record(s) vid"), this)),
       OPEN_RECORD_IN_FILE_SYSTEM(new QAction(tr("Open record"), this)),
       LOAD_FROM_PJSON_PATH(new QAction(tr("Load from pjson"), this)),
-      LOAD_FROM_FILE_SYSTEM_STRUCTURE(new QAction(tr("Load from file-system structure"), this)),
+      LOAD_FROM_FILE_SYSTEM_STRUCTURE(new QAction(QIcon(":/themes/FOLDER_OPEN"), tr("Load from file-system structure"), this)),
       LOAD_FROM_PERFORMERS_LIST(new QAction(tr("Load from performers list"), this)),
       DUMP_ALL_RECORDS_INTO_PJSON_FILE(new QAction(tr("Dump all record(s)=>.pjson"), this)),
       DUMP_SELECTED_RECORDS_INTO_PJSON_FILE(new QAction(tr("Dump selected record(s)=>.pjson"), this)),
@@ -19,27 +19,17 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
       INSERT_INTO_TABLE(new QAction(QString("insert into table [%1]").arg(DB_TABLE::PERFORMERS), this)),
       DELETE_TABLE(new QAction(tr("Delete table(complete data)"), this)),
       DROP_TABLE(new QAction(tr("Drop table(complete table))"), this)),
-      SUBMIT(new QAction(tr("Submit"), this)),
+      SUBMIT(new QAction(QIcon(":/themes/SUBMIT"), tr("Submit"), this)),
 
       COLUMNS_VISIBILITY(new QAction(tr("Performer table column visibility"), this)),
       CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT(new QAction(tr("Change performer image fixed height(px)"), this)),
 
-      HIDE_THIS_COLUMN(new QAction(tr("hide this column"), this)),
-      SHOW_ALL_COLUMNS(new QAction(tr("show all columns"), this)),
-      STRETCH_DETAIL_SECTION(new QAction(tr("stretch last column"), this)),
       HORIZONTAL_HEADER_AGS(new QActionGroup(this)),
 
       DELETE_RECORDS(new QAction(tr("delete record(s)"), this)),
-      RESIZE_ROWS_TO_CONTENT(new QAction(tr("resize rows to content"), this)),
-      RESIZE_ROWS_DEFAULT_SECTION_SIZE(new QAction(tr("adjust default rows section size"), this)),
       VERTICAL_HEADER_AGS(new QActionGroup(this)),
 
-      SHOW_PERFORMER_MANAGER(new QAction(QIcon(":/themes/PERFORMERS_MANAGER"), tr("Perfs"), this)),
-      m_menuBar(GetMenuBar()) {
-  InitActionsTooltips();
-}
-
-void PerformersManagerActions::InitActionsTooltips() {
+      SHOW_PERFORMER_MANAGER(new QAction(QIcon(":/themes/PERFORMERS_MANAGER"), tr("Perfs"), this)) {
   LOAD_FROM_PJSON_PATH->setToolTip(
       QString("<b>%1 (%2)</b><br/> Load *.pjson from ImageHost.<br/>Update each column value by new one if primary key conflicts.")
           .arg(LOAD_FROM_PJSON_PATH->text(), LOAD_FROM_PJSON_PATH->shortcut().toString()));
@@ -54,11 +44,6 @@ void PerformersManagerActions::InitActionsTooltips() {
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
   SUBMIT->setShortcutVisibleInContextMenu(true);
 
-  RESIZE_ROWS_TO_CONTENT->setCheckable(true);
-  RESIZE_ROWS_TO_CONTENT->setChecked(false);
-  RESIZE_ROWS_TO_CONTENT->setToolTip(QString("<b>%1 (%2)</b><br/> Resize row to content when enabled. row height interactive when disabled")
-                                         .arg(RESIZE_ROWS_TO_CONTENT->text(), RESIZE_ROWS_TO_CONTENT->shortcut().toString()));
-
   SHOW_PERFORMER_MANAGER->setCheckable(true);
   SHOW_PERFORMER_MANAGER->setChecked(
       PreferenceSettings().value(MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.name, MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.v).toBool());
@@ -67,17 +52,9 @@ void PerformersManagerActions::InitActionsTooltips() {
       QString::number(PreferenceSettings().value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v).toInt());
   CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT->setToolTip(heightStr);
 
-  STRETCH_DETAIL_SECTION->setCheckable(true);
-  STRETCH_DETAIL_SECTION->setChecked(
-      PreferenceSettings().value(MemoryKey::PERFORMER_STRETCH_LAST_SECTION.name, MemoryKey::PERFORMER_STRETCH_LAST_SECTION.v).toBool());
-  HORIZONTAL_HEADER_AGS->addAction(HIDE_THIS_COLUMN);
-  HORIZONTAL_HEADER_AGS->addAction(SHOW_ALL_COLUMNS);
-  HORIZONTAL_HEADER_AGS->addAction(STRETCH_DETAIL_SECTION);
   HORIZONTAL_HEADER_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   VERTICAL_HEADER_AGS->addAction(DELETE_RECORDS);
-  VERTICAL_HEADER_AGS->addAction(RESIZE_ROWS_TO_CONTENT);
-  VERTICAL_HEADER_AGS->addAction(RESIZE_ROWS_DEFAULT_SECTION_SIZE);
   VERTICAL_HEADER_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 }
 
@@ -103,10 +80,6 @@ QMenuBar* PerformersManagerActions::GetMenuBar() const {
   editMenu->setToolTipsVisible(true);
 
   auto* viewMenu = new QMenu(tr("View"));
-  viewMenu->addActions({COLUMNS_VISIBILITY, SHOW_ALL_COLUMNS});
-  viewMenu->addSeparator();
-  viewMenu->addActions({STRETCH_DETAIL_SECTION, RESIZE_ROWS_TO_CONTENT, RESIZE_ROWS_DEFAULT_SECTION_SIZE});
-  viewMenu->addSeparator();
   viewMenu->addActions({CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT});
   viewMenu->setToolTipsVisible(true);
 
@@ -115,6 +88,24 @@ QMenuBar* PerformersManagerActions::GetMenuBar() const {
   m_menuBar->addMenu(editMenu);
   m_menuBar->addMenu(viewMenu);
   return m_menuBar;
+}
+
+QMenu* PerformersManagerActions::GetRightClickMenu() const {
+  auto* m_performerTableMenu = new QMenu(tr("performer table right click menu"));
+  m_performerTableMenu->addAction(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS);
+  m_performerTableMenu->addSeparator();
+  m_performerTableMenu->addAction(g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM);
+  m_performerTableMenu->addSeparator();
+  m_performerTableMenu->addAction(g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE);
+  m_performerTableMenu->setToolTipsVisible(true);
+  return m_performerTableMenu;
+}
+
+QActionGroup* PerformersManagerActions::GetVerAGS() const{
+  return g_performersManagerActions().VERTICAL_HEADER_AGS;
+}
+QActionGroup* PerformersManagerActions::GetHorAGS() const{
+  return g_performersManagerActions().HORIZONTAL_HEADER_AGS;
 }
 
 PerformersManagerActions& g_performersManagerActions() {

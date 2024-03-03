@@ -1,6 +1,7 @@
 #include "MyQFileSystemModel.h"
 #include "Tools/PathTool.h"
 
+#include <QDebug>
 #include <QFileIconProvider>
 #include <QMimeData>
 #include <QUrl>
@@ -10,9 +11,7 @@ constexpr int MyQFileSystemModel::cacheWidth;
 constexpr int MyQFileSystemModel::cacheHeight;
 constexpr int MyQFileSystemModel::IMAGES_COUNT_LOAD_ONCE_MAX;
 
-MyQFileSystemModel::MyQFileSystemModel(QObject* parent)
-    : QFileSystemModel(parent), _logger(nullptr), m_imagesSizeLoaded(0) {
-  setRootPath("");  // C and D Disk
+MyQFileSystemModel::MyQFileSystemModel(QObject* parent) : QFileSystemModel(parent), _logger(nullptr), m_imagesSizeLoaded(0) {
   setFilter(QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot);
 
   setReadOnly(true);
@@ -23,8 +22,8 @@ MyQFileSystemModel::MyQFileSystemModel(QObject* parent)
   connect(this, &MyQFileSystemModel::directoryLoaded, this, &MyQFileSystemModel::whenDirectoryLoaded);
 }
 
-void MyQFileSystemModel::BindLogger(CustomStatusBar* logger){
-  if (logger == nullptr){
+void MyQFileSystemModel::BindLogger(CustomStatusBar* logger) {
+  if (logger == nullptr) {
     qWarning("Bind logger failed. nullptr passed here");
     return;
   }
@@ -81,9 +80,14 @@ Qt::DropActions MyQFileSystemModel::supportedDragActions() const {
 void MyQFileSystemModel::whenRootPathChanged(const QString& newpath) {
   previewsCnt = 0;
   int logicalIndex =
-      PreferenceSettings().value(MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, MemoryKey::HEARVIEW_SORT_INDICATOR_LOGICAL_INDEX.v).toInt();
+      PreferenceSettings().value(MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.v).toInt();
+  if (logicalIndex < 0 or columnCount() <= logicalIndex) {
+    qInfo("Skip. column index[%d] out of table column range[0, %d)", logicalIndex, columnCount());
+    return;
+  }
   const QString& orderString(
-      PreferenceSettings().value(MemoryKey::HEARVIEW_SORT_INDICATOR_ORDER.name, MemoryKey::HEARVIEW_SORT_INDICATOR_ORDER.v).toString());
+      PreferenceSettings().value(MemoryKey::HEADVIEW_SORT_INDICATOR_ORDER.name, MemoryKey::HEADVIEW_SORT_INDICATOR_ORDER.v).toString());
+  qDebug() << "FileSystemModel start to sort index:" << logicalIndex << "order:" << orderString;
   if (HEADERVIEW_SORT_INDICATOR_ORDER::string2SortOrderEnumListTable.contains(orderString)) {
     sort(logicalIndex, HEADERVIEW_SORT_INDICATOR_ORDER::string2SortOrderEnumListTable[orderString]);
   }
