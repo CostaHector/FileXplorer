@@ -56,9 +56,7 @@ class ContentPanel : public QStackedWidget {
     QStackedWidget::keyPressEvent(e);
   }
 
-  inline QAbstractItemView* GetView() const {
-    return dynamic_cast<QAbstractItemView*>(currentWidget());
-  }
+  inline QAbstractItemView* GetView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
 
   int AddView(const QString& name, QWidget* w) {
     m_name2ViewIndex[name] = addWidget(w);

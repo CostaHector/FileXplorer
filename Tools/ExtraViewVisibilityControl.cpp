@@ -3,7 +3,7 @@
 #include "Actions/TorrentsManagerActions.h"
 
 #include "Component/PerformersWidget.h"
-#include "Component/TorrentsManagerWidget.h"
+#include "View/TorrentsManagerWidget.h"
 #include "PublicVariable.h"
 
 #include <QAbstractItemView>

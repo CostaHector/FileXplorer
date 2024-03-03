@@ -5,22 +5,40 @@
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)
     : QToolBar(title, parent),
-      _addressLine(new AddressELineEdit),
-      searchLE(new QLineEdit),
+      m_addressLine(new AddressELineEdit{this}),
+      m_searchLE(new QLineEdit{this}),
+      m_itemTypeMenu{new QMenu(tr("Filter"), this)},
+      m_fsFilter{new QToolButton{this}},
       m_IntoNewPath(nullptr),
       m_on_searchTextChanged(nullptr),
       m_on_searchEnterKey(nullptr) {
-  _addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+  m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+  m_addressLine->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
-  searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
-  searchLE->setClearButtonEnabled(true);
-  searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  m_searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+  m_searchLE->setClearButtonEnabled(true);
+  m_searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  m_searchLE->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
+
+  m_itemTypeMenu->addActions({_FILE, _FOLDER, _HIDDEN, _DOTDOT});
+  m_itemTypeMenu->addSeparator();
+  m_itemTypeMenu->addActions({_IMAGES, _VIDEOS, _PLAIN_TEXT});
+  m_itemTypeMenu->addSeparator();
+  m_itemTypeMenu->addActions({_DOCUMENT, _EXE});
+
+  m_fsFilter->setIcon(QIcon(":/themes/FILE_SYSTEM_FILTER"));
+  m_fsFilter->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
+  m_fsFilter->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
+  m_fsFilter->setMenu(m_itemTypeMenu);
+  m_fsFilter->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
-  addWidget(_addressLine);
+  addWidget(m_addressLine);
   addSeparator();
-  addWidget(searchLE);
+  addWidget(m_fsFilter);
+  addSeparator();
+  addWidget(m_searchLE);
 
   setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   layout()->setSpacing(0);
@@ -41,27 +59,27 @@ auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {
   connect(g_addressBarActions()._FORWARD_TO, &QAction::triggered, this, &NavigationAndAddressBar::onForward);
   connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onUpTo);
 
-  connect(searchLE, &QLineEdit::textChanged, this, [this]() -> void {
+  connect(m_searchLE, &QLineEdit::textChanged, this, [this]() -> void {
     if (m_on_searchTextChanged)
-      m_on_searchTextChanged(searchLE->text());
+      m_on_searchTextChanged(m_searchLE->text());
   });
-  connect(searchLE, &QLineEdit::returnPressed, this, [this]() -> void {
+  connect(m_searchLE, &QLineEdit::returnPressed, this, [this]() -> void {
     if (m_on_searchEnterKey)
-      m_on_searchEnterKey(searchLE->text());
+      m_on_searchEnterKey(m_searchLE->text());
   });
 }
 
 auto NavigationAndAddressBar::onBackward() -> bool {
-  if (m_IntoNewPath and pathRD.undoAvailable()) {
-    return m_IntoNewPath(pathRD.undo(), false, false);
+  if (m_IntoNewPath and m_pathRD.undoAvailable()) {
+    return m_IntoNewPath(m_pathRD.undo(), false, false);
   }
   qDebug("[Skip] backward paths pool empty");
   return true;
 }
 
 auto NavigationAndAddressBar::onForward() -> bool {
-  if (m_IntoNewPath and pathRD.redoAvailable()) {
-    return m_IntoNewPath(pathRD.redo(), false, false);
+  if (m_IntoNewPath and m_pathRD.redoAvailable()) {
+    return m_IntoNewPath(m_pathRD.redo(), false, false);
   }
   qDebug("[Skip] Forward paths pool empty");
   return true;
@@ -69,7 +87,7 @@ auto NavigationAndAddressBar::onForward() -> bool {
 
 auto NavigationAndAddressBar::onUpTo() -> bool {
   if (m_IntoNewPath) {
-    return m_IntoNewPath(_addressLine->dirname(), true, false);
+    return m_IntoNewPath(m_addressLine->dirname(), true, false);
   }
 }
 

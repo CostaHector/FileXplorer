@@ -4,6 +4,7 @@
 #include <QFileIconProvider>
 #include <QMimeData>
 #include <QUrl>
+#include <QDebug>
 
 int MyQFileSystemModel::previewsCnt = 0;
 constexpr int MyQFileSystemModel::cacheWidth;

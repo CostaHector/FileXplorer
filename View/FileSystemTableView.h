@@ -2,6 +2,7 @@
 #define FILESYSTEMTABLEVIEW_H
 
 #include "MyQFileSystemModel.h"
+#include "CustomTableView.h"
 
 #include <QTableView>
 #include <QPushButton>
@@ -14,13 +15,11 @@
 #include <QDragMoveEvent>
 #include <QMenu>
 
-class FileSystemTableView : public QTableView {
+class FileSystemTableView : public CustomTableView {
  public:
-  FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu);
+  FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu, QWidget* parent=nullptr);
 
   void subscribe();
-  auto InitViewSettings() -> void;
-  auto UpdateItemViewFontSize() -> void;
 
   void dropEvent(QDropEvent* event) override;
 
@@ -36,12 +35,7 @@ class FileSystemTableView : public QTableView {
 
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
-  void contextMenuEvent(QContextMenuEvent *event) override{
-    _menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
-  }
-
  private:
-  QMenu* _menu;
   QPushButton* backwardBtn;  // will not takeover
   QPushButton* forwardBtn;   // will not takeover
 };

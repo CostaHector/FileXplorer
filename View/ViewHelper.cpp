@@ -1,9 +1,8 @@
 #include "ViewHelper.h"
+#include "Component/RenameConflicts.h"
+#include "MyQFileSystemModel.h"
 
 #include <QFileIconProvider>
-
-#include "Component/RenameConflicts.h"
-
 bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to) {
   const unsigned URLS_SIZE = data->urls().size();
   if (URLS_SIZE == 0) {

@@ -76,8 +76,8 @@ void PerformersPreviewTextBrowser::subscribe() {
 }
 
 QSize PerformersPreviewTextBrowser::sizeHint() const {
-  auto w = PreferenceSettings().value("PerformersManagerWidgetDockerWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
-  auto h = PreferenceSettings().value("PerformersManagerWidgetDockerlHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
+  auto w = PreferenceSettings().value("PerformersWidgetDockerWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
+  auto h = PreferenceSettings().value("PerformersWidgetDockerHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
   return QSize(w, h);
 }
 
