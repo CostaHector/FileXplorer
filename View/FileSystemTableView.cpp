@@ -8,6 +8,7 @@
 #include "Actions/ViewActions.h"
 
 FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu, QWidget* parent) : CustomTableView("FILE_SYSTEM", parent) {
+  BindMenu(menu);
   setModel(fsmModel);
 
   setDragDropMode(QAbstractItemView::DragDrop);
