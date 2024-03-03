@@ -26,7 +26,6 @@ DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSql
   setModel(_dbModel);
 
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
-  setSortingEnabled(true);
 
   InitMoviesTables();
   const QString defaultTableName = PreferenceSettings().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString();
@@ -36,8 +35,8 @@ DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSql
   }
   setCurrentMovieTable(_tables->currentText());
 
-  InitTableView();
   subscribe();
+  InitTableView();
 }
 
 void DatabaseTableView::subscribe() {
