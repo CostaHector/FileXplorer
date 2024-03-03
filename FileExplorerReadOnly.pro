@@ -43,7 +43,7 @@ SOURCES += \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
-    Component/TorrentsManagerWidget.cpp \
+    View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
     Component/DatabaseSearchToolBar.cpp \
@@ -80,6 +80,7 @@ SOURCES += \
     Tools/VideoPlayerWatcher.cpp \
     Tools/ViewSelection.cpp \
     UndoRedo.cpp \
+    View/CustomTableView.cpp \
     View/DatabaseTableView.cpp \
     FileExplorerEvent.cpp \
     FolderPreviewComponent/FolderListView.cpp \
@@ -100,6 +101,7 @@ SOURCES += \
     View/FileSystemListView.cpp \
     View/FileSystemTableView.cpp \
     View/FileSystemTreeView.cpp \
+    View/PerformersTableView.cpp \
     View/SearchItemTableView.cpp \
     View/ViewHelper.cpp \
     View/ViewStyleSheet.cpp \
@@ -143,7 +145,7 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
-    Component/TorrentsManagerWidget.h \
+    View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
     Component/DatabaseSearchToolBar.h \
@@ -180,6 +182,7 @@ HEADERS += \
     Tools/VideoPlayerWatcher.h \
     Tools/ViewSelection.h \
     UndoRedo.h \
+    View/CustomTableView.h \
     View/DatabaseTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
@@ -201,6 +204,7 @@ HEADERS += \
     View/FileSystemListView.h \
     View/FileSystemTableView.h \
     View/FileSystemTreeView.h \
+    View/PerformersTableView.h \
     View/SearchItemTableView.h \
     View/ViewHelper.h \
     View/ViewStyleSheet.h

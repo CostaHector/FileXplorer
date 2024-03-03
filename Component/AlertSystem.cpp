@@ -83,7 +83,7 @@ AlertSystem::AlertSystem(QWidget* parent)
   m_alertsTable->setItem(r, NUMBER_INDEX, new QTableWidgetItem(QString::number(r)));
   m_alertsTable->setItem(r, NAME_INDEX, new QTableWidgetItem(fileKey.name));
   m_alertsTable->setItem(r, VALUE_INDEX, new QTableWidgetItem(iconProvider.icon(QFileInfo(fileVal)), fileVal));
-  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in reveal in terminal."));
+  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Reveal in terminal (Windows)."));
   ++r;
   m_alertsTable->insertRow(r);
   auto folderKey = MemoryKey::WIN32_RUNLOG;
@@ -92,6 +92,14 @@ AlertSystem::AlertSystem(QWidget* parent)
   m_alertsTable->setItem(r, NAME_INDEX, new QTableWidgetItem(folderKey.name));
   m_alertsTable->setItem(r, VALUE_INDEX, new QTableWidgetItem(iconProvider.icon(QFileInfo(fileVal)), fileVal));
   m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in log records when some file operation failed."));
+  ++r;
+  m_alertsTable->insertRow(r);
+  folderKey = MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE;
+  fileVal = PreferenceSettings().value(folderKey.name, folderKey.v).toString();
+  m_alertsTable->setItem(r, NUMBER_INDEX, new QTableWidgetItem(QString::number(r)));
+  m_alertsTable->setItem(r, NAME_INDEX, new QTableWidgetItem(folderKey.name));
+  m_alertsTable->setItem(r, VALUE_INDEX, new QTableWidgetItem(iconProvider.icon(QFileInfo(fileVal)), fileVal));
+  m_alertsTable->setItem(r, NOTE_INDEX, new QTableWidgetItem("Used in Performers Widget"));
   ++r;
 #else
   m_alertsTable->insertRow(r);
@@ -174,6 +182,8 @@ bool AlertSystem::isRowItemPass(const int row) const {
     isPass = MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.checker(keyValue);
   } else if (keyName == MemoryKey::WIN32_RUNLOG.name) {
     isPass = MemoryKey::WIN32_RUNLOG.checker(keyValue);
+  } else if (keyName == MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name) {
+    isPass = MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.checker(keyValue);
   }
 #else
   if (keyName == MemoryKey::LINUX_PERFORMERS_TABLE.name) {

@@ -1,25 +1,22 @@
 #ifndef DATABASETABLEVIEW_H
 #define DATABASETABLEVIEW_H
 
-#include "Component/DBRightClickMenu.h"
-#include "Component/QuickWhereClause.h"
 #include "Component/DatabaseSearchToolBar.h"
+#include "Component/QuickWhereClause.h"
 #include "MyQSqlTableModel.h"
+#include "View/CustomTableView.h"
 
 #include <QComboBox>
 #include <QInputDialog>
 #include <QKeyEvent>
+#include <QLayout>
 #include <QMessageBox>
 #include <QTableView>
-#include <QLayout>
 
-
-class DatabaseTableView : public QTableView {
+class DatabaseTableView : public CustomTableView {
  public:
-  DatabaseTableView(DatabaseSearchToolBar* dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent=nullptr);
+  DatabaseTableView(DatabaseSearchToolBar* dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent = nullptr);
 
-  auto InitViewSettings() -> void;
-  auto UpdateItemViewFontSize() -> void;
   void subscribe();
   auto on_cellDoubleClicked(QModelIndex clickedIndex) -> bool;
   auto on_PlayVideo() const -> bool;
@@ -32,20 +29,10 @@ class DatabaseTableView : public QTableView {
     QTableView::keyPressEvent(e);
   }
 
-  void on_ShowContextMenu(const QPoint pnt) {
-    m_vidsDBMenu->popup(this->mapToGlobal(pnt));  // or QCursor::pos()
-  }
-
   bool onSearchDataBase(const QString& searchText) {
     _dbModel->setFilter(searchText);
     return true;
   }
-
-  bool ShowOrHideColumnCore();
-  bool onHideThisColumn();
-  bool onShowAllColumn();
-  void onStretchLastSection(const bool checked);
-
 
   bool InitMoviesTables();
   bool setCurrentMovieTable(const QString& movieTableName);
@@ -62,26 +49,13 @@ class DatabaseTableView : public QTableView {
 
   bool onInsertIntoTable();
 
-  void onSelectBatch(const QAction* act);
-
-
   void onQuickWhereClause();
 
   int onCountRow();
 
-
   MyQSqlTableModel* _dbModel;
 
  private:
-  DBRightClickMenu* m_vidsDBMenu;
-
-  QAction* SHOW_ALL_COLUMNS;
-  QAction* HIDE_THIS_COLUMN;
-  QAction* STRETCH_DETAIL_SECTION;
-  QMenu* m_horizontalHeaderMenu;
-  int m_horizontalHeaderSectionClicked = -1;
-  QString m_columnsShowSwitch;
-
   DatabaseSearchToolBar* _dbSearchBar;
   QComboBox* _tables;
   QLineEdit* _searchLE;

@@ -21,7 +21,6 @@ class FocusEventWatch : public QObject {
   Q_OBJECT
  public:
   explicit FocusEventWatch(QObject* parent = nullptr);
-
   bool eventFilter(QObject* watched, QEvent* event) override;
 
  signals:

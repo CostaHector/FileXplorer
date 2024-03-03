@@ -8,7 +8,6 @@
 #include <QPushButton>
 
 #include "Actions/AddressBarActions.h"
-#include "MyQFileSystemModel.h"
 #include "PublicVariable.h"
 
 #include <QDrag>
