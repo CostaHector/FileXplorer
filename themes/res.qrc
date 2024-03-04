@@ -41,7 +41,9 @@
         <file alias="FILE">FILTER_TYPE/FILE.svg</file>
         <file alias="FOLDER">FILTER_TYPE/FOLDER.png</file>
         <file alias="HIDDEN">FILTER_TYPE/HIDDEN.png</file>
-        <file alias="DOT_DOT">FILTER_TYPE/DOT_DOT.svg</file>
+        <file alias="NO_DOT">FILTER_TYPE/NO_DOT.svg</file>
+        <file alias="NO_DOT_DOT">FILTER_TYPE/NO_DOT_DOT.svg</file>
+        <file alias="CASE_SENSITIVE">FILTER_TYPE/CASE_SENSITIVE.svg</file>
         <file alias="IMAGE">FILTER_TYPE/IMAGE.png</file>
         <file alias="PLAIN_TEXT">FILTER_TYPE/PLAIN_TEXT.ico</file>
         <file alias="VIDEO">FILTER_TYPE/VIDEO.png</file>
