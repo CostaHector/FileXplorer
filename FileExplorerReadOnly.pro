@@ -43,6 +43,7 @@ SOURCES += \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
+    Component/ToolButtonFileSystemTypeFilter.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -145,6 +146,7 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    Component/ToolButtonFileSystemTypeFilter.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \

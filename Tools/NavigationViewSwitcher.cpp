@@ -19,8 +19,8 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
       auto F_IntoNewPath = std::bind(&ContentPanel::onActionAndViewNavigate, _view, _1, _2, _3);
-      _navigation->m_addressBar->subscribe(F_IntoNewPath, std::bind(&ContentPanel::on_searchTextChanged, _view, _1),
-                                           std::bind(&ContentPanel::on_searchEnterKey, _view, _1));
+      _navigation->m_addressBar->BindFileSystemViewCallback(F_IntoNewPath, std::bind(&ContentPanel::on_searchTextChanged, _view, _1),
+                                           std::bind(&ContentPanel::on_searchEnterKey, _view, _1), _view->m_fsModel);
       ActionWithPath::BindIntoNewPath(F_IntoNewPath);
     }
     naviIndex = _navigation->m_name2StackIndex["NavigationAddress"];
