@@ -2,11 +2,15 @@
 #define CONTENTPANEL_H
 
 #include <QStackedWidget>
+#include "Component/AdvanceSearchToolBar.h"
 #include "Component/CustomStatusBar.h"
 #include "Component/FolderPreviewHTML.h"
 #include "Component/FolderPreviewWidget.h"
 #include "Component/NavigationAndAddressBar.h"
+
 #include "MyQFileSystemModel.h"
+
+#include "View/AdvanceSearchWindow.h"
 #include "View/DatabaseTableView.h"
 #include "View/FileSystemListView.h"
 #include "View/FileSystemTableView.h"
@@ -37,6 +41,7 @@ class ContentPanel : public QStackedWidget {
   auto subscribe() -> void;
   void BindNavigationAddressBar(NavigationAndAddressBar* addressBar);
   void BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar);
+  void BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar);
   void BindCustomStatusBar(CustomStatusBar* logger);
 
   auto on_cellDoubleClicked(QModelIndex clickedIndex) -> bool;
@@ -72,16 +77,20 @@ class ContentPanel : public QStackedWidget {
 
   NavigationAndAddressBar* _addressBar;
   DatabaseSearchToolBar* _dbSearchBar;
+  AdvanceSearchToolBar* _advanceSearchBar;
 
   MyQFileSystemModel* m_fsModel;
   MyQSqlTableModel* m_dbModel;
+  MySearchModel* m_srcModel;
+  SearchProxyModel* m_proxyModel;
+
   QMenu* m_menu;
 
-  FileSystemTableView* m_fsView;
-  FileSystemListView* m_fsListView;
-  FileSystemTreeView* m_fsTreeView;
-
-  DatabaseTableView* m_dbPanel;
+  FileSystemTableView* m_fsView{nullptr};
+  FileSystemListView* m_fsListView{nullptr};
+  FileSystemTreeView* m_fsTreeView{nullptr};
+  DatabaseTableView* m_dbPanel{nullptr};
+  AdvanceSearchTableView* m_advanceSearchView{nullptr};
 
   FolderPreviewHTML* previewHtml;
   FolderPreviewWidget* previewWidget;

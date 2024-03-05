@@ -50,7 +50,7 @@ bool SearchItemModel::ChangeRootPathOrFilter(const QString& rootPath,
 
   setRowCount(0);
   auto showTable = [this]() {
-    for (const FileProperty& fp : indexData_[m_Key]) {
+    for (const FilePropertyTemp& fp : indexData_[m_Key]) {
       appendRow({new QStandardItem(fp.name), new QStandardItem(QString::number(fp.size)), new QStandardItem(fp.type),
                  new QStandardItem(QString::number(fp.createdTime)), new QStandardItem(fp.relPath)});
     }
@@ -66,7 +66,7 @@ bool SearchItemModel::ChangeRootPathOrFilter(const QString& rootPath,
   }
   if (indexData_.contains(m_Key)) {
     qDebug("Met Key: %s", qPrintable(m_Key));
-    QList<FileProperty> tempListForRelease;
+    QList<FilePropertyTemp> tempListForRelease;
     const int beforeItemsCount = indexData_[m_Key].size();
     tempListForRelease.reserve(beforeItemsCount);
     indexData_[m_Key].swap(tempListForRelease);
@@ -81,7 +81,7 @@ bool SearchItemModel::ChangeRootPathOrFilter(const QString& rootPath,
     it.next();
     const QFileInfo& fi = it.fileInfo();
     const QString& relPath = fi.absoluteFilePath().mid(PRE_PATH_LEN + 1);
-    FileProperty fp;
+    FilePropertyTemp fp;
     strncpy(fp.name, fi.fileName().toStdString().c_str(), sizeof(fp.name));
     fp.size = fi.size();
     strncpy(fp.type, fi.suffix().toStdString().c_str(), sizeof(fp.name));
@@ -113,7 +113,7 @@ QVariant SearchItemModel::data(const QModelIndex& index, int role) const {
     return {};
   }
   const int r = index.row(), c = index.column();
-  const FileProperty& filePro = indexData_[m_Key][r];
+  const FilePropertyTemp& filePro = indexData_[m_Key][r];
   switch (c) {
     case 0:
       return filePro.name;

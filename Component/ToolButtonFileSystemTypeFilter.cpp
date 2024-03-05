@@ -44,42 +44,58 @@ ToolButtonFileSystemTypeFilter::ToolButtonFileSystemTypeFilter(QWidget* parent)
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 }
 
-void ToolButtonFileSystemTypeFilter::BindFileSystemModel(QFileSystemModel* fsm) {
+void ToolButtonFileSystemTypeFilter::BindFileSystemModel(QAbstractItemModel* newModel) {
   if (_model != nullptr) {
-    qWarning("skip. model already not nullptr. don't rebind");
+    qWarning("skip. model is already not nullptr. don't rebind");
     return;
   }
-  _model = fsm;
-  if (FILTER_SWITCH->isChecked()) {
-    _model->setFilter(m_flagWhenFilterEnabled);
-  } else {
-    _model->setFilter(DEFAULT_FILTER_FLAG);
+  if (newModel == nullptr) {
+    qWarning("skip. don't try to bind a nullptr");
+    return;
   }
-  _model->setNameFilterDisables(GRAY_IF_FILTERED->isChecked());
+  _model = _fsmModel = dynamic_cast<QFileSystemModel*>(newModel);
+  if (_fsmModel != nullptr) {
+    m_modelType = MODEL_TYPE::FILE_SYSTEM_MODEL;
+  } else {
+    _model = _searchModel = dynamic_cast<MySearchModel*>(newModel);
+    if (_searchModel != nullptr) {
+      m_modelType = MODEL_TYPE::SEARCH_MODEL;
+    } else {
+      qDebug("BindFileSystemModel failed. _model cannot converted QFileSystemModel* or MySearchModel*");
+      return;
+    }
+  }
+  if (FILTER_SWITCH->isChecked()) {
+    setFilterAgent(m_flagWhenFilterEnabled);
+  } else {
+    setFilterAgent(DEFAULT_FILTER_FLAG);
+  }
+  setNameFilterDisablesAgent(GRAY_IF_FILTERED->isChecked());
   connect(fileTypeFilterMenu, &QMenu::triggered, this, &ToolButtonFileSystemTypeFilter::onTypeChecked);
   connect(FILTER_SWITCH, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::onSwitchChanged);
   connect(GRAY_IF_FILTERED, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::onGrayOrHideChanged);
 }
 
-void ToolButtonFileSystemTypeFilter::onSwitchChanged(bool isOn){
+void ToolButtonFileSystemTypeFilter::onSwitchChanged(bool isOn) {
   PreferenceSettings().setValue("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", isOn);
-  if (_model == nullptr){
+  if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
   }
   if (not isOn) {
-    m_flagWhenFilterEnabled = _model->filter();
-    _model->setFilter(DEFAULT_FILTER_FLAG);
+    m_flagWhenFilterEnabled = filterAgent();
+    setFilterAgent(DEFAULT_FILTER_FLAG);
   } else {  // recover last flag
-    _model->setFilter(m_flagWhenFilterEnabled);
+    setFilterAgent(m_flagWhenFilterEnabled);
   }
   qDebug() << "Save switch on: " << isOn << ". Keep flags:" << m_flagWhenFilterEnabled;
 }
 
-void ToolButtonFileSystemTypeFilter::onGrayOrHideChanged(bool isGray){
+void ToolButtonFileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
   PreferenceSettings().setValue("FILE_SYSTEM_GRAY_IF_FILTERED", isGray);
-  if (_model != nullptr) {
-    _model->setNameFilterDisables(isGray);
+  if (m_flagWhenFilterEnabled == INVALID_MODEL) {
+    return;
   }
+  setNameFilterDisablesAgent(isGray);
 }
 
 void ToolButtonFileSystemTypeFilter::onTypeChecked(QAction* act) {
@@ -90,9 +106,46 @@ void ToolButtonFileSystemTypeFilter::onTypeChecked(QAction* act) {
   }
   PreferenceSettings().setValue("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(m_flagWhenFilterEnabled));
   if (FILTER_SWITCH->isChecked()) {  // take into effect only switch is on. Record changes even switch is off
-    _model->setFilter(m_flagWhenFilterEnabled);
+    setFilterAgent(m_flagWhenFilterEnabled);
   }
   qDebug() << "Keep switch on: " << FILTER_SWITCH->isChecked() << ". Save flags:" << m_flagWhenFilterEnabled;
+}
+
+QDir::Filters ToolButtonFileSystemTypeFilter::filterAgent() const {
+  switch (m_modelType) {
+    case FILE_SYSTEM_MODEL:
+      return _fsmModel->filter();
+    case SEARCH_MODEL:
+      return _searchModel->filter();
+    default:
+      return QDir::Filter::NoFilter;
+  }
+}
+
+void ToolButtonFileSystemTypeFilter::setFilterAgent(QDir::Filters filters) {
+  switch (m_modelType) {
+    case FILE_SYSTEM_MODEL:
+      _fsmModel->setFilter(filters);
+      return;
+    case SEARCH_MODEL:
+      _searchModel->setFilter(filters);
+      return;
+    default:
+      return;
+  }
+}
+
+void ToolButtonFileSystemTypeFilter::setNameFilterDisablesAgent(bool enable) {
+  switch (m_modelType) {
+    case FILE_SYSTEM_MODEL:
+      _fsmModel->setNameFilterDisables(enable);
+      return;
+    case SEARCH_MODEL:
+      _searchModel->setNameFilterDisables(enable);
+      return;
+    default:
+      return;
+  }
 }
 
 #include <QTableView>
