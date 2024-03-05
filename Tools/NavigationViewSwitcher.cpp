@@ -20,11 +20,11 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
 
       auto F_IntoNewPath = std::bind(&ContentPanel::onActionAndViewNavigate, _view, _1, _2, _3);
       _navigation->m_addressBar->BindFileSystemViewCallback(F_IntoNewPath, std::bind(&ContentPanel::on_searchTextChanged, _view, _1),
-                                           std::bind(&ContentPanel::on_searchEnterKey, _view, _1), _view->m_fsModel);
+                                                            std::bind(&ContentPanel::on_searchEnterKey, _view, _1), _view->m_fsModel);
       ActionWithPath::BindIntoNewPath(F_IntoNewPath);
     }
     naviIndex = _navigation->m_name2StackIndex["NavigationAddress"];
-  } else {
+  } else if (viewType == "movie") {
     if (_navigation->m_dbSearchBar == nullptr) {
       _navigation->m_dbSearchBar = new DatabaseSearchToolBar;
       _navigation->AddToolBar("DatabaseSearch", _navigation->m_dbSearchBar);
@@ -32,6 +32,14 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->BindDatabaseSearchToolBar(_navigation->m_dbSearchBar);
     }
     naviIndex = _navigation->m_name2StackIndex["DatabaseSearch"];
+  } else if (viewType == "search") {
+    if (_navigation->m_advanceSearchBar == nullptr) {
+      _navigation->m_advanceSearchBar = new AdvanceSearchToolBar;
+      _navigation->AddToolBar("search", _navigation->m_advanceSearchBar);
+
+      _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
+    }
+    naviIndex = _navigation->m_name2StackIndex["search"];
   }
   _navigation->m_stackedToolBar->setCurrentIndex(naviIndex);
 
@@ -67,8 +75,29 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->AddView(viewType, _view->m_dbPanel);
     }
     viewIndex = _view->m_name2ViewIndex[viewType];
+  } else if (viewType == "search") {
+    if (_view->m_advanceSearchView == nullptr) {
+      _view->m_srcModel = new MySearchModel;
+      _view->m_proxyModel = new SearchProxyModel;
+      _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_srcModel, _view->m_proxyModel, _view);
+      _view->AddView(viewType, _view->m_advanceSearchView);
+
+      _navigation->m_advanceSearchBar->BindProxyModel(_view->m_proxyModel);
+      _navigation->m_advanceSearchBar->BindSourceModel(_view->m_srcModel);
+    }
+    viewIndex = _view->m_name2ViewIndex[viewType];
+    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+    if (newPath.count('/') >= 2) {
+      QDir::Filters restoredFilters{
+          PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(ToolButtonFileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
+      _view->m_srcModel->setRootPathAndFilter(newPath, restoredFilters);
+      _view->m_advanceSearchView->setWindowTitle("Search under|" + newPath);
+    } else {
+      qWarning("Skip. path[%s] is a huge folder, search will cause lags.", qPrintable(newPath));
+    }
   }
   _view->setCurrentIndex(viewIndex);
+
   if (fileSystemView.contains(viewType) and _view->_addressBar) {
     _view->onActionAndViewNavigate(_view->_addressBar->m_addressLine->pathFromLineEdit(), false);
   }

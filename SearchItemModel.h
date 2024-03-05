@@ -6,7 +6,7 @@
 #include <QStandardItemModel>
 #include "PublicVariable.h"
 #include <QFileIconProvider>
-struct FileProperty {
+struct FilePropertyTemp {
   char name[256];
   qint64 size;
   char type[10];
@@ -58,7 +58,7 @@ class SearchItemModel : public QStandardItemModel {
 
  private:
   // rootPath, typeFilter
-  QHash<QString, QList<FileProperty>> indexData_;
+  QHash<QString, QList<FilePropertyTemp>> indexData_;
   QString m_Key;
   QString m_rootPath;
   QFileIconProvider m_icon_provider;
