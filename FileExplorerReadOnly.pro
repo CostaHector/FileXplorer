@@ -23,7 +23,7 @@ SOURCES += \
     Actions/ViewActions.cpp \
     Component/AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
-    Component/AdvanceSearchWindow.cpp \
+    Component/AdvanceSearchToolBar.cpp \
     Component/AlertSystem.cpp \
     Component/ClickableSlider.cpp \
     Component/CustomStatusBar.cpp \
@@ -40,10 +40,14 @@ SOURCES += \
     Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
+    Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     Component/ToolButtonFileSystemTypeFilter.cpp \
+    MySearchModel.cpp \
+    Tools/SearchProxyModel.cpp \
+    View/AdvanceSearchWindow.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -125,7 +129,7 @@ HEADERS += \
     Actions/ViewActions.h \
     Component/AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
-    Component/AdvanceSearchWindow.h \
+    Component/AdvanceSearchToolBar.h \
     Component/AlertSystem.h \
     Component/ClickableSlider.h \
     Component/CustomStatusBar.h \
@@ -143,10 +147,14 @@ HEADERS += \
     Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
+    Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
     Component/ToolButtonFileSystemTypeFilter.h \
+    MySearchModel.h \
+    Tools/SearchProxyModel.h \
+    View/AdvanceSearchWindow.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \

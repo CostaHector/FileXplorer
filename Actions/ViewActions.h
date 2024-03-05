@@ -4,12 +4,12 @@
 #include <QAction>
 #include <QActionGroup>
 
-
 class ViewActions : public QObject {
   Q_OBJECT
  public:
   explicit ViewActions(QObject* parent = nullptr)
       : QObject{parent},
+        _SEARCH_ITEM{new QAction(QIcon(":/themes/SEARCH_FILENAMES_AND_CONTENTS"), "search")},
         _MOVIE_VIEW{new QAction(QIcon(":/themes/SHOW_DATABASE"), "movie")},
         _LIST_VIEW{new QAction(QIcon(":/themes/DISPLAY_LARGE_THUMBNAILS"), "list")},
         _TABLE_VIEW{new QAction(QIcon(":/themes/DISPLAY_DETAIL_INFOMATIONS"), "table")},
@@ -29,7 +29,7 @@ class ViewActions : public QObject {
   QActionGroup* GetPlayersActions();
 
   QActionGroup* GetListTableTreeActions();
-  QAction *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW;
+  QAction *_SEARCH_ITEM, *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW;
   QActionGroup* _TRIPLE_VIEW;
 
   QAction* NAVIGATION_PANE;
