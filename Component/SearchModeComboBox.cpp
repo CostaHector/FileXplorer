@@ -2,7 +2,7 @@
 
 #include "PublicVariable.h"
 SearchModeComboBox::SearchModeComboBox(QWidget* parent):QComboBox(parent){
-  addItems({"Normal", "Wildcard", "Regex"});
+  addItems({"Normal", "Wildcard", "Regex", "Search for File Content"});
   setCurrentText(PreferenceSettings().value("SEARCH_MODE_DEFAULT_VALUE", "Normal").toString());
 }
 

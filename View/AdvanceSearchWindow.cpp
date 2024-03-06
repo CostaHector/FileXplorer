@@ -36,7 +36,7 @@ class AdvanceSearchTableViewWindowTest : public QMainWindow {
     m_tb->BindProxyModel(m_proxyModel);
     m_tb->BindSourceModel(m_srcModel);
 
-    setWindowIcon(QIcon(":/themes/SEARCH_FILENAMES_AND_CONTENTS"));
+    setWindowIcon(QIcon(":/themes/SEARCH"));
     setWindowTitle("Search under|" + m_srcModel->rootPath());
   }
   auto sizeHint() const -> QSize override { return QSize(1024, 768); }

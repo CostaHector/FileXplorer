@@ -34,8 +34,6 @@
         <file alias="PATH_BACK_TO">AddressControl/PATH_BACK_TO.svg</file>
         <file alias="PATH_FORWARD_TO">AddressControl/PATH_FORWARD_TO.svg</file>
         <file alias="SEARCH">AddressControl/SEARCH.svg</file>
-        <file alias="SERACH_FILENAMES">AddressControl/SERACH_FILENAMES.svg</file>
-        <file alias="SEARCH_FILENAMES_AND_CONTENTS">AddressControl/SEARCH_FILENAMES_AND_CONTENTS.svg</file>
 
         <file alias="FILE_SYSTEM_FILTER">AddressControl/FILTER.svg</file>
         <file alias="FILE">FILTER_TYPE/FILE.svg</file>

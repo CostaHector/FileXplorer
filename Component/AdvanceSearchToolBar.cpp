@@ -15,6 +15,8 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
+
+  m_nameFilter->setText(PreferenceSettings().value("ADVANCE_SEARCH_LINEEDIT_VALUE", "").toString());
 }
 
 void AdvanceSearchToolBar::BindProxyModel(SearchProxyModel* proxyModel) {
@@ -27,10 +29,17 @@ void AdvanceSearchToolBar::BindProxyModel(SearchProxyModel* proxyModel) {
     return;
   }
   _proxyModel = proxyModel;
-  connect(m_nameFilter, &QLineEdit::textChanged, _proxyModel, &SearchProxyModel::startFilter);
-  connect(m_nameFilter, &QLineEdit::returnPressed, _proxyModel, [this]() { _proxyModel->startFilter(m_nameFilter->text()); });
+  connect(m_nameFilter, &QLineEdit::textChanged, _proxyModel, &SearchProxyModel::startFilterWhenTextChanges);
+  connect(m_nameFilter, &QLineEdit::returnPressed, this, &AdvanceSearchToolBar::onSearchEnterAndApply);
   m_searchModeComboBox->BindSearchModel(_proxyModel);
   //    _model->BindProxyModel(m_proxyModel);
+}
+
+void AdvanceSearchToolBar::onSearchEnterAndApply() {
+  PreferenceSettings().setValue("ADVANCE_SEARCH_LINEEDIT_VALUE", m_nameFilter->text());
+  if (_proxyModel) {
+    _proxyModel->startFilterWhenTextChanged(m_nameFilter->text());
+  }
 }
 
 void AdvanceSearchToolBar::BindSourceModel(MySearchModel* model) {

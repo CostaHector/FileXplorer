@@ -1,6 +1,10 @@
 #include "MySearchModel.h"
+#include "PublicVariable.h"
 
 const QStringList MySearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size", "type", "date", "relative path"};
+
+MySearchModel::MySearchModel(QObject* parent)
+    : QAbstractTableModel(parent), m_iteratorFlags{bool2IteratorFlag(PreferenceSettings().value("INCLUDING_SUBDIRECTORIES", true).toBool())} {}
 
 auto MySearchModel::_updatePlanetList() -> void {
   if (m_rootPath.isEmpty()) {
@@ -17,13 +21,16 @@ auto MySearchModel::_updatePlanetList() -> void {
   this->endRemoveRows();
 
   decltype(m_planetList) newPlanetList;
-  const int N = m_rootPath.size();
-  QDirIterator it(m_rootPath, m_filters, QDirIterator::IteratorFlag::Subdirectories);
+  QDirIterator it(m_rootPath, m_filters, m_iteratorFlags);
   while (it.hasNext()) {
     it.next();
     QFileInfo fi = it.fileInfo();
-    newPlanetList.append(FileProperty{fi.fileName(), fi.size(), fi.suffix(), fi.lastModified(), fi.absoluteFilePath().mid(N)});
+    const auto name = fi.fileName();
+    const auto absPath = fi.absoluteFilePath();
+    newPlanetList.append(FileProperty{name, fi.size(), fi.suffix(), fi.lastModified(), absPath.left(absPath.size() - name.size())});
   }
+  // C:/A/B/C
+  // C:/A   file
   qDebug("> %d item(s) | %d | enter [%s] ", newPlanetList.size(), int(m_filters), qPrintable(m_rootPath));
   this->beginInsertRows(QModelIndex(), 0, newPlanetList.size() - 1);
   newPlanetList.swap(m_planetList);
@@ -49,19 +56,20 @@ auto MySearchModel::setRootPath(const QString& path) -> void {
   }
   m_rootPath = path;
   _updatePlanetList();
-  qDebug() << "MySearchModel::setRootPath";
+  qDebug("MySearchModel::setRootPath(%s)", qPrintable(path));
 }
 
-auto MySearchModel::setFilter(QDir::Filters filters) -> void {
-  if (m_filters == filters) {
-    return;
-  }
-  m_filters = filters;
+auto MySearchModel::initFilter(QDir::Filters initialFilters) -> void {
+  m_filters = initialFilters;
+}
+
+auto MySearchModel::setFilter(QDir::Filters newFilters) -> void {
+  initFilter(newFilters);
   if (not checkPathNeed(m_rootPath)) {
     return;
   }
   _updatePlanetList();
-  qDebug() << "MySearchModel::setFilter";
+  qDebug() << "MySearchModel::setFilter" << m_filters;
 }
 
 void MySearchModel::setRootPathAndFilter(const QString& path, QDir::Filters filters) {
@@ -75,6 +83,14 @@ void MySearchModel::setRootPathAndFilter(const QString& path, QDir::Filters filt
   m_filters = filters;
   _updatePlanetList();
   qDebug() << "MySearchModel::setRootPathAndFilter";
+}
+
+QDirIterator::IteratorFlag MySearchModel::bool2IteratorFlag(const bool isIncludeEnabled) const {
+  return isIncludeEnabled ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags;
+}
+
+void MySearchModel::initIteratorFlag(QDirIterator::IteratorFlag initialFlags) {
+  m_iteratorFlags = initialFlags;
 }
 
 QVariant MySearchModel::data(const QModelIndex& index, int role) const {
@@ -101,7 +117,7 @@ QVariant MySearchModel::data(const QModelIndex& index, int role) const {
     }
   } else if (role == Qt::DecorationRole) {
     if (index.column() == 0) {
-      return m_iconProvider.icon(QFileInfo(m_rootPath + m_planetList[index.row()].relPath));
+      return m_iconProvider.icon(QFileInfo(m_planetList[index.row()].relPath + m_planetList[index.row()].name));
     }
     return QVariant();
   } else if (role == Qt::TextAlignmentRole) {
@@ -110,6 +126,8 @@ QVariant MySearchModel::data(const QModelIndex& index, int role) const {
       return Qt::AlignRight;
     }
     return int(Qt::AlignLeft | Qt::AlignTop);
+  } else if (role == Qt::BackgroundRole) {
+//    return QBrush(Qt::transparent);
   }
   return QVariant();
 }
