@@ -23,6 +23,8 @@ class AdvanceSearchToolBar : public QToolBar {
 
   void BindSourceModel(MySearchModel* model);
 
+  void onSearchEnterAndApply();
+
  private:
   QLineEdit* m_nameFilter = new QLineEdit(this);
   ToolButtonFileSystemTypeFilter* m_typeButton = new ToolButtonFileSystemTypeFilter(this);

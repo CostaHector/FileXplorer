@@ -56,7 +56,6 @@ SOURCES += \
     MyQSqlTableModel.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
-    SearchItemModel.cpp \
     Tools/ActionWithPath.cpp \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
@@ -107,7 +106,6 @@ SOURCES += \
     View/FileSystemTableView.cpp \
     View/FileSystemTreeView.cpp \
     View/PerformersTableView.cpp \
-    View/SearchItemTableView.cpp \
     View/ViewHelper.cpp \
     View/ViewStyleSheet.cpp \
     main.cpp \
@@ -163,7 +161,6 @@ HEADERS += \
     MyQSqlTableModel.h \
     PublicTool.h \
     RibbonMenu.h \
-    SearchItemModel.h \
     Tools/ActionWithPath.h \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
@@ -215,7 +212,6 @@ HEADERS += \
     View/FileSystemTableView.h \
     View/FileSystemTreeView.h \
     View/PerformersTableView.h \
-    View/SearchItemTableView.h \
     View/ViewHelper.h \
     View/ViewStyleSheet.h
 

@@ -70,14 +70,14 @@ QActionGroup* ViewActions::GetListTableTreeActions() {
   _TREE_VIEW->setCheckable(true);
 
   _MOVIE_VIEW->setCheckable(true);
-  _SEARCH_ITEM->setCheckable(true);
+  _ADVANCE_SEARCH_VIEW->setCheckable(true);
 
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_LIST_VIEW);
   actionGroup->addAction(_TABLE_VIEW);
   actionGroup->addAction(_TREE_VIEW);
   actionGroup->addAction(_MOVIE_VIEW);
-  actionGroup->addAction(_SEARCH_ITEM);
+  actionGroup->addAction(_ADVANCE_SEARCH_VIEW);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
   return actionGroup;
 }

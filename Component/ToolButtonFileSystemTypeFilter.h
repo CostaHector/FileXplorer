@@ -21,8 +21,14 @@ class ToolButtonFileSystemTypeFilter : public QToolButton {
   void onTypeChecked(QAction* act);
 
   QDir::Filters filterAgent() const;
+  void initFilterAgent(QDir::Filters filters);
   void setFilterAgent(QDir::Filters filters);
+
+  void initNameFilterDisablesAgent(bool enable);
   void setNameFilterDisablesAgent(bool enable);
+
+  void initSearchModelIteratorFlagAgent();
+  void changeSearchModelIteratorFlagAgent(const bool including);
 
   static const QDir::Filters DEFAULT_FILTER_FLAG;
 
@@ -44,7 +50,9 @@ class ToolButtonFileSystemTypeFilter : public QToolButton {
   //  QAction* _DOCUMENT = new QAction(QIcon(":/themes/DOCUMENT"), "document");
   //  QAction* _EXE = new QAction(QIcon(":/themes/EXE"), "executable");
 
-  QAction* GRAY_IF_FILTERED = new QAction(tr("gray the filtered"), fileTypeFilterMenu);
+  QAction* HIDE_ENTRIES_DONT_PASS_FILTER = new QAction(tr("hide/disable the entries don't pass name filter"), fileTypeFilterMenu);
+  QAction* INCLUDING_SUBDIRECTORIES = new QAction(tr("Including Subdirs"), fileTypeFilterMenu);
+
   QActionGroup* m_FILTER_FLAG_AGS = new QActionGroup(this);
 
   QHash<QString, QDir::Filter> m_text2FilterFlag = {{FILES->text(), QDir::Files},
@@ -62,6 +70,8 @@ class ToolButtonFileSystemTypeFilter : public QToolButton {
   enum MODEL_TYPE { INVALID_MODEL = 0, FILE_SYSTEM_MODEL = 1, SEARCH_MODEL = 2 };
   MODEL_TYPE m_modelType = MODEL_TYPE::INVALID_MODEL;
   QDir::Filters m_flagWhenFilterEnabled;
+
+  bool m_isIncludingSubdirectory;
 };
 
 #endif  // TOOLBUTTONFILESYSTEMTYPEFILTER_H
