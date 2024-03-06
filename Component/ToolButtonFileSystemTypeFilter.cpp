@@ -9,14 +9,28 @@ const QDir::Filters ToolButtonFileSystemTypeFilter::DEFAULT_FILTER_FLAG =
 
 ToolButtonFileSystemTypeFilter::ToolButtonFileSystemTypeFilter(QWidget* parent)
     : QToolButton(parent),
-      m_flagWhenFilterEnabled{PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(DEFAULT_FILTER_FLAG)).toInt()} {
+      m_flagWhenFilterEnabled{PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(DEFAULT_FILTER_FLAG)).toInt()},
+      m_isIncludingSubdirectory{PreferenceSettings().value("INCLUDING_SUBDIRECTORIES", true).toBool()} {
   FILTER_SWITCH->setCheckable(true);
   FILTER_SWITCH->setChecked(PreferenceSettings().value("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", true).toBool());
+  FILTER_SWITCH->setToolTip(
+      "1. QFileSystemModel->setFilter()\n"
+      "2. SearchModel->setFilter()");
 
-  qDebug() << PreferenceSettings().value("FILE_SYSTEM_GRAY_IF_FILTERED", false).toBool();
-  GRAY_IF_FILTERED->setCheckable(true);
-  GRAY_IF_FILTERED->setChecked(true);
-  GRAY_IF_FILTERED->setToolTip("Gray items meet rule when enabled. hide when Disabled");
+  HIDE_ENTRIES_DONT_PASS_FILTER->setCheckable(true);
+  HIDE_ENTRIES_DONT_PASS_FILTER->setChecked(PreferenceSettings().value("HIDE_ENTRIES_DONT_PASS_FILTER", true).toBool());
+  HIDE_ENTRIES_DONT_PASS_FILTER->setToolTip(
+      "This property holds whether files that don't pass the name filter are hidden(true) or disabled(false)\n"
+      "This property is true by default.\n"
+      "1. QFileSystemModel->setNameFilters()\n"
+      "2. SearchModel->setFilter()");
+
+  INCLUDING_SUBDIRECTORIES->setCheckable(true);
+  INCLUDING_SUBDIRECTORIES->setChecked(m_isIncludingSubdirectory);
+  INCLUDING_SUBDIRECTORIES->setToolTip(
+      "List entries inside all subdirectories as well.\n"
+      "1. Skip for QFileSystemModel\n"
+      "2. In searchModel QDirIterator(flags=QDirIterator::IteratorFlag::Subdirectories)");
 
   m_FILTER_FLAG_AGS->addAction(FILES);
   m_FILTER_FLAG_AGS->addAction(DIRS);
@@ -29,7 +43,10 @@ ToolButtonFileSystemTypeFilter::ToolButtonFileSystemTypeFilter(QWidget* parent)
 
   fileTypeFilterMenu->addActions(m_FILTER_FLAG_AGS->actions());
   fileTypeFilterMenu->addSeparator();
-  fileTypeFilterMenu->addAction(GRAY_IF_FILTERED);
+  fileTypeFilterMenu->addAction(HIDE_ENTRIES_DONT_PASS_FILTER);
+  fileTypeFilterMenu->addSeparator();
+  fileTypeFilterMenu->addAction(INCLUDING_SUBDIRECTORIES);
+
   fileTypeFilterMenu->setToolTipsVisible(true);
 
   qDebug() << "Stored switch on: " << FILTER_SWITCH->isChecked() << ", flags:" << m_flagWhenFilterEnabled;
@@ -66,14 +83,16 @@ void ToolButtonFileSystemTypeFilter::BindFileSystemModel(QAbstractItemModel* new
     }
   }
   if (FILTER_SWITCH->isChecked()) {
-    setFilterAgent(m_flagWhenFilterEnabled);
+    initFilterAgent(m_flagWhenFilterEnabled);
   } else {
-    setFilterAgent(DEFAULT_FILTER_FLAG);
+    initFilterAgent(DEFAULT_FILTER_FLAG);
   }
-  setNameFilterDisablesAgent(GRAY_IF_FILTERED->isChecked());
+  initNameFilterDisablesAgent(HIDE_ENTRIES_DONT_PASS_FILTER->isChecked());
+
   connect(fileTypeFilterMenu, &QMenu::triggered, this, &ToolButtonFileSystemTypeFilter::onTypeChecked);
   connect(FILTER_SWITCH, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::onSwitchChanged);
-  connect(GRAY_IF_FILTERED, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::onGrayOrHideChanged);
+  connect(HIDE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::onGrayOrHideChanged);
+  connect(INCLUDING_SUBDIRECTORIES, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::changeSearchModelIteratorFlagAgent);
 }
 
 void ToolButtonFileSystemTypeFilter::onSwitchChanged(bool isOn) {
@@ -91,7 +110,7 @@ void ToolButtonFileSystemTypeFilter::onSwitchChanged(bool isOn) {
 }
 
 void ToolButtonFileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
-  PreferenceSettings().setValue("FILE_SYSTEM_GRAY_IF_FILTERED", isGray);
+  PreferenceSettings().setValue("HIDE_ENTRIES_DONT_PASS_FILTER", isGray);
   if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
   }
@@ -135,6 +154,33 @@ void ToolButtonFileSystemTypeFilter::setFilterAgent(QDir::Filters filters) {
   }
 }
 
+void ToolButtonFileSystemTypeFilter::initFilterAgent(QDir::Filters filters) {
+  switch (m_modelType) {
+    case FILE_SYSTEM_MODEL:
+      // Todo: may cause double load
+      _fsmModel->setFilter(filters);
+      return;
+    case SEARCH_MODEL:
+      _searchModel->initFilter(filters);
+      return;
+    default:
+      return;
+  }
+}
+
+void ToolButtonFileSystemTypeFilter::initNameFilterDisablesAgent(bool enable) {
+  switch (m_modelType) {
+    case FILE_SYSTEM_MODEL:
+      _fsmModel->setNameFilterDisables(enable);
+      return;
+    case SEARCH_MODEL:
+      _searchModel->initNameFilterDisables(enable);
+      return;
+    default:
+      return;
+  }
+}
+
 void ToolButtonFileSystemTypeFilter::setNameFilterDisablesAgent(bool enable) {
   switch (m_modelType) {
     case FILE_SYSTEM_MODEL:
@@ -146,6 +192,24 @@ void ToolButtonFileSystemTypeFilter::setNameFilterDisablesAgent(bool enable) {
     default:
       return;
   }
+}
+
+void ToolButtonFileSystemTypeFilter::initSearchModelIteratorFlagAgent() {
+  if (m_modelType != SEARCH_MODEL) {
+    return;
+  }
+  auto iteratorFlag = m_isIncludingSubdirectory ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags;
+  _searchModel->initIteratorFlag(iteratorFlag);  // only change value not set
+}
+
+void ToolButtonFileSystemTypeFilter::changeSearchModelIteratorFlagAgent(const bool including) {
+  PreferenceSettings().setValue("INCLUDING_SUBDIRECTORIES", including);
+  m_isIncludingSubdirectory = including;
+  if (m_modelType != SEARCH_MODEL) {
+    return;
+  }
+  auto iteratorFlag = m_isIncludingSubdirectory ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags;
+  _searchModel->setIteratorFlag(iteratorFlag);  // change value and set
 }
 
 #include <QTableView>

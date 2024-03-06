@@ -63,9 +63,7 @@ class FileBasicOperationsActions : public QObject {
         SELECT_ALL{new QAction(QIcon(":/themes/SELECT_ALL"), tr("Select all"))},
         SELECT_NONE{new QAction(QIcon(":/themes/SELECT_NONE"), tr("Select none"))},
         SELECT_INVERT{new QAction(QIcon(":/themes/SELECT_INVERT"), tr("Invert selection"))},
-        SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()),
-
-        ADVANCE_SEARCH_RIBBON(Get_Advance_Search_Actions()) {}
+        SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()) {}
 
   QActionGroup* GetDeleteActions();
   QActionGroup* GetMOVE_COPY_TOActions();
@@ -112,8 +110,6 @@ class FileBasicOperationsActions : public QObject {
 
   QAction *SELECT_ALL, *SELECT_NONE, *SELECT_INVERT;
   QActionGroup* SELECTION_RIBBONS;
-
-  QActionGroup* ADVANCE_SEARCH_RIBBON;
 };
 
 FileBasicOperationsActions& g_fileBasicOperationsActions();
