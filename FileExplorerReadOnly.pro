@@ -21,6 +21,7 @@ SOURCES += \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
+    AdvanceSearchModel.cpp \
     Component/AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
     Component/AdvanceSearchToolBar.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
     Component/CustomStatusBar.cpp \
     Component/DBRightClickMenu.cpp \
     Component/DatabaseToolBar.cpp \
+    Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
     Component/MD5Window.cpp \
@@ -44,8 +46,6 @@ SOURCES += \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
-    Component/ToolButtonFileSystemTypeFilter.cpp \
-    MySearchModel.cpp \
     Tools/SearchProxyModel.cpp \
     View/AdvanceSearchWindow.cpp \
     View/TorrentsManagerWidget.cpp \
@@ -125,6 +125,7 @@ HEADERS += \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
+    AdvanceSearchModel.h \
     Component/AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
     Component/AdvanceSearchToolBar.h \
@@ -133,6 +134,7 @@ HEADERS += \
     Component/CustomStatusBar.h \
     Component/DBRightClickMenu.h \
     Component/DatabaseToolBar.h \
+    Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
     Component/MD5Window.h \
@@ -149,8 +151,6 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
-    Component/ToolButtonFileSystemTypeFilter.h \
-    MySearchModel.h \
     Tools/SearchProxyModel.h \
     View/AdvanceSearchWindow.h \
     View/TorrentsManagerWidget.h \

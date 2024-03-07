@@ -5,7 +5,7 @@
 #include "PathUndoRedoer.h"
 #include "PublicVariable.h"
 
-#include "Component/ToolButtonFileSystemTypeFilter.h"
+#include "Component/FileSystemTypeFilter.h"
 
 #include <QHBoxLayout>
 #include <QToolBar>
@@ -37,8 +37,8 @@ class NavigationAndAddressBar : public QToolBar {
   AddressELineEdit* m_addressLine;
   PathUndoRedoer m_pathRD;
   QLineEdit* m_searchLE;
-
-  ToolButtonFileSystemTypeFilter* m_fsFilter;
+  
+  FileSystemTypeFilter* m_fsFilter;
  private:
   std::function<bool(QString, bool, bool)> m_IntoNewPath;
   std::function<void(QString)> m_on_searchTextChanged;

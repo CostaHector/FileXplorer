@@ -1,10 +1,8 @@
 #ifndef ADVANCESEARCHWINDOW_H
 #define ADVANCESEARCHWINDOW_H
 
-#include "Component/SearchModeComboBox.h"
-#include "Component/ToolButtonFileSystemTypeFilter.h"
 #include "CustomTableView.h"
-#include "MySearchModel.h"
+#include "AdvanceSearchModel.h"
 #include "Tools/SearchProxyModel.h"
 
 #include <QDebug>
@@ -15,7 +13,7 @@
 
 class AdvanceSearchTableView : public CustomTableView{
  public:
-  AdvanceSearchTableView(MySearchModel* _sourceModel, SearchProxyModel* _searchProxyModel, QWidget* parent = nullptr);
+  AdvanceSearchTableView(AdvanceSearchModel* _sourceModel, SearchProxyModel* _searchProxyModel, QWidget* parent = nullptr);
 
  private:
 };
