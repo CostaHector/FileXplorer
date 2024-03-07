@@ -21,14 +21,16 @@ SOURCES += \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
+    AdvanceSearchModel.cpp \
     Component/AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
-    Component/AdvanceSearchWindow.cpp \
+    Component/AdvanceSearchToolBar.cpp \
     Component/AlertSystem.cpp \
     Component/ClickableSlider.cpp \
     Component/CustomStatusBar.cpp \
     Component/DBRightClickMenu.cpp \
     Component/DatabaseToolBar.cpp \
+    Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
     Component/MD5Window.cpp \
@@ -40,9 +42,12 @@ SOURCES += \
     Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
+    Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
+    Tools/SearchProxyModel.cpp \
+    View/AdvanceSearchWindow.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -51,7 +56,6 @@ SOURCES += \
     MyQSqlTableModel.cpp \
     PublicTool.cpp \
     RibbonMenu.cpp \
-    SearchItemModel.cpp \
     Tools/ActionWithPath.cpp \
     Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
@@ -102,7 +106,6 @@ SOURCES += \
     View/FileSystemTableView.cpp \
     View/FileSystemTreeView.cpp \
     View/PerformersTableView.cpp \
-    View/SearchItemTableView.cpp \
     View/ViewHelper.cpp \
     View/ViewStyleSheet.cpp \
     main.cpp \
@@ -122,14 +125,16 @@ HEADERS += \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
+    AdvanceSearchModel.h \
     Component/AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
-    Component/AdvanceSearchWindow.h \
+    Component/AdvanceSearchToolBar.h \
     Component/AlertSystem.h \
     Component/ClickableSlider.h \
     Component/CustomStatusBar.h \
     Component/DBRightClickMenu.h \
     Component/DatabaseToolBar.h \
+    Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
     Component/MD5Window.h \
@@ -142,9 +147,12 @@ HEADERS += \
     Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
+    Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    Tools/SearchProxyModel.h \
+    View/AdvanceSearchWindow.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
@@ -153,7 +161,6 @@ HEADERS += \
     MyQSqlTableModel.h \
     PublicTool.h \
     RibbonMenu.h \
-    SearchItemModel.h \
     Tools/ActionWithPath.h \
     Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
@@ -205,7 +212,6 @@ HEADERS += \
     View/FileSystemTableView.h \
     View/FileSystemTreeView.h \
     View/PerformersTableView.h \
-    View/SearchItemTableView.h \
     View/ViewHelper.h \
     View/ViewStyleSheet.h
 

@@ -6,7 +6,7 @@
 #include <QTableView>
 #include <QTreeView>
 
-#include <QAbstractItemModel>
+#include <QAbstractItemView>
 
 
 class CopyItemPropertiesToClipboardIF {

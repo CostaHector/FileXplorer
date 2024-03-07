@@ -1,5 +1,6 @@
 #ifndef STACKEDTOOLBAR_H
 #define STACKEDTOOLBAR_H
+#include "Component/AdvanceSearchToolBar.h"
 #include "Component/DatabaseSearchToolBar.h"
 #include "Component/NavigationAndAddressBar.h"
 #include "PublicVariable.h"
@@ -15,7 +16,7 @@ class StackedToolBar : public QToolBar {
  public:
   friend class NavigationViewSwitcher;
   explicit StackedToolBar(const QString& title = "Stacked Toolbar", QWidget* parent = nullptr)
-      : QToolBar{title, parent}, m_addressBar{nullptr}, m_dbSearchBar{nullptr}, m_stackedToolBar{new QStackedWidget(this)} {
+      : QToolBar{title, parent}, m_stackedToolBar{new QStackedWidget(this)} {
     addWidget(m_stackedToolBar);
 
     setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
@@ -24,9 +25,11 @@ class StackedToolBar : public QToolBar {
   }
   int AddToolBar(const QString& name, QToolBar* tb);
 
-  NavigationAndAddressBar* m_addressBar;
-  DatabaseSearchToolBar* m_dbSearchBar;
-private:
+  NavigationAndAddressBar* m_addressBar{nullptr};
+  DatabaseSearchToolBar* m_dbSearchBar{nullptr};
+  AdvanceSearchToolBar* m_advanceSearchBar{nullptr};
+
+ private:
   QStackedWidget* m_stackedToolBar;
   QHash<QString, int> m_name2StackIndex;
 };

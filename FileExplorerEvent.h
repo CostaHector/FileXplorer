@@ -13,7 +13,7 @@
 #include "ContentPanel.h"
 
 #include <QAbstractButton>
-#include <QAbstractItemModel>
+#include <QAbstractTableModel>
 #include <QClipboard>
 #include <QCryptographicHash>
 #include <QDateTime>
@@ -34,6 +34,8 @@ class FileExplorerEvent : public QObject {
   FileExplorerEvent(QObject* parent = nullptr,
                     MyQFileSystemModel* fsm = nullptr,
                     MyQSqlTableModel* dbModel = nullptr,
+                    AdvanceSearchModel* searchModel = nullptr,
+                    SearchProxyModel* searchProxyModel = nullptr,
                     ContentPanel* view = nullptr,
                     CustomStatusBar* logger = nullptr,
                     T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
@@ -77,6 +79,7 @@ class FileExplorerEvent : public QObject {
   auto on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false) -> bool;
   auto on_BatchNewFilesOrFolders(bool isFolder = false) -> bool;
 
+  auto selectedIndexesProxyToSource() const -> QModelIndexList;
   auto selectedIndexes() const -> QModelIndexList;
   auto selectedItems() const -> QStringList {
     const auto& inds = selectedIndexes();
@@ -151,6 +154,8 @@ class FileExplorerEvent : public QObject {
 
   MyQFileSystemModel* _fileSysModel;
   MyQSqlTableModel* _dbModel;
+  AdvanceSearchModel* _searchModel;
+  SearchProxyModel* _searchProxyModel;
 
   ContentPanel* _contentPane;
   CustomStatusBar* _logger;

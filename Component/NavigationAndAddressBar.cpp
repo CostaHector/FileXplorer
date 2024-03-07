@@ -7,8 +7,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
     : QToolBar(title, parent),
       m_addressLine(new AddressELineEdit{this}),
       m_searchLE(new QLineEdit{this}),
-      m_itemTypeMenu{new QMenu(tr("Filter"), this)},
-      m_fsFilter{new QToolButton{this}},
+      m_fsFilter{new FileSystemTypeFilter},
       m_IntoNewPath(nullptr),
       m_on_searchTextChanged(nullptr),
       m_on_searchEnterKey(nullptr) {
@@ -20,16 +19,6 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   m_searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   m_searchLE->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
-  m_itemTypeMenu->addActions({_FILE, _FOLDER, _HIDDEN, _DOTDOT});
-  m_itemTypeMenu->addSeparator();
-  m_itemTypeMenu->addActions({_IMAGES, _VIDEOS, _PLAIN_TEXT});
-  m_itemTypeMenu->addSeparator();
-  m_itemTypeMenu->addActions({_DOCUMENT, _EXE});
-
-  m_fsFilter->setIcon(QIcon(":/themes/FILE_SYSTEM_FILTER"));
-  m_fsFilter->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
-  m_fsFilter->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
-  m_fsFilter->setMenu(m_itemTypeMenu);
   m_fsFilter->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
@@ -46,12 +35,14 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   InitEventWhenViewChanged();
 }
 
-void NavigationAndAddressBar::subscribe(T_IntoNewPath IntoNewPath,
-                                        T_on_searchTextChanged on_searchTextChanged,
-                                        T_on_searchEnterKey on_searchEnterKey) {
+void NavigationAndAddressBar::BindFileSystemViewCallback(T_IntoNewPath IntoNewPath,
+                                                         T_on_searchTextChanged on_searchTextChanged,
+                                                         T_on_searchEnterKey on_searchEnterKey,
+                                                         QFileSystemModel* _fsm) {
   m_IntoNewPath = IntoNewPath;
   m_on_searchTextChanged = on_searchTextChanged;
   m_on_searchEnterKey = on_searchEnterKey;
+  m_fsFilter->BindFileSystemModel(_fsm);
 }
 
 auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {

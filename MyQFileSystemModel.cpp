@@ -2,7 +2,6 @@
 #include "Tools/PathTool.h"
 
 #include <QDebug>
-#include <QFileIconProvider>
 #include <QMimeData>
 #include <QUrl>
 
@@ -12,11 +11,7 @@ constexpr int MyQFileSystemModel::cacheHeight;
 constexpr int MyQFileSystemModel::IMAGES_COUNT_LOAD_ONCE_MAX;
 
 MyQFileSystemModel::MyQFileSystemModel(QObject* parent) : QFileSystemModel(parent), _logger(nullptr), m_imagesSizeLoaded(0) {
-  setFilter(QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot);
-
   setReadOnly(true);
-  setNameFilterDisables(false);  // gray(True) or hide(False) for items filtered out
-  setIconProvider(new QFileIconProvider);
 
   connect(this, &MyQFileSystemModel::rootPathChanged, this, &MyQFileSystemModel::whenRootPathChanged);
   connect(this, &MyQFileSystemModel::directoryLoaded, this, &MyQFileSystemModel::whenDirectoryLoaded);
