@@ -24,11 +24,9 @@ ContentPanel::ContentPanel(FolderPreviewHTML* previewHtml_, FolderPreviewWidget*
       _dbSearchBar(nullptr),
       m_fsModel(new MyQFileSystemModel(this)),
       m_dbModel(new MyQSqlTableModel(this, GetSqlVidsDB())),
+      m_srcModel{new AdvanceSearchModel},
+      m_proxyModel{new SearchProxyModel},
       m_menu(new RightClickMenu("Right click menu", this)),
-      m_fsView(nullptr),
-      m_fsListView(nullptr),
-      m_fsTreeView(nullptr),
-      m_dbPanel(nullptr),
       previewHtml(previewHtml_),
       previewWidget(previewWidget_),
       _logger(nullptr),
@@ -77,7 +75,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     }
   }
 #ifdef WIN32
-  if (newPath.isEmpty()){
+  if (newPath.isEmpty()) {
     onAfterDirectoryLoaded(newPath);
   }
 #endif
@@ -131,6 +129,15 @@ void ContentPanel::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar)
   }
   _dbSearchBar = dbSearchBar;
 }
+
+void ContentPanel::BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar){
+  if (advanceSearchBar == nullptr){
+    qWarning("Bind AdvanceSearchToolBar failed. nullptr passed here");
+    return;
+  }
+  _advanceSearchBar = advanceSearchBar;
+}
+
 
 void ContentPanel::BindCustomStatusBar(CustomStatusBar* logger) {
   if (logger == nullptr) {
