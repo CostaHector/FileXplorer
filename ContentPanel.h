@@ -81,7 +81,7 @@ class ContentPanel : public QStackedWidget {
 
   MyQFileSystemModel* m_fsModel;
   MyQSqlTableModel* m_dbModel;
-  MySearchModel* m_srcModel;
+  AdvanceSearchModel* m_srcModel;
   SearchProxyModel* m_proxyModel;
 
   QMenu* m_menu;

@@ -1,13 +1,13 @@
-#include "ToolButtonFileSystemTypeFilter.h"
+#include "FileSystemTypeFilter.h"
 #include "PublicVariable.h"
 
 #include <QDebug>
 #include <QSplitter>
 
-const QDir::Filters ToolButtonFileSystemTypeFilter::DEFAULT_FILTER_FLAG =
+const QDir::Filters FileSystemTypeFilter::DEFAULT_FILTER_FLAG =
     QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::NoDotAndDotDot;
 
-ToolButtonFileSystemTypeFilter::ToolButtonFileSystemTypeFilter(QWidget* parent)
+FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
     : QToolButton(parent),
       m_flagWhenFilterEnabled{PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(DEFAULT_FILTER_FLAG)).toInt()},
       m_isIncludingSubdirectory{PreferenceSettings().value("INCLUDING_SUBDIRECTORIES", true).toBool()} {
@@ -61,27 +61,41 @@ ToolButtonFileSystemTypeFilter::ToolButtonFileSystemTypeFilter(QWidget* parent)
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 }
 
-void ToolButtonFileSystemTypeFilter::BindFileSystemModel(QAbstractItemModel* newModel) {
-  if (_model != nullptr) {
-    qWarning("skip. model is already not nullptr. don't rebind");
-    return;
-  }
+void FileSystemTypeFilter::BindFileSystemModel(QFileSystemModel* newModel) {
   if (newModel == nullptr) {
     qWarning("skip. don't try to bind a nullptr");
     return;
   }
-  _model = _fsmModel = dynamic_cast<QFileSystemModel*>(newModel);
   if (_fsmModel != nullptr) {
-    m_modelType = MODEL_TYPE::FILE_SYSTEM_MODEL;
-  } else {
-    _model = _searchModel = dynamic_cast<MySearchModel*>(newModel);
-    if (_searchModel != nullptr) {
-      m_modelType = MODEL_TYPE::SEARCH_MODEL;
-    } else {
-      qDebug("BindFileSystemModel failed. _model cannot converted QFileSystemModel* or MySearchModel*");
-      return;
-    }
+    qWarning("skip. don't try to rebind");
   }
+  m_modelType = MODEL_TYPE::FILE_SYSTEM_MODEL;
+  _fsmModel = newModel;
+  if (FILTER_SWITCH->isChecked()) {
+    initFilterAgent(m_flagWhenFilterEnabled);
+  } else {
+    initFilterAgent(DEFAULT_FILTER_FLAG);
+  }
+  initNameFilterDisablesAgent(HIDE_ENTRIES_DONT_PASS_FILTER->isChecked());
+  connect(fileTypeFilterMenu, &QMenu::triggered, this, &FileSystemTypeFilter::onTypeChecked);
+  connect(FILTER_SWITCH, &QAction::triggered, this, &FileSystemTypeFilter::onSwitchChanged);
+  connect(HIDE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &FileSystemTypeFilter::onGrayOrHideChanged);
+  connect(INCLUDING_SUBDIRECTORIES, &QAction::triggered, this, &FileSystemTypeFilter::changeSearchModelIteratorFlagAgent);
+}
+
+void FileSystemTypeFilter::BindFileSystemModel(AdvanceSearchModel* newModel, SearchProxyModel* newProxyModel) {
+  if (newModel == nullptr) {
+    qWarning("skip. don't try to bind a nullptr");
+    return;
+  }
+  if (_searchSourceModel != nullptr or _searchProxyModel != nullptr) {
+    qWarning("skip. don't try to rebind. _searchSourceModel*[%0xp], _searchProxyModel*[%0xp]", _searchSourceModel, _searchProxyModel);
+    return;
+  }
+  m_modelType = MODEL_TYPE::SEARCH_MODEL;
+  _searchSourceModel = newModel;
+  _searchProxyModel = newProxyModel;
+
   if (FILTER_SWITCH->isChecked()) {
     initFilterAgent(m_flagWhenFilterEnabled);
   } else {
@@ -89,13 +103,13 @@ void ToolButtonFileSystemTypeFilter::BindFileSystemModel(QAbstractItemModel* new
   }
   initNameFilterDisablesAgent(HIDE_ENTRIES_DONT_PASS_FILTER->isChecked());
 
-  connect(fileTypeFilterMenu, &QMenu::triggered, this, &ToolButtonFileSystemTypeFilter::onTypeChecked);
-  connect(FILTER_SWITCH, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::onSwitchChanged);
-  connect(HIDE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::onGrayOrHideChanged);
-  connect(INCLUDING_SUBDIRECTORIES, &QAction::triggered, this, &ToolButtonFileSystemTypeFilter::changeSearchModelIteratorFlagAgent);
+  connect(fileTypeFilterMenu, &QMenu::triggered, this, &FileSystemTypeFilter::onTypeChecked);
+  connect(FILTER_SWITCH, &QAction::triggered, this, &FileSystemTypeFilter::onSwitchChanged);
+  connect(HIDE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &FileSystemTypeFilter::onGrayOrHideChanged);
+  connect(INCLUDING_SUBDIRECTORIES, &QAction::triggered, this, &FileSystemTypeFilter::changeSearchModelIteratorFlagAgent);
 }
 
-void ToolButtonFileSystemTypeFilter::onSwitchChanged(bool isOn) {
+void FileSystemTypeFilter::onSwitchChanged(bool isOn) {
   PreferenceSettings().setValue("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", isOn);
   if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
@@ -109,7 +123,7 @@ void ToolButtonFileSystemTypeFilter::onSwitchChanged(bool isOn) {
   qDebug() << "Save switch on: " << isOn << ". Keep flags:" << m_flagWhenFilterEnabled;
 }
 
-void ToolButtonFileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
+void FileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
   PreferenceSettings().setValue("HIDE_ENTRIES_DONT_PASS_FILTER", isGray);
   if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
@@ -117,7 +131,7 @@ void ToolButtonFileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
   setNameFilterDisablesAgent(isGray);
 }
 
-void ToolButtonFileSystemTypeFilter::onTypeChecked(QAction* act) {
+void FileSystemTypeFilter::onTypeChecked(QAction* act) {
   if (act->isChecked()) {
     m_flagWhenFilterEnabled |= m_text2FilterFlag[act->text()];
   } else {
@@ -130,86 +144,91 @@ void ToolButtonFileSystemTypeFilter::onTypeChecked(QAction* act) {
   qDebug() << "Keep switch on: " << FILTER_SWITCH->isChecked() << ". Save flags:" << m_flagWhenFilterEnabled;
 }
 
-QDir::Filters ToolButtonFileSystemTypeFilter::filterAgent() const {
+QDir::Filters FileSystemTypeFilter::filterAgent() const {
   switch (m_modelType) {
     case FILE_SYSTEM_MODEL:
       return _fsmModel->filter();
     case SEARCH_MODEL:
-      return _searchModel->filter();
+      return _searchSourceModel->filter();
     default:
+      qDebug("invalid Model. return default filter");
       return QDir::Filter::NoFilter;
   }
 }
 
-void ToolButtonFileSystemTypeFilter::setFilterAgent(QDir::Filters filters) {
+void FileSystemTypeFilter::setFilterAgent(QDir::Filters filters) {
   switch (m_modelType) {
     case FILE_SYSTEM_MODEL:
       _fsmModel->setFilter(filters);
       return;
     case SEARCH_MODEL:
-      _searchModel->setFilter(filters);
+      _searchSourceModel->setFilter(filters);
       return;
     default:
+      qDebug("invalid Model. not setFilterAgent");
       return;
   }
 }
 
-void ToolButtonFileSystemTypeFilter::initFilterAgent(QDir::Filters filters) {
+void FileSystemTypeFilter::initFilterAgent(QDir::Filters filters) {
   switch (m_modelType) {
     case FILE_SYSTEM_MODEL:
       // Todo: may cause double load
       _fsmModel->setFilter(filters);
       return;
     case SEARCH_MODEL:
-      _searchModel->initFilter(filters);
+      _searchSourceModel->initFilter(filters);
       return;
     default:
+      qDebug("invalid Model. not initFilterAgent");
       return;
   }
 }
 
-void ToolButtonFileSystemTypeFilter::initNameFilterDisablesAgent(bool enable) {
+void FileSystemTypeFilter::initNameFilterDisablesAgent(bool enable) {
   switch (m_modelType) {
     case FILE_SYSTEM_MODEL:
       _fsmModel->setNameFilterDisables(enable);
       return;
     case SEARCH_MODEL:
-      _searchModel->initNameFilterDisables(enable);
+      _searchProxyModel->setNameFilterDisables(enable);
       return;
     default:
+      qDebug("invalid Model. not setNameFilterDisable");
       return;
   }
 }
 
-void ToolButtonFileSystemTypeFilter::setNameFilterDisablesAgent(bool enable) {
+void FileSystemTypeFilter::setNameFilterDisablesAgent(bool enable) {
   switch (m_modelType) {
     case FILE_SYSTEM_MODEL:
       _fsmModel->setNameFilterDisables(enable);
       return;
     case SEARCH_MODEL:
-      _searchModel->setNameFilterDisables(enable);
+      _searchProxyModel->setNameFilterDisables(enable);
       return;
     default:
+      qDebug("invalid Model. not setNameFilterDisable");
       return;
   }
 }
 
-void ToolButtonFileSystemTypeFilter::initSearchModelIteratorFlagAgent() {
+void FileSystemTypeFilter::initSearchModelIteratorFlagAgent() {
   if (m_modelType != SEARCH_MODEL) {
     return;
   }
   auto iteratorFlag = m_isIncludingSubdirectory ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags;
-  _searchModel->initIteratorFlag(iteratorFlag);  // only change value not set
+  _searchSourceModel->initIteratorFlag(iteratorFlag);  // only change value not set
 }
 
-void ToolButtonFileSystemTypeFilter::changeSearchModelIteratorFlagAgent(const bool including) {
+void FileSystemTypeFilter::changeSearchModelIteratorFlagAgent(const bool including) {
   PreferenceSettings().setValue("INCLUDING_SUBDIRECTORIES", including);
   m_isIncludingSubdirectory = including;
   if (m_modelType != SEARCH_MODEL) {
     return;
   }
   auto iteratorFlag = m_isIncludingSubdirectory ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags;
-  _searchModel->setIteratorFlag(iteratorFlag);  // change value and set
+  _searchSourceModel->setIteratorFlag(iteratorFlag);  // change value and set
 }
 
 #include <QTableView>
@@ -222,7 +241,7 @@ class FileSystemFilter : public QSplitter {
     m_tv->setModel(m_model);
     m_tv->setRootIndex(m_model->setRootPath("./"));
 
-    auto* fileTypeFilterButton = new ToolButtonFileSystemTypeFilter;
+    auto* fileTypeFilterButton = new FileSystemTypeFilter;
     fileTypeFilterButton->BindFileSystemModel(m_model);
 
     addWidget(m_tv);

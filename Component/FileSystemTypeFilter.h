@@ -1,5 +1,5 @@
-#ifndef TOOLBUTTONFILESYSTEMTYPEFILTER_H
-#define TOOLBUTTONFILESYSTEMTYPEFILTER_H
+#ifndef FILESYSTEMTYPEFILTER_H
+#define FILESYSTEMTYPEFILTER_H
 
 #include <QAction>
 #include <QApplication>
@@ -9,13 +9,15 @@
 #include <QStyle>
 #include <QToolButton>
 
-#include "MySearchModel.h"
+#include "AdvanceSearchModel.h"
+#include "Tools/SearchProxyModel.h"
 
-class ToolButtonFileSystemTypeFilter : public QToolButton {
+class FileSystemTypeFilter : public QToolButton {
   Q_OBJECT
  public:
-  ToolButtonFileSystemTypeFilter(QWidget* parent = nullptr);
-  void BindFileSystemModel(QAbstractItemModel* newModel);
+  FileSystemTypeFilter(QWidget* parent = nullptr);
+  void BindFileSystemModel(QFileSystemModel* newModel);
+  void BindFileSystemModel(AdvanceSearchModel* newModel, SearchProxyModel* newProxyModel);
   void onSwitchChanged(bool isOn);
   void onGrayOrHideChanged(bool isGray);
   void onTypeChecked(QAction* act);
@@ -63,9 +65,9 @@ class ToolButtonFileSystemTypeFilter : public QToolButton {
                                                     {NO_DOT_DOT->text(), QDir::NoDotDot},
                                                     {CASE_SENSITIVE->text(), QDir::CaseSensitive}};
 
-  QAbstractItemModel* _model{nullptr};
   QFileSystemModel* _fsmModel{nullptr};
-  MySearchModel* _searchModel{nullptr};
+  AdvanceSearchModel* _searchSourceModel{nullptr};
+  SearchProxyModel* _searchProxyModel{nullptr};
 
   enum MODEL_TYPE { INVALID_MODEL = 0, FILE_SYSTEM_MODEL = 1, SEARCH_MODEL = 2 };
   MODEL_TYPE m_modelType = MODEL_TYPE::INVALID_MODEL;
@@ -74,4 +76,4 @@ class ToolButtonFileSystemTypeFilter : public QToolButton {
   bool m_isIncludingSubdirectory;
 };
 
-#endif  // TOOLBUTTONFILESYSTEMTYPEFILTER_H
+#endif  // FILESYSTEMTYPEFILTER_H

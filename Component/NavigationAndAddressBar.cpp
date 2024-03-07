@@ -7,7 +7,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
     : QToolBar(title, parent),
       m_addressLine(new AddressELineEdit{this}),
       m_searchLE(new QLineEdit{this}),
-      m_fsFilter{new ToolButtonFileSystemTypeFilter},
+      m_fsFilter{new FileSystemTypeFilter},
       m_IntoNewPath(nullptr),
       m_on_searchTextChanged(nullptr),
       m_on_searchEnterKey(nullptr) {
