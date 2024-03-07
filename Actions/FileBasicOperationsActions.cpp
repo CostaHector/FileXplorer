@@ -260,21 +260,6 @@ auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::Get_Advance_Search_Actions() {
-  QAction* _ADVANCE_SEARCH = new QAction(QIcon(":/themes/SEARCH"), tr("Advance search"));
-  _ADVANCE_SEARCH->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_F));
-  _ADVANCE_SEARCH->setShortcutVisibleInContextMenu(true);
-  _ADVANCE_SEARCH->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Search by file name or file contents.").arg(_ADVANCE_SEARCH->text(), _ADVANCE_SEARCH->shortcut().toString()));
-  _ADVANCE_SEARCH->setCheckable(false);
-
-  QActionGroup* actionGroup = new QActionGroup(this);
-  actionGroup->addAction(_ADVANCE_SEARCH);
-
-  actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  return actionGroup;
-}
-
 FileBasicOperationsActions& g_fileBasicOperationsActions() {
   static FileBasicOperationsActions fileOpIns;
   return fileOpIns;

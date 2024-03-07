@@ -22,52 +22,52 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../View/CustomTableView.h" line="46"/>
+        <location filename="../View/CustomTableView.h" line="47"/>
         <source>Performer table column visibility</source>
         <translation>演员表列可见性</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="47"/>
+        <location filename="../View/CustomTableView.h" line="48"/>
         <source>hide this column</source>
         <translation>隐藏此列</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="48"/>
+        <location filename="../View/CustomTableView.h" line="49"/>
         <source>show all columns</source>
         <translation>显示所有列</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="49"/>
+        <location filename="../View/CustomTableView.h" line="50"/>
         <source>stretch last column</source>
         <translation>延展最后一列</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="50"/>
+        <location filename="../View/CustomTableView.h" line="51"/>
         <source>enable column sort</source>
         <translation>允许列排序</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="52"/>
+        <location filename="../View/CustomTableView.h" line="53"/>
         <source>show vertical header</source>
         <translation>显示垂直表头</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="53"/>
+        <location filename="../View/CustomTableView.h" line="54"/>
         <source>resize rows to content</source>
         <translation>自适应行高</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="54"/>
+        <location filename="../View/CustomTableView.h" line="55"/>
         <source>adjust default rows section size</source>
         <translation>调节行高</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="75"/>
+        <location filename="../View/CustomTableView.h" line="76"/>
         <source>vertical header menu</source>
         <translation>垂直表头</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="76"/>
+        <location filename="../View/CustomTableView.h" line="77"/>
         <source>horizontal header menu</source>
         <translation>水平表头</translation>
     </message>
@@ -574,59 +574,49 @@
 <context>
     <name>NavigationAndAddressBar</name>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="21"/>
+        <location filename="../Component/NavigationAndAddressBar.h" line="22"/>
         <source>Address Toolbar</source>
         <translation>地址工具条</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="37"/>
         <source>file</source>
-        <translation>文件</translation>
+        <translation type="vanished">文件</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="38"/>
         <source>folder</source>
-        <translation>文件夹</translation>
+        <translation type="vanished">文件夹</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="39"/>
         <source>hidden</source>
-        <translation>隐藏项目</translation>
+        <translation type="vanished">隐藏项目</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="40"/>
         <source>dotdot</source>
-        <translation>点路径</translation>
+        <translation type="vanished">点路径</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="41"/>
         <source>image</source>
-        <translation>图像</translation>
+        <translation type="vanished">图像</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="42"/>
         <source>video</source>
-        <translation>视频</translation>
+        <translation type="vanished">视频</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="43"/>
         <source>plain Text</source>
-        <translation>文本文件</translation>
+        <translation type="vanished">文本文件</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="44"/>
         <source>document</source>
-        <translation>文档</translation>
+        <translation type="vanished">文档</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.h" line="45"/>
         <source>executable</source>
-        <translation>可执行文件</translation>
+        <translation type="vanished">可执行文件</translation>
     </message>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.cpp" line="10"/>
         <source>Filter</source>
-        <translation>文件类型过滤</translation>
+        <translation type="vanished">文件类型过滤</translation>
     </message>
 </context>
 <context>
@@ -929,6 +919,19 @@
         <location filename="../Component/RightClickableToolBar.cpp" line="18"/>
         <source>Unpin All</source>
         <translation>断开所有链接</translation>
+    </message>
+</context>
+<context>
+    <name>ToolButtonFileSystemTypeFilter</name>
+    <message>
+        <location filename="../Component/ToolButtonFileSystemTypeFilter.h" line="24"/>
+        <source>Filter Menu</source>
+        <translation>类型过滤器菜单</translation>
+    </message>
+    <message>
+        <location filename="../Component/ToolButtonFileSystemTypeFilter.h" line="39"/>
+        <source>gray the filtered</source>
+        <translation>灰化滤出项</translation>
     </message>
 </context>
 <context>
