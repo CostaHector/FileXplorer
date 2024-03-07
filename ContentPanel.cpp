@@ -24,7 +24,7 @@ ContentPanel::ContentPanel(FolderPreviewHTML* previewHtml_, FolderPreviewWidget*
       _dbSearchBar(nullptr),
       m_fsModel(new MyQFileSystemModel(this)),
       m_dbModel(new MyQSqlTableModel(this, GetSqlVidsDB())),
-      m_srcModel{new MySearchModel},
+      m_srcModel{new AdvanceSearchModel},
       m_proxyModel{new SearchProxyModel},
       m_menu(new RightClickMenu("Right click menu", this)),
       previewHtml(previewHtml_),

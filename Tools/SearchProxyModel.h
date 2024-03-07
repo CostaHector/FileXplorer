@@ -1,13 +1,21 @@
 #ifndef SEARCHPROXYMODEL_H
 #define SEARCHPROXYMODEL_H
 
+#include <QAbstractItemModel>
 #include <QComboBox>
 #include <QDebug>
-#include <QSortFilterProxyModel>
+#include "AdvanceSearchModel.h"
 
 class SearchProxyModel : public QSortFilterProxyModel {
  public:
   SearchProxyModel(QObject* parent = nullptr);
+  void setSourceModel(QAbstractItemModel* sourceModel) override {
+    _searchSourceModel = dynamic_cast<AdvanceSearchModel*>(sourceModel);
+    QSortFilterProxyModel::setSourceModel(sourceModel);
+    if (_searchSourceModel == nullptr) {
+      qWarning("Error. setNameFilterDisables will not work.");
+    }
+  }
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
     return sourceModel()->headerData(section, orientation, role);
@@ -25,25 +33,22 @@ class SearchProxyModel : public QSortFilterProxyModel {
   void Reset() {
     m_searchFileContent.clear();
     m_nameFilters.clear();
-    m_isCustomSearch = false;
   }
 
   void setSearchInFileContentsString(const QString& searchContent, const QStringList& nameSrcFilters);
 
-  void initNameFilterDisable(bool hide) { m_nameFilterDisablesOrHidden = hide; }
-  void setNameFilterDisable(bool hide) {
-    initNameFilterDisable(hide);
-    //    m_nameFilterDisablesOrHidden = hide;
-  }
+  void initNameFilterDisables(bool hide) { m_nameFilterHideOrDisable = hide; }
+  void setNameFilterDisables(bool hide) { initNameFilterDisables(hide); }
 
  private:
+  AdvanceSearchModel* _searchSourceModel{nullptr};
+
   QString m_lastTimeFilterStr;
   QString m_searchMode;
 
   QString m_searchFileContent;
   QList<QRegExp> m_nameFilters;
-  bool m_isCustomSearch = false;
-  bool m_nameFilterDisablesOrHidden = true;
-  //  m_nameFilterDisablesOrHidden{PreferenceSettings().value("HIDE_ENTRIES_DONT_PASS_FILTER", true).toBool()}
+  bool m_nameFilterHideOrDisable;
+  bool m_isCustomSearch;
 };
 #endif  // SEARCHPROXYMODEL_H

@@ -1,10 +1,11 @@
 #include "AdvanceSearchWindow.h"
+#include "Actions/FileBasicOperationsActions.h"
+#include "Component/AdvanceSearchToolBar.h"
+#include "Component/FileSystemTypeFilter.h"
+#include "CustomTableView.h"
 #include "PublicVariable.h"
 
-#include "Component/AdvanceSearchToolBar.h"
-#include "CustomTableView.h"
-
-AdvanceSearchTableView::AdvanceSearchTableView(MySearchModel* _sourceModel, SearchProxyModel* _searchProxyModel, QWidget* parent)
+AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* _sourceModel, SearchProxyModel* _searchProxyModel, QWidget* parent)
     : CustomTableView("ADVANCE_SEARCH_SYSTEM", parent) {
   //  BindMenu(menu);
   _searchProxyModel->setSourceModel(_sourceModel);
@@ -18,6 +19,8 @@ AdvanceSearchTableView::AdvanceSearchTableView(MySearchModel* _sourceModel, Sear
 
   //  subscribe();
   InitTableView();
+
+  addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
 }
 
 class AdvanceSearchTableViewWindowTest : public QMainWindow {
@@ -25,17 +28,14 @@ class AdvanceSearchTableViewWindowTest : public QMainWindow {
   explicit AdvanceSearchTableViewWindowTest(QWidget* parent = nullptr) : QMainWindow(parent) {
     const QString restoredPath = "D:/extra";
     QDir::Filters restoredFilters{
-        PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(ToolButtonFileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
+                                  PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(FileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
     m_srcModel->setRootPathAndFilter(restoredPath, restoredFilters);
     m_proxyModel->setSourceModel(m_srcModel);
 
     m_tv = new AdvanceSearchTableView(m_srcModel, m_proxyModel, this);
     setCentralWidget(m_tv);
     addToolBar(m_tb);
-
-    m_tb->BindProxyModel(m_proxyModel);
-    m_tb->BindSourceModel(m_srcModel);
-
+    m_tb->BindSearchAllModel(m_proxyModel, m_srcModel);
     setWindowIcon(QIcon(":/themes/SEARCH"));
     setWindowTitle("Search under|" + m_srcModel->rootPath());
   }
@@ -53,7 +53,7 @@ class AdvanceSearchTableViewWindowTest : public QMainWindow {
 
  private:
   AdvanceSearchToolBar* m_tb = new AdvanceSearchToolBar("advance search tb", this);
-  MySearchModel* m_srcModel = new MySearchModel;
+  AdvanceSearchModel* m_srcModel = new AdvanceSearchModel;
   SearchProxyModel* m_proxyModel = new SearchProxyModel;
 
   AdvanceSearchTableView* m_tv = nullptr;

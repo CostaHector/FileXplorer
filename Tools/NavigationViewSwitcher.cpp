@@ -77,19 +77,18 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "search") {
     if (_view->m_advanceSearchView == nullptr) {
-      _view->m_srcModel = new MySearchModel;
+      _view->m_srcModel = new AdvanceSearchModel;
       _view->m_proxyModel = new SearchProxyModel;
       _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_srcModel, _view->m_proxyModel, _view);
       _view->AddView(viewType, _view->m_advanceSearchView);
 
-      _navigation->m_advanceSearchBar->BindProxyModel(_view->m_proxyModel);
-      _navigation->m_advanceSearchBar->BindSourceModel(_view->m_srcModel);
+      _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_srcModel);
     }
     viewIndex = _view->m_name2ViewIndex[viewType];
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
     if (newPath.count('/') >= 2) {
       QDir::Filters restoredFilters{
-          PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(ToolButtonFileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
+                                    PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(FileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
       _view->m_srcModel->setRootPathAndFilter(newPath, restoredFilters);
       _view->m_advanceSearchView->setWindowTitle("Search under|" + newPath);
     } else {

@@ -1,5 +1,5 @@
-#ifndef MYSEARCHMODEL_H
-#define MYSEARCHMODEL_H
+#ifndef ADVANCESEARCHMODEL_H
+#define ADVANCESEARCHMODEL_H
 
 #include <QComboBox>
 #include <QDateTime>
@@ -10,7 +10,6 @@
 #include <QFileInfo>
 #include <QSortFilterProxyModel>
 #include <QWidget>
-#include "Tools/SearchProxyModel.h"
 
 struct FileProperty {
   QString name;
@@ -20,9 +19,9 @@ struct FileProperty {
   QString relPath;
 };
 
-class MySearchModel : public QAbstractTableModel {
+class AdvanceSearchModel : public QAbstractTableModel {
  public:
-  explicit MySearchModel(QObject* parent = nullptr);
+  explicit AdvanceSearchModel(QObject* parent = nullptr);
 
   auto filter() const -> QDir::Filters { return m_filters; }
   auto _updatePlanetList() -> void;
@@ -47,15 +46,19 @@ class MySearchModel : public QAbstractTableModel {
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
   auto headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const -> QVariant override;
 
-  auto BindProxyModel(SearchProxyModel* proxyModel) -> void { m_proxyModel = proxyModel; }
-  auto setNameFilterDisables(bool enable) -> void {
-    qDebug("Todo. setNameFilterDisables not works now.");
-//    m_proxyModel->setNameFilterDisable(enable);
-  }
-  auto initNameFilterDisables(bool enable) -> void {
-    qDebug("Todo. initNameFilterDisables not works now.");
-    //    m_proxyModel->setNameFilterDisable(enable);
-  }
+  void setNameFilterDisables(bool enable) = delete;
+  // call setNameFilterDisables or proxy model instead
+  void initNameFilterDisables(bool enable) = delete;
+
+  void ClearCopyAndCutDict();
+  void ClearCutDict();
+  void ClearCopiedDict();
+  void CutSomething(const QModelIndexList& cutIndexes, bool appendMode = false);
+  void CopiedSomething(const QModelIndexList& copiedIndexes, bool appendMode = false);
+
+  void appendDisable(const QModelIndex& ind);
+  void removeDisable(const QModelIndex& ind);
+  void clearDisables();
 
  private:
   QString m_rootPath;
@@ -63,8 +66,12 @@ class MySearchModel : public QAbstractTableModel {
   QFileIconProvider m_iconProvider;
   QDir::Filters m_filters;
   QDirIterator::IteratorFlags m_iteratorFlags;
-  SearchProxyModel* m_proxyModel = nullptr;
+
+  QHash<QString, QModelIndexList> m_copiedMap;
+  QHash<QString, QModelIndexList> m_cutMap;
+  QSet<QModelIndex> m_disableList;  // QFileSystemModel: only setNameFilter will effect this
+                                    // SearchModel: both setNameFilter and contents will effect this
   static const QStringList HORIZONTAL_HEADER_NAMES;
 };
 
-#endif  // MYSEARCHMODEL_H
+#endif  // ADVANCESEARCHMODEL_H
