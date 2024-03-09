@@ -7,9 +7,10 @@
 #include "Component/PropertiesWindow.h"
 #include "Component/VideoPlayer.h"
 
-#include "Tools/MyClipboard.h"
 #include "Tools/MimeDataCX.h"
+#include "Tools/MyClipboard.h"
 #include "Tools/RedundantFolderRemove.h"
+#include "Tools/RenameWidget.h"
 
 #include "ContentPanel.h"
 
@@ -32,45 +33,24 @@
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
+
  public:
-  FileExplorerEvent(QObject* parent = nullptr,
-                    MyQFileSystemModel* fsm = nullptr,
-                    ContentPanel* view = nullptr,
-                    CustomStatusBar* logger = nullptr,
-                    T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
+  static FileExplorerEvent* GetFileExlorerEvent(MyQFileSystemModel* fsm,
+                                               ContentPanel* view,
+                                               CustomStatusBar* logger,
+                                               T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility(),
+                                               QObject* parent = nullptr);
+
+ private:
+  FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, T_UpdateComponentVisibility hotUpdate_, QObject* parent);
   void subscribe();
 
-  auto onRenamePre() const -> QPair<QString, QStringList> {
-    QStringList preNames;
-    for (QModelIndex ind : selectedIndexes()) {
-      preNames.append(_fileSysModel->fileName(ind));
-    }
-    return {_fileSysModel->rootPath(), preNames};
-  }
+  void onRename(RenameWidget* renameWid);
+  auto onRenamePre() const -> std::pair<QString, QStringList>;
 
-  auto __CanNewItem() const -> bool {
-    if (_fileSysModel->rootPath().isEmpty()) {
-      qDebug("Reject. don't create item here[%s]", qPrintable(_fileSysModel->rootPath()));
-      Notificator::warning("Reject", QString("Don't create item here[%s]").arg(_fileSysModel->rootPath()));
-      return false;
-    }
-    return true;
-  }
+  auto __CanNewItem() const -> bool;
 
-  auto __FocusNewItem(const QString& itemPath) -> bool {
-    if (_contentPane->isFSView()){
-      return false;
-    }
-    auto* view = _contentPane->GetCurView();
-    const QModelIndex ind = _fileSysModel->index(itemPath);
-    if (not ind.isValid()) {
-      qDebug("Target Lose");
-      return false;
-    }
-    view->clearSelection();
-    view->setCurrentIndex(ind);
-    return true;
-  }
+  auto __FocusNewItem(const QString& itemPath) -> bool;
 
   auto on_NewTextFile(QString newTextName = "", const QString& contents = "") -> bool;
   auto on_NewJsonFile() -> bool;
