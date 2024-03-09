@@ -21,9 +21,9 @@ class CustomStatusBar : public QStatusBar {
 
   auto pathInfo(const int count, const int index = 0) -> void {
     if (index == 0) {
-      labelLst[0]->setText(QString("Total %1 item(s)").arg(count));
+      labelLst[0]->setText(QString("Total %1 item(s) |").arg(count));
     } else if (index == 1) {
-      labelLst[1]->setText(QString("%1 selected").arg(count));
+      labelLst[1]->setText(QString("%1 selected |").arg(count));
     }
   }
   auto msg(const QString& msg = "", const STATUS_STR_TYPE statusStrType = STATUS_STR_TYPE::NORMAL) -> void {

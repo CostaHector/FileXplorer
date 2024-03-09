@@ -153,37 +153,36 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
       return false;
     }
   }
-  QString path(fi.absoluteFilePath());
-  if (fi.isDir() and isFSView()) {  // file system view change path to directory. otherwise open in system explorer
-    onActionAndViewNavigate(path, true, true);
-    return true;
-  }
-  if (fi.isFile()) {
+  // file system view change path to directory. otherwise open in system explorer
+  if (fi.isFile() or not isFSView()) {
     return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
+  }
+  if (fi.isDir()) {
+    onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
   }
   return true;
 }
 
 auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) -> bool {
-  if (m_fsModel == nullptr) {
+  if (not isFSView()) {
     return false;
   }
-  if (selected.isEmpty()) {
-    if (_logger) {
-      _logger->pathInfo(0, 1);
-    }
-    return true;
-  }
-  // new selected count
+  const int selectCnt = getSelectedRowsCount();
   if (_logger) {
-    _logger->pathInfo(getSelectedRowsCount(), 1);
+    _logger->pathInfo(selectCnt, 1);
   }
-  const QModelIndex& firstIndex = selected.indexes().front();
+  if (selectCnt <= 0) {
+    return false;
+  }
+  // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
+  const QModelIndex firstIndex = selected.indexes().front();
+  if (not firstIndex.isValid()) {
+    return false;
+  }
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
-
   const QString& pth = m_fsModel->rootPath();
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
-  qDebug("\t\t Anchor of path [%s] target to [%d,%d]", qPrintable(pth), m_anchorTags[pth].row, m_anchorTags[pth].col);
+  qDebug("\t\t Anchor of path [%s] target to (%d, %d)", qPrintable(pth), m_anchorTags[pth].row, m_anchorTags[pth].col);
   if (previewWidget != nullptr) {
     emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
   }

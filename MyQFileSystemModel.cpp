@@ -48,7 +48,7 @@ Qt::ItemFlags MyQFileSystemModel::flags(const QModelIndex& index) const {
 
 bool MyQFileSystemModel::canItemsBeDragged(const QModelIndex& index) const {
   // can dragged: valid and not root item
-  return index.isValid() and not PATHTOOL::isRootOrEmpty(filePath(index));
+  return index.isValid() and not PATHTOOL::isLinuxRootOrWinEmpty(filePath(index));
 }
 
 bool MyQFileSystemModel::canItemsDroppedHere(const QModelIndex& index) const {

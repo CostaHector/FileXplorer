@@ -34,8 +34,7 @@ class FileExplorerReadOnly : public QMainWindow {
       m_fsPanel->_addressBar->m_searchLE->selectAll();
       return;
     }else if (ev->key() == Qt::Key_Escape){
-      m_fsPanel->m_fsTableView->clearSelection();
-      m_fsPanel->m_fsTableView->setFocus();
+      m_fsPanel->GetCurView()->setFocus();
       return;
     }
     QMainWindow::keyPressEvent(ev);
