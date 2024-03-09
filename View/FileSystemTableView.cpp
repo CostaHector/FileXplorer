@@ -18,7 +18,7 @@ FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* me
 
   subscribe();
 
-  InitTableView();
+  InitTableView();  
 }
 
 void FileSystemTableView::subscribe() {
