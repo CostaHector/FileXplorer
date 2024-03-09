@@ -34,14 +34,13 @@ class FileExplorerReadOnly : public QMainWindow {
       m_fsPanel->_addressBar->m_searchLE->selectAll();
       return;
     }else if (ev->key() == Qt::Key_Escape){
-      m_fsPanel->m_fsView->clearSelection();
-      m_fsPanel->m_fsView->setFocus();
+      m_fsPanel->m_fsTableView->clearSelection();
+      m_fsPanel->m_fsTableView->setFocus();
       return;
     }
     QMainWindow::keyPressEvent(ev);
   }
 
-  const static QString DEFAULT_PATH;
   QDockWidget* previewHtmlDock;
   FolderPreviewHTML* previewHtml;
   FolderPreviewWidget* previewWidget;

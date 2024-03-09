@@ -82,8 +82,8 @@ class MyQFileSystemModel : public QFileSystemModel {
   }
 
   void DragRelease() {
-    if (not m_draggedHoverIndex.isValid()){
-      return; // already invalid index
+    if (not m_draggedHoverIndex.isValid()) {
+      return;  // already invalid index
     }
     QModelIndex tmpIndex = m_draggedHoverIndex;
     m_draggedHoverIndex = QModelIndex();

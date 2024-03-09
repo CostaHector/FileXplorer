@@ -1,8 +1,10 @@
 #ifndef ADVANCESEARCHTOOLBAR_H
 #define ADVANCESEARCHTOOLBAR_H
 
-#include "Component/SearchModeComboBox.h"
 #include "Component/FileSystemTypeFilter.h"
+#include "Component/SearchCaseMatterToolButton.h"
+#include "Component/SearchModeComboBox.h"
+
 #include "AdvanceSearchModel.h"
 #include "Tools/SearchProxyModel.h"
 
@@ -21,8 +23,6 @@ class AdvanceSearchToolBar : public QToolBar {
 
   void onSearchEnterAndApply();
 
-  void UpdateLineEditReplaceHolder(const QString& searchModeText);
-
  private:
   void BindSearchProxyModel(SearchProxyModel* searchProxyModel);
   void BindSearchSourceModel(AdvanceSearchModel* searchSourceModel);
@@ -30,9 +30,10 @@ class AdvanceSearchToolBar : public QToolBar {
   QLineEdit* m_nameFilter = new QLineEdit(this);
   FileSystemTypeFilter* m_typeButton = new FileSystemTypeFilter(this);
   SearchModeComboBox* m_searchModeComboBox = new SearchModeComboBox;
+  SearchCaseMatterToolButton* m_searchCaseButton = new SearchCaseMatterToolButton(this);
 
   SearchProxyModel* _searchProxyModel = nullptr;
   AdvanceSearchModel* _searchSourceModel = nullptr;
 };
 
-#endif // ADVANCESEARCHTOOLBAR_H
+#endif  // ADVANCESEARCHTOOLBAR_H

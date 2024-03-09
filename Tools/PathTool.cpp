@@ -1,5 +1,8 @@
 #include "PathTool.h"
 
+#include <QFileInfo>
+#include <QStringList>
+
 QString PATHTOOL::StripTrailingSlash(QString path) {
   // drive letter will be kept while trailing path seperator will be trunc
   // i.e.,
@@ -102,12 +105,63 @@ QString PATHTOOL::driver(const QString& fullPath) {
 #endif
 }
 QString PATHTOOL::commonPrefix(const QString& path1, const QString& path2) {
-  return "";
-}
-QString PATHTOOL::commonPath(const QString& path1, const QString& path2) {
-  return "";
+  const int length = std::min(path1.size(), path2.size());
+  int index = 0;
+  while (index < length && path1[index] == path2[index]) {
+    ++index;
+  }
+  return path1.left(index);
 }
 
 bool PATHTOOL::isRootOrEmpty(const QString& path) {
   return path.isEmpty() or path == "/";
+}
+
+QStringList PATHTOOL::GetRels(int prefixLen, const QStringList& lAbsPathList) {
+  // "/home/rel2entry", "/home", prefixLen = 4
+  const int rel2EntryN = prefixLen + 1;
+  QStringList lRels;
+  for (const auto& lAbsPath : lAbsPathList) {
+    lRels.append(lAbsPath.mid(rel2EntryN));
+  }
+  return lRels;
+}
+
+std::pair<QString, QStringList> PATHTOOL::GetLAndRels(const QStringList& lAbsPathList) {
+  if (lAbsPathList.isEmpty()) {
+    return {"", lAbsPathList};
+  }
+  const auto& prefixPath = longestCommonPrefix(lAbsPathList);
+  // "/home/rel2entry" => rel2EntryN = 5+1
+  const int prefixLen = prefixPath.size();
+  QStringList lRels = GetRels(prefixLen, lAbsPathList);
+  return {prefixPath, lRels};
+}
+
+QString PATHTOOL::longestCommonPrefix(const QStringList& strs) {
+  if (strs.isEmpty()) {
+    return "";
+  }
+  if (strs.size() == 1) {
+    return QFileInfo(strs[0]).absolutePath();
+  }
+
+  QString prefix = strs[0];
+  int count = strs.size();
+  for (int i = 1; i < count; ++i) {
+    prefix = commonPrefix(prefix, strs[i]);
+    if (!prefix.size()) {
+      break;
+    }
+  }
+
+  // source         => plain prefix   => path prefix
+  // /home/costa    => /home/costa    => /home
+  // /home/costa/H  => /home/costa
+
+  // return path without trailing '/'
+
+  const int slashIndex = prefix.lastIndexOf('/');
+  return slashIndex == -1 ? prefix : prefix.left(slashIndex);
+  ;
 }

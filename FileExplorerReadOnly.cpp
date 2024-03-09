@@ -10,8 +10,6 @@
 #include "Component/FolderPreviewHTML.h"
 #include "PublicVariable.h"
 
-const QString FileExplorerReadOnly::DEFAULT_PATH = "";
-
 FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
     : QMainWindow(parent),
       previewHtmlDock(new QDockWidget("Preview HTML", this)),
@@ -31,7 +29,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
   m_views->addActions(g_viewActions()._TRIPLE_VIEW->actions());
 
   m_fsPanel = new ContentPanel(previewHtml, nullptr, this);
-  m_fsPanel->BindCustomStatusBar(_statusBar);
+  m_fsPanel->BindLogger(_statusBar);
 
   m_viewSwitcher = new NavigationViewSwitcher{m_stackedBar, m_fsPanel};
   m_viewSwitcher->onSwitchByViewType("table");
@@ -70,7 +68,8 @@ void FileExplorerReadOnly::closeEvent(QCloseEvent* event) {
     PreferenceSettings().setValue("dockerHtmlWidth", previewHtml->width());
     PreferenceSettings().setValue("dockerHtmlHeight", previewHtml->height());
   }
-  PreferenceSettings().setValue("defaultOpenPath", m_fsPanel->CurrentPath());
+
+  PreferenceSettings().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
   return QMainWindow::closeEvent(event);
 }
 
@@ -85,7 +84,7 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
   QString inputPath(initialPath.endsWith('"') ? initialPath.chopped(1) : initialPath);
   const QFileInfo inputFi = QFileInfo(inputPath);
   if (not inputFi.exists()) {  // input valid
-    openPath = PreferenceSettings().value("defaultOpenPath", FileExplorerReadOnly::DEFAULT_PATH).toString();
+    openPath = PreferenceSettings().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
   } else {  // when input invalid, use last time path
     if (inputFi.isFile()) {
       openPath = inputFi.absolutePath();

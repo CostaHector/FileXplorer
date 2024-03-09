@@ -18,7 +18,7 @@ FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
       "2. SearchModel->setFilter()");
 
   HIDE_ENTRIES_DONT_PASS_FILTER->setCheckable(true);
-  HIDE_ENTRIES_DONT_PASS_FILTER->setChecked(PreferenceSettings().value("HIDE_ENTRIES_DONT_PASS_FILTER", true).toBool());
+  HIDE_ENTRIES_DONT_PASS_FILTER->setChecked(PreferenceSettings().value(MemoryKey::HIDE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::HIDE_ENTRIES_DONT_PASS_FILTER.v).toBool());
   HIDE_ENTRIES_DONT_PASS_FILTER->setToolTip(
       "This property holds whether files that don't pass the name filter are hidden(true) or disabled(false)\n"
       "This property is true by default.\n"
@@ -124,7 +124,7 @@ void FileSystemTypeFilter::onSwitchChanged(bool isOn) {
 }
 
 void FileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
-  PreferenceSettings().setValue("HIDE_ENTRIES_DONT_PASS_FILTER", isGray);
+  PreferenceSettings().setValue(MemoryKey::HIDE_ENTRIES_DONT_PASS_FILTER.name, isGray);
   if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
   }
@@ -191,7 +191,7 @@ void FileSystemTypeFilter::initNameFilterDisablesAgent(bool enable) {
       _fsmModel->setNameFilterDisables(enable);
       return;
     case SEARCH_MODEL:
-      _searchProxyModel->setNameFilterDisables(enable);
+      _searchProxyModel->initNameFilterDisables(enable);
       return;
     default:
       qDebug("invalid Model. not setNameFilterDisable");

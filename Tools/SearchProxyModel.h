@@ -11,17 +11,18 @@ class SearchProxyModel : public QSortFilterProxyModel {
   SearchProxyModel(QObject* parent = nullptr);
   void setSourceModel(QAbstractItemModel* sourceModel) override {
     _searchSourceModel = dynamic_cast<AdvanceSearchModel*>(sourceModel);
-    QSortFilterProxyModel::setSourceModel(sourceModel);
     if (_searchSourceModel == nullptr) {
       qWarning("Error. setNameFilterDisables will not work.");
     }
+    QSortFilterProxyModel::setSourceModel(sourceModel);
   }
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
     return sourceModel()->headerData(section, orientation, role);
   }
 
-  auto onSearchModeChanged(const QString& searchMode) -> void;
+  auto initSearchMode(const QString& searchMode) -> void;
+  auto setSearchMode(const QString& searchMode) -> void;
 
   auto startFilterWhenTextChanged(const QString& searchText) -> void;
   auto startFilterWhenTextChanges(const QString& searchText) -> void;
@@ -31,24 +32,36 @@ class SearchProxyModel : public QSortFilterProxyModel {
   auto filterAcceptsRow(int source_row, const QModelIndex& source_parent) const -> bool override;
 
   void Reset() {
-    m_searchFileContent.clear();
+    m_fileContents.clear();
     m_nameFilters.clear();
   }
 
-  void setSearchInFileContentsString(const QString& searchContent, const QStringList& nameSrcFilters);
+  void changeCustomSearchNameAndContents(const QString& searchText);
 
   void initNameFilterDisables(bool hide) { m_nameFilterHideOrDisable = hide; }
-  void setNameFilterDisables(bool hide) { initNameFilterDisables(hide); }
+  void setNameFilterDisables(bool hide);
+
+  inline void initFileContentsCaseSensitive(bool sensitive) { m_fileContentsCaseSensitive = sensitive; }
+  void setFileContentsCaseSensitive(bool sensitive);
+
+  inline void initFileNameFiltersCaseSensitive(bool sensitive) { m_nameFiltersCaseSensitive = sensitive; }
+  void setFileNameFiltersCaseSensitive(bool sensitive);
 
  private:
+  auto CheckIfContentsContained(const QString& filePath, const QString& contained) const -> bool;
   AdvanceSearchModel* _searchSourceModel{nullptr};
 
-  QString m_lastTimeFilterStr;
-  QString m_searchMode;
+  QString m_searchSourceString;
 
-  QString m_searchFileContent;
-  QList<QRegExp> m_nameFilters;
-  bool m_nameFilterHideOrDisable;
+  QString m_searchMode;
   bool m_isCustomSearch;
+
+  QString m_fileContents;
+  QList<QRegExp> m_nameFilters;
+
+  bool m_fileContentsCaseSensitive;
+  bool m_nameFiltersCaseSensitive;
+
+  bool m_nameFilterHideOrDisable;
 };
 #endif  // SEARCHPROXYMODEL_H

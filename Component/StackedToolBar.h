@@ -34,4 +34,7 @@ class StackedToolBar : public QToolBar {
   QHash<QString, int> m_name2StackIndex;
 };
 
+
+
+
 #endif  // STACKEDTOOLBAR_H
