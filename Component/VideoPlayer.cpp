@@ -522,7 +522,7 @@ bool VideoPlayer::onPositionAdd(const int ms) {
 }
 
 auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {
-  qDebug("Rate: %s score.", checkedAction->text().toStdString().c_str());
+  qDebug("Rate: %s score.", qPrintable(checkedAction->text()));
   const QString& jsonPath = JsonFileValidCheck("rate movie");
   if (jsonPath.isEmpty()) {
     return false;

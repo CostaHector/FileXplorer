@@ -55,5 +55,5 @@ class PerformersManagerTest : public QObject {
   }
 };
 
-QTEST_MAIN(PerformersManagerTest)
-#include "PerformersStringParserTest.moc"
+//QTEST_MAIN(PerformersManagerTest)
+//#include "PerformersStringParserTest.moc"

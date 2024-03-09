@@ -10,34 +10,24 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   addWidget(m_nameFilter);
   addWidget(m_typeButton);
   addWidget(m_searchModeComboBox);
+  addWidget(m_searchCaseButton);
 
   m_nameFilter->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_nameFilter->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   m_typeButton->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   m_searchModeComboBox->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
+  m_searchCaseButton->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
 
   m_nameFilter->setText(PreferenceSettings().value("ADVANCE_SEARCH_LINEEDIT_VALUE", "").toString());
-  connect(m_searchModeComboBox, &QComboBox::currentTextChanged, this, &AdvanceSearchToolBar::UpdateLineEditReplaceHolder);
+
+  m_nameFilter->setPlaceholderText("Normal[abc], Wildcard[do?x], Regex[\\d{4}], Search for File Content[*.html,*.txt|contents]");
 }
 
-void AdvanceSearchToolBar::UpdateLineEditReplaceHolder(const QString& searchModeText) {
-  m_nameFilter->setPlaceholderText("");
-  if (searchModeText == "Normal") {
-    m_nameFilter->setPlaceholderText("abc");
-  } else if (searchModeText == "Wildcard") {
-    m_nameFilter->setPlaceholderText("do?x");
-  } else if (searchModeText == "Regex") {
-    m_nameFilter->setPlaceholderText("\\d{4}");
-  } else if (searchModeText == "Search for File Content") {
-    m_nameFilter->setPlaceholderText("name|*.html,*.txt");
-  }
-}
-
-void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel){
+void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel) {
   // independant bind
   BindSearchProxyModel(searchProxyModel);
   BindSearchSourceModel(searchSourceModel);
@@ -58,6 +48,7 @@ void AdvanceSearchToolBar::BindSearchProxyModel(SearchProxyModel* searchProxyMod
   connect(m_nameFilter, &QLineEdit::textChanged, _searchProxyModel, &SearchProxyModel::startFilterWhenTextChanges);
   connect(m_nameFilter, &QLineEdit::returnPressed, this, &AdvanceSearchToolBar::onSearchEnterAndApply);
   m_searchModeComboBox->BindSearchModel(_searchProxyModel);
+  m_searchCaseButton->BindSearchModel(_searchProxyModel);
 }
 
 void AdvanceSearchToolBar::BindSearchSourceModel(AdvanceSearchModel* searchSourceModel) {

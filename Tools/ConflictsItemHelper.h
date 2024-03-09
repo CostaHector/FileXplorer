@@ -8,35 +8,7 @@
 #include <QSet>
 #include <QString>
 #include <QStringList>
-
-static auto GetLAndRels(const QStringList& lAbsPathList) -> QPair<QString, QStringList> {
-  if (lAbsPathList.isEmpty()) {
-    return {"", lAbsPathList};
-  }
-  if (lAbsPathList.size() == 1) {
-    return {QFileInfo(lAbsPathList[0]).absolutePath(), {QFileInfo(lAbsPathList[0]).fileName()}};
-  }
-  const QStringList& first = lAbsPathList.front().split('/');
-  const QStringList& last = lAbsPathList.back().split('/');
-  int comparedCharsLength = std::min(first.size(), last.size());
-  QString maxCommonPrepath;
-  for (int i = 0; i < comparedCharsLength; ++i) {
-    if (first[i] == last[i]) {
-      maxCommonPrepath += (first[i] + '/');  // including trailing '/';
-    }
-  }
-  if (maxCommonPrepath.isEmpty()) {
-    return {"", lAbsPathList};
-  }
-
-  QStringList lRels;
-  const int N = maxCommonPrepath.size();
-  for (const QString& lAbsPath : lAbsPathList) {
-    lRels.append(lAbsPath.mid(N));
-  }
-  return {maxCommonPrepath.chopped(1), lRels};  // remove the trailing '/'
-}
-
+#include "Tools/PathTool.h"
 
 class Finder {
  public:
@@ -115,7 +87,7 @@ class ConflictsItemHelper {
   const QStringList commonList;
   explicit ConflictsItemHelper(const QString& l_, const QString& r_, const QStringList& lRels_)
       : l(l_), r(r_), lRels(lRels_), commonList(Finder::FindLLRelRCommon(l_, lRels_, r_)) {}
-  explicit ConflictsItemHelper(const QPair<QString, QStringList>& lAndRels, const QString& r_)
+  explicit ConflictsItemHelper(const std::pair<QString, QStringList>& lAndRels, const QString& r_)
       : l(lAndRels.first), r(r_), lRels(lAndRels.second), commonList(Finder::FindLLRelRCommon(l, lRels, r_)) {}
 
   operator bool() const { return not commonList.isEmpty(); }
@@ -123,7 +95,7 @@ class ConflictsItemHelper {
   explicit ConflictsItemHelper(const QString& l_, const QString& r_)
       : ConflictsItemHelper(l_, r_, QDir(l_, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList()) {}
 
-  explicit ConflictsItemHelper(const QStringList& lAbsPathList, const QString& r_) : ConflictsItemHelper(GetLAndRels(lAbsPathList), r_) {}
+  explicit ConflictsItemHelper(const QStringList& lAbsPathList, const QString& r_) : ConflictsItemHelper(PATHTOOL::GetLAndRels(lAbsPathList), r_) {}
   auto GetLeftRelPathList(const bool isMove) const -> QStringList { return Finder::FindAllItems(l, lRels, isMove); }
 };
 #endif  // CONFLICTSITEMHELPER_H

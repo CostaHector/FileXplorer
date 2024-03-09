@@ -10,7 +10,7 @@
 
 #include "MyQFileSystemModel.h"
 
-#include "View/AdvanceSearchWindow.h"
+#include "View/AdvanceSearchTableView.h"
 #include "View/DatabaseTableView.h"
 #include "View/FileSystemListView.h"
 #include "View/FileSystemTableView.h"
@@ -24,12 +24,6 @@ class ContentPanel : public QStackedWidget {
   friend class NavigationViewSwitcher;
 
   explicit ContentPanel(FolderPreviewHTML* previewHtml_ = nullptr, FolderPreviewWidget* previewWidget_ = nullptr, QWidget* parent = nullptr);
-  inline QString CurrentPath() { return m_fsModel->rootPath(); }
-  inline bool isFSView() const {
-    auto* p = currentWidget();
-    return p != nullptr and (p == m_fsView or p == m_fsListView or p == m_fsTreeView);
-  }
-
  public slots:
   bool onActionAndViewNavigate(QString newPath, bool isNewPath = true, bool isF5Force = false);
   bool onAddressToolbarPathChanged(QString newPath, bool isNewPath = true);
@@ -42,31 +36,37 @@ class ContentPanel : public QStackedWidget {
   void BindNavigationAddressBar(NavigationAndAddressBar* addressBar);
   void BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar);
   void BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar);
-  void BindCustomStatusBar(CustomStatusBar* logger);
+  void BindLogger(CustomStatusBar* logger);
 
-  auto on_cellDoubleClicked(QModelIndex clickedIndex) -> bool;
+  auto on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool;
   auto on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) -> bool;
   auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
 
-  auto keyPressEvent(QKeyEvent* e) -> void override {
-    if (e->modifiers() == Qt::NoModifier and e->key() == Qt::Key_Backspace) {
-      if (_addressBar) {
-        _addressBar->onUpTo();
-      }
-      return;
-    } else if (e->modifiers() == Qt::NoModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
-      on_cellDoubleClicked(m_fsView->currentIndex());
-      return;
-    }
-    QStackedWidget::keyPressEvent(e);
-  }
+  auto keyPressEvent(QKeyEvent* e) -> void override;
 
-  inline QAbstractItemView* GetView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
-
-  int AddView(const QString& name, QWidget* w) {
-    m_name2ViewIndex[name] = addWidget(w);
-    return m_name2ViewIndex[name];
+  inline bool isFSView() const {
+    const auto* p = currentWidget();
+    return p != nullptr and (p == m_fsTableView or p == m_fsListView or p == m_fsTreeView);
   }
+  inline QAbstractItemView* GetCurView() const {
+    return dynamic_cast<QAbstractItemView*>(currentWidget());
+  }
+  QAbstractItemView* GetView(const QString& name) const;
+  QString GetCurViewName() const;
+  int AddView(const QString& viewType, QWidget* w);
+
+
+  QString getRootPath() const;
+  QString getFilePath(const QModelIndex& ind) const;
+  QModelIndexList getSelectedRows() const;
+  QStringList getFileNames() const;
+  QStringList getFilePaths() const;
+  QStringList getFilePrepaths() const;
+  QStringList getTheJpgFolderPaths() const;
+  std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
+
+  int getSelectedRowsCount() const;
+  QFileInfo getFileInfo(const QModelIndex& ind) const;
 
  public:
   struct Anchor {
@@ -80,13 +80,13 @@ class ContentPanel : public QStackedWidget {
   AdvanceSearchToolBar* _advanceSearchBar;
 
   MyQFileSystemModel* m_fsModel;
-  MyQSqlTableModel* m_dbModel;
-  AdvanceSearchModel* m_srcModel;
-  SearchProxyModel* m_proxyModel;
+  MyQSqlTableModel* m_dbModel{nullptr};
+  AdvanceSearchModel* m_srcModel{nullptr};
+  SearchProxyModel* m_proxyModel{nullptr};
 
   QMenu* m_menu;
 
-  FileSystemTableView* m_fsView{nullptr};
+  FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
   DatabaseTableView* m_dbPanel{nullptr};
