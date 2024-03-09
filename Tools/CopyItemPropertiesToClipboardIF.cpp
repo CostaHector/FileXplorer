@@ -98,3 +98,5 @@ auto CopyItemPropertiesToClipboardIF::on_copyName(const QAbstractItemView* view)
   }
   return PathCopyTriple(mixed, "file-name");
 }
+
+
