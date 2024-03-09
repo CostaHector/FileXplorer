@@ -87,7 +87,6 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
           [this](const QPoint pnt) { m_verMenu->popup(viewport()->mapToGlobal(pnt)); });
 
   horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-
   connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this, [this](const QPoint pnt) {
     m_horizontalHeaderSectionClicked = horizontalHeader()->logicalIndexAt(pnt);
     m_horMenu->popup(viewport()->mapToGlobal(pnt));
@@ -237,7 +236,13 @@ void CustomTableView::onSortIndicatorChanged(int logicalIndex, Qt::SortOrder ord
   if (not isIndicatorHoldByRestoredStateTrustable) {
     qInfo(
         "At first time, QHeaderView.restoreState() would restore state with bugs(always being descending) "
-        "and triggered indicator changed. So instead, we trust value more from PreferenceSetting.");
+        "and triggered indicator changed. So instead, we trust value more from PreferenceSetting."
+        "The first time. we trust onSortIndicatorChanged more");
+    int logicalIndex =
+        PreferenceSettings().value(MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.v).toInt();
+    const QString& orderString(
+        PreferenceSettings().value(MemoryKey::HEADVIEW_SORT_INDICATOR_ORDER.name, MemoryKey::HEADVIEW_SORT_INDICATOR_ORDER.v).toString());
+    horizontalHeader()->setSortIndicator(logicalIndex, HEADERVIEW_SORT_INDICATOR_ORDER::string2SortOrderEnumListTable[orderString]);
     return;
   }
   PreferenceSettings().setValue(MemoryKey::HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX.name, logicalIndex);
