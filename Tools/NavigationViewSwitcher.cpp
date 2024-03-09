@@ -45,11 +45,12 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
 
   int viewIndex = -1;
   if (viewType == "table") {
-    if (_view->m_fsView == nullptr) {
-      _view->m_fsView = new FileSystemTableView(_view->m_fsModel, _view->m_menu);
-      ContentPanel::connect(_view->m_fsView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      ContentPanel::connect(_view->m_fsView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
-      _view->AddView(viewType, _view->m_fsView);
+    if (_view->m_fsTableView == nullptr) {
+      _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel, _view->m_menu);
+      ContentPanel::connect(_view->m_fsTableView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, _view,
+                            &ContentPanel::on_selectionChanged);
+      _view->AddView(viewType, _view->m_fsTableView);
     }
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "list") {
@@ -72,6 +73,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     if (_view->m_dbPanel == nullptr) {
       _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
       _view->m_dbPanel = new DatabaseTableView(_view->_dbSearchBar, _view->m_dbModel, _view);
+      ContentPanel::connect(_view->m_dbPanel, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->AddView(viewType, _view->m_dbPanel);
     }
     viewIndex = _view->m_name2ViewIndex[viewType];
@@ -80,15 +82,19 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->m_srcModel = new AdvanceSearchModel;
       _view->m_proxyModel = new SearchProxyModel;
       _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_srcModel, _view->m_proxyModel, _view);
-      _view->AddView(viewType, _view->m_advanceSearchView);
+      ContentPanel::connect(_view->m_advanceSearchView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
 
-      _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_srcModel);
+      _view->m_advanceSearchView->BindLogger(_view->_logger);
+      if (_navigation->m_advanceSearchBar != nullptr) {
+        _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_srcModel);
+      }
+      _view->AddView(viewType, _view->m_advanceSearchView);
     }
     viewIndex = _view->m_name2ViewIndex[viewType];
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
     if (newPath.count('/') >= 2) {
       QDir::Filters restoredFilters{
-                                    PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(FileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
+          PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(FileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
       _view->m_srcModel->setRootPathAndFilter(newPath, restoredFilters);
       _view->m_advanceSearchView->setWindowTitle("Search under|" + newPath);
     } else {

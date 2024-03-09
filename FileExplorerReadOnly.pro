@@ -42,12 +42,15 @@ SOURCES += \
     Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
     Component/RightClickMenu.cpp \
+    Component/SearchCaseMatterToolButton.cpp \
     Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
+    ContentPanelImplementer.cpp \
     Tools/SearchProxyModel.cpp \
-    View/AdvanceSearchWindow.cpp \
+    Tools/MyClipboard.cpp \
+    View/AdvanceSearchTableView.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -147,12 +150,14 @@ HEADERS += \
     Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
     Component/RightClickMenu.h \
+    Component/SearchCaseMatterToolButton.h \
     Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
     Tools/SearchProxyModel.h \
-    View/AdvanceSearchWindow.h \
+    Tools/MyClipboard.h \
+    View/AdvanceSearchTableView.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \

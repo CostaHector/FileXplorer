@@ -20,6 +20,14 @@
     </message>
 </context>
 <context>
+    <name>AdvanceSearchToolBar</name>
+    <message>
+        <location filename="../Component/AdvanceSearchToolBar.h" line="20"/>
+        <source>Advance Search Toolbar</source>
+        <translation>高级搜索工具栏</translation>
+    </message>
+</context>
+<context>
     <name>CustomTableView</name>
     <message>
         <location filename="../View/CustomTableView.h" line="47"/>
@@ -336,9 +344,8 @@
         <translation type="vanished">后者(合并两个文件夹到)</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.cpp" line="264"/>
         <source>Advance search</source>
-        <translation>高级搜索</translation>
+        <translation type="vanished">高级搜索</translation>
     </message>
 </context>
 <context>
@@ -357,6 +364,25 @@
         <location filename="../Actions/FileLeafAction.cpp" line="8"/>
         <source>Language</source>
         <translation>语言</translation>
+    </message>
+</context>
+<context>
+    <name>FileSystemTypeFilter</name>
+    <message>
+        <location filename="../Component/FileSystemTypeFilter.h" line="40"/>
+        <source>Filter Menu</source>
+        <translation>文件系统类型过滤器菜单</translation>
+    </message>
+    <message>
+        <location filename="../Component/FileSystemTypeFilter.h" line="55"/>
+        <source>hide/disable the entries don&apos;t pass name filter</source>
+        <translatorcomment>true:隐藏; false:灰化</translatorcomment>
+        <translation>隐藏/灰化未通过项目</translation>
+    </message>
+    <message>
+        <location filename="../Component/FileSystemTypeFilter.h" line="56"/>
+        <source>Including Subdirs</source>
+        <translation>包含子目录</translation>
     </message>
 </context>
 <context>
@@ -922,16 +948,21 @@
     </message>
 </context>
 <context>
-    <name>ToolButtonFileSystemTypeFilter</name>
+    <name>SearchCaseMatterToolButton</name>
     <message>
-        <location filename="../Component/ToolButtonFileSystemTypeFilter.h" line="24"/>
-        <source>Filter Menu</source>
-        <translation>类型过滤器菜单</translation>
+        <location filename="../Component/SearchCaseMatterToolButton.cpp" line="5"/>
+        <source>search type(name or contents)</source>
+        <translation>搜索类型(文件名称或者文件内容)</translation>
     </message>
     <message>
-        <location filename="../Component/ToolButtonFileSystemTypeFilter.h" line="39"/>
-        <source>gray the filtered</source>
-        <translation>灰化滤出项</translation>
+        <location filename="../Component/SearchCaseMatterToolButton.h" line="17"/>
+        <source>Name sensitive</source>
+        <translation>名称大小写敏感</translation>
+    </message>
+    <message>
+        <location filename="../Component/SearchCaseMatterToolButton.h" line="18"/>
+        <source>Content sensitive</source>
+        <translation>内容大小写敏感</translation>
     </message>
 </context>
 <context>
