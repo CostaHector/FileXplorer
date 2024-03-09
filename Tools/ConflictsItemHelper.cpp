@@ -7,13 +7,13 @@ auto TestMvConflictItemIF() -> void {
       ConflictsItemHelper(DONT_CHANGE_SRC, DONT_CHANGE_SRC,
                           QDir(DONT_CHANGE_SRC, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList());
   if (conflictIF0) {
-    qDebug(QString(conflictIF0.commonList.join('\n')).toStdString().c_str());
+    qDebug("%s", qPrintable(conflictIF0.commonList.join('\n')));
   }
   qDebug("\n=================\n");
 
   const auto& conflictIF1 = ConflictsItemHelper(DONT_CHANGE_SRC, DONT_CHANGE_SRC);
   if (conflictIF1) {
-    qDebug(QString(conflictIF1.commonList.join('\n')).toStdString().c_str());
+    qDebug("%s", qPrintable(conflictIF1.commonList.join('\n')));
   }
   qDebug("\n=================\n");
 
@@ -24,7 +24,7 @@ auto TestMvConflictItemIF() -> void {
   }
   const auto& conflictIF2 = ConflictsItemHelper(lAbsPath, DONT_CHANGE_SRC);
   if (conflictIF2) {
-    qDebug(QString(conflictIF2.commonList.join('\n')).toStdString().c_str());
+    qDebug("%s", qPrintable(conflictIF2.commonList.join('\n')));
   }
   qDebug("\n=================\n");
 }

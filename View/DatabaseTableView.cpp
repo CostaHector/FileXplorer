@@ -174,7 +174,7 @@ bool DatabaseTableView::onUnionTables() {
   const auto ret = unionTableQry.exec(unionCmd);
   if (not ret) {
     qDebug("%s. \nUnion %d table(s) into [%s] failed. \n%s", qPrintable(unionCmd), SRC_TABLE_CNT, qPrintable(DB_TABLE::MOVIES),
-           unionTableQry.lastError().text().toStdString().c_str());
+           qPrintable(unionTableQry.lastError().text()));
     QMessageBox::warning(this, DB_TABLE::MOVIES,
                          unionCmd + QString("\nUnion %1 table(s) failed.\n").arg(SRC_TABLE_CNT) + unionTableQry.lastError().text());
     con.rollback();
@@ -286,7 +286,7 @@ bool DatabaseTableView::onDropATable() {
   const bool dropTableRet = dropQry.exec(sqlCmd);
   dropQry.finish();
   if (not dropTableRet) {
-    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), con.lastError().databaseText().toStdString().c_str());
+    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), qPrintable(con.lastError().databaseText()));
     QMessageBox::information(this, dropTableName, "Table drop failed");
     return false;
   }
@@ -427,7 +427,7 @@ bool DatabaseTableView::onInsertIntoTable() {
     const bool insertResult = insertTableQuery.exec(currentInsert);
     succeedItemCnt += int(insertResult);
     if (not insertResult) {
-      qDebug("Error [%s]: %s", qPrintable(currentInsert), insertTableQuery.lastError().text().toStdString().c_str());
+      qDebug("Error [%s]: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
     }
     ++totalItemCnt;
   }

@@ -25,7 +25,7 @@ QSet<QString> PerformersManager::ReadOutPerformers() {
 
   QFile performersFi(perfFilePath);
   if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("file[%s] not found.", performersFi.fileName().toStdString().c_str());
+    qDebug("file[%s] not found.", qPrintable(performersFi.fileName()));
     return {};
   }
   QTextStream stream(&performersFi);
@@ -78,7 +78,7 @@ int PerformersManager::LearningFromAPath(const QString& path) {
 
   QFile performersFi(PROJECT_PATH + "/bin/PERFORMERS_TABLE.txt");
   if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qDebug("file cannot open. learned performers will not update to %s.", performersFi.fileName().toStdString().c_str());
+    qDebug("file cannot open. learned performers will not update to %s.", qPrintable(performersFi.fileName()));
   }
   QStringList perfsLst(m_performers.cbegin(), m_performers.cend());
   QTextStream stream(&performersFi);
