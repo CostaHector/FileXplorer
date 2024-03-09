@@ -283,7 +283,6 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
 
 int ContentPanel::getSelectedRowsCount() const {
   const QString& viewName = GetCurViewName();
-  QStringList prepaths;
   if (viewName == "table") {
     return m_fsTableView->selectionModel()->selectedRows().size();
   } else if (viewName == "list") {
@@ -299,9 +298,25 @@ int ContentPanel::getSelectedRowsCount() const {
   return -1;
 }
 
+QString ContentPanel::getCurFilePath() const {
+  const QString& viewName = GetCurViewName();
+  if (viewName == "table") {
+    return m_fsModel->filePath(m_fsTableView->currentIndex());
+  } else if (viewName == "list") {
+    return m_fsModel->filePath(m_fsListView->currentIndex());
+  } else if (viewName == "tree") {
+    return m_fsModel->filePath(m_fsTreeView->currentIndex());
+  } else if (viewName == "movie") {
+    return m_dbModel->filePath(m_dbPanel->currentIndex());
+  } else if (viewName == "search") {
+    return m_srcModel->filePath(m_proxyModel->mapToSource(m_advanceSearchView->currentIndex()));
+  }
+  qDebug("No getCurFilePath");
+  return "";
+}
+
 QFileInfo ContentPanel::getFileInfo(const QModelIndex& ind) const {
   const QString& viewName = GetCurViewName();
-  QStringList prepaths;
   if (viewName == "table") {
     return m_fsModel->fileInfo(ind);
   } else if (viewName == "list") {
