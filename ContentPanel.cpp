@@ -1,4 +1,5 @@
 #include "ContentPanel.h"
+#include "Component/NotificatorFrame.h"
 #include "Component/RightClickMenu.h"
 
 #include <QLineEdit>
@@ -135,7 +136,8 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
   QFileInfo fi = getFileInfo(clickedIndex);
   qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), fi.fileName().toStdString().c_str());
   if (not fi.exists()) {
-    qDebug("[path inexists] %s", fi.absoluteFilePath().toStdString().c_str());
+    qDebug("[path inexists] %s", qPrintable(fi.absoluteFilePath()));
+    Notificator::warning("Cannot open inexist path", fi.absoluteFilePath());
     return false;
   }
   if (fi.isSymLink()) {
@@ -146,12 +148,13 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
 #endif
     fi = QFileInfo(tarPath);
     if (not fi.exists()) {
-      qDebug("[link inexists] %s", fi.absoluteFilePath().toStdString().c_str());
+      qDebug("[link inexists] %s", qPrintable(fi.absoluteFilePath()));
+      Notificator::warning("Cannot open inexist link", fi.absoluteFilePath());
       return false;
     }
   }
   QString path(fi.absoluteFilePath());
-  if (fi.isDir()) {
+  if (fi.isDir() and isFSView()) {  // file system view change path to directory. otherwise open in system explorer
     onActionAndViewNavigate(path, true, true);
     return true;
   }
