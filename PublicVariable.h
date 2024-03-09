@@ -156,6 +156,7 @@ class GVarListStr : public GVar {
 constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 
 namespace MemoryKey {
+const GVarStrFolder DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "."};
 const GVarBool LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false);
 const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
 const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
@@ -213,6 +214,10 @@ const GVarStr SEARCH_MODEL_NAME_FILTER("SEARCH_MODEL_NAME_FILTER", "*", {});
 
 const GVarInt VIDEO_PLAYER_VOLUME("VIDEO_PLAYER_VOLUME", 100, 0, 101);
 const GVarBool VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false);
+const GVarStr SEARCH_MODE_DEFAULT_VALUE("SEARCH_MODE_DEFAULT_VALUE", "Normal", {"Normal", "Wildcard", "Regex", "Search for File Content"});
+const GVarBool SEARCH_NAME_CASE_SENSITIVE{"SEARCH_NAME_CASE_SENSITIVE", false};
+const GVarBool SEARCH_CONTENTS_CASE_SENSITIVE{"SEARCH_CONTENTS_CASE_SENSITIVE", false};
+const GVarBool HIDE_ENTRIES_DONT_PASS_FILTER{"HIDE_ENTRIES_DONT_PASS_FILTER", true};
 
 const GVarStrFile WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
 const GVarStrFile WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
@@ -315,7 +320,6 @@ bool VerifyOneFilePath(const GVarStrFile& kv, const QString& fileType = "txt");
 bool VerifyOneFolderPath(const GVarStrFolder& kv);
 
 bool InitOutterPlainTextPath();
-
 
 constexpr int CONTROL_TOOLBAR_HEIGHT = 28;
 #endif  // PUBLICVARIABLE_H

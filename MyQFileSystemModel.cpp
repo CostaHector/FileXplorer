@@ -5,6 +5,8 @@
 #include <QMimeData>
 #include <QUrl>
 
+#include "PublicVariable.h"
+
 int MyQFileSystemModel::previewsCnt = 0;
 constexpr int MyQFileSystemModel::cacheWidth;
 constexpr int MyQFileSystemModel::cacheHeight;
@@ -19,7 +21,11 @@ MyQFileSystemModel::MyQFileSystemModel(QObject* parent) : QFileSystemModel(paren
 
 void MyQFileSystemModel::BindLogger(CustomStatusBar* logger) {
   if (logger == nullptr) {
-    qWarning("Bind logger failed. nullptr passed here");
+    qWarning("Don't try to bind nullptr to _logger");
+    return;
+  }
+  if (_logger != nullptr){
+    qWarning("Don't try to rebind logger to non nullptr _logger");
     return;
   }
   _logger = logger;

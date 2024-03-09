@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include <QSortFilterProxyModel>
 #include <QWidget>
+#include "Component/CustomStatusBar.h"
 
 struct FileProperty {
   QString name;
@@ -23,10 +24,12 @@ class AdvanceSearchModel : public QAbstractTableModel {
  public:
   explicit AdvanceSearchModel(QObject* parent = nullptr);
 
+  void BindLogger(CustomStatusBar* logger);
+
   auto filter() const -> QDir::Filters { return m_filters; }
   auto _updatePlanetList() -> void;
 
-  inline QString rootPath() const { return m_rootPath; }
+  QString rootPath() const { return m_rootPath; }
   auto checkPathNeed(const QString& path) const -> bool;
   auto setRootPath(const QString& path) -> void;
 
@@ -60,7 +63,25 @@ class AdvanceSearchModel : public QAbstractTableModel {
   void removeDisable(const QModelIndex& ind);
   void clearDisables();
 
+  auto rootDirectory(const QString& placeHolder = "" /* no use */) const -> QDir { return QDir(rootPath()); }
+
+  auto absolutePath(QModelIndex curIndex) const -> QString {
+    QModelIndex preIndex = index(curIndex.row(), 4, curIndex.parent());
+    return data(preIndex, Qt::ItemDataRole::DisplayRole).toString();
+  }
+
+  auto fileName(QModelIndex curIndex) const -> QString {
+    QModelIndex nameIndex = index(curIndex.row(), 0, curIndex.parent());
+    return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
+  }
+
+  auto filePath(QModelIndex curIndex) const -> QString { return QDir(absolutePath(curIndex)).absoluteFilePath(fileName(curIndex)); }
+
+  auto fileInfo(QModelIndex curIndex) const -> QFileInfo { return QFileInfo(filePath(curIndex)); }
+
  private:
+  CustomStatusBar* _logger{nullptr};
+
   QString m_rootPath;
   QList<FileProperty> m_planetList;
   QFileIconProvider m_iconProvider;

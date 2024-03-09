@@ -116,7 +116,7 @@ QSqlDatabase PerformersWidget::GetSqlDB() const {
   }
   con.setDatabaseName(SystemPath::PEFORMERS_DATABASE);
   if (not con.open()) {
-    qDebug("%s", con.lastError().text().toStdString().c_str());
+    qDebug("%s", qPrintable(con.lastError().text()));
   }
   return con;
 }
@@ -139,7 +139,7 @@ void PerformersWidget::onInitATable() {
   }
 
   if (con.tables().contains(DB_TABLE::PERFORMERS)) {
-    qDebug("Table[%s] already exists in database[%s]", qPrintable(DB_TABLE::PERFORMERS), con.databaseName().toStdString().c_str());
+    qDebug("Table[%s] already exists in database[%s]", qPrintable(DB_TABLE::PERFORMERS), qPrintable(con.databaseName()));
     return;
   }
 
@@ -219,7 +219,7 @@ bool PerformersWidget::onDropDeleteTable(const DROP_OR_DELETE dropOrDelete) {
   QSqlQuery dropQry(con);
   const auto dropTableRet = dropQry.exec(sqlCmd);
   if (not dropTableRet) {
-    qDebug("[Drop Table Failed] [%s]. Reason: %s", qPrintable(sqlCmd), dropQry.lastError().text().toStdString().c_str());
+    qDebug("[Drop Table Failed] [%s]. Reason: %s", qPrintable(sqlCmd), qPrintable(dropQry.lastError().text()));
   }
   dropQry.finish();
   m_perfsDBModel->submitAll();
@@ -413,7 +413,7 @@ int PerformersWidget::onLoadFromPJsonDirectory() {
       succeedCnt += ret;
       ++loadCnt;
       if (not ret) {
-        qDebug("[Command Failed] [%s]. Reason: %s", qPrintable(currentInsert), insertTableQuery.lastError().text().toStdString().c_str());
+        qDebug("[Command Failed] [%s]. Reason: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
       }
     }
     if (!con.commit()) {
