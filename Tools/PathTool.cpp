@@ -1,6 +1,7 @@
 #include "PathTool.h"
 
 #include <QFileInfo>
+#include <QDir>
 #include <QStringList>
 
 QString PATHTOOL::StripTrailingSlash(QString path) {
@@ -113,8 +114,12 @@ QString PATHTOOL::commonPrefix(const QString& path1, const QString& path2) {
   return path1.left(index);
 }
 
-bool PATHTOOL::isRootOrEmpty(const QString& path) {
+bool PATHTOOL::isLinuxRootOrWinEmpty(const QString& path) {
   return path.isEmpty() or path == "/";
+}
+
+bool PATHTOOL::isRootOrEmpty(const QString& path) {
+  return path.isEmpty() or path == "/" or QDir(path).isRoot();
 }
 
 QStringList PATHTOOL::GetRels(int prefixLen, const QStringList& lAbsPathList) {

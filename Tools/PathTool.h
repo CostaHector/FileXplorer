@@ -17,7 +17,8 @@ QString fileName(const QString& fullPath);
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
 QString commonPrefix(const QString& path1, const QString& path2);
-bool isRootOrEmpty(const QString& path);
+bool isLinuxRootOrWinEmpty(const QString& path); // loose
+bool isRootOrEmpty(const QString& path); // strict
 
 QString longestCommonPrefix(const QStringList& strs);
 

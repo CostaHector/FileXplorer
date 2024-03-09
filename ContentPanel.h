@@ -66,6 +66,7 @@ class ContentPanel : public QStackedWidget {
   std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
 
   int getSelectedRowsCount() const;
+  QString getCurFilePath() const;
   QFileInfo getFileInfo(const QModelIndex& ind) const;
 
  public:
