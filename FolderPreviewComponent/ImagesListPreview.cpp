@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 
   QTableView::connect(tb, &QTableView::doubleClicked, [previewer, fsm](QModelIndex clickedIndex) -> void {
     QFileInfo fi = fsm->fileInfo(clickedIndex);
-    qDebug("doubleclicked [%s]", fi.absoluteFilePath().toStdString().c_str());
+    qDebug("doubleclicked [%s]", qPrintable(fi.absoluteFilePath()));
     (*previewer)(fi.absoluteFilePath());
   });
 

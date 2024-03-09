@@ -10,7 +10,9 @@ TEMPLATE = app
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    TestCase/PathToolTest.cpp \
     Tools/ProductionStudioManager.cpp \
+    Tools/PathTool.cpp\
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     FileOperation/FileOperation.cpp \
@@ -41,6 +43,7 @@ HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Tools/ProductionStudioManager.h \
+    Tools/PathTool.h\
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
     FileOperation/FileOperation.h \

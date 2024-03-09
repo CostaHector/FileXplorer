@@ -7,6 +7,7 @@
 #include "Component/PropertiesWindow.h"
 #include "Component/VideoPlayer.h"
 
+#include "Tools/MyClipboard.h"
 #include "Tools/MimeDataCX.h"
 #include "Tools/RedundantFolderRemove.h"
 
@@ -27,15 +28,13 @@
 #include <QProcess>
 #include <QTextStream>
 
+#include "View/AdvanceSearchTableView.h"
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
  public:
   FileExplorerEvent(QObject* parent = nullptr,
                     MyQFileSystemModel* fsm = nullptr,
-                    MyQSqlTableModel* dbModel = nullptr,
-                    AdvanceSearchModel* searchModel = nullptr,
-                    SearchProxyModel* searchProxyModel = nullptr,
                     ContentPanel* view = nullptr,
                     CustomStatusBar* logger = nullptr,
                     T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility());
@@ -62,7 +61,7 @@ class FileExplorerEvent : public QObject {
     if (_contentPane->isFSView()){
       return false;
     }
-    auto* view = _contentPane->GetView();
+    auto* view = _contentPane->GetCurView();
     const QModelIndex ind = _fileSysModel->index(itemPath);
     if (not ind.isValid()) {
       qDebug("Target Lose");
@@ -126,23 +125,6 @@ class FileExplorerEvent : public QObject {
   auto on_Cut() -> bool;
   auto on_Paste() -> bool;
 
-  auto FillMimeDataIntoClipboard(const CCMMode cutCopy = CCMMode::ERROR, const QString& fromPath = "") -> int {
-    QStringList lRels;
-    QList<QUrl> urls;
-    for (const QModelIndex ind : selectedIndexes()) {
-      lRels.append(_fileSysModel->fileName(ind));
-      urls.append(QUrl::fromLocalFile(lRels.back()));
-    }
-    if (lRels.isEmpty()) {
-      return 0;
-    }
-    MimeDataCX* mimedata = new MimeDataCX(fromPath, lRels, cutCopy);
-    mimedata->setUrls(urls);
-
-    mimedata->setText(lRels.join('\n'));
-    this->clipboard->setMimeData(mimedata);
-    return urls.size();
-  }
   auto on_NameStandardize() -> bool;
   auto on_FileClassify() -> bool;
   auto on_RemoveDuplicateImages() -> bool;
@@ -153,13 +135,10 @@ class FileExplorerEvent : public QObject {
   auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY, r); }
 
   MyQFileSystemModel* _fileSysModel;
-  MyQSqlTableModel* _dbModel;
-  AdvanceSearchModel* _searchModel;
-  SearchProxyModel* _searchProxyModel;
-
   ContentPanel* _contentPane;
+
   CustomStatusBar* _logger;
-  QClipboard* clipboard;
+  MyClipboard* m_clipboard;
   JsonEditor* jsonEditor;
   VideoPlayer* videoPlayer;
   T_UpdateComponentVisibility updateComponentVisibility;

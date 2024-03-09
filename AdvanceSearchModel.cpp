@@ -6,6 +6,18 @@ const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size",
 AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
     : QAbstractTableModel(parent), m_iteratorFlags{bool2IteratorFlag(PreferenceSettings().value("INCLUDING_SUBDIRECTORIES", true).toBool())} {}
 
+void AdvanceSearchModel::BindLogger(CustomStatusBar* logger) {
+  if (logger == nullptr) {
+    qWarning("Don't try to bind nullptr to _logger");
+    return;
+  }
+  if (_logger != nullptr) {
+    qWarning("Don't try to rebind logger to non nullptr _logger");
+    return;
+  }
+  _logger = logger;
+}
+
 auto AdvanceSearchModel::_updatePlanetList() -> void {
   if (m_rootPath.isEmpty()) {
     qDebug("reject do under path \"\"");
@@ -31,7 +43,11 @@ auto AdvanceSearchModel::_updatePlanetList() -> void {
   }
   // C:/A/B/C
   // C:/A   file
-  qDebug("> %d item(s) | %d | enter [%s] ", newPlanetList.size(), int(m_filters), qPrintable(m_rootPath));
+  qDebug("> %d item(s) | QDir::Filters: %d | under [%s]", newPlanetList.size(), int(m_filters), qPrintable(m_rootPath));
+  if (_logger) {
+    _logger->pathInfo(newPlanetList.size(), 0);
+    _logger->msg(QString("QDir::Filters: %1 | under [%2]").arg(int(m_filters)).arg(m_rootPath));
+  }
   this->beginInsertRows(QModelIndex(), 0, newPlanetList.size() - 1);
   newPlanetList.swap(m_planetList);
   this->endInsertRows();

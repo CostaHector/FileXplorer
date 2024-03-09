@@ -1,17 +1,17 @@
 #include "DatabaseTableView.h"
 
-#include "Component/QuickWhereClause.h"
 #include "Component/DBRightClickMenu.h"
+#include "Component/QuickWhereClause.h"
 #include "Tools/PlayVideo.h"
 
 #include "PublicTool.h"
 #include "PublicVariable.h"
 
 #include <QDesktopServices>
+#include <QDirIterator>
 #include <QHeaderView>
 #include <QProcess>
 #include <QStorageInfo>
-#include <QDirIterator>
 
 DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent)
     : CustomTableView("MOVIE_TABLE", parent),
@@ -40,13 +40,10 @@ DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSql
 }
 
 void DatabaseTableView::subscribe() {
-  connect(g_dbAct().OPEN_RUN, &QAction::triggered, this, [this]() { on_cellDoubleClicked(currentIndex()); });
   connect(g_dbAct()._PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
 
   connect(horizontalHeader(), &QHeaderView::sectionResized, this,
           [this]() { PreferenceSettings().setValue("DATABASE_TABLEVIEW_HERDER_GEOMETRY", horizontalHeader()->saveState()); });
-
-  connect(this, &QTableView::doubleClicked, this, &DatabaseTableView::on_cellDoubleClicked);
 
   connect(_searchLE, &QLineEdit::returnPressed, this, [this]() {
     const QString& searchPattern = _searchLE->text();
@@ -90,36 +87,6 @@ void DatabaseTableView::subscribe() {
     QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
     connect(COUNT, &QAction::triggered, this, &DatabaseTableView::onCountRow);
   }
-}
-
-auto DatabaseTableView::on_cellDoubleClicked(QModelIndex clickedIndex) -> bool {
-  if (not clickedIndex.isValid()) {
-    return false;
-  }
-  if (not _dbModel) {
-    return false;
-  }
-
-  QFileInfo fi = _dbModel->fileInfo(clickedIndex);
-  qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), fi.fileName().toStdString().c_str());
-  if (not fi.exists()) {
-    qDebug("[path inexists] %s", fi.absoluteFilePath().toStdString().c_str());
-    return false;
-  }
-  if (fi.isSymLink()) {
-#ifdef _WIN32
-    QString tarPath = fi.symLinkTarget();
-#else  // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
-    QString tarPath(fi.absoluteFilePath());
-#endif
-    fi = QFileInfo(tarPath);
-    if (not fi.exists()) {
-      qDebug("[link inexists] %s", fi.absoluteFilePath().toStdString().c_str());
-      return false;
-    }
-  }
-  QString path(fi.absoluteFilePath());
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 }
 
 auto DatabaseTableView::on_PlayVideo() const -> bool {
@@ -207,7 +174,7 @@ bool DatabaseTableView::onUnionTables() {
   const auto ret = unionTableQry.exec(unionCmd);
   if (not ret) {
     qDebug("%s. \nUnion %d table(s) into [%s] failed. \n%s", qPrintable(unionCmd), SRC_TABLE_CNT, qPrintable(DB_TABLE::MOVIES),
-           unionTableQry.lastError().text().toStdString().c_str());
+           qPrintable(unionTableQry.lastError().text()));
     QMessageBox::warning(this, DB_TABLE::MOVIES,
                          unionCmd + QString("\nUnion %1 table(s) failed.\n").arg(SRC_TABLE_CNT) + unionTableQry.lastError().text());
     con.rollback();
@@ -319,7 +286,7 @@ bool DatabaseTableView::onDropATable() {
   const bool dropTableRet = dropQry.exec(sqlCmd);
   dropQry.finish();
   if (not dropTableRet) {
-    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), con.lastError().databaseText().toStdString().c_str());
+    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), qPrintable(con.lastError().databaseText()));
     QMessageBox::information(this, dropTableName, "Table drop failed");
     return false;
   }
@@ -460,7 +427,7 @@ bool DatabaseTableView::onInsertIntoTable() {
     const bool insertResult = insertTableQuery.exec(currentInsert);
     succeedItemCnt += int(insertResult);
     if (not insertResult) {
-      qDebug("Error [%s]: %s", qPrintable(currentInsert), insertTableQuery.lastError().text().toStdString().c_str());
+      qDebug("Error [%s]: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
     }
     ++totalItemCnt;
   }
