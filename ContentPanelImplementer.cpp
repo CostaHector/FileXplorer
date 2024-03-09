@@ -147,24 +147,24 @@ QStringList ContentPanel::getFilePrepaths() const {
   const QString& viewName = GetCurViewName();
   QStringList prepaths;
   if (viewName == "table") {
-    const int rowCnt = m_fsTableView->selectionModel()->selectedRows().size();
+    int rowCnt = m_fsTableView->selectionModel()->selectedRows().size();
     const QString& prepath = m_fsModel->rootPath();
     prepaths.reserve(rowCnt);
-    while (rowCnt > 0) {
+    while (rowCnt-- > 0) {
       prepaths.append(prepath);
     }
   } else if (viewName == "list") {
-    const int rowCnt = m_fsListView->selectionModel()->selectedRows().size();
+    int rowCnt = m_fsListView->selectionModel()->selectedRows().size();
     const QString& prepath = m_fsModel->rootPath();
     prepaths.reserve(rowCnt);
-    while (rowCnt > 0) {
+    while (rowCnt-- > 0) {
       prepaths.append(prepath);
     }
   } else if (viewName == "tree") {
-    const int rowCnt = m_fsTreeView->selectionModel()->selectedRows().size();
+    int rowCnt = m_fsTreeView->selectionModel()->selectedRows().size();
     const QString& prepath = m_fsModel->rootPath();
     prepaths.reserve(rowCnt);
-    while (rowCnt > 0) {
+    while (rowCnt-- > 0) {
       prepaths.append(prepath);
     }
   } else if (viewName == "movie") {
