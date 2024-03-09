@@ -20,7 +20,7 @@ QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
 #endif
   QFile file(akaPerfFilePath);
   if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("File not found: %s.", file.fileName().toStdString().c_str());
+    qDebug("File not found: %s.", qPrintable(file.fileName()));
     return {};
   }
 

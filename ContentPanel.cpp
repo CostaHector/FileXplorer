@@ -134,7 +134,7 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
   if (not clickedIndex.isValid())
     return false;
   QFileInfo fi = getFileInfo(clickedIndex);
-  qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), fi.fileName().toStdString().c_str());
+  qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (not fi.exists()) {
     qDebug("[path inexists] %s", qPrintable(fi.absoluteFilePath()));
     Notificator::warning("Cannot open inexist path", fi.absoluteFilePath());
