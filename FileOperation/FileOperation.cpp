@@ -13,7 +13,7 @@ auto FileOperation::WriteIntoLogFile(const QString& msg) -> bool {
 #endif
   QFile logFi(QString("%1/%2.log").arg(logPrePath).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd")));
   if (not logFi.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-    qDebug("log file cannot open. ", logFi.fileName().toStdString().c_str());
+    qDebug("log file cannot open. ", qPrintable(logFi.fileName()));
     return false;
   }
   QTextStream stream(&logFi);

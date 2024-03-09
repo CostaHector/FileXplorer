@@ -1,10 +1,10 @@
 #include "PublicTool.h"
 #include "PublicVariable.h"
 
-#include <QDir>
-#include <QSqlError>
-#include <QDirIterator>
 #include <QCoreApplication>
+#include <QDir>
+#include <QDirIterator>
+#include <QSqlError>
 
 bool PublicTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
   QDir sourceDir(fromDir);
@@ -30,10 +30,9 @@ bool PublicTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir
     if (targetDir.exists(fileInfo.fileName())) {
       if (coverFileIfExist) {
         targetDir.remove(fileInfo.fileName());
-        qDebug("%s/%s is covered by file under [%s]", targetDir.absolutePath().toStdString().c_str(), fileInfo.fileName().toStdString().c_str(),
-               qPrintable(fromDir));
+        qDebug("%s/%s is covered by file under [%s]", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()), qPrintable(fromDir));
       } else {
-        qDebug("%s/[%s] was kept", targetDir.absolutePath().toStdString().c_str(), fileInfo.fileName().toStdString().c_str());
+        qDebug("%s/[%s] was kept", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()));
       }
     }
     // files copy
@@ -43,7 +42,6 @@ bool PublicTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir
   }
   return true;
 }
-
 
 OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool includingSub, const bool includingSuffix) {
   // Reverse the return value, One can get bottom To Top result like os.walk
@@ -184,7 +182,7 @@ auto GetSqlVidsDB() -> QSqlDatabase {
   }
   con.setDatabaseName(SystemPath::VIDS_DATABASE);
   if (not con.open()) {
-    qDebug("%s", con.lastError().text().toStdString().c_str());
+    qDebug("%s", qPrintable(con.lastError().text()));
   }
   return con;
 }

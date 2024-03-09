@@ -77,7 +77,7 @@ QSqlDatabase TorrentsManagerWidget::GetSqlDB() const {
   }
   con.setDatabaseName(SystemPath::TORRENTS_DATABASE);
   if (not con.open()) {
-    qDebug("%s", con.lastError().text().toStdString().c_str());
+    qDebug("%s", qPrintable(con.lastError().text()));
   }
   return con;
 }
@@ -99,7 +99,7 @@ void TorrentsManagerWidget::onInitATable() {
     return;
   }
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
-    qDebug("Table[%s] already exists in database[%s]", qPrintable(DB_TABLE::TORRENTS), con.databaseName().toStdString().c_str());
+    qDebug("Table[%s] already exists in database[%s]", qPrintable(DB_TABLE::TORRENTS), qPrintable(con.databaseName()));
     return;
   }
 
@@ -108,7 +108,7 @@ void TorrentsManagerWidget::onInitATable() {
   QSqlQuery createTableQuery(con);
   const auto ret = createTableQuery.exec(createTableSQL);
   if (not ret) {
-    qDebug("Create table[%s] failed.\n%s", qPrintable(DB_TABLE::TORRENTS), createTableQuery.lastError().text().toStdString().c_str());
+    qDebug("Create table[%s] failed.\n%s", qPrintable(DB_TABLE::TORRENTS), qPrintable(createTableQuery.lastError().text()));
     return;
   }
   m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
@@ -160,7 +160,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     const bool insertResult = insertTableQuery.exec(currentInsert);
     succeedItemCnt += int(insertResult);
     if (not insertResult) {
-      qDebug("Error [%s]: %s", qPrintable(currentInsert), insertTableQuery.lastError().text().toStdString().c_str());
+      qDebug("Error [%s]: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
     }
     ++totalItemCnt;
   }
@@ -200,7 +200,7 @@ bool TorrentsManagerWidget::onDropATable() {
   QSqlQuery dropQry(con);
   const auto dropTableRet = dropQry.exec(sqlCmd);
   if (not dropTableRet) {
-    qDebug("Drop Table[%s] failed. %s", qPrintable(DB_TABLE::TORRENTS), con.lastError().databaseText().toStdString().c_str());
+    qDebug("Drop Table[%s] failed. %s", qPrintable(DB_TABLE::TORRENTS), qPrintable(con.lastError().databaseText()));
   }
   dropQry.finish();
   m_torrentsDBModel->submitAll();
