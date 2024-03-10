@@ -5,8 +5,6 @@
 #include <QMimeData>
 #include <QUrl>
 
-#include "PublicVariable.h"
-
 int MyQFileSystemModel::previewsCnt = 0;
 constexpr int MyQFileSystemModel::cacheWidth;
 constexpr int MyQFileSystemModel::cacheHeight;
