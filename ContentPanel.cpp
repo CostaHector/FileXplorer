@@ -171,7 +171,7 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
     return false;
   }
   // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
-  const QModelIndex firstIndex = selected.indexes().front();
+  const QModelIndex firstIndex = GetCurView()->currentIndex();
   if (not firstIndex.isValid()) {
     return false;
   }
