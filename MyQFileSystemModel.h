@@ -106,6 +106,15 @@ class MyQFileSystemModel : public QFileSystemModel {
     return QFileSystemModel::data(index, role);
   }
 
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+    if (orientation == Qt::Vertical) {
+      if (role == Qt::TextAlignmentRole) {
+        return Qt::AlignRight;
+      }
+    }
+    return QFileSystemModel::headerData(section, orientation, role);
+  }
+
  public slots:
   void whenRootPathChanged(const QString& newpath);
   void whenDirectoryLoaded(const QString& path);

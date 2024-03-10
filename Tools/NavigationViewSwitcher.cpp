@@ -82,7 +82,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
   } else if (viewType == "movie") {
     if (_view->m_movieView == nullptr) {
       _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
-      _view->m_movieView = new DatabaseTableView(_view->_dbSearchBar, _view->m_dbModel, _view);
+      _view->m_movieView = new MovieDBView(_view->_dbSearchBar, _view->m_dbModel, _view);
       ContentPanel::connect(_view->m_movieView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->AddView(viewType, _view->m_movieView);
     }

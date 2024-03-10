@@ -181,13 +181,18 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
 }
 
 auto AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
-  if (role != Qt::DisplayRole) {
-    return QVariant();
+  if (role == Qt::TextAlignmentRole) {
+    if (orientation == Qt::Vertical) {
+      return Qt::AlignRight;
+    }
   }
-  if (orientation == Qt::Orientation::Horizontal) {
-    return HORIZONTAL_HEADER_NAMES[section];
+  if (role == Qt::DisplayRole) {
+    if (orientation == Qt::Orientation::Horizontal) {
+      return HORIZONTAL_HEADER_NAMES[section];
+    }
+    return section + 1;
   }
-  return section + 1;
+  return QAbstractTableModel::headerData(section, orientation, role);
 }
 
 void AdvanceSearchModel::ClearCopyAndCutDict() {

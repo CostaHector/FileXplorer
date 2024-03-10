@@ -9,6 +9,15 @@ class MyQSqlTableModel : public QSqlTableModel {
  public:
   explicit MyQSqlTableModel(QObject* parent = nullptr, QSqlDatabase con = QSqlDatabase());
 
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+    if (orientation == Qt::Vertical) {
+      if (role == Qt::TextAlignmentRole) {
+        return Qt::AlignRight;
+      }
+    }
+    return QSqlTableModel::headerData(section, orientation, role);
+  }
+
   auto rootDirectory(const QString& placeHolder = "" /* no use */) const -> QDir { return QDir(rootPath(placeHolder)); }
 
   auto rootPath(const QString& placeHolder = "" /* no use */) const -> QString { return placeHolder; }

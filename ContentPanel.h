@@ -11,7 +11,7 @@
 #include "MyQFileSystemModel.h"
 
 #include "View/AdvanceSearchTableView.h"
-#include "View/DatabaseTableView.h"
+#include "View/MovieDBView.h"
 #include "View/FileSystemListView.h"
 #include "View/FileSystemTableView.h"
 #include "View/FileSystemTreeView.h"
@@ -87,7 +87,7 @@ class ContentPanel : public QStackedWidget {
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
-  DatabaseTableView* m_movieView{nullptr};
+  MovieDBView* m_movieView{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
 
   FolderPreviewHTML* previewHtml;
