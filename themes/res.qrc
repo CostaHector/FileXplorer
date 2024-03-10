@@ -88,6 +88,7 @@
         <file alias="PASTE_ITEM">RightClickIcon/PASTE.png</file>
         <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5FileIdentifier.png</file>
         <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
+        <file alias="REFRESH_SEARCH_SOURCE">RightClickIcon/REFRESH_SEARCH_SOURCE.svg</file>
         <file alias="SORT_BY">sorting/SORT_BY.ico</file>
         <file alias="SORTING_FILE_FOLDER">sorting/sorting.png</file>
         <file alias="ASCENDING_ORDER">sorting/ascendingOrder.png</file>
@@ -147,7 +148,7 @@
         <file alias="RENAME_LOOSE_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_WEAK_USB.svg</file>
         <file alias="RENAME_STRICT_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_STRONG_Usb.svg</file>
         <file alias="RENAME_TOGGLE_CASE">NameStrIcon/CaseToggler.svg</file>
-        <file alias="NAME_STR_INSERTER_PATH">NameStrIcon/Inserter.png</file>
+        <file alias="NAME_STR_DELETER_PATH">NameStrIcon/Inserter.png</file>
         <file alias="NAME_STR_DELETER_PATH">NameStrIcon/Deleter.png</file>
         <file alias="NAME_STR_REPLACER_PATH">NameStrIcon/Replacer.png</file>
         <file alias="BACKGROUND_IMAGE_PATH">PreferenceIcons/BACKGROUND_IMAGE_PATH.ico</file>

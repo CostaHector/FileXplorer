@@ -308,7 +308,7 @@ class RenameWidget_Insert : public RenameWidget {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = QString("Insert name string | %1 item(s) under [%2]");
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/NAME_STR_INSERTER_PATH"));
+    setWindowIcon(QIcon(":/themes/NAME_STR_DELETER_PATH"));
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl = new QToolBar;
