@@ -53,8 +53,10 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
                             &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsTableView);
     }
+    const auto& newRootIndex = _view->getRootIndex();
+    if (newRootIndex.isValid())
+      _view->m_fsTableView->setRootIndex(newRootIndex);  // sync root index from last valid file-system model root index
     viewIndex = _view->m_name2ViewIndex[viewType];
-    _view->m_fsTableView->setRootIndex(_view->getRootIndex());  // sync root index of current path
   } else if (viewType == "list") {
     if (_view->m_fsListView == nullptr) {
       _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
@@ -62,7 +64,9 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       ContentPanel::connect(_view->m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsListView);
     }
-    _view->m_fsListView->setRootIndex(_view->getRootIndex());  // sync root index of current path
+    const auto& newRootIndex = _view->getRootIndex();
+    if (newRootIndex.isValid())
+      _view->m_fsListView->setRootIndex(newRootIndex);  // sync root index from last valid file-system model root index
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "tree") {
     if (_view->m_fsTreeView == nullptr) {
@@ -71,16 +75,18 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       ContentPanel::connect(_view->m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsTreeView);
     }
-    _view->m_fsTreeView->setRootIndex(_view->getRootIndex());  // sync root index of current path
+    const auto& newRootIndex = _view->getRootIndex();
+    if (newRootIndex.isValid())
+      _view->m_fsTreeView->setRootIndex(newRootIndex);  // sync root index from last valid file-system model root index
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "movie") {
-    if (_view->m_dbPanel == nullptr) {
+    if (_view->m_movieView == nullptr) {
       _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
-      _view->m_dbPanel = new DatabaseTableView(_view->_dbSearchBar, _view->m_dbModel, _view);
-      ContentPanel::connect(_view->m_dbPanel, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      _view->AddView(viewType, _view->m_dbPanel);
+      _view->m_movieView = new DatabaseTableView(_view->_dbSearchBar, _view->m_dbModel, _view);
+      ContentPanel::connect(_view->m_movieView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      _view->AddView(viewType, _view->m_movieView);
     }
-    _view->m_advanceSearchView->setWindowTitle(QString("Movie[%1]").arg(_view->m_dbPanel->getMovieTableName()));
+    _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->getMovieTableName()));
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "search") {
     if (_view->m_advanceSearchView == nullptr) {

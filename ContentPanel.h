@@ -87,7 +87,7 @@ class ContentPanel : public QStackedWidget {
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
-  DatabaseTableView* m_dbPanel{nullptr};
+  DatabaseTableView* m_movieView{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
 
   FolderPreviewHTML* previewHtml;
