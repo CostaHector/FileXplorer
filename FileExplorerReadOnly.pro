@@ -24,16 +24,18 @@ SOURCES += \
     AdvanceSearchModel.cpp \
     Component/AddressELineEdit.cpp \
     AllQtLearning/Learning_Database.cpp \
+    Component/AdvanceSearchMenu.cpp \
     Component/AdvanceSearchToolBar.cpp \
     Component/AlertSystem.cpp \
     Component/ClickableSlider.cpp \
     Component/CustomStatusBar.cpp \
-    Component/DBRightClickMenu.cpp \
     Component/DatabaseToolBar.cpp \
+    Component/FileSystemMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
     Component/MD5Window.cpp \
+    Component/MovieDatabaseMenu.cpp \
     Component/NotificatorFrame.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
     Component/PerformersWidget.cpp \
@@ -41,7 +43,6 @@ SOURCES += \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
     Component/RenameConflicts.cpp \
-    Component/RightClickMenu.cpp \
     Component/SearchCaseMatterToolButton.cpp \
     Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
@@ -131,16 +132,18 @@ HEADERS += \
     AdvanceSearchModel.h \
     Component/AddressELineEdit.h \
     AllQtLearning/Learning_Database.h \
+    Component/AdvanceSearchMenu.h \
     Component/AdvanceSearchToolBar.h \
     Component/AlertSystem.h \
     Component/ClickableSlider.h \
     Component/CustomStatusBar.h \
-    Component/DBRightClickMenu.h \
     Component/DatabaseToolBar.h \
+    Component/FileSystemMenu.h \
     Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
     Component/MD5Window.h \
+    Component/MovieDatabaseMenu.h \
     Component/NotificatorFrame.h \
     Component/NotificatorFrame_p.h \
     Component/PerformersPreviewTextBrowser.h \
@@ -149,7 +152,6 @@ HEADERS += \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
     Component/RenameConflicts.h \
-    Component/RightClickMenu.h \
     Component/SearchCaseMatterToolButton.h \
     Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \

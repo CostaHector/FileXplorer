@@ -31,7 +31,9 @@ class AdvanceSearchModel : public QAbstractTableModel {
 
   QString rootPath() const { return m_rootPath; }
   auto checkPathNeed(const QString& path) const -> bool;
+  auto initRootPath(const QString& path) -> void;
   auto setRootPath(const QString& path) -> void;
+  auto forceRefresh() -> void { setRootPath(m_rootPath); }
 
   auto initFilter(QDir::Filters initialFilters) -> void;
   auto setFilter(QDir::Filters newFilters) -> void;
@@ -63,6 +65,9 @@ class AdvanceSearchModel : public QAbstractTableModel {
   void removeDisable(const QModelIndex& ind);
   void clearDisables();
 
+  void RecycleSomething(const QSet<QModelIndex>& recycleIndexes);
+  void ClearRecycle();
+
   auto rootDirectory(const QString& placeHolder = "" /* no use */) const -> QDir { return QDir(rootPath()); }
 
   auto absolutePath(QModelIndex curIndex) const -> QString {
@@ -92,6 +97,7 @@ class AdvanceSearchModel : public QAbstractTableModel {
   QHash<QString, QModelIndexList> m_cutMap;
   QSet<QModelIndex> m_disableList;  // QFileSystemModel: only setNameFilter will effect this
                                     // SearchModel: both setNameFilter and contents will effect this
+  QSet<QModelIndex> m_recycleSet;
   static const QStringList HORIZONTAL_HEADER_NAMES;
 };
 

@@ -2,6 +2,7 @@
 #define DATABASETABLEVIEW_H
 
 #include "Component/DatabaseSearchToolBar.h"
+#include "Component/MovieDatabaseMenu.h"
 #include "Component/QuickWhereClause.h"
 #include "MyQSqlTableModel.h"
 #include "View/CustomTableView.h"
@@ -20,9 +21,7 @@ class DatabaseTableView : public CustomTableView {
   void subscribe();
   auto on_PlayVideo() const -> bool;
 
-  auto keyPressEvent(QKeyEvent* e) -> void override {
-    QTableView::keyPressEvent(e);
-  }
+  auto keyPressEvent(QKeyEvent* e) -> void override { QTableView::keyPressEvent(e); }
 
   bool onSearchDataBase(const QString& searchText) {
     _dbModel->setFilter(searchText);
@@ -48,15 +47,19 @@ class DatabaseTableView : public CustomTableView {
 
   int onCountRow();
 
-  MyQSqlTableModel* _dbModel;
+  QString getMovieTableName() const { return m_movieTableName; }
 
  private:
+  MyQSqlTableModel* _dbModel;
+  MovieDatabaseMenu* m_movieMenu;
   DatabaseSearchToolBar* _dbSearchBar;
   QComboBox* _tables;
   QLineEdit* _searchLE;
   QComboBox* _searchCB;
 
   QuickWhereClause* m_quickWhereClause;
+
+  QString m_movieTableName;
 };
 
 #endif  // DATABASETABLEVIEW_H

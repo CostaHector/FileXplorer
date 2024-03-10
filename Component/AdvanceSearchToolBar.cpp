@@ -22,7 +22,8 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
 
-  m_nameFilter->setText(PreferenceSettings().value("ADVANCE_SEARCH_LINEEDIT_VALUE", "").toString());
+  m_nameFilter->setText(
+      PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
 
   m_nameFilter->setPlaceholderText("Normal[abc], Wildcard[do?x], Regex[\\d{4}], Search for File Content[*.html,*.txt|contents]");
 }
@@ -65,7 +66,7 @@ void AdvanceSearchToolBar::BindSearchSourceModel(AdvanceSearchModel* searchSourc
 
 void AdvanceSearchToolBar::onSearchEnterAndApply() {
   // hint message placeholder
-  PreferenceSettings().setValue("ADVANCE_SEARCH_LINEEDIT_VALUE", m_nameFilter->text());
+  PreferenceSettings().setValue(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, m_nameFilter->text());
   if (_searchProxyModel) {
     _searchProxyModel->startFilterWhenTextChanged(m_nameFilter->text());
   }

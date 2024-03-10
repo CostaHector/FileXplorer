@@ -20,6 +20,14 @@
     </message>
 </context>
 <context>
+    <name>AdvanceSearchMenu</name>
+    <message>
+        <location filename="../Component/AdvanceSearchMenu.h" line="12"/>
+        <source>Refresh search source</source>
+        <translation>强制刷新搜索源</translation>
+    </message>
+</context>
+<context>
     <name>AdvanceSearchToolBar</name>
     <message>
         <location filename="../Component/AdvanceSearchToolBar.h" line="20"/>
@@ -83,42 +91,42 @@
 <context>
     <name>DataBaseActions</name>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="32"/>
+        <location filename="../Actions/DataBaseActions.h" line="37"/>
         <source>Where clause</source>
         <translation>Where助手</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="37"/>
+        <location filename="../Actions/DataBaseActions.h" line="26"/>
         <source>Create Database</source>
         <translation>创建电影数据库</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="40"/>
+        <location filename="../Actions/DataBaseActions.h" line="27"/>
         <source>Create Table</source>
         <translation>创建电影收录表</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="43"/>
+        <location filename="../Actions/DataBaseActions.h" line="28"/>
         <source>Drop Database</source>
         <translation>删除电影数据库</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="46"/>
+        <location filename="../Actions/DataBaseActions.h" line="29"/>
         <source>Drop Table</source>
         <translation>删除电影收录表</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="49"/>
+        <location filename="../Actions/DataBaseActions.h" line="30"/>
         <source>Insert into</source>
         <translation>插入记录</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="52"/>
+        <location filename="../Actions/DataBaseActions.h" line="31"/>
         <source>Delete from</source>
         <translation>删除记录</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="55"/>
+        <location filename="../Actions/DataBaseActions.h" line="32"/>
         <source>Union</source>
         <translation>联表查询</translation>
     </message>
@@ -127,24 +135,22 @@
         <translation type="vanished">电影窗体</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="75"/>
+        <location filename="../Actions/DataBaseActions.cpp" line="40"/>
         <source>COUNT</source>
         <translation>计数</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="78"/>
+        <location filename="../Actions/DataBaseActions.cpp" line="43"/>
         <source>SUM</source>
         <translation>求和</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="93"/>
         <source>&amp;Open</source>
-        <translation>打开(&amp;O)</translation>
+        <translation type="vanished">打开(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="96"/>
         <source>Play Videos</source>
-        <translation>播放</translation>
+        <translation type="vanished">播放</translation>
     </message>
     <message>
         <source>Reveal in Explorer</source>
@@ -159,12 +165,12 @@
         <translation type="vanished">复制全路径</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="101"/>
+        <location filename="../Actions/DataBaseActions.h" line="34"/>
         <source>Delete by driver</source>
         <translation>按驱动删除</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="102"/>
+        <location filename="../Actions/DataBaseActions.h" line="35"/>
         <source>Delete by prepath</source>
         <translation>按前置路径删除</translation>
     </message>
@@ -221,72 +227,72 @@
         <translation>去除空文件夹</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="46"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="49"/>
         <source>Recycle</source>
         <translation>回收</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="47"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="50"/>
         <source>Delete permanently</source>
         <translation>永久删除</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.cpp" line="23"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="42"/>
         <source>Move to</source>
         <translation>移动到</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.cpp" line="28"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="43"/>
         <source>Copy to</source>
         <translation>复制到</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="54"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="57"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="55"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="58"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="56"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="59"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="50"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="53"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="51"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="54"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="59"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="62"/>
         <source>Merged to front</source>
         <translation>合并到前者中</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="60"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="63"/>
         <source>Merge to back</source>
         <translation>合并到后者中</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="63"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="66"/>
         <source>Select all</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="64"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="67"/>
         <source>Select none</source>
         <translation>空选</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="65"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="68"/>
         <source>Invert selection</source>
         <translation>反选</translation>
     </message>
@@ -364,6 +370,24 @@
         <location filename="../Actions/FileLeafAction.cpp" line="8"/>
         <source>Language</source>
         <translation>语言</translation>
+    </message>
+</context>
+<context>
+    <name>FileSystemMenu</name>
+    <message>
+        <location filename="../Component/FileSystemMenu.cpp" line="31"/>
+        <source>&amp;New</source>
+        <translation>新建(&amp;N)</translation>
+    </message>
+    <message>
+        <location filename="../Component/FileSystemMenu.cpp" line="39"/>
+        <source>&amp;View</source>
+        <translation>视图(&amp;V)</translation>
+    </message>
+    <message>
+        <location filename="../Component/FileSystemMenu.cpp" line="58"/>
+        <source>&amp;Rename</source>
+        <translation>重命名(&amp;R)</translation>
     </message>
 </context>
 <context>
@@ -825,57 +849,57 @@
 <context>
     <name>RenameActions</name>
     <message>
-        <location filename="../Actions/RenameActions.cpp" line="30"/>
+        <location filename="../Actions/RenameActions.h" line="12"/>
         <source>Rename (ith)</source>
         <translation>重命名(编号)</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.cpp" line="35"/>
+        <location filename="../Actions/RenameActions.h" line="13"/>
         <source>swap 1-2-3 to 1-3-2</source>
         <translation>交换名称段</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.cpp" line="41"/>
+        <location filename="../Actions/RenameActions.h" line="14"/>
         <source>Case</source>
         <translation>大小写设置</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.cpp" line="43"/>
+        <location filename="../Actions/RenameActions.h" line="15"/>
         <source>Str Inserter</source>
         <translation>插入字符串</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.cpp" line="48"/>
+        <location filename="../Actions/RenameActions.h" line="16"/>
         <source>Str Deleter</source>
         <translation>删除字符串</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.cpp" line="53"/>
+        <location filename="../Actions/RenameActions.h" line="17"/>
         <source>Str Replacer</source>
         <translation>替换字符串</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="14"/>
+        <location filename="../Actions/RenameActions.h" line="19"/>
         <source>Upper Case</source>
         <translation>全大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="15"/>
+        <location filename="../Actions/RenameActions.h" line="20"/>
         <source>Lower Case</source>
         <translation>全小写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="16"/>
+        <location filename="../Actions/RenameActions.h" line="21"/>
         <source>Loose Capitalize</source>
         <translation>宽首字母大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="17"/>
+        <location filename="../Actions/RenameActions.h" line="22"/>
         <source>Strict Capitalize</source>
         <translation>严首字母大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="18"/>
+        <location filename="../Actions/RenameActions.h" line="23"/>
         <source>Swap Case</source>
         <translation>颠倒大小写</translation>
     </message>
@@ -906,19 +930,16 @@
 <context>
     <name>RightClickMenu</name>
     <message>
-        <location filename="../Component/RightClickMenu.h" line="40"/>
         <source>&amp;New</source>
-        <translation>新建(&amp;N)</translation>
+        <translation type="vanished">新建(&amp;N)</translation>
     </message>
     <message>
-        <location filename="../Component/RightClickMenu.h" line="47"/>
         <source>&amp;View</source>
-        <translation>视图(&amp;V)</translation>
+        <translation type="vanished">视图(&amp;V)</translation>
     </message>
     <message>
-        <location filename="../Component/RightClickMenu.h" line="66"/>
         <source>&amp;Rename</source>
-        <translation>重命名(&amp;R)</translation>
+        <translation type="vanished">重命名(&amp;R)</translation>
     </message>
 </context>
 <context>
