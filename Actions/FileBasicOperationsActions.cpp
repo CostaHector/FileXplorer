@@ -20,12 +20,9 @@ QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
 }
 
 QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
-  _MOVE_TO = new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), tr("Move to"));
   _MOVE_TO->setShortcutVisibleInContextMenu(true);
   _MOVE_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location one specified later")
                            .arg(_MOVE_TO->text(), _MOVE_TO->shortcut().toString()));
-
-  _COPY_TO = new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), tr("Copy to"));
   _COPY_TO->setShortcutVisibleInContextMenu(true);
   _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later")
                            .arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
@@ -271,7 +268,7 @@ class FileOperationActionIllustration : public QToolBar {
  public:
   explicit FileOperationActionIllustration(const QString& title, QWidget* parent = nullptr) : QToolBar(title, parent) {
     addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
-    addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
+    addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
     addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
     addActions(g_fileBasicOperationsActions().NEW->actions());
     addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());

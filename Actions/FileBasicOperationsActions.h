@@ -38,6 +38,9 @@ class FileBasicOperationsActions : public QObject {
         _REMOVE_REDUNDANT_ITEMS{new QAction(QIcon(":/themes/ONE_FILE_IN_ONE_FOLDER"), tr("Rmv Redundancy"))},
         _REMOVE_EMPTY_FOLDER{new QAction(QIcon(":/themes/EMPTY_FOLDER"), tr("Rmv Empty"))},
         FOLDER_FILE_PROCESS(FolderFileCategoryProcess()),
+
+        _MOVE_TO{new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), tr("Move to"))},
+        _COPY_TO{new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), tr("Copy to"))},
         MOVE_COPY_TO(GetMOVE_COPY_TOActions()),
 
         MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
@@ -54,7 +57,7 @@ class FileBasicOperationsActions : public QObject {
         CUT{new QAction(QIcon(":/themes/CUT_ITEM"), tr("Cut"))},
         COPY{new QAction(QIcon(":/themes/COPY_ITEM"), tr("Copy"))},
         PASTE{new QAction(QIcon(":/themes/PASTE_ITEM"), tr("Paste"))},
-        CUT_COPY_MERGE_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
+        CUT_COPY_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
 
         MERGE{new QAction(QIcon(":/themes/FOLDER_MERGE_TO_FIRST"), tr("Merged to front"))},
         MERGE_REVERSE{new QAction(QIcon(":/themes/FOLDER_MERGE_TO_LAST"), tr("Merge to back"))},
@@ -103,7 +106,7 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* UNDO_REDO_RIBBONS;
 
   QAction *CUT, *COPY, *PASTE;
-  QActionGroup* CUT_COPY_MERGE_PASTE;
+  QActionGroup* CUT_COPY_PASTE;
 
   QAction *MERGE, *MERGE_REVERSE;
   QActionGroup* FOLDER_MERGE;

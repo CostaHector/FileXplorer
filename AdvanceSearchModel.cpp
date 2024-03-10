@@ -1,10 +1,14 @@
 #include "AdvanceSearchModel.h"
+#include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 
 const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size", "type", "date", "relative path"};
 
 AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
-    : QAbstractTableModel(parent), m_iteratorFlags{bool2IteratorFlag(PreferenceSettings().value("INCLUDING_SUBDIRECTORIES", true).toBool())} {}
+    : QAbstractTableModel(parent),
+      m_filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
+      m_iteratorFlags{bool2IteratorFlag(
+          PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())} {}
 
 void AdvanceSearchModel::BindLogger(CustomStatusBar* logger) {
   if (logger == nullptr) {
@@ -19,6 +23,7 @@ void AdvanceSearchModel::BindLogger(CustomStatusBar* logger) {
 }
 
 auto AdvanceSearchModel::_updatePlanetList() -> void {
+  ClearRecycle();
   if (m_rootPath.isEmpty()) {
     qDebug("reject do under path \"\"");
     return;
@@ -60,10 +65,16 @@ auto AdvanceSearchModel::checkPathNeed(const QString& path) const -> bool {
   if (not QFileInfo(path).isDir()) {
     return false;
   }
+  if (path.count('/') < 2) {
+    qWarning("[Search] Skip. Search under path[%s] will cause lag.", qPrintable(path));
+    Notificator::warning("Search skip. Search under path[%s] will cause lag", path);
+    return false;
+  }
+
   return true;
 }
 
-auto AdvanceSearchModel::setRootPath(const QString& path) -> void {
+auto AdvanceSearchModel::initRootPath(const QString& path) -> void {
   if (m_rootPath == path) {
     return;
   }
@@ -71,8 +82,16 @@ auto AdvanceSearchModel::setRootPath(const QString& path) -> void {
     return;
   }
   m_rootPath = path;
+  qDebug() << "AdvanceSearchModel::initRootPath(%s)" << m_rootPath;
+}
+
+auto AdvanceSearchModel::setRootPath(const QString& path) -> void {
+  if (not checkPathNeed(path)) {
+    return;
+  }
+  initRootPath(path);
   _updatePlanetList();
-  qDebug("MySearchModel::setRootPath(%s)", qPrintable(path));
+  qDebug() << "AdvanceSearchModel::setRootPath" << m_rootPath;
 }
 
 auto AdvanceSearchModel::initFilter(QDir::Filters initialFilters) -> void {
@@ -85,7 +104,7 @@ auto AdvanceSearchModel::setFilter(QDir::Filters newFilters) -> void {
     return;
   }
   _updatePlanetList();
-  qDebug() << "MySearchModel::setFilter" << m_filters;
+  qDebug() << "AdvanceSearchModel::setFilter" << m_filters;
 }
 
 void AdvanceSearchModel::setRootPathAndFilter(const QString& path, QDir::Filters filters) {
@@ -152,6 +171,9 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   } else if (role == Qt::ForegroundRole) {
     if (m_disableList.contains(index)) {
       return QBrush(Qt::GlobalColor::lightGray);
+    }
+    if (m_recycleSet.contains(index)) {
+      return QBrush(Qt::GlobalColor::red);
     }
     return QBrush(Qt::GlobalColor::black);
   }
@@ -233,7 +255,19 @@ void AdvanceSearchModel::clearDisables() {
   decltype(m_disableList) tmp;
   tmp.swap(m_disableList);
   m_disableList.clear();
-  for (const auto& ind : tmp) {
+  foreach (const QModelIndex& ind, tmp) {
     emit dataChanged(ind, ind, {Qt::ForegroundRole});
+  }
+}
+
+void AdvanceSearchModel::RecycleSomething(const QSet<QModelIndex>& recycleIndexes) {
+  m_recycleSet += recycleIndexes;
+}
+
+void AdvanceSearchModel::ClearRecycle() {
+  decltype(m_recycleSet) tmp;
+  tmp.swap(m_recycleSet);
+  foreach (const QModelIndex& ind, tmp) {
+    emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
   }
 }

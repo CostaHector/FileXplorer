@@ -1,7 +1,5 @@
 #include "RenameActions.h"
 
-
-
 auto RenameActions::Get_CASE_Actions() -> QActionGroup* {
   _LOOSE_CAPITALIZE->setToolTip(
       "Weak. Only capitalize first char of each word and skip others.<br/>e.g.<br/>"
@@ -27,47 +25,40 @@ auto RenameActions::Get_CASE_Actions() -> QActionGroup* {
 }
 
 auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
-  QAction* _NUMERIZER = new QAction(QIcon(":/themes/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"));
   _NUMERIZER->setShortcut(QKeySequence(Qt::Key_F2));
   _NUMERIZER->setToolTip(
       QString("<b>%1 (%2)</b><br/> Numerizer each file in a sequence.").arg(_NUMERIZER->text()).arg(_NUMERIZER->shortcut().toString()));
 
-  QAction* _RENAME_SWAPPER = new QAction(QIcon(":/themes/NAME_STR_SWAPPER_PATH"), tr("swap 1-2-3 to 1-3-2"));
   _RENAME_SWAPPER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F2));
   _RENAME_SWAPPER->setToolTip(QString("<b>%1 (%2)</b><br/> Swap sections in name. e.g., A-B-C -> A-C-B.")
                                   .arg(_RENAME_SWAPPER->text())
                                   .arg(_RENAME_SWAPPER->shortcut().toString()));
 
-  QAction* _caseName = new QAction(QIcon(":/themes/NAME_STR_CASE"), tr("Case"));
+  _STR_INSERTER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_I));
+  _STR_INSERTER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Insert a string into file name.").arg(_STR_INSERTER->text()).arg(_STR_INSERTER->shortcut().toString()));
 
-  QAction* _strInserter = new QAction(QIcon(":/themes/NAME_STR_INSERTER_PATH"), tr("Str Inserter"));
-  _strInserter->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_I));
-  _strInserter->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Insert a string into file name.").arg(_strInserter->text()).arg(_strInserter->shortcut().toString()));
+  _STR_DELETER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_D));
+  _STR_DELETER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Remove a substring from file name.").arg(_STR_DELETER->text(), _STR_DELETER->shortcut().toString()));
 
-  QAction* _strDeleter = new QAction(QIcon(":/themes/NAME_STR_DELETER_PATH"), tr("Str Deleter"));
-  _strDeleter->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_D));
-  _strDeleter->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Remove a substring from file name.").arg(_strDeleter->text(), _strDeleter->shortcut().toString()));
-
-  QAction* _strReplacer = new QAction(QIcon(":/themes/NAME_STR_REPLACER_PATH"), tr("Str Replacer"));
-  _strReplacer->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_R));
-  _strReplacer->setToolTip(QString("<b>%1 (%2)</b><br/> Replace a substring in file name with "
+  _STR_REPLACER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_R));
+  _STR_REPLACER->setToolTip(QString("<b>%1 (%2)</b><br/> Replace a substring in file name with "
                                    "another string.")
-                               .arg(_strReplacer->text(), _strReplacer->shortcut().toString()));
+                                .arg(_STR_REPLACER->text(), _STR_REPLACER->shortcut().toString()));
 
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
   actionGroup->addAction(_RENAME_SWAPPER);
-  actionGroup->addAction(_caseName);
-  actionGroup->addAction(_strInserter);
-  actionGroup->addAction(_strDeleter);
-  actionGroup->addAction(_strReplacer);
+  actionGroup->addAction(_CASE_NAME);
+  actionGroup->addAction(_STR_INSERTER);
+  actionGroup->addAction(_STR_DELETER);
+  actionGroup->addAction(_STR_REPLACER);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
   for (QAction* act : actionGroup->actions()) {
     act->setCheckable(false);
     act->setShortcutVisibleInContextMenu(true);
-  };
+  }
   return actionGroup;
 }
 

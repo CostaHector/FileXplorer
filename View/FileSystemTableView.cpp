@@ -7,8 +7,8 @@
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
 
-FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu, QWidget* parent) : CustomTableView("FILE_SYSTEM", parent) {
-  BindMenu(menu);
+FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent) : CustomTableView("FILE_SYSTEM", parent) {
+  BindMenu(m_fsMenu);
   setModel(fsmModel);
 
   setDragDropMode(QAbstractItemView::DragDrop);
@@ -26,7 +26,7 @@ void FileSystemTableView::subscribe() {
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());
-  addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
+  addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
   addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
   addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
   addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());

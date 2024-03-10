@@ -2,6 +2,7 @@
 #define FILESYSTEMTREEVIEW_H
 
 #include "MyQFileSystemModel.h"
+#include "Component/FileSystemMenu.h"
 
 #include <QTreeView>
 #include <QPushButton>
@@ -16,7 +17,7 @@
 
 class FileSystemTreeView : public QTreeView {
  public:
-  FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu);
+  FileSystemTreeView(MyQFileSystemModel* fsmModel);
 
   void subscribe();
   auto InitViewSettings() -> void;
@@ -37,13 +38,13 @@ class FileSystemTreeView : public QTreeView {
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
   void contextMenuEvent(QContextMenuEvent *event) override{
-    _menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+    m_fsMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
   }
 
  private:
-  QMenu* _menu;
-  QPushButton* backwardBtn;  // will not takeover
-  QPushButton* forwardBtn;   // will not takeover
+  QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
+  QPushButton* backwardBtn{nullptr};  // will not takeover
+  QPushButton* forwardBtn{nullptr};   // will not takeover
 };
 
 

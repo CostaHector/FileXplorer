@@ -10,7 +10,7 @@
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
 
-FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QMenu* menu) : QListView(), _menu(menu) {
+FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel) : QListView(){
   setModel(fsmModel);
   InitViewSettings();
 
@@ -33,7 +33,7 @@ void FileSystemListView::subscribe() {
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());
-  addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
+  addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
   addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
   addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
   addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());

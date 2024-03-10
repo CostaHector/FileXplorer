@@ -1,4 +1,5 @@
 #include "NavigationViewSwitcher.h"
+#include "Component/NotificatorFrame.h"
 #include "PublicTool.h"
 #include "Tools/ActionWithPath.h"
 
@@ -46,28 +47,31 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
   int viewIndex = -1;
   if (viewType == "table") {
     if (_view->m_fsTableView == nullptr) {
-      _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel, _view->m_menu);
+      _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel);
       ContentPanel::connect(_view->m_fsTableView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       ContentPanel::connect(_view->m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, _view,
                             &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsTableView);
     }
     viewIndex = _view->m_name2ViewIndex[viewType];
+    _view->m_fsTableView->setRootIndex(_view->getRootIndex());  // sync root index of current path
   } else if (viewType == "list") {
     if (_view->m_fsListView == nullptr) {
-      _view->m_fsListView = new FileSystemListView(_view->m_fsModel, _view->m_menu);
+      _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
       ContentPanel::connect(_view->m_fsListView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       ContentPanel::connect(_view->m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsListView);
     }
+    _view->m_fsListView->setRootIndex(_view->getRootIndex());  // sync root index of current path
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "tree") {
     if (_view->m_fsTreeView == nullptr) {
-      _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel, _view->m_menu);
+      _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel);
       ContentPanel::connect(_view->m_fsTreeView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       ContentPanel::connect(_view->m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
       _view->AddView(viewType, _view->m_fsTreeView);
     }
+    _view->m_fsTreeView->setRootIndex(_view->getRootIndex());  // sync root index of current path
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "movie") {
     if (_view->m_dbPanel == nullptr) {
@@ -76,6 +80,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       ContentPanel::connect(_view->m_dbPanel, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->AddView(viewType, _view->m_dbPanel);
     }
+    _view->m_advanceSearchView->setWindowTitle(QString("Movie[%1]").arg(_view->m_dbPanel->getMovieTableName()));
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "search") {
     if (_view->m_advanceSearchView == nullptr) {
@@ -89,23 +94,15 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
         _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_srcModel);
       }
       _view->AddView(viewType, _view->m_advanceSearchView);
+      _view->m_srcModel->initFilter(
+          QDir::Filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()});
     }
-    viewIndex = _view->m_name2ViewIndex[viewType];
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    if (newPath.count('/') >= 2) {
-      QDir::Filters restoredFilters{
-          PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(FileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
-      _view->m_srcModel->setRootPathAndFilter(newPath, restoredFilters);
-      _view->m_advanceSearchView->setWindowTitle("Search under|" + newPath);
-    } else {
-      qWarning("Skip. path[%s] is a huge folder, search will cause lags.", qPrintable(newPath));
-    }
+    _view->m_srcModel->setRootPath(newPath);
+    _view->m_advanceSearchView->setWindowTitle(QString("Search[%1]").arg(newPath));
+    viewIndex = _view->m_name2ViewIndex[viewType];
   }
   _view->setCurrentIndex(viewIndex);
-
-  if (fileSystemView.contains(viewType) and _view->_addressBar) {
-    _view->onActionAndViewNavigate(_view->_addressBar->m_addressLine->pathFromLineEdit(), false);
-  }
 }
 
 void NavigationViewSwitcher::onSwitchByViewAction(const QAction* activatedAction) {
