@@ -1,23 +1,23 @@
 #ifndef FILESYSTEMTABLEVIEW_H
 #define FILESYSTEMTABLEVIEW_H
 
-#include "MyQFileSystemModel.h"
+#include "Component/FileSystemMenu.h"
 #include "CustomTableView.h"
+#include "MyQFileSystemModel.h"
 
-#include <QTableView>
-#include <QPushButton>
-#include <QDropEvent>
+#include <QContextMenuEvent>
+#include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
-#include <QDragEnterEvent>
-#include <QContextMenuEvent>
-#include <QMouseEvent>
-#include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QMenu>
+#include <QMouseEvent>
+#include <QPushButton>
+#include <QTableView>
 
 class FileSystemTableView : public CustomTableView {
  public:
-  FileSystemTableView(MyQFileSystemModel* fsmModel, QMenu* menu, QWidget* parent=nullptr);
+  FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent = nullptr);
 
   void subscribe();
 
@@ -36,8 +36,9 @@ class FileSystemTableView : public CustomTableView {
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
  private:
-  QPushButton* backwardBtn;  // will not takeover
-  QPushButton* forwardBtn;   // will not takeover
+  QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
+  QPushButton* backwardBtn{nullptr};  // will not takeover
+  QPushButton* forwardBtn{nullptr};   // will not takeover
 };
 
 #endif  // FILESYSTEMTABLEVIEW_H

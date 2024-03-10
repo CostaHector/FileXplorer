@@ -1,16 +1,14 @@
 #include "AdvanceSearchTableView.h"
-#include "Actions/FileBasicOperationsActions.h"
 #include "Component/AdvanceSearchToolBar.h"
-#include "Component/FileSystemTypeFilter.h"
 #include "CustomTableView.h"
 #include "PublicVariable.h"
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
-    : CustomTableView("ADVANCE_SEARCH_SYSTEM", parent), _sourceModel(sourceModel), _searchProxyModel(searchProxyModel) {
-  m_menu->addActions({COPY_NAME_STR, COPY_ABSOLUTE_PATH_STR, COPY_DIR_STR});
-  m_menu->addSeparator();
-  m_menu->addActions({COPY_FILE, CUT_FILE});
-  BindMenu(m_menu);
+    : CustomTableView("ADVANCE_SEARCH_SYSTEM", parent),
+      m_searchMenu{new AdvanceSearchMenu("Search right click menu", this)},
+      _sourceModel(sourceModel),
+      _searchProxyModel(searchProxyModel) {
+  BindMenu(m_searchMenu);
 
   _searchProxyModel->setSourceModel(_sourceModel);
   setModel(_searchProxyModel);
@@ -30,42 +28,7 @@ void AdvanceSearchTableView::subscribe() {
       _logger->pathInfo(selectionModel()->selectedRows().size(), 1);
     }
   });
-
-  addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
-
-  connect(COPY_NAME_STR, &QAction::triggered, this, &AdvanceSearchTableView::onCopyNamesStr);
-  connect(COPY_FILE, &QAction::triggered, this, &AdvanceSearchTableView::onCutFiles);
-  connect(CUT_FILE, &QAction::triggered, this, &AdvanceSearchTableView::onCopyFiles);
-}
-
-void AdvanceSearchTableView::onCopyNamesStr() const {
-  qDebug() << "Todo: onCopyNamesStr not support now";
-}
-
-void AdvanceSearchTableView::onCopyFiles() {
-  QModelIndexList srcCutList;
-  for (const auto& ind : selectedIndexes()) {
-    const auto indexOfSourceModel = _searchProxyModel->mapToSource(ind);
-    srcCutList.append(indexOfSourceModel);
-    if (ind.column() != 0) {
-      continue;
-    }
-    qDebug() << "Copy" << ind.row() << _sourceModel->data(indexOfSourceModel, Qt::DisplayRole).toString();
-  }
-  _sourceModel->CopiedSomething(srcCutList);
-}
-
-void AdvanceSearchTableView::onCutFiles() {
-  QModelIndexList srcCutList;
-  for (const auto& ind : selectedIndexes()) {
-    const auto indexOfSourceModel = _searchProxyModel->mapToSource(ind);
-    srcCutList.append(indexOfSourceModel);
-    if (ind.column() != 0) {
-      continue;
-    }
-    qDebug() << "Cut" << ind.row() << _sourceModel->data(indexOfSourceModel, Qt::DisplayRole).toString();
-  }
-  _sourceModel->CutSomething(srcCutList);
+  connect(m_searchMenu->_FORCE_REFRESH_SEARCH_SOURCE, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
 }
 
 void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {
@@ -82,12 +45,17 @@ void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {
   //  _searchProxyModel->BindLogger(_logger);
 }
 
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+
+#include <QMainWindow>
+
 class AdvanceSearchTableViewWindowTest : public QMainWindow {
  public:
   explicit AdvanceSearchTableViewWindowTest(QWidget* parent = nullptr) : QMainWindow(parent) {
     const QString restoredPath = "D:/extra";
     QDir::Filters restoredFilters{
-        PreferenceSettings().value("FILE_SYSTEM_FLAG_WHEN_FILTER_ENABLED", int(FileSystemTypeFilter::DEFAULT_FILTER_FLAG)).toInt()};
+        PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()};
     m_srcModel->setRootPathAndFilter(restoredPath, restoredFilters);
     m_proxyModel->setSourceModel(m_srcModel);
 
@@ -114,12 +82,9 @@ class AdvanceSearchTableViewWindowTest : public QMainWindow {
   AdvanceSearchToolBar* m_tb = new AdvanceSearchToolBar("advance search tb", this);
   AdvanceSearchModel* m_srcModel = new AdvanceSearchModel;
   SearchProxyModel* m_proxyModel = new SearchProxyModel;
-
   AdvanceSearchTableView* m_tv = nullptr;
 };
 
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
 int main(int argc, char* argv[]) {

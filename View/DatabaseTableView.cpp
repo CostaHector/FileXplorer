@@ -1,6 +1,6 @@
 #include "DatabaseTableView.h"
 
-#include "Component/DBRightClickMenu.h"
+#include "Actions/DataBaseActions.h"
 #include "Component/QuickWhereClause.h"
 #include "Tools/PlayVideo.h"
 
@@ -13,15 +13,19 @@
 #include <QProcess>
 #include <QStorageInfo>
 
+#include <QSqlError>
+#include <QSqlQuery>
+
 DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent)
     : CustomTableView("MOVIE_TABLE", parent),
       _dbModel(dbModel),
+      m_movieMenu{new MovieDatabaseMenu("Movie Right click menu", this)},
       _dbSearchBar{_dbSearchBar},
       _tables{_dbSearchBar->m_tables},
       _searchLE{_dbSearchBar->m_searchLE},
       _searchCB{_dbSearchBar->m_searchCB},
       m_quickWhereClause{new QuickWhereClause(this)} {
-  BindMenu(new DBRightClickMenu("Database Right click menu", this));
+  BindMenu(m_movieMenu);
 
   setModel(_dbModel);
 
@@ -40,8 +44,6 @@ DatabaseTableView::DatabaseTableView(DatabaseSearchToolBar* _dbSearchBar, MyQSql
 }
 
 void DatabaseTableView::subscribe() {
-  connect(g_dbAct()._PLAY_VIDEOS, &QAction::triggered, this, &DatabaseTableView::on_PlayVideo);
-
   connect(horizontalHeader(), &QHeaderView::sectionResized, this,
           [this]() { PreferenceSettings().setValue("DATABASE_TABLEVIEW_HERDER_GEOMETRY", horizontalHeader()->saveState()); });
 
@@ -135,6 +137,7 @@ bool DatabaseTableView::InitMoviesTables() {
 }
 
 bool DatabaseTableView::setCurrentMovieTable(const QString& movieTableName) {
+  m_movieTableName = movieTableName;
   _tables->setCurrentText(movieTableName);
   _dbModel->setTable(movieTableName);
   _dbModel->submitAll();

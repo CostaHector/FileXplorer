@@ -1,1 +1,1 @@
-cmd.exe /K "C: && cd C:/"
+cmd.exe /K "E: && cd E:/ImageHost/hetero"
