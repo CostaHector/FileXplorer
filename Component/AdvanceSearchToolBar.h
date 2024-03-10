@@ -23,6 +23,11 @@ class AdvanceSearchToolBar : public QToolBar {
 
   void onSearchEnterAndApply();
 
+  void onGetFocus() {
+    m_nameFilter->setFocus();
+    m_nameFilter->selectAll();
+  }
+
  private:
   void BindSearchProxyModel(SearchProxyModel* searchProxyModel);
   void BindSearchSourceModel(AdvanceSearchModel* searchSourceModel);
