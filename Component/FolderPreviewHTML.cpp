@@ -53,6 +53,7 @@ bool FolderPreviewHTML::operator()(const QString& path) {
     htmlSrc += nextImgsHTMLSrc();
   }
   htmlSrc += "</body>\n</html>\n";
+  setHtml(""); // release memory occupied before
   setHtml(htmlSrc);
   return true;
 }
