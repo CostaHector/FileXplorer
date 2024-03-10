@@ -1,22 +1,22 @@
 #ifndef FILESYSTEMLISTVIEW_H
 #define FILESYSTEMLISTVIEW_H
 
+#include "Component/FileSystemMenu.h"
 #include "MyQFileSystemModel.h"
 
-#include <QListView>
-#include <QPushButton>
-#include <QDropEvent>
+#include <QContextMenuEvent>
+#include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
-#include <QDragEnterEvent>
-#include <QContextMenuEvent>
-#include <QMouseEvent>
-#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QListView>
 #include <QMenu>
+#include <QMouseEvent>
+#include <QPushButton>
 
 class FileSystemListView : public QListView {
  public:
-  FileSystemListView(MyQFileSystemModel* fsmModel, QMenu* menu);
+  FileSystemListView(MyQFileSystemModel* fsmModel);
 
   void subscribe();
   auto InitViewSettings() -> void;
@@ -36,14 +36,14 @@ class FileSystemListView : public QListView {
 
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
-  void contextMenuEvent(QContextMenuEvent *event) override{
-    _menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+  void contextMenuEvent(QContextMenuEvent* event) override {
+    m_fsMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
   }
 
  private:
-  QMenu* _menu;
-  QPushButton* backwardBtn;  // will not takeover
-  QPushButton* forwardBtn;   // will not takeover
+  QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
+  QPushButton* backwardBtn{nullptr};  // will not takeover
+  QPushButton* forwardBtn{nullptr};   // will not takeover
 };
 
-#endif // FILESYSTEMLISTVIEW_H
+#endif  // FILESYSTEMLISTVIEW_H

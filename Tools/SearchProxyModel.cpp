@@ -1,5 +1,5 @@
 #include "SearchProxyModel.h"
-
+#include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 
 SearchProxyModel::SearchProxyModel(QObject* parent)
@@ -129,9 +129,15 @@ void SearchProxyModel::changeCustomSearchNameAndContents(const QString& searchTe
     nameSrcFilters = searchText.left(splitIndex).split(',');
     m_fileContents = searchText.mid(splitIndex + 1);
   }
-  for (const auto& nameSrc : nameSrcFilters) {
+  foreach (const QString& nameSrc, nameSrcFilters) {
     QRegExp wildCardRe(nameSrc);
     wildCardRe.setPatternSyntax(QRegExp::Wildcard);
+    if (not wildCardRe.isValid()) {
+      qWarning("Invalid wildcard[%s]. Disable filter and pass everything.", qPrintable(nameSrc));
+      Notificator::warning("Invalid wildcard[%1]. Disable filter and pass everything.", nameSrc);
+      m_fileContents = "";
+      break;
+    }
     wildCardRe.setCaseSensitivity(m_nameFiltersCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
     m_nameFilters.append(wildCardRe);
   }

@@ -1,6 +1,5 @@
 #include "ContentPanel.h"
 #include "Component/NotificatorFrame.h"
-#include "Component/RightClickMenu.h"
 
 #include <QLineEdit>
 #include <QTableView>
@@ -15,10 +14,7 @@
 
 ContentPanel::ContentPanel(FolderPreviewHTML* previewHtml_, FolderPreviewWidget* previewWidget_, QWidget* parent)
     : QStackedWidget(parent),
-      _addressBar(nullptr),
-      _dbSearchBar(nullptr),
       m_fsModel(new MyQFileSystemModel(this)),
-      m_menu(new RightClickMenu("Right click menu", this)),
       previewHtml(previewHtml_),
       previewWidget(previewWidget_),
       _logger(nullptr),
@@ -222,4 +218,11 @@ auto ContentPanel::keyPressEvent(QKeyEvent* e) -> void {
     return;
   }
   QStackedWidget::keyPressEvent(e);
+}
+
+QModelIndex ContentPanel::getRootIndex() const {
+  if (not isFSView()) {
+    return QModelIndex();
+  }
+  return GetCurView()->rootIndex();
 }
