@@ -36,9 +36,6 @@ QString ContentPanel::getRootPath() const {
   if (viewName == "search" or viewName == "table" or viewName == "list" or viewName == "tree") {
     return m_fsModel->rootPath();
   }
-  if (viewName == "movie") {
-    return m_dbModel->rootPath();
-  }
   qDebug("No rootpath");
   return "";
 }
@@ -109,8 +106,9 @@ QStringList ContentPanel::getFileNames() const {
       const auto& srcIndex = m_proxyModel->mapToSource(ind);
       names.append(m_srcModel->fileName(srcIndex));
     }
+  } else {
+    qDebug("No getFileNames");
   }
-  qDebug("No getFileNames");
   return names;
 }
 
@@ -138,8 +136,9 @@ QStringList ContentPanel::getFilePaths() const {
       const auto& srcIndex = m_proxyModel->mapToSource(ind);
       filePaths.append(m_srcModel->filePath(srcIndex));
     }
+  } else {
+    qDebug("No getFilePaths");
   }
-  qDebug("No getFilePaths");
   return filePaths;
 }
 
@@ -147,24 +146,24 @@ QStringList ContentPanel::getFilePrepaths() const {
   const QString& viewName = GetCurViewName();
   QStringList prepaths;
   if (viewName == "table") {
-    const int rowCnt = m_fsTableView->selectionModel()->selectedRows().size();
+    int rowCnt = m_fsTableView->selectionModel()->selectedRows().size();
     const QString& prepath = m_fsModel->rootPath();
     prepaths.reserve(rowCnt);
-    while (rowCnt > 0) {
+    while (rowCnt-- > 0) {
       prepaths.append(prepath);
     }
   } else if (viewName == "list") {
-    const int rowCnt = m_fsListView->selectionModel()->selectedRows().size();
+    int rowCnt = m_fsListView->selectionModel()->selectedRows().size();
     const QString& prepath = m_fsModel->rootPath();
     prepaths.reserve(rowCnt);
-    while (rowCnt > 0) {
+    while (rowCnt-- > 0) {
       prepaths.append(prepath);
     }
   } else if (viewName == "tree") {
-    const int rowCnt = m_fsTreeView->selectionModel()->selectedRows().size();
+    int rowCnt = m_fsTreeView->selectionModel()->selectedRows().size();
     const QString& prepath = m_fsModel->rootPath();
     prepaths.reserve(rowCnt);
-    while (rowCnt > 0) {
+    while (rowCnt-- > 0) {
       prepaths.append(prepath);
     }
   } else if (viewName == "movie") {
@@ -176,8 +175,9 @@ QStringList ContentPanel::getFilePrepaths() const {
       const auto& srcIndex = m_proxyModel->mapToSource(ind);
       prepaths.append(m_srcModel->absolutePath(srcIndex));
     }
+  } else {
+    qDebug("No getFilePrepaths");
   }
-  qDebug("No getFilePrepaths");
   return prepaths;
 }
 
@@ -216,8 +216,9 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
       const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
       prepaths.append(m_srcModel->absolutePath(srcIndex));
     }
+  } else {
+    qDebug("No getTheJpgFolderPaths");
   }
-  qDebug("No getTheJpgFolderPaths");
   return prepaths;
 }
 
@@ -265,10 +266,10 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
     }
   } else if (viewName == "search") {
     QModelIndexList srcInds;
-    for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
-      const auto& srcIndex = m_proxyModel->mapToSource(ind);
-      srcInds.append(srcIndex);
-      filePaths.append(m_srcModel->filePath(srcIndex));
+    for (const auto& proInd : m_advanceSearchView->selectionModel()->selectedRows()) {
+      const auto& ind = m_proxyModel->mapToSource(proInd);
+      srcInds.append(ind);
+      filePaths.append(m_srcModel->filePath(ind));
       urls.append(QUrl::fromLocalFile(filePaths.back()));
     }
     if (dropAct == Qt::CopyAction) {
@@ -276,9 +277,63 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
     } else if (dropAct == Qt::MoveAction) {
       m_srcModel->CutSomething(srcInds);
     }
+  } else {
+    qDebug("No getFilePathsAndUrls");
   }
-  qDebug("No getFilePathsAndUrls");
   return {filePaths, urls};
+}
+
+std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const bool isSearchRecycle) const {
+  const QString& viewName = GetCurViewName();
+  QStringList prepaths;
+  QStringList names;
+  prepaths.reserve(10);
+  names.reserve(10);
+  if (viewName == "table") {
+    const QString prepath = m_fsModel->rootPath();
+    const auto& inds = m_fsTableView->selectionModel()->selectedRows();
+    for (const auto& ind : inds) {
+      prepaths.append(prepath);
+      names.append(m_fsModel->fileName(ind));
+    }
+  } else if (viewName == "list") {
+    const QString prepath = m_fsModel->rootPath();
+    const auto& inds = m_fsListView->selectionModel()->selectedRows();
+    for (const auto& ind : inds) {
+      prepaths.append(prepath);
+      names.append(m_fsModel->fileName(ind));
+    }
+  } else if (viewName == "tree") {
+    const QString prepath = m_fsModel->rootPath();
+    const auto& inds = m_fsTreeView->selectionModel()->selectedRows();
+    for (const auto& ind : inds) {
+      prepaths.append(prepath);
+      names.append(m_fsModel->fileName(ind));
+    }
+  } else if (viewName == "movie") {
+    for (const auto& ind : m_dbPanel->selectionModel()->selectedRows()) {
+      prepaths.append(m_dbModel->absolutePath(ind));
+      names.append(m_dbModel->fileName(ind));
+    }
+  } else if (viewName == "search") {
+    QSet<QModelIndex> srcInds;
+    for (const auto& proInd : m_advanceSearchView->selectionModel()->selectedRows()) {
+      const auto& ind = m_proxyModel->mapToSource(proInd);
+      prepaths.append(m_srcModel->absolutePath(ind));
+      names.append(m_srcModel->fileName(ind));
+      srcInds.insert(ind);
+    }
+    if (isSearchRecycle) {
+      m_srcModel->RecycleSomething(srcInds);
+    }
+  } else {
+    qDebug("No getFilePrepathsAndName");
+  }
+  if (prepaths.size() != names.size()) {
+    qWarning("getFilePrepathsAndName size differ");
+    return {};
+  }
+  return {prepaths, names};
 }
 
 int ContentPanel::getSelectedRowsCount() const {

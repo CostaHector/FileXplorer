@@ -8,7 +8,7 @@
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
 
-FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QMenu* menu) : QTreeView(), _menu(menu) {
+FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel) : QTreeView() {
   setModel(fsmModel);
   InitViewSettings();
 
@@ -32,7 +32,7 @@ void FileSystemTreeView::subscribe() {
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());
-  addActions(g_fileBasicOperationsActions().CUT_COPY_MERGE_PASTE->actions());
+  addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
   addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
   addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
   addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());

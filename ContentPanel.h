@@ -48,13 +48,11 @@ class ContentPanel : public QStackedWidget {
     const auto* p = currentWidget();
     return p != nullptr and (p == m_fsTableView or p == m_fsListView or p == m_fsTreeView);
   }
-  inline QAbstractItemView* GetCurView() const {
-    return dynamic_cast<QAbstractItemView*>(currentWidget());
-  }
+  QModelIndex getRootIndex() const;
+  inline QAbstractItemView* GetCurView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
   QAbstractItemView* GetView(const QString& name) const;
   QString GetCurViewName() const;
   int AddView(const QString& viewType, QWidget* w);
-
 
   QString getRootPath() const;
   QString getFilePath(const QModelIndex& ind) const;
@@ -64,6 +62,7 @@ class ContentPanel : public QStackedWidget {
   QStringList getFilePrepaths() const;
   QStringList getTheJpgFolderPaths() const;
   std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
+  std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false) const;
 
   int getSelectedRowsCount() const;
   QString getCurFilePath() const;
@@ -76,16 +75,14 @@ class ContentPanel : public QStackedWidget {
   };
   QMap<QString, Anchor> m_anchorTags;
 
-  NavigationAndAddressBar* _addressBar;
-  DatabaseSearchToolBar* _dbSearchBar;
-  AdvanceSearchToolBar* _advanceSearchBar;
+  NavigationAndAddressBar* _addressBar{nullptr};
+  DatabaseSearchToolBar* _dbSearchBar{nullptr};
+  AdvanceSearchToolBar* _advanceSearchBar{nullptr};
 
   MyQFileSystemModel* m_fsModel;
   MyQSqlTableModel* m_dbModel{nullptr};
   AdvanceSearchModel* m_srcModel{nullptr};
   SearchProxyModel* m_proxyModel{nullptr};
-
-  QMenu* m_menu;
 
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
