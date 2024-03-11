@@ -1,4 +1,5 @@
 #include "MyQFileSystemModel.h"
+#include "PublicVariable.h"
 #include "Tools/PathTool.h"
 
 #include <QDebug>
@@ -22,11 +23,18 @@ void MyQFileSystemModel::BindLogger(CustomStatusBar* logger) {
     qWarning("Don't try to bind nullptr to _logger");
     return;
   }
-  if (_logger != nullptr){
+  if (_logger != nullptr) {
     qWarning("Don't try to rebind logger to non nullptr _logger");
     return;
   }
   _logger = logger;
+}
+
+auto MyQFileSystemModel::fullInfo(const QModelIndex& curIndex) const -> QString {
+  using namespace MainKey;
+  const int row = curIndex.row();
+  const QModelIndex& par = curIndex.parent();
+  return data(index(row, Name, par)).toString() + '\t' + data(index(row, Size, par)).toString() + '\t' + rootPath();
 }
 
 Qt::ItemFlags MyQFileSystemModel::flags(const QModelIndex& index) const {

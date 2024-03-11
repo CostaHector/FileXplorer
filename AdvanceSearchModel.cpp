@@ -282,3 +282,9 @@ void AdvanceSearchModel::ClearRecycle() {
     emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
   }
 }
+
+auto AdvanceSearchModel::fullInfo(const QModelIndex& curIndex) const -> QString {
+  const int row = curIndex.row();
+  const QModelIndex& par = curIndex.parent();
+  return data(index(row, 0, par)).toString() + '\t' + data(index(row, 1, par)).toString() + '\t' + data(index(row, 4, par)).toString();
+}
