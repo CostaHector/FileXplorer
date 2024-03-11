@@ -16,8 +16,9 @@ class MyQFileSystemModel : public QFileSystemModel {
 
   void BindLogger(CustomStatusBar* logger);
 
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  auto fullInfo(const QModelIndex& curIndex) const -> QString;
 
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
   bool canItemsBeDragged(const QModelIndex& index) const;
 
   bool canItemsDroppedHere(const QModelIndex& index) const;
