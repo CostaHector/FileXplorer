@@ -39,6 +39,8 @@ class ContentPanel : public QStackedWidget {
   void BindLogger(CustomStatusBar* logger);
 
   auto on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool;
+  void connectSelectionChanged(QString typeName);
+  void disconnectSelectionChanged(QString typeName);
   auto on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) -> bool;
   auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
 

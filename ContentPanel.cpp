@@ -188,6 +188,32 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
   return true;
 }
 
+void ContentPanel::connectSelectionChanged(QString typeName) {
+  if (typeName.isEmpty()) {
+    typeName = GetCurViewName();
+  }
+  disconnectSelectionChanged(typeName);
+  if (typeName == "table") {
+    ContentPanel::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  } else if (typeName == "list") {
+    ContentPanel::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  } else if (typeName == "tree") {
+    ContentPanel::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  }
+}
+void ContentPanel::disconnectSelectionChanged(QString typeName) {
+  if (typeName.isEmpty()) {
+    typeName = GetCurViewName();
+  }
+  if (typeName == "table") {
+    ContentPanel::disconnect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  } else if (typeName == "list") {
+    ContentPanel::disconnect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  } else if (typeName == "tree") {
+    ContentPanel::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  }
+}
+
 bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
   m_fsTableView->setFocus();
   qDebug("onAfterDirectoryLoaded[%s]", qPrintable(loadedPath));

@@ -23,6 +23,7 @@ FolderPreviewHTML::FolderPreviewHTML(QWidget* parent) : m_parent(parent), m_PLAY
 }
 
 bool FolderPreviewHTML::operator()(const QString& path) {
+  setHtml(""); // release memory occupied before
   dirPath = QDir::fromNativeSeparators(path);
   m_curImgCntIndex = 0;
   m_imgsLst.clear();
@@ -53,7 +54,6 @@ bool FolderPreviewHTML::operator()(const QString& path) {
     htmlSrc += nextImgsHTMLSrc();
   }
   htmlSrc += "</body>\n</html>\n";
-  setHtml(""); // release memory occupied before
   setHtml(htmlSrc);
   return true;
 }
