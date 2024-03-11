@@ -113,6 +113,8 @@ void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
 }
 
 void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
+  // In mouse drag and move event, we can get DropAction directly.
+  // So no need to get from mimedata.data("Preferred DropEffect").
   auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
     qDebug("m_fsm is nullptr");
