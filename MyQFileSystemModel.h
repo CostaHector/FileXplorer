@@ -1,12 +1,14 @@
 #ifndef MYQFILESYSTEMMODEL_H
 #define MYQFILESYSTEMMODEL_H
 
+#include "Component/CustomStatusBar.h"
+
+#include <QDebug>
 #include <QFileSystemModel>
 #include <QHash>
 #include <QMap>
 #include <QObject>
 #include <QSettings>
-#include "Component/CustomStatusBar.h"
 
 class MyQFileSystemModel : public QFileSystemModel {
  public:
@@ -33,8 +35,15 @@ class MyQFileSystemModel : public QFileSystemModel {
   void ClearCutDict() {
     decltype(m_cutMap) tmp;
     tmp.swap(m_cutMap);
+    // continous cut made index not exist but valid can emit not exist make it crash down.
+    // so we need remove index before emit dataChanged
+    // bugs here
+    return;
     for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
       for (auto index : it.value()) {
+        qDebug() << index;
+        if (not index.isValid())
+          continue;  // this index may by cut away. so may be invalid here
         emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
       }
     }
@@ -45,6 +54,8 @@ class MyQFileSystemModel : public QFileSystemModel {
     tmp.swap(m_copiedMap);
     for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
       for (auto index : it.value()) {
+        if (not index.isValid())
+          continue;
         emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
       }
     }
@@ -70,6 +81,21 @@ class MyQFileSystemModel : public QFileSystemModel {
       m_copiedMap[rootPath()] = {};
     }
     m_copiedMap[rootPath()] += copiedIndexes;
+  }
+
+  void InvalidSomething(const QModelIndexList& aboutToRemove) {
+    const QString& pth = rootPath();
+    const QSet<QModelIndex> toRemoveSet{aboutToRemove.cbegin(), aboutToRemove.end()};
+    if (m_copiedMap.contains(pth)) {
+      QSet<QModelIndex> copied{m_copiedMap[pth].cbegin(), m_copiedMap[pth].cend()};
+      const auto& temp = copied - toRemoveSet;
+      m_copiedMap[pth] = QModelIndexList{temp.cbegin(), temp.cend()};
+    }
+    if (m_cutMap.contains(pth)) {
+      QSet<QModelIndex> cut{m_cutMap[pth].cbegin(), m_cutMap[pth].cend()};
+      const auto& temp = cut - toRemoveSet;
+      m_copiedMap[pth] = QModelIndexList{temp.cbegin(), temp.cend()};
+    }
   }
 
   void DragHover(const QModelIndex index) {
