@@ -7,42 +7,33 @@
 #include "Tools/PathTool.h"
 
 class MimeDataCX : public QMimeData {
+  // Enhanced MimeDataCX, always keep folder structure
  public:
   static MimeDataCX fromPlainMimeData(const QMimeData* baseMimeData);
-  static QStringList Urls2QStringList(const QMimeData& mimeData) {
-    QStringList lAbsPathList;
-    for (const QUrl& url : mimeData.urls()) {
-      lAbsPathList.append(url.toLocalFile());
-    }
-    return lAbsPathList;
-  }
-
-  MimeDataCX(const QMimeData& parent, const CCMMode cutCopy_ = CCMMode::ERROR) :
-        MimeDataCX(Urls2QStringList(parent), cutCopy_) {
-    setHtml(parent.html());
-    setText(parent.text());
-    setUrls(parent.urls());
-    setImageData(parent.imageData());
-  }
+  static QStringList Urls2QStringList(const QMimeData& mimeData);
+  static CCMMode getModeFrom(const QMimeData* native);
 
   MimeDataCX(const MimeDataCX& rhs) noexcept;
 
   MimeDataCX(const QString& l_, const QStringList& lRels_, const CCMMode cutCopy_ = CCMMode::ERROR)
-      : QMimeData(), l(l_), lRels(lRels_), cutCopy(cutCopy_) {}
+      : QMimeData(), l(l_), lRels(lRels_), m_cutCopy(cutCopy_) {
+    refillBaseMode(m_cutCopy);
+  }
 
   MimeDataCX(const std::pair<QString, QStringList>& lAndRels, const CCMMode cutCopy_ = CCMMode::ERROR)
       : MimeDataCX(lAndRels.first, lAndRels.second, cutCopy_) {}
 
-  MimeDataCX(const QStringList& lAbsPathList, const CCMMode cutCopy_ = CCMMode::ERROR) :
-        MimeDataCX(PATHTOOL::GetLAndRels(lAbsPathList), cutCopy_) {
-  }
+  MimeDataCX(const QStringList& lAbsPathList, const CCMMode cutCopy_ = CCMMode::ERROR) : MimeDataCX(PATHTOOL::GetLAndRels(lAbsPathList), cutCopy_) {}
 
-  void setMode(const CCMMode newMode) { cutCopy = newMode; }
+  MimeDataCX(const QMimeData& parent, const CCMMode cutCopy_ = CCMMode::ERROR);
+
+  void determineMode(const CCMMode newMode) { m_cutCopy = newMode; }
+  bool refillBaseMode(const CCMMode mode);
 
  public:
   const QString l;
   const QStringList lRels;
-  CCMMode cutCopy;
+  CCMMode m_cutCopy;
 };
 
 #endif  // MIMEDATACX_H
