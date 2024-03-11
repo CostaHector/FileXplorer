@@ -49,8 +49,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     if (_view->m_fsTableView == nullptr) {
       _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel);
       ContentPanel::connect(_view->m_fsTableView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      ContentPanel::connect(_view->m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, _view,
-                            &ContentPanel::on_selectionChanged);
+      _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsTableView);
     }
     const auto& newRootIndex = _view->getRootIndex();
@@ -61,7 +60,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     if (_view->m_fsListView == nullptr) {
       _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
       ContentPanel::connect(_view->m_fsListView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      ContentPanel::connect(_view->m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
+      _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsListView);
     }
     const auto& newRootIndex = _view->getRootIndex();
@@ -72,7 +71,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     if (_view->m_fsTreeView == nullptr) {
       _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel);
       ContentPanel::connect(_view->m_fsTreeView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      ContentPanel::connect(_view->m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, _view, &ContentPanel::on_selectionChanged);
+      _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsTreeView);
     }
     const auto& newRootIndex = _view->getRootIndex();
