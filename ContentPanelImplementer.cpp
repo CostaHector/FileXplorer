@@ -112,6 +112,36 @@ QStringList ContentPanel::getFileNames() const {
   return names;
 }
 
+QStringList ContentPanel::getFullRecords() const {
+  const QString& viewName = GetCurViewName();
+  QStringList fullRecords;
+  if (viewName == "table") {
+    for (const auto& ind : m_fsTableView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_fsModel->fullInfo(ind));
+    }
+  } else if (viewName == "list") {
+    for (const auto& ind : m_fsListView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_fsModel->fullInfo(ind));
+    }
+  } else if (viewName == "tree") {
+    for (const auto& ind : m_fsTreeView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_fsModel->fullInfo(ind));
+    }
+  } else if (viewName == "movie") {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_dbModel->fullInfo(ind));
+    }
+  } else if (viewName == "search") {
+    for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
+      const auto& srcIndex = m_proxyModel->mapToSource(ind);
+      fullRecords.append(m_srcModel->fullInfo(srcIndex));
+    }
+  } else {
+    qDebug("No getFullRecords");
+  }
+  return fullRecords;
+}
+
 QStringList ContentPanel::getFilePaths() const {
   const QString& viewName = GetCurViewName();
   QStringList filePaths;

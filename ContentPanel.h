@@ -63,6 +63,7 @@ class ContentPanel : public QStackedWidget {
   QStringList getFilePaths() const;
   QStringList getFilePrepaths() const;
   QStringList getTheJpgFolderPaths() const;
+  QStringList getFullRecords() const;
   std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false, const bool needSyncModelDisplay=false) const;
 
