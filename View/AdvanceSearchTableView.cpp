@@ -1,7 +1,7 @@
 #include "AdvanceSearchTableView.h"
-#include "Component/AdvanceSearchToolBar.h"
+#include "Actions/FileBasicOperationsActions.h"
+#include "Actions/ViewActions.h"
 #include "CustomTableView.h"
-#include "PublicVariable.h"
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
     : CustomTableView("ADVANCE_SEARCH_SYSTEM", parent),
@@ -29,6 +29,12 @@ void AdvanceSearchTableView::subscribe() {
     }
   });
   connect(m_searchMenu->_FORCE_REFRESH_SEARCH_SOURCE, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
+
+  addActions(g_viewActions()._VIDEO_PLAYERS->actions());
+  addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
+  addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
+  addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
+  addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
 }
 
 void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {

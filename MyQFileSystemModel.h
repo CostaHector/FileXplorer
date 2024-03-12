@@ -1,12 +1,14 @@
 #ifndef MYQFILESYSTEMMODEL_H
 #define MYQFILESYSTEMMODEL_H
 
+#include "Component/CustomStatusBar.h"
+
+#include <QDebug>
 #include <QFileSystemModel>
 #include <QHash>
 #include <QMap>
 #include <QObject>
 #include <QSettings>
-#include "Component/CustomStatusBar.h"
 
 class MyQFileSystemModel : public QFileSystemModel {
  public:
@@ -14,8 +16,9 @@ class MyQFileSystemModel : public QFileSystemModel {
 
   void BindLogger(CustomStatusBar* logger);
 
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  auto fullInfo(const QModelIndex& curIndex) const -> QString;
 
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
   bool canItemsBeDragged(const QModelIndex& index) const;
 
   bool canItemsDroppedHere(const QModelIndex& index) const;
@@ -33,9 +36,14 @@ class MyQFileSystemModel : public QFileSystemModel {
   void ClearCutDict() {
     decltype(m_cutMap) tmp;
     tmp.swap(m_cutMap);
+    // continous cut made index not exist but valid can emit not exist make it crash down.
+    // so we need remove index before emit dataChanged
+    // bugs here. so we need check if DoNotUseParent is true
     for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-      for (auto index : it.value()) {
-        emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
+      for (auto ind : it.value()) {
+        if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+          continue;
+        emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
       }
     }
   }
@@ -44,8 +52,10 @@ class MyQFileSystemModel : public QFileSystemModel {
     decltype(m_copiedMap) tmp;
     tmp.swap(m_copiedMap);
     for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-      for (auto index : it.value()) {
-        emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
+      for (auto ind : it.value()) {
+        if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+          continue;
+        emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
       }
     }
   }
@@ -104,6 +114,15 @@ class MyQFileSystemModel : public QFileSystemModel {
       return QBrush(Qt::transparent);
     }
     return QFileSystemModel::data(index, role);
+  }
+
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+    if (orientation == Qt::Vertical) {
+      if (role == Qt::TextAlignmentRole) {
+        return Qt::AlignRight;
+      }
+    }
+    return QFileSystemModel::headerData(section, orientation, role);
   }
 
  public slots:
