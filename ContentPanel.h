@@ -11,7 +11,7 @@
 #include "MyQFileSystemModel.h"
 
 #include "View/AdvanceSearchTableView.h"
-#include "View/DatabaseTableView.h"
+#include "View/MovieDBView.h"
 #include "View/FileSystemListView.h"
 #include "View/FileSystemTableView.h"
 #include "View/FileSystemTreeView.h"
@@ -39,6 +39,8 @@ class ContentPanel : public QStackedWidget {
   void BindLogger(CustomStatusBar* logger);
 
   auto on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool;
+  void connectSelectionChanged(QString typeName);
+  void disconnectSelectionChanged(QString typeName);
   auto on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) -> bool;
   auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
 
@@ -61,6 +63,7 @@ class ContentPanel : public QStackedWidget {
   QStringList getFilePaths() const;
   QStringList getFilePrepaths() const;
   QStringList getTheJpgFolderPaths() const;
+  QStringList getFullRecords() const;
   std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false) const;
 
@@ -87,7 +90,7 @@ class ContentPanel : public QStackedWidget {
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
-  DatabaseTableView* m_dbPanel{nullptr};
+  MovieDBView* m_movieView{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
 
   FolderPreviewHTML* previewHtml;

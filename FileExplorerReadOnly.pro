@@ -52,6 +52,7 @@ SOURCES += \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     View/AdvanceSearchTableView.cpp \
+    View/MovieDBView.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -89,7 +90,6 @@ SOURCES += \
     Tools/ViewSelection.cpp \
     UndoRedo.cpp \
     View/CustomTableView.cpp \
-    View/DatabaseTableView.cpp \
     FileExplorerEvent.cpp \
     FolderPreviewComponent/FolderListView.cpp \
     FolderPreviewComponent/ImagesFileSystemModel.cpp \
@@ -160,6 +160,7 @@ HEADERS += \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     View/AdvanceSearchTableView.h \
+    View/MovieDBView.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
@@ -197,7 +198,6 @@ HEADERS += \
     Tools/ViewSelection.h \
     UndoRedo.h \
     View/CustomTableView.h \
-    View/DatabaseTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
     FolderPreviewComponent/FolderListView.h \

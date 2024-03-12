@@ -181,13 +181,18 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
 }
 
 auto AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
-  if (role != Qt::DisplayRole) {
-    return QVariant();
+  if (role == Qt::TextAlignmentRole) {
+    if (orientation == Qt::Vertical) {
+      return Qt::AlignRight;
+    }
   }
-  if (orientation == Qt::Orientation::Horizontal) {
-    return HORIZONTAL_HEADER_NAMES[section];
+  if (role == Qt::DisplayRole) {
+    if (orientation == Qt::Orientation::Horizontal) {
+      return HORIZONTAL_HEADER_NAMES[section];
+    }
+    return section + 1;
   }
-  return section + 1;
+  return QAbstractTableModel::headerData(section, orientation, role);
 }
 
 void AdvanceSearchModel::ClearCopyAndCutDict() {
@@ -198,9 +203,12 @@ void AdvanceSearchModel::ClearCopyAndCutDict() {
 void AdvanceSearchModel::ClearCutDict() {
   decltype(m_cutMap) tmp;
   tmp.swap(m_cutMap);
+  return;
   for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-    for (auto index : it.value()) {
-      emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
+    for (auto ind : it.value()) {
+      if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+        continue;
+      emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
     }
   }
 }
@@ -209,8 +217,10 @@ void AdvanceSearchModel::ClearCopiedDict() {
   decltype(m_copiedMap) tmp;
   tmp.swap(m_copiedMap);
   for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-    for (auto index : it.value()) {
-      emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
+    for (auto ind : it.value()) {
+      if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+        continue;
+      emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
     }
   }
 }
@@ -270,4 +280,10 @@ void AdvanceSearchModel::ClearRecycle() {
   foreach (const QModelIndex& ind, tmp) {
     emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
   }
+}
+
+auto AdvanceSearchModel::fullInfo(const QModelIndex& curIndex) const -> QString {
+  const int row = curIndex.row();
+  const QModelIndex& par = curIndex.parent();
+  return data(index(row, 0, par)).toString() + '\t' + data(index(row, 1, par)).toString() + '\t' + data(index(row, 4, par)).toString();
 }

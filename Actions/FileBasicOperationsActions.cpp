@@ -151,11 +151,16 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
                                 .arg(COPY_THE_PATH->text(), COPY_THE_PATH->shortcut().toString()));
   COPY_THE_PATH->setShortcutVisibleInContextMenu(true);
 
+  COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> <b>Copy the selected records, especially name, size, and prepath")
+                               .arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
+  COPY_RECORDS->setShortcutVisibleInContextMenu(true);
+
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(COPY_FULL_PATH);
   actionGroup->addAction(COPY_PATH);
   actionGroup->addAction(COPY_NAME);
   actionGroup->addAction(COPY_THE_PATH);
+  actionGroup->addAction(COPY_RECORDS);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   for (QAction* act : actionGroup->actions()) {

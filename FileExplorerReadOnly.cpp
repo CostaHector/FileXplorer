@@ -123,3 +123,21 @@ void FileExplorerReadOnly::UpdateComponentVisibility() {
   const bool showPrev = not showDB and showFolderPrev;
   previewHtmlDock->setVisible(showPrev);
 }
+
+void FileExplorerReadOnly::keyPressEvent(QKeyEvent* ev) {
+  if (ev->key() == Qt::Key_F3) {  // F3 Search
+    if (m_fsPanel->isFSView()) {
+      if (m_fsPanel->_addressBar != nullptr)
+        m_fsPanel->_addressBar->onGetFocus();
+    } else if (m_fsPanel->GetCurViewName() == "search") {
+      if (m_fsPanel->_advanceSearchBar != nullptr) {
+        m_fsPanel->_advanceSearchBar->onGetFocus();
+      }
+    }
+    return;
+  } else if (ev->key() == Qt::Key_Escape) {
+    m_fsPanel->GetCurView()->setFocus();
+    return;
+  }
+  QMainWindow::keyPressEvent(ev);
+}
