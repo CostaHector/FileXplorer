@@ -1,5 +1,5 @@
-#ifndef DATABASETABLEVIEW_H
-#define DATABASETABLEVIEW_H
+#ifndef MOVIEDBVIEW_H
+#define MOVIEDBVIEW_H
 
 #include "Component/DatabaseSearchToolBar.h"
 #include "Component/MovieDatabaseMenu.h"
@@ -14,9 +14,9 @@
 #include <QMessageBox>
 #include <QTableView>
 
-class DatabaseTableView : public CustomTableView {
+class MovieDBView : public CustomTableView {
  public:
-  DatabaseTableView(DatabaseSearchToolBar* dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent = nullptr);
+  MovieDBView(DatabaseSearchToolBar* dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent = nullptr);
 
   void subscribe();
   auto on_PlayVideo() const -> bool;
@@ -62,4 +62,4 @@ class DatabaseTableView : public CustomTableView {
   QString m_movieTableName;
 };
 
-#endif  // DATABASETABLEVIEW_H
+#endif  // MOVIEDBVIEW_H

@@ -84,6 +84,8 @@ class AdvanceSearchModel : public QAbstractTableModel {
 
   auto fileInfo(QModelIndex curIndex) const -> QFileInfo { return QFileInfo(filePath(curIndex)); }
 
+  auto fullInfo(const QModelIndex& curIndex) const -> QString;
+
  private:
   CustomStatusBar* _logger{nullptr};
 

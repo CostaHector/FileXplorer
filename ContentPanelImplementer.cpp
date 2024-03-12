@@ -8,7 +8,7 @@ QAbstractItemView* ContentPanel::GetView(const QString& viewType) const {
   } else if (viewType == "tree") {
     return m_fsTreeView;
   } else if (viewType == "movie") {
-    return m_dbPanel;
+    return m_movieView;
   } else if (viewType == "search") {
     return m_advanceSearchView;
   }
@@ -68,7 +68,7 @@ QModelIndexList ContentPanel::getSelectedRows() const {
     return m_fsTreeView->selectionModel()->selectedRows();
   }
   if (viewName == "movie") {
-    return m_dbPanel->selectionModel()->selectedRows();
+    return m_movieView->selectionModel()->selectedRows();
   }
   if (viewName == "search") {
     const auto& proxyIndexesLst = m_advanceSearchView->selectionModel()->selectedRows();
@@ -98,7 +98,7 @@ QStringList ContentPanel::getFileNames() const {
       names.append(m_fsModel->fileName(ind));
     }
   } else if (viewName == "movie") {
-    for (const auto& ind : m_dbPanel->selectionModel()->selectedRows()) {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
       names.append(m_dbModel->fileName(ind));
     }
   } else if (viewName == "search") {
@@ -110,6 +110,36 @@ QStringList ContentPanel::getFileNames() const {
     qDebug("No getFileNames");
   }
   return names;
+}
+
+QStringList ContentPanel::getFullRecords() const {
+  const QString& viewName = GetCurViewName();
+  QStringList fullRecords;
+  if (viewName == "table") {
+    for (const auto& ind : m_fsTableView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_fsModel->fullInfo(ind));
+    }
+  } else if (viewName == "list") {
+    for (const auto& ind : m_fsListView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_fsModel->fullInfo(ind));
+    }
+  } else if (viewName == "tree") {
+    for (const auto& ind : m_fsTreeView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_fsModel->fullInfo(ind));
+    }
+  } else if (viewName == "movie") {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
+      fullRecords.append(m_dbModel->fullInfo(ind));
+    }
+  } else if (viewName == "search") {
+    for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
+      const auto& srcIndex = m_proxyModel->mapToSource(ind);
+      fullRecords.append(m_srcModel->fullInfo(srcIndex));
+    }
+  } else {
+    qDebug("No getFullRecords");
+  }
+  return fullRecords;
 }
 
 QStringList ContentPanel::getFilePaths() const {
@@ -128,7 +158,7 @@ QStringList ContentPanel::getFilePaths() const {
       filePaths.append(m_fsModel->filePath(ind));
     }
   } else if (viewName == "movie") {
-    for (const auto& ind : m_dbPanel->selectionModel()->selectedRows()) {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
       filePaths.append(m_dbModel->filePath(ind));
     }
   } else if (viewName == "search") {
@@ -167,7 +197,7 @@ QStringList ContentPanel::getFilePrepaths() const {
       prepaths.append(prepath);
     }
   } else if (viewName == "movie") {
-    for (const auto& ind : m_dbPanel->selectionModel()->selectedRows()) {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
       prepaths.append(m_dbModel->absolutePath(ind));
     }
   } else if (viewName == "search") {
@@ -204,7 +234,7 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
       prepaths.append(QDir::toNativeSeparators(imagePath));
     }
   } else if (viewName == "movie") {
-    for (const auto& ind : m_dbPanel->selectionModel()->selectedRows()) {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
       const QFileInfo dirFi = m_dbModel->fileInfo(ind);
       const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
       prepaths.append(m_dbModel->absolutePath(ind));
@@ -260,7 +290,7 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
       m_fsModel->CutSomething(inds);
     }
   } else if (viewName == "movie") {
-    for (const auto& ind : m_dbPanel->selectionModel()->selectedRows()) {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
       filePaths.append(m_dbModel->filePath(ind));
       urls.append(QUrl::fromLocalFile(filePaths.back()));
     }
@@ -311,7 +341,7 @@ std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const b
       names.append(m_fsModel->fileName(ind));
     }
   } else if (viewName == "movie") {
-    for (const auto& ind : m_dbPanel->selectionModel()->selectedRows()) {
+    for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
       prepaths.append(m_dbModel->absolutePath(ind));
       names.append(m_dbModel->fileName(ind));
     }
@@ -345,7 +375,7 @@ int ContentPanel::getSelectedRowsCount() const {
   } else if (viewName == "tree") {
     return m_fsTreeView->selectionModel()->selectedRows().size();
   } else if (viewName == "movie") {
-    return m_dbPanel->selectionModel()->selectedRows().size();
+    return m_movieView->selectionModel()->selectedRows().size();
   } else if (viewName == "search") {
     return m_advanceSearchView->selectionModel()->selectedRows().size();
   }
@@ -362,7 +392,7 @@ QString ContentPanel::getCurFilePath() const {
   } else if (viewName == "tree") {
     return m_fsModel->filePath(m_fsTreeView->currentIndex());
   } else if (viewName == "movie") {
-    return m_dbModel->filePath(m_dbPanel->currentIndex());
+    return m_dbModel->filePath(m_movieView->currentIndex());
   } else if (viewName == "search") {
     return m_srcModel->filePath(m_proxyModel->mapToSource(m_advanceSearchView->currentIndex()));
   }
