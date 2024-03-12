@@ -313,7 +313,7 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
   return {filePaths, urls};
 }
 
-std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const bool isSearchRecycle, const bool needSyncModelDisplay) const {
+std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const bool isSearchRecycle) const {
   const QString& viewName = GetCurViewName();
   QStringList prepaths;
   QStringList names;
