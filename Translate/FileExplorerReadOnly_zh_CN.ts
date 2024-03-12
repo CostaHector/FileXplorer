@@ -196,9 +196,8 @@
         <translation>在终端中打开</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="24"/>
         <source>Copy full records</source>
-        <translation>拷贝整行</translation>
+        <translation type="vanished">拷贝整行</translation>
     </message>
     <message>
         <location filename="../Actions/FileBasicOperationsActions.h" line="35"/>
@@ -320,6 +319,11 @@
         <location filename="../Actions/FileBasicOperationsActions.h" line="23"/>
         <source>Copy the path</source>
         <translation>拷贝拼接路径</translation>
+    </message>
+    <message>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="24"/>
+        <source>Copy records</source>
+        <translation>拷贝记录</translation>
     </message>
     <message>
         <location filename="../Actions/FileBasicOperationsActions.h" line="26"/>

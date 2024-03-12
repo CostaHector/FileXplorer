@@ -203,13 +203,12 @@ void AdvanceSearchModel::ClearCopyAndCutDict() {
 void AdvanceSearchModel::ClearCutDict() {
   decltype(m_cutMap) tmp;
   tmp.swap(m_cutMap);
-  // continous cut made index not exist but valid can emit not exist make it crash down
   return;
   for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-    for (auto index : it.value()) {
-      if (not index.isValid())
-        continue;  // this index may by cut away. so may be invalid here
-      emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
+    for (auto ind : it.value()) {
+      if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+        continue;
+      emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
     }
   }
 }
@@ -218,10 +217,10 @@ void AdvanceSearchModel::ClearCopiedDict() {
   decltype(m_copiedMap) tmp;
   tmp.swap(m_copiedMap);
   for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-    for (auto index : it.value()) {
-      if (not index.isValid())
+    for (auto ind : it.value()) {
+      if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
         continue;
-      emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
+      emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
     }
   }
 }

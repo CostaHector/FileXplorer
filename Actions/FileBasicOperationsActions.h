@@ -21,7 +21,7 @@ class FileBasicOperationsActions : public QObject {
         COPY_NAME{new QAction(QIcon(":/themes/COPY_NAME"), tr("Copy name"))},
 
         COPY_THE_PATH{new QAction(QIcon(":/themes/COPY_THE_PATH"), tr("Copy the path"))},
-        COPY_RECORDS{new QAction(QIcon(), tr("Copy full records"))},
+        COPY_RECORDS{new QAction(QIcon(":/themes/COPY_RECORD"), tr("Copy records"))},
         COPY_PATH_AG(GetCOPY_PATHActions()),
         NEW_FOLDER{new QAction(QIcon(":/themes/NEW_FOLDER"), tr("New folder"))},
 
