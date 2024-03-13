@@ -15,7 +15,6 @@ class CustomStatusBar : public QStatusBar {
   QToolBar* _views;
   QProgressBar* process;
   QList<QLabel*> labelLst;
-  QLabel* m_clickMe;
 
   explicit CustomStatusBar(QToolBar* views, QWidget* parent = nullptr);
 

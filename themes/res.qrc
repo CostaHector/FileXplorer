@@ -4,6 +4,8 @@
         <file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
         <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
         <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
+        <file alias="FLOW_LOGS">AppIcons/FLOW_LOGS.svg</file>
+
         <file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
         <file alias="DEDUPLICATE">Media/DEDUPLICATE.png</file>
         <file alias="EMPTY_FOLDER">Media/EMPTY_FOLDER.svg</file>

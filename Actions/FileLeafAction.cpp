@@ -3,6 +3,7 @@
 
 FileLeafActions::FileLeafActions(QObject* parent)
     : QObject(parent),
+      _LOGGING{new QAction{QIcon(":/themes/FLOW_LOGS"), tr("Logs")}},
       _PREFERENCE_SETTING{new QAction(QIcon(":/themes/SETTINGS"), tr("Settings"))},
       _ABOUT_FILE_EXPLORER{new QAction(QIcon(":/themes/ABOUT"), tr("About"))},
       _LANUAGE(new QAction(QIcon(":/themes/LANGUAGE"), tr("Language"))),
@@ -10,6 +11,8 @@ FileLeafActions::FileLeafActions(QObject* parent)
 
 QActionGroup* FileLeafActions::GetLeafTabActions() {
   LEAF_FILE = new QActionGroup(nullptr);
+
+  _LOGGING->setShortcutVisibleInContextMenu(true);
 
   _PREFERENCE_SETTING->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
   _PREFERENCE_SETTING->setShortcutVisibleInContextMenu(true);
@@ -20,6 +23,7 @@ QActionGroup* FileLeafActions::GetLeafTabActions() {
   _LANUAGE->setCheckable(true);
   _LANUAGE->setChecked(PreferenceSettings().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
 
+  LEAF_FILE->addAction(_LOGGING);
   LEAF_FILE->addAction(_PREFERENCE_SETTING);
   LEAF_FILE->addAction(_ABOUT_FILE_EXPLORER);
   LEAF_FILE->addAction(_LANUAGE);

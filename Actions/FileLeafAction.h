@@ -9,6 +9,7 @@ class FileLeafActions : public QObject {
   explicit FileLeafActions(QObject* parent = nullptr);
 
   QActionGroup* GetLeafTabActions();
+  QAction* _LOGGING;
   QAction* _PREFERENCE_SETTING;
   QAction* _ABOUT_FILE_EXPLORER;
   QAction* _LANUAGE;
