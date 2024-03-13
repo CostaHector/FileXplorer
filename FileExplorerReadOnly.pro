@@ -49,9 +49,12 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
+    LogModel.cpp \
+    Tools/MessageOutput.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     View/AdvanceSearchTableView.cpp \
+    View/LogView.cpp \
     View/MovieDBView.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
@@ -157,9 +160,12 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    LogModel.h \
+    Tools/MessageOutput.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     View/AdvanceSearchTableView.h \
+    View/LogView.h \
     View/MovieDBView.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
