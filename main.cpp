@@ -2,6 +2,7 @@
 #include "FileExplorerReadOnly.h"
 #include "PublicTool.h"
 #include "Tools/ExtraViewVisibilityControl.h"
+#include "Tools/MessageOutput.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -13,6 +14,9 @@ int main(int argc, char* argv[]) {
   if (not InitOutterPlainTextPath()) {
     qWarning("Init plain text path failed. Some json/where clause function may not work");
   }
+
+  MessageOutput mo;
+
   if (argc > 1) {
     qInfo("argc[%d]>1. argv[1][%s].", argc, argv[1]);
   } else {

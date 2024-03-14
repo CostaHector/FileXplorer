@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QTableWidget>
 #include <QWidget>
+#include "View/CustomTableView.h"
+#include "Model/PreferenceModel.h"
 
 class AlertSystem : public QDialog {
  public:
@@ -19,7 +21,7 @@ class AlertSystem : public QDialog {
   bool InitLineColor(const int row);
   bool RefreshLineColor(const int row);
   bool on_cellChanged(const int row, const int column);
-  bool on_cellDoubleClicked(const int row, const int column) const;
+  bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
 
   void onEditPreferenceSetting() const;
 
@@ -28,7 +30,8 @@ class AlertSystem : public QDialog {
  private:
   QMap<QString, bool> m_checkItemStatus;
   QLabel* m_failItemCnt;
-  QTableWidget* m_alertsTable;
+  PreferenceModel* m_alertModel{new PreferenceModel{this}};
+  CustomTableView* m_alertsTable{new CustomTableView{"ALERT_SYSTEM", this}};
   QDialogButtonBox* m_recheckButtonBox;
 };
 
