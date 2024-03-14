@@ -13,6 +13,7 @@ SOURCES += \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
+    Actions/LogViewActions.cpp \
     Actions/PerformersManagerActions.cpp \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
@@ -49,7 +50,10 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
-    LogModel.cpp \
+    Model/LogModel.cpp \
+    Model/LogProxyModel.cpp \
+    Model/PreferenceModel.cpp \
+    Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
@@ -124,6 +128,7 @@ HEADERS += \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
+    Actions/LogViewActions.h \
     Actions/PerformersManagerActions.h \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
@@ -160,7 +165,10 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
-    LogModel.h \
+    Model/LogModel.h \
+    Model/LogProxyModel.h \
+    Model/PreferenceModel.h \
+    Tools/Log.h \
     Tools/MessageOutput.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \

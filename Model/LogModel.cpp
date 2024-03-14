@@ -18,8 +18,7 @@ void LogModel::_reloadLogFiles() {
   QTextStream ts(&fi);
   decltype(mlogs) tempLogs;
   while (not ts.atEnd()) {
-    const QStringList& lns = ts.readLine().split('\t');
-    tempLogs.append(Log(lns));
+    tempLogs.append(Log(ts.readLine()));
   }
   // equal
   if (mlogs.size() == tempLogs.size()) {
@@ -71,21 +70,12 @@ auto LogModel::data(const QModelIndex& index, int role) const -> QVariant {
   } else if (role == Qt::DecorationRole) {
     return QVariant();
   } else if (role == Qt::BackgroundRole) {
-    const auto& record = mlogs[index.row()];
-    if (record.level == "Info")
-      return QBrush(QColor(0xFF, 0xFF, 0xFF));
-    else if (record.level == "Debug")
-      return QBrush(QColor(0xC0, 0xC0, 0xC0));
-    else if (record.level == "Warning")
-      return QBrush(QColor(0xFF, 0xBF, 0x00));
-    else if (record.level == "Fatal")
-      return QBrush(QColor(0xFF, 0x7F, 0x50));
-    return QVariant();
+    return Log::GetColor(mlogs[index.row()].level);
   } else if (role == Qt::TextAlignmentRole) {
-    if (index.column() == 1) {
-      return int(Qt::AlignRight | Qt::AlignVCenter);
+    if (index.column() == 2) {
+      return int(Qt::AlignLeft | Qt::AlignTop);
     }
-    return int(Qt::AlignLeft | Qt::AlignVCenter);
+    return int(Qt::AlignRight | Qt::AlignVCenter);
   }
   return QVariant();
 }
@@ -95,5 +85,13 @@ QString LogModel::getFileNameAndLineNo(const QModelIndex& ind) const {
     return {};
   }
   const auto& record = mlogs[ind.row()];
-  return record.fileName.mid(1) + ":" + record.lineNo;
+  return record.fileName.mid(1) + ":" + QString::number(record.lineNo);
+}
+
+QString LogModel::fullInfo(const QModelIndex& ind) const {
+  if (not ind.isValid()) {
+    return {};
+  }
+  const auto& record = mlogs[ind.row()];
+  return record.time + '\n' + record.level + '\n' + record.fileName + ':' + QString::number(record.lineNo) + '\n' + record.funcName + '\n' + record.msg;
 }

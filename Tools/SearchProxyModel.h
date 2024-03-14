@@ -2,8 +2,7 @@
 #define SEARCHPROXYMODEL_H
 
 #include <QAbstractItemModel>
-#include <QComboBox>
-#include <QDebug>
+#include <QSortFilterProxyModel>
 #include "AdvanceSearchModel.h"
 
 class SearchProxyModel : public QSortFilterProxyModel {
