@@ -13,6 +13,7 @@ SOURCES += \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
+    Actions/LogViewActions.cpp \
     Actions/PerformersManagerActions.cpp \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
@@ -49,9 +50,15 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
+    Model/LogModel.cpp \
+    Model/LogProxyModel.cpp \
+    Model/PreferenceModel.cpp \
+    Tools/Log.cpp \
+    Tools/MessageOutput.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     View/AdvanceSearchTableView.cpp \
+    View/LogView.cpp \
     View/MovieDBView.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
@@ -121,6 +128,7 @@ HEADERS += \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
+    Actions/LogViewActions.h \
     Actions/PerformersManagerActions.h \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
@@ -157,9 +165,15 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    Model/LogModel.h \
+    Model/LogProxyModel.h \
+    Model/PreferenceModel.h \
+    Tools/Log.h \
+    Tools/MessageOutput.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     View/AdvanceSearchTableView.h \
+    View/LogView.h \
     View/MovieDBView.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
