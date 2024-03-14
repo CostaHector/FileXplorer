@@ -4,6 +4,8 @@
         <file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
         <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
         <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
+        <file alias="FLOW_LOGS">AppIcons/FLOW_LOGS.svg</file>
+
         <file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
         <file alias="DEDUPLICATE">Media/DEDUPLICATE.png</file>
         <file alias="EMPTY_FOLDER">Media/EMPTY_FOLDER.svg</file>
@@ -220,6 +222,14 @@
         <file alias="FAILED">AlertSystem/FAILED.svg</file>
         <file alias="PASS">AlertSystem/PASS.svg</file>
         <file alias="RECHECK">AlertSystem/RECHECK.svg</file>
+
+        <file alias="_ALL">LogView/_ALL.svg</file>
+        <file alias="_INFO">LogView/_INFO.svg</file>
+        <file alias="_DEBUG">LogView/_DEBUG.svg</file>
+        <file alias="_WARNING">LogView/_WARNING.svg</file>
+        <file alias="_CRITICAL">LogView/_CRITICAL.svg</file>
+        <file alias="_FATAL">LogView/_FATAL.svg</file>
+        <file alias="_LOCATE_WHERE">LogView/_LOCATE_WHERE.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>

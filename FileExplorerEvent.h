@@ -3,11 +3,12 @@
 #include "Component/CustomStatusBar.h"
 #include "Component/JsonEditor.h"
 #include "Component/MD5Window.h"
-#include "Component/NotificatorFrame.h"
+
 #include "Component/PropertiesWindow.h"
 #include "Component/VideoPlayer.h"
+#include "Component/AlertSystem.h"
+#include "View/LogView.h"
 
-#include "Tools/MimeDataCX.h"
 #include "Tools/MyClipboard.h"
 #include "Tools/RedundantFolderRemove.h"
 #include "Tools/RenameWidget.h"
@@ -28,8 +29,6 @@
 #include <QObject>
 #include <QProcess>
 #include <QTextStream>
-
-#include "View/AdvanceSearchTableView.h"
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
@@ -119,9 +118,13 @@ class FileExplorerEvent : public QObject {
 
   CustomStatusBar* _logger;
   MyClipboard* m_clipboard;
-  JsonEditor* jsonEditor;
-  VideoPlayer* videoPlayer;
+  JsonEditor* jsonEditor{nullptr};
+  VideoPlayer* videoPlayer{nullptr};
   T_UpdateComponentVisibility updateComponentVisibility;
+
+
+  AlertSystem* m_alertSystem{nullptr};
+  LogView* m_logView{nullptr};
  signals:
  private:
   auto QueryCopyOrCut() -> CCMMode;
