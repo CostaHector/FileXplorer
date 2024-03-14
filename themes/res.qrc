@@ -222,6 +222,14 @@
         <file alias="FAILED">AlertSystem/FAILED.svg</file>
         <file alias="PASS">AlertSystem/PASS.svg</file>
         <file alias="RECHECK">AlertSystem/RECHECK.svg</file>
+
+        <file alias="_ALL">LogView/_ALL.svg</file>
+        <file alias="_INFO">LogView/_INFO.svg</file>
+        <file alias="_DEBUG">LogView/_DEBUG.svg</file>
+        <file alias="_WARNING">LogView/_WARNING.svg</file>
+        <file alias="_CRITICAL">LogView/_CRITICAL.svg</file>
+        <file alias="_FATAL">LogView/_FATAL.svg</file>
+        <file alias="_LOCATE_WHERE">LogView/_LOCATE_WHERE.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>
