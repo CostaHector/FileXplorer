@@ -8,6 +8,7 @@
 struct AlertItem {
  public:
   explicit AlertItem(int alarmID_, const KV* kv_, QString note_);
+  // QList<AlertItem> will call copy constructor, m_kv cannot be default copied
   static QIcon GetAlertIcon(const AlertItem& alert);
   static const QStringList ALERT_TABLE_HEADER;
 
