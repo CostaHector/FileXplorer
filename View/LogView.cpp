@@ -45,6 +45,7 @@ void LogView::ReadSettings() {
     setGeometry(DEFAULT_GEOMETRY);
   }
   m_logViewSplitter->restoreState(PreferenceSettings().value("LOG_VIEW_SPLITTER_STATE", QByteArray()).toByteArray());
+  m_logTable->InitTableView();
 }
 
 void LogView::closeEvent(QCloseEvent* event) {
@@ -115,7 +116,7 @@ void LogView::onSelectedANewLog() {
   m_logDetails->setText(txt);
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 
 #include <QApplication>
