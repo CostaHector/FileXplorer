@@ -90,148 +90,172 @@ const QStringList HEADERVIEW_SORT_INDICATOR_ORDER_STR = string2SortOrderEnumList
 QString SortOrderEnum2String(const Qt::SortOrder orderEnum);
 }  // namespace HEADERVIEW_SORT_INDICATOR_ORDER
 
-class GVar {
+class ValueChecker {
  public:
-  explicit GVar(const QString& name_, const QVariant& v_) : name(name_), v(v_){};
-  virtual bool checker() const = 0;
-  QString name;
-  QVariant v;
-};
+  friend struct KV;
 
-class GVarBool : public GVar {
- public:
-  explicit GVarBool(const QString& name_, bool v_) : GVar(name_, v_) {}
+  enum VALUE_TYPE {
+    ERROR_TYPE = 0,
+    PLAIN_STR = 1,
+    PLAIN_BOOL = 2,
+    PLAIN_INT = 3,
+    PLAIN_FLOAT = 4,
+    PLAIN_DOUBLE,
+    FILE_PATH,
+    EXT_SPECIFIED_FILE_PATH,
+    FOLDER_PATH,
+    RANGE_INT,
+    SWITCH_STRING,  // "010101"
+    CANDIDATE_STRING
+  };
 
-  bool checker() const override { return true; }
-};
+  explicit ValueChecker(const QStringList& candidates, const VALUE_TYPE valueType_ = EXT_SPECIFIED_FILE_PATH);
 
-class GVarInt : public GVar {
- public:
-  explicit GVarInt(const QString& name_, int v_, int minV_ = INT32_MIN, int maxV_ = INT32_MAX) : GVar(name_, v_), minV(minV_), maxV(maxV_) {}
+  explicit ValueChecker(int minV_ = INT32_MIN, int maxV_ = INT32_MAX);
+  explicit ValueChecker(const QSet<QChar>& chars = {'0', '1'}, int minLength = 1);
 
-  bool checker() const override { return minV <= v.toInt() and v.toInt() < maxV; }
+  explicit ValueChecker(const VALUE_TYPE valueType_);
+
+  static QString GetFileExtension(const QString& path);
+
+  static bool isFileExist(const QString& path);
+  static bool isFolderExist(const QString& path);
+  bool isStrInCandidate(const QString& str) const;
+  bool isSpecifiedExtensionFileExist(const QString& path) const;
+  bool isIntInRange(const int v) const;
+  bool isSwitchString(const QString& switchs) const;
+
+  bool operator()(const QVariant& v) const;
+  QString toString(const QVariant& v) const;
+  QVariant toQVariant(const QString& v) const;
+
+ private:
+  VALUE_TYPE valueType;
+
+  QSet<QString> m_strCandidates;  // e.g. extension candidates
+  QSet<QChar> m_switchStates;
+  int m_switchMinCnt;
+
   int minV;
   int maxV;
 };
 
-class GVarStr : public GVar {
- public:
-  explicit GVarStr(const QString& name_, QString v_, const QStringList& candidatePool_ = {}) : GVar(name_, v_), candidatePool(candidatePool_) {}
+struct KV {
+  explicit KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_);
+  QSet<QString> GetCandidatePool() const { return checker.m_strCandidates; }
 
-  bool checker() const override { return candidatePool.isEmpty() or candidatePool.contains(v.toString()); }
-  QStringList candidatePool;
-};
-
-class GVarStrFile : public GVar {
- public:
-  explicit GVarStrFile(const QString& name_, QString v_, const QStringList& candidateSuffixPool_ = {"exe"})
-      : GVar(name_, v_), candidateSuffixPool(candidateSuffixPool_) {}
-  using GVar::checker;
-  bool checker() const override { return GVarStrFile::checker(v.toString()); }
-
-  bool checker(const QString& path) const {
-    QFileInfo fi(path);
-    return fi.isFile() and (candidateSuffixPool.isEmpty() or candidateSuffixPool.contains(fi.suffix()));
-  }
-
-  QStringList candidateSuffixPool;
-};
-
-class GVarStrFolder : public GVar {
- public:
-  explicit GVarStrFolder(const QString& name_, QString v_) : GVar(name_, v_) {}
-
-  using GVar::checker;
-  bool checker() const override { return GVarStrFolder::checker(v.toString()); }
-  bool checker(const QString& path) const { return QFileInfo(path).isDir(); }
-};
-
-class GVarListStr : public GVar {
- public:
-  explicit GVarListStr(const QString& name_, QStringList v_) : GVar(name_, v_) {}
-
-  bool checker() const override { return true; }
+  QString name;
+  QVariant v;
+  ValueChecker checker;
 };
 
 constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 
 namespace MemoryKey {
-const GVarStrFolder DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "."};
-const GVarBool LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false);
-const GVarStrFile BACKGROUND_IMAGE("BACKGROUND_IMAGE", "");
-const GVarBool SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false);
-const GVarStrFolder PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "");
-const GVarStrFolder PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "");
-const GVarStrFolder PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./");
-const GVarStrFolder PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./");
-const GVarStrFolder PATH_DB_INSERT_VIDS_FROM("PATH_DB_INSERT_VIDS_FROM", "./");
-const GVarStrFolder PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./");
+const KV DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH}};
+const KV LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV BACKGROUND_IMAGE("BACKGROUND_IMAGE", "", ValueChecker{{"png", "webp", "jpg", "jpeg"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+const KV PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+const KV PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+const KV PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+const KV PATH_DB_INSERT_VIDS_FROM("PATH_DB_INSERT_VIDS_FROM", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+const KV PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
-const GVarBool AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false);
-const GVarBool SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true);
-const GVarBool SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true);
-const GVarBool SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false);
+const KV AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 
-const GVarBool SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true);
-const GVarBool SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true);
-const GVarBool EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true);
-const GVarBool SHOW_DATABASE("SHOW_DATABASE", false);
-const GVarBool SHOW_PERFORMERS_MANAGER_DATABASE("SHOW_PERFORMERS_MANAGER_DATABASE", false);
-const GVarBool SHOW_TORRENTS_MANAGER_DATABASE("SHOW_TORRENTS_MANAGER_DATABASE", false);
-const GVarBool QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false);
+const KV SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SHOW_DATABASE("SHOW_DATABASE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SHOW_PERFORMERS_MANAGER_DATABASE("SHOW_PERFORMERS_MANAGER_DATABASE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SHOW_TORRENTS_MANAGER_DATABASE("SHOW_TORRENTS_MANAGER_DATABASE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 
-const GVarInt HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, 0);
-const GVarStr HEADVIEW_SORT_INDICATOR_ORDER("HEADVIEW_SORT_INDICATOR_ORDER",
-                                            HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
-                                            HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR);
-const GVarInt ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, 8, 25);
-const GVarStr DEFAULT_VIDEO_PLAYER("DEFAULT_VIDEO_PLAYER", "Play", {"Play in embedded player", "Play"});
-const GVarStr DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", "New folder", {"New folder", "New text", "New json", "New folder html"});
-const GVarStr DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", {"Copy fullpath", "Copy path", "Copy name", "Copy the path"});
-const GVarStr DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
-                                    "Rename (ith)",
-                                    {"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"});
-const GVarStr MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", {});
-const GVarStr COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", {});
-const GVarStr WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", {});
+const KV HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, ValueChecker{0});
 
-const GVarInt MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, 0);
-const GVarInt AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN("AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN", 2);
+const KV HEADVIEW_SORT_INDICATOR_ORDER("HEADVIEW_SORT_INDICATOR_ORDER",
+                                       HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
+                                       ValueChecker{HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR,
+                                                    ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, ValueChecker{8, 25 + 1});
+const KV DEFAULT_VIDEO_PLAYER("DEFAULT_VIDEO_PLAYER",
+                              "Play",
+                              ValueChecker{{"Play in embedded player", "Play"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE",
+                            "New folder",
+                            ValueChecker{{"New folder", "New text", "New json", "New folder html"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE",
+                             "Copy fullpath",
+                             ValueChecker{{"Copy fullpath", "Copy path", "Copy name", "Copy the path"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
+                               "Rename (ith)",
+                               ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"},
+                                            ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
+const KV COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
+const KV WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
 
-const GVarInt TABLE_DEFAULT_SECTION_SIZE("TABLE_DEFAULT_SECTION_SIZE", 24, 0);
-const GVarInt PERFORMER_IMAGE_FIXED_HEIGHT("PERFORMER_IMAGE_FIXED_HEIGHT", 200, 0);
+const KV MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, ValueChecker{0});
+const KV AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN("AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN", 2, ValueChecker{0});
 
-const GVarStr VIDS_LAST_TABLE_NAME("VIDS_LAST_TABLE_NAME", "");
-const GVarInt RIGHT_CLICK_TOOLBUTTON_STYLE("RIGHT_CLICK_TOOLBUTTON_STYLE", 0);
+const KV TABLE_DEFAULT_SECTION_SIZE("TABLE_DEFAULT_SECTION_SIZE", 24, ValueChecker{0});
+const KV PERFORMER_IMAGE_FIXED_HEIGHT("PERFORMER_IMAGE_FIXED_HEIGHT", 200, ValueChecker{0});
 
-const GVarStr NAME_PATTERN_USED_CREATE_BATCH_FILES("NAME_PATTERN_USED_CREATE_BATCH_FILES", "Page %03d%1$1$11.html", {});
-const GVarStr NAME_PATTERN_USED_CREATE_BATCH_FOLDERS("NAME_PATTERN_USED_CREATE_BATCH_FOLDERS", "Page %03d%1$1$11", {});
+const KV VIDS_LAST_TABLE_NAME("VIDS_LAST_TABLE_NAME", "", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
+const KV RIGHT_CLICK_TOOLBUTTON_STYLE("RIGHT_CLICK_TOOLBUTTON_STYLE", 0, ValueChecker{0, 4 + 1});
 
-const GVarInt DIR_FILTER_ON_SWITCH_ENABLE("DIR_FILTER_ON_SWITCH_ENABLE",
-                                                   int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives |
-                                                       QDir::Filter::NoDotAndDotDot));
+const KV NAME_PATTERN_USED_CREATE_BATCH_FILES("NAME_PATTERN_USED_CREATE_BATCH_FILES",
+                                              "Page %03d%1$1$11.html",
+                                              ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
+const KV NAME_PATTERN_USED_CREATE_BATCH_FOLDERS("NAME_PATTERN_USED_CREATE_BATCH_FOLDERS",
+                                                "Page %03d%1$1$11",
+                                                ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
 
-const GVarInt VIDEO_PLAYER_VOLUME("VIDEO_PLAYER_VOLUME", 100, 0, 101);
-const GVarBool VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false);
-const GVarBool SEARCH_INCLUDING_SUBDIRECTORIES("SEARCH_INCLUDING_SUBDIRECTORIES", false);
-const GVarStr SEARCH_MODE_DEFAULT_VALUE("SEARCH_MODE_DEFAULT_VALUE", "Normal", {"Normal", "Wildcard", "Regex", "Search for File Content"});
-const GVarBool SEARCH_NAME_CASE_SENSITIVE{"SEARCH_NAME_CASE_SENSITIVE", false};
-const GVarBool SEARCH_CONTENTS_CASE_SENSITIVE{"SEARCH_CONTENTS_CASE_SENSITIVE", false};
-const GVarStr ADVANCE_SEARCH_LINEEDIT_VALUE("ADVANCE_SEARCH_LINEEDIT_VALUE", "");
-const GVarBool HIDE_ENTRIES_DONT_PASS_FILTER{"HIDE_ENTRIES_DONT_PASS_FILTER", true};
+const KV DIR_FILTER_ON_SWITCH_ENABLE("DIR_FILTER_ON_SWITCH_ENABLE",
+                                     int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::NoDotAndDotDot),
+                                     ValueChecker{0});
 
-const GVarStrFile WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
-const GVarStrFile WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
-const GVarStrFile WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.json", {"json"});
-const GVarStrFile WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH",
-                                                      "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
-                                                      {"bat"});
-const GVarStrFolder WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG");
+const KV VIDEO_PLAYER_VOLUME("VIDEO_PLAYER_VOLUME", 100, ValueChecker{0, 100 + 1});
+const KV VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SEARCH_INCLUDING_SUBDIRECTORIES("SEARCH_INCLUDING_SUBDIRECTORIES", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV SEARCH_MODE_DEFAULT_VALUE("SEARCH_MODE_DEFAULT_VALUE",
+                                   "Normal",
+                                   ValueChecker{{"Normal", "Wildcard", "Regex", "Search for File Content"},
+                                                ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV SEARCH_NAME_CASE_SENSITIVE{"SEARCH_NAME_CASE_SENSITIVE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
+const KV SEARCH_CONTENTS_CASE_SENSITIVE{"SEARCH_CONTENTS_CASE_SENSITIVE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
+const KV ADVANCE_SEARCH_LINEEDIT_VALUE("ADVANCE_SEARCH_LINEEDIT_VALUE", "", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
+const KV HIDE_ENTRIES_DONT_PASS_FILTER{"HIDE_ENTRIES_DONT_PASS_FILTER", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 
-const GVarStrFile LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", {"txt"});
-const GVarStrFile LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", {"txt"});
-const GVarStrFile LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.json", {"json"});
-const GVarStrFolder LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG");
+const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE",
+                                "../bin/PERFORMERS_TABLE.txt",
+                                ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS",
+                              "../bin/AKA_PERFORMERS.txt",
+                              ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME",
+                                    "../bin/STANDARD_STUDIO_NAME.json",
+                                    ValueChecker{{"json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH",
+                                             "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
+                                             ValueChecker{{"bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+
+const KV LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE",
+                                "../bin/PERFORMERS_TABLE.txt",
+                                ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS",
+                              "../bin/AKA_PERFORMERS.txt",
+                              ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME",
+                                    "../bin/STANDARD_STUDIO_NAME.json",
+                                    ValueChecker{{"json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 }  // namespace MemoryKey
 
 namespace SystemPath {
@@ -317,8 +341,8 @@ const QColor TOMATO_COLOR(244, 164, 96);
 const QColor TRANSPARENT_COLOR(Qt::GlobalColor::color0);
 }  // namespace STATUS_COLOR
 
-bool VerifyOneFilePath(const GVarStrFile& kv, const QString& fileType = "txt");
-bool VerifyOneFolderPath(const GVarStrFolder& kv);
+bool VerifyOneFilePath(const KV& kv, const QString& fileType = "txt");
+bool VerifyOneFolderPath(const KV& kv);
 
 bool InitOutterPlainTextPath();
 
