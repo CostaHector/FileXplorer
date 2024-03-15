@@ -2,7 +2,7 @@
 
 #include "PublicVariable.h"
 SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox(parent) {
-  addItems(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.candidatePool);
+  addItems(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.GetCandidatePool().values());
   setCurrentText(PreferenceSettings().value(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.name, MemoryKey::SEARCH_MODE_DEFAULT_VALUE.v).toString());
 }
 
