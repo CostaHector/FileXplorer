@@ -126,8 +126,8 @@ class ValueChecker {
   bool isSwitchString(const QString& switchs) const;
 
   bool operator()(const QVariant& v) const;
-  QString toString(const QVariant& v) const;
-  QVariant toQVariant(const QString& v) const;
+  QString valueToString(const QVariant& v) const;
+  QVariant strToQVariant(const QString& v) const;
 
  private:
   VALUE_TYPE valueType;
@@ -143,6 +143,8 @@ class ValueChecker {
 struct KV {
   explicit KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_);
   QSet<QString> GetCandidatePool() const { return checker.m_strCandidates; }
+
+  QString valueToString() const;
 
   QString name;
   QVariant v;
