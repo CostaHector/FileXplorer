@@ -178,7 +178,7 @@ bool ValueChecker::operator()(const QVariant& v) const {
   }
 }
 
-QString ValueChecker::toString(const QVariant& v) const {
+QString ValueChecker::valueToString(const QVariant& v) const {
   switch (valueType) {
     case EXT_SPECIFIED_FILE_PATH:
     case CANDIDATE_STRING:
@@ -200,7 +200,7 @@ QString ValueChecker::toString(const QVariant& v) const {
   }
 }
 
-QVariant ValueChecker::toQVariant(const QString& v) const {
+QVariant ValueChecker::strToQVariant(const QString& v) const {
   switch (valueType) {
     case EXT_SPECIFIED_FILE_PATH:
     case CANDIDATE_STRING:
@@ -224,3 +224,7 @@ QVariant ValueChecker::toQVariant(const QString& v) const {
 }
 
 KV::KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_) : name(name_), v(v_), checker(checker_) {}
+
+QString KV::valueToString() const {
+  return checker.valueToString(v);
+}

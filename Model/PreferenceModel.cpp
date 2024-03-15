@@ -4,14 +4,13 @@
 const QStringList AlertItem::ALERT_TABLE_HEADER{"Number", "Name", "Value", "Note", "isOk"};
 
 AlertItem::AlertItem(int alarmID_, const KV* kv_, QString note_)
-    : m_kv(kv_), alarmID(alarmID_), name(m_kv->name), value{QLVTypeToStr()}, note(note_), checkRes{isStoredValuePass()} {}
+    : m_kv(kv_), alarmID(alarmID_), name(m_kv->name), value{getStoredValue()}, note(note_), checkRes{isStoredValuePass()} {}
 
-QString AlertItem::QLVTypeToStr() {
+QVariant AlertItem::getStoredValue() {
   if (m_kv == nullptr) {
     return "";
   }
-  const QVariant& v = PreferenceSettings().value(m_kv->name, m_kv->v);
-  return m_kv->checker.toString(v);
+  return PreferenceSettings().value(m_kv->name, m_kv->v);
 }
 
 bool AlertItem::isStoredValuePass() const {
@@ -22,25 +21,27 @@ bool AlertItem::isStoredValuePass() const {
   return m_kv->checker(v);
 }
 
-std::pair<bool, QVariant> AlertItem::isPass(const QString& userInput) const {
+bool AlertItem::isPass(const QVariant& userInput) const {
   if (m_kv == nullptr) {
-    return {false, QVariant()};
+    return false;
   }
-  const QVariant& v = m_kv->checker.toQVariant(userInput);
-  return {m_kv->checker(v), v};
+  return m_kv->checker(userInput);
 }
 
 QIcon AlertItem::GetAlertIcon(const AlertItem& alert) {
   return alert.checkRes ? QIcon(":/themes/PASS") : QIcon(":/themes/FAILED");
 }
 
-bool AlertItem::setValue(const QString& newValue) {
+void AlertItem::setValue(const QVariant& newValue) {
   value = newValue;  // change value and pass
-  QVariant newQVariant;
-  std::tie(checkRes, newQVariant) = isPass(newValue);
+  checkRes = isPass(newValue);
   if (checkRes) {
-    PreferenceSettings().setValue(name, newQVariant);
+    PreferenceSettings().setValue(name, newValue);
   }
+}
+
+QString AlertItem::value2Str() const {
+  return m_kv->valueToString();
 }
 
 PreferenceModel::PreferenceModel(QObject* parent) : QAbstractTableModel{parent} {}
@@ -67,7 +68,7 @@ QModelIndex PreferenceModel::setRootPath(const QString&) {
 int PreferenceModel::failCount() const {
   int fails = 0;
   foreach (const AlertItem& item, m_alerts) {
-    fails += (1 - item.checkRes); // 1 - bool, revert
+    fails += (1 - item.checkRes);  // 1 - bool, revert
   }
   return fails;
 }
@@ -109,7 +110,7 @@ QVariant PreferenceModel::data(const QModelIndex& index, int role) const {
 
 bool PreferenceModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (role == Qt::EditRole and index.column() == 2) {  // 2: value
-    m_alerts[index.row()].setValue(value.toString());
+    m_alerts[index.row()].setValue(value);
     // check is value valid. if valid write into Preference setting;
     emit dataChanged(index, index, {Qt::DisplayRole});
   }

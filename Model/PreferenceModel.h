@@ -11,18 +11,20 @@ struct AlertItem {
   static QIcon GetAlertIcon(const AlertItem& alert);
   static const QStringList ALERT_TABLE_HEADER;
 
-  bool setValue(const QString& newValue);
+  void setValue(const QVariant& newValue);
+  QString value2Str() const;
 
  private:
-  QString QLVTypeToStr();
+  QVariant getStoredValue();
   bool isStoredValuePass() const;
-  std::pair<bool, QVariant> isPass(const QString& userInput) const;
+  bool isPass(const QVariant& userInput) const;
+
   const KV* m_kv;
 
  public:
   int alarmID;
   QString name;
-  QString value;
+  QVariant value;
   QString note;
   bool checkRes;
 };
@@ -67,7 +69,7 @@ class PreferenceModel : public QAbstractTableModel {
     if (not index.isValid()) {
       return "";
     }
-    return m_alerts[index.row()].value;
+    return m_alerts[index.row()].value2Str();  // Todo. May some int bool here
   }
 
  private:
