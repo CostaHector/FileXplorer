@@ -143,12 +143,12 @@ bool CustomTableView::ShowOrHideColumnCore() {
     return false;
   }
   const int tableColumnsCount = model_->columnCount();
-  if (Column2RelIndex(tableColumnsCount - 1) >= m_columnsShowSwitch.size()) {
-    qDebug("Skip set visibility of horizontal header. N + N/BATCH_CNT must < lens of column show switch.");
+  if (tableColumnsCount > m_columnsShowSwitch.size()) {
+    qWarning("Skip set visibility of horizontal header. switchs count less than columns count.");
     return false;
   }
   for (int c = 0; c < tableColumnsCount; ++c) {
-    setColumnHidden(c, isColumnithHidden(c));
+    setColumnHidden(c, m_columnsShowSwitch[c] == '0');
   }
   PreferenceSettings().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
   return true;
@@ -157,42 +157,59 @@ bool CustomTableView::ShowOrHideColumnCore() {
 bool CustomTableView::onShowHideColumn() {
   auto* model_ = this->model();
   if (model_ == nullptr) {
-    qDebug("Skip set visibility of horizontal header. model is nullptr.");
+    qWarning("Skip set visibility of horizontal header. model is nullptr.");
     return false;
   }
+  const int tableColumnsCount = model_->columnCount();
+  if (m_columnsShowSwitch.size() < tableColumnsCount) {
+    qWarning("switches must contain at least %d element[actual: %d]", tableColumnsCount, m_columnsShowSwitch.size());
+    return false;
+  }
+
+  QString switches;
+  for (int i = 0; i < horizontalHeader()->count(); ++i) {
+    const QChar SEP = (i != 0 and i % SWITCHS_BATCH_COUNT == 0) ? '\n' : ',';
+    if (not m_horHeaderTitlesInit) {
+      m_horHeaderTitles += model_->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() + SEP;
+    }
+    switches += m_columnsShowSwitch[i] + SEP;
+  }
+  m_horHeaderTitlesInit = true;
+
   bool ok = false;
-  const QString& showHideSwitchArray = QInputDialog::getText(this, "Performer table column visibility(0:hide, 1:show)",
-                                                             "Extra element will be dismissed simply", QLineEdit::Normal, m_columnsShowSwitch, &ok);
+  QString userInputArray =
+      QInputDialog::getText(this, QString("Table column visibility(0:hide, 1:show) at least %1 element(s)\n").arg(tableColumnsCount),
+                            m_horHeaderTitles, QLineEdit::Normal, switches, &ok);
   if (not ok) {
     qInfo("User cancel change horizontal header visibility");
     return false;
   }
-  if (Column2RelIndex(model_->columnCount() - 1) >= showHideSwitchArray.size()) {
-    QMessageBox::warning(this, "Change horizontal header visibility failed", "must meet: N+N/5 < lens of input array");
-    qDebug("Skip Change horizontal header visibility. N(%d) + N/BATCH_CNT(%d) must < lens of column show switch(%d).", model_->columnCount() - 1,
-           SWITCHS_BATCH_COUNT, showHideSwitchArray.size());
+  userInputArray.remove(',').remove('\n');
+  if (userInputArray.size() < tableColumnsCount) {
+    qWarning("Input must contain at least %d element[actual: %d]", tableColumnsCount, userInputArray.size());
+    QMessageBox::warning(this, "Skip",
+                         QString("Input must contain at least %1 element(s)[actual: %2]").arg(tableColumnsCount).arg(userInputArray.size()));
     return false;
   }
-  m_columnsShowSwitch = showHideSwitchArray;
+  m_columnsShowSwitch = userInputArray;
   ShowOrHideColumnCore();
   return true;
 }
 
 bool CustomTableView::onHideThisColumn() {
-  int c = GetClickedHorIndex();
-  int relIndex = Column2RelIndex(c);
-  if (relIndex < 0 or relIndex >= m_columnsShowSwitch.size()) {
-    qDebug("invalid %dth column => %d not in [0, %d)", c, relIndex, m_columnsShowSwitch.size());
+  const int c = GetClickedHorIndex();
+  if (not(0 <= c and c < m_columnsShowSwitch.size())) {
+    qWarning("invalid %dth column  not in [0, %d)", c, m_columnsShowSwitch.size());
     QMessageBox::warning(this, "Invalid column index", "Skip HideThisColumn");
     return false;
   }
-  if (m_columnsShowSwitch[relIndex] == '0') {
-    qDebug("Column[%dth=>%d] already hide. Select another column to hide", c, relIndex);
-    QMessageBox::warning(this, QString("Column[%1th=>%2] already hide").arg(c).arg(relIndex), "Select another column to hide");
+  if (m_columnsShowSwitch[c] == '0') {
+    qDebug("Column[%dth] is already hide. Select another column to hide", c);
+    QMessageBox::information(this, QString("Column[%1th] is already hide").arg(c), "Select another column to hide");
     return true;
   }
-  m_columnsShowSwitch[relIndex] = '0';
-  setColumnHidden(c, isColumnithHidden(c));
+  m_columnsShowSwitch[c] = '0';
+  setColumnHidden(c, m_columnsShowSwitch[c] == '0');
   PreferenceSettings().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
   return true;
 }

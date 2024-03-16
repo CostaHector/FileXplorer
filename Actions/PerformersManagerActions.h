@@ -30,7 +30,6 @@ class PerformersManagerActions : public QObject {
   QAction* DROP_TABLE;
   QAction* SUBMIT;
 
-  QAction* COLUMNS_VISIBILITY;
   QAction* CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT;
 
   QActionGroup* HORIZONTAL_HEADER_AGS;
