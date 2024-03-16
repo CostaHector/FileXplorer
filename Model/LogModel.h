@@ -1,8 +1,8 @@
 #ifndef LOGMODEL_H
 #define LOGMODEL_H
 
-#include "Tools/Log.h"
 #include <QAbstractTableModel>
+#include "Tools/Log.h"
 
 // curTime, "Debug", qPrintable(msg), context.file).arg(context.line).arg(context.function);
 class LogModel : public QAbstractTableModel {
@@ -35,8 +35,9 @@ class LogModel : public QAbstractTableModel {
   QString getFileNameAndLineNo(const QModelIndex& ind) const;
 
   QString fullInfo(const QModelIndex& ind) const;
+
  private:
-  QString m_rootPath = "logs_info.log";
+  QString m_rootPath;
   QList<Log> mlogs;
 };
 

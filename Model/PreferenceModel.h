@@ -3,17 +3,31 @@
 
 #include <QAbstractTableModel>
 #include <QIcon>
+#include "PublicVariable.h"
 
 struct AlertItem {
  public:
+  explicit AlertItem(int alarmID_, const KV* kv_, QString note_);
+  // QList<AlertItem> will call copy constructor, m_kv cannot be default copied
+  static QIcon GetAlertIcon(const AlertItem& alert);
+  static const QStringList ALERT_TABLE_HEADER;
+
+  void setValue(const QVariant& newValue);
+  QString value2Str() const;
+
+ private:
+  QVariant getStoredValue();
+  bool isStoredValuePass() const;
+  bool isPass(const QVariant& userInput) const;
+
+  const KV* m_kv;
+
+ public:
   int alarmID;
   QString name;
-  QString value;
+  QVariant value;
   QString note;
-
-  static QIcon GetColor(const AlertItem& alert);
-
-  static const QStringList ALERT_TABLE_HEADER;
+  bool checkRes;
 };
 
 class PreferenceModel : public QAbstractTableModel {
@@ -25,10 +39,10 @@ class PreferenceModel : public QAbstractTableModel {
 
   auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_alerts.size(); }
   auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return AlertItem::ALERT_TABLE_HEADER.size(); }
-
+  int failCount() const;
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
 
-  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
     if (role == Qt::TextAlignmentRole) {
@@ -56,7 +70,7 @@ class PreferenceModel : public QAbstractTableModel {
     if (not index.isValid()) {
       return "";
     }
-    return m_alerts[index.row()].value;
+    return m_alerts[index.row()].value2Str();  // Todo. May some int bool here
   }
 
  private:

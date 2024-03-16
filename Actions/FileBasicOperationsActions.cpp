@@ -33,7 +33,7 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(GVarStr memoryKey) {
+QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey) {
   QString historyStr = PreferenceSettings().value(memoryKey.name, memoryKey.v).toString();
   QStringList historyList = historyStr.split(MOVE_COPT_TO_PATH_STR_SEPERATOR);
   QActionGroup* actionGroup = new QActionGroup(this);
