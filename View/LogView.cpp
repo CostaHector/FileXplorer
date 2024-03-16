@@ -74,16 +74,16 @@ void LogView::onLogTypeChanged() {
     m_logProxyModel->setFilterFixedString("");
     return;
   }
-  QStringList types;
+  QString types;
   foreach (QAction* act, m_logTypeToolbar->actions()) {
     if (act->isSeparator()) {
       continue;
     }
     if (act->isChecked()) {
-      types.append(act->text());
+      types += act->text()[0];
     }
   }
-  const QString& pat = '[' + types.join("") + ']';
+  const QString& pat = '[' + types + ']';
   m_logProxyModel->setFilterRegExp(pat);
 }
 
