@@ -13,6 +13,7 @@ struct AlertItem {
   static const QStringList ALERT_TABLE_HEADER;
 
   void setValue(const QVariant& newValue);
+  QString defaultValue2Str() const;
   QString value2Str() const;
 
  private:
