@@ -40,8 +40,11 @@ void AlertItem::setValue(const QVariant& newValue) {
   }
 }
 
-QString AlertItem::value2Str() const {
+QString AlertItem::defaultValue2Str() const {
   return m_kv->valueToString();
+}
+QString AlertItem::value2Str() const {
+  return m_kv->valueToString(value);
 }
 
 PreferenceModel::PreferenceModel(QObject* parent) : QAbstractTableModel{parent} {}
