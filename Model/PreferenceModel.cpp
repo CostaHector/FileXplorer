@@ -58,7 +58,7 @@ QModelIndex PreferenceModel::setRootPath(const QString&) {
 #else
   m_alerts.append(
       AlertItem{10000, &MemoryKey::LINUX_PERFORMERS_TABLE, "Used in Json editor. Provide the ability to filter performers out from giving string"});
-  m_alerts.append(AlertItem{10001, &MemoryKey::LINUX_AKA_PERFORMERS.name, "Used in Quick Where Window to join where clause."});
+  m_alerts.append(AlertItem{10001, &MemoryKey::LINUX_AKA_PERFORMERS, "Used in Quick Where Window to join where clause."});
   m_alerts.append(AlertItem{10002, &MemoryKey::LINUX_STANDARD_STUDIO_NAME, "Used in Json Editor to guess studio name."});
   m_alerts.append(AlertItem{10004, &MemoryKey::LINUX_RUNLOG, "Used in log records when some file operation failed."});
   m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Performers Widget"});
