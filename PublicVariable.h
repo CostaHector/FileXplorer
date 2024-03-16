@@ -145,6 +145,7 @@ struct KV {
   QSet<QString> GetCandidatePool() const { return checker.m_strCandidates; }
 
   QString valueToString() const;
+  QString valueToString(const QVariant& v_) const;
 
   QString name;
   QVariant v;
