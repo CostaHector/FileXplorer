@@ -6,8 +6,6 @@
 class LogProxyModel : public QSortFilterProxyModel {
  public:
   explicit LogProxyModel(QObject* parent = nullptr);
-
-
 };
 
 #endif  // LOGPROXYMODEL_H

@@ -21,7 +21,6 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
       DROP_TABLE(new QAction(tr("Drop table(complete table))"), this)),
       SUBMIT(new QAction(QIcon(":/themes/SUBMIT"), tr("Submit"), this)),
 
-      COLUMNS_VISIBILITY(new QAction(tr("Performer table column visibility"), this)),
       CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT(new QAction(tr("Change performer image fixed height(px)"), this)),
 
       HORIZONTAL_HEADER_AGS(new QActionGroup(this)),

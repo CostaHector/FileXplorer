@@ -71,7 +71,7 @@ class FileBasicOperationsActions : public QObject {
 
   QActionGroup* GetDeleteActions();
   QActionGroup* GetMOVE_COPY_TOActions();
-  QActionGroup* GetMOVE_COPY_TO_PATH_HistoryActions(GVarStr memoryKey);
+  QActionGroup* GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey);
   QActionGroup* Get_CUT_COPY_PASTE_OPERATIONS_Actions();
   QActionGroup* Get_UNDO_REDO_OPERATIONS_Actions();
   QActionGroup* Get_SELECTION_RIBBON_Action();

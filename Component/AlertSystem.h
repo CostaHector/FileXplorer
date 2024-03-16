@@ -6,21 +6,28 @@
 #include <QLabel>
 #include <QTableWidget>
 #include <QWidget>
-#include "View/CustomTableView.h"
 #include "Model/PreferenceModel.h"
+#include "View/CustomTableView.h"
 
 class AlertSystem : public QDialog {
  public:
   explicit AlertSystem(QWidget* parent = nullptr);
 
-  auto sizeHint() const -> QSize override { return QSize(1024, 768); }
+  void ReadSettings() {
+    if (PreferenceSettings().contains("ALERT_SYSTEM_GEOMETRY")) {
+      restoreGeometry(PreferenceSettings().value("ALERT_SYSTEM_GEOMETRY").toByteArray());
+    } else {
+      setGeometry(DEFAULT_GEOMETRY);
+    }
+    m_alertsTable->InitTableView();
+  }
+
+  void closeEvent(QCloseEvent* event) {
+    PreferenceSettings().setValue("ALERT_SYSTEM_GEOMETRY", saveGeometry());
+    return QDialog::closeEvent(event);
+  }
 
   void RefreshWindowIcon();
-
-  bool isRowItemPass(const int row) const;
-  bool InitLineColor(const int row);
-  bool RefreshLineColor(const int row);
-  bool on_cellChanged(const int row, const int column);
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
 
   void onEditPreferenceSetting() const;
@@ -28,7 +35,6 @@ class AlertSystem : public QDialog {
  signals:
 
  private:
-  QMap<QString, bool> m_checkItemStatus;
   QLabel* m_failItemCnt;
   PreferenceModel* m_alertModel{new PreferenceModel{this}};
   CustomTableView* m_alertsTable{new CustomTableView{"ALERT_SYSTEM", this}};
