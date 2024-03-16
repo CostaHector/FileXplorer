@@ -22,6 +22,7 @@
 
 PerformersWidget::PerformersWidget(QWidget* parent)
     : QMainWindow{parent},
+      m_perfSearch{new QLineEdit{QString("%1 like \"%\"").arg(PERFORMER_DB_HEADER_KEY::Name), this}},
       m_performersListView{new PerformersTableView(nullptr)},
       m_introductionTextEdit(new PerformersPreviewTextBrowser),
       performerPreviewDock{new QDockWidget(tr("Overview"), this)},
@@ -30,6 +31,9 @@ PerformersWidget::PerformersWidget(QWidget* parent)
           PreferenceSettings().value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v).toString()),
       m_performerImageHeight(
           PreferenceSettings().value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v).toInt()) {
+  m_perfToolbar->addWidget(m_perfSearch);
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_perfToolbar);
+
   QSqlDatabase con = GetSqlDB();
   m_perfsDBModel = new RatingSqlTableModel(this, con);
   if (con.tables().contains(DB_TABLE::PERFORMERS)) {
@@ -48,12 +52,18 @@ PerformersWidget::PerformersWidget(QWidget* parent)
 
   subscribe();
 
-  updateWindowsSize();
+  readSettings();
+  m_performersListView->InitTableView();
   setWindowTitle("Performers Manager Widget");
   setWindowIcon(QIcon(":/themes/PERFORMERS_MANAGER"));
 }
 
 void PerformersWidget::subscribe() {
+  connect(m_perfSearch, &QLineEdit::returnPressed, this, [this]() {
+    const QString& searchPattern = m_perfSearch->text();
+    m_perfsDBModel->setFilter(searchPattern);
+  });
+
   connect(g_performersManagerActions().OPEN_WITH_LOCAL_APP, &QAction::triggered, this, [this]() {
     if (not QFile::exists(SystemPath::PEFORMERS_DATABASE)) {
       QMessageBox::information(this, "open failed", QString("[%1] not exists. \nCreate it first").arg(SystemPath::PEFORMERS_DATABASE));
@@ -99,7 +109,7 @@ auto PerformersWidget::closeEvent(QCloseEvent* event) -> void {
   QMainWindow::closeEvent(event);
 }
 
-void PerformersWidget::updateWindowsSize() {
+void PerformersWidget::readSettings() {
   if (PreferenceSettings().contains("PerformersWidgetGeometry")) {
     restoreGeometry(PreferenceSettings().value("PerformersWidgetGeometry").toByteArray());
   } else {
@@ -518,7 +528,7 @@ int PerformersWidget::onForceRefreshRecordsVids() {
     record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR));
     m_perfsDBModel->setRecord(r, record);  // update back
     vidsCnt += vidsList.size();
-    if (recordsCnt == 0){
+    if (recordsCnt == 0) {
       m_introductionTextEdit->operator()(record, m_imageHostPath, m_performerImageHeight);
     }
     ++recordsCnt;
@@ -556,7 +566,7 @@ bool PerformersWidget::onOpenRecordInFileSystem() const {
 int PerformersWidget::onDeleteRecords() {
   if (not m_performersListView->selectionModel()->hasSelection()) {
     qDebug("Nothing was selected. Select some row(s) to delete");
-    QMessageBox::warning(this, "Nothing was selected", "Select some row(s) to delete");
+    QMessageBox::information(this, "Nothing was selected", "Select some row(s) to delete");
     return 0;
   }
   int deleteCnt = 0;

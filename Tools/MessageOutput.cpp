@@ -1,11 +1,18 @@
 #include "MessageOutput.h"
+#include "PublicVariable.h"
 
-QFile MessageOutput::outFile("logs_info.log");
+QFile MessageOutput::outFile;
 QTextStream MessageOutput::ts(&outFile);
 const QString MessageOutput::logTemplate("%1\t%2\t%3\t%4\t%5\t%6\n");
 
 MessageOutput::MessageOutput() {
   qInstallMessageHandler(MessageOutput::myMessageOutput);
+#ifdef _WIN32
+  QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
+#else
+  QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
+#endif
+  outFile.setFileName(QString("%1/logs_info.log").arg(logPrePath));
 }
 
 void MessageOutput::myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg) {

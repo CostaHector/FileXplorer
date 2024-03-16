@@ -44,7 +44,7 @@ class CustomTableView : public QTableView {
   void InitTableView();
 
  private:
-  QAction* COLUMNS_VISIBILITY = new QAction(tr("Performer table column visibility"), this);
+  QAction* COLUMNS_VISIBILITY = new QAction(tr("Column title visibility"), this);
   QAction* HIDE_THIS_COLUMN = new QAction(tr("hide this column"), this);
   QAction* SHOW_ALL_COLUMNS = new QAction(tr("show all columns"), this);
   QAction* STRETCH_DETAIL_SECTION = new QAction(tr("stretch last column"), this);
@@ -65,13 +65,10 @@ class CustomTableView : public QTableView {
 
   int m_defaultTableRowHeight;
 
-  QString m_columnsShowSwitch;  // 11111,00000,11111
+  QString m_horHeaderTitles;
+  bool m_horHeaderTitlesInit = false;
+  QString m_columnsShowSwitch;  // 111110000011111
   static constexpr int SWITCHS_BATCH_COUNT = 5;
-  static inline int Column2RelIndex(int i) { return i + i / SWITCHS_BATCH_COUNT; }
-  inline bool isColumnithHidden(int i) const {
-    int relI = Column2RelIndex(i);
-    return 0 < relI and relI < m_columnsShowSwitch.size() and m_columnsShowSwitch[relI] == '0';
-  }
   QMenu* m_menu = nullptr;
   QMenu* m_verMenu = new QMenu{tr("vertical header menu"), this};
   QMenu* m_horMenu = new QMenu{tr("horizontal header menu"), this};

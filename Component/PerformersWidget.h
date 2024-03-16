@@ -17,6 +17,7 @@
 #include <QSqlTableModel>
 
 #include <QAction>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
 
@@ -26,7 +27,7 @@ class PerformersWidget : public QMainWindow {
   explicit PerformersWidget(QWidget* parent = nullptr);
   auto closeEvent(QCloseEvent* event) -> void override;
 
-  void updateWindowsSize();
+  void readSettings();
   void subscribe();
 
  signals:
@@ -64,9 +65,14 @@ class PerformersWidget : public QMainWindow {
   int onForceRefreshRecordsVids();
   bool onOpenRecordInFileSystem() const;
 
+ private:
+  QLineEdit* m_perfSearch;
+  QToolBar* m_perfToolbar = new QToolBar("Performer tool", this);
+
   PerformersTableView* m_performersListView;
   PerformersPreviewTextBrowser* m_introductionTextEdit;
   QDockWidget* performerPreviewDock;
+
   QSqlTableModel* m_perfsDBModel;
 
   QString m_imageHostPath;
