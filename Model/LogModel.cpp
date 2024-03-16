@@ -4,8 +4,16 @@
 #include <QFile>
 #include <QIODevice>
 #include <QTextStream>
+#include "PublicVariable.h"
 
-LogModel::LogModel(QObject* parent) : QAbstractTableModel{parent} {}
+LogModel::LogModel(QObject* parent) : QAbstractTableModel{parent} {
+#ifdef _WIN32
+  QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
+#else
+  QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
+#endif
+  m_rootPath = QString("%1/logs_info.log").arg(logPrePath);
+}
 
 void LogModel::_reloadLogFiles() {
   QFile fi(m_rootPath);
@@ -93,5 +101,6 @@ QString LogModel::fullInfo(const QModelIndex& ind) const {
     return {};
   }
   const auto& record = mlogs[ind.row()];
-  return record.time + '\n' + record.level + '\n' + record.fileName + ':' + QString::number(record.lineNo) + '\n' + record.funcName + '\n' + record.msg;
+  return record.time + '\n' + record.level + '\n' + record.fileName + ':' + QString::number(record.lineNo) + '\n' + record.funcName + '\n' +
+         record.msg;
 }

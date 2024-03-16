@@ -39,8 +39,8 @@
     <name>CustomTableView</name>
     <message>
         <location filename="../View/CustomTableView.h" line="47"/>
-        <source>Performer table column visibility</source>
-        <translation>演员表列可见性</translation>
+        <source>Column title visibility</source>
+        <translation>列抬头可见性</translation>
     </message>
     <message>
         <location filename="../View/CustomTableView.h" line="48"/>
