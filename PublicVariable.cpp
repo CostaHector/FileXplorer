@@ -228,3 +228,7 @@ KV::KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_) :
 QString KV::valueToString() const {
   return checker.valueToString(v);
 }
+
+QString KV::valueToString(const QVariant& v_) const {
+  return checker.valueToString(v_);
+}
