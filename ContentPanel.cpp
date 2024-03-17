@@ -178,7 +178,6 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
   const QString& pth = m_fsModel->rootPath();
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
-  qDebug("\t\t Anchor of path [%s] target to (%d, %d)", qPrintable(pth), m_anchorTags[pth].row, m_anchorTags[pth].col);
   if (previewWidget != nullptr) {
     emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
   }

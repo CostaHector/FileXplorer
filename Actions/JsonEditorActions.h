@@ -39,7 +39,6 @@ class JsonEditorActions : public QObject {
   QAction* _LAST_FILE;
   QAction* _NEXT_FILE;
   QAction* _AUTO_SKIP;
-  QAction* _CONDITION_NOT;
   QActionGroup* _QUICK_EDIT_ACTIONS;
 
   QAction* _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD;

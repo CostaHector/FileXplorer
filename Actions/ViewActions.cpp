@@ -70,6 +70,10 @@ QActionGroup* ViewActions::GetListTableTreeActions() {
   _TREE_VIEW->setCheckable(true);
 
   _MOVIE_VIEW->setCheckable(true);
+
+  _ADVANCE_SEARCH_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_F));
+  _ADVANCE_SEARCH_VIEW->setShortcutVisibleInContextMenu(true);
+  _ADVANCE_SEARCH_VIEW->setToolTip(QString("Show advanced search window. (%1)").arg(_ADVANCE_SEARCH_VIEW->shortcut().toString()));
   _ADVANCE_SEARCH_VIEW->setCheckable(true);
 
   QActionGroup* actionGroup = new QActionGroup(this);
