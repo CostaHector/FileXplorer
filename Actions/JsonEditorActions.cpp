@@ -26,7 +26,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
 
       _LAST_FILE(new QAction(QIcon(":/themes/LAST_JSON"), tr("Last"), this)),
       _NEXT_FILE(new QAction(QIcon(":/themes/NEXT_JSON"), tr("Next"), this)),
+      _DONE_AND_NEXT(new QAction(QIcon(":/themes/DONE_AND_NEXT"), tr("Done and next"), this)),
       _AUTO_SKIP(new QAction(QIcon(":/themes/AUTO_SKIP"), tr("Autoskip"), this)),
+      _COMPLETE_PERFS_COUNT(new QAction(QIcon(":/themes/COMPLETE_PERFS_COUNT"), tr("Perf Cnt"), this)),
       _QUICK_EDIT_ACTIONS{new QActionGroup(this)},
 
       _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), tr("Capitalize"), this)),
@@ -63,14 +65,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                              .arg(_FORMATTER->text())
                              .arg(_FORMATTER->shortcut().toString()));
 
-  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Period));
-  _NEXT_FILE->setShortcutVisibleInContextMenu(true);
-  _NEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)").arg(_NEXT_FILE->text()).arg(_NEXT_FILE->shortcut().toString()));
-
-  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Comma));
-  _LAST_FILE->setShortcutVisibleInContextMenu(true);
-  _LAST_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)").arg(_LAST_FILE->text()).arg(_LAST_FILE->shortcut().toString()));
-
   _SUBMIT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_S));
   _SUBMIT->setShortcutVisibleInContextMenu(true);
   _SUBMIT->setToolTip(
@@ -105,7 +99,34 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
-  _AUTO_SKIP->setCheckable(false);
+  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Comma));
+  _LAST_FILE->setShortcutVisibleInContextMenu(true);
+  _LAST_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)").arg(_LAST_FILE->text()).arg(_LAST_FILE->shortcut().toString()));
+
+  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Period));
+  _NEXT_FILE->setShortcutVisibleInContextMenu(true);
+  _NEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)").arg(_NEXT_FILE->text()).arg(_NEXT_FILE->shortcut().toString()));
+
+  _DONE_AND_NEXT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Return));
+  _DONE_AND_NEXT->setShortcutVisibleInContextMenu(true);
+  _DONE_AND_NEXT->setToolTip(QString("<b>%1 (%2)</b><br/> Mark item as done and move to next unfinished item")
+                                 .arg(_DONE_AND_NEXT->text())
+                                 .arg(_DONE_AND_NEXT->shortcut().toString()));
+
+  _AUTO_SKIP->setCheckable(true);
+  _AUTO_SKIP->setChecked(true);
+
+  _COMPLETE_PERFS_COUNT->setShortcutVisibleInContextMenu(true);
+  _COMPLETE_PERFS_COUNT->setToolTip(QString("<b>%1 (%2)</b><br/> Set json complete performer count")
+                                        .arg(_COMPLETE_PERFS_COUNT->text())
+                                        .arg(_COMPLETE_PERFS_COUNT->shortcut().toString()));
+
+  _QUICK_EDIT_ACTIONS->addAction(_LAST_FILE);
+  _QUICK_EDIT_ACTIONS->addAction(_NEXT_FILE);
+  _QUICK_EDIT_ACTIONS->addAction(_DONE_AND_NEXT);
+  _QUICK_EDIT_ACTIONS->addAction(_AUTO_SKIP);
+  _QUICK_EDIT_ACTIONS->addAction(_COMPLETE_PERFS_COUNT);
+  _QUICK_EDIT_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcutVisibleInContextMenu(true);
@@ -132,11 +153,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
 
   _FILE_LOAD_ACTIONS->addAction(_BROWSE_AND_SELECT_THE_FOLDER);
   _FILE_LOAD_ACTIONS->addAction(_CLR_TO_BE_EDITED_LIST);
-
-  _QUICK_EDIT_ACTIONS->addAction(_LAST_FILE);
-  _QUICK_EDIT_ACTIONS->addAction(_NEXT_FILE);
-  _QUICK_EDIT_ACTIONS->addAction(_AUTO_SKIP);
-  _QUICK_EDIT_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   _TEXT_EDIT_ACTIONS->addAction(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
   _TEXT_EDIT_ACTIONS->addAction(_LOWER_ALL_WORDS);

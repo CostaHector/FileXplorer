@@ -78,12 +78,12 @@
         <translation>调节行高</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="76"/>
+        <location filename="../View/CustomTableView.h" line="73"/>
         <source>vertical header menu</source>
         <translation>垂直表头</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="77"/>
+        <location filename="../View/CustomTableView.h" line="74"/>
         <source>horizontal header menu</source>
         <translation>水平表头</translation>
     </message>
@@ -367,16 +367,21 @@
     <name>FileLeafActions</name>
     <message>
         <location filename="../Actions/FileLeafAction.cpp" line="6"/>
+        <source>Logs</source>
+        <translation>日志</translation>
+    </message>
+    <message>
+        <location filename="../Actions/FileLeafAction.cpp" line="7"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="7"/>
+        <location filename="../Actions/FileLeafAction.cpp" line="8"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="8"/>
+        <location filename="../Actions/FileLeafAction.cpp" line="9"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -501,110 +506,150 @@
     </message>
     <message>
         <location filename="../Actions/JsonEditorActions.cpp" line="29"/>
+        <source>Done and next</source>
+        <translation>完成并下一个</translation>
+    </message>
+    <message>
+        <location filename="../Actions/JsonEditorActions.cpp" line="30"/>
         <source>Autoskip</source>
         <translation>自动跳过</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="30"/>
         <source>WhenNot</source>
-        <translation>跳过条件取反</translation>
+        <translation type="vanished">跳过条件取反</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="33"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="31"/>
+        <source>Perf Cnt</source>
+        <translation>json完整演员数量</translation>
+    </message>
+    <message>
+        <location filename="../Actions/JsonEditorActions.cpp" line="34"/>
         <source>Capitalize</source>
         <translation>首字母大写</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="34"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="35"/>
         <source>lowercase</source>
         <translation>全小写</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="35"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="36"/>
         <source>Formatter</source>
         <translation>格式化</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="36"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="37"/>
         <source>Reload now</source>
         <translation>刷新本json</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="37"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="38"/>
         <source>Append to perfs</source>
         <translation>追加到演员值中</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="40"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="41"/>
         <source>save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="41"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="42"/>
         <source>cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="42"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="43"/>
         <source>submit</source>
         <translation>提交修改</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="45"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="46"/>
         <source>Reveal</source>
         <translation>在资源管理器中显示</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="46"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="47"/>
         <source>Open</source>
         <translation>打开Json文件</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="49"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="50"/>
         <source>AI Hint</source>
         <translation>AI提示</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="50"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="51"/>
         <source>AI Library</source>
         <oldsource>&gt;&gt;AI Library</oldsource>
         <translation>供AI学习</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="53"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="54"/>
         <source>Select Current path</source>
         <oldsource>Select Current folder and load from it</oldsource>
         <translation>选中并读取当前路径</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="54"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="55"/>
         <source>Construct jsons by file properties</source>
         <translation>构建Jsons根据视频文件数据</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="55"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="56"/>
         <source>Append performers</source>
         <translation>追加演员名</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="56"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="57"/>
         <source>Set production studio</source>
         <translation>设置制片商</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="57"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="58"/>
         <source>Construct performers k-v pair</source>
         <translation>构建演职员KV对</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="58"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="59"/>
         <source>Construct studio k-v pair</source>
         <translation>构建产商KV对</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="59"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="60"/>
         <source>Clear performers and studio values</source>
         <translation>清空演员和厂商值</translation>
+    </message>
+</context>
+<context>
+    <name>LogView</name>
+    <message>
+        <location filename="../View/LogView.cpp" line="33"/>
+        <source>Log View</source>
+        <translation>日志视图</translation>
+    </message>
+</context>
+<context>
+    <name>LogViewActions</name>
+    <message>
+        <location filename="../Actions/LogViewActions.h" line="35"/>
+        <source>Log type menu</source>
+        <translation>日志类型目录</translation>
+    </message>
+    <message>
+        <location filename="../Actions/LogViewActions.h" line="41"/>
+        <source>Refresh</source>
+        <translation>写入并刷新</translation>
+    </message>
+    <message>
+        <location filename="../Actions/LogViewActions.h" line="42"/>
+        <source>Copy location</source>
+        <translation>拷贝定位行</translation>
+    </message>
+    <message>
+        <location filename="../Actions/LogViewActions.h" line="43"/>
+        <source>Reveal log file</source>
+        <translation>打开日志文件</translation>
     </message>
 </context>
 <context>
@@ -746,17 +791,16 @@
         <translation>提交</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="24"/>
         <source>Performer table column visibility</source>
-        <translation>演员表列可见性</translation>
+        <translation type="vanished">演员表列可见性</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="25"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="24"/>
         <source>Change performer image fixed height(px)</source>
         <translation>修改演员图片固定宽度(像素)</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="94"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="93"/>
         <source>performer table right click menu</source>
         <translation>演员表右键菜单</translation>
     </message>
@@ -773,7 +817,7 @@
         <translation type="vanished">延展最后一列</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="29"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="28"/>
         <source>delete record(s)</source>
         <translation>删除记录</translation>
     </message>
@@ -786,22 +830,22 @@
         <translation type="vanished">调节默认行高</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="32"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="31"/>
         <source>Perfs</source>
         <translation>演职员库</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="62"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="61"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="74"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="73"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="82"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="81"/>
         <source>View</source>
         <translation>视图</translation>
     </message>
@@ -809,7 +853,7 @@
 <context>
     <name>PerformersWidget</name>
     <message>
-        <location filename="../Component/PerformersWidget.cpp" line="27"/>
+        <location filename="../Component/PerformersWidget.cpp" line="28"/>
         <source>Overview</source>
         <translation>全览</translation>
     </message>
