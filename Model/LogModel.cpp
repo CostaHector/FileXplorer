@@ -26,7 +26,10 @@ void LogModel::_reloadLogFiles() {
   QTextStream ts(&fi);
   decltype(mlogs) tempLogs;
   while (not ts.atEnd()) {
-    tempLogs.append(Log(ts.readLine()));
+    const auto& logLine = Log::fromLogFilesLine(ts.readLine());
+    if (not logLine)
+      continue;
+    tempLogs.append(logLine);
   }
   // equal
   if (mlogs.size() == tempLogs.size()) {

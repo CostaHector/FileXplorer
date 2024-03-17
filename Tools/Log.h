@@ -4,8 +4,12 @@
 #include <QColor>
 struct Log {
  public:
-  explicit Log(const QStringList& lst) : time{lst[0]}, level{lst[1][0]}, msg{lst[2]}, fileName{lst[3]}, lineNo{lst[4].toInt()}, funcName{lst[5]} {}
-  explicit Log(const QString& log) : Log(log.split('\t')) {}
+  static Log fromLogFilesLine(const QString& line);
+  Log(const QString& time_, QChar level_, const QString& msg_, const QString& fileName_, int lineNo_, const QString& funcName_)
+      : time{time_}, level{level_}, msg{msg_}, fileName{fileName_}, lineNo{lineNo_}, funcName{funcName_} {}
+  Log() = default;
+
+  operator bool() const { return not time.isEmpty(); };
 
   QString time;
   QChar level;
