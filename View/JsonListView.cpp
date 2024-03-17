@@ -45,7 +45,7 @@ void JsonListView::contextMenuEvent(QContextMenuEvent* event) {
   QListView::contextMenuEvent(event);
 }
 
-void JsonListView::onAutoSkipSwitch(const bool checked) {
+void JsonListView::onSetPerfCount(const bool checked) {
   const int storedSkipCnt = PreferenceSettings()
                                 .value(MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.name, MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.v)
                                 .toInt();
@@ -63,6 +63,7 @@ void JsonListView::onAutoSkipSwitch(const bool checked) {
 }
 
 void JsonListView::autoNext() {
+  clearSelection();
   for (auto curRow = currentRow() + 1; curRow < count(); ++curRow) {
     if (not m_jsonModel->isPerfComplete(curRow)) {
       setCurrentRow(curRow);
@@ -89,6 +90,7 @@ bool JsonListView::hasLast() const {
 
 void JsonListView::last() {
   const auto curRow = currentRow() - 1;
+  clearSelection();
   setCurrentRow(curRow);
   qDebug("last curRow %d", curRow);
 }
@@ -100,6 +102,7 @@ bool JsonListView::hasNext() const {
 
 void JsonListView::next() {
   const auto curRow = currentRow() + 1;
+  clearSelection();
   setCurrentRow(curRow);
   qDebug("next curRow %d", curRow);
 }

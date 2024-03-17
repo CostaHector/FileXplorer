@@ -126,7 +126,8 @@ void JsonEditor::subscribe() {
 
   connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, m_jsonList, &JsonListView::onNext);
   connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, m_jsonList, &JsonListView::onLast);
-  connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, m_jsonList, &JsonListView::onAutoSkipSwitch);
+  connect(g_jsonEditorActions()._DONE_AND_NEXT, &QAction::triggered, this, &JsonEditor::onSaveAndNextUnfinishedItem);
+  connect(g_jsonEditorActions()._COMPLETE_PERFS_COUNT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
 
   connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);  // (.json, save former .backup for recover)
   connect(g_jsonEditorActions()._CANCEL, &QAction::triggered, this, &JsonEditor::onResetChanges);
@@ -203,7 +204,7 @@ bool JsonEditor::onStageChanges() {
   const auto curRow = m_jsonList->currentRow();
   if (not(0 <= curRow and curRow < m_jsonList->count())) {
     qWarning("try save on out of range[0, %d] row[%d]", m_jsonList->count(), curRow);
-    return true;
+    return false;
   }
 
   QVariantHash dict;
@@ -241,7 +242,11 @@ bool JsonEditor::onStageChanges() {
       dict.insert(keyName, valueStr);
     }
   }
-  m_jsonModel->updatePerfCount(curRow);
+  if (dict.contains(JSONKey::Performers)) {
+    const int newCount = dict[JSONKey::Performers].toStringList().size();
+    m_jsonModel->setPerfCount(curRow, newCount);
+  }
+
   const QString& curJsonPath = m_jsonList->filePath(curRow);
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (QFile::exists(backupJsonPath)) {
@@ -258,6 +263,15 @@ bool JsonEditor::onStageChanges() {
     return false;
   }
   return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
+}
+
+bool JsonEditor::onSaveAndNextUnfinishedItem() {
+  const bool isSavedSucceed = onStageChanges();
+  if (not isSavedSucceed) {
+    return false;
+  }
+  m_jsonList->onNext();
+  return true;
 }
 
 bool JsonEditor::onResetChanges() {
@@ -476,7 +490,7 @@ int JsonEditor::load(const QString& path) {
   return deltaFile;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
