@@ -85,7 +85,12 @@ void JsonModel::SetCompletePerfCount(int newCount) {
 }
 
 void JsonModel::updatePerfCount(int row) {
-  const int count = JsonProperties::getPerfsCount(m_jsons[row].jsonPath);
-  m_jsons[row].perfsCount = count;
+  const int newCount = JsonProperties::getPerfsCount(m_jsons[row].jsonPath);
+  m_jsons[row].perfsCount = newCount;
+  emit dataChanged(index(row), index(row), {Qt::ItemDataRole::ForegroundRole});
+}
+
+void JsonModel::setPerfCount(int row, int newCount) {
+  m_jsons[row].perfsCount = newCount;
   emit dataChanged(index(row), index(row), {Qt::ItemDataRole::ForegroundRole});
 }

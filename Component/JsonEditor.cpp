@@ -241,7 +241,11 @@ bool JsonEditor::onStageChanges() {
       dict.insert(keyName, valueStr);
     }
   }
-  m_jsonModel->updatePerfCount(curRow);
+  if (dict.contains(JSONKey::Performers)) {
+    const int newCount = dict[JSONKey::Performers].toStringList().size();
+    m_jsonModel->setPerfCount(curRow, newCount);
+  }
+
   const QString& curJsonPath = m_jsonList->filePath(curRow);
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (QFile::exists(backupJsonPath)) {
@@ -257,6 +261,7 @@ bool JsonEditor::onStageChanges() {
     qDebug("cannot copy json file[%s]", qPrintable(backupJsonPath));
     return false;
   }
+
   return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
 }
 
@@ -476,7 +481,7 @@ int JsonEditor::load(const QString& path) {
   return deltaFile;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
