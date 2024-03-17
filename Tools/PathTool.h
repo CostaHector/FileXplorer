@@ -17,8 +17,8 @@ QString fileName(const QString& fullPath);
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
 QString commonPrefix(const QString& path1, const QString& path2);
-bool isLinuxRootOrWinEmpty(const QString& path); // loose
-bool isRootOrEmpty(const QString& path); // strict
+bool isLinuxRootOrWinEmpty(const QString& path);  // loose
+bool isRootOrEmpty(const QString& path);          // strict
 
 QString longestCommonPrefix(const QStringList& strs);
 
@@ -26,6 +26,10 @@ QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 
 constexpr char PATH_SEP_CHAR = '/';
+constexpr static int EXTENSION_SIZE = 5;
+
+int getFileExtensionDotIndex(const QString& path);
+
 }  // namespace PATHTOOL
 
 #endif  // PATHTOOL_H
