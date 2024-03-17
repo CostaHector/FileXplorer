@@ -66,6 +66,7 @@ QModelIndex PreferenceModel::setRootPath(const QString&) {
   m_alerts.append(AlertItem{10004, &MemoryKey::LINUX_RUNLOG, "Used in log records when some file operation failed."});
   m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Performers Widget"});
 #endif
+  return QModelIndex();
 }
 
 int PreferenceModel::failCount() const {

@@ -18,24 +18,15 @@
 
 #include <QVariantMap>
 
+#include "Model/JsonModel.h"
+#include "View/JsonListView.h"
+
 class JsonEditor : public QMainWindow {
  public:
   explicit JsonEditor(QWidget* parent = nullptr);
 
-  auto hasLast() const -> bool;
-  auto hasNext() const -> bool;
-
-  auto last() -> void;
-  auto next() -> void;
-
-  auto onAutoSkipSwitch(const bool checked) -> void;
-  void autoNext();
-
-  auto onNext() -> void;
-  auto onLast() -> void;
-
   auto load(const QString& path) -> int;
-  auto refreshEditPanel() -> void;
+  auto refreshEditPanel(const QModelIndex& curIndex) -> void;
 
   auto currentJsonString() const -> QString;
 
@@ -81,12 +72,14 @@ class JsonEditor : public QMainWindow {
 
   QFormLayout* m_editorPanel;
   QFormLayout* m_extraEditorPanel;  // no so frequently used key-value pair
+
   QWidget* m_editorWidget;
-  QListWidget* m_jsonList;
+
+  JsonModel* m_jsonModel;
+  JsonListView* m_jsonList;
 
   QMenuBar* m_menuBar;
   QToolBar* m_editorToolBar;
-  QMenu* m_listMenu;
 
   QSplitter* m_editorAndListSplitter;
 
