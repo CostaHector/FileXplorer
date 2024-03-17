@@ -1,0 +1,17 @@
+{
+    "Bitrate": "",
+    "Detail": "This is just a json example.",
+    "Hot": [
+    ],
+    "Name": "StudioName - Movie Name - Performer 1, Performer 2",
+    "Performers": [
+    ],
+    "ProductionStudio": "StudioName",
+    "Rate": 4,
+    "Resolution": "720p",
+    "Size": "126113854",
+    "Tags": [
+		"nonporn"
+    ],
+    "Uploaded": "20231022"
+}

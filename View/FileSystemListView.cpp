@@ -21,7 +21,7 @@ FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel) : QListView
   setDragEnabled(true);
   setDropIndicatorShown(true);
 
-  FileSystemListView::subscribe();
+  subscribe();
 
   setStyleSheet(ViewStyleSheet::LISTVIEW_STYLESHEET);
 }
