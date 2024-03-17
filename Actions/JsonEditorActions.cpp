@@ -27,6 +27,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _LAST_FILE(new QAction(QIcon(":/themes/LAST_JSON"), tr("Last"), this)),
       _NEXT_FILE(new QAction(QIcon(":/themes/NEXT_JSON"), tr("Next"), this)),
       _AUTO_SKIP(new QAction(QIcon(":/themes/AUTO_SKIP"), tr("Autoskip"), this)),
+      _COMPLETE_PERFS_COUNT(new QAction(QIcon(":/themes/COMPLETE_PERFS_COUNT"), tr("Perf Cnt"), this)),
       _QUICK_EDIT_ACTIONS{new QActionGroup(this)},
 
       _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), tr("Capitalize"), this)),
@@ -105,7 +106,12 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
-  _AUTO_SKIP->setCheckable(false);
+  _AUTO_SKIP->setCheckable(true);
+  _AUTO_SKIP->setChecked(true);
+
+  _COMPLETE_PERFS_COUNT->setToolTip(QString("<b>%1 (%2)</b><br/> Set json complete performer count")
+                                        .arg(_COMPLETE_PERFS_COUNT->text())
+                                        .arg(_COMPLETE_PERFS_COUNT->shortcut().toString()));
 
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcutVisibleInContextMenu(true);

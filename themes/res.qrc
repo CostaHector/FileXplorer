@@ -104,6 +104,7 @@
         <file alias="AI_IDEA">JsonEditor/AI_IDEA.svg</file>
         <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
         <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
+        <file alias="COMPLETE_PERFS_COUNT">JsonEditor/COMPLETE_PERFS_COUNT.svg</file>
         <file alias="FORMAT">JsonEditor/FORMAT.svg</file>
         <file alias="SUBMIT">JsonEditor/SUBMIT.svg</file>
         <file alias="NEXT_JSON">JsonEditor/NEXT_JSON.svg</file>
