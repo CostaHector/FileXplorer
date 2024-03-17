@@ -56,6 +56,7 @@ class JsonModel : public QAbstractListModel {
 
   void SetCompletePerfCount(int newCount);
   void updatePerfCount(int row);
+  void setPerfCount(int row, int newCount);
 
  private:
   int m_completeJsonPerfCount;
