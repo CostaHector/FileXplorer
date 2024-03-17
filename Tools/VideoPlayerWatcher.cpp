@@ -12,7 +12,7 @@ bool VideoPlayerWatcher::eventFilter(QObject* watched, QEvent* event) {
       return true;
     }
     if (m_controlled->isVisible()) {
-      if (me->pos().x() <= RIGHT_EDGE_WIDTH_PIXEL) {
+      if (me->pos().x() <= m_watched->width()) {
         m_controlled->setVisible(false);
       }
       return true;

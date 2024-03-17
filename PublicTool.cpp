@@ -1,5 +1,6 @@
 #include "PublicTool.h"
 #include "PublicVariable.h"
+#include "Tools/PathTool.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -62,8 +63,10 @@ OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool
       completeNames.append(fileInfo.fileName());
       suffixs.append("");
     } else {
-      completeNames.append(fileInfo.completeBaseName());
-      suffixs.append(fileInfo.suffix());
+      const QString& nm = fileInfo.fileName();
+      const int dotIndex = PATHTOOL::getFileExtensionDotIndex(nm);
+      completeNames.append(nm.left(dotIndex));
+      suffixs.append(nm.mid(dotIndex + 1));
     }
 
     if (includingSub and fileInfo.isDir()) {  // folders
@@ -77,8 +80,10 @@ OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool
           completeNames.append(fi.fileName());
           suffixs.append("");
         } else {
-          completeNames.append(fi.completeBaseName());
-          suffixs.append(fi.suffix());
+          const QString& nm = fileInfo.fileName();
+          const int dotIndex = PATHTOOL::getFileExtensionDotIndex(nm);
+          completeNames.append(nm.left(dotIndex));
+          suffixs.append(nm.mid(dotIndex + 1));
         }
       }
     }
