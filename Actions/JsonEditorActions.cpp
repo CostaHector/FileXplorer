@@ -27,7 +27,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _LAST_FILE(new QAction(QIcon(":/themes/LAST_JSON"), tr("Last"), this)),
       _NEXT_FILE(new QAction(QIcon(":/themes/NEXT_JSON"), tr("Next"), this)),
       _AUTO_SKIP(new QAction(QIcon(":/themes/AUTO_SKIP"), tr("Autoskip"), this)),
-      _CONDITION_NOT(new QAction(QIcon(":/themes/CONDITION_NOT"), tr("WhenNot"), this)),
       _QUICK_EDIT_ACTIONS{new QActionGroup(this)},
 
       _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":/themes/CAPITALIZE_EACH_WORD"), tr("Capitalize"), this)),
@@ -106,9 +105,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
-  _AUTO_SKIP->setCheckable(true);
-  _AUTO_SKIP->setChecked(true);
-  _CONDITION_NOT->setCheckable(true);
+  _AUTO_SKIP->setCheckable(false);
 
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcutVisibleInContextMenu(true);
@@ -139,7 +136,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _QUICK_EDIT_ACTIONS->addAction(_LAST_FILE);
   _QUICK_EDIT_ACTIONS->addAction(_NEXT_FILE);
   _QUICK_EDIT_ACTIONS->addAction(_AUTO_SKIP);
-  _QUICK_EDIT_ACTIONS->addAction(_CONDITION_NOT);
   _QUICK_EDIT_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   _TEXT_EDIT_ACTIONS->addAction(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
