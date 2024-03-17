@@ -99,11 +99,11 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
-  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_K));
+  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_K));
   _LAST_FILE->setShortcutVisibleInContextMenu(true);
   _LAST_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)").arg(_LAST_FILE->text()).arg(_LAST_FILE->shortcut().toString()));
 
-  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_J));
+  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_J));
   _NEXT_FILE->setShortcutVisibleInContextMenu(true);
   _NEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)").arg(_NEXT_FILE->text()).arg(_NEXT_FILE->shortcut().toString()));
 
