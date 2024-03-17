@@ -50,6 +50,7 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
+    Model/JsonModel.cpp \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
@@ -58,6 +59,7 @@ SOURCES += \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     View/AdvanceSearchTableView.cpp \
+    View/JsonListView.cpp \
     View/LogView.cpp \
     View/MovieDBView.cpp \
     View/TorrentsManagerWidget.cpp \
@@ -165,6 +167,7 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    Model/JsonModel.h \
     Model/LogModel.h \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
@@ -173,6 +176,7 @@ HEADERS += \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     View/AdvanceSearchTableView.h \
+    View/JsonListView.h \
     View/LogView.h \
     View/MovieDBView.h \
     View/TorrentsManagerWidget.h \
