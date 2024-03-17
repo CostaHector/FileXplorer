@@ -126,6 +126,7 @@ void JsonEditor::subscribe() {
 
   connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, m_jsonList, &JsonListView::onNext);
   connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, m_jsonList, &JsonListView::onLast);
+  connect(g_jsonEditorActions()._DONE_AND_NEXT, &QAction::triggered, this, &JsonEditor::onSaveAndNextUnfinishedItem);
   connect(g_jsonEditorActions()._COMPLETE_PERFS_COUNT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
 
   connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);  // (.json, save former .backup for recover)
@@ -203,7 +204,7 @@ bool JsonEditor::onStageChanges() {
   const auto curRow = m_jsonList->currentRow();
   if (not(0 <= curRow and curRow < m_jsonList->count())) {
     qWarning("try save on out of range[0, %d] row[%d]", m_jsonList->count(), curRow);
-    return true;
+    return false;
   }
 
   QVariantHash dict;
@@ -261,8 +262,16 @@ bool JsonEditor::onStageChanges() {
     qDebug("cannot copy json file[%s]", qPrintable(backupJsonPath));
     return false;
   }
-
   return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
+}
+
+bool JsonEditor::onSaveAndNextUnfinishedItem() {
+  const bool isSavedSucceed = onStageChanges();
+  if (not isSavedSucceed) {
+    return false;
+  }
+  m_jsonList->onNext();
+  return true;
 }
 
 bool JsonEditor::onResetChanges() {
