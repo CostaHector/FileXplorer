@@ -34,7 +34,6 @@ struct AlertItem {
 class PreferenceModel : public QAbstractTableModel {
  public:
   explicit PreferenceModel(QObject* parent = nullptr);
-  void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
 
   QModelIndex setRootPath(const QString& /*path*/);
 

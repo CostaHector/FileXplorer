@@ -33,20 +33,15 @@ JsonEditor::JsonEditor(QWidget* parent)
       m_editorPanel(new QFormLayout),
       m_extraEditorPanel(new QFormLayout),
       m_editorWidget(new QWidget(this)),
-      m_jsonList(new QListWidget(this)),
+
+      m_jsonModel{new JsonModel{this}},
+      m_jsonList(new JsonListView{m_jsonModel, this}),
 
       m_menuBar(g_jsonEditorActions().GetJsonMenuBar(this)),
       m_editorToolBar(g_jsonEditorActions().GetJsonToolBar(this)),
-      m_listMenu(g_jsonEditorActions().GetJsonToBeEdittedListMenu(this)),
       m_editorAndListSplitter(new QSplitter(Qt::Orientation::Horizontal, this)) {
   setMenuBar(m_menuBar);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_editorToolBar);
-
-  m_jsonList->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_jsonList->setAlternatingRowColors(true);
-  m_jsonList->setSortingEnabled(true);
-  m_jsonList->setDragDropMode(QAbstractItemView::NoDragDrop);
-  m_jsonList->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
   for (const QString& jsonKey : JSONKey::JsonKeyListOrder) {
     m_editorPanel->addRow(jsonKey, freqJsonKeyValue[jsonKey]);
@@ -70,95 +65,14 @@ JsonEditor::JsonEditor(QWidget* parent)
   updateWindowsSize();
 }
 
-bool JsonEditor::hasLast() const {
-  const auto curRow = m_jsonList->currentRow();
-  return curRow - 1 >= 0;
-}
-
-void JsonEditor::last() {
-  const auto curRow = m_jsonList->currentRow() - 1;
-  m_jsonList->setCurrentRow(curRow);
-  qDebug("last curRow %d", curRow);
-}
-
-bool JsonEditor::hasNext() const {
-  const auto curRow = m_jsonList->currentRow();
-  return curRow + 1 < m_jsonList->count();
-}
-
-void JsonEditor::next() {
-  const auto curRow = m_jsonList->currentRow() + 1;
-  m_jsonList->setCurrentRow(curRow);
-  qDebug("next curRow %d", curRow);
-}
-
-void JsonEditor::onAutoSkipSwitch(const bool checked) {
-  if (not checked) {
-    return;
-  }
-  bool okClicked = false;
-  const int PAUSE_CNT = PreferenceSettings()
-                            .value(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.v)
-                            .toInt();
-  const QString& pauseCntStr =
-      QInputDialog::getItem(this, "Auto Skip when perforers count < ?", MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name,
-                            {QString::number(PAUSE_CNT), "1", "2", "3", "4", "5"}, 0, false, &okClicked);
-  if (not okClicked or pauseCntStr.isEmpty()) {
-    qDebug("Cancel");
-    return;
-  }
-  PreferenceSettings().setValue(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, pauseCntStr.toInt());
-}
-
-void JsonEditor::autoNext() {
-  const auto reverseCondition = g_jsonEditorActions()._CONDITION_NOT->isChecked();
-  const int PAUSE_CNT = PreferenceSettings()
-                            .value(MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.name, MemoryKey::AUTO_SKIP_WHEN_PERFORMERS_CNT_LESS_THAN.v)
-                            .toInt();
-
-  for (auto curRow = m_jsonList->currentRow() + 1; curRow < m_jsonList->count(); ++curRow) {
-    const QString& curJsonPath = m_jsonList->item(curRow)->text();
-    const auto& dict = JsonFileHelper::MovieJsonLoader(curJsonPath);
-    if (dict.isEmpty()) {
-      continue;
-    }
-    qDebug("len(performers)=%d, [%s]", dict[DB_HEADER_KEY::Performers].toJsonArray().size(), qPrintable(curJsonPath));
-    if ((dict[DB_HEADER_KEY::Performers].toJsonArray().size() < PAUSE_CNT) == not reverseCondition) {
-      m_jsonList->item(curRow)->setForeground(NOT_MEET_CONDITION_COLOR);
-      m_jsonList->setCurrentRow(curRow);
-      return;
-    }
-    m_jsonList->item(curRow)->setForeground(MEET_CONDITION_COLOR);
-  }
-  if (m_jsonList->count() > 0) {
-    m_jsonList->setCurrentRow(m_jsonList->count() - 1);
-  }
-}
-
-void JsonEditor::onNext() {
-  if (g_jsonEditorActions()._AUTO_SKIP->isChecked()) {
-    autoNext();
-    return;
-  }
-  if (hasNext()) {
-    next();
-  }
-}
-
-void JsonEditor::onLast() {
-  if (hasLast()) {
-    last();
-  }
-}
-
-void JsonEditor::refreshEditPanel() {
+void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
   jsonKeySetMet.clear();
-  if (not m_jsonList->currentItem()) {
-    qDebug("skip refresh edit panel");
+  if (not curIndex.isValid()) {
+    qWarning("Current index invalid");
     return;
   }
-
-  const QString& curJsonPath = m_jsonList->currentItem()->text();
+  m_jsonModel->updatePerfCount(curIndex.row());
+  const QString& curJsonPath = m_jsonList->filePath(curIndex.row());
   qDebug("refreshEditPanel %s", qPrintable(curJsonPath));
   const auto& jsonDict = JsonFileHelper::MovieJsonLoader(curJsonPath);
   const QList<QPair<QString, QVariant>>& jsonItem = JsonFileHelper::MapToOrderedList(jsonDict);
@@ -205,31 +119,14 @@ void JsonEditor::refreshEditPanel() {
 }
 
 void JsonEditor::subscribe() {
-  connect(m_jsonList, &QListWidget::itemSelectionChanged, this, &JsonEditor::refreshEditPanel);
-  connect(m_jsonList, &QListWidget::itemDoubleClicked, this,
-          [](const QListWidgetItem* item) { QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(item->text()).absolutePath())); });
-
-  auto ShowContextMenu = [this](const QPoint pnt) {
-    m_listMenu->popup(m_jsonList->mapToGlobal(pnt));  // or QCursor::pos()
-  };
-  connect(m_jsonList, &QListView::customContextMenuRequested, ShowContextMenu);
-
-  connect(g_jsonEditorActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this, [this]() {
-    if (m_jsonList->currentItem())
-      QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(m_jsonList->currentItem()->text()).absolutePath()));
-  });
-  connect(g_jsonEditorActions()._OPEN_THIS_FILE, &QAction::triggered, this, [this]() {
-    if (m_jsonList->currentItem())
-      QDesktopServices::openUrl(QUrl::fromLocalFile(m_jsonList->currentItem()->text()));
-  });
+  connect(m_jsonList->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonEditor::refreshEditPanel);
 
   connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
-  connect(g_jsonEditorActions()._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, this, &JsonEditor::refreshEditPanel);
+  connect(g_jsonEditorActions()._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, this, [this]() { refreshEditPanel(m_jsonList->currentIndex()); });
 
-  connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, this, &JsonEditor::onNext);
-  connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, this, &JsonEditor::onLast);
-
-  connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, this, &JsonEditor::onAutoSkipSwitch);
+  connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, m_jsonList, &JsonListView::onNext);
+  connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, m_jsonList, &JsonListView::onLast);
+  connect(g_jsonEditorActions()._AUTO_SKIP, &QAction::triggered, m_jsonList, &JsonListView::onAutoSkipSwitch);
 
   connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);  // (.json, save former .backup for recover)
   connect(g_jsonEditorActions()._CANCEL, &QAction::triggered, this, &JsonEditor::onResetChanges);
@@ -245,7 +142,6 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
 
   connect(g_jsonEditorActions()._BROWSE_AND_SELECT_THE_FOLDER, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
-  connect(g_jsonEditorActions()._CLR_TO_BE_EDITED_LIST, &QAction::triggered, this->m_jsonList, &QListWidget::clear);
 
   connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
@@ -296,7 +192,7 @@ int JsonEditor::onLoadASelectedPath(const QString& folderPath) {
   QFileInfo loadFromFi(loadFromPath);
   if (not loadFromFi.isDir()) {
     QMessageBox::warning(this, "Failed when Load json from a folder", QString("Not a folder:\n%1").arg(folderPath));
-    qDebug("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(folderPath));
+    qWarning("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(folderPath));
     return 0;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, loadFromFi.absoluteFilePath());
@@ -304,6 +200,12 @@ int JsonEditor::onLoadASelectedPath(const QString& folderPath) {
 }
 
 bool JsonEditor::onStageChanges() {
+  const auto curRow = m_jsonList->currentRow();
+  if (not(0 <= curRow and curRow < m_jsonList->count())) {
+    qWarning("try save on out of range[0, %d] row[%d]", m_jsonList->count(), curRow);
+    return true;
+  }
+
   QVariantHash dict;
   for (auto r = 0; r != m_extraEditorPanel->rowCount(); ++r) {
     const QString& keyName = qobject_cast<QLabel*>(m_extraEditorPanel->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
@@ -339,12 +241,8 @@ bool JsonEditor::onStageChanges() {
       dict.insert(keyName, valueStr);
     }
   }
-
-  const auto curRow = m_jsonList->currentRow();
-  if (curRow == -1) {
-    return true;
-  }
-  const QString& curJsonPath = m_jsonList->item(curRow)->text();
+  m_jsonModel->updatePerfCount(curRow);
+  const QString& curJsonPath = m_jsonList->filePath(curRow);
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (QFile::exists(backupJsonPath)) {
     const auto rmRet = QFile::remove(backupJsonPath);
@@ -354,7 +252,6 @@ bool JsonEditor::onStageChanges() {
     }
   }
   const auto copyRet = QFile::copy(curJsonPath, backupJsonPath);
-
   qDebug("result:%d, changes->%s, backup: %s", int(copyRet), qPrintable(curJsonPath), qPrintable(backupJsonPath));
   if (not copyRet) {
     qDebug("cannot copy json file[%s]", qPrintable(backupJsonPath));
@@ -368,7 +265,7 @@ bool JsonEditor::onResetChanges() {
   if (curRow == -1) {
     return true;
   }
-  const QString& curJsonPath = m_jsonList->item(curRow)->text();
+  const QString& curJsonPath = m_jsonList->filePath(curRow);
   const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
   if (not QFile::exists(backupJsonPath)) {
     qDebug("cannot reset. backup file[%s] not exist", qPrintable(backupJsonPath));
@@ -382,7 +279,7 @@ bool JsonEditor::onSubmitAllChanges() {
   int succeedCnt = 0;
   int failCnt = 0;
   for (auto r = 0; r < m_jsonList->count(); ++r) {
-    const QString& curJsonPath = m_jsonList->item(r)->text();
+    const QString& curJsonPath = m_jsonList->filePath(r);
     const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
     if (QFile::exists(backupJsonPath)) {
       const auto ret = QFile::remove(backupJsonPath);
@@ -574,28 +471,12 @@ bool JsonEditor::formatter() {
 }
 
 int JsonEditor::load(const QString& path) {
-  if (not QDir(path).exists()) {
-    return 0;
-  }
-  const int beforeJsonFileCnt = m_jsonList->count();
-  QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    if (m_jsonList->findItems(it.filePath(), Qt::MatchFlag::MatchExactly).isEmpty()) {
-      m_jsonList->addItem(it.filePath());
-    }
-  }
-  const int afterJsonFileCnt = m_jsonList->count();
-  const int deltaFile = afterJsonFileCnt - beforeJsonFileCnt;
-
+  const int deltaFile = m_jsonList->load(path);
   setWindowTitle(TITLE_TEMPLATE.arg(deltaFile).arg(m_jsonList->count()));
-  if (deltaFile != 0) {
-    m_jsonList->setCurrentRow(beforeJsonFileCnt);
-  }
   return deltaFile;
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
