@@ -293,14 +293,14 @@ class FileOperation {
         }
         auto mkpthRet = QDir(toPth).mkpath(toRel);
         if (not mkpthRet) {
-          qDebug("Failed QDir(%s).mkpath(%s)", qPrintable(toPth), qPrintable(toRel));
+          qWarning("Failed QDir(%s).mkpath(%s)", qPrintable(toPth), qPrintable(toRel));
           return {ErrorCode::UNKNOWN_ERROR, recoverList};
         }
         recoverList.append({"rmpath", toPth, toRel});
       } else {  // file
         auto cpRet = QFile(fromPth).copy(toPath);
         if (not cpRet) {
-          qDebug("Failed QFile(%s).copy(%s)", qPrintable(fromPth), qPrintable(toPath));
+          qWarning("Failed QFile(%s).copy(%s)", qPrintable(fromPth), qPrintable(toPath));
           return {ErrorCode::UNKNOWN_ERROR, recoverList};
         }
         recoverList.append({"rmfile", toPth, toRel});
@@ -362,13 +362,13 @@ class FileOperation {
       BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
       if (ret != ErrorCode::OK) {
         ++failedCommandCnt;
-        const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]\n").arg(k).arg(vals.join(",")).arg(vals.size());
-        qDebug("%s", qPrintable(msg));
+        const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]").arg(k).arg(vals.join(",")).arg(vals.size());
+        qWarning("%s", qPrintable(msg));
         log += msg;
       }
       if (k == "moveToTrash" and not srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
         if (recover.size() > 1) {
-          qDebug("moveToTrash recover command can only <= 1. Here is[%d]", recover.size());
+          qWarning("moveToTrash recover command can only <= 1. Here is[%d]", recover.size());
           assert(false);
         }
         if (recover.size() == 1) {
@@ -381,8 +381,8 @@ class FileOperation {
     }
 
     if (failedCommandCnt != 0) {
-      qDebug("Above %d command(s) failed.", failedCommandCnt);
-      log += QString("Above %1 command(s) failed.\n").arg(failedCommandCnt);
+      qWarning("Above %d command(s) failed.", failedCommandCnt);
+      log += QString("Above %1 command(s) failed.").arg(failedCommandCnt);
       WriteIntoLogFile(log);
     }
     // in-place reverse

@@ -54,9 +54,9 @@ bool PropertiesWindow::operator()(const QStringList& items) {
   QFileInfo fi(items.first());
   QString propertiesMsg;
   if (items.size() == 1) {
-    propertiesMsg += QString("General:\n  Name:\t%1\n  Location:\t%2\n").arg(fi.fileName()).arg(fi.absolutePath());
+    propertiesMsg += QString("General: Name:[%1]\n  Location:[%2]\n").arg(fi.fileName()).arg(fi.absolutePath());
   } else {
-    propertiesMsg += QString("General:\n  %1 items\n").arg(items.size());
+    propertiesMsg += QString("General: %1 items\n").arg(items.size());
   }
   if (m_showMore->isChecked()) {
     // total size, files count, folders count
