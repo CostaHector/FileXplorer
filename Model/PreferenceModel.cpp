@@ -1,7 +1,7 @@
 #include "PreferenceModel.h"
 #include "PublicVariable.h"
 
-const QStringList AlertItem::ALERT_TABLE_HEADER{"Number", "Name", "Value", "Note", "isOk"};
+const QStringList AlertItem::ALERT_TABLE_HEADER{"ID", "Name", "Value", "Note", "isOk"};
 
 AlertItem::AlertItem(int alarmID_, const KV* kv_, QString note_)
     : m_kv(kv_), alarmID(alarmID_), name(m_kv->name), value{getStoredValue()}, note(note_), checkRes{isStoredValuePass()} {}
