@@ -25,8 +25,8 @@ class JsonListView : public QListView {
 
   auto last() -> void;
   auto next() -> void;
-
-  auto onAutoSkipSwitch(const bool checked) -> void;
+  
+  auto onSetPerfCount(const bool checked) -> void;
   void autoNext();
 
   auto onNext() -> void;
