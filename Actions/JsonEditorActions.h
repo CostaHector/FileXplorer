@@ -48,6 +48,7 @@ class JsonEditorActions : public QObject {
   QAction* _FORMATTER;
   QAction* _RELOAD_JSON_FROM_FROM_DISK;
   QAction* _ADD_SELECTED_PERFORMER;
+  QAction* _EXTRACT_CAPITALIZED_PERFORMER;
   QActionGroup* _TEXT_EDIT_ACTIONS;
 
   QAction* _SAVE;

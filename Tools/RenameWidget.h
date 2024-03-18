@@ -496,30 +496,6 @@ class RenameWidget_Case : public RenameWidget {
   }
   //    FIRST_LETTER_OF_EACH_WORD_COMP = re.compile("(^|\s)(\S)");
 
-  static QString CapitaliseEachWordFirstLetterOnly(const QString& sentence) {
-    QStringList words = sentence.split(' ', Qt::SkipEmptyParts);
-    for (QString& word : words) {
-      word.front() = word.front().toUpper();
-    }
-    return words.join(" ");
-  }
-  static QString CapitaliseEachWordFirstLetterLowercaseOthers(QString sentence) {
-    const QString& sentenceInLowercase = sentence.toLower();
-    return CapitaliseEachWordFirstLetterOnly(sentenceInLowercase);
-  }
-
-  static QString ToggleSentenceCase(const QString& sentence) {
-    QString toggled;
-    for (QChar c : sentence) {
-      if (c.isLetter()) {
-        toggled += (c.toLatin1() ^ 0x20);  // trick upper to lower case by bitwise operator
-      } else {
-        toggled += c;
-      }
-    }
-    return toggled;
-  }
-
   auto RenameCore(const QStringList& replaceeList) -> QStringList override;
 
   static QStringList ChangeCaseRename(const QStringList& replaceeList, const QString& caseRuleName);

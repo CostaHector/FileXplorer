@@ -7,6 +7,7 @@
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
+#include "Tools/NameTool.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -318,7 +319,7 @@ int PerformersWidget::onLoadFromPerformersList() {
     if (line.isEmpty()) {
       continue;
     }
-    QStringList aka = line.split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+    QStringList aka = NameTool()(line);
     QString stdName = aka.front();
     aka.pop_front();
     perfs.insert(stdName, aka.join(","));

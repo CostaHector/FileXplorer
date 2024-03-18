@@ -333,8 +333,6 @@ const QRegExp RESOLUTION_COMP("2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD", Qt
 const QRegExp CONTINOUS_SPACE("\\s+");
 
 const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
-
-const QRegExp SEPERATOR_COMP(" and | & | , |,\r\n|, | ,|& | &|; | ;|\r\n|,\n|\n|,|;|&|\\+", Qt::CaseInsensitive);
 }  // namespace JSON_RENAME_REGEX
 
 #include <QColor>

@@ -36,6 +36,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), tr("Formatter"), this)),
       _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_FROM_DISK"), tr("Reload now"), this)),
       _ADD_SELECTED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), tr("Append to perfs"), this)),
+      _EXTRACT_CAPITALIZED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), tr("Append capitalized to perfs"), this)),
       _TEXT_EDIT_ACTIONS{new QActionGroup(this)},
 
       _SAVE(new QAction(QIcon(":/themes/SAVED"), tr("save"), this)),
@@ -75,6 +76,10 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _ADD_SELECTED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Append selection to performers lineeditor")
                                           .arg(_ADD_SELECTED_PERFORMER->text())
                                           .arg(_ADD_SELECTED_PERFORMER->shortcut().toString()));
+
+  _EXTRACT_CAPITALIZED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Append capitalized name in selection to performers lineeditor")
+                                                 .arg(_EXTRACT_CAPITALIZED_PERFORMER->text())
+                                                 .arg(_EXTRACT_CAPITALIZED_PERFORMER->shortcut().toString()));
 
   _SAVE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
   _SAVE->setShortcutVisibleInContextMenu(true);
@@ -159,6 +164,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _TEXT_EDIT_ACTIONS->addAction(_FORMATTER);
   _TEXT_EDIT_ACTIONS->addAction(_RELOAD_JSON_FROM_FROM_DISK);
   _TEXT_EDIT_ACTIONS->addAction(_ADD_SELECTED_PERFORMER);
+  _TEXT_EDIT_ACTIONS->addAction(_EXTRACT_CAPITALIZED_PERFORMER);
 
   _SYSTEM_ACTIONS->addAction(_REVEAL_IN_EXPLORER);
   _SYSTEM_ACTIONS->addAction(_OPEN_THIS_FILE);

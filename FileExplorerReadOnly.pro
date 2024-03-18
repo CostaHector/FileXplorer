@@ -56,6 +56,7 @@ SOURCES += \
     Model/PreferenceModel.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
+    Tools/NameTool.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     View/AdvanceSearchTableView.cpp \
@@ -173,6 +174,7 @@ HEADERS += \
     Model/PreferenceModel.h \
     Tools/Log.h \
     Tools/MessageOutput.h \
+    Tools/NameTool.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     View/AdvanceSearchTableView.h \

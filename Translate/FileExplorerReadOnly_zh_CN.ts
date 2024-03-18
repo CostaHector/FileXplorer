@@ -546,77 +546,82 @@
     <message>
         <location filename="../Actions/JsonEditorActions.cpp" line="38"/>
         <source>Append to perfs</source>
-        <translation>追加到演员值中</translation>
+        <translation>追加选中演员名</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="41"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="39"/>
+        <source>Append capitalized to perfs</source>
+        <translation>追加选中且大写演员名</translation>
+    </message>
+    <message>
+        <location filename="../Actions/JsonEditorActions.cpp" line="42"/>
         <source>save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="42"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="43"/>
         <source>cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="43"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="44"/>
         <source>submit</source>
         <translation>提交修改</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="46"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="47"/>
         <source>Reveal</source>
         <translation>在资源管理器中显示</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="47"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="48"/>
         <source>Open</source>
         <translation>打开Json文件</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="50"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="51"/>
         <source>AI Hint</source>
         <translation>AI提示</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="51"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="52"/>
         <source>AI Library</source>
         <oldsource>&gt;&gt;AI Library</oldsource>
         <translation>供AI学习</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="54"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="55"/>
         <source>Select Current path</source>
         <oldsource>Select Current folder and load from it</oldsource>
         <translation>选中并读取当前路径</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="55"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="56"/>
         <source>Construct jsons by file properties</source>
         <translation>构建Jsons根据视频文件数据</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="56"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="57"/>
         <source>Append performers</source>
         <translation>追加演员名</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="57"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="58"/>
         <source>Set production studio</source>
         <translation>设置制片商</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="58"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="59"/>
         <source>Construct performers k-v pair</source>
         <translation>构建演职员KV对</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="59"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="60"/>
         <source>Construct studio k-v pair</source>
         <translation>构建产商KV对</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="60"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="61"/>
         <source>Clear performers and studio values</source>
         <translation>清空演员和厂商值</translation>
     </message>
@@ -853,7 +858,7 @@
 <context>
     <name>PerformersWidget</name>
     <message>
-        <location filename="../Component/PerformersWidget.cpp" line="28"/>
+        <location filename="../Component/PerformersWidget.cpp" line="29"/>
         <source>Overview</source>
         <translation>全览</translation>
     </message>
