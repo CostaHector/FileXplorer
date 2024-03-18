@@ -6,6 +6,7 @@
 #include "Tools/ProductionStudioManager.h"
 
 #include "Tools/JsonFileHelper.h"
+#include "Tools/NameTool.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/StringEditHelper.h"
@@ -141,6 +142,7 @@ void JsonEditor::subscribe() {
   });
 
   connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
+  connect(g_jsonEditorActions()._EXTRACT_CAPITALIZED_PERFORMER, &QAction::triggered, this, &JsonEditor::onExtractCapitalizedPerformersHint);
 
   connect(g_jsonEditorActions()._BROWSE_AND_SELECT_THE_FOLDER, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
 
@@ -225,7 +227,7 @@ bool JsonEditor::onStageChanges() {
 
     const QString& valueStr = qobject_cast<QLineEdit*>(freqJsonKeyValue[keyName])->text().trimmed();
     if (keyName == JSONKey::Performers or keyName == JSONKey::Tags) {
-      const auto& arr = JsonFileHelper::PerformersString2StringList(valueStr);
+      const auto& arr = NameTool()(valueStr);
       dict.insert(keyName, arr);
     } else if (keyName == JSONKey::Hot) {
       const auto& arr = JsonFileHelper::HotSceneString2IntList(valueStr);
@@ -376,7 +378,7 @@ QStringList JsonEditor::onPerformersHint() {
   const QStringList& newPerfsList = pm(sentence);
   QStringList beforePerfsList;
   if (not p->text().isEmpty()) {
-    beforePerfsList = p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+    beforePerfsList = NameTool()(p->text());
   }
   if (beforePerfsList.size() < newPerfsList.size()) {
     p->setText(newPerfsList.join(", "));
@@ -394,6 +396,38 @@ QStringList JsonEditor::onPerformersHint() {
   return newPerfsList;
 }
 
+auto JsonEditor::onExtractCapitalizedPerformersHint() -> bool {
+  static PerformersManager& pm = PerformersManager::getIns();
+
+  if (not jsonKeySetMet.contains(JSONKey::Performers)) {
+    jsonKeySetMet.insert(JSONKey::Performers);
+  }
+
+  QStringList perfs;
+  auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
+  if (not p->text().isEmpty()) {
+    perfs += NameTool()(p->text());
+  }
+
+  if (jsonKeySetMet.contains(JSONKey::Name)) {
+    const auto* le = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Name]);
+    if (le->hasSelectedText()) {
+      const QString& capitalizedStr = le->selectedText();
+      perfs << NameTool().fromArticleCapitalizedNames(capitalizedStr);
+    }
+  }
+  if (jsonKeySetMet.contains(JSONKey::Detail)) {
+    const auto* te = qobject_cast<QTextEdit*>(freqJsonKeyValue[JSONKey::Detail]);
+    if (te->textCursor().hasSelection()) {
+      const QString& capitalizedStr = te->textCursor().selection().toPlainText();
+      perfs += NameTool().fromArticleCapitalizedNames(capitalizedStr);
+    }
+  }
+  perfs.removeDuplicates();
+  p->setText(perfs.join(", "));
+  return true;
+}
+
 bool JsonEditor::onSelectedTextAppendToPerformers() {
   static PerformersManager& pm = PerformersManager::getIns();
 
@@ -404,7 +438,7 @@ bool JsonEditor::onSelectedTextAppendToPerformers() {
   QStringList perfs;
   auto* p = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
   if (not p->text().isEmpty()) {
-    perfs += p->text().split(JSON_RENAME_REGEX::SEPERATOR_COMP);
+    perfs += NameTool()(p->text());
   }
 
   if (jsonKeySetMet.contains(JSONKey::Name)) {
@@ -472,15 +506,13 @@ void JsonEditor::onEditStudios() {
 bool JsonEditor::formatter() {
   if (jsonKeySetMet.contains(JSONKey::Performers)) {
     auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Performers]);
-    QString valueStr = lineWidget->text();
-    valueStr.replace(JSON_RENAME_REGEX::SEPERATOR_COMP, ", ");
-    lineWidget->setText(valueStr.trimmed());
+    const QStringList& stdNameList = NameTool()(lineWidget->text());
+    lineWidget->setText(stdNameList.join(", "));
   }
   if (jsonKeySetMet.contains(JSONKey::Tags)) {
     auto* lineWidget = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::Tags]);
-    QString valueStr = lineWidget->text();
-    valueStr.replace(JSON_RENAME_REGEX::SEPERATOR_COMP, ", ");
-    lineWidget->setText(valueStr.trimmed());
+    const QStringList& stdTagsList = NameTool()(lineWidget->text());
+    lineWidget->setText(stdTagsList.join(", "));
   }
 }
 

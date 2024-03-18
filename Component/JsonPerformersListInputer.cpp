@@ -4,8 +4,10 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QPushButton>
-#include "Tools/PerformersManager.h"
 #include "Tools/JsonFileHelper.h"
+#include "Tools/NameTool.h"
+#include "Tools/PerformersManager.h"
+
 JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)
     : QDialog{parent, f},
       m_onePerf(new QLineEdit),
@@ -43,7 +45,7 @@ bool JsonPerformersListInputer::appendAPerformer() {
   const QString& stdPerf = stdPerfL.join(' ');
 
   const QString& perfs = text();
-  QStringList perfsL = (perfs.isEmpty() ? QStringList() : perfs.split(JSON_RENAME_REGEX::SEPERATOR_COMP));
+  QStringList perfsL = (perfs.isEmpty() ? QStringList() : NameTool()(perfs));
 
   if (perfsL.contains(stdPerf)) {
     return false;
@@ -58,8 +60,7 @@ void JsonPerformersListInputer::uniquePerformers() {
   if (perfs.isEmpty()) {
     return;
   }
-  QStringList perfL = perfs.split(JSON_RENAME_REGEX::SEPERATOR_COMP);
-  perfL.removeDuplicates();
+  const QStringList& perfL = NameTool()(perfs);
   m_perfsList->setText(perfL.join(", "));
 }
 
@@ -74,7 +75,7 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
     return false;
   }
   const QString& perfs = text();
-  dict[JSONKey::Performers] = JsonFileHelper::PerformersString2StringList(perfs);
+  dict[JSONKey::Performers] = NameTool()(perfs);
   return JsonFileHelper::MovieJsonDumper(dict, jsonFilePath);
 }
 
