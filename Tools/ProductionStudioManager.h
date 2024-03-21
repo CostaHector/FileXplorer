@@ -20,7 +20,7 @@ class ProductionStudioManager {
 
   auto operator()(QString sentence) const -> QString;
   auto operator[](const QString& nm) const -> QString {
-    return m_prodStudioMap.contains(nm.toLower()) ? m_prodStudioMap[nm.toLower()].toString() : "";
+    return m_prodStudioMap.contains(nm.toLower()) ? m_prodStudioMap[nm.toLower()].toString() : nm;
   }
 
   int ForceReloadStdStudioName();
