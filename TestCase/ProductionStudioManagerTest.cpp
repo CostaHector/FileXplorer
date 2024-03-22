@@ -40,7 +40,12 @@ class ProductionStudioManagerTest : public QObject {
     QCOMPARE(psm("[bait bus] 2008 - Part.mp4"), "BaitBus");
     QCOMPARE(psm("[baitbus] 2008 - Part.mp4"), "BaitBus");
   }
+
+  void test_hintStudioName(){
+    QCOMPARE(psm.hintStdStudioName("not a studio map at all - 2008 - Part.mp4"), "");
+    QCOMPARE(psm.hintStdStudioName("Men at play - 2008 - Part.mp4"), "MenAtPlay");
+  }
 };
 
-// QTEST_MAIN(ProductionStudioManagerTest)
-// #include "ProductionStudioManagerTest.moc"
+ QTEST_MAIN(ProductionStudioManagerTest)
+ #include "ProductionStudioManagerTest.moc"
