@@ -18,9 +18,12 @@ class ProductionStudioManager {
 
   QStringList StandardProductionStudioFrom(QString standardPs) const;
 
-  auto operator()(QString sentence) const -> QString;
-  auto operator[](const QString& nm) const -> QString {
-    return m_prodStudioMap.contains(nm.toLower()) ? m_prodStudioMap[nm.toLower()].toString() : nm;
+  QString hintStdStudioName(const QString& sentence) const;// from a studio name
+
+  QString operator()(const QString& sentence) const; // from a file name
+  QString operator[](const QString& nm) const {
+    auto it = m_prodStudioMap.find(nm.toLower());
+    return it != m_prodStudioMap.cend() ? it.value().toString() : nm;
   }
 
   int ForceReloadStdStudioName();
@@ -33,6 +36,8 @@ class ProductionStudioManager {
   QVariantHash m_prodStudioMap;
 
  private:
+  QString FileName2StudioNameSection(QString sentence) const;
+
   ProductionStudioManager();
 };
 

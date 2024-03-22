@@ -77,15 +77,27 @@ QStringList ProductionStudioManager::StandardProductionStudioFrom(QString standa
   return {pslower, psWithSpace.toLower()};
 }
 
-auto ProductionStudioManager::operator()(QString sentence) const -> QString {
+QString ProductionStudioManager::FileName2StudioNameSection(QString sentence) const{
   sentence.remove(leadingStrComp);          // remove [FFL], [FL], [GT]
   sentence.remove(leadingOpenBracketComp);  // remove open braces [({
   sentence.replace(nonLeadingBracketComp, "-");
 
   QString prodStudioSection = sentence.split("-")[0];
   QString noInvalidStr = prodStudioSection.remove(DISCRAD_LETTER_COMP);
-  const QString& inputStr = noInvalidStr.trimmed();
-  return (*this)[inputStr];
+  const QString& studioNameSection = noInvalidStr.trimmed();
+  return studioNameSection;
+}
+
+auto ProductionStudioManager::operator()(const QString& sentence) const -> QString {
+  const QString studioNameSection = FileName2StudioNameSection(sentence);
+  return this->operator[](studioNameSection);
+}
+
+QString ProductionStudioManager::hintStdStudioName(const QString& sentence) const {
+  const QString& studioNameSection = FileName2StudioNameSection(sentence);
+  const QString& lowercaseStudioName = studioNameSection.toLower();
+  auto it = m_prodStudioMap.find(lowercaseStudioName);
+  return it != m_prodStudioMap.cend() ? it.value().toString() : "";
 }
 
 // #define __NAME__EQ__MAIN__ 1

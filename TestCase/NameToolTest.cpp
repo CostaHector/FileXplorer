@@ -180,5 +180,5 @@ void NameToolTest::test_ToggleCase() {
   QCOMPARE(NameTool::ToggleSentenceCase("Henry Cavill"), "hENRY cAVILL");
 }
 
-QTEST_MAIN(NameToolTest)
+//QTEST_MAIN(NameToolTest)
 #include "NameToolTest.moc"
