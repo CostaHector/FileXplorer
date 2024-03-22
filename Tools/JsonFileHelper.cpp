@@ -134,7 +134,7 @@ int JsonFileHelper::JsonProductionStudiosKeyValuePairAdd(const QString& path) {
       continue;
     }
     const QString& sentence = dict.contains(JSONKey::Name) ? dict[JSONKey::Name].toString() : "";
-    dict.insert(JSONKey::ProductionStudio, psm(sentence));
+    dict.insert(JSONKey::ProductionStudio, psm.hintStdStudioName(sentence));
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryKVPairCnt;
   }

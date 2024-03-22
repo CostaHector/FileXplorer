@@ -389,7 +389,7 @@ QStringList JsonEditor::onPerformersHint() {
   }
 
   auto* ps = qobject_cast<QLineEdit*>(freqJsonKeyValue[JSONKey::ProductionStudio]);
-  const QString newProdStudioName = psm(nameText);
+  const QString& newProdStudioName = psm.hintStdStudioName(nameText);
   if (not newProdStudioName.isEmpty()) {
     ps->setText(newProdStudioName);
   }
