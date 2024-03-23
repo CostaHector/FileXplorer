@@ -37,7 +37,7 @@ class SearchProxyModel : public QSortFilterProxyModel {
 
   void changeCustomSearchNameAndContents(const QString& searchText);
 
-  void initNameFilterDisables(bool hide) { m_nameFilterHideOrDisable = hide; }
+  void initNameFilterDisables(bool hide) { m_nameFilterDisableOrHide = hide; }
   void setNameFilterDisables(bool hide);
 
   inline void initFileContentsCaseSensitive(bool sensitive) { m_fileContentsCaseSensitive = sensitive; }
@@ -61,6 +61,6 @@ class SearchProxyModel : public QSortFilterProxyModel {
   bool m_fileContentsCaseSensitive;
   bool m_nameFiltersCaseSensitive;
 
-  bool m_nameFilterHideOrDisable;
+  bool m_nameFilterDisableOrHide;
 };
 #endif  // SEARCHPROXYMODEL_H

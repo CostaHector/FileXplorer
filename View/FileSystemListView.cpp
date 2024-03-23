@@ -1,5 +1,6 @@
 #include "FileSystemListView.h"
 
+#include "Actions/RightClickMenuActions.h"
 #include "View/FileSystemListView.h"
 #include "View/ViewHelper.h"
 #include "View/ViewStyleSheet.h"
@@ -27,8 +28,9 @@ FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel) : QListView
 }
 
 void FileSystemListView::subscribe() {
-  //  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
-  //          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
+  addAction(g_rightClickActions()._CALC_MD5_ACT);
+  addAction(g_rightClickActions()._PROPERTIES);
+
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 

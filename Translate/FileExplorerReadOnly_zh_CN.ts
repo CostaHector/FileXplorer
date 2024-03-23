@@ -413,9 +413,9 @@
     </message>
     <message>
         <location filename="../Component/FileSystemTypeFilter.h" line="55"/>
-        <source>hide/disable the entries don&apos;t pass name filter</source>
-        <translatorcomment>true:隐藏; false:灰化</translatorcomment>
-        <translation>隐藏/灰化未通过项目</translation>
+        <source>disable the entries don&apos;t pass name filter</source>
+        <translatorcomment>true:灰化; false:隐藏</translatorcomment>
+        <translation>灰化未通过项目</translation>
     </message>
     <message>
         <location filename="../Component/FileSystemTypeFilter.h" line="56"/>
@@ -866,7 +866,7 @@
 <context>
     <name>PropertiesWindow</name>
     <message>
-        <location filename="../Component/PropertiesWindow.cpp" line="18"/>
+        <location filename="../Component/PropertiesWindow.cpp" line="17"/>
         <source>MD5</source>
         <translation>哈希值</translation>
     </message>
