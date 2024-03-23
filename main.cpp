@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     qWarning("Init plain text path failed. Some json/where clause function may not work");
   }
 
-  MessageOutput mo;
+//  MessageOutput mo;
 
   if (argc > 1) {
     qInfo("argc[%d]>1. argv[1][%s].", argc, argv[1]);

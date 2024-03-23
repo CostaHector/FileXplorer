@@ -38,6 +38,13 @@ void JsonListView::subscribe() {
     const auto& containsUrl = QUrl::fromLocalFile(containsPath);
     QDesktopServices::openUrl(containsUrl);
   });
+
+  connect(g_jsonEditorActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this, [this]() {
+    const QString& jsonPath = m_jsonModel->filePath(currentIndex());
+    const QString& containsPath = QFileInfo(jsonPath).absolutePath();
+    const auto& containsUrl = QUrl::fromLocalFile(containsPath);
+    QDesktopServices::openUrl(containsUrl);
+  });
 }
 
 void JsonListView::contextMenuEvent(QContextMenuEvent* event) {
