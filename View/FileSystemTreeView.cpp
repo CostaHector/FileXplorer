@@ -1,4 +1,5 @@
 #include "FileSystemTreeView.h"
+#include "Actions/RightClickMenuActions.h"
 #include "View/ViewHelper.h"
 #include "View/ViewStyleSheet.h"
 
@@ -27,6 +28,9 @@ FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel) : QTreeView
 void FileSystemTreeView::subscribe() {
   connect(header(), &QHeaderView::sectionResized, this,
           [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
+
+  addAction(g_rightClickActions()._CALC_MD5_ACT);
+  addAction(g_rightClickActions()._PROPERTIES);
 
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
