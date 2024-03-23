@@ -52,7 +52,7 @@ class FileSystemTypeFilter : public QToolButton {
   //  QAction* _DOCUMENT = new QAction(QIcon(":/themes/DOCUMENT"), "document");
   //  QAction* _EXE = new QAction(QIcon(":/themes/EXE"), "executable");
 
-  QAction* HIDE_ENTRIES_DONT_PASS_FILTER = new QAction(tr("hide/disable the entries don't pass name filter"), fileTypeFilterMenu);
+  QAction* DISABLE_ENTRIES_DONT_PASS_FILTER = new QAction(tr("disable the entries don't pass name filter"), fileTypeFilterMenu);
   QAction* INCLUDING_SUBDIRECTORIES = new QAction(tr("Including Subdirs"), fileTypeFilterMenu);
 
   QActionGroup* m_FILTER_FLAG_AGS = new QActionGroup(this);
