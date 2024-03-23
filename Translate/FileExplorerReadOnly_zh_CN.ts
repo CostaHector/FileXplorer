@@ -1117,6 +1117,116 @@
         <source>Mute</source>
         <translation>静音</translation>
     </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="7"/>
+        <source>Update</source>
+        <translation>刷新播放列表</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="8"/>
+        <source>Trashbin</source>
+        <translation>回收</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="9"/>
+        <source>Nxt folder</source>
+        <translation>播放下一个文件夹中的文件</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="10"/>
+        <source>Lst folder</source>
+        <translation>播放上一个文件夹中的文件</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="11"/>
+        <source>last hot scene</source>
+        <translation>上一高潮</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="12"/>
+        <source>next hot scene</source>
+        <translation>下一高潮</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="13"/>
+        <source>-10s</source>
+        <translation>后退10s</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="14"/>
+        <source>+10s</source>
+        <translation>前进10s</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="15"/>
+        <source>auto</source>
+        <translation>自动下一集</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="16"/>
+        <source>play/pause</source>
+        <translation>播放/暂停</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="17"/>
+        <source>last video</source>
+        <translation>上一视频</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="18"/>
+        <source>next video</source>
+        <translation>下一视频</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="19"/>
+        <source>open a video</source>
+        <translation>播放此视频</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="20"/>
+        <source>load a path</source>
+        <translation>载入一个路径</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="21"/>
+        <source>clear playlist</source>
+        <translation>清空列表</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="22"/>
+        <source>Play current path</source>
+        <translation>载入并播放当前路径</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="23"/>
+        <source>Play selection</source>
+        <translation>播放选中列表</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="25"/>
+        <source>keep show playlist</source>
+        <translation>常驻播放列表</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="26"/>
+        <source>mark</source>
+        <translation>标记一处高潮</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="27"/>
+        <source>grab</source>
+        <translation>抓取一帧</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="28"/>
+        <source>rename</source>
+        <translation>重命名</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.cpp" line="29"/>
+        <source>mod performers</source>
+        <translation>修改演员</translation>
+    </message>
 </context>
 <context>
     <name>ViewActions</name>
