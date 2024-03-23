@@ -4,29 +4,29 @@
 VideoPlayerActions::VideoPlayerActions(QObject* parent)
     : QObject{parent},
       _VOLUME_CTRL_MUTE(new QAction(tr("Mute"), this)),
-      _UPDATE_ITEM_PLAYABLE(new QAction(QIcon(":/themes/REFRESH_THIS_PATH"), "Update", this)),
-      _MOVE_SELECTED_ITEMS_TO_TRASHBIN(new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Trashbin", this)),
-      _SCROLL_TO_NEXT_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_NEXT_VIDEO_FOLDER"), "Nxt folder", this)),
-      _SCROLL_TO_LAST_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_LAST_VIDEO_FOLDER"), "Lst folder", this)),
-      _JUMP_LAST_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_LAST_HOT_SCENE"), "last hot scene", this)),
-      _JUMP_NEXT_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_NEXT_HOT_SCENE"), "next hot scene", this)),
-      _LAST_10_SECONDS(new QAction("-", this)),
-      _NEXT_10_SECONDS(new QAction("+", this)),
-      _AUTO_PLAY_NEXT_VIDEO(new QAction("auto", this)),
-      _PLAY_PAUSE(new QAction(QIcon(":/themes/PLAY_VIDEO"), "play/pause", this)),
-      _LAST_VIDEO(new QAction(QIcon(":/themes/LAST_VIDEO"), "last video", this)),
-      _NEXT_VIDEO(new QAction(QIcon(":/themes/NEXT_VIDEO"), "next video", this)),
-      _OPEN_A_VIDEO(new QAction(QIcon(":/themes/OPEN_A_VIDEO"), "open a video", this)),
-      _LOAD_A_PATH(new QAction(QIcon(":/themes/OPEN_A_FOLDER"), "load a path", this)),
-      _CLEAR_VIDEOS_LIST(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), "clear playlist", this)),
-      _PLAY_CURRENT_PATH(new QAction(QIcon(":/themes/OPEN_A_FOLDER"), "Play current path", this)),
-      _PLAY_SELECTION(new QAction("Play selection", this)),
+      _UPDATE_ITEM_PLAYABLE(new QAction(QIcon(":/themes/REFRESH_THIS_PATH"), tr("Update"), this)),
+      _MOVE_SELECTED_ITEMS_TO_TRASHBIN(new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), tr("Trashbin"), this)),
+      _SCROLL_TO_NEXT_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_NEXT_VIDEO_FOLDER"), tr("Nxt folder"), this)),
+      _SCROLL_TO_LAST_FOLDER(new QAction(QIcon(":/themes/SCROLL_TO_LAST_VIDEO_FOLDER"), tr("Lst folder"), this)),
+      _JUMP_LAST_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_LAST_HOT_SCENE"), tr("last hot scene"), this)),
+      _JUMP_NEXT_HOT_SCENE(new QAction(QIcon(":/themes/JUMP_NEXT_HOT_SCENE"), tr("next hot scene"), this)),
+      _LAST_10_SECONDS(new QAction(tr("-10s"), this)),
+      _NEXT_10_SECONDS(new QAction(tr("+10s"), this)),
+      _AUTO_PLAY_NEXT_VIDEO(new QAction(tr("auto"), this)),
+      _PLAY_PAUSE(new QAction(QIcon(":/themes/PLAY_VIDEO"), tr("play/pause"), this)),
+      _LAST_VIDEO(new QAction(QIcon(":/themes/LAST_VIDEO"), tr("last video"), this)),
+      _NEXT_VIDEO(new QAction(QIcon(":/themes/NEXT_VIDEO"), tr("next video"), this)),
+      _OPEN_A_VIDEO(new QAction(QIcon(":/themes/OPEN_A_VIDEO"), tr("open a video"), this)),
+      _LOAD_A_PATH(new QAction(QIcon(":/themes/OPEN_A_FOLDER"), tr("load a path"), this)),
+      _CLEAR_VIDEOS_LIST(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), tr("clear playlist"), this)),
+      _PLAY_CURRENT_PATH(new QAction(QIcon(":/themes/OPEN_A_FOLDER"), tr("Play current path"), this)),
+      _PLAY_SELECTION(new QAction(tr("Play selection"), this)),
       _BATCH_VIDEO_ACTIONS(new QActionGroup(this)),
-      _VIDEOS_LIST_MENU(new QAction(QIcon(":/themes/VIDEOS_LIST_MENU"), "show playlist", this)),
-      _MARK_HOT_SCENE(new QAction(QIcon(":/themes/MARK_HOT_SCENE_POSITION"), "mark", this)),
-      _GRAB_FRAME(new QAction(QIcon(":/themes/GRAB_FRAME"), "grab", this)),
-      _RENAME_VIDEO(new QAction(QIcon(":/themes/RENAME_VIDEO"), "rename", this)),
-      _MOD_PERFORMERS(new QAction(QIcon(":/themes/RENAME_PERFORMERS"), "mod performers", this)),
+      _SHOW_VIDEOS_LIST(new QAction(QIcon(":/themes/VIDEOS_LIST_MENU"), tr("keep show playlist"), this)),
+      _MARK_HOT_SCENE(new QAction(QIcon(":/themes/MARK_HOT_SCENE_POSITION"), tr("mark"), this)),
+      _GRAB_FRAME(new QAction(QIcon(":/themes/GRAB_FRAME"), tr("grab"), this)),
+      _RENAME_VIDEO(new QAction(QIcon(":/themes/RENAME_VIDEO"), tr("rename"), this)),
+      _MOD_PERFORMERS(new QAction(QIcon(":/themes/RENAME_PERFORMERS"), tr("mod performers"), this)),
       _RATE_AG(GetRateActionGroups()),
       _RATE_LEVEL_COUNT(_RATE_AG->actions().size()),
       _REVEAL_IN_EXPLORER(new QAction(QIcon(), "reveal in explorer", this)) {
@@ -79,8 +79,8 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
   _LOAD_A_PATH->setShortcutVisibleInContextMenu(true);
   _LOAD_A_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> Load videos from a path").arg(_LOAD_A_PATH->text(), _LOAD_A_PATH->shortcut().toString()));
 
-  _VIDEOS_LIST_MENU->setCheckable(true);
-  _VIDEOS_LIST_MENU->setChecked(true);
+  _SHOW_VIDEOS_LIST->setCheckable(true);
+  _SHOW_VIDEOS_LIST->setChecked(PreferenceSettings().value(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.v).toBool());
 
   _MARK_HOT_SCENE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_P));
   _MARK_HOT_SCENE->setShortcutVisibleInContextMenu(true);

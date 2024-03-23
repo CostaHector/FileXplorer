@@ -39,7 +39,7 @@ class VideoPlayerActions : public QObject
   QAction* _PLAY_SELECTION;
   QActionGroup* _BATCH_VIDEO_ACTIONS;
 
-  QAction* _VIDEOS_LIST_MENU;
+  QAction* _SHOW_VIDEOS_LIST;
 
   QAction* _MARK_HOT_SCENE;
   QAction* _GRAB_FRAME;

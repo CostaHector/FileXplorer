@@ -54,6 +54,7 @@ SOURCES += \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
+    Model/VidModel.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameTool.cpp \
@@ -120,6 +121,7 @@ SOURCES += \
     View/FileSystemTableView.cpp \
     View/FileSystemTreeView.cpp \
     View/PerformersTableView.cpp \
+    View/VidsPlayListView.cpp \
     View/ViewHelper.cpp \
     View/ViewStyleSheet.cpp \
     main.cpp \
@@ -172,6 +174,7 @@ HEADERS += \
     Model/LogModel.h \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
+    Model/VidModel.h \
     Tools/Log.h \
     Tools/MessageOutput.h \
     Tools/NameTool.h \
@@ -239,6 +242,7 @@ HEADERS += \
     View/FileSystemTableView.h \
     View/FileSystemTreeView.h \
     View/PerformersTableView.h \
+    View/VidsPlayListView.h \
     View/ViewHelper.h \
     View/ViewStyleSheet.h
 
