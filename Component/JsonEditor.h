@@ -42,8 +42,10 @@ class JsonEditor : public QMainWindow {
   auto onCapitalizeEachWord() -> void;
   auto onLearnPerfomersFromJsonFile() -> bool;
   auto onPerformersHint() -> QStringList;
+  auto onExtractCapitalizedPerformersHint() -> bool;
   auto onSelectedTextAppendToPerformers() -> bool;
 
+  bool onRenameJsonFile();
   void onEditPerformers();
   void onEditAkaPerformer();
   void onEditStudios();

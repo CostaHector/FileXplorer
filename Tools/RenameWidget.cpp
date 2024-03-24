@@ -1,4 +1,5 @@
 #include "RenameWidget.h"
+#include "Tools/NameTool.h"
 
 const QString RenameWidget::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> RenameWidget::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
@@ -119,7 +120,6 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
   }
   qDebug("Case rule: %s", qPrintable(caseRuleName));
   QStringList replacedList;
-
   if (g_renameAg()._UPPER_CASE->isChecked()) {
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toUpper());
@@ -130,15 +130,15 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
     }
   } else if (g_renameAg()._LOOSE_CAPITALIZE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
     for (const QString& nm : replaceeList) {
-      replacedList.append(CapitaliseEachWordFirstLetterOnly(nm));
+      replacedList.append(NameTool::CapitaliseEachWordFirstLetterOnly(nm));
     }
   } else if (g_renameAg()._STRICT_CAPITALIZE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
     for (const QString& nm : replaceeList) {
-      replacedList.append(CapitaliseEachWordFirstLetterLowercaseOthers(nm));
+      replacedList.append(NameTool::CapitaliseEachWordFirstLetterLowercaseOthers(nm));
     }
   } else if (g_renameAg()._SWAP_CASE->isChecked()) {
     for (const QString& nm : replaceeList) {
-      replacedList.append(ToggleSentenceCase(nm));
+      replacedList.append(NameTool::ToggleSentenceCase(nm));
     }
   } else {
     qDebug("Case rule[%s] not supported", qPrintable(caseRuleName));

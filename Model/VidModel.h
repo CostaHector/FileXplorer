@@ -1,21 +1,15 @@
-#ifndef JSONMODEL_H
-#define JSONMODEL_H
+#ifndef VIDMODEL_H
+#define VIDMODEL_H
+
 #include "Model/DifferRootFileSystemModel.h"
 
 #include <QDebug>
+#include <QItemSelectionModel>
 #include <QSet>
 
-struct JsonProperties {
-  explicit JsonProperties(const QString& path);
-  static int getPerfsCount(const QString& pth);
-
-  QString jsonPath;
-  int perfsCount;
-};
-
-class JsonModel : public DifferRootFileSystemModel {
+class VidModel : public DifferRootFileSystemModel {
  public:
-  explicit JsonModel(QObject* parent = nullptr);
+  explicit VidModel(QObject* parent = nullptr);
 
   int appendAPath(const QString& path) override;
   int appendRows(const QStringList& lst) override;
@@ -25,23 +19,22 @@ class JsonModel : public DifferRootFileSystemModel {
       qWarning() << "Try to access invalid index" << index;
       return "";
     }
-    return m_jsons[index.row()].jsonPath;
+    return m_vids[index.row()];
   }
   QString filePath(const int row) const override {
     if (not(0 <= row and row < rowCount())) {
       qWarning("Try to access row[%d] not in [0, %d)", row, rowCount());
       return "";
     }
-    return m_jsons[row].jsonPath;
+    return m_vids[row];
   }
 
   void clear() override;
 
-  auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_jsons.size(); }
+  auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_vids.size(); }
   auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return 1; }
 
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
-  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
     if (role == Qt::TextAlignmentRole) {
@@ -57,18 +50,22 @@ class JsonModel : public DifferRootFileSystemModel {
     return QAbstractListModel::headerData(section, orientation, role);
   }
 
-  bool isPerfComplete(int row) const { return m_jsons[row].perfsCount >= m_completeJsonPerfCount; }
+  bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
-  void SetCompletePerfCount(int newCount);
-  void updatePerfCount(int row);
-  void setPerfCount(int row, int newCount);
+  Qt::ItemFlags flags(const QModelIndex& index) const override {
+    if (index.column() == 2) {
+      return Qt::ItemFlag::ItemIsEditable | Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
+    }
+    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
+  }
+
+  void whenFilesDeleted(const QItemSelection& selections);
+
+  void updatePlayableForeground();
 
  private:
-  int m_completeJsonPerfCount;
-
   QString m_rootPath;
-  QList<JsonProperties> m_jsons;
-  QSet<QString> m_uniqueSet;
+  QList<QString> m_vids;
 };
 
-#endif  // JSONMODEL_H
+#endif  // VIDMODEL_H

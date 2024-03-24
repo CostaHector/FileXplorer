@@ -3,8 +3,8 @@
 
 #include <QAction>
 #include <QActionGroup>
-#include <QMenuBar>
 #include <QMenu>
+#include <QMenuBar>
 #include <QObject>
 #include <QToolBar>
 
@@ -48,6 +48,7 @@ class JsonEditorActions : public QObject {
   QAction* _FORMATTER;
   QAction* _RELOAD_JSON_FROM_FROM_DISK;
   QAction* _ADD_SELECTED_PERFORMER;
+  QAction* _EXTRACT_CAPITALIZED_PERFORMER;
   QActionGroup* _TEXT_EDIT_ACTIONS;
 
   QAction* _SAVE;
@@ -55,9 +56,12 @@ class JsonEditorActions : public QObject {
   QAction* _SUBMIT;
   QActionGroup* _FILE_SAVE_ACTIONS;
 
-  QAction* _REVEAL_IN_EXPLORER;
-  QAction* _OPEN_THIS_FILE;
-  QActionGroup* _SYSTEM_ACTIONS;
+
+  QActionGroup* GetSystemActions();
+  QAction* _REVEAL_IN_EXPLORER{new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal"), this)};
+  QAction* _OPEN_THIS_FILE{new QAction(tr("Open"), this)};
+  QAction* _RENAME_THIS_FILE{new QAction(tr("Rename"), this)};
+  QActionGroup* _SYSTEM_ACTIONS{GetSystemActions()};
 
   QAction* _AI_HINT;
   QAction* _LEARN_PERFORMERS_FROM_JSON;

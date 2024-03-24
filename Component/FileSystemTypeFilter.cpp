@@ -16,12 +16,12 @@ FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
       "1. QFileSystemModel->setFilter()\n"
       "2. SearchModel->setFilter()");
 
-  HIDE_ENTRIES_DONT_PASS_FILTER->setCheckable(true);
-  HIDE_ENTRIES_DONT_PASS_FILTER->setChecked(
-      PreferenceSettings().value(MemoryKey::HIDE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::HIDE_ENTRIES_DONT_PASS_FILTER.v).toBool());
-  HIDE_ENTRIES_DONT_PASS_FILTER->setToolTip(
-      "This property holds whether files that don't pass the name filter are hidden(true) or disabled(false)\n"
-      "This property is true by default.\n"
+  DISABLE_ENTRIES_DONT_PASS_FILTER->setCheckable(true);
+  DISABLE_ENTRIES_DONT_PASS_FILTER->setChecked(
+      PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool());
+  DISABLE_ENTRIES_DONT_PASS_FILTER->setToolTip(
+      "This property holds whether files that don't pass the name filter are disable(true) or hide(false)\n"
+      "This property is true disable by default.\n"
       "1. QFileSystemModel->setNameFilters()\n"
       "2. SearchModel->setFilter()");
 
@@ -43,7 +43,7 @@ FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
 
   fileTypeFilterMenu->addActions(m_FILTER_FLAG_AGS->actions());
   fileTypeFilterMenu->addSeparator();
-  fileTypeFilterMenu->addAction(HIDE_ENTRIES_DONT_PASS_FILTER);
+  fileTypeFilterMenu->addAction(DISABLE_ENTRIES_DONT_PASS_FILTER);
   fileTypeFilterMenu->addSeparator();
   fileTypeFilterMenu->addAction(INCLUDING_SUBDIRECTORIES);
 
@@ -76,10 +76,10 @@ void FileSystemTypeFilter::BindFileSystemModel(QFileSystemModel* newModel) {
   } else {
     initFilterAgent(DEFAULT_FILTER_FLAG);
   }
-  initNameFilterDisablesAgent(HIDE_ENTRIES_DONT_PASS_FILTER->isChecked());
+  initNameFilterDisablesAgent(DISABLE_ENTRIES_DONT_PASS_FILTER->isChecked());
   connect(fileTypeFilterMenu, &QMenu::triggered, this, &FileSystemTypeFilter::onTypeChecked);
   connect(FILTER_SWITCH, &QAction::triggered, this, &FileSystemTypeFilter::onSwitchChanged);
-  connect(HIDE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &FileSystemTypeFilter::onGrayOrHideChanged);
+  connect(DISABLE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &FileSystemTypeFilter::onGrayOrHideChanged);
   connect(INCLUDING_SUBDIRECTORIES, &QAction::triggered, this, &FileSystemTypeFilter::changeSearchModelIteratorFlagAgent);
 }
 
@@ -101,11 +101,11 @@ void FileSystemTypeFilter::BindFileSystemModel(AdvanceSearchModel* newModel, Sea
   } else {
     initFilterAgent(DEFAULT_FILTER_FLAG);
   }
-  initNameFilterDisablesAgent(HIDE_ENTRIES_DONT_PASS_FILTER->isChecked());
+  initNameFilterDisablesAgent(DISABLE_ENTRIES_DONT_PASS_FILTER->isChecked());
 
   connect(fileTypeFilterMenu, &QMenu::triggered, this, &FileSystemTypeFilter::onTypeChecked);
   connect(FILTER_SWITCH, &QAction::triggered, this, &FileSystemTypeFilter::onSwitchChanged);
-  connect(HIDE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &FileSystemTypeFilter::onGrayOrHideChanged);
+  connect(DISABLE_ENTRIES_DONT_PASS_FILTER, &QAction::triggered, this, &FileSystemTypeFilter::onGrayOrHideChanged);
   connect(INCLUDING_SUBDIRECTORIES, &QAction::triggered, this, &FileSystemTypeFilter::changeSearchModelIteratorFlagAgent);
 }
 
@@ -124,7 +124,7 @@ void FileSystemTypeFilter::onSwitchChanged(bool isOn) {
 }
 
 void FileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
-  PreferenceSettings().setValue(MemoryKey::HIDE_ENTRIES_DONT_PASS_FILTER.name, isGray);
+  PreferenceSettings().setValue(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, isGray);
   if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
   }

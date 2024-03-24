@@ -16,12 +16,14 @@
 #include "Component/JsonPerformersListInputer.h"
 #include "PublicVariable.h"
 
+#include "Model/VidModel.h"
+#include "View/VidsPlayListView.h"
+
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
 class QLabel;
 class QUrl;
 QT_END_NAMESPACE
-
 
 class VideoPlayer : public QMainWindow {
   Q_OBJECT
@@ -49,17 +51,13 @@ class VideoPlayer : public QMainWindow {
   void onPlayLastVideo();
   void onPlayNextVideo();
 
-  void onListWidgetDoubleClicked(QListWidgetItem* item);
-  void onUpdatePlayableList();
-
-  void onRevealInSystemExplorer();
-  void onRecycleSelectedItems();
+  void onListWidgetDoubleClicked(const QModelIndex& ind);
 
   void onScrollToAnotherFolder(int inc = 1);
   void onScrollToNextFolder() { onScrollToAnotherFolder(1); }
   void onScrollToLastFolder() { onScrollToAnotherFolder(-1); }
 
-  void onShowPlaylist();
+  void onShowPlaylist(bool keepShow);
   void onClearPlaylist();
   void openAFolder(const QString& folderPath = "");
 
@@ -140,16 +138,21 @@ class VideoPlayer : public QMainWindow {
   QList<int> m_hotSceneList;
   constexpr static int MICROSECOND = 1000;
 
-  QListWidget* m_playListWid;
+  VidModel* m_playListModel;
+  VidsPlayListView* m_playListWid;
+
+  QObject* m_watcher = nullptr;
+
   QSplitter* m_playlistSplitter;
 
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
   static const QColor RECYCLED_ITEM_COLOR;
 
   JsonPerformersListInputer* m_performerWid;
-  QVariantHash m_dict;
 
-  QMenu* m_playListMenu;
+  QStatusBar* m_playerStatusBar;
+
+  QVariantHash m_dict;
 };
 
 #endif  // VIDEOPLAYER_H

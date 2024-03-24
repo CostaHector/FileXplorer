@@ -109,6 +109,7 @@ void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
 
 void CustomTableView::BindMenu(QMenu* menu) {
   if (menu == nullptr) {
+    qWarning("Don't bind a nullptr menu");
     return;
   }
   m_menu = menu;
