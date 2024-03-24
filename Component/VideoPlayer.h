@@ -25,7 +25,6 @@ class QLabel;
 class QUrl;
 QT_END_NAMESPACE
 
-
 class VideoPlayer : public QMainWindow {
   Q_OBJECT
  public:
@@ -145,10 +144,14 @@ class VideoPlayer : public QMainWindow {
   QObject* m_watcher = nullptr;
 
   QSplitter* m_playlistSplitter;
+
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
   static const QColor RECYCLED_ITEM_COLOR;
 
   JsonPerformersListInputer* m_performerWid;
+
+  QStatusBar* m_playerStatusBar;
+
   QVariantHash m_dict;
 };
 

@@ -183,6 +183,8 @@ void JsonEditor::subscribe() {
     int itemsCntChanged = dbTM.ForceReloadAkaName();
     Notificator::information("Reload AKA performers", QString("delta %1 item(s)").arg(itemsCntChanged));
   });
+
+  connect(g_jsonEditorActions()._RENAME_THIS_FILE, &QAction::triggered, this, &JsonEditor::onRenameJsonFile);
 }
 
 int JsonEditor::onLoadASelectedPath(const QString& folderPath) {
@@ -455,6 +457,40 @@ bool JsonEditor::onSelectedTextAppendToPerformers() {
   }
   perfs.removeDuplicates();
   p->setText(perfs.join(", "));
+  return true;
+}
+
+bool JsonEditor::onRenameJsonFile() {
+  const QModelIndex& ind = m_jsonList->currentIndex();
+  if (not ind.isValid()) {
+    qWarning() << "Try to rename invalid ind" << ind;
+    return true;
+  }
+  const QFileInfo fi{m_jsonModel->filePath(ind)};
+  if (not fi.exists()) {
+    qWarning("Skip json file[%s] not exist", qPrintable(fi.absoluteFilePath()));
+    return true;
+  }
+  const QString beforeFileName = fi.fileName();
+  QDir dir = fi.absoluteDir();
+
+  bool okClicked = false;
+  const QString& newFileName = QInputDialog::getItem(this, "Rename Jsons", fi.absolutePath(), {beforeFileName}, 0, true, &okClicked);
+  if (not okClicked or newFileName.isEmpty()) {
+    qInfo("Skip User cancel rename");
+    return false;
+  }
+  if (beforeFileName == newFileName) {
+    qInfo("Skip name not changed");
+    return true;
+  }
+  const bool renameResult = dir.rename(beforeFileName, newFileName);
+  if (not renameResult) {
+    qWarning("Rename failed [%s]=>[%s]", qPrintable(beforeFileName), qPrintable(newFileName));
+    Notificator::warning(QString("Rename failed[%1]").arg(fi.absolutePath()), beforeFileName + "=>" + newFileName);
+    return false;
+  }
+  m_jsonModel->setData(ind, dir.absoluteFilePath(newFileName), Qt::DisplayRole);
   return true;
 }
 

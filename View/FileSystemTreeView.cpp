@@ -9,7 +9,7 @@
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
 
-FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel) : QTreeView() {
+FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* parent) : QTreeView(parent) {
   setModel(fsmModel);
   InitViewSettings();
 

@@ -70,7 +70,7 @@ class PreferenceModel : public QAbstractTableModel {
     if (not index.isValid()) {
       return "";
     }
-    return m_alerts[index.row()].value2Str();  // Todo. May some int bool here
+    return m_alerts[index.row()].value2Str();
   }
 
  private:

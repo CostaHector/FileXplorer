@@ -5,7 +5,7 @@
 #include <QDirIterator>
 #include <QFile>
 
-VidModel::VidModel(QObject* parent) : QAbstractListModel{parent} {}
+VidModel::VidModel(QObject* parent) : DifferRootFileSystemModel{parent} {}
 
 int VidModel::appendAPath(const QString& path) {
   decltype(m_vids) deltaVids;
@@ -60,7 +60,7 @@ QVariant VidModel::data(const QModelIndex& index, int role) const {
 }
 
 bool VidModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (role == Qt::EditRole and index.column() == 0) {  // 0: value
+  if (role == Qt::DisplayRole and index.column() == 0) {  // 0: value
     m_vids[index.row()] = value.toString();
     // check is value valid. if valid write into Preference setting;
     emit dataChanged(index, index, {Qt::DisplayRole});
