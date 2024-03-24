@@ -45,6 +45,7 @@ class JsonEditor : public QMainWindow {
   auto onExtractCapitalizedPerformersHint() -> bool;
   auto onSelectedTextAppendToPerformers() -> bool;
 
+  bool onRenameJsonFile();
   void onEditPerformers();
   void onEditAkaPerformer();
   void onEditStudios();

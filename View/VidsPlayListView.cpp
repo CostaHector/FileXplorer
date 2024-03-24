@@ -4,47 +4,28 @@
 #include "FileOperation/FileOperation.h"
 #include "Tools/PathTool.h"
 #include "UndoRedo.h"
-#include "View/ViewHelper.h"
-#include "View/ViewStyleSheet.h"
 
 #include <QDesktopServices>
 
 VidsPlayListView::VidsPlayListView(VidModel* model_, QWidget* parent)
-    : QListView{parent}, m_vidModel{model_}, m_vidMenu{new QMenu("playList", this)} {
+    : CustomListView{"VID_PLAYLIST_VIEW", parent}, m_vidModel{model_}, m_vidMenu{new QMenu("playList", this)} {
   setModel(m_vidModel);
+  BindMenu(m_vidMenu);
 
   m_vidMenu->addAction(g_videoPlayerActions()._REVEAL_IN_EXPLORER);
   m_vidMenu->addAction(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN);
+  m_vidMenu->addAction(g_videoPlayerActions()._RENAME_VIDEO);
 
-  setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::NoDragDrop);
-  setAcceptDrops(false);
-  setDragEnabled(false);
-  setDropIndicatorShown(false);
 
   subscribe();
-
-  setStyleSheet(ViewStyleSheet::LISTVIEW_STYLESHEET);
 }
 
 void VidsPlayListView::subscribe() {
   connect(g_videoPlayerActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this, &VidsPlayListView::onRevealInSystemExplorer);
   connect(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE, &QAction::triggered, m_vidModel, &VidModel::updatePlayableForeground);
   connect(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN, &QAction::triggered, this, &VidsPlayListView::onRecycleSelectedItems);
-}
-
-auto VidsPlayListView::InitViewSettings() -> void {
-  setAlternatingRowColors(true);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
-  View::UpdateItemViewFontSizeCore(this);
-}
-
-void VidsPlayListView::contextMenuEvent(QContextMenuEvent* event) {
-  m_vidMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
-  QListView::contextMenuEvent(event);
 }
 
 void VidsPlayListView::onRevealInSystemExplorer() {

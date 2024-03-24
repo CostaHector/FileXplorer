@@ -114,6 +114,7 @@ QVariant PreferenceModel::data(const QModelIndex& index, int role) const {
 
 bool PreferenceModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (role == Qt::EditRole and index.column() == 2) {  // 2: value
+    // for direct edit, using EditRole
     m_alerts[index.row()].setValue(value);
     // check is value valid. if valid write into Preference setting;
     emit dataChanged(index, index, {Qt::DisplayRole});

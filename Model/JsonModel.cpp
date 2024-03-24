@@ -16,17 +16,18 @@ int JsonProperties::getPerfsCount(const QString& pth) {
 }
 
 JsonModel::JsonModel(QObject* parent)
-    : QAbstractListModel{parent},
+    : DifferRootFileSystemModel{parent},
       m_completeJsonPerfCount{
           PreferenceSettings()
               .value(MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.name, MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.v)
               .toInt()} {}
 
-QModelIndex JsonModel::setRootPath(const QString& path) {
+int JsonModel::appendAPath(const QString& path) {
   // m_jsons increase delta
   m_rootPath = path;
   if (not QDir(path).exists()) {
-    return QModelIndex();
+    qWarning("Cannot read jsons from inexist path[%s]", qPrintable(path));
+    return 0;
   }
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
 
@@ -39,10 +40,33 @@ QModelIndex JsonModel::setRootPath(const QString& path) {
       m_jsonsDelta.append(JsonProperties{jsonPath});
     }
   }
+  if (m_jsonsDelta.isEmpty()) {
+    qWarning("No unique json found from path[%s]", qPrintable(path));
+    return 0;
+  }
+
   beginInsertRows(QModelIndex(), m_jsons.size(), m_jsons.size() + m_jsonsDelta.size() - 1);
   m_jsons += m_jsonsDelta;
   endInsertRows();
-  return QModelIndex();
+  return m_jsonsDelta.size();
+}
+
+int JsonModel::appendRows(const QStringList& lst) {
+  decltype(m_jsons) m_jsonsDelta;
+  for (const auto& jsonPath : lst) {
+    if (not m_uniqueSet.contains(jsonPath)) {
+      m_uniqueSet.insert(jsonPath);
+      m_jsonsDelta.append(JsonProperties{jsonPath});
+    }
+  }
+  if (m_jsonsDelta.isEmpty()) {
+    qWarning("No unique json found from input [%d] item(s) list", lst.size());
+    return 0;
+  }
+  beginInsertRows(QModelIndex(), m_jsons.size(), m_jsons.size() + m_jsonsDelta.size() - 1);
+  m_jsons += m_jsonsDelta;
+  endInsertRows();
+  return m_jsonsDelta.size();
 }
 
 QVariant JsonModel::data(const QModelIndex& index, int role) const {
@@ -69,6 +93,14 @@ QVariant JsonModel::data(const QModelIndex& index, int role) const {
     return int(Qt::AlignLeft);
   }
   return QVariant();
+}
+
+bool JsonModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (role == Qt::DisplayRole and index.column() == 0) {  // 0: value
+    m_jsons[index.row()].jsonPath = value.toString();
+    emit dataChanged(index, index, {Qt::DisplayRole});
+  }
+  return QAbstractItemModel::setData(index, value, role);
 }
 
 void JsonModel::clear() {

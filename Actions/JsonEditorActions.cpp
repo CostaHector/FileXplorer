@@ -44,10 +44,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _SUBMIT(new QAction(QIcon(":/themes/APPROVAL"), tr("submit"), this)),
       _FILE_SAVE_ACTIONS{new QActionGroup(this)},
 
-      _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal"), this)),
-      _OPEN_THIS_FILE(new QAction(tr("Open"), this)),
-      _SYSTEM_ACTIONS{new QActionGroup(this)},
-
       _AI_HINT(new QAction(QIcon(":/themes/AI_IDEA"), tr("AI Hint"), this)),
       _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/AI_LEARN"), tr("AI Library"), this)),
       _AI_ACTIONS{new QActionGroup(this)},
@@ -166,9 +162,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _TEXT_EDIT_ACTIONS->addAction(_ADD_SELECTED_PERFORMER);
   _TEXT_EDIT_ACTIONS->addAction(_EXTRACT_CAPITALIZED_PERFORMER);
 
-  _SYSTEM_ACTIONS->addAction(_REVEAL_IN_EXPLORER);
-  _SYSTEM_ACTIONS->addAction(_OPEN_THIS_FILE);
-
   _AI_ACTIONS->addAction(_AI_HINT);
   _AI_ACTIONS->addAction(_LEARN_PERFORMERS_FROM_JSON);
 
@@ -176,17 +169,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _FILE_SAVE_ACTIONS->addAction(_CANCEL);
   _FILE_SAVE_ACTIONS->addAction(_SUBMIT);
   _FILE_SAVE_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
-  _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal the json in its parent folder.")
-                                      .arg(_REVEAL_IN_EXPLORER->text())
-                                      .arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
-
-  _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
-  _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
-  _OPEN_THIS_FILE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
 
   _AI_HINT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _AI_HINT->setToolTip(QString("<b>%1 (%2)</b><br/> Give you performers list hint").arg(_AI_HINT->text()).arg(_AI_HINT->shortcut().toString()));
@@ -229,6 +211,30 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_CLR_PERFORMERS_STUDIO_VALUE);
 }
 
+QActionGroup* JsonEditorActions::GetSystemActions() {
+  auto* _SYSTEM_ACTIONS = new QActionGroup(this);
+
+  _SYSTEM_ACTIONS->addAction(_RENAME_THIS_FILE);
+  _SYSTEM_ACTIONS->addAction(_REVEAL_IN_EXPLORER);
+  _SYSTEM_ACTIONS->addAction(_OPEN_THIS_FILE);
+
+  _RENAME_THIS_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F2));
+  _RENAME_THIS_FILE->setShortcutVisibleInContextMenu(true);
+
+  _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
+  _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
+  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal the json in its parent folder.")
+                                      .arg(_REVEAL_IN_EXPLORER->text())
+                                      .arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
+
+  _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
+  _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
+  _OPEN_THIS_FILE->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
+
+  return _SYSTEM_ACTIONS;
+}
+
 QMenuBar* JsonEditorActions::GetJsonMenuBar(QWidget* parent) {
   auto* m_menuBar = new QMenuBar(parent);
   QMenu* fileMenu = new QMenu("File", m_menuBar);
@@ -266,6 +272,8 @@ QToolBar* JsonEditorActions::GetJsonToolBar(QWidget* parent) {
   m_editorToolBar->addActions(_FILE_SAVE_ACTIONS->actions());
   m_editorToolBar->addSeparator();
   m_editorToolBar->addActions(_AI_ACTIONS->actions());
+  m_editorToolBar->addSeparator();
+  m_editorToolBar->addAction(g_jsonEditorActions()._RENAME_THIS_FILE);
   m_editorToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return m_editorToolBar;
 }
