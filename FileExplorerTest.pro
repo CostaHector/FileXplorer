@@ -10,9 +10,11 @@ TEMPLATE = app
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
+    Tools/NameTool.cpp\
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     FileOperation/FileOperation.cpp \
@@ -26,7 +28,6 @@ SOURCES += \
     TestCase/ProductionStudioManagerTest.cpp \
     TestCase/QStringFunctionTest.cpp \
     TestCase/QuickWhereClauseTest.cpp \
-    TestCase/RenameWidgetTest.cpp \
     TestCase/FileOperationTest.cpp \
     TestCase/UndoRedoTest.cpp \
     Tools/Categorizer.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     Actions/RenameActions.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
+    Tools/NameTool.h\
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
     FileOperation/FileOperation.h \

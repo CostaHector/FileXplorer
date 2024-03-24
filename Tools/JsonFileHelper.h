@@ -95,38 +95,7 @@ class JsonFileHelper {
     return out;
   }
 
-  static auto PerformersString2StringList(const QString& valueStr) -> QStringList {
-    if (valueStr.isEmpty()) {
-      return {};
-    }
-    QStringList arr;
-    for (const QString& perfRaw : valueStr.split(JSON_RENAME_REGEX::SEPERATOR_COMP)) {
-      const QString& perf = perfRaw.trimmed();
-      if (not arr.contains(perf)) {
-        arr << perf;
-      }
-    }
-    return arr;
-  }
-
-  static auto HotSceneString2IntList(const QString& valueStr) -> QList<QVariant> {
-    const QString& s = valueStr.trimmed();
-    if (s.isEmpty()) {
-      return {};
-    }
-    decltype(HotSceneString2IntList("")) arr;
-    for (const QString& perfRaw : s.split(JSON_RENAME_REGEX::SEPERATOR_COMP)) {
-      const QString& perf = perfRaw.trimmed();
-      bool isOk = false;
-      int hot = perf.toInt(&isOk);
-      if (not isOk) {
-        qDebug("Hot scene position[%s] is not a number", qPrintable(perf));
-        continue;
-      }
-      arr.append(hot);
-    }
-    return arr;
-  }
+  static auto HotSceneString2IntList(const QString& valueStr) -> QList<QVariant>;
 
   static auto GetJsonValueString(const QString& keyName, const QVariant& v) -> QString {
     QString valueStr;

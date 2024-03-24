@@ -16,6 +16,7 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
       QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString()));
   PREVIEW_PANE_HTML->setCheckable(true);
 
+  _JSON_EDITOR_PANE->setCheckable(true);
   _JSON_EDITOR_PANE->setToolTip(
       QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(_JSON_EDITOR_PANE->text(), _JSON_EDITOR_PANE->shortcut().toString()));
 

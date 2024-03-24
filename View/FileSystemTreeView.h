@@ -1,23 +1,21 @@
 #ifndef FILESYSTEMTREEVIEW_H
 #define FILESYSTEMTREEVIEW_H
 
-#include "MyQFileSystemModel.h"
 #include "Component/FileSystemMenu.h"
+#include "MyQFileSystemModel.h"
 
-#include <QTreeView>
-#include <QPushButton>
-#include <QDropEvent>
+#include <QContextMenuEvent>
+#include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
-#include <QDragEnterEvent>
-#include <QContextMenuEvent>
-#include <QMouseEvent>
-#include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QMenu>
+#include <QMouseEvent>
+#include <QTreeView>
 
 class FileSystemTreeView : public QTreeView {
  public:
-  FileSystemTreeView(MyQFileSystemModel* fsmModel);
+  FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* parent = nullptr);
 
   void subscribe();
   auto InitViewSettings() -> void;
@@ -37,15 +35,12 @@ class FileSystemTreeView : public QTreeView {
 
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
-  void contextMenuEvent(QContextMenuEvent *event) override{
+  void contextMenuEvent(QContextMenuEvent* event) override {
     m_fsMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
   }
 
  private:
   QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
-  QPushButton* backwardBtn{nullptr};  // will not takeover
-  QPushButton* forwardBtn{nullptr};   // will not takeover
 };
 
-
-#endif // FILESYSTEMTREEVIEW_H
+#endif  // FILESYSTEMTREEVIEW_H

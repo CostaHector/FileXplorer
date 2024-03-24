@@ -15,6 +15,7 @@
 #include <QTextEdit>
 
 class LogView : public QMainWindow {
+  Q_OBJECT
  public:
   explicit LogView(QWidget* parent = nullptr);
 
@@ -31,6 +32,8 @@ class LogView : public QMainWindow {
 
   void onSelectedANewLog();
  signals:
+
+ private:
   QMenu* m_logMenu{new QMenu{"Log Menu", this}};
 
   QToolBar* m_logTypeToolbar{nullptr};

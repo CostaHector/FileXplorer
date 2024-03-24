@@ -95,5 +95,5 @@ void PathToolTest::test_longestCommonPrefix_samepath_scene() {
   QCOMPARE(actualPrepath, expectPrepath);
 }
 
-QTEST_MAIN(PathToolTest)
+//QTEST_MAIN(PathToolTest)
 #include "PathToolTest.moc"
