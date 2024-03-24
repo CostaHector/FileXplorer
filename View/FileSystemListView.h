@@ -2,6 +2,8 @@
 #define FILESYSTEMLISTVIEW_H
 
 #include "Component/FileSystemMenu.h"
+#include "View/CustomListView.h"
+
 #include "MyQFileSystemModel.h"
 
 #include <QContextMenuEvent>
@@ -12,15 +14,12 @@
 #include <QListView>
 #include <QMenu>
 #include <QMouseEvent>
-#include <QPushButton>
 
-class FileSystemListView : public QListView {
+class FileSystemListView : public CustomListView {
  public:
-  FileSystemListView(MyQFileSystemModel* fsmModel);
+  FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* parent=nullptr);
 
   void subscribe();
-  auto InitViewSettings() -> void;
-  auto UpdateItemViewFontSize() -> void;
 
   void dropEvent(QDropEvent* event) override;
 
@@ -36,14 +35,8 @@ class FileSystemListView : public QListView {
 
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
-  void contextMenuEvent(QContextMenuEvent* event) override {
-    m_fsMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
-  }
-
  private:
   QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
-  QPushButton* backwardBtn{nullptr};  // will not takeover
-  QPushButton* forwardBtn{nullptr};   // will not takeover
 };
 
 #endif  // FILESYSTEMLISTVIEW_H

@@ -12,8 +12,6 @@
 #include <QDropEvent>
 #include <QMenu>
 #include <QMouseEvent>
-#include <QPushButton>
-#include <QTableView>
 
 class FileSystemTableView : public CustomTableView {
  public:
@@ -37,8 +35,6 @@ class FileSystemTableView : public CustomTableView {
 
  private:
   QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
-  QPushButton* backwardBtn{nullptr};  // will not takeover
-  QPushButton* forwardBtn{nullptr};   // will not takeover
 };
 
 #endif  // FILESYSTEMTABLEVIEW_H

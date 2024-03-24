@@ -1,6 +1,8 @@
 #ifndef JSONMODEL_H
 #define JSONMODEL_H
-#include <QAbstractListModel>
+#include "Model/DifferRootFileSystemModel.h"
+
+#include <QDebug>
 #include <QSet>
 
 struct JsonProperties {
@@ -11,16 +13,35 @@ struct JsonProperties {
   int perfsCount;
 };
 
-class JsonModel : public QAbstractListModel {
+class JsonModel : public DifferRootFileSystemModel {
  public:
   explicit JsonModel(QObject* parent = nullptr);
 
-  QModelIndex setRootPath(const QString& path);
+  int appendAPath(const QString& path) override;
+  int appendRows(const QStringList& lst) override;
+
+  QString filePath(const QModelIndex& index) const override {
+    if (not index.isValid()) {
+      qWarning() << "Try to access invalid index" << index;
+      return "";
+    }
+    return m_jsons[index.row()].jsonPath;
+  }
+  QString filePath(const int row) const override {
+    if (not(0 <= row and row < rowCount())) {
+      qWarning("Try to access row[%d] not in [0, %d)", row, rowCount());
+      return "";
+    }
+    return m_jsons[row].jsonPath;
+  }
+
+  void clear() override;
 
   auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_jsons.size(); }
   auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return 1; }
 
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
     if (role == Qt::TextAlignmentRole) {
@@ -36,23 +57,7 @@ class JsonModel : public QAbstractListModel {
     return QAbstractListModel::headerData(section, orientation, role);
   }
 
-  Qt::ItemFlags flags(const QModelIndex& index) const override {
-    if (index.column() == 2) {
-      return Qt::ItemFlag::ItemIsEditable | Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
-    }
-    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
-  }
-
-  QString filePath(const QModelIndex& index) const {
-    if (not index.isValid()) {
-      return "";
-    }
-    return m_jsons[index.row()].jsonPath;  // Todo. May some int bool here
-  }
-
   bool isPerfComplete(int row) const { return m_jsons[row].perfsCount >= m_completeJsonPerfCount; }
-
-  void clear();
 
   void SetCompletePerfCount(int newCount);
   void updatePerfCount(int row);

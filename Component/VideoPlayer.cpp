@@ -21,13 +21,14 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_timeLabel(new QLabel(m_timeTemplate)),
       m_errorLabel(new QLabel),
       m_sliderTB(new QToolBar("slider", this)),
-      m_controlTB(new QToolBar("play control", this)),
+      m_controlTB(g_videoPlayerActions().GetPlayControlToolBar(this, m_timeLabel)),
       m_videoWidget(new QVideoWidget),
       m_probe(new QVideoProbe),
       m_playListModel{new VidModel{this}},
       m_playListWid{new VidsPlayListView{m_playListModel, this}},
       m_playlistSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
-      m_performerWid(nullptr) {
+      m_performerWid(nullptr),
+      m_playerStatusBar{new QStatusBar{this}} {
   m_probe->setSource(m_mediaPlayer);  // Returns true, hopefully.
 
   m_timeSlider->setRange(0, 0);
@@ -53,38 +54,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   m_sliderTB->addAction(g_videoPlayerActions()._VOLUME_CTRL_MUTE);
   m_sliderTB->addWidget(m_volumnSlider);
 
-  auto* spacer = new QWidget;
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
-  m_controlTB->addAction(g_videoPlayerActions()._LAST_VIDEO);
-  m_controlTB->addAction(g_videoPlayerActions()._NEXT_VIDEO);
-  m_controlTB->addAction(g_videoPlayerActions()._OPEN_A_VIDEO);
-  m_controlTB->addSeparator();
-  m_controlTB->addWidget(m_timeLabel);
-  m_controlTB->addSeparator();
-  m_controlTB->addAction(g_videoPlayerActions()._MARK_HOT_SCENE);
-  m_controlTB->addAction(g_videoPlayerActions()._GRAB_FRAME);
-  m_controlTB->addSeparator();
-  m_controlTB->addAction(g_videoPlayerActions()._RENAME_VIDEO);
-  m_controlTB->addAction(g_videoPlayerActions()._MOD_PERFORMERS);
-  m_controlTB->addSeparator();
-  m_controlTB->addActions(g_videoPlayerActions()._RATE_AG->actions());
-  m_controlTB->addSeparator();
-  m_controlTB->addWidget(spacer);
-  m_controlTB->addSeparator();
-  m_controlTB->addAction(g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO);
-  m_controlTB->addSeparator();
-  m_controlTB->addAction(g_videoPlayerActions()._SCROLL_TO_LAST_FOLDER);
-  m_controlTB->addAction(g_videoPlayerActions()._SCROLL_TO_NEXT_FOLDER);
-  m_controlTB->addSeparator();
-  m_controlTB->addAction(g_videoPlayerActions()._CLEAR_VIDEOS_LIST);
-  m_controlTB->addAction(g_videoPlayerActions()._LOAD_A_PATH);
-  m_controlTB->addAction(g_videoPlayerActions()._SHOW_VIDEOS_LIST);
-  m_controlTB->addAction(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE);
-  m_controlTB->addSeparator();
-  m_controlTB->addAction(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN);
   m_controlTB->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
-  m_controlTB->setContentsMargins(0, 0, 0, 0);
 
   addToolBar(Qt::ToolBarArea::BottomToolBarArea, m_controlTB);
   addToolBarBreak(Qt::ToolBarArea::BottomToolBarArea);
@@ -93,10 +63,9 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   addActions(m_sliderTB->actions());
   addActions(m_controlTB->actions());
 
-  auto* _sb = new QStatusBar(this);
-  _sb->addWidget(m_errorLabel);
-  _sb->setVisible(false);
-  setStatusBar(_sb);
+  m_playerStatusBar->addWidget(m_errorLabel);
+  m_playerStatusBar->setVisible(false);
+  setStatusBar(m_playerStatusBar);
 
   m_playlistSplitter->setOpaqueResize(false);
   m_playlistSplitter->addWidget(m_videoWidget);
@@ -560,7 +529,6 @@ void VideoPlayer::onShowPlaylist(bool keepShow) {
   PreferenceSettings().setValue(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, keepShow);
   m_playListWid->setVisible(keepShow);
   dynamic_cast<VideoPlayerWatcher*>(m_watcher)->setKeepListShow(keepShow);
-
 }
 
 void VideoPlayer::onClearPlaylist() {

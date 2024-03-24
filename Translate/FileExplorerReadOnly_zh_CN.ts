@@ -569,59 +569,64 @@
         <translation>提交修改</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="47"/>
+        <location filename="../Actions/JsonEditorActions.h" line="61"/>
         <source>Reveal</source>
         <translation>在资源管理器中显示</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="48"/>
+        <location filename="../Actions/JsonEditorActions.h" line="62"/>
         <source>Open</source>
         <translation>打开Json文件</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="51"/>
+        <location filename="../Actions/JsonEditorActions.h" line="63"/>
+        <source>Rename</source>
+        <translation>重命名</translation>
+    </message>
+    <message>
+        <location filename="../Actions/JsonEditorActions.cpp" line="47"/>
         <source>AI Hint</source>
         <translation>AI提示</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="52"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="48"/>
         <source>AI Library</source>
         <oldsource>&gt;&gt;AI Library</oldsource>
         <translation>供AI学习</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="55"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="51"/>
         <source>Select Current path</source>
         <oldsource>Select Current folder and load from it</oldsource>
         <translation>选中并读取当前路径</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="56"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="52"/>
         <source>Construct jsons by file properties</source>
         <translation>构建Jsons根据视频文件数据</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="57"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="53"/>
         <source>Append performers</source>
         <translation>追加演员名</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="58"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="54"/>
         <source>Set production studio</source>
         <translation>设置制片商</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="59"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="55"/>
         <source>Construct performers k-v pair</source>
         <translation>构建演职员KV对</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="60"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="56"/>
         <source>Construct studio k-v pair</source>
         <translation>构建产商KV对</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="61"/>
+        <location filename="../Actions/JsonEditorActions.cpp" line="57"/>
         <source>Clear performers and studio values</source>
         <translation>清空演员和厂商值</translation>
     </message>
@@ -1113,119 +1118,124 @@
 <context>
     <name>VideoPlayerActions</name>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="6"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="16"/>
         <source>Mute</source>
         <translation>静音</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="7"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="17"/>
         <source>Update</source>
         <translation>刷新播放列表</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="8"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="18"/>
         <source>Trashbin</source>
         <translation>回收</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="9"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="19"/>
         <source>Nxt folder</source>
         <translation>播放下一个文件夹中的文件</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="10"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="20"/>
         <source>Lst folder</source>
         <translation>播放上一个文件夹中的文件</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="11"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="21"/>
         <source>last hot scene</source>
         <translation>上一高潮</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="12"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="22"/>
         <source>next hot scene</source>
         <translation>下一高潮</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="13"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="23"/>
         <source>-10s</source>
         <translation>后退10s</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="14"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="24"/>
         <source>+10s</source>
         <translation>前进10s</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="15"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="25"/>
         <source>auto</source>
         <translation>自动下一集</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="16"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="26"/>
         <source>play/pause</source>
         <translation>播放/暂停</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="17"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="27"/>
         <source>last video</source>
         <translation>上一视频</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="18"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="28"/>
         <source>next video</source>
         <translation>下一视频</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="19"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="29"/>
         <source>open a video</source>
         <translation>播放此视频</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="20"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="30"/>
         <source>load a path</source>
         <translation>载入一个路径</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="21"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="31"/>
         <source>clear playlist</source>
         <translation>清空列表</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="22"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="32"/>
         <source>Play current path</source>
         <translation>载入并播放当前路径</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="23"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="33"/>
         <source>Play selection</source>
         <translation>播放选中列表</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="25"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="36"/>
         <source>keep show playlist</source>
         <translation>常驻播放列表</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="26"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="37"/>
         <source>mark</source>
         <translation>标记一处高潮</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="27"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="38"/>
         <source>grab</source>
         <translation>抓取一帧</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="28"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="39"/>
         <source>rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.cpp" line="29"/>
+        <location filename="../Actions/VideoPlayerActions.h" line="40"/>
         <source>mod performers</source>
         <translation>修改演员</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.h" line="43"/>
+        <source>Reveal in explorer</source>
+        <translation>在资源管理器中显示本视频</translation>
     </message>
 </context>
 <context>
