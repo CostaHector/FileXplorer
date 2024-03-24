@@ -1,26 +1,22 @@
 #include "JsonListView.h"
 #include <QDesktopServices>
+#include <QDir>
+#include <QFileInfo>
 #include <QInputDialog>
+#include <QUrl>
 
 #include "Actions/JsonEditorActions.h"
-#include "View/ViewHelper.h"
-#include "View/ViewStyleSheet.h"
+#include "PublicVariable.h"
 
 JsonListView::JsonListView(JsonModel* model_, QWidget* parent)
-    : QListView{parent}, m_jsonModel{model_}, m_jsonMenu{g_jsonEditorActions().GetJsonToBeEdittedListMenu(this)} {
+    : CustomListView{"JSON_LIST_VIEW", parent}, m_jsonModel{model_}, m_jsonMenu{g_jsonEditorActions().GetJsonToBeEdittedListMenu(this)} {
+  BindMenu(m_jsonMenu);
   setModel(m_jsonModel);
-  InitViewSettings();
 
-  setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::NoDragDrop);
-  setAcceptDrops(true);
-  setDragEnabled(true);
-  setDropIndicatorShown(true);
 
   subscribe();
-
-  setStyleSheet(ViewStyleSheet::LISTVIEW_STYLESHEET);
 }
 
 void JsonListView::subscribe() {
@@ -38,11 +34,6 @@ void JsonListView::subscribe() {
     const auto& containsUrl = QUrl::fromLocalFile(containsPath);
     QDesktopServices::openUrl(containsUrl);
   });
-}
-
-void JsonListView::contextMenuEvent(QContextMenuEvent* event) {
-  m_jsonMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
-  QListView::contextMenuEvent(event);
 }
 
 void JsonListView::onSetPerfCount(const bool checked) {
@@ -73,14 +64,6 @@ void JsonListView::autoNext() {
   if (count() > 0) {  // stop at last line
     setCurrentRow(count() - 1);
   }
-}
-
-auto JsonListView::InitViewSettings() -> void {
-  setAlternatingRowColors(true);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  this->sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
-  View::UpdateItemViewFontSizeCore(this);
 }
 
 bool JsonListView::hasLast() const {
@@ -128,7 +111,7 @@ int JsonListView::load(const QString& path) {
     return 0;
   }
   const int beforeJsonFileCnt = count();
-  m_jsonModel->setRootPath(path);
+  m_jsonModel->appendAPath(path);
   const int afterJsonFileCnt = count();
   const int deltaFile = afterJsonFileCnt - beforeJsonFileCnt;
   if (deltaFile != 0) {

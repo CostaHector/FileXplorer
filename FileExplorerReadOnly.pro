@@ -50,15 +50,19 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
+    Model/DifferRootFileSystemModel.cpp \
     Model/JsonModel.cpp \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
+    Model/VidModel.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
+    Tools/NameTool.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     View/AdvanceSearchTableView.cpp \
+    View/CustomListView.cpp \
     View/JsonListView.cpp \
     View/LogView.cpp \
     View/MovieDBView.cpp \
@@ -119,6 +123,7 @@ SOURCES += \
     View/FileSystemTableView.cpp \
     View/FileSystemTreeView.cpp \
     View/PerformersTableView.cpp \
+    View/VidsPlayListView.cpp \
     View/ViewHelper.cpp \
     View/ViewStyleSheet.cpp \
     main.cpp \
@@ -167,15 +172,19 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    Model/DifferRootFileSystemModel.h \
     Model/JsonModel.h \
     Model/LogModel.h \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
+    Model/VidModel.h \
     Tools/Log.h \
     Tools/MessageOutput.h \
+    Tools/NameTool.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     View/AdvanceSearchTableView.h \
+    View/CustomListView.h \
     View/JsonListView.h \
     View/LogView.h \
     View/MovieDBView.h \
@@ -237,6 +246,7 @@ HEADERS += \
     View/FileSystemTableView.h \
     View/FileSystemTreeView.h \
     View/PerformersTableView.h \
+    View/VidsPlayListView.h \
     View/ViewHelper.h \
     View/ViewStyleSheet.h
 

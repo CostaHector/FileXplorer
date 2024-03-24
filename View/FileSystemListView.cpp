@@ -1,22 +1,23 @@
 #include "FileSystemListView.h"
 
+#include "Actions/FileBasicOperationsActions.h"
+#include "Actions/RenameActions.h"
+#include "Actions/RightClickMenuActions.h"
+#include "Actions/ViewActions.h"
+
 #include "View/FileSystemListView.h"
 #include "View/ViewHelper.h"
 #include "View/ViewStyleSheet.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/RenameActions.h"
-#include "Actions/ViewActions.h"
 
-FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel) : QListView(){
+FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* parent) : CustomListView{"FILE_SYSTEM_LIST", parent} {
+  BindMenu(m_fsMenu);
   setModel(fsmModel);
-  InitViewSettings();
 
-  setSelectionMode(QAbstractItemView::ExtendedSelection);
-  setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::DragDrop);
+
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
@@ -27,8 +28,9 @@ FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel) : QListView
 }
 
 void FileSystemListView::subscribe() {
-  //  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
-  //          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY", horizontalHeader()->saveState()); });
+  addAction(g_rightClickActions()._CALC_MD5_ACT);
+  addAction(g_rightClickActions()._PROPERTIES);
+
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
@@ -42,18 +44,6 @@ void FileSystemListView::subscribe() {
 
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
-}
-
-auto FileSystemListView::InitViewSettings() -> void {
-  setAlternatingRowColors(true);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  this->sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
-  FileSystemListView::UpdateItemViewFontSize();
-}
-
-auto FileSystemListView::UpdateItemViewFontSize() -> void {
-  View::UpdateItemViewFontSizeCore(this);
 }
 
 void FileSystemListView::dropEvent(QDropEvent* event) {

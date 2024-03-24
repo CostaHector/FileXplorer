@@ -36,16 +36,13 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _FORMATTER(new QAction(QIcon(":/themes/FORMAT"), tr("Formatter"), this)),
       _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":/themes/RELOAD_FROM_DISK"), tr("Reload now"), this)),
       _ADD_SELECTED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), tr("Append to perfs"), this)),
+      _EXTRACT_CAPITALIZED_PERFORMER(new QAction(QIcon(":/themes/NEW_FILE_FOLDER_PATH"), tr("Append capitalized to perfs"), this)),
       _TEXT_EDIT_ACTIONS{new QActionGroup(this)},
 
       _SAVE(new QAction(QIcon(":/themes/SAVED"), tr("save"), this)),
       _CANCEL(new QAction(QIcon(":/themes/NOT_SAVED"), tr("cancel"), this)),
       _SUBMIT(new QAction(QIcon(":/themes/APPROVAL"), tr("submit"), this)),
       _FILE_SAVE_ACTIONS{new QActionGroup(this)},
-
-      _REVEAL_IN_EXPLORER(new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal"), this)),
-      _OPEN_THIS_FILE(new QAction(tr("Open"), this)),
-      _SYSTEM_ACTIONS{new QActionGroup(this)},
 
       _AI_HINT(new QAction(QIcon(":/themes/AI_IDEA"), tr("AI Hint"), this)),
       _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":/themes/AI_LEARN"), tr("AI Library"), this)),
@@ -76,6 +73,10 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                                           .arg(_ADD_SELECTED_PERFORMER->text())
                                           .arg(_ADD_SELECTED_PERFORMER->shortcut().toString()));
 
+  _EXTRACT_CAPITALIZED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Append capitalized name in selection to performers lineeditor")
+                                                 .arg(_EXTRACT_CAPITALIZED_PERFORMER->text())
+                                                 .arg(_EXTRACT_CAPITALIZED_PERFORMER->shortcut().toString()));
+
   _SAVE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
   _SAVE->setShortcutVisibleInContextMenu(true);
   _SAVE->setToolTip(QString("<b>%1 (%2)</b><br/> Stage current changes").arg(_SAVE->text()).arg(_SAVE->shortcut().toString()));
@@ -99,11 +100,11 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
-  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Comma));
+  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_J));
   _LAST_FILE->setShortcutVisibleInContextMenu(true);
   _LAST_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)").arg(_LAST_FILE->text()).arg(_LAST_FILE->shortcut().toString()));
 
-  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Period));
+  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_K));
   _NEXT_FILE->setShortcutVisibleInContextMenu(true);
   _NEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)").arg(_NEXT_FILE->text()).arg(_NEXT_FILE->shortcut().toString()));
 
@@ -159,9 +160,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _TEXT_EDIT_ACTIONS->addAction(_FORMATTER);
   _TEXT_EDIT_ACTIONS->addAction(_RELOAD_JSON_FROM_FROM_DISK);
   _TEXT_EDIT_ACTIONS->addAction(_ADD_SELECTED_PERFORMER);
-
-  _SYSTEM_ACTIONS->addAction(_REVEAL_IN_EXPLORER);
-  _SYSTEM_ACTIONS->addAction(_OPEN_THIS_FILE);
+  _TEXT_EDIT_ACTIONS->addAction(_EXTRACT_CAPITALIZED_PERFORMER);
 
   _AI_ACTIONS->addAction(_AI_HINT);
   _AI_ACTIONS->addAction(_LEARN_PERFORMERS_FROM_JSON);
@@ -170,17 +169,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _FILE_SAVE_ACTIONS->addAction(_CANCEL);
   _FILE_SAVE_ACTIONS->addAction(_SUBMIT);
   _FILE_SAVE_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
-  _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal the json in its parent folder.")
-                                      .arg(_REVEAL_IN_EXPLORER->text())
-                                      .arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
-
-  _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
-  _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
-  _OPEN_THIS_FILE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
 
   _AI_HINT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _AI_HINT->setToolTip(QString("<b>%1 (%2)</b><br/> Give you performers list hint").arg(_AI_HINT->text()).arg(_AI_HINT->shortcut().toString()));
@@ -223,6 +211,30 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_CLR_PERFORMERS_STUDIO_VALUE);
 }
 
+QActionGroup* JsonEditorActions::GetSystemActions() {
+  auto* _SYSTEM_ACTIONS = new QActionGroup(this);
+
+  _SYSTEM_ACTIONS->addAction(_RENAME_THIS_FILE);
+  _SYSTEM_ACTIONS->addAction(_REVEAL_IN_EXPLORER);
+  _SYSTEM_ACTIONS->addAction(_OPEN_THIS_FILE);
+
+  _RENAME_THIS_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F2));
+  _RENAME_THIS_FILE->setShortcutVisibleInContextMenu(true);
+
+  _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
+  _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
+  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal the json in its parent folder.")
+                                      .arg(_REVEAL_IN_EXPLORER->text())
+                                      .arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
+
+  _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
+  _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
+  _OPEN_THIS_FILE->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
+
+  return _SYSTEM_ACTIONS;
+}
+
 QMenuBar* JsonEditorActions::GetJsonMenuBar(QWidget* parent) {
   auto* m_menuBar = new QMenuBar(parent);
   QMenu* fileMenu = new QMenu("File", m_menuBar);
@@ -260,6 +272,8 @@ QToolBar* JsonEditorActions::GetJsonToolBar(QWidget* parent) {
   m_editorToolBar->addActions(_FILE_SAVE_ACTIONS->actions());
   m_editorToolBar->addSeparator();
   m_editorToolBar->addActions(_AI_ACTIONS->actions());
+  m_editorToolBar->addSeparator();
+  m_editorToolBar->addAction(g_jsonEditorActions()._RENAME_THIS_FILE);
   m_editorToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return m_editorToolBar;
 }

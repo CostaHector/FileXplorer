@@ -1,19 +1,16 @@
 #ifndef JSONLISTVIEW_H
 #define JSONLISTVIEW_H
 
-#include <QAbstractListModel>
-#include <QListView>
 #include "Model/JsonModel.h"
+#include "View/CustomListView.h"
 
+#include <QListView>
 #include <QMenu>
 
-class JsonListView : public QListView {
+class JsonListView : public CustomListView {
  public:
   JsonListView(JsonModel* model_, QWidget* parent = nullptr);
-  auto InitViewSettings() -> void;
   void subscribe();
-
-  void contextMenuEvent(QContextMenuEvent* event);
 
   int currentRow() const { return currentIndex().row(); }
   void setCurrentRow(int row) { setCurrentIndex(m_jsonModel->index(row)); }
@@ -25,7 +22,7 @@ class JsonListView : public QListView {
 
   auto last() -> void;
   auto next() -> void;
-  
+
   auto onSetPerfCount(const bool checked) -> void;
   void autoNext();
 

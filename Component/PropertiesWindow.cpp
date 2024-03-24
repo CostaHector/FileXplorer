@@ -7,7 +7,6 @@
 
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
-#include "Tools/MP4DurationGetter.h"
 
 PropertiesWindow::PropertiesWindow(const QStringList& items, QWidget* parent)
     : QDialog(parent),
