@@ -2,15 +2,16 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Component/NotificatorFrame.h"
+#include "FileOperation/FileOperation.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
+#include "UndoRedo.h"
 
 #include <QVideoWidget>
 #include <QtWidgets>
 
 constexpr int VideoPlayer::MICROSECOND;
 const QString VideoPlayer::PLAYLIST_DOCK_TITLE_TEMPLATE{"playlist: %1"};
-const QColor VideoPlayer::RECYCLED_ITEM_COLOR(255, 0, 0);
 
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QMainWindow(parent),
@@ -176,7 +177,44 @@ void VideoPlayer::onVolumeValueChange(const int logScaleValue) {
   PreferenceSettings().setValue(MemoryKey::VIDEO_PLAYER_VOLUME.name, logScaleValue);
 }
 
+int VideoPlayer::onRecycleSelectedItems() {
+  if (not m_playListWid->selectionModel()->hasSelection()) {
+    qDebug("select before delete.");
+    return 0;
+  }
+  QString urlToPlayStr = m_playingUrl.toLocalFile();
+
+  FileOperation::BATCH_COMMAND_LIST_TYPE recycleCmds;
+  for (const auto& ind : m_playListWid->selectionModel()->selectedIndexes()) {
+    QFileInfo fi(m_playListModel->filePath(ind));
+    if (not fi.exists()) {
+      continue;
+    }
+    if (urlToPlayStr == fi.absoluteFilePath()) {
+      qDebug("Skip current playing[%s]", qPrintable(urlToPlayStr));
+      urlToPlayStr = m_playListModel->filePath(m_playListModel->index(ind.row() + 1, 0));
+    }
+    recycleCmds.append({"moveToTrash", fi.absolutePath(), fi.fileName()});
+  }
+  if (urlToPlayStr != m_playingUrl.toLocalFile() and not urlToPlayStr.isEmpty() and QFile::exists(urlToPlayStr)) {
+    // to recycle, play first unselected vid.
+    setUrl(QUrl::fromLocalFile(urlToPlayStr));
+  }
+
+  bool recycleRet = g_undoRedo.Do(recycleCmds);
+  if (recycleRet) {
+    qDebug("Recycle succeed. %d files", recycleCmds.size());
+    Notificator::information("Recycle succeed", QString("%1 files").arg(recycleCmds.size()));
+  } else {
+    qWarning("Some recycle failed. %d files", recycleCmds.size());
+    Notificator::warning("Some Recycle Failed", QString("%1 files").arg(recycleCmds.size()));
+  }
+  m_playListModel->whenFilesDeleted(m_playListWid->selectionModel()->selection());
+  return recycleCmds.size();
+}
+
 void VideoPlayer::setUrl(const QUrl& url) {
+  m_playingUrl = url;
   m_errorLabel->setText(QString());
   if (url.isLocalFile()) {
     const QString& vidsPath = url.toLocalFile();
@@ -274,6 +312,8 @@ void VideoPlayer::subscribe() {
   connect(g_videoPlayerActions()._SCROLL_TO_NEXT_FOLDER, &QAction::triggered, this, &VideoPlayer::onScrollToNextFolder);
 
   connect(m_playlistSplitter, &QSplitter::splitterMoved, this, [](int pos, int index) -> void { qDebug("pos %d, index %d", pos, index); });
+
+  connect(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN, &QAction::triggered, this, &VideoPlayer::onRecycleSelectedItems);
 }
 
 bool VideoPlayer::onModeName() {
