@@ -24,7 +24,6 @@ class VidsPlayListView : public CustomListView {
   void onRevealInSystemExplorer();
 
   int appendToPlayList(const QStringList& fileAbsPathList);
-  int onRecycleSelectedItems();
 
  private:
   VidModel* m_vidModel;
