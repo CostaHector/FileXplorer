@@ -11,7 +11,7 @@ SearchProxyModel::SearchProxyModel(QObject* parent)
       m_nameFiltersCaseSensitive{
           PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool()},
       m_nameFilterDisableOrHide{
-                                PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool()} {}
+          PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool()} {}
 
 auto SearchProxyModel::initSearchMode(const QString& searchMode) -> void {
   m_searchMode = searchMode;
@@ -67,8 +67,8 @@ auto SearchProxyModel::ReturnPostOperation(const bool isPass, const QModelIndex&
       _searchSourceModel->removeDisable(index);
     return true;  // show and normal
   }
-  if (not m_nameFilterDisableOrHide) { // true: disable, false: hide
-    return false;  // hidden and normal
+  if (not m_nameFilterDisableOrHide) {  // true: disable, false: hide
+    return false;                       // hidden and normal
   }
   if (_searchSourceModel)
     _searchSourceModel->appendDisable(index);
