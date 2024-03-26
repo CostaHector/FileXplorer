@@ -18,8 +18,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "Component/StateLabel.h"
 #include "Component/NotificatorFrame.h"
+#include "Component/StateLabel.h"
 #include "UndoRedo.h"
 
 class RenameWidget : public QDialog {
@@ -156,15 +156,15 @@ class RenameWidget : public QDialog {
     }
     if (not invalidFileNames.isEmpty()) {
       const QString& invalidFileNameStr = invalidFileNames.join('\n');
-      const QString& msg = QString("Check Failed [invalid new name]. %1 invalid name(s) find:\n%2")
-                               .arg(invalidFileNames.size())
-                               .arg(qPrintable(invalidFileNameStr));
+      const QString& msg =
+          QString("Check Failed [invalid new name]. %1 invalid name(s) find:\n%2").arg(invalidFileNames.size()).arg(qPrintable(invalidFileNameStr));
       qDebug("%s", qPrintable(msg));
       QMessageBox::warning(this, "Check Failed [invalid new name]", msg);
       return false;
     }
     return true;
   }
+
   auto onApply(const bool isOnlyHelp = false, const bool isInterative = false) -> bool {
     QStringList relNameList = relName->toPlainText().split('\n');
     QStringList oldCompleteNameList = oldCompleteName->toPlainText().split('\n');
@@ -175,21 +175,21 @@ class RenameWidget : public QDialog {
 
     if (not(relNameList.size() == oldCompleteNameList.size() and oldCompleteNameList.size() == oldSuffixList.size() and
             oldSuffixList.size() == newCompleteNameList.size() and newCompleteNameList.size() == newSuffixList.size())) {
-      const QString& msg = QString("Dont add/delete line only in one column<br/>(%1,%2,%3,%4,%5)")
+      const QString& msg = QString("Don't add/delete line only in one column<br/>(%1,%2,%3,%4,%5)")
                                .arg(relNameList.size())
                                .arg(oldCompleteNameList.size())
                                .arg(oldSuffixList.size())
                                .arg(newCompleteNameList.size())
                                .arg(newSuffixList.size());
+      qWarning("unequal length of list, %s", qPrintable(msg));
       QMessageBox::warning(this, "Check Failed length inequal", msg);
       return false;
     }
 
     auto itEmpty = std::find_if(newCompleteNameList.cbegin(), newCompleteNameList.cend(), [](const QString& s) -> bool { return s.isEmpty(); });
     if (itEmpty != newCompleteNameList.cend()) {
-      const QString& msg("File name cannot be empty");
-      qDebug("Check Failed some complete filename is empty, %s", qPrintable(msg));
-      QMessageBox::warning(this, "Check Failed some complete filename is empty", msg);
+      qWarning("Check Failed some complete filename is empty, File name cannot be empty");
+      QMessageBox::warning(this, "Check failed some complete", "File name cannot be empty");
       return false;
     }
 
@@ -204,6 +204,7 @@ class RenameWidget : public QDialog {
     }
     if (not Checker(olds, news)) {
       if (isInterative) {
+        qWarning("[Abort] Name conflicts olds[%d], news[%d]", olds.size(), news.size());
         Notificator::warning("[Abort] Name conflicts", QString("olds[%1], news[%2]").arg(olds.size()).arg(news.size()));
       }
       return false;
@@ -232,7 +233,8 @@ class RenameWidget : public QDialog {
     bool isAllSuccess = g_undoRedo.Do(reversedcmds);
     if (isInterative) {
       if (isAllSuccess) {
-        Notificator::information("Batch rename", QString("%1 command(s).").arg(reversedcmds.size()));
+        qInfo("Batch rename ok %d command(s).", reversedcmds.size());
+        Notificator::goodNews("Batch rename ok", QString("%1 command(s).").arg(reversedcmds.size()));
       }
     }
     close();
