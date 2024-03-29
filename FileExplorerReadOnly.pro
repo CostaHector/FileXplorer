@@ -29,6 +29,7 @@ SOURCES += \
     Component/AdvanceSearchToolBar.cpp \
     Component/AlertSystem.cpp \
     Component/ClickableSlider.cpp \
+    Component/ConflictsRecycle.cpp \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
     Component/FileSystemMenu.cpp \
@@ -43,7 +44,6 @@ SOURCES += \
     Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
-    Component/RenameConflicts.cpp \
     Component/SearchCaseMatterToolButton.cpp \
     Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
@@ -59,6 +59,7 @@ SOURCES += \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameTool.cpp \
+    Tools/RenameNamesUnique.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     View/AdvanceSearchTableView.cpp \
@@ -151,6 +152,7 @@ HEADERS += \
     Component/AdvanceSearchToolBar.h \
     Component/AlertSystem.h \
     Component/ClickableSlider.h \
+    Component/ConflictsRecycle.h \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
     Component/FileSystemMenu.h \
@@ -166,7 +168,6 @@ HEADERS += \
     Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
-    Component/RenameConflicts.h \
     Component/SearchCaseMatterToolButton.h \
     Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \
@@ -181,6 +182,7 @@ HEADERS += \
     Tools/Log.h \
     Tools/MessageOutput.h \
     Tools/NameTool.h \
+    Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     View/AdvanceSearchTableView.h \
