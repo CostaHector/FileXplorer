@@ -84,3 +84,36 @@ void VidModel::updatePlayableForeground() {
     emit dataChanged(index(0, 0), index(rowCount() - 1, 0), {Qt::ForegroundRole});
   }
 }
+
+int VidModel::getNextAvailableVidUrl(const QUrl& startFrom, const QModelIndexList& notAvailList) const {
+  const QString& startStr = startFrom.toLocalFile();
+  const int startRow = m_vids.indexOf(startStr);
+  if (startRow == -1) {
+    qWarning("Search startFrom url[%s] not found", qPrintable(startStr));
+    return -1;
+  }
+  for (int row = startRow; row < rowCount(); ++row) {
+    auto ind = index(row, 0);
+    if (notAvailList.contains(ind)) {
+      continue;
+    }
+    if (not QFileInfo(m_vids[row]).isFile()) {
+      continue;
+    }
+    return row;
+  }
+  qDebug("Available url not found during index[%d, %d)", startRow, rowCount());
+  return -1;
+}
+
+QStringList VidModel::getToRemoveFileList(const QModelIndexList& toRmvList) const {
+  decltype(getToRemoveFileList({})) ans;
+  for (const auto& ind : toRmvList) {
+    const QString& pth = filePath(ind);
+    if (not QFileInfo(pth).isFile()) {
+      continue;
+    }
+    ans.append(pth);
+  }
+  return ans;
+}

@@ -19,15 +19,13 @@
 #include <QWidget>
 
 #include "Component/StateLabel.h"
-#include "Component/NotificatorFrame.h"
-#include "UndoRedo.h"
 
 class RenameWidget : public QDialog {
  public:
   static const QString INVALID_CHARS;
   static const QSet<QChar> INVALID_FILE_NAME_CHAR_SET;
   QString windowTitleFormat;
-  QString pre;
+  QString m_pre;
   QStringList rels;
   QStringList completeNames;
   QList<bool> isFiles;
@@ -63,6 +61,7 @@ class RenameWidget : public QDialog {
 
     buttonBox->setOrientation(Qt::Orientation::Horizontal);
     buttonBox->button(QDialogButtonBox::Ok)->setStyleSheet(SUBMIT_BTN_STYLE);
+    buttonBox->button(QDialogButtonBox::Help)->setText("See commands...");
   }
 
   void init() {
@@ -156,114 +155,42 @@ class RenameWidget : public QDialog {
     }
     if (not invalidFileNames.isEmpty()) {
       const QString& invalidFileNameStr = invalidFileNames.join('\n');
-      const QString& msg = QString("Check Failed [invalid new name]. %1 invalid name(s) find:\n%2")
-                               .arg(invalidFileNames.size())
-                               .arg(qPrintable(invalidFileNameStr));
+      const QString& msg =
+          QString("Check Failed [invalid new name]. %1 invalid name(s) find:\n%2").arg(invalidFileNames.size()).arg(qPrintable(invalidFileNameStr));
       qDebug("%s", qPrintable(msg));
       QMessageBox::warning(this, "Check Failed [invalid new name]", msg);
       return false;
     }
     return true;
   }
-  auto onApply(const bool isOnlyHelp = false, const bool isInterative = false) -> bool {
-    QStringList relNameList = relName->toPlainText().split('\n');
-    QStringList oldCompleteNameList = oldCompleteName->toPlainText().split('\n');
-    QStringList oldSuffixList = oldSuffix->toPlainText().split('\n');
 
-    QStringList newCompleteNameList = newCompleteName->toPlainText().split('\n');
-    QStringList newSuffixList = newSuffix->toPlainText().split('\n');
-
-    if (not(relNameList.size() == oldCompleteNameList.size() and oldCompleteNameList.size() == oldSuffixList.size() and
-            oldSuffixList.size() == newCompleteNameList.size() and newCompleteNameList.size() == newSuffixList.size())) {
-      const QString& msg = QString("Dont add/delete line only in one column<br/>(%1,%2,%3,%4,%5)")
-                               .arg(relNameList.size())
-                               .arg(oldCompleteNameList.size())
-                               .arg(oldSuffixList.size())
-                               .arg(newCompleteNameList.size())
-                               .arg(newSuffixList.size());
-      QMessageBox::warning(this, "Check Failed length inequal", msg);
-      return false;
-    }
-
-    auto itEmpty = std::find_if(newCompleteNameList.cbegin(), newCompleteNameList.cend(), [](const QString& s) -> bool { return s.isEmpty(); });
-    if (itEmpty != newCompleteNameList.cend()) {
-      const QString& msg("File name cannot be empty");
-      qDebug("Check Failed some complete filename is empty, %s", qPrintable(msg));
-      QMessageBox::warning(this, "Check Failed some complete filename is empty", msg);
-      return false;
-    }
-
-    QStringList olds;
-    QStringList news;
-    for (auto i = 0; i < oldCompleteNameList.size(); ++i) {
-      QString bs = (oldSuffixList[i].isEmpty() ? "" : ".") + oldSuffixList[i];
-      QString ns = (newSuffixList[i].isEmpty() ? "" : ".") + newSuffixList[i];
-      QString relTmp = relNameList[i] + (relNameList[i].isEmpty() ? "" : "/");
-      olds.append(relTmp + oldCompleteNameList[i] + bs);
-      news.append(relTmp + newCompleteNameList[i] + ns);
-    }
-    if (not Checker(olds, news)) {
-      if (isInterative) {
-        Notificator::warning("[Abort] Name conflicts", QString("olds[%1], news[%2]").arg(olds.size()).arg(news.size()));
-      }
-      return false;
-    }
-
-    // skip mediate tempR;
-    FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
-    for (int i = 0; i < olds.size(); ++i) {
-      if (olds[i] == news[i]) {
-        continue;
-      }
-      cmds.append({"rename", pre, olds[i], pre, news[i]});
-    }
-
-    decltype(cmds) reversedcmds(cmds.crbegin(), cmds.crend());  // rename files first, than its folders;
-
-    if (isOnlyHelp) {
-      for (const QStringList& cmd : reversedcmds) {
-        te->appendPlainText(cmd.join('\t'));
-      }
-      te->setWindowTitle(QString("%1 Command(s)").arg(cmds.size()));
-      te->setMinimumWidth(1024);
-      te->show();
-      return true;
-    }
-    bool isAllSuccess = g_undoRedo.Do(reversedcmds);
-    if (isInterative) {
-      if (isAllSuccess) {
-        Notificator::information("Batch rename", QString("%1 command(s).").arg(reversedcmds.size()));
-      }
-    }
-    close();
-    return isAllSuccess;
-  }
+  auto onApply(const bool isOnlyHelp = false, const bool isInterative = false) -> bool;
   auto onRegex(const int regexState) -> void {
     // regexState;
     OnlyTriggerRenameCore();
   }
-  auto onIncludingSub(int includingSubState) -> void { InitTextContent(pre, rels); }
+  auto onIncludingSub(int includingSubState) -> void { InitTextContent(m_pre, rels); }
   auto onIncludeSuffix(int includingSuffixState) -> void {
     bool vis = not(includingSuffixState == Qt::Checked);
     oldSuffix->setVisible(vis);
     newSuffix->setVisible(vis);
-    InitTextContent(pre, rels);
+    InitTextContent(m_pre, rels);
   }
 
   auto InitTextContent(const QString& p, const QStringList& r) -> void {
-    pre = p;
+    m_pre = p;
     rels = r;
 
     const Qt::CheckState includingSubState = includingSub->checkState();
     const Qt::CheckState includingSuffixState = includingSuffix->checkState();
 
-    OSWalker_RETURN osWalkerRet = OSWalker(pre, rels, includingSubState == Qt::Checked, includingSuffixState == Qt::Checked);
+    OSWalker_RETURN osWalkerRet = OSWalker(m_pre, rels, includingSubState == Qt::Checked, includingSuffixState == Qt::Checked);
     const auto& relToNames = osWalkerRet.relToNames;
     completeNames = osWalkerRet.completeNames;
     const auto& suffixs = osWalkerRet.suffixs;
     isFiles = osWalkerRet.isFiles;
 
-    setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(pre));
+    setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
 
     relName->setPlainText(relToNames.join('\n'));
 

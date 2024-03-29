@@ -1,5 +1,5 @@
-#ifndef RENAMECONFLICTS_H
-#define RENAMECONFLICTS_H
+#ifndef CONFLICTSRECYCLE_H
+#define CONFLICTSRECYCLE_H
 
 #include <QAbstractItemView>
 #include <QAction>
@@ -52,7 +52,7 @@ class FileInfoType {
   QString dateModified;
 };
 
-class RenameConflicts : public QDialog {
+class ConflictsRecycle : public QDialog {
   Q_OBJECT
  public:
   const ConflictsItemHelper itemIF;  // dont user reference. object point to will be release after statement
@@ -80,7 +80,7 @@ class RenameConflicts : public QDialog {
   static const QStringList COLUMNS_NAME_LIST;
   static const int COLUMNS_NAME_LIST_LEN;
 
-  RenameConflicts(const ConflictsItemHelper& itemIF_, const CCMMode& operation = CCMMode::MERGE, QWidget* parent = nullptr)
+  ConflictsRecycle(const ConflictsItemHelper& itemIF_, const CCMMode& operation = CCMMode::MERGE, QWidget* parent = nullptr)
       : QDialog(parent),
         itemIF(itemIF_),
         leftFolderPath(itemIF.l),
@@ -212,4 +212,4 @@ class RenameConflicts : public QDialog {
 
   auto sizeHint() const -> QSize override { return QSize(1024, 768); }
 };
-#endif  // RENAMECONFLICTS_H
+#endif  // CONFLICTSRECYCLE_H
