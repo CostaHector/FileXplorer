@@ -16,6 +16,8 @@ class Notificator : public QFrame {
   Q_OBJECT
 
  public:
+  static void goodNews(const QString& title, const QString& message);
+  static void badNews(const QString& title, const QString& message);
   static void critical(const QString& title, const QString& message);
   static void warning(const QString& title, const QString& message);
   static void information(const QString& title, const QString& message);

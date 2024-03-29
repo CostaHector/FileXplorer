@@ -21,6 +21,7 @@ constexpr int DST_LINK_INEXIST = 13;
 constexpr int CANNOT_REMOVE_LINK = 14;
 constexpr int OPERATION_NOT_AVAILABLE = 15;
 constexpr int OPERATION_PARMS_NOT_MATCH = 16;
+constexpr int RECYCLE_OCCUPIED_FILE_FAILED = 17;
 constexpr int UNKNOWN_ERROR = -1;
 }  // namespace ErrorCode
 
@@ -161,6 +162,9 @@ class FileOperation {
     QFile file(pth);
     auto ret = file.moveToTrash();
     if (ret) {
+      if (file.fileName().isEmpty()) {
+        return {ErrorCode::RECYCLE_OCCUPIED_FILE_FAILED, {}};
+      }
       return {ErrorCode::OK, {{"rename", "", file.fileName(), "", pth}}};
     } else {
       return {ErrorCode::UNKNOWN_ERROR, {}};

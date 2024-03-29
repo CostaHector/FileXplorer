@@ -63,6 +63,9 @@ class VidModel : public DifferRootFileSystemModel {
 
   void updatePlayableForeground();
 
+  int getNextAvailableVidUrl(const QUrl& startFrom, const QModelIndexList& notAvailList) const;
+  QStringList getToRemoveFileList(const QModelIndexList& toRmvList) const;
+
  private:
   QString m_rootPath;
   QList<QString> m_vids;

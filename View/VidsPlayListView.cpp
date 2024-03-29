@@ -1,9 +1,9 @@
 #include "VidsPlayListView.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Component/NotificatorFrame.h"
-#include "FileOperation/FileOperation.h"
+
+#include "PublicVariable.h"
 #include "Tools/PathTool.h"
-#include "UndoRedo.h"
 
 #include <QDesktopServices>
 
@@ -25,7 +25,6 @@ VidsPlayListView::VidsPlayListView(VidModel* model_, QWidget* parent)
 void VidsPlayListView::subscribe() {
   connect(g_videoPlayerActions()._REVEAL_IN_EXPLORER, &QAction::triggered, this, &VidsPlayListView::onRevealInSystemExplorer);
   connect(g_videoPlayerActions()._UPDATE_ITEM_PLAYABLE, &QAction::triggered, m_vidModel, &VidModel::updatePlayableForeground);
-  connect(g_videoPlayerActions()._MOVE_SELECTED_ITEMS_TO_TRASHBIN, &QAction::triggered, this, &VidsPlayListView::onRecycleSelectedItems);
 }
 
 void VidsPlayListView::onRevealInSystemExplorer() {
@@ -59,27 +58,4 @@ int VidsPlayListView::appendToPlayList(const QStringList& fileAbsPathList) {
     validList.append(fileAbsPath);
   }
   return m_vidModel->appendRows(validList);
-}
-
-int VidsPlayListView::onRecycleSelectedItems() {
-  if (not selectionModel()->hasSelection()) {
-    return 0;
-  }
-  FileOperation::BATCH_COMMAND_LIST_TYPE recycleCmds;
-  for (const auto& ind : selectionModel()->selectedIndexes()) {
-    QFileInfo fi(filePath(ind));
-    if (fi.exists()) {
-      recycleCmds.append({"moveToTrash", fi.absolutePath(), fi.fileName()});
-    }
-  }
-  bool recycleRet = g_undoRedo.Do(recycleCmds);
-  if (recycleRet) {
-    qDebug("Recycle succeed. %d files", recycleCmds.size());
-    Notificator::information("Recycle succeed", QString("%1 files").arg(recycleCmds.size()));
-  } else {
-    qWarning("Some recycle failed. %d files", recycleCmds.size());
-    Notificator::warning("Some Recycle Failed", QString("%1 files").arg(recycleCmds.size()));
-  }
-  m_vidModel->whenFilesDeleted(selectionModel()->selection());
-  return recycleCmds.size();
 }

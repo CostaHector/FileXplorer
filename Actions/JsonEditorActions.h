@@ -60,7 +60,7 @@ class JsonEditorActions : public QObject {
   QActionGroup* GetSystemActions();
   QAction* _REVEAL_IN_EXPLORER{new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), tr("Reveal"), this)};
   QAction* _OPEN_THIS_FILE{new QAction(tr("Open"), this)};
-  QAction* _RENAME_THIS_FILE{new QAction(tr("Rename"), this)};
+  QAction* _RENAME_THIS_FILE{new QAction(QIcon(":/themes/RENAME_VIDEO"), tr("Rename"), this)};
   QActionGroup* _SYSTEM_ACTIONS{GetSystemActions()};
 
   QAction* _AI_HINT;

@@ -1,4 +1,5 @@
 #include "PerformersManager.h"
+#include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 #include "Tools/JsonFileHelper.h"
 
@@ -72,13 +73,22 @@ int PerformersManager::LearningFromAPath(const QString& path) {
       m_performers.insert(performer.toLower());
     }
   }
-
   const int increCnt = int(m_performers.size()) - beforePerformersCnt;
   qDebug("Learn extra %d performers, now %u performers in total", increCnt, m_performers.size());
+  if (increCnt == 0) {
+    return 0;
+  }
 
-  QFile performersFi(PROJECT_PATH + "/bin/PERFORMERS_TABLE.txt");
+#ifdef _WIN32
+  const QString perfsFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
+#else
+  const QString perfsFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
+#endif
+  QFile performersFi{perfsFilePath};
   if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qDebug("file cannot open. learned performers will not update to %s.", qPrintable(performersFi.fileName()));
+    qCritical("Open [%s] to write failed. Performers will not update.", qPrintable(perfsFilePath));
+    Notificator::critical("Open [%s] to write failed. Performers will not update.", perfsFilePath);
+    return -1;
   }
   QStringList perfsLst(m_performers.cbegin(), m_performers.cend());
   QTextStream stream(&performersFi);

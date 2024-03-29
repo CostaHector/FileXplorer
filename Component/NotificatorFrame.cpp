@@ -23,6 +23,14 @@ constexpr int DISPLAY_NOTIFICATION_DIRECTION_TOP_TO_BOTTOM = false;
 
 using namespace NOTIFICATOR_SETTING;
 
+void Notificator::goodNews(const QString& title, const QString& message) {
+  showMessage(QIcon(":/themes/PASS"), title, message);
+}
+
+void Notificator::badNews(const QString& title, const QString& message) {
+  showMessage(QIcon(":/themes/FAILED"), title, message);
+}
+
 void Notificator::critical(const QString& title, const QString& message) {
   QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
   showMessage(icon, title, message);
