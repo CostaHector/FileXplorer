@@ -1,5 +1,5 @@
 #include "ViewHelper.h"
-#include "Component/RenameConflicts.h"
+#include "Component/ConflictsRecycle.h"
 #include "MyQFileSystemModel.h"
 
 #include <QFileIconProvider>
@@ -32,7 +32,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
       return false;
   }
   ConflictsItemHelper conflictIF(selectedItems, to);
-  auto* tfm = new RenameConflicts(conflictIF, opMode);
+  auto* tfm = new ConflictsRecycle(conflictIF, opMode);
   if (to == conflictIF.l and opMode != CCMMode::LINK) {
     return false;
   }

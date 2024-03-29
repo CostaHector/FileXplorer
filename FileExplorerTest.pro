@@ -12,11 +12,13 @@ SOURCES += \
     Actions/RenameActions.cpp \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
+    TestCase/RenameUnqiueCheckTest.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
+    Component/NotificatorFrame.cpp \
     FileOperation/FileOperation.cpp \
     PublicTool.cpp \
     PublicVariable.cpp \
@@ -37,6 +39,7 @@ SOURCES += \
     Tools/NameStandardizer.cpp \
     Tools/PerformersManager.cpp \
     Tools/RenameWidget.cpp \
+    Tools/RenameNamesUnique.cpp \
     UndoRedo.cpp
 
 
@@ -48,6 +51,7 @@ HEADERS += \
     Tools/NameTool.h\
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
+    Component/NotificatorFrame.h \
     FileOperation/FileOperation.h \
     PublicTool.h \
     PublicVariable.h \
@@ -58,6 +62,7 @@ HEADERS += \
     Tools/NameStandardizer.h \
     Tools/PerformersManager.h \
     Tools/RenameWidget.h \
+    Tools/RenameNamesUnique.h \
     UndoRedo.h
 
 DISTFILES += \
