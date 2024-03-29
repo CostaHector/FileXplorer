@@ -104,6 +104,9 @@ class VideoPlayer : public QMainWindow {
     QWidget::keyPressEvent(e);
   }
 
+
+  int onRecycleSelectedItems();
+
  public slots:
   void openFile(const QString& filePath = "");
   void play();
@@ -120,6 +123,7 @@ class VideoPlayer : public QMainWindow {
   auto loadVideoRate() -> void;
   inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;
 
+  QUrl m_playingUrl;
   QMediaPlayer* m_mediaPlayer;
   ClickableSlider* m_timeSlider;
   QSlider* m_volumnSlider;
@@ -146,7 +150,6 @@ class VideoPlayer : public QMainWindow {
   QSplitter* m_playlistSplitter;
 
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
-  static const QColor RECYCLED_ITEM_COLOR;
 
   JsonPerformersListInputer* m_performerWid;
 

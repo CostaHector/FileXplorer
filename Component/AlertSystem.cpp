@@ -64,7 +64,7 @@ void AlertSystem::onEditPreferenceSetting() const {
   QString fileAbsPath = PreferenceSettings().fileName();
   if (not QFile::exists(fileAbsPath)) {
     qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    Notificator::critical("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));

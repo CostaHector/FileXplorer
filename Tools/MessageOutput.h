@@ -15,6 +15,8 @@ class MessageOutput {
   }
 
  private:
+  static bool IS_LOG_TO_FILE;
+  static bool IS_LOG_TO_FILE_AVAIL;
   static QFile outFile;
   static QTextStream ts;
   static const QString logTemplate;

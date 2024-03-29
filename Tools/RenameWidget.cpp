@@ -1,5 +1,8 @@
 #include "RenameWidget.h"
+#include "Component/NotificatorFrame.h"
 #include "Tools/NameTool.h"
+#include "Tools/RenameNamesUnique.h"
+#include "UndoRedo.h"
 
 const QString RenameWidget::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> RenameWidget::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
@@ -168,6 +171,46 @@ auto RenameWidget_SwapSection::RenameCore(const QStringList& replaceeList) -> QS
     }
   }
   return sectionSwapped;
+}
+
+auto RenameWidget::onApply(const bool isOnlyHelp, const bool isInterative) -> bool {
+  const QStringList& relNameList = relName->toPlainText().split('\n');
+  const QStringList& oldCompleteNameList = oldCompleteName->toPlainText().split('\n');
+  const QStringList& oldSuffixList = oldSuffix->toPlainText().split('\n');
+
+  const QStringList& newCompleteNameList = newCompleteName->toPlainText().split('\n');
+  const QStringList& newSuffixList = newSuffix->toPlainText().split('\n');
+
+  RenameNamesUnique renameHelper(m_pre, relNameList, oldCompleteNameList, oldSuffixList, newCompleteNameList, newSuffixList,
+                                 includingSub->isChecked());
+  renameHelper();
+  if (not renameHelper) {
+    const QString& rejectMsg = renameHelper.Details();
+    qWarning("Cannot do rename commands[%s]", qPrintable(rejectMsg));
+    Notificator::badNews("Cannot do rename commands", rejectMsg);
+    return false;
+  }
+  const auto& reversedcmds(renameHelper.getRenameCommands());  // rename files first, than its folders;
+
+  if (isOnlyHelp) {
+    for (const QStringList& cmd : reversedcmds) {
+      te->appendPlainText(cmd.join('\t'));
+    }
+    te->setWindowTitle(QString("Rename names unique | Total %1 Command(s)").arg(reversedcmds.size()));
+    te->setMinimumWidth(1024);
+    te->raise();
+    te->show();
+    return true;
+  }
+  bool isAllSuccess = g_undoRedo.Do(reversedcmds);
+  if (isInterative) {
+    if (isAllSuccess) {
+      qInfo("Batch rename ok %d command(s).", reversedcmds.size());
+      Notificator::goodNews("Batch rename ok", QString("%1 command(s).").arg(reversedcmds.size()));
+    }
+  }
+  close();
+  return isAllSuccess;
 }
 
 // #define __NAME__EQ__MAIN__ 1

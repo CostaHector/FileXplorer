@@ -477,7 +477,7 @@
     <message>
         <location filename="../Actions/JsonEditorActions.cpp" line="19"/>
         <source>Edit AKA perf file</source>
-        <translation>编辑演职员右边文件</translation>
+        <translation>编辑演职员又名文件</translation>
     </message>
     <message>
         <location filename="../Actions/JsonEditorActions.cpp" line="20"/>
