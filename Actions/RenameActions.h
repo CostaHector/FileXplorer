@@ -15,6 +15,7 @@ class RenameActions : public QObject {
         _STR_INSERTER{new QAction(QIcon(":/themes/NAME_STR_DELETER_PATH"), tr("Str Inserter"))},
         _STR_DELETER{new QAction(QIcon(":/themes/NAME_STR_DELETER_PATH"), tr("Str Deleter"))},
         _STR_REPLACER{new QAction(QIcon(":/themes/NAME_STR_REPLACER_PATH"), tr("Str Replacer"))},
+        _NAME_NO_CONSECUTIVE{new QAction(QIcon(":/themes/_NAME_NO_CONSECUTIVE"), tr("Name No Consecutive"))},
         RENAME_RIBBONS(Get_Rename_Actions()),
         _UPPER_CASE{new QAction(QIcon(":/themes/RENAME_UPPER_CASE"), tr("Upper Case"))},
         _LOWER_CASE{new QAction(QIcon(":/themes/RENAME_LOWER_CASE"), tr("Lower Case"))},
@@ -32,6 +33,7 @@ class RenameActions : public QObject {
   QAction* _STR_INSERTER;
   QAction* _STR_DELETER;
   QAction* _STR_REPLACER;
+  QAction* _NAME_NO_CONSECUTIVE;
   QActionGroup* RENAME_RIBBONS;
 
   QAction* _UPPER_CASE;
