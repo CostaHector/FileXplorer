@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2024-03-28T22:45:26. -->
+<!-- Written by QtCreator 11.0.2, 2024-03-29T22:56:51. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -69,10 +69,8 @@
     <value type="bool" key="AutoTest.Framework.QtTest">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="AutoTest.CheckStates">
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameToolTest.cpp:cleanup">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameToolTest.cpp:cleanupTestCase">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameToolTest.cpp:init">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameToolTest.cpp:initTestCase">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/RenameUnqiueCheckTest.cpp:cleanup">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/RenameUnqiueCheckTest.cpp:init">Unchecked</value>
    </valuemap>
    <value type="int" key="AutoTest.RunAfterBuild">0</value>
    <value type="bool" key="AutoTest.UseGlobal">true</value>

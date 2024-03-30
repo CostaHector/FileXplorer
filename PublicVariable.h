@@ -106,7 +106,8 @@ class ValueChecker {
     FOLDER_PATH,
     RANGE_INT,
     SWITCH_STRING,  // "010101"
-    CANDIDATE_STRING
+    CANDIDATE_STRING,
+    QSTRING_LIST,
   };
 
   explicit ValueChecker(const QStringList& candidates, const VALUE_TYPE valueType_ = EXT_SPECIFIED_FILE_PATH);
@@ -235,6 +236,15 @@ const KV SEARCH_NAME_CASE_SENSITIVE{"SEARCH_NAME_CASE_SENSITIVE", false, ValueCh
 const KV SEARCH_CONTENTS_CASE_SENSITIVE{"SEARCH_CONTENTS_CASE_SENSITIVE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV ADVANCE_SEARCH_LINEEDIT_VALUE("ADVANCE_SEARCH_LINEEDIT_VALUE", "", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
 const KV DISABLE_ENTRIES_DONT_PASS_FILTER{"DISABLE_ENTRIES_DONT_PASS_FILTER", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
+
+const KV RENAMER_INCLUDING_FILE_EXTENSION{"RENAMER_INCLUDING_FILE_EXTENSION", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
+const KV RENAMER_INCLUDING_DIR{"RENAMER_INCLUDING_DIR", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
+const KV RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",
+                              QStringList{" BB ", " BB", " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD"},
+                              ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
+const KV RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST", QStringList{"", " ", "", " - 1080p"}, ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
+const KV RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"},
+                                     ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 
 const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE",
                                 "../bin/PERFORMERS_TABLE.txt",
