@@ -13,6 +13,8 @@ SOURCES += \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
+    TestCase/ToConsecutiveFileNameNoTest.cpp \
+    Component/RenameWidgets/AdvanceRenamer.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
@@ -38,14 +40,15 @@ SOURCES += \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/NameStandardizer.cpp \
     Tools/PerformersManager.cpp \
-    Tools/RenameWidget.cpp \
     Tools/RenameNamesUnique.cpp \
+    Tools/ToConsecutiveFileNameNo.cpp \
     UndoRedo.cpp
 
 
 HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
+    Component/RenameWidgets/AdvanceRenamer.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
     Tools/NameTool.h\
@@ -61,8 +64,8 @@ HEADERS += \
     Tools/FilesNameBatchStandardizer.h \
     Tools/NameStandardizer.h \
     Tools/PerformersManager.h \
-    Tools/RenameWidget.h \
     Tools/RenameNamesUnique.h \
+    Tools/ToConsecutiveFileNameNo.h \
     UndoRedo.h
 
 DISTFILES += \

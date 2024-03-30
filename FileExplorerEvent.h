@@ -11,7 +11,7 @@
 
 #include "Tools/MyClipboard.h"
 #include "Tools/RedundantFolderRemove.h"
-#include "Tools/RenameWidget.h"
+#include "Component/RenameWidgets/AdvanceRenamer.h"
 
 #include "ContentPanel.h"
 
@@ -44,7 +44,7 @@ class FileExplorerEvent : public QObject {
   FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, T_UpdateComponentVisibility hotUpdate_, QObject* parent);
   void subscribe();
 
-  void onRename(RenameWidget* renameWid);
+  void onRename(AdvanceRenamer* renameWid);
   auto onRenamePre() const -> std::pair<QString, QStringList>;
 
   auto __CanNewItem() const -> bool;

@@ -62,6 +62,7 @@ SOURCES += \
     Tools/RenameNamesUnique.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
+    Tools/ToConsecutiveFileNameNo.cpp \
     View/AdvanceSearchTableView.cpp \
     View/CustomListView.cpp \
     View/JsonListView.cpp \
@@ -96,7 +97,7 @@ SOURCES += \
     Tools/ProductionStudioManager.cpp \
     Tools/PlayVideo.cpp \
     Tools/RedundantFolderRemove.cpp \
-    Tools/RenameWidget.cpp \
+    Component/RenameWidgets/AdvanceRenamer.cpp \
     Tools/StringEditHelper.cpp \
     Tools/SysTerminal.cpp \
     Tools/TorrentsDatabaseHelper.cpp \
@@ -185,6 +186,7 @@ HEADERS += \
     Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
+    Tools/ToConsecutiveFileNameNo.h \
     View/AdvanceSearchTableView.h \
     View/CustomListView.h \
     View/JsonListView.h \
@@ -219,7 +221,7 @@ HEADERS += \
     Tools/ProductionStudioManager.h \
     Tools/PlayVideo.h \
     Tools/RedundantFolderRemove.h \
-    Tools/RenameWidget.h \
+    Component/RenameWidgets/AdvanceRenamer.h \
     Tools/StringEditHelper.h \
     Tools/SysTerminal.h \
     Tools/TorrentsDatabaseHelper.h \
