@@ -366,7 +366,7 @@ class FileOperation {
       BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
       if (ret != ErrorCode::OK) {
         ++failedCommandCnt;
-        const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]").arg(k).arg(vals.join(",")).arg(vals.size());
+        const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]. ErrorCode[%4]").arg(k).arg(vals.join(",")).arg(vals.size()).arg(ret);
         qWarning("%s", qPrintable(msg));
         log += msg;
       }
