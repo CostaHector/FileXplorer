@@ -238,11 +238,7 @@ class RenameWidget_Delete : public RenameWidget_Replace {
 
 class RenameWidget_Numerize : public AdvanceRenamer {
  public:
-  QLineEdit* m_startNo;
-  QLineEdit* m_completeBaseName;
-
-  explicit RenameWidget_Numerize(QWidget* parent = nullptr)
-      : AdvanceRenamer(parent), m_startNo(new QLineEdit("0")), m_completeBaseName(new QLineEdit) {
+  explicit RenameWidget_Numerize(QWidget* parent = nullptr) : AdvanceRenamer(parent) {
     EXT_INSIDE_FILENAME->setChecked(false);
     ITEMS_INSIDE_SUBDIR->setChecked(false);
   }
@@ -253,21 +249,28 @@ class RenameWidget_Numerize : public AdvanceRenamer {
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl(new QToolBar);
-    replaceControl->addWidget(new QLabel("Complete base name"));
+    replaceControl->addWidget(m_nameBase);
     replaceControl->addWidget(m_completeBaseName);
-    replaceControl->addWidget(new QLabel("Start No:"));
+    replaceControl->addSeparator();
+    replaceControl->addWidget(m_nameStartNo);
     replaceControl->addWidget(m_startNo);
+    replaceControl->addSeparator();
+    replaceControl->addWidget(EXT_INSIDE_FILENAME);
     return replaceControl;
   }
   auto extraSubscribe() -> void override {
     connect(m_startNo, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
     connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
   }
-  auto InitExtraMemberWidget() -> void override {
-    m_startNo = new QLineEdit("0");
-    m_completeBaseName = new QLineEdit;
-  }
+  auto InitExtraMemberWidget() -> void override {}
   auto RenameCore(const QStringList& replaceeList) -> QStringList override;
+
+ private:
+  QLineEdit* m_startNo{new QLineEdit("0")};
+  QLineEdit* m_completeBaseName{new QLineEdit};
+
+  QLabel* m_nameBase = new QLabel("Complete base name:");
+  QLabel* m_nameStartNo = new QLabel("Start No:");
 };
 
 #include "Actions/RenameActions.h"
@@ -297,7 +300,6 @@ class RenameWidget_Case : public AdvanceRenamer {
     caseTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     return;
   }
-  //    FIRST_LETTER_OF_EACH_WORD_COMP = re.compile("(^|\s)(\S)");
 
   auto RenameCore(const QStringList& replaceeList) -> QStringList override;
 
