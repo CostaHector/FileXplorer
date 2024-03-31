@@ -173,6 +173,7 @@ bool ValueChecker::operator()(const QVariant& v) const {
     case PLAIN_BOOL:
     case PLAIN_FLOAT:
     case PLAIN_DOUBLE:
+    case QSTRING_LIST:
     default:
       return true;
   }
@@ -195,6 +196,8 @@ QString ValueChecker::valueToString(const QVariant& v) const {
       return QString::number(v.toFloat());
     case PLAIN_DOUBLE:
       return QString::number(v.toDouble());
+    case QSTRING_LIST:
+      return v.toStringList().join('\n');
     default:
       return "";
   }
@@ -218,6 +221,8 @@ QVariant ValueChecker::strToQVariant(const QString& v) const {
       return v.toFloat();
     case PLAIN_DOUBLE:
       return v.toDouble();
+    case QSTRING_LIST:
+      return v.split('\n');
     default:
       return QVariant();
   }

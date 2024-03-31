@@ -44,8 +44,11 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
 
   _STR_REPLACER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_R));
   _STR_REPLACER->setToolTip(QString("<b>%1 (%2)</b><br/> Replace a substring in file name with "
-                                   "another string.")
+                                    "another string.")
                                 .arg(_STR_REPLACER->text(), _STR_REPLACER->shortcut().toString()));
+
+  _NAME_NO_CONSECUTIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Rename and make file number consecutive.")
+                                       .arg(_NAME_NO_CONSECUTIVE->text(), _NAME_NO_CONSECUTIVE->shortcut().toString()));
 
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
@@ -54,6 +57,7 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   actionGroup->addAction(_STR_INSERTER);
   actionGroup->addAction(_STR_DELETER);
   actionGroup->addAction(_STR_REPLACER);
+  actionGroup->addAction(_NAME_NO_CONSECUTIVE);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
   for (QAction* act : actionGroup->actions()) {
     act->setCheckable(false);

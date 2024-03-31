@@ -80,7 +80,7 @@ OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool
           completeNames.append(fi.fileName());
           suffixs.append("");
         } else {
-          const QString& nm = fileInfo.fileName();
+          const QString& nm = fi.fileName();
           const int dotIndex = PATHTOOL::getFileExtensionDotIndex(nm);
           completeNames.append(nm.left(dotIndex));
           suffixs.append(nm.mid(dotIndex + 1));
