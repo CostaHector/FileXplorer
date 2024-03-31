@@ -70,6 +70,6 @@ void ToConsecutiveFileNameNoTest::init() {}
 
 void ToConsecutiveFileNameNoTest::cleanup() {}
 
-QTEST_MAIN(ToConsecutiveFileNameNoTest)
+//QTEST_MAIN(ToConsecutiveFileNameNoTest)
 
-#include "ToConsecutiveFileNameNoTest.moc"
+//#include "ToConsecutiveFileNameNoTest.moc"

@@ -65,6 +65,10 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
 }
 
 QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
+  if (replaceeList.isEmpty()) {
+    return replaceeList;
+  }
+
   const QString& oldString = oldStrCB->currentText();
   const QString& newString = newStrCB->currentText();
   auto regexEnable = regex->isChecked();
@@ -95,40 +99,43 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
 }
 
 QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
-  QString startNoStr = m_startNo->text();
-
-  bool isnumeric = false;
-  int startNo = startNoStr.toInt(&isnumeric);
-  if (not isnumeric) {
-    qDebug("start index is not number[%s]", qPrintable(startNoStr));
+  if (replaceeList.isEmpty()) {
     return replaceeList;
   }
 
-  if (m_completeBaseName->text().isEmpty()) {
-    // set default complete basename
-    m_completeBaseName->setText(replaceeList[0]);
-    m_completeBaseName->selectAll();
+  QString startNoStr = m_startNo->text();
+  bool isnumeric = false;
+  const int START_NO = startNoStr.toInt(&isnumeric);
+  if (not isnumeric) {
+    qWarning("start index is not number[%s]", qPrintable(startNoStr));
+    return replaceeList;
   }
-  const QString& completeBaseNameString = m_completeBaseName->text();
-  const QStringList& suffixs = m_oExtTE->toPlainText().split('\n');
 
+  m_completeBaseName->setText(replaceeList[0]);
+  m_completeBaseName->selectAll();
+
+  const QStringList& suffixs = m_oExtTE->toPlainText().split('\n');
   QMap<QString, int> sufCntMap;
   for (const QString& suf : suffixs) {
-    if (sufCntMap.contains(suf)) {
-      ++sufCntMap[suf];
+    auto extIt = sufCntMap.find(suf);
+    if (extIt != sufCntMap.end()) {
+      ++extIt.value();
     } else {
-      sufCntMap[suf] = 1;
+      extIt.value() = 1;
     }
   }
-  QMap<QString, int> sufCurIndex;
-  for (const QString& suf : sufCntMap.keys()) {
-    if (sufCntMap[suf] > 1) {
-      sufCurIndex[suf] = startNo;
+
+  QMap<QString, int> sufCurIndex; // each extension no. start
+  for (auto ext2Cnt = sufCntMap.cbegin(); ext2Cnt != sufCntMap.cend(); ++ext2Cnt) {
+    if (ext2Cnt.value() > 1) {
+      sufCurIndex[ext2Cnt.key()] = START_NO;
     }
   }
+
+  const QString& completeBaseNameString = m_completeBaseName->text();
   QStringList numerizedNames;
   for (const QString& suf : suffixs) {
-    if (not sufCurIndex.contains(suf)) {
+    if (not sufCurIndex.contains(suf)) { // no need to no. because this extension count <= 1
       numerizedNames.append(completeBaseNameString);
       continue;
     }
@@ -141,9 +148,12 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
 }
 
 auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
+  if (replaceeList.isEmpty()) {
+    return replaceeList;
+  }
   auto* caseAct = caseAG->checkedAction();  // todo checked
   if (caseAct == nullptr) {
-    qDebug("No rule enabled");
+    qWarning("No rule enabled");
     return replaceeList;
   }
   return RenameWidget_Case::ChangeCaseRename(replaceeList, caseAct->text());
@@ -393,6 +403,9 @@ int main(int argc, char* argv[]) {
 #include "Tools/ToConsecutiveFileNameNo.h"
 
 QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replaceeList) {
+  if (replaceeList.isEmpty()) {
+    return replaceeList;
+  }
   const QString& startNoStr = m_fileNoStartIndex->text();
   bool isnumeric = false;
   int startNo = startNoStr.toInt(&isnumeric);
