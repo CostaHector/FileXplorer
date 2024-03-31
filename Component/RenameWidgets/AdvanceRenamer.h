@@ -127,6 +127,7 @@ class RenameWidget_ConsecutiveFileNo : public AdvanceRenamer {
 
   RenameWidget_ConsecutiveFileNo(QWidget* parent = nullptr) : AdvanceRenamer(parent) {
     EXT_INSIDE_FILENAME->setCheckState(Qt::CheckState::Checked);
+    ITEMS_INSIDE_SUBDIR->setEnabled(false);
     ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
   };
 
@@ -239,8 +240,9 @@ class RenameWidget_Delete : public RenameWidget_Replace {
 class RenameWidget_Numerize : public AdvanceRenamer {
  public:
   explicit RenameWidget_Numerize(QWidget* parent = nullptr) : AdvanceRenamer(parent) {
-    EXT_INSIDE_FILENAME->setChecked(false);
-    ITEMS_INSIDE_SUBDIR->setChecked(false);
+    EXT_INSIDE_FILENAME->setCheckState(Qt::CheckState::Unchecked);
+    ITEMS_INSIDE_SUBDIR->setEnabled(false);
+    ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
   }
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
@@ -256,6 +258,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
     replaceControl->addWidget(m_startNo);
     replaceControl->addSeparator();
     replaceControl->addWidget(EXT_INSIDE_FILENAME);
+    replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
     return replaceControl;
   }
   auto extraSubscribe() -> void override {

@@ -121,11 +121,11 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
     if (extIt != sufCntMap.end()) {
       ++extIt.value();
     } else {
-      extIt.value() = 1;
+      sufCntMap.insert(extIt, suf, 1);
     }
   }
 
-  QMap<QString, int> sufCurIndex; // each extension no. start
+  QMap<QString, int> sufCurIndex;  // each extension no. start
   for (auto ext2Cnt = sufCntMap.cbegin(); ext2Cnt != sufCntMap.cend(); ++ext2Cnt) {
     if (ext2Cnt.value() > 1) {
       sufCurIndex[ext2Cnt.key()] = START_NO;
@@ -135,7 +135,7 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
   const QString& completeBaseNameString = m_completeBaseName->text();
   QStringList numerizedNames;
   for (const QString& suf : suffixs) {
-    if (not sufCurIndex.contains(suf)) { // no need to no. because this extension count <= 1
+    if (not sufCurIndex.contains(suf)) {  // no need to no. because this extension count <= 1
       numerizedNames.append(completeBaseNameString);
       continue;
     }
@@ -231,6 +231,13 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
 
+  EXT_INSIDE_FILENAME->setToolTip("Extension inside file name.\nRules will also work on suffix");
+  ITEMS_INSIDE_SUBDIR->setToolTip("Items contains subdirectory.\nRules will also work on itself and its subdirectories");
+
+  EXT_INSIDE_FILENAME->setChecked(
+      PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
+  ITEMS_INSIDE_SUBDIR->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
+
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
   m_buttonBox->button(QDialogButtonBox::Ok)->setStyleSheet(SUBMIT_BTN_STYLE);
   m_buttonBox->button(QDialogButtonBox::Help)->setText("See commands...");
@@ -254,12 +261,6 @@ void AdvanceRenamer::ReadSettings() {
 void AdvanceRenamer::init() {
   InitExtraCommonVariable();
   InitExtraMemberWidget();
-
-  EXT_INSIDE_FILENAME->setChecked(
-      PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
-  EXT_INSIDE_FILENAME->setToolTip("Extension inside file name.\nRules will also work on suffix");
-  ITEMS_INSIDE_SUBDIR->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
-  ITEMS_INSIDE_SUBDIR->setToolTip("Items contains subdirectory.\nRules will also work on itself and its subdirectories");
 
   m_replaceControlBar = InitControlTB();
 
