@@ -47,6 +47,9 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
                                     "another string.")
                                 .arg(_STR_REPLACER->text(), _STR_REPLACER->shortcut().toString()));
 
+  _NAME_NO_CONSECUTIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Rename and make file number consecutive.")
+                                       .arg(_NAME_NO_CONSECUTIVE->text(), _NAME_NO_CONSECUTIVE->shortcut().toString()));
+
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
   actionGroup->addAction(_RENAME_SWAPPER);
