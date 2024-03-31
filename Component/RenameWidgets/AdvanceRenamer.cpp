@@ -110,9 +110,11 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
     qWarning("start index is not number[%s]", qPrintable(startNoStr));
     return replaceeList;
   }
-
-  m_completeBaseName->setText(replaceeList[0]);
-  m_completeBaseName->selectAll();
+  if (not m_baseNameInited) { // init lineedit only at first time. when lineedit editted by user. lineedit should not init
+    m_completeBaseName->setText(replaceeList[0]);
+    m_completeBaseName->selectAll();
+    m_baseNameInited = true;
+  }
 
   const QStringList& suffixs = m_oExtTE->toPlainText().split('\n');
   QMap<QString, int> sufCntMap;

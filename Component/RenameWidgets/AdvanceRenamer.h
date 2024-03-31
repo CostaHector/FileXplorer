@@ -251,10 +251,10 @@ class RenameWidget_Numerize : public AdvanceRenamer {
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl(new QToolBar);
-    replaceControl->addWidget(m_nameBase);
+    replaceControl->addWidget(new QLabel("Complete base name:"));
     replaceControl->addWidget(m_completeBaseName);
     replaceControl->addSeparator();
-    replaceControl->addWidget(m_nameStartNo);
+    replaceControl->addWidget(new QLabel("Start No:"));
     replaceControl->addWidget(m_startNo);
     replaceControl->addSeparator();
     replaceControl->addWidget(EXT_INSIDE_FILENAME);
@@ -271,9 +271,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
  private:
   QLineEdit* m_startNo{new QLineEdit("0")};
   QLineEdit* m_completeBaseName{new QLineEdit};
-
-  QLabel* m_nameBase = new QLabel("Complete base name:");
-  QLabel* m_nameStartNo = new QLabel("Start No:");
+  bool m_baseNameInited = false;
 };
 
 #include "Actions/RenameActions.h"
