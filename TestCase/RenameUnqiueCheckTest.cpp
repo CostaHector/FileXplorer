@@ -60,7 +60,16 @@ class RenameUnqiueCheckTest : public QObject {
   QStringList m_conflictNames;
 };
 
-void RenameUnqiueCheckTest::initTestCase() {}
+void RenameUnqiueCheckTest::initTestCase() {
+  const QDir baseDir(TEST_SRC_DIR);
+  const QStringList& shouldExistPaths = {"rename12To45Basic/1", "rename12To45Basic/2", "renameDiretoryNameShouldNotConflict/dirName/dirName",
+                                         "renameDiretoryNameShouldNotConflict/dirName/file1"};
+  for (const QString& path : shouldExistPaths) {
+    if (not baseDir.exists(path)) {
+      QVERIFY2(baseDir.mkpath(path), "environment not met [folder make failed]");
+    }
+  }
+}
 
 void RenameUnqiueCheckTest::cleanupTestCase() {}
 
@@ -70,6 +79,6 @@ void RenameUnqiueCheckTest::init() {
 
 void RenameUnqiueCheckTest::cleanup() {}
 
-QTEST_MAIN(RenameUnqiueCheckTest)
+ QTEST_MAIN(RenameUnqiueCheckTest)
 
-#include "RenameUnqiueCheckTest.moc"
+ #include "RenameUnqiueCheckTest.moc"

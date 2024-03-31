@@ -36,6 +36,29 @@
     </message>
 </context>
 <context>
+    <name>ConflictsRecycle</name>
+    <message>
+        <location filename="../Component/ConflictsRecycle.cpp" line="12"/>
+        <source>Size Smaller</source>
+        <translation>选中文件较小方</translation>
+    </message>
+    <message>
+        <location filename="../Component/ConflictsRecycle.cpp" line="13"/>
+        <source>Date Newer</source>
+        <translation>选中文件较新方</translation>
+    </message>
+    <message>
+        <location filename="../Component/ConflictsRecycle.cpp" line="14"/>
+        <source>Revert Selection</source>
+        <translation>反转当前选中</translation>
+    </message>
+    <message>
+        <location filename="../Component/ConflictsRecycle.cpp" line="15"/>
+        <source>Reset Table</source>
+        <translation>重置选中</translation>
+    </message>
+</context>
+<context>
     <name>CustomTableView</name>
     <message>
         <location filename="../View/CustomTableView.h" line="47"/>
@@ -942,27 +965,32 @@
         <translation>替换字符串</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="19"/>
+        <location filename="../Actions/RenameActions.h" line="18"/>
+        <source>Name No Consecutive</source>
+        <translation>连续编号</translation>
+    </message>
+    <message>
+        <location filename="../Actions/RenameActions.h" line="20"/>
         <source>Upper Case</source>
         <translation>全大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="20"/>
+        <location filename="../Actions/RenameActions.h" line="21"/>
         <source>Lower Case</source>
         <translation>全小写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="21"/>
+        <location filename="../Actions/RenameActions.h" line="22"/>
         <source>Loose Capitalize</source>
         <translation>宽首字母大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="22"/>
+        <location filename="../Actions/RenameActions.h" line="23"/>
         <source>Strict Capitalize</source>
         <translation>严首字母大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="23"/>
+        <location filename="../Actions/RenameActions.h" line="24"/>
         <source>Swap Case</source>
         <translation>颠倒大小写</translation>
     </message>
@@ -970,24 +998,20 @@
 <context>
     <name>RenameConflicts</name>
     <message>
-        <location filename="../Component/RenameConflicts.cpp" line="12"/>
         <source>Size Smaller</source>
-        <translation>选择文件较小者</translation>
+        <translation type="vanished">选择文件较小者</translation>
     </message>
     <message>
-        <location filename="../Component/RenameConflicts.cpp" line="13"/>
         <source>Date Newer</source>
-        <translation>选择文件较新者</translation>
+        <translation type="vanished">选择文件较新者</translation>
     </message>
     <message>
-        <location filename="../Component/RenameConflicts.cpp" line="14"/>
         <source>Revert Selection</source>
-        <translation>反选文件</translation>
+        <translation type="vanished">反选文件</translation>
     </message>
     <message>
-        <location filename="../Component/RenameConflicts.cpp" line="15"/>
         <source>Reset Table</source>
-        <translation>重置选择</translation>
+        <translation type="vanished">重置选择</translation>
     </message>
 </context>
 <context>
