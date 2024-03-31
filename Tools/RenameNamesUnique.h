@@ -39,8 +39,8 @@ class RenameNamesUnique {
 
   QString Details() const {
     return QString(
-               "arr len unequal:[%1]\n"
-               "name line empty[%2].\n")
+               "arr len unequal:[%1]; "
+               "name line empty[%2]; ")
                .arg(m_isArrLenUnequal)
                .arg(m_nameLineEmpty) +
            "Conflict list: [" + m_conflictNames.join('|') + "].";
