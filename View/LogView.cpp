@@ -1,4 +1,5 @@
 #include "LogView.h"
+#include "Actions/FileLeafAction.h"
 #include "Actions/LogViewActions.h"
 #include "PublicVariable.h"
 #include "Tools/MessageOutput.h"
@@ -31,7 +32,7 @@ LogView::LogView(QWidget* parent) : QMainWindow{parent} {
   setCentralWidget(m_logViewSplitter);
 
   setWindowTitle(tr("Log View"));
-  setWindowIcon(QIcon(":/themes/FLOW_LOGS"));
+  setWindowIcon(g_fileLeafActions()._LOGGING->icon());
   ReadSettings();
 
   subscribe();
@@ -46,6 +47,11 @@ void LogView::ReadSettings() {
   }
   m_logViewSplitter->restoreState(PreferenceSettings().value("LOG_VIEW_SPLITTER_STATE", QByteArray()).toByteArray());
   m_logTable->InitTableView();
+}
+
+void LogView::hideEvent(QHideEvent* event) {
+  g_fileLeafActions()._LOGGING->setChecked(false);
+  QMainWindow::hideEvent(event);
 }
 
 void LogView::closeEvent(QCloseEvent* event) {

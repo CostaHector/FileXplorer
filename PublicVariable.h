@@ -240,7 +240,7 @@ const KV DISABLE_ENTRIES_DONT_PASS_FILTER{"DISABLE_ENTRIES_DONT_PASS_FILTER", tr
 const KV RENAMER_INCLUDING_FILE_EXTENSION{"RENAMER_INCLUDING_FILE_EXTENSION", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV RENAMER_INCLUDING_DIR{"RENAMER_INCLUDING_DIR", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",
-                              QStringList{" BB ", " BB", " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD"},
+                              QStringList{"", " BB ", " BB", " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD"},
                               ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 const KV RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST", QStringList{"", " ", "", " - 1080p"}, ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 const KV RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"},

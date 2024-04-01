@@ -42,7 +42,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
   // True means newPath would be push into undo.
   // false not
   if (not newPath.isEmpty() and not QFileInfo(newPath).isDir()) {
-    qDebug("Path[%s] is not [empty or existed directory].", qPrintable(newPath));
+    qWarning("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
   QAbstractItemView* fsView = GetCurView();
@@ -74,7 +74,6 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
     m_fsModel->setNameFilters({});
     return true;
   }
-  qDebug("search pattern: [*%s*].", qPrintable(targetStr));
   m_fsModel->setNameFilters({"*" + targetStr + "*"});
   return true;
 }
@@ -130,9 +129,9 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
   if (not clickedIndex.isValid())
     return false;
   QFileInfo fi = getFileInfo(clickedIndex);
-  qDebug("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
+  qInfo("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (not fi.exists()) {
-    qDebug("[path inexists] %s", qPrintable(fi.absoluteFilePath()));
+    qWarning("[path inexists] %s", qPrintable(fi.absoluteFilePath()));
     Notificator::warning("Cannot open inexist path", fi.absoluteFilePath());
     return false;
   }
@@ -214,21 +213,20 @@ void ContentPanel::disconnectSelectionChanged(QString typeName) {
 }
 
 bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
-  m_fsTableView->setFocus();
-  qDebug("onAfterDirectoryLoaded[%s]", qPrintable(loadedPath));
-  const QModelIndex rootIndex = m_fsTableView->rootIndex();
+  qInfo("Directory loaded [%s]", qPrintable(loadedPath));
   if (not m_anchorTags.contains(loadedPath)) {
-    qDebug("anchorTags[%s] not exist. scroll abort", qPrintable(loadedPath));
+    qDebug("AnchorTags[%s] not exist. cancel scroll", qPrintable(loadedPath));
     return false;
   }
-  const QModelIndex qmodelIndex = m_fsModel->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
-  if (not qmodelIndex.isValid()) {
-    qDebug("anchorTags[%s] index invalid. scroll abort", qPrintable(loadedPath));
+  const QModelIndex rootIndex = m_fsTableView->rootIndex();
+  const QModelIndex anchorInd = m_fsModel->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
+  if (not anchorInd.isValid()) {
+    qDebug("anchorTags[%s] invalid. cancel scroll", qPrintable(loadedPath));
     m_anchorTags.remove(loadedPath);
     return false;
   }
-  m_fsTableView->setCurrentIndex(qmodelIndex);
-  m_fsTableView->scrollTo(qmodelIndex);
+  m_fsTableView->setCurrentIndex(anchorInd);
+  m_fsTableView->scrollTo(anchorInd);
   return true;
 }
 
