@@ -22,7 +22,8 @@ class AlertSystem : public QDialog {
     m_alertsTable->InitTableView();
   }
 
-  void closeEvent(QCloseEvent* event) {
+  virtual void hideEvent(QHideEvent* event) override;
+  virtual void closeEvent(QCloseEvent* event) override{
     PreferenceSettings().setValue("ALERT_SYSTEM_GEOMETRY", saveGeometry());
     return QDialog::closeEvent(event);
   }

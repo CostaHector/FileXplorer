@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "Actions/FileLeafAction.h"
 #include "NotificatorFrame.h"
 #include "PublicVariable.h"
 using namespace STATUS_COLOR;
@@ -37,6 +38,11 @@ AlertSystem::AlertSystem(QWidget* parent)
 
   ReadSettings();
   RefreshWindowIcon();
+}
+
+void AlertSystem::hideEvent(QHideEvent* event) {
+  g_fileLeafActions()._ALERT_ITEMS->setChecked(false);
+  QDialog::hideEvent(event);
 }
 
 void AlertSystem::RefreshWindowIcon() {

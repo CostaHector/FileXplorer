@@ -10,7 +10,7 @@ class FileLeafActions : public QObject {
 
   QActionGroup* GetLeafTabActions();
   QAction* _LOGGING;
-  QAction* _PREFERENCE_SETTING;
+  QAction* _ALERT_ITEMS;
   QAction* _ABOUT_FILE_EXPLORER;
   QAction* _LANUAGE;
 
