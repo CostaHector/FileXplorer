@@ -4,7 +4,7 @@
 FileLeafActions::FileLeafActions(QObject* parent)
     : QObject(parent),
       _LOGGING{new QAction{QIcon(":/themes/FLOW_LOGS"), tr("Logs")}},
-      _PREFERENCE_SETTING{new QAction(QIcon(":/themes/SETTINGS"), tr("Settings"))},
+      _ALERT_ITEMS{new QAction(QIcon(":/themes/SETTINGS"), tr("Alerts"))},
       _ABOUT_FILE_EXPLORER{new QAction(QIcon(":/themes/ABOUT"), tr("About"))},
       _LANUAGE(new QAction(QIcon(":/themes/LANGUAGE"), tr("Language"))),
       LEAF_FILE(GetLeafTabActions()) {}
@@ -15,17 +15,17 @@ QActionGroup* FileLeafActions::GetLeafTabActions() {
   _LOGGING->setCheckable(true);
   _LOGGING->setShortcutVisibleInContextMenu(true);
 
-  _PREFERENCE_SETTING->setCheckable(true);
-  _PREFERENCE_SETTING->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
-  _PREFERENCE_SETTING->setShortcutVisibleInContextMenu(true);
-  _PREFERENCE_SETTING->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_PREFERENCE_SETTING->text(), _PREFERENCE_SETTING->shortcut().toString()));
+  _ALERT_ITEMS->setCheckable(true);
+  _ALERT_ITEMS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
+  _ALERT_ITEMS->setShortcutVisibleInContextMenu(true);
+  _ALERT_ITEMS->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_ALERT_ITEMS->text(), _ALERT_ITEMS->shortcut().toString()));
 
   _LANUAGE->setCheckable(true);
   _LANUAGE->setChecked(PreferenceSettings().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
 
   LEAF_FILE->addAction(_LOGGING);
-  LEAF_FILE->addAction(_PREFERENCE_SETTING);
+  LEAF_FILE->addAction(_ALERT_ITEMS);
   LEAF_FILE->addAction(_ABOUT_FILE_EXPLORER);
   LEAF_FILE->addAction(_LANUAGE);
   LEAF_FILE->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
