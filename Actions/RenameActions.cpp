@@ -50,6 +50,9 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   _NAME_NO_CONSECUTIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Rename and make file number consecutive.")
                                        .arg(_NAME_NO_CONSECUTIVE->text(), _NAME_NO_CONSECUTIVE->shortcut().toString()));
 
+  _CONVERT_UNICODE_TO_ASCII->setToolTip(QString("<b>%1 (%2)</b><br/> Convert bold unicode charset to ascii")
+                                            .arg(_CONVERT_UNICODE_TO_ASCII->text(), _CONVERT_UNICODE_TO_ASCII->shortcut().toString()));
+
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
   actionGroup->addAction(_RENAME_SWAPPER);
@@ -58,6 +61,7 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   actionGroup->addAction(_STR_DELETER);
   actionGroup->addAction(_STR_REPLACER);
   actionGroup->addAction(_NAME_NO_CONSECUTIVE);
+  actionGroup->addAction(_CONVERT_UNICODE_TO_ASCII);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
   for (QAction* act : actionGroup->actions()) {
     act->setCheckable(false);
