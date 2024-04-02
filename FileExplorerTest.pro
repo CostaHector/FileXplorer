@@ -10,6 +10,7 @@ TEMPLATE = app
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    TestCase/ConvertBoldUnicodeCharsetToAsciiTest.cpp \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
+    Tools/ConvertBoldUnicodeCharsetToAscii.cpp\
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     Component/NotificatorFrame.cpp \
@@ -66,6 +68,7 @@ HEADERS += \
     Tools/PerformersManager.h \
     Tools/RenameNamesUnique.h \
     Tools/ToConsecutiveFileNameNo.h \
+    Tools/ConvertBoldUnicodeCharsetToAscii.h\
     UndoRedo.h
 
 DISTFILES += \

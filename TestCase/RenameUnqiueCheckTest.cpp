@@ -79,6 +79,6 @@ void RenameUnqiueCheckTest::init() {
 
 void RenameUnqiueCheckTest::cleanup() {}
 
- QTEST_MAIN(RenameUnqiueCheckTest)
+//QTEST_MAIN(RenameUnqiueCheckTest)
 
- #include "RenameUnqiueCheckTest.moc"
+//#include "RenameUnqiueCheckTest.moc"

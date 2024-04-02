@@ -64,13 +64,12 @@ class AdvanceRenamer : public QDialog {
     const auto& suffixs = osWalkerRet.suffixs;
     isFiles = osWalkerRet.isFiles;
 
-    setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
-
     m_relNameTE->setPlainText(relToNames.join('\n'));
 
     m_oBaseTE->setPlainText(completeNames.join('\n'));
     m_oExtTE->setPlainText(suffixs.join('\n'));
 
+    setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
     const auto& newCompleteNames = RenameCore(completeNames);
     m_nBaseTE->setPlainText(newCompleteNames.join('\n'));
     m_nExtTE->setPlainText(suffixs.join('\n'));
@@ -78,6 +77,7 @@ class AdvanceRenamer : public QDialog {
   auto OnlyTriggerRenameCore() -> void {
     // will not call OSWalker.;
     // only update complete name;
+    setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
     const auto& newCompleteNames = RenameCore(completeNames);
     m_nBaseTE->setPlainText(newCompleteNames.join('\n'));
   }

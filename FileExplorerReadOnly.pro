@@ -56,6 +56,7 @@ SOURCES += \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/VidModel.cpp \
+    Tools/ConvertBoldUnicodeCharsetToAscii.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameTool.cpp \
@@ -98,6 +99,7 @@ SOURCES += \
     Tools/PlayVideo.cpp \
     Tools/RedundantFolderRemove.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
+    Component/RenameWidgets/RenameWidget_ConvertBoldUnicodeCharset2Ascii.cpp \
     Tools/StringEditHelper.cpp \
     Tools/SysTerminal.cpp \
     Tools/TorrentsDatabaseHelper.cpp \
@@ -180,6 +182,7 @@ HEADERS += \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/VidModel.h \
+    Tools/ConvertBoldUnicodeCharsetToAscii.h \
     Tools/Log.h \
     Tools/MessageOutput.h \
     Tools/NameTool.h \
@@ -222,6 +225,7 @@ HEADERS += \
     Tools/PlayVideo.h \
     Tools/RedundantFolderRemove.h \
     Component/RenameWidgets/AdvanceRenamer.h \
+    Component/RenameWidgets/RenameWidget_ConvertBoldUnicodeCharset2Ascii.h \
     Tools/StringEditHelper.h \
     Tools/SysTerminal.h \
     Tools/TorrentsDatabaseHelper.h \
