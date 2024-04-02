@@ -394,9 +394,13 @@
         <translation>日志</translation>
     </message>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="7"/>
         <source>Settings</source>
-        <translation>设置</translation>
+        <translation type="vanished">设置</translation>
+    </message>
+    <message>
+        <location filename="../Actions/FileLeafAction.cpp" line="7"/>
+        <source>Alerts</source>
+        <translation>告警</translation>
     </message>
     <message>
         <location filename="../Actions/FileLeafAction.cpp" line="8"/>
@@ -657,7 +661,7 @@
 <context>
     <name>LogView</name>
     <message>
-        <location filename="../View/LogView.cpp" line="33"/>
+        <location filename="../View/LogView.cpp" line="34"/>
         <source>Log View</source>
         <translation>日志视图</translation>
     </message>
@@ -970,27 +974,32 @@
         <translation>连续编号</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="20"/>
+        <location filename="../Actions/RenameActions.h" line="19"/>
+        <source>Unicode to ASCII</source>
+        <translation>Unicode转换为ASCII</translation>
+    </message>
+    <message>
+        <location filename="../Actions/RenameActions.h" line="21"/>
         <source>Upper Case</source>
         <translation>全大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="21"/>
+        <location filename="../Actions/RenameActions.h" line="22"/>
         <source>Lower Case</source>
         <translation>全小写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="22"/>
+        <location filename="../Actions/RenameActions.h" line="23"/>
         <source>Loose Capitalize</source>
         <translation>宽首字母大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="23"/>
+        <location filename="../Actions/RenameActions.h" line="24"/>
         <source>Strict Capitalize</source>
         <translation>严首字母大写</translation>
     </message>
     <message>
-        <location filename="../Actions/RenameActions.h" line="24"/>
+        <location filename="../Actions/RenameActions.h" line="25"/>
         <source>Swap Case</source>
         <translation>颠倒大小写</translation>
     </message>
