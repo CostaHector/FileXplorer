@@ -148,6 +148,8 @@
         <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.png</file>
         <file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/Numerizer.svg</file>
         <file alias="NAME_STR_SWAPPER_PATH">NameStrIcon/NAME_SWAPPER.png</file>
+        <file alias="UNICODE_TO_ASCII_TEXT">NameStrIcon/UNICODE_TO_ASCII_TEXT.png</file>
+
         <file alias="RENAME_LOWER_CASE">NameStrIcon/CaseLower.png</file>
         <file alias="RENAME_UPPER_CASE">NameStrIcon/CaseUpper.png</file>
         <file alias="RENAME_LOOSE_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_WEAK_USB.svg</file>
