@@ -33,6 +33,6 @@ void ConvertBoldUnicodeCharsetToAsciiTest::init() {}
 
 void ConvertBoldUnicodeCharsetToAsciiTest::cleanup() {}
 
-QTEST_MAIN(ConvertBoldUnicodeCharsetToAsciiTest)
+//QTEST_MAIN(ConvertBoldUnicodeCharsetToAsciiTest)
 
-#include "ConvertBoldUnicodeCharsetToAsciiTest.moc"
+//#include "ConvertBoldUnicodeCharsetToAsciiTest.moc"

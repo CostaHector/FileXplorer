@@ -194,29 +194,6 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
   return replacedList;
 }
 
-auto RenameWidget_SwapSection::RenameCore(const QStringList& replaceeList) -> QStringList {
-  if (replaceeList.isEmpty()) {
-    return replaceeList;
-  }
-  QAction* caseAct = caseAG->checkedAction();
-  if (caseAct == nullptr) {
-    return replaceeList;
-  }
-  int f = caseAct->text().leftRef(1).toInt();
-  int s = caseAct->text().leftRef(1).toInt();
-  QStringList sectionSwapped;
-  for (const QString nm : replaceeList) {
-    QStringList secList = nm.split('-');
-    if (secList.size() > s) {  // swap element at f, s index;
-      std::swap(secList[f], secList[s]);
-      sectionSwapped.append(secList.join('-'));
-    } else {
-      sectionSwapped.append(nm);
-    }
-  }
-  return sectionSwapped;
-}
-
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)
     : QDialog(parent),
       windowTitleFormat("%1 | %2"),

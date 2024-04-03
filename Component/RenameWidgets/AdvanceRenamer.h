@@ -306,48 +306,4 @@ class RenameWidget_Case : public AdvanceRenamer {
 
   static QStringList ChangeCaseRename(const QStringList& replaceeList, const QString& caseRuleName);
 };
-
-class RenameWidget_SwapSection : public AdvanceRenamer {
- public:
-  QToolBar* swapTB;
-  QActionGroup* caseAG;
-
-  explicit RenameWidget_SwapSection(QWidget* parent = nullptr) : AdvanceRenamer(parent), swapTB(new QToolBar), caseAG(new QActionGroup(this)) {
-    EXT_INSIDE_FILENAME->setChecked(false);
-  }
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = "Swap section name string | %1 item(s) under [%2]";
-    setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/NAME_STR_SWAPPER_PATH"));
-  }
-  auto InitControlTB() -> QToolBar* override {
-    QToolBar* replaceControl(new QToolBar);
-    replaceControl->addWidget(new QLabel("Swap:"));
-    replaceControl->addWidget(swapTB);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-    return replaceControl;
-  }
-  auto extraSubscribe() -> void override { connect(swapTB, &QToolBar::actionTriggered, this, &AdvanceRenamer::OnlyTriggerRenameCore); }
-  auto InitExtraMemberWidget() -> void override {
-    QAction* section12 = new QAction("1 <> 2");
-    QAction* section23 = new QAction("2 <> 3");
-    QAction* section01 = new QAction("0 <> 1");
-
-    caseAG->addAction(section12);
-    caseAG->addAction(section23);
-    caseAG->addAction(section01);
-
-    caseAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
-    for (QAction* act : caseAG->actions()) {
-      act->setCheckable(true);
-    }
-    section12->setChecked(true);
-
-    swapTB->addActions(caseAG->actions());
-    swapTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  }
-  auto RenameCore(const QStringList& replaceeList) -> QStringList override;
-};
-
 #endif  // ADVANCERENAMER_H
