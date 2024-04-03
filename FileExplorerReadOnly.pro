@@ -44,6 +44,7 @@ SOURCES += \
     Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
+    Component/RenameWidgets/RenameWidget_ArrangeSection.cpp \
     Component/SearchCaseMatterToolButton.cpp \
     Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
@@ -59,6 +60,7 @@ SOURCES += \
     Tools/ConvertBoldUnicodeCharsetToAscii.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
+    Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
     Tools/RenameNamesUnique.cpp \
     Tools/SearchProxyModel.cpp \
@@ -171,6 +173,7 @@ HEADERS += \
     Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
+    Component/RenameWidgets/RenameWidget_ArrangeSection.h \
     Component/SearchCaseMatterToolButton.h \
     Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \
@@ -185,6 +188,7 @@ HEADERS += \
     Tools/ConvertBoldUnicodeCharsetToAscii.h \
     Tools/Log.h \
     Tools/MessageOutput.h \
+    Tools/NameSectionArrange.h \
     Tools/NameTool.h \
     Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \

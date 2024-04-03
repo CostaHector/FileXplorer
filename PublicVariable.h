@@ -245,6 +245,8 @@ const KV RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",
 const KV RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST", QStringList{"", " ", "", " - 1080p"}, ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 const KV RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"},
                                      ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
+const KV RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2",
+                                     ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR}};
 
 const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE",
                                 "../bin/PERFORMERS_TABLE.txt",
