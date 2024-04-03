@@ -11,6 +11,7 @@ SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
     TestCase/ConvertBoldUnicodeCharsetToAsciiTest.cpp \
+    TestCase/NameSectionArrangeTest.cpp \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
@@ -44,6 +45,7 @@ SOURCES += \
     Tools/PerformersManager.cpp \
     Tools/RenameNamesUnique.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
+    Tools/NameSectionArrange.cpp \
     UndoRedo.cpp
 
 
@@ -69,6 +71,7 @@ HEADERS += \
     Tools/RenameNamesUnique.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/ConvertBoldUnicodeCharsetToAscii.h\
+    Tools/NameSectionArrange.h \
     UndoRedo.h
 
 DISTFILES += \
