@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2024-04-03T05:49:18. -->
+<!-- Written by QtCreator 11.0.2, 2024-04-03T22:49:54. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -73,6 +73,10 @@
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/ConvertBoldUnicodeCharsetToAsciiTest.cpp:cleanupTestCase">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/ConvertBoldUnicodeCharsetToAsciiTest.cpp:init">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/ConvertBoldUnicodeCharsetToAsciiTest.cpp:initTestCase">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameSectionArrangeTest.cpp:cleanup">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameSectionArrangeTest.cpp:cleanupTestCase">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameSectionArrangeTest.cpp:init">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/NameSectionArrangeTest.cpp:initTestCase">Unchecked</value>
    </valuemap>
    <value type="int" key="AutoTest.RunAfterBuild">0</value>
    <value type="bool" key="AutoTest.UseGlobal">true</value>
@@ -115,7 +119,7 @@
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
-      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">true</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
       <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
      </valuemap>
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">

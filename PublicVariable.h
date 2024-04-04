@@ -117,6 +117,7 @@ class ValueChecker {
 
   explicit ValueChecker(const VALUE_TYPE valueType_);
 
+  static int getFileExtensionDotIndex(const QString& path);
   static QString GetFileExtension(const QString& path);
 
   static bool isFileExist(const QString& path);

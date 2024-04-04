@@ -17,6 +17,7 @@ SOURCES += \
     TestCase/RenameUnqiueCheckTest.cpp \
     TestCase/ToConsecutiveFileNameNoTest.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
+    TestCase/ValueCheckerTest.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
