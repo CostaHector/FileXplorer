@@ -168,13 +168,4 @@ QString PATHTOOL::longestCommonPrefix(const QStringList& strs) {
 
   const int slashIndex = prefix.lastIndexOf('/');
   return slashIndex == -1 ? prefix : prefix.left(slashIndex);
-  ;
-}
-
-int PATHTOOL::getFileExtensionDotIndex(const QString& path) {
-  const int lastDot = path.lastIndexOf('.');
-  if (lastDot == -1) {
-    return path.size();
-  }
-  return path.size() - (lastDot + 1) > EXTENSION_SIZE ? path.size() : lastDot;
 }

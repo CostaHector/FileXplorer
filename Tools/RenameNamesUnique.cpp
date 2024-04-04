@@ -22,7 +22,7 @@ RenameNamesUnique::RenameNamesUnique(const QString& pre,
                                newSuffixList.size()};
   m_isArrLenUnequal = inputSizeSet.size() != 1;
   if (m_isArrLenUnequal) {
-    qCritical() << "Invalid. Parms with unequal array length: " << inputSizeSet << ".";
+    qCritical("Invalid. Parms with unequal array length.");
     return;
   }
   m_nameLineEmpty = newCompleteNameList.contains("");
@@ -32,10 +32,8 @@ RenameNamesUnique::RenameNamesUnique(const QString& pre,
   }
 
   for (auto i = 0; i < m_oldCompleteNameList.size(); ++i) {
-    QString bs = (m_oldSuffixList[i].isEmpty() ? "" : ".") + m_oldSuffixList[i];
-    QString ns = (m_newSuffixList[i].isEmpty() ? "" : ".") + m_newSuffixList[i];
-    m_leftNames.append(m_oldCompleteNameList[i] + bs);
-    m_rightNames.append(m_newCompleteNameList[i] + ns);
+    m_leftNames.append(m_oldCompleteNameList[i] + m_oldSuffixList[i]);
+    m_rightNames.append(m_newCompleteNameList[i] + m_newSuffixList[i]);
   }
 }
 
