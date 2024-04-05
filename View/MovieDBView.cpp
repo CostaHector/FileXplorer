@@ -51,7 +51,7 @@ void MovieDBView::subscribe() {
     const QString& searchPattern = _searchLE->text();
     onSearchDataBase(searchPattern);
   });
-  
+
   connect(_tables, &QComboBox::currentTextChanged, this, &MovieDBView::setCurrentMovieTable);
 
   {
@@ -64,15 +64,15 @@ void MovieDBView::subscribe() {
     QAction* DROP_A_DATABASE = DB_CONTROL_ACTIONS[4];
     QAction* DROP_A_TABLE = DB_CONTROL_ACTIONS[5];
     QAction* UNION_TABLE = DB_CONTROL_ACTIONS[6];
-    
+
     connect(INIT_A_DATABASE, &QAction::triggered, this, &MovieDBView::onInitDataBase);
     connect(DROP_A_DATABASE, &QAction::triggered, this, [this]() { QMessageBox::warning(this, "Too danger", "Cancel drop database"); });
-    
+
     connect(INIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onCreateATable);
     connect(DROP_A_TABLE, &QAction::triggered, this, &MovieDBView::onDropATable);
     connect(INSERT_A_PATH, &QAction::triggered, this, &MovieDBView::onInsertIntoTable);
     connect(DELETE_FROM_TABLE, &QAction::triggered, this, [this]() { this->onDeleteFromTable(); });
-    
+
     connect(UNION_TABLE, &QAction::triggered, this, &MovieDBView::onUnionTables);
   }
 
@@ -80,7 +80,7 @@ void MovieDBView::subscribe() {
     connect(g_dbAct().DELETE_BY_DRIVER, &QAction::triggered, this, &MovieDBView::on_DeleteByDrive);
     connect(g_dbAct().DELETE_BY_PREPATH, &QAction::triggered, this, &MovieDBView::on_DeleteByPrepath);
   }
-  
+
   { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &MovieDBView::onQuickWhereClause); }
 
   {
@@ -376,26 +376,29 @@ bool MovieDBView::on_DeleteByPrepath() {
 bool MovieDBView::onInsertIntoTable() {
   QSqlDatabase con = GetSqlVidsDB();
   if (not con.isOpen() and not con.open()) {
-    qDebug("con cannot open");
+    qWarning("con cannot open");
     return false;
   }
   const QString& insertIntoTable = _tables->currentText();
   if (not con.tables().contains(insertIntoTable)) {
-    qDebug("Cannot insert into inexist table[%s]", qPrintable(insertIntoTable));
+    qWarning("Cannot insert into inexist table[%s]", qPrintable(insertIntoTable));
     QMessageBox::warning(this, insertIntoTable, "Table NOT exist. ABORT insert");
     return false;
   }
-  const QString& selectPath = QFileDialog::getExistingDirectory(
-      this, "Choose a path into table: " + insertIntoTable,
-      PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString(),
-      QFileDialog::ShowDirsOnly);
+
+  QString lastPath = PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString();
+  if (not QFileInfo(lastPath).isDir()) {  // fallback
+    lastPath = MemoryKey::PATH_DB_INSERT_VIDS_FROM.v.toString();
+  }
+  const QString& selectPath =
+      QFileDialog::getExistingDirectory(this, "Choose a path into table: " + insertIntoTable, lastPath, QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
-    qDebug("Path[%s] is not directory", qPrintable(selectPath));
+    qWarning("Path[%s] is not directory", qPrintable(selectPath));
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
   if (QMessageBox::question(this, "CONFIRM INSERT?", selectPath + "/* =>" + insertIntoTable) != QMessageBox::StandardButton::Yes) {
-    qDebug("User cancel insert[%s]", qPrintable(selectPath));
+    qInfo("User cancel insert[%s]", qPrintable(selectPath));
     return true;
   }
 
@@ -405,7 +408,7 @@ bool MovieDBView::onInsertIntoTable() {
                                   QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\", %7, \"%8\", \"%9\", \"%10\", \"%11\");");
 
   if (not con.transaction()) {
-    qDebug() << "Failed to start transaction mode";
+    qCritical() << "Failed to start transaction mode";
     return 0;
   }
   QSqlQuery insertTableQuery(con);
@@ -430,7 +433,7 @@ bool MovieDBView::onInsertIntoTable() {
     const bool insertResult = insertTableQuery.exec(currentInsert);
     succeedItemCnt += int(insertResult);
     if (not insertResult) {
-      qDebug("Error [%s]: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
+      qWarning("Error [%s]: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
     }
     ++totalItemCnt;
   }

@@ -227,6 +227,7 @@ bool TorrentsManagerWidget::onDeleteFromTable() {
 }
 
 auto TorrentsManagerWidget::closeEvent(QCloseEvent* event) -> void {
+  g_torrentsManagerActions().SHOW_TORRENTS_MANAGER->setChecked(false);
   PreferenceSettings().setValue("TorrentsManagerWidgetGeometry", saveGeometry());
   QMainWindow::closeEvent(event);
 }

@@ -4,43 +4,39 @@
 
 #include "Component/PerformersWidget.h"
 #include "View/TorrentsManagerWidget.h"
-#include "PublicVariable.h"
 
-#include <QAbstractItemView>
-#include <QMainWindow>
-#include <QSqlError>
-#include <QSqlQuery>
-
-#include "PublicVariable.h"
+#include <QDebug>
 
 ExtraViewVisibilityControl::ExtraViewVisibilityControl(QWidget* parent)
     : QObject(parent), _parent(parent), performerManager(nullptr), torrentsManager(nullptr) {
-  this->subscribe();
+  subscribe();
 }
 
 void ExtraViewVisibilityControl::subscribe() {
-  connect(g_performersManagerActions().SHOW_PERFORMER_MANAGER, &QAction::triggered, this, &ExtraViewVisibilityControl::onShowOrHidePerformerManger);
-  if (g_performersManagerActions().SHOW_PERFORMER_MANAGER->isChecked()) {
-    onShowOrHidePerformerManger(true);
-  }
-  connect(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER, &QAction::triggered, this, &ExtraViewVisibilityControl::onShowOrHideTorrentsManager);
-  if (g_torrentsManagerActions().SHOW_TORRENTS_MANAGER->isChecked()) {
-    onShowOrHideTorrentsManager(true);
-  }
-}
-
-auto ExtraViewVisibilityControl::onShowOrHidePerformerManger(const bool isVisible) -> void {
-  PreferenceSettings().setValue(MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.name, isVisible);
-  if (!performerManager) {
-    performerManager = new PerformersWidget(_parent);
-  }
-  performerManager->setVisible(isVisible);
-}
-
-auto ExtraViewVisibilityControl::onShowOrHideTorrentsManager(const bool isVisible) -> void {
-  PreferenceSettings().setValue(MemoryKey::SHOW_TORRENTS_MANAGER_DATABASE.name, isVisible);
-  if (!torrentsManager) {
-    torrentsManager = new TorrentsManagerWidget(_parent);
-  }
-  torrentsManager->setVisible(isVisible);
+  connect(g_performersManagerActions().SHOW_PERFORMER_MANAGER, &QAction::triggered, this, [this](const bool checked) -> void {
+    if (not checked) {
+      if (performerManager != nullptr)
+        performerManager->hide();
+      return;
+    }
+    if (performerManager == nullptr) {
+      performerManager = new PerformersWidget(_parent);
+    }
+    performerManager->show();
+    performerManager->activateWindow();
+    performerManager->raise();
+  });
+  connect(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER, &QAction::triggered, this, [this](const bool checked) -> void {
+    if (not checked) {
+      if (torrentsManager != nullptr)
+        torrentsManager->hide();
+      return;
+    }
+    if (torrentsManager == nullptr) {
+      torrentsManager = new TorrentsManagerWidget(_parent);
+    }
+    torrentsManager->show();
+    torrentsManager->activateWindow();
+    torrentsManager->raise();
+  });
 }
