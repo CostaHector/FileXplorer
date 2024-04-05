@@ -25,7 +25,6 @@ typedef std::function<bool(QString, bool, bool)> T_IntoNewPath;
 typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
 typedef std::function<void()> T_SwitchStackWidget;
-typedef std::function<void()> T_UpdateComponentVisibility;
 
 namespace MainKey {
 constexpr int Name = 0;
@@ -117,6 +116,7 @@ class ValueChecker {
 
   explicit ValueChecker(const VALUE_TYPE valueType_);
 
+  static int getFileExtensionDotIndex(const QString& path);
   static QString GetFileExtension(const QString& path);
 
   static bool isFileExist(const QString& path);
@@ -176,9 +176,6 @@ const KV SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false, ValueChec
 const KV SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV SHOW_DATABASE("SHOW_DATABASE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV SHOW_PERFORMERS_MANAGER_DATABASE("SHOW_PERFORMERS_MANAGER_DATABASE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV SHOW_TORRENTS_MANAGER_DATABASE("SHOW_TORRENTS_MANAGER_DATABASE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 
 const KV HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, ValueChecker{0});

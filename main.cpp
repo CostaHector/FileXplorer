@@ -31,8 +31,7 @@ int main(int argc, char* argv[]) {
   }
 
   FileExplorerReadOnly fileExplorer(argc, argv, nullptr);
-  FileExplorerEvent::GetFileExlorerEvent(fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer._statusBar,
-                                         std::bind(&FileExplorerReadOnly::UpdateComponentVisibility, &fileExplorer));
+  FileExplorerEvent::GetFileExlorerEvent(fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer._statusBar);
 
   auto* extraViewVisibility = new ExtraViewVisibilityControl(fileExplorer.centralWidget());
   fileExplorer.show();

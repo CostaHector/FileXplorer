@@ -55,10 +55,7 @@ class AdvanceRenamer : public QDialog {
     m_pre = p;
     rels = r;
 
-    const Qt::CheckState includingSubState = ITEMS_INSIDE_SUBDIR->checkState();
-    const Qt::CheckState includingSuffixState = EXT_INSIDE_FILENAME->checkState();
-
-    OSWalker_RETURN osWalkerRet = OSWalker(m_pre, rels, includingSubState == Qt::Checked, includingSuffixState == Qt::Checked);
+    OSWalker_RETURN osWalkerRet = OSWalker(m_pre, rels, ITEMS_INSIDE_SUBDIR->isChecked(), EXT_INSIDE_FILENAME->isChecked());
     const auto& relToNames = osWalkerRet.relToNames;
     completeNames = osWalkerRet.completeNames;  // may baseName only or baseName+extension, depend on includingSuffixState
     const auto& suffixs = osWalkerRet.suffixs;
