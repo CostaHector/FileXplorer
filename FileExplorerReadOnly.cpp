@@ -52,11 +52,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
   setStatusBar(_statusBar);
 
   InitComponentVisibility();
-
-  connect(m_views, &QToolBar::actionTriggered, m_viewSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
+  subscribe();
 }
-
-FileExplorerReadOnly::~FileExplorerReadOnly() {}
 
 void FileExplorerReadOnly::closeEvent(QCloseEvent* event) {
   PreferenceSettings().setValue("geometry", saveGeometry());
@@ -105,23 +102,25 @@ void FileExplorerReadOnly::InitComponentVisibility() {
     m_navigationToolBar->setVisible(false);
   }
 
-  const bool showDB = PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool();
   const bool showFolderPrev = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool();
-  const bool showPrev = not showDB and showFolderPrev;
+  const bool showPrev = m_fsPanel->isFSView() and showFolderPrev;
   if (not showPrev) {
     previewHtmlDock->setVisible(false);
   }
 }
 
-void FileExplorerReadOnly::UpdateComponentVisibility() {
-  const bool showNavi =
-      PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool();
-  m_navigationToolBar->setVisible(showNavi);
-
-  const bool showDB = PreferenceSettings().value(MemoryKey::SHOW_DATABASE.name, MemoryKey::SHOW_DATABASE.v).toBool();
-  const bool showFolderPrev = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool();
-  const bool showPrev = not showDB and showFolderPrev;
-  previewHtmlDock->setVisible(showPrev);
+void FileExplorerReadOnly::subscribe() {
+  auto& vA = g_viewActions();
+  connect(vA.NAVIGATION_PANE, &QAction::triggered, this, [this](const bool checked) {
+    PreferenceSettings().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
+    m_navigationToolBar->setVisible(checked);
+  });
+  connect(vA.PREVIEW_PANE_HTML, &QAction::triggered, this, [this](const bool checked) {
+    PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, checked);
+    const bool showPrev = m_fsPanel->isFSView() and checked;
+    previewHtmlDock->setVisible(showPrev);
+  });
+  connect(m_views, &QToolBar::actionTriggered, m_viewSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
 }
 
 void FileExplorerReadOnly::keyPressEvent(QKeyEvent* ev) {

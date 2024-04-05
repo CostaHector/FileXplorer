@@ -26,10 +26,6 @@ QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 
 constexpr char PATH_SEP_CHAR = '/';
-constexpr static int EXTENSION_SIZE = 5;
-
-int getFileExtensionDotIndex(const QString& path);
-
 }  // namespace PATHTOOL
 
 #endif  // PATHTOOL_H

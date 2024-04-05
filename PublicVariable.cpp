@@ -120,13 +120,24 @@ ValueChecker::ValueChecker(const QSet<QChar>& chars, int minLength) : valueType{
 
 ValueChecker::ValueChecker(const VALUE_TYPE valueType_) : valueType(valueType_) {}
 
-QString ValueChecker::GetFileExtension(const QString& path) {
+int ValueChecker::getFileExtensionDotIndex(const QString& path) {
   constexpr static int EXTENSION_SIZE = 5;
   const int lastDot = path.lastIndexOf('.');
+  const int N = path.size();
   if (lastDot == -1) {
-    return "";
+    return N;
   }
-  return path.size() - (lastDot + 1) > EXTENSION_SIZE ? "" : path.mid(lastDot + 1);
+  if (N >= 2 and lastDot == N - 2 and path[N - 1].isDigit()) {
+    return N;
+  }
+  if (N >= 3 and lastDot == N - 3 and path[N - 1].isDigit() and path[N - 2].isDigit()) {
+    return N;
+  }
+  return N - (lastDot + 1) > EXTENSION_SIZE ? N : lastDot;
+}
+
+QString ValueChecker::GetFileExtension(const QString& path) {
+  return path.mid(getFileExtensionDotIndex(path));
 }
 
 bool ValueChecker::isFileExist(const QString& path) {

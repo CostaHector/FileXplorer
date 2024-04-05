@@ -64,9 +64,9 @@ OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool
       suffixs.append("");
     } else {
       const QString& nm = fileInfo.fileName();
-      const int dotIndex = PATHTOOL::getFileExtensionDotIndex(nm);
+      const int dotIndex = ValueChecker::getFileExtensionDotIndex(nm);
       completeNames.append(nm.left(dotIndex));
-      suffixs.append(nm.mid(dotIndex + 1));
+      suffixs.append(nm.mid(dotIndex));
     }
 
     if (includingSub and fileInfo.isDir()) {  // folders
@@ -81,9 +81,9 @@ OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool
           suffixs.append("");
         } else {
           const QString& nm = fi.fileName();
-          const int dotIndex = PATHTOOL::getFileExtensionDotIndex(nm);
+          const int dotIndex = ValueChecker::getFileExtensionDotIndex(nm);
           completeNames.append(nm.left(dotIndex));
-          suffixs.append(nm.mid(dotIndex + 1));
+          suffixs.append(nm.mid(dotIndex));
         }
       }
     }
