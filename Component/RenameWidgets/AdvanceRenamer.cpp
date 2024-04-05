@@ -165,7 +165,6 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
   if (replaceeList.isEmpty()) {
     return {};
   }
-  qDebug("Case rule: %s", qPrintable(caseRuleName));
   QStringList replacedList;
   if (g_renameAg()._UPPER_CASE->isChecked()) {
     for (const QString& nm : replaceeList) {

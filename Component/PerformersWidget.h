@@ -25,6 +25,7 @@ class PerformersWidget : public QMainWindow {
   Q_OBJECT
  public:
   explicit PerformersWidget(QWidget* parent = nullptr);
+
   auto closeEvent(QCloseEvent* event) -> void override;
 
   void readSettings();
