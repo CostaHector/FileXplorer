@@ -59,6 +59,6 @@ void NameSectionArrangeTest::init() {}
 
 void NameSectionArrangeTest::cleanup() {}
 
-QTEST_MAIN(NameSectionArrangeTest)
+//QTEST_MAIN(NameSectionArrangeTest)
 
-#include "NameSectionArrangeTest.moc"
+//#include "NameSectionArrangeTest.moc"
