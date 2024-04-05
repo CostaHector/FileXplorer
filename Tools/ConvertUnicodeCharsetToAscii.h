@@ -1,11 +1,11 @@
-#ifndef CONVERTBOLDUNICODECHARSETTOASCII_H
-#define CONVERTBOLDUNICODECHARSETTOASCII_H
+#ifndef CONVERTUNICODECHARSETTOASCII_H
+#define CONVERTUNICODECHARSETTOASCII_H
 
 #include <QTextDecoder>
 
 #include <QHash>
 #include <QString>
-class ConvertBoldUnicodeCharsetToAscii {
+class ConvertUnicodeCharsetToAscii {
  public:
   QString operator()(const QString& boldStr) const {
     QString ansStr;
@@ -45,8 +45,9 @@ class ConvertBoldUnicodeCharsetToAscii {
   }
 
  private:
+  static constexpr QChar UNICODE_FIRST_TWO_BYTE{0xD835};
   static QHash<QString, char> getBoldToTextDict();
   static const QHash<QString, char> BOLD_TO_TEXT_DICT;
 };
 
-#endif  // CONVERTBOLDUNICODECHARSETTOASCII_H
+#endif  // CONVERTUNICODECHARSETTOASCII_H
