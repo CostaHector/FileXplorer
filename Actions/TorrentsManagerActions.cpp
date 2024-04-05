@@ -21,8 +21,6 @@ TorrentsManagerActions::TorrentsManagerActions(QObject* parent)
   SUBMIT->setShortcutVisibleInContextMenu(true);
 
   SHOW_TORRENTS_MANAGER->setCheckable(true);
-  SHOW_TORRENTS_MANAGER->setChecked(
-      PreferenceSettings().value(MemoryKey::SHOW_TORRENTS_MANAGER_DATABASE.name, MemoryKey::SHOW_TORRENTS_MANAGER_DATABASE.v).toBool());
 }
 
 QMenuBar* TorrentsManagerActions::GetMenuBar() const {

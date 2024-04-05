@@ -104,6 +104,7 @@ void PerformersWidget::subscribe() {
 }
 
 auto PerformersWidget::closeEvent(QCloseEvent* event) -> void {
+  g_performersManagerActions().SHOW_PERFORMER_MANAGER->setChecked(false);
   PreferenceSettings().setValue("PerformersWidgetGeometry", saveGeometry());
   PreferenceSettings().setValue("PerformersWidgetDockerWidth", performerPreviewDock->width());
   PreferenceSettings().setValue("PerformersWidgetDockerHeight", performerPreviewDock->height());

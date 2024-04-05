@@ -21,12 +21,12 @@ class FileExplorerReadOnly : public QMainWindow {
 
  public:
   FileExplorerReadOnly(const int argc = 1, char const* const argv[] = nullptr, QWidget* parent = nullptr);
-  ~FileExplorerReadOnly();
+  ~FileExplorerReadOnly() = default;
   virtual void closeEvent(QCloseEvent* event) override;
 
   auto ReadSettings(const QString& initialPath) -> QString;
   void InitComponentVisibility();
-  void UpdateComponentVisibility();
+  void subscribe();
 
   void keyPressEvent(QKeyEvent* ev) override;
 

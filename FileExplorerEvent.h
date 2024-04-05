@@ -37,11 +37,10 @@ class FileExplorerEvent : public QObject {
   static FileExplorerEvent* GetFileExlorerEvent(MyQFileSystemModel* fsm,
                                                ContentPanel* view,
                                                CustomStatusBar* logger,
-                                               T_UpdateComponentVisibility hotUpdate_ = T_UpdateComponentVisibility(),
                                                QObject* parent = nullptr);
 
  private:
-  FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, T_UpdateComponentVisibility hotUpdate_, QObject* parent);
+  FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent);
   void subscribe();
 
   void onRename(AdvanceRenamer* renameWid);
@@ -120,8 +119,6 @@ class FileExplorerEvent : public QObject {
   MyClipboard* m_clipboard;
   JsonEditor* jsonEditor{nullptr};
   VideoPlayer* videoPlayer{nullptr};
-  T_UpdateComponentVisibility updateComponentVisibility;
-
 
   AlertSystem* m_alertSystem{nullptr};
   LogView* m_logView{nullptr};

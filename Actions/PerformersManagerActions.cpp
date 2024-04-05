@@ -44,8 +44,6 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
   SUBMIT->setShortcutVisibleInContextMenu(true);
 
   SHOW_PERFORMER_MANAGER->setCheckable(true);
-  SHOW_PERFORMER_MANAGER->setChecked(
-      PreferenceSettings().value(MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.name, MemoryKey::SHOW_PERFORMERS_MANAGER_DATABASE.v).toBool());
 
   const QString& heightStr =
       QString::number(PreferenceSettings().value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v).toInt());
