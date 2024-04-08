@@ -22,7 +22,7 @@ RenameNamesUnique::RenameNamesUnique(const QString& pre,
                                newSuffixList.size()};
   m_isArrLenUnequal = inputSizeSet.size() != 1;
   if (m_isArrLenUnequal) {
-    qCritical("Invalid. Parms with unequal array length.");
+    qCritical("Invalid. Parms with [%d] unequal array lengths.", inputSizeSet.size());
     return;
   }
   m_nameLineEmpty = newCompleteNameList.contains("");
