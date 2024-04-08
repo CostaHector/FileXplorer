@@ -11,7 +11,13 @@ SearchProxyModel::SearchProxyModel(QObject* parent)
       m_nameFiltersCaseSensitive{
           PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool()},
       m_nameFilterDisableOrHide{
-          PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool()} {}
+          PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool()} {
+  const auto nameCaseSensitive = m_nameFiltersCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
+  if (filterCaseSensitivity() != nameCaseSensitive) {
+    setFilterCaseSensitivity(nameCaseSensitive);
+    return;
+  }
+}
 
 auto SearchProxyModel::initSearchMode(const QString& searchMode) -> void {
   m_searchMode = searchMode;
@@ -159,6 +165,11 @@ void SearchProxyModel::setFileContentsCaseSensitive(bool sensitive) {
 void SearchProxyModel::setFileNameFiltersCaseSensitive(bool sensitive) {
   PreferenceSettings().setValue(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, sensitive);
   initFileNameFiltersCaseSensitive(sensitive);
+  const auto nameCaseSensitive = sensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
+  if (filterCaseSensitivity() != nameCaseSensitive) {
+    setFilterCaseSensitivity(nameCaseSensitive);
+    return;
+  }
   startFilterWhenTextChanged(m_searchSourceString);
 }
 
