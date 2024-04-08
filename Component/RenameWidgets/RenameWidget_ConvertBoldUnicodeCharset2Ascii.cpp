@@ -1,5 +1,5 @@
 #include "RenameWidget_ConvertBoldUnicodeCharset2Ascii.h"
-#include "Tools/ConvertBoldUnicodeCharsetToAscii.h"
+#include "Tools/ConvertUnicodeCharsetToAscii.h"
 
 QToolBar* RenameWidget_ConvertBoldUnicodeCharset2Ascii::InitControlTB() {
   QToolBar* replaceControl = new QToolBar;
@@ -9,6 +9,6 @@ QToolBar* RenameWidget_ConvertBoldUnicodeCharset2Ascii::InitControlTB() {
 }
 
 QStringList RenameWidget_ConvertBoldUnicodeCharset2Ascii::RenameCore(const QStringList& replaceeList) {
-  ConvertBoldUnicodeCharsetToAscii cbuctt;
+  ConvertUnicodeCharsetToAscii cbuctt;
   return cbuctt.BatchCovert2Text(replaceeList);
 }
