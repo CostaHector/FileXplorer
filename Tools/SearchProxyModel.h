@@ -43,7 +43,9 @@ class SearchProxyModel : public QSortFilterProxyModel {
   inline void initFileContentsCaseSensitive(bool sensitive) { m_fileContentsCaseSensitive = sensitive; }
   void setFileContentsCaseSensitive(bool sensitive);
 
-  inline void initFileNameFiltersCaseSensitive(bool sensitive) { m_nameFiltersCaseSensitive = sensitive; }
+  inline void initFileNameFiltersCaseSensitive(bool sensitive) {
+    m_nameFiltersCaseSensitive = sensitive;
+  }
   void setFileNameFiltersCaseSensitive(bool sensitive);
 
  private:
