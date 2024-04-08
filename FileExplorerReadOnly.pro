@@ -57,7 +57,7 @@ SOURCES += \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/VidModel.cpp \
-    Tools/ConvertBoldUnicodeCharsetToAscii.cpp \
+    Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameSectionArrange.cpp \
@@ -185,7 +185,7 @@ HEADERS += \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/VidModel.h \
-    Tools/ConvertBoldUnicodeCharsetToAscii.h \
+    Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/Log.h \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \

@@ -37,6 +37,6 @@ void ValueCheckerTest::init() {}
 
 void ValueCheckerTest::cleanup() {}
 
-QTEST_MAIN(ValueCheckerTest)
+//QTEST_MAIN(ValueCheckerTest)
 
-#include "ValueCheckerTest.moc"
+//#include "ValueCheckerTest.moc"
