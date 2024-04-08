@@ -46,6 +46,12 @@ class ConvertUnicodeCharsetToAsciiTest : public QObject {
     QCOMPARE(expect, actual);
   }
 
+  void charsetItalicUppercase() {
+    const QString& actual = ConvertUnicodeCharsetToAscii()("𝑷𝑨𝑫𝑫𝒀");
+    const QString& expect = "PADDY";
+    QCOMPARE(expect, actual);
+  }
+
   void skipExtraUnicodeCharset() {
     const QString& actual = ConvertUnicodeCharsetToAscii()("𝐂𝗗𝗘𝐬𝐭𝐰 - ABC");
     const QString& expect = "CDEstw - ABC";

@@ -28,6 +28,17 @@ QHash<QString, char> ConvertUnicodeCharsetToAscii::getBoldToTextDict() {
     left.append(QChar(0XDDD4 + 26 + i));
     dict.insert(left, 'a' + i);
   }
+  // Italic
+  for (int i = 0; i < 26; ++i){
+    QString left = UNICODE_FIRST_TWO_BYTE;
+    left.append(QChar(0XDC68 + i));
+    dict.insert(left, 'A' + i);
+  }
+  for (int i = 0; i < 26; ++i){
+    QString left = UNICODE_FIRST_TWO_BYTE;
+    left.append(QChar(0XDC68 + 26 + i));
+    dict.insert(left, 'a' + i);
+  }
   return dict;
 }
 
