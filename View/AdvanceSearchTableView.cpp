@@ -51,6 +51,14 @@ void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {
   //  _searchProxyModel->BindLogger(_logger);
 }
 
+auto AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) -> void {
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
+    emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
+    return;
+  }
+  QTableView::keyPressEvent(e);
+}
+
 // #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 
