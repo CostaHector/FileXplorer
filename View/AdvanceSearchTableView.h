@@ -19,6 +19,8 @@ class AdvanceSearchTableView : public CustomTableView {
 
   void BindLogger(CustomStatusBar* logger);
 
+  auto keyPressEvent(QKeyEvent* e) -> void override;
+
  private:
   AdvanceSearchMenu* m_searchMenu;
   AdvanceSearchModel* _sourceModel;

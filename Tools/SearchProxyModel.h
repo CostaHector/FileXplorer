@@ -12,6 +12,7 @@ class SearchProxyModel : public QSortFilterProxyModel {
     _searchSourceModel = dynamic_cast<AdvanceSearchModel*>(sourceModel);
     if (_searchSourceModel == nullptr) {
       qWarning("Error. setNameFilterDisables will not work.");
+      return;
     }
     QSortFilterProxyModel::setSourceModel(sourceModel);
   }
