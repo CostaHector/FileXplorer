@@ -195,6 +195,9 @@ int VideoPlayer::onRecycleSelectedItems() {
       // to recycle, play first unselected and available vid.
       m_playListWid->setCurrentRow(nextPlayRow);
       setUrl(nextPlayUrl);
+      if (g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked()) {
+        play();
+      }
     }
   }
 
