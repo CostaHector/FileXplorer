@@ -1186,16 +1186,6 @@
         <translation>下一高潮</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.h" line="23"/>
-        <source>-10s</source>
-        <translation>后退10s</translation>
-    </message>
-    <message>
-        <location filename="../Actions/VideoPlayerActions.h" line="24"/>
-        <source>+10s</source>
-        <translation>前进10s</translation>
-    </message>
-    <message>
         <location filename="../Actions/VideoPlayerActions.h" line="25"/>
         <source>auto</source>
         <translation>自动下一集</translation>

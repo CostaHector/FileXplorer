@@ -33,19 +33,20 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
 
   _LAST_10_SECONDS->setShortcut(QKeySequence(Qt::Key_Left));
   _LAST_10_SECONDS->setShortcutVisibleInContextMenu(true);
-  _LAST_10_SECONDS->setToolTip(QString("<b>%1 (%2)</b><br/> -10s").arg(_LAST_10_SECONDS->text(), _LAST_10_SECONDS->shortcut().toString()));
+  _LAST_10_SECONDS->setToolTip(QString("<b>%1 (%2)</b><br/> minus 10s").arg(_LAST_10_SECONDS->text(), _LAST_10_SECONDS->shortcut().toString()));
 
   _NEXT_10_SECONDS->setShortcut(QKeySequence(Qt::Key_Right));
   _NEXT_10_SECONDS->setShortcutVisibleInContextMenu(true);
-  _NEXT_10_SECONDS->setToolTip(QString("<b>%1 (%2)</b><br/> +10s").arg(_NEXT_10_SECONDS->text(), _NEXT_10_SECONDS->shortcut().toString()));
+  _NEXT_10_SECONDS->setToolTip(QString("<b>%1 (%2)</b><br/> plus 10s").arg(_NEXT_10_SECONDS->text(), _NEXT_10_SECONDS->shortcut().toString()));
 
   _AUTO_PLAY_NEXT_VIDEO->setCheckable(true);
   _AUTO_PLAY_NEXT_VIDEO->setChecked(PreferenceSettings().value(MemoryKey::AUTO_PLAY_NEXT_VIDEO.name, MemoryKey::AUTO_PLAY_NEXT_VIDEO.v).toBool());
+  _AUTO_PLAY_NEXT_VIDEO->setToolTip(QString("<b>%1 (%2)</b><br/> Auto play next video when current finished").arg(_AUTO_PLAY_NEXT_VIDEO->text(), _AUTO_PLAY_NEXT_VIDEO->shortcut().toString()));
 
   _PLAY_PAUSE->setEnabled(false);
   _PLAY_PAUSE->setShortcutVisibleInContextMenu(true);
   _PLAY_PAUSE->setShortcut(QKeySequence(Qt::Key_Space));
-  _PLAY_PAUSE->setToolTip(QString("<b>%1 (%2)</b><br/> Switch between pause/play").arg(_PLAY_PAUSE->text(), _PLAY_PAUSE->shortcut().toString()));
+  _PLAY_PAUSE->setToolTip(QString("<b>%1 (%2)</b><br/> Start play or pause").arg(_PLAY_PAUSE->text(), _PLAY_PAUSE->shortcut().toString()));
 
   _LOAD_A_PATH->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _LOAD_A_PATH->setShortcutVisibleInContextMenu(true);
