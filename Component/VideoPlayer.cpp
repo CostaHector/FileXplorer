@@ -18,8 +18,8 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_mediaPlayer(new QMediaPlayer(this, QMediaPlayer::LowLatency)),
       m_timeSlider(new ClickableSlider),
       m_volumnSlider(new QSlider(Qt::Orientation::Horizontal, this)),
-      m_timeTemplate("%1/%2"),
-      m_timeLabel(new QLabel(m_timeTemplate)),
+      m_timeTemplate{"%1|%2"},
+      m_timeLabel{new QLabel(m_timeTemplate, this)},
       m_errorLabel(new QLabel),
       m_sliderTB(new QToolBar("slider", this)),
       m_controlTB(g_videoPlayerActions().GetPlayControlToolBar(this, m_timeLabel)),
@@ -609,7 +609,7 @@ void VideoPlayer::onSetPlayerPosition(int position) {
 }
 
 void VideoPlayer::onPlayerPositionChanged(qint64 position) {
-  m_timeLabel->setText(m_timeTemplate.arg(position / MICROSECOND));
+  m_timeLabel->setText(m_timeTemplate.arg(MillionSecond2hhmmss(position)));
   m_timeSlider->setValue(position);
   if (position > 0 and position == m_timeSlider->maximum() and g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked()) {
     onPositionAdd(1);
@@ -617,9 +617,9 @@ void VideoPlayer::onPlayerPositionChanged(qint64 position) {
 }
 
 void VideoPlayer::durationChanged(qint64 duration) {
-  qDebug("Duration changed to %lld", duration);
+  qInfo("Duration changed to %lld", duration);
   m_timeSlider->setRange(0, duration);
-  m_timeTemplate = "%1/" + QString::number(duration / MICROSECOND);
+  m_timeTemplate = "%1|" + MillionSecond2hhmmss(duration);
 }
 
 void VideoPlayer::handleError() {
