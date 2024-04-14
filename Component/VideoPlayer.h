@@ -119,6 +119,10 @@ class VideoPlayer : public QMainWindow {
   void handleError();
 
  private:
+  static inline QString MillionSecond2hhmmss(qint64 ms) {
+    return QTime(0,0,0,0).addMSecs(ms).toString("hh:mm:ss");
+  }
+
   auto loadHotSceneList() -> void;
   auto loadVideoRate() -> void;
   inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;
