@@ -175,7 +175,12 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
     return false;
   }
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
-  const QString& pth = m_fsModel->rootPath();
+  QString pth = m_fsModel->rootPath();
+#ifdef _WIN32
+  if (not pth.isEmpty() and pth.back() == ':') {
+    pth += '/';
+  }
+#endif
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
   if (previewWidget != nullptr) {
     emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
