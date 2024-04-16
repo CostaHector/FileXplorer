@@ -1,6 +1,8 @@
 #include "AdvanceSearchModel.h"
+#include <QMessageBox>
 #include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
+#include "Tools/PathTool.h"
 
 const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size", "type", "date", "relative path"};
 
@@ -22,7 +24,7 @@ void AdvanceSearchModel::BindLogger(CustomStatusBar* logger) {
   _logger = logger;
 }
 
-auto AdvanceSearchModel::_updatePlanetList() -> void {
+auto AdvanceSearchModel::updateSearchResultList() -> void {
   ClearRecycle();
   if (m_rootPath.isEmpty()) {
     qDebug("reject do under path \"\"");
@@ -58,19 +60,26 @@ auto AdvanceSearchModel::_updatePlanetList() -> void {
   this->endInsertRows();
 }
 
-auto AdvanceSearchModel::checkPathNeed(const QString& path) const -> bool {
-  if (path.isEmpty()) {
+auto AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory) -> bool {
+  // when you need to call updateSearchResultList after checkPathNeed.
+  // queryWhenSearchUnderLargeDirectory is most likely set to be true
+  const QString& stdPath = PATHTOOL::GetWinStdPath(path);
+  if (stdPath.isEmpty()) {
     return false;
   }
-  if (not QFileInfo(path).isDir()) {
+  if (not QFileInfo(stdPath).isDir()) {
     return false;
   }
-  if (path.count('/') < 2) {
-    qWarning("[Search] Skip. Search under path[%s] will cause lag.", qPrintable(path));
-    Notificator::warning("Search skip. Search under path[%s] will cause lag", path);
+  if (queryWhenSearchUnderLargeDirectory and stdPath.count('/') < 2) {  // C:/A
+    auto retBtn = QMessageBox::warning(this->_logger, "Confirm search?", "large directory: " + stdPath,
+                                       QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
+    if (retBtn == QMessageBox::StandardButton::Yes) {
+      return true;
+    }
+    qInfo("User cancel search under large directory[%s] as it may cause lag", qPrintable(stdPath));
+    Notificator::information("User cancel search under large directory[%s] as it may cause lag", stdPath);
     return false;
   }
-
   return true;
 }
 
@@ -78,7 +87,7 @@ auto AdvanceSearchModel::initRootPath(const QString& path) -> void {
   if (m_rootPath == path) {
     return;
   }
-  if (not checkPathNeed(path)) {
+  if (not checkPathNeed(path, false)) {
     return;
   }
   m_rootPath = path;
@@ -90,7 +99,7 @@ auto AdvanceSearchModel::setRootPath(const QString& path) -> void {
     return;
   }
   initRootPath(path);
-  _updatePlanetList();
+  updateSearchResultList();
   qDebug() << "AdvanceSearchModel::setRootPath" << m_rootPath;
 }
 
@@ -103,7 +112,7 @@ auto AdvanceSearchModel::setFilter(QDir::Filters newFilters) -> void {
   if (not checkPathNeed(m_rootPath)) {
     return;
   }
-  _updatePlanetList();
+  updateSearchResultList();
   qDebug() << "AdvanceSearchModel::setFilter" << m_filters;
 }
 
@@ -116,7 +125,7 @@ void AdvanceSearchModel::setRootPathAndFilter(const QString& path, QDir::Filters
   }
   m_rootPath = path;
   m_filters = filters;
-  _updatePlanetList();
+  updateSearchResultList();
 }
 
 QDirIterator::IteratorFlag AdvanceSearchModel::bool2IteratorFlag(const bool isIncludeEnabled) const {
