@@ -4,6 +4,14 @@
 #include <QString>
 
 namespace PATHTOOL {
+inline QString GetWinStdPath(const QString& path) {
+#ifdef _WIN32
+  if (not path.isEmpty() and path.back() == ':') {
+    return path + '/';
+  }
+#endif
+return path;
+}
 QString StripTrailingSlash(QString path);
 QString linkPath(const QString& localPath);
 QString localPath(const QString& linkPath);
