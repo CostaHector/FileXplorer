@@ -16,6 +16,7 @@ SOURCES += \
     Actions/LogViewActions.cpp \
     Actions/PerformersManagerActions.cpp \
     Actions/QuickWhereActions.cpp \
+    Actions/RecycleBinActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
@@ -51,6 +52,8 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
+    FileOperation/FileOperatorPub.cpp \
+    FileOperation/RecycleBinHelper.cpp \
     Model/DifferRootFileSystemModel.cpp \
     Model/JsonModel.cpp \
     Model/LogModel.cpp \
@@ -71,6 +74,7 @@ SOURCES += \
     View/JsonListView.cpp \
     View/LogView.cpp \
     View/MovieDBView.cpp \
+    View/RecycleBinWidget.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -144,6 +148,7 @@ HEADERS += \
     Actions/LogViewActions.h \
     Actions/PerformersManagerActions.h \
     Actions/QuickWhereActions.h \
+    Actions/RecycleBinActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
@@ -179,6 +184,8 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    FileOperation/FileOperatorPub.h \
+    FileOperation/RecycleBinHelper.h \
     Model/DifferRootFileSystemModel.h \
     Model/JsonModel.h \
     Model/LogModel.h \
@@ -199,6 +206,7 @@ HEADERS += \
     View/JsonListView.h \
     View/LogView.h \
     View/MovieDBView.h \
+    View/RecycleBinWidget.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \

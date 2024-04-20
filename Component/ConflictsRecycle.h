@@ -202,7 +202,7 @@ class ConflictsRecycle : public QDialog {
     return joinedStr;
   }
 
-  auto NoConflictOperation(const QStringList& selectedItems, const QSet<QString>& leftDeleteSet) const -> FileOperation::BATCH_COMMAND_LIST_TYPE;
+  auto NoConflictOperation(const QStringList& selectedItems, const QSet<QString>& leftDeleteSet) const -> FileOperatorType::BATCH_COMMAND_LIST_TYPE;
 
   auto on_Submit() -> bool;
   auto Subscribe() -> void;

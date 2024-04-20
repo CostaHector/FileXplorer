@@ -111,7 +111,7 @@ bool RenameNamesUnique::operator()() {
   return CheckConflict(m_occupiedNames, m_relNameList, m_leftNames, m_rightNames, m_conflictNames);
 }
 
-FileOperation::BATCH_COMMAND_LIST_TYPE RenameNamesUnique::getRenameCommands() const {
+FileOperatorType::BATCH_COMMAND_LIST_TYPE RenameNamesUnique::getRenameCommands() const {
   if (not this->operator bool()) {
     return {};
   }
@@ -124,7 +124,7 @@ FileOperation::BATCH_COMMAND_LIST_TYPE RenameNamesUnique::getRenameCommands() co
     news.append(relTmp + m_rightNames[i]);
   }
 
-  FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
   for (int i = 0; i < olds.size(); ++i) {
     if (olds[i] == news[i]) {
       continue;
