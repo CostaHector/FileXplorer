@@ -46,7 +46,7 @@ class RenameNamesUnique {
            "Conflict list: [" + m_conflictNames.join('|') + "].";
   }
 
-  FileOperation::BATCH_COMMAND_LIST_TYPE getRenameCommands() const;
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE getRenameCommands() const;
 
  private:
   inline bool isInputValid() const { return not m_isArrLenUnequal and not m_nameLineEmpty; }

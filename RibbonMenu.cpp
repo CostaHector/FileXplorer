@@ -6,6 +6,7 @@
 #include "Actions/FileLeafAction.h"
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/JsonEditorActions.h"
+#include "Actions/RecycleBinActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "Actions/VideoPlayerActions.h"
@@ -48,6 +49,8 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 QToolBar* RibbonMenu::LeafFile() const {
   QToolBar* leafFileWid(new QToolBar);
   leafFileWid->addActions(g_fileLeafActions().LEAF_FILE->actions());
+  leafFileWid->addSeparator();
+  leafFileWid->addAction(g_recycleBinAg().RECYLE_BIN_WIDGET);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafFileWid;
 }

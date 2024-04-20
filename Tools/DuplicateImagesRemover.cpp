@@ -47,10 +47,17 @@ int DuplicateImagesRemover::operator()(const QString& imgPath) {
   if (imgsToBeDelete.isEmpty()) {
     return 0;
   }
-  FileOperation::BATCH_COMMAND_LIST_TYPE removeCmds;
+
+  QStringList preList;
+  QStringList relList;
+  preList.reserve(imgsToBeDelete.size());
+  relList.reserve(imgsToBeDelete.size());
   for (const auto& nm : imgsToBeDelete) {
-    removeCmds.append({"moveToTrash", imgPath, nm});
+    preList.append(imgPath);
+    relList.append(nm);
   }
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
+
   g_undoRedo.Do(removeCmds);
   return imgsToBeDelete.size();
 }

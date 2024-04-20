@@ -12,7 +12,7 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
       LOAD_FROM_PERFORMERS_LIST(new QAction(tr("Load from performers list"), this)),
       DUMP_ALL_RECORDS_INTO_PJSON_FILE(new QAction(tr("Dump all record(s)=>.pjson"), this)),
       DUMP_SELECTED_RECORDS_INTO_PJSON_FILE(new QAction(tr("Dump selected record(s)=>.pjson"), this)),
-      OPEN_WITH_LOCAL_APP(new QAction(tr("Open with"), this)),
+      OPEN_WITH_LOCAL_APP(new QAction(QIcon(":/themes/SQLITE_APP"), tr("Open with"), this)),
       LOCATE_IMAGEHOST(new QAction(tr("Locate imagehost"), this)),
       INIT_DATABASE(new QAction(QString("Init Database [%1]").arg(SystemPath::PEFORMERS_DATABASE), this)),
       INIT_TABLE(new QAction(QString("Create table [%1]").arg(DB_TABLE::PERFORMERS), this)),

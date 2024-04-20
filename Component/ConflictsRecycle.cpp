@@ -118,8 +118,8 @@ auto ConflictsRecycle::RecycleTableEvent(QAction* RESTORE, QTableWidget* recycle
 }
 
 auto ConflictsRecycle::NoConflictOperation(const QStringList& selectedItems, const QSet<QString>& leftDeleteSet) const
-    -> FileOperation::BATCH_COMMAND_LIST_TYPE {
-  FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+    -> FileOperatorType::BATCH_COMMAND_LIST_TYPE {
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
   if (OP == CCMMode::CUT or OP == CCMMode::MERGE) {
     for (const QString& nm : selectedItems) {
       if (leftDeleteSet.contains(nm)) {
@@ -172,22 +172,30 @@ auto ConflictsRecycle::on_Submit() -> bool {
     qDebug("Both Remove Confirm: Ok");
   }
   QSet<QString> leftDeleteSet;
-  FileOperation::BATCH_COMMAND_LIST_TYPE removeCmds;
+
+  QStringList preList;
+  QStringList relList;
+  preList.reserve(ROW_COUNT);
+  relList.reserve(ROW_COUNT);
+
   for (int r = 0; r < ROW_COUNT; ++r) {
     auto leftItem = leftRestore->item(r, ConflictsRecycle::CONFLICT_NAME_COLUMN_INDEX);
     auto rightItem = rightRestore->item(r, ConflictsRecycle::CONFLICT_NAME_COLUMN_INDEX);
     if (leftItem != nullptr) {
       const QString& nm = leftItem->text();
       leftDeleteSet.insert(nm);
-      removeCmds.append({"moveToTrash", leftFolderPath, nm});
+      preList.append(leftFolderPath);
+      relList.append(nm);
     }
     if (rightItem != nullptr) {
-      removeCmds.append({"moveToTrash", rightFolderPath, rightItem->text()});
+      preList.append(rightFolderPath);
+      relList.append(rightItem->text());
     }
   }
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
 
   QString msg;
-  if (not removeCmds.isEmpty()) {
+  if (not preList.isEmpty()) {
     auto isRmvAllSucceed = g_undoRedo.Do(removeCmds);
     qDebug("Submit result: isRmvAllSucceed:%d", isRmvAllSucceed);
     msg += QString("%1 rmv cmd(s): %2.\n").arg(removeCmds.size()).arg(isRmvAllSucceed);

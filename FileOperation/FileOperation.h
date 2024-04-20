@@ -3,28 +3,6 @@
 
 #include <QStringList>
 
-namespace ErrorCode {
-constexpr int OK = 0;
-constexpr int SRC_PRE_DIR_INEXIST = 1;
-constexpr int SRC_FILE_INEXIST = 2;
-constexpr int SRC_DIR_INEXIST = 3;
-constexpr int SRC_INEXIST = 4;
-constexpr int DST_DIR_INEXIST = 5;
-constexpr int DST_PRE_DIR_CANNOT_MAKE = 6;
-constexpr int DST_FOLDER_ALREADY_EXIST = 7;
-constexpr int DST_FILE_ALREADY_EXIST = 8;
-constexpr int DST_FILE_OR_PATH_ALREADY_EXIST = 9;
-constexpr int CANNOT_REMOVE_FILE = 10;
-constexpr int CANNOT_REMOVE_DIR = 11;
-constexpr int CANNOT_MAKE_LINK = 12;
-constexpr int DST_LINK_INEXIST = 13;
-constexpr int CANNOT_REMOVE_LINK = 14;
-constexpr int OPERATION_NOT_AVAILABLE = 15;
-constexpr int OPERATION_PARMS_NOT_MATCH = 16;
-constexpr int RECYCLE_OCCUPIED_FILE_FAILED = 17;
-constexpr int UNKNOWN_ERROR = -1;
-}  // namespace ErrorCode
-
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -34,14 +12,13 @@ constexpr int UNKNOWN_ERROR = -1;
 #include <QDir>
 #include <QMap>
 #include <functional>
+
 #include "PublicVariable.h"
+#include "FileOperatorPub.h"
+
 
 class FileOperation {
  public:
-  using BATCH_COMMAND_LIST_TYPE = QList<QStringList>;
-  using RETURN_TYPE = QPair<int, BATCH_COMMAND_LIST_TYPE>;
-  using EXECUTE_RETURN_TYPE = QPair<bool, BATCH_COMMAND_LIST_TYPE>;
-
   static inline QPair<QString, QString> SplitDirName(const QString& fullPath) {
     auto ind = fullPath.lastIndexOf('/');
     if (ind == -1) {
@@ -53,7 +30,7 @@ class FileOperation {
     return {fullPath.left(ind), fullPath.mid(ind + 1)};
   }
 
-  static inline auto rmpathAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto rmpathAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -62,7 +39,7 @@ class FileOperation {
     return FileOperation::rmpath(pre, rel);
   }
 
-  static inline auto rmpath(const QString& pre, const QString& rel) -> RETURN_TYPE {
+  static inline auto rmpath(const QString& pre, const QString& rel) -> FileOperatorType::RETURN_TYPE {
     // can only remove an empty directory
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QDir(pth).exists()) {
@@ -75,7 +52,7 @@ class FileOperation {
     return {ErrorCode::CANNOT_REMOVE_DIR, {}};
   }
 
-  static inline auto mkpathAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto mkpathAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -84,7 +61,7 @@ class FileOperation {
     return FileOperation::mkpath(pre, rel);
   }
 
-  static inline auto mkpath(const QString& pre, const QString& rel) -> RETURN_TYPE {
+  static inline auto mkpath(const QString& pre, const QString& rel) -> FileOperatorType::RETURN_TYPE {
     QDir preDir(pre);
     if (not preDir.exists()) {
       return {ErrorCode::DST_DIR_INEXIST, {}};
@@ -94,14 +71,13 @@ class FileOperation {
     }
 
     auto ret = preDir.mkpath(rel);
-    if (ret) {
-      return {ErrorCode::OK, {{"rmpath", pre, rel}}};
-    } else {
+    if (not ret) {
       return {ErrorCode::UNKNOWN_ERROR, {}};
     }
+    return {ErrorCode::OK, {{"rmpath", pre, rel}}};
   }
 
-  static inline auto rmfileAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto rmfileAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -110,7 +86,7 @@ class FileOperation {
     return FileOperation::rmfile(pre, rel);
   }
 
-  static auto rmfile(const QString& pre, const QString& rel) -> RETURN_TYPE {
+  static auto rmfile(const QString& pre, const QString& rel) -> FileOperatorType::RETURN_TYPE {
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QFileInfo::exists(pth)) {
       return {ErrorCode::OK, {}};
@@ -123,7 +99,7 @@ class FileOperation {
     }
   }
 
-  static inline auto rmdirAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto rmdirAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -132,7 +108,7 @@ class FileOperation {
     return FileOperation::rmdir(pre, rel);
   }
 
-  static auto rmdir(const QString& pre, const QString& rel) -> RETURN_TYPE {
+  static auto rmdir(const QString& pre, const QString& rel) -> FileOperatorType::RETURN_TYPE {
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QDir(pth).exists()) {
       return {ErrorCode::OK, {}};
@@ -145,33 +121,17 @@ class FileOperation {
     }
   }
 
-  static inline auto moveToTrashAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto moveToTrashAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
-    const QString& pre = parms[0];
-    const QString& rel = parms[1];
-    return FileOperation::moveToTrash(pre, rel);
+    const QString& pres = parms[0]; // seperated by '\n'
+    const QString& rels = parms[1];
+    return FileOperation::moveToTrash(pres, rels);
   }
+  static auto moveToTrash(const QString& pres, const QString& rels) -> FileOperatorType::RETURN_TYPE;
 
-  static inline auto moveToTrash(const QString& pre, const QString& rel) -> RETURN_TYPE {
-    const QString& pth = QDir(pre).absoluteFilePath(rel);
-    if (not QFile::exists(pth)) {
-      return {ErrorCode::OK, {}};
-    }
-    QFile file(pth);
-    auto ret = file.moveToTrash();
-    if (ret) {
-      if (file.fileName().isEmpty()) {
-        return {ErrorCode::RECYCLE_OCCUPIED_FILE_FAILED, {}};
-      }
-      return {ErrorCode::OK, {{"rename", "", file.fileName(), "", pth}}};
-    } else {
-      return {ErrorCode::UNKNOWN_ERROR, {}};
-    }
-  }
-
-  static inline auto renameAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto renameAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 4) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -182,7 +142,7 @@ class FileOperation {
     return FileOperation::rename(pre, rel, to, toRel);
   }
 
-  static auto rename(const QString& pre, const QString& rel, const QString& to, const QString& toRel) -> RETURN_TYPE {
+  static auto rename(const QString& pre, const QString& rel, const QString& to, const QString& toRel) -> FileOperatorType::RETURN_TYPE {
     // a/b -> a/b skip
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QFile::exists(pth)) {
@@ -196,7 +156,7 @@ class FileOperation {
       return {ErrorCode::DST_FILE_OR_PATH_ALREADY_EXIST, {}};
     }
 
-    FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
     const QString& preNewPathFolder = QFileInfo(absNewPath).absolutePath();
     if (not QDir(preNewPathFolder).exists()) {
       auto preNewPathFolderRet = QDir().mkpath(preNewPathFolder);  // only remove dirs
@@ -212,7 +172,7 @@ class FileOperation {
     cmds.append({"rename", to, toRel, pre, rel});
     return {ErrorCode::OK, cmds};
   }
-  static inline auto cpfileAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto cpfileAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 3) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -221,7 +181,7 @@ class FileOperation {
     const QString& to = parms[2];
     return FileOperation::cpfile(pre, rel, to);
   }
-  static auto cpfile(const QString& pre, const QString& rel, const QString& to) -> RETURN_TYPE {
+  static auto cpfile(const QString& pre, const QString& rel, const QString& to) -> FileOperatorType::RETURN_TYPE {
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QFile::exists(pth)) {
       return {ErrorCode::SRC_INEXIST, {}};
@@ -234,7 +194,7 @@ class FileOperation {
       return {ErrorCode::DST_FILE_ALREADY_EXIST, {}};
     }
 
-    FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
     const QString& prePath = QFileInfo(toPth).absolutePath();
     if (not QDir(prePath).exists()) {
       auto prePathRet = QDir().mkpath(prePath);  // only remove dirs
@@ -251,7 +211,7 @@ class FileOperation {
     return {ErrorCode::OK, cmds};
   }
 
-  static inline auto cpdirAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto cpdirAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 3) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -261,7 +221,7 @@ class FileOperation {
     return FileOperation::cpdir(pre, rel, to);
   }
 
-  static auto cpdir(const QString& pre, const QString& rel, const QString& to) -> RETURN_TYPE {
+  static auto cpdir(const QString& pre, const QString& rel, const QString& to) -> FileOperatorType::RETURN_TYPE {
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QFile::exists(pth)) {
       return {ErrorCode::SRC_INEXIST, {}};
@@ -273,7 +233,7 @@ class FileOperation {
     if (QFile::exists(toPth)) {
       return {ErrorCode::DST_FOLDER_ALREADY_EXIST, {}};  // dir or file
     }
-    FileOperation::BATCH_COMMAND_LIST_TYPE recoverList;
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE recoverList;
     auto mkRootPthRet = QDir(to).mkpath(rel);
     if (not mkRootPthRet) {
       qDebug("Failed QDir(%s).mkpath(%s)", qPrintable(to), qPrintable(rel));
@@ -313,7 +273,7 @@ class FileOperation {
     return {ErrorCode::OK, recoverList};
   }
 
-  static inline auto touchAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto touchAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -322,7 +282,7 @@ class FileOperation {
     return FileOperation::touch(pre, rel);
   }
 
-  static auto touch(const QString& pre, const QString& rel) -> RETURN_TYPE {
+  static auto touch(const QString& pre, const QString& rel) -> FileOperatorType::RETURN_TYPE {
     if (not QDir(pre).exists()) {
       return {ErrorCode::DST_DIR_INEXIST, {}};
     }
@@ -331,7 +291,7 @@ class FileOperation {
     if (textFile.exists()) {
       return {ErrorCode::OK, {}};  // after all it exists
     }
-    FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
     const QString& prePath = QFileInfo(pth).absolutePath();
     if (not QDir(prePath).exists()) {
       auto prePathRet = QDir().mkpath(prePath);
@@ -350,8 +310,8 @@ class FileOperation {
 
   static auto WriteIntoLogFile(const QString& msg) -> bool;
 
-  static auto executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) -> EXECUTE_RETURN_TYPE {
-    FileOperation::BATCH_COMMAND_LIST_TYPE recoverList;
+  static auto executer(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& aBatch, FileOperatorType::BATCH_COMMAND_LIST_TYPE& srcCommand) -> FileOperatorType::EXECUTE_RETURN_TYPE {
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE recoverList;
     int failedCommandCnt = 0;
     QString log;
     for (int i = 0; i < aBatch.size(); ++i) {
@@ -361,9 +321,9 @@ class FileOperation {
       }
       const QString& k = cmds[0];  // operation name
       QStringList vals(cmds.cbegin() + 1, cmds.cend());
-      RETURN_TYPE returnEle = FileOperation::LambdaTable[k](vals);
+      FileOperatorType::RETURN_TYPE returnEle = FileOperation::LambdaTable[k](vals);
       int ret = returnEle.first;
-      BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
+      FileOperatorType::BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
       if (ret != ErrorCode::OK) {
         ++failedCommandCnt;
         const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]. ErrorCode[%4]").arg(k).arg(vals.join(",")).arg(vals.size()).arg(ret);
@@ -393,7 +353,7 @@ class FileOperation {
     return {failedCommandCnt == 0, QList<QStringList>(recoverList.crbegin(), recoverList.crend())};
   }
 
-  static inline auto linkAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto linkAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2 and parms.size() != 3) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -406,7 +366,7 @@ class FileOperation {
     return FileOperation::link(pre, rel, to);
   }
 
-  static inline auto link(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath) -> RETURN_TYPE {
+  static inline auto link(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath) -> FileOperatorType::RETURN_TYPE {
     const QString pth = QDir(pre).absoluteFilePath(rel);
     if (not QFile::exists(pth)) {
       return {ErrorCode::SRC_INEXIST, {}};
@@ -417,7 +377,7 @@ class FileOperation {
     QString toPath(QDir(to).absoluteFilePath(rel) + ".lnk");
     QFile toFile(toPath);
 
-    FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
     if (toFile.exists()) {
       if (not QFile(toPath).moveToTrash()) {
         return {ErrorCode::CANNOT_REMOVE_FILE, cmds};
@@ -441,7 +401,7 @@ class FileOperation {
     return {ErrorCode::OK, cmds};
   }
 
-  static inline auto unlinkAgent(const QStringList& parms) -> RETURN_TYPE {
+  static inline auto unlinkAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2 and parms.size() != 3) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
@@ -454,8 +414,8 @@ class FileOperation {
     return FileOperation::unlink(pre, rel, to);
   }
 
-  static inline auto unlink(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath) -> RETURN_TYPE {
-    FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+  static inline auto unlink(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath) -> FileOperatorType::RETURN_TYPE {
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
     QString toPath(QDir(to).absoluteFilePath(rel));
     if (not QFile::exists(toPath)) {
       return {ErrorCode::OK, cmds};  // after all it not exist
@@ -476,7 +436,7 @@ class FileOperation {
        "rename": rename,
        "cpfile": cpfile, "cpdir": cpdir,
        "link": link, "unlink": unlink}*/
-  static const QMap<QString, std::function<RETURN_TYPE(const QStringList& QStringList)>> LambdaTable;
+  static const QMap<QString, std::function<FileOperatorType::RETURN_TYPE(const QStringList& QStringList)>> LambdaTable;
 };
 
 #endif  // FILEOPERATION_H
