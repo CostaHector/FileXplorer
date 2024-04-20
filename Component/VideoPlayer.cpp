@@ -201,11 +201,17 @@ int VideoPlayer::onRecycleSelectedItems() {
     }
   }
 
-  FileOperation::BATCH_COMMAND_LIST_TYPE recycleCmds;
+  QStringList preList;
+  QStringList relList;
+  preList.reserve(rmvFilesLst.size());
+  relList.reserve(rmvFilesLst.size());
   for (const QString& pth : rmvFilesLst) {
     QFileInfo fi(pth);
-    recycleCmds.append({"moveToTrash", fi.absolutePath(), fi.fileName()});
+    preList.append(fi.absolutePath());
+    relList.append(fi.fileName());
   }
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE recycleCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
+
   if (recycleCmds.isEmpty()) {
     qDebug("Skip Recycle. No file need to recycle");
     Notificator::goodNews("Recycle succeed", "No file need to recycle");
