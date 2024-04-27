@@ -23,13 +23,13 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
 
       m_views{new QToolBar("views switch", this)},
       m_navigationToolBar(new NavigationToolBar),
-      osm(new RibbonMenu),
+      m_ribbonMenu(new RibbonMenu{this}),
 
-      _statusBar(new CustomStatusBar{m_views, this}) {
+      m_statusBar(new CustomStatusBar{m_views, this}) {
   m_views->addActions(g_viewActions()._TRIPLE_VIEW->actions());
 
   m_fsPanel = new ContentPanel(previewHtml, nullptr, this);
-  m_fsPanel->BindLogger(_statusBar);
+  m_fsPanel->BindLogger(m_statusBar);
 
   m_viewSwitcher = new NavigationViewSwitcher{m_stackedBar, m_fsPanel};
   m_viewSwitcher->onSwitchByViewType("table");
@@ -48,8 +48,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
 
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
   addToolBar(Qt::ToolBarArea::LeftToolBarArea, m_navigationToolBar);
-  setMenuWidget(osm);
-  setStatusBar(_statusBar);
+  setMenuWidget(m_ribbonMenu);
+  setStatusBar(m_statusBar);
 
   InitComponentVisibility();
   subscribe();

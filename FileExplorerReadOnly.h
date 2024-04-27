@@ -41,7 +41,7 @@ class FileExplorerReadOnly : public QMainWindow {
   QToolBar* m_views;
 
   NavigationToolBar* m_navigationToolBar;
-  RibbonMenu* osm;
-  CustomStatusBar* _statusBar;
+  RibbonMenu* m_ribbonMenu;
+  CustomStatusBar* m_statusBar;
 };
 #endif  // FILEEXPLORERREADONLY_H
