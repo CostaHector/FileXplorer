@@ -30,6 +30,8 @@ namespace FileOperatorType {
 using BATCH_COMMAND_LIST_TYPE = QList<QStringList>;
 using RETURN_TYPE = QPair<int, BATCH_COMMAND_LIST_TYPE>;
 using EXECUTE_RETURN_TYPE = QPair<bool, BATCH_COMMAND_LIST_TYPE>;
+
+QString BatchCommands2String(const BATCH_COMMAND_LIST_TYPE& cmds);
 }  // namespace FileOperatorType
 
 #endif  // FILEOPERATORPUB_H

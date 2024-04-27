@@ -8,7 +8,7 @@ const QMap<QString, std::function<FileOperatorType::RETURN_TYPE(const QStringLis
     {"touch", touchAgent},   {"mkpath", mkpathAgent}, {"rename", renameAgent}, {"cpfile", cpfileAgent},
     {"cpdir", cpdirAgent},   {"link", linkAgent},     {"unlink", unlinkAgent}};
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 15, 2)  // build in moveToTrash supported path in bin supporte at least in 5.15
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)  // build in moveToTrash supported path in bin supporte at least in 5.15
 auto FileOperation::moveToTrash(const QString& pres, const QString& rels) -> FileOperatorType::RETURN_TYPE {
   const QStringList& paths = pres.split('\n');
   const QStringList& names = rels.split('\n');

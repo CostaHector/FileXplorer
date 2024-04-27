@@ -1,6 +1,5 @@
 #include "PublicTool.h"
 #include "PublicVariable.h"
-#include "Tools/PathTool.h"
 
 #include <QCoreApplication>
 #include <QDir>

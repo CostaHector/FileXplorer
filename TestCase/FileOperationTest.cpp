@@ -3,7 +3,7 @@
 
 // add necessary includes here
 #include "FileOperation/FileOperation.h"
-
+#include "FileOperation/FileOperatorPub.h"
 #include <QFileInfo>
 #include "PublicTool.h"
 
@@ -110,7 +110,7 @@ void FileOperationTest::testSplitDirName()
 void FileOperationTest::test_file_remove()
 {
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rmfile(TEST_DIR, "a.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rmfile(TEST_DIR, "a.txt");
     QCOMPARE(retEle.first, ErrorCode::OK);
     QVERIFY(not QDir(TEST_DIR).exists("a.txt"));
     QVERIFY(retEle.second.isEmpty());
@@ -120,7 +120,7 @@ void FileOperationTest::test_folder_remove() {
     QVERIFY(QDir(TEST_DIR).exists("a"));
     QVERIFY(QDir(TEST_DIR).exists("a/a1"));
     QVERIFY(QDir(TEST_DIR).exists("a/a1.txt"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rmdir(TEST_DIR, "a");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rmdir(TEST_DIR, "a");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -134,7 +134,7 @@ void FileOperationTest::test_file_to_trashbin()
 {
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
 
-    FileOperation::RETURN_TYPE retEle = FileOperation::moveToTrash(TEST_DIR, "a.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::moveToTrash(TEST_DIR, "a.txt");
 
     auto ret = retEle.first;
     auto aBatch = retEle.second;
@@ -147,7 +147,7 @@ void FileOperationTest::test_file_to_trashbin()
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
 
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
     QVERIFY(recoverRet);
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
@@ -159,7 +159,7 @@ void FileOperationTest::test_file_copy(){
     QVERIFY(QDir(TEST_DIR).exists("b"));
     QVERIFY(not QDir(TEST_DIR).exists(QString("b/%1").arg(existFile)));
 
-    FileOperation::RETURN_TYPE retEle = FileOperation::cpfile(TEST_DIR, existFile, QString("%1/b").arg(TEST_DIR));
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::cpfile(TEST_DIR, existFile, QString("%1/b").arg(TEST_DIR));
     auto ret = retEle.first;
     auto aBatch = retEle.second;
 
@@ -172,7 +172,7 @@ void FileOperationTest::test_file_copy(){
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
 
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -187,7 +187,7 @@ void FileOperationTest::test_inexist_file_copy(){
     QVERIFY(not QDir(TEST_DIR).exists(inexistFileName));
     QVERIFY(QDir(TEST_DIR).exists("b"));
     QVERIFY(not QDir(TEST_DIR).exists(QString("b/%1").arg(inexistFileName)));
-    FileOperation::RETURN_TYPE retEle = FileOperation::cpfile(TEST_DIR, inexistFileName, QString("%1/b").arg(TEST_DIR));
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::cpfile(TEST_DIR, inexistFileName, QString("%1/b").arg(TEST_DIR));
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QVERIFY(ret != ErrorCode::OK);
@@ -208,7 +208,7 @@ void FileOperationTest::test_folder_copy_including_its_articles(){
     QVERIFY(not QDir(TEST_DIR).exists(QString("b/%1").arg(existFile)));
     QVERIFY(not QDir(TEST_DIR).exists(QString("b/%1").arg(subDir)));
     QVERIFY(not QDir(TEST_DIR).exists(QString("b/%1").arg(subFile)));
-    FileOperation::RETURN_TYPE retEle = FileOperation::cpdir(TEST_DIR, existFile, QString("%1/b").arg(TEST_DIR));
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::cpdir(TEST_DIR, existFile, QString("%1/b").arg(TEST_DIR));
 
     auto ret = retEle.first;
     auto aBatch = retEle.second;
@@ -224,7 +224,7 @@ void FileOperationTest::test_folder_copy_including_its_articles(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -241,7 +241,7 @@ void FileOperationTest::test_inexist_folder_copy_including_its_articles(){
     QVERIFY(not QDir(TEST_DIR).exists(inexistFolder));
     QVERIFY(QDir(TEST_DIR).exists("b"));
     QVERIFY(not QDir(TEST_DIR).exists(QString("b/%1").arg(inexistFolder)));
-    FileOperation::RETURN_TYPE retEle = FileOperation::cpdir(TEST_DIR, inexistFolder, QString("%1/b").arg(TEST_DIR));
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::cpdir(TEST_DIR, inexistFolder, QString("%1/b").arg(TEST_DIR));
 
     auto ret = retEle.first;
     auto aBatch = retEle.second;
@@ -256,7 +256,7 @@ void FileOperationTest::test_inexist_folder_copy_including_its_articles(){
 void FileOperationTest::test_file_move_same_directory_unique_name(){
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
     QVERIFY(not QDir(TEST_DIR).exists("a moved.txt"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TEST_DIR, "a moved.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TEST_DIR, "a moved.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
 
@@ -266,7 +266,7 @@ void FileOperationTest::test_file_move_same_directory_unique_name(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -276,7 +276,7 @@ void FileOperationTest::test_file_move_same_directory_unique_name(){
 void FileOperationTest::test_file_move_same_directory_conflict_name(){
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
     QVERIFY(QDir(TEST_DIR).exists("b.txt"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TEST_DIR, "b.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TEST_DIR, "b.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QVERIFY(ret != ErrorCode::OK);
@@ -287,7 +287,7 @@ void FileOperationTest::test_file_move_same_directory_conflict_name(){
 void FileOperationTest::test_folder_move_same_directory_unique_name(){
     QVERIFY(QDir(TEST_DIR).exists("a"));
     QVERIFY(not QDir(TEST_DIR).exists("a moved"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TEST_DIR, "a moved");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TEST_DIR, "a moved");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -296,7 +296,7 @@ void FileOperationTest::test_folder_move_same_directory_unique_name(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -306,7 +306,7 @@ void FileOperationTest::test_folder_move_same_directory_unique_name(){
 void FileOperationTest::test_folder_move_same_directory_conflict_name(){
     QVERIFY(QDir(TEST_DIR).exists("a"));
     QVERIFY(QDir(TEST_DIR).exists("b"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TEST_DIR, "b");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TEST_DIR, "b");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QVERIFY(ret != ErrorCode::OK);
@@ -319,7 +319,7 @@ void FileOperationTest::test_file_move_jump_directory_unique_name(){
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
     QVERIFY(QDir(TEST_DIR).exists("b"));
     QVERIFY(not QDir(TO).exists("path/to/a moved.txt"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TO, "path/to/a moved.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TO, "path/to/a moved.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -329,7 +329,7 @@ void FileOperationTest::test_file_move_jump_directory_unique_name(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -342,7 +342,7 @@ void FileOperationTest::test_file_move_jump_directory_conflict_name(){
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
     QVERIFY(QDir(TEST_DIR).exists("b"));
     QVERIFY(QDir(TO).exists("b1/b2.txt")); // conflict here;
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TO, "b1/b2.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a.txt", TO, "b1/b2.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QVERIFY(ret != ErrorCode::OK);
@@ -358,7 +358,7 @@ void FileOperationTest::test_folder_move_jump_directory_unique_name(){
     QVERIFY(QDir(TEST_DIR).exists("a/a1.txt"));
     QVERIFY(QDir(TEST_DIR).exists("b"));
     QVERIFY(not QDir(TO).exists("path/to/a moved"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TO, "path/to/a moved");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TO, "path/to/a moved");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -372,7 +372,7 @@ void FileOperationTest::test_folder_move_jump_directory_unique_name(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -387,7 +387,7 @@ void FileOperationTest::test_folder_move_jump_directory_conflict_name(){
     QVERIFY(QDir(TEST_DIR).exists("a"));
     QVERIFY(QDir(TEST_DIR).exists("b"));
     QVERIFY(QDir(TO).exists("b1/b2"));  // conflict here;
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TO, "b1/b2");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "a", TO, "b1/b2");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QVERIFY(ret != ErrorCode::OK);
@@ -398,7 +398,7 @@ void FileOperationTest::test_folder_move_jump_directory_conflict_name(){
 }
 void FileOperationTest::test_touch_a_json_file_in_direct_path(){
     QVERIFY(not QDir(TEST_DIR).exists("a new json file.json"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a new json file.json");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a new json file.json");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -406,7 +406,7 @@ void FileOperationTest::test_touch_a_json_file_in_direct_path(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -414,7 +414,7 @@ void FileOperationTest::test_touch_a_json_file_in_direct_path(){
 }
 void FileOperationTest::test_touch_a_json_file_in_relative_path(){
     QVERIFY(not QDir(TEST_DIR).exists("path/to/a new json file.json"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "path/to/a new json file.json");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "path/to/a new json file.json");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -422,7 +422,7 @@ void FileOperationTest::test_touch_a_json_file_in_relative_path(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -430,7 +430,7 @@ void FileOperationTest::test_touch_a_json_file_in_relative_path(){
 }
 void FileOperationTest::test_touch_an_existed_txt_file_in_direct_path(){
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -439,7 +439,7 @@ void FileOperationTest::test_touch_an_existed_txt_file_in_direct_path(){
 }
 void FileOperationTest::test_touch_an_existed_txt_file_in_relative_path(){
     QVERIFY(QDir(TEST_DIR).exists("a/a1.txt"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a/a1.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a/a1.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -448,7 +448,7 @@ void FileOperationTest::test_touch_an_existed_txt_file_in_relative_path(){
 }
 void FileOperationTest::test_touch_a_folder_in_direct_path(){
     QVERIFY(not QDir(TEST_DIR).exists("a new folder"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a new folder");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a new folder");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -456,7 +456,7 @@ void FileOperationTest::test_touch_a_folder_in_direct_path(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -464,7 +464,7 @@ void FileOperationTest::test_touch_a_folder_in_direct_path(){
 }
 void FileOperationTest::test_touch_a_folder_in_relative_path(){
     QVERIFY(not QDir(TEST_DIR).exists("path/to/a new folder"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "path/to/a new folder");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "path/to/a new folder");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -472,7 +472,7 @@ void FileOperationTest::test_touch_a_folder_in_relative_path(){
     QVERIFY(not aBatch.isEmpty());
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
 
     QVERIFY(recoverRet);
@@ -480,7 +480,7 @@ void FileOperationTest::test_touch_a_folder_in_relative_path(){
 }
 void FileOperationTest::test_touch_an_existed_folder_in_direct_path(){
     QVERIFY(QDir(TEST_DIR).exists("a"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -489,7 +489,7 @@ void FileOperationTest::test_touch_an_existed_folder_in_direct_path(){
 }
 void FileOperationTest::test_touch_an_existed_folder_in_relative_path(){
     QVERIFY(QDir(TEST_DIR).exists("a/a1"));
-    FileOperation::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a/a1");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::touch(TEST_DIR, "a/a1");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
     QCOMPARE(ret, ErrorCode::OK);
@@ -500,7 +500,7 @@ void FileOperationTest::test_touch_an_existed_folder_in_relative_path(){
 void FileOperationTest::test_link_a_file(){
     QVERIFY2(QDir(TEST_DIR).exists("a.txt"), "Precondition not required.");
 
-    FileOperation::RETURN_TYPE retEle = FileOperation::link(TEST_DIR, "a.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::link(TEST_DIR, "a.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
 
@@ -512,7 +512,7 @@ void FileOperationTest::test_link_a_file(){
 
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
     QVERIFY(recoverRet);
     QVERIFY(QDir(TEST_DIR).exists("a.txt"));
@@ -522,7 +522,7 @@ void FileOperationTest::test_link_a_file(){
 void FileOperationTest::test_link_a_relative_file(){
     QVERIFY2(QDir(TEST_DIR).exists("a/a1.txt"), "Precondition not required.");
 
-    FileOperation::RETURN_TYPE retEle = FileOperation::link(TEST_DIR, "a/a1.txt");
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::link(TEST_DIR, "a/a1.txt");
     auto ret = retEle.first;
     auto aBatch = retEle.second;
 
@@ -534,7 +534,7 @@ void FileOperationTest::test_link_a_relative_file(){
 
     QList<QStringList> srcCommand;
     const auto& reversedaBatch = decltype(srcCommand)(aBatch.crbegin(), aBatch.crend());
-    const FileOperation::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
     const auto recoverRet = exeRetEle.first;
     QVERIFY(recoverRet);
     QVERIFY(QDir(TEST_DIR).exists("a/a1.txt"));
@@ -546,7 +546,7 @@ void FileOperationTest::test_rename_a_txt_To_A_TXT_Not_Exists(){
     QVERIFY2(QDir(TEST_DIR).entryList(QDir::Filter::AllEntries).contains(lowerCaseName), "Environment should met first");
 
     const QString upperCaseName = "A.TXT";
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, lowerCaseName, TEST_DIR, upperCaseName);
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, lowerCaseName, TEST_DIR, upperCaseName);
     QCOMPARE(retEle.first, ErrorCode::OK);
     QVERIFY2(QDir(TEST_DIR).entryList(QDir::Filter::AllEntries).contains(upperCaseName), "a.txt should be renamed to A.TXT");
 }
@@ -557,7 +557,7 @@ void FileOperationTest::test_rename_b_txt_To_A_TXT_Already_Exists(){
     // rename b.txt -> A.TXT while {a.txt} already exist in destination
     const QString onlyCaseDifferName = "A.TXT";
 
-    FileOperation::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "b.txt", TEST_DIR, onlyCaseDifferName);
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(TEST_DIR, "b.txt", TEST_DIR, onlyCaseDifferName);
     QVERIFY2(retEle.first != ErrorCode::OK, "should reject this rename and override operation");
 
 }
