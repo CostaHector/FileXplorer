@@ -9,6 +9,7 @@ CONFIG += c++11
 
 SOURCES += \
     Actions/AddressBarActions.cpp \
+    Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FramelessWindowActions.cpp \
@@ -54,6 +55,7 @@ SOURCES += \
     ContentPanelImplementer.cpp \
     FileOperation/FileOperatorPub.cpp \
     FileOperation/RecycleBinHelper.cpp \
+    Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
     Model/JsonModel.cpp \
     Model/LogModel.cpp \
@@ -141,6 +143,7 @@ SOURCES += \
 
 HEADERS += \
     Actions/AddressBarActions.h \
+    Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
     Actions/FileBasicOperationsActions.h \
     Actions/FramelessWindowActions.h \
@@ -186,6 +189,7 @@ HEADERS += \
     Component/Toaster.h \
     FileOperation/FileOperatorPub.h \
     FileOperation/RecycleBinHelper.h \
+    Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
     Model/JsonModel.h \
     Model/LogModel.h \

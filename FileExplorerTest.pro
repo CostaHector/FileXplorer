@@ -10,6 +10,8 @@ TEMPLATE = app
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    TestCase/ConflictSolveModelTest.cpp \
+    TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/NameSectionArrangeTest.cpp \
     TestCase/NameToolTest.cpp \
@@ -18,14 +20,17 @@ SOURCES += \
     TestCase/ToConsecutiveFileNameNoTest.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
     TestCase/ValueCheckerTest.cpp \
+    TestCase/FinderTest.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
+    Tools/ConflictsItemHelper.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp\
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     Component/NotificatorFrame.cpp \
     FileOperation/FileOperation.cpp \
+    FileOperation/FileOperatorPub.cpp \
     PublicTool.cpp \
     PublicVariable.cpp \
     TestCase/CatergorizerTest.cpp \
@@ -47,6 +52,7 @@ SOURCES += \
     Tools/RenameNamesUnique.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/NameSectionArrange.cpp \
+    model/ConflictsFileSystemModel.cpp \
     UndoRedo.cpp
 
 
@@ -54,13 +60,16 @@ HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Component/RenameWidgets/AdvanceRenamer.h \
+    TestCase/pub/FileSystemRelatedTest.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
     Tools/NameTool.h\
+    Tools/ConflictsItemHelper.h \
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
     Component/NotificatorFrame.h \
     FileOperation/FileOperation.h \
+    FileOperation/FileOperatorPub.h \
     PublicTool.h \
     PublicVariable.h \
     Tools/Categorizer.h \
@@ -73,6 +82,7 @@ HEADERS += \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/NameSectionArrange.h \
+    model/ConflictsFileSystemModel.h \
     UndoRedo.h
 
 DISTFILES += \

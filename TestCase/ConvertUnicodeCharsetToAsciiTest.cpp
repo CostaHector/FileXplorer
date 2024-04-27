@@ -67,6 +67,6 @@ void ConvertUnicodeCharsetToAsciiTest::init() {}
 
 void ConvertUnicodeCharsetToAsciiTest::cleanup() {}
 
-QTEST_MAIN(ConvertUnicodeCharsetToAsciiTest)
+//QTEST_MAIN(ConvertUnicodeCharsetToAsciiTest)
 
-#include "ConvertUnicodeCharsetToAsciiTest.moc"
+//#include "ConvertUnicodeCharsetToAsciiTest.moc"
