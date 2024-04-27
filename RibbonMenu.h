@@ -3,32 +3,32 @@
 
 #include <QTabWidget>
 #include <QToolBar>
-#include <QLineEdit>
 
 class RibbonMenu : public QTabWidget {
  public:
-  RibbonMenu();
+  explicit RibbonMenu(QWidget *parent = nullptr);
   QToolBar* GetMenuRibbonCornerWid(QWidget* attached = nullptr);
 
   QToolBar* LeafFile() const;
   QToolBar* LeafHome() const;
-  QToolBar* LeafShare() const;
   QToolBar* LeafView() const;
-  QToolBar* LeafDatabase();
+  QToolBar* LeafDatabase() const;
   QToolBar* LeafMediaTools() const;
 
   void Subscribe();
 
+  void on_officeStyleWidgetVisibilityChanged(const bool vis);;
+  void on_currentTabChangedRecordIndex(const int tabIndex);
+
  private:
-  QToolBar* menuRibbonCornerWid;
+  QToolBar* m_corner;
 
-  QToolBar* leafFileWid;
-  QToolBar* leafHomeWid;
-  QToolBar* leafShareWid;
-  QToolBar* leafViewWid;
-  QToolBar* leafDatabaseWid;
+  QToolBar* m_leafFile;
+  QToolBar* m_leafHome;
+  QToolBar* m_leafView;
+  QToolBar* m_leafDatabase;
 
-  QToolBar* leafMediaWid;
+  QToolBar* m_leafMore;
 
   static constexpr int MAX_WIDGET_HEIGHT = 400;
 };
