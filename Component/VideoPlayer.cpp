@@ -94,7 +94,7 @@ bool VideoPlayer::operator()(const QString& path) {
   return true;
 }
 
-auto VideoPlayer::PlaySelections(const QStringList& fileAbsPathList) -> bool {
+auto VideoPlayer::operator()(const QStringList& fileAbsPathList) -> bool {
   const int rowToPlay = m_playListWid->count();
   const int vidCntDelta = m_playListWid->appendToPlayList(fileAbsPathList);
   if (vidCntDelta <= 0) {
@@ -175,6 +175,38 @@ void VideoPlayer::onVolumeValueChange(const int logScaleValue) {
   qDebug("logarithmic:%d, linear:%f", logScaleValue, linearVolume);
   QToolTip::showText(cursor().pos(), "Volume:" + QString::number(linearVolume));
   PreferenceSettings().setValue(MemoryKey::VIDEO_PLAYER_VOLUME.name, logScaleValue);
+}
+
+auto VideoPlayer::keyPressEvent(QKeyEvent* e) -> void {
+  if (e->modifiers() == Qt::AltModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
+    m_playListWid->hide();
+    m_sliderTB->show();
+    m_controlTB->hide();
+    setWindowState(Qt::WindowMaximized);
+    return;
+  } else if (e->key() == Qt::Key_Escape) {
+    m_playListWid->show();
+    m_sliderTB->show();
+    m_controlTB->show();
+    setWindowState(Qt::WindowMaximized);
+    return;
+  } else if (e->key() == Qt::Key_F11) {
+    m_playListWid->hide();
+    m_sliderTB->hide();
+    m_controlTB->hide();
+    setWindowState(Qt::WindowFullScreen);
+    return;
+  } else if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+    setUrl(QUrl::fromLocalFile(m_playListWid->currentFilePath()));
+    play();
+    return;
+  } else if (e->key() == Qt::Key_Space) {
+    bool beforeChecked = g_videoPlayerActions()._PLAY_PAUSE->isChecked();
+    g_videoPlayerActions()._PLAY_PAUSE->setChecked(not beforeChecked);
+    emit g_videoPlayerActions()._PLAY_PAUSE->triggered(not beforeChecked);
+    return;
+  }
+  QWidget::keyPressEvent(e);
 }
 
 int VideoPlayer::onRecycleSelectedItems() {
@@ -584,6 +616,11 @@ void VideoPlayer::onScrollToAnotherFolder(int inc) {
 void VideoPlayer::onShowPlaylist(bool keepShow) {
   PreferenceSettings().setValue(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, keepShow);
   m_playListWid->setVisible(keepShow);
+  if (keepShow) {
+    if (m_playListWid->currentIndex().isValid()) {
+      QTimer::singleShot(100, [this]() { m_playListWid->scrollTo(m_playListWid->currentIndex()); });
+    }
+  }
   dynamic_cast<VideoPlayerWatcher*>(m_watcher)->setKeepListShow(keepShow);
 }
 
@@ -642,7 +679,7 @@ void VideoPlayer::handleError() {
   m_errorLabel->setText(message);
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -650,7 +687,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   VideoPlayer player;
   player.show();
-  player("E:/Leaked And Loaded/Leaked And Loaded - Billy Santoro, Gage Santoro.ts");
+  player("E:/115/0419");
   a.exec();
   return 0;
 }
