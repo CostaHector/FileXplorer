@@ -9,9 +9,8 @@
 
 #include "Component/CustomStatusBar.h"
 #include "Component/NavigationToolBar.h"
+#include "Component/PreviewFolder.h"
 #include "Component/StackedToolBar.h"
-
-#include "Tools/NavigationViewSwitcher.h"
 
 #include "ContentPanel.h"
 #include "RibbonMenu.h"
@@ -31,14 +30,15 @@ class FileExplorerReadOnly : public QMainWindow {
   void keyPressEvent(QKeyEvent* ev) override;
 
   QDockWidget* previewHtmlDock;
-  FolderPreviewHTML* previewHtml;
-  FolderPreviewWidget* previewWidget;
+
+  PreviewFolder* m_previewFolder;
+  FolderPreviewSwitcher* m_previewSwitcher;
 
   ContentPanel* m_fsPanel;
   StackedToolBar* m_stackedBar;
 
-  NavigationViewSwitcher* m_viewSwitcher;
-  QToolBar* m_views;
+  NavigationViewSwitcher* m_naviSwitcher;
+  QToolBar* m_viewsSwitcher;
 
   NavigationToolBar* m_navigationToolBar;
   RibbonMenu* m_ribbonMenu;

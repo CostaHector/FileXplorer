@@ -1,4 +1,4 @@
-#include "FolderPreviewHTML.h"
+#include "PreviewBrowser.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "PublicVariable.h"
 
@@ -7,22 +7,22 @@
 #include <QIODevice>
 #include <QTextStream>
 
-constexpr int FolderPreviewHTML::SHOW_IMGS_CNT_LIST[];
-constexpr int FolderPreviewHTML::N_SHOW_IMGS_CNT_LIST;
+constexpr int PreviewBrowser::SHOW_IMGS_CNT_LIST[];
+constexpr int PreviewBrowser::N_SHOW_IMGS_CNT_LIST;
 
-const QString FolderPreviewHTML::HTML_H1_TEMPLATE = "<a href=\"file:///%1\">%2</a>";
-const QString FolderPreviewHTML::HTML_H1_WITH_VIDS_TEMPLATE = "<a href=\"file:///%1\">&#9654;%2</a>";
-const QString FolderPreviewHTML::HTML_IMG_TEMPLATE = "<a href=\"file:///%1\"><img src=\"%1\" alt=\"%2\" width=\"%3\"></a><br/>\n";
-constexpr int FolderPreviewHTML::HTML_IMG_FIXED_WIDTH;
+const QString PreviewBrowser::HTML_H1_TEMPLATE = "<a href=\"file:///%1\">%2</a>";
+const QString PreviewBrowser::HTML_H1_WITH_VIDS_TEMPLATE = "<a href=\"file:///%1\">&#9654;%2</a>";
+const QString PreviewBrowser::HTML_IMG_TEMPLATE = "<a href=\"file:///%1\"><img src=\"%1\" alt=\"%2\" width=\"%3\"></a><br/>\n";
+constexpr int PreviewBrowser::HTML_IMG_FIXED_WIDTH;
 
-FolderPreviewHTML::FolderPreviewHTML(QWidget* parent) : m_parent(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN_AG->actions()[0]) {
+PreviewBrowser::PreviewBrowser(QWidget* parent) : m_parentDocker(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN_AG->actions()[0]) {
   setReadOnly(true);
   setOpenLinks(false);
   setOpenExternalLinks(true);
   subscribe();
 }
 
-bool FolderPreviewHTML::operator()(const QString& path) {
+bool PreviewBrowser::operator()(const QString& path) {
   setHtml("");  // release memory occupied before
   dirPath = QDir::fromNativeSeparators(path);
   m_curImgCntIndex = 0;
@@ -38,9 +38,7 @@ bool FolderPreviewHTML::operator()(const QString& path) {
   }
   const QString& headLine = fi.isDir() ? HTML_H1_WITH_VIDS_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName())
                                        : HTML_H1_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName());
-  if (m_parent) {
-    m_parent->setWindowTitle(QString::number(vidCnt) + '|' + QString::number(m_imgsLst.size()));
-  }
+  setDockerWindowTitle(vidCnt);
 
   QString htmlSrc;
   htmlSrc += "<!DOCTYPE html>\n<html>\n";
@@ -58,18 +56,12 @@ bool FolderPreviewHTML::operator()(const QString& path) {
   return true;
 }
 
-void FolderPreviewHTML::subscribe() {
-  connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &FolderPreviewHTML::ShowRemainImages);
-  connect(this, &QTextBrowser::anchorClicked, this, &FolderPreviewHTML::onAnchorClicked);
+void PreviewBrowser::subscribe() {
+  connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &PreviewBrowser::ShowRemainImages);
+  connect(this, &QTextBrowser::anchorClicked, this, &PreviewBrowser::onAnchorClicked);
 }
 
-QSize FolderPreviewHTML::sizeHint() const {
-  auto w = PreferenceSettings().value("dockerHtmlWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
-  auto h = PreferenceSettings().value("dockerHtmlHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
-  return QSize(w, h);
-}
-
-QStringList FolderPreviewHTML::InitImgsList(const QString& dirPath) const {
+QStringList PreviewBrowser::InitImgsList(const QString& dirPath) const {
   QDir dir(dirPath);
   if (not dir.exists()) {
     return {};
@@ -87,11 +79,11 @@ QStringList FolderPreviewHTML::InitImgsList(const QString& dirPath) const {
   return imgsLst;
 }
 
-bool FolderPreviewHTML::hasNextImgs() const {
+bool PreviewBrowser::hasNextImgs() const {
   return (not m_imgsLst.isEmpty()) and m_curImgCntIndex + 1 < N_SHOW_IMGS_CNT_LIST;
 }
 
-QString FolderPreviewHTML::nextImgsHTMLSrc() {
+QString PreviewBrowser::nextImgsHTMLSrc() {
   QString imgSrc;
   const QDir dir(dirPath);
   for (int i = SHOW_IMGS_CNT_LIST[m_curImgCntIndex]; i < m_imgsLst.size() and i < SHOW_IMGS_CNT_LIST[m_curImgCntIndex + 1]; ++i) {
@@ -102,7 +94,7 @@ QString FolderPreviewHTML::nextImgsHTMLSrc() {
   return imgSrc;
 }
 
-bool FolderPreviewHTML::onAnchorClicked(const QUrl& url) {
+bool PreviewBrowser::onAnchorClicked(const QUrl& url) {
   if (not url.isLocalFile()) {
     return false;
   }
@@ -117,7 +109,7 @@ bool FolderPreviewHTML::onAnchorClicked(const QUrl& url) {
   return true;
 }
 
-bool FolderPreviewHTML::ShowRemainImages(const int val) {
+bool PreviewBrowser::ShowRemainImages(const int val) {
   if (this->verticalScrollBar()->maximum() != val) {
     return false;
   }

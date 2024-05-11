@@ -1,8 +1,9 @@
 #include "ImagesFileSystemModel.h"
+#include "PublicVariable.h"
 
-ImagesFileSystemModel::ImagesFileSystemModel(QObject* parent, bool showThumbnails_)
-    : MyQFileSystemModel(parent), m_showThumbnails(showThumbnails_), IMG_NAME_FILTERS(GetImgNameFiltersList()) {
-  setNameFilters(IMG_NAME_FILTERS);
+ImagesFileSystemModel::ImagesFileSystemModel(QObject* parent, bool showThumbnails_) : MyQFileSystemModel(parent), m_showThumbnails(showThumbnails_) {
+  setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  setNameFilterDisables(false);
 }
 
 QVariant ImagesFileSystemModel::getPreview(QModelIndex index) const {
@@ -29,12 +30,4 @@ QVariant ImagesFileSystemModel::data(const QModelIndex& index, int role) const {
   } else {
     return QFileSystemModel::data(index, role);
   }
-}
-
-QStringList ImagesFileSystemModel::GetImgNameFiltersList() const {
-  QStringList IMG_NAME_FILTERS;
-  for (int i = 0; i < IMAGES_COUNT_LOAD_ONCE_MAX; ++i) {
-    IMG_NAME_FILTERS += {QString("* %1.jpg").arg(i), QString("* %1.jpg").arg(i), QString("* %1.png").arg(i), QString("* %1.webp").arg(i)};
-  }
-  return IMG_NAME_FILTERS;
 }
