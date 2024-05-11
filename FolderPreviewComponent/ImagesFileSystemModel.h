@@ -8,11 +8,9 @@ class ImagesFileSystemModel : public MyQFileSystemModel {
   explicit ImagesFileSystemModel(QObject* parent = nullptr, bool showThumbnails_ = false);
   QVariant getPreview(QModelIndex index) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  QStringList GetImgNameFiltersList() const;
 
  protected:
   bool m_showThumbnails;
-  const QStringList IMG_NAME_FILTERS;
 };
 
 #endif  // IMAGESFILESYSTEMMODEL_H

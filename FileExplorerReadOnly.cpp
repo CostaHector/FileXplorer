@@ -6,33 +6,36 @@
 #include <QFileInfo>
 #include <functional>
 
+#include "Actions/FolderPreviewActions.h"
 #include "Actions/ViewActions.h"
-#include "Component/FolderPreviewHTML.h"
 #include "PublicVariable.h"
+
+#include "Tools/FolderPreviewSwitcher.h"
+#include "Tools/NavigationViewSwitcher.h"
 
 FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
     : QMainWindow(parent),
-      previewHtmlDock(new QDockWidget("Preview HTML", this)),
-      previewHtml(new FolderPreviewHTML(previewHtmlDock)),
-      //      previewWidget(new FolderPreviewWidget),
-      previewWidget{nullptr},
+      previewHtmlDock(new QDockWidget("Preview", this)),
+
+      m_previewFolder{new PreviewFolder{previewHtmlDock}},
+      m_previewSwitcher{new FolderPreviewSwitcher{m_previewFolder, previewHtmlDock}},
 
       m_fsPanel{nullptr},
       m_stackedBar{new StackedToolBar},
-      m_viewSwitcher{nullptr},
+      m_naviSwitcher{nullptr},
 
-      m_views{new QToolBar("views switch", this)},
+      m_viewsSwitcher{new QToolBar("views switch", this)},
       m_navigationToolBar(new NavigationToolBar),
       m_ribbonMenu(new RibbonMenu{this}),
 
-      m_statusBar(new CustomStatusBar{m_views, this}) {
-  m_views->addActions(g_viewActions()._TRIPLE_VIEW->actions());
+      m_statusBar(new CustomStatusBar{m_viewsSwitcher, this}) {
+  m_viewsSwitcher->addActions(g_viewActions()._TRIPLE_VIEW->actions());
 
-  m_fsPanel = new ContentPanel(previewHtml, nullptr, this);
+  m_fsPanel = new ContentPanel(m_previewFolder, this);
   m_fsPanel->BindLogger(m_statusBar);
 
-  m_viewSwitcher = new NavigationViewSwitcher{m_stackedBar, m_fsPanel};
-  m_viewSwitcher->onSwitchByViewType("table");
+  m_naviSwitcher = new NavigationViewSwitcher{m_stackedBar, m_fsPanel};
+  m_naviSwitcher->onSwitchByViewType("table");
 
   qDebug("FileExplorerReadOnly Current path [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
   QString initialPath = (argc > 1) ? argv[1] : "";
@@ -41,8 +44,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
 
   setCentralWidget(m_fsPanel);
 
-  previewHtmlDock->setWidget(previewHtml);
-  //  previewHtmlDock->setWidget(previewWidget);
+  previewHtmlDock->setWidget(m_previewFolder);
   previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
 
@@ -57,15 +59,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
 
 void FileExplorerReadOnly::closeEvent(QCloseEvent* event) {
   PreferenceSettings().setValue("geometry", saveGeometry());
-  if (previewWidget) {
-    PreferenceSettings().setValue("dockerWidgetWidth", previewWidget->width());
-    PreferenceSettings().setValue("dockerWidgetHeight", previewWidget->height());
-  }
-  if (previewHtml) {
-    PreferenceSettings().setValue("dockerHtmlWidth", previewHtml->width());
-    PreferenceSettings().setValue("dockerHtmlHeight", previewHtml->height());
-  }
-
+  PreferenceSettings().setValue("dockerFolderPreviewWidth", m_previewFolder->width());
+  PreferenceSettings().setValue("dockerFolderPreviewHeight", m_previewFolder->height());
   PreferenceSettings().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
   return QMainWindow::closeEvent(event);
 }
@@ -115,12 +110,21 @@ void FileExplorerReadOnly::subscribe() {
     PreferenceSettings().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
     m_navigationToolBar->setVisible(checked);
   });
+
   connect(vA.PREVIEW_PANE_HTML, &QAction::triggered, this, [this](const bool checked) {
     PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, checked);
     const bool showPrev = m_fsPanel->isFSView() and checked;
     previewHtmlDock->setVisible(showPrev);
   });
-  connect(m_views, &QToolBar::actionTriggered, m_viewSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
+  auto& fpAG = g_folderPreviewActions();
+  connect(fpAG.PREVIEW_AG, &QActionGroup::triggered, this, [this](QAction* triggeredActions) {
+    if (triggeredActions == nullptr)
+      return;
+    const QString& previewType = triggeredActions->text();
+    PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
+    m_previewSwitcher->onSwitchByViewType(previewType);
+  });
+  connect(m_viewsSwitcher, &QToolBar::actionTriggered, m_naviSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
 }
 
 void FileExplorerReadOnly::keyPressEvent(QKeyEvent* ev) {

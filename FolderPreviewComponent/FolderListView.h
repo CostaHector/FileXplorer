@@ -13,7 +13,7 @@ public:
     virtual auto InitViewSettings()->void = 0;
     bool operator()(const QString& path);
     void subscribe();;
-    void CustomContextMenuEvent(const QPoint& pnt);
+    void contextMenuEvent(QContextMenuEvent* event) override;
     QAction* hideWidget;
 
 protected:

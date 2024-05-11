@@ -4,6 +4,7 @@
 #include <QToolButton>
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/FileLeafAction.h"
+#include "Actions/FolderPreviewActions.h"
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/JsonEditorActions.h"
 #include "Actions/RecycleBinActions.h"
@@ -54,7 +55,6 @@ RibbonMenu::RibbonMenu(QWidget* parent)
       m_leafView(LeafView()),
       m_leafDatabase(LeafDatabase()),
       m_leafMore(LeafMediaTools()) {
-
   addTab(m_leafFile, "&File");
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
@@ -220,6 +220,13 @@ QToolBar* RibbonMenu::LeafView() const {
   viewPaneToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
   SetLayoutAlightment(viewPaneToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
+  auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(nullptr);
+  folderPreviewToolBar->setOrientation(Qt::Orientation::Vertical);
+  folderPreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  folderPreviewToolBar->setStyleSheet("QToolBar { max-width: 128px; }");
+  folderPreviewToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+
   auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions()._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup,
                                           "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   auto* embeddedPlayerTB = DropListToolButton(g_viewActions()._VIDEO_PLAYER_EMBEDDED, g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(),
@@ -228,6 +235,7 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* leafViewWid = new QToolBar("Leaf View");
   leafViewWid->setToolTip("View Leaf");
   leafViewWid->addWidget(viewPaneToolBar);
+  leafViewWid->addWidget(folderPreviewToolBar);
   leafViewWid->addSeparator();
   leafViewWid->addWidget(jsonEditorTB);
   leafViewWid->addSeparator();

@@ -1,5 +1,5 @@
-#ifndef FOLDERPREVIEWHTML_H
-#define FOLDERPREVIEWHTML_H
+#ifndef PREVIEWBROWSER_H
+#define PREVIEWBROWSER_H
 #include <QDesktopServices>
 #include <QDir>
 #include <QScrollBar>
@@ -7,12 +7,18 @@
 #include <QTextCursor>
 #include <QTextEdit>
 
-class FolderPreviewHTML : public QTextBrowser {
+class PreviewBrowser : public QTextBrowser {
  public:
-  explicit FolderPreviewHTML(QWidget* parent = nullptr);
+  explicit PreviewBrowser(QWidget* parent = nullptr);
   auto operator()(const QString& path) -> bool;
   void subscribe();
-  QSize sizeHint() const override;
+
+  void setDockerWindowTitle(int vidCnt) {
+    if (m_parentDocker == nullptr) {
+      return;
+    }
+    m_parentDocker->setWindowTitle(QString::number(vidCnt) + '|' + QString::number(m_imgsLst.size()));
+  }
 
   bool onAnchorClicked(const QUrl& url);
 
@@ -21,13 +27,13 @@ class FolderPreviewHTML : public QTextBrowser {
   QString nextImgsHTMLSrc();
   auto ShowRemainImages(const int val) -> bool;
 
-  static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 50, INT_MAX}; // never remove last element "INT_MAX"
+  static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 50, INT_MAX};  // never remove last element "INT_MAX"
   static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(SHOW_IMGS_CNT_LIST[0]);
   int m_curImgCntIndex = 0;
 
   QString dirPath;
   QStringList m_imgsLst;
-  QWidget* m_parent;
+  QWidget* m_parentDocker;
   QAction* m_PLAY_ACTION;
   static const QString HTML_H1_TEMPLATE;
   static const QString HTML_H1_WITH_VIDS_TEMPLATE;
@@ -35,4 +41,5 @@ class FolderPreviewHTML : public QTextBrowser {
   static constexpr int HTML_IMG_FIXED_WIDTH = 600;
 };
 
-#endif  // FOLDERPREVIEWHTML_H
+void ffff();
+#endif  // PREVIEWBROWSER_H
