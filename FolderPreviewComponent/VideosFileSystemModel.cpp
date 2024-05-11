@@ -1,5 +1,7 @@
 #include "VideosFileSystemModel.h"
+#include "PublicVariable.h"
 
 VideosFileSystemModel::VideosFileSystemModel(QObject* parent, bool showThumbnails_) : MyQFileSystemModel(parent) {
-  setNameFilters({"*.mp4", "*.mov", "*.avi", "*.flv", "*.wmv", "*.mkv", "*.divx", "*.m4v", "*.mpg", "*.ts", "*.vob"});
+  setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
+  setNameFilterDisables(false);
 }

@@ -1,8 +1,9 @@
-#include "FolderPreviewWidget.h"
+#include "PreviewLists.h"
 
 #include "FolderPreviewComponent/ImagesListPreview.h"
 #include "FolderPreviewComponent/OtherItemsListPreview.h"
 #include "FolderPreviewComponent/VideosListPreview.h"
+#include "qevent.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -11,10 +12,12 @@
 #include <QUrl>
 
 #include <QMenu>
-#include "PublicVariable.h"
 
-FolderPreviewWidget::FolderPreviewWidget(QWidget* parent)
+#include <QContextMenuEvent>
+
+PreviewLists::PreviewLists(QWidget* parent)
     : QWidget(parent),
+      m_parentDocker{parent},
       m_vidsPreview(new VideosListPreview),
       m_imgsPreview(new ImagesListPreview),
       m_othersPreview(new OtherItemsListPreview),
@@ -37,32 +40,21 @@ FolderPreviewWidget::FolderPreviewWidget(QWidget* parent)
   m_folderPreviewMenu->addAction(m_vidsPreview->hideWidget);
   m_folderPreviewMenu->addAction(m_imgsPreview->hideWidget);
   m_folderPreviewMenu->addAction(m_othersPreview->hideWidget);
-  setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
-bool FolderPreviewWidget::operator()(const QString& path) {
+bool PreviewLists::operator()(const QString& path) {
   if (not QFileInfo(path).isDir()) {
     return true;
   }
   (*m_vidsPreview)(path);
   (*m_imgsPreview)(path);
   (*m_othersPreview)(path);
+  setDockerWindowTitle(m_vidsPreview->model()->rowCount(), m_imgsPreview->model()->rowCount());
   return true;
 }
 
-void FolderPreviewWidget::subscribe() {
-  connect(this, &QWidget::customContextMenuRequested, this, &FolderPreviewWidget::CustomContextMenuEvent);
-  connect(this, &FolderPreviewWidget::showANewPath, this, &FolderPreviewWidget::operator());
-}
-
-void FolderPreviewWidget::CustomContextMenuEvent(const QPoint& pnt) {
-  m_folderPreviewMenu->popup(mapToGlobal(pnt));
-}
-
-QSize FolderPreviewWidget::sizeHint() const {
-  auto w = PreferenceSettings().value("dockerWidgetWidth", DOCKER_DEFAULT_SIZE.width()).toInt();
-  auto h = PreferenceSettings().value("dockerWidgetHeight", DOCKER_DEFAULT_SIZE.height()).toInt();
-  return QSize(w, h);
+void PreviewLists::contextMenuEvent(QContextMenuEvent* event) {
+  m_folderPreviewMenu->popup(mapToGlobal(event->pos()));
 }
 
 // #define __MAIN__EQ__NAME__ 1

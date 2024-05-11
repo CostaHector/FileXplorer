@@ -172,6 +172,8 @@ const KV AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false, ValueChecker{ValueC
 const KV SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
+const KV FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels",
+                             ValueChecker{{"labels", "browser", "lists"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING}};
 
 const KV SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
@@ -242,8 +244,7 @@ const KV RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",
 const KV RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST", QStringList{"", " ", "", " - 1080p"}, ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 const KV RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"},
                                      ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
-const KV RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2",
-                                     ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR}};
+const KV RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR}};
 
 const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE",
                                 "../bin/PERFORMERS_TABLE.txt",
