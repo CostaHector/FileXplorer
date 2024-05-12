@@ -245,18 +245,25 @@ void AdvanceRenamer::init() {
   m_relNameTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
   m_relNameTE->setReadOnly(true);
   m_relNameTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_relNameTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
   m_oBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
   m_oBaseTE->setReadOnly(true);
   m_oBaseTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_oBaseTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
   m_oExtTE->setReadOnly(true);
   m_oExtTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_oExtTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
   m_nBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+  m_nBaseTE->setReadOnly(false);
   m_nBaseTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  m_nBaseTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
+  m_nExtTE->setReadOnly(false);
   m_nExtTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_nExtTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
   m_nameEditLayout = new QHBoxLayout;
   m_nameEditLayout->addWidget(m_relNameTE);

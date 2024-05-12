@@ -18,8 +18,8 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_mediaPlayer(new QMediaPlayer(this, QMediaPlayer::LowLatency)),
       m_timeSlider(new ClickableSlider),
       m_volumnSlider(new QSlider(Qt::Orientation::Horizontal, this)),
-      m_timeTemplate("%1/%2"),
-      m_timeLabel(new QLabel(m_timeTemplate)),
+      m_timeTemplate{"%1|%2"},
+      m_timeLabel{new QLabel(m_timeTemplate, this)},
       m_errorLabel(new QLabel),
       m_sliderTB(new QToolBar("slider", this)),
       m_controlTB(g_videoPlayerActions().GetPlayControlToolBar(this, m_timeLabel)),
@@ -94,7 +94,7 @@ bool VideoPlayer::operator()(const QString& path) {
   return true;
 }
 
-auto VideoPlayer::PlaySelections(const QStringList& fileAbsPathList) -> bool {
+auto VideoPlayer::operator()(const QStringList& fileAbsPathList) -> bool {
   const int rowToPlay = m_playListWid->count();
   const int vidCntDelta = m_playListWid->appendToPlayList(fileAbsPathList);
   if (vidCntDelta <= 0) {
@@ -177,6 +177,38 @@ void VideoPlayer::onVolumeValueChange(const int logScaleValue) {
   PreferenceSettings().setValue(MemoryKey::VIDEO_PLAYER_VOLUME.name, logScaleValue);
 }
 
+auto VideoPlayer::keyPressEvent(QKeyEvent* e) -> void {
+  if (e->modifiers() == Qt::AltModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
+    m_playListWid->hide();
+    m_sliderTB->show();
+    m_controlTB->hide();
+    setWindowState(Qt::WindowMaximized);
+    return;
+  } else if (e->key() == Qt::Key_Escape) {
+    m_playListWid->show();
+    m_sliderTB->show();
+    m_controlTB->show();
+    setWindowState(Qt::WindowMaximized);
+    return;
+  } else if (e->key() == Qt::Key_F11) {
+    m_playListWid->hide();
+    m_sliderTB->hide();
+    m_controlTB->hide();
+    setWindowState(Qt::WindowFullScreen);
+    return;
+  } else if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+    setUrl(QUrl::fromLocalFile(m_playListWid->currentFilePath()));
+    play();
+    return;
+  } else if (e->key() == Qt::Key_Space) {
+    bool beforeChecked = g_videoPlayerActions()._PLAY_PAUSE->isChecked();
+    g_videoPlayerActions()._PLAY_PAUSE->setChecked(not beforeChecked);
+    emit g_videoPlayerActions()._PLAY_PAUSE->triggered(not beforeChecked);
+    return;
+  }
+  QWidget::keyPressEvent(e);
+}
+
 int VideoPlayer::onRecycleSelectedItems() {
   if (not m_playListWid->selectionModel()->hasSelection()) {
     qDebug("Recycle skip. Select before delete.");
@@ -195,14 +227,23 @@ int VideoPlayer::onRecycleSelectedItems() {
       // to recycle, play first unselected and available vid.
       m_playListWid->setCurrentRow(nextPlayRow);
       setUrl(nextPlayUrl);
+      if (g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked()) {
+        play();
+      }
     }
   }
 
-  FileOperation::BATCH_COMMAND_LIST_TYPE recycleCmds;
+  QStringList preList;
+  QStringList relList;
+  preList.reserve(rmvFilesLst.size());
+  relList.reserve(rmvFilesLst.size());
   for (const QString& pth : rmvFilesLst) {
     QFileInfo fi(pth);
-    recycleCmds.append({"moveToTrash", fi.absolutePath(), fi.fileName()});
+    preList.append(fi.absolutePath());
+    relList.append(fi.fileName());
   }
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE recycleCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
+
   if (recycleCmds.isEmpty()) {
     qDebug("Skip Recycle. No file need to recycle");
     Notificator::goodNews("Recycle succeed", "No file need to recycle");
@@ -575,6 +616,11 @@ void VideoPlayer::onScrollToAnotherFolder(int inc) {
 void VideoPlayer::onShowPlaylist(bool keepShow) {
   PreferenceSettings().setValue(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, keepShow);
   m_playListWid->setVisible(keepShow);
+  if (keepShow) {
+    if (m_playListWid->currentIndex().isValid()) {
+      QTimer::singleShot(100, [this]() { m_playListWid->scrollTo(m_playListWid->currentIndex()); });
+    }
+  }
   dynamic_cast<VideoPlayerWatcher*>(m_watcher)->setKeepListShow(keepShow);
 }
 
@@ -609,7 +655,7 @@ void VideoPlayer::onSetPlayerPosition(int position) {
 }
 
 void VideoPlayer::onPlayerPositionChanged(qint64 position) {
-  m_timeLabel->setText(m_timeTemplate.arg(position / MICROSECOND));
+  m_timeLabel->setText(m_timeTemplate.arg(MillionSecond2hhmmss(position)));
   m_timeSlider->setValue(position);
   if (position > 0 and position == m_timeSlider->maximum() and g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO->isChecked()) {
     onPositionAdd(1);
@@ -617,9 +663,9 @@ void VideoPlayer::onPlayerPositionChanged(qint64 position) {
 }
 
 void VideoPlayer::durationChanged(qint64 duration) {
-  qDebug("Duration changed to %lld", duration);
+  qInfo("Duration changed to %lld", duration);
   m_timeSlider->setRange(0, duration);
-  m_timeTemplate = "%1/" + QString::number(duration / MICROSECOND);
+  m_timeTemplate = "%1|" + MillionSecond2hhmmss(duration);
 }
 
 void VideoPlayer::handleError() {
@@ -633,7 +679,7 @@ void VideoPlayer::handleError() {
   m_errorLabel->setText(message);
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -641,7 +687,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   VideoPlayer player;
   player.show();
-  player("E:/Leaked And Loaded/Leaked And Loaded - Billy Santoro, Gage Santoro.ts");
+  player("E:/115/0419");
   a.exec();
   return 0;
 }

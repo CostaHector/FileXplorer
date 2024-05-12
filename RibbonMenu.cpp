@@ -4,8 +4,10 @@
 #include <QToolButton>
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/FileLeafAction.h"
+#include "Actions/FolderPreviewActions.h"
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/JsonEditorActions.h"
+#include "Actions/RecycleBinActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "Actions/VideoPlayerActions.h"
@@ -13,44 +15,6 @@
 #include "Component/DatabaseToolBar.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
-
-RibbonMenu::RibbonMenu()
-    : menuRibbonCornerWid(GetMenuRibbonCornerWid()),
-      leafFileWid(LeafFile()),
-      leafHomeWid(LeafHome()),
-      leafShareWid(LeafShare()),
-      leafViewWid(LeafView()),
-      leafDatabaseWid(LeafDatabase()),
-      leafMediaWid(LeafMediaTools()) {
-  addTab(leafFileWid, "&File");
-  addTab(leafHomeWid, "&Home");
-  addTab(leafShareWid, "&Share");
-  addTab(leafViewWid, "&View");
-  addTab(leafDatabaseWid, "&Database");
-  addTab(leafMediaWid, "&Media");
-
-  setCornerWidget(menuRibbonCornerWid, Qt::Corner::TopRightCorner);
-
-  Subscribe();
-
-  setCurrentIndex(PreferenceSettings().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
-}
-
-QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
-  QToolBar* menuRibbonCornerWid = new QToolBar("Frameless window menu bar", attached);
-  menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
-  menuRibbonCornerWid->addSeparator();
-  menuRibbonCornerWid->addAction(g_framelessWindowAg()._EXPAND_RIBBONS);
-  menuRibbonCornerWid->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
-  return menuRibbonCornerWid;
-}
-
-QToolBar* RibbonMenu::LeafFile() const {
-  QToolBar* leafFileWid(new QToolBar);
-  leafFileWid->addActions(g_fileLeafActions().LEAF_FILE->actions());
-  leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  return leafFileWid;
-}
 
 QToolButton* DropListToolButton(QAction* defaultAction,
                                 QList<QAction*> dropdownActions,
@@ -81,6 +45,45 @@ QToolButton* DropListToolButton(QAction* defaultAction,
   mn->setToolTipsVisible(true);
   tb->setMenu(mn);
   return tb;
+}
+
+RibbonMenu::RibbonMenu(QWidget* parent)
+    : QTabWidget{parent},
+      m_corner(GetMenuRibbonCornerWid()),
+      m_leafFile(LeafFile()),
+      m_leafHome(LeafHome()),
+      m_leafView(LeafView()),
+      m_leafDatabase(LeafDatabase()),
+      m_leafMore(LeafMediaTools()) {
+  addTab(m_leafFile, "&File");
+  addTab(m_leafHome, "&Home");
+  addTab(m_leafView, "&View");
+  addTab(m_leafDatabase, "&Database");
+  addTab(m_leafMore, "&More");
+
+  setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
+
+  Subscribe();
+
+  setCurrentIndex(PreferenceSettings().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
+}
+
+QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
+  QToolBar* menuRibbonCornerWid = new QToolBar("corner tools", attached);
+  menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  menuRibbonCornerWid->addSeparator();
+  menuRibbonCornerWid->addAction(g_framelessWindowAg()._EXPAND_RIBBONS);
+  menuRibbonCornerWid->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  return menuRibbonCornerWid;
+}
+
+QToolBar* RibbonMenu::LeafFile() const {
+  QToolBar* leafFileWid(new QToolBar);
+  leafFileWid->addActions(g_fileLeafActions().LEAF_FILE->actions());
+  leafFileWid->addSeparator();
+  leafFileWid->addAction(g_recycleBinAg().RECYLE_BIN_WIDGET);
+  leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  return leafFileWid;
 }
 
 QToolBar* RibbonMenu::LeafHome() const {
@@ -204,10 +207,6 @@ QToolBar* RibbonMenu::LeafHome() const {
   return leafHomeWid;
 }
 
-QToolBar* RibbonMenu::LeafShare() const {
-  return new QToolBar();
-}
-
 QToolBar* RibbonMenu::LeafView() const {
   auto* NAVIGATION_PANE = g_viewActions().NAVIGATION_PANE;
   auto* PREVIEW_PANE_HTML = g_viewActions().PREVIEW_PANE_HTML;
@@ -221,6 +220,13 @@ QToolBar* RibbonMenu::LeafView() const {
   viewPaneToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
   SetLayoutAlightment(viewPaneToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
+  auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(nullptr);
+  folderPreviewToolBar->setOrientation(Qt::Orientation::Vertical);
+  folderPreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  folderPreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+  folderPreviewToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+
   auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions()._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup,
                                           "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   auto* embeddedPlayerTB = DropListToolButton(g_viewActions()._VIDEO_PLAYER_EMBEDDED, g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(),
@@ -229,6 +235,7 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* leafViewWid = new QToolBar("Leaf View");
   leafViewWid->setToolTip("View Leaf");
   leafViewWid->addWidget(viewPaneToolBar);
+  leafViewWid->addWidget(folderPreviewToolBar);
   leafViewWid->addSeparator();
   leafViewWid->addWidget(jsonEditorTB);
   leafViewWid->addSeparator();
@@ -236,33 +243,31 @@ QToolBar* RibbonMenu::LeafView() const {
   return leafViewWid;
 }
 
-QToolBar* RibbonMenu::LeafDatabase() {
-  auto* databaseToolBar = new DatabaseToolBar("Database Leaf", this);
+QToolBar* RibbonMenu::LeafDatabase() const {
+  auto* databaseToolBar = new DatabaseToolBar("Leaf Database");
   return databaseToolBar;
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
-  auto* archiveVidsTB = new QToolBar("Achive vid/img/json files");
+  auto* archiveVidsTB = new QToolBar("Leaf Achive Files");
   archiveVidsTB->addActions(g_fileBasicOperationsActions().FOLDER_FILE_PROCESS->actions());
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
 
 void RibbonMenu::Subscribe() {
-  auto on_officeStyleWidget = [this](const bool vis) -> void {
-    PreferenceSettings().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
-    if (vis) {
-      setMaximumHeight(RibbonMenu::MAX_WIDGET_HEIGHT);
-    } else {
-      setMaximumHeight(tabBar()->height());
-    }
-  };
-  connect(g_framelessWindowAg()._EXPAND_RIBBONS, &QAction::triggered, this, on_officeStyleWidget);
+  connect(g_framelessWindowAg()._EXPAND_RIBBONS, &QAction::triggered, this, &RibbonMenu::on_officeStyleWidgetVisibilityChanged);
+  on_officeStyleWidgetVisibilityChanged(g_framelessWindowAg()._EXPAND_RIBBONS->isChecked());
+  connect(this, &QTabWidget::currentChanged, this, &RibbonMenu::on_currentTabChangedRecordIndex);
+}
 
-  emit g_framelessWindowAg()._EXPAND_RIBBONS->triggered(g_framelessWindowAg()._EXPAND_RIBBONS->isChecked());
+void RibbonMenu::on_officeStyleWidgetVisibilityChanged(const bool vis) {
+  PreferenceSettings().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
+  setMaximumHeight(vis ? RibbonMenu::MAX_WIDGET_HEIGHT : tabBar()->height());
+}
 
-  auto on_currentTabChanged = [](int tabInd) -> void { PreferenceSettings().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabInd); };
-  connect(this, &QTabWidget::currentChanged, on_currentTabChanged);
+void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
+  PreferenceSettings().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
 }
 
 #include <QMainWindow>

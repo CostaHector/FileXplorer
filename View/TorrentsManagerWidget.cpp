@@ -104,7 +104,7 @@ void TorrentsManagerWidget::onInitATable() {
   }
 
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
-  const QString& createTableSQL = TorrentsDatabaseHelper::CreatePerformerTableSQL(DB_TABLE::TORRENTS);
+  static const QString& createTableSQL = TorrentsDatabaseHelper::CreatePerformerTableSQL(DB_TABLE::TORRENTS);
   QSqlQuery createTableQuery(con);
   const auto ret = createTableQuery.exec(createTableSQL);
   if (not ret) {

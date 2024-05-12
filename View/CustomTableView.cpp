@@ -140,7 +140,7 @@ bool CustomTableView::ShowOrHideColumnCore() {
   }
   auto* model_ = this->model();
   if (model_ == nullptr) {
-    qDebug("Skip set visibility of horizontal header. model is nullptr.");
+    qWarning("Skip set visibility of horizontal header. model is nullptr.");
     return false;
   }
   const int tableColumnsCount = model_->columnCount();
