@@ -5,7 +5,7 @@
 #include "FolderListView.h"
 class ImagesListPreview : public FolderListView {
  public:
-  explicit ImagesListPreview();
+  explicit ImagesListPreview(QWidget* parent = nullptr);
   void InitViewSettings() override;
 };
 
