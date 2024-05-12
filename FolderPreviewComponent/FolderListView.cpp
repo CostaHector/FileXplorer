@@ -9,8 +9,8 @@
 
 #include "PublicVariable.h"
 
-FolderListView::FolderListView(MyQFileSystemModel* fileSystemModel_, const QString& viewName_)
-    : hideWidget(new QAction(viewName_)), m_fileSystemPreview(fileSystemModel_), m_listViewMenu(new QMenu), m_viewName(viewName_) {
+FolderListView::FolderListView(MyQFileSystemModel* fileSystemModel_, const QString& viewName_, QWidget* parent)
+    : QListView{parent}, hideWidget(new QAction(viewName_)), m_fileSystemPreview(fileSystemModel_), m_listViewMenu(new QMenu), m_viewName(viewName_) {
   PreferenceSettings().beginGroup("ShowFolderPreview");
   bool checked = PreferenceSettings().value(m_viewName, true).toBool();
   if (not checked)
