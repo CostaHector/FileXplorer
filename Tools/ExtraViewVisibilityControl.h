@@ -13,6 +13,7 @@ class ExtraViewVisibilityControl : public QObject {
   QWidget* _parent;
   QWidget* performerManager;
   QWidget* torrentsManager;
+  QWidget* m_recycleBin;
 };
 
 #endif  // EXTRAVIEWVISIBILITYCONTROL_H

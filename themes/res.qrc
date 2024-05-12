@@ -26,7 +26,7 @@
         <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
         <file alias="ADD_TO_MUSIC_PLAYLIST">TopSideToolBarIcons/ADD_TO_MUSIC_PLAYLIST.png</file>
         <file alias="SETTINGS">TopSideToolBarIcons/SETTINGS.svg</file>
-        <file alias="MOVE_TO_TRASH_BIN">TopSideToolBarIcons/MOVE_TO_TRASH_BIN.ico</file>
+        <file alias="MOVE_TO_TRASH_BIN">TopSideToolBarIcons/MOVE_TO_TRASH_BIN.svg</file>
         <file alias="DELETE_ITEMS_PERMANENTLY">TopSideToolBarIcons/DELETE_ITEMS_PERMANENTLY.svg</file>
         <file alias="ABOUT">TopSideToolBarIcons/ABOUT.svg</file>
         <file alias="SELECT_ALL">TopSideToolBarIcons/SELECT_ALL.ico</file>
@@ -236,6 +236,14 @@
         <file alias="_CRITICAL">LogView/_CRITICAL.svg</file>
         <file alias="_FATAL">LogView/_FATAL.svg</file>
         <file alias="_LOCATE_WHERE">LogView/_LOCATE_WHERE.svg</file>
+
+        <file alias="RESTORE_ALL_ITEMS">RecycleBin/RESTORE_ALL_ITEMS.ico</file>
+        <file alias="RESTORE_SELECTED_ITEMS">RecycleBin/RESTORE_SELECTED_ITEMS.ico</file>
+        <file alias="EMPTY_RECYCLE_BIN">RecycleBin/EMPTY_RECYCLE_BIN.ico</file>
+        <file alias="DELETE_SELECTED_ITEMS">RecycleBin/DELETE_SELECTED_ITEMS.svg</file>
+        <file alias="DIRTY_STATUS">RecycleBin/DIRTY_STATUS.ico</file>
+        <file alias="CLEAN_STATUS">RecycleBin/CLEAN_STATUS.ico</file>
+        <file alias="SQLITE_APP">RecycleBin/SQLITE_APP.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>

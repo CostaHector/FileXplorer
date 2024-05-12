@@ -12,13 +12,8 @@
 
 #include <QUrl>
 
-ContentPanel::ContentPanel(FolderPreviewHTML* previewHtml_, FolderPreviewWidget* previewWidget_, QWidget* parent)
-    : QStackedWidget(parent),
-      m_fsModel(new MyQFileSystemModel(this)),
-      previewHtml(previewHtml_),
-      previewWidget(previewWidget_),
-      _logger(nullptr),
-      m_parent(parent) {
+ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
+    : QStackedWidget(parent), m_fsModel(new MyQFileSystemModel(this)), _previewFolder{previewFolder}, _logger(nullptr), m_parent(parent) {
   layout()->setContentsMargins(0, 0, 0, 0);
   layout()->setSpacing(0);
   subscribe();
@@ -175,13 +170,15 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
     return false;
   }
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
-  const QString& pth = m_fsModel->rootPath();
-  m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
-  if (previewWidget != nullptr) {
-    emit previewWidget->showANewPath(firstFileInfo.absoluteFilePath());
+  QString pth = m_fsModel->rootPath();
+#ifdef _WIN32
+  if (not pth.isEmpty() and pth.back() == ':') {
+    pth += '/';
   }
-  if (previewHtml != nullptr) {
-    previewHtml->operator()(firstFileInfo.absoluteFilePath());
+#endif
+  m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
+  if (_previewFolder != nullptr) {
+    _previewFolder->operator()(firstFileInfo.absoluteFilePath());
   }
   return true;
 }

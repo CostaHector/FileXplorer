@@ -1,14 +1,16 @@
 #include "ExtraViewVisibilityControl.h"
 #include "Actions/PerformersManagerActions.h"
+#include "Actions/RecycleBinActions.h"
 #include "Actions/TorrentsManagerActions.h"
 
 #include "Component/PerformersWidget.h"
+#include "View/RecycleBinWidget.h"
 #include "View/TorrentsManagerWidget.h"
 
 #include <QDebug>
 
 ExtraViewVisibilityControl::ExtraViewVisibilityControl(QWidget* parent)
-    : QObject(parent), _parent(parent), performerManager(nullptr), torrentsManager(nullptr) {
+    : QObject(parent), _parent(parent), performerManager(nullptr), torrentsManager(nullptr), m_recycleBin{nullptr} {
   subscribe();
 }
 
@@ -38,5 +40,18 @@ void ExtraViewVisibilityControl::subscribe() {
     torrentsManager->show();
     torrentsManager->activateWindow();
     torrentsManager->raise();
+  });
+  connect(g_recycleBinAg().RECYLE_BIN_WIDGET, &QAction::triggered, this, [this](const bool checked) -> void {
+    if (not checked) {
+      if (m_recycleBin != nullptr)
+        m_recycleBin->hide();
+      return;
+    }
+    if (m_recycleBin == nullptr) {
+      m_recycleBin = new RecycleBinWidget(_parent);
+    }
+    m_recycleBin->show();
+    m_recycleBin->activateWindow();
+    m_recycleBin->raise();
   });
 }

@@ -27,10 +27,10 @@ class AdvanceSearchModel : public QAbstractTableModel {
   void BindLogger(CustomStatusBar* logger);
 
   auto filter() const -> QDir::Filters { return m_filters; }
-  auto _updatePlanetList() -> void;
+  auto updateSearchResultList() -> void;
 
   QString rootPath() const { return m_rootPath; }
-  auto checkPathNeed(const QString& path) const -> bool;
+  auto checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory = true) -> bool;
   auto initRootPath(const QString& path) -> void;
   auto setRootPath(const QString& path) -> void;
   auto forceRefresh() -> void { setRootPath(m_rootPath); }
@@ -43,7 +43,7 @@ class AdvanceSearchModel : public QAbstractTableModel {
   void initIteratorFlag(QDirIterator::IteratorFlag initialFlags);
   void setIteratorFlag(QDirIterator::IteratorFlag newFlags) {
     initIteratorFlag(newFlags);
-    _updatePlanetList();
+    updateSearchResultList();
   }
 
   auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_planetList.size(); }
