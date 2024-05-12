@@ -38,24 +38,63 @@
 <context>
     <name>ConflictsRecycle</name>
     <message>
-        <location filename="../Component/ConflictsRecycle.cpp" line="12"/>
         <source>Size Smaller</source>
-        <translation>选中文件较小方</translation>
+        <translation type="vanished">选中文件较小方</translation>
     </message>
     <message>
-        <location filename="../Component/ConflictsRecycle.cpp" line="13"/>
         <source>Date Newer</source>
-        <translation>选中文件较新方</translation>
+        <translation type="vanished">选中文件较新方</translation>
     </message>
     <message>
-        <location filename="../Component/ConflictsRecycle.cpp" line="14"/>
         <source>Revert Selection</source>
-        <translation>反转当前选中</translation>
+        <translation type="vanished">反转当前选中</translation>
     </message>
     <message>
-        <location filename="../Component/ConflictsRecycle.cpp" line="15"/>
         <source>Reset Table</source>
-        <translation>重置选中</translation>
+        <translation type="vanished">重置选中</translation>
+    </message>
+</context>
+<context>
+    <name>ConflictsSolveActions</name>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="42"/>
+        <source>Size larger</source>
+        <translation>选中大小较小者</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="43"/>
+        <source>Date newer</source>
+        <translation>选中创建时间较新者</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="44"/>
+        <source>Revert Selection</source>
+        <translation>反选</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="46"/>
+        <source>Keep left side</source>
+        <translation>保留左侧</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="47"/>
+        <source>Keep right side</source>
+        <translation>保留右侧</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="49"/>
+        <source>Hide no conflict</source>
+        <translation>隐藏不冲突项</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="51"/>
+        <source>recycle</source>
+        <translation>回收</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ConflictsSolveActions.h" line="52"/>
+        <source>keep</source>
+        <translation>保留</translation>
     </message>
 </context>
 <context>
@@ -837,7 +876,7 @@
         <translation>修改演员图片固定宽度(像素)</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="93"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="91"/>
         <source>performer table right click menu</source>
         <translation>演员表右键菜单</translation>
     </message>
@@ -872,17 +911,17 @@
         <translation>演职员库</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="61"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="59"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="73"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="71"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../Actions/PerformersManagerActions.cpp" line="81"/>
+        <location filename="../Actions/PerformersManagerActions.cpp" line="79"/>
         <source>View</source>
         <translation>视图</translation>
     </message>
@@ -1122,12 +1161,12 @@
         <translation>种子(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../Actions/TorrentsManagerActions.cpp" line="29"/>
+        <location filename="../Actions/TorrentsManagerActions.cpp" line="27"/>
         <source>&amp;File</source>
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../Actions/TorrentsManagerActions.cpp" line="33"/>
+        <location filename="../Actions/TorrentsManagerActions.cpp" line="31"/>
         <source>&amp;Edit</source>
         <translation>编辑(&amp;F)</translation>
     </message>
@@ -1186,9 +1225,13 @@
         <translation>下一高潮</translation>
     </message>
     <message>
-        <location filename="../Actions/VideoPlayerActions.h" line="25"/>
         <source>auto</source>
-        <translation>自动下一集</translation>
+        <translation type="vanished">自动下一集</translation>
+    </message>
+    <message>
+        <location filename="../Actions/VideoPlayerActions.h" line="25"/>
+        <source>Autoplay</source>
+        <translation>自动播放</translation>
     </message>
     <message>
         <location filename="../Actions/VideoPlayerActions.h" line="26"/>
@@ -1264,23 +1307,39 @@
 <context>
     <name>ViewActions</name>
     <message>
-        <location filename="../Actions/ViewActions.h" line="19"/>
         <source>Navigate pane</source>
+        <translation type="vanished">导航面板</translation>
+    </message>
+    <message>
+        <source>HTML preview</source>
+        <translation type="vanished">网页预览</translation>
+    </message>
+    <message>
+        <source>Json editor</source>
+        <translation type="vanished">Json编辑器</translation>
+    </message>
+    <message>
+        <source>Embedded player</source>
+        <translation type="vanished">内置播放器</translation>
+    </message>
+    <message>
+        <location filename="../Actions/ViewActions.h" line="19"/>
+        <source>Navigation Pane</source>
         <translation>导航面板</translation>
     </message>
     <message>
         <location filename="../Actions/ViewActions.h" line="20"/>
-        <source>HTML preview</source>
-        <translation>网页预览</translation>
+        <source>Folder Preview</source>
+        <translation>文件夹预览</translation>
     </message>
     <message>
         <location filename="../Actions/ViewActions.h" line="21"/>
-        <source>Json editor</source>
+        <source>Json Editor</source>
         <translation>Json编辑器</translation>
     </message>
     <message>
         <location filename="../Actions/ViewActions.h" line="22"/>
-        <source>Embedded player</source>
+        <source>Embedded Player</source>
         <translation>内置播放器</translation>
     </message>
     <message>

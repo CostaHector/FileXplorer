@@ -170,8 +170,6 @@ const KV PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./", ValueChe
 const KV KEEP_VIDEOS_PLAYLIST_SHOW{"KEEP_VIDEOS_PLAYLIST_SHOW", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV SHOW_FOLDER_PREVIEW_WIDGET("SHOW_FOLDER_PREVIEW_WIDGET", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV SHOW_FOLDER_PREVIEW_IMAGE("SHOW_FOLDER_PREVIEW_IMAGE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels",
                              ValueChecker{{"labels", "browser", "lists"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING}};
 
