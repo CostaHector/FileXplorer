@@ -223,7 +223,7 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(nullptr);
   folderPreviewToolBar->setOrientation(Qt::Orientation::Vertical);
   folderPreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  folderPreviewToolBar->setStyleSheet("QToolBar { max-width: 128px; }");
+  folderPreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
   folderPreviewToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 

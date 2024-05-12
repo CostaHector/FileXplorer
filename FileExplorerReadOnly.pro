@@ -44,10 +44,10 @@ SOURCES += \
     Component/NotificatorFrame.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
     Component/PerformersWidget.cpp \
-    Component/PreviewBrowser.cpp \
-    Component/PreviewFolder.cpp \
-    Component/PreviewLabels.cpp \
-    Component/PreviewLists.cpp \
+    Component/FolderPreview/PreviewFolder.cpp \
+    Component/FolderPreview/PreviewBrowser.cpp \
+    Component/FolderPreview/PreviewLabels.cpp \
+    Component/FolderPreview/PreviewLists.cpp \
     Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
@@ -185,10 +185,10 @@ HEADERS += \
     Component/NotificatorFrame_p.h \
     Component/PerformersPreviewTextBrowser.h \
     Component/PerformersWidget.h \
-    Component/PreviewBrowser.h \
-    Component/PreviewFolder.h \
-    Component/PreviewLabels.h \
-    Component/PreviewLists.h \
+    Component/FolderPreview/PreviewBrowser.h \
+    Component/FolderPreview/PreviewFolder.h \
+    Component/FolderPreview/PreviewLabels.h \
+    Component/FolderPreview/PreviewLists.h \
     Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
