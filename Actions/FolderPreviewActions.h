@@ -16,9 +16,9 @@ class FolderPreviewActions : public QObject {
     return previewTB;
   }
 
-  QAction* LISTS{new QAction{"lists", this}};
-  QAction* BROWSER{new QAction{"browser", this}};
-  QAction* LABELS{new QAction{"labels", this}};
+  QAction* LISTS{new QAction{QIcon(":/themes/FOLDER_PREVIEW_LISTS"), "lists", this}};
+  QAction* BROWSER{new QAction{QIcon(":/themes/FOLDER_PREVIEW_BROWSER"), "browser", this}};
+  QAction* LABELS{new QAction{QIcon(":/themes/FOLDER_PREVIEW_LABELS"), "labels", this}};
   QActionGroup* PREVIEW_AG{new QActionGroup{this}};
 };
 
