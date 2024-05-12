@@ -49,8 +49,27 @@ bool PreviewLists::operator()(const QString& path) {
   (*m_vidsPreview)(path);
   (*m_imgsPreview)(path);
   (*m_othersPreview)(path);
-  setDockerWindowTitle(m_vidsPreview->model()->rowCount(), m_imgsPreview->model()->rowCount());
   return true;
+}
+
+void PreviewLists::subscribe() {
+  if (m_parentDocker == nullptr) {
+    qDebug("will neither record imgs/vids count nor update docker title");
+    return;
+  }
+
+  connect(dynamic_cast<QFileSystemModel*>(m_imgsPreview->model()), &QFileSystemModel::directoryLoaded, this, [this]() {
+    mImgCnt = m_imgsPreview->model()->rowCount(m_imgsPreview->rootIndex());
+    if (isCntOk()) {
+      setDockerWindowTitle();
+    }
+  });
+  connect(dynamic_cast<QFileSystemModel*>(m_vidsPreview->model()), &QFileSystemModel::directoryLoaded, this, [this]() {
+    mVidsCnt = m_vidsPreview->model()->rowCount(m_vidsPreview->rootIndex());
+    if (isCntOk()) {
+      setDockerWindowTitle();
+    }
+  });
 }
 
 void PreviewLists::contextMenuEvent(QContextMenuEvent* event) {

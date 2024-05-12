@@ -1,7 +1,7 @@
 #include "OtherItemsListPreview.h"
 #include "OtherItemFileSystemModel.h"
 
-OtherItemsListPreview::OtherItemsListPreview() : FolderListView(new OtherItemFileSystemModel(nullptr, false), "others") {
+OtherItemsListPreview::OtherItemsListPreview() : FolderListView(new OtherItemFileSystemModel(nullptr), "others") {
   OtherItemsListPreview::InitViewSettings();
 }
 

@@ -1,37 +1,52 @@
 #include "PreviewLabels.h"
 #include "PublicVariable.h"
 
-constexpr int PreviewLabels::NEXT_FOLDER_TIME_INTERVAL;        // ms
 constexpr int PreviewLabels::SLIDE_TO_NEXT_IMG_TIME_INTERVAL;  // ms
 constexpr int PreviewLabels::MAX_LABEL_CNT;
 
-bool PreviewLabels::getImgsPathAndVidsCount(const QString& path, QStringList& imgs, int& vidsCnt) const {
-  imgs.clear();
-  vidsCnt = 0;
+void PreviewLabels::operator()(const QString& folderPath) {
+  if (m_nextImgTimer->isActive()) {
+    m_nextImgTimer->stop();
+  }
+  m_inFolderImgIndex = 0;
+  getImgsPathAndVidsCount(folderPath);
+  setDockerWindowTitle();
+  if (m_imgsUnderAPath.isEmpty()) {
+    clearLabelContents();
+    return;
+  }
 
-  const QString& suffix = "*." + QFileInfo(path).suffix().toLower();
+  nxtImgInFolder();
+  if (m_imgsUnderAPath.size() > MAX_LABEL_CNT) {
+    m_nextImgTimer->start();
+  }
+}
+
+bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
+  m_imgsUnderAPath.clear();
+  m_vidsCountUnderAPath = 0;
+
   QFileInfo pathFi(path);
   if (pathFi.isFile()) {
+    const QString& suffix = "*." + QFileInfo(path).suffix().toLower();
     if (TYPE_FILTER::IMAGE_TYPE_SET.contains(suffix)) {
-      imgs = QStringList{path};
+      m_imgsUnderAPath = QStringList{path};
     }
     if (TYPE_FILTER::VIDEO_TYPE_SET.contains(suffix)) {
-      vidsCnt = 1;
+      m_vidsCountUnderAPath = 1;
     }
     return true;
-  } else if (not pathFi.isDir()) {
-    imgs.clear();
-    vidsCnt = 0;
+  }
+  if (pathFi.isDir()) {
+    QDir dir(path, "*", QDir::SortFlag::NoSort, QDir::Filter::Files);
+    dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+    for (const QString& imgName : dir.entryList()) {
+      m_imgsUnderAPath.append(dir.absoluteFilePath(imgName));
+    }
+    dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
+    m_vidsCountUnderAPath = dir.entryList().size();
     return true;
   }
-
-  QDir dir(path, "*", QDir::SortFlag::NoSort, QDir::Filter::Files);
-  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
-  for (const QString& imgName : dir.entryList()) {
-    imgs.append(dir.absoluteFilePath(imgName));
-  }
-  dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
-  vidsCnt = dir.entryList().size();
   return true;
 }
 
@@ -47,25 +62,6 @@ auto PreviewLabels::nxtImgInFolder() -> void {
     QPixmap pm(m_imgsUnderAPath[m_inFolderImgIndex++]);
     m_imgLabelsList[labelCnt]->setPixmap(pm.scaledToWidth(width()));
     m_isLabelDirty = true;
-  }
-}
-
-auto PreviewLabels::display() -> void {
-  QString lastPath = m_folderPathsStack.back();
-  // list will be cleared. dont use reference to its element
-  clear();
-
-  m_inFolderImgIndex = 0;
-  getImgsPathAndVidsCount(lastPath, m_imgsUnderAPath, m_vidsCountUnderAPath);
-  setDockerWindowTitle();
-  if (m_imgsUnderAPath.isEmpty()) {
-    clearLabelContents();
-    return;
-  }
-
-  nxtImgInFolder();
-  if (m_imgsUnderAPath.size() > MAX_LABEL_CNT) {
-    m_nextImgTimer->start();
   }
 }
 
