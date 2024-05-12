@@ -5,7 +5,7 @@
 #include "Component/AdvanceSearchToolBar.h"
 #include "Component/CustomStatusBar.h"
 #include "Component/NavigationAndAddressBar.h"
-#include "Component/PreviewFolder.h"
+#include "Component/FolderPreview/PreviewFolder.h"
 
 #include "MyQFileSystemModel.h"
 

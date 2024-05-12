@@ -5,7 +5,7 @@
 
 class OtherItemFileSystemModel : public MyQFileSystemModel {
  public:
-  explicit OtherItemFileSystemModel(QObject* parent = nullptr, bool showThumbnails_ = false);
+  explicit OtherItemFileSystemModel(QObject* parent = nullptr);
 };
 
 #endif  // OTHERITEMFILESYSTEMMODEL_H

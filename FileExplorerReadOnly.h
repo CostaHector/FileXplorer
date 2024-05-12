@@ -9,7 +9,7 @@
 
 #include "Component/CustomStatusBar.h"
 #include "Component/NavigationToolBar.h"
-#include "Component/PreviewFolder.h"
+#include "Component/FolderPreview/PreviewFolder.h"
 #include "Component/StackedToolBar.h"
 
 #include "ContentPanel.h"
