@@ -69,7 +69,7 @@ class PreviewLabels : public QScrollArea {
   bool m_isLabelDirty = false;
 
   static constexpr int SLIDE_TO_NEXT_IMG_TIME_INTERVAL = 2 * 1000;  // ms
-  static constexpr int MAX_LABEL_CNT = 4;
+  static constexpr int MAX_LABEL_CNT = 2;
 };
 
 #endif  // PREVIEWLABELS_H

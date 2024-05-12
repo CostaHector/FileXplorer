@@ -208,38 +208,40 @@ QToolBar* RibbonMenu::LeafHome() const {
 }
 
 QToolBar* RibbonMenu::LeafView() const {
-  auto* NAVIGATION_PANE = g_viewActions().NAVIGATION_PANE;
-  auto* PREVIEW_PANE_HTML = g_viewActions().PREVIEW_PANE_HTML;
-  auto* JSON_EDITOR_PANE = g_viewActions()._JSON_EDITOR_PANE;
+  auto* leafViewWid = new QToolBar("Leaf View");
 
-  auto* viewPaneToolBar = new QToolBar("View Pane Group");
-  viewPaneToolBar->setOrientation(Qt::Orientation::Vertical);
-  viewPaneToolBar->addActions({NAVIGATION_PANE, PREVIEW_PANE_HTML});
-  viewPaneToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  viewPaneToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
-  viewPaneToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_2x1, TABS_ICON_IN_MENU_2x1));
-  SetLayoutAlightment(viewPaneToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+  auto* fileSystemView = new QToolBar("Navigation Preview Switch");
+  fileSystemView->setOrientation(Qt::Orientation::Vertical);
+  fileSystemView->addActions({g_viewActions()._LIST_VIEW, g_viewActions()._TABLE_VIEW, g_viewActions()._TREE_VIEW});
+  fileSystemView->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  fileSystemView->setStyleSheet("QToolBar { max-width: 256px; }");
+  fileSystemView->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  SetLayoutAlightment(fileSystemView->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(nullptr);
+  auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
   folderPreviewToolBar->setOrientation(Qt::Orientation::Vertical);
   folderPreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderPreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
   folderPreviewToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
+  auto* JSON_EDITOR_PANE = g_viewActions()._JSON_EDITOR_PANE;
   auto* jsonEditorTB = DropListToolButton(JSON_EDITOR_PANE, g_jsonEditorActions()._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup,
                                           "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   auto* embeddedPlayerTB = DropListToolButton(g_viewActions()._VIDEO_PLAYER_EMBEDDED, g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(),
                                               QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 
-  auto* leafViewWid = new QToolBar("Leaf View");
   leafViewWid->setToolTip("View Leaf");
-  leafViewWid->addWidget(viewPaneToolBar);
+  leafViewWid->addAction(g_viewActions().NAVIGATION_PANE);
+  leafViewWid->addWidget(fileSystemView);
+  leafViewWid->addSeparator();
+  leafViewWid->addAction(g_viewActions().PREVIEW_PANE_HTML);
   leafViewWid->addWidget(folderPreviewToolBar);
   leafViewWid->addSeparator();
   leafViewWid->addWidget(jsonEditorTB);
   leafViewWid->addSeparator();
   leafViewWid->addWidget(embeddedPlayerTB);
+  leafViewWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafViewWid;
 }
 
