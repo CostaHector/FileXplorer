@@ -10,24 +10,28 @@ class PreviewLists : public QWidget {
  public:
   explicit PreviewLists(QWidget* parent = nullptr);
   bool operator()(const QString& path);
-  void subscribe() {}
+  void subscribe();
 
-  void setDockerWindowTitle(int vidCnt, int imgCnt) {
+  void contextMenuEvent(QContextMenuEvent* event) override;
+
+  void setDockerWindowTitle() {
     if (m_parentDocker == nullptr) {
       return;
     }
-    m_parentDocker->setWindowTitle(QString::number(vidCnt) + '|' + QString::number(imgCnt));
+    m_parentDocker->setWindowTitle(QString("%1|%2").arg(mImgCnt).arg(mVidsCnt));
+    clearCnt();
   }
 
-  void contextMenuEvent(QContextMenuEvent* event) override;
- signals:
-  void showANewPath(const QString&);
-
  protected:
+  void clearCnt() { mImgCnt = mVidsCnt = -1; }
+  bool isCntOk() { return mImgCnt != -1 and mVidsCnt != -1; }
   QWidget* m_parentDocker;
   FolderListView* m_vidsPreview;
   FolderListView* m_imgsPreview;
   FolderListView* m_othersPreview;
+
+  int mImgCnt = -1;
+  int mVidsCnt = -1;
 
   QMenu* m_folderPreviewMenu;
 };

@@ -3,7 +3,7 @@
 #include <QHBoxLayout>
 #include "VideosFileSystemModel.h"
 
-VideosListPreview::VideosListPreview() : FolderListView(new VideosFileSystemModel(nullptr, false), "vids") {
+VideosListPreview::VideosListPreview() : FolderListView(new VideosFileSystemModel(nullptr), "vids") {
   VideosListPreview::InitViewSettings();
 }
 
@@ -16,14 +16,6 @@ auto VideosListPreview::InitViewSettings() -> void {
   setResizeMode(QListView::ResizeMode::Adjust);
   setMovement(QListView::Movement::Free);
   setWrapping(true);
-
-  //    const int width=128, height=64;
-  //    const int textHeight = 16;
-  //    QSize gridSize(width, height);
-  //    QSize iconSize(width, height - textHeight);
-  //    setGridSize(gridSize);
-  //    setIconSize(iconSize);
-  //    UpdateListIconSize(size);
 }
 
 // #define __MAIN__EQ__NAME__ 1
