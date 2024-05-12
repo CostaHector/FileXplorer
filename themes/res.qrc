@@ -19,7 +19,7 @@
         <file alias="NAVIGATION_PANE">TopSideToolBarIcons/NAVIGATION_PANE.ico</file>
         <file alias="SHOW_FOLDER_PREVIEW_HTML">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW_HTML.ico</file>
         <file alias="SHOW_FOLDER_PREVIEW">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW.svg</file>
-        <file alias="SHOW_FOLDER_PREVIEW_JSON_EDITOR">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW_JSON_EDITOR.png</file>
+        <file alias="JSON_EDITOR">TopSideToolBarIcons/JSON_EDITOR.png</file>
         <file alias="COMPRESS_ITEM">TopSideToolBarIcons/COMPRESS_ITEM.png</file>
         <file alias="EXTRACT_ITEM">TopSideToolBarIcons/EXTRACT_ITEM.png</file>
         <file alias="MOVE_PATH_UP">TopSideToolBarIcons/MOVE_PATH_UP.webp</file>
@@ -147,7 +147,7 @@
         <file alias="NAME_STANDARDLIZER_PATH">NameStrIcon/NAME_STANDARDLIZER.svg</file>
         <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.png</file>
         <file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/Numerizer.svg</file>
-        <file alias="NAME_STR_SWAPPER_PATH">NameStrIcon/NAME_SWAPPER.png</file>
+        <file alias="NAME_STR_SWAPPER_PATH">NameStrIcon/NAME_SWAPPER.svg</file>
         <file alias="UNICODE_TO_ASCII_TEXT">NameStrIcon/UNICODE_TO_ASCII_TEXT.png</file>
 
         <file alias="RENAME_LOWER_CASE">NameStrIcon/CaseLower.png</file>
@@ -189,6 +189,10 @@
         <file alias="DISPLAY_DETAIL_INFOMATIONS">View/DISPLAY_DETAIL_INFOMATIONS.png</file>
         <file alias="DISPLAY_LARGE_THUMBNAILS">View/DISPLAY_LARGE_THUMBNAILS.png</file>
         <file alias="DISPLAY_ACHITECTURE">View/DISPLAY_ACHITECTURE.webp</file>
+        <file alias="FOLDER_PREVIEW_LABELS">View/FOLDER_PREVIEW_LABELS.svg</file>
+        <file alias="FOLDER_PREVIEW_BROWSER">View/FOLDER_PREVIEW_BROWSER.svg</file>
+        <file alias="FOLDER_PREVIEW_LISTS">View/FOLDER_PREVIEW_LISTS.svg</file>
+
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
         <file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
         <file alias="DROP_DATABASE">Database/DROP_DATABASE.svg</file>
