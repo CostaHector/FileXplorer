@@ -1,39 +1,64 @@
 #include "ConflictsItemHelper.h"
 
-auto TestMvConflictItemIF() -> void {
-  const QString& DONT_CHANGE_SRC =
-      QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_ConflictsItem/DONT_CHANGE");
-  const auto& conflictIF0 =
-      ConflictsItemHelper(DONT_CHANGE_SRC, DONT_CHANGE_SRC,
-                          QDir(DONT_CHANGE_SRC, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList());
-  if (conflictIF0) {
-    qDebug("%s", qPrintable(conflictIF0.commonList.join('\n')));
+QStringList Finder::FindAllItems(const QString& l, const QStringList& lRels) const {
+  if (lRels.isEmpty()) {
+    return {};
   }
-  qDebug("\n=================\n");
-
-  const auto& conflictIF1 = ConflictsItemHelper(DONT_CHANGE_SRC, DONT_CHANGE_SRC);
-  if (conflictIF1) {
-    qDebug("%s", qPrintable(conflictIF1.commonList.join('\n')));
+  const int n = l.size();
+  QStringList itemList;
+  for (const QString& lName : lRels) {
+    if (QFileInfo(l, lName).isFile()) {
+      itemList.append(lName);
+    } else {
+      QStringList lst;
+      lst.append(lName);
+      QDirIterator it(l + '/' + lName, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories);
+      while (it.hasNext()) {
+        it.next();
+        lst.append(it.filePath().mid(n + 1));
+      }
+      itemList += QStringList(lst.crbegin(), lst.crend());
+    }
   }
-  qDebug("\n=================\n");
-
-  QList<QFileInfo> fList = QDir(DONT_CHANGE_SRC, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryInfoList();
-  QStringList lAbsPath;
-  for (auto& fi : fList) {
-    lAbsPath.append(fi.absoluteFilePath());
-  }
-  const auto& conflictIF2 = ConflictsItemHelper(lAbsPath, DONT_CHANGE_SRC);
-  if (conflictIF2) {
-    qDebug("%s", qPrintable(conflictIF2.commonList.join('\n')));
-  }
-  qDebug("\n=================\n");
+  return itemList;
 }
 
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
+QStringList Finder::FindLLRelRCommon(const QString& l, const QStringList& lRels, const QString& r) const {
+  if (lRels.isEmpty()) {
+    return {};
+  }
+  QStringList lFileLst;
+  QStringList lFolderLst;
+  for (const QString& lName : lRels) {
+    if (QFileInfo(l, lName).isFile()) {
+      lFileLst.append(isLink() ? lName + ".lnk" : lName);
+    } else {
+      lFolderLst.append(isLink() ? lName + ".lnk" : lName);
+    }
+  }
 
-int main(int argc, char* argv[]) {
-  TestMvConflictItemIF();
+  auto rFolderLst = QDir(r, "", QDir::SortFlag::NoSort, QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot).entryList();
+  auto commonFoldersSet = QSet<QString>(lFolderLst.cbegin(), lFolderLst.cend()).intersect(QSet<QString>(rFolderLst.cbegin(), rFolderLst.cend()));
+  QStringList commonFolders(commonFoldersSet.cbegin(), commonFoldersSet.cend());
+  commonFolders.sort(Qt::CaseSensitivity::CaseInsensitive);
+
+  QStringList commonList;
+  for (const QString& folder : commonFolders) {
+    const QString& newl = l + '/' + folder;
+    const QString& newr = r + '/' + folder;
+    const QStringList& newlRels = QDir(newl, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList();
+    const QStringList& tempDup = Finder::FindLLRelRCommon(newl, newlRels, newr);
+    for (const QString& d : tempDup) {
+      commonList.append(folder + '/' + d);
+    }
+    commonList.append(folder);
+  }
+  const QStringList& rFileLst = QDir(r, "", QDir::SortFlag::NoSort, QDir::Filter::Files).entryList();
+
+  QSet<QString> commonFilesSet(lFileLst.cbegin(), lFileLst.cend());
+  commonFilesSet.intersect(QSet<QString>(rFileLst.cbegin(), rFileLst.cend()));
+  QStringList commonFiles(commonFilesSet.cbegin(), commonFilesSet.cend());
+  commonFiles.sort(Qt::CaseSensitivity::CaseInsensitive);
+  commonList += commonFiles;
+  return commonList;
 }
-#endif

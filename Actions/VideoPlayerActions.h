@@ -20,9 +20,9 @@ class VideoPlayerActions : public QObject {
   QAction* _SCROLL_TO_LAST_FOLDER{new QAction(QIcon(":/themes/SCROLL_TO_LAST_VIDEO_FOLDER"), tr("Lst folder"), this)};
   QAction* _JUMP_LAST_HOT_SCENE{new QAction(QIcon(":/themes/JUMP_LAST_HOT_SCENE"), tr("last hot scene"), this)};
   QAction* _JUMP_NEXT_HOT_SCENE{new QAction(QIcon(":/themes/JUMP_NEXT_HOT_SCENE"), tr("next hot scene"), this)};
-  QAction* _LAST_10_SECONDS{new QAction(tr("-10s"), this)};
-  QAction* _NEXT_10_SECONDS{new QAction(tr("+10s"), this)};
-  QAction* _AUTO_PLAY_NEXT_VIDEO{new QAction(tr("auto"), this)};
+  QAction* _LAST_10_SECONDS{new QAction("-10s", this)};
+  QAction* _NEXT_10_SECONDS{new QAction("+10s", this)};
+  QAction* _AUTO_PLAY_NEXT_VIDEO{new QAction(tr("Autoplay"), this)};
   QAction* _PLAY_PAUSE{new QAction(QIcon(":/themes/PLAY_VIDEO"), tr("play/pause"), this)};
   QAction* _LAST_VIDEO{new QAction(QIcon(":/themes/LAST_VIDEO"), tr("last video"), this)};
   QAction* _NEXT_VIDEO{new QAction(QIcon(":/themes/NEXT_VIDEO"), tr("next video"), this)};

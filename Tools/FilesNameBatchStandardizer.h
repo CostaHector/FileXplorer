@@ -38,7 +38,7 @@ public:
                    newNmList.size()-uniqueAbsPathSet.size(), newNmList.size());
             return false;
         }
-        FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+        FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
         for (auto i = nmList.size() - 1 ; i > -1 ; --i){
             const QString& oldNm = nmList[i];
             const QString& newNm = newNmList[i];

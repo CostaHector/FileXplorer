@@ -9,6 +9,9 @@ class MyQSqlTableModel : public QSqlTableModel {
  public:
   explicit MyQSqlTableModel(QObject* parent = nullptr, QSqlDatabase con = QSqlDatabase());
 
+
+  QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
+
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
     if (orientation == Qt::Vertical) {
       if (role == Qt::TextAlignmentRole) {

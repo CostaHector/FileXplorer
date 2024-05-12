@@ -4,17 +4,16 @@
 #include <QStackedWidget>
 #include "Component/AdvanceSearchToolBar.h"
 #include "Component/CustomStatusBar.h"
-#include "Component/FolderPreviewHTML.h"
-#include "Component/FolderPreviewWidget.h"
 #include "Component/NavigationAndAddressBar.h"
+#include "Component/FolderPreview/PreviewFolder.h"
 
 #include "MyQFileSystemModel.h"
 
 #include "View/AdvanceSearchTableView.h"
-#include "View/MovieDBView.h"
 #include "View/FileSystemListView.h"
 #include "View/FileSystemTableView.h"
 #include "View/FileSystemTreeView.h"
+#include "View/MovieDBView.h"
 
 class NavigationViewSwitcher;
 
@@ -23,7 +22,7 @@ class ContentPanel : public QStackedWidget {
  public:
   friend class NavigationViewSwitcher;
 
-  explicit ContentPanel(FolderPreviewHTML* previewHtml_ = nullptr, FolderPreviewWidget* previewWidget_ = nullptr, QWidget* parent = nullptr);
+  explicit ContentPanel(PreviewFolder* previewFolder = nullptr, QWidget* parent = nullptr);
  public slots:
   bool onActionAndViewNavigate(QString newPath, bool isNewPath = true, bool isF5Force = false);
   bool onAddressToolbarPathChanged(QString newPath, bool isNewPath = true);
@@ -93,8 +92,8 @@ class ContentPanel : public QStackedWidget {
   MovieDBView* m_movieView{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
 
-  FolderPreviewHTML* previewHtml;
-  FolderPreviewWidget* previewWidget;
+  PreviewFolder* _previewFolder;
+
   CustomStatusBar* _logger;
 
   QWidget* m_parent;

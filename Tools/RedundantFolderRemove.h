@@ -4,7 +4,6 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include "FileOperation/FileOperation.h"
 #include "UndoRedo.h"
 
 class RedundantRmv {
@@ -12,7 +11,7 @@ class RedundantRmv {
   RedundantRmv() = default;
   ~RedundantRmv() = default;
 
-  FileOperation::BATCH_COMMAND_LIST_TYPE m_cmds;
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE m_cmds;
 
   virtual auto CleanEmptyFolderCore(const QString& folderPath) -> int = 0;
 
@@ -44,7 +43,7 @@ class RedundantRmv {
   operator QString() {
     QString s;
     for (const auto& l : m_cmds) {
-      s += (l.join(',') + '\n');
+      s += (l.join(',') + '|');
     }
     return s;
   }
