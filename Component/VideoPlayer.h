@@ -31,8 +31,8 @@ class VideoPlayer : public QMainWindow {
   explicit VideoPlayer(QWidget* parent = nullptr);
   ~VideoPlayer();
 
-  auto operator()(const QString& path) -> bool;
-  auto PlaySelections(const QStringList& fileAbsPathList) -> bool;
+  auto operator()(const QString& path) -> bool;                 // one file or one folder
+  auto operator()(const QStringList& fileAbsPathList) -> bool;  // selections
 
   void setUrl(const QUrl& url);
   auto subscribe() -> void;
@@ -81,29 +81,7 @@ class VideoPlayer : public QMainWindow {
     QMainWindow::closeEvent(event);
   }
 
-  auto keyPressEvent(QKeyEvent* e) -> void override {
-    if (e->modifiers() == Qt::AltModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
-      m_playListWid->hide();
-      m_sliderTB->show();
-      m_controlTB->hide();
-      setWindowState(Qt::WindowMaximized);
-      return;
-    } else if (e->key() == Qt::Key_Escape) {
-      m_playListWid->show();
-      m_sliderTB->show();
-      m_controlTB->show();
-      setWindowState(Qt::WindowMaximized);
-      return;
-    } else if (e->key() == Qt::Key_F11) {
-      m_playListWid->hide();
-      m_sliderTB->hide();
-      m_controlTB->hide();
-      setWindowState(Qt::WindowFullScreen);
-      return;
-    }
-    QWidget::keyPressEvent(e);
-  }
-
+  auto keyPressEvent(QKeyEvent* e) -> void override;
 
   int onRecycleSelectedItems();
 
@@ -119,6 +97,8 @@ class VideoPlayer : public QMainWindow {
   void handleError();
 
  private:
+  static inline QString MillionSecond2hhmmss(qint64 ms) { return QTime(0, 0, 0, 0).addMSecs(ms).toString("hh:mm:ss"); }
+
   auto loadHotSceneList() -> void;
   auto loadVideoRate() -> void;
   inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;

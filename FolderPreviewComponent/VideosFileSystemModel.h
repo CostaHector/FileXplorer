@@ -5,7 +5,7 @@
 
 class VideosFileSystemModel : public MyQFileSystemModel {
  public:
-  explicit VideosFileSystemModel(QObject* parent = nullptr, bool showThumbnails_ = false);
+  explicit VideosFileSystemModel(QObject* parent = nullptr);
 };
 
 #endif  // VIDEOSFILESYSTEMMODEL_H

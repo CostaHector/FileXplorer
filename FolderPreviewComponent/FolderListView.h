@@ -4,22 +4,20 @@
 #include <QListView>
 #include "MyQFileSystemModel.h"
 
-class FolderListView : public QListView
-{
-public:
-    using QListView::contextMenuEvent;
+class FolderListView : public QListView {
+ public:
+  explicit FolderListView(MyQFileSystemModel* fileSystemModel_ = nullptr, const QString& viewName_ = "", QWidget* parent = nullptr);
+  virtual auto InitViewSettings() -> void = 0;
+  bool operator()(const QString& path);
+  void subscribe();
+  ;
+  void contextMenuEvent(QContextMenuEvent* event) override;
+  QAction* hideWidget;
 
-    explicit FolderListView(MyQFileSystemModel* fileSystemModel_=nullptr, const QString& viewName_="");
-    virtual auto InitViewSettings()->void = 0;
-    bool operator()(const QString& path);
-    void subscribe();;
-    void CustomContextMenuEvent(const QPoint& pnt);
-    QAction* hideWidget;
-
-protected:
-    MyQFileSystemModel* m_fileSystemPreview;
-    QMenu* m_listViewMenu;
-    QString m_viewName;
+ protected:
+  MyQFileSystemModel* m_fileSystemPreview;
+  QMenu* m_listViewMenu;
+  QString m_viewName;
 };
 
-#endif // FOLDERLISTVIEW_H
+#endif  // FOLDERLISTVIEW_H

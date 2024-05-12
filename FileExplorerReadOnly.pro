@@ -2,20 +2,23 @@ QT       += core gui sql multimedia multimediawidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
-
+LIBS += -lz
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
     Actions/AddressBarActions.cpp \
+    Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
     Actions/FileBasicOperationsActions.cpp \
+    Actions/FolderPreviewActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
     Actions/LogViewActions.cpp \
     Actions/PerformersManagerActions.cpp \
     Actions/QuickWhereActions.cpp \
+    Actions/RecycleBinActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
@@ -41,6 +44,10 @@ SOURCES += \
     Component/NotificatorFrame.cpp \
     Component/PerformersPreviewTextBrowser.cpp \
     Component/PerformersWidget.cpp \
+    Component/FolderPreview/PreviewFolder.cpp \
+    Component/FolderPreview/PreviewBrowser.cpp \
+    Component/FolderPreview/PreviewLabels.cpp \
+    Component/FolderPreview/PreviewLists.cpp \
     Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
@@ -51,17 +58,23 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
+    FileOperation/FileOperatorPub.cpp \
+    FileOperation/RecycleBinHelper.cpp \
+    Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
     Model/JsonModel.cpp \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/VidModel.cpp \
+    Tools/ArchieveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
+    Tools/FolderPreviewSwitcher.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
+    Tools/QCompressor.cpp \
     Tools/RenameNamesUnique.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
@@ -71,6 +84,7 @@ SOURCES += \
     View/JsonListView.cpp \
     View/LogView.cpp \
     View/MovieDBView.cpp \
+    View/RecycleBinWidget.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -117,8 +131,6 @@ SOURCES += \
     FolderPreviewComponent/OtherItemsListPreview.cpp \
     FolderPreviewComponent/VideosFileSystemModel.cpp \
     FolderPreviewComponent/VideosListPreview.cpp \
-    Component/FolderPreviewHTML.cpp \
-    Component/FolderPreviewWidget.cpp \
     MyQFileSystemModel.cpp \
     Component/NavigationAndAddressBar.cpp \
     Component/NavigationToolBar.cpp \
@@ -137,13 +149,16 @@ SOURCES += \
 
 HEADERS += \
     Actions/AddressBarActions.h \
+    Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
     Actions/FileBasicOperationsActions.h \
+    Actions/FolderPreviewActions.h \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
     Actions/LogViewActions.h \
     Actions/PerformersManagerActions.h \
     Actions/QuickWhereActions.h \
+    Actions/RecycleBinActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
@@ -170,6 +185,10 @@ HEADERS += \
     Component/NotificatorFrame_p.h \
     Component/PerformersPreviewTextBrowser.h \
     Component/PerformersWidget.h \
+    Component/FolderPreview/PreviewBrowser.h \
+    Component/FolderPreview/PreviewFolder.h \
+    Component/FolderPreview/PreviewLabels.h \
+    Component/FolderPreview/PreviewLists.h \
     Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
@@ -179,17 +198,23 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/Toaster.h \
+    FileOperation/FileOperatorPub.h \
+    FileOperation/RecycleBinHelper.h \
+    Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
     Model/JsonModel.h \
     Model/LogModel.h \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/VidModel.h \
+    Tools/ArchieveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
+    Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
     Tools/NameTool.h \
+    Tools/QCompressor.h \
     Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
@@ -199,6 +224,7 @@ HEADERS += \
     View/JsonListView.h \
     View/LogView.h \
     View/MovieDBView.h \
+    View/RecycleBinWidget.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
@@ -246,8 +272,6 @@ HEADERS += \
     FolderPreviewComponent/OtherItemsListPreview.h \
     FolderPreviewComponent/VideosFileSystemModel.h \
     FolderPreviewComponent/VideosListPreview.h \
-    Component/FolderPreviewHTML.h \
-    Component/FolderPreviewWidget.h \
     MyQFileSystemModel.h \
     Component/NavigationAndAddressBar.h \
     Component/NavigationToolBar.h \

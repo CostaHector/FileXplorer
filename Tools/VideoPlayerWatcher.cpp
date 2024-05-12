@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QMouseEvent>
 
+#include <QTimer>
+
 constexpr int VideoPlayerWatcher::RIGHT_EDGE_WIDTH_PIXEL;
 
 VideoPlayerWatcher::VideoPlayerWatcher(QObject* parent, QWidget* watched, QListView* controlled)
@@ -32,8 +34,9 @@ bool VideoPlayerWatcher::eventFilter(QObject* watched, QEvent* event) {
     }
     if (m_watched->width() - me->pos().x() <= RIGHT_EDGE_WIDTH_PIXEL) {
       m_controlled->setVisible(true);
-      m_controlled->setFocus();
-      m_controlled->scrollTo(m_controlled->currentIndex());
+      if (m_controlled->currentIndex().isValid()) {
+        QTimer::singleShot(100, [this]() { m_controlled->scrollTo(m_controlled->currentIndex()); });
+      }
     }
     return true;
   }

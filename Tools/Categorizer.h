@@ -84,7 +84,7 @@ class Categorizer {
       qDebug("[Folder is root or not exists error] %s", qPrintable(rootDir));
       return false;
     }
-    FileOperation::BATCH_COMMAND_LIST_TYPE cmds;
+    FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
     const auto& dic = Classify(rootDir);
     QMapIterator<QString, QStringList> i(dic);
     while (i.hasNext()) {

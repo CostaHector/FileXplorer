@@ -31,8 +31,8 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
       qWarning() << "[Err] Unknown action:" << action;
       return false;
   }
-  ConflictsItemHelper conflictIF(selectedItems, to);
-  auto* tfm = new ConflictsRecycle(conflictIF, opMode);
+  ConflictsItemHelper conflictIF(selectedItems, to, opMode);
+  auto* tfm = new ConflictsRecycle(conflictIF);
   if (to == conflictIF.l and opMode != CCMMode::LINK) {
     return false;
   }

@@ -4,7 +4,7 @@
 
 TorrentsManagerActions::TorrentsManagerActions(QObject* parent)
     : QObject{parent},
-      OPEN_WITH_LOCAL_APP{new QAction(tr("&Open with local app"), this)},
+      OPEN_WITH_LOCAL_APP{new QAction(QIcon(":/themes/SQLITE_APP"), tr("&Open with local app"), this)},
       INIT_DATABASE{new QAction(QString("init Database [%1]").arg(SystemPath::TORRENTS_DATABASE), this)},
       INIT_TABLE{new QAction(QString("&Create table [%1]").arg(DB_TABLE::TORRENTS), this)},
       INSERT_INTO_TABLE{new QAction(QString("&insert into table [%1]").arg(DB_TABLE::TORRENTS), this)},
