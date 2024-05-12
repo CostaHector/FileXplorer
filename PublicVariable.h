@@ -117,7 +117,7 @@ class ValueChecker {
   explicit ValueChecker(const VALUE_TYPE valueType_);
 
   static int getFileExtensionDotIndex(const QString& path);
-  static QString GetFileExtension(const QString& path);
+  static QString GetFileExtension(const QString& path); // e.g. .txt .bat
 
   static bool isFileExist(const QString& path);
   static bool isFolderExist(const QString& path);
@@ -158,7 +158,7 @@ constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 namespace MemoryKey {
 const KV DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH}};
 const KV LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV BACKGROUND_IMAGE("BACKGROUND_IMAGE", "", ValueChecker{{"png", "webp", "jpg", "jpeg"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV BACKGROUND_IMAGE("BACKGROUND_IMAGE", "", ValueChecker{{".png", ".webp", ".jpg", ".jpeg"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 const KV PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
@@ -248,27 +248,27 @@ const KV RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2", V
 
 const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE",
                                 "../bin/PERFORMERS_TABLE.txt",
-                                ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                                ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS",
                               "../bin/AKA_PERFORMERS.txt",
-                              ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                              ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME",
                                     "../bin/STANDARD_STUDIO_NAME.json",
-                                    ValueChecker{{"json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                                    ValueChecker{{".json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH",
                                              "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
-                                             ValueChecker{{"bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                                             ValueChecker{{".bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
 const KV LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE",
                                 "../bin/PERFORMERS_TABLE.txt",
-                                ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                                ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS",
                               "../bin/AKA_PERFORMERS.txt",
-                              ValueChecker{{"txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                              ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME",
                                     "../bin/STANDARD_STUDIO_NAME.json",
-                                    ValueChecker{{"json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                                    ValueChecker{{".json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 }  // namespace MemoryKey
 

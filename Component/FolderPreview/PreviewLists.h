@@ -18,7 +18,7 @@ class PreviewLists : public QWidget {
     if (m_parentDocker == nullptr) {
       return;
     }
-    m_parentDocker->setWindowTitle(QString("%1|%2").arg(mImgCnt).arg(mVidsCnt));
+    m_parentDocker->setWindowTitle(QString("%1|%2").arg(mVidsCnt).arg(mImgCnt));
     clearCnt();
   }
 
