@@ -16,10 +16,10 @@ class ViewActions : public QObject {
         _TREE_VIEW{new QAction(QIcon(":/themes/DISPLAY_ACHITECTURE"), "tree")},
         _TRIPLE_VIEW{GetListTableTreeActions()},
 
-        NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), tr("Navigate pane"))},
-        PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("HTML preview"))},
-        _JSON_EDITOR_PANE{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_JSON_EDITOR"), tr("Json editor"))},
-        _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":/themes/VIDEO_PLAYER"), tr("Embedded player"))},
+        NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), tr("Navigation Pane"))},
+        PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("Folder Preview"))},
+        _JSON_EDITOR_PANE{new QAction(QIcon(":/themes/JSON_EDITOR"), tr("Json Editor"))},
+        _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":/themes/VIDEO_PLAYER"), tr("Embedded Player"))},
         _VIEW_ACRIONS(Get_NAVIGATION_PANE_Actions()),
         _SYS_VIDEO_PLAYERS(new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
         _VIDEO_PLAYERS(GetPlayersActions()) {}

@@ -116,6 +116,7 @@ void FileExplorerReadOnly::subscribe() {
     const bool showPrev = m_fsPanel->isFSView() and checked;
     previewHtmlDock->setVisible(showPrev);
   });
+
   auto& fpAG = g_folderPreviewActions();
   connect(fpAG.PREVIEW_AG, &QActionGroup::triggered, this, [this](QAction* triggeredActions) {
     if (triggeredActions == nullptr)
