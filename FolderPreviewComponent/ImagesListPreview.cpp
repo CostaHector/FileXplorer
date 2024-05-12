@@ -2,26 +2,26 @@
 #include <QHBoxLayout>
 #include "ImagesFileSystemModel.h"
 
-ImagesListPreview::ImagesListPreview() : FolderListView(new ImagesFileSystemModel(nullptr, true), "imgs") {
+ImagesListPreview::ImagesListPreview(QWidget* parent) : FolderListView(new ImagesFileSystemModel(nullptr, true), "imgs") {
   ImagesListPreview::InitViewSettings();
 }
 
 auto ImagesListPreview::InitViewSettings() -> void {
   setViewMode(QListView::ViewMode::IconMode);
-  setFlow(QListView::Flow::LeftToRight);
+  setFlow(QListView::Flow::TopToBottom);
   setTextElideMode(Qt::TextElideMode::ElideMiddle);
   setUniformItemSizes(false);
 
   setResizeMode(QListView::ResizeMode::Adjust);
   setMovement(QListView::Movement::Free);
-  //    setWrapping(true);
+  setWrapping(false);
 
   //    const int width=128, height=64;
   //    const int textHeight = 16;
   //    QSize gridSize(width, height);
   //    QSize iconSize(width, height - textHeight);
   //    setGridSize(gridSize);
-  //    setIconSize(iconSize);
+  setIconSize(QSize{width(), width()});
   //    UpdateListIconSize(size);
 }
 
