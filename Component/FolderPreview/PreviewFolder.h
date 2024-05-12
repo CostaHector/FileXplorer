@@ -13,7 +13,14 @@ class FolderPreviewSwitcher;
 class PreviewFolder : public QStackedWidget {
  public:
   friend class FolderPreviewSwitcher;
-  explicit PreviewFolder(QWidget* parent = nullptr) : QStackedWidget{parent}, m_parentDocker{parent} {}
+  explicit PreviewFolder(QWidget* parent = nullptr) : QStackedWidget{parent}, m_parentDocker{parent} {
+    if (isTimerDisabled()) {
+      return;
+    }
+    m_nextFolderTimer->setInterval(PreviewFolder::NEXT_FOLDER_TIME_INTERVAL);
+    m_nextFolderTimer->setSingleShot(true);
+    connect(m_nextFolderTimer, &QTimer::timeout, this, &PreviewFolder::display);
+  }
 
   QString GetCurViewName() const {
     const int curInd = currentIndex();
@@ -27,13 +34,23 @@ class PreviewFolder : public QStackedWidget {
   }
   int AddView(const QString& viewType, QWidget* w) { return m_name2PreviewIndex[viewType] = addWidget(w); }
 
-  bool operator()(const QString& path) {
+  void operator()(const QString& path) {
     m_curPath = path;
+    if (isTimerDisabled()) {
+      display();
+    }
+    m_nextFolderTimer->stop();
+    m_nextFolderTimer->start();
+  }
+
+  inline bool isTimerDisabled() const { return PreviewFolder::NEXT_FOLDER_TIME_INTERVAL <= 0; }
+
+  void display() {
     auto* curPreview = currentWidget();
     if (curPreview == nullptr) {
       qWarning("skip current preview is nullptr");
-      return false;
     }
+
     if (curPreview == m_browser) {
       m_browser->operator()(m_curPath);
     } else if (curPreview == m_labels) {
@@ -42,9 +59,7 @@ class PreviewFolder : public QStackedWidget {
       m_lists->operator()(m_curPath);
     } else {
       qWarning("skip current preview is not supported");
-      return false;
     }
-    return true;
   }
 
   QString GetCurPath() const { return m_curPath; }
@@ -59,6 +74,11 @@ class PreviewFolder : public QStackedWidget {
   PreviewBrowser* m_browser{nullptr};
   PreviewLabels* m_labels{nullptr};
   PreviewLists* m_lists{nullptr};
+
+  QTimer* m_nextFolderTimer = new QTimer{this};
+
+  static constexpr int NEXT_FOLDER_TIME_INTERVAL = 0.1 * 1000;
+  // ms, when NEXT_FOLDER_TIME_INTERVAL <= 0. update preview imgs imediately(may cause lag).
 };
 
 #endif  // PREVIEWFOLDER_H
