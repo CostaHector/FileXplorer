@@ -20,8 +20,8 @@ class Finder {
   QStringList FindLLRelRCommon(const QString& l, const QStringList& lRels, const QString& r) const;
 
  private:
-  bool isLink() const { return m_mode == CCMMode::LINK; }
-  bool isMove() const { return m_mode == CCMMode::MERGE or m_mode == CCMMode::CUT or m_mode == CCMMode::LINK; }
+  bool isLink() const { return m_mode == CCMMode::LINK_OP; }
+  bool isMove() const { return m_mode == CCMMode::MERGE_OP or m_mode == CCMMode::CUT_OP or m_mode == CCMMode::LINK_OP; }
   CCMMode m_mode;
 };
 

@@ -7,21 +7,30 @@
 
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
+#include "Tools/VidsDurationDisplayString.h"
 
 PropertiesWindow::PropertiesWindow(const QStringList& items, QWidget* parent)
     : QDialog(parent),
       m_items(items),
       m_propertiesInfoTextEdit(new QPlainTextEdit(this)),
       m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Orientation::Horizontal, this)),
-      m_showMore(new QAction("More", this)),
+      m_showFilesSize(new QAction("Files Size", this)),
+      m_showVidsDuration(new QAction("Vids Duration", this)),
       m_showMD5(new QAction(QIcon(":/themes/MD5_FILE_IDENTIFIER_PATH"), tr("MD5"), this)),
       m_extraToolbar(new QToolBar("Extra Info", this)) {
-  m_showMore->setCheckable(true);
-  m_showMore->setToolTip("Display videos duration of each *mp4 file");
+  m_showFilesSize->setCheckable(true);
+  m_showFilesSize->setChecked(true);
+  m_showFilesSize->setToolTip("Display total files size");
+
+  m_showVidsDuration->setCheckable(true);
+  m_showVidsDuration->setChecked(false);
+  m_showVidsDuration->setToolTip("Display videos duration in million-second");
+
   m_showMD5->setCheckable(true);
   m_showMD5->setToolTip("Display MD5 of each file");
+
   m_propertiesInfoTextEdit->setFont(QFont("Consolas"));
-  m_extraToolbar->addActions({m_showMore, m_showMD5});
+  m_extraToolbar->addActions({m_showFilesSize, m_showVidsDuration, m_showMD5});
   m_extraToolbar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   m_extraToolbar->setOrientation(Qt::Orientation::Horizontal);
   auto* lo = new QVBoxLayout(this);
@@ -57,7 +66,7 @@ bool PropertiesWindow::operator()(const QStringList& items) {
   } else {
     propertiesMsg += QString("General: %1 items\n").arg(items.size());
   }
-  if (m_showMore->isChecked()) {
+  if (m_showFilesSize->isChecked()) {
     // total size, files count, folders count
     propertiesMsg += QString(40, '-');
     const auto& itemStatic = FileSystemItemFilter::ItemCounter(items);
@@ -71,10 +80,14 @@ bool PropertiesWindow::operator()(const QStringList& items) {
 
     propertiesMsg += QString("Contents:\n%1 file(s), %2 folder(s), totalling:\n%3\n").arg(itemStatic.fileCnt).arg(itemStatic.folderCnt).arg(sizeMsg);
     propertiesMsg += QString(40, '-');
-    // lag here
-    // const QStringList& mp4Files = FileSystemItemFilter::MP4Out(items);
-    // propertiesMsg += MP4DurationGetter::DisplayVideosDuration(mp4Files);
   }
+
+  if (m_showVidsDuration->isChecked()) {
+    // lag here
+    const QStringList& mp4Files = FileSystemItemFilter::MP4Out(items);
+    propertiesMsg += VidsDurationDisplayString::DisplayVideosDuration(mp4Files);
+  }
+
   if (m_showMD5->isChecked()) {
     propertiesMsg += QString(40, '-');
     const QStringList& files = FileSystemItemFilter::FilesOut(items);
@@ -85,7 +98,8 @@ bool PropertiesWindow::operator()(const QStringList& items) {
 }
 
 void PropertiesWindow::subscribe() {
-  connect(m_showMore, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
+  connect(m_showFilesSize, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
+  connect(m_showVidsDuration, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
   connect(m_showMD5, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
   connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QDialog::accept);
 }
