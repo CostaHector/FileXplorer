@@ -97,12 +97,14 @@ bool VerifyOneFolderPath(const KV& kv) {
 bool InitOutterPlainTextPath() {
   bool initOk = true;
 #ifdef _WIN32
+  initOk = VerifyOneFilePath(MemoryKey::WIN32_MEDIAINFO_LIB_PATH) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::WIN32_AKA_PERFORMERS) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::WIN32_PERFORMERS_TABLE) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::WIN32_STANDARD_STUDIO_NAME, "json") and initOk;
   initOk = VerifyOneFilePath(MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH, "bat") and initOk;
   initOk = VerifyOneFolderPath(MemoryKey::WIN32_RUNLOG) and initOk;
 #else
+  initOk = VerifyOneFilePath(MemoryKey::LINUX_MEDIAINFO_LIB_PATH) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::LINUX_AKA_PERFORMERS) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::LINUX_PERFORMERS_TABLE) and initOk;
   initOk = VerifyOneFilePath(MemoryKey::LINUX_STANDARD_STUDIO_NAME, "json") and initOk;

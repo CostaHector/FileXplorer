@@ -109,8 +109,8 @@ class FileExplorerEvent : public QObject {
   auto on_RemoveRedundantItem(RedundantRmv* remover) -> bool;
 
   auto on_MoveCopyEventSkeleton(const CCMMode operationName, QString r) -> bool;
-  auto on_MoveTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::CUT, r); }
-  auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY, r); }
+  auto on_MoveTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::CUT_OP, r); }
+  auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY_OP, r); }
 
   MyQFileSystemModel* _fileSysModel;
   ContentPanel* _contentPane;
