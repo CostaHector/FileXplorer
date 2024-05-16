@@ -75,10 +75,12 @@ SOURCES += \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
     Tools/QCompressor.cpp \
+    Tools/QMediaInfo.cpp \
     Tools/RenameNamesUnique.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
+    Tools/VidsDurationDisplayString.cpp \
     View/AdvanceSearchTableView.cpp \
     View/CustomListView.cpp \
     View/JsonListView.cpp \
@@ -103,7 +105,6 @@ SOURCES += \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/JsonFileHelper.cpp \
     Tools/MD5Calculator.cpp \
-    Tools/MP4DurationGetter.cpp \
     Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
     Tools/NavigationViewSwitcher.cpp \
@@ -211,14 +212,17 @@ HEADERS += \
     Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \
+    Tools/MediaInfoDLL.h \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
     Tools/NameTool.h \
     Tools/QCompressor.h \
+    Tools/QMediaInfo.h \
     Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     Tools/ToConsecutiveFileNameNo.h \
+    Tools/VidsDurationDisplayString.h \
     View/AdvanceSearchTableView.h \
     View/CustomListView.h \
     View/JsonListView.h \
@@ -243,7 +247,6 @@ HEADERS += \
     Tools/FilesNameBatchStandardizer.h \
     Tools/JsonFileHelper.h \
     Tools/MD5Calculator.h \
-    Tools/MP4DurationGetter.h \
     Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
     Tools/NavigationViewSwitcher.h \

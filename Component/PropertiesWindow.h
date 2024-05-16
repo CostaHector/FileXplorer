@@ -21,7 +21,8 @@ class PropertiesWindow : public QDialog {
   QStringList m_items;
   QPlainTextEdit* m_propertiesInfoTextEdit;
   QDialogButtonBox* m_buttonBox;
-  QAction* m_showMore;
+  QAction* m_showFilesSize;
+  QAction* m_showVidsDuration;
   QAction* m_showMD5;
   QToolBar* m_extraToolbar;
 };

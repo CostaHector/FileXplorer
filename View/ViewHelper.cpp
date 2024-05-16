@@ -16,16 +16,16 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
       selectedItems.append(url.toLocalFile());
     }
   }
-  CCMMode opMode = CCMMode::ERROR;
+  CCMMode opMode = CCMMode::ERROR_OP;
   switch (action) {
     case Qt::DropAction::CopyAction:
-      opMode = CCMMode::COPY;
+      opMode = CCMMode::COPY_OP;
       break;
     case Qt::DropAction::MoveAction:
-      opMode = CCMMode::CUT;
+      opMode = CCMMode::CUT_OP;
       break;
     case Qt::DropAction::LinkAction:
-      opMode = CCMMode::LINK;
+      opMode = CCMMode::LINK_OP;
       break;  // should not conflict
     default:
       qWarning() << "[Err] Unknown action:" << action;
@@ -33,7 +33,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
   }
   ConflictsItemHelper conflictIF(selectedItems, to, opMode);
   auto* tfm = new ConflictsRecycle(conflictIF);
-  if (to == conflictIF.l and opMode != CCMMode::LINK) {
+  if (to == conflictIF.l and opMode != CCMMode::LINK_OP) {
     return false;
   }
   if (not conflictIF) {  // conflict
