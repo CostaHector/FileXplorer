@@ -8,20 +8,15 @@
 #include "Component/NotificatorFrame.h"
 #include "FileOperation/RecycleBinHelper.h"
 #include "UndoRedo.h"
+#include "public/DisplayEnhancement.h"
 
 QVariant TrashbinModel::data(const QModelIndex& idx, int role) const {
   if (not idx.isValid()) {
     return QVariant();
   }
   if (role == Qt::DisplayRole) {
-    if (idx.column() == RECYCLE_HEADER_KEY::SIZE_INDEX) {
-      const auto total = QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toUInt();
-      const qint64 xGiB = total / (1 << 30);
-      const qint64 xMiB = total % (1 << 30) / (1 << 20);
-      const qint64 xkiB = total % (1 << 30) % (1 << 20) / (1 << 10);
-      const qint64 xB = total % (1 << 30) % (1 << 20) % (1 << 10);
-      return QString("%1'%2'%3'%4").arg(xGiB).arg(xMiB).arg(xkiB).arg(xB);
-    }
+    if (idx.column() == RECYCLE_HEADER_KEY::SIZE_INDEX)
+      return FILE_SIZE_DSP::toHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toUInt());
   } else if (role == Qt::DecorationRole) {
     if (idx.column() == RECYCLE_HEADER_KEY::DB_NAME_INDEX) {
       return m_iconProvider.icon(fileName(idx));
