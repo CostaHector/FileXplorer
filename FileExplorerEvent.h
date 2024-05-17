@@ -77,8 +77,9 @@ class FileExplorerEvent : public QObject {
 
   bool on_properties() const {
     const QStringList& items = selectedItems();
-    auto* pW = new PropertiesWindow(items, this->_contentPane);
+    auto* pW = new PropertiesWindow(this->_contentPane);
     pW->show();
+    pW->operator()(items);
     return true;
   }
 
