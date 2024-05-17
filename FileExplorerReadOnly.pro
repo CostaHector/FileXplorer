@@ -17,6 +17,7 @@ SOURCES += \
     Actions/JsonEditorActions.cpp \
     Actions/LogViewActions.cpp \
     Actions/PerformersManagerActions.cpp \
+    Actions/PropertiesWindowActions.cpp \
     Actions/QuickWhereActions.cpp \
     Actions/RecycleBinActions.cpp \
     Actions/RenameActions.cpp \
@@ -158,6 +159,7 @@ HEADERS += \
     Actions/JsonEditorActions.h \
     Actions/LogViewActions.h \
     Actions/PerformersManagerActions.h \
+    Actions/PropertiesWindowActions.h \
     Actions/QuickWhereActions.h \
     Actions/RecycleBinActions.h \
     Actions/RenameActions.h \
@@ -287,7 +289,8 @@ HEADERS += \
     View/PerformersTableView.h \
     View/VidsPlayListView.h \
     View/ViewHelper.h \
-    View/ViewStyleSheet.h
+    View/ViewStyleSheet.h \
+    public/DisplayEnhancement.h
 
 TRANSLATIONS += \
     Translate/FileExplorerReadOnly_zh_CN.ts
