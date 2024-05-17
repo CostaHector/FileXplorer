@@ -2,7 +2,6 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Component/NotificatorFrame.h"
-#include "FileOperation/FileOperation.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
 #include "UndoRedo.h"
