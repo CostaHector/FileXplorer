@@ -11,12 +11,14 @@ SOURCES += \
     Actions/AddressBarActions.cpp \
     Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
+    Actions/DuplicateVideosFinderActions.cpp \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FolderPreviewActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
     Actions/LogViewActions.cpp \
     Actions/PerformersManagerActions.cpp \
+    Actions/PropertiesWindowActions.cpp \
     Actions/QuickWhereActions.cpp \
     Actions/RecycleBinActions.cpp \
     Actions/RenameActions.cpp \
@@ -62,6 +64,7 @@ SOURCES += \
     FileOperation/RecycleBinHelper.cpp \
     Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
+    Model/DuplicateVideoModel.cpp \
     Model/JsonModel.cpp \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
@@ -75,12 +78,15 @@ SOURCES += \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
     Tools/QCompressor.cpp \
+    Tools/QMediaInfo.cpp \
     Tools/RenameNamesUnique.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
+    Tools/VidsDurationDisplayString.cpp \
     View/AdvanceSearchTableView.cpp \
     View/CustomListView.cpp \
+    View/DuplicateVideosFinder.cpp \
     View/JsonListView.cpp \
     View/LogView.cpp \
     View/MovieDBView.cpp \
@@ -103,7 +109,6 @@ SOURCES += \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/JsonFileHelper.cpp \
     Tools/MD5Calculator.cpp \
-    Tools/MP4DurationGetter.cpp \
     Tools/MimeDataCX.cpp \
     Tools/NameStandardizer.cpp \
     Tools/NavigationViewSwitcher.cpp \
@@ -151,12 +156,14 @@ HEADERS += \
     Actions/AddressBarActions.h \
     Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
+    Actions/DuplicateVideosFinderActions.h \
     Actions/FileBasicOperationsActions.h \
     Actions/FolderPreviewActions.h \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
     Actions/LogViewActions.h \
     Actions/PerformersManagerActions.h \
+    Actions/PropertiesWindowActions.h \
     Actions/QuickWhereActions.h \
     Actions/RecycleBinActions.h \
     Actions/RenameActions.h \
@@ -202,6 +209,7 @@ HEADERS += \
     FileOperation/RecycleBinHelper.h \
     Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
+    Model/DuplicateVideoModel.h \
     Model/JsonModel.h \
     Model/LogModel.h \
     Model/LogProxyModel.h \
@@ -211,16 +219,20 @@ HEADERS += \
     Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \
+    Tools/MediaInfoDLL.h \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
     Tools/NameTool.h \
     Tools/QCompressor.h \
+    Tools/QMediaInfo.h \
     Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     Tools/ToConsecutiveFileNameNo.h \
+    Tools/VidsDurationDisplayString.h \
     View/AdvanceSearchTableView.h \
     View/CustomListView.h \
+    View/DuplicateVideosFinder.h \
     View/JsonListView.h \
     View/LogView.h \
     View/MovieDBView.h \
@@ -243,7 +255,6 @@ HEADERS += \
     Tools/FilesNameBatchStandardizer.h \
     Tools/JsonFileHelper.h \
     Tools/MD5Calculator.h \
-    Tools/MP4DurationGetter.h \
     Tools/MimeDataCX.h \
     Tools/NameStandardizer.h \
     Tools/NavigationViewSwitcher.h \
@@ -284,7 +295,8 @@ HEADERS += \
     View/PerformersTableView.h \
     View/VidsPlayListView.h \
     View/ViewHelper.h \
-    View/ViewStyleSheet.h
+    View/ViewStyleSheet.h \
+    public/DisplayEnhancement.h
 
 TRANSLATIONS += \
     Translate/FileExplorerReadOnly_zh_CN.ts

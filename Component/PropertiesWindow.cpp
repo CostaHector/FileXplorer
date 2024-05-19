@@ -5,100 +5,136 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "Actions/PropertiesWindowActions.h"
+#include "PublicVariable.h"
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
+#include "Tools/VidsDurationDisplayString.h"
+#include "public/DisplayEnhancement.h"
 
-PropertiesWindow::PropertiesWindow(const QStringList& items, QWidget* parent)
-    : QDialog(parent),
-      m_items(items),
-      m_propertiesInfoTextEdit(new QPlainTextEdit(this)),
-      m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Orientation::Horizontal, this)),
-      m_showMore(new QAction("More", this)),
-      m_showMD5(new QAction(QIcon(":/themes/MD5_FILE_IDENTIFIER_PATH"), tr("MD5"), this)),
-      m_extraToolbar(new QToolBar("Extra Info", this)) {
-  m_showMore->setCheckable(true);
-  m_showMore->setToolTip("Display videos duration of each *mp4 file");
-  m_showMD5->setCheckable(true);
-  m_showMD5->setToolTip("Display MD5 of each file");
+const QString PropertiesWindow::STRING_SPLITTER{60, '-'};
+
+PropertiesWindow::PropertiesWindow(QWidget* parent) : QDialog{parent} {
   m_propertiesInfoTextEdit->setFont(QFont("Consolas"));
-  m_extraToolbar->addActions({m_showMore, m_showMD5});
-  m_extraToolbar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
-  m_extraToolbar->setOrientation(Qt::Orientation::Horizontal);
-  auto* lo = new QVBoxLayout(this);
-  lo->addWidget(m_extraToolbar);
-  lo->addWidget(m_propertiesInfoTextEdit);
-  lo->addWidget(m_buttonBox);
-  setLayout(lo);
-  UpdateMessage();
+
+  m_propertyTB = g_propertiesWindowAct().getPropertiesToolBar(this);
+
+  m_mainLo->addWidget(m_propertyTB);
+  m_mainLo->addWidget(m_propertiesInfoTextEdit);
+  setLayout(m_mainLo);
 
   subscribe();
+  setWindowFlags(Qt::Window);  // show maximize, minimize button at title bar
   setWindowIcon(QIcon(":/themes/PROPERTIES"));
+
+  ReadSetting();
 }
 
 bool PropertiesWindow::UpdateMessage() {
-  return (*this)(m_items);
-}
-
-bool PropertiesWindow::operator()(const QStringList& items) {
-  if (items.isEmpty()) {
-    setWindowTitle("empty property");
-    return true;
-  }
-  if (items.size() == 1) {
-    setWindowTitle(QString("%1 property").arg(items.first()));
-  } else {
-    setWindowTitle(QString("%1 and other %2 items(s) properties").arg(items.first()).arg(items.size() - 1));
-  }
-
-  QFileInfo fi(items.first());
   QString propertiesMsg;
-  if (items.size() == 1) {
-    propertiesMsg += QString("General: Name:[%1]\n  Location:[%2]\n").arg(fi.fileName()).arg(fi.absolutePath());
-  } else {
-    propertiesMsg += QString("General: %1 items\n").arg(items.size());
+  if (g_propertiesWindowAct().SHOW_FILES_SIZE->isChecked()) {
+    if (m_commonInfomation.isEmpty()) {
+      InitCommonInfo();
+    }
+    propertiesMsg += STRING_SPLITTER;
+    propertiesMsg += m_commonInfomation;
+    propertiesMsg += "<br/>\n";
   }
-  if (m_showMore->isChecked()) {
-    // total size, files count, folders count
-    propertiesMsg += QString(40, '-');
-    const auto& itemStatic = FileSystemItemFilter::ItemCounter(items);
-
-    const qint64 total = itemStatic.fileSize;
-    const qint64 xGiB = total / (1 << 30);
-    const qint64 xMiB = total % (1 << 30) / (1 << 20);
-    const qint64 xkiB = total % (1 << 30) % (1 << 20) / (1 << 10);
-    const qint64 xB = total % (1 << 30) % (1 << 20) % (1 << 10);
-    const QString sizeMsg = QString("%1GiB+%2MiB+%3KiB+%4Byte = %5B").arg(xGiB).arg(xMiB).arg(xkiB).arg(xB).arg(total);
-
-    propertiesMsg += QString("Contents:\n%1 file(s), %2 folder(s), totalling:\n%3\n").arg(itemStatic.fileCnt).arg(itemStatic.folderCnt).arg(sizeMsg);
-    propertiesMsg += QString(40, '-');
-    // lag here
-    // const QStringList& mp4Files = FileSystemItemFilter::MP4Out(items);
-    // propertiesMsg += MP4DurationGetter::DisplayVideosDuration(mp4Files);
+  if (g_propertiesWindowAct().SHOW_VIDS_DURATION->isChecked()) {
+    if (m_durations.isEmpty()) {
+      InitDurationInfo();
+    }
+    propertiesMsg += STRING_SPLITTER;
+    propertiesMsg += m_durations;
+    propertiesMsg += "<br/>\n";
   }
-  if (m_showMD5->isChecked()) {
-    propertiesMsg += QString(40, '-');
-    const QStringList& files = FileSystemItemFilter::FilesOut(items);
-    propertiesMsg += MD5Calculator::DisplayFilesMD5(files);
+  if (g_propertiesWindowAct().SHOW_FILES_MD5->isChecked()) {
+    if (m_fileIdentifier.isEmpty()) {
+      InitFileIndentifierInfo();
+    }
+    propertiesMsg += STRING_SPLITTER;
+    propertiesMsg += m_fileIdentifier;
   }
-  m_propertiesInfoTextEdit->setPlainText(propertiesMsg);
+  m_propertiesInfoTextEdit->setHtml(propertiesMsg);
   return true;
 }
 
-void PropertiesWindow::subscribe() {
-  connect(m_showMore, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
-  connect(m_showMD5, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
-  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QDialog::accept);
+void PropertiesWindow::InitCommonInfo() {
+  const auto& itemStatic = FileSystemItemFilter::ItemCounter(m_items);
+  const QString sizeMsg = FILE_PROPERTY_DSP::sizeToFileSizeDetail(itemStatic.fileSize);
+  m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(itemStatic.fileCnt).arg(itemStatic.folderCnt);
+  m_commonInfomation += QString("Size: %3").arg(sizeMsg);
 }
 
-// #define __NAME__EQ__MAIN__ 1
+void PropertiesWindow::InitDurationInfo() {
+  const QStringList& mp4Files = FileSystemItemFilter::MP4Out(m_items);
+  m_durations = VidsDurationDisplayString::DisplayVideosDuration(mp4Files);
+}
+
+void PropertiesWindow::InitFileIndentifierInfo() {
+  const QStringList& files = FileSystemItemFilter::FilesOut(m_items);
+  m_fileIdentifier = MD5Calculator::DisplayFilesMD5(files);
+}
+
+bool PropertiesWindow::operator()(const QStringList& items) {
+  m_items = items;
+  setWindowTitle(QString("Property | [%1] item(s)").arg(m_items.first()));
+  if (m_items.isEmpty()) {
+    m_propertiesInfoTextEdit->setPlainText("nothing item selected");
+    return true;
+  }
+  m_commonInfomation.clear();
+  m_durations.clear();
+  m_fileIdentifier.clear();
+
+  if (g_propertiesWindowAct().SHOW_FILES_SIZE->isChecked()) {
+    InitCommonInfo();
+  }
+
+  if (g_propertiesWindowAct().SHOW_VIDS_DURATION->isChecked()) {
+    InitDurationInfo();
+  }
+
+  if (g_propertiesWindowAct().SHOW_FILES_MD5->isChecked()) {
+    InitFileIndentifierInfo();
+  }
+
+  UpdateMessage();
+  return true;
+}
+
+void PropertiesWindow::ReadSetting() {
+  if (PreferenceSettings().contains("PropertiesWindowGeometry")) {
+    restoreGeometry(PreferenceSettings().value("PropertiesWindowGeometry").toByteArray());
+  } else {
+    setGeometry(QRect(0, 0, 1024, 768));
+  }
+}
+
+void PropertiesWindow::closeEvent(QCloseEvent* event) {
+  PreferenceSettings().setValue("PropertiesWindowGeometry", saveGeometry());
+  QDialog::closeEvent(event);
+}
+
+void PropertiesWindow::subscribe() {
+  connect(g_propertiesWindowAct().SHOW_FILES_SIZE, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
+  connect(g_propertiesWindowAct().SHOW_VIDS_DURATION, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
+  connect(g_propertiesWindowAct().SHOW_FILES_MD5, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
+}
+
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   // PropertiesWindow propertiesWindow({__FILE__});
-  PropertiesWindow propertiesWindow({QFileInfo(__FILE__).absolutePath()});
+  PropertiesWindow propertiesWindow;
   propertiesWindow.show();
+  //  propertiesWindow({QFileInfo(__FILE__).absolutePath()});
+  propertiesWindow({"E:/P/Leaked And Loaded/After taking 12 loads, Gage thanks his with a hot suck - XVIDEOS.COM.ts",
+                    "E:/P/Leaked And Loaded/Billy Santoro adds load number 6 to Gage's welcome to DC - XVIDEOS.COM.ts",
+                    "E:/P/Leaked And Loaded/Gage Billy Santoro is pretty sensitive after his foreskin removal surgery - XVIDEOS.COM.ts"});
   a.exec();
   return 0;
 }

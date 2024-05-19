@@ -149,11 +149,11 @@ void ConflictsFileSystemModel::updateCommands() {
       }
     }
     switch (OP) {
-      case CCMMode::CUT:
-      case CCMMode::MERGE:
+      case CCMMode::CUT_OP:
+      case CCMMode::MERGE_OP:
         m_cmds.append({"rename", l, nm, r, nm});
         break;
-      case CCMMode::COPY: {
+      case CCMMode::COPY_OP: {
         if (QFileInfo(l, nm).isDir()) {
           m_cmds.append({"mkpath", r, nm});
         } else {
@@ -161,13 +161,13 @@ void ConflictsFileSystemModel::updateCommands() {
         }
         break;
       }
-      case CCMMode::LINK:
+      case CCMMode::LINK_OP:
         m_cmds.append({"link", l, nm, r});
       default:
         break;
     }
   }
-  if (OP == CCMMode::MERGE) {
+  if (OP == CCMMode::MERGE_OP) {
     m_cmds.append({"rmpath", "", l});  // when merge A to B, folder A need to removed
   }
 }

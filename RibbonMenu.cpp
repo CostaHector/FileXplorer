@@ -252,7 +252,12 @@ QToolBar* RibbonMenu::LeafDatabase() const {
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
   auto* archiveVidsTB = new QToolBar("Leaf Achive Files");
-  archiveVidsTB->addActions(g_fileBasicOperationsActions().FOLDER_FILE_PROCESS->actions());
+  archiveVidsTB->addActions({g_fileBasicOperationsActions()._NAME_STANDARDLIZER, g_fileBasicOperationsActions()._CLASSIFIER});
+  archiveVidsTB->addSeparator();
+  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER, g_fileBasicOperationsActions()._REMOVE_REDUNDANT_ITEMS,
+                             g_fileBasicOperationsActions()._REMOVE_EMPTY_FOLDER});
+  archiveVidsTB->addSeparator();
+  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER});
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
