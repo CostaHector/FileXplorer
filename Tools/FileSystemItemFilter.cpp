@@ -2,12 +2,16 @@
 #include "PublicVariable.h"
 FileSystemItemFilter::FileSystemItemFilter() {}
 
+// for direct files in items must be "*.type" contained in nameFilters
+// for files in items subdirs can be any "*" nameFilters
 QStringList FileSystemItemFilter::FilesOut(const QStringList& items, const QStringList& nameFilters) {
   QStringList files;
   for (const QString& path : items) {
     QFileInfo fi(path);
     if (fi.isFile()) {
-      files << fi.absoluteFilePath();
+      if (nameFilters.isEmpty() or nameFilters.contains("*." + fi.suffix())) {
+        files << fi.absoluteFilePath();
+      }
       continue;
     }
     if (fi.isDir()) {
@@ -24,4 +28,6 @@ QStringList FileSystemItemFilter::FilesOut(const QStringList& items, const QStri
   return files;
 }
 
-QStringList FileSystemItemFilter::MP4Out(const QStringList& items) { return FilesOut(items, TYPE_FILTER::VIDEO_TYPE_SET); }
+QStringList FileSystemItemFilter::MP4Out(const QStringList& items) {
+  return FilesOut(items, TYPE_FILTER::VIDEO_TYPE_SET);
+}
