@@ -1,20 +1,27 @@
 #ifndef QMEDIAINFO_H
 #define QMEDIAINFO_H
 
+#include <QLibrary>
+#include <QTime>
 #include <iostream>
 #include <string>
-#include <QLibrary>
 #include "MediaInfoDLL.h"
-#include <QTime>
 
-//typedef void* (*MEDIAINFO_New)();
-//typedef void (*MEDIAINFO_Delete)(void*);
-//typedef size_t (*MEDIAINFO_Open)(void*, const wchar_t *);
-//typedef wchar_t* (*MEDIAINFO_Inform)(void*, long);
-//typedef wchar_t* (*MEDIAINFO_Get)(void*, int, int, wchar_t *, int, int);
 
-class QMediaInfo
-{
+#ifdef _WIN32
+typedef wchar_t MediaInfo_Char;
+#else
+typedef char MediaInfo_Char;
+#endif
+
+// typedef void* (*MEDIAINFO_New)();
+// typedef void (*MEDIAINFO_Delete)(void*);
+// typedef size_t (*MEDIAINFO_Open)(void*, const MediaInfo_Char *);
+// typedef MediaInfo_Char* (*MEDIAINFO_Inform)(void*, long);
+// typedef MediaInfo_Char* (*MEDIAINFO_Get)(void*, int, int, MediaInfo_Char *, int, int);
+
+
+class QMediaInfo {
  public:
   QMediaInfo();
   bool IsLoaded() const;
@@ -45,15 +52,19 @@ class QMediaInfo
   QString AudioLanguages() const;
   QString SubtitleLanguages() const;
 
-  bool Open(const QString &filename);
+  bool Open(const QString& filename);
   ~QMediaInfo();
+
  private:
-  const wchar_t *Get(MediaInfo_stream_C streamKind, int streamNumber, wchar_t* parameter,
-               MediaInfo_info_C infoKind, MediaInfo_info_C searchKind) const;
+  const MediaInfo_Char* Get(MediaInfo_stream_C streamKind,
+                     int streamNumber,
+                     MediaInfo_Char* parameter,
+                     MediaInfo_info_C infoKind,
+                     MediaInfo_info_C searchKind) const;
   int StreamCount(MediaInfo_stream_C stream) const;
 
-  QLibrary *_lib;
-  void *_pMedia;
+  QLibrary* _lib;
+  void* _pMedia;
 };
 
-#endif // QMEDIAINFO_H
+#endif  // QMEDIAINFO_H
