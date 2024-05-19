@@ -1,7 +1,7 @@
 #ifndef QCOMPRESSOR_H
 #define QCOMPRESSOR_H
 
-#include <zlib.h>
+// #include <zlib.h>
 #include <QByteArray>
 
 constexpr int GZIP_WINDOWS_BIT = 15 + 16;
