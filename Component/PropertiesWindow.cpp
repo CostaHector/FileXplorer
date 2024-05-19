@@ -61,7 +61,7 @@ bool PropertiesWindow::UpdateMessage() {
 
 void PropertiesWindow::InitCommonInfo() {
   const auto& itemStatic = FileSystemItemFilter::ItemCounter(m_items);
-  const QString sizeMsg = FILE_SIZE_DSP::toFileSizeDetail(itemStatic.fileSize);
+  const QString sizeMsg = FILE_PROPERTY_DSP::sizeToFileSizeDetail(itemStatic.fileSize);
   m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(itemStatic.fileCnt).arg(itemStatic.folderCnt);
   m_commonInfomation += QString("Size: %3").arg(sizeMsg);
 }
@@ -122,7 +122,7 @@ void PropertiesWindow::subscribe() {
   connect(g_propertiesWindowAct().SHOW_FILES_MD5, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
 }
 
-#define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

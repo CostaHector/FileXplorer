@@ -11,6 +11,7 @@ SOURCES += \
     Actions/AddressBarActions.cpp \
     Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
+    Actions/DuplicateVideosFinderActions.cpp \
     Actions/FileBasicOperationsActions.cpp \
     Actions/FolderPreviewActions.cpp \
     Actions/FramelessWindowActions.cpp \
@@ -63,6 +64,7 @@ SOURCES += \
     FileOperation/RecycleBinHelper.cpp \
     Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
+    Model/DuplicateVideoModel.cpp \
     Model/JsonModel.cpp \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
@@ -84,6 +86,7 @@ SOURCES += \
     Tools/VidsDurationDisplayString.cpp \
     View/AdvanceSearchTableView.cpp \
     View/CustomListView.cpp \
+    View/DuplicateVideosFinder.cpp \
     View/JsonListView.cpp \
     View/LogView.cpp \
     View/MovieDBView.cpp \
@@ -153,6 +156,7 @@ HEADERS += \
     Actions/AddressBarActions.h \
     Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
+    Actions/DuplicateVideosFinderActions.h \
     Actions/FileBasicOperationsActions.h \
     Actions/FolderPreviewActions.h \
     Actions/FramelessWindowActions.h \
@@ -205,6 +209,7 @@ HEADERS += \
     FileOperation/RecycleBinHelper.h \
     Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
+    Model/DuplicateVideoModel.h \
     Model/JsonModel.h \
     Model/LogModel.h \
     Model/LogProxyModel.h \
@@ -227,6 +232,7 @@ HEADERS += \
     Tools/VidsDurationDisplayString.h \
     View/AdvanceSearchTableView.h \
     View/CustomListView.h \
+    View/DuplicateVideosFinder.h \
     View/JsonListView.h \
     View/LogView.h \
     View/MovieDBView.h \
