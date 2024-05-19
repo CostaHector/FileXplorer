@@ -32,14 +32,6 @@ class FileBasicOperationsActions : public QObject {
         BATCH_NEW_FOLDERS{new QAction(QIcon(":/themes/NEW_FOLDERS"), tr("New Folders"))},
         NEW(GetNEWActions()),
 
-        _NAME_STANDARDLIZER{new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), tr("Name Ruler"))},
-        _CLASSIFIER{new QAction(QIcon(":/themes/CATEGORIZER"), tr("Categorizer"))},
-        _ITEM_ORGANIZER{new QAction(QIcon(":/themes/ITEMS_ORGANIZER"), tr("Organizer"))},
-        _DUPLICATE_ITEMS_REMOVER{new QAction(QIcon(":/themes/DEDUPLICATE"), tr("Deduplicator"))},
-        _REMOVE_REDUNDANT_ITEMS{new QAction(QIcon(":/themes/ONE_FILE_IN_ONE_FOLDER"), tr("Rmv Redundancy"))},
-        _REMOVE_EMPTY_FOLDER{new QAction(QIcon(":/themes/EMPTY_FOLDER"), tr("Rmv Empty"))},
-        FOLDER_FILE_PROCESS(FolderFileCategoryProcess()),
-
         _MOVE_TO{new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), tr("Move to"))},
         _COPY_TO{new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), tr("Copy to"))},
         MOVE_COPY_TO(GetMOVE_COPY_TOActions()),
@@ -67,7 +59,9 @@ class FileBasicOperationsActions : public QObject {
         SELECT_ALL{new QAction(QIcon(":/themes/SELECT_ALL"), tr("Select all"))},
         SELECT_NONE{new QAction(QIcon(":/themes/SELECT_NONE"), tr("Select none"))},
         SELECT_INVERT{new QAction(QIcon(":/themes/SELECT_INVERT"), tr("Invert selection"))},
-        SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()) {}
+        SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()) {
+    FolderFileCategoryProcess();
+  }
 
   QActionGroup* GetDeleteActions();
   QActionGroup* GetMOVE_COPY_TOActions();
@@ -91,9 +85,13 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* Get_Advance_Search_Actions();
   QActionGroup* FolderMergeActions();
 
-  QActionGroup* FolderFileCategoryProcess();
-  QAction *_NAME_STANDARDLIZER, *_CLASSIFIER, *_ITEM_ORGANIZER, *_DUPLICATE_ITEMS_REMOVER, *_REMOVE_REDUNDANT_ITEMS, *_REMOVE_EMPTY_FOLDER;
-  QActionGroup* FOLDER_FILE_PROCESS;
+  void FolderFileCategoryProcess();
+  QAction* _NAME_STANDARDLIZER{new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), tr("Name Ruler"))};
+  QAction* _CLASSIFIER{new QAction(QIcon(":/themes/CATEGORIZER"), tr("Categorizer"))};
+  QAction* _DUPLICATE_ITEMS_REMOVER{new QAction(QIcon(":/themes/DEDUPLICATE"), tr("Deduplicator"))};
+  QAction* _REMOVE_REDUNDANT_ITEMS{new QAction(QIcon(":/themes/ONE_FILE_IN_ONE_FOLDER"), tr("Rmv Redundancy"))};
+  QAction* _REMOVE_EMPTY_FOLDER{new QAction(QIcon(":/themes/EMPTY_FOLDER"), tr("Rmv Empty"))};
+  QAction* _DUPLICATE_VIDEOS_FINDER{new QAction(QIcon(":/themes/DUPLICATE_VIDEOS_FINDER"), "Duplicate Videos Finder")};
 
   QAction *_MOVE_TO, *_COPY_TO;
   QActionGroup* MOVE_COPY_TO;

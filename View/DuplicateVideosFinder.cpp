@@ -1,0 +1,244 @@
+#include "DuplicateVideosFinder.h"
+#include "Actions/DuplicateVideosFinderActions.h"
+#include "Actions/FileBasicOperationsActions.h"
+#include "PublicVariable.h"
+#include "UndoRedo.h"
+
+#include <QDesktopServices>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QMessageBox>
+
+#include <QSortFilterProxyModel>
+
+LeftDuplicateList::LeftDuplicateList(QWidget* parent) : CustomTableView{"LeftDuplicateList", parent} {
+  m_dupListModel = new VidInfoModel{this};
+
+  m_sortProxy = new QSortFilterProxyModel;
+  m_sortProxy->setSourceModel(m_dupListModel);
+  setModel(m_sortProxy);
+
+  subscribe();
+
+  InitTableView();
+  setSortingEnabled(true);
+}
+
+void LeftDuplicateList::subscribe() {}
+
+// -------------------------------------------------------------------------------------------------
+
+RightDuplicateDetails::RightDuplicateDetails(QWidget* parent) : CustomTableView{"RightDuplicateDetails", parent} {
+  m_detailsModel = new DuplicateDetailsModel{this};
+
+  m_sortProxy = new QSortFilterProxyModel;
+  m_sortProxy->setSourceModel(m_detailsModel);
+  setModel(m_sortProxy);
+
+  subscribe();
+
+  InitTableView();
+  setSortingEnabled(true);
+}
+
+void RightDuplicateDetails::on_cellDoubleClicked(const QModelIndex& ind) const {
+  const auto& srcIndex = m_sortProxy->mapToSource(ind);
+  const QString filepath = m_detailsModel->filePath(srcIndex);
+  QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
+}
+
+void RightDuplicateDetails::setSharedMember(CLASSIFIED_SORT_LIST_2D* pClassifiedSort, DIFFER_BY_TYPE* pCurDifferType) {
+  m_detailsModel->SyncFrom(pClassifiedSort, pCurDifferType);
+}
+
+void RightDuplicateDetails::onRecycleSelection() {
+  if (not selectionModel()->hasSelection()) {
+    qDebug("nothing selected to recycle");
+    return;
+  }
+  const int SELECTED_CNT = selectionModel()->selectedRows().size();
+
+  QStringList preList, relList;
+  preList.reserve(SELECTED_CNT);
+  relList.reserve(SELECTED_CNT);
+
+  for (const auto& proInd : selectionModel()->selectedRows()) {
+    const auto& srcInd = m_sortProxy->mapToSource(proInd);
+    preList.append("");
+    relList.append(m_detailsModel->filePath(srcInd));
+  }
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE recycleCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
+  auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
+  qDebug("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
+}
+
+void RightDuplicateDetails::subscribe() {
+  connect(this, &QTableView::doubleClicked, this, &RightDuplicateDetails::on_cellDoubleClicked);
+  connect(g_dupVidFinderAg().RECYCLE_ONE_FILE, &QAction::triggered, this, &RightDuplicateDetails::onRecycleSelection);
+}
+
+// -------------------------------------------------------------------------------------------------
+const QString DuplicateVideosFinder::DUPLICATE_FINDER_TEMPLATE = "Duplicate Videos Finder(Differ by %1) | %2 batch(es) | total %3 video(s)";
+
+DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{parent} {
+  m_tb = g_dupVidFinderAg().getToolBar(this);
+  m_tb->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_tb);
+
+  m_dupList = new LeftDuplicateList{this};
+  m_details = new RightDuplicateDetails{this};
+  m_mainWidget = new QSplitter{Qt::Orientation::Horizontal, this};
+
+  m_mainWidget->addWidget(m_dupList);
+  m_mainWidget->addWidget(m_details);
+
+  setCentralWidget(m_mainWidget);
+
+  m_details->setSharedMember(&m_dupList->m_dupListModel->m_classifiedSort, &m_dupList->m_dupListModel->m_currentDiffer);
+  subscribe();
+
+  updateWindowsSize();
+  UpdateWindowsTitle();
+  setWindowIcon(QIcon(":/themes/DUPLICATE_VIDEOS_FINDER"));
+}
+
+void DuplicateVideosFinder::UpdateWindowsTitle() {
+  if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
+    return;
+  }
+  auto* pDupListModel = m_dupList->m_dupListModel;
+  setWindowTitle(
+      DUPLICATE_FINDER_TEMPLATE.arg(pDupListModel->getDifferTypeStr()).arg(pDupListModel->rowCount()).arg(pDupListModel->getReadVidsCount()));
+}
+
+void DuplicateVideosFinder::updateWindowsSize() {
+  if (PreferenceSettings().contains("DuplicateVideosFinderGeometry")) {
+    restoreGeometry(PreferenceSettings().value("DuplicateVideosFinderGeometry").toByteArray());
+  } else {
+    setGeometry(QRect(0, 0, 1024, 768));
+  }
+  m_mainWidget->restoreState(PreferenceSettings().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
+}
+
+void DuplicateVideosFinder::closeEvent(QCloseEvent* event) {
+  PreferenceSettings().setValue("DuplicateVideosFinderGeometry", saveGeometry());
+  PreferenceSettings().setValue("DuplicateVideosFinderSplitterState", m_mainWidget->saveState());
+  QMainWindow::closeEvent(event);
+}
+
+bool DuplicateVideosFinder::loadAPath(const QString& path) {
+  if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
+    qWarning("Duplicate list or its model is nullptr");
+    return false;
+  }
+  if (not QFileInfo(path).isDir()) {
+    qWarning("path[%s] is not a directory", qPrintable(path));
+    return false;
+  }
+  m_dupList->m_dupListModel->AppendAPath(path);
+  UpdateWindowsTitle();
+  return true;
+}
+
+void DuplicateVideosFinder::subscribe() {
+  connect(g_dupVidFinderAg().APPEND_A_PATH, &QAction::triggered, this, &DuplicateVideosFinder::onSelectAPath);
+  connect(g_dupVidFinderAg().DIFFER_BY, &QActionGroup::triggered, this, &DuplicateVideosFinder::onDifferTypeChanged);
+
+  connect(g_dupVidFinderAg().durationDevLE, &QLineEdit::returnPressed, this, &DuplicateVideosFinder::onChangeDurationDeviation);
+  connect(g_dupVidFinderAg().sizeDevLE, &QLineEdit::returnPressed, this, &DuplicateVideosFinder::onChangeSizeDeviation);
+  connect(m_dupList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &DuplicateVideosFinder::on_selectionChanged);
+}
+
+void DuplicateVideosFinder::on_selectionChanged() {
+  const auto& proxyIndex = m_dupList->currentIndex();
+  const auto& srcIndex = m_dupList->m_sortProxy->mapToSource(proxyIndex);
+
+  if (not srcIndex.isValid()) {
+    return;
+  }
+  m_details->clearSelection();
+  m_details->m_detailsModel->onChangeDetailIndex(srcIndex.row());
+}
+
+void DuplicateVideosFinder::onSelectAPath() {
+  const QString& defaultOpenDir = PreferenceSettings().value("DUPLICATE_VIDEOS_SELECT_FROM", ".").toString();
+  const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
+
+  QFileInfo loadFromFi(loadFromPath);
+  const QString& absPath = loadFromFi.absoluteFilePath();
+  if (not loadFromFi.isDir()) {
+    QMessageBox::warning(this, "Failed when select a folder", QString("Not a folder:\n%1").arg(absPath));
+    qWarning("Failed when select a folder. Not a folder:\n%s", qPrintable(absPath));
+    return;
+  }
+  PreferenceSettings().setValue("DUPLICATE_VIDEOS_SELECT_FROM", absPath);
+  m_dupList->clearSelection();
+  m_details->m_detailsModel->whenDifferTypeAboutToChanged();
+  loadAPath(absPath);
+  UpdateWindowsTitle();
+}
+
+void DuplicateVideosFinder::onDifferTypeChanged(QAction* newDifferAct) {
+  if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
+    qWarning("Duplicate list or its model is nullptr when set differ by duration");
+    return;
+  }
+  m_dupList->clearSelection();
+  m_details->m_detailsModel->whenDifferTypeAboutToChanged();
+  if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_SIZE) {
+    m_dupList->m_dupListModel->setDifferType(DIFFER_BY_TYPE::SIZE);
+  } else if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_DURATION) {
+    m_dupList->m_dupListModel->setDifferType(DIFFER_BY_TYPE::DURATION);
+  }
+
+  UpdateWindowsTitle();
+}
+
+void DuplicateVideosFinder::onChangeSizeDeviation() {
+  if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
+    qWarning("Duplicate list or its model is nullptr when onChangeSizeDeviation");
+    return;
+  }
+  const QString& szDevStr = g_dupVidFinderAg().sizeDevLE->text();
+  bool isIntValid = false;
+  int dev = szDevStr.toInt(&isIntValid);
+  if (not isIntValid or dev <= 0) {
+    qWarning("size str[%s] is not valid", qPrintable(szDevStr));
+    return;
+  }
+  m_dupList->clearSelection();
+  m_details->m_detailsModel->whenDifferTypeAboutToChanged();
+  m_dupList->m_dupListModel->setDeviationSize(dev);
+  UpdateWindowsTitle();
+}
+void DuplicateVideosFinder::onChangeDurationDeviation() {
+  if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
+    qWarning("Duplicate list or its model is nullptr when onChangeDurationDeviation");
+    return;
+  }
+  const QString& durDevStr = g_dupVidFinderAg().durationDevLE->text();
+  bool isIntValid = false;
+  int dev = durDevStr.toInt(&isIntValid);
+  if (not isIntValid or dev <= 0) {
+    qWarning("duration str[%s] is not valid", qPrintable(durDevStr));
+    return;
+  }
+  m_dupList->clearSelection();
+  m_details->m_detailsModel->whenDifferTypeAboutToChanged();
+  m_dupList->m_dupListModel->setDeviationDuration(dev);
+  UpdateWindowsTitle();
+}
+
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+#include <QApplication>
+
+int main(int argc, char* argv[]) {
+  QApplication a(argc, argv);
+  DuplicateVideosFinder mainWindow;
+  mainWindow.show();
+  mainWindow.loadAPath("E:/P/Leaked And Loaded");
+  a.exec();
+  return 0;
+}
+#endif

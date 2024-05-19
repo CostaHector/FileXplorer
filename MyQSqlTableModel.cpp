@@ -13,7 +13,7 @@ QVariant MyQSqlTableModel::data(const QModelIndex& idx, int role) const {
   }
   if (role == Qt::DisplayRole) {
     if (idx.column() == DB_HEADER_KEY::DB_SIZE_COLUMN)
-      return FILE_SIZE_DSP::toHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toUInt());
+      return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toUInt());
   }
   return QSqlTableModel::data(idx, role);
 }

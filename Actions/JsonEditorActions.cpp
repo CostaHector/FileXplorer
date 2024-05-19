@@ -20,7 +20,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _RELOAD_PERF_AKA(new QAction(QIcon(":/themes/RELOAD_FROM_DISK"), tr("Reload AKA perf"), this)),
       _PERFS_AKA_ACTIONS{new QActionGroup(this)},
 
-      _BROWSE_AND_SELECT_THE_FOLDER(new QAction(QIcon(":/themes/SELECT_A_FOLDER_AND_LOAD_JSON"), tr("browse"), this)),
+      _BROWSE_AND_SELECT_THE_FOLDER(new QAction(QIcon(":/themes/LOAD_A_PATH"), tr("Browse"), this)),
       _CLR_TO_BE_EDITED_LIST(new QAction(QIcon(":/themes/EMPTY_LISTWIDGET"), tr("Clear list"), this)),
       _FILE_LOAD_ACTIONS{new QActionGroup(this)},
 

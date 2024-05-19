@@ -1,20 +1,5 @@
 #ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
-#include "Component/CustomStatusBar.h"
-#include "Component/JsonEditor.h"
-#include "Component/MD5Window.h"
-
-#include "Component/PropertiesWindow.h"
-#include "Component/VideoPlayer.h"
-#include "Component/AlertSystem.h"
-#include "View/LogView.h"
-
-#include "Tools/MyClipboard.h"
-#include "Tools/RedundantFolderRemove.h"
-#include "Component/RenameWidgets/AdvanceRenamer.h"
-
-#include "ContentPanel.h"
-
 #include <QAbstractButton>
 #include <QAbstractTableModel>
 #include <QClipboard>
@@ -29,15 +14,27 @@
 #include <QObject>
 #include <QProcess>
 #include <QTextStream>
+#include "Tools/MyClipboard.h"
+#include "Tools/RedundantFolderRemove.h"
+
+#include "MyQFileSystemModel.h"
+class MyQFileSystemModel;
+class ContentPanel;
+class CustomStatusBar;
+class MyClipboard;
+class JsonEditor;
+class VideoPlayer;
+class AlertSystem;
+class LogView;
+class AdvanceRenamer;
+class PropertiesWindow;
+class DuplicateVideosFinder;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
 
  public:
-  static FileExplorerEvent* GetFileExlorerEvent(MyQFileSystemModel* fsm,
-                                               ContentPanel* view,
-                                               CustomStatusBar* logger,
-                                               QObject* parent = nullptr);
+  static FileExplorerEvent* GetFileExlorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent = nullptr);
 
  private:
   FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent);
@@ -68,20 +65,9 @@ class FileExplorerEvent : public QObject {
     return filePaths;
   }
 
-  bool on_calcMD5() const {
-    const QStringList& items = selectedItems();
-    auto* md5W = new MD5Window(_fileSysModel->rootPath(), items, this->_contentPane);
-    md5W->show();
-    return true;
-  }
+  bool on_calcMD5() const;
 
-  bool on_properties() const {
-    const QStringList& items = selectedItems();
-    auto* pW = new PropertiesWindow(this->_contentPane);
-    pW->show();
-    pW->operator()(items);
-    return true;
-  }
+  bool on_properties() const;
 
   bool on_revealInExplorer() const;
   bool on_OpenInTerminal() const;
@@ -123,6 +109,7 @@ class FileExplorerEvent : public QObject {
 
   AlertSystem* m_alertSystem{nullptr};
   LogView* m_logView{nullptr};
+  DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
  signals:
  private:
   auto QueryCopyOrCut() -> CCMMode;
