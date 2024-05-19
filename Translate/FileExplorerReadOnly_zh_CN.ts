@@ -262,103 +262,102 @@
         <translation type="vanished">拷贝整行</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="35"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="89"/>
         <source>Name Ruler</source>
         <translation>命名之尺</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="36"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="90"/>
         <source>Categorizer</source>
         <translation>电影文件分类器</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="37"/>
         <source>Organizer</source>
-        <translation>组织器</translation>
+        <translation type="vanished">组织器</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="38"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="91"/>
         <source>Deduplicator</source>
         <translation>去重器</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="39"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="92"/>
         <source>Rmv Redundancy</source>
         <translatorcomment>仅有一个文件或没有文件的文件夹定义为冗余文件夹</translatorcomment>
         <translation>去除冗余文件夹</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="40"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="93"/>
         <source>Rmv Empty</source>
         <translation>去除空文件夹</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="50"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="42"/>
         <source>Recycle</source>
         <translation>回收</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="51"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="43"/>
         <source>Delete permanently</source>
         <translation>永久删除</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="43"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="35"/>
         <source>Move to</source>
         <translation>移动到</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="44"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="36"/>
         <source>Copy to</source>
         <translation>复制到</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="58"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="50"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="59"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="51"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="60"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="52"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="54"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="46"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="55"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="47"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="63"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="55"/>
         <source>Merged to front</source>
         <translation>合并到前者中</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="64"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="56"/>
         <source>Merge to back</source>
         <translation>合并到后者中</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="67"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="59"/>
         <source>Select all</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="68"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="60"/>
         <source>Select none</source>
         <translation>空选</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="69"/>
+        <location filename="../Actions/FileBasicOperationsActions.h" line="61"/>
         <source>Invert selection</source>
         <translation>反选</translation>
     </message>
@@ -551,9 +550,8 @@
         <translation>重新读入演职员又名</translation>
     </message>
     <message>
-        <location filename="../Actions/JsonEditorActions.cpp" line="23"/>
         <source>browse</source>
-        <translation>浏览</translation>
+        <translation type="vanished">浏览</translation>
     </message>
     <message>
         <location filename="../Actions/JsonEditorActions.cpp" line="24"/>
@@ -583,6 +581,11 @@
     <message>
         <source>WhenNot</source>
         <translation type="vanished">跳过条件取反</translation>
+    </message>
+    <message>
+        <location filename="../Actions/JsonEditorActions.cpp" line="23"/>
+        <source>Browse</source>
+        <translation>载入</translation>
     </message>
     <message>
         <location filename="../Actions/JsonEditorActions.cpp" line="31"/>
@@ -937,9 +940,8 @@
 <context>
     <name>PropertiesWindow</name>
     <message>
-        <location filename="../Component/PropertiesWindow.cpp" line="17"/>
         <source>MD5</source>
-        <translation>哈希值</translation>
+        <translation type="vanished">哈希值</translation>
     </message>
 </context>
 <context>

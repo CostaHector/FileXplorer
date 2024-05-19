@@ -224,7 +224,7 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
   return actionGroup;
 }
 
-auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
+void FileBasicOperationsActions::FolderFileCategoryProcess() {
   _NAME_STANDARDLIZER->setToolTip(
       "<b>Standardized Files/Folders Name under current view path</b><br/>"
       "Given: [A..mp4, A (1).jpg, A -- 2.json]<br/>"
@@ -232,10 +232,6 @@ auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
   _CLASSIFIER->setToolTip(
       "<b>Category Files/Folders Name under current view path</b><br/>"
       "Move [A.mp4, A.jpg, A.json]<br/>"
-      "To Folder A");
-  _ITEM_ORGANIZER->setToolTip(
-      "<b>Organize</b><br/>"
-      "Move [A - B.mp4, A - C.mp4, A - D.mp4]<br/>"
       "To Folder A");
   _DUPLICATE_ITEMS_REMOVER->setToolTip(
       "<b>Remove Files/Folders whose names with a certern pattern under current view path</b>:<br/>"
@@ -252,14 +248,10 @@ auto FileBasicOperationsActions::FolderFileCategoryProcess() -> QActionGroup* {
       "<b>Remove Empty folders under current view path </b>"
       "Only Empty folder will be removed");
 
-  QActionGroup* actionGroup = new QActionGroup(this);
-  actionGroup->addAction(_NAME_STANDARDLIZER);
-  actionGroup->addAction(_CLASSIFIER);
-  actionGroup->addAction(_ITEM_ORGANIZER);
-  actionGroup->addAction(_DUPLICATE_ITEMS_REMOVER);
-  actionGroup->addAction(_REMOVE_REDUNDANT_ITEMS);
-  actionGroup->addAction(_REMOVE_EMPTY_FOLDER);
-  return actionGroup;
+  _DUPLICATE_VIDEOS_FINDER->setToolTip(
+      "<b>Differ videos by duration or filesize</b>"
+      "to let it easy to find duplicate one");
+  _DUPLICATE_VIDEOS_FINDER->setCheckable(true);
 }
 
 FileBasicOperationsActions& g_fileBasicOperationsActions() {

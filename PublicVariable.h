@@ -117,7 +117,7 @@ class ValueChecker {
   explicit ValueChecker(const VALUE_TYPE valueType_);
 
   static int getFileExtensionDotIndex(const QString& path);
-  static QString GetFileExtension(const QString& path); // e.g. .txt .bat
+  static QString GetFileExtension(const QString& path);  // e.g. .txt .bat
 
   static bool isFileExist(const QString& path);
   static bool isFolderExist(const QString& path);
@@ -158,7 +158,9 @@ constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 namespace MemoryKey {
 const KV DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH}};
 const KV LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV BACKGROUND_IMAGE("BACKGROUND_IMAGE", "", ValueChecker{{".png", ".webp", ".jpg", ".jpeg"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV BACKGROUND_IMAGE("BACKGROUND_IMAGE",
+                          "",
+                          ValueChecker{{".png", ".webp", ".jpg", ".jpeg"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 const KV PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
@@ -244,6 +246,9 @@ const KV RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{
                                      ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 const KV RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR}};
 
+const KV WIN32_MEDIAINFO_LIB_PATH("WIN32_MEDIAINFO_LIB_PATH",
+                                  "../bin/lib/MediaInfo.dll",
+                                  ValueChecker{{".dll"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE",
                                 "../bin/PERFORMERS_TABLE.txt",
                                 ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
@@ -258,6 +263,10 @@ const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PAT
                                              ValueChecker{{".bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
+const KV LINUX_MEDIAINFO_LIB_PATH("LINUX_MEDIAINFO_LIB_PATH",
+                                  "../bin/lib/MediaInfo.dll",
+                                  ValueChecker{{".dll"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+
 const KV LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE",
                                 "../bin/PERFORMERS_TABLE.txt",
                                 ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
@@ -268,6 +277,9 @@ const KV LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME",
                                     "../bin/STANDARD_STUDIO_NAME.json",
                                     ValueChecker{{".json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+
+const KV DUPLICATE_FINDER_DEVIATION_DURATION("DUPLICATE_FINDER_DEVIATION_DURATION", 2 * 1000, ValueChecker{0, 20 * 1000});         // 2s ~ 20s
+const KV DUPLICATE_FINDER_DEVIATION_FILESIZE("DUPLICATE_FINDER_DEVIATION_FILESIZE", 2 * 1024, ValueChecker{0, 30 * 1024 * 1024});  // 2kB ~ 30MB
 }  // namespace MemoryKey
 
 namespace SystemPath {
@@ -305,19 +317,14 @@ const QStringList JSON_TYPE_SET = {"*.json"};
 const QStringList TEXT_TYPE_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat"};
 }  // namespace TYPE_FILTER
 
-enum class CCMMode {
-  ERROR = -1,
-  MERGE = 0,
-  COPY = 1,
-  CUT = 2,
-  LINK = 3,
-};
+enum class CCMMode { ERROR_OP = -1, MERGE_OP = 0, COPY_OP = 1, CUT_OP = 2, LINK_OP = 3 };
 
-static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE, "MERGE"},
-                                                       {CCMMode::COPY, "COPY"},
-                                                       {CCMMode::CUT, "CUT"},
-                                                       {CCMMode::LINK, "LINK"}};
+static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE_OP, "MERGE"},
+                                                       {CCMMode::COPY_OP, "COPY"},
+                                                       {CCMMode::CUT_OP, "CUT"},
+                                                       {CCMMode::LINK_OP, "LINK"}};
 
+#include <QColor>
 #include <QRegExp>
 
 namespace JSON_RENAME_REGEX {
@@ -345,7 +352,6 @@ const QRegExp CONTINOUS_SPACE("\\s+");
 const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
 }  // namespace JSON_RENAME_REGEX
 
-#include <QColor>
 namespace STATUS_COLOR {
 const QColor LIGHT_GREEN_COLOR(245, 245, 220);
 const QColor TOMATO_COLOR(244, 164, 96);
@@ -354,7 +360,6 @@ const QColor TRANSPARENT_COLOR(Qt::GlobalColor::color0);
 
 bool VerifyOneFilePath(const KV& kv, const QString& fileType = "txt");
 bool VerifyOneFolderPath(const KV& kv);
-
 bool InitOutterPlainTextPath();
 
 constexpr int CONTROL_TOOLBAR_HEIGHT = 28;
