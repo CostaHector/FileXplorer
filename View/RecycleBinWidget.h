@@ -12,7 +12,7 @@
 #include <QDir>
 #include <QFileInfo>
 
-#include <fileapi.h>
+// #include <fileapi.h>
 #include <QFileIconProvider>
 #include <QModelIndexList>
 #include <QSqlError>
