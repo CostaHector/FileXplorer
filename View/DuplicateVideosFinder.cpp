@@ -188,9 +188,12 @@ void DuplicateVideosFinder::onDifferTypeChanged(QAction* newDifferAct) {
   if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_SIZE) {
     m_dupList->m_dupListModel->setDifferType(DIFFER_BY_TYPE::SIZE);
   } else if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_DURATION) {
+#ifdef _WIN32
     m_dupList->m_dupListModel->setDifferType(DIFFER_BY_TYPE::DURATION);
+#else
+    QMessageBox::warning(this, "Cannot differ by type", "MediaInfo lib is not lib");
+#endif
   }
-
   UpdateWindowsTitle();
 }
 
@@ -237,7 +240,11 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   DuplicateVideosFinder mainWindow;
   mainWindow.show();
+#ifdef _WIN32
   mainWindow.loadAPath("E:/P/Leaked And Loaded");
+#else
+  mainWindow.loadAPath("/home/ariel/Downloads");
+#endif
   a.exec();
   return 0;
 }
