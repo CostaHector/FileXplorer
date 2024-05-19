@@ -92,3 +92,28 @@ FileOperatorType::BATCH_COMMAND_LIST_TYPE RecycleBinHelper::RecycleABatch(const 
   //  m_model->submitAll();
   return cmds;
 }
+
+QString RecycleBinHelper::GetRecyleBinRootPath(const QString& path) {
+  static QSet<QChar> availableDriver;
+#ifdef _WIN32
+  if (path.isEmpty()) {
+    qWarning("Never pass an empty path here");
+    return "";
+  }
+  const QChar driverLetter = path.front();
+  QString recycleRootPath = driverLetter + QString(":/.recyle");
+#else
+  const QChar driverLetter = '/';
+  QString recycleRootPath = SystemPath::desktopPath + '/' + ".recyle";
+#endif
+  if (availableDriver.contains(driverLetter)) {
+    return recycleRootPath;
+  }
+  const bool pathMkResult = QDir("").mkpath(recycleRootPath);
+  if (not pathMkResult) {
+    qWarning("Cannot make recycle root path[%s]", qPrintable(recycleRootPath));
+    return "";
+  }
+  availableDriver.insert(driverLetter);
+  return recycleRootPath;
+}
