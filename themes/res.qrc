@@ -116,7 +116,6 @@
         <file alias="PRODUCTION_STUDIOS">JsonEditor/PRODUCTION_STUDIOS.svg</file>
         <file alias="CAPITALIZE_EACH_WORD">JsonEditor/CAPITALIZE_EACH_WORD.svg</file>
         <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
-        <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
         <file alias="LOAD_JSONS_FROM_CURRENT_PATH">JsonEditor/LOAD_JSONS_FROM_CURRENT_PATH.svg</file>
         <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
         <file alias="PERFORMERS_LIST_HINT">JsonEditor/PERFORMERS_LIST_HINT.svg</file>
@@ -184,6 +183,11 @@
         <file alias="SERVICE_REGISTERED">PreferenceIcons/SERVICE_REGISTERED.svg</file>
         <file alias="SERVICE_UNREGISTERED">PreferenceIcons/SERVICE_UNREGISTERED.svg</file>
         <file alias="SERVICE_SUSPENDED">PreferenceIcons/SERVICE_SUSPENDED.svg</file>
+        <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
+        <file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.png</file>
+        <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
+        <file alias="DUPLICATE_VIDEOS_FINDER">PreferenceIcons/DUPLICATE_VIDEOS_FINDER.png</file>
+
         <file alias="UNDO">View/UNDO.svg</file>
         <file alias="REDO">View/REDO.svg</file>
         <file alias="DISPLAY_DETAIL_INFOMATIONS">View/DISPLAY_DETAIL_INFOMATIONS.png</file>
@@ -205,7 +209,7 @@
         <file alias="SUM">Database/SUM.svg</file>
         <file alias="UNION">Database/UNION.svg</file>
         <file alias="ZIP">Share/ZIP.ico</file>
-        <file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.svg</file>
+        <file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.png</file>
         <file alias="MIRROR_REVERT">RenameConflictIcons/MIRROR_REVERT.svg</file>
         <file alias="RESET">RenameConflictIcons/RESET.svg</file>
         <file alias="TIME_AXIS">RenameConflictIcons/TIME_AXIS.svg</file>

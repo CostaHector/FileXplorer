@@ -1,29 +1,41 @@
 #ifndef PROPERTIESWINDOW_H
 #define PROPERTIESWINDOW_H
 
-#include <QAction>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QPlainTextEdit>
+#include <QTextEdit>
+#include <QVBoxLayout>
 #include <QToolBar>
+
 class PropertiesWindow : public QDialog {
-  Q_OBJECT
  public:
-  explicit PropertiesWindow(const QStringList& items, QWidget* parent = nullptr);
-  QSize sizeHint() const { return QSize(600, 400); }
+  explicit PropertiesWindow(QWidget* parent = nullptr);
+  bool operator()(const QStringList& items);
+
+  void ReadSetting();
+  void closeEvent(QCloseEvent* event) override;
+
  protected:
   bool UpdateMessage();
-  bool operator()(const QStringList& items);
 
  private:
   void subscribe();
 
+  void InitCommonInfo();
+  void InitDurationInfo();
+  void InitFileIndentifierInfo();
+
   QStringList m_items;
-  QPlainTextEdit* m_propertiesInfoTextEdit;
-  QDialogButtonBox* m_buttonBox;
-  QAction* m_showMore;
-  QAction* m_showMD5;
-  QToolBar* m_extraToolbar;
+  QTextEdit* m_propertiesInfoTextEdit{new QTextEdit(this)};
+
+  QVBoxLayout* m_mainLo{new QVBoxLayout{this}};
+  QToolBar* m_propertyTB{nullptr};
+
+  QString m_commonInfomation;
+  QString m_durations;
+  QString m_fileIdentifier;
+
+  static const QString STRING_SPLITTER;
 };
 
 #endif  // PROPERTIESWINDOW_H
+
