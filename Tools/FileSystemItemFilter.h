@@ -38,28 +38,8 @@ class FileSystemItemFilter {
     return itemStatistic;
   }
 
-  static QStringList FilesOut(const QStringList& items, const QStringList& nameFilters = {}) {
-    QStringList files;
-    for (const QString& path : items) {
-      QFileInfo fi(path);
-      if (fi.isFile()) {
-        files << fi.absoluteFilePath();
-        continue;
-      }
-      if (fi.isDir()) {
-        QDirIterator it(path, nameFilters, QDir::Filter::Files, QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-          it.next();
-          if (it.fileInfo().isFile()) {
-            files << it.filePath();
-          }
-        }
-        continue;
-      }
-    }
-    return files;
-  }
-  static QStringList MP4Out(const QStringList& items) { return FilesOut(items, {"*.mp4"}); }
+  static QStringList FilesOut(const QStringList& items, const QStringList& nameFilters = {});
+  static QStringList MP4Out(const QStringList& items);
 };
 
 #endif  // FILESYSTEMITEMFILTER_H
