@@ -55,30 +55,7 @@ class RecycleBinHelper {
     return recycleRootPath + '/' + QString::number(id);
   }
 
-  static QString GetRecyleBinRootPath(const QString& path) {
-    static QSet<QChar> availableDriver;
-#ifdef _WIN32
-    if (path.isEmpty()) {
-      qWarning("Never pass an empty path here");
-      return "";
-    }
-    const QChar driverLetter = path.front();
-    QString recycleRootPath = driverLetter + QString(":/.recyle");
-#else
-    const QChar driverLetter = '/';
-    QString recycleRootPath = SystemPath::desktopPath + '/' + ".recyle";
-#endif
-    if (availableDriver.contains(driverLetter)) {
-      return recycleRootPath;
-    }
-    const bool pathMkResult = QDir("").mkpath(recycleRootPath);
-    if (not pathMkResult) {
-      qWarning("Cannot make recycle root path[%s]", qPrintable(recycleRootPath));
-      return "";
-    }
-    availableDriver.insert(driverLetter);
-    return recycleRootPath;
-  }
+  static QString GetRecyleBinRootPath(const QString& path);
 
   static int UseCurrentBatchID() { return s_item_id++; }
   static QMap<int, int> s_batchID2Cnt;

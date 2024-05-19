@@ -74,4 +74,10 @@ level1: typeFilterToolButton FileSystemModel
 level2: searchModeComboBox, CaseSensitiveToolButton, searchColumnComboBox, e.g., SortFilterMode
 
 
+# Install Suggestion
 
+## 1. fsearch
+
+Install in app store:
+
+https://github.com/cboxdoerfer/fsearch/wiki/Snap-is-no-longer-officially-supported
