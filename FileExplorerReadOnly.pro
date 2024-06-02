@@ -11,6 +11,7 @@ LIBS += -lz
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Actions/AchiveFilesActions.cpp \
     Actions/AddressBarActions.cpp \
     Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
     Component/AdvanceSearchMenu.cpp \
     Component/AdvanceSearchToolBar.cpp \
     Component/AlertSystem.cpp \
+    Component/ArchiveFilesPreview.cpp \
     Component/ClickableSlider.cpp \
     Component/ConflictsRecycle.cpp \
     Component/CustomStatusBar.cpp \
@@ -73,7 +75,7 @@ SOURCES += \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/VidModel.cpp \
-    Tools/ArchieveFiles.cpp \
+    Tools/ArchiveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/FolderPreviewSwitcher.cpp \
     Tools/Log.cpp \
@@ -155,6 +157,7 @@ SOURCES += \
     FileExplorerReadOnly.cpp
 
 HEADERS += \
+    Actions/AchiveFilesActions.h \
     Actions/AddressBarActions.h \
     Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
@@ -180,6 +183,7 @@ HEADERS += \
     Component/AdvanceSearchMenu.h \
     Component/AdvanceSearchToolBar.h \
     Component/AlertSystem.h \
+    Component/ArchiveFilesPreview.h \
     Component/ClickableSlider.h \
     Component/ConflictsRecycle.h \
     Component/CustomStatusBar.h \
@@ -217,7 +221,7 @@ HEADERS += \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/VidModel.h \
-    Tools/ArchieveFiles.h \
+    Tools/ArchiveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \
