@@ -1,4 +1,5 @@
 #include "FileSystemMenu.h"
+#include "Actions/AchiveFilesActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
@@ -8,6 +9,7 @@ FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(ti
 
   addActions(g_viewActions()._VIDEO_PLAYERS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
+  addAction(g_AchiveFilesActions().ARCHIEVE_PREVIEW);
   addSeparator();
   addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
   addSeparator();
@@ -17,7 +19,7 @@ FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(ti
   addSeparator();
   addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
   addSeparator();
-  
+
   addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
   addSeparator();
   addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
@@ -61,7 +63,7 @@ QMenu* FileSystemMenu::GetRenameMenu() {
   return renameMenuLevel2;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

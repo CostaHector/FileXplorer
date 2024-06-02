@@ -2,13 +2,16 @@ QT       += core gui sql multimedia multimediawidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
-# LIBS += -lz
-LIBS += -ldl
+#for windows
+LIBS += -lz
+# for linux
+#LIBS += -ldl
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Actions/AchiveFilesActions.cpp \
     Actions/AddressBarActions.cpp \
     Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
@@ -34,6 +37,7 @@ SOURCES += \
     Component/AdvanceSearchMenu.cpp \
     Component/AdvanceSearchToolBar.cpp \
     Component/AlertSystem.cpp \
+    Component/ArchiveFilesPreview.cpp \
     Component/ClickableSlider.cpp \
     Component/ConflictsRecycle.cpp \
     Component/CustomStatusBar.cpp \
@@ -71,14 +75,13 @@ SOURCES += \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/VidModel.cpp \
-    Tools/ArchieveFiles.cpp \
+    Tools/ArchiveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/FolderPreviewSwitcher.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
-    Tools/QCompressor.cpp \
     Tools/QMediaInfo.cpp \
     Tools/RenameNamesUnique.cpp \
     Tools/SearchProxyModel.cpp \
@@ -154,6 +157,7 @@ SOURCES += \
     FileExplorerReadOnly.cpp
 
 HEADERS += \
+    Actions/AchiveFilesActions.h \
     Actions/AddressBarActions.h \
     Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
@@ -179,6 +183,7 @@ HEADERS += \
     Component/AdvanceSearchMenu.h \
     Component/AdvanceSearchToolBar.h \
     Component/AlertSystem.h \
+    Component/ArchiveFilesPreview.h \
     Component/ClickableSlider.h \
     Component/ConflictsRecycle.h \
     Component/CustomStatusBar.h \
@@ -216,7 +221,7 @@ HEADERS += \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/VidModel.h \
-    Tools/ArchieveFiles.h \
+    Tools/ArchiveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \
@@ -224,7 +229,6 @@ HEADERS += \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
     Tools/NameTool.h \
-    Tools/QCompressor.h \
     Tools/QMediaInfo.h \
     Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \
@@ -319,7 +323,6 @@ DISTFILES += \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \
     bin/PerformerHtmlTemplate.html \
-    bin/JsonExample/StudioName - Movie Name - Performer 1, Performer 2.json \
     readme.md
 
 QMAKE_POST_LINK +=
