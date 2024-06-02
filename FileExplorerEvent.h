@@ -29,6 +29,7 @@ class LogView;
 class AdvanceRenamer;
 class PropertiesWindow;
 class DuplicateVideosFinder;
+class ArchiveFilesPreview;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
@@ -39,6 +40,7 @@ class FileExplorerEvent : public QObject {
  private:
   FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent);
   void subscribe();
+  void subsribeCompress();
 
   void onRename(AdvanceRenamer* renameWid);
   auto onRenamePre() const -> std::pair<QString, QStringList>;
@@ -71,6 +73,11 @@ class FileExplorerEvent : public QObject {
 
   bool on_revealInExplorer() const;
   bool on_OpenInTerminal() const;
+
+  bool on_compress();
+  bool on_deCompress();
+  bool on_compressImgsByGroup();
+  bool on_archivePreview();
 
   auto on_moveToTrashBin() -> bool;
 
@@ -109,6 +116,7 @@ class FileExplorerEvent : public QObject {
 
   AlertSystem* m_alertSystem{nullptr};
   LogView* m_logView{nullptr};
+  ArchiveFilesPreview* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
  signals:
  private:
