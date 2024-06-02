@@ -1,6 +1,7 @@
 #include "PreviewLabels.h"
 #include "PublicVariable.h"
 
+#include "Tools/ArchiveFiles.h"
 constexpr int PreviewLabels::SLIDE_TO_NEXT_IMG_TIME_INTERVAL;  // ms
 constexpr int PreviewLabels::MAX_LABEL_CNT;
 
@@ -30,7 +31,10 @@ bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
   if (pathFi.isFile()) {
     const QString& suffix = "*." + QFileInfo(path).suffix().toLower();
     if (TYPE_FILTER::IMAGE_TYPE_SET.contains(suffix)) {
-      m_imgsUnderAPath = QStringList{path};
+      m_imgsUnderAPath = QVariantList{path};
+    } else if (TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET.contains(suffix)) {
+      ArchiveFiles af{path};
+      m_imgsUnderAPath = af.PreviewFirstKItems(-1);
     }
     if (TYPE_FILTER::VIDEO_TYPE_SET.contains(suffix)) {
       m_vidsCountUnderAPath = 1;
@@ -42,6 +46,17 @@ bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
     dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
     for (const QString& imgName : dir.entryList()) {
       m_imgsUnderAPath.append(dir.absoluteFilePath(imgName));
+    }
+    // show .qz as image preview only when images not exist
+    if (m_imgsUnderAPath.isEmpty()) {
+      dir.setNameFilters(TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET);
+      const QStringList& qzNamesList = dir.entryList();
+      if (not qzNamesList.isEmpty()) {
+        // only show first qz file
+        const QString& qzFilePath = dir.absoluteFilePath(qzNamesList.front());
+        ArchiveFiles af{qzFilePath};
+        m_imgsUnderAPath = af.PreviewFirstKItems(-1);
+      }
     }
     dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
     m_vidsCountUnderAPath = dir.entryList().size();
@@ -59,9 +74,20 @@ auto PreviewLabels::nxtImgInFolder() -> void {
       m_imgLabelsList[labelCnt]->setText("placeholder");
       continue;
     }
-    QPixmap pm(m_imgsUnderAPath[m_inFolderImgIndex++]);
-    m_imgLabelsList[labelCnt]->setPixmap(pm.scaledToWidth(width()));
+    const QVariant& imgEle = m_imgsUnderAPath[m_inFolderImgIndex];
+    ++m_inFolderImgIndex;
+
     m_isLabelDirty = true;
+    QPixmap pm;
+    if (imgEle.type() == QVariant::String) {
+      pm.load(imgEle.toString());
+    } else if (imgEle.type() == QVariant::ByteArray) {
+      pm.loadFromData(imgEle.toByteArray());
+    } else {
+      qWarning("imgEle type is invalid %d", int(imgEle.type()));
+      return;
+    }
+    m_imgLabelsList[labelCnt]->setPixmap(pm.scaledToWidth(width()));
   }
 }
 

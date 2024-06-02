@@ -2,6 +2,7 @@
 #include <QMenu>
 #include <QTabBar>
 #include <QToolButton>
+#include "Actions/AchiveFilesActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/FileLeafAction.h"
 #include "Actions/FolderPreviewActions.h"
@@ -162,6 +163,11 @@ QToolBar* RibbonMenu::LeafHome() const {
 
   QToolButton* recycleItemsTB = DropListToolButton(nullptr, g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
 
+  QToolBar* archievePreviewToolBar = new QToolBar("ArchievePreview");
+  archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIEVE_PREVIEW);
+  archievePreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  archievePreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+
   QToolBar* selectionToolBar = new QToolBar("Selection");
   {
     selectionToolBar->addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
@@ -170,6 +176,18 @@ QToolBar* RibbonMenu::LeafHome() const {
     selectionToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
     selectionToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
     SetLayoutAlightment(selectionToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+  }
+
+  QToolBar* compressToolBar = new QToolBar("Compress/Decompress");
+  {
+    compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_HERE);
+    compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_IMAGES);
+    compressToolBar->addAction(g_AchiveFilesActions().DECOMPRESSED_HERE);
+    compressToolBar->setOrientation(Qt::Orientation::Vertical);
+    compressToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+    compressToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    compressToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+    SetLayoutAlightment(compressToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
   const QString& _defRenameActName = PreferenceSettings().value(MemoryKey::DEFAULT_RENAME_CHOICE.name, MemoryKey::DEFAULT_RENAME_CHOICE.v).toString();
@@ -202,6 +220,9 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addWidget(newItemsTB);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(selectionToolBar);
+  leafHomeWid->addSeparator();
+  leafHomeWid->addWidget(archievePreviewToolBar);
+  leafHomeWid->addWidget(compressToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(advanceSearchToolBar);
   return leafHomeWid;

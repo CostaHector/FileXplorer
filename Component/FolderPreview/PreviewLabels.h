@@ -61,7 +61,7 @@ class PreviewLabels : public QScrollArea {
   QWidget* m_imgsBanner;
 
   int m_vidsCountUnderAPath = 0;
-  QStringList m_imgsUnderAPath;
+  QVariantList m_imgsUnderAPath;
 
   QTimer* m_nextImgTimer = new QTimer{this};
 
