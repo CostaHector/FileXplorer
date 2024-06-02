@@ -22,6 +22,9 @@ auto FileOperation::moveToTrash(const QString& pres, const QString& rels) -> Fil
   for (int i = 0; i < paths.size(); ++i) {
     const QString& pre = paths[i];
     const QString& rel = names[i];
+    if (pre.isEmpty() and rel.isEmpty()) {
+      continue;
+    }
     const QString& pth = QDir(pre).absoluteFilePath(rel);
     if (not QFile::exists(pth)) {
       continue;
