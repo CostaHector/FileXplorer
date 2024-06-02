@@ -315,6 +315,7 @@ const QStringList VIDEO_TYPE_SET = {"*.mp4", "*.mov", "*.avi", "*.flv", "*.wmv",
 const QStringList IMAGE_TYPE_SET = {"*.jpeg", "*.jpg", "*.png", "*.tiff", "*.jfif", "*.gif", "*.webp", "*.ico", "*.svg"};
 const QStringList JSON_TYPE_SET = {"*.json"};
 const QStringList TEXT_TYPE_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat"};
+const QStringList BUILTIN_COMPRESSED_TYPE_SET = {"*.qz"};
 }  // namespace TYPE_FILTER
 
 enum class CCMMode { ERROR_OP = -1, MERGE_OP = 0, COPY_OP = 1, CUT_OP = 2, LINK_OP = 3 };
