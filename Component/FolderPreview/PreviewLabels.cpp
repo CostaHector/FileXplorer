@@ -5,6 +5,17 @@
 constexpr int PreviewLabels::SLIDE_TO_NEXT_IMG_TIME_INTERVAL;  // ms
 constexpr int PreviewLabels::MAX_LABEL_CNT;
 
+void PreviewLabels::setDockerWindowTitle() {
+  if (m_parentDocker == nullptr) {
+    return;
+  }
+  QString title;
+  title += QString::number(m_vidsCountUnderAPath);
+  title += '|';
+  title += QString::number(m_imgsUnderAPath != nullptr ? m_imgsUnderAPath->size() : 0);
+  m_parentDocker->setWindowTitle(title);
+}
+
 void PreviewLabels::operator()(const QString& folderPath) {
   if (m_nextImgTimer->isActive()) {
     m_nextImgTimer->stop();
@@ -12,50 +23,64 @@ void PreviewLabels::operator()(const QString& folderPath) {
   m_inFolderImgIndex = 0;
   getImgsPathAndVidsCount(folderPath);
   setDockerWindowTitle();
-  if (m_imgsUnderAPath.isEmpty()) {
+  if (m_imgsUnderAPath != nullptr and m_imgsUnderAPath->isEmpty()) {
     clearLabelContents();
     return;
   }
 
   nxtImgInFolder();
-  if (m_imgsUnderAPath.size() > MAX_LABEL_CNT) {
+  if (m_imgsUnderAPath != nullptr and m_imgsUnderAPath->size() > MAX_LABEL_CNT) {
     m_nextImgTimer->start();
   }
 }
 
+void PreviewLabels::ResetImgsList(FilesListBase* pImgsList) {
+  if (m_imgsUnderAPath == nullptr) {
+    m_imgsUnderAPath = pImgsList;
+    return;
+  }
+  delete m_imgsUnderAPath;
+  m_imgsUnderAPath = pImgsList;
+}
+
 bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
-  m_imgsUnderAPath.clear();
+  if (m_imgsUnderAPath != nullptr) {
+    m_imgsUnderAPath->clear();
+  }
   m_vidsCountUnderAPath = 0;
 
   QFileInfo pathFi(path);
   if (pathFi.isFile()) {
     const QString& suffix = "*." + QFileInfo(path).suffix().toLower();
     if (TYPE_FILTER::IMAGE_TYPE_SET.contains(suffix)) {
-      m_imgsUnderAPath = QVariantList{path};
+      ResetImgsList(new PlainStringList(QStringList{path}));
     } else if (TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET.contains(suffix)) {
-      ArchiveFiles af{path};
-      m_imgsUnderAPath = af.PreviewFirstKItems(-1);
+      ResetImgsList(new ArchiveFiles{path});
     }
     if (TYPE_FILTER::VIDEO_TYPE_SET.contains(suffix)) {
       m_vidsCountUnderAPath = 1;
     }
     return true;
   }
+
   if (pathFi.isDir()) {
     QDir dir(path, "*", QDir::SortFlag::NoSort, QDir::Filter::Files);
     dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+    QStringList imgs;
     for (const QString& imgName : dir.entryList()) {
-      m_imgsUnderAPath.append(dir.absoluteFilePath(imgName));
+      imgs.append(dir.absoluteFilePath(imgName));
     }
+
     // show .qz as image preview only when images not exist
-    if (m_imgsUnderAPath.isEmpty()) {
+    if (not imgs.isEmpty()) {
+      ResetImgsList(new PlainStringList(imgs));
+    } else {
       dir.setNameFilters(TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET);
       const QStringList& qzNamesList = dir.entryList();
       if (not qzNamesList.isEmpty()) {
         // only show first qz file
         const QString& qzFilePath = dir.absoluteFilePath(qzNamesList.front());
-        ArchiveFiles af{qzFilePath};
-        m_imgsUnderAPath = af.PreviewFirstKItems(-1);
+        ResetImgsList(new ArchiveFiles{qzFilePath});
       }
     }
     dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
@@ -66,15 +91,18 @@ bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
 }
 
 auto PreviewLabels::nxtImgInFolder() -> void {
+  if (m_imgsUnderAPath == nullptr) {
+    return;
+  }
   for (int labelCnt = 0; labelCnt < MAX_LABEL_CNT; ++labelCnt) {
-    if (m_inFolderImgIndex >= m_imgsUnderAPath.size()) {
+    if (m_inFolderImgIndex >= m_imgsUnderAPath->size()) {
       if (m_nextImgTimer->isActive()) {
         m_nextImgTimer->stop();
       }
       m_imgLabelsList[labelCnt]->setText("placeholder");
       continue;
     }
-    const QVariant& imgEle = m_imgsUnderAPath[m_inFolderImgIndex];
+    const QVariant& imgEle = (*m_imgsUnderAPath)[m_inFolderImgIndex];
     ++m_inFolderImgIndex;
 
     m_isLabelDirty = true;
