@@ -6,24 +6,48 @@
 #include <QFileInfo>
 #include <QSet>
 #include <QString>
+#include <QVariant>
+class ArchiveImagesRecusive;
 
-class ArchiveFiles {
+class FilesListBase {
  public:
+  FilesListBase() = default;
+  virtual ~FilesListBase() = default;
+  virtual bool isEmpty() const = 0;
+  virtual int size() const = 0;
+  virtual QVariant operator[](const int i) const = 0;
+  virtual void clear() = 0;
+};
+
+class PlainStringList : public FilesListBase {
+ public:
+  PlainStringList(const QStringList& lst) : FilesListBase(), m_lst{lst} {}
+  PlainStringList(QStringList&& lst) : FilesListBase(), m_lst{lst} {}
+  virtual bool isEmpty() const override { return m_lst.isEmpty(); }
+  virtual int size() const override { return m_lst.size(); }
+  virtual QVariant operator[](const int i) const override { return m_lst[i]; }
+  virtual void clear() override { m_lst.clear(); }
+
+  QStringList m_lst;
+};
+
+class ArchiveFiles : public FilesListBase {
+ public:
+  friend class ArchiveImagesRecusive;
   enum OPERATION_TYPE { A_FOLDER = 0, FILES };
   enum COMPRESS_FILETYPE_FILTER { NO_FILTER = 0, ONLY_IMAGE, ONLY_PLAIN_TEXT };
 
-  static int CompressImagesByGroup(const QString& rootPath, bool recycleAfterCompressed = true);
-
-  ArchiveFiles(const QString& achieveName, const COMPRESS_FILETYPE_FILTER& compressFileType = NO_FILTER);
+  ArchiveFiles(const QString& achieveName = "", const COMPRESS_FILETYPE_FILTER& compressFileType = NO_FILTER);
+  void ResetPath(const QString& achieveName = "");
   ~ArchiveFiles();
 
-  QVariantList PreviewFirstKItems(int k = -1);
-  bool ReadFirstKItemsOut(int k, QStringList& paths, QByteArrayList& datas);
+  static bool isQZFile(const QFileInfo& fi);
+  static bool isQZFile(const QString& path);
 
   bool CompressNow(OPERATION_TYPE type, const QStringList& paths, bool enableAppend = true);
   bool DecompressToPath(const QString& dstPath);
 
-  bool deleteAchieveFile() const {
+  bool deleteAchieveFile() {
     if (not m_fi.exists()) {
       qDebug("achieve file[%s] already not exist", qPrintable(m_fi.fileName()));
       return false;
@@ -31,7 +55,7 @@ class ArchiveFiles {
     return QFile::moveToTrash(m_fi.fileName());
   }
 
-  QByteArray compress(const QByteArray& source) const {
+  QByteArray compress(const QByteArray& source) {
     switch (m_compressFilesType) {
       case ONLY_PLAIN_TEXT:
         return qCompress(source, PLAIN_TEXT_FILE_COMPRESS_LEVEL);
@@ -48,9 +72,22 @@ class ArchiveFiles {
         return compressed;
     }
   }
+  virtual void clear() override {
+    m_fi.setFileName("");
+    m_ds.setDevice(nullptr);
+    m_names.clear();
+    m_datas.clear();
+  }
+  virtual bool isEmpty() const override { return m_names.isEmpty(); }
+  virtual int size() const override { return m_names.size(); }
+  virtual QVariant operator[](const int i) const override { return m_datas[i]; }
+
+  const QString& key(int i) const { return m_names[i]; }
+  QByteArray value(int i) const { return m_datas[i].toByteArray(); }
+  const QVariantList& getByteArrayList() const { return m_datas; }
 
  private:
-  static bool CompressADirectlyPath(const QString& path, const QString& qzBaseName, QString& allPres, QString& allNames);
+  bool ReadItemsCount();
 
   bool IsNeedCompress(const QString& suffix) const;
   QStringList GetCompressType() const;
@@ -59,8 +96,23 @@ class ArchiveFiles {
 
   QFile m_fi;
   QDataStream m_ds;
-  const COMPRESS_FILETYPE_FILTER m_compressFilesType;
+  QStringList m_names;
+  QVariantList m_datas;
 
+  COMPRESS_FILETYPE_FILTER m_compressFilesType;
   static constexpr int PLAIN_TEXT_FILE_COMPRESS_LEVEL = -1;
+  static constexpr int MAX_COMPRESSED_IMG_CNT = 30;
 };
+
+class ArchiveImagesRecusive {
+ public:
+  ArchiveImagesRecusive(bool autoRecycle = true) : m_autoRecycle{autoRecycle} {}
+  int CompressImgRecur(const QString& rootPath);
+  bool CompressSubfolder(const QString& path, const QString& qzBaseName);
+
+ private:
+  QStringList m_allPres, m_allNames;
+  bool m_autoRecycle;
+};
+
 #endif  // ARCHIVEFILES_H
