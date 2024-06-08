@@ -1,5 +1,7 @@
 #include "ContentPanel.h"
+#include "Actions/AchiveFilesActions.h"
 #include "Component/NotificatorFrame.h"
+#include "Tools/ArchiveFiles.h"
 
 #include <QLineEdit>
 #include <QTableView>
@@ -143,12 +145,28 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
       return false;
     }
   }
-  // file system view change path to directory. otherwise open in system explorer
-  if (fi.isFile() or not isFSView()) {
+
+  // For File
+  // qz File Open in QZ Archive always
+  // other file: open in QDesktopService
+
+  // For Folder
+  // FileSystemView: change file system view path to directory.
+  // Non-FileSystemView: open in QDesktopService;
+
+  if (fi.isFile()) {
+    if (ArchiveFiles::isQZFile(fi)) {
+      emit g_AchiveFilesActions().ARCHIVE_PREVIEW->trigger();
+      return true;
+    }
     return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
   }
+
   if (fi.isDir()) {
-    onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
+    if (isFSView()) {
+      return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
+    }
+    return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
   }
   return true;
 }

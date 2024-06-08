@@ -37,7 +37,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
     return false;
   }
   if (not conflictIF) {  // conflict
-    tfm->on_Submit();
+    tfm->on_completeMerge();
   } else {
     tfm->exec();
   }
