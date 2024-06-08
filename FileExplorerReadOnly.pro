@@ -37,7 +37,7 @@ SOURCES += \
     Component/AdvanceSearchMenu.cpp \
     Component/AdvanceSearchToolBar.cpp \
     Component/AlertSystem.cpp \
-    Component/ArchiveFilesPreview.cpp \
+    Component/Archiver.cpp \
     Component/ClickableSlider.cpp \
     Component/ConflictsRecycle.cpp \
     Component/CustomStatusBar.cpp \
@@ -183,7 +183,7 @@ HEADERS += \
     Component/AdvanceSearchMenu.h \
     Component/AdvanceSearchToolBar.h \
     Component/AlertSystem.h \
-    Component/ArchiveFilesPreview.h \
+    Component/Archiver.h \
     Component/ClickableSlider.h \
     Component/ConflictsRecycle.h \
     Component/CustomStatusBar.h \
