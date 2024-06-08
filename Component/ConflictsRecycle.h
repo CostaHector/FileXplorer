@@ -38,11 +38,10 @@ class ConflictsRecycle : public QDialog {
   QVBoxLayout* m_mainLayout{new QVBoxLayout{this}};
   QPlainTextEdit* m_commandsPreview{new QPlainTextEdit};
 
-  auto on_Submit() -> bool;
+  auto on_completeMerge() -> bool;
   bool on_ShowCommand();
 
   bool on_doubleClicked();
-  bool on_batchSetKeepOrRecycle();
 
   void Subscribe();
   bool on_Open(const QModelIndex& index);
