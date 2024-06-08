@@ -48,7 +48,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
   if (viewType == "table") {
     if (_view->m_fsTableView == nullptr) {
       _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel);
-      ContentPanel::connect(_view->m_fsTableView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_fsTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsTableView);
     }
@@ -59,7 +59,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
   } else if (viewType == "list") {
     if (_view->m_fsListView == nullptr) {
       _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
-      ContentPanel::connect(_view->m_fsListView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_fsListView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsListView);
     }
@@ -70,7 +70,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
   } else if (viewType == "tree") {
     if (_view->m_fsTreeView == nullptr) {
       _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel);
-      ContentPanel::connect(_view->m_fsTreeView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_fsTreeView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsTreeView);
     }
@@ -82,7 +82,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     if (_view->m_movieView == nullptr) {
       _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
       _view->m_movieView = new MovieDBView(_view->_dbSearchBar, _view->m_dbModel, _view);
-      ContentPanel::connect(_view->m_movieView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->AddView(viewType, _view->m_movieView);
     }
     _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->getMovieTableName()));
@@ -92,7 +92,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->m_srcModel = new AdvanceSearchModel;
       _view->m_proxyModel = new SearchProxyModel;
       _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_srcModel, _view->m_proxyModel, _view);
-      ContentPanel::connect(_view->m_advanceSearchView, &QTableView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      ContentPanel::connect(_view->m_advanceSearchView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
 
       _view->m_advanceSearchView->BindLogger(_view->_logger);
       if (_navigation->m_advanceSearchBar != nullptr) {
