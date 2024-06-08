@@ -9,10 +9,12 @@
 #include <QPixmap>
 #include <QScrollArea>
 #include <QSet>
+#include <QStack>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QStack>
+
+class FilesListBase;
 
 class PreviewLabels : public QScrollArea {
  public:
@@ -31,15 +33,13 @@ class PreviewLabels : public QScrollArea {
     m_nextImgTimer->setSingleShot(false);
     connect(m_nextImgTimer, &QTimer::timeout, this, &PreviewLabels::nxtImgInFolder);
   }
+  ~PreviewLabels() { ResetImgsList(); }
 
-  void setDockerWindowTitle() {
-    if (m_parentDocker == nullptr) {
-      return;
-    }
-    m_parentDocker->setWindowTitle(QString::number(m_vidsCountUnderAPath) + '|' + QString::number(m_imgsUnderAPath.size()));
-  }
+  void setDockerWindowTitle();
 
   void operator()(const QString& folderPath);
+
+  void ResetImgsList(FilesListBase* pImgsList = nullptr);
 
   void clearLabelContents() {
     if (not m_isLabelDirty)
@@ -61,7 +61,7 @@ class PreviewLabels : public QScrollArea {
   QWidget* m_imgsBanner;
 
   int m_vidsCountUnderAPath = 0;
-  QVariantList m_imgsUnderAPath;
+  FilesListBase* m_imgsUnderAPath{nullptr};
 
   QTimer* m_nextImgTimer = new QTimer{this};
 

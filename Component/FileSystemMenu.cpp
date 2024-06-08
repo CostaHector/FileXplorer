@@ -9,7 +9,7 @@ FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(ti
 
   addActions(g_viewActions()._VIDEO_PLAYERS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
-  addAction(g_AchiveFilesActions().ARCHIEVE_PREVIEW);
+  addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
   addSeparator();
   addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
   addSeparator();

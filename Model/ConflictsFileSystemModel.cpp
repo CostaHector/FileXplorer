@@ -1,6 +1,6 @@
 #include "ConflictsFileSystemModel.h"
 
-const QStringList ConflictsFileSystemModel::HORIZONTAL_HEADER_NAMES = {"name", "delete left", "size", "date", "size", "date"};
+const QStringList ConflictsFileSystemModel::HORIZONTAL_HEADER_NAMES = {"name", "Delete Incoming", "size", "date", "size", "date"};
 
 ConflictsFileSystemModel::ConflictsFileSystemModel(const ConflictsItemHelper& conflictItemsHelper,
                                                    const KEEP_PRIORITY keepPriority,
