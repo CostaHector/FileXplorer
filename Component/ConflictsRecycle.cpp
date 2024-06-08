@@ -58,7 +58,7 @@ void ConflictsRecycle::closeEvent(QCloseEvent* event) {
   QDialog::closeEvent(event);
 }
 
-auto ConflictsRecycle::on_Submit() -> bool {
+auto ConflictsRecycle::on_completeMerge() -> bool {
   if (not m_conflictModel->isCommandsAvail()) {
     m_conflictModel->updateCommands();
   }
@@ -81,7 +81,7 @@ bool ConflictsRecycle::on_ShowCommand() {
 }
 
 auto ConflictsRecycle::Subscribe() -> void {
-  connect(buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &ConflictsRecycle::on_Submit);
+  connect(buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &ConflictsRecycle::on_completeMerge);
   connect(buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &ConflictsRecycle::close);
   connect(buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::clicked, this, &ConflictsRecycle::on_ShowCommand);
 

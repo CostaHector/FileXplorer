@@ -29,7 +29,7 @@ class LogView;
 class AdvanceRenamer;
 class PropertiesWindow;
 class DuplicateVideosFinder;
-class ArchiveFilesPreview;
+class Archiver;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
@@ -116,7 +116,7 @@ class FileExplorerEvent : public QObject {
 
   AlertSystem* m_alertSystem{nullptr};
   LogView* m_logView{nullptr};
-  ArchiveFilesPreview* m_archivePreview{nullptr};
+  Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
  signals:
  private:

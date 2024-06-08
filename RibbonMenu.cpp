@@ -164,7 +164,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolButton* recycleItemsTB = DropListToolButton(nullptr, g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
 
   QToolBar* archievePreviewToolBar = new QToolBar("ArchievePreview");
-  archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIEVE_PREVIEW);
+  archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
   archievePreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   archievePreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 

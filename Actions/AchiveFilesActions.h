@@ -17,7 +17,7 @@ class AchiveFilesActions : public QObject {
 
   QAction* COMPRESSED_IMAGES{new QAction{"Compress Images", this}};
 
-  QAction* ARCHIEVE_PREVIEW{new QAction{QIcon(":/themes/COMPRESS_ITEM"), "Archieve preview", this}};
+  QAction* ARCHIVE_PREVIEW{new QAction{QIcon(":/themes/COMPRESS_ITEM"), "Archive", this}};
 };
 
 AchiveFilesActions& g_AchiveFilesActions();
