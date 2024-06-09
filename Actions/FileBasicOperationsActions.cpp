@@ -252,6 +252,11 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "<b>Differ videos by duration or filesize</b>"
       "to let it easy to find duplicate one");
   _DUPLICATE_VIDEOS_FINDER->setCheckable(true);
+
+  _REDUNDANT_IMAGES_FINDER->setToolTip(
+      "<b>Find empty or redundant images</b>"
+      "to let it easy to find duplicate one");
+  _REDUNDANT_IMAGES_FINDER->setCheckable(true);
 }
 
 FileBasicOperationsActions& g_fileBasicOperationsActions() {

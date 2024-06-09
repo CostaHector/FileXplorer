@@ -262,6 +262,7 @@ const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PAT
                                              "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
                                              ValueChecker{{".bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+const KV WIN32_RUND_IMG_PATH("WIN32_RUND_IMG_PATH", ".", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
 const KV LINUX_MEDIAINFO_LIB_PATH("LINUX_MEDIAINFO_LIB_PATH",
                                   "../bin/lib/MediaInfo.dll",
@@ -277,6 +278,7 @@ const KV LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME",
                                     "../bin/STANDARD_STUDIO_NAME.json",
                                     ValueChecker{{".json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
+const KV LINUX_RUND_IMG_PATH("LINUX_RUND_IMG_PATH", ".", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
 const KV DUPLICATE_FINDER_DEVIATION_DURATION("DUPLICATE_FINDER_DEVIATION_DURATION", 2 * 1000, ValueChecker{0, 20 * 1000});         // 2s ~ 20s
 const KV DUPLICATE_FINDER_DEVIATION_FILESIZE("DUPLICATE_FINDER_DEVIATION_FILESIZE", 2 * 1024, ValueChecker{0, 30 * 1024 * 1024});  // 2kB ~ 30MB

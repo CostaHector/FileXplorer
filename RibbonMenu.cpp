@@ -2,7 +2,7 @@
 #include <QMenu>
 #include <QTabBar>
 #include <QToolButton>
-#include "Actions/AchiveFilesActions.h"
+#include "Actions/ArchiveFilesActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/FileLeafAction.h"
 #include "Actions/FolderPreviewActions.h"
@@ -60,7 +60,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
   addTab(m_leafDatabase, "&Database");
-  addTab(m_leafMore, "&More");
+  addTab(m_leafMore, "&Arrange");
 
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
@@ -272,13 +272,14 @@ QToolBar* RibbonMenu::LeafDatabase() const {
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
-  auto* archiveVidsTB = new QToolBar("Leaf Achive Files");
+  auto* archiveVidsTB = new QToolBar("Leaf Arrange Files");
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._NAME_STANDARDLIZER, g_fileBasicOperationsActions()._CLASSIFIER});
   archiveVidsTB->addSeparator();
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER, g_fileBasicOperationsActions()._REMOVE_REDUNDANT_ITEMS,
                              g_fileBasicOperationsActions()._REMOVE_EMPTY_FOLDER});
   archiveVidsTB->addSeparator();
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER});
+  archiveVidsTB->addActions({g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER});
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
