@@ -9,16 +9,30 @@
 
 constexpr int ArchiveFiles::PLAIN_TEXT_FILE_COMPRESS_LEVEL;
 constexpr int ArchiveFiles::MAX_COMPRESSED_IMG_CNT;
+constexpr int ArchiveFiles::INFO_ITEMS_CNT;
 
 ArchiveFiles::ArchiveFiles(const QString& achieveName, const COMPRESS_FILETYPE_FILTER& compressFileType)
     : m_fi{achieveName}, m_compressFilesType{compressFileType} {
   ReadItemsCount();
 }
 
-void ArchiveFiles::ResetPath(const QString& achieveName) {
-  clear();
-  m_fi.setFileName(achieveName);
-  ReadItemsCount();
+void ArchiveFiles::swap(ArchiveFiles& rhs) {
+  QString beforeName = m_fi.fileName(), afterName = rhs.m_fi.fileName();
+  beforeName.swap(afterName);
+  m_fi.setFileName(beforeName);
+  rhs.m_fi.setFileName(afterName);
+  // --
+  std::swap(m_compressFilesType, rhs.m_compressFilesType);
+  // --
+  auto *beforeDev = m_ds.device(), *afterDev = rhs.m_ds.device();
+  std::swap(beforeDev, afterDev);
+  m_ds.setDevice(beforeDev);
+  rhs.m_ds.setDevice(afterDev);
+  // --
+  m_names.swap(rhs.m_names);
+  m_beforeSize.swap(rhs.m_beforeSize);
+  m_afterSize.swap(rhs.m_afterSize);
+  m_datas.swap(rhs.m_datas);
 }
 
 ArchiveFiles::~ArchiveFiles() {
@@ -46,11 +60,7 @@ bool ArchiveFiles::ReadItemsCount() {
     m_ds.setDevice(&m_fi);
   }
   while (not m_ds.atEnd()) {
-    QString relFilePath;
-    QByteArray fileData;
-    m_ds >> relFilePath >> fileData;
-    m_names.append(relFilePath);
-    m_datas.append(decompress(fileData));
+    Read();
   }
   return true;
 }
@@ -138,7 +148,7 @@ bool ArchiveFiles::AppendAFolder(const QStringList& paths) {
       continue;
     }
     QByteArray data = compress(fi.readAll());
-    m_ds << fi.fileName().mid(PREPATH_LEN) << data;
+    WriteIntoFile(fi.fileName().mid(PREPATH_LEN), fi.size(), data);
     ++compSuccCnt;
     qDebug("File[%s] (%d bytes) compressed ok", qPrintable(fi.fileName()), data.size());
   }
@@ -162,7 +172,7 @@ bool ArchiveFiles::AppendFiles(const QStringList& filesPath) {
     }
     ++compSuccCnt;
     QByteArray data = compress(srcFi.readAll());
-    m_ds << fi.fileName() << data;
+    WriteIntoFile(fi.fileName(), fi.size(), data);
     qDebug("File[%s] (%d bytes) compressed ok", qPrintable(fi.fileName()), data.size());
   }
   qDebug("%d/%d files compressed ok", compSuccCnt, compTotalCnt);
