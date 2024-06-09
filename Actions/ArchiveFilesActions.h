@@ -1,13 +1,13 @@
-#ifndef ACHIVEFILESACTIONS_H
-#define ACHIVEFILESACTIONS_H
+#ifndef ARCHIVEFILESACTIONS_H
+#define ARCHIVEFILESACTIONS_H
 
 #include <QAction>
 #include <QActionGroup>
 #include <QObject>
 
-class AchiveFilesActions : public QObject {
+class ArchiveFilesActions : public QObject {
  public:
-  explicit AchiveFilesActions(QObject* parent = nullptr);
+  explicit ArchiveFilesActions(QObject* parent = nullptr);
 
   QAction* COMPRESSED_HERE{new QAction{QIcon(":/themes/COMPRESSED"), "Compressd here", this}};
   QAction* COMPRESSED_TO{new QAction{"Compressd to", this}};
@@ -20,6 +20,6 @@ class AchiveFilesActions : public QObject {
   QAction* ARCHIVE_PREVIEW{new QAction{QIcon(":/themes/COMPRESS_ITEM"), "Archive", this}};
 };
 
-AchiveFilesActions& g_AchiveFilesActions();
+ArchiveFilesActions& g_AchiveFilesActions();
 
-#endif  // ACHIVEFILESACTIONS_H
+#endif  // ARCHIVEFILESACTIONS_H

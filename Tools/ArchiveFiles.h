@@ -38,7 +38,8 @@ class ArchiveFiles : public FilesListBase {
   enum COMPRESS_FILETYPE_FILTER { NO_FILTER = 0, ONLY_IMAGE, ONLY_PLAIN_TEXT };
 
   ArchiveFiles(const QString& achieveName = "", const COMPRESS_FILETYPE_FILTER& compressFileType = NO_FILTER);
-  void ResetPath(const QString& achieveName = "");
+  void swap(ArchiveFiles& rhs);
+
   ~ArchiveFiles();
 
   static bool isQZFile(const QFileInfo& fi);
@@ -83,10 +84,32 @@ class ArchiveFiles : public FilesListBase {
   virtual QVariant operator[](const int i) const override { return m_datas[i]; }
 
   const QString& key(int i) const { return m_names[i]; }
+  const qint64& beforeSize(int i) const { return m_beforeSize[i]; }
+  const int& afterSize(int i) const { return m_afterSize[i]; }
+
   QByteArray value(int i) const { return m_datas[i].toByteArray(); }
   const QVariantList& getByteArrayList() const { return m_datas; }
 
  private:
+  inline void WriteIntoFile(const QString& name, const qint64& beforeSize, const QByteArray& fileData) {
+    m_ds << name << beforeSize << fileData.size() << fileData;
+  }
+  inline void Read() {
+    QString relFilePath;
+    qint64 beforeSize = 0;
+    int afterSize = 0;
+    QByteArray fileData;
+    if (INFO_ITEMS_CNT == 4) {
+      m_ds >> relFilePath >> beforeSize >> afterSize >> fileData;
+    } else if (INFO_ITEMS_CNT == 2) {
+      m_ds >> relFilePath >> fileData;
+    }
+    m_names.append(relFilePath);
+    m_beforeSize.append(beforeSize);
+    m_afterSize.append(afterSize);
+    m_datas.append(decompress(fileData));
+  }
+
   bool ReadItemsCount();
 
   bool IsNeedCompress(const QString& suffix) const;
@@ -97,11 +120,14 @@ class ArchiveFiles : public FilesListBase {
   QFile m_fi;
   QDataStream m_ds;
   QStringList m_names;
+  QList<qint64> m_beforeSize;
+  QList<int> m_afterSize;
   QVariantList m_datas;
 
   COMPRESS_FILETYPE_FILTER m_compressFilesType;
   static constexpr int PLAIN_TEXT_FILE_COMPRESS_LEVEL = -1;
   static constexpr int MAX_COMPRESSED_IMG_CNT = 30;
+  static constexpr int INFO_ITEMS_CNT = 4;
 };
 
 class ArchiveImagesRecusive {
