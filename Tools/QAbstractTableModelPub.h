@@ -1,0 +1,31 @@
+#ifndef QABSTRACTTABLEMODELPUB_H
+#define QABSTRACTTABLEMODELPUB_H
+
+#include <QAbstractTableModel>
+
+class QAbstractTableModelPub : public QAbstractTableModel {
+ public:
+  QAbstractTableModelPub(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
+  void RowsCountStartChange(int beforeRow, int afterRow) {
+    if (beforeRow == afterRow) {
+      return;
+    } else if (beforeRow < afterRow) {
+      beginInsertRows(QModelIndex(), 0, afterRow - 1);
+    } else {
+      beginRemoveRows(QModelIndex(), afterRow, beforeRow - 1);
+    }
+  }
+  void RowsCountEndChange(int beforeRow, int afterRow) {
+    if (beforeRow == afterRow) {
+      if (afterRow > 0 and rowCount() > 0) {
+        emit dataChanged(index(0, 0), index(afterRow - 1, rowCount() - 1), {Qt::ItemDataRole::DisplayRole});
+      }
+    } else if (beforeRow < afterRow) {
+      endInsertRows();
+    } else {
+      endRemoveRows();
+    }
+  }
+};
+
+#endif  // QABSTRACTTABLEMODELPUB_H
