@@ -2,7 +2,7 @@
 #define ArchiveFilesPreview_H
 #include "Tools/ArchiveFiles.h"
 class QLabel;
-class CustomListView;
+class CustomTableView;
 class ArchiverModel;
 class QSplitter;
 class QCheckBox;
@@ -30,11 +30,11 @@ class Archiver : public QMainWindow {
   QSlider* m_archiveSizeScale;
   QMenu* m_archiveMenu;
   QSplitter* m_splitter;
-  CustomListView* m_itemsList;
+  CustomTableView* m_itemsTable;
   ArchiverModel* m_archiverModel;
   QLabel* m_thumbnailViewer;
 
-  ArchiveFiles m_af, m_tempAf;
+  ArchiveFiles m_af;
 };
 
 #endif  // ArchiveFilesPreview_H
