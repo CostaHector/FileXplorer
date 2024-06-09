@@ -454,17 +454,17 @@
 <context>
     <name>FileSystemMenu</name>
     <message>
-        <location filename="../Component/FileSystemMenu.cpp" line="31"/>
+        <location filename="../Component/FileSystemMenu.cpp" line="33"/>
         <source>&amp;New</source>
         <translation>新建(&amp;N)</translation>
     </message>
     <message>
-        <location filename="../Component/FileSystemMenu.cpp" line="39"/>
+        <location filename="../Component/FileSystemMenu.cpp" line="41"/>
         <source>&amp;View</source>
         <translation>视图(&amp;V)</translation>
     </message>
     <message>
-        <location filename="../Component/FileSystemMenu.cpp" line="58"/>
+        <location filename="../Component/FileSystemMenu.cpp" line="60"/>
         <source>&amp;Rename</source>
         <translation>重命名(&amp;R)</translation>
     </message>
