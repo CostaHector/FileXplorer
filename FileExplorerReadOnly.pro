@@ -11,8 +11,8 @@ LIBS += -lz
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Actions/AchiveFilesActions.cpp \
     Actions/AddressBarActions.cpp \
+    Actions/ArchiveFilesActions.cpp \
     Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
     Actions/DuplicateVideosFinderActions.cpp \
@@ -58,6 +58,7 @@ SOURCES += \
     Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
+    Component/RedundantImageFinder.cpp \
     Component/RenameWidgets/RenameWidget_ArrangeSection.cpp \
     Component/SearchCaseMatterToolButton.cpp \
     Component/SearchModeComboBox.cpp \
@@ -157,8 +158,8 @@ SOURCES += \
     FileExplorerReadOnly.cpp
 
 HEADERS += \
-    Actions/AchiveFilesActions.h \
     Actions/AddressBarActions.h \
+    Actions/ArchiveFilesActions.h \
     Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
     Actions/DuplicateVideosFinderActions.h \
@@ -205,6 +206,7 @@ HEADERS += \
     Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
+    Component/RedundantImageFinder.h \
     Component/RenameWidgets/RenameWidget_ArrangeSection.h \
     Component/SearchCaseMatterToolButton.h \
     Component/SearchModeComboBox.h \
@@ -229,6 +231,7 @@ HEADERS += \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
     Tools/NameTool.h \
+    Tools/QAbstractTableModelPub.h \
     Tools/QMediaInfo.h \
     Tools/RenameNamesUnique.h \
     Tools/SearchProxyModel.h \
