@@ -29,6 +29,7 @@ class LogView;
 class AdvanceRenamer;
 class PropertiesWindow;
 class DuplicateVideosFinder;
+class RedundantImageFinder;
 class Archiver;
 
 class FileExplorerEvent : public QObject {
@@ -118,6 +119,7 @@ class FileExplorerEvent : public QObject {
   LogView* m_logView{nullptr};
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
+  RedundantImageFinder* m_redundantImageFinder{nullptr};
  signals:
  private:
   auto QueryCopyOrCut() -> CCMMode;
