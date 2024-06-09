@@ -59,6 +59,7 @@ QModelIndex PreferenceModel::setRootPath(const QString&) {
   m_alerts.append(AlertItem{10004, &MemoryKey::WIN32_RUNLOG, "Used in log records when some file operation failed."});
   m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Performers Widget"});
   m_alerts.append(AlertItem{10006, &MemoryKey::WIN32_MEDIAINFO_LIB_PATH, "Used in videos duration get"});
+  m_alerts.append(AlertItem{10007, &MemoryKey::WIN32_RUND_IMG_PATH, "Used in redundant images find"});
 #else
   m_alerts.append(
       AlertItem{10000, &MemoryKey::LINUX_PERFORMERS_TABLE, "Used in Json editor. Provide the ability to filter performers out from giving string"});
@@ -67,6 +68,7 @@ QModelIndex PreferenceModel::setRootPath(const QString&) {
   m_alerts.append(AlertItem{10004, &MemoryKey::LINUX_RUNLOG, "Used in log records when some file operation failed."});
   m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Performers Widget"});
   m_alerts.append(AlertItem{10006, &MemoryKey::LINUX_MEDIAINFO_LIB_PATH, "Used in videos duration get"});
+  m_alerts.append(AlertItem{10007, &MemoryKey::LINUX_RUND_IMG_PATH, "Used in redundant images find"});
 #endif
   return QModelIndex();
 }
