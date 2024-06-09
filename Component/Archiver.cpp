@@ -24,9 +24,9 @@ class ArchiverModel : public QAbstractTableModelPub {
           case 0:
             return m_paf->key(index.row());
           case 1:
-            return m_paf->beforeSize(index.row());
+            return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->beforeSize(index.row()));
           case 2:
-            return m_paf->afterSize(index.row());
+            return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->afterSize(index.row()));
           default:
             return QVariant();
         }
@@ -65,7 +65,7 @@ class ArchiverModel : public QAbstractTableModelPub {
   const ArchiveFiles* m_paf{nullptr};
   static const QStringList ARCHIVE_HORIZONTAL_HEADER;
 };
-const QStringList ArchiverModel::ARCHIVE_HORIZONTAL_HEADER{"Name", "Compressed", "Original"};
+const QStringList ArchiverModel::ARCHIVE_HORIZONTAL_HEADER{"Name", "Compressed(B)", "Original(B)"};
 
 Archiver::Archiver(QWidget* parent)
     : QMainWindow{parent},

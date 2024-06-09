@@ -17,6 +17,7 @@
 #include "Tools/PathTool.h"
 #include "Tools/QAbstractTableModelPub.h"
 #include "UndoRedo.h"
+#include "public/DisplayEnhancement.h"
 #include "qdesktopservices.h"
 
 #include <QDataStream>
@@ -39,7 +40,7 @@ class RedundantImageModel : public QAbstractTableModelPub {
           case 0:
             return PATHTOOL::fileName(m_paf->operator[](index.row()).filePath);
           case 1:
-            return m_paf->operator[](index.row()).size;
+            return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->operator[](index.row()).size);
           case 2:
             return m_paf->operator[](index.row()).md5;
           default:
@@ -98,7 +99,7 @@ class RedundantImageModel : public QAbstractTableModelPub {
   const REDUNDANT_IMG_BUNCH* m_paf{nullptr};
   static const QStringList HORIZONTAL_HEADER;
 };
-const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size", "MD5", "Preview"};
+const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview"};
 
 bool RedundantImageFinder::ALSO_RECYCLE_EMPTY_IMAGE = true;
 QSet<qint64> RedundantImageFinder::m_commonFileSizeSet;
@@ -162,6 +163,10 @@ RedundantImageFinder::~RedundantImageFinder() {
   if (m_libFi.isOpen()) {
     m_libFi.close();
   }
+}
+
+void RedundantImageFinder::ChangeWindowTitle(const QString& rootPath) {
+  setWindowTitle(QString("Redundant Images Finder | %1 | %2 item(s)").arg(rootPath).arg(m_imgsBunch.size()));
 }
 
 QString RedundantImageFinder::GetRedunPath() const {
@@ -278,6 +283,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   m_imgModel->RowsCountStartChange(beforeRowCnt, afterRowCnt);
   m_imgsBunch.swap(redundantImgs);
   m_imgModel->RowsCountEndChange(beforeRowCnt, afterRowCnt);
+  ChangeWindowTitle(folderPath);
 }
 
 // #define __NAME__EQ__MAIN__ 1
