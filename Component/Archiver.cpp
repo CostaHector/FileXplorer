@@ -1,30 +1,41 @@
 #include "Archiver.h"
 #include "PublicVariable.h"
 #include "Tools/ArchiveFiles.h"
-#include "View/CustomListView.h"
+#include "Tools/QAbstractTableModelPub.h"
+#include "View/CustomTableView.h"
 #include "public/DisplayEnhancement.h"
 
+#include <QAbstractTableModel>
 #include <QLabel>
 #include <QSplitter>
-#include <QAbstractTableModel>
 
-class ArchiverModel : public QAbstractTableModel {
+class ArchiverModel : public QAbstractTableModelPub {
  public:
-  explicit ArchiverModel(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
+  explicit ArchiverModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
   auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
-  auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_paf != nullptr ? 1 : 0; }
+  auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override {
     if (m_paf == nullptr or not index.isValid()) {
       return QVariant();
     }
     switch (role) {
-      case Qt::DisplayRole:
-        return m_paf->key(index.row());
+      case Qt::DisplayRole: {
+        switch (index.column()) {
+          case 0:
+            return m_paf->key(index.row());
+          case 1:
+            return m_paf->beforeSize(index.row());
+          case 2:
+            return m_paf->afterSize(index.row());
+          default:
+            return QVariant();
+        }
+      }
       default:
         return QVariant();
     }
+    return QVariant();
   }
-
   auto headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const -> QVariant override {
     if (role == Qt::TextAlignmentRole) {
       if (orientation == Qt::Vertical) {
@@ -43,45 +54,37 @@ class ArchiverModel : public QAbstractTableModel {
   void setRootPath(const ArchiveFiles* p_af) {
     int beforeRow = rowCount();
     int afterRow = p_af != nullptr ? p_af->size() : 0;
-    qDebug(" setRootPath %d->%d", beforeRow, afterRow);
-    // equal
-    if (beforeRow == afterRow) {
-      return;
-    }
-    // isInc
-    if (beforeRow < afterRow) {
-      beginInsertRows(QModelIndex(), 0, afterRow - 1);
-      m_paf = p_af;
-      endInsertRows();
-      return;
-    }
-    // isDec
-    beginRemoveRows(QModelIndex(), afterRow, beforeRow - 1);
+    qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
+
+    RowsCountStartChange(beforeRow, afterRow);
     m_paf = p_af;
-    endRemoveRows();
+    RowsCountEndChange(beforeRow, afterRow);
   }
 
  private:
   const ArchiveFiles* m_paf{nullptr};
   static const QStringList ARCHIVE_HORIZONTAL_HEADER;
 };
-const QStringList ArchiverModel::ARCHIVE_HORIZONTAL_HEADER{"Name", "Compressed", "Original", "Type"};
+const QStringList ArchiverModel::ARCHIVE_HORIZONTAL_HEADER{"Name", "Compressed", "Original"};
 
 Archiver::Archiver(QWidget* parent)
     : QMainWindow{parent},
       m_splitter{new QSplitter{this}},
-      m_itemsList{new CustomListView{"ArchiverItemsList", this}},
+      m_itemsTable{new CustomTableView{"ArchiverItemsTable", this}},
       m_archiverModel{new ArchiverModel{this}},
       m_thumbnailViewer{new QLabel{"Preview here", this}},
-      m_af{"", ArchiveFiles::ONLY_IMAGE},
-      m_tempAf{"", ArchiveFiles::ONLY_IMAGE} {
-  m_itemsList->setModel(m_archiverModel);
+      m_af{"", ArchiveFiles::ONLY_IMAGE} {
+  m_itemsTable->setModel(m_archiverModel);
 
-  m_splitter->addWidget(m_itemsList);
+  m_splitter->addWidget(m_itemsTable);
   m_splitter->addWidget(m_thumbnailViewer);
   setCentralWidget(m_splitter);
 
   subscribe();
+
+  m_itemsTable->InitTableView();
+
+  m_archiverModel->setRootPath(&m_af);
 
   UpdateWindowsSize();
   setWindowTitle("QZ Archive");
@@ -109,7 +112,7 @@ void Archiver::closeEvent(QCloseEvent* event) {
 }
 
 void Archiver::subscribe() {
-  connect(m_itemsList->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &Archiver::onNewRow);
+  connect(m_itemsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &Archiver::onNewRow);
 }
 
 bool Archiver::onNewRow(const QModelIndex& current, const QModelIndex& previous) {
@@ -136,9 +139,12 @@ bool Archiver::operator()(const QString& qzPath) {
     return false;
   }
 
-  m_af.ResetPath(qzPath);
-  m_archiverModel->setRootPath(nullptr);
-  m_archiverModel->setRootPath(&m_af);
+  decltype(m_af) temp{qzPath, ArchiveFiles::ONLY_IMAGE};
+  int beforeRowCount = m_af.size();
+  int afterRowCount = temp.size();
+  m_archiverModel->RowsCountStartChange(beforeRowCount, afterRowCount);
+  m_af.swap(temp);
+  m_archiverModel->RowsCountEndChange(beforeRowCount, afterRowCount);
   return true;
 }
 
@@ -149,7 +155,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   Archiver afPreview;
   afPreview.show();
-  afPreview.operator()("E:/Brazzers/profiles/profiles.qz");
+  afPreview.operator()("E:/Brazzers/Page400/Page400/Page400.qz");
   return a.exec();
 }
 #endif

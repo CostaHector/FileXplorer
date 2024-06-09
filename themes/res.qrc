@@ -186,10 +186,11 @@
         <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
         <file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.png</file>
         <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
-        <file alias="DUPLICATE_VIDEOS_FINDER">PreferenceIcons/DUPLICATE_VIDEOS_FINDER.png</file>
 
         <file alias="UNDO">View/UNDO.svg</file>
         <file alias="REDO">View/REDO.svg</file>
+        <file alias="DUPLICATE_VIDEOS_FINDER">View/DUPLICATE_VIDEOS_FINDER.png</file>
+        <file alias="REDUNDANT_IMAGE_FINDER">View/REDUNDANT_IMAGE_FINDER.png</file>
         <file alias="DISPLAY_DETAIL_INFOMATIONS">View/DISPLAY_DETAIL_INFOMATIONS.png</file>
         <file alias="DISPLAY_LARGE_THUMBNAILS">View/DISPLAY_LARGE_THUMBNAILS.png</file>
         <file alias="DISPLAY_ACHITECTURE">View/DISPLAY_ACHITECTURE.webp</file>
