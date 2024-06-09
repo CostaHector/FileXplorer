@@ -35,6 +35,7 @@ class RedundantImageFinder : public QMainWindow {
 
   void RecycleSelection();
 
+  void ChangeWindowTitle(const QString& rootPath);
  private:
   QString GetRedunPath() const;
   void UpdateDisplayWhenRecycled();
