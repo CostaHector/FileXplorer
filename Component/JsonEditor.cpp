@@ -234,7 +234,7 @@ bool JsonEditor::onStageChanges() {
     if (keyName == JSONKey::Performers or keyName == JSONKey::Tags) {
       const auto& arr = NameTool()(valueStr);
       dict.insert(keyName, arr);
-      auto* p = qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Performers]);
+      auto* p = qobject_cast<QLineEdit*>(m_stdKeys[keyName]);
       p->setText(arr.join(", "));
     } else if (keyName == JSONKey::Hot) {
       const auto& arr = JsonFileHelper::HotSceneString2IntList(valueStr);
@@ -388,7 +388,9 @@ QStringList JsonEditor::onPerformersHint() {
   }
 
   const QString& perfStr = GetArrLine(JSONKey::Performers);
-  if (not perfStr.isEmpty()) {
+  if (perfStr.isEmpty()) {
+    UpdateDisplayArrLine(JSONKey::Performers, newPerfsList);
+  } else {
     const QStringList& beforePerfsList = NameTool()(perfStr);
     if (beforePerfsList.size() < newPerfsList.size()) {
       UpdateDisplayArrLine(JSONKey::Performers, newPerfsList);
@@ -556,7 +558,7 @@ bool JsonEditor::formatter() {
   }
   if (m_keysMet.contains(JSONKey::Tags)) {
     const QString& tagStr = GetArrLine(JSONKey::Tags);
-    UpdateDisplayArrLine(JSONKey::Performers, nt(tagStr));
+    UpdateDisplayArrLine(JSONKey::Tags, nt(tagStr));
   }
   return true;
 }
@@ -580,7 +582,7 @@ QString JsonEditor::GetArrLine(const QString& key) const {
     qDebug("Cannot get ArrLine of key[%s]", qPrintable(key));
     return "";
   }
-  auto* p = qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Performers]);
+  auto* p = qobject_cast<QLineEdit*>(m_stdKeys[key]);
   return p->text();
 }
 
@@ -589,7 +591,7 @@ void JsonEditor::UpdateDisplayArrLine(const QString& key, const QStringList& arr
     qDebug("Cannot update ArrLine of key[%s]", qPrintable(key));
     return;
   }
-  auto* p = qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Performers]);
+  auto* p = qobject_cast<QLineEdit*>(m_stdKeys[key]);
   p->setText(arr.join(", "));
 }
 
