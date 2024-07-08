@@ -120,3 +120,37 @@ for (int i = 0; i < paths.size(); ++i) {
   cursor.insertText("\n");
 }
 ```
+
+## 需求文档:
+### 文件整理功能增强:
+#### 要求:
+
+1.1 视频文件
+1. 模式类似`name scene \d.vid`
+
+    -- 期望归入文件夹`name scene \d`
+2. 其他`name.vid`
+
+    -- 期望归入文件夹`name`
+
+1.2 图片文件
+1. 模式类似`name scene \d \d.img`
+
+    -- 期望归入文件夹`name scene \d`
+2. 模式类似`name \d.img`
+
+    -- 期望归入文件夹`name`
+
+须知!
+Notice!
+
+
+
+
+
+
+
+
+
+
+
