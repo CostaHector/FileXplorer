@@ -1,118 +1,76 @@
 #ifndef CATEGORIZER_H
 #define CATEGORIZER_H
 
-#include <QDir>
-#include <QMap>
-#include <QString>
-#include "FileOperation/FileOperation.h"
-#include "PublicVariable.h"
-#include "UndoRedo.h"
+#include <QRegularExpression>
+
+// support index format scene 1, sc. 1, sc.1, sc 1, sc1, and part 1, pt. 1, pt.1, pt 1, pt1, p1
+const QRegularExpression VID_SCENE_NUM_PAT{"^(.*?) (- )?sc(ene |\\. |\\.| |)\\d{1,2}$", QRegularExpression::CaseInsensitiveOption};
+const QRegularExpression VID_PART_NUM_PAT{"^(.*?) (- )?p(art |t\\. |t\\.|t |t|)\\d{1,2}$", QRegularExpression::CaseInsensitiveOption};
+const QRegularExpression VID_NUM_PAT{"^(.*?) (- )?\\d{1,2}$"};
+// Given "Name - 1", (.*) - \d{1, 2} will catch [1] = "Name - ";
+// Given "Name - abc - 1", (.*?) - \d{1, 2} will catch [1] = "Name - abc";
+
+const QRegularExpression IMG_SCENE_NUM_PAT{"^(.*?) (- )?sc(ene |\\. |\\.| |)\\d{1,2}( - \\d{1,2})?$", QRegularExpression::CaseInsensitiveOption};
+const QRegularExpression IMG_PART_NUM_PAT{"^(.*?) (- )?p(art |t\\. |t\\.|t |t|)\\d{1,2}( - \\d{1,2})?$", QRegularExpression::CaseInsensitiveOption};
+const QRegularExpression IMG_NUM_PAT{"^(.*?) (- )?\\d{1,2}( - \\d{1,2})?$"};
+// scene can be scene/sc/sc./part/pt/pt.
+// for vid, txt
+// Name n
+// Name - n
+// Name scene n
+// Name - scene n
+// Name
+// ===> Name
+
+// for only images
+// Name n
+// Name n - n
+// Name - n
+// Name - n - n
+// Name scene n
+// Name scene n - n
+// Name - scene n
+// Name - scene n - n
+// Name
+// ===> Name
 
 class Categorizer {
  public:
-  Categorizer() = default;
-
-  static auto ImaRName(const QString& p) -> QString {
-    auto imgDotIndex = p.lastIndexOf('.');
-    const QString& nm = p.left(imgDotIndex);  // name without ".suffix"
-    const auto spaceInd = nm.lastIndexOf(' ');
-    if (spaceInd == -1) {
+  static auto ImgCoreName(const QString& nm) -> QString {
+    auto extDotIndex = nm.lastIndexOf('.');
+    if (extDotIndex == -1) {
       return nm;
     }
-
-    const QString& num = nm.mid(spaceInd + 1);
-    bool isNumber = false;
-    const int numInt = num.toInt(&isNumber);
-
-    if (not isNumber) {  // AA - 1.mp4, 1984 is a specified year here;
-      return nm;         // delete sequence;
-    }
-    // 10 hour = 36000s
-    // 0 second = 00000s
-    if (1800 <= numInt and numInt <= 2300) {  // AA - 1984.mp4, 1984 is a specified year here;
-      return nm;                              // keep years;
-    }
-    QString rnm = nm.left(spaceInd).trimmed();  // AA - 1.mp4
-    if (rnm.back() != '-') {                    // AA -
-      return rnm;
-    }
-    rnm.chop(1);
-    return rnm.trimmed();
-    ;
-  }
-
-  static auto VidRName(const QString& p) -> QString {
-    auto vidDotIndex = p.lastIndexOf('.');
-    if (vidDotIndex == -1) {
+    const QString& p = nm.left(extDotIndex);
+    QRegularExpressionMatch result;
+    if ((result = IMG_SCENE_NUM_PAT.match(p)).hasMatch()) {
+    } else if ((result = IMG_PART_NUM_PAT.match(p)).hasMatch()) {
+    } else if ((result = IMG_NUM_PAT.match(p)).hasMatch()) {
+    } else {
       return p;
     }
-    return p.left(vidDotIndex);
-  }
-  // Attention: "xx n.image" -> "xx" not "xx n";
-  //            "xx.image" -> "xx";
-  static auto Classify(const QString& rootDir) -> QMap<QString, QStringList> {
-    // Folder: Keep the Same;
-    // Vid: eliminate format;
-    // Images: eliminate format and "- sequence"(if exists);
-    // Json: eliminate format;
-    // d2p["xx 1"] = {xx 1, xx 1.mp4, xx 1 1.jpg, xx 1.json};
-    // d2p["xx"] = {xx, xx.mp4, xx.jpg, xx 1.jpg, xx 2.png, xx.json};
-    QMap<QString, QStringList> dst2Contents;
-    const QList<QFileInfo>& nameList = QDir(rootDir).entryInfoList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-
-    for (const QFileInfo& fi : nameList) {
-      const QString& nm = fi.fileName();
-      QString dst;
-      if (fi.isDir()) {  // folder;
-        dst = fi.fileName();
-      } else if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*." + fi.suffix())) {  // ima;
-        dst = ImaRName(nm);
-      } else {  // vid or json;
-        dst = VidRName(nm);
-      }
-      if (not dst2Contents.contains(dst)) {
-        dst2Contents.insert(dst, {nm});
-        continue;
-      }
-      dst2Contents[dst].append(nm);
-    }
-    return dst2Contents;
+    return result.captured(1);
   }
 
-  auto operator()(const QString& rootDir) const -> bool {
-    if (QDir(rootDir).isRoot() or not QFile::exists(rootDir)) {
-      qDebug("[Folder is root or not exists error] %s", qPrintable(rootDir));
-      return false;
+  static auto VidCoreName(const QString& nm) -> QString {
+    auto extDotIndex = nm.lastIndexOf('.');
+    if (extDotIndex == -1) {
+      return nm;
     }
-    FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
-    const auto& dic = Classify(rootDir);
-    QMapIterator<QString, QStringList> i(dic);
-    while (i.hasNext()) {
-      i.next();
-      const QString& folderName = i.key();
-      const QStringList& fileItems = i.value();
-
-      if (fileItems.size() < 2)
-        continue;  // [Ignored Only One Item] [{folderName}];
-      const QString& underPath = rootDir + '/' + folderName;
-      if (not QFile::exists(underPath)) {
-        cmds.append({"mkpath", rootDir, folderName});
-      }
-      QDir underDir(underPath);
-      for (const QString& fileName : fileItems) {
-        if (QFileInfo(rootDir, fileName).isDir()) {
-          continue;  // skip move dir
-        }
-        if (underDir.exists(fileName)) {
-          qDebug("%s Already Exist in %s", qPrintable(fileName), qPrintable(underPath));
-          continue;
-        }
-        cmds.append({"rename", rootDir, fileName, underPath, fileName});
-      }
+    const QString& p = nm.left(extDotIndex);
+    QRegularExpressionMatch result;
+    if ((result = VID_SCENE_NUM_PAT.match(p)).hasMatch()) {
+    } else if ((result = VID_PART_NUM_PAT.match(p)).hasMatch()) {
+    } else if ((result = VID_NUM_PAT.match(p)).hasMatch()) {
+    } else {
+      return p;
     }
-    const auto isAllSuccess = g_undoRedo.Do(cmds);
-    return isAllSuccess;
+    return result.captured(1);
   }
+
+  auto operator()(const QString& rootDir) const -> bool;
+ private:
+  static auto Classify(const QString& rootDir) -> QMap<QString, QStringList>;
 };
 
 #endif  // CATEGORIZER_H
