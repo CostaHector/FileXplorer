@@ -19,7 +19,7 @@ class FinderTest : public FileSystemRelatedTest {
     QVERIFY2(QDir(TEST_DIR).exists("file.txt"), "Precondition not met.");
 
     const QStringList fromList{"folder", "file.txt"};
-    const auto& actualList = Finder(CCMMode::CUT).FindAllItems(TEST_DIR, fromList);
+    const auto& actualList = Finder(CCMMode::CUT_OP).FindAllItems(TEST_DIR, fromList);
     const QStringList expectList{"folder/folder/file.txt", "folder/folder", "folder/file.txt", "file.txt", "folder"};
 
     QSet<QString> actualSet{actualList.cbegin(), actualList.cend()};
@@ -32,7 +32,7 @@ class FinderTest : public FileSystemRelatedTest {
     QVERIFY2(QDir(TEST_DIR).exists("file.txt"), "Precondition not met.");
 
     const QStringList fromList{"folder", "file.txt"};
-    const auto& actualList = Finder(CCMMode::COPY).FindAllItems(TEST_DIR, fromList);
+    const auto& actualList = Finder(CCMMode::COPY_OP).FindAllItems(TEST_DIR, fromList);
     const QStringList expectList{"folder/folder/file.txt", "folder/folder", "folder/file.txt", "file.txt", "folder"};
     QSet<QString> actualSet{actualList.cbegin(), actualList.cend()};
     QSet<QString> expectSet{expectList.cbegin(), expectList.cend()};
