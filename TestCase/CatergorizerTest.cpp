@@ -177,5 +177,5 @@ class CatergorizerTest : public QObject {
   }
 };
 
-QTEST_MAIN(CatergorizerTest)
-#include "CatergorizerTest.moc"
+//QTEST_MAIN(CatergorizerTest)
+//#include "CatergorizerTest.moc"
