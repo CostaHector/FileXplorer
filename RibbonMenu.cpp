@@ -11,6 +11,7 @@
 #include "Actions/RecycleBinActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
+#include "Actions/SyncFileSystemModificationActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Component/DatabaseToolBar.h"
@@ -206,6 +207,13 @@ QToolBar* RibbonMenu::LeafHome() const {
   advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
+  QToolBar* syncModToolBar = g_syncFileSystemModificationActions().GetSyncToolbar();
+  {
+    syncModToolBar->setOrientation(Qt::Orientation::Vertical);
+    syncModToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+    SetLayoutAlightment(syncModToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+  }
+
   QToolBar* leafHomeWid = new QToolBar("LeafHome");
   leafHomeWid->setToolTip("Home Leaf ToolBar");
   leafHomeWid->addWidget(openItemsTB);
@@ -225,6 +233,8 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addWidget(compressToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(advanceSearchToolBar);
+  leafHomeWid->addSeparator();
+  leafHomeWid->addWidget(syncModToolBar);
   return leafHomeWid;
 }
 

@@ -28,6 +28,7 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
+    Actions/SyncFileSystemModificationActions.cpp \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
@@ -64,6 +65,7 @@ SOURCES += \
     Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
+    Component/SyncModifiyFileSystem.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
     FileOperation/FileOperatorPub.cpp \
@@ -175,6 +177,7 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
+    Actions/SyncFileSystemModificationActions.h \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
@@ -212,6 +215,7 @@ HEADERS += \
     Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
+    Component/SyncModifiyFileSystem.h \
     Component/Toaster.h \
     FileOperation/FileOperatorPub.h \
     FileOperation/RecycleBinHelper.h \
