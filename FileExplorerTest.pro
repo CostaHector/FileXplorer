@@ -17,8 +17,10 @@ SOURCES += \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
+    TestCase/SyncModifiyFileSystemTest.cpp \
     TestCase/ToConsecutiveFileNameNoTest.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
+    Component/SyncModifiyFileSystem.cpp \
     TestCase/ValueCheckerTest.cpp \
     TestCase/FinderTest.cpp \
     Tools/ProductionStudioManager.cpp \
@@ -68,6 +70,7 @@ HEADERS += \
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
     Component/NotificatorFrame.h \
+    Component/SyncModifiyFileSystem.h \
     FileOperation/FileOperation.h \
     FileOperation/FileOperatorPub.h \
     PublicTool.h \
