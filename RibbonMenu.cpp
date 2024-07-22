@@ -207,11 +207,18 @@ QToolBar* RibbonMenu::LeafHome() const {
   advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  QToolBar* syncModToolBar = g_syncFileSystemModificationActions().GetSyncToolbar();
+  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
   {
-    syncModToolBar->setOrientation(Qt::Orientation::Vertical);
-    syncModToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
-    SetLayoutAlightment(syncModToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+    syncSwitchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+    syncSwitchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  }
+  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
+  {
+    syncPathToolBar->setOrientation(Qt::Orientation::Vertical);
+    syncPathToolBar->setStyleSheet("QToolBar { max-width: 512px; }");
+    syncPathToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    syncPathToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+    SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
   QToolBar* leafHomeWid = new QToolBar("LeafHome");
@@ -234,7 +241,8 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(advanceSearchToolBar);
   leafHomeWid->addSeparator();
-  leafHomeWid->addWidget(syncModToolBar);
+  leafHomeWid->addWidget(syncSwitchToolBar);
+  leafHomeWid->addWidget(syncPathToolBar);
   return leafHomeWid;
 }
 
