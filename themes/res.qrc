@@ -32,6 +32,8 @@
         <file alias="SELECT_ALL">TopSideToolBarIcons/SELECT_ALL.ico</file>
         <file alias="SELECT_INVERT">TopSideToolBarIcons/SELECT_INVERT.ico</file>
         <file alias="SELECT_NONE">TopSideToolBarIcons/SELECT_NONE.ico</file>
+        <file alias="SYNC_MODIFICATION_SWITCH">TopSideToolBarIcons/SYNC_MODIFICATION_SWITCH.svg</file>
+        <file alias="SYNC_REVERSE_SWITCH">TopSideToolBarIcons/SYNC_REVERSE_SWITCH.svg</file>
         <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>
         <file alias="PATH_BACK_TO">AddressControl/PATH_BACK_TO.svg</file>
         <file alias="PATH_FORWARD_TO">AddressControl/PATH_FORWARD_TO.svg</file>
