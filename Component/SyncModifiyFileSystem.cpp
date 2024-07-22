@@ -33,12 +33,14 @@ bool SyncModifiyFileSystem::operator()(QString& path) const {
     qWarning("Basic path[%s] equals to synchronized to path, no need sync", qPrintable(m_basicPath));
     return false;
   }
+  // path can be "m_basicPath" or "m_basicPath/xxx"
+  // path can alse be "m_synchronizedToPath" or "m_synchronizedToPath/xxx" if m_alsoSyncReversebackSwitch is true
   bool needSync{false};
-  if (path.startsWith(m_basicPath)) {
+  if (path == m_basicPath || path.startsWith(m_basicPath + '/')) {
     path.replace(0, m_basicPath.size(), m_synchronizedToPath);
     needSync = true;
   } else if (m_alsoSyncReversebackSwitch) {
-    if (path.startsWith(m_synchronizedToPath)) {
+    if (path == m_synchronizedToPath || path.startsWith(m_synchronizedToPath + '/')) {
       path.replace(0, m_synchronizedToPath.size(), m_basicPath);
       needSync = true;
     }
