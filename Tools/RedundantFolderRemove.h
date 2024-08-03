@@ -15,16 +15,10 @@ class RedundantRmv {
 
   virtual auto CleanEmptyFolderCore(const QString& folderPath) -> int = 0;
 
-  auto operator()(const QStringList& paths) -> int {
-    int totalCount = 0;
-    for (const auto& path : paths) {
-      totalCount += operator()(path);
-    }
-    return totalCount;
-  }
   auto operator()(const QString& path) -> int {
     QFileInfo fi(path);
-    if (fi.isFile()) {
+    if (!fi.isDir()) {
+      qWarning("path[%s] is not a directory", qPrintable(path));
       return 0;
     }
     return CleanEmptyFolderCore(fi.absoluteFilePath());
@@ -49,6 +43,10 @@ class RedundantRmv {
   }
 };
 
+// RedundantFolderRemove:
+// A/nothing => recycle folder A
+// A/ABCautoGEHI => keep folder A and folder ABCautoGEHI
+// A/A.mp4 => move A.mp4 to its up level folder and recycle folder A
 class RedundantFolderRemove : public RedundantRmv {
  public:
   /* Here we call a folder with no item or only one item redundant folder
@@ -60,13 +58,22 @@ class RedundantFolderRemove : public RedundantRmv {
   auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
 };
 
+// EmptyFolderRemove:
+// A/nothing => recycle folder A
+// A/A.mp4 => keep
+// A/B/nothing, A/C/nothing => recycle nothingx2
 class EmptyFolderRemove : public RedundantRmv {
  public:
-  EmptyFolderRemove(bool _includingSubFolder = true) : RedundantRmv(), m_includingSubFolder(_includingSubFolder) {}
+  EmptyFolderRemove() : RedundantRmv() {}
+  auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
+};
+
+class RedundantItemsRemoverByKeyword : public RedundantRmv {
+ public:
+  explicit RedundantItemsRemoverByKeyword(const QString& keyword) : RedundantRmv(), m_keyword{keyword} {}
   auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
 
  private:
-  bool m_includingSubFolder;
+  const QString m_keyword;
 };
-
 #endif  // REDUNDANTFOLDERREMOVE_H
