@@ -12,7 +12,7 @@ SyncFileSystemModificationActions::SyncFileSystemModificationActions(QObject* pa
   _SYNC_REVERSE_SWITCH->setCheckable(true);
 
   _SYNC_MOD_SWITCH->setToolTip("Modification on basic path will also syncronized to destination path,"
-      "including\n1.file rename\n2.file move/into into\n3.file recycle\n4.file delete\nWarning: When copy items out, only first commands will succeed.");
+      "including\n1.file rename\n2.file move/into into\n3.file recycle\n4.file delete\nWarning: When copy/cut items out of these 2 paths, only first commands will succeed.");
   _SYNC_REVERSE_SWITCH->setToolTip("Also sync modification reverse back to basic path");
 }
 
