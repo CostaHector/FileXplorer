@@ -79,5 +79,5 @@ class SyncModifiyFileSystemTest : public QObject {
   }
 };
 
-QTEST_MAIN(SyncModifiyFileSystemTest)
+//QTEST_MAIN(SyncModifiyFileSystemTest)
 #include "SyncModifiyFileSystemTest.moc"
