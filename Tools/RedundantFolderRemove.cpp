@@ -1,15 +1,28 @@
 #include "RedundantFolderRemove.h"
+#include <QDirIterator>
+#include <cmath>
+
+auto RedundantFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
+  QDir dir(folderPath);
+  dir.setFilter(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+  const int dirNameLen = dir.dirName().size();
+  const QStringList& lst = dir.entryList();
+  if (lst.isEmpty()) {
+    m_cmds.append({"moveToTrash", "", folderPath});
+    return 1;
+  }
+
+  if ((lst.size() == 1) && (std::abs(lst[0].size() - dirNameLen) <= TOLERANCE_LETTER_CNT)) {
+    m_cmds.append({"rename", folderPath, lst[0], QFileInfo(folderPath).absolutePath(), lst[0]});
+    m_cmds.append({"moveToTrash", "", folderPath});
+    return 1;
+  }
+  return 0;
+}
 
 auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
   QDir dir(folderPath);
   if (dir.isEmpty()) {
-    m_cmds.append({"moveToTrash", "", folderPath});
-    return 1;
-  }
-  if (not m_includingSubFolder) {
-    if (not dir.isEmpty()) {
-      return 0;
-    }
     m_cmds.append({"moveToTrash", "", folderPath});
     return 1;
   }
@@ -21,23 +34,34 @@ auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
   return totalCount;
 }
 
-auto RedundantFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
-  QDir dir(folderPath);
-  dir.setFilter(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
-  const int dirNameLen = dir.dirName().size();
-  const QStringList& lst = dir.entryList();
-  if (lst.isEmpty()) {
-    m_cmds.append({"moveToTrash", "", folderPath});
-    return 1;
+auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderPath) -> int {
+  const auto isFolderNeedRecycle = [](const QString& subfolderPath) -> bool {
+    QDir dir{subfolderPath, "*", QDir::SortFlag::Name, QDir::AllEntries | QDir::NoDotAndDotDot};
+    if (dir.entryList().size() > 10) {
+      return false;
+    }
+    dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
+    if (dir.isEmpty()) {
+      return true;
+    }
+    return false;
+  };
+
+  QDirIterator rIt{
+      folderPath, {"*" + m_keyword + "*"}, QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
+  while (rIt.hasNext()) {
+    rIt.next();
+    const QString& subfolderPath = rIt.filePath();
+    if (!subfolderPath.contains(m_keyword)) {
+      continue;
+    }
+    if (!isFolderNeedRecycle(subfolderPath)) {
+      continue;
+    }
+    // recycle this folder
+    m_cmds.append({"moveToTrash", "", subfolderPath});
   }
-  if (lst.size() == 1 and (-TOLERANCE_LETTER_CNT <= lst[0].size() - dirNameLen and lst[0].size() - dirNameLen <= TOLERANCE_LETTER_CNT)) {
-    m_cmds.append({"rename", folderPath, lst[0], QFileInfo(folderPath).absolutePath(), lst[0]});
-    m_cmds.append({"moveToTrash", "", folderPath});
-    return 1;
-  }
-  // A/ABCautoGEHI => keep;
-  // A/A.mp4 => move A.mp4 to its up level folder;
-  return 0;
+  return m_cmds.size();
 }
 
 // #define __NAME__EQ__MAIN__ 1
