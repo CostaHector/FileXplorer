@@ -16,6 +16,7 @@ SOURCES += \
     TestCase/NameSectionArrangeTest.cpp \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
+    TestCase/RedundantItemsRemoverTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
     TestCase/SyncModifiyFileSystemTest.cpp \
     TestCase/ToConsecutiveFileNameNoTest.cpp \
@@ -27,7 +28,8 @@ SOURCES += \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
     Tools/ConflictsItemHelper.cpp \
-    Tools/ConvertUnicodeCharsetToAscii.cpp\
+    Tools/ConvertUnicodeCharsetToAscii.cpp \
+    Tools/RedundantFolderRemove.cpp \
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     Component/NotificatorFrame.cpp \
@@ -85,6 +87,7 @@ HEADERS += \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/NameSectionArrange.h \
+    Tools/RedundantFolderRemove.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 
