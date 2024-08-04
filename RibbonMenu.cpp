@@ -294,7 +294,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._NAME_STANDARDLIZER, g_fileBasicOperationsActions()._CLASSIFIER});
   archiveVidsTB->addSeparator();
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER, g_fileBasicOperationsActions()._REMOVE_REDUNDANT_ITEMS,
-                             g_fileBasicOperationsActions()._REMOVE_EMPTY_FOLDER});
+                             g_fileBasicOperationsActions()._REMOVE_EMPTY_FOLDER, g_fileBasicOperationsActions()._REMOVE_FOLDER_BY_KEYWORD});
   archiveVidsTB->addSeparator();
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER});
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER});
