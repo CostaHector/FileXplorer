@@ -27,6 +27,7 @@ void FileSystemTableView::subscribe() {
   addAction(g_rightClickActions()._PROPERTIES);
 
   addActions(g_viewActions()._VIEW_ACRIONS->actions());
+  addActions(g_viewActions()._VIDEO_PLAYERS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());
