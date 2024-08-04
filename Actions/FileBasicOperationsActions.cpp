@@ -247,7 +247,9 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
   _REMOVE_EMPTY_FOLDER->setToolTip(
       "<b>Remove Empty folders under current view path </b>"
       "Only Empty folder will be removed");
-
+  _REMOVE_FOLDER_BY_KEYWORD->setToolTip(
+      "<b>Remove Empty folders name contains keyword under current view path </b>"
+      "Only folder items count <= 10 and not contains videos will be removed");
   _DUPLICATE_VIDEOS_FINDER->setToolTip(
       "<b>Differ videos by duration or filesize</b>"
       "to let it easy to find duplicate one");
