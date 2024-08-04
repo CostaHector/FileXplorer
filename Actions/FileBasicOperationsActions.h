@@ -91,6 +91,7 @@ class FileBasicOperationsActions : public QObject {
   QAction* _DUPLICATE_ITEMS_REMOVER{new QAction(QIcon(":/themes/DEDUPLICATE"), tr("Deduplicator"))};
   QAction* _REMOVE_REDUNDANT_ITEMS{new QAction(QIcon(":/themes/ONE_FILE_IN_ONE_FOLDER"), tr("Rmv Redundancy"))};
   QAction* _REMOVE_EMPTY_FOLDER{new QAction(QIcon(":/themes/EMPTY_FOLDER"), tr("Rmv Empty"))};
+  QAction* _REMOVE_FOLDER_BY_KEYWORD{new QAction(QIcon(""), tr("Rmv by Keyword"))};
   QAction* _DUPLICATE_VIDEOS_FINDER{new QAction(QIcon(":/themes/DUPLICATE_VIDEOS_FINDER"), "Duplicate Videos Finder")};
   QAction* _REDUNDANT_IMAGES_FINDER{new QAction(QIcon(":/themes/REDUNDANT_IMAGE_FINDER"), "Redundant Images Finder")};
 

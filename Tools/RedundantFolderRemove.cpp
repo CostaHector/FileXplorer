@@ -36,12 +36,15 @@ auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
 
 auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderPath) -> int {
   const auto isFolderNeedRecycle = [](const QString& subfolderPath) -> bool {
-    QDir dir{subfolderPath, "*", QDir::SortFlag::Name, QDir::AllEntries | QDir::NoDotAndDotDot};
-    if (dir.entryList().size() > 10) {
+    QDir dir{subfolderPath, "*", QDir::SortFlag::NoSort, QDir::AllEntries | QDir::NoDotAndDotDot};
+    if (!dir.isEmpty(QDir::Dirs | QDir::NoDotAndDotDot)) {
+      return false;
+    }
+    if (dir.count() > 10) {
       return false;
     }
     dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
-    if (dir.isEmpty()) {
+    if (dir.isEmpty(QDir::Files)) {
       return true;
     }
     return false;
@@ -51,10 +54,10 @@ auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderP
       folderPath, {"*" + m_keyword + "*"}, QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
   while (rIt.hasNext()) {
     rIt.next();
-    const QString& subfolderPath = rIt.filePath();
-    if (!subfolderPath.contains(m_keyword)) {
+    if (!rIt.fileName().contains(m_keyword)) {
       continue;
     }
+    const QString& subfolderPath = rIt.filePath();
     if (!isFolderNeedRecycle(subfolderPath)) {
       continue;
     }
