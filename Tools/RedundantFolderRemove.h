@@ -1,8 +1,6 @@
 #ifndef REDUNDANTFOLDERREMOVE_H
 #define REDUNDANTFOLDERREMOVE_H
 
-#include <QDir>
-#include <QFile>
 #include <QFileInfo>
 #include "UndoRedo.h"
 
@@ -43,25 +41,30 @@ class RedundantRmv {
   }
 };
 
-// RedundantFolderRemove:
-// A/nothing => recycle folder A
-// A/ABCautoGEHI => keep folder A and folder ABCautoGEHI
-// A/A.mp4 => move A.mp4 to its up level folder and recycle folder A
-class RedundantFolderRemove : public RedundantRmv {
+/* Here we call a folder with no item or only one item redundant folder
+In that case, we will move the file (if it exists) to its upper level folder.
+And erase the redundant folder */
+/* usage example:
+A/{B, C} => do nothing
+A/{ABCautoGEHI} => do nothing, because len(sub)-len(parent) > TOLERANCE_LETTER_CNT
+A/{} => recycle parent A
+A/{AB} => upgrade AB level, then recycle parent A
+A/{A.mp4} => upgrade A.mp4 level, then recycle folder A
+*/
+
+class RedunParentFolderRem : public RedundantRmv {
  public:
-  /* Here we call a folder with no item or only one item redundant folder
-  In that case, we will move the file (if it exists) to its upper level folder. And erase the redundant folder */
   constexpr static int TOLERANCE_LETTER_CNT = 6;
-  RedundantFolderRemove() : RedundantRmv() {
+  RedunParentFolderRem() : RedundantRmv() {
     // defence : including subfolder may cause huge problem to the whole file system;
   }
   auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
 };
 
 // EmptyFolderRemove:
-// A/nothing => recycle folder A
-// A/A.mp4 => keep
-// A/B/nothing, A/C/nothing => recycle nothingx2
+// A/{} => recycle folder A
+// A/{A.mp4} => do nothing
+// A/B/{}, A/C/{}=> recycle B and C
 class EmptyFolderRemove : public RedundantRmv {
  public:
   EmptyFolderRemove() : RedundantRmv() {}
