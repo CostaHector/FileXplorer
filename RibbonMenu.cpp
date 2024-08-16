@@ -290,15 +290,26 @@ QToolBar* RibbonMenu::LeafDatabase() const {
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
+  auto* folderRmv{new QToolBar{"Folder Remover"}};
+  folderRmv->setOrientation(Qt::Orientation::Vertical);
+  folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
+  folderRmv->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_REDUN_PARENT_FOLDER);
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
+
   auto* archiveVidsTB = new QToolBar("Leaf Arrange Files");
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._NAME_STANDARDLIZER, g_fileBasicOperationsActions()._CLASSIFIER});
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER, g_fileBasicOperationsActions()._REMOVE_REDUNDANT_ITEMS,
-                             g_fileBasicOperationsActions()._REMOVE_EMPTY_FOLDER, g_fileBasicOperationsActions()._REMOVE_FOLDER_BY_KEYWORD});
+  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER});
+  archiveVidsTB->addSeparator();
+  archiveVidsTB->addWidget(folderRmv);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER});
   archiveVidsTB->addActions({g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER});
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+
   return archiveVidsTB;
 }
 
