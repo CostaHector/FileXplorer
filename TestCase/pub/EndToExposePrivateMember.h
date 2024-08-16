@@ -1,0 +1,7 @@
+#ifndef ENDTOEXPOSEPRIVATEMEMBER_H
+#define ENDTOEXPOSEPRIVATEMEMBER_H
+
+#undef protected
+#undef private
+
+#endif // ENDTOEXPOSEPRIVATEMEMBER_H
