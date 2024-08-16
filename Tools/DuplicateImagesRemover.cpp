@@ -2,7 +2,6 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QHash>
-#include "FileOperation/FileOperation.h"
 #include "PublicVariable.h"
 #include "UndoRedo.h"
 

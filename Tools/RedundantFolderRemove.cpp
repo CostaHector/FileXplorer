@@ -1,26 +1,44 @@
 #include "RedundantFolderRemove.h"
 #include <QDirIterator>
+#include <QDir>
 #include <cmath>
 
-auto RedundantFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
-  QDir dir(folderPath);
-  dir.setFilter(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
-  const int dirNameLen = dir.dirName().size();
-  const QStringList& lst = dir.entryList();
-  if (lst.isEmpty()) {
-    m_cmds.append({"moveToTrash", "", folderPath});
-    return 1;
-  }
+constexpr int RedunParentFolderRem::TOLERANCE_LETTER_CNT;
 
-  if ((lst.size() == 1) && (std::abs(lst[0].size() - dirNameLen) <= TOLERANCE_LETTER_CNT)) {
-    m_cmds.append({"rename", folderPath, lst[0], QFileInfo(folderPath).absolutePath(), lst[0]});
-    m_cmds.append({"moveToTrash", "", folderPath});
-    return 1;
+auto RedunParentFolderRem::CleanEmptyFolderCore(const QString& folderPath) -> int {
+  m_cmds.clear();
+  if (!QFileInfo(folderPath).isDir()) {
+    qDebug("Path[%s] is not a folder", qPrintable(folderPath));
+    return -1;
   }
-  return 0;
+  QDir dir{folderPath, "", QDir::SortFlag::NoSort, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  const int dirNameLen = dir.dirName().size();
+  for (const QString& sub: dir.entryList()) {
+    QDir subDir{dir.absoluteFilePath(sub), "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot};
+    switch (subDir.count()) {
+      case 0: {
+        m_cmds.append({"moveToTrash", folderPath, sub});
+        break;
+      }
+      case 1: {
+        const QString& itemName = dir.entryList().front();
+        if (std::abs(itemName.size() - dirNameLen) > TOLERANCE_LETTER_CNT) {
+          qDebug("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
+          break;
+        }
+        m_cmds.append({"rename", subDir.absolutePath(), itemName, folderPath, itemName});
+        m_cmds.append({"moveToTrash", folderPath, sub});
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  return m_cmds.size();
 }
 
 auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
+  // as recursive calling, m_cmds will not clean automatically
   QDir dir(folderPath);
   if (dir.isEmpty()) {
     m_cmds.append({"moveToTrash", "", folderPath});
@@ -35,6 +53,7 @@ auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
 }
 
 auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderPath) -> int {
+  m_cmds.clear();
   const auto isFolderNeedRecycle = [](const QString& subfolderPath) -> bool {
     QDir dir{subfolderPath, "*", QDir::SortFlag::NoSort, QDir::AllEntries | QDir::NoDotAndDotDot};
     if (!dir.isEmpty(QDir::Dirs | QDir::NoDotAndDotDot)) {
@@ -67,18 +86,3 @@ auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderP
   return m_cmds.size();
 }
 
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-int main() {
-  EmptyFolderRemove efr(true);
-  int cnt = efr("../");
-  qDebug("EmptyFolderRemove %d", cnt);
-  qDebug() << efr.m_removeList;
-
-  RedundantFolderRemove rfr;
-  cnt = rfr("../");
-  qDebug("RedundantFolderRemove %d", cnt);
-  qDebug() << rfr.m_moveList;
-  return 0;
-}
-#endif

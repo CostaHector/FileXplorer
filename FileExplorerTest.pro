@@ -64,6 +64,8 @@ HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Component/RenameWidgets/AdvanceRenamer.h \
+    TestCase/pub/BeginToExposePrivateMember.h \
+    TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
