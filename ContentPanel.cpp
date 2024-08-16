@@ -68,7 +68,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
-  if (targetStr.isEmpty()) {
+  if (targetStr.isEmpty()) {  
     m_fsModel->setNameFilters({});
     return true;
   }

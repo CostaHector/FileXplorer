@@ -19,6 +19,9 @@ FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* 
 
   subscribe();
 
+  setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
   InitTableView();  
 }
 
