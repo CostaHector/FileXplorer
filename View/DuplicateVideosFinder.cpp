@@ -81,9 +81,14 @@ void RightDuplicateDetails::subscribe() {
 const QString DuplicateVideosFinder::DUPLICATE_FINDER_TEMPLATE = "Duplicate Videos Finder(Differ by %1) | %2 batch(es) | total %3 video(s)";
 
 DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{parent} {
-  m_tb = g_dupVidFinderAg().getToolBar(this);
+  m_tb = g_dupVidFinderAg().GetAiMediaToolBar(this);
   m_tb->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  m_aiTables = new AiMediaDupTableView{this};
+  m_aiTablesTB = new QToolBar{"Ai Media Tables", this};
+  m_aiTablesTB->addWidget(m_aiTables);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_tb);
+  addToolBarBreak(Qt::ToolBarArea::TopToolBarArea);
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_aiTablesTB);
 
   m_dupList = new LeftDuplicateList{this};
   m_details = new RightDuplicateDetails{this};
@@ -126,24 +131,20 @@ void DuplicateVideosFinder::closeEvent(QCloseEvent* event) {
   QMainWindow::closeEvent(event);
 }
 
-bool DuplicateVideosFinder::loadAPath(const QString& path) {
+bool DuplicateVideosFinder::TablesGroupChangedTo(const QStringList& tbls) {
   if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
     qWarning("Duplicate list or its model is nullptr");
     return false;
   }
-  if (not QFileInfo(path).isDir()) {
-    qWarning("path[%s] is not a directory", qPrintable(path));
-    return false;
-  }
-  m_dupList->m_dupListModel->AppendAPath(path);
+  m_dupList->m_dupListModel->ChangeTableGroups(tbls);
   UpdateWindowsTitle();
   return true;
 }
 
 void DuplicateVideosFinder::subscribe() {
-  connect(g_dupVidFinderAg().APPEND_A_PATH, &QAction::triggered, this, &DuplicateVideosFinder::onSelectAPath);
+  connect(g_dupVidFinderAg().ANALYSE_THESE_TABLES, &QAction::triggered, this, &DuplicateVideosFinder::onAnalyseAiMediaTableChanged);
+  connect(g_dupVidFinderAg().CANCEL_ANALYSE, &QAction::triggered, this, &DuplicateVideosFinder::onCancelAnalyse);
   connect(g_dupVidFinderAg().DIFFER_BY, &QActionGroup::triggered, this, &DuplicateVideosFinder::onDifferTypeChanged);
-
   connect(g_dupVidFinderAg().durationDevLE, &QLineEdit::returnPressed, this, &DuplicateVideosFinder::onChangeDurationDeviation);
   connect(g_dupVidFinderAg().sizeDevLE, &QLineEdit::returnPressed, this, &DuplicateVideosFinder::onChangeSizeDeviation);
   connect(m_dupList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &DuplicateVideosFinder::on_selectionChanged);
@@ -160,21 +161,26 @@ void DuplicateVideosFinder::on_selectionChanged() {
   m_details->m_detailsModel->onChangeDetailIndex(srcIndex.row());
 }
 
-void DuplicateVideosFinder::onSelectAPath() {
-  const QString& defaultOpenDir = PreferenceSettings().value("DUPLICATE_VIDEOS_SELECT_FROM", ".").toString();
-  const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
-
-  QFileInfo loadFromFi(loadFromPath);
-  const QString& absPath = loadFromFi.absoluteFilePath();
-  if (not loadFromFi.isDir()) {
-    QMessageBox::warning(this, "Failed when select a folder", QString("Not a folder:\n%1").arg(absPath));
-    qWarning("Failed when select a folder. Not a folder:\n%s", qPrintable(absPath));
+void DuplicateVideosFinder::UpdateAiMediaTableNames() {
+  if (m_aiTables == nullptr) {
+    qWarning("m_aiTables is nullptr");
     return;
   }
-  PreferenceSettings().setValue("DUPLICATE_VIDEOS_SELECT_FROM", absPath);
+  m_aiTables->LoadAiMediaTableNames();
+}
+
+void DuplicateVideosFinder::onAnalyseAiMediaTableChanged() {
   m_dupList->clearSelection();
   m_details->m_detailsModel->whenDifferTypeAboutToChanged();
-  loadAPath(absPath);
+  const QStringList& tbls = m_aiTables->GetSelectedAiTables();
+  TablesGroupChangedTo(tbls);
+  UpdateWindowsTitle();
+}
+
+void DuplicateVideosFinder::onCancelAnalyse() {
+  m_dupList->clearSelection();
+  m_details->m_detailsModel->whenDifferTypeAboutToChanged();
+  TablesGroupChangedTo({});
   UpdateWindowsTitle();
 }
 
@@ -232,7 +238,7 @@ void DuplicateVideosFinder::onChangeDurationDeviation() {
   UpdateWindowsTitle();
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
@@ -240,11 +246,6 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   DuplicateVideosFinder mainWindow;
   mainWindow.show();
-#ifdef _WIN32
-  mainWindow.loadAPath("E:/P/Leaked And Loaded");
-#else
-  mainWindow.loadAPath("/home/ariel/Downloads");
-#endif
   a.exec();
   return 0;
 }

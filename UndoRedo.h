@@ -15,14 +15,7 @@ class UndoRedo {
  public:
   using UNDO_REDO_RETURN = QPair<bool, OperationStream>;
 
-  inline auto Do(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& cmd) -> bool {
-    FileOperatorType::BATCH_COMMAND_LIST_TYPE srcCommand;
-    const FileOperatorType::EXECUTE_RETURN_TYPE& exeRetEle = FileOperation::executer(cmd, srcCommand);
-    const auto isAllSucceed = exeRetEle.first;
-    const auto& recover_cmd = exeRetEle.second;
-    undoList.append(OperationStream{cmd, recover_cmd});
-    return isAllSucceed;
-  }
+  auto Do(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& cmd) -> bool;
 
   inline auto Undo() -> UNDO_REDO_RETURN {
     if (not undoAvailable()) {

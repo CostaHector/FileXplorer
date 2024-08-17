@@ -123,8 +123,8 @@ auto MovieDBView::on_PlayVideo() const -> bool {
 
 bool MovieDBView::InitMoviesTables() {
   QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen() and not con.open()) {
-    qDebug("con cannot open");
+  if (!con.isOpen()) {
+    qDebug("db[%s] not opened[%s]", qPrintable(SystemPath::VIDS_DATABASE), qPrintable(con.lastError().text()));
     return false;
   }
   if (_tables == nullptr) {

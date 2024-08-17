@@ -10,22 +10,30 @@ TEMPLATE = app
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    TestCase/AIMediaDuplicateTest.cpp \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
+    TestCase/MD5CalculatorTest.cpp \
     TestCase/NameSectionArrangeTest.cpp \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
+    TestCase/RedundantItemsRemoverTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
+    TestCase/SyncModifiyFileSystemTest.cpp \
     TestCase/ToConsecutiveFileNameNoTest.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
+    Component/SyncModifiyFileSystem.cpp \
     TestCase/ValueCheckerTest.cpp \
     TestCase/FinderTest.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
     Tools/ConflictsItemHelper.cpp \
-    Tools/ConvertUnicodeCharsetToAscii.cpp\
+    Tools/ConvertUnicodeCharsetToAscii.cpp \
+    Tools/RedundantFolderRemove.cpp \
+    Tools/MD5Calculator.cpp \
+    Tools/QMediaInfo.cpp \
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     Component/NotificatorFrame.cpp \
@@ -52,6 +60,7 @@ SOURCES += \
     Tools/RenameNamesUnique.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/NameSectionArrange.cpp \
+    Tools/AIMediaDuplicate.cpp \
     model/ConflictsFileSystemModel.cpp \
     UndoRedo.cpp
 
@@ -60,14 +69,18 @@ HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Component/RenameWidgets/AdvanceRenamer.h \
+    TestCase/pub/BeginToExposePrivateMember.h \
+    TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
     Tools/NameTool.h\
     Tools/ConflictsItemHelper.h \
+    Tools/MD5Calculator.h \
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
     Component/NotificatorFrame.h \
+    Component/SyncModifiyFileSystem.h \
     FileOperation/FileOperation.h \
     FileOperation/FileOperatorPub.h \
     PublicTool.h \
@@ -82,6 +95,9 @@ HEADERS += \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/NameSectionArrange.h \
+    Tools/RedundantFolderRemove.h \
+    Tools/AIMediaDuplicate.h \
+    Tools/QMediaInfo.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 

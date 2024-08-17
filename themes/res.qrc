@@ -32,6 +32,8 @@
         <file alias="SELECT_ALL">TopSideToolBarIcons/SELECT_ALL.ico</file>
         <file alias="SELECT_INVERT">TopSideToolBarIcons/SELECT_INVERT.ico</file>
         <file alias="SELECT_NONE">TopSideToolBarIcons/SELECT_NONE.ico</file>
+        <file alias="SYNC_MODIFICATION_SWITCH">TopSideToolBarIcons/SYNC_MODIFICATION_SWITCH.svg</file>
+        <file alias="SYNC_REVERSE_SWITCH">TopSideToolBarIcons/SYNC_REVERSE_SWITCH.svg</file>
         <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>
         <file alias="PATH_BACK_TO">AddressControl/PATH_BACK_TO.svg</file>
         <file alias="PATH_FORWARD_TO">AddressControl/PATH_FORWARD_TO.svg</file>
@@ -202,6 +204,8 @@
         <file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
         <file alias="DROP_DATABASE">Database/DROP_DATABASE.svg</file>
         <file alias="DROP_TABLE">Database/DROP_TABLE.png</file>
+        <file alias="ANALYSE_AI_MEDIA_TABLES">Database/ANALYSE_AI_MEDIA_TABLES.svg</file>
+        <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
         <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
         <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
         <file alias="SHOW_DATABASE">Database/SHOW_DATABASE.svg</file>
