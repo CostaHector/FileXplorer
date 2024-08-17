@@ -16,7 +16,8 @@ QVariant TrashbinModel::data(const QModelIndex& idx, int role) const {
   }
   if (role == Qt::DisplayRole) {
     if (idx.column() == RECYCLE_HEADER_KEY::SIZE_INDEX)
-      return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toUInt());
+      return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(
+          QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
   } else if (role == Qt::DecorationRole) {
     if (idx.column() == RECYCLE_HEADER_KEY::DB_NAME_INDEX) {
       return m_iconProvider.icon(fileName(idx));

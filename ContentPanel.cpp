@@ -2,6 +2,7 @@
 #include "Actions/ArchiveFilesActions.h"
 #include "Component/NotificatorFrame.h"
 #include "Tools/ArchiveFiles.h"
+#include "public/DisplayEnhancement.h"
 
 #include <QLineEdit>
 #include <QTableView>
@@ -67,7 +68,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
-  if (targetStr.isEmpty()) {
+  if (targetStr.isEmpty()) {  
     m_fsModel->setNameFilters({});
     return true;
   }
@@ -188,6 +189,12 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
     return false;
   }
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
+  if (selectCnt == 1 && firstFileInfo.isFile()) {
+    _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(firstFileInfo.size()));
+  } else {
+    _logger->msg("size: unknown");
+  }
+
   QString pth = m_fsModel->rootPath();
 #ifdef _WIN32
   if (not pth.isEmpty() and pth.back() == ':') {

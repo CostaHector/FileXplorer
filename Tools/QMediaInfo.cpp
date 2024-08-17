@@ -20,6 +20,8 @@ QMediaInfo::QMediaInfo() {
   qDebug("%s", qPrintable(QFileInfo(libPath).absoluteFilePath()));
   _lib = new QLibrary(libPath);
   if (!_lib->load()) {
+    // ERROR_BAD_EXE_FORMAT: 0x0x000000c1.
+    // use win64 archi
     qDebug("load lib failed: %s", qPrintable(_lib->errorString()));
     return;
   }
@@ -53,6 +55,27 @@ const MediaInfo_Char* QMediaInfo::Get(MediaInfo_stream_C streamKind,
   if (!get)
     return NULL;
   return get(_pMedia, streamKind, streamNumber, parameter, infoKind, searchKind);
+}
+
+int QMediaInfo::VidDurationLength(const QString& vidAbsPath) const {
+  if (!IsLoaded()) {
+    qWarning("_lib not loaded");
+    return -1;
+  }
+  MEDIAINFO_Get get = (MEDIAINFO_Get)_lib->resolve("MediaInfo_Get");
+  if (!get) {
+    qWarning("function named MediaInfo_Get not exist in lib");
+    return -1;
+  }
+
+  MEDIAINFO_Open mopen = (MEDIAINFO_Open)_lib->resolve("MediaInfo_Open");
+  InitMediaInfo_CharArr(prop, "Duration/String3");
+  if (mopen(_pMedia, QString2MediaInfoc_str(vidAbsPath)) == 0) {
+    return -1;
+  }
+  const QString& dur = QStringFromMediaInfoc_str(get(_pMedia, MediaInfo_Stream_General, 0, prop, MediaInfo_Info_Text, MediaInfo_Info_Name));
+  int durInt = QTime::fromString(dur, Qt::ISODateWithMs).msecsSinceStartOfDay();
+  return durInt;
 }
 
 QList<int> QMediaInfo::batchVidsDurationLength(const QStringList& vidsAbsPath) const {
