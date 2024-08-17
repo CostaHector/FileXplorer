@@ -178,17 +178,14 @@ auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* old
 }
 
 auto GetSqlVidsDB() -> QSqlDatabase {
-  QSqlDatabase con;
-  if (QSqlDatabase::connectionNames().contains("custom_connection")) {
-    con = QSqlDatabase::database("custom_connection", false);
-  } else {
-    con = QSqlDatabase::addDatabase("QSQLITE", "custom_connection");
+  if (QSqlDatabase::connectionNames().contains("DBMOVIE_CONNECT")) {
+    auto db = QSqlDatabase::database("DBMOVIE_CONNECT");
+    return db;
   }
-  con.setDatabaseName(SystemPath::VIDS_DATABASE);
-  if (not con.open()) {
-    qDebug("%s", qPrintable(con.lastError().text()));
-  }
-  return con;
+  auto db = QSqlDatabase::addDatabase("QSQLITE", "DBMOVIE_CONNECT");
+  db.setDatabaseName(SystemPath::VIDS_DATABASE);
+  db.open();
+  return db;
 }
 
 void LoadCNLanguagePack(QTranslator& translator) {

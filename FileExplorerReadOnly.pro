@@ -78,6 +78,7 @@ SOURCES += \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/VidModel.cpp \
+    Tools/AIMediaDuplicate.cpp \
     Tools/ArchiveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/FolderPreviewSwitcher.cpp \
@@ -227,6 +228,7 @@ HEADERS += \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/VidModel.h \
+    Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/FolderPreviewSwitcher.h \
