@@ -204,6 +204,8 @@
         <file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
         <file alias="DROP_DATABASE">Database/DROP_DATABASE.svg</file>
         <file alias="DROP_TABLE">Database/DROP_TABLE.png</file>
+        <file alias="ANALYSE_AI_MEDIA_TABLES">Database/ANALYSE_AI_MEDIA_TABLES.svg</file>
+        <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
         <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
         <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
         <file alias="SHOW_DATABASE">Database/SHOW_DATABASE.svg</file>
