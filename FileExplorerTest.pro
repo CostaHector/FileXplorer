@@ -10,9 +10,11 @@ TEMPLATE = app
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    TestCase/AIMediaDuplicateTest.cpp \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
+    TestCase/MD5CalculatorTest.cpp \
     TestCase/NameSectionArrangeTest.cpp \
     TestCase/NameToolTest.cpp \
     TestCase/PathToolTest.cpp \
@@ -30,6 +32,7 @@ SOURCES += \
     Tools/ConflictsItemHelper.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/RedundantFolderRemove.cpp \
+    Tools/MD5Calculator.cpp \
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     Component/NotificatorFrame.cpp \
@@ -56,6 +59,7 @@ SOURCES += \
     Tools/RenameNamesUnique.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/NameSectionArrange.cpp \
+    Tools/AIMediaDuplicate.cpp \
     model/ConflictsFileSystemModel.cpp \
     UndoRedo.cpp
 
@@ -71,6 +75,7 @@ HEADERS += \
     Tools/PathTool.h\
     Tools/NameTool.h\
     Tools/ConflictsItemHelper.h \
+    Tools/MD5Calculator.h \
     Component/QuickWhereClause.h \
     Component/StateLabel.h \
     Component/NotificatorFrame.h \
@@ -90,6 +95,7 @@ HEADERS += \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/NameSectionArrange.h \
     Tools/RedundantFolderRemove.h \
+    Tools/AIMediaDuplicate.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 
