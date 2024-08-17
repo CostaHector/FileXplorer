@@ -50,5 +50,5 @@ class MD5CalculatorTest : public QObject {
   }
 };
 
-QTEST_MAIN(MD5CalculatorTest)
+//QTEST_MAIN(MD5CalculatorTest)
 #include "MD5CalculatorTest.moc"

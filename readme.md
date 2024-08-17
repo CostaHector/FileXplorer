@@ -147,7 +147,34 @@ Notice!
 
 
 
+## Read from table
+```cpp
+QSqlQuery query(db);
+query.prepare(QString("SELECT "
+                      "	`SIZE`,"
+                      "	COUNT(`SIZE`)"
+                      "FROM "
+                      "	`%1`"
+                      "GROUP BY "
+                      "	`SIZE`"
+                      "HAVING "
+                      "	COUNT(`SIZE`) > 1")
+                  .arg(tableName));
+const bool selectRet = query.exec();
+if (!selectRet) {
+  qWarning("Select error[%s]", qPrintable(query.lastError().text()));
+  return -1;
+}
 
+QSqlQuery queryFullPath(db);
+queryFullPath.prepare(QString("SELECT "
+                              "	`ABSOLUTE_PATH`"
+                              "FROM "
+                              "	`%1`"
+                              "WHERE"
+                              "	`SIZE` == (?)")
+                          .arg(tableName));
+```
 
 
 

@@ -294,6 +294,7 @@ const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures")
 const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
 const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/VIDS_DATABASE.db");
+const QString AI_MEDIA_DUP_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/DUPLICATES_DB.db");
 const QString RECYCLE_BIN_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/RECYCLE_BIN_DATABASE.db");
 const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
 const QString TORRENTS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/TORRENTS_DATABASE.db");
