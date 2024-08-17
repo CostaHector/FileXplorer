@@ -294,6 +294,7 @@ const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures")
 const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
 const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/VIDS_DATABASE.db");
+const QString AI_MEDIA_DUP_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/DUPLICATES_DB.db");
 const QString RECYCLE_BIN_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/RECYCLE_BIN_DATABASE.db");
 const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
 const QString TORRENTS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/TORRENTS_DATABASE.db");
@@ -313,7 +314,7 @@ constexpr int TABS_ICON_IN_MENU_2x1 = 24;
 constexpr int TABS_ICON_IN_MENU_1x1 = 48;
 
 namespace TYPE_FILTER {
-const QStringList VIDEO_TYPE_SET = {"*.mp4", "*.mov", "*.avi", "*.flv", "*.wmv", "*.mkv", "*.divx", "*.m4v", "*.mpg", "*.ts", "*.vob"};
+const QStringList VIDEO_TYPE_SET = {"*.mp4", "*.mov", "*.avi", "*.flv", "*.wmv", "*.mkv", "*.divx", "*.m4v", "*.mpg", "*.ts", "*.vob", "*.iso"};
 const QStringList IMAGE_TYPE_SET = {"*.jpeg", "*.jpg", "*.png", "*.tiff", "*.jfif", "*.gif", "*.webp", "*.ico", "*.svg"};
 const QStringList JSON_TYPE_SET = {"*.json"};
 const QStringList TEXT_TYPE_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat"};
