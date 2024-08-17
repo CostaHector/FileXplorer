@@ -3,18 +3,22 @@
 #include <QFile>
 #include <QFileInfo>
 
-QString MD5Calculator::getMd5(const QString& filepath) {
+QString MD5Calculator::GetMD5(const QString& filepath, const int onlyFirstByte) {
   QFile file(filepath);
   file.open(QIODevice::ReadOnly);
   QCryptographicHash md5(QCryptographicHash::Md5);
-  while (!file.atEnd()) {
-    md5.addData(file.read(8192));
+  if (onlyFirstByte > 0) {
+    md5.addData(file.read(onlyFirstByte));
+  } else {
+    while (!file.atEnd()) {
+      md5.addData(file.read(8192));
+    }
   }
   file.close();
   return md5.result().toHex();
 }
 
-QStringList MD5Calculator::getBatchMD5(const QStringList& filepaths) {
+QStringList MD5Calculator::GetBatchMD5(const QStringList& filepaths, const int onlyFirstByte) {
   QStringList md5Lst;
   md5Lst.reserve(filepaths.size());
   for (const auto& path : filepaths) {
@@ -22,13 +26,13 @@ QStringList MD5Calculator::getBatchMD5(const QStringList& filepaths) {
     if (not fi.exists() or not fi.isFile()) {
       continue;
     }
-    md5Lst << getMd5(path);
+    md5Lst << GetMD5(path);
   }
   return md5Lst;
 }
 
 QString MD5Calculator::DisplayFilesMD5(const QStringList& fileAbsPaths) {
-  return MD5PrepathName2Table(getBatchMD5(fileAbsPaths), fileAbsPaths);
+  return MD5PrepathName2Table(GetBatchMD5(fileAbsPaths), fileAbsPaths);
 }
 
 QString MD5Calculator::MD5PrepathName2Table(const QStringList& md5s, const QStringList& fileAbsPaths) {

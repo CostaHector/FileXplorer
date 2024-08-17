@@ -28,6 +28,7 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
+    Actions/SyncFileSystemModificationActions.cpp \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
@@ -64,10 +65,12 @@ SOURCES += \
     Component/SearchModeComboBox.cpp \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
+    Component/SyncModifiyFileSystem.cpp \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
     FileOperation/FileOperatorPub.cpp \
     FileOperation/RecycleBinHelper.cpp \
+    Model/AiMediaTablesModel.cpp \
     Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
     Model/DuplicateVideoModel.cpp \
@@ -76,6 +79,7 @@ SOURCES += \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/VidModel.cpp \
+    Tools/AIMediaDuplicate.cpp \
     Tools/ArchiveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/FolderPreviewSwitcher.cpp \
@@ -90,6 +94,7 @@ SOURCES += \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/VidsDurationDisplayString.cpp \
     View/AdvanceSearchTableView.cpp \
+    View/AiMediaDupTableView.cpp \
     View/CustomListView.cpp \
     View/DuplicateVideosFinder.cpp \
     View/JsonListView.cpp \
@@ -175,6 +180,7 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
+    Actions/SyncFileSystemModificationActions.h \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
@@ -212,9 +218,11 @@ HEADERS += \
     Component/SearchModeComboBox.h \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
+    Component/SyncModifiyFileSystem.h \
     Component/Toaster.h \
     FileOperation/FileOperatorPub.h \
     FileOperation/RecycleBinHelper.h \
+    Model/AiMediaTablesModel.h \
     Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
     Model/DuplicateVideoModel.h \
@@ -223,6 +231,7 @@ HEADERS += \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/VidModel.h \
+    Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/FolderPreviewSwitcher.h \
@@ -239,6 +248,7 @@ HEADERS += \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/VidsDurationDisplayString.h \
     View/AdvanceSearchTableView.h \
+    View/AiMediaDupTableView.h \
     View/CustomListView.h \
     View/DuplicateVideosFinder.h \
     View/JsonListView.h \

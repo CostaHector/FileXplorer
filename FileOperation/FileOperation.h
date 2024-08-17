@@ -13,9 +13,8 @@
 #include <QMap>
 #include <functional>
 
-#include "PublicVariable.h"
 #include "FileOperatorPub.h"
-
+#include "PublicVariable.h"
 
 class FileOperation {
  public:
@@ -125,7 +124,7 @@ class FileOperation {
     if (parms.size() != 2) {
       return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
     }
-    const QString& pres = parms[0]; // seperated by '\n'
+    const QString& pres = parms[0];  // seperated by '\n'
     const QString& rels = parms[1];
     return FileOperation::moveToTrash(pres, rels);
   }
@@ -310,48 +309,7 @@ class FileOperation {
 
   static auto WriteIntoLogFile(const QString& msg) -> bool;
 
-  static auto executer(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& aBatch, FileOperatorType::BATCH_COMMAND_LIST_TYPE& srcCommand) -> FileOperatorType::EXECUTE_RETURN_TYPE {
-    FileOperatorType::BATCH_COMMAND_LIST_TYPE recoverList;
-    int failedCommandCnt = 0;
-    QString log;
-    for (int i = 0; i < aBatch.size(); ++i) {
-      const QStringList& cmds = aBatch[i];
-      if (cmds.isEmpty()) {
-        continue;
-      }
-      const QString& k = cmds[0];  // operation name
-      QStringList vals(cmds.cbegin() + 1, cmds.cend());
-      FileOperatorType::RETURN_TYPE returnEle = FileOperation::LambdaTable[k](vals);
-      int ret = returnEle.first;
-      FileOperatorType::BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
-      if (ret != ErrorCode::OK) {
-        ++failedCommandCnt;
-        const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]. ErrorCode[%4]").arg(k).arg(vals.join(",")).arg(vals.size()).arg(ret);
-        qWarning("%s", qPrintable(msg));
-        log += msg;
-      }
-      if (k == "moveToTrash" and not srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
-        if (recover.size() > 1) {
-          qWarning("moveToTrash recover command can only <= 1. Here is[%d]", recover.size());
-          assert(false);
-        }
-        if (recover.size() == 1) {
-          *(srcCommand.rbegin() + i) = recover[0];
-        } else {
-          (srcCommand.rbegin() + i)->clear();
-        }
-      }
-      recoverList += recover;
-    }
-
-    if (failedCommandCnt != 0) {
-      qWarning("Above %d command(s) failed.", failedCommandCnt);
-      log += QString("Above %1 command(s) failed.").arg(failedCommandCnt);
-      WriteIntoLogFile(log);
-    }
-    // in-place reverse
-    return {failedCommandCnt == 0, QList<QStringList>(recoverList.crbegin(), recoverList.crend())};
-  }
+  static auto executer(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& aBatch, FileOperatorType::BATCH_COMMAND_LIST_TYPE& srcCommand)-> FileOperatorType::EXECUTE_RETURN_TYPE;
 
   static inline auto linkAgent(const QStringList& parms) -> FileOperatorType::RETURN_TYPE {
     if (parms.size() != 2 and parms.size() != 3) {

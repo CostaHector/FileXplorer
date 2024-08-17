@@ -11,6 +11,7 @@
 #include "Actions/RecycleBinActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
+#include "Actions/SyncFileSystemModificationActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Component/DatabaseToolBar.h"
@@ -206,6 +207,20 @@ QToolBar* RibbonMenu::LeafHome() const {
   advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
+  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
+  {
+    syncSwitchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+    syncSwitchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  }
+  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
+  {
+    syncPathToolBar->setOrientation(Qt::Orientation::Vertical);
+    syncPathToolBar->setStyleSheet("QToolBar { max-width: 512px; }");
+    syncPathToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    syncPathToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+    SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+  }
+
   QToolBar* leafHomeWid = new QToolBar("LeafHome");
   leafHomeWid->setToolTip("Home Leaf ToolBar");
   leafHomeWid->addWidget(openItemsTB);
@@ -225,6 +240,9 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addWidget(compressToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(advanceSearchToolBar);
+  leafHomeWid->addSeparator();
+  leafHomeWid->addWidget(syncSwitchToolBar);
+  leafHomeWid->addWidget(syncPathToolBar);
   return leafHomeWid;
 }
 
@@ -272,14 +290,31 @@ QToolBar* RibbonMenu::LeafDatabase() const {
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
+  auto* folderRmv{new QToolBar{"Folder Remover"}};
+  folderRmv->setOrientation(Qt::Orientation::Vertical);
+  folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
+  folderRmv->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_REDUN_PARENT_FOLDER);
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
+
+  auto* mediaDupFinder{new QToolBar{"Duplicate Medias Finder"}};
+  mediaDupFinder->setOrientation(Qt::Orientation::Vertical);
+  mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  mediaDupFinder->setStyleSheet("QToolBar { max-width: 256px; }");
+  mediaDupFinder->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER);
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER);
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
+
   auto* archiveVidsTB = new QToolBar("Leaf Arrange Files");
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._NAME_STANDARDLIZER, g_fileBasicOperationsActions()._CLASSIFIER});
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._NAME_STANDARDLIZER);
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._CLASSIFIER);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER, g_fileBasicOperationsActions()._REMOVE_REDUNDANT_ITEMS,
-                             g_fileBasicOperationsActions()._REMOVE_EMPTY_FOLDER});
+  archiveVidsTB->addWidget(folderRmv);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER});
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER});
+  archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }

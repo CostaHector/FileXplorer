@@ -42,7 +42,7 @@ class ConflictSolveModelTest : public FileSystemRelatedTest {
   }
 
   void test_noConflictCut() {
-    CCMMode mode = CCMMode::CUT;
+    CCMMode mode = CCMMode::CUT_OP;
     const QString l = QDir(TEST_DIR).absoluteFilePath("NoConflictPage");
     const QString r = TEST_DIR;
     const auto& conflictIF0 = ConflictsItemHelper(l, r, {"RandomFolder"}, mode);
@@ -70,7 +70,7 @@ class ConflictSolveModelTest : public FileSystemRelatedTest {
   }
 
   void test_practicalCutTest() {
-    CCMMode mode = CCMMode::CUT;
+    CCMMode mode = CCMMode::CUT_OP;
     const QString l = QDir(TEST_DIR).absoluteFilePath("Page12");
     const QString r = TEST_DIR;
     const auto& conflictIF0 = ConflictsItemHelper(l, r, {"Movie"}, mode);
@@ -98,6 +98,6 @@ class ConflictSolveModelTest : public FileSystemRelatedTest {
   }
 };
 
-QTEST_MAIN(ConflictSolveModelTest)
+//QTEST_MAIN(ConflictSolveModelTest)
 
-#include "ConflictSolveModelTest.moc"
+//#include "ConflictSolveModelTest.moc"

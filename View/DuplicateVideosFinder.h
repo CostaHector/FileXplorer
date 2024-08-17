@@ -1,7 +1,9 @@
 #ifndef DUPLICATEVIDEOSFINDER_H
 #define DUPLICATEVIDEOSFINDER_H
 
-#include "CustomTableView.h"
+#include "View/CustomTableView.h"
+#include "View/AiMediaDupTableView.h"
+
 #include "Model/DuplicateVideoModel.h"
 
 #include <QLabel>
@@ -11,7 +13,6 @@
 #include <QToolBar>
 
 class DuplicateVideosFinder;
-
 class QSortFilterProxyModel;
 
 class LeftDuplicateList : public CustomTableView {
@@ -32,6 +33,7 @@ class RightDuplicateDetails : public CustomTableView {
   void on_cellDoubleClicked(const QModelIndex& ind) const;
   void setSharedMember(CLASSIFIED_SORT_LIST_2D* pClassifiedSort, DIFFER_BY_TYPE* pCurDifferType);
   void onRecycleSelection();
+
  private:
   void subscribe();
   DuplicateDetailsModel* m_detailsModel{nullptr};
@@ -41,14 +43,17 @@ class RightDuplicateDetails : public CustomTableView {
 class DuplicateVideosFinder : public QMainWindow {
  public:
   DuplicateVideosFinder(QWidget* parent = nullptr);
-  bool loadAPath(const QString& path);
-
-  void onSelectAPath();
+  bool TablesGroupChangedTo(const QStringList& tbls);
+  
+  void onAnalyseAiMediaTableChanged();
+  void onCancelAnalyse();
   void onDifferTypeChanged(QAction* newDifferAct);
 
   void onChangeSizeDeviation();
   void onChangeDurationDeviation();
   void on_selectionChanged();
+
+  void UpdateAiMediaTableNames();
 
   void UpdateWindowsTitle();
 
@@ -62,6 +67,9 @@ class DuplicateVideosFinder : public QMainWindow {
   QToolBar* m_tb{nullptr};
   LeftDuplicateList* m_dupList{nullptr};
   RightDuplicateDetails* m_details{nullptr};
+
+  QToolBar* m_aiTablesTB{nullptr};
+  AiMediaDupTableView* m_aiTables{nullptr};
 
   QSplitter* m_mainWidget{nullptr};
 
