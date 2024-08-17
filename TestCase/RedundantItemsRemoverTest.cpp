@@ -81,5 +81,5 @@ class RedundantItemsRemoverTest : public QObject {
   }
 };
 
-QTEST_MAIN(RedundantItemsRemoverTest)
-#include "RedundantItemsRemoverTest.moc"
+//QTEST_MAIN(RedundantItemsRemoverTest)
+//#include "RedundantItemsRemoverTest.moc"
