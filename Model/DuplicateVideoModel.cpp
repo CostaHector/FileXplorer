@@ -9,6 +9,7 @@
 #include <QFileInfo>
 
 #include <QBrush>
+#include <QFileIconProvider>
 
 const QStringList DuplicateDetailsModel::VIDS_DETAIL_HEADER{"Name", "Date", "Size", "Duration", "Prepath"};
 const QStringList VidInfoModel::DUPLICATE_LIST_HEADER{"Count", "Value"};
@@ -20,24 +21,31 @@ QVariant DuplicateDetailsModel::data(const QModelIndex& index, int role) const {
     return {};
   const int row = index.row();
   const int column = index.column();
-  const info& inf = (*p_classifiedSort)[(int)*m_currentDiffer][m_leftRow][row];
+  const DUP_INFO& inf = (*p_classifiedSort)[(int)*m_currentDiffer][m_leftRow][row];
   switch (role) {
     case Qt::DisplayRole: {
       switch (column) {
         case 0:
           return inf.name;
         case 1:
-          return inf.modifiedDate;
+          return QDateTime::fromMSecsSinceEpoch(inf.modifiedDate);
         case 2:
           return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(inf.sz);
         case 3:
           return FILE_PROPERTY_DSP::durationToHumanReadFriendly(inf.dur);
         case 4:
-          return inf.prepath;
+          return inf.abspath;
       }
     }
     case Qt::ForegroundRole: {
-      return QFile::exists(inf.prepath + inf.name) ? QBrush(Qt::GlobalColor::black) : QBrush(Qt::GlobalColor::gray);
+      return QFile::exists(inf.abspath) ? QBrush(Qt::GlobalColor::black) : QBrush(Qt::GlobalColor::gray);
+    }
+    case Qt::DecorationRole: {
+      if (column == 0) {
+        static QFileIconProvider fip;
+        return fip.icon(inf.abspath);
+      }
+      return {};
     }
     default:
       return {};
@@ -107,8 +115,8 @@ QString DuplicateDetailsModel::filePath(const QModelIndex& index) const {
     qWarning("shared member is nullptr");
     return {};
   }
-  const info& inf = (*p_classifiedSort)[(int)*m_currentDiffer][m_leftRow][index.row()];
-  return inf.prepath + inf.name;
+  const DUP_INFO& inf = (*p_classifiedSort)[(int)*m_currentDiffer][m_leftRow][index.row()];
+  return inf.abspath;
 }
 
 // call this before change differ type in dupList
@@ -153,56 +161,26 @@ QVariant VidInfoModel::data(const QModelIndex& index, int role) const {
   }
   const int row = index.row();
   const int column = index.column();
-  auto& info = m_classifiedSort[(int)m_currentDiffer][row];
+  auto& DUP_INFO = m_classifiedSort[(int)m_currentDiffer][row];
   if (column == 0) {
-    return info.size();
+    return DUP_INFO.size();
   }
   if (column == 1) {
     if (m_currentDiffer == DIFFER_BY_TYPE::DURATION) {
-      return info.front().dur;
+      return DUP_INFO.front().dur;
     } else if (m_currentDiffer == DIFFER_BY_TYPE::SIZE) {
-      return info.front().sz;
+      return DUP_INFO.front().sz;
     }
   }
   return {};
 }
 
-void VidInfoModel::AppendAPath(const QString& path) {
+void VidInfoModel::ChangeTableGroups(const QStringList& tbls) {
   setDataChangedFlag();
-  m_needFillDuration = true;
-  QDirIterator it(path, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  QString name, prepath;
-  while (it.hasNext()) {
-    it.next();
-    const QFileInfo fi = it.fileInfo();
-    getName(fi.absoluteFilePath(), name, prepath);
-    if (m_metNames.contains(name)) {
-      continue;
-    }
-    m_metNames.insert(name);
-    m_vidsInfo.append(info{name, fi.lastModified(), fi.size(), 0, prepath, true});
-  }
+  auto& aimd = AIMediaDuplicate::GetInst();
+  aimd.ReadSpecifiedTables2List(tbls, m_vidsInfo);
   UpdateMemberList();
   TryUpdateRowCountAndDisplay();
-}
-
-void VidInfoModel::FillStructDurationMember() {
-  QStringList filesLst;
-  QList<int> toBeRefreshIndxes;
-  for (int i = 0; i < m_vidsInfo.size(); ++i) {
-    if (m_vidsInfo[i].dur > 0) {
-      continue;
-    }
-    filesLst.append(m_vidsInfo[i].prepath + m_vidsInfo[i].name);
-    toBeRefreshIndxes.append(i);
-  }
-
-  QMediaInfo mi;
-  const QList<int>& durs = mi.batchVidsDurationLength(filesLst);
-  for (int i = 0; i < durs.size(); ++i) {
-    m_vidsInfo[toBeRefreshIndxes[i]].dur = durs[i];
-  }
-  m_needFillDuration = false;
 }
 
 void VidInfoModel::TryUpdateRowCountAndDisplay() {
@@ -260,7 +238,7 @@ void VidInfoModel::setDeviationSize(int newSize) {
   TryUpdateRowCountAndDisplay();
 }
 
-bool sortByListSize(const QList<info>& lhsLst, const QList<info>& rhsLst) {
+bool sortByListSize(const QList<DUP_INFO>& lhsLst, const QList<DUP_INFO>& rhsLst) {
   return lhsLst.size() > rhsLst.size();
 }
 
@@ -276,9 +254,6 @@ void VidInfoModel::UpdateMemberList() {
       m_dataChangedFlag[(int)m_currentDiffer] = true;
       break;
     case DIFFER_BY_TYPE::DURATION:
-      if (m_needFillDuration) {
-        FillStructDurationMember();
-      }
       m_classifiedSort[(int)m_currentDiffer] = getDurationsLst();
       m_dataChangedFlag[(int)m_currentDiffer] = true;
       break;
@@ -289,8 +264,8 @@ void VidInfoModel::UpdateMemberList() {
   m_afterRow = m_classifiedSort[(int)m_currentDiffer].size();
 }
 
-QList<QList<info>> VidInfoModel::getDurationsLst() const {
-  QMap<qint64, QList<info>> curMap;
+QList<QList<DUP_INFO>> VidInfoModel::getDurationsLst() const {
+  QMap<qint64, QList<DUP_INFO>> curMap;
   for (auto it = m_vidsInfo.cbegin(); it != m_vidsInfo.cend(); ++it) {
     auto fuzzyDur = getFuzzyDur(it->dur);
     auto durIt = curMap.find(fuzzyDur);
@@ -301,7 +276,7 @@ QList<QList<info>> VidInfoModel::getDurationsLst() const {
     durIt.value().append(*it);
   }
 
-  QList<QList<info>> sortByCnt2DList;
+  QList<QList<DUP_INFO>> sortByCnt2DList;
   for (auto it = curMap.cbegin(); it != curMap.cend(); ++it) {
     if (it.value().size() < 2) {
       continue;
@@ -312,8 +287,8 @@ QList<QList<info>> VidInfoModel::getDurationsLst() const {
   return sortByCnt2DList;
 }
 
-QList<QList<info>> VidInfoModel::getSizeLst() const {
-  QMap<qint64, QList<info>> curMap;
+QList<QList<DUP_INFO>> VidInfoModel::getSizeLst() const {
+  QMap<qint64, QList<DUP_INFO>> curMap;
   for (auto it = m_vidsInfo.cbegin(); it != m_vidsInfo.cend(); ++it) {
     auto fuzzySz = getFuzzySz(it->sz);
     auto szIt = curMap.find(fuzzySz);
@@ -324,7 +299,7 @@ QList<QList<info>> VidInfoModel::getSizeLst() const {
     szIt.value().append(*it);
   }
 
-  QList<QList<info>> sortByCnt2DList;
+  QList<QList<DUP_INFO>> sortByCnt2DList;
   for (auto it = curMap.cbegin(); it != curMap.cend(); ++it) {
     if (it.value().size() < 2) {
       continue;

@@ -6,22 +6,15 @@
 #include <QMap>
 #include <QSet>
 #include <QString>
-
-struct info {
-  QString name;
-  QDateTime modifiedDate;
-  qint64 sz;
-  int dur;
-  QString prepath;
-  bool exist;
-};
+#include "Tools/AIMediaDuplicate.h"
 
 enum class DIFFER_BY_TYPE {
   DURATION = 0,
   SIZE = 1,
   BOTTOM,
 };
-typedef QList<QList<info>> CLASSIFIED_SORT_LIST_2D[(int)DIFFER_BY_TYPE::BOTTOM];
+
+typedef QList<QList<DUP_INFO>> CLASSIFIED_SORT_LIST_2D[(int)DIFFER_BY_TYPE::BOTTOM];
 
 class DuplicateDetailsModel : public QAbstractTableModel {
  public:
@@ -77,15 +70,13 @@ class VidInfoModel : public QAbstractTableModel {
     return QAbstractTableModel::headerData(section, orientation, role);
   }
 
-  void AppendAPath(const QString& path);
-
-  void FillStructDurationMember();
+  void ChangeTableGroups(const QStringList& path);
 
   void TryUpdateRowCountAndDisplay();
 
   void UpdateMemberList();
-  QList<QList<info>> getDurationsLst() const;
-  QList<QList<info>> getSizeLst() const;
+  QList<QList<DUP_INFO>> getDurationsLst() const;
+  QList<QList<DUP_INFO>> getSizeLst() const;
 
   void setDifferType(const DIFFER_BY_TYPE& newDifferType);
 
@@ -132,10 +123,8 @@ class VidInfoModel : public QAbstractTableModel {
 
   int m_beforeRowN = -1, m_afterRow = -1;
   bool m_dataChangedFlag[(int)DIFFER_BY_TYPE::BOTTOM] = {0};
-  bool m_needFillDuration = false;
 
-  QList<info> m_vidsInfo;
-  QSet<QString> m_metNames;
+  QList<DUP_INFO> m_vidsInfo;
 
   static int m_deviationDur;    // ms, 995~1004 => 1000, (v+dev/2)//dev*dev
   static qint64 m_deviationSz;  // bytes

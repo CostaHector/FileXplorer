@@ -70,6 +70,7 @@ SOURCES += \
     ContentPanelImplementer.cpp \
     FileOperation/FileOperatorPub.cpp \
     FileOperation/RecycleBinHelper.cpp \
+    Model/AiMediaTablesModel.cpp \
     Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
     Model/DuplicateVideoModel.cpp \
@@ -93,6 +94,7 @@ SOURCES += \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/VidsDurationDisplayString.cpp \
     View/AdvanceSearchTableView.cpp \
+    View/AiMediaDupTableView.cpp \
     View/CustomListView.cpp \
     View/DuplicateVideosFinder.cpp \
     View/JsonListView.cpp \
@@ -220,6 +222,7 @@ HEADERS += \
     Component/Toaster.h \
     FileOperation/FileOperatorPub.h \
     FileOperation/RecycleBinHelper.h \
+    Model/AiMediaTablesModel.h \
     Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
     Model/DuplicateVideoModel.h \
@@ -245,6 +248,7 @@ HEADERS += \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/VidsDurationDisplayString.h \
     View/AdvanceSearchTableView.h \
+    View/AiMediaDupTableView.h \
     View/CustomListView.h \
     View/DuplicateVideosFinder.h \
     View/JsonListView.h \
