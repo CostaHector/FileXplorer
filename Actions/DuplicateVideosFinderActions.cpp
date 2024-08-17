@@ -1,20 +1,45 @@
 #include "DuplicateVideosFinderActions.h"
 
 #include <QLineEdit>
-
+#include <QMenu>
 #include "PublicVariable.h"
+#include <QLabel>
 
 DuplicateVideosFinderActions& g_dupVidFinderAg() {
   static DuplicateVideosFinderActions ins;
   return ins;
 }
 
-QToolBar* DuplicateVideosFinderActions::getToolBar(QWidget* parent) {
+DuplicateVideosFinderActions::DuplicateVideosFinderActions(QObject* parent) : QObject{parent} {
+  DIFFER_BY_DURATION->setToolTip("Value in [a-dev/2, a+dev/2) will be classified to a\nUnit: ms");
+  DIFFER_BY_SIZE->setToolTip("Value in [a-dev/2, a+dev/2) will be classified to a\nUnit: Byte");
+
+  DIFFER_BY->addAction(DIFFER_BY_DURATION);
+  DIFFER_BY->addAction(DIFFER_BY_SIZE);
+  DIFFER_BY->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+
+  RECYCLE_ONE_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key_Delete));
+
+  for (auto* act : DIFFER_BY->actions()) {
+    act->setCheckable(true);
+  }
+  DIFFER_BY_SIZE->setChecked(true);
+
+  ANALYSE_THESE_TABLES->setToolTip("Analyse this tables");
+  AUDIT_AI_MEDIA_TABLE->setToolTip("Will delete record if driver online and abspath item is no longer exist.");
+  DROP_TABLE->setToolTip("Will drop a table.");
+  DROP_THEN_REBUILD_THIS_TABLE->setToolTip("Will drop a table then rebuild it.");
+}
+
+QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
   QToolBar* m_tb{new QToolBar{"Duplicator finder toolbar", parent}};
   m_tb->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-
-  m_tb->addAction(APPEND_A_PATH);
+  m_tb->addWidget(new QLabel{"Tables", m_tb});
+  if (tblKWFilter == nullptr) {
+    tblKWFilter = new QLineEdit{"", m_tb};
+  }
   m_tb->addSeparator();
+  m_tb->addWidget(tblKWFilter);
   m_tb->addAction(DIFFER_BY_DURATION);
   if (durationDevLE == nullptr) {
     int durDev =
@@ -34,4 +59,19 @@ QToolBar* DuplicateVideosFinderActions::getToolBar(QWidget* parent) {
   m_tb->addAction(RECYCLE_ONE_FILE);
   m_tb->addSeparator();
   return m_tb;
+}
+
+QMenu* DuplicateVideosFinderActions::GetMenu(QWidget* parent) {
+  auto* menu = new QMenu{"Ai Media Duplicate Menu", parent};
+  menu->addAction(ANALYSE_THESE_TABLES);
+  menu->addSeparator();
+  menu->addAction(SCAN_A_PATH);
+  menu->addSeparator();
+  menu->addAction(AUDIT_AI_MEDIA_TABLE);
+  menu->addSeparator();
+  menu->addAction(DROP_TABLE);
+  menu->addAction(DROP_THEN_REBUILD_THIS_TABLE);
+  menu->addSeparator();
+  menu->addAction(CANCEL_ANALYSE);
+  return menu;
 }
