@@ -16,7 +16,7 @@ class AIMediaDuplicateTest : public QObject {
   void initTestCase() {}
   void cleanupTestCase() {}
 
-  void init() {}
+  void init() { AIMediaDuplicate::SKIP_GETTER_DURATION = true; }
   void cleanup() {}
 
   void test_Basic() { QCOMPARE("123", GetEffectiveName("123")); }
@@ -37,16 +37,20 @@ class AIMediaDuplicateTest : public QObject {
   }
 
   void test_C_DISK_DRIVER_NAME_2_TableName() {
-    QCOMPARE(GetTableName("C:/DISK/LD2"), "DISK_LD2");
-    QCOMPARE(GetTableName("C:/DISK/LDBKP"), "DISK_LDBKP");
-    QCOMPARE(GetTableName("C:/DISK/F24BKP"), "DISK_F24BKP");
+    QCOMPARE(GetTableName("C:/DISK/LD2"), "C__DISK_LD2");
+    QCOMPARE(GetTableName("C:/DISK/LDBKP"), "C__DISK_LDBKP");
+    QCOMPARE(GetTableName("C:/DISK/F24BKP"), "C__DISK_F24BKP");
+
+    QCOMPARE(TableName2Path("C__DISK_LD2"), "C:/DISK/LD2");
+    QCOMPARE(TableName2Path("C__DISK_LDBKP"), "C:/DISK/LDBKP");
+    QCOMPARE(TableName2Path("C__DISK_F24BKP"), "C:/DISK/F24BKP");
   }
 
   void test_DRIVER_LETTER_2_TableName() {
     QCOMPARE(GetTableName("C:"), "C_");
     QCOMPARE(GetTableName("C:/"), "C__");
-    QCOMPARE(GetTableName("C:/A"), "A");
-    QCOMPARE(GetTableName("E:/P/Hetero/jerk"), "P_Hetero_jerk");
+    QCOMPARE(GetTableName("C:/A"), "C__A");
+    QCOMPARE(GetTableName("E:/P/Hetero/jerk"), "E__P_Hetero_jerk");
   }
 
   void test_noDriverLetter_TableName() {
@@ -60,7 +64,7 @@ class AIMediaDuplicateTest : public QObject {
     QCOMPARE(aid.GetTablesCnt(), 0);
   }
 
-  void test_ScanAPath_ok() {
+  void test_ScanAnEmptyPath_ok() {
     auto& aid = AIMediaDuplicate::GetInst();
     QVERIFY(aid.DropTables({}, true) != -1);
     bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_EMPTY, true);
@@ -68,12 +72,37 @@ class AIMediaDuplicateTest : public QObject {
     QCOMPARE(aid.GetTablesCnt(), 1);
   }
 
-  void test_ScanPaths_ok() {
+  void test_ScanAPaths_ok() {
     auto& aid = AIMediaDuplicate::GetInst();
     QVERIFY(aid.DropTables({}, true) != -1);
     bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_FOLDER_1, true);
     QVERIFY(scanRet);
     QCOMPARE(aid.GetTablesCnt(), 1);
+  }
+
+  void test_ScanPathContainDuplicates_ok() {
+    auto& aid = AIMediaDuplicate::GetInst();
+    QVERIFY(aid.DropTables({}, true) != -1);
+    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_FOLDER_1, true);
+    QVERIFY(scanRet);
+    QCOMPARE(aid.GetTablesCnt(), 1);
+    const QString& tableName = GetTableName(AI_MEDIA_DUPLICATE_DIR_FOLDER_1);
+    const int fillCnt = aid.FillHashFieldIfSizeConflict(tableName);
+    QCOMPARE(fillCnt, 2);
+
+    QSqlDatabase db = QSqlDatabase::database(AIMediaDuplicate::CONNECTION_NAME);
+    QSqlQuery query(db);
+    const bool qryRet = query.exec(QString("SELECT `FIRST_1024_HASH`, `SIZE` FROM `%1` WHERE `FIRST_1024_HASH` IS NOT NULL").arg(tableName));
+    int cnt = 0;
+    QSet<QString> md5s;
+    // both are 24byte: movie 1 duplicate.mp4; movie 2 duplicate.mp4;
+    while (query.next()) {
+      md5s << query.value(0).toString();
+      QCOMPARE(query.value(1).toLongLong(), 24);
+      ++cnt;
+    }
+    QCOMPARE(cnt, 2);
+    QCOMPARE(md5s.size(), 1);
   }
 
   void test_ScanNoMediaPaths_ok() {
@@ -97,5 +126,5 @@ class AIMediaDuplicateTest : public QObject {
   }
 };
 
-//QTEST_MAIN(AIMediaDuplicateTest)
+QTEST_MAIN(AIMediaDuplicateTest)
 #include "AIMediaDuplicateTest.moc"

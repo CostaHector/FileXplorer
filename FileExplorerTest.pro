@@ -33,6 +33,7 @@ SOURCES += \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/RedundantFolderRemove.cpp \
     Tools/MD5Calculator.cpp \
+    Tools/QMediaInfo.cpp \
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     Component/NotificatorFrame.cpp \
@@ -96,6 +97,7 @@ HEADERS += \
     Tools/NameSectionArrange.h \
     Tools/RedundantFolderRemove.h \
     Tools/AIMediaDuplicate.h \
+    Tools/QMediaInfo.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 

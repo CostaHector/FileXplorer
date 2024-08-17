@@ -8,3 +8,4 @@ FileExplorerTest.pro.user.f225af0
 bin/RUNLOG/*.log
 bin/lib/*
 ./*.json
+*.idx
