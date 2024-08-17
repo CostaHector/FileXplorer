@@ -26,6 +26,7 @@ class QMediaInfo {
   QMediaInfo();
   bool IsLoaded() const;
 
+  int VidDurationLength(const QString& vidAbsPath) const;
   QList<int> batchVidsDurationLength(const QStringList& vidsAbsPath) const;
 
   QString CompleteName() const;
