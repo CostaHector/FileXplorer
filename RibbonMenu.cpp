@@ -299,17 +299,23 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
 
+  auto* mediaDupFinder{new QToolBar{"Duplicate Medias Finder"}};
+  mediaDupFinder->setOrientation(Qt::Orientation::Vertical);
+  mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  mediaDupFinder->setStyleSheet("QToolBar { max-width: 256px; }");
+  mediaDupFinder->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER);
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER);
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
+
   auto* archiveVidsTB = new QToolBar("Leaf Arrange Files");
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._NAME_STANDARDLIZER, g_fileBasicOperationsActions()._CLASSIFIER});
-  archiveVidsTB->addSeparator();
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER});
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._NAME_STANDARDLIZER);
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._CLASSIFIER);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(folderRmv);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER});
-  archiveVidsTB->addActions({g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER});
+  archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-
   return archiveVidsTB;
 }
 
