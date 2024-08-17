@@ -71,7 +71,7 @@ bool MD5Window::onIncrementalCalculateMD5() {
     m_fileMD5Map.remove(eraseKey);
   }
 
-  const auto& md5Lst = MD5Calculator::getBatchMD5(toUpdateFileLst);
+  const auto& md5Lst = MD5Calculator::GetBatchMD5(toUpdateFileLst);
   setWindowTitle(
       QString("MD5 | +%1-%2/%3 file(s) update | %4").arg(toUpdateFileLst.size()).arg(toEraseFileList.size()).arg(fileLst.size()).arg(m_root));
   // add new files
@@ -90,7 +90,7 @@ bool MD5Window::onFullCalculateMD5() {
   const auto& fileLst = FileSystemItemFilter::FilesOut(m_items);
   setWindowTitle(QString("MD5 | +%1-0/%2 file(s) update | %3").arg(fileLst.size()).arg(fileLst.size()).arg(m_root));
 
-  const auto& md5Lst = MD5Calculator::getBatchMD5(fileLst);
+  const auto& md5Lst = MD5Calculator::GetBatchMD5(fileLst);
   const int ROOT_PATH_LEN = m_root.size();
   decltype(m_fileMD5Map) tempForRelease;
   m_fileMD5Map.swap(tempForRelease);

@@ -234,14 +234,14 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "Move [A.mp4, A.jpg, A.json]<br/>"
       "To Folder A");
   _DUPLICATE_ITEMS_REMOVER->setToolTip(
-      "<b>Remove Files/Folders whose names with a certern pattern under current view path</b>:<br/>"
-      "\"NAME - {$resolution}.FILETYPE\"<br/>"
+      "<b>Remove Files/Folders whose names with a certern pattern under current view path</b><br/>"
+      "NAME - {$resolution}.FILETYPE<br/>"
       "It work for any file name meet following resolution pattern.<br/>"
       "Given: [A - 480p, A - 720p, A - 1080p, A - 2160p, A - 4K]<br/>"
       "Result: only A - 2160p will be kept, and others will moved to trashbin.");
 
   _RMV_REDUN_PARENT_FOLDER->setToolTip(
-      "<b>Remove redundant Files/Folders under current view path </b><br/>"
+      "<b>Remove redundant Files/Folders under current view path</b><br/>"
       "An empty folder or one item folder(sub name like parent folder name)<br/>"
       "Upgrade sub file(if it exists) to its upper level. And erase the parent folder");
   _RMV_EMPTY_FOLDER_R->setToolTip(
