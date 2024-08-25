@@ -30,6 +30,7 @@ class RightDuplicateDetails : public CustomTableView {
  public:
   friend class DuplicateVideosFinder;
   RightDuplicateDetails(QWidget* parent = nullptr);
+  void on_effectiveNameCopiedForEverything(const QModelIndex& ind) const;
   void on_cellDoubleClicked(const QModelIndex& ind) const;
   void setSharedMember(CLASSIFIED_SORT_LIST_2D* pClassifiedSort, DIFFER_BY_TYPE* pCurDifferType);
   void onRecycleSelection();
@@ -61,6 +62,7 @@ class DuplicateVideosFinder : public QMainWindow {
 
   void closeEvent(QCloseEvent* event) override;
 
+  void keyPressEvent(QKeyEvent* e) override;
  private:
   void subscribe();
 
