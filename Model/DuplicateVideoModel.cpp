@@ -2,6 +2,8 @@
 
 #include "PublicVariable.h"
 #include "Tools/QMediaInfo.h"
+#include "Tools/MD5Calculator.h"
+
 #include "public/DisplayEnhancement.h"
 
 #include <QDir>
@@ -11,8 +13,9 @@
 #include <QBrush>
 #include <QFileIconProvider>
 
-const QStringList DuplicateDetailsModel::VIDS_DETAIL_HEADER{"Name", "Date", "Size", "Duration", "Prepath"};
+const QStringList DuplicateDetailsModel::VIDS_DETAIL_HEADER{"Name", "Date", "Size", "Duration", "Hash", "FullPath"};
 const QStringList VidInfoModel::DUPLICATE_LIST_HEADER{"Count", "Value"};
+using namespace MD5Calculator;
 
 QVariant DuplicateDetailsModel::data(const QModelIndex& index, int role) const {
   if (p_classifiedSort == nullptr or m_leftRow == -1)
@@ -33,8 +36,16 @@ QVariant DuplicateDetailsModel::data(const QModelIndex& index, int role) const {
           return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(inf.sz);
         case 3:
           return FILE_PROPERTY_DSP::durationToHumanReadFriendly(inf.dur);
-        case 4:
+        case 4: {
+          if (inf.hash.isEmpty() && rowCount() <= 10) {
+            return GetMD5(inf.abspath, 1024);
+          }
+          return inf.hash;
+        }
+        case 5:
           return inf.abspath;
+        default:
+          return {};
       }
     }
     case Qt::ForegroundRole: {
@@ -104,6 +115,21 @@ void DuplicateDetailsModel::onChangeDetailIndex(int newRow) {
     emit dataChanged(index(0, 0, {}), index(afterRowN - 1, columnCount() - 1, {}), {Qt::ItemDataRole::DisplayRole});
   }
   qDebug("details rowCount %d->%d", beforeRowN, afterRowN);
+}
+
+QString DuplicateDetailsModel::fileNameEverything(const QModelIndex& index) const {
+  if (not index.isValid()) {
+    qWarning("modelindex is invalid");
+    return {};
+  }
+  if (p_classifiedSort == nullptr or m_currentDiffer == nullptr) {
+    qWarning("shared member is nullptr");
+    return {};
+  }
+  const DUP_INFO& inf = (*p_classifiedSort)[(int)*m_currentDiffer][m_leftRow][index.row()];
+  QString name = QFileInfo(inf.abspath).fileName();
+  name.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, " ");
+  return name;
 }
 
 QString DuplicateDetailsModel::filePath(const QModelIndex& index) const {

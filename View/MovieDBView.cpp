@@ -284,12 +284,9 @@ bool MovieDBView::onDropATable() {
   }
 
   const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(dropTableName);
-
   QSqlQuery dropQry(con);
-  const bool dropTableRet = dropQry.exec(sqlCmd);
-  dropQry.finish();
-  if (not dropTableRet) {
-    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), qPrintable(con.lastError().databaseText()));
+  if (not dropQry.exec(sqlCmd)) {
+    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), qPrintable(dropQry.lastError().text()));
     QMessageBox::information(this, dropTableName, "Table drop failed");
     return false;
   }
