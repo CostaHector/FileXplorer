@@ -11,6 +11,9 @@
 
 #include <QSortFilterProxyModel>
 
+#include <QApplication>
+#include <QClipboard>
+
 LeftDuplicateList::LeftDuplicateList(QWidget* parent) : CustomTableView{"LeftDuplicateList", parent} {
   m_dupListModel = new VidInfoModel{this};
 
@@ -39,6 +42,18 @@ RightDuplicateDetails::RightDuplicateDetails(QWidget* parent) : CustomTableView{
 
   InitTableView();
   setSortingEnabled(true);
+}
+
+void RightDuplicateDetails::on_effectiveNameCopiedForEverything(const QModelIndex& ind) const {
+  const auto& srcIndex = m_sortProxy->mapToSource(ind);
+  const QString& name = m_detailsModel->fileNameEverything(srcIndex);
+  auto* cb = QApplication::clipboard();
+  if (cb == nullptr) {
+    qWarning("cb is nullptr, Copy[%s] failed", qPrintable(name));
+    return;
+  }
+  cb->setText(name, QClipboard::Mode::Clipboard);
+  return;
 }
 
 void RightDuplicateDetails::on_cellDoubleClicked(const QModelIndex& ind) const {
@@ -129,6 +144,49 @@ void DuplicateVideosFinder::closeEvent(QCloseEvent* event) {
   PreferenceSettings().setValue("DuplicateVideosFinderGeometry", saveGeometry());
   PreferenceSettings().setValue("DuplicateVideosFinderSplitterState", m_mainWidget->saveState());
   QMainWindow::closeEvent(event);
+}
+
+void DuplicateVideosFinder::keyPressEvent(QKeyEvent* e) {
+  if (e->modifiers() == Qt::KeyboardModifier::ControlModifier && e->key() == Qt::Key_Insert) {
+    const QModelIndex& playInd = m_details->currentIndex();
+    if (!playInd.isValid()) {
+      qWarning("invalid index ignore copy everything name");
+      return;
+    }
+    m_details->on_effectiveNameCopiedForEverything(playInd);
+    return;
+  }
+  if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+    switch (e->modifiers()) {
+      case Qt::KeyboardModifier::NoModifier: {
+        const QModelIndex& playInd = m_details->currentIndex();
+        if (!playInd.isValid()) {
+          qWarning("playInd is invalid");
+          return;
+        }
+        emit m_details->doubleClicked(m_details->currentIndex());
+        return;
+      }
+      case Qt::KeyboardModifier::ShiftModifier: {
+        const QModelIndex& bef = m_dupList->currentIndex();
+        if (not bef.isValid()) {
+          qWarning("before index is invalid");
+          return;
+        }
+        const QModelIndex& aft = m_dupList->model()->index(bef.row() + 1, bef.column());
+        if (not aft.isValid()) {
+          qWarning("after index is invalid");
+          return;
+        }
+        m_dupList->setCurrentIndex(aft);
+        emit m_dupList->currentChanged(aft, bef);
+        return;
+      }
+      default:
+        break;
+    }
+  }
+  return QMainWindow::keyPressEvent(e);
 }
 
 bool DuplicateVideosFinder::TablesGroupChangedTo(const QStringList& tbls) {
@@ -238,7 +296,7 @@ void DuplicateVideosFinder::onChangeDurationDeviation() {
   UpdateWindowsTitle();
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
