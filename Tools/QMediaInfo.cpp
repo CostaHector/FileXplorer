@@ -57,6 +57,38 @@ const MediaInfo_Char* QMediaInfo::Get(MediaInfo_stream_C streamKind,
   return get(_pMedia, streamKind, streamNumber, parameter, infoKind, searchKind);
 }
 
+const MediaInfo_Char QMediaInfo::m_prop[]{ L"" "Duration/String3" };
+
+bool QMediaInfo::StartToGet() {
+  if (m_get != nullptr && m_open != nullptr) {
+    return true;
+  }
+  if (!IsLoaded()) {
+    qWarning("_lib not loaded");
+    return false;
+  }
+  m_get = (MEDIAINFO_Get)_lib->resolve("MediaInfo_Get");
+  if (m_get == nullptr) {
+    qWarning("function named MediaInfo_Get not exist in lib");
+    return false;
+  }
+  m_open = (MEDIAINFO_Open)_lib->resolve("MediaInfo_Open");
+  return m_open != nullptr;
+}
+
+void QMediaInfo::EndToGet() {
+  m_get = nullptr;
+  m_open = nullptr;
+}
+
+int QMediaInfo::VidDurationLengthQuick(const QString& vidAbsPath) const {
+  assert((m_get != nullptr && m_open != nullptr));
+  if (m_open(_pMedia, QString2MediaInfoc_str(vidAbsPath)) == 0) {
+    return -1;
+  }
+  return QTime::fromString(QStringFromMediaInfoc_str(m_get(_pMedia, MediaInfo_Stream_General, 0, m_prop, MediaInfo_Info_Text, MediaInfo_Info_Name)), Qt::ISODateWithMs).msecsSinceStartOfDay();
+}
+
 int QMediaInfo::VidDurationLength(const QString& vidAbsPath) const {
   if (!IsLoaded()) {
     qWarning("_lib not loaded");

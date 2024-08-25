@@ -5,7 +5,10 @@
 
 QString MD5Calculator::GetMD5(const QString& filepath, const int onlyFirstByte) {
   QFile file(filepath);
-  file.open(QIODevice::ReadOnly);
+  if (!file.exists() || !file.open(QIODevice::ReadOnly)) {
+    qDebug("file[%s] open failed or not exist", qPrintable(filepath));
+    return "";
+  }
   QCryptographicHash md5(QCryptographicHash::Md5);
   if (onlyFirstByte > 0) {
     md5.addData(file.read(onlyFirstByte));

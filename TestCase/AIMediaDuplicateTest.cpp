@@ -16,7 +16,10 @@ class AIMediaDuplicateTest : public QObject {
   void initTestCase() {}
   void cleanupTestCase() {}
 
-  void init() { AIMediaDuplicate::SKIP_GETTER_DURATION = true; }
+  void init() {
+    AIMediaDuplicate::SKIP_GETTER_DURATION = true;
+    AIMediaDuplicate::IS_TEST = true;
+  }
   void cleanup() {}
 
   void test_Basic() { QCOMPARE("123", GetEffectiveName("123")); }
@@ -87,7 +90,7 @@ class AIMediaDuplicateTest : public QObject {
     QVERIFY(scanRet);
     QCOMPARE(aid.GetTablesCnt(), 1);
     const QString& tableName = GetTableName(AI_MEDIA_DUPLICATE_DIR_FOLDER_1);
-    const int fillCnt = aid.FillHashFieldIfSizeConflict(tableName);
+    const int fillCnt = aid.FillHashFieldIfSizeConflict(AI_MEDIA_DUPLICATE_DIR_FOLDER_1);
     QCOMPARE(fillCnt, 2);
 
     QSqlDatabase db = QSqlDatabase::database(AIMediaDuplicate::CONNECTION_NAME);
@@ -126,5 +129,5 @@ class AIMediaDuplicateTest : public QObject {
   }
 };
 
-QTEST_MAIN(AIMediaDuplicateTest)
-#include "AIMediaDuplicateTest.moc"
+//QTEST_MAIN(AIMediaDuplicateTest)
+//#include "AIMediaDuplicateTest.moc"
