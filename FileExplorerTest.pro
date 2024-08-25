@@ -26,6 +26,7 @@ SOURCES += \
     Component/SyncModifiyFileSystem.cpp \
     TestCase/ValueCheckerTest.cpp \
     TestCase/FinderTest.cpp \
+    TestCase/VideosDurationGetterTest.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\

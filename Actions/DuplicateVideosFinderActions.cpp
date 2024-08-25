@@ -19,12 +19,14 @@ DuplicateVideosFinderActions::DuplicateVideosFinderActions(QObject* parent) : QO
   DIFFER_BY->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
   RECYCLE_ONE_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key_Delete));
+  RECYCLE_ONE_FILE->setToolTip(QString("(%1) Can Only Record 1 item at a time").arg(RECYCLE_ONE_FILE->shortcut().toString()));
 
   for (auto* act : DIFFER_BY->actions()) {
     act->setCheckable(true);
   }
   DIFFER_BY_SIZE->setChecked(true);
 
+  SCAN_A_PATH->setToolTip("Skip if table already exist. Create a table then insert records into it.");
   ANALYSE_THESE_TABLES->setToolTip("Analyse this tables");
   AUDIT_AI_MEDIA_TABLE->setToolTip("Will delete record if driver online and abspath item is no longer exist.");
   DROP_TABLE->setToolTip("Will drop a table.");
@@ -34,12 +36,6 @@ DuplicateVideosFinderActions::DuplicateVideosFinderActions(QObject* parent) : QO
 QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
   QToolBar* m_tb{new QToolBar{"Duplicator finder toolbar", parent}};
   m_tb->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  m_tb->addWidget(new QLabel{"Tables", m_tb});
-  if (tblKWFilter == nullptr) {
-    tblKWFilter = new QLineEdit{"", m_tb};
-  }
-  m_tb->addSeparator();
-  m_tb->addWidget(tblKWFilter);
   m_tb->addAction(DIFFER_BY_DURATION);
   if (durationDevLE == nullptr) {
     int durDev =
@@ -57,6 +53,13 @@ QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
   m_tb->addWidget(sizeDevLE);
   m_tb->addSeparator();
   m_tb->addAction(RECYCLE_ONE_FILE);
+  m_tb->addSeparator();
+  m_tb->addWidget(new QLabel{"Filter:", m_tb});
+  if (tblKWFilter == nullptr) {
+    tblKWFilter = new QLineEdit{"", m_tb};
+    tblKWFilter->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+  }
+  m_tb->addWidget(tblKWFilter);
   m_tb->addSeparator();
   return m_tb;
 }

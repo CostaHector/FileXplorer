@@ -1,6 +1,7 @@
 #include "AiMediaDupTableView.h"
 
 #include "Actions/DuplicateVideosFinderActions.h"
+#include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 #include <QItemSelectionModel>
 
@@ -55,8 +56,10 @@ void AiMediaDupTableView::onScanAPath() {
   }
   PreferenceSettings().setValue("DUPLICATE_VIDEOS_SELECT_FROM", absPath);
   auto& aimd = AIMediaDuplicate::GetInst();
-  aimd.ScanALocation(absPath, false, true);
+  const bool scanRet = aimd.ScanALocation(absPath, false, true);
+  aimd.FillHashFieldIfSizeConflict(absPath);
   LoadAiMediaTableNames();
+  Notificator::goodNews("Scan path result", QString("bool:%1, Path: %2").arg(scanRet).arg(absPath));
 }
 
 QModelIndexList AiMediaDupTableView::Proxy2Source(const QModelIndexList& proInds) const {
@@ -79,20 +82,36 @@ void AiMediaDupTableView::subscribe() {
 
   connect(g_dupVidFinderAg().DROP_TABLE, &QAction::triggered, this, [this]() {
     auto& aimd = AIMediaDuplicate::GetInst();
-    aimd.DropTables(GetSelectedAiTables(), false);
+    const auto ret = QMessageBox::warning(this, "Drop selected tables?", "Cannot recover",
+                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    if (ret != QMessageBox::StandardButton::Yes) {
+      Notificator::goodNews("User has cancel drop table", "ok");
+      return;
+    }
+    const int tblCnt = aimd.DropTables(GetSelectedAiTables(), false);
     LoadAiMediaTableNames();
+    Notificator::goodNews("Drop Tables succeed", QString("%1 table(s)").arg(tblCnt));
   });
 
   connect(g_dupVidFinderAg().AUDIT_AI_MEDIA_TABLE, &QAction::triggered, this, [this]() {
     auto& aimd = AIMediaDuplicate::GetInst();
-    aimd.AuditTables(GetSelectedAiTables(), false);
+    const int tblCnt = aimd.AuditTables(GetSelectedAiTables(), false);
     LoadAiMediaTableNames();
+    Notificator::goodNews("Audit Tables succeed", QString("%1 records(s)").arg(tblCnt));
   });
 
   connect(g_dupVidFinderAg().DROP_THEN_REBUILD_THIS_TABLE, &QAction::triggered, this, [this]() {
     auto& aimd = AIMediaDuplicate::GetInst();
-    aimd.RebuildTables(GetSelectedAiTables(), false);
+    const auto ret =
+        QMessageBox::warning(this, "Drop & Rebuild selected tables?", "If disk is offline, only table fields can rebuild, records cannot",
+                             QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    if (ret != QMessageBox::StandardButton::Yes) {
+      qDebug("User has cancel drop&rebuild table");
+      return;
+    }
+    const int tblCnt = aimd.RebuildTables(GetSelectedAiTables(), false);
     LoadAiMediaTableNames();
+    Notificator::goodNews("Drop & Rebuild succeed", QString("%1 table(s)").arg(tblCnt));
   });
 
   connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& ind) {
@@ -101,6 +120,7 @@ void AiMediaDupTableView::subscribe() {
     const QString& pth = TableName2Path(tableName);
     if (!QFileInfo(pth).isDir()) {
       qDebug("Path[%s] or table[%s] not exist", qPrintable(pth), qPrintable(tableName));
+      Notificator::badNews("Open failed succeed", QString("Path:%1\ntable:%2").arg(pth).arg(tableName));
       return;
     }
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
