@@ -233,6 +233,8 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "<b>Category Files/Folders Name under current view path</b><br/>"
       "Move [A.mp4, A.jpg, A.json]<br/>"
       "To Folder A");
+  _LONG_PATH_FINDER->setToolTip("<b>Long path finder</b><br>/"
+      "drop a section of a long path folder, say last section");
   _DUPLICATE_ITEMS_REMOVER->setToolTip(
       "<b>Remove Files/Folders whose names with a certern pattern under current view path</b><br/>"
       "NAME - {$resolution}.FILETYPE<br/>"

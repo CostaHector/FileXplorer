@@ -60,6 +60,7 @@ SOURCES += \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
     Component/RedundantImageFinder.cpp \
+    Component/RenameWidgets/LongPathFolderRenamer.cpp \
     Component/RenameWidgets/RenameWidget_ArrangeSection.cpp \
     Component/SearchCaseMatterToolButton.cpp \
     Component/SearchModeComboBox.cpp \
@@ -93,6 +94,7 @@ SOURCES += \
     Tools/MyClipboard.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/VidsDurationDisplayString.cpp \
+    Tools/LongPathFinder.cpp \
     View/AdvanceSearchTableView.cpp \
     View/AiMediaDupTableView.cpp \
     View/CustomListView.cpp \
@@ -213,6 +215,7 @@ HEADERS += \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
     Component/RedundantImageFinder.h \
+    Component/RenameWidgets/LongPathFolderRenamer.h \
     Component/RenameWidgets/RenameWidget_ArrangeSection.h \
     Component/SearchCaseMatterToolButton.h \
     Component/SearchModeComboBox.h \
@@ -247,6 +250,7 @@ HEADERS += \
     Tools/MyClipboard.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/VidsDurationDisplayString.h \
+    Tools/LongPathFinder.h \
     View/AdvanceSearchTableView.h \
     View/AiMediaDupTableView.h \
     View/CustomListView.h \

@@ -31,6 +31,7 @@ class PropertiesWindow;
 class DuplicateVideosFinder;
 class RedundantImageFinder;
 class Archiver;
+class LongPathFolderRenamer;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
@@ -100,6 +101,7 @@ class FileExplorerEvent : public QObject {
 
   auto on_NameStandardize() -> bool;
   auto on_FileClassify() -> bool;
+  auto on_LongPathFolderFinder() -> bool;
   auto on_RemoveDuplicateImages() -> bool;
   auto on_RemoveRedundantItem(RedundantRmv& remover) -> bool;
 
@@ -120,6 +122,7 @@ class FileExplorerEvent : public QObject {
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};
+  LongPathFolderRenamer* m_longPathFolderFinder{nullptr};
  signals:
  private:
   auto QueryCopyOrCut() -> CCMMode;
