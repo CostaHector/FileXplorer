@@ -14,6 +14,7 @@ SOURCES += \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
+    TestCase/LongPathFinderTest.cpp \
     TestCase/MD5CalculatorTest.cpp \
     TestCase/NameSectionArrangeTest.cpp \
     TestCase/NameToolTest.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
     TestCase/ValueCheckerTest.cpp \
     TestCase/FinderTest.cpp \
     TestCase/VideosDurationGetterTest.cpp \
+    Tools/LongPathFinder.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
@@ -73,6 +75,7 @@ HEADERS += \
     TestCase/pub/BeginToExposePrivateMember.h \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
+    Tools/LongPathFinder.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
     Tools/NameTool.h\
