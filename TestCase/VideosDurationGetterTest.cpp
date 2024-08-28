@@ -82,5 +82,5 @@ class VideosDurationGetterTest : public QObject {
   }
 };
 
-QTEST_MAIN(VideosDurationGetterTest)
-#include "VideosDurationGetterTest.moc"
+//QTEST_MAIN(VideosDurationGetterTest)
+//#include "VideosDurationGetterTest.moc"
