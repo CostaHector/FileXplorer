@@ -100,7 +100,7 @@ void LongPathFolderRenamer::Subscribe() {
 
 auto LongPathFolderRenamer::InitTextContent(const QString& p) -> void {
   m_lpf(p);
-  m_lpf.Check();
+  m_lpf.CheckTooLongPathCount();
   m_statusTE->setPlainText(m_lpf.m_status);
   m_preTE->setPlainText(m_lpf.pres.join('\n'));
   m_oldTE->setPlainText(m_lpf.olds.join('\n'));
@@ -110,7 +110,7 @@ auto LongPathFolderRenamer::InitTextContent(const QString& p) -> void {
 
 void LongPathFolderRenamer::UpdateStatus(const QStringList& news) {
   m_lpf.news = news;
-  m_lpf.Check();
+  m_lpf.CheckTooLongPathCount();
   m_statusTE->setPlainText(m_lpf.m_status);
   setWindowTitle(windowTitleFormat.arg(m_lpf.pres.size()).arg(m_lpf.StillTooLongPathCount()));
 }
@@ -123,7 +123,7 @@ auto LongPathFolderRenamer::DropSectionChanged(const QString& newDropSectionStr)
     return;
   }
   m_lpf.SetDropSectionWhenTooLong(newDropSection);
-  m_lpf.Check();
+  m_lpf.CheckTooLongPathCount();
   m_statusTE->setPlainText(m_lpf.m_status);
   m_newTE->setPlainText(m_lpf.news.join('\n'));
   setWindowTitle(windowTitleFormat.arg(m_lpf.pres.size()).arg(m_lpf.StillTooLongPathCount()));

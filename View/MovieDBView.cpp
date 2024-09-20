@@ -1,6 +1,7 @@
 #include "MovieDBView.h"
 
 #include "Actions/DataBaseActions.h"
+#include "Actions/FileBasicOperationsActions.h"
 #include "Component/QuickWhereClause.h"
 #include "Tools/PlayVideo.h"
 
@@ -89,6 +90,10 @@ void MovieDBView::subscribe() {
     QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
     connect(COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
   }
+
+  addAction(g_fileBasicOperationsActions().COPY_FULL_PATH);
+  addAction(g_fileBasicOperationsActions().COPY_NAME);
+  addAction(g_fileBasicOperationsActions().COPY_RECORDS);
 }
 
 auto MovieDBView::on_PlayVideo() const -> bool {

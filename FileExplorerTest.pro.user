@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2024-08-28T20:53:51. -->
+<!-- Written by QtCreator 11.0.2, 2024-08-31T20:14:03. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -73,10 +73,6 @@
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/LongPathFinderTest.cpp:cleanupTestCase">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/LongPathFinderTest.cpp:init">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/LongPathFinderTest.cpp:initTestCase">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/VideosDurationGetterTest.cpp:cleanup">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/VideosDurationGetterTest.cpp:cleanupTestCase">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/VideosDurationGetterTest.cpp:init">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/VideosDurationGetterTest.cpp:initTestCase">Unchecked</value>
    </valuemap>
    <value type="int" key="AutoTest.RunAfterBuild">0</value>
    <value type="bool" key="AutoTest.UseGlobal">true</value>

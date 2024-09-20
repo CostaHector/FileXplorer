@@ -35,26 +35,32 @@ class LongPathFinderTest : public QObject {
     QCOMPARE(lpf.GetNewFolderName("A - B - C - D"), "A - B - D");
   }
 
-  void test_CheckLengthOk() {
+  void test_CheckTooLongPathCountLengthOk() {
     LongPathFinder lpf;
     lpf.SetDropSectionWhenTooLong(-1);
-    lpf.pres.append("C:/home to path");
-    lpf.olds.append("ABCDE FGHIJ ABCDE FGHIJ - 0123456789 0123456789 0123456789 0123456789 - 0123456789 0123456789 0123456789 0123456789");
-    lpf.news.append("ABCDE FGHIJ ABCDE FGHIJ - 0123456789 0123456789 0123456789 0123456789");
-    QCOMPARE(lpf.Check(), 0);
+    QString s49{49, '0'};
+    lpf.pres.append(s49); // 1
+    lpf.olds.append(s49+'-'+s49); // 2
+    lpf.news.append(s49); // 1
+    // old: (1+2+2)*50 = 300
+    // new: (1+1+2)*50 = 250 already ok
+    QCOMPARE(lpf.CheckTooLongPathCount(), 0);
   }
 
-  void test_CheckLengthStillTooOk() {
+  void test_CheckTooLongPathCountLengthStillTooOk() {
     LongPathFinder lpf;
     lpf.SetDropSectionWhenTooLong(-1);
     lpf.pres.append("C:/home");
     lpf.olds.append("A - B - C");
     lpf.news.append("A - B");
 
-    lpf.pres.append("C:/home to path");
-    lpf.olds.append("ABCDE FGHIJ ABCDE FGHIJ - 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 - 0123456789");
-    lpf.news.append("ABCDE FGHIJ ABCDE FGHIJ - 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789");
-    QCOMPARE(lpf.Check(), 1);
+    QString s49{49, '0'};
+    lpf.pres.append(s49); // 1
+    lpf.olds.append(s49+'-'+s49+'-'+s49); // 3
+    lpf.news.append(s49+'-'+s49); // 2
+    // before: (1+3+3) * 50  = 350
+    // after: (1+2+3) * 50 = 300 still too long
+    QCOMPARE(lpf.CheckTooLongPathCount(), 1);
   }
 
 };
