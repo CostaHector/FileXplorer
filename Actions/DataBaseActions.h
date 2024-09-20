@@ -9,13 +9,7 @@
 class DataBaseActions : public QObject {
   Q_OBJECT
  public:
-  explicit DataBaseActions(QObject* parent = nullptr)
-      : QObject{parent},
-        DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),
-        DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()),
-        DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()) {
-    QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
-  }
+  explicit DataBaseActions(QObject* parent = nullptr);
 
   auto Get_DB_CONTROL_ACTIONS() -> QActionGroup*;
 
