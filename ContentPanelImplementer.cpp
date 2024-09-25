@@ -1,4 +1,5 @@
 #include "ContentPanel.h"
+#include "Model/ScenesTableModel.h"
 
 QAbstractItemView* ContentPanel::GetView(const QString& viewType) const {
   if (viewType == "table") {
@@ -412,6 +413,8 @@ QFileInfo ContentPanel::getFileInfo(const QModelIndex& ind) const {
     return m_dbModel->fileInfo(ind);
   } else if (viewName == "search") {
     return m_srcModel->fileInfo(m_proxyModel->mapToSource(ind));
+  } else if (viewName == "scene") {
+    return m_scenesModel->fileInfo(ind);
   }
   qDebug("No getFileInfo");
   return QFileInfo();
