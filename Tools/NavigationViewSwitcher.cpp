@@ -1,5 +1,7 @@
 #include "NavigationViewSwitcher.h"
 #include "Component/NotificatorFrame.h"
+#include "View/SceneTableView.h"
+#include "Model/ScenesTableModel.h"
 #include "PublicTool.h"
 #include "Tools/ActionWithPath.h"
 
@@ -41,6 +43,12 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
     }
     naviIndex = _navigation->m_name2StackIndex["search"];
+  } else if (viewType == "scene") {
+    if (_navigation->m_addressBar == nullptr) {
+      _navigation->m_addressBar = new NavigationAndAddressBar;
+      _navigation->AddToolBar("scene", _navigation->m_addressBar);
+    }
+    naviIndex = _navigation->m_name2StackIndex["scene"];
   }
   _navigation->m_stackedToolBar->setCurrentIndex(naviIndex);
 
@@ -105,6 +113,16 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
     _view->m_srcModel->setRootPath(newPath);
     _view->m_advanceSearchView->setWindowTitle(QString("Search[%1]").arg(newPath));
+    viewIndex = _view->m_name2ViewIndex[viewType];
+  } else if (viewType == "scene") {
+    if (_view->m_sceneTableView == nullptr) {
+      _view->m_scenesModel = new ScenesTableModel;
+      _view->m_sceneTableView = new SceneTableView(_view->m_scenesModel, _view);
+      ContentPanel::connect(_view->m_sceneTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+      _view->AddView(viewType, _view->m_sceneTableView);
+    }
+    const QString& rootPath = _view->m_fsModel->rootPath();
+    _view->m_sceneTableView->setRootPath(rootPath);
     viewIndex = _view->m_name2ViewIndex[viewType];
   }
   _view->setCurrentIndex(viewIndex);

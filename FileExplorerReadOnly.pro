@@ -28,6 +28,7 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
+    Actions/SceneInPageActions.cpp \
     Actions/SyncFileSystemModificationActions.cpp \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
@@ -79,6 +80,7 @@ SOURCES += \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
+    Model/ScenesTableModel.cpp \
     Model/VidModel.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/ArchiveFiles.cpp \
@@ -103,6 +105,7 @@ SOURCES += \
     View/LogView.cpp \
     View/MovieDBView.cpp \
     View/RecycleBinWidget.cpp \
+    View/SceneTableView.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -182,6 +185,7 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
+    Actions/SceneInPageActions.h \
     Actions/SyncFileSystemModificationActions.h \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
@@ -233,6 +237,7 @@ HEADERS += \
     Model/LogModel.h \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
+    Model/ScenesTableModel.h \
     Model/VidModel.h \
     Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
@@ -259,6 +264,7 @@ HEADERS += \
     View/LogView.h \
     View/MovieDBView.h \
     View/RecycleBinWidget.h \
+    View/SceneTableView.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
@@ -336,6 +342,7 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
+    Experiment.py \
     Translate/FileExplorerReadOnly_zh_CN.ts \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \
