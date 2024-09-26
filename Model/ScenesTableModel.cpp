@@ -129,6 +129,8 @@ bool ScenesTableModel::setRootPath(const QString& rootPath) {
       newFilteredList.append(newEntryList.back());
     }
   }
+
+  mImg2Vid.clear();
   QDirIterator vidIt(mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot,
                      QDirIterator::IteratorFlag::Subdirectories);
   while (vidIt.hasNext()) {
