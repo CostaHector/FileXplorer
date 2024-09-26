@@ -4,16 +4,21 @@
 #include <QDebug>
 
 AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent) : QToolBar(title, parent) {
+  m_nameFilterCB = new QComboBox{this};
+
+  m_nameFilter = new QLineEdit{"", m_nameFilterCB};
   m_nameFilter->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
   m_nameFilter->setClearButtonEnabled(true);
 
-  addWidget(m_nameFilter);
+  m_nameFilterCB->setLineEdit(m_nameFilter);
+
+  addWidget(m_nameFilterCB);
   addWidget(m_typeButton);
   addWidget(m_searchModeComboBox);
   addWidget(m_searchCaseButton);
 
-  m_nameFilter->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  m_nameFilter->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
+  m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+  m_nameFilterCB->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   m_typeButton->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   m_searchModeComboBox->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   m_searchCaseButton->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
@@ -22,9 +27,8 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
 
-  m_nameFilter->setText(
-      PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
-
+  m_nameFilterCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
+  m_nameFilterCB->addItem("*.html|nonporn");
   m_nameFilter->setPlaceholderText("Normal[abc], Wildcard[do?x], Regex[\\d{4}], Search for File Content[*.html,*.txt|contents]");
 }
 
