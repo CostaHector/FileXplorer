@@ -50,6 +50,12 @@ class ContentPanel : public QStackedWidget {
     const auto* p = currentWidget();
     return p != nullptr and (p == m_fsTableView or p == m_fsListView or p == m_fsTreeView);
   }
+
+  inline bool isSceneView() const {
+    const auto* p = currentWidget();
+    return p != nullptr && p == m_sceneTableView;
+  }
+
   QModelIndex getRootIndex() const;
   inline QAbstractItemView* GetCurView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
   QAbstractItemView* GetView(const QString& name) const;
