@@ -28,6 +28,7 @@ auto ContentPanel::onActionAndViewNavigate(QString newPath, bool isNewPath, bool
   if (not ret) {
     return false;
   }
+
   if (_addressBar) {
     _addressBar->m_addressLine->updateAddressToolBarPathActions(newPath);
   }
@@ -43,32 +44,42 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     qWarning("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
-  QAbstractItemView* fsView = GetCurView();
-  if (fsView == nullptr) {
-    qWarning("not FileSystemView");
-    return false;
+
+  if (isSceneView()) {
+    m_sceneTableView->setRootPath(newPath);
   }
-  fsView->setRootIndex(m_fsModel->setRootPath(newPath));
-  fsView->selectionModel()->clearCurrentIndex();
-  fsView->selectionModel()->clearSelection();
+
+  const bool isFileSystem = isFSView();
+  if (isFileSystem) {
+    QAbstractItemView* fsView = GetCurView();
+    if (fsView != nullptr) {
+      fsView->setRootIndex(m_fsModel->setRootPath(newPath));
+      fsView->selectionModel()->clearCurrentIndex();
+      fsView->selectionModel()->clearSelection();
+    }
+  }
+
   if (m_parent != nullptr) {
     m_parent->setWindowTitle(newPath);
   }
+
   if (isNewPath) {
-    if (_addressBar) {
+    if (_addressBar != nullptr) {
       _addressBar->m_pathRD(newPath);
     }
   }
+
 #ifdef WIN32
-  if (newPath.isEmpty()) {
+  if (newPath.isEmpty() && isFileSystem) {
     onAfterDirectoryLoaded(newPath);
   }
 #endif
+
   return true;
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
-  if (targetStr.isEmpty()) {  
+  if (targetStr.isEmpty()) {
     m_fsModel->setNameFilters({});
     return true;
   }

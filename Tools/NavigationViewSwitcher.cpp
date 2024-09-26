@@ -13,7 +13,7 @@ NavigationViewSwitcher::NavigationViewSwitcher(StackedToolBar* navigation, Conte
     : QObject(parent), _navigation(navigation), _view(view) {}
 
 void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
-  const QSet<QString> fileSystemView{"list", "table", "tree"};
+  static const QSet<QString> fileSystemView{"list", "table", "tree"};
   int naviIndex = -1;
   if (fileSystemView.contains(viewType)) {
     if (_navigation->m_addressBar == nullptr) {
@@ -24,6 +24,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       auto F_IntoNewPath = std::bind(&ContentPanel::onActionAndViewNavigate, _view, _1, _2, _3);
       _navigation->m_addressBar->BindFileSystemViewCallback(F_IntoNewPath, std::bind(&ContentPanel::on_searchTextChanged, _view, _1),
                                                             std::bind(&ContentPanel::on_searchEnterKey, _view, _1), _view->m_fsModel);
+
       ActionWithPath::BindIntoNewPath(F_IntoNewPath);
     }
     naviIndex = _navigation->m_name2StackIndex["NavigationAddress"];
@@ -60,9 +61,13 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsTableView);
     }
-    const auto& newRootIndex = _view->getRootIndex();
-    if (newRootIndex.isValid())
-      _view->m_fsTableView->setRootIndex(newRootIndex);  // sync root index from last valid file-system model root index
+    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+    const auto& newRootIndex = _view->m_fsModel->setRootPath(newPath);
+    //    const auto& newRootIndex = _view->getRootIndex();
+    if (newRootIndex.isValid()) {
+      // sync root index from last valid file-system model root index
+      _view->m_fsTableView->setRootIndex(newRootIndex);
+    }
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "list") {
     if (_view->m_fsListView == nullptr) {
@@ -71,9 +76,13 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsListView);
     }
-    const auto& newRootIndex = _view->getRootIndex();
-    if (newRootIndex.isValid())
-      _view->m_fsListView->setRootIndex(newRootIndex);  // sync root index from last valid file-system model root index
+    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+    const auto& newRootIndex = _view->m_fsModel->setRootPath(newPath);
+//    const auto& newRootIndex = _view->getRootIndex();
+    if (newRootIndex.isValid()) {
+      // sync root index from last valid file-system model root index
+      _view->m_fsListView->setRootIndex(newRootIndex);
+    }
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "tree") {
     if (_view->m_fsTreeView == nullptr) {
@@ -82,9 +91,13 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->connectSelectionChanged(viewType);
       _view->AddView(viewType, _view->m_fsTreeView);
     }
-    const auto& newRootIndex = _view->getRootIndex();
-    if (newRootIndex.isValid())
-      _view->m_fsTreeView->setRootIndex(newRootIndex);  // sync root index from last valid file-system model root index
+    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+    const auto& newRootIndex = _view->m_fsModel->setRootPath(newPath);
+    //    const auto& newRootIndex = _view->getRootIndex();
+    if (newRootIndex.isValid()) {
+      // sync root index from last valid file-system model root index
+      _view->m_fsTreeView->setRootIndex(newRootIndex);
+    }
     viewIndex = _view->m_name2ViewIndex[viewType];
   } else if (viewType == "movie") {
     if (_view->m_movieView == nullptr) {
@@ -121,8 +134,8 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       ContentPanel::connect(_view->m_sceneTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->AddView(viewType, _view->m_sceneTableView);
     }
-    const QString& rootPath = _view->m_fsModel->rootPath();
-    _view->m_sceneTableView->setRootPath(rootPath);
+    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+    _view->m_sceneTableView->setRootPath(newPath);
     viewIndex = _view->m_name2ViewIndex[viewType];
   }
   _view->setCurrentIndex(viewIndex);
