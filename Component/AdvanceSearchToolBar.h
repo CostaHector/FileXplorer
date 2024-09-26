@@ -32,7 +32,8 @@ class AdvanceSearchToolBar : public QToolBar {
   void BindSearchProxyModel(SearchProxyModel* searchProxyModel);
   void BindSearchSourceModel(AdvanceSearchModel* searchSourceModel);
 
-  QLineEdit* m_nameFilter = new QLineEdit(this);
+  QComboBox* m_nameFilterCB{nullptr};
+  QLineEdit* m_nameFilter{nullptr};
   FileSystemTypeFilter* m_typeButton = new FileSystemTypeFilter(this);
   SearchModeComboBox* m_searchModeComboBox = new SearchModeComboBox;
   SearchCaseMatterToolButton* m_searchCaseButton = new SearchCaseMatterToolButton(this);
