@@ -4,13 +4,7 @@
 #include <QHBoxLayout>
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)
-    : QToolBar(title, parent),
-      m_addressLine(new AddressELineEdit{this}),
-      m_searchLE(new QLineEdit{this}),
-      m_fsFilter{new FileSystemTypeFilter},
-      m_IntoNewPath(nullptr),
-      m_on_searchTextChanged(nullptr),
-      m_on_searchEnterKey(nullptr) {
+    : QToolBar(title, parent), m_addressLine(new AddressELineEdit{this}), m_searchLE(new QLineEdit{this}), m_fsFilter{new FileSystemTypeFilter} {
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_addressLine->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
@@ -52,35 +46,47 @@ auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {
   connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onUpTo);
 
   connect(m_searchLE, &QLineEdit::textChanged, this, [this]() -> void {
-    if (m_on_searchTextChanged)
+    if (m_on_searchTextChanged != nullptr)
       m_on_searchTextChanged(m_searchLE->text());
   });
   connect(m_searchLE, &QLineEdit::returnPressed, this, [this]() -> void {
-    if (m_on_searchEnterKey)
+    if (m_on_searchEnterKey != nullptr) {
       m_on_searchEnterKey(m_searchLE->text());
+    }
   });
 }
 
 auto NavigationAndAddressBar::onBackward() -> bool {
-  if (m_IntoNewPath and m_pathRD.undoAvailable()) {
-    return m_IntoNewPath(m_pathRD.undo(), false, false);
+  if (!m_pathRD.undoAvailable()) {
+    qDebug("[Skip] backward paths pool empty");
   }
-  qDebug("[Skip] backward paths pool empty");
-  return true;
+  bool backwardRes{true};
+  const QString& undoPath = m_pathRD.undo();
+  if (m_IntoNewPath != nullptr) {
+    backwardRes = m_IntoNewPath(undoPath, false, false);
+  }
+  return backwardRes;
 }
 
 auto NavigationAndAddressBar::onForward() -> bool {
-  if (m_IntoNewPath and m_pathRD.redoAvailable()) {
-    return m_IntoNewPath(m_pathRD.redo(), false, false);
+  if (!m_pathRD.redoAvailable()) {
+    qDebug("[Skip] Forward paths pool empty");
   }
-  qDebug("[Skip] Forward paths pool empty");
-  return true;
+  bool forwardRes{true};
+  const QString& redoPath = m_pathRD.redo();
+  if (m_IntoNewPath != nullptr) {
+    forwardRes = m_IntoNewPath(redoPath, false, false);
+  }
+  return forwardRes;
 }
 
 auto NavigationAndAddressBar::onUpTo() -> bool {
-  if (m_IntoNewPath) {
-    return m_IntoNewPath(m_addressLine->dirname(), true, false);
+  const QString& upPath = m_addressLine->dirname();
+  bool upRes{true};
+  if (m_IntoNewPath != nullptr) {
+    upRes = m_IntoNewPath(upPath, true, false);
   }
+  return upRes;
 }
 
 // #define __NAME__EQ__MAIN__ 1

@@ -95,6 +95,9 @@ QActionGroup* ViewActions::GetListTableTreeActions() {
   _ADVANCE_SEARCH_VIEW->setToolTip(QString("Show advanced search window. (%1)").arg(_ADVANCE_SEARCH_VIEW->shortcut().toString()));
   _ADVANCE_SEARCH_VIEW->setCheckable(true);
 
+  _SCENE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
+  _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
+  _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
   _SCENE_VIEW->setCheckable(true);
 
   QActionGroup* actionGroup = new QActionGroup(this);

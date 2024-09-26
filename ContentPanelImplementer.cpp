@@ -12,6 +12,8 @@ QAbstractItemView* ContentPanel::GetView(const QString& viewType) const {
     return m_movieView;
   } else if (viewType == "search") {
     return m_advanceSearchView;
+  } else if (viewType == "scene") {
+    return m_sceneTableView;
   }
   qDebug("ViewType[%s] not found", qPrintable(viewType));
   return nullptr;
@@ -34,7 +36,7 @@ int ContentPanel::AddView(const QString& viewType, QWidget* w) {
 
 QString ContentPanel::getRootPath() const {
   const QString& viewName = GetCurViewName();
-  if (viewName == "search" or viewName == "table" or viewName == "list" or viewName == "tree") {
+  if (viewName == "search" or viewName == "table" or viewName == "list" or viewName == "tree" or viewName == "scene") {
     return m_fsModel->rootPath();
   }
   qDebug("No rootpath");
@@ -52,6 +54,9 @@ QString ContentPanel::getFilePath(const QModelIndex& ind) const {
   if (viewName == "search") {
     const auto srcIndex = m_proxyModel->mapToSource(ind);
     return m_srcModel->filePath(srcIndex);
+  }
+  if (viewName == "scene") {
+    return m_scenesModel->filePath(ind);
   }
   qDebug("No FilePath");
   return "";
@@ -78,6 +83,10 @@ QModelIndexList ContentPanel::getSelectedRows() const {
       srcIndexesLst.append(m_proxyModel->mapToSource(ind));
     }
     return srcIndexesLst;
+  }
+  if (viewName == "scene") {
+    qWarning("no selected row concept in scene model");
+    return {};
   }
   qDebug("No SelectedRows");
   return {};
@@ -106,6 +115,10 @@ QStringList ContentPanel::getFileNames() const {
     for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
       const auto& srcIndex = m_proxyModel->mapToSource(ind);
       names.append(m_srcModel->fileName(srcIndex));
+    }
+  } else if (viewName == "scene") {
+    for (const auto& ind : m_sceneTableView->selectionModel()->selectedIndexes()) {
+      names.append(m_scenesModel->fileName(ind));
     }
   } else {
     qDebug("No getFileNames");
@@ -137,6 +150,8 @@ QStringList ContentPanel::getFullRecords() const {
       const auto& srcIndex = m_proxyModel->mapToSource(ind);
       fullRecords.append(m_srcModel->fullInfo(srcIndex));
     }
+  } else if (viewName == "scene") {
+    qDebug("Todo: getFullRecords is not supported in scene model now");
   } else {
     qDebug("No getFullRecords");
   }
@@ -166,6 +181,10 @@ QStringList ContentPanel::getFilePaths() const {
     for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
       const auto& srcIndex = m_proxyModel->mapToSource(ind);
       filePaths.append(m_srcModel->filePath(srcIndex));
+    }
+  } else if (viewName == "scene") {
+    for (const auto& ind : m_sceneTableView->selectionModel()->selectedIndexes()) {
+      filePaths.append(m_scenesModel->filePath(ind));
     }
   } else {
     qDebug("No getFilePaths");
@@ -205,6 +224,10 @@ QStringList ContentPanel::getFilePrepaths() const {
     for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
       const auto& srcIndex = m_proxyModel->mapToSource(ind);
       prepaths.append(m_srcModel->absolutePath(srcIndex));
+    }
+  } else if (viewName == "scene") {
+    for (const auto& ind : m_sceneTableView->selectionModel()->selectedIndexes()) {
+      prepaths.append(m_scenesModel->absolutePath(ind));
     }
   } else {
     qDebug("No getFilePrepaths");
@@ -396,6 +419,8 @@ QString ContentPanel::getCurFilePath() const {
     return m_dbModel->filePath(m_movieView->currentIndex());
   } else if (viewName == "search") {
     return m_srcModel->filePath(m_proxyModel->mapToSource(m_advanceSearchView->currentIndex()));
+  } else if (viewName == "scene") {
+    return m_scenesModel->filePath(m_sceneTableView->currentIndex());
   }
   qDebug("No getCurFilePath");
   return "";
