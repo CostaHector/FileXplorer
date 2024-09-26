@@ -12,6 +12,38 @@ struct SCENE_INFO {
   qint64 like;
 };
 
+class ImgCorrespondVid {
+ public:
+  void append(const QString& vidName, const QString& vidFullPath) {
+    const int lastDot = vidName.lastIndexOf('.');
+    const QString coreName{lastDot == -1 ? vidName : vidName.left(lastDot)};
+    mCoreName2VidMap[coreName] = vidFullPath;
+  }
+
+  bool contains(const QString& imgPath, QString* pVidPath = nullptr) const {
+    const int lastDot = imgPath.lastIndexOf('.');
+    const QString coreName{lastDot == -1 ? imgPath : imgPath.left(lastDot)};
+    auto it = mCoreName2VidMap.find(coreName);
+    if (it == mCoreName2VidMap.cend()) {
+      return false;
+    }
+    if (pVidPath != nullptr) {
+      *pVidPath = it.value();
+    }
+    return true;
+  }
+
+  inline void clear() {
+    decltype(mCoreName2VidMap) tmp;
+    mCoreName2VidMap.swap(tmp);
+  }
+
+  inline bool size() const { return mCoreName2VidMap.size(); }
+
+ private:
+  QHash<QString, QString> mCoreName2VidMap;
+};
+
 class ScenesTableModel : public QAbstractTableModelPub {
  public:
   typedef QList<SCENE_INFO> SCENE_INFO_LIST;
@@ -27,8 +59,26 @@ class ScenesTableModel : public QAbstractTableModelPub {
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
+  inline bool isIndexValid(const QModelIndex& index, int* pLinearInd = nullptr) const {
+    if (!index.isValid()) {
+      qWarning("Invalid index");
+      return false;
+    }
+    const int linearInd = index.row() * mSCENES_CNT_COLUMN + index.column();
+    if (mCurBegin + linearInd >= mCurEnd) {
+      qWarning("Invalid index(%d, %d) user input", index.row(), index.column());
+      return false;
+    }
+    if (pLinearInd != nullptr) {
+      *pLinearInd = linearInd;
+    }
+    return true;
+  }
   QFileInfo fileInfo(const QModelIndex& index) const;
-  void setRootPath(const QString& rootPath);
+  QString filePath(const QModelIndex& index) const;
+  QString fileName(const QModelIndex& index) const;
+  QString absolutePath(const QModelIndex& index) const;
+  bool setRootPath(const QString& rootPath);
 
   bool ChangeRowsCnt(int newRowCnt, int newPageIndex);
   bool ChangeColumnsCnt(int newColumnCnt = 4, int newPageIndex = -1);
@@ -58,5 +108,6 @@ class ScenesTableModel : public QAbstractTableModelPub {
   SCENE_INFO_LIST mEntryList;
   SCENE_INFO_LIST mEntryListFiltered;
   SCENE_INFO_LIST::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
+  ImgCorrespondVid mImg2Vid;
 };
 #endif  // SCENESTABLEMODEL_H
