@@ -18,6 +18,8 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
+  addActions(g_addressBarActions()._FOLDER_IT_CONTROLS->actions());
+  addSeparator();
   addWidget(m_addressLine);
   addSeparator();
   addWidget(m_fsFilter);
@@ -45,15 +47,11 @@ auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {
   connect(g_addressBarActions()._FORWARD_TO, &QAction::triggered, this, &NavigationAndAddressBar::onForward);
   connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onUpTo);
 
-  connect(m_searchLE, &QLineEdit::textChanged, this, [this]() -> void {
-    if (m_on_searchTextChanged != nullptr)
-      m_on_searchTextChanged(m_searchLE->text());
-  });
-  connect(m_searchLE, &QLineEdit::returnPressed, this, [this]() -> void {
-    if (m_on_searchEnterKey != nullptr) {
-      m_on_searchEnterKey(m_searchLE->text());
-    }
-  });
+  connect(g_addressBarActions()._LAST_FOLDER, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToLastFolder);
+  connect(g_addressBarActions()._NEXT_FOLDER, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToNextFolder);
+
+  connect(m_searchLE, &QLineEdit::textChanged, this, &NavigationAndAddressBar::onSearchTextChanged);
+  connect(m_searchLE, &QLineEdit::returnPressed, this, &NavigationAndAddressBar::onSearchTextReturnPressed);
 }
 
 auto NavigationAndAddressBar::onBackward() -> bool {
@@ -87,6 +85,50 @@ auto NavigationAndAddressBar::onUpTo() -> bool {
     upRes = m_IntoNewPath(upPath, true, false);
   }
   return upRes;
+}
+
+bool NavigationAndAddressBar::onIteratorToAnotherFolderCore(bool isNext) {
+  const QFileInfo fi{m_addressLine->pathFromLineEdit()};
+  const QString parentPath = fi.absolutePath();
+  const QString curDirName = fi.fileName();
+  const QString& newDir = isNext ? mFolderNxtLstIt.next(parentPath, curDirName) : mFolderNxtLstIt.last(parentPath, curDirName);
+  if (newDir.isEmpty()) {
+    qDebug("skip empty dir[%s]", qPrintable(parentPath));
+    return false;
+  }
+  if (curDirName == newDir) {
+    qDebug("skip same dir[%s/%s]", qPrintable(parentPath), qPrintable(curDirName));
+    return false;
+  }
+  const QString& newPath = parentPath + '/' + newDir;
+  bool intoRes{true};
+  if (m_IntoNewPath != nullptr) {
+    intoRes = m_IntoNewPath(newPath, true, false);
+  } else {
+    qWarning("m_IntoNewPath is nullptr");
+    return false;
+  }
+  return intoRes;
+}
+
+bool NavigationAndAddressBar::onIteratorToNextFolder() {
+  return onIteratorToAnotherFolderCore(true);
+}
+bool NavigationAndAddressBar::onIteratorToLastFolder() {
+  return onIteratorToAnotherFolderCore(false);
+}
+
+bool NavigationAndAddressBar::onSearchTextChanged() {
+  if (m_on_searchTextChanged != nullptr) {
+    m_on_searchTextChanged(m_searchLE->text());
+  }
+  return true;
+}
+bool NavigationAndAddressBar::onSearchTextReturnPressed() {
+  if (m_on_searchEnterKey != nullptr) {
+    m_on_searchEnterKey(m_searchLE->text());
+  }
+  return true;
 }
 
 // #define __NAME__EQ__MAIN__ 1

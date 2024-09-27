@@ -12,11 +12,15 @@ class AddressBarActions : public QObject
   explicit AddressBarActions(QObject *parent = nullptr);
 
   QActionGroup* GetAddressBarActions();
-  QAction* _BACK_TO;
-  QAction* _FORWARD_TO;
-  QAction* _UP_TO;
+  QAction* _BACK_TO{nullptr};
+  QAction* _FORWARD_TO{nullptr};
+  QAction* _UP_TO{nullptr};
+  QActionGroup* ADDRESS_CONTROLS{nullptr};
 
-  QActionGroup* ADDRESS_CONTROLS;
+  QActionGroup* GetFolderIteratorActions();
+  QAction* _LAST_FOLDER{nullptr};
+  QAction* _NEXT_FOLDER{nullptr};
+  QActionGroup* _FOLDER_IT_CONTROLS{nullptr};
 };
 
 AddressBarActions& g_addressBarActions();
