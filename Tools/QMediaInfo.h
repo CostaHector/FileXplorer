@@ -26,6 +26,10 @@ class QMediaInfo {
   QMediaInfo();
   bool IsLoaded() const;
 
+  bool StartToGet();
+  int VidDurationLengthQuick(const QString& vidAbsPath) const;
+  void EndToGet();
+
   int VidDurationLength(const QString& vidAbsPath) const;
   QList<int> batchVidsDurationLength(const QStringList& vidsAbsPath) const;
 
@@ -66,6 +70,10 @@ class QMediaInfo {
 
   QLibrary* _lib;
   void* _pMedia;
+
+  MEDIAINFO_Get m_get{nullptr};
+  MEDIAINFO_Open m_open{nullptr};
+  static const MediaInfo_Char m_prop[];
 };
 
 #endif  // QMEDIAINFO_H
