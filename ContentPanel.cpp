@@ -3,6 +3,7 @@
 #include "Component/NotificatorFrame.h"
 #include "Tools/ArchiveFiles.h"
 #include "public/DisplayEnhancement.h"
+#include "Model/ScenesTableModel.h"
 
 #include <QLineEdit>
 #include <QTableView>
@@ -28,6 +29,7 @@ auto ContentPanel::onActionAndViewNavigate(QString newPath, bool isNewPath, bool
   if (not ret) {
     return false;
   }
+
   if (_addressBar) {
     _addressBar->m_addressLine->updateAddressToolBarPathActions(newPath);
   }
@@ -43,41 +45,77 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     qWarning("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
-  QAbstractItemView* fsView = GetCurView();
-  if (fsView == nullptr) {
-    qWarning("not FileSystemView");
-    return false;
+
+  if (isSceneView()) {
+    if (m_sceneTableView == nullptr) {
+      qWarning("m_scenesModel is nullptr");
+      return false;
+    }
+    m_sceneTableView->setRootPath(newPath);
+    return true;
   }
-  fsView->setRootIndex(m_fsModel->setRootPath(newPath));
-  fsView->selectionModel()->clearCurrentIndex();
-  fsView->selectionModel()->clearSelection();
+
+  const bool isFileSystem = isFSView();
+  if (isFileSystem) {
+    QAbstractItemView* fsView = GetCurView();
+    if (fsView != nullptr) {
+      fsView->setRootIndex(m_fsModel->setRootPath(newPath));
+      fsView->selectionModel()->clearCurrentIndex();
+      fsView->selectionModel()->clearSelection();
+    }
+  }
+
   if (m_parent != nullptr) {
     m_parent->setWindowTitle(newPath);
   }
+
   if (isNewPath) {
-    if (_addressBar) {
+    if (_addressBar != nullptr) {
       _addressBar->m_pathRD(newPath);
     }
   }
+
 #ifdef WIN32
-  if (newPath.isEmpty()) {
+  if (newPath.isEmpty() && isFileSystem) {
     onAfterDirectoryLoaded(newPath);
   }
 #endif
+
   return true;
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
-  if (targetStr.isEmpty()) {  
-    m_fsModel->setNameFilters({});
+  if (isSceneView()) {
+    if (m_scenesModel == nullptr) {
+      qWarning("m_scenesModel is nullptr");
+      return false;
+    }
+    m_scenesModel->setFilterRegExp(targetStr);
     return true;
   }
-  m_fsModel->setNameFilters({"*" + targetStr + "*"});
+  if (isFSView()) {
+    if (targetStr.isEmpty()) {
+      m_fsModel->setNameFilters({});
+      return true;
+    }
+    m_fsModel->setNameFilters({"*" + targetStr + "*"});
+  }
   return true;
 }
 
 auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
-  return on_searchTextChanged(targetStr);
+  if (isSceneView()) {
+    if (m_scenesModel == nullptr) {
+      qWarning("m_scenesModel is nullptr");
+      return false;
+    }
+    m_scenesModel->setFilterRegExp(targetStr);
+    return true;
+  }
+  if (isFSView()) {
+    return on_searchTextChanged(targetStr);
+  }
+  return true;
 }
 
 void ContentPanel::subscribe() {

@@ -5,7 +5,6 @@
 #include <QHeaderView>
 #include <QMouseEvent>
 #include "Actions/FileBasicOperationsActions.h"
-#include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
 
 FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent) : CustomTableView("FILE_SYSTEM", parent) {
@@ -39,8 +38,7 @@ void FileSystemTableView::subscribe() {
   addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
   addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
 
-  addActions(g_renameAg().RENAME_RIBBONS->actions());
-
+  addAction(g_fileBasicOperationsActions().COPY_RECORDS);
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
 }

@@ -50,8 +50,7 @@ class RedundantImageModel : public QAbstractTableModelPub {
       case Qt::DecorationRole: {
         if (index.column() == HORIZONTAL_HEADER.size() - 1) {
           QPixmap pm{m_paf->operator[](index.row()).filePath};
-          pm.scaledToWidth(128);
-          return pm;
+          return pm.scaledToWidth(128);
         }
       }
       default:
