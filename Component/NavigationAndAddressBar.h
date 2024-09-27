@@ -14,7 +14,7 @@
 #include <QPushButton>
 #include <QToolButton>
 
-#include <functional>
+#include "Tools/FolderNxtAndLastIterator.h"
 
 class NavigationAndAddressBar : public QToolBar {
   Q_OBJECT
@@ -34,6 +34,12 @@ class NavigationAndAddressBar : public QToolBar {
 
   auto onUpTo() -> bool;
 
+  bool onIteratorToNextFolder();
+  bool onIteratorToLastFolder();
+
+  bool onSearchTextChanged();
+  bool onSearchTextReturnPressed();
+
   void onGetFocus() {
     m_searchLE->setFocus();
     m_searchLE->selectAll();
@@ -41,11 +47,14 @@ class NavigationAndAddressBar : public QToolBar {
 
   AddressELineEdit* m_addressLine;
   PathUndoRedoer m_pathRD;
+  FolderNxtAndLastIterator mFolderNxtLstIt;
   QLineEdit* m_searchLE;
 
   FileSystemTypeFilter* m_fsFilter;
 
  private:
+  bool onIteratorToAnotherFolderCore(bool isNext);
+
   T_IntoNewPath m_IntoNewPath{nullptr};
   T_on_searchTextChanged m_on_searchTextChanged{nullptr};
   T_on_searchEnterKey m_on_searchEnterKey{nullptr};
