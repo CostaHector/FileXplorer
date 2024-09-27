@@ -14,6 +14,7 @@
 #include "View/FileSystemTableView.h"
 #include "View/FileSystemTreeView.h"
 #include "View/MovieDBView.h"
+#include "View/SceneTableView.h"
 
 class NavigationViewSwitcher;
 
@@ -49,6 +50,12 @@ class ContentPanel : public QStackedWidget {
     const auto* p = currentWidget();
     return p != nullptr and (p == m_fsTableView or p == m_fsListView or p == m_fsTreeView);
   }
+
+  inline bool isSceneView() const {
+    const auto* p = currentWidget();
+    return p != nullptr && p == m_sceneTableView;
+  }
+
   QModelIndex getRootIndex() const;
   inline QAbstractItemView* GetCurView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
   QAbstractItemView* GetView(const QString& name) const;
@@ -85,12 +92,14 @@ class ContentPanel : public QStackedWidget {
   MyQSqlTableModel* m_dbModel{nullptr};
   AdvanceSearchModel* m_srcModel{nullptr};
   SearchProxyModel* m_proxyModel{nullptr};
+  ScenesTableModel* m_scenesModel{nullptr};
 
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
   MovieDBView* m_movieView{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
+  SceneTableView* m_sceneTableView{nullptr};
 
   PreviewFolder* _previewFolder;
 
