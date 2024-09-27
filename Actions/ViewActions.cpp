@@ -6,6 +6,24 @@ ViewActions& g_viewActions() {
   return ins;
 }
 
+ViewActions::ViewActions(QObject* parent)
+    : QObject{parent},
+      _ADVANCE_SEARCH_VIEW{new QAction(QIcon(":/themes/SEARCH"), "search")},
+      _MOVIE_VIEW{new QAction(QIcon(":/themes/SHOW_DATABASE"), "movie")},
+      _LIST_VIEW{new QAction(QIcon(":/themes/DISPLAY_LARGE_THUMBNAILS"), "list")},
+      _TABLE_VIEW{new QAction(QIcon(":/themes/DISPLAY_DETAIL_INFOMATIONS"), "table")},
+      _TREE_VIEW{new QAction(QIcon(":/themes/DISPLAY_ACHITECTURE"), "tree")},
+      _SCENE_VIEW{new QAction(QIcon(":/themes/SCENE_TABLE_VIEW"), "scene")},
+      _TRIPLE_VIEW{GetListTableTreeActions()},
+
+      NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), tr("Navigation Pane"))},
+      PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("Folder Preview"))},
+      _JSON_EDITOR_PANE{new QAction(QIcon(":/themes/JSON_EDITOR"), tr("Json Editor"))},
+      _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":/themes/VIDEO_PLAYER"), tr("Embedded Player"))},
+      _VIEW_ACRIONS(Get_NAVIGATION_PANE_Actions()),
+      _SYS_VIDEO_PLAYERS(new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
+      _VIDEO_PLAYERS(GetPlayersActions()) {}
+
 QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   NAVIGATION_PANE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
@@ -77,12 +95,18 @@ QActionGroup* ViewActions::GetListTableTreeActions() {
   _ADVANCE_SEARCH_VIEW->setToolTip(QString("Show advanced search window. (%1)").arg(_ADVANCE_SEARCH_VIEW->shortcut().toString()));
   _ADVANCE_SEARCH_VIEW->setCheckable(true);
 
+  _SCENE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
+  _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
+  _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
+  _SCENE_VIEW->setCheckable(true);
+
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_LIST_VIEW);
   actionGroup->addAction(_TABLE_VIEW);
   actionGroup->addAction(_TREE_VIEW);
   actionGroup->addAction(_MOVIE_VIEW);
   actionGroup->addAction(_ADVANCE_SEARCH_VIEW);
+  actionGroup->addAction(_SCENE_VIEW);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
   return actionGroup;
 }

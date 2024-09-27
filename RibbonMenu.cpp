@@ -11,6 +11,7 @@
 #include "Actions/RecycleBinActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
+#include "Actions/SceneInPageActions.h"
 #include "Actions/SyncFileSystemModificationActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
@@ -56,11 +57,13 @@ RibbonMenu::RibbonMenu(QWidget* parent)
       m_leafHome(LeafHome()),
       m_leafView(LeafView()),
       m_leafDatabase(LeafDatabase()),
+      m_leafScenes(LeafScenesTools()),
       m_leafMore(LeafMediaTools()) {
   addTab(m_leafFile, "&File");
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
   addTab(m_leafDatabase, "&Database");
+  addTab(m_leafScenes, "&Scene");
   addTab(m_leafMore, "&Arrange");
 
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
@@ -311,12 +314,18 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto* archiveVidsTB = new QToolBar("Leaf Arrange Files");
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._NAME_STANDARDLIZER);
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._CLASSIFIER);
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._LONG_PATH_FINDER);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(folderRmv);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
+}
+
+QToolBar* RibbonMenu::LeafScenesTools() const {
+  auto& ag = g_SceneInPageActions();
+  return ag.GetSceneToolbar();
 }
 
 void RibbonMenu::Subscribe() {
@@ -353,7 +362,7 @@ class RibbonMenuIllu : public QMainWindow {
   }
 };
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
