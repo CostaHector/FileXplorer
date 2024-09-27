@@ -3,6 +3,7 @@
 #include "Component/NotificatorFrame.h"
 #include "Tools/ArchiveFiles.h"
 #include "public/DisplayEnhancement.h"
+#include "Model/ScenesTableModel.h"
 
 #include <QLineEdit>
 #include <QTableView>
@@ -46,7 +47,12 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
   }
 
   if (isSceneView()) {
+    if (m_sceneTableView == nullptr) {
+      qWarning("m_scenesModel is nullptr");
+      return false;
+    }
     m_sceneTableView->setRootPath(newPath);
+    return true;
   }
 
   const bool isFileSystem = isFSView();
@@ -79,16 +85,37 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
-  if (targetStr.isEmpty()) {
-    m_fsModel->setNameFilters({});
+  if (isSceneView()) {
+    if (m_scenesModel == nullptr) {
+      qWarning("m_scenesModel is nullptr");
+      return false;
+    }
+    m_scenesModel->setFilterRegExp(targetStr);
     return true;
   }
-  m_fsModel->setNameFilters({"*" + targetStr + "*"});
+  if (isFSView()) {
+    if (targetStr.isEmpty()) {
+      m_fsModel->setNameFilters({});
+      return true;
+    }
+    m_fsModel->setNameFilters({"*" + targetStr + "*"});
+  }
   return true;
 }
 
 auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
-  return on_searchTextChanged(targetStr);
+  if (isSceneView()) {
+    if (m_scenesModel == nullptr) {
+      qWarning("m_scenesModel is nullptr");
+      return false;
+    }
+    m_scenesModel->setFilterRegExp(targetStr);
+    return true;
+  }
+  if (isFSView()) {
+    return on_searchTextChanged(targetStr);
+  }
+  return true;
 }
 
 void ContentPanel::subscribe() {

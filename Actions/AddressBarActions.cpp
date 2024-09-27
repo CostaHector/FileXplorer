@@ -10,8 +10,13 @@ AddressBarActions::AddressBarActions(QObject* parent) : QObject{parent} {
   _NEXT_FOLDER = new QAction{QIcon(""), "v"};
   _FOLDER_IT_CONTROLS = GetFolderIteratorActions();
 
-  _LAST_FOLDER->setToolTip("last folder of parent path in current view");
-  _NEXT_FOLDER->setToolTip("next folder of parent path in current view");
+  _LAST_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_BracketLeft));
+  _NEXT_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_BracketRight));
+
+  _LAST_FOLDER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Into last folder of parent path in current view.").arg(_LAST_FOLDER->text(), _LAST_FOLDER->shortcut().toString()));
+  _NEXT_FOLDER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Into next folder of parent path in current view.").arg(_NEXT_FOLDER->text(), _NEXT_FOLDER->shortcut().toString()));
 }
 
 QActionGroup* AddressBarActions::GetAddressBarActions() {
