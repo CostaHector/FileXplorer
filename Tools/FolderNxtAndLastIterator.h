@@ -6,16 +6,16 @@
 
 class FolderNxtAndLastIterator {
  public:
-  void operator()(const QString& currentPath);
+  void operator()(const QString& parentPath);
 
-  QString next(const QString& currentPath) {
-    return lastNextCore(currentPath, true);
+  QString next(const QString& parentPath, const QString& curDirName) {
+    return lastNextCore(parentPath, curDirName, true);
   }
-  QString last(const QString& currentPath) {
-    return lastNextCore(currentPath, false);
+  QString last(const QString& parentPath, const QString& curDirName) {
+    return lastNextCore(parentPath, curDirName, false);
   }
  private:
-  QString lastNextCore(const QString& currentPath, bool isNext = true);
+  QString lastNextCore(const QString& parentPath, const QString& curDirName, bool isNext = true);
   QMap<QString, QStringList> path2SameLevelPaths;
 };
 
