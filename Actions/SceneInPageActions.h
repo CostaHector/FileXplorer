@@ -28,6 +28,10 @@ class SceneInPageActions : public QObject {
   QLineEdit* mColumnsInputLE{nullptr};
   QLineEdit* mPageIndexInputLE{nullptr};
 
+  QToolBar* mOrderTB{nullptr};
+  QToolBar* mEnablePageTB{nullptr};
+  QToolBar* mRowByColumnTB{nullptr};
+  QToolBar* mRowEnablePageTB{nullptr};
   QToolBar* mPagesSelectTB{nullptr};
   QToolBar* mSceneTB{nullptr};
 };
