@@ -10,7 +10,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
     if (beforeRow == afterRow) {
       return;
     } else if (beforeRow < afterRow) {
-      beginInsertRows(QModelIndex(), 0, afterRow - 1);
+      beginInsertRows(QModelIndex(), beforeRow, afterRow - 1);
     } else {
       beginRemoveRows(QModelIndex(), afterRow, beforeRow - 1);
     }
@@ -24,6 +24,21 @@ class QAbstractTableModelPub : public QAbstractTableModel {
       endInsertRows();
     } else {
       endRemoveRows();
+    }
+  }
+
+  void ColumnsBeginChange(int beforeColumnCnt, int afterColumnCnt){
+    if (beforeColumnCnt < afterColumnCnt){
+      beginInsertColumns(QModelIndex(), beforeColumnCnt, afterColumnCnt - 1);
+    } else if (beforeColumnCnt > afterColumnCnt){
+      beginRemoveColumns(QModelIndex(), afterColumnCnt, beforeColumnCnt - 1);
+    }
+  }
+  void ColumnsEndChange(int beforeColumnCnt, int afterColumnCnt){
+    if (beforeColumnCnt < afterColumnCnt){
+      endInsertColumns();
+    }else if (beforeColumnCnt > afterColumnCnt){
+      endRemoveColumns();
     }
   }
 };

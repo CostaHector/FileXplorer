@@ -26,6 +26,7 @@ class DuplicateDetailsModel : public QAbstractTableModel {
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override;
 
+  QString fileNameEverything(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
 
   void SyncFrom(CLASSIFIED_SORT_LIST_2D* _classifiedSort, DIFFER_BY_TYPE* _currentDiffer) {
@@ -83,21 +84,6 @@ class VidInfoModel : public QAbstractTableModel {
   void setDeviationDuration(int newDuration);
 
   void setDeviationSize(int newSize);
-
-  static void getName(const QString& pth, QString& name, QString& prepath) {
-    name.clear();
-    prepath.clear();
-    int cnt = 0;
-    for (int i = pth.size() - 1; i > -1; --i) {
-      if (pth[i] == '/') {
-        if (++cnt == NAME_LEVEL_COUNT) {
-          name = pth.mid(i + 1);
-          prepath = pth.left(i + 1);
-          return;
-        }
-      }
-    }
-  }
 
   static inline int getFuzzyDur(int dur) { return m_deviationDur == 0 ? dur : (dur + m_deviationDur / 2) / m_deviationDur * m_deviationDur; }
   static inline qint64 getFuzzySz(qint64 sz) { return m_deviationSz == 0 ? sz : (sz + m_deviationSz / 2) / m_deviationSz * m_deviationSz; }

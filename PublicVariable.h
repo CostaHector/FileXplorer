@@ -314,6 +314,7 @@ constexpr int TABS_ICON_IN_MENU_2x1 = 24;
 constexpr int TABS_ICON_IN_MENU_1x1 = 48;
 
 namespace TYPE_FILTER {
+const QStringList AI_DUP_VIDEO_TYPE_SET = {"*.mp4", "*.mov", "*.avi", "*.flv", "*.wmv", "*.mkv", "*.divx", "*.m4v", "*.mpg", "*.ts"};
 const QStringList VIDEO_TYPE_SET = {"*.mp4", "*.mov", "*.avi", "*.flv", "*.wmv", "*.mkv", "*.divx", "*.m4v", "*.mpg", "*.ts", "*.vob", "*.iso"};
 const QStringList IMAGE_TYPE_SET = {"*.jpeg", "*.jpg", "*.png", "*.tiff", "*.jfif", "*.gif", "*.webp", "*.ico", "*.svg"};
 const QStringList JSON_TYPE_SET = {"*.json"};

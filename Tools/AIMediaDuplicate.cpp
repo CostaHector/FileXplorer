@@ -33,6 +33,7 @@ QString TableName2Path(const QString& tableName) {
 
 const char AIMediaDuplicate::CONNECTION_NAME[] = "RANDOM_CONNECT";
 bool AIMediaDuplicate::SKIP_GETTER_DURATION = false;
+bool AIMediaDuplicate::IS_TEST = false;
 
 AIMediaDuplicate& AIMediaDuplicate::GetInst() {
   static AIMediaDuplicate inst;
@@ -41,7 +42,12 @@ AIMediaDuplicate& AIMediaDuplicate::GetInst() {
 
 AIMediaDuplicate::AIMediaDuplicate() {
   QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", CONNECTION_NAME);
-  db.setDatabaseName(qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+  if (IS_TEST) {
+    db.setDatabaseName("DUPLICATES_DB.db");
+  } else {
+    db.setDatabaseName(SystemPath::AI_MEDIA_DUP_DATABASE);
+  }
+
   if (!db.open()) {
     qWarning("Open DB[%s] failed[%s]", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE), qPrintable(db.lastError().text()));
   }
@@ -121,13 +127,17 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
   // 开始事务
   db.transaction();
   QMediaInfo mi;
-  QDirIterator it(path, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories);
+  if (!SKIP_GETTER_DURATION && !mi.StartToGet()) {
+    qWarning("Video duration getter is nullptr");
+    return false;
+  }
+  QDirIterator it(path, TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories);
   while (it.hasNext()) {
     const QFileInfo file_info = it.next();
     const QString file_path = file_info.absoluteFilePath();
     query.bindValue(0, GetEffectiveName(file_path));
     query.bindValue(1, file_info.size());
-    query.bindValue(2, SKIP_GETTER_DURATION ? 0 : mi.VidDurationLength(file_path));
+    query.bindValue(2, SKIP_GETTER_DURATION ? 0 : mi.VidDurationLengthQuick(file_path));
     query.bindValue(3, file_info.birthTime().toMSecsSinceEpoch());
     query.bindValue(4, file_path);
     if (!query.exec()) {
@@ -189,7 +199,7 @@ int AIMediaDuplicate::AuditTables(const QStringList& atTables, bool auditAll) {
       continue;
     }
     query.prepare(QString("SELECT "
-                          "       `ABSOLUTE_PATH`,"
+                          "       `ABSOLUTE_PATH` "
                           "FROM "
                           "	`%1`;")
                       .arg(tableName));
@@ -214,7 +224,7 @@ int AIMediaDuplicate::AuditTables(const QStringList& atTables, bool auditAll) {
     }
     ++auditTblCnt;
   }
-  qWarning("repaird %d item(s) in %d table(s)", repairedCnt, auditTblCnt);
+  qWarning("Audit repaird %d item(s) in %d table(s)", repairedCnt, auditTblCnt);
   return repairedCnt;
 }
 
@@ -264,7 +274,8 @@ QHash<qint64, QString> AIMediaDuplicate::ReadATabel(const QString& tableName) {
   return result;
 }
 
-int AIMediaDuplicate::FillHashFieldIfSizeConflict(const QString& tableName) {
+int AIMediaDuplicate::FillHashFieldIfSizeConflict(const QString& path) {
+  const QString& tableName = GetTableName(path);
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
     qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
@@ -379,7 +390,7 @@ QList<DupTableModelData> AIMediaDuplicate::TableName2Cnt() {
 int main(int argc, char* argv[]) {
   auto& aid = AIMediaDuplicate::GetInst();
   aid.ScanALocation("E:/P/Hetero", true, false);
-  aid.FillHashFieldIfSizeConflict(GetTableName("E:/P/Hetero"));
+  aid.FillHashFieldIfSizeConflict("E:/P/Hetero");
   return 0;
 }
 

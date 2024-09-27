@@ -14,6 +14,8 @@ SOURCES += \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
+    TestCase/FolderNxtAndLastIteratorTest.cpp \
+    TestCase/LongPathFinderTest.cpp \
     TestCase/MD5CalculatorTest.cpp \
     TestCase/NameSectionArrangeTest.cpp \
     TestCase/NameToolTest.cpp \
@@ -26,6 +28,9 @@ SOURCES += \
     Component/SyncModifiyFileSystem.cpp \
     TestCase/ValueCheckerTest.cpp \
     TestCase/FinderTest.cpp \
+    TestCase/VideosDurationGetterTest.cpp \
+    Tools/FolderNxtAndLastIterator.cpp \
+    Tools/LongPathFinder.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
     Tools/NameTool.cpp\
@@ -72,6 +77,8 @@ HEADERS += \
     TestCase/pub/BeginToExposePrivateMember.h \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
+    Tools/FolderNxtAndLastIterator.h \
+    Tools/LongPathFinder.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
     Tools/NameTool.h\

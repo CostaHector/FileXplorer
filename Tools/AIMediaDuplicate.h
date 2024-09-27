@@ -51,7 +51,7 @@ class AIMediaDuplicate {
 
   int GetTablesCnt() const;
   QHash<qint64, QString> ReadATabel(const QString& tableName);
-  int FillHashFieldIfSizeConflict(const QString& tableName);
+  int FillHashFieldIfSizeConflict(const QString& path);
   int ReadSpecifiedTables2List(const QStringList& tbls, QList<DUP_INFO>& vidsInfo);
   QList<DupTableModelData> TableName2Cnt();
 
@@ -61,6 +61,8 @@ class AIMediaDuplicate {
   static const char CONNECTION_NAME[];
   QString mInfosDBSavedPath;
   QHash<QString, QString> mEscapePairPath{{"C:/DISK/F24", "C:/DISK/F24BKP"}, {"C:/DISK/LD2", "C:/DISK/LDBKPP"}};
+
+  static bool IS_TEST; // if true, mod on another table.
 };
 
 #endif  // AIMEDIADUPLICATE_H

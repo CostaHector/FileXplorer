@@ -28,6 +28,7 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
+    Actions/SceneInPageActions.cpp \
     Actions/SyncFileSystemModificationActions.cpp \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
@@ -60,6 +61,7 @@ SOURCES += \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
     Component/RedundantImageFinder.cpp \
+    Component/RenameWidgets/LongPathFolderRenamer.cpp \
     Component/RenameWidgets/RenameWidget_ArrangeSection.cpp \
     Component/SearchCaseMatterToolButton.cpp \
     Component/SearchModeComboBox.cpp \
@@ -78,10 +80,12 @@ SOURCES += \
     Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
+    Model/ScenesTableModel.cpp \
     Model/VidModel.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/ArchiveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
+    Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
     Tools/Log.cpp \
     Tools/MessageOutput.cpp \
@@ -93,6 +97,7 @@ SOURCES += \
     Tools/MyClipboard.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/VidsDurationDisplayString.cpp \
+    Tools/LongPathFinder.cpp \
     View/AdvanceSearchTableView.cpp \
     View/AiMediaDupTableView.cpp \
     View/CustomListView.cpp \
@@ -101,6 +106,8 @@ SOURCES += \
     View/LogView.cpp \
     View/MovieDBView.cpp \
     View/RecycleBinWidget.cpp \
+    View/SceneActionsSubscribe.cpp \
+    View/SceneTableView.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
     ContentPanel.cpp \
@@ -180,6 +187,7 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
+    Actions/SceneInPageActions.h \
     Actions/SyncFileSystemModificationActions.h \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
@@ -213,6 +221,7 @@ HEADERS += \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
     Component/RedundantImageFinder.h \
+    Component/RenameWidgets/LongPathFolderRenamer.h \
     Component/RenameWidgets/RenameWidget_ArrangeSection.h \
     Component/SearchCaseMatterToolButton.h \
     Component/SearchModeComboBox.h \
@@ -230,10 +239,12 @@ HEADERS += \
     Model/LogModel.h \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
+    Model/ScenesTableModel.h \
     Model/VidModel.h \
     Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
+    Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \
     Tools/MediaInfoDLL.h \
@@ -247,6 +258,7 @@ HEADERS += \
     Tools/MyClipboard.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/VidsDurationDisplayString.h \
+    Tools/LongPathFinder.h \
     View/AdvanceSearchTableView.h \
     View/AiMediaDupTableView.h \
     View/CustomListView.h \
@@ -255,6 +267,8 @@ HEADERS += \
     View/LogView.h \
     View/MovieDBView.h \
     View/RecycleBinWidget.h \
+    View/SceneActionsSubscribe.h \
+    View/SceneTableView.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
     ContentPanel.h \
@@ -332,6 +346,7 @@ RESOURCES += \
     themes/res.qrc
 
 DISTFILES += \
+    Experiment.py \
     Translate/FileExplorerReadOnly_zh_CN.ts \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \

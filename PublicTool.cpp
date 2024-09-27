@@ -180,6 +180,7 @@ auto MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* old
 auto GetSqlVidsDB() -> QSqlDatabase {
   if (QSqlDatabase::connectionNames().contains("DBMOVIE_CONNECT")) {
     auto db = QSqlDatabase::database("DBMOVIE_CONNECT");
+    db.open();
     return db;
   }
   auto db = QSqlDatabase::addDatabase("QSQLITE", "DBMOVIE_CONNECT");
@@ -187,6 +188,7 @@ auto GetSqlVidsDB() -> QSqlDatabase {
   db.open();
   return db;
 }
+
 
 void LoadCNLanguagePack(QTranslator& translator) {
   qDebug("Load Chinese pack");
