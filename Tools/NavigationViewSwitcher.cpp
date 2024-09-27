@@ -1,5 +1,6 @@
 #include "NavigationViewSwitcher.h"
 #include "Component/NotificatorFrame.h"
+#include "View/SceneActionsSubscribe.h"
 #include "View/SceneTableView.h"
 #include "Model/ScenesTableModel.h"
 #include "PublicTool.h"
@@ -130,6 +131,10 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->m_sceneTableView = new SceneTableView(_view->m_scenesModel, _view);
       ContentPanel::connect(_view->m_sceneTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->AddView(viewType, _view->m_sceneTableView);
+      auto* sceneSub = new SceneActionsSubscribe{_view->m_sceneTableView};
+      if (sceneSub->BindWidget(_view->m_sceneTableView, _view->m_scenesModel)) {
+        sceneSub->operator()();
+      }
     }
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
     _view->m_sceneTableView->setRootPath(newPath);

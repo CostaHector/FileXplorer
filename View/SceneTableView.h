@@ -5,10 +5,12 @@
 #include "View/CustomTableView.h"
 class ScenesTableModel;
 class QStyledItemDelegate;
+class SceneActionsSubscribe;
 class SceneTableView : public CustomTableView {
  public:
   explicit SceneTableView(ScenesTableModel* sceneModel, QWidget* parent = nullptr);
   void setRootPath(const QString& rootPath);
+
  private:
   ScenesTableModel* _sceneModel;
   QStyledItemDelegate* mAlignDelegate{nullptr};
