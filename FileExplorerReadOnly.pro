@@ -106,6 +106,7 @@ SOURCES += \
     View/LogView.cpp \
     View/MovieDBView.cpp \
     View/RecycleBinWidget.cpp \
+    View/SceneActionsSubscribe.cpp \
     View/SceneTableView.cpp \
     View/TorrentsManagerWidget.cpp \
     Component/VideoPlayer.cpp \
@@ -266,6 +267,7 @@ HEADERS += \
     View/LogView.h \
     View/MovieDBView.h \
     View/RecycleBinWidget.h \
+    View/SceneActionsSubscribe.h \
     View/SceneTableView.h \
     View/TorrentsManagerWidget.h \
     Component/VideoPlayer.h \
