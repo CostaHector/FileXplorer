@@ -1,0 +1,145 @@
+#include "SceneActionsSubscribe.h"
+#include "Actions/SceneInPageActions.h"
+#include <QToolBar>
+
+bool SceneActionsSubscribe::BindWidget(QTableView* tableView, ScenesTableModel* model) {
+  if (tableView == nullptr) {
+    qWarning("tableView is nullptr");
+    return false;
+  }
+  if (model == nullptr) {
+    qWarning("model is nullptr");
+    return false;
+  }
+  _tableView = tableView;
+  _model = model;
+  return true;
+}
+
+bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
+  auto& ags = g_SceneInPageActions();
+  QString beforeIndexStr = ags.mPageIndexInputLE->text();
+  bool isNumber{false};
+  int beforePageInd = beforeIndexStr.toInt(&isNumber);
+  if (not isNumber) {
+    qDebug("Error before index");
+    return false;
+  }
+  int dstPageInd = beforePageInd;
+  int maxPage = _model->GetPageCnt();
+  if (pageAct == ags._NEXT_PAGE) {
+    ++dstPageInd;
+    dstPageInd %= maxPage;
+  } else if (pageAct == ags._LAST_PAGE) {
+    --dstPageInd;
+    if (dstPageInd < 0) {
+      dstPageInd = maxPage - 1;
+    }
+  } else if (pageAct == ags._THE_FIRST_PAGE) {
+    dstPageInd = 0;
+  } else if (pageAct == ags._THE_LAST_PAGE) {
+    dstPageInd = maxPage - 1;
+  } else {
+    qDebug("nothing triggered");
+    return false;
+  }
+
+  if (dstPageInd == beforePageInd) {
+    qDebug("Page remains %d, ignore switch page", beforePageInd);
+    return true;
+  }
+  qDebug("page index changed: %d->%d", beforePageInd, dstPageInd);
+  ags.mPageIndexInputLE->setText(QString::number(dstPageInd));
+  emit ags.mPageIndexInputLE->textChanged(ags.mPageIndexInputLE->text());
+  return true;
+}
+
+void SceneActionsSubscribe::SetScenesGroupByPage(bool groupByPageAction) {
+  auto& ags = g_SceneInPageActions();
+  ags.mPagesSelectTB->setEnabled(groupByPageAction);
+  if (groupByPageAction) {
+    SetScenesPerColumn();
+  }
+}
+
+void SceneActionsSubscribe::SetPageIndex() {
+  auto& ags = g_SceneInPageActions();
+  const QString& pageIndStr = ags.mPageIndexInputLE->text();
+  bool isNumber{false};
+  int pageIndex = pageIndStr.toInt(&isNumber);
+  if (not isNumber) {
+    qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
+    return;
+  }
+  _model->SetPageIndex(pageIndex);
+}
+
+bool SceneActionsSubscribe::SetScenesPerColumn() {
+  auto& ags = g_SceneInPageActions();
+  const QString& rowCntStr = ags.mRowsInputLE->text();
+  const QString& pageIndStr = ags.mPageIndexInputLE->text();
+  bool isRowCntNumber{false}, isPageIndNumber{false};
+  const int rowCnt = rowCntStr.toInt(&isRowCntNumber);
+  const int pageInd = pageIndStr.toInt(&isPageIndNumber);
+  if (not isRowCntNumber) {
+    qDebug("Row Count str[%s] invalid", qPrintable(rowCntStr));
+    return false;
+  }
+  if (not isPageIndNumber) {
+    qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
+    return false;
+  }
+  _model->ChangeRowsCnt(rowCnt, pageInd);
+  return true;
+}
+
+bool SceneActionsSubscribe::SetScenesPerRow() {
+  auto& ags = g_SceneInPageActions();
+  const QString& columnCntStr = ags.mColumnsInputLE->text();
+  const QString& pageIndStr = ags.mPageIndexInputLE->text();
+  bool isColCntNumber{false}, isPageIndNumber{false};
+  const int colCnt = columnCntStr.toInt(&isColCntNumber);
+  const int pageInd = pageIndStr.toInt(&isPageIndNumber);
+  if (not isColCntNumber) {
+    qDebug("Column Count str[%s] invalid", qPrintable(columnCntStr));
+    return false;
+  }
+  if (not isPageIndNumber) {
+    qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
+    return false;
+  }
+  _model->ChangeColumnsCnt(colCnt, pageInd);
+  return true;
+}
+
+void SceneActionsSubscribe::SortIt(QAction* triggerAct) {
+  if (triggerAct == nullptr) {
+    qWarning("triggerAct is nullptr");
+    return;
+  }
+  _model->SortOrder(triggerAct->text() == "Descending");
+}
+
+bool SceneActionsSubscribe::operator()() {
+  if (_model == nullptr) {
+    qWarning("_model is nullptr");
+    return false;
+  }
+  if (_tableView == nullptr) {
+    qWarning("_tableView is nullptr");
+    return false;
+  }
+
+  auto& ags = g_SceneInPageActions();
+  connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortIt);
+  connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
+  connect(ags.mRowsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);
+  connect(ags.mPageIndexInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetPageIndex);
+  connect(ags.mColumnsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerRow);
+  connect(ags.mPagesSelectTB, &QToolBar::actionTriggered, this, &SceneActionsSubscribe::PageIndexIncDec);
+
+  ags._GROUP_BY_PAGE->setChecked(false);
+  emit ags._GROUP_BY_PAGE->triggered(false);
+
+  return true;
+}
