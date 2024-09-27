@@ -62,8 +62,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->AddView(viewType, _view->m_fsTableView);
     }
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    const auto& newRootIndex = _view->m_fsModel->setRootPath(newPath);
-    //    const auto& newRootIndex = _view->getRootIndex();
+    const auto& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
     if (newRootIndex.isValid()) {
       // sync root index from last valid file-system model root index
       _view->m_fsTableView->setRootIndex(newRootIndex);
@@ -77,8 +76,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->AddView(viewType, _view->m_fsListView);
     }
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    const auto& newRootIndex = _view->m_fsModel->setRootPath(newPath);
-//    const auto& newRootIndex = _view->getRootIndex();
+    const auto& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
     if (newRootIndex.isValid()) {
       // sync root index from last valid file-system model root index
       _view->m_fsListView->setRootIndex(newRootIndex);
@@ -92,8 +90,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->AddView(viewType, _view->m_fsTreeView);
     }
     const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    const auto& newRootIndex = _view->m_fsModel->setRootPath(newPath);
-    //    const auto& newRootIndex = _view->getRootIndex();
+    const auto& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
     if (newRootIndex.isValid()) {
       // sync root index from last valid file-system model root index
       _view->m_fsTreeView->setRootIndex(newRootIndex);
