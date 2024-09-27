@@ -30,26 +30,26 @@ class FolderNxtAndLastIteratorTest : public QObject {
 
   void test_emptyFolderReturnEmpty_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.next(m0FolderDir.absolutePath() + "/any folder"), "");
-    QCOMPARE(nlIt.last(m0FolderDir.absolutePath() + "/any folder"), "");
+    QCOMPARE(nlIt.next(m0FolderDir.absolutePath(), "any folder"), "");
+    QCOMPARE(nlIt.last(m0FolderDir.absolutePath(), "any folder"), "");
   }
 
   void test_1ElementFolderReturnItself_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.next(m1FolderDir.absolutePath() + "/folder 0"), "folder 0");
-    QCOMPARE(nlIt.last(m1FolderDir.absolutePath() + "/folder 0"), "folder 0");
+    QCOMPARE(nlIt.next(m1FolderDir.absolutePath(), "folder 0"), "folder 0");
+    QCOMPARE(nlIt.last(m1FolderDir.absolutePath(), "folder 0"), "folder 0");
   }
 
   void test_conventionNxt_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.next(m5FoldersDir.absolutePath() + "/folder 4"), "folder 0");
-    QCOMPARE(nlIt.next(m5FoldersDir.absolutePath() + "/folder 1"), "folder 2");
+    QCOMPARE(nlIt.next(m5FoldersDir.absolutePath(), "folder 4"), "folder 0");
+    QCOMPARE(nlIt.next(m5FoldersDir.absolutePath(), "folder 1"), "folder 2");
   }
 
   void test_conventionLast_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.last(m5FoldersDir.absolutePath() + "/folder 0"), "folder 4");
-    QCOMPARE(nlIt.last(m5FoldersDir.absolutePath() + "/folder 2"), "folder 1");
+    QCOMPARE(nlIt.last(m5FoldersDir.absolutePath(), "folder 0"), "folder 4");
+    QCOMPARE(nlIt.last(m5FoldersDir.absolutePath(), "folder 2"), "folder 1");
   }
 };
 
