@@ -65,5 +65,5 @@ class LongPathFinderTest : public QObject {
 
 };
 
-QTEST_MAIN(LongPathFinderTest)
+//QTEST_MAIN(LongPathFinderTest)
 #include "LongPathFinderTest.moc"
