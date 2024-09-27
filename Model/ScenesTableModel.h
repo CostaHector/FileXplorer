@@ -79,6 +79,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
   QString fileName(const QModelIndex& index) const;
   QString absolutePath(const QModelIndex& index) const;
   bool setRootPath(const QString& rootPath);
+  QString rootPath() const { return mRootPath; }
 
   bool ChangeRowsCnt(int newRowCnt, int newPageIndex);
   bool ChangeColumnsCnt(int newColumnCnt = 4, int newPageIndex = -1);
