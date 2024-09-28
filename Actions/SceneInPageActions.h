@@ -12,7 +12,11 @@ class SceneInPageActions : public QObject {
  public:
   explicit SceneInPageActions(QObject* parent = nullptr);
 
+  bool InitWidget();
   QToolBar* GetSceneToolbar();
+  QToolBar* GetOrderToolBar();
+  QToolBar* GetPagesRowByColumnToolBar();
+  QToolBar* GetPageIndexSelectionToolBar();
 
   QAction* _ASCENDING{nullptr};
   QAction* _DESCENDING{nullptr};
@@ -30,10 +34,10 @@ class SceneInPageActions : public QObject {
 
   QToolBar* mOrderTB{nullptr};
   QToolBar* mEnablePageTB{nullptr};
-  QToolBar* mRowByColumnTB{nullptr};
   QToolBar* mRowEnablePageTB{nullptr};
   QToolBar* mPagesSelectTB{nullptr};
-  QToolBar* mSceneTB{nullptr};
+ private:
+  constexpr static int ROW_COLUMN_LINEDIT_MAX_WIDTH = 80;
 };
 
 SceneInPageActions& g_SceneInPageActions();
