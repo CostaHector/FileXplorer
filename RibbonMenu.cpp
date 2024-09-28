@@ -325,7 +325,20 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
 
 QToolBar* RibbonMenu::LeafScenesTools() const {
   auto& ag = g_SceneInPageActions();
-  return ag.GetSceneToolbar();
+  if (!ag.InitWidget()) {
+    return nullptr;
+  }
+
+  auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
+  sceneTB->addAction(g_viewActions()._SCENE_VIEW);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mOrderTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mEnablePageTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mPagesSelectTB);
+  sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  return sceneTB;
 }
 
 void RibbonMenu::Subscribe() {
@@ -362,7 +375,7 @@ class RibbonMenuIllu : public QMainWindow {
   }
 };
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

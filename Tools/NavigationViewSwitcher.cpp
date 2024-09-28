@@ -6,6 +6,42 @@
 #include "PublicTool.h"
 #include "Tools/ActionWithPath.h"
 
+enum class ViewType : char {
+  VIEW_TYPE_BEGIN = 0,
+  LIST = VIEW_TYPE_BEGIN,
+  TABLE,
+  TREE,
+  SEARCH,
+  MOVIE,
+  SCENE,
+  VIEW_TYPE_BUTT,
+};
+
+const char* GetViewTypeHumanFriendlyStr(ViewType viewType) {
+  static const char viewType2Str[(char)ViewType::VIEW_TYPE_BUTT][16] = {"list", "table", "tree", "search", "movie", "scene"};
+  if ((char)viewType >= (char)ViewType::VIEW_TYPE_BUTT) {
+    qDebug("viewType[%d] is invalid", (char)viewType);
+    return "invalidViewType";
+  }
+  return viewType2Str[(char)viewType];
+}
+
+ViewType GetViewTypeByActionText(const QAction* viewAct) {
+  if (viewAct == nullptr) {
+    qWarning("viewAct is nullptr");
+    return ViewType::VIEW_TYPE_BUTT;
+  }
+  static const QMap<QString, ViewType> actText2View{{"list", ViewType::LIST},     {"table", ViewType::TABLE}, {"tree", ViewType::TREE},
+                                                    {"search", ViewType::SEARCH}, {"movie", ViewType::MOVIE}, {"scene", ViewType::SCENE}};
+  const QString& viewTypeStr = viewAct->text();
+  auto it = actText2View.find(viewTypeStr);
+  if (it == actText2View.cend()) {
+    qWarning("viewtype[%s] not found in %d element(s) map", qPrintable(viewTypeStr), actText2View.size());
+    return ViewType::VIEW_TYPE_BUTT;
+  }
+  return it.value();
+}
+
 using std::placeholders::_1;
 using std::placeholders::_2;
 using std::placeholders::_3;
@@ -29,6 +65,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       ActionWithPath::BindIntoNewPath(F_IntoNewPath);
     }
     naviIndex = _navigation->m_name2StackIndex["NavigationAddress"];
+    qDebug("Switch to list/table/tree");
   } else if (viewType == "movie") {
     if (_navigation->m_dbSearchBar == nullptr) {
       _navigation->m_dbSearchBar = new DatabaseSearchToolBar;
@@ -37,6 +74,7 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->BindDatabaseSearchToolBar(_navigation->m_dbSearchBar);
     }
     naviIndex = _navigation->m_name2StackIndex["DatabaseSearch"];
+    qDebug("Switch to movie");
   } else if (viewType == "search") {
     if (_navigation->m_advanceSearchBar == nullptr) {
       _navigation->m_advanceSearchBar = new AdvanceSearchToolBar;
@@ -45,12 +83,14 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
     }
     naviIndex = _navigation->m_name2StackIndex["search"];
+    qDebug("Switch to search");
   } else if (viewType == "scene") {
     if (_navigation->m_addressBar == nullptr) {
       _navigation->m_addressBar = new NavigationAndAddressBar;
       _navigation->AddToolBar("scene", _navigation->m_addressBar);
     }
     naviIndex = _navigation->m_name2StackIndex["scene"];
+    qDebug("Switch to scene");
   }
   _navigation->m_stackedToolBar->setCurrentIndex(naviIndex);
 
