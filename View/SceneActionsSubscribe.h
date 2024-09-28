@@ -24,7 +24,7 @@ class SceneActionsSubscribe : public QObject {
 
   bool SetScenesPerRow();
 
-  void SortIt(QAction* triggerAct);
+  void SortSceneItems(QAction* triggerAct);
 
  private:
   ScenesTableModel* _model{nullptr};

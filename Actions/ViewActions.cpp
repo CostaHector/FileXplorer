@@ -14,7 +14,7 @@ ViewActions::ViewActions(QObject* parent)
       _TABLE_VIEW{new QAction(QIcon(":/themes/DISPLAY_DETAIL_INFOMATIONS"), "table")},
       _TREE_VIEW{new QAction(QIcon(":/themes/DISPLAY_ACHITECTURE"), "tree")},
       _SCENE_VIEW{new QAction(QIcon(":/themes/SCENE_TABLE_VIEW"), "scene")},
-      _TRIPLE_VIEW{GetListTableTreeActions()},
+      _VIEWS_AG{GetViewsAG()},
 
       NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), tr("Navigation Pane"))},
       PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("Folder Preview"))},
@@ -71,7 +71,7 @@ QActionGroup* ViewActions::GetPlayersActions() {
   return actionGroup;
 }
 
-QActionGroup* ViewActions::GetListTableTreeActions() {
+QActionGroup* ViewActions::GetViewsAG() {
   _LIST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_2));
   _LIST_VIEW->setShortcutVisibleInContextMenu(true);
   _LIST_VIEW->setToolTip(QString("Displays items by using large thumbnails. (%1)").arg(_LIST_VIEW->shortcut().toString()));
