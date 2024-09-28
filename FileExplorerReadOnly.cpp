@@ -29,7 +29,7 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
       m_ribbonMenu(new RibbonMenu{this}),
 
       m_statusBar(new CustomStatusBar{m_viewsSwitcher, this}) {
-  m_viewsSwitcher->addActions(g_viewActions()._TRIPLE_VIEW->actions());
+  m_viewsSwitcher->addActions(g_viewActions()._VIEWS_AG->actions());
 
   m_fsPanel = new ContentPanel(m_previewFolder, this);
   m_fsPanel->BindLogger(m_statusBar);
@@ -125,7 +125,7 @@ void FileExplorerReadOnly::subscribe() {
     PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
     m_previewSwitcher->onSwitchByViewType(previewType);
   });
-  connect(m_viewsSwitcher, &QToolBar::actionTriggered, m_naviSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
+  connect(vA._VIEWS_AG, &QActionGroup::triggered, m_naviSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
 }
 
 void FileExplorerReadOnly::keyPressEvent(QKeyEvent* ev) {
