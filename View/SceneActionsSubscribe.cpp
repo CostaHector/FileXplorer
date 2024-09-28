@@ -71,6 +71,10 @@ void SceneActionsSubscribe::SetPageIndex() {
     qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
     return;
   }
+  if (_model == nullptr) {
+    qWarning("_model is nullptr");
+    return;
+  }
   _model->SetPageIndex(pageIndex);
 }
 
@@ -87,6 +91,10 @@ bool SceneActionsSubscribe::SetScenesPerColumn() {
   }
   if (not isPageIndNumber) {
     qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
+    return false;
+  }
+  if (_model == nullptr) {
+    qWarning("_model is nullptr");
     return false;
   }
   _model->ChangeRowsCnt(rowCnt, pageInd);
@@ -108,11 +116,15 @@ bool SceneActionsSubscribe::SetScenesPerRow() {
     qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
     return false;
   }
+  if (_model == nullptr) {
+    qWarning("_model is nullptr");
+    return false;
+  }
   _model->ChangeColumnsCnt(colCnt, pageInd);
   return true;
 }
 
-void SceneActionsSubscribe::SortIt(QAction* triggerAct) {
+void SceneActionsSubscribe::SortSceneItems(QAction* triggerAct) {
   if (triggerAct == nullptr) {
     qWarning("triggerAct is nullptr");
     return;
@@ -131,7 +143,7 @@ bool SceneActionsSubscribe::operator()() {
   }
 
   auto& ags = g_SceneInPageActions();
-  connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortIt);
+  connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
   connect(ags.mRowsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);
   connect(ags.mPageIndexInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetPageIndex);

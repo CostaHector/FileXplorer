@@ -4,6 +4,8 @@
 #include <QLabel>
 #include <QIntValidator>
 
+constexpr int SceneInPageActions::ROW_COLUMN_LINEDIT_MAX_WIDTH;
+
 SceneInPageActions& g_SceneInPageActions() {
   static SceneInPageActions ins;
   return ins;
@@ -27,47 +29,72 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   _THE_FIRST_PAGE = new QAction("The First<<", this);
 }
 
-QToolBar* SceneInPageActions::GetSceneToolbar() {
-  mRowsInputLE = new QLineEdit("5");
-  mColumnsInputLE = new QLineEdit("4");
-  mRowsInputLE->setMaximumWidth(80);
-  mColumnsInputLE->setMaximumWidth(80);
+bool SceneInPageActions::InitWidget() {
+  if (mOrderTB != nullptr || mEnablePageTB != nullptr || mPagesSelectTB != nullptr) {
+    return true;
+  }
+  mOrderTB = GetOrderToolBar();
+  mEnablePageTB = GetPagesRowByColumnToolBar();
+  mPagesSelectTB = GetPageIndexSelectionToolBar();
+  if (mOrderTB == nullptr || mEnablePageTB == nullptr || mPagesSelectTB == nullptr) {
+    qWarning("Init Scene Order/Row-by-Column/PageIndex Failed");
+    return false;
+  }
+  return true;
+}
 
+QToolBar* SceneInPageActions::GetSceneToolbar() {
+  if (!InitWidget()) {
+    return nullptr;
+  }
+  auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
+  sceneTB->addWidget(mOrderTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(mEnablePageTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(mPagesSelectTB);
+  return sceneTB;
+}
+
+QToolBar* SceneInPageActions::GetOrderToolBar() {
+  auto* orderTB = new (std::nothrow) QToolBar("Scene Order");
+  orderTB->addActions(_ORDER_AG->actions());
+  orderTB->setOrientation(Qt::Orientation::Vertical);
+  orderTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  return orderTB;
+}
+
+QToolBar* SceneInPageActions::GetPagesRowByColumnToolBar() {
+  mRowsInputLE = new (std::nothrow) QLineEdit("5");
+  mColumnsInputLE = new (std::nothrow) QLineEdit("4");
+  mRowsInputLE->setMaximumWidth(ROW_COLUMN_LINEDIT_MAX_WIDTH);
+  mColumnsInputLE->setMaximumWidth(ROW_COLUMN_LINEDIT_MAX_WIDTH);
   mRowsInputLE->setValidator(new QIntValidator{1, 10000});
   mColumnsInputLE->setValidator(new QIntValidator{1, 10000});
 
-  mPageIndexInputLE = new QLineEdit("0");
-  mPageIndexInputLE->setMaximumWidth(80);
+  auto* rowByColumnTB = new (std::nothrow) QToolBar("Page Row-by-Column");
+  rowByColumnTB->addWidget(mRowsInputLE);
+  rowByColumnTB->addWidget(new QLabel("-by-"));
+  rowByColumnTB->addWidget(mColumnsInputLE);
+
+  auto* enableRowColTB = new (std::nothrow) QToolBar{"Enable Page"};
+  enableRowColTB->addAction(_GROUP_BY_PAGE);
+  enableRowColTB->addWidget(rowByColumnTB);
+  enableRowColTB->setOrientation(Qt::Orientation::Vertical);
+  return enableRowColTB;
+}
+
+QToolBar* SceneInPageActions::GetPageIndexSelectionToolBar() {
+  mPageIndexInputLE = new (std::nothrow) QLineEdit("0");
+  mPageIndexInputLE->setMaximumWidth(ROW_COLUMN_LINEDIT_MAX_WIDTH);
   mPageIndexInputLE->setValidator(new QIntValidator{-1, 10000});
 
-  mOrderTB = new QToolBar("Scene Order");
-  mOrderTB->addActions(_ORDER_AG->actions());
-  mOrderTB->setOrientation(Qt::Orientation::Vertical);
-  mOrderTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-
-  mRowByColumnTB = new QToolBar("Page Row-by-Column");
-  mRowByColumnTB->addWidget(mRowsInputLE);
-  mRowByColumnTB->addWidget(new QLabel("-by-"));
-  mRowByColumnTB->addWidget(mColumnsInputLE);
-
-  mEnablePageTB = new QToolBar{"Enable Page"};
-  mEnablePageTB->addAction(_GROUP_BY_PAGE);
-  mEnablePageTB->addWidget(mRowByColumnTB);
-  mEnablePageTB->setOrientation(Qt::Orientation::Vertical);
-
-  mPagesSelectTB = new QToolBar("Page Select");
-  mPagesSelectTB->addSeparator();
-  mPagesSelectTB->addActions({_THE_FIRST_PAGE, _LAST_PAGE});
-  mPagesSelectTB->addSeparator();
-  mPagesSelectTB->addWidget(mPageIndexInputLE);
-  mPagesSelectTB->addSeparator();
-  mPagesSelectTB->addActions({_NEXT_PAGE, _THE_LAST_PAGE});
-
-  mSceneTB = new QToolBar("scene toolbar");
-  mSceneTB->addWidget(mOrderTB);
-  mSceneTB->addSeparator();
-  mSceneTB->addWidget(mEnablePageTB);
-  mSceneTB->addSeparator();
-  mSceneTB->addWidget(mPagesSelectTB);
-  return mSceneTB;
+  auto* pagesSelectTB = new (std::nothrow) QToolBar("Page Select");
+  pagesSelectTB->addSeparator();
+  pagesSelectTB->addActions({_THE_FIRST_PAGE, _LAST_PAGE});
+  pagesSelectTB->addSeparator();
+  pagesSelectTB->addWidget(mPageIndexInputLE);
+  pagesSelectTB->addSeparator();
+  pagesSelectTB->addActions({_NEXT_PAGE, _THE_LAST_PAGE});
+  return pagesSelectTB;
 }
