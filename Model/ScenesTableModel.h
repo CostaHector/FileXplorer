@@ -9,26 +9,25 @@
 struct SCENE_INFO {
   QString filename;
   qint64 size;
-  qint64 like;
 };
 
 class ImgCorrespondVid {
  public:
-  void append(const QString& vidName, const QString& vidFullPath) {
+  void append(const QString& vidName, const SCENE_INFO& vidsInfo) {
     const int lastDot = vidName.lastIndexOf('.');
     const QString coreName{lastDot == -1 ? vidName : vidName.left(lastDot)};
-    mCoreName2VidMap[coreName] = vidFullPath;
+    mCoreName2VidMap[coreName] = vidsInfo;
   }
 
-  bool contains(const QString& imgPath, QString* pVidPath = nullptr) const {
+  bool contains(const QString& imgPath, SCENE_INFO* pVidInfo = nullptr) const {
     const int lastDot = imgPath.lastIndexOf('.');
     const QString coreName{lastDot == -1 ? imgPath : imgPath.left(lastDot)};
     auto it = mCoreName2VidMap.find(coreName);
     if (it == mCoreName2VidMap.cend()) {
       return false;
     }
-    if (pVidPath != nullptr) {
-      *pVidPath = it.value();
+    if (pVidInfo != nullptr) {
+      *pVidInfo = it.value();
     }
     return true;
   }
@@ -41,12 +40,12 @@ class ImgCorrespondVid {
   inline bool size() const { return mCoreName2VidMap.size(); }
 
  private:
-  QHash<QString, QString> mCoreName2VidMap;
+  QHash<QString, SCENE_INFO> mCoreName2VidMap;
 };
 
 class ScenesTableModel : public QAbstractTableModelPub {
  public:
-  typedef QList<SCENE_INFO> SCENE_INFO_LIST;
+  typedef QStringList IMGS_LIST;
   ScenesTableModel(QObject* object = nullptr);
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override {
@@ -95,7 +94,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
     return N / (mSCENES_CNT_ROW * mSCENES_CNT_COLUMN) + int(N % (mSCENES_CNT_ROW * mSCENES_CNT_COLUMN) != 0);
   }
 
-  inline const SCENE_INFO_LIST& GetEntryList() const { return mFilterEnable ? mEntryListFiltered : mEntryList; }
+  inline const IMGS_LIST& GetEntryList() const { return mFilterEnable ? mEntryListFiltered : mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
   void setFilterRegExp(const QString& pattern);
 
@@ -106,9 +105,9 @@ class ScenesTableModel : public QAbstractTableModelPub {
   bool mFilterEnable{false};
   QString mPattern;
   QString mRootPath;
-  SCENE_INFO_LIST mEntryList;
-  SCENE_INFO_LIST mEntryListFiltered;
-  SCENE_INFO_LIST::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
+  IMGS_LIST mEntryList;
+  IMGS_LIST mEntryListFiltered;
+  IMGS_LIST::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
   ImgCorrespondVid mImg2Vid;
 };
 #endif  // SCENESTABLEMODEL_H
