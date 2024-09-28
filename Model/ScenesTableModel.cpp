@@ -1,5 +1,6 @@
 #include "ScenesTableModel.h"
 #include "PublicVariable.h"
+#include "public/DisplayEnhancement.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -19,19 +20,21 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
   if (mCurBegin + linearInd >= mCurEnd) {
     return {};
   }
-  const QString& nm = mCurBegin[linearInd].filename;
   switch (role) {
-    case Qt::ItemDataRole::DisplayRole:
-      return QString("%1\n%2\n%3").arg(nm).arg(mCurBegin[linearInd].size).arg(mCurBegin[linearInd].like);
-    case Qt::ItemDataRole::DecorationRole: {
-      if (nm.endsWith(".jpg", Qt::CaseInsensitive)) {
-        QPixmap pm(mRootPath + '/' + nm);
-        return pm;
+    case Qt::ItemDataRole::DisplayRole:{
+      QString disp = mCurBegin[linearInd];
+      SCENE_INFO vidInfo;
+      if (mImg2Vid.contains(disp, &vidInfo)) {
+        disp += '\n';
+        disp += FILE_PROPERTY_DSP::sizeToHumanReadFriendly(vidInfo.size);
       }
-      break;
+      return disp;
+    }
+    case Qt::ItemDataRole::DecorationRole: {
+      return QPixmap{mRootPath + '/' + mCurBegin[linearInd]}.scaledToWidth(420);
     }
     case Qt::ItemDataRole::BackgroundRole: {
-      if (!mImg2Vid.contains(nm, nullptr)) {
+      if (!mImg2Vid.contains(mCurBegin[linearInd], nullptr)) {
         return QBrush(Qt::GlobalColor::darkGray, Qt::BrushStyle::SolidPattern);
       }
       break;
@@ -61,9 +64,9 @@ QFileInfo ScenesTableModel::fileInfo(const QModelIndex& index) const {
   if (!isIndexValid(index, &linearInd)) {
     return {};
   }
-  QString vidFullPath;
-  if (mImg2Vid.contains(mCurBegin[linearInd].filename, &vidFullPath)) {
-    return vidFullPath;
+  SCENE_INFO vidsInfo;
+  if (mImg2Vid.contains(mCurBegin[linearInd], &vidsInfo)) {
+    return vidsInfo.filename;
   }
   qDebug("fileInfo of img in mp4 not find");
   return {};
@@ -75,9 +78,9 @@ QString ScenesTableModel::filePath(const QModelIndex& index) const {
     return {};
   }
 
-  QString vidFullPath;
-  if (mImg2Vid.contains(mCurBegin[linearInd].filename, &vidFullPath)) {
-    return vidFullPath;
+  SCENE_INFO vidsInfo;
+  if (mImg2Vid.contains(mCurBegin[linearInd], &vidsInfo)) {
+    return vidsInfo.filename;
   }
   qDebug("filePath of img in mp4 not find");
   return {};
@@ -88,9 +91,9 @@ QString ScenesTableModel::fileName(const QModelIndex& index) const {
   if (!isIndexValid(index, &linearInd)) {
     return {};
   }
-  QString vidFullPath;
-  if (mImg2Vid.contains(mCurBegin[linearInd].filename, &vidFullPath)) {
-    return QFileInfo(vidFullPath).fileName();
+  SCENE_INFO vidsInfo;
+  if (mImg2Vid.contains(mCurBegin[linearInd], &vidsInfo)) {
+    return QFileInfo(vidsInfo.filename).fileName();
   }
   qDebug("fileName of img in mp4 not find");
   return {};
@@ -102,9 +105,9 @@ QString ScenesTableModel::absolutePath(const QModelIndex& index) const {
     return {};
   }
 
-  QString vidFullPath;
-  if (mImg2Vid.contains(mCurBegin[linearInd].filename, &vidFullPath)) {
-    return QFileInfo(vidFullPath).absolutePath();
+  SCENE_INFO vidsInfo;
+  if (mImg2Vid.contains(mCurBegin[linearInd], &vidsInfo)) {
+    return QFileInfo(vidsInfo.filename).absolutePath();
   }
   qDebug("filePath of img in mp4 not find");
   return {};
@@ -119,12 +122,11 @@ bool ScenesTableModel::setRootPath(const QString& rootPath) {
   QDirIterator imgIt(mRootPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot,
                      QDirIterator::IteratorFlag::Subdirectories);
   const int PRE_PATH_STR_LEN = rootPath.size();
-  SCENE_INFO_LIST newEntryList, newFilteredList;
+  IMGS_LIST newEntryList, newFilteredList;
   // mRootPath + / + relName
   while (imgIt.hasNext()) {
     const QString& relName = imgIt.next().mid(PRE_PATH_STR_LEN + 1);
-    const QFileInfo& fi = imgIt.fileInfo();
-    newEntryList.append(SCENE_INFO{relName, fi.size(), fi.size()});
+    newEntryList.append(relName);
     if (mFilterEnable && relName.contains(mPattern)) {
       newFilteredList.append(newEntryList.back());
     }
@@ -134,8 +136,9 @@ bool ScenesTableModel::setRootPath(const QString& rootPath) {
   QDirIterator vidIt(mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot,
                      QDirIterator::IteratorFlag::Subdirectories);
   while (vidIt.hasNext()) {
-    const QString& relName = vidIt.next().mid(PRE_PATH_STR_LEN + 1);
-    mImg2Vid.append(relName, vidIt.filePath());
+    const QString& vidPath = vidIt.next();
+    const QString& relName = vidPath.mid(PRE_PATH_STR_LEN + 1);
+    mImg2Vid.append(relName, SCENE_INFO{vidPath, vidIt.fileInfo().size()});
   }
 
   qDebug("new path[%s], imgs[%d], imgsFiltered[%d], vids[%d]", qPrintable(mRootPath), newEntryList.size(), newFilteredList.size(), mImg2Vid.size());
@@ -181,7 +184,7 @@ bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
   int afterColumnCnt{0};
 
   int begin{0}, end{0};
-  const SCENE_INFO_LIST& lst = GetEntryList();
+  const IMGS_LIST& lst = GetEntryList();
   const int TOTAL_N = GetEntryListLen();
   if (mSCENES_CNT_ROW == -1) {
     qDebug("Row count = -1, all items in one page");
@@ -218,11 +221,13 @@ bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
   qDebug("============== ChangeColumnsCnt new dimension: %dx%d ==============", rowCount(), columnCount());
   return true;
 }
+
 void ScenesTableModel::SortOrder(bool reverse) {
-  std::sort(mEntryList.begin(), mEntryList.end(), [reverse](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool {
-    bool less = lhs.filename < rhs.filename;
-    return reverse ? !less : less;
-  });
+  if (reverse) {
+    std::sort(mEntryList.begin(), mEntryList.end(), std::greater<QString>());
+  } else {
+    std::sort(mEntryList.begin(), mEntryList.end(), std::less<QString>());
+  }
   emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), {});
 }
 
@@ -231,7 +236,7 @@ bool ScenesTableModel::ChangeRowsCnt(int newRowCnt, int newPageIndex) {
     qDebug("Invalid row count %d or page index %d", newRowCnt, newPageIndex);
     return true;
   }
-  const SCENE_INFO_LIST& lst = GetEntryList();
+  const IMGS_LIST& lst = GetEntryList();
   const int TOTAL_N = GetEntryListLen();
   const int begin = std::min(mSCENES_CNT_COLUMN * newRowCnt * newPageIndex, TOTAL_N);
   const int end = std::min(mSCENES_CNT_COLUMN * newRowCnt * (newPageIndex + 1), TOTAL_N);
@@ -268,7 +273,7 @@ bool ScenesTableModel::SetPageIndex(int newPageIndex) {
     return false;
   }
 
-  const SCENE_INFO_LIST& lst = GetEntryList();
+  const IMGS_LIST& lst = GetEntryList();
   const int TOTAL_N = GetEntryListLen();
   const int begin = std::min(mSCENES_CNT_COLUMN * mSCENES_CNT_ROW * newPageIndex, TOTAL_N);
   const int end = std::min(mSCENES_CNT_COLUMN * mSCENES_CNT_ROW * (newPageIndex + 1), TOTAL_N);
@@ -313,9 +318,9 @@ void ScenesTableModel::setFilterRegExp(const QString& pattern) {
     return;
   }
 
-  SCENE_INFO_LIST newCurrentList;
+  IMGS_LIST newCurrentList;
   for (const auto& item : mEntryList) {
-    if (item.filename.contains(mPattern, Qt::CaseSensitivity::CaseInsensitive)) {
+    if (item.contains(mPattern, Qt::CaseSensitivity::CaseInsensitive)) {
       newCurrentList.append(item);
     }
   }
