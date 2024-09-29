@@ -200,6 +200,7 @@
         <file alias="FOLDER_PREVIEW_BROWSER">View/FOLDER_PREVIEW_BROWSER.svg</file>
         <file alias="FOLDER_PREVIEW_LISTS">View/FOLDER_PREVIEW_LISTS.svg</file>
         <file alias="SCENE_TABLE_VIEW">View/SCENE_TABLE_VIEW.svg</file>
+        <file alias="COMBINE_MEDIAS_INFO">View/COMBINE_MEDIAS_INFO.svg</file>
 
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
         <file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
