@@ -119,7 +119,7 @@ bool ScenesTableModel::setRootPath(const QString& rootPath) {
     return true;
   }
   mRootPath = rootPath;
-  QDirIterator imgIt(mRootPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot,
+  QDirIterator imgIt(mRootPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files | QDir::Filter::NoDotAndDotDot,
                      QDirIterator::IteratorFlag::Subdirectories);
   const int PRE_PATH_STR_LEN = rootPath.size();
   IMGS_LIST newEntryList, newFilteredList;
@@ -133,7 +133,7 @@ bool ScenesTableModel::setRootPath(const QString& rootPath) {
   }
 
   mImg2Vid.clear();
-  QDirIterator vidIt(mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot,
+  QDirIterator vidIt(mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files | QDir::Filter::NoDotAndDotDot,
                      QDirIterator::IteratorFlag::Subdirectories);
   while (vidIt.hasNext()) {
     const QString& vidPath = vidIt.next();
