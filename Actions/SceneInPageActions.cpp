@@ -12,6 +12,12 @@ SceneInPageActions& g_SceneInPageActions() {
 }
 
 SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
+  _COMBINE_MEDIAINFOS_JSON = new QAction(QIcon(":/themes/COMBINE_MEDIAS_INFO"), "Combine infos", this);
+  _COMBINE_MEDIAINFOS_JSON->setShortcut(QKeySequence(Qt::Key_F5));
+  _COMBINE_MEDIAINFOS_JSON->setShortcutVisibleInContextMenu(true);
+  _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Combine Videos/Images info Into json files.")
+                                           .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
+
   _ASCENDING = new QAction(QIcon(":/themes/ASCENDING_ORDER"), "Ascending", this);
   _ASCENDING->setCheckable(true);
   _DESCENDING = new QAction(QIcon(":/themes/DESCENDING_ORDER"), "Descending", this);
