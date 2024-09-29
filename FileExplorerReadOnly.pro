@@ -93,6 +93,7 @@ SOURCES += \
     Tools/NameTool.cpp \
     Tools/QMediaInfo.cpp \
     Tools/RenameNamesUnique.cpp \
+    Tools/SceneInfoManager.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
@@ -254,6 +255,7 @@ HEADERS += \
     Tools/QAbstractTableModelPub.h \
     Tools/QMediaInfo.h \
     Tools/RenameNamesUnique.h \
+    Tools/SceneInfoManager.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     Tools/ToConsecutiveFileNameNo.h \
