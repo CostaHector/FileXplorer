@@ -5,18 +5,27 @@
 #include <QDirIterator>
 #include <QDir>
 
-SCENES_TYPE SceneInfoManager::GetScenesFromPath(const QString& path) {
+SCENES_TYPE SceneInfoManager::GetScenesFromPath(const QString& path, const bool enableFilter, const QString& pattern, SCENES_TYPE* pFiltered) {
   if (!QFileInfo(path).isDir()) {
     qDebug("path[%s] is not a directory", qPrintable(path));
     return {};
   }
+  const bool needFilter{enableFilter && pFiltered != nullptr && !pattern.isEmpty()};
+
   SCENES_TYPE scenes;
   QDirIterator jsonIt(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (jsonIt.hasNext()) {
-    QVariantHash rawJsonDict = JsonFileHelper::MovieJsonLoader(jsonIt.next());
+    const QFileInfo jFi{jsonIt.next()};
+    const QVariantHash rawJsonDict = JsonFileHelper::MovieJsonLoader(jFi.absoluteFilePath());
     scenes.append(SCENE_INFO{rawJsonDict.value("Name", "").toString(), rawJsonDict.value("ImgName", "").toString(),
                              rawJsonDict.value("VidName", "").toString(), rawJsonDict.value("VidSize", 0).toLongLong(),
                              rawJsonDict.value("Rate", 0).toInt(), rawJsonDict.value("Uploaded", "").toString()});
+    if (needFilter && jFi.fileName().contains(pattern, Qt::CaseSensitivity::CaseInsensitive)) {
+      pFiltered->append(scenes.back());
+    }
+  }
+  if (pFiltered != nullptr && pattern.isEmpty()) {
+    *pFiltered = scenes;
   }
   return scenes;
 }

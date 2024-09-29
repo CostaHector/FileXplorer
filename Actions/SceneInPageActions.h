@@ -18,6 +18,8 @@ class SceneInPageActions : public QObject {
   QToolBar* GetPagesRowByColumnToolBar();
   QToolBar* GetPageIndexSelectionToolBar();
 
+  QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
+
   QAction* _ASCENDING{nullptr};
   QAction* _DESCENDING{nullptr};
   QActionGroup* _ORDER_AG{nullptr};
