@@ -22,6 +22,7 @@ SOURCES += \
     TestCase/PathToolTest.cpp \
     TestCase/RedundantItemsRemoverTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
+    TestCase/SceneViewTest.cpp \
     TestCase/SyncModifiyFileSystemTest.cpp \
     TestCase/ToConsecutiveFileNameNoTest.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
@@ -63,9 +64,11 @@ SOURCES += \
     Tools/NameStandardizer.cpp \
     Tools/PerformersManager.cpp \
     Tools/RenameNamesUnique.cpp \
+    Tools/SceneInfoManager.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/AIMediaDuplicate.cpp \
+    Tools/JsonFileHelper.cpp \
     model/ConflictsFileSystemModel.cpp \
     UndoRedo.cpp
 
@@ -99,12 +102,14 @@ HEADERS += \
     Tools/NameStandardizer.h \
     Tools/PerformersManager.h \
     Tools/RenameNamesUnique.h \
+    Tools/SceneInfoManager.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/NameSectionArrange.h \
     Tools/RedundantFolderRemove.h \
     Tools/AIMediaDuplicate.h \
     Tools/QMediaInfo.h \
+    Tools/JsonFileHelper.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 
