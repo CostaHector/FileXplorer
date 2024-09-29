@@ -1,5 +1,6 @@
 #include "SceneActionsSubscribe.h"
 #include "Actions/SceneInPageActions.h"
+#include "Tools/SceneInfoManager.h"
 #include <QToolBar>
 
 bool SceneActionsSubscribe::BindWidget(QTableView* tableView, ScenesTableModel* model) {
@@ -132,6 +133,11 @@ void SceneActionsSubscribe::SortSceneItems(QAction* triggerAct) {
   _model->SortOrder(triggerAct->text() == "Descending");
 }
 
+void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
+  const QString& pth = _model->rootPath();
+  const int& updatedCnt = SceneInfoManager::UpdateJsonImgVidSize(pth);
+}
+
 bool SceneActionsSubscribe::operator()() {
   if (_model == nullptr) {
     qWarning("_model is nullptr");
@@ -143,6 +149,8 @@ bool SceneActionsSubscribe::operator()() {
   }
 
   auto& ags = g_SceneInPageActions();
+  connect(ags._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneActionsSubscribe::CombineMediaInfoIntoJson);
+
   connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
   connect(ags.mRowsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);

@@ -26,6 +26,8 @@ class SceneActionsSubscribe : public QObject {
 
   void SortSceneItems(QAction* triggerAct);
 
+  void CombineMediaInfoIntoJson();
+
  private:
   ScenesTableModel* _model{nullptr};
   QTableView* _tableView{nullptr};
