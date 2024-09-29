@@ -332,6 +332,8 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
   sceneTB->addAction(g_viewActions()._SCENE_VIEW);
   sceneTB->addSeparator();
+  sceneTB->addAction(ag._COMBINE_MEDIAINFOS_JSON);
+  sceneTB->addSeparator();
   sceneTB->addWidget(ag.mOrderTB);
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mEnablePageTB);

@@ -2,50 +2,50 @@
 #define SCENESTABLEMODEL_H
 
 #include "Tools/QAbstractTableModelPub.h"
+#include "Tools/SceneInfoManager.h"
 #include <utility>
 #include <QSet>
 #include <QFileInfo>
 
-struct SCENE_INFO {
-  QString filename;
-  qint64 size;
-};
+//struct SCENE_INFO {
+//  QString filename;
+//  qint64 size;
+//};
 
-class ImgCorrespondVid {
- public:
-  void append(const QString& vidName, const SCENE_INFO& vidsInfo) {
-    const int lastDot = vidName.lastIndexOf('.');
-    const QString coreName{lastDot == -1 ? vidName : vidName.left(lastDot)};
-    mCoreName2VidMap[coreName] = vidsInfo;
-  }
+//class ImgCorrespondVid {
+// public:
+//  void append(const QString& vidName, const SCENE_INFO& vidsInfo) {
+//    const int lastDot = vidName.lastIndexOf('.');
+//    const QString coreName{lastDot == -1 ? vidName : vidName.left(lastDot)};
+//    mCoreName2VidMap[coreName] = vidsInfo;
+//  }
 
-  bool contains(const QString& imgPath, SCENE_INFO* pVidInfo = nullptr) const {
-    const int lastDot = imgPath.lastIndexOf('.');
-    const QString coreName{lastDot == -1 ? imgPath : imgPath.left(lastDot)};
-    auto it = mCoreName2VidMap.find(coreName);
-    if (it == mCoreName2VidMap.cend()) {
-      return false;
-    }
-    if (pVidInfo != nullptr) {
-      *pVidInfo = it.value();
-    }
-    return true;
-  }
+//  bool contains(const QString& imgPath, SCENE_INFO* pVidInfo = nullptr) const {
+//    const int lastDot = imgPath.lastIndexOf('.');
+//    const QString coreName{lastDot == -1 ? imgPath : imgPath.left(lastDot)};
+//    auto it = mCoreName2VidMap.find(coreName);
+//    if (it == mCoreName2VidMap.cend()) {
+//      return false;
+//    }
+//    if (pVidInfo != nullptr) {
+//      *pVidInfo = it.value();
+//    }
+//    return true;
+//  }
 
-  inline void clear() {
-    decltype(mCoreName2VidMap) tmp;
-    mCoreName2VidMap.swap(tmp);
-  }
+//  inline void clear() {
+//    decltype(mCoreName2VidMap) tmp;
+//    mCoreName2VidMap.swap(tmp);
+//  }
 
-  inline bool size() const { return mCoreName2VidMap.size(); }
+//  inline bool size() const { return mCoreName2VidMap.size(); }
 
- private:
-  QHash<QString, SCENE_INFO> mCoreName2VidMap;
-};
+// private:
+//  QHash<QString, SCENE_INFO> mCoreName2VidMap;
+//};
 
 class ScenesTableModel : public QAbstractTableModelPub {
  public:
-  typedef QStringList IMGS_LIST;
   ScenesTableModel(QObject* object = nullptr);
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override {
@@ -94,7 +94,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
     return N / (mSCENES_CNT_ROW * mSCENES_CNT_COLUMN) + int(N % (mSCENES_CNT_ROW * mSCENES_CNT_COLUMN) != 0);
   }
 
-  inline const IMGS_LIST& GetEntryList() const { return mFilterEnable ? mEntryListFiltered : mEntryList; }
+  inline const SCENES_TYPE& GetEntryList() const { return mFilterEnable ? mEntryListFiltered : mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
   void setFilterRegExp(const QString& pattern);
 
@@ -105,9 +105,9 @@ class ScenesTableModel : public QAbstractTableModelPub {
   bool mFilterEnable{false};
   QString mPattern;
   QString mRootPath;
-  IMGS_LIST mEntryList;
-  IMGS_LIST mEntryListFiltered;
-  IMGS_LIST::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
-  ImgCorrespondVid mImg2Vid;
+  SCENES_TYPE mEntryList;
+  SCENES_TYPE mEntryListFiltered;
+  SCENES_TYPE::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
+  SceneInfoManager mScenesInfo;
 };
 #endif  // SCENESTABLEMODEL_H
