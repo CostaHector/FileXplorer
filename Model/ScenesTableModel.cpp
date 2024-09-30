@@ -35,7 +35,7 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
       if (mCurBegin[linearInd].imgName.isEmpty()) {
         return {};
       }
-      return QPixmap{mRootPath + '/' + mCurBegin[linearInd].imgName}.scaledToWidth(420);
+      return QPixmap{mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].imgName}.scaledToWidth(420);
     }
     case Qt::ItemDataRole::BackgroundRole: {
       if (mCurBegin[linearInd].vidName.isEmpty()) {
