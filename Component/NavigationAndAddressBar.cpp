@@ -57,6 +57,7 @@ auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {
 auto NavigationAndAddressBar::onBackward() -> bool {
   if (!m_pathRD.undoAvailable()) {
     qDebug("[Skip] backward paths pool empty");
+    return false;
   }
   bool backwardRes{true};
   const QString& undoPath = m_pathRD.undo();
@@ -69,6 +70,7 @@ auto NavigationAndAddressBar::onBackward() -> bool {
 auto NavigationAndAddressBar::onForward() -> bool {
   if (!m_pathRD.redoAvailable()) {
     qDebug("[Skip] Forward paths pool empty");
+    return false;
   }
   bool forwardRes{true};
   const QString& redoPath = m_pathRD.redo();

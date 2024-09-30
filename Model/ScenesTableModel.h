@@ -7,43 +7,6 @@
 #include <QSet>
 #include <QFileInfo>
 
-//struct SCENE_INFO {
-//  QString filename;
-//  qint64 size;
-//};
-
-//class ImgCorrespondVid {
-// public:
-//  void append(const QString& vidName, const SCENE_INFO& vidsInfo) {
-//    const int lastDot = vidName.lastIndexOf('.');
-//    const QString coreName{lastDot == -1 ? vidName : vidName.left(lastDot)};
-//    mCoreName2VidMap[coreName] = vidsInfo;
-//  }
-
-//  bool contains(const QString& imgPath, SCENE_INFO* pVidInfo = nullptr) const {
-//    const int lastDot = imgPath.lastIndexOf('.');
-//    const QString coreName{lastDot == -1 ? imgPath : imgPath.left(lastDot)};
-//    auto it = mCoreName2VidMap.find(coreName);
-//    if (it == mCoreName2VidMap.cend()) {
-//      return false;
-//    }
-//    if (pVidInfo != nullptr) {
-//      *pVidInfo = it.value();
-//    }
-//    return true;
-//  }
-
-//  inline void clear() {
-//    decltype(mCoreName2VidMap) tmp;
-//    mCoreName2VidMap.swap(tmp);
-//  }
-
-//  inline bool size() const { return mCoreName2VidMap.size(); }
-
-// private:
-//  QHash<QString, SCENE_INFO> mCoreName2VidMap;
-//};
-
 class ScenesTableModel : public QAbstractTableModelPub {
  public:
   ScenesTableModel(QObject* object = nullptr);
@@ -108,6 +71,5 @@ class ScenesTableModel : public QAbstractTableModelPub {
   SCENES_TYPE mEntryList;
   SCENES_TYPE mEntryListFiltered;
   SCENES_TYPE::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
-  SceneInfoManager mScenesInfo;
 };
 #endif  // SCENESTABLEMODEL_H
