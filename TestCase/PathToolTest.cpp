@@ -26,6 +26,13 @@ class PathToolTest : public QObject {
 
   void test_longestCommonPrefix_path_scene();
   void test_longestCommonPrefix_samepath_scene();
+
+  void test_dirName();
+  void test_fileName();
+  void test_RelativePath2File_InvalidInput();
+  void test_RelativePath2File_ok();
+
+  void test_GetBaseNameExt();
 };
 
 void PathToolTest::initTestCase() {
@@ -93,6 +100,43 @@ void PathToolTest::test_longestCommonPrefix_samepath_scene() {
   QString actualPrepath = longestCommonPrefix({"E:/115/ABC", "E:/115/ABC"});
   QString expectPrepath = "E:/115";
   QCOMPARE(actualPrepath, expectPrepath);
+}
+
+void PathToolTest::test_dirName() {
+  // rootPath/Any/Relative/Path/File = > Path
+  // rootPath/Relative/File = > Relative
+  QCOMPARE(dirName("rootPath/Any/Relative/Path/File"), "Path");
+  QCOMPARE(dirName("rootPath/Relative/File"), "Relative");
+}
+void PathToolTest::test_fileName() {
+  // rootPath/Relative/File = > File, just like QFileInfo("rootPath/Relative/File").fileName()
+  QCOMPARE(fileName("rootPath/Relative/File"), "File");
+}
+
+void PathToolTest::test_RelativePath2File_InvalidInput() {
+  QCOMPARE(RelativePath2File(strlen(""), "no slash path"), "");
+}
+
+void PathToolTest::test_RelativePath2File_ok() {
+  QCOMPARE(strlen("C:/home"), 7);
+  // "C:", C:/home/file.txt = > /home/
+  // "rootPath", rootPath/Any/Relative/Path/File = > /Any/Relative/Path/
+  // "rootPath", rootPath/Relative/File = > /Relative/
+  // "rootPath", rootPath/File = > /
+  QCOMPARE(RelativePath2File(strlen("C:"), "C:/home/file.txt"), "/home/");
+  QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Any/Relative/Path/File"), "/Any/Relative/Path/");
+  QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Relative/File"), "/Relative/");
+  QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/File"), "/");
+
+  QCOMPARE(RelativePath2File(strlen("C:"), "C:/home/file.txt", strlen("file.txt")), "/home/");
+  QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Any/Relative/Path/File", 4), "/Any/Relative/Path/");
+  QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Relative/File", 4), "/Relative/");
+  QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/File", 4), "/");
+}
+
+void PathToolTest::test_GetBaseNameExt() {
+  QCOMPARE(GetBaseNameExt("C:/home/file.m"), std::make_pair(QString("file"), QString(".m")));
+  QCOMPARE(GetBaseNameExt("a.txt"), std::make_pair(QString("a"), QString(".txt")));
 }
 
 //QTEST_MAIN(PathToolTest)
