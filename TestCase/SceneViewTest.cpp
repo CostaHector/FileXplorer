@@ -65,20 +65,20 @@ class SceneViewTest : public QObject {
     QCOMPARE(scenes[0].name, "somejsonfile1");
     QCOMPARE(scenes[1].name, "somejsonfile2");
     QCOMPARE(scenes[2].name, "somejsonfileEmpty");
-    SceneInfoManager::sort(scenes, SortByKey::NAME, true);
+    SceneInfoManager::sort(scenes, SceneSortOption::NAME, true);
     QCOMPARE(scenes[0].name, "somejsonfileEmpty");
     QCOMPARE(scenes[1].name, "somejsonfile2");
     QCOMPARE(scenes[2].name, "somejsonfile1");
-    SceneInfoManager::sort(scenes, SortByKey::NAME, false);
+    SceneInfoManager::sort(scenes, SceneSortOption::NAME, false);
     QCOMPARE(scenes[0].name, "somejsonfile1");
     QCOMPARE(scenes[1].name, "somejsonfile2");
     QCOMPARE(scenes[2].name, "somejsonfileEmpty");
 
-    SceneInfoManager::sort(scenes, SortByKey::RATE, true);
+    SceneInfoManager::sort(scenes, SceneSortOption::RATE, true);
     QCOMPARE(scenes[0].rate, 99);
     QCOMPARE(scenes[1].rate, 50);
     QCOMPARE(scenes[2].rate, 0);
-    SceneInfoManager::sort(scenes, SortByKey::RATE, false);
+    SceneInfoManager::sort(scenes, SceneSortOption::RATE, false);
     QCOMPARE(scenes[0].rate, 0);
     QCOMPARE(scenes[1].rate, 50);
     QCOMPARE(scenes[2].rate, 99);
