@@ -44,6 +44,7 @@ SOURCES += \
     Component/ConflictsRecycle.cpp \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
+    Component/DropListToolButton.cpp \
     Component/FileSystemMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
@@ -204,6 +205,7 @@ HEADERS += \
     Component/ConflictsRecycle.h \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
+    Component/DropListToolButton.h \
     Component/FileSystemMenu.h \
     Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \

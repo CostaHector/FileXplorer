@@ -61,8 +61,14 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
 void SceneActionsSubscribe::SetScenesGroupByPage(bool groupByPageAction) {
   auto& ags = g_SceneInPageActions();
   ags.mPagesSelectTB->setEnabled(groupByPageAction);
+  if (_model == nullptr) {
+    qCritical("_model is nullptr");
+    return;
+  }
   if (groupByPageAction) {
     SetScenesPerColumn();
+  } else {
+    _model->ShowAllScenesInOnePage();
   }
 }
 
@@ -128,12 +134,22 @@ bool SceneActionsSubscribe::SetScenesPerRow() {
   return true;
 }
 
-void SceneActionsSubscribe::SortSceneItems(QAction* triggerAct) {
-  if (triggerAct == nullptr) {
-    qWarning("triggerAct is nullptr");
+void SceneActionsSubscribe::SortSceneItems() {
+  auto& ags = g_SceneInPageActions();
+  if (ags._ORDER_AG == nullptr || ags._REVERSE_SORT == nullptr) {
+    qCritical("_ORDER_AG or _REVERSE_SORT is nullptr");
     return;
   }
-  _model->SortOrder(triggerAct->text() == "Descending");
+  QAction* triggerAct = ags._ORDER_AG->checkedAction();
+  if (triggerAct == nullptr) {
+    qCritical("triggerAct is nullptr, nothing sort option is select");
+    return;
+  }
+  const QString sortOptionStr{triggerAct->text()};
+  const bool bReverse{ags._REVERSE_SORT->isChecked()};
+  SceneInfoManager::SceneSortOption sortOption = SceneInfoManager::GetSortOptionFromStr(sortOptionStr);
+  qDebug("sort option: %s, bReverse: %d", qPrintable(sortOptionStr), bReverse);
+  _model->SortOrder(sortOption, bReverse);
 }
 
 void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
@@ -180,6 +196,7 @@ bool SceneActionsSubscribe::operator()() {
   connect(ags._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneActionsSubscribe::CombineMediaInfoIntoJson);
 
   connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
+  connect(ags._REVERSE_SORT, &QAction::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
   connect(ags.mRowsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);
   connect(ags.mPageIndexInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetPageIndex);

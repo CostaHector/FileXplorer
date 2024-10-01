@@ -200,14 +200,27 @@ bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
   return true;
 }
 
-void ScenesTableModel::SortOrder(bool reverse) {
-  // Todo:
-//  if (reverse) {
-//    std::sort(mEntryList.begin(), mEntryList.end(), std::greater<QString>());
-//  } else {
-//    std::sort(mEntryList.begin(), mEntryList.end(), std::less<QString>());
-//  }
-  emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), {});
+void ScenesTableModel::SortOrder(SceneInfoManager::SceneSortOption sortOption, bool reverse) {
+  if (sortOption == SceneInfoManager::SceneSortOption::BUTT) {
+    qDebug("sortOption[%d] is invalid, cannot used to sort", (int)sortOption);
+    return;
+  }
+  int newBegin{0}, newEnd{0};
+  if (mFilterEnable) {
+    newBegin = mCurBegin - mEntryListFiltered.cbegin();
+    newEnd = mCurEnd - mEntryListFiltered.cbegin();
+    SceneInfoManager::sort(mEntryListFiltered, sortOption, reverse);
+    mCurBegin = mEntryListFiltered.cbegin() + newBegin;
+    mCurEnd = mEntryListFiltered.cbegin() + newEnd;
+  } else {
+    newBegin = mCurBegin - mEntryList.cbegin();
+    newEnd = mCurEnd - mEntryList.cbegin();
+    SceneInfoManager::sort(mEntryList, sortOption, reverse);
+    mCurBegin = mEntryList.cbegin() + newBegin;
+    mCurEnd = mEntryList.cbegin() + newEnd;
+  }
+  emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1),
+                   {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
 }
 
 bool ScenesTableModel::ChangeRowsCnt(int newRowCnt, int newPageIndex) {
@@ -242,6 +255,28 @@ bool ScenesTableModel::ChangeRowsCnt(int newRowCnt, int newPageIndex) {
   qDebug("==============dimension: %dx%d==============", rowCount(), columnCount());
   return true;
 }
+
+bool ScenesTableModel::ShowAllScenesInOnePage() {
+  const int TOTAL_N = GetEntryListLen();
+
+  const int beforeRowCnt = rowCount();
+  const int afterRowCnt = TOTAL_N / mSCENES_CNT_COLUMN + int(TOTAL_N % mSCENES_CNT_COLUMN != 0);
+  const int beforeColumnCnt = columnCount();
+  const int afterColumnCnt = mSCENES_CNT_COLUMN;
+
+  ColumnsBeginChange(beforeColumnCnt, afterColumnCnt);
+  RowsCountStartChange(beforeRowCnt, afterRowCnt);
+
+  mSCENES_CNT_ROW = -1;
+  mPageIndex = -1;
+  const SCENES_TYPE& lst = GetEntryList();
+  mCurBegin = lst.cbegin();
+  mCurEnd = lst.cend();
+
+  RowsCountEndChange(beforeRowCnt, afterRowCnt);
+  ColumnsEndChange(beforeColumnCnt, afterColumnCnt);
+}
+
 bool ScenesTableModel::SetPageIndex(int newPageIndex) {
   if (newPageIndex == -1) {
     qDebug("invalid page index[%d]", newPageIndex);
@@ -268,7 +303,8 @@ bool ScenesTableModel::SetPageIndex(int newPageIndex) {
   mCurBegin = lst.cbegin() + begin;
   mCurEnd = lst.cbegin() + end;
 
-  emit dataChanged(index(0, 0), index(beforeRowCnt, afterRowCnt - 1), {});
+  emit dataChanged(index(0, 0), index(beforeRowCnt, afterRowCnt - 1),
+                   {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
   qDebug("============== SetPageIndex new dimension: %dx%d ==============", rowCount(), columnCount());
   return true;
 }
