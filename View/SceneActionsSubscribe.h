@@ -24,7 +24,7 @@ class SceneActionsSubscribe : public QObject {
 
   bool SetScenesPerRow();
 
-  void SortSceneItems(QAction* triggerAct);
+  void SortSceneItems();
 
   void CombineMediaInfoIntoJson();
 
