@@ -16,39 +16,10 @@
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Component/DatabaseToolBar.h"
+#include "Component/DropListToolButton.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
 
-QToolButton* DropListToolButton(QAction* defaultAction,
-                                QList<QAction*> dropdownActions,
-                                QToolButton::ToolButtonPopupMode popupMode = QToolButton::ToolButtonPopupMode::InstantPopup,
-                                const QString& updateToolTip = "",
-                                const Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
-                                const int iconSize = TABS_ICON_IN_MENU_1x1) {
-  if (dropdownActions.isEmpty()) {
-    return nullptr;
-  }
-  if (defaultAction == nullptr) {
-    defaultAction = dropdownActions[0];
-  }
-
-  QToolButton* tb = new QToolButton;
-  tb->setDefaultAction(defaultAction);
-  if (not updateToolTip.isEmpty()) {
-    defaultAction->setToolTip(updateToolTip);
-  }
-  tb->setPopupMode(popupMode);
-  tb->setToolButtonStyle(toolButtonStyle);
-  tb->setAutoRaise(true);
-  tb->setStyleSheet("QToolButton { max-width: 256px; }");
-  tb->setIconSize(QSize(iconSize, iconSize));
-
-  QMenu* mn = new QMenu(tb);
-  mn->addActions(dropdownActions);
-  mn->setToolTipsVisible(true);
-  tb->setMenu(mn);
-  return tb;
-}
 
 RibbonMenu::RibbonMenu(QWidget* parent)
     : QTabWidget{parent},
