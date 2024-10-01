@@ -45,7 +45,9 @@ class ScenesTableModel : public QAbstractTableModelPub {
 
   bool ChangeRowsCnt(int newRowCnt, int newPageIndex);
   bool ChangeColumnsCnt(int newColumnCnt = 4, int newPageIndex = -1);
-  void SortOrder(bool reverse = false);
+  bool ShowAllScenesInOnePage();
+
+  void SortOrder(SceneInfoManager::SceneSortOption sortOption, bool reverse = false);
   bool SetPageIndex(int newPageIndex);
   std::pair<int, int> GetEntryIndexBE(int totalLen) const;
 

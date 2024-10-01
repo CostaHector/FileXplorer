@@ -3,6 +3,7 @@
 #include <QToolBar>
 #include <QLabel>
 #include <QIntValidator>
+#include "Component/DropListToolButton.h"
 
 constexpr int SceneInPageActions::ROW_COLUMN_LINEDIT_MAX_WIDTH;
 
@@ -15,16 +16,27 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   _COMBINE_MEDIAINFOS_JSON = new QAction(QIcon(":/themes/COMBINE_MEDIAS_INFO"), "Combine infos", this);
   _COMBINE_MEDIAINFOS_JSON->setShortcut(QKeySequence(Qt::Key_F5));
   _COMBINE_MEDIAINFOS_JSON->setShortcutVisibleInContextMenu(true);
-  _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Combine Videos/Images info Into json files.")
+  _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Combine Videos/Images info Into json files. Then generate scn file from valid "
+                                               "json file(s). This operation may update json file contents")
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
 
-  _ASCENDING = new QAction(QIcon(":/themes/ASCENDING_ORDER"), "Ascending", this);
-  _ASCENDING->setCheckable(true);
-  _DESCENDING = new QAction(QIcon(":/themes/DESCENDING_ORDER"), "Descending", this);
-  _DESCENDING->setCheckable(true);
+  _BY_MOVIE_NAME = new QAction(QIcon(":/themes/SORTING_FILE_FOLDER"), "Movie Name", this);
+  _BY_MOVIE_NAME->setCheckable(true);
+  _BY_MOVIE_SIZE = new QAction("Movie Size", this);
+  _BY_MOVIE_SIZE->setCheckable(true);
+  _BY_RATE = new QAction("Rate", this);
+  _BY_RATE->setCheckable(true);
+  _BY_UPLOADED_TIME = new QAction("Uploaded Time", this);
+  _BY_UPLOADED_TIME->setCheckable(true);
+
+  _REVERSE_SORT = new QAction("Reverse", this);
+  _REVERSE_SORT->setCheckable(true);
+
   _ORDER_AG = new QActionGroup(this);
-  _ORDER_AG->addAction(_ASCENDING);
-  _ORDER_AG->addAction(_DESCENDING);
+  _ORDER_AG->addAction(_BY_MOVIE_NAME);
+  _ORDER_AG->addAction(_BY_MOVIE_SIZE);
+  _ORDER_AG->addAction(_BY_RATE);
+  _ORDER_AG->addAction(_BY_UPLOADED_TIME);
   _ORDER_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
 
   _GROUP_BY_PAGE = new QAction("Enable Group by page:\nrow x column", this);
@@ -63,8 +75,14 @@ QToolBar* SceneInPageActions::GetSceneToolbar() {
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar() {
+  auto* defaultDisp = new QAction{QIcon(":/themes/SORTING_FILE_FOLDER"), "Sort"};
+  defaultDisp->setToolTip("Choose sort option");
+  auto* orderToolButton = DropListToolButton(defaultDisp, _ORDER_AG->actions(), QToolButton::InstantPopup, "Choose sort option",
+                                             Qt::ToolButtonStyle::ToolButtonTextBesideIcon, TABS_ICON_IN_MENU_2x1);
+
   auto* orderTB = new (std::nothrow) QToolBar("Scene Order");
-  orderTB->addActions(_ORDER_AG->actions());
+  orderTB->addWidget(orderToolButton);
+  orderTB->addAction(_REVERSE_SORT);
   orderTB->setOrientation(Qt::Orientation::Vertical);
   orderTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   return orderTB;
