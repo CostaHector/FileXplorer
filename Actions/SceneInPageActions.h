@@ -20,8 +20,11 @@ class SceneInPageActions : public QObject {
 
   QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
 
-  QAction* _ASCENDING{nullptr};
-  QAction* _DESCENDING{nullptr};
+  QAction* _BY_MOVIE_NAME{nullptr};
+  QAction* _BY_MOVIE_SIZE{nullptr};
+  QAction* _BY_RATE{nullptr};
+  QAction* _BY_UPLOADED_TIME{nullptr};
+  QAction* _REVERSE_SORT{nullptr};
   QActionGroup* _ORDER_AG{nullptr};
 
   QAction* _GROUP_BY_PAGE{nullptr};

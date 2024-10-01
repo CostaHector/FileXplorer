@@ -7,6 +7,14 @@
 #include <QDir>
 
 namespace SceneInfoManager {
+SceneSortOption GetSortOptionFromStr(const QString& sortOption) {
+  static const QMap<QString, SceneSortOption> option2SortEnum{{"Movie Name", SceneSortOption::NAME},
+                                                              {"Movie Size", SceneSortOption::SIZE},
+                                                              {"Rate", SceneSortOption::RATE},
+                                                              {"Uploaded Time", SceneSortOption::UPLOADED}};
+  return option2SortEnum.value(sortOption, SceneSortOption::BUTT);
+}
+
 SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter, const QString& pattern, SCENES_TYPE* pFiltered) {
   if (!QFileInfo(path).isDir()) {
     qDebug("path[%s] is not a directory", qPrintable(path));
@@ -28,25 +36,23 @@ SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter, cons
   return scenes;
 }
 
-SCENES_TYPE& sort(SCENES_TYPE& scenes, SortByKey sortByKey, const bool reverse) {
-  static const std::function<bool(const SCENE_INFO&, const SCENE_INFO&)> sortedFuncs[(int)SortByKey::BUTT] = {
-      [&reverse](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool {
-        return lhs.name < rhs.name ? (reverse ? false : true) : (reverse ? true : false);
-      },
-      [&reverse](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool {
-        return lhs.vidSize < rhs.vidSize ? (reverse ? false : true) : (reverse ? true : false);
-      },
-      [&reverse](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool {
-        return lhs.rate < rhs.rate ? (reverse ? false : true) : (reverse ? true : false);
-      },
-      [&reverse](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool {
-        return lhs.uploaded < rhs.uploaded ? (reverse ? false : true) : (reverse ? true : false);
-      }};
-  if ((int)sortByKey >= (int)SortByKey::BUTT) {
-    qWarning("key[%d] used to sort is out of bound[%d]", (int)sortByKey, (int)SortByKey::BUTT);
+SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey, const bool reverse) {
+  if ((char)sortByKey >= (int)SceneSortOption::BUTT) {
+    qWarning("key[%d] used to sort is out of bound[%d]", (char)sortByKey, (char)SceneSortOption::BUTT);
     return scenes;
   }
-  std::sort(scenes.begin(), scenes.end(), sortedFuncs[(int)sortByKey]);
+  static const std::function<bool(const SCENE_INFO&, const SCENE_INFO&)> sortedMap[2][(int)SceneSortOption::BUTT] = {
+      // < operator here
+      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name < rhs.name; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize < rhs.vidSize; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate < rhs.rate; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded < rhs.uploaded; }},
+      // > operator here
+      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name > rhs.name; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize > rhs.vidSize; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate > rhs.rate; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded > rhs.uploaded; }}};
+  std::sort(scenes.begin(), scenes.end(), sortedMap[(int)reverse][(char)sortByKey]);
   return scenes;
 }
 
