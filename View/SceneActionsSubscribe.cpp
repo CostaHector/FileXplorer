@@ -60,11 +60,17 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
 
 void SceneActionsSubscribe::SetScenesGroupByPage(bool groupByPageAction) {
   auto& ags = g_SceneInPageActions();
+  if (ags.mPagesSelectTB == nullptr) {
+    qCritical("mPagesSelectTB is nullptr");
+    return;
+  }
   ags.mPagesSelectTB->setEnabled(groupByPageAction);
+
   if (_model == nullptr) {
     qCritical("_model is nullptr");
     return;
   }
+
   if (groupByPageAction) {
     SetScenesPerColumn();
   } else {
@@ -170,7 +176,7 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
 
   int jsonUpdatedCnt = SceneInfoManager::UpdateJsonImgVidSize(rootPath);
   if (jsonUpdatedCnt >= 0) {
-    Notificator::goodNews(QString("%d Json(s) Update succeed").arg(jsonUpdatedCnt), qPrintable(rootPath));
+    Notificator::goodNews(QString("%1 Json(s) Update succeed").arg(jsonUpdatedCnt), qPrintable(rootPath));
   }
   int scnFileCnt = SceneInfoManager::GenerateScnFiles(rootPath);
   if (scnFileCnt == -1) {
@@ -194,7 +200,6 @@ bool SceneActionsSubscribe::operator()() {
 
   auto& ags = g_SceneInPageActions();
   connect(ags._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneActionsSubscribe::CombineMediaInfoIntoJson);
-
   connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._REVERSE_SORT, &QAction::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
@@ -202,9 +207,5 @@ bool SceneActionsSubscribe::operator()() {
   connect(ags.mPageIndexInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetPageIndex);
   connect(ags.mColumnsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerRow);
   connect(ags.mPagesSelectTB, &QToolBar::actionTriggered, this, &SceneActionsSubscribe::PageIndexIncDec);
-
-  ags._GROUP_BY_PAGE->setChecked(false);
-  emit ags._GROUP_BY_PAGE->triggered(false);
-
   return true;
 }
