@@ -45,6 +45,7 @@ void SceneTableView::setRootPath(const QString& rootPath) {
     }
   }
   _sceneModel->setRootPath(rootPath);
+  qDebug("setRootPath[%s]", qPrintable(rootPath));
 }
 
 //#define __NAME__EQ__MAIN__ 1
