@@ -70,10 +70,10 @@ QFileInfo ScenesTableModel::fileInfo(const QModelIndex& index) const {
   }
 
   if (mCurBegin[linearInd].vidName.isEmpty()) {
-    qDebug("fileInfo empty");
+    qDebug("vidName is empty");
     return {};
   }
-  return QFileInfo(mRootPath + '/' + mCurBegin[linearInd].vidName);
+  return QFileInfo(mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].vidName);
 }
 
 QString ScenesTableModel::filePath(const QModelIndex& index) const {
@@ -83,10 +83,10 @@ QString ScenesTableModel::filePath(const QModelIndex& index) const {
   }
 
   if (mCurBegin[linearInd].vidName.isEmpty()) {
-    qDebug("filePath empty");
+    qDebug("vidName is empty");
     return {};
   }
-  return mRootPath + '/' + mCurBegin[linearInd].vidName;
+  return mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].vidName;
 }
 
 QString ScenesTableModel::fileName(const QModelIndex& index) const {
@@ -95,7 +95,7 @@ QString ScenesTableModel::fileName(const QModelIndex& index) const {
     return {};
   }
   if (mCurBegin[linearInd].vidName.isEmpty()) {
-    qDebug("fileName empty");
+    qDebug("vidName is empty");
     return {};
   }
   qDebug("fileName of img in mp4 not find");
@@ -107,7 +107,7 @@ QString ScenesTableModel::absolutePath(const QModelIndex& index) const {
   if (!isIndexValid(index, &linearInd)) {
     return {};
   }
-  return mRootPath;
+  return mRootPath + mCurBegin[linearInd].rel2scn;
 }
 
 bool ScenesTableModel::setRootPath(const QString& rootPath) {
@@ -147,6 +147,7 @@ bool ScenesTableModel::setRootPath(const QString& rootPath) {
   }
 
   RowsCountEndChange(beforeRow, afterRow);
+  qDebug("set root succeed");
   return true;
 }
 
@@ -263,7 +264,7 @@ bool ScenesTableModel::ShowAllScenesInOnePage() {
   const int afterRowCnt = TOTAL_N / mSCENES_CNT_COLUMN + int(TOTAL_N % mSCENES_CNT_COLUMN != 0);
   const int beforeColumnCnt = columnCount();
   const int afterColumnCnt = mSCENES_CNT_COLUMN;
-
+  qDebug("Display by page disable  (%d, %d)->(%d, %d)", beforeRowCnt, beforeColumnCnt, afterRowCnt, afterColumnCnt);
   ColumnsBeginChange(beforeColumnCnt, afterColumnCnt);
   RowsCountStartChange(beforeRowCnt, afterRowCnt);
 
@@ -275,6 +276,7 @@ bool ScenesTableModel::ShowAllScenesInOnePage() {
 
   RowsCountEndChange(beforeRowCnt, afterRowCnt);
   ColumnsEndChange(beforeColumnCnt, afterColumnCnt);
+  return true;
 }
 
 bool ScenesTableModel::SetPageIndex(int newPageIndex) {

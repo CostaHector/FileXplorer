@@ -41,6 +41,8 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
 
   _GROUP_BY_PAGE = new QAction("Enable Group by page:\nrow x column", this);
   _GROUP_BY_PAGE->setCheckable(true);
+  _GROUP_BY_PAGE->setChecked(false);
+
   _THE_LAST_PAGE = new QAction("The Last>>", this);
   _LAST_PAGE = new QAction("Last<", this);
   _NEXT_PAGE = new QAction("Next>", this);
@@ -58,6 +60,7 @@ bool SceneInPageActions::InitWidget() {
     qWarning("Init Scene Order/Row-by-Column/PageIndex Failed");
     return false;
   }
+  mPagesSelectTB->setEnabled(false);
   return true;
 }
 

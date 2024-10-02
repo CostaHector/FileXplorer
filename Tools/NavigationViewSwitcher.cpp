@@ -171,7 +171,10 @@ void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
       _view->m_sceneTableView = new SceneTableView(_view->m_scenesModel, _view);
       ContentPanel::connect(_view->m_sceneTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
       _view->AddView(viewType, _view->m_sceneTableView);
-      auto* sceneSub = new SceneActionsSubscribe{_view->m_sceneTableView};
+      auto* sceneSub = new (std::nothrow) SceneActionsSubscribe{_view->m_sceneTableView};
+      if (sceneSub == nullptr) {
+        qCritical("sceneSub is nullptr");
+      }
       if (sceneSub->BindWidget(_view->m_sceneTableView, _view->m_scenesModel)) {
         sceneSub->operator()();
       }
