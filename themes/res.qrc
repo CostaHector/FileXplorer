@@ -10,6 +10,7 @@
         <file alias="DEDUPLICATE">Media/DEDUPLICATE.png</file>
         <file alias="EMPTY_FOLDER">Media/EMPTY_FOLDER.svg</file>
         <file alias="ONE_FILE_IN_ONE_FOLDER">Media/ONE_FILE_IN_ONE_FOLDER.svg</file>
+        <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
