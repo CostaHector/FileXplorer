@@ -88,7 +88,7 @@ class FileBasicOperationsActions : public QObject {
   void FolderFileCategoryProcess();
   QAction* _NAME_STANDARDLIZER{new QAction(QIcon(":/themes/NAME_STANDARDLIZER_PATH"), tr("Name Ruler"))};
   QAction* _CLASSIFIER{new QAction(QIcon(":/themes/CATEGORIZER"), tr("Categorizer"))};
-  QAction* _LONG_PATH_FINDER{new QAction(QIcon(""), "Long path finder")};
+  QAction* _LONG_PATH_FINDER{new QAction(QIcon(":/themes/LONG_PATH_FINDER"), "Long path finder")};
   QAction* _DUPLICATE_ITEMS_REMOVER{new QAction(QIcon(":/themes/DEDUPLICATE"), tr("Deduplicator"))};
   QAction* _RMV_REDUN_PARENT_FOLDER{new QAction(QIcon(":/themes/ONE_FILE_IN_ONE_FOLDER"), tr("Rmv redundant parent folder"))};
   QAction* _RMV_EMPTY_FOLDER_R{new QAction(QIcon(":/themes/EMPTY_FOLDER"), tr("Rmv empty folder -r"))};
