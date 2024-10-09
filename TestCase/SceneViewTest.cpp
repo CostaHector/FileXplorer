@@ -57,7 +57,7 @@ class SceneViewTest : public QObject {
   }
 
   void test_3jsonsFolder_ok() {
-    QCOMPARE(SceneInfoManager::GenerateScnFiles(TEST_DIR), 1);
+    QCOMPARE(SceneInfoManager::GenerateScnFilesDirectly(TEST_DIR), 1);
 
     auto scenes = SceneInfoManager::GetScenesFromPath(TEST_DIR);
     QCOMPARE(scenes.size(), 3);
@@ -85,16 +85,30 @@ class SceneViewTest : public QObject {
   }
   void test_UpdateInExistPath() {
     QVERIFY(!QFileInfo("Any/Inexist/Path").isDir());
-    QCOMPARE(SceneInfoManager::UpdateJsonImgVidSize("Any/Inexist/Path"), -1);
+    JsonDataRefresher jdr;
+    QCOMPARE(jdr("Any/Inexist/Path"), -1);
   }
 
   void test_UpdateJsonVidImgRateUploaded() {
-    QCOMPARE(SceneInfoManager::UpdateJsonImgVidSize(TEST_DIR), 1);
+    // modification on json file
+    // somejsonfile1.json: update img, vid to empty
+    // somejsonfile2.json: update img, vid to empty
+    // somejsonfileEmpty.json: insert img, vid key value pair
+    JsonDataRefresher jdr;
+    QCOMPARE(jdr(TEST_DIR), 3);
 
     QVERIFY(!QDir(TEST_DIR).exists("COPY_REMOVABLE.scn"));
-    QCOMPARE(SceneInfoManager::GenerateScnFiles(TEST_DIR), 1);
+    QCOMPARE(jdr.GenerateScnFiles(), 1);
 
     auto afterScenes = SceneInfoManager::GetScenesFromPath(TEST_DIR);
+    QCOMPARE(afterScenes[0].name, "somejsonfile1");
+    QCOMPARE(afterScenes[0].imgName, "");
+    QCOMPARE(afterScenes[0].vidName, "");
+
+    QCOMPARE(afterScenes[1].name, "somejsonfile2");
+    QCOMPARE(afterScenes[1].imgName, "");
+    QCOMPARE(afterScenes[1].vidName, "");
+
     QCOMPARE(afterScenes[2].name, "somejsonfileEmpty");
     QCOMPARE(afterScenes[2].imgName, "somejsonfileEmpty.png");
     QCOMPARE(afterScenes[2].vidName, "somejsonfileEmpty.mp4");
@@ -106,11 +120,43 @@ class SceneViewTest : public QObject {
   void test_WriteScenesIntoScnFile() {
     const QString scnFileName = PATHTOOL::fileName(TEST_DIR) + ".scn";
     QVERIFY2(!QDir(TEST_DIR).exists(scnFileName), "*.scn file should not exists yet");
-    QCOMPARE(SceneInfoManager::GenerateScnFiles(TEST_DIR), 1);
+    QCOMPARE(SceneInfoManager::GenerateScnFilesDirectly(TEST_DIR), 1);
     QVERIFY2(QDir(TEST_DIR).exists(scnFileName), "*.scn file should exists");
-    QCOMPARE(SceneInfoManager::GenerateScnFiles(TEST_DIR), 1);
+    QCOMPARE(SceneInfoManager::GenerateScnFilesDirectly(TEST_DIR), 1);
+  }
+
+  void test_MixedScenes() {
+    QStringList files;
+    files << "name.mp4"
+          << "name.mkv"
+          << "name.json"
+          << "name.jpg"
+          << "name 1.jpeg"
+          << "name 2.webp"
+          << "name 10.png"
+          << "name - 10.png";
+    files << "another name.mp4"
+          << "another name.wmv"
+          << "another name.json"
+          << "another name.jpg"
+          << "another name 1.jpeg"
+          << "another name 2.webp"
+          << "another name 10.png"
+          << "another name - 10.png";
+
+    ScenesMixed sMixed;
+    QCOMPARE(sMixed(files), 2);
+    QCOMPARE(sMixed.m_img2Name["name"].size(), 5);
+    QCOMPARE(sMixed.m_img2Name["name"][0], "name.jpg");
+    QCOMPARE(sMixed.m_vid2Name["name"].size(), 2);
+    QCOMPARE(sMixed.m_json2Name["name"], "name.json");
+
+    QCOMPARE(sMixed.m_img2Name["another name"].size(), 5);
+    QCOMPARE(sMixed.m_img2Name["another name"][0], "another name.jpg");
+    QCOMPARE(sMixed.m_vid2Name["another name"].size(), 2);
+    QCOMPARE(sMixed.m_json2Name["another name"], "another name.json");
   }
 };
 
-//QTEST_MAIN(SceneViewTest)
+QTEST_MAIN(SceneViewTest)
 #include "SceneViewTest.moc"
