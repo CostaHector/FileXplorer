@@ -304,6 +304,7 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addAction(g_viewActions()._SCENE_VIEW);
   sceneTB->addSeparator();
   sceneTB->addAction(ag._COMBINE_MEDIAINFOS_JSON);
+  sceneTB->addAction(ag._UPDATE_SCN_ONLY);
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mOrderTB);
   sceneTB->addSeparator();

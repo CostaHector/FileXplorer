@@ -18,7 +18,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
   void RowsCountEndChange(int beforeRow, int afterRow) {
     if (beforeRow == afterRow) {
       if (afterRow > 0 and rowCount() > 0) {
-        emit dataChanged(index(0, 0), index(afterRow - 1, rowCount() - 1), {Qt::ItemDataRole::DisplayRole});
+        emit dataChanged(index(0, 0), index(afterRow - 1, columnCount() - 1), {Qt::ItemDataRole::DisplayRole});
       }
     } else if (beforeRow < afterRow) {
       endInsertRows();
@@ -28,16 +28,22 @@ class QAbstractTableModelPub : public QAbstractTableModel {
   }
 
   void ColumnsBeginChange(int beforeColumnCnt, int afterColumnCnt){
-    if (beforeColumnCnt < afterColumnCnt){
+    if (beforeColumnCnt == afterColumnCnt) {
+      return;
+    } else if (beforeColumnCnt < afterColumnCnt){
       beginInsertColumns(QModelIndex(), beforeColumnCnt, afterColumnCnt - 1);
-    } else if (beforeColumnCnt > afterColumnCnt){
+    } else {
       beginRemoveColumns(QModelIndex(), afterColumnCnt, beforeColumnCnt - 1);
     }
   }
   void ColumnsEndChange(int beforeColumnCnt, int afterColumnCnt){
-    if (beforeColumnCnt < afterColumnCnt){
+    if (beforeColumnCnt == afterColumnCnt) {
+      if (afterColumnCnt > 0 and columnCount() > 0) {
+        emit dataChanged(index(0, 0), index(rowCount() - 1, afterColumnCnt - 1), {Qt::ItemDataRole::DisplayRole});
+      }
+    } else if (beforeColumnCnt < afterColumnCnt){
       endInsertColumns();
-    }else if (beforeColumnCnt > afterColumnCnt){
+    }else {
       endRemoveColumns();
     }
   }
