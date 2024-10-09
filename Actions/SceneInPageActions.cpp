@@ -13,12 +13,17 @@ SceneInPageActions& g_SceneInPageActions() {
 }
 
 SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
-  _COMBINE_MEDIAINFOS_JSON = new QAction(QIcon(":/themes/COMBINE_MEDIAS_INFO"), "Combine infos", this);
-  _COMBINE_MEDIAINFOS_JSON->setShortcut(QKeySequence(Qt::Key_F5));
+  _COMBINE_MEDIAINFOS_JSON = new QAction(QIcon(":/themes/COMBINE_MEDIAS_INFO"), "Update infos", this);
   _COMBINE_MEDIAINFOS_JSON->setShortcutVisibleInContextMenu(true);
   _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Combine Videos/Images info Into json files. Then generate scn file from valid "
                                                "json file(s). This operation may update json file contents")
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
+
+  _UPDATE_SCN_ONLY = new QAction(QIcon(), "Update Scn", this);
+  _UPDATE_SCN_ONLY->setShortcut(QKeySequence(Qt::Key_F5));
+  _UPDATE_SCN_ONLY->setShortcutVisibleInContextMenu(true);
+  _UPDATE_SCN_ONLY->setToolTip(QString("<b>%1 (%2)</b><br/> Only update scn file from valid json file(s).")
+                                           .arg(_UPDATE_SCN_ONLY->text(), _UPDATE_SCN_ONLY->shortcut().toString()));
 
   _BY_MOVIE_NAME = new QAction(QIcon(":/themes/SORTING_FILE_FOLDER"), "Movie Name", this);
   _BY_MOVIE_NAME->setCheckable(true);

@@ -164,7 +164,7 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
     return;
   }
   const QString& rootPath = _model->rootPath();
-  if (rootPath.count('/') < 3) {
+  if (rootPath.count('/') < 3) {  // large folder
     qDebug("Combine Media Info may cause lag. As [%s] contains a large json/vid/img(s)", qPrintable(rootPath));
     const auto ret = QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath,
                                           QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
@@ -174,17 +174,44 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
     }
   }
 
-  int jsonUpdatedCnt = SceneInfoManager::UpdateJsonImgVidSize(rootPath);
+  JsonDataRefresher jdr;
+  int jsonUpdatedCnt = jdr(rootPath);
   if (jsonUpdatedCnt >= 0) {
     Notificator::goodNews(QString("%1 Json(s) Update succeed").arg(jsonUpdatedCnt), qPrintable(rootPath));
   }
-  int scnFileCnt = SceneInfoManager::GenerateScnFiles(rootPath);
+  int scnFileCnt = jdr.GenerateScnFiles();
   if (scnFileCnt == -1) {
     Notificator::badNews("Combine scn file failed. May path not exist", qPrintable(rootPath));
   } else if (scnFileCnt == 0) {
     Notificator::goodNews("Skip. No json file find, No need to combine scn file", qPrintable(rootPath));
   } else {
     Notificator::goodNews(QString("Combine %1 scn file(s) succeed").arg(scnFileCnt), qPrintable(rootPath));
+  }
+}
+
+void SceneActionsSubscribe::UpdateScnFilesOnly() {
+  if (_model == nullptr || _tableView == nullptr) {
+    qDebug("_model or _tableView is nullptr");
+    return;
+  }
+  const QString& rootPath = _model->rootPath();
+  if (rootPath.count('/') < 3) {  // large folder
+    qDebug("Update Scn file may cause lag. As [%s] contains a large json(s)", qPrintable(rootPath));
+    const auto ret = QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath,
+                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    if (ret != QMessageBox::StandardButton::Yes) {
+      qDebug("User cancel Update Scn file on a large path[%s]", qPrintable(rootPath));
+      return;
+    }
+  }
+
+  int scnFileCnt = SceneInfoManager::GenerateAScnFile(rootPath);
+  if (scnFileCnt == -1) {
+    Notificator::badNews("Update scn file failed. May path not exist", qPrintable(rootPath));
+  } else if (scnFileCnt == 0) {
+    Notificator::goodNews("Skip. No json file find, No need to update scn file at all", qPrintable(rootPath));
+  } else {
+    Notificator::goodNews(QString("Update %1 scn file(s) succeed").arg(scnFileCnt), qPrintable(rootPath));
   }
 }
 
@@ -200,6 +227,7 @@ bool SceneActionsSubscribe::operator()() {
 
   auto& ags = g_SceneInPageActions();
   connect(ags._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneActionsSubscribe::CombineMediaInfoIntoJson);
+  connect(ags._UPDATE_SCN_ONLY, &QAction::triggered, this, &SceneActionsSubscribe::UpdateScnFilesOnly);
   connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._REVERSE_SORT, &QAction::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
