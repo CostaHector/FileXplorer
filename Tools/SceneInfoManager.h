@@ -20,17 +20,48 @@ typedef QList<SCENE_INFO> SCENES_TYPE;
 namespace SceneInfoManager {
 enum class SceneSortOption : char { NAME = 0, SIZE, RATE, UPLOADED, BUTT };
 SceneSortOption GetSortOptionFromStr(const QString& sortOption);
-
-int UpdateJsonImgVidSize(const QString& path);
 SCENES_TYPE ScnFileParser(const QString& scnFileFullPath,
                           const QString rel,
                           bool enableFilter,
                           const QString& pattern,
                           SCENES_TYPE* pFilterd = nullptr);
-int GenerateScnFiles(const QString& path);
+
+// json file will not updated, read json then generate scn file directly
+bool GenerateAScnFile(const QString& aPath);
+int GenerateScnFilesDirectly(const QString& rootPath);
 
 SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter = false, const QString& pattern = {}, SCENES_TYPE* pFiltered = nullptr);
+
 SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey = SceneSortOption::NAME, const bool reverse = false);
 }  // namespace SceneInfoManager
+
+
+class ScenesMixed {
+ public:
+  enum SCENE_COMPONENT_TYPE:char{IMG=0, VID=1, JSON=2, OTHER=3};
+  int operator()(const QString& path);
+  int operator()(const QStringList& files);
+  const QString& GetFirstImg(const QString& baseName) const;
+  const QString& GetFirstVid(const QString& baseName) const;
+  QMap<QString, QStringList> m_img2Name;  // images baseName, extension with prefix dot
+  QMap<QString, QStringList> m_vid2Name;
+  QMap<QString, QString> m_json2Name;
+
+};
+
+
+#include <QVariantHash>
+class JsonDataRefresher {
+ public:
+  int UpdateAFolderItself(const QString& path);
+  // call operator() to refresh json, than generated scn from refreshed jsons
+  int operator()(const QString& rootPath);
+  int GenerateScnFiles();
+  QMap<QString, QList<QVariantHash>> m_jsonsDicts; // relativePathToJsonFile -> Jsons
+ private:
+  int m_updatedJsonFilesCnt = 0, m_usefullJsonCnt = 0;
+};
+
+
 
 #endif  // SCENEINFOMANAGER_H
