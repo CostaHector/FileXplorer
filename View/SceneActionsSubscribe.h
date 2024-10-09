@@ -27,7 +27,7 @@ class SceneActionsSubscribe : public QObject {
   void SortSceneItems();
 
   void CombineMediaInfoIntoJson();
-
+  void UpdateScnFilesOnly();
  private:
   ScenesTableModel* _model{nullptr};
   QTableView* _tableView{nullptr};
