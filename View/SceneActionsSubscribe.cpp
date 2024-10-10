@@ -189,7 +189,7 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
     return;
   }
   Notificator::goodNews(QString("Update %1 scn file(s) succeed").arg(scnFileCnt), qPrintable(rootPath));
-  _model->setRootPath(rootPath);
+  _model->setRootPath(rootPath, true);
 }
 
 void SceneActionsSubscribe::UpdateScnFilesOnly() {

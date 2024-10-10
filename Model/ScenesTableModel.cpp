@@ -1,5 +1,4 @@
 #include "ScenesTableModel.h"
-#include "PublicVariable.h"
 #include "public/DisplayEnhancement.h"
 #include <QObject>
 #include <QPixmap>
@@ -13,7 +12,7 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
   if (not index.isValid()) {
     return {};
   }
-  if (mCurBegin == nullptr || mCurEnd == nullptr || mCurBegin == mCurEnd) {
+  if (IsScnsEmpty()) {
     return {};
   }
   const int linearInd = index.row() * mSCENES_CNT_COLUMN + index.column();
@@ -110,8 +109,8 @@ QString ScenesTableModel::absolutePath(const QModelIndex& index) const {
   return mRootPath + mCurBegin[linearInd].rel2scn;
 }
 
-bool ScenesTableModel::setRootPath(const QString& rootPath) {
-  if (mRootPath == rootPath) {
+bool ScenesTableModel::setRootPath(const QString& rootPath, const bool bForce) {
+  if (mRootPath == rootPath && !bForce) {
     qDebug("Scene ignore set same root path");
     return true;
   }
