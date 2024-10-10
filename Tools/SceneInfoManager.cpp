@@ -2,6 +2,7 @@
 #include "PublicVariable.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PathTool.h"
+#include "Tools/ExtractPileItemsOutFolder.h"
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
@@ -185,73 +186,6 @@ int GenerateScnFilesDirectly(const QString& rootPath) {
 }
 
 }  // namespace SceneInfoManager
-
-int ScenesMixed::operator()(const QString& path) {
-  QDir mediaDir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
-  mediaDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET + TYPE_FILTER::IMAGE_TYPE_SET + TYPE_FILTER::JSON_TYPE_SET);
-  return operator()(mediaDir.entryList());
-}
-
-int ScenesMixed::operator()(const QStringList& files) {
-  static const QMap<QString, SCENE_COMPONENT_TYPE> ext2Type{{".jpg", IMG},  {".jpeg", IMG}, {".png", IMG}, {".webp", IMG},
-                                                            {".jfif", IMG}, {".webp", IMG}, {".mp4", VID}, {".mkv", VID},
-                                                            {".avi", VID},  {".wmv", VID},  {".ts", VID},  {".json", JSON}};
-
-  static QRegularExpression PILE_NAME_PATTERN("^(.*?)( | - )?(\\d{1,3})?$");
-  QString noNumberName;
-  QRegularExpressionMatch result;
-  for (const QString& medName : files) {
-    QString baseName, ext;
-    std::tie(baseName, ext) = PATHTOOL::GetBaseNameExt(medName);
-    noNumberName = baseName;
-    auto typeEnum = ext2Type.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
-    switch (typeEnum) {
-      case IMG: {
-        if ((result = PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
-          noNumberName = result.captured(1);
-        }
-        m_img2Name[noNumberName].append(medName);
-        break;
-      }
-      case VID: {
-        if ((result = PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
-          noNumberName = result.captured(1);
-        }
-        m_vid2Name[noNumberName].append(medName);
-        break;
-      }
-      case JSON:
-        m_json2Name[baseName] = medName;
-        break;
-      case OTHER:
-        break;
-    }
-  }
-
-  for (auto& pr : m_img2Name) {
-    std::sort(pr.begin(), pr.end(), [](const QString& lhs, const QString& rhs) -> bool { return lhs.size() < rhs.size(); });
-  }
-
-  qDebug("%d,%d,%d piles of img/vid/json found from %d item(s) given", m_img2Name.size(), m_vid2Name.size(), m_json2Name.size(), files.size());
-  return m_json2Name.size();
-}
-
-const QString& ScenesMixed::GetFirstImg(const QString& baseName) const {
-  auto it = m_img2Name.find(baseName);
-  if (it == m_img2Name.cend()) {
-    static QString imgNoExist;
-    return imgNoExist;
-  }
-  return it.value().first();
-}
-const QString& ScenesMixed::GetFirstVid(const QString& baseName) const {
-  auto it = m_vid2Name.find(baseName);
-  if (it == m_vid2Name.cend()) {
-    static QString vidNoExist;
-    return vidNoExist;
-  }
-  return it.value().first();
-}
 
 int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
   int updatedJsonFilesCnt = 0, usefullJsonCnt = 0;

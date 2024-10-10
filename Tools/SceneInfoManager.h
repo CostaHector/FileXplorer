@@ -36,20 +36,6 @@ SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey = SceneSortOpti
 }  // namespace SceneInfoManager
 
 
-class ScenesMixed {
- public:
-  enum SCENE_COMPONENT_TYPE:char{IMG=0, VID=1, JSON=2, OTHER=3};
-  int operator()(const QString& path);
-  int operator()(const QStringList& files);
-  const QString& GetFirstImg(const QString& baseName) const;
-  const QString& GetFirstVid(const QString& baseName) const;
-  QMap<QString, QStringList> m_img2Name;  // images baseName, extension with prefix dot
-  QMap<QString, QStringList> m_vid2Name;
-  QMap<QString, QString> m_json2Name;
-
-};
-
-
 #include <QVariantHash>
 class JsonDataRefresher {
  public:
