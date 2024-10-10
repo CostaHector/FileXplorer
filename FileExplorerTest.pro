@@ -14,6 +14,7 @@ SOURCES += \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
+    TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
     TestCase/LongPathFinderTest.cpp \
     TestCase/MD5CalculatorTest.cpp \
@@ -69,6 +70,7 @@ SOURCES += \
     Tools/NameSectionArrange.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/JsonFileHelper.cpp \
+    Tools/ExtractPileItemsOutFolder.cpp \
     model/ConflictsFileSystemModel.cpp \
     UndoRedo.cpp
 
@@ -110,6 +112,7 @@ HEADERS += \
     Tools/AIMediaDuplicate.h \
     Tools/QMediaInfo.h \
     Tools/JsonFileHelper.h \
+    Tools/ExtractPileItemsOutFolder.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 
