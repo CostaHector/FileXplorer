@@ -86,6 +86,7 @@ SOURCES += \
     Tools/AIMediaDuplicate.cpp \
     Tools/ArchiveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
+    Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
     Tools/Log.cpp \
@@ -247,6 +248,7 @@ HEADERS += \
     Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
+    Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \

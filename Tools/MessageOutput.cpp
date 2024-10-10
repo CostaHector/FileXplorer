@@ -18,38 +18,26 @@ MessageOutput::MessageOutput() {
   IS_LOG_TO_FILE = envVar.isEmpty();
 
   IS_LOG_TO_FILE_AVAIL = outFile.isOpen() or outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+  qCritical("log message cannot redirect to file[%s]", qPrintable(outFile.fileName()));
   qInstallMessageHandler(MessageOutput::myMessageOutput);
 }
 
 void MessageOutput::myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
+  static const QChar DBG_TYPE_2_CHAR[QtInfoMsg+1] = {'D', 'I', 'W', 'C', 'F'};
+  const QString& curTime = QTime::currentTime().toString("hh:mm:ss.zzz");
+  const QString& logMsg = logTemplate.arg(curTime, DBG_TYPE_2_CHAR[type], qPrintable(msg), context.file).arg(context.line).arg(context.function);
+
   if (not IS_LOG_TO_FILE) {
-    printf("%s\n", qPrintable(msg));
-    fflush(stdout);
+    printf("%s\n", qPrintable(logMsg));
+    if (type >= QtWarningMsg) {
+      fflush(stdout);
+    }
     return;
   }
   if (not IS_LOG_TO_FILE_AVAIL) {
-    printf("[ERROR] Logs will not be save to files");
+    printf("%s\n", qPrintable(logMsg));
     fflush(stdout);
     return;
   }
-  const QString& curTime = QTime::currentTime().toString("hh:mm:ss.zzz");
-  switch (type) {
-    case QtDebugMsg:
-      ts << logTemplate.arg(curTime, "D", qPrintable(msg), context.file).arg(context.line).arg(context.function);
-      break;
-    case QtInfoMsg:
-      ts << logTemplate.arg(curTime, "I", qPrintable(msg), context.file).arg(context.line).arg(context.function);
-      break;
-    case QtWarningMsg:
-      ts << logTemplate.arg(curTime, "W", qPrintable(msg), context.file).arg(context.line).arg(context.function);
-      break;
-    case QtCriticalMsg:
-      ts << logTemplate.arg(curTime, "C", qPrintable(msg), context.file).arg(context.line).arg(context.function);
-      break;
-    case QtFatalMsg:
-      ts << logTemplate.arg(curTime, "F", qPrintable(msg), context.file).arg(context.line).arg(context.function);
-      abort();
-    default:
-      ts << logTemplate.arg(curTime, "U", qPrintable(msg), context.file).arg(context.line).arg(context.function);
-  }
+  ts << logMsg;
 }

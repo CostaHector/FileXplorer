@@ -10,7 +10,7 @@
 class ScenesTableModel : public QAbstractTableModelPub {
  public:
   ScenesTableModel(QObject* object = nullptr);
-
+  inline bool IsScnsEmpty() const { return mCurBegin == nullptr || mCurEnd == nullptr || mCurBegin == mCurEnd;}
   int rowCount(const QModelIndex& /*parent*/ = {}) const override {
     int begin{0}, end{0};
     std::tie(begin, end) = GetEntryIndexBE(GetEntryListLen());
@@ -40,7 +40,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
   QString absolutePath(const QModelIndex& index) const;
-  bool setRootPath(const QString& rootPath);
+  bool setRootPath(const QString& rootPath, const bool bForce = false);
   QString rootPath() const { return mRootPath; }
 
   bool ChangeRowsCnt(int newRowCnt, int newPageIndex);
