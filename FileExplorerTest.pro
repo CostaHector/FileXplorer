@@ -32,6 +32,7 @@ SOURCES += \
     TestCase/FinderTest.cpp \
     TestCase/VideosDurationGetterTest.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
+    Tools/ItemsPileCategory.cpp \
     Tools/LongPathFinder.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
@@ -71,6 +72,7 @@ SOURCES += \
     Tools/AIMediaDuplicate.cpp \
     Tools/JsonFileHelper.cpp \
     Tools/ExtractPileItemsOutFolder.cpp \
+    Tools/ItemsPileCategory.cpp \
     model/ConflictsFileSystemModel.cpp \
     UndoRedo.cpp
 
@@ -83,6 +85,7 @@ HEADERS += \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
     Tools/FolderNxtAndLastIterator.h \
+    Tools/ItemsPileCategory.h \
     Tools/LongPathFinder.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
@@ -113,6 +116,7 @@ HEADERS += \
     Tools/QMediaInfo.h \
     Tools/JsonFileHelper.h \
     Tools/ExtractPileItemsOutFolder.h \
+    Tools/ItemsPileCategory.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 

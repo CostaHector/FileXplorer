@@ -5,7 +5,6 @@ bool MessageOutput::IS_LOG_TO_FILE{true};
 bool MessageOutput::IS_LOG_TO_FILE_AVAIL{false};
 QFile MessageOutput::outFile;
 QTextStream MessageOutput::ts(&outFile);
-const QString MessageOutput::logTemplate("%1\t%2\t%3\t%4\t%5\t%6\n");
 
 MessageOutput::MessageOutput() {
 #ifdef _WIN32
@@ -23,9 +22,21 @@ MessageOutput::MessageOutput() {
 }
 
 void MessageOutput::myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
-  static const QChar DBG_TYPE_2_CHAR[QtInfoMsg+1] = {'D', 'I', 'W', 'C', 'F'};
-  const QString& curTime = QTime::currentTime().toString("hh:mm:ss.zzz");
-  const QString& logMsg = logTemplate.arg(curTime, DBG_TYPE_2_CHAR[type], qPrintable(msg), context.file).arg(context.line).arg(context.function);
+  static const QChar DBG_TYPE_2_CHAR[QtInfoMsg + 1] = {'D', 'I', 'W', 'C', 'F'};
+  static QString logMsg;
+  logMsg.reserve(300);
+  logMsg.clear();
+  logMsg += QTime::currentTime().toString("hh:mm:ss.zzz");
+  logMsg += ' ';
+  logMsg += DBG_TYPE_2_CHAR[type];
+  logMsg += ' ';
+  logMsg += msg;
+  logMsg += '[';
+  logMsg += context.file;
+  logMsg += ":";
+  logMsg += QString::number(context.line);
+  logMsg += ']';
+  logMsg += context.function;
 
   if (not IS_LOG_TO_FILE) {
     printf("%s\n", qPrintable(logMsg));

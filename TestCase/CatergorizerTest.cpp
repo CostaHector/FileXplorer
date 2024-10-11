@@ -1,9 +1,11 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-// add necessary includes here
 #include "PublicTool.h"
+#include "pub/BeginToExposePrivateMember.h"
 #include "Tools/Categorizer.h"
+#include "Tools/ExtractPileItemsOutFolder.h"
+#include "pub/EndToExposePrivateMember.h"
 
 const QString TEST_SRC_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_Classfier/DONT_CHANGE");
 const QString TEST_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_Classfier/COPY_REMOVABLE");
@@ -11,7 +13,6 @@ const QString TEST_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePa
 class CatergorizerTest : public QObject {
   Q_OBJECT
  public:
-  Categorizer categorizer;
  private slots:
   void init() {
     if (QDir(TEST_DIR).exists()) {
@@ -26,156 +27,104 @@ class CatergorizerTest : public QObject {
     }
   }
 
-  void initTestCase() {  // 将在执行第一个测试函数之前调用。
-    qDebug("Start CatergorizerTest...");
-  }
+  void initTestCase() { qDebug("Start CatergorizerTest..."); }
   //  initTestCase_data();//将被调用以创建全局测试数据表。
-  void cleanupTestCase() {  // 将在执行最后一个测试函数后调用。
-    qDebug("End CatergorizerTest...");
-  }
+  void cleanupTestCase() { qDebug("End CatergorizerTest..."); }
 
-  void test_a1Vid1ImgException() {
-    // OneVid;
-    const QString& SUB_TEST_DIR = QDir(TEST_DIR).absoluteFilePath("1Vid1ImgException");
-    categorizer(SUB_TEST_DIR);
-    const auto& fL = QDir(SUB_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-    QCOMPARE(fL.size(), 2);
-    QVERIFY(fL.contains("Test A.mp4"));
-    QVERIFY(fL.contains("Test B.jpg"));
-  }
-  void test_3Imgs1Json() {
-    // Test - 1984.jpg, Test - 1984.json
-    // Test - 1.jpg, Test - 2.jpg
-    const QString& SUB_TEST_DIR = QDir(TEST_DIR).absoluteFilePath("3Imgs1Json");
-    categorizer(SUB_TEST_DIR);
-    const auto& fL = QDir(SUB_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-    QCOMPARE(fL.size(), 2);  // two folders: [Test, Test - 1984];
-    QVERIFY(fL.contains("Test"));
-    QVERIFY(fL.contains("Test - 1984"));
+  void test_imgsVidsIsolatedExistedFolder();
 
-    const auto& FolderTestfL = QDir(SUB_TEST_DIR + "/Test").entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-    QCOMPARE(FolderTestfL.size(), 2);
-    const auto& FolderTest1984fL = QDir(SUB_TEST_DIR + "/Test - 1984").entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-    QCOMPARE(FolderTest1984fL.size(), 2);
-  }
-  void test_VidsEndBySceneIndexAndExistedFolder() {
-    // Falcon - Heated:{scene/sc./sc/part/pt./pt/p; - 2x\d - 2x\d};
-    // Factory - Movie Name - Malik Daddy, Rafael Daddy:{2x\d};
-    const QString& SUB_TEST_DIR = QDir(TEST_DIR).absoluteFilePath("VidsEndBySceneIndexAndExistedFolder");
-    categorizer(SUB_TEST_DIR);
-    const auto& fL = QDir(SUB_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-    QCOMPARE(fL.size(), 2);  // 1 file{yy 1.png} and 2 folder{xx scene 1, yy 1};
-
-    QVERIFY(fL.contains("Factory - Movie Name - Malik Daddy, Rafael Daddy"));
-    QVERIFY(fL.contains("Falcon - Heated"));
-  }
-
-  void testrandomVidNames() {
-    QCOMPARE(Categorizer::VidCoreName("a078d0708b9ed65258070434c23b14cd66b34256.mp4"), "a078d0708b9ed65258070434c23b14cd66b34256");
-    QCOMPARE(Categorizer::VidCoreName("Name.mp4"), "Name");
-  }
-
-  void testrandomImgNames() {
-    QCOMPARE(Categorizer::ImgCoreName("a078d0708b9ed65258070434c23b14cd66b34256.jpg"), "a078d0708b9ed65258070434c23b14cd66b34256");
-    QCOMPARE(Categorizer::ImgCoreName("Heated 2022.webp"), "Heated 2022");
-  }
-
-  void testonlyIndexVidNames() {
-    QCOMPARE(Categorizer::VidCoreName("MovieName - Micheal, Jensen Ankles 1.mp4"), "MovieName - Micheal, Jensen Ankles");
-    QCOMPARE(Categorizer::VidCoreName("MovieName - Micheal, Jensen Ankles 19.mp4"), "MovieName - Micheal, Jensen Ankles");
-    QCOMPARE(Categorizer::VidCoreName("MovieName - Micheal, Jensen Ankles - 1.mp4"), "MovieName - Micheal, Jensen Ankles");
-    QCOMPARE(Categorizer::VidCoreName("MovieName - Micheal, Jensen Ankles - 19.mp4"), "MovieName - Micheal, Jensen Ankles");
-  }
-
-  void testvidNameSceneAndItsAbbrTest() {
-    QCOMPARE(Categorizer::VidCoreName("Name Scene 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Sc. 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Sc.1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Sc 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Sc1.mp4"), "Name");
-
-    QCOMPARE(Categorizer::VidCoreName("Name scene 1.mp4"), "Name");
-  }
-
-  void testvidNamePartAndItsAbbrTest() {
-    QCOMPARE(Categorizer::VidCoreName("Name Part 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Pt. 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Pt.1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Pt 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name Pt1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name P1.mp4"), "Name");
-
-    QCOMPARE(Categorizer::VidCoreName("Name part 1.mp4"), "Name");
-  }
-
-  void testvidNameHypenTest() {
-    QCOMPARE(Categorizer::VidCoreName("Name - Scene 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name - Sc. 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name - Sc 1.mp4"), "Name");
-
-    QCOMPARE(Categorizer::VidCoreName("Name - Part 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name - Pt. 1.mp4"), "Name");
-    QCOMPARE(Categorizer::VidCoreName("Name - Pt 1.mp4"), "Name");
-
-    QCOMPARE(Categorizer::VidCoreName("Blurred Line - Kris Evans, Fassbinder - Scene 1.mp4"), "Blurred Line - Kris Evans, Fassbinder");
-    QCOMPARE(Categorizer::VidCoreName("Blurred Line - Kris Evans, Fassbinder - Sc. 1.mp4"), "Blurred Line - Kris Evans, Fassbinder");
-    QCOMPARE(Categorizer::VidCoreName("Blurred Line - Kris Evans, Fassbinder - Sc 1.mp4"), "Blurred Line - Kris Evans, Fassbinder");
-  }
-
-  void testscenePartImgName() {
-    QCOMPARE(Categorizer::ImgCoreName("Name Scene 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name Sc 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name SC. 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name SC.1.png"), "Name");
-
-    QCOMPARE(Categorizer::ImgCoreName("Name Scene 1 - 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name Sc 1 - 2.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name SC. 1 - 3.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name SC.1 - 3.png"), "Name");
-
-    QCOMPARE(Categorizer::ImgCoreName("Name Part 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name Pt 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name PT. 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name PT.1.png"), "Name");
-
-    QCOMPARE(Categorizer::ImgCoreName("Name Part 1 - 4.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name Pt 1 - 5.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name PT. 1 - 6.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name PT.1 - 6.png"), "Name");
-  }
-
-  void testbasicImgNameNoIndex() {
-    QCOMPARE(Categorizer::ImgCoreName("Name 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name - 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("LE - Sporty - Malik, King - 1.png"), "LE - Sporty - Malik, King");
-  }
-
-  void testbasicImgNameWithIndex() {
-    QCOMPARE(Categorizer::ImgCoreName("Name 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name 1 - 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name - 1.png"), "Name");
-    QCOMPARE(Categorizer::ImgCoreName("Name - 1 - 1.png"), "Name");
-  }
-
-  void test_JsonImgVidNormalScene() {
-    const QString& SUB_TEST_DIR = QDir(TEST_DIR).absoluteFilePath("JsonImgVidNormalScene");
-    categorizer(SUB_TEST_DIR);
-
-    const auto& fL = QDir(SUB_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-    QCOMPARE(fL.size(), 1);  // only one folder;
-    QVERIFY(fL.contains("xx"));
-  }
-
-  void test_GrabbedImageVidsScene() {
-    // "xx.mp4" "xx.jpeg" "xx 00001.jpg" "xx 99999.jpeg"
-    const QString& SUB_TEST_DIR = QDir(TEST_DIR).absoluteFilePath("GrabbedImageVidScene");
-    categorizer(SUB_TEST_DIR);
-
-    const auto& fL = QDir(SUB_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-    QCOMPARE(fL.size(), 1);  // only one folder;
-    QVERIFY(fL.contains("xx"));
-  }
+  void test_name2CoreName_unchange();
+  void test_vidNameWithIndex_chop_index();
+  void test_imgNameWithIndex_chop_index();
 };
 
-//QTEST_MAIN(CatergorizerTest)
-//#include "CatergorizerTest.moc"
+void CatergorizerTest::test_name2CoreName_unchange() {
+  QStringList dependentMixedFilesFolders;
+  dependentMixedFilesFolders << "a078d0708b9ed65258070434c23b14cd66b34256"
+                             << "a078d0708b9ed65258070434c23b14cd66b34276"
+                             << "Name.mp4"
+                             << "Heated 2022";
+  Categorizer classfier;
+  const auto& folder2Items = classfier.ClassifyItemIntoPiles(dependentMixedFilesFolders);
+  QCOMPARE(folder2Items.size(), 4);
+}
+
+void CatergorizerTest::test_vidNameWithIndex_chop_index() {
+  QStringList aMovie;
+  aMovie << "MovieName - Micheal, Jensen Ankles.mp4"
+         << "MovieName - Micheal, Jensen Ankles.avi"
+         << "MovieName - Micheal, Jensen Ankles.mkv"
+         << "MovieName - Micheal, Jensen Ankles FHD.mp4"
+         << "MovieName - Micheal, Jensen Ankles 1080p.mp4"
+         << "MovieName - Micheal, Jensen Ankles - HD.mp4";
+  Categorizer classfier;
+  const auto& folder2Items = classfier.ClassifyItemIntoPiles(aMovie);
+  QCOMPARE(folder2Items.size(), 4);
+  QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles"));
+  QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles FHD"));
+  QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles 1080p"));
+  QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles - HD"));
+}
+
+void CatergorizerTest::test_imgNameWithIndex_chop_index() {
+  QStringList imgs;
+  imgs << "Name 1.png"
+       << "Name - 1.png"                        // Name
+       << "Name 1 - 1.png"                      // Name 1
+       << "Name - 1 - 1.png"                    // Name - 1
+       << "LE - Sporty - Malik, King - 1.png";  // LE - Sporty - Malik, King
+  Categorizer classfier;
+  const auto& folder2Items = classfier.ClassifyItemIntoPiles(imgs);
+  QCOMPARE(folder2Items.size(), 4);
+  QVERIFY(folder2Items.contains("Name"));
+  QVERIFY(folder2Items.contains("Name 1"));
+  QVERIFY(folder2Items.contains("Name - 1"));
+  QVERIFY(folder2Items.contains("LE - Sporty - Malik, King"));
+}
+
+void CatergorizerTest::test_imgsVidsIsolatedExistedFolder() {
+  QStringList theFirstItems =
+      QDir(TEST_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+
+  // packer
+  QMap<QString, QStringList> folder2Items;
+  folder2Items["isolated file"] << "isolated file.json";                                                                  // isolated not rearrange
+  folder2Items["isolated folder"] << "isolated folder";                                                                   // folder not rearrange
+  folder2Items["Falcon - Heated"] << "Falcon - Heated.mp4"                                                                // create a folder and move
+                                  << "Falcon - Heated.avi";                                                               // move
+  folder2Items["Factory - Movie Name - Malik Daddy, Rafael Daddy"] << "Factory - Movie Name - Malik Daddy, Rafael Daddy"  // folder not rearrange
+                                                                   << "Factory - Movie Name - Malik Daddy, Rafael Daddy 1.jpg"  // move
+                                                                   << "Factory - Movie Name - Malik Daddy, Rafael Daddy.json";  // move
+  Categorizer packer;
+  int filesRearrangedCnt = packer(TEST_DIR, folder2Items);
+  QCOMPARE(packer.m_cmds.size(), 5);  // mkpath 1 + move 4 files
+  QCOMPARE(filesRearrangedCnt, 4);
+  QVERIFY(packer.StartToRearrange());
+
+  QDir dir(TEST_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+  QStringList itemsActual = dir.entryList();
+  itemsActual.sort();
+  QCOMPARE(itemsActual.size(), 4);
+
+  QStringList expectItems{"isolated folder", "isolated file.json", "Falcon - Heated", "Factory - Movie Name - Malik Daddy, Rafael Daddy"};
+  expectItems.sort();
+  QCOMPARE(expectItems.size(), 4);
+  QCOMPARE(itemsActual, expectItems);
+
+  // unpacker
+  ExtractPileItemsOutFolder unpacker;
+  int upackedFoldersCnt = unpacker(TEST_DIR);
+  QCOMPARE(upackedFoldersCnt, 2);
+  QCOMPARE(unpacker.m_cmds.size(), 6);  // recyle 2 path + move 4 files
+  QVERIFY(unpacker.StartToRearrange());
+
+  QStringList theLastItems =
+      QDir(TEST_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  theLastItems << "Factory - Movie Name - Malik Daddy, Rafael Daddy";  // this folder will be removed at correct purpose
+  theFirstItems.sort();
+  theLastItems.sort();
+  QCOMPARE(theFirstItems, theLastItems);
+}
+
+QTEST_MAIN(CatergorizerTest)
+#include "CatergorizerTest.moc"
