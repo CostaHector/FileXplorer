@@ -35,7 +35,7 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
 }
 
 void SceneTableView::setRootPath(const QString& rootPath) {
-  if (rootPath.count('/') < 3) {
+  if (rootPath.count('/') < 2) { // large folder
     qDebug("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
     const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath,
                                           QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
@@ -45,6 +45,7 @@ void SceneTableView::setRootPath(const QString& rootPath) {
     }
   }
   _sceneModel->setRootPath(rootPath);
+  qDebug("setRootPath[%s]", qPrintable(rootPath));
 }
 
 //#define __NAME__EQ__MAIN__ 1

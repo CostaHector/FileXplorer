@@ -46,6 +46,16 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     return false;
   }
 
+  if (m_parent != nullptr) {
+    m_parent->setWindowTitle(newPath);
+  }
+
+  if (isNewPath) {
+    if (_addressBar != nullptr) {
+      _addressBar->m_pathRD(newPath);
+    }
+  }
+
   if (isSceneView()) {
     if (m_sceneTableView == nullptr) {
       qWarning("m_scenesModel is nullptr");
@@ -62,25 +72,9 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
       fsView->setRootIndex(m_fsModel->setRootPath(newPath));
       fsView->selectionModel()->clearCurrentIndex();
       fsView->selectionModel()->clearSelection();
+      onAfterDirectoryLoaded(newPath);
     }
   }
-
-  if (m_parent != nullptr) {
-    m_parent->setWindowTitle(newPath);
-  }
-
-  if (isNewPath) {
-    if (_addressBar != nullptr) {
-      _addressBar->m_pathRD(newPath);
-    }
-  }
-
-#ifdef WIN32
-  if (newPath.isEmpty() && isFileSystem) {
-    onAfterDirectoryLoaded(newPath);
-  }
-#endif
-
   return true;
 }
 

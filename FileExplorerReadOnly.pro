@@ -44,6 +44,7 @@ SOURCES += \
     Component/ConflictsRecycle.cpp \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
+    Component/DropListToolButton.cpp \
     Component/FileSystemMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
@@ -85,6 +86,7 @@ SOURCES += \
     Tools/AIMediaDuplicate.cpp \
     Tools/ArchiveFiles.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
+    Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
     Tools/Log.cpp \
@@ -93,6 +95,7 @@ SOURCES += \
     Tools/NameTool.cpp \
     Tools/QMediaInfo.cpp \
     Tools/RenameNamesUnique.cpp \
+    Tools/SceneInfoManager.cpp \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
@@ -203,6 +206,7 @@ HEADERS += \
     Component/ConflictsRecycle.h \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
+    Component/DropListToolButton.h \
     Component/FileSystemMenu.h \
     Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \
@@ -244,6 +248,7 @@ HEADERS += \
     Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
+    Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/Log.h \
@@ -254,6 +259,7 @@ HEADERS += \
     Tools/QAbstractTableModelPub.h \
     Tools/QMediaInfo.h \
     Tools/RenameNamesUnique.h \
+    Tools/SceneInfoManager.h \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     Tools/ToConsecutiveFileNameNo.h \

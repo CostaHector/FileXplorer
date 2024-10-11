@@ -24,7 +24,6 @@ class PublicTool {
   static bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 };
 
-auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction*;
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 
 auto Walker(const QString& preUserInput, const QStringList& rels) -> QStringList;
