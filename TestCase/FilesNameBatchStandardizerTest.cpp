@@ -52,11 +52,7 @@ private slots:
         QVERIFY(QDir(TEST_DIR).exists("Movie - C"));
         QVERIFY(QDir(TEST_DIR).exists("A B/C - A"));
     }
-
 };
 
-
-
 //QTEST_MAIN(FilesNameBatchStandardizerTest)
-
 #include "FilesNameBatchStandardizerTest.moc"

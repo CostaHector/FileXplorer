@@ -84,6 +84,37 @@ QString PATHTOOL::fileName(const QString& fullPath) {
   int forwardSlashIndex = fullPath.lastIndexOf('/');
   return forwardSlashIndex == -1 ? fullPath : fullPath.mid(forwardSlashIndex + 1);
 }
+
+QString PATHTOOL::RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen) {
+  if (fileNameLen > 0) {
+    return fullPath.mid(rootPathLen, fullPath.size() - fileNameLen - rootPathLen);
+  }
+
+  int lastSlashIndex = fullPath.lastIndexOf('/');
+  if (lastSlashIndex == -1) {
+    return {};
+  }
+  if (lastSlashIndex - rootPathLen + 1 < 1) {
+    return {};
+  }
+  return fullPath.mid(rootPathLen, lastSlashIndex - rootPathLen + 1);
+}
+
+std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
+  int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
+  if (lastIndexOfSlash == -1) {
+    lastIndexOfSlash = -1;
+  }
+  int lastIndexOfExtDot = fullpath.lastIndexOf('.');
+  if (lastIndexOfExtDot + 5 < fullpath.size()) {  // N - index(dot) > 5=len(".json")
+    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), "");
+  }
+  if (lastIndexOfExtDot != -1 && lastIndexOfSlash < lastIndexOfExtDot) {
+    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), fullpath.mid(lastIndexOfExtDot));
+  }
+  return {};
+}
+
 QString PATHTOOL::join(const QString& prefix, const QString& relative) {
   if (prefix.isEmpty()) {
     return relative;

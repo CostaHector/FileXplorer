@@ -16,39 +16,10 @@
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Component/DatabaseToolBar.h"
+#include "Component/DropListToolButton.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
 
-QToolButton* DropListToolButton(QAction* defaultAction,
-                                QList<QAction*> dropdownActions,
-                                QToolButton::ToolButtonPopupMode popupMode = QToolButton::ToolButtonPopupMode::InstantPopup,
-                                const QString& updateToolTip = "",
-                                const Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
-                                const int iconSize = TABS_ICON_IN_MENU_1x1) {
-  if (dropdownActions.isEmpty()) {
-    return nullptr;
-  }
-  if (defaultAction == nullptr) {
-    defaultAction = dropdownActions[0];
-  }
-
-  QToolButton* tb = new QToolButton;
-  tb->setDefaultAction(defaultAction);
-  if (not updateToolTip.isEmpty()) {
-    defaultAction->setToolTip(updateToolTip);
-  }
-  tb->setPopupMode(popupMode);
-  tb->setToolButtonStyle(toolButtonStyle);
-  tb->setAutoRaise(true);
-  tb->setStyleSheet("QToolButton { max-width: 256px; }");
-  tb->setIconSize(QSize(iconSize, iconSize));
-
-  QMenu* mn = new QMenu(tb);
-  mn->addActions(dropdownActions);
-  mn->setToolTipsVisible(true);
-  tb->setMenu(mn);
-  return tb;
-}
 
 RibbonMenu::RibbonMenu(QWidget* parent)
     : QTabWidget{parent},
@@ -313,7 +284,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
 
   auto* archiveVidsTB = new QToolBar("Leaf Arrange Files");
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._NAME_STANDARDLIZER);
-  archiveVidsTB->addAction(g_fileBasicOperationsActions()._CLASSIFIER);
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._PACK_FOLDERS);
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._UNPACK_FOLDERS);
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._LONG_PATH_FINDER);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(folderRmv);
@@ -325,7 +297,23 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
 
 QToolBar* RibbonMenu::LeafScenesTools() const {
   auto& ag = g_SceneInPageActions();
-  return ag.GetSceneToolbar();
+  if (!ag.InitWidget()) {
+    return nullptr;
+  }
+
+  auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
+  sceneTB->addAction(g_viewActions()._SCENE_VIEW);
+  sceneTB->addSeparator();
+  sceneTB->addAction(ag._COMBINE_MEDIAINFOS_JSON);
+  sceneTB->addAction(ag._UPDATE_SCN_ONLY);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mOrderTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mEnablePageTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mPagesSelectTB);
+  sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  return sceneTB;
 }
 
 void RibbonMenu::Subscribe() {
@@ -362,7 +350,7 @@ class RibbonMenuIllu : public QMainWindow {
   }
 };
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

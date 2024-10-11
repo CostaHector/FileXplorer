@@ -14,6 +14,7 @@ SOURCES += \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
+    TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
     TestCase/LongPathFinderTest.cpp \
     TestCase/MD5CalculatorTest.cpp \
@@ -22,6 +23,7 @@ SOURCES += \
     TestCase/PathToolTest.cpp \
     TestCase/RedundantItemsRemoverTest.cpp \
     TestCase/RenameUnqiueCheckTest.cpp \
+    TestCase/SceneViewTest.cpp \
     TestCase/SyncModifiyFileSystemTest.cpp \
     TestCase/ToConsecutiveFileNameNoTest.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
@@ -30,6 +32,7 @@ SOURCES += \
     TestCase/FinderTest.cpp \
     TestCase/VideosDurationGetterTest.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
+    Tools/ItemsPileCategory.cpp \
     Tools/LongPathFinder.cpp \
     Tools/ProductionStudioManager.cpp \
     Tools/PathTool.cpp\
@@ -63,9 +66,13 @@ SOURCES += \
     Tools/NameStandardizer.cpp \
     Tools/PerformersManager.cpp \
     Tools/RenameNamesUnique.cpp \
+    Tools/SceneInfoManager.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/AIMediaDuplicate.cpp \
+    Tools/JsonFileHelper.cpp \
+    Tools/ExtractPileItemsOutFolder.cpp \
+    Tools/ItemsPileCategory.cpp \
     model/ConflictsFileSystemModel.cpp \
     UndoRedo.cpp
 
@@ -78,6 +85,7 @@ HEADERS += \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
     Tools/FolderNxtAndLastIterator.h \
+    Tools/ItemsPileCategory.h \
     Tools/LongPathFinder.h \
     Tools/ProductionStudioManager.h \
     Tools/PathTool.h\
@@ -99,12 +107,16 @@ HEADERS += \
     Tools/NameStandardizer.h \
     Tools/PerformersManager.h \
     Tools/RenameNamesUnique.h \
+    Tools/SceneInfoManager.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/NameSectionArrange.h \
     Tools/RedundantFolderRemove.h \
     Tools/AIMediaDuplicate.h \
     Tools/QMediaInfo.h \
+    Tools/JsonFileHelper.h \
+    Tools/ExtractPileItemsOutFolder.h \
+    Tools/ItemsPileCategory.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 

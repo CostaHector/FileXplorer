@@ -53,5 +53,5 @@ class FolderNxtAndLastIteratorTest : public QObject {
   }
 };
 
-QTEST_MAIN(FolderNxtAndLastIteratorTest)
+//QTEST_MAIN(FolderNxtAndLastIteratorTest)
 #include "FolderNxtAndLastIteratorTest.moc"
