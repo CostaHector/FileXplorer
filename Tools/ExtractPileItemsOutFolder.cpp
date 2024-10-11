@@ -1,15 +1,28 @@
 #include "ExtractPileItemsOutFolder.h"
 #include "Tools/PathTool.h"
+#include "Tools/ItemsPileCategory.h"
+#include "UndoRedo.h"
 #include <QRegularExpression>
 #include <QDir>
 
-enum SCENE_COMPONENT_TYPE : char { IMG = 0, VID = 1, JSON = 2, OTHER = 3 };
+using namespace ItemsPileCategory;
 
-QMap<QString, SCENE_COMPONENT_TYPE> DOT_EXT_2_TYPE{{".jpg", IMG}, {".jpeg", IMG}, {".png", IMG}, {".webp", IMG}, {".jfif", IMG}, {".webp", IMG},
-                                                   {".mp4", VID}, {".mkv", VID},  {".avi", VID}, {".wmv", VID},  {".ts", VID},   {".json", JSON}};
-const QRegularExpression IMG_PILE_NAME_PATTERN{"^(.*?)( | - )?(\\d{1,3})?$"};
-const QRegularExpression VID_PILE_NAME_PATTERN{"^(.*?)( | - )?(HD|FHD|4k|720p|1080p|2160p|810p|60FPS|otherRes)?$",
-                                               QRegularExpression::PatternOption::CaseInsensitiveOption};
+QMap<QString, QStringList> ExtractPileItemsOutFolder::UnpackItemFromPiles(const QString& path) {
+  QDir rootPathDir(path, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+  return UnpackItemFromPiles(path, rootPathDir.entryList());
+}
+QMap<QString, QStringList> ExtractPileItemsOutFolder::UnpackItemFromPiles(const QString& path, const QStringList& folders) {
+  QMap<QString, QStringList> folder2PileItems;
+  for (const QString& subPath : folders) {
+    QDir pathDir{path + '/' + subPath, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
+    if (!pathDir.isEmpty(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot)) {
+      qDebug("skip, folder existed in path[%s]", qPrintable(pathDir.absolutePath()));
+      continue;
+    }
+    folder2PileItems[subPath] = pathDir.entryList();
+  }
+  return folder2PileItems;
+}
 
 bool ExtractPileItemsOutFolder::CanExtractOut(const QStringList& items) {
   QString stdName;
@@ -49,38 +62,49 @@ bool ExtractPileItemsOutFolder::CanExtractOut(const QStringList& items) {
   return true;
 }
 
-int ExtractPileItemsOutFolder::operator()(const QMap<QString, QStringList>& folder2PileItems) {
+int ExtractPileItemsOutFolder::operator()(const QString& path, const QMap<QString, QStringList>& folder2PileItems) {
+  QDir outDir(path);
   int foldersNeedExtractCnt = 0, itemsExtractedOutCnt = 0;
   for (auto it = folder2PileItems.cbegin(); it != folder2PileItems.cend(); ++it) {
-    const QStringList& items = it.value();
-    if (items.isEmpty()) {
-      // this folder may be redundant, will not process here
+    const QString& folderName = it.key();
+    const QStringList& files = it.value();
+    if (files.size() < 2) {
+      // this folder is not classfied by Categorizer will not process here
+      qDebug("FolderName[%s] only contains %d item(s), skip", qPrintable(folderName), files.size());
       continue;
     }
-    if (!CanExtractOut(items)) {
+    if (!CanExtractOut(files)) {
       qDebug("path[%s] should not extract out", qPrintable(it.key()));
       continue;
     }
-    qDebug("Extract %d pile item(s) out of folder[%s]", items.size(), qPrintable(it.key()));
-    itemsExtractedOutCnt += items.size();
+    int filesExtractedCnt = 0;
+    for (const QString& file : files) {
+      if (outDir.exists(file)) {
+        qDebug("%s/%s already exist outside, move will failed, skip it", qPrintable(path), qPrintable(file));
+        continue;
+      }
+      m_cmds.append({"rename", path + '/' + folderName, file, path, file});
+      ++filesExtractedCnt;
+    }
+    itemsExtractedOutCnt += filesExtractedCnt;
+    // recycle path + '/' + folderName
+    m_cmds.append({"moveToTrash", path, folderName});
     ++foldersNeedExtractCnt;
+    qDebug("Extract %d pile item(s) out of folder[%s]", files.size(), qPrintable(it.key()));
   }
   qDebug("Extract %d item(s) total from %d folders", itemsExtractedOutCnt, foldersNeedExtractCnt);
   return foldersNeedExtractCnt;
 }
 
-int ExtractPileItemsOutFolder::operator()(const QString& rootPath) {
-  QMap<QString, QStringList> folder2PileItems;
-  QDir rootPathDir(rootPath, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
-  for (const QString& path : rootPathDir.entryList()) {
-    QDir pathDir{rootPath + '/' + path, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
-    if (!pathDir.isEmpty(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot)) {
-      qDebug("skip, folder existed in path[%s]", qPrintable(pathDir.absolutePath()));
-      continue;
-    }
-    folder2PileItems[path] = pathDir.entryList();
-  }
-  return operator()(folder2PileItems);
+int ExtractPileItemsOutFolder::operator()(const QString& path) {
+  const QMap<QString, QStringList>& folder2PileItems = UnpackItemFromPiles(path);
+  return operator()(path, folder2PileItems);
+}
+
+bool ExtractPileItemsOutFolder::StartToRearrange() {
+  const auto isAllSuccess = g_undoRedo.Do(m_cmds);
+  qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
+  return isAllSuccess;
 }
 
 #include "PublicVariable.h"

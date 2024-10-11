@@ -100,7 +100,8 @@ class FileExplorerEvent : public QObject {
   auto on_Paste() -> bool;
 
   auto on_NameStandardize() -> bool;
-  auto on_FileClassify() -> bool;
+  bool on_FileClassify();
+  bool on_FileUnclassify();
   auto on_LongPathFolderFinder() -> bool;
   auto on_RemoveDuplicateImages() -> bool;
   auto on_RemoveRedundantItem(RedundantRmv& remover) -> bool;
