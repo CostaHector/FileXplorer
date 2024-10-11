@@ -1,71 +1,101 @@
 #include "Categorizer.h"
 
 #include "PublicVariable.h"
+#include "Tools/PathTool.h"
+#include "Tools/ItemsPileCategory.h"
 #include "UndoRedo.h"
 
 #include <QDir>
 #include <QMap>
+#include <QRegularExpression>
 
-// Folder: Keep the Same;
-// Vid: eliminate format;
-// Images: eliminate format and "- sequence"(if exists);
-// Json: eliminate format;
-// d2p["xx 1"] = {xx 1, xx 1.mp4, xx 1 1.jpg, xx 1.json};
-// d2p["xx"] = {xx, xx.mp4, xx.jpg, xx 1.jpg, xx 2.png, xx.json};
-auto Categorizer::Classify(const QString& rootDir) -> QMap<QString, QStringList> {
-  QMap<QString, QStringList> dst2Contents;
-  const QList<QFileInfo>& nameList = QDir(rootDir).entryInfoList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot);
-
-  for (const QFileInfo& fi : nameList) {
-    const QString& nm = fi.fileName();
-    QString dst;
-    if (fi.isDir()) {  // folder;
-      dst = fi.fileName();
-    } else if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*." + fi.suffix())) {  // ima;
-      dst = ImgCoreName(nm);
-    } else {  // vid or json;
-      dst = VidCoreName(nm);
+QMap<QString, QStringList> Categorizer::ClassifyItemIntoPiles(const QStringList& fileFolderMixed) {
+  using namespace ItemsPileCategory;
+  QMap<QString, QStringList> baseName2ItemsPile;
+  QString noNumberName;
+  QRegularExpressionMatch result;
+  for (const QString& medName : fileFolderMixed) {
+    QString baseName, ext;
+    std::tie(baseName, ext) = PATHTOOL::GetBaseNameExt(medName);
+    noNumberName = baseName;
+    auto typeEnum = DOT_EXT_2_TYPE.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
+    switch (typeEnum) {
+      case IMG: {
+        if ((result = IMG_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
+          noNumberName = result.captured(1);
+        }
+        baseName2ItemsPile[noNumberName].append(medName);
+        break;
+      }
+      case VID: {
+        if ((result = VID_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
+          noNumberName = result.captured(1);
+        }
+        baseName2ItemsPile[noNumberName].append(medName);
+        break;
+      }
+      case JSON:
+        baseName2ItemsPile[baseName].append(medName);
+        break;
+      case OTHER:  // can be a folder
+        baseName2ItemsPile[baseName].append(medName);
+        break;
     }
-    if (not dst2Contents.contains(dst)) {
-      dst2Contents.insert(dst, {nm});
-      continue;
-    }
-    dst2Contents[dst].append(nm);
   }
-  return dst2Contents;
+  return baseName2ItemsPile;
 }
 
-auto Categorizer::operator()(const QString& rootDir) const -> bool {
-  if (QDir(rootDir).isRoot() or not QFile::exists(rootDir)) {
-    qDebug("[Folder is root or not exists error] %s", qPrintable(rootDir));
-    return false;
-  }
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
-  const auto& dic = Classify(rootDir);
-  QMapIterator<QString, QStringList> i(dic);
-  while (i.hasNext()) {
-    i.next();
-    const QString& folderName = i.key();
-    const QStringList& fileItems = i.value();
+QMap<QString, QStringList> Categorizer::ClassifyItemIntoPiles(const QString& path) {
+  QDir pathdir(path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+  return ClassifyItemIntoPiles(pathdir.entryList());
+}
 
-    if (fileItems.size() < 2)
-      continue;  // [Ignored Only One Item] [{folderName}];
-    const QString& underPath = rootDir + '/' + folderName;
-    if (not QFile::exists(underPath)) {
-      cmds.append({"mkpath", rootDir, folderName});
+int Categorizer::operator()(const QString& path, const QMap<QString, QStringList>& pilesMap) {
+  int filesRearrangedCnt = 0;
+  int pathCreatedCnt = 0;
+  for (auto it = pilesMap.cbegin(); it != pilesMap.cend(); ++it) {
+    const QString& folderName = it.key();
+    const QStringList& files = it.value();
+    if (files.size() < 2) {
+      qDebug("FolderName[%s] only contains %d item(s), skip", qPrintable(folderName), files.size());
+      continue;
     }
+    const QString& underPath = path + '/' + folderName;
     QDir underDir(underPath);
-    for (const QString& fileName : fileItems) {
-      if (QFileInfo(rootDir, fileName).isDir()) {
-        continue;  // skip move dir
-      }
-      if (underDir.exists(fileName)) {
-        qDebug("%s Already Exist in %s", qPrintable(fileName), qPrintable(underPath));
+    if (!underDir.exists()) {
+      // create a folder path + '/' + folderName
+      m_cmds.append({"mkpath", path, folderName});
+      ++pathCreatedCnt;
+    }
+    for (const QString& file : files) {
+      if (QFileInfo(path, file).isDir()) {
+        // path/file is a directory, skip move "path/file" to "underPath/*"
         continue;
       }
-      cmds.append({"rename", rootDir, fileName, underPath, fileName});
+      if (underDir.exists(file)) {
+        qDebug("%s/%s already exist, move will failed, skip it", qPrintable(underPath), qPrintable(file));
+        continue;
+      }
+      m_cmds.append({"rename", path, file, underPath, file});
+      ++filesRearrangedCnt;
     }
   }
-  const auto isAllSuccess = g_undoRedo.Do(cmds);
+
+  qDebug("%d file(s) rearrange, %d path(s) make, %d cmds been generated under path[%s]", filesRearrangedCnt, pathCreatedCnt, qPrintable(path));
+  return filesRearrangedCnt;
+}
+
+int Categorizer::operator()(const QString& path) {
+  if (!QFileInfo(path).isDir()) {
+    qDebug("path[%s] is not an existed directory", qPrintable(path));
+    return {};
+  }
+  const auto& pilesMap = ClassifyItemIntoPiles(path);
+  return operator()(path, pilesMap);
+}
+
+bool Categorizer::StartToRearrange() {
+  const auto isAllSuccess = g_undoRedo.Do(m_cmds);
+  qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;
 }

@@ -106,6 +106,9 @@ std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
     lastIndexOfSlash = -1;
   }
   int lastIndexOfExtDot = fullpath.lastIndexOf('.');
+  if (lastIndexOfExtDot + 5 < fullpath.size()) {  // N - index(dot) > 5=len(".json")
+    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), "");
+  }
   if (lastIndexOfExtDot != -1 && lastIndexOfSlash < lastIndexOfExtDot) {
     return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), fullpath.mid(lastIndexOfExtDot));
   }
