@@ -1,6 +1,10 @@
 #include "SceneActionsSubscribe.h"
 #include "Actions/SceneInPageActions.h"
+#include "Tools/SceneInfoManager.h"
 #include <QToolBar>
+#include <QMessageBox>
+
+#include "Component/NotificatorFrame.h"
 
 bool SceneActionsSubscribe::BindWidget(QTableView* tableView, ScenesTableModel* model) {
   if (tableView == nullptr) {
@@ -56,9 +60,21 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
 
 void SceneActionsSubscribe::SetScenesGroupByPage(bool groupByPageAction) {
   auto& ags = g_SceneInPageActions();
+  if (ags.mPagesSelectTB == nullptr) {
+    qCritical("mPagesSelectTB is nullptr");
+    return;
+  }
   ags.mPagesSelectTB->setEnabled(groupByPageAction);
+
+  if (_model == nullptr) {
+    qCritical("_model is nullptr");
+    return;
+  }
+
   if (groupByPageAction) {
     SetScenesPerColumn();
+  } else {
+    _model->ShowAllScenesInOnePage();
   }
 }
 
@@ -69,6 +85,10 @@ void SceneActionsSubscribe::SetPageIndex() {
   int pageIndex = pageIndStr.toInt(&isNumber);
   if (not isNumber) {
     qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
+    return;
+  }
+  if (_model == nullptr) {
+    qWarning("_model is nullptr");
     return;
   }
   _model->SetPageIndex(pageIndex);
@@ -87,6 +107,10 @@ bool SceneActionsSubscribe::SetScenesPerColumn() {
   }
   if (not isPageIndNumber) {
     qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
+    return false;
+  }
+  if (_model == nullptr) {
+    qWarning("_model is nullptr");
     return false;
   }
   _model->ChangeRowsCnt(rowCnt, pageInd);
@@ -108,16 +132,93 @@ bool SceneActionsSubscribe::SetScenesPerRow() {
     qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
     return false;
   }
+  if (_model == nullptr) {
+    qWarning("_model is nullptr");
+    return false;
+  }
   _model->ChangeColumnsCnt(colCnt, pageInd);
   return true;
 }
 
-void SceneActionsSubscribe::SortIt(QAction* triggerAct) {
-  if (triggerAct == nullptr) {
-    qWarning("triggerAct is nullptr");
+void SceneActionsSubscribe::SortSceneItems() {
+  auto& ags = g_SceneInPageActions();
+  if (ags._ORDER_AG == nullptr || ags._REVERSE_SORT == nullptr) {
+    qCritical("_ORDER_AG or _REVERSE_SORT is nullptr");
     return;
   }
-  _model->SortOrder(triggerAct->text() == "Descending");
+  QAction* triggerAct = ags._ORDER_AG->checkedAction();
+  if (triggerAct == nullptr) {
+    qCritical("triggerAct is nullptr, nothing sort option is select");
+    return;
+  }
+  const QString sortOptionStr{triggerAct->text()};
+  const bool bReverse{ags._REVERSE_SORT->isChecked()};
+  SceneInfoManager::SceneSortOption sortOption = SceneInfoManager::GetSortOptionFromStr(sortOptionStr);
+  qDebug("sort option: %s, bReverse: %d", qPrintable(sortOptionStr), bReverse);
+  _model->SortOrder(sortOption, bReverse);
+}
+
+void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
+  if (_model == nullptr || _tableView == nullptr) {
+    qDebug("_model or _tableView is nullptr");
+    return;
+  }
+  const QString& rootPath = _model->rootPath();
+  if (rootPath.count('/') < 2) {  // large folder
+    qDebug("Combine Media Info may cause lag. As [%s] contains a large json/vid/img(s)", qPrintable(rootPath));
+    const auto ret = QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath,
+                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    if (ret != QMessageBox::StandardButton::Yes) {
+      qDebug("User cancel Combine Media Info on a large path[%s]", qPrintable(rootPath));
+      return;
+    }
+  }
+
+  JsonDataRefresher jdr;
+  int jsonUpdatedCnt = jdr(rootPath);
+  if (jsonUpdatedCnt >= 0) {
+    Notificator::goodNews(QString("%1 Json(s) Update succeed").arg(jsonUpdatedCnt), qPrintable(rootPath));
+  }
+  int scnFileCnt = jdr.GenerateScnFiles();
+  if (scnFileCnt == -1) {
+    Notificator::badNews("Combine scn file failed. May path not exist", qPrintable(rootPath));
+    return;
+  }
+  if (scnFileCnt == 0) {
+    Notificator::goodNews("Skip. No json file find, No need to combine scn file", qPrintable(rootPath));
+    return;
+  }
+  Notificator::goodNews(QString("Update %1 scn file(s) succeed").arg(scnFileCnt), qPrintable(rootPath));
+  _model->setRootPath(rootPath, true);
+}
+
+void SceneActionsSubscribe::UpdateScnFilesOnly() {
+  if (_model == nullptr || _tableView == nullptr) {
+    qDebug("_model or _tableView is nullptr");
+    return;
+  }
+  const QString& rootPath = _model->rootPath();
+  if (rootPath.count('/') < 2) {  // large folder
+    qDebug("Update Scn file may cause lag. As [%s] contains a large json(s)", qPrintable(rootPath));
+    const auto ret = QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath,
+                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    if (ret != QMessageBox::StandardButton::Yes) {
+      qDebug("User cancel Update Scn file on a large path[%s]", qPrintable(rootPath));
+      return;
+    }
+  }
+
+  int scnFileCnt = SceneInfoManager::GenerateAScnFile(rootPath);
+  if (scnFileCnt == -1) {
+    Notificator::badNews("Update scn file failed. May path not exist", qPrintable(rootPath));
+    return;
+  }
+  if (scnFileCnt == 0) {
+    Notificator::goodNews("Skip. No json file find, No need to update scn file at all", qPrintable(rootPath));
+    return;
+  }
+  Notificator::goodNews(QString("Update %1 scn file(s) succeed").arg(scnFileCnt), qPrintable(rootPath));
+  _model->setRootPath(rootPath);
 }
 
 bool SceneActionsSubscribe::operator()() {
@@ -131,15 +232,14 @@ bool SceneActionsSubscribe::operator()() {
   }
 
   auto& ags = g_SceneInPageActions();
-  connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortIt);
+  connect(ags._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneActionsSubscribe::CombineMediaInfoIntoJson);
+  connect(ags._UPDATE_SCN_ONLY, &QAction::triggered, this, &SceneActionsSubscribe::UpdateScnFilesOnly);
+  connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
+  connect(ags._REVERSE_SORT, &QAction::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
   connect(ags.mRowsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);
   connect(ags.mPageIndexInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetPageIndex);
   connect(ags.mColumnsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerRow);
   connect(ags.mPagesSelectTB, &QToolBar::actionTriggered, this, &SceneActionsSubscribe::PageIndexIncDec);
-
-  ags._GROUP_BY_PAGE->setChecked(false);
-  emit ags._GROUP_BY_PAGE->triggered(false);
-
   return true;
 }
