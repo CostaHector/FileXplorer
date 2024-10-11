@@ -24,8 +24,10 @@ class SceneActionsSubscribe : public QObject {
 
   bool SetScenesPerRow();
 
-  void SortIt(QAction* triggerAct);
+  void SortSceneItems();
 
+  void CombineMediaInfoIntoJson();
+  void UpdateScnFilesOnly();
  private:
   ScenesTableModel* _model{nullptr};
   QTableView* _tableView{nullptr};

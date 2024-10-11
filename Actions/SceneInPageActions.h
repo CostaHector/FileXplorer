@@ -12,10 +12,20 @@ class SceneInPageActions : public QObject {
  public:
   explicit SceneInPageActions(QObject* parent = nullptr);
 
+  bool InitWidget();
   QToolBar* GetSceneToolbar();
+  QToolBar* GetOrderToolBar();
+  QToolBar* GetPagesRowByColumnToolBar();
+  QToolBar* GetPageIndexSelectionToolBar();
 
-  QAction* _ASCENDING{nullptr};
-  QAction* _DESCENDING{nullptr};
+  QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
+  QAction* _UPDATE_SCN_ONLY{nullptr};
+
+  QAction* _BY_MOVIE_NAME{nullptr};
+  QAction* _BY_MOVIE_SIZE{nullptr};
+  QAction* _BY_RATE{nullptr};
+  QAction* _BY_UPLOADED_TIME{nullptr};
+  QAction* _REVERSE_SORT{nullptr};
   QActionGroup* _ORDER_AG{nullptr};
 
   QAction* _GROUP_BY_PAGE{nullptr};
@@ -30,10 +40,10 @@ class SceneInPageActions : public QObject {
 
   QToolBar* mOrderTB{nullptr};
   QToolBar* mEnablePageTB{nullptr};
-  QToolBar* mRowByColumnTB{nullptr};
   QToolBar* mRowEnablePageTB{nullptr};
   QToolBar* mPagesSelectTB{nullptr};
-  QToolBar* mSceneTB{nullptr};
+ private:
+  constexpr static int ROW_COLUMN_LINEDIT_MAX_WIDTH = 80;
 };
 
 SceneInPageActions& g_SceneInPageActions();
