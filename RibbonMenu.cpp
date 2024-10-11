@@ -284,7 +284,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
 
   auto* archiveVidsTB = new QToolBar("Leaf Arrange Files");
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._NAME_STANDARDLIZER);
-  archiveVidsTB->addAction(g_fileBasicOperationsActions()._CLASSIFIER);
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._PACK_FOLDERS);
+  archiveVidsTB->addAction(g_fileBasicOperationsActions()._UNPACK_FOLDERS);
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._LONG_PATH_FINDER);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(folderRmv);

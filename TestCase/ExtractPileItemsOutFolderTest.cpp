@@ -27,10 +27,6 @@ class ExtractPileItemsOutFolderTest : public QObject {
                << "name.ts"
                << "name.avi"
                << "name.wmv"
-               << "name 4k.wmv"
-               << "name 60FPS.wmv"
-               << "name 1080p.wmv"
-               << "name 720p.mp4"
                << "name.json"
                << "name.jpg"
                << "name 1.jpeg"
@@ -47,10 +43,6 @@ class ExtractPileItemsOutFolderTest : public QObject {
                              << "name.ts"
                              << "name.avi"
                              << "name.wmv"
-                             << "name 4k.wmv"
-                             << "name 60FPS.wmv"
-                             << "name 1080p.wmv"
-                             << "name 720p.mp4"
                              << "name.json"
                              << "name.jpg"
                              << "name 1.jpeg"
@@ -60,7 +52,7 @@ class ExtractPileItemsOutFolderTest : public QObject {
     folder2PileItems["not a pile"] << "random name.mp4"
                                    << "another random name.mp4";
     ExtractPileItemsOutFolder epiof;
-    QCOMPARE(epiof(folder2PileItems), 1);
+    QCOMPARE(epiof("not existed out directory", folder2PileItems), 1);
   }
 
   void test_MixedScenes() {
