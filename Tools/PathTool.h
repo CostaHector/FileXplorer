@@ -20,8 +20,25 @@ QString normPath(QString fullPath);
 QString absolutePath(const QString& fullPath);
 QString relativePath(const QString& fullPath, const int rootpathLen = 0);
 QString forSearchPath(const QString& fullPath);  // get QString for database index last three sectors
+
+// rootPath/Any/Relative/Path/File = > Path
+// rootPath/Relative/File = > Relative
+// dirName is located by last two slash
 QString dirName(const QString& fullPath);
+
+// rootPath/Relative/File = > File, just like QFileInfo("rootPath/Relative/File").fileName()
+// fileName is located by the last slash
 QString fileName(const QString& fullPath);
+
+// "rootPath", rootPath/Any/Relative/Path/File = > /Any/Relative/Path/
+// "rootPath", rootPath/Relative/File = > /Relative/
+// "rootPath", rootPath/File = > /
+QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen = -1);
+
+// Get "baseName, extension with prefix dot" from fullpath
+// a.txt => ("a", ".txt")
+std::pair<QString, QString> GetBaseNameExt(const QString& fullpath);
+
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
 QString commonPrefix(const QString& path1, const QString& path2);

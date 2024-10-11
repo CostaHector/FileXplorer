@@ -1,4 +1,5 @@
 #include "View/FileSystemTableView.h"
+#include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "View/ViewHelper.h"
 
@@ -37,6 +38,8 @@ void FileSystemTableView::subscribe() {
   addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
   addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
   addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+
+  addActions(g_renameAg().RENAME_RIBBONS->actions());
 
   addAction(g_fileBasicOperationsActions().COPY_RECORDS);
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
