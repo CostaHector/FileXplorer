@@ -2,6 +2,59 @@
 #include <QApplication>
 #include <QStyle>
 
+FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
+    : QObject(parent),
+      _REVEAL_IN_EXPLORER{new QAction(QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in explorer", this)},
+      _OPEN_IN_TERMINAL{new QAction(QIcon(":/themes/OPEN_IN_TERMINAL"), "Open in terminal", this)},
+      OPEN_AG(GetOPENActions()),
+
+      COPY_FULL_PATH{new QAction(QIcon(":/themes/COPY_FULL_PATH"), "Copy fullpath")},
+      COPY_PATH{new QAction(QIcon(":/themes/COPY_PATH"), "Copy path")},
+      COPY_NAME{new QAction(QIcon(":/themes/COPY_NAME"), "Copy name")},
+
+      COPY_THE_PATH{new QAction(QIcon(":/themes/COPY_THE_PATH"), "Copy the path")},
+      COPY_RECORDS{new QAction(QIcon(":/themes/COPY_RECORD"), "Copy records")},
+      COPY_PATH_AG(GetCOPY_PATHActions()),
+      NEW_FOLDER{new QAction(QIcon(":/themes/NEW_FOLDER"), "New folder")},
+
+      NEW_TEXT_FILE{new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENT"), "New text")},
+      NEW_JSON_FILE{new QAction(QIcon(":/themes/NEW_JSON_FILE"), "New json")},
+      BATCH_NEW_FILES{new QAction(QIcon(":/themes/NEW_TEXT_DOCUMENTS"), "New Files")},
+
+      BATCH_NEW_FOLDERS{new QAction(QIcon(":/themes/NEW_FOLDERS"), "New Folders")},
+      NEW(GetNEWActions()),
+
+      _MOVE_TO{new QAction(QIcon(":/themes/MV_TO_COMMAND_PATH"), "Move to")},
+      _COPY_TO{new QAction(QIcon(":/themes/CP_TO_COMMAND_PATH"), "Copy to")},
+      MOVE_COPY_TO(GetMOVE_COPY_TOActions()),
+
+      MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
+      COPY_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY)),
+
+      MOVE_TO_TRASHBIN{new QAction(QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Recycle")},
+      DELETE_PERMANENTLY{new QAction(QIcon(":/themes/DELETE_ITEMS_PERMANENTLY"), "Delete permanently")},
+      DELETE_ACTIONS(GetDeleteActions()),
+
+      UNDO_OPERATION{new QAction(QIcon(":/themes/UNDO"), "Undo", this)},
+      REDO_OPERATION{new QAction(QIcon(":/themes/REDO"), "Redo", this)},
+      UNDO_REDO_RIBBONS(Get_UNDO_REDO_OPERATIONS_Actions()),
+
+      CUT{new QAction(QIcon(":/themes/CUT_ITEM"), "Cut")},
+      COPY{new QAction(QIcon(":/themes/COPY_ITEM"), "Copy")},
+      PASTE{new QAction(QIcon(":/themes/PASTE_ITEM"), "Paste")},
+      CUT_COPY_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
+
+      MERGE{new QAction(QIcon(":/themes/FOLDER_MERGE_TO_FIRST"), "Merged to front")},
+      MERGE_REVERSE{new QAction(QIcon(":/themes/FOLDER_MERGE_TO_LAST"), "Merge to back")},
+      FOLDER_MERGE(FolderMergeActions()),
+
+      SELECT_ALL{new QAction(QIcon(":/themes/SELECT_ALL"), "Select all")},
+      SELECT_NONE{new QAction(QIcon(":/themes/SELECT_NONE"), "Select none")},
+      SELECT_INVERT{new QAction(QIcon(":/themes/SELECT_INVERT"), "Invert selection")},
+      SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()) {
+  FolderFileCategoryProcess();
+}
+
 QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
   MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
   MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
@@ -230,11 +283,16 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "<b>Standardized Files/Folders Name under current view path</b><br/>"
       "Given: [A..mp4, A (1).jpg, A -- 2.json]<br/>"
       "Result: [A.mp4, A - 1.jpg, A - 2.json]");
-  _CLASSIFIER->setToolTip(
+  _PACK_FOLDERS->setToolTip(
       "<b>Category Files/Folders Name under current view path</b><br/>"
       "Move [A.mp4, A.jpg, A.json]<br/>"
       "To Folder A");
-  _LONG_PATH_FINDER->setToolTip("<b>Long path finder</b><br/>"
+  _UNPACK_FOLDERS->setToolTip(
+      "<b>Unpack items from folders to current view path</b><br/>"
+      "Move 3 item(s) under path/{A.mp4, A.jpg, A.json}<br/>"
+      "To path");
+  _LONG_PATH_FINDER->setToolTip(
+      "<b>Long path finder</b><br/>"
       "find out all too long path(s), then chop one section from full path, say the second to last section");
   _DUPLICATE_ITEMS_REMOVER->setToolTip(
       "<b>Remove Files/Folders whose names with a certern pattern under current view path</b><br/>"

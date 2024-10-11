@@ -11,6 +11,8 @@
         <file alias="EMPTY_FOLDER">Media/EMPTY_FOLDER.svg</file>
         <file alias="ONE_FILE_IN_ONE_FOLDER">Media/ONE_FILE_IN_ONE_FOLDER.svg</file>
         <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
+        <file alias="PACK_FOLDERS">Media/PACK_FOLDERS.svg</file>
+        <file alias="UNPACK_FOLDERS">Media/UNPACK_FOLDERS.svg</file>
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
@@ -79,7 +81,6 @@
         <file alias="NEW_TEXT_DOCUMENT">RightClickIcon/NEW_TEXT_DOCUMENT.svg</file>
         <file alias="NEW_TEXT_DOCUMENTS">RightClickIcon/NEW_TEXT_DOCUMENTS.svg</file>
         <file alias="NEW_JSON_FILE">RightClickIcon/NEW_JSON_FILE.svg</file>
-        <file alias="CATEGORIZER">RightClickIcon/CATEGORIZER.svg</file>
         <file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
         <file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
         <file alias="MERGE_TEXT_FILE">RightClickIcon/mergeTextFile.png</file>

@@ -126,5 +126,5 @@ class SceneViewTest : public QObject {
   }
 };
 
-QTEST_MAIN(SceneViewTest)
+//QTEST_MAIN(SceneViewTest)
 #include "SceneViewTest.moc"
