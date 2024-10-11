@@ -73,13 +73,13 @@ class JsonFileHelper {
       json_string = in.readAll();
       jsonFile.close();
     } else {
-      qDebug("[Normal] json file not found");
+      qDebug("[Normal] json file[%s] not found", qPrintable(movieJsonItemPath));
       return {};
     }
     QJsonParseError jsonErr;
     QJsonDocument json_doc = QJsonDocument::fromJson(json_string.toUtf8(), &jsonErr);
     if (jsonErr.error != QJsonParseError::NoError) {
-      qDebug("Error when parse");
+      qDebug("Error parse[%s]: %s", qPrintable(movieJsonItemPath), qPrintable(jsonErr.errorString()));
       return {};
     }
     const QJsonObject& rootObj = json_doc.object();
