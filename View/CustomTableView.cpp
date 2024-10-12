@@ -251,11 +251,12 @@ void CustomTableView::onResizeColumnToContents(const bool checked) {
 }
 
 void CustomTableView::onSetRowMaxHeight() {
+  bool setOk{false};
   static const int INIT_MAX_ROW_HEIGHT = verticalHeader()->maximumSectionSize();
   const int size = QInputDialog::getInt(this, "Set row max height size >=0 ", QString("current max height:%1 px").arg(INIT_MAX_ROW_HEIGHT),
-                                        m_defaultTableRowHeight);
-  if (size < 0) {
-    qDebug("User cancel resize row height");
+                                        m_defaultTableRowHeight, 0, 10000, 20, &setOk);
+  if (!setOk) {
+    qWarning("User cancel resize row height");
     return;
   }
   verticalHeader()->setMaximumSectionSize(size);
@@ -263,10 +264,11 @@ void CustomTableView::onSetRowMaxHeight() {
 }
 
 void CustomTableView::onSetRowDefaultSectionSize() {
+  bool setOk{false};
   const int size = QInputDialog::getInt(this, "Set default row section size >=0 ", QString("current row:%1 px").arg(m_defaultTableRowHeight),
-                                        m_defaultTableRowHeight);
-  if (size < 0) {
-    qDebug("User cancel resize row height");
+                                        m_defaultTableRowHeight, 0, 10000, 20, &setOk);
+  if (!setOk) {
+    qWarning("User cancel resize row height");
     return;
   }
   m_defaultTableRowHeight = size;
@@ -275,10 +277,11 @@ void CustomTableView::onSetRowDefaultSectionSize() {
 }
 
 void CustomTableView::onSetColumnDefaultSectionSize() {
+  bool setOk{false};
   const int size = QInputDialog::getInt(this, "Set default column section size >=0 ", QString("current column:%1 px").arg(m_defaultTableRowHeight),
-                                        m_defaultTableColumnWidth);
-  if (size < 0) {
-    qDebug("User cancel resize column height");
+                                        m_defaultTableColumnWidth, 0, 10000, 20, &setOk);
+  if (!setOk) {
+    qWarning("User cancel resize column height");
     return;
   }
   m_defaultTableColumnWidth = size;
