@@ -250,14 +250,6 @@
         <file alias="PASS">AlertSystem/PASS.svg</file>
         <file alias="RECHECK">AlertSystem/RECHECK.svg</file>
 
-        <file alias="_ALL">LogView/_ALL.svg</file>
-        <file alias="_INFO">LogView/_INFO.svg</file>
-        <file alias="_DEBUG">LogView/_DEBUG.svg</file>
-        <file alias="_WARNING">LogView/_WARNING.svg</file>
-        <file alias="_CRITICAL">LogView/_CRITICAL.svg</file>
-        <file alias="_FATAL">LogView/_FATAL.svg</file>
-        <file alias="_LOCATE_WHERE">LogView/_LOCATE_WHERE.svg</file>
-
         <file alias="RESTORE_ALL_ITEMS">RecycleBin/RESTORE_ALL_ITEMS.ico</file>
         <file alias="RESTORE_SELECTED_ITEMS">RecycleBin/RESTORE_SELECTED_ITEMS.ico</file>
         <file alias="EMPTY_RECYCLE_BIN">RecycleBin/EMPTY_RECYCLE_BIN.ico</file>
