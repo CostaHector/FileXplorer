@@ -47,7 +47,7 @@ class RedundantImageFinder : public QMainWindow {
 
   QFile m_libFi;
   RedundantImageModel* m_imgModel;
-  QTableView* m_list;
+  QTableView* m_table;
 
   QAction* RECYLE_NOW{new QAction{QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Recycle selections", this}};
   QAction* RECYCLE_EMPTY_IMAGE{new QAction{"Also empty image", this}};
