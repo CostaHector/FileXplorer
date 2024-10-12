@@ -1,5 +1,6 @@
 #include "SceneTableView.h"
 #include "Model/ScenesTableModel.h"
+#include "Tools/PlayVideo.h"
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -27,7 +28,9 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
 
   m_menu = new QMenu{"scene table view menu", this};
   COPY_BASENAME_FROM_SCENE = new QAction("copy basename", m_menu);
+  OPEN_CORRESPONDING_FOLDER = new QAction("play this folder", m_menu);
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
+  m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
   BindMenu(m_menu);
   //  BindMenu(g_performersManagerActions().GetRightClickMenu());
   //  AppendVerticalHeaderMenuAGS(g_performersManagerActions().GetVerAGS());
@@ -43,8 +46,16 @@ void SceneTableView::onCopyBaseName() {
   qDebug("user copied str: [%s]", qPrintable(copiedStr));
 }
 
+void SceneTableView::onOpenCorrespondingFolder() {
+  const QModelIndex& curInd = currentIndex();
+  const QString& scenePath = _sceneModel->absolutePath(curInd);
+  on_ShiftEnterPlayVideo(scenePath);
+  qDebug("Play path: [%s]", qPrintable(scenePath));
+}
+
 void SceneTableView::subscribe() {
   connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneTableView::onCopyBaseName);
+  connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneTableView::onOpenCorrespondingFolder);
 }
 
 void SceneTableView::setRootPath(const QString& rootPath) {
