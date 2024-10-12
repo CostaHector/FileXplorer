@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2024-10-11T22:27:47. -->
+<!-- Written by QtCreator 11.0.2, 2024-10-11T23:10:13. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -73,6 +73,10 @@
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/CatergorizerTest.cpp:cleanupTestCase">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/CatergorizerTest.cpp:init">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/CatergorizerTest.cpp:initTestCase">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/ExtractPileItemsOutFolderTest.cpp:cleanup">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/ExtractPileItemsOutFolderTest.cpp:cleanupTestCase">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/ExtractPileItemsOutFolderTest.cpp:init">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/ExtractPileItemsOutFolderTest.cpp:initTestCase">Unchecked</value>
    </valuemap>
    <value type="int" key="AutoTest.RunAfterBuild">0</value>
    <value type="bool" key="AutoTest.UseGlobal">true</value>
@@ -420,7 +424,6 @@
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/home/Ariel/qtcpp/build-FileExplorerTest-Desktop_Qt_5_15_2_MinGW_32_bit-Debug</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>
