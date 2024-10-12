@@ -3,6 +3,8 @@
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QApplication>
+#include <QClipboard>
 
 class AlignDelegate : public QStyledItemDelegate {
  public:
@@ -23,9 +25,26 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
   mAlignDelegate = new AlignDelegate;
   setItemDelegate(mAlignDelegate);
 
+  m_menu = new QMenu{"scene table view menu", this};
+  COPY_BASENAME_FROM_SCENE = new QAction("copy basename", m_menu);
+  m_menu->addAction(COPY_BASENAME_FROM_SCENE);
+  BindMenu(m_menu);
   //  BindMenu(g_performersManagerActions().GetRightClickMenu());
   //  AppendVerticalHeaderMenuAGS(g_performersManagerActions().GetVerAGS());
   //  AppendHorizontalHeaderMenuAGS(g_performersManagerActions().GetHorAGS());
+  subscribe();
+}
+
+void SceneTableView::onCopyBaseName() {
+  const QModelIndex& curInd = currentIndex();
+  const QString& copiedStr = _sceneModel->fileName(curInd);
+  auto* cb = QApplication::clipboard();
+  cb->setText(copiedStr, QClipboard::Mode::Clipboard);
+  qDebug("user copied str: [%s]", qPrintable(copiedStr));
+}
+
+void SceneTableView::subscribe() {
+  connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneTableView::onCopyBaseName);
 }
 
 void SceneTableView::setRootPath(const QString& rootPath) {
