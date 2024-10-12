@@ -4,17 +4,17 @@
 <context>
     <name>AddressBarActions</name>
     <message>
-        <location filename="../Actions/AddressBarActions.cpp" line="5"/>
+        <location filename="../Actions/AddressBarActions.cpp" line="4"/>
         <source>back to</source>
         <translation>后退</translation>
     </message>
     <message>
-        <location filename="../Actions/AddressBarActions.cpp" line="6"/>
+        <location filename="../Actions/AddressBarActions.cpp" line="5"/>
         <source>forward to</source>
         <translation>前进</translation>
     </message>
     <message>
-        <location filename="../Actions/AddressBarActions.cpp" line="7"/>
+        <location filename="../Actions/AddressBarActions.cpp" line="6"/>
         <source>up to</source>
         <translation>上一级</translation>
     </message>
@@ -100,52 +100,44 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../View/CustomTableView.h" line="47"/>
         <source>Column title visibility</source>
-        <translation>列抬头可见性</translation>
+        <translation type="vanished">列抬头可见性</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="48"/>
         <source>hide this column</source>
-        <translation>隐藏此列</translation>
+        <translation type="vanished">隐藏此列</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="49"/>
         <source>show all columns</source>
-        <translation>显示所有列</translation>
+        <translation type="vanished">显示所有列</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="50"/>
         <source>stretch last column</source>
-        <translation>延展最后一列</translation>
+        <translation type="vanished">延展最后一列</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="51"/>
         <source>enable column sort</source>
-        <translation>允许列排序</translation>
+        <translation type="vanished">允许列排序</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="53"/>
         <source>show vertical header</source>
-        <translation>显示垂直表头</translation>
+        <translation type="vanished">显示垂直表头</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="54"/>
         <source>resize rows to content</source>
-        <translation>自适应行高</translation>
+        <translation type="vanished">自适应行高</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="55"/>
         <source>adjust default rows section size</source>
-        <translation>调节行高</translation>
+        <translation type="vanished">调节行高</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="73"/>
+        <location filename="../View/CustomTableView.h" line="86"/>
         <source>vertical header menu</source>
         <translation>垂直表头</translation>
     </message>
     <message>
-        <location filename="../View/CustomTableView.h" line="74"/>
+        <location filename="../View/CustomTableView.h" line="87"/>
         <source>horizontal header menu</source>
         <translation>水平表头</translation>
     </message>
@@ -153,42 +145,42 @@
 <context>
     <name>DataBaseActions</name>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="37"/>
+        <location filename="../Actions/DataBaseActions.h" line="31"/>
         <source>Where clause</source>
         <translation>Where助手</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="26"/>
+        <location filename="../Actions/DataBaseActions.h" line="20"/>
         <source>Create Database</source>
         <translation>创建电影数据库</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="27"/>
+        <location filename="../Actions/DataBaseActions.h" line="21"/>
         <source>Create Table</source>
         <translation>创建电影收录表</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="28"/>
+        <location filename="../Actions/DataBaseActions.h" line="22"/>
         <source>Drop Database</source>
         <translation>删除电影数据库</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="29"/>
+        <location filename="../Actions/DataBaseActions.h" line="23"/>
         <source>Drop Table</source>
         <translation>删除电影收录表</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="30"/>
+        <location filename="../Actions/DataBaseActions.h" line="24"/>
         <source>Insert into</source>
         <translation>插入记录</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="31"/>
+        <location filename="../Actions/DataBaseActions.h" line="25"/>
         <source>Delete from</source>
         <translation>删除记录</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="32"/>
+        <location filename="../Actions/DataBaseActions.h" line="26"/>
         <source>Union</source>
         <translation>联表查询</translation>
     </message>
@@ -197,12 +189,12 @@
         <translation type="vanished">电影窗体</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.cpp" line="40"/>
+        <location filename="../Actions/DataBaseActions.cpp" line="48"/>
         <source>COUNT</source>
         <translation>计数</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.cpp" line="43"/>
+        <location filename="../Actions/DataBaseActions.cpp" line="51"/>
         <source>SUM</source>
         <translation>求和</translation>
     </message>
@@ -227,12 +219,12 @@
         <translation type="vanished">复制全路径</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="34"/>
+        <location filename="../Actions/DataBaseActions.h" line="28"/>
         <source>Delete by driver</source>
         <translation>按驱动删除</translation>
     </message>
     <message>
-        <location filename="../Actions/DataBaseActions.h" line="35"/>
+        <location filename="../Actions/DataBaseActions.h" line="29"/>
         <source>Delete by prepath</source>
         <translation>按前置路径删除</translation>
     </message>
@@ -248,168 +240,137 @@
 <context>
     <name>FileBasicOperationsActions</name>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="15"/>
         <source>Reveal in explorer</source>
-        <translation>在资源管理器中显示</translation>
+        <translation type="vanished">在资源管理器中显示</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="16"/>
         <source>Open in terminal</source>
-        <translation>在终端中打开</translation>
+        <translation type="vanished">在终端中打开</translation>
     </message>
     <message>
         <source>Copy full records</source>
         <translation type="vanished">拷贝整行</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="89"/>
         <source>Name Ruler</source>
-        <translation>命名之尺</translation>
+        <translation type="vanished">命名之尺</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="90"/>
         <source>Categorizer</source>
-        <translation>电影文件分类器</translation>
+        <translation type="vanished">电影文件分类器</translation>
     </message>
     <message>
         <source>Organizer</source>
         <translation type="vanished">组织器</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="91"/>
         <source>Deduplicator</source>
-        <translation>去重器</translation>
+        <translation type="vanished">去重器</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="92"/>
         <source>Rmv Redundancy</source>
         <translatorcomment>仅有一个文件或没有文件的文件夹定义为冗余文件夹</translatorcomment>
-        <translation>去除冗余文件夹</translation>
+        <translation type="vanished">去除冗余文件夹</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="93"/>
         <source>Rmv Empty</source>
-        <translation>去除空文件夹</translation>
+        <translation type="vanished">去除空文件夹</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="42"/>
         <source>Recycle</source>
-        <translation>回收</translation>
+        <translation type="vanished">回收</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="43"/>
         <source>Delete permanently</source>
-        <translation>永久删除</translation>
+        <translation type="vanished">永久删除</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="35"/>
         <source>Move to</source>
-        <translation>移动到</translation>
+        <translation type="vanished">移动到</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="36"/>
         <source>Copy to</source>
-        <translation>复制到</translation>
+        <translation type="vanished">复制到</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="50"/>
         <source>Cut</source>
-        <translation>剪切</translation>
+        <translation type="vanished">剪切</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="51"/>
         <source>Copy</source>
-        <translation>复制</translation>
+        <translation type="vanished">复制</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="52"/>
         <source>Paste</source>
-        <translation>粘贴</translation>
+        <translation type="vanished">粘贴</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="46"/>
         <source>Undo</source>
-        <translation>撤销</translation>
+        <translation type="vanished">撤销</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="47"/>
         <source>Redo</source>
-        <translation>重做</translation>
+        <translation type="vanished">重做</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="55"/>
         <source>Merged to front</source>
-        <translation>合并到前者中</translation>
+        <translation type="vanished">合并到前者中</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="56"/>
         <source>Merge to back</source>
-        <translation>合并到后者中</translation>
+        <translation type="vanished">合并到后者中</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="59"/>
         <source>Select all</source>
-        <translation>全选</translation>
+        <translation type="vanished">全选</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="60"/>
         <source>Select none</source>
-        <translation>空选</translation>
+        <translation type="vanished">空选</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="61"/>
         <source>Invert selection</source>
-        <translation>反选</translation>
+        <translation type="vanished">反选</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="19"/>
         <source>Copy fullpath</source>
-        <translation>拷贝全路径</translation>
+        <translation type="vanished">拷贝全路径</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="20"/>
         <source>Copy path</source>
-        <translation>拷贝前置路径</translation>
+        <translation type="vanished">拷贝前置路径</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="21"/>
         <source>Copy name</source>
-        <translation>拷贝名称</translation>
+        <translation type="vanished">拷贝名称</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="23"/>
         <source>Copy the path</source>
-        <translation>拷贝拼接路径</translation>
+        <translation type="vanished">拷贝拼接路径</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="24"/>
         <source>Copy records</source>
-        <translation>拷贝记录</translation>
+        <translation type="vanished">拷贝记录</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="26"/>
         <source>New folder</source>
-        <translation>新建文件夹</translation>
+        <translation type="vanished">新建文件夹</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="28"/>
         <source>New text</source>
-        <translation>新建文本文档</translation>
+        <translation type="vanished">新建文本文档</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="29"/>
         <source>New json</source>
-        <translation>新建Json文件</translation>
+        <translation type="vanished">新建Json文件</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="30"/>
         <source>New Files</source>
-        <translation>批量新建文件</translation>
+        <translation type="vanished">批量新建文件</translation>
     </message>
     <message>
-        <location filename="../Actions/FileBasicOperationsActions.h" line="32"/>
         <source>New Folders</source>
-        <translation>批量新建文件夹</translation>
+        <translation type="vanished">批量新建文件夹</translation>
     </message>
     <message>
         <source>Merge into first folder</source>
@@ -427,28 +388,24 @@
 <context>
     <name>FileLeafActions</name>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="6"/>
         <source>Logs</source>
-        <translation>日志</translation>
+        <translation type="vanished">日志</translation>
     </message>
     <message>
         <source>Settings</source>
         <translation type="vanished">设置</translation>
     </message>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="7"/>
         <source>Alerts</source>
-        <translation>告警</translation>
+        <translation type="vanished">告警</translation>
     </message>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="8"/>
         <source>About</source>
-        <translation>关于</translation>
+        <translation type="vanished">关于</translation>
     </message>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="9"/>
         <source>Language</source>
-        <translation>语言</translation>
+        <translation type="vanished">语言</translation>
     </message>
 </context>
 <context>
@@ -703,9 +660,8 @@
 <context>
     <name>LogView</name>
     <message>
-        <location filename="../View/LogView.cpp" line="34"/>
         <source>Log View</source>
-        <translation>日志视图</translation>
+        <translation type="vanished">日志视图</translation>
     </message>
 </context>
 <context>
@@ -1325,27 +1281,27 @@
         <translation type="vanished">内置播放器</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="19"/>
+        <location filename="../Actions/ViewActions.cpp" line="19"/>
         <source>Navigation Pane</source>
         <translation>导航面板</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="20"/>
+        <location filename="../Actions/ViewActions.cpp" line="20"/>
         <source>Folder Preview</source>
         <translation>文件夹预览</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="21"/>
+        <location filename="../Actions/ViewActions.cpp" line="21"/>
         <source>Json Editor</source>
         <translation>Json编辑器</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="22"/>
+        <location filename="../Actions/ViewActions.cpp" line="22"/>
         <source>Embedded Player</source>
         <translation>内置播放器</translation>
     </message>
     <message>
-        <location filename="../Actions/ViewActions.h" line="24"/>
+        <location filename="../Actions/ViewActions.cpp" line="24"/>
         <source>Play</source>
         <translation>播放</translation>
     </message>
