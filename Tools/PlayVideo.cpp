@@ -1,6 +1,12 @@
 #include "PlayVideo.h"
-
-PlayVideo::PlayVideo() {}
+#include "PublicVariable.h"
+#include <QDesktopServices>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QProcess>
+#include <QString>
+#include <QUrl>
 
 bool PlayADir(const QString& dirPath) {
   //    if (not NRF.isAvail("VideoPlayer")){
@@ -21,7 +27,7 @@ bool PlayADir(const QString& dirPath) {
 #endif
 }
 
-bool on_ShiftEnterPlayVideo(QString& path) {
+bool on_ShiftEnterPlayVideo(const QString& path) {
   if (not QFile::exists(path)) {
     return false;
   }
