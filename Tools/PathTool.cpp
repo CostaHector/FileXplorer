@@ -115,6 +115,21 @@ std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
   return {};
 }
 
+QString PATHTOOL::GetBaseName(const QString& fullpath) {
+  int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
+  if (lastIndexOfSlash == -1) {
+    lastIndexOfSlash = -1;
+  }
+  int lastIndexOfExtDot = fullpath.lastIndexOf('.');
+  if (lastIndexOfExtDot + 5 < fullpath.size()) {  // N - index(dot) > 5=len(".json")
+    return fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1);
+  }
+  if (lastIndexOfExtDot != -1 && lastIndexOfSlash < lastIndexOfExtDot) {
+    return fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1);
+  }
+  return {};
+}
+
 QString PATHTOOL::join(const QString& prefix, const QString& relative) {
   if (prefix.isEmpty()) {
     return relative;

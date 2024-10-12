@@ -1,4 +1,5 @@
 #include "ScenesTableModel.h"
+#include "Tools/PathTool.h"
 #include "public/DisplayEnhancement.h"
 #include <QObject>
 #include <QPixmap>
@@ -97,8 +98,19 @@ QString ScenesTableModel::fileName(const QModelIndex& index) const {
     qDebug("vidName is empty");
     return {};
   }
-  qDebug("fileName of img in mp4 not find");
   return mCurBegin[linearInd].vidName;
+}
+
+QString ScenesTableModel::baseName(const QModelIndex& index) const {
+  int linearInd{-1};
+  if (!isIndexValid(index, &linearInd)) {
+    return {};
+  }
+  if (mCurBegin[linearInd].vidName.isEmpty()) {
+    qDebug("vidName is empty");
+    return {};
+  }
+  return PATHTOOL::GetBaseName(mCurBegin[linearInd].vidName);
 }
 
 QString ScenesTableModel::absolutePath(const QModelIndex& index) const {
