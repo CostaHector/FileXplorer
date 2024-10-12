@@ -4,7 +4,6 @@
 #include <QHeaderView>
 #include <QMessageBox>
 
-
 class AlignDelegate : public QStyledItemDelegate {
  public:
   void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override {
@@ -21,11 +20,6 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
   }
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
 
-  horizontalHeader()->setDefaultSectionSize(600 * 3 / 4);
-  horizontalHeader()->setVisible(true);
-  verticalHeader()->setDefaultSectionSize(337 * 3 / 4 + 50);
-  horizontalHeader()->setStretchLastSection(true);
-
   mAlignDelegate = new AlignDelegate;
   setItemDelegate(mAlignDelegate);
 
@@ -35,7 +29,7 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
 }
 
 void SceneTableView::setRootPath(const QString& rootPath) {
-  if (rootPath.count('/') < 2) { // large folder
+  if (rootPath.count('/') < 2) {  // large folder
     qDebug("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
     const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath,
                                           QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
@@ -45,10 +39,11 @@ void SceneTableView::setRootPath(const QString& rootPath) {
     }
   }
   _sceneModel->setRootPath(rootPath);
+  //  resizeRowsToContents();
   qDebug("setRootPath[%s]", qPrintable(rootPath));
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 #include <QMainWindow>
