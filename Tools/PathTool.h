@@ -38,6 +38,7 @@ QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileName
 // Get "baseName, extension with prefix dot" from fullpath
 // a.txt => ("a", ".txt")
 std::pair<QString, QString> GetBaseNameExt(const QString& fullpath);
+QString GetBaseName(const QString& fullpath);
 
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);

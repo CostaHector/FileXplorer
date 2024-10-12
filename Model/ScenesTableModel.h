@@ -39,6 +39,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
   QFileInfo fileInfo(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
+  QString baseName(const QModelIndex& index) const;
   QString absolutePath(const QModelIndex& index) const;
   bool setRootPath(const QString& rootPath, const bool bForce = false);
   QString rootPath() const { return mRootPath; }
