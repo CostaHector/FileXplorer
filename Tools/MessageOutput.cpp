@@ -8,9 +8,9 @@ QTextStream MessageOutput::ts(&outFile);
 
 MessageOutput::MessageOutput() {
 #ifdef _WIN32
-  QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
+  const QString& logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
 #else
-  QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
+  const QString& logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
 #endif
   outFile.setFileName(QString("%1/logs_info.log").arg(logPrePath));
   const QByteArray envVar = qgetenv("QTDIR");
@@ -22,7 +22,7 @@ MessageOutput::MessageOutput() {
 }
 
 void MessageOutput::myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
-  static const QChar DBG_TYPE_2_CHAR[QtInfoMsg + 1] = {'D', 'I', 'W', 'C', 'F'};
+  static const QChar DBG_TYPE_2_CHAR[QtInfoMsg + 1] = {'D', 'W', 'C', 'F', 'I'};
   static QString logMsg;
   logMsg.reserve(300);
   logMsg.clear();
