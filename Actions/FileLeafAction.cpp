@@ -3,17 +3,18 @@
 
 FileLeafActions::FileLeafActions(QObject* parent)
     : QObject(parent),
-      _LOGGING{new QAction{QIcon(":/themes/FLOW_LOGS"), tr("Logs")}},
-      _ALERT_ITEMS{new QAction(QIcon(":/themes/SETTINGS"), tr("Alerts"))},
-      _ABOUT_FILE_EXPLORER{new QAction(QIcon(":/themes/ABOUT"), tr("About"))},
-      _LANUAGE(new QAction(QIcon(":/themes/LANGUAGE"), tr("Language"))),
+      _LOGGING{new QAction{QIcon(":/themes/FLOW_LOGS"), "Logs"}},
+      _ALERT_ITEMS{new QAction(QIcon(":/themes/SETTINGS"), "Alerts")},
+      _ABOUT_FILE_EXPLORER{new QAction(QIcon(":/themes/ABOUT"), "About")},
+      _LANUAGE(new QAction(QIcon(":/themes/LANGUAGE"), "Language")),
       LEAF_FILE(GetLeafTabActions()) {}
 
 QActionGroup* FileLeafActions::GetLeafTabActions() {
   LEAF_FILE = new QActionGroup(nullptr);
 
-  _LOGGING->setCheckable(true);
+  _LOGGING->setCheckable(false);
   _LOGGING->setShortcutVisibleInContextMenu(true);
+  _LOGGING->setToolTip(QString("<b>%1 (%2)</b><br/> Show log files.").arg(_LOGGING->text(), _LOGGING->shortcut().toString()));
 
   _ALERT_ITEMS->setCheckable(true);
   _ALERT_ITEMS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
