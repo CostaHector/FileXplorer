@@ -12,8 +12,10 @@ class SceneTableView : public CustomTableView {
   void setRootPath(const QString& rootPath);
   void subscribe();
   void onCopyBaseName();
+  void onOpenCorrespondingFolder();
  private:
   QAction* COPY_BASENAME_FROM_SCENE{nullptr};
+  QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
   QMenu* m_menu{nullptr};
   ScenesTableModel* _sceneModel;
   QStyledItemDelegate* mAlignDelegate{nullptr};
