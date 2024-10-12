@@ -37,7 +37,7 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
 
 void SceneTableView::onCopyBaseName() {
   const QModelIndex& curInd = currentIndex();
-  const QString& copiedStr = _sceneModel->fileName(curInd);
+  const QString& copiedStr = _sceneModel->baseName(curInd);
   auto* cb = QApplication::clipboard();
   cb->setText(copiedStr, QClipboard::Mode::Clipboard);
   qDebug("user copied str: [%s]", qPrintable(copiedStr));
