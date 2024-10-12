@@ -203,6 +203,10 @@
         <file alias="FOLDER_PREVIEW_LISTS">View/FOLDER_PREVIEW_LISTS.svg</file>
         <file alias="SCENE_TABLE_VIEW">View/SCENE_TABLE_VIEW.svg</file>
         <file alias="COMBINE_MEDIAS_INFO">View/COMBINE_MEDIAS_INFO.svg</file>
+        <file alias="DEFAULT_COLUMN_WIDTH">View/DEFAULT_COLUMN_WIDTH.svg</file>
+        <file alias="DEFAULT_ROW_HEIGHT">View/DEFAULT_ROW_HEIGHT.svg</file>
+        <file alias="RESIZE_COLUMN_TO_CONTENTS">View/RESIZE_COLUMN_TO_CONTENTS.svg</file>
+        <file alias="RESIZE_ROW_TO_CONTENTS">View/RESIZE_ROW_TO_CONTENTS.svg</file>
 
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
         <file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
