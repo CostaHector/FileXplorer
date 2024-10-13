@@ -68,7 +68,7 @@ LongPathFolderRenamer::LongPathFolderRenamer(QWidget* parent) : QDialog{parent},
   Subscribe();
 
   setWindowTitle(windowTitleFormat);
-  setWindowIcon(QIcon(":/themes/LONG_PATH_FINDER"));
+  setWindowIcon(QIcon(":img/LONG_PATH_FINDER"));
   ReadSettings();
 }
 

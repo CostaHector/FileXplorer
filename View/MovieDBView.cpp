@@ -496,7 +496,7 @@ int MovieDBView::onCountRow() {
 //     this->addToolBar(Qt::ToolBarArea::TopToolBarArea, m_databaseTB);
 //     this->setCentralWidget(m_dbPanel);
 //     this->setWindowTitle("QTableView Example");
-//     this->setWindowIcon(QIcon(":/themes/SHOW_DATABASE"));
+//     this->setWindowIcon(QIcon(":img/SHOW_DATABASE"));
 //   }
 //   QSize sizeHint() const override { return QSize(1400, 768); }
 // };

@@ -1,9 +1,9 @@
 #include "AddressBarActions.h"
 
 AddressBarActions::AddressBarActions(QObject* parent) : QObject{parent} {
-  _BACK_TO = new QAction{QIcon(":/themes/PATH_BACK_TO"), tr("back to")};
-  _FORWARD_TO = new QAction{QIcon(":/themes/PATH_FORWARD_TO"), tr("forward to")};
-  _UP_TO = new QAction{QIcon(":/themes/PATH_UP_TO"), tr("up to")};
+  _BACK_TO = new QAction{QIcon(":img/PATH_BACK_TO"), tr("back to")};
+  _FORWARD_TO = new QAction{QIcon(":img/PATH_FORWARD_TO"), tr("forward to")};
+  _UP_TO = new QAction{QIcon(":img/PATH_UP_TO"), tr("up to")};
   ADDRESS_CONTROLS = GetAddressBarActions();
 
   _LAST_FOLDER = new QAction{QIcon(""), "^"};

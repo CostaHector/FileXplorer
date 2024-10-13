@@ -3,10 +3,10 @@
 
 FileLeafActions::FileLeafActions(QObject* parent)
     : QObject(parent),
-      _LOGGING{new QAction{QIcon(":/themes/FLOW_LOGS"), "Logs"}},
-      _ALERT_ITEMS{new QAction(QIcon(":/themes/SETTINGS"), "Alerts")},
-      _ABOUT_FILE_EXPLORER{new QAction(QIcon(":/themes/ABOUT"), "About")},
-      _LANUAGE(new QAction(QIcon(":/themes/LANGUAGE"), "Language")),
+      _LOGGING{new QAction{QIcon(":img/FLOW_LOGS"), "Logs"}},
+      _ALERT_ITEMS{new QAction(QIcon(":img/SETTINGS"), "Alerts")},
+      _ABOUT_FILE_EXPLORER{new QAction(QIcon(":img/ABOUT"), "About")},
+      _LANUAGE(new QAction(QIcon(":img/LANGUAGE"), "Language")),
       LEAF_FILE(GetLeafTabActions()) {}
 
 QActionGroup* FileLeafActions::GetLeafTabActions() {

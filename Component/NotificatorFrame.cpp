@@ -24,11 +24,11 @@ constexpr int DISPLAY_NOTIFICATION_DIRECTION_TOP_TO_BOTTOM = false;
 using namespace NOTIFICATOR_SETTING;
 
 void Notificator::goodNews(const QString& title, const QString& message) {
-  showMessage(QIcon(":/themes/PASS"), title, message);
+  showMessage(QIcon(":img/PASS"), title, message);
 }
 
 void Notificator::badNews(const QString& title, const QString& message) {
-  showMessage(QIcon(":/themes/FAILED"), title, message);
+  showMessage(QIcon(":img/FAILED"), title, message);
 }
 
 void Notificator::critical(const QString& title, const QString& message) {

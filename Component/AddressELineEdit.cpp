@@ -226,7 +226,7 @@ class TestAddressELineEdit : public QWidget {
     QLineEdit* searchLe = new QLineEdit("Search here");
     searchLe->setClearButtonEnabled(true);
 
-    searchLe->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+    searchLe->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
     searchLe->setPlaceholderText("Search...");
 
     QHBoxLayout* lo = new QHBoxLayout;

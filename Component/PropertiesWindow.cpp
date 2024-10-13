@@ -25,7 +25,7 @@ PropertiesWindow::PropertiesWindow(QWidget* parent) : QDialog{parent} {
 
   subscribe();
   setWindowFlags(Qt::Window);  // show maximize, minimize button at title bar
-  setWindowIcon(QIcon(":/themes/PROPERTIES"));
+  setWindowIcon(QIcon(":img/PROPERTIES"));
 
   ReadSetting();
 }
