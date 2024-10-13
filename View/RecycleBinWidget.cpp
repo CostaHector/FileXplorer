@@ -95,12 +95,12 @@ RecycleBinWidget::RecycleBinWidget(QWidget* parent)
 
 void RecycleBinWidget::ChangeWindowIcon() {
   if (m_model->rowCount() == 0) {
-    g_recycleBinAg().RECYLE_BIN_WIDGET->setIcon(QIcon(":/themes/CLEAN_STATUS"));
-    setWindowIcon(QIcon(":/themes/CLEAN_STATUS"));
+    g_recycleBinAg().RECYLE_BIN_WIDGET->setIcon(QIcon(":img/CLEAN_STATUS"));
+    setWindowIcon(QIcon(":img/CLEAN_STATUS"));
     return;
   }
-  g_recycleBinAg().RECYLE_BIN_WIDGET->setIcon(QIcon(":/themes/DIRTY_STATUS"));
-  setWindowIcon(QIcon(":/themes/DIRTY_STATUS"));
+  g_recycleBinAg().RECYLE_BIN_WIDGET->setIcon(QIcon(":img/DIRTY_STATUS"));
+  setWindowIcon(QIcon(":img/DIRTY_STATUS"));
 }
 
 void RecycleBinWidget::closeEvent(QCloseEvent* event) {

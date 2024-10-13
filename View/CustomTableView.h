@@ -5,7 +5,6 @@
 #include <QMenu>
 #include <QTableView>
 class CustomTableView : public QTableView {
-  Q_OBJECT
  public:
   explicit CustomTableView(const QString& name, QWidget* parent = nullptr);
 
@@ -33,9 +32,16 @@ class CustomTableView : public QTableView {
   bool onHideThisColumn();
 
   void onStretchLastSection(const bool checked);
-  void onResizeRowToContents(const bool checked);
 
-  void onResizeRowDefaultSectionSize();
+  void onResizeRowToContents(const bool checked);
+  void onResizeColumnToContents(const bool checked);
+
+  void onHorizontalHeaderMenuRequest(const QPoint& pnt);
+  void onVerticalHeaderMenuRequest(const QPoint& pnt);
+
+  void onSetRowMaxHeight();
+  void onSetRowDefaultSectionSize();
+  void onSetColumnDefaultSectionSize();
 
   void onShowVerticalHeader(bool showChecked);
   void onSortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
@@ -43,27 +49,34 @@ class CustomTableView : public QTableView {
 
   void InitTableView();
 
- private:
-  QAction* COLUMNS_VISIBILITY = new QAction(tr("Column title visibility"), this);
-  QAction* HIDE_THIS_COLUMN = new QAction(tr("hide this column"), this);
-  QAction* SHOW_ALL_COLUMNS = new QAction(tr("show all columns"), this);
-  QAction* STRETCH_DETAIL_SECTION = new QAction(tr("stretch last column"), this);
-  QAction* ENABLE_COLUMN_SORT = new QAction(tr("enable column sort"), this);
+  void SubscribeHeaderActions();
 
-  QAction* SHOW_VERTICAL_HEADER = new QAction(tr("show vertical header"), this);
-  QAction* RESIZE_ROWS_TO_CONTENT = new QAction(tr("resize rows to content"), this);
-  QAction* RESIZE_ROWS_DEFAULT_SECTION_SIZE = new QAction(tr("adjust default rows section size"), this);
+ private:
+  QAction* COLUMNS_VISIBILITY = new QAction("column title visibility", this);
+  QAction* HIDE_THIS_COLUMN = new QAction("hide this column", this);
+  QAction* SHOW_ALL_COLUMNS = new QAction("show all columns", this);
+  QAction* STRETCH_DETAIL_SECTION = new QAction("stretch last column", this);
+  QAction* ENABLE_COLUMN_SORT = new QAction("enable column sort", this);
+  QAction* RESIZE_COLUMN_TO_CONTENTS = new QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), "resize cols to content", this);
+  QAction* SET_COLS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":img/DEFAULT_COLUMN_WIDTH"), "set default cols section size", this);
+
+  QAction* SHOW_VERTICAL_HEADER = new QAction("show vertical header", this);
+  QAction* RESIZE_ROW_TO_CONTENTS = new QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), "resize rows to content", this);
+  QAction* SET_ROWS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":img/DEFAULT_ROW_HEIGHT"), "set default rows section size", this);
+  QAction* SET_MAX_ROWS_SECTION_SIZE = new QAction("set max row section size", this);
 
   int m_horizontalHeaderSectionClicked = -1;
   QString m_name;
   QString m_columnVisibiltyKey;
   QString m_stretchLastSectionKey;
-  QString m_defaultSectionSizeKey;
+  const QString m_DEFAULT_SECTION_SIZE_KEY;
+  const QString m_DEFAULT_COLUMN_SECTION_SIZE_KEY;
   QString m_horizontalHeaderStateKey;
   QString m_showVerticalHeaderKey;
   QString m_sortByColumnSwitchKey;
 
   int m_defaultTableRowHeight;
+  int m_defaultTableColumnWidth;
 
   QString m_horHeaderTitles;
   bool m_horHeaderTitlesInit = false;
