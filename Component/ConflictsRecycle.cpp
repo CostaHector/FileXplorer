@@ -33,7 +33,7 @@ ConflictsRecycle::ConflictsRecycle(const ConflictsItemHelper& itemIF_, QWidget* 
                      .arg(itemIF.commonList.size())
                      .arg(itemIF.m_fromPathItems.size())
                      .arg(CCMMode2QString.value(itemIF_.m_mode, "unknown")));
-  setWindowIcon(QIcon(":/themes/CONFLICT"));
+  setWindowIcon(QIcon(":img/CONFLICT"));
 }
 
 void ConflictsRecycle::ReadSettings() {

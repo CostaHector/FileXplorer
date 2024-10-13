@@ -15,10 +15,10 @@ MD5Window::MD5Window(const QString& root, const QStringList& items, QWidget* par
       m_md5FileName(QFileInfo(m_root).fileName() + ".md5"),
       m_md5TextEdit(new QPlainTextEdit(this)),
       m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Orientation::Horizontal, this)),
-      m_incrementRefresh(new QAction(QIcon(":/themes/INCREMENTAL_CALCULATE"), tr("Incremental Calc"), this)),
+      m_incrementRefresh(new QAction(QIcon(":img/INCREMENTAL_CALCULATE"), tr("Incremental Calc"), this)),
       m_reloadFromFile(new QAction(tr("Reload"), this)),
       m_dumpMD5IntoFile(new QAction(tr("Dump"), this)),
-      m_fullRefresh(new QAction(QIcon(":/themes/FULL_CALCULATE"), tr("Full Calc"), this)),
+      m_fullRefresh(new QAction(QIcon(":img/FULL_CALCULATE"), tr("Full Calc"), this)),
       m_md5InfoTB(new QToolBar("Extra Info", this)) {
   m_md5TextEdit->setReadOnly(true);
   m_md5TextEdit->setFont(QFont("Consolas"));
@@ -45,7 +45,7 @@ MD5Window::MD5Window(const QString& root, const QStringList& items, QWidget* par
 
   subscribe();
   setWindowTitle(QString("MD5 | Direct: %1 item(s) | %2").arg(items.size()).arg(m_root));
-  setWindowIcon(QIcon(":/themes/MD5_FILE_IDENTIFIER_PATH"));
+  setWindowIcon(QIcon(":img/MD5_FILE_IDENTIFIER_PATH"));
 
   onLoadFromMD5Files();
 }

@@ -6,7 +6,7 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
     : QToolBar(title, parent), m_tables(new QComboBox), m_searchLE(new QLineEdit), m_searchCB(new QComboBox) {
   m_tables->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
 
-  m_searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+  m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
 
   m_searchCB->setLineEdit(m_searchLE);

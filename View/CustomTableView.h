@@ -57,12 +57,12 @@ class CustomTableView : public QTableView {
   QAction* SHOW_ALL_COLUMNS = new QAction("show all columns", this);
   QAction* STRETCH_DETAIL_SECTION = new QAction("stretch last column", this);
   QAction* ENABLE_COLUMN_SORT = new QAction("enable column sort", this);
-  QAction* RESIZE_COLUMN_TO_CONTENTS = new QAction(QIcon(":/themes/RESIZE_COLUMN_TO_CONTENTS"), "resize cols to content", this);
-  QAction* SET_COLS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":/themes/DEFAULT_COLUMN_WIDTH"), "set default cols section size", this);
+  QAction* RESIZE_COLUMN_TO_CONTENTS = new QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), "resize cols to content", this);
+  QAction* SET_COLS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":img/DEFAULT_COLUMN_WIDTH"), "set default cols section size", this);
 
   QAction* SHOW_VERTICAL_HEADER = new QAction("show vertical header", this);
-  QAction* RESIZE_ROW_TO_CONTENTS = new QAction(QIcon(":/themes/RESIZE_ROW_TO_CONTENTS"), "resize rows to content", this);
-  QAction* SET_ROWS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":/themes/DEFAULT_ROW_HEIGHT"), "set default rows section size", this);
+  QAction* RESIZE_ROW_TO_CONTENTS = new QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), "resize rows to content", this);
+  QAction* SET_ROWS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":img/DEFAULT_ROW_HEIGHT"), "set default rows section size", this);
   QAction* SET_MAX_ROWS_SECTION_SIZE = new QAction("set max row section size", this);
 
   int m_horizontalHeaderSectionClicked = -1;
