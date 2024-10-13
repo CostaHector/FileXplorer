@@ -124,4 +124,4 @@ DISTFILES += \
     readme.md
 
 RESOURCES += \
-    themes/res.qrc
+    bin/themes/res.qrc
