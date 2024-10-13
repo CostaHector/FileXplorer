@@ -88,7 +88,7 @@ Archiver::Archiver(QWidget* parent)
 
   UpdateWindowsSize();
   setWindowTitle("QZ Archive");
-  setWindowIcon(QIcon(":/themes/COMPRESS_ITEM"));
+  setWindowIcon(QIcon(":img/COMPRESS_ITEM"));
 }
 
 void Archiver::ChangeWindowTitle(const QString& name, const int& Bytes) {

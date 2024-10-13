@@ -57,7 +57,7 @@ QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
   m_tb->addWidget(new QLabel{"Filter:", m_tb});
   if (tblKWFilter == nullptr) {
     tblKWFilter = new QLineEdit{"", m_tb};
-    tblKWFilter->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+    tblKWFilter->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   }
   m_tb->addWidget(tblKWFilter);
   m_tb->addSeparator();

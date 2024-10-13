@@ -17,8 +17,8 @@ class SyncFileSystemModificationActions : public QObject {
 
   QLineEdit* _BASIC_PATH{nullptr};
   QLineEdit* _SYNC_TO_PATH{nullptr};
-  QAction* _SYNC_MOD_SWITCH{new QAction(QIcon(":/themes/SYNC_MODIFICATION_SWITCH"), "Sync", this)};
-  QAction* _SYNC_REVERSE_SWITCH{new QAction(QIcon(":/themes/SYNC_REVERSE_SWITCH"), "reverse back", this)};
+  QAction* _SYNC_MOD_SWITCH{new QAction(QIcon(":img/SYNC_MODIFICATION_SWITCH"), "Sync", this)};
+  QAction* _SYNC_REVERSE_SWITCH{new QAction(QIcon(":img/SYNC_REVERSE_SWITCH"), "reverse back", this)};
 };
 
 SyncFileSystemModificationActions& g_syncFileSystemModificationActions();

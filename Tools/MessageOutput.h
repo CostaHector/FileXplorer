@@ -9,13 +9,17 @@ class MessageOutput {
  public:
   MessageOutput();
   static void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
-  static void flush() {
-    if (ts.device() != nullptr)
+  static inline void ManualFlush() {
+#ifdef QT_DEBUG
+    fflush(stdout);
+#else
+    if (ts.device() != nullptr) {
       ts.flush();
+    }
+#endif
   }
 
  private:
-  static bool IS_LOG_TO_FILE;
   static bool IS_LOG_TO_FILE_AVAIL;
   static QFile outFile;
   static QTextStream ts;

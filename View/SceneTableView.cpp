@@ -1,9 +1,11 @@
 #include "SceneTableView.h"
 #include "Model/ScenesTableModel.h"
+#include "Tools/PlayVideo.h"
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
-
+#include <QApplication>
+#include <QClipboard>
 
 class AlignDelegate : public QStyledItemDelegate {
  public:
@@ -21,21 +23,43 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
   }
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
 
-  horizontalHeader()->setDefaultSectionSize(600 * 3 / 4);
-  horizontalHeader()->setVisible(true);
-  verticalHeader()->setDefaultSectionSize(337 * 3 / 4 + 50);
-  horizontalHeader()->setStretchLastSection(true);
-
   mAlignDelegate = new AlignDelegate;
   setItemDelegate(mAlignDelegate);
 
+  m_menu = new QMenu{"scene table view menu", this};
+  COPY_BASENAME_FROM_SCENE = new QAction("copy basename", m_menu);
+  OPEN_CORRESPONDING_FOLDER = new QAction("play this folder", m_menu);
+  m_menu->addAction(COPY_BASENAME_FROM_SCENE);
+  m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
+  BindMenu(m_menu);
   //  BindMenu(g_performersManagerActions().GetRightClickMenu());
   //  AppendVerticalHeaderMenuAGS(g_performersManagerActions().GetVerAGS());
   //  AppendHorizontalHeaderMenuAGS(g_performersManagerActions().GetHorAGS());
+  subscribe();
+}
+
+void SceneTableView::onCopyBaseName() {
+  const QModelIndex& curInd = currentIndex();
+  const QString& copiedStr = _sceneModel->baseName(curInd);
+  auto* cb = QApplication::clipboard();
+  cb->setText(copiedStr, QClipboard::Mode::Clipboard);
+  qDebug("user copied str: [%s]", qPrintable(copiedStr));
+}
+
+void SceneTableView::onOpenCorrespondingFolder() {
+  const QModelIndex& curInd = currentIndex();
+  const QString& scenePath = _sceneModel->absolutePath(curInd);
+  on_ShiftEnterPlayVideo(scenePath);
+  qDebug("Play path: [%s]", qPrintable(scenePath));
+}
+
+void SceneTableView::subscribe() {
+  connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneTableView::onCopyBaseName);
+  connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneTableView::onOpenCorrespondingFolder);
 }
 
 void SceneTableView::setRootPath(const QString& rootPath) {
-  if (rootPath.count('/') < 2) { // large folder
+  if (rootPath.count('/') < 2) {  // large folder
     qDebug("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
     const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath,
                                           QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
@@ -45,10 +69,11 @@ void SceneTableView::setRootPath(const QString& rootPath) {
     }
   }
   _sceneModel->setRootPath(rootPath);
+  //  resizeRowsToContents();
   qDebug("setRootPath[%s]", qPrintable(rootPath));
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 #include <QMainWindow>
