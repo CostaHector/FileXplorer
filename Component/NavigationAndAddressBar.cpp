@@ -9,7 +9,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   m_addressLine->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
   m_searchLE->setPlaceholderText("Wild card supported. e.g., *Abc*");
-  m_searchLE->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+  m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
   m_searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   m_searchLE->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
