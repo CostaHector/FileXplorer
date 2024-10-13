@@ -56,7 +56,7 @@ PerformersWidget::PerformersWidget(QWidget* parent)
   readSettings();
   m_performersListView->InitTableView();
   setWindowTitle("Performers Manager Widget");
-  setWindowIcon(QIcon(":/themes/PERFORMERS_MANAGER"));
+  setWindowIcon(QIcon(":img/PERFORMERS_MANAGER"));
 }
 
 void PerformersWidget::subscribe() {

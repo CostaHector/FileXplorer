@@ -126,5 +126,5 @@ void CatergorizerTest::test_imgsVidsIsolatedExistedFolder() {
   QCOMPARE(theFirstItems, theLastItems);
 }
 
-QTEST_MAIN(CatergorizerTest)
+//QTEST_MAIN(CatergorizerTest)
 #include "CatergorizerTest.moc"

@@ -101,18 +101,25 @@ QString PATHTOOL::RelativePath2File(int rootPathLen, const QString& fullPath, in
 }
 
 std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
-  int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
-  if (lastIndexOfSlash == -1) {
-    lastIndexOfSlash = -1;
+  const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
+  const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
+  // like "C:/.a/b"
+  // like "C:/a/any.no_extension"
+  // like "C:/a/any file"
+  // index(dot) + 5 <= size()
+  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + 5 < fullpath.size()) {
+    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1), "");
   }
-  int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  if (lastIndexOfExtDot + 5 < fullpath.size()) {  // N - index(dot) > 5=len(".json")
-    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), "");
+  return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), fullpath.mid(lastIndexOfExtDot));
+}
+
+QString PATHTOOL::GetBaseName(const QString& fullpath) {
+  const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
+  const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
+  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + 5 < fullpath.size()) {
+    return fullpath.mid(lastIndexOfSlash + 1);
   }
-  if (lastIndexOfExtDot != -1 && lastIndexOfSlash < lastIndexOfExtDot) {
-    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), fullpath.mid(lastIndexOfExtDot));
-  }
-  return {};
+  return fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1);
 }
 
 QString PATHTOOL::join(const QString& prefix, const QString& relative) {

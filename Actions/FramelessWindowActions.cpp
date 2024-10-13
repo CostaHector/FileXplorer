@@ -4,8 +4,8 @@
 
 FramelessWindowActions::FramelessWindowActions(QObject* parent)
     : QObject{parent},
-      _EXPAND_RIBBONS{new QAction(QIcon(":/themes/EXPAND_RIBBON"), tr("Expand or Hide Commands"), this)},
-      _FRAMELESS{new QAction(QIcon(":/themes/FRAMELESS_WINDOW"), tr("Frameless Window"), this)},
+      _EXPAND_RIBBONS{new QAction(QIcon(":img/EXPAND_RIBBON"), tr("Expand or Hide Commands"), this)},
+      _FRAMELESS{new QAction(QIcon(":img/FRAMELESS_WINDOW"), tr("Frameless Window"), this)},
       _MINIMIZE{new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMinButton), "Minimize Window", this)},
       _MAXIMIZE{new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMaxButton), "Maximize/Normalize window", this)},
       _CLOSE{new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton), "X", this)},

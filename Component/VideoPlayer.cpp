@@ -75,7 +75,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   subscribe();
   m_watcher = new VideoPlayerWatcher(this, m_videoWidget, m_playListWid);
 
-  setWindowIcon(QIcon(":/themes/VIDEO_PLAYER"));
+  setWindowIcon(QIcon(":img/VIDEO_PLAYER"));
   updateWindowsSize();
 }
 
@@ -162,9 +162,9 @@ void VideoPlayer::onVolumeMute(const bool isMute) {
   m_mediaPlayer->setMuted(isMute);
   PreferenceSettings().setValue(MemoryKey::VIDEO_PLAYER_MUTE.name, isMute);
   if (isMute) {
-    g_videoPlayerActions()._VOLUME_CTRL_MUTE->setIcon(QIcon(":/themes/VOLUME_MUTE"));
+    g_videoPlayerActions()._VOLUME_CTRL_MUTE->setIcon(QIcon(":img/VOLUME_MUTE"));
   } else {
-    g_videoPlayerActions()._VOLUME_CTRL_MUTE->setIcon(QIcon(":/themes/VOLUME_UNMUTE"));
+    g_videoPlayerActions()._VOLUME_CTRL_MUTE->setIcon(QIcon(":img/VOLUME_UNMUTE"));
   }
 }
 void VideoPlayer::onVolumeValueChange(const int logScaleValue) {

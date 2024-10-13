@@ -10,7 +10,7 @@ class RenameWidget_ConvertBoldUnicodeCharset2Ascii : public AdvanceRenamer {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Convert bold unicode charset to ascii | %1 item(s) under [%2]";
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/UNICODE_TO_ASCII_TEXT"));
+    setWindowIcon(QIcon(":img/UNICODE_TO_ASCII_TEXT"));
   }
 
   auto InitControlTB() -> QToolBar* override;
