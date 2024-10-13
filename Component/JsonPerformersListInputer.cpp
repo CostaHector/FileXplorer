@@ -15,7 +15,7 @@ JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::Window
       buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel)),
       p_dict(nullptr) {
   m_onePerf->setCompleter(&PerformersManager::getIns().perfsCompleter);
-  m_onePerf->addAction(QIcon(":/themes/RENAME_PERFORMERS"), QLineEdit::LeadingPosition);
+  m_onePerf->addAction(QIcon(":img/RENAME_PERFORMERS"), QLineEdit::LeadingPosition);
   m_onePerf->setClearButtonEnabled(true);
   m_perfsList->setClearButtonEnabled(true);
 
@@ -26,7 +26,7 @@ JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::Window
   setLayout(lo);
 
   subscribe();
-  setWindowIcon(QIcon(":/themes/RENAME_PERFORMERS"));
+  setWindowIcon(QIcon(":img/RENAME_PERFORMERS"));
   setWindowTitle("mod performers");
 }
 

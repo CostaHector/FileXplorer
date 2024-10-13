@@ -155,7 +155,7 @@ class RenameWidget_Insert : public AdvanceRenamer {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = QString("Insert name string | %1 item(s) under [%2]");
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/NAME_STR_DELETER_PATH"));
+    setWindowIcon(QIcon(":img/NAME_STR_DELETER_PATH"));
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl = new QToolBar;
@@ -191,7 +191,7 @@ class RenameWidget_Replace : public AdvanceRenamer {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = QString("Replace name string | %1 item(s) under [%2]");
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/NAME_STR_REPLACER_PATH"));
+    setWindowIcon(QIcon(":img/NAME_STR_REPLACER_PATH"));
   }
 
   auto InitControlTB() -> QToolBar* override {
@@ -230,7 +230,7 @@ class RenameWidget_Delete : public RenameWidget_Replace {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Delete name string | %1 item(s) under [%2]";
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/NAME_STR_DELETER_PATH"));
+    setWindowIcon(QIcon(":img/NAME_STR_DELETER_PATH"));
   }
 };
 
@@ -244,7 +244,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/NAME_STR_NUMERIZER_PATH"));
+    setWindowIcon(QIcon(":img/NAME_STR_NUMERIZER_PATH"));
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl(new QToolBar);
@@ -281,7 +281,7 @@ class RenameWidget_Case : public AdvanceRenamer {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Case name string | %1 item(s) under [%2]";
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":/themes/NAME_STR_CASE"));
+    setWindowIcon(QIcon(":img/NAME_STR_CASE"));
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl(new QToolBar);

@@ -35,23 +35,16 @@ class FileSystemTypeFilter : public QToolButton {
   static const QDir::Filters DEFAULT_FILTER_FLAG;
 
  private:
-  QAction* FILTER_SWITCH = new QAction(QIcon(":/themes/FILE_SYSTEM_FILTER"), "Filter", this);
+  QAction* FILTER_SWITCH = new QAction(QIcon(":img/FILE_SYSTEM_FILTER"), "Filter", this);
 
   QMenu* fileTypeFilterMenu = new QMenu(tr("Filter Menu"), this);
   QAction* FILES = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_FileIcon), "Files", fileTypeFilterMenu);
   QAction* DIRS = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), "Dirs", fileTypeFilterMenu);
   QAction* DRIVES = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon), "Drives", fileTypeFilterMenu);
-  QAction* HIDDEN = new QAction(QIcon(":/themes/HIDDEN"), "Hidden", fileTypeFilterMenu);
-  QAction* NO_DOT = new QAction(QIcon(":/themes/NO_DOT"), "NoDot", fileTypeFilterMenu);
-  QAction* NO_DOT_DOT = new QAction(QIcon(":/themes/NO_DOT_DOT"), "NoDotDot", fileTypeFilterMenu);
-  QAction* CASE_SENSITIVE = new QAction(QIcon(":/themes/CASE_SENSITIVE"), "Case Sensitive", fileTypeFilterMenu);
-
-  //  QAction* _IMAGES = new QAction(QIcon(":/themes/IMAGE"), "image");
-  //  QAction* _VIDEOS = new QAction(QIcon(":/themes/VIDEO"), "video");
-  //  QAction* _PLAIN_TEXT = new QAction(QIcon(":/themes/PLAIN_TEXT"), "plain Text");
-  //  QAction* _DOCUMENT = new QAction(QIcon(":/themes/DOCUMENT"), "document");
-  //  QAction* _EXE = new QAction(QIcon(":/themes/EXE"), "executable");
-
+  QAction* HIDDEN = new QAction(QIcon(":img/HIDDEN"), "Hidden", fileTypeFilterMenu);
+  QAction* NO_DOT = new QAction(QIcon(":img/NO_DOT"), "NoDot", fileTypeFilterMenu);
+  QAction* NO_DOT_DOT = new QAction(QIcon(":img/NO_DOT_DOT"), "NoDotDot", fileTypeFilterMenu);
+  QAction* CASE_SENSITIVE = new QAction(QIcon(":img/CASE_SENSITIVE"), "Case Sensitive", fileTypeFilterMenu);
   QAction* DISABLE_ENTRIES_DONT_PASS_FILTER = new QAction(tr("disable the entries don't pass name filter"), fileTypeFilterMenu);
   QAction* INCLUDING_SUBDIRECTORIES = new QAction(tr("Including Subdirs"), fileTypeFilterMenu);
 

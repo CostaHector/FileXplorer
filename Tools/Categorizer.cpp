@@ -1,6 +1,5 @@
 #include "Categorizer.h"
 
-#include "PublicVariable.h"
 #include "Tools/PathTool.h"
 #include "Tools/ItemsPileCategory.h"
 #include "UndoRedo.h"

@@ -20,7 +20,6 @@ SOURCES += \
     Actions/FolderPreviewActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
-    Actions/LogViewActions.cpp \
     Actions/PerformersManagerActions.cpp \
     Actions/PropertiesWindowActions.cpp \
     Actions/QuickWhereActions.cpp \
@@ -78,7 +77,6 @@ SOURCES += \
     Model/DifferRootFileSystemModel.cpp \
     Model/DuplicateVideoModel.cpp \
     Model/JsonModel.cpp \
-    Model/LogModel.cpp \
     Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/ScenesTableModel.cpp \
@@ -89,7 +87,6 @@ SOURCES += \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
-    Tools/Log.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
@@ -106,7 +103,6 @@ SOURCES += \
     View/CustomListView.cpp \
     View/DuplicateVideosFinder.cpp \
     View/JsonListView.cpp \
-    View/LogView.cpp \
     View/MovieDBView.cpp \
     View/RecycleBinWidget.cpp \
     View/SceneActionsSubscribe.cpp \
@@ -182,7 +178,6 @@ HEADERS += \
     Actions/FolderPreviewActions.h \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
-    Actions/LogViewActions.h \
     Actions/PerformersManagerActions.h \
     Actions/PropertiesWindowActions.h \
     Actions/QuickWhereActions.h \
@@ -240,7 +235,6 @@ HEADERS += \
     Model/DifferRootFileSystemModel.h \
     Model/DuplicateVideoModel.h \
     Model/JsonModel.h \
-    Model/LogModel.h \
     Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/ScenesTableModel.h \
@@ -251,7 +245,6 @@ HEADERS += \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
-    Tools/Log.h \
     Tools/MediaInfoDLL.h \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
@@ -270,7 +263,6 @@ HEADERS += \
     View/CustomListView.h \
     View/DuplicateVideosFinder.h \
     View/JsonListView.h \
-    View/LogView.h \
     View/MovieDBView.h \
     View/RecycleBinWidget.h \
     View/SceneActionsSubscribe.h \
@@ -349,7 +341,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    themes/res.qrc
+    bin/themes/res.qrc
 
 DISTFILES += \
     Experiment.py \
