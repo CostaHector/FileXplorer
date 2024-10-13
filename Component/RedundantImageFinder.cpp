@@ -152,7 +152,7 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)
 
   m_imgModel->setRootPath(&m_imgsBunch);
 
-  setWindowIcon(QIcon(":/themes/REDUNDANT_IMAGE_FINDER"));
+  setWindowIcon(QIcon(":img/REDUNDANT_IMAGE_FINDER"));
   setWindowTitle("Redundant Images Finder");
   setMinimumSize(1024, 768);
 

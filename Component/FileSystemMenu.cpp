@@ -31,7 +31,7 @@ FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(ti
 
 QMenu* FileSystemMenu::GetNewMenu() {
   auto* _newMenuLevel2 = new QMenu(tr("&New"), this);
-  _newMenuLevel2->setIcon(QIcon(":/themes/NEW_FILE_FOLDER_PATH"));
+  _newMenuLevel2->setIcon(QIcon(":img/NEW_FILE_FOLDER_PATH"));
   _newMenuLevel2->setToolTipsVisible(true);
   _newMenuLevel2->addActions(g_fileBasicOperationsActions().NEW->actions());
   return _newMenuLevel2;
@@ -39,7 +39,7 @@ QMenu* FileSystemMenu::GetNewMenu() {
 
 QMenu* FileSystemMenu::GetViewMenu() {
   auto* viewMenuL2 = new QMenu(tr("&View"), this);
-  viewMenuL2->setIcon(QIcon(":/themes/SORTING_FILE_FOLDER"));
+  viewMenuL2->setIcon(QIcon(":img/SORTING_FILE_FOLDER"));
   viewMenuL2->setToolTipsVisible(true);
   //    viewMenuL2->addActions(g_viewActions().SORT_INDICATOR_ORDER->actions());
   //  viewMenuL2->addSeparator();
@@ -58,7 +58,7 @@ QMenu* FileSystemMenu::GetViewMenu() {
 
 QMenu* FileSystemMenu::GetRenameMenu() {
   auto* renameMenuLevel2 = new QMenu(tr("&Rename"), this);
-  renameMenuLevel2->setIcon(QIcon(":/themes/RENAME"));
+  renameMenuLevel2->setIcon(QIcon(":img/RENAME"));
   renameMenuLevel2->addActions(g_renameAg().RENAME_RIBBONS->actions());
   return renameMenuLevel2;
 }
