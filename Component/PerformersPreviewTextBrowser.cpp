@@ -54,7 +54,7 @@ bool PerformersPreviewTextBrowser::operator()(const QSqlRecord& record, const QS
   m_curImgCntIndex = 0;
   const QString& firstImgPath = m_imgsLst.isEmpty() ? "" : dirPath + '/' + m_imgsLst.front();
   if (PERFORMER_HTML_TEMPLATE.isEmpty()){
-      PERFORMER_HTML_TEMPLATE = TextReader(":/PERFORMER_HTML_TEMPLATE");
+      PERFORMER_HTML_TEMPLATE = TextReader(":txt/PERFORMER_HTML_TEMPLATE");
   }
   const QString& htmlSrc = PERFORMER_HTML_TEMPLATE.arg(name)
                                .arg(firstImgPath)

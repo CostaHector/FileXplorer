@@ -9,20 +9,20 @@ class RenameActions : public QObject {
  public:
   explicit RenameActions(QObject* parent = nullptr)
       : QObject{parent},
-        _NUMERIZER{new QAction(QIcon(":/themes/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"))},
-        _RENAME_SWAPPER{new QAction(QIcon(":/themes/NAME_STR_SWAPPER_PATH"), tr("swap 1-2-3 to 1-3-2"))},
-        _CASE_NAME{new QAction(QIcon(":/themes/NAME_STR_CASE"), tr("Case"))},
-        _STR_INSERTER{new QAction(QIcon(":/themes/NAME_STR_DELETER_PATH"), tr("Str Inserter"))},
-        _STR_DELETER{new QAction(QIcon(":/themes/NAME_STR_DELETER_PATH"), tr("Str Deleter"))},
-        _STR_REPLACER{new QAction(QIcon(":/themes/NAME_STR_REPLACER_PATH"), tr("Str Replacer"))},
-        _NAME_NO_CONSECUTIVE{new QAction(QIcon(":/themes/_NAME_NO_CONSECUTIVE"), tr("Name No Consecutive"))},
-        _CONVERT_UNICODE_TO_ASCII{new QAction(QIcon(":/themes/UNICODE_TO_ASCII_TEXT"), tr("Unicode to ASCII"))},
+        _NUMERIZER{new QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"))},
+        _RENAME_SWAPPER{new QAction(QIcon(":img/NAME_STR_SWAPPER_PATH"), tr("swap 1-2-3 to 1-3-2"))},
+        _CASE_NAME{new QAction(QIcon(":img/NAME_STR_CASE"), tr("Case"))},
+        _STR_INSERTER{new QAction(QIcon(":img/NAME_STR_DELETER_PATH"), tr("Str Inserter"))},
+        _STR_DELETER{new QAction(QIcon(":img/NAME_STR_DELETER_PATH"), tr("Str Deleter"))},
+        _STR_REPLACER{new QAction(QIcon(":img/NAME_STR_REPLACER_PATH"), tr("Str Replacer"))},
+        _NAME_NO_CONSECUTIVE{new QAction(QIcon(":img/_NAME_NO_CONSECUTIVE"), tr("Name No Consecutive"))},
+        _CONVERT_UNICODE_TO_ASCII{new QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), tr("Unicode to ASCII"))},
         RENAME_RIBBONS(Get_Rename_Actions()),
-        _UPPER_CASE{new QAction(QIcon(":/themes/RENAME_UPPER_CASE"), tr("Upper Case"))},
-        _LOWER_CASE{new QAction(QIcon(":/themes/RENAME_LOWER_CASE"), tr("Lower Case"))},
-        _LOOSE_CAPITALIZE{new QAction(QIcon(":/themes/RENAME_LOOSE_CAPITALIZE_CASE"), tr("Loose Capitalize"))},
-        _STRICT_CAPITALIZE{new QAction(QIcon(":/themes/RENAME_STRICT_CAPITALIZE_CASE"), tr("Strict Capitalize"))},
-        _SWAP_CASE{new QAction(QIcon(":/themes/RENAME_TOGGLE_CASE"), tr("Swap Case"))},
+        _UPPER_CASE{new QAction(QIcon(":img/RENAME_UPPER_CASE"), tr("Upper Case"))},
+        _LOWER_CASE{new QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lower Case"))},
+        _LOOSE_CAPITALIZE{new QAction(QIcon(":img/RENAME_LOOSE_CAPITALIZE_CASE"), tr("Loose Capitalize"))},
+        _STRICT_CAPITALIZE{new QAction(QIcon(":img/RENAME_STRICT_CAPITALIZE_CASE"), tr("Strict Capitalize"))},
+        _SWAP_CASE{new QAction(QIcon(":img/RENAME_TOGGLE_CASE"), tr("Swap Case"))},
         NAME_CASE(Get_CASE_Actions()) {}
 
   auto Get_CASE_Actions() -> QActionGroup*;

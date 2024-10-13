@@ -5,9 +5,9 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
   _VOLUME_CTRL_MUTE->setCheckable(true);
   _VOLUME_CTRL_MUTE->setChecked(PreferenceSettings().value(MemoryKey::VIDEO_PLAYER_MUTE.name, MemoryKey::VIDEO_PLAYER_MUTE.v).toBool());
   if (_VOLUME_CTRL_MUTE->isChecked()) {
-    _VOLUME_CTRL_MUTE->setIcon(QIcon(":/themes/VOLUME_MUTE"));
+    _VOLUME_CTRL_MUTE->setIcon(QIcon(":img/VOLUME_MUTE"));
   } else {
-    _VOLUME_CTRL_MUTE->setIcon(QIcon(":/themes/VOLUME_UNMUTE"));
+    _VOLUME_CTRL_MUTE->setIcon(QIcon(":img/VOLUME_UNMUTE"));
   }
 
   _UPDATE_ITEM_PLAYABLE->setShortcut(QKeySequence(Qt::Key_F5));
