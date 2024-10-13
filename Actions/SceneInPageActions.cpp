@@ -13,19 +13,19 @@ SceneInPageActions& g_SceneInPageActions() {
 }
 
 SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
-  _COMBINE_MEDIAINFOS_JSON = new QAction(QIcon(":/themes/COMBINE_MEDIAS_INFO"), "Update infos", this);
+  _COMBINE_MEDIAINFOS_JSON = new QAction(QIcon(":img/UPDATE_JSON_THEN_SCN"), "Update infos", this);
   _COMBINE_MEDIAINFOS_JSON->setShortcut(QKeySequence(Qt::Key_F5));
   _COMBINE_MEDIAINFOS_JSON->setShortcutVisibleInContextMenu(true);
   _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Combine Videos/Images infos Into json files. Then generate scn file from valid "
                                                "json file(s). This operation may update json file contents")
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
 
-  _UPDATE_SCN_ONLY = new QAction(QIcon(), "Update Scn", this);
+  _UPDATE_SCN_ONLY = new QAction(QIcon(":img/UPDATE_SCN_FILE"), "Update Scn", this);
   _UPDATE_SCN_ONLY->setShortcutVisibleInContextMenu(true);
-  _UPDATE_SCN_ONLY->setToolTip(QString("<b>%1 (%2)</b><br/> Only update scn file from valid json file(s).")
+  _UPDATE_SCN_ONLY->setToolTip(QString("<b>%1 (%2)</b><br/> Only update scn file from valid json file(s). This operation will not update json file(s)")
                                            .arg(_UPDATE_SCN_ONLY->text(), _UPDATE_SCN_ONLY->shortcut().toString()));
 
-  _BY_MOVIE_NAME = new QAction(QIcon(":/themes/SORTING_FILE_FOLDER"), "Movie Name", this);
+  _BY_MOVIE_NAME = new QAction(QIcon(":img/SORTING_FILE_FOLDER"), "Movie Name", this);
   _BY_MOVIE_NAME->setCheckable(true);
   _BY_MOVIE_SIZE = new QAction("Movie Size", this);
   _BY_MOVIE_SIZE->setCheckable(true);
@@ -83,7 +83,7 @@ QToolBar* SceneInPageActions::GetSceneToolbar() {
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar() {
-  auto* defaultDisp = new QAction{QIcon(":/themes/SORTING_FILE_FOLDER"), "Sort"};
+  auto* defaultDisp = new QAction{QIcon(":img/SORTING_FILE_FOLDER"), "Sort"};
   defaultDisp->setToolTip("Choose sort option");
   auto* orderToolButton = DropListToolButton(defaultDisp, _ORDER_AG->actions(), QToolButton::InstantPopup, "Choose sort option",
                                              Qt::ToolButtonStyle::ToolButtonTextBesideIcon, TABS_ICON_IN_MENU_2x1);

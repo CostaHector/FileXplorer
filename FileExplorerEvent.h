@@ -25,7 +25,6 @@ class MyClipboard;
 class JsonEditor;
 class VideoPlayer;
 class AlertSystem;
-class LogView;
 class AdvanceRenamer;
 class PropertiesWindow;
 class DuplicateVideosFinder;
@@ -43,6 +42,7 @@ class FileExplorerEvent : public QObject {
   FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent);
   void subscribe();
   void subsribeCompress();
+  void subsribeFileActions();
 
   void onRename(AdvanceRenamer* renameWid);
   auto onRenamePre() const -> std::pair<QString, QStringList>;
@@ -119,7 +119,6 @@ class FileExplorerEvent : public QObject {
   VideoPlayer* videoPlayer{nullptr};
 
   AlertSystem* m_alertSystem{nullptr};
-  LogView* m_logView{nullptr};
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};

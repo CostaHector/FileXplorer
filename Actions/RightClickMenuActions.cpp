@@ -2,8 +2,8 @@
 
 RightClickMenuActions::RightClickMenuActions(QObject* parent)
     : QObject{parent},
-      _CALC_MD5_ACT(new QAction(QIcon(":/themes/MD5_FILE_IDENTIFIER_PATH"), tr("MD5 (File Indentifier)"))),
-      _PROPERTIES(new QAction(QIcon(":/themes/PROPERTIES"), tr("Properties")))
+      _CALC_MD5_ACT(new QAction(QIcon(":img/MD5_FILE_IDENTIFIER_PATH"), tr("MD5 (File Indentifier)"))),
+      _PROPERTIES(new QAction(QIcon(":img/PROPERTIES"), tr("Properties")))
 
 {
   _PROPERTIES->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_Return));

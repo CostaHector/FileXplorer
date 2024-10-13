@@ -33,6 +33,10 @@ class PathToolTest : public QObject {
   void test_RelativePath2File_ok();
 
   void test_GetBaseNameExt();
+  void test_GetBaseName_folder();
+  void test_GetBaseName_file();
+
+  void test_GetBaseNameDotBeforeSlash();
 };
 
 void PathToolTest::initTestCase() {
@@ -137,7 +141,28 @@ void PathToolTest::test_RelativePath2File_ok() {
 void PathToolTest::test_GetBaseNameExt() {
   QCOMPARE(GetBaseNameExt("C:/home/file.m"), std::make_pair(QString("file"), QString(".m")));
   QCOMPARE(GetBaseNameExt("a.txt"), std::make_pair(QString("a"), QString(".txt")));
+  QCOMPARE(GetBaseNameExt("a"), std::make_pair(QString("a"), QString("")));
+  QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"),
+           std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));
 }
 
-//QTEST_MAIN(PathToolTest)
+void PathToolTest::test_GetBaseName_folder() {
+  QCOMPARE(GetBaseName("C:/home/folder"), "folder");
+  QCOMPARE(GetBaseName("C:/home/any movie name folder sc.1 - performer 1, performer 2"), "any movie name folder sc.1 - performer 1, performer 2");
+}
+
+void PathToolTest::test_GetBaseName_file() {
+  QCOMPARE(GetBaseName("C:/home/file.m"), "file");
+  QCOMPARE(GetBaseName("a.txt"), "a");
+  QCOMPARE(GetBaseName("a"), "a");
+  QCOMPARE(GetBaseName("any movie name sc.1 - performer 1, performer 2"), "any movie name sc.1 - performer 1, performer 2");
+  QCOMPARE(GetBaseName("any movie name sc.1 - performer 1, performer 2.txt"), "any movie name sc.1 - performer 1, performer 2");
+}
+
+void PathToolTest::test_GetBaseNameDotBeforeSlash() {
+  QCOMPARE(GetBaseName("C:/.a/b"), "b");
+  QCOMPARE(GetBaseName("C:/.a/any movie name"), "any movie name");
+}
+
+QTEST_MAIN(PathToolTest)
 #include "PathToolTest.moc"

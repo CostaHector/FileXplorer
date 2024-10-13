@@ -45,10 +45,10 @@ QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
 }
 
 QActionGroup* DataBaseActions::Get_DB_FUNCTIONS_Action() {
-  QAction* COUNT = new QAction(QIcon(":/themes/COUNTER"), tr("COUNT"), this);
+  QAction* COUNT = new QAction(QIcon(":img/COUNTER"), tr("COUNT"), this);
   COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
 
-  QAction* SUM = new QAction(QIcon(":/themes/SUM"), tr("SUM"), this);
+  QAction* SUM = new QAction(QIcon(":img/SUM"), tr("SUM"), this);
   SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
 
   QActionGroup* databaseFunctionsAG = new QActionGroup(this);
