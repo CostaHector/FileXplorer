@@ -39,20 +39,20 @@ class ConflictsSolveActions : public QObject {
     return menu;
   }
 
-  QAction* SIZE_ACT{new QAction(QIcon(":/themes/FILESIZE_SCALE"), tr("Size larger"), this)};
-  QAction* DATE_ACT{new QAction(QIcon(":/themes/TIME_AXIS"), tr("Date newer"), this)};
-  QAction* REVERT_ACT{new QAction(QIcon(":/themes/MIRROR_REVERT"), tr("Revert Selection"), this)};
+  QAction* SIZE_ACT{new QAction(QIcon(":img/FILESIZE_SCALE"), tr("Size larger"), this)};
+  QAction* DATE_ACT{new QAction(QIcon(":img/TIME_AXIS"), tr("Date newer"), this)};
+  QAction* REVERT_ACT{new QAction(QIcon(":img/MIRROR_REVERT"), tr("Revert Selection"), this)};
 
   QAction* ALWAYS_KEEP_LEFT_SIDE{new QAction(QIcon(""), tr("Keep left side"), this)};
   QAction* ALWAYS_KEEP_RIGHT_SIDE{new QAction(QIcon(""), tr("Keep right side"), this)};
 
   QAction* HIDE_NO_CONFLICT_ITEM{new QAction(QIcon(""), tr("Hide no conflict"), this)};
 
-  QAction* RECYCLE_SELECTION{new QAction(QIcon(":/themes/RECYCLE"), tr("recycle"), this)};
+  QAction* RECYCLE_SELECTION{new QAction(QIcon(":img/RECYCLE"), tr("recycle"), this)};
   QAction* KEEP_SELECTION{new QAction(QIcon(""), tr("keep"), this)};
 
-  QAction* LEFT_FOLDER{new QAction(QIcon(":/themes/FOLDER"), "left folder path", this)};
-  QAction* RIGHT_FOLDER{new QAction(QIcon(":/themes/FOLDER"), "right folder path", this)};
+  QAction* LEFT_FOLDER{new QAction(QIcon(":img/FOLDER"), "left folder path", this)};
+  QAction* RIGHT_FOLDER{new QAction(QIcon(":img/FOLDER"), "right folder path", this)};
 };
 
 ConflictsSolveActions& g_conflictSolveAct();

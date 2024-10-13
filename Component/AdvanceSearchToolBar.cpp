@@ -7,7 +7,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_nameFilterCB = new QComboBox{this};
 
   m_nameFilter = new QLineEdit{"", m_nameFilterCB};
-  m_nameFilter->addAction(QIcon(":/themes/SEARCH"), QLineEdit::LeadingPosition);
+  m_nameFilter->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_nameFilter->setClearButtonEnabled(true);
 
   m_nameFilterCB->setLineEdit(m_nameFilter);

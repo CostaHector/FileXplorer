@@ -36,9 +36,9 @@ class Toaster : public QDialog {
 
     QLabel* titleLable = new QLabel;
     if (isNormal) {
-      titleLable->setPixmap(QPixmap(":/themes/SAVED").scaled(24, 24, Qt::KeepAspectRatio));
+      titleLable->setPixmap(QPixmap(":img/SAVED").scaled(24, 24, Qt::KeepAspectRatio));
     } else {
-      titleLable->setPixmap(QPixmap(":/themes/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio));
+      titleLable->setPixmap(QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio));
     }
     QLabel* label = new QLabel(text);
     label->setStyleSheet("color: rgb(255, 255, 255);");

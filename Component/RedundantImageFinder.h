@@ -49,7 +49,7 @@ class RedundantImageFinder : public QMainWindow {
   RedundantImageModel* m_imgModel;
   QTableView* m_table;
 
-  QAction* RECYLE_NOW{new QAction{QIcon(":/themes/MOVE_TO_TRASH_BIN"), "Recycle selections", this}};
+  QAction* RECYLE_NOW{new QAction{QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle selections", this}};
   QAction* RECYCLE_EMPTY_IMAGE{new QAction{"Also empty image", this}};
   QAction* OPEN_REDUNDANT_IMAGES_FOLDER{new QAction{"Open redun folder", this}};
   QToolBar* m_toolBar;

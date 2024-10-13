@@ -33,7 +33,7 @@ class PropertiesWindowActions : QObject {
 
   QAction* SHOW_FILES_SIZE{new QAction("Files Size", this)};
   QAction* SHOW_VIDS_DURATION{new QAction("Videos Duration", this)};
-  QAction* SHOW_FILES_MD5{new QAction(QIcon(":/themes/MD5_FILE_IDENTIFIER_PATH"), "FilesIdentifier", this)};
+  QAction* SHOW_FILES_MD5{new QAction(QIcon(":img/MD5_FILE_IDENTIFIER_PATH"), "FilesIdentifier", this)};
   QAction* FORCE_RECALCULATE{new QAction{"Force", this}};
 };
 

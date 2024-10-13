@@ -14,8 +14,8 @@ class StateLabel : public QLabel {
  public:
   explicit StateLabel(const QString& text, QWidget* parent = nullptr)
       : QLabel(text, parent),
-        pixmapMap{{SAVED_STR, QPixmap(":/themes/SAVED").scaled(24, 24, Qt::KeepAspectRatio)},
-                  {NOT_SAVED_STR, QPixmap(":/themes/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio)}},
+        pixmapMap{{SAVED_STR, QPixmap(":img/SAVED").scaled(24, 24, Qt::KeepAspectRatio)},
+                  {NOT_SAVED_STR, QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio)}},
         currentState(SAVED_STR) {
     setPixmap(pixmapMap[currentState]);
     setAlignment(Qt::AlignRight);

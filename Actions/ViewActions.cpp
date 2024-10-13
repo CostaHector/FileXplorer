@@ -8,20 +8,20 @@ ViewActions& g_viewActions() {
 
 ViewActions::ViewActions(QObject* parent)
     : QObject{parent},
-      _ADVANCE_SEARCH_VIEW{new QAction(QIcon(":/themes/SEARCH"), "search")},
-      _MOVIE_VIEW{new QAction(QIcon(":/themes/SHOW_DATABASE"), "movie")},
-      _LIST_VIEW{new QAction(QIcon(":/themes/DISPLAY_LARGE_THUMBNAILS"), "list")},
-      _TABLE_VIEW{new QAction(QIcon(":/themes/DISPLAY_DETAIL_INFOMATIONS"), "table")},
-      _TREE_VIEW{new QAction(QIcon(":/themes/DISPLAY_ACHITECTURE"), "tree")},
-      _SCENE_VIEW{new QAction(QIcon(":/themes/SCENE_TABLE_VIEW"), "scene")},
+      _ADVANCE_SEARCH_VIEW{new QAction(QIcon(":img/SEARCH"), "search")},
+      _MOVIE_VIEW{new QAction(QIcon(":img/SHOW_DATABASE"), "movie")},
+      _LIST_VIEW{new QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), "list")},
+      _TABLE_VIEW{new QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), "table")},
+      _TREE_VIEW{new QAction(QIcon(":img/DISPLAY_ACHITECTURE"), "tree")},
+      _SCENE_VIEW{new QAction(QIcon(":img/SCENE_TABLE_VIEW"), "scene")},
       _VIEWS_AG{GetViewsAG()},
 
-      NAVIGATION_PANE{new QAction(QIcon(":/themes/NAVIGATION_PANE"), tr("Navigation Pane"))},
-      PREVIEW_PANE_HTML{new QAction(QIcon(":/themes/SHOW_FOLDER_PREVIEW_HTML"), tr("Folder Preview"))},
-      _JSON_EDITOR_PANE{new QAction(QIcon(":/themes/JSON_EDITOR"), tr("Json Editor"))},
-      _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":/themes/VIDEO_PLAYER"), tr("Embedded Player"))},
+      NAVIGATION_PANE{new QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"))},
+      PREVIEW_PANE_HTML{new QAction(QIcon(":img/SHOW_FOLDER_PREVIEW_HTML"), tr("Folder Preview"))},
+      _JSON_EDITOR_PANE{new QAction(QIcon(":img/JSON_EDITOR"), tr("Json Editor"))},
+      _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":img/VIDEO_PLAYER"), tr("Embedded Player"))},
       _VIEW_ACRIONS(Get_NAVIGATION_PANE_Actions()),
-      _SYS_VIDEO_PLAYERS(new QAction(QIcon(":/themes/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
+      _SYS_VIDEO_PLAYERS(new QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
       _VIDEO_PLAYERS(GetPlayersActions()) {}
 
 QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
