@@ -16,9 +16,9 @@ AlertSystem::AlertSystem(QWidget* parent)
       m_failItemCnt{new QLabel("0", this)},
       m_recheckButtonBox{
           new QDialogButtonBox(QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry, Qt::Orientation::Horizontal, this)} {
-  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open)->setIcon(QIcon(":/themes/CONFIGURE"));
+  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open)->setIcon(QIcon(":img/CONFIGURE"));
   m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setText("Recheck");
-  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setIcon(QIcon(":/themes/RELOAD_FROM_DISK"));
+  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setIcon(QIcon(":img/RELOAD_FROM_DISK"));
   m_alertModel->setRootPath("");
   m_alertsTable->setModel(m_alertModel);
   m_alertsTable->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
@@ -48,7 +48,7 @@ void AlertSystem::hideEvent(QHideEvent* event) {
 void AlertSystem::RefreshWindowIcon() {
   qInfo("Alert System RefreshWindowIcon");
   const int failsCnt = m_alertModel->failCount();
-  setWindowIcon(QIcon(failsCnt > 0 ? ":/themes/ALERT_ACTIVE" : ":/themes/ALERT"));
+  setWindowIcon(QIcon(failsCnt > 0 ? ":img/ALERT_ACTIVE" : ":img/ALERT"));
   QString msg;
   if (failsCnt > 0) {
     msg = QString("<b><font color=\"#FF0000\">%1</font></b>").arg(failsCnt);

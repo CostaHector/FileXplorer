@@ -19,6 +19,7 @@
 #include "UndoRedo.h"
 #include "public/DisplayEnhancement.h"
 #include "qdesktopservices.h"
+#include "View/CustomTableView.h"
 
 #include <QDataStream>
 
@@ -107,7 +108,7 @@ QSet<QString> RedundantImageFinder::m_commonFileHash;
 RedundantImageFinder::RedundantImageFinder(QWidget* parent)
     : QMainWindow{parent},
       m_imgModel{new RedundantImageModel{this}},
-      m_list{new QTableView{this}},
+      m_table{new CustomTableView{"RedundantImageTable", this}},
       m_toolBar{new QToolBar{"RedundantImageFinderToolbar", this}} {
   RECYLE_NOW->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_Delete));
   RECYLE_NOW->setToolTip(
@@ -132,26 +133,26 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)
   m_toolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   addToolBar(m_toolBar);
 
-  m_list->setModel(m_imgModel);
-  m_list->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+  m_table->setModel(m_imgModel);
+  m_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 
-  m_list->horizontalHeader()->setStretchLastSection(true);
-  m_list->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-  m_list->horizontalHeader()->setSectionResizeMode(RedundantImageModel::HORIZONTAL_HEADER.indexOf("MD5"), QHeaderView::ResizeMode::Stretch);
-  m_list->horizontalHeader()->setSectionResizeMode(RedundantImageModel::HORIZONTAL_HEADER.indexOf("Name"), QHeaderView::ResizeMode::ResizeToContents);
+  m_table->horizontalHeader()->setStretchLastSection(true);
+  m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
+  m_table->horizontalHeader()->setSectionResizeMode(RedundantImageModel::HORIZONTAL_HEADER.indexOf("MD5"), QHeaderView::ResizeMode::Stretch);
+  m_table->horizontalHeader()->setSectionResizeMode(RedundantImageModel::HORIZONTAL_HEADER.indexOf("Name"), QHeaderView::ResizeMode::ResizeToContents);
 
-  m_list->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
-  m_list->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-  m_list->setTextElideMode(Qt::TextElideMode::ElideLeft);
-  m_list->setShowGrid(false);
+  m_table->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+  m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+  m_table->setTextElideMode(Qt::TextElideMode::ElideLeft);
+  m_table->setShowGrid(false);
 
-  setCentralWidget(m_list);
+  setCentralWidget(m_table);
 
   subscribe();
 
   m_imgModel->setRootPath(&m_imgsBunch);
 
-  setWindowIcon(QIcon(":/themes/REDUNDANT_IMAGE_FINDER"));
+  setWindowIcon(QIcon(":img/REDUNDANT_IMAGE_FINDER"));
   setWindowTitle("Redundant Images Finder");
   setMinimumSize(1024, 768);
 
@@ -183,7 +184,7 @@ void RedundantImageFinder::subscribe() {
 }
 
 void RedundantImageFinder::RecycleSelection() {
-  const QModelIndexList& sel = m_list->selectionModel()->selectedRows();
+  const QModelIndexList& sel = m_table->selectionModel()->selectedRows();
   if (sel.isEmpty()) {
     return;
   }

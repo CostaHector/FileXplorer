@@ -61,7 +61,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   subscribe();
 
   setWindowTitle(TITLE_TEMPLATE);
-  setWindowIcon(QIcon(":/themes/JSON_EDITOR"));
+  setWindowIcon(QIcon(":img/JSON_EDITOR"));
 
   updateWindowsSize();
 }

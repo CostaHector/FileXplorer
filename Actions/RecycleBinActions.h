@@ -46,18 +46,18 @@ class RecycleBinActions : public QObject {
     return m_recycleBinMenu;
   }
 
-  QAction* RESTORE_SELECTED_ITEMS{new QAction{QIcon(":/themes/RESTORE_SELECTED_ITEMS"), "Restore the Selected Items", this}};
-  QAction* DELETE_SELECTED_ITEMS{new QAction{QIcon(":/themes/DELETE_SELECTED_ITEMS"), "Delete the Selected Items", this}};
-  QAction* PROPERTY{new QAction{QIcon(":/themes/PROPERTIES"), "Recycle Bin Properties", this}};
-  QAction* EMPTY_RECYCLE_BIN{new QAction{QIcon(":/themes/EMPTY_RECYCLE_BIN"), "Empty Recycle Bin", this}};
-  QAction* RESTORE_ALL_ITEMS{new QAction{QIcon(":/themes/RESTORE_ALL_ITEMS"), "Restore All Items", this}};
-  QAction* PLAY_THIS{new QAction{QIcon(":/themes/PLAY_BUTTON_ROUND"), "Play", this}};
-  QAction* REVEAL_IN_FILE_EXPLORER{new QAction{QIcon(":/themes/REVEAL_IN_EXPLORER"), "Reveal in file exploerer", this}};
-  QAction* OPEN_DB_IN_APP{new QAction{QIcon(":/themes/SQLITE_APP"), "Open database in APP", this}};
+  QAction* RESTORE_SELECTED_ITEMS{new QAction{QIcon(":img/RESTORE_SELECTED_ITEMS"), "Restore the Selected Items", this}};
+  QAction* DELETE_SELECTED_ITEMS{new QAction{QIcon(":img/DELETE_SELECTED_ITEMS"), "Delete the Selected Items", this}};
+  QAction* PROPERTY{new QAction{QIcon(":img/PROPERTIES"), "Recycle Bin Properties", this}};
+  QAction* EMPTY_RECYCLE_BIN{new QAction{QIcon(":img/EMPTY_RECYCLE_BIN"), "Empty Recycle Bin", this}};
+  QAction* RESTORE_ALL_ITEMS{new QAction{QIcon(":img/RESTORE_ALL_ITEMS"), "Restore All Items", this}};
+  QAction* PLAY_THIS{new QAction{QIcon(":img/PLAY_BUTTON_ROUND"), "Play", this}};
+  QAction* REVEAL_IN_FILE_EXPLORER{new QAction{QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in file exploerer", this}};
+  QAction* OPEN_DB_IN_APP{new QAction{QIcon(":img/SQLITE_APP"), "Open database in APP", this}};
 
-  QAction* SUBMIT_AND_REFRESH{new QAction{QIcon(":/themes/REFRESH_THIS_PATH"), "Submit&Refresh", this}};
+  QAction* SUBMIT_AND_REFRESH{new QAction{QIcon(":img/REFRESH_THIS_PATH"), "Submit&Refresh", this}};
 
-  QAction* RECYLE_BIN_WIDGET{new QAction{QIcon(":/themes/DIRTY_STATUS"), "Recycle bin", this}};
+  QAction* RECYLE_BIN_WIDGET{new QAction{QIcon(":img/DIRTY_STATUS"), "Recycle bin", this}};
 };
 RecycleBinActions& g_recycleBinAg();
 

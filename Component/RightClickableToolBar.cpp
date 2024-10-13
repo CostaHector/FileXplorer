@@ -14,7 +14,7 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
     : QToolBar(title),
       extraAG(new QActionGroup(this)),
       rightClickedPos(-1, -1),
-      UNPIN{new QAction(QIcon(":/themes/UNPIN"), tr("Unpin"), this)},
+      UNPIN{new QAction(QIcon(":img/UNPIN"), tr("Unpin"), this)},
       UNPIN_ALL{new QAction(tr("Unpin All"), this)},
       SHOW_TOOL_BUTTON_TEXT(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextOnly], this)),
       SHOW_TOOL_BUTTON_ICON(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonIconOnly], this)),

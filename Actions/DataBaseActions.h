@@ -17,18 +17,18 @@ class DataBaseActions : public QObject {
 
   auto Get_DB_RIGHT_CLICK_MENU_AG() -> QActionGroup*;
 
-  QAction* INIT_A_DATABASE = new QAction(QIcon(":/themes/CREATE_DATABASE"), tr("Create Database"), this);
-  QAction* INIT_A_TABLE = new QAction(QIcon(":/themes/CREATE_TABLE"), tr("Create Table"), this);
-  QAction* DROP_A_DATABASE = new QAction(QIcon(":/themes/DROP_DATABASE"), tr("Drop Database"), this);
-  QAction* DROP_A_TABLE = new QAction(QIcon(":/themes/DROP_TABLE"), tr("Drop Table"), this);
-  QAction* INSERT_A_PATH = new QAction(QIcon(":/themes/INSERT_INTO_TABLE"), tr("Insert into"), this);
-  QAction* DELETE_FROM_TABLE = new QAction(QIcon(":/themes/DELETE_FROM_TABLE"), tr("Delete from"), this);
-  QAction* UNION_TABLE = new QAction(QIcon(":/themes/UNION"), tr("Union"), this);
+  QAction* INIT_A_DATABASE = new QAction(QIcon(":img/CREATE_DATABASE"), tr("Create Database"), this);
+  QAction* INIT_A_TABLE = new QAction(QIcon(":img/CREATE_TABLE"), tr("Create Table"), this);
+  QAction* DROP_A_DATABASE = new QAction(QIcon(":img/DROP_DATABASE"), tr("Drop Database"), this);
+  QAction* DROP_A_TABLE = new QAction(QIcon(":img/DROP_TABLE"), tr("Drop Table"), this);
+  QAction* INSERT_A_PATH = new QAction(QIcon(":img/INSERT_INTO_TABLE"), tr("Insert into"), this);
+  QAction* DELETE_FROM_TABLE = new QAction(QIcon(":img/DELETE_FROM_TABLE"), tr("Delete from"), this);
+  QAction* UNION_TABLE = new QAction(QIcon(":img/UNION"), tr("Union"), this);
 
   QAction* DELETE_BY_DRIVER = new QAction(QIcon(), tr("Delete by driver"));
   QAction* DELETE_BY_PREPATH = new QAction(QIcon(), tr("Delete by prepath"));
 
-  QAction* QUICK_WHERE_CLAUSE{new QAction(QIcon(":/themes/QUICK_WHERE_CLAUSE"), tr("Where clause"), this)};
+  QAction* QUICK_WHERE_CLAUSE{new QAction(QIcon(":img/QUICK_WHERE_CLAUSE"), tr("Where clause"), this)};
 
   QActionGroup* DB_CONTROL_ACTIONS;
   QActionGroup* DB_FUNCTIONS;

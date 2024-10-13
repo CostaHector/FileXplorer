@@ -1,5 +1,8 @@
 <RCC>
-    <qresource prefix="/themes">
+    <qresource prefix="txt">
+        <file alias="PERFORMER_HTML_TEMPLATE">../PerformerHtmlTemplate.html</file>
+    </qresource>
+    <qresource prefix="img">
         <file alias="APP_ICON_PATH">AppIcons/FOLDER_OF_PICTURES.png</file>
         <file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
         <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
@@ -66,10 +69,10 @@
         <file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.png</file>
         <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.png</file>
         <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
-        <file alias="MUSIC_PLAYER">Flat/MUSIC_PLAYER.svg</file>
-        <file alias="PLAY_BUTTON_ROUND">Flat/PLAY_BUTTON_ROUND.svg</file>
-        <file alias="PLAY_BUTTON_TRIANGLE">Flat/PLAY_BUTTON_TRIANGLE.svg</file>
-        <file alias="STAR">Flat/STAR.svg</file>
+        <file alias="MUSIC_PLAYER">Media/MUSIC_PLAYER.svg</file>
+        <file alias="PLAY_BUTTON_ROUND">Media/PLAY_BUTTON_ROUND.svg</file>
+        <file alias="PLAY_BUTTON_TRIANGLE">Media/PLAY_BUTTON_TRIANGLE.svg</file>
+        <file alias="STAR">Media/STAR.svg</file>
         <file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
         <file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.ico</file>
         <file alias="FOLDER_MERGE_TO_FIRST">RightClickIcon/FOLDER_MERGE_TO_FIRST.svg</file>
@@ -96,10 +99,10 @@
         <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5FileIdentifier.png</file>
         <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
         <file alias="REFRESH_SEARCH_SOURCE">RightClickIcon/REFRESH_SEARCH_SOURCE.svg</file>
-        <file alias="SORT_BY">sorting/SORT_BY.ico</file>
-        <file alias="SORTING_FILE_FOLDER">sorting/sorting.png</file>
-        <file alias="ASCENDING_ORDER">sorting/ascendingOrder.png</file>
-        <file alias="DESCENDING_ORDER">sorting/descendingOrder.png</file>
+        <file alias="SORT_BY">TopSideToolBarIcons/SORT_BY.ico</file>
+        <file alias="SORTING_FILE_FOLDER">TopSideToolBarIcons/sorting.png</file>
+        <file alias="ASCENDING_ORDER">TopSideToolBarIcons/ascendingOrder.png</file>
+        <file alias="DESCENDING_ORDER">TopSideToolBarIcons/descendingOrder.png</file>
         <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
         <file alias="SAVED">JsonEditor/SAVED.svg</file>
         <file alias="APPROVAL">JsonEditor/APPROVAL.svg</file>
@@ -143,9 +146,7 @@
         <file alias="VIDEOS_LIST_MENU">VideoPlayer/VIDEOS_LIST_MENU.svg</file>
         <file alias="VOLUME_UNMUTE">VideoPlayer/VOLUME_UNMUTE.svg</file>
         <file alias="VOLUME_MUTE">VideoPlayer/VOLUME_MUTE.svg</file>
-        <file alias="FOLDER_OPEN">Parser/FOLDER_OPEN.svg</file>
-        <file alias="JSON_AND_HTML">Parser/JSON_AND_HTML.svg</file>
-        <file alias="IMAGE">Parser/IMAGE.svg</file>
+        <file alias="FOLDER_OPEN">Media/FOLDER_OPEN.svg</file>
         <file alias="RENAME">NameStrIcon/RENAME.png</file>
         <file alias="NAME_STANDARDLIZER_PATH">NameStrIcon/NAME_STANDARDLIZER.svg</file>
         <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.png</file>
@@ -202,7 +203,10 @@
         <file alias="FOLDER_PREVIEW_BROWSER">View/FOLDER_PREVIEW_BROWSER.svg</file>
         <file alias="FOLDER_PREVIEW_LISTS">View/FOLDER_PREVIEW_LISTS.svg</file>
         <file alias="SCENE_TABLE_VIEW">View/SCENE_TABLE_VIEW.svg</file>
-        <file alias="COMBINE_MEDIAS_INFO">View/COMBINE_MEDIAS_INFO.svg</file>
+        <file alias="DEFAULT_COLUMN_WIDTH">View/DEFAULT_COLUMN_WIDTH.svg</file>
+        <file alias="DEFAULT_ROW_HEIGHT">View/DEFAULT_ROW_HEIGHT.svg</file>
+        <file alias="RESIZE_COLUMN_TO_CONTENTS">View/RESIZE_COLUMN_TO_CONTENTS.svg</file>
+        <file alias="RESIZE_ROW_TO_CONTENTS">View/RESIZE_ROW_TO_CONTENTS.svg</file>
 
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
         <file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
@@ -217,7 +221,7 @@
         <file alias="COUNTER">Database/COUNTER.svg</file>
         <file alias="SUM">Database/SUM.svg</file>
         <file alias="UNION">Database/UNION.svg</file>
-        <file alias="ZIP">Share/ZIP.ico</file>
+        <file alias="ZIP">TopSideToolBarIcons/ZIP.ico</file>
         <file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.png</file>
         <file alias="MIRROR_REVERT">RenameConflictIcons/MIRROR_REVERT.svg</file>
         <file alias="RESET">RenameConflictIcons/RESET.svg</file>
@@ -236,8 +240,10 @@
         <file alias="RATE8">PerformersManager/8.png</file>
         <file alias="RATE9">PerformersManager/9.png</file>
         <file alias="RATE10">PerformersManager/10.png</file>
-        <file alias="FULL_CALCULATE">MD5Window/FULL_CALCULATE.png</file>
-        <file alias="INCREMENTAL_CALCULATE">MD5Window/INCREMENTAL_CALCULATE.png</file>
+        <file alias="FULL_CALCULATE">Media/FULL_CALCULATE.png</file>
+        <file alias="INCREMENTAL_CALCULATE">Media/INCREMENTAL_CALCULATE.png</file>
+        <file alias="UPDATE_JSON_THEN_SCN">Media/UPDATE_JSON_THEN_SCN.svg</file>
+        <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
 
         <file alias="ALERT">AlertSystem/ALERT.svg</file>
         <file alias="ALERT_ACTIVE">AlertSystem/ALERT_ACTIVE.svg</file>
@@ -246,14 +252,6 @@
         <file alias="PASS">AlertSystem/PASS.svg</file>
         <file alias="RECHECK">AlertSystem/RECHECK.svg</file>
 
-        <file alias="_ALL">LogView/_ALL.svg</file>
-        <file alias="_INFO">LogView/_INFO.svg</file>
-        <file alias="_DEBUG">LogView/_DEBUG.svg</file>
-        <file alias="_WARNING">LogView/_WARNING.svg</file>
-        <file alias="_CRITICAL">LogView/_CRITICAL.svg</file>
-        <file alias="_FATAL">LogView/_FATAL.svg</file>
-        <file alias="_LOCATE_WHERE">LogView/_LOCATE_WHERE.svg</file>
-
         <file alias="RESTORE_ALL_ITEMS">RecycleBin/RESTORE_ALL_ITEMS.ico</file>
         <file alias="RESTORE_SELECTED_ITEMS">RecycleBin/RESTORE_SELECTED_ITEMS.ico</file>
         <file alias="EMPTY_RECYCLE_BIN">RecycleBin/EMPTY_RECYCLE_BIN.ico</file>
@@ -261,8 +259,5 @@
         <file alias="DIRTY_STATUS">RecycleBin/DIRTY_STATUS.ico</file>
         <file alias="CLEAN_STATUS">RecycleBin/CLEAN_STATUS.ico</file>
         <file alias="SQLITE_APP">RecycleBin/SQLITE_APP.svg</file>
-    </qresource>
-    <qresource prefix="/">
-        <file alias="PERFORMER_HTML_TEMPLATE">../bin/PerformerHtmlTemplate.html</file>
     </qresource>
 </RCC>
