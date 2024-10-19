@@ -103,6 +103,33 @@ bool PropertiesWindow::operator()(const QStringList& items) {
   return true;
 }
 
+bool PropertiesWindow::operator()(const QSqlTableModel* model, const QTableView* tv) {
+  if (model == nullptr || tv == nullptr) {
+    qCritical("model is nullptr");
+    return false;
+  }
+
+  m_commonInfomation = "not available";
+  m_durations = "not available";
+  m_fileIdentifier = "not available";
+
+  if (g_propertiesWindowAct().SHOW_FILES_SIZE->isChecked()) {
+    qint64 totalSz = 0;
+    const QModelIndexList& selIdxs = tv->selectionModel()->selectedRows();
+    const QModelIndex rootIndex = tv->rootIndex();
+    for (const QModelIndex& idx : selIdxs) {
+      const QModelIndex szInd = model->index(idx.row(), DB_HEADER_KEY::DB_SIZE_COLUMN, rootIndex);
+      totalSz += model->QSqlTableModel::data(szInd, Qt::ItemDataRole::DisplayRole).toLongLong();
+    }
+    m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(selIdxs.size()).arg(0);
+    const QString sizeMsg = FILE_PROPERTY_DSP::sizeToFileSizeDetail(totalSz);
+    m_commonInfomation += QString("Size: %3").arg(sizeMsg);
+  }
+
+  UpdateMessage();
+  return true;
+}
+
 void PropertiesWindow::ReadSetting() {
   if (PreferenceSettings().contains("PropertiesWindowGeometry")) {
     restoreGeometry(PreferenceSettings().value("PropertiesWindowGeometry").toByteArray());
@@ -122,7 +149,7 @@ void PropertiesWindow::subscribe() {
   connect(g_propertiesWindowAct().SHOW_FILES_MD5, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

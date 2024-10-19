@@ -56,6 +56,10 @@ class ContentPanel : public QStackedWidget {
     return p != nullptr && p == m_sceneTableView;
   }
 
+  inline bool isMovieDBView() const {
+    const auto* p = currentWidget();
+    return p != nullptr && p == m_movieView;
+  }
   QModelIndex getRootIndex() const;
   inline QAbstractItemView* GetCurView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
   QAbstractItemView* GetView(const QString& name) const;
