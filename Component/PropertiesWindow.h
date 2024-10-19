@@ -5,11 +5,14 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QToolBar>
+#include <QSqlTableModel>
+#include <QTableView>
 
 class PropertiesWindow : public QDialog {
  public:
   explicit PropertiesWindow(QWidget* parent = nullptr);
   bool operator()(const QStringList& items);
+  bool operator()(const QSqlTableModel* model, const QTableView* tv);
 
   void ReadSetting();
   void closeEvent(QCloseEvent* event) override;
