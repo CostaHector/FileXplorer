@@ -124,12 +124,13 @@ FileOperatorType::BATCH_COMMAND_LIST_TYPE RenameNamesUnique::getRenameCommands()
     news.append(relTmp + m_rightNames[i]);
   }
 
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE cmds;
   for (int i = 0; i < olds.size(); ++i) {
     if (olds[i] == news[i]) {
       continue;
     }
-    cmds.append({"rename", m_pre, olds[i], m_pre, news[i]});
+    cmds.append(ACMD{RENAME, {m_pre, olds[i], m_pre, news[i]}});
   }
   return {cmds.crbegin(), cmds.crend()};  // rename files first, than its folders;
 }

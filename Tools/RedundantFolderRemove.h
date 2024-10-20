@@ -35,7 +35,7 @@ class RedundantRmv {
   operator QString() {
     QString s;
     for (const auto& l : m_cmds) {
-      s += (l.join(',') + '|');
+      s += (l.toStr() + '|');
     }
     return s;
   }

@@ -50,6 +50,7 @@ QMap<QString, QStringList> Categorizer::ClassifyItemIntoPiles(const QString& pat
 }
 
 int Categorizer::operator()(const QString& path, const QMap<QString, QStringList>& pilesMap) {
+  using namespace FileOperatorType;
   int filesRearrangedCnt = 0;
   int pathCreatedCnt = 0;
   for (auto it = pilesMap.cbegin(); it != pilesMap.cend(); ++it) {
@@ -63,7 +64,7 @@ int Categorizer::operator()(const QString& path, const QMap<QString, QStringList
     QDir underDir(underPath);
     if (!underDir.exists()) {
       // create a folder path + '/' + folderName
-      m_cmds.append({"mkpath", path, folderName});
+      m_cmds.append(ACMD{MKPATH, {path, folderName}});
       ++pathCreatedCnt;
     }
     for (const QString& file : files) {
@@ -75,12 +76,12 @@ int Categorizer::operator()(const QString& path, const QMap<QString, QStringList
         qDebug("%s/%s already exist, move will failed, skip it", qPrintable(underPath), qPrintable(file));
         continue;
       }
-      m_cmds.append({"rename", path, file, underPath, file});
+      m_cmds.append(ACMD{RENAME, {path, file, underPath, file}});
       ++filesRearrangedCnt;
     }
   }
 
-  qDebug("%d file(s) rearrange, %d path(s) make, %d cmds been generated under path[%s]", filesRearrangedCnt, pathCreatedCnt, qPrintable(path));
+  qDebug("%d file(s) rearrange, %d path(s) make under path[%s]", filesRearrangedCnt, pathCreatedCnt, qPrintable(path));
   return filesRearrangedCnt;
 }
 
