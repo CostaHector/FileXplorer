@@ -31,10 +31,9 @@ void MyQFileSystemModel::BindLogger(CustomStatusBar* logger) {
 }
 
 auto MyQFileSystemModel::fullInfo(const QModelIndex& curIndex) const -> QString {
-  using namespace MainKey;
   const int row = curIndex.row();
   const QModelIndex& par = curIndex.parent();
-  return data(index(row, Name, par)).toString() + '\t' + data(index(row, Size, par)).toString() + '\t' + rootPath();
+  return data(index(row, MainKey::Name, par)).toString() + '\t' + data(index(row, MainKey::Size, par)).toString() + '\t' + rootPath();
 }
 
 Qt::ItemFlags MyQFileSystemModel::flags(const QModelIndex& index) const {

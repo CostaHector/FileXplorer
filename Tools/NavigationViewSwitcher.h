@@ -9,7 +9,7 @@ class NavigationViewSwitcher : public QObject {
  public:
   explicit NavigationViewSwitcher(StackedToolBar* navigation, ContentPanel* view, QObject* parent = nullptr);
 
-  void onSwitchByViewType(const QString& viewType);
+  void onSwitchByViewType(ViewTypeTool::ViewType);
   void onSwitchByViewAction(const QAction* activatedAction);
 
  private:
