@@ -314,8 +314,8 @@ auto AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) -> 
   const auto& reversedcmds(renameHelper.getRenameCommands());  // rename files first, than its folders;
 
   if (isOnlyHelp) {
-    for (const QStringList& cmd : reversedcmds) {
-      m_commandsPreview->appendPlainText(cmd.join('\t'));
+    for (const auto& cmd : reversedcmds) {
+      m_commandsPreview->appendPlainText(cmd.toStr());
     }
     m_commandsPreview->setWindowTitle(QString("Rename names unique | Total %1 Command(s)").arg(reversedcmds.size()));
     m_commandsPreview->setMinimumWidth(1024);

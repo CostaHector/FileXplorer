@@ -38,14 +38,15 @@ public:
                    newNmList.size()-uniqueAbsPathSet.size(), newNmList.size());
             return false;
         }
-        FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+        using namespace FileOperatorType;
+        BATCH_COMMAND_LIST_TYPE cmds;
         for (auto i = nmList.size() - 1 ; i > -1 ; --i){
             const QString& oldNm = nmList[i];
             const QString& newNm = newNmList[i];
             if (oldNm == newNm){
                 continue;
             }
-            cmds.append({"rename", pathList[i], oldNm, pathList[i], newNm});
+            cmds.append(ACMD{RENAME, {pathList[i], oldNm, pathList[i], newNm}});
         }
         auto isAllSuccess = g_undoRedo.Do(cmds);
         return isAllSuccess;

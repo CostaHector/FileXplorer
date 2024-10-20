@@ -78,6 +78,7 @@ bool ConflictsRecycle::on_ShowCommand() {
   m_commandsPreview->setMinimumWidth(1024);
   m_commandsPreview->raise();
   m_commandsPreview->show();
+  return true;
 }
 
 auto ConflictsRecycle::Subscribe() -> void {
