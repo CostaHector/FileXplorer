@@ -164,5 +164,5 @@ void PathToolTest::test_GetBaseNameDotBeforeSlash() {
   QCOMPARE(GetBaseName("C:/.a/any movie name"), "any movie name");
 }
 
-QTEST_MAIN(PathToolTest)
+//QTEST_MAIN(PathToolTest)
 #include "PathToolTest.moc"

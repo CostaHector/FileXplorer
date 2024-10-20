@@ -1,21 +1,24 @@
 #include "UndoRedo.h"
 #include "Component/SyncModifiyFileSystem.h"
+#include "FileOperation/FileOperation.h"
+using namespace FileOperatorType;
+
 UndoRedo g_undoRedo;
 
-auto syncExecuterconst(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& aBatch) -> FileOperatorType::BATCH_COMMAND_LIST_TYPE {
+BATCH_COMMAND_LIST_TYPE syncExecuterconst(const BATCH_COMMAND_LIST_TYPE& aBatch) {
   if (!SyncModifiyFileSystem::m_syncModifyFileSystemSwitch) {
     return {};
   }
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE syncBatch;
+  BATCH_COMMAND_LIST_TYPE syncBatch;
   syncBatch.reserve(aBatch.size());
   const SyncModifiyFileSystem syncMod;
   for (int i = 0; i < aBatch.size(); ++i) {
-    QStringList cmds = aBatch[i];
-    if (cmds.isEmpty()) {
+    auto cmds = aBatch[i];
+    if (!cmds) {
       continue;
     }
     bool cmdNeedSync{false};
-    for (int parm = 1; parm < cmds.size(); ++parm) {
+    for (int parm = 0; parm < cmds.size(); ++parm) {
       if (syncMod(cmds[parm])) {
         cmdNeedSync = true;
       }
@@ -28,26 +31,25 @@ auto syncExecuterconst(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& aBatch) 
   return syncBatch;
 }
 
-auto UndoRedo::Do(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& cmd) -> bool {
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE srcCommand;
-  FileOperatorType::EXECUTE_RETURN_TYPE exeRetEle = FileOperation::executer(cmd, srcCommand);
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE syncCmd;
+bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
+  BATCH_COMMAND_LIST_TYPE srcCommand;
+  auto exeRetEle = FileOperation::executer(cmd, srcCommand);
+
+  BATCH_COMMAND_LIST_TYPE syncCmd;
   if (SyncModifiyFileSystem::m_syncModifyFileSystemSwitch) {
     syncCmd = syncExecuterconst(cmd);
     if (!syncCmd.isEmpty()) {
-      FileOperatorType::BATCH_COMMAND_LIST_TYPE syncSrcCommand;
-      const FileOperatorType::EXECUTE_RETURN_TYPE& syncRetEle = FileOperation::executer(syncCmd, syncSrcCommand);
-      if (!syncRetEle.first) {
+      BATCH_COMMAND_LIST_TYPE syncSrcCommand;
+      const auto& syncRetEle = FileOperation::executer(syncCmd, syncSrcCommand);
+      if (!syncRetEle) {
         qWarning("sync commands failed");
       }
-      exeRetEle.first = exeRetEle.first && syncRetEle.first;
-      exeRetEle.second = syncRetEle.second + exeRetEle.second;
+      exeRetEle.ret = exeRetEle.ret && syncRetEle.ret;
+      exeRetEle.cmds = syncRetEle.cmds + exeRetEle.cmds;
     }
   }
-  const auto isAllSucceed = exeRetEle.first;
-  const auto& recover_cmd = exeRetEle.second;
-  undoList.append(OperationStream{cmd + syncCmd, recover_cmd});
-  return isAllSucceed;
+  undoList.append(OperationStream{cmd + syncCmd, exeRetEle.cmds});
+  return exeRetEle;
 }
 
 bool UndoRedo::on_Undo() {
@@ -70,4 +72,27 @@ bool UndoRedo::on_Redo() {
   const char* redoMsg = isAllSucceed ? "All redo succeed" : "Some redo failed.";
   qDebug("%s", redoMsg);
   return isAllSucceed;
+}
+
+UndoRedo::UNDO_REDO_RETURN UndoRedo::Undo() {
+  if (not undoAvailable()) {
+    qDebug("Skip Cannot undo");
+    return qMakePair<bool, OperationStream>(true, OperationStream());
+  }
+  OperationStream ele = undoList.pop();
+  const auto& exeRetEle = FileOperation::executer(ele.recoverCmd, ele.doCmd);
+  redoList.append(ele);  // you can not just update do_cmd in ele. Because it is not equivelant as rmfile has no recover
+  // compromise method: when pass the do_cmd list into it
+  return qMakePair<bool, OperationStream>(exeRetEle, ele);
+}
+
+UndoRedo::UNDO_REDO_RETURN UndoRedo::Redo() {
+  if (not redoAvailable()) {
+    qDebug("Skip Cannot redo");
+    return qMakePair<bool, OperationStream>(true, OperationStream());
+  }
+  OperationStream ele = redoList.pop();
+  const auto& exeRetEle = FileOperation::executer(ele.doCmd, ele.recoverCmd);
+  undoList.append(ele);
+  return qMakePair<bool, OperationStream>(exeRetEle, ele);
 }
