@@ -12,6 +12,7 @@
 
 #include "Tools/FolderPreviewSwitcher.h"
 #include "Tools/NavigationViewSwitcher.h"
+#include "Tools/ViewTypeTool.h"
 
 FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
     : QMainWindow(parent),
@@ -35,7 +36,8 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
   m_fsPanel->BindLogger(m_statusBar);
 
   m_naviSwitcher = new NavigationViewSwitcher{m_stackedBar, m_fsPanel};
-  m_naviSwitcher->onSwitchByViewType("table");
+
+  m_naviSwitcher->onSwitchByViewType(ViewTypeTool::ViewType::TABLE);
 
   qDebug("FileExplorerReadOnly Current path [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
   QString initialPath = (argc > 1) ? argv[1] : "";
