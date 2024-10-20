@@ -68,14 +68,14 @@ class AdvanceSearchModel : public QAbstractTableModel {
   void RecycleSomething(const QSet<QModelIndex>& recycleIndexes);
   void ClearRecycle();
 
-  auto rootDirectory(const QString& placeHolder = "" /* no use */) const -> QDir { return QDir(rootPath()); }
+  QDir rootDirectory(const QString& placeHolder = "" /* no use */) const { return QDir(rootPath()); }
 
-  auto absolutePath(QModelIndex curIndex) const -> QString {
+  QString absolutePath(QModelIndex curIndex) const {
     QModelIndex preIndex = index(curIndex.row(), 4, curIndex.parent());
     return data(preIndex, Qt::ItemDataRole::DisplayRole).toString();
   }
 
-  auto fileName(QModelIndex curIndex) const -> QString {
+  QString fileName(QModelIndex curIndex) const {
     QModelIndex nameIndex = index(curIndex.row(), 0, curIndex.parent());
     return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
   }
