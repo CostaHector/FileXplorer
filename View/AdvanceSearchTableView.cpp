@@ -70,15 +70,15 @@ class AdvanceSearchTableViewWindowTest : public QMainWindow {
     const QString restoredPath = "D:/extra";
     QDir::Filters restoredFilters{
         PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()};
-    m_srcModel->setRootPathAndFilter(restoredPath, restoredFilters);
-    m_proxyModel->setSourceModel(m_srcModel);
+    m_searchSrcModel->setRootPathAndFilter(restoredPath, restoredFilters);
+    m_proxyModel->setSourceModel(m_searchSrcModel);
 
-    m_tv = new AdvanceSearchTableView(m_srcModel, m_proxyModel, this);
+    m_tv = new AdvanceSearchTableView(m_searchSrcModel, m_proxyModel, this);
     setCentralWidget(m_tv);
     addToolBar(m_tb);
-    m_tb->BindSearchAllModel(m_proxyModel, m_srcModel);
+    m_tb->BindSearchAllModel(m_proxyModel, m_searchSrcModel);
     setWindowIcon(QIcon(":img/SEARCH"));
-    setWindowTitle("Search under|" + m_srcModel->rootPath());
+    setWindowTitle("Search under|" + m_searchSrcModel->rootPath());
   }
   auto sizeHint() const -> QSize override { return QSize(1024, 768); }
 
@@ -87,14 +87,14 @@ class AdvanceSearchTableViewWindowTest : public QMainWindow {
       qWarning("Path is a huge folder, search will cause lags[%s]", qPrintable(newPath));
       return false;
     }
-    m_srcModel->setRootPath(newPath);
-    setWindowTitle("Search under|" + m_srcModel->rootPath());
+    m_searchSrcModel->setRootPath(newPath);
+    setWindowTitle("Search under|" + m_searchSrcModel->rootPath());
     return true;
   }
 
  private:
   AdvanceSearchToolBar* m_tb = new AdvanceSearchToolBar("advance search tb", this);
-  AdvanceSearchModel* m_srcModel = new AdvanceSearchModel;
+  AdvanceSearchModel* m_searchSrcModel = new AdvanceSearchModel;
   SearchProxyModel* m_proxyModel = new SearchProxyModel;
   AdvanceSearchTableView* m_tv = nullptr;
 };
