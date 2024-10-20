@@ -1,6 +1,5 @@
 #include "StackedToolBar.h"
 
-int StackedToolBar::AddToolBar(const QString& name, QToolBar* tb) {
-  m_name2StackIndex[name] = m_stackedToolBar->addWidget(tb);
-  return m_name2StackIndex[name];
+int StackedToolBar::AddToolBar(ViewTypeTool::ViewType vt, QToolBar* tb) {
+  return m_name2StackIndex[vt] = m_stackedToolBar->addWidget(tb);
 }

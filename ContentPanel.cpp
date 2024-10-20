@@ -16,6 +16,7 @@
 
 #include <QUrl>
 
+using namespace ViewTypeTool;
 ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
     : QStackedWidget(parent), m_fsModel(new MyQFileSystemModel(this)), _previewFolder{previewFolder}, _logger(nullptr), m_parent(parent) {
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -56,7 +57,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     }
   }
 
-  if (isSceneView()) {
+  if (GetCurViewType() == ViewType::SCENE) {
     if (m_sceneTableView == nullptr) {
       qWarning("m_scenesModel is nullptr");
       return false;
@@ -79,7 +80,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
-  if (isSceneView()) {
+  if (GetCurViewType() == ViewType::SCENE) {
     if (m_scenesModel == nullptr) {
       qWarning("m_scenesModel is nullptr");
       return false;
@@ -98,7 +99,7 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
 }
 
 auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
-  if (isSceneView()) {
+  if (GetCurViewType() == ViewType::SCENE) {
     if (m_scenesModel == nullptr) {
       qWarning("m_scenesModel is nullptr");
       return false;
@@ -240,28 +241,22 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QIt
   return true;
 }
 
-void ContentPanel::connectSelectionChanged(QString typeName) {
-  if (typeName.isEmpty()) {
-    typeName = GetCurViewName();
-  }
-  disconnectSelectionChanged(typeName);
-  if (typeName == "table") {
+void ContentPanel::connectSelectionChanged(ViewTypeTool::ViewType vt) {
+  disconnectSelectionChanged(vt);
+  if (vt == ViewType::TABLE) {
     ContentPanel::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (typeName == "list") {
+  } else if (vt == ViewType::LIST) {
     ContentPanel::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (typeName == "tree") {
+  } else if (vt == ViewType::TREE) {
     ContentPanel::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
   }
 }
-void ContentPanel::disconnectSelectionChanged(QString typeName) {
-  if (typeName.isEmpty()) {
-    typeName = GetCurViewName();
-  }
-  if (typeName == "table") {
+void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
+  if (vt == ViewType::TABLE) {
     ContentPanel::disconnect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (typeName == "list") {
+  } else if (vt == ViewType::LIST) {
     ContentPanel::disconnect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (typeName == "tree") {
+  } else if (vt == ViewType::TREE) {
     ContentPanel::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
   }
 }
