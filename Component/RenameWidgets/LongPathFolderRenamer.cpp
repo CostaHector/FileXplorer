@@ -144,8 +144,8 @@ auto LongPathFolderRenamer::onApply(const bool isOnlyHelp, const bool isInterati
     Notificator::warning("Edit them first", QString("There are still %1 path(s) too long").arg(tooLongCnt));
     return false;
   }
-
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE cmds;
   for (int i = 0; i < newCompleteNameList.size(); ++i) {
     if (newCompleteNameList[i].isEmpty()) {
       qWarning("new name of [%s] is empty", qPrintable(m_lpf.olds[i]));
@@ -155,7 +155,7 @@ auto LongPathFolderRenamer::onApply(const bool isOnlyHelp, const bool isInterati
     if (m_lpf.olds[i] == newCompleteNameList[i]) {
       continue;
     }
-    cmds.append({"rename", m_lpf.pres[i], m_lpf.olds[i], m_lpf.pres[i], newCompleteNameList[i]});
+    cmds.append(ACMD{RENAME, {m_lpf.pres[i], m_lpf.olds[i], m_lpf.pres[i], newCompleteNameList[i]}});
   }
   FileOperatorType::BATCH_COMMAND_LIST_TYPE reversedcmds{cmds.crbegin(), cmds.crend()};  // rename files first, than its folders;
 
@@ -163,8 +163,8 @@ auto LongPathFolderRenamer::onApply(const bool isOnlyHelp, const bool isInterati
     if (m_commandsPreview == nullptr) {
       m_commandsPreview = new QPlainTextEdit;
     }
-    for (const QStringList& cmd : reversedcmds) {
-      m_commandsPreview->appendPlainText(cmd.join('\t'));
+    for (const ACMD& cmd : reversedcmds) {
+      m_commandsPreview->appendPlainText(cmd.lst.join('\t'));
     }
     m_commandsPreview->setWindowTitle(QString("Rename names | Total %1 Command(s)").arg(reversedcmds.size()));
     m_commandsPreview->setMinimumWidth(1024);

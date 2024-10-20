@@ -1,4 +1,5 @@
 #include "ConflictsFileSystemModel.h"
+using namespace FileOperatorType;
 
 const QStringList ConflictsFileSystemModel::HORIZONTAL_HEADER_NAMES = {"name", "Delete Incoming", "size", "date", "size", "date"};
 
@@ -128,7 +129,7 @@ QString ConflictsFileSystemModel::filePath(const QModelIndex& index) const {
 }
 
 QString ConflictsFileSystemModel::displayCommands() const {
-  return FileOperatorType::BatchCommands2String(m_cmds);
+  return BatchCommands2String(m_cmds);
 }
 
 void ConflictsFileSystemModel::updateCommands() {
@@ -142,7 +143,7 @@ void ConflictsFileSystemModel::updateCommands() {
     const QString& nm = m_conflict.m_fromPathItems[i];
     if (m_recycleMap.contains(i)) {
       const auto& conflictItems = m_recycleMap[i];
-      m_cmds.append({"moveToTrash", conflictItems.recycleLeft ? l : r, nm});
+      m_cmds.append(ACMD{MOVETOTRASH, {conflictItems.recycleLeft ? l : r, nm}});
       if (conflictItems.recycleLeft) {
         // don't need to do anything
         continue;
@@ -151,24 +152,24 @@ void ConflictsFileSystemModel::updateCommands() {
     switch (OP) {
       case CCMMode::CUT_OP:
       case CCMMode::MERGE_OP:
-        m_cmds.append({"rename", l, nm, r, nm});
+        m_cmds.append(ACMD{RENAME, {l, nm, r, nm}});
         break;
       case CCMMode::COPY_OP: {
         if (QFileInfo(l, nm).isDir()) {
-          m_cmds.append({"mkpath", r, nm});
+          m_cmds.append(ACMD{MKPATH, {r, nm}});
         } else {
-          m_cmds.append({"cpfile", l, nm, r});
+          m_cmds.append(ACMD{CPFILE, {l, nm, r}});
         }
         break;
       }
       case CCMMode::LINK_OP:
-        m_cmds.append({"link", l, nm, r});
+        m_cmds.append(ACMD{LINK, {l, nm, r}});
       default:
         break;
     }
   }
   if (OP == CCMMode::MERGE_OP) {
-    m_cmds.append({"rmpath", "", l});  // when merge A to B, folder A need to removed
+    m_cmds.append(ACMD{RMPATH, {"", l}});  // when merge A to B, folder A need to removed
   }
 }
 
