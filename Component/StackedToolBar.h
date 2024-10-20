@@ -9,6 +9,7 @@
 #include <QLayout>
 #include <QStackedWidget>
 #include <QToolBar>
+#include "Tools/ViewTypeTool.h"
 
 class NavigationViewSwitcher;
 
@@ -23,7 +24,7 @@ class StackedToolBar : public QToolBar {
     layout()->setSpacing(0);
     layout()->setContentsMargins(0, 0, 0, 0);
   }
-  int AddToolBar(const QString& name, QToolBar* tb);
+  int AddToolBar(ViewTypeTool::ViewType vt, QToolBar* tb);
 
   NavigationAndAddressBar* m_addressBar{nullptr};
   DatabaseSearchToolBar* m_dbSearchBar{nullptr};
@@ -31,7 +32,7 @@ class StackedToolBar : public QToolBar {
 
  private:
   QStackedWidget* m_stackedToolBar;
-  QHash<QString, int> m_name2StackIndex;
+  QMap<ViewTypeTool::ViewType, int> m_name2StackIndex;
 };
 
 

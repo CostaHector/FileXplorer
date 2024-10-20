@@ -96,6 +96,7 @@ SOURCES += \
     Tools/SearchProxyModel.cpp \
     Tools/MyClipboard.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
+    Tools/ViewTypeTool.cpp \
     Tools/VidsDurationDisplayString.cpp \
     Tools/LongPathFinder.cpp \
     View/AdvanceSearchTableView.cpp \
@@ -256,6 +257,7 @@ HEADERS += \
     Tools/SearchProxyModel.h \
     Tools/MyClipboard.h \
     Tools/ToConsecutiveFileNameNo.h \
+    Tools/ViewTypeTool.h \
     Tools/VidsDurationDisplayString.h \
     Tools/LongPathFinder.h \
     View/AdvanceSearchTableView.h \
