@@ -16,6 +16,8 @@
 #include "View/MovieDBView.h"
 #include "View/SceneTableView.h"
 
+#include "Tools/ViewTypeTool.h"
+
 class NavigationViewSwitcher;
 
 class ContentPanel : public QStackedWidget {
@@ -39,32 +41,50 @@ class ContentPanel : public QStackedWidget {
   void BindLogger(CustomStatusBar* logger);
 
   auto on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool;
-  void connectSelectionChanged(QString typeName);
-  void disconnectSelectionChanged(QString typeName);
+  void connectSelectionChanged(ViewTypeTool::ViewType vt);
+  void disconnectSelectionChanged(ViewTypeTool::ViewType vt);
   auto on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) -> bool;
   auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
 
   auto keyPressEvent(QKeyEvent* e) -> void override;
 
   inline bool isFSView() const {
-    const auto* p = currentWidget();
-    return p != nullptr and (p == m_fsTableView or p == m_fsListView or p == m_fsTreeView);
+    ViewTypeTool::ViewType vt = GetCurViewType();
+    return ViewTypeTool::isFSView(vt);
   }
 
-  inline bool isSceneView() const {
-    const auto* p = currentWidget();
-    return p != nullptr && p == m_sceneTableView;
-  }
-
-  inline bool isMovieDBView() const {
-    const auto* p = currentWidget();
-    return p != nullptr && p == m_movieView;
-  }
   QModelIndex getRootIndex() const;
   inline QAbstractItemView* GetCurView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
-  QAbstractItemView* GetView(const QString& name) const;
   QString GetCurViewName() const;
-  int AddView(const QString& viewType, QWidget* w);
+  inline ViewTypeTool::ViewType GetCurViewType() const {
+    using namespace ViewTypeTool;
+    const auto* p = currentWidget();
+    if (p == nullptr) {
+      return ViewType::VIEW_TYPE_BUTT;
+    }
+    if (p == m_fsTableView) {
+      return ViewType::TABLE;
+    }
+    if (p == m_fsListView) {
+      return ViewType::LIST;
+    }
+    if (p == m_fsTreeView) {
+      return ViewType::TREE;
+    }
+    if (p == m_movieView) {
+      return ViewType::MOVIE;
+    }
+    if (p == m_advanceSearchView) {
+      return ViewType::SEARCH;
+    }
+    if (p == m_sceneTableView) {
+      return ViewType::SCENE;
+    }
+    qCritical("Current View Type[%s] not supported", qPrintable(GetCurViewName()));
+    return ViewType::VIEW_TYPE_BUTT;
+  }
+
+  int AddView(ViewTypeTool::ViewType vt, QWidget* w);
 
   QString getRootPath() const;
   QString getFilePath(const QModelIndex& ind) const;
@@ -94,7 +114,7 @@ class ContentPanel : public QStackedWidget {
 
   MyQFileSystemModel* m_fsModel;
   MyQSqlTableModel* m_dbModel{nullptr};
-  AdvanceSearchModel* m_srcModel{nullptr};
+  AdvanceSearchModel* m_searchSrcModel{nullptr};
   SearchProxyModel* m_proxyModel{nullptr};
   ScenesTableModel* m_scenesModel{nullptr};
 
@@ -112,7 +132,7 @@ class ContentPanel : public QStackedWidget {
   QWidget* m_parent;
 
  private:
-  QHash<QString, int> m_name2ViewIndex;
+  QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
 };
 
 #endif  // CONTENTPANEL_H
