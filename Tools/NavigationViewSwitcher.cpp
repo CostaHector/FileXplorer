@@ -5,188 +5,188 @@
 #include "Model/ScenesTableModel.h"
 #include "PublicTool.h"
 #include "Tools/ActionWithPath.h"
-
-enum class ViewType : char {
-  VIEW_TYPE_BEGIN = 0,
-  LIST = VIEW_TYPE_BEGIN,
-  TABLE,
-  TREE,
-  SEARCH,
-  MOVIE,
-  SCENE,
-  VIEW_TYPE_BUTT,
-};
-
-const char* GetViewTypeHumanFriendlyStr(ViewType viewType) {
-  static const char viewType2Str[(char)ViewType::VIEW_TYPE_BUTT][16] = {"list", "table", "tree", "search", "movie", "scene"};
-  if ((char)viewType >= (char)ViewType::VIEW_TYPE_BUTT) {
-    qDebug("viewType[%d] is invalid", (char)viewType);
-    return "invalidViewType";
-  }
-  return viewType2Str[(char)viewType];
-}
-
-ViewType GetViewTypeByActionText(const QAction* viewAct) {
-  if (viewAct == nullptr) {
-    qWarning("viewAct is nullptr");
-    return ViewType::VIEW_TYPE_BUTT;
-  }
-  static const QMap<QString, ViewType> actText2View{{"list", ViewType::LIST},     {"table", ViewType::TABLE}, {"tree", ViewType::TREE},
-                                                    {"search", ViewType::SEARCH}, {"movie", ViewType::MOVIE}, {"scene", ViewType::SCENE}};
-  const QString& viewTypeStr = viewAct->text();
-  auto it = actText2View.find(viewTypeStr);
-  if (it == actText2View.cend()) {
-    qWarning("viewtype[%s] not found in %d element(s) map", qPrintable(viewTypeStr), actText2View.size());
-    return ViewType::VIEW_TYPE_BUTT;
-  }
-  return it.value();
-}
-
-using std::placeholders::_1;
-using std::placeholders::_2;
-using std::placeholders::_3;
+#include "Tools/ViewTypeTool.h"
+using namespace ViewTypeTool;
 
 NavigationViewSwitcher::NavigationViewSwitcher(StackedToolBar* navigation, ContentPanel* view, QObject* parent)
     : QObject(parent), _navigation(navigation), _view(view) {}
 
-void NavigationViewSwitcher::onSwitchByViewType(const QString& viewType) {
-  static const QSet<QString> fileSystemView{"list", "table", "tree"};
+void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
+  // push toolbar to stackwidget and set current toolbar widget
   int naviIndex = -1;
-  if (fileSystemView.contains(viewType)) {
-    if (_navigation->m_addressBar == nullptr) {
-      _navigation->m_addressBar = new NavigationAndAddressBar;
-      _navigation->AddToolBar("NavigationAddress", _navigation->m_addressBar);
-      _view->BindNavigationAddressBar(_navigation->m_addressBar);
+  switch (viewType) {
+    case ViewType::LIST:
+    case ViewType::TABLE:
+    case ViewType::TREE: {
+      if (_navigation->m_addressBar == nullptr) {
+        _navigation->m_addressBar = new NavigationAndAddressBar;
+        _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
+        _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
-      auto F_IntoNewPath = std::bind(&ContentPanel::onActionAndViewNavigate, _view, _1, _2, _3);
-      _navigation->m_addressBar->BindFileSystemViewCallback(F_IntoNewPath, std::bind(&ContentPanel::on_searchTextChanged, _view, _1),
-                                                            std::bind(&ContentPanel::on_searchEnterKey, _view, _1), _view->m_fsModel);
+        static auto F_IntoNewPath = [this](QString newPath, bool isNewPath, bool isF5Force) -> bool {
+          return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force);
+        };
+        static auto F_SearchTextChanged = [this](const QString& targetStr) -> bool { return _view->on_searchTextChanged(targetStr); };
+        static auto F_SearchEnterKey = [this](const QString& targetStr) -> bool { return _view->on_searchEnterKey(targetStr); };
 
-      ActionWithPath::BindIntoNewPath(F_IntoNewPath);
-    }
-    naviIndex = _navigation->m_name2StackIndex["NavigationAddress"];
-    qDebug("Switch to list/table/tree");
-  } else if (viewType == "movie") {
-    if (_navigation->m_dbSearchBar == nullptr) {
-      _navigation->m_dbSearchBar = new DatabaseSearchToolBar;
-      _navigation->AddToolBar("DatabaseSearch", _navigation->m_dbSearchBar);
+        _navigation->m_addressBar->BindFileSystemViewCallback(F_IntoNewPath, F_SearchTextChanged, F_SearchEnterKey, _view->m_fsModel);
 
-      _view->BindDatabaseSearchToolBar(_navigation->m_dbSearchBar);
+        ActionWithPath::BindIntoNewPath(F_IntoNewPath);
+      }
+      naviIndex = _navigation->m_name2StackIndex[ViewType::TABLE];
+      qDebug("Switch toolbar to list/table/tree[%c]", (char)viewType);
+      break;
     }
-    naviIndex = _navigation->m_name2StackIndex["DatabaseSearch"];
-    qDebug("Switch to movie");
-  } else if (viewType == "search") {
-    if (_navigation->m_advanceSearchBar == nullptr) {
-      _navigation->m_advanceSearchBar = new AdvanceSearchToolBar;
-      _navigation->AddToolBar("search", _navigation->m_advanceSearchBar);
+    case ViewType::MOVIE: {
+      if (_navigation->m_dbSearchBar == nullptr) {
+        _navigation->m_dbSearchBar = new DatabaseSearchToolBar;
+        _navigation->AddToolBar(viewType, _navigation->m_dbSearchBar);
 
-      _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
+        _view->BindDatabaseSearchToolBar(_navigation->m_dbSearchBar);
+      }
+      naviIndex = _navigation->m_name2StackIndex[viewType];
+      qDebug("Switch toolbar to movie[%c]", (char)viewType);
+      break;
     }
-    naviIndex = _navigation->m_name2StackIndex["search"];
-    qDebug("Switch to search");
-  } else if (viewType == "scene") {
-    if (_navigation->m_addressBar == nullptr) {
-      _navigation->m_addressBar = new NavigationAndAddressBar;
-      _navigation->AddToolBar("scene", _navigation->m_addressBar);
+    case ViewType::SEARCH: {
+      if (_navigation->m_advanceSearchBar == nullptr) {
+        _navigation->m_advanceSearchBar = new AdvanceSearchToolBar;
+        _navigation->AddToolBar(viewType, _navigation->m_advanceSearchBar);
+
+        _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
+      }
+      naviIndex = _navigation->m_name2StackIndex[viewType];
+      qDebug("Switch toolbar to search[%c]", (char)viewType);
+      break;
     }
-    naviIndex = _navigation->m_name2StackIndex["scene"];
-    qDebug("Switch to scene");
+    case ViewType::SCENE: {
+      if (_navigation->m_addressBar == nullptr) {
+        _navigation->m_addressBar = new NavigationAndAddressBar;
+        _navigation->AddToolBar(viewType, _navigation->m_addressBar);
+      }
+      naviIndex = _navigation->m_name2StackIndex[viewType];
+      qDebug("Switch toolbar to scene[%c]", (char)viewType);
+      break;
+    }
+    default: {
+      return;
+    }
   }
   _navigation->m_stackedToolBar->setCurrentIndex(naviIndex);
 
+  // push view widget to stackwidget and set current view widget
   int viewIndex = -1;
-  if (viewType == "table") {
-    if (_view->m_fsTableView == nullptr) {
-      _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel);
-      ContentPanel::connect(_view->m_fsTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      _view->connectSelectionChanged(viewType);
-      _view->AddView(viewType, _view->m_fsTableView);
+  switch (viewType) {
+    case ViewType::LIST: {
+      if (_view->m_fsListView == nullptr) {
+        _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
+        ContentPanel::connect(_view->m_fsListView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+        _view->connectSelectionChanged(viewType);
+        _view->AddView(viewType, _view->m_fsListView);
+      }
+      const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
+      if (newRootIndex.isValid()) {
+        // sync root index from last valid file-system model root index
+        _view->m_fsListView->setRootIndex(newRootIndex);
+      }
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to list[%c]", (char)viewType);
+      break;
     }
-    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    const auto& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
-    if (newRootIndex.isValid()) {
-      // sync root index from last valid file-system model root index
-      _view->m_fsTableView->setRootIndex(newRootIndex);
+    case ViewType::TABLE: {
+      if (_view->m_fsTableView == nullptr) {
+        _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel);
+        ContentPanel::connect(_view->m_fsTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+        _view->connectSelectionChanged(viewType);
+        _view->AddView(viewType, _view->m_fsTableView);
+      }
+      const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
+      if (newRootIndex.isValid()) {
+        // sync root index from last valid file-system model root index
+        _view->m_fsTableView->setRootIndex(newRootIndex);
+      }
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to table[%c]", (char)viewType);
+      break;
     }
-    viewIndex = _view->m_name2ViewIndex[viewType];
-  } else if (viewType == "list") {
-    if (_view->m_fsListView == nullptr) {
-      _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
-      ContentPanel::connect(_view->m_fsListView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      _view->connectSelectionChanged(viewType);
-      _view->AddView(viewType, _view->m_fsListView);
+    case ViewType::TREE: {
+      if (_view->m_fsTreeView == nullptr) {
+        _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel);
+        ContentPanel::connect(_view->m_fsTreeView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+        _view->connectSelectionChanged(viewType);
+        _view->AddView(viewType, _view->m_fsTreeView);
+      }
+      const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
+      if (newRootIndex.isValid()) {
+        // sync root index from last valid file-system model root index
+        _view->m_fsTreeView->setRootIndex(newRootIndex);
+      }
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to tree[%c]", (char)viewType);
+      break;
     }
-    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    const auto& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
-    if (newRootIndex.isValid()) {
-      // sync root index from last valid file-system model root index
-      _view->m_fsListView->setRootIndex(newRootIndex);
+    case ViewType::MOVIE: {
+      if (_view->m_movieView == nullptr) {
+        _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
+        _view->m_movieView = new MovieDBView(_view->_dbSearchBar, _view->m_dbModel, _view);
+        ContentPanel::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+        _view->AddView(viewType, _view->m_movieView);
+      }
+      _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->getMovieTableName()));
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to movie[%c]", (char)viewType);
+      break;
     }
-    viewIndex = _view->m_name2ViewIndex[viewType];
-  } else if (viewType == "tree") {
-    if (_view->m_fsTreeView == nullptr) {
-      _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel);
-      ContentPanel::connect(_view->m_fsTreeView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      _view->connectSelectionChanged(viewType);
-      _view->AddView(viewType, _view->m_fsTreeView);
-    }
-    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    const auto& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
-    if (newRootIndex.isValid()) {
-      // sync root index from last valid file-system model root index
-      _view->m_fsTreeView->setRootIndex(newRootIndex);
-    }
-    viewIndex = _view->m_name2ViewIndex[viewType];
-  } else if (viewType == "movie") {
-    if (_view->m_movieView == nullptr) {
-      _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
-      _view->m_movieView = new MovieDBView(_view->_dbSearchBar, _view->m_dbModel, _view);
-      ContentPanel::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      _view->AddView(viewType, _view->m_movieView);
-    }
-    _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->getMovieTableName()));
-    viewIndex = _view->m_name2ViewIndex[viewType];
-  } else if (viewType == "search") {
-    if (_view->m_advanceSearchView == nullptr) {
-      _view->m_srcModel = new AdvanceSearchModel;
-      _view->m_proxyModel = new SearchProxyModel;
-      _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_srcModel, _view->m_proxyModel, _view);
-      ContentPanel::connect(_view->m_advanceSearchView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+    case ViewType::SEARCH: {
+      if (_view->m_advanceSearchView == nullptr) {
+        _view->m_searchSrcModel = new AdvanceSearchModel;
+        _view->m_proxyModel = new SearchProxyModel;
+        _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_searchSrcModel, _view->m_proxyModel, _view);
+        ContentPanel::connect(_view->m_advanceSearchView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
 
-      _view->m_advanceSearchView->BindLogger(_view->_logger);
-      if (_navigation->m_advanceSearchBar != nullptr) {
-        _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_srcModel);
+        _view->m_advanceSearchView->BindLogger(_view->_logger);
+        if (_navigation->m_advanceSearchBar != nullptr) {
+          _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_searchSrcModel);
+        }
+        _view->AddView(viewType, _view->m_advanceSearchView);
+        _view->m_searchSrcModel->initFilter(
+            QDir::Filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()});
       }
-      _view->AddView(viewType, _view->m_advanceSearchView);
-      _view->m_srcModel->initFilter(
-          QDir::Filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()});
+      const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+      _view->m_searchSrcModel->setRootPath(newPath);
+      _view->m_advanceSearchView->setWindowTitle(QString("Search[%1]").arg(newPath));
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to search[%c]", (char)viewType);
+      break;
     }
-    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    _view->m_srcModel->setRootPath(newPath);
-    _view->m_advanceSearchView->setWindowTitle(QString("Search[%1]").arg(newPath));
-    viewIndex = _view->m_name2ViewIndex[viewType];
-  } else if (viewType == "scene") {
-    if (_view->m_sceneTableView == nullptr) {
-      _view->m_scenesModel = new ScenesTableModel;
-      _view->m_sceneTableView = new SceneTableView(_view->m_scenesModel, _view);
-      ContentPanel::connect(_view->m_sceneTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-      _view->AddView(viewType, _view->m_sceneTableView);
-      auto* sceneSub = new (std::nothrow) SceneActionsSubscribe{_view->m_sceneTableView};
-      if (sceneSub == nullptr) {
-        qCritical("sceneSub is nullptr");
+    case ViewType::SCENE: {
+      if (_view->m_sceneTableView == nullptr) {
+        _view->m_scenesModel = new ScenesTableModel;
+        _view->m_sceneTableView = new SceneTableView(_view->m_scenesModel, _view);
+        ContentPanel::connect(_view->m_sceneTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
+        _view->AddView(viewType, _view->m_sceneTableView);
+        auto* sceneSub = new (std::nothrow) SceneActionsSubscribe{_view->m_sceneTableView};
+        if (sceneSub->BindWidget(_view->m_sceneTableView, _view->m_scenesModel)) {
+          sceneSub->operator()();
+        }
       }
-      if (sceneSub->BindWidget(_view->m_sceneTableView, _view->m_scenesModel)) {
-        sceneSub->operator()();
-      }
+      const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+      _view->m_sceneTableView->setRootPath(newPath);
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to scene[%c]", (char)viewType);
+      break;
     }
-    const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-    _view->m_sceneTableView->setRootPath(newPath);
-    viewIndex = _view->m_name2ViewIndex[viewType];
+    default: {
+      return;
+    }
   }
   _view->setCurrentIndex(viewIndex);
 }
 
 void NavigationViewSwitcher::onSwitchByViewAction(const QAction* activatedAction) {
-  const QString& viewType = activatedAction->text();
-  onSwitchByViewType(viewType);
+  ViewType vt = GetViewTypeByActionText(activatedAction);
+  onSwitchByViewType(vt);
 }
