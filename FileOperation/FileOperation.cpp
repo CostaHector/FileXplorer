@@ -1,94 +1,26 @@
 #include "FileOperation.h"
+
 #include <QDateTime>
+#include <QStringList>
 
-#include "RecycleBinHelper.h"
+#include <QDir>
+#include <QFile>
+#include <QDirIterator>
+#include <QFileInfo>
 
-const QMap<QString, std::function<FileOperatorType::RETURN_TYPE(const QStringList&)>> FileOperation::LambdaTable = {
-    {"rmfile", rmfileAgent}, {"rmpath", rmpathAgent}, {"rmdir", rmdirAgent},   {"moveToTrash", moveToTrashAgent},
-    {"touch", touchAgent},   {"mkpath", mkpathAgent}, {"rename", renameAgent}, {"cpfile", cpfileAgent},
-    {"cpdir", cpdirAgent},   {"link", linkAgent},     {"unlink", unlinkAgent}};
+#include <QPair>
+#include <QMap>
+#include <functional>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)  // build in moveToTrash supported path in bin supporte at least in 5.15
-auto FileOperation::moveToTrash(const QString& pres, const QString& rels) -> FileOperatorType::RETURN_TYPE {
-  const QStringList& paths = pres.split('\n');
-  const QStringList& names = rels.split('\n');
-  if (paths.size() != names.size()) {
-    return {ErrorCode::PATH_NAME_LIST_NOT_EQUAL, {}};
-  }
+namespace FileOperation {
 
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE revertCmds;
-  revertCmds.reserve(pres.size());
+using namespace FileOperatorType;
 
-  for (int i = 0; i < paths.size(); ++i) {
-    const QString& pre = paths[i];
-    const QString& rel = names[i];
-    if (pre.isEmpty() and rel.isEmpty()) {
-      continue;
-    }
-    const QString& pth = QDir(pre).absoluteFilePath(rel);
-    if (not QFile::exists(pth)) {
-      continue;
-    }
-    QFile file(pth);
-    auto ret = file.moveToTrash();
-    if (ret) {
-      if (file.fileName().isEmpty()) {
-        continue;
-      }
-      revertCmds.append({"rename", "", file.fileName(), "", pth});
-    } else {
-      return {ErrorCode::UNKNOWN_ERROR, revertCmds};
-    }
-  }
-  return {ErrorCode::OK, revertCmds};
-}
-#else
-auto FileOperation::moveToTrash(const QString& pres, const QString& rels) -> FileOperatorType::RETURN_TYPE {
-  // seperated by '\n'
-  const QStringList& paths = pres.split('\n');
-  const QStringList& names = rels.split('\n');
-  if (paths.size() != names.size()) {
-    return {ErrorCode::PATH_NAME_LIST_NOT_EQUAL, {}};
-  }
-  const FileOperatorType::BATCH_COMMAND_LIST_TYPE& cmds = RecycleBinHelper::RecycleABatch(paths, names);
-  // cmds only contains following 2 commands type:
-  //  cmds.append({"mkpath", "", tempLocation});
-  //  cmds.append({"rename", path, name, tempLocation, name});
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE revertCmds;
-  revertCmds.reserve(cmds.size());
-  for (const QStringList& cmd : cmds) {
-    if (cmd[0] == "rename") {
-      if (cmd.size() != 5) {
-        return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
-      }
-      auto ret = QFile::rename(QDir(cmd[1]).absoluteFilePath(cmd[2]), QDir(cmd[3]).absoluteFilePath(cmd[4]));
-      if (not ret) {
-        return {ErrorCode::UNKNOWN_ERROR, cmds};
-      }
-      revertCmds.append({"rename", cmd[3], cmd[4], cmd[1], cmd[2]});
-    } else if (cmd[0] == "mkpath") {
-      if (cmd.size() != 3) {
-        return {ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
-      }
-      auto ret = QDir(cmd[1]).mkpath(cmd[2]);
-      if (not ret) {
-        return {ErrorCode::UNKNOWN_ERROR, cmds};
-      }
-      revertCmds.append({"rmpath", cmd[1], cmd[2]});
-    } else {
-      qCritical("Invalid command type find in move to trash[%s]", qPrintable(cmd.join(',')));
-      return {ErrorCode::COMMAND_TYPE_UNSUPPORT, revertCmds};
-    }
-  }
-  return {ErrorCode::OK, revertCmds};
-}
-#endif
-
-auto FileOperation::WriteIntoLogFile(const QString& msg) -> bool {
+bool WriteIntoLogFile(const QString& msg) {
 #ifdef _WIN32
-  QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
+  const QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
 #else
-  QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
+  const QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
 #endif
   QFile logFi(QString("%1/%2.log").arg(logPrePath).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd")));
   if (not logFi.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
@@ -103,39 +35,61 @@ auto FileOperation::WriteIntoLogFile(const QString& msg) -> bool {
   return true;
 }
 
-auto FileOperation::executer(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& aBatch,
-                             FileOperatorType::BATCH_COMMAND_LIST_TYPE& srcCommand) -> FileOperatorType::EXECUTE_RETURN_TYPE {
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE recoverList;
+RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
+  BATCH_COMMAND_LIST_TYPE revertCmds;
+  if (pre.isEmpty() && rel.isEmpty()) {
+    return {OK, revertCmds};
+  }
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  if (not QFile::exists(pth)) {
+    return {OK, revertCmds};
+  }
+  QFile file(pth);
+  auto ret = file.moveToTrash();
+  if (ret) {
+    if (file.fileName().isEmpty()) {
+      qCritical("The file[%s] name in trashbin is not accessible", qPrintable(pth));
+      return {UNKNOWN_ERROR, revertCmds};
+    }
+    revertCmds.append(ACMD{RENAME, {"", file.fileName(), "", pth}});
+  } else {
+    return {UNKNOWN_ERROR, revertCmds};
+  }
+  return {OK, revertCmds};
+}
+
+RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) {
+  static const QMap<FileOperator, std::function<RETURN_TYPE(const QStringList&)>> LAMBDA_TABLE = {
+      {RMFILE, rmfileAgent}, {RMPATH, rmpathAgent}, {RMDIR, rmdirAgent},   {MOVETOTRASH, moveToTrashAgent},
+      {TOUCH, touchAgent},   {MKPATH, mkpathAgent}, {RENAME, renameAgent}, {CPFILE, cpfileAgent},
+      {CPDIR, cpdirAgent},   {LINK, linkAgent},     {UNLINK, unlinkAgent}};
+
+  BATCH_COMMAND_LIST_TYPE recoverList;
   int failedCommandCnt = 0;
   QString log;
   for (int i = 0; i < aBatch.size(); ++i) {
-    const QStringList& cmds = aBatch[i];
+    const ACMD& cmds = aBatch[i];
     if (cmds.isEmpty()) {
       continue;
     }
-    const QString& k = cmds[0];  // operation name
-    QStringList vals(cmds.cbegin() + 1, cmds.cend());
-    FileOperatorType::RETURN_TYPE returnEle = FileOperation::LambdaTable[k](vals);
-    int ret = returnEle.first;
-    FileOperatorType::BATCH_COMMAND_LIST_TYPE recover = returnEle.second;
-    if (ret != ErrorCode::OK) {
+
+    const RETURN_TYPE returnEle = LAMBDA_TABLE[cmds.op](cmds.lst);
+    if (!returnEle) {
       ++failedCommandCnt;
-      const QString& msg = QString("Fail: %1(%2) [%3 parm(s)]. ErrorCode[%4]").arg(k).arg(vals.join(",")).arg(vals.size()).arg(ret);
-      qWarning("%s", qPrintable(msg));
-      log += msg;
+      log += cmds.toStr();
     }
-    if (k == "moveToTrash" and not srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
-      if (recover.size() > 1) {
-        qWarning("moveToTrash recover command can only <= 1. Here is[%d]", recover.size());
-        assert(false);
-      }
-      if (recover.size() == 1) {
-        *(srcCommand.rbegin() + i) = recover[0];
+
+    if (cmds.op == MOVETOTRASH && !srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
+      if (returnEle.size() > 1) {
+        qFatal("moveToTrash recover commands count[%d] can only <= 1", returnEle.size());
+        return {UNKNOWN_ERROR, {}};
+      } else if (returnEle.size() == 1) {
+        srcCommand.rbegin()[i] = returnEle[0];
       } else {
-        (srcCommand.rbegin() + i)->clear();
+        srcCommand.rbegin()[i].clear();
       }
     }
-    recoverList += recover;
+    recoverList += returnEle;
   }
 
   if (failedCommandCnt != 0) {
@@ -144,5 +98,360 @@ auto FileOperation::executer(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& aB
     WriteIntoLogFile(log);
   }
   // in-place reverse
-  return {failedCommandCnt == 0, QList<QStringList>(recoverList.crbegin(), recoverList.crend())};
+  return RETURN_TYPE{failedCommandCnt, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
 }
+
+RETURN_TYPE rmpathAgent(const QStringList& parms) {
+  if (parms.size() != 2) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  return FileOperation::rmpath(pre, rel);
+}
+
+RETURN_TYPE rmpath(const QString& pre, const QString& rel) {
+  // can only remove an empty directory
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  if (not QDir(pth).exists()) {
+    return {OK, {}};  // already inexists
+  }
+  auto ret = QDir(pre).rmpath(rel);
+  if (ret) {
+    return {OK, {FileOperatorType::ACMD{FileOperatorType::MKPATH, {pre, rel}}}};
+  }
+  return {CANNOT_REMOVE_DIR, {}};
+}
+
+RETURN_TYPE mkpathAgent(const QStringList& parms) {
+  if (parms.size() != 2) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  return FileOperation::mkpath(pre, rel);
+}
+
+RETURN_TYPE mkpath(const QString& pre, const QString& rel) {
+  QDir preDir(pre);
+  if (not preDir.exists()) {
+    return {DST_DIR_INEXIST, {}};
+  }
+  if (preDir.exists(rel)) {
+    return {OK, {}};  // after all it exists
+  }
+
+  auto ret = preDir.mkpath(rel);
+  if (not ret) {
+    return {UNKNOWN_ERROR, {}};
+  }
+  return {OK, {FileOperatorType::ACMD{FileOperatorType::RMPATH, {pre, rel}}}};
+}
+
+RETURN_TYPE rmfileAgent(const QStringList& parms) {
+  if (parms.size() != 2) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  return FileOperation::rmfile(pre, rel);
+}
+
+RETURN_TYPE rmfile(const QString& pre, const QString& rel) {
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  if (not QFileInfo::exists(pth)) {
+    return {OK, {}};
+  }
+  auto ret = QDir(pre).remove(rel);
+  if (ret) {
+    return {OK, {}};
+  } else {
+    return {CANNOT_REMOVE_FILE, {}};
+  }
+}
+
+RETURN_TYPE rmdirAgent(const QStringList& parms) {
+  if (parms.size() != 2) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  return FileOperation::rmdir(pre, rel);
+}
+
+RETURN_TYPE rmdir(const QString& pre, const QString& rel) {
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  if (not QDir(pth).exists()) {
+    return {OK, {}};
+  }
+  auto ret = QDir(pth).removeRecursively();
+  if (ret) {
+    return {OK, {}};
+  } else {
+    return {CANNOT_REMOVE_DIR, {}};
+  }
+}
+
+RETURN_TYPE moveToTrashAgent(const QStringList& parms) {
+  if (parms.size() != 2) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pres = parms[0];  // seperated by '\n'
+  const QString& rels = parms[1];
+  return FileOperation::moveToTrash(pres, rels);
+}
+
+RETURN_TYPE renameAgent(const QStringList& parms) {
+  if (parms.size() != 4) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  const QString& to = parms[2];
+  const QString& toRel = parms[3];
+  return FileOperation::rename(pre, rel, to, toRel);
+}
+
+RETURN_TYPE rename(const QString& pre, const QString& rel, const QString& to, const QString& toRel) {
+  // a/b -> a/b skip
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  if (not QFile::exists(pth)) {
+    return {SRC_INEXIST, {}};
+  }
+  const QString& absNewPath = QDir(to).absoluteFilePath(toRel);
+
+  const bool isOnlyCaseDiffer = rel != toRel and rel.toLower() == toRel.toLower();
+  if (QFile(absNewPath).exists() and not isOnlyCaseDiffer) {
+    // rename item -> FILE. but there is {file} already. Reject to rename to avoid override {file}
+    return {DST_FILE_OR_PATH_ALREADY_EXIST, {}};
+  }
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+  const QString& preNewPathFolder = QFileInfo(absNewPath).absolutePath();
+  if (not QDir(preNewPathFolder).exists()) {
+    auto preNewPathFolderRet = QDir().mkpath(preNewPathFolder);  // only remove dirs
+    if (not preNewPathFolderRet) {
+      return {DST_PRE_DIR_CANNOT_MAKE, {}};
+    }
+    cmds.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {"", preNewPathFolder}});
+  }
+  auto ret = QFile::rename(pth, absNewPath);
+  if (not ret) {
+    return {UNKNOWN_ERROR, cmds};
+  }
+  cmds.append(FileOperatorType::ACMD{FileOperatorType::RENAME, {to, toRel, pre, rel}});
+  return {OK, cmds};
+}
+RETURN_TYPE cpfileAgent(const QStringList& parms) {
+  if (parms.size() != 3) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  const QString& to = parms[2];
+  return FileOperation::cpfile(pre, rel, to);
+}
+RETURN_TYPE cpfile(const QString& pre, const QString& rel, const QString& to) {
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  if (not QFile::exists(pth)) {
+    return {SRC_INEXIST, {}};
+  }
+  if (not QDir(to).exists()) {
+    return {DST_DIR_INEXIST, {}};
+  }
+  const QString& toPth = QDir(to).absoluteFilePath(rel);
+  if (QFile::exists(toPth)) {
+    return {DST_FILE_ALREADY_EXIST, {}};
+  }
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+  const QString& prePath = QFileInfo(toPth).absolutePath();
+  if (not QDir(prePath).exists()) {
+    auto prePathRet = QDir().mkpath(prePath);  // only remove dirs
+    if (not prePathRet) {
+      return {DST_PRE_DIR_CANNOT_MAKE, {}};
+    }
+    cmds.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {"", prePath}});
+  }
+  auto ret = QFile(pth).copy(toPth);
+  if (not ret) {
+    return {UNKNOWN_ERROR, cmds};
+  }
+  cmds.append(FileOperatorType::ACMD{FileOperatorType::RMFILE, {to, rel}});
+  return {OK, cmds};
+}
+
+RETURN_TYPE cpdirAgent(const QStringList& parms) {
+  if (parms.size() != 3) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  const QString& to = parms[2];
+  return FileOperation::cpdir(pre, rel, to);
+}
+
+RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  if (not QFile::exists(pth)) {
+    return {SRC_INEXIST, {}};
+  }
+  if (not QDir(to).exists()) {
+    return {DST_DIR_INEXIST, {}};
+  }
+  const QString& toPth = QDir(to).absoluteFilePath(rel);
+  if (QFile::exists(toPth)) {
+    return {DST_FOLDER_ALREADY_EXIST, {}};  // dir or file
+  }
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE recoverList;
+  auto mkRootPthRet = QDir(to).mkpath(rel);
+  if (not mkRootPthRet) {
+    qDebug("Failed QDir(%s).mkpath(%s)", qPrintable(to), qPrintable(rel));
+    return {UNKNOWN_ERROR, recoverList};
+  }
+  recoverList.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {to, rel}});
+
+  // or shutil.copytree(pth, toPth)
+  QDirIterator src(pth, {}, QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files, QDirIterator::Subdirectories);
+  int relN = pth.size() + 1;
+  while (src.hasNext()) {
+    src.next();
+    const QString& fromPth = src.filePath();
+    const QString& toRel = fromPth.mid(relN);
+    const QString& toPath = QDir(toPth).absoluteFilePath(toRel);
+    if (src.fileInfo().isDir()) {  // dir
+      if (QFile::exists(toPath)) {
+        if (QFileInfo(toPath).isFile()) {
+          return {DST_FILE_ALREADY_EXIST, recoverList};
+        }
+      }
+      auto mkpthRet = QDir(toPth).mkpath(toRel);
+      if (not mkpthRet) {
+        qWarning("Failed QDir(%s).mkpath(%s)", qPrintable(toPth), qPrintable(toRel));
+        return {UNKNOWN_ERROR, recoverList};
+      }
+      recoverList.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {toPth, toRel}});
+    } else {  // file
+      auto cpRet = QFile(fromPth).copy(toPath);
+      if (not cpRet) {
+        qWarning("Failed QFile(%s).copy(%s)", qPrintable(fromPth), qPrintable(toPath));
+        return {UNKNOWN_ERROR, recoverList};
+      }
+      recoverList.append(FileOperatorType::ACMD{FileOperatorType::RMFILE, {toPth, toRel}});
+    }
+  }
+  return {OK, recoverList};
+}
+
+RETURN_TYPE touchAgent(const QStringList& parms) {
+  if (parms.size() != 2) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  return FileOperation::touch(pre, rel);
+}
+
+RETURN_TYPE touch(const QString& pre, const QString& rel) {
+  if (not QDir(pre).exists()) {
+    return {DST_DIR_INEXIST, {}};
+  }
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  QFile textFile(pth);
+  if (textFile.exists()) {
+    return {OK, {}};  // after all it exists
+  }
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+  const QString& prePath = QFileInfo(pth).absolutePath();
+  if (not QDir(prePath).exists()) {
+    auto prePathRet = QDir().mkpath(prePath);
+    if (not prePathRet) {
+      return {DST_PRE_DIR_CANNOT_MAKE, cmds};
+    }
+    cmds.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {"", prePath}});
+  }
+  auto ret = textFile.open(QIODevice::NewOnly);
+  if (not ret) {
+    return {UNKNOWN_ERROR, cmds};
+  }
+  cmds.append(FileOperatorType::ACMD{FileOperatorType::RMFILE, {pre, rel}});
+  return {OK, cmds};
+}
+
+RETURN_TYPE linkAgent(const QStringList& parms) {
+  if (parms.size() != 2 and parms.size() != 3) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  if (parms.size() == 2) {
+    return FileOperation::link(pre, rel);
+  }
+  const QString& to = parms[2];
+  return FileOperation::link(pre, rel, to);
+}
+
+RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to) {
+  const QString pth = QDir(pre).absoluteFilePath(rel);
+  if (not QFile::exists(pth)) {
+    return {SRC_INEXIST, {}};
+  }
+  if (not QDir(to).exists()) {
+    return {DST_DIR_INEXIST, {}};
+  }
+  QString toPath(QDir(to).absoluteFilePath(rel) + ".lnk");
+  QFile toFile(toPath);
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+  if (toFile.exists()) {
+    if (not QFile(toPath).moveToTrash()) {
+      return {CANNOT_REMOVE_FILE, cmds};
+    }
+    cmds.append(FileOperatorType::ACMD{FileOperatorType::RENAME, {"", toFile.fileName(), "", toPath}});
+  }
+
+  QString prePath(QFileInfo(toPath).absolutePath());
+  if (not QDir(prePath).exists()) {
+    const auto prePathRet = QDir().mkpath(prePath);
+    if (not prePathRet) {
+      return {DST_PRE_DIR_CANNOT_MAKE, cmds};
+    }
+    cmds.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {"", prePath}});
+  }
+  if (not QFile::link(pth, toPath)) {
+    return {CANNOT_MAKE_LINK, cmds};
+  }
+
+  cmds.append(FileOperatorType::ACMD{FileOperatorType::UNLINK, {pre, rel + ".lnk", to}});
+  return {OK, cmds};
+}
+
+RETURN_TYPE unlinkAgent(const QStringList& parms) {
+  if (parms.size() != 2 and parms.size() != 3) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& pre = parms[0];
+  const QString& rel = parms[1];
+  if (parms.size() == 2) {
+    return FileOperation::unlink(pre, rel);
+  }
+  const QString& to = parms[2];
+  return FileOperation::unlink(pre, rel, to);
+}
+
+RETURN_TYPE unlink(const QString& pre, const QString& rel, const QString& to) {
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
+  QString toPath(QDir(to).absoluteFilePath(rel));
+  if (not QFile::exists(toPath)) {
+    return {OK, cmds};  // after all it not exist
+  }
+
+  const auto ret = QDir().remove(toPath);
+  if (not ret) {
+    return {CANNOT_REMOVE_LINK, cmds};
+  }
+  cmds.append(FileOperatorType::ACMD{FileOperatorType::LINK, {pre, rel.left(rel.size() - 4), to}});  // move the trailing ".lnk"
+  return {OK, cmds};
+}
+
+}  // namespace FileOperation
