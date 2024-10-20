@@ -6,11 +6,11 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
-
 #include <QSet>
 #include <QString>
 
-#include "FileOperation/FileOperation.h"
+#include "FileOperation/FileOperatorPub.h"
+
 using std::ostringstream;
 
 class RenameNamesUnique {

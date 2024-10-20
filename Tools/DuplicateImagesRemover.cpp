@@ -5,6 +5,8 @@
 #include "PublicVariable.h"
 #include "UndoRedo.h"
 
+using namespace FileOperatorType;
+
 QStringList DuplicateImagesRemover::GetDuplicateImagesFiles(const QStringList& imgs) {
   QHash<QString, QStringList> duplicateImg;
   for (const auto& nm : imgs) {
@@ -47,17 +49,13 @@ int DuplicateImagesRemover::operator()(const QString& imgPath) {
     return 0;
   }
 
-  QStringList preList;
-  QStringList relList;
-  preList.reserve(imgsToBeDelete.size());
-  relList.reserve(imgsToBeDelete.size());
+  BATCH_COMMAND_LIST_TYPE removeCmds;
+  removeCmds.reserve(imgsToBeDelete.size());
   for (const auto& nm : imgsToBeDelete) {
-    preList.append(imgPath);
-    relList.append(nm);
+    removeCmds.append(ACMD{MOVETOTRASH, {imgPath, nm}});
   }
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
-
-  g_undoRedo.Do(removeCmds);
+  bool bAllSucceed = g_undoRedo.Do(removeCmds);
+  qDebug("delete %d items, bAllSucceed[%d]", imgsToBeDelete.size(), bAllSucceed);
   return imgsToBeDelete.size();
 }
 
