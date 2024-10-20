@@ -185,18 +185,16 @@ void RedundantImageFinder::subscribe() {
 
 void RedundantImageFinder::RecycleSelection() {
   const QModelIndexList& sel = m_table->selectionModel()->selectedRows();
-  if (sel.isEmpty()) {
+  const int SELECTED_CNT = sel.size();
+  if (SELECTED_CNT <= 0) {
     return;
   }
-  const int SELECTED_CNT = sel.size();
-  QStringList preList, relList;
-  preList.reserve(SELECTED_CNT);
-  relList.reserve(SELECTED_CNT);
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE recycleCmds;
+  recycleCmds.reserve(SELECTED_CNT);
   for (const auto& srcInd : sel) {
-    preList.append("");
-    relList.append(m_imgModel->filePath(srcInd));
+    recycleCmds.append(ACMD{MOVETOTRASH, {"", m_imgModel->filePath(srcInd)}});
   }
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE recycleCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
   auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
   qDebug("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
   if (isRenameAllSucceed) {

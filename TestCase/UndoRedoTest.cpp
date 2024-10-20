@@ -8,6 +8,8 @@
 #include "UndoRedo.h"
 #include "FileOperation/FileOperatorPub.h"
 
+using namespace FileOperatorType;
+
 class UndoRedoTest : public QObject {
   Q_OBJECT
 
@@ -47,7 +49,7 @@ void UndoRedoTest::test_RemovePermanently() {
   QVERIFY(not ur.undoAvailable());
   QVERIFY(not ur.redoAvailable());
 
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE rmfileCommand{{"rmfile", TEST_DIR, "012.txt"}};
+  BATCH_COMMAND_LIST_TYPE rmfileCommand{ACMD{RMFILE, {TEST_DIR, "012.txt"}}};
   QVERIFY2(ur.Do(rmfileCommand), "rmfile \"012.txt\" should succeed");
 
   QVERIFY2(not QDir(TEST_DIR).exists("012.txt"), "file 012.txt should never exist");
@@ -65,7 +67,7 @@ void UndoRedoTest::test_moveToTrash() {
   QVERIFY(not ur.undoAvailable());
   QVERIFY(not ur.redoAvailable());
 
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE moveToTrashCommand{{"moveToTrash", TEST_DIR, "012.txt"}};
+  BATCH_COMMAND_LIST_TYPE moveToTrashCommand{ACMD{MOVETOTRASH, {TEST_DIR, "012.txt"}}};
   QVERIFY2(ur.Do(moveToTrashCommand), "moveToTrash \"012.txt\" -> \"trashbin\" should succeed");
 
   QVERIFY2(not QDir(TEST_DIR).exists("012.txt"), "file 012.txt should in trashbin not here");
@@ -83,7 +85,7 @@ void UndoRedoTest::test_Rename() {
   UndoRedo ur;
 
   // rename "012.txt" -> "210.txt"
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE renameCommands1{{"rename", TEST_DIR, "012.txt", TEST_DIR, "210.txt"}};
+  BATCH_COMMAND_LIST_TYPE renameCommands1{ACMD{RENAME, {TEST_DIR, "012.txt", TEST_DIR, "210.txt"}}};
   QVERIFY2(ur.Do(renameCommands1), "rename \"012.txt\" -> \"210.txt\" should succeed");
   QVERIFY2(not QDir(TEST_DIR).exists("012.txt"), "file 012.txt should not exist");
   QVERIFY2(QDir(TEST_DIR).exists("210.txt"), "file 210.txt should exist");
@@ -92,7 +94,7 @@ void UndoRedoTest::test_Rename() {
   QVERIFY(not ur.redoAvailable());
 
   // rename "012.txt" -> "210.txt" -> "999.txt"
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE renameCommands2{{"rename", TEST_DIR, "210.txt", TEST_DIR, "999.txt"}};
+  BATCH_COMMAND_LIST_TYPE renameCommands2{ACMD{RENAME, {TEST_DIR, "210.txt", TEST_DIR, "999.txt"}}};
   QVERIFY2(ur.Do(renameCommands2), "rename \"210.txt\" -> \"999.txt\" should succeed");
   QVERIFY2(not QDir(TEST_DIR).exists("210.txt"), "file 210.txt should not exist");
   QVERIFY2(QDir(TEST_DIR).exists("999.txt"), "file 999.txt should exist");
@@ -124,5 +126,5 @@ void UndoRedoTest::cleanupTestCase() {
   qDebug() << "UndoRedoTest start to cleanupTestCase";
 }
 
-// QTEST_MAIN(UndoRedoTest)
-//  #include "UndoRedoTest.moc"
+//QTEST_MAIN(UndoRedoTest)
+#include "UndoRedoTest.moc"

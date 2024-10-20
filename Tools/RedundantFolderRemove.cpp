@@ -1,8 +1,9 @@
 #include "RedundantFolderRemove.h"
+#include "PublicVariable.h"
 #include <QDirIterator>
 #include <QDir>
 #include <cmath>
-
+using namespace FileOperatorType;
 constexpr int RedunParentFolderRem::TOLERANCE_LETTER_CNT;
 
 auto RedunParentFolderRem::CleanEmptyFolderCore(const QString& folderPath) -> int {
@@ -17,7 +18,7 @@ auto RedunParentFolderRem::CleanEmptyFolderCore(const QString& folderPath) -> in
     QDir subDir{dir.absoluteFilePath(sub), "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot};
     switch (subDir.count()) {
       case 0: {
-        m_cmds.append({"moveToTrash", folderPath, sub});
+        m_cmds.append(ACMD{MOVETOTRASH, {folderPath, sub}});
         break;
       }
       case 1: {
@@ -26,8 +27,8 @@ auto RedunParentFolderRem::CleanEmptyFolderCore(const QString& folderPath) -> in
           qDebug("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
           break;
         }
-        m_cmds.append({"rename", subDir.absolutePath(), itemName, folderPath, itemName});
-        m_cmds.append({"moveToTrash", folderPath, sub});
+        m_cmds.append(ACMD{RENAME, {subDir.absolutePath(), itemName, folderPath, itemName}});
+        m_cmds.append(ACMD{MOVETOTRASH, {folderPath, sub}});
         break;
       }
       default:
@@ -41,7 +42,7 @@ auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
   // as recursive calling, m_cmds will not clean automatically
   QDir dir(folderPath);
   if (dir.isEmpty()) {
-    m_cmds.append({"moveToTrash", "", folderPath});
+    m_cmds.append(ACMD{MOVETOTRASH, {"", folderPath}});
     return 1;
   }
   dir.setFilter(QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot);
@@ -81,7 +82,7 @@ auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderP
       continue;
     }
     // recycle this folder
-    m_cmds.append({"moveToTrash", "", subfolderPath});
+    m_cmds.append(ACMD{MOVETOTRASH, {"", subfolderPath}});
   }
   return m_cmds.size();
 }

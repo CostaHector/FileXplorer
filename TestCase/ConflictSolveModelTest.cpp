@@ -98,6 +98,5 @@ class ConflictSolveModelTest : public FileSystemRelatedTest {
   }
 };
 
-//QTEST_MAIN(ConflictSolveModelTest)
-
-//#include "ConflictSolveModelTest.moc"
+QTEST_MAIN(ConflictSolveModelTest)
+#include "ConflictSolveModelTest.moc"
