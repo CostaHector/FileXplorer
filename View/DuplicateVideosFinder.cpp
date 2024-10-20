@@ -67,22 +67,18 @@ void RightDuplicateDetails::setSharedMember(CLASSIFIED_SORT_LIST_2D* pClassified
 }
 
 void RightDuplicateDetails::onRecycleSelection() {
-  if (not selectionModel()->hasSelection()) {
+  const int SELECTED_CNT = selectionModel()->selectedRows().size();
+  if (SELECTED_CNT < 1) {
     qDebug("nothing selected to recycle");
     return;
   }
-  const int SELECTED_CNT = selectionModel()->selectedRows().size();
-
-  QStringList preList, relList;
-  preList.reserve(SELECTED_CNT);
-  relList.reserve(SELECTED_CNT);
-
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE recycleCmds;
+  recycleCmds.reserve(SELECTED_CNT);
   for (const auto& proInd : selectionModel()->selectedRows()) {
     const auto& srcInd = m_sortProxy->mapToSource(proInd);
-    preList.append("");
-    relList.append(m_detailsModel->filePath(srcInd));
+    recycleCmds.append(ACMD{MOVETOTRASH, {"", m_detailsModel->filePath(srcInd)}});
   }
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE recycleCmds{{"moveToTrash", preList.join('\n'), relList.join('\n')}};
   auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
   qDebug("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
 }
