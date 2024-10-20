@@ -6,6 +6,7 @@
 #include <QDir>
 
 using namespace ItemsPileCategory;
+using namespace FileOperatorType;
 
 QMap<QString, QStringList> ExtractPileItemsOutFolder::UnpackItemFromPiles(const QString& path) {
   QDir rootPathDir(path, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
@@ -83,12 +84,12 @@ int ExtractPileItemsOutFolder::operator()(const QString& path, const QMap<QStrin
         qDebug("%s/%s already exist outside, move will failed, skip it", qPrintable(path), qPrintable(file));
         continue;
       }
-      m_cmds.append({"rename", path + '/' + folderName, file, path, file});
+      m_cmds.append(ACMD{RENAME, {path + '/' + folderName, file, path, file}});
       ++filesExtractedCnt;
     }
     itemsExtractedOutCnt += filesExtractedCnt;
     // recycle path + '/' + folderName
-    m_cmds.append({"moveToTrash", path, folderName});
+    m_cmds.append(ACMD{MOVETOTRASH, {path, folderName}});
     ++foldersNeedExtractCnt;
     qDebug("Extract %d pile item(s) out of folder[%s]", files.size(), qPrintable(it.key()));
   }
