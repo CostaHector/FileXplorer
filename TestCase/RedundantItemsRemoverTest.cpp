@@ -34,8 +34,8 @@ class RedundantItemsRemoverTest : public QObject {
     const int recycleCmdCnt = efr(EMPTY_TEST_DIR);
     QCOMPARE(recycleCmdCnt, 2);
     QCOMPARE(efr.m_cmds.size(), 2);
-    const QSet<QString> optypes{efr.m_cmds[0][0], efr.m_cmds[1][0]};
-    QCOMPARE(optypes, (QSet<QString>{"moveToTrash", "moveToTrash"}));
+    QCOMPARE(efr.m_cmds[0].op, FileOperatorType::MOVETOTRASH);
+    QCOMPARE(efr.m_cmds[1].op, FileOperatorType::MOVETOTRASH);
   }
 
   void test_redundantParentFolder() {
@@ -52,9 +52,8 @@ class RedundantItemsRemoverTest : public QObject {
     const int cmdCnt = rpfr(REDUN_PARENT_TEST_DIR);
     QCOMPARE(cmdCnt, 2);
     QCOMPARE(rpfr.m_cmds.size(), 2);
-
-    const QSet<QString> optypes{rpfr.m_cmds[0][0], rpfr.m_cmds[1][0]};
-    QCOMPARE(optypes, (QSet<QString>{"rename", "moveToTrash"}));
+    QCOMPARE(rpfr.m_cmds[0].op, FileOperatorType::RENAME);
+    QCOMPARE(rpfr.m_cmds[1].op, FileOperatorType::MOVETOTRASH);
   }
 
   void test_recycleRedundantItemByKeyWord() {
@@ -82,4 +81,4 @@ class RedundantItemsRemoverTest : public QObject {
 };
 
 //QTEST_MAIN(RedundantItemsRemoverTest)
-//#include "RedundantItemsRemoverTest.moc"
+#include "RedundantItemsRemoverTest.moc"

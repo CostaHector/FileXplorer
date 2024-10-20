@@ -23,7 +23,6 @@ SOURCES += \
     Actions/PerformersManagerActions.cpp \
     Actions/PropertiesWindowActions.cpp \
     Actions/QuickWhereActions.cpp \
-    Actions/RecycleBinActions.cpp \
     Actions/RenameActions.cpp \
     Actions/FileLeafAction.cpp \
     Actions/RightClickMenuActions.cpp \
@@ -71,7 +70,6 @@ SOURCES += \
     Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
     FileOperation/FileOperatorPub.cpp \
-    FileOperation/RecycleBinHelper.cpp \
     Model/AiMediaTablesModel.cpp \
     Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
@@ -105,7 +103,6 @@ SOURCES += \
     View/DuplicateVideosFinder.cpp \
     View/JsonListView.cpp \
     View/MovieDBView.cpp \
-    View/RecycleBinWidget.cpp \
     View/SceneActionsSubscribe.cpp \
     View/SceneTableView.cpp \
     View/TorrentsManagerWidget.cpp \
@@ -182,7 +179,6 @@ HEADERS += \
     Actions/PerformersManagerActions.h \
     Actions/PropertiesWindowActions.h \
     Actions/QuickWhereActions.h \
-    Actions/RecycleBinActions.h \
     Actions/RenameActions.h \
     Actions/FileLeafAction.h \
     Actions/RightClickMenuActions.h \
@@ -230,7 +226,6 @@ HEADERS += \
     Component/SyncModifiyFileSystem.h \
     Component/Toaster.h \
     FileOperation/FileOperatorPub.h \
-    FileOperation/RecycleBinHelper.h \
     Model/AiMediaTablesModel.h \
     Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
@@ -266,7 +261,6 @@ HEADERS += \
     View/DuplicateVideosFinder.h \
     View/JsonListView.h \
     View/MovieDBView.h \
-    View/RecycleBinWidget.h \
     View/SceneActionsSubscribe.h \
     View/SceneTableView.h \
     View/TorrentsManagerWidget.h \
