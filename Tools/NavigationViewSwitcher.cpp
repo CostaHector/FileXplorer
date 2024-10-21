@@ -34,7 +34,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         ActionWithPath::BindIntoNewPath(F_IntoNewPath);
       }
       naviIndex = _navigation->m_name2StackIndex[ViewType::TABLE];
-      qDebug("Switch toolbar to list/table/tree[%c]", (char)viewType);
+      qDebug("Switch toolbar to list/table/tree[%d]", (char)viewType);
       break;
     }
     case ViewType::MOVIE: {
@@ -45,7 +45,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _view->BindDatabaseSearchToolBar(_navigation->m_dbSearchBar);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
-      qDebug("Switch toolbar to movie[%c]", (char)viewType);
+      qDebug("Switch toolbar to movie[%d]", (char)viewType);
       break;
     }
     case ViewType::SEARCH: {
@@ -56,7 +56,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
-      qDebug("Switch toolbar to search[%c]", (char)viewType);
+      qDebug("Switch toolbar to search[%d]", (char)viewType);
       break;
     }
     case ViewType::SCENE: {
@@ -65,7 +65,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _navigation->AddToolBar(viewType, _navigation->m_addressBar);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
-      qDebug("Switch toolbar to scene[%c]", (char)viewType);
+      qDebug("Switch toolbar to scene[%d]", (char)viewType);
       break;
     }
     default: {
@@ -91,7 +91,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _view->m_fsListView->setRootIndex(newRootIndex);
       }
       viewIndex = _view->m_name2ViewIndex[viewType];
-      qDebug("Switch view widget to list[%c]", (char)viewType);
+      qDebug("Switch view widget to list[%d]", (char)viewType);
       break;
     }
     case ViewType::TABLE: {
@@ -108,7 +108,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _view->m_fsTableView->setRootIndex(newRootIndex);
       }
       viewIndex = _view->m_name2ViewIndex[viewType];
-      qDebug("Switch view widget to table[%c]", (char)viewType);
+      qDebug("Switch view widget to table[%d]", (char)viewType);
       break;
     }
     case ViewType::TREE: {
@@ -125,7 +125,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _view->m_fsTreeView->setRootIndex(newRootIndex);
       }
       viewIndex = _view->m_name2ViewIndex[viewType];
-      qDebug("Switch view widget to tree[%c]", (char)viewType);
+      qDebug("Switch view widget to tree[%d]", (char)viewType);
       break;
     }
     case ViewType::MOVIE: {
@@ -137,7 +137,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       }
       _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->getMovieTableName()));
       viewIndex = _view->m_name2ViewIndex[viewType];
-      qDebug("Switch view widget to movie[%c]", (char)viewType);
+      qDebug("Switch view widget to movie[%d]", (char)viewType);
       break;
     }
     case ViewType::SEARCH: {
@@ -159,7 +159,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       _view->m_searchSrcModel->setRootPath(newPath);
       _view->m_advanceSearchView->setWindowTitle(QString("Search[%1]").arg(newPath));
       viewIndex = _view->m_name2ViewIndex[viewType];
-      qDebug("Switch view widget to search[%c]", (char)viewType);
+      qDebug("Switch view widget to search[%d]", (char)viewType);
       break;
     }
     case ViewType::SCENE: {
@@ -176,7 +176,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_sceneTableView->setRootPath(newPath);
       viewIndex = _view->m_name2ViewIndex[viewType];
-      qDebug("Switch view widget to scene[%c]", (char)viewType);
+      qDebug("Switch view widget to scene[%d]", (char)viewType);
       break;
     }
     default: {
