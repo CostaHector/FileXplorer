@@ -27,7 +27,7 @@ QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
   QHash<QString, QString> akaDict;
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
-  static const QRegExp PERF_SPLIT("\\s*,\\s*");
+  static const QRegularExpression PERF_SPLIT("\\s*,\\s*");
   while (not stream.atEnd()) {
     QString line = stream.readLine();
     line.replace(PERF_SPLIT, "|");
