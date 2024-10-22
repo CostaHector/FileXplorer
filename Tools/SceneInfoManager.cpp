@@ -207,7 +207,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     }
 
     bool jsonNeedUpdate{false};
-    QVariantHash::iterator it{nullptr};
+    QVariantHash::iterator it;
 
     const QString& imgFileName = sMixed.GetFirstImg(baseName);
     it = rawJsonDict.find("ImgName");

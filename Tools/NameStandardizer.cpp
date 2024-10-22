@@ -11,8 +11,8 @@
 #include "PublicVariable.h"
 #include "Tools/ProductionStudioManager.h"
 
-const QRegExp stdCommaComp("\\s+,");
-const QRegExp stdExclamationComp("\\s+!");
+const QRegularExpression stdCommaComp("\\s+,");
+const QRegularExpression stdExclamationComp("\\s+!");
 
 using namespace JSON_RENAME_REGEX;
 auto NameStandardizer::operator()(QString aFileName) -> QString {
