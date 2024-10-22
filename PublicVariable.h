@@ -331,31 +331,31 @@ static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE_OP, "MERG
                                                        {CCMMode::LINK_OP, "LINK"}};
 
 #include <QColor>
-#include <QRegExp>
+#include <QRegularExpression>
 
 namespace JSON_RENAME_REGEX {
-const QRegExp invalidCharPat("[\\#\\\\/\\:\\*\\?\\<\\>\\|]");  // #\/:*?<>
-const QRegExp invalidQuotePat("[’“”\"]");                      //'
+const QRegularExpression invalidCharPat("[\\#\\\\/\\:\\*\\?\\<\\>\\|]");  // #\/:*?<>
+const QRegularExpression invalidQuotePat("[’“”\"]");                      //'
 
-const QRegExp leadingStrComp("^((\\[FL\\])|(\\[FFL\\])|(\\[GT\\]))", Qt::CaseInsensitive);  // delete it
-const QRegExp leadingOpenBracketComp("^[\[\{\(]");                                          //-                                         //-
+const QRegularExpression leadingStrComp("^((\\[FL\\])|(\\[FFL\\])|(\\[GT\\]))", QRegularExpression::PatternOption::CaseInsensitiveOption);  // delete it
+const QRegularExpression leadingOpenBracketComp("^[\[\{\(]");                                          //-                                         //-
 
-const QRegExp continuousSpaceComp("\\s\\s+");  //' '
+const QRegularExpression continuousSpaceComp("\\s\\s+");  //' '
 
-const QRegExp nonLeadingBracketComp("[\\(\\{\\[\\)\\}\\]–]");  //-
-const QRegExp spaceBarSpaceComp("\\s*-\\s*");                  //-
-const QRegExp continousHypenComp("--+");                       //-
+const QRegularExpression nonLeadingBracketComp("[\\(\\{\\[\\)\\}\\]–]");  //-
+const QRegularExpression spaceBarSpaceComp("\\s*-\\s*");                  //-
+const QRegularExpression continousHypenComp("--+");                       //-
 
-const QRegExp hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
-const QRegExp trailingHypenComp("-$");                      // delete it
+const QRegularExpression hypenOrSpaceFollowedWithDotPat("[\\s-]\\.");  //.
+const QRegularExpression trailingHypenComp("-$");                      // delete it
 
-const QRegExp DISCRAD_LETTER_COMP("[^A-Zãáéíóúüñ¿¡0-9._@# ']", Qt::CaseInsensitive);
-const QRegExp INVALID_TABLE_NAME_LETTER("[^A-Z0-9_]", Qt::CaseInsensitive);
-const QRegExp AND_COMP(" and | fucked by | fucked | fucks | fuck |\\+", Qt::CaseInsensitive);
-const QRegExp RESOLUTION_COMP("2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD", Qt::CaseInsensitive);
-const QRegExp CONTINOUS_SPACE("\\s+");
+const QRegularExpression DISCRAD_LETTER_COMP("[^A-Zãáéíóúüñ¿¡0-9._@# ']", QRegularExpression::PatternOption::CaseInsensitiveOption);
+const QRegularExpression INVALID_TABLE_NAME_LETTER("[^A-Z0-9_]", QRegularExpression::PatternOption::CaseInsensitiveOption);
+const QRegularExpression AND_COMP(" and | fucked by | fucked | fucks | fuck |\\+", QRegularExpression::PatternOption::CaseInsensitiveOption);
+const QRegularExpression RESOLUTION_COMP("2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD", QRegularExpression::PatternOption::CaseInsensitiveOption);
+const QRegularExpression CONTINOUS_SPACE("\\s+");
 
-const QRegExp SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", Qt::CaseSensitive);
+const QRegularExpression SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", QRegularExpression::PatternOption::NoPatternOption);
 }  // namespace JSON_RENAME_REGEX
 
 namespace STATUS_COLOR {
