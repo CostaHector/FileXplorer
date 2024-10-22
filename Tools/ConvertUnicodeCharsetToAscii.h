@@ -1,8 +1,6 @@
 #ifndef CONVERTUNICODECHARSETTOASCII_H
 #define CONVERTUNICODECHARSETTOASCII_H
 
-#include <QTextDecoder>
-
 #include <QHash>
 #include <QString>
 class ConvertUnicodeCharsetToAscii {
