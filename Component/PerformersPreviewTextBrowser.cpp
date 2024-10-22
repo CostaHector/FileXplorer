@@ -21,7 +21,7 @@ constexpr int PerformersPreviewTextBrowser::HTML_IMG_FIXED_WIDTH;
 const QString PerformersPreviewTextBrowser::VID_LINK_TEMPLATE = "<a href=\"file:///%1\">&#9654;%1</a>";
 
 QString PerformersPreviewTextBrowser::PERFORMER_HTML_TEMPLATE;
-const QRegExp PerformersPreviewTextBrowser::IMG_VID_SEP_COMP("\\||\r\n|\n");
+const QRegularExpression PerformersPreviewTextBrowser::IMG_VID_SEP_COMP("\\||\r\n|\n");
 
 PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent) : QTextBrowser(parent) {
   setReadOnly(true);

@@ -3,15 +3,15 @@
 #include "PublicVariable.h"
 
 SearchProxyModel::SearchProxyModel(QObject* parent)
-    : QSortFilterProxyModel{parent},
-      m_searchMode{PreferenceSettings().value(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.name, MemoryKey::SEARCH_MODE_DEFAULT_VALUE.v).toString()},
-      m_isCustomSearch{m_searchMode == "Search for File Content"},
-      m_fileContentsCaseSensitive{
-          PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool()},
-      m_nameFiltersCaseSensitive{
-          PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool()},
-      m_nameFilterDisableOrHide{
-          PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool()} {
+  : QSortFilterProxyModel{parent},
+    m_searchMode{PreferenceSettings().value(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.name, MemoryKey::SEARCH_MODE_DEFAULT_VALUE.v).toString()},
+    m_isCustomSearch{m_searchMode == "Search for File Content"},
+    m_fileContentsCaseSensitive{
+      PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool()},
+    m_nameFiltersCaseSensitive{
+      PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool()},
+    m_nameFilterDisableOrHide{
+      PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool()} {
   const auto nameCaseSensitive = m_nameFiltersCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
   if (filterCaseSensitivity() != nameCaseSensitive) {
     setFilterCaseSensitivity(nameCaseSensitive);
@@ -41,7 +41,7 @@ auto SearchProxyModel::startFilterWhenTextChanged(const QString& searchText) -> 
   } else if (m_searchMode == "Wildcard") {
     setFilterWildcard(searchText);
   } else if (m_searchMode == "Regex") {
-    setFilterRegExp(searchText);
+    setFilterRegularExpression(searchText);
   } else if (m_searchMode == "Search for File Content") {
     changeCustomSearchNameAndContents(searchText);
   } else {
@@ -58,7 +58,7 @@ auto SearchProxyModel::startFilterWhenTextChanges(const QString& searchText) -> 
   } else if (m_searchMode == "Wildcard") {
     setFilterWildcard(searchText);
   } else if (m_searchMode == "Regex") {
-    setFilterRegExp(searchText);
+    setFilterRegularExpression(searchText);
   } else if (m_searchMode == "Search for File Content") {
     ;
   } else {
@@ -94,7 +94,7 @@ auto SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
     return ReturnPostOperation(isPass, nameModelIndex);
   }
 
-  if (m_fileContents.isEmpty()) {
+  if (m_fileContFilter.isEmpty()) {
     return ReturnPostOperation(true, nameModelIndex);
   }
 
@@ -105,8 +105,8 @@ auto SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
   const QString filePath = filePrePath + fileName;
 
   for (const auto& wildCardRe : m_nameFilters) {
-    if (wildCardRe.exactMatch(fileName)) {
-      bool isPass = CheckIfContentsContained(filePath, m_fileContents);
+    if (wildCardRe.match(fileName).hasMatch()) {
+      bool isPass = CheckIfContentsContained(filePath, m_fileContFilter);
       return ReturnPostOperation(isPass, nameModelIndex);
     }
   }
@@ -114,38 +114,27 @@ auto SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
 }
 
 void SearchProxyModel::changeCustomSearchNameAndContents(const QString& searchText) {
-  // will change m_isCustomSearch, m_fileContents, m_nameFilters
+  // will change m_isCustomSearch, m_fileContFilter, m_nameFilters
   m_isCustomSearch = true;
-
+  m_nameFilters.clear();
   if (searchText.isEmpty()) {
-    QRegExp wildCardRe("*");
-    wildCardRe.setPatternSyntax(QRegExp::Wildcard);
-    m_nameFilters = {wildCardRe};
-    m_fileContents = "";
+    m_fileContFilter = ""; // file contents full match m_fileContFilter
     return;
   }
 
   // "nameFilter|contents"
-  QStringList nameSrcFilters;
+  QStringList fileNameStrFilters;
   int splitIndex = searchText.lastIndexOf('|');
   if (splitIndex == -1) {
-    nameSrcFilters = searchText.split(',');
-    m_fileContents = "";
+    fileNameStrFilters = searchText.split(',');
+    m_fileContFilter = "";
   } else {
-    nameSrcFilters = searchText.left(splitIndex).split(',');
-    m_fileContents = searchText.mid(splitIndex + 1);
+    fileNameStrFilters = searchText.left(splitIndex).split(',');
+    m_fileContFilter = searchText.mid(splitIndex + 1);
   }
-  foreach (const QString& nameSrc, nameSrcFilters) {
-    QRegExp wildCardRe(nameSrc);
-    wildCardRe.setPatternSyntax(QRegExp::Wildcard);
-    if (not wildCardRe.isValid()) {
-      qWarning("Invalid wildcard[%s]. Disable filter and pass everything.", qPrintable(nameSrc));
-      Notificator::warning("Invalid wildcard[%1]. Disable filter and pass everything.", nameSrc);
-      m_fileContents = "";
-      break;
-    }
-    wildCardRe.setCaseSensitivity(m_nameFiltersCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
-    m_nameFilters.append(wildCardRe);
+  foreach (const QString& fileNameWildCard, fileNameStrFilters) {
+    const QString fileNameReg = QRegularExpression::wildcardToRegularExpression(fileNameWildCard);
+    m_nameFilters.append(QRegularExpression{fileNameReg, m_nameFiltersCaseSensitive ? QRegularExpression::PatternOption::NoPatternOption : QRegularExpression::PatternOption::CaseInsensitiveOption});
   }
   invalidateFilter();
 }
@@ -173,7 +162,7 @@ void SearchProxyModel::setFileNameFiltersCaseSensitive(bool sensitive) {
   startFilterWhenTextChanged(m_searchSourceString);
 }
 
-auto SearchProxyModel::CheckIfContentsContained(const QString& filePath, const QString& contained) const -> bool {
+bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const QString& contained) const {
   qDebug("Read file [%s]", qPrintable(filePath));
   if (contained.isEmpty()) {
     return true;
@@ -185,6 +174,6 @@ auto SearchProxyModel::CheckIfContentsContained(const QString& filePath, const Q
   ts.setCodec("UTF-8");
   const QString& fileContents = ts.readAll();
   fi.close();
-  return fileContents.contains(contained, m_fileContentsCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
   // Todo: new feature on the way: regex match, parms text is a wildcard
-};
+  return fileContents.contains(contained, m_fileContentsCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
+}

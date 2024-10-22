@@ -300,7 +300,7 @@ class ScenesTableModel(QAbstractTableModel):
     def GetEntryListLen(self) -> int:
         return len(self.GetEntryList())
 
-    def setFilterRegExp(self, pattern: str):
+    def setFilterRegularExpression(self, pattern: str):
         self.mPattern = pattern
         if not pattern:
             print("filter now disabled", pattern)
@@ -432,7 +432,7 @@ class BearingWidget(QMainWindow):
         self.maxScenesPerColumnInput.textChanged.connect(self.SetScenesPerColumn)
         self.pageIndexInput.textChanged.connect(self.SetPageIndex)
         self.maxScenesPerRowInput.textChanged.connect(self.SetScenesPerRow)
-        self.filterStrInput.textChanged.connect(self.model.setFilterRegExp)
+        self.filterStrInput.textChanged.connect(self.model.setFilterRegularExpression)
         self.newPathInput.returnPressed.connect(lambda: self.IntoANewPath(self.newPathInput.text()))
 
         self.pagesSelectTB.actionTriggered[QAction].connect(self.PageIndexIncDec)

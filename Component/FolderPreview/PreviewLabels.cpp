@@ -64,7 +64,7 @@ bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
   }
 
   if (pathFi.isDir()) {
-    QDir dir(path, "*", QDir::SortFlag::NoSort, QDir::Filter::Files);
+    QDir dir(path, "", QDir::SortFlag::NoSort, QDir::Filter::Files);
     dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
     QStringList imgs;
     for (const QString& imgName : dir.entryList()) {

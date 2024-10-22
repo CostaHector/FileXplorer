@@ -3,6 +3,24 @@
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 
+namespace JSONKey {
+bool JsonKeySorter(const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) {
+  auto lftIt = JsonKeyPri.find(l.first);
+  auto rhgtIt = JsonKeyPri.find(r.first);
+  auto end = JsonKeyPri.cend();
+  if (lftIt != end && rhgtIt != end) {
+    return lftIt.value() < rhgtIt.value();
+  }
+  if (lftIt != end) {
+    return true;
+  }
+  if (rhgtIt != end) {
+    return false;
+  }
+  return l.first < r.first;
+}
+}
+
 const QMap<QString, QString> JsonFileHelper::key2ValueType = {{JSONKey::Performers, "QStringList"},
                                                               {JSONKey::Tags, "QStringList"},
                                                               {JSONKey::Hot, "QIntList"},
