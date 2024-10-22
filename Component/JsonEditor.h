@@ -11,7 +11,6 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
-#include <QRegExp>
 #include <QSplitter>
 #include <QTextEdit>
 #include <QWidget>

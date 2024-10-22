@@ -83,7 +83,7 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
     return replacedLst;
   }
 
-  QRegExp repRegex(oldString);
+  QRegularExpression repRegex(oldString);
   if (not repRegex.isValid()) {
     const QString& msg = QString("invalid regex[%1]").arg(oldString);
     qDebug("%s", qPrintable(msg));

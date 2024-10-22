@@ -32,7 +32,7 @@ class SearchProxyModel : public QSortFilterProxyModel {
   auto filterAcceptsRow(int source_row, const QModelIndex& source_parent) const -> bool override;
 
   void Reset() {
-    m_fileContents.clear();
+    m_fileContFilter.clear();
     m_nameFilters.clear();
   }
 
@@ -58,8 +58,8 @@ class SearchProxyModel : public QSortFilterProxyModel {
   QString m_searchMode;
   bool m_isCustomSearch;
 
-  QString m_fileContents;
-  QList<QRegExp> m_nameFilters;
+  QString m_fileContFilter;
+  QList<QRegularExpression> m_nameFilters;
 
   bool m_fileContentsCaseSensitive;
   bool m_nameFiltersCaseSensitive;

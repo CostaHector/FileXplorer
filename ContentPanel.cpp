@@ -85,7 +85,7 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
       qWarning("m_scenesModel is nullptr");
       return false;
     }
-    m_scenesModel->setFilterRegExp(targetStr);
+    m_scenesModel->setFilterRegularExpression(targetStr);
     return true;
   }
   if (isFSView()) {
@@ -104,7 +104,7 @@ auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
       qWarning("m_scenesModel is nullptr");
       return false;
     }
-    m_scenesModel->setFilterRegExp(targetStr);
+    m_scenesModel->setFilterRegularExpression(targetStr);
     return true;
   }
   if (isFSView()) {
