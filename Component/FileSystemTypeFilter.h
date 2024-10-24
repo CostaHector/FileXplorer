@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QStyle>
 #include <QToolButton>
+#include <QActionGroup>
 
 #include "AdvanceSearchModel.h"
 #include "Tools/SearchProxyModel.h"
