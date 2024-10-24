@@ -54,7 +54,7 @@ QVariant DuplicateDetailsModel::data(const QModelIndex& index, int role) const {
     case Qt::DecorationRole: {
       if (column == 0) {
         static QFileIconProvider fip;
-        return fip.icon(inf.abspath);
+          return fip.icon(QFileInfo(inf.abspath));
       }
       return {};
     }

@@ -108,7 +108,7 @@ class BearingWidget : public QMainWindow {
 
     if (sceneSub->BindWidget(m_tableView, m_model)) {
       sceneSub->operator()();
-      connect(m_filterInput, &QLineEdit::textChanged, m_model, &ScenesTableModel::setFilterRegExp);
+      connect(m_filterInput, &QLineEdit::textChanged, m_model, &ScenesTableModel::setFilterRegularExpression);
     }
 
     IntoANewPath("E:/115/MEN/Page120");

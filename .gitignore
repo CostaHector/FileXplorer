@@ -9,3 +9,4 @@ bin/RUNLOG/*.log
 bin/lib/*
 ./*.json
 *.idx
+build/*

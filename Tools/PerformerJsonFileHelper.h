@@ -1,7 +1,7 @@
 #ifndef PERFORMERJSONFILEHELPER_H
 #define PERFORMERJSONFILEHELPER_H
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSqlField>
 #include <QSqlRecord>
 #include <QString>
@@ -34,7 +34,7 @@ const int Detail_INDEX = DB_HEADER.indexOf(Detail);
 
 class PerformerJsonFileHelper {
  public:
-  static const QRegExp IMG_VID_SEP_COMP;
+  static const QRegularExpression IMG_VID_SEP_COMP;
 
   static QString GetFirstPerformerImgPath(const QString& m_imageHostPath, const QString& ori, const QString& performerName, const QString& imgs) {
     const int i = imgs.indexOf(IMG_VID_SEP_COMP);
