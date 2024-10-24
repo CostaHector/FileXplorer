@@ -2,7 +2,7 @@
 #define PRODUCTIONSTUDIOMANAGER_H
 
 #include <QMessageBox>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSet>
 #include <QVariantHash>
 #include <QWidget>
