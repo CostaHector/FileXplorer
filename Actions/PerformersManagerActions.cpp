@@ -1,6 +1,7 @@
 #include "PerformersManagerActions.h"
 #include <QMenu>
 #include "PublicVariable.h"
+#include <QActionGroup>
 
 PerformersManagerActions::PerformersManagerActions(QObject* parent)
     : QObject{parent},

@@ -62,7 +62,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
 
   inline const SCENES_TYPE& GetEntryList() const { return mFilterEnable ? mEntryListFiltered : mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
-  void setFilterRegExp(const QString& pattern);
+  void setFilterRegularExpression(const QString& pattern);
 
  private:
   int mPageIndex{-1};
