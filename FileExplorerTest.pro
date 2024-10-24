@@ -16,6 +16,7 @@ SOURCES += \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
+    TestCase/JsonToolTest.cpp \
     TestCase/LongPathFinderTest.cpp \
     TestCase/MD5CalculatorTest.cpp \
     TestCase/NameSectionArrangeTest.cpp \

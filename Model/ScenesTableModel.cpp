@@ -329,7 +329,7 @@ std::pair<int, int> ScenesTableModel::GetEntryIndexBE(int maxLen) const {
   const int end = mSCENES_CNT_COLUMN * mSCENES_CNT_ROW * (mPageIndex + 1);
   return std::make_pair(std::min(begin, maxLen), std::min(end, maxLen));
 }
-void ScenesTableModel::setFilterRegExp(const QString& pattern) {
+void ScenesTableModel::setFilterRegularExpression(const QString& pattern) {
   mPattern = pattern;
   if (mPattern.isEmpty()) {
     int newBegin{0}, newEnd{0};

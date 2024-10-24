@@ -2,7 +2,6 @@
 #include "NotificatorFrame_p.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QGridLayout>
 #include <QLabel>
 #include <QProgressBar>

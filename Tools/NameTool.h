@@ -55,7 +55,7 @@ class NameTool {
     QString toggled;
     for (QChar c : sentence) {
       if (c.isLetter()) {
-        toggled += (c.toLatin1() ^ 0x20);  // trick upper to lower case by bitwise operator
+        toggled += (c.toLower());  // trick upper to lower case by bitwise operator
       } else {
         toggled += c;
       }

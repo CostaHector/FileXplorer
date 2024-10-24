@@ -1,6 +1,6 @@
 #include "PerformerJsonFileHelper.h"
 
-const QRegExp PerformerJsonFileHelper::IMG_VID_SEP_COMP("\\||\r\n|\n");
+const QRegularExpression PerformerJsonFileHelper::IMG_VID_SEP_COMP("\\||\r\n|\n");
 constexpr char PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR;
 
 QString PerformerJsonFileHelper::CreatePerformerTableSQL(const QString& tableName) {
