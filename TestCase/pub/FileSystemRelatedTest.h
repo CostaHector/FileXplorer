@@ -1,34 +1,40 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QString>
-#include "PublicTool.h"
+#include "FileSystemHelper.h"
+#include <QtTest>
 
 class FileSystemRelatedTest : public QObject {
   Q_OBJECT
  public:
-  FileSystemRelatedTest(const char* testSuiteName, const char* testName)
-      : TEST_SRC_DIR{QDir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath())
-                         .absoluteFilePath(QString("test/%1/DONT_CHANGE").arg(testSuiteName))},
-        TEST_DIR{QDir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath())
-                     .absoluteFilePath(QString("test/%1/%2").arg(testSuiteName).arg(testName))} {}
- private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
-
-  void init() {
-    if (QDir(TEST_DIR).exists()) {
-      QDir(TEST_DIR).removeRecursively();
+  FileSystemRelatedTest(const char* testSuiteName, bool autoEnvClear = false)
+      : QObject(),
+        ROOT_DIR{QDir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath()).absoluteFilePath(QString("test/%1").arg(testSuiteName))},
+        m_rootHelper{ROOT_DIR},
+        m_autoEnvClear{autoEnvClear} {
+    if (!QFileInfo(ROOT_DIR).isDir()) {
+      if (!QDir().mkpath(ROOT_DIR)) {
+        qWarning("mkpath ROOT_DIR(%s) failed", qPrintable(ROOT_DIR));
+        return;
+      }
     }
-    auto ret = PublicTool::copyDirectoryFiles(TEST_SRC_DIR, TEST_DIR);
-    assert(ret);  // should copied ok
   }
+  ~FileSystemRelatedTest() {
+    if (!QFileInfo(ROOT_DIR).isDir()) {
+      return;
+    }
+    QFileInfo fi{ROOT_DIR};
+    if (!QDir(fi.absolutePath()).rmdir(fi.fileName())) {
+      qWarning("remove ROOT_DIR(%s) failed", qPrintable(ROOT_DIR));
+    }
+  }
+  const QString ROOT_DIR;
+  const FileSystemHelper m_rootHelper;
+  bool m_autoEnvClear;
+ public slots:
   void cleanup() {
-    if (QDir(TEST_DIR).exists()) {
-      QDir(TEST_DIR).removeRecursively();
+    if (m_autoEnvClear) {
+      QVERIFY(m_rootHelper.EraseFileSystemTree(false));
     }
   }
-
- protected:
-  const QString TEST_SRC_DIR;
-  const QString TEST_DIR;
 };
