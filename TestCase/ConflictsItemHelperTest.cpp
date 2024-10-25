@@ -4,30 +4,45 @@
 // add necessary includes here
 #include "Tools/ConflictsItemHelper.h"
 #include "pub/FileSystemRelatedTest.h"
-
 #include <QSet>
 
 class ConflictsItemHelperTest : public FileSystemRelatedTest {
   Q_OBJECT
  public:
-  ConflictsItemHelperTest() : FileSystemRelatedTest{"TestEnv_ConflictsItem", "EDITABLE"} {}
+  ConflictsItemHelperTest() : FileSystemRelatedTest{"TestEnv_ConflictsItem"} {}
 
  private slots:
+  void init() {
+    // conflictFolder{conflict.mp4,not conflict video.mp4}
+    // from{conflictFolder{conflict.mp4}, 1 conflict.txt, x noconflict.txt, y noconflict.txt}
+    // 1 conflict.txt, z noconflict.txt
+    m_rootHelper << FileSystemNode{"conflictFolder"}
+                 << FileSystemNode{"from"}
+                 << FileSystemNode{"1 conflict.txt", false, ""}
+                 << FileSystemNode{"z noconflict.txt", false, ""};
+    m_rootHelper.GetSubHelper("conflictFolder")
+        << FileSystemNode{"conflict.mp4", false, ""}
+        << FileSystemNode{"not conflict video.mp4", false, ""};
+    m_rootHelper.GetSubHelper("from")
+        << FileSystemNode{"1 conflict.txt", false, ""}
+        << FileSystemNode{"x noconflict.txt", false, ""}
+        << FileSystemNode{"y noconflict.txt", false, ""};
+  }
   void test_enviromentMet() {
-    QVERIFY(QDir(TEST_DIR).exists("conflictFolder/conflict.mp4"));
-    QVERIFY(QDir(TEST_DIR).exists("conflictFolder/not conflict video.mp4"));
-    QVERIFY(QDir(TEST_DIR).exists("1 conflict.txt"));
-    QVERIFY(QDir(TEST_DIR).exists("z noconflict.txt"));
-    QVERIFY(QDir(TEST_DIR).exists("from/conflictFolder/conflict.mp4"));
-    QVERIFY(QDir(TEST_DIR).exists("from/1 conflict.txt"));
-    QVERIFY(QDir(TEST_DIR).exists("from/y noconflict.txt"));
+    QVERIFY(QDir(ROOT_DIR).exists("conflictFolder/conflict.mp4"));
+    QVERIFY(QDir(ROOT_DIR).exists("conflictFolder/not conflict video.mp4"));
+    QVERIFY(QDir(ROOT_DIR).exists("1 conflict.txt"));
+    QVERIFY(QDir(ROOT_DIR).exists("z noconflict.txt"));
+    QVERIFY(QDir(ROOT_DIR).exists("from/conflictFolder/conflict.mp4"));
+    QVERIFY(QDir(ROOT_DIR).exists("from/1 conflict.txt"));
+    QVERIFY(QDir(ROOT_DIR).exists("from/y noconflict.txt"));
   }
 
   void test_HelperConstructorsWhenCut() {
     const QSet<QString> expectConflicts{"conflictFolder/conflict.mp4", "conflictFolder", "1 conflict.txt"};
     CCMMode mode = CCMMode::CUT_OP;
-    const QString l = QDir(TEST_DIR).absoluteFilePath("from");
-    const QString r = TEST_DIR;
+    const QString l = QDir(ROOT_DIR).absoluteFilePath("from");
+    const QString r = ROOT_DIR;
     const auto& conflictIF0 =
         ConflictsItemHelper(l, r, QDir(l, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList(), mode);
     QVERIFY2(conflictIF0, "There must be some items conflicts");
@@ -53,8 +68,8 @@ class ConflictsItemHelperTest : public FileSystemRelatedTest {
   void test_ConflictsWhenLink() {
     const QSet<QString> expectConflicts;
     CCMMode mode = CCMMode::LINK_OP;
-    const QString l = QDir(TEST_DIR).absoluteFilePath("from");
-    const QString r = TEST_DIR;
+    const QString l = QDir(ROOT_DIR).absoluteFilePath("from");
+    const QString r = ROOT_DIR;
     const auto& conflictIF0 =
         ConflictsItemHelper(l, r, QDir(l, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList(), mode);
     QVERIFY2(not conflictIF0, "There must no conflicts");
@@ -64,5 +79,4 @@ class ConflictsItemHelperTest : public FileSystemRelatedTest {
 };
 
 //QTEST_MAIN(ConflictsItemHelperTest)
-
-//#include "ConflictsItemHelperTest.moc"
+#include "ConflictsItemHelperTest.moc"
