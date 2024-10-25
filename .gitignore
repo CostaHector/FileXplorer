@@ -10,3 +10,4 @@ bin/lib/*
 ./*.json
 *.idx
 build/*
+*.pro.user.*
