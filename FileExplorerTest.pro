@@ -15,6 +15,7 @@ SOURCES += \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
+    TestCase/pub/FileSystemHelper.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
     TestCase/JsonToolTest.cpp \
     TestCase/LongPathFinderTest.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Component/RenameWidgets/AdvanceRenamer.h \
+    TestCase/pub/FileSystemHelper.h \
     TestCase/pub/BeginToExposePrivateMember.h \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \

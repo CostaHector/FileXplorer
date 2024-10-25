@@ -51,5 +51,5 @@ void JsonToolTest::test_inexistedKeySorter() {
   QCOMPARE(prs[1].first, QString("any key"));
 }
 
-QTEST_MAIN(JsonToolTest)
+//QTEST_MAIN(JsonToolTest)
 #include "JsonToolTest.moc"
