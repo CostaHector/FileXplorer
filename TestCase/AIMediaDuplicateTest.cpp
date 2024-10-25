@@ -4,22 +4,37 @@
 #include "TestCase/pub/BeginToExposePrivateMember.h"
 #include "Tools/AIMediaDuplicate.h"
 #include "TestCase/pub/EndToExposePrivateMember.h"
+#include "pub/FileSystemRelatedTest.h"
 
-const QString AI_MEDIA_DUPLICATE_DIR_EMPTY = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_AIMediaDuplicate/empty");
-const QString AI_MEDIA_DUPLICATE_DIR_FOLDER_1 = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_AIMediaDuplicate/folder_1");
-const QString AI_MEDIA_DUPLICATE_DIR_NO_MEDIA = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_AIMediaDuplicate/no_media");
-
-class AIMediaDuplicateTest : public QObject {
+class AIMediaDuplicateTest : public FileSystemRelatedTest {
   Q_OBJECT
  public:
- private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
+  AIMediaDuplicateTest() : FileSystemRelatedTest("TestEnv_AIMediaDuplicate", false) {
+  }
+  ~AIMediaDuplicateTest() {
+    m_rootHelper.EraseFileSystemTree(true);
+  }
 
+  const FileSystemHelper m_rootHelper{ROOT_DIR};
+  const QString AI_MEDIA_DUPLICATE_DIR_EMPTY = ROOT_DIR + "/empty";
+  const QString AI_MEDIA_DUPLICATE_DIR_FOLDER_1 = ROOT_DIR + "/folder_1";
+  const QString AI_MEDIA_DUPLICATE_DIR_NO_MEDIA = ROOT_DIR + "/no_media";
+
+ private slots:
+  void initTestCase() {
+    // empty, folder_1{movie 1 duplicate.mp4, movie 2 duplicate.mp4, movie 3 unique.mkv}, no_media{any text.txt}
+    std::string size102Str(102, '0');
+    QString s102{size102Str.c_str()};
+    m_rootHelper << FileSystemNode{"empty"} << FileSystemNode{"folder_1"} << FileSystemNode{"no_media"};
+    m_rootHelper.GetSubHelper("folder_1") << FileSystemNode{"movie 1 duplicate.mp4", false, "012345678901234567890123"} << FileSystemNode{"movie 2 duplicate.mp4", false, "012345678901234567890123"}
+                                          << FileSystemNode{"movie 3 unique.mkv", false, s102};
+    m_rootHelper.GetSubHelper("no_media").GetSubHelper("folder") << FileSystemNode{"any text.txt", false, ""};
+  }
   void init() {
     AIMediaDuplicate::SKIP_GETTER_DURATION = true;
     AIMediaDuplicate::IS_TEST = true;
   }
+
   void cleanup() {}
 
   void test_Basic() { QCOMPARE("123", GetEffectiveName("123")); }
@@ -129,5 +144,5 @@ class AIMediaDuplicateTest : public QObject {
   }
 };
 
-//QTEST_MAIN(AIMediaDuplicateTest)
-//#include "AIMediaDuplicateTest.moc"
+QTEST_MAIN(AIMediaDuplicateTest)
+#include "AIMediaDuplicateTest.moc"
