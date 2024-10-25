@@ -292,25 +292,24 @@ RETURN_TYPE cpdirAgent(const QStringList& parms) {
 }
 
 RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
-  const QString& pth = QDir(pre).absoluteFilePath(rel);
-  if (not QFile::exists(pth)) {
+  if (!QFileInfo(pre, rel).isDir()) {
     return {SRC_INEXIST, {}};
   }
-  if (not QDir(to).exists()) {
+  if (!QDir(to).exists()) {
     return {DST_DIR_INEXIST, {}};
   }
-  const QString& toPth = QDir(to).absoluteFilePath(rel);
-  if (QFile::exists(toPth)) {
+  if (QFileInfo(to, rel).isDir()) {
     return {DST_FOLDER_ALREADY_EXIST, {}};  // dir or file
   }
   FileOperatorType::BATCH_COMMAND_LIST_TYPE recoverList;
-  auto mkRootPthRet = QDir(to).mkpath(rel);
-  if (not mkRootPthRet) {
+  if (!QDir(to).mkpath(rel)) {
     qDebug("Failed QDir(%s).mkpath(%s)", qPrintable(to), qPrintable(rel));
     return {UNKNOWN_ERROR, recoverList};
   }
   recoverList.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {to, rel}});
 
+  const QString& pth = QDir(pre).absoluteFilePath(rel);
+  const QString& toPth = QDir(to).absoluteFilePath(rel);
   // or shutil.copytree(pth, toPth)
   QDirIterator src(pth, {}, QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files, QDirIterator::Subdirectories);
   int relN = pth.size() + 1;
