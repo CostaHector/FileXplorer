@@ -52,7 +52,7 @@ bool FileSystemHelper::EraseFileSystemTree(bool bRootInclude) const {
   }
 
   if (bRootInclude) {  // recover root path
-    if (pathDir.removeRecursively()) {
+    if (!pathDir.removeRecursively()) {
       qWarning("QDir(%s)removeRecursively() failed", qPrintable(m_path));
       return false;
     }
