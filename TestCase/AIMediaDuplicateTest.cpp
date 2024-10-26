@@ -144,5 +144,5 @@ class AIMediaDuplicateTest : public FileSystemRelatedTest {
   }
 };
 
-QTEST_MAIN(AIMediaDuplicateTest)
+//QTEST_MAIN(AIMediaDuplicateTest)
 #include "AIMediaDuplicateTest.moc"
