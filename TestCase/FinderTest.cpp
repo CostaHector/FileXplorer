@@ -10,7 +10,7 @@
 class FinderTest : public FileSystemRelatedTest {
   Q_OBJECT
  public:
-  FinderTest() : FileSystemRelatedTest{"TestEnv_Finder"} {}
+  FinderTest() : FileSystemRelatedTest{"TestEnv_Finder", false} {}
 
  private slots:
   void init() {
