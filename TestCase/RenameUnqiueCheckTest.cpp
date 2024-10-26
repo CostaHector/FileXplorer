@@ -2,20 +2,29 @@
 #include <QtTest>
 
 #include "Tools/RenameNamesUnique.h"
+#include "pub/FileSystemRelatedTest.h"
 
-const QString TEST_SRC_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_RenameNamesUnique");
-
-class RenameUnqiueCheckTest : public QObject {
+class RenameUnqiueCheckTest : public FileSystemRelatedTest {
   Q_OBJECT
  public:
+  RenameUnqiueCheckTest() : FileSystemRelatedTest{"TestEnv_RenameNamesUnique", false} {}
+
  private slots:
-  void initTestCase();
-  void cleanupTestCase();
-  void init();
-  void cleanup();
+  void initTestCase() {
+    /*
+    rename12To45Basic{1, 2}
+    renameDiretoryNameShouldNotConflict{dirName{dirName, file1}}
+    */
+    m_rootHelper << FileSystemNode{"rename12To45Basic"} << FileSystemNode{"renameDiretoryNameShouldNotConflict"};
+    m_rootHelper.GetSubHelper("rename12To45Basic") << FileSystemNode{"1"} << FileSystemNode{"2"};
+    m_rootHelper.GetSubHelper("renameDiretoryNameShouldNotConflict") << FileSystemNode{"dirName"};
+    m_rootHelper.GetSubHelper("renameDiretoryNameShouldNotConflict").GetSubHelper("dirName") << FileSystemNode{"dirName"} << FileSystemNode{"file1"};
+  }
+
+  void cleanupTestCase() { FileSystemHelper(ROOT_DIR).EraseFileSystemTree(true); }
 
   void occupiedNameOfrename12To45Basic() {
-    const QString pre = QDir(TEST_SRC_DIR).absoluteFilePath("rename12To45Basic");
+    const QString pre = QDir(ROOT_DIR).absoluteFilePath("rename12To45Basic");
     const QSet<QString>& occupied = RenameNamesUnique::getOccupiedPostPath(pre, {"", ""}, {"1", "2"}, true);
     const QSet<QString> actual{"1", "2"};
     QCOMPARE(occupied, actual);
@@ -42,7 +51,7 @@ class RenameUnqiueCheckTest : public QObject {
   }
 
   void occupiedNameOfrenameDiretoryNameShouldNotConflict() {
-    const QString pre = QDir(TEST_SRC_DIR).absoluteFilePath("renameDiretoryNameShouldNotConflict");
+    const QString pre = QDir(ROOT_DIR).absoluteFilePath("renameDiretoryNameShouldNotConflict");
     const QSet<QString>& occupied = RenameNamesUnique::getOccupiedPostPath(pre, {"", "dirName", "dirName"}, {"dirName", "file1", "dirName"}, true);
     const QSet<QString> actual{"dirName", "dirName/file1", "dirName/dirName"};
     QCOMPARE(occupied, actual);
@@ -51,8 +60,8 @@ class RenameUnqiueCheckTest : public QObject {
   void renameDiretoryNameShouldNotConflict() {
     // dirName/file1, dirName
     // dir Name/file 1, dir Name
-    bool ans = RenameNamesUnique::CheckConflict({"dirName", "dirName/file1", "dirName/dirName"}, {"", "dirName", "dirName"},
-                                                {"dirName", "file1", "dirName"}, {"dir Name", "file 1", "dir Name"}, m_conflictNames);
+    bool ans = RenameNamesUnique::CheckConflict({"dirName", "dirName/file1", "dirName/dirName"}, {"", "dirName", "dirName"}, {"dirName", "file1", "dirName"}, {"dir Name", "file 1", "dir Name"},
+                                                m_conflictNames);
     QVERIFY(ans);
   }
 
@@ -60,25 +69,5 @@ class RenameUnqiueCheckTest : public QObject {
   QStringList m_conflictNames;
 };
 
-void RenameUnqiueCheckTest::initTestCase() {
-  const QDir baseDir(TEST_SRC_DIR);
-  const QStringList& shouldExistPaths = {"rename12To45Basic/1", "rename12To45Basic/2", "renameDiretoryNameShouldNotConflict/dirName/dirName",
-                                         "renameDiretoryNameShouldNotConflict/dirName/file1"};
-  for (const QString& path : shouldExistPaths) {
-    if (not baseDir.exists(path)) {
-      QVERIFY2(baseDir.mkpath(path), "environment not met [folder make failed]");
-    }
-  }
-}
-
-void RenameUnqiueCheckTest::cleanupTestCase() {}
-
-void RenameUnqiueCheckTest::init() {
-  m_conflictNames.clear();
-}
-
-void RenameUnqiueCheckTest::cleanup() {}
-
 //QTEST_MAIN(RenameUnqiueCheckTest)
-
-//#include "RenameUnqiueCheckTest.moc"
+#include "RenameUnqiueCheckTest.moc"
