@@ -7,7 +7,7 @@
 class FileSystemRelatedTest : public QObject {
   Q_OBJECT
  public:
-  FileSystemRelatedTest(const char* testSuiteName, bool autoEnvClear = false)
+  FileSystemRelatedTest(const char* testSuiteName, bool autoEnvClear = true)
       : QObject(),
         ROOT_DIR{QDir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath()).absoluteFilePath(QString("test/%1").arg(testSuiteName))},
         m_rootHelper{ROOT_DIR},
