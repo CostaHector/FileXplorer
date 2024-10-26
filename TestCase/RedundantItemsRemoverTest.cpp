@@ -4,31 +4,70 @@
 #include "TestCase/pub/BeginToExposePrivateMember.h"
 #include "Tools/RedundantFolderRemove.h"
 #include "TestCase/pub/EndToExposePrivateMember.h"
+#include "pub/FileSystemRelatedTest.h"
 
-const QString EMPTY_TEST_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_RedundantItemRemove/EmptyFolder");
-const QString KEYWORD_TEST_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_RedundantItemRemove/RedundantKeyword");
-const QString REDUN_PARENT_TEST_DIR =
-    QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_RedundantItemRemove/RedundantParentFolder");
-
-class RedundantItemsRemoverTest : public QObject {
+class RedundantItemsRemoverTest : public FileSystemRelatedTest {
   Q_OBJECT
  public:
+  RedundantItemsRemoverTest():FileSystemRelatedTest{"TestEnv_RedundantItemRemove", false} {}
  private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
+  void initTestCase() {
+    /*
+EmptyFolder
+    // DeleteRandomEmptyFolder1
+    // DeleteRandomEmptyFolder2
+    // KeepNonEmptyFolder
+    //  - randomFile.txt
+RedundantKeyword
+    // Delete Movie Falcon{delete.txt}
+    // Keep KristenBjorn imgs{.jpg total: 11}
+    // Keep RagingStallion Movie{keep.mp4}
+RedundantParentFolder
+    // useful parent folder
+    // - random folder
+    // - 1.txt
+    // - 2.txt
+    // useless parent folder
+    // - useless parent folder.txt
+     */
+    m_rootHelper<<FileSystemNode{"EmptyFolder"}<<FileSystemNode{"RedundantKeyword"}<<FileSystemNode{"RedundantParentFolder"};
 
-  void init() {
-    QVERIFY2(QDir(EMPTY_TEST_DIR).exists(), "precondition. path should exist");
-    QVERIFY2(QDir(KEYWORD_TEST_DIR).exists(), "precondition. path should exist");
-    QVERIFY2(QDir(REDUN_PARENT_TEST_DIR).exists(), "precondition. path should exist");
+    m_rootHelper.GetSubHelper("EmptyFolder") << FileSystemNode{"DeleteRandomEmptyFolder1"}<< FileSystemNode{"DeleteRandomEmptyFolder2"}<< FileSystemNode{"KeepNonEmptyFolder"};
+    m_rootHelper.GetSubHelper("EmptyFolder").GetSubHelper("KeepNonEmptyFolder") << FileSystemNode{"randomFile.txt", false, ""};
+
+
+    m_rootHelper.GetSubHelper("RedundantKeyword") << FileSystemNode{"Delete Movie Falcon"}<< FileSystemNode{"Keep KristenBjorn imgs"}<< FileSystemNode{"Keep RagingStallion Movie"};
+    m_rootHelper.GetSubHelper("RedundantKeyword").GetSubHelper("Delete Movie Falcon") << FileSystemNode{"delete.txt", false, ""};
+    auto imgs = m_rootHelper.GetSubHelper("RedundantKeyword").GetSubHelper("Keep KristenBjorn imgs");
+    for (int imgCnt = 1; imgCnt < 12; ++imgCnt) {
+      imgs << FileSystemNode{QString("keep - Copy (%1).jpg").arg(imgCnt)};
+    }
+    m_rootHelper.GetSubHelper("RedundantKeyword").GetSubHelper("Keep RagingStallion Movie") << FileSystemNode{"keep.mp4", false, ""};
+
+
+    m_rootHelper.GetSubHelper("RedundantParentFolder")
+        << FileSystemNode{"useful parent folder"}
+        << FileSystemNode{"useless parent folder"};
+    m_rootHelper.GetSubHelper("RedundantParentFolder").GetSubHelper("useful parent folder")
+        <<FileSystemNode{"random folder"}
+        << FileSystemNode{"1.txt", false, ""}
+        << FileSystemNode{"2.txt", false, ""};
+    m_rootHelper.GetSubHelper("RedundantParentFolder").GetSubHelper("useless parent folder")
+        << FileSystemNode{"useless parent folder.txt", false, ""};
   }
-  void cleanup() {}
+
+  void cleanupTestCase() {
+    FileSystemHelper(ROOT_DIR).EraseFileSystemTree(true);
+  }
+
+  void init() {}
 
   void test_recycleEmptyFolder() {
     // DeleteRandomEmptyFolder1
     // DeleteRandomEmptyFolder2
     // KeepNonEmptyFolder
     //  - randomFile.txt
+    const QString EMPTY_TEST_DIR = ROOT_DIR+"/EmptyFolder";
     QCOMPARE(QDir(EMPTY_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 3);
     EmptyFolderRemove efr;
     const int recycleCmdCnt = efr(EMPTY_TEST_DIR);
@@ -39,13 +78,13 @@ class RedundantItemsRemoverTest : public QObject {
   }
 
   void test_redundantParentFolder() {
-    // RedundantParentFolder
-    //  - useful parent folder
-    //    - random folder
-    //    - 1.txt
-    //    - 2.txt
-    //  - useless parent folder
-    //    - useless parent folder.txt
+    // useful parent folder
+    // - random folder
+    // - 1.txt
+    // - 2.txt
+    // useless parent folder
+    // - useless parent folder.txt
+    const QString REDUN_PARENT_TEST_DIR = ROOT_DIR + "/RedundantParentFolder";
     QCOMPARE(QDir(REDUN_PARENT_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 2);
 
     RedunParentFolderRem rpfr;
@@ -60,6 +99,7 @@ class RedundantItemsRemoverTest : public QObject {
     // Delete Movie Falcon{delete.txt}
     // Keep KristenBjorn imgs{.jpg total: 11}
     // Keep RagingStallion Movie{keep.mp4}
+    const QString KEYWORD_TEST_DIR = ROOT_DIR + "/RedundantKeyword";
     QCOMPARE(QDir(KEYWORD_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 3);
     int recycleCmdCnt = -1;
 

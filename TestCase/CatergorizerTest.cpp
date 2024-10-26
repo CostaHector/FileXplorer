@@ -7,24 +7,30 @@
 #include "Tools/ExtractPileItemsOutFolder.h"
 #include "pub/EndToExposePrivateMember.h"
 
-const QString TEST_SRC_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_Classfier/DONT_CHANGE");
-const QString TEST_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_Classfier/COPY_REMOVABLE");
+#include "pub/FileSystemRelatedTest.h"
 
-class CatergorizerTest : public QObject {
+class CatergorizerTest : public FileSystemRelatedTest {
   Q_OBJECT
  public:
+  CatergorizerTest() : FileSystemRelatedTest{"TestEnv_Classfier"} {}
  private slots:
   void init() {
-    if (QDir(TEST_DIR).exists()) {
-      QDir(TEST_DIR).removeRecursively();
-    }
-    auto ret = PublicTool::copyDirectoryFiles(TEST_SRC_DIR, TEST_DIR);
-    assert(ret);  // should copied ok
-  }
-  void cleanup() {
-    if (QDir(TEST_DIR).exists()) {
-      QDir(TEST_DIR).removeRecursively();
-    }
+    /*
+Factory - Movie Name - Malik Daddy, Rafael Daddy
+isolated folder
+Factory - Movie Name - Malik Daddy, Rafael Daddy 1.jpg
+Factory - Movie Name - Malik Daddy, Rafael Daddy.json
+Falcon - Heated.avi
+Falcon - Heated.mp4
+isolated file.json
+     */
+    m_rootHelper << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy"}
+                 << FileSystemNode{"isolated folder"}
+                 << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy 1.jpg", false, ""}
+                 << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy.json", false, ""}
+                 << FileSystemNode{"Falcon - Heated.avi", false, ""}
+                 << FileSystemNode{"Falcon - Heated.mp4", false, ""}
+                 << FileSystemNode{"isolated file.json", false, ""};
   }
 
   void initTestCase() { qDebug("Start CatergorizerTest..."); }
@@ -83,25 +89,24 @@ void CatergorizerTest::test_imgNameWithIndex_chop_index() {
 }
 
 void CatergorizerTest::test_imgsVidsIsolatedExistedFolder() {
-  QStringList theFirstItems =
-      QDir(TEST_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  QStringList theFirstItems = QDir(ROOT_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
 
   // packer
   QMap<QString, QStringList> folder2Items;
-  folder2Items["isolated file"] << "isolated file.json";                                                                  // isolated not rearrange
-  folder2Items["isolated folder"] << "isolated folder";                                                                   // folder not rearrange
-  folder2Items["Falcon - Heated"] << "Falcon - Heated.mp4"                                                                // create a folder and move
-                                  << "Falcon - Heated.avi";                                                               // move
-  folder2Items["Factory - Movie Name - Malik Daddy, Rafael Daddy"] << "Factory - Movie Name - Malik Daddy, Rafael Daddy"  // folder not rearrange
+  folder2Items["isolated file"] << "isolated file.json";                                                                        // isolated not rearrange
+  folder2Items["isolated folder"] << "isolated folder";                                                                         // folder not rearrange
+  folder2Items["Falcon - Heated"] << "Falcon - Heated.mp4"                                                                      // create a folder and move
+                                  << "Falcon - Heated.avi";                                                                     // move
+  folder2Items["Factory - Movie Name - Malik Daddy, Rafael Daddy"] << "Factory - Movie Name - Malik Daddy, Rafael Daddy"        // folder not rearrange
                                                                    << "Factory - Movie Name - Malik Daddy, Rafael Daddy 1.jpg"  // move
                                                                    << "Factory - Movie Name - Malik Daddy, Rafael Daddy.json";  // move
   Categorizer packer;
-  int filesRearrangedCnt = packer(TEST_DIR, folder2Items);
+  int filesRearrangedCnt = packer(ROOT_DIR, folder2Items);
   QCOMPARE(packer.m_cmds.size(), 5);  // mkpath 1 + move 4 files
   QCOMPARE(filesRearrangedCnt, 4);
   QVERIFY(packer.StartToRearrange());
 
-  QDir dir(TEST_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+  QDir dir(ROOT_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
   QStringList itemsActual = dir.entryList();
   itemsActual.sort();
   QCOMPARE(itemsActual.size(), 4);
@@ -113,13 +118,12 @@ void CatergorizerTest::test_imgsVidsIsolatedExistedFolder() {
 
   // unpacker
   ExtractPileItemsOutFolder unpacker;
-  int upackedFoldersCnt = unpacker(TEST_DIR);
+  int upackedFoldersCnt = unpacker(ROOT_DIR);
   QCOMPARE(upackedFoldersCnt, 2);
   QCOMPARE(unpacker.m_cmds.size(), 6);  // recyle 2 path + move 4 files
   QVERIFY(unpacker.StartToRearrange());
 
-  QStringList theLastItems =
-      QDir(TEST_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  QStringList theLastItems = QDir(ROOT_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
   theLastItems << "Factory - Movie Name - Malik Daddy, Rafael Daddy";  // this folder will be removed at correct purpose
   theFirstItems.sort();
   theLastItems.sort();
