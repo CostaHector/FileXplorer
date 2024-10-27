@@ -4,6 +4,7 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QVariantHash>
 
 struct SCENE_INFO {
   QString rel2scn;   // jsonFullPath = mRootPath + rel2scn + jsonFileName, rel2scn can be '/' or '/any thing/'
@@ -27,6 +28,7 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath,
                           SCENES_TYPE* pFilterd = nullptr);
 
 // json file will not updated, read json then generate scn file directly
+std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const QList<QVariantHash>& jsonDicts);
 bool GenerateAScnFile(const QString& aPath);
 int GenerateScnFilesDirectly(const QString& rootPath);
 
@@ -35,8 +37,6 @@ SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter = fal
 SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey = SceneSortOption::NAME, const bool reverse = false);
 }  // namespace SceneInfoManager
 
-
-#include <QVariantHash>
 class JsonDataRefresher {
  public:
   int UpdateAFolderItself(const QString& path);

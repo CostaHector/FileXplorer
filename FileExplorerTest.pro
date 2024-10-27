@@ -15,6 +15,7 @@ SOURCES += \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
+    TestCase/SceneInfoManagerTest.cpp \
     TestCase/pub/FileSystemHelper.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
     TestCase/JsonToolTest.cpp \
