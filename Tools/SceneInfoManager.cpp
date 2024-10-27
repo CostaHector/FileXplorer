@@ -126,7 +126,7 @@ std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const Q
       qDebug("Json dict[%s] may corrupt.", qPrintable(jsonFileName));
       continue;
     }
-    scnContent += PATHTOOL::GetFileNameExtRemoved(jsonFileName);
+    scnContent += rawJsonDict.value("Name", "").toString();
     scnContent += '\n';
     scnContent += rawJsonDict.value("ImgName", "").toString();
     scnContent += '\n';
@@ -215,13 +215,18 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
       qWarning("json file[%s] may corrupt read failed", qPrintable(jPath));
       continue;
     }
-    if (!rawJsonDict.contains("Name")) {
+
+    QVariantHash::iterator it = rawJsonDict.find("Name");
+    if (it == rawJsonDict.cend()) {
       qDebug("This json file[%s] is not we want", qPrintable(jPath));
       continue;
     }
 
     bool jsonNeedUpdate{false};
-    QVariantHash::iterator it;
+    if (it.value() != baseName) {
+      it->setValue(baseName);
+      jsonNeedUpdate = true;
+    }
 
     const QString& imgFileName = sMixed.GetFirstImg(baseName);
     it = rawJsonDict.find("ImgName");
@@ -279,11 +284,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     }
     ++usefullJsonCnt;
 
-    if (!m_jsonsDicts.contains(path)) {
-      m_jsonsDicts[path] = {rawJsonDict};
-    } else {
-      m_jsonsDicts[path].append(rawJsonDict);
-    }
+    m_jsonsDicts[path].append(rawJsonDict);
   }
   m_updatedJsonFilesCnt += updatedJsonFilesCnt;
   m_usefullJsonCnt += usefullJsonCnt;
