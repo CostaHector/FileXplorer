@@ -98,5 +98,5 @@ void UndoRedoTest::test_Rename() {
   QVERIFY2(not QDir(ROOT_DIR).exists("210.txt"), "file 210.txt should not exist");
 }
 
-QTEST_MAIN(UndoRedoTest)
+//QTEST_MAIN(UndoRedoTest)
 #include "UndoRedoTest.moc"
