@@ -2,6 +2,7 @@
 #include "Tools/NameTool.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
+#include "PublicVariable.h"
 
 namespace JSONKey {
 bool JsonKeySorter(const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) {
@@ -237,4 +238,29 @@ int JsonFileHelper::JsonValueProductionStudioSetter(const QString& path, const Q
     qDebug("%d/%d json add productionStudio set succeed", succeedCnt, tryConstuctCnt);
   }
   return succeedCnt;
+}
+
+
+QVariantHash JsonFileHelper::MovieJsonLoader(const QString& movieJsonItemPath) {
+  QFile jsonFile(movieJsonItemPath);
+  if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qDebug("[Normal] json file[%s] not found", qPrintable(movieJsonItemPath));
+    return {};
+  }
+  QTextStream in(&jsonFile);
+  in.setCodec("UTF-8");
+  QString json_string = in.readAll();
+  jsonFile.close();
+  return JsonStr2Dict(json_string);
+}
+
+QVariantHash JsonFileHelper::JsonStr2Dict(const QString& jsonStr) {
+  QJsonParseError jsonErr;
+  QJsonDocument json_doc = QJsonDocument::fromJson(jsonStr.toUtf8(), &jsonErr);
+  if (jsonErr.error != QJsonParseError::NoError) {
+    qWarning("Error parse json string %d char(s): %s", jsonStr.size(), qPrintable(jsonErr.errorString()));
+    return {};
+  }
+  const QJsonObject& rootObj = json_doc.object();
+  return rootObj.toVariantHash();
 }

@@ -107,7 +107,7 @@ std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
   // like "C:/a/any.no_extension"
   // like "C:/a/any file"
   // index(dot) + 5 <= size()
-  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + 5 < fullpath.size()) {
+  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()) {
     return std::make_pair(fullpath.mid(lastIndexOfSlash + 1), "");
   }
   return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), fullpath.mid(lastIndexOfExtDot));
@@ -116,10 +116,26 @@ std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
 QString PATHTOOL::GetBaseName(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + 5 < fullpath.size()) {
+  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()) {
     return fullpath.mid(lastIndexOfSlash + 1);
   }
   return fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1);
+}
+
+QString PATHTOOL::GetFileNameExtRemoved(const QString& fileName) {
+  const int lastIndexOfExtDot = fileName.lastIndexOf('.');
+  if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
+    return fileName;
+  }
+  return fileName.left(lastIndexOfExtDot);
+}
+
+QString PATHTOOL::GetFileNameExtRemoved(QString&& fileName) {
+  const int lastIndexOfExtDot = fileName.lastIndexOf('.');
+  if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
+    return fileName;
+  }
+  return fileName.left(lastIndexOfExtDot);
 }
 
 QString PATHTOOL::join(const QString& prefix, const QString& relative) {
