@@ -12,11 +12,15 @@ class PathToolTest : public QObject {
 
  public:
  private slots:
-  void initTestCase();
-  void cleanupTestCase();
+  void initTestCase() { qDebug() << "PathToolTest start"; }
 
-  void init();
-  void cleanup();
+  void cleanupTestCase() { qDebug() << "PathToolTest end"; }
+
+  void test_GetWinStdPath();
+  void test_StripTrailingSlash();
+  void test_linkPath();
+  void test_localPath();
+  void test_forSearchPath();
 
   void test_commonprefixOfEmptyElementList();
   void test_commonprefixOfOneElementList();
@@ -35,21 +39,45 @@ class PathToolTest : public QObject {
   void test_GetBaseNameExt();
   void test_GetBaseName_folder();
   void test_GetBaseName_file();
+  void test_FileNameRemoveExt();
 
   void test_GetBaseNameDotBeforeSlash();
+
+  void test_isLinuxRootOrWinEmpty();
+  void test_isRootOrEmpty();
 };
 
-void PathToolTest::initTestCase() {
-  qDebug() << "PathToolTest start to initTestCase";
+void PathToolTest::test_GetWinStdPath() {
+#ifdef WIN32
+  QCOMPARE(GetWinStdPath("C:"), "C:/");
+  QCOMPARE(GetWinStdPath("X:"), "X:/");
+  QCOMPARE(GetWinStdPath("F1:"), "F1:/");
+#else
+  QCOMPARE(GetWinStdPath("/"), "/");
+  QCOMPARE(GetWinStdPath("/home"), "/home");
+#endif
+}
+void PathToolTest::test_StripTrailingSlash() {
+  // "XX:/A/"  -> "XX:/A" and "XX:/" -> same
+  // "/home/user/" ->"/home/user" and "/" -> same
+  QCOMPARE(StripTrailingSlash("XX:/A/"), "XX:/A");
+  QCOMPARE(StripTrailingSlash("XX:/"), "XX:/");
+  QCOMPARE(StripTrailingSlash("/home/user/"), "/home/user");
+  QCOMPARE(StripTrailingSlash("/"), "/");
 }
 
-void PathToolTest::cleanupTestCase() {
-  qDebug() << "PathToolTest start to initTestCase";
+void PathToolTest::test_linkPath() {
+  QCOMPARE(linkPath("anyfile.txt"), "file:///anyfile.txt");
 }
 
-void PathToolTest::init() {}
+void PathToolTest::test_localPath() {
+  QCOMPARE(localPath("file:///anyfile.txt"), "anyfile.txt");
+}
 
-void PathToolTest::cleanup() {}
+void PathToolTest::test_forSearchPath() {
+  QCOMPARE(forSearchPath("C:/home/movie/vids/file.mp4"), "movie/vids/file.mp4");
+  QCOMPARE(forSearchPath("C:/file.mp4"), "C:/file.mp4");
+}
 
 void PathToolTest::test_commonprefixOfEmptyElementList() {
   const QStringList paths;
@@ -88,8 +116,8 @@ void PathToolTest::test_commonprefixFusion() {
 }
 
 void PathToolTest::test_commonprefixLongePath() {
-  QString actualPrepath = longestCommonPrefix({"E:/py/NameStandardlizeTestFolder/New Folder 20231020222814/New Text Document 20231125234056.txt",
-                                               "E:/py/NameStandardlizeTestFolder/New Text Document 20231020222955.txt"});
+  QString actualPrepath =
+      longestCommonPrefix({"E:/py/NameStandardlizeTestFolder/New Folder 20231020222814/New Text Document 20231125234056.txt", "E:/py/NameStandardlizeTestFolder/New Text Document 20231020222955.txt"});
   QString expectPrepath = "E:/py/NameStandardlizeTestFolder";
   QCOMPARE(actualPrepath, expectPrepath);
 }
@@ -142,8 +170,7 @@ void PathToolTest::test_GetBaseNameExt() {
   QCOMPARE(GetBaseNameExt("C:/home/file.m"), std::make_pair(QString("file"), QString(".m")));
   QCOMPARE(GetBaseNameExt("a.txt"), std::make_pair(QString("a"), QString(".txt")));
   QCOMPARE(GetBaseNameExt("a"), std::make_pair(QString("a"), QString("")));
-  QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"),
-           std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));
+  QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"), std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));
 }
 
 void PathToolTest::test_GetBaseName_folder() {
@@ -159,10 +186,34 @@ void PathToolTest::test_GetBaseName_file() {
   QCOMPARE(GetBaseName("any movie name sc.1 - performer 1, performer 2.txt"), "any movie name sc.1 - performer 1, performer 2");
 }
 
+void PathToolTest::test_FileNameRemoveExt() {
+  QCOMPARE(GetFileNameExtRemoved("C:/home/file.m"), "C:/home/file");
+  QCOMPARE(GetFileNameExtRemoved("a.txt"), "a");
+}
+
 void PathToolTest::test_GetBaseNameDotBeforeSlash() {
   QCOMPARE(GetBaseName("C:/.a/b"), "b");
   QCOMPARE(GetBaseName("C:/.a/any movie name"), "any movie name");
 }
+
+void PathToolTest::test_isLinuxRootOrWinEmpty() {
+#ifdef WIN32
+  QVERIFY(isLinuxRootOrWinEmpty(""));
+#else
+  QVERIFY(isLinuxRootOrWinEmpty("/"));
+#endif
+}
+void PathToolTest::test_isRootOrEmpty() {
+#ifdef WIN32
+  QVERIFY(isRootOrEmpty(""));
+  QVERIFY(isRootOrEmpty("C:/"));
+  QVERIFY(!isRootOrEmpty("C:/home"));
+#else
+  QVERIFY(isRootOrEmpty("/"));
+  QVERIFY(!isRootOrEmpty("/home"));
+#endif
+}
+
 
 //QTEST_MAIN(PathToolTest)
 #include "PathToolTest.moc"
