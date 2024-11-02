@@ -94,7 +94,7 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
 
   if (failedCommandCnt != 0) {
     qWarning("Above %d command(s) failed.", failedCommandCnt);
-    log += QString("Above %1 command(s) failed.").arg(failedCommandCnt);
+    log += QString("\tAbove %1 command(s) failed.").arg(failedCommandCnt);
     WriteIntoLogFile(log);
   }
   // in-place reverse
