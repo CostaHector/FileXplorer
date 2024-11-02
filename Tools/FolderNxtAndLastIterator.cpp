@@ -3,9 +3,6 @@
 #include <QDir>
 
 void FolderNxtAndLastIterator::operator()(const QString& parentPath) {
-  if (path2SameLevelPaths.contains(parentPath)) {
-    return;
-  }
   path2SameLevelPaths[parentPath] = QDir(parentPath, "", QDir::SortFlag::DirsFirst, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
 }
 
