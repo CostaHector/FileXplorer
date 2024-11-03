@@ -89,6 +89,7 @@ SOURCES += \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
     Tools/QMediaInfo.cpp \
+    Tools/RenameHelper.cpp \
     Tools/RenameNamesUnique.cpp \
     Tools/SceneInfoManager.cpp \
     Tools/SearchProxyModel.cpp \
@@ -247,6 +248,7 @@ HEADERS += \
     Tools/NameTool.h \
     Tools/QAbstractTableModelPub.h \
     Tools/QMediaInfo.h \
+    Tools/RenameHelper.h \
     Tools/RenameNamesUnique.h \
     Tools/SceneInfoManager.h \
     Tools/SearchProxyModel.h \

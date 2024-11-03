@@ -2,6 +2,7 @@
 #include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 #include "Tools/NameTool.h"
+#include "Tools/RenameHelper.h"
 #include "Tools/RenameNamesUnique.h"
 #include "UndoRedo.h"
 
@@ -17,35 +18,21 @@ auto RenameWidget_Insert::InitExtraMemberWidget() -> void {
 
   insertAtCB->setEditable(true);
   insertAtCB->setCompleter(nullptr);
-  insertAtCB->addItems(
-      PreferenceSettings().value(MemoryKey::RENAMER_INSERT_INDEXES_LIST.name, MemoryKey::RENAMER_INSERT_INDEXES_LIST.v).toStringList());
+  insertAtCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_INSERT_INDEXES_LIST.name, MemoryKey::RENAMER_INSERT_INDEXES_LIST.v).toStringList());
   insertAtCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   insertAtCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
 }
 
 QStringList RenameWidget_Insert::RenameCore(const QStringList& replaceeList) {
-  if (replaceeList.isEmpty()) {
-    return replaceeList;
-  }
   const QString& insertString = insertStrCB->currentText();
-  if (insertString.isEmpty()) {
-    return replaceeList;
-  }
   const QString& insertAtStr = insertAtCB->currentText();
-
   bool isnumeric = false;
   int insertAt = insertAtStr.toInt(&isnumeric);
-  if (not isnumeric) {
+  if (!isnumeric) {
     qCritical("Insert index[%s] must be a number", qPrintable(insertAtStr));
     return replaceeList;
   }
-
-  QStringList afterInsert;
-  for (const QString& replacee : replaceeList) {
-    int realInsertAt = (insertAt > replacee.size()) ? replacee.size() : insertAt;
-    afterInsert.append(replacee.left(realInsertAt) + insertString + replacee.mid(realInsertAt));
-  }
-  return afterInsert;
+  return RenameHelper::InsertRename(replaceeList, insertString, insertAt);
 }
 
 auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
@@ -65,88 +52,39 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
 }
 
 QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
-  if (replaceeList.isEmpty()) {
-    return replaceeList;
-  }
-
   const QString& oldString = oldStrCB->currentText();
   const QString& newString = newStrCB->currentText();
-  auto regexEnable = regex->isChecked();
-  if (oldString.isEmpty()) {
-    return replaceeList;
-  }
-  if (not regexEnable) {
-    QStringList replacedLst(replaceeList);
-    for (QString& s : replacedLst) {
-      s.replace(oldString, newString);
+  const bool regexEnable = regex->isChecked();
+  if (regexEnable) {
+    QRegularExpression repRegex(oldString);
+    if (repRegex.isValid()) {
+      regexValidLabel->ToSaved();
+    } else {
+      regexValidLabel->ToNotSaved();
+      qWarning("regular expression invalid[%s]", qPrintable(oldString));
+      return {};
     }
-    return replacedLst;
   }
-
-  QRegularExpression repRegex(oldString);
-  if (not repRegex.isValid()) {
-    const QString& msg = QString("invalid regex[%1]").arg(oldString);
-    qDebug("%s", qPrintable(msg));
-    regexValidLabel->ToNotSaved();
-    return replaceeList;
-  }
-  regexValidLabel->ToSaved();
-  QStringList replacedLst(replaceeList);
-  for (QString& s : replacedLst) {
-    s.replace(repRegex, newString);
-  }
-  return replacedLst;
+  return RenameHelper::ReplaceRename(replaceeList, oldString, newString, regexEnable);
 }
 
 QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
-  if (replaceeList.isEmpty()) {
-    return replaceeList;
-  }
-
+  const QString& namePattern = m_numberPattern->text();
   QString startNoStr = m_startNo->text();
   bool isnumeric = false;
-  const int START_NO = startNoStr.toInt(&isnumeric);
-  if (not isnumeric) {
+  const int startInd = startNoStr.toInt(&isnumeric);
+  if (!isnumeric) {
     qWarning("start index is not number[%s]", qPrintable(startNoStr));
     return replaceeList;
   }
-  if (not m_baseNameInited) { // init lineedit only at first time. when lineedit editted by user. lineedit should not init
+  if (!m_baseNameInited) {  // init lineedit only at first time. when lineedit editted by user. lineedit should not init
     m_completeBaseName->setText(replaceeList[0]);
     m_completeBaseName->selectAll();
     m_baseNameInited = true;
   }
-
   const QStringList& suffixs = m_oExtTE->toPlainText().split('\n');
-  QMap<QString, int> sufCntMap;
-  for (const QString& suf : suffixs) {
-    auto extIt = sufCntMap.find(suf);
-    if (extIt != sufCntMap.end()) {
-      ++extIt.value();
-    } else {
-      sufCntMap.insert(extIt, suf, 1);
-    }
-  }
-
-  QMap<QString, int> sufCurIndex;  // each extension no. start
-  for (auto ext2Cnt = sufCntMap.cbegin(); ext2Cnt != sufCntMap.cend(); ++ext2Cnt) {
-    if (ext2Cnt.value() > 1) {
-      sufCurIndex[ext2Cnt.key()] = START_NO;
-    }
-  }
-
-  const QString& completeBaseNameString = m_completeBaseName->text();
-  QStringList numerizedNames;
-  for (const QString& suf : suffixs) {
-    if (not sufCurIndex.contains(suf)) {  // no need to no. because this extension count <= 1
-      numerizedNames.append(completeBaseNameString);
-      continue;
-    }
-    const QString& newBaseName =
-        QString("%1%2(%3)").arg(completeBaseNameString).arg(completeBaseNameString.isEmpty() ? "" : " ").arg(sufCurIndex[suf]);
-    numerizedNames.append(newBaseName);
-    sufCurIndex[suf] += 1;
-  }
-  return numerizedNames;
+  const QString& baseName = m_completeBaseName->text();
+  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
 }
 
 auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
@@ -212,8 +150,7 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)
   EXT_INSIDE_FILENAME->setToolTip("Extension inside file name.\nRules will also work on suffix");
   ITEMS_INSIDE_SUBDIR->setToolTip("Items contains subdirectory.\nRules will also work on itself and its subdirectories");
 
-  EXT_INSIDE_FILENAME->setChecked(
-      PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
+  EXT_INSIDE_FILENAME->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
   ITEMS_INSIDE_SUBDIR->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
 
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
@@ -302,8 +239,7 @@ auto AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) -> 
   const QStringList& newCompleteNameList = m_nBaseTE->toPlainText().split('\n');
   const QStringList& newSuffixList = m_nExtTE->toPlainText().split('\n');
 
-  RenameNamesUnique renameHelper(m_pre, relNameList, oldCompleteNameList, oldSuffixList, newCompleteNameList, newSuffixList,
-                                 ITEMS_INSIDE_SUBDIR->isChecked());
+  RenameNamesUnique renameHelper(m_pre, relNameList, oldCompleteNameList, oldSuffixList, newCompleteNameList, newSuffixList, ITEMS_INSIDE_SUBDIR->isChecked());
   renameHelper();
   if (not renameHelper) {
     const QString& rejectMsg = renameHelper.Details();
