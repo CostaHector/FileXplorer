@@ -15,38 +15,45 @@ class FolderNxtAndLastIteratorTest : public FileSystemRelatedTest {
   void init() {
     m_rootHelper << FileSystemNode{"0 Folder Include"} << FileSystemNode{"1 Folder Include"} << FileSystemNode{"5 Folder Include"};
     m_rootHelper.GetSubHelper("1 Folder Include") << FileSystemNode{"folder 0"};
-    m_rootHelper.GetSubHelper("5 Folder Include")
-        << FileSystemNode{"folder 0"}
-        << FileSystemNode{"folder 1"}
-        << FileSystemNode{"folder 2"}
-        << FileSystemNode{"folder 3"}
-        << FileSystemNode{"folder 4"};
+    m_rootHelper.GetSubHelper("5 Folder Include") << FileSystemNode{"folder 0"} << FileSystemNode{"folder 1"} << FileSystemNode{"folder 2"} << FileSystemNode{"folder 3"} << FileSystemNode{"folder 4"};
   }
 
   void test_emptyFolderReturnEmpty_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.next(ROOT_DIR+"/0 Folder Include", "any nonexist folder"), "");
-    QCOMPARE(nlIt.last(ROOT_DIR+"/0 Folder Include", "any nonexist folder"), "");
+    QCOMPARE(nlIt.next(ROOT_DIR + "/0 Folder Include", "any nonexist folder"), "");
+    QCOMPARE(nlIt.last(ROOT_DIR + "/0 Folder Include", "any nonexist folder"), "");
   }
 
   void test_1ElementFolderReturnItself_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.next(ROOT_DIR+"/1 Folder Include", "folder 0"), "folder 0");
-    QCOMPARE(nlIt.last(ROOT_DIR+"/1 Folder Include", "folder 0"), "folder 0");
+    QCOMPARE(nlIt.next(ROOT_DIR + "/1 Folder Include", "folder 0"), "folder 0");
+    QCOMPARE(nlIt.last(ROOT_DIR + "/1 Folder Include", "folder 0"), "folder 0");
   }
 
   void test_conventionNxt_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.next(ROOT_DIR+"/5 Folder Include", "folder 4"), "folder 0");
-    QCOMPARE(nlIt.next(ROOT_DIR+"/5 Folder Include", "folder 1"), "folder 2");
+    QCOMPARE(nlIt.next(ROOT_DIR + "/5 Folder Include", "folder 4"), "folder 0");
+    QCOMPARE(nlIt.next(ROOT_DIR + "/5 Folder Include", "folder 1"), "folder 2");
   }
 
   void test_conventionLast_ok() {
     FolderNxtAndLastIterator nlIt;
-    QCOMPARE(nlIt.last(ROOT_DIR+"/5 Folder Include", "folder 0"), "folder 4");
-    QCOMPARE(nlIt.last(ROOT_DIR+"/5 Folder Include", "folder 2"), "folder 1");
+    QCOMPARE(nlIt.last(ROOT_DIR + "/5 Folder Include", "folder 0"), "folder 4");
+    QCOMPARE(nlIt.last(ROOT_DIR + "/5 Folder Include", "folder 2"), "folder 1");
+  }
+
+  void test_parentPathLvlsFolder_noNeedUpdate() {
+    FolderNxtAndLastIterator nlIt;
+    QVERIFY(nlIt(ROOT_DIR + "/5 Folder Include"));
+    QVERIFY(!nlIt(ROOT_DIR + "/5 Folder Include"));
+  }
+
+  void test_parentPathLvlsFolder_needUpdate() {
+    FolderNxtAndLastIterator nlIt;
+    QVERIFY(nlIt(ROOT_DIR + "/5 Folder Include"));
+    QVERIFY(nlIt(ROOT_DIR + "/1 Folder Include"));
   }
 };
 
-//QTEST_MAIN(FolderNxtAndLastIteratorTest)
+QTEST_MAIN(FolderNxtAndLastIteratorTest)
 #include "FolderNxtAndLastIteratorTest.moc"
