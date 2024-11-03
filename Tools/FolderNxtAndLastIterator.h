@@ -6,7 +6,7 @@
 
 class FolderNxtAndLastIterator {
  public:
-  void operator()(const QString& parentPath);
+  bool operator()(const QString& parentPath);
 
   QString next(const QString& parentPath, const QString& curDirName) {
     return lastNextCore(parentPath, curDirName, true);
@@ -16,7 +16,8 @@ class FolderNxtAndLastIterator {
   }
  private:
   QString lastNextCore(const QString& parentPath, const QString& curDirName, bool isNext = true);
-  QMap<QString, QStringList> path2SameLevelPaths;
+  QString m_lastTimeParentPath;
+  QStringList sameLevelPaths;
 };
 
 #endif // FOLDERNXTANDLASTITERATOR_H
