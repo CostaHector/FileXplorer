@@ -2,6 +2,16 @@
 #include <QFileInfo>
 #include <QDir>
 
+FolderNxtAndLastIterator::FolderNxtAndLastIterator(FuncGetSortedDirNames dirNamesGetter) : m_dirNamesGetter{dirNamesGetter} {
+  if (m_dirNamesGetter != nullptr) {
+    return;
+  }
+  static const auto FileSystemDirGetter = [](const QString& parentPath) -> QStringList {
+    return QDir(parentPath, "", QDir::SortFlag::DirsFirst, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  };
+  m_dirNamesGetter = FileSystemDirGetter;
+}
+
 bool FolderNxtAndLastIterator::operator()(const QString& parentPath) {
   if (!m_lastTimeParentPath.isEmpty() && m_lastTimeParentPath == parentPath) {
     // not first time && parentPath unchange => no update
@@ -9,7 +19,7 @@ bool FolderNxtAndLastIterator::operator()(const QString& parentPath) {
   }
   // first time || parentPath changed => update needed
   m_lastTimeParentPath = parentPath;
-  auto lvls = QDir(parentPath, "", QDir::SortFlag::DirsFirst, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  auto lvls = m_dirNamesGetter(parentPath);
   sameLevelPaths.swap(lvls);
   return true;
 }
