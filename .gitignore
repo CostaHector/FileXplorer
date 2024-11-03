@@ -1,10 +1,8 @@
 FileExplorerReadOnly.pro.user
-FileExplorerReadOnly.pro.user.187c1f8
-FileExplorerReadOnly.pro.user.f225af0
+FileExplorerReadOnly.pro.user.*
 FileExplorerReadOnly_zh_CN.qm
 FileExplorerTest.pro.user
-FileExplorerTest.pro.user.187c1f8
-FileExplorerTest.pro.user.f225af0
+FileExplorerTest.pro.user.*
 bin/RUNLOG/*.log
 bin/lib/*
 ./*.json
