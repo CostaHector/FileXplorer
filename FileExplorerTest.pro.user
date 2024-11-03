@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2024-10-27T17:38:10. -->
+<!-- Written by QtCreator 11.0.2, 2024-11-03T12:16:21. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -69,8 +69,9 @@
     <value type="bool" key="AutoTest.Framework.QtTest">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="AutoTest.CheckStates">
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/PathToolTest.cpp:cleanupTestCase">Unchecked</value>
-    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/PathToolTest.cpp:initTestCase">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/FolderNxtAndLastIteratorTest.cpp:cleanupTestCase">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/FolderNxtAndLastIteratorTest.cpp:init">Unchecked</value>
+    <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/FolderNxtAndLastIteratorTest.cpp:initTestCase">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/SceneInfoManagerTest.cpp:cleanupTestCase">Unchecked</value>
     <value type="Qt::CheckState" key="1@C:/home/Ariel/qtcpp/FileExplorerReadOnly/TestCase/SceneInfoManagerTest.cpp:initTestCase">Unchecked</value>
    </valuemap>

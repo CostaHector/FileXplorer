@@ -15,6 +15,7 @@ SOURCES += \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
+    TestCase/RenameHelperTest.cpp \
     TestCase/SceneInfoManagerTest.cpp \
     TestCase/pub/FileSystemHelper.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
@@ -69,6 +70,7 @@ SOURCES += \
     Tools/NameStandardizer.cpp \
     Tools/PerformersManager.cpp \
     Tools/RenameNamesUnique.cpp \
+    Tools/RenameHelper.cpp \
     Tools/SceneInfoManager.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/NameSectionArrange.cpp \
@@ -111,6 +113,7 @@ HEADERS += \
     Tools/NameStandardizer.h \
     Tools/PerformersManager.h \
     Tools/RenameNamesUnique.h \
+    Tools/RenameHelper.h \
     Tools/SceneInfoManager.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
