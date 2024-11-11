@@ -18,7 +18,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
-  addActions(g_addressBarActions()._FOLDER_IT_CONTROLS->actions());
+  addActions(g_addressBarActions()._FOLDER_ITER_CONTROLS->actions());
   addSeparator();
   addWidget(m_addressLine);
   addSeparator();

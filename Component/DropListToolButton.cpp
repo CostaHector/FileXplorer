@@ -26,8 +26,18 @@ QToolButton* DropListToolButton(QAction* defaultAction,
   tb->setStyleSheet("QToolButton { max-width: 256px; }");
   tb->setIconSize(QSize(iconSize, iconSize));
 
-  QMenu* mn = new QMenu(tb);
-  mn->addActions(dropdownActions);
+  QMenu* mn = new (std::nothrow) QMenu(tb);
+  if (mn == nullptr) {
+    qCritical("mn is nullptr");
+    return nullptr;
+  }
+  for (auto* pAct : dropdownActions) {
+    if (pAct == nullptr) {
+      mn->addSeparator();
+    } else {
+      mn->addAction(pAct);
+    }
+  }
   mn->setToolTipsVisible(true);
   tb->setMenu(mn);
   return tb;

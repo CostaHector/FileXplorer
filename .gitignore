@@ -8,4 +8,5 @@ bin/lib/*
 ./*.json
 *.idx
 build/*
+*.pro.user
 *.pro.user.*
