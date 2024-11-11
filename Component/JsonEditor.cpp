@@ -154,39 +154,6 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
   connect(g_jsonEditorActions()._AI_HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 
-  connect(g_jsonEditorActions()._STUDIO_INFORMATION, &QAction::triggered, this, [this]() {
-    static auto& psm = ProductionStudioManager::getIns();
-    psm.DisplayStatistic(this);
-  });
-  connect(g_jsonEditorActions()._EDIT_STUDIOS, &QAction::triggered, this, &JsonEditor::onEditStudios);
-  connect(g_jsonEditorActions()._RELOAD_STUDIOS, &QAction::triggered, this, []() {
-    static auto& psm = ProductionStudioManager::getIns();
-    int itemsCntChanged = psm.ForceReloadStdStudioName();
-    Notificator::information("Reload standard studio name", QString("delta %1 items").arg(itemsCntChanged));
-  });
-
-  connect(g_jsonEditorActions()._PERFORMERS_INFORMATION, &QAction::triggered, this, [this]() {
-    static auto& pm = PerformersManager::getIns();
-    pm.DisplayStatistic(this);
-  });
-  connect(g_jsonEditorActions()._EDIT_PERFS, &QAction::triggered, this, &JsonEditor::onEditPerformers);
-  connect(g_jsonEditorActions()._RELOAD_PERFS, &QAction::triggered, this, []() {
-    static auto& pm = PerformersManager::getIns();
-    int itemsCntChanged = pm.ForceReloadPerformers();
-    Notificator::information("Reload performers", QString("delta %1 item(s)").arg(itemsCntChanged));
-  });
-
-  connect(g_jsonEditorActions()._AKA_PERFORMERS_INFORMATION, &QAction::triggered, this, [this]() {
-    static auto& dbTM = PerformersAkaManager::getIns();
-    dbTM.DisplayStatistic(this);
-  });
-  connect(g_jsonEditorActions()._EDIT_PERF_AKA, &QAction::triggered, this, &JsonEditor::onEditAkaPerformer);
-  connect(g_jsonEditorActions()._RELOAD_PERF_AKA, &QAction::triggered, this, []() {
-    static auto& dbTM = PerformersAkaManager::getIns();
-    int itemsCntChanged = dbTM.ForceReloadAkaName();
-    Notificator::information("Reload AKA performers", QString("delta %1 item(s)").arg(itemsCntChanged));
-  });
-
   connect(g_jsonEditorActions()._RENAME_THIS_FILE, &QAction::triggered, this, &JsonEditor::onRenameJsonFile);
 }
 
@@ -503,51 +470,6 @@ bool JsonEditor::onRenameJsonFile() {
   }
   m_jsonModel->setData(ind, dir.absoluteFilePath(newFileName), Qt::DisplayRole);
   return true;
-}
-
-void JsonEditor::onEditPerformers() {
-#ifdef _WIN32
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
-#else
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
-#endif
-  if (not QFile::exists(fileAbsPath)) {
-    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
-    return;
-  }
-  QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Remember to reload", "don't forget it");
-}
-
-void JsonEditor::onEditAkaPerformer() {
-#ifdef _WIN32
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name).toString();
-#else
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name).toString();
-#endif
-  if (not QFile::exists(fileAbsPath)) {
-    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
-    return;
-  }
-  QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Work after reopen", "changes not work now");
-}
-
-void JsonEditor::onEditStudios() {
-#ifdef _WIN32
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
-#else
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
-#endif
-  if (not QFile::exists(fileAbsPath)) {
-    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
-    return;
-  }
-  QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Work after rebuild", "changes not work now");
 }
 
 bool JsonEditor::formatter() {
