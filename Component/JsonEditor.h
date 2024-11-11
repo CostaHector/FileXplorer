@@ -45,9 +45,6 @@ class JsonEditor : public QMainWindow {
   auto onSelectedTextAppendToPerformers() -> bool;
 
   bool onRenameJsonFile();
-  void onEditPerformers();
-  void onEditAkaPerformer();
-  void onEditStudios();
 
   auto updateWindowsSize() -> void {
     if (PreferenceSettings().contains("JsonEditorGeometry")) {
