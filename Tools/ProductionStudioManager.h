@@ -29,7 +29,6 @@ class ProductionStudioManager {
   int ForceReloadStdStudioName();
 
   inline int count() const { return m_prodStudioMap.size(); }
-  inline void DisplayStatistic(QWidget* parent) { QMessageBox::information(parent, "Studios Count", QString::number(count())); }
 
  protected:
   static QVariantHash ReadOutStdStudioName();

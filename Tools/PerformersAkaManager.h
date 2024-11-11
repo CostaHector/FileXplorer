@@ -27,7 +27,6 @@ class PerformersAkaManager {
   QString GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const;
 
   inline int count() const { return akaPerf.size(); }
-  inline void DisplayStatistic(QWidget* parent) { QMessageBox::information(parent, "Performers AKA Count", QString::number(count())); }
 
  private:
   PerformersAkaManager();

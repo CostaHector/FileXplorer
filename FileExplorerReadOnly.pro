@@ -13,6 +13,7 @@ LIBS += -lz
 SOURCES += \
     Actions/AddressBarActions.cpp \
     Actions/ArchiveFilesActions.cpp \
+    Actions/ArrangeActions.cpp \
     Actions/ConflictsSolveActions.cpp \
     Actions/DataBaseActions.cpp \
     Actions/DuplicateVideosFinderActions.cpp \
@@ -170,6 +171,7 @@ SOURCES += \
 HEADERS += \
     Actions/AddressBarActions.h \
     Actions/ArchiveFilesActions.h \
+    Actions/ArrangeActions.h \
     Actions/ConflictsSolveActions.h \
     Actions/DataBaseActions.h \
     Actions/DuplicateVideosFinderActions.h \
