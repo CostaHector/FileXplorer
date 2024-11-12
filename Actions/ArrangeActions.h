@@ -11,16 +11,16 @@ class ArrangeActions : public QObject {
 
   void subscribe();
 
-  QAction* _STUDIO_INFORMATION{nullptr};
   QAction* _EDIT_STUDIOS{nullptr};
   QAction* _RELOAD_STUDIOS{nullptr};
 
-  QAction* _PERFORMERS_INFORMATION{nullptr};
   QAction* _EDIT_PERFS{nullptr};
   QAction* _RELOAD_PERFS{nullptr};
-  QAction* _AKA_PERFORMERS_INFORMATION{nullptr};
+
   QAction* _EDIT_PERF_AKA{nullptr};
   QAction* _RELOAD_PERF_AKA{nullptr};
+
+  QAction* _RENAME_RULE_STAT{nullptr};
 };
 
 ArrangeActions& g_ArrangeActions();

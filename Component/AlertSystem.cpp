@@ -34,6 +34,7 @@ AlertSystem::AlertSystem(QWidget* parent)
   connect(m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open), &QPushButton::clicked, this, &AlertSystem::onEditPreferenceSetting);
   connect(m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry), &QPushButton::clicked, this, &AlertSystem::RefreshWindowIcon);
 
+
   connect(m_alertModel, &QAbstractItemModel::dataChanged, this, &AlertSystem::RefreshWindowIcon);
 
   ReadSettings();
@@ -68,7 +69,7 @@ bool AlertSystem::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
 
 void AlertSystem::onEditPreferenceSetting() const {
   QString fileAbsPath = PreferenceSettings().fileName();
-  if (not QFile::exists(fileAbsPath)) {
+  if (!QFile::exists(fileAbsPath)) {
     qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
     Notificator::critical("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
     return;
