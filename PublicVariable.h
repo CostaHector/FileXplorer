@@ -257,8 +257,8 @@ const KV WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS",
                               "../bin/AKA_PERFORMERS.txt",
                               ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME",
-                                    "../bin/STANDARD_STUDIO_NAME.json",
-                                    ValueChecker{{".json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                                    "../bin/STANDARD_STUDIO_NAME.txt",
+                                    ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH",
                                              "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
                                              ValueChecker{{".bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
@@ -276,8 +276,8 @@ const KV LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS",
                               "../bin/AKA_PERFORMERS.txt",
                               ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME",
-                                    "../bin/STANDARD_STUDIO_NAME.json",
-                                    ValueChecker{{".json"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+                                    "../bin/STANDARD_STUDIO_NAME.txt",
+                                    ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 const KV LINUX_RUND_IMG_PATH("LINUX_RUND_IMG_PATH", ".", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
