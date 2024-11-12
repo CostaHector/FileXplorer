@@ -15,17 +15,41 @@ QVariantHash ProductionStudioManager::ReadOutStdStudioName() {
 #else
   const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
 #endif
-  auto stdStudioNameDict = JsonFileHelper::MovieJsonLoader(stdStudiosFilePath);
-  qDebug("%d studio name(s) read out", stdStudioNameDict.size());
+  QFile jsonFile(stdStudiosFilePath);
+  if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qDebug("File[%s] not found or open for read failed", qPrintable(stdStudiosFilePath));
+    return {};
+  }
+  QVariantHash stdStudioNameDict;
+
+  QTextStream in(&jsonFile);
+  in.setCodec("UTF-8");
+  int lineIndex = 0;
+  while (!in.atEnd()) {
+    ++lineIndex;
+    QString line = in.readLine(128);
+    if (line.isEmpty()) {
+      continue;
+    }
+    int tabKeyInd = line.indexOf('\t');
+    if (tabKeyInd == -1) {
+      qWarning("The %dth line of file[%s] is invalid", lineIndex, qPrintable(stdStudiosFilePath));
+      continue;
+    }
+    stdStudioNameDict.insert(line.left(tabKeyInd), line.mid(tabKeyInd + 1));
+  }
+  jsonFile.close();
+  qDebug("%d studio item(s) read out from %d lines", stdStudioNameDict.size(), lineIndex);
   return stdStudioNameDict;
 }
 
 int ProductionStudioManager::ForceReloadStdStudioName() {
-  int beforeStudioNameCnt = m_prodStudioMap.size();
-  m_prodStudioMap = ProductionStudioManager::ReadOutStdStudioName();
-  int afterStudioNameCnt = m_prodStudioMap.size();
-  qDebug("%d standard studio names added/removed", afterStudioNameCnt - beforeStudioNameCnt);
-  return afterStudioNameCnt - beforeStudioNameCnt;
+  int befCnt = m_prodStudioMap.size();
+  auto newStudioNames = ProductionStudioManager::ReadOutStdStudioName();
+  m_prodStudioMap.swap(newStudioNames);
+  int aftCnt = m_prodStudioMap.size();
+  qDebug("standard studio names rule from %d to %d", befCnt, aftCnt);
+  return aftCnt - befCnt;
 }
 
 int ProductionStudioManager::LearningFromAPath(const QString& path) {
@@ -77,7 +101,7 @@ QStringList ProductionStudioManager::StandardProductionStudioFrom(QString standa
   return {pslower, psWithSpace.toLower()};
 }
 
-QString ProductionStudioManager::FileName2StudioNameSection(QString sentence) const{
+QString ProductionStudioManager::FileName2StudioNameSection(QString sentence) const {
   sentence.remove(leadingStrComp);          // remove [FFL], [FL], [GT]
   sentence.remove(leadingOpenBracketComp);  // remove open braces [({
   sentence.replace(nonLeadingBracketComp, "-");
