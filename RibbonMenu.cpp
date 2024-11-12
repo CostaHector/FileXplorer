@@ -276,9 +276,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
 
   auto& arrangeAct = g_ArrangeActions();
-  QList<QAction*> studiosActions{arrangeAct._STUDIO_INFORMATION,         arrangeAct._EDIT_STUDIOS,  arrangeAct._RELOAD_STUDIOS, nullptr,
-                                 arrangeAct._PERFORMERS_INFORMATION,     arrangeAct._EDIT_PERFS,    arrangeAct._RELOAD_PERFS,   nullptr,
-                                 arrangeAct._AKA_PERFORMERS_INFORMATION, arrangeAct._EDIT_PERF_AKA, arrangeAct._RELOAD_PERF_AKA};
+  QList<QAction*> studiosActions{arrangeAct._EDIT_STUDIOS,  arrangeAct._RELOAD_STUDIOS,  nullptr, arrangeAct._EDIT_PERFS,      arrangeAct._RELOAD_PERFS, nullptr,
+                                 arrangeAct._EDIT_PERF_AKA, arrangeAct._RELOAD_PERF_AKA, nullptr, arrangeAct._RENAME_RULE_STAT};
   QToolButton* nameRulerToolButton =
       DropListToolButton(g_fileBasicOperationsActions()._NAME_STANDARDLIZER, studiosActions, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
 
