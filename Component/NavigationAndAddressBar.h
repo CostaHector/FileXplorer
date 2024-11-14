@@ -17,9 +17,8 @@
 #include "Tools/FolderNxtAndLastIterator.h"
 
 class NavigationAndAddressBar : public QToolBar {
-  Q_OBJECT
  public:
-  explicit NavigationAndAddressBar(const QString& title = tr("Address Toolbar"), QWidget* parent = nullptr);
+  explicit NavigationAndAddressBar(const QString& title = "Address Toolbar", QWidget* parent = nullptr);
 
   void BindFileSystemViewCallback(T_IntoNewPath IntoNewPath,
                                   T_on_searchTextChanged on_searchTextChanged,
@@ -45,12 +44,11 @@ class NavigationAndAddressBar : public QToolBar {
     m_searchLE->selectAll();
   }
 
-  AddressELineEdit* m_addressLine;
+  AddressELineEdit* m_addressLine{nullptr};
   PathUndoRedoer m_pathRD;
-  FolderNxtAndLastIterator mFolderNxtLstIt;
-  QLineEdit* m_searchLE;
-
-  FileSystemTypeFilter* m_fsFilter;
+  FolderNxtAndLastIterator mFolderNxtLstIt{nullptr};
+  QLineEdit* m_searchLE{nullptr};
+  FileSystemTypeFilter* m_fsFilter{nullptr};
 
  private:
   bool onIteratorToAnotherFolderCore(bool isNext);
