@@ -46,8 +46,8 @@ class AdvanceSearchModel : public QAbstractTableModel {
     updateSearchResultList();
   }
 
-  auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_planetList.size(); }
-  auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return HORIZONTAL_HEADER_NAMES.size(); }
+  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_planetList.size(); }
+  auto columnCount(const QModelIndex& parent = {}) const -> int override { return HORIZONTAL_HEADER_NAMES.size(); }
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
   auto headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const -> QVariant override;
 
@@ -68,7 +68,7 @@ class AdvanceSearchModel : public QAbstractTableModel {
   void RecycleSomething(const QSet<QModelIndex>& recycleIndexes);
   void ClearRecycle();
 
-  QDir rootDirectory(const QString& placeHolder = "" /* no use */) const { return QDir(rootPath()); }
+  QDir rootDirectory(const QString& placeHolder = "") const { return QDir(rootPath()); }
 
   QString absolutePath(QModelIndex curIndex) const {
     QModelIndex preIndex = index(curIndex.row(), 4, curIndex.parent());

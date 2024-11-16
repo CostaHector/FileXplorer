@@ -59,7 +59,7 @@ SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey, const bool rev
        [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize > rhs.vidSize; },
        [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate > rhs.rate; },
        [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded > rhs.uploaded; }}};
-  std::sort(scenes.begin(), scenes.end(), sortedMap[(int)reverse][(char)sortByKey]);
+  std::sort(scenes.begin(), scenes.end(), sortedMap[(int)reverse][(int)sortByKey]);
   return scenes;
 }
 
