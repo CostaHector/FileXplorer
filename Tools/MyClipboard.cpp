@@ -5,7 +5,7 @@
 
 MyClipboard::MyClipboard(QObject* parent) : QObject{parent}, m_clipboard(QGuiApplication::clipboard()) {}
 
-int MyClipboard::FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode cutCopy) {
+int MyClipboard::FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode /* cutCopy */) {
   QMimeData* mimedata = new QMimeData;
   mimedata->setUrls(urls);
   // files in pathsList will drop its former level relation

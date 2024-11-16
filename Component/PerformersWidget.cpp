@@ -389,7 +389,7 @@ inline bool PerformersWidget::onSubmit() {
   return m_perfsDBModel->submitAll();
 }
 
-bool PerformersWidget::on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
+bool PerformersWidget::on_selectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
   if (not m_performersListView->currentIndex().isValid()) {
     m_introductionTextEdit->setText("");
     return true;

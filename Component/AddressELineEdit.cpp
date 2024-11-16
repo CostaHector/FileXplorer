@@ -171,7 +171,7 @@ auto AddressELineEdit::inputMode() -> void {
   setCurrentWidget(pathComboBox);
 }
 
-void AddressELineEdit::mousePressEvent(QMouseEvent* event) {
+void AddressELineEdit::mousePressEvent(QMouseEvent* /* event */) {
   emit pathComboBoxFocusWatcher->focusChanged(true);
   pathLineEdit->setFocus();
   pathLineEdit->selectAll();
