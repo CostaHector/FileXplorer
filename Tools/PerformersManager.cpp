@@ -26,13 +26,13 @@ QSet<QString> PerformersManager::ReadOutPerformers() {
 
   QFile performersFi(perfFilePath);
   if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("file[%s] not found.", qPrintable(performersFi.fileName()));
+    qWarning("file[%s] not found or open for read failed.", qPrintable(performersFi.fileName()));
     return {};
   }
   QTextStream stream(&performersFi);
   stream.setCodec("UTF-8");
   decltype(m_performers) perfSet;
-  while (not stream.atEnd()) {
+  while (!stream.atEnd()) {
     perfSet.insert(stream.readLine().toLower());
   }
   if (perfSet.contains("")) {
@@ -52,31 +52,29 @@ int PerformersManager::ForceReloadPerformers() {
 }
 
 int PerformersManager::LearningFromAPath(const QString& path) {
-  if (not QDir(path).exists()) {
+  if (!QDir(path).exists()) {
     return 0;
   }
-
-  const int beforePerformersCnt = m_performers.size();
+  decltype(m_performers) castsIncrement;
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    if (not dict.contains(DB_HEADER_KEY::Performers)) {
+    if (!dict.contains(DB_HEADER_KEY::Performers)) {
       continue;
     }
     const QVariant& v = dict[DB_HEADER_KEY::Performers];
     for (const QString& performer : v.toStringList()) {
-      if (performer.isEmpty() or m_performers.contains(performer)) {
+      if (performer.isEmpty() || m_performers.contains(performer)) {
         continue;
       }
-      m_performers.insert(performer.toLower());
+      castsIncrement.insert(performer.toLower());
     }
   }
-  const int increCnt = int(m_performers.size()) - beforePerformersCnt;
-  qDebug("Learn extra %d performers, now %u performers in total", increCnt, m_performers.size());
-  if (increCnt == 0) {
-    return 0;
+  qDebug("Learn extra %d performers from json files", castsIncrement.size());
+  if (castsIncrement.isEmpty()) {
+    return castsIncrement.size();
   }
 
 #ifdef _WIN32
@@ -85,17 +83,19 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   const QString perfsFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
 #endif
   QFile performersFi{perfsFilePath};
-  if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qCritical("Open [%s] to write failed. Performers will not update.", qPrintable(perfsFilePath));
-    Notificator::critical("Open [%s] to write failed. Performers will not update.", perfsFilePath);
+  if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+    qWarning("Open [%s] to write failed. Performers will not update.", qPrintable(perfsFilePath));
+    Notificator::warning("Open [%s] to write failed. Performers will not update.", perfsFilePath);
     return -1;
   }
-  QStringList perfsLst(m_performers.cbegin(), m_performers.cend());
   QTextStream stream(&performersFi);
   stream.setCodec("UTF-8");
-  stream << perfsLst.join("\n");
+  for (const QString& perf : castsIncrement) {
+    stream << perf << '\n';
+  }
+  stream.flush();
   performersFi.close();
-  return increCnt;
+  return castsIncrement.size();
 }
 
 QStringList PerformersManager::SplitSentence(QString sentence) {

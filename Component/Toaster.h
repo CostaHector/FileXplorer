@@ -116,9 +116,9 @@ class Toaster : public QDialog {
     opacityAni->start();
   }
 
-  void enterEvent(QEvent* event) override { restore(); }
+  void enterEvent(QEvent* /*event*/) override { restore(); }
 
-  void leaveEvent(QEvent* event) override { timer->start(); }
+  void leaveEvent(QEvent* /*event*/) override { timer->start(); }
 
   void closeEvent(QCloseEvent* event) override {
     // we don't need the notification anymore, delete it!

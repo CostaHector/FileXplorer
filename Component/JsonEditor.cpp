@@ -376,8 +376,6 @@ QStringList JsonEditor::onPerformersHint() {
 }
 
 auto JsonEditor::onExtractCapitalizedPerformersHint() -> bool {
-  static PerformersManager& pm = PerformersManager::getIns();
-
   if (not m_keysMet.contains(JSONKey::Performers)) {
     m_keysMet.insert(JSONKey::Performers);
   }
