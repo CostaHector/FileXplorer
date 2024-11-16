@@ -205,7 +205,7 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
   return true;
 }
 
-auto ContentPanel::on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) -> bool {
+auto ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, const QItemSelection& /* deselected */) -> bool {
   if (not isFSView()) {
     return false;
   }

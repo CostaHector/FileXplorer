@@ -29,8 +29,8 @@ class RedundantImageModel : public QAbstractTableModelPub {
  public:
   friend class RedundantImageFinder;
   explicit RedundantImageModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
-  auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
-  auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return HORIZONTAL_HEADER.size(); }
+  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
+  auto columnCount(const QModelIndex& parent = {}) const -> int override { return HORIZONTAL_HEADER.size(); }
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override {
     if (m_paf == nullptr or not index.isValid()) {
       return QVariant();
@@ -47,15 +47,17 @@ class RedundantImageModel : public QAbstractTableModelPub {
           default:
             return QVariant();
         }
+        break;
       }
       case Qt::DecorationRole: {
         if (index.column() == HORIZONTAL_HEADER.size() - 1) {
           QPixmap pm{m_paf->operator[](index.row()).filePath};
           return pm.scaledToWidth(128);
         }
+        break;
       }
       default:
-        return QVariant();
+        break;
     }
     return QVariant();
   }
@@ -64,8 +66,7 @@ class RedundantImageModel : public QAbstractTableModelPub {
       if (orientation == Qt::Vertical) {
         return Qt::AlignRight;
       }
-    }
-    if (role == Qt::DisplayRole) {
+    }else if (role == Qt::DisplayRole) {
       if (orientation == Qt::Orientation::Horizontal) {
         return HORIZONTAL_HEADER[section];
       }

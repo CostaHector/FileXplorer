@@ -84,12 +84,12 @@ void FileSystemTypeFilter::BindFileSystemModel(QFileSystemModel* newModel) {
 }
 
 void FileSystemTypeFilter::BindFileSystemModel(AdvanceSearchModel* newModel, SearchProxyModel* newProxyModel) {
-  if (newModel == nullptr) {
-    qWarning("skip. don't try to bind a nullptr");
+  if (newModel == nullptr || newProxyModel == nullptr) {
+    qWarning("skip. newModel is nullptr");
     return;
   }
-  if (_searchSourceModel != nullptr or _searchProxyModel != nullptr) {
-    qWarning("skip. don't try to rebind. _searchSourceModel*[%0xp], _searchProxyModel*[%0xp]", _searchSourceModel, _searchProxyModel);
+  if (_searchSourceModel != nullptr || _searchProxyModel != nullptr) {
+    qWarning("Skip. reject rebind.");
     return;
   }
   m_modelType = MODEL_TYPE::SEARCH_MODEL;

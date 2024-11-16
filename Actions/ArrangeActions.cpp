@@ -13,8 +13,8 @@ void onEditStudios() {
 #else
   QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
 #endif
-  if (not QFile::exists(fileAbsPath)) {
-    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
+  if (!QFile::exists(fileAbsPath)) {
+    qWarning("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
     Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
     return;
   }

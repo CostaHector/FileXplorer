@@ -31,8 +31,8 @@ class VidModel : public DifferRootFileSystemModel {
 
   void clear() override;
 
-  auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_vids.size(); }
-  auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return 1; }
+  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_vids.size(); }
+  auto columnCount(const QModelIndex& parent = {}) const -> int override { return 1; }
 
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
 

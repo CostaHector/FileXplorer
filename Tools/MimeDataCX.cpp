@@ -1,6 +1,6 @@
 #include "MimeDataCX.h"
 
-MimeDataCX::MimeDataCX(const MimeDataCX& rhs) noexcept : l(rhs.l), lRels(rhs.lRels), m_cutCopy(rhs.m_cutCopy) {
+MimeDataCX::MimeDataCX(const MimeDataCX& rhs) noexcept : QMimeData(), l(rhs.l), lRels(rhs.lRels), m_cutCopy(rhs.m_cutCopy) {
   setHtml(rhs.html());
   setText(rhs.text());
   setUrls(rhs.urls());
