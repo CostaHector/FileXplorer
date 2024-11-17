@@ -20,7 +20,7 @@ class AddressBarActions : public QObject
   QActionGroup* GetFolderIteratorActions();
   QAction* _LAST_FOLDER{nullptr};
   QAction* _NEXT_FOLDER{nullptr};
-  QActionGroup* _FOLDER_IT_CONTROLS{nullptr};
+  QActionGroup* _FOLDER_ITER_CONTROLS{nullptr};
 };
 
 AddressBarActions& g_addressBarActions();

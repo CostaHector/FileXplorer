@@ -87,7 +87,6 @@ void MovieDBView::subscribe() {
   {
     const QList<QAction*>& DB_FUNCTIONS_ACTIONS = g_dbAct().DB_FUNCTIONS->actions();
     QAction* COUNT = DB_FUNCTIONS_ACTIONS[0];
-    QAction* SUM = DB_FUNCTIONS_ACTIONS[1];
     connect(COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
   }
 
