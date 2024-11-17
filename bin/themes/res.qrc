@@ -109,7 +109,6 @@
         <file alias="SAVED">JsonEditor/SAVED.svg</file>
         <file alias="APPROVAL">JsonEditor/APPROVAL.svg</file>
         <file alias="STATS">JsonEditor/STATS.svg</file>
-        <file alias="APPROVAL">JsonEditor/APPROVAL.svg</file>
         <file alias="AI_IDEA">JsonEditor/AI_IDEA.svg</file>
         <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
         <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
@@ -161,7 +160,7 @@
         <file alias="RENAME_LOOSE_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_WEAK_USB.svg</file>
         <file alias="RENAME_STRICT_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_STRONG_Usb.svg</file>
         <file alias="RENAME_TOGGLE_CASE">NameStrIcon/CaseToggler.svg</file>
-        <file alias="NAME_STR_DELETER_PATH">NameStrIcon/Inserter.png</file>
+        <file alias="NAME_STR_INSERTER_PATH">NameStrIcon/Inserter.png</file>
         <file alias="NAME_STR_DELETER_PATH">NameStrIcon/Deleter.png</file>
         <file alias="NAME_STR_REPLACER_PATH">NameStrIcon/Replacer.png</file>
         <file alias="_NAME_NO_CONSECUTIVE">NameStrIcon/_NAME_NO_CONSECUTIVE.svg</file>
