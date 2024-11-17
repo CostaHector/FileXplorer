@@ -4,7 +4,11 @@
 #include <QHBoxLayout>
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)
-    : QToolBar(title, parent), m_addressLine(new AddressELineEdit{this}), m_searchLE(new QLineEdit{this}), m_fsFilter{new FileSystemTypeFilter} {
+    : QToolBar(title, parent) {
+  m_addressLine = new (std::nothrow) AddressELineEdit{this};
+  m_searchLE = new (std::nothrow) QLineEdit{this};
+  m_fsFilter = new (std::nothrow) FileSystemTypeFilter;
+
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_addressLine->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
@@ -18,9 +22,9 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
-  addActions(g_addressBarActions()._FOLDER_IT_CONTROLS->actions());
-  addSeparator();
   addWidget(m_addressLine);
+  addSeparator();
+  addActions(g_addressBarActions()._FOLDER_ITER_CONTROLS->actions());
   addSeparator();
   addWidget(m_fsFilter);
   addSeparator();

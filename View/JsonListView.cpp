@@ -22,7 +22,7 @@ JsonListView::JsonListView(JsonModel* model_, QWidget* parent)
 void JsonListView::subscribe() {
   connect(g_jsonEditorActions()._CLR_TO_BE_EDITED_LIST, &QAction::triggered, m_jsonModel, &JsonModel::clear);
 
-  connect(this, &QListView::doubleClicked, this, [this](const QModelIndex& ind) {
+  connect(this, &QListView::doubleClicked, this, [this](const QModelIndex& /* ind */) {
     const QString& jsonPath = m_jsonModel->filePath(currentIndex());
     const auto& jsonUrl = QUrl::fromLocalFile(jsonPath);
     QDesktopServices::openUrl(jsonUrl);
@@ -36,7 +36,7 @@ void JsonListView::subscribe() {
   });
 }
 
-void JsonListView::onSetPerfCount(const bool checked) {
+void JsonListView::onSetPerfCount(const bool /* checked */) {
   const int storedSkipCnt = PreferenceSettings()
                                 .value(MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.name, MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.v)
                                 .toInt();
