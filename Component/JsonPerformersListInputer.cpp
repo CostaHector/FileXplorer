@@ -100,6 +100,7 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
   }
   perfL.removeDuplicates();
   m_perfsList->setText(perfL.join(", "));
+  return true;
 }
 
 void JsonPerformersListInputer::subscribe() {

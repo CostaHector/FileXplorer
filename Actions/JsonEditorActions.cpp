@@ -5,21 +5,6 @@
 
 JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
-      _STUDIO_INFORMATION(new QAction(QIcon(":img/STATS"), tr("Studios statistics"), this)),
-      _EDIT_STUDIOS(new QAction(QIcon(":img/PRODUCTION_STUDIOS"), tr("Edit Studios map"), this)),
-      _RELOAD_STUDIOS(new QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload Studios"), this)),
-      _STUDIO_ACTIONS{new QActionGroup(this)},
-
-      _PERFORMERS_INFORMATION(new QAction(QIcon(":img/STATS"), tr("Performers statistics"), this)),
-      _EDIT_PERFS(new QAction(QIcon(":img/PERFORMERS"), tr("Edit Performers list"), this)),
-      _RELOAD_PERFS(new QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload Performers"), this)),
-      _PERFS_ACTIONS{new QActionGroup(this)},
-
-      _AKA_PERFORMERS_INFORMATION(new QAction(QIcon(":img/STATS"), tr("Aka Performers statistics"), this)),
-      _EDIT_PERF_AKA(new QAction(QIcon(":img/EDIT_AKA_FILE"), tr("Edit AKA perf file"), this)),
-      _RELOAD_PERF_AKA(new QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload AKA perf"), this)),
-      _PERFS_AKA_ACTIONS{new QActionGroup(this)},
-
       _BROWSE_AND_SELECT_THE_FOLDER(new QAction(QIcon(":img/LOAD_A_PATH"), tr("Browse"), this)),
       _CLR_TO_BE_EDITED_LIST(new QAction(QIcon(":img/EMPTY_LISTWIDGET"), tr("Clear list"), this)),
       _FILE_LOAD_ACTIONS{new QActionGroup(this)},
@@ -140,18 +125,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _LOWER_ALL_WORDS->setToolTip(
       QString("<b>%1 (%2)</b><br/> Lowercase a sentense.").arg(_LOWER_ALL_WORDS->text()).arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
-  _STUDIO_ACTIONS->addAction(_STUDIO_INFORMATION);
-  _STUDIO_ACTIONS->addAction(_EDIT_STUDIOS);
-  _STUDIO_ACTIONS->addAction(_RELOAD_STUDIOS);
-
-  _PERFS_ACTIONS->addAction(_PERFORMERS_INFORMATION);
-  _PERFS_ACTIONS->addAction(_EDIT_PERFS);
-  _PERFS_ACTIONS->addAction(_RELOAD_PERFS);
-
-  _PERFS_AKA_ACTIONS->addAction(_AKA_PERFORMERS_INFORMATION);
-  _PERFS_AKA_ACTIONS->addAction(_EDIT_PERF_AKA);
-  _PERFS_AKA_ACTIONS->addAction(_RELOAD_PERF_AKA);
-
   _FILE_LOAD_ACTIONS->addAction(_BROWSE_AND_SELECT_THE_FOLDER);
   _FILE_LOAD_ACTIONS->addAction(_CLR_TO_BE_EDITED_LIST);
 
@@ -247,17 +220,9 @@ QMenuBar* JsonEditorActions::GetJsonMenuBar(QWidget* parent) {
   editMenu->addActions(_TEXT_EDIT_ACTIONS->actions());
   editMenu->addSeparator();
   editMenu->addActions(_FILE_SAVE_ACTIONS->actions());
-  QMenu* productionStudioMenu = new QMenu("Studio", m_menuBar);
-  productionStudioMenu->addActions(_STUDIO_ACTIONS->actions());
-  QMenu* performerMenu = new QMenu("Performer", m_menuBar);
-  performerMenu->addActions(_PERFS_ACTIONS->actions());
-  performerMenu->addSeparator();
-  performerMenu->addActions(_PERFS_AKA_ACTIONS->actions());
 
   m_menuBar->addMenu(fileMenu);
   m_menuBar->addMenu(editMenu);
-  m_menuBar->addMenu(productionStudioMenu);
-  m_menuBar->addMenu(performerMenu);
   return m_menuBar;
 }
 

@@ -3,11 +3,11 @@
 
 namespace ViewTypeTool {
 const char* GetViewTypeHumanFriendlyStr(ViewType viewType) {
-  if ((char)viewType >= (char)ViewType::VIEW_TYPE_BUTT) {
-    qDebug("viewType[%d] is invalid", (char)viewType);
+  if ((int)viewType >= (int)ViewType::VIEW_TYPE_BUTT) {
+    qDebug("viewType[%d] is invalid", (int)viewType);
     return "";
   }
-  return VIEW_TYPE_2_STR[(char)viewType];
+  return VIEW_TYPE_2_STR[(int)viewType];
 }
 
 ViewType GetViewTypeByActionText(const QAction* viewAct) {

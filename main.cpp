@@ -5,7 +5,6 @@
 #include "Tools/MessageOutput.h"
 
 #include <QApplication>
-#include <QDebug>
 
 #define RUN_MAIN_FILE 1
 #ifdef RUN_MAIN_FILE

@@ -59,7 +59,7 @@ SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey, const bool rev
        [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize > rhs.vidSize; },
        [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate > rhs.rate; },
        [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded > rhs.uploaded; }}};
-  std::sort(scenes.begin(), scenes.end(), sortedMap[(int)reverse][(char)sortByKey]);
+  std::sort(scenes.begin(), scenes.end(), sortedMap[(int)reverse][(int)sortByKey]);
   return scenes;
 }
 
@@ -112,21 +112,18 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, boo
   return scenesList;
 }
 
-bool GenerateAScnFile(const QString& aPath) {
-  const QString folderFullPath{aPath};
-  QString scnContent;
-
-  if (!QFileInfo(folderFullPath).isDir()) {
-    return 0;
+std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const QList<QVariantHash>& jsonDicts) {
+  if (jsonNames.size() != jsonDicts.size()) {
+    qWarning("json file name count:%d, dict count:%d", jsonNames.size(), jsonDicts.size());
+    return std::pair<QString, int>{"", -1};
   }
-  QDir jsonDir{folderFullPath, "", QDir::SortFlag::Name, QDir::Filter::Files};
-  jsonDir.setNameFilters(TYPE_FILTER::JSON_TYPE_SET);
-
   int jsonUsedCnt = 0;
-  for (const QString& jsonFileName : jsonDir.entryList()) {
-    const QVariantHash rawJsonDict = JsonFileHelper::MovieJsonLoader(jsonDir.absoluteFilePath(jsonFileName));
+  QString scnContent;
+  for (int i = 0; i < jsonNames.size(); ++i) {
+    const QVariantHash& rawJsonDict = jsonDicts[i];
+    const QString& jsonFileName = jsonNames[i];
     if (rawJsonDict.isEmpty()) {
-      qDebug("Json file[%s] may corrupt.", qPrintable(jsonDir.absoluteFilePath(jsonFileName)));
+      qDebug("Json dict[%s] may corrupt.", qPrintable(jsonFileName));
       continue;
     }
     scnContent += rawJsonDict.value("Name", "").toString();
@@ -143,16 +140,33 @@ bool GenerateAScnFile(const QString& aPath) {
     scnContent += '\n';
     ++jsonUsedCnt;
   }
-  qDebug("%d json(s) under[%s] are found to generate a scn file", jsonUsedCnt, qPrintable(folderFullPath));
+  return std::pair<QString, int>(scnContent, jsonUsedCnt);
+}
 
-  if (jsonUsedCnt <= 0) {
+bool GenerateAScnFile(const QString& aPath) {
+  if (!QFileInfo(aPath).isDir()) {
+    qDebug("path[%s] is not a directory", qPrintable(aPath));
     return false;
   }
-  if (scnContent.isEmpty()) {
+
+  QDir jsonDir{aPath, {}, QDir::SortFlag::Name, QDir::Filter::Files};
+  jsonDir.setNameFilters(TYPE_FILTER::JSON_TYPE_SET);
+  const QStringList& jsonNames = jsonDir.entryList();
+  QList<QVariantHash> jsonDicts;
+  jsonDicts.reserve(jsonNames.size());
+  for (const QString& jsonFileName : jsonNames) {
+    jsonDicts << JsonFileHelper::MovieJsonLoader(jsonDir.absoluteFilePath(jsonFileName));
+  }
+  int jsonUsedCnt = 0;
+  QString scnContent;
+  std::tie(scnContent, jsonUsedCnt) = GetScnFileContents(jsonNames, jsonDicts);
+  qDebug("%d json(s) under[%s] are found to generate a scn file", jsonUsedCnt, qPrintable(aPath));
+
+  if (jsonUsedCnt == 0 || scnContent.isEmpty()) {
     return false;
   }
 
-  QFile scnFi{folderFullPath + '/' + PATHTOOL::fileName(aPath) + ".scn"};
+  QFile scnFi{aPath + '/' + PATHTOOL::fileName(aPath) + ".scn"};
   if (!scnFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qCritical("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
     return false;
@@ -201,13 +215,18 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
       qWarning("json file[%s] may corrupt read failed", qPrintable(jPath));
       continue;
     }
-    if (!rawJsonDict.contains("Name")) {
+
+    QVariantHash::iterator it = rawJsonDict.find("Name");
+    if (it == rawJsonDict.cend()) {
       qDebug("This json file[%s] is not we want", qPrintable(jPath));
       continue;
     }
 
     bool jsonNeedUpdate{false};
-    QVariantHash::iterator it;
+    if (it.value() != baseName) {
+      it->setValue(baseName);
+      jsonNeedUpdate = true;
+    }
 
     const QString& imgFileName = sMixed.GetFirstImg(baseName);
     it = rawJsonDict.find("ImgName");
@@ -265,11 +284,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     }
     ++usefullJsonCnt;
 
-    if (!m_jsonsDicts.contains(path)) {
-      m_jsonsDicts[path] = {rawJsonDict};
-    } else {
-      m_jsonsDicts[path].append(rawJsonDict);
-    }
+    m_jsonsDicts[path].append(rawJsonDict);
   }
   m_updatedJsonFilesCnt += updatedJsonFilesCnt;
   m_usefullJsonCnt += usefullJsonCnt;

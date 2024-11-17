@@ -63,9 +63,9 @@ QVariant DuplicateDetailsModel::data(const QModelIndex& index, int role) const {
   }
 }
 
-auto DuplicateDetailsModel::rowCount(const QModelIndex& parent) const -> int {
-  if (p_classifiedSort == nullptr or m_currentDiffer == nullptr) {
-    qWarning("p_classifiedSort is nullptr");
+auto DuplicateDetailsModel::rowCount(const QModelIndex& /*parent*/) const -> int {
+  if (p_classifiedSort == nullptr || m_currentDiffer == nullptr) {
+    qWarning("nullptr");
     return 0;
   }
   if (m_leftRow == -1) {
