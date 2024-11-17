@@ -135,7 +135,6 @@ class ArchiveImagesRecusive {
   ArchiveImagesRecusive(bool autoRecycle = true) : m_autoRecycle{autoRecycle} {}
   int CompressImgRecur(const QString& rootPath);
   bool CompressSubfolder(const QString& path, const QString& qzBaseName);
-
  private:
   QStringList m_allPres, m_allNames;
   bool m_autoRecycle;
