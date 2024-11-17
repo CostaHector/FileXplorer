@@ -353,7 +353,7 @@ int AIMediaDuplicate::ReadSpecifiedTables2List(const QStringList& tbls, QList<DU
     }
     while (query.next()) {
       vidsInfo.append(DUP_INFO{query.value(0).toString(), query.value(1).toLongLong(), query.value(2).toInt(), query.value(3).toLongLong(),
-                               query.value(4).toString(), query.value(5).toString()});
+                               query.value(4).toString(), query.value(5).toString(), true});
     }
     ++succeedTblCnt;
   }

@@ -21,7 +21,7 @@ QString MD5Calculator::GetMD5(const QString& filepath, const int onlyFirstByte) 
   return md5.result().toHex();
 }
 
-QStringList MD5Calculator::GetBatchMD5(const QStringList& filepaths, const int onlyFirstByte) {
+QStringList MD5Calculator::GetBatchMD5(const QStringList& filepaths, const int /* onlyFirstByte */) {
   QStringList md5Lst;
   md5Lst.reserve(filepaths.size());
   for (const auto& path : filepaths) {

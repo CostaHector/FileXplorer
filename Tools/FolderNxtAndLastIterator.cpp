@@ -2,16 +2,32 @@
 #include <QFileInfo>
 #include <QDir>
 
-void FolderNxtAndLastIterator::operator()(const QString& parentPath) {
-  if (path2SameLevelPaths.contains(parentPath)) {
+FolderNxtAndLastIterator::FolderNxtAndLastIterator(FuncGetSortedDirNames dirNamesGetter) : m_dirNamesGetter{dirNamesGetter} {
+  if (m_dirNamesGetter != nullptr) {
     return;
   }
-  path2SameLevelPaths[parentPath] = QDir(parentPath, "", QDir::SortFlag::DirsFirst, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  static const auto FileSystemDirGetter = [](const QString& parentPath) -> QStringList {
+    return QDir(parentPath, "", QDir::SortFlag::DirsFirst, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  };
+  m_dirNamesGetter = FileSystemDirGetter;
+}
+
+bool FolderNxtAndLastIterator::operator()(const QString& parentPath) {
+  if (!m_lastTimeParentPath.isEmpty() && m_lastTimeParentPath == parentPath) {
+    // not first time && parentPath unchange => no update
+    return false;
+  }
+  // first time || parentPath changed => update needed
+  m_lastTimeParentPath = parentPath;
+  auto lvls = m_dirNamesGetter(parentPath);
+  sameLevelPaths.swap(lvls);
+  return true;
 }
 
 QString FolderNxtAndLastIterator::lastNextCore(const QString& parentPath, const QString& curDirName, bool isNext) {
   operator()(parentPath);
-  QStringList::const_iterator beg = path2SameLevelPaths[parentPath].cbegin(), end = path2SameLevelPaths[parentPath].cend();
+  QStringList::const_iterator beg = sameLevelPaths.cbegin();
+  QStringList::const_iterator end = sameLevelPaths.cend();
   if (beg == end) {
     qDebug("parent folder(%s) contains nothing", qPrintable(parentPath));
     return "";
@@ -23,12 +39,14 @@ QString FolderNxtAndLastIterator::lastNextCore(const QString& parentPath, const 
   if (isNext) {
     QStringList::const_iterator it = std::upper_bound(beg, end, curDirName);
     if (it == end) {
+      qDebug("[%s] is already the last folder, wrapped to the first one", qPrintable(curDirName));
       return *beg;
     }
     return *it;
   } else {
     QStringList::const_iterator it = std::lower_bound(beg, end, curDirName);
     if (it == beg) {
+      qDebug("[%s] is already the first folder, wrapped to the last one", qPrintable(curDirName));
       return *(end - 1);
     }
     return *(it - 1);
