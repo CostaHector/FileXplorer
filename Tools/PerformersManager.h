@@ -25,7 +25,6 @@ class PerformersManager {
   QCompleter perfsCompleter;
 
   inline int count() const { return m_performers.size(); }
-  inline void DisplayStatistic(QWidget* parent) { QMessageBox::information(parent, "Performers Count", QString::number(count())); }
 
  private:
   PerformersManager();

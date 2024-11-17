@@ -15,51 +15,87 @@ QVariantHash ProductionStudioManager::ReadOutStdStudioName() {
 #else
   const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
 #endif
-  auto stdStudioNameDict = JsonFileHelper::MovieJsonLoader(stdStudiosFilePath);
-  qDebug("%d studio name(s) read out", stdStudioNameDict.size());
+  QFile txtFile(stdStudiosFilePath);
+  if (!txtFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qDebug("File[%s] not found or open for read failed", qPrintable(stdStudiosFilePath));
+    return {};
+  }
+  QVariantHash stdStudioNameDict;
+
+  QTextStream in(&txtFile);
+  in.setCodec("UTF-8");
+  int lineIndex = 0;
+  while (!in.atEnd()) {
+    ++lineIndex;
+    QString line = in.readLine(128);
+    if (line.isEmpty()) {
+      continue;
+    }
+    int tabKeyInd = line.indexOf('\t');
+    if (tabKeyInd == -1) {
+      qWarning("The %dth line of file[%s] is invalid", lineIndex, qPrintable(stdStudiosFilePath));
+      continue;
+    }
+    stdStudioNameDict.insert(line.left(tabKeyInd), line.mid(tabKeyInd + 1));
+  }
+  txtFile.close();
+  qDebug("%d studio item(s) read out from %d lines", stdStudioNameDict.size(), lineIndex);
   return stdStudioNameDict;
 }
 
 int ProductionStudioManager::ForceReloadStdStudioName() {
-  int beforeStudioNameCnt = m_prodStudioMap.size();
-  m_prodStudioMap = ProductionStudioManager::ReadOutStdStudioName();
-  int afterStudioNameCnt = m_prodStudioMap.size();
-  qDebug("%d standard studio names added/removed", afterStudioNameCnt - beforeStudioNameCnt);
-  return afterStudioNameCnt - beforeStudioNameCnt;
+  int befCnt = m_prodStudioMap.size();
+  auto newStudioNames = ProductionStudioManager::ReadOutStdStudioName();
+  m_prodStudioMap.swap(newStudioNames);
+  int aftCnt = m_prodStudioMap.size();
+  qDebug("standard studio names rule from %d to %d", befCnt, aftCnt);
+  return aftCnt - befCnt;
 }
 
 int ProductionStudioManager::LearningFromAPath(const QString& path) {
   if (not QDir(path).exists()) {
     return 0;
   }
-  const int beforePerformersCnt = m_prodStudioMap.size();
+
+  QHash<QString, QString> studiosIncrementMap;
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    if (not dict.contains(JSONKey::ProductionStudio)) {
+    if (!dict.contains(JSONKey::ProductionStudio)) {
       continue;
     }
     const QString& v = dict[JSONKey::ProductionStudio].toString();
     for (const QString& psFrom : StandardProductionStudioFrom(v)) {
-      if (psFrom.isEmpty() or m_prodStudioMap.contains(psFrom)) {
+      if (psFrom.isEmpty() || m_prodStudioMap.contains(psFrom)) {
         continue;
       }
-      m_prodStudioMap.insert(psFrom, v);
+      studiosIncrementMap.insert(psFrom, v);
     }
   }
-  const int increCnt = int(m_prodStudioMap.size()) - beforePerformersCnt;
-  qDebug("Learn extra %d production studios, now %u production studios in total", increCnt, m_prodStudioMap.size());
-
+  qDebug("Learn extra %d studios from json files", studiosIncrementMap.size());
+  if (studiosIncrementMap.isEmpty()) {
+    return studiosIncrementMap.size();
+  }
 #ifdef _WIN32
   const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
 #else
   const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
 #endif
-
-  const bool dumpRes = JsonFileHelper::MovieJsonDumper(m_prodStudioMap, stdStudiosFilePath);
-  return increCnt;
+  QFile txtFile(stdStudiosFilePath);
+  if (!txtFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+    qDebug("File[%s] not found or open for write failed", qPrintable(stdStudiosFilePath));
+    return {};
+  }
+  QTextStream in(&txtFile);
+  in.setCodec("UTF-8");
+  for (auto it = studiosIncrementMap.cbegin(), end = studiosIncrementMap.cend(); it != end; ++it) {
+    in << it.key() << '\t' << it.value() << '\n';
+  }
+  in.flush();
+  txtFile.close();
+  return studiosIncrementMap.size();
 }
 
 ProductionStudioManager& ProductionStudioManager::getIns() {
@@ -77,7 +113,7 @@ QStringList ProductionStudioManager::StandardProductionStudioFrom(QString standa
   return {pslower, psWithSpace.toLower()};
 }
 
-QString ProductionStudioManager::FileName2StudioNameSection(QString sentence) const{
+QString ProductionStudioManager::FileName2StudioNameSection(QString sentence) const {
   sentence.remove(leadingStrComp);          // remove [FFL], [FL], [GT]
   sentence.remove(leadingOpenBracketComp);  // remove open braces [({
   sentence.replace(nonLeadingBracketComp, "-");

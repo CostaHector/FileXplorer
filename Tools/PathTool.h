@@ -39,6 +39,8 @@ QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileName
 // a.txt => ("a", ".txt")
 std::pair<QString, QString> GetBaseNameExt(const QString& fullpath);
 QString GetBaseName(const QString& fullpath);
+QString GetFileNameExtRemoved(const QString& fileName);
+QString GetFileNameExtRemoved(QString&& fileName);
 
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
@@ -52,6 +54,7 @@ QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 
 constexpr char PATH_SEP_CHAR = '/';
+constexpr int EXTENSION_MAX_LENGTH = 5; // ".json"
 }  // namespace PATHTOOL
 
 #endif  // PATHTOOL_H
