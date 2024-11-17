@@ -12,8 +12,8 @@
 class ArchiverModel : public QAbstractTableModelPub {
  public:
   explicit ArchiverModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
-  auto rowCount(const QModelIndex& parent = QModelIndex()) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
-  auto columnCount(const QModelIndex& parent = QModelIndex()) const -> int override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
+  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
+  auto columnCount(const QModelIndex& parent = {}) const -> int override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override {
     if (m_paf == nullptr or not index.isValid()) {
       return QVariant();
@@ -115,7 +115,7 @@ void Archiver::subscribe() {
   connect(m_itemsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &Archiver::onNewRow);
 }
 
-bool Archiver::onNewRow(const QModelIndex& current, const QModelIndex& previous) {
+bool Archiver::onNewRow(const QModelIndex& current, const QModelIndex& /* previous */) {
   if (not current.isValid()) {
     m_thumbnailViewer->clear();
     return false;
