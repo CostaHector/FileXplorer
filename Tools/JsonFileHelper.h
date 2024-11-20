@@ -39,22 +39,7 @@ bool JsonKeySorter(const QPair<QString, QVariant>& l, const QPair<QString, QVari
 
 class JsonFileHelper {
  public:
-  static auto MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath) -> bool {
-    auto jsonObject = QJsonObject::fromVariantHash(dict);
-    QJsonDocument document;
-    document.setObject(jsonObject);
-    const auto& byteArray = document.toJson(QJsonDocument::JsonFormat::Indented);
-    QFile jsonFile(movieJsonItemPath);
-    if (not jsonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      jsonFile.close();
-      return false;
-    }
-    QTextStream out(&jsonFile);
-    out.setCodec("UTF-8");
-    out << byteArray;
-    jsonFile.close();
-    return true;
-  }
+  static bool MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath);
 
   static QVariantHash JsonStr2Dict(const QString& jsonStr);
   static QVariantHash MovieJsonLoader(const QString& movieJsonItemPath);

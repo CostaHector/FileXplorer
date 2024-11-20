@@ -27,6 +27,23 @@ const QMap<QString, QString> JsonFileHelper::key2ValueType = {{JSONKey::Performe
                                                               {JSONKey::Hot, "QIntList"},
                                                               {JSONKey::Rate, "int"}};
 
+bool JsonFileHelper::MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath) {
+  auto jsonObject = QJsonObject::fromVariantHash(dict);
+  QJsonDocument document;
+  document.setObject(jsonObject);
+  const auto& byteArray = document.toJson(QJsonDocument::JsonFormat::Indented);
+  QFile jsonFile(movieJsonItemPath);
+  if (!jsonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    jsonFile.close();
+    return false;
+  }
+  QTextStream out(&jsonFile);
+  out.setCodec("UTF-8");
+  out << byteArray;
+  jsonFile.close();
+  return true;
+}
+
 auto JsonFileHelper::HotSceneString2IntList(const QString& valueStr) -> QList<QVariant> {
   const QString& s = valueStr.trimmed();
   if (s.isEmpty()) {
