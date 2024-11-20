@@ -12,7 +12,7 @@ class RenameActions : public QObject {
         _NUMERIZER{new QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"))},
         _RENAME_SWAPPER{new QAction(QIcon(":img/NAME_STR_SWAPPER_PATH"), tr("swap 1-2-3 to 1-3-2"))},
         _CASE_NAME{new QAction(QIcon(":img/NAME_STR_CASE"), tr("Case"))},
-        _STR_INSERTER{new QAction(QIcon(":img/NAME_STR_DELETER_PATH"), tr("Str Inserter"))},
+        _STR_INSERTER{new QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), tr("Str Inserter"))},
         _STR_DELETER{new QAction(QIcon(":img/NAME_STR_DELETER_PATH"), tr("Str Deleter"))},
         _STR_REPLACER{new QAction(QIcon(":img/NAME_STR_REPLACER_PATH"), tr("Str Replacer"))},
         _NAME_NO_CONSECUTIVE{new QAction(QIcon(":img/_NAME_NO_CONSECUTIVE"), tr("Name No Consecutive"))},

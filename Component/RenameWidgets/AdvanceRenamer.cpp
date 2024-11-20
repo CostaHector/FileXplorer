@@ -132,18 +132,18 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
 }
 
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)
-    : QDialog(parent),
-      windowTitleFormat("%1 | %2"),
-      EXT_INSIDE_FILENAME(new QCheckBox("Also Extensions")),
-      ITEMS_INSIDE_SUBDIR(new QCheckBox("Also subdirectory")),
-      regexValidLabel(new StateLabel("Regex expression state")),
-      m_relNameTE(new QPlainTextEdit()),
-      m_oBaseTE(new QPlainTextEdit()),
-      m_oExtTE(new QPlainTextEdit()),
-      m_nBaseTE(new QPlainTextEdit()),
-      m_nExtTE(new QPlainTextEdit()),
-      m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help)),
-      m_commandsPreview(new QPlainTextEdit) {
+  : QDialog(parent),
+    windowTitleFormat("%1 | %2"),
+    EXT_INSIDE_FILENAME(new QCheckBox("Also Extensions")),
+    ITEMS_INSIDE_SUBDIR(new QCheckBox("Also subdirectory")),
+    regexValidLabel(new StateLabel("Regex expression state")),
+    m_relNameTE(new QPlainTextEdit()),
+    m_oBaseTE(new QPlainTextEdit()),
+    m_oExtTE(new QPlainTextEdit()),
+    m_nBaseTE(new QPlainTextEdit()),
+    m_nExtTE(new QPlainTextEdit()),
+    m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help)),
+    m_commandsPreview(new QPlainTextEdit) {
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
 
@@ -154,7 +154,10 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)
   ITEMS_INSIDE_SUBDIR->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
 
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
-  m_buttonBox->button(QDialogButtonBox::Ok)->setStyleSheet(SUBMIT_BTN_STYLE);
+  auto* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok);
+  pOkBtn->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
+  pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.").arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
+  pOkBtn->setStyleSheet(SUBMIT_BTN_STYLE);
   m_buttonBox->button(QDialogButtonBox::Help)->setText("See commands...");
 
   ReadSettings();
@@ -229,6 +232,22 @@ void AdvanceRenamer::init() {
   const bool isNameIncludingExtension = EXT_INSIDE_FILENAME->checkState() == Qt::Checked;
   m_oExtTE->setVisible(not isNameIncludingExtension);
   m_nExtTE->setVisible(not isNameIncludingExtension);
+}
+
+void AdvanceRenamer::Subscribe() {
+  connect(EXT_INSIDE_FILENAME, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludeSuffix);
+  connect(ITEMS_INSIDE_SUBDIR, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludingSub);
+
+  connect(m_nBaseTE->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](const int position) {
+    m_relNameTE->verticalScrollBar()->setValue(position);
+    m_oBaseTE->verticalScrollBar()->setValue(position);
+    m_oExtTE->verticalScrollBar()->setValue(position);
+    m_nExtTE->verticalScrollBar()->setValue(position);
+  });
+
+  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, [this]() { onApply(false, true); });
+  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::clicked, this, [this]() { onApply(true, false); });
+  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &AdvanceRenamer::close);
 }
 
 auto AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) -> bool {

@@ -181,7 +181,7 @@ bool ArchiveFiles::AppendFiles(const QStringList& filesPath) {
 
 bool ArchiveFiles::DecompressToPath(const QString& dstPath) {
   QDir dstDir{dstPath};
-  if (not dstDir.exists()) {
+  if (!dstDir.exists()) {
     qWarning("destination path[%s] not exist", qPrintable(dstPath));
     return false;
   }
