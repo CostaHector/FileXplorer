@@ -15,6 +15,7 @@
 #include "Actions/SyncFileSystemModificationActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
+#include "Actions/ThumbnailProcessActions.h"
 #include "Component/DatabaseToolBar.h"
 #include "Component/DropListToolButton.h"
 #include "PublicTool.h"
@@ -28,13 +29,13 @@ RibbonMenu::RibbonMenu(QWidget* parent)
       m_leafView(LeafView()),
       m_leafDatabase(LeafDatabase()),
       m_leafScenes(LeafScenesTools()),
-      m_leafArrange(LeafMediaTools()) {
+      m_leafMedia(LeafMediaTools()) {
   addTab(m_leafFile, "&File");
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
   addTab(m_leafDatabase, "&Database");
   addTab(m_leafScenes, "&Scene");
-  addTab(m_leafArrange, "&Arrange");
+  addTab(m_leafMedia, "&Arrange");
 
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
@@ -275,11 +276,17 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER);
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
 
-  auto& arrangeAct = g_ArrangeActions();
-  QList<QAction*> studiosActions{arrangeAct._EDIT_STUDIOS,  arrangeAct._RELOAD_STUDIOS,  nullptr, arrangeAct._EDIT_PERFS,      arrangeAct._RELOAD_PERFS, nullptr,
-                                 arrangeAct._EDIT_PERF_AKA, arrangeAct._RELOAD_PERF_AKA, nullptr, arrangeAct._RENAME_RULE_STAT};
+  auto& arrangeIns = g_ArrangeActions();
+  QList<QAction*> studiosActions{arrangeIns._EDIT_STUDIOS,  arrangeIns._RELOAD_STUDIOS,  nullptr, arrangeIns._EDIT_PERFS,      arrangeIns._RELOAD_PERFS, nullptr,
+                                 arrangeIns._EDIT_PERF_AKA, arrangeIns._RELOAD_PERF_AKA, nullptr, arrangeIns._RENAME_RULE_STAT};
   QToolButton* nameRulerToolButton =
       DropListToolButton(g_fileBasicOperationsActions()._NAME_STANDARDLIZER, studiosActions, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+
+  auto& thumbnailIns = g_ThumbnailProcessActions();
+  QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
+                                   thumbnailIns._SKIP_IF_ALREADY_EXIST};
+  QToolButton* thumbnailToolButton =
+      DropListToolButton(thumbnailIns._EXTRACT_1ST_IMG, thumbnailActions, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
 
   QToolBar* archiveVidsTB = new QToolBar("Leaf Arrange Files");
   archiveVidsTB->addWidget(nameRulerToolButton);
@@ -290,6 +297,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addWidget(folderRmv);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
+  archiveVidsTB->addSeparator();
+  archiveVidsTB->addWidget(thumbnailToolButton);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
