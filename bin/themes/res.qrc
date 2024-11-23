@@ -16,6 +16,7 @@
         <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
         <file alias="PACK_FOLDERS">Media/PACK_FOLDERS.svg</file>
         <file alias="UNPACK_FOLDERS">Media/UNPACK_FOLDERS.svg</file>
+        <file alias="THUMBNAIL_EXTRACTOR">Media/THUMBNAIL_EXTRACTOR.svg</file>
         <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
         <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
         <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
