@@ -53,7 +53,7 @@ class MyQFileSystemModel : public QFileSystemModel {
     tmp.swap(m_copiedMap);
     for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
       for (auto ind : it.value()) {
-        if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+         if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
           continue;
         emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
       }
