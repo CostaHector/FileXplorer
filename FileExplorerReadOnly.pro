@@ -29,6 +29,7 @@ SOURCES += \
     Actions/RightClickMenuActions.cpp \
     Actions/SceneInPageActions.cpp \
     Actions/SyncFileSystemModificationActions.cpp \
+    Actions/ThumbnailProcessActions.cpp \
     Actions/TorrentsManagerActions.cpp \
     Actions/VideoPlayerActions.cpp \
     Actions/ViewActions.cpp \
@@ -86,6 +87,7 @@ SOURCES += \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
+    Tools/ThumbnailProcesser.cpp \
     Tools/MessageOutput.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
@@ -187,6 +189,7 @@ HEADERS += \
     Actions/RightClickMenuActions.h \
     Actions/SceneInPageActions.h \
     Actions/SyncFileSystemModificationActions.h \
+    Actions/ThumbnailProcessActions.h \
     Actions/TorrentsManagerActions.h \
     Actions/VideoPlayerActions.h \
     Actions/ViewActions.h \
@@ -244,6 +247,7 @@ HEADERS += \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
+    Tools/ThumbnailProcesser.h \
     Tools/MediaInfoDLL.h \
     Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
