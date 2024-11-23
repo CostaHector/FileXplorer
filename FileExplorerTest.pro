@@ -15,6 +15,7 @@ SOURCES += \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
+    TestCase/ImgThumbnailProcesserTest.cpp \
     TestCase/RenameHelperTest.cpp \
     TestCase/SceneInfoManagerTest.cpp \
     TestCase/pub/FileSystemHelper.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
     TestCase/FinderTest.cpp \
     TestCase/VideosDurationGetterTest.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
+    Tools/ImgThumbnailProcesser.cpp \
     Tools/ItemsPileCategory.cpp \
     Tools/LongPathFinder.cpp \
     Tools/ProductionStudioManager.cpp \
@@ -91,6 +93,7 @@ HEADERS += \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
     Tools/FolderNxtAndLastIterator.h \
+    Tools/ImgThumbnailProcesser.h \
     Tools/ItemsPileCategory.h \
     Tools/LongPathFinder.h \
     Tools/ProductionStudioManager.h \
