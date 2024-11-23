@@ -3,12 +3,12 @@
 
 #include <QStringList>
 
-class ImgThumbnailProcesser {
+class ThumbnailProcesser {
  public:
   static bool IsImageAnThumbnail(const QString& imgAbsPath);
   static bool IsImageNameLooksLikeThumbnail(const QString& imgBaseName);
 
-  explicit ImgThumbnailProcesser(bool skipIfImgAlreadyExist = true);
+  explicit ThumbnailProcesser(bool skipIfImgAlreadyExist = true);
   int operator()(const QString& rootPath, int beg = 0, int end = 1);
 
   QStringList mErrImg;
