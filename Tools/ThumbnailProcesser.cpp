@@ -1,4 +1,4 @@
-#include "ImgThumbnailProcesser.h"
+#include "ThumbnailProcesser.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include <QRegularExpression>
@@ -10,9 +10,9 @@
 
 using namespace PATHTOOL;
 
-ImgThumbnailProcesser::ImgThumbnailProcesser(bool skipIfImgAlreadyExist) : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist} {}
+ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist) : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist} {}
 
-bool ImgThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
+bool ThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
   QString imgBaseName;
   QString ext;
   std::tie(imgBaseName, ext) = GetBaseNameExt(imgAbsPath);
@@ -33,7 +33,7 @@ bool ImgThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
   return true;
 }
 
-bool ImgThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseName) {
+bool ThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseName) {
   static const QRegularExpression THUMBNAIL_TWODIGIT_PATTERN{R"( \d\d$)"};
   QRegularExpressionMatch ret;
   if (!(ret = THUMBNAIL_TWODIGIT_PATTERN.match(imgBaseName)).hasMatch()) {
@@ -55,7 +55,7 @@ bool ImgThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBase
   return false;
 }
 
-std::pair<int, int> ImgThumbnailProcesser::GetThumbnailDimension(const QString& imgBaseName) {
+std::pair<int, int> ThumbnailProcesser::GetThumbnailDimension(const QString& imgBaseName) {
   if (imgBaseName.size() < 2) {
     return {-1, -1};
   }
@@ -64,7 +64,7 @@ std::pair<int, int> ImgThumbnailProcesser::GetThumbnailDimension(const QString& 
   return {row, column};
 }
 
-int ImgThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
+int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
   mErrImg.clear();
   mExtractImagesCnt = 0;
   mRewriteImagesCnt = 0;
