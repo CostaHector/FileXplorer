@@ -43,6 +43,7 @@ class FileExplorerEvent : public QObject {
   void subscribe();
   void subsribeCompress();
   void subsribeFileActions();
+  void subscribeThumbnailActions();
 
   void onRename(AdvanceRenamer* renameWid);
   auto onRenamePre() const -> std::pair<QString, QStringList>;
@@ -56,6 +57,8 @@ class FileExplorerEvent : public QObject {
   auto on_NewFolder() -> bool;
   auto on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false) -> bool;
   auto on_BatchNewFilesOrFolders(bool isFolder = false) -> bool;
+
+  bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
 
   auto selectedIndexesProxyToSource() const -> QModelIndexList;
   auto selectedIndexes() const -> QModelIndexList;
