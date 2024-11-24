@@ -83,8 +83,7 @@ class OrderClass {
 };
 const OrderClass AscendingOrder{"AscendingOrder", Qt::SortOrder::AscendingOrder};
 const OrderClass DescendingOrder{"DescendingOrder", Qt::SortOrder::DescendingOrder};
-const QMap<QString, Qt::SortOrder> string2SortOrderEnumListTable = {{AscendingOrder.name, AscendingOrder.value},
-                                                                    {DescendingOrder.name, DescendingOrder.value}};
+const QMap<QString, Qt::SortOrder> string2SortOrderEnumListTable = {{AscendingOrder.name, AscendingOrder.value}, {DescendingOrder.name, DescendingOrder.value}};
 const QStringList HEADERVIEW_SORT_INDICATOR_ORDER_STR = string2SortOrderEnumListTable.keys();
 QString SortOrderEnum2String(const Qt::SortOrder orderEnum);
 }  // namespace HEADERVIEW_SORT_INDICATOR_ORDER
@@ -158,9 +157,7 @@ constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 namespace MemoryKey {
 const KV DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH}};
 const KV LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV BACKGROUND_IMAGE("BACKGROUND_IMAGE",
-                          "",
-                          ValueChecker{{".png", ".webp", ".jpg", ".jpeg"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV BACKGROUND_IMAGE("BACKGROUND_IMAGE", "", ValueChecker{{".png", ".webp", ".jpg", ".jpeg"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 const KV PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
@@ -172,8 +169,7 @@ const KV PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./", ValueChe
 const KV KEEP_VIDEOS_PLAYLIST_SHOW{"KEEP_VIDEOS_PLAYLIST_SHOW", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels",
-                             ValueChecker{{"labels", "browser", "lists"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING}};
+const KV FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels", ValueChecker{{"labels", "browser", "lists"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING}};
 
 const KV SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
@@ -184,22 +180,14 @@ const KV HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEADVIEW_SORT_INDICATOR_LOGICAL_
 
 const KV HEADVIEW_SORT_INDICATOR_ORDER("HEADVIEW_SORT_INDICATOR_ORDER",
                                        HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
-                                       ValueChecker{HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR,
-                                                    ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+                                       ValueChecker{HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
 const KV ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, ValueChecker{8, 25 + 1});
-const KV DEFAULT_VIDEO_PLAYER("DEFAULT_VIDEO_PLAYER",
-                              "Play",
-                              ValueChecker{{"Play in embedded player", "Play"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
-const KV DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE",
-                            "New folder",
-                            ValueChecker{{"New folder", "New text", "New json", "New folder html"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
-const KV DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE",
-                             "Copy fullpath",
-                             ValueChecker{{"Copy fullpath", "Copy path", "Copy name", "Copy the path"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV DEFAULT_VIDEO_PLAYER("DEFAULT_VIDEO_PLAYER", "Play", ValueChecker{{"Play in embedded player", "Play"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", "New folder", ValueChecker{{"New folder", "New text", "New json", "New folder html"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", ValueChecker{{"Copy fullpath", "Copy path", "Copy name", "Copy the path"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
 const KV DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
                                "Rename (ith)",
-                               ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"},
-                                            ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+                               ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
 const KV MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
 const KV COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
 const KV WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
@@ -214,24 +202,15 @@ const KV PERFORMER_IMAGE_FIXED_HEIGHT("PERFORMER_IMAGE_FIXED_HEIGHT", 200, Value
 const KV VIDS_LAST_TABLE_NAME("VIDS_LAST_TABLE_NAME", "", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
 const KV RIGHT_CLICK_TOOLBUTTON_STYLE("RIGHT_CLICK_TOOLBUTTON_STYLE", 0, ValueChecker{0, 4 + 1});
 
-const KV NAME_PATTERN_USED_CREATE_BATCH_FILES("NAME_PATTERN_USED_CREATE_BATCH_FILES",
-                                              "Page %03d%1$1$11.html",
-                                              ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
-const KV NAME_PATTERN_USED_CREATE_BATCH_FOLDERS("NAME_PATTERN_USED_CREATE_BATCH_FOLDERS",
-                                                "Page %03d%1$1$11",
-                                                ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
+const KV NAME_PATTERN_USED_CREATE_BATCH_FILES("NAME_PATTERN_USED_CREATE_BATCH_FILES", "Page %03d%1$1$11.html", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
+const KV NAME_PATTERN_USED_CREATE_BATCH_FOLDERS("NAME_PATTERN_USED_CREATE_BATCH_FOLDERS", "Page %03d%1$1$11", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
 
-const KV DIR_FILTER_ON_SWITCH_ENABLE("DIR_FILTER_ON_SWITCH_ENABLE",
-                                     int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::NoDotAndDotDot),
-                                     ValueChecker{0});
+const KV DIR_FILTER_ON_SWITCH_ENABLE("DIR_FILTER_ON_SWITCH_ENABLE", int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::NoDotAndDotDot), ValueChecker{0});
 
 const KV VIDEO_PLAYER_VOLUME("VIDEO_PLAYER_VOLUME", 100, ValueChecker{0, 100 + 1});
 const KV VIDEO_PLAYER_MUTE("VIDEO_PLAYER_MUTE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SEARCH_INCLUDING_SUBDIRECTORIES("SEARCH_INCLUDING_SUBDIRECTORIES", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV SEARCH_MODE_DEFAULT_VALUE("SEARCH_MODE_DEFAULT_VALUE",
-                                   "Normal",
-                                   ValueChecker{{"Normal", "Wildcard", "Regex", "Search for File Content"},
-                                                ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
+const KV SEARCH_MODE_DEFAULT_VALUE("SEARCH_MODE_DEFAULT_VALUE", "Normal", ValueChecker{{"Normal", "Wildcard", "Regex", "Search for File Content"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
 const KV SEARCH_NAME_CASE_SENSITIVE{"SEARCH_NAME_CASE_SENSITIVE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV SEARCH_CONTENTS_CASE_SENSITIVE{"SEARCH_CONTENTS_CASE_SENSITIVE", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV ADVANCE_SEARCH_LINEEDIT_VALUE("ADVANCE_SEARCH_LINEEDIT_VALUE", "", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR});
@@ -239,45 +218,31 @@ const KV DISABLE_ENTRIES_DONT_PASS_FILTER{"DISABLE_ENTRIES_DONT_PASS_FILTER", tr
 
 const KV RENAMER_INCLUDING_FILE_EXTENSION{"RENAMER_INCLUDING_FILE_EXTENSION", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV RENAMER_INCLUDING_DIR{"RENAMER_INCLUDING_DIR", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
-const KV RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",
-                              QStringList{"", " BB ", " BB", " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD"},
+const KV RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST", QStringList{"", " BB ", " BB", " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD"},
                               ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 const KV RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST", QStringList{"", " ", "", " - 1080p"}, ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
-const KV RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"},
-                                     ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
+const KV RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"}, ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
 const KV RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2", ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_STR}};
 
-const KV WIN32_MEDIAINFO_LIB_PATH("WIN32_MEDIAINFO_LIB_PATH",
-                                  "../bin/lib/MediaInfo.dll",
-                                  ValueChecker{{".dll"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
-const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE",
-                                "../bin/PERFORMERS_TABLE.txt",
-                                ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
-const KV WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS",
-                              "../bin/AKA_PERFORMERS.txt",
-                              ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
-const KV WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME",
-                                    "../bin/STANDARD_STUDIO_NAME.txt",
-                                    ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV RENAMER_NUMERIAZER_START_INDEX{"RENAMER_NUMERIAZER_START_INDEX", 0, ValueChecker{INT32_MIN, INT32_MAX}};
+const KV RENAMER_NUMERIAZER_NO_FORMAT{"RENAMER_NUMERIAZER_NO_FORMAT", QStringList{" %1", " - %1", " (%1)"}, ValueChecker{ValueChecker::VALUE_TYPE::QSTRING_LIST}};
+const KV RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX{"RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX", 0, ValueChecker{0, 16}};
+
+const KV WIN32_MEDIAINFO_LIB_PATH("WIN32_MEDIAINFO_LIB_PATH", "../bin/lib/MediaInfo.dll", ValueChecker{{".dll"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV WIN32_PERFORMERS_TABLE("WIN32_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV WIN32_AKA_PERFORMERS("WIN32_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH",
                                              "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
                                              ValueChecker{{".bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 const KV WIN32_RUND_IMG_PATH("WIN32_RUND_IMG_PATH", ".", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
-const KV LINUX_MEDIAINFO_LIB_PATH("LINUX_MEDIAINFO_LIB_PATH",
-                                  "../bin/lib/MediaInfo.dll",
-                                  ValueChecker{{".dll"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LINUX_MEDIAINFO_LIB_PATH("LINUX_MEDIAINFO_LIB_PATH", "../bin/lib/MediaInfo.dll", ValueChecker{{".dll"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 
-const KV LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE",
-                                "../bin/PERFORMERS_TABLE.txt",
-                                ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
-const KV LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS",
-                              "../bin/AKA_PERFORMERS.txt",
-                              ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
-const KV LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME",
-                                    "../bin/STANDARD_STUDIO_NAME.txt",
-                                    ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LINUX_PERFORMERS_TABLE("LINUX_PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LINUX_AKA_PERFORMERS("LINUX_AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LINUX_STANDARD_STUDIO_NAME("LINUX_STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", ValueChecker{{".txt"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
 const KV LINUX_RUNLOG("LINUX_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 const KV LINUX_RUND_IMG_PATH("LINUX_RUND_IMG_PATH", ".", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
@@ -325,10 +290,7 @@ const QStringList BUILTIN_COMPRESSED_TYPE_SET = {"*.qz"};
 
 enum class CCMMode { ERROR_OP = -1, MERGE_OP = 0, COPY_OP = 1, CUT_OP = 2, LINK_OP = 3 };
 
-static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE_OP, "MERGE"},
-                                                       {CCMMode::COPY_OP, "COPY"},
-                                                       {CCMMode::CUT_OP, "CUT"},
-                                                       {CCMMode::LINK_OP, "LINK"}};
+static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE_OP, "MERGE"}, {CCMMode::COPY_OP, "COPY"}, {CCMMode::CUT_OP, "CUT"}, {CCMMode::LINK_OP, "LINK"}};
 
 #include <QColor>
 #include <QRegularExpression>
@@ -338,7 +300,7 @@ const QRegularExpression invalidCharPat("[\\#\\\\/\\:\\*\\?\\<\\>\\|]");  // #\/
 const QRegularExpression invalidQuotePat("[’“”\"]");                      //'
 
 const QRegularExpression leadingStrComp("^((\\[FL\\])|(\\[FFL\\])|(\\[GT\\]))", QRegularExpression::PatternOption::CaseInsensitiveOption);  // delete it
-const QRegularExpression leadingOpenBracketComp("^[\[\{\(]");                                          //-                                         //-
+const QRegularExpression leadingOpenBracketComp("^[\[\{\(]");                                                                               //-                                         //-
 
 const QRegularExpression continuousSpaceComp("\\s\\s+");  //' '
 
