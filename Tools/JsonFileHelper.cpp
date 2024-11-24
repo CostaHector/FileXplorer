@@ -81,14 +81,14 @@ QVariantHash JsonFileHelper::GetMovieFileJsonDict(const QString& fileAbsPath, co
   return dict;
 }
 
-QVariantHash JsonFileHelper::GetDefaultJsonFile(const QString& fileName) {
+QVariantHash JsonFileHelper::GetDefaultJsonFile(const QString& fileName, const QString& fileSz) {
   QVariantHash dict = {{JSONKey::Name, fileName},
                        {JSONKey::Performers, QStringList()},
                        {JSONKey::ProductionStudio, ""},
                        {JSONKey::Uploaded, ""},
                        {JSONKey::Tags, QStringList()},
                        {JSONKey::Rate, -1},
-                       {JSONKey::Size, QString::number(0)},
+                       {JSONKey::Size, fileSz},
                        {JSONKey::Resolution, ""},
                        {JSONKey::Bitrate, ""},
                        {JSONKey::Hot, QList<QVariant>()},
