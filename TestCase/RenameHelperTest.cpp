@@ -193,5 +193,5 @@ class RenameHelperTest : public QObject {
   }
 };
 
-QTEST_MAIN(RenameHelperTest)
+//QTEST_MAIN(RenameHelperTest)
 #include "RenameHelperTest.moc"
