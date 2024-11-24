@@ -17,6 +17,7 @@ SOURCES += \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/RenameHelperTest.cpp \
     TestCase/SceneInfoManagerTest.cpp \
+    TestCase/ThumbnailProcessActions.cpp \
     TestCase/pub/FileSystemHelper.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
     TestCase/JsonToolTest.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
     TestCase/FinderTest.cpp \
     TestCase/VideosDurationGetterTest.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
+    Tools/ThumbnailProcesser.cpp \
     Tools/ItemsPileCategory.cpp \
     Tools/LongPathFinder.cpp \
     Tools/ProductionStudioManager.cpp \
@@ -91,6 +93,7 @@ HEADERS += \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
     Tools/FolderNxtAndLastIterator.h \
+    Tools/ThumbnailProcesser.h \
     Tools/ItemsPileCategory.h \
     Tools/LongPathFinder.h \
     Tools/ProductionStudioManager.h \

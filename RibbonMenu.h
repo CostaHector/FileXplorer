@@ -30,7 +30,7 @@ class RibbonMenu : public QTabWidget {
   QToolBar* m_leafDatabase;
   QToolBar* m_leafScenes;
 
-  QToolBar* m_leafArrange;
+  QToolBar* m_leafMedia;
 
   static constexpr int MAX_WIDGET_HEIGHT = 400;
 };
