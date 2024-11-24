@@ -84,7 +84,7 @@ class JsonFileHelper {
 
   static QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath, const QString& performersListStr = "", const QString& productionStudio = "");
 
-  static QVariantHash GetDefaultJsonFile(const QString& fileName = "");
+  static QVariantHash GetDefaultJsonFile(const QString& fileName = "", const QString& fileSz = "0");
 
   static QString GetJsonFilePath(const QString& vidsPath) {
     const int sufLen = vidsPath.lastIndexOf('.');
