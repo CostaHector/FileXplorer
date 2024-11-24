@@ -28,21 +28,7 @@ class AdvanceRenamer : public QDialog {
 
   void init();
 
-  void Subscribe() {
-    connect(EXT_INSIDE_FILENAME, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludeSuffix);
-    connect(ITEMS_INSIDE_SUBDIR, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludingSub);
-
-    connect(m_nBaseTE->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](const int position) {
-      m_relNameTE->verticalScrollBar()->setValue(position);
-      m_oBaseTE->verticalScrollBar()->setValue(position);
-      m_oExtTE->verticalScrollBar()->setValue(position);
-      m_nExtTE->verticalScrollBar()->setValue(position);
-    });
-
-    connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, [this]() { onApply(false, true); });
-    connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::clicked, this, [this]() { onApply(true, false); });
-    connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &AdvanceRenamer::close);
-  }
+  void Subscribe();
   auto onApply(const bool isOnlyHelp = false, const bool isInterative = false) -> bool;
   auto onRegex(const int /*regexState*/) -> void {
     // regexState;
@@ -150,12 +136,12 @@ class RenameWidget_Insert : public AdvanceRenamer {
   QComboBox* insertStrCB;
   QComboBox* insertAtCB;
 
-  RenameWidget_Insert(QWidget* parent = nullptr) : AdvanceRenamer(parent), insertStrCB(new QComboBox), insertAtCB(new QComboBox){};
+  RenameWidget_Insert(QWidget* parent = nullptr) : AdvanceRenamer(parent), insertStrCB(new QComboBox), insertAtCB(new QComboBox){}
 
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = QString("Insert name string | %1 item(s) under [%2]");
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/NAME_STR_DELETER_PATH"));
+    setWindowIcon(QIcon(":img/NAME_STR_INSERTER_PATH"));
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl = new QToolBar;

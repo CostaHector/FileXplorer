@@ -21,6 +21,7 @@ bool FolderNxtAndLastIterator::operator()(const QString& parentPath) {
   m_lastTimeParentPath = parentPath;
   auto lvls = m_dirNamesGetter(parentPath);
   sameLevelPaths.swap(lvls);
+  qDebug("folders count changed from %d->%d[%s]", lvls.size(), sameLevelPaths.size(), qPrintable(parentPath));
   return true;
 }
 
@@ -33,7 +34,7 @@ QString FolderNxtAndLastIterator::lastNextCore(const QString& parentPath, const 
     return "";
   }
   if (beg + 1 == end) {
-    // contain only 1 directory
+    qDebug("contain only 1 directory");
     return *beg;
   }
   if (isNext) {
