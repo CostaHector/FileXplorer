@@ -106,6 +106,9 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
       continue;
     }
     int eachImgWidth{wPixels / row}, eachImgHeight{hPixels / column};
+    if (!(eachImgWidth == 360 || eachImgWidth == 480 || eachImgWidth == 720 || eachImgWidth == 1080)) {
+      continue;
+    }
 
     for (int imgInd = beg; imgInd < endIndex; ++imgInd) {
       int iRow = imgInd / column;
