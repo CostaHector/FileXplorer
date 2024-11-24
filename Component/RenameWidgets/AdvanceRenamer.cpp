@@ -68,8 +68,75 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
   return RenameHelper::ReplaceRename(replaceeList, oldString, newString, regexEnable);
 }
 
+void RenameWidget_Numerize::InitExtraMemberWidget() {
+  int startIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_START_INDEX.v).toInt();
+  const QStringList& noFormatCandidate{PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
+  int noFormatDefaultIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
+  m_startNo = new (std::nothrow) QLineEdit(QString::number(startIndex));  // "0"
+  if (m_startNo == nullptr) {
+    qCritical("m_startNo is nullptr");
+    return;
+  }
+  m_startNo->setMaximumWidth(20);
+  m_numberPattern = new (std::nothrow) QComboBox;  // " - %1"
+  if (m_numberPattern == nullptr) {
+    qCritical("m_numberPattern is nullptr");
+    return;
+  }
+  m_numberPattern->setEditable(true);
+  m_numberPattern->setDuplicatesEnabled(false);
+  m_numberPattern->setMaximumWidth(60);
+  m_numberPattern->addItems(noFormatCandidate);
+  if (0 <= noFormatDefaultIndex && noFormatDefaultIndex < noFormatCandidate.size()) {
+    m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
+  }
+}
+
+void RenameWidget_Numerize::InitExtraCommonVariable() {
+  windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
+  setWindowTitle(windowTitleFormat);
+  setWindowIcon(QIcon(":img/NAME_STR_NUMERIZER_PATH"));
+}
+
+QToolBar* RenameWidget_Numerize::InitControlTB() {
+  QToolBar* replaceControl{new QToolBar};
+  replaceControl->addWidget(new QLabel("Base name:"));
+  replaceControl->addWidget(m_completeBaseName);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(new QLabel("Start index:"));
+  replaceControl->addWidget(m_startNo);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(new QLabel("No. format:"));
+  replaceControl->addWidget(m_numberPattern);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(EXT_INSIDE_FILENAME);
+  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  return replaceControl;
+}
+void RenameWidget_Numerize::extraSubscribe() {
+  PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, 10);
+
+  connect(m_startNo, &QLineEdit::textChanged, this, [this](const QString& startNoStr) -> void {
+    bool isNumber = false;
+    int startNo = startNoStr.toInt(&isNumber);
+    if (!isNumber) {
+      qWarning("%s is not valid start number", qPrintable(startNoStr));
+      return;
+    }
+    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, startNo);
+    OnlyTriggerRenameCore();
+  });
+
+  connect(m_numberPattern, &QComboBox::currentTextChanged, this, [this]() -> void {
+    int defaultFormateInd = m_numberPattern->currentIndex();
+    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
+    OnlyTriggerRenameCore();
+  });
+  connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
+}
+
 QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
-  const QString& namePattern = m_numberPattern->text();
+  const QString& namePattern = m_numberPattern->currentText();
   QString startNoStr = m_startNo->text();
   bool isnumeric = false;
   const int startInd = startNoStr.toInt(&isnumeric);
@@ -132,18 +199,18 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
 }
 
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)
-  : QDialog(parent),
-    windowTitleFormat("%1 | %2"),
-    EXT_INSIDE_FILENAME(new QCheckBox("Also Extensions")),
-    ITEMS_INSIDE_SUBDIR(new QCheckBox("Also subdirectory")),
-    regexValidLabel(new StateLabel("Regex expression state")),
-    m_relNameTE(new QPlainTextEdit()),
-    m_oBaseTE(new QPlainTextEdit()),
-    m_oExtTE(new QPlainTextEdit()),
-    m_nBaseTE(new QPlainTextEdit()),
-    m_nExtTE(new QPlainTextEdit()),
-    m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help)),
-    m_commandsPreview(new QPlainTextEdit) {
+    : QDialog(parent),
+      windowTitleFormat("%1 | %2"),
+      EXT_INSIDE_FILENAME(new QCheckBox("Also Extensions")),
+      ITEMS_INSIDE_SUBDIR(new QCheckBox("Also subdirectory")),
+      regexValidLabel(new StateLabel("Regex expression state")),
+      m_relNameTE(new QPlainTextEdit()),
+      m_oBaseTE(new QPlainTextEdit()),
+      m_oExtTE(new QPlainTextEdit()),
+      m_nBaseTE(new QPlainTextEdit()),
+      m_nExtTE(new QPlainTextEdit()),
+      m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help)),
+      m_commandsPreview(new QPlainTextEdit) {
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
 
