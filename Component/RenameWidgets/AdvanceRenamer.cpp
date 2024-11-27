@@ -114,8 +114,6 @@ QToolBar* RenameWidget_Numerize::InitControlTB() {
   return replaceControl;
 }
 void RenameWidget_Numerize::extraSubscribe() {
-  PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, 10);
-
   connect(m_startNo, &QLineEdit::textChanged, this, [this](const QString& startNoStr) -> void {
     bool isNumber = false;
     int startNo = startNoStr.toInt(&isNumber);
