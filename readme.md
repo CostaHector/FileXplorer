@@ -3,6 +3,20 @@
 
 An File Explorer that can be used in windows and linux.
 
+## New Feature
+1. Logs Control
+
+## Log Control
+Interactive function:
+1. Open latest log file
+2. Open logs folder
+3. Set log level(default: error), Attention:
+    - This log level only control release edition.
+4. Aging log file if size >= 20MiB
+
+a log line example:
+> `hh:mm:ss.zzz E functionName msg [fileName:fileNo]`
+
 ## Component
 
 ### ContentPanel

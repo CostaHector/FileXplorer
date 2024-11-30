@@ -235,6 +235,7 @@ const KV WIN32_STANDARD_STUDIO_NAME("WIN32_STANDARD_STUDIO_NAME", "../bin/STANDA
 const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("WIN32_TERMINAL_OPEN_BATCH_FILE_PATH",
                                              "../bin/WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.bat",
                                              ValueChecker{{".bat"}, ValueChecker::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH});
+const KV LOG_DEVEL_DEBUG{"LOG_DEVEL_DEBUG", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV WIN32_RUNLOG("WIN32_RUNLOG", "../bin/RUNLOG", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 const KV WIN32_RUND_IMG_PATH("WIN32_RUND_IMG_PATH", ".", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH});
 
