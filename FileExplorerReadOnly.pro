@@ -21,6 +21,7 @@ SOURCES += \
     Actions/FolderPreviewActions.cpp \
     Actions/FramelessWindowActions.cpp \
     Actions/JsonEditorActions.cpp \
+    Actions/LogActions.cpp \
     Actions/PerformersManagerActions.cpp \
     Actions/PropertiesWindowActions.cpp \
     Actions/QuickWhereActions.cpp \
@@ -87,8 +88,8 @@ SOURCES += \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
+    Tools/LogHandler.cpp \
     Tools/ThumbnailProcesser.cpp \
-    Tools/MessageOutput.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
     Tools/QMediaInfo.cpp \
@@ -181,6 +182,7 @@ HEADERS += \
     Actions/FolderPreviewActions.h \
     Actions/FramelessWindowActions.h \
     Actions/JsonEditorActions.h \
+    Actions/LogActions.h \
     Actions/PerformersManagerActions.h \
     Actions/PropertiesWindowActions.h \
     Actions/QuickWhereActions.h \
@@ -247,9 +249,9 @@ HEADERS += \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
+    Tools/LogHandler.h \
     Tools/ThumbnailProcesser.h \
     Tools/MediaInfoDLL.h \
-    Tools/MessageOutput.h \
     Tools/NameSectionArrange.h \
     Tools/NameTool.h \
     Tools/QAbstractTableModelPub.h \
