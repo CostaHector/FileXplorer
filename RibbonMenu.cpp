@@ -16,6 +16,7 @@
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Actions/ThumbnailProcessActions.h"
+#include "Actions/LogActions.h"
 #include "Component/DatabaseToolBar.h"
 #include "Component/DropListToolButton.h"
 #include "PublicTool.h"
@@ -58,14 +59,20 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 }
 
 QToolBar* RibbonMenu::LeafFile() const {
+  QToolButton* logToolButton =
+      DropListToolButton(g_LogActions()._LOG_FILE, g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+
   QToolBar* leafFileWid{new (std::nothrow) QToolBar};
   if (leafFileWid == nullptr) {
     qCritical("leafFileWid is nullptr");
     return nullptr;
   }
 
-  leafFileWid->addActions(g_fileLeafActions().LEAF_FILE->actions());
+  leafFileWid->addActions(g_fileLeafActions()._LEAF_FILE->actions());
+  leafFileWid->addSeparator();
+  leafFileWid->addWidget(logToolButton);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+
   return leafFileWid;
 }
 
