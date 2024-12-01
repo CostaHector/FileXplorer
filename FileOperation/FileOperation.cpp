@@ -71,7 +71,7 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
   }
 
   ErrorCode errorCode = ErrorCode::OK;
-  if (failCmd.isEmpty()) {
+  if (!failCmd.isEmpty()) {
     errorCode = ErrorCode::UNKNOWN_ERROR;
     qCritical("Below %d command(s) failed:\n%s", failCmd.size(), qPrintable(failCmd.join('\n')));
   }
