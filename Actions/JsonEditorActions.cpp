@@ -43,20 +43,16 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _BATCH_EDIT_TOOL_ACTIONS{new QActionGroup(this)} {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setShortcutVisibleInContextMenu(true);
-  _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.")
-                             .arg(_FORMATTER->text())
-                             .arg(_FORMATTER->shortcut().toString()));
+  _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.").arg(_FORMATTER->text()).arg(_FORMATTER->shortcut().toString()));
 
   _SUBMIT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_S));
   _SUBMIT->setShortcutVisibleInContextMenu(true);
-  _SUBMIT->setToolTip(
-      QString("<b>%1 (%2)</b><br/> (CANNOT RECOVER!) Submit all staged changes").arg(_SUBMIT->text()).arg(_SUBMIT->shortcut().toString()));
+  _SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> (CANNOT RECOVER!) Submit all staged changes").arg(_SUBMIT->text()).arg(_SUBMIT->shortcut().toString()));
 
   _ADD_SELECTED_PERFORMER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
   _ADD_SELECTED_PERFORMER->setShortcutVisibleInContextMenu(true);
-  _ADD_SELECTED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Append selection to performers lineeditor")
-                                          .arg(_ADD_SELECTED_PERFORMER->text())
-                                          .arg(_ADD_SELECTED_PERFORMER->shortcut().toString()));
+  _ADD_SELECTED_PERFORMER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Append selection to performers lineeditor").arg(_ADD_SELECTED_PERFORMER->text()).arg(_ADD_SELECTED_PERFORMER->shortcut().toString()));
 
   _EXTRACT_CAPITALIZED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Append capitalized name in selection to performers lineeditor")
                                                  .arg(_EXTRACT_CAPITALIZED_PERFORMER->text())
@@ -70,42 +66,33 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _CANCEL->setShortcutVisibleInContextMenu(true);
   _CANCEL->setToolTip(QString("<b>%1 (%2)</b><br/> Cancel current changes").arg(_CANCEL->text()).arg(_CANCEL->shortcut().toString()));
 
-  _BROWSE_AND_SELECT_THE_FOLDER->setShortcut(
-      QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_O));
+  _BROWSE_AND_SELECT_THE_FOLDER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_O));
   _BROWSE_AND_SELECT_THE_FOLDER->setShortcutVisibleInContextMenu(true);
-  _BROWSE_AND_SELECT_THE_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Browse and select the folder. Then load jsons file from it")
-                                                .arg(_BROWSE_AND_SELECT_THE_FOLDER->text())
-                                                .arg(_BROWSE_AND_SELECT_THE_FOLDER->shortcut().toString()));
-  _CLR_TO_BE_EDITED_LIST->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Clear to-be-edit list").arg(_CLR_TO_BE_EDITED_LIST->text()).arg(_CLR_TO_BE_EDITED_LIST->shortcut().toString()));
+  _BROWSE_AND_SELECT_THE_FOLDER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Browse and select the folder. Then load jsons file from it").arg(_BROWSE_AND_SELECT_THE_FOLDER->text()).arg(_BROWSE_AND_SELECT_THE_FOLDER->shortcut().toString()));
+  _CLR_TO_BE_EDITED_LIST->setToolTip(QString("<b>%1 (%2)</b><br/> Clear to-be-edit list").arg(_CLR_TO_BE_EDITED_LIST->text()).arg(_CLR_TO_BE_EDITED_LIST->shortcut().toString()));
 
   _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
   _RELOAD_JSON_FROM_FROM_DISK->setShortcutVisibleInContextMenu(true);
-  _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from disk")
-                                              .arg(_RELOAD_JSON_FROM_FROM_DISK->text())
-                                              .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
+  _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from disk").arg(_RELOAD_JSON_FROM_FROM_DISK->text()).arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
-  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_J));
+  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_BracketLeft));
   _LAST_FILE->setShortcutVisibleInContextMenu(true);
   _LAST_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)").arg(_LAST_FILE->text()).arg(_LAST_FILE->shortcut().toString()));
 
-  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_K));
+  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_BracketRight));
   _NEXT_FILE->setShortcutVisibleInContextMenu(true);
   _NEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)").arg(_NEXT_FILE->text()).arg(_NEXT_FILE->shortcut().toString()));
 
   _DONE_AND_NEXT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_Return));
   _DONE_AND_NEXT->setShortcutVisibleInContextMenu(true);
-  _DONE_AND_NEXT->setToolTip(QString("<b>%1 (%2)</b><br/> Mark item as done and move to next unfinished item")
-                                 .arg(_DONE_AND_NEXT->text())
-                                 .arg(_DONE_AND_NEXT->shortcut().toString()));
+  _DONE_AND_NEXT->setToolTip(QString("<b>%1 (%2)</b><br/> Mark item as done and move to next unfinished item").arg(_DONE_AND_NEXT->text()).arg(_DONE_AND_NEXT->shortcut().toString()));
 
   _AUTO_SKIP->setCheckable(true);
   _AUTO_SKIP->setChecked(true);
 
   _COMPLETE_PERFS_COUNT->setShortcutVisibleInContextMenu(true);
-  _COMPLETE_PERFS_COUNT->setToolTip(QString("<b>%1 (%2)</b><br/> Set json complete performer count")
-                                        .arg(_COMPLETE_PERFS_COUNT->text())
-                                        .arg(_COMPLETE_PERFS_COUNT->shortcut().toString()));
+  _COMPLETE_PERFS_COUNT->setToolTip(QString("<b>%1 (%2)</b><br/> Set json complete performer count").arg(_COMPLETE_PERFS_COUNT->text()).arg(_COMPLETE_PERFS_COUNT->shortcut().toString()));
 
   _QUICK_EDIT_ACTIONS->addAction(_LAST_FILE);
   _QUICK_EDIT_ACTIONS->addAction(_NEXT_FILE);
@@ -122,8 +109,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
 
   _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
   _LOWER_ALL_WORDS->setShortcutVisibleInContextMenu(true);
-  _LOWER_ALL_WORDS->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Lowercase a sentense.").arg(_LOWER_ALL_WORDS->text()).arg(_LOWER_ALL_WORDS->shortcut().toString()));
+  _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentense.").arg(_LOWER_ALL_WORDS->text()).arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
   _FILE_LOAD_ACTIONS->addAction(_BROWSE_AND_SELECT_THE_FOLDER);
   _FILE_LOAD_ACTIONS->addAction(_CLR_TO_BE_EDITED_LIST);
@@ -146,23 +132,20 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _AI_HINT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _AI_HINT->setToolTip(QString("<b>%1 (%2)</b><br/> Give you performers list hint").arg(_AI_HINT->text()).arg(_AI_HINT->shortcut().toString()));
 
-  _LEARN_PERFORMERS_FROM_JSON->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Learn performers from value of key \"Performers\" in json file. \n Improve its performers hint capability.")
-          .arg(_LEARN_PERFORMERS_FROM_JSON->text())
-          .arg(_LEARN_PERFORMERS_FROM_JSON->shortcut().toString()));
+  _LEARN_PERFORMERS_FROM_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Learn performers from value of key \"Performers\" in json file. \n Improve its performers hint capability.")
+                                              .arg(_LEARN_PERFORMERS_FROM_JSON->text())
+                                              .arg(_LEARN_PERFORMERS_FROM_JSON->shortcut().toString()));
 
   _SELECT_CURRENT_FOLDER->setCheckable(false);
-  _SELECT_CURRENT_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/>Load json files from current view root path.")
-                                         .arg(_SELECT_CURRENT_FOLDER->text(), _SELECT_CURRENT_FOLDER->shortcut().toString()));
+  _SELECT_CURRENT_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/>Load json files from current view root path.").arg(_SELECT_CURRENT_FOLDER->text(), _SELECT_CURRENT_FOLDER->shortcut().toString()));
 
-  _CONSTRUCT_JSONS_FOR_VIDS->setToolTip(QString("<b>%1 (%2)</b><br/>Construct json file for each vids under current path if json not exists.")
-                                            .arg(_CONSTRUCT_JSONS_FOR_VIDS->text(), _CONSTRUCT_JSONS_FOR_VIDS->shortcut().toString()));
+  _CONSTRUCT_JSONS_FOR_VIDS->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Construct json file for each vids under current path if json not exists.").arg(_CONSTRUCT_JSONS_FOR_VIDS->text(), _CONSTRUCT_JSONS_FOR_VIDS->shortcut().toString()));
 
-  _APPEND_PERFORMERS->setToolTip(QString("<b>%1 (%2)</b><br/>Input performers and append them json files under current path")
-                                     .arg(_APPEND_PERFORMERS->text(), _APPEND_PERFORMERS->shortcut().toString()));
+  _APPEND_PERFORMERS->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Input performers and append them json files under current path").arg(_APPEND_PERFORMERS->text(), _APPEND_PERFORMERS->shortcut().toString()));
 
-  _SET_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Input and set studio for json files under current path")
-                              .arg(_SET_STUDIO->text(), _SET_STUDIO->shortcut().toString()));
+  _SET_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Input and set studio for json files under current path").arg(_SET_STUDIO->text(), _SET_STUDIO->shortcut().toString()));
 
   _CONSTRUCT_PERFORMER_KVP->setToolTip(QString("<b>%1 (%2)</b><br/>Add and construct performers key-value pair for json files under current path."
                                                "For performer value is non-empty, the json file will be skipped.")
@@ -196,14 +179,11 @@ QActionGroup* JsonEditorActions::GetSystemActions() {
 
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal the json in its parent folder.")
-                                      .arg(_REVEAL_IN_EXPLORER->text())
-                                      .arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
+  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal the json in its parent folder.").arg(_REVEAL_IN_EXPLORER->text()).arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
 
   _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
-  _OPEN_THIS_FILE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
+  _OPEN_THIS_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Open this json file.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
 
   return _SYSTEM_ACTIONS;
 }
