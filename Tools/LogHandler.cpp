@@ -1,14 +1,20 @@
 #include "LogHandler.h"
 #include "PublicVariable.h"
 #include "Actions/LogActions.h"
+
 #include <QDesktopServices>
+#include <QMessageLogContext>
+#include <QTime>
 
 const QString LogHandler::LOG_ABSFILENAME_TEMPLATE{"%1/logs_info%2.log"};
 QtMsgType LogHandler::OUTPUT_LOG_LEVEL = QtWarningMsg;
-QFile LogHandler::outFile;
-QTextStream LogHandler::ts(&outFile);
-QString LogHandler::logPrePath;
-bool LogHandler::m_flushInstantly{false};
+
+QString LogHandler::mLogFolderPath;
+bool LogHandler::mFlushLogInBufferInstantly{false};
+
+QFile LogHandler::mLogFile;
+QTextStream LogHandler::mLogTextStream(&mLogFile);
+
 LogHandler::LogHandler(QObject* parent) : QObject{parent} {
   //  const QByteArray envVar = qgetenv("QTDIR");
   //  IS_LOG_TO_FILE = envVar.isEmpty();
@@ -18,22 +24,23 @@ LogHandler::LogHandler(QObject* parent) : QObject{parent} {
   //  }
   OUTPUT_LOG_LEVEL = PreferenceSettings().value(MemoryKey::LOG_DEVEL_DEBUG.name, MemoryKey::LOG_DEVEL_DEBUG.v).toBool() ? QtDebugMsg : QtWarningMsg;
 #ifdef _WIN32
-  logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
+  mLogFolderPath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
 #else
   logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
 #endif
-  outFile.setFileName(LOG_ABSFILENAME_TEMPLATE.arg(logPrePath, ""));
-  if (!outFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
-    qCritical("Log message CANNOT redirect to file[%s]", qPrintable(outFile.fileName()));
+  mLogFile.setFileName(LOG_ABSFILENAME_TEMPLATE.arg(mLogFolderPath, ""));
+  if (!mLogFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+    qCritical("Log message CANNOT redirect to file[%s]", qPrintable(mLogFile.fileName()));
     return;
   }
-  qInfo("Log message will be redirect to file[%s]", qPrintable(outFile.fileName()));
+  qInfo("Log message will be redirect to file[%s]", qPrintable(mLogFile.fileName()));
+
   qInstallMessageHandler(LogHandler::myMessageOutput);
 }
 
 LogHandler::~LogHandler() {
-  if (outFile.isOpen()) {
-    outFile.close();
+  if (mLogFile.isOpen()) {
+    mLogFile.close();
   }
 }
 
@@ -67,27 +74,27 @@ void LogHandler::myMessageOutput(QtMsgType type, const QMessageLogContext& conte
   fflush(stdout);
   return;
 #else  // release mode, compile choice add "-g" to display function name and line
-  if (ts.device() == nullptr || !outFile.isOpen()) {
+  if (mLogTextStream.device() == nullptr || !mLogFile.isOpen()) {
     printf("critical error, cannot write into log file");
     return;
   }
-  ts << logMsg << '\n';
-  if (m_flushInstantly || type >= QtWarningMsg) {
-    ts.flush();
+  mLogTextStream << logMsg << '\n';
+  if (mFlushLogInBufferInstantly || type >= QtWarningMsg) {
+    mLogTextStream.flush();
   }
 #endif
 }
 
 bool LogHandler::OpenLogFile() {
   LogHandler::ManualFlush();
-  const bool openLogFileResult{QDesktopServices::openUrl(QUrl::fromLocalFile(outFile.fileName()))};
-  qDebug("open log file[%s] bResult:%d", qPrintable(outFile.fileName()), openLogFileResult);
+  const bool openLogFileResult{QDesktopServices::openUrl(QUrl::fromLocalFile(mLogFile.fileName()))};
+  qDebug("open log file[%s] bResult:%d", qPrintable(mLogFile.fileName()), openLogFileResult);
   return openLogFileResult;
 }
 
 bool LogHandler::OpenLogFolder() {
-  const bool openLogFolderResult{QDesktopServices::openUrl(QUrl::fromLocalFile(logPrePath))};
-  qDebug("open log folder[%s] bResult:%d", qPrintable(logPrePath), openLogFolderResult);
+  const bool openLogFolderResult{QDesktopServices::openUrl(QUrl::fromLocalFile(mLogFolderPath))};
+  qDebug("open log folder[%s] bResult:%d", qPrintable(mLogFolderPath), openLogFolderResult);
   return openLogFolderResult;
 }
 
@@ -101,33 +108,33 @@ void LogHandler::SetLogLevelDebug() {
 }
 
 void LogHandler::SetFlushInstantly(bool flushInstant) {
-  m_flushInstantly = flushInstant;
+  mFlushLogInBufferInstantly = flushInstant;
 }
 
 bool LogHandler::AgingLogFiles() {
-  const QString oldLogFileName{outFile.fileName()};
-  if (!outFile.exists()) {
+  const QString oldLogFileName{mLogFile.fileName()};
+  if (!mLogFile.exists()) {
     qWarning("Log file[%s] not exists", qPrintable(oldLogFileName));
     return false;
   }
-  if (outFile.size() < 10 * 1024 * 1024) {  // 10 MiB
-    qWarning("Log file[%s] size[%lld] is bellow 10 MiB, no need to aging now", qPrintable(oldLogFileName), outFile.size());
+  if (mLogFile.size() < 10 * 1024 * 1024) {  // 10 MiB
+    qWarning("Log file[%s] size[%lld] is bellow 10 MiB, no need to aging now", qPrintable(oldLogFileName), mLogFile.size());
     return true;
   }
-  ManualFlush(); // flush it right now
-  if (outFile.isOpen()) {
-    outFile.close();
+  ManualFlush();  // flush it right now
+  if (mLogFile.isOpen()) {
+    mLogFile.close();
     qWarning("Close log file succeed");
   }
 
-  const QString newLogFileName{LOG_ABSFILENAME_TEMPLATE.arg(logPrePath, QTime::currentTime().toString("_hh_mm_ss"))};
+  const QString newLogFileName{LOG_ABSFILENAME_TEMPLATE.arg(mLogFolderPath, QTime::currentTime().toString("_hh_mm_ss"))};
   if (!QFile::rename(oldLogFileName, newLogFileName)) {
     qWarning("Aging log file name failed:\n[%s]\n[%s]", qPrintable(oldLogFileName), qPrintable(newLogFileName));
     return false;
   }
   qWarning("Aging log file ok");
-  outFile.setFileName(newLogFileName);
-  if (!outFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+  mLogFile.setFileName(newLogFileName);
+  if (!mLogFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
     qCritical("Log message CANNOT redirect to file[%s]", qPrintable(newLogFileName));
     return false;
   }

@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
   FileExplorerReadOnly fileExplorer(argc, argv, nullptr);
   FileExplorerEvent::GetFileExlorerEvent(fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer.m_statusBar);
 
-  auto* extraViewVisibility = new ExtraViewVisibilityControl(fileExplorer.centralWidget());
+  auto* extraViewVisibility = new (std::nothrow)ExtraViewVisibilityControl(fileExplorer.centralWidget());
   fileExplorer.show();
 
   mo.subscribe();

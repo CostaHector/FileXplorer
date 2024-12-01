@@ -16,25 +16,6 @@ namespace FileOperation {
 
 using namespace FileOperatorType;
 
-bool WriteIntoLogFile(const QString& msg) {
-#ifdef _WIN32
-  const QString logPrePath = PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString();
-#else
-  const QString logPrePath = PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString();
-#endif
-  QFile logFi(QString("%1/%2.log").arg(logPrePath).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd")));
-  if (not logFi.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-    qCritical("log file[%s] cannot open. ", qPrintable(logFi.fileName()));
-    return false;
-  }
-  QTextStream stream(&logFi);
-  stream.setCodec("UTF-8");
-  stream << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss\n");
-  stream << msg;
-  logFi.close();
-  return true;
-}
-
 RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
   BATCH_COMMAND_LIST_TYPE revertCmds;
   if (pre.isEmpty() && rel.isEmpty()) {
@@ -59,14 +40,12 @@ RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
 }
 
 RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) {
-  static const QMap<FileOperator, std::function<RETURN_TYPE(const QStringList&)>> LAMBDA_TABLE = {
-      {RMFILE, rmfileAgent}, {RMPATH, rmpathAgent}, {RMDIR, rmdirAgent},   {MOVETOTRASH, moveToTrashAgent},
-      {TOUCH, touchAgent},   {MKPATH, mkpathAgent}, {RENAME, renameAgent}, {CPFILE, cpfileAgent},
-      {CPDIR, cpdirAgent},   {LINK, linkAgent},     {UNLINK, unlinkAgent}};
-
+  static const QMap<FileOperator, std::function<RETURN_TYPE(const QStringList&)>> LAMBDA_TABLE = {{RMFILE, rmfileAgent}, {RMPATH, rmpathAgent}, {RMDIR, rmdirAgent},   {MOVETOTRASH, moveToTrashAgent},
+                                                                                                  {TOUCH, touchAgent},   {MKPATH, mkpathAgent}, {RENAME, renameAgent}, {CPFILE, cpfileAgent},
+                                                                                                  {CPDIR, cpdirAgent},   {LINK, linkAgent},     {UNLINK, unlinkAgent}};
   BATCH_COMMAND_LIST_TYPE recoverList;
-  int failedCommandCnt = 0;
-  QString log;
+  QStringList failCmd;
+
   for (int i = 0; i < aBatch.size(); ++i) {
     const ACMD& cmds = aBatch[i];
     if (cmds.isEmpty()) {
@@ -75,13 +54,12 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
 
     const RETURN_TYPE returnEle = LAMBDA_TABLE[cmds.op](cmds.lst);
     if (!returnEle) {
-      ++failedCommandCnt;
-      log += cmds.toStr();
+      failCmd << cmds.toStr();
     }
 
     if (cmds.op == MOVETOTRASH && !srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
       if (returnEle.size() > 1) {
-        qFatal("moveToTrash recover commands count[%d] can only <= 1", returnEle.size());
+        qCritical("moveToTrash recover commands count[%d] can only <= 1", returnEle.size());
         return {UNKNOWN_ERROR, {}};
       } else if (returnEle.size() == 1) {
         srcCommand.rbegin()[i] = returnEle[0];
@@ -92,13 +70,13 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
     recoverList += returnEle;
   }
 
-  if (failedCommandCnt != 0) {
-    qWarning("Above %d command(s) failed.", failedCommandCnt);
-    log += QString("\tAbove %1 command(s) failed.").arg(failedCommandCnt);
-    WriteIntoLogFile(log);
+  ErrorCode errorCode = ErrorCode::OK;
+  if (failCmd.isEmpty()) {
+    errorCode = ErrorCode::UNKNOWN_ERROR;
+    qCritical("Below %d command(s) failed:\n%s", failCmd.size(), qPrintable(failCmd.join('\n')));
   }
   // in-place reverse
-  return RETURN_TYPE{failedCommandCnt, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
+  return RETURN_TYPE{errorCode, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
 }
 
 RETURN_TYPE rmpathAgent(const QStringList& parms) {
