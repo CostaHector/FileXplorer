@@ -336,7 +336,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   QList<QAction*> studiosActions{arrangeIns._EDIT_STUDIOS,  arrangeIns._RELOAD_STUDIOS,  nullptr, arrangeIns._EDIT_PERFS,      arrangeIns._RELOAD_PERFS, nullptr,
                                  arrangeIns._EDIT_PERF_AKA, arrangeIns._RELOAD_PERF_AKA, nullptr, arrangeIns._RENAME_RULE_STAT};
   QToolButton* nameRulerToolButton =
-      DropListToolButton(g_fileBasicOperationsActions()._NAME_STANDARDLIZER, studiosActions, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+      DropListToolButton(g_fileBasicOperationsActions()._NAME_RULER, studiosActions, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
 
   auto& viewIns = g_viewActions();
   auto& jsonIns = g_jsonEditorActions();

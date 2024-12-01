@@ -7,8 +7,6 @@ namespace FileOperation {
 
 using namespace FileOperatorType;
 
-bool WriteIntoLogFile(const QString& msg);
-
 RETURN_TYPE rmpathAgent(const QStringList& parms);
 
 RETURN_TYPE rmpath(const QString& pre, const QString& rel);
