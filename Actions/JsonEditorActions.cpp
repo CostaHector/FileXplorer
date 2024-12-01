@@ -36,9 +36,9 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _SELECT_CURRENT_FOLDER{new QAction(QIcon(":img/LOAD_JSONS_FROM_CURRENT_PATH"), tr("Select Current path"))},
       _CONSTRUCT_JSONS_FOR_VIDS{new QAction(tr("Construct jsons by file properties"))},
       _APPEND_PERFORMERS{new QAction(QIcon(":img/APPEND_PERFORMERS"), tr("Append performers"))},
-      _SET_STUDIO{new QAction(QIcon(":img/PRODUCTION_STUDIOS"), tr("Set production studio"))},
-      _CONSTRUCT_PERFORMER_KVP{new QAction(QIcon(":img/PERFORMERS"), tr("Construct performers k-v pair"))},
-      _CONSTRUCT_STUDIO_KVP{new QAction(QIcon(":img/PRODUCTION_STUDIOS"), tr("Construct studio k-v pair"))},
+      _SET_STUDIO{new QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), tr("Set production studio"))},
+      _CONSTRUCT_PERFORMER_KVP{new QAction(QIcon(":img/PERFORMERS_LIST_FILE"), tr("Construct performers k-v pair"))},
+      _CONSTRUCT_STUDIO_KVP{new QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), tr("Construct studio k-v pair"))},
       _CLR_PERFORMERS_STUDIO_VALUE{new QAction(tr("Clear performers and studio values"))},
       _BATCH_EDIT_TOOL_ACTIONS{new QActionGroup(this)} {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));

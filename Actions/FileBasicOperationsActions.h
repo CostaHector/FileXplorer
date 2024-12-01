@@ -34,7 +34,7 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* FolderMergeActions();
 
   void FolderFileCategoryProcess();
-  QAction* _NAME_STANDARDLIZER{new QAction(QIcon(":img/NAME_STANDARDLIZER_PATH"), "Name Ruler")};
+  QAction* _NAME_RULER{new QAction(QIcon(":img/NAME_RULER"), "Name Ruler")};
   QAction* _PACK_FOLDERS{new QAction(QIcon(":img/PACK_FOLDERS"), "Packer")};
   QAction* _UNPACK_FOLDERS{new QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker")};
   QAction* _LONG_PATH_FINDER{new QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder")};
