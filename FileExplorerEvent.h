@@ -79,6 +79,8 @@ class FileExplorerEvent : public QObject {
   bool on_revealInExplorer() const;
   bool on_OpenInTerminal() const;
 
+  bool on_forceRefreshFileSystemModel();
+
   bool on_compress();
   bool on_deCompress();
   bool on_compressImgsByGroup();
