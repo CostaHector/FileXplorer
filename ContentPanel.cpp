@@ -73,7 +73,6 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
       fsView->setRootIndex(m_fsModel->setRootPath(newPath));
       fsView->selectionModel()->clearCurrentIndex();
       fsView->selectionModel()->clearSelection();
-      onAfterDirectoryLoaded(newPath);
     }
   }
   return true;
