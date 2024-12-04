@@ -8,12 +8,12 @@ class FileLeafActions : public QObject {
   explicit FileLeafActions(QObject* parent = nullptr);
 
   QActionGroup* GetLeafTabActions();
-  QAction* _LOGGING;
-  QAction* _ALERT_ITEMS;
-  QAction* _ABOUT_FILE_EXPLORER;
-  QAction* _LANUAGE;
 
-  QActionGroup* LEAF_FILE;
+  QAction* _ALERT_ITEMS{nullptr};
+  QAction* _ABOUT_FILE_EXPLORER{nullptr};
+  QAction* _LANUAGE{nullptr};
+
+  QActionGroup* _LEAF_FILE{nullptr};
 };
 
 FileLeafActions& g_fileLeafActions();
