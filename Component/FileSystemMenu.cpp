@@ -3,6 +3,7 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
+#include "Actions/RightClickMenuActions.h"
 
 FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(title, parent), NEW_MENU{GetNewMenu()}, VIEW_MENU{GetViewMenu()} {
   setToolTipsVisible(true);
@@ -27,6 +28,10 @@ FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(ti
 
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
   addMenu(GetRenameMenu());
+  addSeparator();
+  addAction(g_rightClickActions()._CALC_MD5_ACT);
+  addAction(g_rightClickActions()._PROPERTIES);
+  addAction(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL);
 }
 
 QMenu* FileSystemMenu::GetNewMenu() {

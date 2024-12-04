@@ -8,9 +8,9 @@ class RightClickMenuActions : public QObject {
  public:
   explicit RightClickMenuActions(QObject *parent = nullptr);
 
-  QAction* _CALC_MD5_ACT;
-  QAction* _PROPERTIES;
-
+  QAction* _CALC_MD5_ACT{nullptr};
+  QAction* _PROPERTIES{nullptr};
+  QAction* _FORCE_REFRESH_FILESYSTEMMODEL{nullptr};
  signals:
 
 };
