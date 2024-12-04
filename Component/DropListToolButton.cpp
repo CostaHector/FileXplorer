@@ -15,7 +15,11 @@ QToolButton* DropListToolButton(QAction* defaultAction,
     defaultAction = dropdownActions[0];
   }
 
-  QToolButton* tb = new QToolButton;
+  QToolButton* tb{new (std::nothrow) QToolButton};
+  if (tb == nullptr) {
+    qCritical("tb is nullptr");
+    return nullptr;
+  }
   tb->setDefaultAction(defaultAction);
   if (not updateToolTip.isEmpty()) {
     defaultAction->setToolTip(updateToolTip);
@@ -26,7 +30,7 @@ QToolButton* DropListToolButton(QAction* defaultAction,
   tb->setStyleSheet("QToolButton { max-width: 256px; }");
   tb->setIconSize(QSize(iconSize, iconSize));
 
-  QMenu* mn = new (std::nothrow) QMenu(tb);
+  QMenu* mn{new (std::nothrow) QMenu(tb)};
   if (mn == nullptr) {
     qCritical("mn is nullptr");
     return nullptr;
