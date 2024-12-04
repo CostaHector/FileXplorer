@@ -53,16 +53,16 @@ void onEditAkaPerformer() {
 }
 
 ArrangeActions::ArrangeActions(QObject* parent) : QObject{parent} {
-  _EDIT_STUDIOS = new QAction(QIcon(":img/PRODUCTION_STUDIOS"), "Edit Studios map", this);
-  _RELOAD_STUDIOS = new QAction(QIcon(":img/RELOAD_FROM_DISK"), "Reload Studios", this);
+  _EDIT_STUDIOS = new QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Edit studios list file", this);
+  _RELOAD_STUDIOS = new QAction("Reload studios", this);
 
-  _EDIT_PERFS = new QAction(QIcon(":img/PERFORMERS"), "Edit Performers list", this);
-  _RELOAD_PERFS = new QAction(QIcon(":img/RELOAD_FROM_DISK"), "Reload Performers", this);
+  _EDIT_PERFS = new QAction(QIcon(":img/PERFORMERS_LIST_FILE"), "Edit performers list file", this);
+  _RELOAD_PERFS = new QAction("Reload performers", this);
 
-  _EDIT_PERF_AKA = new QAction(QIcon(":img/EDIT_AKA_FILE"), "Edit AKA perf file", this);
-  _RELOAD_PERF_AKA = new QAction(QIcon(":img/RELOAD_FROM_DISK"), "Reload AKA perf", this);
+  _EDIT_PERF_AKA = new QAction(QIcon(":img/PERFORMER_AKA_LIST_FILE"), "Edit performers AKA list file", this);
+  _RELOAD_PERF_AKA = new QAction("Reload performers AKA", this);
 
-  _RENAME_RULE_STAT = new QAction(QIcon(":img/STATS"), "Rename rule statistics", this);
+  _RENAME_RULE_STAT = new QAction(QIcon(":img/SHOW_PERFORMER_STUDIO_STATISTIC"), "Rename rule statistics", this);
 }
 
 void onShowRenameRuleStatistics() {

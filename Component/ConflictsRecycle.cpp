@@ -49,7 +49,6 @@ void ConflictsRecycle::ReadSettings() {
 }
 
 void ConflictsRecycle::hideEvent(QHideEvent* event) {
-  //  g_fileLeafActions()._LOGGING->setChecked(false);
   QDialog::hideEvent(event);
 }
 

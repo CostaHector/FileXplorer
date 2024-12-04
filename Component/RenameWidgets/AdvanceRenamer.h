@@ -228,45 +228,18 @@ class RenameWidget_Numerize : public AdvanceRenamer {
     ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
   }
 
-  auto InitExtraMemberWidget() -> void override {
-    m_startNo = new QLineEdit("0");
-    m_startNo->setMaximumWidth(20);
-    m_numberPattern = new QLineEdit(" - %1");
-    m_startNo->setMaximumWidth(60);
-  }
+  auto InitExtraMemberWidget() -> void override;
 
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
-    setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/NAME_STR_NUMERIZER_PATH"));
-  }
+  auto InitExtraCommonVariable() -> void override;
 
-  auto InitControlTB() -> QToolBar* override {
-    QToolBar* replaceControl{new QToolBar};
-    replaceControl->addWidget(new QLabel("Base name:"));
-    replaceControl->addWidget(m_completeBaseName);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(new QLabel("Start index:"));
-    replaceControl->addWidget(m_startNo);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(new QLabel("No. Pattern:"));
-    replaceControl->addWidget(m_numberPattern);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(EXT_INSIDE_FILENAME);
-    replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-    return replaceControl;
-  }
-  auto extraSubscribe() -> void override {
-    connect(m_startNo, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
-    connect(m_numberPattern, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
-    connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
-  }
+  auto InitControlTB() -> QToolBar* override;
+  auto extraSubscribe() -> void override;
 
   auto RenameCore(const QStringList& replaceeList) -> QStringList override;
 
  private:
   QLineEdit* m_startNo{nullptr};
-  QLineEdit* m_numberPattern{nullptr};
+  QComboBox* m_numberPattern{nullptr};
   QLineEdit* m_completeBaseName{new QLineEdit};
   bool m_baseNameInited = false;
 };
