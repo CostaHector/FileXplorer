@@ -279,7 +279,7 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
 }
 
 void FileBasicOperationsActions::FolderFileCategoryProcess() {
-  _NAME_STANDARDLIZER->setToolTip(
+  _NAME_RULER->setToolTip(
       "<b>Standardized Files/Folders Name under current view path</b><br/>"
       "Given: [A..mp4, A (1).jpg, A -- 2.json]<br/>"
       "Result: [A.mp4, A - 1.jpg, A - 2.json]");
