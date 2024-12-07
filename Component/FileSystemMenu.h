@@ -3,7 +3,6 @@
 
 #include <QMenu>
 
-
 class FileSystemMenu : public QMenu {
   Q_OBJECT
  public:

@@ -556,7 +556,35 @@ QString ContentPanel::getCurFilePath() const {
       return m_dbModel->filePath(m_movieView->currentIndex());
     }
     default: {
-      qDebug("No getCurFilePath");
+      qWarning("No getCurFilePath");
+    }
+  }
+  return "";
+}
+
+QString ContentPanel::getCurFileName() const {
+  auto vt = GetCurViewType();
+  switch (vt) {
+    case ViewType::TABLE: {
+      return m_fsModel->fileName(m_fsTableView->currentIndex());
+    }
+    case ViewType::LIST: {
+      return m_fsModel->fileName(m_fsListView->currentIndex());
+    }
+    case ViewType::TREE: {
+      return m_fsModel->fileName(m_fsTreeView->currentIndex());
+    }
+    case ViewType::SEARCH: {
+      return m_searchSrcModel->fileName(m_proxyModel->mapToSource(m_advanceSearchView->currentIndex()));
+    }
+    case ViewType::SCENE: {
+      return m_scenesModel->fileName(m_sceneTableView->currentIndex());
+    }
+    case ViewType::MOVIE: {
+      return m_dbModel->fileName(m_movieView->currentIndex());
+    }
+    default: {
+      qWarning("No getCurFileName");
     }
   }
   return "";
