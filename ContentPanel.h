@@ -99,6 +99,7 @@ class ContentPanel : public QStackedWidget {
 
   int getSelectedRowsCount() const;
   QString getCurFilePath() const;
+  QString getCurFileName() const;
   QFileInfo getFileInfo(const QModelIndex& ind) const;
 
  public:
