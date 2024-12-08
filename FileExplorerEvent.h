@@ -66,12 +66,13 @@ class FileExplorerEvent : public QObject {
     const auto& inds = selectedIndexes();
     QStringList filePaths;
     filePaths.reserve(inds.size());
-    for (const QModelIndex ind : inds) {
+    for (const QModelIndex& ind : inds) {
       filePaths << _fileSysModel->filePath(ind);
     }
     return filePaths;
   }
 
+  bool on_searchKeywordInSystemDefaultExplorer() const;
   bool on_calcMD5() const;
 
   bool on_properties() const;
