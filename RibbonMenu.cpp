@@ -366,6 +366,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(thumbnailToolButton);
+  archiveVidsTB->addSeparator();
+  archiveVidsTB->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
