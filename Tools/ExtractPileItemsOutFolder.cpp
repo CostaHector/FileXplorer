@@ -115,6 +115,16 @@ int ScenesMixed::operator()(const QString& path) {
   return operator()(mediaDir.entryList());
 }
 
+void SetElementIndexFirstIfValueFirst(QStringList& lst) {
+  if (lst.size() < 2) {
+    return;
+  }
+  auto minIt = std::min_element(lst.begin(), lst.end(), [](const QString& l, const QString& r) -> bool { return l.size() < r.size() || (l.size() == r.size() && l < r); });
+  if (minIt != lst.begin()) {
+    lst.front().swap(*minIt);
+  }
+}
+
 int ScenesMixed::operator()(const QStringList& files) {
   QString noNumberName;
   QRegularExpressionMatch result;
@@ -147,7 +157,7 @@ int ScenesMixed::operator()(const QStringList& files) {
   }
 
   for (auto& pr : m_img2Name) {
-    std::sort(pr.begin(), pr.end(), [](const QString& lhs, const QString& rhs) -> bool { return lhs.size() < rhs.size(); });
+    SetElementIndexFirstIfValueFirst(pr);
   }
 
   qDebug("%d,%d,%d piles of img/vid/json found from %d item(s) given", m_img2Name.size(), m_vid2Name.size(), m_json2Name.size(), files.size());

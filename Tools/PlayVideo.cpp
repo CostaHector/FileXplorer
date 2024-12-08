@@ -9,54 +9,27 @@
 #include <QUrl>
 
 bool PlayADir(const QString& dirPath) {
-  //    if (not NRF.isAvail("VideoPlayer")){
-  //        return false;
-  //    }
-  //    const QString& exePath = NRF.GetUrl("VideoPlayer");
-  const QString& exePath = "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe";
-  QFileInfo playerFi(exePath);
   QProcess process;
 #ifdef _WIN32
-  process.setProgram(playerFi.absoluteFilePath());
-  process.setArguments({QFileInfo(dirPath).absoluteFilePath()});
-  process.startDetached();  // Start the process in detached mode instead of start
-  return true;
+  process.setProgram("C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe");
 #else
-  qDebug("Not on WIN32 platform");
-  return false;
+  process.setProgram("xdg-open");
 #endif
+  process.setArguments({QDir::toNativeSeparators(dirPath)});
+  process.startDetached();  // Start the process in detached mode instead of start
+  qWarning("Play folder program[%s], args[%s]...", qPrintable(process.program()), qPrintable(process.arguments().join(',')));
+  return true;
 }
 
 bool on_ShiftEnterPlayVideo(const QString& path) {
-  if (not QFile::exists(path)) {
+  if (!QFile::exists(path)) {
+    qWarning("path[%s] not exist skip play", qPrintable(path));
     return false;
   }
   QFileInfo fi(path);
   if (fi.isDir()) {
-    if (PlayADir(path)) {  // try play it now
-      return true;
-    }
-    // try to find a vids
-    QDir dir(fi.absoluteFilePath());
-    dir.setFilter(QDir::Files);
-    dir.setSorting(QDir::SortFlag::Name | QDir::SortFlag::IgnoreCase);
-    dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
-    QList<QString> fiList = dir.entryList();
-    if (fiList.isEmpty()) {
-      return false;
-    }
-    fi = QFileInfo(dir.absoluteFilePath(fiList.back()));
-  } else if (fi.isFile()) {
-    if (fi.isSymLink()) {
-      fi = QFileInfo(fi.symLinkTarget());
-    }
-  } else {
-    qDebug("[Error] Never goes here");
-    return false;
+    return PlayADir(path);
   }
-
-  if (fi.isFile() and (TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + fi.completeSuffix()))) {
-    return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
-  }
-  return false;
+  qWarning("Play file[%s]...", qPrintable(path));
+  return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 }
