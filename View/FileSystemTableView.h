@@ -1,7 +1,7 @@
 #ifndef FILESYSTEMTABLEVIEW_H
 #define FILESYSTEMTABLEVIEW_H
 
-#include "Component/FileSystemMenu.h"
+#include "Component/RightClickMenu.h"
 #include "CustomTableView.h"
 #include "MyQFileSystemModel.h"
 
@@ -34,7 +34,7 @@ class FileSystemTableView : public CustomTableView {
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
  private:
-  QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
+  QMenu* m_fsMenu = new RightClickMenu("Right click menu", this);
 };
 
 #endif  // FILESYSTEMTABLEVIEW_H

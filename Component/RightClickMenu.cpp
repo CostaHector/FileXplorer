@@ -1,11 +1,11 @@
-#include "FileSystemMenu.h"
+#include "RightClickMenu.h"
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
 #include "Actions/RightClickMenuActions.h"
 
-FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(title, parent), NEW_MENU{GetNewMenu()}, VIEW_MENU{GetViewMenu()} {
+RightClickMenu::RightClickMenu(const QString& title, QWidget* parent) : QMenu(title, parent), NEW_MENU{GetNewMenu()}, VIEW_MENU{GetViewMenu()} {
   setToolTipsVisible(true);
 
   addActions(g_viewActions()._VIDEO_PLAYERS->actions());
@@ -34,7 +34,7 @@ FileSystemMenu::FileSystemMenu(const QString& title, QWidget* parent) : QMenu(ti
   addAction(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL);
 }
 
-QMenu* FileSystemMenu::GetNewMenu() {
+QMenu* RightClickMenu::GetNewMenu() {
   auto* _newMenuLevel2 = new QMenu(tr("&New"), this);
   _newMenuLevel2->setIcon(QIcon(":img/NEW_FILE_FOLDER_PATH"));
   _newMenuLevel2->setToolTipsVisible(true);
@@ -42,7 +42,7 @@ QMenu* FileSystemMenu::GetNewMenu() {
   return _newMenuLevel2;
 }
 
-QMenu* FileSystemMenu::GetViewMenu() {
+QMenu* RightClickMenu::GetViewMenu() {
   auto* viewMenuL2 = new QMenu(tr("&View"), this);
   viewMenuL2->setIcon(QIcon(":img/SORTING_FILE_FOLDER"));
   viewMenuL2->setToolTipsVisible(true);
@@ -61,7 +61,7 @@ QMenu* FileSystemMenu::GetViewMenu() {
   return viewMenuL2;
 }
 
-QMenu* FileSystemMenu::GetRenameMenu() {
+QMenu* RightClickMenu::GetRenameMenu() {
   auto* renameMenuLevel2 = new QMenu(tr("&Rename"), this);
   renameMenuLevel2->setIcon(QIcon(":img/RENAME"));
   renameMenuLevel2->addActions(g_renameAg().RENAME_RIBBONS->actions());
@@ -82,7 +82,7 @@ class FileSystemMenuTest : public QListView {
     m_fileSysModel->setReadOnly(true);
     setModel(m_fileSysModel);
 
-    m_menu = new FileSystemMenu("File System menu", this);
+    m_menu = new RightClickMenu("File System menu", this);
     setWindowTitle("Test File System Menu");
 
     const QString path = QFileInfo(__FILE__).absolutePath();

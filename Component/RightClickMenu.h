@@ -3,10 +3,10 @@
 
 #include <QMenu>
 
-class FileSystemMenu : public QMenu {
+class RightClickMenu : public QMenu {
   Q_OBJECT
  public:
-  explicit FileSystemMenu(const QString& title, QWidget* parent = nullptr);
+  explicit RightClickMenu(const QString& title, QWidget* parent = nullptr);
   auto GetNewMenu() -> QMenu*;
   auto GetViewMenu() -> QMenu*;
 
