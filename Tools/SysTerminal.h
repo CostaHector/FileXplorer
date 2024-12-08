@@ -4,13 +4,12 @@
 #include <QString>
 class SysTerminal {
  public:
-  SysTerminal();
-
-  bool WriteIntoBatchFile(const QString& command);
-
+  SysTerminal() = default;
   bool operator()(const QString& path);
-
-  QString m_BAT_FILE_PATH;
+ private:
+#ifdef _WIN32
+  QString UpdateBatFile(const QString& command) const;
+#endif
 };
 
 #endif  // SYSTERMINAL_H
