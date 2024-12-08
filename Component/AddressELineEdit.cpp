@@ -20,23 +20,18 @@ FocusEventWatch::FocusEventWatch(QObject* parent) : mouseButtonPressedBefore(fal
 
 bool FocusEventWatch::eventFilter(QObject* watched, QEvent* event) {
   if (event->type() == QEvent::Type::MouseButtonPress) {
-    qDebug("MouseButtonPress");
     mouseButtonPressedBefore = true;
   } else if (event->type() == QEvent::Type::MouseButtonRelease) {
     ;
   } else if (event->type() == QEvent::Type::FocusOut) {
     if (not mouseButtonPressedBefore) {  // block until next time focus out
-      qDebug("1");
       emit focusChanged(false);
     }
-    qDebug("2");
     mouseButtonPressedBefore = false;
   } else if (event->type() == QEvent::Type::FocusIn) {
     if (not mouseButtonPressedBefore) {  // block until next time focus out
-      qDebug("3");
       emit focusChanged(true);
     }
-    qDebug("4");
     mouseButtonPressedBefore = false;
   }
   return QObject::eventFilter(watched, event);

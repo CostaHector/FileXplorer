@@ -116,7 +116,7 @@
 <file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
 <file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
 <file alias="MERGE_TEXT_FILE">RightClickIcon/mergeTextFile.png</file>
-<file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH.ico</file>
+<file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH_THIS_PATH.svg</file>
 <file alias="COPY_FULL_PATH">RightClickIcon/COPY_FULL_PATH.png</file>
 <file alias="COPY_PATH">RightClickIcon/COPY_PATH.svg</file>
 <file alias="COPY_NAME">RightClickIcon/COPY_NAME.svg</file>

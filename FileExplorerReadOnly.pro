@@ -46,7 +46,7 @@ SOURCES += \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
     Component/DropListToolButton.cpp \
-    Component/FileSystemMenu.cpp \
+    Component/RightClickMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
@@ -207,7 +207,7 @@ HEADERS += \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
     Component/DropListToolButton.h \
-    Component/FileSystemMenu.h \
+    Component/RightClickMenu.h \
     Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
