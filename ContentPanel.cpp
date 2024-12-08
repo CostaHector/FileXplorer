@@ -18,7 +18,7 @@
 
 using namespace ViewTypeTool;
 ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
-    : QStackedWidget(parent), m_fsModel(new MyQFileSystemModel(this)), _previewFolder{previewFolder}, _logger(nullptr), m_parent(parent) {
+  : QStackedWidget(parent), m_fsModel(new MyQFileSystemModel(this)), _previewFolder{previewFolder}, _logger(nullptr), m_parent(parent) {
   layout()->setContentsMargins(0, 0, 0, 0);
   layout()->setSpacing(0);
   subscribe();
@@ -279,20 +279,33 @@ bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
 }
 
 auto ContentPanel::keyPressEvent(QKeyEvent* e) -> void {
-  if (e->modifiers() == Qt::NoModifier and e->key() == Qt::Key_Backspace) {
-    if (_addressBar) {
-      _addressBar->onUpTo();
+  switch (e->modifiers()) {
+    case Qt::KeyboardModifier::NoModifier: {
+      switch (e->key()) {
+        case Qt::Key_Backspace: {
+          if (_addressBar != nullptr) {
+            _addressBar->onUpTo();
+          }
+          return;
+        }
+        case Qt::Key_Enter:
+        case Qt::Key_Return:{ // enter or return
+          on_cellDoubleClicked(GetCurView()->currentIndex());
+          return;
+        }
+        default:
+          break;
+      }
+      break;
     }
-    return;
-  } else if (e->modifiers() == Qt::NoModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
-    on_cellDoubleClicked(GetCurView()->currentIndex());
-    return;
+    default:
+      break;
   }
   QStackedWidget::keyPressEvent(e);
 }
 
 QModelIndex ContentPanel::getRootIndex() const {
-  if (not isFSView()) {
+  if (!isFSView()) {
     return QModelIndex();
   }
   return GetCurView()->rootIndex();
