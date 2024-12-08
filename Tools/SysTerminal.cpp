@@ -6,49 +6,63 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QUrl>
+#include <QProcess>
 
-SysTerminal::SysTerminal() : m_BAT_FILE_PATH{PreferenceSettings().value(MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.name).toString()} {}
-
-bool SysTerminal::WriteIntoBatchFile(const QString& command) {
-  QFile fi(m_BAT_FILE_PATH);
-  if (not fi.open(QIODevice::Text | QIODevice::WriteOnly)) {
-    qWarning("Cannot write into [%s]. May write protected or folder not exists", qPrintable(m_BAT_FILE_PATH));
-    return false;
+#ifdef _WIN32
+QString SysTerminal::UpdateBatFile(const QString& command) const {
+  const QString batFileAbsPath{PreferenceSettings().value(MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.name).toString()};
+  QFile fi{batFileAbsPath};
+  if (!fi.open(QIODevice::Text | QIODevice::WriteOnly)) {
+    qWarning("bat file[%s] open for write failed", qPrintable(batFileAbsPath));
+    return "";
   }
   // for chinese path use GB2312. UTF-8 not work in command line
   QTextStream ts(&fi);
   ts.setCodec("GBK2312");
   ts << command;
   fi.close();
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(m_BAT_FILE_PATH));
+  return batFileAbsPath;
 }
-#include <QProcess>
+#endif
+
 bool SysTerminal::operator()(const QString& path) {
-  QFileInfo fi(path);
-  if (not fi.exists()) {
+  const QFileInfo fi(path);
+  if (!fi.exists()) {
     qDebug("path[%s] not exist", qPrintable(path));
     return false;
   }
-  QString containerPath = fi.isFile() ? fi.absolutePath() : fi.absoluteFilePath();
+  const QString pth = QDir::toNativeSeparators(fi.isFile() ? fi.absolutePath() : fi.absoluteFilePath());
 #ifdef _WIN32
-  const int colonIndex = containerPath.indexOf(':');
-  QString command;
+  static const QString BAT_CONTENT_TEMPLATE{R"(cmd.exe /K "%1 && cd %2")"};
+  const int colonIndex = pth.indexOf(':');
+  QString batContent;
   if (colonIndex != -1) {
-    QString diskPart = path.left(colonIndex + 1);
-    command = QString("cmd.exe /K \"%1 && cd %2\"").arg(diskPart, containerPath);
+    const QString diskPart = path.left(colonIndex + 1);
+    batContent = BAT_CONTENT_TEMPLATE.arg(diskPart, pth);
   } else {
-    command = QString("cmd.exe /K \"%1\"").arg(containerPath);
+    batContent = BAT_CONTENT_TEMPLATE.arg(pth, pth);
   }
-  return WriteIntoBatchFile(command);
+  const QString& batAbsPath = UpdateBatFile(batContent);
+  if (batAbsPath.isEmpty()) {
+    return false;
+  }
+  QProcess process;
+  process.setProgram("explorer.exe");
+  process.setArguments({QDir::toNativeSeparators(batAbsPath)});
+  return process.startDetached();
 #else
   QProcess process;
+  QStringList args;
   process.setProgram("gnome-terminal");
-  process.setArguments({"--working-directory=" + containerPath});
-  process.startDetached();  // Start the process in detached mode instead of start
-  return true;
+  args << QString("--working-directory=%1").arg(pth);
+  process.setArguments(args);
+  return process.startDetached();  // Start the process in detached mode instead of start
 #endif
 }
 
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+#include <QApplication>
 #include <QLineEdit>
 class AwakeSystemTerminal : public QLineEdit {
  public:
@@ -56,15 +70,9 @@ class AwakeSystemTerminal : public QLineEdit {
     setWindowTitle("Awake System Terminal");
     connect(this, &QLineEdit::returnPressed, this, &AwakeSystemTerminal::Awake);
   }
-
   auto Awake() -> bool { return SysTerminal()(text()); }
   QSize sizeHint() const override { return QSize(1024, 768); }
 };
-
-// #define __NAME__EQ__MAIN__ 1
-
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
