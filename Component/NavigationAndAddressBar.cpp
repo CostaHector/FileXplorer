@@ -1,13 +1,25 @@
 #include "NavigationAndAddressBar.h"
 #include "Actions/AddressBarActions.h"
-
+#include "Actions/RightClickMenuActions.h"
 #include <QHBoxLayout>
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)
-    : QToolBar(title, parent) {
+  : QToolBar{title, parent} {
   m_addressLine = new (std::nothrow) AddressELineEdit{this};
+  if (m_addressLine == nullptr) {
+    qCritical("m_addressLine is nullptr");
+    return;
+  }
   m_searchLE = new (std::nothrow) QLineEdit{this};
+  if (m_searchLE == nullptr) {
+    qCritical("m_searchLE is nullptr");
+    return;
+  }
   m_fsFilter = new (std::nothrow) FileSystemTypeFilter;
+  if (m_fsFilter == nullptr) {
+    qCritical("m_fsFilter is nullptr");
+    return;
+  }
 
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_addressLine->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
@@ -23,6 +35,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
   addWidget(m_addressLine);
+  addAction(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL);
   addSeparator();
   addActions(g_addressBarActions()._FOLDER_ITER_CONTROLS->actions());
   addSeparator();
@@ -142,7 +155,7 @@ bool NavigationAndAddressBar::onSearchTextReturnPressed() {
 #include <QApplication>
 
 class IntoNewPathMockClass {
- public:
+public:
   bool IntoNewPath(QString a, bool b, bool c) {
     qDebug("IntoNewPath: %s, %d, %d", qPrintable(a), b, c);
     return true;
