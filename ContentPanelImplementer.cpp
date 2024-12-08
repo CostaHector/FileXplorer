@@ -559,6 +559,7 @@ QString ContentPanel::getCurFilePath() const {
       qWarning("No getCurFilePath");
     }
   }
+  qWarning("nothing selected in viewType[%d]", (int)vt);
   return "";
 }
 
