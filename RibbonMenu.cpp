@@ -9,6 +9,7 @@
 #include "Actions/FolderPreviewActions.h"
 #include "Actions/FramelessWindowActions.h"
 #include "Actions/JsonEditorActions.h"
+#include "Actions/PreferenceActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "Actions/SceneInPageActions.h"
@@ -59,6 +60,8 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 }
 
 QToolBar* RibbonMenu::LeafFile() const {
+  QToolButton* styleToolButton =
+      DropListToolButton(g_PreferenceActions().STYLE, g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
   QToolButton* logToolButton =
       DropListToolButton(g_LogActions()._LOG_FILE, g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, "", Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
 
@@ -67,8 +70,9 @@ QToolBar* RibbonMenu::LeafFile() const {
     qCritical("leafFileWid is nullptr");
     return nullptr;
   }
-
   leafFileWid->addActions(g_fileLeafActions()._LEAF_FILE->actions());
+  leafFileWid->addSeparator();
+  leafFileWid->addWidget(styleToolButton);
   leafFileWid->addSeparator();
   leafFileWid->addWidget(logToolButton);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
