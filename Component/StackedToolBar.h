@@ -16,14 +16,7 @@ class NavigationViewSwitcher;
 class StackedToolBar : public QToolBar {
  public:
   friend class NavigationViewSwitcher;
-  explicit StackedToolBar(const QString& title = "Stacked Toolbar", QWidget* parent = nullptr)
-      : QToolBar{title, parent}, m_stackedToolBar{new QStackedWidget(this)} {
-    addWidget(m_stackedToolBar);
-
-    setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-    layout()->setSpacing(0);
-    layout()->setContentsMargins(0, 0, 0, 0);
-  }
+  explicit StackedToolBar(const QString& title = "Stacked Toolbar", QWidget* parent = nullptr);
   int AddToolBar(ViewTypeTool::ViewType vt, QToolBar* tb);
 
   NavigationAndAddressBar* m_addressBar{nullptr};

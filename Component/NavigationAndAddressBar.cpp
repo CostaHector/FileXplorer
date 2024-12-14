@@ -22,15 +22,11 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   }
 
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  m_addressLine->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
   m_searchLE->setPlaceholderText("Wild card supported. e.g., *Abc*");
   m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
   m_searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-  m_searchLE->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-
-  m_fsFilter->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
@@ -43,7 +39,6 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   addSeparator();
   addWidget(m_searchLE);
 
-  setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
   InitEventWhenViewChanged();
