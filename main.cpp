@@ -36,7 +36,6 @@ int main(int argc, char* argv[]) {
   fileExplorer.show();
 
   mo.subscribe();
-
   a.exec();
 
   delete extraViewVisibility;
