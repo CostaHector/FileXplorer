@@ -4,7 +4,7 @@
 
 SearchProxyModel::SearchProxyModel(QObject* parent)
   : QSortFilterProxyModel{parent},
-    m_searchMode{PreferenceSettings().value(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.name, MemoryKey::SEARCH_MODE_DEFAULT_VALUE.v).toString()},
+    m_searchMode{"Normal"},
     m_isCustomSearch{m_searchMode == "Search for File Content"},
     m_fileContentsCaseSensitive{
       PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool()},
@@ -24,7 +24,6 @@ auto SearchProxyModel::initSearchMode(const QString& searchMode) -> void {
 }
 
 auto SearchProxyModel::setSearchMode(const QString& searchMode) -> void {
-  PreferenceSettings().setValue(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.name, searchMode);
   initSearchMode(searchMode);
   startFilterWhenTextChanged(m_searchSourceString);
 }

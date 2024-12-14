@@ -217,14 +217,14 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, con
   }
   // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
   const QModelIndex firstIndex = GetCurView()->currentIndex();
-  if (not firstIndex.isValid()) {
+  if (!firstIndex.isValid()) {
     return false;
   }
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
   if (selectCnt == 1 && firstFileInfo.isFile()) {
-    _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(firstFileInfo.size()));
+    if (_logger) _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(firstFileInfo.size()));
   } else {
-    _logger->msg("size: unknown");
+    if (_logger) _logger->msg("size: unknown");
   }
 
   QString pth = m_fsModel->rootPath();
