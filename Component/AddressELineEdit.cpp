@@ -62,14 +62,12 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
   clickMode();
   subscribe();
 
-  pathComboBox->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_pathActionsTB->setStyleSheet(
       "QToolBar{"
-      "border-left: 1px solid black;"
+      "border-left: 1px solid gray;"
       "border-right: 1px solid gray;"
       "border-top: 1px solid gray;"
       "border-bottom: 1px solid gray;"

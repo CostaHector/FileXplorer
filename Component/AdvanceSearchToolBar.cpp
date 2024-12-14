@@ -4,12 +4,11 @@
 #include <QDebug>
 
 AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent) : QToolBar(title, parent) {
-  m_nameFilterCB = new QComboBox{this};
-
-  m_nameFilter = new QLineEdit{"", m_nameFilterCB};
+  m_nameFilter = new QLineEdit{""};
   m_nameFilter->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_nameFilter->setClearButtonEnabled(true);
 
+  m_nameFilterCB = new QComboBox{this};
   m_nameFilterCB->setLineEdit(m_nameFilter);
 
   addWidget(m_nameFilterCB);
@@ -18,19 +17,13 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   addWidget(m_searchCaseButton);
 
   m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  m_nameFilterCB->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-  m_typeButton->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-  m_searchModeComboBox->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-  m_searchCaseButton->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-  setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-
-  layout()->setSpacing(0);
-  layout()->setContentsMargins(0, 0, 0, 0);
-
   m_nameFilterCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
   m_nameFilterCB->addItem("*.html|nonporn");
   m_nameFilterCB->addItem("*.torrent");
   m_nameFilter->setPlaceholderText("Normal[abc], Wildcard[do?x], Regex[\\d{4}], Search for File Content[*.html,*.txt|contents]");
+
+  layout()->setSpacing(0);
+  layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel) {

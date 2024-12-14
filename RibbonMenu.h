@@ -18,7 +18,7 @@ class RibbonMenu : public QTabWidget {
 
   void Subscribe();
 
-  void on_officeStyleWidgetVisibilityChanged(const bool vis);;
+  void on_officeStyleWidgetVisibilityChanged(const bool vis);
   void on_currentTabChangedRecordIndex(const int tabIndex);
 
  private:
