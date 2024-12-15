@@ -116,7 +116,7 @@
 <file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
 <file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
 <file alias="MERGE_TEXT_FILE">RightClickIcon/mergeTextFile.png</file>
-<file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH.ico</file>
+<file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH_THIS_PATH.svg</file>
 <file alias="COPY_FULL_PATH">RightClickIcon/COPY_FULL_PATH.png</file>
 <file alias="COPY_PATH">RightClickIcon/COPY_PATH.svg</file>
 <file alias="COPY_NAME">RightClickIcon/COPY_NAME.svg</file>
@@ -212,15 +212,21 @@
 <file alias="TABLE_VIEW">PreferenceIcons/TABLE_VIEW.png</file>
 <file alias="LEFT_TO_RIGHT">PreferenceIcons/LEFT_TO_RIGHT.png</file>
 <file alias="TOP_TO_BOTTOM">PreferenceIcons/TOP_TO_BOTTOM.png</file>
-<file alias="PLAIN_THEME">PreferenceIcons/PLAIN_THEME.svg</file>
-<file alias="DARK_THEME_MOON_FOG">PreferenceIcons/DARK_THEME_MOON_FOG.svg</file>
-<file alias="LIGHT_THEME_SUN">PreferenceIcons/LIGHT_THEME_SUN.svg</file>
 <file alias="SERVICE_REGISTERED">PreferenceIcons/SERVICE_REGISTERED.svg</file>
 <file alias="SERVICE_UNREGISTERED">PreferenceIcons/SERVICE_UNREGISTERED.svg</file>
 <file alias="SERVICE_SUSPENDED">PreferenceIcons/SERVICE_SUSPENDED.svg</file>
 <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
 <file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.png</file>
 <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
+
+<!--Style icon here-->
+<file alias="STYLESHEET_DEFAULT">styles/STYLESHEET_DEFAULT.svg</file>
+<file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
+<file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
+<file alias="STYLE_APP">styles/STYLE_APP.svg</file>
+<file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
+<file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
+<file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
 
 <!--View icon here-->
 <file alias="UNDO">View/UNDO.svg</file>
@@ -295,4 +301,5 @@
 <file alias="CLEAN_STATUS">RecycleBin/CLEAN_STATUS.ico</file>
 <file alias="SQLITE_APP">RecycleBin/SQLITE_APP.svg</file>
 </qresource>
+
 </RCC>
