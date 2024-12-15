@@ -54,7 +54,6 @@
 <file alias="MOVE_PATH_UP">TopSideToolBarIcons/MOVE_PATH_UP.webp</file>
 <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
 <file alias="ADD_TO_MUSIC_PLAYLIST">TopSideToolBarIcons/ADD_TO_MUSIC_PLAYLIST.png</file>
-<file alias="SETTINGS">TopSideToolBarIcons/SETTINGS.svg</file>
 <file alias="MOVE_TO_TRASH_BIN">TopSideToolBarIcons/MOVE_TO_TRASH_BIN.svg</file>
 <file alias="DELETE_ITEMS_PERMANENTLY">TopSideToolBarIcons/DELETE_ITEMS_PERMANENTLY.svg</file>
 <file alias="ABOUT">TopSideToolBarIcons/ABOUT.svg</file>
@@ -220,13 +219,13 @@
 <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
 
 <!--Style icon here-->
+<file alias="STYLE_SETTING">styles/STYLE_SETTING.svg</file>
+<file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
+<file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
+<file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
 <file alias="STYLESHEET_DEFAULT">styles/STYLESHEET_DEFAULT.svg</file>
 <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
 <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
-<file alias="STYLE_APP">styles/STYLE_APP.svg</file>
-<file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
-<file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
-<file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
 
 <!--View icon here-->
 <file alias="UNDO">View/UNDO.svg</file>
