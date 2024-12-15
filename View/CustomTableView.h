@@ -44,11 +44,12 @@ class CustomTableView : public QTableView {
   void onSetColumnDefaultSectionSize();
 
   void onShowVerticalHeader(bool showChecked);
-  void onSortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
   void onEnableColumnSort(const bool enableChecked);
 
-  void InitTableView();
+  void onHorizontalHeaderChanged() const;
+  void onVerticalHeaderChanged() const;
 
+  void InitTableView();
   void SubscribeHeaderActions();
 
  private:
@@ -88,8 +89,6 @@ class CustomTableView : public QTableView {
 
   inline bool isNameExists(const QString& name) const { return TABLES_SET.contains(name); }
   static QSet<QString> TABLES_SET;
-
-  bool isIndicatorHoldByRestoredStateTrustable = false;
 };
 
 #endif  // CUSTOMTABLEVIEW_H
