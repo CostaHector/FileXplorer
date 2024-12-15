@@ -19,9 +19,6 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   addWidget(m_tables);
   addWidget(m_searchCB);
 
-  m_tables->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-  m_searchCB->setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
-  setFixedHeight(CONTROL_TOOLBAR_HEIGHT);
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
 }

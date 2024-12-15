@@ -15,21 +15,21 @@
 #include "Tools/ViewTypeTool.h"
 
 FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
-    : QMainWindow(parent),
-      previewHtmlDock(new QDockWidget("Preview", this)),
+  : QMainWindow(parent),
+    previewHtmlDock(new QDockWidget("Preview", this)),
 
-      m_previewFolder{new PreviewFolder{previewHtmlDock}},
-      m_previewSwitcher{new FolderPreviewSwitcher{m_previewFolder, previewHtmlDock}},
+    m_previewFolder{new PreviewFolder{previewHtmlDock}},
+    m_previewSwitcher{new FolderPreviewSwitcher{m_previewFolder, previewHtmlDock}},
 
-      m_fsPanel{nullptr},
-      m_stackedBar{new StackedToolBar},
-      m_naviSwitcher{nullptr},
+    m_fsPanel{nullptr},
+    m_stackedBar{new StackedToolBar},
+    m_naviSwitcher{nullptr},
 
-      m_viewsSwitcher{new QToolBar("views switch", this)},
-      m_navigationToolBar(new NavigationToolBar),
-      m_ribbonMenu(new RibbonMenu{this}),
+    m_viewsSwitcher{new QToolBar("views switch", this)},
+    m_navigationToolBar(new NavigationToolBar),
+    m_ribbonMenu(new RibbonMenu{this}),
 
-      m_statusBar(new CustomStatusBar{m_viewsSwitcher, this}) {
+    m_statusBar(new CustomStatusBar{m_viewsSwitcher, this}) {
   m_viewsSwitcher->addActions(g_viewActions()._VIEWS_AG->actions());
 
   m_fsPanel = new ContentPanel(m_previewFolder, this);
@@ -131,17 +131,23 @@ void FileExplorerReadOnly::subscribe() {
 }
 
 void FileExplorerReadOnly::keyPressEvent(QKeyEvent* ev) {
-  if (ev->key() == Qt::Key_F3) {  // F3 Search
-    if (m_fsPanel->isFSView()) {
-      if (m_fsPanel->_addressBar != nullptr)
+  const auto ky = ev->key();
+  if (ky == Qt::Key_F3 || (ev->modifiers() == Qt::KeyboardModifier::ControlModifier && ky == Qt::Key_F)) {
+    // F3/Ctrl+F Search
+    const auto vt = m_fsPanel->GetCurViewType();
+    if (ViewTypeTool::isFSView(vt)) {
+      if (m_fsPanel->_addressBar != nullptr) {
         m_fsPanel->_addressBar->onGetFocus();
-    } else if (m_fsPanel->GetCurViewName() == "search") {
+      }
+      return;
+    } else if (vt == ViewTypeTool::ViewType::SEARCH) {
       if (m_fsPanel->_advanceSearchBar != nullptr) {
         m_fsPanel->_advanceSearchBar->onGetFocus();
       }
+      return;
     }
     return;
-  } else if (ev->key() == Qt::Key_Escape) {
+  } else if (ky == Qt::Key_Escape) {
     m_fsPanel->GetCurView()->setFocus();
     return;
   }
