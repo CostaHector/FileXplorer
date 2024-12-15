@@ -16,7 +16,6 @@ public:
   bool PostActions();
 
   // style: "windows", "windowsvista", "fusion", or "macos"
-  QAction *STYLE{nullptr};
   QAction *STYLE_WINDOWS_VISTA{nullptr}, *STYLE_WINDOWS{nullptr}, *STYLE_FUSION{nullptr}, *STYLE_MACOS{nullptr};
   QActionGroup* STYLE_AG{nullptr};
 
