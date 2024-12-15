@@ -6,8 +6,6 @@
 #include "PublicVariable.h"
 
 PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {
-  STYLE = new QAction{QIcon(":img/STYLE_APP"), "Style"};
-
   STYLE_WINDOWS_VISTA = new QAction{QIcon(":img/STYLE_WINDOWS_VISTA"), "windowsvista"};
   STYLE_WINDOWS_VISTA->setCheckable(true);
   STYLE_WINDOWS_VISTA->setChecked(true);
