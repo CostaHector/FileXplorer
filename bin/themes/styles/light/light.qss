@@ -1812,69 +1812,36 @@ QTreeView:branch:open:has-children:!has-siblings:hover, QTreeView:branch:open:ha
   image: url(":/qss_icons/light/rc/branch_open_focus.png");
 }
 
-QTreeView::indicator:checked,
-QListView::indicator:checked,
-QTableView::indicator:checked,
 QColumnView::indicator:checked {
   image: url(":/qss_icons/light/rc/checkbox_checked.png");
 }
 
-QTreeView::indicator:checked:hover, QTreeView::indicator:checked:focus, QTreeView::indicator:checked:pressed,
-QListView::indicator:checked:hover,
-QListView::indicator:checked:focus,
-QListView::indicator:checked:pressed,
-QTableView::indicator:checked:hover,
-QTableView::indicator:checked:focus,
-QTableView::indicator:checked:pressed,
 QColumnView::indicator:checked:hover,
 QColumnView::indicator:checked:focus,
 QColumnView::indicator:checked:pressed {
   image: url(":/qss_icons/light/rc/checkbox_checked_focus.png");
 }
 
-QTreeView::indicator:unchecked,
-QListView::indicator:unchecked,
-QTableView::indicator:unchecked,
 QColumnView::indicator:unchecked {
   image: url(":/qss_icons/light/rc/checkbox_unchecked.png");
 }
 
-QTreeView::indicator:unchecked:hover, QTreeView::indicator:unchecked:focus, QTreeView::indicator:unchecked:pressed,
-QListView::indicator:unchecked:hover,
-QListView::indicator:unchecked:focus,
-QListView::indicator:unchecked:pressed,
-QTableView::indicator:unchecked:hover,
-QTableView::indicator:unchecked:focus,
-QTableView::indicator:unchecked:pressed,
 QColumnView::indicator:unchecked:hover,
 QColumnView::indicator:unchecked:focus,
 QColumnView::indicator:unchecked:pressed {
   image: url(":/qss_icons/light/rc/checkbox_unchecked_focus.png");
 }
 
-QTreeView::indicator:indeterminate,
-QListView::indicator:indeterminate,
-QTableView::indicator:indeterminate,
 QColumnView::indicator:indeterminate {
   image: url(":/qss_icons/light/rc/checkbox_indeterminate.png");
 }
 
-QTreeView::indicator:indeterminate:hover, QTreeView::indicator:indeterminate:focus, QTreeView::indicator:indeterminate:pressed,
-QListView::indicator:indeterminate:hover,
-QListView::indicator:indeterminate:focus,
-QListView::indicator:indeterminate:pressed,
-QTableView::indicator:indeterminate:hover,
-QTableView::indicator:indeterminate:focus,
-QTableView::indicator:indeterminate:pressed,
 QColumnView::indicator:indeterminate:hover,
 QColumnView::indicator:indeterminate:focus,
 QColumnView::indicator:indeterminate:pressed {
   image: url(":/qss_icons/light/rc/checkbox_indeterminate_focus.png");
 }
 
-QTreeView,
-QListView,
-QTableView,
 QColumnView {
   background-color: #FAFAFA;
   border: 1px solid #C0C4C8;
@@ -1883,54 +1850,33 @@ QColumnView {
   border-radius: 4px;
 }
 
-QTreeView:disabled,
-QListView:disabled,
-QTableView:disabled,
 QColumnView:disabled {
   background-color: #FAFAFA;
   color: #9DA9B5;
 }
 
-QTreeView:selected,
-QListView:selected,
-QTableView:selected,
 QColumnView:selected {
   background-color: #9FCBFF;
   color: #C0C4C8;
 }
 
-QTreeView:focus,
-QListView:focus,
-QTableView:focus,
 QColumnView:focus {
   border: 1px solid #73C7FF;
 }
 
-QTreeView::item:pressed,
-QListView::item:pressed,
-QTableView::item:pressed,
 QColumnView::item:pressed {
   background-color: #9FCBFF;
 }
 
-QTreeView::item:selected:active,
-QListView::item:selected:active,
-QTableView::item:selected:active,
 QColumnView::item:selected:active {
   background-color: #9FCBFF;
 }
 
-QTreeView::item:selected:!active,
-QListView::item:selected:!active,
-QTableView::item:selected:!active,
 QColumnView::item:selected:!active {
   color: #19232D;
   background-color: #D2D5D8;
 }
 
-QTreeView::item:!selected:hover,
-QListView::item:!selected:hover,
-QTableView::item:!selected:hover,
 QColumnView::item:!selected:hover {
   outline: 0;
   color: #19232D;
