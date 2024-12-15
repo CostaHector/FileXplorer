@@ -27,7 +27,7 @@ RightClickMenuActions::RightClickMenuActions(QObject* parent)
   _PROPERTIES->setToolTip(
         QString("<b>%1 (%2)</b><br/>Show the properties for the selected item(s)").arg(_PROPERTIES->text(), _PROPERTIES->shortcut().toString()));
 
-  _FORCE_REFRESH_FILESYSTEMMODEL = new (std::nothrow) QAction{"Refresh"};
+  _FORCE_REFRESH_FILESYSTEMMODEL = new (std::nothrow) QAction{QIcon(":img/REFRESH_THIS_PATH"), "Refresh"};
   if (_FORCE_REFRESH_FILESYSTEMMODEL == nullptr) {
     qCritical("_FORCE_REFRESH_FILESYSTEMMODEL is nullptr");
     return;

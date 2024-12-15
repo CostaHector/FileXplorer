@@ -26,7 +26,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) : QListView
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
 
-  setStyleSheet(ViewStyleSheet::TABLEVIEW_STYLESHEET);
+  setStyleSheet(ViewStyleSheet::GetDefaultListViewStyleSheet());
 }
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
@@ -47,5 +47,4 @@ void CustomListView::BindMenu(QMenu* menu) {
 
 void CustomListView::InitListView() {
   sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
-  isIndicatorHoldByRestoredStateTrustable = true;
 }

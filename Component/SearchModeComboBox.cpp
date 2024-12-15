@@ -1,9 +1,9 @@
 #include "SearchModeComboBox.h"
-
+#include <QLayout>
 #include "PublicVariable.h"
-SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox(parent) {
-  addItems(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.GetCandidatePool().values());
-  setCurrentText(PreferenceSettings().value(MemoryKey::SEARCH_MODE_DEFAULT_VALUE.name, MemoryKey::SEARCH_MODE_DEFAULT_VALUE.v).toString());
+SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox{parent} {
+  addItems({"Normal", "Wildcard", "Regex", "Search for File Content"});
+  setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
 }
 
 void SearchModeComboBox::BindSearchModel(SearchProxyModel* searchProxyModel) {
