@@ -27,9 +27,7 @@ QMap<QString, QStringList> Categorizer::ClassifyItemIntoPiles(const QStringList&
         break;
       }
       case VID: {
-        if ((result = VID_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
-          noNumberName = result.captured(1);
-        }
+        noNumberName = baseName;
         baseName2ItemsPile[noNumberName].append(medName);
         break;
       }

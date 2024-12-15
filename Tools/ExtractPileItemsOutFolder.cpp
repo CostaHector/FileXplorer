@@ -43,9 +43,7 @@ bool ExtractPileItemsOutFolder::CanExtractOut(const QStringList& items) {
         break;
       }
       case VID: {
-        if ((result = VID_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
-          noNumberName = result.captured(1);
-        }
+        noNumberName = baseName;
         break;
       }
       case JSON:
@@ -142,9 +140,7 @@ int ScenesMixed::operator()(const QStringList& files) {
         break;
       }
       case VID: {
-        if ((result = VID_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
-          noNumberName = result.captured(1);
-        }
+        noNumberName = baseName;
         m_vid2Name[noNumberName].append(medName);
         break;
       }
