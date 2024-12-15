@@ -23,6 +23,7 @@ SOURCES += \
     Actions/JsonEditorActions.cpp \
     Actions/LogActions.cpp \
     Actions/PerformersManagerActions.cpp \
+    Actions/PreferenceActions.cpp \
     Actions/PropertiesWindowActions.cpp \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
@@ -46,7 +47,7 @@ SOURCES += \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
     Component/DropListToolButton.cpp \
-    Component/FileSystemMenu.cpp \
+    Component/RightClickMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
     Component/JsonPerformersListInputer.cpp \
@@ -184,6 +185,7 @@ HEADERS += \
     Actions/JsonEditorActions.h \
     Actions/LogActions.h \
     Actions/PerformersManagerActions.h \
+    Actions/PreferenceActions.h \
     Actions/PropertiesWindowActions.h \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
@@ -207,7 +209,7 @@ HEADERS += \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
     Component/DropListToolButton.h \
-    Component/FileSystemMenu.h \
+    Component/RightClickMenu.h \
     Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \
     Component/JsonPerformersListInputer.h \
@@ -347,7 +349,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    bin/themes/res.qrc
+    bin/themes/res.qrc \
+    bin/themes/styles/dark/darkstyle.qrc\
+    bin/themes/styles/light/lightstyle.qrc\
 
 DISTFILES += \
     Experiment.py \

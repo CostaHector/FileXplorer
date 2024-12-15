@@ -1,7 +1,7 @@
 #ifndef FILESYSTEMTREEVIEW_H
 #define FILESYSTEMTREEVIEW_H
 
-#include "Component/FileSystemMenu.h"
+#include "Component/RightClickMenu.h"
 #include "MyQFileSystemModel.h"
 
 #include <QContextMenuEvent>
@@ -40,7 +40,7 @@ class FileSystemTreeView : public QTreeView {
   }
 
  private:
-  QMenu* m_fsMenu = new FileSystemMenu("Right click menu", this);
+  QMenu* m_fsMenu = new RightClickMenu("Right click menu", this);
 };
 
 #endif  // FILESYSTEMTREEVIEW_H
