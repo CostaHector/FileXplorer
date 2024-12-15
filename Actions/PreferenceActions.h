@@ -13,6 +13,7 @@ public:
   void subscribe();
   bool onSetAppStyle(QAction* pAct);
   bool onSetStylesheet(QAction* pAct);
+  bool PostActions();
 
   // style: "windows", "windowsvista", "fusion", or "macos"
   QAction *STYLE{nullptr};
