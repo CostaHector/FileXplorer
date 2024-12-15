@@ -176,11 +176,6 @@ const KV SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true, ValueChecker{Value
 const KV EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 
-const KV HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX("HEADVIEW_SORT_INDICATOR_LOGICAL_INDEX", MainKey::Name, ValueChecker{0});
-
-const KV HEADVIEW_SORT_INDICATOR_ORDER("HEADVIEW_SORT_INDICATOR_ORDER",
-                                       HEADERVIEW_SORT_INDICATOR_ORDER::AscendingOrder.name,
-                                       ValueChecker{HEADERVIEW_SORT_INDICATOR_ORDER::HEADERVIEW_SORT_INDICATOR_ORDER_STR, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
 const KV ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, ValueChecker{8, 25 + 1});
 const KV DEFAULT_VIDEO_PLAYER("DEFAULT_VIDEO_PLAYER", "Play", ValueChecker{{"Play in embedded player", "Play"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});
 const KV DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", "New folder", ValueChecker{{"New folder", "New text", "New json", "New folder html"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING});

@@ -22,7 +22,7 @@ FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* pa
 
   FileSystemTreeView::subscribe();
 
-  setStyleSheet(ViewStyleSheet::TREEVIEW_STYLESHEET);
+  setStyleSheet(ViewStyleSheet::GetDefaultTreeViewStyleSheet());
 }
 
 void FileSystemTreeView::subscribe() {

@@ -22,8 +22,6 @@ class CustomListView : public QListView {
 
   inline bool isNameExists(const QString& name) const { return LISTS_SET.contains(name); }
   static QSet<QString> LISTS_SET;
-
-  bool isIndicatorHoldByRestoredStateTrustable = false;
 };
 
 #endif  // CUSTOMLISTVIEW_H
