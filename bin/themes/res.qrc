@@ -220,13 +220,13 @@
 <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
 
 <!--Style icon here-->
-<file alias="STYLESHEET_DEFAULT">style/STYLESHEET_DEFAULT.svg</file>
-<file alias="STYLESHEET_DARK_THEME_MOON_FOG">style/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
-<file alias="STYLESHEET_LIGHT_THEME_SUN">style/STYLESHEET_LIGHT_THEME_SUN.svg</file>
-<file alias="STYLE_APP">style/STYLE_APP.svg</file>
-<file alias="STYLE_FUSION">style/STYLE_FUSION.svg</file>
-<file alias="STYLE_WINDOWS_VISTA">style/STYLE_WINDOWS_VISTA.svg</file>
-<file alias="STYLE_WINDOWS_TRADITIONAL">style/STYLE_WINDOWS_TRADITIONAL.svg</file>
+<file alias="STYLESHEET_DEFAULT">styles/STYLESHEET_DEFAULT.svg</file>
+<file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
+<file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
+<file alias="STYLE_APP">styles/STYLE_APP.svg</file>
+<file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
+<file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
+<file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
 
 <!--View icon here-->
 <file alias="UNDO">View/UNDO.svg</file>

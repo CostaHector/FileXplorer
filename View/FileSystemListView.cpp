@@ -23,8 +23,6 @@ FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* pa
   setDropIndicatorShown(true);
 
   subscribe();
-
-  setStyleSheet(ViewStyleSheet::LISTVIEW_STYLESHEET);
 }
 
 void FileSystemListView::subscribe() {

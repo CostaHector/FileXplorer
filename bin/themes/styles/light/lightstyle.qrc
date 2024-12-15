@@ -210,7 +210,7 @@
     <file>rc/window_undock_pressed.png</file>
     <file>rc/window_undock_pressed@2x.png</file>
   </qresource>
-  <qresource prefix="qdarkstyle/light">
-      <file>lightstyle.qss</file>
+  <qresource prefix="stylesheet">
+      <file>light.qss</file>
   </qresource>
 </RCC>
