@@ -15,9 +15,8 @@
 #include <QLayout>
 
 class AdvanceSearchToolBar : public QToolBar {
-  Q_OBJECT
  public:
-  explicit AdvanceSearchToolBar(const QString& title = tr("Advance Search Toolbar"), QWidget* parent = nullptr);
+  explicit AdvanceSearchToolBar(const QString& title = "Advance Search Toolbar", QWidget* parent = nullptr);
 
   void BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel);
 
