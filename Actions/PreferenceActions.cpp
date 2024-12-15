@@ -10,17 +10,19 @@ PreferenceActions::PreferenceActions(QObject *parent): QObject{parent} {
   STYLE_WINDOWS_VISTA=new QAction{QIcon(":img/STYLE_WINDOWS_VISTA"), "windowsvista"};
   STYLE_WINDOWS_VISTA->setCheckable(true);
   STYLE_WINDOWS_VISTA->setChecked(true);
-  STYLE_WINDOWS_VISTA->setToolTip("Windows Vista Style");
+  STYLE_WINDOWS_VISTA->setToolTip("Change style to Windows Vista");
 
   STYLE_WINDOWS = new QAction{QIcon(":img/STYLE_WINDOWS_TRADITIONAL"), "windows"};
   STYLE_WINDOWS->setCheckable(true);
-  STYLE_WINDOWS->setToolTip("Windows Traditional Style");
+  STYLE_WINDOWS->setToolTip("Change style to Windows Traditional (win98)");
 
   STYLE_FUSION=new QAction{QIcon(":img/STYLE_FUSION"), "fusion"};
   STYLE_FUSION->setCheckable(true);
+  STYLE_FUSION->setToolTip("Change style to Fusion");
 
   STYLE_MACOS=new QAction{"macos"};
   STYLE_MACOS->setCheckable(true);
+  STYLE_MACOS->setToolTip("Change style to Macos (not supported in windows)");
 
   STYLE_AG = new QActionGroup(this);
   STYLE_AG->addAction(STYLE_WINDOWS_VISTA);
@@ -32,10 +34,16 @@ PreferenceActions::PreferenceActions(QObject *parent): QObject{parent} {
   STYLESHEET_DEFAULT=new QAction{QIcon(":img/STYLESHEET_DEFAULT"), "default"};
   STYLESHEET_DEFAULT->setCheckable(true);
   STYLESHEET_DEFAULT->setChecked(true);
+  STYLESHEET_DEFAULT->setToolTip("Change stylesheet to default");
+
   STYLESHEET_LIGHT_THEME_SUN=new QAction{QIcon(":img/STYLESHEET_LIGHT_THEME_SUN"), "light"};
   STYLESHEET_LIGHT_THEME_SUN->setCheckable(true);
+  STYLESHEET_LIGHT_THEME_SUN->setToolTip("Change stylesheet to light");
+
   STYLESHEET_DARK_THEME_MOON_FOG=new QAction{QIcon(":img/STYLESHEET_DARK_THEME_MOON_FOG"), "dark"};
   STYLESHEET_DARK_THEME_MOON_FOG->setCheckable(true);
+  STYLESHEET_DARK_THEME_MOON_FOG->setToolTip("Change stylesheet to dark");
+
   STYLESHEET = new QActionGroup(this);
   STYLESHEET->addAction(STYLESHEET_DEFAULT);
   STYLESHEET->addAction(STYLESHEET_LIGHT_THEME_SUN);
@@ -73,11 +81,11 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   const QString& stylesheet = pAct->text();
   QFile qssFile;
   if (stylesheet == "light") {
-    qssFile.setFileName(":qdarkstyle/light/lightstyle.qss");
+    qssFile.setFileName(":stylesheet/light.qss");
   } else if (stylesheet == "dark") {
-    qssFile.setFileName(":qdarkstyle/dark/darkstyle.qss");
+    qssFile.setFileName(":stylesheet/dark.qss");
   } else { // "default" or any stylesheet except light/dark
-    qWarning("qApp->setStyleSheet: default, stylesheet name[%s]", qPrintable(stylesheet));
+    qDebug("qApp->setStyleSheet: default[%s]", qPrintable(stylesheet));
     qApp->setStyleSheet("");
     return false;
   }
