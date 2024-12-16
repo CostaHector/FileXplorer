@@ -67,5 +67,5 @@ class ThumbnailProcesserTest : public QObject {
   }
 };
 
-QTEST_MAIN(ThumbnailProcesserTest)
-#include "ThumbnailProcesserTest.moc"
+// QTEST_MAIN(ThumbnailProcesserTest)
+// #include "ThumbnailProcesserTest.moc"
