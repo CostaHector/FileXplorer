@@ -295,8 +295,8 @@ void AdvanceRenamer::init() {
   extraSubscribe();
 
   const bool isNameIncludingExtension = EXT_INSIDE_FILENAME->checkState() == Qt::Checked;
-  m_oExtTE->setVisible(not isNameIncludingExtension);
-  m_nExtTE->setVisible(not isNameIncludingExtension);
+  m_oExtTE->setVisible(!isNameIncludingExtension);
+  m_nExtTE->setVisible(!isNameIncludingExtension);
 }
 
 void AdvanceRenamer::Subscribe() {
