@@ -116,6 +116,8 @@ DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{pare
   updateWindowsSize();
   UpdateWindowsTitle();
   setWindowIcon(QIcon(":img/DUPLICATE_VIDEOS_FINDER"));
+
+  UpdateAiMediaTableNames();
 }
 
 void DuplicateVideosFinder::UpdateWindowsTitle() {

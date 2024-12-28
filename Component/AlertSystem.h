@@ -32,6 +32,7 @@ class AlertSystem : public QDialog {
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
 
   void onEditPreferenceSetting() const;
+  bool operator()(const QString& /**/) {return true;}
 
  signals:
 
