@@ -25,10 +25,9 @@ const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 
 JsonEditor::JsonEditor(QWidget* parent)
     : QMainWindow{parent},
-      m_stdKeys{{JSONKey::Name, new QLineEdit},     {JSONKey::Performers, new QLineEdit}, {JSONKey::ProductionStudio, new QLineEdit},
-                {JSONKey::Uploaded, new QLineEdit}, {JSONKey::Tags, new QLineEdit},       {JSONKey::Rate, new QLineEdit},
-                {JSONKey::Size, new QLineEdit},     {JSONKey::Resolution, new QLineEdit}, {JSONKey::Bitrate, new QLineEdit},
-                {JSONKey::Hot, new QLineEdit},      {JSONKey::Detail, new QTextEdit}},
+      m_stdKeys{{JSONKey::Name, new QLineEdit},  {JSONKey::Performers, new QLineEdit}, {JSONKey::ProductionStudio, new QLineEdit}, {JSONKey::Uploaded, new QLineEdit}, {JSONKey::Tags, new QLineEdit},
+                {JSONKey::Rate, new QLineEdit},  {JSONKey::Size, new QLineEdit},       {JSONKey::Resolution, new QLineEdit},       {JSONKey::Bitrate, new QLineEdit},  {JSONKey::Hot, new QLineEdit},
+                {JSONKey::Detail, new QTextEdit}},
       m_jsonFormLo(new QFormLayout),
       m_jsonFormExtraLo(new QFormLayout),
       m_jsonFormWid(new QWidget(this)),
@@ -137,8 +136,7 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._CANCEL, &QAction::triggered, this, &JsonEditor::onResetChanges);
   connect(g_jsonEditorActions()._SUBMIT, &QAction::triggered, this, [this]() {
     qDebug("submit all");  //  (.json and delete .backup)
-    const auto ret = QMessageBox::warning(this, "Submit all ?", "Cannot recover", QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
-                                          QMessageBox::StandardButton::No);
+    const auto ret = QMessageBox::warning(this, "Submit all ?", "Cannot recover", QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret == QMessageBox::StandardButton::Yes) {
       onSubmitAllChanges();
     }
@@ -146,8 +144,7 @@ void JsonEditor::subscribe() {
 
   connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
   connect(g_jsonEditorActions()._EXTRACT_CAPITALIZED_PERFORMER, &QAction::triggered, this, &JsonEditor::onExtractCapitalizedPerformersHint);
-
-  connect(g_jsonEditorActions()._BROWSE_AND_SELECT_THE_FOLDER, &QAction::triggered, this, [this]() { this->onLoadASelectedPath(); });
+  connect(g_jsonEditorActions()._BROWSE_AND_SELECT_THE_FOLDER, &QAction::triggered, this, [this]() { this->JsonEditor::operator()(); });
 
   connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
@@ -157,11 +154,10 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._RENAME_THIS_FILE, &QAction::triggered, this, &JsonEditor::onRenameJsonFile);
 }
 
-int JsonEditor::onLoadASelectedPath(const QString& folderPath) {
+int JsonEditor::operator()(const QString& folderPath) {
   QString loadFromPath = folderPath;
   if (folderPath.isEmpty()) {
-    const QString& defaultOpenDir =
-        PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
+    const QString& defaultOpenDir = PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
     loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
   }
   QFileInfo loadFromFi(loadFromPath);
@@ -261,8 +257,7 @@ bool JsonEditor::onResetChanges() {
     qDebug("cannot reset. backup file[%s] not exist", qPrintable(backupJsonPath));
     return false;
   }
-  return QFile::rename(curJsonPath, curJsonPath + "mv") and QFile::rename(backupJsonPath, curJsonPath) and
-         QFile::rename(curJsonPath + "mv", backupJsonPath);
+  return QFile::rename(curJsonPath, curJsonPath + "mv") and QFile::rename(backupJsonPath, curJsonPath) and QFile::rename(curJsonPath + "mv", backupJsonPath);
 }
 
 bool JsonEditor::onSubmitAllChanges() {
@@ -306,8 +301,7 @@ auto JsonEditor::onCapitalizeEachWord() -> void {
 }
 
 bool JsonEditor::onLearnPerfomersFromJsonFile() {
-  const QString& loadFromDefaultPath =
-      PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
+  const QString& loadFromDefaultPath = PreferenceSettings().value(MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.name, MemoryKey::PATH_JSON_EDITOR_LOAD_FROM.v).toString();
   const auto loadFromPath = QFileDialog::getExistingDirectory(this, "Choose location", loadFromDefaultPath);
   QFileInfo loadFromFi(loadFromPath);
   if (not loadFromFi.isDir()) {
@@ -322,9 +316,7 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
   const int newLearnedProdStudioCnt = psm.LearningFromAPath(loadFromFi.absoluteFilePath());
 
-  QMessageBox::information(
-      this, "Learning succeed",
-      QString("New Learned:\n Performers Count:%1\n Production Studios Count:%2").arg(newLearnedCnt).arg(newLearnedProdStudioCnt));
+  QMessageBox::information(this, "Learning succeed", QString("New Learned:\n Performers Count:%1\n Production Studios Count:%2").arg(newLearnedCnt).arg(newLearnedProdStudioCnt));
 
   return newLearnedCnt >= 0 or newLearnedProdStudioCnt >= 0;
 }

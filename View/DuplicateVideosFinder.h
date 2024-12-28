@@ -63,6 +63,8 @@ class DuplicateVideosFinder : public QMainWindow {
   void closeEvent(QCloseEvent* event) override;
 
   void keyPressEvent(QKeyEvent* e) override;
+
+  bool operator()(const QString& /**/) {return true;}
  private:
   void subscribe();
 

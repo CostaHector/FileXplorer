@@ -24,6 +24,7 @@ auto SearchProxyModel::initSearchMode(const QString& searchMode) -> void {
 }
 
 auto SearchProxyModel::setSearchMode(const QString& searchMode) -> void {
+  PreferenceSettings().setValue("ADVANCE_SEARCH_MODE", searchMode);
   initSearchMode(searchMode);
   startFilterWhenTextChanged(m_searchSourceString);
 }
