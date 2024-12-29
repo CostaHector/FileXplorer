@@ -2,7 +2,7 @@
 
 #include <QDir>
 #include <QFileInfo>
-#include <QStringList>
+#include <QDirIterator>
 
 QString PATHTOOL::StripTrailingSlash(QString path) {
   // drive letter will be kept while trailing path seperator will be trunc
@@ -222,4 +222,107 @@ QString PATHTOOL::longestCommonPrefix(const QStringList& strs) {
 
   const int slashIndex = prefix.lastIndexOf('/');
   return slashIndex == -1 ? prefix : prefix.left(slashIndex);
+}
+
+int PATHTOOL::getFileExtensionDotIndex(const QString& path) {
+  const int lastDot = path.lastIndexOf('.');
+  const int N = path.size();
+  if (lastDot == -1) {
+    return N;
+  }
+  if (N >= 2 and lastDot == N - 2 and path[N - 1].isDigit()) {
+    return N;
+  }
+  if (N >= 3 and lastDot == N - 3 and path[N - 1].isDigit() and path[N - 2].isDigit()) {
+    return N;
+  }
+  return N - (lastDot + 1) > EXTENSION_MAX_LENGTH ? N : lastDot;
+}
+
+QString PATHTOOL::GetFileExtension(const QString& path) {
+  return path.mid(getFileExtensionDotIndex(path));
+}
+
+OSWalker_RETURN PATHTOOL::OSWalker(const QString& pre, const QStringList& rels, const bool includingSub, const bool includingSuffix) {
+  // Reverse the return value, One can get bottom To Top result like os.walk
+  const auto dirIterFlag {includingSub ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags};
+  const int n1 = pre.size() + 1;
+  QDir preDir(pre);
+
+  QStringList relToNames;
+  QStringList completeNames;
+  QStringList suffixs;
+  QList<bool> isFiles;
+
+  for (const QString& rel : rels) {
+    QFileInfo fileInfo(preDir.absoluteFilePath(rel));
+    isFiles.append(fileInfo.isFile());
+    relToNames.append(fileInfo.absolutePath().mid(n1));
+    if (includingSuffix) {
+      completeNames.append(fileInfo.fileName());
+      suffixs.append("");
+    } else {
+      const QString& nm = fileInfo.fileName();
+      const int dotIndex = getFileExtensionDotIndex(nm);
+      completeNames.append(nm.left(dotIndex));
+      suffixs.append(nm.mid(dotIndex));
+    }
+
+    if (includingSub and fileInfo.isDir()) {  // folders
+      QDirIterator it(fileInfo.absoluteFilePath(), {}, QDir::Filter::NoDotAndDotDot | QDir::Filter::AllEntries, dirIterFlag);
+      while (it.hasNext()) {
+        it.next();
+        auto fi = it.fileInfo();
+        isFiles.append(fi.isFile());
+        relToNames.append(fi.absolutePath().mid(n1));
+        if (includingSuffix) {
+          completeNames.append(fi.fileName());
+          suffixs.append("");
+        } else {
+          const QString& nm = fi.fileName();
+          const int dotIndex = getFileExtensionDotIndex(nm);
+          completeNames.append(nm.left(dotIndex));
+          suffixs.append(nm.mid(dotIndex));
+        }
+      }
+    }
+  }
+  return {relToNames, completeNames, suffixs, isFiles};
+}
+
+bool PATHTOOL::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
+  QDir sourceDir(fromDir);
+  QDir targetDir(toDir);
+  if (!targetDir.exists()) { /* if directory don't exists, build it */
+    if (!targetDir.mkdir(targetDir.absolutePath()))
+      return false;
+  }
+
+  QFileInfoList fileInfoList = sourceDir.entryInfoList();
+  for (const QFileInfo& fileInfo : fileInfoList) {
+    if (fileInfo.fileName() == "." || fileInfo.fileName() == "..")
+      continue;
+
+    if (fileInfo.isDir()) { /* if it is directory, copy recursively*/
+      if (copyDirectoryFiles(fileInfo.filePath(), targetDir.filePath(fileInfo.fileName()), coverFileIfExist)) {
+        continue;
+      }
+      return false;
+    }
+    /* if coverFileIfExist == true, remove old file first */
+
+    if (targetDir.exists(fileInfo.fileName())) {
+      if (coverFileIfExist) {
+        targetDir.remove(fileInfo.fileName());
+        qDebug("%s/%s is covered by file under [%s]", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()), qPrintable(fromDir));
+      } else {
+        qDebug("%s/[%s] was kept", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()));
+      }
+    }
+    // files copy
+    if (!QFile::copy(fileInfo.filePath(), targetDir.filePath(fileInfo.fileName()))) {
+      return false;
+    }
+  }
+  return true;
 }

@@ -88,7 +88,7 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
 
 QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey) {
   QString historyStr = PreferenceSettings().value(memoryKey.name, memoryKey.v).toString();
-  QStringList historyList = historyStr.split(MOVE_COPT_TO_PATH_STR_SEPERATOR);
+  QStringList historyList = historyStr.split('\n');
   QActionGroup* actionGroup = new QActionGroup(this);
   for (const QString& path : historyList) {
     QAction* tempPath = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), path);

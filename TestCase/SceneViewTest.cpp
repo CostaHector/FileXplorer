@@ -42,7 +42,7 @@ class SceneViewTest : public QObject {
     if (QDir(TEST_DIR).exists()) {
       QDir(TEST_DIR).removeRecursively();
     }
-    auto ret = PublicTool::copyDirectoryFiles(SCENE_VIEW_PATH, TEST_DIR);
+    auto ret = PATHTOOL::copyDirectoryFiles(SCENE_VIEW_PATH, TEST_DIR);
     assert(ret);  // should copied ok
   }
   void cleanup() {
