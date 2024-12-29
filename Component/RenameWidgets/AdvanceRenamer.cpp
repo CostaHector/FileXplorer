@@ -1,7 +1,8 @@
 #include "AdvanceRenamer.h"
-#include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
+#include "Component/NotificatorFrame.h"
 #include "Tools/NameTool.h"
+#include "Tools/PathTool.h"
 #include "Tools/RenameHelper.h"
 #include "Tools/RenameNamesUnique.h"
 #include "UndoRedo.h"
@@ -366,6 +367,26 @@ auto AdvanceRenamer::onIncludeSuffix(int includingSuffixState) -> void {
   m_oExtTE->setVisible(not isNameIncludingExtension);
   m_nExtTE->setVisible(not isNameIncludingExtension);
   InitTextContent(m_pre, rels);
+}
+
+void AdvanceRenamer::InitTextContent(const QString& p, const QStringList& r) {
+  m_pre = p;
+  rels = r;
+  OSWalker_RETURN osWalkerRet = PATHTOOL::OSWalker(m_pre, rels, ITEMS_INSIDE_SUBDIR->isChecked(), EXT_INSIDE_FILENAME->isChecked());
+  const auto& relToNames = osWalkerRet.relToNames;
+  completeNames = osWalkerRet.completeNames;  // may baseName only or baseName+extension, depend on includingSuffixState
+  const auto& suffixs = osWalkerRet.suffixs;
+  isFiles = osWalkerRet.isFiles;
+
+  m_relNameTE->setPlainText(relToNames.join('\n'));
+
+  m_oBaseTE->setPlainText(completeNames.join('\n'));
+  m_oExtTE->setPlainText(suffixs.join('\n'));
+
+  setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
+  const auto& newCompleteNames = RenameCore(completeNames);
+  m_nBaseTE->setPlainText(newCompleteNames.join('\n'));
+  m_nExtTE->setPlainText(suffixs.join('\n'));
 }
 
 // #define __NAME__EQ__MAIN__ 1

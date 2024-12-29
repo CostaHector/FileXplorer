@@ -13,6 +13,20 @@
 const QRect DEFAULT_GEOMETRY(0, 0, 1024, 768);
 const QSize DOCKER_DEFAULT_SIZE(DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height());
 const QString PROJECT_PATH{"../FileExplorerReadOnly"};
+const char* const SUBMIT_BTN_STYLE =
+    "QPushButton{"
+    "    color: #fff;"
+    "    background-color: DodgerBlue;"
+    "    border-color: DodgerBlue;"
+    "}"
+    "QPushButton:hover {"
+    "    color: #fff;"
+    "    background-color: rgb(36, 118, 199);"
+    "    border-color: rgb(36, 118, 199);"
+    "}";
+constexpr int TABS_ICON_IN_MENU_3x1 = 16;
+constexpr int TABS_ICON_IN_MENU_2x1 = 24;
+constexpr int TABS_ICON_IN_MENU_1x1 = 48;
 
 static inline QSettings& PreferenceSettings() {
   static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", "FileExplorerReadOnly");
@@ -75,19 +89,6 @@ const int RELPATH_COLUMN = EXPLORER_COLUMNS_TITLE.indexOf(RelPath);
 const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
 }  // namespace SearchKey
 
-namespace HEADERVIEW_SORT_INDICATOR_ORDER {
-class OrderClass {
- public:
-  QString name;
-  Qt::SortOrder value;
-};
-const OrderClass AscendingOrder{"AscendingOrder", Qt::SortOrder::AscendingOrder};
-const OrderClass DescendingOrder{"DescendingOrder", Qt::SortOrder::DescendingOrder};
-const QMap<QString, Qt::SortOrder> string2SortOrderEnumListTable = {{AscendingOrder.name, AscendingOrder.value}, {DescendingOrder.name, DescendingOrder.value}};
-const QStringList HEADERVIEW_SORT_INDICATOR_ORDER_STR = string2SortOrderEnumListTable.keys();
-QString SortOrderEnum2String(const Qt::SortOrder orderEnum);
-}  // namespace HEADERVIEW_SORT_INDICATOR_ORDER
-
 class ValueChecker {
  public:
   friend struct KV;
@@ -114,9 +115,6 @@ class ValueChecker {
   explicit ValueChecker(const QSet<QChar>& chars = {'0', '1'}, int minLength = 1);
 
   explicit ValueChecker(const VALUE_TYPE valueType_);
-
-  static int getFileExtensionDotIndex(const QString& path);
-  static QString GetFileExtension(const QString& path);  // e.g. .txt .bat
 
   static bool isFileExist(const QString& path);
   static bool isFolderExist(const QString& path);
@@ -151,8 +149,6 @@ struct KV {
   QVariant v;
   ValueChecker checker;
 };
-
-constexpr char MOVE_COPT_TO_PATH_STR_SEPERATOR = '\n';
 
 namespace MemoryKey {
 const KV DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "./", ValueChecker{ValueChecker::VALUE_TYPE::FOLDER_PATH}};
@@ -268,11 +264,6 @@ const QString PERFORMERS = "PERFORMERS";
 const QString TORRENTS = "TORRENTS";
 }  // namespace DB_TABLE
 
-extern const char* SUBMIT_BTN_STYLE;
-
-constexpr int TABS_ICON_IN_MENU_3x1 = 16;
-constexpr int TABS_ICON_IN_MENU_2x1 = 24;
-constexpr int TABS_ICON_IN_MENU_1x1 = 48;
 
 namespace TYPE_FILTER {
 const QStringList AI_DUP_VIDEO_TYPE_SET = {"*.mp4", "*.mov", "*.avi", "*.flv", "*.wmv", "*.mkv", "*.divx", "*.m4v", "*.mpg", "*.ts"};
@@ -284,10 +275,8 @@ const QStringList BUILTIN_COMPRESSED_TYPE_SET = {"*.qz"};
 }  // namespace TYPE_FILTER
 
 enum class CCMMode { ERROR_OP = -1, MERGE_OP = 0, COPY_OP = 1, CUT_OP = 2, LINK_OP = 3 };
-
 static const QMap<CCMMode, QString> CCMMode2QString = {{CCMMode::MERGE_OP, "MERGE"}, {CCMMode::COPY_OP, "COPY"}, {CCMMode::CUT_OP, "CUT"}, {CCMMode::LINK_OP, "LINK"}};
 
-#include <QColor>
 #include <QRegularExpression>
 
 namespace JSON_RENAME_REGEX {
@@ -315,15 +304,4 @@ const QRegularExpression CONTINOUS_SPACE("\\s+");
 const QRegularExpression SPLIT_BY_UPPERCASE("([A-Z0-9]\\d{0,4})", QRegularExpression::PatternOption::NoPatternOption);
 }  // namespace JSON_RENAME_REGEX
 
-namespace STATUS_COLOR {
-const QColor LIGHT_GREEN_COLOR(245, 245, 220);
-const QColor TOMATO_COLOR(244, 164, 96);
-const QColor TRANSPARENT_COLOR(Qt::GlobalColor::color0);
-}  // namespace STATUS_COLOR
-
-bool VerifyOneFilePath(const KV& kv, const QString& fileType = "txt");
-bool VerifyOneFolderPath(const KV& kv);
-bool InitOutterPlainTextPath();
-
-constexpr int CONTROL_TOOLBAR_HEIGHT = 28;
 #endif  // PUBLICVARIABLE_H
