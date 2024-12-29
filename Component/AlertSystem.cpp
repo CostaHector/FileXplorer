@@ -9,7 +9,6 @@
 #include "Actions/FileLeafAction.h"
 #include "NotificatorFrame.h"
 #include "PublicVariable.h"
-using namespace STATUS_COLOR;
 
 AlertSystem::AlertSystem(QWidget* parent)
     : QDialog{parent},
