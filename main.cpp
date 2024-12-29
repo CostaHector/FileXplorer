@@ -1,5 +1,6 @@
 #include "FileExplorerEvent.h"
 #include "FileExplorerReadOnly.h"
+#include "InitCheck.h"
 #include "PublicTool.h"
 #include "Tools/ExtraViewVisibilityControl.h"
 #include "Tools/LogHandler.h"
@@ -10,7 +11,7 @@
 #ifdef RUN_MAIN_FILE
 
 int main(int argc, char* argv[]) {
-  if (not InitOutterPlainTextPath()) {
+  if (!InitCheck::InitOutterPlainTextPath()) {
     qWarning("Init plain text path failed. Some json/where clause function may not work");
   }
 
