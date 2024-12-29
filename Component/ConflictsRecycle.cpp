@@ -7,8 +7,6 @@
 #include <QDesktopServices>
 #include <QPushButton>
 
-using namespace STATUS_COLOR;
-
 ConflictsRecycle::ConflictsRecycle(const ConflictsItemHelper& itemIF_, QWidget* parent)
     : QDialog(parent),
       itemIF(itemIF_),
@@ -180,7 +178,7 @@ int main(int argc, char* argv[]) {
       return false;
     }
   }
-  auto ret = PublicTool::copyDirectoryFiles(DONT_CHANGE_SRC, ENV_PATH);
+  auto ret = PATHTOOL::copyDirectoryFiles(DONT_CHANGE_SRC, ENV_PATH);
   if (not ret) {
     qDebug("Copy environment folder failed");
     return -1;
