@@ -2,11 +2,19 @@
 #define PATHTOOL_H
 
 #include <QString>
+#include <QStringList>
+
+struct OSWalker_RETURN {
+  QStringList relToNames;
+  QStringList completeNames;
+  QStringList suffixs;
+  QList<bool> isFiles;
+};
 
 namespace PATHTOOL {
 inline QString GetWinStdPath(const QString& path) {
 #ifdef _WIN32
-  if (not path.isEmpty() and path.back() == ':') {
+  if (!path.isEmpty() and path.back() == ':') {
     return path + '/';
   }
 #endif
@@ -52,6 +60,12 @@ QString longestCommonPrefix(const QStringList& strs);
 
 QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
+
+
+int getFileExtensionDotIndex(const QString& path);
+QString GetFileExtension(const QString& path);
+OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool includingSub = false, const bool includingSuffix = false);
+bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 
 constexpr char PATH_SEP_CHAR = '/';
 constexpr int EXTENSION_MAX_LENGTH = 5; // ".json"
