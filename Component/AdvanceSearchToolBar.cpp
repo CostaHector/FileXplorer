@@ -18,10 +18,9 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
 
   m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_nameFilterCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
-  m_nameFilterCB->addItem("*.html|nonporn");
+  m_nameFilterCB->addItem("nonporn|.*?html"); // grep -E \"contents\" --include="*.html"
   m_nameFilterCB->addItem("*.torrent");
-  m_nameFilter->setPlaceholderText("Normal[abc], Wildcard[do?x], Regex[\\d{4}], Search for File Content[*.html,*.txt|contents]");
-
+  m_nameFilter->setPlaceholderText("Normal[abc], Wildcard[do?x], Regex[\\d{4}], Search for File Content[nonporn|.*?html]");
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
 }
