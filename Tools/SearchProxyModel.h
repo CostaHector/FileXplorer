@@ -4,6 +4,8 @@
 #include <QAbstractItemModel>
 #include <QSortFilterProxyModel>
 #include "AdvanceSearchModel.h"
+#include "Tools/SearchTools.h"
+
 
 class SearchProxyModel : public QSortFilterProxyModel {
  public:
@@ -17,9 +19,7 @@ class SearchProxyModel : public QSortFilterProxyModel {
     QSortFilterProxyModel::setSourceModel(sourceModel);
   }
 
-  auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
-    return sourceModel()->headerData(section, orientation, role);
-  }
+  auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override { return sourceModel()->headerData(section, orientation, role); }
 
   auto initSearchMode(const QString& searchMode) -> void;
   auto setSearchMode(const QString& searchMode) -> void;
@@ -32,8 +32,8 @@ class SearchProxyModel : public QSortFilterProxyModel {
   auto filterAcceptsRow(int source_row, const QModelIndex& source_parent) const -> bool override;
 
   void Reset() {
-    m_fileContFilter.clear();
-    m_nameFilters.clear();
+    m_fileContentFilter.clear();
+    m_nameFilters.setPattern("");
   }
 
   void changeCustomSearchNameAndContents(const QString& searchText);
@@ -44,22 +44,18 @@ class SearchProxyModel : public QSortFilterProxyModel {
   inline void initFileContentsCaseSensitive(bool sensitive) { m_fileContentsCaseSensitive = sensitive; }
   void setFileContentsCaseSensitive(bool sensitive);
 
-  inline void initFileNameFiltersCaseSensitive(bool sensitive) {
-    m_nameFiltersCaseSensitive = sensitive;
-  }
+  inline void initFileNameFiltersCaseSensitive(bool sensitive) { m_nameFiltersCaseSensitive = sensitive; }
   void setFileNameFiltersCaseSensitive(bool sensitive);
 
  private:
   auto CheckIfContentsContained(const QString& filePath, const QString& contained) const -> bool;
   AdvanceSearchModel* _searchSourceModel{nullptr};
 
+  SearchTools::SEARCH_MODE m_searchMode;
   QString m_searchSourceString;
 
-  QString m_searchMode;
-  bool m_isCustomSearch;
-
-  QString m_fileContFilter;
-  QList<QRegularExpression> m_nameFilters;
+  QString m_fileContentFilter;
+  QRegularExpression m_nameFilters;
 
   bool m_fileContentsCaseSensitive;
   bool m_nameFiltersCaseSensitive;
