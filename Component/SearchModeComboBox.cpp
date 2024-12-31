@@ -1,8 +1,11 @@
 #include "SearchModeComboBox.h"
 #include <QLayout>
 #include "PublicVariable.h"
+#include "Tools/SearchTools.h"
+using namespace SearchTools;
+
 SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox{parent} {
-  addItems({"Normal", "Wildcard", "Regex", "Search for File Content"});
+  addItems(GetSearchModeStrList());
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
 
   setCurrentText(PreferenceSettings().value("ADVANCE_SEARCH_MODE", "Wildcard").toString());

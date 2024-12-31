@@ -87,6 +87,7 @@ SOURCES += \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
     Tools/LogHandler.cpp \
+    Tools/SearchTools.cpp \
     Tools/ThumbnailProcesser.cpp \
     Tools/NameSectionArrange.cpp \
     Tools/NameTool.cpp \
@@ -250,6 +251,7 @@ HEADERS += \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
     Tools/LogHandler.h \
+    Tools/SearchTools.h \
     Tools/ThumbnailProcesser.h \
     Tools/MediaInfoDLL.h \
     Tools/NameSectionArrange.h \
