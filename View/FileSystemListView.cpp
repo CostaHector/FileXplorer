@@ -42,6 +42,7 @@ void FileSystemListView::subscribe() {
 
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+  addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 }
 
 void FileSystemListView::dropEvent(QDropEvent* event) {
