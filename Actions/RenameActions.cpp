@@ -34,6 +34,11 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
                                   .arg(_RENAME_SWAPPER->text())
                                   .arg(_RENAME_SWAPPER->shortcut().toString()));
 
+  _RENAME_REVERSE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_R));
+  _RENAME_REVERSE->setToolTip(QString("<b>%1 (%2)</b><br/> Reverse filenames. e.g., file1, file2 -> file2, file1")
+                                  .arg(_RENAME_REVERSE->text())
+                                  .arg(_RENAME_REVERSE->shortcut().toString()));
+
   _STR_INSERTER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_I));
   _STR_INSERTER->setToolTip(
       QString("<b>%1 (%2)</b><br/> Insert a string into file name.").arg(_STR_INSERTER->text()).arg(_STR_INSERTER->shortcut().toString()));
@@ -56,6 +61,7 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
   actionGroup->addAction(_RENAME_SWAPPER);
+  actionGroup->addAction(_RENAME_REVERSE);
   actionGroup->addAction(_CASE_NAME);
   actionGroup->addAction(_STR_INSERTER);
   actionGroup->addAction(_STR_DELETER);
