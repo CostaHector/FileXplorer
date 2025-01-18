@@ -43,6 +43,7 @@ SOURCES += \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
     Component/DropListToolButton.cpp \
+    Component/RenameWidgets/RenameWidget_ReverseNames.cpp \
     Component/RightClickMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
     Component/JsonEditor.cpp \
@@ -207,6 +208,7 @@ HEADERS += \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
     Component/DropListToolButton.h \
+    Component/RenameWidgets/RenameWidget_ReverseNames.h \
     Component/RightClickMenu.h \
     Component/FileSystemTypeFilter.h \
     Component/JsonEditor.h \
