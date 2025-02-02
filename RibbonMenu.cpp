@@ -279,6 +279,8 @@ QToolBar* RibbonMenu::LeafView() const {
   leafViewWid->addWidget(folderPreviewToolBar);
   leafViewWid->addSeparator();
   leafViewWid->addWidget(embeddedPlayerTB);
+  leafViewWid->addSeparator();
+  leafViewWid->addAction(g_viewActions()._HAR_VIEW);
   leafViewWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafViewWid;
 }
