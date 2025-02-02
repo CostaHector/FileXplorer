@@ -20,27 +20,26 @@ ViewActions::ViewActions(QObject* parent)
       PREVIEW_PANE_HTML{new QAction(QIcon(":img/SHOW_FOLDER_PREVIEW_HTML"), tr("Folder Preview"))},
       _JSON_EDITOR_PANE{new QAction(QIcon(":img/JSON_EDITOR"), tr("Json Editor"))},
       _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":img/VIDEO_PLAYER"), tr("Embedded Player"))},
-      _VIEW_ACRIONS(Get_NAVIGATION_PANE_Actions()),
+      _VIEW_ACTIONS(Get_NAVIGATION_PANE_Actions()),
       _SYS_VIDEO_PLAYERS(new QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
-      _VIDEO_PLAYERS(GetPlayersActions()) {}
+      _VIDEO_PLAYERS(GetPlayersActions()) {
+  _HAR_VIEW = new QAction{QIcon(), "Har View"};
+}
 
 QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
-  NAVIGATION_PANE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
+  NAVIGATION_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
   NAVIGATION_PANE->setCheckable(true);
 
   PREVIEW_PANE_HTML->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_P));
-  PREVIEW_PANE_HTML->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString()));
+  PREVIEW_PANE_HTML->setToolTip(QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString()));
   PREVIEW_PANE_HTML->setCheckable(true);
 
   _JSON_EDITOR_PANE->setCheckable(true);
-  _JSON_EDITOR_PANE->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(_JSON_EDITOR_PANE->text(), _JSON_EDITOR_PANE->shortcut().toString()));
+  _JSON_EDITOR_PANE->setToolTip(QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(_JSON_EDITOR_PANE->text(), _JSON_EDITOR_PANE->shortcut().toString()));
 
   _VIDEO_PLAYER_EMBEDDED->setShortcutVisibleInContextMenu(true);
-  _VIDEO_PLAYER_EMBEDDED->setToolTip(QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.")
-                                         .arg(_VIDEO_PLAYER_EMBEDDED->text(), _VIDEO_PLAYER_EMBEDDED->shortcut().toString()));
+  _VIDEO_PLAYER_EMBEDDED->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.").arg(_VIDEO_PLAYER_EMBEDDED->text(), _VIDEO_PLAYER_EMBEDDED->shortcut().toString()));
 
   auto* actionGroup = new QActionGroup(this);
   actionGroup->addAction(NAVIGATION_PANE);

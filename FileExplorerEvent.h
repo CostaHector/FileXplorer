@@ -94,6 +94,7 @@ class FileExplorerEvent : public QObject {
   auto on_SelectNone() -> void;
   auto on_SelectInvert() -> void;
 
+  bool on_HarView();
   auto on_PlaySelectedItemsInView() -> bool;
   auto on_PlayCurrentPathOfView() -> bool;
 
