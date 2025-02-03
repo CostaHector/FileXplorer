@@ -86,7 +86,7 @@ SOURCES += \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
-    Tools/HarParserHelper.cpp \
+    Tools/HarFiles.cpp \
     Tools/LogHandler.cpp \
     Tools/SearchTools.cpp \
     Tools/ThumbnailProcesser.cpp \
@@ -252,7 +252,7 @@ HEADERS += \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
-    Tools/HarParserHelper.h \
+    Tools/HarFiles.h \
     Tools/LogHandler.h \
     Tools/SearchTools.h \
     Tools/ThumbnailProcesser.h \
