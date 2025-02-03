@@ -1,4 +1,5 @@
-#include "HarParserHelper.h"
+#include "HarFiles.h"
+#include "PublicVariable.h"
 #include <QFile>
 #include <QDir>
 #include <QIODevice>
@@ -7,7 +8,7 @@
 #include <QJsonParseError>
 #include <QJsonObject>
 
-const QMap<QString, QString> HarParserHelper::SUPPORTED_MIMETYPES = {{"image/webp", ".webp"}, {"image/jpeg", ".jpeg"},  // *.jpg files have two possible extensions
+const QMap<QString, QString> HarFiles::SUPPORTED_MIMETYPES = {{"image/webp", ".webp"}, {"image/jpeg", ".jpeg"},  // *.jpg files have two possible extensions
                                                                      {"image/jpeg", ".jpg"},                            //   (but .jpeg is official and thus preferred)
                                                                      {"image/png", ".png"},   {"image/svg+xml", ".svg"}, {"image/avif", ".avif"},
                                                                      {"image/bmp", ".bmp"},   {"image/gif", ".gif"},     {"image/vnd.microsoft.icon", ".ico"},
@@ -15,7 +16,7 @@ const QMap<QString, QString> HarParserHelper::SUPPORTED_MIMETYPES = {{"image/web
                                                                      {"image/tiff", ".tiff"},  //   (but .tiff is what I know and prefer)
                                                                      {"video/mp2t", ".ts"}};
 
-HarParserHelper::HarParserHelper() {}
+HarFiles::HarFiles() {}
 
 QString GetPathStem(const QString& url) {
   const int slashIndex = url.lastIndexOf('/');
@@ -29,18 +30,18 @@ QString GetPathStem(const QString& url) {
   return noRootPath.left(dotIndex);
 }
 
-void HarParserHelper::init() {
+void HarFiles::init() {
   mHarFilePath.clear();
   mHarItems.clear();
 }
 
-void HarParserHelper::swap(HarParserHelper& rhs)
+void HarFiles::swap(HarFiles& rhs)
 {
   mHarFilePath.swap(rhs.mHarFilePath);
   mHarItems.swap(rhs.mHarItems);
 }
 
-const HAR_FILE_ITEM& HarParserHelper::operator[](int i) const {
+const HAR_FILE_ITEM& HarFiles::operator[](int i) const {
   if (i < 0 || i >= size()) {
     static HAR_FILE_ITEM INVALID_HAR_FILE_ITEM;
     return INVALID_HAR_FILE_ITEM;
@@ -48,7 +49,11 @@ const HAR_FILE_ITEM& HarParserHelper::operator[](int i) const {
   return mHarItems[i];
 }
 
-bool HarParserHelper::operator()(const QString& harAbsPath) {
+bool HarFiles::IsHarFile(const QFileInfo& fi) {
+  return TYPE_FILTER::HAR_TYPE_SET.contains("*." + fi.suffix());
+}
+
+bool HarFiles::operator()(const QString& harAbsPath) {
   qDebug("parse har file[%s] start...", qPrintable(harAbsPath));
   init();
   mHarFilePath = harAbsPath;
@@ -57,6 +62,7 @@ bool HarParserHelper::operator()(const QString& harAbsPath) {
     qWarning("harJson file[%s] not exist", qPrintable(harAbsPath));
     return false;
   }
+
   if (!fi.open(QIODevice::ReadOnly)) {
     qWarning("harJson file[%s] read failed", qPrintable(harAbsPath));
     return false;
@@ -146,7 +152,7 @@ bool HarParserHelper::operator()(const QString& harAbsPath) {
   return true;
 }
 
-int HarParserHelper::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {
+int HarFiles::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {
   if (mHarItems.isEmpty() || selectedRows.isEmpty()) {
     qDebug("mHarItems is empty or nothing selected no need to save");
     return 0;

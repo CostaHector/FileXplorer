@@ -35,7 +35,7 @@ QVariant HarModel::data(const QModelIndex& index, int role) const {
 
 int HarModel::SetHarFileAbsPath(const QString& harFileAbsPath) {
   int before = rowCount();
-  HarParserHelper rhs;
+  HarFiles rhs;
   rhs(harFileAbsPath);
   int after = rhs.size();
   RowsCountStartChange(before, after);
