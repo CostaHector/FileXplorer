@@ -1,7 +1,9 @@
 #include "ContentPanel.h"
 #include "Actions/ArchiveFilesActions.h"
+#include "Actions/ViewActions.h"
 #include "Component/NotificatorFrame.h"
 #include "Tools/ArchiveFiles.h"
+#include "Tools/HarFiles.h"
 #include "public/DisplayEnhancement.h"
 #include "Model/ScenesTableModel.h"
 
@@ -160,7 +162,7 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
     return false;
   QFileInfo fi = getFileInfo(clickedIndex);
   qInfo("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
-  if (not fi.exists()) {
+  if (!fi.exists()) {
     qWarning("[path inexists] %s", qPrintable(fi.absoluteFilePath()));
     Notificator::warning("Cannot open inexist path", fi.absoluteFilePath());
     return false;
@@ -181,6 +183,7 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
 
   // For File
   // qz File Open in QZ Archive always
+  // har File Open in Har Viewer always
   // other file: open in QDesktopService
 
   // For Folder
@@ -190,6 +193,10 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
   if (fi.isFile()) {
     if (ArchiveFiles::isQZFile(fi)) {
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->trigger();
+      return true;
+    }
+    if (HarFiles::IsHarFile(fi)) {
+      emit g_viewActions()._HAR_VIEW->trigger();
       return true;
     }
     return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
