@@ -48,12 +48,6 @@ int HarModel::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {
   return mHarParser.SaveToLocal(dstRootpath, selectedRows);
 }
 
-QByteArray HarModel::GetImageByteArray(const int rowIndex, QString& fileName) const {
-  if (!(0 <= rowIndex && rowIndex < rowCount())) {
-    fileName = "";
-    return {};
-  }
-  const auto& item = mHarParser[rowIndex];
-  fileName = item.name;
-  return item.content;
+const HAR_FILE_ITEM& HarModel::GetHarEntryItem(const int rowIndex) const {
+  return mHarParser[rowIndex];
 }
