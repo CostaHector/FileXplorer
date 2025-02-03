@@ -2,7 +2,7 @@
 #define HARMODEL_H
 
 #include "Tools/QAbstractTableModelPub.h"
-#include "Tools/HarParserHelper.h"
+#include "Tools/HarFiles.h"
 #include <QItemSelectionModel>
 #include <QFileIconProvider>
 
@@ -42,7 +42,7 @@ class HarModel : public QAbstractTableModelPub {
   int SaveToLocal(QString dstRootpath = "", const QList<int>& selectedRows = {});
   const HAR_FILE_ITEM& GetHarEntryItem(const int rowIndex) const;
  private:
-  HarParserHelper mHarParser;
+  HarFiles mHarParser;
   QFileIconProvider m_iconProvider;
 };
 

@@ -76,7 +76,7 @@ int HarTableView::SaveSelectionFilesTo() const {
   return exportCount;
 }
 
-bool HarTableView::PreviewImage() const {
+bool HarTableView::PreviewImage() {
   if (!mShowImagePreview) {
     return false;
   }
@@ -94,15 +94,14 @@ bool HarTableView::PreviewImage() const {
     qWarning("image[%s] load from data failed", qPrintable(fileName));
     return false;
   }
-  static QLabel* myLabel = nullptr;
-  if (myLabel == nullptr) {
-    myLabel = new QLabel{nullptr};
-    myLabel->move(geometry().x() + width(), geometry().y());
+  if (mPreviewLabel == nullptr) {
+    mPreviewLabel = new QLabel{nullptr};
+    mPreviewLabel->move(geometry().x() + width(), geometry().y());
   }
-  myLabel->setPixmap(QPixmap::fromImage(image));
-  myLabel->setWindowTitle(QString("%1 | %2 Byte(s)").arg(fileName).arg(entryItem.content.size()));
-  myLabel->show();
-  myLabel->raise();
+  mPreviewLabel->setPixmap(QPixmap::fromImage(image));
+  mPreviewLabel->setWindowTitle(QString("%1 | %2 Byte(s)").arg(fileName).arg(entryItem.content.size()));
+  mPreviewLabel->show();
+  mPreviewLabel->raise();
   return true;
 }
 
@@ -116,6 +115,7 @@ void HarTableView::updateWindowsSize() {
 
 void HarTableView::closeEvent(QCloseEvent* event) {
   PreferenceSettings().setValue("HAR_TABLEVIEW_GEOMETRY", saveGeometry());
+  mPreviewLabel->close();
   CustomTableView::closeEvent(event);
 }
 

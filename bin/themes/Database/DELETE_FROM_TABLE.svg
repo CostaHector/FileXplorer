@@ -1,17 +1,28 @@
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-
-<g id="SVGRepo_bgCarrier"/>
-
-<g id="SVGRepo_tracerCarrier"/>
-
-<g id="SVGRepo_iconCarrier"> <g id="Edit / Table_Remove"> 
-<path id="Vector" d="M11 4H15.8002C16.9203 4 17.4801 4 17.9079 4.21799C18.2842 4.40973 18.5905 4.71547 18.7822 5.0918C19 5.5192 19 6.07899 19 7.19691V9.0002L11.0001 9.0001M11 4H6.2002C5.08009 4 4.51962 4 4.0918 4.21799C3.71547 4.40973 3.40973 4.71547 3.21799 5.0918C3 5.51962 3 6.08009 3 7.2002V9M11 4L11.0001 9.0001M3 9V15M3 9L11.0001 9.0001M3 15V16.8002C3 17.9203 3 18.4801 3.21799 18.9079C3.40973 19.2842 3.71547 19.5905 4.0918 19.7822C4.5192 20 5.07899 20 6.19691 20H11.0002L11.0001 9.0001 M3 15H11" 
-stroke="#000000" stroke-width="1" fill="#FF7F50" /> 
-<path id="Vector" d="M15 16H21" stroke="#ff0000" stroke-width="1"/> 
-</g> </g>
-
-
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 28.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FF7F50;stroke:#000000;stroke-width:33.3333;stroke-miterlimit:133.3333;}
+	.st1{stroke:#FF0000;stroke-width:33.3333;stroke-miterlimit:133.3333;}
+	.st2{fill:#FFFFFF;stroke:#000000;stroke-width:33.3333;stroke-miterlimit:133.3333;}
+	.st3{fill:none;stroke:#000000;stroke-width:20;stroke-miterlimit:133.3333;}
+</style>
+<g id="SVGRepo_bgCarrier">
+</g>
+<g id="SVGRepo_tracerCarrier">
+</g>
+<g id="SVGRepo_iconCarrier">
+	<g id="Edit__x2F__Table_x5F_Remove">
+		<path id="Vector" class="st0" d="M408,133.3h160c37.3,0,56,0,70.3,7.3c12.5,6.4,22.8,16.6,29.1,29.1c7.3,14.2,7.3,32.9,7.3,70.2
+			V300H408 M408,133.3H248c-37.3,0-56,0-70.3,7.3c-12.5,6.4-22.7,16.6-29.1,29.1c-7.3,14.3-7.3,33-7.3,70.3v60 M408,133.3V300
+			 M141.3,300H408 M141.3,500v60c0,37.3,0,56,7.3,70.3c6.4,12.5,16.6,22.8,29.1,29.1c14.2,7.3,32.9,7.3,70.2,7.3H408h266.7
+			c-0.9-56.9-1.8-113.8-2.7-170.7 M141.3,500h533.3"/>
+		<path id="Vector_00000044157660476678620750000006797449510069533076_" class="st1" d="M674.7,400"/>
+		<path id="Vector_00000079457057181875701010000011943191311639287739_" class="st1" d="M125.3,400"/>
+	</g>
+</g>
+<line class="st2" x1="408" y1="504" x2="408" y2="666.7"/>
+<rect x="146.3" y="355" class="st3" width="528.3" height="98"/>
+<line class="st2" x1="407.9" y1="360.8" x2="407.9" y2="447.2"/>
 </svg>
