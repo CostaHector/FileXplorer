@@ -12,16 +12,20 @@ class HarTableView : public CustomTableView {
   int operator()(const QString& harAbsPath);
   void subscribe();
   QSize sizeHint() const { return QSize(1024, 768); }
-  int SaveSelectionFilesTo();
+  int SaveSelectionFilesTo() const;
   bool PreviewImage() const;
 
+  void updateWindowsSize();
+  void closeEvent(QCloseEvent* event) override;
  private:
   QString GetWinTitleStr(const QString& harFile={}) const;
   QString mHarAbsPath;
+  bool mShowImagePreview;
   HarModel* mHarModel;
   QSortFilterProxyModel *mSortProxyModel;
   QMenu *mMenu {nullptr};
   QAction *mEXPORT_TO {nullptr};
+  QAction *mQUICK_PREVIEW{nullptr};
 };
 
 #endif // HARTABLEVIEW_H
