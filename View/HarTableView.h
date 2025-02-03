@@ -5,15 +5,15 @@
 #include "Model/HarModel.h"
 #include <QSortFilterProxyModel>
 #include <QMenu>
+#include <QLabel>
 
 class HarTableView : public CustomTableView {
  public:
   explicit HarTableView(QWidget* parent = nullptr);
   int operator()(const QString& harAbsPath);
   void subscribe();
-  QSize sizeHint() const { return QSize(1024, 768); }
   int SaveSelectionFilesTo() const;
-  bool PreviewImage() const;
+  bool PreviewImage();
 
   void updateWindowsSize();
   void closeEvent(QCloseEvent* event) override;
@@ -26,6 +26,7 @@ class HarTableView : public CustomTableView {
   QMenu *mMenu {nullptr};
   QAction *mEXPORT_TO {nullptr};
   QAction *mQUICK_PREVIEW{nullptr};
+  QLabel *mPreviewLabel{nullptr};
 };
 
 #endif // HARTABLEVIEW_H

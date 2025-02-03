@@ -274,6 +274,7 @@ const QStringList IMAGE_TYPE_SET = {"*.jpeg", "*.jpg", "*.png", "*.tiff", "*.jfi
 const QStringList JSON_TYPE_SET = {"*.json"};
 const QStringList TEXT_TYPE_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat"};
 const QStringList BUILTIN_COMPRESSED_TYPE_SET = {"*.qz"};
+const QStringList HAR_TYPE_SET = {"*.har"};
 }  // namespace TYPE_FILTER
 
 enum class CCMMode { ERROR_OP = -1, MERGE_OP = 0, COPY_OP = 1, CUT_OP = 2, LINK_OP = 3 };
