@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMap>
+#include <QSet>
 
 struct HAR_FILE_ITEM {
   QString name;
@@ -12,6 +13,7 @@ struct HAR_FILE_ITEM {
 };
 
 const QStringList HAR_VERTICAL_HEAD {"Name", "Size(Byte)", "Type", "Url"};
+const QSet<QString> IMAGE_PREVIEW_SUPPORTED {".jpeg", ".jpg", ".png", ".webp"};
 
 class HarParserHelper
 {
