@@ -40,7 +40,7 @@ class HarModel : public QAbstractTableModelPub {
 
   int SetHarFileAbsPath(const QString& harFileAbsPath);
   int SaveToLocal(QString dstRootpath = "", const QList<int>& selectedRows = {});
-  QByteArray GetImageByteArray(const int rowIndex, QString& fileName) const;
+  const HAR_FILE_ITEM& GetHarEntryItem(const int rowIndex) const;
  private:
   HarParserHelper mHarParser;
   QFileIconProvider m_iconProvider;
