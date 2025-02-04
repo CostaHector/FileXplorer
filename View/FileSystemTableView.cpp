@@ -44,6 +44,8 @@ void FileSystemTableView::subscribe() {
   addAction(g_fileBasicOperationsActions().COPY_RECORDS);
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+
+  addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 }
 
 void FileSystemTableView::dropEvent(QDropEvent* event) {
