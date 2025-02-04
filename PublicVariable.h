@@ -239,6 +239,8 @@ const KV LINUX_RUND_IMG_PATH("LINUX_RUND_IMG_PATH", ".", ValueChecker{ValueCheck
 
 const KV DUPLICATE_FINDER_DEVIATION_DURATION("DUPLICATE_FINDER_DEVIATION_DURATION", 2 * 1000, ValueChecker{0, 20 * 1000});         // 2s ~ 20s
 const KV DUPLICATE_FINDER_DEVIATION_FILESIZE("DUPLICATE_FINDER_DEVIATION_FILESIZE", 2 * 1024, ValueChecker{0, 30 * 1024 * 1024});  // 2kB ~ 30MB
+
+const KV SHOW_HAR_IMAGE_PREVIEW{"SHOW_HAR_IMAGE_PREVIEW", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 }  // namespace MemoryKey
 
 namespace SystemPath {
@@ -272,6 +274,7 @@ const QStringList IMAGE_TYPE_SET = {"*.jpeg", "*.jpg", "*.png", "*.tiff", "*.jfi
 const QStringList JSON_TYPE_SET = {"*.json"};
 const QStringList TEXT_TYPE_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat"};
 const QStringList BUILTIN_COMPRESSED_TYPE_SET = {"*.qz"};
+const QStringList HAR_TYPE_SET = {"*.har"};
 }  // namespace TYPE_FILTER
 
 enum class CCMMode { ERROR_OP = -1, MERGE_OP = 0, COPY_OP = 1, CUT_OP = 2, LINK_OP = 3 };
