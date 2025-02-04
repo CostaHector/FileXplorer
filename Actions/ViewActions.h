@@ -21,10 +21,12 @@ class ViewActions : public QObject {
   QAction* PREVIEW_PANE_HTML;
   QAction* _JSON_EDITOR_PANE;
   QAction* _VIDEO_PLAYER_EMBEDDED;
-  QActionGroup* _VIEW_ACRIONS;
+  QActionGroup* _VIEW_ACTIONS;
 
   QAction* _SYS_VIDEO_PLAYERS = nullptr;
   QActionGroup* _VIDEO_PLAYERS;
+
+  QAction* _HAR_VIEW = nullptr;
 };
 
 ViewActions& g_viewActions();
