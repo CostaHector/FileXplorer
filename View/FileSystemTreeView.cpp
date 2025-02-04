@@ -32,7 +32,7 @@ void FileSystemTreeView::subscribe() {
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
 
-  addActions(g_viewActions()._VIEW_ACRIONS->actions());
+  addActions(g_viewActions()._VIEW_ACTIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());
@@ -45,6 +45,7 @@ void FileSystemTreeView::subscribe() {
 
   addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+  addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 }
 
 auto FileSystemTreeView::InitViewSettings() -> void {
