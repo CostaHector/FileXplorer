@@ -76,8 +76,8 @@ SOURCES += \
     Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
     Model/DuplicateVideoModel.cpp \
+    Model/HarModel.cpp \
     Model/JsonModel.cpp \
-    Model/LogProxyModel.cpp \
     Model/PreferenceModel.cpp \
     Model/ScenesTableModel.cpp \
     Model/VidModel.cpp \
@@ -87,6 +87,7 @@ SOURCES += \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/FolderPreviewSwitcher.cpp \
+    Tools/HarFiles.cpp \
     Tools/LogHandler.cpp \
     Tools/SearchTools.cpp \
     Tools/ThumbnailProcesser.cpp \
@@ -106,6 +107,7 @@ SOURCES += \
     View/AiMediaDupTableView.cpp \
     View/CustomListView.cpp \
     View/DuplicateVideosFinder.cpp \
+    View/HarTableView.cpp \
     View/JsonListView.cpp \
     View/MovieDBView.cpp \
     View/SceneActionsSubscribe.cpp \
@@ -241,8 +243,8 @@ HEADERS += \
     Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
     Model/DuplicateVideoModel.h \
+    Model/HarModel.h \
     Model/JsonModel.h \
-    Model/LogProxyModel.h \
     Model/PreferenceModel.h \
     Model/ScenesTableModel.h \
     Model/VidModel.h \
@@ -252,6 +254,7 @@ HEADERS += \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/FolderPreviewSwitcher.h \
+    Tools/HarFiles.h \
     Tools/LogHandler.h \
     Tools/SearchTools.h \
     Tools/ThumbnailProcesser.h \
@@ -273,6 +276,7 @@ HEADERS += \
     View/AiMediaDupTableView.h \
     View/CustomListView.h \
     View/DuplicateVideosFinder.h \
+    View/HarTableView.h \
     View/JsonListView.h \
     View/MovieDBView.h \
     View/SceneActionsSubscribe.h \
