@@ -5,11 +5,8 @@
 
 #include <QToolBar>
 #include <QWidget>
-
 #include <QTextBrowser>
-
 #include <QVBoxLayout>
-
 #include <QSqlTableModel>
 
 #include <QAction>
