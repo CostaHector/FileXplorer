@@ -54,7 +54,6 @@
 <file alias="JSON_EDITOR">TopSideToolBarIcons/JSON_EDITOR.png</file>
 <file alias="COMPRESS_ITEM">TopSideToolBarIcons/COMPRESS_ITEM.png</file>
 <file alias="EXTRACT_ITEM">TopSideToolBarIcons/EXTRACT_ITEM.png</file>
-<file alias="MOVE_PATH_UP">TopSideToolBarIcons/MOVE_PATH_UP.webp</file>
 <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
 <file alias="ADD_TO_MUSIC_PLAYLIST">TopSideToolBarIcons/ADD_TO_MUSIC_PLAYLIST.png</file>
 <file alias="MOVE_TO_TRASH_BIN">TopSideToolBarIcons/MOVE_TO_TRASH_BIN.svg</file>
@@ -250,9 +249,9 @@
 
 <!--Database icon here-->
 <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
-<file alias="CREATE_TABLE">Database/CREATE_TABLE.png</file>
+<file alias="CREATE_TABLE">Database/CREATE_TABLE.svg</file>
 <file alias="DROP_DATABASE">Database/DROP_DATABASE.svg</file>
-<file alias="DROP_TABLE">Database/DROP_TABLE.png</file>
+<file alias="DROP_TABLE">Database/DROP_TABLE.svg</file>
 <file alias="ANALYSE_AI_MEDIA_TABLES">Database/ANALYSE_AI_MEDIA_TABLES.svg</file>
 <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
 <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
