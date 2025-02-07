@@ -23,7 +23,7 @@ ViewActions::ViewActions(QObject* parent)
       _VIEW_ACTIONS(Get_NAVIGATION_PANE_Actions()),
       _SYS_VIDEO_PLAYERS(new QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
       _VIDEO_PLAYERS(GetPlayersActions()) {
-  _HAR_VIEW = new QAction{QIcon(), "Har View"};
+  _HAR_VIEW = new QAction{QIcon(":img/HAR_VIEW"), "Har View"};
 }
 
 QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
