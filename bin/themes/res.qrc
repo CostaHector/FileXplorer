@@ -246,6 +246,7 @@
 <file alias="DEFAULT_ROW_HEIGHT">View/DEFAULT_ROW_HEIGHT.svg</file>
 <file alias="RESIZE_COLUMN_TO_CONTENTS">View/RESIZE_COLUMN_TO_CONTENTS.svg</file>
 <file alias="RESIZE_ROW_TO_CONTENTS">View/RESIZE_ROW_TO_CONTENTS.svg</file>
+<file alias="HAR_VIEW">View/HAR_VIEW.svg</file>
 
 <!--Database icon here-->
 <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>

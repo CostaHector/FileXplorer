@@ -3,11 +3,11 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:none;stroke:#000000;stroke-width:20;stroke-miterlimit:125;stroke-dasharray:50,25;}
-	.st1{fill:none;stroke:#000000;stroke-width:25;stroke-miterlimit:125;}
-	.st2{fill:none;stroke:#000000;stroke-width:20;stroke-miterlimit:10;}
+	.st0{fill:none;stroke:#FF7F50;stroke-width:20;stroke-miterlimit:125;stroke-dasharray:50,25;}
+	.st1{fill:none;stroke:#FF7F50;stroke-width:25;stroke-miterlimit:125;}
+	.st2{fill:none;stroke:#FF7F50;stroke-width:20;stroke-miterlimit:10;}
 	.st3{fill:#FF7F50;}
-	.st4{fill:none;stroke:#FFFFFF;stroke-width:20;stroke-miterlimit:10;}
+	.st4{fill:none;stroke:#FFFFFF;stroke-width:60;stroke-miterlimit:10;}
 </style>
 <line class="st0" x1="796" y1="294" x2="8.7" y2="294"/>
 <line class="st1" x1="8.7" y1="120.4" x2="796" y2="120.4"/>
@@ -23,12 +23,13 @@
 <line class="st2" x1="640.6" y1="263.7" x2="640.6" y2="150.7"/>
 <line class="st2" x1="607" y1="263.7" x2="607" y2="150.7"/>
 <line class="st2" x1="573.5" y1="263.7" x2="573.5" y2="150.7"/>
-<ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -196.703 557.2761)" class="st3" cx="574.3" cy="516.1" rx="100.3" ry="91.8"/>
 <g>
-	<path d="M514.4,456.2c36.2-36.2,92.3-38.7,125.4-5.6c33,33,30.5,89.3-5.6,125.4c-36.2,36.2-92.3,38.7-125.4,5.6
-		C475.8,548.6,478.3,492.3,514.4,456.2 M504.4,446.2c-42.1,42.1-45.1,107.8-6.5,146.3c38.6,38.6,104.1,35.7,146.3-6.5
-		c42.3-42.1,45.1-107.8,6.5-146.3C612.2,401,546.6,404,504.4,446.2L504.4,446.2z"/>
+	<ellipse class="st3" cx="599.5" cy="481" rx="137.3" ry="137.4"/>
+	<g>
+		<path class="st3" d="M599.5,354.2c69.9,0,126.8,56.9,126.8,126.8s-57,126.8-126.8,126.8S472.7,550.9,472.7,481
+			S529.6,354.2,599.5,354.2 M599.5,333c-81.8,0-148,66.3-148,148s66.2,148,148,148s148-66.3,148-148S681.3,333,599.5,333L599.5,333z
+			"/>
+	</g>
 </g>
-<line class="st4" x1="614.2" y1="556.1" x2="534.4" y2="476.1"/>
-<line class="st4" x1="530.7" y1="559.8" x2="617.9" y2="472.4"/>
+<line class="st4" x1="707.8" y1="481" x2="491.2" y2="481"/>
 </svg>
