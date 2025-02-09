@@ -36,7 +36,8 @@ NameSectionArrange NameSectionArrange::FromUserInput(const QString& userInput, c
     const int section1 = userInput.left(ind).toInt(&is1stIndexInt);
     bool is2ndIndexInt;
     const int section2 = userInput.mid(ind + 1).toInt(&is2ndIndexInt);
-    if (not is1stIndexInt or not is2ndIndexInt or section1 == section2 or section1 < 0 or section2 < 0 or section1 > 9 or section2 > 9) {
+    const bool isInputInValid {!is1stIndexInt || !is2ndIndexInt || section1 == section2 || section1 < 0 || section2 < 0 || section1 > 9 || section2 > 9};
+    if (isInputInValid) {
       qWarning("userInput[%s] is invalid[section1=%d, section2=%d]", qPrintable(userInput), section1, section2);
       return NameSectionArrange();
     }
