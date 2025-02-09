@@ -25,7 +25,7 @@ SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolB
   SEARCH_CONTENTS_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Content Case matter.")
                                                  .arg(SEARCH_CONTENTS_CASE_SENSITIVE->text(), SEARCH_CONTENTS_CASE_SENSITIVE->shortcut().toString()));
 
-  setIcon(QIcon(":img/CASE_SENSITIVE"));
+  setIcon(QIcon(":img/NAME_STR_CASE"));
   setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
   setMenu(m_searchCaseMenu);
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
