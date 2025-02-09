@@ -1,8 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <path fill="none" stroke="#23A24D" stroke-linecap="round" stroke-width="2" d="M12.6 9h8.029a2.153 2.153 0 012.153 2.153v8.893a2.153 2.153 0 01-2.149 2.154h-10.48A2.153 2.153 0 018 20.045v-4.823"/>
-  <path fill="none" stroke="#494c4e" stroke-linecap="round" stroke-width="2" d="M4.351 15.197h-.122A2.22 2.22 0 012 13.044V4.151a2.153 2.153 0 012.152-2.154h11.48a2.153 2.153 0 012.153 2.155v.964"/>
-  <path fill="none" stroke="#494c4e" stroke-linecap="round" stroke-width="2" d="M7.285 8.5l6 6"/>
-  <path fill="#23A24D" d="M14.328 13.6l1.324-1.334a.931.931 0 01.65-.267.934.934 0 01.92.92v4.6a.923.923 0 01-.92.92h-4.6a.908.908 0 01-.846-.57.922.922 0 01.193-1l1.335-1.328.313-.322z"/>
-  <path fill="none" stroke="#494c4e" stroke-linecap="round" stroke-width="2" d="M4.351 15.197h-.122A2.22 2.22 0 012 13.044V4.151a2.153 2.153 0 012.152-2.154h11.48a2.153 2.153 0 012.153 2.155v.964"/>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 28.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#23A24D;stroke-width:66.6667;stroke-linecap:round;stroke-miterlimit:133.3333;}
+	.st1{fill:none;stroke:#000000;stroke-width:66.6667;stroke-linecap:round;stroke-miterlimit:133.3333;}
+	.st2{stroke:#000000;stroke-width:50;stroke-linecap:round;stroke-miterlimit:133.3333;}
+	.st3{fill:none;stroke:#494C4E;stroke-width:66.6667;stroke-linecap:round;stroke-miterlimit:133.3333;}
+</style>
+<path class="st0" d="M420,300h267.6c39.6,0,71.8,32.1,71.8,71.8v296.4c0,39.6-32,71.7-71.6,71.8H338.4c-39.6,0-71.8-32.1-71.8-71.8
+	c0,0,0,0,0-0.1V507.4"/>
+<path class="st1" d="M145,506.6H141c-40.1,0.2-73.1-31.7-74.3-71.8V138.4c0-39.6,32.1-71.8,71.7-71.8c0,0,0,0,0,0h382.7
+	c39.6,0,71.8,32.1,71.8,71.8c0,0,0,0,0,0.1v32.1"/>
+<path class="st2" d="M242.8,283.3l200,200"/>
+<path class="st3" d="M0,0"/>
+<path d="M437.9,430.9l31.7-32c4.2-4.1,9.7-6.4,15.6-6.4c12.1,0.2,21.9,9.9,22.1,22.1v110.3c0,12.2-9.9,22-22.1,22.1H375
+	c-8.9,0-17-5.4-20.3-13.7c-3.4-8.2-1.6-17.6,4.6-24l32-31.8l7.5-7.7L437.9,430.9z"/>
 </svg>
