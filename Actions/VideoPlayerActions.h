@@ -16,8 +16,8 @@ class VideoPlayerActions : public QObject {
   QAction* _VOLUME_CTRL_MUTE{new QAction(tr("Mute"), this)};
   QAction* _UPDATE_ITEM_PLAYABLE{new QAction(QIcon(":img/REFRESH_THIS_PATH"), tr("Update"), this)};
   QAction* _MOVE_SELECTED_ITEMS_TO_TRASHBIN{new QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), tr("Trashbin"), this)};
-  QAction* _SCROLL_TO_NEXT_FOLDER{new QAction(QIcon(":img/SCROLL_TO_NEXT_VIDEO_FOLDER"), tr("Nxt folder"), this)};
-  QAction* _SCROLL_TO_LAST_FOLDER{new QAction(QIcon(":img/SCROLL_TO_LAST_VIDEO_FOLDER"), tr("Lst folder"), this)};
+  QAction* _SCROLL_TO_NEXT_FOLDER{new QAction(QIcon(":img/NEXT_FOLDER"), tr("Nxt folder"), this)};
+  QAction* _SCROLL_TO_LAST_FOLDER{new QAction(QIcon(":img/LAST_FOLDER"), tr("Lst folder"), this)};
   QAction* _JUMP_LAST_HOT_SCENE{new QAction(QIcon(":img/JUMP_LAST_HOT_SCENE"), tr("last hot scene"), this)};
   QAction* _JUMP_NEXT_HOT_SCENE{new QAction(QIcon(":img/JUMP_NEXT_HOT_SCENE"), tr("next hot scene"), this)};
   QAction* _LAST_10_SECONDS{new QAction("-10s", this)};
@@ -36,7 +36,7 @@ class VideoPlayerActions : public QObject {
   QAction* _SHOW_VIDEOS_LIST{new QAction(QIcon(":img/VIDEOS_LIST_MENU"), tr("keep show playlist"), this)};
   QAction* _MARK_HOT_SCENE{new QAction(QIcon(":img/MARK_HOT_SCENE_POSITION"), tr("mark"), this)};
   QAction* _GRAB_FRAME{new QAction(QIcon(":img/GRAB_FRAME"), tr("grab"), this)};
-  QAction* _RENAME_VIDEO{new QAction(QIcon(":img/RENAME_VIDEO"), tr("rename"), this)};
+  QAction* _RENAME_VIDEO{new QAction(QIcon(":img/RENAME"), tr("rename"), this)};
   QAction* _MOD_PERFORMERS{new QAction(QIcon(":img/RENAME_PERFORMERS"), tr("mod performers"), this)};
 
   QActionGroup* _RATE_AG{GetRateActionGroups()};
