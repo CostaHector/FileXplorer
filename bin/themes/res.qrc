@@ -116,7 +116,6 @@
 <file alias="NEW_JSON_FILE">RightClickIcon/NEW_JSON_FILE.svg</file>
 <file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
 <file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
-<file alias="MERGE_TEXT_FILE">RightClickIcon/mergeTextFile.png</file>
 <file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH_THIS_PATH.svg</file>
 <file alias="COPY_FULL_PATH">RightClickIcon/COPY_FULL_PATH.png</file>
 <file alias="COPY_PATH">RightClickIcon/COPY_PATH.svg</file>
@@ -176,7 +175,7 @@
 
 <!--NameStr Icon here-->
 <file alias="RENAME">NameStrIcon/RENAME.png</file>
-<file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.png</file>
+<file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.svg</file>
 <file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/Numerizer.svg</file>
 <file alias="NAME_STR_SWAPPER_PATH">NameStrIcon/NAME_SWAPPER.svg</file>
 <file alias="UNICODE_TO_ASCII_TEXT">NameStrIcon/UNICODE_TO_ASCII_TEXT.png</file>
