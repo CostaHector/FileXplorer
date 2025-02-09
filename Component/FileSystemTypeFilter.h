@@ -45,7 +45,7 @@ class FileSystemTypeFilter : public QToolButton {
   QAction* HIDDEN = new QAction(QIcon(":img/HIDDEN"), "Hidden", fileTypeFilterMenu);
   QAction* NO_DOT = new QAction(QIcon(":img/NO_DOT"), "NoDot", fileTypeFilterMenu);
   QAction* NO_DOT_DOT = new QAction(QIcon(":img/NO_DOT_DOT"), "NoDotDot", fileTypeFilterMenu);
-  QAction* CASE_SENSITIVE = new QAction(QIcon(":img/CASE_SENSITIVE"), "Case Sensitive", fileTypeFilterMenu);
+  QAction* CASE_SENSITIVE = new QAction(QIcon(":img/NAME_STR_CASE"), "Case Sensitive", fileTypeFilterMenu);
   QAction* DISABLE_ENTRIES_DONT_PASS_FILTER = new QAction(tr("disable the entries don't pass name filter"), fileTypeFilterMenu);
   QAction* INCLUDING_SUBDIRECTORIES = new QAction(tr("Including Subdirs"), fileTypeFilterMenu);
 

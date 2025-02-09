@@ -3,8 +3,12 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
 <style type="text/css">
-	.st0{font-family:'Stencil';}
-	.st1{font-size:401.5941px;}
+	.st0{fill:#37FF6E;}
+	.st1{font-family:'Stencil';}
+	.st2{font-size:401.5941px;}
 </style>
-<text id="svg_4" transform="matrix(1.097 0 0 1 -9.765625e-04 520.9883)" class="st0 st1">SCN</text>
+<path class="st0" d="M767.1,420.8c-17.9,203.9-197.7,353-400.2,336.5c-61.1-4.8-117.2-25.6-167-57.1l-39.5,49.8L66,515.6l249.7,38.1
+	L275,604.6c30.4,17.9,66.3,28.2,102.9,31.9c137.3,12.8,258.9-90.4,269.8-226.6c12.8-137.3-90.4-258.9-226.6-269.8
+	c-137.3-12.8-258.9,90.4-269.8,226.6l-119.7-9.9C49.5,152.7,230.4,2.6,431.8,20.2C634.6,38.5,784,217.9,767.1,420.8z"/>
+<text id="svg_4" transform="matrix(1.097 0 0 1 -9.765625e-04 520.9883)" class="st1 st2">SCN</text>
 </svg>
