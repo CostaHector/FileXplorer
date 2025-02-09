@@ -1,8 +1,11 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 42 42" xml:space="preserve">
-<path style="fill:#23A24D;" d="M37.059,16H26V4.941C26,2.224,23.718,0,21,0s-5,2.224-5,4.941V16H4.941C2.224,16,0,18.282,0,21
-	s2.224,5,4.941,5H16v11.059C16,39.776,18.282,42,21,42s5-2.224,5-4.941V26h11.059C39.776,26,42,23.718,42,21S39.776,16,37.059,16z"
-	/>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 28.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#23A24D;stroke:#000000;stroke-miterlimit:10;}
+</style>
+<path class="st0" d="M705.9,304.8H495.2V94.1C495.2,42.4,451.8,0,400,0s-95.2,42.4-95.2,94.1v210.6H94.1C42.4,304.8,0,348.2,0,400
+	s42.4,95.2,94.1,95.2h210.6v210.6c0,51.8,43.5,94.1,95.2,94.1s95.2-42.4,95.2-94.1V495.2h210.6c51.8,0,94.1-43.5,94.1-95.2
+	S757.6,304.8,705.9,304.8z"/>
 </svg>
