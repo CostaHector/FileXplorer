@@ -11,6 +11,7 @@ class RenameActions : public QObject {
       : QObject{parent},
         _NUMERIZER{new QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"))},
         _RENAME_SWAPPER{new QAction(QIcon(":img/NAME_STR_SWAPPER_PATH"), tr("swap 1-2-3 to 1-3-2"))},
+        _RENAME_REVERSE{new QAction(QIcon(""), "Reverse filenames")},
         _CASE_NAME{new QAction(QIcon(":img/NAME_STR_CASE"), tr("Case"))},
         _STR_INSERTER{new QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), tr("Str Inserter"))},
         _STR_DELETER{new QAction(QIcon(":img/NAME_STR_DELETER_PATH"), tr("Str Deleter"))},
@@ -30,6 +31,7 @@ class RenameActions : public QObject {
 
   QAction* _NUMERIZER;
   QAction* _RENAME_SWAPPER;
+  QAction* _RENAME_REVERSE;
   QAction* _CASE_NAME;
   QAction* _STR_INSERTER;
   QAction* _STR_DELETER;
