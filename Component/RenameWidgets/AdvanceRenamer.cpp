@@ -178,11 +178,11 @@ QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList,
     for (const QString& nm : replaceeList) {
       replacedList.append(nm.toLower());
     }
-  } else if (g_renameAg()._LOOSE_CAPITALIZE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
+  } else if (g_renameAg()._SENTENSE_CASE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
     for (const QString& nm : replaceeList) {
       replacedList.append(NameTool::CapitaliseEachWordFirstLetterOnly(nm));
     }
-  } else if (g_renameAg()._STRICT_CAPITALIZE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
+  } else if (g_renameAg()._SENTENSE_CASE_IGNORE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
     for (const QString& nm : replaceeList) {
       replacedList.append(NameTool::CapitaliseEachWordFirstLetterLowercaseOthers(nm));
     }
