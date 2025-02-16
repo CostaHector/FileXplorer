@@ -145,10 +145,7 @@
 <file alias="DONE_AND_NEXT">JsonEditor/DONE_AND_NEXT.png</file>
 <file alias="FORMAT">JsonEditor/FORMAT.svg</file>
 <file alias="SUBMIT">JsonEditor/SUBMIT.svg</file>
-<file alias="NEXT_JSON">JsonEditor/NEXT_JSON.svg</file>
-<file alias="LAST_JSON">JsonEditor/LAST_JSON.svg</file>
 <file alias="CONDITION_NOT">JsonEditor/CONDITION_NOT.svg</file>
-<file alias="CAPITALIZE_EACH_WORD">JsonEditor/CAPITALIZE_EACH_WORD.svg</file>
 <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
 <file alias="LOAD_JSONS_FROM_CURRENT_PATH">JsonEditor/LOAD_JSONS_FROM_CURRENT_PATH.svg</file>
 
@@ -172,18 +169,17 @@
 <!--NameStr Icon here-->
 <file alias="RENAME">NameStrIcon/RENAME.svg</file>
 <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.svg</file>
-<file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/Numerizer.svg</file>
-<file alias="NAME_STR_SWAPPER_PATH">NameStrIcon/NAME_SWAPPER.svg</file>
+<file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/NAME_STR_NUMERIZER_PATH.svg</file>
+<file alias="NAME_SECTIONS_SWAP">NameStrIcon/NAME_SECTIONS_SWAP.svg</file>
+<file alias="RENAME_SWAP_2_NAMES">NameStrIcon/RENAME_SWAP_2_NAMES.svg</file>
 <file alias="UNICODE_TO_ASCII_TEXT">NameStrIcon/UNICODE_TO_ASCII_TEXT.png</file>
-<file alias="RENAME_LOWER_CASE">NameStrIcon/CaseLower.png</file>
-<file alias="RENAME_UPPER_CASE">NameStrIcon/CaseUpper.png</file>
-<file alias="RENAME_LOOSE_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_WEAK_USB.svg</file>
-<file alias="RENAME_STRICT_CAPITALIZE_CASE">NameStrIcon/CAPITALIZE_STRONG_Usb.svg</file>
-<file alias="RENAME_TOGGLE_CASE">NameStrIcon/CaseToggler.svg</file>
-<file alias="NAME_STR_INSERTER_PATH">NameStrIcon/Inserter.png</file>
-<file alias="NAME_STR_DELETER_PATH">NameStrIcon/Deleter.png</file>
+<file alias="RENAME_LOWER_CASE">NameStrIcon/RENAME_LOWER_CASE.png</file>
+<file alias="RENAME_UPPER_CASE">NameStrIcon/RENAME_UPPER_CASE.png</file>
+<file alias="RENAME_TOGGLE_CASE">NameStrIcon/RENAME_TOGGLE_CASE.svg</file>
+<file alias="NAME_STR_INSERTER_PATH">NameStrIcon/NAME_STR_INSERTER_PATH.svg</file>
+<file alias="NAME_STR_DELETER_PATH">NameStrIcon/NAME_STR_DELETER_PATH.svg</file>
 <file alias="NAME_STR_REPLACER_PATH">NameStrIcon/Replacer.png</file>
-<file alias="_NAME_NO_CONSECUTIVE">NameStrIcon/_NAME_NO_CONSECUTIVE.svg</file>
+<file alias="_CONTINUOUS_NUMBERING">NameStrIcon/_CONTINUOUS_NUMBERING.svg</file>
 <file alias="NAME_RULER">NameStrIcon/NAME_RULER.svg</file>
 <file alias="PRODUCTION_STUDIOS_LIST_FILE">NameStrIcon/PRODUCTION_STUDIOS_LIST_FILE.svg</file>
 <file alias="PERFORMERS_LIST_FILE">NameStrIcon/PERFORMERS_LIST_FILE.svg</file>
