@@ -23,7 +23,7 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
   switch (role) {
     case Qt::ItemDataRole::DisplayRole: {
       QString disp = mCurBegin[linearInd].name;
-      disp += '\n';
+      disp += " | ";
       disp += QString::number(mCurBegin[linearInd].rate);
       disp += " | ";
       disp += mCurBegin[linearInd].uploaded;
@@ -32,10 +32,15 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
       return disp;
     }
     case Qt::ItemDataRole::DecorationRole: {
-      if (mCurBegin[linearInd].imgName.isEmpty()) {
+      const auto& scnInfo = mCurBegin[linearInd];
+      if (scnInfo.imgName.isEmpty()) {
         return {};
       }
-      QPixmap previewImg{mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].imgName};
+      const QPixmap previewImg{mRootPath + scnInfo.rel2scn + scnInfo.imgName};
+      if (previewImg.isNull()) {
+        qCritical("qpixmap[%s] is null", qPrintable(scnInfo.imgName));
+        return {};
+      }
       if (previewImg.width() > previewImg.height()) {
         return previewImg.scaledToWidth(420);
       }
