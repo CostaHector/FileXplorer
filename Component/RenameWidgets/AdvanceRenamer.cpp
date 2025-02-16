@@ -221,7 +221,7 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)
 
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
   auto* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok);
-  pOkBtn->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
+  pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.").arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
   pOkBtn->setStyleSheet(SUBMIT_BTN_STYLE);
   m_buttonBox->button(QDialogButtonBox::Help)->setText("See commands...");
