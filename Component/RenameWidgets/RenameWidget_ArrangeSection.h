@@ -20,7 +20,7 @@ class RenameWidget_ArrangeSection : public AdvanceRenamer {
   auto InitExtraCommonVariable() -> void override {
     windowTitleFormat = "Arrange section sequence | %1 item(s) under [%2]";
     setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/NAME_STR_SWAPPER_PATH"));
+    setWindowIcon(QIcon(":img/NAME_SECTIONS_SWAP"));
   }
   auto InitControlTB() -> QToolBar* override {
     QToolBar* replaceControl(new QToolBar);

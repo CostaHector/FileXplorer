@@ -83,13 +83,16 @@ QToolButton* DropListToolButtonWithoutDefAction(const QIcon &icon, const QString
 
 auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction* {
   if (ag == nullptr) {
+    qWarning("candidate actions is nullptr");
     return nullptr;
   }
-  for (QAction* act : ag->actions()) {
+  const auto& candidateActs = ag->actions();
+  for (QAction* act : candidateActs) {
     if (act->text() == actionName) {
       return act;
     }
   }
+  qCritical("cannot find action[%s] from %d candidate actions", qPrintable(actionName), candidateActs.size());
   return nullptr;
 }
 
