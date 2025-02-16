@@ -9,14 +9,14 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
       _CLR_TO_BE_EDITED_LIST(new QAction(QIcon(":img/EMPTY_LISTWIDGET"), tr("Clear list"), this)),
       _FILE_LOAD_ACTIONS{new QActionGroup(this)},
 
-      _LAST_FILE(new QAction(QIcon(":img/LAST_JSON"), tr("Last"), this)),
-      _NEXT_FILE(new QAction(QIcon(":img/NEXT_JSON"), tr("Next"), this)),
+      _LAST_FILE(new QAction(tr("Last"), this)),
+      _NEXT_FILE(new QAction(tr("Next"), this)),
       _DONE_AND_NEXT(new QAction(QIcon(":img/DONE_AND_NEXT"), tr("Done and next"), this)),
       _AUTO_SKIP(new QAction(QIcon(":img/AUTO_SKIP"), tr("Autoskip"), this)),
       _COMPLETE_PERFS_COUNT(new QAction(QIcon(":img/COMPLETE_PERFS_COUNT"), tr("Perf Cnt"), this)),
       _QUICK_EDIT_ACTIONS{new QActionGroup(this)},
 
-      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(QIcon(":img/CAPITALIZE_EACH_WORD"), tr("Capitalize"), this)),
+      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(tr("Sentense Case"), this)),
       _LOWER_ALL_WORDS(new QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("lowercase"), this)),
       _FORMATTER(new QAction(QIcon(":img/FORMAT"), tr("Formatter"), this)),
       _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload now"), this)),
