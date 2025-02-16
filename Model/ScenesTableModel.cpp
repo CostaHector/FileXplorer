@@ -35,7 +35,11 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
       if (mCurBegin[linearInd].imgName.isEmpty()) {
         return {};
       }
-      return QPixmap{mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].imgName}.scaledToWidth(420);
+      QPixmap previewImg{mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].imgName};
+      if (previewImg.width() > previewImg.height()) {
+        return previewImg.scaledToWidth(420);
+      }
+      return previewImg.scaledToHeight(280);
     }
     case Qt::ItemDataRole::BackgroundRole: {
       if (mCurBegin[linearInd].vidName.isEmpty()) {
