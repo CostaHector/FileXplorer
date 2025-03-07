@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-#include "PublicVariable.h"
+#include "Tools/PathTool.h"
 
 class ValueCheckerTest : public QObject {
   Q_OBJECT
@@ -13,19 +13,19 @@ class ValueCheckerTest : public QObject {
   void cleanup();
 
   void fileExtensionBasic() {
-    QCOMPARE(ValueChecker::GetFileExtension("AAA.mp4"), ".mp4");
-    QCOMPARE(ValueChecker::GetFileExtension("AAA.json"), ".json");
-    QCOMPARE(ValueChecker::GetFileExtension("AAA.z01"), ".z01");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.mp4"), ".mp4");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.json"), ".json");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.z01"), ".z01");
   }
 
   void fileExtension_1Char() {
-    QCOMPARE(ValueChecker::GetFileExtension("AAA.h"), ".h");
-    QCOMPARE(ValueChecker::GetFileExtension("AAA.m"), ".m");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.h"), ".h");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.m"), ".m");
   }
 
   void fileExtension_NoExtension() {
-    QCOMPARE(ValueChecker::GetFileExtension("AAA.5"), "");
-    QCOMPARE(ValueChecker::GetFileExtension("AAA.51"), "");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.5"), "");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.51"), "");
   }
 };
 

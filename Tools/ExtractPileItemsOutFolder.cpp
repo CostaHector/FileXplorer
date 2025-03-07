@@ -168,6 +168,16 @@ const QString& ScenesMixed::GetFirstImg(const QString& baseName) const {
   }
   return it.value().first();
 }
+
+const QStringList& ScenesMixed::GetAllImgs(const QString& baseName) const {
+  auto it = m_img2Name.find(baseName);
+  if (it == m_img2Name.cend()) {
+    static QStringList tempEmpty;
+    return tempEmpty;
+  }
+  return it.value();
+}
+
 const QString& ScenesMixed::GetFirstVid(const QString& baseName) const {
   auto it = m_vid2Name.find(baseName);
   if (it == m_vid2Name.cend()) {
