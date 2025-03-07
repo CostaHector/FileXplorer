@@ -24,6 +24,7 @@ class ScenesMixed {
   int operator()(const QString& path);
   int operator()(const QStringList& files);
   const QString& GetFirstImg(const QString& baseName) const;
+  const QStringList& GetAllImgs(const QString& baseName) const;
   const QString& GetFirstVid(const QString& baseName) const;
   QMap<QString, QStringList> m_img2Name;  // images baseName, extension with prefix dot
   QMap<QString, QStringList> m_vid2Name;
