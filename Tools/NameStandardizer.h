@@ -2,13 +2,11 @@
 #define NAMESTANDARDIZER_H
 
 #include <QString>
-#include <QMap>
-
 
 class NameStandardizer
 {
  public:
-  auto operator()(QString aFileName)->QString;
+  QString operator()(QString aFileName);
 };
 
 #endif // NAMESTANDARDIZER_H
