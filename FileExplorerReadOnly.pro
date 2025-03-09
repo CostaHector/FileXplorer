@@ -83,6 +83,8 @@ SOURCES += \
     Model/VidModel.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/ArchiveFiles.cpp \
+    Tools/Classify/ItemsClassifier.cpp \
+    Tools/Classify/SceneMixed.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
@@ -121,7 +123,6 @@ SOURCES += \
     PublicTool.cpp \
     RibbonMenu.cpp \
     Tools/ActionWithPath.cpp \
-    Tools/Categorizer.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/CopyItemPropertiesToClipboardIF.cpp \
     Tools/DuplicateImagesRemover.cpp \
@@ -250,6 +251,8 @@ HEADERS += \
     Model/VidModel.h \
     Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
+    Tools/Classify/ItemsClassifier.h \
+    Tools/Classify/SceneMixed.h \
     Tools/ConvertUnicodeCharsetToAscii.h \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FolderNxtAndLastIterator.h \
@@ -290,7 +293,6 @@ HEADERS += \
     PublicTool.h \
     RibbonMenu.h \
     Tools/ActionWithPath.h \
-    Tools/Categorizer.h \
     Tools/ConflictsItemHelper.h \
     Tools/CopyItemPropertiesToClipboardIF.h \
     Tools/DuplicateImagesRemover.h \
