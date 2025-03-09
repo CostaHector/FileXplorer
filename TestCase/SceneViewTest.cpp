@@ -102,15 +102,15 @@ class SceneViewTest : public QObject {
 
     auto afterScenes = SceneInfoManager::GetScenesFromPath(TEST_DIR);
     QCOMPARE(afterScenes[0].name, "somejsonfile1");
-    QCOMPARE(afterScenes[0].imgName, "");
+    QVERIFY(afterScenes[0].imgs.isEmpty());
     QCOMPARE(afterScenes[0].vidName, "");
 
     QCOMPARE(afterScenes[1].name, "somejsonfile2");
-    QCOMPARE(afterScenes[1].imgName, "");
+    QVERIFY(afterScenes[1].imgs.isEmpty());
     QCOMPARE(afterScenes[1].vidName, "");
 
     QCOMPARE(afterScenes[2].name, "somejsonfileEmpty");
-    QCOMPARE(afterScenes[2].imgName, "somejsonfileEmpty.png");
+    QCOMPARE(afterScenes[2].imgs, QStringList{"somejsonfileEmpty.png"});
     QCOMPARE(afterScenes[2].vidName, "somejsonfileEmpty.mp4");
     QVERIFY(afterScenes[2].vidSize > 0);
     QCOMPARE(afterScenes[2].rate, 0);

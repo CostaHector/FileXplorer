@@ -68,7 +68,7 @@ int ExtractPileItemsOutFolder::operator()(const QString& path, const QMap<QStrin
     const QString& folderName = it.key();
     const QStringList& files = it.value();
     if (files.size() < 2) {
-      // this folder is not classfied by Categorizer will not process here
+      // this folder is not classfied by ItemsClassifier will not process here
       qDebug("FolderName[%s] only contains %d item(s), skip", qPrintable(folderName), files.size());
       continue;
     }
@@ -104,85 +104,4 @@ bool ExtractPileItemsOutFolder::StartToRearrange() {
   const auto isAllSuccess = g_undoRedo.Do(m_cmds);
   qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;
-}
-
-#include "PublicVariable.h"
-int ScenesMixed::operator()(const QString& path) {
-  QDir mediaDir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
-  mediaDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET + TYPE_FILTER::IMAGE_TYPE_SET + TYPE_FILTER::JSON_TYPE_SET);
-  return operator()(mediaDir.entryList());
-}
-
-void SetElementIndexFirstIfValueFirst(QStringList& lst) {
-  if (lst.size() < 2) {
-    return;
-  }
-  auto minIt = std::min_element(lst.begin(), lst.end(), [](const QString& l, const QString& r) -> bool { return l.size() < r.size() || (l.size() == r.size() && l < r); });
-  if (minIt != lst.begin()) {
-    lst.front().swap(*minIt);
-  }
-}
-
-int ScenesMixed::operator()(const QStringList& files) {
-  QString noNumberName;
-  QRegularExpressionMatch result;
-  for (const QString& medName : files) {
-    QString baseName, ext;
-    std::tie(baseName, ext) = PATHTOOL::GetBaseNameExt(medName);
-    noNumberName = baseName;
-    auto typeEnum = DOT_EXT_2_TYPE.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
-    switch (typeEnum) {
-      case IMG: {
-        if ((result = IMG_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
-          noNumberName = result.captured(1);
-        }
-        m_img2Name[noNumberName].append(medName);
-        break;
-      }
-      case VID: {
-        noNumberName = baseName;
-        m_vid2Name[noNumberName].append(medName);
-        break;
-      }
-      case JSON:
-        m_json2Name[baseName] = medName;
-        break;
-      case OTHER:
-        break;
-    }
-  }
-
-  for (auto& pr : m_img2Name) {
-    SetElementIndexFirstIfValueFirst(pr);
-  }
-
-  qDebug("%d,%d,%d piles of img/vid/json found from %d item(s) given", m_img2Name.size(), m_vid2Name.size(), m_json2Name.size(), files.size());
-  return m_json2Name.size();
-}
-
-const QString& ScenesMixed::GetFirstImg(const QString& baseName) const {
-  auto it = m_img2Name.find(baseName);
-  if (it == m_img2Name.cend()) {
-    static QString imgNoExist;
-    return imgNoExist;
-  }
-  return it.value().first();
-}
-
-const QStringList& ScenesMixed::GetAllImgs(const QString& baseName) const {
-  auto it = m_img2Name.find(baseName);
-  if (it == m_img2Name.cend()) {
-    static QStringList tempEmpty;
-    return tempEmpty;
-  }
-  return it.value();
-}
-
-const QString& ScenesMixed::GetFirstVid(const QString& baseName) const {
-  auto it = m_vid2Name.find(baseName);
-  if (it == m_vid2Name.cend()) {
-    static QString vidNoExist;
-    return vidNoExist;
-  }
-  return it.value().first();
 }
