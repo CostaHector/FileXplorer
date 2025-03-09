@@ -1,18 +1,25 @@
 #include "SceneInfoManager.h"
 #include "PublicVariable.h"
+#include "Tools/Classify/SceneMixed.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PathTool.h"
-#include "Tools/ExtractPileItemsOutFolder.h"
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
 
+QString SCENE_INFO::GetFirstKImagesLabel(const QString& rootPath, const int k) const {
+  static const QString IMAGE_LABEL_TEMPLATE = R"(<img alt="%1" height="480" src="%1"/>)";
+  QString imgLabels;
+  for (int i = 0; i < k && i < imgs.size(); ++i) {
+    imgLabels += IMAGE_LABEL_TEMPLATE.arg(rootPath + rel2scn + imgs[i]);
+  }
+  return imgLabels;
+}
+
 namespace SceneInfoManager {
 SceneSortOption GetSortOptionFromStr(const QString& sortOption) {
-  static const QMap<QString, SceneSortOption> option2SortEnum{{"Movie Name", SceneSortOption::NAME},
-                                                              {"Movie Size", SceneSortOption::SIZE},
-                                                              {"Rate", SceneSortOption::RATE},
-                                                              {"Uploaded Time", SceneSortOption::UPLOADED}};
+  static const QMap<QString, SceneSortOption> option2SortEnum{
+      {"Movie Name", SceneSortOption::NAME}, {"Movie Size", SceneSortOption::SIZE}, {"Rate", SceneSortOption::RATE}, {"Uploaded Time", SceneSortOption::UPLOADED}};
   return option2SortEnum.value(sortOption, SceneSortOption::BUTT);
 }
 
@@ -50,15 +57,11 @@ SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey, const bool rev
   }
   static const std::function<bool(const SCENE_INFO&, const SCENE_INFO&)> sortedMap[2][(int)SceneSortOption::BUTT] = {
       // < operator here
-      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name < rhs.name; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize < rhs.vidSize; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate < rhs.rate; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded < rhs.uploaded; }},
+      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name < rhs.name; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize < rhs.vidSize; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate < rhs.rate; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded < rhs.uploaded; }},
       // > operator here
-      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name > rhs.name; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize > rhs.vidSize; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate > rhs.rate; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded > rhs.uploaded; }}};
+      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name > rhs.name; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize > rhs.vidSize; },
+       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate > rhs.rate; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded > rhs.uploaded; }}};
   std::sort(scenes.begin(), scenes.end(), sortedMap[(int)reverse][(int)sortByKey]);
   return scenes;
 }
@@ -81,26 +84,56 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, boo
 
   SCENE_INFO aScene;
   aScene.rel2scn = rel;
-  QString vidSize;
-  QString rate;
-  bool isNum{false};
+
   while (!stream.atEnd()) {
-    stream.readLineInto(&aScene.name, 256);
-    stream.readLineInto(&aScene.imgName, 256);
-    stream.readLineInto(&aScene.vidName, 256);
-    stream.readLineInto(&vidSize, 20);
-    stream.readLineInto(&rate, 5);
-    aScene.vidSize = vidSize.toLongLong(&isNum);
-    if (!isNum) {
+    // name
+    if (!stream.readLineInto(&aScene.name, 256)) {
+      qWarning("read name line failed");
+      return {};
+    }
+    // images list: a.jpg|a 2.png|a 4.webp
+    QString imgsSeperatedByVerticalBar;
+    if (!stream.readLineInto(&imgsSeperatedByVerticalBar)) {
+      qWarning("read imgs line failed");
+      return {};
+    }
+    aScene.imgs = imgsSeperatedByVerticalBar.split('|');
+    // Video Name: video.mp4
+    if (!stream.readLineInto(&aScene.vidName, 256)) {
+      qWarning("read video name line failed");
+      return {};
+    }
+    // Video Size: 10240kByte
+    QString vidSizeStr;
+    if (!stream.readLineInto(&vidSizeStr, 20)) {
+      qWarning("read video size line failed");
+      return {};
+    }
+    bool isVidSizeStrNum{false};
+    aScene.vidSize = vidSizeStr.toLongLong(&isVidSizeStrNum);
+    if (!isVidSizeStrNum) {
+      qWarning("Video size string[%s] is not a number.", qPrintable(vidSizeStr));
       aScene.vidSize = 0;
+      return {};
     }
-    isNum = false;
-    aScene.rate = rate.toLongLong(&isNum);
-    if (!isNum) {
+    // Rate: 10'
+    QString rateStr;
+    if (!stream.readLineInto(&rateStr, 5)) {
+      qWarning("read rate line failed");
+      return {};
+    }
+    bool isRateStrNum = false;
+    aScene.rate = rateStr.toLongLong(&isRateStrNum);
+    if (!isRateStrNum) {
+      qWarning("Rate string[%s] is not a number.", qPrintable(rateStr));
       aScene.rate = 0;
+      return {};
     }
-    isNum = false;
-    stream.readLineInto(&aScene.uploaded, 32);
+    // uploaded time: 2024/12/12 12:50:50
+    if (!stream.readLineInto(&aScene.uploaded, 32)) {
+      qWarning("Uploaded time read failed.");
+      return {};
+    }
 
     scenesList.append(aScene);
     if (enableFilter && aScene.name.contains(pattern, Qt::CaseSensitivity::CaseInsensitive)) {
@@ -228,13 +261,13 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
       jsonNeedUpdate = true;
     }
 
-    const QString& imgFileName = sMixed.GetFirstImg(baseName);
+    const QStringList& imgsLst = sMixed.GetAllImgs(baseName);
     it = rawJsonDict.find("ImgName");
     if (it == rawJsonDict.cend()) {
-      rawJsonDict.insert("ImgName", imgFileName);
+      rawJsonDict.insert("ImgName", imgsLst);
       jsonNeedUpdate = true;
-    } else if (it.value().toString() != imgFileName) {
-      it->setValue(imgFileName);
+    } else if (it.value().toStringList() != imgsLst) {
+      it->setValue(imgsLst);
       jsonNeedUpdate = true;
     }
 
@@ -301,8 +334,7 @@ int JsonDataRefresher::operator()(const QString& rootPath) {  // will iterate al
     UpdateAFolderItself(folderIt.next());
   }
   UpdateAFolderItself(rootPath);
-  qDebug("%d useful json file(s) founded, %d json file(s) updated from %d folder(s) In path[%s]", m_usefullJsonCnt, m_updatedJsonFilesCnt,
-         m_jsonsDicts.size(), qPrintable(rootPath));
+  qDebug("%d useful json file(s) founded, %d json file(s) updated from %d folder(s) In path[%s]", m_usefullJsonCnt, m_updatedJsonFilesCnt, m_jsonsDicts.size(), qPrintable(rootPath));
   return m_updatedJsonFilesCnt;
 }
 
@@ -319,7 +351,7 @@ int JsonDataRefresher::GenerateScnFiles() {
       }
       scnContent += rawJsonDict.value("Name", "").toString();
       scnContent += '\n';
-      scnContent += rawJsonDict.value("ImgName", "").toString();
+      scnContent += rawJsonDict.value("ImgName", "").toStringList().join('|');
       scnContent += '\n';
       scnContent += rawJsonDict.value("VidName", "").toString();
       scnContent += '\n';
