@@ -68,7 +68,7 @@ class ScenesMixedTest : public QObject {
     QCOMPARE(sMixed.m_json2Name["another Tarzan"], "another Tarzan.json");
   }
 
-  void test_VidWithPartNumber() {
+  void test_FolderNameNotStartWith_notCombine() {
     QStringList files;
     files << "Superman - The Inked Meat Part 1.mp4"
           << "Superman - The Inked Meat Part 1.json"
@@ -97,34 +97,46 @@ class ScenesMixedTest : public QObject {
     QCOMPARE(sMixed.m_img2Name["Superman - The Inked Meat Part 2"], part2SortedLst);
   }
 
-  void test_1VidWithoutPartNumberOtherWith() {
-    // part 1 and part 2 share a json file
+  void test_folder2NameStartWithFolder1_folder2HasJson_NotCombine() {
+    // both part 1 and part 2 have a json file, no combine
     QStringList files;
-    files << "Captain America - The Inked Meat.mp4"
-          << "Captain America - The Inked Meat.json"
-          << "Captain America - The Inked Meat.jpg"
-          << "Captain America - The Inked Meat 0.jpg"
-          << "Captain America - The Inked Meat 33.jpg"
-          << "Captain America - The Inked Meat Part 2.mp4"
-          << "Captain America - The Inked Meat Part 2 0.jpg"
-          << "Captain America - The Inked Meat Part 2 33.jpg";
+    files << "Captain America - Henry Carvill, Chris Evans.json"
+          << "Captain America - Henry Carvill, Chris Evans.mp4"
+          << "Captain America - Henry Carvill, Chris Evans.jpg"
+          << "Captain America - Henry Carvill, Chris Evans 1.jpg"
+          << "Captain America - Henry Carvill, Chris Evans 2.jpg"
+          << "Captain America - Henry Carvill, Chris Evans Part 2.json"
+          << "Captain America - Henry Carvill, Chris Evans Part 2.mp4";
     ScenesMixed sMixed;
     const auto& batches = sMixed(files);
     QCOMPARE(batches.size(), 2);  // batch count = 2
-    QCOMPARE(batches["Captain America - The Inked Meat"].size(), 5);
-    QCOMPARE(batches["Captain America - The Inked Meat Part 2"].size(), 3);
-    QCOMPARE(sMixed.m_json2Name.size(), 1);
+    QCOMPARE(batches["Captain America - Henry Carvill, Chris Evans"].size(), 5);
+    QCOMPARE(batches["Captain America - Henry Carvill, Chris Evans Part 2"].size(), 2);
+    QCOMPARE(sMixed.m_json2Name.size(), 2);
     QCOMPARE(sMixed.m_vid2Name.size(), 2);
-    QCOMPARE(sMixed.m_img2Name.size(), 2);
+    QCOMPARE(sMixed.m_img2Name.size(), 1);
+  }
 
-    QVERIFY(sMixed.m_json2Name.contains("Captain America - The Inked Meat"));
-    QVERIFY(sMixed.m_vid2Name.contains("Captain America - The Inked Meat"));
-    QVERIFY(sMixed.m_vid2Name.contains("Captain America - The Inked Meat Part 2"));
-    QVERIFY(sMixed.m_img2Name.contains("Captain America - The Inked Meat"));
-    QVERIFY(sMixed.m_img2Name.contains("Captain America - The Inked Meat Part 2"));
+  void test_folder2NameStartWithFolder1_folder2NoJson_Combine2Front() {
+    // part 1 and part 2 share a json file
+    QStringList files;
+    files << "Captain America - Henry Carvill, Chris Evans.json"
+          << "Captain America - Henry Carvill, Chris Evans.mp4"
+          << "Captain America - Henry Carvill, Chris Evans.jpg"
+          << "Captain America - Henry Carvill, Chris Evans 1.jpg"
+          << "Captain America - Henry Carvill, Chris Evans 2.jpg"
+          << "Captain America - Henry Carvill, Chris Evans Part 2.mp4";
+    ScenesMixed sMixed;
+    const auto& batches = sMixed(files);
+    QCOMPARE(batches.size(), 1);  // batch count = 2
+    QCOMPARE(batches["Captain America - Henry Carvill, Chris Evans"].size(), 6);
+    QCOMPARE(sMixed.m_json2Name.size(), 1);
+    QCOMPARE(sMixed.m_vid2Name.size(), 1);
+    QCOMPARE(sMixed.m_img2Name.size(), 1);
 
-    QVERIFY(sMixed.m_vid2Name.contains("Captain America - The Inked Meat Part 2"));
-    QVERIFY(sMixed.m_img2Name.contains("Captain America - The Inked Meat Part 2"));
+    QVERIFY(sMixed.m_json2Name.contains("Captain America - Henry Carvill, Chris Evans"));
+    QVERIFY(sMixed.m_vid2Name.contains("Captain America - Henry Carvill, Chris Evans"));
+    QVERIFY(sMixed.m_img2Name.contains("Captain America - Henry Carvill, Chris Evans"));
   }
 
   void test_VidAndFoldersMixed() {
@@ -138,7 +150,7 @@ class ScenesMixedTest : public QObject {
     QCOMPARE(folder2Items.size(), 4);
   }
 
-  void test_vidNameWithIndex_chop_index() {
+  void test_folderWithoutJson_CombinedToFront() {
     QStringList aMovie;
     aMovie << "MovieName - Micheal, Jensen Ankles.mp4"
            << "MovieName - Micheal, Jensen Ankles.avi"
@@ -148,11 +160,9 @@ class ScenesMixedTest : public QObject {
            << "MovieName - Micheal, Jensen Ankles - HD.mp4";
     ScenesMixed sMixed;
     const auto& folder2Items = sMixed(aMovie);
-    QCOMPARE(folder2Items.size(), 4);
+    QCOMPARE(folder2Items.size(), 1);
     QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles"));
-    QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles FHD"));
-    QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles 1080p"));
-    QVERIFY(folder2Items.contains("MovieName - Micheal, Jensen Ankles - HD"));
+    QCOMPARE(folder2Items["MovieName - Micheal, Jensen Ankles"].size(), 6);
   }
 
   void test_imgNameWithIndex_chop_index() {
@@ -166,19 +176,10 @@ class ScenesMixedTest : public QObject {
          << "LE - Sporty - Malik, King - 2.png";  // LE - Sporty - Malik, King
     ScenesMixed sMixed;
     const auto& folder2Items = sMixed(imgs);
-    QCOMPARE(folder2Items.size(), 4);
+    QCOMPARE(folder2Items.size(), 2);
 
     QVERIFY(folder2Items.contains("Name"));
-    const QStringList nameImg{"Name 1.png", "Name - 1.png"};
-    QCOMPARE(folder2Items["Name"], nameImg);
-
-    const QStringList nameSpace1Img{"Name 1 - 1.png"};
-    QVERIFY(folder2Items.contains("Name 1"));
-    QCOMPARE(folder2Items["Name 1"], nameSpace1Img);
-
-    const QStringList nameHypen1Img{"Name - 1 - 1.png"};
-    QVERIFY(folder2Items.contains("Name - 1"));
-    QCOMPARE(folder2Items["Name - 1"], nameHypen1Img);
+    QCOMPARE(folder2Items["Name"].size(), 4);
 
     QVERIFY(folder2Items.contains("LE - Sporty - Malik, King"));
     QCOMPARE(folder2Items["LE - Sporty - Malik, King"].size(), 3);
