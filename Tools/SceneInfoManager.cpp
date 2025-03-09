@@ -1,14 +1,14 @@
 #include "SceneInfoManager.h"
 #include "PublicVariable.h"
+#include "Tools/Classify/SceneMixed.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PathTool.h"
-#include "Tools/ExtractPileItemsOutFolder.h"
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
 
 QString SCENE_INFO::GetFirstKImagesLabel(const QString& rootPath, const int k) const {
-  static const QString IMAGE_LABEL_TEMPLATE = R"(<img alt="%1" width="720" src="%1"/>)";
+  static const QString IMAGE_LABEL_TEMPLATE = R"(<img alt="%1" height="480" src="%1"/>)";
   QString imgLabels;
   for (int i = 0; i < k && i < imgs.size(); ++i) {
     imgLabels += IMAGE_LABEL_TEMPLATE.arg(rootPath + rel2scn + imgs[i]);
