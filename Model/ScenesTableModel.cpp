@@ -10,7 +10,7 @@
 ScenesTableModel::ScenesTableModel(QObject* object) : QAbstractTableModelPub(object) {}
 
 QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
-  if (not index.isValid()) {
+  if (!index.isValid()) {
     return {};
   }
   if (IsScnsEmpty()) {
@@ -22,35 +22,34 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
   }
   switch (role) {
     case Qt::ItemDataRole::DisplayRole: {
-      QString disp = mCurBegin[linearInd].name;
-      disp += " | ";
-      disp += QString::number(mCurBegin[linearInd].rate);
-      disp += " | ";
-      disp += mCurBegin[linearInd].uploaded;
-      disp += " | ";
-      disp += FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mCurBegin[linearInd].vidSize);
-      return disp;
+      return mCurBegin[linearInd].name;
     }
     case Qt::ItemDataRole::DecorationRole: {
-      const auto& scnInfo = mCurBegin[linearInd];
-      if (scnInfo.imgName.isEmpty()) {
+      if (mCurBegin[linearInd].imgs.isEmpty()) {
         return {};
       }
-      const QPixmap previewImg{mRootPath + scnInfo.rel2scn + scnInfo.imgName};
-      if (previewImg.isNull()) {
-        qCritical("qpixmap[%s] is null", qPrintable(scnInfo.imgName));
+      const QString imgAbsPath = mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].imgs.front();
+      if (!QFile::exists(imgAbsPath)) {
         return {};
       }
-      if (previewImg.width() > previewImg.height()) {
-        return previewImg.scaledToWidth(420);
+      const QPixmap previewImg{imgAbsPath};
+      if (previewImg.height() > 2 * previewImg.width()) {
+        // H:w > 2:1
+        return previewImg.scaledToHeight(280);
       }
-      return previewImg.scaledToHeight(280);
+      return previewImg.scaledToWidth(420);
     }
     case Qt::ItemDataRole::BackgroundRole: {
       if (mCurBegin[linearInd].vidName.isEmpty()) {
         return QBrush(Qt::GlobalColor::darkGray, Qt::BrushStyle::SolidPattern);
       }
       break;
+    }
+    case Qt::ItemDataRole::ToolTipRole: {
+      static const QString TOOLTIP_TEMPLATE = R"(<b>%1</b><br/>%2<br/>%3)";
+      return TOOLTIP_TEMPLATE.arg(mCurBegin[linearInd].name,                                                 // name
+                                  FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mCurBegin[linearInd].vidSize),  // size
+                                  mCurBegin[linearInd].GetFirstKImagesLabel(mRootPath));                     // images
     }
     default:
       break;
@@ -236,8 +235,7 @@ void ScenesTableModel::SortOrder(SceneInfoManager::SceneSortOption sortOption, b
     mCurBegin = mEntryList.cbegin() + newBegin;
     mCurEnd = mEntryList.cbegin() + newEnd;
   }
-  emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1),
-                   {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
+  emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
 }
 
 bool ScenesTableModel::ChangeRowsCnt(int newRowCnt, int newPageIndex) {
@@ -321,8 +319,7 @@ bool ScenesTableModel::SetPageIndex(int newPageIndex) {
   mCurBegin = lst.cbegin() + begin;
   mCurEnd = lst.cbegin() + end;
 
-  emit dataChanged(index(0, 0), index(beforeRowCnt, afterRowCnt - 1),
-                   {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
+  emit dataChanged(index(0, 0), index(beforeRowCnt, afterRowCnt - 1), {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
   qDebug("============== SetPageIndex new dimension: %dx%d ==============", rowCount(), columnCount());
   return true;
 }
@@ -369,6 +366,5 @@ void ScenesTableModel::setFilterRegularExpression(const QString& pattern) {
   mCurBegin = mEntryListFiltered.cbegin() + newBegin;
   mCurEnd = mEntryListFiltered.cbegin() + newEnd;
   RowsCountEndChange(beforeRow, afterRow);
-  qDebug("============== filter now enable pattern[%s], new dimension: %dx%d, scenes count:%d ==============", qPrintable(pattern), rowCount(),
-         columnCount(), newScenesCnt);
+  qDebug("============== filter now enable pattern[%s], new dimension: %dx%d, scenes count:%d ==============", qPrintable(pattern), rowCount(), columnCount(), newScenesCnt);
 }
