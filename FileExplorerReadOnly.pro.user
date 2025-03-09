@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 14.0.2, 2025-02-16T16:17:36. -->
+<!-- Written by QtCreator 11.0.2, 2025-03-09T12:50:07. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -425,7 +425,7 @@
  </data>
  <data>
   <variable>ProjectExplorer.Project.TargetCount</variable>
-  <value type="qlonglong">2</value>
+  <value type="qlonglong">1</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.FileVersion</variable>
