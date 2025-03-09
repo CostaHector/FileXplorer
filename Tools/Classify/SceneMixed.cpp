@@ -26,6 +26,24 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QString& path) {
   return operator()(mediaDir.entryList());
 }
 
+bool ScenesMixed::NeedCombine2Folder(const QString& folderNameLhs, const QString& folderNameRhs) {
+  // lhs: a
+  // rhs: a part 2 contains not json file
+  if (folderNameLhs.size() >= folderNameRhs.size()) {
+    return false;
+  }
+
+  if (!folderNameRhs.startsWith(folderNameLhs)) {
+    return false;
+  }
+
+  if (m_json2Name.contains(folderNameRhs)) {
+    return false;
+  }
+
+  return true;
+}
+
 QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
   struct ImageName {
     QString baseName;
@@ -61,30 +79,57 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
     }
   }
 
+  // classify images into m_img2Name
   QRegularExpressionMatch result;
   for (const ImageName& imageName : imageNames) {
     QString imagefullname = imageName.baseName + imageName.extension;
     if (batches.contains(imageName.baseName)) {
-      // a part 1.jpg
-      // a part 1.json
+      // a part 1.jpg => folder name "a part 1"
       m_img2Name[imageName.baseName].append(imagefullname);
       batches[imageName.baseName].append(imagefullname);
       continue;
     }
     if ((result = IMG_PILE_NAME_PATTERN.match(imageName.baseName)).hasMatch()) {
       // ^(.*?)( | - )(\\d{1,3})?$
-      // a.jpg
+      // a.jpg => folder name "a"
       // a 1.json
       // a - 1.json
       // a.json
-      auto it = batches.constFind(result.captured(1));
-      if (it != batches.constEnd()) {
-        m_img2Name[it.key()].append(imagefullname);
-      }
+      m_img2Name[result.captured(1)].append(imagefullname);
       batches[result.captured(1)].append(imagefullname);
       continue;
     }
     batches[imageName.baseName].append(imagefullname);
+  }
+
+  if (batches.size() > 1) {
+    auto it1 = batches.begin();
+    auto it2 = it1 + 1;
+    while (it1 != it2 && it1 != batches.end() && it2 != batches.end()) {
+      // combine items in it2 into it1
+      const QString& it1FolderName = it1.key();
+      const QString& it2FolderName = it2.key();
+      bool needCombine = NeedCombine2Folder(it1FolderName, it2FolderName);
+      if (!needCombine) {
+        ++it1;
+        ++it2;
+        continue;
+      }
+
+      auto tmpImgIt = m_img2Name.find(it2FolderName);
+      if (tmpImgIt != m_img2Name.end()) {
+        m_img2Name[it1FolderName] += tmpImgIt.value();
+        m_img2Name.erase(tmpImgIt);
+      }
+      auto tmpVidIt = m_vid2Name.find(it2FolderName);
+      if (tmpVidIt != m_vid2Name.end()) {
+        m_vid2Name[it1FolderName] += tmpVidIt.value();
+        m_vid2Name.erase(tmpVidIt);
+      }
+
+      it1.value() += it2.value();
+      it2 = batches.erase(it2);
+    }
   }
 
   for (QStringList& imgs : m_img2Name) {
