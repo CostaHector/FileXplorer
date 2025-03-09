@@ -1,21 +1,12 @@
 #include "NameStandardizer.h"
-
-#include <QDebug>
-#include <QDir>
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonParseError>
-#include <QJsonValue>
-#include "PublicVariable.h"
 #include "Tools/ProductionStudioManager.h"
+#include "PublicVariable.h"
 
 const QRegularExpression stdCommaComp("\\s+,");
 const QRegularExpression stdExclamationComp("\\s+!");
 
 using namespace JSON_RENAME_REGEX;
-auto NameStandardizer::operator()(QString aFileName) -> QString {
+QString NameStandardizer::operator()(QString aFileName) {
   // non-standard character
   QString& noInvalidChar = aFileName.replace(invalidCharPat, " ");
   QString& noExtraSpaceComma = noInvalidChar.replace(stdCommaComp, ", ");
@@ -36,7 +27,7 @@ auto NameStandardizer::operator()(QString aFileName) -> QString {
 
   // Get standard Name
   const int barIndex = fileName.indexOf('-');
-  if (barIndex == -1 or barIndex == 0) {
+  if (barIndex == -1 || barIndex == 0) {
     return fileName;
   }
   static auto& psm = ProductionStudioManager::getIns();

@@ -19,15 +19,5 @@ class ExtractPileItemsOutFolder {
   FileOperatorType::BATCH_COMMAND_LIST_TYPE m_cmds;
 };
 
-class ScenesMixed {
- public:
-  int operator()(const QString& path);
-  int operator()(const QStringList& files);
-  const QString& GetFirstImg(const QString& baseName) const;
-  const QString& GetFirstVid(const QString& baseName) const;
-  QMap<QString, QStringList> m_img2Name;  // images baseName, extension with prefix dot
-  QMap<QString, QStringList> m_vid2Name;
-  QMap<QString, QString> m_json2Name;
-};
 
 #endif // EXTRACTPILEITEMSOUTFOLDER_H
