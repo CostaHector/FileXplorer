@@ -15,6 +15,8 @@ class ScenesMixed {
   QMap<QString, QStringList> m_img2Name;  // images baseName, extension with prefix dot
   QMap<QString, QStringList> m_vid2Name;
   QMap<QString, QString> m_json2Name;
+ private:
+  bool NeedCombine2Folder(const QString& folderNameLhs, const QString& folderNameRhs);
 };
 
 #endif
