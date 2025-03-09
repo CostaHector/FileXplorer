@@ -255,10 +255,6 @@
         <translation type="vanished">命名之尺</translation>
     </message>
     <message>
-        <source>Categorizer</source>
-        <translation type="vanished">电影文件分类器</translation>
-    </message>
-    <message>
         <source>Organizer</source>
         <translation type="vanished">组织器</translation>
     </message>
