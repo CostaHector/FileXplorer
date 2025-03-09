@@ -9,11 +9,13 @@
 struct SCENE_INFO {
   QString rel2scn;   // jsonFullPath = mRootPath + rel2scn + jsonFileName, rel2scn can be '/' or '/any thing/'
   QString name;      // name, key"Name"
-  QString imgName;   // img, key"ImgName"
+  QStringList imgs;   // img, key"ImgName"
   QString vidName;   // video, key"VidName"
   qint64 vidSize;    // video size, from json file, key"VidSize"
   int rate;          // video rate, from json file, key"Rate"
   QString uploaded;  // from json file, key"Uploaded"
+
+  QString GetFirstKImagesLabel(const QString& rootPath, const int k = 2) const;
 };
 
 typedef QList<SCENE_INFO> SCENES_TYPE;
