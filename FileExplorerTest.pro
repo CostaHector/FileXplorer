@@ -15,8 +15,10 @@ SOURCES += \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
+    TestCase/ItemsClassifierTest.cpp \
     TestCase/RenameHelperTest.cpp \
     TestCase/SceneInfoManagerTest.cpp \
+    TestCase/ScenesMixedTest.cpp \
     TestCase/ThumbnailProcessActions.cpp \
     TestCase/pub/FileSystemHelper.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
@@ -48,6 +50,8 @@ SOURCES += \
     Tools/RedundantFolderRemove.cpp \
     Tools/MD5Calculator.cpp \
     Tools/QMediaInfo.cpp \
+    Tools/Classify/ItemsClassifier.cpp \
+    Tools/Classify/SceneMixed.cpp \
     Component/QuickWhereClause.cpp \
     Component/StateLabel.cpp \
     Component/NotificatorFrame.cpp \
@@ -55,7 +59,6 @@ SOURCES += \
     FileOperation/FileOperatorPub.cpp \
     PublicTool.cpp \
     PublicVariable.cpp \
-    TestCase/CatergorizerTest.cpp \
     TestCase/DuplicateImagesRemoverTest.cpp \
     TestCase/FilesNameBatchStandardizerTest.cpp \
     TestCase/MovieNameStandardizerTest.cpp \
@@ -65,7 +68,6 @@ SOURCES += \
     TestCase/QuickWhereClauseTest.cpp \
     TestCase/FileOperationTest.cpp \
     TestCase/UndoRedoTest.cpp \
-    Tools/Categorizer.cpp \
     Tools/PerformersAkaManager.cpp \
     Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
@@ -109,7 +111,6 @@ HEADERS += \
     FileOperation/FileOperatorPub.h \
     PublicTool.h \
     PublicVariable.h \
-    Tools/Categorizer.h \
     Tools/PerformersAkaManager.h \
     Tools/DuplicateImagesRemover.h \
     Tools/FilesNameBatchStandardizer.h \
@@ -127,6 +128,8 @@ HEADERS += \
     Tools/JsonFileHelper.h \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/ItemsPileCategory.h \
+    Tools/Classify/ItemsClassifier.h \
+    Tools/Classify/SceneMixed.h \
     model/ConflictsFileSystemModel.h \
     UndoRedo.h
 
