@@ -10,6 +10,7 @@ TEMPLATE = app
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    MainTestSuite.cpp \
     TestCase/AIMediaDuplicateTest.cpp \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
@@ -38,6 +39,7 @@ SOURCES += \
     TestCase/ValueCheckerTest.cpp \
     TestCase/FinderTest.cpp \
     TestCase/VideosDurationGetterTest.cpp \
+    TestCase/pub/MyTestSuite.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/ThumbnailProcesser.cpp \
     Tools/ItemsPileCategory.cpp \
@@ -94,6 +96,7 @@ HEADERS += \
     TestCase/pub/BeginToExposePrivateMember.h \
     TestCase/pub/EndToExposePrivateMember.h \
     TestCase/pub/FileSystemRelatedTest.h \
+    TestCase/pub/MyTestSuite.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/ThumbnailProcesser.h \
     Tools/ItemsPileCategory.h \
