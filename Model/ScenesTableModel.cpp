@@ -114,11 +114,7 @@ QString ScenesTableModel::baseName(const QModelIndex& index) const {
   if (!isIndexValid(index, &linearInd)) {
     return {};
   }
-  if (mCurBegin[linearInd].vidName.isEmpty()) {
-    qDebug("vidName is empty");
-    return {};
-  }
-  return PATHTOOL::GetBaseName(mCurBegin[linearInd].vidName);
+  return mCurBegin[linearInd].name;
 }
 
 QString ScenesTableModel::absolutePath(const QModelIndex& index) const {
