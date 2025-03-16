@@ -35,8 +35,6 @@ class JsonEditor : public QMainWindow {
 
   auto onStageChanges() -> bool;
   bool onSaveAndNextUnfinishedItem();
-  auto onResetChanges() -> bool;
-  auto onSubmitAllChanges() -> bool;
   auto onLowercaseEachWord() -> void;
   auto onCapitalizeEachWord() -> void;
   auto onLearnPerfomersFromJsonFile() -> bool;
@@ -63,7 +61,6 @@ class JsonEditor : public QMainWindow {
   }
 
  private:
-  static inline auto getBackupJsonFile(const QString& origin) -> QString { return origin + ".bkp"; }
   bool IsValueOfKeyArr(const QString& key) const;
   QString GetArrLine(const QString& key) const;
   void UpdateDisplayArrLine(const QString& key, const QStringList& arr);

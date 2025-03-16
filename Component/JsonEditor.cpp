@@ -67,7 +67,7 @@ JsonEditor::JsonEditor(QWidget* parent)
 
 void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
   m_keysMet.clear();
-  if (not curIndex.isValid()) {
+  if (!curIndex.isValid()) {
     qWarning("Current index invalid");
     return;
   }
@@ -101,19 +101,19 @@ void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
 
     m_jsonFormExtraLo->addRow(key, new QLineEdit(valueStr));
   }
-  if (not m_keysMet.contains(JSONKey::Performers)) {
+  if (!m_keysMet.contains(JSONKey::Performers)) {
     m_keysMet.insert(JSONKey::Performers);
     onPerformersHint();
   }
-  if (not m_keysMet.contains(JSONKey::ProductionStudio)) {
+  if (!m_keysMet.contains(JSONKey::ProductionStudio)) {
     m_keysMet.insert(JSONKey::ProductionStudio);
     qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::ProductionStudio])->setText("");
   }
-  if (not m_keysMet.contains(JSONKey::Hot)) {
+  if (!m_keysMet.contains(JSONKey::Hot)) {
     m_keysMet.insert(JSONKey::Hot);
     qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Hot])->setText("");
   }
-  if (not m_keysMet.contains(JSONKey::Rate)) {
+  if (!m_keysMet.contains(JSONKey::Rate)) {
     m_keysMet.insert(JSONKey::Rate);
     qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Rate])->setText("-1");
   }
@@ -132,19 +132,10 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._DONE_AND_NEXT, &QAction::triggered, this, &JsonEditor::onSaveAndNextUnfinishedItem);
   connect(g_jsonEditorActions()._COMPLETE_PERFS_COUNT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
 
-  connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);  // (.json, save former .backup for recover)
-  connect(g_jsonEditorActions()._CANCEL, &QAction::triggered, this, &JsonEditor::onResetChanges);
-  connect(g_jsonEditorActions()._SUBMIT, &QAction::triggered, this, [this]() {
-    qDebug("submit all");  //  (.json and delete .backup)
-    const auto ret = QMessageBox::warning(this, "Submit all ?", "Cannot recover", QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
-    if (ret == QMessageBox::StandardButton::Yes) {
-      onSubmitAllChanges();
-    }
-  });
+  connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);
 
   connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
   connect(g_jsonEditorActions()._EXTRACT_CAPITALIZED_PERFORMER, &QAction::triggered, this, &JsonEditor::onExtractCapitalizedPerformersHint);
-  connect(g_jsonEditorActions()._BROWSE_AND_SELECT_THE_FOLDER, &QAction::triggered, this, [this]() { this->JsonEditor::operator()(); });
 
   connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
   connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
@@ -172,8 +163,8 @@ int JsonEditor::operator()(const QString& folderPath) {
 
 bool JsonEditor::onStageChanges() {
   const int curRow = m_jsonList->currentRow();
-  if (not(0 <= curRow and curRow < m_jsonList->count())) {
-    qWarning("Skip save row[%d] of out range[0, %d]", curRow, m_jsonList->count());
+  if (curRow < 0 || curRow >= m_jsonList->count()) {
+    qWarning("Skip save, curRow:%d out of bound [0, %d)", curRow, m_jsonList->count());
     return true;
   }
 
@@ -220,20 +211,6 @@ bool JsonEditor::onStageChanges() {
   }
 
   const QString& curJsonPath = m_jsonList->filePath(curRow);
-  const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
-  if (QFile::exists(backupJsonPath)) {
-    const auto rmRet = QFile::remove(backupJsonPath);
-    if (not rmRet) {
-      qDebug("cannot rm json file[%s]", qPrintable(backupJsonPath));
-      return false;
-    }
-  }
-  const auto copyRet = QFile::copy(curJsonPath, backupJsonPath);
-  qDebug("result:%d, changed to->%s, backup source: %s", int(copyRet), qPrintable(curJsonPath), qPrintable(backupJsonPath));
-  if (not copyRet) {
-    qDebug("Copy json file failed[%s]", qPrintable(backupJsonPath));
-    return false;
-  }
   return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
 }
 
@@ -244,36 +221,6 @@ bool JsonEditor::onSaveAndNextUnfinishedItem() {
   }
   m_jsonList->onNext();
   return true;
-}
-
-bool JsonEditor::onResetChanges() {
-  const auto curRow = m_jsonList->currentRow();
-  if (curRow == -1) {
-    return true;
-  }
-  const QString& curJsonPath = m_jsonList->filePath(curRow);
-  const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
-  if (not QFile::exists(backupJsonPath)) {
-    qDebug("cannot reset. backup file[%s] not exist", qPrintable(backupJsonPath));
-    return false;
-  }
-  return QFile::rename(curJsonPath, curJsonPath + "mv") and QFile::rename(backupJsonPath, curJsonPath) and QFile::rename(curJsonPath + "mv", backupJsonPath);
-}
-
-bool JsonEditor::onSubmitAllChanges() {
-  int succeedCnt = 0;
-  int failCnt = 0;
-  for (auto r = 0; r < m_jsonList->count(); ++r) {
-    const QString& curJsonPath = m_jsonList->filePath(r);
-    const QString& backupJsonPath = getBackupJsonFile(curJsonPath);
-    if (QFile::exists(backupJsonPath)) {
-      const auto ret = QFile::remove(backupJsonPath);
-      succeedCnt += int(ret);
-      failCnt += 1 - int(ret);
-    }
-  }
-  qDebug("%d/%d succeed", succeedCnt, succeedCnt + failCnt);
-  return failCnt == 0;
 }
 
 auto JsonEditor::onLowercaseEachWord() -> void {
