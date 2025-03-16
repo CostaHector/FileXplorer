@@ -5,36 +5,33 @@
 
 JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
-      _BROWSE_AND_SELECT_THE_FOLDER(new QAction(QIcon(":img/LOAD_A_PATH"), tr("Browse"), this)),
       _CLR_TO_BE_EDITED_LIST(new QAction(QIcon(":img/EMPTY_LISTWIDGET"), tr("Clear list"), this)),
       _FILE_LOAD_ACTIONS{new QActionGroup(this)},
 
-      _LAST_FILE(new QAction(tr("Last"), this)),
-      _NEXT_FILE(new QAction(tr("Next"), this)),
-      _DONE_AND_NEXT(new QAction(QIcon(":img/DONE_AND_NEXT"), tr("Done and next"), this)),
+      _LAST_FILE(new QAction("Last", this)),
+      _NEXT_FILE(new QAction("Next", this)),
+      _DONE_AND_NEXT(new QAction(QIcon(""), tr("Done and next"), this)),
       _AUTO_SKIP(new QAction(QIcon(":img/AUTO_SKIP"), tr("Autoskip"), this)),
-      _COMPLETE_PERFS_COUNT(new QAction(QIcon(":img/COMPLETE_PERFS_COUNT"), tr("Perf Cnt"), this)),
+      _COMPLETE_PERFS_COUNT(new QAction(QIcon(), "Skip if", this)),
       _QUICK_EDIT_ACTIONS{new QActionGroup(this)},
 
       _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(tr("Sentense Case"), this)),
       _LOWER_ALL_WORDS(new QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("lowercase"), this)),
-      _FORMATTER(new QAction(QIcon(":img/FORMAT"), tr("Formatter"), this)),
-      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload now"), this)),
-      _ADD_SELECTED_PERFORMER(new QAction(QIcon(":img/NEW_FILE_FOLDER_PATH"), tr("Append to perfs"), this)),
-      _EXTRACT_CAPITALIZED_PERFORMER(new QAction(QIcon(":img/NEW_FILE_FOLDER_PATH"), tr("Append capitalized to perfs"), this)),
+      _FORMATTER(new QAction(QIcon(""), "Formatter", this)),
+      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(""), "Reload contents", this)),
+      _ADD_SELECTED_PERFORMER{new QAction(QIcon(":img/APPEND_PERFORMERS"), "Add Perfs", this)},
+      _EXTRACT_CAPITALIZED_PERFORMER{new QAction(QIcon(""), "Add Perfs(Capitalized Sentence)", this)},
       _TEXT_EDIT_ACTIONS{new QActionGroup(this)},
 
-      _SAVE(new QAction(QIcon(":img/SAVED"), tr("save"), this)),
-      _CANCEL(new QAction(QIcon(":img/NOT_SAVED"), tr("cancel"), this)),
-      _SUBMIT(new QAction(QIcon(":img/APPROVAL"), tr("submit"), this)),
+      _SAVE{new QAction{QIcon(":img/SAVE_JSON"), "Save Change", this}},
       _FILE_SAVE_ACTIONS{new QActionGroup(this)},
 
-      _AI_HINT(new QAction(QIcon(":img/AI_IDEA"), tr("AI Hint"), this)),
-      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":img/AI_LEARN"), tr("AI Library"), this)),
+      _AI_HINT(new QAction(QIcon(":img/AI_IDEA"), "Hint", this)),
+      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":img/AI_LEARN"), "Self Learning", this)),
       _AI_ACTIONS{new QActionGroup(this)},
 
-      _SELECT_CURRENT_FOLDER{new QAction(QIcon(":img/LOAD_JSONS_FROM_CURRENT_PATH"), tr("Select Current path"))},
-      _CONSTRUCT_JSONS_FOR_VIDS{new QAction(tr("Construct jsons by file properties"))},
+      _SELECT_CURRENT_FOLDER{new QAction{QIcon(":img/SELECT_A_FOLDER_AND_LOAD_JSON"), "Read Current path"}},
+      _CONSTRUCT_JSONS_FOR_VIDS{new QAction(QIcon(""), "Construct jsons by file properties")},
       _APPEND_PERFORMERS{new QAction(QIcon(":img/APPEND_PERFORMERS"), tr("Append performers"))},
       _SET_STUDIO{new QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), tr("Set production studio"))},
       _CONSTRUCT_PERFORMER_KVP{new QAction(QIcon(":img/PERFORMERS_LIST_FILE"), tr("Construct performers k-v pair"))},
@@ -44,10 +41,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setShortcutVisibleInContextMenu(true);
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.").arg(_FORMATTER->text()).arg(_FORMATTER->shortcut().toString()));
-
-  _SUBMIT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_S));
-  _SUBMIT->setShortcutVisibleInContextMenu(true);
-  _SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> (CANNOT RECOVER!) Submit all staged changes").arg(_SUBMIT->text()).arg(_SUBMIT->shortcut().toString()));
 
   _ADD_SELECTED_PERFORMER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
   _ADD_SELECTED_PERFORMER->setShortcutVisibleInContextMenu(true);
@@ -62,14 +55,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _SAVE->setShortcutVisibleInContextMenu(true);
   _SAVE->setToolTip(QString("<b>%1 (%2)</b><br/> Stage current changes").arg(_SAVE->text()).arg(_SAVE->shortcut().toString()));
 
-  _CANCEL->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_R));
-  _CANCEL->setShortcutVisibleInContextMenu(true);
-  _CANCEL->setToolTip(QString("<b>%1 (%2)</b><br/> Cancel current changes").arg(_CANCEL->text()).arg(_CANCEL->shortcut().toString()));
-
-  _BROWSE_AND_SELECT_THE_FOLDER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_O));
-  _BROWSE_AND_SELECT_THE_FOLDER->setShortcutVisibleInContextMenu(true);
-  _BROWSE_AND_SELECT_THE_FOLDER->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Browse and select the folder. Then load jsons file from it").arg(_BROWSE_AND_SELECT_THE_FOLDER->text()).arg(_BROWSE_AND_SELECT_THE_FOLDER->shortcut().toString()));
   _CLR_TO_BE_EDITED_LIST->setToolTip(QString("<b>%1 (%2)</b><br/> Clear to-be-edit list").arg(_CLR_TO_BE_EDITED_LIST->text()).arg(_CLR_TO_BE_EDITED_LIST->shortcut().toString()));
 
   _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
@@ -111,7 +96,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _LOWER_ALL_WORDS->setShortcutVisibleInContextMenu(true);
   _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentense.").arg(_LOWER_ALL_WORDS->text()).arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
-  _FILE_LOAD_ACTIONS->addAction(_BROWSE_AND_SELECT_THE_FOLDER);
   _FILE_LOAD_ACTIONS->addAction(_CLR_TO_BE_EDITED_LIST);
 
   _TEXT_EDIT_ACTIONS->addAction(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
@@ -125,8 +109,6 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
   _AI_ACTIONS->addAction(_LEARN_PERFORMERS_FROM_JSON);
 
   _FILE_SAVE_ACTIONS->addAction(_SAVE);
-  _FILE_SAVE_ACTIONS->addAction(_CANCEL);
-  _FILE_SAVE_ACTIONS->addAction(_SUBMIT);
   _FILE_SAVE_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   _AI_HINT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
