@@ -100,25 +100,41 @@ QString PATHTOOL::RelativePath2File(int rootPathLen, const QString& fullPath, in
   return fullPath.mid(rootPathLen, lastSlashIndex - rootPathLen + 1);
 }
 
+bool HasLetter(const QString& fullpath, int startIdx) {
+  for (int i = startIdx; i < fullpath.size(); ++i) {
+    if (fullpath[i].isLetter()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  // like "C:/.a/b"
-  // like "C:/a/any.no_extension"
-  // like "C:/a/any file"
-  // index(dot) + 5 <= size()
-  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()) {
-    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1), "");
+  if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
+      || lastIndexOfExtDot == -1                                     // hello world
+      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()  // ok. say when
+      || !HasLetter(fullpath, lastIndexOfExtDot + 1))                // sc. 01
+  {
+    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1),  // base
+                          "");                                 // extension
   }
-  return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), fullpath.mid(lastIndexOfExtDot));
+  return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1),  // base
+                        fullpath.mid(lastIndexOfExtDot));                                              // extension
 }
 
 QString PATHTOOL::GetBaseName(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  if (lastIndexOfExtDot <= lastIndexOfSlash || lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()) {
+  if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
+      || lastIndexOfExtDot == -1                                     // hello world
+      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()  // ok. say when
+      || !HasLetter(fullpath, lastIndexOfExtDot + 1))                // sc. 01
+  {
     return fullpath.mid(lastIndexOfSlash + 1);
   }
+
   return fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1);
 }
 
@@ -245,7 +261,7 @@ QString PATHTOOL::GetFileExtension(const QString& path) {
 
 OSWalker_RETURN PATHTOOL::OSWalker(const QString& pre, const QStringList& rels, const bool includingSub, const bool includingSuffix) {
   // Reverse the return value, One can get bottom To Top result like os.walk
-  const auto dirIterFlag {includingSub ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags};
+  const auto dirIterFlag{includingSub ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags};
   const int n1 = pre.size() + 1;
   QDir preDir(pre);
 
