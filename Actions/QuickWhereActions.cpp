@@ -10,7 +10,7 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
       HIST_WHERE(new QToolButton),
       SHOW_HISTORY(new QAction(QIcon(":img/WHERE_CLAUSE_HISTORY"), tr("HIST"), this)),
       CLEAR_ALL_WHERE(new QAction(QIcon(":img/CLEAR_VIDEOS_LIST"), tr("Clear"), this)),
-      AUTO_COMPLETE_AKA_SWITCH(new QAction(QIcon(":img/PERFORMERS_LIST_HINT"), tr("Completer"), this)),
+      AUTO_COMPLETE_AKA_SWITCH(new QAction(QIcon(""), tr("Completer"), this)),
       APPLY_AND_CLOSE(new QAction(QIcon(":img/SAVED"), tr("Apply"), this)),
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {

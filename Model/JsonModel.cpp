@@ -9,7 +9,7 @@ JsonProperties::JsonProperties(const QString& path) : jsonPath{path}, perfsCount
 
 int JsonProperties::getPerfsCount(const QString& pth) {
   const auto& dict = JsonFileHelper::MovieJsonLoader(pth);
-  if (dict.isEmpty() or not dict.contains(DB_HEADER_KEY::Performers)) {
+  if (dict.isEmpty() || !dict.contains(DB_HEADER_KEY::Performers)) {
     return 0;
   }
   return dict[DB_HEADER_KEY::Performers].toJsonArray().size();

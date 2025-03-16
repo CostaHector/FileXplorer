@@ -17,7 +17,6 @@ class JsonEditorActions : public QObject {
   QToolBar* GetJsonToolBar(QWidget* parent);
   QMenu* GetJsonToBeEdittedListMenu(QWidget* parent);
 
-  QAction* _BROWSE_AND_SELECT_THE_FOLDER;
   QAction* _CLR_TO_BE_EDITED_LIST;
   QActionGroup* _FILE_LOAD_ACTIONS;
 
@@ -37,8 +36,6 @@ class JsonEditorActions : public QObject {
   QActionGroup* _TEXT_EDIT_ACTIONS;
 
   QAction* _SAVE;
-  QAction* _CANCEL;
-  QAction* _SUBMIT;
   QActionGroup* _FILE_SAVE_ACTIONS;
 
 

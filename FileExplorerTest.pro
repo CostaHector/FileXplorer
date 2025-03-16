@@ -17,6 +17,7 @@ SOURCES += \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/ItemsClassifierTest.cpp \
+    TestCase/JsonEditorToolTest.cpp \
     TestCase/RenameHelperTest.cpp \
     TestCase/SceneInfoManagerTest.cpp \
     TestCase/ScenesMixedTest.cpp \

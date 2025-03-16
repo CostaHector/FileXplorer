@@ -68,7 +68,6 @@ SOURCES += \
     Component/StackedToolBar.cpp \
     Component/StateLabel.cpp \
     Component/SyncModifiyFileSystem.cpp \
-    Component/Toaster.cpp \
     ContentPanelImplementer.cpp \
     FileOperation/FileOperatorPub.cpp \
     InitCheck.cpp \
@@ -237,7 +236,6 @@ HEADERS += \
     Component/StackedToolBar.h \
     Component/StateLabel.h \
     Component/SyncModifiyFileSystem.h \
-    Component/Toaster.h \
     FileOperation/FileOperatorPub.h \
     InitCheck.h \
     Model/AiMediaTablesModel.h \
