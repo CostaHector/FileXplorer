@@ -43,12 +43,13 @@ int ItemsClassifier::operator()(const QString& path, const QMap<QString, QString
 }
 
 int ItemsClassifier::operator()(const QString& path) {
-  if (!QFileInfo(path).isDir()) {
+  QDir pathdir(path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+  if (!pathdir.exists()) {
     qDebug("path[%s] is not an existed directory", qPrintable(path));
     return {};
   }
   ScenesMixed sMixed;
-  const auto& pilesMap = sMixed(path);
+  const auto& pilesMap = sMixed(pathdir.entryList());
   return operator()(path, pilesMap);
 }
 
