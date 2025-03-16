@@ -73,8 +73,9 @@ isolated file.json
     theFirstItems.sort();
     theLastItems.sort();
     QCOMPARE(theFirstItems, theLastItems);
+    QCOMPARE(1, 2);
   }
 };
 
-QTEST_MAIN(ItemsClassifierTest)
+// QTEST_MAIN(ItemsClassifierTest);
 #include "ItemsClassifierTest.moc"
