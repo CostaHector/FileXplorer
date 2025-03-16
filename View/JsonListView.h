@@ -22,7 +22,6 @@ class JsonListView : public CustomListView {
 
   auto last() -> void;
   auto next() -> void;
-
   auto onSetPerfCount(const bool checked) -> void;
   void autoNext();
 

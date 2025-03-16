@@ -1,8 +1,13 @@
-FileExplorerReadOnly.pro.user
-FileExplorerReadOnly.pro.user.*
-FileExplorerReadOnly_zh_CN.qm
-FileExplorerTest.pro.user
-FileExplorerTest.pro.user.*
+./FileExplorerReadOnly.pro.user
+
+./FileExplorerReadOnly.pro.user.*
+
+./FileExplorerReadOnly_zh_CN.qm
+
+./FileExplorerTest.pro.*
+
+./FileExplorerTest.pro.user.*
+
 bin/RUNLOG/*.log
 bin/lib/*
 ./*.json
@@ -10,3 +15,5 @@ bin/lib/*
 build/*
 *.pro.user
 *.pro.user.*
+FileExplorerReadOnly.pro.user
+
