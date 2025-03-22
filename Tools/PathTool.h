@@ -3,8 +3,8 @@
 
 #include <QString>
 #include <QStringList>
-
-struct OSWalker_RETURN {
+class QFileInfo;
+struct FileOSWalkerRet {
   QStringList relToNames;
   QStringList completeNames;
   QStringList suffixs;
@@ -12,14 +12,18 @@ struct OSWalker_RETURN {
 };
 
 namespace PATHTOOL {
+constexpr char PATH_SEP_CHAR = '/';
+constexpr int EXTENSION_MAX_LENGTH = 5;  // ".json"
+
 inline QString GetWinStdPath(const QString& path) {
 #ifdef _WIN32
   if (!path.isEmpty() and path.back() == ':') {
     return path + '/';
   }
 #endif
-return path;
+  return path;
 }
+
 QString StripTrailingSlash(QString path);
 QString linkPath(const QString& localPath);
 QString localPath(const QString& linkPath);
@@ -61,14 +65,26 @@ QString longestCommonPrefix(const QStringList& strs);
 QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 
-
-int getFileExtensionDotIndex(const QString& path);
 QString GetFileExtension(const QString& path);
-OSWalker_RETURN OSWalker(const QString& pre, const QStringList& rels, const bool includingSub = false, const bool includingSuffix = false);
 bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 
-constexpr char PATH_SEP_CHAR = '/';
-constexpr int EXTENSION_MAX_LENGTH = 5; // ".json"
 }  // namespace PATHTOOL
+
+class FileOsWalker {
+ public:
+  FileOsWalker(const QString& pre, bool sufInside);
+  FileOSWalkerRet operator()(const QStringList& rels, const bool includingSub);
+
+ private:
+  void FillByFileInfo(const QFileInfo& fi);
+  QStringList relToNames;
+  QStringList completeNames;
+  QStringList suffixs;
+  QList<bool> isFiles;
+
+  QString mPrepathWithSlash;
+  int N;
+  bool mSufInside;
+};
 
 #endif  // PATHTOOL_H

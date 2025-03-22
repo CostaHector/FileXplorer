@@ -240,70 +240,8 @@ QString PATHTOOL::longestCommonPrefix(const QStringList& strs) {
   return slashIndex == -1 ? prefix : prefix.left(slashIndex);
 }
 
-int PATHTOOL::getFileExtensionDotIndex(const QString& path) {
-  const int lastDot = path.lastIndexOf('.');
-  const int N = path.size();
-  if (lastDot == -1) {
-    return N;
-  }
-  if (N >= 2 and lastDot == N - 2 and path[N - 1].isDigit()) {
-    return N;
-  }
-  if (N >= 3 and lastDot == N - 3 and path[N - 1].isDigit() and path[N - 2].isDigit()) {
-    return N;
-  }
-  return N - (lastDot + 1) > EXTENSION_MAX_LENGTH ? N : lastDot;
-}
-
 QString PATHTOOL::GetFileExtension(const QString& path) {
-  return path.mid(getFileExtensionDotIndex(path));
-}
-
-OSWalker_RETURN PATHTOOL::OSWalker(const QString& pre, const QStringList& rels, const bool includingSub, const bool includingSuffix) {
-  // Reverse the return value, One can get bottom To Top result like os.walk
-  const auto dirIterFlag{includingSub ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags};
-  const int n1 = pre.size() + 1;
-  QDir preDir(pre);
-
-  QStringList relToNames;
-  QStringList completeNames;
-  QStringList suffixs;
-  QList<bool> isFiles;
-
-  for (const QString& rel : rels) {
-    QFileInfo fileInfo(preDir.absoluteFilePath(rel));
-    isFiles.append(fileInfo.isFile());
-    relToNames.append(fileInfo.absolutePath().mid(n1));
-    if (includingSuffix) {
-      completeNames.append(fileInfo.fileName());
-      suffixs.append("");
-    } else {
-      const QString& nm = fileInfo.fileName();
-      const int dotIndex = getFileExtensionDotIndex(nm);
-      completeNames.append(nm.left(dotIndex));
-      suffixs.append(nm.mid(dotIndex));
-    }
-
-    if (includingSub and fileInfo.isDir()) {  // folders
-      QDirIterator it(fileInfo.absoluteFilePath(), {}, QDir::Filter::NoDotAndDotDot | QDir::Filter::AllEntries, dirIterFlag);
-      while (it.hasNext()) {
-        it.next();
-        auto fi = it.fileInfo();
-        isFiles.append(fi.isFile());
-        relToNames.append(fi.absolutePath().mid(n1));
-        if (includingSuffix) {
-          completeNames.append(fi.fileName());
-          suffixs.append("");
-        } else {
-          const QString& nm = fi.fileName();
-          const int dotIndex = getFileExtensionDotIndex(nm);
-          completeNames.append(nm.left(dotIndex));
-          suffixs.append(nm.mid(dotIndex));
-        }
-      }
-    }
-  }
-  return {relToNames, completeNames, suffixs, isFiles};
+  return QFileInfo(path).suffix();
 }
 
 bool PATHTOOL::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
@@ -341,4 +279,46 @@ bool PATHTOOL::copyDirectoryFiles(const QString& fromDir, const QString& toDir, 
     }
   }
   return true;
+}
+
+FileOsWalker::FileOsWalker(const QString& pre, bool sufInside)
+    : mPrepathWithSlash{PATHTOOL::normPath(pre) + '/'},  // "rel/"
+      N{mPrepathWithSlash.size()},                       // N = len("rel/")
+      mSufInside{sufInside}                              // a.txt
+{}
+
+FileOSWalkerRet FileOsWalker::operator()(const QStringList& rels, const bool includingSub) {
+  // Reverse the return value, One can get bottom To Top result like os.walk
+  for (const QString& rel : rels) {
+    const QFileInfo fi{mPrepathWithSlash + rel};
+    FillByFileInfo(fi);
+    if (!includingSub) {
+      continue;
+    }
+    if (!fi.isDir()) {
+      continue;
+    }
+    // folders
+    QDirIterator it(fi.absoluteFilePath(), {}, QDir::Filter::NoDotAndDotDot | QDir::Filter::AllEntries, QDirIterator::IteratorFlag::Subdirectories);
+    while (it.hasNext()) {
+      it.next();
+      const QFileInfo subFi{it.fileInfo()};
+      FillByFileInfo(subFi);
+    }
+  }
+  return {relToNames, completeNames, suffixs, isFiles};
+}
+
+void FileOsWalker::FillByFileInfo(const QFileInfo& fi) {
+  QString completeNm, dotSuf;
+  isFiles.append(fi.isFile());
+  relToNames.append(fi.absolutePath().mid(N));
+  if (mSufInside) {
+    completeNames.append(fi.fileName());
+    suffixs.append("");
+  } else {
+    std::tie(completeNm, dotSuf) = PATHTOOL::GetBaseNameExt(fi.fileName());
+    completeNames.append(completeNm);
+    suffixs.append(dotSuf);
+  }
 }
