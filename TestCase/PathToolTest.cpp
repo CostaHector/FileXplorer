@@ -224,6 +224,95 @@ class PathToolTest : public MyTestSuite {
     QVERIFY(!isRootOrEmpty("/home"));
 #endif
   }
+
+  bool EnvCheck(const QString& pre) {
+    // under path test/TestEnv_FileOsWalker, there are 3 item(s) in total as follow:
+    // ABC - DEF - name sc.1
+    // -  ABC - DEF - name sc.1.m
+    // ABC - DEF - name sc.1.txt
+    if (!QFile::exists(pre)) {
+      return false;
+    }
+    if (!QFile::exists(pre + "\\ABC - DEF - name sc.1")) {
+      return false;
+    }
+    if (!QFile::exists(pre + "\\ABC - DEF - name sc.1\\ABC - DEF - name sc.1.m")) {
+      return false;
+    }
+    if (!QFile::exists(pre + "\\ABC - DEF - name sc.1.txt")) {
+      return false;
+    }
+    qDebug("environment test ok");
+    return true;
+  }
+
+  void test_FileOsWalker_WithSub() {
+    const QString pre = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOsWalker");
+    QVERIFY(EnvCheck(pre));
+    const QStringList rels{"ABC - DEF - name sc.1",  //
+                           "ABC - DEF - name sc.1.txt"};
+    FileOsWalker fow{pre, false};
+    const bool includeDirectory = true;
+    const auto ans = fow(rels, includeDirectory);
+
+    const QStringList relToNames{"",                       //
+                                 "ABC - DEF - name sc.1",  //
+                                 ""};
+    const QStringList completeNames{"ABC - DEF - name sc.1",  //
+                                    "ABC - DEF - name sc.1",  //
+                                    "ABC - DEF - name sc.1"};
+    const QStringList suffixs{"", ".m", ".txt"};
+    const QList<bool> isFiles{false, true, true};
+    QCOMPARE(ans.relToNames, relToNames);
+    QCOMPARE(ans.completeNames, completeNames);
+    QCOMPARE(ans.suffixs, suffixs);
+    QCOMPARE(ans.isFiles, isFiles);
+  }
+
+  void test_FileOsWalker_WithNoSub() {
+    const QString pre = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOsWalker");
+    QVERIFY(EnvCheck(pre));
+    const QStringList rels{"ABC - DEF - name sc.1",  //
+                           "ABC - DEF - name sc.1.txt"};
+    const bool includeDirectory = false;
+    FileOsWalker fow{pre, false};
+    const auto ans = fow(rels, includeDirectory);
+
+    const QStringList relToNames{"",  //
+                                 ""};
+    const QStringList completeNames{"ABC - DEF - name sc.1",  //
+                                    "ABC - DEF - name sc.1"};
+    const QStringList suffixs{"", ".txt"};
+    const QList<bool> isFiles{false, true};
+    QCOMPARE(ans.relToNames, relToNames);
+    QCOMPARE(ans.completeNames, completeNames);
+    QCOMPARE(ans.suffixs, suffixs);
+    QCOMPARE(ans.isFiles, isFiles);
+  }
+
+  void test_FileOsWalker_SufInside() {
+    const QString pre = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOsWalker");
+    QVERIFY(EnvCheck(pre));
+    const QStringList rels{"ABC - DEF - name sc.1",  //
+                           "ABC - DEF - name sc.1.txt"};
+    const bool suffixInsideFilename = true;
+    FileOsWalker fow{pre, suffixInsideFilename};
+    const bool includeDirectory = true;
+    const auto ans = fow(rels, includeDirectory);
+
+    const QStringList relToNames{"",                       //
+                                 "ABC - DEF - name sc.1",  //
+                                 ""};
+    const QStringList completeNames{"ABC - DEF - name sc.1",    //
+                                    "ABC - DEF - name sc.1.m",  //
+                                    "ABC - DEF - name sc.1.txt"};
+    const QStringList suffixs{"", "", ""};
+    const QList<bool> isFiles{false, true, true};
+    QCOMPARE(ans.relToNames, relToNames);
+    QCOMPARE(ans.completeNames, completeNames);
+    QCOMPARE(ans.suffixs, suffixs);
+    QCOMPARE(ans.isFiles, isFiles);
+  }
 };
 
 #include "PathToolTest.moc"
