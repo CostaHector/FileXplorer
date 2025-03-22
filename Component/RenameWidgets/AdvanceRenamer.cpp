@@ -372,7 +372,10 @@ auto AdvanceRenamer::onIncludeSuffix(int includingSuffixState) -> void {
 void AdvanceRenamer::InitTextContent(const QString& p, const QStringList& r) {
   m_pre = p;
   rels = r;
-  OSWalker_RETURN osWalkerRet = PATHTOOL::OSWalker(m_pre, rels, ITEMS_INSIDE_SUBDIR->isChecked(), EXT_INSIDE_FILENAME->isChecked());
+
+  const bool bSubDir = ITEMS_INSIDE_SUBDIR->isChecked();
+  const bool bSuffixInside = EXT_INSIDE_FILENAME->isChecked();
+  FileOSWalkerRet osWalkerRet = FileOsWalker(m_pre, bSuffixInside)(rels, bSubDir);
   const auto& relToNames = osWalkerRet.relToNames;
   completeNames = osWalkerRet.completeNames;  // may baseName only or baseName+extension, depend on includingSuffixState
   const auto& suffixs = osWalkerRet.suffixs;
