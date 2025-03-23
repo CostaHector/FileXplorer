@@ -22,7 +22,7 @@ class JsonFileHelperTest : public MyTestSuite {
     QCOMPARE(dict[JSONKey::Studio].toString(), "Henri Cavill");
     QVERIFY(dict[JSONKey::Tags].toStringList().isEmpty());
     QCOMPARE(dict[JSONKey::Rate].toInt(), -1);
-    QCOMPARE(dict[JSONKey::Size].toString(), "0");
+    QCOMPARE(dict[JSONKey::Size].toString(), "0'0'0'0");
     QVERIFY(dict[JSONKey::Hot].toList().isEmpty());
     QVERIFY(dict[JSONKey::Detail].toString().isEmpty());
   }
@@ -37,7 +37,7 @@ class JsonFileHelperTest : public MyTestSuite {
     QVERIFY(dict[JSONKey::Studio].toString().isEmpty());
     QVERIFY(dict[JSONKey::Tags].toStringList().isEmpty());
     QCOMPARE(dict[JSONKey::Rate].toInt(), -1);
-    QCOMPARE(dict[JSONKey::Size].toString(), "0");
+    QCOMPARE(dict[JSONKey::Size].toString(), "0'0'0'0");
     QVERIFY(dict[JSONKey::Hot].toList().isEmpty());
     QVERIFY(dict[JSONKey::Detail].toString().isEmpty());
   }
