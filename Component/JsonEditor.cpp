@@ -25,11 +25,7 @@ const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 
 JsonEditor::JsonEditor(QWidget* parent)
     : QMainWindow{parent},
-      m_stdKeys{{JSONKey::Name, new QLineEdit},  {JSONKey::Performers, new QLineEdit}, {JSONKey::ProductionStudio, new QLineEdit}, {JSONKey::Uploaded, new QLineEdit}, {JSONKey::Tags, new QLineEdit},
-                {JSONKey::Rate, new QLineEdit},  {JSONKey::Size, new QLineEdit},       {JSONKey::Resolution, new QLineEdit},       {JSONKey::Bitrate, new QLineEdit},  {JSONKey::Hot, new QLineEdit},
-                {JSONKey::Detail, new QTextEdit}},
       m_jsonFormLo(new QFormLayout),
-      m_jsonFormExtraLo(new QFormLayout),
       m_jsonFormWid(new QWidget(this)),
 
       m_jsonModel{new JsonModel{this}},
@@ -41,12 +37,32 @@ JsonEditor::JsonEditor(QWidget* parent)
   setMenuBar(m_menuBar);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
-  for (const QString& key : JSONKey::JsonKeyListOrder) {
-    m_jsonFormLo->addRow(key, m_stdKeys[key]);
-  }
+  mName = new LineEditStr{JSONKey::Name, "", this};
+  mPerfsCsv = new LineEditCSV{JSONKey::Performers, "", this};  // comma seperated
+  mStudio = new LineEditStr{JSONKey::Studio, "", this};
+  mUploaded = new LineEditStr{JSONKey::Uploaded, "", this};
+  mTagsCsv = new LineEditCSV{JSONKey::Tags, "", this};  // comma seperated
+  mRateInt = new LineEditInt{JSONKey::Rate, "", this};  // int
+  mSize = new LineEditStr{JSONKey::Size, "", this};
+  mResolution = new LineEditStr{JSONKey::Resolution, "", this};
+  mBitrate = new LineEditStr{JSONKey::Bitrate, "", this};
+  mHot = new LineEditCSV{JSONKey::Hot, "", this};              // QList<QVariant>
+  mDetail = new TextEditMultiLine{JSONKey::Detail, "", this};  // multi-line
+
+  m_jsonFormLo->addRow(mName->GetFormName(), mName);
+  m_jsonFormLo->addRow(mPerfsCsv->GetFormName(), mPerfsCsv);
+  m_jsonFormLo->addRow(mStudio->GetFormName(), mStudio);
+  m_jsonFormLo->addRow(mUploaded->GetFormName(), mUploaded);
+  m_jsonFormLo->addRow(mTagsCsv->GetFormName(), mTagsCsv);
+  m_jsonFormLo->addRow(mRateInt->GetFormName(), mRateInt);
+  m_jsonFormLo->addRow(mSize->GetFormName(), mSize);
+  m_jsonFormLo->addRow(mResolution->GetFormName(), mResolution);
+  m_jsonFormLo->addRow(mBitrate->GetFormName(), mBitrate);
+  m_jsonFormLo->addRow(mHot->GetFormName(), mHot);
+  m_jsonFormLo->addRow(mDetail->GetFormName(), mDetail);
+
   m_jsonFormLo->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
   m_jsonFormLo->setRowWrapPolicy(QFormLayout::RowWrapPolicy::WrapLongRows);
-  m_jsonFormLo->addRow(m_jsonFormExtraLo);
 
   m_jsonFormWid->setLayout(m_jsonFormLo);
 
@@ -65,60 +81,42 @@ JsonEditor::JsonEditor(QWidget* parent)
   updateWindowsSize();
 }
 
+void CompatibleJsonKey(QVariantHash& vh) {
+  auto itPS = vh.find("ProductionStudio");
+  if (itPS != vh.cend()) {
+    vh[JSONKey::Studio] = itPS.value();
+    vh.erase(itPS);
+  }
+}
+
 void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
-  m_keysMet.clear();
   if (!curIndex.isValid()) {
     qWarning("Current index invalid");
     return;
   }
-  m_jsonModel->updatePerfCount(curIndex.row());
 
-  for (int r = m_jsonFormExtraLo->rowCount() - 1; r > -1; --r) {
-    m_jsonFormExtraLo->removeRow(r);
-  }
+  const int rowIdx = curIndex.row();
+  const QString& jAbsPth = m_jsonList->filePath(rowIdx);
+  QVariantHash jsonDict = JsonFileHelper::MovieJsonLoader(jAbsPth);
+  CompatibleJsonKey(jsonDict);
 
-  const QString& curJsonPath = m_jsonList->filePath(curIndex.row());
-  const auto& jsonDict = JsonFileHelper::MovieJsonLoader(curJsonPath);
-  const QList<QPair<QString, QVariant>>& jsonList = JsonFileHelper::MapToOrderedList(jsonDict);
-  if (jsonList.isEmpty()) {
-    return;
-  }
+  const int newCnt = jsonDict[DB_HEADER_KEY::Performers].toJsonArray().size();
+  m_jsonModel->updatePerfCount(rowIdx, newCnt);
+  qDebug("Now json[%s] perfs cnt:%d", qPrintable(jAbsPth), newCnt);
 
-  for (auto it = jsonList.cbegin(); it != jsonList.cend(); ++it) {
-    const QString& key = it->first;
-    const QVariant& var = it->second;
-    m_keysMet.insert(key);
-
-    QString valueStr = JsonFileHelper::GetJsonValueString(key, var);
-    if (m_stdKeys.contains(key)) {
-      if (key == JSONKey::Detail) {
-        qobject_cast<QTextEdit*>(m_stdKeys[JSONKey::Detail])->setText(valueStr);
-      } else {
-        qobject_cast<QLineEdit*>(m_stdKeys[key])->setText(valueStr);
-      }
-      continue;
-    }
-
-    m_jsonFormExtraLo->addRow(key, new QLineEdit(valueStr));
-  }
-  if (!m_keysMet.contains(JSONKey::Performers)) {
-    m_keysMet.insert(JSONKey::Performers);
-    onPerformersHint();
-  }
-  if (!m_keysMet.contains(JSONKey::ProductionStudio)) {
-    m_keysMet.insert(JSONKey::ProductionStudio);
-    qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::ProductionStudio])->setText("");
-  }
-  if (!m_keysMet.contains(JSONKey::Hot)) {
-    m_keysMet.insert(JSONKey::Hot);
-    qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Hot])->setText("");
-  }
-  if (!m_keysMet.contains(JSONKey::Rate)) {
-    m_keysMet.insert(JSONKey::Rate);
-    qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Rate])->setText("-1");
-  }
+  mName->setText(jsonDict[JSONKey::Name].toString());
+  mPerfsCsv->ReadFromStringList(jsonDict[JSONKey::Performers].toStringList());
+  mStudio->setText(jsonDict[JSONKey::Studio].toString());
+  mUploaded->setText(jsonDict[JSONKey::Uploaded].toString());
+  mTagsCsv->ReadFromStringList(jsonDict[JSONKey::Tags].toStringList());
+  mRateInt->ReadFromInt(jsonDict[JSONKey::Rate].toInt());
+  mSize->setText(jsonDict[JSONKey::Size].toString());
+  mResolution->setText(jsonDict[JSONKey::Resolution].toString());
+  mBitrate->setText(jsonDict[JSONKey::Bitrate].toString());
+  mHot->ReadFromVariantList(jsonDict[JSONKey::Hot].toList());
+  mDetail->setText(jsonDict[JSONKey::Detail].toString());
+  // todo: user determine save or not
   m_jsonFormLo->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
-  qDebug("Refresh json file display [%s]", qPrintable(curJsonPath));
 }
 
 void JsonEditor::subscribe() {
@@ -164,51 +162,25 @@ int JsonEditor::operator()(const QString& folderPath) {
 bool JsonEditor::onStageChanges() {
   const int curRow = m_jsonList->currentRow();
   if (curRow < 0 || curRow >= m_jsonList->count()) {
-    qWarning("Skip save, curRow:%d out of bound [0, %d)", curRow, m_jsonList->count());
+    qWarning("Cannot save, curRow:%d out of bound [0, %d)", curRow, m_jsonList->count());
     return true;
   }
 
+  const QStringList& perfs = mPerfsCsv->GetStringList();
+  m_jsonModel->updatePerfCount(curRow, perfs.size());
+
   QVariantHash dict;
-  for (auto r = 0; r != m_jsonFormExtraLo->rowCount(); ++r) {
-    const QString& keyName = qobject_cast<QLabel*>(m_jsonFormExtraLo->itemAt(r, QFormLayout::ItemRole::LabelRole)->widget())->text();
-    const QString& valueStr = qobject_cast<QLineEdit*>(m_jsonFormExtraLo->itemAt(r, QFormLayout::ItemRole::FieldRole)->widget())->text();
-    dict.insert(keyName, valueStr);
-  }
-
-  for (const QString& keyName : m_keysMet) {
-    if (keyName == JSONKey::Detail) {
-      dict.insert(keyName, qobject_cast<QTextEdit*>(m_stdKeys[JSONKey::Detail])->toPlainText());
-      continue;
-    }
-    if (not m_stdKeys.contains(keyName)) {
-      continue;
-    }
-
-    const QString& valueStr = qobject_cast<QLineEdit*>(m_stdKeys[keyName])->text().trimmed();
-    if (keyName == JSONKey::Performers or keyName == JSONKey::Tags) {
-      const auto& arr = NameTool()(valueStr);
-      dict.insert(keyName, arr);
-      auto* p = qobject_cast<QLineEdit*>(m_stdKeys[keyName]);
-      p->setText(arr.join(", "));
-    } else if (keyName == JSONKey::Hot) {
-      const auto& arr = JsonFileHelper::HotSceneString2IntList(valueStr);
-      dict.insert(keyName, arr);
-    } else if (keyName == JSONKey::Rate) {
-      bool isOk = false;
-      int rateNumer = valueStr.toInt(&isOk);
-      if (not isOk) {
-        qDebug("Rate[%s] is not a number, will use default value -1", qPrintable(valueStr));
-        rateNumer = -1;
-      }
-      dict.insert(keyName, rateNumer);
-    } else {
-      dict.insert(keyName, valueStr);
-    }
-  }
-  if (dict.contains(JSONKey::Performers)) {
-    const int newCount = dict[JSONKey::Performers].toStringList().size();
-    m_jsonModel->setPerfCount(curRow, newCount);
-  }
+  dict[mName->GetFormName()] = mName->text();
+  dict[mPerfsCsv->GetFormName()] = perfs;
+  dict[mStudio->GetFormName()] = mStudio->text();
+  dict[mUploaded->GetFormName()] = mUploaded->text();
+  dict[mTagsCsv->GetFormName()] = mTagsCsv->GetStringList();
+  dict[mRateInt->GetFormName()] = mRateInt->GetIntValue();
+  dict[mSize->GetFormName()] = mSize->text();
+  dict[mResolution->GetFormName()] = mResolution->text();
+  dict[mBitrate->GetFormName()] = mBitrate->text();
+  dict[mHot->GetFormName()] = mHot->GetVariantList();
+  dict[mDetail->GetFormName()] = mDetail->toPlainText();
 
   const QString& curJsonPath = m_jsonList->filePath(curRow);
   return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
@@ -224,27 +196,31 @@ bool JsonEditor::onSaveAndNextUnfinishedItem() {
 }
 
 auto JsonEditor::onLowercaseEachWord() -> void {
-  for (const QString& keyName : m_keysMet) {
-    if (keyName == JSONKey::Detail) {
-      QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(m_stdKeys[JSONKey::Detail]);
-      StringEditHelper::ReplaceAndUpdateSelection(detailEditWidget, StringEditHelper::lowercaseSentense);
-      continue;
-    }
-    QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(m_stdKeys[keyName]);
-    StringEditHelper::ReplaceAndUpdateSelection(lineEditWidget, StringEditHelper::lowercaseSentense);
-  }
+  StringEditHelper::ReplaceAndUpdateSelection(mName, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mPerfsCsv, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mStudio, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mUploaded, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mTagsCsv, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mRateInt, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mSize, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mResolution, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mBitrate, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mHot, StringEditHelper::lowercaseSentense);
+  StringEditHelper::ReplaceAndUpdateSelection(mDetail, StringEditHelper::lowercaseSentense);
 }
 
 auto JsonEditor::onCapitalizeEachWord() -> void {
-  for (const QString& keyName : m_keysMet) {
-    if (keyName == JSONKey::Detail) {
-      QTextEdit* detailEditWidget = qobject_cast<QTextEdit*>(m_stdKeys[JSONKey::Detail]);
-      StringEditHelper::ReplaceAndUpdateSelection(detailEditWidget, StringEditHelper::capitalizeEachWord);
-      continue;
-    }
-    QLineEdit* lineEditWidget = qobject_cast<QLineEdit*>(m_stdKeys[keyName]);
-    StringEditHelper::ReplaceAndUpdateSelection(lineEditWidget, StringEditHelper::capitalizeEachWord);
-  }
+  StringEditHelper::ReplaceAndUpdateSelection(mName, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mPerfsCsv, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mStudio, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mUploaded, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mTagsCsv, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mRateInt, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mSize, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mResolution, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mBitrate, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mHot, StringEditHelper::capitalizeEachWord);
+  StringEditHelper::ReplaceAndUpdateSelection(mDetail, StringEditHelper::capitalizeEachWord);
 }
 
 bool JsonEditor::onLearnPerfomersFromJsonFile() {
@@ -268,110 +244,59 @@ bool JsonEditor::onLearnPerfomersFromJsonFile() {
   return newLearnedCnt >= 0 or newLearnedProdStudioCnt >= 0;
 }
 
-QStringList JsonEditor::onPerformersHint() {
+bool JsonEditor::onPerformersHint() {
+  const int curRow = m_jsonList->currentRow();
+  if (curRow < 0 || curRow >= m_jsonList->count()) {
+    qWarning("Cannot Hint, curRow:%d out of bound [0, %d)", curRow, m_jsonList->count());
+    return false;
+  }
+
+  const QString& nameText = mName->text();
+  QString sentence = nameText;
+
+  if (mDetail->textCursor().hasSelection()) {
+    sentence += " " + mDetail->textCursor().selection().toPlainText();
+  }
   static PerformersManager& pm = PerformersManager::getIns();
+  const QStringList& hintPerfsList = pm(sentence);
+  const int newPerfsCnt = mPerfsCsv->AppendFromStringList(hintPerfsList);
+
   static ProductionStudioManager& psm = ProductionStudioManager::getIns();
-
-  QString nameText;
-  QString newProdStudioName;
-  QString sentence;
-  if (m_keysMet.contains(JSONKey::Name)) {
-    nameText = qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Name])->text();
-    newProdStudioName = psm.hintStdStudioName(nameText);
-    sentence += nameText;
+  const QString& newProdStudioName = psm.hintStdStudioName(nameText);
+  if (!newProdStudioName.isEmpty()) {
+    mStudio->setText(newProdStudioName);
   }
 
-  if (m_keysMet.contains(JSONKey::Detail)) {
-    auto* te = qobject_cast<QTextEdit*>(m_stdKeys[JSONKey::Detail]);
-    if (te->textCursor().hasSelection()) {
-      sentence += " " + te->textCursor().selection().toPlainText();
-    }
-  }
-  const QStringList& newPerfsList = pm(sentence);
-
-  if (not m_keysMet.contains(JSONKey::Performers)) {
-    m_keysMet.insert(JSONKey::Performers);
-  }
-
-  const QString& perfStr = GetArrLine(JSONKey::Performers);
-  if (perfStr.isEmpty()) {
-    UpdateDisplayArrLine(JSONKey::Performers, newPerfsList);
-  } else {
-    const QStringList& beforePerfsList = NameTool()(perfStr);
-    if (beforePerfsList.size() < newPerfsList.size()) {
-      UpdateDisplayArrLine(JSONKey::Performers, newPerfsList);
-    }
-  }
-
-  if (not m_keysMet.contains(JSONKey::ProductionStudio)) {
-    m_keysMet.insert(JSONKey::ProductionStudio);
-  }
-
-  auto* ps = qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::ProductionStudio]);
-  if (not newProdStudioName.isEmpty()) {
-    ps->setText(newProdStudioName);
-  }
-  return newPerfsList;
+  m_jsonModel->updatePerfCount(curRow, newPerfsCnt);
+  return true;
 }
 
 auto JsonEditor::onExtractCapitalizedPerformersHint() -> bool {
-  if (not m_keysMet.contains(JSONKey::Performers)) {
-    m_keysMet.insert(JSONKey::Performers);
+  QStringList hintPerfs;
+  if (mName->hasSelectedText()) {
+    const QString& capitalizedStr = mName->selectedText();
+    hintPerfs += NameTool().fromArticleCapitalizedNames(capitalizedStr);
   }
-
-  QStringList perfs;
-  const QString& names = GetArrLine(JSONKey::Performers);
-  if (not names.isEmpty()) {
-    perfs += NameTool()(names);
+  if (mDetail->textCursor().hasSelection()) {
+    const QString& capitalizedStr = mDetail->textCursor().selection().toPlainText();
+    hintPerfs += NameTool().fromArticleCapitalizedNames(capitalizedStr);
   }
-
-  if (m_keysMet.contains(JSONKey::Name)) {
-    const auto* le = qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Name]);
-    if (le->hasSelectedText()) {
-      const QString& capitalizedStr = le->selectedText();
-      perfs << NameTool().fromArticleCapitalizedNames(capitalizedStr);
-    }
-  }
-  if (m_keysMet.contains(JSONKey::Detail)) {
-    const auto* te = qobject_cast<QTextEdit*>(m_stdKeys[JSONKey::Detail]);
-    if (te->textCursor().hasSelection()) {
-      const QString& capitalizedStr = te->textCursor().selection().toPlainText();
-      perfs += NameTool().fromArticleCapitalizedNames(capitalizedStr);
-    }
-  }
-  perfs.removeDuplicates();
-  UpdateDisplayArrLine(JSONKey::Performers, perfs);
+  mPerfsCsv->AppendFromStringList(hintPerfs);
   return true;
 }
 
 bool JsonEditor::onSelectedTextAppendToPerformers() {
-  if (not m_keysMet.contains(JSONKey::Performers)) {
-    m_keysMet.insert(JSONKey::Performers);
+  QStringList selectedPerfs;
+
+  if (mName->hasSelectedText()) {
+    selectedPerfs += mName->selectedText();
   }
 
-  QStringList perfs;
-
-  const QString& names = GetArrLine(JSONKey::Performers);
-  if (not names.isEmpty()) {
-    perfs += NameTool()(names);
+  if (mDetail->textCursor().hasSelection()) {
+    selectedPerfs += mDetail->textCursor().selection().toPlainText();
   }
 
-  if (m_keysMet.contains(JSONKey::Name)) {
-    const auto* le = qobject_cast<QLineEdit*>(m_stdKeys[JSONKey::Name]);
-    if (le->hasSelectedText()) {
-      perfs << le->selectedText();
-    }
-  }
-
-  if (m_keysMet.contains(JSONKey::Detail)) {
-    const auto* te = qobject_cast<QTextEdit*>(m_stdKeys[JSONKey::Detail]);
-    if (te->textCursor().hasSelection()) {
-      perfs << te->textCursor().selection().toPlainText();
-    }
-  }
-
-  perfs.removeDuplicates();
-  UpdateDisplayArrLine(JSONKey::Performers, perfs);
+  mPerfsCsv->AppendFromStringList(selectedPerfs);
   return true;
 }
 
@@ -410,15 +335,8 @@ bool JsonEditor::onRenameJsonFile() {
 }
 
 bool JsonEditor::formatter() {
-  NameTool nt;
-  if (m_keysMet.contains(JSONKey::Performers)) {
-    const QString& nameStr = GetArrLine(JSONKey::Performers);
-    UpdateDisplayArrLine(JSONKey::Performers, nt(nameStr));
-  }
-  if (m_keysMet.contains(JSONKey::Tags)) {
-    const QString& tagStr = GetArrLine(JSONKey::Tags);
-    UpdateDisplayArrLine(JSONKey::Tags, nt(tagStr));
-  }
+  mPerfsCsv->Format();
+  mTagsCsv->Format();
   return true;
 }
 
@@ -428,33 +346,7 @@ int JsonEditor::load(const QString& path) {
   return deltaFile;
 }
 
-bool JsonEditor::IsValueOfKeyArr(const QString& key) const {
-  if (not(key == JSONKey::Performers or key == JSONKey::Tags)) {
-    qWarning("Value of Key[%s] is not registered as array", qPrintable(key));
-    return false;
-  }
-  return true;
-}
-
-QString JsonEditor::GetArrLine(const QString& key) const {
-  if (not IsValueOfKeyArr(key)) {
-    qDebug("Cannot get ArrLine of key[%s]", qPrintable(key));
-    return "";
-  }
-  auto* p = qobject_cast<QLineEdit*>(m_stdKeys[key]);
-  return p->text();
-}
-
-void JsonEditor::UpdateDisplayArrLine(const QString& key, const QStringList& arr) {
-  if (not IsValueOfKeyArr(key)) {
-    qDebug("Cannot update ArrLine of key[%s]", qPrintable(key));
-    return;
-  }
-  auto* p = qobject_cast<QLineEdit*>(m_stdKeys[key]);
-  p->setText(arr.join(", "));
-}
-
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

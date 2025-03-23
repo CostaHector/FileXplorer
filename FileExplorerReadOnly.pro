@@ -43,6 +43,11 @@ SOURCES += \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
     Component/DropListToolButton.cpp \
+    Component/JsonEditorWidget/EditorWidgetIF.cpp \
+    Component/JsonEditorWidget/LineEditCSV.cpp \
+    Component/JsonEditorWidget/LineEditInt.cpp \
+    Component/JsonEditorWidget/LineEditStr.cpp \
+    Component/JsonEditorWidget/TextEditMultiLine.cpp \
     Component/RenameWidgets/RenameWidget_ReverseNames.cpp \
     Component/RightClickMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
@@ -210,6 +215,11 @@ HEADERS += \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
     Component/DropListToolButton.h \
+    Component/JsonEditorWidget/EditorWidgetIF.h \
+    Component/JsonEditorWidget/LineEditCSV.h \
+    Component/JsonEditorWidget/LineEditInt.h \
+    Component/JsonEditorWidget/LineEditStr.h \
+    Component/JsonEditorWidget/TextEditMultiLine.h \
     Component/RenameWidgets/RenameWidget_ReverseNames.h \
     Component/RightClickMenu.h \
     Component/FileSystemTypeFilter.h \
