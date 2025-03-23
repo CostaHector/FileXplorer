@@ -18,13 +18,13 @@ SOURCES += \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/ItemsClassifierTest.cpp \
     TestCase/JsonEditorToolTest.cpp \
+    TestCase/JsonFileHelperTest.cpp \
     TestCase/RenameHelperTest.cpp \
     TestCase/SceneInfoManagerTest.cpp \
     TestCase/ScenesMixedTest.cpp \
     TestCase/ThumbnailProcessActions.cpp \
     TestCase/pub/FileSystemHelper.cpp \
     TestCase/FolderNxtAndLastIteratorTest.cpp \
-    TestCase/JsonToolTest.cpp \
     TestCase/LongPathFinderTest.cpp \
     TestCase/MD5CalculatorTest.cpp \
     TestCase/NameSectionArrangeTest.cpp \

@@ -1,38 +1,124 @@
 #include "JsonFileHelper.h"
 #include "Tools/NameTool.h"
+#include "Tools/PathTool.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 #include "PublicVariable.h"
 
-namespace JSONKey {
-bool JsonKeySorter(const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r) {
-  auto lftIt = JsonKeyPri.find(l.first);
-  auto rhgtIt = JsonKeyPri.find(r.first);
-  auto end = JsonKeyPri.cend();
-  if (lftIt != end && rhgtIt != end) {
-    return lftIt.value() < rhgtIt.value();
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QJsonValue>
+#include <QDirIterator>
+#include <QFile>
+
+namespace VariantHashHelper {
+bool ClearPerformerAndStudio(QVariantHash& dict) {
+  auto perfIt = dict.find(JSONKey::Performers);
+  bool cleared = false;
+  if (perfIt != dict.cend() && !perfIt.value().toStringList().isEmpty()) {
+    perfIt.value().clear();
+    cleared = true;
   }
-  if (lftIt != end) {
-    return true;
+  auto studioIt = dict.find(JSONKey::Studio);
+  if (studioIt != dict.cend() && !perfIt.value().toString().isEmpty()) {
+    studioIt.value().clear();
+    cleared = true;
   }
-  if (rhgtIt != end) {
+  return cleared;
+}
+
+bool InsertPerfsPairToDictByNameHint(QVariantHash& dict) {
+  auto perfIt = dict.find(JSONKey::Performers);
+  if (perfIt != dict.cend() and !perfIt.value().toStringList().isEmpty()) {
     return false;
   }
-  return l.first < r.first;
-}
+  const QString& sentence = dict.value(JSONKey::Name, "").toString();
+  static const PerformersManager& pm = PerformersManager::getIns();
+  dict.insert(JSONKey::Performers, pm(sentence));
+  return true;
 }
 
-const QMap<QString, QString> JsonFileHelper::key2ValueType = {{JSONKey::Performers, "QStringList"},
-                                                              {JSONKey::Tags, "QStringList"},
-                                                              {JSONKey::Hot, "QIntList"},
-                                                              {JSONKey::Rate, "int"}};
+bool AppendPerfsToDict(QVariantHash& dict, const QStringList& performerList) {
+  auto perfIt = dict.find(JSONKey::Performers);
+  if (perfIt != dict.cend()) {
+    QStringList afterLst = perfIt.value().toStringList();
+    afterLst += performerList;
+    afterLst.removeDuplicates();
+    if (afterLst == perfIt.value().toStringList()) {
+      return false;
+    }
+    perfIt.value().toStringList().swap(afterLst);
+  } else {
+    dict[JSONKey::Performers] = performerList;
+  }
+  return true;
+}
 
-bool JsonFileHelper::MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath) {
+bool InsertStudioPairIntoDict(QVariantHash& dict) {
+  auto studioIt = dict.find(JSONKey::Studio);
+  if (studioIt != dict.cend() && !studioIt.value().toString().isEmpty()) {
+    return false;
+  }
+  const QString& sentence = dict.value(JSONKey::Name, "").toString();
+  static const ProductionStudioManager& psm = ProductionStudioManager::getIns();
+  dict.insert(JSONKey::Studio, psm.hintStdStudioName(sentence));
+  return true;
+}
+bool UpdateStudio(QVariantHash& dict, const QString& productionStudio) {
+  auto studioIt = dict.find(JSONKey::Studio);
+  if (studioIt == dict.cend()) {
+    dict[JSONKey::Studio] = productionStudio;
+    return true;
+  }
+  if (studioIt.value().toString() == productionStudio) {
+    return false;
+  }
+  studioIt.value() = productionStudio;
+  return true;
+}
+}  // namespace VariantHashHelper
+
+namespace JsonFileHelper {
+QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath,        //
+                                  const QString& performersListStr,  //
+                                  const QString& productionStudio) {
+  const QStringList& performersList = NameTool()(performersListStr);
+  const QFileInfo fi{fileAbsPath};
+  return QVariantHash{{JSONKey::Name, fi.baseName()},
+                      {JSONKey::Performers, performersList},
+                      {JSONKey::Studio, productionStudio},
+                      {JSONKey::Uploaded, fi.birthTime().toString("yyyyMMdd")},
+                      {JSONKey::Tags, QStringList()},
+                      {JSONKey::Rate, -1},
+                      {JSONKey::Size, QString::number(fi.size())},
+                      {JSONKey::Resolution, ""},
+                      {JSONKey::Bitrate, ""},
+                      {JSONKey::Hot, QVariantList{}},
+                      {JSONKey::Detail, ""}};
+}
+
+QVariantHash GetDefaultJsonFile(const QString& fileName, const qint64& fileSz) {
+  return QVariantHash{{JSONKey::Name, fileName},                 //
+                      {JSONKey::Performers, QStringList{}},      //
+                      {JSONKey::Studio, ""},                     //
+                      {JSONKey::Uploaded, ""},                   //
+                      {JSONKey::Tags, QStringList{}},            //
+                      {JSONKey::Rate, -1},                       //
+                      {JSONKey::Size, QString::number(fileSz)},  //
+                      {JSONKey::Resolution, ""},                 //
+                      {JSONKey::Bitrate, ""},                    //
+                      {JSONKey::Hot, QList<QVariant>{}},         //
+                      {JSONKey::Detail, ""}};
+}
+
+bool MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath) {
   auto jsonObject = QJsonObject::fromVariantHash(dict);
   QJsonDocument document;
   document.setObject(jsonObject);
   const auto& byteArray = document.toJson(QJsonDocument::JsonFormat::Indented);
-  QFile jsonFile(movieJsonItemPath);
+  QFile jsonFile{movieJsonItemPath};
   if (!jsonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
     jsonFile.close();
     return false;
@@ -44,59 +130,13 @@ bool JsonFileHelper::MovieJsonDumper(const QVariantHash& dict, const QString& mo
   return true;
 }
 
-auto JsonFileHelper::HotSceneString2IntList(const QString& valueStr) -> QList<QVariant> {
-  const QString& s = valueStr.trimmed();
-  if (s.isEmpty()) {
-    return {};
-  }
-  QList<QVariant> arr;
-  for (const QString& perf : NameTool()(s)) {
-    bool isOk = false;
-    int hot = perf.toInt(&isOk);
-    if (not isOk) {
-      qDebug("Hot scene position[%s] is not a number", qPrintable(perf));
-      continue;
-    }
-    arr.append(hot);
-  }
-  return arr;
+QString GetJsonFilePath(const QString& vidsPath) {
+  const QString& baseName = PATHTOOL::GetBaseName(vidsPath);
+  const int lastSlashInd = vidsPath.lastIndexOf('/');
+  return vidsPath.left(lastSlashInd + 1) + baseName + ".json";
 }
 
-QVariantHash JsonFileHelper::GetMovieFileJsonDict(const QString& fileAbsPath, const QString& performersListStr, const QString& productionStudio) {
-  const QStringList& performersList = NameTool()(performersListStr);
-
-  QFileInfo fi(fileAbsPath);
-  QList<QVariant> hotSceneList = HotSceneString2IntList("");
-  QVariantHash dict = {{JSONKey::Name, fi.fileName()},
-                       {JSONKey::Performers, performersList},
-                       {JSONKey::Studio, productionStudio},
-                       {JSONKey::Uploaded, fi.birthTime().toString("yyyyMMdd")},
-                       {JSONKey::Tags, QStringList()},
-                       {JSONKey::Rate, -1},
-                       {JSONKey::Size, QString::number(fi.size())},
-                       {JSONKey::Resolution, ""},
-                       {JSONKey::Bitrate, ""},
-                       {JSONKey::Hot, hotSceneList},
-                       {JSONKey::Detail, ""}};
-  return dict;
-}
-
-QVariantHash JsonFileHelper::GetDefaultJsonFile(const QString& fileName, const QString& fileSz) {
-  QVariantHash dict = {{JSONKey::Name, fileName},
-                       {JSONKey::Performers, QStringList()},
-                       {JSONKey::Studio, ""},
-                       {JSONKey::Uploaded, ""},
-                       {JSONKey::Tags, QStringList()},
-                       {JSONKey::Rate, -1},
-                       {JSONKey::Size, fileSz},
-                       {JSONKey::Resolution, ""},
-                       {JSONKey::Bitrate, ""},
-                       {JSONKey::Hot, QList<QVariant>()},
-                       {JSONKey::Detail, ""}};
-  return dict;
-}
-
-int JsonFileHelper::ConstructJsonForVids(const QString& path, const QString& productionStudio, const QString& performersListStr) {
+int ConstructJsonForVids(const QString& path, const QString& productionStudio, const QString& performersListStr) {
   if (not QFileInfo(path).isDir()) {
     return -1;
   }
@@ -120,29 +160,21 @@ int JsonFileHelper::ConstructJsonForVids(const QString& path, const QString& pro
   return succeedCnt;
 }
 
-int JsonFileHelper::JsonPerformersKeyValuePairAdd(const QString& path) {
-  if (not QFileInfo(path).isDir()) {
+int JsonPerformersKeyValuePairAdd(const QString& path) {
+  if (!QFileInfo(path).isDir()) {
     return -1;
   }
   int succeedCnt = 0;
   int tryKVPairCnt = 0;
-
-  static PerformersManager& pm = PerformersManager::getIns();
 
   QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (dict.contains(JSONKey::Performers) and not dict[JSONKey::Performers].toStringList().isEmpty()) {
+    if (!VariantHashHelper::InsertPerfsPairToDictByNameHint(dict)) {
       continue;
     }
-
-    const QString& sentence = dict.contains(JSONKey::Name) ? dict[JSONKey::Name].toString() : "";
-    QStringList perfL = pm(sentence);
-    perfL.removeDuplicates();
-    dict.insert(JSONKey::Performers, perfL);
-
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryKVPairCnt;
   }
@@ -152,36 +184,32 @@ int JsonFileHelper::JsonPerformersKeyValuePairAdd(const QString& path) {
   return succeedCnt;
 }
 
-int JsonFileHelper::JsonProductionStudiosKeyValuePairAdd(const QString& path) {
-  if (not QFileInfo(path).isDir()) {
+int JsonProductionStudiosKeyValuePairAdd(const QString& path) {
+  if (!QFileInfo(path).isDir()) {
     return -1;
   }
   int succeedCnt = 0;
   int tryKVPairCnt = 0;
-
-  static ProductionStudioManager& psm = ProductionStudioManager::getIns();
 
   QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (dict.contains(JSONKey::Studio) and not dict[JSONKey::Studio].toString().isEmpty()) {
+    if (!VariantHashHelper::InsertStudioPairIntoDict(dict)) {
       continue;
     }
-    const QString& sentence = dict.contains(JSONKey::Name) ? dict[JSONKey::Name].toString() : "";
-    dict.insert(JSONKey::Studio, psm.hintStdStudioName(sentence));
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryKVPairCnt;
   }
   if (tryKVPairCnt != succeedCnt) {
-    qDebug("%d/%d json add production studio key-value pair succeed", succeedCnt, tryKVPairCnt);
+    qDebug("%d/%d json add studio key-value pair succeed", succeedCnt, tryKVPairCnt);
   }
   return succeedCnt;
 }
 
-int JsonFileHelper::JsonValuePerformersProductionStudiosCleaner(const QString& path) {
-  if (not QFileInfo(path).isDir()) {
+int JsonValuePerformersProductionStudiosCleaner(const QString& path) {
+  if (!QFileInfo(path).isDir()) {
     return -1;
   }
   int succeedCnt = 0;
@@ -191,16 +219,8 @@ int JsonFileHelper::JsonValuePerformersProductionStudiosCleaner(const QString& p
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (dict.contains(JSONKey::Performers)) {
-      dict[JSONKey::Performers] = QStringList();
-    }
-    if (dict.contains(JSONKey::Studio)) {
-      dict[JSONKey::Studio] = "";
-    }
-    auto itPS = dict.find("ProductionStudio");
-    if (itPS != dict.cend()) {
-      dict.erase(itPS);
-      dict[JSONKey::Studio] = "";
+    if (!VariantHashHelper::ClearPerformerAndStudio(dict)) {
+      continue;
     }
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryCleanCnt;
@@ -211,9 +231,9 @@ int JsonFileHelper::JsonValuePerformersProductionStudiosCleaner(const QString& p
   return succeedCnt;
 }
 
-int JsonFileHelper::JsonValuePerformersAdder(const QString& path, const QString& performers) {
+int JsonValuePerformersAdder(const QString& path, const QString& performers) {
   const QStringList& performerList = NameTool()(performers);
-  if (performerList.isEmpty() or not QFileInfo(path).isDir()) {
+  if (performerList.isEmpty() || !QFileInfo(path).isDir()) {
     return -1;
   }
   int succeedCnt = 0;
@@ -224,9 +244,9 @@ int JsonFileHelper::JsonValuePerformersAdder(const QString& path, const QString&
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    QStringList perfL = dict[JSONKey::Performers].toStringList() + performerList;
-    perfL.removeDuplicates();
-    dict[JSONKey::Performers] = perfL;
+    if (!VariantHashHelper::AppendPerfsToDict(dict, performerList)) {
+      continue;
+    }
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryConstuctCnt;
   }
@@ -236,7 +256,7 @@ int JsonFileHelper::JsonValuePerformersAdder(const QString& path, const QString&
   return succeedCnt;
 }
 
-int JsonFileHelper::JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio) {
+int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio) {
   const QString& productionStudio = _productionStudio.trimmed();
   if (not QFileInfo(path).isDir()) {
     return -1;
@@ -249,10 +269,9 @@ int JsonFileHelper::JsonValueProductionStudioSetter(const QString& path, const Q
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (dict[JSONKey::Studio].toString() == productionStudio) {
+    if (!VariantHashHelper::UpdateStudio(dict, productionStudio)) {
       continue;
     }
-    dict[JSONKey::Studio] = productionStudio;
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryConstuctCnt;
   }
@@ -262,9 +281,8 @@ int JsonFileHelper::JsonValueProductionStudioSetter(const QString& path, const Q
   return succeedCnt;
 }
 
-
-QVariantHash JsonFileHelper::MovieJsonLoader(const QString& movieJsonItemPath) {
-  QFile jsonFile(movieJsonItemPath);
+QVariantHash MovieJsonLoader(const QString& movieJsonItemPath) {
+  QFile jsonFile{movieJsonItemPath};
   if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("[Normal] json file[%s] not found", qPrintable(movieJsonItemPath));
     return {};
@@ -276,7 +294,7 @@ QVariantHash JsonFileHelper::MovieJsonLoader(const QString& movieJsonItemPath) {
   return JsonStr2Dict(json_string);
 }
 
-QVariantHash JsonFileHelper::JsonStr2Dict(const QString& jsonStr) {
+QVariantHash JsonStr2Dict(const QString& jsonStr) {
   QJsonParseError jsonErr;
   QJsonDocument json_doc = QJsonDocument::fromJson(jsonStr.toUtf8(), &jsonErr);
   if (jsonErr.error != QJsonParseError::NoError) {
@@ -284,5 +302,8 @@ QVariantHash JsonFileHelper::JsonStr2Dict(const QString& jsonStr) {
     return {};
   }
   const QJsonObject& rootObj = json_doc.object();
-  return rootObj.toVariantHash();
+  auto dict = rootObj.toVariantHash();
+  VariantHashHelper::CompatibleJsonKey(dict);
+  return dict;
 }
+}  // namespace JsonFileHelper
