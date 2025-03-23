@@ -3,15 +3,14 @@
     "Detail": "This is just a json example.",
     "Hot": [
     ],
-    "Name": "StudioName - Movie Name - Performer 1, Performer 2",
+    "Name": "StudioName - Movie Name - Performer 1",
     "Performers": [
-        "Performer 1",
-        "Performer 2"
+        "Performer 1"
     ],
-    "ProductionStudio": "StudioName",
     "Rate": 4,
     "Resolution": "720p",
     "Size": "126113854",
+    "Studio": "StudioName",
     "Tags": [
         "nonporn"
     ],
