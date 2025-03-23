@@ -20,45 +20,48 @@ const QStringList JsonKeyListOrder{Name, Performers, Studio, Uploaded, Tags, Rat
 }  // namespace JSONKey
 
 namespace VariantHashHelper {
-inline bool CompatibleJsonKey(QVariantHash& vh) {
-  auto itPS = vh.find("ProductionStudio");
-  if (itPS != vh.cend()) {
-    vh[JSONKey::Studio] = itPS.value();
-    vh.erase(itPS);
-    return true;
-  }
-  return false;
-}
+struct CompatibleJsonKey {
+  bool operator()(QVariantHash& dict) const;
+};
+struct ClearPerformerAndStudio {
+  bool operator()(QVariantHash& dict) const;
+};
+struct InsertPerfsPairToDictByNameHint {
+  bool operator()(QVariantHash& dict) const;
+};
+struct AppendPerfsToDict {
+  AppendPerfsToDict(const QString& perfsStr);
+  bool operator()(QVariantHash& dict) const;
 
-bool ClearPerformerAndStudio(QVariantHash& dict);
-bool InsertPerfsPairToDictByNameHint(QVariantHash& dict);
-bool AppendPerfsToDict(QVariantHash& dict, const QStringList& performerList);
-bool InsertStudioPairIntoDict(QVariantHash& dict);
-bool UpdateStudio(QVariantHash& dict, const QString& productionStudio);
+ private:
+  const QStringList performerList;
+};
+struct InsertStudioPairIntoDict {
+  bool operator()(QVariantHash& dict) const;
+};
+struct UpdateStudio {
+  UpdateStudio(const QString& _studio) : studio{_studio.trimmed()} {};
+  bool operator()(QVariantHash& dict) const;
+
+ private:
+  const QString studio;
+};
+
+typedef std::function<bool(QVariantHash& dict)> JSON_DICT_PROCESS_T;
 }  // namespace VariantHashHelper
 
 namespace JsonFileHelper {
 QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath, const QString& performersListStr = "", const QString& productionStudio = "");
 QVariantHash GetDefaultJsonFile(const QString& fileName = "", const qint64& fileSz = 0);
-
-bool MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath);
-
 QVariantHash JsonStr2Dict(const QString& jsonStr);
 QVariantHash MovieJsonLoader(const QString& movieJsonItemPath);
 
+bool MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath);
 QString GetJsonFilePath(const QString& vidsPath);
 
 int ConstructJsonForVids(const QString& path, const QString& productionStudio = "", const QString& performersListStr = "");
+int JsonFileKeyValueProcess(const QString& path, const VariantHashHelper::JSON_DICT_PROCESS_T jDProc);
 
-int JsonPerformersKeyValuePairAdd(const QString& path);
-
-int JsonProductionStudiosKeyValuePairAdd(const QString& path);
-
-int JsonValuePerformersProductionStudiosCleaner(const QString& path);
-
-int JsonValuePerformersAdder(const QString& path, const QString& performers);
-
-int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio);
 }  // namespace JsonFileHelper
 
 #endif  // JSONFILEHELPER_H
