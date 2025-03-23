@@ -2,10 +2,8 @@
 #define PERFORMERSMANAGER_H
 
 #include <QCompleter>
-#include <QMessageBox>
 #include <QSet>
 #include <QString>
-#include <QWidget>
 
 class PerformersManager {
  public:
@@ -20,7 +18,7 @@ class PerformersManager {
   static auto RmvBelongLetter(const QString& word) -> QString;
   static QStringList SplitSentence(QString sentence);
   QStringList FilterPerformersOut(const QStringList& words) const;
-  auto operator()(const QString& sentence) const -> QStringList { return FilterPerformersOut(SplitSentence(sentence)); }
+  QStringList operator()(const QString& sentence) const;
   QSet<QString> m_performers;
   QCompleter perfsCompleter;
 

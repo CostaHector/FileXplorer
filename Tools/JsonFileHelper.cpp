@@ -3,8 +3,8 @@
 #include "Tools/PathTool.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
-#include "PublicVariable.h"
 #include "public/DisplayEnhancement.h"
+#include "PublicVariable.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -15,24 +15,34 @@
 #include <QFile>
 
 namespace VariantHashHelper {
-bool ClearPerformerAndStudio(QVariantHash& dict) {
-  auto perfIt = dict.find(JSONKey::Performers);
+bool CompatibleJsonKey::operator()(QVariantHash& dict) const {
+  auto itPS = dict.find("ProductionStudio");
+  if (itPS != dict.cend()) {
+    dict[JSONKey::Studio] = itPS.value();
+    dict.erase(itPS);
+    return true;
+  }
+  return false;
+}
+
+bool ClearPerformerAndStudio::operator()(QVariantHash& dict) const {
   bool cleared = false;
+  auto perfIt = dict.find(JSONKey::Performers);
   if (perfIt != dict.cend() && !perfIt.value().toStringList().isEmpty()) {
     perfIt.value().clear();
     cleared = true;
   }
   auto studioIt = dict.find(JSONKey::Studio);
-  if (studioIt != dict.cend() && !perfIt.value().toString().isEmpty()) {
+  if (studioIt != dict.cend() && !studioIt.value().toString().isEmpty()) {
     studioIt.value().clear();
     cleared = true;
   }
   return cleared;
 }
 
-bool InsertPerfsPairToDictByNameHint(QVariantHash& dict) {
+bool InsertPerfsPairToDictByNameHint::operator()(QVariantHash& dict) const {
   auto perfIt = dict.find(JSONKey::Performers);
-  if (perfIt != dict.cend() and !perfIt.value().toStringList().isEmpty()) {
+  if (perfIt != dict.cend() && !perfIt.value().toStringList().isEmpty()) {
     return false;
   }
   const QString& sentence = dict.value(JSONKey::Name, "").toString();
@@ -41,23 +51,29 @@ bool InsertPerfsPairToDictByNameHint(QVariantHash& dict) {
   return true;
 }
 
-bool AppendPerfsToDict(QVariantHash& dict, const QStringList& performerList) {
+AppendPerfsToDict::AppendPerfsToDict(const QString& perfsStr) : performerList{NameTool()(perfsStr)} {}
+
+bool AppendPerfsToDict::operator()(QVariantHash& dict) const {
   auto perfIt = dict.find(JSONKey::Performers);
+  QStringList afterLst;
+  afterLst += performerList;
   if (perfIt != dict.cend()) {
-    QStringList afterLst = perfIt.value().toStringList();
-    afterLst += performerList;
+    afterLst += perfIt.value().toStringList();
+    afterLst.sort();
     afterLst.removeDuplicates();
     if (afterLst == perfIt.value().toStringList()) {
       return false;
     }
-    perfIt.value().toStringList().swap(afterLst);
+    perfIt.value() = afterLst;
   } else {
-    dict[JSONKey::Performers] = performerList;
+    afterLst.sort();
+    afterLst.removeDuplicates();
+    dict[JSONKey::Performers] = afterLst;
   }
   return true;
 }
 
-bool InsertStudioPairIntoDict(QVariantHash& dict) {
+bool InsertStudioPairIntoDict::operator()(QVariantHash& dict) const {
   auto studioIt = dict.find(JSONKey::Studio);
   if (studioIt != dict.cend() && !studioIt.value().toString().isEmpty()) {
     return false;
@@ -67,21 +83,22 @@ bool InsertStudioPairIntoDict(QVariantHash& dict) {
   dict.insert(JSONKey::Studio, psm.hintStdStudioName(sentence));
   return true;
 }
-bool UpdateStudio(QVariantHash& dict, const QString& productionStudio) {
+bool UpdateStudio::operator()(QVariantHash& dict) const {
   auto studioIt = dict.find(JSONKey::Studio);
   if (studioIt == dict.cend()) {
-    dict[JSONKey::Studio] = productionStudio;
+    dict[JSONKey::Studio] = studio;
     return true;
   }
-  if (studioIt.value().toString() == productionStudio) {
+  if (studioIt.value().toString() == studio) {
     return false;
   }
-  studioIt.value() = productionStudio;
+  studioIt.value() = studio;
   return true;
 }
 }  // namespace VariantHashHelper
 
 namespace JsonFileHelper {
+using namespace VariantHashHelper;
 QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath,        //
                                   const QString& performersListStr,  //
                                   const QString& productionStudio) {
@@ -161,80 +178,9 @@ int ConstructJsonForVids(const QString& path, const QString& productionStudio, c
   return succeedCnt;
 }
 
-int JsonPerformersKeyValuePairAdd(const QString& path) {
+int JsonFileKeyValueProcess(const QString& path, const VariantHashHelper::JSON_DICT_PROCESS_T jDProc) {
   if (!QFileInfo(path).isDir()) {
-    return -1;
-  }
-  int succeedCnt = 0;
-  int tryKVPairCnt = 0;
-
-  QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    const QString& jsonPath = it.filePath();
-    QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (!VariantHashHelper::InsertPerfsPairToDictByNameHint(dict)) {
-      continue;
-    }
-    succeedCnt += MovieJsonDumper(dict, jsonPath);
-    ++tryKVPairCnt;
-  }
-  if (tryKVPairCnt != succeedCnt) {
-    qDebug("%d/%d json add performer key-value pair succeed", succeedCnt, tryKVPairCnt);
-  }
-  return succeedCnt;
-}
-
-int JsonProductionStudiosKeyValuePairAdd(const QString& path) {
-  if (!QFileInfo(path).isDir()) {
-    return -1;
-  }
-  int succeedCnt = 0;
-  int tryKVPairCnt = 0;
-
-  QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    const QString& jsonPath = it.filePath();
-    QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (!VariantHashHelper::InsertStudioPairIntoDict(dict)) {
-      continue;
-    }
-    succeedCnt += MovieJsonDumper(dict, jsonPath);
-    ++tryKVPairCnt;
-  }
-  if (tryKVPairCnt != succeedCnt) {
-    qDebug("%d/%d json add studio key-value pair succeed", succeedCnt, tryKVPairCnt);
-  }
-  return succeedCnt;
-}
-
-int JsonValuePerformersProductionStudiosCleaner(const QString& path) {
-  if (!QFileInfo(path).isDir()) {
-    return -1;
-  }
-  int succeedCnt = 0;
-  int tryCleanCnt = 0;
-  QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    const QString& jsonPath = it.filePath();
-    QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (!VariantHashHelper::ClearPerformerAndStudio(dict)) {
-      continue;
-    }
-    succeedCnt += MovieJsonDumper(dict, jsonPath);
-    ++tryCleanCnt;
-  }
-  if (tryCleanCnt != succeedCnt) {
-    qDebug("%d/%d json clean performer or production studio name succeed", succeedCnt, tryCleanCnt);
-  }
-  return succeedCnt;
-}
-
-int JsonValuePerformersAdder(const QString& path, const QString& performers) {
-  const QStringList& performerList = NameTool()(performers);
-  if (performerList.isEmpty() || !QFileInfo(path).isDir()) {
+    qDebug("path[%s] is not a dir", qPrintable(path));
     return -1;
   }
   int succeedCnt = 0;
@@ -245,39 +191,14 @@ int JsonValuePerformersAdder(const QString& path, const QString& performers) {
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (!VariantHashHelper::AppendPerfsToDict(dict, performerList)) {
+    if (!jDProc(dict)) {
       continue;
     }
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryConstuctCnt;
   }
   if (tryConstuctCnt != succeedCnt) {
-    qDebug("%d/%d json add performer succeed", succeedCnt, tryConstuctCnt);
-  }
-  return succeedCnt;
-}
-
-int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio) {
-  const QString& productionStudio = _productionStudio.trimmed();
-  if (not QFileInfo(path).isDir()) {
-    return -1;
-  }
-  int succeedCnt = 0;
-  int tryConstuctCnt = 0;
-
-  QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    const QString& jsonPath = it.filePath();
-    QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (!VariantHashHelper::UpdateStudio(dict, productionStudio)) {
-      continue;
-    }
-    succeedCnt += MovieJsonDumper(dict, jsonPath);
-    ++tryConstuctCnt;
-  }
-  if (tryConstuctCnt != succeedCnt) {
-    qDebug("%d/%d json add productionStudio set succeed", succeedCnt, tryConstuctCnt);
+    qDebug("%d/%d json processed", succeedCnt, tryConstuctCnt);
   }
   return succeedCnt;
 }
@@ -304,7 +225,7 @@ QVariantHash JsonStr2Dict(const QString& jsonStr) {
   }
   const QJsonObject& rootObj = json_doc.object();
   auto dict = rootObj.toVariantHash();
-  VariantHashHelper::CompatibleJsonKey(dict);
+  CompatibleJsonKey()(dict);
   return dict;
 }
 }  // namespace JsonFileHelper

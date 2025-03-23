@@ -159,6 +159,11 @@ QStringList PerformersManager::FilterPerformersOut(const QStringList& words) con
   return performersList;
 }
 
+QStringList PerformersManager::operator()(const QString& sentence) const  //
+{
+  return FilterPerformersOut(SplitSentence(sentence));
+}
+
 // #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 
