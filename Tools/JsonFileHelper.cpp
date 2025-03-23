@@ -69,7 +69,7 @@ QVariantHash JsonFileHelper::GetMovieFileJsonDict(const QString& fileAbsPath, co
   QList<QVariant> hotSceneList = HotSceneString2IntList("");
   QVariantHash dict = {{JSONKey::Name, fi.fileName()},
                        {JSONKey::Performers, performersList},
-                       {JSONKey::ProductionStudio, productionStudio},
+                       {JSONKey::Studio, productionStudio},
                        {JSONKey::Uploaded, fi.birthTime().toString("yyyyMMdd")},
                        {JSONKey::Tags, QStringList()},
                        {JSONKey::Rate, -1},
@@ -84,7 +84,7 @@ QVariantHash JsonFileHelper::GetMovieFileJsonDict(const QString& fileAbsPath, co
 QVariantHash JsonFileHelper::GetDefaultJsonFile(const QString& fileName, const QString& fileSz) {
   QVariantHash dict = {{JSONKey::Name, fileName},
                        {JSONKey::Performers, QStringList()},
-                       {JSONKey::ProductionStudio, ""},
+                       {JSONKey::Studio, ""},
                        {JSONKey::Uploaded, ""},
                        {JSONKey::Tags, QStringList()},
                        {JSONKey::Rate, -1},
@@ -166,11 +166,11 @@ int JsonFileHelper::JsonProductionStudiosKeyValuePairAdd(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (dict.contains(JSONKey::ProductionStudio) and not dict[JSONKey::ProductionStudio].toString().isEmpty()) {
+    if (dict.contains(JSONKey::Studio) and not dict[JSONKey::Studio].toString().isEmpty()) {
       continue;
     }
     const QString& sentence = dict.contains(JSONKey::Name) ? dict[JSONKey::Name].toString() : "";
-    dict.insert(JSONKey::ProductionStudio, psm.hintStdStudioName(sentence));
+    dict.insert(JSONKey::Studio, psm.hintStdStudioName(sentence));
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryKVPairCnt;
   }
@@ -194,8 +194,13 @@ int JsonFileHelper::JsonValuePerformersProductionStudiosCleaner(const QString& p
     if (dict.contains(JSONKey::Performers)) {
       dict[JSONKey::Performers] = QStringList();
     }
-    if (dict.contains(JSONKey::ProductionStudio)) {
-      dict[JSONKey::ProductionStudio] = "";
+    if (dict.contains(JSONKey::Studio)) {
+      dict[JSONKey::Studio] = "";
+    }
+    auto itPS = dict.find("ProductionStudio");
+    if (itPS != dict.cend()) {
+      dict.erase(itPS);
+      dict[JSONKey::Studio] = "";
     }
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryCleanCnt;
@@ -244,10 +249,10 @@ int JsonFileHelper::JsonValueProductionStudioSetter(const QString& path, const Q
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    if (dict[JSONKey::ProductionStudio].toString() == productionStudio) {
+    if (dict[JSONKey::Studio].toString() == productionStudio) {
       continue;
     }
-    dict[JSONKey::ProductionStudio] = productionStudio;
+    dict[JSONKey::Studio] = productionStudio;
     succeedCnt += MovieJsonDumper(dict, jsonPath);
     ++tryConstuctCnt;
   }

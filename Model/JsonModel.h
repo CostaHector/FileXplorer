@@ -60,8 +60,7 @@ class JsonModel : public DifferRootFileSystemModel {
   bool isPerfComplete(int row) const { return m_jsons[row].perfsCount >= m_completeJsonPerfCount; }
 
   void SetCompletePerfCount(int newCount);
-  void updatePerfCount(int row);
-  void setPerfCount(int row, int newCount);
+  void updatePerfCount(int row, int newCnt);
 
  private:
   int m_completeJsonPerfCount;
