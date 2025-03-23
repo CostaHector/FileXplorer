@@ -81,14 +81,6 @@ JsonEditor::JsonEditor(QWidget* parent)
   updateWindowsSize();
 }
 
-void CompatibleJsonKey(QVariantHash& vh) {
-  auto itPS = vh.find("ProductionStudio");
-  if (itPS != vh.cend()) {
-    vh[JSONKey::Studio] = itPS.value();
-    vh.erase(itPS);
-  }
-}
-
 void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
   if (!curIndex.isValid()) {
     qWarning("Current index invalid");
@@ -97,10 +89,8 @@ void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
 
   const int rowIdx = curIndex.row();
   const QString& jAbsPth = m_jsonList->filePath(rowIdx);
-  QVariantHash jsonDict = JsonFileHelper::MovieJsonLoader(jAbsPth);
-  CompatibleJsonKey(jsonDict);
-
-  const int newCnt = jsonDict[DB_HEADER_KEY::Performers].toJsonArray().size();
+  const QVariantHash& jsonDict = JsonFileHelper::MovieJsonLoader(jAbsPth);
+  const int newCnt = jsonDict[DB_HEADER_KEY::Performers].toStringList().size();
   m_jsonModel->updatePerfCount(rowIdx, newCnt);
   qDebug("Now json[%s] perfs cnt:%d", qPrintable(jAbsPth), newCnt);
 
