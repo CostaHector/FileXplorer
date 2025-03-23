@@ -5,15 +5,15 @@
     ],
     "Name": "StudioName - Movie Name - Performer 1, Performer 2",
     "Performers": [
-		"Performer 1",
-		"Performer 2"
+        "Performer 1",
+        "Performer 2"
     ],
-    "ProductionStudio": "StudioName",
     "Rate": 4,
     "Resolution": "720p",
     "Size": "126113854",
+    "Studio": "",
     "Tags": [
-		"nonporn"
+        "nonporn"
     ],
     "Uploaded": "20231022"
 }

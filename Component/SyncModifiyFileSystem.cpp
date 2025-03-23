@@ -16,10 +16,10 @@ void SyncModifiyFileSystem::LoadFromMemory() {
   const QString& toPath = PreferenceSettings().value("SYNC_TO_PATH", "").toString();
   const bool syncSwOn = PreferenceSettings().value("SYNC_FS_MOD", SyncModifiyFileSystem::m_syncModifyFileSystemSwitch).toBool();
   const bool syncBackOn = PreferenceSettings().value("SYNC_REVERSE_BACK", SyncModifiyFileSystem::m_alsoSyncReversebackSwitch).toBool();
-  if (not basicPath.isEmpty()) {
+  if (!basicPath.isEmpty()) {
     SetBasicPath(basicPath);
   }
-  if (not toPath.isEmpty()) {
+  if (!toPath.isEmpty()) {
     SetSynchronizedToPaths(toPath);
   }
   SyncModifiyFileSystem::m_syncModifyFileSystemSwitch = syncSwOn;

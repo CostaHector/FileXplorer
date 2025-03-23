@@ -20,6 +20,11 @@
 #include "Model/JsonModel.h"
 #include "View/JsonListView.h"
 
+#include "JsonEditorWidget/LineEditCSV.h"
+#include "JsonEditorWidget/LineEditInt.h"
+#include "JsonEditorWidget/LineEditStr.h"
+#include "JsonEditorWidget/TextEditMultiLine.h"
+
 class JsonEditor : public QMainWindow {
  public:
   explicit JsonEditor(QWidget* parent = nullptr);
@@ -38,7 +43,7 @@ class JsonEditor : public QMainWindow {
   auto onLowercaseEachWord() -> void;
   auto onCapitalizeEachWord() -> void;
   auto onLearnPerfomersFromJsonFile() -> bool;
-  auto onPerformersHint() -> QStringList;
+  bool onPerformersHint();
   auto onExtractCapitalizedPerformersHint() -> bool;
   auto onSelectedTextAppendToPerformers() -> bool;
 
@@ -61,16 +66,21 @@ class JsonEditor : public QMainWindow {
   }
 
  private:
-  bool IsValueOfKeyArr(const QString& key) const;
-  QString GetArrLine(const QString& key) const;
-  void UpdateDisplayArrLine(const QString& key, const QStringList& arr);
+  bool formatter();
 
-  auto formatter() -> bool;
-
-  QHash<QString, QWidget*> m_stdKeys;
+  LineEditStr* mName{nullptr};
+  LineEditCSV* mPerfsCsv{nullptr};  // comma seperated
+  LineEditStr* mStudio{nullptr};
+  LineEditStr* mUploaded{nullptr};
+  LineEditCSV* mTagsCsv{nullptr};  // comma seperated
+  LineEditInt* mRateInt{nullptr}; // int
+  LineEditStr* mSize{nullptr};
+  LineEditStr* mResolution{nullptr};
+  LineEditStr* mBitrate{nullptr};
+  LineEditCSV* mHot{nullptr};           // QList<QVariant>
+  TextEditMultiLine* mDetail{nullptr};  // multi-line
 
   QFormLayout* m_jsonFormLo;
-  QFormLayout* m_jsonFormExtraLo;  // no so frequently used key-value pair
 
   QWidget* m_jsonFormWid;
 

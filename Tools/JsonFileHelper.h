@@ -13,7 +13,7 @@
 namespace JSONKey {
 const QString Name = "Name";
 const QString Performers = "Performers";
-const QString ProductionStudio = "ProductionStudio";
+const QString Studio = "Studio";
 const QString Uploaded = "Uploaded";
 const QString Tags = "Tags";
 const QString Rate = "Rate";
@@ -22,10 +22,10 @@ const QString Resolution = "Resolution";
 const QString Bitrate = "Bitrate";
 const QString Hot = "Hot";
 const QString Detail = "Detail";
-const QStringList JsonKeyListOrder{Name, Performers, ProductionStudio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
+const QStringList JsonKeyListOrder{Name, Performers, Studio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
 const QHash<QString, int> JsonKeyPri = {{Name, JsonKeyListOrder.indexOf(Name)},
                                         {Performers, JsonKeyListOrder.indexOf(Performers)},
-                                        {ProductionStudio, JsonKeyListOrder.indexOf(ProductionStudio)},
+                                        {Studio, JsonKeyListOrder.indexOf(Studio)},
                                         {Uploaded, JsonKeyListOrder.indexOf(Uploaded)},
                                         {Tags, JsonKeyListOrder.indexOf(Tags)},
                                         {Rate, JsonKeyListOrder.indexOf(Rate)},
