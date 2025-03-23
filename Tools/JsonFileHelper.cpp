@@ -4,6 +4,7 @@
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 #include "PublicVariable.h"
+#include "public/DisplayEnhancement.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -92,7 +93,7 @@ QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath,        //
                       {JSONKey::Uploaded, fi.birthTime().toString("yyyyMMdd")},
                       {JSONKey::Tags, QStringList()},
                       {JSONKey::Rate, -1},
-                      {JSONKey::Size, QString::number(fi.size())},
+                      {JSONKey::Size, FILE_PROPERTY_DSP::sizeToHumanReadFriendly(fi.size())},
                       {JSONKey::Resolution, ""},
                       {JSONKey::Bitrate, ""},
                       {JSONKey::Hot, QVariantList{}},
@@ -100,16 +101,16 @@ QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath,        //
 }
 
 QVariantHash GetDefaultJsonFile(const QString& fileName, const qint64& fileSz) {
-  return QVariantHash{{JSONKey::Name, fileName},                 //
-                      {JSONKey::Performers, QStringList{}},      //
-                      {JSONKey::Studio, ""},                     //
-                      {JSONKey::Uploaded, ""},                   //
-                      {JSONKey::Tags, QStringList{}},            //
-                      {JSONKey::Rate, -1},                       //
-                      {JSONKey::Size, QString::number(fileSz)},  //
-                      {JSONKey::Resolution, ""},                 //
-                      {JSONKey::Bitrate, ""},                    //
-                      {JSONKey::Hot, QList<QVariant>{}},         //
+  return QVariantHash{{JSONKey::Name, fileName},                                            //
+                      {JSONKey::Performers, QStringList{}},                                 //
+                      {JSONKey::Studio, ""},                                                //
+                      {JSONKey::Uploaded, ""},                                              //
+                      {JSONKey::Tags, QStringList{}},                                       //
+                      {JSONKey::Rate, -1},                                                  //
+                      {JSONKey::Size, FILE_PROPERTY_DSP::sizeToHumanReadFriendly(fileSz)},  //
+                      {JSONKey::Resolution, ""},                                            //
+                      {JSONKey::Bitrate, ""},                                               //
+                      {JSONKey::Hot, QList<QVariant>{}},                                    //
                       {JSONKey::Detail, ""}};
 }
 
