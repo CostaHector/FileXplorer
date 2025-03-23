@@ -1,14 +1,8 @@
 #ifndef JSONFILEHELPER_H
 #define JSONFILEHELPER_H
 
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonParseError>
-#include <QJsonValue>
-
-#include <QDirIterator>
-#include <QFile>
+#include <QVariantHash>
+#include <QString>
 
 namespace JSONKey {
 const QString Name = "Name";
@@ -23,88 +17,48 @@ const QString Bitrate = "Bitrate";
 const QString Hot = "Hot";
 const QString Detail = "Detail";
 const QStringList JsonKeyListOrder{Name, Performers, Studio, Uploaded, Tags, Rate, Size, Resolution, Bitrate, Hot, Detail};
-const QHash<QString, int> JsonKeyPri = {{Name, JsonKeyListOrder.indexOf(Name)},
-                                        {Performers, JsonKeyListOrder.indexOf(Performers)},
-                                        {Studio, JsonKeyListOrder.indexOf(Studio)},
-                                        {Uploaded, JsonKeyListOrder.indexOf(Uploaded)},
-                                        {Tags, JsonKeyListOrder.indexOf(Tags)},
-                                        {Rate, JsonKeyListOrder.indexOf(Rate)},
-                                        {Size, JsonKeyListOrder.indexOf(Size)},
-                                        {Resolution, JsonKeyListOrder.indexOf(Resolution)},
-                                        {Bitrate, JsonKeyListOrder.indexOf(Bitrate)},
-                                        {Hot, JsonKeyListOrder.indexOf(Hot)},
-                                        {Detail, JsonKeyListOrder.indexOf(Detail)}};
-bool JsonKeySorter(const QPair<QString, QVariant>& l, const QPair<QString, QVariant>& r);
 }  // namespace JSONKey
 
-class JsonFileHelper {
- public:
-  static bool MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath);
-
-  static QVariantHash JsonStr2Dict(const QString& jsonStr);
-  static QVariantHash MovieJsonLoader(const QString& movieJsonItemPath);
-
-  static auto MapToOrderedList(const QVariantHash& in) -> QList<QPair<QString, QVariant>> {
-    QList<QPair<QString, QVariant>> out;
-    for (auto it = in.cbegin(); it != in.cend(); ++it) {
-      out.append(qMakePair(it.key(), it.value()));
-    }
-    std::sort(out.begin(), out.end(), JSONKey::JsonKeySorter);
-    return out;
+namespace VariantHashHelper {
+inline bool CompatibleJsonKey(QVariantHash& vh) {
+  auto itPS = vh.find("ProductionStudio");
+  if (itPS != vh.cend()) {
+    vh[JSONKey::Studio] = itPS.value();
+    vh.erase(itPS);
+    return true;
   }
+  return false;
+}
 
-  static auto HotSceneString2IntList(const QString& valueStr) -> QList<QVariant>;
+bool ClearPerformerAndStudio(QVariantHash& dict);
+bool InsertPerfsPairToDictByNameHint(QVariantHash& dict);
+bool AppendPerfsToDict(QVariantHash& dict, const QStringList& performerList);
+bool InsertStudioPairIntoDict(QVariantHash& dict);
+bool UpdateStudio(QVariantHash& dict, const QString& productionStudio);
+}  // namespace VariantHashHelper
 
-  static auto GetJsonValueString(const QString& keyName, const QVariant& v) -> QString {
-    QString valueStr;
-    if (key2ValueType.contains(keyName)) {
-      if (key2ValueType[keyName] == "QStringList") {
-        valueStr = v.toStringList().join(", ");
-      } else if (key2ValueType[keyName] == "QIntList") {
-        QStringList hotSceneSL;
-        for (QVariant ivariant : v.toList()) {
-          bool isInt = false;
-          int hot = ivariant.toInt(&isInt);
-          if (not isInt) {
-            continue;
-          }
-          hotSceneSL.append(QString::number(hot));
-        }
-        valueStr = hotSceneSL.join(", ");
-      } else if (key2ValueType[keyName] == "int") {
-        valueStr = QString::number(v.toInt());
-      } else {
-        qDebug("type(map[%s]) cannot be processed", qPrintable(keyName));
-      }
-    } else {
-      valueStr = v.toString();
-    }
-    return valueStr;
-  }
+namespace JsonFileHelper {
+QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath, const QString& performersListStr = "", const QString& productionStudio = "");
+QVariantHash GetDefaultJsonFile(const QString& fileName = "", const qint64& fileSz = 0);
 
-  static QVariantHash GetMovieFileJsonDict(const QString& fileAbsPath, const QString& performersListStr = "", const QString& productionStudio = "");
+bool MovieJsonDumper(const QVariantHash& dict, const QString& movieJsonItemPath);
 
-  static QVariantHash GetDefaultJsonFile(const QString& fileName = "", const QString& fileSz = "0");
+QVariantHash JsonStr2Dict(const QString& jsonStr);
+QVariantHash MovieJsonLoader(const QString& movieJsonItemPath);
 
-  static QString GetJsonFilePath(const QString& vidsPath) {
-    const int sufLen = vidsPath.lastIndexOf('.');
-    const QString& jsonPath = vidsPath.left(sufLen) + ".json";
-    return jsonPath;
-  }
+QString GetJsonFilePath(const QString& vidsPath);
 
-  static int ConstructJsonForVids(const QString& path, const QString& productionStudio = "", const QString& performersListStr = "");
+int ConstructJsonForVids(const QString& path, const QString& productionStudio = "", const QString& performersListStr = "");
 
-  static int JsonPerformersKeyValuePairAdd(const QString& path);
+int JsonPerformersKeyValuePairAdd(const QString& path);
 
-  static int JsonProductionStudiosKeyValuePairAdd(const QString& path);
+int JsonProductionStudiosKeyValuePairAdd(const QString& path);
 
-  static int JsonValuePerformersProductionStudiosCleaner(const QString& path);
+int JsonValuePerformersProductionStudiosCleaner(const QString& path);
 
-  static int JsonValuePerformersAdder(const QString& path, const QString& performers);
+int JsonValuePerformersAdder(const QString& path, const QString& performers);
 
-  static int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio);
-
-  static const QMap<QString, QString> key2ValueType;
-};
+int JsonValueProductionStudioSetter(const QString& path, const QString& _productionStudio);
+}  // namespace JsonFileHelper
 
 #endif  // JSONFILEHELPER_H
