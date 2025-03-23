@@ -241,7 +241,7 @@ QString PATHTOOL::longestCommonPrefix(const QStringList& strs) {
 }
 
 QString PATHTOOL::GetFileExtension(const QString& path) {
-  return QFileInfo(path).suffix();
+  return '.' + QFileInfo(path).suffix();
 }
 
 bool PATHTOOL::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {

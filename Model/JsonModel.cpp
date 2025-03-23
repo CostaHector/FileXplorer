@@ -17,10 +17,7 @@ int JsonProperties::getPerfsCount(const QString& pth) {
 
 JsonModel::JsonModel(QObject* parent)
     : DifferRootFileSystemModel{parent},
-      m_completeJsonPerfCount{
-          PreferenceSettings()
-              .value(MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.name, MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.v)
-              .toInt()} {}
+      m_completeJsonPerfCount{PreferenceSettings().value(MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.name, MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.v).toInt()} {}
 
 int JsonModel::appendAPath(const QString& path) {
   // m_jsons increase delta
@@ -116,13 +113,10 @@ void JsonModel::SetCompletePerfCount(int newCount) {
   emit dataChanged(index(0), index(rowCount() - 1), {Qt::ItemDataRole::ForegroundRole});
 }
 
-void JsonModel::updatePerfCount(int row) {
-  const int newCount = JsonProperties::getPerfsCount(m_jsons[row].jsonPath);
-  m_jsons[row].perfsCount = newCount;
-  emit dataChanged(index(row), index(row), {Qt::ItemDataRole::ForegroundRole});
-}
-
-void JsonModel::setPerfCount(int row, int newCount) {
-  m_jsons[row].perfsCount = newCount;
+void JsonModel::updatePerfCount(int row, int newCnt) {
+  if (m_jsons[row].perfsCount == newCnt) {
+    return;
+  }
+  m_jsons[row].perfsCount = newCnt;
   emit dataChanged(index(row), index(row), {Qt::ItemDataRole::ForegroundRole});
 }

@@ -63,10 +63,10 @@ int ProductionStudioManager::LearningFromAPath(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    if (!dict.contains(JSONKey::ProductionStudio)) {
+    if (!dict.contains(JSONKey::Studio)) {
       continue;
     }
-    const QString& v = dict[JSONKey::ProductionStudio].toString();
+    const QString& v = dict[JSONKey::Studio].toString();
     for (const QString& psFrom : StandardProductionStudioFrom(v)) {
       if (psFrom.isEmpty() || m_prodStudioMap.contains(psFrom)) {
         continue;
