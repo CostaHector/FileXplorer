@@ -2,8 +2,6 @@
 #include <QCoreApplication>
 #include "pub/MyTestSuite.h"
 
-
-
 class JsonEditorToolTest : public MyTestSuite
 {
   Q_OBJECT
@@ -22,6 +20,6 @@ class JsonEditorToolTest : public MyTestSuite
   }
 };
 
-JsonEditorToolTest g_jsonEditorToolTest;
+//JsonEditorToolTest g_jsonEditorToolTest;
 
 #include "JsonEditorToolTest.moc"

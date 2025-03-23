@@ -10,13 +10,16 @@ QString LineEditCSV::GetFormName() const {
 }
 
 QStringList LineEditCSV::GetStringList() const {
+  if (text().isEmpty()) {
+    return {};
+  }
   return text().split(", ");
 }
 
 QList<QVariant> LineEditCSV::GetVariantList() const {
   const QStringList& sl = GetStringList();
   QList<QVariant> ans;
-  for (const QString& s: sl) {
+  for (const QString& s : sl) {
     bool isInt = false;
     int iVal = s.toInt(&isInt);
     if (!isInt) {
@@ -28,8 +31,7 @@ QList<QVariant> LineEditCSV::GetVariantList() const {
   return ans;
 }
 
-int LineEditCSV::AppendFromStringList(const QStringList& sl)
-{
+int LineEditCSV::AppendFromStringList(const QStringList& sl) {
   QStringList curSl = GetStringList();
   curSl += sl;
   curSl.sort();
