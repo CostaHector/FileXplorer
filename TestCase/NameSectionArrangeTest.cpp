@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 #include "Tools/NameSectionArrange.h"
 
-class NameSectionArrangeTest : public QObject {
+class NameSectionArrangeTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase();
-  void cleanupTestCase();
-  void init();
-  void cleanup();
+  void initTestCase() {}
+  void cleanupTestCase() {}
+  void init() {}
+  void cleanup() {}
 
   void arrange0213Basic() {
     NameSectionArrange nss("0213");
@@ -51,14 +51,5 @@ class NameSectionArrangeTest : public QObject {
   }
 };
 
-void NameSectionArrangeTest::initTestCase() {}
-
-void NameSectionArrangeTest::cleanupTestCase() {}
-
-void NameSectionArrangeTest::init() {}
-
-void NameSectionArrangeTest::cleanup() {}
-
-//QTEST_MAIN(NameSectionArrangeTest)
-
-//#include "NameSectionArrangeTest.moc"
+NameSectionArrangeTest g_NameSectionArrangeTest;
+#include "NameSectionArrangeTest.moc"

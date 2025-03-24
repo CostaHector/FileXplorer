@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 #include "Tools/ConvertUnicodeCharsetToAscii.h"
 
-class ConvertUnicodeCharsetToAsciiTest : public QObject {
+class ConvertUnicodeCharsetToAsciiTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase();
-  void cleanupTestCase();
-  void init();
-  void cleanup();
+  void initTestCase() {}
+  void cleanupTestCase() {}
+  void init() {}
+  void cleanup() {}
 
   void CodingTest() {
     QString startOfBoldA = QChar{0xD835};
@@ -59,14 +59,5 @@ class ConvertUnicodeCharsetToAsciiTest : public QObject {
   }
 };
 
-void ConvertUnicodeCharsetToAsciiTest::initTestCase() {}
-
-void ConvertUnicodeCharsetToAsciiTest::cleanupTestCase() {}
-
-void ConvertUnicodeCharsetToAsciiTest::init() {}
-
-void ConvertUnicodeCharsetToAsciiTest::cleanup() {}
-
-//QTEST_MAIN(ConvertUnicodeCharsetToAsciiTest)
-
-//#include "ConvertUnicodeCharsetToAsciiTest.moc"
+ConvertUnicodeCharsetToAsciiTest g_ConvertUnicodeCharsetToAsciiTest;
+#include "ConvertUnicodeCharsetToAsciiTest.moc"

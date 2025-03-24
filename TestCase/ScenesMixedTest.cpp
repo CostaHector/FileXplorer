@@ -1,9 +1,9 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 #include "Tools/Classify/SceneMixed.h"
 
-class ScenesMixedTest : public QObject {
+class ScenesMixedTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -186,5 +186,5 @@ class ScenesMixedTest : public QObject {
   }
 };
 
-//QTEST_MAIN(ScenesMixedTest)
+ScenesMixedTest g_ScenesMixedTest;
 #include "ScenesMixedTest.moc"

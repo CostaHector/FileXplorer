@@ -55,7 +55,7 @@ QString NameTool::ToggleSentenceCase(const QString& sentence) {
   QString toggled;
   for (QChar c : sentence) {
     if (c.isLetter()) {
-      toggled += (c.toLower());  // trick upper to lower case by bitwise operator
+      toggled += (c.toLatin1() ^ 0x20);  // trick upper to lower case by bitwise operator
     } else {
       toggled += c;
     }
