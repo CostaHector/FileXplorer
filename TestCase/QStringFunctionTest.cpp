@@ -1,9 +1,9 @@
 #include <QtTest>
 #include <QCoreApplication>
-
+#include "pub/MyTestSuite.h"
 // add necessary includes here
 #include <QRegularExpression>
-class QStringFunctionTest : public QObject
+class QStringFunctionTest : public MyTestSuite
 {
   Q_OBJECT
 
@@ -101,5 +101,5 @@ void QStringFunctionTest::test_exactSentenceMatch() {
   QCOMPARE(noMultiLineMatchAkaRet.hasMatch(), false);
 }
 
-// QTEST_MAIN(QStringFunctionTest)
+QStringFunctionTest g_QStringFunctionTest;
 #include "QStringFunctionTest.moc"

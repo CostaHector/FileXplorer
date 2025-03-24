@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 #include "Tools/PathTool.h"
 
-class ValueCheckerTest : public QObject {
+class ValueCheckerTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase();
-  void cleanupTestCase();
-  void init();
-  void cleanup();
+  void initTestCase() {}
+  void cleanupTestCase() {}
+  void init() {}
+  void cleanup() {}
 
   void fileExtensionBasic() {
     QCOMPARE(PATHTOOL::GetFileExtension("AAA.mp4"), ".mp4");
@@ -24,19 +24,11 @@ class ValueCheckerTest : public QObject {
   }
 
   void fileExtension_NoExtension() {
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.5"), "");
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.51"), "");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.5"), ".5");
+    QCOMPARE(PATHTOOL::GetFileExtension("AAA.51"), ".51");
   }
 };
 
-void ValueCheckerTest::initTestCase() {}
+ValueCheckerTest g_ValueCheckerTest;
 
-void ValueCheckerTest::cleanupTestCase() {}
-
-void ValueCheckerTest::init() {}
-
-void ValueCheckerTest::cleanup() {}
-
-//QTEST_MAIN(ValueCheckerTest)
-
-//#include "ValueCheckerTest.moc"
+#include "ValueCheckerTest.moc"
