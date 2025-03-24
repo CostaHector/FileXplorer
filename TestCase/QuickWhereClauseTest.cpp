@@ -1,14 +1,13 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 // add necessary includes here
 #include "Tools/PerformersAkaManager.h"
-class QuickWhereClauseTest : public QObject {
+class QuickWhereClauseTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  QuickWhereClauseTest() : dbTM(PerformersAkaManager::getIns()) {}
-  PerformersAkaManager& dbTM;
+  PerformersAkaManager& dbTM {PerformersAkaManager::getIns()};
  private slots:
   void test_SearchSpaceString();
   void test_SearchEmptyString();
@@ -61,5 +60,5 @@ void QuickWhereClauseTest::SearchThreePerfsABC() {
   QCOMPARE(whereClause, "((Name like \"%A%\" AND Name like \"%B%\") AND Name like \"%C%\")");
 }
 
-// QTEST_MAIN(QuickWhereClauseTest)
-//  #include "QuickWhereClauseTest.moc"
+//QuickWhereClauseTest g_QuickWhereClauseTest;
+#include "QuickWhereClauseTest.moc"
