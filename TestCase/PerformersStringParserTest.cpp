@@ -1,14 +1,13 @@
 #include <QCoreApplication>
 #include <QtTest>
+#include "pub/MyTestSuite.h"
 
 // add necessary includes here
 #include "Tools/PerformersManager.h"
-
-class PerformersManagerTest : public QObject {
+class PerformersStringParserTest : public MyTestSuite {
   Q_OBJECT
  public:
-  explicit PerformersManagerTest(QObject* parent = nullptr) : QObject(parent), pm(PerformersManager::getIns()) {}
-  PerformersManager& pm;
+  const PerformersManager& pm{PerformersManager::getIns()};
 
  private slots:
   void test_performersDictNotEmpty() { QVERIFY2(not pm.m_performers.isEmpty(), "performers list should not be empty"); }
@@ -55,5 +54,5 @@ class PerformersManagerTest : public QObject {
   }
 };
 
-//QTEST_MAIN(PerformersManagerTest)
-//#include "PerformersStringParserTest.moc"
+#include "PerformersStringParserTest.moc"
+PerformersStringParserTest g_PerformersManagerTest;

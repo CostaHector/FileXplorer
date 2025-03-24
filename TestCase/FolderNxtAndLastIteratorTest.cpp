@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 #include "Tools/FolderNxtAndLastIterator.h"
 
 QStringList Invoke_GetSortedDirNames(const QString& parentPath) {
@@ -15,7 +15,7 @@ QStringList Invoke_GetSortedDirNames(const QString& parentPath) {
   }
 }
 
-class FolderNxtAndLastIteratorTest : public QObject {
+class FolderNxtAndLastIteratorTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -56,5 +56,5 @@ class FolderNxtAndLastIteratorTest : public QObject {
   }
 };
 
-//QTEST_MAIN(FolderNxtAndLastIteratorTest)
+FolderNxtAndLastIteratorTest g_FolderNxtAndLastIteratorTest;
 #include "FolderNxtAndLastIteratorTest.moc"

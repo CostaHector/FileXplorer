@@ -1,8 +1,9 @@
 #include <QCoreApplication>
 #include <QtTest>
+#include "pub/MyTestSuite.h"
 #include "Tools/ExtractPileItemsOutFolder.h"
 
-class ExtractPileItemsOutFolderTest : public QObject {
+class ExtractPileItemsOutFolderTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -55,5 +56,5 @@ class ExtractPileItemsOutFolderTest : public QObject {
   }
 };
 
-//QTEST_MAIN(ExtractPileItemsOutFolderTest)
+ExtractPileItemsOutFolderTest g_ExtractPileItemsOutFolderTest;
 #include "ExtractPileItemsOutFolderTest.moc"

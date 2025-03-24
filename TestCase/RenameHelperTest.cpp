@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 #include "Tools/RenameHelper.h"
 using namespace RenameHelper;
 
-class RenameHelperTest : public QObject {
+class RenameHelperTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -193,5 +193,5 @@ class RenameHelperTest : public QObject {
   }
 };
 
-//QTEST_MAIN(RenameHelperTest)
+RenameHelperTest g_RenameHelperTest;
 #include "RenameHelperTest.moc"

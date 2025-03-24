@@ -7,15 +7,19 @@
 #include <QDirIterator>
 #include <QTextStream>
 
-ProductionStudioManager::ProductionStudioManager() : m_prodStudioMap(ReadOutStdStudioName()) {}
+ProductionStudioManager::ProductionStudioManager()  //
+    : m_prodStudioMap(ReadOutStdStudioName())       //
+{}
 
 QVariantHash ProductionStudioManager::ReadOutStdStudioName() {
 #ifdef _WIN32
-  const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
+  const QString stdStudiosFilePath =  //
+      PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name, "").toString();
 #else
-  const QString stdStudiosFilePath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
+  const QString stdStudiosFilePath =  //
+      PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name, "").toString();
 #endif
-  QFile txtFile(stdStudiosFilePath);
+  QFile txtFile{stdStudiosFilePath};
   if (!txtFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("File[%s] not found or open for read failed", qPrintable(stdStudiosFilePath));
     return {};

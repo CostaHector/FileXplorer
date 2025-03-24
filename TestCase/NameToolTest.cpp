@@ -1,11 +1,11 @@
 #include <QCoreApplication>
 #include <QtTest>
+#include "pub/MyTestSuite.h"
 
 // add necessary includes here
-#include <QStringList>
 #include "Tools/NameTool.h"
 
-class NameToolTest : public QObject {
+class NameToolTest : public MyTestSuite {
   Q_OBJECT
 
  public:
@@ -180,5 +180,5 @@ void NameToolTest::test_ToggleCase() {
   QCOMPARE(NameTool::ToggleSentenceCase("Henry Cavill"), "hENRY cAVILL");
 }
 
-//QTEST_MAIN(NameToolTest)
+NameToolTest g_NameToolTest;
 #include "NameToolTest.moc"
