@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 #include "Tools/ToConsecutiveFileNameNo.h"
 
-class ToConsecutiveFileNameNoTest : public QObject {
+class ToConsecutiveFileNameNoTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase();
-  void cleanupTestCase();
-  void init();
-  void cleanup();
+  void initTestCase(){};
+  void cleanupTestCase(){};
+  void init(){};
+  void cleanup(){};
 
   void QRegularExpressionFileNameEndWithNoException() {
     QString newNameTemplate;
@@ -30,7 +30,7 @@ class ToConsecutiveFileNameNoTest : public QObject {
     QString fileNameScNoDotNoSpace = "movie name Sc1.jpg";
     QVERIFY(not ToConsecutiveFileNameNo::nameNeedToProcess(fileNameScNoDotNoSpace, newNameTemplate));
 
-    QString fileNameNotBeginingOfWord = "bankrupt 1.jpg"; // should not in exception list
+    QString fileNameNotBeginingOfWord = "bankrupt 1.jpg";  // should not in exception list
     QVERIFY(ToConsecutiveFileNameNo::nameNeedToProcess(fileNameNotBeginingOfWord, newNameTemplate));
   }
 
@@ -62,14 +62,5 @@ class ToConsecutiveFileNameNoTest : public QObject {
   }
 };
 
-void ToConsecutiveFileNameNoTest::initTestCase() {}
-
-void ToConsecutiveFileNameNoTest::cleanupTestCase() {}
-
-void ToConsecutiveFileNameNoTest::init() {}
-
-void ToConsecutiveFileNameNoTest::cleanup() {}
-
-//QTEST_MAIN(ToConsecutiveFileNameNoTest)
-
-//#include "ToConsecutiveFileNameNoTest.moc"
+#include "ToConsecutiveFileNameNoTest.moc"
+ToConsecutiveFileNameNoTest g_ToConsecutiveFileNameNoTest;

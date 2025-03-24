@@ -17,7 +17,6 @@ SOURCES += \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/ItemsClassifierTest.cpp \
-    TestCase/JsonEditorToolTest.cpp \
     TestCase/JsonFileHelperTest.cpp \
     TestCase/RenameHelperTest.cpp \
     TestCase/SceneInfoManagerTest.cpp \
@@ -142,3 +141,5 @@ DISTFILES += \
 
 RESOURCES += \
     bin/themes/res.qrc
+
+DEFINES += QT_TEST

@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 // add necessary includes here
 #include "Tools/DuplicateImagesRemover.h"
 
-class DuplicateImagesRemoverTest : public QObject {
+class DuplicateImagesRemoverTest : public MyTestSuite {
   Q_OBJECT
  public:
   DuplicateImagesRemover m_duplicateImagsRemover;
@@ -36,6 +36,5 @@ class DuplicateImagesRemoverTest : public QObject {
   }
 };
 
-// QTEST_MAIN(DuplicateImagesRemoverTest)
-
-// #include "DuplicateImagesRemoverTest.moc"
+DuplicateImagesRemoverTest g_DuplicateImagesRemoverTest;
+#include "DuplicateImagesRemoverTest.moc"
