@@ -321,7 +321,7 @@ int AIMediaDuplicate::FillHashFieldIfSizeConflict(const QString& path) {
       continue;
     }
     for (const QString& abspath : pths) {
-      setHash.bindValue(0, GetMD5(abspath, 1024));
+      setHash.bindValue(0, GetFileMD5(abspath, 1024));
       setHash.bindValue(1, abspath);
       if (!setHash.exec()) {
         qWarning("set field md5 of[`%s`] failed", qPrintable(abspath));
