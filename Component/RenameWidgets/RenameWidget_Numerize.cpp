@@ -1,0 +1,93 @@
+#include "RenameWidget_Numerize.h"
+#include "PublicVariable.h"
+#include "Tools/RenameHelper.h"
+
+RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent) : AdvanceRenamer(parent) {
+  EXT_INSIDE_FILENAME->setCheckState(Qt::CheckState::Unchecked);
+  ITEMS_INSIDE_SUBDIR->setEnabled(false);
+  ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
+}
+
+void RenameWidget_Numerize::InitExtraMemberWidget() {
+  int startIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_START_INDEX.v).toInt();
+  const QStringList& noFormatCandidate{PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
+  int noFormatDefaultIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
+  m_startNo = new (std::nothrow) QLineEdit(QString::number(startIndex));  // "0"
+  if (m_startNo == nullptr) {
+    qCritical("m_startNo is nullptr");
+    return;
+  }
+  m_startNo->setMaximumWidth(20);
+  m_numberPattern = new (std::nothrow) QComboBox;  // " - %1"
+  if (m_numberPattern == nullptr) {
+    qCritical("m_numberPattern is nullptr");
+    return;
+  }
+  m_numberPattern->setEditable(true);
+  m_numberPattern->setDuplicatesEnabled(false);
+  m_numberPattern->setMaximumWidth(60);
+  m_numberPattern->addItems(noFormatCandidate);
+  if (0 <= noFormatDefaultIndex && noFormatDefaultIndex < noFormatCandidate.size()) {
+    m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
+  }
+}
+
+void RenameWidget_Numerize::InitExtraCommonVariable() {
+  windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
+  setWindowTitle(windowTitleFormat);
+  setWindowIcon(QIcon(":img/NAME_STR_NUMERIZER_PATH"));
+}
+
+QToolBar* RenameWidget_Numerize::InitControlTB() {
+  QToolBar* replaceControl{new QToolBar};
+  replaceControl->addWidget(new QLabel("Base name:"));
+  replaceControl->addWidget(m_completeBaseName);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(new QLabel("Start index:"));
+  replaceControl->addWidget(m_startNo);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(new QLabel("No. format:"));
+  replaceControl->addWidget(m_numberPattern);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(EXT_INSIDE_FILENAME);
+  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  return replaceControl;
+}
+void RenameWidget_Numerize::extraSubscribe() {
+  connect(m_startNo, &QLineEdit::textChanged, this, [this](const QString& startNoStr) -> void {
+    bool isNumber = false;
+    int startNo = startNoStr.toInt(&isNumber);
+    if (!isNumber) {
+      qWarning("%s is not valid start number", qPrintable(startNoStr));
+      return;
+    }
+    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, startNo);
+    OnlyTriggerRenameCore();
+  });
+
+  connect(m_numberPattern, &QComboBox::currentTextChanged, this, [this]() -> void {
+    int defaultFormateInd = m_numberPattern->currentIndex();
+    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
+    OnlyTriggerRenameCore();
+  });
+  connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
+}
+
+QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
+  const QString& namePattern = m_numberPattern->currentText();
+  QString startNoStr = m_startNo->text();
+  bool isnumeric = false;
+  const int startInd = startNoStr.toInt(&isnumeric);
+  if (!isnumeric) {
+    qWarning("start index is not number[%s]", qPrintable(startNoStr));
+    return replaceeList;
+  }
+  if (!m_baseNameInited) {  // init lineedit only at first time. when lineedit editted by user. lineedit should not init
+    m_completeBaseName->setText(replaceeList[0]);
+    m_completeBaseName->selectAll();
+    m_baseNameInited = true;
+  }
+  const QStringList& suffixs = m_oExtTE->toPlainText().split('\n');
+  const QString& baseName = m_completeBaseName->text();
+  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+}
