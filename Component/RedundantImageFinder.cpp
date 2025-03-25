@@ -247,7 +247,7 @@ void RedundantImageFinder::LearnCommonImageCharacteristic(const QString& folderP
     const QString fileAbsPath = imgFi.absoluteFilePath();
     const qint64 sz = imgFi.size();
     m_commonFileSizeSet.insert(sz);
-    const QString& md5 = MD5Calculator::GetMD5(fileAbsPath);
+    const QString& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
     m_commonFileHash.insert(md5);
   }
   qDebug("redundant image info size[%d] and hash[%d]", m_commonFileSizeSet.size(), m_commonFileHash.size());
@@ -270,7 +270,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
     if (not m_commonFileSizeSet.contains(sz)) {
       continue;
     }
-    const QString& md5 = MD5Calculator::GetMD5(fileAbsPath);
+    const QString& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
     if (not m_commonFileHash.contains(md5)) {
       continue;
     }

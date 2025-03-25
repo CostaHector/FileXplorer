@@ -7,16 +7,12 @@ class RenameWidget_ConvertBoldUnicodeCharset2Ascii : public AdvanceRenamer {
  public:
   RenameWidget_ConvertBoldUnicodeCharset2Ascii(QWidget* parent = nullptr) : AdvanceRenamer(parent) {}
 
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = "Convert bold unicode charset to ascii | %1 item(s) under [%2]";
-    setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/UNICODE_TO_ASCII_TEXT"));
-  }
+  void InitExtraCommonVariable() override;
 
-  auto InitControlTB() -> QToolBar* override;
-  auto extraSubscribe() -> void override {}
+  QToolBar* InitControlTB() override;
+  void extraSubscribe() override {}
 
-  auto InitExtraMemberWidget() -> void override {}
+  void InitExtraMemberWidget() override {}
 
   QStringList RenameCore(const QStringList& replaceeList) override;
 };

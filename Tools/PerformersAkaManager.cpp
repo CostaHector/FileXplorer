@@ -14,9 +14,11 @@ PerformersAkaManager::PerformersAkaManager() : akaPerf(ReadOutAkaName()) {}
 
 QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
 #ifdef _WIN32
-  const QString akaPerfFilePath = PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name).toString();
+  const QString akaPerfFilePath = //
+      PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name, MemoryKey::WIN32_AKA_PERFORMERS.v).toString();
 #else
-  const QString akaPerfFilePath = PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name).toString();
+  const QString akaPerfFilePath = //
+      PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name, MemoryKey::LINUX_AKA_PERFORMERS.v).toString();
 #endif
   QFile file(akaPerfFilePath);
   if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {

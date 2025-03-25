@@ -2,6 +2,19 @@
 #include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 #include "Tools/NameSectionArrange.h"
+
+RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
+    : AdvanceRenamer(parent) {
+  EXT_INSIDE_FILENAME->setEnabled(false);
+  EXT_INSIDE_FILENAME->setChecked(false);
+  m_indexesCB->setCompleter(nullptr);
+  m_indexesCB->setEditable(true);
+
+  m_strictMode->setCheckable(true);
+  m_strictMode->setChecked(true);
+  m_strictMode->setToolTip("When enabled, if some section is wasted, name remain former");
+}
+
 auto RenameWidget_ArrangeSection::extraSubscribe() -> void {
   connect(m_indexesCB, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(m_strictMode, &QCheckBox::stateChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
@@ -39,4 +52,22 @@ auto RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeList) ->
     qWarning("wasted section found[%s]", qPrintable(wastedNames));
   }
   return newNames;
+}
+
+void RenameWidget_ArrangeSection::InitExtraCommonVariable() {
+  windowTitleFormat = "Arrange section sequence | %1 item(s) under [%2]";
+  setWindowTitle(windowTitleFormat);
+  setWindowIcon(QIcon(":img/NAME_SECTIONS_SWAP"));
+}
+
+QToolBar* RenameWidget_ArrangeSection::InitControlTB() {
+  QToolBar* replaceControl(new QToolBar);
+  replaceControl->addWidget(new QLabel("Arrange index or swap 2 index:"));
+  replaceControl->addWidget(m_indexesCB);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(m_strictMode);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  replaceControl->addWidget(EXT_INSIDE_FILENAME);
+  return replaceControl;
 }

@@ -28,37 +28,21 @@ class AdvanceRenamer : public QDialog {
   void init();
 
   void Subscribe();
-  auto onApply(const bool isOnlyHelp = false, const bool isInterative = false) -> bool;
-  auto onRegex(const int /*regexState*/) -> void {
-    // regexState;
-    OnlyTriggerRenameCore();
-  }
-  auto onIncludingSub(int includingSubState) -> void;
-  auto onIncludeSuffix(int includingSuffixState) -> void;
+  bool onApply(const bool isOnlyHelp = false, const bool isInterative = false);
+  void onRegex(const int /*regexState*/);
+  void onIncludingSub(int includingSubState);
+  void onIncludeSuffix(int includingSuffixState);
 
   void InitTextContent(const QString& p, const QStringList& r);
-  auto OnlyTriggerRenameCore() -> void {
-    // will not call OSWalker.;
-    // only update complete name;
-    setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
-    const auto& newCompleteNames = RenameCore(completeNames);
-    m_nBaseTE->setPlainText(newCompleteNames.join('\n'));
-  }
+  void OnlyTriggerRenameCore();
 
   virtual void InitExtraCommonVariable() = 0;
   virtual void InitExtraMemberWidget() = 0;
   virtual auto InitControlTB() -> QToolBar* = 0;
   virtual void extraSubscribe() = 0;
-  virtual auto RenameCore(const QStringList& replaceeList) -> QStringList = 0;
-
-  static inline auto IsFileNameInvalid(const QString& filename) -> bool {
-    QSet<QChar> nameSet(filename.cbegin(), filename.cend());
-    return nameSet.intersects(AdvanceRenamer::INVALID_FILE_NAME_CHAR_SET);
-  }
+  virtual QStringList RenameCore(const QStringList& replaceeList) = 0;
 
  public:
-  static const QString INVALID_CHARS;
-  static const QSet<QChar> INVALID_FILE_NAME_CHAR_SET;
   QString windowTitleFormat;
 
   QString m_pre;
@@ -84,176 +68,4 @@ class AdvanceRenamer : public QDialog {
   QPlainTextEdit* m_commandsPreview;
 };
 
-class RenameWidget_ConsecutiveFileNo : public AdvanceRenamer {
- public:
-  QLineEdit* m_fileNoStartIndex{new QLineEdit{"0", this}};
-
-  RenameWidget_ConsecutiveFileNo(QWidget* parent = nullptr) : AdvanceRenamer(parent) {
-    EXT_INSIDE_FILENAME->setCheckState(Qt::CheckState::Checked);
-    ITEMS_INSIDE_SUBDIR->setEnabled(false);
-    ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
-  };
-
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = QString("Consecutive file number | %1 item(s) under [%2]");
-    setWindowTitle(windowTitleFormat);
-  }
-  auto InitControlTB() -> QToolBar* override {
-    QToolBar* replaceControl = new QToolBar;
-    replaceControl->addWidget(new QLabel("start no:"));
-    replaceControl->addWidget(m_fileNoStartIndex);
-    return replaceControl;
-  }
-
-  auto extraSubscribe() -> void override { connect(m_fileNoStartIndex, &QLineEdit::textEdited, this, &AdvanceRenamer::OnlyTriggerRenameCore); }
-
-  auto InitExtraMemberWidget() -> void override {}
-  auto RenameCore(const QStringList& replaceeList) -> QStringList override;
-};
-
-class RenameWidget_Insert : public AdvanceRenamer {
- public:
-  QComboBox* insertStrCB;
-  QComboBox* insertAtCB;
-
-  RenameWidget_Insert(QWidget* parent = nullptr) : AdvanceRenamer(parent), insertStrCB(new QComboBox), insertAtCB(new QComboBox){}
-
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = QString("Insert name string | %1 item(s) under [%2]");
-    setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/NAME_STR_INSERTER_PATH"));
-  }
-  auto InitControlTB() -> QToolBar* override {
-    QToolBar* replaceControl = new QToolBar;
-    replaceControl->addWidget(new QLabel("String:"));
-    replaceControl->addWidget(insertStrCB);
-    replaceControl->addWidget(new QLabel("Index:"));
-    replaceControl->addWidget(insertAtCB);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(EXT_INSIDE_FILENAME);
-    replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(regexValidLabel);
-    return replaceControl;
-  }
-
-  auto extraSubscribe() -> void override {
-    connect(insertAtCB, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
-    connect(insertStrCB, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
-  }
-
-  auto InitExtraMemberWidget() -> void override;
-  auto RenameCore(const QStringList& replaceeList) -> QStringList override;
-};
-
-class RenameWidget_Replace : public AdvanceRenamer {
- public:
-  QComboBox* oldStrCB;
-  QComboBox* newStrCB;
-  QCheckBox* regex;
-  RenameWidget_Replace(QWidget* parent = nullptr)
-      : AdvanceRenamer(parent), oldStrCB(new QComboBox), newStrCB(new QComboBox), regex(new QCheckBox("Regex")) {}
-
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = QString("Replace name string | %1 item(s) under [%2]");
-    setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/NAME_STR_REPLACER_PATH"));
-  }
-
-  auto InitControlTB() -> QToolBar* override {
-    QToolBar* replaceControl = new QToolBar;
-    replaceControl->addWidget(new QLabel("Old:"));
-    replaceControl->addWidget(oldStrCB);
-    replaceControl->addWidget(new QLabel("New:"));
-    replaceControl->addWidget(newStrCB);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(regex);
-    replaceControl->addWidget(EXT_INSIDE_FILENAME);
-    replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(regexValidLabel);
-    return replaceControl;
-  }
-  auto extraSubscribe() -> void override {
-    connect(oldStrCB, &QComboBox::currentTextChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
-    connect(regex, &QCheckBox::stateChanged, this, &RenameWidget_Replace::onRegex);
-    connect(newStrCB, &QComboBox::currentTextChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
-  }
-
-  auto InitExtraMemberWidget() -> void override;
-
-  auto RenameCore(const QStringList& replaceeList) -> QStringList override;
-};
-
-class RenameWidget_Delete : public RenameWidget_Replace {
- public:
-  RenameWidget_Delete(QWidget* parent = nullptr) : RenameWidget_Replace(parent) {
-    newStrCB->setCurrentText("");
-    newStrCB->setEnabled(false);
-    newStrCB->setToolTip("New str is identically equal to empty str");
-  }
-
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = "Delete name string | %1 item(s) under [%2]";
-    setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/NAME_STR_DELETER_PATH"));
-  }
-};
-
-class RenameWidget_Numerize : public AdvanceRenamer {
- public:
-  explicit RenameWidget_Numerize(QWidget* parent = nullptr) : AdvanceRenamer(parent) {
-    EXT_INSIDE_FILENAME->setCheckState(Qt::CheckState::Unchecked);
-    ITEMS_INSIDE_SUBDIR->setEnabled(false);
-    ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
-  }
-
-  auto InitExtraMemberWidget() -> void override;
-
-  auto InitExtraCommonVariable() -> void override;
-
-  auto InitControlTB() -> QToolBar* override;
-  auto extraSubscribe() -> void override;
-
-  auto RenameCore(const QStringList& replaceeList) -> QStringList override;
-
- private:
-  QLineEdit* m_startNo{nullptr};
-  QComboBox* m_numberPattern{nullptr};
-  QLineEdit* m_completeBaseName{new QLineEdit};
-  bool m_baseNameInited = false;
-};
-
-#include "Actions/RenameActions.h"
-class RenameWidget_Case : public AdvanceRenamer {
- public:
-  QActionGroup* caseAG;
-  QToolBar* caseTB;
-
-  explicit RenameWidget_Case(QWidget* parent = nullptr) : AdvanceRenamer(parent), caseAG(g_renameAg().NAME_CASE), caseTB(new QToolBar) {}
-  auto InitExtraCommonVariable() -> void override {
-    windowTitleFormat = "Case name string | %1 item(s) under [%2]";
-    setWindowTitle(windowTitleFormat);
-    setWindowIcon(QIcon(":img/NAME_STR_CASE"));
-  }
-  auto InitControlTB() -> QToolBar* override {
-    QToolBar* replaceControl(new QToolBar);
-    replaceControl->addWidget(new QLabel("Case:"));
-    replaceControl->addWidget(caseTB);
-    replaceControl->addSeparator();
-    replaceControl->addWidget(EXT_INSIDE_FILENAME);
-    replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-    return replaceControl;
-  }
-  auto extraSubscribe() -> void override { connect(caseTB, &QToolBar::actionTriggered, this, &AdvanceRenamer::OnlyTriggerRenameCore); }
-  auto InitExtraMemberWidget() -> void override {
-    caseTB->addActions(caseAG->actions());
-    caseTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    return;
-  }
-
-  auto RenameCore(const QStringList& replaceeList) -> QStringList override;
-
-  static QStringList ChangeCaseRename(const QStringList& replaceeList, const QString& caseRuleName);
-};
 #endif  // ADVANCERENAMER_H
