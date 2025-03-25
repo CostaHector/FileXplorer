@@ -12,3 +12,9 @@ QStringList RenameWidget_ConvertBoldUnicodeCharset2Ascii::RenameCore(const QStri
   ConvertUnicodeCharsetToAscii cbuctt;
   return cbuctt.BatchCovert2Text(replaceeList);
 }
+
+void RenameWidget_ConvertBoldUnicodeCharset2Ascii::InitExtraCommonVariable() {
+  windowTitleFormat = "Convert bold unicode charset to ascii | %1 item(s) under [%2]";
+  setWindowTitle(windowTitleFormat);
+  setWindowIcon(QIcon(":img/UNICODE_TO_ASCII_TEXT"));
+}

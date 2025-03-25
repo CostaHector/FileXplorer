@@ -6,6 +6,9 @@ const QRegularExpression NameTool::FS_COMP(FIELD_SEPERATOR, QRegularExpression::
 const char* NameTool::FREQUENT_NAME_PATTER = "[A-Z]{2,}\\s[A-Z']+(\\s[A-Z]{2,})*";
 const QRegularExpression NameTool::NAME_COMP(FREQUENT_NAME_PATTER);
 
+const QString NameTool::INVALID_CHARS("*?\"<>|");
+const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
+
 QStringList NameTool::operator()(const QString& s) const {
   QStringList ans;
   foreach (QString nm, s.split(NameTool::FS_COMP)) {
@@ -24,7 +27,7 @@ QStringList NameTool::fromArticleCapitalizedNames(const QString& s) const {
     QRegularExpressionMatch match = it.next();
     if (match.hasMatch()) {
       const QString& caurseName = match.captured(0);
-      const QString& stdName = CapitaliseEachWordFirstLetterLowercaseOthers(caurseName);
+      const QString& stdName = CapitaliseFirstLetterLowerOther(caurseName);
       ans.append(stdName);
     }
   }
@@ -32,7 +35,7 @@ QStringList NameTool::fromArticleCapitalizedNames(const QString& s) const {
   return ans;
 }
 
-QString NameTool::CapitaliseEachWordFirstLetterOnly(const QString& sentence) {
+QString NameTool::CapitaliseFirstLetterKeepOther(const QString& sentence) {
   QStringList words = sentence.split(' ', Qt::SkipEmptyParts);
   for (QString& word : words) {
     word.front() = word.front().toUpper();
@@ -46,9 +49,9 @@ QString NameTool::CapitaliseEachWordFirstLetterOnly(const QString& sentence) {
   return caurse;
 }
 
-QString NameTool::CapitaliseEachWordFirstLetterLowercaseOthers(const QString& sentence) {
+QString NameTool::CapitaliseFirstLetterLowerOther(const QString& sentence) {
   const QString& sentenceInLowercase = sentence.toLower();
-  return CapitaliseEachWordFirstLetterOnly(sentenceInLowercase);
+  return CapitaliseFirstLetterKeepOther(sentenceInLowercase);
 }
 
 QString NameTool::ToggleSentenceCase(const QString& sentence) {

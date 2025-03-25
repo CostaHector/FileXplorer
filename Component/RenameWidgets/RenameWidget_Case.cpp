@@ -1,0 +1,83 @@
+#include "RenameWidget_Case.h"
+#include "Tools/NameTool.h"
+#include "Actions/RenameActions.h"
+
+typedef enum tagRENAME_CASE_E {
+  UPPER_CASE = 0,
+  LOWER_CASE,
+  CAPITALIZE_FIRST_LETTER,
+  CAPITALIZE_FIRST_LETTER_AND_LOWER_OTHER,
+  TOGGLE_CASE,
+  BUTTON_CASE,
+} RENAME_CASE_E;
+
+struct StringCaseOperator {
+  QStringList operator()(const QStringList& lst, const QAction* caseAct) const;
+};
+
+QStringList StringCaseOperator::operator()(const QStringList& lst, const QAction* caseAct) const {
+  static const QHash<const QAction*, decltype(NameTool::Upper)*> RULE_OPS_MAP{
+      {g_renameAg()._UPPER_CASE, NameTool::Upper},
+      {g_renameAg()._LOWER_CASE, NameTool::Lower},
+      {g_renameAg()._CAPITALIZE_KEEP_OTHER, NameTool::CapitaliseFirstLetterKeepOther},
+      {g_renameAg()._CAPITALIZE_LOWER_OTHER, NameTool::CapitaliseFirstLetterLowerOther},
+      {g_renameAg()._TOGGLE_CASE, NameTool::ToggleSentenceCase},
+  };
+
+  auto funcIt = RULE_OPS_MAP.find(caseAct);
+  if (funcIt == RULE_OPS_MAP.cend()) {
+    qWarning("Case rule type not found");
+    return {};
+  }
+  QStringList replacedList;
+  replacedList.reserve(lst.size());
+  const auto pCaseFunc = funcIt.value();
+  if (pCaseFunc == nullptr) {
+    qWarning("pCaseFunc is nullptr");
+    return {};
+  }
+  for (const QString& nm : lst) {
+    replacedList.append(pCaseFunc(nm));
+  }
+  return replacedList;
+}
+
+RenameWidget_Case::RenameWidget_Case(QWidget* parent)                                 //
+    : AdvanceRenamer(parent), caseAG(g_renameAg().NAME_CASE), caseTB(new QToolBar) {  //
+}
+
+auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
+  const QAction* pCaseAct = caseAG->checkedAction();  // todo checked
+  if (pCaseAct == nullptr) {
+    qWarning("pCaseAct is nullptr");
+    return replaceeList;
+  }
+  const StringCaseOperator sco;
+  return sco(replaceeList, pCaseAct);
+}
+
+void RenameWidget_Case::InitExtraCommonVariable() {
+  windowTitleFormat = "Case name string | %1 item(s) under [%2]";
+  setWindowTitle(windowTitleFormat);
+  setWindowIcon(QIcon(":img/NAME_STR_CASE"));
+}
+
+QToolBar* RenameWidget_Case::InitControlTB() {
+  QToolBar* replaceControl{new QToolBar};
+  replaceControl->addWidget(new QLabel("Case:"));
+  replaceControl->addWidget(caseTB);
+  replaceControl->addSeparator();
+  replaceControl->addWidget(EXT_INSIDE_FILENAME);
+  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  return replaceControl;
+}
+
+void RenameWidget_Case::extraSubscribe() {     //
+  connect(caseTB, &QToolBar::actionTriggered,  //
+          this, &AdvanceRenamer::OnlyTriggerRenameCore);
+}
+
+void RenameWidget_Case::InitExtraMemberWidget() {
+  caseTB->addActions(caseAG->actions());
+  caseTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+}
