@@ -15,6 +15,7 @@ SOURCES += \
     TestCase/ConflictSolveModelTest.cpp \
     TestCase/ConflictsItemHelperTest.cpp \
     TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
+    TestCase/DisplayEnhancementTest.cpp \
     TestCase/ExtractPileItemsOutFolderTest.cpp \
     TestCase/ItemsClassifierTest.cpp \
     TestCase/JsonFileHelperTest.cpp \
@@ -134,7 +135,8 @@ HEADERS += \
     Tools/Classify/ItemsClassifier.h \
     Tools/Classify/SceneMixed.h \
     model/ConflictsFileSystemModel.h \
-    UndoRedo.h
+    UndoRedo.h \
+    public/DisplayEnhancement.h
 
 DISTFILES += \
     readme.md

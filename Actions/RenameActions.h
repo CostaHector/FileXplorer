@@ -25,9 +25,9 @@ class RenameActions : public QObject {
 
   QAction* _UPPER_CASE {nullptr};
   QAction* _LOWER_CASE {nullptr};
-  QAction* _SENTENSE_CASE {nullptr};
-  QAction* _SENTENSE_CASE_IGNORE {nullptr};
-  QAction* _SWAP_CASE {nullptr};
+  QAction* _CAPITALIZE_KEEP_OTHER {nullptr};
+  QAction* _CAPITALIZE_LOWER_OTHER {nullptr};
+  QAction* _TOGGLE_CASE {nullptr};
   QActionGroup* NAME_CASE {nullptr};
 };
 

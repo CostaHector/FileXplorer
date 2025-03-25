@@ -48,6 +48,11 @@ SOURCES += \
     Component/JsonEditorWidget/LineEditInt.cpp \
     Component/JsonEditorWidget/LineEditStr.cpp \
     Component/JsonEditorWidget/TextEditMultiLine.cpp \
+    Component/RenameWidgets/RenameWidget_Case.cpp \
+    Component/RenameWidgets/RenameWidget_ConsecutiveFileNo.cpp \
+    Component/RenameWidgets/RenameWidget_Insert.cpp \
+    Component/RenameWidgets/RenameWidget_Numerize.cpp \
+    Component/RenameWidgets/RenameWidget_Replace.cpp \
     Component/RenameWidgets/RenameWidget_ReverseNames.cpp \
     Component/RightClickMenu.cpp \
     Component/FileSystemTypeFilter.cpp \
@@ -220,6 +225,11 @@ HEADERS += \
     Component/JsonEditorWidget/LineEditInt.h \
     Component/JsonEditorWidget/LineEditStr.h \
     Component/JsonEditorWidget/TextEditMultiLine.h \
+    Component/RenameWidgets/RenameWidget_Case.h \
+    Component/RenameWidgets/RenameWidget_ConsecutiveFileNo.h \
+    Component/RenameWidgets/RenameWidget_Insert.h \
+    Component/RenameWidgets/RenameWidget_Numerize.h \
+    Component/RenameWidgets/RenameWidget_Replace.h \
     Component/RenameWidgets/RenameWidget_ReverseNames.h \
     Component/RightClickMenu.h \
     Component/FileSystemTypeFilter.h \

@@ -2,13 +2,33 @@
 #include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 #include "Tools/NameSectionArrange.h"
-auto RenameWidget_ReverseNames::extraSubscribe() -> void {
+
+RenameWidget_ReverseNames::RenameWidget_ReverseNames(QWidget* parent)//
+    : AdvanceRenamer(parent) {
+  EXT_INSIDE_FILENAME->setEnabled(false);
+  EXT_INSIDE_FILENAME->setChecked(false);
+}
+void RenameWidget_ReverseNames::InitExtraCommonVariable() {
+  windowTitleFormat = "Reverse file names | %1 item(s) under [%2]";
+  setWindowTitle(windowTitleFormat);
+  setWindowIcon(QIcon(""));
+}
+QToolBar* RenameWidget_ReverseNames::InitControlTB() {
+  QToolBar* replaceControl(new QToolBar);
+  replaceControl->addWidget(new QLabel("Reverse rename"));
+  replaceControl->addSeparator();
+  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  replaceControl->addWidget(EXT_INSIDE_FILENAME);
+  return replaceControl;
 }
 
-auto RenameWidget_ReverseNames::InitExtraMemberWidget() -> void {
+void RenameWidget_ReverseNames::extraSubscribe() {
 }
 
-auto RenameWidget_ReverseNames::RenameCore(const QStringList& replaceeList) -> QStringList {
+void RenameWidget_ReverseNames::InitExtraMemberWidget() {
+}
+
+QStringList RenameWidget_ReverseNames::RenameCore(const QStringList& replaceeList) {
   if (replaceeList.isEmpty()) {
     return replaceeList;
   }

@@ -38,7 +38,7 @@ QVariant DuplicateDetailsModel::data(const QModelIndex& index, int role) const {
           return FILE_PROPERTY_DSP::durationToHumanReadFriendly(inf.dur);
         case 4: {
           if (inf.hash.isEmpty() && rowCount() <= 10) {
-            return GetMD5(inf.abspath, 1024);
+            return GetFileMD5(inf.abspath, 1024);
           }
           return inf.hash;
         }
