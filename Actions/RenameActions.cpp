@@ -14,35 +14,37 @@ RenameActions::RenameActions(QObject* parent) : QObject{parent} {
 
   _UPPER_CASE = new QAction(QIcon(":img/RENAME_UPPER_CASE"), "Uppercase");
   _LOWER_CASE = new QAction(QIcon(":img/RENAME_LOWER_CASE"), "Lowercase");
-  _SENTENSE_CASE = new QAction(QIcon(""), "Sentence Case");
-  _SENTENSE_CASE_IGNORE = new QAction(QIcon(""), "Sentence Case(Ignore)");
-  _SWAP_CASE = new QAction(QIcon(":img/RENAME_TOGGLE_CASE"), "Toggle Case");
+  _CAPITALIZE_KEEP_OTHER = new QAction(QIcon(""), "Capitalize first & keep other");
+  _CAPITALIZE_LOWER_OTHER = new QAction(QIcon(""), "Capitalize first & lower other");
+  _TOGGLE_CASE = new QAction(QIcon(":img/RENAME_TOGGLE_CASE"), "Toggle Case");
   NAME_CASE = Get_CASE_Actions();
 }
 
 auto RenameActions::Get_CASE_Actions() -> QActionGroup* {
   _UPPER_CASE->setToolTip("All uppercase letters");
   _LOWER_CASE->setToolTip("All lowercase letters");
-  _SWAP_CASE->setToolTip("Alternates between upper-and lower-case");
-  _SENTENSE_CASE->setToolTip(
-      "Capitalizes the first letter of each sentence while keeping all other letters in lower case, making it easy to read and understand.<br/>"
+  _TOGGLE_CASE->setToolTip("Alternates between upper-and lower-case");
+  _CAPITALIZE_KEEP_OTHER->setToolTip(
+      "Capitalizes first letter of each sentence and ignore other letters.<br/>"
+      "Making it easy to read and understand.<br/>"
       "e.g.<br/>"
-      "   i like NBA\tI Like Nba");
-  _SENTENSE_CASE_IGNORE->setToolTip(
-      "Capitalizes only the first letter of each sentence ignore others.<br/>"
-      "   i like NBA\tI Like NBA");
+      "i like NBA\tI Like NBA");
+  _CAPITALIZE_LOWER_OTHER->setToolTip(
+      "Capitalizes first letter of each sentence and lower others.<br/>"
+      "e.g.<br/>"
+      "i like NBA\tI Like Nba");
 
   QActionGroup* caseAG = new QActionGroup(this);
   caseAG->addAction(_UPPER_CASE);
   caseAG->addAction(_LOWER_CASE);
-  caseAG->addAction(_SENTENSE_CASE);
-  caseAG->addAction(_SENTENSE_CASE_IGNORE);
-  caseAG->addAction(_SWAP_CASE);
+  caseAG->addAction(_CAPITALIZE_KEEP_OTHER);
+  caseAG->addAction(_CAPITALIZE_LOWER_OTHER);
+  caseAG->addAction(_TOGGLE_CASE);
   caseAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
   for (QAction* act : caseAG->actions()) {
     act->setCheckable(true);
   }
-  _SENTENSE_CASE_IGNORE->setChecked(true);
+  _CAPITALIZE_LOWER_OTHER->setChecked(true);
   return caseAG;
 }
 

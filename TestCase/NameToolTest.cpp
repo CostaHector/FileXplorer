@@ -166,15 +166,15 @@ void NameToolTest::test_someFactoryDetail() {
 }
 
 void NameToolTest::test_CapitalWeak() {
-  QCOMPARE(NameTool::CapitaliseEachWordFirstLetterOnly("henry cavill"), "Henry Cavill");
-  QCOMPARE(NameTool::CapitaliseEachWordFirstLetterOnly("HENRY CAVILL"), "HENRY CAVILL");
+  QCOMPARE(NameTool::CapitaliseFirstLetterKeepOther("henry cavill"), "Henry Cavill");
+  QCOMPARE(NameTool::CapitaliseFirstLetterKeepOther("HENRY CAVILL"), "HENRY CAVILL");
 }
 void NameToolTest::test_CapitalStrong() {
-  QCOMPARE(NameTool::CapitaliseEachWordFirstLetterLowercaseOthers("henry cavill"), "Henry Cavill");
-  QCOMPARE(NameTool::CapitaliseEachWordFirstLetterLowercaseOthers("HENRY CAVILL"), "Henry Cavill");
+  QCOMPARE(NameTool::CapitaliseFirstLetterLowerOther("henry cavill"), "Henry Cavill");
+  QCOMPARE(NameTool::CapitaliseFirstLetterLowerOther("HENRY CAVILL"), "Henry Cavill");
 }
 void NameToolTest::test_CapitalStrongWithApostrophe() {
-  QCOMPARE(NameTool::CapitaliseEachWordFirstLetterLowercaseOthers("ROND D'ALEMBERT"), "Rond D'Alembert");
+  QCOMPARE(NameTool::CapitaliseFirstLetterLowerOther("ROND D'ALEMBERT"), "Rond D'Alembert");
 }
 void NameToolTest::test_ToggleCase() {
   QCOMPARE(NameTool::ToggleSentenceCase("Henry Cavill"), "hENRY cAVILL");

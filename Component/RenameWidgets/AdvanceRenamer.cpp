@@ -1,201 +1,9 @@
 #include "AdvanceRenamer.h"
 #include "PublicVariable.h"
 #include "Component/NotificatorFrame.h"
-#include "Tools/NameTool.h"
 #include "Tools/PathTool.h"
-#include "Tools/RenameHelper.h"
 #include "Tools/RenameNamesUnique.h"
 #include "UndoRedo.h"
-
-const QString AdvanceRenamer::INVALID_CHARS("*?\"<>|");
-const QSet<QChar> AdvanceRenamer::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
-
-auto RenameWidget_Insert::InitExtraMemberWidget() -> void {
-  insertStrCB->setEditable(true);
-  insertStrCB->setCompleter(nullptr);
-  insertStrCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
-  insertStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  insertStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-
-  insertAtCB->setEditable(true);
-  insertAtCB->setCompleter(nullptr);
-  insertAtCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_INSERT_INDEXES_LIST.name, MemoryKey::RENAMER_INSERT_INDEXES_LIST.v).toStringList());
-  insertAtCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  insertAtCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-}
-
-QStringList RenameWidget_Insert::RenameCore(const QStringList& replaceeList) {
-  const QString& insertString = insertStrCB->currentText();
-  const QString& insertAtStr = insertAtCB->currentText();
-  bool isnumeric = false;
-  int insertAt = insertAtStr.toInt(&isnumeric);
-  if (!isnumeric) {
-    qCritical("Insert index[%s] must be a number", qPrintable(insertAtStr));
-    return replaceeList;
-  }
-  return RenameHelper::InsertRename(replaceeList, insertString, insertAt);
-}
-
-auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
-  oldStrCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
-  oldStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  oldStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  oldStrCB->setEditable(true);
-  oldStrCB->setCompleter(nullptr);  // block auto complete
-
-  newStrCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_NEW_STR_LIST.name, MemoryKey::RENAMER_NEW_STR_LIST.v).toStringList());
-  newStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  newStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  newStrCB->setEditable(true);
-  newStrCB->setCompleter(nullptr);
-
-  regex->setToolTip("Regular expression enable switch");
-}
-
-QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
-  const QString& oldString = oldStrCB->currentText();
-  const QString& newString = newStrCB->currentText();
-  const bool regexEnable = regex->isChecked();
-  if (regexEnable) {
-    QRegularExpression repRegex(oldString);
-    if (repRegex.isValid()) {
-      regexValidLabel->ToSaved();
-    } else {
-      regexValidLabel->ToNotSaved();
-      qWarning("regular expression invalid[%s]", qPrintable(oldString));
-      return {};
-    }
-  }
-  return RenameHelper::ReplaceRename(replaceeList, oldString, newString, regexEnable);
-}
-
-void RenameWidget_Numerize::InitExtraMemberWidget() {
-  int startIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_START_INDEX.v).toInt();
-  const QStringList& noFormatCandidate{PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
-  int noFormatDefaultIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
-  m_startNo = new (std::nothrow) QLineEdit(QString::number(startIndex));  // "0"
-  if (m_startNo == nullptr) {
-    qCritical("m_startNo is nullptr");
-    return;
-  }
-  m_startNo->setMaximumWidth(20);
-  m_numberPattern = new (std::nothrow) QComboBox;  // " - %1"
-  if (m_numberPattern == nullptr) {
-    qCritical("m_numberPattern is nullptr");
-    return;
-  }
-  m_numberPattern->setEditable(true);
-  m_numberPattern->setDuplicatesEnabled(false);
-  m_numberPattern->setMaximumWidth(60);
-  m_numberPattern->addItems(noFormatCandidate);
-  if (0 <= noFormatDefaultIndex && noFormatDefaultIndex < noFormatCandidate.size()) {
-    m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
-  }
-}
-
-void RenameWidget_Numerize::InitExtraCommonVariable() {
-  windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
-  setWindowTitle(windowTitleFormat);
-  setWindowIcon(QIcon(":img/NAME_STR_NUMERIZER_PATH"));
-}
-
-QToolBar* RenameWidget_Numerize::InitControlTB() {
-  QToolBar* replaceControl{new QToolBar};
-  replaceControl->addWidget(new QLabel("Base name:"));
-  replaceControl->addWidget(m_completeBaseName);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(new QLabel("Start index:"));
-  replaceControl->addWidget(m_startNo);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(new QLabel("No. format:"));
-  replaceControl->addWidget(m_numberPattern);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(EXT_INSIDE_FILENAME);
-  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-  return replaceControl;
-}
-void RenameWidget_Numerize::extraSubscribe() {
-  connect(m_startNo, &QLineEdit::textChanged, this, [this](const QString& startNoStr) -> void {
-    bool isNumber = false;
-    int startNo = startNoStr.toInt(&isNumber);
-    if (!isNumber) {
-      qWarning("%s is not valid start number", qPrintable(startNoStr));
-      return;
-    }
-    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, startNo);
-    OnlyTriggerRenameCore();
-  });
-
-  connect(m_numberPattern, &QComboBox::currentTextChanged, this, [this]() -> void {
-    int defaultFormateInd = m_numberPattern->currentIndex();
-    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
-    OnlyTriggerRenameCore();
-  });
-  connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
-}
-
-QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
-  const QString& namePattern = m_numberPattern->currentText();
-  QString startNoStr = m_startNo->text();
-  bool isnumeric = false;
-  const int startInd = startNoStr.toInt(&isnumeric);
-  if (!isnumeric) {
-    qWarning("start index is not number[%s]", qPrintable(startNoStr));
-    return replaceeList;
-  }
-  if (!m_baseNameInited) {  // init lineedit only at first time. when lineedit editted by user. lineedit should not init
-    m_completeBaseName->setText(replaceeList[0]);
-    m_completeBaseName->selectAll();
-    m_baseNameInited = true;
-  }
-  const QStringList& suffixs = m_oExtTE->toPlainText().split('\n');
-  const QString& baseName = m_completeBaseName->text();
-  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
-}
-
-auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
-  if (replaceeList.isEmpty()) {
-    return replaceeList;
-  }
-  auto* caseAct = caseAG->checkedAction();  // todo checked
-  if (caseAct == nullptr) {
-    qWarning("No rule enabled");
-    return replaceeList;
-  }
-  return RenameWidget_Case::ChangeCaseRename(replaceeList, caseAct->text());
-}
-
-QStringList RenameWidget_Case::ChangeCaseRename(const QStringList& replaceeList, const QString& caseRuleName) {
-  if (replaceeList.isEmpty()) {
-    return {};
-  }
-  QStringList replacedList;
-  if (g_renameAg()._UPPER_CASE->isChecked()) {
-    for (const QString& nm : replaceeList) {
-      replacedList.append(nm.toUpper());
-    }
-  } else if (g_renameAg()._LOWER_CASE->isChecked()) {
-    for (const QString& nm : replaceeList) {
-      replacedList.append(nm.toLower());
-    }
-  } else if (g_renameAg()._SENTENSE_CASE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> HENRY CAVILL
-    for (const QString& nm : replaceeList) {
-      replacedList.append(NameTool::CapitaliseEachWordFirstLetterOnly(nm));
-    }
-  } else if (g_renameAg()._SENTENSE_CASE_IGNORE->isChecked()) {  // henry cavill -> Henry cavill and HENRY CAVILL -> Henry cavill
-    for (const QString& nm : replaceeList) {
-      replacedList.append(NameTool::CapitaliseEachWordFirstLetterLowercaseOthers(nm));
-    }
-  } else if (g_renameAg()._SWAP_CASE->isChecked()) {
-    for (const QString& nm : replaceeList) {
-      replacedList.append(NameTool::ToggleSentenceCase(nm));
-    }
-  } else {
-    qDebug("Case rule[%s] not supported", qPrintable(caseRuleName));
-    return {};
-  }
-  return replacedList;
-}
 
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)
     : QDialog(parent),
@@ -316,7 +124,7 @@ void AdvanceRenamer::Subscribe() {
   connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &AdvanceRenamer::close);
 }
 
-auto AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) -> bool {
+bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   const QStringList& relNameList = m_relNameTE->toPlainText().split('\n');
   const QStringList& oldCompleteNameList = m_oBaseTE->toPlainText().split('\n');
   const QStringList& oldSuffixList = m_oExtTE->toPlainText().split('\n');
@@ -354,14 +162,17 @@ auto AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) -> 
   close();
   return isAllSuccess;
 }
+void AdvanceRenamer::onRegex(const int /*regexState*/) {
+  OnlyTriggerRenameCore();
+}
 
-auto AdvanceRenamer::onIncludingSub(int includingSubState) -> void {
+void AdvanceRenamer::onIncludingSub(int includingSubState) {
   const bool isIncludingDir = includingSubState == Qt::Checked;
   PreferenceSettings().setValue(MemoryKey::RENAMER_INCLUDING_DIR.name, isIncludingDir);
   InitTextContent(m_pre, rels);
 }
 
-auto AdvanceRenamer::onIncludeSuffix(int includingSuffixState) -> void {
+void AdvanceRenamer::onIncludeSuffix(int includingSuffixState) {
   const bool isNameIncludingExtension = includingSuffixState == Qt::Checked;
   PreferenceSettings().setValue(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, isNameIncludingExtension);
   m_oExtTE->setVisible(not isNameIncludingExtension);
@@ -390,6 +201,14 @@ void AdvanceRenamer::InitTextContent(const QString& p, const QStringList& r) {
   const auto& newCompleteNames = RenameCore(completeNames);
   m_nBaseTE->setPlainText(newCompleteNames.join('\n'));
   m_nExtTE->setPlainText(suffixs.join('\n'));
+}
+
+void AdvanceRenamer::OnlyTriggerRenameCore() {
+  // will not call OSWalker.;
+  // only update complete name;
+  setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
+  const auto& newCompleteNames = RenameCore(completeNames);
+  m_nBaseTE->setPlainText(newCompleteNames.join('\n'));
 }
 
 // #define __NAME__EQ__MAIN__ 1
@@ -430,19 +249,3 @@ int main(int argc, char* argv[]) {
 }
 #endif
 
-#include "Tools/ToConsecutiveFileNameNo.h"
-
-QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replaceeList) {
-  if (replaceeList.isEmpty()) {
-    return replaceeList;
-  }
-  const QString& startNoStr = m_fileNoStartIndex->text();
-  bool isnumeric = false;
-  int startNo = startNoStr.toInt(&isnumeric);
-  if (not isnumeric) {
-    qCritical("start no[%s] must be a number", qPrintable(startNoStr));
-    Notificator::critical("start no[%s] must be a number", startNoStr);
-    return replaceeList;
-  }
-  return ToConsecutiveFileNameNo(startNo)(replaceeList);
-}
