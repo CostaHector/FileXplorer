@@ -1,7 +1,34 @@
 #include "StateLabel.h"
+#include <QPixmap>
 
-const QString StateLabel::SAVED_STR = "saved";
-const QString StateLabel::NOT_SAVED_STR = "notSaved";
+QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status) {
+  if (status < StateLabel::BEGIN || status >= StateLabel::BUTT) {
+    qWarning("status[%d] out of bound", status);
+    return {};
+  }
+  static const QPixmap labelSavedStatusPxp[StateLabel::BUTT]       //
+      {QPixmap(":img/SAVED").scaled(24, 24, Qt::KeepAspectRatio),  //
+       QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio)};
+  return labelSavedStatusPxp[status];
+}
+
+StateLabel::StateLabel(const QString& text, QWidget* parent)  //
+    : QLabel{text, parent} {
+  setPixmap(GetLabelStatusPixmap(m_currentState));
+  setAlignment(Qt::AlignRight);
+}
+
+void StateLabel::ToSaved() {
+  m_currentState = SAVED;
+  setPixmap(GetLabelStatusPixmap(m_currentState));
+}
+void StateLabel::ToNotSaved() {
+  m_currentState = NOT_SAVED;
+  setPixmap(GetLabelStatusPixmap(m_currentState));
+}
+
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -21,8 +48,6 @@ class StateLabelWidget : public QWidget {
   }
 };
 
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
 int main(int argc, char* argv[]) {

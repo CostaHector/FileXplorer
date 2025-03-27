@@ -4,9 +4,9 @@
 
 RenameWidget_ConsecutiveFileNo::RenameWidget_ConsecutiveFileNo(QWidget* parent)  //
     : AdvanceRenamer(parent) {
-  EXT_INSIDE_FILENAME->setCheckState(Qt::CheckState::Checked);
-  ITEMS_INSIDE_SUBDIR->setEnabled(false);
-  ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
+  m_extensionInNameCB->setCheckState(Qt::CheckState::Checked);
+  m_recursiveCB->setEnabled(false);
+  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 };
 
 QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replaceeList) {
