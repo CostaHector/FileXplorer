@@ -42,12 +42,11 @@ QStringList StringCaseOperator::operator()(const QStringList& lst, const QAction
   return replacedList;
 }
 
-RenameWidget_Case::RenameWidget_Case(QWidget* parent)                                 //
-    : AdvanceRenamer(parent), caseAG(g_renameAg().NAME_CASE), caseTB(new QToolBar) {  //
-}
+RenameWidget_Case::RenameWidget_Case(QWidget* parent)  //
+    : AdvanceRenamer(parent) {}
 
 auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
-  const QAction* pCaseAct = caseAG->checkedAction();  // todo checked
+  const QAction* pCaseAct = g_renameAg().NAME_CASE->checkedAction();  // todo checked
   if (pCaseAct == nullptr) {
     qWarning("pCaseAct is nullptr");
     return replaceeList;
@@ -64,20 +63,15 @@ void RenameWidget_Case::InitExtraCommonVariable() {
 
 QToolBar* RenameWidget_Case::InitControlTB() {
   QToolBar* replaceControl{new QToolBar};
-  replaceControl->addWidget(new QLabel("Case:"));
-  replaceControl->addWidget(caseTB);
+  replaceControl->addActions(g_renameAg().NAME_CASE->actions());
   replaceControl->addSeparator();
-  replaceControl->addWidget(EXT_INSIDE_FILENAME);
-  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  replaceControl->addWidget(m_extensionInNameCB);
+  replaceControl->addWidget(m_recursiveCB);
+  replaceControl->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return replaceControl;
 }
 
-void RenameWidget_Case::extraSubscribe() {     //
-  connect(caseTB, &QToolBar::actionTriggered,  //
+void RenameWidget_Case::extraSubscribe() {                   //
+  connect(g_renameAg().NAME_CASE, &QActionGroup::triggered,  //
           this, &AdvanceRenamer::OnlyTriggerRenameCore);
-}
-
-void RenameWidget_Case::InitExtraMemberWidget() {
-  caseTB->addActions(caseAG->actions());
-  caseTB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 }
