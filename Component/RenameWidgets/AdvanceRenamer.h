@@ -38,7 +38,7 @@ class AdvanceRenamer : public QDialog {
 
   virtual void InitExtraCommonVariable() = 0;
   virtual void InitExtraMemberWidget() = 0;
-  virtual auto InitControlTB() -> QToolBar* = 0;
+  virtual QToolBar* InitControlTB() = 0;
   virtual void extraSubscribe() = 0;
   virtual QStringList RenameCore(const QStringList& replaceeList) = 0;
 
@@ -50,22 +50,25 @@ class AdvanceRenamer : public QDialog {
   QStringList completeNames;
   QList<bool> isFiles;
 
-  QCheckBox* EXT_INSIDE_FILENAME;
-  QCheckBox* ITEMS_INSIDE_SUBDIR;
-  StateLabel* regexValidLabel;
+  QCheckBox* m_extensionInNameCB{nullptr};
+  QCheckBox* m_recursiveCB{nullptr};
+  StateLabel* regexValidLabel{nullptr};
 
-  QPlainTextEdit* m_relNameTE;
-  QPlainTextEdit* m_oBaseTE;
-  QPlainTextEdit* m_oExtTE;  // absolutefilepath = m_pre + m_relNameTE + m_oBaseTE + m_oExtTE
-  QPlainTextEdit* m_nBaseTE;
-  QPlainTextEdit* m_nExtTE;
-  QDialogButtonBox* m_buttonBox;
+  QPlainTextEdit* m_relNameTE{nullptr};
+
+  QPlainTextEdit* m_oBaseTE{nullptr};
+  QPlainTextEdit* m_oExtTE{nullptr};
+  // absolutefilepath = m_pre + m_relNameTE + m_oBaseTE + m_oExtTE
+  QPlainTextEdit* m_nBaseTE{nullptr};
+  QPlainTextEdit* m_nExtTE{nullptr};
+
+  QDialogButtonBox* m_buttonBox{nullptr};
 
   QToolBar* m_replaceControlBar{nullptr};
   QHBoxLayout* m_nameEditLayout{nullptr};
   QVBoxLayout* m_mainLayout{nullptr};
 
-  QPlainTextEdit* m_commandsPreview;
+  QPlainTextEdit* m_commandsPreview{nullptr};
 };
 
 #endif  // ADVANCERENAMER_H

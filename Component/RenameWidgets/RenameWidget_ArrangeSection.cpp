@@ -5,8 +5,8 @@
 
 RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
     : AdvanceRenamer(parent) {
-  EXT_INSIDE_FILENAME->setEnabled(false);
-  EXT_INSIDE_FILENAME->setChecked(false);
+  m_extensionInNameCB->setEnabled(false);
+  m_extensionInNameCB->setChecked(false);
   m_indexesCB->setCompleter(nullptr);
   m_indexesCB->setEditable(true);
 
@@ -67,7 +67,7 @@ QToolBar* RenameWidget_ArrangeSection::InitControlTB() {
   replaceControl->addSeparator();
   replaceControl->addWidget(m_strictMode);
   replaceControl->addSeparator();
-  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-  replaceControl->addWidget(EXT_INSIDE_FILENAME);
+  replaceControl->addWidget(m_recursiveCB);
+  replaceControl->addWidget(m_extensionInNameCB);
   return replaceControl;
 }

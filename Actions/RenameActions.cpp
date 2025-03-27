@@ -12,11 +12,11 @@ RenameActions::RenameActions(QObject* parent) : QObject{parent} {
   _CONVERT_UNICODE_TO_ASCII = new QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), "Unicode Char to ASCII");
   RENAME_RIBBONS = Get_Rename_Actions();
 
-  _UPPER_CASE = new QAction(QIcon(":img/RENAME_UPPER_CASE"), "Uppercase");
-  _LOWER_CASE = new QAction(QIcon(":img/RENAME_LOWER_CASE"), "Lowercase");
-  _CAPITALIZE_KEEP_OTHER = new QAction(QIcon(""), "Capitalize first & keep other");
-  _CAPITALIZE_LOWER_OTHER = new QAction(QIcon(""), "Capitalize first & lower other");
-  _TOGGLE_CASE = new QAction(QIcon(":img/RENAME_TOGGLE_CASE"), "Toggle Case");
+  _UPPER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_UPPER_CASE"), "Uppercase");
+  _LOWER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), "Lowercase");
+  _CAPITALIZE_KEEP_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_KEEP_OTHER"), "Capitalize first and keep other");
+  _CAPITALIZE_LOWER_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_LOWER_OTHER"), "Capitalize first and lower other");
+  _TOGGLE_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_TOGGLE_CASE"), "Toggle Case");
   NAME_CASE = Get_CASE_Actions();
 }
 

@@ -3,9 +3,9 @@
 #include "Tools/RenameHelper.h"
 
 RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent) : AdvanceRenamer(parent) {
-  EXT_INSIDE_FILENAME->setCheckState(Qt::CheckState::Unchecked);
-  ITEMS_INSIDE_SUBDIR->setEnabled(false);
-  ITEMS_INSIDE_SUBDIR->setCheckState(Qt::CheckState::Unchecked);
+  m_extensionInNameCB->setCheckState(Qt::CheckState::Unchecked);
+  m_recursiveCB->setEnabled(false);
+  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 }
 
 void RenameWidget_Numerize::InitExtraMemberWidget() {
@@ -49,8 +49,8 @@ QToolBar* RenameWidget_Numerize::InitControlTB() {
   replaceControl->addWidget(new QLabel("No. format:"));
   replaceControl->addWidget(m_numberPattern);
   replaceControl->addSeparator();
-  replaceControl->addWidget(EXT_INSIDE_FILENAME);
-  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  replaceControl->addWidget(m_extensionInNameCB);
+  replaceControl->addWidget(m_recursiveCB);
   return replaceControl;
 }
 void RenameWidget_Numerize::extraSubscribe() {
