@@ -6,7 +6,7 @@
 class RenameWidget_ReverseNames : public AdvanceRenamer {
  public:
   explicit RenameWidget_ReverseNames(QWidget* parent = nullptr);
-  auto InitExtraCommonVariable() -> void override;
+  void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
   void extraSubscribe()  override;
   void InitExtraMemberWidget() override;

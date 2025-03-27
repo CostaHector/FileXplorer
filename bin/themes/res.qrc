@@ -169,6 +169,8 @@
 <file alias="UNICODE_TO_ASCII_TEXT">NameStrIcon/UNICODE_TO_ASCII_TEXT.png</file>
 <file alias="RENAME_LOWER_CASE">NameStrIcon/RENAME_LOWER_CASE.png</file>
 <file alias="RENAME_UPPER_CASE">NameStrIcon/RENAME_UPPER_CASE.png</file>
+<file alias="CAPITALIZE_KEEP_OTHER">NameStrIcon/CAPITALIZE_KEEP_OTHER.svg</file>
+<file alias="CAPITALIZE_LOWER_OTHER">NameStrIcon/CAPITALIZE_LOWER_OTHER.svg</file>
 <file alias="RENAME_TOGGLE_CASE">NameStrIcon/RENAME_TOGGLE_CASE.svg</file>
 <file alias="NAME_STR_INSERTER_PATH">NameStrIcon/NAME_STR_INSERTER_PATH.svg</file>
 <file alias="NAME_STR_DELETER_PATH">NameStrIcon/NAME_STR_DELETER_PATH.svg</file>

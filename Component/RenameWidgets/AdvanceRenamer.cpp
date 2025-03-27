@@ -5,30 +5,29 @@
 #include "Tools/RenameNamesUnique.h"
 #include "UndoRedo.h"
 
-AdvanceRenamer::AdvanceRenamer(QWidget* parent)
-    : QDialog(parent),
-      windowTitleFormat("%1 | %2"),
-      EXT_INSIDE_FILENAME(new QCheckBox("Also Extensions")),
-      ITEMS_INSIDE_SUBDIR(new QCheckBox("Also subdirectory")),
-      regexValidLabel(new StateLabel("Regex expression state")),
-      m_relNameTE(new QPlainTextEdit()),
-      m_oBaseTE(new QPlainTextEdit()),
-      m_oExtTE(new QPlainTextEdit()),
-      m_nBaseTE(new QPlainTextEdit()),
-      m_nExtTE(new QPlainTextEdit()),
-      m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help)),
-      m_commandsPreview(new QPlainTextEdit) {
+AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
+    : QDialog(parent), windowTitleFormat("%1 | %2") {
+  m_extensionInNameCB = new (std::nothrow) QCheckBox{"Extension in name"};
+  m_recursiveCB = new (std::nothrow) QCheckBox{"Recursive"};
+  regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state"};
+  m_relNameTE = new (std::nothrow) QPlainTextEdit;
+  m_oBaseTE = new (std::nothrow) QPlainTextEdit;
+  m_oExtTE = new (std::nothrow) QPlainTextEdit;
+  m_nBaseTE = new (std::nothrow) QPlainTextEdit;
+  m_nExtTE = new (std::nothrow) QPlainTextEdit;
+  m_buttonBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help};
+  m_commandsPreview = new (std::nothrow) QPlainTextEdit;
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
 
-  EXT_INSIDE_FILENAME->setToolTip("Extension inside file name.\nRules will also work on suffix");
-  ITEMS_INSIDE_SUBDIR->setToolTip("Items contains subdirectory.\nRules will also work on itself and its subdirectories");
+  m_extensionInNameCB->setToolTip("Extension in file name.\nRules will also work on suffix");
+  m_recursiveCB->setToolTip("Recursive rename.\nRules will also work on itself and its subdirectories");
 
-  EXT_INSIDE_FILENAME->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
-  ITEMS_INSIDE_SUBDIR->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
+  m_extensionInNameCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
+  m_recursiveCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
 
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
-  auto* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok);
+  QPushButton* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok);
   pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.").arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
   pOkBtn->setStyleSheet(SUBMIT_BTN_STYLE);
@@ -103,14 +102,14 @@ void AdvanceRenamer::init() {
   Subscribe();
   extraSubscribe();
 
-  const bool isNameIncludingExtension = EXT_INSIDE_FILENAME->checkState() == Qt::Checked;
+  const bool isNameIncludingExtension = m_extensionInNameCB->checkState() == Qt::Checked;
   m_oExtTE->setVisible(!isNameIncludingExtension);
   m_nExtTE->setVisible(!isNameIncludingExtension);
 }
 
 void AdvanceRenamer::Subscribe() {
-  connect(EXT_INSIDE_FILENAME, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludeSuffix);
-  connect(ITEMS_INSIDE_SUBDIR, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludingSub);
+  connect(m_extensionInNameCB, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludeSuffix);
+  connect(m_recursiveCB, &QCheckBox::stateChanged, this, &AdvanceRenamer::onIncludingSub);
 
   connect(m_nBaseTE->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](const int position) {
     m_relNameTE->verticalScrollBar()->setValue(position);
@@ -132,9 +131,9 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   const QStringList& newCompleteNameList = m_nBaseTE->toPlainText().split('\n');
   const QStringList& newSuffixList = m_nExtTE->toPlainText().split('\n');
 
-  RenameNamesUnique renameHelper(m_pre, relNameList, oldCompleteNameList, oldSuffixList, newCompleteNameList, newSuffixList, ITEMS_INSIDE_SUBDIR->isChecked());
+  RenameNamesUnique renameHelper{m_pre, relNameList, oldCompleteNameList, oldSuffixList, newCompleteNameList, newSuffixList, m_recursiveCB->isChecked()};
   renameHelper();
-  if (not renameHelper) {
+  if (!renameHelper) {
     const QString& rejectMsg = renameHelper.Details();
     qWarning("Cannot do rename commands[%s]", qPrintable(rejectMsg));
     Notificator::badNews("Cannot do rename commands", rejectMsg);
@@ -184,8 +183,8 @@ void AdvanceRenamer::InitTextContent(const QString& p, const QStringList& r) {
   m_pre = p;
   rels = r;
 
-  const bool bSubDir = ITEMS_INSIDE_SUBDIR->isChecked();
-  const bool bSuffixInside = EXT_INSIDE_FILENAME->isChecked();
+  const bool bSubDir = m_recursiveCB->isChecked();
+  const bool bSuffixInside = m_extensionInNameCB->isChecked();
   FileOSWalkerRet osWalkerRet = FileOsWalker(m_pre, bSuffixInside)(rels, bSubDir);
   const auto& relToNames = osWalkerRet.relToNames;
   completeNames = osWalkerRet.completeNames;  // may baseName only or baseName+extension, depend on includingSuffixState
@@ -248,4 +247,3 @@ int main(int argc, char* argv[]) {
   return a.exec();
 }
 #endif
-
