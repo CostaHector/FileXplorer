@@ -4,9 +4,6 @@
 
 class RenameWidget_Replace : public AdvanceRenamer {
  public:
-  QComboBox* oldStrCB;
-  QComboBox* newStrCB;
-  QCheckBox* regex;
   RenameWidget_Replace(QWidget* parent = nullptr);
 
   void InitExtraCommonVariable() override;
@@ -15,6 +12,13 @@ class RenameWidget_Replace : public AdvanceRenamer {
   void InitExtraMemberWidget() override;
 
   QStringList RenameCore(const QStringList& replaceeList) override;
+
+ protected:
+  QComboBox* m_newStrCB{nullptr};
+
+ private:
+  QComboBox* m_oldStrCB{nullptr};
+  QCheckBox* m_regexCB{nullptr};
 };
 
 class RenameWidget_Delete : public RenameWidget_Replace {
@@ -23,4 +27,4 @@ class RenameWidget_Delete : public RenameWidget_Replace {
   void InitExtraCommonVariable() override;
 };
 
-#endif // RENAMEWIDGET_REPLACE_H
+#endif  // RENAMEWIDGET_REPLACE_H
