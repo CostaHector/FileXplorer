@@ -49,8 +49,8 @@ QToolBar* RenameWidget_Insert::InitControlTB() {
   replaceControl->addWidget(new QLabel("Index:"));
   replaceControl->addWidget(insertAtCB);
   replaceControl->addSeparator();
-  replaceControl->addWidget(EXT_INSIDE_FILENAME);
-  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  replaceControl->addWidget(m_extensionInNameCB);
+  replaceControl->addWidget(m_recursiveCB);
   replaceControl->addSeparator();
   replaceControl->addWidget(regexValidLabel);
   return replaceControl;

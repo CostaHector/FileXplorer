@@ -3,8 +3,8 @@
 
 QToolBar* RenameWidget_ConvertBoldUnicodeCharset2Ascii::InitControlTB() {
   QToolBar* replaceControl = new QToolBar;
-  replaceControl->addWidget(EXT_INSIDE_FILENAME);
-  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
+  replaceControl->addWidget(m_extensionInNameCB);
+  replaceControl->addWidget(m_recursiveCB);
   return replaceControl;
 }
 

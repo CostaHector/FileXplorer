@@ -5,8 +5,8 @@
 
 RenameWidget_ReverseNames::RenameWidget_ReverseNames(QWidget* parent)//
     : AdvanceRenamer(parent) {
-  EXT_INSIDE_FILENAME->setEnabled(false);
-  EXT_INSIDE_FILENAME->setChecked(false);
+  m_extensionInNameCB->setEnabled(false);
+  m_extensionInNameCB->setChecked(false);
 }
 void RenameWidget_ReverseNames::InitExtraCommonVariable() {
   windowTitleFormat = "Reverse file names | %1 item(s) under [%2]";
@@ -17,8 +17,8 @@ QToolBar* RenameWidget_ReverseNames::InitControlTB() {
   QToolBar* replaceControl(new QToolBar);
   replaceControl->addWidget(new QLabel("Reverse rename"));
   replaceControl->addSeparator();
-  replaceControl->addWidget(ITEMS_INSIDE_SUBDIR);
-  replaceControl->addWidget(EXT_INSIDE_FILENAME);
+  replaceControl->addWidget(m_recursiveCB);
+  replaceControl->addWidget(m_extensionInNameCB);
   return replaceControl;
 }
 

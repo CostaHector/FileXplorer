@@ -28,11 +28,7 @@ class RenameNamesUnique {
   static QSet<QString> getOccupiedPostPath(const QString& pre, const QStringList& leftRoots, const QStringList& leftNames, bool includeSub = true);
   static QString join2Path(const QString& rel2Name, const QString& name);
   static QStringList join2Path(const QString& rel2Name, const QStringList& names);
-  static bool CheckConflict(QSet<QString> occupied,
-                            const QStringList& leftRoots,
-                            const QStringList& leftNames,
-                            const QStringList& rightNames,
-                            QStringList& conflictNames);
+  static bool CheckConflict(QSet<QString> occupied, const QStringList& leftRoots, const QStringList& leftNames, const QStringList& rightNames, QStringList& conflictNames);
 
   operator bool() const { return isInputValid() and m_conflictNames.empty(); }
   bool operator()();
@@ -49,7 +45,9 @@ class RenameNamesUnique {
   FileOperatorType::BATCH_COMMAND_LIST_TYPE getRenameCommands() const;
 
  private:
-  inline bool isInputValid() const { return not m_isArrLenUnequal and not m_nameLineEmpty; }
+  inline bool isInputValid() const {  //
+    return !m_isArrLenUnequal && !m_nameLineEmpty;
+  }
 
   bool m_isArrLenUnequal = false;
   bool m_nameLineEmpty = false;
