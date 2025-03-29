@@ -1,32 +1,22 @@
 #include "DropListToolButton.h"
-#include <QAction>
-#include <QActionGroup>
 #include <QMenu>
-QToolButton* DropListToolButton(QAction* defaultAction,
-                                QList<QAction*> dropdownActions,
-                                QToolButton::ToolButtonPopupMode popupMode,
-                                const Qt::ToolButtonStyle toolButtonStyle,
-                                const int iconSize) {
-  if (dropdownActions.isEmpty() || defaultAction == nullptr) {
-    qCritical("no action exist");
-    return nullptr;
-  }
-  QToolButton* pDropdownButton{new (std::nothrow) QToolButton};
-  if (pDropdownButton == nullptr) {
-    qCritical("pDropdownButton is nullptr");
-    return nullptr;
-  }
-  pDropdownButton->setDefaultAction(defaultAction);
-  pDropdownButton->setPopupMode(popupMode);
-  pDropdownButton->setToolButtonStyle(toolButtonStyle);
-  pDropdownButton->setAutoRaise(true);
-  pDropdownButton->setStyleSheet("QToolButton { max-width: 256px; }");
-  pDropdownButton->setIconSize(QSize(iconSize, iconSize));
 
-  QMenu* pDropdownMenu{new (std::nothrow) QMenu(pDropdownButton)};
+DropdownToolButton::DropdownToolButton(QList<QAction*> dropdownActions,             //
+                                       QToolButton::ToolButtonPopupMode popupMode,  //
+                                       const Qt::ToolButtonStyle toolButtonStyle,   //
+                                       const int iconSize,                          //
+                                       QWidget* parent)
+    : QToolButton{parent} {
+  setPopupMode(popupMode);
+  setToolButtonStyle(toolButtonStyle);
+  setAutoRaise(true);
+  setStyleSheet("QToolButton { max-width: 256px; }");
+  setIconSize(QSize{iconSize, iconSize});
+
+  QMenu* pDropdownMenu{new (std::nothrow) QMenu{this}};
   if (pDropdownMenu == nullptr) {
     qCritical("pDropdownMenu is nullptr");
-    return nullptr;
+    return;
   }
   for (auto* pAct : dropdownActions) {
     if (pAct == nullptr) {
@@ -36,81 +26,43 @@ QToolButton* DropListToolButton(QAction* defaultAction,
     }
   }
   pDropdownMenu->setToolTipsVisible(true);
-  pDropdownButton->setMenu(pDropdownMenu);
-  return pDropdownButton;
+  setMenu(pDropdownMenu);
 }
 
-QToolButton* DropListToolButtonWithoutDefAction(const QIcon &icon, const QString &text, const QString& toolTip,
-                                                QList<QAction*> dropdownActions,
-                                                QToolButton::ToolButtonPopupMode popupMode,
-                                                const Qt::ToolButtonStyle toolButtonStyle,
-                                                const int iconSize) {
-  if (dropdownActions.isEmpty()) {
-    qCritical("no action exist");
-    return nullptr;
-  }
-
-  QToolButton* pDropdownButton{new (std::nothrow) QToolButton};
-  if (pDropdownButton == nullptr) {
-    qCritical("pDropdownButton is nullptr");
-    return nullptr;
-  }
-  pDropdownButton->setIcon(icon);
-  pDropdownButton->setText(text);
-  pDropdownButton->setToolTip(toolTip);
-  pDropdownButton->setPopupMode(popupMode);
-  pDropdownButton->setToolButtonStyle(toolButtonStyle);
-  pDropdownButton->setAutoRaise(true);
-  pDropdownButton->setStyleSheet("QToolButton { max-width: 256px; }");
-  pDropdownButton->setIconSize(QSize(iconSize, iconSize));
-
-  QMenu* pDropdownMenu{new (std::nothrow) QMenu(pDropdownButton)};
-  if (pDropdownMenu == nullptr) {
-    qCritical("pDropdownMenu is nullptr");
-    return nullptr;
-  }
-  for (auto* pAct : dropdownActions) {
-    if (pAct == nullptr) {
-      pDropdownMenu->addSeparator();
-    } else {
-      pDropdownMenu->addAction(pAct);
-    }
-  }
-  pDropdownMenu->setToolTipsVisible(true);
-  pDropdownButton->setMenu(pDropdownMenu);
-  return pDropdownButton;
+void DropdownToolButton::SetCaption(const QIcon& icon, const QString& text, const QString& tooltip) {
+  setIcon(icon);
+  setText(text);
+  setToolTip(tooltip);
 }
 
-auto FindQActionFromQActionGroupByActionName(const QString& actionName, QActionGroup* ag) -> QAction* {
-  if (ag == nullptr) {
-    qWarning("candidate actions is nullptr");
-    return nullptr;
-  }
-  const auto& candidateActs = ag->actions();
-  for (QAction* act : candidateActs) {
-    if (act->text() == actionName) {
-      return act;
-    }
-  }
-  qCritical("cannot find action[%s] from %d candidate actions", qPrintable(actionName), candidateActs.size());
-  return nullptr;
+void DropdownToolButton::MemorizeCurrentAction(const QString& memoryKey) {
+  m_memoryKey = memoryKey;
+  QToolButton::connect(this, &QToolButton::triggered,  //
+                       this, &DropdownToolButton::onToolButtonActTriggered);
 }
 
-bool EnableAutoChangeDefaultActionInToolButton(QToolButton* pTb, const QString& memoryKey) {
-  if (pTb == nullptr) {
-    qCritical("pTb is nullptr");
-    return false;
+bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
+  auto* pMenu = menu();
+  const auto& actsList = pMenu->actions();
+  for (QAction* act : actsList) {
+    if (act->text() == memoryValue) {
+      setDefaultAction(act);
+      return true;
+    }
   }
-  auto onToolButtonActTriggered = [pTb, memoryKey](QAction* triggeredAct) -> void {
-    if (pTb != nullptr) {
-      pTb->setDefaultAction(triggeredAct);
-    } else {
-      qCritical("pTb is nullptr");
-    }
-    if (!memoryKey.isEmpty()) {
-      PreferenceSettings().setValue(memoryKey, triggeredAct->text());
-    }
-  };
-  QToolButton::connect(pTb, &QToolButton::triggered, onToolButtonActTriggered);
-  return true;
+  qWarning("default action not find by memoryValue[%s] from %d actions",//
+         qPrintable(memoryValue), actsList.size());
+  return false;
 }
+
+void DropdownToolButton::onToolButtonActTriggered(QAction* pAct) {
+  if (pAct == nullptr) {
+    qCritical("pAct is nullptr");
+    return;
+  }
+  setDefaultAction(pAct);
+  if (m_memoryKey.isEmpty()) {
+    return;
+  }
+  PreferenceSettings().setValue(m_memoryKey, pAct->text());
+};

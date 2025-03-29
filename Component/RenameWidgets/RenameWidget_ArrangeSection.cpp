@@ -2,54 +2,100 @@
 #include "Component/NotificatorFrame.h"
 #include "PublicVariable.h"
 #include "Tools/NameSectionArrange.h"
+#include <QLineEdit>
+
+ArrangeSectionActions::ArrangeSectionActions(QObject* parent) : QObject{parent} {
+  _SWAP_SECTION_AT_2_INDEXES->setCheckable(true);
+  _SWAP_SECTION_AT_2_INDEXES->setChecked(true);
+  _SECTION_JOIN_WITH_SELECT_INDEXES->setCheckable(true);
+  _SECTION_JOIN_WITH_SELECT_INDEXES->setChecked(false);
+
+  _ARRANGE_SECTION_AG->addAction(_SWAP_SECTION_AT_2_INDEXES);
+  _ARRANGE_SECTION_AG->addAction(_SECTION_JOIN_WITH_SELECT_INDEXES);
+  _ARRANGE_SECTION_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+}
+
+ArrangeSectionActions& ArrangeSectionActions::GetInst() {
+  static ArrangeSectionActions inst;
+  return inst;
+}
 
 RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
-    : AdvanceRenamer(parent) {
+    : AdvanceRenamer{parent} {
+  m_2IndexesInput->setInputMask("0,0");
+  m_2IndexesInput->setAlignment(Qt::AlignRight);
+  m_indexes->setLineEdit(m_2IndexesInput);
+  m_indexes->setEditable(true);
+  m_indexes->setCompleter(nullptr);
+
+  m_sectionsUsedToJoin->setCompleter(nullptr);
+  m_sectionsUsedToJoin->setEditable(true);
+  m_sectionsUsedToJoin->setToolTip("Section join with user input sequence");
+
   m_extensionInNameCB->setEnabled(false);
   m_extensionInNameCB->setChecked(false);
-  m_indexesCB->setCompleter(nullptr);
-  m_indexesCB->setEditable(true);
 
   m_strictMode->setCheckable(true);
   m_strictMode->setChecked(true);
-  m_strictMode->setToolTip("When enabled, if some section is wasted, name remain former");
+  m_strictMode->setToolTip("If some section is wasted, name remains unchanged When enabled.");
 }
 
 auto RenameWidget_ArrangeSection::extraSubscribe() -> void {
-  connect(m_indexesCB, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  auto& inst = ArrangeSectionActions::GetInst();
+  connect(inst._SWAP_SECTION_AT_2_INDEXES, &QAction::triggered,  //
+          this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(inst._SECTION_JOIN_WITH_SELECT_INDEXES, &QAction::triggered,  //
+          this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(m_indexes, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(m_sectionsUsedToJoin, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(m_strictMode, &QCheckBox::stateChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
 }
 
 auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   const QString& defaultUserInput = PreferenceSettings().value(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.v).toString();
-  m_indexesCB->addItem(defaultUserInput);
-  m_indexesCB->addItems(NameSectionArrange::PATTERN_INDEX_FREQ);
-  m_indexesCB->addItems(NameSectionArrange::SWAP_INDEX_FREQ);
+  m_indexes->addItem(defaultUserInput);
+  m_indexes->addItems(NameSectionArrange::SWAP_INDEX_FREQ);
 }
 
-auto RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeList) -> QStringList {
-  if (replaceeList.isEmpty()) {
-    return replaceeList;
+QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeList) {
+  NameSectionArrange nsa;
+
+  auto& inst = ArrangeSectionActions::GetInst();
+  const bool isStrictMode = m_strictMode->isChecked();
+  QList<int> sortedSequenceIndex;
+  if (inst._SWAP_SECTION_AT_2_INDEXES->isChecked()) {
+    if (!SubscriptsStr2Int(m_indexes->currentText(), sortedSequenceIndex)) {
+      qWarning("Swapped 2 indexes[%s] invalid", qPrintable(m_sectionsUsedToJoin->currentText()));
+      regexValidLabel->ToNotSaved();
+      return {};
+    }
+    if (sortedSequenceIndex.size() != 2) {
+      qWarning("Swapped 2 indexes[%s] invalid must 2 number but now [%d]", qPrintable(m_sectionsUsedToJoin->currentText()), sortedSequenceIndex.size());
+      regexValidLabel->ToNotSaved();
+      return {};
+    }
+    PreferenceSettings().setValue(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, m_indexes->currentText());
+    nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), isStrictMode);
+  } else if (inst._SECTION_JOIN_WITH_SELECT_INDEXES->isChecked()) {
+    if (!SubscriptsDigitChar2Int(m_sectionsUsedToJoin->currentText(), sortedSequenceIndex)) {
+      qWarning("Sorted arrange indexes[%s] invalid", qPrintable(m_sectionsUsedToJoin->currentText()));
+      regexValidLabel->ToNotSaved();
+      return {};
+    }
+    nsa = NameSectionArrange(sortedSequenceIndex, isStrictMode);
+  } else {
+    qWarning("Section arrange style not found");
+    regexValidLabel->ToNotSaved();
+    return {};
   }
-  bool isStrictMode = m_strictMode->isChecked();
-  auto nsa = NameSectionArrange::FromUserInput(m_indexesCB->currentText(), isStrictMode);
-  if (not nsa) {
-    m_indexesCB->setStyleSheet(
-        "QComboBox {"
-        "    color: #fff;"
-        "    background-color: rgb(200, 100, 20);"
-        "    border-color: rgb(255, 0, 0);"
-        "}");
-    return replaceeList;
-  }
-  m_indexesCB->setStyleSheet("");
-  PreferenceSettings().setValue(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, m_indexesCB->currentText());
+
+  regexValidLabel->ToSaved();
 
   const QStringList& newNames = nsa.BatchSwapper(replaceeList);
-  if (not nsa.m_wastedList.isEmpty()) {
-    const QString& wastedNames = nsa.m_wastedList.join('|');
+  if (isStrictMode && nsa.HasWasted()) {
+    const QString& wastedNames = nsa.GetWastedNames();
     Notificator::warning("wasted section found", wastedNames);
-    qWarning("wasted section found[%s]", qPrintable(wastedNames));
+    qWarning("Following name contains some section wasted. [%s]", qPrintable(wastedNames));
   }
   return newNames;
 }
@@ -62,12 +108,19 @@ void RenameWidget_ArrangeSection::InitExtraCommonVariable() {
 
 QToolBar* RenameWidget_ArrangeSection::InitControlTB() {
   QToolBar* replaceControl(new QToolBar);
-  replaceControl->addWidget(new QLabel("Arrange index or swap 2 index:"));
-  replaceControl->addWidget(m_indexesCB);
+  auto& inst = ArrangeSectionActions::GetInst();
+  replaceControl->addAction(inst._SWAP_SECTION_AT_2_INDEXES);
+  replaceControl->addWidget(m_indexes);
+  replaceControl->addSeparator();
+  replaceControl->addAction(inst._SECTION_JOIN_WITH_SELECT_INDEXES);
+  replaceControl->addWidget(m_sectionsUsedToJoin);
   replaceControl->addSeparator();
   replaceControl->addWidget(m_strictMode);
   replaceControl->addSeparator();
   replaceControl->addWidget(m_recursiveCB);
   replaceControl->addWidget(m_extensionInNameCB);
+  replaceControl->addWidget(regexValidLabel);
+  m_indexes->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+  m_sectionsUsedToJoin->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   return replaceControl;
 }
