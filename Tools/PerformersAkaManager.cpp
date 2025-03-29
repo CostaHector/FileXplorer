@@ -30,7 +30,7 @@ QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
   static const QRegularExpression PERF_SPLIT("\\s*,\\s*");
-  while (not stream.atEnd()) {
+  while (!stream.atEnd()) {
     QString line = stream.readLine();
     line.replace(PERF_SPLIT, "|");
     for (const QString& perf : line.split('|')) {

@@ -12,9 +12,9 @@
 class ArchiverModel : public QAbstractTableModelPub {
  public:
   explicit ArchiverModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
-  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
-  auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override {
+  int rowCount(const QModelIndex& parent = {}) const override { return m_paf != nullptr ? m_paf->size() : 0; }
+  int columnCount(const QModelIndex& parent = {}) const override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
     if (m_paf == nullptr or not index.isValid()) {
       return QVariant();
     }
@@ -36,7 +36,7 @@ class ArchiverModel : public QAbstractTableModelPub {
     }
     return QVariant();
   }
-  auto headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const -> QVariant override {
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
     if (role == Qt::TextAlignmentRole) {
       if (orientation == Qt::Vertical) {
         return Qt::AlignRight;
