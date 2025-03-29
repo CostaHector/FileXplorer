@@ -1,58 +1,53 @@
 #include "NameSectionArrange.h"
+#include <QRegularExpression>
+
+bool SubscriptsStr2Int(const QString& subscripts, QList<int>& sortedIndLst) {
+  static const QRegularExpression SORT_INDEX_SEP{", |,| "};
+  const QStringList& sortedIndLstStr = subscripts.split(SORT_INDEX_SEP);
+  sortedIndLst.reserve(sortedIndLstStr.size());
+  int ind = 0;
+  for (const QString& indStr : sortedIndLstStr) {
+    bool isNumber = false;
+    ind = indStr.toInt(&isNumber);
+    if (!isNumber) {
+      return false;
+    }
+    sortedIndLst << ind;
+  }
+  return true;
+}
+
+bool SubscriptsDigitChar2Int(const QString& subscripts, QList<int>& sortedIndLst) {
+  sortedIndLst.reserve(subscripts.size());
+  for (auto c : subscripts) {
+    if (!c.isDigit()) {
+      continue;
+    }
+    sortedIndLst.push_back(c.toLatin1() - '0');
+  }
+  return true;
+}
 
 const QStringList NameSectionArrange::PATTERN_INDEX_FREQ{"0213456", "0132456"};
-const QStringList NameSectionArrange::SWAP_INDEX_FREQ{"1,2", "2,3"};
-const int NameSectionArrange::INDEX_ARR[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+const QStringList NameSectionArrange::SWAP_INDEX_FREQ{"1,2", "2,3", "1,3", "0,1", "0,2", "0,3"};
+const QList<int> NameSectionArrange::INDEX_ARR{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-NameSectionArrange::NameSectionArrange() : m_valid{false}, m_strictMode{true} {}
-
-NameSectionArrange::NameSectionArrange(const QString& indexPattern, const bool strictMode) : m_valid{true}, m_strictMode{strictMode} {
-  m_seq.reserve(indexPattern.size());
-  for (auto c : indexPattern) {
-    if (not c.isDigit()) {
-      m_valid = false;
-      return;
-    }
-    m_seq.push_back(c.toLatin1() - '0');
-  }
+NameSectionArrange::NameSectionArrange() : m_strictMode{true} {  //
 }
 
-NameSectionArrange::NameSectionArrange(const int section1, const int section2, const bool strictMode) : NameSectionArrange{"0123456789", strictMode} {  // swap section edition
-  if (!(0 <= section1 && section1 < m_seq.size() && 0 <= section2 && section2 < m_seq.size())) {
-    m_valid = false;
-    return;
-  }
+NameSectionArrange::NameSectionArrange(const QList<int>& sortedIndlst, const bool strictMode)  //
+    : m_strictMode{strictMode},                                                                //
+      m_seq{sortedIndlst} {                                                                    //
+}
+
+NameSectionArrange::NameSectionArrange(const int section1, const int section2, const bool strictMode)  //
+    : NameSectionArrange{INDEX_ARR, strictMode} {                                                      // swap section edition
   std::swap(m_seq[section1], m_seq[section2]);
-}
-
-NameSectionArrange NameSectionArrange::FromUserInput(const QString& userInput, const bool strictMode) {
-  const int commaCnt = userInput.count(',');
-  if (commaCnt > 1) {
-    return NameSectionArrange();
-  }
-  if (commaCnt == 1) {
-    int ind = userInput.indexOf(',');
-    bool is1stIndexInt;
-    const int section1 = userInput.left(ind).toInt(&is1stIndexInt);
-    bool is2ndIndexInt;
-    const int section2 = userInput.mid(ind + 1).toInt(&is2ndIndexInt);
-    const bool isInputInValid {!is1stIndexInt || !is2ndIndexInt || section1 == section2 || section1 < 0 || section2 < 0 || section1 > 9 || section2 > 9};
-    if (isInputInValid) {
-      qWarning("userInput[%s] is invalid[section1=%d, section2=%d]", qPrintable(userInput), section1, section2);
-      return NameSectionArrange();
-    }
-    return NameSectionArrange{section1, section2, strictMode};
-  }
-  return NameSectionArrange{userInput, strictMode};
 }
 
 QStringList NameSectionArrange::BatchSwapper(const QStringList& lst) {
   m_wastedList.clear();
   m_wastedList.reserve(lst.size());
-
-  if (!operator bool()) {
-    return lst;
-  }
 
   QStringList ansList;
   ansList.reserve(lst.size());
@@ -63,33 +58,23 @@ QStringList NameSectionArrange::BatchSwapper(const QStringList& lst) {
 }
 
 QString NameSectionArrange::operator()(const QString& names) {
-  if (!operator bool()) {
+  const QStringList& section = names.split('-');
+  if (m_seq == INDEX_ARR && m_seq.size() == section.size()) {
+    qDebug("nothing changes");
     return names;
   }
-  const QStringList& section = names.split('-');
-  if (m_seq == QList<int>(INDEX_ARR, INDEX_ARR + m_seq.size()) and m_seq.size() == section.size()) {
-    return names;  // nothing changes
-  }
 
-  int sectionMet = 0;
-  QString ans;
-  ans.reserve(names.size() + 3);
+  QStringList newNameSec;
   for (int index : m_seq) {
-    if (0 > index || index >= section.size()) {
+    if (index < 0 || index >= section.size()) {
       continue;
     }
-    ans += section[index].trimmed() + " - ";
-    ++sectionMet;
+    newNameSec << section[index].trimmed();
   }
-  if (sectionMet < section.size()) {
-    // Attention: some section part is wasted
+  if (m_strictMode && newNameSec.size() < section.size()) {  // Attention: some section part is wasted
     m_wastedList.push_back(names);
-    if (m_strictMode) {
-      return names;
-    }
   }
-  if (!ans.isEmpty()) {
-    ans.remove(ans.size() - 3, ans.size());
-  }
-  return ans;
+  static const QString SECTION_JOIN_SEP = " - ";
+  return newNameSec.join(SECTION_JOIN_SEP);
+  ;
 }

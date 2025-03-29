@@ -60,10 +60,10 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 }
 
 QToolBar* RibbonMenu::LeafFile() const {
-  QToolButton* styleToolButton =
-      DropListToolButtonWithoutDefAction(QIcon{":img/STYLE_SETTING"}, "style", "", g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
-  QToolButton* logToolButton =
-      DropListToolButton(g_LogActions()._LOG_FILE, g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  auto* styleToolButton = new DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "style");
+  QToolButton* logToolButton = new DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  logToolButton->setDefaultAction(g_LogActions()._LOG_FILE);
 
   QToolBar* leafFileWid{new (std::nothrow) QToolBar};
   if (leafFileWid == nullptr) {
@@ -81,10 +81,9 @@ QToolBar* RibbonMenu::LeafFile() const {
 }
 
 QToolBar* RibbonMenu::LeafHome() const {
-  const QString& _defPlayActName = PreferenceSettings().value(MemoryKey::DEFAULT_VIDEO_PLAYER.name, MemoryKey::DEFAULT_VIDEO_PLAYER.v).toString();
-  QAction* _defPlayAct = FindQActionFromQActionGroupByActionName(_defPlayActName, g_viewActions()._VIDEO_PLAYERS);
-  QToolButton* playTB = DropListToolButton(_defPlayAct, g_viewActions()._VIDEO_PLAYERS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  EnableAutoChangeDefaultActionInToolButton(playTB, MemoryKey::DEFAULT_VIDEO_PLAYER.name);
+  auto* playTB = new DropdownToolButton(g_viewActions()._VIDEO_PLAYERS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  playTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_VIDEO_PLAYER.name, MemoryKey::DEFAULT_VIDEO_PLAYER.v).toString());
+  playTB->MemorizeCurrentAction(MemoryKey::DEFAULT_VIDEO_PLAYER.name);
 
   QToolBar* openItemsTB = new (std::nothrow) QToolBar("Open");
   if (openItemsTB == nullptr) {
@@ -101,10 +100,9 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(openItemsTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  const QString& defaultCopyActionName = PreferenceSettings().value(MemoryKey::DEFAULT_COPY_CHOICE.name, MemoryKey::DEFAULT_COPY_CHOICE.v).toString();
-  QAction* defaultCopyAction = FindQActionFromQActionGroupByActionName(defaultCopyActionName, g_fileBasicOperationsActions().COPY_PATH_AG);
-  QToolButton* copyTB = DropListToolButton(defaultCopyAction, g_fileBasicOperationsActions().COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  EnableAutoChangeDefaultActionInToolButton(copyTB, MemoryKey::DEFAULT_COPY_CHOICE.name);
+  auto* copyTB = new DropdownToolButton(g_fileBasicOperationsActions().COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  copyTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_COPY_CHOICE.name, MemoryKey::DEFAULT_COPY_CHOICE.v).toString());
+  copyTB->MemorizeCurrentAction(MemoryKey::DEFAULT_COPY_CHOICE.name);
 
   QToolBar* propertiesTB = new (std::nothrow) QToolBar("Properties");
   if (propertiesTB == nullptr) {
@@ -122,10 +120,9 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  const QString& _defNewActName = PreferenceSettings().value(MemoryKey::DEFAULT_NEW_CHOICE.name, MemoryKey::DEFAULT_NEW_CHOICE.v).toString();
-  QAction* _defaultNewAction = FindQActionFromQActionGroupByActionName(_defNewActName, g_fileBasicOperationsActions().NEW);
-  QToolButton* newItemsTB = DropListToolButton(_defaultNewAction, g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  EnableAutoChangeDefaultActionInToolButton(newItemsTB, MemoryKey::DEFAULT_NEW_CHOICE.name);
+  auto* newItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  newItemsTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_NEW_CHOICE.name, MemoryKey::DEFAULT_NEW_CHOICE.v).toString());
+  newItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_NEW_CHOICE.name);
 
   QToolBar* moveCopyItemsToTB = new (std::nothrow) QToolBar("Move/Copy item(s) To ToolBar");
   if (moveCopyItemsToTB == nullptr) {
@@ -133,19 +130,21 @@ QToolBar* RibbonMenu::LeafHome() const {
     return nullptr;
   }
   {
-    auto* const _MOVE_TO = g_fileBasicOperationsActions()._MOVE_TO;
-    auto* const _COPY_TO = g_fileBasicOperationsActions()._COPY_TO;
     const auto& _MOVE_TO_HIST_LIST = g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY->actions();
     const auto& _COPY_TO_HIST_LIST = g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY->actions();
-    moveCopyItemsToTB->addWidget(
-        DropListToolButton(_MOVE_TO, _MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_2x1));
-    moveCopyItemsToTB->addWidget(
-        DropListToolButton(_COPY_TO, _COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_2x1));
+    auto* pMoveToToolButton = new DropdownToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_2x1);
+    pMoveToToolButton->setDefaultAction(g_fileBasicOperationsActions()._MOVE_TO);
+    auto* pCopyToToolButton = new DropdownToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_2x1);
+    pCopyToToolButton->setDefaultAction(g_fileBasicOperationsActions()._COPY_TO);
+
+    moveCopyItemsToTB->addWidget(pMoveToToolButton);
+    moveCopyItemsToTB->addWidget(pCopyToToolButton);
     moveCopyItemsToTB->setOrientation(Qt::Orientation::Horizontal);
     SetLayoutAlightment(moveCopyItemsToTB->layout(), Qt::AlignmentFlag::AlignTop);
   }
 
-  QToolButton* recycleItemsTB = DropListToolButton(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN, g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
+  QToolButton* recycleItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
+  recycleItemsTB->setDefaultAction(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN);
 
   QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar("ArchievePreview");
   if (archievePreviewToolBar == nullptr) {
@@ -186,11 +185,9 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(compressToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  const QString& _defRenameActName = PreferenceSettings().value(MemoryKey::DEFAULT_RENAME_CHOICE.name, MemoryKey::DEFAULT_RENAME_CHOICE.v).toString();
-  QAction* _defRenameAct = FindQActionFromQActionGroupByActionName(_defRenameActName, g_renameAg().RENAME_RIBBONS);
-  QToolButton* renameItemsTB = DropListToolButton(_defRenameAct, g_renameAg().RENAME_RIBBONS->actions(), QToolButton::MenuButtonPopup);
-  EnableAutoChangeDefaultActionInToolButton(renameItemsTB, MemoryKey::DEFAULT_RENAME_CHOICE.name);
-
+  auto* renameItemsTB = new DropdownToolButton(g_renameAg().RENAME_RIBBONS->actions(), QToolButton::MenuButtonPopup);
+  renameItemsTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_RENAME_CHOICE.name, MemoryKey::DEFAULT_RENAME_CHOICE.v).toString());
+  renameItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_RENAME_CHOICE.name);
   QToolBar* advanceSearchToolBar = new (std::nothrow) QToolBar("AdvanceSearch");
   if (advanceSearchToolBar == nullptr) {
     qCritical("advanceSearchToolBar is nullptr");
@@ -269,8 +266,8 @@ QToolBar* RibbonMenu::LeafView() const {
   folderPreviewToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  auto* embeddedPlayerTB = DropListToolButton(g_viewActions()._VIDEO_PLAYER_EMBEDDED, g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-
+  auto* embeddedPlayerTB = new DropdownToolButton(g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  embeddedPlayerTB->setDefaultAction(g_viewActions()._VIDEO_PLAYER_EMBEDDED);
   leafViewWid->setToolTip("View Leaf");
   leafViewWid->addAction(g_viewActions().NAVIGATION_PANE);
   leafViewWid->addWidget(fileSystemView);
@@ -316,18 +313,18 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto& arrangeIns = g_ArrangeActions();
   QList<QAction*> studiosActions{arrangeIns._EDIT_STUDIOS,  arrangeIns._RELOAD_STUDIOS,  nullptr, arrangeIns._EDIT_PERFS,      arrangeIns._RELOAD_PERFS, nullptr,
                                  arrangeIns._EDIT_PERF_AKA, arrangeIns._RELOAD_PERF_AKA, nullptr, arrangeIns._RENAME_RULE_STAT};
-  QToolButton* nameRulerToolButton =
-      DropListToolButton(g_fileBasicOperationsActions()._NAME_RULER, studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
-
+  QToolButton* nameRulerToolButton = new DropdownToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  nameRulerToolButton->setDefaultAction(g_fileBasicOperationsActions()._NAME_RULER);
   auto& viewIns = g_viewActions();
   auto& jsonIns = g_jsonEditorActions();
-  auto* jsonEditorTB = DropListToolButton(viewIns._JSON_EDITOR_PANE, jsonIns._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  auto* jsonEditorTB = new DropdownToolButton(jsonIns._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  jsonEditorTB->setDefaultAction(viewIns._JSON_EDITOR_PANE);
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
   QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
                                    thumbnailIns._SKIP_IF_ALREADY_EXIST};
-  QToolButton* thumbnailToolButton =
-      DropListToolButton(thumbnailIns._EXTRACT_1ST_IMG, thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  QToolButton* thumbnailToolButton = new DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  thumbnailToolButton->setDefaultAction(thumbnailIns._EXTRACT_1ST_IMG);
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
   if (archiveVidsTB == nullptr) {
