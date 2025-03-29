@@ -1,7 +1,4 @@
 #include "RenameWidget_ReverseNames.h"
-#include "Component/NotificatorFrame.h"
-#include "PublicVariable.h"
-#include "Tools/NameSectionArrange.h"
 
 RenameWidget_ReverseNames::RenameWidget_ReverseNames(QWidget* parent)//
     : AdvanceRenamer(parent) {
