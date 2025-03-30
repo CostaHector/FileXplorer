@@ -12,30 +12,45 @@ class NameSectionArrangeTest : public MyTestSuite {
   void init() {}
   void cleanup() {}
 
+  void test_SubscriptsStr2Int() {
+    // seperated by comma, space-comma, space
+    const QStringList strLst{"5,10,2,3,4", "5 10 2 3 4", "5 10 2 3 4"};
+    const QList<int> expectLst{5, 10, 2, 3, 4};
+    for (const QString& str : strLst) {
+      QList<int> sortedIndLst;
+      QVERIFY(SubscriptsStr2Int(str, sortedIndLst));
+      QCOMPARE(sortedIndLst, expectLst);
+    }
+  }
+
+  void test_SubscriptsDigitChar2Int() {
+    // seperated by comma, space-comma, space
+    const QString digitStrLst{"510234"};
+    const QList<int> expectLst{5, 1, 0, 2, 3, 4};
+    QList<int> sortedIndLst;
+    QVERIFY(SubscriptsDigitChar2Int(digitStrLst, sortedIndLst));
+    QCOMPARE(sortedIndLst, expectLst);
+  }
+
   void test_0213_1digit_SortIndex_strict() {
     NameSectionArrange nss({0, 2, 1, 3});
-
-    QString actual = nss("1-2-3-4");
-    QString expect("1 - 3 - 2 - 4");
-    QCOMPARE(expect, actual);
+    QCOMPARE(nss("1-2-3-4"), "1 - 3 - 2 - 4");
   }
 
-  void test_4012_1digit_SortIndex_strict() {
-    NameSectionArrange nss({4, 0, 1, 2},  false);
-    QString actual = nss("1-2-3-4");
-    QString expect("1 - 2 - 3");
-    QCOMPARE(expect, actual);
+  void test_4012_1digit_SortIndex_notStrict() {
+    NameSectionArrange nss({4, 0, 1, 2}, false);
+    QCOMPARE(nss("1-2-3-4"), "1 - 2 - 3");
+    // is_strictMode=false, ignore name that contains wasted
+    QVERIFY(!nss.HasWasted());
   }
 
-  void test_40213_1digit_SortIndex() {
+  void test_40213_1digit_SortIndex_notStrict() {
     NameSectionArrange nss({4, 0, 2, 1, 3}, false);
-    QString actual = nss("1-2-3-4");
-    QString expect("1 - 3 - 2 - 4");
-    QCOMPARE(expect, actual);
+    QCOMPARE(nss("1-2-3-4"), "1 - 3 - 2 - 4");
   }
 
   void test_4021_1digitSortIndex() {
-    NameSectionArrange nss{{4, 0, 2, 1}, true}; // section 3 wasted
+    NameSectionArrange nss{{4, 0, 2, 1}, true};  // section 3 wasted
     QStringList actual = nss.BatchSwapper({"1-2-3-4", "A-B-C-D", "X - Y - Z"});
     QStringList expect{"1 - 3 - 2", "A - C - B", "X - Z - Y"};
     QCOMPARE(nss.GetWastedNames(), "1-2-3-4\nA-B-C-D");
