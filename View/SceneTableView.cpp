@@ -10,12 +10,24 @@
 class AlignDelegate : public QStyledItemDelegate {
  public:
   void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override {
+    option->decorationPosition = QStyleOptionViewItem::Position::Top;
+    option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
+    option->textElideMode = Qt::TextElideMode::ElideLeft;
+    option->displayAlignment = Qt::AlignmentFlag::AlignVCenter;
     QStyledItemDelegate::initStyleOption(option, index);
-    option->decorationPosition = QStyleOptionViewItem::Position::Bottom;
   }
+//  QString displayText(const QVariant& value, const QLocale& locale) const override {
+//    const QString& text = value.toString();
+//    static constexpr int CHAR_LETTER_CNT = 64;
+//    if (text.size() <= CHAR_LETTER_CNT) {
+//      return text;
+//    }
+//    return text.left(CHAR_LETTER_CNT / 2) + "..." + text.right(CHAR_LETTER_CNT / 2);
+//  }
 };
 
-SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : CustomTableView{"SCENES_TABLE", parent}, _sceneModel{sceneModel} {
+SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent)  //
+    : CustomTableView{"SCENES_TABLE", parent}, _sceneModel{sceneModel} {
   if (_sceneModel == nullptr) {
     qWarning("sceneModel is nullptr");
   } else {
@@ -36,6 +48,7 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent) : 
   //  AppendVerticalHeaderMenuAGS(g_performersManagerActions().GetVerAGS());
   //  AppendHorizontalHeaderMenuAGS(g_performersManagerActions().GetHorAGS());
   subscribe();
+  InitTableView();
 }
 
 void SceneTableView::onCopyBaseName() {
@@ -61,8 +74,7 @@ void SceneTableView::subscribe() {
 void SceneTableView::setRootPath(const QString& rootPath) {
   if (rootPath.count('/') < 2) {  // large folder
     qDebug("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
-    const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath,
-                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
       qDebug("User cancel setRootPath on a large path[%s]", qPrintable(rootPath));
       return;
