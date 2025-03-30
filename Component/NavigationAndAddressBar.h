@@ -46,7 +46,7 @@ class NavigationAndAddressBar : public QToolBar {
 
   AddressELineEdit* m_addressLine{nullptr};
   PathUndoRedoer m_pathRD;
-  FolderNxtAndLastIterator mFolderNxtLstIt{nullptr};
+  FolderNxtAndLastIterator mFolderNxtLstIt;
   QLineEdit* m_searchLE{nullptr};
   FileSystemTypeFilter* m_fsFilter{nullptr};
 

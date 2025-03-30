@@ -4,12 +4,11 @@
 #include <QString>
 #include <QMap>
 
-typedef QStringList (*FuncGetSortedDirNames)(const QString& path);
-
 class FolderNxtAndLastIterator {
  public:
-  explicit FolderNxtAndLastIterator(FuncGetSortedDirNames dirNamesGetter = nullptr);
+  FolderNxtAndLastIterator() = default;
   bool operator()(const QString& parentPath);
+  bool operator()(const QString& parentPath, const QStringList& pathList);
 
   QString next(const QString& parentPath, const QString& curDirName) {
     return lastNextCore(parentPath, curDirName, true);
@@ -21,7 +20,6 @@ class FolderNxtAndLastIterator {
   QString lastNextCore(const QString& parentPath, const QString& curDirName, bool isNext = true);
   QString m_lastTimeParentPath;
   QStringList sameLevelPaths;
-  FuncGetSortedDirNames m_dirNamesGetter;
 };
 
 #endif // FOLDERNXTANDLASTITERATOR_H
