@@ -43,6 +43,7 @@ class CustomTableView : public QTableView {
   void onSetRowDefaultSectionSize();
   void onSetColumnDefaultSectionSize();
 
+  void onShowHorizontalHeader(bool showChecked);
   void onShowVerticalHeader(bool showChecked);
   void onEnableColumnSort(const bool enableChecked);
 
@@ -61,6 +62,7 @@ class CustomTableView : public QTableView {
   QAction* RESIZE_COLUMN_TO_CONTENTS = new QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), "resize cols to content", this);
   QAction* SET_COLS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":img/DEFAULT_COLUMN_WIDTH"), "set default cols section size", this);
 
+  QAction* SHOW_HORIZONTAL_HEADER = new QAction("show horizontal header", this);
   QAction* SHOW_VERTICAL_HEADER = new QAction("show vertical header", this);
   QAction* RESIZE_ROW_TO_CONTENTS = new QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), "resize rows to content", this);
   QAction* SET_ROWS_DEFAULT_SECTION_SIZE = new QAction(QIcon(":img/DEFAULT_ROW_HEIGHT"), "set default rows section size", this);
@@ -73,8 +75,10 @@ class CustomTableView : public QTableView {
   const QString m_DEFAULT_SECTION_SIZE_KEY;
   const QString m_DEFAULT_COLUMN_SECTION_SIZE_KEY;
   QString m_horizontalHeaderStateKey;
+  QString m_showHorizontalHeaderKey;
   QString m_showVerticalHeaderKey;
   QString m_sortByColumnSwitchKey;
+  QString m_rowResizeToContentKey;
 
   int m_defaultTableRowHeight;
   int m_defaultTableColumnWidth;
@@ -86,6 +90,8 @@ class CustomTableView : public QTableView {
   QMenu* m_menu = nullptr;
   QMenu* m_verMenu = new QMenu{tr("vertical header menu"), this};
   QMenu* m_horMenu = new QMenu{tr("horizontal header menu"), this};
+
+  bool m_enableDefaultSectionSize {true};
 
   inline bool isNameExists(const QString& name) const { return TABLES_SET.contains(name); }
   static QSet<QString> TABLES_SET;

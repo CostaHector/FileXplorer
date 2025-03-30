@@ -32,12 +32,7 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
       if (!QFile::exists(imgAbsPath)) {
         return {};
       }
-      const QPixmap previewImg{imgAbsPath};
-      if (previewImg.height() > 2 * previewImg.width()) {
-        // H:w > 2:1
-        return previewImg.scaledToHeight(280);
-      }
-      return previewImg.scaledToWidth(420);
+      return QPixmap{imgAbsPath}.scaledToHeight(280);
     }
     case Qt::ItemDataRole::BackgroundRole: {
       if (mCurBegin[linearInd].vidName.isEmpty()) {
