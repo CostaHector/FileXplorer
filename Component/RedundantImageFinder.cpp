@@ -93,7 +93,7 @@ class RedundantImageModel : public QAbstractTableModelPub {
 
     RowsCountStartChange(beforeRow, afterRow);
     m_paf = p_af;
-    RowsCountEndChange(beforeRow, afterRow);
+    RowsCountEndChange();
   }
 
  private:
@@ -218,7 +218,7 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
   int afterRowCnt = redundantImgs.size();
   m_imgModel->RowsCountStartChange(beforeRowCnt, afterRowCnt);
   m_imgsBunch.swap(redundantImgs);
-  m_imgModel->RowsCountEndChange(beforeRowCnt, afterRowCnt);
+  m_imgModel->RowsCountEndChange();
 }
 
 void RedundantImageFinder::ReadLocalCharacteristicLib(const QString& libPath) {
@@ -281,7 +281,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   int afterRowCnt = redundantImgs.size();
   m_imgModel->RowsCountStartChange(beforeRowCnt, afterRowCnt);
   m_imgsBunch.swap(redundantImgs);
-  m_imgModel->RowsCountEndChange(beforeRowCnt, afterRowCnt);
+  m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(folderPath);
 }
 
