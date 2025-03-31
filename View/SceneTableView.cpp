@@ -16,14 +16,14 @@ class AlignDelegate : public QStyledItemDelegate {
     option->displayAlignment = Qt::AlignmentFlag::AlignVCenter;
     QStyledItemDelegate::initStyleOption(option, index);
   }
-//  QString displayText(const QVariant& value, const QLocale& locale) const override {
-//    const QString& text = value.toString();
-//    static constexpr int CHAR_LETTER_CNT = 64;
-//    if (text.size() <= CHAR_LETTER_CNT) {
-//      return text;
-//    }
-//    return text.left(CHAR_LETTER_CNT / 2) + "..." + text.right(CHAR_LETTER_CNT / 2);
-//  }
+  //  QString displayText(const QVariant& value, const QLocale& locale) const override {
+  //    const QString& text = value.toString();
+  //    static constexpr int CHAR_LETTER_CNT = 64;
+  //    if (text.size() <= CHAR_LETTER_CNT) {
+  //      return text;
+  //    }
+  //    return text.left(CHAR_LETTER_CNT / 2) + "..." + text.right(CHAR_LETTER_CNT / 2);
+  //  }
 };
 
 SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent)  //
@@ -38,6 +38,8 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent)  /
   mAlignDelegate = new AlignDelegate;
   setItemDelegate(mAlignDelegate);
 
+  m_fPrev = new FloatingPreview;
+
   m_menu = new QMenu{"scene table view menu", this};
   COPY_BASENAME_FROM_SCENE = new QAction("copy basename", m_menu);
   OPEN_CORRESPONDING_FOLDER = new QAction("play this folder", m_menu);
@@ -49,6 +51,8 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent)  /
   //  AppendHorizontalHeaderMenuAGS(g_performersManagerActions().GetHorAGS());
   subscribe();
   InitTableView();
+
+  setMouseTracking(true);
 }
 
 void SceneTableView::onCopyBaseName() {
@@ -81,8 +85,26 @@ void SceneTableView::setRootPath(const QString& rootPath) {
     }
   }
   _sceneModel->setRootPath(rootPath);
-  //  resizeRowsToContents();
-  qDebug("setRootPath[%s]", qPrintable(rootPath));
+}
+
+void SceneTableView::mouseMoveEvent(QMouseEvent* event) {
+  const QPoint& pnt = event->pos();
+  const QModelIndex& idx = indexAt(pnt);
+  if (!idx.isValid()) {
+    m_fPrev->hide();
+    return;
+  }
+  const QString& name = _sceneModel->data(idx, Qt::ItemDataRole::DisplayRole).toString();
+  if (!m_fPrev->NeedUpdate(name)) {
+    return;
+  }
+  const QStringList& imgs = _sceneModel->GetImgs(idx);
+  m_fPrev->move(event->globalPos() + QPoint{20, 20});
+  (*m_fPrev)(name, imgs);
+  if (m_fPrev->isHidden()) {
+    m_fPrev->show();
+  }
+  m_fPrev->raise();
 }
 
 // #define __NAME__EQ__MAIN__ 1

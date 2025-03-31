@@ -43,6 +43,7 @@ SOURCES += \
     Component/CustomStatusBar.cpp \
     Component/DatabaseToolBar.cpp \
     Component/DropListToolButton.cpp \
+    Component/FloatingPreview.cpp \
     Component/JsonEditorWidget/EditorWidgetIF.cpp \
     Component/JsonEditorWidget/LineEditCSV.cpp \
     Component/JsonEditorWidget/LineEditInt.cpp \
@@ -220,6 +221,7 @@ HEADERS += \
     Component/CustomStatusBar.h \
     Component/DatabaseToolBar.h \
     Component/DropListToolButton.h \
+    Component/FloatingPreview.h \
     Component/JsonEditorWidget/EditorWidgetIF.h \
     Component/JsonEditorWidget/LineEditCSV.h \
     Component/JsonEditorWidget/LineEditInt.h \

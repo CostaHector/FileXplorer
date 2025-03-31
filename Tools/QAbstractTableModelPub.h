@@ -7,46 +7,66 @@ class QAbstractTableModelPub : public QAbstractTableModel {
  public:
   QAbstractTableModelPub(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
   void RowsCountStartChange(int beforeRow, int afterRow) {
-    if (beforeRow == afterRow) {
+    qDebug("Row changing %d->%d...", beforeRow, afterRow);
+    m_befRow = beforeRow;
+    m_aftRow = afterRow;
+    if (m_befRow == m_aftRow) {
       return;
-    } else if (beforeRow < afterRow) {
-      beginInsertRows(QModelIndex(), beforeRow, afterRow - 1);
+    } else if (m_befRow < m_aftRow) {
+      beginInsertRows(QModelIndex(), m_befRow, m_aftRow - 1);
     } else {
-      beginRemoveRows(QModelIndex(), afterRow, beforeRow - 1);
+      beginRemoveRows(QModelIndex(), m_aftRow, m_befRow - 1);
     }
   }
-  void RowsCountEndChange(int beforeRow, int afterRow) {
-    if (beforeRow == afterRow) {
-      if (afterRow > 0 and rowCount() > 0) {
-        emit dataChanged(index(0, 0), index(afterRow - 1, columnCount() - 1), {Qt::ItemDataRole::DisplayRole});
+  void RowsCountEndChange() {
+    if (!IsRowCntValid()) {
+      qWarning("row count[bef:%d, aft:%d] invalid", m_befRow, m_aftRow);
+      return;
+    }
+    if (m_befRow == m_aftRow) {
+      if (m_aftRow > 0 && columnCount() > 0) {
+        emit dataChanged(index(0, 0), index(m_aftRow - 1, columnCount() - 1), {Qt::ItemDataRole::DisplayRole});
       }
-    } else if (beforeRow < afterRow) {
+    } else if (m_befRow < m_aftRow) {
       endInsertRows();
     } else {
       endRemoveRows();
     }
   }
 
-  void ColumnsBeginChange(int beforeColumnCnt, int afterColumnCnt){
-    if (beforeColumnCnt == afterColumnCnt) {
+  void ColumnsBeginChange(int beforeColumnCnt, int afterColumnCnt) {
+    qDebug("column changing %d->%d...", beforeColumnCnt, afterColumnCnt);
+    m_befCol = beforeColumnCnt;
+    m_aftCol = afterColumnCnt;
+    if (m_befCol == m_aftCol) {
       return;
-    } else if (beforeColumnCnt < afterColumnCnt){
-      beginInsertColumns(QModelIndex(), beforeColumnCnt, afterColumnCnt - 1);
+    } else if (m_befCol < m_aftCol) {
+      beginInsertColumns(QModelIndex(), m_befCol, m_aftCol - 1);
     } else {
-      beginRemoveColumns(QModelIndex(), afterColumnCnt, beforeColumnCnt - 1);
+      beginRemoveColumns(QModelIndex(), m_aftCol, m_befCol - 1);
     }
   }
-  void ColumnsEndChange(int beforeColumnCnt, int afterColumnCnt){
-    if (beforeColumnCnt == afterColumnCnt) {
-      if (afterColumnCnt > 0 and columnCount() > 0) {
-        emit dataChanged(index(0, 0), index(rowCount() - 1, afterColumnCnt - 1), {Qt::ItemDataRole::DisplayRole});
+  void ColumnsEndChange() {
+    if (!IsColCntValid()) {
+      qWarning("col count[bef:%d, aft:%d] invalid", m_befCol, m_aftCol);
+      return;
+    }
+    if (m_befCol == m_aftCol) {
+      if (m_aftCol > 0 && rowCount() > 0) {
+        emit dataChanged(index(0, 0), index(rowCount() - 1, m_aftCol - 1), {Qt::ItemDataRole::DisplayRole});
       }
-    } else if (beforeColumnCnt < afterColumnCnt){
+    } else if (m_befCol < m_aftCol) {
       endInsertColumns();
-    }else {
+    } else {
       endRemoveColumns();
     }
   }
+
+ private:
+  bool IsRowCntValid() const { return m_befRow >= 0 || m_aftRow >= 0; }
+  bool IsColCntValid() const { return m_befCol >= 0 || m_aftCol >= 0; }
+  int m_befRow{-1}, m_aftRow{-1};
+  int m_befCol{-1}, m_aftCol{-1};
 };
 
 #endif  // QABSTRACTTABLEMODELPUB_H
