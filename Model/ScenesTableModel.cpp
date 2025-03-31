@@ -1,6 +1,4 @@
 #include "ScenesTableModel.h"
-#include "Tools/PathTool.h"
-#include "public/DisplayEnhancement.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -16,7 +14,7 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
   if (IsScnsEmpty()) {
     return {};
   }
-  const int linearInd = index.row() * mSCENES_CNT_COLUMN + index.column();
+  const int linearInd = toLinearIndex(index);
   if (mCurBegin + linearInd >= mCurEnd) {
     return {};
   }
@@ -32,7 +30,11 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
       if (!QFile::exists(imgAbsPath)) {
         return {};
       }
-      return QPixmap{imgAbsPath}.scaledToHeight(280);
+      const QPixmap pm{imgAbsPath};
+      if (pm.width() * 280 >= pm.height() * 480) {
+        return pm.scaledToWidth(480);
+      }
+      return pm.scaledToHeight(280);
     }
     case Qt::ItemDataRole::BackgroundRole: {
       if (mCurBegin[linearInd].vidName.isEmpty()) {
@@ -40,12 +42,12 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
       }
       break;
     }
-    case Qt::ItemDataRole::ToolTipRole: {
-      static const QString TOOLTIP_TEMPLATE = R"(<b>%1</b><br/>%2<br/>%3)";
-      return TOOLTIP_TEMPLATE.arg(mCurBegin[linearInd].name,                                                 // name
-                                  FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mCurBegin[linearInd].vidSize),  // size
-                                  mCurBegin[linearInd].GetFirstKImagesLabel(mRootPath));                     // images
-    }
+//    case Qt::ItemDataRole::ToolTipRole: {
+//      static const QString TOOLTIP_TEMPLATE = R"(<b>%1</b><br/>%2<br/>%3)";
+//      return TOOLTIP_TEMPLATE.arg(mCurBegin[linearInd].name,                                                 // name
+//                                  FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mCurBegin[linearInd].vidSize),  // size
+//                                  mCurBegin[linearInd].GetFirstKImagesLabel(mRootPath));                     // images
+//    }
     default:
       break;
   }
@@ -156,9 +158,23 @@ bool ScenesTableModel::setRootPath(const QString& rootPath, const bool bForce) {
     mCurEnd = mEntryList.cbegin() + newEnd;
   }
 
-  RowsCountEndChange(beforeRow, afterRow);
+  RowsCountEndChange();
   qDebug("set root succeed");
   return true;
+}
+
+QStringList ScenesTableModel::GetImgs(const QModelIndex& index) const{
+  static QStringList EMPTY_IMGS_LIST;
+  const int linearInd = toLinearIndex(index);
+  if (mCurBegin + linearInd >= mCurEnd) {
+    return EMPTY_IMGS_LIST;
+  }
+  QStringList imgs;
+  imgs.reserve(mCurBegin[linearInd].imgs.size());
+  for (const QString& name: mCurBegin[linearInd].imgs) {
+    imgs.append(mRootPath + mCurBegin[linearInd].rel2scn + name);
+  }
+  return imgs;
 }
 
 bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
@@ -204,8 +220,8 @@ bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
   mCurBegin = lst.cbegin() + begin;
   mCurEnd = lst.cbegin() + end;
 
-  RowsCountEndChange(beforeRowCnt, afterRowCnt);
-  ColumnsEndChange(beforeColumnCnt, afterColumnCnt);
+  RowsCountEndChange();
+  ColumnsEndChange();
 
   qDebug("============== ChangeColumnsCnt new dimension: %dx%d ==============", rowCount(), columnCount());
   return true;
@@ -259,8 +275,8 @@ bool ScenesTableModel::ChangeRowsCnt(int newRowCnt, int newPageIndex) {
   mCurBegin = lst.cbegin() + begin;
   mCurEnd = lst.cbegin() + end;
 
-  RowsCountEndChange(beforeRowCnt, afterRowCnt);
-  ColumnsEndChange(beforeColumnCnt, afterColumnCnt);
+  RowsCountEndChange();
+  ColumnsEndChange();
 
   qDebug("==============dimension: %dx%d==============", rowCount(), columnCount());
   return true;
@@ -283,8 +299,8 @@ bool ScenesTableModel::ShowAllScenesInOnePage() {
   mCurBegin = lst.cbegin();
   mCurEnd = lst.cend();
 
-  RowsCountEndChange(beforeRowCnt, afterRowCnt);
-  ColumnsEndChange(beforeColumnCnt, afterColumnCnt);
+  RowsCountEndChange();
+  ColumnsEndChange();
   return true;
 }
 
@@ -310,7 +326,7 @@ bool ScenesTableModel::SetPageIndex(int newPageIndex) {
   RowsCountStartChange(beforeRowCnt, afterRowCnt);
 
   mPageIndex = newPageIndex;
-  RowsCountEndChange(beforeRowCnt, afterRowCnt);
+  RowsCountEndChange();
   mCurBegin = lst.cbegin() + begin;
   mCurEnd = lst.cbegin() + end;
 
@@ -338,7 +354,7 @@ void ScenesTableModel::setFilterRegularExpression(const QString& pattern) {
     mFilterEnable = false;
     mCurBegin = mEntryList.cbegin() + newBegin;
     mCurEnd = mEntryList.cbegin() + newEnd;
-    RowsCountEndChange(beforeRow, afterRow);
+    RowsCountEndChange();
     qDebug("============== Filter now disabled, new dimension: %dx%d ==============", rowCount(), columnCount());
     return;
   }
@@ -360,6 +376,6 @@ void ScenesTableModel::setFilterRegularExpression(const QString& pattern) {
   mFilterEnable = true;
   mCurBegin = mEntryListFiltered.cbegin() + newBegin;
   mCurEnd = mEntryListFiltered.cbegin() + newEnd;
-  RowsCountEndChange(beforeRow, afterRow);
+  RowsCountEndChange();
   qDebug("============== filter now enable pattern[%s], new dimension: %dx%d, scenes count:%d ==============", qPrintable(pattern), rowCount(), columnCount(), newScenesCnt);
 }

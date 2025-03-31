@@ -42,7 +42,8 @@ class ScenesTableModel : public QAbstractTableModelPub {
   QString baseName(const QModelIndex& index) const;
   QString absolutePath(const QModelIndex& index) const;
   bool setRootPath(const QString& rootPath, const bool bForce = false);
-  QString rootPath() const { return mRootPath; }
+  inline QString rootPath() const { return mRootPath; }
+  QStringList GetImgs(const QModelIndex& index) const;
 
   bool ChangeRowsCnt(int newRowCnt, int newPageIndex);
   bool ChangeColumnsCnt(int newColumnCnt = 4, int newPageIndex = -1);
@@ -65,6 +66,9 @@ class ScenesTableModel : public QAbstractTableModelPub {
   void setFilterRegularExpression(const QString& pattern);
 
  private:
+  inline int toLinearIndex(const QModelIndex& index) const {
+    return index.row() * mSCENES_CNT_COLUMN + index.column();
+  }
   int mPageIndex{-1};
   int mSCENES_CNT_COLUMN{4};
   int mSCENES_CNT_ROW{-1};

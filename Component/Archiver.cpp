@@ -58,7 +58,7 @@ class ArchiverModel : public QAbstractTableModelPub {
 
     RowsCountStartChange(beforeRow, afterRow);
     m_paf = p_af;
-    RowsCountEndChange(beforeRow, afterRow);
+    RowsCountEndChange();
   }
 
  private:
@@ -144,7 +144,7 @@ bool Archiver::operator()(const QString& qzPath) {
   int afterRowCount = temp.size();
   m_archiverModel->RowsCountStartChange(beforeRowCount, afterRowCount);
   m_af.swap(temp);
-  m_archiverModel->RowsCountEndChange(beforeRowCount, afterRowCount);
+  m_archiverModel->RowsCountEndChange();
   return true;
 }
 
