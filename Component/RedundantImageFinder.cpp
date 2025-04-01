@@ -91,7 +91,7 @@ class RedundantImageModel : public QAbstractTableModelPub {
     int afterRow = p_af != nullptr ? p_af->size() : 0;
     qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
 
-    RowsCountStartChange(beforeRow, afterRow);
+    RowsCountBeginChange(beforeRow, afterRow);
     m_paf = p_af;
     RowsCountEndChange();
   }
@@ -216,7 +216,7 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
 
   int beforeRowCnt = m_imgsBunch.size();
   int afterRowCnt = redundantImgs.size();
-  m_imgModel->RowsCountStartChange(beforeRowCnt, afterRowCnt);
+  m_imgModel->RowsCountBeginChange(beforeRowCnt, afterRowCnt);
   m_imgsBunch.swap(redundantImgs);
   m_imgModel->RowsCountEndChange();
 }
@@ -279,7 +279,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
 
   int beforeRowCnt = m_imgsBunch.size();
   int afterRowCnt = redundantImgs.size();
-  m_imgModel->RowsCountStartChange(beforeRowCnt, afterRowCnt);
+  m_imgModel->RowsCountBeginChange(beforeRowCnt, afterRowCnt);
   m_imgsBunch.swap(redundantImgs);
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(folderPath);
