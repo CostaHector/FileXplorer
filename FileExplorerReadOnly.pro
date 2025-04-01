@@ -279,6 +279,7 @@ HEADERS += \
     Tools/FolderPreviewSwitcher.h \
     Tools/HarFiles.h \
     Tools/LogHandler.h \
+    Tools/QAbstractListModelPub.h \
     Tools/SearchTools.h \
     Tools/ThumbnailProcesser.h \
     Tools/MediaInfoDLL.h \

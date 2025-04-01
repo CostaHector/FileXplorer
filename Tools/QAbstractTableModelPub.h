@@ -6,8 +6,7 @@
 class QAbstractTableModelPub : public QAbstractTableModel {
  public:
   QAbstractTableModelPub(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
-  void RowsCountStartChange(int beforeRow, int afterRow) {
-    qDebug("Row changing %d->%d...", beforeRow, afterRow);
+  void RowsCountBeginChange(int beforeRow, int afterRow) {
     m_befRow = beforeRow;
     m_aftRow = afterRow;
     if (m_befRow == m_aftRow) {
@@ -25,7 +24,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
     }
     if (m_befRow == m_aftRow) {
       if (m_aftRow > 0 && columnCount() > 0) {
-        emit dataChanged(index(0, 0), index(m_aftRow - 1, columnCount() - 1), {Qt::ItemDataRole::DisplayRole});
+        emit dataChanged(index(0, 0), index(m_aftRow - 1, columnCount() - 1), {Qt::ItemDataRole::DisplayRole | Qt::ItemDataRole::DecorationRole});
       }
     } else if (m_befRow < m_aftRow) {
       endInsertRows();
@@ -34,8 +33,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
     }
   }
 
-  void ColumnsBeginChange(int beforeColumnCnt, int afterColumnCnt) {
-    qDebug("column changing %d->%d...", beforeColumnCnt, afterColumnCnt);
+  void ColumnsCountBeginChange(int beforeColumnCnt, int afterColumnCnt) {
     m_befCol = beforeColumnCnt;
     m_aftCol = afterColumnCnt;
     if (m_befCol == m_aftCol) {
@@ -46,14 +44,14 @@ class QAbstractTableModelPub : public QAbstractTableModel {
       beginRemoveColumns(QModelIndex(), m_aftCol, m_befCol - 1);
     }
   }
-  void ColumnsEndChange() {
+  void ColumnsCountEndChange() {
     if (!IsColCntValid()) {
       qWarning("col count[bef:%d, aft:%d] invalid", m_befCol, m_aftCol);
       return;
     }
     if (m_befCol == m_aftCol) {
       if (m_aftCol > 0 && rowCount() > 0) {
-        emit dataChanged(index(0, 0), index(rowCount() - 1, m_aftCol - 1), {Qt::ItemDataRole::DisplayRole});
+        emit dataChanged(index(0, 0), index(rowCount() - 1, m_aftCol - 1), {Qt::ItemDataRole::DisplayRole | Qt::ItemDataRole::DecorationRole});
       }
     } else if (m_befCol < m_aftCol) {
       endInsertColumns();

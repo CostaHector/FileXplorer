@@ -46,9 +46,6 @@ SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent)  /
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
   BindMenu(m_menu);
-  //  BindMenu(g_performersManagerActions().GetRightClickMenu());
-  //  AppendVerticalHeaderMenuAGS(g_performersManagerActions().GetVerAGS());
-  //  AppendHorizontalHeaderMenuAGS(g_performersManagerActions().GetHorAGS());
   subscribe();
   InitTableView();
 
@@ -91,6 +88,7 @@ void SceneTableView::mouseMoveEvent(QMouseEvent* event) {
   const QPoint& pnt = event->pos();
   const QModelIndex& idx = indexAt(pnt);
   if (!idx.isValid()) {
+    m_fPrev->SaveSettings();
     m_fPrev->hide();
     return;
   }

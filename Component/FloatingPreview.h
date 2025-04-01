@@ -3,18 +3,18 @@
 
 #include <QWidget>
 #include <QPushButton>
-#include <QTableView>
+#include <QListView>
 #include <QVBoxLayout>
-#include "Tools/QAbstractTableModelPub.h"
+#include "Tools/QAbstractListModelPub.h"
 
-class ImgsModel : public QAbstractTableModelPub {
+class ImgsModel : public QAbstractListModelPub {
  public:
   explicit ImgsModel(QObject* object = nullptr)  //
-      : QAbstractTableModelPub{object} {}
-  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return 1; }
-  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return mImgsLst.size(); }
+      : QAbstractListModelPub{object} {}
+  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mImgsLst.size(); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   void UpdateImgs(const QStringList& newImgsLst);
+  QString filePath(const QModelIndex& index) const;
  private:
   QStringList mImgsLst;
 };
@@ -22,24 +22,26 @@ class ImgsModel : public QAbstractTableModelPub {
 class FloatingPreview: public QWidget {
  public:
   FloatingPreview(QWidget* parent=nullptr);
+  void ReadSettings();
+  void SaveSettings();
   static QPushButton* CreateBtn(const QString& tag, QWidget* parent);
 
   bool operator()(const QString& pth); // file system
   bool operator()(const QString& name, const QString& pth); // scene
   bool operator()(const QString& name, const QStringList& imgPthLst); // scene
-  QSize sizeHint() const { return QSize{1080, 480};}
   bool NeedUpdate(const QString& lastName) const;
 
   void subscribe();
 
  private:
   bool onImgBtnClicked(bool checked);
+  void on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
 
   QVBoxLayout* mVLo{nullptr};
   QPushButton* mImgBtn{nullptr};
   QPushButton* mVidsBtn{nullptr};
   QPushButton* mOthersBtn{nullptr};
-  QTableView* mImgTv{nullptr};
+  QListView* mImgTv{nullptr};
   ImgsModel* mImgModel{nullptr};
 
   QString mLastName;
