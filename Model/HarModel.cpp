@@ -38,7 +38,7 @@ int HarModel::SetHarFileAbsPath(const QString& harFileAbsPath) {
   HarFiles rhs;
   rhs(harFileAbsPath);
   int after = rhs.size();
-  RowsCountStartChange(before, after);
+  RowsCountBeginChange(before, after);
   mHarParser.swap(rhs);
   RowsCountEndChange();
   return after;
