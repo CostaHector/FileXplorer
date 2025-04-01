@@ -146,7 +146,7 @@ bool ScenesTableModel::setRootPath(const QString& rootPath, const bool bForce) {
     qDebug("Entry elements: %d->%d", mEntryList.size(), newEntryList.size());
   }
   qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
-  RowsCountStartChange(beforeRow, afterRow);
+  RowsCountBeginChange(beforeRow, afterRow);
 
   mEntryList.swap(newEntryList);
   mEntryListFiltered.swap(newFilteredList);
@@ -212,8 +212,8 @@ bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
   }
   qDebug("ChangeColumnsCnt. columnCnt: %d->%d, rowCnt: %d->%d", beforeColumnCnt, afterColumnCnt, beforeRowCnt, afterRowCnt);
 
-  ColumnsBeginChange(beforeColumnCnt, afterColumnCnt);
-  RowsCountStartChange(beforeRowCnt, afterRowCnt);
+  ColumnsCountBeginChange(beforeColumnCnt, afterColumnCnt);
+  RowsCountBeginChange(beforeRowCnt, afterRowCnt);
 
   mSCENES_CNT_COLUMN = newColumnCnt;
   mPageIndex = newPageIndex;
@@ -221,7 +221,7 @@ bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
   mCurEnd = lst.cbegin() + end;
 
   RowsCountEndChange();
-  ColumnsEndChange();
+  ColumnsCountEndChange();
 
   qDebug("============== ChangeColumnsCnt new dimension: %dx%d ==============", rowCount(), columnCount());
   return true;
@@ -267,8 +267,8 @@ bool ScenesTableModel::ChangeRowsCnt(int newRowCnt, int newPageIndex) {
   qDebug("Change to page %d", newPageIndex);
   qDebug("ChangeRowsCnt. columnCnt: %d->%d", beforeColumnCnt, afterColumnCnt);
   qDebug("ChangeRowsCnt. rowCnt: %d->%d", beforeRowCnt, afterRowCnt);
-  ColumnsBeginChange(beforeColumnCnt, afterColumnCnt);
-  RowsCountStartChange(beforeRowCnt, afterRowCnt);
+  ColumnsCountBeginChange(beforeColumnCnt, afterColumnCnt);
+  RowsCountBeginChange(beforeRowCnt, afterRowCnt);
 
   mSCENES_CNT_ROW = newRowCnt;
   mPageIndex = newPageIndex;
@@ -276,7 +276,7 @@ bool ScenesTableModel::ChangeRowsCnt(int newRowCnt, int newPageIndex) {
   mCurEnd = lst.cbegin() + end;
 
   RowsCountEndChange();
-  ColumnsEndChange();
+  ColumnsCountEndChange();
 
   qDebug("==============dimension: %dx%d==============", rowCount(), columnCount());
   return true;
@@ -290,8 +290,8 @@ bool ScenesTableModel::ShowAllScenesInOnePage() {
   const int beforeColumnCnt = columnCount();
   const int afterColumnCnt = mSCENES_CNT_COLUMN;
   qDebug("Display by page disable  (%d, %d)->(%d, %d)", beforeRowCnt, beforeColumnCnt, afterRowCnt, afterColumnCnt);
-  ColumnsBeginChange(beforeColumnCnt, afterColumnCnt);
-  RowsCountStartChange(beforeRowCnt, afterRowCnt);
+  ColumnsCountBeginChange(beforeColumnCnt, afterColumnCnt);
+  RowsCountBeginChange(beforeRowCnt, afterRowCnt);
 
   mSCENES_CNT_ROW = -1;
   mPageIndex = -1;
@@ -300,7 +300,7 @@ bool ScenesTableModel::ShowAllScenesInOnePage() {
   mCurEnd = lst.cend();
 
   RowsCountEndChange();
-  ColumnsEndChange();
+  ColumnsCountEndChange();
   return true;
 }
 
@@ -323,7 +323,7 @@ bool ScenesTableModel::SetPageIndex(int newPageIndex) {
   const int beforeRowCnt = rowCount();
   const int afterRowCnt = TOTAL_PAGE_IND / mSCENES_CNT_COLUMN + int(TOTAL_PAGE_IND % mSCENES_CNT_COLUMN != 0);
   qDebug("SetPageIndex, rowCnt:%d->%d", beforeRowCnt, afterRowCnt);
-  RowsCountStartChange(beforeRowCnt, afterRowCnt);
+  RowsCountBeginChange(beforeRowCnt, afterRowCnt);
 
   mPageIndex = newPageIndex;
   RowsCountEndChange();
@@ -350,7 +350,7 @@ void ScenesTableModel::setFilterRegularExpression(const QString& pattern) {
     const int newScenesCnt = newEnd - newBegin;
     const int beforeRow = rowCount();
     const int afterRow = newScenesCnt / mSCENES_CNT_COLUMN + int(newScenesCnt % mSCENES_CNT_COLUMN != 0);
-    RowsCountStartChange(beforeRow, afterRow);
+    RowsCountBeginChange(beforeRow, afterRow);
     mFilterEnable = false;
     mCurBegin = mEntryList.cbegin() + newBegin;
     mCurEnd = mEntryList.cbegin() + newEnd;
@@ -371,7 +371,7 @@ void ScenesTableModel::setFilterRegularExpression(const QString& pattern) {
 
   const int beforeRow = rowCount();
   const int afterRow = newScenesCnt / mSCENES_CNT_COLUMN + int(newScenesCnt % mSCENES_CNT_COLUMN != 0);
-  RowsCountStartChange(beforeRow, afterRow);
+  RowsCountBeginChange(beforeRow, afterRow);
   mEntryListFiltered.swap(newCurrentList);
   mFilterEnable = true;
   mCurBegin = mEntryListFiltered.cbegin() + newBegin;

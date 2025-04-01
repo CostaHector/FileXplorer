@@ -56,7 +56,7 @@ class ArchiverModel : public QAbstractTableModelPub {
     int afterRow = p_af != nullptr ? p_af->size() : 0;
     qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
 
-    RowsCountStartChange(beforeRow, afterRow);
+    RowsCountBeginChange(beforeRow, afterRow);
     m_paf = p_af;
     RowsCountEndChange();
   }
@@ -142,7 +142,7 @@ bool Archiver::operator()(const QString& qzPath) {
   decltype(m_af) temp{qzPath, ArchiveFiles::ONLY_IMAGE};
   int beforeRowCount = m_af.size();
   int afterRowCount = temp.size();
-  m_archiverModel->RowsCountStartChange(beforeRowCount, afterRowCount);
+  m_archiverModel->RowsCountBeginChange(beforeRowCount, afterRowCount);
   m_af.swap(temp);
   m_archiverModel->RowsCountEndChange();
   return true;
