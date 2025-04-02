@@ -1,7 +1,6 @@
 #ifndef RatingSqlTableModel_H
 #define RatingSqlTableModel_H
 
-#include <QPixmap>
 #include <QSqlTableModel>
 
 class RatingSqlTableModel : public QSqlTableModel {
