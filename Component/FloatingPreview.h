@@ -1,48 +1,63 @@
 #ifndef FLOATINGPREVIEW_H
 #define FLOATINGPREVIEW_H
 
-#include <QWidget>
+#include <QSplitter>
 #include <QPushButton>
-#include <QListView>
-#include <QVBoxLayout>
-#include "Tools/QAbstractListModelPub.h"
+#include "View/CustomListView.h"
+#include "Model/FloatingModels.h"
+#include <QAction>
+#include <QToolBar>
 
-class ImgsModel : public QAbstractListModelPub {
+class ItemView : public CustomListView {
  public:
-  explicit ImgsModel(QObject* object = nullptr)  //
-      : QAbstractListModelPub{object} {}
-  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mImgsLst.size(); }
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  void UpdateImgs(const QStringList& newImgsLst);
-  QString filePath(const QModelIndex& index) const;
+  explicit ItemView(const QString& itemViewName, QWidget* parent = nullptr);
+  void SetCurrentModel(FloatingModels* mdl) {
+    setModel(mdl);
+    mModels = mdl;
+  }
+  void subscribe();
+  void onCellDoubleClicked(const QModelIndex& clickedIndex) const;
+  void onOrientationChange(const QAction* pOrientation);
+
  private:
-  QStringList mImgsLst;
+  FloatingModels* mModels{nullptr};
+  QAction* _PLAY_ITEM{nullptr};
+  QAction *_ORIENTATION_LEFT_TO_RIGHT{nullptr}, *_ORIENTATION_TOP_TO_BOTTOM{nullptr};
+  QActionGroup* _ORIENTATION_GRP{nullptr};
+  QMenu* mItemMenu{nullptr};
 };
 
-class FloatingPreview: public QWidget {
+class FloatingPreview : public QSplitter {
  public:
-  FloatingPreview(QWidget* parent=nullptr);
+  FloatingPreview(QWidget* parent = nullptr);
   void ReadSettings();
   void SaveSettings();
   static QPushButton* CreateBtn(const QString& tag, QWidget* parent);
 
-  bool operator()(const QString& pth); // file system
-  bool operator()(const QString& name, const QString& pth); // scene
-  bool operator()(const QString& name, const QStringList& imgPthLst); // scene
-  bool NeedUpdate(const QString& lastName) const;
+  void operator()(const QString& pth);                                 // file system
+  void operator()(const QString& name, const QString& pth);            // scene
+  void UpdateImgs(const QString& name, const QStringList& imgPthLst);  // scene
+  void UpdateVids(const QStringList& dataLst);
+  void UpdateOthers(const QStringList& dataLst);
+
+  bool NeedUpdate(const QString& lastName) const { return mLastName.isEmpty() || mLastName != lastName; }
+  bool NeedUpdateImgs() const { return mImgTv != nullptr; }
+  bool NeedUpdateVids() const { return mVidTv != nullptr; }
+  bool NeedUpdateOthers() const { return mOthTv != nullptr; }
 
   void subscribe();
 
  private:
-  bool onImgBtnClicked(bool checked);
-  void on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
+  void onImgBtnClicked(bool checked);
+  void onVidBtnClicked(bool checked);
+  void onOthBtnClicked(bool checked);
 
-  QVBoxLayout* mVLo{nullptr};
-  QPushButton* mImgBtn{nullptr};
-  QPushButton* mVidsBtn{nullptr};
-  QPushButton* mOthersBtn{nullptr};
-  QListView* mImgTv{nullptr};
+  QAction* mImgBtn{nullptr}, *mVidsBtn{nullptr}, *mOthersBtn{nullptr};
+  QToolBar* mTypeToDisplayTB{nullptr};
   ImgsModel* mImgModel{nullptr};
+  VidsModel* mVidsModel{nullptr};
+  OthersModel* mOthModel{nullptr};
+  ItemView *mImgTv{nullptr}, *mVidTv{nullptr}, *mOthTv{nullptr};
 
   QString mLastName;
 };

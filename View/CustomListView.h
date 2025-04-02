@@ -15,9 +15,10 @@ class CustomListView : public QListView {
 
   void InitListView();
 
- private:
+ protected:
   QString m_name;
 
+ private:
   QMenu* m_menu = nullptr;
 
   inline bool isNameExists(const QString& name) const { return LISTS_SET.contains(name); }
