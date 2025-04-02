@@ -15,7 +15,7 @@
 #include "PublicVariable.h"
 #include "Tools/MD5Calculator.h"
 #include "Tools/PathTool.h"
-#include "Tools/QAbstractTableModelPub.h"
+#include "Model/QAbstractTableModelPub.h"
 #include "UndoRedo.h"
 #include "public/DisplayEnhancement.h"
 #include "qdesktopservices.h"

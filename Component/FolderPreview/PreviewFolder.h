@@ -6,7 +6,7 @@
 
 #include "PreviewBrowser.h"
 #include "PreviewLabels.h"
-#include "PreviewLists.h"
+#include "Component/FloatingPreview.h"
 
 class FolderPreviewSwitcher;
 
@@ -73,7 +73,7 @@ class PreviewFolder : public QStackedWidget {
   QString m_curPath;
   PreviewBrowser* m_browser{nullptr};
   PreviewLabels* m_labels{nullptr};
-  PreviewLists* m_lists{nullptr};
+  FloatingPreview* m_lists{nullptr};
 
   QTimer* m_nextFolderTimer = new QTimer{this};
 

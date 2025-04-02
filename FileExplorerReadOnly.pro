@@ -67,7 +67,6 @@ SOURCES += \
     Component/FolderPreview/PreviewFolder.cpp \
     Component/FolderPreview/PreviewBrowser.cpp \
     Component/FolderPreview/PreviewLabels.cpp \
-    Component/FolderPreview/PreviewLists.cpp \
     Component/PropertiesWindow.cpp \
     Component/QuickWhereClause.cpp \
     Component/RatingSqlTableModel.cpp \
@@ -86,6 +85,7 @@ SOURCES += \
     Model/ConflictsFileSystemModel.cpp \
     Model/DifferRootFileSystemModel.cpp \
     Model/DuplicateVideoModel.cpp \
+    Model/FloatingModels.cpp \
     Model/HarModel.cpp \
     Model/JsonModel.cpp \
     Model/PreferenceModel.cpp \
@@ -161,13 +161,6 @@ SOURCES += \
     UndoRedo.cpp \
     View/CustomTableView.cpp \
     FileExplorerEvent.cpp \
-    FolderPreviewComponent/FolderListView.cpp \
-    FolderPreviewComponent/ImagesFileSystemModel.cpp \
-    FolderPreviewComponent/ImagesListPreview.cpp \
-    FolderPreviewComponent/OtherItemFileSystemModel.cpp \
-    FolderPreviewComponent/OtherItemsListPreview.cpp \
-    FolderPreviewComponent/VideosFileSystemModel.cpp \
-    FolderPreviewComponent/VideosListPreview.cpp \
     MyQFileSystemModel.cpp \
     Component/NavigationAndAddressBar.cpp \
     Component/NavigationToolBar.cpp \
@@ -246,7 +239,6 @@ HEADERS += \
     Component/FolderPreview/PreviewBrowser.h \
     Component/FolderPreview/PreviewFolder.h \
     Component/FolderPreview/PreviewLabels.h \
-    Component/FolderPreview/PreviewLists.h \
     Component/PropertiesWindow.h \
     Component/QuickWhereClause.h \
     Component/RatingSqlTableModel.h \
@@ -264,11 +256,14 @@ HEADERS += \
     Model/ConflictsFileSystemModel.h \
     Model/DifferRootFileSystemModel.h \
     Model/DuplicateVideoModel.h \
+    Model/FloatingModels.h \
     Model/HarModel.h \
     Model/JsonModel.h \
     Model/PreferenceModel.h \
     Model/ScenesTableModel.h \
     Model/VidModel.h \
+    Model/QAbstractListModelPub.h \
+    Model/QAbstractTableModelPub.h \
     Tools/AIMediaDuplicate.h \
     Tools/ArchiveFiles.h \
     Tools/Classify/ItemsClassifier.h \
@@ -279,13 +274,11 @@ HEADERS += \
     Tools/FolderPreviewSwitcher.h \
     Tools/HarFiles.h \
     Tools/LogHandler.h \
-    Tools/QAbstractListModelPub.h \
     Tools/SearchTools.h \
     Tools/ThumbnailProcesser.h \
     Tools/MediaInfoDLL.h \
     Tools/NameSectionArrange.h \
     Tools/NameTool.h \
-    Tools/QAbstractTableModelPub.h \
     Tools/QMediaInfo.h \
     Tools/RenameHelper.h \
     Tools/RenameNamesUnique.h \
@@ -343,13 +336,6 @@ HEADERS += \
     View/CustomTableView.h \
     FileExplorerEvent.h \
     FileExplorerReadOnly.h \
-    FolderPreviewComponent/FolderListView.h \
-    FolderPreviewComponent/ImagesFileSystemModel.h \
-    FolderPreviewComponent/ImagesListPreview.h \
-    FolderPreviewComponent/OtherItemFileSystemModel.h \
-    FolderPreviewComponent/OtherItemsListPreview.h \
-    FolderPreviewComponent/VideosFileSystemModel.h \
-    FolderPreviewComponent/VideosListPreview.h \
     MyQFileSystemModel.h \
     Component/NavigationAndAddressBar.h \
     Component/NavigationToolBar.h \

@@ -1,7 +1,7 @@
 #include "Archiver.h"
 #include "PublicVariable.h"
 #include "Tools/ArchiveFiles.h"
-#include "Tools/QAbstractTableModelPub.h"
+#include "Model/QAbstractTableModelPub.h"
 #include "View/CustomTableView.h"
 #include "public/DisplayEnhancement.h"
 
