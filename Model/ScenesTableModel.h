@@ -1,7 +1,7 @@
 #ifndef SCENESTABLEMODEL_H
 #define SCENESTABLEMODEL_H
 
-#include "Tools/QAbstractTableModelPub.h"
+#include "Model/QAbstractTableModelPub.h"
 #include "Tools/SceneInfoManager.h"
 #include <utility>
 #include <QSet>
@@ -44,6 +44,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
   bool setRootPath(const QString& rootPath, const bool bForce = false);
   inline QString rootPath() const { return mRootPath; }
   QStringList GetImgs(const QModelIndex& index) const;
+  QStringList GetVids(const QModelIndex& index) const;
 
   bool ChangeRowsCnt(int newRowCnt, int newPageIndex);
   bool ChangeColumnsCnt(int newColumnCnt = 4, int newPageIndex = -1);

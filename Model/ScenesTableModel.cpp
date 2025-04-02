@@ -42,12 +42,12 @@ QVariant ScenesTableModel::data(const QModelIndex& index, int role) const {
       }
       break;
     }
-//    case Qt::ItemDataRole::ToolTipRole: {
-//      static const QString TOOLTIP_TEMPLATE = R"(<b>%1</b><br/>%2<br/>%3)";
-//      return TOOLTIP_TEMPLATE.arg(mCurBegin[linearInd].name,                                                 // name
-//                                  FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mCurBegin[linearInd].vidSize),  // size
-//                                  mCurBegin[linearInd].GetFirstKImagesLabel(mRootPath));                     // images
-//    }
+      //    case Qt::ItemDataRole::ToolTipRole: {
+      //      static const QString TOOLTIP_TEMPLATE = R"(<b>%1</b><br/>%2<br/>%3)";
+      //      return TOOLTIP_TEMPLATE.arg(mCurBegin[linearInd].name,                                                 // name
+      //                                  FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mCurBegin[linearInd].vidSize),  // size
+      //                                  mCurBegin[linearInd].GetFirstKImagesLabel(mRootPath));                     // images
+      //    }
     default:
       break;
   }
@@ -163,18 +163,30 @@ bool ScenesTableModel::setRootPath(const QString& rootPath, const bool bForce) {
   return true;
 }
 
-QStringList ScenesTableModel::GetImgs(const QModelIndex& index) const{
-  static QStringList EMPTY_IMGS_LIST;
+QStringList ScenesTableModel::GetImgs(const QModelIndex& index) const {
   const int linearInd = toLinearIndex(index);
   if (mCurBegin + linearInd >= mCurEnd) {
-    return EMPTY_IMGS_LIST;
+    return {};
   }
   QStringList imgs;
   imgs.reserve(mCurBegin[linearInd].imgs.size());
-  for (const QString& name: mCurBegin[linearInd].imgs) {
+  for (const QString& name : mCurBegin[linearInd].imgs) {
     imgs.append(mRootPath + mCurBegin[linearInd].rel2scn + name);
   }
   return imgs;
+}
+
+QStringList ScenesTableModel::GetVids(const QModelIndex& index) const {
+  const int linearInd = toLinearIndex(index);
+  if (mCurBegin + linearInd >= mCurEnd) {
+    return {};
+  }
+  QStringList vids;
+  vids.reserve(1);
+  //  for (const QString& name: mCurBegin[linearInd].imgs) {
+  vids.append(mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].vidName);
+  //  }
+  return vids;
 }
 
 bool ScenesTableModel::ChangeColumnsCnt(int newColumnCnt, int newPageIndex) {
