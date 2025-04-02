@@ -261,19 +261,6 @@
 <file alias="RECYCLE">RenameConflictIcons/RECYCLE.svg</file>
 <file alias="RESTORE">RenameConflictIcons/RESTORE.svg</file>
 
-<!--PerformersManager icon here-->
-<file alias="RATE0">PerformersManager/0.png</file>
-<file alias="RATE1">PerformersManager/1.png</file>
-<file alias="RATE2">PerformersManager/2.png</file>
-<file alias="RATE3">PerformersManager/3.png</file>
-<file alias="RATE4">PerformersManager/4.png</file>
-<file alias="RATE5">PerformersManager/5.png</file>
-<file alias="RATE6">PerformersManager/6.png</file>
-<file alias="RATE7">PerformersManager/7.png</file>
-<file alias="RATE8">PerformersManager/8.png</file>
-<file alias="RATE9">PerformersManager/9.png</file>
-<file alias="RATE10">PerformersManager/10.png</file>
-
 <!--AlertSystem icon here-->
 <file alias="ALERT">AlertSystem/ALERT.svg</file>
 <file alias="ALERT_ACTIVE">AlertSystem/ALERT_ACTIVE.svg</file>
