@@ -13,14 +13,16 @@ QPixmap GetRatePixmap(int r, bool hasBorder = false) {
   static constexpr int WIDTH = 100, HEIGHT = (int)(WIDTH * 0.618);
   QPixmap mp{WIDTH, HEIGHT};
   int originWith = WIDTH * r / 10;
-  mp.fill(QColor{0, 0, 0, 0});
+  static constexpr QColor OPAGUE{0, 0, 0, 0};
+  static constexpr QColor STD_ORANGE{255, 165, 0, 255};
+  mp.fill(OPAGUE); // opague
   QPainter painter{&mp};
-  painter.setPen(QColor{255, 165, 0, 255});
-  painter.setBrush(QColor{255, 165, 0, 255});
+  painter.setPen(STD_ORANGE); // standard orange
+  painter.setBrush(STD_ORANGE);
   painter.drawRect(0, 0, originWith, HEIGHT);
   if (hasBorder) {
-    painter.setPen(QColor{0, 0, 0, 255});
-    painter.setBrush(QColor{0, 0, 0, 0});
+    painter.setPen(QColor{0, 0, 0, 255}); // standard black
+    painter.setBrush(OPAGUE);
     painter.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
   }
   painter.end();
