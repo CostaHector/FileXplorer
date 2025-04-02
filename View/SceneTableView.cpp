@@ -85,6 +85,9 @@ void SceneTableView::setRootPath(const QString& rootPath) {
 }
 
 void SceneTableView::mouseMoveEvent(QMouseEvent* event) {
+  if (m_fPrev == nullptr) {
+    return;
+  }
   const QPoint& pnt = event->pos();
   const QModelIndex& idx = indexAt(pnt);
   if (!idx.isValid()) {
@@ -96,9 +99,16 @@ void SceneTableView::mouseMoveEvent(QMouseEvent* event) {
   if (!m_fPrev->NeedUpdate(name)) {
     return;
   }
-  const QStringList& imgs = _sceneModel->GetImgs(idx);
   m_fPrev->move(event->globalPos() + QPoint{20, 20});
-  (*m_fPrev)(name, imgs);
+  if (m_fPrev->NeedUpdateImgs()) {
+    m_fPrev->UpdateImgs(name, _sceneModel->GetImgs(idx));
+  }
+  if (m_fPrev->NeedUpdateVids()) {
+    m_fPrev->UpdateVids(_sceneModel->GetVids(idx));
+  }
+  if (m_fPrev->NeedUpdateOthers()) {
+    // todo:
+  }
   if (m_fPrev->isHidden()) {
     m_fPrev->show();
   }
