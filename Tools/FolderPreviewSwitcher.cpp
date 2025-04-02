@@ -14,7 +14,7 @@ void FolderPreviewSwitcher::onSwitchByViewType(const QString& viewType) {
   }
   if (viewType == g_folderPreviewActions().LISTS->text()) {
     if (_folderPreview->m_lists == nullptr) {
-      _folderPreview->m_lists = new PreviewLists{_parentDocker};
+      _folderPreview->m_lists = new FloatingPreview{_parentDocker};
       _folderPreview->AddView(viewType, _folderPreview->m_lists);
     }
     _folderPreview->m_lists->operator()(_folderPreview->GetCurPath());
