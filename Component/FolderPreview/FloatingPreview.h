@@ -1,31 +1,12 @@
 #ifndef FLOATINGPREVIEW_H
 #define FLOATINGPREVIEW_H
 
+#include "Model/FloatingModels.h"
+#include "View/ItemView.h"
 #include <QSplitter>
 #include <QPushButton>
-#include "View/CustomListView.h"
-#include "Model/FloatingModels.h"
 #include <QAction>
 #include <QToolBar>
-
-class ItemView : public CustomListView {
- public:
-  explicit ItemView(const QString& itemViewName, QWidget* parent = nullptr);
-  void SetCurrentModel(FloatingModels* mdl) {
-    setModel(mdl);
-    mModels = mdl;
-  }
-  void subscribe();
-  void onCellDoubleClicked(const QModelIndex& clickedIndex) const;
-  void onOrientationChange(const QAction* pOrientation);
-
- private:
-  FloatingModels* mModels{nullptr};
-  QAction* _PLAY_ITEM{nullptr};
-  QAction *_ORIENTATION_LEFT_TO_RIGHT{nullptr}, *_ORIENTATION_TOP_TO_BOTTOM{nullptr};
-  QActionGroup* _ORIENTATION_GRP{nullptr};
-  QMenu* mItemMenu{nullptr};
-};
 
 class FloatingPreview : public QSplitter {
  public:
@@ -40,7 +21,7 @@ class FloatingPreview : public QSplitter {
   void UpdateVids(const QStringList& dataLst);
   void UpdateOthers(const QStringList& dataLst);
 
-  bool NeedUpdate(const QString& lastName) const { return mLastName.isEmpty() || mLastName != lastName; }
+  bool NeedUpdate(const QString& lastName) const { return !lastName.isEmpty() && (mLastName.isEmpty() || mLastName != lastName); }
   bool NeedUpdateImgs() const { return mImgTv != nullptr; }
   bool NeedUpdateVids() const { return mVidTv != nullptr; }
   bool NeedUpdateOthers() const { return mOthTv != nullptr; }
@@ -52,7 +33,7 @@ class FloatingPreview : public QSplitter {
   void onVidBtnClicked(bool checked);
   void onOthBtnClicked(bool checked);
 
-  QAction* mImgBtn{nullptr}, *mVidsBtn{nullptr}, *mOthersBtn{nullptr};
+  QAction* _IMG_ENABLED{nullptr}, *_VID_ENABLED{nullptr}, *_OTH_ENABLED{nullptr};
   QToolBar* mTypeToDisplayTB{nullptr};
   ImgsModel* mImgModel{nullptr};
   VidsModel* mVidsModel{nullptr};
