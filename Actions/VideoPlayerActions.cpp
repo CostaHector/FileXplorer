@@ -1,5 +1,6 @@
 #include "VideoPlayerActions.h"
 #include "PublicVariable.h"
+#include "Component/SpacerWidget.h"
 
 VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
   _VOLUME_CTRL_MUTE->setCheckable(true);
@@ -85,9 +86,7 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
 
 QToolBar* VideoPlayerActions::GetPlayControlToolBar(QWidget* parent, QLabel* label) {
   auto* controlTB = new QToolBar("play control", parent);
-
-  auto* spacer = new QWidget;
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  auto* spacer = GetSpacerWidget();
 
   controlTB->addAction(g_videoPlayerActions()._LAST_VIDEO);
   controlTB->addAction(g_videoPlayerActions()._NEXT_VIDEO);

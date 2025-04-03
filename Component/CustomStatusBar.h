@@ -25,7 +25,7 @@ class CustomStatusBar : public QStatusBar {
       labelLst[1]->setText(QString("%1 selected |").arg(count));
     }
   }
-  auto msg(const QString& msg = "", const STATUS_STR_TYPE statusStrType = STATUS_STR_TYPE::NORMAL) -> void {
+  void msg(const QString& msg = "", const STATUS_STR_TYPE statusStrType = STATUS_STR_TYPE::NORMAL) {
     if (statusStrType == STATUS_STR_TYPE::ABNORMAL) {  // abnormal
       labelLst[2]->setStyleSheet("QLabel{color:red;font-weight:bold;}");
     } else {  // normal;

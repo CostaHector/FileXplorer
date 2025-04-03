@@ -26,7 +26,7 @@ void NavigationToolBar::InitFixedActions() {
   this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Documents"), QIcon(":img/FOLDER_OF_DOCUMENTS"), "Documents"));
   this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Downloads"), QIcon(":img/FOLDER_OF_DOWNLOADS"), "Downloads"));
   this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Pictures"), QIcon(":img/FOLDER_OF_PICTURES"), "Pictures"));
-  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Videos"), QIcon(":img/FOLDER_OF_VIDEOS"), "Videos"));
+  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "    Videos"), QIcon(":img/FOLDER_OF_VIDEOS"), "    Videos"));
   this->addAction(new ActionWithPath("", QIcon(":img/FOLDER_OF_FAVORITE"), "Starred"));
   this->addAction(new ActionWithPath("", QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer"));
 }

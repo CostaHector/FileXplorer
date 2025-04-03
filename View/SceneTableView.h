@@ -2,11 +2,12 @@
 #define SCENETABLEVIEW_H
 
 #include "View/CustomTableView.h"
-#include "Component/FloatingPreview.h"
+#include "Component/FolderPreview/FloatingPreview.h"
+#include <QMenu>
+
 class ScenesTableModel;
 class QStyledItemDelegate;
 class SceneActionsSubscribe;
-class QMenu;
 
 class SceneTableView : public CustomTableView {
  public:
