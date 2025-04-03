@@ -4,7 +4,7 @@
 #include "Tools/ThumbnailProcesser.h"
 #include "pub/EndToExposePrivateMember.h"
 
-QString rootpath = QFileInfo(__FILE__).absolutePath() + "/test/TestEnv_ThumbnailProcesserTest";
+const QString rootpath = QFileInfo(__FILE__).absolutePath() + "/test/TestEnv_ThumbnailProcesserTest";
 const QDir rootDir(rootpath);
 
 class ThumbnailProcesserTest : public QObject {
