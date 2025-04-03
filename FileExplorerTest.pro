@@ -1,46 +1,16 @@
-QT += testlib
-QT += gui
-QT += core
-QT += widgets
-QT += sql
+QT += testlib gui core sql
 CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
+
+SOURCES += $$files(TestCase/*.cpp)
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
     MainTestSuite.cpp \
-    TestCase/AIMediaDuplicateTest.cpp \
-    TestCase/ConflictSolveModelTest.cpp \
-    TestCase/ConflictsItemHelperTest.cpp \
-    TestCase/ConvertUnicodeCharsetToAsciiTest.cpp \
-    TestCase/DisplayEnhancementTest.cpp \
-    TestCase/ExtractPileItemsOutFolderTest.cpp \
-    TestCase/ItemsClassifierTest.cpp \
-    TestCase/JsonFileHelperTest.cpp \
-    TestCase/RenameHelperTest.cpp \
-    TestCase/SceneInfoManagerTest.cpp \
-    TestCase/ScenesMixedTest.cpp \
-    TestCase/ThumbnailProcessActions.cpp \
-    TestCase/pub/FileSystemHelper.cpp \
-    TestCase/FolderNxtAndLastIteratorTest.cpp \
-    TestCase/LongPathFinderTest.cpp \
-    TestCase/MD5CalculatorTest.cpp \
-    TestCase/NameSectionArrangeTest.cpp \
-    TestCase/NameToolTest.cpp \
-    TestCase/PathToolTest.cpp \
-    TestCase/RedundantItemsRemoverTest.cpp \
-    TestCase/RenameUnqiueCheckTest.cpp \
-    TestCase/SceneViewTest.cpp \
-    TestCase/SyncModifiyFileSystemTest.cpp \
-    TestCase/ToConsecutiveFileNameNoTest.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
     Component/SyncModifiyFileSystem.cpp \
-    TestCase/ValueCheckerTest.cpp \
-    TestCase/FinderTest.cpp \
-    TestCase/VideosDurationGetterTest.cpp \
-    TestCase/pub/MyTestSuite.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/ThumbnailProcesser.cpp \
     Tools/ItemsPileCategory.cpp \
@@ -62,15 +32,6 @@ SOURCES += \
     FileOperation/FileOperatorPub.cpp \
     PublicTool.cpp \
     PublicVariable.cpp \
-    TestCase/DuplicateImagesRemoverTest.cpp \
-    TestCase/FilesNameBatchStandardizerTest.cpp \
-    TestCase/MovieNameStandardizerTest.cpp \
-    TestCase/PerformersStringParserTest.cpp \
-    TestCase/ProductionStudioManagerTest.cpp \
-    TestCase/QStringFunctionTest.cpp \
-    TestCase/QuickWhereClauseTest.cpp \
-    TestCase/FileOperationTest.cpp \
-    TestCase/UndoRedoTest.cpp \
     Tools/PerformersAkaManager.cpp \
     Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
@@ -89,15 +50,12 @@ SOURCES += \
     UndoRedo.cpp
 
 
+HEADERS += $$files(TestCase/pub/*.h)
+
 HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Component/RenameWidgets/AdvanceRenamer.h \
-    TestCase/pub/FileSystemHelper.h \
-    TestCase/pub/BeginToExposePrivateMember.h \
-    TestCase/pub/EndToExposePrivateMember.h \
-    TestCase/pub/FileSystemRelatedTest.h \
-    TestCase/pub/MyTestSuite.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/ThumbnailProcesser.h \
     Tools/ItemsPileCategory.h \
