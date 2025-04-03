@@ -6,7 +6,7 @@
 
 #include "PreviewBrowser.h"
 #include "PreviewLabels.h"
-#include "Component/FloatingPreview.h"
+#include "FloatingPreview.h"
 
 class FolderPreviewSwitcher;
 

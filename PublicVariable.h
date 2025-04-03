@@ -165,7 +165,7 @@ const KV PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./", ValueChe
 const KV KEEP_VIDEOS_PLAYLIST_SHOW{"KEEP_VIDEOS_PLAYLIST_SHOW", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL}};
 const KV AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
-const KV FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels", ValueChecker{{"labels", "browser", "lists"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING}};
+const KV FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels", ValueChecker{{"3-lists", "browser", "lists"}, ValueChecker::VALUE_TYPE::CANDIDATE_STRING}};
 
 const KV SHOW_QUICK_NAVIGATION_TOOL_BAR("SHOW_QUICK_NAVIGATION_TOOL_BAR", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
 const KV SHOW_FRAMELESS_WINDOW("SHOW_FRAMELESS_WINDOW", true, ValueChecker{ValueChecker::VALUE_TYPE::PLAIN_BOOL});
@@ -250,7 +250,7 @@ const QString documentPath = QDir(QDir::homePath()).absoluteFilePath("Documents"
 const QString downloadPath = QDir(QDir::homePath()).absoluteFilePath("Downloads");
 const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
 const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
-const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("Videos");
+const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("    Videos");
 const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
 const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/VIDS_DATABASE.db");
 const QString AI_MEDIA_DUP_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/DUPLICATES_DB.db");

@@ -1,9 +1,10 @@
 #include "FloatingModels.h"
-#include "PublicVariable.h"
 #include "Tools/PathTool.h"
 #include <QPixmap>
 #include <QFileIconProvider>
 #include <QDir>
+
+constexpr int FloatingModels::BATCH_LOAD_COUNT;
 
 QVariant FloatingModels::data(const QModelIndex& index, int role) const {
   const int rw = index.row();
@@ -16,11 +17,12 @@ QVariant FloatingModels::data(const QModelIndex& index, int role) const {
   return {};
 }
 
-void FloatingModels::UpdateData(const QStringList& newDataLst) {  // dont use newImgsLst after
+int FloatingModels::UpdateData(const QStringList& newDataLst) {  // dont use newImgsLst after
   RowsCountBeginChange(mDataLst.size(), newDataLst.size());
   mDataLst = newDataLst;
   m_curLoadedCount = mDataLst.size();
   RowsCountEndChange();
+  return mDataLst.size();
 }
 
 QString FloatingModels::filePath(const QModelIndex& index) const {
@@ -30,9 +32,49 @@ QString FloatingModels::filePath(const QModelIndex& index) const {
   }
   return mDataLst[rw];
 }
+
+int FloatingModels::setDirPath(const QString& path, const QStringList& sFilters, bool loadAllIn1Time) {
+  QStringList datas;
+  QDir dir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
+  dir.setNameFilters(sFilters);
+  foreach (QString name, dir.entryList()) {
+    datas.append(path + '/' + name);
+  }
+  if (loadAllIn1Time) {
+    UpdateData(datas);
+  } else {
+    beginResetModel();
+    mDataLst.swap(datas);
+    m_curLoadedCount = 0;
+    endResetModel();
+  }
+  return mDataLst.size();
+}
+
+bool FloatingModels::canFetchMore(const QModelIndex& parent) const {
+  if (parent.isValid()) {
+    return false;
+  }
+  return m_curLoadedCount < mDataLst.size();
+}
+
+void FloatingModels::fetchMore(const QModelIndex& parent) {
+  if (parent.isValid()) {
+    return;
+  }
+  const int remainder = mDataLst.size() - m_curLoadedCount;
+  const int fetchCntThisTime = qMin(BATCH_LOAD_COUNT, remainder);
+  if (fetchCntThisTime <= 0) {
+    return;
+  }
+  beginInsertRows(QModelIndex(), m_curLoadedCount, m_curLoadedCount + fetchCntThisTime - 1);
+  m_curLoadedCount += fetchCntThisTime;
+  endInsertRows();
+}
+
+
 // ------------------
 
-constexpr int ImgsModel::BATCH_LOAD_COUNT;
 QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   const int rw = index.row();
   if (isOuterBound(rw)) {
@@ -49,39 +91,8 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   return {};
 }
 
-void ImgsModel::setDirPath(const QString& path) {
-  beginResetModel();
-  mDataLst.clear();
-  QDir dir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
-  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
-  for (const QString& name : dir.entryList()) {
-    mDataLst.append(path + '/' + name);
-  }
-  m_curLoadedCount = 0;
-  endResetModel();
-}
-
-bool ImgsModel::canFetchMore(const QModelIndex& parent) const {
-  if (parent.isValid()) {
-    return false;
-  }
-  return m_curLoadedCount < mDataLst.size();
-}
-
-void ImgsModel::fetchMore(const QModelIndex& parent) {
-  if (parent.isValid()) {
-    return;
-  }
-  const int remainder = mDataLst.size() - m_curLoadedCount;
-  const int fetchCntThisTime = qMin(BATCH_LOAD_COUNT, remainder);
-  if (fetchCntThisTime <= 0) {
-    return;
-  }
-  beginInsertRows(QModelIndex(), m_curLoadedCount, m_curLoadedCount + fetchCntThisTime - 1);
-  m_curLoadedCount += fetchCntThisTime;
-  endInsertRows();
-}
 // ----------------
+
 QVariant VidsModel::data(const QModelIndex& index, int role) const {
   const int rw = index.row();
   if (isOuterBound(rw)) {
