@@ -5,7 +5,7 @@
 #include <QTime>
 #include <iostream>
 #include <string>
-#include "MediaInfoDLL.h"
+#include "lib/MediaInfoDLL.h"
 
 
 #ifdef _WIN32
