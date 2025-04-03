@@ -7,13 +7,14 @@
 #include <QPushButton>
 #include <QAction>
 #include <QToolBar>
+#include <QLineEdit>
 
 class FloatingPreview : public QSplitter {
  public:
   FloatingPreview(QWidget* parent = nullptr);
   void ReadSettings();
   void SaveSettings();
-  static QPushButton* CreateBtn(const QString& tag, QWidget* parent);
+  void SaveState();
 
   void operator()(const QString& pth);                                 // file system
   void operator()(const QString& name, const QString& pth);            // scene
@@ -33,8 +34,10 @@ class FloatingPreview : public QSplitter {
   void onVidBtnClicked(bool checked);
   void onOthBtnClicked(bool checked);
 
-  QAction* _IMG_ENABLED{nullptr}, *_VID_ENABLED{nullptr}, *_OTH_ENABLED{nullptr};
+  QAction *_IMG_ENABLED{nullptr}, *_VID_ENABLED{nullptr}, *_OTH_ENABLED{nullptr};
+  QLineEdit *mImageWidth{nullptr}, *mImageHeight{nullptr};
   QToolBar* mTypeToDisplayTB{nullptr};
+
   ImgsModel* mImgModel{nullptr};
   VidsModel* mVidsModel{nullptr};
   OthersModel* mOthModel{nullptr};
