@@ -20,7 +20,7 @@
 
 using namespace ViewTypeTool;
 ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
-  : QStackedWidget(parent), m_fsModel(new MyQFileSystemModel(this)), _previewFolder{previewFolder}, _logger(nullptr), m_parent(parent) {
+    : QStackedWidget(parent), m_fsModel(new MyQFileSystemModel(this)), _previewFolder{previewFolder}, _logger(nullptr), m_parent(parent) {
   layout()->setContentsMargins(0, 0, 0, 0);
   layout()->setSpacing(0);
   subscribe();
@@ -124,8 +124,7 @@ void ContentPanel::BindNavigationAddressBar(NavigationAndAddressBar* addressBar)
     return;
   }
   _addressBar = addressBar;
-  connect(_addressBar->m_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed,
-          this, [this](const QString& newPath) { onAddressToolbarPathChanged(newPath, true); });
+  connect(_addressBar->m_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed, this, [this](const QString& newPath) { onAddressToolbarPathChanged(newPath, true); });
 }
 
 void ContentPanel::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar) {
@@ -229,9 +228,9 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, con
   }
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
   if (selectCnt == 1 && firstFileInfo.isFile()) {
-    if (_logger) _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(firstFileInfo.size()));
-  } else {
-    if (_logger) _logger->msg("size: unknown");
+    if (_logger) {
+      _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(firstFileInfo.size()));
+    }
   }
 
   QString pth = m_fsModel->rootPath();
@@ -296,7 +295,7 @@ auto ContentPanel::keyPressEvent(QKeyEvent* e) -> void {
           return;
         }
         case Qt::Key_Enter:
-        case Qt::Key_Return:{ // enter or return
+        case Qt::Key_Return: {  // enter or return
           on_cellDoubleClicked(GetCurView()->currentIndex());
           return;
         }
