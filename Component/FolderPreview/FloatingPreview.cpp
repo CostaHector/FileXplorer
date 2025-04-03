@@ -17,12 +17,28 @@ FloatingPreview::FloatingPreview(QWidget* parent) : QSplitter{parent} {
   _VID_ENABLED->setCheckable(true);
   _OTH_ENABLED->setCheckable(true);
 
+  const int width = PreferenceSettings().value("FLOATING_WINDOW_IMG_WIDTH", 480).toInt();
+  const int height = PreferenceSettings().value("FLOATING_WINDOW_IMG_HEIGHT", 280).toInt();
+
+  ImgsModel::IMG_WIDTH = width;
+  ImgsModel::IMG_HEIGHT = height;
+
+  mImageWidth = new QLineEdit{QString::number(width), this};
+  mImageHeight = new QLineEdit{QString::number(height), this};
+  mImageWidth->setToolTip("Image width pixel");
+  mImageHeight->setToolTip("Image height pixel");
+
   mTypeToDisplayTB = new QToolBar{"Type To Display", this};
   mTypeToDisplayTB->addAction(_IMG_ENABLED);
   mTypeToDisplayTB->addSeparator();
   mTypeToDisplayTB->addAction(_VID_ENABLED);
   mTypeToDisplayTB->addSeparator();
   mTypeToDisplayTB->addAction(_OTH_ENABLED);
+  mTypeToDisplayTB->addSeparator();
+  mTypeToDisplayTB->addWidget(mImageWidth);
+  mTypeToDisplayTB->addSeparator();
+  mTypeToDisplayTB->addWidget(mImageHeight);
+
   mTypeToDisplayTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mTypeToDisplayTB->setMaximumHeight(35);
   addWidget(mTypeToDisplayTB);
@@ -44,6 +60,7 @@ FloatingPreview::FloatingPreview(QWidget* parent) : QSplitter{parent} {
 void FloatingPreview::ReadSettings() {
   if (PreferenceSettings().contains("FLOATING_PREVIEW_GEOMETRY")) {
     restoreGeometry(PreferenceSettings().value("FLOATING_PREVIEW_GEOMETRY").toByteArray());
+    restoreState(PreferenceSettings().value("FLOATING_PREVIEW_STATE").toByteArray());
   } else {
     setGeometry(QRect(0, 0, 480, 1080));
   }
@@ -51,6 +68,10 @@ void FloatingPreview::ReadSettings() {
 
 void FloatingPreview::SaveSettings() {
   PreferenceSettings().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
+}
+
+void FloatingPreview::SaveState() {
+  PreferenceSettings().setValue("FLOATING_PREVIEW_STATE", saveState());
 }
 
 void FloatingPreview::operator()(const QString& pth) {  // file system
@@ -142,6 +163,29 @@ void FloatingPreview::subscribe() {
   connect(_IMG_ENABLED, &QAction::triggered, this, &FloatingPreview::onImgBtnClicked);
   connect(_VID_ENABLED, &QAction::triggered, this, &FloatingPreview::onVidBtnClicked);
   connect(_OTH_ENABLED, &QAction::triggered, this, &FloatingPreview::onOthBtnClicked);
+
+  connect(mImageWidth, &QLineEdit::returnPressed, this, [this]() {
+    const QString& s = mImageWidth->text();
+    bool isOk = false;
+    int w = s.toInt(&isOk);
+    if (!isOk) {
+      return;
+    }
+    ImgsModel::IMG_WIDTH = w;
+    PreferenceSettings().setValue("FLOATING_WINDOW_IMG_WIDTH", w);
+  });
+  connect(mImageHeight, &QLineEdit::returnPressed, this, [this]() {
+    const QString& s = mImageHeight->text();
+    bool isOk = false;
+    int h = s.toInt(&isOk);
+    if (!isOk) {
+      return;
+    }
+    ImgsModel::IMG_HEIGHT = h;
+    PreferenceSettings().setValue("FLOATING_WINDOW_IMG_HEIGHT", h);
+  });
+
+  connect(this, &QSplitter::splitterMoved, this, &FloatingPreview::SaveState);
 }
 
 void FloatingPreview::onImgBtnClicked(bool checked) {
