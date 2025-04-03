@@ -72,21 +72,26 @@ void FloatingModels::fetchMore(const QModelIndex& parent) {
   endInsertRows();
 }
 
-
 // ------------------
+int ImgsModel::IMG_WIDTH = 480;
+int ImgsModel::IMG_HEIGHT = 280;
 
 QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   const int rw = index.row();
   if (isOuterBound(rw)) {
     return {};
   }
-  if (role == Qt::DecorationRole) {
-    const QPixmap pm{mDataLst[rw]};
-    // w/h > 480/280 = 48 / 28 = 12 / 7
-    if (pm.width() * 7 >= pm.height() * 12) {
-      return pm.scaledToWidth(480);
+  if (role == Qt::DecorationRole) {  // default image height = 280
+    QPixmap pm;
+    if (!mPixCache.find(mDataLst[rw], &pm)) {
+      pm = QPixmap{mDataLst[rw]};
+      mPixCache.insert(mDataLst[rw], pm);
     }
-    return pm.scaledToHeight(280);
+    // w/h > 480/280 = 48 / 28 = 12 / 7
+    if (pm.width() * IMG_HEIGHT >= pm.height() * IMG_WIDTH) {
+      return pm.scaledToWidth(IMG_WIDTH);
+    }
+    return pm.scaledToHeight(IMG_HEIGHT);
   }
   return {};
 }
