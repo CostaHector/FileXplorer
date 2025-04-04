@@ -96,7 +96,6 @@ void SceneListView::setRootPath(const QString& rootPath) {
 }
 
 void SceneListView::mouseMoveEvent(QMouseEvent* event) {
-  return;
   if (m_fPrev == nullptr) {
     return;
   }
