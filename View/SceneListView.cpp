@@ -1,4 +1,5 @@
 #include "SceneListView.h"
+#include "Actions/ViewActions.h"
 #include "Model/ScenesListModel.h"
 #include "Tools/PlayVideo.h"
 #include <QStyledItemDelegate>
@@ -60,7 +61,8 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   m_menu->addActions(_ORIENTATION_GRP->actions());
   BindMenu(m_menu);
   subscribe();
-  setMouseTracking(true);
+
+  setMouseTracking(g_viewActions()._FLOATING_PREVIEW->isChecked());
 }
 
 void SceneListView::onCopyBaseName() {
@@ -81,6 +83,7 @@ void SceneListView::onOpenCorrespondingFolder() {
 void SceneListView::subscribe() {
   connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneListView::onCopyBaseName);
   connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
+  connect(g_viewActions()._FLOATING_PREVIEW, &QAction::triggered, this, &SceneListView::setMouseTracking);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {

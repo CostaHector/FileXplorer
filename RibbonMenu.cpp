@@ -367,6 +367,8 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addWidget(ag.mEnablePageTB);
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mImageSizeTB);
+  sceneTB->addSeparator();
+  sceneTB->addAction(g_viewActions()._FLOATING_PREVIEW);
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }
