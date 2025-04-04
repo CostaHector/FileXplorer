@@ -4,32 +4,28 @@
 #include <QObject>
 #include <QAction>
 #include <QLineEdit>
-#include <QTableView>
+#include <QListView>
 
-#include "Model/ScenesTableModel.h"
+#include "Model/ScenesListModel.h"
 
 class SceneActionsSubscribe : public QObject {
  public:
   explicit SceneActionsSubscribe(QObject* parent = nullptr) : QObject{parent} {};
-  bool BindWidget(QTableView* tableView, ScenesTableModel* model);
+  bool BindWidget(QListView* tableView, ScenesListModel* model);
   bool operator()();
 
   bool PageIndexIncDec(const QAction* pageAct);
-
   void SetScenesGroupByPage(bool groupByPageAction);
 
   void SetPageIndex();
-
   bool SetScenesPerColumn();
-
-  bool SetScenesPerRow();
 
   void SortSceneItems();
 
   void CombineMediaInfoIntoJson();
   void UpdateScnFilesOnly();
  private:
-  ScenesTableModel* _model{nullptr};
-  QTableView* _tableView{nullptr};
+  ScenesListModel* _model{nullptr};
+  QListView* _tableView{nullptr};
 };
 #endif  // SCENEACTIONSSUBSCRIBE_H

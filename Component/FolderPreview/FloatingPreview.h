@@ -35,7 +35,6 @@ class FloatingPreview : public QSplitter {
   void onOthBtnClicked(bool checked);
 
   QAction *_IMG_ENABLED{nullptr}, *_VID_ENABLED{nullptr}, *_OTH_ENABLED{nullptr};
-  QLineEdit *mImageWidth{nullptr}, *mImageHeight{nullptr};
   QToolBar* mTypeToDisplayTB{nullptr};
 
   ImgsModel* mImgModel{nullptr};

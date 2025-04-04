@@ -1,5 +1,5 @@
 #include "ContentPanel.h"
-#include "Model/ScenesTableModel.h"
+#include "Model/ScenesListModel.h"
 
 using namespace ViewTypeTool;
 /*

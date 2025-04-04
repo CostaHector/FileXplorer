@@ -12,13 +12,10 @@ class ItemView : public CustomListView {
   }
   void subscribe();
   void onCellDoubleClicked(const QModelIndex& clickedIndex) const;
-  void onOrientationChange(const QAction* pOrientation);
 
  private:
   FloatingModels* mModels{nullptr};
   QAction* _PLAY_ITEM{nullptr};
-  QAction *_ORIENTATION_LEFT_TO_RIGHT{nullptr}, *_ORIENTATION_TOP_TO_BOTTOM{nullptr};
-  QActionGroup* _ORIENTATION_GRP{nullptr};
   QMenu* mItemMenu{nullptr};
 };
 
