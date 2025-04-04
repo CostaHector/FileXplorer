@@ -14,7 +14,7 @@ class ViewActions : public QObject {
   QActionGroup* GetPlayersActions();
 
   QActionGroup* GetViewsAG();
-  QAction *_ADVANCE_SEARCH_VIEW, *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW, *_SCENE_VIEW;
+  QAction *_ADVANCE_SEARCH_VIEW, *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW, *_SCENE_VIEW, *_FLOATING_PREVIEW;
   QActionGroup* _VIEWS_AG;
 
   QAction* NAVIGATION_PANE;
