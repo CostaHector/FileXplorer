@@ -16,7 +16,7 @@ class ScenesListModel : public QAbstractListModelPub {
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-  inline bool isIndexValid(const QModelIndex& index, int linearInd) const {
+  inline bool isIndexValid(const QModelIndex& index, int& linearInd) const {
     if (!index.isValid()) {
       return false;
     }
