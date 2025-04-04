@@ -5,12 +5,16 @@ DataBaseActions& g_dbAct() {
   return ins;
 }
 
-DataBaseActions::DataBaseActions(QObject* parent)
-    : QObject{parent},
-      DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),
-      DB_FUNCTIONS(Get_DB_FUNCTIONS_Action()),
+DataBaseActions::DataBaseActions(QObject* parent)    //
+    : QObject{parent},                               //
+      DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),  //
       DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()) {
   QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
+  _COUNT = new QAction(QIcon(":img/COUNTER"), tr("COUNT"), this);
+  _COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
+
+  _SUM = new QAction(QIcon(":img/SUM"), tr("SUM"), this);
+  _SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
 }
 
 QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
@@ -42,24 +46,6 @@ QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
     act->setCheckable(false);
   }
   return databaseControlAG;
-}
-
-QActionGroup* DataBaseActions::Get_DB_FUNCTIONS_Action() {
-  QAction* COUNT = new QAction(QIcon(":img/COUNTER"), tr("COUNT"), this);
-  COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
-
-  QAction* SUM = new QAction(QIcon(":img/SUM"), tr("SUM"), this);
-  SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
-
-  QActionGroup* databaseFunctionsAG = new QActionGroup(this);
-  databaseFunctionsAG->addAction(COUNT);
-  databaseFunctionsAG->addAction(SUM);
-  databaseFunctionsAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  for (QAction* act : databaseFunctionsAG->actions()) {
-    act->setCheckable(false);
-  }
-  return databaseFunctionsAG;
 }
 
 QActionGroup* DataBaseActions::Get_DB_RIGHT_CLICK_MENU_AG() {

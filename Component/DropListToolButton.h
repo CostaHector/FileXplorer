@@ -12,7 +12,7 @@ class DropdownToolButton : public QToolButton {
   DropdownToolButton(QList<QAction*> dropdownActions,
                      QToolButton::ToolButtonPopupMode popupMode = QToolButton::ToolButtonPopupMode::InstantPopup,
                      const Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
-                     const int iconSize = TABS_ICON_IN_MENU_1x1,
+                     const int iconSize = IMAGE_SIZE::TABS_ICON_IN_MENU_1x1,
                      QWidget* parent = nullptr);
   void SetCaption(const QIcon& icon = {}, const QString& text = "", const QString& tooltip = "");
   void MemorizeCurrentAction(const QString& memoryKey);

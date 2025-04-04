@@ -14,7 +14,7 @@
 #include "View/FileSystemTableView.h"
 #include "View/FileSystemTreeView.h"
 #include "View/MovieDBView.h"
-#include "View/SceneTableView.h"
+#include "View/SceneListView.h"
 
 #include "Tools/ViewTypeTool.h"
 
@@ -117,14 +117,14 @@ class ContentPanel : public QStackedWidget {
   MyQSqlTableModel* m_dbModel{nullptr};
   AdvanceSearchModel* m_searchSrcModel{nullptr};
   SearchProxyModel* m_proxyModel{nullptr};
-  ScenesTableModel* m_scenesModel{nullptr};
+  ScenesListModel* m_scenesModel{nullptr};
 
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
   MovieDBView* m_movieView{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
-  SceneTableView* m_sceneTableView{nullptr};
+  SceneListView* m_sceneTableView{nullptr};
 
   PreviewFolder* _previewFolder;
 

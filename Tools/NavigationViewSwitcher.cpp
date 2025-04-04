@@ -1,8 +1,8 @@
 #include "NavigationViewSwitcher.h"
 #include "Component/NotificatorFrame.h"
 #include "View/SceneActionsSubscribe.h"
-#include "View/SceneTableView.h"
-#include "Model/ScenesTableModel.h"
+#include "View/SceneListView.h"
+#include "Model/ScenesListModel.h"
 #include "PublicTool.h"
 #include "Tools/ActionWithPath.h"
 #include "Tools/ViewTypeTool.h"
@@ -164,8 +164,8 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::SCENE: {
       if (_view->m_sceneTableView == nullptr) {
-        _view->m_scenesModel = new ScenesTableModel;
-        _view->m_sceneTableView = new SceneTableView(_view->m_scenesModel, _view);
+        _view->m_scenesModel = new ScenesListModel;
+        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view);
         ContentPanel::connect(_view->m_sceneTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_sceneTableView);
         auto* sceneSub = new (std::nothrow) SceneActionsSubscribe{_view->m_sceneTableView};

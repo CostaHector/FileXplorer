@@ -5,7 +5,7 @@
 #include "Tools/ArchiveFiles.h"
 #include "Tools/HarFiles.h"
 #include "public/DisplayEnhancement.h"
-#include "Model/ScenesTableModel.h"
+#include "Model/ScenesListModel.h"
 
 #include <QLineEdit>
 #include <QTableView>

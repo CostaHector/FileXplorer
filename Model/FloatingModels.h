@@ -29,7 +29,6 @@ class FloatingModels : public QAbstractListModelPub {
 class ImgsModel : public FloatingModels {
  public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  static int IMG_WIDTH, IMG_HEIGHT;
 
  private:
   QPixmapCache mPixCache;

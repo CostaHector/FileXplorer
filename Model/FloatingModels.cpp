@@ -1,5 +1,6 @@
 #include "FloatingModels.h"
 #include "Tools/PathTool.h"
+#include "PublicVariable.h"
 #include <QPixmap>
 #include <QFileIconProvider>
 #include <QDir>
@@ -73,9 +74,6 @@ void FloatingModels::fetchMore(const QModelIndex& parent) {
 }
 
 // ------------------
-int ImgsModel::IMG_WIDTH = 480;
-int ImgsModel::IMG_HEIGHT = 280;
-
 QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   const int rw = index.row();
   if (isOuterBound(rw)) {
@@ -83,15 +81,18 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   }
   if (role == Qt::DecorationRole) {  // default image height = 280
     QPixmap pm;
-    if (!mPixCache.find(mDataLst[rw], &pm)) {
-      pm = QPixmap{mDataLst[rw]};
-      mPixCache.insert(mDataLst[rw], pm);
+    if (mPixCache.find(mDataLst[rw], &pm)) {
+      return pm;
     }
+    pm = QPixmap{mDataLst[rw]};
     // w/h > 480/280 = 48 / 28 = 12 / 7
-    if (pm.width() * IMG_HEIGHT >= pm.height() * IMG_WIDTH) {
-      return pm.scaledToWidth(IMG_WIDTH);
+    if (pm.width() * IMAGE_SIZE::IMG_HEIGHT >= pm.height() * IMAGE_SIZE::IMG_WIDTH) {
+      pm = pm.scaledToWidth(IMAGE_SIZE::IMG_WIDTH);
+    } else {
+      pm = pm.scaledToHeight(IMAGE_SIZE::IMG_HEIGHT);
     }
-    return pm.scaledToHeight(IMG_HEIGHT);
+    mPixCache.insert(mDataLst[rw], pm);
+    return pm;
   }
   return {};
 }
