@@ -12,8 +12,9 @@ ViewActions::ViewActions(QObject* parent)
       _MOVIE_VIEW{new QAction(QIcon(":img/SHOW_DATABASE"), "movie")},
       _LIST_VIEW{new QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), "list")},
       _TABLE_VIEW{new QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), "table")},
-      _TREE_VIEW{new QAction(QIcon(":img/DISPLAY_ACHITECTURE"), "tree")},
+      _TREE_VIEW{new QAction(QIcon(":img/DISPLAY_TREE_VIEW"), "tree")},
       _SCENE_VIEW{new QAction(QIcon(":img/SCENE_TABLE_VIEW"), "scene")},
+      _FLOATING_PREVIEW{new QAction(QIcon(":img/FLOATING_PREVIEW"), "floating preview")},
       _VIEWS_AG{GetViewsAG()},
 
       NAVIGATION_PANE{new QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"))},
@@ -87,6 +88,7 @@ QActionGroup* ViewActions::GetViewsAG() {
   _TREE_VIEW->setToolTip(QString("Display files and folders achitecures. (%1)").arg(_TREE_VIEW->shortcut().toString()));
   _TREE_VIEW->setCheckable(true);
 
+  _MOVIE_VIEW->setToolTip(QString("Movie dictionary view aka Database view. (%1)").arg(_MOVIE_VIEW->shortcut().toString()));
   _MOVIE_VIEW->setCheckable(true);
 
   _ADVANCE_SEARCH_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_F));
@@ -98,6 +100,10 @@ QActionGroup* ViewActions::GetViewsAG() {
   _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
   _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
   _SCENE_VIEW->setCheckable(true);
+
+  _FLOATING_PREVIEW->setToolTip(QString("Show floating preview for a scene in scene view. (%1)").arg(_FLOATING_PREVIEW->shortcut().toString()));
+  _FLOATING_PREVIEW->setCheckable(true);
+  _FLOATING_PREVIEW->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool());
 
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->addAction(_LIST_VIEW);
