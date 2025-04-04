@@ -233,8 +233,10 @@
 <file alias="DEFAULT_ROW_HEIGHT">View/DEFAULT_ROW_HEIGHT.svg</file>
 <file alias="RESIZE_COLUMN_TO_CONTENTS">View/RESIZE_COLUMN_TO_CONTENTS.svg</file>
 <file alias="RESIZE_ROW_TO_CONTENTS">View/RESIZE_ROW_TO_CONTENTS.svg</file>
-<file alias="HAR_VIEW">View/HAR_VIEW.svg</file>
-
+<file alias="PAGINATION_START">View/PAGINATION_START.svg</file>
+<file alias="PAGINATION_END">View/PAGINATION_END.svg</file>
+<file alias="PAGINATION_LAST">View/PAGINATION_LAST.svg</file>
+<file alias="PAGINATION_NEXT">View/PAGINATION_NEXT.svg</file>
 <!--Database icon here-->
 <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
 <file alias="CREATE_TABLE">Database/CREATE_TABLE.svg</file>

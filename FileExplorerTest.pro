@@ -1,4 +1,4 @@
-QT += testlib gui core sql
+QT += testlib gui core sql widgets
 CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
@@ -32,6 +32,8 @@ SOURCES += \
     FileOperation/FileOperatorPub.cpp \
     PublicTool.cpp \
     PublicVariable.cpp \
+    TestCase/pub/FileSystemHelper.cpp\
+    TestCase/pub/MyTestSuite.cpp\
     Tools/PerformersAkaManager.cpp \
     Tools/DuplicateImagesRemover.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
@@ -71,8 +73,14 @@ HEADERS += \
     Component/SyncModifiyFileSystem.h \
     FileOperation/FileOperation.h \
     FileOperation/FileOperatorPub.h \
+    public/DisplayEnhancement.h\
     PublicTool.h \
     PublicVariable.h \
+    TestCase/pub/BeginToExposePrivateMember.h\
+    TestCase/pub/EndToExposePrivateMember.h\
+    TestCase/pub/FileSystemHelper.h\
+    TestCase/pub/FileSystemRelatedTest.h\
+    TestCase/pub/MyTestSuite.h\
     Tools/PerformersAkaManager.h \
     Tools/DuplicateImagesRemover.h \
     Tools/FilesNameBatchStandardizer.h \
@@ -93,8 +101,7 @@ HEADERS += \
     Tools/Classify/ItemsClassifier.h \
     Tools/Classify/SceneMixed.h \
     model/ConflictsFileSystemModel.h \
-    UndoRedo.h \
-    public/DisplayEnhancement.h
+    UndoRedo.h
 
 DISTFILES += \
     readme.md

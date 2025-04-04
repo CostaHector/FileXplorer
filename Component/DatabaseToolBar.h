@@ -11,6 +11,7 @@
 #include "Actions/PerformersManagerActions.h"
 #include "Actions/TorrentsManagerActions.h"
 #include "Actions/ViewActions.h"
+#include "PublicVariable.h"
 
 class DatabaseToolBar : public QToolBar {
  public:
@@ -19,10 +20,7 @@ class DatabaseToolBar : public QToolBar {
   QToolBar* dbViewHideShow;
 
   DatabaseToolBar(const QString& title, QWidget* parent = nullptr)
-      : QToolBar(title, parent),
-        dbControlTB(GetDatabaseControlTB()),
-        functionsTB(GetFunctionsTB()),
-        dbViewHideShow(GetHideShowToolButton()) {
+      : QToolBar(title, parent), dbControlTB(GetDatabaseControlTB()), functionsTB(GetFunctionsTB()), dbViewHideShow(GetHideShowToolButton()) {
     addWidget(dbControlTB);
     addSeparator();
     addWidget(functionsTB);
@@ -54,9 +52,12 @@ class DatabaseToolBar : public QToolBar {
 
   auto GetFunctionsTB() -> QToolBar* {
     QToolBar* functionsTB = new QToolBar("Function", this);
-    functionsTB->setOrientation(Qt::Orientation::Vertical);
-    functionsTB->addActions(g_dbAct().DB_FUNCTIONS->actions());
+    functionsTB->addAction(g_dbAct()._SUM);
+    functionsTB->addAction(g_dbAct()._COUNT);
     functionsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+    functionsTB->setOrientation(Qt::Orientation::Vertical);
+    functionsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
+    functionsTB->setStyleSheet("QToolBar { max-width: 256px; }");
     return functionsTB;
   }
 };
