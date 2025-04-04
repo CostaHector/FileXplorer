@@ -55,14 +55,14 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_framelessWindowAg()._EXPAND_RIBBONS);
-  menuRibbonCornerWid->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  menuRibbonCornerWid->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
   return menuRibbonCornerWid;
 }
 
 QToolBar* RibbonMenu::LeafFile() const {
-  auto* styleToolButton = new DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  auto* styleToolButton = new DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
   styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "style");
-  QToolButton* logToolButton = new DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  QToolButton* logToolButton = new DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
   logToolButton->setDefaultAction(g_LogActions()._LOG_FILE);
 
   QToolBar* leafFileWid{new (std::nothrow) QToolBar};
@@ -96,7 +96,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     openItemsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     openItemsTB->setOrientation(Qt::Orientation::Vertical);
     openItemsTB->setStyleSheet("QToolBar { max-width: 256px; }");
-    openItemsTB->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    openItemsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
     SetLayoutAlightment(openItemsTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
@@ -115,7 +115,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     propertiesTB->addAction(g_rightClickActions()._PROPERTIES);
     propertiesTB->setOrientation(Qt::Orientation::Vertical);
     propertiesTB->setStyleSheet("QToolBar { max-width: 256px; }");
-    propertiesTB->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    propertiesTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
     propertiesTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
@@ -132,9 +132,9 @@ QToolBar* RibbonMenu::LeafHome() const {
   {
     const auto& _MOVE_TO_HIST_LIST = g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY->actions();
     const auto& _COPY_TO_HIST_LIST = g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY->actions();
-    auto* pMoveToToolButton = new DropdownToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_2x1);
+    auto* pMoveToToolButton = new DropdownToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
     pMoveToToolButton->setDefaultAction(g_fileBasicOperationsActions()._MOVE_TO);
-    auto* pCopyToToolButton = new DropdownToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_2x1);
+    auto* pCopyToToolButton = new DropdownToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
     pCopyToToolButton->setDefaultAction(g_fileBasicOperationsActions()._COPY_TO);
 
     moveCopyItemsToTB->addWidget(pMoveToToolButton);
@@ -164,7 +164,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     selectionToolBar->addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
     selectionToolBar->setOrientation(Qt::Orientation::Vertical);
     selectionToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    selectionToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    selectionToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
     selectionToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
     SetLayoutAlightment(selectionToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
@@ -180,7 +180,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     compressToolBar->addAction(g_AchiveFilesActions().DECOMPRESSED_HERE);
     compressToolBar->setOrientation(Qt::Orientation::Vertical);
     compressToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    compressToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    compressToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
     compressToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
     SetLayoutAlightment(compressToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
@@ -206,7 +206,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   {
     syncPathToolBar->setOrientation(Qt::Orientation::Vertical);
     syncPathToolBar->setStyleSheet("QToolBar { max-width: 512px; }");
-    syncPathToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+    syncPathToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
     syncPathToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
@@ -256,14 +256,14 @@ QToolBar* RibbonMenu::LeafView() const {
   fileSystemView->addActions({g_viewActions()._LIST_VIEW, g_viewActions()._TABLE_VIEW, g_viewActions()._TREE_VIEW});
   fileSystemView->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   fileSystemView->setStyleSheet("QToolBar { max-width: 256px; }");
-  fileSystemView->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  fileSystemView->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
   SetLayoutAlightment(fileSystemView->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
   folderPreviewToolBar->setOrientation(Qt::Orientation::Vertical);
   folderPreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderPreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
-  folderPreviewToolBar->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  folderPreviewToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto* embeddedPlayerTB = new DropdownToolButton(g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
@@ -296,7 +296,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->setOrientation(Qt::Orientation::Vertical);
   folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
-  folderRmv->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  folderRmv->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_REDUN_PARENT_FOLDER);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
@@ -305,7 +305,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   mediaDupFinder->setOrientation(Qt::Orientation::Vertical);
   mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mediaDupFinder->setStyleSheet("QToolBar { max-width: 256px; }");
-  mediaDupFinder->setIconSize(QSize(TABS_ICON_IN_MENU_3x1, TABS_ICON_IN_MENU_3x1));
+  mediaDupFinder->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER);
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER);
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
@@ -313,7 +313,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto& arrangeIns = g_ArrangeActions();
   QList<QAction*> studiosActions{arrangeIns._EDIT_STUDIOS,  arrangeIns._RELOAD_STUDIOS,  nullptr, arrangeIns._EDIT_PERFS,      arrangeIns._RELOAD_PERFS, nullptr,
                                  arrangeIns._EDIT_PERF_AKA, arrangeIns._RELOAD_PERF_AKA, nullptr, arrangeIns._RENAME_RULE_STAT};
-  QToolButton* nameRulerToolButton = new DropdownToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  QToolButton* nameRulerToolButton = new DropdownToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
   nameRulerToolButton->setDefaultAction(g_fileBasicOperationsActions()._NAME_RULER);
   auto& viewIns = g_viewActions();
   auto& jsonIns = g_jsonEditorActions();
@@ -323,7 +323,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto& thumbnailIns = g_ThumbnailProcessActions();
   QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
                                    thumbnailIns._SKIP_IF_ALREADY_EXIST};
-  QToolButton* thumbnailToolButton = new DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, TABS_ICON_IN_MENU_3x1);
+  QToolButton* thumbnailToolButton = new DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
   thumbnailToolButton->setDefaultAction(thumbnailIns._EXTRACT_1ST_IMG);
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
@@ -366,7 +366,7 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mEnablePageTB);
   sceneTB->addSeparator();
-  sceneTB->addWidget(ag.mPagesSelectTB);
+  sceneTB->addWidget(ag.mImageSizeTB);
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }

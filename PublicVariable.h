@@ -24,9 +24,15 @@ const char* const SUBMIT_BTN_STYLE =
     "    background-color: rgb(36, 118, 199);"
     "    border-color: rgb(36, 118, 199);"
     "}";
-constexpr int TABS_ICON_IN_MENU_3x1 = 16;
-constexpr int TABS_ICON_IN_MENU_2x1 = 24;
-constexpr int TABS_ICON_IN_MENU_1x1 = 48;
+
+
+struct IMAGE_SIZE {
+  static constexpr int TABS_ICON_IN_MENU_3x1 = 16;
+  static constexpr int TABS_ICON_IN_MENU_2x1 = 24;
+  static constexpr int TABS_ICON_IN_MENU_1x1 = 48;
+  static int IMG_WIDTH;
+  static int IMG_HEIGHT;
+};
 
 static inline QSettings& PreferenceSettings() {
   static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", "FileExplorerReadOnly");

@@ -85,9 +85,7 @@ void MovieDBView::subscribe() {
   { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &MovieDBView::onQuickWhereClause); }
 
   {
-    const QList<QAction*>& DB_FUNCTIONS_ACTIONS = g_dbAct().DB_FUNCTIONS->actions();
-    QAction* COUNT = DB_FUNCTIONS_ACTIONS[0];
-    connect(COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
+    connect(g_dbAct()._COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
   }
 
   addAction(g_fileBasicOperationsActions().COPY_FULL_PATH);

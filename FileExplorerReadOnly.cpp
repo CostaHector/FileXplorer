@@ -115,8 +115,7 @@ void FileExplorerReadOnly::subscribe() {
 
   connect(vA.PREVIEW_PANE_HTML, &QAction::triggered, this, [this](const bool checked) {
     PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, checked);
-    const bool showPrev = m_fsPanel->isFSView() and checked;
-    previewHtmlDock->setVisible(showPrev);
+    previewHtmlDock->setVisible(checked);
   });
 
   auto& fpAG = g_folderPreviewActions();
