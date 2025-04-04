@@ -1,11 +1,12 @@
-#include "SceneTableView.h"
-#include "Model/ScenesTableModel.h"
+#include "SceneListView.h"
+#include "Model/ScenesListModel.h"
 #include "Tools/PlayVideo.h"
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
+#include <QMouseEvent>
 
 class AlignDelegate : public QStyledItemDelegate {
  public:
@@ -16,43 +17,53 @@ class AlignDelegate : public QStyledItemDelegate {
     option->displayAlignment = Qt::AlignmentFlag::AlignVCenter;
     QStyledItemDelegate::initStyleOption(option, index);
   }
-  //  QString displayText(const QVariant& value, const QLocale& locale) const override {
-  //    const QString& text = value.toString();
-  //    static constexpr int CHAR_LETTER_CNT = 64;
-  //    if (text.size() <= CHAR_LETTER_CNT) {
-  //      return text;
-  //    }
-  //    return text.left(CHAR_LETTER_CNT / 2) + "..." + text.right(CHAR_LETTER_CNT / 2);
-  //  }
+
+  QString displayText(const QVariant& value, const QLocale& /**/) const override {
+    const QString& text = value.toString();
+    static constexpr int CHAR_LETTER_CNT = 40;
+    if (text.size() <= CHAR_LETTER_CNT) {
+      return text;
+    }
+    return text.left(CHAR_LETTER_CNT / 2) + "\n" + text.right(CHAR_LETTER_CNT / 2);
+  }
 };
 
-SceneTableView::SceneTableView(ScenesTableModel* sceneModel, QWidget* parent)  //
-    : CustomTableView{"SCENES_TABLE", parent}, _sceneModel{sceneModel} {
+SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
+    : CustomListView{"SCENES_TABLE", parent}, _sceneModel{sceneModel} {
   if (_sceneModel == nullptr) {
-    qWarning("sceneModel is nullptr");
+    qCritical("sceneModel is nullptr");
+    return;
   } else {
     setModel(_sceneModel);
   }
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
+  setViewMode(QListView::ViewMode::ListMode);
+  setTextElideMode(Qt::TextElideMode::ElideMiddle);
+  setUniformItemSizes(false);
+
+  setResizeMode(QListView::ResizeMode::Adjust);
+  setMovement(QListView::Movement::Free);
+  setWrapping(true);
+  setFlow(QListView::Flow::LeftToRight);
 
   mAlignDelegate = new AlignDelegate;
   setItemDelegate(mAlignDelegate);
 
   m_fPrev = new FloatingPreview;
 
-  m_menu = new QMenu{"scene table view menu", this};
+  QMenu* m_menu = new QMenu{"scene table view menu", this};
   COPY_BASENAME_FROM_SCENE = new QAction("copy basename", m_menu);
   OPEN_CORRESPONDING_FOLDER = new QAction("play this folder", m_menu);
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
+  m_menu->addSeparator();
+  m_menu->addActions(_ORIENTATION_GRP->actions());
   BindMenu(m_menu);
   subscribe();
-  InitTableView();
-
   setMouseTracking(true);
 }
 
-void SceneTableView::onCopyBaseName() {
+void SceneListView::onCopyBaseName() {
   const QModelIndex& curInd = currentIndex();
   const QString& copiedStr = _sceneModel->baseName(curInd);
   auto* cb = QApplication::clipboard();
@@ -60,19 +71,19 @@ void SceneTableView::onCopyBaseName() {
   qDebug("user copied str: [%s]", qPrintable(copiedStr));
 }
 
-void SceneTableView::onOpenCorrespondingFolder() {
+void SceneListView::onOpenCorrespondingFolder() {
   const QModelIndex& curInd = currentIndex();
   const QString& scenePath = _sceneModel->absolutePath(curInd);
   on_ShiftEnterPlayVideo(scenePath);
   qDebug("Play path: [%s]", qPrintable(scenePath));
 }
 
-void SceneTableView::subscribe() {
-  connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneTableView::onCopyBaseName);
-  connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneTableView::onOpenCorrespondingFolder);
+void SceneListView::subscribe() {
+  connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneListView::onCopyBaseName);
+  connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
 }
 
-void SceneTableView::setRootPath(const QString& rootPath) {
+void SceneListView::setRootPath(const QString& rootPath) {
   if (rootPath.count('/') < 2) {  // large folder
     qDebug("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
     const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
@@ -84,7 +95,8 @@ void SceneTableView::setRootPath(const QString& rootPath) {
   _sceneModel->setRootPath(rootPath);
 }
 
-void SceneTableView::mouseMoveEvent(QMouseEvent* event) {
+void SceneListView::mouseMoveEvent(QMouseEvent* event) {
+  return;
   if (m_fPrev == nullptr) {
     return;
   }
@@ -114,58 +126,3 @@ void SceneTableView::mouseMoveEvent(QMouseEvent* event) {
   }
   m_fPrev->raise();
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-#include <QMainWindow>
-#include "View/SceneActionsSubscribe.h"
-#include "Actions/SceneInPageActions.h"
-#include <QToolBar>
-
-class BearingWidget : public QMainWindow {
- public:
-  QToolBar* mSceneTB{nullptr};
-  QLineEdit* m_filterInput{nullptr};
-
-  ScenesTableModel* m_model{nullptr};
-  SceneTableView* m_tableView{nullptr};
-
-  SceneActionsSubscribe* sceneSub{nullptr};
-
-  BearingWidget(QWidget* parent = nullptr) : QMainWindow{parent} {
-    setWindowTitle("BearingWidget");
-    setMinimumSize(1780, 768);
-
-    m_filterInput = new QLineEdit("", parent);
-    mSceneTB = g_SceneInPageActions().GetSceneToolbar();
-    mSceneTB->addAction("Filter:");
-    mSceneTB->addWidget(m_filterInput);
-
-    addToolBar(Qt::ToolBarArea::TopToolBarArea, mSceneTB);
-
-    m_model = new ScenesTableModel;
-    m_tableView = new SceneTableView(m_model, this);
-    setCentralWidget(m_tableView);
-
-    if (sceneSub->BindWidget(m_tableView, m_model)) {
-      sceneSub->operator()();
-      connect(m_filterInput, &QLineEdit::textChanged, m_model, &ScenesTableModel::setFilterRegularExpression);
-    }
-
-    IntoANewPath("E:/115/MEN/Page120");
-  }
-
-  void IntoANewPath(const QString& path) {
-    m_model->setRootPath(path);
-    //    m_tableView->resizeColumnsToContents();
-  }
-};
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  BearingWidget sceneWid;
-  sceneWid.show();
-  return a.exec();
-}
-#endif

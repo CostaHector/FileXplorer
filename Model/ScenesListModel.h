@@ -1,39 +1,30 @@
-#ifndef SCENESTABLEMODEL_H
-#define SCENESTABLEMODEL_H
+#ifndef SCENESLISTMODEL_H
+#define SCENESLISTMODEL_H
 
-#include "Model/QAbstractTableModelPub.h"
+#include "Model/QAbstractListModelPub.h"
 #include "Tools/SceneInfoManager.h"
 #include <utility>
 #include <QSet>
 #include <QFileInfo>
+#include <QPixmapCache>
 
-class ScenesTableModel : public QAbstractTableModelPub {
+class ScenesListModel : public QAbstractListModelPub {
  public:
-  ScenesTableModel(QObject* object = nullptr);
-  inline bool IsScnsEmpty() const { return mCurBegin == nullptr || mCurEnd == nullptr || mCurBegin == mCurEnd;}
-  int rowCount(const QModelIndex& /*parent*/ = {}) const override {
-    int begin{0}, end{0};
-    std::tie(begin, end) = GetEntryIndexBE(GetEntryListLen());
-    int scenesCnt = end - begin;
-    return scenesCnt / mSCENES_CNT_COLUMN + int(scenesCnt % mSCENES_CNT_COLUMN != 0);
-  }
-  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return mSCENES_CNT_COLUMN; }
+  ScenesListModel(QObject* object = nullptr);
+  inline bool IsScnsEmpty() const { return mCurBegin == nullptr || mCurEnd == nullptr || mCurBegin == mCurEnd; }
+  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mCurEnd - mCurBegin; }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-  inline bool isIndexValid(const QModelIndex& index, int* pLinearInd = nullptr) const {
+  inline bool isIndexValid(const QModelIndex& index, int linearInd) const {
     if (!index.isValid()) {
-      qWarning("Invalid index");
       return false;
     }
-    const int linearInd = index.row() * mSCENES_CNT_COLUMN + index.column();
-    if (mCurBegin + linearInd >= mCurEnd) {
-      qWarning("Invalid index(%d, %d) user input", index.row(), index.column());
+    if (mCurBegin + index.row() >= mCurEnd) {
+      qWarning("Invalid index(%d) user input", index.row());
       return false;
     }
-    if (pLinearInd != nullptr) {
-      *pLinearInd = linearInd;
-    }
+    linearInd = index.row();
     return true;
   }
   QFileInfo fileInfo(const QModelIndex& index) const;
@@ -46,8 +37,7 @@ class ScenesTableModel : public QAbstractTableModelPub {
   QStringList GetImgs(const QModelIndex& index) const;
   QStringList GetVids(const QModelIndex& index) const;
 
-  bool ChangeRowsCnt(int newRowCnt, int newPageIndex);
-  bool ChangeColumnsCnt(int newColumnCnt = 4, int newPageIndex = -1);
+  bool ChangeItemsCntIn1Page(int scCnt1Page);
   bool ShowAllScenesInOnePage();
 
   void SortOrder(SceneInfoManager::SceneSortOption sortOption, bool reverse = false);
@@ -55,11 +45,8 @@ class ScenesTableModel : public QAbstractTableModelPub {
   std::pair<int, int> GetEntryIndexBE(int totalLen) const;
 
   inline int GetPageCnt() const {
-    if (mSCENES_CNT_ROW == -1) {
-      return 1;
-    }
     int N = GetEntryListLen();
-    return N / (mSCENES_CNT_ROW * mSCENES_CNT_COLUMN) + int(N % (mSCENES_CNT_ROW * mSCENES_CNT_COLUMN) != 0);
+    return N / SCENES_CNT_1_PAGE + int(N % SCENES_CNT_1_PAGE != 0);
   }
 
   inline const SCENES_TYPE& GetEntryList() const { return mFilterEnable ? mEntryListFiltered : mEntryList; }
@@ -67,17 +54,15 @@ class ScenesTableModel : public QAbstractTableModelPub {
   void setFilterRegularExpression(const QString& pattern);
 
  private:
-  inline int toLinearIndex(const QModelIndex& index) const {
-    return index.row() * mSCENES_CNT_COLUMN + index.column();
-  }
-  int mPageIndex{-1};
-  int mSCENES_CNT_COLUMN{4};
-  int mSCENES_CNT_ROW{-1};
+  int mPageIndex{0};
+  int SCENES_CNT_1_PAGE{12};  // 4-by-3
   bool mFilterEnable{false};
   QString mPattern;
   QString mRootPath;
   SCENES_TYPE mEntryList;
   SCENES_TYPE mEntryListFiltered;
   SCENES_TYPE::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
+
+  QPixmapCache mPixCache;
 };
-#endif  // SCENESTABLEMODEL_H
+#endif  // SCENESLISTMODEL_H

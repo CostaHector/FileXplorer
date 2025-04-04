@@ -1,12 +1,12 @@
 #include "SceneActionsSubscribe.h"
 #include "Actions/SceneInPageActions.h"
 #include "Tools/SceneInfoManager.h"
+#include "Component/NotificatorFrame.h"
+#include "PublicVariable.h"
 #include <QToolBar>
 #include <QMessageBox>
 
-#include "Component/NotificatorFrame.h"
-
-bool SceneActionsSubscribe::BindWidget(QTableView* tableView, ScenesTableModel* model) {
+bool SceneActionsSubscribe::BindWidget(QListView* tableView, ScenesListModel* model) {
   if (tableView == nullptr) {
     qWarning("tableView is nullptr");
     return false;
@@ -64,6 +64,7 @@ void SceneActionsSubscribe::SetScenesGroupByPage(bool groupByPageAction) {
     qCritical("mPagesSelectTB is nullptr");
     return;
   }
+  ags.mPageIndexInputLE->setEnabled(groupByPageAction);
   ags.mPagesSelectTB->setEnabled(groupByPageAction);
 
   if (_model == nullptr) {
@@ -95,48 +96,21 @@ void SceneActionsSubscribe::SetPageIndex() {
 }
 
 bool SceneActionsSubscribe::SetScenesPerColumn() {
-  auto& ags = g_SceneInPageActions();
-  const QString& rowCntStr = ags.mRowsInputLE->text();
-  const QString& pageIndStr = ags.mPageIndexInputLE->text();
-  bool isRowCntNumber{false}, isPageIndNumber{false};
-  const int rowCnt = rowCntStr.toInt(&isRowCntNumber);
-  const int pageInd = pageIndStr.toInt(&isPageIndNumber);
-  if (not isRowCntNumber) {
-    qDebug("Row Count str[%s] invalid", qPrintable(rowCntStr));
-    return false;
-  }
-  if (not isPageIndNumber) {
-    qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
-    return false;
-  }
   if (_model == nullptr) {
     qWarning("_model is nullptr");
     return false;
   }
-  _model->ChangeRowsCnt(rowCnt, pageInd);
-  return true;
-}
 
-bool SceneActionsSubscribe::SetScenesPerRow() {
   auto& ags = g_SceneInPageActions();
-  const QString& columnCntStr = ags.mColumnsInputLE->text();
-  const QString& pageIndStr = ags.mPageIndexInputLE->text();
-  bool isColCntNumber{false}, isPageIndNumber{false};
-  const int colCnt = columnCntStr.toInt(&isColCntNumber);
-  const int pageInd = pageIndStr.toInt(&isPageIndNumber);
-  if (not isColCntNumber) {
-    qDebug("Column Count str[%s] invalid", qPrintable(columnCntStr));
+  const QString& scenesCnt1PageStr = ags.mPageDimensionLE->text();
+  bool isPageScenesCntValid = false;
+  const int scenesCnt1Page = scenesCnt1PageStr.toInt(&isPageScenesCntValid);
+  if (!isPageScenesCntValid) {
+    qDebug("Page scenes count str[%s] invalid", qPrintable(scenesCnt1PageStr));
     return false;
   }
-  if (not isPageIndNumber) {
-    qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
-    return false;
-  }
-  if (_model == nullptr) {
-    qWarning("_model is nullptr");
-    return false;
-  }
-  _model->ChangeColumnsCnt(colCnt, pageInd);
+  PreferenceSettings().setValue("SCENES_COUNT_EACH_PAGE", scenesCnt1Page);
+  _model->ChangeItemsCntIn1Page(scenesCnt1Page);
   return true;
 }
 
@@ -166,8 +140,8 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
   const QString& rootPath = _model->rootPath();
   if (rootPath.count('/') < 2) {  // large folder
     qDebug("Combine Media Info may cause lag. As [%s] contains a large json/vid/img(s)", qPrintable(rootPath));
-    const auto ret = QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath,
-                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    const auto ret =
+        QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
       qDebug("User cancel Combine Media Info on a large path[%s]", qPrintable(rootPath));
       return;
@@ -200,8 +174,8 @@ void SceneActionsSubscribe::UpdateScnFilesOnly() {
   const QString& rootPath = _model->rootPath();
   if (rootPath.count('/') < 2) {  // large folder
     qDebug("Update Scn file may cause lag. As [%s] contains a large json(s)", qPrintable(rootPath));
-    const auto ret = QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath,
-                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    const auto ret =
+        QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
       qDebug("User cancel Update Scn file on a large path[%s]", qPrintable(rootPath));
       return;
@@ -237,9 +211,8 @@ bool SceneActionsSubscribe::operator()() {
   connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._REVERSE_SORT, &QAction::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
-  connect(ags.mRowsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);
+  connect(ags.mPageDimensionLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);
   connect(ags.mPageIndexInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetPageIndex);
-  connect(ags.mColumnsInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerRow);
   connect(ags.mPagesSelectTB, &QToolBar::actionTriggered, this, &SceneActionsSubscribe::PageIndexIncDec);
   return true;
 }

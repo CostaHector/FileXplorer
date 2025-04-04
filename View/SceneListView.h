@@ -1,17 +1,17 @@
-#ifndef SCENETABLEVIEW_H
-#define SCENETABLEVIEW_H
+#ifndef SCENELISTVIEW_H
+#define SCENELISTVIEW_H
 
-#include "View/CustomTableView.h"
+#include "View/CustomListView.h"
 #include "Component/FolderPreview/FloatingPreview.h"
 #include <QMenu>
 
-class ScenesTableModel;
+class ScenesListModel;
 class QStyledItemDelegate;
 class SceneActionsSubscribe;
 
-class SceneTableView : public CustomTableView {
+class SceneListView : public CustomListView {
  public:
-  explicit SceneTableView(ScenesTableModel* sceneModel, QWidget* parent = nullptr);
+  explicit SceneListView(ScenesListModel* sceneModel, QWidget* parent = nullptr);
   void setRootPath(const QString& rootPath);
   void subscribe();
   void onCopyBaseName();
@@ -21,10 +21,9 @@ class SceneTableView : public CustomTableView {
   void mouseMoveEvent(QMouseEvent *event) override;
   QAction* COPY_BASENAME_FROM_SCENE{nullptr};
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
-  QMenu* m_menu{nullptr};
-  ScenesTableModel* _sceneModel;
+  ScenesListModel* _sceneModel;
   QStyledItemDelegate* mAlignDelegate{nullptr};
   FloatingPreview* m_fPrev{nullptr};
 };
 
-#endif  // SCENETABLEVIEW_H
+#endif  // SCENELISTVIEW_H

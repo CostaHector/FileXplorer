@@ -13,8 +13,6 @@ class DataBaseActions : public QObject {
 
   auto Get_DB_CONTROL_ACTIONS() -> QActionGroup*;
 
-  auto Get_DB_FUNCTIONS_Action() -> QActionGroup*;
-
   auto Get_DB_RIGHT_CLICK_MENU_AG() -> QActionGroup*;
 
   QAction* INIT_A_DATABASE = new QAction(QIcon(":img/CREATE_DATABASE"), tr("Create Database"), this);
@@ -30,8 +28,9 @@ class DataBaseActions : public QObject {
 
   QAction* QUICK_WHERE_CLAUSE{new QAction(QIcon(":img/QUICK_WHERE_CLAUSE"), tr("Where clause"), this)};
 
+  QAction *_COUNT{nullptr}, *_SUM{nullptr};
+
   QActionGroup* DB_CONTROL_ACTIONS;
-  QActionGroup* DB_FUNCTIONS;
   QActionGroup* DB_RIGHT_CLICK_MENU_AG;
 };
 
