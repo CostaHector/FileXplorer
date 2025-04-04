@@ -39,7 +39,7 @@ FloatingPreview::FloatingPreview(QWidget* parent) : QSplitter{parent} {
   subscribe();
 
   ReadSettings();
-  setWindowIcon(QIcon(":img/FOLDER_PREVIEW_LISTS"));
+  setWindowIcon(QIcon(":img/FLOATING_PREVIEW"));
 }
 
 void FloatingPreview::ReadSettings() {
