@@ -13,8 +13,8 @@ class RibbonMenu : public QTabWidget {
   QToolBar* LeafHome() const;
   QToolBar* LeafView() const;
   QToolBar* LeafDatabase() const;
-  QToolBar* LeafMediaTools() const;
   QToolBar* LeafScenesTools() const;
+  QToolBar* LeafMediaTools() const;
 
   void Subscribe();
 
