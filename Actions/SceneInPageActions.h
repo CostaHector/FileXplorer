@@ -13,10 +13,9 @@ class SceneInPageActions : public QObject {
   explicit SceneInPageActions(QObject* parent = nullptr);
 
   bool InitWidget();
-  QToolBar* GetSceneToolbar();
   QToolBar* GetOrderToolBar();
   QToolBar* GetPagesRowByColumnToolBar();
-  QToolBar* GetPageIndexSelectionToolBar();
+  QToolBar* GetImageSizeToolBar();
 
   QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
   QAction* _UPDATE_SCN_ONLY{nullptr};
@@ -29,23 +28,27 @@ class SceneInPageActions : public QObject {
   QActionGroup* _ORDER_AG{nullptr};
 
   QAction* _GROUP_BY_PAGE{nullptr};
-  QAction* _THE_LAST_PAGE{nullptr};
+  QAction* _THE_FIRST_PAGE{nullptr};
   QAction* _LAST_PAGE{nullptr};
   QAction* _NEXT_PAGE{nullptr};
-  QAction* _THE_FIRST_PAGE{nullptr};
+  QAction* _THE_LAST_PAGE{nullptr};
 
-  QLineEdit* mRowsInputLE{nullptr};
-  QLineEdit* mColumnsInputLE{nullptr};
-  QLineEdit* mPageIndexInputLE{nullptr};
-
+  // order | page action
+  // order | ----------
+  // order | line edit
+  // order | ----------
+  // order | page select
   QToolBar* mOrderTB{nullptr};
   QToolBar* mEnablePageTB{nullptr};
-  QToolBar* mRowEnablePageTB{nullptr};
+
+  QLineEdit* mPageDimensionLE{nullptr};
+  QLineEdit* mPageIndexInputLE{nullptr};
   QToolBar* mPagesSelectTB{nullptr};
- private:
-  constexpr static int ROW_COLUMN_LINEDIT_MAX_WIDTH = 80;
+
+  QLineEdit* mImageSize{nullptr};
+  QToolBar* mImageSizeTB{nullptr};
 };
 
 SceneInPageActions& g_SceneInPageActions();
 
-#endif // SCENEINPAGEACTIONS_H
+#endif  // SCENEINPAGEACTIONS_H
