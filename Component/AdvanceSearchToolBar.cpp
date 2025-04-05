@@ -1,7 +1,6 @@
 #include "AdvanceSearchToolBar.h"
-#include "PublicVariable.h"
-
-#include <QDebug>
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent) : QToolBar(title, parent) {
   m_nameFilter = new QLineEdit{""};

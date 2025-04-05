@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 
 #include "Actions/PropertiesWindowActions.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
 #include "Tools/VidsDurationDisplayString.h"

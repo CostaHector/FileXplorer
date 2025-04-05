@@ -1,6 +1,8 @@
 #include "QMediaInfo.h"
 #include <QFileInfo>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
+
 #ifdef WIN32
 #define QString2MediaInfoc_str(qstr) (qstr).toStdWString().c_str()
 #define QStringFromMediaInfoc_str(cStr) QString::fromStdWString(cStr)

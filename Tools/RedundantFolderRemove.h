@@ -2,7 +2,7 @@
 #define REDUNDANTFOLDERREMOVE_H
 
 #include <QFileInfo>
-#include "UndoRedo.h"
+#include "public/UndoRedo.h"
 
 class RedundantRmv {
  public:

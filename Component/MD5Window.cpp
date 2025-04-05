@@ -104,11 +104,11 @@ bool MD5Window::onFullCalculateMD5() {
 
 bool MD5Window::onLoadFromMD5Files() {
   QFile file(m_root + '/' + m_md5FileName);
-  if (not file.exists()) {
+  if (!file.exists()) {
     qWarning("File[%s] not exists", qPrintable(m_md5FileName));
     return false;
   }
-  if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qWarning("File[%s] open for read failed", qPrintable(m_md5FileName));
     return false;
   }
@@ -116,7 +116,7 @@ bool MD5Window::onLoadFromMD5Files() {
   stream.setCodec("UTF-8");
   static constexpr int MD5_LEN = 32;
   QString contents;
-  while (not stream.atEnd()) {
+  while (!stream.atEnd()) {
     const QString& line = stream.readLine();
     contents += line;
     m_fileMD5Map[line.mid(MD5_LEN + 1)] = line.left(MD5_LEN);

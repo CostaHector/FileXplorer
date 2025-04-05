@@ -1,18 +1,19 @@
 #include "FileExplorerReadOnly.h"
 
-#include <QString>
-
-#include <QDockWidget>
-#include <QFileInfo>
-#include <functional>
-
 #include "Actions/FolderPreviewActions.h"
 #include "Actions/ViewActions.h"
-#include "PublicVariable.h"
+
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 #include "Tools/FolderPreviewSwitcher.h"
 #include "Tools/NavigationViewSwitcher.h"
 #include "Tools/ViewTypeTool.h"
+
+#include <QString>
+#include <QDockWidget>
+#include <QFileInfo>
+#include <functional>
 
 FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const argv[], QWidget* parent)
   : QMainWindow(parent),

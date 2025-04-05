@@ -1,7 +1,7 @@
 #include "SyncModifiyFileSystem.h"
 #include <QDir>
 #include <QFileInfo>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 bool SyncModifiyFileSystem::m_syncModifyFileSystemSwitch = false;
 bool SyncModifiyFileSystem::m_alsoSyncReversebackSwitch = true;

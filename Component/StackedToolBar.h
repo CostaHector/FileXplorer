@@ -3,7 +3,7 @@
 #include "Component/AdvanceSearchToolBar.h"
 #include "Component/DatabaseSearchToolBar.h"
 #include "Component/NavigationAndAddressBar.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 #include <QHash>
 #include <QLayout>

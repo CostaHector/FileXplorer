@@ -20,7 +20,6 @@ SOURCES += $$files(FileOperation/*.cpp)
 SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(AllQtLearning/*.cpp)
 SOURCES += $$files(*.cpp)
-SOURCES -= MainTestSuite.cpp
 
 HEADERS += $$files(Actions/*.h)
 HEADERS += $$files(Model/*.h)

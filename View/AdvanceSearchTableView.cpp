@@ -23,7 +23,7 @@ AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, 
 }
 
 void AdvanceSearchTableView::subscribe() {
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, [this](const QItemSelection& selected, const QItemSelection& deselected) {
+  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, [this](const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
     if (_logger) {
       _logger->pathInfo(selectionModel()->selectedRows().size(), 1);
     }
@@ -63,7 +63,7 @@ auto AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) -> void {
 #ifdef __NAME__EQ__MAIN__
 
 #include <QMainWindow>
-
+#include "public/MemoryKey.h"
 class AdvanceSearchTableViewWindowTest : public QMainWindow {
  public:
   explicit AdvanceSearchTableViewWindowTest(QWidget* parent = nullptr) : QMainWindow(parent) {

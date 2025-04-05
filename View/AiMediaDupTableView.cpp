@@ -2,7 +2,7 @@
 
 #include "Actions/DuplicateVideosFinderActions.h"
 #include "Component/NotificatorFrame.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include <QItemSelectionModel>
 
 #include <QFileDialog>

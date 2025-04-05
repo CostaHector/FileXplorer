@@ -1,6 +1,6 @@
 #include "PreviewFolder.h"
 
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 constexpr int PreviewFolder::NEXT_FOLDER_TIME_INTERVAL;        // ms
 
