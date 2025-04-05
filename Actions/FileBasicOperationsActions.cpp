@@ -1,6 +1,7 @@
 #include "FileBasicOperationsActions.h"
 #include <QApplication>
 #include <QStyle>
+#include "public/MemoryKey.h"
 
 FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
     : QObject(parent),

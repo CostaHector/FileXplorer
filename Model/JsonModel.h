@@ -37,8 +37,8 @@ class JsonModel : public DifferRootFileSystemModel {
 
   void clear() override;
 
-  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_jsons.size(); }
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return 1; }
+  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_jsons.size(); }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return 1; }
 
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;

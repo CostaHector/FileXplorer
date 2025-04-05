@@ -1,5 +1,5 @@
 #include "DatabaseSearchToolBar.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include <QLayout>
 
 DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent)

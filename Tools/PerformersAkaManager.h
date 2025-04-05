@@ -7,7 +7,7 @@
 #include <QStack>
 #include <QString>
 #include <QWidget>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 class PerformersAkaManager {
  public:

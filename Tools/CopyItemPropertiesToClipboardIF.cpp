@@ -1,5 +1,5 @@
 #include "CopyItemPropertiesToClipboardIF.h"
-#include "MyQSqlTableModel.h"
+#include "Model/MyQSqlTableModel.h"
 #include "ViewSelection.h"
 
 #include <QFileSystemModel>

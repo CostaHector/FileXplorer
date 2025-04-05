@@ -4,7 +4,7 @@
 #include "Component/RightClickMenu.h"
 #include "View/CustomListView.h"
 
-#include "MyQFileSystemModel.h"
+#include "Model/MyQFileSystemModel.h"
 
 #include <QContextMenuEvent>
 #include <QDragEnterEvent>

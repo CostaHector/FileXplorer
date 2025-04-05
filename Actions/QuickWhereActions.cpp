@@ -1,6 +1,7 @@
 #include "QuickWhereActions.h"
-#include "PublicVariable.h"
 
+#include "public/MemoryKey.h"
+#include "public/PublicVariable.h"
 #include <QDesktopServices>
 
 QuickWhereActions::QuickWhereActions(QObject* parent)
@@ -15,8 +16,8 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {
   m_historyWhereClauseMenu->setToolTipsVisible(true);
-  for (const QString& where :
-       PreferenceSettings().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString().split('\n')) {
+  const QString& histories = PreferenceSettings().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
+  for (const QString& where : histories.split('\n')) {
     m_historyWhereClauseMenu->addAction(new QAction(where, m_historyWhereClauseMenu));
   }
 

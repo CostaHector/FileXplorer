@@ -1,5 +1,5 @@
 #include "PreviewLabels.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 #include "Tools/ArchiveFiles.h"
 constexpr int PreviewLabels::SLIDE_TO_NEXT_IMG_TIME_INTERVAL;  // ms

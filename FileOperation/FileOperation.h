@@ -1,6 +1,6 @@
 #ifndef FILEOPERATION_H
 #define FILEOPERATION_H
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include "FileOperatorPub.h"
 
 namespace FileOperation {

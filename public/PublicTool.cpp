@@ -1,10 +1,53 @@
-#include "PublicTool.h"
-#include "PublicVariable.h"
+#include "public/PublicTool.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
+#include <QAction>
+#include <QFileDialog>
 #include <QCoreApplication>
 #include <QDir>
 #include <QDirIterator>
 #include <QSqlError>
+
+QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG) {
+  if (oldAG == nullptr) {
+    qCritical("oldAG is nullptr");
+    return "";
+  }
+  QString i_1_path = first_path;           // first and (i-1) path
+  foreach (QAction* act, oldAG->actions()) {  // i path
+    QString i_path = act->text();
+    if (i_path == first_path) {
+      act->setText(i_1_path);  // finish
+      break;
+    }
+    act->setText(i_1_path);
+    i_1_path = i_path;
+  }
+  QStringList actionList;
+  actionList.reserve(oldAG->actions().size());
+  foreach (const QAction* act, oldAG->actions()) {
+    actionList += act->text();
+  }
+  return actionList.join('\n');
+}
+
+QString TextReader(const QString& textPath) {
+  QFile file(textPath);
+  if (!file.exists()) {
+    qDebug("File[%s] not found", qPrintable(textPath));
+    return "";
+  }
+  if (!file.open(QIODevice::ReadOnly)) {
+    qDebug("File[%s] open for read failed", qPrintable(textPath));
+    return "";
+  }
+  QTextStream stream(&file);
+  stream.setCodec("UTF-8");
+  QString contents(stream.readAll());
+  file.close();
+  return contents;
+}
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
   for (int i = 0; i < lay->count(); ++i) {
@@ -27,31 +70,6 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   return dstFi.absoluteFilePath();
 }
 
-QString MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* oldAG) {
-  if (oldAG == nullptr) {
-    qCritical("oldAG is nullptr");
-    return "";
-  }
-  QString i_1_path = first_path;        // first and (i-1) path
-  for (auto* act : oldAG->actions()) {  // i path
-    QString i_path = act->text();
-    if (i_path == first_path) {
-      act->setText(i_1_path);  // finish
-      break;
-    }
-    act->setText(i_1_path);
-    i_1_path = i_path;
-  }
-  QString actionsStr;
-  for (auto* act : oldAG->actions()) {
-    actionsStr += (act->text() + '\n');
-  }
-  if (!actionsStr.isEmpty()) {
-    actionsStr.chop(1);
-  }
-  return actionsStr;
-}
-
 QSqlDatabase GetSqlVidsDB() {
   if (QSqlDatabase::connectionNames().contains("DBMOVIE_CONNECT")) {
     auto db = QSqlDatabase::database("DBMOVIE_CONNECT");
@@ -63,7 +81,6 @@ QSqlDatabase GetSqlVidsDB() {
   db.open();
   return db;
 }
-
 
 void LoadCNLanguagePack(QTranslator& translator) {
   qDebug("Load Chinese pack");

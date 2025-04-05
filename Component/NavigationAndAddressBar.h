@@ -2,8 +2,8 @@
 #define NAVIGATIONANDADDRESSBAR_H
 
 #include "AddressELineEdit.h"
-#include "PathUndoRedoer.h"
-#include "PublicVariable.h"
+#include "public/PathUndoRedoer.h"
+#include "public/PublicVariable.h"
 
 #include "Component/FileSystemTypeFilter.h"
 
