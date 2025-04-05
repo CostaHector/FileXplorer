@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-#include "PublicTool.h"
+#include "public/PublicTool.h"
 #include "pub/BeginToExposePrivateMember.h"
 #include "Tools/Classify/ItemsClassifier.h"
 #include "Tools/ExtractPileItemsOutFolder.h"

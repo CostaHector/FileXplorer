@@ -1,6 +1,6 @@
 #include "FolderPreviewActions.h"
-
-#include "PublicVariable.h"
+#include "public/MemoryKey.h"
+#include "public/PublicVariable.h"
 
 FolderPreviewActions& g_folderPreviewActions() {
   static FolderPreviewActions ins;

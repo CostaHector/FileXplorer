@@ -8,7 +8,7 @@
 #include <QPushButton>
 
 #include "Actions/AddressBarActions.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 #include <QDrag>
 #include <QDragMoveEvent>
@@ -37,16 +37,7 @@ class View {
     }
   }
 
-  static void UpdateItemViewFontSizeCore(QAbstractItemView* view) {
-    if (view == nullptr) {
-      qDebug("UpdateItemViewFontSizeCore view* pointer is nullptr");
-      return;
-    }
-    const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
-    QFont defaultFont(view->font());
-    defaultFont.setPointSize(fontSize);
-    view->setFont(defaultFont);
-  }
+  static void UpdateItemViewFontSizeCore(QAbstractItemView* view);
 
   static inline QModelIndexList selectedIndexes(QAbstractItemView* view) {  // ignore other column, keep the first column
     if (dynamic_cast<QListView*>(view) != nullptr) {

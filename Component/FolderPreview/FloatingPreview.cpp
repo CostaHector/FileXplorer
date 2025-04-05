@@ -1,6 +1,6 @@
 #include "FloatingPreview.h"
-#include "PublicVariable.h"
-#include "Tools/PathTool.h"
+#include "public/PublicVariable.h"
+#include "public/PathTool.h"
 #include <QDir>
 #include <QHeaderView>
 #include <QMenu>

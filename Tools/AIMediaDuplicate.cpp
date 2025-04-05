@@ -1,5 +1,5 @@
 #include "AIMediaDuplicate.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include "Tools/MD5Calculator.h"
 #include "Tools/QMediaInfo.h"
 #include <QDebug>

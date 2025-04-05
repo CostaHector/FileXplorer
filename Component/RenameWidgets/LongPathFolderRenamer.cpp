@@ -1,8 +1,8 @@
 #include "LongPathFolderRenamer.h"
 #include "FileOperation/FileOperatorPub.h"
 #include "Component/NotificatorFrame.h"
-#include "PublicVariable.h"
-#include "UndoRedo.h"
+#include "public/PublicVariable.h"
+#include "public/UndoRedo.h"
 #include <QLabel>
 
 LongPathFolderRenamer::LongPathFolderRenamer(QWidget* parent) : QDialog{parent}, windowTitleFormat{"%1 folder(s) path too long(now: %2)"} {

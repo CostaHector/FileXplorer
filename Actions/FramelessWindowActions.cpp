@@ -1,6 +1,7 @@
 #include "FramelessWindowActions.h"
+#include "public/MemoryKey.h"
+#include "public/PublicVariable.h"
 #include <QStyle>
-#include "PublicVariable.h"
 
 FramelessWindowActions::FramelessWindowActions(QObject* parent)
     : QObject{parent},

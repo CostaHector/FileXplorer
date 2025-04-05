@@ -1,10 +1,11 @@
 #include "JsonFileHelper.h"
 #include "Tools/NameTool.h"
-#include "Tools/PathTool.h"
+#include "public/PathTool.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 #include "public/DisplayEnhancement.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/PublicTool.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -204,15 +205,7 @@ int JsonFileKeyValueProcess(const QString& path, const VariantHashHelper::JSON_D
 }
 
 QVariantHash MovieJsonLoader(const QString& movieJsonItemPath) {
-  QFile jsonFile{movieJsonItemPath};
-  if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("[Normal] json file[%s] not found", qPrintable(movieJsonItemPath));
-    return {};
-  }
-  QTextStream in(&jsonFile);
-  in.setCodec("UTF-8");
-  QString json_string = in.readAll();
-  jsonFile.close();
+  const QString& json_string = TextReader(movieJsonItemPath);
   return JsonStr2Dict(json_string);
 }
 

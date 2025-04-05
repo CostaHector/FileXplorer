@@ -1,11 +1,11 @@
 #include "ArrangeActions.h"
-
-#include "PublicVariable.h"
 #include "Component/NotificatorFrame.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 #include "Tools/PerformersAkaManager.h"
 #include <QDesktopServices>
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 void onEditStudios() {
 #ifdef _WIN32

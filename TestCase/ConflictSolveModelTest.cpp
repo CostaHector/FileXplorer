@@ -3,7 +3,7 @@
 
 // add necessary includes here
 #include "Tools/ConflictsItemHelper.h"
-#include "UndoRedo.h"
+#include "public/UndoRedo.h"
 #include "model/ConflictsFileSystemModel.h"
 #include "pub/FileSystemRelatedTest.h"
 

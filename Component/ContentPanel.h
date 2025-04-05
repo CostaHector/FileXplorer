@@ -7,7 +7,7 @@
 #include "Component/NavigationAndAddressBar.h"
 #include "Component/FolderPreview/PreviewFolder.h"
 
-#include "MyQFileSystemModel.h"
+#include "Model/MyQFileSystemModel.h"
 
 #include "View/AdvanceSearchTableView.h"
 #include "View/FileSystemListView.h"

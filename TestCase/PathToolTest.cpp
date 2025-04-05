@@ -4,7 +4,7 @@
 // add necessary includes here
 #include <QFileInfo>
 #include "pub/MyTestSuite.h"
-#include "Tools/PathTool.h"
+#include "public/PathTool.h"
 
 using namespace ::PATHTOOL;
 

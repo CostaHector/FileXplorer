@@ -1,5 +1,6 @@
 #include "LogHandler.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Actions/LogActions.h"
 
 #include <QDesktopServices>
