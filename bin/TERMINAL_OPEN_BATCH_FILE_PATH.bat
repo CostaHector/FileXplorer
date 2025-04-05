@@ -1,1 +1,1 @@
-cmd.exe /K "E: && cd E:\115\0208\34\KristenBjorn - Casting Couch 522 - Mikhail Loozov and Xiscoxx"
+cmd.exe /K "C: && cd C:\home\Ariel\qtcpp\FileExplorerReadOnly\lib"

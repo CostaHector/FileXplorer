@@ -1,6 +1,6 @@
-#include "MyQFileSystemModel.h"
-#include "PublicVariable.h"
-#include "Tools/PathTool.h"
+#include "Model/MyQFileSystemModel.h"
+#include "public/PublicVariable.h"
+#include "public/PathTool.h"
 
 #include <QDebug>
 #include <QMimeData>
@@ -61,14 +61,14 @@ bool MyQFileSystemModel::canItemsDroppedHere(const QModelIndex& index) const {
   return (index.isValid() and QFileInfo(filePath(index)).isDir()) or (not index.isValid() and not rootPath().isEmpty());
 }
 
-bool MyQFileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) const {
-  if ((action & supportedDropActions()) and data->hasUrls()) {
+bool MyQFileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& /*parent*/) const {
+  if ((action & supportedDropActions()) && data->hasUrls()) {
     return true;
   }
   return false;
 }
 
-bool MyQFileSystemModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) {
+bool MyQFileSystemModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& /*parent*/) {
   qDebug() << action << QString("%1 item(s) Drop In MyQFileSystemModel").arg(data->urls().size());
   return true;
 }
@@ -81,9 +81,9 @@ Qt::DropActions MyQFileSystemModel::supportedDragActions() const {
   return Qt::MoveAction | Qt::CopyAction | Qt::LinkAction;
 }
 
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
-void MyQFileSystemModel::whenRootPathChanged(const QString& newpath) {
+void MyQFileSystemModel::whenRootPathChanged(const QString& /*newpath*/) {
   previewsCnt = 0;
 }
 

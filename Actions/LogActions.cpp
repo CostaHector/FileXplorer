@@ -1,5 +1,6 @@
 #include "LogActions.h"
-#include "PublicVariable.h"
+#include "public/MemoryKey.h"
+#include "public/PublicVariable.h"
 
 LogActions::LogActions(QObject* parent) : QObject{parent} {
   _LOG_FILE = new (std::nothrow) QAction{QIcon(":img/RUNNING_LOGS"), "Logs"};

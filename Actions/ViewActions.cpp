@@ -1,6 +1,6 @@
 #include "ViewActions.h"
-#include "PublicVariable.h"
-
+#include "public/MemoryKey.h"
+#include "public/PublicVariable.h"
 ViewActions& g_viewActions() {
   static ViewActions ins;
   return ins;

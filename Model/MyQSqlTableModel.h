@@ -3,7 +3,7 @@
 
 #include <QFileInfo>
 #include <QSqlTableModel>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 class MyQSqlTableModel : public QSqlTableModel {
  public:
