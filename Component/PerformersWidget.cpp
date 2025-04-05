@@ -2,8 +2,9 @@
 
 #include "Actions/PerformersManagerActions.h"
 #include "Component/RatingSqlTableModel.h"
-#include "PublicTool.h"
-#include "PublicVariable.h"
+#include "public/PublicTool.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
@@ -20,6 +21,7 @@
 #include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QFileDialog>
 
 PerformersWidget::PerformersWidget(QWidget* parent)
     : QMainWindow{parent},

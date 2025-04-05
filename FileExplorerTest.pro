@@ -3,105 +3,89 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
+SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
+SOURCES += $$files(public/*.cpp)
+SOURCES += $$files(FileOperation/*.cpp)
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
-    MainTestSuite.cpp \
+    Component/NotificatorFrame.cpp \
+    Component/QuickWhereClause.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
+    Component/StateLabel.cpp \
     Component/SyncModifiyFileSystem.cpp \
-    Tools/FolderNxtAndLastIterator.cpp \
-    Tools/ThumbnailProcesser.cpp \
-    Tools/ItemsPileCategory.cpp \
-    Tools/LongPathFinder.cpp \
-    Tools/ProductionStudioManager.cpp \
-    Tools/PathTool.cpp\
-    Tools/NameTool.cpp\
-    Tools/ConflictsItemHelper.cpp \
-    Tools/ConvertUnicodeCharsetToAscii.cpp \
-    Tools/RedundantFolderRemove.cpp \
-    Tools/MD5Calculator.cpp \
-    Tools/QMediaInfo.cpp \
+    Tools/AIMediaDuplicate.cpp \
     Tools/Classify/ItemsClassifier.cpp \
     Tools/Classify/SceneMixed.cpp \
-    Component/QuickWhereClause.cpp \
-    Component/StateLabel.cpp \
-    Component/NotificatorFrame.cpp \
-    FileOperation/FileOperation.cpp \
-    FileOperation/FileOperatorPub.cpp \
-    PublicTool.cpp \
-    PublicVariable.cpp \
-    TestCase/pub/FileSystemHelper.cpp\
-    TestCase/pub/MyTestSuite.cpp\
-    Tools/PerformersAkaManager.cpp \
+    Tools/ConflictsItemHelper.cpp \
+    Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/DuplicateImagesRemover.cpp \
-    Tools/FilesNameBatchStandardizer.cpp \
-    Tools/NameStandardizer.cpp \
-    Tools/PerformersManager.cpp \
-    Tools/RenameNamesUnique.cpp \
-    Tools/RenameHelper.cpp \
-    Tools/SceneInfoManager.cpp \
-    Tools/ToConsecutiveFileNameNo.cpp \
-    Tools/NameSectionArrange.cpp \
-    Tools/AIMediaDuplicate.cpp \
-    Tools/JsonFileHelper.cpp \
     Tools/ExtractPileItemsOutFolder.cpp \
+    Tools/FilesNameBatchStandardizer.cpp \
+    Tools/FolderNxtAndLastIterator.cpp \
     Tools/ItemsPileCategory.cpp \
+    Tools/ItemsPileCategory.cpp \
+    Tools/JsonFileHelper.cpp \
+    Tools/LongPathFinder.cpp \
+    Tools/MD5Calculator.cpp \
+    Tools/NameSectionArrange.cpp \
+    Tools/NameStandardizer.cpp \
+    Tools/NameTool.cpp\
+    Tools/PerformersAkaManager.cpp \
+    Tools/PerformersManager.cpp \
+    Tools/ProductionStudioManager.cpp \
+    Tools/QMediaInfo.cpp \
+    Tools/RedundantFolderRemove.cpp \
+    Tools/RenameHelper.cpp \
+    Tools/RenameNamesUnique.cpp \
+    Tools/SceneInfoManager.cpp \
+    Tools/ThumbnailProcesser.cpp \
+    Tools/ToConsecutiveFileNameNo.cpp \
     model/ConflictsFileSystemModel.cpp \
-    UndoRedo.cpp
 
-
+HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(TestCase/pub/*.h)
+HEADERS += $$files(public/*.h)
+HEADERS += $$files(FileOperation/*.h)
 
 HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
-    Component/RenameWidgets/AdvanceRenamer.h \
-    Tools/FolderNxtAndLastIterator.h \
-    Tools/ThumbnailProcesser.h \
-    Tools/ItemsPileCategory.h \
-    Tools/LongPathFinder.h \
-    Tools/ProductionStudioManager.h \
-    Tools/PathTool.h\
-    Tools/NameTool.h\
-    Tools/ConflictsItemHelper.h \
-    Tools/MD5Calculator.h \
-    Component/QuickWhereClause.h \
-    Component/StateLabel.h \
     Component/NotificatorFrame.h \
+    Component/QuickWhereClause.h \
+    Component/RenameWidgets/AdvanceRenamer.h \
+    Component/StateLabel.h \
     Component/SyncModifiyFileSystem.h \
-    FileOperation/FileOperation.h \
-    FileOperation/FileOperatorPub.h \
-    public/DisplayEnhancement.h\
-    PublicTool.h \
-    PublicVariable.h \
-    TestCase/pub/BeginToExposePrivateMember.h\
-    TestCase/pub/EndToExposePrivateMember.h\
-    TestCase/pub/FileSystemHelper.h\
-    TestCase/pub/FileSystemRelatedTest.h\
-    TestCase/pub/MyTestSuite.h\
-    Tools/PerformersAkaManager.h \
-    Tools/DuplicateImagesRemover.h \
-    Tools/FilesNameBatchStandardizer.h \
-    Tools/NameStandardizer.h \
-    Tools/PerformersManager.h \
-    Tools/RenameNamesUnique.h \
-    Tools/RenameHelper.h \
-    Tools/SceneInfoManager.h \
-    Tools/ToConsecutiveFileNameNo.h \
-    Tools/ConvertUnicodeCharsetToAscii.h\
-    Tools/NameSectionArrange.h \
-    Tools/RedundantFolderRemove.h \
     Tools/AIMediaDuplicate.h \
-    Tools/QMediaInfo.h \
-    Tools/JsonFileHelper.h \
-    Tools/ExtractPileItemsOutFolder.h \
-    Tools/ItemsPileCategory.h \
     Tools/Classify/ItemsClassifier.h \
     Tools/Classify/SceneMixed.h \
+    Tools/ConflictsItemHelper.h \
+    Tools/ConvertUnicodeCharsetToAscii.h\
+    Tools/DuplicateImagesRemover.h \
+    Tools/ExtractPileItemsOutFolder.h \
+    Tools/FilesNameBatchStandardizer.h \
+    Tools/FolderNxtAndLastIterator.h \
+    Tools/ItemsPileCategory.h \
+    Tools/ItemsPileCategory.h \
+    Tools/JsonFileHelper.h \
+    Tools/LongPathFinder.h \
+    Tools/MD5Calculator.h \
+    Tools/NameSectionArrange.h \
+    Tools/NameStandardizer.h \
+    Tools/NameTool.h\
+    Tools/PerformersAkaManager.h \
+    Tools/PerformersManager.h \
+    Tools/ProductionStudioManager.h \
+    Tools/QMediaInfo.h \
+    Tools/RedundantFolderRemove.h \
+    Tools/RenameHelper.h \
+    Tools/RenameNamesUnique.h \
+    Tools/SceneInfoManager.h \
+    Tools/ThumbnailProcesser.h \
+    Tools/ToConsecutiveFileNameNo.h \
     model/ConflictsFileSystemModel.h \
-    UndoRedo.h
 
 DISTFILES += \
     readme.md

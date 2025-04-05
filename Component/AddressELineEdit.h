@@ -1,7 +1,7 @@
 #ifndef ADDRESSELINEEDIT_H
 #define ADDRESSELINEEDIT_H
 
-#include "Tools/PathTool.h"
+#include "public/PathTool.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QToolBar>

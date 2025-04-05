@@ -3,7 +3,8 @@
 
 #include <QAbstractTableModel>
 #include <QIcon>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 struct AlertItem {
  public:
@@ -37,8 +38,8 @@ class PreferenceModel : public QAbstractTableModel {
 
   QModelIndex setRootPath(const QString& /*path*/);
 
-  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_alerts.size(); }
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return AlertItem::ALERT_TABLE_HEADER.size(); }
+  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_alerts.size(); }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return AlertItem::ALERT_TABLE_HEADER.size(); }
   int failCount() const;
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
 

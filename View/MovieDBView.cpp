@@ -5,8 +5,9 @@
 #include "Component/QuickWhereClause.h"
 #include "Tools/PlayVideo.h"
 
-#include "PublicTool.h"
-#include "PublicVariable.h"
+#include "public/PublicTool.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -16,6 +17,8 @@
 
 #include <QSqlError>
 #include <QSqlQuery>
+
+#include <QFileDialog>
 
 MovieDBView::MovieDBView(DatabaseSearchToolBar* _dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent)
     : CustomTableView("MOVIE_TABLE", parent),

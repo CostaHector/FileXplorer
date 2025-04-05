@@ -1,19 +1,17 @@
 #ifndef PUBLICTOOL_H
 #define PUBLICTOOL_H
 
-#include <QAction>
 #include <QActionGroup>
-#include <QFileDialog>
 #include <QLayout>
 #include <QString>
 #include <QSqlDatabase>
 #include <QTranslator>
 
+QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG);
+QString TextReader(const QString& textPath);
+
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
-
 QString ChooseCopyDestination(QString defaultPath, QWidget *parent=nullptr);
-QString MoveCopyToRearrangeActionsText(const QString& first_path, QActionGroup* oldAG);
-
 QSqlDatabase GetSqlVidsDB();
 
 void LoadCNLanguagePack(QTranslator& translator);

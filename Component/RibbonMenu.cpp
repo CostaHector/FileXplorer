@@ -1,4 +1,4 @@
-#include "RibbonMenu.h"
+#include "Component/RibbonMenu.h"
 #include <QMenu>
 #include <QTabBar>
 #include <QToolButton>
@@ -20,8 +20,9 @@
 #include "Actions/LogActions.h"
 #include "Component/DatabaseToolBar.h"
 #include "Component/DropListToolButton.h"
-#include "PublicTool.h"
-#include "PublicVariable.h"
+#include "public/PublicTool.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
     : QTabWidget{parent},
