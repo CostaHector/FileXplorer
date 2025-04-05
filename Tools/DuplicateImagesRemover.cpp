@@ -2,8 +2,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QHash>
-#include "PublicVariable.h"
-#include "UndoRedo.h"
+#include "public/PublicVariable.h"
+#include "public/UndoRedo.h"
 
 using namespace FileOperatorType;
 

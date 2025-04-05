@@ -1,9 +1,10 @@
 #include "AdvanceRenamer.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Component/NotificatorFrame.h"
-#include "Tools/PathTool.h"
+#include "public/PathTool.h"
 #include "Tools/RenameNamesUnique.h"
-#include "UndoRedo.h"
+#include "public/UndoRedo.h"
 
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
     : QDialog(parent), windowTitleFormat("%1 | %2") {

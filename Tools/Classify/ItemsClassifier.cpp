@@ -1,6 +1,6 @@
 #include "ItemsClassifier.h"
 #include "Tools/Classify/SceneMixed.h"
-#include "UndoRedo.h"
+#include "public/UndoRedo.h"
 
 #include <QDir>
 #include <QMap>

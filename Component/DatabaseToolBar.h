@@ -11,7 +11,7 @@
 #include "Actions/PerformersManagerActions.h"
 #include "Actions/TorrentsManagerActions.h"
 #include "Actions/ViewActions.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 class DatabaseToolBar : public QToolBar {
  public:
