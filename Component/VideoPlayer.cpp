@@ -4,7 +4,8 @@
 #include "Component/NotificatorFrame.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
-#include "UndoRedo.h"
+#include "public/MemoryKey.h"
+#include "public/UndoRedo.h"
 
 #include <QVideoWidget>
 #include <QtWidgets>

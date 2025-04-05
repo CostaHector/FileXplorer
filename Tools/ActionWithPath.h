@@ -2,7 +2,7 @@
 #define ACTIONWITHPATH_H
 
 #include <QAction>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 class ActionWithPath : public QAction {
  public:

@@ -1,7 +1,7 @@
 #ifndef SCENESLISTMODEL_H
 #define SCENESLISTMODEL_H
 
-#include "Model/QAbstractListModelPub.h"
+#include "QAbstractListModelPub.h"
 #include "Tools/SceneInfoManager.h"
 #include <utility>
 #include <QSet>

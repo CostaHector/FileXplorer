@@ -1,5 +1,5 @@
 #include "PreferenceModel.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 const QStringList AlertItem::ALERT_TABLE_HEADER{"ID", "Name", "Value", "Note", "isOk"};
 

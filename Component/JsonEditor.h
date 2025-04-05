@@ -1,7 +1,7 @@
 #ifndef JSONEDITOR_H
 #define JSONEDITOR_H
 
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 #include <QFormLayout>
 #include <QKeyEvent>

@@ -1,7 +1,7 @@
 #include "PerformersPreviewTextBrowser.h"
 #include "Actions/FileBasicOperationsActions.h"
-#include "PublicTool.h"
-#include "PublicVariable.h"
+#include "public/PublicTool.h"
+#include "public/PublicVariable.h"
 #include "Tools/PerformerJsonFileHelper.h"
 
 #include <QDir>
