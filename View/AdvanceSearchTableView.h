@@ -1,7 +1,7 @@
 #ifndef ADVANCESEARCHTABLEVIEW_H
 #define ADVANCESEARCHTABLEVIEW_H
 
-#include "AdvanceSearchModel.h"
+#include "Model/AdvanceSearchModel.h"
 #include "Component/AdvanceSearchMenu.h"
 #include "Component/CustomStatusBar.h"
 #include "CustomTableView.h"

@@ -1,5 +1,6 @@
 #include "RenameWidget_Insert.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Tools/RenameHelper.h"
 
 RenameWidget_Insert::RenameWidget_Insert(QWidget* parent)  //

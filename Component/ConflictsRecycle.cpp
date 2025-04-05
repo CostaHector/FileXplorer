@@ -1,8 +1,8 @@
 #include "ConflictsRecycle.h"
 #include "Actions/ConflictsSolveActions.h"
 #include "Component/NotificatorFrame.h"
-#include "PublicVariable.h"
-#include "UndoRedo.h"
+#include "public/PublicVariable.h"
+#include "public/UndoRedo.h"
 
 #include <QDesktopServices>
 #include <QPushButton>

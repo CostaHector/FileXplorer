@@ -1,5 +1,6 @@
 #include "SearchCaseMatterToolButton.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolButton(parent) {
   m_searchCaseMenu->addSection(tr("search type(name or contents)"));

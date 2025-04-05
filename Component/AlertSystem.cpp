@@ -8,7 +8,7 @@
 
 #include "Actions/FileLeafAction.h"
 #include "NotificatorFrame.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 AlertSystem::AlertSystem(QWidget* parent)
     : QDialog{parent},

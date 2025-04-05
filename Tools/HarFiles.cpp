@@ -1,5 +1,6 @@
 #include "HarFiles.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/PublicTool.h"
 #include <QFile>
 #include <QDir>
 #include <QIODevice>
@@ -57,21 +58,7 @@ bool HarFiles::operator()(const QString& harAbsPath) {
   qDebug("parse har file[%s] start...", qPrintable(harAbsPath));
   init();
   mHarFilePath = harAbsPath;
-  QFile fi(harAbsPath);
-  if (!fi.exists()) {
-    qWarning("harJson file[%s] not exist", qPrintable(harAbsPath));
-    return false;
-  }
-
-  if (!fi.open(QIODevice::ReadOnly)) {
-    qWarning("harJson file[%s] read failed", qPrintable(harAbsPath));
-    return false;
-  }
-
-  QTextStream in(&fi);
-  in.setCodec("UTF-8");
-  QString jsonStr = in.readAll();
-  fi.close();
+  const QString& jsonStr = TextReader(harAbsPath);
 
   QJsonParseError jsonErr;
   QJsonDocument json_doc = QJsonDocument::fromJson(jsonStr.toUtf8(), &jsonErr);

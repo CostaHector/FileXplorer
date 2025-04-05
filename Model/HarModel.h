@@ -10,8 +10,8 @@ class HarModel : public QAbstractTableModelPub {
  public:
   explicit HarModel(QObject* parent = nullptr);
 
-  auto rowCount(const QModelIndex& parent = {}) const -> int override { return mHarParser.size(); }
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return HAR_VERTICAL_HEAD.size(); }
+  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return mHarParser.size(); }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return HAR_VERTICAL_HEAD.size(); }
 
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
 
