@@ -1,5 +1,5 @@
 #include "MemoryKey.h"
-#include "public/PathTool.h"
+#include "PathTool.h"
 
 ValueChecker::ValueChecker(const QStringList& candidates, const VALUE_TYPE valueType_)
     : valueType{valueType_}, m_strCandidates{candidates.cbegin(), candidates.cend()} {}

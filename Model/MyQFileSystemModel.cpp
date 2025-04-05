@@ -1,4 +1,4 @@
-#include "Model/MyQFileSystemModel.h"
+#include "MyQFileSystemModel.h"
 #include "public/PublicVariable.h"
 #include "public/PathTool.h"
 
