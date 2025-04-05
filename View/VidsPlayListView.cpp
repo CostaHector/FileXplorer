@@ -2,8 +2,8 @@
 #include "Actions/VideoPlayerActions.h"
 #include "Component/NotificatorFrame.h"
 
-#include "PublicVariable.h"
-#include "Tools/PathTool.h"
+#include "public/PublicVariable.h"
+#include "public/PathTool.h"
 
 #include <QDesktopServices>
 

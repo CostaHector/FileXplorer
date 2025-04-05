@@ -22,7 +22,7 @@ class DuplicateDetailsModel : public QAbstractTableModel {
 
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   auto rowCount(const QModelIndex& parent = {}) const -> int override;
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return VIDS_DETAIL_HEADER.size(); }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return VIDS_DETAIL_HEADER.size(); }
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override;
 
@@ -52,8 +52,8 @@ class VidInfoModel : public QAbstractTableModel {
   VidInfoModel(QObject* parent = nullptr);
 
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_classifiedSort[(int)m_currentDiffer].size(); }
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return DUPLICATE_LIST_HEADER.size(); }
+  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_classifiedSort[(int)m_currentDiffer].size(); }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return DUPLICATE_LIST_HEADER.size(); }
 
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
     if (role == Qt::TextAlignmentRole) {

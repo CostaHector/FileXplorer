@@ -1,7 +1,8 @@
 #include "TorrentsManagerWidget.h"
 #include "Actions/TorrentsManagerActions.h"
-#include "PublicVariable.h"
 #include "Tools/TorrentsDatabaseHelper.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>

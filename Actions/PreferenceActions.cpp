@@ -3,7 +3,7 @@
 #include <QFile>
 #include <QIODevice>
 #include <QTextStream>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {
   STYLE_WINDOWS_VISTA = new QAction{QIcon(":img/STYLE_WINDOWS_VISTA"), "windowsvista"};

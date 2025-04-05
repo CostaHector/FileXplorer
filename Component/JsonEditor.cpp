@@ -1,10 +1,10 @@
 #include "JsonEditor.h"
 
 #include "Actions/JsonEditorActions.h"
-
 #include "Component/NotificatorFrame.h"
-#include "Tools/ProductionStudioManager.h"
+#include "public/MemoryKey.h"
 
+#include "Tools/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/NameTool.h"
 #include "Tools/PerformersAkaManager.h"
@@ -344,7 +344,7 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   JsonEditor jsonEditor;
   jsonEditor.show();
-  jsonEditor.load(PROJECT_PATH + "/bin/JsonExample");
+  jsonEditor.load("./bin/JsonExample");
   a.exec();
   return 0;
 }

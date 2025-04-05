@@ -4,7 +4,7 @@
 #include "Component/DatabaseSearchToolBar.h"
 #include "Component/MovieDatabaseMenu.h"
 #include "Component/QuickWhereClause.h"
-#include "MyQSqlTableModel.h"
+#include "Model/MyQSqlTableModel.h"
 #include "View/CustomTableView.h"
 
 #include <QComboBox>
