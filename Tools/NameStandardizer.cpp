@@ -1,6 +1,6 @@
 #include "NameStandardizer.h"
 #include "Tools/ProductionStudioManager.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 const QRegularExpression stdCommaComp("\\s+,");
 const QRegularExpression stdExclamationComp("\\s+!");

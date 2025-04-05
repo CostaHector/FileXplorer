@@ -3,7 +3,7 @@
 
 #include "Component/RightClickMenu.h"
 #include "CustomTableView.h"
-#include "MyQFileSystemModel.h"
+#include "Model/MyQFileSystemModel.h"
 
 #include <QContextMenuEvent>
 #include <QDragEnterEvent>

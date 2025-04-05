@@ -6,7 +6,8 @@
 #include <QUrl>
 
 #include "Actions/JsonEditorActions.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 JsonListView::JsonListView(JsonModel* model_, QWidget* parent)
     : CustomListView{"JSON_LIST_VIEW", parent}, m_jsonModel{model_}, m_jsonMenu{g_jsonEditorActions().GetJsonToBeEdittedListMenu(this)} {

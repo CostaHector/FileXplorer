@@ -5,7 +5,8 @@
 #include <QActionGroup>
 #include <QObject>
 
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 class FileBasicOperationsActions : public QObject {
  public:

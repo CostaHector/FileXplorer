@@ -1,6 +1,6 @@
 #include "TorrentsManagerActions.h"
 #include <QMenu>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 TorrentsManagerActions::TorrentsManagerActions(QObject* parent)
     : QObject{parent},

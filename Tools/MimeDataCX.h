@@ -3,8 +3,8 @@
 
 #include <QMimeData>
 #include <QUrl>
-#include "PublicVariable.h"
-#include "Tools/PathTool.h"
+#include "public/PublicVariable.h"
+#include "public/PathTool.h"
 
 class MimeDataCX : public QMimeData {
   // Enhanced MimeDataCX, always keep folder structure
