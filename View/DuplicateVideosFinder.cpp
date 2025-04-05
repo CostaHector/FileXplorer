@@ -1,8 +1,8 @@
 #include "DuplicateVideosFinder.h"
 #include "Actions/DuplicateVideosFinderActions.h"
 #include "Actions/FileBasicOperationsActions.h"
-#include "PublicVariable.h"
-#include "UndoRedo.h"
+#include "public/PublicVariable.h"
+#include "public/UndoRedo.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>

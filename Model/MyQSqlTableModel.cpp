@@ -1,6 +1,6 @@
-#include "MyQSqlTableModel.h"
+#include "Model/MyQSqlTableModel.h"
 
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include "public/DisplayEnhancement.h"
 
 MyQSqlTableModel::MyQSqlTableModel(QObject* parent, QSqlDatabase con) : QSqlTableModel{parent, con} {

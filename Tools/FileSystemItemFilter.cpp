@@ -1,5 +1,5 @@
 #include "FileSystemItemFilter.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 FileSystemItemFilter::ItemStatistic FileSystemItemFilter::ItemCounter(const QStringList& items) {
   ItemStatistic itemStatistic;

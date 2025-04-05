@@ -2,7 +2,8 @@
 #include <QBrush>
 #include <QDir>
 #include <QDirIterator>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Tools/JsonFileHelper.h"
 
 JsonProperties::JsonProperties(const QString& path) : jsonPath{path}, perfsCount{getPerfsCount(path)} {}

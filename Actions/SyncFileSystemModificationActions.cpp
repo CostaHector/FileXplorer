@@ -1,6 +1,6 @@
 #include "SyncFileSystemModificationActions.h"
 #include "Component/SyncModifiyFileSystem.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {
   static SyncFileSystemModificationActions ins;

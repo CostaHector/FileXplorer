@@ -1,5 +1,5 @@
 #include "RedundantFolderRemove.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include <QDirIterator>
 #include <QDir>
 #include <cmath>

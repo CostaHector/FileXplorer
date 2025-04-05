@@ -1,6 +1,6 @@
 #include "PreviewBrowser.h"
 #include "Actions/FileBasicOperationsActions.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 #include <QDir>
 #include <QFileInfo>

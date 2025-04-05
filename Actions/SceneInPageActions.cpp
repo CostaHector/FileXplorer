@@ -1,6 +1,6 @@
 #include "SceneInPageActions.h"
 #include "Component/DropListToolButton.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include <QLineEdit>
 #include <QToolBar>
 #include <QLabel>

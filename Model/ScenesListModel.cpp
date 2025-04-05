@@ -1,5 +1,5 @@
 #include "ScenesListModel.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>

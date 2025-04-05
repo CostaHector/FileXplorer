@@ -120,7 +120,7 @@ class Toaster : public QDialog {
 
   void leaveEvent(QEvent* /*event*/) override { timer->start(); }
 
-  void closeEvent(QCloseEvent* event) override {
+  void closeEvent(QCloseEvent* /*event*/) override {
     // we don't need the notification anymore, delete it!
     deleteLater();
   }
