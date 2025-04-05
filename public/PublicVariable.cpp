@@ -1,4 +1,4 @@
-#include "public/PublicVariable.h"
+#include "PublicVariable.h"
 
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_3x1;
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_2x1;
