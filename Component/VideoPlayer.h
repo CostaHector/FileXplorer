@@ -14,7 +14,7 @@
 
 #include "Component/ClickableSlider.h"
 #include "Component/JsonPerformersListInputer.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 #include "Model/VidModel.h"
 #include "View/VidsPlayListView.h"

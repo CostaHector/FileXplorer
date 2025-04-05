@@ -1,7 +1,7 @@
 #include "SceneMixed.h"
-#include "Tools/PathTool.h"
+#include "public/PathTool.h"
 #include "Tools/ItemsPileCategory.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 using namespace ItemsPileCategory;
 

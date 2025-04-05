@@ -98,8 +98,8 @@ class ConflictsFileSystemModel : public QAbstractTableModel {
     return m_revertKeepItemPriority ? not recycleLeft : recycleLeft;
   }
 
-  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_conflict.m_fromPathItems.size(); }
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return HORIZONTAL_HEADER_NAMES.size(); }
+  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_conflict.m_fromPathItems.size(); }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return HORIZONTAL_HEADER_NAMES.size(); }
 
   auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
   auto headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const -> QVariant override;

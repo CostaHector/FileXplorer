@@ -1,5 +1,6 @@
 #include "CustomTableView.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "ViewStyleSheet.h"
 
 #include <QHeaderView>
