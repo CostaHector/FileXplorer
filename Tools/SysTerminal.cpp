@@ -1,5 +1,6 @@
 #include "SysTerminal.h"
-#include <PublicVariable.h>
+#include "Public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFile>
@@ -47,7 +48,7 @@ bool SysTerminal::operator()(const QString& path) {
     return false;
   }
   QProcess process;
-  process.setProgram("explorer.exe");
+  process.setProgram("cmd.exe");
   process.setArguments({QDir::toNativeSeparators(batAbsPath)});
   return process.startDetached();
 #else

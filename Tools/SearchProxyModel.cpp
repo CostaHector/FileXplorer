@@ -1,5 +1,7 @@
 #include "SearchProxyModel.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
+#include "public/PublicTool.h"
 
 SearchProxyModel::SearchProxyModel(QObject* parent)
     : QSortFilterProxyModel{parent},
@@ -165,18 +167,11 @@ void SearchProxyModel::setFileNameFiltersCaseSensitive(bool sensitive) {
 }
 
 bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const QString& contained) const {
-  qDebug("Read file [%s]", qPrintable(filePath));
   if (contained.isEmpty()) {
     return true;
   }
-  QFile fi(filePath);
-  if (!fi.open(QIODevice::Text | QIODevice::ReadOnly)) {
-    return false;
-  }
-  QTextStream ts(&fi);
-  ts.setCodec("UTF-8");
-  const QString& fileContents = ts.readAll();
-  fi.close();
+  qDebug("Read file [%s]", qPrintable(filePath));
+  const QString& fileContents = TextReader(filePath);
   // Todo: new feature on the way: regex match, parms text is a wildcard
   return fileContents.contains(contained, m_fileContentsCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }

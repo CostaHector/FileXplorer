@@ -12,8 +12,8 @@
 #include "Component/FolderPreview/PreviewFolder.h"
 #include "Component/StackedToolBar.h"
 
-#include "ContentPanel.h"
-#include "RibbonMenu.h"
+#include "Component/ContentPanel.h"
+#include "Component/RibbonMenu.h"
 
 class FileExplorerReadOnly : public QMainWindow {
   Q_OBJECT

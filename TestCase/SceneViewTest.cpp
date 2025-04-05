@@ -2,11 +2,11 @@
 #include <QtTest>
 
 // #include "pub/BeginToExposePrivateMember.h"
-#include "Tools/PathTool.h"
+#include "public/PathTool.h"
 #include "Tools/SceneInfoManager.h"
 // #include "pub/EndToExposePrivateMember.h"
-#include "PublicVariable.h"
-#include "PublicTool.h"
+#include "public/PublicVariable.h"
+#include "public/PublicTool.h"
 
 #include <QDir>
 #include <QFileInfo>

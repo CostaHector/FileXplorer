@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 #include "Tools/QMediaInfo.h"
 #include <chrono>
 
