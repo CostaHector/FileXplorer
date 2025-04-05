@@ -1,4 +1,4 @@
-#include "Model/MyQSqlTableModel.h"
+#include "MyQSqlTableModel.h"
 
 #include "public/PublicVariable.h"
 #include "public/DisplayEnhancement.h"
