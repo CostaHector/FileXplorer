@@ -5,7 +5,7 @@
 #include "Component/SearchCaseMatterToolButton.h"
 #include "Component/SearchModeComboBox.h"
 
-#include "AdvanceSearchModel.h"
+#include "Model/AdvanceSearchModel.h"
 #include "Tools/SearchProxyModel.h"
 
 #include <QLineEdit>

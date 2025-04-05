@@ -1,4 +1,4 @@
-#include "ContentPanel.h"
+#include "Component/ContentPanel.h"
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/ViewActions.h"
 #include "Component/NotificatorFrame.h"

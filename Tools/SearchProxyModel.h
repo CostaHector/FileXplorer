@@ -3,7 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <QSortFilterProxyModel>
-#include "AdvanceSearchModel.h"
+#include "Model/AdvanceSearchModel.h"
 #include "Tools/SearchTools.h"
 
 

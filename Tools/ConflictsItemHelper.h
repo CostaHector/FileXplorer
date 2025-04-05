@@ -8,8 +8,8 @@
 #include <QSet>
 #include <QString>
 #include <QStringList>
-#include "PublicVariable.h"
-#include "Tools/PathTool.h"
+#include "public/PublicVariable.h"
+#include "public/PathTool.h"
 
 class Finder {
  public:

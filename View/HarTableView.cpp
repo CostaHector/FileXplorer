@@ -1,5 +1,6 @@
 #include "HarTableView.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include <QFileDialog>
 #include <QLabel>
 

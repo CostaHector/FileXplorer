@@ -4,7 +4,7 @@
 #include <QAbstractItemView>
 #include <QClipboard>
 #include <QFileSystemModel>
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
 
 class MyClipboard : public QObject {
   Q_OBJECT
@@ -17,7 +17,7 @@ class MyClipboard : public QObject {
 
   int FillSelectionIntoClipboard(QAbstractItemView* _view, QFileSystemModel* _fileSysModel, const CCMMode cutCopy);
 
-  const QMimeData* mimeData(QClipboard::Mode mode = QClipboard::Clipboard) const { return m_clipboard->mimeData(); }
+  const QMimeData* mimeData(QClipboard::Mode /*mode*/ = QClipboard::Clipboard) const { return m_clipboard->mimeData(); }
 
  signals:
 

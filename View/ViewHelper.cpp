@@ -1,8 +1,20 @@
 #include "ViewHelper.h"
 #include "Component/ConflictsRecycle.h"
-#include "MyQFileSystemModel.h"
-
+#include "public/MemoryKey.h"
+#include "Model/MyQFileSystemModel.h"
 #include <QFileIconProvider>
+
+void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
+  if (view == nullptr) {
+    qDebug("UpdateItemViewFontSizeCore view* pointer is nullptr");
+    return;
+  }
+  const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
+  QFont defaultFont(view->font());
+  defaultFont.setPointSize(fontSize);
+  view->setFont(defaultFont);
+}
+
 bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to) {
   const unsigned URLS_SIZE = data->urls().size();
   if (URLS_SIZE == 0) {

@@ -1,5 +1,6 @@
 #include "FileSystemTypeFilter.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 #include <QDebug>
 #include <QSplitter>

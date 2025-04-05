@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "Component/StackedToolBar.h"
-#include "ContentPanel.h"
+#include "Component/ContentPanel.h"
 
 class NavigationViewSwitcher : public QObject {
  public:

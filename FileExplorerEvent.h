@@ -17,7 +17,7 @@
 #include "Tools/MyClipboard.h"
 #include "Tools/RedundantFolderRemove.h"
 
-#include "MyQFileSystemModel.h"
+#include "Model/MyQFileSystemModel.h"
 class MyQFileSystemModel;
 class ContentPanel;
 class CustomStatusBar;

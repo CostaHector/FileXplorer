@@ -1,6 +1,7 @@
 #include "PerformersManager.h"
 #include "Component/NotificatorFrame.h"
-#include "PublicVariable.h"
+#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Tools/JsonFileHelper.h"
 
 #include <QDir>
@@ -25,7 +26,7 @@ QSet<QString> PerformersManager::ReadOutPerformers() {
 #endif
 
   QFile performersFi(perfFilePath);
-  if (not performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+  if (!performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qWarning("file[%s] not found or open for read failed.", qPrintable(performersFi.fileName()));
     return {};
   }

@@ -3,7 +3,8 @@
 #include "View/SceneActionsSubscribe.h"
 #include "View/SceneListView.h"
 #include "Model/ScenesListModel.h"
-#include "PublicTool.h"
+#include "public/PublicTool.h"
+#include "public/MemoryKey.h"
 #include "Tools/ActionWithPath.h"
 #include "Tools/ViewTypeTool.h"
 using namespace ViewTypeTool;
