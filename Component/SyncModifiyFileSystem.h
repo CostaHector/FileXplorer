@@ -7,8 +7,6 @@
 
 class SyncModifiyFileSystem {
  public:
-  SyncModifiyFileSystem();
-
   bool operator()(QString& path) const;
 
   static void LoadFromMemory();
@@ -21,6 +19,7 @@ class SyncModifiyFileSystem {
 
   static QString m_basicPath;
   static QString m_synchronizedToPath;
+  static bool mInited;
 };
 
 #endif  // SYNCMODIFIYFILESYSTEM_H
