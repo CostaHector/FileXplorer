@@ -99,6 +99,7 @@ struct MemoryKey {
   static const KV DEFAULT_NEW_CHOICE;
   static const KV DEFAULT_COPY_CHOICE;
   static const KV DEFAULT_RENAME_CHOICE;
+  static const KV DEFAULT_EXTRACT_CHOICE;
   static const KV MOVE_TO_PATH_HISTORY;
   static const KV COPY_TO_PATH_HISTORY;
   static const KV WHERE_CLAUSE_HISTORY;
