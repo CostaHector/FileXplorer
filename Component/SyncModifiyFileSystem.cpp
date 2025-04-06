@@ -9,21 +9,22 @@ bool SyncModifiyFileSystem::m_alsoSyncReversebackSwitch = true;
 QString SyncModifiyFileSystem::m_basicPath;
 QString SyncModifiyFileSystem::m_synchronizedToPath;
 
-SyncModifiyFileSystem::SyncModifiyFileSystem() {}
+bool SyncModifiyFileSystem::mInited = false;
 
 void SyncModifiyFileSystem::LoadFromMemory() {
+  if (mInited) {
+    return;
+  }
   const QString& basicPath = PreferenceSettings().value("SYNC_BASIC_PATH", "").toString();
   const QString& toPath = PreferenceSettings().value("SYNC_TO_PATH", "").toString();
+  SetBasicPath(basicPath);
+  SetSynchronizedToPaths(toPath);
   const bool syncSwOn = PreferenceSettings().value("SYNC_FS_MOD", SyncModifiyFileSystem::m_syncModifyFileSystemSwitch).toBool();
   const bool syncBackOn = PreferenceSettings().value("SYNC_REVERSE_BACK", SyncModifiyFileSystem::m_alsoSyncReversebackSwitch).toBool();
-  if (!basicPath.isEmpty()) {
-    SetBasicPath(basicPath);
-  }
-  if (!toPath.isEmpty()) {
-    SetSynchronizedToPaths(toPath);
-  }
   SyncModifiyFileSystem::m_syncModifyFileSystemSwitch = syncSwOn;
   SyncModifiyFileSystem::m_alsoSyncReversebackSwitch = syncBackOn;
+
+  mInited = true;
 }
 bool SyncModifiyFileSystem::operator()(QString& path) const {
   if (!m_syncModifyFileSystemSwitch) {
