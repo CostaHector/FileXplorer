@@ -16,4 +16,5 @@ QSqlDatabase GetSqlVidsDB();
 
 void LoadCNLanguagePack(QTranslator& translator);
 void LoadSysLanaguagePack(QTranslator& translator);
+
 #endif  // PUBLICTOOL_H
