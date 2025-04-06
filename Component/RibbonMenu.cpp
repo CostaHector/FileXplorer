@@ -133,9 +133,11 @@ QToolBar* RibbonMenu::LeafHome() const {
   {
     const auto& _MOVE_TO_HIST_LIST = g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY->actions();
     const auto& _COPY_TO_HIST_LIST = g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY->actions();
-    auto* pMoveToToolButton = new DropdownToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
+    auto* pMoveToToolButton =
+        new DropdownToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
     pMoveToToolButton->setDefaultAction(g_fileBasicOperationsActions()._MOVE_TO);
-    auto* pCopyToToolButton = new DropdownToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
+    auto* pCopyToToolButton =
+        new DropdownToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
     pCopyToToolButton->setDefaultAction(g_fileBasicOperationsActions()._COPY_TO);
 
     moveCopyItemsToTB->addWidget(pMoveToToolButton);
@@ -324,8 +326,9 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto& thumbnailIns = g_ThumbnailProcessActions();
   QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
                                    thumbnailIns._SKIP_IF_ALREADY_EXIST};
-  QToolButton* thumbnailToolButton = new DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
-  thumbnailToolButton->setDefaultAction(thumbnailIns._EXTRACT_1ST_IMG);
+  auto* thumbnailToolButton = new DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
+  thumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
+  thumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
   if (archiveVidsTB == nullptr) {
