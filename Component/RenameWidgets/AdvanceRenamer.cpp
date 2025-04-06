@@ -1,30 +1,40 @@
 #include "AdvanceRenamer.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
-#include "Component/NotificatorFrame.h"
 #include "public/PathTool.h"
-#include "Tools/RenameNamesUnique.h"
 #include "public/UndoRedo.h"
+#include "public/PublicMacro.h"
+#include "Component/NotificatorFrame.h"
+#include "Tools/RenameNamesUnique.h"
 
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
     : QDialog(parent), windowTitleFormat("%1 | %2") {
   m_extensionInNameCB = new (std::nothrow) QCheckBox{"Extension in name"};
+  CHECK_NULLPTR_RETURN_VOID(m_extensionInNameCB)
   m_recursiveCB = new (std::nothrow) QCheckBox{"Recursive"};
+  CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
   regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state"};
+  CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
   m_relNameTE = new (std::nothrow) QPlainTextEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_relNameTE)
   m_oBaseTE = new (std::nothrow) QPlainTextEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_oBaseTE)
   m_oExtTE = new (std::nothrow) QPlainTextEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_oExtTE)
   m_nBaseTE = new (std::nothrow) QPlainTextEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_nBaseTE)
   m_nExtTE = new (std::nothrow) QPlainTextEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_nExtTE)
   m_buttonBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help};
+  CHECK_NULLPTR_RETURN_VOID(m_buttonBox)
   m_commandsPreview = new (std::nothrow) QPlainTextEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_commandsPreview)
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
 
   m_extensionInNameCB->setToolTip("Extension in file name.\nRules will also work on suffix");
-  m_recursiveCB->setToolTip("Recursive rename.\nRules will also work on itself and its subdirectories");
-
   m_extensionInNameCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
+  m_recursiveCB->setToolTip("Recursive rename.\nRules will also work on itself and its subdirectories");
   m_recursiveCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
 
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
@@ -162,7 +172,9 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   close();
   return isAllSuccess;
 }
-void AdvanceRenamer::onRegex(const int /*regexState*/) {
+void AdvanceRenamer::onRegex(const int regexState) {
+  const bool isRegexEnabled{regexState == Qt::Checked};
+  PreferenceSettings().setValue(MemoryKey::RENAMER_REGEX_ENABLED.name, isRegexEnabled);
   OnlyTriggerRenameCore();
 }
 
