@@ -1,10 +1,16 @@
 #include "RenameWidget_Insert.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
 #include "Tools/RenameHelper.h"
 
 RenameWidget_Insert::RenameWidget_Insert(QWidget* parent)  //
-    : AdvanceRenamer(parent), insertStrCB(new QComboBox), insertAtCB(new QComboBox) {}
+    : AdvanceRenamer(parent) {
+  insertStrCB = new (std::nothrow) QComboBox;
+  CHECK_NULLPTR_RETURN_VOID(insertStrCB)
+  insertAtCB = new (std::nothrow) QComboBox;
+  CHECK_NULLPTR_RETURN_VOID(insertAtCB)
+}
 
 void RenameWidget_Insert::extraSubscribe() {
   connect(insertAtCB, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
