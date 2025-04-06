@@ -5,9 +5,9 @@
 
 class RenameWidget_ConsecutiveFileNo : public AdvanceRenamer {
  public:
-  QLineEdit* m_fileNoStartIndex{new QLineEdit{"0", this}};
-
   RenameWidget_ConsecutiveFileNo(QWidget* parent = nullptr);
+
+  QLineEdit* m_fileNoStartIndex{nullptr};
 
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;

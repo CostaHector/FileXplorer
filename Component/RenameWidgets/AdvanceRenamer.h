@@ -29,7 +29,7 @@ class AdvanceRenamer : public QDialog {
 
   void Subscribe();
   bool onApply(const bool isOnlyHelp = false, const bool isInterative = false);
-  void onRegex(const int /*regexState*/);
+  void onRegex(const int regexState);
   void onIncludingSub(int includingSubState);
   void onIncludeSuffix(int includingSuffixState);
 
