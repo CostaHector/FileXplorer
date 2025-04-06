@@ -2,19 +2,28 @@
 #include "Tools/RenameHelper.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
 
 RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
     : AdvanceRenamer(parent) {
-  m_oldStrCB = new QComboBox;
-  m_newStrCB = new QComboBox;  //
-  m_regexCB = new QCheckBox("Regex");
+  m_oldStrCB = new (std::nothrow) QComboBox;
+  CHECK_NULLPTR_RETURN_VOID(m_oldStrCB)
+  m_newStrCB = new (std::nothrow) QComboBox;
+  CHECK_NULLPTR_RETURN_VOID(m_newStrCB)
+  m_regexCB = new (std::nothrow) QCheckBox("Regex");
+  CHECK_NULLPTR_RETURN_VOID(m_regexCB)
 }
 
 QToolBar* RenameWidget_Replace::InitControlTB() {
-  QToolBar* replaceControl = new QToolBar;
-  replaceControl->addWidget(new QLabel("Old:"));
+  QToolBar* replaceControl = new (std::nothrow) QToolBar;
+  CHECK_NULLPTR_RETURN_NULLPTR(replaceControl)
+  auto* pOldLabel = new (std::nothrow) QLabel("Old:");
+  CHECK_NULLPTR_RETURN_NULLPTR(pOldLabel)
+  auto* pNewLabel = new (std::nothrow) QLabel("New:");
+  CHECK_NULLPTR_RETURN_NULLPTR(pNewLabel)
+  replaceControl->addWidget(pOldLabel);
   replaceControl->addWidget(m_oldStrCB);
-  replaceControl->addWidget(new QLabel("New:"));
+  replaceControl->addWidget(pNewLabel);
   replaceControl->addWidget(m_newStrCB);
   replaceControl->addSeparator();
   replaceControl->addWidget(m_regexCB);
@@ -33,17 +42,18 @@ void RenameWidget_Replace::extraSubscribe() {
 auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
   m_oldStrCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
   m_oldStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  m_oldStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+  m_oldStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_oldStrCB->setEditable(true);
   m_oldStrCB->setCompleter(nullptr);  // block auto complete
 
   m_newStrCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_NEW_STR_LIST.name, MemoryKey::RENAMER_NEW_STR_LIST.v).toStringList());
   m_newStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  m_newStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+  m_newStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_newStrCB->setEditable(true);
   m_newStrCB->setCompleter(nullptr);
 
-  m_regexCB->setToolTip("Regular expression enable switch");
+  m_regexCB->setToolTip("Enable regex");
+  m_regexCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_REGEX_ENABLED.name, MemoryKey::RENAMER_REGEX_ENABLED.v).toBool());
 }
 
 QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
