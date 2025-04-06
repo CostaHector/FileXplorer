@@ -1,9 +1,13 @@
 #include "RenameWidget_ConsecutiveFileNo.h"
 #include "Tools/ToConsecutiveFileNameNo.h"
 #include "Component/NotificatorFrame.h"
+#include "public/PublicMacro.h"
 
 RenameWidget_ConsecutiveFileNo::RenameWidget_ConsecutiveFileNo(QWidget* parent)  //
     : AdvanceRenamer(parent) {
+  m_fileNoStartIndex = new (std::nothrow) QLineEdit{"0", this};
+  CHECK_NULLPTR_RETURN_VOID(m_fileNoStartIndex)
+
   m_extensionInNameCB->setCheckState(Qt::CheckState::Checked);
   m_recursiveCB->setEnabled(false);
   m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
