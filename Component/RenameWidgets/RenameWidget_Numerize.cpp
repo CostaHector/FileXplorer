@@ -1,6 +1,7 @@
 #include "RenameWidget_Numerize.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
 #include "Tools/RenameHelper.h"
 
 RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent) : AdvanceRenamer(parent) {
@@ -11,24 +12,22 @@ RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent) : AdvanceRenamer(p
 
 void RenameWidget_Numerize::InitExtraMemberWidget() {
   int startIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_START_INDEX.v).toInt();
-  const QStringList& noFormatCandidate{PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
-  int noFormatDefaultIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
   m_startNo = new (std::nothrow) QLineEdit(QString::number(startIndex));  // "0"
-  if (m_startNo == nullptr) {
-    qCritical("m_startNo is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(m_startNo)
   m_startNo->setMaximumWidth(20);
+
   m_numberPattern = new (std::nothrow) QComboBox;  // " - %1"
-  if (m_numberPattern == nullptr) {
-    qCritical("m_numberPattern is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(m_numberPattern)
   m_numberPattern->setEditable(true);
   m_numberPattern->setDuplicatesEnabled(false);
   m_numberPattern->setMaximumWidth(60);
+  const QStringList& noFormatCandidate{PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
   m_numberPattern->addItems(noFormatCandidate);
-  if (0 <= noFormatDefaultIndex && noFormatDefaultIndex < noFormatCandidate.size()) {
+
+  const int noFormatDefaultIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
+  if (noFormatDefaultIndex < 0 && noFormatDefaultIndex >= noFormatCandidate.size()) {
+    qWarning("number[%d] pattern out of bound[%d, %d)", noFormatDefaultIndex, 0, noFormatCandidate.size());
+  } else {
     m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
   }
 }
