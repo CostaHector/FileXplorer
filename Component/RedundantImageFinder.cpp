@@ -30,78 +30,88 @@ class RedundantImageModel : public QAbstractTableModelPub {
  public:
   friend class RedundantImageFinder;
   explicit RedundantImageModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
-  auto rowCount(const QModelIndex& parent = {}) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
-  auto columnCount(const QModelIndex& parent = {}) const -> int override { return HORIZONTAL_HEADER.size(); }
-  auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override {
-    if (m_paf == nullptr or not index.isValid()) {
-      return QVariant();
-    }
-    switch (role) {
-      case Qt::DisplayRole: {
-        switch (index.column()) {
-          case 0:
-            return PATHTOOL::fileName(m_paf->operator[](index.row()).filePath);
-          case 1:
-            return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->operator[](index.row()).size);
-          case 2:
-            return m_paf->operator[](index.row()).md5;
-          default:
-            return QVariant();
-        }
-        break;
-      }
-      case Qt::DecorationRole: {
-        if (index.column() == HORIZONTAL_HEADER.size() - 1) {
-          QPixmap pm{m_paf->operator[](index.row()).filePath};
-          return pm.scaledToWidth(128);
-        }
-        break;
-      }
-      default:
-        break;
-    }
-    return QVariant();
-  }
-  auto headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const -> QVariant override {
-    if (role == Qt::TextAlignmentRole) {
-      if (orientation == Qt::Vertical) {
-        return Qt::AlignRight;
-      }
-    }else if (role == Qt::DisplayRole) {
-      if (orientation == Qt::Orientation::Horizontal) {
-        return HORIZONTAL_HEADER[section];
-      }
-      return section + 1;
-    }
-    return QAbstractTableModel::headerData(section, orientation, role);
-  }
+  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return HORIZONTAL_HEADER.size(); }
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-  QString filePath(const QModelIndex& index) const {
-    if (m_paf == nullptr or not index.isValid())
-      return "";
-    const int r = index.row();
-    if (not(0 <= r and r < rowCount())) {
-      qWarning("r[%d] out of range[0, %d)", r, rowCount());
-      return "";
-    }
-    return m_paf->operator[](r).filePath;
-  }
-
-  void setRootPath(const REDUNDANT_IMG_BUNCH* p_af) {
-    int beforeRow = rowCount();
-    int afterRow = p_af != nullptr ? p_af->size() : 0;
-    qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
-
-    RowsCountBeginChange(beforeRow, afterRow);
-    m_paf = p_af;
-    RowsCountEndChange();
-  }
+  QString filePath(const QModelIndex& index) const;
+  void setRootPath(const REDUNDANT_IMG_BUNCH* p_af);
 
  private:
   const REDUNDANT_IMG_BUNCH* m_paf{nullptr};
   static const QStringList HORIZONTAL_HEADER;
 };
 const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview"};
+
+
+QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
+  if (m_paf == nullptr or not index.isValid()) {
+    return QVariant();
+  }
+  switch (role) {
+    case Qt::DisplayRole: {
+      switch (index.column()) {
+        case 0:
+          return PATHTOOL::fileName(m_paf->operator[](index.row()).filePath);
+        case 1:
+          return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->operator[](index.row()).size);
+        case 2:
+          return m_paf->operator[](index.row()).md5;
+        default:
+          return QVariant();
+      }
+      break;
+    }
+    case Qt::DecorationRole: {
+      if (index.column() == HORIZONTAL_HEADER.size() - 1) {
+        QPixmap pm{m_paf->operator[](index.row()).filePath};
+        return pm.scaledToWidth(128);
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  return QVariant();
+}
+
+QVariant RedundantImageModel::headerData(int section, Qt::Orientation orientation, int role) const {
+  if (role == Qt::TextAlignmentRole) {
+    if (orientation == Qt::Vertical) {
+      return Qt::AlignRight;
+    }
+  }else if (role == Qt::DisplayRole) {
+    if (orientation == Qt::Orientation::Horizontal) {
+      return HORIZONTAL_HEADER[section];
+    }
+    return section + 1;
+  }
+  return QAbstractTableModel::headerData(section, orientation, role);
+}
+
+QString RedundantImageModel::filePath(const QModelIndex& index) const {
+  if (m_paf == nullptr || !index.isValid()) {
+    return "";
+  }
+  const int r = index.row();
+  if (r < 0 || r >= rowCount()) {
+    qWarning("r[%d] out of range[0, %d)", r, rowCount());
+    return "";
+  }
+  return m_paf->operator[](r).filePath;
+}
+
+void RedundantImageModel::setRootPath(const REDUNDANT_IMG_BUNCH* p_af) {
+  int beforeRow = rowCount();
+  int afterRow = p_af != nullptr ? p_af->size() : 0;
+  qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
+
+  RowsCountBeginChange(beforeRow, afterRow);
+  m_paf = p_af;
+  RowsCountEndChange();
+}
+
 
 bool RedundantImageFinder::ALSO_RECYCLE_EMPTY_IMAGE = true;
 QSet<qint64> RedundantImageFinder::m_commonFileSizeSet;
