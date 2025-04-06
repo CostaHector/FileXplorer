@@ -243,7 +243,7 @@ void RedundantImageFinder::ReadLocalCharacteristicLib(const QString& libPath) {
   ds.setDevice(&m_libFi);
   qint64 size;
   QString md5;
-  while (not ds.atEnd()) {
+  while (!ds.atEnd()) {
     ds >> size >> md5;
     m_commonFileSizeSet.insert(size);
     m_commonFileHash.insert(md5);
@@ -251,6 +251,11 @@ void RedundantImageFinder::ReadLocalCharacteristicLib(const QString& libPath) {
 }
 
 void RedundantImageFinder::LearnCommonImageCharacteristic(const QString& folderPath) {
+  qDebug("Benchmark redundant images located in [%s]", qPrintable(folderPath));
+  if (folderPath == ".") {
+    qWarning("Benchmark redundant images path");
+    return;
+  }
   QDirIterator it(folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
