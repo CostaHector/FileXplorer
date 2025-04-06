@@ -149,6 +149,10 @@ const KV MemoryKey::DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", 
 const KV MemoryKey::DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
                                           "Rename (ith)",
                                           ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"}, CANDIDATE_STRING});
+const KV MemoryKey::DEFAULT_EXTRACT_CHOICE("DEFAULT_EXTRACT_CHOICE",
+                                           "Extract [0, 2) imgs",
+                                           ValueChecker{{"Thumbnail Extractor", "Extract [0, 2) imgs", "Extract [0, 4) imgs", "Extract [b, e) imgs"}, CANDIDATE_STRING});
+
 const KV MemoryKey::MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
 const KV MemoryKey::COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
 const KV MemoryKey::WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{PLAIN_STR});
@@ -184,9 +188,9 @@ const KV MemoryKey::RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",                
                                                      " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD",  //
                                                      ".*?", "([A-Z])", "( s\\d{1,2})"},                                                    //
                                          ValueChecker{QSTRING_LIST}};
-const KV MemoryKey::RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST",      //
-                                         QStringList{"", " ",         //
-                                                     " - 1080p",      //
+const KV MemoryKey::RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST",        //
+                                         QStringList{"", " ",           //
+                                                     " - 1080p",        //
                                                      " \\1", "\\1 -"},  //
                                          ValueChecker{QSTRING_LIST}};
 const KV MemoryKey::RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"}, ValueChecker{QSTRING_LIST}};
