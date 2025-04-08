@@ -57,6 +57,7 @@ struct ACMD {
   operator bool() const { return !isEmpty(); }
   bool isEmpty() const { return op == FileOperator::BUTT || lst.isEmpty(); }
   QString toStr() const { return QString::number(op) + ":" + lst.join('\t'); }
+  bool operator==(const ACMD& rhs) const;
 };
 
 using BATCH_COMMAND_LIST_TYPE = QList<ACMD>;
