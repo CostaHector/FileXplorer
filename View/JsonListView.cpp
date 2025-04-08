@@ -16,7 +16,7 @@ JsonListView::JsonListView(JsonModel* model_, QWidget* parent)
 
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
   setDragDropMode(QAbstractItemView::NoDragDrop);
-
+  setFlow(QListView::Flow::TopToBottom);
   subscribe();
 }
 
