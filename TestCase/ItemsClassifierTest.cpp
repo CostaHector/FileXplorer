@@ -1,12 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-#include "public/PublicTool.h"
 #include "pub/BeginToExposePrivateMember.h"
 #include "Tools/Classify/ItemsClassifier.h"
 #include "Tools/ExtractPileItemsOutFolder.h"
 #include "pub/EndToExposePrivateMember.h"
-
 #include "pub/FileSystemRelatedTest.h"
 
 class ItemsClassifierTest : public FileSystemRelatedTest {
@@ -14,7 +12,7 @@ class ItemsClassifierTest : public FileSystemRelatedTest {
  public:
   ItemsClassifierTest() : FileSystemRelatedTest{"TestEnv_Classfier"} {}
  private slots:
-  void init() {
+  void test_imgsVidsIsolatedExistedFolder() {
     /*
 Factory - Movie Name - Malik Daddy, Rafael Daddy
 isolated folder
@@ -24,19 +22,17 @@ Falcon - Heated.avi
 Falcon - Heated.mp4
 isolated file.json
      */
-    m_rootHelper << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy"} << FileSystemNode{"isolated folder"}
-                 << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy 1.jpg", false, ""} << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy.json", false, ""}
-                 << FileSystemNode{"Falcon - Heated.avi", false, ""} << FileSystemNode{"Falcon - Heated.mp4", false, ""} << FileSystemNode{"isolated file.json", false, ""};
-  }
+    m_rootHelper << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy"}                   //
+                 << FileSystemNode{"isolated folder"}                                                    //
+                 << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy 1.jpg", false, ""}  //
+                 << FileSystemNode{"Factory - Movie Name - Malik Daddy, Rafael Daddy.json", false, ""}   //
+                 << FileSystemNode{"Falcon - Heated.avi", false, ""}                                     //
+                 << FileSystemNode{"Falcon - Heated.mp4", false, ""}                                     //
+                 << FileSystemNode{"isolated file.json", false, ""};
 
-  void initTestCase() { qDebug("Start ItemsClassifierTest..."); }
-  //  initTestCase_data();//将被调用以创建全局测试数据表。
-  void cleanupTestCase() { qDebug("End ItemsClassifierTest..."); }
-
-  void test_imgsVidsIsolatedExistedFolder() {
     QStringList theFirstItems = QDir(ROOT_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
 
-            // packer
+    // packer
     QMap<QString, QStringList> folder2Items;
     folder2Items["isolated file"] << "isolated file.json";                                                                        // isolated not rearrange
     folder2Items["isolated folder"] << "isolated folder";                                                                         // folder not rearrange
@@ -61,7 +57,7 @@ isolated file.json
     QCOMPARE(expectItems.size(), 4);
     QCOMPARE(itemsActual, expectItems);
 
-            // unpacker
+    // unpacker
     ExtractPileItemsOutFolder unpacker;
     int upackedFoldersCnt = unpacker(ROOT_DIR);
     QCOMPARE(upackedFoldersCnt, 2);
@@ -69,13 +65,14 @@ isolated file.json
     QVERIFY(unpacker.StartToRearrange());
 
     QStringList theLastItems = QDir(ROOT_DIR, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
-    theLastItems << "Factory - Movie Name - Malik Daddy, Rafael Daddy";  // this folder will be removed at correct purpose
+    // this empty folder will be removed after unpack
+    // before items and after items only differ in this folder
+    theLastItems << "Factory - Movie Name - Malik Daddy, Rafael Daddy";
     theFirstItems.sort();
     theLastItems.sort();
     QCOMPARE(theFirstItems, theLastItems);
-    QCOMPARE(1, 2);
   }
 };
 
-// QTEST_MAIN(ItemsClassifierTest);
+//QTEST_MAIN(ItemsClassifierTest);
 #include "ItemsClassifierTest.moc"

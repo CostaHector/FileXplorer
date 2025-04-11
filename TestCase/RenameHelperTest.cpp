@@ -52,6 +52,30 @@ class RenameHelperTest : public MyTestSuite {
     QCOMPARE(ansLst, expectList);
   }
 
+  void test_regular_expression_replace() {
+    QRegularExpression repRegex("^(.*?)$");
+    QVERIFY(repRegex.isValid());
+    QString beforeName {"FS 001"};
+    beforeName.replace(repRegex, "FusionSphere \\1 front");
+    QCOMPARE(beforeName, "FusionSphere FS 001 front");
+  }
+
+  void test_ReplaceRename_regex_ok() {
+    QStringList replaceeList;
+    replaceeList << "FS 01"
+                 << "FS 02"
+                 << "FS 05";
+    QStringList expectList;
+    expectList << "FushionSphere FS 01 Back"
+               << "FushionSphere FS 02 Back"
+               << "FushionSphere FS 05 Back";
+    QString oldString{"^(.*?)$"};
+    QString newString{"FushionSphere \\1 Back"};
+    bool regexEnable{true};
+    QStringList ansLst = ReplaceRename(replaceeList, oldString, newString, regexEnable);
+    QCOMPARE(ansLst, expectList);
+  }
+
   void test_ReplaceRename_skip_ok() {
     QVERIFY(ReplaceRename({}, "A", "B", false).isEmpty());
     QVERIFY(ReplaceRename({"AAA", "BBB"}, "", "B", false).isEmpty());
