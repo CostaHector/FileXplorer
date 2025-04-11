@@ -183,16 +183,13 @@ const KV MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER{"DISABLE_ENTRIES_DONT_PASS_
 const KV MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION{"RENAMER_INCLUDING_FILE_EXTENSION", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::RENAMER_INCLUDING_DIR{"RENAMER_INCLUDING_DIR", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",                                                                           //
-                                         QStringList{"",                                                                                   //
-                                                     " BB ", " BB",                                                                        //
+                                         QStringList{"", "^(.*?)$", " BB ", " BB",                                                                        //
                                                      " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD",  //
-                                                     ".*?", "([A-Z])", "( s\\d{1,2})"},                                                    //
-                                         ValueChecker{QSTRING_LIST}};
+                                                     "([A-Z])", "( s\\d{1,2})"},                                                    //
+                                                                                ValueChecker{QSTRING_LIST}}; //
 const KV MemoryKey::RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST",        //
-                                         QStringList{"", " ",           //
-                                                     " - 1080p",        //
-                                                     " \\1", "\\1 -"},  //
-                                         ValueChecker{QSTRING_LIST}};
+                                         QStringList{"", " ", " \\1", "\\1 -", " - 1080p"},  //
+                                                                                ValueChecker{QSTRING_LIST}};
 const KV MemoryKey::RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"}, ValueChecker{QSTRING_LIST}};
 const KV MemoryKey::RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2", ValueChecker{PLAIN_STR}};
 const KV MemoryKey::RENAMER_REGEX_ENABLED{"RENAMER_REGEX_ENABLED", false, ValueChecker{PLAIN_BOOL}};
