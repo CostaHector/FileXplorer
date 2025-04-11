@@ -16,7 +16,7 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldStr
     }
     return replacedLst;
   }
-  QRegularExpression repRegex(oldString);
+  const QRegularExpression repRegex(oldString);
   if (!repRegex.isValid()) {
     qWarning("regular expression error[%s]", qPrintable(oldString));
     return {};
