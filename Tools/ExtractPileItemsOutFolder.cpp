@@ -8,13 +8,10 @@
 using namespace ItemsPileCategory;
 using namespace FileOperatorType;
 
-QMap<QString, QStringList> ExtractPileItemsOutFolder::UnpackItemFromPiles(const QString& path) {
+QMap<QString, QStringList> ExtractPileItemsOutFolder::GetFolder2ItemsMapByCurPath(const QString& path) {
   QDir rootPathDir(path, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
-  return UnpackItemFromPiles(path, rootPathDir.entryList());
-}
-QMap<QString, QStringList> ExtractPileItemsOutFolder::UnpackItemFromPiles(const QString& path, const QStringList& folders) {
   QMap<QString, QStringList> folder2PileItems;
-  for (const QString& subPath : folders) {
+  for (const QString& subPath : rootPathDir.entryList()) {
     QDir pathDir{path + '/' + subPath, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
     if (!pathDir.isEmpty(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot)) {
       qDebug("skip, folder existed in path[%s]", qPrintable(pathDir.absolutePath()));
@@ -61,8 +58,9 @@ bool ExtractPileItemsOutFolder::CanExtractOut(const QStringList& items) {
   return true;
 }
 
-int ExtractPileItemsOutFolder::operator()(const QString& path, const QMap<QString, QStringList>& folder2PileItems) {
-  QDir outDir(path);
+int ExtractPileItemsOutFolder::operator()(const QString& path,                                 //
+                                          const QMap<QString, QStringList>& folder2PileItems,  //
+                                          const QStringList& alreadyExistItems) {
   int foldersNeedExtractCnt = 0, itemsExtractedOutCnt = 0;
   for (auto it = folder2PileItems.cbegin(); it != folder2PileItems.cend(); ++it) {
     const QString& folderName = it.key();
@@ -78,7 +76,7 @@ int ExtractPileItemsOutFolder::operator()(const QString& path, const QMap<QStrin
     }
     int filesExtractedCnt = 0;
     for (const QString& file : files) {
-      if (outDir.exists(file)) {
+      if (alreadyExistItems.contains(file)) {
         qDebug("%s/%s already exist outside, move will failed, skip it", qPrintable(path), qPrintable(file));
         continue;
       }
@@ -96,8 +94,10 @@ int ExtractPileItemsOutFolder::operator()(const QString& path, const QMap<QStrin
 }
 
 int ExtractPileItemsOutFolder::operator()(const QString& path) {
-  const QMap<QString, QStringList>& folder2PileItems = UnpackItemFromPiles(path);
-  return operator()(path, folder2PileItems);
+  QDir dirIt{path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  const QStringList& alreadyExistItems = dirIt.entryList();
+  const QMap<QString, QStringList>& folder2PileItems = GetFolder2ItemsMapByCurPath(path);
+  return operator()(path, folder2PileItems, alreadyExistItems);
 }
 
 bool ExtractPileItemsOutFolder::StartToRearrange() {

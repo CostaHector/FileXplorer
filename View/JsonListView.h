@@ -14,7 +14,7 @@ class JsonListView : public CustomListView {
 
   int currentRow() const { return currentIndex().row(); }
   void setCurrentRow(int row) { setCurrentIndex(m_jsonModel->index(row)); }
-  int count() const { return m_jsonModel->rowCount(); };
+  int count() const { return m_jsonModel->rowCount(); }
   QString filePath(int row) const { return m_jsonModel->filePath(m_jsonModel->index(row)); }
 
   auto hasLast() const -> bool;
