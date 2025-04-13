@@ -1,25 +1,16 @@
 #ifndef PERFORMERSPREVIEWTEXTBROWSER_H
 #define PERFORMERSPREVIEWTEXTBROWSER_H
 
-#include <QTextBrowser>
-
-#include <QDesktopServices>
-#include <QDir>
-#include <QScrollBar>
+#include "FolderPreview/ClickableTextBrowser.h"
 #include <QSqlRecord>
-#include <QTextBrowser>
-#include <QTextCursor>
-#include <QTextEdit>
 
-class PerformersPreviewTextBrowser : public QTextBrowser {
+class PerformersPreviewTextBrowser : public ClickableTextBrowser {
  public:
   explicit PerformersPreviewTextBrowser(QWidget* parent = nullptr);
   auto operator()(const QSqlRecord& record, const QString& m_imageHostPath, const int m_performerImageHeight = 200) -> bool;
   void subscribe();
   QSize sizeHint() const override;
   auto keyPressEvent(QKeyEvent* e) -> void override;
-
-  bool onAnchorClicked(const QUrl& url);
 
   QStringList InitImgsList(const QString& dirPath) const;
   bool hasNextImgs() const;
@@ -34,9 +25,6 @@ class PerformersPreviewTextBrowser : public QTextBrowser {
   QString dirPath;
   QStringList m_imgsLst;
 
-  static const QString HTML_IMG_TEMPLATE;
-  static constexpr int HTML_IMG_FIXED_WIDTH = 600;
-  static const QString VID_LINK_TEMPLATE;
   static QString PERFORMER_HTML_TEMPLATE;
   static const QRegularExpression IMG_VID_SEP_COMP;
 };

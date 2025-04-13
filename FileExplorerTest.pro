@@ -43,6 +43,7 @@ SOURCES += \
     Tools/SceneInfoManager.cpp \
     Tools/ThumbnailProcesser.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
+    Tools/SplitterInsertIndexHelper.cpp \
     model/ConflictsFileSystemModel.cpp \
 
 HEADERS += $$files(TestCase/*.h)
@@ -85,6 +86,7 @@ HEADERS += \
     Tools/SceneInfoManager.h \
     Tools/ThumbnailProcesser.h \
     Tools/ToConsecutiveFileNameNo.h \
+    Tools/SplitterInsertIndexHelper.h \
     model/ConflictsFileSystemModel.h \
 
 DISTFILES += \
