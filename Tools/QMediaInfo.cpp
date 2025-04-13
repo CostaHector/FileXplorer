@@ -25,6 +25,8 @@ QMediaInfo::QMediaInfo() {
     // ERROR_BAD_EXE_FORMAT: 0x0x000000c1.
     // use win64 archi
     qDebug("load lib failed: %s", qPrintable(_lib->errorString()));
+    delete _lib;
+    _lib = nullptr;
     return;
   }
   qDebug("load[%s] success", qPrintable(_lib->fileName()));
@@ -294,11 +296,16 @@ QString QMediaInfo::FileExtension() const {
 }
 
 bool QMediaInfo::IsLoaded() const {
-  return (_lib->isLoaded());
+  return _lib != nullptr && _lib->isLoaded();
 }
 
 QMediaInfo::~QMediaInfo() {
+  if (_lib == nullptr) {
+    return;
+  }
   MEDIAINFO_Delete d = (MEDIAINFO_Delete)_lib->resolve("MediaInfo_Delete");
   d(_pMedia);
-  _lib->unload();
+  if (IsLoaded()) {
+    _lib->unload();
+  }
 }
