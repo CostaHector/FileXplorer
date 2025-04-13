@@ -19,7 +19,7 @@ class FolderPreviewActions : public QObject {
   QAction* LISTS{nullptr};
   QAction* BROWSER{nullptr};
   QAction* LABELS{nullptr};
-  QActionGroup* PREVIEW_AG{new QActionGroup{this}};
+  QActionGroup* PREVIEW_AG{nullptr};
 };
 
 FolderPreviewActions& g_folderPreviewActions();

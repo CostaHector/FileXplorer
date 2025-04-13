@@ -21,8 +21,7 @@ SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(AllQtLearning/*.cpp)
 SOURCES += $$files(*.cpp)
 
-HEADERS += $$files(Actions/*.h) \
-    public/PublicMacro.h
+HEADERS += $$files(Actions/*.h)
 HEADERS += $$files(Model/*.h)
 HEADERS += $$files(View/*.h)
 HEADERS += $$files(Component/*.h)
