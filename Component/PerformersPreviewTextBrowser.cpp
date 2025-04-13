@@ -1,32 +1,20 @@
 #include "PerformersPreviewTextBrowser.h"
-#include "Actions/FileBasicOperationsActions.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 #include "Tools/PerformerJsonFileHelper.h"
 
+#include <QScrollBar>
 #include <QDir>
-#include <QFileInfo>
-#include <QIODevice>
 #include <QKeyEvent>
-#include <QSqlField>
-#include <QSqlQuery>
-#include <QTextStream>
 
 constexpr int PerformersPreviewTextBrowser::SHOW_IMGS_CNT_LIST[];
 constexpr int PerformersPreviewTextBrowser::N_SHOW_IMGS_CNT_LIST;
 
-const QString PerformersPreviewTextBrowser::HTML_IMG_TEMPLATE = "<a href=\"file:///%1\"><img src=\"%1\" alt=\"%2\" width=\"%3\"></a><br/>\n";
-constexpr int PerformersPreviewTextBrowser::HTML_IMG_FIXED_WIDTH;
-
-const QString PerformersPreviewTextBrowser::VID_LINK_TEMPLATE = "<a href=\"file:///%1\">&#9654;%1</a>";
-
 QString PerformersPreviewTextBrowser::PERFORMER_HTML_TEMPLATE;
 const QRegularExpression PerformersPreviewTextBrowser::IMG_VID_SEP_COMP("\\||\r\n|\n");
 
-PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent) : QTextBrowser(parent) {
-  setReadOnly(true);
-  setOpenLinks(false);
-  setOpenExternalLinks(true);
+PerformersPreviewTextBrowser::PerformersPreviewTextBrowser(QWidget* parent)  //
+    : ClickableTextBrowser(parent) {
   subscribe();
 }
 
@@ -46,25 +34,17 @@ bool PerformersPreviewTextBrowser::operator()(const QSqlRecord& record, const QS
   QString vidsLinks;
   if (not vids.isEmpty()) {
     for (const QString& vidPath : vids.split(IMG_VID_SEP_COMP)) {
-      vidsLinks += (VID_LINK_TEMPLATE.arg(vidPath) + "<br/>");
+      vidsLinks += (VID_LINK_TEMPLATE.arg(vidPath, vidPath) + "<br/>");
     }
   }
 
   dirPath = m_imageHostPath + '/' + ori + '/' + name;
   m_curImgCntIndex = 0;
   const QString& firstImgPath = m_imgsLst.isEmpty() ? "" : dirPath + '/' + m_imgsLst.front();
-  if (PERFORMER_HTML_TEMPLATE.isEmpty()){
-      PERFORMER_HTML_TEMPLATE = TextReader(":txt/PERFORMER_HTML_TEMPLATE");
+  if (PERFORMER_HTML_TEMPLATE.isEmpty()) {
+    PERFORMER_HTML_TEMPLATE = TextReader(":txt/PERFORMER_HTML_TEMPLATE");
   }
-  const QString& htmlSrc = PERFORMER_HTML_TEMPLATE.arg(name)
-                               .arg(firstImgPath)
-                               .arg(m_performerImageHeight)
-                               .arg(rates)
-                               .arg(akas)
-                               .arg(tags)
-                               .arg(ori)
-                               .arg(vidsLinks)
-                               .arg(details);
+  const QString& htmlSrc = PERFORMER_HTML_TEMPLATE.arg(name).arg(firstImgPath).arg(m_performerImageHeight).arg(rates).arg(akas).arg(tags).arg(ori).arg(vidsLinks).arg(details);
   setHtml(htmlSrc);
   return true;
 }
@@ -72,7 +52,6 @@ bool PerformersPreviewTextBrowser::operator()(const QSqlRecord& record, const QS
 void PerformersPreviewTextBrowser::subscribe() {
   connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &PerformersPreviewTextBrowser::ShowRemainImages);
   //  connect(this->verticalScrollBar(), &QScrollBar::actionTriggered, this, &PerformersPreviewTextBrowser::onVerticalScrollBarAction);
-  connect(this, &QTextBrowser::anchorClicked, this, &PerformersPreviewTextBrowser::onAnchorClicked);
 }
 
 QSize PerformersPreviewTextBrowser::sizeHint() const {
@@ -118,14 +97,6 @@ QString PerformersPreviewTextBrowser::nextImgsHTMLSrc() {
   }
   ++m_curImgCntIndex;
   return imgSrc;
-}
-
-bool PerformersPreviewTextBrowser::onAnchorClicked(const QUrl& url) {
-  if (not url.isLocalFile()) {
-    return false;
-  }
-  QDesktopServices::openUrl(url);
-  return true;
 }
 
 bool PerformersPreviewTextBrowser::ShowRemainImages(const int val) {

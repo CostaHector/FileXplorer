@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
-
+#include "pub/MyTestSuite.h"
 // add necessary includes here
 #include "Component/SyncModifiyFileSystem.h"
 
-class SyncModifiyFileSystemTest : public QObject {
+class SyncModifiyFileSystemTest : public MyTestSuite {
   Q_OBJECT
  public:
   SyncModifiyFileSystem syncMod;
@@ -17,16 +17,11 @@ class SyncModifiyFileSystemTest : public QObject {
   }
   void cleanupTestCase() { qDebug("End SyncModifiyFileSystemTest..."); }
 
-  void init() {}
-  void cleanup() {}
-
   void test_syncSwitchOff() {
     syncMod.m_syncModifyFileSystemSwitch = false;
     syncMod.m_alsoSyncReversebackSwitch = true;
     // rename: path/oldItemName => path/newItemName
     QString path = "C:/Program Files";
-    QString oldItemName = "old.txt";
-    QString newItemName = "new.txt";
     QVERIFY2(!syncMod(path), "switch is off, no sync");
     QCOMPARE(path, "C:/Program Files");
   }
@@ -37,8 +32,6 @@ class SyncModifiyFileSystemTest : public QObject {
     // rename: path1/oldItemName => path2/newItemName
     QString path1 = "D:/home/to/randompath";
     QString path2 = "D:/home";
-    QString oldItemName = "old.txt";
-    QString newItemName = "new.txt";
     QVERIFY2(!syncMod(path1), "should no need to sync");
 
     path1 = "C:/Program Files";
@@ -56,8 +49,6 @@ class SyncModifiyFileSystemTest : public QObject {
     syncMod.m_alsoSyncReversebackSwitch = false;
     // rename: path/oldItemName => path/newItemName
     QString path = "C:/Program Files";
-    QString oldItemName = "old.txt";
-    QString newItemName = "new.txt";
 
     QVERIFY2(syncMod(path), "should sync");
     QCOMPARE(path, "C:/Users");
@@ -79,5 +70,5 @@ class SyncModifiyFileSystemTest : public QObject {
   }
 };
 
-//QTEST_MAIN(SyncModifiyFileSystemTest)
 #include "SyncModifiyFileSystemTest.moc"
+SyncModifiyFileSystemTest g_SyncModifiyFileSystemTest;
