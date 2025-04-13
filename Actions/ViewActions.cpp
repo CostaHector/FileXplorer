@@ -18,7 +18,6 @@ ViewActions::ViewActions(QObject* parent)
       _VIEWS_AG{GetViewsAG()},
 
       NAVIGATION_PANE{new QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"))},
-      PREVIEW_PANE_HTML{new QAction(QIcon(":img/SHOW_FOLDER_PREVIEW_HTML"), tr("Folder Preview"))},
       _JSON_EDITOR_PANE{new QAction(QIcon(":img/JSON_EDITOR"), tr("Json Editor"))},
       _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":img/VIDEO_PLAYER"), tr("Embedded Player"))},
       _VIEW_ACTIONS(Get_NAVIGATION_PANE_Actions()),
@@ -31,10 +30,6 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   NAVIGATION_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
   NAVIGATION_PANE->setCheckable(true);
 
-  PREVIEW_PANE_HTML->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_P));
-  PREVIEW_PANE_HTML->setToolTip(QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(PREVIEW_PANE_HTML->text(), PREVIEW_PANE_HTML->shortcut().toString()));
-  PREVIEW_PANE_HTML->setCheckable(true);
-
   _JSON_EDITOR_PANE->setCheckable(true);
   _JSON_EDITOR_PANE->setToolTip(QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(_JSON_EDITOR_PANE->text(), _JSON_EDITOR_PANE->shortcut().toString()));
 
@@ -44,13 +39,11 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
 
   auto* actionGroup = new QActionGroup(this);
   actionGroup->addAction(NAVIGATION_PANE);
-  actionGroup->addAction(PREVIEW_PANE_HTML);
   actionGroup->addAction(_JSON_EDITOR_PANE);
   actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   NAVIGATION_PANE->setChecked(PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
-  PREVIEW_PANE_HTML->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name).toBool());
   return actionGroup;
 }
 
