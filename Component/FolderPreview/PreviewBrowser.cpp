@@ -1,7 +1,8 @@
 #include "PreviewBrowser.h"
-#include "Actions/FileBasicOperationsActions.h"
 #include "public/PublicVariable.h"
 
+#include <QScrollBar>
+#include <QTextCursor>
 #include <QDir>
 #include <QFileInfo>
 #include <QIODevice>
@@ -10,15 +11,8 @@
 constexpr int PreviewBrowser::SHOW_IMGS_CNT_LIST[];
 constexpr int PreviewBrowser::N_SHOW_IMGS_CNT_LIST;
 
-const QString PreviewBrowser::HTML_H1_TEMPLATE = "<a href=\"file:///%1\">%2</a>";
-const QString PreviewBrowser::HTML_H1_WITH_VIDS_TEMPLATE = "<a href=\"file:///%1\">&#9654;%2</a>";
-const QString PreviewBrowser::HTML_IMG_TEMPLATE = "<a href=\"file:///%1\"><img src=\"%1\" alt=\"%2\" width=\"%3\"></a><br/>\n";
-constexpr int PreviewBrowser::HTML_IMG_FIXED_WIDTH;
-
-PreviewBrowser::PreviewBrowser(QWidget* parent) : m_parentDocker(parent), m_PLAY_ACTION(g_fileBasicOperationsActions().OPEN_AG->actions()[0]) {
-  setReadOnly(true);
-  setOpenLinks(false);
-  setOpenExternalLinks(true);
+PreviewBrowser::PreviewBrowser(QWidget* parent)  //
+    : ClickableTextBrowser{parent}, m_parentDocker(parent) {
   subscribe();
 }
 
@@ -36,8 +30,7 @@ bool PreviewBrowser::operator()(const QString& path) {
     vidCnt = vidDir.entryList().size();
     m_imgsLst = InitImgsList(dirPath);
   }
-  const QString& headLine = fi.isDir() ? HTML_H1_WITH_VIDS_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName())
-                                       : HTML_H1_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName());
+  const QString& headLine = fi.isDir() ? VID_LINK_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName()) : HTML_H1_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName());
   setDockerWindowTitle(vidCnt);
 
   QString htmlSrc;
@@ -58,7 +51,6 @@ bool PreviewBrowser::operator()(const QString& path) {
 
 void PreviewBrowser::subscribe() {
   connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &PreviewBrowser::ShowRemainImages);
-  connect(this, &QTextBrowser::anchorClicked, this, &PreviewBrowser::onAnchorClicked);
 }
 
 QStringList PreviewBrowser::InitImgsList(const QString& dirPath) const {
@@ -92,21 +84,6 @@ QString PreviewBrowser::nextImgsHTMLSrc() {
   }
   ++m_curImgCntIndex;
   return imgSrc;
-}
-
-bool PreviewBrowser::onAnchorClicked(const QUrl& url) {
-  if (not url.isLocalFile()) {
-    return false;
-  }
-  QFileInfo fi(url.toLocalFile());
-  if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + fi.suffix()) or fi.isDir()) {
-    if (m_PLAY_ACTION) {
-      emit m_PLAY_ACTION->triggered(false);
-    }
-    return true;
-  }
-  QDesktopServices::openUrl(url);
-  return true;
 }
 
 bool PreviewBrowser::ShowRemainImages(const int val) {
