@@ -275,7 +275,6 @@ QToolBar* RibbonMenu::LeafView() const {
   leafViewWid->addAction(g_viewActions().NAVIGATION_PANE);
   leafViewWid->addWidget(fileSystemView);
   leafViewWid->addSeparator();
-  leafViewWid->addAction(g_viewActions().PREVIEW_PANE_HTML);
   leafViewWid->addWidget(folderPreviewToolBar);
   leafViewWid->addSeparator();
   leafViewWid->addWidget(embeddedPlayerTB);
