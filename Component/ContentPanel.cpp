@@ -1,6 +1,7 @@
 #include "Component/ContentPanel.h"
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/ViewActions.h"
+#include "Actions/FolderPreviewActions.h"
 #include "Component/NotificatorFrame.h"
 #include "Tools/ArchiveFiles.h"
 #include "Tools/HarFiles.h"
@@ -240,7 +241,7 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, con
   }
 #endif
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
-  if (_previewFolder != nullptr) {
+  if (_previewFolder != nullptr && g_folderPreviewActions().PREVIEW_AG->checkedAction() != nullptr) {
     _previewFolder->operator()(firstFileInfo.absoluteFilePath());
   }
   return true;
