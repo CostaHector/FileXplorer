@@ -13,74 +13,110 @@
 #define InitMediaInfo_CharArr(arrayName, initialLiteralString) MediaInfo_Char arrayName[] = initialLiteralString
 #endif
 
-QMediaInfo::QMediaInfo() {
-#ifdef _WIN32
-  QString libPath = PreferenceSettings().value(MemoryKey::WIN32_MEDIAINFO_LIB_PATH.name).toString();
-#else
-  QString libPath = PreferenceSettings().value(MemoryKey::LINUX_MEDIAINFO_LIB_PATH.name).toString();
-#endif
-  qDebug("%s", qPrintable(QFileInfo(libPath).absoluteFilePath()));
-  _lib = new QLibrary(libPath);
-  if (!_lib->load()) {
-    // ERROR_BAD_EXE_FORMAT: 0x0x000000c1.
-    // use win64 archi
-    qDebug("load lib failed: %s", qPrintable(_lib->errorString()));
-    return;
+QMediaInfo::~QMediaInfo() {
+  if (pLib != nullptr) {
+    MEDIAINFO_Delete d = (MEDIAINFO_Delete)pLib->resolve("MediaInfo_Delete");
+    if (d != nullptr) {
+      d(_pMedia);
+    }
+    if (IsLoaded()) {
+      pLib->unload();
+    }
   }
-  qDebug("load[%s] success", qPrintable(_lib->fileName()));
-  MEDIAINFO_New v = (MEDIAINFO_New)_lib->resolve("MediaInfo_New");
-  _pMedia = v();
+
+  pLib = nullptr;
+  _pMedia = nullptr;
+  m_get = nullptr;
+  m_open = nullptr;
 }
 
 bool QMediaInfo::Open(const QString& filename) {
-  if (!IsLoaded())
+  if (!IsLoaded()) {
     return false;
-  MEDIAINFO_Open mopen = (MEDIAINFO_Open)_lib->resolve("MediaInfo_Open");
+  }
+  MEDIAINFO_Open mopen = (MEDIAINFO_Open)pLib->resolve("MediaInfo_Open");
   if ((mopen(_pMedia, QString2MediaInfoc_str(filename))) == 0)
     return false;
   return true;
 }
 
 QString QMediaInfo::Inform() const {
-  MEDIAINFO_Inform inf = (MEDIAINFO_Inform)_lib->resolve("MediaInfo_Inform");
+  MEDIAINFO_Inform inf = (MEDIAINFO_Inform)pLib->resolve("MediaInfo_Inform");
   if (!inf)
     return NULL;
   return QStringFromMediaInfoc_str(inf(_pMedia, 0));
 }
 
-const MediaInfo_Char* QMediaInfo::Get(MediaInfo_stream_C streamKind,
-                                      int streamNumber,
-                                      MediaInfo_Char* parameter,
-                                      MediaInfo_info_C infoKind,
-                                      MediaInfo_info_C searchKind) const {
-  MEDIAINFO_Get get = (MEDIAINFO_Get)_lib->resolve("MediaInfo_Get");
+const MediaInfo_Char* QMediaInfo::Get(MediaInfo_stream_C streamKind, int streamNumber, MediaInfo_Char* parameter, MediaInfo_info_C infoKind, MediaInfo_info_C searchKind) const {
+  MEDIAINFO_Get get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
   if (!get)
     return NULL;
   return get(_pMedia, streamKind, streamNumber, parameter, infoKind, searchKind);
 }
 
-const MediaInfo_Char QMediaInfo::m_prop[]{ L"" "Duration/String3" };
+const MediaInfo_Char QMediaInfo::m_prop[]{
+    L""
+    "Duration/String3"};
 
-bool QMediaInfo::StartToGet() {
-  if (m_get != nullptr && m_open != nullptr) {
-    return true;
-  }
-  if (!IsLoaded()) {
-    qWarning("_lib not loaded");
-    return false;
-  }
-  m_get = (MEDIAINFO_Get)_lib->resolve("MediaInfo_Get");
-  if (m_get == nullptr) {
-    qWarning("function named MediaInfo_Get not exist in lib");
-    return false;
-  }
-  m_open = (MEDIAINFO_Open)_lib->resolve("MediaInfo_Open");
-  return m_open != nullptr;
+bool QMediaInfo::IsLoaded() const {
+  return pLib != nullptr && pLib->isLoaded();
 }
 
-void QMediaInfo::EndToGet() {
-  m_get = nullptr;
-  m_open = nullptr;
+bool QMediaInfo::StartToGet() {
+  if (IsLoaded()) {
+    qDebug("already loaded skip load");
+    return true;
+  }
+
+#ifdef _WIN32
+  const QString libPath = PreferenceSettings().value(MemoryKey::WIN32_MEDIAINFO_LIB_PATH.name).toString();
+#else
+  const QString libPath = PreferenceSettings().value(MemoryKey::LINUX_MEDIAINFO_LIB_PATH.name).toString();
+#endif
+  if (!QFile::exists(libPath)) {
+    qWarning("lib path[%s] not found", qPrintable(libPath));
+    return false;
+  }
+  qDebug("lib path[%s]", qPrintable(libPath));
+  if (pLib == nullptr) {
+    pLib = new (std::nothrow) QLibrary(libPath);
+    if (pLib == nullptr) {
+      qCritical("pLib is nullptr");
+      return false;
+    }
+  }
+
+  if (!pLib->load()) {
+    // if error says: ERROR_BAD_EXE_FORMAT: 0x0x000000c1 use win64 archi
+    qWarning("load lib FAILED, message: %s", qPrintable(pLib->errorString()));
+    delete pLib;
+    pLib = nullptr;
+    return false;
+  }
+
+  if (_pMedia == nullptr) {
+    MEDIAINFO_New pNew = (MEDIAINFO_New)pLib->resolve("MediaInfo_New");
+    if (pNew == nullptr) {
+      return false;
+    }
+    _pMedia = pNew();
+  }
+
+  if (m_get == nullptr) {
+    m_get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
+    if (m_get == nullptr) {
+      qWarning("function named MediaInfo_Get not exist in lib");
+      return false;
+    }
+  }
+  if (m_open == nullptr) {
+    m_open = (MEDIAINFO_Open)pLib->resolve("MediaInfo_Open");
+    if (m_open == nullptr) {
+      qWarning("function named MediaInfo_Open not exist in lib");
+      return false;
+    }
+  }
+  return true;
 }
 
 int QMediaInfo::VidDurationLengthQuick(const QString& vidAbsPath) const {
@@ -96,13 +132,13 @@ int QMediaInfo::VidDurationLength(const QString& vidAbsPath) const {
     qWarning("_lib not loaded");
     return -1;
   }
-  MEDIAINFO_Get get = (MEDIAINFO_Get)_lib->resolve("MediaInfo_Get");
+  MEDIAINFO_Get get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
   if (!get) {
     qWarning("function named MediaInfo_Get not exist in lib");
     return -1;
   }
 
-  MEDIAINFO_Open mopen = (MEDIAINFO_Open)_lib->resolve("MediaInfo_Open");
+  MEDIAINFO_Open mopen = (MEDIAINFO_Open)pLib->resolve("MediaInfo_Open");
   InitMediaInfo_CharArr(prop, "Duration/String3");
   if (mopen(_pMedia, QString2MediaInfoc_str(vidAbsPath)) == 0) {
     return -1;
@@ -119,9 +155,9 @@ QList<int> QMediaInfo::batchVidsDurationLength(const QStringList& vidsAbsPath) c
   }
   if (!IsLoaded()) {
     qWarning("_lib not loaded");
-    return {};
+
   }
-  MEDIAINFO_Get get = (MEDIAINFO_Get)_lib->resolve("MediaInfo_Get");
+  MEDIAINFO_Get get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
   if (!get) {
     qWarning("function named MediaInfo_Get not exist in lib");
     return {};
@@ -130,7 +166,7 @@ QList<int> QMediaInfo::batchVidsDurationLength(const QStringList& vidsAbsPath) c
   QList<int> durationList;
   durationList.reserve(vidsAbsPath.size());
 
-  MEDIAINFO_Open mopen = (MEDIAINFO_Open)_lib->resolve("MediaInfo_Open");
+  MEDIAINFO_Open mopen = (MEDIAINFO_Open)pLib->resolve("MediaInfo_Open");
   InitMediaInfo_CharArr(prop, "Duration/String3");
   for (const QString& filename : vidsAbsPath) {
     if (mopen(_pMedia, QString2MediaInfoc_str(filename)) == 0) {
@@ -291,14 +327,4 @@ QString QMediaInfo::Filename() const {
 QString QMediaInfo::FileExtension() const {
   InitMediaInfo_CharArr(prop, "FileExtension");
   return QStringFromMediaInfoc_str(Get(MediaInfo_Stream_General, 0, prop, MediaInfo_Info_Text, MediaInfo_Info_Name));
-}
-
-bool QMediaInfo::IsLoaded() const {
-  return (_lib->isLoaded());
-}
-
-QMediaInfo::~QMediaInfo() {
-  MEDIAINFO_Delete d = (MEDIAINFO_Delete)_lib->resolve("MediaInfo_Delete");
-  d(_pMedia);
-  _lib->unload();
 }

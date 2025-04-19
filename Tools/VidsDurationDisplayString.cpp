@@ -1,4 +1,5 @@
 #include "VidsDurationDisplayString.h"
+#include <QTime>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,6 +10,10 @@
 
 QString VidsDurationDisplayString::DisplayVideosDuration(const QStringList& fileAbsPaths) {
   QMediaInfo mi;
+  if (!mi.StartToGet()) {
+    qDebug("StartToGet failed");
+    return {};
+  }
   const QList<int>& durationLst = mi.batchVidsDurationLength(fileAbsPaths);
   return DurationPrepathName2Table(durationLst, fileAbsPaths);
 }
