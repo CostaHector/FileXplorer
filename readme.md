@@ -1,4 +1,18 @@
 # FileExplorerReadyOnly
+
+## Devoloping Settings
+```md
+git update-index --assume-unchange FileExplorerReadOnly.pro.user
+git update-index --assume-unchange FileExplorerTest.pro.user
+git update-index --assume-unchange bin/logs_info.log
+
+git update-index --no-assume-unchange FileExplorerReadOnly.pro.user
+git update-index --no-assume-unchange FileExplorerTest.pro.user
+git update-index --no-assume-unchange bin/logs_info.log
+
+```
+
+
 ## Introduction
 
 An File Explorer that can be used in windows and linux.
