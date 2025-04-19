@@ -2,11 +2,8 @@
 #define QMEDIAINFO_H
 
 #include <QLibrary>
-#include <QTime>
-#include <iostream>
 #include <string>
 #include "lib/MediaInfoDLL.h"
-
 
 #ifdef _WIN32
 typedef wchar_t MediaInfo_Char;
@@ -20,15 +17,14 @@ typedef char MediaInfo_Char;
 // typedef MediaInfo_Char* (*MEDIAINFO_Inform)(void*, long);
 // typedef MediaInfo_Char* (*MEDIAINFO_Get)(void*, int, int, MediaInfo_Char *, int, int);
 
-
 class QMediaInfo {
  public:
-  QMediaInfo();
+  QMediaInfo() = default;
+  ~QMediaInfo();
   bool IsLoaded() const;
 
   bool StartToGet();
   int VidDurationLengthQuick(const QString& vidAbsPath) const;
-  void EndToGet();
 
   int VidDurationLength(const QString& vidAbsPath) const;
   QList<int> batchVidsDurationLength(const QStringList& vidsAbsPath) const;
@@ -58,18 +54,13 @@ class QMediaInfo {
   QString SubtitleLanguages() const;
 
   bool Open(const QString& filename);
-  ~QMediaInfo();
 
  private:
-  const MediaInfo_Char* Get(MediaInfo_stream_C streamKind,
-                     int streamNumber,
-                     MediaInfo_Char* parameter,
-                     MediaInfo_info_C infoKind,
-                     MediaInfo_info_C searchKind) const;
+  const MediaInfo_Char* Get(MediaInfo_stream_C streamKind, int streamNumber, MediaInfo_Char* parameter, MediaInfo_info_C infoKind, MediaInfo_info_C searchKind) const;
   int StreamCount(MediaInfo_stream_C stream) const;
 
-  QLibrary* _lib;
-  void* _pMedia;
+  QLibrary* pLib{nullptr};
+  void* _pMedia{nullptr};
 
   MEDIAINFO_Get m_get{nullptr};
   MEDIAINFO_Open m_open{nullptr};
