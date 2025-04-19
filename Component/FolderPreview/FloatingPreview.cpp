@@ -70,15 +70,15 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   QString detail;
   detail += QString(R"(<h1>%1</h1>)").arg(fileName);
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
-//  if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)) {
-//    QMediaInfo mi;
-//    if (!mi.StartToGet()) {
-//      qWarning("Video duration getter is nullptr");
-//      return {};
-//    }
-//    const int dur = mi.VidDurationLengthQuick(fileAbsPath);
-//    detail += QString(R"(Length: %1<br/>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
-//  }
+  if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)) {
+    QMediaInfo mi;
+    if (!mi.StartToGet()) {
+      qWarning("Start to Get failed");
+      return {};
+    }
+    const int dur = mi.VidDurationLengthQuick(fileAbsPath);
+    detail += QString(R"(<h3>Length: %1</h3><br/>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
+  }
 
   QString imgStr;
   if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + extension)) {
