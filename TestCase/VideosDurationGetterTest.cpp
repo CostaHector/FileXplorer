@@ -1,86 +1,108 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-#include "public/PublicVariable.h"
+#include "pub/MyTestSuite.h"
 #include "Tools/QMediaInfo.h"
 #include <chrono>
 
-const QString VIDEOS_DURATION_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_VideosDurationGetter/TYPES");
-const QString VIDEOS_DURATION_MP4_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_VideosDurationGetter/MP4");
+const QString VIDEOS_DURATION_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_VideosDurationGetter");
 
-class VideosDurationGetterTest : public QObject {
+class VideosDurationGetterTest : public MyTestSuite {
   Q_OBJECT
  public:
-  QDir typesDir{VIDEOS_DURATION_DIR, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
-  QDir mp4Dir{VIDEOS_DURATION_MP4_DIR, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
  private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
-
-  void init() {
-    typesDir.setNameFilters(TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET);
-    mp4Dir.setNameFilters(TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET);
-  }
-  void cleanup() {}
-
-  void test_Basic() {
-    const QStringList& names = typesDir.entryList();
-    QVERIFY2(!names.isEmpty(), "should contains some videos in this path");
+  void test_duration_of_mp4_files() {
+    QStringList mp4VidsLst;
+    mp4VidsLst << "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 144p 33s.mp4"
+               << "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 360p 33s.mp4"
+               << "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 720p 33s.mp4"
+               << "Big Buck Bunny sample - XenForo community 720p 26s.mp4"
+               << "Big Buck Bunny SampleVideo_360x240_1mb 13s.mp4";
+    QList<int> durationsLst{33, 33, 33, 26, 13};
+    // precondition 1: "list length should same"
+    QCOMPARE(durationsLst.size(), mp4VidsLst.size());
+    // precondition 2: "video file should exist"
+    const QDir mp4Dir{VIDEOS_DURATION_DIR};
+    foreach (const QString mp4FileName, mp4VidsLst) {
+      QVERIFY2(mp4Dir.exists(mp4FileName), qPrintable(mp4FileName));
+    }
 
     QMediaInfo mi;
     QVERIFY2(mi.StartToGet(), "Should start succeed");
-    for (const QString& name : names) {
-      const QString& vidPath = typesDir.absoluteFilePath(name);
-      QVERIFY2(mi.VidDurationLengthQuick(vidPath) > 0, qPrintable(vidPath));
+    for (int i = 0; i < mp4VidsLst.size(); ++i) {
+      const QString& name = mp4VidsLst[i];
+      const QString& vidPath = mp4Dir.absoluteFilePath(name);
+      const int duration = mi.VidDurationLengthQuick(vidPath);  // msec
+      // duration should not be zero
+      QVERIFY2((duration > 0), qPrintable(name));
+      // duration differs value should not large than 3s
+      QVERIFY2((std::abs(duration / 1000 - durationsLst[i]) < 3), qPrintable(vidPath));
     }
-    mi.EndToGet();
   }
 
-  void test_OnlyMp4() {
-    const QStringList& names = mp4Dir.entryList();
-    QVERIFY2(!names.isEmpty(), "should contains some videos in this path");
+  void test_all_video_types() {
+    QStringList mp4VidsLst;
+    mp4VidsLst << "Big Buck Bunny SampleVideo_320x240_1mb 15s.3gp"
+               << "Big Buck Bunny SampleVideo_360x240_1mb 9s.mkv"
+               << "Big Buck Bunny SampleVideo_360x240_1mb 10s.flv"
+               << "Big Buck Bunny SampleVideo_360x240_1mb 13s.mp4";
+    QList<int> durationsLst{15, 9, 10, 13};
+    // precondition 1: "list length should same"
+    QCOMPARE(durationsLst.size(), mp4VidsLst.size());
+    // precondition 2: "video file should exist"
+    const QDir mp4Dir{VIDEOS_DURATION_DIR};
+    foreach (const QString mp4FileName, mp4VidsLst) {
+      QVERIFY2(mp4Dir.exists(mp4FileName), qPrintable(mp4FileName));
+    }
 
     QMediaInfo mi;
-    for (const QString& name : names) {
+    QVERIFY2(mi.StartToGet(), "Should start succeed");
+    for (int i = 0; i < mp4VidsLst.size(); ++i) {
+      const QString& name = mp4VidsLst[i];
       const QString& vidPath = mp4Dir.absoluteFilePath(name);
-      QVERIFY2(mi.VidDurationLength(vidPath) > 0, qPrintable(vidPath));
+      const int duration = mi.VidDurationLengthQuick(vidPath);  // msec
+      // duration should not be zero
+      QVERIFY2((duration > 0), qPrintable(name));
+      // duration differs value should not large than 3s
+      QVERIFY2((std::abs(duration / 1000 - durationsLst[i]) < 3), qPrintable(vidPath));
     }
   }
 
-  void test_compareSpeed() {
-    auto traditionWay = [dir = mp4Dir](int loopCount = 1) -> int {
-      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-      const QStringList& names = dir.entryList();
-      QMediaInfo mi;
-      for (int ind = 0; ind < loopCount; ++ind) {
-        for (const QString& name : names) {
-          const QString& vidPath = dir.absoluteFilePath(name);
-          mi.VidDurationLength(vidPath);
-        }
-      }
-      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-      return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    };
-    auto quickWay = [dir = mp4Dir](int loopCount = 1) -> int {
-      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-      const QStringList& names = dir.entryList();
-      QMediaInfo mi;
-      mi.StartToGet();
-      for (int ind = 0; ind < loopCount; ++ind) {
-        for (const QString& name : names) {
-          const QString& vidPath = dir.absoluteFilePath(name);
-          mi.VidDurationLengthQuick(vidPath);
-        }
-      }
-      mi.EndToGet();
-      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-      return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    };
-    int tradCost = traditionWay(100);
-    int quickCost = quickWay(100);
-    QVERIFY(quickCost <= tradCost);
-  }
+  //  void test_compareSpeed() {
+  //    auto traditionWay = [dir = mp4Dir](int loopCount = 1) -> int {
+  //      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+  //      const QStringList& names = dir.entryList();
+  //      QMediaInfo mi;
+  //      for (int ind = 0; ind < loopCount; ++ind) {
+  //        for (const QString& name : names) {
+  //          const QString& vidPath = dir.absoluteFilePath(name);
+  //          mi.VidDurationLength(vidPath);
+  //        }
+  //      }
+  //      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+  //      return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+  //    };
+  //    auto quickWay = [dir = mp4Dir](int loopCount = 1) -> int {
+  //      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+  //      const QStringList& names = dir.entryList();
+  //      QMediaInfo mi;
+  //      mi.StartToGet();
+  //      for (int ind = 0; ind < loopCount; ++ind) {
+  //        for (const QString& name : names) {
+  //          const QString& vidPath = dir.absoluteFilePath(name);
+  //          mi.VidDurationLengthQuick(vidPath);
+  //        }
+  //      }
+  //      mi.EndToGet();
+  //      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+  //      return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+  //    };
+  //    int tradCost = traditionWay(100);
+  //    int quickCost = quickWay(100);
+  //    QVERIFY(quickCost <= tradCost);
+  //  }
 };
 
-//QTEST_MAIN(VideosDurationGetterTest)
-//#include "VideosDurationGetterTest.moc"
+// QTEST_MAIN(VideosDurationGetterTest)
+#include "VideosDurationGetterTest.moc"
+VideosDurationGetterTest g_VideosDurationGetterTest;
