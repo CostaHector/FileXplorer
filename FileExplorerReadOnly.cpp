@@ -94,15 +94,14 @@ auto FileExplorerReadOnly::ReadSettings(const QString& initialPath) -> QString {
 }
 
 void FileExplorerReadOnly::InitComponentVisibility() {
-  const bool showNavi =
-      PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool();
-  if (not showNavi) {
+  const bool showNavi {PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
+  if (!showNavi) {
     m_navigationToolBar->setVisible(false);
   }
 
-  const bool showFolderPrev = PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool();
-  const bool showPrev = m_fsPanel->isFSView() and showFolderPrev;
-  if (not showPrev) {
+  const bool showFolderPrev {PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool()};
+  const bool showPrev {m_fsPanel->isFSView() && showFolderPrev};
+  if (!showPrev) {
     previewHtmlDock->setVisible(false);
   }
 }
@@ -114,15 +113,15 @@ void FileExplorerReadOnly::subscribe() {
     m_navigationToolBar->setVisible(checked);
   });
 
-  connect(vA.PREVIEW_PANE_HTML, &QAction::triggered, this, [this](const bool checked) {
-    PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, checked);
-    previewHtmlDock->setVisible(checked);
-  });
-
   auto& fpAG = g_folderPreviewActions();
   connect(fpAG.PREVIEW_AG, &QActionGroup::triggered, this, [this](QAction* triggeredActions) {
-    if (triggeredActions == nullptr)
+    if (triggeredActions == nullptr) {
       return;
+    }
+    const bool checked{triggeredActions->isChecked()};
+    PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, checked);
+    previewHtmlDock->setVisible(checked);
+
     const QString& previewType = triggeredActions->text();
     PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
     m_previewSwitcher->onSwitchByViewType(previewType);

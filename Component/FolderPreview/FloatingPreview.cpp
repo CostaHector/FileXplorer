@@ -1,15 +1,19 @@
 #include "FloatingPreview.h"
 #include "public/PublicVariable.h"
 #include "public/PathTool.h"
+#include "public/DisplayEnhancement.h"
+#include "Tools/QMediaInfo.h"
 #include <QDir>
 #include <QHeaderView>
 #include <QMenu>
 #include <QScrollBar>
 #include <QLayout>
+#include <QIcon>
+#include <QFileIconProvider>
+#include <QBuffer>
 
 FloatingPreview::FloatingPreview(QWidget* parent) : QSplitter{parent} {
   setOrientation(Qt::Orientation::Vertical);
-
   _IMG_ENABLED = new QAction(QIcon(":img/IMAGE"), "Images", this);
   _VID_ENABLED = new QAction(QIcon(":img/VIDEO"), "Videos", this);
   _OTH_ENABLED = new QAction(QIcon(":img/FILE"), "Others", this);
@@ -26,7 +30,7 @@ FloatingPreview::FloatingPreview(QWidget* parent) : QSplitter{parent} {
 
   mTypeToDisplayTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mTypeToDisplayTB->setMaximumHeight(35);
-  addWidget(mTypeToDisplayTB);
+  insertWidget(m_insertIndex(TYPE_DISPLAY_CONTROL), mTypeToDisplayTB);
 
   _IMG_ENABLED->setChecked(PreferenceSettings().value("FLOATING_IMAGE_VIEW_SHOW", true).toBool());
   _VID_ENABLED->setChecked(PreferenceSettings().value("FLOATING_VIDEO_VIEW_SHOW", false).toBool());
@@ -59,6 +63,48 @@ void FloatingPreview::SaveState() {
   PreferenceSettings().setValue("FLOATING_PREVIEW_STATE", saveState());
 }
 
+QString GetDetailDescription(const QString& fileAbsPath) {
+  QString fileName, extension;
+  std::tie(fileName, extension) = PATHTOOL::GetBaseNameExt(fileAbsPath);
+  const QFileInfo fi{fileAbsPath};
+  QString detail;
+  detail += QString(R"(<h1>%1</h1>)").arg(fileName);
+  detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
+  if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)) {
+    QMediaInfo mi;
+    if (!mi.StartToGet()) {
+      qWarning("Start to Get failed");
+      return {};
+    }
+    const int dur = mi.VidDurationLengthQuick(fileAbsPath);
+    detail += QString(R"(<h3>Length: %1</h3><br/>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
+  }
+
+  QString imgStr;
+  if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + extension)) {
+    imgStr = QString(R"(<img src="%1" width="480" alt="%1" />)").arg(fileAbsPath);
+  } else {
+    static QFileIconProvider iconProv;
+    const QIcon& ic = iconProv.icon(fi);
+    const QPixmap pm{ic.pixmap(64, 64)};
+    QByteArray bArray;
+    QBuffer buffer(&bArray);
+    buffer.open(QIODevice::WriteOnly);
+    pm.save(&buffer, "PNG");
+    imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="128" alt="%1">)").arg(fileAbsPath);
+  }
+
+  detail += QString(R"(<h3><a href="file:///%1">%2<br/>%1</a></h3>)").arg(fileAbsPath, imgStr);
+  detail += QString(R"(<body>)");
+  detail += QString(R"(<font size="+2">)");
+  detail += QString(R"(Size: %1<br/>)").arg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(fi.size()));
+  detail += QString(R"(Date created: %1<br/>)").arg(fi.lastModified().toString(Qt::ISODate));
+  detail += QString(R"(Date modified: %1<br/>)").arg(fi.birthTime().toString(Qt::ISODate));
+  detail += QString(R"(</font>)");
+  detail += QString(R"(</body>)");
+  return detail;
+}
+
 void FloatingPreview::operator()(const QString& pth) {  // file system
   if (!NeedUpdate(pth)) {
     return;
@@ -66,41 +112,16 @@ void FloatingPreview::operator()(const QString& pth) {  // file system
 
   mLastName = pth;
   setWindowTitle(mLastName);
-
-  if (!QDir(pth).exists()) {
-    // not a folder
-    if (NeedUpdateImgs() && !mImgModel->IsEmpty()) {
-      mImgModel->Clear();
+  if (!QDir(pth).exists()) {  // a file
+    BeforeDisplayAFileDetail();
+    if (mDetailsPane == nullptr) {
+      mDetailsPane = new (std::nothrow) ClickableTextBrowser(this);
+      insertWidget(m_insertIndex(DETAIL), mDetailsPane);
     }
-    if (NeedUpdateVids() && !mVidsModel->IsEmpty()) {
-      mVidsModel->Clear();
-    }
-    if (NeedUpdateOthers() && !mOthModel->IsEmpty()) {
-      mOthModel->Clear();
-    }
-    if (_IMG_ENABLED->text() != "Images") {
-      _IMG_ENABLED->setText("Images");
-    }
-    if (_VID_ENABLED->text() != "Videos") {
-      _VID_ENABLED->setText("Videos");
-    }
-    if (_OTH_ENABLED->text() != "Others") {
-      _OTH_ENABLED->setText("Others");
-    }
-
-    QString base, extension;
-    std::tie(base, extension) = PATHTOOL::GetBaseNameExt(pth);
-    if (TYPE_FILTER::IMAGE_TYPE_SET.contains('*' + extension)) {
-      int cnt = 0;
-      if (NeedUpdateImgs()) {
-        mImgTv->setEnabled(true);
-        cnt = mImgModel->UpdateData({pth});
-      }
-      _IMG_ENABLED->setText(QString("%1 Images").arg(cnt, 3, 10));
-    }
+    mDetailsPane->setHtml(GetDetailDescription(pth));
     return;
   }
-
+  BeforeDisplayAFolder();
   if (NeedUpdateImgs()) {
     const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
     _IMG_ENABLED->setText(QString("%1 Images").arg(imgCnt, 3, 10));
@@ -157,7 +178,7 @@ void FloatingPreview::onImgBtnClicked(bool checked) {
     mImgTv = new (std::nothrow) ItemView{"FLOATING_IMAGE_VIEW", this};
     mImgTv->SetCurrentModel(mImgModel);
     mImgTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-    insertWidget(count() - 1, mImgTv);
+    insertWidget(m_insertIndex(IMAGE), mImgTv);
   }
   PreferenceSettings().setValue("FLOATING_IMAGE_VIEW_SHOW", checked);
   mImgTv->setVisible(checked);
@@ -169,7 +190,7 @@ void FloatingPreview::onVidBtnClicked(bool checked) {
     mVidTv = new (std::nothrow) ItemView{"FLOATING_VIDEO_VIEW", this};
     mVidTv->SetCurrentModel(mVidsModel);
     mVidTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-    insertWidget(count() - 1, mVidTv);
+    insertWidget(m_insertIndex(VIDEO), mVidTv);
   }
   PreferenceSettings().setValue("FLOATING_VIDEO_VIEW_SHOW", checked);
   mVidTv->setVisible(checked);
@@ -181,8 +202,23 @@ void FloatingPreview::onOthBtnClicked(bool checked) {
     mOthTv = new (std::nothrow) ItemView{"FLOATING_OTHER_VIEW", this};
     mOthTv->SetCurrentModel(mOthModel);
     mOthTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-    insertWidget(count() - 1, mOthTv);
+    insertWidget(m_insertIndex(OTHER), mOthTv);
   }
   PreferenceSettings().setValue("FLOATING_OTHER_VIEW_SHOW", checked);
   mOthTv->setVisible(checked);
 }
+
+// #define RUN_MAIN_FILE 1
+// #ifdef RUN_MAIN_FILE
+// #include <QApplication>
+
+// int main(int argc, char* argv[]) {
+//   QApplication a(argc, argv);
+
+//  FloatingPreview fp;
+//  fp.show();
+//  fp(R"(E:/115/2022 M06 07/FunSizeBoys - Fetish for Daddy Issues - Mr. Steel, Marcus 1.jpg)");
+//  a.exec();
+//  return 0;
+//}
+// #endif

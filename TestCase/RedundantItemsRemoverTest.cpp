@@ -9,7 +9,7 @@
 class RedundantItemsRemoverTest : public FileSystemRelatedTest {
   Q_OBJECT
  public:
-  RedundantItemsRemoverTest():FileSystemRelatedTest{"TestEnv_RedundantItemRemove", false} {}
+  RedundantItemsRemoverTest() : FileSystemRelatedTest{"TestEnv_RedundantItemRemove", false} {}
  private slots:
   void initTestCase() {
     /*
@@ -30,13 +30,12 @@ RedundantParentFolder
     // useless parent folder
     // - useless parent folder.txt
      */
-    m_rootHelper<<FileSystemNode{"EmptyFolder"}<<FileSystemNode{"RedundantKeyword"}<<FileSystemNode{"RedundantParentFolder"};
+    m_rootHelper << FileSystemNode{"EmptyFolder"} << FileSystemNode{"RedundantKeyword"} << FileSystemNode{"RedundantParentFolder"};
 
-    m_rootHelper.GetSubHelper("EmptyFolder") << FileSystemNode{"DeleteRandomEmptyFolder1"}<< FileSystemNode{"DeleteRandomEmptyFolder2"}<< FileSystemNode{"KeepNonEmptyFolder"};
+    m_rootHelper.GetSubHelper("EmptyFolder") << FileSystemNode{"DeleteRandomEmptyFolder1"} << FileSystemNode{"DeleteRandomEmptyFolder2"} << FileSystemNode{"KeepNonEmptyFolder"};
     m_rootHelper.GetSubHelper("EmptyFolder").GetSubHelper("KeepNonEmptyFolder") << FileSystemNode{"randomFile.txt", false, ""};
 
-
-    m_rootHelper.GetSubHelper("RedundantKeyword") << FileSystemNode{"Delete Movie Falcon"}<< FileSystemNode{"Keep KristenBjorn imgs"}<< FileSystemNode{"Keep RagingStallion Movie"};
+    m_rootHelper.GetSubHelper("RedundantKeyword") << FileSystemNode{"Delete Movie Falcon"} << FileSystemNode{"Keep KristenBjorn imgs"} << FileSystemNode{"Keep RagingStallion Movie"};
     m_rootHelper.GetSubHelper("RedundantKeyword").GetSubHelper("Delete Movie Falcon") << FileSystemNode{"delete.txt", false, ""};
     auto imgs = m_rootHelper.GetSubHelper("RedundantKeyword").GetSubHelper("Keep KristenBjorn imgs");
     for (int imgCnt = 1; imgCnt < 12; ++imgCnt) {
@@ -44,21 +43,13 @@ RedundantParentFolder
     }
     m_rootHelper.GetSubHelper("RedundantKeyword").GetSubHelper("Keep RagingStallion Movie") << FileSystemNode{"keep.mp4", false, ""};
 
-
-    m_rootHelper.GetSubHelper("RedundantParentFolder")
-        << FileSystemNode{"useful parent folder"}
-        << FileSystemNode{"useless parent folder"};
+    m_rootHelper.GetSubHelper("RedundantParentFolder") << FileSystemNode{"useful parent folder"} << FileSystemNode{"useless parent folder"};
     m_rootHelper.GetSubHelper("RedundantParentFolder").GetSubHelper("useful parent folder")
-        <<FileSystemNode{"random folder"}
-        << FileSystemNode{"1.txt", false, ""}
-        << FileSystemNode{"2.txt", false, ""};
-    m_rootHelper.GetSubHelper("RedundantParentFolder").GetSubHelper("useless parent folder")
-        << FileSystemNode{"useless parent folder.txt", false, ""};
+        << FileSystemNode{"random folder"} << FileSystemNode{"1.txt", false, ""} << FileSystemNode{"2.txt", false, ""};
+    m_rootHelper.GetSubHelper("RedundantParentFolder").GetSubHelper("useless parent folder") << FileSystemNode{"useless parent folder.txt", false, ""};
   }
 
-  void cleanupTestCase() {
-    FileSystemHelper(ROOT_DIR).EraseFileSystemTree(true);
-  }
+  void cleanupTestCase() { FileSystemHelper(ROOT_DIR).EraseFileSystemTree(true); }
 
   void init() {}
 
@@ -67,7 +58,7 @@ RedundantParentFolder
     // DeleteRandomEmptyFolder2
     // KeepNonEmptyFolder
     //  - randomFile.txt
-    const QString EMPTY_TEST_DIR = ROOT_DIR+"/EmptyFolder";
+    const QString EMPTY_TEST_DIR = ROOT_DIR + "/EmptyFolder";
     QCOMPARE(QDir(EMPTY_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 3);
     EmptyFolderRemove efr;
     const int recycleCmdCnt = efr(EMPTY_TEST_DIR);
@@ -120,5 +111,5 @@ RedundantParentFolder
   }
 };
 
-//QTEST_MAIN(RedundantItemsRemoverTest)
+// QTEST_MAIN(RedundantItemsRemoverTest)
 #include "RedundantItemsRemoverTest.moc"
