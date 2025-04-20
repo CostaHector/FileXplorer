@@ -1,5 +1,12 @@
 # FileExplorerReadyOnly
 
+## Coding Style
+
+variable of class data memeber:
+
+1. class itself has ownership, start with "m_" or start with "m";
+2. only transfer, no ownership, start with "m_" or start with "m" and endwith "_";
+
 ## Devoloping Settings
 ```md
 git update-index --assume-unchange FileExplorerReadOnly.pro.user

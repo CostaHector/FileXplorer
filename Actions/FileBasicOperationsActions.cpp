@@ -5,53 +5,53 @@
 
 FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
     : QObject(parent),
-      _REVEAL_IN_EXPLORER{new QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this)},
-      _OPEN_IN_TERMINAL{new QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this)},
+      _REVEAL_IN_EXPLORER{new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this)},
+      _OPEN_IN_TERMINAL{new (std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this)},
       OPEN_AG(GetOPENActions()),
 
-      COPY_FULL_PATH{new QAction(QIcon(":img/COPY_FULL_PATH"), "Copy fullpath")},
-      COPY_PATH{new QAction(QIcon(":img/COPY_PATH"), "Copy path")},
-      COPY_NAME{new QAction(QIcon(":img/COPY_NAME"), "Copy name")},
+      COPY_FULL_PATH{new (std::nothrow) QAction(QIcon(":img/COPY_FULL_PATH"), "Copy fullpath")},
+      COPY_PATH{new (std::nothrow) QAction(QIcon(":img/COPY_PATH"), "Copy path")},
+      COPY_NAME{new (std::nothrow) QAction(QIcon(":img/COPY_NAME"), "Copy name")},
 
-      COPY_THE_PATH{new QAction(QIcon(":img/COPY_THE_PATH"), "Copy the path")},
-      COPY_RECORDS{new QAction(QIcon(":img/COPY_RECORD"), "Copy records")},
+      COPY_THE_PATH{new (std::nothrow) QAction(QIcon(":img/COPY_THE_PATH"), "Copy the path")},
+      COPY_RECORDS{new (std::nothrow) QAction(QIcon(":img/COPY_RECORD"), "Copy records")},
       COPY_PATH_AG(GetCOPY_PATHActions()),
-      NEW_FOLDER{new QAction(QIcon(":img/NEW_FOLDER"), "New folder")},
+      NEW_FOLDER{new (std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), "New folder")},
 
-      NEW_TEXT_FILE{new QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), "New text")},
-      NEW_JSON_FILE{new QAction(QIcon(":img/NEW_JSON_FILE"), "New json")},
-      BATCH_NEW_FILES{new QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), "New Files")},
+      NEW_TEXT_FILE{new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), "New text")},
+      NEW_JSON_FILE{new (std::nothrow) QAction(QIcon(":img/NEW_JSON_FILE"), "New json")},
+      BATCH_NEW_FILES{new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), "New Files")},
 
-      BATCH_NEW_FOLDERS{new QAction(QIcon(":img/NEW_FOLDERS"), "New Folders")},
+      BATCH_NEW_FOLDERS{new (std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), "New Folders")},
       NEW(GetNEWActions()),
 
-      _MOVE_TO{new QAction(QIcon(":img/MV_TO_COMMAND_PATH"), "Move to")},
-      _COPY_TO{new QAction(QIcon(":img/CP_TO_COMMAND_PATH"), "Copy to")},
+      _MOVE_TO{new (std::nothrow) QAction(QIcon(":img/MV_TO_COMMAND_PATH"), "Move to")},
+      _COPY_TO{new (std::nothrow) QAction(QIcon(":img/CP_TO_COMMAND_PATH"), "Copy to")},
       MOVE_COPY_TO(GetMOVE_COPY_TOActions()),
 
       MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
       COPY_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY)),
 
-      MOVE_TO_TRASHBIN{new QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle")},
-      DELETE_PERMANENTLY{new QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently")},
+      MOVE_TO_TRASHBIN{new (std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle")},
+      DELETE_PERMANENTLY{new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently")},
       DELETE_ACTIONS(GetDeleteActions()),
 
-      UNDO_OPERATION{new QAction(QIcon(":img/UNDO"), "Undo", this)},
-      REDO_OPERATION{new QAction(QIcon(":img/REDO"), "Redo", this)},
+      UNDO_OPERATION{new (std::nothrow) QAction(QIcon(":img/UNDO"), "Undo", this)},
+      REDO_OPERATION{new (std::nothrow) QAction(QIcon(":img/REDO"), "Redo", this)},
       UNDO_REDO_RIBBONS(Get_UNDO_REDO_OPERATIONS_Actions()),
 
-      CUT{new QAction(QIcon(":img/CUT_ITEM"), "Cut")},
-      COPY{new QAction(QIcon(":img/COPY_ITEM"), "Copy")},
-      PASTE{new QAction(QIcon(":img/PASTE_ITEM"), "Paste")},
+      CUT{new (std::nothrow) QAction(QIcon(":img/CUT_ITEM"), "Cut")},
+      COPY{new (std::nothrow) QAction(QIcon(":img/COPY_ITEM"), "Copy")},
+      PASTE{new (std::nothrow) QAction(QIcon(":img/PASTE_ITEM"), "Paste")},
       CUT_COPY_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
 
-      MERGE{new QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), "Merged to front")},
-      MERGE_REVERSE{new QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), "Merge to back")},
+      MERGE{new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), "Merged to front")},
+      MERGE_REVERSE{new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), "Merge to back")},
       FOLDER_MERGE(FolderMergeActions()),
 
-      SELECT_ALL{new QAction(QIcon(":img/SELECT_ALL"), "Select all")},
-      SELECT_NONE{new QAction(QIcon(":img/SELECT_NONE"), "Select none")},
-      SELECT_INVERT{new QAction(QIcon(":img/SELECT_INVERT"), "Invert selection")},
+      SELECT_ALL{new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all")},
+      SELECT_NONE{new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none")},
+      SELECT_INVERT{new (std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), "Invert selection")},
       SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()) {
   FolderFileCategoryProcess();
 }
@@ -67,7 +67,7 @@ QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
   DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
                                      .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(MOVE_TO_TRASHBIN);
   actionGroup->addAction(DELETE_PERMANENTLY);
   return actionGroup;
@@ -81,7 +81,7 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
   _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later")
                            .arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_MOVE_TO);
   actionGroup->addAction(_COPY_TO);
   return actionGroup;
@@ -90,9 +90,9 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
 QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey) {
   QString historyStr = PreferenceSettings().value(memoryKey.name, memoryKey.v).toString();
   QStringList historyList = historyStr.split('\n');
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   for (const QString& path : historyList) {
-    QAction* tempPath = new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), path);
+    QAction* tempPath = new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), path);
     tempPath->setCheckable(false);
     actionGroup->addAction(tempPath);
   }
@@ -113,7 +113,7 @@ QActionGroup* FileBasicOperationsActions::Get_CUT_COPY_PASTE_OPERATIONS_Actions(
   PASTE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Paste the contents of clipboard to the current location.").arg(PASTE->text(), PASTE->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(CUT);
   actionGroup->addAction(COPY);
   actionGroup->addAction(PASTE);
@@ -129,11 +129,11 @@ QActionGroup* FileBasicOperationsActions::Get_UNDO_REDO_OPERATIONS_Actions() {
   REDO_OPERATION->setShortcutVisibleInContextMenu(true);
   REDO_OPERATION->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(REDO_OPERATION->text(), REDO_OPERATION->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(UNDO_OPERATION);
   actionGroup->addAction(REDO_OPERATION);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  for (QAction* act : actionGroup->actions()) {
+  foreach(QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -150,12 +150,12 @@ QActionGroup* FileBasicOperationsActions::Get_SELECTION_RIBBON_Action() {
   SELECT_INVERT->setShortcutVisibleInContextMenu(true);
   SELECT_INVERT->setToolTip(QString("<b>%1 </b><br/> Reverse the current selections.").arg(SELECT_INVERT->text()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(SELECT_ALL);
   actionGroup->addAction(SELECT_NONE);
   actionGroup->addAction(SELECT_INVERT);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  for (QAction* act : actionGroup->actions()) {
+  foreach(QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -174,11 +174,11 @@ auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
                                         "Open current view path in terminal")
                                     .arg(_OPEN_IN_TERMINAL->text(), _OPEN_IN_TERMINAL->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_REVEAL_IN_EXPLORER);
   actionGroup->addAction(_OPEN_IN_TERMINAL);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  for (QAction* act : actionGroup->actions()) {
+  foreach(QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -210,7 +210,7 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
                                .arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
   COPY_RECORDS->setShortcutVisibleInContextMenu(true);
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(COPY_FULL_PATH);
   actionGroup->addAction(COPY_PATH);
   actionGroup->addAction(COPY_NAME);
@@ -218,7 +218,7 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
   actionGroup->addAction(COPY_RECORDS);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  for (QAction* act : actionGroup->actions()) {
+  foreach(QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -254,7 +254,7 @@ QActionGroup* FileBasicOperationsActions::GetNEWActions() {
                                 "\"Page %03d$1$10\"<br/>"
                                 "it will create ten folders numbered by Page 001,002,...,009 respectively.");
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(NEW_FOLDER);
   actionGroup->addAction(NEW_TEXT_FILE);
   actionGroup->addAction(NEW_JSON_FILE);
@@ -273,7 +273,7 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
   MERGE_REVERSE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE_REVERSE->text(), MERGE_REVERSE->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(MERGE);
   actionGroup->addAction(MERGE_REVERSE);
   return actionGroup;
