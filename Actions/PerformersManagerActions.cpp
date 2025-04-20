@@ -6,31 +6,31 @@
 
 PerformersManagerActions::PerformersManagerActions(QObject* parent)
     : QObject{parent},
-      REFRESH_ALL_RECORDS_VIDS(new QAction(tr("Refresh all record(s) vid"), this)),
-      REFRESH_SELECTED_RECORDS_VIDS(new QAction(tr("Refresh selected record(s) vid"), this)),
-      OPEN_RECORD_IN_FILE_SYSTEM(new QAction(tr("Open record"), this)),
-      LOAD_FROM_PJSON_PATH(new QAction(tr("Load from pjson"), this)),
-      LOAD_FROM_FILE_SYSTEM_STRUCTURE(new QAction(QIcon(":img/FOLDER_OPEN"), tr("Load from file-system structure"), this)),
-      LOAD_FROM_PERFORMERS_LIST(new QAction(tr("Load from performers list"), this)),
-      DUMP_ALL_RECORDS_INTO_PJSON_FILE(new QAction(tr("Dump all record(s)=>.pjson"), this)),
-      DUMP_SELECTED_RECORDS_INTO_PJSON_FILE(new QAction(tr("Dump selected record(s)=>.pjson"), this)),
-      OPEN_WITH_LOCAL_APP(new QAction(QIcon(":img/SQLITE_APP"), tr("Open with"), this)),
-      LOCATE_IMAGEHOST(new QAction(tr("Locate imagehost"), this)),
-      INIT_DATABASE(new QAction(QString("Init Database [%1]").arg(SystemPath::PEFORMERS_DATABASE), this)),
-      INIT_TABLE(new QAction(QString("Create table [%1]").arg(DB_TABLE::PERFORMERS), this)),
-      INSERT_INTO_TABLE(new QAction(QString("insert into table [%1]").arg(DB_TABLE::PERFORMERS), this)),
-      DELETE_TABLE(new QAction(tr("Delete table(complete data)"), this)),
-      DROP_TABLE(new QAction(tr("Drop table(complete table))"), this)),
-      SUBMIT(new QAction(QIcon(":img/SUBMIT"), tr("Submit"), this)),
+      REFRESH_ALL_RECORDS_VIDS(new (std::nothrow) QAction(tr("Refresh all record(s) vid"), this)),
+      REFRESH_SELECTED_RECORDS_VIDS(new (std::nothrow) QAction(tr("Refresh selected record(s) vid"), this)),
+      OPEN_RECORD_IN_FILE_SYSTEM(new (std::nothrow) QAction(tr("Open record"), this)),
+      LOAD_FROM_PJSON_PATH(new (std::nothrow) QAction(tr("Load from pjson"), this)),
+      LOAD_FROM_FILE_SYSTEM_STRUCTURE(new (std::nothrow) QAction(QIcon(":img/FOLDER_OPEN"), tr("Load from file-system structure"), this)),
+      LOAD_FROM_PERFORMERS_LIST(new (std::nothrow) QAction(tr("Load from performers list"), this)),
+      DUMP_ALL_RECORDS_INTO_PJSON_FILE(new (std::nothrow) QAction(tr("Dump all record(s)=>.pjson"), this)),
+      DUMP_SELECTED_RECORDS_INTO_PJSON_FILE(new (std::nothrow) QAction(tr("Dump selected record(s)=>.pjson"), this)),
+      OPEN_WITH_LOCAL_APP(new (std::nothrow) QAction(QIcon(":img/SQLITE_APP"), tr("Open with"), this)),
+      LOCATE_IMAGEHOST(new (std::nothrow) QAction(tr("Locate imagehost"), this)),
+      INIT_DATABASE(new (std::nothrow) QAction(QString("Init Database [%1]").arg(SystemPath::PEFORMERS_DATABASE), this)),
+      INIT_TABLE(new (std::nothrow) QAction(QString("Create table [%1]").arg(DB_TABLE::PERFORMERS), this)),
+      INSERT_INTO_TABLE(new (std::nothrow) QAction(QString("insert into table [%1]").arg(DB_TABLE::PERFORMERS), this)),
+      DELETE_TABLE(new (std::nothrow) QAction(tr("Delete table(complete data)"), this)),
+      DROP_TABLE(new (std::nothrow) QAction(tr("Drop table(complete table))"), this)),
+      SUBMIT(new (std::nothrow) QAction(QIcon(":img/SUBMIT"), tr("Submit"), this)),
 
-      CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT(new QAction(tr("Change performer image fixed height(px)"), this)),
+      CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT(new (std::nothrow) QAction(tr("Change performer image fixed height(px)"), this)),
 
-      HORIZONTAL_HEADER_AGS(new QActionGroup(this)),
+      HORIZONTAL_HEADER_AGS(new (std::nothrow) QActionGroup(this)),
 
-      DELETE_RECORDS(new QAction(tr("delete record(s)"), this)),
-      VERTICAL_HEADER_AGS(new QActionGroup(this)),
+      DELETE_RECORDS(new (std::nothrow) QAction(tr("delete record(s)"), this)),
+      VERTICAL_HEADER_AGS(new (std::nothrow) QActionGroup(this)),
 
-      SHOW_PERFORMER_MANAGER(new QAction(QIcon(":img/PERFORMERS_MANAGER"), tr("Perfs"), this)) {
+      SHOW_PERFORMER_MANAGER(new (std::nothrow) QAction(QIcon(":img/PERFORMERS_MANAGER"), tr("Perfs"), this)) {
   LOAD_FROM_PJSON_PATH->setToolTip(
       QString("<b>%1 (%2)</b><br/> Load *.pjson from ImageHost.<br/>Update each column value by new one if primary key conflicts.")
           .arg(LOAD_FROM_PJSON_PATH->text(), LOAD_FROM_PJSON_PATH->shortcut().toString()));

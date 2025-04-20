@@ -4,13 +4,17 @@ CONFIG += qt warn_on depend_includepath testcase
 TEMPLATE = app
 
 SOURCES += $$files(TestCase/pub/*.cpp)
+
 SOURCES += $$files(TestCase/*.cpp)
+
 SOURCES += $$files(public/*.cpp)
+
 SOURCES += $$files(FileOperation/*.cpp)
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
+    Actions/LogActions.cpp \
     Component/NotificatorFrame.cpp \
     Component/QuickWhereClause.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
@@ -44,6 +48,7 @@ SOURCES += \
     Tools/ThumbnailProcesser.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/SplitterInsertIndexHelper.cpp \
+    Tools/LogHandler.cpp \
     model/ConflictsFileSystemModel.cpp \
 
 HEADERS += $$files(TestCase/*.h)
@@ -54,6 +59,7 @@ HEADERS += $$files(FileOperation/*.h)
 HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
+    Actions/LogActions.h \
     Component/NotificatorFrame.h \
     Component/QuickWhereClause.h \
     Component/RenameWidgets/AdvanceRenamer.h \
@@ -87,6 +93,7 @@ HEADERS += \
     Tools/ThumbnailProcesser.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/SplitterInsertIndexHelper.h \
+    Tools/LogHandler.h \
     model/ConflictsFileSystemModel.h \
 
 DISTFILES += \

@@ -14,8 +14,8 @@ class SearchCaseMatterToolButton:public QToolButton {
   void BindSearchModel(SearchProxyModel* searchProxyModel);
  private:
   SearchProxyModel* _searchProxyModel = nullptr;
-  QAction* SEARCH_NAME_CASE_SENSITIVE = new QAction(tr("Name sensitive"), this);
-  QAction* SEARCH_CONTENTS_CASE_SENSITIVE = new QAction(tr("Content sensitive"), this);
+  QAction* SEARCH_NAME_CASE_SENSITIVE = new (std::nothrow) QAction(tr("Name sensitive"), this);
+  QAction* SEARCH_CONTENTS_CASE_SENSITIVE = new (std::nothrow) QAction(tr("Content sensitive"), this);
   QMenu* m_searchCaseMenu = new QMenu("Search case-sensitive");
 };
 
