@@ -1,5 +1,5 @@
 #include "RightClickableToolBar.h"
-#include "Tools/ActionWithPath.h"
+#include "Actions/ActionWithPath.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include <QHash>
