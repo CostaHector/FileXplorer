@@ -1,5 +1,8 @@
 #include "FileSystemItemFilter.h"
 #include "public/PublicVariable.h"
+#include <QDir>
+#include <QDirIterator>
+#include <QFileInfo>
 
 FileSystemItemFilter::ItemStatistic FileSystemItemFilter::ItemCounter(const QStringList& items) {
   ItemStatistic itemStatistic;
@@ -10,10 +13,13 @@ FileSystemItemFilter::ItemStatistic FileSystemItemFilter::ItemCounter(const QStr
       itemStatistic.fileSize += fi.size();
     } else if (fi.isDir()) {
       ++itemStatistic.folderCnt;
-      QDirIterator it(path, QDir::Filter::Files, QDirIterator::Subdirectories);
+      QDirIterator it{path,                                                                     //
+                      {},                                                                       //
+                      QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot,  //
+                      QDirIterator::Subdirectories};
       while (it.hasNext()) {
         it.next();
-        QFileInfo subFi = it.fileInfo();
+        const QFileInfo subFi = it.fileInfo();
         if (subFi.isFile()) {
           ++itemStatistic.fileCnt;
           itemStatistic.fileSize += it.fileInfo().size();
