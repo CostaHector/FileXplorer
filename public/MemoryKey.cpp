@@ -1,124 +1,7 @@
 #include "MemoryKey.h"
-#include "PathTool.h"
+#include <QDir>
 
 using namespace VALUE_CHECKER_TYPE;
-
-ValueChecker::ValueChecker(const QStringList& candidates, const VALUE_TYPE valueType_) : valueType{valueType_}, m_strCandidates{candidates.cbegin(), candidates.cend()} {}
-
-ValueChecker::ValueChecker(int minV_, int maxV_) : valueType{RANGE_INT}, minV{minV_}, maxV{maxV_} {}
-
-ValueChecker::ValueChecker(const QSet<QChar>& chars, int minLength) : valueType{SWITCH_STRING}, m_switchStates{chars}, m_switchMinCnt{minLength} {}
-
-ValueChecker::ValueChecker(const VALUE_TYPE valueType_) : valueType(valueType_) {}
-
-bool ValueChecker::isFileExist(const QString& path) {
-  return QFileInfo(path).isFile();
-}
-
-bool ValueChecker::isFolderExist(const QString& path) {
-  return QFileInfo(path).isDir();
-}
-
-bool ValueChecker::isStrInCandidate(const QString& str) const {
-  return m_strCandidates.isEmpty() or m_strCandidates.contains(str);
-}
-
-bool ValueChecker::isSpecifiedExtensionFileExist(const QString& path) const {
-  const QString& ext = PATHTOOL::GetFileExtension(path);
-  return isFileExist(path) && !ext.isEmpty() && isStrInCandidate(ext);
-}
-
-bool ValueChecker::isIntInRange(const int v) const {
-  return minV <= v && v < maxV;
-}
-
-bool ValueChecker::isSwitchString(const QString& switchs) const {
-  return switchs.size() >= m_switchMinCnt && QSet<QChar>(switchs.cbegin(), switchs.cend()) == m_switchStates;
-}
-
-bool ValueChecker::operator()(const QVariant& v) const {
-  switch (valueType) {
-    case EXT_SPECIFIED_FILE_PATH:
-      return isSpecifiedExtensionFileExist(v.toString());
-    case CANDIDATE_STRING:
-      return isStrInCandidate(v.toString());
-    case FILE_PATH:
-      return isFileExist(v.toString());
-    case FOLDER_PATH:
-      return isFolderExist(v.toString());
-    case RANGE_INT:
-      return isIntInRange(v.toInt());
-    case SWITCH_STRING:
-      return isSwitchString(v.toString());
-    case PLAIN_STR:
-    case PLAIN_INT:
-    case PLAIN_BOOL:
-    case PLAIN_FLOAT:
-    case PLAIN_DOUBLE:
-    case QSTRING_LIST:
-    default:
-      return true;
-  }
-}
-
-QString ValueChecker::valueToString(const QVariant& v) const {
-  switch (valueType) {
-    case EXT_SPECIFIED_FILE_PATH:
-    case CANDIDATE_STRING:
-    case FILE_PATH:
-    case FOLDER_PATH:
-    case SWITCH_STRING:
-    case PLAIN_STR:
-      return v.toString();
-    case RANGE_INT:
-    case PLAIN_INT:
-    case PLAIN_BOOL:
-      return QString::number(v.toInt());
-    case PLAIN_FLOAT:
-      return QString::number(v.toFloat());
-    case PLAIN_DOUBLE:
-      return QString::number(v.toDouble());
-    case QSTRING_LIST:
-      return v.toStringList().join('\n');
-    default:
-      return "";
-  }
-}
-
-QVariant ValueChecker::strToQVariant(const QString& v) const {
-  switch (valueType) {
-    case EXT_SPECIFIED_FILE_PATH:
-    case CANDIDATE_STRING:
-    case FILE_PATH:
-    case FOLDER_PATH:
-    case SWITCH_STRING:
-    case PLAIN_STR:
-      return v;
-    case RANGE_INT:
-    case PLAIN_INT:
-      return v.toInt();
-    case PLAIN_BOOL:
-      return v == "true";
-    case PLAIN_FLOAT:
-      return v.toFloat();
-    case PLAIN_DOUBLE:
-      return v.toDouble();
-    case QSTRING_LIST:
-      return v.split('\n');
-    default:
-      return QVariant();
-  }
-}
-
-KV::KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_) : name(name_), v(v_), checker(checker_) {}
-
-QString KV::valueToString() const {
-  return checker.valueToString(v);
-}
-
-QString KV::valueToString(const QVariant& v_) const {
-  return checker.valueToString(v_);
-}
 
 const KV MemoryKey::DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "./", ValueChecker{FOLDER_PATH}};
 const KV MemoryKey::LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{PLAIN_BOOL});
@@ -183,13 +66,13 @@ const KV MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER{"DISABLE_ENTRIES_DONT_PASS_
 const KV MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION{"RENAMER_INCLUDING_FILE_EXTENSION", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::RENAMER_INCLUDING_DIR{"RENAMER_INCLUDING_DIR", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",                                                                           //
-                                         QStringList{"", "^(.*?)$", " BB ", " BB",                                                                        //
+                                         QStringList{"", "^(.*?)$", " BB ", " BB",                                                         //
                                                      " - 360p", " - 480p", " - 516p", " - 720p", " - 1080p", " - 4K", " - FHD", " - UHD",  //
-                                                     "([A-Z])", "( s\\d{1,2})"},                                                    //
-                                                                                ValueChecker{QSTRING_LIST}}; //
-const KV MemoryKey::RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST",        //
-                                         QStringList{"", " ", " \\1", "\\1 -", " - 1080p"},  //
-                                                                                ValueChecker{QSTRING_LIST}};
+                                                     "([A-Z])", "( s\\d{1,2})"},                                                           //
+                                         ValueChecker{QSTRING_LIST}};                                                                      //
+const KV MemoryKey::RENAMER_NEW_STR_LIST{"RENAMER_NEW_STR_LIST",                                                                           //
+                                         QStringList{"", " ", " \\1", "\\1 -", " - 1080p"},                                                //
+                                         ValueChecker{QSTRING_LIST}};
 const KV MemoryKey::RENAMER_INSERT_INDEXES_LIST{"RENAMER_INSERT_INDEXES_LIST", QStringList{"0", "50", "100", "128", "200"}, ValueChecker{QSTRING_LIST}};
 const KV MemoryKey::RENAMER_ARRANGE_SECTION_INDEX{"RENAMER_ARRANGE_SECTION_INDEX", "1,2", ValueChecker{PLAIN_STR}};
 const KV MemoryKey::RENAMER_REGEX_ENABLED{"RENAMER_REGEX_ENABLED", false, ValueChecker{PLAIN_BOOL}};
@@ -205,16 +88,19 @@ const KV MemoryKey::WIN32_STANDARD_STUDIO_NAME("STANDARD_STUDIO_NAME", "../bin/S
 const KV MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("TERMINAL_OPEN_BATCH_FILE_PATH", "../bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat", ValueChecker{{".bat"}, EXT_SPECIFIED_FILE_PATH});
 const KV MemoryKey::LOG_DEVEL_DEBUG{"LOG_DEVEL_DEBUG", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::WIN32_RUNLOG("RUNLOG", "../bin/RUNLOG", ValueChecker{FOLDER_PATH});
-const KV MemoryKey::WIN32_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
 
 const KV MemoryKey::LINUX_MEDIAINFO_LIB_PATH("MEDIAINFO_LIB_PATH", "../lib/MediaInfo.dll", ValueChecker{{".dll"}, EXT_SPECIFIED_FILE_PATH});
 const KV MemoryKey::LINUX_PERFORMERS_TABLE("PERFORMERS_TABLE", "../bin/PERFORMERS_TABLE.txt", ValueChecker{{".txt"}, EXT_SPECIFIED_FILE_PATH});
 const KV MemoryKey::LINUX_AKA_PERFORMERS("AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", ValueChecker{{".txt"}, EXT_SPECIFIED_FILE_PATH});
 const KV MemoryKey::LINUX_STANDARD_STUDIO_NAME("STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", ValueChecker{{".txt"}, EXT_SPECIFIED_FILE_PATH});
 const KV MemoryKey::LINUX_RUNLOG("RUNLOG", "../bin/RUNLOG", ValueChecker{FOLDER_PATH});
-const KV MemoryKey::LINUX_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
 
 const KV MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION("DUPLICATE_FINDER_DEVIATION_DURATION", 2 * 1000, ValueChecker{0, 20 * 1000});         // 2s ~ 20s
 const KV MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE("DUPLICATE_FINDER_DEVIATION_FILESIZE", 2 * 1024, ValueChecker{0, 30 * 1024 * 1024});  // 2kB ~ 30MB
 
 const KV MemoryKey::SHOW_HAR_IMAGE_PREVIEW{"SHOW_HAR_IMAGE_PREVIEW", false, ValueChecker{PLAIN_BOOL}};
+
+const KV RedunImgFinderKey::GEOMETRY{"RedunImgFinderKey/GEOMETRY", {}, ValueChecker{QBYTEARRAY}};
+const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
+const KV RedunImgFinderKey::WIN32_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
+const KV RedunImgFinderKey::LINUX_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
