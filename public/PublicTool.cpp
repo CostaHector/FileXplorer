@@ -14,7 +14,7 @@ QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGrou
     qCritical("oldAG is nullptr");
     return "";
   }
-  QString i_1_path = first_path;           // first and (i-1) path
+  QString i_1_path = first_path;              // first and (i-1) path
   foreach (QAction* act, oldAG->actions()) {  // i path
     QString i_path = act->text();
     if (i_path == first_path) {
@@ -47,6 +47,20 @@ QString TextReader(const QString& textPath) {
   QString contents(stream.readAll());
   file.close();
   return contents;
+}
+
+bool TextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
+  QFile fi{fileName};
+  if (!fi.open(openMode)) {
+    qWarning("Open [%s] to write failed. fill will not update.", qPrintable(fileName));
+    return false;
+  }
+  QTextStream stream(&fi);
+  stream.setCodec("UTF-8");
+  stream << content;
+  stream.flush();
+  fi.close();
+  return true;
 }
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
