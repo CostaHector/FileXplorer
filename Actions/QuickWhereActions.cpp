@@ -6,19 +6,19 @@
 
 QuickWhereActions::QuickWhereActions(QObject* parent)
     : QObject{parent},
-      RESET_CONDITION(new QAction(QIcon(":img/RESET"), tr("Reset"), this)),
-      SAVE_WHERE(new QAction(QIcon(":img/PATH_BACK_TO"), tr("Save"), this)),
+      RESET_CONDITION(new (std::nothrow) QAction(QIcon(":img/RESET"), tr("Reset"), this)),
+      SAVE_WHERE(new (std::nothrow) QAction(QIcon(":img/PATH_BACK_TO"), tr("Save"), this)),
       HIST_WHERE(new QToolButton),
-      SHOW_HISTORY(new QAction(QIcon(":img/WHERE_CLAUSE_HISTORY"), tr("HIST"), this)),
-      CLEAR_ALL_WHERE(new QAction(QIcon(":img/CLEAR_VIDEOS_LIST"), tr("Clear"), this)),
-      AUTO_COMPLETE_AKA_SWITCH(new QAction(QIcon(""), tr("Completer"), this)),
-      APPLY_AND_CLOSE(new QAction(QIcon(":img/SAVED"), tr("Apply"), this)),
+      SHOW_HISTORY(new (std::nothrow) QAction(QIcon(":img/WHERE_CLAUSE_HISTORY"), tr("HIST"), this)),
+      CLEAR_ALL_WHERE(new (std::nothrow) QAction(QIcon(":img/CLEAR_VIDEOS_LIST"), tr("Clear"), this)),
+      AUTO_COMPLETE_AKA_SWITCH(new (std::nothrow) QAction(QIcon(""), tr("Completer"), this)),
+      APPLY_AND_CLOSE(new (std::nothrow) QAction(QIcon(":img/SAVED"), tr("Apply"), this)),
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {
   m_historyWhereClauseMenu->setToolTipsVisible(true);
   const QString& histories = PreferenceSettings().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
   for (const QString& where : histories.split('\n')) {
-    m_historyWhereClauseMenu->addAction(new QAction(where, m_historyWhereClauseMenu));
+    m_historyWhereClauseMenu->addAction(new (std::nothrow) QAction(where, m_historyWhereClauseMenu));
   }
 
   AUTO_COMPLETE_AKA_SWITCH->setCheckable(true);
