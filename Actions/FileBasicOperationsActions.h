@@ -35,16 +35,16 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* FolderMergeActions();
 
   void FolderFileCategoryProcess();
-  QAction* _NAME_RULER{new QAction(QIcon(":img/NAME_RULER"), "Name Ruler")};
-  QAction* _PACK_FOLDERS{new QAction(QIcon(":img/PACK_FOLDERS"), "Packer")};
-  QAction* _UNPACK_FOLDERS{new QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker")};
-  QAction* _LONG_PATH_FINDER{new QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder")};
-  QAction* _DUPLICATE_ITEMS_REMOVER{new QAction(QIcon(":img/DEDUPLICATE"), "Deduplicator")};
-  QAction* _RMV_REDUN_PARENT_FOLDER{new QAction(QIcon(":img/ONE_FILE_IN_ONE_FOLDER"), "Rmv redundant parent folder")};
-  QAction* _RMV_EMPTY_FOLDER_R{new QAction(QIcon(":img/EMPTY_FOLDER"), "Rmv empty folder -r")};
-  QAction* _RMV_FOLDER_BY_KEYWORD{new QAction(QIcon(""), "Rmv by keyword")};
-  QAction* _DUPLICATE_VIDEOS_FINDER{new QAction(QIcon(":img/DUPLICATE_VIDEOS_FINDER"), "Duplicate Videos Finder")};
-  QAction* _REDUNDANT_IMAGES_FINDER{new QAction(QIcon(":img/REDUNDANT_IMAGE_FINDER"), "Useless Images Finder")};
+  QAction* _NAME_RULER{new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), "Name Ruler")};
+  QAction* _PACK_FOLDERS{new (std::nothrow) QAction(QIcon(":img/PACK_FOLDERS"), "Packer")};
+  QAction* _UNPACK_FOLDERS{new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker")};
+  QAction* _LONG_PATH_FINDER{new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder")};
+  QAction* _DUPLICATE_ITEMS_REMOVER{new (std::nothrow) QAction(QIcon(":img/DEDUPLICATE"), "Deduplicator")};
+  QAction* _RMV_REDUN_PARENT_FOLDER{new (std::nothrow) QAction(QIcon(":img/ONE_FILE_IN_ONE_FOLDER"), "Rmv redundant parent folder")};
+  QAction* _RMV_EMPTY_FOLDER_R{new (std::nothrow) QAction(QIcon(":img/EMPTY_FOLDER"), "Rmv empty folder -r")};
+  QAction* _RMV_FOLDER_BY_KEYWORD{new (std::nothrow) QAction(QIcon(""), "Rmv by keyword")};
+  QAction* _DUPLICATE_VIDEOS_FINDER{new (std::nothrow) QAction(QIcon(":img/DUPLICATE_VIDEOS_FINDER"), "Duplicate Videos Finder")};
+  QAction* _REDUNDANT_IMAGES_FINDER{new (std::nothrow) QAction(QIcon(":img/REDUNDANT_IMAGE_FINDER"), "Useless Images Finder")};
 
   QAction *_MOVE_TO, *_COPY_TO;
   QActionGroup* MOVE_COPY_TO;

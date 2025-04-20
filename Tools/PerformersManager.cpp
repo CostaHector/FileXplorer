@@ -84,7 +84,7 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   const QString perfsFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
 #endif
   QFile performersFi{perfsFilePath};
-  if (not performersFi.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+  if (!performersFi.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
     qWarning("Open [%s] to write failed. Performers will not update.", qPrintable(perfsFilePath));
     Notificator::warning("Open [%s] to write failed. Performers will not update.", perfsFilePath);
     return -1;
