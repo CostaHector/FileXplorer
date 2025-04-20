@@ -5,7 +5,7 @@
 #include "Model/ScenesListModel.h"
 #include "public/PublicTool.h"
 #include "public/MemoryKey.h"
-#include "Tools/ActionWithPath.h"
+#include "Actions/ActionWithPath.h"
 #include "Tools/ViewTypeTool.h"
 using namespace ViewTypeTool;
 
