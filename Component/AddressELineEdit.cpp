@@ -102,7 +102,7 @@ auto AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) -
   }
   qDebug("set Path [%s]", qPrintable(fullpath));
   for (const QString& pt : fullpath.split(PATHTOOL::PATH_SEP_CHAR)) {
-    m_pathActionsTB->addAction(new QAction(pt));
+    m_pathActionsTB->addAction(new (std::nothrow) QAction(pt));
   }
 
   if (not pathComboBox->hasFocus()) {  // in disp mode

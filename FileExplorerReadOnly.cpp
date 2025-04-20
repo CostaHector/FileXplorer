@@ -26,12 +26,11 @@ FileExplorerReadOnly::FileExplorerReadOnly(const int argc, char const* const arg
     m_stackedBar{new StackedToolBar},
     m_naviSwitcher{nullptr},
 
-    m_viewsSwitcher{new QToolBar("views switch", this)},
+    m_viewsSwitcher{g_viewActions().GetViewTB()},
     m_navigationToolBar(new NavigationToolBar),
     m_ribbonMenu(new RibbonMenu{this}),
 
     m_statusBar(new CustomStatusBar{m_viewsSwitcher, this}) {
-  m_viewsSwitcher->addActions(g_viewActions()._VIEWS_AG->actions());
 
   m_fsPanel = new ContentPanel(m_previewFolder, this);
   m_fsPanel->BindLogger(m_statusBar);

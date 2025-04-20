@@ -44,7 +44,7 @@ void DropdownToolButton::MemorizeCurrentAction(const QString& memoryKey) {
 bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
   auto* pMenu = menu();
   const auto& actsList = pMenu->actions();
-  for (QAction* act : actsList) {
+  foreach(QAction* act, actsList) {
     if (act->text() == memoryValue) {
       setDefaultAction(act);
       return true;

@@ -53,8 +53,8 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   m_fPrev = new FloatingPreview;
 
   QMenu* m_menu = new QMenu{"scene table view menu", this};
-  COPY_BASENAME_FROM_SCENE = new QAction("copy basename", m_menu);
-  OPEN_CORRESPONDING_FOLDER = new QAction("play this folder", m_menu);
+  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction("copy basename", m_menu);
+  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction("play this folder", m_menu);
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
   m_menu->addSeparator();
