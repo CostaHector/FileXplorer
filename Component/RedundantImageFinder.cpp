@@ -9,149 +9,38 @@
 #include <QListView>
 #include <QTableView>
 #include <QToolBar>
+#include <QDesktopServices>
 
 #include "Actions/FileBasicOperationsActions.h"
+#include "Actions/RedundantImageFinderActions.h"
 #include "Component/NotificatorFrame.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
-#include "Tools/MD5Calculator.h"
-#include "public/PathTool.h"
-#include "Model/QAbstractTableModelPub.h"
 #include "public/UndoRedo.h"
-#include "public/DisplayEnhancement.h"
-#include "qdesktopservices.h"
-#include "View/CustomTableView.h"
+#include "public/PublicMacro.h"
+#include "Model/QAbstractTableModelPub.h"
 
-#include <QDataStream>
+RedunImgLibs RedundantImageFinder::mRedunLibs{"redunSizeHashlib"};
 
-class RedundantImageFinder;
+RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
+    : QMainWindow{parent} {
+  m_imgModel = new (std::nothrow) RedundantImageModel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_imgModel);
+  m_table = new (std::nothrow) CustomTableView{"RedundantImageTable", this};
+  CHECK_NULLPTR_RETURN_VOID(m_table);
 
-class RedundantImageModel : public QAbstractTableModelPub {
- public:
-  friend class RedundantImageFinder;
-  explicit RedundantImageModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
-  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_paf != nullptr ? m_paf->size() : 0; }
-  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return HORIZONTAL_HEADER.size(); }
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-  QString filePath(const QModelIndex& index) const;
-  void setRootPath(const REDUNDANT_IMG_BUNCH* p_af);
-
- private:
-  const REDUNDANT_IMG_BUNCH* m_paf{nullptr};
-  static const QStringList HORIZONTAL_HEADER;
-};
-const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview"};
-
-
-QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
-  if (m_paf == nullptr or not index.isValid()) {
-    return QVariant();
-  }
-  switch (role) {
-    case Qt::DisplayRole: {
-      switch (index.column()) {
-        case 0:
-          return PATHTOOL::fileName(m_paf->operator[](index.row()).filePath);
-        case 1:
-          return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->operator[](index.row()).size);
-        case 2:
-          return m_paf->operator[](index.row()).md5;
-        default:
-          return QVariant();
-      }
-      break;
-    }
-    case Qt::DecorationRole: {
-      if (index.column() == HORIZONTAL_HEADER.size() - 1) {
-        QPixmap pm{m_paf->operator[](index.row()).filePath};
-        return pm.scaledToWidth(128);
-      }
-      break;
-    }
-    default:
-      break;
-  }
-  return QVariant();
-}
-
-QVariant RedundantImageModel::headerData(int section, Qt::Orientation orientation, int role) const {
-  if (role == Qt::TextAlignmentRole) {
-    if (orientation == Qt::Vertical) {
-      return Qt::AlignRight;
-    }
-  }else if (role == Qt::DisplayRole) {
-    if (orientation == Qt::Orientation::Horizontal) {
-      return HORIZONTAL_HEADER[section];
-    }
-    return section + 1;
-  }
-  return QAbstractTableModel::headerData(section, orientation, role);
-}
-
-QString RedundantImageModel::filePath(const QModelIndex& index) const {
-  if (m_paf == nullptr || !index.isValid()) {
-    return "";
-  }
-  const int r = index.row();
-  if (r < 0 || r >= rowCount()) {
-    qWarning("r[%d] out of range[0, %d)", r, rowCount());
-    return "";
-  }
-  return m_paf->operator[](r).filePath;
-}
-
-void RedundantImageModel::setRootPath(const REDUNDANT_IMG_BUNCH* p_af) {
-  int beforeRow = rowCount();
-  int afterRow = p_af != nullptr ? p_af->size() : 0;
-  qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
-
-  RowsCountBeginChange(beforeRow, afterRow);
-  m_paf = p_af;
-  RowsCountEndChange();
-}
-
-
-bool RedundantImageFinder::ALSO_RECYCLE_EMPTY_IMAGE = true;
-QSet<qint64> RedundantImageFinder::m_commonFileSizeSet;
-QSet<QString> RedundantImageFinder::m_commonFileHash;
-
-RedundantImageFinder::RedundantImageFinder(QWidget* parent)
-    : QMainWindow{parent},
-      m_imgModel{new RedundantImageModel{this}},
-      m_table{new CustomTableView{"RedundantImageTable", this}},
-      m_toolBar{new QToolBar{"RedundantImageFinderToolbar", this}} {
-  RECYLE_NOW->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_Delete));
-  RECYLE_NOW->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.").arg(RECYLE_NOW->text(), RECYLE_NOW->shortcut().toString()));
-
-  RECYCLE_EMPTY_IMAGE->setCheckable(true);
-  RECYCLE_EMPTY_IMAGE->setChecked(ALSO_RECYCLE_EMPTY_IMAGE);
-  RECYCLE_EMPTY_IMAGE->setToolTip(QString("<b>%1 (%2)</b><br/> Empty images alse be regard as redundant image.")
-                                      .arg(RECYCLE_EMPTY_IMAGE->text(), RECYCLE_EMPTY_IMAGE->shortcut().toString()));
-
-  OPEN_REDUNDANT_IMAGES_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Open redundant images learned from folder.")
-                                               .arg(OPEN_REDUNDANT_IMAGES_FOLDER->text(), OPEN_REDUNDANT_IMAGES_FOLDER->shortcut().toString()));
-
-  m_toolBar->addAction(RECYLE_NOW);
-  m_toolBar->addSeparator();
-  m_toolBar->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
-  m_toolBar->addSeparator();
-  m_toolBar->addAction(RECYCLE_EMPTY_IMAGE);
-  m_toolBar->addSeparator();
-  m_toolBar->addAction(OPEN_REDUNDANT_IMAGES_FOLDER);
-
-  m_toolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  addToolBar(m_toolBar);
+  auto* toolBar = g_redunImgFinderAg().GetRedunImgTB(this);
+  CHECK_NULLPTR_RETURN_VOID(toolBar);
+  toolBar->addSeparator();
+  toolBar->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  addToolBar(toolBar);
 
   m_table->setModel(m_imgModel);
-  m_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+  m_table->verticalHeader()->setStretchLastSection(false);
+  m_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
 
   m_table->horizontalHeader()->setStretchLastSection(true);
   m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
-  m_table->horizontalHeader()->setSectionResizeMode(RedundantImageModel::HORIZONTAL_HEADER.indexOf("MD5"), QHeaderView::ResizeMode::Stretch);
-  m_table->horizontalHeader()->setSectionResizeMode(RedundantImageModel::HORIZONTAL_HEADER.indexOf("Name"), QHeaderView::ResizeMode::ResizeToContents);
 
   m_table->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
   m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
@@ -166,33 +55,42 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)
 
   setWindowIcon(QIcon(":img/REDUNDANT_IMAGE_FINDER"));
   setWindowTitle("Redundant Images Finder");
-  setMinimumSize(1024, 768);
 
-  LearnCommonImageCharacteristic(GetRedunPath());
+  mRedunLibs.LearnSizeAndHashFromRedunImgPath(mRedunLibs.GetRedunPath());
+  ReadSetting();
 }
 
-RedundantImageFinder::~RedundantImageFinder() {
-  if (m_libFi.isOpen()) {
-    m_libFi.close();
+RedundantImageFinder::~RedundantImageFinder() {}
+
+void RedundantImageFinder::ReadSetting() {
+  if (PreferenceSettings().contains(RedunImgFinderKey::GEOMETRY.name)) {
+    restoreGeometry(PreferenceSettings().value(RedunImgFinderKey::GEOMETRY.name).toByteArray());
+  } else {
+    setGeometry(DEFAULT_GEOMETRY);
   }
+}
+
+void RedundantImageFinder::closeEvent(QCloseEvent* event) {
+  g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER->setChecked(false);
+  PreferenceSettings().setValue(RedunImgFinderKey::GEOMETRY.name, saveGeometry());
+  QMainWindow::closeEvent(event);
 }
 
 void RedundantImageFinder::ChangeWindowTitle(const QString& rootPath) {
   setWindowTitle(QString("Redundant Images Finder | %1 | %2 item(s)").arg(rootPath).arg(m_imgsBunch.size()));
 }
 
-QString RedundantImageFinder::GetRedunPath() const {
-#ifdef _WIN32
-  return PreferenceSettings().value(MemoryKey::WIN32_RUND_IMG_PATH.name).toString();
-#else
-  return PreferenceSettings().value(MemoryKey::LINUX_RUND_IMG_PATH.name).toString();
-#endif
-}
-
 void RedundantImageFinder::subscribe() {
-  connect(RECYLE_NOW, &QAction::triggered, this, &RedundantImageFinder::RecycleSelection);
-  connect(RECYCLE_EMPTY_IMAGE, &QAction::triggered, this, [](bool recycleEmptyImage) -> void { ALSO_RECYCLE_EMPTY_IMAGE = recycleEmptyImage; });
-  connect(OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered, this, [this]() { QDesktopServices::openUrl(QUrl::fromLocalFile(GetRedunPath())); });
+  connect(g_redunImgFinderAg().RECYLE_NOW, &QAction::triggered,  //
+          this, &RedundantImageFinder::RecycleSelection);
+  connect(g_redunImgFinderAg().RECYCLE_EMPTY_IMAGE, &QAction::triggered,  //
+          this, [](bool recycleEmptyImage) -> void {                      //
+            PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, recycleEmptyImage);
+          });
+  connect(g_redunImgFinderAg().OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered,  //
+          this, [this]() {                                                         //
+            QDesktopServices::openUrl(QUrl::fromLocalFile(mRedunLibs.GetRedunPath()));
+          });
 }
 
 void RedundantImageFinder::RecycleSelection() {
@@ -219,8 +117,8 @@ void RedundantImageFinder::RecycleSelection() {
 
 void RedundantImageFinder::UpdateDisplayWhenRecycled() {
   decltype(m_imgsBunch) redundantImgs;
-  for (const auto& info : m_imgsBunch) {
-    if (not QFile::exists(info.filePath))
+  foreach (const REDUNDANT_IMG_INFO& info, m_imgsBunch) {
+    if (!QFile::exists(info.filePath))
       continue;
     redundantImgs.append(info);
   }
@@ -232,71 +130,13 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
   m_imgModel->RowsCountEndChange();
 }
 
-void RedundantImageFinder::ReadLocalCharacteristicLib(const QString& libPath) {
-  m_libFi.setFileName(libPath);
-  if ((not m_libFi.isOpen()) and (not m_libFi.open(QFile::OpenModeFlag::ReadOnly))) {
-    qWarning("Cannot open file[%s] for read", qPrintable(libPath));
-    return;
-  }
-
-  QDataStream ds;
-  ds.setDevice(&m_libFi);
-  qint64 size;
-  QString md5;
-  while (!ds.atEnd()) {
-    ds >> size >> md5;
-    m_commonFileSizeSet.insert(size);
-    m_commonFileHash.insert(md5);
-  }
-}
-
-void RedundantImageFinder::LearnCommonImageCharacteristic(const QString& folderPath) {
-  qDebug("Benchmark redundant images located in [%s]", qPrintable(folderPath));
-  if (folderPath == ".") {
-    qWarning("Benchmark redundant images path");
-    return;
-  }
-  QDirIterator it(folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    QFileInfo imgFi(it.filePath());
-    const QString fileAbsPath = imgFi.absoluteFilePath();
-    const qint64 sz = imgFi.size();
-    m_commonFileSizeSet.insert(sz);
-    const QString& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
-    m_commonFileHash.insert(md5);
-  }
-  qDebug("redundant image info size[%d] and hash[%d]", m_commonFileSizeSet.size(), m_commonFileHash.size());
-}
-
 void RedundantImageFinder::operator()(const QString& folderPath) {
-  QDirIterator it(folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  REDUNDANT_IMG_BUNCH redundantImgs;
-  while (it.hasNext()) {
-    it.next();
-    QFileInfo imgFi(it.filePath());
-    const QString fileAbsPath = imgFi.absoluteFilePath();
-    const qint64 sz = imgFi.size();
-    if (sz == 0) {
-      if (ALSO_RECYCLE_EMPTY_IMAGE) {
-        redundantImgs.append(REDUNDANT_IMG_INFO{fileAbsPath, 0, ""});
-      }
-      continue;
-    }
-    if (not m_commonFileSizeSet.contains(sz)) {
-      continue;
-    }
-    const QString& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
-    if (not m_commonFileHash.contains(md5)) {
-      continue;
-    }
-    redundantImgs.append(REDUNDANT_IMG_INFO{fileAbsPath, sz, md5});
-  }
+  REDUNDANT_IMG_BUNCH newImgs = mRedunLibs.FindRedunImgs(folderPath);
 
   int beforeRowCnt = m_imgsBunch.size();
-  int afterRowCnt = redundantImgs.size();
+  int afterRowCnt = newImgs.size();
   m_imgModel->RowsCountBeginChange(beforeRowCnt, afterRowCnt);
-  m_imgsBunch.swap(redundantImgs);
+  m_imgsBunch.swap(newImgs);
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(folderPath);
 }
