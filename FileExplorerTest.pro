@@ -49,6 +49,7 @@ SOURCES += \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/SplitterInsertIndexHelper.cpp \
     Tools/LogHandler.cpp \
+    Tools/FileSystemItemFilter.cpp \
     model/ConflictsFileSystemModel.cpp \
 
 HEADERS += $$files(TestCase/*.h)
@@ -94,6 +95,7 @@ HEADERS += \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/SplitterInsertIndexHelper.h \
     Tools/LogHandler.h \
+    Tools/FileSystemItemFilter.h \
     model/ConflictsFileSystemModel.h \
 
 DISTFILES += \

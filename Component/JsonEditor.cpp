@@ -25,15 +25,15 @@ const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 
 JsonEditor::JsonEditor(QWidget* parent)
     : QMainWindow{parent},
-      m_jsonFormLo(new QFormLayout),
-      m_jsonFormWid(new QWidget(this)),
+      m_jsonFormLo{new QFormLayout},
+      m_jsonFormWid{new QWidget(this)},
 
       m_jsonModel{new JsonModel{this}},
       m_jsonList(new JsonListView{m_jsonModel, this}),
 
-      m_menuBar(g_jsonEditorActions().GetJsonMenuBar(this)),
-      m_toolBar(g_jsonEditorActions().GetJsonToolBar(this)),
-      m_splitter(new QSplitter(Qt::Orientation::Horizontal, this)) {
+      m_menuBar{g_jsonEditorActions().GetJsonMenuBar(this)},
+      m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
+      m_splitter{new (std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
   setMenuBar(m_menuBar);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
@@ -140,7 +140,7 @@ int JsonEditor::operator()(const QString& folderPath) {
     loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
   }
   QFileInfo loadFromFi(loadFromPath);
-  if (not loadFromFi.isDir()) {
+  if (!loadFromFi.isDir()) {
     QMessageBox::warning(this, "Failed when Load json from a folder", QString("Not a folder:\n%1").arg(folderPath));
     qWarning("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(folderPath));
     return 0;
@@ -336,7 +336,7 @@ int JsonEditor::load(const QString& path) {
   return deltaFile;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
