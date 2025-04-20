@@ -5,39 +5,39 @@
 
 JsonEditorActions::JsonEditorActions(QObject* parent)
     : QObject{parent},
-      _CLR_TO_BE_EDITED_LIST(new QAction(QIcon(":img/EMPTY_LISTWIDGET"), tr("Clear list"), this)),
-      _FILE_LOAD_ACTIONS{new QActionGroup(this)},
+      _CLR_TO_BE_EDITED_LIST(new (std::nothrow) QAction(QIcon(":img/EMPTY_LISTWIDGET"), tr("Clear list"), this)),
+      _FILE_LOAD_ACTIONS{new (std::nothrow) QActionGroup(this)},
 
-      _LAST_FILE(new QAction("Last", this)),
-      _NEXT_FILE(new QAction("Next", this)),
-      _DONE_AND_NEXT(new QAction(QIcon(""), tr("Done and next"), this)),
-      _AUTO_SKIP(new QAction(QIcon(":img/AUTO_SKIP"), tr("Autoskip"), this)),
-      _COMPLETE_PERFS_COUNT(new QAction(QIcon(), "Skip if", this)),
-      _QUICK_EDIT_ACTIONS{new QActionGroup(this)},
+      _LAST_FILE(new (std::nothrow) QAction("Last", this)),
+      _NEXT_FILE(new (std::nothrow) QAction("Next", this)),
+      _DONE_AND_NEXT(new (std::nothrow) QAction(QIcon(""), tr("Done and next"), this)),
+      _AUTO_SKIP(new (std::nothrow) QAction(QIcon(":img/AUTO_SKIP"), tr("Autoskip"), this)),
+      _COMPLETE_PERFS_COUNT(new (std::nothrow) QAction(QIcon(), "Skip if", this)),
+      _QUICK_EDIT_ACTIONS{new (std::nothrow) QActionGroup(this)},
 
-      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new QAction(tr("Sentense Case"), this)),
-      _LOWER_ALL_WORDS(new QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("lowercase"), this)),
-      _FORMATTER(new QAction(QIcon(""), "Formatter", this)),
-      _RELOAD_JSON_FROM_FROM_DISK(new QAction(QIcon(""), "Reload contents", this)),
-      _ADD_SELECTED_PERFORMER{new QAction(QIcon(":img/APPEND_PERFORMERS"), "Add Perfs", this)},
-      _EXTRACT_CAPITALIZED_PERFORMER{new QAction(QIcon(""), "Add Perfs(Capitalized Sentence)", this)},
-      _TEXT_EDIT_ACTIONS{new QActionGroup(this)},
+      _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD(new (std::nothrow) QAction(tr("Sentense Case"), this)),
+      _LOWER_ALL_WORDS(new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("lowercase"), this)),
+      _FORMATTER(new (std::nothrow) QAction(QIcon(""), "Formatter", this)),
+      _RELOAD_JSON_FROM_FROM_DISK(new (std::nothrow) QAction(QIcon(""), "Reload contents", this)),
+      _ADD_SELECTED_PERFORMER{new (std::nothrow) QAction(QIcon(":img/APPEND_PERFORMERS"), "Add Perfs", this)},
+      _EXTRACT_CAPITALIZED_PERFORMER{new (std::nothrow) QAction(QIcon(""), "Add Perfs(Capitalized Sentence)", this)},
+      _TEXT_EDIT_ACTIONS{new (std::nothrow) QActionGroup(this)},
 
-      _SAVE{new QAction{QIcon(":img/SAVE_JSON"), "Save Change", this}},
-      _FILE_SAVE_ACTIONS{new QActionGroup(this)},
+      _SAVE{new (std::nothrow) QAction{QIcon(":img/SAVE_JSON"), "Save Change", this}},
+      _FILE_SAVE_ACTIONS{new (std::nothrow) QActionGroup(this)},
 
-      _AI_HINT(new QAction(QIcon(":img/AI_IDEA"), "Hint", this)),
-      _LEARN_PERFORMERS_FROM_JSON(new QAction(QIcon(":img/AI_LEARN"), "Self Learning", this)),
-      _AI_ACTIONS{new QActionGroup(this)},
+      _AI_HINT(new (std::nothrow) QAction(QIcon(":img/AI_IDEA"), "Hint", this)),
+      _LEARN_PERFORMERS_FROM_JSON(new (std::nothrow) QAction(QIcon(":img/AI_LEARN"), "Self Learning", this)),
+      _AI_ACTIONS{new (std::nothrow) QActionGroup(this)},
 
-      _SELECT_CURRENT_FOLDER{new QAction{QIcon(":img/SELECT_A_FOLDER_AND_LOAD_JSON"), "Read Current path"}},
-      _CONSTRUCT_JSONS_FOR_VIDS{new QAction(QIcon(""), "Construct jsons by file properties")},
-      _APPEND_PERFORMERS{new QAction(QIcon(":img/APPEND_PERFORMERS"), tr("Append performers"))},
-      _SET_STUDIO{new QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), tr("Set production studio"))},
-      _CONSTRUCT_PERFORMER_KVP{new QAction(QIcon(":img/PERFORMERS_LIST_FILE"), tr("Construct performers k-v pair"))},
-      _CONSTRUCT_STUDIO_KVP{new QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), tr("Construct studio k-v pair"))},
-      _CLR_PERFORMERS_STUDIO_VALUE{new QAction(tr("Clear performers and studio values"))},
-      _BATCH_EDIT_TOOL_ACTIONS{new QActionGroup(this)} {
+      _SELECT_CURRENT_FOLDER{new (std::nothrow) QAction{QIcon(":img/SELECT_A_FOLDER_AND_LOAD_JSON"), "Read Current path"}},
+      _CONSTRUCT_JSONS_FOR_VIDS{new (std::nothrow) QAction(QIcon(""), "Construct jsons by file properties")},
+      _APPEND_PERFORMERS{new (std::nothrow) QAction(QIcon(":img/APPEND_PERFORMERS"), tr("Append performers"))},
+      _SET_STUDIO{new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), tr("Set production studio"))},
+      _CONSTRUCT_PERFORMER_KVP{new (std::nothrow) QAction(QIcon(":img/PERFORMERS_LIST_FILE"), tr("Construct performers k-v pair"))},
+      _CONSTRUCT_STUDIO_KVP{new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), tr("Construct studio k-v pair"))},
+      _CLR_PERFORMERS_STUDIO_VALUE{new (std::nothrow) QAction(tr("Clear performers and studio values"))},
+      _BATCH_EDIT_TOOL_ACTIONS{new (std::nothrow) QActionGroup(this)} {
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setShortcutVisibleInContextMenu(true);
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format current json(not stage). e.g., A,B -> A, B.").arg(_FORMATTER->text()).arg(_FORMATTER->shortcut().toString()));
@@ -150,7 +150,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)
 }
 
 QActionGroup* JsonEditorActions::GetSystemActions() {
-  auto* _SYSTEM_ACTIONS = new QActionGroup(this);
+  auto* _SYSTEM_ACTIONS = new (std::nothrow) QActionGroup(this);
 
   _SYSTEM_ACTIONS->addAction(_RENAME_THIS_FILE);
   _SYSTEM_ACTIONS->addAction(_REVEAL_IN_EXPLORER);

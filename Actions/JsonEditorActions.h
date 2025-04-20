@@ -40,9 +40,9 @@ class JsonEditorActions : public QObject {
 
 
   QActionGroup* GetSystemActions();
-  QAction* _REVEAL_IN_EXPLORER{new QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal"), this)};
-  QAction* _OPEN_THIS_FILE{new QAction(tr("Open"), this)};
-  QAction* _RENAME_THIS_FILE{new QAction(QIcon(":img/RENAME"), tr("Rename"), this)};
+  QAction* _REVEAL_IN_EXPLORER{new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal"), this)};
+  QAction* _OPEN_THIS_FILE{new (std::nothrow) QAction(tr("Open"), this)};
+  QAction* _RENAME_THIS_FILE{new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename"), this)};
   QActionGroup* _SYSTEM_ACTIONS{GetSystemActions()};
 
   QAction* _AI_HINT;
