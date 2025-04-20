@@ -8,9 +8,9 @@ FolderPreviewActions& g_folderPreviewActions() {
 }
 
 FolderPreviewActions::FolderPreviewActions(QObject* parent) : QObject{parent} {
-  LISTS = {new QAction{QIcon(":img/FOLDER_PREVIEW_LISTS"), "3-lists", this}};
-  BROWSER = {new QAction{QIcon(":img/FOLDER_PREVIEW_BROWSER"), "browser", this}};
-  LABELS = {new QAction{QIcon(":img/FOLDER_PREVIEW_LABELS"), "labels", this}};
+  LISTS = {new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LISTS"), "3-lists", this}};
+  BROWSER = {new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_BROWSER"), "browser", this}};
+  LABELS = {new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LABELS"), "labels", this}};
 
   LISTS->setToolTip(QString("<b>%1 (%2)</b><br/> IMAGE/VIDEO/OTHER list item view.")  //
                         .arg(LISTS->text(), LISTS->shortcut().toString()));
@@ -19,7 +19,7 @@ FolderPreviewActions::FolderPreviewActions(QObject* parent) : QObject{parent} {
   LABELS->setToolTip(QString("<b>%1 (%2)</b><br/> QLabels(Slidershow and Periodic timer).")  //
                          .arg(LABELS->text(), LABELS->shortcut().toString()));
 
-  PREVIEW_AG = new QActionGroup{this};
+  PREVIEW_AG = new (std::nothrow) QActionGroup{this};
   PREVIEW_AG->addAction(LISTS);
   PREVIEW_AG->addAction(BROWSER);
   PREVIEW_AG->addAction(LABELS);
