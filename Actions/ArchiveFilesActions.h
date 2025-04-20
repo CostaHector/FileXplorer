@@ -9,15 +9,15 @@ class ArchiveFilesActions : public QObject {
  public:
   explicit ArchiveFilesActions(QObject* parent = nullptr);
 
-  QAction* COMPRESSED_HERE{new QAction{QIcon(":img/COMPRESSED"), "Compressd here", this}};
-  QAction* COMPRESSED_TO{new QAction{"Compressd to", this}};
+  QAction* COMPRESSED_HERE{new (std::nothrow) QAction{QIcon(":img/COMPRESSED"), "Compressd here", this}};
+  QAction* COMPRESSED_TO{new (std::nothrow) QAction{"Compressd to", this}};
 
-  QAction* DECOMPRESSED_TO{new QAction{"Decompressd to", this}};
-  QAction* DECOMPRESSED_HERE{new QAction{"Decompressd here", this}};
+  QAction* DECOMPRESSED_TO{new (std::nothrow) QAction{"Decompressd to", this}};
+  QAction* DECOMPRESSED_HERE{new (std::nothrow) QAction{"Decompressd here", this}};
 
-  QAction* COMPRESSED_IMAGES{new QAction{"Compress Images", this}};
+  QAction* COMPRESSED_IMAGES{new (std::nothrow) QAction{"Compress Images", this}};
 
-  QAction* ARCHIVE_PREVIEW{new QAction{QIcon(":img/COMPRESS_ITEM"), "Archive", this}};
+  QAction* ARCHIVE_PREVIEW{new (std::nothrow) QAction{QIcon(":img/COMPRESS_ITEM"), "Archive", this}};
 };
 
 ArchiveFilesActions& g_AchiveFilesActions();

@@ -9,9 +9,9 @@ class ArrangeSectionActions : public QObject {
  public:
   static ArrangeSectionActions& GetInst();
   ArrangeSectionActions(QObject* parent = nullptr);
-  QAction* _SWAP_SECTION_AT_2_INDEXES{new QAction{"Swap 2 sections:"}};
-  QAction* _SECTION_JOIN_WITH_SELECT_INDEXES{new QAction{"Join sections with select indexes:", this}};
-  QActionGroup* _ARRANGE_SECTION_AG{new QActionGroup{this}};
+  QAction* _SWAP_SECTION_AT_2_INDEXES{new (std::nothrow) QAction{"Swap 2 sections:"}};
+  QAction* _SECTION_JOIN_WITH_SELECT_INDEXES{new (std::nothrow) QAction{"Join sections with select indexes:", this}};
+  QActionGroup* _ARRANGE_SECTION_AG{new (std::nothrow) QActionGroup{this}};
 };
 
 class RenameWidget_ArrangeSection : public AdvanceRenamer {

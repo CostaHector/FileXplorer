@@ -1,5 +1,6 @@
 #include "ViewActions.h"
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
 ViewActions& g_viewActions() {
   static ViewActions ins;
@@ -8,22 +9,22 @@ ViewActions& g_viewActions() {
 
 ViewActions::ViewActions(QObject* parent)
     : QObject{parent},
-      _ADVANCE_SEARCH_VIEW{new QAction(QIcon(":img/SEARCH"), "search")},
-      _MOVIE_VIEW{new QAction(QIcon(":img/SHOW_DATABASE"), "movie")},
-      _LIST_VIEW{new QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), "list")},
-      _TABLE_VIEW{new QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), "table")},
-      _TREE_VIEW{new QAction(QIcon(":img/DISPLAY_TREE_VIEW"), "tree")},
-      _SCENE_VIEW{new QAction(QIcon(":img/SCENE_TABLE_VIEW"), "scene")},
-      _FLOATING_PREVIEW{new QAction(QIcon(":img/FLOATING_PREVIEW"), "floating preview")},
+      _ADVANCE_SEARCH_VIEW{new (std::nothrow) QAction(QIcon(":img/SEARCH"), "search")},
+      _MOVIE_VIEW{new (std::nothrow) QAction(QIcon(":img/SHOW_DATABASE"), "movie")},
+      _LIST_VIEW{new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), "list")},
+      _TABLE_VIEW{new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), "table")},
+      _TREE_VIEW{new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), "tree")},
+      _SCENE_VIEW{new (std::nothrow) QAction(QIcon(":img/SCENE_TABLE_VIEW"), "scene")},
+      _FLOATING_PREVIEW{new (std::nothrow) QAction(QIcon(":img/FLOATING_PREVIEW"), "floating preview")},
       _VIEWS_AG{GetViewsAG()},
 
-      NAVIGATION_PANE{new QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"))},
-      _JSON_EDITOR_PANE{new QAction(QIcon(":img/JSON_EDITOR"), tr("Json Editor"))},
-      _VIDEO_PLAYER_EMBEDDED{new QAction(QIcon(":img/VIDEO_PLAYER"), tr("Embedded Player"))},
+      NAVIGATION_PANE{new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"))},
+      _JSON_EDITOR_PANE{new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), tr("Json Editor"))},
+      _VIDEO_PLAYER_EMBEDDED{new (std::nothrow) QAction(QIcon(":img/VIDEO_PLAYER"), tr("Embedded Player"))},
       _VIEW_ACTIONS(Get_NAVIGATION_PANE_Actions()),
-      _SYS_VIDEO_PLAYERS(new QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
+      _SYS_VIDEO_PLAYERS(new (std::nothrow) QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"))),
       _VIDEO_PLAYERS(GetPlayersActions()) {
-  _HAR_VIEW = new QAction{QIcon(":img/HAR_VIEW"), "Har View"};
+  _HAR_VIEW = new (std::nothrow) QAction{QIcon(":img/HAR_VIEW"), "Har View"};
 }
 
 QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
@@ -37,7 +38,8 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   _VIDEO_PLAYER_EMBEDDED->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.").arg(_VIDEO_PLAYER_EMBEDDED->text(), _VIDEO_PLAYER_EMBEDDED->shortcut().toString()));
 
-  auto* actionGroup = new QActionGroup(this);
+  auto* actionGroup = new (std::nothrow) QActionGroup(this);
+  CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
   actionGroup->addAction(NAVIGATION_PANE);
   actionGroup->addAction(_JSON_EDITOR_PANE);
   actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
@@ -53,12 +55,13 @@ QActionGroup* ViewActions::GetPlayersActions() {
   _SYS_VIDEO_PLAYERS->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                          "Play the selected item(s) in default system player.")
                                      .arg(_SYS_VIDEO_PLAYERS->text(), _SYS_VIDEO_PLAYERS->shortcut().toString()));
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
+  CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
   actionGroup->addAction(_SYS_VIDEO_PLAYERS);
   actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  for (QAction* act : actionGroup->actions()) {
+  foreach(QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -98,7 +101,8 @@ QActionGroup* ViewActions::GetViewsAG() {
   _FLOATING_PREVIEW->setCheckable(true);
   _FLOATING_PREVIEW->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool());
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
+  CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
   actionGroup->addAction(_LIST_VIEW);
   actionGroup->addAction(_TABLE_VIEW);
   actionGroup->addAction(_TREE_VIEW);
@@ -107,4 +111,15 @@ QActionGroup* ViewActions::GetViewsAG() {
   actionGroup->addAction(_SCENE_VIEW);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
   return actionGroup;
+}
+
+QToolBar* ViewActions::GetViewTB(QWidget* parent) {
+  auto* pTb = new (std::nothrow) QToolBar{"views switch", parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(pTb);
+  pTb->addActions(_VIEWS_AG->actions());
+  pTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
+  pTb->setOrientation(Qt::Orientation::Horizontal);
+  pTb->setStyleSheet("QToolBar { max-width: 256px; }");
+  pTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
+  return pTb;
 }

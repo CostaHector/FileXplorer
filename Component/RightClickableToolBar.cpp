@@ -13,14 +13,14 @@ const QHash<Qt::ToolButtonStyle, QString> TOOL_BTN_STYLE_REV_MAP = {{Qt::ToolBut
 
 RightClickableToolBar::RightClickableToolBar(const QString& title)
     : QToolBar(title),
-      extraAG(new QActionGroup(this)),
+      extraAG(new (std::nothrow) QActionGroup(this)),
       rightClickedPos(-1, -1),
-      UNPIN{new QAction(QIcon(":img/UNPIN"), tr("Unpin"), this)},
-      UNPIN_ALL{new QAction(tr("Unpin All"), this)},
-      SHOW_TOOL_BUTTON_TEXT(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextOnly], this)),
-      SHOW_TOOL_BUTTON_ICON(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonIconOnly], this)),
-      SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON(new QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextBesideIcon], this)),
-      textIconActionGroup(new QActionGroup(this)),
+      UNPIN{new (std::nothrow) QAction(QIcon(":img/UNPIN"), tr("Unpin"), this)},
+      UNPIN_ALL{new (std::nothrow) QAction(tr("Unpin All"), this)},
+      SHOW_TOOL_BUTTON_TEXT(new (std::nothrow) QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextOnly], this)),
+      SHOW_TOOL_BUTTON_ICON(new (std::nothrow) QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonIconOnly], this)),
+      SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON(new (std::nothrow) QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextBesideIcon], this)),
+      textIconActionGroup(new (std::nothrow) QActionGroup(this)),
       menuQWidget(new QMenu(this))
 
 {
@@ -32,7 +32,7 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
   textIconActionGroup->setExclusive(true);
 
   const int _style = PreferenceSettings().value(MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.name, MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.v).toInt();
-  for (QAction* act : textIconActionGroup->actions()) {
+  foreach(QAction* act, textIconActionGroup->actions()) {
     act->setCheckable(true);
     if (int(TOOL_BTN_STYLE_MAP[act->text()]) == _style) {
       act->setChecked(true);
@@ -132,7 +132,7 @@ void RightClickableToolBar::_unpin() {
 }
 
 void RightClickableToolBar::_unpinAll() {
-  for (QAction* act : actions()) {
+  foreach(QAction* act, actions()) {
     removeAction(act);
   }
   _save();
