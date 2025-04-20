@@ -23,6 +23,7 @@
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
     : QTabWidget{parent},
@@ -49,10 +50,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
 
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar("corner tools", attached)};
-  if (menuRibbonCornerWid == nullptr) {
-    qCritical("menuRibbonCornerWid is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
   menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_framelessWindowAg()._EXPAND_RIBBONS);
@@ -67,10 +65,7 @@ QToolBar* RibbonMenu::LeafFile() const {
   logToolButton->setDefaultAction(g_LogActions()._LOG_FILE);
 
   QToolBar* leafFileWid{new (std::nothrow) QToolBar};
-  if (leafFileWid == nullptr) {
-    qCritical("leafFileWid is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(leafFileWid);
   leafFileWid->addActions(g_fileLeafActions()._LEAF_FILE->actions());
   leafFileWid->addSeparator();
   leafFileWid->addWidget(styleToolButton);
@@ -87,10 +82,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   playTB->MemorizeCurrentAction(MemoryKey::DEFAULT_VIDEO_PLAYER.name);
 
   QToolBar* openItemsTB = new (std::nothrow) QToolBar("Open");
-  if (openItemsTB == nullptr) {
-    qCritical("openItemsTB is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(openItemsTB);
   {
     openItemsTB->addWidget(playTB);
     openItemsTB->addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
@@ -106,10 +98,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   copyTB->MemorizeCurrentAction(MemoryKey::DEFAULT_COPY_CHOICE.name);
 
   QToolBar* propertiesTB = new (std::nothrow) QToolBar("Properties");
-  if (propertiesTB == nullptr) {
-    qCritical("propertiesTB is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(propertiesTB);
   {
     propertiesTB->addWidget(copyTB);
     propertiesTB->addAction(g_rightClickActions()._CALC_MD5_ACT);
@@ -126,10 +115,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   newItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_NEW_CHOICE.name);
 
   QToolBar* moveCopyItemsToTB = new (std::nothrow) QToolBar("Move/Copy item(s) To ToolBar");
-  if (moveCopyItemsToTB == nullptr) {
-    qCritical("moveCopyItemsToTB is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(moveCopyItemsToTB);
   {
     const auto& _MOVE_TO_HIST_LIST = g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY->actions();
     const auto& _COPY_TO_HIST_LIST = g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY->actions();
@@ -150,19 +136,13 @@ QToolBar* RibbonMenu::LeafHome() const {
   recycleItemsTB->setDefaultAction(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN);
 
   QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar("ArchievePreview");
-  if (archievePreviewToolBar == nullptr) {
-    qCritical("archievePreviewToolBar is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(archievePreviewToolBar);
   archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
   archievePreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   archievePreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
   QToolBar* selectionToolBar = new (std::nothrow) QToolBar("Selection");
-  if (selectionToolBar == nullptr) {
-    qCritical("selectionToolBar is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(selectionToolBar);
   {
     selectionToolBar->addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
     selectionToolBar->setOrientation(Qt::Orientation::Vertical);
@@ -173,10 +153,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   }
 
   QToolBar* compressToolBar = new (std::nothrow) QToolBar("Compress/Decompress");
-  if (compressToolBar == nullptr) {
-    qCritical("compressToolBar is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(compressToolBar);
   {
     compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_HERE);
     compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_IMAGES);
@@ -192,10 +169,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   renameItemsTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_RENAME_CHOICE.name, MemoryKey::DEFAULT_RENAME_CHOICE.v).toString());
   renameItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_RENAME_CHOICE.name);
   QToolBar* advanceSearchToolBar = new (std::nothrow) QToolBar("AdvanceSearch");
-  if (advanceSearchToolBar == nullptr) {
-    qCritical("advanceSearchToolBar is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(advanceSearchToolBar);
   advanceSearchToolBar->addAction(g_viewActions()._ADVANCE_SEARCH_VIEW);
   advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
@@ -215,10 +189,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   }
 
   QToolBar* leafHomeWid = new (std::nothrow) QToolBar("LeafHome");
-  if (leafHomeWid == nullptr) {
-    qCritical("leafHomeWid is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
   leafHomeWid->setToolTip("Home Leaf ToolBar");
   leafHomeWid->addWidget(openItemsTB);
   leafHomeWid->addSeparator();
@@ -245,16 +216,10 @@ QToolBar* RibbonMenu::LeafHome() const {
 
 QToolBar* RibbonMenu::LeafView() const {
   auto* leafViewWid = new (std::nothrow) QToolBar("Leaf View");
-  if (leafViewWid == nullptr) {
-    qCritical("leafViewWid is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(leafViewWid);
 
   auto* fileSystemView = new (std::nothrow) QToolBar("Navigation Preview Switch");
-  if (fileSystemView == nullptr) {
-    qCritical("fileSystemView is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(fileSystemView);
   fileSystemView->setOrientation(Qt::Orientation::Vertical);
   fileSystemView->addActions({g_viewActions()._LIST_VIEW, g_viewActions()._TABLE_VIEW, g_viewActions()._TREE_VIEW});
   fileSystemView->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
@@ -286,15 +251,13 @@ QToolBar* RibbonMenu::LeafView() const {
 
 QToolBar* RibbonMenu::LeafDatabase() const {
   auto* databaseToolBar{new (std::nothrow) DatabaseToolBar("Leaf Database")};
-  if (databaseToolBar == nullptr) {
-    qCritical("databaseToolBar is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(databaseToolBar);
   return databaseToolBar;
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
-  QToolBar* folderRmv{new QToolBar{"Folder Remover"}};
+  QToolBar* folderRmv{new (std::nothrow) QToolBar{"Folder Remover"}};
+  CHECK_NULLPTR_RETURN_NULLPTR(folderRmv);
   folderRmv->setOrientation(Qt::Orientation::Vertical);
   folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
@@ -303,7 +266,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
 
-  QToolBar* mediaDupFinder{new QToolBar{"Duplicate Medias Finder"}};
+  QToolBar* mediaDupFinder{new (std::nothrow) QToolBar{"Duplicate Medias Finder"}};
+  CHECK_NULLPTR_RETURN_NULLPTR(mediaDupFinder);
   mediaDupFinder->setOrientation(Qt::Orientation::Vertical);
   mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mediaDupFinder->setStyleSheet("QToolBar { max-width: 256px; }");
@@ -315,25 +279,26 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto& arrangeIns = g_ArrangeActions();
   QList<QAction*> studiosActions{arrangeIns._EDIT_STUDIOS,  arrangeIns._RELOAD_STUDIOS,  nullptr, arrangeIns._EDIT_PERFS,      arrangeIns._RELOAD_PERFS, nullptr,
                                  arrangeIns._EDIT_PERF_AKA, arrangeIns._RELOAD_PERF_AKA, nullptr, arrangeIns._RENAME_RULE_STAT};
-  QToolButton* nameRulerToolButton = new DropdownToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
+  QToolButton* nameRulerToolButton =
+      new (std::nothrow) DropdownToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
+  CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
   nameRulerToolButton->setDefaultAction(g_fileBasicOperationsActions()._NAME_RULER);
   auto& viewIns = g_viewActions();
   auto& jsonIns = g_jsonEditorActions();
-  auto* jsonEditorTB = new DropdownToolButton(jsonIns._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  auto* jsonEditorTB = new (std::nothrow) DropdownToolButton(jsonIns._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  CHECK_NULLPTR_RETURN_NULLPTR(jsonEditorTB);
   jsonEditorTB->setDefaultAction(viewIns._JSON_EDITOR_PANE);
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
   QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
                                    thumbnailIns._SKIP_IF_ALREADY_EXIST};
-  auto* thumbnailToolButton = new DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
+  auto* thumbnailToolButton = new (std::nothrow) DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
+  CHECK_NULLPTR_RETURN_NULLPTR(thumbnailToolButton);
   thumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
   thumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
-  if (archiveVidsTB == nullptr) {
-    qCritical("archiveVidsTB is nullptr");
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
   archiveVidsTB->addWidget(nameRulerToolButton);
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._PACK_FOLDERS);
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._UNPACK_FOLDERS);
