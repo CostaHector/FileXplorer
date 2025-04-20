@@ -8,6 +8,7 @@ SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
 
 SOURCES += $$files(public/*.cpp)
+SOURCES += $$files(public/Memory/*.cpp)
 
 SOURCES += $$files(FileOperation/*.cpp)
 
@@ -20,6 +21,7 @@ SOURCES += \
     Component/RenameWidgets/AdvanceRenamer.cpp \
     Component/StateLabel.cpp \
     Component/SyncModifiyFileSystem.cpp \
+    model/ConflictsFileSystemModel.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/Classify/ItemsClassifier.cpp \
     Tools/Classify/SceneMixed.cpp \
@@ -50,11 +52,12 @@ SOURCES += \
     Tools/SplitterInsertIndexHelper.cpp \
     Tools/LogHandler.cpp \
     Tools/FileSystemItemFilter.cpp \
-    model/ConflictsFileSystemModel.cpp \
+    Tools/RedunImgLibs.cpp \
 
 HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(TestCase/pub/*.h)
 HEADERS += $$files(public/*.h)
+SOURCES += $$files(public/Memory/*.h)
 HEADERS += $$files(FileOperation/*.h)
 
 HEADERS += \
@@ -66,6 +69,7 @@ HEADERS += \
     Component/RenameWidgets/AdvanceRenamer.h \
     Component/StateLabel.h \
     Component/SyncModifiyFileSystem.h \
+    model/ConflictsFileSystemModel.h \
     Tools/AIMediaDuplicate.h \
     Tools/Classify/ItemsClassifier.h \
     Tools/Classify/SceneMixed.h \
@@ -96,7 +100,7 @@ HEADERS += \
     Tools/SplitterInsertIndexHelper.h \
     Tools/LogHandler.h \
     Tools/FileSystemItemFilter.h \
-    model/ConflictsFileSystemModel.h \
+    Tools/RedunImgLibs.h \
 
 DISTFILES += \
     readme.md
