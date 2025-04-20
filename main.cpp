@@ -25,15 +25,13 @@ int main(int argc, char* argv[]) {
     LoadCNLanguagePack(translator);
   }
 
-  FileExplorerReadOnly fileExplorer(argc, argv, nullptr);
+  FileExplorerReadOnly fileExplorer{argc, argv, nullptr};
   FileExplorerEvent::GetFileExlorerEvent(fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer.m_statusBar);
-
-  auto* extraViewVisibility = new (std::nothrow) ExtraViewVisibilityControl(fileExplorer.centralWidget());
+  ExtraViewVisibilityControl extraViewVisibility{fileExplorer.centralWidget()};
   fileExplorer.show();
 
   mo.subscribe();
   a.exec();
-  delete extraViewVisibility;
   return 0;
 }
 #endif
