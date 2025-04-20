@@ -3,7 +3,7 @@
 #include "public/PublicVariable.h"
 
 FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
-  _ALERT_ITEMS = new QAction{QIcon(":img/ALERT"), "Alerts"};
+  _ALERT_ITEMS = new (std::nothrow) QAction{QIcon(":img/ALERT"), "Alerts"};
   if (_ALERT_ITEMS == nullptr) {
     qCritical("_ALERT_ITEMS is nullptr");
     return;
