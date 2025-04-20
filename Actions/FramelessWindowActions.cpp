@@ -5,11 +5,11 @@
 
 FramelessWindowActions::FramelessWindowActions(QObject* parent)
     : QObject{parent},
-      _EXPAND_RIBBONS{new QAction(QIcon(":img/EXPAND_RIBBON"), tr("Expand or Hide Commands"), this)},
-      _FRAMELESS{new QAction(QIcon(":img/FRAMELESS_WINDOW"), tr("Frameless Window"), this)},
-      _MINIMIZE{new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMinButton), "Minimize Window", this)},
-      _MAXIMIZE{new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMaxButton), "Maximize/Normalize window", this)},
-      _CLOSE{new QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton), "X", this)},
+      _EXPAND_RIBBONS{new (std::nothrow) QAction(QIcon(":img/EXPAND_RIBBON"), tr("Expand or Hide Commands"), this)},
+      _FRAMELESS{new (std::nothrow) QAction(QIcon(":img/FRAMELESS_WINDOW"), tr("Frameless Window"), this)},
+      _MINIMIZE{new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMinButton), "Minimize Window", this)},
+      _MAXIMIZE{new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarMaxButton), "Maximize/Normalize window", this)},
+      _CLOSE{new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton), "X", this)},
       FRAMELESS_MENU_RIBBONS(Get_FRAMELESS_MENU_Actions()) {}
 
 auto FramelessWindowActions::Get_FRAMELESS_MENU_Actions() -> QActionGroup* {
@@ -32,7 +32,7 @@ auto FramelessWindowActions::Get_FRAMELESS_MENU_Actions() -> QActionGroup* {
   _MAXIMIZE->setToolTip(QString("<b>%1 (%2)</b><br/> Shows the widget maximized or Restores the widget after it has been maximized or minimized.")
                             .arg(_MAXIMIZE->text(), _MAXIMIZE->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_EXPAND_RIBBONS);
   actionGroup->addAction(_FRAMELESS);
   actionGroup->addAction(_MINIMIZE);

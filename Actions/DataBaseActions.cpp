@@ -10,10 +10,10 @@ DataBaseActions::DataBaseActions(QObject* parent)    //
       DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),  //
       DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()) {
   QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
-  _COUNT = new QAction(QIcon(":img/COUNTER"), tr("COUNT"), this);
+  _COUNT = new (std::nothrow) QAction(QIcon(":img/COUNTER"), tr("COUNT"), this);
   _COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
 
-  _SUM = new QAction(QIcon(":img/SUM"), tr("SUM"), this);
+  _SUM = new (std::nothrow) QAction(QIcon(":img/SUM"), tr("SUM"), this);
   _SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
 }
 
@@ -32,7 +32,7 @@ QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
 
   UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
 
-  QActionGroup* databaseControlAG = new QActionGroup(this);
+  QActionGroup* databaseControlAG = new (std::nothrow) QActionGroup(this);
   databaseControlAG->addAction(INSERT_A_PATH);
   databaseControlAG->addAction(DELETE_FROM_TABLE);
   databaseControlAG->addAction(INIT_A_DATABASE);
@@ -49,7 +49,7 @@ QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
 }
 
 QActionGroup* DataBaseActions::Get_DB_RIGHT_CLICK_MENU_AG() {
-  QActionGroup* dbRightClickMenuAG = new QActionGroup(this);
+  QActionGroup* dbRightClickMenuAG = new (std::nothrow) QActionGroup(this);
   dbRightClickMenuAG->addAction(DELETE_BY_DRIVER);
   dbRightClickMenuAG->addAction(DELETE_BY_PREPATH);
   return dbRightClickMenuAG;

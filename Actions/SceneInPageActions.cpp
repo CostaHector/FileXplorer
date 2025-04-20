@@ -12,45 +12,45 @@ SceneInPageActions& g_SceneInPageActions() {
 }
 
 SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
-  _COMBINE_MEDIAINFOS_JSON = new QAction(QIcon(":img/UPDATE_JSON_THEN_SCN"), "Update infos", this);
+  _COMBINE_MEDIAINFOS_JSON = new (std::nothrow) QAction(QIcon(":img/UPDATE_JSON_THEN_SCN"), "Update infos", this);
   _COMBINE_MEDIAINFOS_JSON->setShortcut(QKeySequence(Qt::Key_F5));
   _COMBINE_MEDIAINFOS_JSON->setShortcutVisibleInContextMenu(true);
   _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Combine Videos/Images infos Into json files. Then generate scn file from valid "
                                                "json file(s). This operation may update json file contents")
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
 
-  _UPDATE_SCN_ONLY = new QAction(QIcon(":img/UPDATE_SCN_FILE"), "Update Scn", this);
+  _UPDATE_SCN_ONLY = new (std::nothrow) QAction(QIcon(":img/UPDATE_SCN_FILE"), "Update Scn", this);
   _UPDATE_SCN_ONLY->setShortcutVisibleInContextMenu(true);
   _UPDATE_SCN_ONLY->setToolTip(
       QString("<b>%1 (%2)</b><br/> Only update scn file from valid json file(s). This operation will not update json file(s)").arg(_UPDATE_SCN_ONLY->text(), _UPDATE_SCN_ONLY->shortcut().toString()));
 
-  _BY_MOVIE_NAME = new QAction(QIcon(":img/SORTING_FILE_FOLDER"), "Movie Name", this);
+  _BY_MOVIE_NAME = new (std::nothrow) QAction(QIcon(":img/SORTING_FILE_FOLDER"), "Movie Name", this);
   _BY_MOVIE_NAME->setCheckable(true);
-  _BY_MOVIE_SIZE = new QAction("Movie Size", this);
+  _BY_MOVIE_SIZE = new (std::nothrow) QAction("Movie Size", this);
   _BY_MOVIE_SIZE->setCheckable(true);
-  _BY_RATE = new QAction("Rate", this);
+  _BY_RATE = new (std::nothrow) QAction("Rate", this);
   _BY_RATE->setCheckable(true);
-  _BY_UPLOADED_TIME = new QAction("Uploaded Time", this);
+  _BY_UPLOADED_TIME = new (std::nothrow) QAction("Uploaded Time", this);
   _BY_UPLOADED_TIME->setCheckable(true);
 
-  _REVERSE_SORT = new QAction("Reverse", this);
+  _REVERSE_SORT = new (std::nothrow) QAction("Reverse", this);
   _REVERSE_SORT->setCheckable(true);
 
-  _ORDER_AG = new QActionGroup(this);
+  _ORDER_AG = new (std::nothrow) QActionGroup(this);
   _ORDER_AG->addAction(_BY_MOVIE_NAME);
   _ORDER_AG->addAction(_BY_MOVIE_SIZE);
   _ORDER_AG->addAction(_BY_RATE);
   _ORDER_AG->addAction(_BY_UPLOADED_TIME);
   _ORDER_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
 
-  _GROUP_BY_PAGE = new QAction("Enable Pagination display", this);
+  _GROUP_BY_PAGE = new (std::nothrow) QAction("Enable Pagination display", this);
   _GROUP_BY_PAGE->setCheckable(true);
   _GROUP_BY_PAGE->setChecked(false);
 
-  _THE_FIRST_PAGE = new QAction(QIcon(":img/PAGINATION_START"), "Start", this);
-  _LAST_PAGE = new QAction(QIcon(":img/PAGINATION_LAST"), "Last", this);
-  _NEXT_PAGE = new QAction(QIcon(":img/PAGINATION_NEXT"), "Next", this);
-  _THE_LAST_PAGE = new QAction(QIcon(":img/PAGINATION_END"), "End", this);
+  _THE_FIRST_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_START"), "Start", this);
+  _LAST_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_LAST"), "Last", this);
+  _NEXT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_NEXT"), "Next", this);
+  _THE_LAST_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_END"), "End", this);
 }
 
 bool SceneInPageActions::InitWidget() {
