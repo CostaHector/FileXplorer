@@ -4,14 +4,14 @@
 
 TorrentsManagerActions::TorrentsManagerActions(QObject* parent)
     : QObject{parent},
-      OPEN_WITH_LOCAL_APP{new QAction(QIcon(":img/SQLITE_APP"), tr("&Open with local app"), this)},
-      INIT_DATABASE{new QAction(QString("init Database [%1]").arg(SystemPath::TORRENTS_DATABASE), this)},
-      INIT_TABLE{new QAction(QString("&Create table [%1]").arg(DB_TABLE::TORRENTS), this)},
-      INSERT_INTO_TABLE{new QAction(QString("&insert into table [%1]").arg(DB_TABLE::TORRENTS), this)},
-      DELETE_FROM_TABLE{new QAction(tr("&Delete from table"), this)},
-      DROP_TABLE{new QAction(tr("Drop table(complete table))"), this)},
-      SUBMIT{new QAction(tr("&Submit"), this)},
-      SHOW_TORRENTS_MANAGER{new QAction(QIcon(":img/TORRENTS_MANAGER"), tr("&Torrents"), this)} {
+      OPEN_WITH_LOCAL_APP{new (std::nothrow) QAction(QIcon(":img/SQLITE_APP"), tr("&Open with local app"), this)},
+      INIT_DATABASE{new (std::nothrow) QAction(QString("init Database [%1]").arg(SystemPath::TORRENTS_DATABASE), this)},
+      INIT_TABLE{new (std::nothrow) QAction(QString("&Create table [%1]").arg(DB_TABLE::TORRENTS), this)},
+      INSERT_INTO_TABLE{new (std::nothrow) QAction(QString("&insert into table [%1]").arg(DB_TABLE::TORRENTS), this)},
+      DELETE_FROM_TABLE{new (std::nothrow) QAction(tr("&Delete from table"), this)},
+      DROP_TABLE{new (std::nothrow) QAction(tr("Drop table(complete table))"), this)},
+      SUBMIT{new (std::nothrow) QAction(tr("&Submit"), this)},
+      SHOW_TORRENTS_MANAGER{new (std::nothrow) QAction(QIcon(":img/TORRENTS_MANAGER"), tr("&Torrents"), this)} {
   OPEN_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
   OPEN_WITH_LOCAL_APP->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")

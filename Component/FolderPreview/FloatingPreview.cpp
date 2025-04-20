@@ -14,9 +14,9 @@
 
 FloatingPreview::FloatingPreview(QWidget* parent) : QSplitter{parent} {
   setOrientation(Qt::Orientation::Vertical);
-  _IMG_ENABLED = new QAction(QIcon(":img/IMAGE"), "Images", this);
-  _VID_ENABLED = new QAction(QIcon(":img/VIDEO"), "Videos", this);
-  _OTH_ENABLED = new QAction(QIcon(":img/FILE"), "Others", this);
+  _IMG_ENABLED = new (std::nothrow) QAction(QIcon(":img/IMAGE"), "Images", this);
+  _VID_ENABLED = new (std::nothrow) QAction(QIcon(":img/VIDEO"), "Videos", this);
+  _OTH_ENABLED = new (std::nothrow) QAction(QIcon(":img/FILE"), "Others", this);
   _IMG_ENABLED->setCheckable(true);
   _VID_ENABLED->setCheckable(true);
   _OTH_ENABLED->setCheckable(true);

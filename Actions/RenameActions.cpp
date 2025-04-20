@@ -1,15 +1,15 @@
 #include "RenameActions.h"
 
 RenameActions::RenameActions(QObject* parent) : QObject{parent} {
-  _NUMERIZER = new QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), "Rename (ith)");
-  _SECTIONS_SWAPPER = new QAction(QIcon(":img/NAME_SECTIONS_SWAP"), "Sections Swap");
-  _SWAP_2_NAMES = new QAction(QIcon(":img/RENAME_SWAP_2_NAMES"), "Swap 2 names");
-  _CASE_NAME = new QAction(QIcon(":img/NAME_STR_CASE"), "Case Change");
-  _STR_INSERTER = new QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), "String Insert");
-  _STR_DELETER = new QAction(QIcon(":img/NAME_STR_DELETER_PATH"), "String Delete");
-  _STR_REPLACER = new QAction(QIcon(":img/NAME_STR_REPLACER_PATH"), "String Replace");
-  _CONTINUOUS_NUMBERING = new QAction(QIcon(":img/_CONTINUOUS_NUMBERING"), "Name Continous");
-  _CONVERT_UNICODE_TO_ASCII = new QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), "Unicode Char to ASCII");
+  _NUMERIZER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), "Rename (ith)");
+  _SECTIONS_SWAPPER = new (std::nothrow) QAction(QIcon(":img/NAME_SECTIONS_SWAP"), "Sections Swap");
+  _SWAP_2_NAMES = new (std::nothrow) QAction(QIcon(":img/RENAME_SWAP_2_NAMES"), "Swap 2 names");
+  _CASE_NAME = new (std::nothrow) QAction(QIcon(":img/NAME_STR_CASE"), "Case Change");
+  _STR_INSERTER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), "String Insert");
+  _STR_DELETER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_DELETER_PATH"), "String Delete");
+  _STR_REPLACER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_REPLACER_PATH"), "String Replace");
+  _CONTINUOUS_NUMBERING = new (std::nothrow) QAction(QIcon(":img/_CONTINUOUS_NUMBERING"), "Name Continous");
+  _CONVERT_UNICODE_TO_ASCII = new (std::nothrow) QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), "Unicode Char to ASCII");
   RENAME_RIBBONS = Get_Rename_Actions();
 
   _UPPER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_UPPER_CASE"), "Uppercase");
@@ -34,14 +34,14 @@ auto RenameActions::Get_CASE_Actions() -> QActionGroup* {
       "e.g.<br/>"
       "i like NBA\tI Like Nba");
 
-  QActionGroup* caseAG = new QActionGroup(this);
+  QActionGroup* caseAG = new (std::nothrow) QActionGroup(this);
   caseAG->addAction(_UPPER_CASE);
   caseAG->addAction(_LOWER_CASE);
   caseAG->addAction(_CAPITALIZE_KEEP_OTHER);
   caseAG->addAction(_CAPITALIZE_LOWER_OTHER);
   caseAG->addAction(_TOGGLE_CASE);
   caseAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
-  for (QAction* act : caseAG->actions()) {
+  foreach(QAction* act, caseAG->actions()) {
     act->setCheckable(true);
   }
   _CAPITALIZE_LOWER_OTHER->setChecked(true);
@@ -78,7 +78,7 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   _CONVERT_UNICODE_TO_ASCII->setToolTip(
       QString("<b>%1 (%2)</b><br/> Convert unicode charset in name to ascii").arg(_CONVERT_UNICODE_TO_ASCII->text(), _CONVERT_UNICODE_TO_ASCII->shortcut().toString()));
 
-  QActionGroup* actionGroup = new QActionGroup(this);
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
   actionGroup->addAction(_SECTIONS_SWAPPER);
   actionGroup->addAction(_SWAP_2_NAMES);
@@ -89,7 +89,7 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   actionGroup->addAction(_CONTINUOUS_NUMBERING);
   actionGroup->addAction(_CONVERT_UNICODE_TO_ASCII);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  for (QAction* act : actionGroup->actions()) {
+  foreach(QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
     act->setShortcutVisibleInContextMenu(true);
   }

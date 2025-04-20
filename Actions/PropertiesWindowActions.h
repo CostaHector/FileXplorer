@@ -12,9 +12,9 @@ class PropertiesWindowActions : QObject {
   explicit PropertiesWindowActions(QObject* parent = nullptr);
   QToolBar* getPropertiesToolBar(QWidget* parent);
 
-  QAction* SHOW_FILES_SIZE{new QAction("Files Size", this)};
-  QAction* SHOW_VIDS_DURATION{new QAction(QIcon(":img/VIDEO_DURATION"), "Videos Duration", this)};
-  QAction* SHOW_FILES_MD5{new QAction(QIcon(":img/MD5_FILE_IDENTIFIER_PATH"), "Files Identifier", this)};
+  QAction* SHOW_FILES_SIZE{new (std::nothrow) QAction("Files Size", this)};
+  QAction* SHOW_VIDS_DURATION{new (std::nothrow) QAction(QIcon(":img/VIDEO_DURATION"), "Videos Duration", this)};
+  QAction* SHOW_FILES_MD5{new (std::nothrow) QAction(QIcon(":img/MD5_FILE_IDENTIFIER_PATH"), "Files Identifier", this)};
 };
 
 PropertiesWindowActions& g_propertiesWindowAct();
