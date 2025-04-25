@@ -54,6 +54,10 @@ QString GetBaseName(const QString& fullpath);
 QString GetFileNameExtRemoved(const QString& fileName);
 QString GetFileNameExtRemoved(QString&& fileName);
 
+QString Path2Join(const QString& a, const QString& b);
+QString Path3Join(const QString& a, const QString& b, const QString& c);
+void GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight);
+
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
 QString commonPrefix(const QString& path1, const QString& path2);
