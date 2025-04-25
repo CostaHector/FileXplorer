@@ -7,11 +7,6 @@ class ValueCheckerTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
-  void init() {}
-  void cleanup() {}
-
   void fileExtensionBasic() {
     QCOMPARE(PATHTOOL::GetFileExtension("AAA.mp4"), ".mp4");
     QCOMPARE(PATHTOOL::GetFileExtension("AAA.json"), ".json");
