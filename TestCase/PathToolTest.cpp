@@ -313,6 +313,29 @@ class PathToolTest : public MyTestSuite {
     QCOMPARE(ans.suffixs, suffixs);
     QCOMPARE(ans.isFiles, isFiles);
   }
+
+  void test_path_part_split() {
+    QString preLeft, preRight2;
+    GetPrepathParts("C:/A/B/C.mp4", preLeft, preRight2);
+    QCOMPARE(preLeft, "C:");
+    QCOMPARE(preRight2, "A/B");
+    QCOMPARE(PATHTOOL::Path3Join("C:", "A/B", "C.mp4"), "C:/A/B/C.mp4");
+
+    GetPrepathParts("C:/A/C.mp4", preLeft, preRight2);
+    QCOMPARE(preLeft, "");
+    QCOMPARE(preRight2, "C:/A");
+    QCOMPARE(PATHTOOL::Path3Join("", "C:/A", "C.mp4"), "C:/A/C.mp4");
+
+    GetPrepathParts("C:/C.mp4", preLeft, preRight2);
+    QCOMPARE(preLeft, "");
+    QCOMPARE(preRight2, "C:");
+    QCOMPARE(PATHTOOL::Path3Join("", "C:", "C.mp4"), "C:/C.mp4");
+
+    GetPrepathParts("C.mp4", preLeft, preRight2);
+    QCOMPARE(preLeft, "");
+    QCOMPARE(preRight2, "");
+    QCOMPARE(PATHTOOL::Path3Join("", "", "C.mp4"), "C.mp4");
+  }
 };
 
 #include "PathToolTest.moc"

@@ -7,11 +7,6 @@ class ToConsecutiveFileNameNoTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase(){};
-  void cleanupTestCase(){};
-  void init(){};
-  void cleanup(){};
-
   void QRegularExpressionFileNameEndWithNoException() {
     QString newNameTemplate;
 
