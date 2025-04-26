@@ -7,10 +7,10 @@
 #include "public/MemoryKey.h"
 #include "Actions/ActionWithPath.h"
 #include "Tools/ViewTypeTool.h"
+#include "Tools/FileDescriptor/MovieBaseDb.h"
 using namespace ViewTypeTool;
 
-NavigationViewSwitcher::NavigationViewSwitcher(StackedToolBar* navigation, ContentPanel* view, QObject* parent)
-    : QObject(parent), _navigation(navigation), _view(view) {}
+NavigationViewSwitcher::NavigationViewSwitcher(StackedToolBar* navigation, ContentPanel* view, QObject* parent) : QObject(parent), _navigation(navigation), _view(view) {}
 
 void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
   // push toolbar to stackwidget and set current toolbar widget
@@ -24,9 +24,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
         _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
-        static auto F_IntoNewPath = [this](QString newPath, bool isNewPath, bool isF5Force) -> bool {
-          return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force);
-        };
+        static auto F_IntoNewPath = [this](QString newPath, bool isNewPath, bool isF5Force) -> bool { return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force); };
         static auto F_SearchTextChanged = [this](const QString& targetStr) -> bool { return _view->on_searchTextChanged(targetStr); };
         static auto F_SearchEnterKey = [this](const QString& targetStr) -> bool { return _view->on_searchEnterKey(targetStr); };
 
@@ -131,8 +129,8 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::MOVIE: {
       if (_view->m_movieView == nullptr) {
-        _view->m_dbModel = new MyQSqlTableModel(_view, GetSqlVidsDB());
-        _view->m_movieView = new MovieDBView(_view->_dbSearchBar, _view->m_dbModel, _view);
+        _view->m_dbModel = new (std::nothrow) MyQSqlTableModel{_view, _view->mMovieDb.GetDb()};
+        _view->m_movieView = new (std::nothrow) MovieDBView(_view->m_dbModel, _view->_dbSearchBar, _view->mMovieDb, _view);
         ContentPanel::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_movieView);
       }
@@ -153,8 +151,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
           _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_searchSrcModel);
         }
         _view->AddView(viewType, _view->m_advanceSearchView);
-        _view->m_searchSrcModel->initFilter(
-            QDir::Filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()});
+        _view->m_searchSrcModel->initFilter(QDir::Filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()});
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_searchSrcModel->setRootPath(newPath);
