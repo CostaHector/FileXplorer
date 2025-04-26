@@ -35,9 +35,10 @@ class DbManager : public QObject {
     DELETE = 1,
   };
   static QString GetRmvCmd(DROP_OR_DELETE dropOrDelete);
-
+  bool IsValid() const { return mIsValid; }
   DbManager(const QString& dbName, const QString& connName, QObject* parent = nullptr);
   ~DbManager();
+
   bool CreateDatabase();
   bool CreateTable(const QString& tableName, const QString& tableDefinitionTemplate);
   int RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dropOrDelete);
@@ -50,14 +51,16 @@ class DbManager : public QObject {
     return RmvTable(tableNameRegexPattern, DROP_OR_DELETE::DELETE);
   }
   bool DeleteDatabase();
-  QSqlDatabase GetDb() const;
+  QSqlDatabase GetDb(bool open = true) const;
+  QString GetCfgDebug() const { return "table:" + mDbName + "| conn:" + mConnName; }
   bool CheckValidAndOpen(QSqlDatabase& db) const;
   static bool IsMatch(const QString& s, const QRegularExpression& regex);
   static const QString DROP_TABLE_TEMPLATE;
   static const QString DELETE_TABLE_TEMPLATE;
 
   bool QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) const;
-
+  int CountRow(const QString& tableName, const QString& whereClause = "");
+  bool DeleteByWhereClause(const QString& tableName, const QString& whereClause);
  protected:
   void ReleaseConnection();
   bool mIsValid{false};
