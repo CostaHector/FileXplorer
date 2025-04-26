@@ -6,8 +6,10 @@
 // 在main函数中调用 QTest::qExec(pQObject, argc, argv)即可
 class MyTestSuite : public QObject {
  public:
-  MyTestSuite();
-  static QVector<QObject*> & suite();
+  MyTestSuite(bool bExculsive=false);
+  static QVector<MyTestSuite*> & suite();
+  bool mExclusive{false};
+  static bool bOnlyExecuteExculsive;
 };
 
 #endif // MYTESTSUITE_H
