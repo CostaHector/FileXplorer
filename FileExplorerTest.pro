@@ -3,14 +3,13 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
+SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
-
 SOURCES += $$files(TestCase/*.cpp)
-
 SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(public/Memory/*.cpp)
-
 SOURCES += $$files(FileOperation/*.cpp)
+SOURCES += $$files(Tools/FileDescriptor/*.cpp)
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
@@ -54,11 +53,12 @@ SOURCES += \
     Tools/FileSystemItemFilter.cpp \
     Tools/RedunImgLibs.cpp \
 
-HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(TestCase/pub/*.h)
+HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(public/*.h)
-SOURCES += $$files(public/Memory/*.h)
+HEADERS += $$files(public/Memory/*.h)
 HEADERS += $$files(FileOperation/*.h)
+HEADERS += $$files(Tools/FileDescriptor/*.h)
 
 HEADERS += \
     Actions/QuickWhereActions.h \
