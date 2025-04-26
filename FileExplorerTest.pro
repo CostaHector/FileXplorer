@@ -3,6 +3,7 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
+SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
 SOURCES += $$files(public/*.cpp)

@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pub/MyTestSuite.h"
 #include "Tools/FileDescriptor/FileDescriptor.h"
 #include "public/PublicTool.h"
 
-const QString rootpath = QFileInfo(__FILE__).absolutePath() + "/test/TestEnv_FileDescriptor";
+const QString rootpath = QFileInfo(__FILE__).absolutePath() + "/FileDescriptor";
 const QString fi5Char = rootpath + "/5CharFile.txt";
 const QString fi10Char = rootpath + "/10CharFile.txt";
 const QString fiTemp = rootpath + "/Temp.txt";
