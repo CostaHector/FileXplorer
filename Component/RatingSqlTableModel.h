@@ -5,7 +5,8 @@
 
 class RatingSqlTableModel : public QSqlTableModel {
  public:
-  explicit RatingSqlTableModel(QObject* parent = nullptr, QSqlDatabase db = QSqlDatabase()) : QSqlTableModel{parent, db} {
+  explicit RatingSqlTableModel(QObject* parent = nullptr, QSqlDatabase db = QSqlDatabase())  //
+      : QSqlTableModel{parent, db} {
     setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
   }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
