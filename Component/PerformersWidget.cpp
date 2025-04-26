@@ -10,6 +10,7 @@
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
+#include "Tools/FileDescriptor/MovieBaseDb.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -346,9 +347,11 @@ int PerformersWidget::onForceRefreshRecordsVids() {
     Notificator::badNews("Nothing was selected", "Select some row to refresh");
     return 0;
   }
-  QSqlDatabase con = ::GetSqlVidsDB();  // videos table
-  if (!con.isOpen()) {
-    qDebug("con cannot open [%s]", qPrintable(SystemPath::VIDS_DATABASE));
+
+  MovieBaseDb movieDb{SystemPath::VIDS_DATABASE, "SEARCH_MOVIE_BY_PERFORMER"};
+  QSqlDatabase con = movieDb.GetDb();  // videos table
+  if (!movieDb.CheckValidAndOpen(con)) {
+    qWarning("Open failed:%s", qPrintable(con.lastError().text()));
     return 0;
   }
 
