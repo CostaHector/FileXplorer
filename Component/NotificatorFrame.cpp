@@ -23,30 +23,36 @@ constexpr int DISPLAY_NOTIFICATION_DIRECTION_TOP_TO_BOTTOM = false;
 using namespace NOTIFICATOR_SETTING;
 
 void Notificator::goodNews(const QString& title, const QString& message) {
-  showMessage(QIcon(":img/PASS"), title, message);
+  qDebug("%s:%s", qPrintable(title), qPrintable(message));
+  showMessage(QIcon(":img/SAVED"), title, message);
 }
 
 void Notificator::badNews(const QString& title, const QString& message) {
-  showMessage(QIcon(":img/FAILED"), title, message);
+  qWarning("%s:%s", qPrintable(title), qPrintable(message));
+  showMessage(QIcon(":img/NOT_SAVED"), title, message);
 }
 
 void Notificator::critical(const QString& title, const QString& message) {
-  QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
+  qCritical("%s:%s", qPrintable(title), qPrintable(message));
+  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
   showMessage(icon, title, message);
 }
 
 void Notificator::warning(const QString& title, const QString& message) {
-  QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
+  qWarning("%s:%s", qPrintable(title), qPrintable(message));
+  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
   showMessage(icon, title, message);
 }
 
 void Notificator::information(const QString& title, const QString& message) {
-  QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
+  qInfo("%s:%s", qPrintable(title), qPrintable(message));
+  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
   showMessage(icon, title, message);
 }
 
 void Notificator::question(const QString& title, const QString& message) {
-  QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion);
+  qDebug("%s:%s", qPrintable(title), qPrintable(message));
+  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion);
   showMessage(icon, title, message);
 }
 
@@ -58,11 +64,7 @@ void Notificator::showMessage(const QIcon& icon, const QString& title, const QSt
   QTimer::singleShot(DEFAULT_MESSAGE_SHOW_TIME, instance, SLOT(close()));
 }
 
-Notificator* Notificator::showMessage(const QIcon& icon,
-                                      const QString& title,
-                                      const QString& message,
-                                      const QObject* sender,
-                                      const char* finishedSignal) {
+Notificator* Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
   Notificator* instance = 0;
   if (sender != 0) {
     instance = new Notificator(false);
@@ -302,3 +304,27 @@ QProgressBar* NotificatorPrivate::progress() {
   }
   return m_progress;
 }
+
+//#define RUN_MAIN_FILE 1
+#ifdef RUN_MAIN_FILE
+#include <QToolBar>
+int main(int argc, char* argv[]) {
+  QApplication a(argc, argv);
+  QToolBar w;
+  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
+  static constexpr int BATCH_SIZE = 10;
+  for (int i = QStyle::StandardPixmap::SP_TitleBarMenuButton;  //
+       i <= QStyle::StandardPixmap::SP_RestoreDefaultsButton;  //
+       ++i) {
+    w.addAction(qApp->style()->standardIcon((QStyle::StandardPixmap)i), QString::number(i));
+    if (i % BATCH_SIZE == 0) {
+      w.addSeparator();
+    }
+  }
+  w.setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  w.show();
+  a.exec();
+  return 0;
+}
+
+#endif
