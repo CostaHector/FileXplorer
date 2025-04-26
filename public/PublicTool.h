@@ -14,6 +14,11 @@ void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 QString ChooseCopyDestination(QString defaultPath, QWidget *parent=nullptr);
 QSqlDatabase GetSqlVidsDB();
 
+inline void ImagesNameSort(QStringList& imgs) {
+  static const auto IMG_SORTER = [](const QString& lhs, const QString& rhs) -> bool { return lhs.size() < rhs.size() || (lhs.size() == rhs.size() && lhs < rhs); };
+  std::sort(imgs.begin(), imgs.end(), IMG_SORTER);
+}
+
 void LoadCNLanguagePack(QTranslator& translator);
 void LoadSysLanaguagePack(QTranslator& translator);
 
