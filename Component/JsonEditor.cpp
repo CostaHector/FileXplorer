@@ -3,7 +3,6 @@
 #include "Actions/JsonEditorActions.h"
 #include "Component/NotificatorFrame.h"
 #include "public/MemoryKey.h"
-
 #include "Tools/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/NameTool.h"
