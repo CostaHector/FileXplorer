@@ -2,8 +2,6 @@
 #define PATHRELATEDTOOL_H
 #include <QFileInfo>
 
-QString TestCaseRootPath() {
-  return QFileInfo(__FILE__).absolutePath();
-}
+QString TestCaseRootPath();
 
 #endif  // PATHRELATEDTOOL_H
