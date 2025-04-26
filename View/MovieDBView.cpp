@@ -2,33 +2,45 @@
 
 #include "Actions/DataBaseActions.h"
 #include "Actions/FileBasicOperationsActions.h"
+
 #include "Component/QuickWhereClause.h"
+#include "Component/NotificatorFrame.h"
+
 #include "Tools/PlayVideo.h"
 
-#include "public/PublicTool.h"
+#include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 
 #include <QDesktopServices>
-#include <QDirIterator>
 #include <QHeaderView>
 #include <QProcess>
 #include <QStorageInfo>
 
+#include <QDirIterator>
 #include <QSqlError>
 #include <QSqlQuery>
 
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QInputDialog>
 
-MovieDBView::MovieDBView(DatabaseSearchToolBar* _dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent)
-    : CustomTableView("MOVIE_TABLE", parent),
-      _dbModel(dbModel),
-      m_movieMenu{new MovieDatabaseMenu("Movie Right click menu", this)},
-      _dbSearchBar{_dbSearchBar},
-      _tables{_dbSearchBar->m_tables},
-      _searchLE{_dbSearchBar->m_searchLE},
-      _searchCB{_dbSearchBar->m_searchCB},
-      m_quickWhereClause{new QuickWhereClause(this)} {
+MovieDBView::MovieDBView(MyQSqlTableModel* model_,             //
+                         DatabaseSearchToolBar* _dbSearchBar,  //
+                         MovieBaseDb& movieDb_,
+                         QWidget* parent)      //
+    : CustomTableView("MOVIE_TABLE", parent),  //
+      mDb{movieDb_} {
+  CHECK_NULLPTR_RETURN_VOID(model_);
+  _dbModel = model_;
+  CHECK_NULLPTR_RETURN_VOID(_dbSearchBar);
+  _tablesDropDownList = _dbSearchBar->m_tables;
+  CHECK_NULLPTR_RETURN_VOID(_tablesDropDownList);
+  _searchWhereLineEdit = _dbSearchBar->m_searchLE;
+  CHECK_NULLPTR_RETURN_VOID(_searchWhereLineEdit);
+
+  m_movieMenu = new MovieDatabaseMenu{"Movie Right click menu", this};
+  m_quickWhereClause = new QuickWhereClause{this};
   BindMenu(m_movieMenu);
 
   setModel(_dbModel);
@@ -37,26 +49,25 @@ MovieDBView::MovieDBView(DatabaseSearchToolBar* _dbSearchBar, MyQSqlTableModel* 
 
   InitMoviesTables();
   const QString defaultTableName = PreferenceSettings().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString();
-  int defaultTableIndex = _tables->findText(defaultTableName, Qt::MatchExactly);
+  int defaultTableIndex = _tablesDropDownList->findText(defaultTableName, Qt::MatchExactly);
   if (defaultTableIndex != -1) {
-    _tables->setCurrentIndex(defaultTableIndex);
+    _tablesDropDownList->setCurrentIndex(defaultTableIndex);
   }
-  setCurrentMovieTable(_tables->currentText());
+  setCurrentMovieTable(_tablesDropDownList->currentText());
 
   subscribe();
   InitTableView();
 }
 
 void MovieDBView::subscribe() {
-  connect(horizontalHeader(), &QHeaderView::sectionResized, this,
-          [this]() { PreferenceSettings().setValue("DATABASE_TABLEVIEW_HERDER_GEOMETRY", horizontalHeader()->saveState()); });
+  connect(horizontalHeader(), &QHeaderView::sectionResized, this, [this]() { PreferenceSettings().setValue("DATABASE_TABLEVIEW_HERDER_GEOMETRY", horizontalHeader()->saveState()); });
 
-  connect(_searchLE, &QLineEdit::returnPressed, this, [this]() {
-    const QString& searchPattern = _searchLE->text();
+  connect(_searchWhereLineEdit, &QLineEdit::returnPressed, this, [this]() {
+    const QString& searchPattern = _searchWhereLineEdit->text();
     onSearchDataBase(searchPattern);
   });
 
-  connect(_tables, &QComboBox::currentTextChanged, this, &MovieDBView::setCurrentMovieTable);
+  connect(_tablesDropDownList, &QComboBox::currentTextChanged, this, &MovieDBView::setCurrentMovieTable);
 
   {
     const QList<QAction*>& DB_CONTROL_ACTIONS = g_dbAct().DB_CONTROL_ACTIONS->actions();
@@ -87,16 +98,14 @@ void MovieDBView::subscribe() {
 
   { connect(g_dbAct().QUICK_WHERE_CLAUSE, &QAction::triggered, this, &MovieDBView::onQuickWhereClause); }
 
-  {
-    connect(g_dbAct()._COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
-  }
+  { connect(g_dbAct()._COUNT, &QAction::triggered, this, &MovieDBView::onCountRow); }
 
   addAction(g_fileBasicOperationsActions().COPY_FULL_PATH);
   addAction(g_fileBasicOperationsActions().COPY_NAME);
   addAction(g_fileBasicOperationsActions().COPY_RECORDS);
 }
 
-auto MovieDBView::on_PlayVideo() const -> bool {
+bool MovieDBView::on_PlayVideo() const {
   // select an item or select nothing
   const int selectedCnt = selectedIndexes().size();
   QString playPath;
@@ -127,64 +136,73 @@ auto MovieDBView::on_PlayVideo() const -> bool {
 }
 
 bool MovieDBView::InitMoviesTables() {
-  QSqlDatabase con = GetSqlVidsDB();
-  if (!con.isOpen()) {
-    qDebug("db[%s] not opened[%s]", qPrintable(SystemPath::VIDS_DATABASE), qPrintable(con.lastError().text()));
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qWarning("opened failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
-  if (_tables == nullptr) {
-    qDebug("m_tables is nullptr");
-    return false;
-  }
-  _tables->clear();
-  _tables->addItems(con.tables());
+  CHECK_NULLPTR_RETURN_FALSE(_tablesDropDownList);
+  const QStringList& tbls = con.tables();
+  _tablesDropDownList->clear();
+  _tablesDropDownList->addItems(tbls);
+  qDebug("tables count:%d", tbls.size());
   return true;
 }
 
 bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
-  m_movieTableName = movieTableName;
-  _tables->setCurrentText(movieTableName);
+  qDebug("Set Current table to[%s]", qPrintable(movieTableName));
+  PreferenceSettings().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
+  _tablesDropDownList->setCurrentText(movieTableName);
   _dbModel->setTable(movieTableName);
+  //  m_dbModel->select();
   _dbModel->submitAll();
   InitTableView();
-  PreferenceSettings().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
   return true;
 }
 
 bool MovieDBView::onUnionTables() {
-  QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen() and not con.open()) {
-    qDebug("Con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qDebug("Open failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
 
   const QStringList& tbs = con.tables();
-  if (not con.tables().contains(DB_TABLE::MOVIES)) {
+  if (!con.tables().contains(DB_TABLE::MOVIES)) {
     QMessageBox::warning(this, DB_TABLE::MOVIES, "Destination table not exist. Create it at first");
     return false;
   }
+
   const int SRC_TABLE_CNT = tbs.size() - 1;
-  if (SRC_TABLE_CNT < 1) {
-    qDebug("nothing to union");
+  if (SRC_TABLE_CNT <= 1) {
+    Notificator::information("No need union", "Only one table find(except destination table)");
     return true;
   }
+
+  const QString& confirmUnionHintMsg = QString("All %1 tables into Table[%2]").arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES);
+  if (QMessageBox::question(this, "Confirm Union?", confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+    Notificator::goodNews(QString("User cancel union %1 tables").arg(SRC_TABLE_CNT), "Skip");
+    return true;
+  }
+
   QStringList unionSrcTbs;
+  unionSrcTbs.reserve(SRC_TABLE_CNT);
   for (const QString& srcTable : tbs) {
     if (srcTable == DB_TABLE::MOVIES) {
       continue;
     }
     unionSrcTbs << QString("SELECT * FROM `%1`").arg(srcTable);
   }
+
   // REPLACE INTO `MOVIES` SELECT * FROM `A568` UNION SELECT * FROM `AASAD`;
   const QString& unionStr = unionSrcTbs.join(" UNION ");
   const QString& unionCmd = QString("REPLACE INTO `%1` %2").arg(DB_TABLE::MOVIES).arg(unionStr);
-  QSqlQuery unionTableQry(con);
-  const auto ret = unionTableQry.exec(unionCmd);
-  if (not ret) {
-    qDebug("%s. \nUnion %d table(s) into [%s] failed. \n%s", qPrintable(unionCmd), SRC_TABLE_CNT, qPrintable(DB_TABLE::MOVIES),
-           qPrintable(unionTableQry.lastError().text()));
-    QMessageBox::warning(this, DB_TABLE::MOVIES,
-                         unionCmd + QString("\nUnion %1 table(s) failed.\n").arg(SRC_TABLE_CNT) + unionTableQry.lastError().text());
+  QSqlQuery unionTableQry{con};
+  if (!unionTableQry.exec(unionCmd)) {
+    const QString& title = QString("Union %1 table(s) into [%2]").arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES);
+    const QString& msg = QString("cmd: %1 failed: %2").arg(unionTableQry.executedQuery()).arg(unionTableQry.lastError().text());
+    Notificator::goodNews(title, msg);
+    QMessageBox::warning(this, title, msg);
     con.rollback();
     return false;
   }
@@ -194,163 +212,128 @@ bool MovieDBView::onUnionTables() {
 }
 
 bool MovieDBView::onInitDataBase() {
-  QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen()) {
-    qDebug("con cannot open");
-    return false;
+  if (!mDb.CreateDatabase()) {
+    Notificator::badNews("Init database failed", mDb.GetCfgDebug());
   }
-  qDebug("Database create succeed");
+  Notificator::goodNews("Init database succeed", mDb.GetCfgDebug());
   return true;
 }
 
 void MovieDBView::onCreateATable() {
-  QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen() and not con.open()) {
-    qDebug("Con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qDebug("Open failed:%s", qPrintable(con.lastError().text()));
     return;
   }
 
-  QStringList tbs = con.tables();
-  if (not tbs.contains(DB_TABLE::MOVIES)) {
-    tbs << DB_TABLE::MOVIES;
-  }
-
-  const QString& inputTableName = QInputDialog::getItem(this, "Input an unique table name", "current tables", tbs, tbs.size() - 1, true);
-  if (inputTableName.isEmpty() or con.tables().contains(inputTableName)) {
-    qDebug("Table name[%s] is empty or already occupied", qPrintable(inputTableName));
-    QMessageBox::warning(this, inputTableName, "Table name is empty or already occupied");
+  bool tablesNameOk{false};
+  const QStringList& tables = con.tables();
+  const QString& tablesLabel = tables.join('\n');
+  const QString& tableName = QInputDialog::getText(this, "Input an unique table name",  //
+                                                   tablesLabel,                         //
+                                                   QLineEdit::Normal, "", &tablesNameOk);
+  if (!tablesNameOk || tableName.isEmpty() || tables.contains(tableName)) {
+    qWarning("User cancel[%d], Table[%s] name empty, or already occupied",  //
+             tablesNameOk, qPrintable(tableName));
+    Notificator::warning("Create table failed", "User cancel or table name empty or occupied.");
     return;
   }
 
-  if (inputTableName.contains(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER)) {
-    qDebug("Table name[%s] contains invalid letter", qPrintable(inputTableName));
-    QMessageBox::warning(this, inputTableName, "Table name contains invalid letter");
+  if (tableName.contains(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER)) {
+    qDebug("Table name[%s] contains invalid letter", qPrintable(tableName));
+    Notificator::warning(tableName, QString("Table name contains invalid letter, create failed."));
     return;
   }
 
-  // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
-  const QString& createTableSQL = QString(
-                                      "CREATE TABLE IF NOT EXISTS `%1`("
-                                      "   `%2` NCHAR(256) NOT NULL,"   // Name
-                                      "   `%3` INT DEFAULT 0,"         // Size
-                                      "   `%4` CHAR(10),"              // Type
-                                      "   `%5` CHAR(20),"              // DateModified
-                                      "   `%6` NCHAR(40),"             // Performers
-                                      "   `%7` CHAR(40),"              // Tags
-                                      "   `%8` INT DEFAULT 0,"         // Rate
-                                      "   `%9` CHAR(20),"              // Driver
-                                      "   `%10` NCHAR(256) NOT NULL,"  // Prepath
-                                      "   `%11` CHAR(128),"            // Extra
-                                      "   `%12` NCHAR(512) NOT NULL,"  // ForSearch
-                                      "    PRIMARY KEY (%2, %10, %12)"
-                                      "    );")
-                                      .arg(inputTableName)
-                                      .arg(DB_HEADER_KEY::Name)
-                                      .arg(DB_HEADER_KEY::Size)
-                                      .arg(DB_HEADER_KEY::Type)
-                                      .arg(DB_HEADER_KEY::DateModified)
-                                      .arg(DB_HEADER_KEY::Performers)
-                                      .arg(DB_HEADER_KEY::Tags)
-                                      .arg(DB_HEADER_KEY::Rate)
-                                      .arg(DB_HEADER_KEY::Driver)
-                                      .arg(DB_HEADER_KEY::Prepath)
-                                      .arg(DB_HEADER_KEY::Extra)
-                                      .arg(DB_HEADER_KEY::ForSearch);
-  QSqlQuery createTableQuery(con);
-  const auto ret = createTableQuery.exec(createTableSQL);
-  if (not ret) {
-    qDebug("Create table[%s] failed.", qPrintable(inputTableName));
-    QMessageBox::warning(this, inputTableName, "Create table[%s] failed");
+  if (!mDb.CreateTable(DB_TABLE::MOVIES, MovieBaseDb::CREATE_MOVIE_TABLE_TEMPLATE)) {
+    Notificator::badNews(tableName + " Table name created failed", "see detail in log");
     return;
   }
-  _tables->addItem(inputTableName);
-  _tables->setCurrentText(inputTableName);
-  qDebug("Table create succeed");
+
+  _tablesDropDownList->addItem(tableName);
+  _tablesDropDownList->setCurrentText(tableName);
+  Notificator::goodNews(tableName, "Table name created succeed");
 }
 
 bool MovieDBView::onDropATable() {
-  QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen() and not con.open()) {
-    qDebug("con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qWarning("Open failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
   const QStringList& tables = con.tables();
   if (tables.isEmpty()) {
-    qDebug("No table find now");
+    Notificator::goodNews("no need drop a table", "No tables at all");
     return true;
   }
 
   bool okUserSelect = false;
-  const QString& dropTableName = QInputDialog::getItem(this, "CONFIRM DROP?", "Choose a table to drop (NOT RECOVERABLE)", tables,
-                                                       tables.indexOf(_tables->currentText()), false, &okUserSelect);
-  if (not okUserSelect) {
-    qDebug("User cancel drop table");
+  const QString& tableName = QInputDialog::getItem(this, "CONFIRM DROP?",                               //
+                                                   "Choose a table to drop (NOT RECOVERABLE)",          //
+                                                   tables,                                              //
+                                                   tables.indexOf(_tablesDropDownList->currentText()),  //
+                                                   false,                                               //
+                                                   &okUserSelect);
+  if (!okUserSelect || tableName.isEmpty()) {
+    Notificator::goodNews("User cancel drop table", tableName);
     return true;
   }
 
-  const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(dropTableName);
-  QSqlQuery dropQry(con);
-  if (not dropQry.exec(sqlCmd)) {
-    qDebug("Drop Table[%s] failed. %s", qPrintable(dropTableName), qPrintable(dropQry.lastError().text()));
-    QMessageBox::information(this, dropTableName, "Table drop failed");
+  if (!mDb.DropTable('^' + tableName + '|')) {
+    Notificator::badNews("Table drop failed", tableName);
     return false;
   }
   InitMoviesTables();
-  QMessageBox::information(this, dropTableName, "Table has been Dropped");
+  Notificator::goodNews("Table has been dropped", tableName);
   return true;
 }
 
 bool MovieDBView::onDeleteFromTable(const QString& clause) {
-  QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen() and not con.open()) {
-    qDebug("con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qWarning("Open failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
 
-  const QString& deleteFromTable = _tables->currentText();
+  const QString& deleteFromTable = _tablesDropDownList->currentText();
   QString whereClause = clause;
   if (clause.isEmpty()) {
-    static const QStringList deleteDriverChoicePool{QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Name), QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Size),
-                                                    QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Driver),
+    static const QStringList deleteDriverChoicePool{QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Name), QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Size), QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Driver),
                                                     QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Prepath)};
 
     bool okClicked = false;
-    whereClause = QInputDialog::getItem(this, "Delete where", QString("DELETE FROM \"%1\" WHERE").arg(deleteFromTable), deleteDriverChoicePool, 0,
-                                        true, &okClicked);
-    if (not okClicked or whereClause.isEmpty()) {
+    whereClause = QInputDialog::getItem(this, "Delete where", QString("DELETE FROM \"%1\" WHERE").arg(deleteFromTable), deleteDriverChoicePool, 0, true, &okClicked);
+    if (!okClicked || whereClause.isEmpty()) {
       qDebug("User Cancel delete row");
       return true;
     }
   }
 
-  const QString& deleteCmd = QString("DELETE FROM \"%1\" WHERE %2").arg(deleteFromTable, whereClause);
-  if (QMessageBox::question(this, "Confirm Delete(NOT recoverable)?", deleteCmd, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) !=
-      QMessageBox::Yes) {
-    qDebug("User Cancel delete row");
+  if (QMessageBox::question(this, "Confirm Delete(NOT recoverable)?", whereClause, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+    Notificator::goodNews("skip", "User Cancel delete records");
     return true;
   }
 
-  QSqlQuery seleteQry(con);
-  const bool deleteRes = seleteQry.exec(deleteCmd);
-  qDebug("delete from result: %d", deleteRes);
+  if (!mDb.DeleteByWhereClause(deleteFromTable, whereClause)) {
+    Notificator::badNews("Delete record(s) failed", QString("DELETE FROM %1 WHERE %2").arg(deleteFromTable).arg(whereClause));
+    return false;
+  }
+  Notificator::goodNews("Delete record(s) succceed", QString("DELETE FROM %1 WHERE %2").arg(deleteFromTable).arg(whereClause));
   _dbModel->submitAll();
-  return deleteRes;
+  return true;
 }
 
 bool MovieDBView::on_DeleteByDrive() {
   QSet<QString> driversSet;
-
   for (const auto rowIndex : selectionModel()->selectedRows()) {
     const QString& curDriver = _dbModel->driver(rowIndex);  // TODO:driver
     if (driversSet.contains(curDriver)) {
       continue;
     }
     driversSet.insert(curDriver);
-
-    const QString& whereClause = QString("\"%1\"=\"%2\"").arg(DB_HEADER_KEY::Driver, curDriver);
-    const auto ret = onDeleteFromTable(whereClause);
-    if (not ret) {
-      qDebug("Error when %s", qPrintable(whereClause));
+    const QString& whereClause = QString(R"(`%1`="%2")").arg(DB_HEADER_KEY::Driver, curDriver);
+    if (!onDeleteFromTable(whereClause)) {
+      qWarning("delete by drive failed:%s", qPrintable(whereClause));
       return false;
     }
   }
@@ -359,16 +342,15 @@ bool MovieDBView::on_DeleteByDrive() {
 
 bool MovieDBView::on_DeleteByPrepath() {
   QSet<QString> prepathSet;
-  for (const auto rowIndex : selectionModel()->selectedRows()) {
+  for (const auto& rowIndex : selectionModel()->selectedRows()) {
     const QString& prepath = _dbModel->absolutePath(rowIndex);
     if (prepathSet.contains(prepath)) {
       continue;
     }
     prepathSet.insert(prepath);
-    const QString& whereClause = QString("\"%1\"=\"%2\"").arg(DB_HEADER_KEY::Prepath, prepath);
-    const auto ret = onDeleteFromTable(whereClause);
-    if (not ret) {
-      qDebug("Error when %s", qPrintable(whereClause));
+    const QString& whereClause = QString(R"(`%1`="%2")").arg(DB_HEADER_KEY::Prepath, prepath);
+    if (!onDeleteFromTable(whereClause)) {
+      qWarning("delete by prepath failed:%s", qPrintable(whereClause));
       return false;
     }
   }
@@ -376,79 +358,43 @@ bool MovieDBView::on_DeleteByPrepath() {
 }
 
 bool MovieDBView::onInsertIntoTable() {
-  QSqlDatabase con = GetSqlVidsDB();
-  if (not con.isOpen() and not con.open()) {
-    qWarning("con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    Notificator::badNews("Open failed", con.lastError().text());
     return false;
   }
-  const QString& insertIntoTable = _tables->currentText();
-  if (not con.tables().contains(insertIntoTable)) {
-    qWarning("Cannot insert into inexist table[%s]", qPrintable(insertIntoTable));
-    QMessageBox::warning(this, insertIntoTable, "Table NOT exist. ABORT insert");
+  const QString& operateTable = _tablesDropDownList->currentText();
+  if (!con.tables().contains(operateTable)) {
+    Notificator::badNews(operateTable, "Table NOT exist. ABORT insert");
     return false;
   }
 
   QString lastPath = PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString();
-  if (not QFileInfo(lastPath).isDir()) {  // fallback
+  if (!QFileInfo(lastPath).isDir()) {  // fallback
     lastPath = MemoryKey::PATH_DB_INSERT_VIDS_FROM.v.toString();
   }
-  const QString& selectPath =
-      QFileDialog::getExistingDirectory(this, "Choose a path into table: " + insertIntoTable, lastPath, QFileDialog::ShowDirsOnly);
+  const QString& selectPath = QFileDialog::getExistingDirectory(this,                                         //
+                                                                "Choose a path into table: " + operateTable,  //
+                                                                lastPath, QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
-    qWarning("Path[%s] is not directory", qPrintable(selectPath));
+    Notificator::warning("User cancel insert, path is not directory", selectPath);
     return false;
   }
+
   PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
-  if (QMessageBox::question(this, "CONFIRM INSERT?", selectPath + "/* =>" + insertIntoTable) != QMessageBox::StandardButton::Yes) {
-    qInfo("User cancel insert[%s]", qPrintable(selectPath));
+  if (QMessageBox::question(this, "CONFIRM INSERT?", selectPath + "/* ----->---- Table:" + operateTable) != QMessageBox::StandardButton::Yes) {
+    Notificator::information("User cancel insert", selectPath);
     return true;
   }
 
-  const QString CURRENT_DRIVE_LETTER = QStorageInfo(selectPath).rootPath();
-
-  const QString& insertTemplate = QString("REPLACE INTO `%1` (%2) VALUES").arg(insertIntoTable).arg(DB_HEADER_KEY::DB_HEADER.join(',')) +
-                                  QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\", %7, \"%8\", \"%9\", \"%10\", \"%11\");");
-
-  if (not con.transaction()) {
-    qCritical() << "Failed to start transaction mode";
-    return 0;
-  }
-  QSqlQuery insertTableQuery(con);
-
-  int totalItemCnt = 0;
-  int succeedItemCnt = 0;
-  QDirIterator it(selectPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    const QFileInfo& fi = it.fileInfo();
-    const QString& currentInsert = insertTemplate.arg(fi.fileName())
-                                       .arg(fi.size())
-                                       .arg(fi.suffix())
-                                       .arg(fi.lastModified().toString("yyyy/MM/dd HH:mm:ss"))
-                                       .arg("")
-                                       .arg("")
-                                       .arg(0)
-                                       .arg(CURRENT_DRIVE_LETTER)
-                                       .arg(fi.absolutePath())
-                                       .arg("")
-                                       .arg(fi.absoluteFilePath());
-    const bool insertResult = insertTableQuery.exec(currentInsert);
-    succeedItemCnt += int(insertResult);
-    if (not insertResult) {
-      qWarning("Error [%s]: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
-    }
-    ++totalItemCnt;
-  }
-
-  insertTableQuery.finish();
-  if (!con.commit()) {
-    qDebug() << "Failed to commit, all will be rollback";
-    con.rollback();
-    succeedItemCnt = 0;
+  int retCnt = mDb.ReadVideosFromAPath(selectPath, operateTable);
+  if (retCnt < 0) {
+    Notificator::badNews(QString("Read videos from path failed, code:%1").arg(retCnt), selectPath);
     return false;
   }
-  qDebug("%d/%d item(s) add succeed. [%s]", succeedItemCnt, totalItemCnt, qPrintable(selectPath));
-  QMessageBox::information(this, QString("%1/%2 succeed").arg(succeedItemCnt).arg(totalItemCnt), selectPath);
+
+  Notificator::goodNews(QString("Read videos from path succeed, count:%1").arg(retCnt), selectPath);
+  QMessageBox::information(this, "Read videos from path succeed", QString("Count=%1").arg(retCnt));
   _dbModel->submitAll();
   return true;
 }
@@ -460,30 +406,21 @@ void MovieDBView::onQuickWhereClause() {
   }
   const QString& where = m_quickWhereClause->GetWhereString();
   qDebug("Quick where clause: [%s]", qPrintable(where));
-  _searchLE->setText(where);
-  emit _searchLE->returnPressed();
+  _searchWhereLineEdit->setText(where);
+  emit _searchWhereLineEdit->returnPressed();
 }
 
 int MovieDBView::onCountRow() {
-  auto con = GetSqlVidsDB();
-  if (not con.isOpen() and not con.open()) {
-    qDebug("Cannot open connection");
-    return -1;
+  const QString& tableName = _tablesDropDownList->currentText();
+  const QString& whereClause = _searchWhereLineEdit->text();
+  int succeedCnt = mDb.CountRow(tableName, whereClause);
+  if (succeedCnt < 0) {
+    Notificator::badNews(QString("Get rows count failed, code: %1").arg(succeedCnt), "See details in logs");
+    return succeedCnt;
   }
-
-  QString countCmd = QString("SELECT COUNT(%1) FROM %2").arg(DB_HEADER_KEY::Name).arg(_tables->currentText());
-  if (not _searchLE->text().isEmpty()) {
-    countCmd += ("WHERE " + _searchLE->text());
-  }
-
-  QSqlQuery queryCount(con);
-  queryCount.exec(countCmd);
-  queryCount.next();
-
-  const int rowCnt = queryCount.value(0).toInt();
-  QMessageBox::information(this, countCmd, QString("Count=%1").arg(rowCnt));
-  qDebug("%d: %s", rowCnt, qPrintable(countCmd));
-  return rowCnt;
+  Notificator::goodNews(QString("Get rows count failed, code: %1").arg(succeedCnt), "See details in logs");
+  QMessageBox::information(this, "Get rows count succeed", QString("Count=%1").arg(succeedCnt));
+  return succeedCnt;
 }
 
 // #include <QMainWindow>

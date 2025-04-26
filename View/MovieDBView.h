@@ -4,24 +4,22 @@
 #include "Component/DatabaseSearchToolBar.h"
 #include "Component/MovieDatabaseMenu.h"
 #include "Component/QuickWhereClause.h"
+
+#include "Tools/FileDescriptor/MovieBaseDb.h"
 #include "Model/MyQSqlTableModel.h"
 #include "View/CustomTableView.h"
 
 #include <QComboBox>
-#include <QInputDialog>
-#include <QKeyEvent>
-#include <QLayout>
-#include <QMessageBox>
-#include <QTableView>
 
 class MovieDBView : public CustomTableView {
  public:
-  MovieDBView(DatabaseSearchToolBar* dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent = nullptr);
+  MovieDBView(MyQSqlTableModel* model_,            //
+              DatabaseSearchToolBar* dbSearchBar,  //
+              MovieBaseDb& movieDb_,               //
+              QWidget* parent = nullptr);
 
   void subscribe();
-  auto on_PlayVideo() const -> bool;
-
-  auto keyPressEvent(QKeyEvent* e) -> void override { QTableView::keyPressEvent(e); }
+  bool on_PlayVideo() const;
 
   bool onSearchDataBase(const QString& searchText) {
     _dbModel->setFilter(searchText);
@@ -47,19 +45,22 @@ class MovieDBView : public CustomTableView {
 
   int onCountRow();
 
-  QString getMovieTableName() const { return m_movieTableName; }
-
+  QString getMovieTableName() const {
+    if (_tablesDropDownList == nullptr) {
+      return "";
+    }
+    return _tablesDropDownList->currentText();
+  }
+  // should not call ~destructure after getDb() and pass to QSqlTableModel
  private:
-  MyQSqlTableModel* _dbModel;
-  MovieDatabaseMenu* m_movieMenu;
-  DatabaseSearchToolBar* _dbSearchBar;
-  QComboBox* _tables;
-  QLineEdit* _searchLE;
-  QComboBox* _searchCB;
+  MyQSqlTableModel* _dbModel{nullptr};
+  MovieDatabaseMenu* m_movieMenu{nullptr};
+  QComboBox* _tablesDropDownList{nullptr};
+  QLineEdit* _searchWhereLineEdit{nullptr};
+  QComboBox* _searchCB{nullptr};
 
-  QuickWhereClause* m_quickWhereClause;
-
-  QString m_movieTableName;
+  QuickWhereClause* m_quickWhereClause{nullptr};
+  MovieBaseDb& mDb;
 };
 
 #endif  // MOVIEDBVIEW_H
