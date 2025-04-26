@@ -1,10 +1,12 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/PathRelatedTool.h"
+#include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/GlbDataProtect.h"
 #include "Tools/FileDescriptor/DbManager.h"
 
-const QString rootpath = QFileInfo(__FILE__).absolutePath() + "/test/TestEnv_VideosDurationGetter";
-const QString dbName = rootpath + "/FD_MOVIE_DB_CONN.db";
+const QString rootpath = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
+const QString dbName = TestCaseRootPath() + "/FD_MOVIE_DB_CONN.db";
 
 class DbManagerTest : public MyTestSuite {
   Q_OBJECT
@@ -33,7 +35,7 @@ class DbManagerTest : public MyTestSuite {
   void test_ReadADirectory_invalid() {
     FdBasedDb dbManager{dbName, "FD_MOVIE_DB_CONN"};
     // no such table
-    QCOMPARE(dbManager.ReadADirectory(rootpath, "VOLUME_E"), FdBasedDb::FD_PREPARE_FAILED);
+    QCOMPARE(dbManager.ReadADirectory(rootpath, "VOLUME_E"), FD_PREPARE_FAILED);
 
     QVERIFY(dbManager.CreateTable("VOLUME_E", FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(QFile{dbName}.exists());  // should created
@@ -42,18 +44,21 @@ class DbManagerTest : public MyTestSuite {
     const QString inexistPath{rootpath + "_not_exist_Path"};
     QVERIFY(!QFileInfo{inexistPath}.isDir());
 
-    QCOMPARE(dbManager.ReadADirectory(inexistPath, "VOLUME_E"), FdBasedDb::FD_NOT_DIR);
+    QCOMPARE(dbManager.ReadADirectory(inexistPath, "VOLUME_E"), FD_NOT_DIR);
 
     QVERIFY(dbManager.DeleteDatabase());
     QVERIFY(!QFile{dbName}.exists());
   }
 
   void test_ReadADirectory() {
+    GlbDataProtect<decltype(FdBasedDb::VIDEOS_FILTER)> bkp{FdBasedDb::VIDEOS_FILTER};
+    FdBasedDb::VIDEOS_FILTER = QStringList{"*.mp4"};
+
     // precondition
     QDir dir{rootpath, "", QDir::SortFlag::Name, QDir::Filter::Files};
-    dir.setNameFilters({"*.mp4"});
+    dir.setNameFilters(FdBasedDb::VIDEOS_FILTER);
     const QStringList& vids = dir.entryList();
-    QCOMPARE(vids.size(), 5);
+    QCOMPARE(vids.size(), 5);  // only 5 mp4 videos
     QVERIFY(!QFile{dbName}.exists());
 
     FdBasedDb dbManager{dbName, "FD_MOVIE_DB_CONN"};
