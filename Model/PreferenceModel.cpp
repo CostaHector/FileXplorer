@@ -29,7 +29,7 @@ bool AlertItem::isPass(const QVariant& userInput) const {
 }
 
 QIcon AlertItem::GetAlertIcon(const AlertItem& alert) {
-  return alert.checkRes ? QIcon(":img/PASS") : QIcon(":img/FAILED");
+  return alert.checkRes ? QIcon(":img/SAVED") : QIcon(":img/NOT_SAVED");
 }
 
 void AlertItem::setValue(const QVariant& newValue) {

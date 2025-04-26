@@ -5,7 +5,7 @@
 <qresource prefix="img">
 <!--App Icons here-->
 <file alias="APP_ICON_PATH">AppIcons/FOLDER_OF_PICTURES.png</file>
-<file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
+<file alias="PERFORMERS_APP">AppIcons/PERFORMERS_APP.svg</file>
 <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
 <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
 
@@ -269,8 +269,6 @@
 <file alias="ALERT">AlertSystem/ALERT.svg</file>
 <file alias="ALERT_ACTIVE">AlertSystem/ALERT_ACTIVE.svg</file>
 <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
-<file alias="FAILED">AlertSystem/FAILED.svg</file>
-<file alias="PASS">AlertSystem/PASS.svg</file>
 <file alias="RECHECK">AlertSystem/RECHECK.svg</file>
 
 <!--RecycleBin icon here-->

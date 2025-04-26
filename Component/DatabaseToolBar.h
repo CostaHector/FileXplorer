@@ -34,7 +34,7 @@ class DatabaseToolBar : public QToolBar {
     showHideDB->addSeparator();
     showHideDB->addAction(g_viewActions()._MOVIE_VIEW);
     showHideDB->addSeparator();
-    showHideDB->addAction(g_performersManagerActions().SHOW_PERFORMER_MANAGER);
+    showHideDB->addAction(g_performersManagerActions().PERFORMERS_BOOK);
     showHideDB->addSeparator();
     showHideDB->addAction(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER);
     showHideDB->addSeparator();

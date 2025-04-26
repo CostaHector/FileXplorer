@@ -1,52 +1,29 @@
 #ifndef PERFORMERSWIDGET_H
 #define PERFORMERSWIDGET_H
 
+#include "Tools/FileDescriptor/PerfBaseDb.h"
 #include "Component/PerformersPreviewTextBrowser.h"
 #include "View/PerformersTableView.h"
-
+#include <QSqlTableModel>
 #include <QMainWindow>
 #include <QToolBar>
-#include <QWidget>
-
-#include <QListView>
-#include <QTableView>
-#include <QTextBrowser>
-
-#include <QHBoxLayout>
-
-#include <QSqlTableModel>
-
-#include <QAction>
 #include <QLineEdit>
-#include <QMenu>
-#include <QMenuBar>
 
 class PerformersWidget : public QMainWindow {
   Q_OBJECT
  public:
   explicit PerformersWidget(QWidget* parent = nullptr);
-
-  auto closeEvent(QCloseEvent* event) -> void override;
+  void closeEvent(QCloseEvent* event) override;
 
   void readSettings();
   void subscribe();
 
- signals:
-
  private:
-  QSqlDatabase GetSqlDB() const;
-
-  bool onInitDataBase();
   void onInitATable();
   bool onInsertIntoTable();
   int onDeleteRecords();
 
-  enum class DROP_OR_DELETE {
-    DROP = 0,
-    DELETE = 1,
-  };
-
-  bool onDropDeleteTable(const DROP_OR_DELETE dropOrDelete);
+  bool onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete);
   bool DropSqlDatabase();
 
   int onLoadFromPerformersList();
@@ -67,17 +44,18 @@ class PerformersWidget : public QMainWindow {
   bool onOpenRecordInFileSystem() const;
 
  private:
-  QLineEdit* m_perfSearch;
-  QToolBar* m_perfToolbar = new QToolBar("Performer tool", this);
+  QLineEdit* m_perfSearch{nullptr};
+  QToolBar* m_perfToolbar{nullptr};
+  PerformersTableView* m_perfTv{nullptr};
+  PerformersPreviewTextBrowser* m_introTE{nullptr};
+  QDockWidget* m_perfPrevDock{nullptr};
 
-  PerformersTableView* m_performersListView;
-  PerformersPreviewTextBrowser* m_introductionTextEdit;
-  QDockWidget* performerPreviewDock;
-
-  QSqlTableModel* m_perfsDBModel;
+  QSqlTableModel* m_perfDbMdl{nullptr};
 
   QString m_imageHostPath;
   int m_performerImageHeight;
+
+  PerfBaseDb mDb;
 };
 
 #endif  // PERFORMERSWIDGET_H

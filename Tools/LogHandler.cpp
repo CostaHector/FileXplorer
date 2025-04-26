@@ -165,7 +165,7 @@ bool LogHandler::subscribe() {
   connect(ins._LOG_AGING, &QAction::triggered, []() { LogHandler::AgingLogFiles(); });
 
   connect(ins._LOG_LEVEL_DEBUG, &QAction::triggered, &LogHandler::SetLogLevelDebug);
-  connect(ins._LOG_LEVEL_ERROR, &QAction::triggered, &LogHandler::SetLogLevelError);
+  connect(ins._LOG_LEVEL_WARNING, &QAction::triggered, &LogHandler::SetLogLevelError);
 
   connect(ins._FLUSH_INSTANTLY, &QAction::triggered, &LogHandler::SetFlushInstantly);
   return true;
