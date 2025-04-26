@@ -151,6 +151,9 @@ bool LogHandler::AgingLogFiles(const int AGING_FILE_ABOVE_B, QString* pAgedLogPa
 }
 
 bool LogHandler::ManualFlush() {
+#ifdef QT_DEBUG
+  std::fflush(stdout);
+#endif
   if (mLogTextStream.device() == nullptr || !mLogFile.isOpen()) {
     return false;
   }
