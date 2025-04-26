@@ -56,17 +56,22 @@ DbManager::~DbManager() {
   ReleaseConnection();
 }
 
-QSqlDatabase DbManager::GetDb() const {
+QSqlDatabase DbManager::GetDb(bool open) const {
   if (!mIsValid) {
     qWarning("invalid cannot Get db");
     return {};
   }
   QSqlDatabase db;
   if (QSqlDatabase::contains(mConnName)) {
-    db = QSqlDatabase::database(mConnName);
+    db = QSqlDatabase::database(mConnName, open);
   } else {
     db = QSqlDatabase::addDatabase("QSQLITE", mConnName);
     db.setDatabaseName(mDbName);
+  }
+  if (open && !db.isOpen()) {
+    if (!db.open()) {
+      qWarning("Open %s failed", qPrintable(GetCfgDebug()));
+    }
   }
   return db;
 }
@@ -101,6 +106,50 @@ bool DbManager::QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) 
   }
   while (qry.next()) {
     records << qry.record();
+  }
+  return true;
+}
+
+int DbManager::CountRow(const QString& tableName, const QString& whereClause) {
+  QSqlDatabase db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    qWarning("Open failed:%s", qPrintable(db.lastError().text()));
+    return -1;
+  }
+
+  QString countCmd = QString("SELECT COUNT(*) FROM %1").arg(tableName);
+  if (!whereClause.isEmpty()) {
+    countCmd += (" WHERE " + whereClause);
+  }
+
+  QSqlQuery qry{db};
+  if (!qry.exec(countCmd)) {
+    qWarning("count[%s] failed: %s",  //
+             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    return -1;
+  }
+  qry.next();
+  return qry.value(0).toInt();
+}
+
+bool DbManager::DeleteByWhereClause(const QString& tableName, const QString& whereClause) {
+  QSqlDatabase db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    qWarning("Open failed:%s", qPrintable(db.lastError().text()));
+    return -1;
+  }
+
+  QString deleteCmd{QString(R"(DELETE FROM "%1")").arg(tableName)};
+  if (!whereClause.isEmpty()) {
+    deleteCmd += (" WHERE " + whereClause);
+  }
+
+  QSqlQuery qry{db};
+  if (!qry.exec(deleteCmd)) {
+    db.rollback();
+    qWarning("delete cmd[%s] failed: %s",  //
+             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    return false;
   }
   return true;
 }
@@ -229,13 +278,11 @@ int FdBasedDb::ReadADirectory(const QString& folderAbsPath, const QString& table
     return FD_DB_OPEN_FAILED;
   }
 
-  const QString replaceATable = INSERT_NAME_ORI_IMGS_TEMPLATE.arg(tableName);
-
   // 准备查询语句
   QSqlQuery query(db);
-  if (!query.prepare(replaceATable)) {
+  if (!query.prepare(INSERT_NAME_ORI_IMGS_TEMPLATE.arg(tableName))) {
     qWarning("prepare command[%s] failed: %s",  //
-             qPrintable(replaceATable), qPrintable(query.lastError().text()));
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
