@@ -12,7 +12,6 @@ QString TextReader(const QString& textPath);
 bool TextWriter(const QString& fileName, const QString& content="", const QIODevice::OpenMode openMode = QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 QString ChooseCopyDestination(QString defaultPath, QWidget *parent=nullptr);
-QSqlDatabase GetSqlVidsDB();
 
 inline void ImagesNameSort(QStringList& imgs) {
   static const auto IMG_SORTER = [](const QString& lhs, const QString& rhs) -> bool { return lhs.size() < rhs.size() || (lhs.size() == rhs.size() && lhs < rhs); };

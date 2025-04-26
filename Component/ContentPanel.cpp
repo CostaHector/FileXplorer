@@ -5,8 +5,8 @@
 #include "Component/NotificatorFrame.h"
 #include "Tools/ArchiveFiles.h"
 #include "Tools/HarFiles.h"
-#include "public/DisplayEnhancement.h"
 #include "Model/ScenesListModel.h"
+#include "public/DisplayEnhancement.h"
 
 #include <QLineEdit>
 #include <QTableView>
@@ -21,7 +21,12 @@
 
 using namespace ViewTypeTool;
 ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
-    : QStackedWidget(parent), m_fsModel(new MyQFileSystemModel(this)), _previewFolder{previewFolder}, _logger(nullptr), m_parent(parent) {
+    : QStackedWidget(parent),  //
+      mMovieDb{SystemPath::VIDS_DATABASE, "DBMOVIE_CONNECT"},
+      _previewFolder{previewFolder},  //
+      m_parent(parent)                //
+{
+  m_fsModel = new (std::nothrow) MyQFileSystemModel(this);
   layout()->setContentsMargins(0, 0, 0, 0);
   layout()->setSpacing(0);
   subscribe();

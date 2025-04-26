@@ -2,19 +2,20 @@
 
 #include "public/PublicVariable.h"
 #include "public/DisplayEnhancement.h"
+#include <QSqlQuery>
 
-MyQSqlTableModel::MyQSqlTableModel(QObject* parent, QSqlDatabase con) : QSqlTableModel{parent, con} {
+MyQSqlTableModel::MyQSqlTableModel(QObject* parent, QSqlDatabase con)  //
+    : QSqlTableModel{parent, con} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 }
 
 QVariant MyQSqlTableModel::data(const QModelIndex& idx, int role) const {
-  if (not idx.isValid()) {
+  if (!idx.isValid()) {
     return QVariant();
   }
   if (role == Qt::DisplayRole) {
     if (idx.column() == DB_HEADER_KEY::DB_SIZE_COLUMN)
-      return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(
-          QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
+      return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
   }
   return QSqlTableModel::data(idx, role);
 }
