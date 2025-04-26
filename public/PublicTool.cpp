@@ -84,18 +84,6 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   return dstFi.absoluteFilePath();
 }
 
-QSqlDatabase GetSqlVidsDB() {
-  if (QSqlDatabase::connectionNames().contains("DBMOVIE_CONNECT")) {
-    auto db = QSqlDatabase::database("DBMOVIE_CONNECT");
-    db.open();
-    return db;
-  }
-  auto db = QSqlDatabase::addDatabase("QSQLITE", "DBMOVIE_CONNECT");
-  db.setDatabaseName(SystemPath::VIDS_DATABASE);
-  db.open();
-  return db;
-}
-
 void LoadCNLanguagePack(QTranslator& translator) {
   qDebug("Load Chinese pack");
   const QString baseName = "FileExplorerReadOnly_zh_CN";

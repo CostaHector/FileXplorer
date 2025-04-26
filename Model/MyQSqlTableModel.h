@@ -9,7 +9,6 @@ class MyQSqlTableModel : public QSqlTableModel {
  public:
   explicit MyQSqlTableModel(QObject* parent = nullptr, QSqlDatabase con = QSqlDatabase());
 
-
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
@@ -48,8 +47,7 @@ class MyQSqlTableModel : public QSqlTableModel {
     using namespace DB_HEADER_KEY;
     const int row = curIndex.row();
     const QModelIndex& par = curIndex.parent();
-    return data(index(row, DB_NAME_INDEX, par)).toString() + '\t' + data(index(row, DB_SIZE_COLUMN, par)).toString() + '\t' +
-           data(index(row, DB_PREPATH_INDEX, par)).toString();
+    return data(index(row, DB_NAME_INDEX, par)).toString() + '\t' + data(index(row, DB_SIZE_COLUMN, par)).toString() + '\t' + data(index(row, DB_PREPATH_INDEX, par)).toString();
   }
 };
 
