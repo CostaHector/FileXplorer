@@ -26,8 +26,8 @@ enum FD_ERROR_CODE {
   FD_REPLACE_INTO_FAILED,
   FD_EXEC_FAILED,
   FD_COMMIT_FAILED,
-  FD_SKIP,
   FD_INVALID,
+  FD_SKIP,
   FD_OK = 0,
 };
 
@@ -66,7 +66,9 @@ class DbManager : public QObject {
   bool QueryPK(const QString& tableName, const QString& pk, QSet<int>& vals) const;
 
   int CountRow(const QString& tableName, const QString& whereClause = "");
+  bool IsTableEmpty(const QString& tableName) const;
   bool DeleteByWhereClause(const QString& tableName, const QString& whereClause);
+
  protected:
   void ReleaseConnection();
   bool mIsValid{false};

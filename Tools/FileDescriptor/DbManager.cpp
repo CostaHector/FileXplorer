@@ -179,6 +179,21 @@ int DbManager::CountRow(const QString& tableName, const QString& whereClause) {
   return qry.value(0).toInt();
 }
 
+bool DbManager::IsTableEmpty(const QString& tableName) const {
+  QSqlDatabase db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    qWarning("Open failed:%s", qPrintable(db.lastError().text()));
+    return -1;
+  }
+  QSqlQuery qry{db};
+  qry.prepare(QString{"SELECT * FROM %1"}.arg(tableName));
+  if (!qry.exec()) {
+    qWarning("select[%s] failed: %s",  //
+             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+  }
+  return !qry.next();
+}
+
 bool DbManager::DeleteByWhereClause(const QString& tableName, const QString& whereClause) {
   QSqlDatabase db = GetDb();
   if (!CheckValidAndOpen(db)) {
@@ -219,6 +234,7 @@ bool DbManager::CreateTable(const QString& tableName, const QString& tableDefini
     qWarning("invalid cannot create table[%s]", qPrintable(tableName));
     return false;
   }
+
   if (!tableDefinitionTemplate.contains("%1")) {
     qWarning("tableDefinitionTemplate [%s] invalid", qPrintable(tableDefinitionTemplate));
     return false;
@@ -227,6 +243,10 @@ bool DbManager::CreateTable(const QString& tableName, const QString& tableDefini
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return false;
+  }
+
+  if (db.tables().contains(tableName)) {
+    return true;
   }
 
   // 启用外键支持和WAL模式提升性能

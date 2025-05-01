@@ -104,10 +104,15 @@ QList<VolumeInfo> GetVolumesInfo() {
   return ans;
 }
 
-// SET_OR_UPDATE
 int DevicesAndDriverDb::InitDeviceAndDriver(const QString& tableName) {
   if (tableName.isEmpty()) {
+    qDebug("tableName[%s] invalid", qPrintable(tableName));
     return FD_TABLE_NAME_INVALID;
+  }
+
+  if (!IsTableEmpty(tableName)) {
+    qDebug("table[%s] not empty, skip init", qPrintable(tableName));
+    return FD_OK;
   }
 
   auto db = GetDb();
@@ -115,45 +120,32 @@ int DevicesAndDriverDb::InitDeviceAndDriver(const QString& tableName) {
     return FD_DB_OPEN_FAILED;
   }
 
-  QSqlQuery query(db);
+  QSqlQuery query{db};
   if (!query.prepare(INSERT_DEV_DRV_TEMPLATE.arg(tableName))) {
     qWarning("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
-  // 开始事务
-  if (!db.transaction()) {
-    qWarning("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
-    return FD_TRANSACTION_FAILED;
-  }
-  int drvCount = 0;
-  const auto& volumeInfos = GetVolumesInfo();
-  for (const auto& volumeInfo : volumeInfos) {
-    query.bindValue(ROOT_PATH, volumeInfo.rootPath);  // no known conversion from QString to QVariant. Causes: header QVariant not include
-    query.bindValue(VOLUME_LABEL, volumeInfo.volumeLabel);
-    query.bindValue(TOTAL_BYTES, volumeInfo.totalBytes);
-    query.bindValue(AVAIL_BYTES, volumeInfo.availBytes);
-    query.bindValue(GUID, volumeInfo.guid);
+  const auto& vols = GetVolumesInfo();
+  for (const auto& vol : vols) {
+    // no known conversion from QString to QVariant. Causes: header QVariant not include
+    query.bindValue(ROOT_PATH, vol.rootPath);
+    query.bindValue(VOLUME_LABEL, vol.volumeLabel);
+    query.bindValue(TOTAL_BYTES, vol.totalBytes);
+    query.bindValue(AVAIL_BYTES, vol.availBytes);
+    query.bindValue(GUID, vol.guid);
     if (!query.exec()) {
       db.rollback();
-      qWarning("replace[%s] failed: %s",  //
+      qWarning("Insert[%s] failed: %s",  //
                qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
-    ++drvCount;
   }
 
-  // 提交剩余记录
-  if (!db.commit()) {
-    db.rollback();
-    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
-    return FD_COMMIT_FAILED;
-  }
   query.finish();
-  qWarning("%d record(s) commit replaced into succeed", drvCount);
-  return drvCount;
+  qWarning("%d record(s) commit insert into succeed", vols.size());
+  return vols.size();
 }
 
 int DevicesAndDriverDb::UpdateDeviceAndDriver(const QString& tableName, FUNC_VOLUME_INFO_GETTER pGetter, VolumeUpdateResult* pRst) {

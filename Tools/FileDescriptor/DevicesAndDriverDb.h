@@ -26,8 +26,8 @@ const char* GetFILEDString(FIELD_E enum_val);
 struct VolumeInfo {
   QString rootPath;
   QString volumeLabel;
-  qint64 availBytes;
   qint64 totalBytes;
+  qint64 availBytes;
   QString guid;
 };
 
