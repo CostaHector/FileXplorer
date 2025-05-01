@@ -147,6 +147,12 @@ class PerfBaseDbTest : public MyTestSuite {
     QCOMPARE(perfDb.LoadFromPJsonFile(imgHostPath), PERFS_ITEM_COUNT);
     // load again, replace into will always ok
     QCOMPARE(perfDb.LoadFromPJsonFile(imgHostPath), PERFS_ITEM_COUNT);
+
+    QSet<QString> pkNames;
+    QVERIFY(perfDb.QueryPK(DB_TABLE::PERFORMERS, PERFORMER_DB_HEADER_KEY::Name, pkNames));
+    QSet<QString> expectNames{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
+    QCOMPARE(pkNames, expectNames);
+
     QList<QSqlRecord> records;
     QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
     QCOMPARE(records.size(), PERFS_ITEM_COUNT);
@@ -160,7 +166,6 @@ class PerfBaseDbTest : public MyTestSuite {
       actualImgs << record.value(PERFORMER_DB_HEADER_KEY::Imgs).toString();
       actualRate << record.value(PERFORMER_DB_HEADER_KEY::Rate).toInt();
     }
-    QSet<QString> expectNames{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
     QSet<QString> expectOris{"hetero", "hetero", "hetero", "gay"};
     QSet<QString> expectImgs{"Kaka.jpg", "Chris Evans.jpg\nChris Evans 2.jpg", "Huge Jackman.jpg", "Ricky Martin.jpg"};
     QSet<int> expectRate{10, 9, 8, 10};
