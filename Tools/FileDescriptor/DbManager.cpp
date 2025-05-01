@@ -107,6 +107,53 @@ bool DbManager::QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) 
   while (qry.next()) {
     records << qry.record();
   }
+  qDebug("%d records find by [%s]", records.size(), qPrintable(qryCmd));
+  return true;
+}
+
+bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<QString>& vals) const {
+  if (!mIsValid) {
+    qWarning("invalid cannot query");
+    return false;
+  }
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return false;
+  }
+  const QString& qryCmd = QString{"SELECT `%1` FROM %2"}.arg(pk).arg(tableName);
+  QSqlQuery qry{qryCmd, db};
+  if (!qry.exec()) {
+    qWarning("cmd[%s] failed:%s", qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    db.rollback();
+    return false;
+  }
+  while (qry.next()) {
+    vals << qry.value(pk).toString();
+  }
+  qDebug("%d records find by [%s]", vals.size(), qPrintable(qryCmd));
+  return true;
+}
+
+bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<int>& vals) const {
+  if (!mIsValid) {
+    qWarning("invalid cannot query");
+    return false;
+  }
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return false;
+  }
+  const QString& qryCmd = QString{"SELECT `%1` FROM %2"}.arg(pk).arg(tableName);
+  QSqlQuery qry{qryCmd, db};
+  if (!qry.exec()) {
+    qWarning("cmd[%s] failed:%s", qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    db.rollback();
+    return false;
+  }
+  while (qry.next()) {
+    vals << qry.value(pk).toInt();
+  }
+  qDebug("%d records find by [%s]", vals.size(), qPrintable(qryCmd));
   return true;
 }
 
@@ -293,7 +340,7 @@ int FdBasedDb::ReadADirectory(const QString& folderAbsPath, const QString& table
     return FD_TRANSACTION_FAILED;
   }
 
-  QDirIterator it(folderAbsPath, QStringList() << "*.mp4", QDir::Files, QDirIterator::Subdirectories);
+  QDirIterator it(folderAbsPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories);
   FileDescriptor fd;
   QString prePathLeft, prePathRight;
   int count = 0;
@@ -326,12 +373,12 @@ int FdBasedDb::ReadADirectory(const QString& folderAbsPath, const QString& table
       if (!db.commit()) {
         db.rollback();
         qWarning("commit the %dth batch record(s) failed: %s",  //
-                 count / MAX_BATCH_SIZE + 1, qPrintable(query.lastError().text()));
+                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
         qWarning("start the %dth transaction failed: %s",  //
-                 count / MAX_BATCH_SIZE + 2, qPrintable(query.lastError().text()));
+                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
     }
@@ -340,10 +387,21 @@ int FdBasedDb::ReadADirectory(const QString& folderAbsPath, const QString& table
   // 提交剩余记录
   if (!db.commit()) {
     db.rollback();
-    qWarning("remain record(s) commit failed: %s", qPrintable(query.lastError().text()));
+    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
     return FD_COMMIT_FAILED;
   }
   query.finish();
   qWarning("%d record(s) commit replaced into succeed", count);
   return count;
+}
+// PeerPathTable
+AdtResult FdBasedDb::Adt(const QString& tableName, const QString& peerPath) {
+  // 1. 建立文件路径到文件名的映射
+  QHash<QString, QFileInfo> fileMap;
+  QDirIterator it{peerPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
+  while (it.hasNext()) {
+    const QFileInfo fileInfo(it.next());
+    fileMap.insert(fileInfo.absoluteFilePath(), fileInfo);
+  }
+  return {};
 }
