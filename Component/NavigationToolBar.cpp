@@ -5,37 +5,32 @@
 #include <QMap>
 #include <QStyle>
 #include "Actions/ActionWithPath.h"
+#include "public/PublicMacro.h"
 
-NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)
-    : QToolBar(title), m_extraAppendTB(new NavigationExToolBar("ExtraNavigation")) {
+NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
+    : QToolBar{title} {
   setObjectName(title);
-  InitFixedActions();
-  addSeparator();
-  addWidget(m_extraAppendTB);
-  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
-  setOrientation(Qt::Vertical);
 
-  if (not isShow_) {
+  static const QString TEMPLATE{QDir::homePath() + "/%1"};
+  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Desktop"), QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop", this});
+  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Documents"), QIcon(":img/FOLDER_OF_DOCUMENTS"), "Documents", this});
+  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Downloads"), QIcon(":img/FOLDER_OF_DOWNLOADS"), "Downloads", this});
+  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Pictures"), QIcon(":img/FOLDER_OF_PICTURES"), "Pictures", this});
+  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Videos"), QIcon(":img/FOLDER_OF_VIDEOS"), "Videos", this});
+  addAction(new (std::nothrow) ActionWithPath{"", QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer", this});
+  addSeparator();
+  m_extraAppendTB = new (std::nothrow) NavigationExToolBar{"ExtraNavigation"};
+  CHECK_NULLPTR_RETURN_VOID(m_extraAppendTB);
+  addWidget(m_extraAppendTB);
+
+  setOrientation(Qt::Vertical);
+  setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
+  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
+  setMaximumWidth(40);
+
+  if (!isShow_) {
     hide();
   }
-}
-
-void NavigationToolBar::InitFixedActions() {
-  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Desktop"),
-                                        QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop"));
-  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Documents"), QIcon(":img/FOLDER_OF_DOCUMENTS"), "Documents"));
-  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Downloads"), QIcon(":img/FOLDER_OF_DOWNLOADS"), "Downloads"));
-  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Pictures"), QIcon(":img/FOLDER_OF_PICTURES"), "Pictures"));
-  this->addAction(new ActionWithPath(QString("%1/%2").arg(QDir::homePath(), "Videos"), QIcon(":img/FOLDER_OF_VIDEOS"), "    Videos"));
-  this->addAction(new ActionWithPath("", QIcon(":img/FOLDER_OF_FAVORITE"), "Starred"));
-  this->addAction(new ActionWithPath("", QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer"));
-}
-
-void NavigationToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
-  if (folderName2AbsPath.isEmpty()) {
-    return;
-  }
-  m_extraAppendTB->AppendExtraActions(folderName2AbsPath);
 }
 
 // #define __MAIN__EQ__NAME__ 1
