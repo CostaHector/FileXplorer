@@ -1,4 +1,4 @@
-#include "RightClickableToolBar.h"
+#include "NavigationExToolBar.h"
 #include "Actions/ActionWithPath.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
@@ -11,7 +11,7 @@ const QHash<Qt::ToolButtonStyle, QString> TOOL_BTN_STYLE_REV_MAP = {{Qt::ToolBut
                                                                     {Qt::ToolButtonStyle::ToolButtonIconOnly, "ToolButtonIconOnly"},
                                                                     {Qt::ToolButtonStyle::ToolButtonTextBesideIcon, "ToolButtonTextBesideIcon"}};
 
-RightClickableToolBar::RightClickableToolBar(const QString& title)
+NavigationExToolBar::NavigationExToolBar(const QString& title)
     : QToolBar(title),
       extraAG(new (std::nothrow) QActionGroup(this)),
       rightClickedPos(-1, -1),
@@ -58,13 +58,13 @@ RightClickableToolBar::RightClickableToolBar(const QString& title)
   subscribe();
 }
 
-void RightClickableToolBar::dragEnterEvent(QDragEnterEvent* event) {
+void NavigationExToolBar::dragEnterEvent(QDragEnterEvent* event) {
   const QMimeData* md = event->mimeData();
   qDebug("mimeData cnt=[%d]", md->urls().size());
   event->accept();
 }
 
-void RightClickableToolBar::dropEvent(QDropEvent* event) {
+void NavigationExToolBar::dropEvent(QDropEvent* event) {
   if (not event->mimeData()->hasUrls()) {
     return;
   }
@@ -90,7 +90,7 @@ void RightClickableToolBar::dropEvent(QDropEvent* event) {
   return QToolBar::dropEvent(event);
 }
 
-void RightClickableToolBar::dragMoveEvent(QDragMoveEvent* event) {
+void NavigationExToolBar::dragMoveEvent(QDragMoveEvent* event) {
   // accept drag movements only if the target supports drops
   if (not event->mimeData()->hasUrls()) {
     return;
@@ -98,7 +98,7 @@ void RightClickableToolBar::dragMoveEvent(QDragMoveEvent* event) {
   return QToolBar::dragMoveEvent(event);
 }
 
-void RightClickableToolBar::_save() {
+void NavigationExToolBar::_save() {
   const QList<QAction*>& actsList = this->actions();
   PreferenceSettings().beginWriteArray("ExtraNavigationDict", actsList.size());
   int extraIndex = 0;
@@ -112,7 +112,7 @@ void RightClickableToolBar::_save() {
   PreferenceSettings().setValue(SHOW_TOOL_BUTTON_TEXT->text(), SHOW_TOOL_BUTTON_TEXT->isChecked());
 }
 
-void RightClickableToolBar::readSettings() {
+void NavigationExToolBar::readSettings() {
   int size = PreferenceSettings().beginReadArray("ExtraNavigationDict");
   QMap<QString, QString> folderName2AbsPath;
   for (int extraIndex = 0; extraIndex < size; ++extraIndex) {
@@ -123,7 +123,7 @@ void RightClickableToolBar::readSettings() {
   AppendExtraActions(folderName2AbsPath);
 }
 
-void RightClickableToolBar::_unpin() {
+void NavigationExToolBar::_unpin() {
   QAction* act = actionAt(rightClickedPos);
   if (actions().contains(act)) {
     removeAction(act);
@@ -131,31 +131,31 @@ void RightClickableToolBar::_unpin() {
   _save();
 }
 
-void RightClickableToolBar::_unpinAll() {
+void NavigationExToolBar::_unpinAll() {
   foreach(QAction* act, actions()) {
     removeAction(act);
   }
   _save();
 }
 
-void RightClickableToolBar::_switchTextBesideIcon(const QAction* act) {
+void NavigationExToolBar::_switchTextBesideIcon(const QAction* act) {
   const Qt::ToolButtonStyle styleEnum = TOOL_BTN_STYLE_MAP[act->text()];
   setToolButtonStyle(styleEnum);
   PreferenceSettings().setValue(MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.name, styleEnum);
 }
 
-void RightClickableToolBar::CustomContextMenuEvent(const QPoint& pnt) {
+void NavigationExToolBar::CustomContextMenuEvent(const QPoint& pnt) {
   menuQWidget->popup(mapToGlobal(pnt));
   rightClickedPos = pnt;
 }
 
-void RightClickableToolBar::alighLeft() {
+void NavigationExToolBar::alighLeft() {
   for (int i = 0; i < layout()->count(); ++i) {
     layout()->itemAt(i)->setAlignment(Qt::AlignmentFlag::AlignLeft);
   }
 }
 
-void RightClickableToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
+void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
   if (folderName2AbsPath.isEmpty()) {
     return;
   }
@@ -168,11 +168,11 @@ void RightClickableToolBar::AppendExtraActions(const QMap<QString, QString>& fol
   alighLeft();
 }
 
-bool RightClickableToolBar::subscribe() {
-  connect(textIconActionGroup, &QActionGroup::triggered, this, &RightClickableToolBar::_switchTextBesideIcon);
-  connect(this, &QToolBar::customContextMenuRequested, this, &RightClickableToolBar::CustomContextMenuEvent);
+bool NavigationExToolBar::subscribe() {
+  connect(textIconActionGroup, &QActionGroup::triggered, this, &NavigationExToolBar::_switchTextBesideIcon);
+  connect(this, &QToolBar::customContextMenuRequested, this, &NavigationExToolBar::CustomContextMenuEvent);
 
-  connect(UNPIN, &QAction::triggered, this, &RightClickableToolBar::_unpin);
-  connect(UNPIN_ALL, &QAction::triggered, this, &RightClickableToolBar::_unpinAll);
+  connect(UNPIN, &QAction::triggered, this, &NavigationExToolBar::_unpin);
+  connect(UNPIN_ALL, &QAction::triggered, this, &NavigationExToolBar::_unpinAll);
   return true;
 }
