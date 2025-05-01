@@ -1,5 +1,5 @@
-#ifndef RIGHTCLICKABLETOOLBAR_H
-#define RIGHTCLICKABLETOOLBAR_H
+#ifndef NAVIGATIONEXTOOLBAR_H
+#define NAVIGATIONEXTOOLBAR_H
 
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
@@ -14,10 +14,10 @@
 #include <QMenu>
 #include <QStyle>
 
-class RightClickableToolBar : public QToolBar {
+class NavigationExToolBar : public QToolBar {
   Q_OBJECT
  public:
-  RightClickableToolBar(const QString& title);
+  NavigationExToolBar(const QString& title);
 
   void dragEnterEvent(QDragEnterEvent* event) override;
 
@@ -56,4 +56,4 @@ class RightClickableToolBar : public QToolBar {
   QMenu* menuQWidget;
 };
 
-#endif  // RIGHTCLICKABLETOOLBAR_H
+#endif  // NAVIGATIONEXTOOLBAR_H
