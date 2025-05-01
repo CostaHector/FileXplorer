@@ -43,7 +43,7 @@ const QString DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE  //
                "   `%5` CHAR(36) NOT NULL,"                // GUID, GUID_LEN = 36
                "   `%6` NCHAR(260) DEFAULT \"\","          // MOUNTED_PATH
                "   `%7` INTEGER DEFAULT 0,"                // ADT_TIME
-               "    PRIMARY KEY (%5, %6)"
+               "    PRIMARY KEY (%5)"
                "    );")
            .arg(GetFILEDString(ROOT_PATH))     //
            .arg(GetFILEDString(VOLUME_LABEL))  //
