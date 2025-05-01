@@ -1017,14 +1017,14 @@
     </message>
 </context>
 <context>
-    <name>RightClickableToolBar</name>
+    <name>NavigationExToolBar</name>
     <message>
-        <location filename="../Component/RightClickableToolBar.cpp" line="17"/>
+        <location filename="../Component/NavigationExToolBar.cpp" line="17"/>
         <source>Unpin</source>
         <translation>断开链接</translation>
     </message>
     <message>
-        <location filename="../Component/RightClickableToolBar.cpp" line="18"/>
+        <location filename="../Component/NavigationExToolBar.cpp" line="18"/>
         <source>Unpin All</source>
         <translation>断开所有链接</translation>
     </message>

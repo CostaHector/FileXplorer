@@ -5,7 +5,7 @@
 #include <QActionGroup>
 #include <QList>
 #include <QToolBar>
-#include "RightClickableToolBar.h"
+#include "NavigationExToolBar.h"
 
 class NavigationToolBar : public QToolBar {
  public:
@@ -13,7 +13,7 @@ class NavigationToolBar : public QToolBar {
   void InitFixedActions();
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
  protected:
-  RightClickableToolBar* m_extraAppendTB;
+  NavigationExToolBar* m_extraAppendTB;
 };
 
 #endif  // NAVIGATIONTOOLBAR_H
