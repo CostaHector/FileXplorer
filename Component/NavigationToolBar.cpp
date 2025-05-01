@@ -1,24 +1,35 @@
 #include "NavigationToolBar.h"
-#include <QApplication>
-#include <QDir>
-#include <QFileInfo>
-#include <QMap>
-#include <QStyle>
 #include "Actions/ActionWithPath.h"
 #include "public/PublicMacro.h"
+#include "View/DevicesDriveTableView.h"
+#include <QApplication>
+#include <QDir>
+#include <QStyle>
 
 NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
     : QToolBar{title} {
   setObjectName(title);
-
+  // 1. devices and drives
+  DEVICES_AND_DRIVES = new (std::nothrow) QAction{QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon), "Devices and Drives", this};
+  CHECK_NULLPTR_RETURN_VOID(DEVICES_AND_DRIVES);
+  addAction(DEVICES_AND_DRIVES);
+  DEVICES_AND_DRIVES->setCheckable(true);
+  addSeparator();
+  // 2. all home links
   static const QString TEMPLATE{QDir::homePath() + "/%1"};
   addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Desktop"), QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop", this});
   addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Documents"), QIcon(":img/FOLDER_OF_DOCUMENTS"), "Documents", this});
   addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Downloads"), QIcon(":img/FOLDER_OF_DOWNLOADS"), "Downloads", this});
   addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Pictures"), QIcon(":img/FOLDER_OF_PICTURES"), "Pictures", this});
   addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Videos"), QIcon(":img/FOLDER_OF_VIDEOS"), "Videos", this});
-  addAction(new (std::nothrow) ActionWithPath{"", QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer", this});
   addSeparator();
+  // 3. all volumes
+  addAction(new (std::nothrow) ActionWithPath{"", QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer", this});
+  foreach (const QFileInfo& fi, QDir::drives()) {
+    addAction(new (std::nothrow) ActionWithPath{fi.absoluteFilePath(), fi.absoluteFilePath(), this});
+  }
+  addSeparator();
+  // 4. all collections
   m_extraAppendTB = new (std::nothrow) NavigationExToolBar{"ExtraNavigation"};
   CHECK_NULLPTR_RETURN_VOID(m_extraAppendTB);
   addWidget(m_extraAppendTB);
@@ -31,45 +42,34 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
   if (!isShow_) {
     hide();
   }
+  subscribe();
 }
 
-// #define __MAIN__EQ__NAME__ 1
-#ifdef __MAIN__EQ__NAME__
-#include <QApplication>
-#include <QDir>
-#include <QFileSystemModel>
-#include <QMainWindow>
-#include <QPushButton>
-#include <QTableView>
+void NavigationToolBar::subscribe() {
+  connect(DEVICES_AND_DRIVES, &QAction::triggered, this, [this](const bool checked) {  //
+    if (!checked) {
+      if (mDevDriveTV != nullptr) {
+        mDevDriveTV->hide();
+      }
+      return;
+    }
+    if (mDevDriveTV == nullptr) {
+      mDevDriveTV = new DevicesDriveTableView("DevicesDriveTableView");
+    }
 
-int main(int argc, char* argv[]) {
-  QString rootPath = QFileInfo(__FILE__).absolutePath();
-  QString testDir = QDir(rootPath).absoluteFilePath("test");
-
-  QApplication a(argc, argv);
-
-  QTableView* tb = new QTableView;
-  QFileSystemModel* fsm = new QFileSystemModel;
-  tb->setModel(fsm);
-  tb->setRootIndex(fsm->setRootPath(testDir));
-
-  NavigationToolBar* naviTB = new NavigationToolBar();
-  naviTB->subscribe([](const QString& path, bool isNewPath, bool isForce) -> bool {
-    qDebug("%s,%d,%d", qPrintable(path), isNewPath, isForce);
-    return true;
+    mDevDriveTV->show();
+    mDevDriveTV->activateWindow();
+    mDevDriveTV->raise();
   });
-  auto* appendPins = new QPushButton("append pins");
-  QPushButton::connect(appendPins, &QPushButton::clicked, nullptr, [naviTB]() { naviTB->AppendExtraActions({{"1", "path/to/1"}}); });
+}
 
-  QToolBar* topRibbons = new QToolBar("TopRibbons");
-  topRibbons->addWidget(appendPins);
-
-  QMainWindow mw;
-  mw.setCentralWidget(tb);
-  mw.addToolBar(Qt::ToolBarArea::LeftToolBarArea, naviTB);
-  mw.addToolBar(Qt::ToolBarArea::TopToolBarArea, topRibbons);
-
-  mw.show();
+//#define __MAIN__EQ__NAME__ 1
+#ifdef __MAIN__EQ__NAME__
+int main(int argc, char* argv[]) {
+  QApplication a(argc, argv);
+  NavigationToolBar naviTB{"nvTB", true};
+  naviTB.show();
+  // try drag a folder into NavigationExToolBar, it should create a link
   return a.exec();
 }
 #endif
