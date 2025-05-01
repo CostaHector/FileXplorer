@@ -7,7 +7,7 @@
 #include "Actions/ActionWithPath.h"
 
 NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)
-    : QToolBar(title), m_extraAppendTB(new RightClickableToolBar("ExtraNavigation")) {
+    : QToolBar(title), m_extraAppendTB(new NavigationExToolBar("ExtraNavigation")) {
   setObjectName(title);
   InitFixedActions();
   addSeparator();
