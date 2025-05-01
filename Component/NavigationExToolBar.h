@@ -4,56 +4,33 @@
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
-#include <QMimeData>
 #include <QToolBar>
 
-#include <QFileInfo>
-
-#include <QApplication>
-#include <QLayout>
-#include <QMenu>
-#include <QStyle>
-
 class NavigationExToolBar : public QToolBar {
-  Q_OBJECT
  public:
-  NavigationExToolBar(const QString& title);
+  explicit NavigationExToolBar(const QString& title, QWidget* parent = nullptr);
 
   void dragEnterEvent(QDragEnterEvent* event) override;
-
   void dropEvent(QDropEvent* event) override;
-
   void dragMoveEvent(QDragMoveEvent* event) override;
 
-  void _save();
+  void ReadSettings();
+  void Subscribe();
 
-  void readSettings();
+  void SaveName2PathLink();
+  void UnpinThis();
+  void UnpinAll();
 
-  void _unpin();
-
-  void _unpinAll();
-
-  void _switchTextBesideIcon(const QAction* act);
-
-  using QToolBar::contextMenuEvent;
   void CustomContextMenuEvent(const QPoint& pnt);
 
-  void alighLeft();
+  void AlighLeft();
 
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
 
-  bool subscribe();
-
-  QActionGroup* extraAG;
-  QPoint rightClickedPos;
-
-  QAction *UNPIN, *UNPIN_ALL;
-  QAction* SHOW_TOOL_BUTTON_TEXT;
-  QAction* SHOW_TOOL_BUTTON_ICON;
-  QAction* SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON;
-  QActionGroup* textIconActionGroup;
-
-  QMenu* menuQWidget;
+ private:
+  QPoint mRightClickAtPnt;
+  QAction *UNPIN_THIS, *UNPIN_ALL;
+  QMenu* mMenu;
 };
 
 #endif  // NAVIGATIONEXTOOLBAR_H

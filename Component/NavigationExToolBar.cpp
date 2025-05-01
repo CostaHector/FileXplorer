@@ -1,178 +1,141 @@
 #include "NavigationExToolBar.h"
 #include "Actions/ActionWithPath.h"
+#include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include <QHash>
 
-const QHash<QString, Qt::ToolButtonStyle> TOOL_BTN_STYLE_MAP = {{"ToolButtonTextOnly", Qt::ToolButtonStyle::ToolButtonTextOnly},
-                                                                {"ToolButtonIconOnly", Qt::ToolButtonStyle::ToolButtonIconOnly},
-                                                                {"ToolButtonTextBesideIcon", Qt::ToolButtonStyle::ToolButtonTextBesideIcon}};
-const QHash<Qt::ToolButtonStyle, QString> TOOL_BTN_STYLE_REV_MAP = {{Qt::ToolButtonStyle::ToolButtonTextOnly, "ToolButtonTextOnly"},
-                                                                    {Qt::ToolButtonStyle::ToolButtonIconOnly, "ToolButtonIconOnly"},
-                                                                    {Qt::ToolButtonStyle::ToolButtonTextBesideIcon, "ToolButtonTextBesideIcon"}};
+#include <QMimeData>
+#include <QFileInfo>
+#include <QApplication>
+#include <QLayout>
+#include <QMenu>
+#include <QStyle>
 
-NavigationExToolBar::NavigationExToolBar(const QString& title)
-    : QToolBar(title),
-      extraAG(new (std::nothrow) QActionGroup(this)),
-      rightClickedPos(-1, -1),
-      UNPIN{new (std::nothrow) QAction(QIcon(":img/UNPIN"), tr("Unpin"), this)},
-      UNPIN_ALL{new (std::nothrow) QAction(tr("Unpin All"), this)},
-      SHOW_TOOL_BUTTON_TEXT(new (std::nothrow) QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextOnly], this)),
-      SHOW_TOOL_BUTTON_ICON(new (std::nothrow) QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonIconOnly], this)),
-      SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON(new (std::nothrow) QAction(TOOL_BTN_STYLE_REV_MAP[Qt::ToolButtonStyle::ToolButtonTextBesideIcon], this)),
-      textIconActionGroup(new (std::nothrow) QActionGroup(this)),
-      menuQWidget(new QMenu(this))
-
-{
+NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent)  //
+    : QToolBar{title, parent} {
   setObjectName(title);
 
-  textIconActionGroup->addAction(SHOW_TOOL_BUTTON_TEXT);
-  textIconActionGroup->addAction(SHOW_TOOL_BUTTON_ICON);
-  textIconActionGroup->addAction(SHOW_TOOL_BUTTON_TEXT_BESIDE_ICON);
-  textIconActionGroup->setExclusive(true);
+  UNPIN_THIS = new (std::nothrow) QAction{QIcon{":img/UNPIN"}, "Unpin this", this};
+  CHECK_NULLPTR_RETURN_VOID(UNPIN_THIS);
+  UNPIN_ALL = new (std::nothrow) QAction{"Unpin All", this};
+  CHECK_NULLPTR_RETURN_VOID(UNPIN_ALL);
 
-  const int _style = PreferenceSettings().value(MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.name, MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.v).toInt();
-  foreach(QAction* act, textIconActionGroup->actions()) {
-    act->setCheckable(true);
-    if (int(TOOL_BTN_STYLE_MAP[act->text()]) == _style) {
-      act->setChecked(true);
-      _switchTextBesideIcon(act);
-    }
-  }
+  mMenu = new (std::nothrow) QMenu{this};
+  CHECK_NULLPTR_RETURN_VOID(mMenu);
+  mMenu->addAction(UNPIN_THIS);
+  mMenu->addSeparator();
+  mMenu->addAction(UNPIN_ALL);
 
-  menuQWidget->addAction(UNPIN);
-  menuQWidget->addSeparator();
-  menuQWidget->addActions(textIconActionGroup->actions());
-  menuQWidget->addSeparator();
-  menuQWidget->addAction(UNPIN_ALL);
-
-  setContextMenuPolicy(Qt::CustomContextMenu);
-
+  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextOnly);
   setOrientation(Qt::Vertical);
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
-  setMaximumWidth(100);
+
+  setContextMenuPolicy(Qt::CustomContextMenu);
   setAcceptDrops(true);
 
-  readSettings();
-
-  subscribe();
+  ReadSettings();
+  Subscribe();
 }
 
 void NavigationExToolBar::dragEnterEvent(QDragEnterEvent* event) {
-  const QMimeData* md = event->mimeData();
-  qDebug("mimeData cnt=[%d]", md->urls().size());
+  const QMimeData* pMimeData = event->mimeData();
+  CHECK_NULLPTR_RETURN_VOID(pMimeData);
+  qDebug("mimeData urls cnt[%d]", pMimeData->urls().size());
   event->accept();
 }
 
 void NavigationExToolBar::dropEvent(QDropEvent* event) {
-  if (not event->mimeData()->hasUrls()) {
+  if (!event->mimeData()->hasUrls()) {
     return;
   }
-  auto urlsLst = event->mimeData()->urls();
+  const auto& urlsLst = event->mimeData()->urls();
   QMap<QString, QString> folderName2AbsPath;
-  for (const QUrl& url : urlsLst) {
-    QString pth(url.toLocalFile());
-    QFileInfo fi(pth);
-    if (not fi.isDir()) {
+  foreach (const QUrl& url, urlsLst) {
+    const QString pth{url.toLocalFile()};
+    const QFileInfo fi(pth);
+    if (!fi.isDir()) {
       continue;
     }
-    QString nameShown;
-    if (fi.isRoot()) {
-      nameShown = fi.absoluteFilePath();
-    } else {
-      nameShown = fi.completeBaseName();
-    }
+    const QString nameShown{fi.isRoot() ? pth : fi.completeBaseName()};
     folderName2AbsPath[nameShown] = fi.absoluteFilePath();
   }
-  qDebug("drop cnt[%d]", folderName2AbsPath.size());
+  qDebug("%d link action(s) dropped here...", folderName2AbsPath.size());
   AppendExtraActions(folderName2AbsPath);
-  _save();
+  SaveName2PathLink();
   return QToolBar::dropEvent(event);
 }
 
+// accept drag movements only if the target supports drops
 void NavigationExToolBar::dragMoveEvent(QDragMoveEvent* event) {
-  // accept drag movements only if the target supports drops
-  if (not event->mimeData()->hasUrls()) {
+  if (!event->mimeData()->hasUrls()) {
     return;
   }
   return QToolBar::dragMoveEvent(event);
 }
 
-void NavigationExToolBar::_save() {
-  const QList<QAction*>& actsList = this->actions();
+void NavigationExToolBar::SaveName2PathLink() {
+  const QList<QAction*>& actsList = actions();
   PreferenceSettings().beginWriteArray("ExtraNavigationDict", actsList.size());
   int extraIndex = 0;
-  for (const QAction* act : actsList) {
+  foreach (const QAction* pAct, actsList) {
     PreferenceSettings().setArrayIndex(extraIndex);
-    PreferenceSettings().setValue("folderName", act->text());
-    PreferenceSettings().setValue("absPath", act->toolTip());
+    PreferenceSettings().setValue("folderName", pAct->text());
+    PreferenceSettings().setValue("absPath", pAct->toolTip());
     ++extraIndex;
   }
   PreferenceSettings().endArray();
-  PreferenceSettings().setValue(SHOW_TOOL_BUTTON_TEXT->text(), SHOW_TOOL_BUTTON_TEXT->isChecked());
 }
 
-void NavigationExToolBar::readSettings() {
-  int size = PreferenceSettings().beginReadArray("ExtraNavigationDict");
+void NavigationExToolBar::ReadSettings() {
+  int lnkCnt = PreferenceSettings().beginReadArray("ExtraNavigationDict");
   QMap<QString, QString> folderName2AbsPath;
-  for (int extraIndex = 0; extraIndex < size; ++extraIndex) {
+  for (int extraIndex = 0; extraIndex < lnkCnt; ++extraIndex) {
     PreferenceSettings().setArrayIndex(extraIndex);
-    folderName2AbsPath[PreferenceSettings().value("folderName").toString()] = PreferenceSettings().value("absPath").toString();
+    folderName2AbsPath[PreferenceSettings().value("folderName").toString()]  //
+        = PreferenceSettings().value("absPath").toString();
   }
   PreferenceSettings().endArray();
   AppendExtraActions(folderName2AbsPath);
 }
 
-void NavigationExToolBar::_unpin() {
-  QAction* act = actionAt(rightClickedPos);
+void NavigationExToolBar::Subscribe() {
+  connect(this, &QToolBar::customContextMenuRequested, this, &NavigationExToolBar::CustomContextMenuEvent);
+  connect(UNPIN_THIS, &QAction::triggered, this, &NavigationExToolBar::UnpinThis);
+  connect(UNPIN_ALL, &QAction::triggered, this, &NavigationExToolBar::UnpinAll);
+}
+
+void NavigationExToolBar::UnpinThis() {
+  QAction* act = actionAt(mRightClickAtPnt);
   if (actions().contains(act)) {
     removeAction(act);
   }
-  _save();
+  SaveName2PathLink();
 }
 
-void NavigationExToolBar::_unpinAll() {
-  foreach(QAction* act, actions()) {
+void NavigationExToolBar::UnpinAll() {
+  foreach (QAction* act, actions()) {
     removeAction(act);
   }
-  _save();
-}
-
-void NavigationExToolBar::_switchTextBesideIcon(const QAction* act) {
-  const Qt::ToolButtonStyle styleEnum = TOOL_BTN_STYLE_MAP[act->text()];
-  setToolButtonStyle(styleEnum);
-  PreferenceSettings().setValue(MemoryKey::RIGHT_CLICK_TOOLBUTTON_STYLE.name, styleEnum);
+  SaveName2PathLink();
 }
 
 void NavigationExToolBar::CustomContextMenuEvent(const QPoint& pnt) {
-  menuQWidget->popup(mapToGlobal(pnt));
-  rightClickedPos = pnt;
+  CHECK_NULLPTR_RETURN_VOID(mMenu);
+  mMenu->popup(mapToGlobal(pnt));
+  mRightClickAtPnt = pnt;
 }
 
-void NavigationExToolBar::alighLeft() {
+void NavigationExToolBar::AlighLeft() {
   for (int i = 0; i < layout()->count(); ++i) {
     layout()->itemAt(i)->setAlignment(Qt::AlignmentFlag::AlignLeft);
   }
 }
 
 void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
-  if (folderName2AbsPath.isEmpty()) {
-    return;
-  }
   for (auto it = folderName2AbsPath.cbegin(); it != folderName2AbsPath.cend(); ++it) {
     const QString& folderName = it.key();
     const QString& absPath = it.value();
-    QAction* TEMP_ACTIONS = new ActionWithPath(absPath, QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), folderName, this);
+    QAction* TEMP_ACTIONS = new ActionWithPath{absPath, QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), folderName, this};
     addAction(TEMP_ACTIONS);
   }
-  alighLeft();
-}
-
-bool NavigationExToolBar::subscribe() {
-  connect(textIconActionGroup, &QActionGroup::triggered, this, &NavigationExToolBar::_switchTextBesideIcon);
-  connect(this, &QToolBar::customContextMenuRequested, this, &NavigationExToolBar::CustomContextMenuEvent);
-
-  connect(UNPIN, &QAction::triggered, this, &NavigationExToolBar::_unpin);
-  connect(UNPIN_ALL, &QAction::triggered, this, &NavigationExToolBar::_unpinAll);
-  return true;
+  AlighLeft();
 }
