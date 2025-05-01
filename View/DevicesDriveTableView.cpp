@@ -45,7 +45,7 @@ DevicesDriveTableView::DevicesDriveTableView(const QString& name, QWidget* paren
     qWarning("CreateTable failed");
     return;
   }
-  if (mDb.UpdateDeviceAndDriver(DB_TABLE::DEVICE_AND_DRIVER) < FD_OK) {
+  if (mDb.InitDeviceAndDriver(DB_TABLE::DEVICE_AND_DRIVER) < FD_OK) {
     qWarning("InitDeviceAndDriver failed");
     return;
   }
@@ -65,9 +65,23 @@ DevicesDriveTableView::DevicesDriveTableView(const QString& name, QWidget* paren
 
   InitTableView();
   setWindowTitle("Devices and Drives");
+  ReadSettings();
 }
 
-//#define __NAME__EQ__MAIN__ 1
+void DevicesDriveTableView::closeEvent(QCloseEvent* event) {
+  PreferenceSettings().setValue("DevicesDriveTableViewGeometry", saveGeometry());
+  CustomTableView::closeEvent(event);
+}
+
+void DevicesDriveTableView::ReadSettings() {
+  if (PreferenceSettings().contains("DevicesDriveTableViewGeometry")) {
+    restoreGeometry(PreferenceSettings().value("DevicesDriveTableViewGeometry").toByteArray());
+  } else {
+    setGeometry(QRect(0, 0, 1024, 768));
+  }
+}
+
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 
