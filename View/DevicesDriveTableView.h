@@ -7,7 +7,7 @@
 class DevicesDriveTableView : public CustomTableView
 {
  public:
-  explicit DevicesDriveTableView(const QString& name, QWidget* parent = nullptr);
+  explicit DevicesDriveTableView(QWidget* parent = nullptr);
   void closeEvent(QCloseEvent* event) override;
   void ReadSettings();
  private:
