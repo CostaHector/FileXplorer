@@ -112,7 +112,7 @@ class FileExplorerEvent : public QObject {
   auto on_RemoveDuplicateImages() -> bool;
   auto on_RemoveRedundantItem(RedundantRmv& remover) -> bool;
 
-  auto on_MoveCopyEventSkeleton(const CCMMode operationName, QString r) -> bool;
+  auto on_MoveCopyEventSkeleton(const CCMMode::Mode operationName, QString r) -> bool;
   auto on_MoveTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::CUT_OP, r); }
   auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY_OP, r); }
 
@@ -131,7 +131,7 @@ class FileExplorerEvent : public QObject {
   LongPathFolderRenamer* m_longPathFolderFinder{nullptr};
  signals:
  private:
-  auto QueryCopyOrCut() -> CCMMode;
+  CCMMode::Mode QueryCopyOrCut();
 };
 
 #endif  // FILEEXPLOREREVENT_H

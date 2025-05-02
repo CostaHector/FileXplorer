@@ -40,7 +40,7 @@ class ConflictsItemHelperTest : public FileSystemRelatedTest {
 
   void test_HelperConstructorsWhenCut() {
     const QSet<QString> expectConflicts{"conflictFolder/conflict.mp4", "conflictFolder", "1 conflict.txt"};
-    CCMMode mode = CCMMode::CUT_OP;
+    CCMMode::Mode mode = CCMMode::CUT_OP;
     const QString l = QDir(ROOT_DIR).absoluteFilePath("from");
     const QString r = ROOT_DIR;
     const auto& conflictIF0 =
@@ -67,7 +67,7 @@ class ConflictsItemHelperTest : public FileSystemRelatedTest {
 
   void test_ConflictsWhenLink() {
     const QSet<QString> expectConflicts;
-    CCMMode mode = CCMMode::LINK_OP;
+    CCMMode::Mode mode = CCMMode::LINK_OP;
     const QString l = QDir(ROOT_DIR).absoluteFilePath("from");
     const QString r = ROOT_DIR;
     const auto& conflictIF0 =

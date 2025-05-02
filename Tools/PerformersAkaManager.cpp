@@ -1,6 +1,10 @@
 #include "PerformersAkaManager.h"
 #include "Tools/PerformerJsonFileHelper.h"
+#include "Tools/FileDescriptor/TableFields.h"
 #include "public/MemoryKey.h"
+#include "public/PublicVariable.h"
+#include "public/PublicMacro.h"
+#include <QTextStream>
 
 const QHash<QChar, QString> PerformersAkaManager::op2Str = {{'&', "AND"}, {'|', "OR"}};
 constexpr char PerformersAkaManager::LOGIC_OR_CHAR;
@@ -15,10 +19,10 @@ PerformersAkaManager::PerformersAkaManager() : akaPerf(ReadOutAkaName()) {}
 
 QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
 #ifdef _WIN32
-  const QString akaPerfFilePath = //
+  const QString akaPerfFilePath =  //
       PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name, MemoryKey::WIN32_AKA_PERFORMERS.v).toString();
 #else
-  const QString akaPerfFilePath = //
+  const QString akaPerfFilePath =  //
       PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name, MemoryKey::LINUX_AKA_PERFORMERS.v).toString();
 #endif
   QFile file(akaPerfFilePath);
@@ -64,16 +68,23 @@ void PerformersAkaManager::OperatorJoinOperands(QStack<QString>& values, QStack<
   values << QString("(%1 %2 %3)").arg(val1).arg(op2Str[op]).arg(val2);
 }
 
-QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& tokens,
-                                                              const QString& keyName,
-                                                              const bool autoCompleteAka,
-                                                              const QString& binaryCondition) const {
+QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& tokens,       //
+                                                               QString keyName,             //
+                                                               const bool autoCompleteAka,  //
+                                                               const QString& binaryCondition) const {
+  using namespace DB_HEADER_KEY;
+  if (keyName.isEmpty()) {
+    keyName = VOLUME_ENUM_TO_STRING(Name);
+  }
   if (tokens.isEmpty()) {
     return "";
   }
-
-  const bool isAutoReplaceAkaEnabled = autoCompleteAka and (keyName == DB_HEADER_KEY::ForSearch or keyName == DB_HEADER_KEY::Performers or
-                                                            keyName == DB_HEADER_KEY::Prepath or keyName == DB_HEADER_KEY::Name);
+  using namespace DB_HEADER_KEY;
+  const bool isAutoReplaceAkaEnabled{autoCompleteAka                                      //
+                                     && (keyName == VOLUME_ENUM_TO_STRING(ForSearch)      //
+                                         || keyName == VOLUME_ENUM_TO_STRING(Performers)  //
+                                         || keyName == VOLUME_ENUM_TO_STRING(Prepath)     //
+                                         || keyName == VOLUME_ENUM_TO_STRING(Name))};
 
   static const QSet<QChar> CONTROL_CHAR = {'(', ')', '&', '|'};
   static const auto isdigit = [](QChar c) -> bool { return not CONTROL_CHAR.contains(c); };
@@ -143,10 +154,11 @@ QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& to
 QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const {
   QString perfs = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
   QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
-  if (not akas.isEmpty()) {
+  if (!akas.isEmpty()) {
     perfs += (LOGIC_OR_CHAR + akas.replace(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR));
   }
-  const QString& whereClause = PlainLogicSentence2FuzzySqlWhere(perfs, DB_HEADER_KEY::ForSearch, false);
+  using namespace DB_HEADER_KEY;
+  const QString& whereClause = PlainLogicSentence2FuzzySqlWhere(perfs, VOLUME_ENUM_TO_STRING(ForSearch), false);
   // movies table
-  return QString("SELECT `%1` from %2 where %3").arg(DB_HEADER_KEY::ForSearch, DB_TABLE::MOVIES, whereClause);
+  return QString("SELECT `%1` from %2 where %3").arg(VOLUME_ENUM_TO_STRING(ForSearch), DB_TABLE::MOVIES, whereClause);
 }
