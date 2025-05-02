@@ -2,7 +2,11 @@
 
 #include "Actions/JsonEditorActions.h"
 #include "Component/Notificator.h"
+
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
+
+#include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/NameTool.h"
@@ -89,7 +93,8 @@ void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
   const int rowIdx = curIndex.row();
   const QString& jAbsPth = m_jsonList->filePath(rowIdx);
   const QVariantHash& jsonDict = JsonFileHelper::MovieJsonLoader(jAbsPth);
-  const int newCnt = jsonDict[DB_HEADER_KEY::Performers].toStringList().size();
+  using namespace DB_HEADER_KEY;
+  const int newCnt = jsonDict[VOLUME_ENUM_TO_STRING(Performers)].toStringList().size();
   m_jsonModel->updatePerfCount(rowIdx, newCnt);
   qDebug("Now json[%s] perfs cnt:%d", qPrintable(jAbsPth), newCnt);
 

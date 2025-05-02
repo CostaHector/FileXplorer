@@ -13,7 +13,7 @@
 
 class Finder {
  public:
-  Finder(CCMMode mode_) : m_mode{mode_} {}
+  explicit Finder(CCMMode::Mode mode_) : m_mode{mode_} {}
 
   QStringList FindAllItems(const QString& l, const QStringList& lRels) const;
 
@@ -21,8 +21,8 @@ class Finder {
 
  private:
   bool isLink() const { return m_mode == CCMMode::LINK_OP; }
-  bool isMove() const { return m_mode == CCMMode::MERGE_OP or m_mode == CCMMode::CUT_OP or m_mode == CCMMode::LINK_OP; }
-  CCMMode m_mode;
+  bool isMove() const { return m_mode == CCMMode::MERGE_OP || m_mode == CCMMode::CUT_OP || m_mode == CCMMode::LINK_OP; }
+  CCMMode::Mode m_mode;
 };
 
 class ConflictsItemHelper {
@@ -30,26 +30,26 @@ class ConflictsItemHelper {
   QString l;
   QStringList lRels;
   QString r;
-  CCMMode m_mode;
+  CCMMode::Mode m_mode;
   Finder m_finder;
   QStringList commonList;
   QStringList m_fromPathItems;
 
-  explicit ConflictsItemHelper(const QString& l_, const QString& r_, const QStringList& lRels_, const CCMMode mode)
+  explicit ConflictsItemHelper(const QString& l_, const QString& r_, const QStringList& lRels_, const CCMMode::Mode mode)
       : l(l_), lRels(lRels_), r(r_), m_mode{mode}, m_finder{mode}, commonList(m_finder.FindLLRelRCommon(l_, lRels_, r_)) {
     saveLeftRelPathList();
   }
 
-  explicit ConflictsItemHelper(const std::pair<QString, QStringList>& lAndRels, const QString& r_, const CCMMode mode)
+  explicit ConflictsItemHelper(const std::pair<QString, QStringList>& lAndRels, const QString& r_, const CCMMode::Mode mode)
       : l(lAndRels.first), lRels(lAndRels.second), r(r_), m_mode{mode}, m_finder{mode}, commonList(m_finder.FindLLRelRCommon(l, lRels, r_)) {
     saveLeftRelPathList();
   }
 
-  explicit ConflictsItemHelper(const QString& l_, const QString& r_, const CCMMode mode)
+  explicit ConflictsItemHelper(const QString& l_, const QString& r_, const CCMMode::Mode mode)
       : ConflictsItemHelper(l_, r_, QDir(l_, "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).entryList(), mode) {
   }
 
-  explicit ConflictsItemHelper(const QStringList& lAbsPathList, const QString& r_, const CCMMode mode)
+  explicit ConflictsItemHelper(const QStringList& lAbsPathList, const QString& r_, const CCMMode::Mode mode)
       : ConflictsItemHelper(PATHTOOL::GetLAndRels(lAbsPathList), r_, mode) {}
 
   operator bool() const { return not commonList.isEmpty(); }

@@ -4,7 +4,6 @@
 #include <QActionGroup>
 #include <QLayout>
 #include <QString>
-#include <QSqlDatabase>
 #include <QTranslator>
 
 QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG);

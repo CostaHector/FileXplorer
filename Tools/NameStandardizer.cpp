@@ -8,21 +8,21 @@ const QRegularExpression stdExclamationComp("\\s+!");
 using namespace JSON_RENAME_REGEX;
 QString NameStandardizer::operator()(QString aFileName) {
   // non-standard character
-  QString& noInvalidChar = aFileName.replace(invalidCharPat, " ");
+  QString& noInvalidChar = aFileName.replace(INVALID_CHARS_IN_FILENAME, " ");
   QString& noExtraSpaceComma = noInvalidChar.replace(stdCommaComp, ", ");
   QString& noExtraExclamationComma = noExtraSpaceComma.replace(stdExclamationComp, "! ");
-  QString& noContiousSpace = noExtraExclamationComma.replace(continuousSpaceComp, " ");
-  QString& noInvalidQuote = noContiousSpace.replace(invalidQuotePat, "'");
+  QString& noContiousSpace = noExtraExclamationComma.replace(CONTINOUS_SPACE_COMP, " ");
+  QString& noInvalidQuote = noContiousSpace.replace(INVALID_QUOTE_IN_FILENAME, "'");
 
-  QString& noLeadingStr = noInvalidQuote.remove(leadingStrComp);
-  QString noLeadingBracket = noLeadingStr.trimmed().remove(leadingOpenBracketComp);
+  QString& noLeadingStr = noInvalidQuote.remove(TORRENT_LEADING_STR_COMP);
+  QString noLeadingBracket = noLeadingStr.trimmed().remove(LEADING_OPEN_BRACKET_COMP);
 
-  QString& noBracket = noLeadingBracket.replace(nonLeadingBracketComp, "-");
-  QString& standardStr = noBracket.replace(spaceBarSpaceComp, "-");
-  QString& noContinousHypen = standardStr.replace(continousHypenComp, "-");
+  QString& noBracket = noLeadingBracket.replace(NON_LEADING_BRACKET_COMP, "-");
+  QString& standardStr = noBracket.replace(SPACE_HYPEN_SPACE_COMP, "-");
+  QString& noContinousHypen = standardStr.replace(CONTINOUS_HYPEN_COMP, "-");
 
-  QString& isloatedDot = noContinousHypen.replace(hypenOrSpaceFollowedWithDotPat, ".");
-  QString& noHypenEnds = isloatedDot.remove(trailingHypenComp);
+  QString& isloatedDot = noContinousHypen.replace(HYPEN_OR_SPACE_END_WITH_DOT_COMP, ".");
+  QString& noHypenEnds = isloatedDot.remove(TRAILING_HYPEN_COMP);
   QString fileName = noHypenEnds.replace('-', " - ").trimmed();
 
   // Get standard Name
