@@ -3,9 +3,10 @@
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 #include "Tools/PerformersAkaManager.h"
-#include <QDesktopServices>
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include <QDesktopServices>
+#include <QUrl>
 
 void onEditStudios() {
 #ifdef _WIN32

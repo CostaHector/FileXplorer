@@ -114,14 +114,14 @@ QStringList ProductionStudioManager::StandardProductionStudioFrom(QString standa
   // Both "lucas entertainment" and "lucasentertainment" should get "LucasEntertainment"
   // so, "LucasEntertainment" is from "lucas entertainment" or "lucasentertainment"
   const QString& pslower = standardPs.toLower();
-  const QString& psWithSpace = standardPs.replace(SPLIT_BY_UPPERCASE, " \\1").trimmed();
+  const QString& psWithSpace = standardPs.replace(SPLIT_BY_UPPERCASE_COMP, " \\1").trimmed();
   return {pslower, psWithSpace.toLower()};
 }
 
 QString ProductionStudioManager::FileName2StudioNameSection(QString sentence) const {
-  sentence.remove(leadingStrComp);          // remove [FFL], [FL], [GT]
-  sentence.remove(leadingOpenBracketComp);  // remove open braces [({
-  sentence.replace(nonLeadingBracketComp, "-");
+  sentence.remove(TORRENT_LEADING_STR_COMP);          // remove [FFL], [FL], [GT]
+  sentence.remove(LEADING_OPEN_BRACKET_COMP);  // remove open braces [({
+  sentence.replace(NON_LEADING_BRACKET_COMP, "-");
 
   QString prodStudioSection = sentence.split("-")[0];
   QString noInvalidStr = prodStudioSection.remove(DISCRAD_LETTER_COMP);

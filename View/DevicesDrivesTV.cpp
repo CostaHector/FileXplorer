@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QApplication>
 #include <QDate>
+#include "Tools/FileDescriptor/TableFields.h"
 
 using namespace DEV_DRV_TABLE;
 class ProgressDelegate : public QStyledItemDelegate {
@@ -38,24 +39,24 @@ class ProgressDelegate : public QStyledItemDelegate {
 
 DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)                          //
     : CustomTableView{"DevicesAndDrives", parent},                         //
-      mDb{SystemPath::DEVICES_AND_DRIVER_DATABASE, "DeviceAndDriverConn"}  //
+      mDb{SystemPath::DEVICES_AND_DRIVES_DATABASE, "DeviceAndDriverConn"}  //
 {
   if (!mDb.CreateDatabase()) {
     qWarning("CreateDatabase failed");
     return;
   }
-  if (!mDb.CreateTable(DB_TABLE::DEVICES_AND_DRIVES, DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE)) {
+  if (!mDb.CreateTable(DB_TABLE::DISKS, DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE)) {
     qWarning("CreateTable failed");
     return;
   }
-  if (mDb.InitDeviceAndDriver(DB_TABLE::DEVICES_AND_DRIVES) < FD_OK) {
+  if (mDb.InitDeviceAndDriver(DB_TABLE::DISKS) < FD_OK) {
     qWarning("InitDeviceAndDriver failed");
     return;
   }
   auto con = mDb.GetDb();
   mDevModel = new (std::nothrow) DevicesDriveModel{this, con};
   CHECK_NULLPTR_RETURN_VOID(mDevModel);
-  mDevModel->setTable(DB_TABLE::DEVICES_AND_DRIVES);
+  mDevModel->setTable(DB_TABLE::DISKS);
   mDevModel->select();
   setModel(mDevModel);
 
@@ -87,7 +88,7 @@ void DevicesDrivesTV::ReadSettings() {
   if (PreferenceSettings().contains("DevicesDriveTableViewGeometry")) {
     restoreGeometry(PreferenceSettings().value("DevicesDriveTableViewGeometry").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
 }
 
@@ -105,7 +106,7 @@ void DevicesDrivesTV::contextMenuEvent(QContextMenuEvent* event) {
 
 void DevicesDrivesTV::onUpdateVolumes() {
   VolumeUpdateResult resStat{0};
-  const int ret = mDb.UpdateDeviceAndDriver(DB_TABLE::DEVICES_AND_DRIVES, &resStat);
+  const int ret = mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &resStat);
   if (ret != FD_OK) {
     Notificator::badNews(QString{"Update Volume(s) FAILED, errorCode:%1"}.arg(ret), "See details in log");
     return;
@@ -126,7 +127,7 @@ void DevicesDrivesTV::onMountADriver() {
     return;
   }
   Notificator::goodNews(QString{"Mount Volume(s)[%1] ok"}.arg(guid), label + " in " + volMountPoint);
-  auto setRet = mDevModel->setData(index.sibling(index.row(), MOUNT_POINT), volMountPoint);
+  auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), volMountPoint);
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
 }
@@ -146,7 +147,7 @@ void DevicesDrivesTV::onUnmountADriver() {
     return;
   }
   Notificator::goodNews(QString{"Unmount Volume(s)[%1] from pnt:%2 ok"}.arg(guid).arg(mountedPnt), "NULL");
-  auto setRet = mDevModel->setData(index.sibling(index.row(), MOUNT_POINT), "");
+  auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), "");
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
 }
@@ -159,7 +160,7 @@ void DevicesDrivesTV::onAdtADriver() {
   const QString& guid = mDevModel->GetGuid(index);
   const QString& rootPath = mDevModel->GetRootPath(index);
   Notificator::badNews(QString{"Adt Volume(s)[%1] %2 FAILED"}.arg(guid).arg(rootPath), "No support now...");
-  auto setRet = mDevModel->setData(index.sibling(index.row(), ADT_TIME), QDateTime::currentMSecsSinceEpoch());
+  auto setRet = mDevModel->setData(index.siblingAtColumn(ADT_TIME), QDateTime::currentMSecsSinceEpoch());
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
 }

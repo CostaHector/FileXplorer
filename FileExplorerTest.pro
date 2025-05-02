@@ -15,6 +15,7 @@ SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
     Actions/LogActions.cpp \
+    Component/NotificatorPrivate.cpp \
     Component/Notificator.cpp \
     Component/QuickWhereClause.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
@@ -64,6 +65,7 @@ HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
     Actions/LogActions.h \
+    Component/NotificatorPrivate.h \
     Component/Notificator.h \
     Component/QuickWhereClause.h \
     Component/RenameWidgets/AdvanceRenamer.h \

@@ -93,15 +93,16 @@
 
 <!--LeftSideToolBarIcons here-->
 <file alias="HOME">LeftSideToolBarIcons/HOME.png</file>
-<file alias="FOLDER_OF_DESKTOP">LeftSideToolBarIcons/FOLDER_OF_DESKTOP.png</file>
-<file alias="FOLDER_OF_DOCUMENTS">LeftSideToolBarIcons/FOLDER_OF_DOCUMENTS.png</file>
-<file alias="FOLDER_OF_DOWNLOADS">LeftSideToolBarIcons/FOLDER_OF_DOWNLOADS.png</file>
-<file alias="FOLDER_OF_MUSICS">LeftSideToolBarIcons/FOLDER_OF_MUSICS.png</file>
-<file alias="FOLDER_OF_PICTURES">LeftSideToolBarIcons/FOLDER_OF_PICTURES.png</file>
-<file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.png</file>
-<file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.png</file>
-<file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.png</file>
+<file alias="FOLDER_OF_DESKTOP">LeftSideToolBarIcons/FOLDER_OF_DESKTOP.ico</file>
+<file alias="FOLDER_OF_DOCUMENTS">LeftSideToolBarIcons/FOLDER_OF_DOCUMENTS.ico</file>
+<file alias="FOLDER_OF_DOWNLOADS">LeftSideToolBarIcons/FOLDER_OF_DOWNLOADS.ico</file>
+<file alias="FOLDER_OF_MUSICS">LeftSideToolBarIcons/FOLDER_OF_MUSICS.ico</file>
+<file alias="FOLDER_OF_PICTURES">LeftSideToolBarIcons/FOLDER_OF_PICTURES.ico</file>
+<file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.ico</file>
+<file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.ico</file>
+<file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.ico</file>
 <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
+<file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
 <file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
 <file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.ico</file>
 <file alias="FOLDER_MERGE_TO_FIRST">RightClickIcon/FOLDER_MERGE_TO_FIRST.svg</file>
