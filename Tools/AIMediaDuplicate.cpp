@@ -6,6 +6,7 @@
 #include <QDirIterator>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QDateTime>
 
 QString GetEffectiveName(const QString& itemPath) {
   static const QSet<QString> specialSegments{"videos", "video", "vid", "video_ts"};

@@ -5,7 +5,7 @@
 
 MyClipboard::MyClipboard(QObject* parent) : QObject{parent}, m_clipboard(QGuiApplication::clipboard()) {}
 
-int MyClipboard::FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode /* cutCopy */) {
+int MyClipboard::FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode /* cutCopy */) {
   QMimeData* mimedata = new QMimeData;
   mimedata->setUrls(urls);
   // files in pathsList will drop its former level relation
@@ -14,7 +14,7 @@ int MyClipboard::FillIntoClipboardSystemBehavior(const QStringList& pathsList, c
   return urls.size();
 }
 
-int MyClipboard::FillIntoClipboardKeepFilesLevelBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode cutCopy) {
+int MyClipboard::FillIntoClipboardKeepFilesLevelBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy) {
   if (pathsList.isEmpty()) {
     return 0;
   }
@@ -32,7 +32,7 @@ int MyClipboard::FillIntoClipboardKeepFilesLevelBehavior(const QStringList& path
 int MyClipboard::FillIntoClipboardFSKeepFilesLevelBehavior(const QString& fromPath,
                                                            const QStringList& pathsList,
                                                            const QList<QUrl>& urls,
-                                                           const CCMMode cutCopy) {
+                                                           const CCMMode::Mode cutCopy) {
   if (pathsList.isEmpty()) {
     return 0;
   }
@@ -44,7 +44,7 @@ int MyClipboard::FillIntoClipboardFSKeepFilesLevelBehavior(const QString& fromPa
   return pathsList.size();
 }
 
-auto MyClipboard::FillSelectionIntoClipboard(QAbstractItemView* _view, QFileSystemModel* _fileSysModel, const CCMMode cutCopy) -> int {
+auto MyClipboard::FillSelectionIntoClipboard(QAbstractItemView* _view, QFileSystemModel* _fileSysModel, const CCMMode::Mode cutCopy) -> int {
   QStringList lRels;
   QList<QUrl> urls;
   for (const QModelIndex& ind : ViewSelection::selectedIndexes(_view)) {
