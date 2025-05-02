@@ -127,8 +127,8 @@ bool MountHelper::MountVolume(const QString& volumeGuid, const QString& label, Q
   return true;
 }
 
-bool MountHelper::UnmountVolume(const QString& mountPath) {
-  return DeleteVolumeMountPointA(mountPath.toStdString().c_str()) == true;
+bool MountHelper::UnmountVolume(const QString& volMountPoint) {
+  return DeleteVolumeMountPointA(volMountPoint.toStdString().c_str()) == true;
 }
 
 QMap<QString, QString> MountHelper::GetGuid2LabelMap() {

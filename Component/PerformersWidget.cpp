@@ -2,7 +2,7 @@
 
 #include "Actions/PerformersManagerActions.h"
 #include "Component/RatingSqlTableModel.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PublicMacro.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
