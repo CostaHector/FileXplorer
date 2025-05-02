@@ -4,7 +4,7 @@
 #include "public/PathTool.h"
 #include "public/UndoRedo.h"
 #include "public/PublicMacro.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "Tools/RenameNamesUnique.h"
 
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
