@@ -1,6 +1,6 @@
 #include "ConflictsRecycle.h"
 #include "Actions/ConflictsSolveActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include "public/UndoRedo.h"
 

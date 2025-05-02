@@ -6,7 +6,7 @@
 #include <QSqlDatabase>
 
 // 审计结果结构
-struct COUNT {
+struct AdtResult {
   int refound = 0;             // 从AGED表恢复的记录数
   int exist_and_same = 0;      // 存在且路径相同的记录
   int exist_and_not_same = 0;  // 存在但路径不同的记录
@@ -16,6 +16,8 @@ struct COUNT {
 
 enum FD_ERROR_CODE {
   FD_NOT_DIR = -1000,
+  FD_TABLE_NAME_INVALID,
+  FD_FIELD_VALUE_INVALID,
   FD_DB_INVALID,
   FD_DB_OPEN_FAILED,
   FD_CONNECT_NAME_NOT_EXIST,
@@ -24,6 +26,7 @@ enum FD_ERROR_CODE {
   FD_REPLACE_INTO_FAILED,
   FD_EXEC_FAILED,
   FD_COMMIT_FAILED,
+  FD_INVALID,
   FD_SKIP,
   FD_OK = 0,
 };
@@ -59,8 +62,13 @@ class DbManager : public QObject {
   static const QString DELETE_TABLE_TEMPLATE;
 
   bool QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) const;
+  bool QueryPK(const QString& tableName, const QString& pk, QSet<QString>& vals) const;
+  bool QueryPK(const QString& tableName, const QString& pk, QSet<int>& vals) const;
+
   int CountRow(const QString& tableName, const QString& whereClause = "");
+  bool IsTableEmpty(const QString& tableName) const;
   bool DeleteByWhereClause(const QString& tableName, const QString& whereClause);
+
  protected:
   void ReleaseConnection();
   bool mIsValid{false};
@@ -69,10 +77,16 @@ class DbManager : public QObject {
   static constexpr int MAX_BATCH_SIZE = 100;  // 每100条提交一次
 };
 
+enum RECORD_STATUS{
+  NORMAL = 0,
+  NOT_FIND = 1,
+};
+
 class FdBasedDb : public DbManager {
  public:
   FdBasedDb(const QString& dbName, const QString& connName, QObject* parent = nullptr) : DbManager{dbName, connName, parent} {}
   int ReadADirectory(const QString& folderAbsPath, const QString& tableName);
+  AdtResult Adt(const QString& tableName, const QString& peerPath);
   static const QString CREATE_TABLE_TEMPLATE;
   static const QString INSERT_NAME_ORI_IMGS_TEMPLATE;
   static QStringList VIDEOS_FILTER;

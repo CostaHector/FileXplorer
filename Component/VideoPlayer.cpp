@@ -1,7 +1,7 @@
 #include "VideoPlayer.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
 #include "public/MemoryKey.h"

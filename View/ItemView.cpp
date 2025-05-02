@@ -1,6 +1,6 @@
 #include "ItemView.h"
 #include <QDesktopServices>
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include <QUrl>
 
 ItemView::ItemView(const QString& itemViewName, QWidget* parent)//
