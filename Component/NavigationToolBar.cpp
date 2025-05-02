@@ -1,5 +1,6 @@
 #include "NavigationToolBar.h"
 #include "Actions/ActionWithPath.h"
+#include "public/OnCheckedPopupOrHideAWidget.h"
 #include "public/PublicMacro.h"
 #include "View/DevicesDriveTableView.h"
 #include <QApplication>
@@ -47,23 +48,11 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
 
 void NavigationToolBar::subscribe() {
   connect(DEVICES_AND_DRIVES, &QAction::triggered, this, [this](const bool checked) {  //
-    if (!checked) {
-      if (mDevDriveTV != nullptr) {
-        mDevDriveTV->hide();
-      }
-      return;
-    }
-    if (mDevDriveTV == nullptr) {
-      mDevDriveTV = new DevicesDriveTableView("DevicesDriveTableView");
-    }
-
-    mDevDriveTV->show();
-    mDevDriveTV->activateWindow();
-    mDevDriveTV->raise();
+    mDevDriveTV = PopupHideWidget<DevicesDriveTableView>(mDevDriveTV, checked, nullptr);
   });
 }
 
-//#define __MAIN__EQ__NAME__ 1
+// #define __MAIN__EQ__NAME__ 1
 #ifdef __MAIN__EQ__NAME__
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);

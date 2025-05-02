@@ -33,9 +33,9 @@ class ProgressDelegate : public QStyledItemDelegate {
   }
 };
 
-DevicesDriveTableView::DevicesDriveTableView(const QString& name, QWidget* parent)  //
-    : CustomTableView{name, parent},                                                //
-      mDb{SystemPath::DEVICES_AND_DRIVER_DATABASE, "DeviceAndDriverConn"}           //
+DevicesDriveTableView::DevicesDriveTableView(QWidget* parent)              //
+    : CustomTableView{"DevicesAndDrives", parent},                         //
+      mDb{SystemPath::DEVICES_AND_DRIVER_DATABASE, "DeviceAndDriverConn"}  //
 {
   if (!mDb.CreateDatabase()) {
     qWarning("CreateDatabase failed");
