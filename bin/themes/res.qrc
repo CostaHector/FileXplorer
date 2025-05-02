@@ -102,6 +102,7 @@
 <file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.ico</file>
 <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.ico</file>
 <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
+<file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
 <file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
 <file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.ico</file>
 <file alias="FOLDER_MERGE_TO_FIRST">RightClickIcon/FOLDER_MERGE_TO_FIRST.svg</file>

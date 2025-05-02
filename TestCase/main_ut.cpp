@@ -1,6 +1,9 @@
 #include "TestCase/pub/MyTestSuite.h"
 #include <QtTest/QtTest>
 
+#define RUN_UT_MAIN_FILE 1
+#ifdef RUN_UT_MAIN_FILE
+
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
   auto& suite = MyTestSuite::suite();
@@ -24,3 +27,5 @@ int main(int argc, char* argv[]) {
   }
   return failedCnt;
 }
+
+#endif

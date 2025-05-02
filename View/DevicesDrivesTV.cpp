@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QApplication>
 #include <QDate>
+#include "Tools/FileDescriptor/TableFields.h"
 
 using namespace DEV_DRV_TABLE;
 class ProgressDelegate : public QStyledItemDelegate {
@@ -87,7 +88,7 @@ void DevicesDrivesTV::ReadSettings() {
   if (PreferenceSettings().contains("DevicesDriveTableViewGeometry")) {
     restoreGeometry(PreferenceSettings().value("DevicesDriveTableViewGeometry").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
 }
 
@@ -126,7 +127,7 @@ void DevicesDrivesTV::onMountADriver() {
     return;
   }
   Notificator::goodNews(QString{"Mount Volume(s)[%1] ok"}.arg(guid), label + " in " + volMountPoint);
-  auto setRet = mDevModel->setData(index.sibling(index.row(), MOUNT_POINT), volMountPoint);
+  auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), volMountPoint);
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
 }
@@ -146,7 +147,7 @@ void DevicesDrivesTV::onUnmountADriver() {
     return;
   }
   Notificator::goodNews(QString{"Unmount Volume(s)[%1] from pnt:%2 ok"}.arg(guid).arg(mountedPnt), "NULL");
-  auto setRet = mDevModel->setData(index.sibling(index.row(), MOUNT_POINT), "");
+  auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), "");
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
 }
@@ -159,7 +160,7 @@ void DevicesDrivesTV::onAdtADriver() {
   const QString& guid = mDevModel->GetGuid(index);
   const QString& rootPath = mDevModel->GetRootPath(index);
   Notificator::badNews(QString{"Adt Volume(s)[%1] %2 FAILED"}.arg(guid).arg(rootPath), "No support now...");
-  auto setRet = mDevModel->setData(index.sibling(index.row(), ADT_TIME), QDateTime::currentMSecsSinceEpoch());
+  auto setRet = mDevModel->setData(index.siblingAtColumn(ADT_TIME), QDateTime::currentMSecsSinceEpoch());
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
 }

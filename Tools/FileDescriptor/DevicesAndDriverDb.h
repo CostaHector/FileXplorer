@@ -3,26 +3,6 @@
 
 #include "DbManager.h"
 
-namespace DEV_DRV_TABLE {
-enum FIELD_E {
-  ROOT_PATH = 0,  //
-  VOLUME_LABEL,   //
-  TOTAL_BYTES,    //
-  AVAIL_BYTES,    //
-  GUID,           //
-  MOUNT_POINT,    //
-  ADT_TIME,       //
-  FILED_BUTT
-};
-
-#define VOLUME_ENUM_TO_STRING(enum_val) #enum_val
-#define VOLUME_ENUM_TO_COLON_STRING(enum_val) ":"#enum_val
-
-// 使用一个函数来返回枚举项的字符串表示
-const char* GetFILEDString(FIELD_E enum_val);
-};  // namespace DEV_DRV_TABLE
-
-
 struct VolumeInfo {
   QString rootPath;
   QString volumeLabel;

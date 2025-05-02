@@ -133,7 +133,7 @@ void DuplicateVideosFinder::updateWindowsSize() {
   if (PreferenceSettings().contains("DuplicateVideosFinderGeometry")) {
     restoreGeometry(PreferenceSettings().value("DuplicateVideosFinderGeometry").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
   m_mainWidget->restoreState(PreferenceSettings().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
 }
