@@ -92,16 +92,9 @@ const int EXPLORER_COLUMNS_COUNT = EXPLORER_COLUMNS_TITLE.size();
 }  // namespace SearchKey
 
 namespace SystemPath {
-const QString drivePath = "";
-const QString desktopPath = QDir(QDir::homePath()).absoluteFilePath("Desktop");
-const QString documentPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
-const QString downloadPath = QDir(QDir::homePath()).absoluteFilePath("Downloads");
-const QString musicPath = QDir(QDir::homePath()).absoluteFilePath("Music");
-const QString picturesPath = QDir(QDir::homePath()).absoluteFilePath("Pictures");
-const QString videosPath = QDir(QDir::homePath()).absoluteFilePath("    Videos");
-const QString starredPath = QDir(QDir::homePath()).absoluteFilePath("Documents");
+const QString STARRED_PATH = QDir(QDir::homePath()).absoluteFilePath("Documents");
 const QString VIDS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/VIDS_DATABASE.db");
-const QString DEVICES_AND_DRIVER_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/DEVICES_AND_DRIVER.db");
+const QString DEVICES_AND_DRIVES_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/DEVICES_AND_DRIVES.db");
 const QString AI_MEDIA_DUP_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/DUPLICATES_DB.db");
 const QString RECYCLE_BIN_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/RECYCLE_BIN_DATABASE.db");
 const QString PEFORMERS_DATABASE = QDir(QDir::homePath()).absoluteFilePath("FileExplorerReadOnly/PERFORMERS_DATABASE.db");
@@ -113,7 +106,7 @@ namespace DB_TABLE {
 const QString MOVIES = "MOVIES";
 const QString PERFORMERS = "PERFORMERS";
 const QString TORRENTS = "TORRENTS";
-const QString DEVICES_AND_DRIVES = "DEVICES_AND_DRIVES";
+const QString DISKS = "DISKS";
 }  // namespace DB_TABLE
 
 namespace TYPE_FILTER {

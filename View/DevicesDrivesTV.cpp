@@ -38,24 +38,24 @@ class ProgressDelegate : public QStyledItemDelegate {
 
 DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)                          //
     : CustomTableView{"DevicesAndDrives", parent},                         //
-      mDb{SystemPath::DEVICES_AND_DRIVER_DATABASE, "DeviceAndDriverConn"}  //
+      mDb{SystemPath::DEVICES_AND_DRIVES_DATABASE, "DeviceAndDriverConn"}  //
 {
   if (!mDb.CreateDatabase()) {
     qWarning("CreateDatabase failed");
     return;
   }
-  if (!mDb.CreateTable(DB_TABLE::DEVICES_AND_DRIVES, DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE)) {
+  if (!mDb.CreateTable(DB_TABLE::DISKS, DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE)) {
     qWarning("CreateTable failed");
     return;
   }
-  if (mDb.InitDeviceAndDriver(DB_TABLE::DEVICES_AND_DRIVES) < FD_OK) {
+  if (mDb.InitDeviceAndDriver(DB_TABLE::DISKS) < FD_OK) {
     qWarning("InitDeviceAndDriver failed");
     return;
   }
   auto con = mDb.GetDb();
   mDevModel = new (std::nothrow) DevicesDriveModel{this, con};
   CHECK_NULLPTR_RETURN_VOID(mDevModel);
-  mDevModel->setTable(DB_TABLE::DEVICES_AND_DRIVES);
+  mDevModel->setTable(DB_TABLE::DISKS);
   mDevModel->select();
   setModel(mDevModel);
 
@@ -105,7 +105,7 @@ void DevicesDrivesTV::contextMenuEvent(QContextMenuEvent* event) {
 
 void DevicesDrivesTV::onUpdateVolumes() {
   VolumeUpdateResult resStat{0};
-  const int ret = mDb.UpdateDeviceAndDriver(DB_TABLE::DEVICES_AND_DRIVES, &resStat);
+  const int ret = mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &resStat);
   if (ret != FD_OK) {
     Notificator::badNews(QString{"Update Volume(s) FAILED, errorCode:%1"}.arg(ret), "See details in log");
     return;
