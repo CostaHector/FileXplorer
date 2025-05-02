@@ -1,5 +1,5 @@
 #include "DevicesDriveModel.h"
-#include "Tools/FileDescriptor/DevicesAndDriverDb.h"
+#include "Tools/FileDescriptor/TableFields.h"
 #include "public/DisplayEnhancement.h"
 using namespace DEV_DRV_TABLE;
 DevicesDriveModel::DevicesDriveModel(QObject* parent, QSqlDatabase con)  //
@@ -31,7 +31,7 @@ QVariant DevicesDriveModel::headerData(int section, Qt::Orientation orientation,
 }
 
 QString DevicesDriveModel::GetRootPath(const QModelIndex& idx) const {
-  const QModelIndex& shiftedRootPathIndex = idx.sibling(idx.row(), DEV_DRV_TABLE::ROOT_PATH);
+  const QModelIndex& shiftedRootPathIndex = idx.siblingAtColumn(DEV_DRV_TABLE::ROOT_PATH);
   if (!shiftedRootPathIndex.isValid()) {
     qWarning("shiftedGuidIndex invalid");
     return {};
@@ -40,7 +40,7 @@ QString DevicesDriveModel::GetRootPath(const QModelIndex& idx) const {
 }
 
 QString DevicesDriveModel::GetGuid(const QModelIndex& idx) const {
-  const QModelIndex& shiftedGuidIndex = idx.sibling(idx.row(), DEV_DRV_TABLE::GUID);
+  const QModelIndex& shiftedGuidIndex = idx.siblingAtColumn(DEV_DRV_TABLE::GUID);
   if (!shiftedGuidIndex.isValid()) {
     qWarning("shiftedGuidIndex invalid");
     return {};
@@ -49,7 +49,7 @@ QString DevicesDriveModel::GetGuid(const QModelIndex& idx) const {
 }
 
 QString DevicesDriveModel::GetMountedPoint(const QModelIndex& idx) const {
-  const QModelIndex& shiftedMountPntIndex = idx.sibling(idx.row(), DEV_DRV_TABLE::MOUNT_POINT);
+  const QModelIndex& shiftedMountPntIndex = idx.siblingAtColumn(DEV_DRV_TABLE::MOUNT_POINT);
   if (!shiftedMountPntIndex.isValid()) {
     qWarning("guidIndex invalid");
     return {};

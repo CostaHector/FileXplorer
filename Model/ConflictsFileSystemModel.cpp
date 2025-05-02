@@ -193,7 +193,7 @@ void ConflictsFileSystemModel::setDeleteOrRecycle(const QModelIndexList& indLst,
         break;
       case 4:
       case 5:
-        m_recycleMap[row].recycleLeft = not isSetDelete;
+        m_recycleMap[row].recycleLeft = !isSetDelete;
         break;
       default:;
     }

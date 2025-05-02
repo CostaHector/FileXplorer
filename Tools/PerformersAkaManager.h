@@ -7,7 +7,6 @@
 #include <QStack>
 #include <QString>
 #include <QWidget>
-#include "public/PublicVariable.h"
 
 class PerformersAkaManager {
  public:
@@ -16,11 +15,7 @@ class PerformersAkaManager {
 
   QHash<QString, QString> ReadOutAkaName();
   int ForceReloadAkaName();
-
-  QString PlainLogicSentence2FuzzySqlWhere(const QString& tokens,
-                                           const QString& keyName = DB_HEADER_KEY::Name,
-                                           const bool autoCompleteAka = false,
-                                           const QString& binaryCondition = "%1 like \"%%2%\"") const;
+  QString PlainLogicSentence2FuzzySqlWhere(const QString& tokens, QString keyName = "", const bool autoCompleteAka = false, const QString& binaryCondition = "%1 like \"%%2%\"") const;
 
   static int UpdateAKAHash(const bool isForce = false);
   QHash<QString, QString> akaPerf;

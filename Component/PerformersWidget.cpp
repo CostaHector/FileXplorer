@@ -10,6 +10,7 @@
 #include "Tools/JsonFileHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
+#include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/FileDescriptor/MovieBaseDb.h"
 
 #include <QDesktopServices>
@@ -133,7 +134,7 @@ void PerformersWidget::readSettings() {
   if (PreferenceSettings().contains("PerformersWidgetGeometry")) {
     restoreGeometry(PreferenceSettings().value("PerformersWidgetGeometry").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
 }
 
@@ -354,7 +355,7 @@ int PerformersWidget::onForceRefreshRecordsVids() {
     qWarning("Open failed:%s", qPrintable(con.lastError().text()));
     return 0;
   }
-
+  using namespace DB_HEADER_KEY;
   static auto& dbTM = PerformersAkaManager::getIns();
   static auto GetVidsListFromVidsTable = [](const QSqlRecord& record, QSqlQuery& qur) -> QStringList {
     const QString& searchCommand = dbTM.GetMovieTablePerformerSelectCommand(record);
@@ -365,7 +366,7 @@ int PerformersWidget::onForceRefreshRecordsVids() {
     }
     QStringList vidPath;
     while (qur.next()) {
-      vidPath << qur.value(DB_HEADER_KEY::ForSearch).toString();
+      vidPath << qur.value(VOLUME_ENUM_TO_STRING(ForSearch)).toString();
     }
     return vidPath;
   };
