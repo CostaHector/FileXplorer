@@ -113,7 +113,7 @@ namespace DB_TABLE {
 const QString MOVIES = "MOVIES";
 const QString PERFORMERS = "PERFORMERS";
 const QString TORRENTS = "TORRENTS";
-const QString DEVICE_AND_DRIVER = "DEVICE_AND_DRIVER";
+const QString DEVICES_AND_DRIVES = "DEVICES_AND_DRIVES";
 }  // namespace DB_TABLE
 
 namespace TYPE_FILTER {
