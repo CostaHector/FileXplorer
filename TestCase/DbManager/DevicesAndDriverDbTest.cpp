@@ -5,7 +5,9 @@
 
 #include "TestCase/pub/MyTestSuite.h"
 #include "Tools/FileDescriptor/DevicesAndDriverDb.h"
+#include "Tools/FileDescriptor/TableFields.h"
 #include "public/PublicVariable.h"
+#include "public/PublicMacro.h"
 
 const QString rootpath = QFileInfo(__FILE__).absolutePath();
 const QString dbName = rootpath + "/DeviceAndDriver.db";

@@ -4,6 +4,7 @@
 #include <QBrush>
 #include <QDirIterator>
 #include <QFile>
+#include <QUrl>
 
 VidModel::VidModel(QObject* parent) : DifferRootFileSystemModel{parent} {}
 
@@ -93,11 +94,11 @@ int VidModel::getNextAvailableVidUrl(const QUrl& startFrom, const QModelIndexLis
     return -1;
   }
   for (int row = startRow; row < rowCount(); ++row) {
-    auto ind = index(row, 0);
+    const auto& ind = index(row, 0);
     if (notAvailList.contains(ind)) {
       continue;
     }
-    if (not QFileInfo(m_vids[row]).isFile()) {
+    if (!QFileInfo{m_vids[row]}.isFile()) {
       continue;
     }
     return row;

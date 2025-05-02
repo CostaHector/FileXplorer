@@ -2,6 +2,7 @@
 #include "FileDescriptor.h"
 #include "public/PathTool.h"
 #include "public/PublicVariable.h"
+#include <QSet>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QDirIterator>
@@ -216,6 +217,7 @@ bool DbManager::DeleteByWhereClause(const QString& tableName, const QString& whe
   return true;
 }
 
+// not full match
 bool DbManager::IsMatch(const QString& s, const QRegularExpression& regex) {
   return regex.isValid() && regex.match(s).hasMatch();
 }

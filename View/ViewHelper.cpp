@@ -28,7 +28,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
       selectedItems.append(url.toLocalFile());
     }
   }
-  CCMMode opMode = CCMMode::ERROR_OP;
+  CCMMode::Mode opMode = CCMMode::ERROR_OP;
   switch (action) {
     case Qt::DropAction::CopyAction:
       opMode = CCMMode::COPY_OP;
