@@ -1,5 +1,5 @@
 #include "ArrangeActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 #include "Tools/PerformersAkaManager.h"

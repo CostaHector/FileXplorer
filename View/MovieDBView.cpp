@@ -4,7 +4,7 @@
 #include "Actions/FileBasicOperationsActions.h"
 
 #include "Component/QuickWhereClause.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 
 #include "Tools/PlayVideo.h"
 
@@ -14,10 +14,7 @@
 
 #include <QDesktopServices>
 #include <QHeaderView>
-#include <QProcess>
-#include <QStorageInfo>
 
-#include <QDirIterator>
 #include <QSqlError>
 #include <QSqlQuery>
 

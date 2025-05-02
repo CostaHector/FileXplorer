@@ -108,12 +108,12 @@ int MovieBaseDb::ReadVideosFromAPath(const QString& path, const QString& tableNa
       if (!db.commit()) {
         db.rollback();
         qWarning("commit the %dth batch record(s) failed: %s",  //
-                 count / MAX_BATCH_SIZE + 1, qPrintable(query.lastError().text()));
+                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
         qWarning("start the %dth transaction failed: %s",  //
-                 count / MAX_BATCH_SIZE + 2, qPrintable(query.lastError().text()));
+                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
     }
@@ -122,7 +122,7 @@ int MovieBaseDb::ReadVideosFromAPath(const QString& path, const QString& tableNa
   // 提交剩余记录
   if (!db.commit()) {
     db.rollback();
-    qWarning("remain record(s) commit failed: %s", qPrintable(query.lastError().text()));
+    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
     return FD_COMMIT_FAILED;
   }
   query.finish();

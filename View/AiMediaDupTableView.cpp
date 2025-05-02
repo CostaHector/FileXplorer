@@ -1,7 +1,7 @@
 #include "AiMediaDupTableView.h"
 
 #include "Actions/DuplicateVideosFinderActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include <QItemSelectionModel>
 

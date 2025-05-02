@@ -116,9 +116,6 @@ class FileExplorerEvent : public QObject {
   auto on_MoveTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::CUT_OP, r); }
   auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY_OP, r); }
 
-  template<typename WIDGET_TYPE>
-  void PopupHideWidget(WIDGET_TYPE*& p, const bool checked);
-
   MyQFileSystemModel* _fileSysModel;
   ContentPanel* _contentPane;
 

@@ -1,5 +1,5 @@
 #include "RenameWidget_ArrangeSection.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "Tools/NameSectionArrange.h"
