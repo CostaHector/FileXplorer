@@ -51,10 +51,9 @@ class DevicesAndDriverDb : public DbManager {
       : DbManager{dbName, connName, parent} {                                                    //
   }
   int InitDeviceAndDriver(const QString& tableName);
-  int UpdateDeviceAndDriver(const QString& tableName, FUNC_VOLUME_INFO_GETTER pGetter = GetVolumesInfo, VolumeUpdateResult* pRst = nullptr);
+  int UpdateDeviceAndDriver(const QString& tableName, VolumeUpdateResult* pRst = nullptr, FUNC_VOLUME_INFO_GETTER pGetter = GetVolumesInfo);
   int UpdateAdtTime(const QString& tableName, const QString& guid, int adtTime);
   int UpdateMountedPath(const QString& tableName, const QString& guid, const QString& mountedPath);
-
   static const QString CREATE_DEV_DRV_TEMPLATE;
   static const QString INSERT_DEV_DRV_TEMPLATE;
   static const QString UPDATE_SIZE_TEMPLATE;

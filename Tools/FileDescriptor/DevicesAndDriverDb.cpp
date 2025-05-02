@@ -148,7 +148,7 @@ int DevicesAndDriverDb::InitDeviceAndDriver(const QString& tableName) {
   return vols.size();
 }
 
-int DevicesAndDriverDb::UpdateDeviceAndDriver(const QString& tableName, FUNC_VOLUME_INFO_GETTER pGetter, VolumeUpdateResult* pRst) {
+int DevicesAndDriverDb::UpdateDeviceAndDriver(const QString& tableName, VolumeUpdateResult* pRst, FUNC_VOLUME_INFO_GETTER pGetter) {
   if (pGetter == nullptr) {
     qWarning("pGetter is nullptr");
     return FD_INVALID;
@@ -322,6 +322,8 @@ int DevicesAndDriverDb::UpdateAdtTime(const QString& tableName, const QString& g
   return FD_OK;
 }
 
+// 外部修改数据库后还需强制刷新模型, 显示内容才会生效
+// model->select();
 int DevicesAndDriverDb::UpdateMountedPath(const QString& tableName, const QString& guid, const QString& mountedPath) {
   if (tableName.isEmpty()) {
     return FD_TABLE_NAME_INVALID;
