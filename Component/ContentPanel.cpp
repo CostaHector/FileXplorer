@@ -2,7 +2,7 @@
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/ViewActions.h"
 #include "Actions/FolderPreviewActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "Tools/ArchiveFiles.h"
 #include "Tools/HarFiles.h"
 #include "Model/ScenesListModel.h"

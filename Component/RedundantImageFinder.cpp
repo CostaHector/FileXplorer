@@ -13,7 +13,7 @@
 
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RedundantImageFinderActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/UndoRedo.h"
