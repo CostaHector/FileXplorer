@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 
 #include "Actions/FileLeafAction.h"
-#include "NotificatorFrame.h"
+#include "Notificator.h"
 #include "public/PublicVariable.h"
 
 AlertSystem::AlertSystem(QWidget* parent)

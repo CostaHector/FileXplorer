@@ -8,7 +8,7 @@ namespace MountHelper
 QString findVolumeGuidByLabel(const QString& label);
 bool isVolumeAvailable(const QString& volumeGuid);
 bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint);
-bool UnmountVolume(const QString& mountPath);
+bool UnmountVolume(const QString& volMountPoint);
 QString resolveFilePath(const QString& relativePath, const QString& volumeGuid);
 QMap<QString, QString> GetGuid2LabelMap();
 bool GetVolumeInfo(const QString &path, QString& volName);

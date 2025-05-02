@@ -1,8 +1,9 @@
 #include "NavigationToolBar.h"
 #include "Actions/ActionWithPath.h"
+#include "Actions/DevicesDrivesActions.h"
 #include "public/OnCheckedPopupOrHideAWidget.h"
 #include "public/PublicMacro.h"
-#include "View/DevicesDriveTableView.h"
+#include "View/DevicesDrivesTV.h"
 #include <QApplication>
 #include <QDir>
 #include <QStyle>
@@ -11,10 +12,8 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
     : QToolBar{title} {
   setObjectName(title);
   // 1. devices and drives
-  DEVICES_AND_DRIVES = new (std::nothrow) QAction{QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon), "Devices and Drives", this};
-  CHECK_NULLPTR_RETURN_VOID(DEVICES_AND_DRIVES);
-  addAction(DEVICES_AND_DRIVES);
-  DEVICES_AND_DRIVES->setCheckable(true);
+
+  addAction(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES);
   addSeparator();
   // 2. all home links
   static const QString TEMPLATE{QDir::homePath() + "/%1"};
@@ -47,8 +46,8 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
 }
 
 void NavigationToolBar::subscribe() {
-  connect(DEVICES_AND_DRIVES, &QAction::triggered, this, [this](const bool checked) {  //
-    mDevDriveTV = PopupHideWidget<DevicesDriveTableView>(mDevDriveTV, checked, nullptr);
+  connect(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES, &QAction::triggered, this, [this](const bool checked) {  //
+    mDevDriveTV = PopupHideWidget<DevicesDrivesTV>(mDevDriveTV, checked, nullptr);
   });
 }
 
