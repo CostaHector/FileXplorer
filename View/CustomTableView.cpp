@@ -17,15 +17,15 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
       m_DEFAULT_SECTION_SIZE_KEY{m_name + "_DEFAULT_SECTION_SIZE"},
       m_DEFAULT_COLUMN_SECTION_SIZE_KEY{m_name + "_DEFAULT_COLUMN_SECTION_SIZE"},
       m_horizontalHeaderStateKey{m_name + "_HEADER_GEOMETRY"},
-      m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"},
       m_showHorizontalHeaderKey{m_name + "_SHOW_HORIZONTAL_HEADER"},
+      m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"},
       m_sortByColumnSwitchKey{m_name + "_SORT_BY_COLUMN_SWITCH"},
       m_rowResizeToContentKey{m_name + "_ROW_RESIZE_TO_CONTENT"},
       m_defaultTableRowHeight{MemoryKey::TABLE_DEFAULT_SECTION_SIZE.v.toInt()},
       m_defaultTableColumnWidth{MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE.v.toInt()},
       m_columnsShowSwitch{"11111,11111,11111,11111,11111,11111"} {
   if (isNameExists(m_name)) {
-    qWarning("Instance Name[%s] already exist", qPrintable(m_name));
+    qWarning("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
     return;
   }
   TABLES_SET.insert(m_name);
