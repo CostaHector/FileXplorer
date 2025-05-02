@@ -16,7 +16,7 @@ NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent) 
 
   UNPIN_THIS = new (std::nothrow) QAction{QIcon{":img/UNPIN"}, "Unpin this", this};
   CHECK_NULLPTR_RETURN_VOID(UNPIN_THIS);
-  UNPIN_ALL = new (std::nothrow) QAction{"Unpin All", this};
+  UNPIN_ALL = new (std::nothrow) QAction{QIcon{":img/UNPIN_ALL"}, "Unpin All", this};
   CHECK_NULLPTR_RETURN_VOID(UNPIN_ALL);
 
   mMenu = new (std::nothrow) QMenu{this};

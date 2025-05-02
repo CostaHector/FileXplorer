@@ -110,7 +110,7 @@ void HarTableView::updateWindowsSize() {
   if (PreferenceSettings().contains("HAR_TABLEVIEW_GEOMETRY")) {
     restoreGeometry(PreferenceSettings().value("HAR_TABLEVIEW_GEOMETRY").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
 }
 

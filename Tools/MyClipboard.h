@@ -11,11 +11,11 @@ class MyClipboard : public QObject {
  public:
   explicit MyClipboard(QObject* parent = nullptr);
 
-  int FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode cutCopy);
-  int FillIntoClipboardKeepFilesLevelBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode cutCopy);
-  int FillIntoClipboardFSKeepFilesLevelBehavior(const QString& fromPath, const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode cutCopy);
+  int FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy);
+  int FillIntoClipboardKeepFilesLevelBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy);
+  int FillIntoClipboardFSKeepFilesLevelBehavior(const QString& fromPath, const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy);
 
-  int FillSelectionIntoClipboard(QAbstractItemView* _view, QFileSystemModel* _fileSysModel, const CCMMode cutCopy);
+  int FillSelectionIntoClipboard(QAbstractItemView* _view, QFileSystemModel* _fileSysModel, const CCMMode::Mode cutCopy);
 
   const QMimeData* mimeData(QClipboard::Mode /*mode*/ = QClipboard::Clipboard) const { return m_clipboard->mimeData(); }
 
