@@ -1,6 +1,4 @@
 #include "MyQSqlTableModel.h"
-
-#include "public/PublicVariable.h"
 #include "public/DisplayEnhancement.h"
 #include <QSqlQuery>
 
@@ -14,7 +12,7 @@ QVariant MyQSqlTableModel::data(const QModelIndex& idx, int role) const {
     return QVariant();
   }
   if (role == Qt::DisplayRole) {
-    if (idx.column() == DB_HEADER_KEY::DB_SIZE_COLUMN)
+    if (idx.column() == DB_HEADER_KEY::Size)
       return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
   }
   return QSqlTableModel::data(idx, role);

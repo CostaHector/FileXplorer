@@ -3,7 +3,8 @@
 
 #include <QFileInfo>
 #include <QSqlTableModel>
-#include "public/PublicVariable.h"
+#include <QDir>
+#include "Tools/FileDescriptor/TableFields.h"
 
 class MyQSqlTableModel : public QSqlTableModel {
  public:
@@ -25,29 +26,35 @@ class MyQSqlTableModel : public QSqlTableModel {
   auto rootPath(const QString& placeHolder = "" /* no use */) const -> QString { return placeHolder; }
 
   auto driver(const QModelIndex& curIndex) const -> QString {
-    const QModelIndex& driverIndex = index(curIndex.row(), DB_HEADER_KEY::DB_DRIVER_INDEX, curIndex.parent());
+    const QModelIndex& driverIndex = curIndex.siblingAtColumn(DB_HEADER_KEY::Driver);
     return data(driverIndex, Qt::ItemDataRole::DisplayRole).toString();
   }
 
   auto absolutePath(const QModelIndex& curIndex) const -> QString {
-    const QModelIndex& preIndex = index(curIndex.row(), DB_HEADER_KEY::DB_PREPATH_INDEX, curIndex.parent());
+    const QModelIndex& preIndex = curIndex.siblingAtColumn(DB_HEADER_KEY::Prepath);
     return data(preIndex, Qt::ItemDataRole::DisplayRole).toString();
   }
 
   auto fileName(const QModelIndex& curIndex) const -> QString {
-    const QModelIndex& nameIndex = index(curIndex.row(), DB_HEADER_KEY::DB_NAME_INDEX, curIndex.parent());
+    const QModelIndex& nameIndex = curIndex.siblingAtColumn(DB_HEADER_KEY::Name);
     return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
   }
 
-  auto filePath(const QModelIndex& curIndex) const -> QString { return QDir(absolutePath(curIndex)).absoluteFilePath(fileName(curIndex)); }
+  auto filePath(const QModelIndex& curIndex) const -> QString {  //
+    return QDir{absolutePath(curIndex)}.absoluteFilePath(fileName(curIndex));
+  }
 
-  auto fileInfo(const QModelIndex& curIndex) const -> QFileInfo { return QFileInfo(filePath(curIndex)); }
+  auto fileInfo(const QModelIndex& curIndex) const -> QFileInfo {  //
+    return QFileInfo{filePath(curIndex)};
+  }
 
   auto fullInfo(const QModelIndex& curIndex) const -> QString {
     using namespace DB_HEADER_KEY;
-    const int row = curIndex.row();
-    const QModelIndex& par = curIndex.parent();
-    return data(index(row, DB_NAME_INDEX, par)).toString() + '\t' + data(index(row, DB_SIZE_COLUMN, par)).toString() + '\t' + data(index(row, DB_PREPATH_INDEX, par)).toString();
+    return data(curIndex.siblingAtColumn(DB_HEADER_KEY::Name)).toString()    //
+           + '\t'                                                         //
+           + data(curIndex.siblingAtColumn(DB_HEADER_KEY::Size)).toString()  //
+           + '\t'                                                         //
+           + data(curIndex.siblingAtColumn(DB_HEADER_KEY::Prepath)).toString();
   }
 };
 
