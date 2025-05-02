@@ -29,3 +29,30 @@ QVariant DevicesDriveModel::headerData(int section, Qt::Orientation orientation,
   }
   return QSqlTableModel::headerData(section, orientation, role);
 }
+
+QString DevicesDriveModel::GetRootPath(const QModelIndex& idx) const {
+  const QModelIndex& shiftedRootPathIndex = idx.sibling(idx.row(), DEV_DRV_TABLE::ROOT_PATH);
+  if (!shiftedRootPathIndex.isValid()) {
+    qWarning("shiftedGuidIndex invalid");
+    return {};
+  }
+  return QSqlTableModel::data(shiftedRootPathIndex).toString();
+}
+
+QString DevicesDriveModel::GetGuid(const QModelIndex& idx) const {
+  const QModelIndex& shiftedGuidIndex = idx.sibling(idx.row(), DEV_DRV_TABLE::GUID);
+  if (!shiftedGuidIndex.isValid()) {
+    qWarning("shiftedGuidIndex invalid");
+    return {};
+  }
+  return QSqlTableModel::data(shiftedGuidIndex).toString();
+}
+
+QString DevicesDriveModel::GetMountedPoint(const QModelIndex& idx) const {
+  const QModelIndex& shiftedMountPntIndex = idx.sibling(idx.row(), DEV_DRV_TABLE::MOUNT_POINT);
+  if (!shiftedMountPntIndex.isValid()) {
+    qWarning("guidIndex invalid");
+    return {};
+  }
+  return QSqlTableModel::data(shiftedMountPntIndex).toString();
+}

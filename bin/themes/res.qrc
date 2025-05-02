@@ -253,6 +253,7 @@
 <file alias="COUNTER">Database/COUNTER.svg</file>
 <file alias="SUM">Database/SUM.svg</file>
 <file alias="UNION">Database/UNION.svg</file>
+<file alias="AUDIT">Database/AUDIT.svg</file>
 
 <file alias="ZIP">TopSideToolBarIcons/ZIP.ico</file>
 

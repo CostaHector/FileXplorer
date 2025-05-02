@@ -1,7 +1,7 @@
 #include "SceneActionsSubscribe.h"
 #include "Actions/SceneInPageActions.h"
 #include "Tools/SceneInfoManager.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include <QToolBar>
 #include <QMessageBox>

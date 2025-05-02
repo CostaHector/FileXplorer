@@ -1,5 +1,5 @@
 #include "NavigationViewSwitcher.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "View/SceneActionsSubscribe.h"
 #include "View/SceneListView.h"
 #include "Model/ScenesListModel.h"

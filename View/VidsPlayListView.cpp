@@ -1,6 +1,6 @@
 #include "VidsPlayListView.h"
 #include "Actions/VideoPlayerActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 
 #include "public/PublicVariable.h"
 #include "public/PathTool.h"
