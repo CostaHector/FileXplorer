@@ -6,6 +6,7 @@
 #include <QDesktopServices>
 #include <QMessageLogContext>
 #include <QDateTime>
+#include <QUrl>
 
 QtMsgType LogHandler::OUTPUT_LOG_LEVEL = QtWarningMsg;
 

@@ -26,11 +26,10 @@ ConflictsRecycle::ConflictsRecycle(const ConflictsItemHelper& itemIF_, QWidget* 
   Subscribe();
 
   ReadSettings();
-
-  setWindowTitle(QString("%1/%2 item(s) Conflict | Operation[%3]")
-                     .arg(itemIF.commonList.size())
-                     .arg(itemIF.m_fromPathItems.size())
-                     .arg(CCMMode2QString.value(itemIF_.m_mode, "unknown")));
+  setWindowTitle(QString("%1/%2 item(s) Conflict | Operation[%3]")  //
+                     .arg(itemIF.commonList.size())                 //
+                     .arg(itemIF.m_fromPathItems.size())            //
+                     .arg(CCMMode::MCCL2STR[(int)itemIF_.m_mode]));
   setWindowIcon(QIcon(":img/CONFLICT"));
 }
 
@@ -83,16 +82,11 @@ auto ConflictsRecycle::Subscribe() -> void {
   connect(buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &ConflictsRecycle::close);
   connect(buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::clicked, this, &ConflictsRecycle::on_ShowCommand);
 
-  connect(g_conflictSolveAct().SIZE_ACT, &QAction::triggered, this,
-          [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::SIZE_LARGE_THEN_NEWER_TIME); });
-  connect(g_conflictSolveAct().DATE_ACT, &QAction::triggered, this,
-          [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::NEWER_TIME_THEN_SIZE_LARGE); });
-  connect(g_conflictSolveAct().ALWAYS_KEEP_LEFT_SIDE, &QAction::triggered, this,
-          [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::ALWAYS_SIDE_LEFT); });
-  connect(g_conflictSolveAct().ALWAYS_KEEP_RIGHT_SIDE, &QAction::triggered, this,
-          [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::ALWAYS_SIDE_RIGHT); });
-  connect(g_conflictSolveAct().REVERT_ACT, &QAction::triggered, this,
-          [this](const bool checked) { m_conflictModel->setRevertKeepItemPriority(checked); });
+  connect(g_conflictSolveAct().SIZE_ACT, &QAction::triggered, this, [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::SIZE_LARGE_THEN_NEWER_TIME); });
+  connect(g_conflictSolveAct().DATE_ACT, &QAction::triggered, this, [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::NEWER_TIME_THEN_SIZE_LARGE); });
+  connect(g_conflictSolveAct().ALWAYS_KEEP_LEFT_SIDE, &QAction::triggered, this, [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::ALWAYS_SIDE_LEFT); });
+  connect(g_conflictSolveAct().ALWAYS_KEEP_RIGHT_SIDE, &QAction::triggered, this, [this]() { m_conflictModel->setKeepItemPriority(ConflictsFileSystemModel::KEEP_PRIORITY::ALWAYS_SIDE_RIGHT); });
+  connect(g_conflictSolveAct().REVERT_ACT, &QAction::triggered, this, [this](const bool checked) { m_conflictModel->setRevertKeepItemPriority(checked); });
 
   connect(g_conflictSolveAct().HIDE_NO_CONFLICT_ITEM, &QAction::triggered, this, &ConflictsRecycle::onHideNoConflictLine);
 
@@ -101,8 +95,7 @@ auto ConflictsRecycle::Subscribe() -> void {
 
   g_conflictSolveAct().LEFT_FOLDER->setText(itemIF.l);
   g_conflictSolveAct().RIGHT_FOLDER->setText(itemIF.r);
-  connect(g_conflictSolveAct().LEFT_FOLDER, &QAction::triggered, g_conflictSolveAct().LEFT_FOLDER,
-          []() { QDesktopServices::openUrl(QUrl::fromLocalFile(g_conflictSolveAct().LEFT_FOLDER->text())); });
+  connect(g_conflictSolveAct().LEFT_FOLDER, &QAction::triggered, g_conflictSolveAct().LEFT_FOLDER, []() { QDesktopServices::openUrl(QUrl::fromLocalFile(g_conflictSolveAct().LEFT_FOLDER->text())); });
   connect(g_conflictSolveAct().RIGHT_FOLDER, &QAction::triggered, g_conflictSolveAct().RIGHT_FOLDER,
           []() { QDesktopServices::openUrl(QUrl::fromLocalFile(g_conflictSolveAct().RIGHT_FOLDER->text())); });
 
@@ -167,10 +160,8 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   //  RenameConflictsIllu wid;
 
-  const QString& ENV_PATH =
-      QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_ConflictSolve/CHANGABLE");
-  const QString& DONT_CHANGE_SRC =
-      QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_ConflictSolve/DONT_CHANGE");
+  const QString& ENV_PATH = QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_ConflictSolve/CHANGABLE");
+  const QString& DONT_CHANGE_SRC = QFileInfo(QFileInfo(__FILE__).absolutePath()).absoluteDir().absoluteFilePath("TestCase/test/TestEnv_ConflictSolve/DONT_CHANGE");
   if (QFile::exists(ENV_PATH)) {
     auto ret = QDir(ENV_PATH).removeRecursively();
     if (not ret) {

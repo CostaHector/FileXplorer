@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QDirIterator>
-#include <QSqlError>
+#include <QTextStream>
 
 QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG) {
   if (oldAG == nullptr) {
