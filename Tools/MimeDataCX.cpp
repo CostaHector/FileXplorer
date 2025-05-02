@@ -7,7 +7,7 @@ MimeDataCX::MimeDataCX(const MimeDataCX& rhs) noexcept : QMimeData(), l(rhs.l), 
   setImageData(rhs.imageData());
 }
 
-MimeDataCX::MimeDataCX(const QMimeData& parent, const CCMMode cutCopy_) : MimeDataCX(Urls2QStringList(parent), cutCopy_) {
+MimeDataCX::MimeDataCX(const QMimeData& parent, const CCMMode::Mode cutCopy_) : MimeDataCX(Urls2QStringList(parent), cutCopy_) {
   // from native QMimeData
   setHtml(parent.html());
   setText(parent.text());
@@ -15,7 +15,7 @@ MimeDataCX::MimeDataCX(const QMimeData& parent, const CCMMode cutCopy_) : MimeDa
   setImageData(parent.imageData());
 }
 
-bool MimeDataCX::refillBaseMode(const CCMMode mode) {
+bool MimeDataCX::refillBaseMode(const CCMMode::Mode mode) {
   QByteArray preferred(4, 0x0);
   if (mode == CCMMode::CUT_OP) {  // # 2 for cut and 5 for copy
     preferred[0] = 0x2;
@@ -35,7 +35,7 @@ MimeDataCX MimeDataCX::fromPlainMimeData(const QMimeData* baseMimeData) {
     return *p2CX;
   }
   const QByteArray& ba = baseMimeData->data("Preferred DropEffect");
-  qDebug() << "Preferred DropEffect" << ba;
+  qDebug("Preferred DropEffect %s", ba.toStdString().c_str());
   if (ba[0] == 0x2) {  // # 2 for cut and 5 for copy
     return {*baseMimeData, CCMMode::CUT_OP};
   } else if (ba[0] == 0x5) {
@@ -52,7 +52,7 @@ QStringList MimeDataCX::Urls2QStringList(const QMimeData& mimeData) {
   return lAbsPathList;
 }
 
-CCMMode MimeDataCX::getModeFrom(const QMimeData* native) {
+CCMMode::Mode MimeDataCX::getModeFrom(const QMimeData* native) {
   const QByteArray& ba = native->data("Preferred DropEffect");
   if (ba[0] == 0x2) {  // # 2 for cut and 5 for copy
     return CCMMode::CUT_OP;

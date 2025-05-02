@@ -292,11 +292,14 @@ bool MovieDBView::onDeleteFromTable(const QString& clause) {
     return false;
   }
 
+  using namespace DB_HEADER_KEY;
   const QString& deleteFromTable = _tablesDropDownList->currentText();
   QString whereClause = clause;
   if (clause.isEmpty()) {
-    static const QStringList deleteDriverChoicePool{QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Name), QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Size), QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Driver),
-                                                    QString("\"%1\"=\"\"").arg(DB_HEADER_KEY::Prepath)};
+    static const QStringList deleteDriverChoicePool{QString("\"%1\"=\"\"").arg(VOLUME_ENUM_TO_STRING(Name)),    //
+                                                    QString("\"%1\"=\"\"").arg(VOLUME_ENUM_TO_STRING(Size)),    //
+                                                    QString("\"%1\"=\"\"").arg(VOLUME_ENUM_TO_STRING(Driver)),  //
+                                                    QString("\"%1\"=\"\"").arg(VOLUME_ENUM_TO_STRING(Prepath))};
 
     bool okClicked = false;
     whereClause = QInputDialog::getItem(this, "Delete where", QString("DELETE FROM \"%1\" WHERE").arg(deleteFromTable), deleteDriverChoicePool, 0, true, &okClicked);
@@ -322,13 +325,14 @@ bool MovieDBView::onDeleteFromTable(const QString& clause) {
 
 bool MovieDBView::on_DeleteByDrive() {
   QSet<QString> driversSet;
+  using namespace DB_HEADER_KEY;
   for (const auto rowIndex : selectionModel()->selectedRows()) {
     const QString& curDriver = _dbModel->driver(rowIndex);  // TODO:driver
     if (driversSet.contains(curDriver)) {
       continue;
     }
     driversSet.insert(curDriver);
-    const QString& whereClause = QString(R"(`%1`="%2")").arg(DB_HEADER_KEY::Driver, curDriver);
+    const QString& whereClause = QString(R"(`%1`="%2")").arg(VOLUME_ENUM_TO_STRING(Driver), curDriver);
     if (!onDeleteFromTable(whereClause)) {
       qWarning("delete by drive failed:%s", qPrintable(whereClause));
       return false;
@@ -339,13 +343,14 @@ bool MovieDBView::on_DeleteByDrive() {
 
 bool MovieDBView::on_DeleteByPrepath() {
   QSet<QString> prepathSet;
+  using namespace DB_HEADER_KEY;
   for (const auto& rowIndex : selectionModel()->selectedRows()) {
     const QString& prepath = _dbModel->absolutePath(rowIndex);
     if (prepathSet.contains(prepath)) {
       continue;
     }
     prepathSet.insert(prepath);
-    const QString& whereClause = QString(R"(`%1`="%2")").arg(DB_HEADER_KEY::Prepath, prepath);
+    const QString& whereClause = QString(R"(`%1`="%2")").arg(VOLUME_ENUM_TO_STRING(Prepath), prepath);
     if (!onDeleteFromTable(whereClause)) {
       qWarning("delete by prepath failed:%s", qPrintable(whereClause));
       return false;

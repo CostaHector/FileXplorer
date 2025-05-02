@@ -4,7 +4,9 @@
 #include "TestCase/pub/MyTestSuite.h"
 #include "TestCase/PathRelatedTool.h"
 #include "Tools/FileDescriptor/MovieBaseDb.h"
+#include "Tools/FileDescriptor/TableFields.h"
 #include "public/PublicVariable.h"
+#include "public/PublicMacro.h"
 
 const QString rootpath = QFileInfo(__FILE__).absolutePath();
 const QString dbName = rootpath + "/MOVIE.db";
@@ -58,7 +60,8 @@ class MovieBaseDbTest : public MyTestSuite {
 
     // total count = 8
     // name contains "2008, The Blender Foundation": count = 3
-    const QString qryWhereClause{QString(R"(`%1` like "%2008, The Blender Foundation%")").arg(DB_HEADER_KEY::Name)};
+    using namespace DB_HEADER_KEY;
+    const QString qryWhereClause{QString(R"(`%1` like "%2008, The Blender Foundation%")").arg(VOLUME_ENUM_TO_STRING(Name))};
     QCOMPARE(mDb.CountRow(DB_TABLE::MOVIES, qryWhereClause), 3);
     QVERIFY(mDb.DeleteByWhereClause(DB_TABLE::MOVIES, qryWhereClause));
     // should remove 3 records, count now = 8 - 3 = 5

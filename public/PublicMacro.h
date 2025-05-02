@@ -19,4 +19,6 @@
       return false;                           \
   }
 
+#define VOLUME_ENUM_TO_STRING(enum_val) #enum_val
+
 #endif  // PUBLICMACRO_H

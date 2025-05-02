@@ -99,7 +99,7 @@ void Archiver::UpdateWindowsSize() {
   if (PreferenceSettings().contains("ArchiverGeometry")) {
     restoreGeometry(PreferenceSettings().value("ArchiverGeometry").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
   m_splitter->restoreState(PreferenceSettings().value("ArchiverSplitterState", QByteArray()).toByteArray());
 }

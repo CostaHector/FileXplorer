@@ -2,10 +2,12 @@
 #include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
 #include "Tools/JsonFileHelper.h"
-
+#include "Tools/FileDescriptor/TableFields.h"
 #include <QDir>
 #include <QDirIterator>
+#include <QTextStream>
 
 PerformersManager::PerformersManager() : m_performers(ReadOutPerformers()), perfsCompleter(m_performers.values()) {
   perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
@@ -56,16 +58,17 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   if (!QDir(path).exists()) {
     return 0;
   }
+  using namespace DB_HEADER_KEY;
   decltype(m_performers) castsIncrement;
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    if (!dict.contains(DB_HEADER_KEY::Performers)) {
+    if (!dict.contains(VOLUME_ENUM_TO_STRING(Performers))) {
       continue;
     }
-    const QVariant& v = dict[DB_HEADER_KEY::Performers];
+    const QVariant& v = dict[VOLUME_ENUM_TO_STRING(Performers)];
     for (const QString& performer : v.toStringList()) {
       if (performer.isEmpty() || m_performers.contains(performer)) {
         continue;
@@ -107,7 +110,7 @@ QStringList PerformersManager::SplitSentence(QString sentence) {
   sentence.replace(DISCRAD_LETTER_COMP, " ");
   sentence.replace(AND_COMP, " & ");
   sentence.remove(RESOLUTION_COMP);
-  return sentence.split(CONTINOUS_SPACE);
+  return sentence.split(AT_LEAST_1_SPACE_COMP);
 }
 
 auto PerformersManager::RmvBelongLetter(const QString& word) -> QString {
