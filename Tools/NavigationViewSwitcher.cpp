@@ -129,7 +129,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::MOVIE: {
       if (_view->m_movieView == nullptr) {
-        _view->m_dbModel = new (std::nothrow) MyQSqlTableModel{_view, _view->mMovieDb.GetDb()};
+        _view->m_dbModel = new (std::nothrow) FdBasedDbModel{_view, _view->mMovieDb.GetDb()};
         _view->m_movieView = new (std::nothrow) MovieDBView(_view->m_dbModel, _view->_dbSearchBar, _view->mMovieDb, _view);
         ContentPanel::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_movieView);
