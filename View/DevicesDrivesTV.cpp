@@ -106,12 +106,13 @@ void DevicesDrivesTV::contextMenuEvent(QContextMenuEvent* event) {
 
 void DevicesDrivesTV::onUpdateVolumes() {
   VolumeUpdateResult resStat{0};
-  const int ret = mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &resStat);
+  const int ret = mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &resStat);
   if (ret != FD_OK) {
     Notificator::badNews(QString{"Update Volume(s) FAILED, errorCode:%1"}.arg(ret), "See details in log");
     return;
   }
   Notificator::goodNews("Update Volume(s) ok", QString{"Insert:%1, Delete:%2, Update:%3"}.arg(resStat.insertCnt).arg(resStat.deleteCnt).arg(resStat.updateCnt));
+  mDevModel->select();
 }
 
 void DevicesDrivesTV::onMountADriver() {
