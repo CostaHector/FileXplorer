@@ -58,17 +58,17 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   if (!QDir(path).exists()) {
     return 0;
   }
-  using namespace DB_HEADER_KEY;
   decltype(m_performers) castsIncrement;
   QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    if (!dict.contains(VOLUME_ENUM_TO_STRING(Performers))) {
+    auto perfIt = dict.find(JSON_KEY::PerformersS);
+    if (perfIt != dict.cend()) {
       continue;
     }
-    const QVariant& v = dict[VOLUME_ENUM_TO_STRING(Performers)];
+    const QVariant& v = perfIt.value();
     for (const QString& performer : v.toStringList()) {
       if (performer.isEmpty() || m_performers.contains(performer)) {
         continue;

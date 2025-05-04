@@ -133,6 +133,26 @@ class MountHelperTest : public MyTestSuite {
     QVERIFY2(!gui2Pnts.isEmpty(), "Recheck if no volumes at all");
   }
 
+  void test_GetGuidJoinDisplayName() {
+    // {"guid_1|root path 1", "guid_2_root path 2"}
+    const QStringList& guidDispLst = GetGuidJoinDisplayName();
+    // {{"guid_1", "root path 1"}, {"guid_2", "root path 2"}}
+    const QMap<QString, QString>& guidTblName2Disp = GetGuidTableName2DisplayName();
+    QCOMPARE(guidDispLst.size(), guidTblName2Disp.size());
+    for (const QString& guidDisp : guidDispLst) {
+      const QString& guid = ChoppedDisplayName(guidDisp);
+      const QString& rootpath = GetDisplayNameByGuidTableName(guid);
+      QCOMPARE(guidTblName2Disp[guid], rootpath);
+    }
+    qDebug("\n%s", qPrintable(guidDispLst.join('\n')));
+  }
+
+  void test_ChoppedDisplayName() {
+    QCOMPARE(ChoppedDisplayName("MOVIES|Display name not found"), "MOVIES");
+    QCOMPARE(ChoppedDisplayName("MOVIES ANYTHING HELLO WORLD"), "MOVIES ANYTHING HELLO WORLD");
+    QCOMPARE(ChoppedDisplayName("0123456789_0123456789_0123456789_012|C:\\"), "0123456789_0123456789_0123456789_012");
+  }
+
 #endif
 };
 
