@@ -17,7 +17,7 @@ QString Guid2RootPathComboxBox::CurrentGuid() const {
   return CurrentTableName().replace(MountHelper::TABLE_UNDERSCORE, MountHelper::GUID_HYPEN);
 }
 QString Guid2RootPathComboxBox::CurrentRootPath() const {
-  return currentText().mid(MountHelper::GUID_LEN + 1);
+  return currentText().mid(MountHelper::ROOTPATH_START);
 }
 QStringList Guid2RootPathComboxBox::ToQStringList() const {
   const int cnt = count();
@@ -44,11 +44,12 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
   m_searchCB->setLineEdit(m_searchLE);
-  using namespace DB_HEADER_KEY;
-  m_searchCB->addItem(QString("%1 like \"%\"").arg(VOLUME_ENUM_TO_STRING(ForSearch)));
-  m_searchCB->addItem(QString("%1 in (\"ts\", \"avi\")").arg(VOLUME_ENUM_TO_STRING(Type)));
-  m_searchCB->addItem(QString("%1 between 0 AND 1000000").arg(VOLUME_ENUM_TO_STRING(Size)));
-  m_searchCB->addItem(QString("%1 = \"E:/\"").arg(VOLUME_ENUM_TO_STRING(Driver)));
+  using namespace MOVIE_TABLE;
+  m_searchCB->addItem(QString{R"(%1 LIKE "%")"}.arg(VOLUME_ENUM_TO_STRING(Name)));
+  m_searchCB->addItem(QString{R"(%1 BETWEEN 0 AND 1000000)"}.arg(VOLUME_ENUM_TO_STRING(Size)));
+  m_searchCB->addItem(QString{R"(%1 = "E:/")"}.arg(VOLUME_ENUM_TO_STRING(Driver)));
+  m_searchCB->addItem(QString{R"(%1 IN ("Comedy", "Documentary"))"}.arg(VOLUME_ENUM_TO_STRING(Tags)));
+  m_searchCB->addItem(QString{R"(%1 LIKES "%Chris Evans%")"}.arg(VOLUME_ENUM_TO_STRING(Cast)));
   m_searchCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   addWidget(m_tables);

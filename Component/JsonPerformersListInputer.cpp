@@ -4,22 +4,30 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QPushButton>
+#include <QCompleter>
 #include "Tools/JsonFileHelper.h"
 #include "Tools/NameTool.h"
 #include "Tools/PerformersManager.h"
+#include "public/PublicMacro.h"
 
-JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)
-    : QDialog{parent, f},
-      m_onePerf(new QLineEdit),
-      m_perfsList(new QLineEdit),
-      buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel)),
-      p_dict(nullptr) {
+const QString PERFS_JOIN_STR{", "};
+
+JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)  //
+    : QDialog{parent, f}                                                                  //
+{
+  m_onePerf = new (std::nothrow) QLineEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_onePerf);
+  m_perfsList = new (std::nothrow) QLineEdit;
+  CHECK_NULLPTR_RETURN_VOID(m_perfsList);
+  buttonBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  CHECK_NULLPTR_RETURN_VOID(buttonBox);
+
   m_onePerf->setCompleter(&PerformersManager::getIns().perfsCompleter);
   m_onePerf->addAction(QIcon(":img/RENAME_PERFORMERS"), QLineEdit::LeadingPosition);
   m_onePerf->setClearButtonEnabled(true);
   m_perfsList->setClearButtonEnabled(true);
 
-  auto* lo = new QFormLayout;
+  lo = new QFormLayout;
   lo->addRow("performer", m_onePerf);
   lo->addRow("list", m_perfsList);
   lo->addWidget(buttonBox);
@@ -27,7 +35,7 @@ JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::Window
 
   subscribe();
   setWindowIcon(QIcon(":img/RENAME_PERFORMERS"));
-  setWindowTitle("mod performers");
+  setWindowTitle("Mod performers");
 }
 
 bool JsonPerformersListInputer::appendAPerformer() {
@@ -51,7 +59,7 @@ bool JsonPerformersListInputer::appendAPerformer() {
     return false;
   }
   perfsL.append(stdPerf);
-  m_perfsList->setText(perfsL.join(", "));
+  m_perfsList->setText(perfsL.join(PERFS_JOIN_STR));
   return true;
 }
 
@@ -61,7 +69,7 @@ void JsonPerformersListInputer::uniquePerformers() {
     return;
   }
   const QStringList& perfL = NameTool()(perfs);
-  m_perfsList->setText(perfL.join(", "));
+  m_perfsList->setText(perfL.join(PERFS_JOIN_STR));
 }
 
 bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
@@ -71,11 +79,11 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
     return false;
   }
   QVariantHash& dict = *p_dict;
-  if (not dict.contains(JSONKey::Performers)) {
+  if (not dict.contains(JSON_KEY::PerformersS)) {
     return false;
   }
   const QString& perfs = text();
-  dict[JSONKey::Performers] = NameTool()(perfs);
+  dict[JSON_KEY::PerformersS] = NameTool()(perfs);
   return JsonFileHelper::DumpJsonDict(dict, jsonFilePath);
 }
 
@@ -87,19 +95,19 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
     return false;
   }
   setWindowFilePath(jsonFilePath);
-  if (not dict.contains(JSONKey::Performers)) {
+  if (not dict.contains(JSON_KEY::PerformersS)) {
     return false;
   }
   static PerformersManager& pm = PerformersManager::getIns();
-  QStringList perfL = dict[JSONKey::Performers].toStringList();
+  QStringList perfL = dict[JSON_KEY::PerformersS].toStringList();
   if (perfL.isEmpty()) {
-    if (dict.contains(JSONKey::Name)) {
-      const QString& name = dict[JSONKey::Name].toString();
-      perfL = pm(name);
+    auto nameIt = dict.find(JSON_KEY::NameS);
+    if (nameIt != dict.cend()) {
+      perfL = pm(nameIt.value().toString());
     }
   }
   perfL.removeDuplicates();
-  m_perfsList->setText(perfL.join(", "));
+  m_perfsList->setText(perfL.join(PERFS_JOIN_STR));
   return true;
 }
 

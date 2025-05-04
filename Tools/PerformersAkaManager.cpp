@@ -144,10 +144,18 @@ QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlReco
   QString perfs = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
   QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
   if (!akas.isEmpty()) {
-    perfs += (LOGIC_OR_CHAR + akas.replace(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR));
+    perfs += LOGIC_OR_CHAR;
+    perfs += akas.replace(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
   }
-  using namespace DB_HEADER_KEY;
-  const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(VOLUME_ENUM_TO_STRING(ForSearch), perfs);
+  const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(VOLUME_ENUM_TO_STRING(Name), perfs);
   // movies table
-  return QString("SELECT `%1` from %2 where %3").arg(VOLUME_ENUM_TO_STRING(ForSearch), DB_TABLE::MOVIES, whereClause);
+  using namespace MOVIE_TABLE;
+  static const QString SELECT_NAME_TEMPLATE           //
+      {QString{"SELECT `%1`, `%2`, `%3` FROM "}       //
+           .arg(VOLUME_ENUM_TO_STRING(PrePathLeft))   //
+           .arg(VOLUME_ENUM_TO_STRING(PrePathRight))  //
+           .arg(VOLUME_ENUM_TO_STRING(Name))          //
+       + "`%1` "                                      //
+       + QString{"WHERE "}};
+  return SELECT_NAME_TEMPLATE.arg(DB_TABLE::MOVIES) + whereClause;
 }
