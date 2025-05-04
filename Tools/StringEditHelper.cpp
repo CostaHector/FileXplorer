@@ -36,11 +36,11 @@ bool StringEditHelper::ReplaceAndUpdateSelection(QLineEdit* lineEditWidget, std:
     qDebug("lineEditWidget is nullptr");
     return false;
   }
-  if (not fTrans) {
+  if (!fTrans) {
     qDebug("fTrans is null");
     return false;
   }
-  if (not lineEditWidget->hasSelectedText()) {
+  if (!lineEditWidget->hasSelectedText()) {
     return true;
   }
 

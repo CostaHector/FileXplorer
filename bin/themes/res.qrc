@@ -5,7 +5,7 @@
 <qresource prefix="img">
 <!--App Icons here-->
 <file alias="APP_ICON_PATH">AppIcons/FOLDER_OF_PICTURES.png</file>
-<file alias="PERFORMERS_MANAGER">AppIcons/PERFORMERS_MANAGER.svg</file>
+<file alias="PERFORMERS_APP">AppIcons/PERFORMERS_APP.svg</file>
 <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
 <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
 
@@ -93,15 +93,16 @@
 
 <!--LeftSideToolBarIcons here-->
 <file alias="HOME">LeftSideToolBarIcons/HOME.png</file>
-<file alias="FOLDER_OF_DESKTOP">LeftSideToolBarIcons/FOLDER_OF_DESKTOP.png</file>
-<file alias="FOLDER_OF_DOCUMENTS">LeftSideToolBarIcons/FOLDER_OF_DOCUMENTS.png</file>
-<file alias="FOLDER_OF_DOWNLOADS">LeftSideToolBarIcons/FOLDER_OF_DOWNLOADS.png</file>
-<file alias="FOLDER_OF_MUSICS">LeftSideToolBarIcons/FOLDER_OF_MUSICS.png</file>
-<file alias="FOLDER_OF_PICTURES">LeftSideToolBarIcons/FOLDER_OF_PICTURES.png</file>
-<file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.png</file>
-<file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.png</file>
-<file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.png</file>
+<file alias="FOLDER_OF_DESKTOP">LeftSideToolBarIcons/FOLDER_OF_DESKTOP.ico</file>
+<file alias="FOLDER_OF_DOCUMENTS">LeftSideToolBarIcons/FOLDER_OF_DOCUMENTS.ico</file>
+<file alias="FOLDER_OF_DOWNLOADS">LeftSideToolBarIcons/FOLDER_OF_DOWNLOADS.ico</file>
+<file alias="FOLDER_OF_MUSICS">LeftSideToolBarIcons/FOLDER_OF_MUSICS.ico</file>
+<file alias="FOLDER_OF_PICTURES">LeftSideToolBarIcons/FOLDER_OF_PICTURES.ico</file>
+<file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.ico</file>
+<file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.ico</file>
+<file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.ico</file>
 <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
+<file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
 <file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
 <file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.ico</file>
 <file alias="FOLDER_MERGE_TO_FIRST">RightClickIcon/FOLDER_MERGE_TO_FIRST.svg</file>
@@ -253,6 +254,7 @@
 <file alias="COUNTER">Database/COUNTER.svg</file>
 <file alias="SUM">Database/SUM.svg</file>
 <file alias="UNION">Database/UNION.svg</file>
+<file alias="AUDIT">Database/AUDIT.svg</file>
 
 <file alias="ZIP">TopSideToolBarIcons/ZIP.ico</file>
 
@@ -269,8 +271,6 @@
 <file alias="ALERT">AlertSystem/ALERT.svg</file>
 <file alias="ALERT_ACTIVE">AlertSystem/ALERT_ACTIVE.svg</file>
 <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
-<file alias="FAILED">AlertSystem/FAILED.svg</file>
-<file alias="PASS">AlertSystem/PASS.svg</file>
 <file alias="RECHECK">AlertSystem/RECHECK.svg</file>
 
 <!--RecycleBin icon here-->

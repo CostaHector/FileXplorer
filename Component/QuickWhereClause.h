@@ -4,9 +4,7 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QLineEdit>
-#include <QPushButton>
-#include <QToolBar>
-#include <QToolButton>
+#include <QFormLayout>
 
 class QuickWhereClause : public QDialog {
  public:
@@ -21,17 +19,17 @@ class QuickWhereClause : public QDialog {
   QString GetWhereString() const { return m_whereLineEdit->text(); }
 
  private:
-  QLineEdit* m_forSearch;
-  QLineEdit* m_name;
-  QLineEdit* m_perf;
-  QLineEdit* m_size;
-  QLineEdit* m_type;
-  QLineEdit* m_dateModified;
-  QLineEdit* m_tags;
-  QLineEdit* m_rate;
+  QLineEdit* m_Name{nullptr};
+  QLineEdit* m_Size{nullptr};
+  QLineEdit* m_Duration{nullptr};
+  QLineEdit* m_Studio{nullptr};
+  QLineEdit* m_Cast{nullptr};
+  QLineEdit* m_Tags{nullptr};
+  QLineEdit* m_whereLineEdit{nullptr};
+  QDialogButtonBox* dbb{nullptr};
+
+  QFormLayout* lo{nullptr};
   QStringList m_whereAndClause;
-  QLineEdit* m_whereLineEdit;
-  QDialogButtonBox* dbb;
 };
 
 #endif  // QUICKWHERECLAUSE_H

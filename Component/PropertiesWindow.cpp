@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 
 #include "Actions/PropertiesWindowActions.h"
+#include "Tools/FileDescriptor/TableFields.h"
 #include "public/PublicVariable.h"
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
@@ -118,7 +119,7 @@ bool PropertiesWindow::operator()(const QSqlTableModel* model, const QTableView*
     const QModelIndexList& selIdxs = tv->selectionModel()->selectedRows();
     const QModelIndex rootIndex = tv->rootIndex();
     for (const QModelIndex& idx : selIdxs) {
-      const QModelIndex szInd = model->index(idx.row(), DB_HEADER_KEY::DB_SIZE_COLUMN, rootIndex);
+      const QModelIndex szInd = model->index(idx.row(), MOVIE_TABLE::Size, rootIndex);
       totalSz += model->QSqlTableModel::data(szInd, Qt::ItemDataRole::DisplayRole).toLongLong();
     }
     m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(selIdxs.size()).arg(0);
@@ -134,7 +135,7 @@ void PropertiesWindow::ReadSetting() {
   if (PreferenceSettings().contains("PropertiesWindowGeometry")) {
     restoreGeometry(PreferenceSettings().value("PropertiesWindowGeometry").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
 }
 

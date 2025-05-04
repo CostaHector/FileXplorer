@@ -14,7 +14,7 @@ class LogActions : public QObject {
   QAction* _LOG_AGING{nullptr};
 
   QAction* _LOG_LEVEL_DEBUG{nullptr};
-  QAction* _LOG_LEVEL_ERROR{nullptr};
+  QAction* _LOG_LEVEL_WARNING{nullptr};
   QActionGroup* _LOG_LEVEL_AG{nullptr};
 
   QAction* _FLUSH_INSTANTLY{nullptr};

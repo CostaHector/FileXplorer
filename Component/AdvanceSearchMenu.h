@@ -9,7 +9,7 @@ class AdvanceSearchMenu : public QMenu {
  public:
   explicit AdvanceSearchMenu(const QString& title, QWidget* parent = nullptr);
 
-  QAction* _FORCE_REFRESH_SEARCH_SOURCE = new QAction(QIcon(":img/REFRESH_SEARCH_SOURCE"), tr("Refresh search source"), this);
+  QAction* _FORCE_REFRESH_SEARCH_SOURCE = new (std::nothrow) QAction(QIcon(":img/REFRESH_SEARCH_SOURCE"), tr("Refresh search source"), this);
  private:
 };
 
