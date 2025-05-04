@@ -27,9 +27,7 @@ class FdBasedDbModel : public QSqlTableModel {
 
   QString rootPath(const QString& /*placeHolder*/ = "") const { return m_rootPath; }
 
-  QString GUID(const QModelIndex& /*curIndex*/ = {}) const {
-    return tableName().replace('_', '-');
-  }
+  QString GUID(const QModelIndex& /*curIndex*/ = {}) const { return tableName().replace('_', '-'); }
 
   QString absolutePath(const QModelIndex& curIndex) const;
 
@@ -47,7 +45,6 @@ class FdBasedDbModel : public QSqlTableModel {
   }
 
   QString fullInfo(const QModelIndex& curIndex) const {
-    using namespace DB_HEADER_KEY;
     return data(curIndex.siblingAtColumn(MOVIE_TABLE::Name)).toString()    //
            + '\t'                                                          //
            + data(curIndex.siblingAtColumn(MOVIE_TABLE::Size)).toString()  //

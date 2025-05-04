@@ -308,7 +308,7 @@ QString MountHelper::GetDisplayNameByGuidTableName(QString guidTableName) {
       return si.displayName();
     }
   }
-  return QString("Display name of[%s] not found").arg(stdVolumeName);
+  return QString("Display name of[%1] not found").arg(stdVolumeName);
 }
 
 // GUID in underscore -> RootPath
@@ -335,12 +335,12 @@ QStringList MountHelper::GetGuidJoinDisplayName() {
   return guidDispLst;
 }
 
-QString MountHelper::ChoppedDisplayName(const QString& GuidJoinDisplayName) {
-  const int colonIndex = GuidJoinDisplayName.indexOf(JOINER_STR);
+QString MountHelper::ChoppedDisplayName(const QString& guidJoinDisplayName) {
+  const int colonIndex = guidJoinDisplayName.indexOf(JOINER_STR);
   if (colonIndex == -1) {
-    return GuidJoinDisplayName;
+    return guidJoinDisplayName;
   }
-  return GuidJoinDisplayName.left(colonIndex);
+  return guidJoinDisplayName.left(colonIndex);
 }
 
 #endif

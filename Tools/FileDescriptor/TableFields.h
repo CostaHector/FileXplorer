@@ -18,23 +18,6 @@ const char* GetFILEDString(FIELD_E enum_val);
 
 #define VOLUME_ENUM_TO_COLON_STRING(enum_val) ":" #enum_val
 
-namespace DB_HEADER_KEY {
-enum FIELD_E {
-  Name = 0,      //
-  Size,          //
-  Type,          //
-  DateModified,  //
-  Performers,    //
-  Tags,          //
-  Rate,          //
-  Driver,        //
-  Prepath,       //
-  Extra,         //
-  ForSearch,     //
-  BUTT
-};
-}  // namespace DB_HEADER_KEY
-
 namespace MainKey {
 enum FIELD_E {
   Name = 0,      //

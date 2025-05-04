@@ -7,7 +7,6 @@
 #include "public/MemoryKey.h"
 #include "Actions/ActionWithPath.h"
 #include "Tools/ViewTypeTool.h"
-#include "Tools/FileDescriptor/MovieBaseDb.h"
 using namespace ViewTypeTool;
 
 NavigationViewSwitcher::NavigationViewSwitcher(StackedToolBar* navigation, ContentPanel* view, QObject* parent) : QObject(parent), _navigation(navigation), _view(view) {}

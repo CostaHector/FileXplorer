@@ -5,9 +5,11 @@
 
 namespace MountHelper {
 
-constexpr QChar JOINER_STR{'|'};
-constexpr QChar GUID_HYPEN = '-', TABLE_UNDERSCORE = '_';
+constexpr char GUID_HYPEN = '-', TABLE_UNDERSCORE = '_';
+// GUID_LEN|ROOTPATH
 constexpr int GUID_LEN = 36;
+constexpr char JOINER_STR{'|'};
+constexpr int ROOTPATH_START = GUID_LEN + 1;
 const QString VOLUME_NAME_TEMPLATE{R"(\\?\Volume{%1}\)"};
 const char VOLUME_PREFIX[] = R"(\\?\Volume{)";
 constexpr int START_INT = sizeof(VOLUME_PREFIX) - 1;
@@ -35,7 +37,7 @@ const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh = false);
 QString GetDisplayNameByGuidTableName(QString guidTableName);
 QMap<QString, QString> GetGuidTableName2DisplayName();
 QStringList GetGuidJoinDisplayName();
-QString ChoppedDisplayName(const QString& GuidJoinDisplayName);
+QString ChoppedDisplayName(const QString& guidJoinDisplayName);
 }  // namespace MountHelper
 
 #endif  // MOUNTHELPER_H
