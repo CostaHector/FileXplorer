@@ -1,0 +1,746 @@
+#include "FdBasedDb.h"
+#include "Tools/FileDescriptor/FileDescriptor.h"
+#include "Tools/JsonFileHelper.h"
+#include "Tools/QMediaInfo.h"
+#include "public/PublicVariable.h"
+#include "public/PathTool.h"
+#include "public/PublicMacro.h"
+#include "TableFields.h"
+#include <QDirIterator>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSet>
+
+using namespace MOVIE_TABLE;
+
+QStringList FdBasedDb::VIDEOS_FILTER = TYPE_FILTER::VIDEO_TYPE_SET;
+bool FdBasedDb::SKIP_GETTER_DURATION{false};
+bool FdBasedDb::CHECK_TABLE_VOLUME_ONLINE{true};
+
+const QString FdBasedDb::CREATE_TABLE_TEMPLATE  //
+    {
+        "CREATE TABLE IF NOT EXISTS `%1` ("          // TABLE_NAME
+        + QString{"`%1` BIGINT NOT NULL, "           // fd BIGINT
+                  "`%2` NCHAR(260) DEFAULT '', "     // PrePathLeft
+                  "`%3` NCHAR(260) DEFAULT '', "     // PrePathRight
+                  "`%4` NCHAR(260) NOT NULL, "       // Name
+                  "`%5` INTEGER DEFAULT 0, "         // Size
+                  "`%6` INTEGER DEFAULT 0, "         // Duration
+                  "`%7` VARCHAR(100) DEFAULT '', "   // Studio
+                  "`%8` VARCHAR(260) DEFAULT '', "   // Cast
+                  "`%9` VARCHAR(260) DEFAULT '', "   // Tags
+                  "`%10` INTEGER UNIQUE NOT NULL, "  // PathHash
+                  "PRIMARY KEY (%1, %3, %4)"
+                  ");"}
+              .arg(VOLUME_ENUM_TO_STRING(Fd))            //
+              .arg(VOLUME_ENUM_TO_STRING(PrePathLeft))   //
+              .arg(VOLUME_ENUM_TO_STRING(PrePathRight))  //
+              .arg(VOLUME_ENUM_TO_STRING(Name))          //
+              .arg(VOLUME_ENUM_TO_STRING(Size))          //
+              .arg(VOLUME_ENUM_TO_STRING(Duration))      //
+              .arg(VOLUME_ENUM_TO_STRING(Studio))        //
+              .arg(VOLUME_ENUM_TO_STRING(Cast))          //
+              .arg(VOLUME_ENUM_TO_STRING(Tags))          //
+              .arg(VOLUME_ENUM_TO_STRING(PathHash))      //
+    };
+
+const QString FdBasedDb::INSERT_MOVIE_RECORD_FULL_TEMPLATE  //
+    {
+        "REPLACE INTO `%1` "                                                        // TABLE_NAME
+        + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`) "  //
+                  "VALUES "                                                         //
+                  "(:%1, :%2, :%3, :%4, :%5, :%6, :%7, :%8, :%9, :%10);"}           //
+              .arg(VOLUME_ENUM_TO_STRING(Fd))                                       //
+              .arg(VOLUME_ENUM_TO_STRING(PrePathLeft))                              //
+              .arg(VOLUME_ENUM_TO_STRING(PrePathRight))                             //
+              .arg(VOLUME_ENUM_TO_STRING(Name))                                     //
+              .arg(VOLUME_ENUM_TO_STRING(Size))                                     //
+              .arg(VOLUME_ENUM_TO_STRING(Duration))                                 //
+              .arg(VOLUME_ENUM_TO_STRING(Studio))                                   //
+              .arg(VOLUME_ENUM_TO_STRING(Cast))                                     //
+              .arg(VOLUME_ENUM_TO_STRING(Tags))                                     //
+              .arg(VOLUME_ENUM_TO_STRING(PathHash))                                 //
+    };
+
+const QString FdBasedDb::INSERT_MOVIE_RECORD_TEMPLATE  //
+    {
+        "REPLACE INTO `%1` "                               // TABLE_NAME
+        + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`) "  //
+                  "VALUES "                                //
+                  "(:%1, :%2, :%3, :%4, :%5, :%6);"}       //
+              .arg(VOLUME_ENUM_TO_STRING(Fd))              //
+              .arg(VOLUME_ENUM_TO_STRING(PrePathLeft))     //
+              .arg(VOLUME_ENUM_TO_STRING(PrePathRight))    //
+              .arg(VOLUME_ENUM_TO_STRING(Name))            //
+              .arg(VOLUME_ENUM_TO_STRING(Size))            //
+              .arg(VOLUME_ENUM_TO_STRING(PathHash))        //
+    };
+
+enum INSERT_FIELD {
+  INSERT_FIELD_Fd = 0,        //
+  INSERT_FIELD_PrePathLeft,   //
+  INSERT_FIELD_PrePathRight,  //
+  INSERT_FIELD_Name,          //
+  INSERT_FIELD_Size,          //
+  INSERT_FIELD_PathHash,      //
+};
+
+enum UPDATE_PATH_FIELED {
+  UPDATE_PATH_FILED_PrePathLeft = 0,  //
+  UPDATE_PATH_FILED_PrePathRight,     //
+  UPDATE_PATH_FILED_Name,             //
+  UPDATE_PATH_FILED_PathHash,         //
+  UPDATE_PATH_FILED_Fd
+};
+
+const QString FdBasedDb::UPDATE_PATH_TEMPLATE  //
+    {
+        "UPDATE `%1` "  //
+        + QString("SET `%1` = :%1, `%2` = :%2, `%3` = :%3, `%4` = :%4 "
+                  "WHERE `%5` = :%5;")
+              .arg(VOLUME_ENUM_TO_STRING(PrePathLeft))   //
+              .arg(VOLUME_ENUM_TO_STRING(PrePathRight))  //
+              .arg(VOLUME_ENUM_TO_STRING(Name))          //
+              .arg(VOLUME_ENUM_TO_STRING(PathHash))      //
+              .arg(VOLUME_ENUM_TO_STRING(Fd))            //
+    };
+
+enum QUERY_DURATION_0_FILED {
+  QUERY_DURATION_0_FILED_PrePathLeft = 0,  //
+  QUERY_DURATION_0_FILED_PrePathRight,     //
+  QUERY_DURATION_0_FILED_Name,             //
+  QUERY_DURATION_0_FILED_Fd
+};
+
+const QString FdBasedDb::SELECT_DURATION_0_TEMPLATE  //
+    {
+        QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM "}  //
+            .arg(VOLUME_ENUM_TO_STRING(PrePathLeft))    //
+            .arg(VOLUME_ENUM_TO_STRING(PrePathRight))   //
+            .arg(VOLUME_ENUM_TO_STRING(Name))           //
+            .arg(VOLUME_ENUM_TO_STRING(Fd))             //
+        + "`%1` "                                       //
+        + QString{"WHERE `%1` = 0;"}                    //
+              .arg(VOLUME_ENUM_TO_STRING(Duration))     //
+    };
+
+enum UPDATE_DURATION_0_FILED {
+  UPDATE_DURATION_0_FILED_Duration = 0,  //
+  UPDATE_DURATION_0_FILED_Fd
+};
+
+const QString FdBasedDb::UPDATE_DURATION_0_TEMPLATE  //
+    {
+        "UPDATE `%1` "  //
+        + QString("SET `%1` = :%1 "
+                  "WHERE `%2` = :%2;")
+              .arg(VOLUME_ENUM_TO_STRING(Duration))  //
+              .arg(VOLUME_ENUM_TO_STRING(Fd))        //
+    };
+
+const QString FdBasedDb::SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE  //
+    {
+        QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7` FROM "}            //
+            .arg(VOLUME_ENUM_TO_STRING(PrePathLeft))                                //
+            .arg(VOLUME_ENUM_TO_STRING(PrePathRight))                               //
+            .arg(VOLUME_ENUM_TO_STRING(Name))                                       //
+            .arg(VOLUME_ENUM_TO_STRING(Duration))                                   //
+            .arg(VOLUME_ENUM_TO_STRING(Studio))                                     //
+            .arg(VOLUME_ENUM_TO_STRING(Cast))                                       //
+            .arg(VOLUME_ENUM_TO_STRING(Tags))                                       //
+        + "`%1` "                                                                   //
+        + QString{R"(WHERE `%1` != 0 OR `%2` != '' OR `%3` != '' OR `%4` != '';)"}  //
+              .arg(VOLUME_ENUM_TO_STRING(Duration))                                 //
+              .arg(VOLUME_ENUM_TO_STRING(Studio))                                   //
+              .arg(VOLUME_ENUM_TO_STRING(Cast))                                     //
+              .arg(VOLUME_ENUM_TO_STRING(Tags))                                     //
+    };
+
+enum UPDATE_STUDIO_CAST_TAGS_FIELED {
+  UPDATE_STUDIO_CAST_TAGS_Studio = 0,  //
+  UPDATE_STUDIO_CAST_TAGS_Cast,        //
+  UPDATE_STUDIO_CAST_TAGS_Tags,        //
+  UPDATE_STUDIO_CAST_TAGS_PathHash,    //
+};
+
+const QString FdBasedDb::UPDATE_STUDIO_CAST_TAGS_TEMPLATE  //
+    {
+        "UPDATE `%1` "                                       //
+        + QString("SET `%1` = :%1, `%2` = :%2, `%3` = :%3 "  //
+                  "WHERE `%4` = :%4;")                       //
+              .arg(VOLUME_ENUM_TO_STRING(Studio))            //
+              .arg(VOLUME_ENUM_TO_STRING(Cast))              //
+              .arg(VOLUME_ENUM_TO_STRING(Tags))              //
+              .arg(VOLUME_ENUM_TO_STRING(PathHash))          //
+    };
+
+enum EXPORT_TO_JSON {
+  EXPORT_TO_JSON_FIELD_PrePathLeft = 0,  //
+  EXPORT_TO_JSON_FIELD_PrePathRight,     //
+  EXPORT_TO_JSON_FIELD_Name,             //
+  EXPORT_TO_JSON_FIELD_Duration,         //
+  EXPORT_TO_JSON_FIELD_Studio,           //
+  EXPORT_TO_JSON_FIELD_Cast,             //
+  EXPORT_TO_JSON_FIELD_Tags,             //
+};
+
+// Incremental
+int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbsPath) {
+  if (tableName.isEmpty()) {
+    return FD_TABLE_NAME_INVALID;
+  }
+
+  if (!QFileInfo(folderAbsPath).isDir()) {
+    qWarning("folderAbsPath[%s] is not a directory", qPrintable(folderAbsPath));
+    return FD_NOT_DIR;
+  }
+
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return FD_DB_OPEN_FAILED;
+  }
+
+  if (!db.tables().contains(tableName)) {
+    return FD_TABLE_INEXIST;
+  }
+
+  // 1. query fd(s) from table
+  QSet<qint64> existedFds;
+  if (!QueryPK(tableName, VOLUME_ENUM_TO_STRING(Fd), existedFds)) {
+    qWarning("Qry fds(s) at table[%s] failed", qPrintable(tableName));
+    return FD_QRY_PK_FAILED;
+  }
+
+  // 2. fd->absolute file path
+  FileDescriptor fd;
+  QHash<qint64, QString> newFd2Pth;
+  QDirIterator it{folderAbsPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
+  QString absFilePath;
+  while (it.hasNext()) {
+    it.next();
+    absFilePath = it.filePath();
+    newFd2Pth[fd.GetFileUniquedId(absFilePath)] = absFilePath;
+  }
+  const QList<qint64>& newFdLst = newFd2Pth.keys();
+  const QSet<qint64> newFds{newFdLst.cbegin(), newFdLst.cend()};
+
+  auto needInsertFds{newFds};
+  needInsertFds.subtract(existedFds);
+
+  int insertCnt = 0;
+  auto ret = Insert(tableName, needInsertFds, newFd2Pth, insertCnt);
+  if (ret != FD_OK) {
+    qWarning("Incremental insert failed errorCode:%d", ret);
+    return ret;
+  }
+
+  qWarning("%d record(s) commit insert into succeed", insertCnt);
+  return insertCnt;
+}
+
+FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
+                                const QSet<qint64>& needInsertFds,        //
+                                const QHash<qint64, QString>& newFd2Pth,  //
+                                int& insertCnt) {
+  auto db = GetDb();
+  insertCnt = 0;
+  if (needInsertFds.isEmpty()) {
+    return FD_OK;
+  }
+  QSqlQuery query{db};
+  if (!query.prepare(INSERT_MOVIE_RECORD_TEMPLATE.arg(tableName))) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+
+  if (!db.transaction()) {
+    qWarning("start the %dth transaction failed: %s",  //
+             1, qPrintable(db.lastError().text()));
+    return FD_TRANSACTION_FAILED;
+  }
+
+  int count = 0;
+  int lastSlashIndex{-1};
+  QString absFilePath, prePathLeft, prePathRight, vidName;
+  for (const qint64& fdVal : needInsertFds) {
+    absFilePath = newFd2Pth[fdVal];
+    lastSlashIndex = PATHTOOL::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
+    vidName = absFilePath.mid(lastSlashIndex + 1);
+
+    // 绑定参数
+    query.bindValue(INSERT_FIELD_Fd, fdVal);
+    query.bindValue(INSERT_FIELD_PrePathLeft, prePathLeft);
+    query.bindValue(INSERT_FIELD_PrePathRight, prePathRight);
+    query.bindValue(INSERT_FIELD_Name, vidName);
+    query.bindValue(INSERT_FIELD_Size, QFile{absFilePath}.size());
+    query.bindValue(INSERT_FIELD_PathHash, JsonFileHelper::CalcFileHash(absFilePath));
+
+    if (!query.exec()) {
+      db.rollback();
+      qWarning("replace[%s] failed: %s",  //
+               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      return FD_EXEC_FAILED;
+    }
+
+    count++;
+    // 分批提交
+    if (count % MAX_BATCH_SIZE == 0) {
+      if (!db.commit()) {
+        db.rollback();
+        qWarning("commit the %dth batch record(s) failed: %s",  //
+                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+        return FD_COMMIT_FAILED;
+      }
+      if (!db.transaction()) {
+        qWarning("start the %dth transaction failed: %s",  //
+                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+        return FD_TRANSACTION_FAILED;
+      }
+    }
+  }
+
+  // 提交剩余记录
+  if (!db.commit()) {
+    db.rollback();
+    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    return FD_COMMIT_FAILED;
+  }
+  query.finish();
+  insertCnt = needInsertFds.size();
+  qDebug("%d record(s) to be inserted...", insertCnt);
+  return FD_OK;
+}
+
+FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& needDeleteFds, int& deleteCnt) {
+  auto db = GetDb();
+  deleteCnt = 0;
+  if (needDeleteFds.isEmpty()) {
+    return FD_OK;
+  }
+  const QString& placeholders = GetDeleteInPlaceholders(needDeleteFds.size());
+  const QString qryCmd = QString{R"(DELETE FROM %1 WHERE `%2` IN (%3);)"}
+                             .arg(tableName)                  //
+                             .arg(VOLUME_ENUM_TO_STRING(Fd))  //
+                             .arg(placeholders);
+  QSqlQuery query{db};
+  if (!query.prepare(qryCmd)) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+
+  for (const qint64& fdVal : needDeleteFds) {
+    query.addBindValue(fdVal);
+  }
+
+  if (!query.exec()) {
+    db.rollback();
+    qWarning("delete[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_INVALID;
+  }
+  query.finish();
+  deleteCnt = needDeleteFds.size();
+  qDebug("%d record(s) to be deleted...", deleteCnt);
+  return FD_OK;
+}
+
+FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& needUpdateFds, const QHash<qint64, QString>& newFd2Pth, int& updateCnt) {
+  auto db = GetDb();
+  updateCnt = 0;
+  if (needUpdateFds.isEmpty()) {
+    return FD_OK;
+  }
+  QSqlQuery query{db};
+  if (!query.prepare(UPDATE_PATH_TEMPLATE.arg(tableName))) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+  // 开始事务
+  if (!db.transaction()) {
+    qWarning("start the %dth transaction failed: %s",  //
+             1, qPrintable(db.lastError().text()));
+    return FD_TRANSACTION_FAILED;
+  }
+  int count = 0;
+  int lastSlashIndex{-1};
+  QString absFilePath, prePathLeft, prePathRight, vidName;
+  for (const qint64& fdVal : needUpdateFds) {
+    absFilePath = newFd2Pth[fdVal];
+    lastSlashIndex = PATHTOOL::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
+    vidName = absFilePath.mid(lastSlashIndex + 1);
+    query.bindValue(UPDATE_PATH_FILED_PrePathLeft, prePathLeft);
+    query.bindValue(UPDATE_PATH_FILED_PrePathRight, prePathRight);
+    query.bindValue(UPDATE_PATH_FILED_Name, vidName);
+    query.bindValue(UPDATE_PATH_FILED_PathHash, JsonFileHelper::CalcFileHash(absFilePath));
+    query.bindValue(UPDATE_PATH_FILED_Fd, fdVal);
+    if (!query.exec()) {
+      db.rollback();
+      qWarning("update[%s] failed: %s",  //
+               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      return FD_INVALID;
+    }
+
+    count++;
+    // 分批提交
+    if (count % MAX_BATCH_SIZE == 0) {
+      if (!db.commit()) {
+        db.rollback();
+        qWarning("commit the %dth batch record(s) failed: %s",  //
+                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+        return FD_COMMIT_FAILED;
+      }
+      if (!db.transaction()) {
+        qWarning("start the %dth transaction failed: %s",  //
+                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+        return FD_TRANSACTION_FAILED;
+      }
+    }
+  }
+
+  // 提交剩余记录
+  if (!db.commit()) {
+    db.rollback();
+    qWarning("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    return FD_COMMIT_FAILED;
+  }
+  query.finish();
+  updateCnt = needUpdateFds.size();
+  qDebug("%d record(s) to be update...", updateCnt);
+  return FD_OK;
+}
+
+// PeerPathTable
+FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, VolumeUpdateResult* pAdt) {
+  if (tableName.isEmpty()) {
+    return FD_TABLE_NAME_INVALID;
+  }
+
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return FD_DB_OPEN_FAILED;
+  }
+
+  if (!db.tables().contains(tableName)) {
+    return FD_TABLE_INEXIST;
+  }
+
+  // 1. query fd(s) from table
+  QSet<qint64> existedFds;
+  if (!QueryPK(tableName, VOLUME_ENUM_TO_STRING(Fd), existedFds)) {
+    qWarning("Qry fds(s) at table[%s] failed", qPrintable(tableName));
+    return FD_QRY_PK_FAILED;
+  }
+
+  // 2. fd->absolute file path
+  FileDescriptor fd;
+  QHash<qint64, QString> newFd2Pth;
+  QDirIterator it{peerPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
+  QString absFilePath;
+  while (it.hasNext()) {
+    it.next();
+    absFilePath = it.filePath();
+    newFd2Pth[fd.GetFileUniquedId(absFilePath)] = absFilePath;
+  }
+  const QList<qint64>& newFdLst = newFd2Pth.keys();
+  const QSet<qint64> newFds{newFdLst.cbegin(), newFdLst.cend()};
+
+  auto needInsertFds{newFds};
+  needInsertFds.subtract(existedFds);
+  auto needDeleteFds{existedFds};
+  needDeleteFds.subtract(newFds);
+  auto needUpdateFds{newFds};
+  needUpdateFds.intersect(existedFds);
+  qDebug("Fds insert:%d, delete:%d, update:%d", needInsertFds.size(), needDeleteFds.size(), needUpdateFds.size());
+
+  // 3. before insert check if at least 1 guid
+  int insertCnt{0};
+  auto ret = Insert(tableName, needInsertFds, newFd2Pth, insertCnt);
+  if (ret != FD_OK) {
+    qWarning("Insert failed errorCode:%d", ret);
+    return ret;
+  }
+  // 4. before delete check if at least 1 guid
+  int deleteCnt{0};
+  ret = Delete(tableName, needDeleteFds, deleteCnt);
+  if (ret != FD_OK) {
+    qWarning("Delete failed errorCode:%d", ret);
+    return ret;
+  }
+  // 5. before update check if at least 1 guid
+  int updateCnt{0};
+  ret = Update(tableName, needUpdateFds, newFd2Pth, updateCnt);
+  if (ret != FD_OK) {
+    qWarning("Delete failed errorCode:%d", ret);
+    return ret;
+  }
+
+  if (pAdt != nullptr) {
+    pAdt->insertCnt = insertCnt;
+    pAdt->deleteCnt = deleteCnt;
+    pAdt->updateCnt = updateCnt;
+  }
+
+  qDebug("insert:%d, delete:%d, update:%d record(s) succeed", insertCnt, deleteCnt, updateCnt);
+  return FD_OK;
+}
+
+int FdBasedDb::SetDuration(const QString& tableName) {
+  if (SKIP_GETTER_DURATION) {
+    return FD_OK;
+  }
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return FD_DB_OPEN_FAILED;
+  }
+
+  if (!db.tables().contains(tableName)) {
+    return FD_OK;  // no need set duration
+  }
+
+  QMediaInfo mi;
+  if (!mi.StartToGet()) {
+    qWarning("Video duration getter is nullptr");
+    return FD_INVALID;
+  }
+
+  // 1. start to query
+  QSqlQuery query{db};
+  query.setForwardOnly(true);
+  if (!query.exec(SELECT_DURATION_0_TEMPLATE.arg(tableName))) {
+    qWarning("Query[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_EXEC_FAILED;
+  }
+
+  QMap<qint64, int> fd2Duration;
+  QString absFilePath;
+  qint64 fdVal{0};
+  while (query.next()) {
+    absFilePath = PATHTOOL::Path3Join(query.value(QUERY_DURATION_0_FILED_PrePathLeft).toString(),   //
+                                      query.value(QUERY_DURATION_0_FILED_PrePathRight).toString(),  //
+                                      query.value(QUERY_DURATION_0_FILED_Name).toString());
+    fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toLongLong();
+    fd2Duration[fdVal] = SKIP_GETTER_DURATION ? 0 : mi.VidDurationLengthQuick(absFilePath);
+  }
+  query.clear();
+  if (fd2Duration.isEmpty()) {
+    qDebug("no duration need update at all, skip");
+    return 0;
+  }
+
+  // 2. start to update
+  if (!query.prepare(UPDATE_DURATION_0_TEMPLATE.arg(tableName))) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+
+  if (!db.transaction()) {
+    qWarning("start the %dth transaction failed: %s",  //
+             1, qPrintable(db.lastError().text()));
+    return FD_TRANSACTION_FAILED;
+  }
+
+  int count = 0;
+  for (auto it = fd2Duration.cbegin(); it != fd2Duration.cend(); ++it) {
+    query.bindValue(UPDATE_DURATION_0_FILED_Duration, it.value());
+    query.bindValue(UPDATE_DURATION_0_FILED_Fd, it.key());
+    if (!query.exec()) {
+      db.rollback();
+      qWarning("replace[%s] failed: %s",  //
+               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      return FD_EXEC_FAILED;
+    }
+
+    count++;
+    // 分批提交
+    if (count % MAX_BATCH_SIZE == 0) {
+      if (!db.commit()) {
+        db.rollback();
+        qWarning("commit the %dth batch record(s) failed: %s",  //
+                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+        return FD_COMMIT_FAILED;
+      }
+      if (!db.transaction()) {
+        qWarning("start the %dth transaction failed: %s",  //
+                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+        return FD_TRANSACTION_FAILED;
+      }
+    }
+  }
+
+  // 提交剩余记录
+  if (!db.commit()) {
+    db.rollback();
+    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    return FD_COMMIT_FAILED;
+  }
+  query.finish();
+  qDebug("%d record(s) to be update...", fd2Duration.size());
+  return fd2Duration.size();
+}
+
+struct DurStudioCastTags {
+  int Duration;
+  QString Studio;
+  QString Cast;
+  QString Tags;
+};
+
+int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) const {
+  if (CHECK_TABLE_VOLUME_ONLINE) {
+    if (!IsTableVolumeOnline(tableName)) {
+      return FD_DISK_OFFLINE;
+    }
+  }
+
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return FD_DB_OPEN_FAILED;
+  }
+
+  if (!db.tables().contains(tableName)) {
+    return FD_OK;  // no need set duration
+  }
+
+  QSqlQuery query{db};
+  if (!query.prepare(SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+  if (!query.exec()) {
+    qWarning("Query[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_EXEC_FAILED;
+  }
+
+  QMap<QString, DurStudioCastTags> pth2Info;
+  QSet<QString> pathJsonsIn;
+  QString jsonAbsFilePath;
+  QString jsonFileName;
+  QString jsonPrepath;
+  while (query.next()) {
+    jsonFileName = PATHTOOL::FileExtReplacedWithJson(query.value(EXPORT_TO_JSON_FIELD_Name).toString());  //
+    jsonPrepath = PATHTOOL::Path2Join(query.value(EXPORT_TO_JSON_FIELD_PrePathLeft).toString(),           //
+                                      query.value(EXPORT_TO_JSON_FIELD_PrePathRight).toString());         //
+    pathJsonsIn << jsonPrepath;
+    jsonAbsFilePath = PATHTOOL::Path2Join(jsonPrepath, jsonFileName);
+    pth2Info[jsonAbsFilePath] = DurStudioCastTags{query.value(EXPORT_TO_JSON_FIELD_Duration).toInt(),   //
+                                                  query.value(EXPORT_TO_JSON_FIELD_Studio).toString(),  //
+                                                  query.value(EXPORT_TO_JSON_FIELD_Cast).toString(),    //
+                                                  query.value(EXPORT_TO_JSON_FIELD_Tags).toString()};
+  }
+  query.clear();
+  if (pth2Info.isEmpty()) {
+    qDebug("No need export to json, skip");
+    return FD_OK;
+  }
+
+  QDir dir;
+  for (const QString& pth : pathJsonsIn) {
+    if (!dir.exists(pth)) {
+      qWarning("Json path[%s] not exist, adt first", qPrintable(pth));
+      return FD_JSON_PATH_NOT_EXIST;
+    }
+  }
+
+  int jsonFilesCnt = 0;
+  using namespace JsonFileHelper;
+  for (auto it = pth2Info.cbegin(); it != pth2Info.cend(); ++it) {
+    const auto& info = it.value();
+    const RET_ENUM& ansRet = InsertOrUpdateDurationStudioCastTags(it.key(),       //
+                                                                  info.Duration,  //
+                                                                  info.Studio,    //
+                                                                  info.Cast,      //
+                                                                  info.Tags);
+    if (ansRet < 0) {
+      qWarning("Export json[%s] failed, errorCode: %d", qPrintable(it.key()), ansRet);
+      continue;
+    }
+    ++jsonFilesCnt;
+  }
+
+  return jsonFilesCnt;
+}
+
+int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QString& peerPath) const {
+  if (CHECK_TABLE_VOLUME_ONLINE) {
+    if (!IsTableVolumeOnline(tableName)) {
+      return FD_DISK_OFFLINE;
+    }
+  }
+  using namespace JsonFileHelper;
+  const QMap<uint, JsonDict2Table>& fileNameHash2Dict = ReadStudioCastTagsOut(peerPath);
+  if (fileNameHash2Dict.isEmpty()) {
+    return FD_OK;
+  }
+
+  // UPDATE_STUDIO_CAST_TAGS_TEMPLATE
+
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return FD_DB_OPEN_FAILED;
+  }
+
+  if (!db.tables().contains(tableName)) {
+    return FD_OK;  // no need update studio/cast/tags
+  }
+
+  QSqlQuery query{db};
+  if (!query.prepare(UPDATE_PATH_TEMPLATE.arg(tableName))) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+  // 开始事务
+  if (!db.transaction()) {
+    qWarning("start the %dth transaction failed: %s",  //
+             1, qPrintable(db.lastError().text()));
+    return FD_TRANSACTION_FAILED;
+  }
+
+  int count{0};
+  for (auto it = fileNameHash2Dict.cbegin(); it != fileNameHash2Dict.cend(); ++it) {
+    const auto& dictInfo = it.value();
+    query.bindValue(UPDATE_STUDIO_CAST_TAGS_Studio, dictInfo.Studio);
+    query.bindValue(UPDATE_STUDIO_CAST_TAGS_Cast, dictInfo.Cast);
+    query.bindValue(UPDATE_STUDIO_CAST_TAGS_Tags, dictInfo.Tags);
+    query.bindValue(UPDATE_STUDIO_CAST_TAGS_PathHash, it.key());
+    if (!query.exec()) {
+      db.rollback();
+      qWarning("update[%s] failed: %s",  //
+               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      return FD_INVALID;
+    }
+
+    count++;
+    // 分批提交
+    if (count % MAX_BATCH_SIZE == 0) {
+      if (!db.commit()) {
+        db.rollback();
+        qWarning("commit the %dth batch record(s) failed: %s",  //
+                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+        return FD_COMMIT_FAILED;
+      }
+      if (!db.transaction()) {
+        qWarning("start the %dth transaction failed: %s",  //
+                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+        return FD_TRANSACTION_FAILED;
+      }
+    }
+  }
+
+  // 提交剩余记录
+  if (!db.commit()) {
+    db.rollback();
+    qWarning("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    return FD_COMMIT_FAILED;
+  }
+  query.finish();
+
+  return fileNameHash2Dict.size();
+}

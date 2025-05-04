@@ -314,7 +314,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     }
 
     if (jsonNeedUpdate) {
-      JsonFileHelper::MovieJsonDumper(rawJsonDict, jPath);
+      JsonFileHelper::DumpJsonDict(rawJsonDict, jPath);
       ++updatedJsonFilesCnt;
     }
     ++usefullJsonCnt;

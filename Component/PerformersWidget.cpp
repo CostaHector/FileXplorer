@@ -3,6 +3,8 @@
 #include "Actions/PerformersManagerActions.h"
 #include "Component/RatingSqlTableModel.h"
 #include "Component/Notificator.h"
+#include "Tools/FileDescriptor/FdBasedDb.h"
+#include "public/PathTool.h"
 #include "public/PublicMacro.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
@@ -11,7 +13,6 @@
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/FileDescriptor/TableFields.h"
-#include "Tools/FileDescriptor/MovieBaseDb.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -48,7 +49,7 @@ PerformersWidget::PerformersWidget(QWidget* parent)
 
   setMenuBar(g_performersManagerActions().GetMenuBar());
 
-  m_introTE = new (std::nothrow) PerformersPreviewTextBrowser{this};
+  m_introTE = new (std::nothrow) ClickableTextBrowser{this};
   CHECK_NULLPTR_RETURN_VOID(m_introTE);
   m_perfPrevDock = new (std::nothrow) QDockWidget{tr("Overview"), this};
   CHECK_NULLPTR_RETURN_VOID(m_perfPrevDock);
@@ -85,15 +86,14 @@ void PerformersWidget::subscribe() {
   });
 
   connect(g_performersManagerActions().OPEN_WITH_LOCAL_APP, &QAction::triggered, this, [this]() {
-    if (not QFile::exists(SystemPath::PEFORMERS_DATABASE)) {
-      QMessageBox::information(this, "open failed", QString("[%1] not exists. \nCreate it first").arg(SystemPath::PEFORMERS_DATABASE));
+    if (!QFile::exists(SystemPath::PEFORMERS_DATABASE)) {
+      QMessageBox::information(this, "Open failed", QString("[%1] not exists.\nCreate it first").arg(SystemPath::PEFORMERS_DATABASE));
       return;
     }
     QDesktopServices::openUrl(QUrl::fromLocalFile(SystemPath::PEFORMERS_DATABASE));
   });
 
-  connect(g_performersManagerActions().INIT_DATABASE, &QAction::triggered,  //
-          &mDb, &DbManager::CreateDatabase);
+  connect(g_performersManagerActions().INIT_DATABASE, &QAction::triggered, &mDb, &DbManager::CreateDatabase);
   connect(g_performersManagerActions().INIT_TABLE, &QAction::triggered, this, &PerformersWidget::onInitATable);
   connect(g_performersManagerActions().INSERT_INTO_TABLE, &QAction::triggered, this, &PerformersWidget::onInsertIntoTable);
   connect(g_performersManagerActions().DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DROP); });
@@ -175,22 +175,21 @@ bool PerformersWidget::onInsertIntoTable() {
 }
 
 bool PerformersWidget::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete) {
-  const QString specifiedTablePattern{'^' + DB_TABLE::PERFORMERS + '$'};
-  auto retBtn = QMessageBox::warning(this,                                                                           //
-                                     QString("Confirm %1?").arg((int)dropOrDelete),                                  //
-                                     "Drop(0)/Delete(1) [" + specifiedTablePattern + "] operation not recoverable",  //
+  auto retBtn = QMessageBox::warning(this,                                                                          //
+                                     QString("Confirm %1?").arg((int)dropOrDelete),                                 //
+                                     "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
                                      QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
   if (retBtn != QMessageBox::StandardButton::Yes) {
-    qDebug("User cancel drop/delete table[%s]", qPrintable(specifiedTablePattern));
+    qDebug("User cancel drop/delete table[%s]", qPrintable(DB_TABLE::PERFORMERS));
     return true;
   }
-  int rmvedTableCnt = mDb.RmvTable(specifiedTablePattern, dropOrDelete);
+  int rmvedTableCnt = mDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
   if (rmvedTableCnt < 0) {
     QMessageBox::warning(this, "Drop/Delete failed", "see details in log");
     return false;
   }
   m_perfDbMdl->submitAll();
-  Notificator::goodNews(QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(specifiedTablePattern),  //
+  Notificator::goodNews(QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(DB_TABLE::PERFORMERS),  //
                         QString("Drop(0)/Delete(1). %1 table removed").arg(rmvedTableCnt));
   return rmvedTableCnt >= 0;
 }
@@ -249,13 +248,13 @@ bool PerformersWidget::onLocateImageHost() {
 
 bool PerformersWidget::onChangePerformerImageHeight() {
   bool ok = false;
-  int height = QInputDialog::getInt(this, "Performer image height(px)", QString("default: %1").arg(m_performerImageHeight), m_performerImageHeight, 0, INT_MAX, 1, &ok);
-  if (not ok) {
+  int height = QInputDialog::getInt(this, "Performer image height(px)", QString::number(m_performerImageHeight), m_performerImageHeight, 0, INT_MAX, 1, &ok);
+  if (!ok) {
     return false;
   }
   m_performerImageHeight = height;
-  PreferenceSettings().setValue(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, m_performerImageHeight);
   g_performersManagerActions().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT->setToolTip(QString::number(height));
+  PreferenceSettings().setValue(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, m_performerImageHeight);
   return true;
 }
 
@@ -267,13 +266,79 @@ inline bool PerformersWidget::onSubmit() {
   return m_perfDbMdl->submitAll();
 }
 
+QString GetHtml(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
+  const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString();
+  const QString& ori = record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString();
+  const QString& imgs = record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString();
+  const QString& vids = record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString();
+  QString details = record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString();  // for display in html. don't mix toString().replace() together
+  details.replace(PerformerJsonFileHelper::IMG_VID_SEP_COMP, "<br/>");
+
+  QString vidsLinks;
+  if (!vids.isEmpty()) {
+    for (const QString& vidPath : vids.split(PerformerJsonFileHelper::IMG_VID_SEP_COMP)) {
+      vidsLinks += (ClickableTextBrowser::VID_LINK_TEMPLATE.arg(vidPath, vidPath) + "<br/>");
+    }
+  }
+
+  const QString& dirPath{imgHost + '/' + ori + '/' + name};
+  const QDir dir{dirPath};
+  const QStringList& m_imgsLst = PerformerJsonFileHelper::InitImgsList(imgs);
+  const QString& firstImgPath{m_imgsLst.isEmpty() ? "" : dir.absoluteFilePath(m_imgsLst.front())};
+  static const QString PERFORMER_HTML_TEMPLATE{
+      R"(
+<html><head></head>
+<style>
+perf{
+font-size:48px;
+font-weight: bold;
+}
+p{
+font-size:24px;
+}
+</style>
+
+<body>
+<perf>%1<a href="file:///%2\"><img width=%3 src="file:///%2" align=right hspace=12 v:shapes="Picture_x0020_2"></a></perf><br/>
+<p> Rates: %4 </p>
+<p> Aka: %5 </p>
+<p> Tags: %6 </p>
+<p> Ori: %7 </p><br/>
+<p> Vids:<br/>%8 </p><br/>
+<p> Details:<br/>%9 </p><br/>
+
+</body>
+
+</html>
+)"};
+
+  QString htmlSrc = PERFORMER_HTML_TEMPLATE                                                   //
+                        .arg(name)                                                            //
+                        .arg(firstImgPath)                                                    //
+                        .arg(imgHeight)                                                       //
+                        .arg(record.field(PERFORMER_DB_HEADER_KEY::Rate).value().toInt())     //
+                        .arg(record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString())   //
+                        .arg(record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString())  //
+                        .arg(ori)                                                             //
+                        .arg(vidsLinks)                                                       //
+                        .arg(details);
+
+  for (const QString& imgName : m_imgsLst) {
+    htmlSrc += ClickableTextBrowser::HTML_IMG_TEMPLATE  //
+                   .arg(dir.absoluteFilePath(imgName))  //
+                   .arg(imgName)                        //
+                   .arg(ClickableTextBrowser::HTML_IMG_FIXED_WIDTH);
+  }
+  return htmlSrc;
+}
+
 bool PerformersWidget::on_selectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
   if (not m_perfTv->currentIndex().isValid()) {
     m_introTE->setText("");
     return true;
   }
   const auto& record = m_perfDbMdl->record(m_perfTv->currentIndex().row());
-  m_introTE->operator()(record, m_imageHostPath, m_performerImageHeight);
+  m_introTE->setHtml(GetHtml(record, m_imageHostPath, m_performerImageHeight));
   return true;
 }
 
@@ -305,7 +370,7 @@ int PerformersWidget::onDumpAllIntoPJsonFile() {
   for (int r = 0; r < m_perfDbMdl->rowCount(); ++r) {
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::MovieJsonDumper(pJson, pJsonPath);
+    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
   qDebug("All %d record(s) dump into pjson file. succeed: %d/%d.", dumpCnt, succeedCnt, dumpCnt);
@@ -330,7 +395,7 @@ int PerformersWidget::onDumpIntoPJsonFile() {
     const int r = indr.row();
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::MovieJsonDumper(pJson, pJsonPath);
+    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
 
@@ -343,38 +408,42 @@ int PerformersWidget::onForceRefreshAllRecordsVids() {
   return 0;
 }
 
+QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query) {
+  using namespace MOVIE_TABLE;
+  static auto& dbTM = PerformersAkaManager::getIns();
+  const QString& searchCommand = dbTM.GetMovieTablePerformerSelectCommand(record);
+  if (!query.exec(searchCommand)) {
+    qWarning("Query[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return {};
+  }
+  QStringList vidPath;
+  while (query.next()) {
+    vidPath << PATHTOOL::Path3Join(query.value(VOLUME_ENUM_TO_STRING(PrePathLeft)).toString(),   //
+                                   query.value(VOLUME_ENUM_TO_STRING(PrePathRight)).toString(),  //
+                                   query.value(VOLUME_ENUM_TO_STRING(Name)).toString());
+  }
+  qDebug("%d records finded", vidPath.size());
+  return vidPath;
+};
+
 int PerformersWidget::onForceRefreshRecordsVids() {
   if (!m_perfTv->selectionModel()->hasSelection()) {
     Notificator::badNews("Nothing was selected", "Select some row to refresh");
     return 0;
   }
 
-  MovieBaseDb movieDb{SystemPath::VIDS_DATABASE, "SEARCH_MOVIE_BY_PERFORMER"};
+  FdBasedDb movieDb{SystemPath::VIDS_DATABASE, "SEARCH_MOVIE_BY_PERFORMER"};
   QSqlDatabase con = movieDb.GetDb();  // videos table
   if (!movieDb.CheckValidAndOpen(con)) {
     qWarning("Open failed:%s", qPrintable(con.lastError().text()));
     return 0;
   }
-  using namespace DB_HEADER_KEY;
-  static auto& dbTM = PerformersAkaManager::getIns();
-  static auto GetVidsListFromVidsTable = [](const QSqlRecord& record, QSqlQuery& qur) -> QStringList {
-    const QString& searchCommand = dbTM.GetMovieTablePerformerSelectCommand(record);
-    bool ret = qur.exec(searchCommand);
-    if (not ret) {
-      qDebug("Failed when[%s]", qPrintable(searchCommand));
-      return {};
-    }
-    QStringList vidPath;
-    while (qur.next()) {
-      vidPath << qur.value(VOLUME_ENUM_TO_STRING(ForSearch)).toString();
-    }
-    return vidPath;
-  };
 
-  QSqlQuery qur(con);
+  QSqlQuery qur{con};
   int recordsCnt = 0;
   int vidsCnt = 0;
-  for (auto indr : m_perfTv->selectionModel()->selectedRows()) {
+  for (const auto& indr : m_perfTv->selectionModel()->selectedRows()) {
     const int r = indr.row();
     auto record = m_perfDbMdl->record(r);
     const QStringList& vidsList = GetVidsListFromVidsTable(record, qur);
@@ -382,7 +451,7 @@ int PerformersWidget::onForceRefreshRecordsVids() {
     m_perfDbMdl->setRecord(r, record);  // update back
     vidsCnt += vidsList.size();
     if (recordsCnt == 0) {
-      m_introTE->operator()(record, m_imageHostPath, m_performerImageHeight);
+      m_introTE->setHtml(GetHtml(record, m_imageHostPath, m_performerImageHeight));
     }
     ++recordsCnt;
   }
@@ -393,7 +462,7 @@ int PerformersWidget::onForceRefreshRecordsVids() {
 
 bool PerformersWidget::onOpenRecordInFileSystem() const {
   if (!QDir(m_imageHostPath).exists()) {
-    qWarning("m_imageHostPath [%s] not exists", qPrintable(m_imageHostPath));
+    qWarning("imgHost [%s] not exists", qPrintable(m_imageHostPath));
     return false;
   }
   if (!m_perfTv->selectionModel()->hasSelection()) {
@@ -402,8 +471,10 @@ bool PerformersWidget::onOpenRecordInFileSystem() const {
   }
 
   const auto& record = m_perfDbMdl->record(m_perfTv->currentIndex().row());
-  QString folderPath =
-      QString("%1/%2/%3").arg(m_imageHostPath).arg(record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString()).arg(record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString());
+  QString folderPath = QString{"%1/%2/%3"}                                                              //
+                           .arg(m_imageHostPath)                                                        //
+                           .arg(record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString())  //
+                           .arg(record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString());
   if (m_perfTv->currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail_INDEX) {
     folderPath += QString("/%1.pjson").arg(record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString());
   }
@@ -435,12 +506,12 @@ int PerformersWidget::onDeleteRecords() {
   return succeedCnt;
 }
 
-// #define __NAME__EQ__MAIN__ 1
+//#define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
-  PerformersManagerWidget perfManaWid;
+  PerformersWidget perfManaWid;
   perfManaWid.show();
   a.exec();
   return 0;

@@ -1,11 +1,10 @@
 #ifndef PERFORMERSWIDGET_H
 #define PERFORMERSWIDGET_H
 
-#include <QCompleter>
 #include <QDialog>
 #include <QLineEdit>
-#include <QWidget>
 #include <QDialogButtonBox>
+#include <QFormLayout>
 
 class JsonPerformersListInputer : public QDialog {
   Q_OBJECT
@@ -20,15 +19,14 @@ class JsonPerformersListInputer : public QDialog {
 
   void subscribe();
 
-  QSize sizeHint() const override{
-    return QSize(600, 100);
-  }
+  QSize sizeHint() const override { return QSize(600, 100); }
 
  private:
-  QLineEdit* m_onePerf;
-  QLineEdit* m_perfsList;
-  QDialogButtonBox *buttonBox;
+  QLineEdit* m_onePerf{nullptr};
+  QLineEdit* m_perfsList{nullptr};
+  QDialogButtonBox* buttonBox{nullptr};
+  QVariantHash* p_dict{nullptr};
 
-  QVariantHash* p_dict;
+  QFormLayout* lo{nullptr};
 };
 #endif  // PERFORMERSWIDGET_H
