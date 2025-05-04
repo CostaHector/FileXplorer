@@ -3,30 +3,18 @@
 const QRegularExpression PerformerJsonFileHelper::IMG_VID_SEP_COMP("\\||\r\n|\n");
 constexpr char PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR;
 
-QString PerformerJsonFileHelper::CreatePerformerTableSQL(const QString& tableName) {
-  return QString(
-             "CREATE TABLE IF NOT EXISTS `%1`("
-             "   `%2` TEXT NOT NULL,"
-             "   `%3` INT DEFAULT %4,"
-             "   `%5` TEXT DEFAULT \"\","
-             "   `%6` TEXT DEFAULT \"\","
-             "   `%7` TEXT DEFAULT \"%8\","
-             "   `%9` TEXT DEFAULT \"\","
-             "   `%10` TEXT DEFAULT \"\","
-             "   `%11` TEXT DEFAULT \"\","
-             "    PRIMARY KEY (%2)"
-             "    );")
-      .arg(tableName)
-      .arg(PERFORMER_DB_HEADER_KEY::Name)
-      .arg(PERFORMER_DB_HEADER_KEY::Rate)
-      .arg(PERFORMER_DB_HEADER_KEY::DEFAULT_RATE)
-      .arg(PERFORMER_DB_HEADER_KEY::AKA)
-      .arg(PERFORMER_DB_HEADER_KEY::Tags)
-      .arg(PERFORMER_DB_HEADER_KEY::Orientation)
-      .arg(PERFORMER_DB_HEADER_KEY::DEFAULT_ORIENTATION)
-      .arg(PERFORMER_DB_HEADER_KEY::Vids)
-      .arg(PERFORMER_DB_HEADER_KEY::Imgs)
-      .arg(PERFORMER_DB_HEADER_KEY::Detail);
+bool PerformerJsonFileHelper::ImgHumanSorter(const QString& lhs, const QString& rhs) {
+  if (lhs.size() != rhs.size()) {
+    return lhs.size() < rhs.size();
+  }
+  return lhs < rhs;
+}
+
+QStringList PerformerJsonFileHelper::InitImgsList(const QString& imgs) {
+  QStringList imgsLst = imgs.split(IMG_VID_SEP_COMP);
+  std::sort(imgsLst.begin(), imgsLst.end(), ImgHumanSorter);
+  // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
+  return imgsLst;
 }
 
 QVariantHash PerformerJsonFileHelper::PerformerJsonJoiner(const QSqlRecord& record) {

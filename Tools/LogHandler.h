@@ -5,30 +5,20 @@
 
 class LogHandler : QObject {
  public:
-  explicit LogHandler(QObject* parent = nullptr);
+  explicit LogHandler(QObject* parent = nullptr, const QString& logPath = "");
   ~LogHandler();
-  static void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
-  static inline void ManualFlush() {
-#ifdef QT_DEBUG
-    fflush(stdout);
-#else
-    if (mLogTextStream.device() == nullptr || !mLogFile.isOpen()) {
-      return;
-    }
-    mLogTextStream.flush();
-#endif
-  }
   static bool subscribe();
+  static bool AgingLogFiles(const int AGING_FILE_ABOVE_B = 2 * 1024 * 1024, QString* pAgedLogPath = nullptr);
 
  private:
+  static void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
   static bool OpenLogFile();
   static bool OpenLogFolder();
   static void SetLogLevelError();
   static void SetLogLevelDebug();
   static void SetFlushInstantly(bool flushInstant);
-  static bool AgingLogFiles();
+  static bool ManualFlush();
 
-  static const QString LOG_ABSFILENAME_TEMPLATE;
   static QtMsgType OUTPUT_LOG_LEVEL;
   static bool mFlushLogInBufferInstantly;
   static QString mLogFolderPath;
