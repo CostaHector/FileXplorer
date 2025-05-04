@@ -5,18 +5,23 @@
 #include <QFileInfo>
 #include <QSqlDatabase>
 
-// 审计结果结构
-struct AdtResult {
-  int refound = 0;             // 从AGED表恢复的记录数
-  int exist_and_same = 0;      // 存在且路径相同的记录
-  int exist_and_not_same = 0;  // 存在但路径不同的记录
-  int insert = 0;              // 新插入的记录
-  int aged = 0;                // 标记为过期的记录
+struct VolumeUpdateResult {
+  void Init() {
+    deleteCnt = 0;
+    insertCnt = 0;
+    updateCnt = 0;
+  }
+  int deleteCnt;
+  int insertCnt;
+  int updateCnt;
 };
 
 enum FD_ERROR_CODE {
-  FD_NOT_DIR = -1000,
+  FD_DISK_OFFLINE = -1000,
+  FD_NOT_DIR,
+  FD_NOT_INITED,
   FD_TABLE_NAME_INVALID,
+  FD_TABLE_INEXIST,
   FD_FIELD_VALUE_INVALID,
   FD_DB_INVALID,
   FD_DB_OPEN_FAILED,
@@ -26,10 +31,14 @@ enum FD_ERROR_CODE {
   FD_REPLACE_INTO_FAILED,
   FD_EXEC_FAILED,
   FD_COMMIT_FAILED,
+  FD_QRY_PK_FAILED,
+  FD_JSON_PATH_NOT_EXIST,
   FD_INVALID,
   FD_SKIP,
   FD_OK = 0,
 };
+
+// DROP DATABASE `DB_NAME`;
 
 class DbManager : public QObject {
  public:
@@ -44,7 +53,7 @@ class DbManager : public QObject {
 
   bool CreateDatabase();
   bool CreateTable(const QString& tableName, const QString& tableDefinitionTemplate);
-  int RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dropOrDelete);
+  int RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dropOrDelete, bool isFullMatch = true);
   int DropTable(const QString& tableNameRegexPattern) {
     // Deletes the entire table along with its structure, indexes, triggers, and all associated objects.
     return RmvTable(tableNameRegexPattern, DROP_OR_DELETE::DROP);
@@ -62,34 +71,24 @@ class DbManager : public QObject {
   static const QString DELETE_TABLE_TEMPLATE;
 
   bool QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) const;
+  int UpdateForTest(const QString& qryCmd) const;
   bool QueryPK(const QString& tableName, const QString& pk, QSet<QString>& vals) const;
   bool QueryPK(const QString& tableName, const QString& pk, QSet<int>& vals) const;
+  bool QueryPK(const QString& tableName, const QString& pk, QSet<qint64>& vals) const;
 
   int CountRow(const QString& tableName, const QString& whereClause = "");
   bool IsTableEmpty(const QString& tableName) const;
-  bool DeleteByWhereClause(const QString& tableName, const QString& whereClause);
+  int DeleteByWhereClause(const QString& tableName, const QString& whereClause);
+
+  bool IsTableVolumeOnline(const QString& tableName) const;
 
  protected:
+  static QString GetDeleteInPlaceholders(int n);
   void ReleaseConnection();
   bool mIsValid{false};
   const QString mDbName;
   const QString mConnName;
   static constexpr int MAX_BATCH_SIZE = 100;  // 每100条提交一次
-};
-
-enum RECORD_STATUS{
-  NORMAL = 0,
-  NOT_FIND = 1,
-};
-
-class FdBasedDb : public DbManager {
- public:
-  FdBasedDb(const QString& dbName, const QString& connName, QObject* parent = nullptr) : DbManager{dbName, connName, parent} {}
-  int ReadADirectory(const QString& folderAbsPath, const QString& tableName);
-  AdtResult Adt(const QString& tableName, const QString& peerPath);
-  static const QString CREATE_TABLE_TEMPLATE;
-  static const QString INSERT_NAME_ORI_IMGS_TEMPLATE;
-  static QStringList VIDEOS_FILTER;
 };
 
 #endif  // DBMANAGER_H
