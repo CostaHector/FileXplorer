@@ -494,7 +494,7 @@ void FileOperationTest::test_link_a_file() {
   QCOMPARE(ret, ErrorCode::OK);
 
   QVERIFY(QDir(ROOT_DIR).exists("a.txt"));
-  QVERIFY(QDir(SystemPath::starredPath).exists("a.txt.lnk"));
+  QVERIFY(QDir(SystemPath::STARRED_PATH).exists("a.txt.lnk"));
   QVERIFY(not aBatch.isEmpty());
 
   BATCH_COMMAND_LIST_TYPE srcCommand;
@@ -503,7 +503,7 @@ void FileOperationTest::test_link_a_file() {
   const auto recoverRet = exeRetEle.ret;
   QCOMPARE(recoverRet, 0);
   QVERIFY(QDir(ROOT_DIR).exists("a.txt"));
-  QVERIFY(not QDir(SystemPath::starredPath).exists("a.txt.lnk"));
+  QVERIFY(not QDir(SystemPath::STARRED_PATH).exists("a.txt.lnk"));
 }
 
 void FileOperationTest::test_link_a_relative_file() {
@@ -516,7 +516,7 @@ void FileOperationTest::test_link_a_relative_file() {
   QCOMPARE(ret, ErrorCode::OK);
 
   QVERIFY(QDir(ROOT_DIR).exists("a/a1.txt"));
-  QVERIFY(QDir(SystemPath::starredPath).exists("a/a1.txt.lnk"));
+  QVERIFY(QDir(SystemPath::STARRED_PATH).exists("a/a1.txt.lnk"));
   QVERIFY(not aBatch.isEmpty());
 
   BATCH_COMMAND_LIST_TYPE srcCommand;
@@ -525,7 +525,7 @@ void FileOperationTest::test_link_a_relative_file() {
   const auto recoverRet = exeRetEle.ret;
   QCOMPARE(recoverRet, 0);
   QVERIFY(QDir(ROOT_DIR).exists("a/a1.txt"));
-  QVERIFY(not QDir(SystemPath::starredPath).exists("a/a1.txt.lnk"));
+  QVERIFY(not QDir(SystemPath::STARRED_PATH).exists("a/a1.txt.lnk"));
 }
 
 void FileOperationTest::test_rename_a_txt_To_A_TXT_Not_Exists() {

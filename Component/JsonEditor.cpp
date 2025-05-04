@@ -1,9 +1,12 @@
 #include "JsonEditor.h"
 
 #include "Actions/JsonEditorActions.h"
-#include "Component/NotificatorFrame.h"
-#include "public/MemoryKey.h"
+#include "Component/Notificator.h"
 
+#include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
+
+#include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/ProductionStudioManager.h"
 #include "Tools/JsonFileHelper.h"
 #include "Tools/NameTool.h"
@@ -25,29 +28,29 @@ const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 
 JsonEditor::JsonEditor(QWidget* parent)
     : QMainWindow{parent},
-      m_jsonFormLo(new QFormLayout),
-      m_jsonFormWid(new QWidget(this)),
+      m_jsonFormLo{new QFormLayout},
+      m_jsonFormWid{new QWidget(this)},
 
       m_jsonModel{new JsonModel{this}},
       m_jsonList(new JsonListView{m_jsonModel, this}),
 
-      m_menuBar(g_jsonEditorActions().GetJsonMenuBar(this)),
-      m_toolBar(g_jsonEditorActions().GetJsonToolBar(this)),
-      m_splitter(new QSplitter(Qt::Orientation::Horizontal, this)) {
+      m_menuBar{g_jsonEditorActions().GetJsonMenuBar(this)},
+      m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
+      m_splitter{new (std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
   setMenuBar(m_menuBar);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
-  mName = new LineEditStr{JSONKey::Name, "", this};
-  mPerfsCsv = new LineEditCSV{JSONKey::Performers, "", this};  // comma seperated
-  mStudio = new LineEditStr{JSONKey::Studio, "", this};
-  mUploaded = new LineEditStr{JSONKey::Uploaded, "", this};
-  mTagsCsv = new LineEditCSV{JSONKey::Tags, "", this};  // comma seperated
-  mRateInt = new LineEditInt{JSONKey::Rate, "", this};  // int
-  mSize = new LineEditStr{JSONKey::Size, "", this};
-  mResolution = new LineEditStr{JSONKey::Resolution, "", this};
-  mBitrate = new LineEditStr{JSONKey::Bitrate, "", this};
-  mHot = new LineEditCSV{JSONKey::Hot, "", this};              // QList<QVariant>
-  mDetail = new TextEditMultiLine{JSONKey::Detail, "", this};  // multi-line
+  mName = new LineEditStr{JSON_KEY::NameS, "", this};
+  mPerfsCsv = new LineEditCSV{JSON_KEY::PerformersS, "", this};  // comma seperated
+  mStudio = new LineEditStr{JSON_KEY::StudioS, "", this};
+  mUploaded = new LineEditStr{JSON_KEY::UploadedS, "", this};
+  mTagsCsv = new LineEditCSV{JSON_KEY::TagsS, "", this};  // comma seperated
+  mRateInt = new LineEditInt{JSON_KEY::RateS, "", this};  // int
+  mSize = new LineEditStr{JSON_KEY::SizeS, "", this};
+  mResolution = new LineEditStr{JSON_KEY::ResolutionS, "", this};
+  mBitrate = new LineEditStr{JSON_KEY::BitrateS, "", this};
+  mHot = new LineEditCSV{JSON_KEY::HotS, "", this};              // QList<QVariant>
+  mDetail = new TextEditMultiLine{JSON_KEY::DetailS, "", this};  // multi-line
 
   m_jsonFormLo->addRow(mName->GetFormName(), mName);
   m_jsonFormLo->addRow(mPerfsCsv->GetFormName(), mPerfsCsv);
@@ -90,21 +93,21 @@ void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
   const int rowIdx = curIndex.row();
   const QString& jAbsPth = m_jsonList->filePath(rowIdx);
   const QVariantHash& jsonDict = JsonFileHelper::MovieJsonLoader(jAbsPth);
-  const int newCnt = jsonDict[DB_HEADER_KEY::Performers].toStringList().size();
+  const int newCnt = jsonDict[JSON_KEY::PerformersS].toStringList().size();
   m_jsonModel->updatePerfCount(rowIdx, newCnt);
   qDebug("Now json[%s] perfs cnt:%d", qPrintable(jAbsPth), newCnt);
 
-  mName->setText(jsonDict[JSONKey::Name].toString());
-  mPerfsCsv->ReadFromStringList(jsonDict[JSONKey::Performers].toStringList());
-  mStudio->setText(jsonDict[JSONKey::Studio].toString());
-  mUploaded->setText(jsonDict[JSONKey::Uploaded].toString());
-  mTagsCsv->ReadFromStringList(jsonDict[JSONKey::Tags].toStringList());
-  mRateInt->ReadFromInt(jsonDict[JSONKey::Rate].toInt());
-  mSize->setText(jsonDict[JSONKey::Size].toString());
-  mResolution->setText(jsonDict[JSONKey::Resolution].toString());
-  mBitrate->setText(jsonDict[JSONKey::Bitrate].toString());
-  mHot->ReadFromVariantList(jsonDict[JSONKey::Hot].toList());
-  mDetail->setText(jsonDict[JSONKey::Detail].toString());
+  mName->setText(jsonDict[JSON_KEY::NameS].toString());
+  mPerfsCsv->ReadFromStringList(jsonDict[JSON_KEY::PerformersS].toStringList());
+  mStudio->setText(jsonDict[JSON_KEY::StudioS].toString());
+  mUploaded->setText(jsonDict[JSON_KEY::UploadedS].toString());
+  mTagsCsv->ReadFromStringList(jsonDict[JSON_KEY::TagsS].toStringList());
+  mRateInt->ReadFromInt(jsonDict[JSON_KEY::RateS].toInt());
+  mSize->setText(jsonDict[JSON_KEY::SizeS].toString());
+  mResolution->setText(jsonDict[JSON_KEY::ResolutionS].toString());
+  mBitrate->setText(jsonDict[JSON_KEY::BitrateS].toString());
+  mHot->ReadFromVariantList(jsonDict[JSON_KEY::HotS].toList());
+  mDetail->setText(jsonDict[JSON_KEY::DetailS].toString());
   // todo: user determine save or not
   m_jsonFormLo->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
@@ -140,7 +143,7 @@ int JsonEditor::operator()(const QString& folderPath) {
     loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
   }
   QFileInfo loadFromFi(loadFromPath);
-  if (not loadFromFi.isDir()) {
+  if (!loadFromFi.isDir()) {
     QMessageBox::warning(this, "Failed when Load json from a folder", QString("Not a folder:\n%1").arg(folderPath));
     qWarning("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(folderPath));
     return 0;
@@ -173,7 +176,7 @@ bool JsonEditor::onStageChanges() {
   dict[mDetail->GetFormName()] = mDetail->toPlainText();
 
   const QString& curJsonPath = m_jsonList->filePath(curRow);
-  return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
+  return JsonFileHelper::DumpJsonDict(dict, curJsonPath);
 }
 
 bool JsonEditor::onSaveAndNextUnfinishedItem() {
@@ -336,7 +339,7 @@ int JsonEditor::load(const QString& path) {
   return deltaFile;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 

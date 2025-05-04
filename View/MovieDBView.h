@@ -4,29 +4,21 @@
 #include "Component/DatabaseSearchToolBar.h"
 #include "Component/MovieDatabaseMenu.h"
 #include "Component/QuickWhereClause.h"
-#include "Model/MyQSqlTableModel.h"
-#include "View/CustomTableView.h"
 
-#include <QComboBox>
-#include <QInputDialog>
-#include <QKeyEvent>
-#include <QLayout>
-#include <QMessageBox>
-#include <QTableView>
+#include "Tools/FileDescriptor/FdBasedDb.h"
+#include "Model/FdBasedDbModel.h"
+#include "View/CustomTableView.h"
 
 class MovieDBView : public CustomTableView {
  public:
-  MovieDBView(DatabaseSearchToolBar* dbSearchBar, MyQSqlTableModel* dbModel, QWidget* parent = nullptr);
+  MovieDBView(FdBasedDbModel* model_,            //
+              DatabaseSearchToolBar* dbSearchBar,  //
+              FdBasedDb& movieDb_,               //
+              QWidget* parent = nullptr);
 
   void subscribe();
-  auto on_PlayVideo() const -> bool;
 
-  auto keyPressEvent(QKeyEvent* e) -> void override { QTableView::keyPressEvent(e); }
-
-  bool onSearchDataBase(const QString& searchText) {
-    _dbModel->setFilter(searchText);
-    return true;
-  }
+  bool onSearchDataBase();
 
   bool InitMoviesTables();
   bool setCurrentMovieTable(const QString& movieTableName);
@@ -36,10 +28,7 @@ class MovieDBView : public CustomTableView {
   bool onInitDataBase();
   void onCreateATable();
   bool onDropATable();
-  bool onDeleteFromTable(const QString& clause = "");
-
-  bool on_DeleteByDrive();
-  bool on_DeleteByPrepath();
+  bool onDeleteFromTable();
 
   bool onInsertIntoTable();
 
@@ -47,19 +36,23 @@ class MovieDBView : public CustomTableView {
 
   int onCountRow();
 
-  QString getMovieTableName() const { return m_movieTableName; }
-
+  QString getMovieTableName() const {
+    if (_tablesDropDownList == nullptr) {
+      qWarning("_tablesDropDownList is nullptr");
+      return "";
+    }
+    return _tablesDropDownList->CurrentTableName();
+  }
+  // should not call ~destructure after getDb() and pass to QSqlTableModel
  private:
-  MyQSqlTableModel* _dbModel;
-  MovieDatabaseMenu* m_movieMenu;
-  DatabaseSearchToolBar* _dbSearchBar;
-  QComboBox* _tables;
-  QLineEdit* _searchLE;
-  QComboBox* _searchCB;
+  FdBasedDbModel* _dbModel{nullptr};
+  MovieDatabaseMenu* m_movieMenu{nullptr};
+  Guid2RootPathComboxBox* _tablesDropDownList{nullptr};
+  QLineEdit* _searchWhereLineEdit{nullptr};
+  QComboBox* _searchCB{nullptr};
 
-  QuickWhereClause* m_quickWhereClause;
-
-  QString m_movieTableName;
+  QuickWhereClause* m_quickWhereClause{nullptr};
+  FdBasedDb& mDb;
 };
 
 #endif  // MOVIEDBVIEW_H

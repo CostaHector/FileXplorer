@@ -37,7 +37,7 @@ class PerformersManagerActions : public QObject {
   QAction* DELETE_RECORDS;
   QActionGroup* VERTICAL_HEADER_AGS;
 
-  QAction* SHOW_PERFORMER_MANAGER;
+  QAction* PERFORMERS_BOOK;
 
   QMenuBar* GetMenuBar() const;
 

@@ -11,29 +11,29 @@ class MimeDataCX : public QMimeData {
  public:
   static MimeDataCX fromPlainMimeData(const QMimeData* baseMimeData);
   static QStringList Urls2QStringList(const QMimeData& mimeData);
-  static CCMMode getModeFrom(const QMimeData* native);
+  static CCMMode::Mode getModeFrom(const QMimeData* native);
 
   MimeDataCX(const MimeDataCX& rhs) noexcept;
   
-  MimeDataCX(const QString& l_, const QStringList& lRels_, const CCMMode cutCopy_ = CCMMode::ERROR_OP)
+  MimeDataCX(const QString& l_, const QStringList& lRels_, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP)
       : QMimeData(), l(l_), lRels(lRels_), m_cutCopy(cutCopy_) {
     refillBaseMode(m_cutCopy);
   }
   
-  MimeDataCX(const std::pair<QString, QStringList>& lAndRels, const CCMMode cutCopy_ = CCMMode::ERROR_OP)
+  MimeDataCX(const std::pair<QString, QStringList>& lAndRels, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP)
       : MimeDataCX(lAndRels.first, lAndRels.second, cutCopy_) {}
   
-  MimeDataCX(const QStringList& lAbsPathList, const CCMMode cutCopy_ = CCMMode::ERROR_OP) : MimeDataCX(PATHTOOL::GetLAndRels(lAbsPathList), cutCopy_) {}
+  MimeDataCX(const QStringList& lAbsPathList, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP) : MimeDataCX(PATHTOOL::GetLAndRels(lAbsPathList), cutCopy_) {}
   
-  MimeDataCX(const QMimeData& parent, const CCMMode cutCopy_ = CCMMode::ERROR_OP);
+  MimeDataCX(const QMimeData& parent, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP);
 
-  void determineMode(const CCMMode newMode) { m_cutCopy = newMode; }
-  bool refillBaseMode(const CCMMode mode);
+  void determineMode(const CCMMode::Mode newMode) { m_cutCopy = newMode; }
+  bool refillBaseMode(const CCMMode::Mode mode);
 
  public:
   const QString l;
   const QStringList lRels;
-  CCMMode m_cutCopy;
+  CCMMode::Mode m_cutCopy;
 };
 
 #endif  // MIMEDATACX_H
