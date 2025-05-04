@@ -1,14 +1,10 @@
 #include "SceneMixed.h"
 #include "public/PathTool.h"
 #include "Tools/ItemsPileCategory.h"
+#include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 
 using namespace ItemsPileCategory;
-
-void ImagesNameSort(QStringList& imgs) {
-  static const auto IMG_SORTER = [](const QString& lhs, const QString& rhs) -> bool { return lhs.size() < rhs.size() || (lhs.size() == rhs.size() && lhs < rhs); };
-  std::sort(imgs.begin(), imgs.end(), IMG_SORTER);
-}
 
 void SetElementIndexFirstIfValueFirst(QStringList& lst) {
   if (lst.size() < 2) {

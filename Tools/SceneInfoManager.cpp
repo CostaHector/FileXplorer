@@ -6,6 +6,8 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
+#include <QTextStream>
+#include <QDateTime>
 
 QString SCENE_INFO::GetFirstKImagesLabel(const QString& rootPath, const int k) const {
   static const QString IMAGE_LABEL_TEMPLATE = R"(<img alt="%1" height="360" src="%1"/>)";
@@ -312,7 +314,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     }
 
     if (jsonNeedUpdate) {
-      JsonFileHelper::MovieJsonDumper(rawJsonDict, jPath);
+      JsonFileHelper::DumpJsonDict(rawJsonDict, jPath);
       ++updatedJsonFilesCnt;
     }
     ++usefullJsonCnt;

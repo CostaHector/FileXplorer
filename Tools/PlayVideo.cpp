@@ -26,7 +26,7 @@ bool on_ShiftEnterPlayVideo(const QString& path) {
     qWarning("path[%s] not exist skip play", qPrintable(path));
     return false;
   }
-  QFileInfo fi(path);
+  const QFileInfo fi(path);
   if (fi.isDir()) {
     return PlayADir(path);
   }
