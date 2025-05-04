@@ -17,33 +17,27 @@ class JsonFileHelperTest : public MyTestSuite {
  private slots:
   void test_GetMovieFileJsonDict() {
     auto dict = GetJsonDictByMovieFile("C:/A/B.mp4", "A,B, and C", "Henri Cavill");
-    foreach (const QString& key, JSONKey::JsonKeyListOrder) {
-      QVERIFY(dict.contains(key));
-    }
     const QStringList expectPerfs{"A", "B", "C"};
-    QCOMPARE(dict[JSONKey::Name].toString(), "B");
-    QCOMPARE(dict[JSONKey::Performers].toStringList(), expectPerfs);
-    QCOMPARE(dict[JSONKey::Studio].toString(), "Henri Cavill");
-    QVERIFY(dict[JSONKey::Tags].toStringList().isEmpty());
-    QCOMPARE(dict[JSONKey::Rate].toInt(), -1);
-    QCOMPARE(dict[JSONKey::Size].toString(), "0'0'0'0");
-    QVERIFY(dict[JSONKey::Hot].toList().isEmpty());
-    QVERIFY(dict[JSONKey::Detail].toString().isEmpty());
+    QCOMPARE(dict[JSON_KEY::NameS].toString(), "B");
+    QCOMPARE(dict[JSON_KEY::PerformersS].toStringList(), expectPerfs);
+    QCOMPARE(dict[JSON_KEY::StudioS].toString(), "Henri Cavill");
+    QVERIFY(dict[JSON_KEY::TagsS].toStringList().isEmpty());
+    QCOMPARE(dict[JSON_KEY::RateS].toInt(), -1);
+    QCOMPARE(dict[JSON_KEY::SizeS].toString(), "0'0'0'0");
+    QVERIFY(dict[JSON_KEY::HotS].toList().isEmpty());
+    QVERIFY(dict[JSON_KEY::DetailS].toString().isEmpty());
   }
 
   void test_GetDefaultJsonFile() {
     auto dict = GetJsonDictDefault();
-    foreach (const QString& key, JSONKey::JsonKeyListOrder) {
-      QVERIFY(dict.contains(key));
-    }
-    QVERIFY(dict[JSONKey::Name].toString().isEmpty());
-    QVERIFY(dict[JSONKey::Performers].toStringList().isEmpty());
-    QVERIFY(dict[JSONKey::Studio].toString().isEmpty());
-    QVERIFY(dict[JSONKey::Tags].toStringList().isEmpty());
-    QCOMPARE(dict[JSONKey::Rate].toInt(), -1);
-    QCOMPARE(dict[JSONKey::Size].toString(), "0'0'0'0");
-    QVERIFY(dict[JSONKey::Hot].toList().isEmpty());
-    QVERIFY(dict[JSONKey::Detail].toString().isEmpty());
+    QVERIFY(dict[JSON_KEY::NameS].toString().isEmpty());
+    QVERIFY(dict[JSON_KEY::PerformersS].toStringList().isEmpty());
+    QVERIFY(dict[JSON_KEY::StudioS].toString().isEmpty());
+    QVERIFY(dict[JSON_KEY::TagsS].toStringList().isEmpty());
+    QCOMPARE(dict[JSON_KEY::RateS].toInt(), -1);
+    QCOMPARE(dict[JSON_KEY::SizeS].toString(), "0'0'0'0");
+    QVERIFY(dict[JSON_KEY::HotS].toList().isEmpty());
+    QVERIFY(dict[JSON_KEY::DetailS].toString().isEmpty());
   }
 
   void test_JsonStr2Dict() {
@@ -60,34 +54,34 @@ class JsonFileHelperTest : public MyTestSuite {
     const char jsonStrArray[] = R"({"ProductionStudio": ["Chris Hemsworth Studio", "Keanu Reeves Studio"]})";
     const QStringList expectSl{"Chris Hemsworth Studio", "Keanu Reeves Studio"};
     const QVariantHash dict = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(dict.contains(JSONKey::Studio));
-    QCOMPARE(dict[JSONKey::Studio].toStringList(), expectSl);
+    QVERIFY(dict.contains(JSON_KEY::StudioS));
+    QCOMPARE(dict[JSON_KEY::StudioS].toStringList(), expectSl);
   }
 
   void test_ClearPerformerAndStudio_ok() {
     const char jsonStrArray[] = R"({"Performers": ["Chris Hemsworth Studio", "Keanu Reeves Studio"], "Name": "Marvel Film"})";
     QVariantHash dictWithPerfAndStudio = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(dictWithPerfAndStudio.contains(JSONKey::Performers));
-    QVERIFY(!dictWithPerfAndStudio.contains(JSONKey::Studio));
-    QVERIFY(!dictWithPerfAndStudio[JSONKey::Performers].toStringList().isEmpty());
+    QVERIFY(dictWithPerfAndStudio.contains(JSON_KEY::PerformersS));
+    QVERIFY(!dictWithPerfAndStudio.contains(JSON_KEY::StudioS));
+    QVERIFY(!dictWithPerfAndStudio[JSON_KEY::PerformersS].toStringList().isEmpty());
     VariantHashHelper::ClearPerformerAndStudio cps;
     QVERIFY(cps(dictWithPerfAndStudio));  // has cleared
-    QVERIFY(dictWithPerfAndStudio.contains(JSONKey::Performers));
-    QVERIFY(!dictWithPerfAndStudio.contains(JSONKey::Studio));
-    QVERIFY(dictWithPerfAndStudio[JSONKey::Performers].toStringList().isEmpty());
+    QVERIFY(dictWithPerfAndStudio.contains(JSON_KEY::PerformersS));
+    QVERIFY(!dictWithPerfAndStudio.contains(JSON_KEY::StudioS));
+    QVERIFY(dictWithPerfAndStudio[JSON_KEY::PerformersS].toStringList().isEmpty());
   }
 
   void test_ClearPerformerAndStudio_skip_keyNotExist() {
     const char jsonStrArray[] = R"({"Name": "Chris Hemsworth life story"})";
     QVariantHash dictWithOnlyName = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(dictWithOnlyName.contains(JSONKey::Name));
-    QVERIFY(!dictWithOnlyName.contains(JSONKey::Performers));
-    QVERIFY(!dictWithOnlyName.contains(JSONKey::Studio));
+    QVERIFY(dictWithOnlyName.contains(JSON_KEY::NameS));
+    QVERIFY(!dictWithOnlyName.contains(JSON_KEY::PerformersS));
+    QVERIFY(!dictWithOnlyName.contains(JSON_KEY::StudioS));
     VariantHashHelper::ClearPerformerAndStudio cps;
     QVERIFY(!cps(dictWithOnlyName));  // has cleared
-    QVERIFY(dictWithOnlyName.contains(JSONKey::Name));
-    QVERIFY(!dictWithOnlyName.contains(JSONKey::Performers));
-    QVERIFY(!dictWithOnlyName.contains(JSONKey::Studio));
+    QVERIFY(dictWithOnlyName.contains(JSON_KEY::NameS));
+    QVERIFY(!dictWithOnlyName.contains(JSON_KEY::PerformersS));
+    QVERIFY(!dictWithOnlyName.contains(JSON_KEY::StudioS));
   }
 
   void test_InsertPerfsPairToDictByNameHint_skip_perfsPair_alreadyExist() {
@@ -96,7 +90,7 @@ class JsonFileHelperTest : public MyTestSuite {
     QVariantHash dictWithPerfs = DeserializedJsonStr2Dict(jsonStrArray);
     VariantHashHelper::InsertPerfsPairToDictByNameHint ipdnh;
     QVERIFY(!ipdnh(dictWithPerfs));
-    auto perfIt = dictWithPerfs.find(JSONKey::Performers);
+    auto perfIt = dictWithPerfs.find(JSON_KEY::PerformersS);
     QVERIFY(perfIt != dictWithPerfs.end());
     QCOMPARE(perfIt.value().toStringList(), expectSl);
   }
@@ -107,7 +101,7 @@ class JsonFileHelperTest : public MyTestSuite {
     QVariantHash dictWithPerfs = DeserializedJsonStr2Dict(jsonStrArray);
     VariantHashHelper::InsertPerfsPairToDictByNameHint ipdnh;
     QVERIFY(ipdnh(dictWithPerfs));
-    auto perfIt = dictWithPerfs.find(JSONKey::Performers);
+    auto perfIt = dictWithPerfs.find(JSON_KEY::PerformersS);
     QVERIFY(perfIt != dictWithPerfs.end());
     QCOMPARE(perfIt.value().toStringList(), expectEmptySl);
   }
@@ -118,9 +112,9 @@ class JsonFileHelperTest : public MyTestSuite {
     const char jsonStrArray[] = R"({"Performers":["A", "E"]})";
     QVariantHash dictPerfs = DeserializedJsonStr2Dict(jsonStrArray);
     const QStringList alreadyExistPerfs{"A", "E"};
-    QCOMPARE(dictPerfs[JSONKey::Performers], alreadyExistPerfs);
+    QCOMPARE(dictPerfs[JSON_KEY::PerformersS], alreadyExistPerfs);
     QVERIFY(apd(dictPerfs));  // B C D inserted ok, A E already exist
-    auto perfIt = dictPerfs.find(JSONKey::Performers);
+    auto perfIt = dictPerfs.find(JSON_KEY::PerformersS);
     QVERIFY(perfIt != dictPerfs.end());
     const QStringList afterInsertedPerfs{"A", "B", "C", "D", "E"};
     QCOMPARE(perfIt.value().toStringList(), afterInsertedPerfs);
@@ -132,9 +126,9 @@ class JsonFileHelperTest : public MyTestSuite {
     const char jsonStrArray[] = R"({"Performers":["A", "E"]})";
     QVariantHash dictPerfs = DeserializedJsonStr2Dict(jsonStrArray);
     const QStringList alreadyExistPerfs{"A", "E"};
-    QCOMPARE(dictPerfs[JSONKey::Performers], alreadyExistPerfs);
+    QCOMPARE(dictPerfs[JSON_KEY::PerformersS], alreadyExistPerfs);
     QVERIFY(!apd(dictPerfs));  // A E already exist, nothing inserted
-    auto perfIt = dictPerfs.find(JSONKey::Performers);
+    auto perfIt = dictPerfs.find(JSON_KEY::PerformersS);
     QVERIFY(perfIt != dictPerfs.end());
     QCOMPARE(perfIt.value().toStringList(), alreadyExistPerfs);
   }
@@ -143,10 +137,10 @@ class JsonFileHelperTest : public MyTestSuite {
     VariantHashHelper::InsertStudioPairIntoDict ispd;
     const char jsonStrArray[] = R"({"Studio":"Marvel Films"})";
     QVariantHash dict = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(dict.contains(JSONKey::Studio));
-    QCOMPARE(dict[JSONKey::Studio].toString(), "Marvel Films");
+    QVERIFY(dict.contains(JSON_KEY::StudioS));
+    QCOMPARE(dict[JSON_KEY::StudioS].toString(), "Marvel Films");
     QVERIFY(!ispd(dict));
-    auto studioIt = dict.find(JSONKey::Studio);
+    auto studioIt = dict.find(JSON_KEY::StudioS);
     QVERIFY(studioIt != dict.end());
     QCOMPARE(studioIt.value().toString(), "Marvel Films");
   }
@@ -155,9 +149,9 @@ class JsonFileHelperTest : public MyTestSuite {
     VariantHashHelper::InsertStudioPairIntoDict ispd;
     const char jsonStrArray[] = R"({"Name":""})";
     QVariantHash dict = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(!dict.contains(JSONKey::Studio));
+    QVERIFY(!dict.contains(JSON_KEY::StudioS));
     QVERIFY(ispd(dict));
-    auto studioIt = dict.find(JSONKey::Studio);
+    auto studioIt = dict.find(JSON_KEY::StudioS);
     QVERIFY(studioIt != dict.end());
     QCOMPARE(studioIt.value().toString(), "");
   }
@@ -166,20 +160,20 @@ class JsonFileHelperTest : public MyTestSuite {
     VariantHashHelper::UpdateStudio us{"Fox"};
     const char jsonStrArray[] = R"({"Name":"", "Studio": "Fox"})";
     QVariantHash dict = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(dict.contains(JSONKey::Studio));
-    QCOMPARE(dict[JSONKey::Studio].toString(), "Fox");
+    QVERIFY(dict.contains(JSON_KEY::StudioS));
+    QCOMPARE(dict[JSON_KEY::StudioS].toString(), "Fox");
     QVERIFY(!us(dict));
-    QVERIFY(dict.contains(JSONKey::Studio));
-    QCOMPARE(dict[JSONKey::Studio].toString(), "Fox");
+    QVERIFY(dict.contains(JSON_KEY::StudioS));
+    QCOMPARE(dict[JSON_KEY::StudioS].toString(), "Fox");
   }
 
   void test_UpdateStudio_studio_pair_insertOk() {
     VariantHashHelper::UpdateStudio us{"Fox"};
     const char jsonStrArray[] = R"({"Name":""})";
     QVariantHash dict = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(!dict.contains(JSONKey::Studio));
+    QVERIFY(!dict.contains(JSON_KEY::StudioS));
     QVERIFY(us(dict));
-    auto studioIt = dict.find(JSONKey::Studio);
+    auto studioIt = dict.find(JSON_KEY::StudioS);
     QVERIFY(studioIt != dict.end());
     QCOMPARE(studioIt.value().toString(), "Fox");
   }
@@ -188,10 +182,10 @@ class JsonFileHelperTest : public MyTestSuite {
     VariantHashHelper::UpdateStudio us{"Fox"};
     const char jsonStrArray[] = R"({"Name":"", "Studio": "Marvel"})";
     QVariantHash dict = DeserializedJsonStr2Dict(jsonStrArray);
-    QVERIFY(dict.contains(JSONKey::Studio));
-    QCOMPARE(dict[JSONKey::Studio].toString(), "Marvel");
+    QVERIFY(dict.contains(JSON_KEY::StudioS));
+    QCOMPARE(dict[JSON_KEY::StudioS].toString(), "Marvel");
     QVERIFY(us(dict));
-    auto studioIt = dict.find(JSONKey::Studio);
+    auto studioIt = dict.find(JSON_KEY::StudioS);
     QVERIFY(studioIt != dict.end());
     QCOMPARE(studioIt.value().toString(), "Fox");
   }
@@ -237,23 +231,23 @@ class JsonFileHelperTest : public MyTestSuite {
     };
 
     // 1. empty value json
-    QVariantHash emptyValueDict{{JSONKey::Studio, ""}, {JSONKey::Performers, ""}, {JSONKey::Tags, ""}};
+    QVariantHash emptyValueDict{{JSON_KEY::StudioS, ""}, {JSON_KEY::PerformersS, ""}, {JSON_KEY::TagsS, ""}};
     QVERIFY(DumpJsonDict(emptyValueDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     QMap<uint, JsonDict2Table> fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 2. only contains studio and tags, but not performers
-    QVariantHash notFullDict{{JSONKey::Studio, "Fox 2000"}, {JSONKey::Tags, "Happiness, Comedy"}};
+    QVariantHash notFullDict{{JSON_KEY::StudioS, "Fox 2000"}, {JSON_KEY::TagsS, "Happiness, Comedy"}};
     QVERIFY(DumpJsonDict(notFullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 3. contains studio and tags and performers
-    QVariantHash fullDict{{JSONKey::Studio, "Fox 2000"}, //
-                          {JSONKey::Performers, "Jocker, Queen"}, //
-                          {JSONKey::Tags, "Happiness, Comedy"}};
+    QVariantHash fullDict{{JSON_KEY::StudioS, "Fox 2000"}, //
+                          {JSON_KEY::PerformersS, "Jocker, Queen"}, //
+                          {JSON_KEY::TagsS, "Happiness, Comedy"}};
     QVERIFY(DumpJsonDict(fullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     fileNameHash2Json = ReadStudioCastTagsOut(rootpath);

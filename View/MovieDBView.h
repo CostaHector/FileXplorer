@@ -9,8 +9,6 @@
 #include "Model/FdBasedDbModel.h"
 #include "View/CustomTableView.h"
 
-#include <QComboBox>
-
 class MovieDBView : public CustomTableView {
  public:
   MovieDBView(FdBasedDbModel* model_,            //
