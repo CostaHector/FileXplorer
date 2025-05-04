@@ -11,11 +11,12 @@
 #include <QToolBar>
 #include <QVideoProbe>
 #include <QWidget>
+#include <QTime>
 
 #include "Component/ClickableSlider.h"
 #include "Component/JsonPerformersListInputer.h"
-#include "public/PublicVariable.h"
 
+#include "public/PublicVariable.h"
 #include "Model/VidModel.h"
 #include "View/VidsPlayListView.h"
 

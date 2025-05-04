@@ -13,11 +13,11 @@ HarTableView::HarTableView(QWidget* parent)
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   InitTableView();
 
-  mEXPORT_TO = new QAction{QIcon{":img/EXPORT_TO"}, "Export to", this};
+  mEXPORT_TO = new (std::nothrow) QAction{QIcon{":img/EXPORT_TO"}, "Export to", this};
   mEXPORT_TO->setToolTip(QString("<b>%1</b><br/> Export the selection items to local path.").arg(mEXPORT_TO->text()));
 
   mShowImagePreview = PreferenceSettings().value(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, MemoryKey::SHOW_HAR_IMAGE_PREVIEW.v).toBool();
-  mQUICK_PREVIEW = new QAction{"Quick Preview", this};
+  mQUICK_PREVIEW = new (std::nothrow) QAction{"Quick Preview", this};
   mQUICK_PREVIEW->setCheckable(true);
   mQUICK_PREVIEW->setChecked(mShowImagePreview);
 
@@ -110,7 +110,7 @@ void HarTableView::updateWindowsSize() {
   if (PreferenceSettings().contains("HAR_TABLEVIEW_GEOMETRY")) {
     restoreGeometry(PreferenceSettings().value("HAR_TABLEVIEW_GEOMETRY").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
 }
 

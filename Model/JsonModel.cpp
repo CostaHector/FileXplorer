@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include "public/PublicVariable.h"
+#include "public/PublicMacro.h"
 #include "public/MemoryKey.h"
 #include "Tools/JsonFileHelper.h"
 
@@ -10,10 +11,13 @@ JsonProperties::JsonProperties(const QString& path) : jsonPath{path}, perfsCount
 
 int JsonProperties::getPerfsCount(const QString& pth) {
   const auto& dict = JsonFileHelper::MovieJsonLoader(pth);
-  if (dict.isEmpty() || !dict.contains(DB_HEADER_KEY::Performers)) {
+  if (dict.isEmpty()) {
     return 0;
   }
-  return dict[DB_HEADER_KEY::Performers].toStringList().size();
+  if (!dict.contains(JSON_KEY::PerformersS)) {
+    return 0;
+  }
+  return dict[VOLUME_ENUM_TO_STRING(Performers)].toStringList().size();
 }
 
 JsonModel::JsonModel(QObject* parent)

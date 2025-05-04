@@ -7,14 +7,14 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QDirIterator>
-#include <QSqlError>
+#include <QTextStream>
 
 QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG) {
   if (oldAG == nullptr) {
     qCritical("oldAG is nullptr");
     return "";
   }
-  QString i_1_path = first_path;           // first and (i-1) path
+  QString i_1_path = first_path;              // first and (i-1) path
   foreach (QAction* act, oldAG->actions()) {  // i path
     QString i_path = act->text();
     if (i_path == first_path) {
@@ -49,6 +49,20 @@ QString TextReader(const QString& textPath) {
   return contents;
 }
 
+bool TextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
+  QFile fi{fileName};
+  if (!fi.open(openMode)) {
+    qWarning("Open [%s] to write failed. fill will not update.", qPrintable(fileName));
+    return false;
+  }
+  QTextStream stream(&fi);
+  stream.setCodec("UTF-8");
+  stream << content;
+  stream.flush();
+  fi.close();
+  return true;
+}
+
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
   for (int i = 0; i < lay->count(); ++i) {
     lay->itemAt(i)->setAlignment(align);
@@ -68,18 +82,6 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   }
   PreferenceSettings().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
   return dstFi.absoluteFilePath();
-}
-
-QSqlDatabase GetSqlVidsDB() {
-  if (QSqlDatabase::connectionNames().contains("DBMOVIE_CONNECT")) {
-    auto db = QSqlDatabase::database("DBMOVIE_CONNECT");
-    db.open();
-    return db;
-  }
-  auto db = QSqlDatabase::addDatabase("QSQLITE", "DBMOVIE_CONNECT");
-  db.setDatabaseName(SystemPath::VIDS_DATABASE);
-  db.open();
-  return db;
 }
 
 void LoadCNLanguagePack(QTranslator& translator) {

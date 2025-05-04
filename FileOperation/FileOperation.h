@@ -42,11 +42,11 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
 
 RETURN_TYPE linkAgent(const QStringList& parms);
 
-RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath);
+RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to = SystemPath::STARRED_PATH);
 
 RETURN_TYPE unlinkAgent(const QStringList& parms);
 
-RETURN_TYPE unlink(const QString& pre, const QString& rel, const QString& to = SystemPath::starredPath);
+RETURN_TYPE unlink(const QString& pre, const QString& rel, const QString& to = SystemPath::STARRED_PATH);
 }  // namespace FileOperation
 
 #endif  // FILEOPERATION_H
