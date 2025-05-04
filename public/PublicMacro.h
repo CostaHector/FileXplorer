@@ -13,4 +13,12 @@
     return nullptr;                           \
   }
 
+#define CHECK_NULLPTR_RETURN_FALSE(pointer)   \
+  if (pointer == nullptr) {                   \
+      qCritical("%s", #pointer " is nullptr");\
+      return false;                           \
+  }
+
+#define VOLUME_ENUM_TO_STRING(enum_val) #enum_val
+
 #endif  // PUBLICMACRO_H

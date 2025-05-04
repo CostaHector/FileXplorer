@@ -1,22 +1,31 @@
 #include "TestCase/pub/MyTestSuite.h"
 #include <QtTest/QtTest>
 
+#define RUN_UT_MAIN_FILE 1
+#ifdef RUN_UT_MAIN_FILE
+
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
-  // run suite
   auto& suite = MyTestSuite::suite();
-  const int totalTestSuiteCnt = suite.size();
-  qDebug("suite.size() = %d", totalTestSuiteCnt);
   int succeedCnt = 0;
+  int skipCnt = 0;
   for (auto it = suite.begin(); it != suite.end(); ++it) {
+    if (MyTestSuite::bOnlyExecuteExculsive && !(*it)->mExclusive) {
+      ++skipCnt;
+      continue;
+    }
     if (QTest::qExec(*it, argc, argv) == 0) {
       ++succeedCnt;
     }
   }
-  if (succeedCnt < totalTestSuiteCnt) {
-    qWarning("%d/%d testcase passed", succeedCnt, totalTestSuiteCnt);
-  } else {
-    qDebug("All %d/%d testcase passed", succeedCnt, totalTestSuiteCnt);
+  const int totalCnt = suite.size();
+  const int shouldExecCnt = totalCnt - skipCnt;
+  const int failedCnt = shouldExecCnt - succeedCnt;
+  qWarning("%d/%d testcase passed (total:%d, skipCnt:%d)", succeedCnt, shouldExecCnt, totalCnt, skipCnt);
+  if (failedCnt != 0) {
+    qCritical("ERROR: %d TEST(s) FAILED", failedCnt);
   }
-  return totalTestSuiteCnt - succeedCnt;
+  return failedCnt;
 }
+
+#endif

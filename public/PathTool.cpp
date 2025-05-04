@@ -154,6 +154,63 @@ QString PATHTOOL::GetFileNameExtRemoved(QString&& fileName) {
   return fileName.left(lastIndexOfExtDot);
 }
 
+QString PATHTOOL::FileExtReplacedWithJson(QString fileName) {
+  const int lastIndexOfExtDot = fileName.lastIndexOf('.');
+  if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
+    fileName += ".json";
+    return fileName;
+  }
+  static constexpr int JSON_EXT_SIZE = 4;
+  return fileName.replace(lastIndexOfExtDot + 1, JSON_EXT_SIZE, "json");
+}
+
+QString PATHTOOL::Path2Join(const QString& a, const QString& b) {
+  QString ans;
+  ans.reserve(a.size() + 1 + b.size());
+  if (!a.isEmpty()) {
+    ans += a;
+    ans += '/';
+  }
+  return ans += b;
+}
+
+QString PATHTOOL::Path3Join(const QString& a, const QString& b, const QString& c) {
+  QString ans;
+  ans.reserve(a.size() + 1 + b.size() + 1 + c.size());
+  if (!a.isEmpty()) {
+    ans += a;
+    ans += '/';
+  }
+  if (!b.isEmpty()) {
+    ans += b;
+    ans += '/';
+  }
+  return ans += c;
+}
+
+int PATHTOOL::GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight) {
+  outPrePathLeft.clear();
+  outPrePathRight.clear();
+  const int lastHashIndex = absPath.lastIndexOf('/');  // 找到最后一个/的位置
+  if (lastHashIndex == -1) {                           // C.mp4
+    return lastHashIndex;
+  }
+  const int secondLastHashIndex = absPath.lastIndexOf('/', lastHashIndex - 1);  // 找到倒数第二个/的位置
+  if (secondLastHashIndex == -1) {                                              // C:/C.mp4
+    outPrePathRight = absPath.left(lastHashIndex);                              // C:
+    return lastHashIndex;
+  }
+  const int thirdLastHashIndex = absPath.lastIndexOf('/', secondLastHashIndex - 1);  // 找到倒数第三个/的位置
+  if (thirdLastHashIndex == -1) {                                                    // C:/A/B.mp4
+    outPrePathRight = absPath.left(lastHashIndex);                                   // C:/A
+    return lastHashIndex;
+  }
+  // C:/A/B/C.mp4
+  outPrePathLeft = absPath.left(thirdLastHashIndex);                                              // C:
+  outPrePathRight = absPath.mid(thirdLastHashIndex + 1, lastHashIndex - thirdLastHashIndex - 1);  // A/B
+  return lastHashIndex;
+}
+
 QString PATHTOOL::join(const QString& prefix, const QString& relative) {
   if (prefix.isEmpty()) {
     return relative;

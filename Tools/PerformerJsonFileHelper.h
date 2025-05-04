@@ -35,6 +35,8 @@ const int Detail_INDEX = DB_HEADER.indexOf(Detail);
 class PerformerJsonFileHelper {
  public:
   static const QRegularExpression IMG_VID_SEP_COMP;
+  static bool ImgHumanSorter(const QString& lhs, const QString& rhs);
+  static QStringList InitImgsList(const QString& imgs);
 
   static QString GetFirstPerformerImgPath(const QString& m_imageHostPath, const QString& ori, const QString& performerName, const QString& imgs) {
     const int i = imgs.indexOf(IMG_VID_SEP_COMP);

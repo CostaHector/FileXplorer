@@ -1,5 +1,5 @@
 #include "AdvanceSearchModel.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PathTool.h"
 #include "public/MemoryKey.h"
 #include "public/PublicVariable.h"
@@ -292,8 +292,3 @@ void AdvanceSearchModel::ClearRecycle() {
   }
 }
 
-auto AdvanceSearchModel::fullInfo(const QModelIndex& curIndex) const -> QString {
-  const int row = curIndex.row();
-  const QModelIndex& par = curIndex.parent();
-  return data(index(row, 0, par)).toString() + '\t' + data(index(row, 1, par)).toString() + '\t' + data(index(row, 4, par)).toString();
-}
