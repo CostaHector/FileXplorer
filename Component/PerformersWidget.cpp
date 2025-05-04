@@ -175,22 +175,21 @@ bool PerformersWidget::onInsertIntoTable() {
 }
 
 bool PerformersWidget::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete) {
-  const QString specifiedTablePattern{'^' + DB_TABLE::PERFORMERS + '$'};
   auto retBtn = QMessageBox::warning(this,                                                                           //
                                      QString("Confirm %1?").arg((int)dropOrDelete),                                  //
-                                     "Drop(0)/Delete(1) [" + specifiedTablePattern + "] operation not recoverable",  //
+                                     "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
                                      QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
   if (retBtn != QMessageBox::StandardButton::Yes) {
-    qDebug("User cancel drop/delete table[%s]", qPrintable(specifiedTablePattern));
+    qDebug("User cancel drop/delete table[%s]", qPrintable(DB_TABLE::PERFORMERS));
     return true;
   }
-  int rmvedTableCnt = mDb.RmvTable(specifiedTablePattern, dropOrDelete);
+  int rmvedTableCnt = mDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
   if (rmvedTableCnt < 0) {
     QMessageBox::warning(this, "Drop/Delete failed", "see details in log");
     return false;
   }
   m_perfDbMdl->submitAll();
-  Notificator::goodNews(QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(specifiedTablePattern),  //
+  Notificator::goodNews(QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(DB_TABLE::PERFORMERS),  //
                         QString("Drop(0)/Delete(1). %1 table removed").arg(rmvedTableCnt));
   return rmvedTableCnt >= 0;
 }
@@ -305,7 +304,7 @@ int PerformersWidget::onDumpAllIntoPJsonFile() {
   for (int r = 0; r < m_perfDbMdl->rowCount(); ++r) {
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::MovieJsonDumper(pJson, pJsonPath);
+    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
   qDebug("All %d record(s) dump into pjson file. succeed: %d/%d.", dumpCnt, succeedCnt, dumpCnt);
@@ -330,7 +329,7 @@ int PerformersWidget::onDumpIntoPJsonFile() {
     const int r = indr.row();
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::MovieJsonDumper(pJson, pJsonPath);
+    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
 

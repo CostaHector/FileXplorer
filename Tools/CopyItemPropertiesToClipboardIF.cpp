@@ -1,5 +1,5 @@
 #include "CopyItemPropertiesToClipboardIF.h"
-#include "Model/MyQSqlTableModel.h"
+#include "Model/FdBasedDbModel.h"
 #include "ViewSelection.h"
 
 #include <QFileSystemModel>
@@ -24,7 +24,7 @@ auto CopyItemPropertiesToClipboardIF::PathCopyTriple(const QStringList& lst, con
 
 bool CopyItemPropertiesToClipboardIF::on_copySelectedItemFullPath(const QAbstractItemView* view) {
   QStringList mixed;
-  auto* sqlModel = dynamic_cast<const MyQSqlTableModel*>(view->model());
+  auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
     for (const QModelIndex ind : selectedIndexes(view)) {
       mixed.append(sqlModel->filePath(ind));
@@ -43,7 +43,7 @@ bool CopyItemPropertiesToClipboardIF::on_copySelectedItemFullPath(const QAbstrac
 auto CopyItemPropertiesToClipboardIF::on_copyFullPathFolderNameAndAppendImageSuffix(const QAbstractItemView* view)
     -> bool {
   QStringList mixed;
-  auto* sqlModel = dynamic_cast<const MyQSqlTableModel*>(view->model());
+  auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
     for (const QModelIndex ind : selectedIndexes(view)) {
       const QFileInfo dirFi = sqlModel->fileInfo(ind);
@@ -65,7 +65,7 @@ auto CopyItemPropertiesToClipboardIF::on_copyFullPathFolderNameAndAppendImageSuf
 
 auto CopyItemPropertiesToClipboardIF::on_copyDirPath(const QAbstractItemView* view) -> bool {
   QStringList mixed;
-  auto* sqlModel = dynamic_cast<const MyQSqlTableModel*>(view->model());
+  auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
     for (const QModelIndex ind : selectedIndexes(view)) {
       mixed.append(sqlModel->fileInfo(ind).absolutePath());
@@ -83,7 +83,7 @@ auto CopyItemPropertiesToClipboardIF::on_copyDirPath(const QAbstractItemView* vi
 
 auto CopyItemPropertiesToClipboardIF::on_copyName(const QAbstractItemView* view) -> bool {
   QStringList mixed;
-  auto* sqlModel = dynamic_cast<const MyQSqlTableModel*>(view->model());
+  auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
     for (const QModelIndex ind : selectedIndexes(view)) {
       mixed.append(sqlModel->fileName(ind));

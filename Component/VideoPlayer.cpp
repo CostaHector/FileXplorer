@@ -5,6 +5,7 @@
 #include "Tools/JsonFileHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
 #include "public/MemoryKey.h"
+#include "public/PathTool.h"
 #include "public/UndoRedo.h"
 
 #include <QVideoWidget>
@@ -263,7 +264,7 @@ void VideoPlayer::setUrl(const QUrl& url) {
   if (url.isLocalFile()) {
     const QString& vidsPath = url.toLocalFile();
     setWindowFilePath(vidsPath);
-    const QString& jsonPath = JsonFileHelper::GetJsonFilePath(vidsPath);
+    const QString& jsonPath = PATHTOOL::FileExtReplacedWithJson(vidsPath);
     m_dict = JsonFileHelper::MovieJsonLoader(jsonPath);
   } else {
     m_dict.clear();
@@ -299,7 +300,7 @@ QString VideoPlayer::JsonFileValidCheck(const QString& op) {
     qDebug("current item is nullptr, cannot %s", qPrintable(op));
     return {};
   }
-  const QString& jsonPath = JsonFileHelper::GetJsonFilePath(m_playListWid->currentFilePath());
+  const QString& jsonPath = PATHTOOL::FileExtReplacedWithJson(m_playListWid->currentFilePath());
   if (not QFile::exists(jsonPath)) {
     qDebug("json file[%s] not exists. cannot %s", qPrintable(jsonPath), qPrintable(op));
     return {};
@@ -361,12 +362,12 @@ void VideoPlayer::subscribe() {
 }
 
 bool VideoPlayer::onModeName() {
-  if (not m_playListWid->currentIndex().isValid()) {
+  if (!m_playListWid->currentIndex().isValid()) {
     qInfo("Skip nothing was selected to rename");
     return true;
   }
-  const QFileInfo vidFi(m_playListWid->currentFilePath());
-  const QFileInfo jsonFi(JsonFileHelper::GetJsonFilePath(vidFi.absoluteFilePath()));
+  const QFileInfo vidFi{m_playListWid->currentFilePath()};
+  const QFileInfo jsonFi{PATHTOOL::FileExtReplacedWithJson(vidFi.absoluteFilePath())};
   if (not vidFi.exists()) {
     return true;
   }
@@ -386,7 +387,7 @@ bool VideoPlayer::onModeName() {
   const QString& newFileAbsPath = vidFi.absoluteDir().absoluteFilePath(newFileName);
   const bool renameResult = QFile::rename(vidFi.absoluteFilePath(), newFileAbsPath);
 
-  if (not renameResult) {
+  if (!renameResult) {
     const QString& msg = QString("Rename [%1] -> [%2] failed").arg(vidFi.fileName()).arg(newFileName);
     qCritical("Result: %s", qPrintable(msg));
     QMessageBox::critical(this, "Rename failed", msg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
@@ -394,9 +395,9 @@ bool VideoPlayer::onModeName() {
   } else {
     // rename vid ok, rename json now if exist
     if (jsonFi.exists()) {
-      const QString& newJsonAbsPath = JsonFileHelper::GetJsonFilePath(newFileAbsPath);
+      const QString& newJsonAbsPath = PATHTOOL::FileExtReplacedWithJson(newFileAbsPath);
       const bool renameJsonResult = QFile::rename(jsonFi.absoluteFilePath(), newJsonAbsPath);
-      if (not renameJsonResult) {
+      if (!renameJsonResult) {
         const QString& msg = QString("Rename Json [%1] -> [%2] failed").arg(vidFi.fileName()).arg(newFileName);
         qCritical("Result: %s", qPrintable(msg));
         QMessageBox::critical(this, "Rename Json failed", msg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
@@ -461,7 +462,7 @@ bool VideoPlayer::onMarkHotScenes() {
 
   QList<QVariant> hotVariantList(m_hotSceneList.cbegin(), m_hotSceneList.cend());
   m_dict.insert(JSONKey::Hot, hotVariantList);
-  bool dumpRet = JsonFileHelper::MovieJsonDumper(m_dict, jsonPath);
+  bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Mark result: %d", dumpRet);
   return dumpRet;
 }
@@ -535,7 +536,7 @@ auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {
   }
   int score = checkedAction->text().back().toLatin1() - '0';
   m_dict.insert(JSONKey::Rate, score);
-  bool dumpRet = JsonFileHelper::MovieJsonDumper(m_dict, jsonPath);
+  bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Rate result: %d", dumpRet);
   return dumpRet;
 }
