@@ -44,4 +44,19 @@ enum FIELD_E {
 };
 }
 
+namespace MOVIE_TABLE {
+enum FIELD_E {
+  Fd = 0,        //
+  PrePathLeft,   //
+  PrePathRight,  //
+  Name,          //
+  Size,          //
+  Duration,      //
+  Studio,        //
+  Cast,          //
+  Tags,          //
+  PathHash,       //
+  BUTT
+};
+}
 #endif  // TABLEFIELDS_H

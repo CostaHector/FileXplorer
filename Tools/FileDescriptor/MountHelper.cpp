@@ -2,6 +2,8 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMap>
+#include <QSet>
+#include <QStorageInfo>
 #include <QProcess>
 
 #ifndef WIN32
@@ -11,13 +13,40 @@ QString findVolumeGuidByLabel(const QString& label) {
 bool isVolumeAvailable(const QString& volumeGuid) {
   return false;
 }
-bool mountVolumeToGuidPath(const QString& volumeGuid) {
+bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) {
   return false;
+}
+bool UnmountVolume(const QString& volMountPoint) {
+  return false;
+}
+QStringList GetMountPointsByVolumeName(const wchar_t* volumeName) {
+  return {};
+}
+QMap<QString, QStringList> GetVolumeName2MountPointsMap() {
+  return {};
 }
 QString resolveFilePath(const QString& relativePath, const QString& volumeGuid) {
   return "";
 }
-QMap<QString, QString> GetCurrentGuid2Label() {
+QMap<QString, QString> GetGuid2LabelMap() {
+  return {};
+}
+bool GetVolumeInfo(const QString& path, QString& volName) {
+  return false;
+}
+bool GetGuidByDrive(const QString& driveStr, QString& guid) {
+  return false;
+}
+bool IsAdministrator() {
+  return false;
+}
+bool RunAsAdmin() {
+  return false;
+}
+QString getVolumeGUIDByMountPoint(const QString& mountPath) {
+  return {};
+}
+QString FindRootByGUIDWin(const QString& targetGuid) {
   return {};
 }
 #else
@@ -25,12 +54,19 @@ QMap<QString, QString> GetCurrentGuid2Label() {
 #include <windows.h>
 #include "fileapi.h"
 
-QString ExtractGuidFromVolumeName(const wchar_t (&volumeName)[MAX_PATH]) {
+QString MountHelper::ExtractGuidFromVolumeName(const QString& volume) {
   // R"(\\?\Volume{36 chars}\)"
-  static const char VOLUME_PREFIX[] = R"(\\?\Volume{)";
-  static constexpr int START_INT = sizeof(VOLUME_PREFIX) - 1;
-  static constexpr int GUID_LEN = 36;
-  return QString::fromWCharArray(volumeName).mid(START_INT, GUID_LEN);
+  return volume.mid(START_INT, GUID_LEN);
+}
+
+QString MountHelper::ExtractGuidFromVolumeName(const wchar_t* p2volume) {
+  // R"(\\?\Volume{36 chars}\)"
+  if (p2volume == nullptr) {
+    qCritical("p2volume is nullptr");
+    return "";
+  }
+  const QString volume = QString::fromStdWString(p2volume);
+  return ExtractGuidFromVolumeName(volume);
 }
 
 // 动态获取GUID（示例：通过卷标匹配）
@@ -76,10 +112,10 @@ bool MountHelper::isVolumeAvailable(const QString& volumeGuid) {
 }
 
 bool MountHelper::RunAsAdmin() {
-  const QString& program = "path\\to\\yourapp.exe"; // 替换为你的应用程序路径
+  const QString& program = "path\\to\\yourapp.exe";  // 替换为你的应用程序路径
   QString runas{"runas"};
   QStringList cmds{"/user:administrator", QString(R"(%1)").arg(program)};
-  return QProcess::startDetached(runas, cmds); // 使用startDetached来异步启动进程
+  return QProcess::startDetached(runas, cmds);  // 使用startDetached来异步启动进程
 }
 
 bool MountHelper::IsAdministrator() {
@@ -115,12 +151,12 @@ bool MountHelper::MountVolume(const QString& volumeGuid, const QString& label, Q
   }
   //  "\\?\Volume{GUID}\"
   volMountPoint = QDir::toNativeSeparators(MOUNT_POINT_ROOT) + R"(\)";
-  const QString volumeName{QString{R"(\\?\Volume{%1}\)"}.arg(volumeGuid)};
+  const QString volumeName{VOLUME_NAME_TEMPLATE.arg(volumeGuid)};
   if (!SetVolumeMountPointW(volMountPoint.toStdWString().c_str(), volumeName.toStdWString().c_str())) {
     // #define ERROR_ACCESS_DENIED __MSABI_LONG(5)
     // #define ERROR_INVALID_NAME __MSABI_LONG(123)
     // #define ERROR_DIR_NOT_EMPTY __MSABI_LONG(145)
-    qWarning("volume Name[%s] mount on[%s], resultCode:%d", qPrintable(volumeName), qPrintable(volMountPoint), GetLastError());
+    qWarning("volume Name[%s] mount on[%s], resultCode:%lu", qPrintable(volumeName), qPrintable(volMountPoint), GetLastError());
     return false;
   }
   qDebug("volume Name[%s] mount on[%s] succeed", qPrintable(volumeName), qPrintable(volMountPoint));
@@ -129,6 +165,49 @@ bool MountHelper::MountVolume(const QString& volumeGuid, const QString& label, Q
 
 bool MountHelper::UnmountVolume(const QString& volMountPoint) {
   return DeleteVolumeMountPointA(volMountPoint.toStdString().c_str()) == true;
+}
+
+// 枚举指定卷的所有挂载点
+QSet<QString> MountHelper::GetMountPointsByVolumeName(const wchar_t* volumeName) {
+  WCHAR mountPoint[MAX_PATH] = {0};
+  HANDLE hFind = FindFirstVolumeMountPointW(volumeName, mountPoint, MAX_PATH);
+  if (hFind == INVALID_HANDLE_VALUE) {
+    if (GetLastError() == ERROR_NO_MORE_ITEMS) {
+      qDebug("no %ls find at all", volumeName);
+    }
+    return {};
+  }
+  QSet<QString> pnts;
+  do {
+    pnts << QString::fromWCharArray(mountPoint);
+  } while (FindNextVolumeMountPointW(hFind, mountPoint, MAX_PATH));
+
+  FindVolumeMountPointClose(hFind);
+  return pnts;
+}
+
+// 主调用逻辑
+QMap<QString, QSet<QString> > MountHelper::Volumes2ContainedMountPnts() {
+  WCHAR volumeName[MAX_PATH] = {0};
+  HANDLE hVol = FindFirstVolumeW(volumeName, ARRAYSIZE(volumeName));
+  QMap<QString, QSet<QString> > vol2Pnts;
+
+  do {
+    // 过滤系统保留卷
+    if (wcsstr(volumeName, L"\\\\?\\Volume") == nullptr) {
+      continue;
+    }
+    const QSet<QString>& pnts = GetMountPointsByVolumeName(volumeName);
+    size_t len = wcslen(volumeName);
+    // 转换卷名格式：去除末尾反斜杠
+    if (len > 0 && volumeName[len - 1] == L'\\') {
+      volumeName[len - 1] = L'\0';
+    }
+    vol2Pnts[QString::fromWCharArray(volumeName)] = pnts;
+  } while (FindNextVolumeW(hVol, volumeName, ARRAYSIZE(volumeName)));
+
+  FindVolumeClose(hVol);
+  return vol2Pnts;
 }
 
 QMap<QString, QString> MountHelper::GetGuid2LabelMap() {
@@ -164,14 +243,12 @@ bool MountHelper::GetVolumeInfo(const QString& path, QString& volName) {
                             volumeName, MAX_PATH,                                 //
                             serialNumber, &maxComponentLength, &fileSystemFlags,  //
                             fileSystemName, MAX_PATH)) {
-    qWarning("Failed to retrieve GUID by path[%s] error:%u", qPrintable(path), GetLastError());
+    qWarning("Failed to retrieve GUID by path[%s] error:%lu", qPrintable(path), GetLastError());
     return false;
   }
   volName = QString::fromWCharArray(volumeName);
   return true;
 }
-
-WINBASEAPI WINBOOL WINAPI GetVolumeNameForVolumeMountPointW(LPCWSTR lpszVolumeMountPoint, LPWSTR lpszVolumeName, DWORD cchBufferLength);
 
 bool MountHelper::GetGuidByDrive(const QString& driveStr, QString& guid) {
   const QString& drvPath = QDir::toNativeSeparators(driveStr);
@@ -182,5 +259,88 @@ bool MountHelper::GetGuidByDrive(const QString& driveStr, QString& guid) {
   guid = ExtractGuidFromVolumeName(volumeName);
   return true;
 }
-#endif
 
+QString MountHelper::FindRootByGUIDWin(const QString& targetGuid) {
+  WCHAR volumePathNames[MAX_PATH] = {0};
+  DWORD bufferSize = MAX_PATH;
+  QString rootPath;
+
+  // 转换为Windows卷名格式
+  const QString& volumeName = VOLUME_NAME_TEMPLATE.arg(targetGuid);
+
+  // 调用API获取挂载点列表
+  if (GetVolumePathNamesForVolumeNameW(volumeName.toStdWString().c_str(), volumePathNames, MAX_PATH, &bufferSize)) {
+    // 解析多字符串结构（以双空字符结尾）
+    WCHAR* p = volumePathNames;
+    while (*p != '\0') {
+      QString path = QString::fromWCharArray(p);
+      // 筛选盘符型根目录（如C:\）
+      if (path.length() == 3 && path[1] == L':') {
+        rootPath = QDir::toNativeSeparators(path);
+        break;
+      }
+      p += wcslen(p) + 1;
+    }
+  }
+  return rootPath;
+}
+
+const MountHelper::GUID_2_PNTS_SET& MountHelper::Guids2MntPntSet(bool forceRefresh) {
+  static GUID_2_PNTS_SET guid2MntPnts;
+  if (forceRefresh || guid2MntPnts.isEmpty()) {
+    const QList<QStorageInfo>& silst = QStorageInfo::mountedVolumes();
+    for (const auto& si : silst) {
+      const QString& volumeFull = QString::fromUtf8(si.device());
+      const QString& volume = ExtractGuidFromVolumeName(volumeFull);
+      const QString& rp = QDir::toNativeSeparators(si.rootPath());  // L"C:\\"
+      guid2MntPnts[volume] = GetMountPointsByVolumeName(rp.toStdWString().c_str());
+    }
+  }
+  return guid2MntPnts;
+}
+
+QString MountHelper::GetDisplayNameByGuidTableName(QString guidTableName) {
+  const QString& stdVolumeName = VOLUME_NAME_TEMPLATE.arg(guidTableName.replace(TABLE_UNDERSCORE, GUID_HYPEN));
+  const auto& mountedVolLst = QStorageInfo::mountedVolumes();
+  for (const auto& si : mountedVolLst) {
+    const QString& volumeFull = QString::fromUtf8(si.device());
+    if (volumeFull == stdVolumeName) {
+      return si.displayName();
+    }
+  }
+  return QString("Display name of[%s] not found").arg(stdVolumeName);
+}
+
+// GUID in underscore -> RootPath
+QMap<QString, QString> MountHelper::GetGuidTableName2DisplayName() {
+  QMap<QString, QString> guidTblName2Disp;
+  const auto& mountedVolLst = QStorageInfo::mountedVolumes();
+  for (const auto& si : mountedVolLst) {
+    const QString& volumeFull = QString::fromUtf8(si.device());
+    QString volume = ExtractGuidFromVolumeName(volumeFull);
+    guidTblName2Disp[volume.replace(GUID_HYPEN, TABLE_UNDERSCORE)] = si.displayName();
+  }
+  return guidTblName2Disp;
+}
+
+QStringList MountHelper::GetGuidJoinDisplayName() {
+  QStringList guidDispLst;
+  const auto& mountedVolLst = QStorageInfo::mountedVolumes();
+  for (const auto& si : mountedVolLst) {
+    const QString& volumeFull = QString::fromUtf8(si.device());
+    QString volumeAlsoTableName = ExtractGuidFromVolumeName(volumeFull);
+    volumeAlsoTableName.replace(GUID_HYPEN, TABLE_UNDERSCORE);
+    guidDispLst << volumeAlsoTableName + JOINER_STR + si.displayName();
+  }
+  return guidDispLst;
+}
+
+QString MountHelper::ChoppedDisplayName(const QString& GuidJoinDisplayName) {
+  const int colonIndex = GuidJoinDisplayName.indexOf(JOINER_STR);
+  if (colonIndex == -1) {
+    return GuidJoinDisplayName;
+  }
+  return GuidJoinDisplayName.left(colonIndex);
+}
+
+#endif

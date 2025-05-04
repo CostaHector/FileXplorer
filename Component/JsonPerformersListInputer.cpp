@@ -76,7 +76,7 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
   }
   const QString& perfs = text();
   dict[JSONKey::Performers] = NameTool()(perfs);
-  return JsonFileHelper::MovieJsonDumper(dict, jsonFilePath);
+  return JsonFileHelper::DumpJsonDict(dict, jsonFilePath);
 }
 
 bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& jsonFilePath, QVariantHash& dict) {
