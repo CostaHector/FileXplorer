@@ -177,7 +177,7 @@ bool JsonEditor::onStageChanges() {
   dict[mDetail->GetFormName()] = mDetail->toPlainText();
 
   const QString& curJsonPath = m_jsonList->filePath(curRow);
-  return JsonFileHelper::MovieJsonDumper(dict, curJsonPath);
+  return JsonFileHelper::DumpJsonDict(dict, curJsonPath);
 }
 
 bool JsonEditor::onSaveAndNextUnfinishedItem() {

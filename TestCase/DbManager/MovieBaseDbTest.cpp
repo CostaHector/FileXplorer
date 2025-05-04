@@ -63,8 +63,9 @@ class MovieBaseDbTest : public MyTestSuite {
     using namespace DB_HEADER_KEY;
     const QString qryWhereClause{QString(R"(`%1` like "%2008, The Blender Foundation%")").arg(VOLUME_ENUM_TO_STRING(Name))};
     QCOMPARE(mDb.CountRow(DB_TABLE::MOVIES, qryWhereClause), 3);
-    QVERIFY(mDb.DeleteByWhereClause(DB_TABLE::MOVIES, qryWhereClause));
-    // should remove 3 records, count now = 8 - 3 = 5
+    // should remove all 3 records
+    QCOMPARE(mDb.DeleteByWhereClause(DB_TABLE::MOVIES, qryWhereClause), 3);
+    // now count now = 8 - 3 = 5
     QCOMPARE(mDb.CountRow(DB_TABLE::MOVIES), VIDS_CNT_UNDER_PATH - 3);
   }
 };

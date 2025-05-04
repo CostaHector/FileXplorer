@@ -1,7 +1,5 @@
 #include "DbManager.h"
-#include "FileDescriptor.h"
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
+#include "Tools/FileDescriptor/MountHelper.h"
 #include <QSet>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -14,20 +12,6 @@
 const QString DbManager::DROP_TABLE_TEMPLATE{"DROP TABLE `%1`;"};
 const QString DbManager::DELETE_TABLE_TEMPLATE{"DELETE FROM `%1`;"};
 constexpr int DbManager::MAX_BATCH_SIZE;
-
-const QString FdBasedDb::CREATE_TABLE_TEMPLATE{
-    "CREATE TABLE IF NOT EXISTS %1 ("
-    "fd BIGINT, "  // BIGINT
-    "prePathLeft VARCHAR(255), "
-    "prePathRight VARCHAR(255), "
-    "Name VARCHAR(255), "
-    "Size INTEGER, "
-    "Duration INTEGER, "
-    "tags TEXT, "
-    "PRIMARY KEY (fd, prePathRight, Name))"};
-const QString FdBasedDb::INSERT_NAME_ORI_IMGS_TEMPLATE{
-    "REPLACE INTO %1 (fd, prePathLeft, prePathRight, Name, Size, Duration, tags) "
-    "VALUES (:fd, :prePathLeft, :prePathRight, :Name, :Size, :Duration, :tags)"};
 
 DbManager::DbManager(const QString& dbName, const QString& connName, QObject* parent)  //
     : QObject{parent}, mDbName{dbName}, mConnName{connName} {                          //
@@ -112,6 +96,27 @@ bool DbManager::QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) 
   return true;
 }
 
+int DbManager::UpdateForTest(const QString& qryCmd) const {
+  if (!mIsValid) {
+    qWarning("invalid cannot query");
+    return FD_NOT_INITED;
+  }
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return FD_DB_INVALID;
+  }
+  QSqlQuery qry{qryCmd, db};
+  if (!qry.exec()) {
+    qWarning("cmd[%s] failed:%s", qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    db.rollback();
+    return FD_EXEC_FAILED;
+  }
+  int affectedRows = qry.numRowsAffected();
+  qDebug("%d records affected by [%s]", affectedRows, qPrintable(qryCmd));
+  qry.finish();
+  return affectedRows;
+}
+
 bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<QString>& vals) const {
   if (!mIsValid) {
     qWarning("invalid cannot query");
@@ -158,11 +163,34 @@ bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<int>& 
   return true;
 }
 
+bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<qint64>& vals) const {
+  if (!mIsValid) {
+    qWarning("invalid cannot query");
+    return false;
+  }
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return false;
+  }
+  const QString& qryCmd = QString{"SELECT `%1` FROM %2"}.arg(pk).arg(tableName);
+  QSqlQuery qry{qryCmd, db};
+  if (!qry.exec()) {
+    qWarning("cmd[%s] failed:%s", qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    db.rollback();
+    return false;
+  }
+  while (qry.next()) {
+    vals << qry.value(pk).toLongLong();
+  }
+  qDebug("%d records find by [%s]", vals.size(), qPrintable(qryCmd));
+  return true;
+}
+
 int DbManager::CountRow(const QString& tableName, const QString& whereClause) {
   QSqlDatabase db = GetDb();
   if (!CheckValidAndOpen(db)) {
     qWarning("Open failed:%s", qPrintable(db.lastError().text()));
-    return -1;
+    return FD_INVALID;
   }
 
   QString countCmd = QString("SELECT COUNT(*) FROM %1").arg(tableName);
@@ -174,7 +202,7 @@ int DbManager::CountRow(const QString& tableName, const QString& whereClause) {
   if (!qry.exec(countCmd)) {
     qWarning("count[%s] failed: %s",  //
              qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-    return -1;
+    return FD_EXEC_FAILED;
   }
   qry.next();
   return qry.value(0).toInt();
@@ -184,7 +212,7 @@ bool DbManager::IsTableEmpty(const QString& tableName) const {
   QSqlDatabase db = GetDb();
   if (!CheckValidAndOpen(db)) {
     qWarning("Open failed:%s", qPrintable(db.lastError().text()));
-    return -1;
+    return true;
   }
   QSqlQuery qry{db};
   qry.prepare(QString{"SELECT * FROM %1"}.arg(tableName));
@@ -195,26 +223,48 @@ bool DbManager::IsTableEmpty(const QString& tableName) const {
   return !qry.next();
 }
 
-bool DbManager::DeleteByWhereClause(const QString& tableName, const QString& whereClause) {
+int DbManager::DeleteByWhereClause(const QString& tableName, const QString& whereClause) {
   QSqlDatabase db = GetDb();
   if (!CheckValidAndOpen(db)) {
     qWarning("Open failed:%s", qPrintable(db.lastError().text()));
-    return -1;
+    return FD_DB_OPEN_FAILED;
   }
 
   QString deleteCmd{QString(R"(DELETE FROM "%1")").arg(tableName)};
   if (!whereClause.isEmpty()) {
-    deleteCmd += (" WHERE " + whereClause);
+    deleteCmd += " WHERE ";
+    deleteCmd += whereClause;
   }
+  deleteCmd += ';';
 
   QSqlQuery qry{db};
   if (!qry.exec(deleteCmd)) {
     db.rollback();
     qWarning("delete cmd[%s] failed: %s",  //
              qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-    return false;
+    return FD_EXEC_FAILED;
   }
-  return true;
+  const int affectedRows = qry.numRowsAffected();
+  qDebug("affectedRows:%d by cmd:%s", affectedRows, qPrintable(deleteCmd));
+  qry.finish();
+  return affectedRows;
+}
+
+bool DbManager::IsTableVolumeOnline(const QString& tableName) const {
+  return MountHelper::isVolumeAvailable(tableName);
+}
+
+QString DbManager::GetDeleteInPlaceholders(int n) {
+  QString placeholders;
+  placeholders.reserve(n * 2);
+  for (int i = 0; i < n; ++i) {
+    placeholders += "?,";
+  }
+  if (!placeholders.isEmpty()) {  // chop last 1 char(s) ","
+    static constexpr int LAST_CHARS_CNT = 1;
+    placeholders.chop(LAST_CHARS_CNT);
+  }
+  return placeholders;
 }
 
 // not full match
@@ -275,12 +325,13 @@ QString DbManager::GetRmvCmd(DROP_OR_DELETE dropOrDelete) {
   }
 }
 
-int DbManager::RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dropOrDelete) {
+int DbManager::RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dropOrDelete, bool isFullMatch) {
   if (!mIsValid) {
     qWarning("invalid cannot drop table");
     return -1;
   }
-  const QRegularExpression regex{tableNameRegexPattern};
+
+  const QRegularExpression regex{isFullMatch ? '^' + tableNameRegexPattern + '$' : tableNameRegexPattern};
   if (!regex.isValid()) {
     qWarning("regex[%s] is invalid", qPrintable(tableNameRegexPattern));
     return -1;
@@ -299,7 +350,6 @@ int DbManager::RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dro
 
   int succeedDropCnt = 0;
   QSqlQuery query(db);
-  const QStringList& tables = db.tables();
   const QStringList& allTables = db.tables();
   for (const QString& tableName : allTables) {
     if (!IsMatch(tableName, regex)) {
@@ -332,98 +382,4 @@ bool DbManager::DeleteDatabase() {
   }
   mIsValid = false;
   return true;
-}
-
-QStringList FdBasedDb::VIDEOS_FILTER = TYPE_FILTER::VIDEO_TYPE_SET;
-
-int FdBasedDb::ReadADirectory(const QString& folderAbsPath, const QString& tableName) {
-  if (!QFileInfo(folderAbsPath).isDir()) {
-    qWarning("folderAbsPath[%s] is not a directory", qPrintable(folderAbsPath));
-    return FD_NOT_DIR;
-  }
-
-  auto db = GetDb();
-  if (!CheckValidAndOpen(db)) {
-    return FD_DB_OPEN_FAILED;
-  }
-
-  // 准备查询语句
-  QSqlQuery query(db);
-  if (!query.prepare(INSERT_NAME_ORI_IMGS_TEMPLATE.arg(tableName))) {
-    qWarning("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-    return FD_PREPARE_FAILED;
-  }
-
-  // 开始事务
-  if (!db.transaction()) {
-    qWarning("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
-    return FD_TRANSACTION_FAILED;
-  }
-
-  QDirIterator it(folderAbsPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories);
-  FileDescriptor fd;
-  QString prePathLeft, prePathRight;
-  int count = 0;
-  while (it.hasNext()) {
-    const QString& absFilePath = it.next();
-    const QFileInfo fileInfo(absFilePath);
-    PATHTOOL::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
-
-    auto fdVal = fd.GetFileUniquedId(absFilePath);
-    // 绑定参数
-    query.bindValue(":fd", fdVal);
-    query.bindValue(":prePathLeft", prePathLeft);
-    query.bindValue(":prePathRight", prePathRight);
-    query.bindValue(":Name", fileInfo.fileName());
-    query.bindValue(":Size", fileInfo.size());
-    query.bindValue(":Duration", 49);
-    query.bindValue(":tags", "");
-
-    if (!query.exec()) {
-      db.rollback();
-      qWarning("replace[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-      return -1;
-    }
-
-    count++;
-
-    // 分批提交
-    if (count % MAX_BATCH_SIZE == 0) {
-      if (!db.commit()) {
-        db.rollback();
-        qWarning("commit the %dth batch record(s) failed: %s",  //
-                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
-        return FD_COMMIT_FAILED;
-      }
-      if (!db.transaction()) {
-        qWarning("start the %dth transaction failed: %s",  //
-                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
-        return FD_TRANSACTION_FAILED;
-      }
-    }
-  }
-
-  // 提交剩余记录
-  if (!db.commit()) {
-    db.rollback();
-    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
-    return FD_COMMIT_FAILED;
-  }
-  query.finish();
-  qWarning("%d record(s) commit replaced into succeed", count);
-  return count;
-}
-// PeerPathTable
-AdtResult FdBasedDb::Adt(const QString& tableName, const QString& peerPath) {
-  // 1. 建立文件路径到文件名的映射
-  QHash<QString, QFileInfo> fileMap;
-  QDirIterator it{peerPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
-  while (it.hasNext()) {
-    const QFileInfo fileInfo(it.next());
-    fileMap.insert(fileInfo.absoluteFilePath(), fileInfo);
-  }
-  return {};
 }
