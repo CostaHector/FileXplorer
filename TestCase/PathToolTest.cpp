@@ -12,6 +12,7 @@ class PathToolTest : public MyTestSuite {
   Q_OBJECT
 
  public:
+  PathToolTest() : MyTestSuite{false} {}
  private slots:
   void initTestCase() { qDebug() << "PathToolTest start"; }
 
@@ -202,6 +203,19 @@ class PathToolTest : public MyTestSuite {
     QCOMPARE(GetFileNameExtRemoved("a.txt"), "a");
   }
 
+  void test_FileExtReplacedWithJson() {
+    QString basename{"Kalman"};
+    QStringList extensions{".m", ".rar", ".7z", ".mpeg"};
+    const QString expectJsonName{basename + ".json"};
+    for (const QString& extWithDot : extensions) {
+      QString fileName{basename + extWithDot};
+      QCOMPARE(FileExtReplacedWithJson(fileName), expectJsonName);
+    }
+
+    QCOMPARE(FileExtReplacedWithJson("file.utorrent"), "file.utorrent.json");
+    QCOMPARE(FileExtReplacedWithJson("/home/to/file.txt"), "/home/to/file.json");
+  }
+
   void test_GetBaseNameDotBeforeSlash() {
     QCOMPARE(GetBaseName("C:/.a/b"), "b");
     QCOMPARE(GetBaseName("C:/.a/any movie name"), "any movie name");
@@ -315,25 +329,29 @@ class PathToolTest : public MyTestSuite {
   }
 
   void test_path_part_split() {
-    QString preLeft, preRight2;
-    GetPrepathParts("C:/A/B/C.mp4", preLeft, preRight2);
+    QString preLeft, preRight;
+    int lastSlashIndex = GetPrepathParts("C:/A/B/C.mp4", preLeft, preRight);
+    QCOMPARE(QString{"C:/A/B/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "C:");
-    QCOMPARE(preRight2, "A/B");
+    QCOMPARE(preRight, "A/B");
     QCOMPARE(PATHTOOL::Path3Join("C:", "A/B", "C.mp4"), "C:/A/B/C.mp4");
 
-    GetPrepathParts("C:/A/C.mp4", preLeft, preRight2);
+    lastSlashIndex = GetPrepathParts("C:/A/C.mp4", preLeft, preRight);
+    QCOMPARE(QString{"C:/A/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "");
-    QCOMPARE(preRight2, "C:/A");
+    QCOMPARE(preRight, "C:/A");
     QCOMPARE(PATHTOOL::Path3Join("", "C:/A", "C.mp4"), "C:/A/C.mp4");
 
-    GetPrepathParts("C:/C.mp4", preLeft, preRight2);
+    lastSlashIndex = GetPrepathParts("C:/C.mp4", preLeft, preRight);
+    QCOMPARE(QString{"C:/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "");
-    QCOMPARE(preRight2, "C:");
+    QCOMPARE(preRight, "C:");
     QCOMPARE(PATHTOOL::Path3Join("", "C:", "C.mp4"), "C:/C.mp4");
 
-    GetPrepathParts("C.mp4", preLeft, preRight2);
+    lastSlashIndex = GetPrepathParts("C.mp4", preLeft, preRight);
+    QCOMPARE(QString{"C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "");
-    QCOMPARE(preRight2, "");
+    QCOMPARE(preRight, "");
     QCOMPARE(PATHTOOL::Path3Join("", "", "C.mp4"), "C.mp4");
   }
 };

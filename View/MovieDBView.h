@@ -5,26 +5,20 @@
 #include "Component/MovieDatabaseMenu.h"
 #include "Component/QuickWhereClause.h"
 
-#include "Tools/FileDescriptor/MovieBaseDb.h"
-#include "Model/MyQSqlTableModel.h"
+#include "Tools/FileDescriptor/FdBasedDb.h"
+#include "Model/FdBasedDbModel.h"
 #include "View/CustomTableView.h"
-
-#include <QComboBox>
 
 class MovieDBView : public CustomTableView {
  public:
-  MovieDBView(MyQSqlTableModel* model_,            //
+  MovieDBView(FdBasedDbModel* model_,            //
               DatabaseSearchToolBar* dbSearchBar,  //
-              MovieBaseDb& movieDb_,               //
+              FdBasedDb& movieDb_,               //
               QWidget* parent = nullptr);
 
   void subscribe();
-  bool on_PlayVideo() const;
 
-  bool onSearchDataBase(const QString& searchText) {
-    _dbModel->setFilter(searchText);
-    return true;
-  }
+  bool onSearchDataBase();
 
   bool InitMoviesTables();
   bool setCurrentMovieTable(const QString& movieTableName);
@@ -34,10 +28,7 @@ class MovieDBView : public CustomTableView {
   bool onInitDataBase();
   void onCreateATable();
   bool onDropATable();
-  bool onDeleteFromTable(const QString& clause = "");
-
-  bool on_DeleteByDrive();
-  bool on_DeleteByPrepath();
+  bool onDeleteFromTable();
 
   bool onInsertIntoTable();
 
@@ -47,20 +38,21 @@ class MovieDBView : public CustomTableView {
 
   QString getMovieTableName() const {
     if (_tablesDropDownList == nullptr) {
+      qWarning("_tablesDropDownList is nullptr");
       return "";
     }
-    return _tablesDropDownList->currentText();
+    return _tablesDropDownList->CurrentTableName();
   }
   // should not call ~destructure after getDb() and pass to QSqlTableModel
  private:
-  MyQSqlTableModel* _dbModel{nullptr};
+  FdBasedDbModel* _dbModel{nullptr};
   MovieDatabaseMenu* m_movieMenu{nullptr};
-  QComboBox* _tablesDropDownList{nullptr};
+  Guid2RootPathComboxBox* _tablesDropDownList{nullptr};
   QLineEdit* _searchWhereLineEdit{nullptr};
   QComboBox* _searchCB{nullptr};
 
   QuickWhereClause* m_quickWhereClause{nullptr};
-  MovieBaseDb& mDb;
+  FdBasedDb& mDb;
 };
 
 #endif  // MOVIEDBVIEW_H

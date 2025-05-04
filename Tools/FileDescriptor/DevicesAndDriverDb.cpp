@@ -16,7 +16,7 @@ const QString DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE  //
                "   `%3` INTEGER DEFAULT 0,"                // TOTAL_BYTES
                "   `%4` INTEGER DEFAULT 0,"                // AVAIL_BYTES
                "   `%5` CHAR(36) NOT NULL,"                // GUID, GUID_LEN = 36
-               "   `%6` NCHAR(260) DEFAULT \"\","          // MOUNTED_PATH
+               "   `%6` NCHAR(512) DEFAULT \"\","          // MOUNTED_PATH
                "   `%7` INTEGER DEFAULT 0,"                // ADT_TIME
                "    PRIMARY KEY (%5)"
                "    );")
@@ -28,29 +28,57 @@ const QString DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE  //
            .arg(GetFILEDString(MOUNT_POINT))   //
            .arg(GetFILEDString(ADT_TIME))};    //
 
-const QString DevicesAndDriverDb::INSERT_DEV_DRV_TEMPLATE  //
-    {"REPLACE INTO `%1` "                                  //
-     + QString(R"(
+const QString DevicesAndDriverDb::INSERT_DEV_DRV_FULL_TEMPLATE  //
+    {
+        "REPLACE INTO `%1` "  //
+        + QString(R"(
 (`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`)
 VALUES(:%1, :%2, :%3, :%4, :%5, :%6, :%7);)")
-           .arg(GetFILEDString(ROOT_PATH))     //
-           .arg(GetFILEDString(VOLUME_LABEL))  //
-           .arg(GetFILEDString(TOTAL_BYTES))   //
-           .arg(GetFILEDString(AVAIL_BYTES))   //
-           .arg(GetFILEDString(GUID))          //
-           .arg(GetFILEDString(MOUNT_POINT))   //
-           .arg(GetFILEDString(ADT_TIME))};    //
+              .arg(GetFILEDString(ROOT_PATH))     //
+              .arg(GetFILEDString(VOLUME_LABEL))  //
+              .arg(GetFILEDString(TOTAL_BYTES))   //
+              .arg(GetFILEDString(AVAIL_BYTES))   //
+              .arg(GetFILEDString(GUID))          //
+              .arg(GetFILEDString(MOUNT_POINT))   //
+              .arg(GetFILEDString(ADT_TIME))      //
+    };                                            //
+
+const QString DevicesAndDriverDb::INSERT_DEV_DRV_TEMPLATE  //
+    {
+        "REPLACE INTO `%1` "  //
+        + QString(R"(
+(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`)
+VALUES(:%1, :%2, :%3, :%4, :%5, :%6);)")
+              .arg(GetFILEDString(ROOT_PATH))     //
+              .arg(GetFILEDString(VOLUME_LABEL))  //
+              .arg(GetFILEDString(TOTAL_BYTES))   //
+              .arg(GetFILEDString(AVAIL_BYTES))   //
+              .arg(GetFILEDString(GUID))          //
+              .arg(GetFILEDString(MOUNT_POINT))   //
+    };                                            //
 
 const QString DevicesAndDriverDb::UPDATE_SIZE_TEMPLATE  //
-    {"UPDATE `%1` "                                     //
-     + QString(R"(
-SET `%1` = :%1, `%2` = :%2, `%3` = :%3, `%4` = :%4
-WHERE `%5` = :%5;)")
-           .arg(GetFILEDString(ROOT_PATH))     //
-           .arg(GetFILEDString(VOLUME_LABEL))  //
-           .arg(GetFILEDString(TOTAL_BYTES))   //
-           .arg(GetFILEDString(AVAIL_BYTES))   //
-           .arg(GetFILEDString(GUID))};
+    {
+        "UPDATE `%1` "  //
+        + QString(R"(
+SET `%1` = :%1, `%2` = :%2, `%3` = :%3, `%4` = :%4, `%5` = :%5
+WHERE `%6` = :%6;)")
+              .arg(GetFILEDString(ROOT_PATH))     //
+              .arg(GetFILEDString(VOLUME_LABEL))  //
+              .arg(GetFILEDString(TOTAL_BYTES))   //
+              .arg(GetFILEDString(AVAIL_BYTES))   //
+              .arg(GetFILEDString(MOUNT_POINT))   //
+              .arg(GetFILEDString(GUID))          //
+    };
+
+enum UPDATE_SIZE_FIELD {
+  UPDATE_SIZE_FIELD_ROOT_PATH = 0,
+  UPDATE_SIZE_FIELD_VOLUME_LABEL,
+  UPDATE_SIZE_FIELD_TOTAL_BYTES,
+  UPDATE_SIZE_FIELD_AVAIL_BYTES,
+  UPDATE_SIZE_FIELD_MOUNT_POINT,
+  UPDATE_SIZE_FIELD_GUID
+};
 
 const QString DevicesAndDriverDb::UPDATE_ADT_TIME_TEMPLATE  //
     {"UPDATE %1 "                                           //
@@ -102,14 +130,18 @@ int DevicesAndDriverDb::InitDeviceAndDriver(const QString& tableName) {
     return FD_PREPARE_FAILED;
   }
 
+  const auto& guid2Pnts = MountHelper::Guids2MntPntSet(true);
   const auto& vols = GetVolumesInfo();
   for (const auto& vol : vols) {
     // no known conversion from QString to QVariant. Causes: header QVariant not include
+    const QSet<QString>& pntsSet = guid2Pnts.value(vol.guid, {});
+    const QStringList pntsLst{pntsSet.cbegin(), pntsSet.cend()};
     query.bindValue(ROOT_PATH, vol.rootPath);
     query.bindValue(VOLUME_LABEL, vol.volumeLabel);
     query.bindValue(TOTAL_BYTES, vol.totalBytes);
     query.bindValue(AVAIL_BYTES, vol.availBytes);
     query.bindValue(GUID, vol.guid);
+    query.bindValue(MOUNT_POINT, pntsLst.join('\n'));
     if (!query.exec()) {
       db.rollback();
       qWarning("Insert[%s] failed: %s",  //
@@ -123,7 +155,129 @@ int DevicesAndDriverDb::InitDeviceAndDriver(const QString& tableName) {
   return vols.size();
 }
 
-int DevicesAndDriverDb::UpdateDeviceAndDriver(const QString& tableName, VolumeUpdateResult* pRst, FUNC_VOLUME_INFO_GETTER pGetter) {
+FD_ERROR_CODE DevicesAndDriverDb::Insert(const QString& tableName, QSet<QString> needInsertGuids, const QList<VolumeInfo>& volumeInfos, int& insertCnt) {
+  insertCnt = 0;
+  if (needInsertGuids.isEmpty()) {
+    return FD_OK;
+  }
+
+  auto db = GetDb();
+  QSqlQuery query{db};
+  if (!query.prepare(INSERT_DEV_DRV_TEMPLATE.arg(tableName))) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+
+  if (!db.transaction()) {
+    qWarning("start the %dth transaction failed: %s",  //
+             1, qPrintable(db.lastError().text()));
+    return FD_TRANSACTION_FAILED;
+  }
+
+  const auto& guid2Pnts = MountHelper::Guids2MntPntSet(false);
+  for (const auto& vol : volumeInfos) {
+    if (!needInsertGuids.contains(vol.guid)) {
+      continue;
+    }
+    const QSet<QString>& pntsSet = guid2Pnts.value(vol.guid, {});
+    const QStringList pntsLst{pntsSet.cbegin(), pntsSet.cend()};
+    query.bindValue(ROOT_PATH, vol.rootPath);  // no known conversion from QString to QVariant. Causes: header QVariant not include
+    query.bindValue(VOLUME_LABEL, vol.volumeLabel);
+    query.bindValue(TOTAL_BYTES, vol.totalBytes);
+    query.bindValue(AVAIL_BYTES, vol.availBytes);
+    query.bindValue(GUID, vol.guid);
+    query.bindValue(MOUNT_POINT, pntsLst.join('\n'));
+    if (!query.exec()) {
+      db.rollback();
+      qWarning("replace[%s] failed: %s",  //
+               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      return FD_INVALID;
+    }
+  }
+  if (!db.commit()) {
+    db.rollback();
+    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    return FD_COMMIT_FAILED;
+  }
+  query.finish();
+  insertCnt = needInsertGuids.size();
+  qDebug("%d record(s) to be insert...", insertCnt);
+  return FD_OK;
+}
+
+FD_ERROR_CODE DevicesAndDriverDb::Delete(const QString& tableName, const QSet<QString>& needDeleteGuids, int& deleteCnt) {
+  auto db = GetDb();
+  deleteCnt = 0;
+  if (needDeleteGuids.isEmpty()) {
+    return FD_OK;
+  }
+  QString qryCmd = QString(R"(DELETE FROM %1 WHERE `%2` IN (")").arg(tableName, VOLUME_ENUM_TO_STRING(GUID));
+  const QStringList guids{needDeleteGuids.cbegin(), needDeleteGuids.cend()};
+  qryCmd += guids.join(R"(",")");
+  qryCmd += R"(");)";
+  QSqlQuery query{db};
+  if (!query.exec(qryCmd)) {
+    db.rollback();
+    qWarning("delete[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_INVALID;
+  }
+  query.finish();
+  deleteCnt = needDeleteGuids.size();
+  qDebug("%d record(s) to be deleted...", deleteCnt);
+  return FD_OK;
+}
+FD_ERROR_CODE DevicesAndDriverDb::Update(const QString& tableName, const QSet<QString>& needUpdateGuids, const QList<VolumeInfo>& volumeInfos, int& updateCnt) {
+  auto db = GetDb();
+  updateCnt = 0;
+  if (needUpdateGuids.isEmpty()) {
+    return FD_OK;
+  }
+  QSqlQuery query{db};
+  if (!query.prepare(UPDATE_SIZE_TEMPLATE.arg(tableName))) {
+    qWarning("prepare command[%s] failed: %s",  //
+             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+  // 开始事务
+  if (!db.transaction()) {
+    qWarning("start the %dth transaction failed: %s",  //
+             1, qPrintable(db.lastError().text()));
+    return FD_TRANSACTION_FAILED;
+  }
+  const auto& guid2Pnts = MountHelper::Guids2MntPntSet(false);
+  for (const auto& vol : volumeInfos) {
+    if (!needUpdateGuids.contains(vol.guid)) {
+      continue;
+    }
+    const QSet<QString>& pntsSet = guid2Pnts.value(vol.guid, {});
+    const QStringList pntsLst{pntsSet.cbegin(), pntsSet.cend()};
+    query.bindValue(UPDATE_SIZE_FIELD_ROOT_PATH, vol.rootPath);
+    query.bindValue(UPDATE_SIZE_FIELD_VOLUME_LABEL, vol.volumeLabel);
+    query.bindValue(UPDATE_SIZE_FIELD_TOTAL_BYTES, vol.totalBytes);
+    query.bindValue(UPDATE_SIZE_FIELD_AVAIL_BYTES, vol.availBytes);
+    query.bindValue(UPDATE_SIZE_FIELD_GUID, vol.guid);
+    query.bindValue(UPDATE_SIZE_FIELD_MOUNT_POINT, pntsLst.join('\n'));
+    if (!query.exec()) {
+      db.rollback();
+      qWarning("update[%s] failed: %s",  //
+               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      return FD_INVALID;
+    }
+  }
+  if (!db.commit()) {
+    db.rollback();
+    qWarning("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    return FD_COMMIT_FAILED;
+  }
+  query.finish();
+  updateCnt = needUpdateGuids.size();
+  qDebug("%d record(s) to be update...", updateCnt);
+  return FD_OK;
+}
+
+FD_ERROR_CODE DevicesAndDriverDb::AdtDeviceAndDriver(const QString& tableName, VolumeUpdateResult* pRst, FUNC_VOLUME_INFO_GETTER pGetter) {
   if (pGetter == nullptr) {
     qWarning("pGetter is nullptr");
     return FD_INVALID;
@@ -138,10 +292,16 @@ int DevicesAndDriverDb::UpdateDeviceAndDriver(const QString& tableName, VolumeUp
     return FD_DB_OPEN_FAILED;
   }
 
+  if (!db.tables().contains(tableName)) {
+    return FD_TABLE_INEXIST;
+  }
+
   QSet<QString> existedGuids, newGuids;
   if (!QueryPK(tableName, VOLUME_ENUM_TO_STRING(GUID), existedGuids)) {
-    qWarning("no guid(s) find at all");
+    qWarning("Qry guid(s) at table[%s] failed", qPrintable(tableName));
+    return FD_QRY_PK_FAILED;
   }
+
   const auto& volumeInfos = pGetter();
   for (const auto& volumeInfo : volumeInfos) {
     newGuids.insert(volumeInfo.guid);
@@ -154,110 +314,38 @@ int DevicesAndDriverDb::UpdateDeviceAndDriver(const QString& tableName, VolumeUp
   needUpdateGuids.intersect(existedGuids);
   qDebug("guids insert:%d, delete:%d, update:%d", needInsertGuids.size(), needDeleteGuids.size(), needUpdateGuids.size());
 
+  MountHelper::Guids2MntPntSet(true);
   // before insert check if at least 1 guid
-  if (!needInsertGuids.isEmpty()) {
-    QSqlQuery query{db};
-    if (!query.prepare(INSERT_DEV_DRV_TEMPLATE.arg(tableName))) {
-      qWarning("prepare command[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-      return FD_PREPARE_FAILED;
-    }
-
-    if (!db.transaction()) {
-      qWarning("start the %dth transaction failed: %s",  //
-               1, qPrintable(db.lastError().text()));
-      return FD_TRANSACTION_FAILED;
-    }
-
-    for (const auto& volumeInfo : volumeInfos) {
-      if (!needInsertGuids.contains(volumeInfo.guid)) {
-        continue;
-      }
-      query.bindValue(ROOT_PATH, volumeInfo.rootPath);  // no known conversion from QString to QVariant. Causes: header QVariant not include
-      query.bindValue(VOLUME_LABEL, volumeInfo.volumeLabel);
-      query.bindValue(TOTAL_BYTES, volumeInfo.totalBytes);
-      query.bindValue(AVAIL_BYTES, volumeInfo.availBytes);
-      query.bindValue(GUID, volumeInfo.guid);
-      if (!query.exec()) {
-        db.rollback();
-        qWarning("replace[%s] failed: %s",  //
-                 qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-        return FD_INVALID;
-      }
-    }
-    if (!db.commit()) {
-      db.rollback();
-      qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
-      return FD_COMMIT_FAILED;
-    }
-    query.finish();
-    qDebug("%d record(s) to be insert...", needInsertGuids.size());
+  int insertCnt{0};
+  auto ret = Insert(tableName, needInsertGuids, volumeInfos, insertCnt);
+  if (ret != FD_OK) {
+    qWarning("Insert failed errorCode:%d", ret);
+    return ret;
   }
 
   // before delete check if at least 1 guid
-  if (!needDeleteGuids.isEmpty()) {
-    QString qryCmd = QString(R"(DELETE FROM %1 WHERE `%2` IN (")").arg(tableName, VOLUME_ENUM_TO_STRING(GUID));
-    const QStringList guids{needDeleteGuids.cbegin(), needDeleteGuids.cend()};
-    qryCmd += guids.join(R"(",")");
-    qryCmd += R"("))";
-    QSqlQuery query{db};
-    if (!query.exec(qryCmd)) {
-      db.rollback();
-      qWarning("delete[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-      return FD_INVALID;
-    }
-    query.finish();
-    qDebug("%d record(s) to be deleted...", needDeleteGuids.size());
+  int deleteCnt{0};
+  ret = Delete(tableName, needDeleteGuids, deleteCnt);
+  if (ret != FD_OK) {
+    qWarning("Delete failed errorCode:%d", ret);
+    return ret;
   }
 
   // before update check if at least 1 guid
-  if (!needUpdateGuids.isEmpty()) {
-    QSqlQuery query{db};
-    if (!query.prepare(UPDATE_SIZE_TEMPLATE.arg(tableName))) {
-      qWarning("prepare command[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-      return FD_PREPARE_FAILED;
-    }
-    // 开始事务
-    if (!db.transaction()) {
-      qWarning("start the %dth transaction failed: %s",  //
-               1, qPrintable(db.lastError().text()));
-      return FD_TRANSACTION_FAILED;
-    }
-    query.prepare(UPDATE_SIZE_TEMPLATE.arg(tableName));
-    for (const auto& volumeInfo : volumeInfos) {
-      if (!needUpdateGuids.contains(volumeInfo.guid)) {
-        continue;
-      }
-      query.bindValue(ROOT_PATH, volumeInfo.rootPath);
-      query.bindValue(VOLUME_LABEL, volumeInfo.volumeLabel);
-      query.bindValue(TOTAL_BYTES, volumeInfo.totalBytes);
-      query.bindValue(AVAIL_BYTES, volumeInfo.availBytes);
-      query.bindValue(GUID, volumeInfo.guid);
-      if (!query.exec()) {
-        db.rollback();
-        qWarning("update[%s] failed: %s",  //
-                 qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-        return FD_INVALID;
-      }
-    }
-    if (!db.commit()) {
-      db.rollback();
-      qWarning("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
-      return FD_COMMIT_FAILED;
-    }
-    query.finish();
-    qDebug("%d record(s) to be update...", needUpdateGuids.size());
+  int updateCnt{0};
+  ret = Update(tableName, needUpdateGuids, volumeInfos, updateCnt);
+  if (ret != FD_OK) {
+    qWarning("Update failed errorCode:%d", ret);
+    return ret;
   }
 
   if (pRst != nullptr) {
-    pRst->deleteCnt = needDeleteGuids.size();
-    pRst->insertCnt = needInsertGuids.size();
-    pRst->updateCnt = needUpdateGuids.size();
+    pRst->insertCnt = insertCnt;
+    pRst->deleteCnt = deleteCnt;
+    pRst->updateCnt = updateCnt;
   }
 
-  qDebug("insert:%d, delete:%d, update:%d record(s) succeed", needInsertGuids.size(), needDeleteGuids.size(), needUpdateGuids.size());
+  qDebug("insert:%d, delete:%d, update:%d record(s) succeed", insertCnt, deleteCnt, updateCnt);
   return FD_OK;
 }
 

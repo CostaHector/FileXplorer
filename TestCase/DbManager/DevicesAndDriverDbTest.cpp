@@ -73,18 +73,18 @@ class DevicesAndDriverDbTest : public MyTestSuite {
     QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), 0);  // empty table
 
     VolumeUpdateResult volUpdRet{0};
-    QCOMPARE(mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::GetVolumesInfo), FD_OK);
+    QCOMPARE(mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::GetVolumesInfo), FD_OK);
     QCOMPARE(volUpdRet.insertCnt, siLst.size());  // all volume inserted
     QCOMPARE(volUpdRet.deleteCnt, 0);             // nothing deleted
     QCOMPARE(volUpdRet.updateCnt, 0);             // nothing update
     QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), siLst.size());
 
     volUpdRet.Init();
-    QCOMPARE(mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoEmpty), FD_OK);
-    QCOMPARE(volUpdRet.insertCnt, 0);                        // nothing insert
-    QCOMPARE(volUpdRet.deleteCnt, siLst.size());             // all volume delete
-    QCOMPARE(volUpdRet.updateCnt, 0);                        // nothing update
-    QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), 0);  // empty table
+    QCOMPARE(mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoEmpty), FD_OK);
+    QCOMPARE(volUpdRet.insertCnt, 0);             // nothing insert
+    QCOMPARE(volUpdRet.deleteCnt, siLst.size());  // all volume delete
+    QCOMPARE(volUpdRet.updateCnt, 0);             // nothing update
+    QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), 0);   // empty table
   }
 
   void test_table_part_insert_ok_part_deleted_ok() {
@@ -98,21 +98,21 @@ class DevicesAndDriverDbTest : public MyTestSuite {
     QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), 0);  // empty volumes table
 
     VolumeUpdateResult volUpdRet{0};
-    QCOMPARE(mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoCDE), FD_OK);
+    QCOMPARE(mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoCDE), FD_OK);
     QCOMPARE(volUpdRet.insertCnt, 3);  // C D E volumes inserted
     QCOMPARE(volUpdRet.deleteCnt, 0);
     QCOMPARE(volUpdRet.updateCnt, 0);
     QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), 3);
 
     volUpdRet.Init();
-    QCOMPARE(mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoCX), FD_OK);
+    QCOMPARE(mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoCX), FD_OK);
     QCOMPARE(volUpdRet.insertCnt, 1);  // X volumes inserted
     QCOMPARE(volUpdRet.deleteCnt, 2);  // D E volumes deleted
     QCOMPARE(volUpdRet.updateCnt, 1);  // C volumes inserted
     QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), 2);
   }
 
-  void test_UpdateAdtTime_MountPoint_ok() {
+  void test_SetDuration_ok() {
     // precondition
     QVERIFY(!QFile{dbName}.exists());
     // procedure
@@ -123,7 +123,7 @@ class DevicesAndDriverDbTest : public MyTestSuite {
     QCOMPARE(mDb.CountRow(DB_TABLE::DISKS), 0);  // empty volumes table
 
     VolumeUpdateResult volUpdRet{0};
-    QCOMPARE(mDb.UpdateDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoCDE), FD_OK);
+    QCOMPARE(mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &volUpdRet, ::MockerGetVolumesInfoCDE), FD_OK);
     QCOMPARE(volUpdRet.insertCnt, 3);  // C D E volumes inserted
     QCOMPARE(volUpdRet.deleteCnt, 0);
     QCOMPARE(volUpdRet.updateCnt, 0);

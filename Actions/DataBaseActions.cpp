@@ -7,8 +7,7 @@ DataBaseActions& g_dbAct() {
 
 DataBaseActions::DataBaseActions(QObject* parent)    //
     : QObject{parent},                               //
-      DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()),  //
-      DB_RIGHT_CLICK_MENU_AG(Get_DB_RIGHT_CLICK_MENU_AG()) {
+      DB_CONTROL_ACTIONS(Get_DB_CONTROL_ACTIONS()) {
   QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
   _COUNT = new (std::nothrow) QAction(QIcon(":img/COUNTER"), tr("COUNT"), this);
   _COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
@@ -21,8 +20,6 @@ QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
   INIT_A_DATABASE->setToolTip("CREATE DATABASE `DB_NAME`;");
 
   INIT_A_TABLE->setToolTip("CREATE TABLE IF NOT EXISTS `DB_TABLE::MOVIES`(`COLUMN_NAME` TEXT NOT NULL, PRIMARY KEY (COLUMN_NAME));");
-
-  DROP_A_DATABASE->setToolTip("DROP DATABASE `DB_NAME`;");
 
   DROP_A_TABLE->setToolTip("DROP TABLE `DB_TABLE::MOVIES`;");
 
@@ -37,7 +34,6 @@ QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
   databaseControlAG->addAction(DELETE_FROM_TABLE);
   databaseControlAG->addAction(INIT_A_DATABASE);
   databaseControlAG->addAction(INIT_A_TABLE);
-  databaseControlAG->addAction(DROP_A_DATABASE);
   databaseControlAG->addAction(DROP_A_TABLE);
   databaseControlAG->addAction(UNION_TABLE);
   databaseControlAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
@@ -46,11 +42,4 @@ QActionGroup* DataBaseActions::Get_DB_CONTROL_ACTIONS() {
     act->setCheckable(false);
   }
   return databaseControlAG;
-}
-
-QActionGroup* DataBaseActions::Get_DB_RIGHT_CLICK_MENU_AG() {
-  QActionGroup* dbRightClickMenuAG = new (std::nothrow) QActionGroup(this);
-  dbRightClickMenuAG->addAction(DELETE_BY_DRIVER);
-  dbRightClickMenuAG->addAction(DELETE_BY_PREPATH);
-  return dbRightClickMenuAG;
 }
