@@ -2,8 +2,8 @@
 #define PERFORMERSWIDGET_H
 
 #include "Tools/FileDescriptor/PerfBaseDb.h"
-#include "Component/PerformersPreviewTextBrowser.h"
 #include "View/PerformersTableView.h"
+#include "Component/FolderPreview/ClickableTextBrowser.h"
 #include <QSqlTableModel>
 #include <QMainWindow>
 #include <QToolBar>
@@ -47,7 +47,7 @@ class PerformersWidget : public QMainWindow {
   QLineEdit* m_perfSearch{nullptr};
   QToolBar* m_perfToolbar{nullptr};
   PerformersTableView* m_perfTv{nullptr};
-  PerformersPreviewTextBrowser* m_introTE{nullptr};
+  ClickableTextBrowser* m_introTE{nullptr};
   QDockWidget* m_perfPrevDock{nullptr};
 
   QSqlTableModel* m_perfDbMdl{nullptr};

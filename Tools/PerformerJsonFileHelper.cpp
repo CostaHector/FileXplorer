@@ -3,6 +3,20 @@
 const QRegularExpression PerformerJsonFileHelper::IMG_VID_SEP_COMP("\\||\r\n|\n");
 constexpr char PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR;
 
+bool PerformerJsonFileHelper::ImgHumanSorter(const QString& lhs, const QString& rhs) {
+  if (lhs.size() != rhs.size()) {
+    return lhs.size() < rhs.size();
+  }
+  return lhs < rhs;
+}
+
+QStringList PerformerJsonFileHelper::InitImgsList(const QString& imgs) {
+  QStringList imgsLst = imgs.split(IMG_VID_SEP_COMP);
+  std::sort(imgsLst.begin(), imgsLst.end(), ImgHumanSorter);
+  // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
+  return imgsLst;
+}
+
 QVariantHash PerformerJsonFileHelper::PerformerJsonJoiner(const QSqlRecord& record) {
   const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
   const int rates = record.field(PERFORMER_DB_HEADER_KEY::Rate_INDEX).value().toInt();
