@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QDateTime>
 
 #include <QDirIterator>
 #include <QInputDialog>
@@ -54,7 +55,7 @@ void TorrentsManagerWidget::subscribe() {
   });
 
   connect(g_torrentsManagerActions().OPEN_WITH_LOCAL_APP, &QAction::triggered, this, [this]() {
-    if (not QFile::exists(SystemPath::TORRENTS_DATABASE)) {
+    if (!QFile::exists(SystemPath::TORRENTS_DATABASE)) {
       QMessageBox::information(this, "open failed", QString("[%1] not exists. \nCreate it first").arg(SystemPath::TORRENTS_DATABASE));
       return;
     }
@@ -144,8 +145,8 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
       QString("REPLACE INTO `%1` (%2) VALUES").arg(DB_TABLE::TORRENTS).arg(TORRENTS_DB_HEADER_KEY::HEADERS.join(',')) +
       QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\");");
 
-  if (not con.transaction()) {
-    qDebug() << "Failed to start transaction mode";
+  if (!con.transaction()) {
+    qDebug("Failed to start transaction mode");
     return 0;
   }
   QSqlQuery insertTableQuery(con);
@@ -167,7 +168,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
   }
 
   if (!con.commit()) {
-    qDebug() << "Failed to commit, all will be rollback";
+    qDebug("Failed to commit, all will be rollback");
     con.rollback();
     succeedItemCnt = 0;
   }
@@ -237,7 +238,7 @@ void TorrentsManagerWidget::updateWindowsSize() {
   if (PreferenceSettings().contains("TorrentsManagerWidgetGeometry")) {
     restoreGeometry(PreferenceSettings().value("TorrentsManagerWidgetGeometry").toByteArray());
   } else {
-    setGeometry(QRect(0, 0, 1024, 768));
+    setGeometry(DEFAULT_GEOMETRY);
   }
 }
 

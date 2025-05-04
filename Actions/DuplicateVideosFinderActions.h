@@ -18,18 +18,18 @@ class DuplicateVideosFinderActions : public QObject {
   QLineEdit* durationDevLE = nullptr;
   QLineEdit* sizeDevLE = nullptr;
 
-  QAction* DIFFER_BY_DURATION{new QAction{QIcon{":img/VIDEO_DURATION"}, "Duration Deviation(ms)", this}};
-  QAction* DIFFER_BY_SIZE{new QAction{QIcon{":img/FILE_SIZE"}, "Size Deviation(B)", this}};
-  QActionGroup* DIFFER_BY{new QActionGroup{this}};
+  QAction* DIFFER_BY_DURATION{new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, "Duration Deviation(ms)", this}};
+  QAction* DIFFER_BY_SIZE{new (std::nothrow) QAction{QIcon{":img/FILE_SIZE"}, "Size Deviation(B)", this}};
+  QActionGroup* DIFFER_BY{new (std::nothrow) QActionGroup{this}};
 
-  QAction* RECYCLE_ONE_FILE{new QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this}};
+  QAction* RECYCLE_ONE_FILE{new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this}};
 
-  QAction* CANCEL_ANALYSE{new QAction{"Cancel Analyse", this}};
-  QAction* ANALYSE_THESE_TABLES{new QAction{QIcon(":img/ANALYSE_AI_MEDIA_TABLES"), "Append Analyse", this}};
-  QAction* SCAN_A_PATH{new QAction{QIcon(":img/LOAD_A_PATH"), "Scan a path", this}};
-  QAction* AUDIT_AI_MEDIA_TABLE{new QAction{QIcon{":img/AUDIT_AI_MEDIA_DUP"}, "Audit Table", this}};
-  QAction* DROP_TABLE{new QAction{QIcon{":img/DROP_TABLE"}, "Drop Table", this}};
-  QAction* DROP_THEN_REBUILD_THIS_TABLE{new QAction{QIcon{""}, "Drop then rebuild", this}};
+  QAction* CANCEL_ANALYSE{new (std::nothrow) QAction{"Cancel Analyse", this}};
+  QAction* ANALYSE_THESE_TABLES{new (std::nothrow) QAction{QIcon(":img/ANALYSE_AI_MEDIA_TABLES"), "Append Analyse", this}};
+  QAction* SCAN_A_PATH{new (std::nothrow) QAction{QIcon(":img/LOAD_A_PATH"), "Scan a path", this}};
+  QAction* AUDIT_AI_MEDIA_TABLE{new (std::nothrow) QAction{QIcon{":img/AUDIT_AI_MEDIA_DUP"}, "Audit Table", this}};
+  QAction* DROP_TABLE{new (std::nothrow) QAction{QIcon{":img/DROP_TABLE"}, "Drop Table", this}};
+  QAction* DROP_THEN_REBUILD_THIS_TABLE{new (std::nothrow) QAction{QIcon{""}, "Drop then rebuild", this}};
 };
 
 DuplicateVideosFinderActions& g_dupVidFinderAg();

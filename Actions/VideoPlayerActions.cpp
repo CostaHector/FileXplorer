@@ -124,9 +124,9 @@ QToolBar* VideoPlayerActions::GetPlayControlToolBar(QWidget* parent, QLabel* lab
 }
 
 QActionGroup* VideoPlayerActions::GetRateActionGroups() {
-  QActionGroup* rateAg = new QActionGroup(this);
+  QActionGroup* rateAg = new (std::nothrow) QActionGroup(this);
   for (int i = 0; i != 10; ++i) {
-    auto* rateI = new QAction(QString::number(i), this);
+    auto* rateI = new (std::nothrow) QAction(QString::number(i), this);
     rateI->setCheckable(true);
     rateAg->addAction(rateI);
   }

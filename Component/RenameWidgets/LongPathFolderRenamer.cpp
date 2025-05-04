@@ -1,6 +1,6 @@
 #include "LongPathFolderRenamer.h"
 #include "FileOperation/FileOperatorPub.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include "public/UndoRedo.h"
 #include <QLabel>

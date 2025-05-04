@@ -4,9 +4,9 @@
 // add necessary includes here
 #include "Tools/ConflictsItemHelper.h"
 #include "public/UndoRedo.h"
-#include "model/ConflictsFileSystemModel.h"
+#include "Public/PublicVariable.h"
 #include "pub/FileSystemRelatedTest.h"
-
+#include "model/ConflictsFileSystemModel.h"
 #include <QSet>
 
 class ConflictSolveModelTest : public FileSystemRelatedTest {
@@ -15,6 +15,14 @@ class ConflictSolveModelTest : public FileSystemRelatedTest {
   ConflictSolveModelTest() : FileSystemRelatedTest{"TestEnv_ConflictSolve"} {}
 
  private slots:
+  void initTestCase() {
+    QCOMPARE(CCMMode::MCCL2STR[CCMMode::MERGE_OP], QString{"MERGE_OP"});
+    QCOMPARE(CCMMode::MCCL2STR[CCMMode::COPY_OP], QString{"COPY_OP"});
+    QCOMPARE(CCMMode::MCCL2STR[CCMMode::CUT_OP], QString{"CUT_OP"});
+    QCOMPARE(CCMMode::MCCL2STR[CCMMode::LINK_OP], QString{"LINK_OP"});
+    QCOMPARE(CCMMode::MCCL2STR[CCMMode::ERROR_OP], QString{"ERROR_OP"});
+  }
+
   void init() {
     /* Movie{movie (0).png,movie (1).png,movie.json},Page12{Movie{
 movie - BTS.mp4
@@ -33,25 +41,13 @@ movie.mp4
      }}, NoConflictPage{RandomFolder{RandomFile.txt}}
      */
     m_rootHelper << FileSystemNode{"Movie"} << FileSystemNode{"Page12"} << FileSystemNode{"NoConflictPage"};
-    m_rootHelper.GetSubHelper("Movie")
-        <<FileSystemNode{"movie (0).png", false, ""}
-        <<FileSystemNode{"movie (1).png", false, ""}
-        <<FileSystemNode{"movie.json", false, "AAAAAAAAAA"};
+    m_rootHelper.GetSubHelper("Movie") << FileSystemNode{"movie (0).png", false, ""} << FileSystemNode{"movie (1).png", false, ""} << FileSystemNode{"movie.json", false, "AAAAAAAAAA"};
     m_rootHelper.GetSubHelper("Page12") << FileSystemNode{"Movie"};
-    m_rootHelper.GetSubHelper("Page12").GetSubHelper("Movie")
-        <<FileSystemNode{"movie - BTS.mp4", false, "0123456789"}
-        <<FileSystemNode{"movie (0).png", false, "0123456"}
-        <<FileSystemNode{"movie (1).png", false, ""}
-        <<FileSystemNode{"movie (2).png", false, ""}
-        <<FileSystemNode{"movie (3).png", false, ""}
-        <<FileSystemNode{"movie (4).png", false, ""}
-        <<FileSystemNode{"movie (5).png", false, ""}
-        <<FileSystemNode{"movie (6).png", false, ""}
-        <<FileSystemNode{"movie (7).png", false, ""}
-        <<FileSystemNode{"movie (8).png", false, ""}
-        <<FileSystemNode{"movie (9).png", false, ""}
-        <<FileSystemNode{"movie.json", false, ""}
-        <<FileSystemNode{"movie.mp4", false, "012345678901234567891"};
+    m_rootHelper.GetSubHelper("Page12").GetSubHelper("Movie") << FileSystemNode{"movie - BTS.mp4", false, "0123456789"} << FileSystemNode{"movie (0).png", false, "0123456"}
+                                                              << FileSystemNode{"movie (1).png", false, ""} << FileSystemNode{"movie (2).png", false, ""} << FileSystemNode{"movie (3).png", false, ""}
+                                                              << FileSystemNode{"movie (4).png", false, ""} << FileSystemNode{"movie (5).png", false, ""} << FileSystemNode{"movie (6).png", false, ""}
+                                                              << FileSystemNode{"movie (7).png", false, ""} << FileSystemNode{"movie (8).png", false, ""} << FileSystemNode{"movie (9).png", false, ""}
+                                                              << FileSystemNode{"movie.json", false, ""} << FileSystemNode{"movie.mp4", false, "012345678901234567891"};
     m_rootHelper.GetSubHelper("NoConflictPage") << FileSystemNode{"RandomFolder"};
     m_rootHelper.GetSubHelper("NoConflictPage").GetSubHelper("RandomFolder") << FileSystemNode{"RandomFile.txt"};
   }
@@ -78,12 +74,11 @@ movie.mp4
     QVERIFY(QDir(ROOT_DIR).exists("NoConflictPage/RandomFolder/RandomFile.txt"));
 
     QVERIFY2(QFileInfo(ROOT_DIR, "Movie/movie.json").size() > QFileInfo(ROOT_DIR, "Page12/Movie/movie.json").size(), "By default, keep left one");
-    QVERIFY2(QFileInfo(ROOT_DIR, "Movie/movie (0).png").size() < QFileInfo(ROOT_DIR, "Page12/Movie/movie (0).png").size(),
-             "By default, keep right one");
+    QVERIFY2(QFileInfo(ROOT_DIR, "Movie/movie (0).png").size() < QFileInfo(ROOT_DIR, "Page12/Movie/movie (0).png").size(), "By default, keep right one");
   }
 
   void test_noConflictCut() {
-    CCMMode mode = CCMMode::CUT_OP;
+    CCMMode::Mode mode = CCMMode::CUT_OP;
     const QString l = QDir(ROOT_DIR).absoluteFilePath("NoConflictPage");
     const QString r = ROOT_DIR;
     const auto& conflictIF0 = ConflictsItemHelper(l, r, {"RandomFolder"}, mode);
@@ -111,7 +106,7 @@ movie.mp4
   }
 
   void test_practicalCutTest() {
-    CCMMode mode = CCMMode::CUT_OP;
+    CCMMode::Mode mode = CCMMode::CUT_OP;
     const QString l = QDir(ROOT_DIR).absoluteFilePath("Page12");
     const QString r = ROOT_DIR;
     const auto& conflictIF0 = ConflictsItemHelper(l, r, {"Movie"}, mode);
@@ -139,5 +134,8 @@ movie.mp4
   }
 };
 
-//QTEST_MAIN(ConflictSolveModelTest)
+//#define RUN_UT_MAIN_FILE 1
+#ifdef RUN_UT_MAIN_FILE
+QTEST_MAIN(ConflictSolveModelTest)
 #include "ConflictSolveModelTest.moc"
+#endif

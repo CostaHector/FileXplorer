@@ -1,11 +1,12 @@
 #include "ArrangeActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 #include "Tools/PerformersManager.h"
 #include "Tools/ProductionStudioManager.h"
 #include "Tools/PerformersAkaManager.h"
-#include <QDesktopServices>
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include <QDesktopServices>
+#include <QUrl>
 
 void onEditStudios() {
 #ifdef _WIN32
@@ -53,16 +54,16 @@ void onEditAkaPerformer() {
 }
 
 ArrangeActions::ArrangeActions(QObject* parent) : QObject{parent} {
-  _EDIT_STUDIOS = new QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Edit studios list file", this);
-  _RELOAD_STUDIOS = new QAction("Reload studios", this);
+  _EDIT_STUDIOS = new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Edit studios list file", this);
+  _RELOAD_STUDIOS = new (std::nothrow) QAction("Reload studios", this);
 
-  _EDIT_PERFS = new QAction(QIcon(":img/PERFORMERS_LIST_FILE"), "Edit performers list file", this);
-  _RELOAD_PERFS = new QAction("Reload performers", this);
+  _EDIT_PERFS = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_LIST_FILE"), "Edit performers list file", this);
+  _RELOAD_PERFS = new (std::nothrow) QAction("Reload performers", this);
 
-  _EDIT_PERF_AKA = new QAction(QIcon(":img/PERFORMER_AKA_LIST_FILE"), "Edit performers AKA list file", this);
-  _RELOAD_PERF_AKA = new QAction("Reload performers AKA", this);
+  _EDIT_PERF_AKA = new (std::nothrow) QAction(QIcon(":img/PERFORMER_AKA_LIST_FILE"), "Edit performers AKA list file", this);
+  _RELOAD_PERF_AKA = new (std::nothrow) QAction("Reload performers AKA", this);
 
-  _RENAME_RULE_STAT = new QAction(QIcon(":img/SHOW_PERFORMER_STUDIO_STATISTIC"), "Rename rule statistics", this);
+  _RENAME_RULE_STAT = new (std::nothrow) QAction(QIcon(":img/SHOW_PERFORMER_STUDIO_STATISTIC"), "Rename rule statistics", this);
 }
 
 void onShowRenameRuleStatistics() {

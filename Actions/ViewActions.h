@@ -3,17 +3,14 @@
 
 #include <QAction>
 #include <QActionGroup>
-
+#include <QToolBar>
 class ViewActions : public QObject {
   Q_OBJECT
  public:
   explicit ViewActions(QObject* parent = nullptr);
 
-  QActionGroup* Get_NAVIGATION_PANE_Actions();
+  QToolBar* GetViewTB(QWidget* parent = nullptr);
 
-  QActionGroup* GetPlayersActions();
-
-  QActionGroup* GetViewsAG();
   QAction *_ADVANCE_SEARCH_VIEW, *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW, *_SCENE_VIEW, *_FLOATING_PREVIEW;
   QActionGroup* _VIEWS_AG;
 
@@ -26,6 +23,11 @@ class ViewActions : public QObject {
   QActionGroup* _VIDEO_PLAYERS;
 
   QAction* _HAR_VIEW = nullptr;
+
+ private:
+  QActionGroup* Get_NAVIGATION_PANE_Actions();
+  QActionGroup* GetPlayersActions();
+  QActionGroup* GetViewsAG();
 };
 
 ViewActions& g_viewActions();

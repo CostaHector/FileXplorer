@@ -3,19 +3,26 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
+SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
 SOURCES += $$files(public/*.cpp)
+SOURCES += $$files(public/Memory/*.cpp)
 SOURCES += $$files(FileOperation/*.cpp)
+SOURCES += $$files(Tools/FileDescriptor/*.cpp)
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
     Actions/RenameActions.cpp \
-    Component/NotificatorFrame.cpp \
+    Actions/LogActions.cpp \
+    Actions/DataBaseActions.cpp \
+    Component/NotificatorPrivate.cpp \
+    Component/Notificator.cpp \
     Component/QuickWhereClause.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
     Component/StateLabel.cpp \
     Component/SyncModifiyFileSystem.cpp \
+    model/ConflictsFileSystemModel.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/Classify/ItemsClassifier.cpp \
     Tools/Classify/SceneMixed.cpp \
@@ -44,21 +51,29 @@ SOURCES += \
     Tools/ThumbnailProcesser.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
     Tools/SplitterInsertIndexHelper.cpp \
-    model/ConflictsFileSystemModel.cpp \
+    Tools/LogHandler.cpp \
+    Tools/FileSystemItemFilter.cpp \
+    Tools/RedunImgLibs.cpp \
 
-HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(TestCase/pub/*.h)
+HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(public/*.h)
+HEADERS += $$files(public/Memory/*.h)
 HEADERS += $$files(FileOperation/*.h)
+HEADERS += $$files(Tools/FileDescriptor/*.h)
 
 HEADERS += \
     Actions/QuickWhereActions.h \
     Actions/RenameActions.h \
-    Component/NotificatorFrame.h \
+    Actions/LogActions.h \
+    Actions/DataBaseActions.h \
+    Component/NotificatorPrivate.h \
+    Component/Notificator.h \
     Component/QuickWhereClause.h \
     Component/RenameWidgets/AdvanceRenamer.h \
     Component/StateLabel.h \
     Component/SyncModifiyFileSystem.h \
+    model/ConflictsFileSystemModel.h \
     Tools/AIMediaDuplicate.h \
     Tools/Classify/ItemsClassifier.h \
     Tools/Classify/SceneMixed.h \
@@ -87,7 +102,9 @@ HEADERS += \
     Tools/ThumbnailProcesser.h \
     Tools/ToConsecutiveFileNameNo.h \
     Tools/SplitterInsertIndexHelper.h \
-    model/ConflictsFileSystemModel.h \
+    Tools/LogHandler.h \
+    Tools/FileSystemItemFilter.h \
+    Tools/RedunImgLibs.h \
 
 DISTFILES += \
     readme.md

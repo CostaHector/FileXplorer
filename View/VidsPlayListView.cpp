@@ -1,11 +1,12 @@
 #include "VidsPlayListView.h"
 #include "Actions/VideoPlayerActions.h"
-#include "Component/NotificatorFrame.h"
+#include "Component/Notificator.h"
 
 #include "public/PublicVariable.h"
 #include "public/PathTool.h"
 
 #include <QDesktopServices>
+#include <QUrl>
 
 VidsPlayListView::VidsPlayListView(VidModel* model_, QWidget* parent)
     : CustomListView{"VID_PLAYLIST_VIEW", parent}, m_vidModel{model_}, m_vidMenu{new QMenu("playList", this)} {
