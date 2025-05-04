@@ -165,7 +165,7 @@ bool MovieDBView::onUnionTables() {
     return false;
   }
   unionTableQry.finish();
-  QMessageBox::information(this, DB_TABLE::MOVIES, "Union into Finish");
+  QMessageBox::information(this, DB_TABLE::MOVIES, "Union into succeed");
   return true;
 }
 
@@ -316,6 +316,7 @@ bool MovieDBView::onInsertIntoTable() {
     Notificator::badNews("Open failed", con.lastError().text());
     return false;
   }
+
   const QString& operateTable = _tablesDropDownList->CurrentTableName();
   if (!con.tables().contains(operateTable)) {
     Notificator::badNews(operateTable, "Table NOT exist. ABORT insert");
@@ -335,7 +336,8 @@ bool MovieDBView::onInsertIntoTable() {
   }
 
   PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
-  if (QMessageBox::question(this, "CONFIRM INSERT?", selectPath + "/* ----->---- Table:" + operateTable) != QMessageBox::StandardButton::Yes) {
+  const QString msg{QString{"%1/* ----->---- Table: %2"}.arg(selectPath).arg(_tablesDropDownList->currentText())};
+  if (QMessageBox::question(this, "CONFIRM INSERT INTO?", msg) != QMessageBox::StandardButton::Yes) {
     Notificator::information("User cancel insert", selectPath);
     return true;
   }

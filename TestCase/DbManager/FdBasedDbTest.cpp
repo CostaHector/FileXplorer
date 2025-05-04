@@ -29,7 +29,7 @@ class FdBasedDbTest : public MyTestSuite {
     QVERIFY(dbManager.CreateTable("VOLUME_E", FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(dbManager.CreateTable("AGED", FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(QFile{dbName}.exists());
-    QCOMPARE(dbManager.DropTable("VOLUME_E"), 1); // by default, full match
+    QCOMPARE(dbManager.DropTable("VOLUME_E"), 1);  // by default, full match
     QCOMPARE(dbManager.DropTable("AGED"), 1);
     QCOMPARE(dbManager.DropTable("VOLUME_E"), 0);
     QCOMPARE(dbManager.DropTable("AGED"), 0);
@@ -86,9 +86,16 @@ class FdBasedDbTest : public MyTestSuite {
     QVERIFY(QFile{dbName}.exists());  // should created
 
     FdBasedDb::VIDEOS_FILTER = MP4_TYPES;
-    QCOMPARE(dbManager.ReadADirectory("VOLUME_E", rootpath), vids.size());
+    QCOMPARE(dbManager.ReadADirectory("VOLUME_E", rootpath), 5);
     FdBasedDb::VIDEOS_FILTER = MP4_MKV_TYPES;
-    QCOMPARE(dbManager.ReadADirectory("VOLUME_E", rootpath), vid2s.size() - vids.size());  // incremental
+    QCOMPARE(dbManager.ReadADirectory("VOLUME_E", rootpath), 1);  // incremental
+
+    // total count = 8
+    using namespace MOVIE_TABLE;
+    const QString qryWhereClause{QString(R"(`%1` like "%.mp4")").arg(VOLUME_ENUM_TO_STRING(Name))};
+    QCOMPARE(dbManager.CountRow("VOLUME_E", qryWhereClause), 5);  // 5 *.mp4 removed
+    QCOMPARE(dbManager.DeleteByWhereClause("VOLUME_E", qryWhereClause), 5);
+    QCOMPARE(dbManager.CountRow("VOLUME_E"), 1);  // 1 *.mkv left
 
     QVERIFY(dbManager.DeleteDatabase());
     QVERIFY(!QFile{dbName}.exists());
@@ -231,7 +238,7 @@ class FdBasedDbTest : public MyTestSuite {
 
     using namespace JsonFileHelper;
     const auto& dict = MovieJsonLoader(dir.absoluteFilePath(JSON_FILENAME));
-    QCOMPARE(dict.value(JSONKey::Performers).toString(), "Henry Cavill, Chris Evans");
+    QCOMPARE(dict.value(JSON_KEY::PerformersS).toString(), "Henry Cavill, Chris Evans");
   }
 
   void test_UpdateStudioCastTagsByJson() {
@@ -268,17 +275,17 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
     // json studio/performers/tags not exits
-    QVariantHash keyValueNotFull{{JSONKey::Studio, ""},                              //
-                                 {JSONKey::Performers, "Chris Pine, Henry Cavill"},  //
-                                 {JSONKey::Tags, "Action, Science"}};
+    QVariantHash keyValueNotFull{{JSON_KEY::StudioS, ""},                              //
+                                 {JSON_KEY::PerformersS, "Chris Pine, Henry Cavill"},  //
+                                 {JSON_KEY::TagsS, "Action, Science"}};
     QVERIFY(DumpJsonDict(keyValueNotFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
     // json studio/performers/tags exists
-    QVariantHash keyFull{{JSONKey::Studio, "HongMeng"},
-                         {JSONKey::Performers, "Chris Evans, Henry Cavill"},  //
-                         {JSONKey::Tags, "Action, Science"}};
+    QVariantHash keyFull{{JSON_KEY::StudioS, "HongMeng"},
+                         {JSON_KEY::PerformersS, "Chris Evans, Henry Cavill"},  //
+                         {JSON_KEY::TagsS, "Action, Science"}};
     QVERIFY(DumpJsonDict(keyFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 1);

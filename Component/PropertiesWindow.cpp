@@ -119,7 +119,7 @@ bool PropertiesWindow::operator()(const QSqlTableModel* model, const QTableView*
     const QModelIndexList& selIdxs = tv->selectionModel()->selectedRows();
     const QModelIndex rootIndex = tv->rootIndex();
     for (const QModelIndex& idx : selIdxs) {
-      const QModelIndex szInd = model->index(idx.row(), DB_HEADER_KEY::Size, rootIndex);
+      const QModelIndex szInd = model->index(idx.row(), MOVIE_TABLE::Size, rootIndex);
       totalSz += model->QSqlTableModel::data(szInd, Qt::ItemDataRole::DisplayRole).toLongLong();
     }
     m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(selIdxs.size()).arg(0);
