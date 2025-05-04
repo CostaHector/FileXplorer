@@ -11,17 +11,22 @@
 class PerformersAkaManager {
  public:
   static PerformersAkaManager& getIns();
+  static const QString FUZZY_LIKE;
+  static QString PlainLogicSentence2FuzzySqlWhere(const QString& keyName,                       //,
+                                                  const QString& tokens,                        //
+                                                  const QString& binaryCondition = FUZZY_LIKE,  //
+                                                  const QHash<QString, QString>& ALSO_DICT = {});
+
   PerformersAkaManager(const PerformersAkaManager& rhs) noexcept = delete;
 
   QHash<QString, QString> ReadOutAkaName();
   int ForceReloadAkaName();
-  QString PlainLogicSentence2FuzzySqlWhere(const QString& tokens, QString keyName = "", const bool autoCompleteAka = false, const QString& binaryCondition = "%1 like \"%%2%\"") const;
 
   static int UpdateAKAHash(const bool isForce = false);
-  QHash<QString, QString> akaPerf;
+  QHash<QString, QString> m_akaPerf;
   QString GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const;
 
-  inline int count() const { return akaPerf.size(); }
+  inline int count() const { return m_akaPerf.size(); }
 
  private:
   PerformersAkaManager();

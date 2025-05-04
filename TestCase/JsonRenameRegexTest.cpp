@@ -10,7 +10,7 @@ class JsonRenameRegexTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  JsonRenameRegexTest() : MyTestSuite{true} {}
+  JsonRenameRegexTest() : MyTestSuite{false} {}
  private slots:
   void test_toUpper() {
     QString s{"abc123ABC!@#"};
