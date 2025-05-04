@@ -9,83 +9,20 @@
 const QHash<QChar, QString> PerformersAkaManager::op2Str = {{'&', "AND"}, {'|', "OR"}};
 constexpr char PerformersAkaManager::LOGIC_OR_CHAR;
 constexpr char PerformersAkaManager::LOGIC_AND_CHAR;
+const QString PerformersAkaManager::FUZZY_LIKE{R"(%1 like "%%2%")"};
 
 PerformersAkaManager& PerformersAkaManager::getIns() {
   static PerformersAkaManager ins;
   return ins;
 }
 
-PerformersAkaManager::PerformersAkaManager() : akaPerf(ReadOutAkaName()) {}
-
-QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
-#ifdef _WIN32
-  const QString akaPerfFilePath =  //
-      PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name, MemoryKey::WIN32_AKA_PERFORMERS.v).toString();
-#else
-  const QString akaPerfFilePath =  //
-      PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name, MemoryKey::LINUX_AKA_PERFORMERS.v).toString();
-#endif
-  QFile file(akaPerfFilePath);
-  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("File not found: %s.", qPrintable(file.fileName()));
-    return {};
-  }
-
-  QHash<QString, QString> akaDict;
-  QTextStream stream(&file);
-  stream.setCodec("UTF-8");
-  static const QRegularExpression PERF_SPLIT("\\s*,\\s*");
-  while (!stream.atEnd()) {
-    QString line = stream.readLine();
-    line.replace(PERF_SPLIT, "|");
-    for (const QString& perf : line.split('|')) {
-      akaDict.insert(perf, line);
-    }
-  }
-  file.close();
-  qDebug("%d aka name(s) read out", akaDict.size());
-  return akaDict;
-}
-
-int PerformersAkaManager::ForceReloadAkaName() {
-  int beforeAkaNameCnt = akaPerf.size();
-  akaPerf = PerformersAkaManager::ReadOutAkaName();
-  int afterAkaNameCnt = akaPerf.size();
-  qDebug("%d aka names added/removed", afterAkaNameCnt - beforeAkaNameCnt);
-  return afterAkaNameCnt - beforeAkaNameCnt;
-}
-
-void PerformersAkaManager::OperatorJoinOperands(QStack<QString>& values, QStack<QChar>& ops) {
-  QString val2 = values.top();
-  values.pop();
-
-  QString val1 = values.top();
-  values.pop();
-
-  QChar op = ops.top();
-  ops.pop();
-
-  values << QString("(%1 %2 %3)").arg(val1).arg(op2Str[op]).arg(val2);
-}
-
-QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& tokens,       //
-                                                               QString keyName,             //
-                                                               const bool autoCompleteAka,  //
-                                                               const QString& binaryCondition) const {
-  using namespace DB_HEADER_KEY;
-  if (keyName.isEmpty()) {
-    keyName = VOLUME_ENUM_TO_STRING(Name);
-  }
-  if (tokens.isEmpty()) {
+QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& keyName,          //
+                                                               const QString& tokens,           //
+                                                               const QString& binaryCondition,  //
+                                                               const QHash<QString, QString>& ALSO_DICT) {
+  if (keyName.isEmpty() || tokens.isEmpty()) {
     return "";
   }
-  using namespace DB_HEADER_KEY;
-  const bool isAutoReplaceAkaEnabled{autoCompleteAka                                      //
-                                     && (keyName == VOLUME_ENUM_TO_STRING(ForSearch)      //
-                                         || keyName == VOLUME_ENUM_TO_STRING(Performers)  //
-                                         || keyName == VOLUME_ENUM_TO_STRING(Prepath)     //
-                                         || keyName == VOLUME_ENUM_TO_STRING(Name))};
-
   static const QSet<QChar> CONTROL_CHAR = {'(', ')', '&', '|'};
   static const auto isdigit = [](QChar c) -> bool { return not CONTROL_CHAR.contains(c); };
   static const auto precedence = [](QChar c) -> int {
@@ -121,8 +58,7 @@ QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& to
       }
       // autoCompleteAka
       const QString& perf = tokens.mid(startIndex, i - startIndex);
-      const QString& searchName = isAutoReplaceAkaEnabled and akaPerf.contains(perf) ? akaPerf[perf] : perf;
-      values << binaryCondition.arg(keyName, searchName);
+      values << binaryCondition.arg(keyName, ALSO_DICT.value(perf, perf));
 
       // right now the i points to
       // the character next to the digit,
@@ -151,6 +87,59 @@ QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& to
   return values.top();
 }
 
+PerformersAkaManager::PerformersAkaManager() : m_akaPerf(ReadOutAkaName()) {}
+
+QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
+#ifdef _WIN32
+  const QString akaPerfFilePath =  //
+      PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name, MemoryKey::WIN32_AKA_PERFORMERS.v).toString();
+#else
+  const QString akaPerfFilePath =  //
+      PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name, MemoryKey::LINUX_AKA_PERFORMERS.v).toString();
+#endif
+  QFile file(akaPerfFilePath);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qDebug("File not found: %s.", qPrintable(file.fileName()));
+    return {};
+  }
+
+  QHash<QString, QString> akaDict;
+  QTextStream stream(&file);
+  stream.setCodec("UTF-8");
+  static const QRegularExpression PERF_SPLIT("\\s*,\\s*");
+  while (!stream.atEnd()) {
+    QString line = stream.readLine();
+    line.replace(PERF_SPLIT, "|");
+    for (const QString& perf : line.split('|')) {
+      akaDict.insert(perf, line);
+    }
+  }
+  file.close();
+  qDebug("%d aka name(s) read out", akaDict.size());
+  return akaDict;
+}
+
+int PerformersAkaManager::ForceReloadAkaName() {
+  int beforeAkaNameCnt = m_akaPerf.size();
+  m_akaPerf = PerformersAkaManager::ReadOutAkaName();
+  int afterAkaNameCnt = m_akaPerf.size();
+  qDebug("%d aka names added/removed", afterAkaNameCnt - beforeAkaNameCnt);
+  return afterAkaNameCnt - beforeAkaNameCnt;
+}
+
+void PerformersAkaManager::OperatorJoinOperands(QStack<QString>& values, QStack<QChar>& ops) {
+  QString val2 = values.top();
+  values.pop();
+
+  QString val1 = values.top();
+  values.pop();
+
+  QChar op = ops.top();
+  ops.pop();
+
+  values << QString("(%1 %2 %3)").arg(val1).arg(op2Str[op]).arg(val2);
+}
+
 QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const {
   QString perfs = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
   QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
@@ -158,7 +147,7 @@ QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlReco
     perfs += (LOGIC_OR_CHAR + akas.replace(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR));
   }
   using namespace DB_HEADER_KEY;
-  const QString& whereClause = PlainLogicSentence2FuzzySqlWhere(perfs, VOLUME_ENUM_TO_STRING(ForSearch), false);
+  const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(VOLUME_ENUM_TO_STRING(ForSearch), perfs);
   // movies table
   return QString("SELECT `%1` from %2 where %3").arg(VOLUME_ENUM_TO_STRING(ForSearch), DB_TABLE::MOVIES, whereClause);
 }

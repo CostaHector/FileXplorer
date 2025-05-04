@@ -163,27 +163,28 @@ void ContentPanel::BindLogger(CustomStatusBar* logger) {
 }
 
 auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool {
-  if (not clickedIndex.isValid())
+  if (!clickedIndex.isValid())
     return false;
   QFileInfo fi = getFileInfo(clickedIndex);
   qInfo("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
-    qWarning("[path inexists] %s", qPrintable(fi.absoluteFilePath()));
-    Notificator::warning("Cannot open inexist path", fi.absoluteFilePath());
+    qWarning("path[%s] nit exists", qPrintable(fi.absoluteFilePath()));
+    Notificator::warning("path not exist", fi.absoluteFilePath());
     return false;
   }
   if (fi.isSymLink()) {
 #ifdef _WIN32
-    QString tarPath = fi.symLinkTarget();
+    const QString tarPath{fi.symLinkTarget()};
 #else  // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
-    QString tarPath(fi.absoluteFilePath());
+    const QString tarPath{fi.absoluteFilePath()};
 #endif
     fi = QFileInfo(tarPath);
-    if (not fi.exists()) {
-      qDebug("[link inexists] %s", qPrintable(fi.absoluteFilePath()));
-      Notificator::warning("Cannot open inexist link", fi.absoluteFilePath());
+    if (!fi.exists()) {
+      qWarning("link[%s] not exists", qPrintable(fi.absoluteFilePath()));
+      Notificator::warning("link not exists", fi.absoluteFilePath());
       return false;
     }
+    qDebug("link[%s]", qPrintable(fi.absoluteFilePath()));
   }
 
   // For File

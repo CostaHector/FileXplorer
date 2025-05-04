@@ -17,7 +17,7 @@
 #include "View/SceneListView.h"
 
 #include "Tools/ViewTypeTool.h"
-#include "Tools/FileDescriptor/MovieBaseDb.h"
+#include "Tools/FileDescriptor/FdBasedDb.h"
 
 class NavigationViewSwitcher;
 
@@ -115,8 +115,8 @@ class ContentPanel : public QStackedWidget {
   AdvanceSearchToolBar* _advanceSearchBar{nullptr};
 
   MyQFileSystemModel* m_fsModel{nullptr};
-  MyQSqlTableModel* m_dbModel{nullptr};
-  MovieBaseDb mMovieDb;
+  FdBasedDbModel* m_dbModel{nullptr};
+  FdBasedDb mMovieDb;
   AdvanceSearchModel* m_searchSrcModel{nullptr};
   SearchProxyModel* m_proxyModel{nullptr};
   ScenesListModel* m_scenesModel{nullptr};

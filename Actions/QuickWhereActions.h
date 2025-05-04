@@ -17,8 +17,6 @@ class QuickWhereActions : public QObject {
 
   void onAkaHint(const bool autoCompleteAkaSwitch);
 
-
-  QAction* RESET_CONDITION;
   QAction* SAVE_WHERE;
   QToolButton* HIST_WHERE;
   QAction* SHOW_HISTORY;
