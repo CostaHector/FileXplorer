@@ -281,9 +281,9 @@ void VideoPlayer::setUrl(const QUrl& url) {
 }
 
 auto VideoPlayer::loadVideoRate() -> void {
-  if (m_dict.contains(JSONKey::Rate)) {
+  if (m_dict.contains(JSON_KEY::RateS)) {
     bool isInt = false;
-    int rate = m_dict[JSONKey::Rate].toInt(&isInt);
+    int rate = m_dict[JSON_KEY::RateS].toInt(&isInt);
     if (isInt and 0 <= rate and rate < g_videoPlayerActions()._RATE_LEVEL_COUNT) {
       g_videoPlayerActions()._RATE_AG->actions()[rate]->setChecked(true);
     }
@@ -416,10 +416,10 @@ bool VideoPlayer::onModPerformers() {
   if (jsonPath.isEmpty()) {
     return false;
   }
-  if (not m_performerWid) {
+  if (!m_performerWid) {
     m_performerWid = new JsonPerformersListInputer(this);
   }
-  if (not m_performerWid) {
+  if (!m_performerWid) {
     qDebug("performer widget is nullptr");
     return false;
   }
@@ -461,7 +461,7 @@ bool VideoPlayer::onMarkHotScenes() {
   std::sort(m_hotSceneList.begin(), m_hotSceneList.end());
 
   QList<QVariant> hotVariantList(m_hotSceneList.cbegin(), m_hotSceneList.cend());
-  m_dict.insert(JSONKey::Hot, hotVariantList);
+  m_dict.insert(JSON_KEY::HotS, hotVariantList);
   bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Mark result: %d", dumpRet);
   return dumpRet;
@@ -469,8 +469,8 @@ bool VideoPlayer::onMarkHotScenes() {
 
 auto VideoPlayer::loadHotSceneList() -> void {
   m_hotSceneList.clear();
-  if (m_dict.contains(JSONKey::Hot)) {
-    for (const QVariant& pos : m_dict[JSONKey::Hot].toList()) {
+  if (m_dict.contains(JSON_KEY::HotS)) {
+    for (const QVariant& pos : m_dict[JSON_KEY::HotS].toList()) {
       m_hotSceneList.append(pos.toInt());
     }
   }
@@ -535,7 +535,7 @@ auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {
     return false;
   }
   int score = checkedAction->text().back().toLatin1() - '0';
-  m_dict.insert(JSONKey::Rate, score);
+  m_dict.insert(JSON_KEY::RateS, score);
   bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Rate result: %d", dumpRet);
   return dumpRet;
