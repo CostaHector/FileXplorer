@@ -51,7 +51,7 @@ QList<qint64> FileDescriptor::GetFileUniquedIds(const QStringList& files) {
   return {};
 #endif
   QList<qint64> fds;
-  foreach (const QString fileAbsPath, files) {
+  foreach (const QString& fileAbsPath, files) {
     fds << GetFileUniquedId(fileAbsPath);
   }
   return fds;

@@ -6,12 +6,11 @@
 
 QuickWhereActions::QuickWhereActions(QObject* parent)
     : QObject{parent},
-      RESET_CONDITION(new (std::nothrow) QAction(QIcon(":img/RESET"), tr("Reset"), this)),
       SAVE_WHERE(new (std::nothrow) QAction(QIcon(":img/PATH_BACK_TO"), tr("Save"), this)),
       HIST_WHERE(new QToolButton),
       SHOW_HISTORY(new (std::nothrow) QAction(QIcon(":img/WHERE_CLAUSE_HISTORY"), tr("HIST"), this)),
       CLEAR_ALL_WHERE(new (std::nothrow) QAction(QIcon(":img/CLEAR_VIDEOS_LIST"), tr("Clear"), this)),
-      AUTO_COMPLETE_AKA_SWITCH(new (std::nothrow) QAction(QIcon(""), tr("Completer"), this)),
+      AUTO_COMPLETE_AKA_SWITCH(new (std::nothrow) QAction(QIcon(""), tr("Aka Completer"), this)),
       APPLY_AND_CLOSE(new (std::nothrow) QAction(QIcon(":img/SAVED"), tr("Apply"), this)),
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {
@@ -41,7 +40,6 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
   m_whereClauseTB->addWidget(HIST_WHERE);
   m_whereClauseTB->addAction(SAVE_WHERE);
   m_whereClauseTB->addSeparator();
-  m_whereClauseTB->addAction(RESET_CONDITION);
   m_whereClauseTB->addAction(APPLY_AND_CLOSE);
   m_whereClauseTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 
