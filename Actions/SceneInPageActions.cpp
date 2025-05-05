@@ -76,7 +76,7 @@ bool SceneInPageActions::InitWidget() {
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar() {
-  auto* orderToolButton = new DropdownToolButton(_ORDER_AG->actions(), QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
+  auto* orderToolButton = new DropdownToolButton(_ORDER_AG->actions(), QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24);
   orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, "Sort");
   auto* orderTB = new (std::nothrow) QToolBar("Scene Order");
   orderTB->addWidget(orderToolButton);
@@ -91,14 +91,14 @@ QToolBar* SceneInPageActions::GetPagesRowByColumnToolBar() {
   mPageDimensionLE = new (std::nothrow) QLineEdit(QString::number(sceneCnt1Page));
   mPageDimensionLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
   mPageDimensionLE->setToolTip("Scenes count each page");
-  mPageDimensionLE->setMaximumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_2x1);
+  mPageDimensionLE->setMaximumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_24);
   mPageDimensionLE->setEnabled(false);
 
   mPageIndexInputLE = new (std::nothrow) QLineEdit("0");
   mPageIndexInputLE->setValidator(new QIntValidator{-1, 10000});
   mPageIndexInputLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
   mPageIndexInputLE->setToolTip("Page index");
-  mPageIndexInputLE->setMaximumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1);
+  mPageIndexInputLE->setMaximumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   mPageIndexInputLE->setEnabled(false);
 
   mPagesSelectTB = new (std::nothrow) QToolBar("Page Select");
@@ -108,7 +108,7 @@ QToolBar* SceneInPageActions::GetPagesRowByColumnToolBar() {
   mPagesSelectTB->addSeparator();
   mPagesSelectTB->addActions({_NEXT_PAGE, _THE_LAST_PAGE});
   mPagesSelectTB->setStyleSheet("QToolBar { max-width: 512px; }");
-  mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
+  mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   mPagesSelectTB->setEnabled(false);
 
   QToolBar* enableRowColTB = new (std::nothrow) QToolBar{"Pagination display"};

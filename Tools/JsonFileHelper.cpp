@@ -209,7 +209,8 @@ QVariantHash MovieJsonLoader(const QString& jsonFilePth) {
   return DeserializedJsonStr2Dict(json_string);
 }
 
-QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr) { if (serializedJsonStr.isEmpty()) {
+QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr) {
+  if (serializedJsonStr.isEmpty()) {
     return {};
   }
   QJsonParseError jsonErr;
@@ -237,7 +238,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
 
   QHash<QString, QVariant>::iterator it;
   if (duration != 0) {
-    it = dict.find(JSON_KEY::SizeS);  // here size is the duration
+    it = dict.find(JSON_KEY::DurationS);  // here size is the duration
     if (it != dict.cend() && it.value().toInt() != duration) {
       it->setValue(duration);
       changed = true;
@@ -251,30 +252,30 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
     }
   }
   if (!cast.isEmpty()) {
+    const QStringList& castLst = cast.split(ELEMENT_JOINER); // casts must seperated by comma only
     it = dict.find(JSON_KEY::PerformersS);  // here cast is the Performers
-    if (it != dict.cend() && it.value().toString() != cast) {
-      it->setValue(cast);
+    if (it != dict.cend() && it.value().toStringList() != castLst) {
+      it->setValue(castLst);
       changed = true;
     }
   }
   if (!tags.isEmpty()) {
+    const QStringList& tagsLst = tags.split(ELEMENT_JOINER); // tags must seperated by comma only
     it = dict.find(JSON_KEY::TagsS);
-    if (it != dict.cend() && it.value().toString() != tags) {
-      it->setValue(tags);
+    if (it != dict.cend() && it.value().toStringList() != tagsLst) {
+      it->setValue(tagsLst);
       changed = true;
     }
   }
 
-  if (changed) {
-    bool dumpResult = DumpJsonDict(dict, jsonPth);
-    if (!dumpResult) {
-      return CHANGED_WRITE_FILE_FAILED;
-    } else {
-      return CHANGED_OK;
-    }
+  if (!changed) {
+    return NOCHANGED_OK;
   }
-
-  return OK;
+  if (!DumpJsonDict(dict, jsonPth)) {
+    qWarning("json[%s] dump failed", qPrintable(jsonPth));
+    return CHANGED_WRITE_FILE_FAILED;
+  }
+  return CHANGED_OK;
 }
 
 QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
@@ -293,11 +294,11 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
     if (studio.isEmpty()) {
       continue;
     }
-    const QString& cast = dict.value(JSON_KEY::PerformersS, "").toString();
+    const QStringList& cast = dict.value(JSON_KEY::PerformersS, {}).toStringList();
     if (cast.isEmpty()) {
       continue;
     }
-    const QString& tags = dict.value(JSON_KEY::TagsS, "").toString();
+    const QStringList& tags = dict.value(JSON_KEY::TagsS, {}).toStringList();
     if (tags.isEmpty()) {
       continue;
     }
