@@ -133,7 +133,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         ContentPanel::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_movieView);
       }
-      _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->getMovieTableName()));
+      _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->GetMovieTableName()));
       viewIndex = _view->m_name2ViewIndex[viewType];
       qDebug("Switch view widget to movie[%d]", (char)viewType);
       break;
