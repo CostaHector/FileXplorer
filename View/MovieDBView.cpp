@@ -317,13 +317,13 @@ bool MovieDBView::onDeleteFromTable() {
   static const QString RELATION_TEMPLATE{R"("%1" = )"};
   static const QStringList candidates{
       "",
-      RELATION_TEMPLATE.arg(VOLUME_ENUM_TO_STRING(PrePathLeft)),   //
-      RELATION_TEMPLATE.arg(VOLUME_ENUM_TO_STRING(PrePathRight)),  //
-      RELATION_TEMPLATE.arg(VOLUME_ENUM_TO_STRING(Name)),          //
-      RELATION_TEMPLATE.arg(VOLUME_ENUM_TO_STRING(Size)),          //
-      RELATION_TEMPLATE.arg(VOLUME_ENUM_TO_STRING(Duration)),      //
-      RELATION_TEMPLATE.arg(VOLUME_ENUM_TO_STRING(Cast)),          //
-      RELATION_TEMPLATE.arg(VOLUME_ENUM_TO_STRING(Tags))           //
+      RELATION_TEMPLATE.arg(ENUM_TO_STRING(PrePathLeft)),   //
+      RELATION_TEMPLATE.arg(ENUM_TO_STRING(PrePathRight)),  //
+      RELATION_TEMPLATE.arg(ENUM_TO_STRING(Name)),          //
+      RELATION_TEMPLATE.arg(ENUM_TO_STRING(Size)),          //
+      RELATION_TEMPLATE.arg(ENUM_TO_STRING(Duration)),      //
+      RELATION_TEMPLATE.arg(ENUM_TO_STRING(Cast)),          //
+      RELATION_TEMPLATE.arg(ENUM_TO_STRING(Tags))           //
   };
 
   bool okClicked = false;
