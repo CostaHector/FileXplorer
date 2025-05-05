@@ -1,6 +1,6 @@
 #include "PerformersWidget.h"
 
-#include "Actions/PerformersManagerActions.h"
+#include "Actions/CastDBActions.h"
 #include "Component/RatingSqlTableModel.h"
 #include "Component/Notificator.h"
 #include "Tools/FileDescriptor/FdBasedDb.h"
@@ -85,13 +85,7 @@ void PerformersWidget::subscribe() {
     m_perfDbMdl->setFilter(searchPattern);
   });
 
-  connect(g_performersManagerActions().OPEN_WITH_LOCAL_APP, &QAction::triggered, this, [this]() {
-    if (!QFile::exists(SystemPath::PEFORMERS_DATABASE)) {
-      QMessageBox::information(this, "Open failed", QString("[%1] not exists.\nCreate it first").arg(SystemPath::PEFORMERS_DATABASE));
-      return;
-    }
-    QDesktopServices::openUrl(QUrl::fromLocalFile(SystemPath::PEFORMERS_DATABASE));
-  });
+  connect(g_performersManagerActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
 
   connect(g_performersManagerActions().INIT_DATABASE, &QAction::triggered, &mDb, &DbManager::CreateDatabase);
   connect(g_performersManagerActions().INIT_TABLE, &QAction::triggered, this, &PerformersWidget::onInitATable);
