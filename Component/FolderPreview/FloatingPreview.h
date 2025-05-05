@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QAction>
 #include <QToolBar>
+#include <QSqlRecord>
 
 class FloatingPreview : public QSplitter {
  public:
@@ -19,9 +20,10 @@ class FloatingPreview : public QSplitter {
   void SaveSettings();
   void SaveState();
 
-  void operator()(const QString& pth);                                 // file system
-  void operator()(const QString& name, const QString& pth);            // scene
-  void UpdateImgs(const QString& name, const QStringList& imgPthLst);  // scene
+  void operator()(const QSqlRecord& record, const QString& imgHost, const int imgHeight);  // cast
+  void operator()(const QString& pth);                                                     // file system
+  void operator()(const QString& name, const QString& pth);                                // scene
+  void UpdateImgs(const QString& name, const QStringList& imgPthLst);                      // scene
   void UpdateVids(const QStringList& dataLst);
   void UpdateOthers(const QStringList& dataLst);
 
