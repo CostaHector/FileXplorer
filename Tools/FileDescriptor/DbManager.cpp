@@ -251,7 +251,9 @@ int DbManager::DeleteByWhereClause(const QString& tableName, const QString& wher
 }
 
 bool DbManager::IsTableVolumeOnline(const QString& tableName) const {
-  return MountHelper::isVolumeAvailable(tableName);
+  QString stdGuidPart{tableName};
+  stdGuidPart.replace(MountHelper::TABLE_UNDERSCORE, MountHelper::GUID_HYPEN);
+  return MountHelper::isVolumeAvailable(stdGuidPart);
 }
 
 QString DbManager::GetDeleteInPlaceholders(int n) {

@@ -11,9 +11,9 @@
 
 class MovieDBView : public CustomTableView {
  public:
-  MovieDBView(FdBasedDbModel* model_,            //
+  MovieDBView(FdBasedDbModel* model_,              //
               DatabaseSearchToolBar* dbSearchBar,  //
-              FdBasedDb& movieDb_,               //
+              FdBasedDb& movieDb_,                 //
               QWidget* parent = nullptr);
 
   void subscribe();
@@ -23,28 +23,41 @@ class MovieDBView : public CustomTableView {
   bool InitMoviesTables();
   bool setCurrentMovieTable(const QString& movieTableName);
 
-  bool onUnionTables();
-
+  bool onSubmit();
+  bool onInsertIntoTable();
   bool onInitDataBase();
   void onCreateATable();
   bool onDropATable();
   bool onDeleteFromTable();
 
-  bool onInsertIntoTable();
+  bool onUnionTables();
+  bool onAuditATable();
+  bool onSetDurationByVideo();
+  bool onExportToJson();
+  bool onUpdateByJson();
 
-  void onQuickWhereClause();
-
+  bool onQuickWhereClause();
   int onCountRow();
 
-  QString getMovieTableName() const {
+  QString GetMovieTableName() const {  // Table Name
     if (_tablesDropDownList == nullptr) {
       qWarning("_tablesDropDownList is nullptr");
       return "";
     }
     return _tablesDropDownList->CurrentTableName();
   }
+  QString GetMovieTableRootPath() const {  // Peer Path
+    if (_tablesDropDownList == nullptr) {
+      qWarning("_tablesDropDownList is nullptr");
+      return "";
+    }
+    return _tablesDropDownList->CurrentRootPath();
+  }
+
   // should not call ~destructure after getDb() and pass to QSqlTableModel
  private:
+  bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected);
+
   FdBasedDbModel* _dbModel{nullptr};
   MovieDatabaseMenu* m_movieMenu{nullptr};
   Guid2RootPathComboxBox* _tablesDropDownList{nullptr};
