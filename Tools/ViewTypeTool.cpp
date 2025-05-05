@@ -1,19 +1,40 @@
 #include "ViewTypeTool.h"
+#include "public/PublicMacro.h"
 #include <QAction>
+#include <QMap>
 
 namespace ViewTypeTool {
+const QMap<QString, ViewType> ACTION_TEXT_2_VIEW_TYPE  //
+    {
+        {ENUM_TO_STRING(LIST), ViewType::LIST},      //
+        {ENUM_TO_STRING(TABLE), ViewType::TABLE},    //
+        {ENUM_TO_STRING(TREE), ViewType::TREE},      //
+        {ENUM_TO_STRING(SEARCH), ViewType::SEARCH},  //
+        {ENUM_TO_STRING(MOVIE), ViewType::MOVIE},    //
+        {ENUM_TO_STRING(SCENE), ViewType::SCENE},    //
+        {ENUM_TO_STRING(CAST), ViewType::CAST}       //
+    };
+
 const char* GetViewTypeHumanFriendlyStr(ViewType viewType) {
-  if ((int)viewType >= (int)ViewType::VIEW_TYPE_BUTT) {
-    qDebug("viewType[%d] is invalid", (int)viewType);
-    return "";
+  switch (viewType) {
+    CASE_BRANCH_ENUM_TO_STRING(LIST);
+    CASE_BRANCH_ENUM_TO_STRING(TABLE);
+    CASE_BRANCH_ENUM_TO_STRING(TREE);
+    CASE_BRANCH_ENUM_TO_STRING(SEARCH);
+    CASE_BRANCH_ENUM_TO_STRING(MOVIE);
+    CASE_BRANCH_ENUM_TO_STRING(SCENE);
+    CASE_BRANCH_ENUM_TO_STRING(CAST);
+    default: {
+      qWarning("viewType[%d] is invalid", viewType);
+      return "";
+    }
   }
-  return VIEW_TYPE_2_STR[(int)viewType];
 }
 
 ViewType GetViewTypeByActionText(const QAction* viewAct) {
   if (viewAct == nullptr) {
     qWarning("viewAct is nullptr");
-    return ViewType::VIEW_TYPE_BUTT;
+    return VIEW_TYPE_BUTT;
   }
   const QString& viewTypeStr = viewAct->text();
   auto it = ACTION_TEXT_2_VIEW_TYPE.find(viewTypeStr);
