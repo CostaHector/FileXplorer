@@ -1,10 +1,10 @@
-#include "PerformersManagerActions.h"
+#include "CastDBActions.h"
 #include <QMenu>
 #include <QActionGroup>
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 
-PerformersManagerActions::PerformersManagerActions(QObject* parent)
+CastDBActions::CastDBActions(QObject* parent)
     : QObject{parent},
       REFRESH_ALL_RECORDS_VIDS(new(std::nothrow) QAction(tr("Refresh all record(s) vid"), this)),
       REFRESH_SELECTED_RECORDS_VIDS(new(std::nothrow) QAction(tr("Refresh selected record(s) vid"), this)),
@@ -14,7 +14,7 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
       LOAD_FROM_PERFORMERS_LIST(new(std::nothrow) QAction(tr("Load from performers list"), this)),
       DUMP_ALL_RECORDS_INTO_PJSON_FILE(new(std::nothrow) QAction(tr("Dump all record(s)=>.pjson"), this)),
       DUMP_SELECTED_RECORDS_INTO_PJSON_FILE(new(std::nothrow) QAction(tr("Dump selected record(s)=>.pjson"), this)),
-      OPEN_WITH_LOCAL_APP(new(std::nothrow) QAction(QIcon(":img/SQLITE_APP"), tr("Open with"), this)),
+      OPEN_DB_WITH_LOCAL_APP(new(std::nothrow) QAction(QIcon(":img/SQLITE_APP"), tr("Open with"), this)),
       LOCATE_IMAGEHOST(new(std::nothrow) QAction(tr("Locate imagehost"), this)),
       INIT_DATABASE(new(std::nothrow) QAction(QString("Init Database [%1]").arg(SystemPath::PEFORMERS_DATABASE), this)),
       INIT_TABLE(new(std::nothrow) QAction(QString("CREATE table [%1]").arg(DB_TABLE::PERFORMERS), this)),
@@ -34,9 +34,9 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
   LOAD_FROM_PJSON_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> Load *.pjson from ImageHost.<br/>Update each column value by new one if primary key conflicts.")
                                        .arg(LOAD_FROM_PJSON_PATH->text(), LOAD_FROM_PJSON_PATH->shortcut().toString()));
 
-  OPEN_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
-  OPEN_WITH_LOCAL_APP->setToolTip(QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
-                                      .arg(OPEN_WITH_LOCAL_APP->text(), OPEN_WITH_LOCAL_APP->shortcut().toString()));
+  OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
+  OPEN_DB_WITH_LOCAL_APP->setToolTip(QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
+                                      .arg(OPEN_DB_WITH_LOCAL_APP->text(), OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
   LOCATE_IMAGEHOST->setToolTip(PreferenceSettings().value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v).toString());
 
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
@@ -53,7 +53,7 @@ PerformersManagerActions::PerformersManagerActions(QObject* parent)
   VERTICAL_HEADER_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 }
 
-QMenuBar* PerformersManagerActions::GetMenuBar() const {
+QMenuBar* CastDBActions::GetMenuBar() const {
   auto* fileMenu = new QMenu(tr("File"));
   fileMenu->addActions({LOAD_FROM_PJSON_PATH, LOAD_FROM_FILE_SYSTEM_STRUCTURE, LOAD_FROM_PERFORMERS_LIST});
   fileMenu->addSeparator();
@@ -61,7 +61,7 @@ QMenuBar* PerformersManagerActions::GetMenuBar() const {
   fileMenu->addSeparator();
   fileMenu->addActions({REFRESH_ALL_RECORDS_VIDS, REFRESH_SELECTED_RECORDS_VIDS});
   fileMenu->addSeparator();
-  fileMenu->addAction(OPEN_WITH_LOCAL_APP);
+  fileMenu->addAction(OPEN_DB_WITH_LOCAL_APP);
   fileMenu->addSeparator();
   fileMenu->addAction(LOCATE_IMAGEHOST);
   fileMenu->setToolTipsVisible(true);
@@ -85,7 +85,7 @@ QMenuBar* PerformersManagerActions::GetMenuBar() const {
   return m_menuBar;
 }
 
-QMenu* PerformersManagerActions::GetRightClickMenu() const {
+QMenu* CastDBActions::GetRightClickMenu() const {
   auto* m_performerTableMenu = new QMenu(tr("performer table right click menu"));
   m_performerTableMenu->addAction(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS);
   m_performerTableMenu->addSeparator();
@@ -96,14 +96,14 @@ QMenu* PerformersManagerActions::GetRightClickMenu() const {
   return m_performerTableMenu;
 }
 
-QActionGroup* PerformersManagerActions::GetVerAGS() const {
+QActionGroup* CastDBActions::GetVerAGS() const {
   return g_performersManagerActions().VERTICAL_HEADER_AGS;
 }
-QActionGroup* PerformersManagerActions::GetHorAGS() const {
+QActionGroup* CastDBActions::GetHorAGS() const {
   return g_performersManagerActions().HORIZONTAL_HEADER_AGS;
 }
 
-PerformersManagerActions& g_performersManagerActions() {
-  static PerformersManagerActions performersManagerActIns;
+CastDBActions& g_performersManagerActions() {
+  static CastDBActions performersManagerActIns;
   return performersManagerActIns;
 }

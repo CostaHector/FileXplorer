@@ -1,6 +1,6 @@
 #include "ExtraViewVisibilityControl.h"
-#include "Actions/PerformersManagerActions.h"
-#include "Actions/TorrentsManagerActions.h"
+#include "Actions/CastDBActions.h"
+#include "Actions/TorrDBAction.h"
 
 #include "Component/PerformersWidget.h"
 #include "View/TorrentsManagerWidget.h"
