@@ -1,5 +1,6 @@
 #include "NavigationViewSwitcher.h"
 #include "Component/Notificator.h"
+#include "View/CastDBView.h"
 #include "View/SceneActionsSubscribe.h"
 #include "View/SceneListView.h"
 #include "Model/ScenesListModel.h"
@@ -64,6 +65,15 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
       qDebug("Switch toolbar to scene[%d]", (char)viewType);
+      break;
+    }
+    case ViewType::CAST: {
+      if (_navigation->m_perfSearch == nullptr) {
+        _navigation->m_perfSearch = new (std::nothrow) QLineEdit{R"(Name like "%")"};
+        _navigation->AddToolBar(viewType, _navigation->m_perfSearch);
+      }
+      naviIndex = _navigation->m_name2StackIndex[viewType];
+      qDebug("Switch toolbar to cast[%d]", (char)viewType);
       break;
     }
     default: {
@@ -174,6 +184,17 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       _view->m_sceneTableView->setRootPath(newPath);
       viewIndex = _view->m_name2ViewIndex[viewType];
       qDebug("Switch view widget to scene[%d]", (char)viewType);
+      break;
+    }
+    case ViewType::CAST: {
+      if (_view->m_castTableView == nullptr) {
+        auto* pFuncSelectionChangeCallback{_view->_previewFolder != nullptr ? _view->_previewFolder->m_lists : nullptr};
+        _view->m_castTableView = new CastDBView(_navigation->m_perfSearch, pFuncSelectionChangeCallback, _view);
+        _view->AddView(viewType, _view->m_castTableView);
+      }
+      _view->m_castTableView->setWindowTitle("Cast");
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to cast[%d]", (char)viewType);
       break;
     }
     default: {
