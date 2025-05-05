@@ -27,8 +27,8 @@ const QString FdBasedDb::CREATE_TABLE_TEMPLATE  //
                   "`%5` INTEGER DEFAULT 0, "         // Size
                   "`%6` INTEGER DEFAULT 0, "         // Duration
                   "`%7` VARCHAR(100) DEFAULT '', "   // Studio
-                  "`%8` VARCHAR(260) DEFAULT '', "   // Cast
-                  "`%9` VARCHAR(260) DEFAULT '', "   // Tags
+                  "`%8` VARCHAR(260) DEFAULT '', "   // Cast must seperated by comma only
+                  "`%9` VARCHAR(260) DEFAULT '', "   // Tags must seperated by comma only
                   "`%10` INTEGER UNIQUE NOT NULL, "  // PathHash
                   "PRIMARY KEY (%1, %3, %4)"
                   ");"}
@@ -214,12 +214,17 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
   // 2. fd->absolute file path
   FileDescriptor fd;
   QHash<qint64, QString> newFd2Pth;
+  qint64 fdVal{0};
   QDirIterator it{folderAbsPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
   QString absFilePath;
   while (it.hasNext()) {
     it.next();
     absFilePath = it.filePath();
-    newFd2Pth[fd.GetFileUniquedId(absFilePath)] = absFilePath;
+    fdVal = fd.GetFileUniquedId(absFilePath);
+    if (fdVal <= 0) {
+      continue;
+    }
+    newFd2Pth[fdVal] = absFilePath;
   }
   const QList<qint64>& newFdLst = newFd2Pth.keys();
   const QSet<qint64> newFds{newFdLst.cbegin(), newFdLst.cend()};
@@ -437,12 +442,17 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
   // 2. fd->absolute file path
   FileDescriptor fd;
   QHash<qint64, QString> newFd2Pth;
+  qint64 fdVal{0};
   QDirIterator it{peerPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
   QString absFilePath;
   while (it.hasNext()) {
     it.next();
     absFilePath = it.filePath();
-    newFd2Pth[fd.GetFileUniquedId(absFilePath)] = absFilePath;
+    fdVal = fd.GetFileUniquedId(absFilePath);
+    if (fdVal <= 0) {
+      continue;
+    }
+    newFd2Pth[fdVal] = absFilePath;
   }
   const QList<qint64>& newFdLst = newFd2Pth.keys();
   const QSet<qint64> newFds{newFdLst.cbegin(), newFdLst.cend()};
@@ -579,7 +589,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     return FD_COMMIT_FAILED;
   }
   query.finish();
-  qDebug("%d record(s) to be update...", fd2Duration.size());
+  qDebug("%d record(s) to be updated", fd2Duration.size());
   return fd2Duration.size();
 }
 
@@ -657,19 +667,19 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
                                                                   info.Studio,    //
                                                                   info.Cast,      //
                                                                   info.Tags);
-    if (ansRet < 0) {
-      qWarning("Export json[%s] failed, errorCode: %d", qPrintable(it.key()), ansRet);
-      continue;
+    if (ansRet == CHANGED_OK) {
+      ++jsonFilesCnt;
     }
-    ++jsonFilesCnt;
   }
 
+  qDebug("%d json(s) file updated succeed", jsonFilesCnt);
   return jsonFilesCnt;
 }
 
 int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QString& peerPath) const {
   if (CHECK_TABLE_VOLUME_ONLINE) {
     if (!IsTableVolumeOnline(tableName)) {
+      qWarning("");
       return FD_DISK_OFFLINE;
     }
   }
@@ -678,8 +688,6 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
   if (fileNameHash2Dict.isEmpty()) {
     return FD_OK;
   }
-
-  // UPDATE_STUDIO_CAST_TAGS_TEMPLATE
 
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
@@ -691,7 +699,7 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
   }
 
   QSqlQuery query{db};
-  if (!query.prepare(UPDATE_PATH_TEMPLATE.arg(tableName))) {
+  if (!query.prepare(UPDATE_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
     qWarning("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
@@ -707,8 +715,8 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
   for (auto it = fileNameHash2Dict.cbegin(); it != fileNameHash2Dict.cend(); ++it) {
     const auto& dictInfo = it.value();
     query.bindValue(UPDATE_STUDIO_CAST_TAGS_Studio, dictInfo.Studio);
-    query.bindValue(UPDATE_STUDIO_CAST_TAGS_Cast, dictInfo.Cast);
-    query.bindValue(UPDATE_STUDIO_CAST_TAGS_Tags, dictInfo.Tags);
+    query.bindValue(UPDATE_STUDIO_CAST_TAGS_Cast, dictInfo.Cast.join(ELEMENT_JOINER));
+    query.bindValue(UPDATE_STUDIO_CAST_TAGS_Tags, dictInfo.Tags.join(ELEMENT_JOINER));
     query.bindValue(UPDATE_STUDIO_CAST_TAGS_PathHash, it.key());
     if (!query.exec()) {
       db.rollback();
@@ -742,5 +750,6 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
   }
   query.finish();
 
+  qDebug("%d record(s) updated succeed", fileNameHash2Dict.size());
   return fileNameHash2Dict.size();
 }

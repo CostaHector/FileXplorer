@@ -9,18 +9,13 @@
 #include "FloatingPreview.h"
 
 class FolderPreviewSwitcher;
+class NavigationViewSwitcher;
 
 class PreviewFolder : public QStackedWidget {
  public:
   friend class FolderPreviewSwitcher;
-  explicit PreviewFolder(QWidget* parent = nullptr) : QStackedWidget{parent}, m_parentDocker{parent} {
-    if (isTimerDisabled()) {
-      return;
-    }
-    m_nextFolderTimer->setInterval(PreviewFolder::NEXT_FOLDER_TIME_INTERVAL);
-    m_nextFolderTimer->setSingleShot(true);
-    connect(m_nextFolderTimer, &QTimer::timeout, this, &PreviewFolder::display);
-  }
+  friend class NavigationViewSwitcher;
+  explicit PreviewFolder(QWidget* parent = nullptr);
 
   QString GetCurViewName() const {
     const int curInd = currentIndex();
@@ -32,12 +27,14 @@ class PreviewFolder : public QStackedWidget {
     qWarning("no view name find for index[%d]", curInd);
     return "";
   }
-  int AddView(const QString& viewType, QWidget* w) { return m_name2PreviewIndex[viewType] = addWidget(w); }
+  int AddView(const QString& viewType, QWidget* w) {  //
+    return m_name2PreviewIndex[viewType] = addWidget(w);
+  }
 
   void operator()(const QString& path) {
     m_curPath = path;
     if (isTimerDisabled()) {
-      display();
+      UpdatePreview();
     }
     m_nextFolderTimer->stop();
     m_nextFolderTimer->start();
@@ -45,22 +42,7 @@ class PreviewFolder : public QStackedWidget {
 
   inline bool isTimerDisabled() const { return PreviewFolder::NEXT_FOLDER_TIME_INTERVAL <= 0; }
 
-  void display() {
-    auto* curPreview = currentWidget();
-    if (curPreview == nullptr) {
-      qWarning("skip current preview is nullptr");
-    }
-
-    if (curPreview == m_browser) {
-      m_browser->operator()(m_curPath);
-    } else if (curPreview == m_labels) {
-      m_labels->operator()(m_curPath);
-    } else if (curPreview == m_lists) {
-      m_lists->operator()(m_curPath);
-    } else {
-      qWarning("skip current preview is not supported");
-    }
-  }
+  void UpdatePreview();
 
   QString GetCurPath() const { return m_curPath; }
 
