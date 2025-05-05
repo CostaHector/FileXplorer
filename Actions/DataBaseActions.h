@@ -11,20 +11,23 @@ class DataBaseActions : public QObject {
  public:
   explicit DataBaseActions(QObject* parent = nullptr);
 
-  QActionGroup* Get_DB_CONTROL_ACTIONS();
+  QAction* SUBMIT{nullptr};
+  QAction* INIT_A_DATABASE{nullptr};
+  QAction* INIT_A_TABLE{nullptr};
+  QAction* DROP_A_TABLE{nullptr};
+  QAction* INSERT_A_PATH{nullptr};
+  QAction* DELETE_FROM_TABLE{nullptr};
+  QAction* UNION_TABLE{nullptr};
+  QAction* AUDIT_A_TABLE{nullptr};
+  QActionGroup* DB_CONTROL_ACTIONS{nullptr};
 
-  QAction* INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), tr("Create Database"), this);
-  QAction* INIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/CREATE_TABLE"), tr("Create Table"), this);
-  QAction* DROP_A_TABLE = new (std::nothrow) QAction(QIcon(":img/DROP_TABLE"), tr("Drop Table"), this);
-  QAction* INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), tr("Insert into"), this);
-  QAction* DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), tr("Delete from"), this);
-  QAction* UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), tr("Union"), this);
+  QAction* SET_DURATION_BY_VIDEO{nullptr};
+  QAction* EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON{nullptr};
+  QAction* UPDATE_STUDIO_CAST_TAGS_BY_JSON{nullptr};
+  QActionGroup* EX_FUNCTION_ACTIONS{nullptr};
 
-  QAction* QUICK_WHERE_CLAUSE{new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_CLAUSE"), tr("Where clause"), this)};
-
+  QAction* QUICK_WHERE_CLAUSE{nullptr};
   QAction *_COUNT{nullptr}, *_SUM{nullptr};
-
-  QActionGroup* DB_CONTROL_ACTIONS;
 };
 
 DataBaseActions& g_dbAct();

@@ -91,17 +91,17 @@ QString MountHelper::findVolumeGuidByLabel(const QString& label) {
 }
 
 // 枚举系统中所有已连接的卷，检查目标GUID是否存在
-bool MountHelper::isVolumeAvailable(const QString& volumeGuid) {
+bool MountHelper::isVolumeAvailable(const QString& dstVolumeGuid) {
   wchar_t volumeName[MAX_PATH]{0};
   HANDLE hFind = FindFirstVolumeW(volumeName, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
-    qWarning("find first volume failed. volumeGuid[%s] not exist", qPrintable(volumeGuid));
+    qWarning("find first volume failed. volumeGuid[%s] not exist", qPrintable(dstVolumeGuid));
     return false;
   }
 
   do {
     const QString currentGuid{ExtractGuidFromVolumeName(volumeName)};  // 提取GUID部分
-    if (currentGuid == volumeGuid) {
+    if (currentGuid == dstVolumeGuid) {
       FindVolumeClose(hFind);
       return true;
     }
