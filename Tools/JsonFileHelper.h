@@ -22,18 +22,18 @@ enum JSON_KEY_E {
   BUTT,
 };
 
-const QString NameS = VOLUME_ENUM_TO_STRING(Name);
-const QString PerformersS = VOLUME_ENUM_TO_STRING(Performers);
-const QString StudioS = VOLUME_ENUM_TO_STRING(Studio);
-const QString UploadedS = VOLUME_ENUM_TO_STRING(Uploaded);
-const QString TagsS = VOLUME_ENUM_TO_STRING(Tags);
-const QString RateS = VOLUME_ENUM_TO_STRING(Rate);
-const QString SizeS = VOLUME_ENUM_TO_STRING(Size);
-const QString ResolutionS = VOLUME_ENUM_TO_STRING(Resolution);
-const QString BitrateS = VOLUME_ENUM_TO_STRING(Bitrate);
-const QString HotS = VOLUME_ENUM_TO_STRING(Hot);
-const QString DetailS = VOLUME_ENUM_TO_STRING(Detail);
-const QString DurationS = VOLUME_ENUM_TO_STRING(Duration);
+const QString NameS = ENUM_TO_STRING(Name);
+const QString PerformersS = ENUM_TO_STRING(Performers);
+const QString StudioS = ENUM_TO_STRING(Studio);
+const QString UploadedS = ENUM_TO_STRING(Uploaded);
+const QString TagsS = ENUM_TO_STRING(Tags);
+const QString RateS = ENUM_TO_STRING(Rate);
+const QString SizeS = ENUM_TO_STRING(Size);
+const QString ResolutionS = ENUM_TO_STRING(Resolution);
+const QString BitrateS = ENUM_TO_STRING(Bitrate);
+const QString HotS = ENUM_TO_STRING(Hot);
+const QString DetailS = ENUM_TO_STRING(Detail);
+const QString DurationS = ENUM_TO_STRING(Duration);
 }  // namespace JSON_KEY
 
 namespace VariantHashHelper {
