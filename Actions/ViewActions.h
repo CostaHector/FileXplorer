@@ -11,18 +11,25 @@ class ViewActions : public QObject {
 
   QToolBar* GetViewTB(QWidget* parent = nullptr);
 
-  QAction *_ADVANCE_SEARCH_VIEW, *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW, *_SCENE_VIEW, *_FLOATING_PREVIEW, *PERFORMERS_BOOK;
-  QActionGroup* _VIEWS_AG;
+  QAction* _ADVANCE_SEARCH_VIEW{nullptr};
+  QAction* _MOVIE_VIEW{nullptr};
+  QAction* _LIST_VIEW{nullptr};
+  QAction* _TABLE_VIEW{nullptr};
+  QAction* _TREE_VIEW{nullptr};
+  QAction* _SCENE_VIEW{nullptr};
+  QAction* _FLOATING_PREVIEW{nullptr};
+  QAction* _CAST_VIEW{nullptr};
+  QActionGroup* _VIEWS_AG{nullptr};
 
-  QAction* NAVIGATION_PANE;
-  QAction* _JSON_EDITOR_PANE;
-  QAction* _VIDEO_PLAYER_EMBEDDED;
-  QActionGroup* _VIEW_ACTIONS;
+  QAction* NAVIGATION_PANE{nullptr};
+  QAction* _JSON_EDITOR_PANE{nullptr};
+  QAction* _VIDEO_PLAYER_EMBEDDED{nullptr};
+  QActionGroup* _VIEW_ACTIONS{nullptr};
 
-  QAction* _SYS_VIDEO_PLAYERS = nullptr;
-  QActionGroup* _VIDEO_PLAYERS;
+  QAction* _SYS_VIDEO_PLAYERS{nullptr};
+  QActionGroup* _VIDEO_PLAYERS{nullptr};
 
-  QAction* _HAR_VIEW = nullptr;
+  QAction* _HAR_VIEW{nullptr};
 
  private:
   QActionGroup* Get_NAVIGATION_PANE_Actions();
