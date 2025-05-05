@@ -18,7 +18,7 @@
 #include "Actions/ViewActions.h"
 #include "Actions/ThumbnailProcessActions.h"
 #include "Actions/LogActions.h"
-#include "Component/DatabaseToolBar.h"
+#include "Component/RibbonMovieDB.h"
 #include "Component/DropListToolButton.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
@@ -250,7 +250,7 @@ QToolBar* RibbonMenu::LeafView() const {
 }
 
 QToolBar* RibbonMenu::LeafDatabase() const {
-  auto* databaseToolBar{new (std::nothrow) DatabaseToolBar("Leaf Database")};
+  auto* databaseToolBar{new (std::nothrow) RibbonMovieDB("Leaf Movie Database")};
   CHECK_NULLPTR_RETURN_NULLPTR(databaseToolBar);
   return databaseToolBar;
 }

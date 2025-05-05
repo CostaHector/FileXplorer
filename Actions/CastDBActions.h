@@ -1,14 +1,14 @@
-#ifndef PERFORMERSMANAGERACTIONS_H
-#define PERFORMERSMANAGERACTIONS_H
+#ifndef CASTDBACTIONS_H
+#define CASTDBACTIONS_H
 
 #include <QAction>
 #include <QMenuBar>
 #include <QObject>
 
-class PerformersManagerActions : public QObject {
+class CastDBActions : public QObject {
   Q_OBJECT
  public:
-  explicit PerformersManagerActions(QObject* parent = nullptr);
+  explicit CastDBActions(QObject* parent = nullptr);
 
   QAction* REFRESH_ALL_RECORDS_VIDS;
   QAction* REFRESH_SELECTED_RECORDS_VIDS;
@@ -19,16 +19,16 @@ class PerformersManagerActions : public QObject {
   QAction* LOAD_FROM_PERFORMERS_LIST;
   QAction* DUMP_ALL_RECORDS_INTO_PJSON_FILE;
   QAction* DUMP_SELECTED_RECORDS_INTO_PJSON_FILE;
-  QAction* OPEN_WITH_LOCAL_APP;
+
+  QAction* OPEN_DB_WITH_LOCAL_APP;
   QAction* LOCATE_IMAGEHOST;
 
+  QAction* SUBMIT;
+  QAction* INSERT_INTO_TABLE;
   QAction* INIT_DATABASE;
   QAction* INIT_TABLE;
-  QAction* INSERT_INTO_TABLE;
-
-  QAction* DELETE_TABLE;
   QAction* DROP_TABLE;
-  QAction* SUBMIT;
+  QAction* DELETE_TABLE;
 
   QAction* CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT;
 
@@ -40,13 +40,12 @@ class PerformersManagerActions : public QObject {
   QAction* PERFORMERS_BOOK;
 
   QMenuBar* GetMenuBar() const;
-
   QMenu* GetRightClickMenu() const;
 
   QActionGroup* GetVerAGS() const;
   QActionGroup* GetHorAGS() const;
 };
 
-PerformersManagerActions& g_performersManagerActions();
+CastDBActions& g_performersManagerActions();
 
-#endif  // PERFORMERSMANAGERACTIONS_H
+#endif  // CASTDBACTIONS_H
