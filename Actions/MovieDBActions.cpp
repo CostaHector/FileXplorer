@@ -1,12 +1,12 @@
-#include "DataBaseActions.h"
+#include "MovieDBActions.h"
 #include "public/PublicMacro.h"
 
-DataBaseActions& g_dbAct() {
-  static DataBaseActions ins;
+MovieDBActions& g_dbAct() {
+  static MovieDBActions ins;
   return ins;
 }
 
-DataBaseActions::DataBaseActions(QObject* parent)  //
+MovieDBActions::MovieDBActions(QObject* parent)  //
     : QObject{parent}                              //
 {
   SUBMIT = new (std::nothrow) QAction(QIcon(":img/SUBMIT"), "Submit", this);
@@ -19,7 +19,7 @@ DataBaseActions::DataBaseActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(DROP_A_TABLE);
   INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), "Insert Into", this);
   CHECK_NULLPTR_RETURN_VOID(INSERT_A_PATH);
-  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), "Delete From", this);
+  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), "Delete Where", this);
   CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
   UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), "Union Into", this);
   CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);
