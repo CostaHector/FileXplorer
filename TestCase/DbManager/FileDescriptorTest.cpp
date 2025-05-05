@@ -4,24 +4,37 @@
 #include "Tools/FileDescriptor/FileDescriptor.h"
 #include "public/PublicTool.h"
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 const QString rootpath = QFileInfo(__FILE__).absolutePath() + "/FileDescriptor";
 const QString fi5Char = rootpath + "/5CharFile.txt";
 const QString fi10Char = rootpath + "/10CharFile.txt";
-const QString fiTemp = rootpath + "/Temp.txt";
+const QString fiFileTemp = rootpath + "/Temp.txt";
+const QString fiPathTemp = rootpath + "/NotExistPath/Temp.txt";
 class FileDescriptorTest : public MyTestSuite {
   Q_OBJECT
  public:
+  FileDescriptorTest() : MyTestSuite{false} {}
  private slots:
   void init() {
     QVERIFY(QFile::exists(fi5Char));
     QVERIFY(QFile::exists(fi10Char));
-    QVERIFY(!QFile::exists(fiTemp));
+    QVERIFY(!QFile::exists(fiFileTemp));
   }
 
+#ifdef Q_OS_WIN
   void test_fd_file_not_exist() {
     FileDescriptor fDescriptor;
-    const auto fd_1 = fDescriptor.GetFileUniquedId(fiTemp);
-    QCOMPARE(fd_1, -1);
+    const qint64 fd_1 = fDescriptor.GetFileUniquedId(fiFileTemp);
+    QCOMPARE(fd_1, -(qint64)ERROR_FILE_NOT_FOUND);
+  }
+
+  void test_fd_path_not_exist() {
+    FileDescriptor fDescriptor;
+    const qint64 fd_1 = fDescriptor.GetFileUniquedId(fiPathTemp);
+    QCOMPARE(fd_1, -(qint64)ERROR_PATH_NOT_FOUND);
   }
 
   void test_fd_get_ok() {
@@ -39,9 +52,9 @@ class FileDescriptorTest : public MyTestSuite {
   void test_fd_unchange_after_name_renamed() {
     FileDescriptor fDescriptor;
     const auto fd5 = fDescriptor.GetFileUniquedId(fi5Char);
-    QVERIFY(QFile::rename(fi5Char, fiTemp));  // rename file name
-    const auto fdTemp = fDescriptor.GetFileUniquedId(fiTemp);
-    QVERIFY(QFile::rename(fiTemp, fi5Char));  // recover
+    QVERIFY(QFile::rename(fi5Char, fiFileTemp));  // rename file name
+    const auto fdTemp = fDescriptor.GetFileUniquedId(fiFileTemp);
+    QVERIFY(QFile::rename(fiFileTemp, fi5Char));  // recover
 
     QVERIFY(fd5 > 0);
     QVERIFY(fdTemp > 0);
@@ -69,6 +82,12 @@ class FileDescriptorTest : public MyTestSuite {
     QVERIFY(fdRenew > 0);
     QVERIFY(fd5 != fdRenew);
   }
+#else
+  void test_fd_not_in_windows() {
+    QCOMPARE(1, 1);
+    qWarning("Not in windows, Fd will not support");
+  }
+#endif
 };
 
 FileDescriptorTest g_FileDescriptorTest;

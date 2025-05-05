@@ -31,11 +31,13 @@ qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
                                    OPEN_EXISTING,                       //
                                    FILE_ATTRIBUTE_NORMAL,               //
                                    NULL);
-
   if (hFile == INVALID_HANDLE_VALUE) {
-    DWORD errorNo = GetLastError();
+//#define ERROR_FILE_NOT_FOUND __MSABI_LONG(2)
+//#define ERROR_PATH_NOT_FOUND __MSABI_LONG(3)
+//#define ERROR_TOO_MANY_OPEN_FILES __MSABI_LONG(4)
+    const DWORD errorNo = GetLastError();
     qWarning("Get fd[%s] error: %lu", qPrintable(fileAbsPath), errorNo);
-    return -1;
+    return -(qint64)errorNo;
   }
   BY_HANDLE_FILE_INFORMATION fileInfo{0};
   if (!GetFileInformationByHandle(hFile, &fileInfo)) {
