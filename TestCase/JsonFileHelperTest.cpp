@@ -209,13 +209,21 @@ class JsonFileHelperTest : public MyTestSuite {
       }
     };
 
-    // json unchange
-    ret = InsertOrUpdateDurationStudioCastTags(jsonPth, 0, {}, {}, {});
-    QCOMPARE(ret, OK);
+    // json changed
+    const QStringList expectCastLst{"Henry Cavill", "Paddy", "Chris", "Fassbender"};
+    const QStringList expectTagsLst{"Comedy"};
+    ret = InsertOrUpdateDurationStudioCastTags(jsonPth, 8, "Fox 20 century", expectCastLst.join(ELEMENT_JOINER), expectTagsLst.join(ELEMENT_JOINER));
+    QCOMPARE(ret, CHANGED_OK);
+
+    const auto& dict = MovieJsonLoader(jsonPth);
+    QCOMPARE(dict.value(JSON_KEY::DurationS).toInt(), 8);
+    QCOMPARE(dict.value(JSON_KEY::StudioS).toString(), "Fox 20 century");
+    QCOMPARE(dict.value(JSON_KEY::PerformersS).toStringList(), expectCastLst);
+    QCOMPARE(dict.value(JSON_KEY::TagsS).toStringList(), expectTagsLst);
 
     // json unchange
-    ret = InsertOrUpdateDurationStudioCastTags(jsonPth, 0, "Fox 20 century", {"Henry Cavill"}, {});
-    QCOMPARE(ret, CHANGED_OK);
+    ret = InsertOrUpdateDurationStudioCastTags(jsonPth, 8, "Fox 20 century", expectCastLst.join(ELEMENT_JOINER), expectTagsLst.join(ELEMENT_JOINER));
+    QCOMPARE(ret, NOCHANGED_OK);
   }
 
   void test_ReadStudioCastTagsOut() {
@@ -231,31 +239,33 @@ class JsonFileHelperTest : public MyTestSuite {
     };
 
     // 1. empty value json
-    QVariantHash emptyValueDict{{JSON_KEY::StudioS, ""}, {JSON_KEY::PerformersS, ""}, {JSON_KEY::TagsS, ""}};
+    QVariantHash emptyValueDict{{JSON_KEY::StudioS, ""}, {JSON_KEY::PerformersS, QStringList{}}, {JSON_KEY::TagsS, QStringList{}}};
     QVERIFY(DumpJsonDict(emptyValueDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     QMap<uint, JsonDict2Table> fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 2. only contains studio and tags, but not performers
-    QVariantHash notFullDict{{JSON_KEY::StudioS, "Fox 2000"}, {JSON_KEY::TagsS, "Happiness, Comedy"}};
+    QVariantHash notFullDict{{JSON_KEY::StudioS, "Fox 2000"}, {JSON_KEY::TagsS, QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(notFullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 3. contains studio and tags and performers
-    QVariantHash fullDict{{JSON_KEY::StudioS, "Fox 2000"}, //
-                          {JSON_KEY::PerformersS, "Jocker, Queen"}, //
-                          {JSON_KEY::TagsS, "Happiness, Comedy"}};
+    QVariantHash fullDict{{JSON_KEY::StudioS, "Fox 2000"},                          //
+                          {JSON_KEY::PerformersS, QStringList{"Jocker", "Queen"}},  //
+                          {JSON_KEY::TagsS, QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(fullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
     QCOMPARE(fileNameHash2Json.size(), 1);
     const JsonDict2Table& info = fileNameHash2Json.cbegin().value();
+    const QStringList expectCasts{"Jocker", "Queen"};
+    const QStringList expectTags{"Happiness", "Comedy"};
     QCOMPARE(info.Studio, "Fox 2000");
-    QCOMPARE(info.Cast, "Jocker, Queen");
-    QCOMPARE(info.Tags, "Happiness, Comedy");
+    QCOMPARE(info.Cast, expectCasts);
+    QCOMPARE(info.Tags, expectTags);
   };
 };
 

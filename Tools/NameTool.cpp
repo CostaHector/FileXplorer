@@ -13,7 +13,7 @@ QStringList NameTool::operator()(const QString& s) const {
   QStringList ans;
   foreach (QString nm, s.split(NameTool::FS_COMP)) {
     const QString& stdName = nm.trimmed();
-    if (not stdName.isEmpty()) {
+    if (!stdName.isEmpty()) {
       ans.append(stdName);
     }
   }
