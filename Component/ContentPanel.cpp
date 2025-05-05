@@ -255,21 +255,33 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, con
 
 void ContentPanel::connectSelectionChanged(ViewTypeTool::ViewType vt) {
   disconnectSelectionChanged(vt);
-  if (vt == ViewType::TABLE) {
-    ContentPanel::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (vt == ViewType::LIST) {
-    ContentPanel::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (vt == ViewType::TREE) {
-    ContentPanel::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  switch (vt) {
+    case ViewType::TABLE:
+      ContentPanel::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      break;
+    case ViewType::LIST:
+      ContentPanel::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      break;
+    case ViewType::TREE:
+      ContentPanel::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      break;
+    default:
+      qDebug("selection changed signal connect skip. current view type[%d]", vt);
   }
 }
 void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
-  if (vt == ViewType::TABLE) {
-    ContentPanel::disconnect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (vt == ViewType::LIST) {
-    ContentPanel::disconnect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
-  } else if (vt == ViewType::TREE) {
-    ContentPanel::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+  switch (vt) {
+    case ViewType::TABLE:
+      ContentPanel::disconnect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      break;
+    case ViewType::LIST:
+      ContentPanel::disconnect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      break;
+    case ViewType::TREE:
+      ContentPanel::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      break;
+    default:
+      qDebug("selection changed signal disconnect skip. current view type[%d]", vt);
   }
 }
 

@@ -1,12 +1,12 @@
-#include "PerformersWidget.h"
+#include "CastDBView.h"
 
 #include "Actions/CastDBActions.h"
+#include "Component/FolderPreview/FloatingPreview.h"
 #include "Component/RatingSqlTableModel.h"
 #include "Component/Notificator.h"
 #include "Tools/FileDescriptor/FdBasedDb.h"
 #include "public/PathTool.h"
 #include "public/PublicMacro.h"
-#include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "Tools/JsonFileHelper.h"
@@ -27,8 +27,10 @@
 #include <QSqlRecord>
 #include <QFileDialog>
 
-PerformersWidget::PerformersWidget(QWidget* parent)
-    : QMainWindow{parent},  //
+CastDBView::CastDBView(QLineEdit* perfSearchLE, FloatingPreview* floatingPreview, QWidget* parent)
+    : CustomTableView{"PERFORMERS_TABLE", parent},  //
+      m_perfSearch{perfSearchLE},
+      _floatingPreview{floatingPreview},
       m_imageHostPath{PreferenceSettings()
                           .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
                                  MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)
@@ -40,21 +42,11 @@ PerformersWidget::PerformersWidget(QWidget* parent)
       mDb{SystemPath::PEFORMERS_DATABASE, "perfs_connection"}
 
 {
-  m_perfSearch = new (std::nothrow) QLineEdit{QString("%1 like \"%\"").arg(PERFORMER_DB_HEADER_KEY::Name), this};
   CHECK_NULLPTR_RETURN_VOID(m_perfSearch);
-  m_perfToolbar = new (std::nothrow) QToolBar{"Performer tool", this};
-  CHECK_NULLPTR_RETURN_VOID(m_perfToolbar);
-  m_perfToolbar->addWidget(m_perfSearch);
-  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_perfToolbar);
 
-  setMenuBar(g_castAct().GetMenuBar());
-
-  m_introTE = new (std::nothrow) ClickableTextBrowser{this};
-  CHECK_NULLPTR_RETURN_VOID(m_introTE);
-  m_perfPrevDock = new (std::nothrow) QDockWidget{tr("Overview"), this};
-  CHECK_NULLPTR_RETURN_VOID(m_perfPrevDock);
-  m_perfPrevDock->setWidget(m_introTE);
-  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_perfPrevDock);
+  BindMenu(g_castAct().GetRightClickMenu());
+  AppendVerticalHeaderMenuAGS(g_castAct().GetVerAGS());
+  AppendHorizontalHeaderMenuAGS(g_castAct().GetHorAGS());
 
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
@@ -67,72 +59,49 @@ PerformersWidget::PerformersWidget(QWidget* parent)
     m_perfDbMdl->setTable(DB_TABLE::PERFORMERS);
     m_perfDbMdl->submitAll();
   }
-  m_perfTv = new (std::nothrow) PerformersTableView{this};
-  CHECK_NULLPTR_RETURN_VOID(m_perfTv);
-  m_perfTv->setModel(m_perfDbMdl);
-  m_perfTv->InitTableView();
-  setCentralWidget(m_perfTv);
+
+  setModel(m_perfDbMdl);
+  InitTableView();
 
   subscribe();
-  readSettings();
   setWindowTitle("Performers Manager Widget");
   setWindowIcon(QIcon(":img/PERFORMERS_APP"));
 }
 
-void PerformersWidget::subscribe() {
+void CastDBView::subscribe() {
   connect(m_perfSearch, &QLineEdit::returnPressed, this, [this]() {
     const QString& searchPattern = m_perfSearch->text();
     m_perfDbMdl->setFilter(searchPattern);
   });
 
-  connect(g_castAct().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
-
+  connect(g_castAct().SUBMIT, &QAction::triggered, this, &CastDBView::onSubmit);
+  connect(g_castAct().INSERT_INTO_TABLE, &QAction::triggered, this, &CastDBView::onInsertIntoTable);
+  connect(g_castAct().DELETE_RECORDS, &QAction::triggered, this, &CastDBView::onDeleteRecords);
   connect(g_castAct().INIT_DATABASE, &QAction::triggered, &mDb, &DbManager::CreateDatabase);
-  connect(g_castAct().INIT_TABLE, &QAction::triggered, this, &PerformersWidget::onInitATable);
-  connect(g_castAct().INSERT_INTO_TABLE, &QAction::triggered, this, &PerformersWidget::onInsertIntoTable);
+  connect(g_castAct().INIT_TABLE, &QAction::triggered, this, &CastDBView::onInitATable);
   connect(g_castAct().DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DROP); });
   connect(g_castAct().DELETE_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DELETE); });
 
-  connect(g_castAct().SUBMIT, &QAction::triggered, this, &PerformersWidget::onSubmit);
+  connect(g_castAct().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &CastDBView::onForceRefreshRecordsVids);
+  connect(g_castAct().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &CastDBView::onForceRefreshAllRecordsVids);
 
-  connect(g_castAct().LOCATE_IMAGEHOST, &QAction::triggered, this, &PerformersWidget::onLocateImageHost);
+  connect(g_castAct().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
+  connect(g_castAct().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &CastDBView::onOpenRecordInFileSystem);
+  connect(g_castAct().LOCATE_IMAGEHOST, &QAction::triggered, this, &CastDBView::onLocateImageHost);
 
-  connect(g_castAct().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT, &QAction::triggered, this, &PerformersWidget::onChangePerformerImageHeight);
+  connect(g_castAct().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
+  connect(g_castAct().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &CastDBView::onLoadFromPerformersList);
+  connect(g_castAct().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &CastDBView::onLoadFromPJsonDirectory);
 
-  connect(g_castAct().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &PerformersWidget::onLoadFromFileSystemStructure);
-  connect(g_castAct().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &PerformersWidget::onLoadFromPerformersList);
-  connect(g_castAct().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &PerformersWidget::onLoadFromPJsonDirectory);
+  connect(g_castAct().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &CastDBView::onDumpAllIntoPJsonFile);
+  connect(g_castAct().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPJsonFile);
 
-  connect(g_castAct().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpAllIntoPJsonFile);
-  connect(g_castAct().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpIntoPJsonFile);
+  connect(g_castAct().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT, &QAction::triggered, this, &CastDBView::onChangePerformerImageHeight);
 
-  connect(g_castAct().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &PerformersWidget::onOpenRecordInFileSystem);
-
-  connect(m_perfTv->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PerformersWidget::on_selectionChanged);
-
-  connect(g_castAct().DELETE_RECORDS, &QAction::triggered, this, &PerformersWidget::onDeleteRecords);
-
-  connect(g_castAct().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshRecordsVids);
-  connect(g_castAct().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshAllRecordsVids);
+  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::on_selectionChanged);
 }
 
-void PerformersWidget::closeEvent(QCloseEvent* event) {
-  g_castAct().PERFORMERS_BOOK->setChecked(false);
-  PreferenceSettings().setValue("PerformersWidgetGeometry", saveGeometry());
-  PreferenceSettings().setValue("PerformersWidgetDockerWidth", m_perfPrevDock->width());
-  PreferenceSettings().setValue("PerformersWidgetDockerHeight", m_perfPrevDock->height());
-  QMainWindow::closeEvent(event);
-}
-
-void PerformersWidget::readSettings() {
-  if (PreferenceSettings().contains("PerformersWidgetGeometry")) {
-    restoreGeometry(PreferenceSettings().value("PerformersWidgetGeometry").toByteArray());
-  } else {
-    setGeometry(DEFAULT_GEOMETRY);
-  }
-}
-
-void PerformersWidget::onInitATable() {
+void CastDBView::onInitATable() {
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
   if (!mDb.CreateTable(DB_TABLE::PERFORMERS, PerfBaseDb::CREATE_PERF_TABLE_TEMPLATE)) {
     qWarning("Table[%s] create failed.", qPrintable(DB_TABLE::PERFORMERS));
@@ -143,7 +112,7 @@ void PerformersWidget::onInitATable() {
   qDebug("Table[%s] create succeed", qPrintable(DB_TABLE::PERFORMERS));
 }
 
-bool PerformersWidget::onInsertIntoTable() {
+bool CastDBView::onInsertIntoTable() {
   const QString& names = QInputDialog::getText(this,                   //
                                                "Insert performer(s)",  //
                                                "Performers can be split by '|'");
@@ -168,7 +137,7 @@ bool PerformersWidget::onInsertIntoTable() {
   return true;
 }
 
-bool PerformersWidget::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete) {
+bool CastDBView::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete) {
   auto retBtn = QMessageBox::warning(this,                                                                          //
                                      QString("Confirm %1?").arg((int)dropOrDelete),                                 //
                                      "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
@@ -188,7 +157,7 @@ bool PerformersWidget::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrD
   return rmvedTableCnt >= 0;
 }
 
-int PerformersWidget::onLoadFromFileSystemStructure() {
+int CastDBView::onLoadFromFileSystemStructure() {
   if (m_perfDbMdl->isDirty()) {
     Notificator::badNews("Table dirty", "submit before load from file-system structure");
     return false;
@@ -204,7 +173,7 @@ int PerformersWidget::onLoadFromFileSystemStructure() {
   return succeedCnt;
 }
 
-int PerformersWidget::onLoadFromPerformersList() {
+int CastDBView::onLoadFromPerformersList() {
   if (m_perfDbMdl->isDirty()) {
     Notificator::badNews("Table dirty", "submit before load from file-system structure");
     return false;
@@ -229,7 +198,7 @@ int PerformersWidget::onLoadFromPerformersList() {
   return succeedCnt;
 }
 
-bool PerformersWidget::onLocateImageHost() {
+bool CastDBView::onLocateImageHost() {
   const QString& locatePath = QFileDialog::getExistingDirectory(this, "Locate imagehost folder", m_imageHostPath);
   if (!QFile::exists(locatePath)) {
     qWarning("locate path not exist");
@@ -240,7 +209,7 @@ bool PerformersWidget::onLocateImageHost() {
   return true;
 }
 
-bool PerformersWidget::onChangePerformerImageHeight() {
+bool CastDBView::onChangePerformerImageHeight() {
   bool ok = false;
   int height = QInputDialog::getInt(this, "Performer image height(px)", QString::number(m_performerImageHeight), m_performerImageHeight, 0, INT_MAX, 1, &ok);
   if (!ok) {
@@ -252,91 +221,36 @@ bool PerformersWidget::onChangePerformerImageHeight() {
   return true;
 }
 
-inline bool PerformersWidget::onSubmit() {
+inline bool CastDBView::onSubmit() {
+  if (m_perfDbMdl == nullptr) {
+    qCritical("_dbModel is nullptr");
+    return false;
+  }
+
   if (!m_perfDbMdl->isDirty()) {
-    qDebug("No need to submit");
+    Notificator::goodNews("Table not dirty, Skip", DB_TABLE::PERFORMERS);
     return true;
   }
-  return m_perfDbMdl->submitAll();
-}
-
-QString GetHtml(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
-  const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString();
-  const QString& ori = record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString();
-  const QString& imgs = record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString();
-  const QString& vids = record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString();
-  QString details = record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString();  // for display in html. don't mix toString().replace() together
-  details.replace(PerformerJsonFileHelper::IMG_VID_SEP_COMP, "<br/>");
-
-  QString vidsLinks;
-  if (!vids.isEmpty()) {
-    for (const QString& vidPath : vids.split(PerformerJsonFileHelper::IMG_VID_SEP_COMP)) {
-      vidsLinks += (ClickableTextBrowser::VID_LINK_TEMPLATE.arg(vidPath, vidPath) + "<br/>");
-    }
+  if (!m_perfDbMdl->submitAll()) {
+    Notificator::badNews("Submit failed. see details in logs", DB_TABLE::PERFORMERS);
+    return false;
   }
 
-  const QString& dirPath{imgHost + '/' + ori + '/' + name};
-  const QDir dir{dirPath};
-  const QStringList& m_imgsLst = PerformerJsonFileHelper::InitImgsList(imgs);
-  const QString& firstImgPath{m_imgsLst.isEmpty() ? "" : dir.absoluteFilePath(m_imgsLst.front())};
-  static const QString PERFORMER_HTML_TEMPLATE{
-      R"(
-<html><head></head>
-<style>
-perf{
-font-size:48px;
-font-weight: bold;
-}
-p{
-font-size:24px;
-}
-</style>
-
-<body>
-<perf>%1<a href="file:///%2\"><img width=%3 src="file:///%2" align=right hspace=12 v:shapes="Picture_x0020_2"></a></perf><br/>
-<p> Rates: %4 </p>
-<p> Aka: %5 </p>
-<p> Tags: %6 </p>
-<p> Ori: %7 </p><br/>
-<p> Vids:<br/>%8 </p><br/>
-<p> Details:<br/>%9 </p><br/>
-
-</body>
-
-</html>
-)"};
-
-  QString htmlSrc = PERFORMER_HTML_TEMPLATE                                                   //
-                        .arg(name)                                                            //
-                        .arg(firstImgPath)                                                    //
-                        .arg(imgHeight)                                                       //
-                        .arg(record.field(PERFORMER_DB_HEADER_KEY::Rate).value().toInt())     //
-                        .arg(record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString())   //
-                        .arg(record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString())  //
-                        .arg(ori)                                                             //
-                        .arg(vidsLinks)                                                       //
-                        .arg(details);
-
-  for (const QString& imgName : m_imgsLst) {
-    htmlSrc += ClickableTextBrowser::HTML_IMG_TEMPLATE  //
-                   .arg(dir.absoluteFilePath(imgName))  //
-                   .arg(imgName)                        //
-                   .arg(ClickableTextBrowser::HTML_IMG_FIXED_WIDTH);
-  }
-  return htmlSrc;
-}
-
-bool PerformersWidget::on_selectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
-  if (not m_perfTv->currentIndex().isValid()) {
-    m_introTE->setText("");
-    return true;
-  }
-  const auto& record = m_perfDbMdl->record(m_perfTv->currentIndex().row());
-  m_introTE->setHtml(GetHtml(record, m_imageHostPath, m_performerImageHeight));
+  Notificator::goodNews("Submit succeed", DB_TABLE::PERFORMERS);
   return true;
 }
 
-int PerformersWidget::onLoadFromPJsonDirectory() {
+bool CastDBView::on_selectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
+  if (!currentIndex().isValid()) {
+    return true;
+  }
+  CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
+  const auto& record = m_perfDbMdl->record(currentIndex().row());
+  _floatingPreview->operator()(record, m_imageHostPath, m_performerImageHeight);
+  return true;
+}
+
+int CastDBView::onLoadFromPJsonDirectory() {
   if (m_perfDbMdl->isDirty()) {
     Notificator::badNews("Table dirty", "submit before load pjson");
     return false;
@@ -354,7 +268,7 @@ int PerformersWidget::onLoadFromPJsonDirectory() {
   return succeedCnt;
 }
 
-int PerformersWidget::onDumpAllIntoPJsonFile() {
+int CastDBView::onDumpAllIntoPJsonFile() {
   if (!QDir(m_imageHostPath).exists()) {
     Notificator::badNews("Path[pjson dump to] not exist", m_imageHostPath);
     return 0;
@@ -372,20 +286,20 @@ int PerformersWidget::onDumpAllIntoPJsonFile() {
   return succeedCnt;
 }
 
-int PerformersWidget::onDumpIntoPJsonFile() {
+int CastDBView::onDumpIntoPJsonFile() {
   if (!QDir(m_imageHostPath).exists()) {
     Notificator::badNews("Path[pjson dump to] not exist", m_imageHostPath);
     return 0;
   }
 
-  if (!m_perfTv->selectionModel()->hasSelection()) {
+  if (!selectionModel()->hasSelection()) {
     Notificator::badNews("Nothing was selected", "Select some row to dump");
     return 0;
   }
 
   int dumpCnt = 0;
   int succeedCnt = 0;
-  for (const auto& indr : m_perfTv->selectionModel()->selectedRows()) {
+  for (const auto& indr : selectionModel()->selectedRows()) {
     const int r = indr.row();
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
@@ -397,7 +311,7 @@ int PerformersWidget::onDumpIntoPJsonFile() {
   return succeedCnt;
 }
 
-int PerformersWidget::onForceRefreshAllRecordsVids() {
+int CastDBView::onForceRefreshAllRecordsVids() {
   QMessageBox::information(this, QString("Oops function not support now"), QString("But you could selected all record(s) and then force refresh instead."));
   return 0;
 }
@@ -421,8 +335,8 @@ QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query)
   return vidPath;
 };
 
-int PerformersWidget::onForceRefreshRecordsVids() {
-  if (!m_perfTv->selectionModel()->hasSelection()) {
+int CastDBView::onForceRefreshRecordsVids() {
+  if (!selectionModel()->hasSelection()) {
     Notificator::badNews("Nothing was selected", "Select some row to refresh");
     return 0;
   }
@@ -437,15 +351,17 @@ int PerformersWidget::onForceRefreshRecordsVids() {
   QSqlQuery qur{con};
   int recordsCnt = 0;
   int vidsCnt = 0;
-  for (const auto& indr : m_perfTv->selectionModel()->selectedRows()) {
+  for (const auto& indr : selectionModel()->selectedRows()) {
     const int r = indr.row();
     auto record = m_perfDbMdl->record(r);
     const QStringList& vidsList = GetVidsListFromVidsTable(record, qur);
     record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR));
     m_perfDbMdl->setRecord(r, record);  // update back
     vidsCnt += vidsList.size();
-    if (recordsCnt == 0) {
-      m_introTE->setHtml(GetHtml(record, m_imageHostPath, m_performerImageHeight));
+    if (recordsCnt == 0) {  // update display html content of first selected record
+      CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
+      const auto& record = m_perfDbMdl->record(currentIndex().row());
+      _floatingPreview->operator()(record, m_imageHostPath, m_performerImageHeight);
     }
     ++recordsCnt;
   }
@@ -454,22 +370,22 @@ int PerformersWidget::onForceRefreshRecordsVids() {
   return recordsCnt;
 }
 
-bool PerformersWidget::onOpenRecordInFileSystem() const {
+bool CastDBView::onOpenRecordInFileSystem() const {
   if (!QDir(m_imageHostPath).exists()) {
     qWarning("imgHost [%s] not exists", qPrintable(m_imageHostPath));
     return false;
   }
-  if (!m_perfTv->selectionModel()->hasSelection()) {
+  if (!selectionModel()->hasSelection()) {
     qDebug("Nothing was selected. Select a row to open pjson folder");
     return false;
   }
 
-  const auto& record = m_perfDbMdl->record(m_perfTv->currentIndex().row());
+  const auto& record = m_perfDbMdl->record(currentIndex().row());
   QString folderPath = QString{"%1/%2/%3"}                                                              //
                            .arg(m_imageHostPath)                                                        //
                            .arg(record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString())  //
                            .arg(record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString());
-  if (m_perfTv->currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail_INDEX) {
+  if (currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail_INDEX) {
     folderPath += QString("/%1.pjson").arg(record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString());
   }
   if (!QFile::exists(folderPath)) {
@@ -479,14 +395,14 @@ bool PerformersWidget::onOpenRecordInFileSystem() const {
   return QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 }
 
-int PerformersWidget::onDeleteRecords() {
-  if (!m_perfTv->selectionModel()->hasSelection()) {
+int CastDBView::onDeleteRecords() {
+  if (!selectionModel()->hasSelection()) {
     Notificator::badNews("Nothing was selected", "Select some row(s) to delete");
     return 0;
   }
   int deleteCnt = 0;
   int succeedCnt = 0;
-  const auto& itemSelection = m_perfTv->selectionModel()->selection();
+  const auto& itemSelection = selectionModel()->selection();
   for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
     int startRow = it->top();  // [top, bottom]
     int size = it->bottom() - startRow + 1;
@@ -500,12 +416,12 @@ int PerformersWidget::onDeleteRecords() {
   return succeedCnt;
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
-  PerformersWidget perfManaWid;
+  CastDBView perfManaWid;
   perfManaWid.show();
   a.exec();
   return 0;
