@@ -1,6 +1,5 @@
 <RCC>
 <qresource prefix="txt">
-<file alias="PERFORMER_HTML_TEMPLATE">../PerformerHtmlTemplate.html</file>
 </qresource>
 <qresource prefix="img">
 <!--App Icons here-->
@@ -101,6 +100,7 @@
 <file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.ico</file>
 <file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.ico</file>
 <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.ico</file>
+<file alias="PIN">LeftSideToolBarIcons/PIN.svg</file>
 <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
 <file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
 <file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
@@ -245,6 +245,7 @@
 <file alias="CREATE_TABLE">Database/CREATE_TABLE.svg</file>
 <file alias="DROP_DATABASE">Database/DROP_DATABASE.svg</file>
 <file alias="DROP_TABLE">Database/DROP_TABLE.svg</file>
+<file alias="DELETE_TABLE">Database/DELETE_TABLE.svg</file>
 <file alias="ANALYSE_AI_MEDIA_TABLES">Database/ANALYSE_AI_MEDIA_TABLES.svg</file>
 <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
 <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>

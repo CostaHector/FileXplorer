@@ -19,7 +19,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(DROP_A_TABLE);
   INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), "Insert Into", this);
   CHECK_NULLPTR_RETURN_VOID(INSERT_A_PATH);
-  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), "Delete From", this);
+  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), "Delete Where", this);
   CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
   UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), "Union Into", this);
   CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);

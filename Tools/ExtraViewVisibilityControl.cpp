@@ -13,7 +13,7 @@ ExtraViewVisibilityControl::ExtraViewVisibilityControl(QWidget* parent)
 }
 
 void ExtraViewVisibilityControl::subscribe() {
-  connect(g_performersManagerActions().PERFORMERS_BOOK, &QAction::triggered, this, [this](const bool checked) -> void {
+  connect(g_castAct().PERFORMERS_BOOK, &QAction::triggered, this, [this](const bool checked) -> void {
     if (not checked) {
       if (performerManager != nullptr)
         performerManager->hide();
