@@ -21,8 +21,12 @@ QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {
     return QVariant();
   }
   if (role == Qt::DisplayRole) {
-    if (idx.column() == MOVIE_TABLE::Size)
-      return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
+    using namespace FILE_PROPERTY_DSP;
+    if (idx.column() == MOVIE_TABLE::Size) {
+      return sizeToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
+    } else if (idx.column() == MOVIE_TABLE::Duration) {
+      return durationToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
+    }
   }
   return QSqlTableModel::data(idx, role);
 }

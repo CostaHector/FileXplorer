@@ -3,7 +3,6 @@
 #include "Component/AdvanceSearchToolBar.h"
 #include "Component/DatabaseSearchToolBar.h"
 #include "Component/NavigationAndAddressBar.h"
-#include "public/PublicVariable.h"
 
 #include <QHash>
 #include <QLayout>
@@ -17,11 +16,12 @@ class StackedToolBar : public QToolBar {
  public:
   friend class NavigationViewSwitcher;
   explicit StackedToolBar(const QString& title = "Stacked Toolbar", QWidget* parent = nullptr);
-  int AddToolBar(ViewTypeTool::ViewType vt, QToolBar* tb);
+  int AddToolBar(ViewTypeTool::ViewType vt, QWidget* tb);
 
   NavigationAndAddressBar* m_addressBar{nullptr};
   DatabaseSearchToolBar* m_dbSearchBar{nullptr};
   AdvanceSearchToolBar* m_advanceSearchBar{nullptr};
+  QLineEdit* m_perfSearch{nullptr};
 
  private:
   QStackedWidget* m_stackedToolBar;
