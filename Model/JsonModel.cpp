@@ -17,7 +17,7 @@ int JsonProperties::getPerfsCount(const QString& pth) {
   if (!dict.contains(JSON_KEY::PerformersS)) {
     return 0;
   }
-  return dict[VOLUME_ENUM_TO_STRING(Performers)].toStringList().size();
+  return dict[ENUM_TO_STRING(Performers)].toStringList().size();
 }
 
 JsonModel::JsonModel(QObject* parent)
