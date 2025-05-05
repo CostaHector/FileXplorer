@@ -53,9 +53,6 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   addWidget(m_LoadExtentOp);
   addSeparator();
   addWidget(m_ExportToOp);
-
-  addAction(g_castAct().PERFORMERS_BOOK);
-  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }
 
 //#define RUN_MAIN_FILE 1

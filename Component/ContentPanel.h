@@ -15,6 +15,7 @@
 #include "View/FileSystemTreeView.h"
 #include "View/MovieDBView.h"
 #include "View/SceneListView.h"
+#include "View/CastDBView.h"
 
 #include "Tools/ViewTypeTool.h"
 #include "Tools/FileDescriptor/FdBasedDb.h"
@@ -127,6 +128,8 @@ class ContentPanel : public QStackedWidget {
   MovieDBView* m_movieView{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
   SceneListView* m_sceneTableView{nullptr};
+
+  CastDBView* m_castTableView{nullptr};
 
   PreviewFolder* _previewFolder;
 

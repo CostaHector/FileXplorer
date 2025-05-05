@@ -28,15 +28,9 @@ class TorrentsManagerWidget : public QMainWindow {
   bool onDropATable();
   bool onDeleteFromTable();
 
-  inline bool onSubmit() {
-    if (not m_torrentsDBModel->isDirty()) {
-      qDebug("No need to submit");
-      return true;
-    }
-    return m_torrentsDBModel->submitAll();
-  }
+  bool onSubmit();
 
-  auto closeEvent(QCloseEvent* event) -> void;
+  void closeEvent(QCloseEvent* event);
   void updateWindowsSize();
 
   TorrDb mDb;

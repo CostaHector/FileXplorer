@@ -85,9 +85,6 @@ CastDBActions::CastDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(VERTICAL_HEADER_AGS);
 //  VERTICAL_HEADER_AGS->addAction(DELETE_RECORDS);
 
-  PERFORMERS_BOOK = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_APP"), "Cast book", this);
-  CHECK_NULLPTR_RETURN_VOID(PERFORMERS_BOOK);
-
   LOAD_FROM_PJSON_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> Load *.pjson from ImageHost.<br/>Update each column value by new one if primary key conflicts.")
                                        .arg(LOAD_FROM_PJSON_PATH->text(), LOAD_FROM_PJSON_PATH->shortcut().toString()));
 
@@ -98,8 +95,6 @@ CastDBActions::CastDBActions(QObject* parent)  //
 
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
   SUBMIT->setShortcutVisibleInContextMenu(true);
-
-  PERFORMERS_BOOK->setCheckable(true);
 
   const QString& heightStr = QString::number(PreferenceSettings().value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v).toInt());
   CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT->setToolTip(heightStr);

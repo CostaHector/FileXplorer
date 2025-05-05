@@ -38,8 +38,6 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_dbViewHideShowTB->addSeparator();
   m_dbViewHideShowTB->addAction(g_viewActions()._MOVIE_VIEW);
   m_dbViewHideShowTB->addSeparator();
-  m_dbViewHideShowTB->addAction(g_castAct().PERFORMERS_BOOK);
-  m_dbViewHideShowTB->addSeparator();
   m_dbViewHideShowTB->addAction(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER);
   m_dbViewHideShowTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   m_dbViewHideShowTB->setOrientation(Qt::Orientation::Horizontal);

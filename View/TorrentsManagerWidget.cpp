@@ -3,6 +3,7 @@
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "Tools/FileDescriptor/TableFields.h"
+#include "Component/Notificator.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -210,7 +211,26 @@ bool TorrentsManagerWidget::onDeleteFromTable() {
   return deleteRes;
 }
 
-auto TorrentsManagerWidget::closeEvent(QCloseEvent* event) -> void {
+bool TorrentsManagerWidget::onSubmit() {
+  if (m_torrentsDBModel == nullptr) {
+    qCritical("_dbModel is nullptr");
+    return false;
+  }
+
+  if (!m_torrentsDBModel->isDirty()) {
+    Notificator::goodNews("Table not dirty, Skip", DB_TABLE::TORRENTS);
+    return true;
+  }
+  if (!m_torrentsDBModel->submitAll()) {
+    Notificator::badNews("Submit failed. see details in logs", DB_TABLE::TORRENTS);
+    return false;
+  }
+
+  Notificator::goodNews("Submit succeed", DB_TABLE::TORRENTS);
+  return true;
+}
+
+void TorrentsManagerWidget::closeEvent(QCloseEvent* event) {
   g_torrentsManagerActions().SHOW_TORRENTS_MANAGER->setChecked(false);
   PreferenceSettings().setValue("TorrentsManagerWidgetGeometry", saveGeometry());
   QMainWindow::closeEvent(event);
