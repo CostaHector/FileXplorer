@@ -42,4 +42,16 @@ enum FIELD_E {
   BUTT
 };
 }
+
+namespace TORRENTS_DB_HEADER_KEY {
+enum FIELD_E {
+  Name = 0,
+  Size,
+  DateModified,
+  MD5,
+  PrePath,
+  BUTT,
+};
+}  // namespace TORRENTS_DB_HEADER_KEY
+
 #endif  // TABLEFIELDS_H

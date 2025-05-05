@@ -52,8 +52,6 @@ class PerformerJsonFileHelper {
     return m_imageHostPath + '/' + ori + '/' + performerName + '/' + performerName + ".pjson";
   }
 
-  static QString CreatePerformerTableSQL(const QString& tableName);
-
   static QVariantHash PerformerJsonJoiner(const QSqlRecord& record);
 
   static QVariantHash PerformerJsonJoiner(const QString& name,
