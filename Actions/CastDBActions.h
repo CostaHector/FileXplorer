@@ -42,8 +42,6 @@ class CastDBActions : public QObject {
   QActionGroup* HORIZONTAL_HEADER_AGS{nullptr};
   QActionGroup* VERTICAL_HEADER_AGS{nullptr};
 
-  QAction* PERFORMERS_BOOK{nullptr};
-
   QMenuBar* GetMenuBar() const;
   QMenu* GetRightClickMenu() const;
 
