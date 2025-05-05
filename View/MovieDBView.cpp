@@ -1,6 +1,6 @@
 #include "MovieDBView.h"
 
-#include "Actions/DataBaseActions.h"
+#include "Actions/MovieDBActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 
 #include "Component/QuickWhereClause.h"
@@ -549,9 +549,9 @@ int MovieDBView::onCountRow() {
 #include <QMainWindow>
 class MoviesDatabase : public QMainWindow {
  public:
-  DatabaseToolBar* m_databaseTB;
+  RibbonMovieDB* m_databaseTB;
   DatabaseTableView* m_dbPanel;
-  explicit MoviesDatabase(QWidget* parent = nullptr) : QMainWindow(parent), m_databaseTB(new DatabaseToolBar("Movies Database Toolbar", this)), m_dbPanel(new DatabaseTableView) {
+  explicit MoviesDatabase(QWidget* parent = nullptr) : QMainWindow(parent), m_databaseTB(new RibbonMovieDB("Movies Database Toolbar", this)), m_dbPanel(new DatabaseTableView) {
     this->addToolBar(Qt::ToolBarArea::TopToolBarArea, m_databaseTB);
     this->setCentralWidget(m_dbPanel);
     this->setWindowTitle("QTableView Example");

@@ -18,7 +18,8 @@
 #include "Actions/ViewActions.h"
 #include "Actions/ThumbnailProcessActions.h"
 #include "Actions/LogActions.h"
-#include "Component/DatabaseToolBar.h"
+#include "Component/RibbonCastDB.h"
+#include "Component/RibbonMovieDB.h"
 #include "Component/DropListToolButton.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
@@ -32,12 +33,14 @@ RibbonMenu::RibbonMenu(QWidget* parent)
       m_leafHome(LeafHome()),
       m_leafView(LeafView()),
       m_leafDatabase(LeafDatabase()),
+      m_leafCast(LeafCast()),
       m_leafScenes(LeafScenesTools()),
       m_leafMedia(LeafMediaTools()) {
   addTab(m_leafFile, "&File");
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
   addTab(m_leafDatabase, "&Database");
+  addTab(m_leafCast, "&Cast");
   addTab(m_leafScenes, "&Scene");
   addTab(m_leafMedia, "&Arrange");
 
@@ -221,7 +224,9 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* fileSystemView = new (std::nothrow) QToolBar("Navigation Preview Switch");
   CHECK_NULLPTR_RETURN_NULLPTR(fileSystemView);
   fileSystemView->setOrientation(Qt::Orientation::Vertical);
-  fileSystemView->addActions({g_viewActions()._LIST_VIEW, g_viewActions()._TABLE_VIEW, g_viewActions()._TREE_VIEW});
+  fileSystemView->addAction(g_viewActions()._LIST_VIEW);
+  fileSystemView->addAction(g_viewActions()._TABLE_VIEW);
+  fileSystemView->addAction(g_viewActions()._TREE_VIEW);
   fileSystemView->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   fileSystemView->setStyleSheet("QToolBar { max-width: 256px; }");
   fileSystemView->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
@@ -250,9 +255,15 @@ QToolBar* RibbonMenu::LeafView() const {
 }
 
 QToolBar* RibbonMenu::LeafDatabase() const {
-  auto* databaseToolBar{new (std::nothrow) DatabaseToolBar("Leaf Database")};
+  auto* databaseToolBar{new (std::nothrow) RibbonMovieDB("Leaf Movie Database")};
   CHECK_NULLPTR_RETURN_NULLPTR(databaseToolBar);
   return databaseToolBar;
+}
+
+QToolBar* RibbonMenu::LeafCast() const {
+  auto* castToolBar{new (std::nothrow) RibbonCastDB("Leaf Cast Database")};
+  CHECK_NULLPTR_RETURN_NULLPTR(castToolBar);
+  return castToolBar;
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
