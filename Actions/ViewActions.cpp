@@ -120,6 +120,6 @@ QToolBar* ViewActions::GetViewTB(QWidget* parent) {
   pTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   pTb->setOrientation(Qt::Orientation::Horizontal);
   pTb->setStyleSheet("QToolBar { max-width: 256px; }");
-  pTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_3x1, IMAGE_SIZE::TABS_ICON_IN_MENU_3x1));
+  pTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   return pTb;
 }
