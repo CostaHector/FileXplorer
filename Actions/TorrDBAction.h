@@ -1,16 +1,16 @@
-#ifndef TORRENTSMANAGERACTIONS_H
-#define TORRENTSMANAGERACTIONS_H
+#ifndef TORRDBACTION_H
+#define TORRDBACTION_H
 
 #include <QAction>
 #include <QMenuBar>
 #include <QObject>
 
-class TorrentsManagerActions : public QObject {
+class TorrDBAction : public QObject {
   Q_OBJECT
  public:
-  explicit TorrentsManagerActions(QObject* parent = nullptr);
+  explicit TorrDBAction(QObject* parent = nullptr);
 
-  QAction* OPEN_WITH_LOCAL_APP;
+  QAction* OPEN_DB_WITH_LOCAL_APP;
 
   QAction* INIT_DATABASE;
   QAction* INIT_TABLE;
@@ -25,6 +25,6 @@ class TorrentsManagerActions : public QObject {
   QMenuBar* GetMenuBar() const;
 };
 
-TorrentsManagerActions& g_torrentsManagerActions();
+TorrDBAction& g_torrentsManagerActions();
 
-#endif  // TORRENTSMANAGERACTIONS_H
+#endif  // TORRDBACTION_H
