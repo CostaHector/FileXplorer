@@ -212,7 +212,7 @@ FD_ERROR_CODE DevicesAndDriverDb::Delete(const QString& tableName, const QSet<QS
   if (needDeleteGuids.isEmpty()) {
     return FD_OK;
   }
-  QString qryCmd = QString(R"(DELETE FROM %1 WHERE `%2` IN (")").arg(tableName, VOLUME_ENUM_TO_STRING(GUID));
+  QString qryCmd = QString(R"(DELETE FROM %1 WHERE `%2` IN (")").arg(tableName, ENUM_TO_STRING(GUID));
   const QStringList guids{needDeleteGuids.cbegin(), needDeleteGuids.cend()};
   qryCmd += guids.join(R"(",")");
   qryCmd += R"(");)";
@@ -297,7 +297,7 @@ FD_ERROR_CODE DevicesAndDriverDb::AdtDeviceAndDriver(const QString& tableName, V
   }
 
   QSet<QString> existedGuids, newGuids;
-  if (!QueryPK(tableName, VOLUME_ENUM_TO_STRING(GUID), existedGuids)) {
+  if (!QueryPK(tableName, ENUM_TO_STRING(GUID), existedGuids)) {
     qWarning("Qry guid(s) at table[%s] failed", qPrintable(tableName));
     return FD_QRY_PK_FAILED;
   }

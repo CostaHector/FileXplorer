@@ -82,7 +82,10 @@ class ContentPanel : public QStackedWidget {
     if (p == m_sceneTableView) {
       return ViewType::SCENE;
     }
-    qCritical("Current View Type[%s] not supported", qPrintable(GetCurViewName()));
+    if (p == m_castTableView) {
+      return ViewType::CAST;
+    }
+    qCritical("Current Index[%d] not find ViewType", currentIndex());
     return ViewType::VIEW_TYPE_BUTT;
   }
 

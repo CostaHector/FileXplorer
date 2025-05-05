@@ -93,7 +93,7 @@ class FdBasedDbTest : public MyTestSuite {
 
     // total count = 8
     using namespace MOVIE_TABLE;
-    const QString qryWhereClause{QString(R"(`%1` like "%.mp4")").arg(VOLUME_ENUM_TO_STRING(Name))};
+    const QString qryWhereClause{QString(R"(`%1` like "%.mp4")").arg(ENUM_TO_STRING(Name))};
     QCOMPARE(dbManager.CountRow("VOLUME_E", qryWhereClause), 5);  // 5 *.mp4 removed
     QCOMPARE(dbManager.DeleteByWhereClause("VOLUME_E", qryWhereClause), 5);
     QCOMPARE(dbManager.CountRow("VOLUME_E"), 1);  // 1 *.mkv left
@@ -131,7 +131,7 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(adtRet.updateCnt, 0);
     // Also Check file name should only contain beforeMKVFileName
     QSet<QString> oldActualNames;
-    QVERIFY(dbManager.QueryPK("VOLUME_E", VOLUME_ENUM_TO_STRING(Name), oldActualNames));
+    QVERIFY(dbManager.QueryPK("VOLUME_E", ENUM_TO_STRING(Name), oldActualNames));
     QVERIFY(oldActualNames.contains(beforeMKVFileName));
     QVERIFY(!oldActualNames.contains(afterMKVFileName));
 
@@ -151,7 +151,7 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.CountRow("VOLUME_E"), 6);
     // Also Check file name should also sync to new one afterMKVFileName
     QSet<QString> newActualNames;
-    QVERIFY(dbManager.QueryPK("VOLUME_E", VOLUME_ENUM_TO_STRING(Name), newActualNames));
+    QVERIFY(dbManager.QueryPK("VOLUME_E", ENUM_TO_STRING(Name), newActualNames));
     QVERIFY(!newActualNames.contains(beforeMKVFileName));
     QVERIFY(newActualNames.contains(afterMKVFileName));
 
@@ -230,8 +230,8 @@ class FdBasedDbTest : public MyTestSuite {
     const QString updateCmd{                                                                              //
                             QString{R"(UPDATE %1 SET `%2` = "Henry Cavill, Chris Evans", `%3` = 6000;)"}  // Atension, here we write ", " in purpose
                                 .arg("VOLUME_E")                                                          //
-                                .arg(VOLUME_ENUM_TO_STRING(Cast))                                         //
-                                .arg(VOLUME_ENUM_TO_STRING(Duration))};
+                                .arg(ENUM_TO_STRING(Cast))                                         //
+                                .arg(ENUM_TO_STRING(Duration))};
     QCOMPARE(dbManager.UpdateForTest(updateCmd), vids.size());
     QCOMPARE(dbManager.ExportDurationStudioCastTagsToJson("VOLUME_E"), vids.size());
     QVERIFY(dir.exists(MKV_FILENAME));
