@@ -8,6 +8,8 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QRegularExpression>
+#include <QDesktopServices>
+#include <QUrl>
 
 const QString DbManager::DROP_TABLE_TEMPLATE{"DROP TABLE `%1`;"};
 const QString DbManager::DELETE_TABLE_TEMPLATE{"DELETE FROM `%1`;"};
@@ -254,6 +256,15 @@ bool DbManager::IsTableVolumeOnline(const QString& tableName) const {
   QString stdGuidPart{tableName};
   stdGuidPart.replace(MountHelper::TABLE_UNDERSCORE, MountHelper::GUID_HYPEN);
   return MountHelper::isVolumeAvailable(stdGuidPart);
+}
+
+bool DbManager::ShowInFileSystemView() const
+{
+  if (!QFile::exists(mDbName)) {
+    qWarning("Database[%s] not exist, open failed", qPrintable(mDbName));
+    return false;
+  }
+  return QDesktopServices::openUrl(QUrl::fromLocalFile(mDbName));
 }
 
 QString DbManager::GetDeleteInPlaceholders(int n) {

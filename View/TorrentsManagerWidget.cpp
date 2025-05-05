@@ -1,8 +1,8 @@
 #include "TorrentsManagerWidget.h"
-#include "Actions/TorrentsManagerActions.h"
-#include "Tools/TorrentsDatabaseHelper.h"
+#include "Actions/TorrDBAction.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "Tools/FileDescriptor/TableFields.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -17,7 +17,8 @@
 
 TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
     : QMainWindow{parent},
-      m_searchLE{new QLineEdit(QString("%1 like \"%\"").arg(TORRENTS_DB_HEADER_KEY::Name))},
+      mDb{SystemPath::TORRENTS_DATABASE, "torrent_connection"},
+      m_searchLE{new QLineEdit(QString("Name like \"%\""))},
       m_torrentsListView(new CustomTableView("TORRENT_TABLE", parent)),
       m_torrentsCentralWidget(new QWidget),
       m_torrentsDBModel(nullptr) {
@@ -29,7 +30,7 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   setMenuBar(g_torrentsManagerActions().GetMenuBar());
   setCentralWidget(m_torrentsCentralWidget);
 
-  QSqlDatabase con = GetSqlDB();
+  QSqlDatabase con = mDb.GetDb();
   m_torrentsDBModel = new QSqlTableModel(this, con);
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
     m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
@@ -54,13 +55,7 @@ void TorrentsManagerWidget::subscribe() {
     m_torrentsDBModel->setFilter(searchPattern);
   });
 
-  connect(g_torrentsManagerActions().OPEN_WITH_LOCAL_APP, &QAction::triggered, this, [this]() {
-    if (!QFile::exists(SystemPath::TORRENTS_DATABASE)) {
-      QMessageBox::information(this, "open failed", QString("[%1] not exists. \nCreate it first").arg(SystemPath::TORRENTS_DATABASE));
-      return;
-    }
-    QDesktopServices::openUrl(QUrl::fromLocalFile(SystemPath::TORRENTS_DATABASE));
-  });
+  connect(g_torrentsManagerActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
 
   connect(g_torrentsManagerActions().INIT_DATABASE, &QAction::triggered, this, &TorrentsManagerWidget::onInitDataBase);
   connect(g_torrentsManagerActions().INIT_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInitATable);
@@ -70,47 +65,28 @@ void TorrentsManagerWidget::subscribe() {
   connect(g_torrentsManagerActions().SUBMIT, &QAction::triggered, this, &TorrentsManagerWidget::onSubmit);
 }
 
-QSqlDatabase TorrentsManagerWidget::GetSqlDB() const {
-  QSqlDatabase con;
-  if (QSqlDatabase::connectionNames().contains("torrents_connection")) {
-    con = QSqlDatabase::database("torrents_connection", false);
-  } else {
-    con = QSqlDatabase::addDatabase("QSQLITE", "torrents_connection");
-  }
-  con.setDatabaseName(SystemPath::TORRENTS_DATABASE);
-  if (not con.open()) {
-    qDebug("%s", qPrintable(con.lastError().text()));
-  }
-  return con;
-}
-
 bool TorrentsManagerWidget::onInitDataBase() {
-  QSqlDatabase con = GetSqlDB();
-  if (not con.isOpen()) {
-    qDebug("con cannot open");
-    return false;
-  }
-  qDebug("Database create succeed");
-  return true;
+  return mDb.CreateDatabase();
 }
 
 void TorrentsManagerWidget::onInitATable() {
-  QSqlDatabase con = GetSqlDB();
-  if (not con.isOpen()) {
-    qDebug("con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
     return;
   }
+
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
     qDebug("Table[%s] already exists in database[%s]", qPrintable(DB_TABLE::TORRENTS), qPrintable(con.databaseName()));
     return;
   }
 
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
-  static const QString& createTableSQL = TorrentsDatabaseHelper::CreatePerformerTableSQL(DB_TABLE::TORRENTS);
+
   QSqlQuery createTableQuery(con);
-  const auto ret = createTableQuery.exec(createTableSQL);
-  if (not ret) {
-    qDebug("Create table[%s] failed.\n%s", qPrintable(DB_TABLE::TORRENTS), qPrintable(createTableQuery.lastError().text()));
+  if (!createTableQuery.exec(TorrDb::CREATE_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
+    qDebug("Exec[%s] failed:%s", qPrintable(createTableQuery.executedQuery()),  //
+           qPrintable(createTableQuery.lastError().text()));
     return;
   }
   m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
@@ -119,20 +95,20 @@ void TorrentsManagerWidget::onInitATable() {
 }
 
 bool TorrentsManagerWidget::onInsertIntoTable() {
-  QSqlDatabase con = GetSqlDB();
-  if (not con.isOpen()) {
-    qDebug("con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
-  if (not con.tables().contains(DB_TABLE::TORRENTS)) {
+
+  if (!con.tables().contains(DB_TABLE::TORRENTS)) {
     const QString& tablesNotExistsMsg = QString("Cannot insert, table[%1] not exist.").arg(DB_TABLE::TORRENTS);
     qDebug("Table [%s] not exists", qPrintable(tablesNotExistsMsg));
     QMessageBox::warning(this, "Abort", tablesNotExistsMsg);
     return false;
   }
 
-  const QString& defaultOpenDir =
-      PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
+  const QString& defaultOpenDir = PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
   const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Load torrents from", defaultOpenDir);
   QFileInfo loadFromFi(loadFromPath);
   if (not loadFromFi.isDir()) {
@@ -141,29 +117,35 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, loadFromFi.absoluteFilePath());
-  static const QString& insertTemplate =
-      QString("REPLACE INTO `%1` (%2) VALUES").arg(DB_TABLE::TORRENTS).arg(TORRENTS_DB_HEADER_KEY::HEADERS.join(',')) +
-      QString("(\"%1\", %2, \"%3\", \"%4\", \"%5\", \"%6\");");
+
+  QSqlQuery query{con};
+  if (!query.prepare(TorrDb::REPLACE_INTO_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
+    qWarning("Prepare failed: %s", qPrintable(query.lastError().text()));
+    return false;
+  }
 
   if (!con.transaction()) {
-    qDebug("Failed to start transaction mode");
+    qDebug("Failed to start transaction[%s]", qPrintable(con.lastError().text()));
     return 0;
   }
-  QSqlQuery insertTableQuery(con);
 
   int totalItemCnt = 0;
   int succeedItemCnt = 0;
-  QDirIterator it(loadFromPath, {"*.torrent"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+  QDirIterator it{loadFromPath, {"*.torrent"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     const QFileInfo& fi = it.fileInfo();
-    const QString& currentInsert =
-        insertTemplate.arg(fi.fileName()).arg(fi.size()).arg(fi.suffix()).arg(fi.lastModified().toMSecsSinceEpoch()).arg("").arg(fi.absolutePath());
-    const bool insertResult = insertTableQuery.exec(currentInsert);
-    succeedItemCnt += int(insertResult);
-    if (not insertResult) {
-      qDebug("Error [%s]: %s", qPrintable(currentInsert), qPrintable(insertTableQuery.lastError().text()));
+    query.bindValue(TORRENTS_DB_HEADER_KEY::Name, fi.fileName());
+    query.bindValue(TORRENTS_DB_HEADER_KEY::Size, fi.size());
+    query.bindValue(TORRENTS_DB_HEADER_KEY::DateModified, fi.lastModified().toMSecsSinceEpoch());
+    query.bindValue(TORRENTS_DB_HEADER_KEY::MD5, "");
+    query.bindValue(TORRENTS_DB_HEADER_KEY::PrePath, fi.absolutePath());
+    if (!query.exec()) {
+      con.rollback();
+      qDebug("Error[%s] fail: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      return 0;
     }
+    ++succeedItemCnt;
     ++totalItemCnt;
   }
 
@@ -172,9 +154,8 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     con.rollback();
     succeedItemCnt = 0;
   }
-  insertTableQuery.finish();
+  query.finish();
   const QString& msg = QString("%1/%2 item(s) add succeed. %3").arg(succeedItemCnt).arg(totalItemCnt).arg(loadFromPath);
-  qDebug("%s", qPrintable(msg));
   QMessageBox::information(this, QString("Finish insert into table[%1]").arg(DB_TABLE::TORRENTS), qPrintable(msg));
   m_torrentsDBModel->submitAll();
   return true;
@@ -182,19 +163,19 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
 
 bool TorrentsManagerWidget::onDropATable() {
   const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(DB_TABLE::TORRENTS);
-  auto retBtn = QMessageBox::warning(this, "CONFIRM DROP?", "(NOT recoverable)\n" + sqlCmd,
-                                     QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
+  auto retBtn = QMessageBox::warning(this, "CONFIRM DROP?", "(NOT recoverable)\n" + sqlCmd, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
   if (retBtn != QMessageBox::StandardButton::Yes) {
     qDebug("User Cancel");
     return true;
   }
 
-  QSqlDatabase con = GetSqlDB();
-  if (not con.isOpen()) {
-    qDebug("con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
-  if (not con.tables().contains(DB_TABLE::TORRENTS)) {
+
+  if (!con.tables().contains(DB_TABLE::TORRENTS)) {
     qDebug("Table[%s] already not exists", qPrintable(DB_TABLE::TORRENTS));
     return true;
   }
@@ -211,12 +192,13 @@ bool TorrentsManagerWidget::onDropATable() {
 }
 
 bool TorrentsManagerWidget::onDeleteFromTable() {
-  QSqlDatabase con = GetSqlDB();
-  if (not con.isOpen()) {
-    qDebug("con cannot open");
+  QSqlDatabase con = mDb.GetDb();
+  if (!mDb.CheckValidAndOpen(con)) {
+    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
-  const QString& whereClause = QInputDialog::getItem(this, "Where Clause", "Input clause below", TORRENTS_DB_HEADER_KEY::HEADERS, 0, true);
+  const QString& whereClause = QInputDialog::getItem(this, "Where Clause", "Input clause below",  //
+                                                     {"Name", "Size"}, 0, true);
   if (whereClause.isEmpty()) {
     return false;
   }

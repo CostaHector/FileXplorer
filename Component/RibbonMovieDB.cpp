@@ -1,12 +1,12 @@
-#include "DatabaseToolBar.h"
-#include "Actions/DataBaseActions.h"
-#include "Actions/PerformersManagerActions.h"
-#include "Actions/TorrentsManagerActions.h"
+#include "RibbonMovieDB.h"
+#include "Actions/MovieDBActions.h"
+#include "Actions/CastDBActions.h"
+#include "Actions/TorrDBAction.h"
 #include "Actions/ViewActions.h"
 #include "public/PublicVariable.h"
 #include "public/PublicMacro.h"
 
-DatabaseToolBar::DatabaseToolBar(const QString& title, QWidget* parent)  //
+RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
     : QToolBar(title, parent)                                            //
 {
   m_dbControlTB = new (std::nothrow) QToolBar("DB Control", this);
@@ -59,7 +59,7 @@ DatabaseToolBar::DatabaseToolBar(const QString& title, QWidget* parent)  //
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
-  DatabaseToolBar dbTB("Database Toolbar");
+  RibbonMovieDB dbTB("Database Toolbar");
   dbTB.show();
   return a.exec();
 }

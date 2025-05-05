@@ -1,7 +1,7 @@
 #include "PerformersTableView.h"
 
 #include <QHeaderView>
-#include "Actions/PerformersManagerActions.h"
+#include "Actions/CastDBActions.h"
 
 PerformersTableView::PerformersTableView(QWidget* parent): CustomTableView("PERFORMERS_TABLE", parent) {
   BindMenu(g_performersManagerActions().GetRightClickMenu());

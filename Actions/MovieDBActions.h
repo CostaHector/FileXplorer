@@ -1,15 +1,15 @@
-#ifndef DATABASEACTIONS_H
-#define DATABASEACTIONS_H
+#ifndef MOVIEDBACTIONS_H
+#define MOVIEDBACTIONS_H
 
 #include <QAction>
 #include <QActionGroup>
 #include <QIcon>
 #include <QObject>
 
-class DataBaseActions : public QObject {
+class MovieDBActions : public QObject {
   Q_OBJECT
  public:
-  explicit DataBaseActions(QObject* parent = nullptr);
+  explicit MovieDBActions(QObject* parent = nullptr);
 
   QAction* SUBMIT{nullptr};
   QAction* INIT_A_DATABASE{nullptr};
@@ -30,5 +30,5 @@ class DataBaseActions : public QObject {
   QAction *_COUNT{nullptr}, *_SUM{nullptr};
 };
 
-DataBaseActions& g_dbAct();
-#endif  // DATABASEACTIONS_H
+MovieDBActions& g_dbAct();
+#endif  // MOVIEDBACTIONS_H

@@ -14,17 +14,14 @@
 #include <QMenuBar>
 
 #include <QLineEdit>
-
 #include "CustomTableView.h"
+#include "Tools/FileDescriptor/TorrDb.h"
 
 class TorrentsManagerWidget : public QMainWindow {
  public:
   explicit TorrentsManagerWidget(QWidget* parent = nullptr);
 
   void subscribe();
-
-  QSqlDatabase GetSqlDB() const;
-
   bool onInitDataBase();
   void onInitATable();
   bool onInsertIntoTable();
@@ -42,7 +39,7 @@ class TorrentsManagerWidget : public QMainWindow {
   auto closeEvent(QCloseEvent* event) -> void;
   void updateWindowsSize();
 
- signals:
+  TorrDb mDb;
   QLineEdit* m_searchLE;
   CustomTableView* m_torrentsListView;
   QWidget* m_torrentsCentralWidget;
