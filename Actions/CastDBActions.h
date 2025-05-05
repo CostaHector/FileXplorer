@@ -10,34 +10,39 @@ class CastDBActions : public QObject {
  public:
   explicit CastDBActions(QObject* parent = nullptr);
 
-  QAction* REFRESH_ALL_RECORDS_VIDS;
-  QAction* REFRESH_SELECTED_RECORDS_VIDS;
-  QAction* OPEN_RECORD_IN_FILE_SYSTEM;
+  QAction* SUBMIT{nullptr};
+  QAction* INSERT_INTO_TABLE{nullptr};
+  QAction* DELETE_RECORDS{nullptr};
+  QAction* INIT_DATABASE{nullptr};
+  QAction* INIT_TABLE{nullptr};
+  QAction* DROP_TABLE{nullptr};
+  QAction* DELETE_TABLE{nullptr};
+  QActionGroup* BASIC_TABLE_OP{nullptr};
 
-  QAction* LOAD_FROM_PJSON_PATH;
-  QAction* LOAD_FROM_FILE_SYSTEM_STRUCTURE;
-  QAction* LOAD_FROM_PERFORMERS_LIST;
-  QAction* DUMP_ALL_RECORDS_INTO_PJSON_FILE;
-  QAction* DUMP_SELECTED_RECORDS_INTO_PJSON_FILE;
+  QAction* REFRESH_ALL_RECORDS_VIDS{nullptr};
+  QAction* REFRESH_SELECTED_RECORDS_VIDS{nullptr};
+  QActionGroup* REFRESH_OP{nullptr};
 
-  QAction* OPEN_DB_WITH_LOCAL_APP;
-  QAction* LOCATE_IMAGEHOST;
+  QAction* OPEN_DB_WITH_LOCAL_APP{nullptr};
+  QAction* OPEN_RECORD_IN_FILE_SYSTEM{nullptr};
+  QAction* LOCATE_IMAGEHOST{nullptr};
+  QActionGroup* FILE_SYSTEM_OP{nullptr};
 
-  QAction* SUBMIT;
-  QAction* INSERT_INTO_TABLE;
-  QAction* INIT_DATABASE;
-  QAction* INIT_TABLE;
-  QAction* DROP_TABLE;
-  QAction* DELETE_TABLE;
+  QAction* LOAD_FROM_PJSON_PATH{nullptr};
+  QAction* LOAD_FROM_FILE_SYSTEM_STRUCTURE{nullptr};
+  QAction* LOAD_FROM_PERFORMERS_LIST{nullptr};
+  QActionGroup* LOAD_EXTEND_OP{nullptr};
 
-  QAction* CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT;
+  QAction* DUMP_ALL_RECORDS_INTO_PJSON_FILE{nullptr};
+  QAction* DUMP_SELECTED_RECORDS_INTO_PJSON_FILE{nullptr};
+  QActionGroup* EXPORT_OP{nullptr};
 
-  QActionGroup* HORIZONTAL_HEADER_AGS;
+  QAction* CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT{nullptr};
 
-  QAction* DELETE_RECORDS;
-  QActionGroup* VERTICAL_HEADER_AGS;
+  QActionGroup* HORIZONTAL_HEADER_AGS{nullptr};
+  QActionGroup* VERTICAL_HEADER_AGS{nullptr};
 
-  QAction* PERFORMERS_BOOK;
+  QAction* PERFORMERS_BOOK{nullptr};
 
   QMenuBar* GetMenuBar() const;
   QMenu* GetRightClickMenu() const;
@@ -46,6 +51,6 @@ class CastDBActions : public QObject {
   QActionGroup* GetHorAGS() const;
 };
 
-CastDBActions& g_performersManagerActions();
+CastDBActions& g_castAct();
 
 #endif  // CASTDBACTIONS_H

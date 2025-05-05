@@ -47,7 +47,7 @@ PerformersWidget::PerformersWidget(QWidget* parent)
   m_perfToolbar->addWidget(m_perfSearch);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_perfToolbar);
 
-  setMenuBar(g_performersManagerActions().GetMenuBar());
+  setMenuBar(g_castAct().GetMenuBar());
 
   m_introTE = new (std::nothrow) ClickableTextBrowser{this};
   CHECK_NULLPTR_RETURN_VOID(m_introTE);
@@ -85,39 +85,39 @@ void PerformersWidget::subscribe() {
     m_perfDbMdl->setFilter(searchPattern);
   });
 
-  connect(g_performersManagerActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
+  connect(g_castAct().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
 
-  connect(g_performersManagerActions().INIT_DATABASE, &QAction::triggered, &mDb, &DbManager::CreateDatabase);
-  connect(g_performersManagerActions().INIT_TABLE, &QAction::triggered, this, &PerformersWidget::onInitATable);
-  connect(g_performersManagerActions().INSERT_INTO_TABLE, &QAction::triggered, this, &PerformersWidget::onInsertIntoTable);
-  connect(g_performersManagerActions().DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DROP); });
-  connect(g_performersManagerActions().DELETE_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DELETE); });
+  connect(g_castAct().INIT_DATABASE, &QAction::triggered, &mDb, &DbManager::CreateDatabase);
+  connect(g_castAct().INIT_TABLE, &QAction::triggered, this, &PerformersWidget::onInitATable);
+  connect(g_castAct().INSERT_INTO_TABLE, &QAction::triggered, this, &PerformersWidget::onInsertIntoTable);
+  connect(g_castAct().DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DROP); });
+  connect(g_castAct().DELETE_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DELETE); });
 
-  connect(g_performersManagerActions().SUBMIT, &QAction::triggered, this, &PerformersWidget::onSubmit);
+  connect(g_castAct().SUBMIT, &QAction::triggered, this, &PerformersWidget::onSubmit);
 
-  connect(g_performersManagerActions().LOCATE_IMAGEHOST, &QAction::triggered, this, &PerformersWidget::onLocateImageHost);
+  connect(g_castAct().LOCATE_IMAGEHOST, &QAction::triggered, this, &PerformersWidget::onLocateImageHost);
 
-  connect(g_performersManagerActions().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT, &QAction::triggered, this, &PerformersWidget::onChangePerformerImageHeight);
+  connect(g_castAct().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT, &QAction::triggered, this, &PerformersWidget::onChangePerformerImageHeight);
 
-  connect(g_performersManagerActions().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &PerformersWidget::onLoadFromFileSystemStructure);
-  connect(g_performersManagerActions().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &PerformersWidget::onLoadFromPerformersList);
-  connect(g_performersManagerActions().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &PerformersWidget::onLoadFromPJsonDirectory);
+  connect(g_castAct().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &PerformersWidget::onLoadFromFileSystemStructure);
+  connect(g_castAct().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &PerformersWidget::onLoadFromPerformersList);
+  connect(g_castAct().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &PerformersWidget::onLoadFromPJsonDirectory);
 
-  connect(g_performersManagerActions().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpAllIntoPJsonFile);
-  connect(g_performersManagerActions().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpIntoPJsonFile);
+  connect(g_castAct().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpAllIntoPJsonFile);
+  connect(g_castAct().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &PerformersWidget::onDumpIntoPJsonFile);
 
-  connect(g_performersManagerActions().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &PerformersWidget::onOpenRecordInFileSystem);
+  connect(g_castAct().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &PerformersWidget::onOpenRecordInFileSystem);
 
   connect(m_perfTv->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PerformersWidget::on_selectionChanged);
 
-  connect(g_performersManagerActions().DELETE_RECORDS, &QAction::triggered, this, &PerformersWidget::onDeleteRecords);
+  connect(g_castAct().DELETE_RECORDS, &QAction::triggered, this, &PerformersWidget::onDeleteRecords);
 
-  connect(g_performersManagerActions().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshRecordsVids);
-  connect(g_performersManagerActions().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshAllRecordsVids);
+  connect(g_castAct().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshRecordsVids);
+  connect(g_castAct().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &PerformersWidget::onForceRefreshAllRecordsVids);
 }
 
 void PerformersWidget::closeEvent(QCloseEvent* event) {
-  g_performersManagerActions().PERFORMERS_BOOK->setChecked(false);
+  g_castAct().PERFORMERS_BOOK->setChecked(false);
   PreferenceSettings().setValue("PerformersWidgetGeometry", saveGeometry());
   PreferenceSettings().setValue("PerformersWidgetDockerWidth", m_perfPrevDock->width());
   PreferenceSettings().setValue("PerformersWidgetDockerHeight", m_perfPrevDock->height());
@@ -236,7 +236,7 @@ bool PerformersWidget::onLocateImageHost() {
     return false;
   }
   PreferenceSettings().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, m_imageHostPath = locatePath);
-  g_performersManagerActions().LOCATE_IMAGEHOST->setToolTip(m_imageHostPath);
+  g_castAct().LOCATE_IMAGEHOST->setToolTip(m_imageHostPath);
   return true;
 }
 
@@ -247,7 +247,7 @@ bool PerformersWidget::onChangePerformerImageHeight() {
     return false;
   }
   m_performerImageHeight = height;
-  g_performersManagerActions().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT->setToolTip(QString::number(height));
+  g_castAct().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT->setToolTip(QString::number(height));
   PreferenceSettings().setValue(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, m_performerImageHeight);
   return true;
 }
