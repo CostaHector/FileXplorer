@@ -7,6 +7,6 @@ StackedToolBar::StackedToolBar(const QString& title, QWidget* parent)
   layout()->setContentsMargins(0, 0, 0, 0);
 }
 
-int StackedToolBar::AddToolBar(ViewTypeTool::ViewType vt, QToolBar* tb) {
+int StackedToolBar::AddToolBar(ViewTypeTool::ViewType vt, QWidget* tb) {
   return m_name2StackIndex[vt] = m_stackedToolBar->addWidget(tb);
 }
