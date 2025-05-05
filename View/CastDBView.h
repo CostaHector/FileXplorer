@@ -1,21 +1,16 @@
-#ifndef PERFORMERSWIDGET_H
-#define PERFORMERSWIDGET_H
+#ifndef CASTDBVIEW_H
+#define CASTDBVIEW_H
 
 #include "Tools/FileDescriptor/PerfBaseDb.h"
-#include "View/PerformersTableView.h"
-#include "Component/FolderPreview/ClickableTextBrowser.h"
+#include "View/CustomTableView.h"
 #include <QSqlTableModel>
-#include <QMainWindow>
 #include <QToolBar>
 #include <QLineEdit>
+class FloatingPreview;
 
-class PerformersWidget : public QMainWindow {
-  Q_OBJECT
+class CastDBView : public CustomTableView {
  public:
-  explicit PerformersWidget(QWidget* parent = nullptr);
-  void closeEvent(QCloseEvent* event) override;
-
-  void readSettings();
+  explicit CastDBView(QLineEdit* perfSearchLE, FloatingPreview* floatingPreview, QWidget* parent = nullptr);
   void subscribe();
 
  private:
@@ -45,17 +40,12 @@ class PerformersWidget : public QMainWindow {
 
  private:
   QLineEdit* m_perfSearch{nullptr};
-  QToolBar* m_perfToolbar{nullptr};
-  PerformersTableView* m_perfTv{nullptr};
-  ClickableTextBrowser* m_introTE{nullptr};
-  QDockWidget* m_perfPrevDock{nullptr};
-
   QSqlTableModel* m_perfDbMdl{nullptr};
-
+  FloatingPreview* _floatingPreview{nullptr};
   QString m_imageHostPath;
   int m_performerImageHeight;
 
   PerfBaseDb mDb;
 };
 
-#endif  // PERFORMERSWIDGET_H
+#endif  // CASTDBVIEW_H
