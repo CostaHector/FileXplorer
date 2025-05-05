@@ -4,7 +4,7 @@
 #include "Actions/CastDBActions.h"
 
 PerformersTableView::PerformersTableView(QWidget* parent): CustomTableView("PERFORMERS_TABLE", parent) {
-  BindMenu(g_performersManagerActions().GetRightClickMenu());
-  AppendVerticalHeaderMenuAGS(g_performersManagerActions().GetVerAGS());
-  AppendHorizontalHeaderMenuAGS(g_performersManagerActions().GetHorAGS());
+  BindMenu(g_castAct().GetRightClickMenu());
+  AppendVerticalHeaderMenuAGS(g_castAct().GetVerAGS());
+  AppendHorizontalHeaderMenuAGS(g_castAct().GetHorAGS());
 }
