@@ -82,6 +82,7 @@ class DbManager : public QObject {
 
   bool IsTableVolumeOnline(const QString& tableName) const;
 
+  bool ShowInFileSystemView() const;
  protected:
   static QString GetDeleteInPlaceholders(int n);
   void ReleaseConnection();
