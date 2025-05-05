@@ -2,30 +2,17 @@
 #include "Actions/CastDBActions.h"
 #include "Actions/TorrDBAction.h"
 
-#include "Component/PerformersWidget.h"
+#include "View/CastDBView.h"
 #include "View/TorrentsManagerWidget.h"
 
 #include <QDebug>
 
 ExtraViewVisibilityControl::ExtraViewVisibilityControl(QWidget* parent)
-    : QObject(parent), _parent(parent), performerManager(nullptr), torrentsManager(nullptr), m_recycleBin{nullptr} {
+    : QObject(parent), _parent(parent), torrentsManager(nullptr), m_recycleBin{nullptr} {
   subscribe();
 }
 
 void ExtraViewVisibilityControl::subscribe() {
-  connect(g_castAct().PERFORMERS_BOOK, &QAction::triggered, this, [this](const bool checked) -> void {
-    if (not checked) {
-      if (performerManager != nullptr)
-        performerManager->hide();
-      return;
-    }
-    if (performerManager == nullptr) {
-      performerManager = new PerformersWidget(_parent);
-    }
-    performerManager->show();
-    performerManager->activateWindow();
-    performerManager->raise();
-  });
   connect(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER, &QAction::triggered, this, [this](const bool checked) -> void {
     if (not checked) {
       if (torrentsManager != nullptr)
