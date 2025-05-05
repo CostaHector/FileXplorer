@@ -73,16 +73,17 @@ typedef std::function<bool(QVariantHash& dict)> JSON_DICT_PROCESS_T;
 }  // namespace VariantHashHelper
 
 namespace JsonFileHelper {
+static constexpr char ELEMENT_JOINER = ',';
 enum RET_ENUM {
   CHANGED_WRITE_FILE_FAILED = -1000,
-  OK = 0,
+  NOCHANGED_OK = 0,
   CHANGED_OK,
 };
 
 struct JsonDict2Table {
   QString Studio;
-  QString Cast;
-  QString Tags;
+  QStringList Cast;
+  QStringList Tags;
 };
 
 uint CalcFileHash(const QString& vidPth);
