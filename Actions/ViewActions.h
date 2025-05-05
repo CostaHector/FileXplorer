@@ -11,7 +11,7 @@ class ViewActions : public QObject {
 
   QToolBar* GetViewTB(QWidget* parent = nullptr);
 
-  QAction *_ADVANCE_SEARCH_VIEW, *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW, *_SCENE_VIEW, *_FLOATING_PREVIEW;
+  QAction *_ADVANCE_SEARCH_VIEW, *_MOVIE_VIEW, *_LIST_VIEW, *_TABLE_VIEW, *_TREE_VIEW, *_SCENE_VIEW, *_FLOATING_PREVIEW, *PERFORMERS_BOOK;
   QActionGroup* _VIEWS_AG;
 
   QAction* NAVIGATION_PANE;
