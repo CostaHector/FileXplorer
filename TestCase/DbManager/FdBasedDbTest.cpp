@@ -8,6 +8,7 @@
 #include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/JsonFileHelper.h"
 #include "public/PublicMacro.h"
+#include <QSqlRecord>
 
 const QString rootpath = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
 const QString dbName = TestCaseRootPath() + "/FD_MOVIE_DB_CONN.db";
@@ -227,7 +228,7 @@ class FdBasedDbTest : public MyTestSuite {
     // need export 1 json(because of Cast key valid) by 1 mkv
     using namespace MOVIE_TABLE;
     const QString updateCmd{                                                                              //
-                            QString{R"(UPDATE %1 SET `%2` = "Henry Cavill, Chris Evans", `%3` = 6000;)"}  //
+                            QString{R"(UPDATE %1 SET `%2` = "Henry Cavill, Chris Evans", `%3` = 6000;)"}  // Atension, here we write ", " in purpose
                                 .arg("VOLUME_E")                                                          //
                                 .arg(VOLUME_ENUM_TO_STRING(Cast))                                         //
                                 .arg(VOLUME_ENUM_TO_STRING(Duration))};
@@ -237,8 +238,11 @@ class FdBasedDbTest : public MyTestSuite {
     QVERIFY(dir.exists(JSON_FILENAME));
 
     using namespace JsonFileHelper;
+    const QStringList expectCastLst{"Henry Cavill", " Chris Evans"};  // Atension,  here we use ',' to seperate not ", "
+    const QStringList notExpectCastLst{"Henry Cavill", "Chris Evans"};
     const auto& dict = MovieJsonLoader(dir.absoluteFilePath(JSON_FILENAME));
-    QCOMPARE(dict.value(JSON_KEY::PerformersS).toString(), "Henry Cavill, Chris Evans");
+    QCOMPARE(dict.value(JSON_KEY::PerformersS).toStringList(), expectCastLst);
+    QVERIFY(dict.value(JSON_KEY::PerformersS).toStringList() != notExpectCastLst);
   }
 
   void test_UpdateStudioCastTagsByJson() {
@@ -274,21 +278,30 @@ class FdBasedDbTest : public MyTestSuite {
     QVERIFY(!dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
-    // json studio/performers/tags not exits
-    QVariantHash keyValueNotFull{{JSON_KEY::StudioS, ""},                              //
-                                 {JSON_KEY::PerformersS, "Chris Pine, Henry Cavill"},  //
-                                 {JSON_KEY::TagsS, "Action, Science"}};
+    // json studio not exits, but performers/tags not exist
+    QVariantHash keyValueNotFull{{JSON_KEY::StudioS, ""},                                             //
+                                 {JSON_KEY::PerformersS, QStringList{"Chris Pine", "Henry Cavill"}},  //
+                                 {JSON_KEY::TagsS, QStringList{"Action", "Science"}}};
     QVERIFY(DumpJsonDict(keyValueNotFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
-    // json studio/performers/tags exists
+    // json studio/performers/tags all exists
     QVariantHash keyFull{{JSON_KEY::StudioS, "HongMeng"},
-                         {JSON_KEY::PerformersS, "Chris Evans, Henry Cavill"},  //
-                         {JSON_KEY::TagsS, "Action, Science"}};
+                         {JSON_KEY::PerformersS, QStringList{"Chris Evans", "Henry Cavill"}},  //
+                         {JSON_KEY::TagsS, QStringList{"Action", "Science"}}};
     QVERIFY(DumpJsonDict(keyFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 1);
+
+    const QString selectAllTemp{"SELECT * FROM %1"};
+    QList<QSqlRecord> ansList;
+    QVERIFY(dbManager.QueryForTest(selectAllTemp.arg("VOLUME_E"), ansList));
+    QCOMPARE(ansList.size(), 1);  // 1 mkv file -> 1 record
+    const QSqlRecord& firstRecord = ansList.front();
+    QCOMPARE(firstRecord.value(MOVIE_TABLE::Studio).toString(), "HongMeng");
+    QCOMPARE(firstRecord.value(MOVIE_TABLE::Cast).toString(), "Chris Evans,Henry Cavill");  // sperated by comma only
+    QCOMPARE(firstRecord.value(MOVIE_TABLE::Tags).toString(), "Action,Science");            // sperated by comma only
   }
 };
 
