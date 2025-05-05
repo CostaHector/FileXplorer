@@ -1,12 +1,12 @@
-#include "DataBaseActions.h"
+#include "MovieDBActions.h"
 #include "public/PublicMacro.h"
 
-DataBaseActions& g_dbAct() {
-  static DataBaseActions ins;
+MovieDBActions& g_dbAct() {
+  static MovieDBActions ins;
   return ins;
 }
 
-DataBaseActions::DataBaseActions(QObject* parent)  //
+MovieDBActions::MovieDBActions(QObject* parent)  //
     : QObject{parent}                              //
 {
   SUBMIT = new (std::nothrow) QAction(QIcon(":img/SUBMIT"), "Submit", this);
