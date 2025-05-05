@@ -62,5 +62,4 @@ DISTFILES += \
     Translate/FileExplorerReadOnly_zh_CN.ts \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \
-    bin/PerformerHtmlTemplate.html \
     readme.md
