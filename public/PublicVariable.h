@@ -21,9 +21,9 @@ const char SUBMIT_BTN_STYLE[] =
     "}";
 
 struct IMAGE_SIZE {
-  static constexpr int TABS_ICON_IN_MENU_3x1 = 16;
-  static constexpr int TABS_ICON_IN_MENU_2x1 = 24;
-  static constexpr int TABS_ICON_IN_MENU_1x1 = 48;
+  static constexpr int TABS_ICON_IN_MENU_16 = 16;
+  static constexpr int TABS_ICON_IN_MENU_24 = 24;
+  static constexpr int TABS_ICON_IN_MENU_48 = 48;
   static int IMG_WIDTH;
   static int IMG_HEIGHT;
 };
