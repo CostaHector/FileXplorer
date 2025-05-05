@@ -224,7 +224,9 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* fileSystemView = new (std::nothrow) QToolBar("Navigation Preview Switch");
   CHECK_NULLPTR_RETURN_NULLPTR(fileSystemView);
   fileSystemView->setOrientation(Qt::Orientation::Vertical);
-  fileSystemView->addActions({g_viewActions()._LIST_VIEW, g_viewActions()._TABLE_VIEW, g_viewActions()._TREE_VIEW});
+  fileSystemView->addAction(g_viewActions()._LIST_VIEW);
+  fileSystemView->addAction(g_viewActions()._TABLE_VIEW);
+  fileSystemView->addAction(g_viewActions()._TREE_VIEW);
   fileSystemView->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   fileSystemView->setStyleSheet("QToolBar { max-width: 256px; }");
   fileSystemView->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
