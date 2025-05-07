@@ -1,14 +1,14 @@
-#ifndef PERFORMERSMANAGER_H
-#define PERFORMERSMANAGER_H
+#ifndef CastManager_H
+#define CastManager_H
 
 #include <QCompleter>
 #include <QSet>
 #include <QString>
 
-class PerformersManager {
+class CastManager {
  public:
-  static PerformersManager& getIns();
-  PerformersManager(const PerformersManager& rhs) noexcept = delete;
+  static CastManager& getIns();
+  CastManager(const CastManager& rhs) noexcept = delete;
 
   QSet<QString> ReadOutPerformers();
   int ForceReloadPerformers();
@@ -25,7 +25,7 @@ class PerformersManager {
   inline int count() const { return m_performers.size(); }
 
  private:
-  PerformersManager();
+  CastManager();
 };
 
-#endif  // PERFORMERSMANAGER_H
+#endif  // CastManager_H
