@@ -3,40 +3,39 @@
 
 #include <QVariantHash>
 #include <QString>
-#include "public/PublicMacro.h"
+
 namespace JSON_KEY {
+
+#define JSON_KEY_MAPPING                                                         \
+  JSON_KEY_ITEM(Name, 0, QString{})                                              \
+  JSON_KEY_ITEM(Cast, 1, QStringList{})                                          \
+  JSON_KEY_ITEM(Performers, 1, QStringList{}) /* deprecated, Use Cast instead */ \
+  JSON_KEY_ITEM(Studio, 2, QString{})                                            \
+  JSON_KEY_ITEM(Uploaded, 3, QString{})                                          \
+  JSON_KEY_ITEM(Tags, 4, QStringList{})                                          \
+  JSON_KEY_ITEM(Rate, 5, 0)                                                      \
+  JSON_KEY_ITEM(Size, 6, 0)                                                      \
+  JSON_KEY_ITEM(Resolution, 7, QString{})                                        \
+  JSON_KEY_ITEM(Bitrate, 8, QString{})                                           \
+  JSON_KEY_ITEM(Hot, 9, QVariantList{})                                          \
+  JSON_KEY_ITEM(Detail, 10, QString{})                                           \
+  JSON_KEY_ITEM(Duration, 11, 0)
+
+// Key
 enum JSON_KEY_E {
-  Name = 0,
-  Cast = 1,
-  Performers = Cast,
-  Studio,
-  Uploaded,
-  Tags,
-  Rate,
-  Size,
-  Resolution,
-  Bitrate,
-  Hot,
-  Detail,
-  Duration,
-  BUTT,
+#define JSON_KEY_ITEM(enu, val, def) enu = val,
+  JSON_KEY_MAPPING
+#undef JSON_KEY_ITEM
+      BUTT,
 };
 
-const QString NameS = ENUM_TO_STRING(Name);
-const QString PerformersS = ENUM_TO_STRING(Performers);
-const QString StudioS = ENUM_TO_STRING(Studio);
-const QString UploadedS = ENUM_TO_STRING(Uploaded);
-const QString TagsS = ENUM_TO_STRING(Tags);
-const QString RateS = ENUM_TO_STRING(Rate);
-const QString SizeS = ENUM_TO_STRING(Size);
-const QString ResolutionS = ENUM_TO_STRING(Resolution);
-const QString BitrateS = ENUM_TO_STRING(Bitrate);
-const QString HotS = ENUM_TO_STRING(Hot);
-const QString DetailS = ENUM_TO_STRING(Detail);
-const QString DurationS = ENUM_TO_STRING(Duration);
+// Default Value: variable like JSON_DEF_VAL_Name
+#define JSON_KEY_ITEM(enu, val, def) static const auto JSON_DEF_VAL_##enu = def;
+JSON_KEY_MAPPING
+#undef JSON_KEY_ITEM
 }  // namespace JSON_KEY
 
-namespace VariantHashHelper {
+namespace DictEditOperator {
 struct CompatibleJsonKey {
   bool operator()(QVariantHash& dict) const;
 };
@@ -45,7 +44,7 @@ struct ClearPerformerAndStudio {
   bool operator()(QVariantHash& dict) const;
 };
 
-struct InsertPerfsPairToDictByNameHint {
+struct ConstructStudioCastByName {
   bool operator()(QVariantHash& dict) const;
 };
 
@@ -57,20 +56,20 @@ struct AppendPerfsToDict {
   const QStringList performerList;
 };
 
-struct InsertStudioPairIntoDict {
-  bool operator()(QVariantHash& dict) const;
-};
-
 struct UpdateStudio {
-  UpdateStudio(const QString& _studio) : studio{_studio.trimmed()} {};
+  UpdateStudio(const QString& _studio) : m_studio{_studio.trimmed()} {};
   bool operator()(QVariantHash& dict) const;
 
  private:
-  const QString studio;
+  const QString m_studio;
+};
+
+struct StandardlizeJsonKey {
+  bool operator()(QVariantHash& dict) const;
 };
 
 typedef std::function<bool(QVariantHash& dict)> JSON_DICT_PROCESS_T;
-}  // namespace VariantHashHelper
+}  // namespace DictEditOperator
 
 namespace JsonFileHelper {
 static constexpr char ELEMENT_JOINER = ',';
@@ -97,7 +96,7 @@ bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth);
 QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path);
 
 int ConstructJsonFileForVideosUnderPath(const QString& path, const QString& productionStudio = "", const QString& performersListStr = "");
-int JsonFileKeyValueProcess(const QString& path, const VariantHashHelper::JSON_DICT_PROCESS_T jDProc);
+int JsonFileKeyValueProcess(const QString& path, const DictEditOperator::JSON_DICT_PROCESS_T jDProc);
 }  // namespace JsonFileHelper
 
 #endif  // JSONFILEHELPER_H
