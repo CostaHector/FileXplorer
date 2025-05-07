@@ -11,13 +11,11 @@ JsonProperties::JsonProperties(const QString& path) : jsonPath{path}, perfsCount
 
 int JsonProperties::getPerfsCount(const QString& pth) {
   const auto& dict = JsonFileHelper::MovieJsonLoader(pth);
-  if (dict.isEmpty()) {
+  const auto it = dict.find(ENUM_TO_STRING(Cast));
+  if (it == dict.cend()) {
     return 0;
   }
-  if (!dict.contains(JSON_KEY::PerformersS)) {
-    return 0;
-  }
-  return dict[ENUM_TO_STRING(Performers)].toStringList().size();
+  return it.value().toStringList().size();
 }
 
 JsonModel::JsonModel(QObject* parent)

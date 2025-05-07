@@ -41,8 +41,8 @@ SOURCES += \
     Tools/NameStandardizer.cpp \
     Tools/NameTool.cpp\
     Tools/PerformersAkaManager.cpp \
-    Tools/PerformersManager.cpp \
-    Tools/ProductionStudioManager.cpp \
+    Tools/CastManager.cpp \
+    Tools/StudiosManager.cpp \
     Tools/QMediaInfo.cpp \
     Tools/RedundantFolderRemove.cpp \
     Tools/RenameHelper.cpp \
@@ -92,8 +92,8 @@ HEADERS += \
     Tools/NameStandardizer.h \
     Tools/NameTool.h\
     Tools/PerformersAkaManager.h \
-    Tools/PerformersManager.h \
-    Tools/ProductionStudioManager.h \
+    Tools/CastManager.h \
+    Tools/StudiosManager.h \
     Tools/QMediaInfo.h \
     Tools/RedundantFolderRemove.h \
     Tools/RenameHelper.h \
