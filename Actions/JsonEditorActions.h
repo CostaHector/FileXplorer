@@ -9,7 +9,6 @@
 #include <QToolBar>
 
 class JsonEditorActions : public QObject {
-  Q_OBJECT
  public:
   explicit JsonEditorActions(QObject* parent = nullptr);
 
@@ -17,47 +16,46 @@ class JsonEditorActions : public QObject {
   QToolBar* GetJsonToolBar(QWidget* parent);
   QMenu* GetJsonToBeEdittedListMenu(QWidget* parent);
 
-  QAction* _CLR_TO_BE_EDITED_LIST;
-  QActionGroup* _FILE_LOAD_ACTIONS;
+  QAction* _CLR_TO_BE_EDITED_LIST{nullptr};
+  QActionGroup* _FILE_LOAD_ACTIONS{nullptr};
 
-  QAction* _LAST_FILE;
-  QAction* _NEXT_FILE;
-  QAction* _DONE_AND_NEXT;
-  QAction* _AUTO_SKIP;
-  QAction* _COMPLETE_PERFS_COUNT;
-  QActionGroup* _QUICK_EDIT_ACTIONS;
+  QAction* _LAST_FILE{nullptr};
+  QAction* _NEXT_FILE{nullptr};
+  QAction* _DONE_AND_NEXT{nullptr};
+  QAction* _AUTO_SKIP{nullptr};
+  QAction* _COMPLETE_PERFS_COUNT{nullptr};
+  QActionGroup* _QUICK_EDIT_ACTIONS{nullptr};
 
-  QAction* _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD;
-  QAction* _LOWER_ALL_WORDS;
-  QAction* _FORMATTER;
-  QAction* _RELOAD_JSON_FROM_FROM_DISK;
-  QAction* _ADD_SELECTED_PERFORMER;
-  QAction* _EXTRACT_CAPITALIZED_PERFORMER;
-  QActionGroup* _TEXT_EDIT_ACTIONS;
+  QAction* _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD{nullptr};
+  QAction* _LOWER_ALL_WORDS{nullptr};
+  QAction* _FORMATTER{nullptr};
+  QAction* _RELOAD_JSON_FROM_FROM_DISK{nullptr};
+  QAction* _ADD_SELECTED_PERFORMER{nullptr};
+  QAction* _EXTRACT_CAPITALIZED_PERFORMER{nullptr};
+  QActionGroup* _TEXT_EDIT_ACTIONS{nullptr};
 
-  QAction* _SAVE;
-  QActionGroup* _FILE_SAVE_ACTIONS;
-
+  QAction* _SAVE{nullptr};
+  QActionGroup* _FILE_SAVE_ACTIONS{nullptr};
 
   QActionGroup* GetSystemActions();
-  QAction* _REVEAL_IN_EXPLORER{new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal"), this)};
-  QAction* _OPEN_THIS_FILE{new (std::nothrow) QAction(tr("Open"), this)};
-  QAction* _RENAME_THIS_FILE{new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename"), this)};
-  QActionGroup* _SYSTEM_ACTIONS{GetSystemActions()};
+  QAction* _REVEAL_IN_EXPLORER{nullptr};
+  QAction* _OPEN_THIS_FILE{nullptr};
+  QAction* _RENAME_THIS_FILE{nullptr};
+  QActionGroup* _SYSTEM_ACTIONS{nullptr};
 
-  QAction* _AI_HINT;
-  QAction* _LEARN_PERFORMERS_FROM_JSON;
-  QActionGroup* _AI_ACTIONS;
+  QAction* _AI_HINT{nullptr};
+  QAction* _LEARN_PERFORMERS_FROM_JSON{nullptr};
+  QActionGroup* _AI_ACTIONS{nullptr};
 
-  QAction* _SELECT_CURRENT_FOLDER;
-  QAction* _CONSTRUCT_JSONS_FOR_VIDS;
-  QAction* _APPEND_PERFORMERS;
-  QAction* _SET_STUDIO;
-  QAction* _CONSTRUCT_STUDIO_CAST;
-  QAction* _CONSTRUCT_STUDIO_KVP;
-  QAction* _CLR_PERFORMERS_STUDIO_VALUE;
-  QAction* _STANDARDLIZE_JSON_KEY;
-  QActionGroup* _BATCH_EDIT_TOOL_ACTIONS;
+  QAction* _SELECT_CURRENT_FOLDER{nullptr};
+  QAction* _CONSTRUCT_JSONS_FOR_VIDS{nullptr};
+  QAction* _APPEND_PERFORMERS{nullptr};
+  QAction* _SET_STUDIO{nullptr};
+  QAction* _CONSTRUCT_STUDIO_CAST{nullptr};
+  QAction* _CONSTRUCT_STUDIO_KVP{nullptr};
+  QAction* _CLR_PERFORMERS_STUDIO_VALUE{nullptr};
+  QAction* _STANDARDLIZE_JSON_KEY{nullptr};
+  QActionGroup* _BATCH_EDIT_TOOL_ACTIONS{nullptr};
 };
 
 JsonEditorActions& g_jsonEditorActions();
