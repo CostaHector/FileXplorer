@@ -7,7 +7,7 @@
 #include <QCompleter>
 #include "Tools/JsonFileHelper.h"
 #include "Tools/NameTool.h"
-#include "Tools/PerformersManager.h"
+#include "Tools/CastManager.h"
 #include "public/PublicMacro.h"
 
 const QString PERFS_JOIN_STR{", "};
@@ -22,7 +22,7 @@ JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::Window
   buttonBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   CHECK_NULLPTR_RETURN_VOID(buttonBox);
 
-  m_onePerf->setCompleter(&PerformersManager::getIns().perfsCompleter);
+  m_onePerf->setCompleter(&CastManager::getIns().perfsCompleter);
   m_onePerf->addAction(QIcon(":img/RENAME_PERFORMERS"), QLineEdit::LeadingPosition);
   m_onePerf->setClearButtonEnabled(true);
   m_perfsList->setClearButtonEnabled(true);
@@ -79,11 +79,11 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
     return false;
   }
   QVariantHash& dict = *p_dict;
-  if (not dict.contains(JSON_KEY::PerformersS)) {
+  if (!dict.contains(ENUM_TO_STRING(Cast))) {
     return false;
   }
   const QString& perfs = text();
-  dict[JSON_KEY::PerformersS] = NameTool()(perfs);
+  dict[ENUM_TO_STRING(Cast)] = NameTool()(perfs);
   return JsonFileHelper::DumpJsonDict(dict, jsonFilePath);
 }
 
@@ -95,13 +95,13 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
     return false;
   }
   setWindowFilePath(jsonFilePath);
-  if (not dict.contains(JSON_KEY::PerformersS)) {
+  if (!dict.contains(ENUM_TO_STRING(Cast))) {
     return false;
   }
-  static PerformersManager& pm = PerformersManager::getIns();
-  QStringList perfL = dict[JSON_KEY::PerformersS].toStringList();
+  static CastManager& pm = CastManager::getIns();
+  QStringList perfL = dict[ENUM_TO_STRING(Cast)].toStringList();
   if (perfL.isEmpty()) {
-    auto nameIt = dict.find(JSON_KEY::NameS);
+    auto nameIt = dict.find(ENUM_TO_STRING(Name));
     if (nameIt != dict.cend()) {
       perfL = pm(nameIt.value().toString());
     }

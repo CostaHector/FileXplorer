@@ -57,7 +57,7 @@ QModelIndex PreferenceModel::setRootPath(const QString&) {
   m_alerts.append(AlertItem{10002, &MemoryKey::WIN32_STANDARD_STUDIO_NAME, "Used in Json Editor to guess studio name."});
   m_alerts.append(AlertItem{10003, &MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH, "Reveal in terminal (Windows)."});
   m_alerts.append(AlertItem{10004, &MemoryKey::WIN32_RUNLOG, "Used in log records when some file operation failed."});
-  m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Performers Widget"});
+  m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Cast Widget"});
   m_alerts.append(AlertItem{10006, &MemoryKey::WIN32_MEDIAINFO_LIB_PATH, "dll file used in videos duration get"});
   m_alerts.append(AlertItem{10007, &RedunImgFinderKey::WIN32_RUND_IMG_PATH, "Used in redundant images find"});
 #else
@@ -66,7 +66,7 @@ QModelIndex PreferenceModel::setRootPath(const QString&) {
   m_alerts.append(AlertItem{10001, &MemoryKey::LINUX_AKA_PERFORMERS, "Used in Quick Where Window to join where clause."});
   m_alerts.append(AlertItem{10002, &MemoryKey::LINUX_STANDARD_STUDIO_NAME, "Used in Json Editor to guess studio name."});
   m_alerts.append(AlertItem{10004, &MemoryKey::LINUX_RUNLOG, "Used in log records when some file operation failed."});
-  m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Performers Widget"});
+  m_alerts.append(AlertItem{10005, &MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE, "Used in Cast Widget"});
   m_alerts.append(AlertItem{10006, &MemoryKey::LINUX_MEDIAINFO_LIB_PATH, "Used in videos duration get"});
   m_alerts.append(AlertItem{10007, &RedunImgFinderKey::LINUX_RUND_IMG_PATH, "Used in redundant images find"});
 #endif
