@@ -1,5 +1,5 @@
 #include "NameStandardizer.h"
-#include "Tools/ProductionStudioManager.h"
+#include "Tools/StudiosManager.h"
 #include "public/PublicVariable.h"
 
 const QRegularExpression stdCommaComp("\\s+,");
@@ -30,7 +30,7 @@ QString NameStandardizer::operator()(QString aFileName) {
   if (barIndex == -1 || barIndex == 0) {
     return fileName;
   }
-  static auto& psm = ProductionStudioManager::getIns();
+  static auto& psm = StudiosManager::getIns();
   const QString& studioName = fileName.left(barIndex - 1);
   return psm[studioName] + fileName.mid(barIndex - 1);
 }
