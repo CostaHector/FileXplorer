@@ -1,7 +1,7 @@
 #include "ArrangeActions.h"
 #include "Component/Notificator.h"
-#include "Tools/PerformersManager.h"
-#include "Tools/ProductionStudioManager.h"
+#include "Tools/CastManager.h"
+#include "Tools/StudiosManager.h"
 #include "Tools/PerformersAkaManager.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
@@ -69,10 +69,10 @@ ArrangeActions::ArrangeActions(QObject* parent) : QObject{parent} {
 void onShowRenameRuleStatistics() {
   QString statictsContent;
   statictsContent += "Studios number\t";
-  statictsContent += QString::number(ProductionStudioManager::getIns().count());
+  statictsContent += QString::number(StudiosManager::getIns().count());
   statictsContent += '\n';
-  statictsContent += "Performers number\t";
-  statictsContent += QString::number(PerformersManager::getIns().count());
+  statictsContent += "Cast number\t";
+  statictsContent += QString::number(CastManager::getIns().count());
   statictsContent += '\n';
   statictsContent += "AKA number\t";
   statictsContent += QString::number(PerformersAkaManager::getIns().count());
@@ -82,14 +82,14 @@ void onShowRenameRuleStatistics() {
 void ArrangeActions::subscribe() {
   connect(_EDIT_STUDIOS, &QAction::triggered, this, &onEditStudios);
   connect(_RELOAD_STUDIOS, &QAction::triggered, this, []() {
-    static auto& psm = ProductionStudioManager::getIns();
+    static auto& psm = StudiosManager::getIns();
     int itemsCntChanged = psm.ForceReloadStdStudioName();
     Notificator::goodNews("Reload studios", QString("delta %1 items").arg(itemsCntChanged));
   });
 
   connect(_EDIT_PERFS, &QAction::triggered, this, &onEditPerformers);
   connect(_RELOAD_PERFS, &QAction::triggered, this, []() {
-    static auto& pm = PerformersManager::getIns();
+    static auto& pm = CastManager::getIns();
     int itemsCntChanged = pm.ForceReloadPerformers();
     Notificator::goodNews("Reload performers", QString("delta %1 item(s)").arg(itemsCntChanged));
   });

@@ -74,7 +74,7 @@ class JsonEditor : public QMainWindow {
   LineEditStr* mUploaded{nullptr};
   LineEditCSV* mTagsCsv{nullptr};  // comma seperated
   LineEditInt* mRateInt{nullptr}; // int
-  LineEditStr* mSize{nullptr};
+  LineEditInt* mSize{nullptr};
   LineEditStr* mResolution{nullptr};
   LineEditStr* mBitrate{nullptr};
   LineEditCSV* mHot{nullptr};           // QList<QVariant>
