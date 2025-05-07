@@ -64,7 +64,7 @@ CastDBView::CastDBView(QLineEdit* perfSearchLE, FloatingPreview* floatingPreview
   InitTableView();
 
   subscribe();
-  setWindowTitle("Performers Manager Widget");
+  setWindowTitle("Cast Manager Widget");
   setWindowIcon(QIcon(":img/PERFORMERS_APP"));
 }
 
@@ -115,7 +115,7 @@ void CastDBView::onInitATable() {
 bool CastDBView::onInsertIntoTable() {
   const QString& names = QInputDialog::getText(this,                   //
                                                "Insert performer(s)",  //
-                                               "Performers can be split by '|'");
+                                               "Cast can be split by '|'");
   if (names.isEmpty()) {
     Notificator::warning("Name is Empty", "Name cannot be empty");
     return false;
@@ -181,7 +181,7 @@ int CastDBView::onLoadFromPerformersList() {
   bool ok = false;
   const QString& perfsText =                             //
       QInputDialog::getMultiLineText(this,               //
-                                     "Performers List",  //
+                                     "Cast List",  //
                                      "Example:\n Guardiola, Pep\nHuge Jackman, Slu", "", &ok);
   if (!ok) {
     Notificator::information("User cancel", "skip");
@@ -211,7 +211,7 @@ bool CastDBView::onLocateImageHost() {
 
 bool CastDBView::onChangePerformerImageHeight() {
   bool ok = false;
-  int height = QInputDialog::getInt(this, "Performer image height(px)", QString::number(m_performerImageHeight), m_performerImageHeight, 0, INT_MAX, 1, &ok);
+  int height = QInputDialog::getInt(this, "Cast image height(px)", QString::number(m_performerImageHeight), m_performerImageHeight, 0, INT_MAX, 1, &ok);
   if (!ok) {
     return false;
   }
