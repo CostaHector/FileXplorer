@@ -151,6 +151,6 @@ QActionGroup* CastDBActions::GetHorAGS() const {
 }
 
 CastDBActions& g_castAct() {
-  static CastDBActions performersManagerActIns;
-  return performersManagerActIns;
+  static CastDBActions CastManagerActIns;
+  return CastManagerActIns;
 }
