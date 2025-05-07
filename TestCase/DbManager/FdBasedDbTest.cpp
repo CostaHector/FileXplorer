@@ -241,8 +241,8 @@ class FdBasedDbTest : public MyTestSuite {
     const QStringList expectCastLst{"Henry Cavill", " Chris Evans"};  // Atension,  here we use ',' to seperate not ", "
     const QStringList notExpectCastLst{"Henry Cavill", "Chris Evans"};
     const auto& dict = MovieJsonLoader(dir.absoluteFilePath(JSON_FILENAME));
-    QCOMPARE(dict.value(JSON_KEY::PerformersS).toStringList(), expectCastLst);
-    QVERIFY(dict.value(JSON_KEY::PerformersS).toStringList() != notExpectCastLst);
+    QCOMPARE(dict.value(ENUM_TO_STRING(Cast)).toStringList(), expectCastLst);
+    QVERIFY(dict.value(ENUM_TO_STRING(Cast)).toStringList() != notExpectCastLst);
   }
 
   void test_UpdateStudioCastTagsByJson() {
@@ -279,17 +279,17 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
     // json studio not exits, but performers/tags not exist
-    QVariantHash keyValueNotFull{{JSON_KEY::StudioS, ""},                                             //
-                                 {JSON_KEY::PerformersS, QStringList{"Chris Pine", "Henry Cavill"}},  //
-                                 {JSON_KEY::TagsS, QStringList{"Action", "Science"}}};
+    QVariantHash keyValueNotFull{{ENUM_TO_STRING(Studio), ""},                                             //
+                                 {ENUM_TO_STRING(Cast), QStringList{"Chris Pine", "Henry Cavill"}},  //
+                                 {ENUM_TO_STRING(Tags), QStringList{"Action", "Science"}}};
     QVERIFY(DumpJsonDict(keyValueNotFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
     // json studio/performers/tags all exists
-    QVariantHash keyFull{{JSON_KEY::StudioS, "HongMeng"},
-                         {JSON_KEY::PerformersS, QStringList{"Chris Evans", "Henry Cavill"}},  //
-                         {JSON_KEY::TagsS, QStringList{"Action", "Science"}}};
+    QVariantHash keyFull{{ENUM_TO_STRING(Studio), "HongMeng"},
+                         {ENUM_TO_STRING(Cast), QStringList{"Chris Evans", "Henry Cavill"}},  //
+                         {ENUM_TO_STRING(Tags), QStringList{"Action", "Science"}}};
     QVERIFY(DumpJsonDict(keyFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 1);
