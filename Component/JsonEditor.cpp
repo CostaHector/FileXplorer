@@ -27,26 +27,26 @@
 const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 
 JsonEditor::JsonEditor(QWidget* parent)
-    : QMainWindow{parent},
-      m_jsonFormLo{new QFormLayout},
-      m_jsonFormWid{new QWidget(this)},
+  : QMainWindow{parent},
+    m_jsonFormLo{new QFormLayout},
+    m_jsonFormWid{new QWidget(this)},
 
-      m_jsonModel{new JsonModel{this}},
-      m_jsonList(new JsonListView{m_jsonModel, this}),
-      m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
-      m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
+    m_jsonModel{new JsonModel{this}},
+    m_jsonList(new JsonListView{m_jsonModel, this}),
+    m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
+    m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
   mName = new LineEditStr{ENUM_TO_STRING(Name), "", this};
-  mPerfsCsv = new LineEditCSV{ENUM_TO_STRING(Cast), "", this};  // comma seperated
+  mPerfsCsv = new LineEditCSV{ENUM_TO_STRING(Cast), "", true, this};  // comma seperated
   mStudio = new LineEditStr{ENUM_TO_STRING(Studio), "", this};
   mUploaded = new LineEditStr{ENUM_TO_STRING(Uploaded), "", this};
-  mTagsCsv = new LineEditCSV{ENUM_TO_STRING(Tags), "", this};  // comma seperated
+  mTagsCsv = new LineEditCSV{ENUM_TO_STRING(Tags), "", true, this};  // comma seperated
   mRateInt = new LineEditInt{ENUM_TO_STRING(Rate), "", this};  // int
   mSize = new LineEditInt{ENUM_TO_STRING(Size), "", this};
   mResolution = new LineEditStr{ENUM_TO_STRING(Resolution), "", this};
   mBitrate = new LineEditStr{ENUM_TO_STRING(Bitrate), "", this};
-  mHot = new LineEditCSV{ENUM_TO_STRING(Hot), "", this};              // QList<QVariant>
+  mHot = new LineEditCSV{ENUM_TO_STRING(Hot), "", true, this};              // QList<QVariant>
   mDetail = new TextEditMultiLine{ENUM_TO_STRING(Detail), "", this};  // multi-line
 
   m_jsonFormLo->addRow(mName->GetFormName(), mName);
@@ -70,7 +70,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_splitter->addWidget(m_jsonList);
   m_splitter->setStyleSheet(QString("QTextEdit {font-size: %1pt}"
                                     "QLineEdit {font-size: %1pt};")
-                                .arg(13));
+                            .arg(13));
   setCentralWidget(m_splitter);
 
   subscribe();
@@ -133,6 +133,7 @@ void JsonEditor::subscribe() {
 
   connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, m_jsonList, &JsonListView::onNext);
   connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, m_jsonList, &JsonListView::onLast);
+  connect(g_jsonEditorActions()._DONE_AND_PREVIOUS, &QAction::triggered, this, &JsonEditor::onSaveAndLastUnfinishedItem);
   connect(g_jsonEditorActions()._DONE_AND_NEXT, &QAction::triggered, this, &JsonEditor::onSaveAndNextUnfinishedItem);
   connect(g_jsonEditorActions()._SKIP_IF_CAST_CNT_GT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
 
@@ -173,6 +174,7 @@ bool JsonEditor::onStageChanges() {
   }
 
   const QStringList& perfs = mPerfsCsv->GetStringList();
+  mPerfsCsv->ReadFromStringList(perfs);
   m_jsonModel->updatePerfCount(curRow, perfs.size());
 
   QVariantHash dict;
@@ -192,9 +194,18 @@ bool JsonEditor::onStageChanges() {
   return JsonFileHelper::DumpJsonDict(dict, curJsonPath);
 }
 
+bool JsonEditor::onSaveAndLastUnfinishedItem() {
+  if (!onStageChanges()) {
+    qDebug("Stage Changes failed");
+    return false;
+  }
+  m_jsonList->onLast();
+  return true;
+}
+
 bool JsonEditor::onSaveAndNextUnfinishedItem() {
-  const bool isSavedSucceed = onStageChanges();
-  if (not isSavedSucceed) {
+  if (!onStageChanges()) {
+    qDebug("Stage Changes failed");
     return false;
   }
   m_jsonList->onNext();

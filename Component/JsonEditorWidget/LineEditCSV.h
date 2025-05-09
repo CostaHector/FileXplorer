@@ -5,7 +5,7 @@
 
 class LineEditCSV : public QLineEdit {
  public:
-  explicit LineEditCSV(const QString& formName, const QString &text="", QWidget *parent = nullptr);
+  explicit LineEditCSV(const QString& formName, const QString &text="", const bool bNoDuplicate = false, QWidget *parent = nullptr);
   int AppendFromStringList(const QStringList& sl);
   void ReadFromStringList(const QStringList& sl);
   void ReadFromVariantList(const QVariantList& vl);
@@ -14,8 +14,10 @@ class LineEditCSV : public QLineEdit {
   QList<QVariant> GetVariantList() const;
   void Format();
  private:
+  const bool mNoDuplicate;
   QString mFormName;
-  static const QString SEPERATOR;
+  static constexpr char CSV_COMMA = ',';
+  static const QRegularExpression CAST_STR_SPLITTER;
 };
 
 #endif
