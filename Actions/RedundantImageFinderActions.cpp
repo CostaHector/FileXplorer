@@ -19,7 +19,7 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
   RECYCLE_EMPTY_IMAGE->setToolTip(QString("<b>%1 (%2)</b><br/> Blank images (with a file size of 0Byte) will also be considered redundant images.")  //
                                       .arg(RECYCLE_EMPTY_IMAGE->text(), RECYCLE_EMPTY_IMAGE->shortcut().toString()));
 
-  OPEN_REDUNDANT_IMAGES_FOLDER = new (std::nothrow) QAction{QIcon(":img/OPEN_A_FOLDER"), "Open redundant image library folder", this};
+  OPEN_REDUNDANT_IMAGES_FOLDER = new (std::nothrow) QAction{QIcon(":img/FOLDER_OPEN"), "Open Redundant library", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_REDUNDANT_IMAGES_FOLDER);
   OPEN_REDUNDANT_IMAGES_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Open the path where the redundant image library is located.")  //
                                                .arg(OPEN_REDUNDANT_IMAGES_FOLDER->text(), OPEN_REDUNDANT_IMAGES_FOLDER->shortcut().toString()));
