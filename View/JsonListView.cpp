@@ -10,7 +10,10 @@
 #include "public/MemoryKey.h"
 
 JsonListView::JsonListView(JsonModel* model_, QWidget* parent)
-    : CustomListView{"JSON_LIST_VIEW", parent}, m_jsonModel{model_}, m_jsonMenu{g_jsonEditorActions().GetJsonToBeEdittedListMenu(this)} {
+    : CustomListView{"JSON_LIST_VIEW", parent},                           //
+      m_jsonModel{model_},                                                //
+      m_jsonMenu{g_jsonEditorActions().GetJsonToBeEdittedListMenu(this)}  //
+{
   BindMenu(m_jsonMenu);
   setModel(m_jsonModel);
 
@@ -21,7 +24,7 @@ JsonListView::JsonListView(JsonModel* model_, QWidget* parent)
 }
 
 void JsonListView::subscribe() {
-  connect(g_jsonEditorActions()._CLR_TO_BE_EDITED_LIST, &QAction::triggered, m_jsonModel, &JsonModel::clear);
+  connect(g_jsonEditorActions()._CLR_JSON_FILE_LIST, &QAction::triggered, m_jsonModel, &JsonModel::clear);
 
   connect(this, &QListView::doubleClicked, this, [this](const QModelIndex& /* ind */) {
     const QString& jsonPath = m_jsonModel->filePath(currentIndex());
@@ -38,9 +41,7 @@ void JsonListView::subscribe() {
 }
 
 void JsonListView::onSetPerfCount(const bool /* checked */) {
-  const int storedSkipCnt = PreferenceSettings()
-                                .value(MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.name, MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.v)
-                                .toInt();
+  const int storedSkipCnt = PreferenceSettings().value(MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.name, MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT.v).toInt();
   bool okClicked = false;
   const int skipCount = QInputDialog::getInt(this, "Auto Skip", "when perforers count >= ?", storedSkipCnt, 0, 5, 1, &okClicked);
   if (not okClicked) {
