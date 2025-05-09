@@ -3,6 +3,7 @@
 #include "Actions/JsonEditorActions.h"
 #include "Component/Notificator.h"
 
+#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
 
@@ -18,7 +19,6 @@
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QMenuBar>
 #include <QTableWidgetItem>
 #include <QTextCursor>
 #include <QTextDocumentFragment>
@@ -33,11 +33,8 @@ JsonEditor::JsonEditor(QWidget* parent)
 
       m_jsonModel{new JsonModel{this}},
       m_jsonList(new JsonListView{m_jsonModel, this}),
-
-      m_menuBar{g_jsonEditorActions().GetJsonMenuBar(this)},
       m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
       m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
-  setMenuBar(m_menuBar);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
   mName = new LineEditStr{ENUM_TO_STRING(Name), "", this};
@@ -84,6 +81,22 @@ JsonEditor::JsonEditor(QWidget* parent)
   updateWindowsSize();
 }
 
+void JsonEditor::updateWindowsSize() {
+  if (PreferenceSettings().contains("JsonEditorGeometry")) {
+    restoreGeometry(PreferenceSettings().value("JsonEditorGeometry").toByteArray());
+  } else {
+    setGeometry(DEFAULT_GEOMETRY);
+  }
+  m_splitter->restoreState(PreferenceSettings().value("JsonEditorSplitterState", QByteArray()).toByteArray());
+}
+
+void JsonEditor::closeEvent(QCloseEvent* event) {
+  PreferenceSettings().setValue("JsonEditorGeometry", saveGeometry());
+  qDebug("Json Editor geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
+  PreferenceSettings().setValue("JsonEditorSplitterState", m_splitter->saveState());
+  QMainWindow::closeEvent(event);
+}
+
 void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
   if (!curIndex.isValid()) {
     qWarning("Current index invalid");
@@ -121,9 +134,9 @@ void JsonEditor::subscribe() {
   connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, m_jsonList, &JsonListView::onNext);
   connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, m_jsonList, &JsonListView::onLast);
   connect(g_jsonEditorActions()._DONE_AND_NEXT, &QAction::triggered, this, &JsonEditor::onSaveAndNextUnfinishedItem);
-  connect(g_jsonEditorActions()._COMPLETE_PERFS_COUNT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
+  connect(g_jsonEditorActions()._SKIP_IF_CAST_CNT_GT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
 
-  connect(g_jsonEditorActions()._SAVE, &QAction::triggered, this, &JsonEditor::onStageChanges);
+  connect(g_jsonEditorActions()._SAVE_CURRENT_CHANGES, &QAction::triggered, this, &JsonEditor::onStageChanges);
 
   connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
   connect(g_jsonEditorActions()._EXTRACT_CAPITALIZED_PERFORMER, &QAction::triggered, this, &JsonEditor::onExtractCapitalizedPerformersHint);
