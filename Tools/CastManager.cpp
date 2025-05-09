@@ -1,4 +1,4 @@
-#include "PerformersManager.h"
+#include "CastManager.h"
 #include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
@@ -9,18 +9,21 @@
 #include <QDirIterator>
 #include <QTextStream>
 
-PerformersManager::PerformersManager() : m_performers(ReadOutPerformers()), perfsCompleter(m_performers.values()) {
+CastManager::CastManager()       //
+    : m_performers{ReadOutPerformers()},     //
+      perfsCompleter(m_performers.values())  //
+{
   perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
   perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
 }
 
-PerformersManager& PerformersManager::getIns() {
-  static PerformersManager ins;
-  qDebug("PerformersManager::getIns()");
+CastManager& CastManager::getIns() {
+  qDebug("CastManager::getIns()");
+  static CastManager ins;
   return ins;
 }
 
-QSet<QString> PerformersManager::ReadOutPerformers() {
+QSet<QString> CastManager::ReadOutPerformers() {
 #ifdef _WIN32
   const QString& perfFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
 #else
@@ -46,15 +49,15 @@ QSet<QString> PerformersManager::ReadOutPerformers() {
   return perfSet;
 }
 
-int PerformersManager::ForceReloadPerformers() {
+int CastManager::ForceReloadPerformers() {
   int beforeStudioNameCnt = m_performers.size();
-  m_performers = PerformersManager::ReadOutPerformers();
+  m_performers = CastManager::ReadOutPerformers();
   int afterStudioNameCnt = m_performers.size();
   qDebug("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
   return afterStudioNameCnt - beforeStudioNameCnt;
 }
 
-int PerformersManager::LearningFromAPath(const QString& path) {
+int CastManager::LearningFromAPath(const QString& path) {
   if (!QDir(path).exists()) {
     return 0;
   }
@@ -64,7 +67,7 @@ int PerformersManager::LearningFromAPath(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    auto perfIt = dict.find(JSON_KEY::PerformersS);
+    auto perfIt = dict.find(ENUM_TO_STRING(Cast));
     if (perfIt != dict.cend()) {
       continue;
     }
@@ -88,8 +91,8 @@ int PerformersManager::LearningFromAPath(const QString& path) {
 #endif
   QFile performersFi{perfsFilePath};
   if (!performersFi.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-    qWarning("Open [%s] to write failed. Performers will not update.", qPrintable(perfsFilePath));
-    Notificator::warning("Open [%s] to write failed. Performers will not update.", perfsFilePath);
+    qWarning("Open [%s] to write failed. Cast will not update.", qPrintable(perfsFilePath));
+    Notificator::warning("Open [%s] to write failed. Cast will not update.", perfsFilePath);
     return -1;
   }
   QTextStream stream(&performersFi);
@@ -102,7 +105,7 @@ int PerformersManager::LearningFromAPath(const QString& path) {
   return castsIncrement.size();
 }
 
-QStringList PerformersManager::SplitSentence(QString sentence) {
+QStringList CastManager::SplitSentence(QString sentence) {
   if (sentence.isEmpty()) {
     return {};
   }
@@ -113,7 +116,7 @@ QStringList PerformersManager::SplitSentence(QString sentence) {
   return sentence.split(AT_LEAST_1_SPACE_COMP);
 }
 
-auto PerformersManager::RmvBelongLetter(const QString& word) -> QString {
+auto CastManager::RmvBelongLetter(const QString& word) -> QString {
   QString s = word.trimmed();
   if (s.endsWith("'s")) {
     s.chop(2);
@@ -123,7 +126,7 @@ auto PerformersManager::RmvBelongLetter(const QString& word) -> QString {
   return s;
 };
 
-QStringList PerformersManager::FilterPerformersOut(const QStringList& words) const {
+QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
   if (words.isEmpty()) {
     return {};
   }
@@ -163,7 +166,7 @@ QStringList PerformersManager::FilterPerformersOut(const QStringList& words) con
   return performersList;
 }
 
-QStringList PerformersManager::operator()(const QString& sentence) const  //
+QStringList CastManager::operator()(const QString& sentence) const  //
 {
   return FilterPerformersOut(SplitSentence(sentence));
 }
