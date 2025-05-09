@@ -1,19 +1,31 @@
 #include "LineEditCSV.h"
 #include "Tools/NameTool.h"
+#include <QRegularExpression>
 
-const QString LineEditCSV::SEPERATOR = ", ";
+constexpr char LineEditCSV::CSV_COMMA;
+const QRegularExpression LineEditCSV::CAST_STR_SPLITTER{R"( & |&| ,|,|\r\n|\n| and )"};
 
-LineEditCSV::LineEditCSV(const QString& formName, const QString& text, QWidget* parent) : QLineEdit{text, parent}, mFormName{formName} {}
+LineEditCSV::LineEditCSV(const QString& formName, const QString& text, const bool bNoDuplicate, QWidget* parent)//
+  : QLineEdit{text, parent}, //
+    mNoDuplicate{bNoDuplicate}, //
+    mFormName{formName} //
+{
+}
 
 QString LineEditCSV::GetFormName() const {
   return mFormName;
 }
 
 QStringList LineEditCSV::GetStringList() const {
-  if (text().isEmpty()) {
+  const QString&s = text();
+  if (s.isEmpty()){
     return {};
   }
-  return text().split(", ");
+  QStringList lst = s.split(CAST_STR_SPLITTER);
+  if (mNoDuplicate){
+    lst.removeDuplicates();
+  }
+  return lst;
 }
 
 QList<QVariant> LineEditCSV::GetVariantList() const {
@@ -35,13 +47,15 @@ int LineEditCSV::AppendFromStringList(const QStringList& sl) {
   QStringList curSl = GetStringList();
   curSl += sl;
   curSl.sort();
-  curSl.removeDuplicates();
+  if (mNoDuplicate) {
+    curSl.removeDuplicates();
+  }
   ReadFromStringList(curSl);
   return curSl.size();
 }
 
 void LineEditCSV::ReadFromStringList(const QStringList& sl) {
-  setText(sl.join(SEPERATOR));
+  setText(sl.join(CSV_COMMA));
 }
 
 void LineEditCSV::ReadFromVariantList(const QVariantList& vl) {
@@ -60,8 +74,11 @@ void LineEditCSV::ReadFromVariantList(const QVariantList& vl) {
 void LineEditCSV::Format() {
   const QString& lineTxt = text();
   NameTool nt;
-  const QStringList& lst = nt(lineTxt);
-  const QString& formatedLineTxt = lst.join(SEPERATOR);
+  QStringList lst = nt(lineTxt);
+  if (mNoDuplicate) {
+    lst.removeDuplicates();
+  }
+  const QString& formatedLineTxt = lst.join(CSV_COMMA);
   if (formatedLineTxt == lineTxt) {
     return;
   }
