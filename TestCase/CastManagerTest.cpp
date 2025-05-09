@@ -3,14 +3,17 @@
 #include "pub/MyTestSuite.h"
 
 // add necessary includes here
-#include "Tools/PerformersManager.h"
-class PerformersStringParserTest : public MyTestSuite {
+#include "Tools/CastManager.h"
+class CastManagerTest : public MyTestSuite {
   Q_OBJECT
  public:
-  const PerformersManager& pm{PerformersManager::getIns()};
+  CastManagerTest() : MyTestSuite{false}, pm{CastManager::getIns()} {}
+  const CastManager& pm;
 
  private slots:
-  void test_performersDictNotEmpty() { QVERIFY2(not pm.m_performers.isEmpty(), "performers list should not be empty"); }
+  void test_performersDictNotEmpty() {  //
+    QVERIFY2(!pm.m_performers.isEmpty(), "performers list should not be empty");
+  }
   void test_sentenseSplit() {
     const auto& wordsList = pm.SplitSentence("Production Name - Movie Core Name - Nice & Devin Franco BB 4K");
     QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
@@ -26,7 +29,7 @@ class PerformersStringParserTest : public MyTestSuite {
     QCOMPARE(perfsSet, realPerfs);
   }
 
-  void test_OneLetterXNameCommaAddSep(){
+  void test_OneLetterXNameCommaAddSep() {
     const auto& wordsList = pm.SplitSentence({"Gabriel Clark, Cutler X + Theo Brady"});
     const auto& perfsList = pm.FilterPerformersOut(wordsList);
     const QSet<QString>& perfsSet{perfsList.cbegin(), perfsList.cend()};
@@ -54,5 +57,5 @@ class PerformersStringParserTest : public MyTestSuite {
   }
 };
 
-#include "PerformersStringParserTest.moc"
-PerformersStringParserTest g_PerformersManagerTest;
+#include "CastManagerTest.moc"
+CastManagerTest g_CastManagerTest;
