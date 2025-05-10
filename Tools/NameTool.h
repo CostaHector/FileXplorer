@@ -5,11 +5,13 @@
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
 #include <QSet>
+class QTextEdit;
+class QLineEdit;
 
 class NameTool {
  public:
   QStringList operator()(const QString& s) const;
-  QStringList fromArticleCapitalizedNames(const QString& s) const;
+  QStringList castFromTitledSentence(const QString& s) const;
 
   static QString CapitaliseFirstLetterKeepOther(const QString& sentence);
   static QString CapitaliseFirstLetterLowerOther(const QString& sentence);
@@ -27,6 +29,10 @@ class NameTool {
     QSet<QChar> nameSet{filename.cbegin(), filename.cend()};
     return nameSet.intersects(INVALID_FILE_NAME_CHAR_SET);
   }
+
+  typedef std::function<QString(const QString&)> SentenceProcessorFunc;
+  static bool ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fTrans);
+  static bool ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fTrans);
 
  private:
   static const QString INVALID_CHARS;
