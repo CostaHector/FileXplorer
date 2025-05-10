@@ -53,7 +53,7 @@ void FdBasedDbModel::SetCastOrTags(const QModelIndexList& tagColIndexes, const Q
     return;
   }
   foreach (const QModelIndex& ind, tagColIndexes) {
-    setData(ind, NameTool::CastTagString(sentence, true));
+    setData(ind, NameTool::CastTagSentenceParse2Str(sentence, true));
   }
 }
 
@@ -68,7 +68,7 @@ void FdBasedDbModel::AddCastOrTags(const QModelIndexList& tagColIndexes, const Q
       beforeStr += ',';
     }
     beforeStr += sentence;
-    setData(ind, NameTool::CastTagString(beforeStr, true));
+    setData(ind, NameTool::CastTagSentenceParse2Str(beforeStr, true));
   }
 }
 
@@ -77,7 +77,7 @@ void FdBasedDbModel::RmvCastOrTags(const QModelIndexList& tagColIndexes, const Q
     return;
   }
   foreach (const QModelIndex& ind, tagColIndexes) {
-    setData(ind, NameTool::CastTagStringRmv(                                 //
+    setData(ind, NameTool::CastTagSentenceRmvEle2Str(                                 //
                      QSqlTableModel::data(ind, Qt::DisplayRole).toString(),  //
                      cast));
   }

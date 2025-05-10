@@ -42,7 +42,7 @@ QMenuBar* TorrDBAction::GetMenuBar() const {
   return m_menuBar;
 }
 
-TorrDBAction& g_torrentsManagerActions() {
+TorrDBAction& g_torrActions() {
   static TorrDBAction torrentsManagerActIns;
   return torrentsManagerActIns;
 }
