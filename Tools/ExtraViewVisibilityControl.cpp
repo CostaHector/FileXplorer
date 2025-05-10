@@ -13,7 +13,7 @@ ExtraViewVisibilityControl::ExtraViewVisibilityControl(QWidget* parent)
 }
 
 void ExtraViewVisibilityControl::subscribe() {
-  connect(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER, &QAction::triggered, this, [this](const bool checked) -> void {
+  connect(g_torrActions().SHOW_TORRENTS_MANAGER, &QAction::triggered, this, [this](const bool checked) -> void {
     if (not checked) {
       if (torrentsManager != nullptr)
         torrentsManager->hide();

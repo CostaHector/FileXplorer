@@ -11,78 +11,96 @@
 class NameToolTest : public MyTestSuite {
   Q_OBJECT
 
- public:
+public:
   NameToolTest() : MyTestSuite{false} {}
- private slots:
+private slots:
   void test_AndAsSubStringOfNameRatherThanFS() {
-    const QString& s = "Andrew Garfield and Andrew Tale";
-    QCOMPARE(m_nameTool(s), (QStringList{"Andrew Garfield", "Andrew Tale"}));
+    const QStringList& sentenseExamples{"Andrew Tale and Andrew Garfield", //
+                                        "Andrew Tale And Andrew Garfield", //
+                                        "Andrew Tale AND Andrew Garfield"};
+    const QStringList expectList{"Andrew Tale", "Andrew Garfield"}; // not sorted
+    foreach (const QString& sentense, sentenseExamples) {
+      QCOMPARE(m_nameTool(sentense), expectList);
+    }
   }
 
   void test_NameTool_operator() {
-    const QStringList lst_A_B{"A", "B"};
-    const QString& commaAsFS = "A , B";
-    QCOMPARE(m_nameTool(commaAsFS), lst_A_B);
-    const QString& verticalBarAsFS = "A | B";
-    QCOMPARE(m_nameTool(verticalBarAsFS), lst_A_B);
-    const QString& addAsFS = "A + B";
-    QCOMPARE(m_nameTool(addAsFS), lst_A_B);
-    const QString& ampersandAsFS = "A & B";
-    QCOMPARE(m_nameTool(ampersandAsFS), lst_A_B);
-    const QString& andAsFS = "A and B";
-    QCOMPARE(m_nameTool(andAsFS), lst_A_B);
-    const QString& AndIgnoreCase = "A And B";
-    QCOMPARE(m_nameTool(AndIgnoreCase), lst_A_B);
-    const QString& atAsFS = "@A @B";
-    QCOMPARE(m_nameTool(atAsFS), lst_A_B);
-    const QString& slashAsFS = "A/B";
-    QCOMPARE(m_nameTool(slashAsFS), lst_A_B);
-    const QString& backSlashAsFS = "A\\B";
-    QCOMPARE(m_nameTool(backSlashAsFS), lst_A_B);
-    const QString& tagAsFS = "A#B";
-    QCOMPARE(m_nameTool(tagAsFS), lst_A_B);
-    const QString& tabAsFS = "A\tB";
-    QCOMPARE(m_nameTool(tabAsFS), lst_A_B);
-    const QString& newlineAsFS = "A\nB";
-    QCOMPARE(m_nameTool(newlineAsFS), lst_A_B);
-    const QString& newlineAndCommaAsFS = "A\n,B";
-    QCOMPARE(m_nameTool(newlineAndCommaAsFS), lst_A_B);
+    const QStringList expectLst{"A", "B"};
+    const QString addAsFS = "A + B";
+    const QStringList commaAsFSLst {"A , B", "A, B", "A, B"};
+    const QString verticalBarAsFS = "A | B";
+    const QString ampersandAsFS = "A & B";
+    const QStringList andAsFSLst{"A and B", "A AND B", "A And B"};
+    const QString atAsFS = "@A @B";
+    const QString slashAsFS = "A/B";
+    const QString backSlashAsFS = "A\\B";
+    const QString tagAsFS = "A#B";
+    const QString tabAsFS = "A\tB";
+    const QString newlineAsFS = "A\nB";
+    const QString newlineAndCommaAsFS = "A\n,B";
+    QCOMPARE(m_nameTool(addAsFS), expectLst);
+    foreach (const QString& commaAsFS, commaAsFSLst) {
+      QCOMPARE(m_nameTool(commaAsFS), expectLst);
+    }
+    QCOMPARE(m_nameTool(verticalBarAsFS), expectLst);
+    QCOMPARE(m_nameTool(ampersandAsFS), expectLst);
+    foreach(const QString& andAsFS, andAsFSLst){
+      QCOMPARE(m_nameTool(andAsFS), expectLst);
+    }
+    QCOMPARE(m_nameTool(atAsFS), expectLst);
+    QCOMPARE(m_nameTool(slashAsFS), expectLst);
+    QCOMPARE(m_nameTool(backSlashAsFS), expectLst);
+    QCOMPARE(m_nameTool(tagAsFS), expectLst);
+    QCOMPARE(m_nameTool(tabAsFS), expectLst);
+    QCOMPARE(m_nameTool(newlineAsFS), expectLst);
+    QCOMPARE(m_nameTool(newlineAndCommaAsFS), expectLst);
   }
 
-  void test_mostCommonPerfs() {
+  void test_moreThan2Perfs() {
     const QString& s = "A, B, and C";
-    QCOMPARE(m_nameTool(s), (QStringList{"A", "B", "C"}));
+    const QStringList perf3{"A", "B", "C"};
+    QCOMPARE(m_nameTool(s), perf3);
   }
+
   void test_humanNaturePerfs() {
     const QString& s = "A.M. and O'Clock";
-    QCOMPARE(m_nameTool(s), (QStringList{"A.M.", "O'Clock"}));
+    const QStringList expectSingleQuote{"A.M.", "O'Clock"};
+    QCOMPARE(m_nameTool(s), expectSingleQuote);
   }
   void test_unexpectedSpace() {
     const QString& s = "A,B ,C&D &E|F |G#H #I@J @K/L /M\\N \\O";
-    QCOMPARE(m_nameTool(s), (QStringList{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"}));
+    const QStringList expectIgnoreSpace{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
+    QCOMPARE(m_nameTool(s), expectIgnoreSpace);
   }
   void test_duplicateNames() {
     const QString& s = "A, B, B";
-    QCOMPARE(m_nameTool(s), (QStringList{"A", "B"}));
+    const QStringList expectUniquePerf{"A", "B"};
+    QCOMPARE(m_nameTool(s), expectUniquePerf);
   }
   void test_sequenceStable() {
     const QString& s = "B, A";
-    QCOMPARE(m_nameTool(s), (QStringList{"B", "A"}));
+    const QStringList expectsStableSequence{"B", "A"};
+    QCOMPARE(m_nameTool(s), expectsStableSequence);
   }
 
   void test_2wordsCapitalizedName() {
     const QString& s = "AA BB and CC DD";
-    QCOMPARE((QStringList{"Aa Bb", "Cc Dd"}), m_nameTool.castFromTitledSentence(s));
+    const QStringList expect{"Aa Bb", "Cc Dd"};
+    const QStringList actual{m_nameTool.castFromTitledSentence(s)};
+    QCOMPARE(expect, actual);
   }
 
   void test_3wordsCapitalizedName() {
     const QString& s = "AA BB CC, DD EE FF";
-    QCOMPARE((QStringList{"Aa Bb Cc", "Dd Ee Ff"}), m_nameTool.castFromTitledSentence(s));
+    const QStringList expects{"Aa Bb Cc", "Dd Ee Ff"};
+    QCOMPARE(expects, m_nameTool.castFromTitledSentence(s));
   }
 
   void test_invalid3wordCapitalizedName() {
     const QString& s = "A B'CC, DD E'F";  // should not process this one
-    QVERIFY((QStringList{"A B'Cc", "Dd E'F"}) != m_nameTool.castFromTitledSentence(s));
+    const QStringList actual{m_nameTool.castFromTitledSentence(s)};
+    const QStringList expect{"A B'Cc", "Dd E'F"};
+    QVERIFY(expect != actual);
   }
 
   void test_capitalizedNameWithApostrophe() {
@@ -115,6 +133,30 @@ class NameToolTest : public MyTestSuite {
   void test_ToggleCase() {  //
     QCOMPARE(NameTool::ToggleSentenceCase("Henry Cavill"), "hENRY cAVILL");
     QCOMPARE(NameTool::ToggleSentenceCase("wI-fI"), "Wi-Fi");
+  }
+
+  void test_CastTagString() {
+    QString sentense{"C, B, B, A"};
+    const QStringList castSortedUnique{"A", "B", "C"};
+    const QStringList castSortedDuplicate{"A", "B", "B", "C"};
+    QCOMPARE(NameTool::CastTagSentenceParse2Lst(sentense, true), castSortedUnique);
+    QCOMPARE(NameTool::CastTagSentenceParse2Lst(sentense, false), castSortedDuplicate);
+    const QString castSortedUniqueStr{"A,B,C"};
+    const QString castSortedDuplicateStr{"A,B,B,C"};
+    QCOMPARE(NameTool::CastTagSentenceParse2Str(sentense, true), castSortedUniqueStr);
+    QCOMPARE(NameTool::CastTagSentenceParse2Str(sentense, false), castSortedDuplicateStr);
+  }
+
+  void test_CastTagStringRmv() {
+    QString sentense{"Chris Pines, Henry Cavill, Henry Cavill, Chris Evans"};
+    const QStringList afterNothingRmved{"Chris Evans", "Chris Pines", "Henry Cavill", "Henry Cavill"};
+    const QStringList afterRmved{"Chris Evans", "Chris Pines"};
+    QCOMPARE(NameTool::CastTagSentenceRmvEle2Lst(sentense, "Alex"), afterNothingRmved);
+    QCOMPARE(NameTool::CastTagSentenceRmvEle2Lst(sentense, "Henry Cavill"), afterRmved);
+    const QString afterNothingRmvedStr{"Chris Evans,Chris Pines,Henry Cavill,Henry Cavill"};
+    const QString afterRmvedStr{"Chris Evans,Chris Pines"};
+    QCOMPARE(NameTool::CastTagSentenceRmvEle2Str(sentense, "Alex"), afterNothingRmvedStr);
+    QCOMPARE(NameTool::CastTagSentenceRmvEle2Str(sentense, "Henry Cavill"), afterRmvedStr);
   }
 
   void test_ReplaceAndUpdateSelection_QLineEdit() {  //
@@ -157,7 +199,7 @@ class NameToolTest : public MyTestSuite {
     QCOMPARE(te.textCursor().selectedText(), "Hello World");
   }
 
- private:
+private:
   NameTool m_nameTool;
 };
 
