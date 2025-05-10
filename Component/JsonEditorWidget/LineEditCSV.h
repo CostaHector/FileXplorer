@@ -14,10 +14,8 @@ class LineEditCSV : public QLineEdit {
   QVariantList GetVariantList() const;
   void Format();
  private:
-  const bool mNoDuplicate;
+  const bool mEleUnique;
   QString mFormName;
-  static constexpr char CSV_COMMA = ',';
-  static const QRegularExpression CAST_STR_SPLITTER;
 };
 
 #endif
