@@ -21,6 +21,7 @@ enum FD_ERROR_CODE {
   FD_NOT_DIR,
   FD_NOT_INITED,
   FD_TABLE_NAME_INVALID,
+  FD_TABLE_NAME_PATTERN_INVALID,
   FD_TABLE_INEXIST,
   FD_FIELD_VALUE_INVALID,
   FD_DB_INVALID,
@@ -62,7 +63,7 @@ class DbManager : public QObject {
     // Deletes specific records (rows) from the table but retains the table structure and its associated objects (such as indexes, triggers, etc.).
     return RmvTable(tableNameRegexPattern, DROP_OR_DELETE::DELETE);
   }
-  bool DeleteDatabase();
+  bool DeleteDatabase(bool bRecyle = true);
   QSqlDatabase GetDb(bool open = true) const;
   QString GetCfgDebug() const { return "table:" + mDbName + "| conn:" + mConnName; }
   bool CheckValidAndOpen(QSqlDatabase& db) const;
