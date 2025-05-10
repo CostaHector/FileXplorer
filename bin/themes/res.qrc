@@ -134,7 +134,8 @@
 <!--JsonEditor Icon here        -->
 <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
 <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
-<file alias="APPEND_PERFORMERS">JsonEditor/APPEND_PERFORMERS.svg</file>
+<file alias="CAST_APPEND">JsonEditor/CAST_APPEND.svg</file>
+<file alias="CAST_REMOVE">JsonEditor/CAST_REMOVE.svg</file>
 <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
 <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
 <file alias="SAVED">JsonEditor/SAVED.svg</file>
@@ -150,6 +151,9 @@
 <file alias="JSON_FILE_NEXT_UNFINISHED">JsonEditor/JSON_FILE_NEXT_UNFINISHED.png</file>
 <file alias="CASE_TITLE">JsonEditor/CASE_TITLE.svg</file>
 <file alias="FORMAT_PAINTER">JsonEditor/FORMAT_PAINTER.svg</file>
+<file alias="TAGS_APPEND">JsonEditor/TAGS_APPEND.svg</file>
+<file alias="TAGS_REMOVE">JsonEditor/TAGS_REMOVE.svg</file>
+<file alias="TAGS_SET">JsonEditor/TAGS_SET.svg</file>
 <!--VideoPlayer icon here-->
 <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
 <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
@@ -259,6 +263,7 @@
 <file alias="SUM">Database/SUM.svg</file>
 <file alias="UNION">Database/UNION.svg</file>
 <file alias="AUDIT">Database/AUDIT.svg</file>
+<file alias="REVERT">Database/REVERT.svg</file>
 
 <file alias="ZIP">TopSideToolBarIcons/ZIP.ico</file>
 
