@@ -3,7 +3,7 @@
 #include <QRegularExpression>
 
 constexpr char LineEditCSV::CSV_COMMA;
-const QRegularExpression LineEditCSV::CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and )"};
+const QRegularExpression LineEditCSV::CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 
 LineEditCSV::LineEditCSV(const QString& formName, const QString& text, const bool bNoDuplicate, QWidget* parent)  //
     : QLineEdit{text, parent},                                                                                    //
