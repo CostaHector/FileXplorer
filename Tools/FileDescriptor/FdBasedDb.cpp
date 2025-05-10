@@ -662,6 +662,7 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
   using namespace JsonFileHelper;
   for (auto it = pth2Info.cbegin(); it != pth2Info.cend(); ++it) {
     const auto& info = it.value();
+    // if json file not exist, will create it first
     const RET_ENUM& ansRet = InsertOrUpdateDurationStudioCastTags(it.key(),       //
                                                                   info.Duration,  //
                                                                   info.Studio,    //

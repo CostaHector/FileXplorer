@@ -79,7 +79,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)  //
   _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from disk")  //
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())              //
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
-  _ADD_SELECTED_PERFORMER = new (std::nothrow) QAction(QIcon(":img/APPEND_PERFORMERS"), "Add Cast", this);
+  _ADD_SELECTED_PERFORMER = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND"), "Add Cast", this);
   _ADD_SELECTED_PERFORMER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
   _ADD_SELECTED_PERFORMER->setShortcutVisibleInContextMenu(true);
   _ADD_SELECTED_PERFORMER->setToolTip(QString("<b>%1 (%2)</b><br/> Append selection to performers lineeditor")  //
@@ -123,7 +123,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)  //
   _SYNC_JSON_NAME_VALUE_BY_FILENAME = new (std::nothrow) QAction(QIcon(":img/SYNC_MODIFICATION_SWITCH"), "Sync Json Name Value");
   _SYNC_JSON_NAME_VALUE_BY_FILENAME->setToolTip(QString("<b>%1 (%2)</b><br/>Sync json name value by corresponding Json file name.")  //
                                                     .arg(_SYNC_JSON_NAME_VALUE_BY_FILENAME->text(), _SYNC_JSON_NAME_VALUE_BY_FILENAME->shortcut().toString()));
-  _APPEND_PERFORMERS = new (std::nothrow) QAction(QIcon(":img/APPEND_PERFORMERS"), "Append Cast");
+  _APPEND_PERFORMERS = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND"), "Append Cast");
   _APPEND_PERFORMERS->setToolTip(QString("<b>%1 (%2)</b><br/>Input performers and append them json files under current path")  //
                                      .arg(_APPEND_PERFORMERS->text(), _APPEND_PERFORMERS->shortcut().toString()));
   _SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Set Studio");
