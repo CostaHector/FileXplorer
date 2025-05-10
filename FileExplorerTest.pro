@@ -3,6 +3,7 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
+SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp)
 SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
@@ -22,6 +23,7 @@ SOURCES += \
     Component/RenameWidgets/AdvanceRenamer.cpp \
     Component/StateLabel.cpp \
     Component/SyncModifiyFileSystem.cpp \
+    Component/JsonEditorWidget/LineEditCSV.cpp \
     model/ConflictsFileSystemModel.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/Classify/ItemsClassifier.cpp \
@@ -73,6 +75,7 @@ HEADERS += \
     Component/RenameWidgets/AdvanceRenamer.h \
     Component/StateLabel.h \
     Component/SyncModifiyFileSystem.h \
+    Component/JsonEditorWidget/LineEditCSV.h \
     model/ConflictsFileSystemModel.h \
     Tools/AIMediaDuplicate.h \
     Tools/Classify/ItemsClassifier.h \
