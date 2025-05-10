@@ -28,7 +28,7 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   mainLo->addWidget(m_torrentsListView);
   m_torrentsCentralWidget->setLayout(mainLo);
 
-  setMenuBar(g_torrentsManagerActions().GetMenuBar());
+  setMenuBar(g_torrActions().GetMenuBar());
   setCentralWidget(m_torrentsCentralWidget);
 
   QSqlDatabase con = mDb.GetDb();
@@ -56,14 +56,14 @@ void TorrentsManagerWidget::subscribe() {
     m_torrentsDBModel->setFilter(searchPattern);
   });
 
-  connect(g_torrentsManagerActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
+  connect(g_torrActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
 
-  connect(g_torrentsManagerActions().INIT_DATABASE, &QAction::triggered, this, &TorrentsManagerWidget::onInitDataBase);
-  connect(g_torrentsManagerActions().INIT_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInitATable);
-  connect(g_torrentsManagerActions().INSERT_INTO_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInsertIntoTable);
-  connect(g_torrentsManagerActions().DROP_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onDropATable);
-  connect(g_torrentsManagerActions().DELETE_FROM_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onDeleteFromTable);
-  connect(g_torrentsManagerActions().SUBMIT, &QAction::triggered, this, &TorrentsManagerWidget::onSubmit);
+  connect(g_torrActions().INIT_DATABASE, &QAction::triggered, this, &TorrentsManagerWidget::onInitDataBase);
+  connect(g_torrActions().INIT_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInitATable);
+  connect(g_torrActions().INSERT_INTO_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInsertIntoTable);
+  connect(g_torrActions().DROP_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onDropATable);
+  connect(g_torrActions().DELETE_FROM_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onDeleteFromTable);
+  connect(g_torrActions().SUBMIT, &QAction::triggered, this, &TorrentsManagerWidget::onSubmit);
 }
 
 bool TorrentsManagerWidget::onInitDataBase() {
@@ -231,7 +231,7 @@ bool TorrentsManagerWidget::onSubmit() {
 }
 
 void TorrentsManagerWidget::closeEvent(QCloseEvent* event) {
-  g_torrentsManagerActions().SHOW_TORRENTS_MANAGER->setChecked(false);
+  g_torrActions().SHOW_TORRENTS_MANAGER->setChecked(false);
   PreferenceSettings().setValue("TorrentsManagerWidgetGeometry", saveGeometry());
   QMainWindow::closeEvent(event);
 }
