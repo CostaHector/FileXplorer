@@ -98,7 +98,7 @@ const QRegularExpression CONTINOUS_HYPEN_COMP{"--+"};                     //-
 const QRegularExpression HYPEN_OR_SPACE_END_WITH_DOT_COMP{R"([\s-]\.)"};  //.
 const QRegularExpression TRAILING_HYPEN_COMP{"-$"};                       // delete it
 
-const QRegularExpression DISCRAD_LETTER_COMP{R"([^A-Zãáéíóúüñ¿¡0-9._@# '])", QRegularExpression::PatternOption::CaseInsensitiveOption};
+const QRegularExpression DISCRAD_LETTER_COMP{R"([^A-Zãáéíóúüñ¿¡0-9_@# '])", QRegularExpression::PatternOption::CaseInsensitiveOption};
 const QRegularExpression INVALID_TABLE_NAME_LETTER{R"([^A-Z0-9_])", QRegularExpression::PatternOption::CaseInsensitiveOption};
 const QRegularExpression AND_COMP{R"( and | fucked by | fucked | fucks | fuck |\+)", QRegularExpression::PatternOption::CaseInsensitiveOption};
 const QRegularExpression RESOLUTION_COMP{R"(2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD)", QRegularExpression::PatternOption::CaseInsensitiveOption};
