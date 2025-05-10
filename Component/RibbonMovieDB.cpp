@@ -6,7 +6,7 @@
 #include "public/PublicMacro.h"
 
 RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
-    : QToolBar(title, parent)                                        //
+  : QToolBar(title, parent)                                        //
 {
   m_dbControlTB = new (std::nothrow) QToolBar("DB Control", this);
   CHECK_NULLPTR_RETURN_VOID(m_dbControlTB);
@@ -32,23 +32,11 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_functionsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_functionsTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  m_dbViewHideShowTB = new (std::nothrow) QToolBar("Show/Hide Database View", this);
-  CHECK_NULLPTR_RETURN_VOID(m_dbViewHideShowTB);
-  m_dbViewHideShowTB->addAction(g_dbAct().QUICK_WHERE_CLAUSE);
-  m_dbViewHideShowTB->addSeparator();
-  m_dbViewHideShowTB->addAction(g_viewActions()._MOVIE_VIEW);
-  m_dbViewHideShowTB->addSeparator();
-  m_dbViewHideShowTB->addAction(g_torrentsManagerActions().SHOW_TORRENTS_MANAGER);
-  m_dbViewHideShowTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  m_dbViewHideShowTB->setOrientation(Qt::Orientation::Horizontal);
-
   m_studioTB = new (std::nothrow) QToolBar("Studio Edit Toolbar", this);
   CHECK_NULLPTR_RETURN_VOID(m_studioTB);
   m_studioTB->addAction(g_dbAct().SET_STUDIO);
   m_studioTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  m_studioTB->setOrientation(Qt::Orientation::Vertical);
-  m_studioTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_48, IMAGE_SIZE::TABS_ICON_IN_MENU_48));
-  m_studioTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  m_studioTB->setOrientation(Qt::Orientation::Horizontal);
 
   m_castEditTB = new (std::nothrow) QToolBar("Cast Edit Toolbar", this);
   CHECK_NULLPTR_RETURN_VOID(m_castEditTB);
@@ -70,17 +58,27 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_tagsEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_tagsEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
+  m_dbViewHideShowTB = new (std::nothrow) QToolBar("Show/Hide Database View", this);
+  CHECK_NULLPTR_RETURN_VOID(m_dbViewHideShowTB);
+  m_dbViewHideShowTB->addAction(g_viewActions()._MOVIE_VIEW);
+  m_dbViewHideShowTB->addSeparator();
+  m_dbViewHideShowTB->addAction(g_torrActions().SHOW_TORRENTS_MANAGER);
+  m_dbViewHideShowTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  m_dbViewHideShowTB->setOrientation(Qt::Orientation::Vertical);
+  m_dbViewHideShowTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  m_dbViewHideShowTB->setStyleSheet("QToolBar { max-width: 256px; }");
+
   addWidget(m_dbControlTB);
   addSeparator();
   addWidget(m_extraFunctionTB);
   addSeparator();
   addWidget(m_functionsTB);
   addSeparator();
-  addWidget(m_dbViewHideShowTB);
-  addSeparator();
   addWidget(m_studioTB);
   addWidget(m_castEditTB);
   addWidget(m_tagsEditTB);
+  addSeparator();
+  addWidget(m_dbViewHideShowTB);
 }
 
 // #define __NAME__EQ__MAIN__ 1

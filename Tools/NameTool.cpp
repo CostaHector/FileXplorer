@@ -118,7 +118,7 @@ bool NameTool::ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fT
 }
 
 const QRegularExpression CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
-QStringList NameTool::CastTagStringProcess(const QString& sentense, bool bElementUnique) {
+QStringList NameTool::CastTagSentenceParse2Lst(const QString& sentense, bool bElementUnique) {
   if (sentense.isEmpty()) {
     return {};
   }
@@ -130,16 +130,20 @@ QStringList NameTool::CastTagStringProcess(const QString& sentense, bool bElemen
   return lst;
 }
 
-QString NameTool::CastTagString(const QString& sentense, bool bElementUnique) {
-  return CastTagStringProcess(sentense, bElementUnique).join(CSV_COMMA);
+QString NameTool::CastTagSentenceParse2Str(const QString& sentense, bool bElementUnique) {
+  return CastTagSentenceParse2Lst(sentense, bElementUnique).join(CSV_COMMA);
 }
 
-QString NameTool::CastTagStringRmv(const QString& sentense, const QString& cast) {
+QStringList NameTool::CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast){
   if (sentense.isEmpty()) {
     return {};
   }
   QStringList lst = sentense.split(CAST_STR_SPLITTER);
   lst.removeAll(cast);
   lst.sort();
-  return lst.join(CSV_COMMA);
+  return lst;
+}
+
+QString NameTool::CastTagSentenceRmvEle2Str(const QString& sentense, const QString& cast) {
+  return CastTagSentenceRmvEle2Lst(sentense, cast).join(CSV_COMMA);
 }
