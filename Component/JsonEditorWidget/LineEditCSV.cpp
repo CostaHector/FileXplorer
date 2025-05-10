@@ -57,13 +57,17 @@ int LineEditCSV::AppendFromStringList(const QStringList& sl) {  // sort
   return curSl.size();
 }
 
-int LineEditCSV::ReadFromStringList(QStringList sl) {  // sort
-  sl.sort();
-  if (mNoDuplicate) {
-    sl.removeDuplicates();
+int LineEditCSV::ReadFromStringList(const QStringList& sl) {  // sort
+  QStringList castLst;
+  foreach (QString cast, sl) {
+    castLst.append(cast.trimmed());
   }
-  setText(sl.join(CSV_COMMA));
-  return sl.size();
+  castLst.sort();
+  if (mNoDuplicate) {
+    castLst.removeDuplicates();
+  }
+  setText(castLst.join(CSV_COMMA));
+  return castLst.size();
 }
 
 int LineEditCSV::ReadFromVariantList(const QVariantList& vl) {  // sort

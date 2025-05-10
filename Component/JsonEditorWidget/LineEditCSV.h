@@ -7,7 +7,7 @@ class LineEditCSV : public QLineEdit {
  public:
   explicit LineEditCSV(const QString& formName, const QString &text="", const bool bNoDuplicate = false, QWidget *parent = nullptr);
   int AppendFromStringList(const QStringList& sl);
-  int ReadFromStringList(QStringList sl);
+  int ReadFromStringList(const QStringList& sl);
   int ReadFromVariantList(const QVariantList& vl);
   QString GetFormName() const;
   QStringList GetStringList() const;
