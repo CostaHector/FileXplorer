@@ -9,9 +9,13 @@
 #include <QDirIterator>
 #include <QTextStream>
 
+
+const QRegularExpression CastManager::EFFECTIVE_CAST_NAME{R"([@ _])"};
+constexpr int CastManager::EFFECTIVE_CAST_NAME_LEN;
+
 CastManager::CastManager()       //
-    : m_performers{ReadOutPerformers()},     //
-      perfsCompleter(m_performers.values())  //
+  : m_performers{ReadOutPerformers()},     //
+    perfsCompleter(m_performers.values())  //
 {
   perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
   perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
@@ -30,7 +34,7 @@ QSet<QString> CastManager::ReadOutPerformers() {
   const QString& perfFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
 #endif
 
-  QFile performersFi(perfFilePath);
+  QFile performersFi{perfFilePath};
   if (!performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qWarning("file[%s] not found or open for read failed.", qPrintable(performersFi.fileName()));
     return {};
@@ -38,12 +42,12 @@ QSet<QString> CastManager::ReadOutPerformers() {
   QTextStream stream(&performersFi);
   stream.setCodec("UTF-8");
 
-  static const QRegularExpression VALID_CAST_NAME{R"([@ _])"};
   decltype(m_performers) perfSet;
   QString name;
   while (!stream.atEnd()) {
     name = stream.readLine().toLower();
-    if (name.size() > 12 || name.contains(VALID_CAST_NAME)) { // at least 2 words, or 12 char
+    // at least 2 words, or 12 char
+    if (name.size() >= EFFECTIVE_CAST_NAME_LEN || name.contains(EFFECTIVE_CAST_NAME)) {
       perfSet.insert(name);
     }
   }
@@ -62,6 +66,7 @@ int CastManager::ForceReloadPerformers() {
 
 int CastManager::LearningFromAPath(const QString& path) {
   if (!QDir(path).exists()) {
+    qWarning("path[%s] not exist", qPrintable(path));
     return 0;
   }
   decltype(m_performers) castsIncrement;
@@ -119,7 +124,7 @@ QStringList CastManager::SplitSentence(QString sentence) {
   return sentence.split(AT_LEAST_1_SPACE_COMP);
 }
 
-auto CastManager::RmvBelongLetter(const QString& word) -> QString {
+QString CastManager::RmvBelongLetter(const QString& word) {
   QString s = word.trimmed();
   if (s.endsWith("'s")) {
     s.chop(2);
@@ -127,7 +132,7 @@ auto CastManager::RmvBelongLetter(const QString& word) -> QString {
     s.chop(1);
   }
   return s;
-};
+}
 
 QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
   if (words.isEmpty()) {
@@ -140,7 +145,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
     if (i < N - 2) {
       const QString& w3 = words[i] + " " + words[i + 1] + " " + RmvBelongLetter(words[i + 2]);
       if (m_performers.contains(w3.toLower())) {
-        if (not performersList.contains(w3))
+        if (!performersList.contains(w3))
           performersList.append(w3);
         i += 3;
         continue;
@@ -149,7 +154,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
     if (i < N - 1) {
       const QString& w2 = words[i] + " " + RmvBelongLetter(words[i + 1]);
       if (m_performers.contains(w2.toLower())) {
-        if (not performersList.contains(w2)) {
+        if (!performersList.contains(w2)) {
           performersList.append(w2);
         }
         i += 2;
@@ -157,8 +162,8 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
       }
     }
     const QString& w1 = RmvBelongLetter(words[i]);
-    if (not w1.isEmpty() and m_performers.contains(w1.toLower())) {
-      if (not performersList.contains(w1))
+    if (!w1.isEmpty() && m_performers.contains(w1.toLower())) {
+      if (!performersList.contains(w1))
         performersList.append(w1);
       i += 1;
       continue;
