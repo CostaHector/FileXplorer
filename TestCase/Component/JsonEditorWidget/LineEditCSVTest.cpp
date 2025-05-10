@@ -10,7 +10,7 @@ class LineEditCSVTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  LineEditCSVTest() : MyTestSuite{true} {}
+  LineEditCSVTest() : MyTestSuite{false} {}
  private slots:
   void test_hotSceneSL() {
     LineEditCSV uniqueEleLe{ENUM_TO_STRING(CAST), "", true};
