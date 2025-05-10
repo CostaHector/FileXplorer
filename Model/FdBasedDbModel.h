@@ -52,6 +52,11 @@ class FdBasedDbModel : public QSqlTableModel {
            + data(curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight)).toString();
   }
 
+  void SetStudio(const QModelIndexList& tagColIndexes, const QString& studio);
+  void SetCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence);
+  void AddCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence);
+  void RmvCastOrTags(const QModelIndexList& tagColIndexes, const QString& cast);
+
  private:
   QString m_rootPath;
 };

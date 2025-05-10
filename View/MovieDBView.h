@@ -24,6 +24,7 @@ class MovieDBView : public CustomTableView {
   bool setCurrentMovieTable(const QString& movieTableName);
 
   bool onSubmit();
+  bool onRevert();
   bool onInsertIntoTable();
   bool onInitDataBase();
   void onCreateATable();
@@ -54,9 +55,17 @@ class MovieDBView : public CustomTableView {
     return _tablesDropDownList->CurrentRootPath();
   }
 
+  enum class FIELF_OP_TYPE { CAST = 0, TAGS = 1, BUTT };
+  static QString FIELF_OP_TYPE_ARR[(int)FIELF_OP_TYPE::BUTT];
+  enum class FIELD_OP_MODE { SET = 0, APPEND = 1, REMOVE = 2, BUTT };
+  static QString FIELD_OP_MODE_ARR[(int)FIELD_OP_MODE::BUTT];
+
+  int onSetStudio();
+  int onSetCastOrTags(const FIELF_OP_TYPE type, const FIELD_OP_MODE mode);
   // should not call ~destructure after getDb() and pass to QSqlTableModel
  private:
   bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected);
+  bool IsHasSelection(const QString& msg = "") const;
 
   FdBasedDbModel* _dbModel{nullptr};
   MovieDatabaseMenu* m_movieMenu{nullptr};
@@ -66,6 +75,9 @@ class MovieDBView : public CustomTableView {
 
   QuickWhereClause* m_quickWhereClause{nullptr};
   FdBasedDb& mDb;
+
+  QStringList m_studioCandidates;
+  QStringList m_tagsCandidates[(int)FIELF_OP_TYPE::BUTT];
 };
 
 #endif  // MOVIEDBVIEW_H
