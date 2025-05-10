@@ -1,6 +1,6 @@
 #include "NameTool.h"
 
-const char* NameTool::FIELD_SEPERATOR {"&|\\band\\b|,|\t|\n|@|#|\\+|\\||/|\\\\"};
+const char* NameTool::FIELD_SEPERATOR{"&|\\band\\b|,|\t|\n|@|#|\\+|\\||/|\\\\"};
 const QRegularExpression NameTool::FS_COMP(FIELD_SEPERATOR, QRegularExpression::PatternOption::CaseInsensitiveOption);
 
 const char* NameTool::FREQUENT_NAME_PATTER = "[A-Z]{2,}\\s[A-Z']+(\\s[A-Z]{2,})*";
@@ -8,6 +8,8 @@ const QRegularExpression NameTool::NAME_COMP(FREQUENT_NAME_PATTER);
 
 const QString NameTool::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
+
+constexpr char NameTool::CSV_COMMA;
 
 QStringList NameTool::operator()(const QString& s) const {
   QStringList ans;
@@ -113,4 +115,31 @@ bool NameTool::ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fT
   const int newSelectLetterCnt = after.size();
   le.setSelection(startPos, newSelectLetterCnt);
   return true;
+}
+
+const QRegularExpression CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
+QStringList NameTool::CastTagStringProcess(const QString& sentense, bool bElementUnique) {
+  if (sentense.isEmpty()) {
+    return {};
+  }
+  QStringList lst = sentense.split(CAST_STR_SPLITTER);
+  lst.sort();
+  if (bElementUnique) {
+    lst.removeDuplicates();
+  }
+  return lst;
+}
+
+QString NameTool::CastTagString(const QString& sentense, bool bElementUnique) {
+  return CastTagStringProcess(sentense, bElementUnique).join(CSV_COMMA);
+}
+
+QString NameTool::CastTagStringRmv(const QString& sentense, const QString& cast) {
+  if (sentense.isEmpty()) {
+    return {};
+  }
+  QStringList lst = sentense.split(CAST_STR_SPLITTER);
+  lst.removeAll(cast);
+  lst.sort();
+  return lst.join(CSV_COMMA);
 }
