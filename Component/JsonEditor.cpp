@@ -13,7 +13,6 @@
 #include "Tools/NameTool.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/CastManager.h"
-#include "Tools/StringEditHelper.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -27,14 +26,14 @@
 const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 
 JsonEditor::JsonEditor(QWidget* parent)
-  : QMainWindow{parent},
-    m_jsonFormLo{new QFormLayout},
-    m_jsonFormWid{new QWidget(this)},
+    : QMainWindow{parent},
+      m_jsonFormLo{new QFormLayout},
+      m_jsonFormWid{new QWidget(this)},
 
-    m_jsonModel{new JsonModel{this}},
-    m_jsonList(new JsonListView{m_jsonModel, this}),
-    m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
-    m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
+      m_jsonModel{new JsonModel{this}},
+      m_jsonList(new JsonListView{m_jsonModel, this}),
+      m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
+      m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
   mName = new LineEditStr{ENUM_TO_STRING(Name), "", this};
@@ -42,11 +41,11 @@ JsonEditor::JsonEditor(QWidget* parent)
   mStudio = new LineEditStr{ENUM_TO_STRING(Studio), "", this};
   mUploaded = new LineEditStr{ENUM_TO_STRING(Uploaded), "", this};
   mTagsCsv = new LineEditCSV{ENUM_TO_STRING(Tags), "", true, this};  // comma seperated
-  mRateInt = new LineEditInt{ENUM_TO_STRING(Rate), "", this};  // int
+  mRateInt = new LineEditInt{ENUM_TO_STRING(Rate), "", this};        // int
   mSize = new LineEditInt{ENUM_TO_STRING(Size), "", this};
   mResolution = new LineEditStr{ENUM_TO_STRING(Resolution), "", this};
   mBitrate = new LineEditStr{ENUM_TO_STRING(Bitrate), "", this};
-  mHot = new LineEditCSV{ENUM_TO_STRING(Hot), "", true, this};              // QList<QVariant>
+  mHot = new LineEditCSV{ENUM_TO_STRING(Hot), "", true, this};        // QList<QVariant>
   mDetail = new TextEditMultiLine{ENUM_TO_STRING(Detail), "", this};  // multi-line
 
   m_jsonFormLo->addRow(mName->GetFormName(), mName);
@@ -70,7 +69,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_splitter->addWidget(m_jsonList);
   m_splitter->setStyleSheet(QString("QTextEdit {font-size: %1pt}"
                                     "QLineEdit {font-size: %1pt};")
-                            .arg(13));
+                                .arg(13));
   setCentralWidget(m_splitter);
 
   subscribe();
@@ -213,31 +212,31 @@ bool JsonEditor::onSaveAndNextUnfinishedItem() {
 }
 
 auto JsonEditor::onLowercaseEachWord() -> void {
-  StringEditHelper::ReplaceAndUpdateSelection(mName, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mPerfsCsv, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mStudio, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mUploaded, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mTagsCsv, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mRateInt, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mSize, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mResolution, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mBitrate, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mHot, StringEditHelper::lowercaseSentense);
-  StringEditHelper::ReplaceAndUpdateSelection(mDetail, StringEditHelper::lowercaseSentense);
+  NameTool::ReplaceAndUpdateSelection(*mName, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mPerfsCsv, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mStudio, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mUploaded, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mTagsCsv, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mRateInt, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mSize, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mResolution, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mBitrate, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mHot, NameTool::Lower);
+  NameTool::ReplaceAndUpdateSelection(*mDetail, NameTool::Lower);
 }
 
 auto JsonEditor::onCapitalizeEachWord() -> void {
-  StringEditHelper::ReplaceAndUpdateSelection(mName, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mPerfsCsv, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mStudio, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mUploaded, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mTagsCsv, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mRateInt, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mSize, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mResolution, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mBitrate, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mHot, StringEditHelper::capitalizeEachWord);
-  StringEditHelper::ReplaceAndUpdateSelection(mDetail, StringEditHelper::capitalizeEachWord);
+  NameTool::ReplaceAndUpdateSelection(*mName, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mPerfsCsv, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mStudio, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mUploaded, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mTagsCsv, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mRateInt, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mSize, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mResolution, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mBitrate, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mHot, NameTool::CapitaliseFirstLetterKeepOther);
+  NameTool::ReplaceAndUpdateSelection(*mDetail, NameTool::CapitaliseFirstLetterKeepOther);
 }
 
 bool JsonEditor::onLearnPerfomersFromJsonFile() {
@@ -292,11 +291,11 @@ auto JsonEditor::onExtractCapitalizedPerformersHint() -> bool {
   QStringList hintPerfs;
   if (mName->hasSelectedText()) {
     const QString& capitalizedStr = mName->selectedText();
-    hintPerfs += NameTool().fromArticleCapitalizedNames(capitalizedStr);
+    hintPerfs += NameTool().castFromTitledSentence(capitalizedStr);
   }
   if (mDetail->textCursor().hasSelection()) {
     const QString& capitalizedStr = mDetail->textCursor().selection().toPlainText();
-    hintPerfs += NameTool().fromArticleCapitalizedNames(capitalizedStr);
+    hintPerfs += NameTool().castFromTitledSentence(capitalizedStr);
   }
   mPerfsCsv->AppendFromStringList(hintPerfs);
   return true;
