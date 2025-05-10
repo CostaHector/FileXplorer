@@ -7,7 +7,7 @@
 #include "Component/Notificator.h"
 
 #include "Tools/FileDescriptor/MountHelper.h"
-
+#include "Tools/StudiosManager.h"
 #include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
@@ -20,6 +20,17 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QInputDialog>
+
+QString MovieDBView::FIELF_OP_TYPE_ARR[(int)FIELF_OP_TYPE::BUTT]{
+    ENUM_TO_STRING(CAST),
+    ENUM_TO_STRING(TAGS),
+};
+
+QString MovieDBView::FIELD_OP_MODE_ARR[(int)FIELD_OP_MODE::BUTT]{
+    ENUM_TO_STRING(SET),
+    ENUM_TO_STRING(APPEND),
+    ENUM_TO_STRING(REMOVE),
+};
 
 MovieDBView::MovieDBView(FdBasedDbModel* model_,               //
                          DatabaseSearchToolBar* _dbSearchBar,  //
@@ -65,6 +76,7 @@ void MovieDBView::subscribe() {
   auto& inst = g_dbAct();
   // control actions
   connect(inst.SUBMIT, &QAction::triggered, this, &MovieDBView::onSubmit);
+  connect(inst.REVERT, &QAction::triggered, this, &MovieDBView::onRevert);
   connect(inst.INIT_A_DATABASE, &QAction::triggered, this, &MovieDBView::onInitDataBase);
   connect(inst.INIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onCreateATable);
   connect(inst.DROP_A_TABLE, &QAction::triggered, this, &MovieDBView::onDropATable);
@@ -73,13 +85,22 @@ void MovieDBView::subscribe() {
   connect(inst.UNION_TABLE, &QAction::triggered, this, &MovieDBView::onUnionTables);
   connect(inst.AUDIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onAuditATable);
   // extra function actions
-  connect(inst.SET_DURATION_BY_VIDEO, &QAction::triggered, this, &MovieDBView::onSetDurationByVideo);
+  connect(inst.READ_DURATION_BY_VIDEO, &QAction::triggered, this, &MovieDBView::onSetDurationByVideo);
   connect(inst.EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON, &QAction::triggered, this, &MovieDBView::onExportToJson);
   connect(inst.UPDATE_STUDIO_CAST_TAGS_BY_JSON, &QAction::triggered, this, &MovieDBView::onUpdateByJson);
   // assistance actions
   connect(inst.QUICK_WHERE_CLAUSE, &QAction::triggered, this, &MovieDBView::onQuickWhereClause);
   // common function actions
   connect(inst._COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
+  connect(inst._OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
+  // record studio/cast/tags manual batch edit
+  connect(inst.SET_STUDIO, &QAction::triggered, this, &MovieDBView::onSetStudio);
+  connect(inst.SET_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::CAST, FIELD_OP_MODE::SET); });
+  connect(inst.APPEND_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::CAST, FIELD_OP_MODE::APPEND); });
+  connect(inst.REMOVE_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE); });
+  connect(inst.SET_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::TAGS, FIELD_OP_MODE::SET); });
+  connect(inst.APPEND_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND); });
+  connect(inst.REMOVE_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE); });
 
   addAction(g_fileBasicOperationsActions().COPY_FULL_PATH);
   addAction(g_fileBasicOperationsActions().COPY_NAME);
@@ -91,10 +112,10 @@ bool MovieDBView::onSearchDataBase() {
   _dbModel->setFilter(searchPattern);
   _dbModel->select();
   if (_dbModel->lastError().isValid()) {
-    Notificator::badNews(QString("FAIL set new searchPattern[%1]").arg(searchPattern), _dbModel->lastError().text());
+    LOG_BAD("FAIL set new searchPattern", _dbModel->lastError().text());
     return false;
   }
-  Notificator::goodNews("Succeed set new searchPattern", searchPattern);
+  LOG_GOOD("Succeed set new searchPattern", searchPattern);
   return true;
 }
 
@@ -131,7 +152,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   const QString& curTblName = GetMovieTableName();
   const QString& tblPeerPath = GetMovieTableRootPath();
   if (!QFileInfo{tblPeerPath}.isDir()) {
-    Notificator::warning(QString{"Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath), "Skip now");
+    const QString offLineMsg = QString{"[Skip] Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath);
     return false;
   }
   QString lastPath = PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString();
@@ -144,11 +165,12 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
                                                          lastPath,  //
                                                          QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
-    Notificator::warning("User cancel insert, path is not directory", selectPath);
+    LOG_WARN("User cancel insert, path is not directory", selectPath);
     return false;
   }
   if (!selectPath.startsWith(tblPeerPath)) {
-    Notificator::warning("Path user selected is not under table PeerPath", selectPath + '\n' + tblPeerPath);
+    const QString pthRelationMsg{selectPath + '\n' + tblPeerPath};
+    LOG_WARN("Path user selected is not under table PeerPath", pthRelationMsg);
     return false;
   }
 
@@ -161,13 +183,13 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
 bool MovieDBView::onInsertIntoTable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    Notificator::badNews("Open failed", con.lastError().text());
+    LOG_BAD("Open failed", con.lastError().text());
     return false;
   }
 
   const QString& curTblName = GetMovieTableName();
   if (!con.tables().contains(curTblName)) {
-    Notificator::badNews(curTblName, "Table NOT exist. ABORT insert");
+    LOG_BAD("[ABORT] Table NOT exist.", curTblName);
     return false;
   }
 
@@ -178,18 +200,19 @@ bool MovieDBView::onInsertIntoTable() {
 
   const QString msg{QString{"%1/* ----->---- Table: %2"}.arg(selectPath).arg(_tablesDropDownList->currentText())};
   if (QMessageBox::question(this, "CONFIRM INSERT INTO?", msg) != QMessageBox::StandardButton::Yes) {
-    Notificator::information("User cancel insert", selectPath);
+    LOG_GOOD("User cancel insert", selectPath);
     return true;
   }
 
   int retCnt = mDb.ReadADirectory(curTblName, selectPath);
   if (retCnt < 0) {
-    Notificator::badNews(QString("Read videos from path failed, code:%1").arg(retCnt), selectPath);
+    LOG_BAD("Read videos from path failed, see details", selectPath);
     return false;
   }
 
-  Notificator::goodNews(QString("Read videos from path succeed, count:%1").arg(retCnt), selectPath);
-  QMessageBox::information(this, "Read videos from path succeed", QString("Count=%1").arg(retCnt));
+  const QString cntMsg{QString("Count=%1").arg(retCnt)};
+  LOG_GOOD("Read videos from path succeed", cntMsg);
+  QMessageBox::information(this, "Read videos from path succeed", cntMsg);
   _dbModel->submitAll();
   return true;
 }
@@ -204,24 +227,41 @@ bool MovieDBView::onSubmit() {
     return false;
   }
   if (!_dbModel->isDirty()) {
-    Notificator::goodNews("Table not dirty, Skip", _tablesDropDownList->currentText());
+    LOG_GOOD("Table not dirty. Skip submit", _tablesDropDownList->currentText());
     return true;
   }
   if (!_dbModel->submitAll()) {
-    Notificator::badNews("Submit failed. see details in logs", _tablesDropDownList->currentText());
+    LOG_BAD("Submit failed. see details in logs", _tablesDropDownList->currentText());
     return false;
   }
+  LOG_GOOD("Submit succeed", _tablesDropDownList->currentText());
+  return true;
+}
 
-  Notificator::goodNews("Submit succeed", _tablesDropDownList->currentText());
+bool MovieDBView::onRevert() {
+  if (_dbModel == nullptr) {
+    qCritical("_dbModel is nullptr");
+    return false;
+  }
+  if (_tablesDropDownList == nullptr) {
+    qCritical("_tablesDropDownList is nullptr");
+    return false;
+  }
+  if (!_dbModel->isDirty()) {
+    LOG_GOOD("Table not dirty. Skip revert", _tablesDropDownList->currentText());
+    return true;
+  }
+  _dbModel->revertAll();
+  LOG_GOOD("Revert succeed", _tablesDropDownList->currentText());
   return true;
 }
 
 bool MovieDBView::onInitDataBase() {
   const bool crtResult = mDb.CreateDatabase();
   if (!crtResult) {
-    Notificator::badNews("Init database failed, reason:", mDb.GetCfgDebug());
+    LOG_BAD("Init database failed, reason:", mDb.GetCfgDebug());
   }
-  Notificator::goodNews("Init database succeed", "...");
+  LOG_GOOD("Init database succeed", "...");
   return true;
 }
 
@@ -239,40 +279,40 @@ void MovieDBView::onCreateATable() {
   const QString& crtTbl = QInputDialog::getItem(this, "Input an table name", msgs, candidates, 0,  //
                                                 true, &isInputOk);
   if (!isInputOk) {
-    qWarning("User cancel[%d]", isInputOk);
-    Notificator::warning("Create table failed", "User cancel.");
+    LOG_GOOD("[skip] User cancel create table", "")
     return;
   }
   const QString& newTbl = MountHelper::ChoppedDisplayName(crtTbl);
   if (newTbl.isEmpty() || tables.contains(newTbl)) {
-    Notificator::warning("Table name " + newTbl, "empty or already occupied");
+    LOG_WARN("[Abort] Table name empty or already occupied", newTbl)
     return;
   }
 
   if (newTbl.contains(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER)) {
-    Notificator::badNews("Table name " + newTbl, "contains invalid letter.");
+    LOG_BAD("[Abort] Table name contains invalid letter.", newTbl)
     return;
   }
 
   if (!mDb.CreateTable(newTbl, FdBasedDb::CREATE_TABLE_TEMPLATE)) {
-    Notificator::badNews(newTbl + " Table name created failed", "see detail in log");
+    LOG_BAD("[Abort] Table name created failed. See detail in log", newTbl)
     return;
   }
 
   _tablesDropDownList->AddItem(newTbl, MountHelper::GetDisplayNameByGuidTableName(newTbl));
   _tablesDropDownList->setCurrentIndex(_tablesDropDownList->count() - 1);
-  Notificator::goodNews("Table name " + newTbl, "created succeed");
+  LOG_GOOD("[OK] Table created succeed", newTbl)
 }
 
 bool MovieDBView::onDropATable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    Notificator::badNews("Open db failed, reason:", con.lastError().text());
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Open db failed, See detail in log", lastErrMsg)
     return false;
   }
   const QStringList& tables = con.tables();
   if (tables.isEmpty()) {
-    Notificator::goodNews("No need drop", "No table exist at all");
+    LOG_GOOD("[Skip] No need drop", "No table exist at all");
     return true;
   }
   const QStringList& candidates = _tablesDropDownList->ToQStringList();
@@ -287,28 +327,30 @@ bool MovieDBView::onDropATable() {
                                                 false,                                    //
                                                 &okUserSelect);
   if (!okUserSelect) {
-    Notificator::goodNews("User cancel drop table", "cancel");
+    LOG_GOOD("[skip] User cancel drop table", "")
     return true;
   }
   const QString& deleteTbl = MountHelper::ChoppedDisplayName(drpTbl);
   if (deleteTbl.isEmpty()) {
-    Notificator::badNews("Table name[%s] is empty, cannot drop", deleteTbl);
+    LOG_BAD("[Abort] Table name is empty, cannot drop", deleteTbl)
     return true;
   }
 
   if (!mDb.DropTable(deleteTbl)) {
-    Notificator::badNews(QString("Table[%s] drop failed").arg(deleteTbl), con.lastError().text());
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Table drop failed, See detail in log", lastErrMsg)
     return false;
   }
   InitMoviesTables();
-  Notificator::goodNews("Table has been dropped", deleteTbl);
+  LOG_GOOD("[OK] Table has been dropped", deleteTbl)
   return true;
 }
 
 bool MovieDBView::onDeleteFromTable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed, reason:%s", qPrintable(con.lastError().text()));
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Open db failed, See detail in log", lastErrMsg)
     return false;
   }
 
@@ -331,28 +373,27 @@ bool MovieDBView::onDeleteFromTable() {
                                                      QString{"DELETE FROM %1 WHERE "}.arg(tbl),  //
                                                      candidates, 0, true, &okClicked);
   if (!okClicked) {
-    qDebug("User Cancel delete row");
+    LOG_GOOD("[skip] User cancel delete row", "")
     return true;
   }
   if (whereClause.isEmpty()) {
     qWarning("All record(s) in table[%s] to be deleted.", qPrintable(tbl));
   }
   qDebug("Where clause[%s]", qPrintable(whereClause));
-
   const QString deleteCmd{QString{"DELETE FROM %1\nWHERE [%2];"}.arg(tbl, whereClause)};
   if (QMessageBox::question(this, "CONFIRM DELETE? (OPERATION NOT RECOVERABLE)", deleteCmd,  //
                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
       != QMessageBox::Yes) {
-    Notificator::goodNews("User Cancel delete records", "Skip");
+    LOG_GOOD("User Cancel delete records", "Skip");
     return true;
   }
-
   const int affectedRows = mDb.DeleteByWhereClause(tbl, whereClause);
   if (affectedRows < 0) {
-    Notificator::badNews("Delete failed", deleteCmd);
+    LOG_BAD("Delete failed", deleteCmd);
     return false;
   }
-  Notificator::goodNews(deleteCmd + " succceed", QString("%1 record(s) affected").arg(affectedRows));
+  QString affectedRowsMsg = QString{"%1 record(s) affected"}.arg(affectedRows);
+  LOG_GOOD("[OK]" + deleteCmd, affectedRowsMsg);
   _dbModel->submitAll();
   return true;
 }
@@ -372,7 +413,8 @@ bool MovieDBView::onQuickWhereClause() {
 bool MovieDBView::onUnionTables() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Open db failed, See detail in log", lastErrMsg)
     return false;
   }
 
@@ -384,13 +426,13 @@ bool MovieDBView::onUnionTables() {
 
   const int SRC_TABLE_CNT = tbs.size() - 1;
   if (SRC_TABLE_CNT <= 1) {
-    Notificator::information("No need union", "Only one table find(except destination table)");
+    LOG_INFO("No need union", "Only one table find(except destination table)");
     return true;
   }
 
   const QString& confirmUnionHintMsg = QString("All %1 tables into Table[%2]").arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES);
   if (QMessageBox::question(this, "Confirm Union?", confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
-    Notificator::goodNews(QString("User cancel union %1 tables").arg(SRC_TABLE_CNT), "Skip");
+    LOG_GOOD("[Skip] User cancel union tables", "cancel");
     return true;
   }
 
@@ -410,7 +452,7 @@ bool MovieDBView::onUnionTables() {
   if (!unionTableQry.exec(unionCmd)) {
     const QString& title = QString("Union %1 table(s) into [%2]").arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES);
     const QString& msg = QString("cmd: %1 failed: %2").arg(unionTableQry.executedQuery()).arg(unionTableQry.lastError().text());
-    Notificator::goodNews(title, msg);
+    LOG_GOOD(title, msg);
     QMessageBox::warning(this, title, msg);
     con.rollback();
     return false;
@@ -421,15 +463,21 @@ bool MovieDBView::onUnionTables() {
 }
 
 bool MovieDBView::onAuditATable() {
+  if (_dbModel->isDirty()) {
+    LOG_WARN("[Skip Audit] Table is dirty. must submit/revert first", _tablesDropDownList->currentText());
+    return true;
+  }
+
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Open db failed, See detail in log", lastErrMsg)
     return false;
   }
   const QString& curTblName = GetMovieTableName();
   const QStringList& tbs = con.tables();
   if (!tbs.contains(curTblName)) {
-    Notificator::warning(QString{"Table[%1] not exist in %1 table(s)"}.arg(curTblName).arg(tbs.size()), "Skip audit now");
+    LOG_WARN("Skip audit now. Table not exist", curTblName);
     return false;
   }
 
@@ -441,13 +489,15 @@ bool MovieDBView::onAuditATable() {
   VolumeUpdateResult adtResult{0};
   auto ret = mDb.Adt(curTblName, selectPath, &adtResult);
   if (ret != FD_OK) {
-    Notificator::badNews(QString{"Audit table[%1] by selectPath[%2] FAILED"}.arg(curTblName).arg(selectPath),  //
-                         QString{"Error code[%3], see in log details"}.arg(ret));
+    QString adtMsg{QString{"Audit table[%1] by selectPath[%2] FAILED, see in log details"}.arg(curTblName).arg(selectPath)};
+    QString retMsg{QString{"Error code[%3]"}.arg(ret)};
+    LOG_BAD(adtMsg, retMsg);
     return false;
   }
   _dbModel->select();
-  Notificator::goodNews(QString{"Audit table[%1] by selectPath[%2] succeed"}.arg(curTblName).arg(selectPath),  //
-                        QString{"Insert: %1/Delete: %2/Update: %3"}.arg(adtResult.insertCnt).arg(adtResult.deleteCnt).arg(adtResult.updateCnt));
+  QString adtMsg = QString{"Audit table[%1] by selectPath[%2] succeed"}.arg(curTblName).arg(selectPath);
+  QString retMsg{QString{"Insert: %1/Delete: %2/Update: %3"}.arg(adtResult.insertCnt).arg(adtResult.deleteCnt).arg(adtResult.updateCnt)};
+  LOG_GOOD(adtMsg, retMsg);
 
   return true;
 }
@@ -455,62 +505,81 @@ bool MovieDBView::onAuditATable() {
 bool MovieDBView::onSetDurationByVideo() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Open db failed, See detail in log", lastErrMsg)
     return false;
   }
   const QString& curTblName = GetMovieTableName();
   const QString& tblPeerPath = GetMovieTableRootPath();
   if (!QFileInfo{tblPeerPath}.isDir()) {
-    Notificator::warning(QString{"Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath), "Skip now");
+    const QString offLineMsg = QString{"[Skip] Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath);
+    LOG_WARN(offLineMsg, "Skip now");
     return false;
   }
   const int retCnt = mDb.SetDuration(curTblName);
   if (retCnt < 0) {
-    Notificator::badNews("SetDuration failed", QString{"errorCode:%1, see details in logs"}.arg(retCnt));
+    const QString errorCode{QString{"errorCode:%1"}.arg(retCnt)};
+    LOG_BAD("[Failed] SetDuration failed. See details in logs", errorCode);
     return false;
   }
   _dbModel->select();
-  Notificator::goodNews("SetDuration succeed", QString{"%1 record(s) duration field get update"}.arg(retCnt));
+  const QString affectedMsg = QString{"%1 record(s) duration field get update"}.arg(retCnt);
+  LOG_GOOD("[OK] SetDuration", affectedMsg);
   return true;
 }
 
 bool MovieDBView::onExportToJson() {
+  if (_dbModel->isDirty()) {
+    LOG_WARN("[Skip Export] Table is dirty. must submit/revert first", _tablesDropDownList->currentText());
+    return true;
+  }
+
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Open db failed, See detail in log", lastErrMsg)
     return false;
   }
   const QString& curTblName = GetMovieTableName();
   const QStringList& tbs = con.tables();
   if (!tbs.contains(curTblName)) {
-    Notificator::warning(QString{"Table[%1] not exist in %1 table(s)"}.arg(curTblName).arg(tbs.size()), "Skip export valid field(s) to local json file now");
+    LOG_WARN("[Skip] Table not exist", curTblName);
     return false;
   }
   const QString& tblPeerPath = GetMovieTableRootPath();
   if (!QFileInfo{tblPeerPath}.isDir()) {
-    Notificator::warning(QString{"Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath), "Skip now");
+    const QString offLineMsg = QString{"[Skip] Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath);
+    LOG_WARN(offLineMsg, "Skip now");
     return false;
   }
   const int retCnt = mDb.ExportDurationStudioCastTagsToJson(curTblName);
   if (retCnt < 0) {
-    Notificator::badNews("Export changed duration/Studio/Cast/Tags fields to json failed", QString{"errorCode:%1, see details in logs"}.arg(retCnt));
+    const QString errorMsg{QString{"errorCode:%1, see details in logs"}.arg(retCnt)};
+    LOG_BAD("Export changed duration/Studio/Cast/Tags fields to json failed", errorMsg)
     return false;
   }
   _dbModel->select();
-  Notificator::goodNews("Export changed duration/Studio/Cast/Tags fields to json succeed", QString{"%1 json file(s) get update"}.arg(retCnt));
+  QString jsonAffectedMsg = QString{"%1 json file(s) get update"}.arg(retCnt);
+  LOG_GOOD("[OK] Export to json succeed", jsonAffectedMsg);
   return true;
 }
 
 bool MovieDBView::onUpdateByJson() {
+  if (_dbModel->isDirty()) {
+    LOG_WARN("[Skip Update] Table is dirty. must submit/revert first", _tablesDropDownList->currentText());
+    return true;
+  }
+
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    QString lastErrMsg{con.lastError().text()};
+    LOG_BAD("[Abort] Open db failed, See detail in log", lastErrMsg)
     return false;
   }
   const QString& curTblName = GetMovieTableName();
   const QStringList& tbs = con.tables();
   if (!tbs.contains(curTblName)) {
-    Notificator::warning(QString{"Table[%1] not exist in %1 table(s)"}.arg(curTblName).arg(tbs.size()), "Skip update field(s) by local json file now");
+    LOG_WARN("[Skip] Table not exist", curTblName);
     return false;
   }
 
@@ -521,11 +590,13 @@ bool MovieDBView::onUpdateByJson() {
 
   const int retCnt = mDb.UpdateStudioCastTagsByJson(curTblName, selectPath);
   if (retCnt < 0) {
-    Notificator::badNews("Update Studio/Cast/Tags/Field(s) by local json file failed", QString{"errorCode:%1, see details in logs"}.arg(retCnt));
+    const QString errorMsg{QString{"errorCode:%1"}.arg(retCnt)};
+    LOG_BAD("Update Studio/Cast/Tags/Field(s) by local json file failed. see details in logs", errorMsg);
     return false;
   }
   _dbModel->select();
-  Notificator::goodNews("Update Studio/Cast/Tags/Field(s) by local json file json succeed", QString{"%1 record(s) get update"}.arg(retCnt));
+  const QString affectedMsg{QString{"%1 record(s) get update"}.arg(retCnt)};
+  LOG_GOOD("Update Studio/Cast/Tags field(s) by local json file json succeed", affectedMsg);
   return true;
 }
 
@@ -534,12 +605,119 @@ int MovieDBView::onCountRow() {
   const QString& whereClause = _searchWhereLineEdit->text();
   int succeedCnt = mDb.CountRow(tableName, whereClause);
   if (succeedCnt < 0) {
-    Notificator::badNews(QString("Get rows count failed, code: %1").arg(succeedCnt), "See details in logs");
+    const QString errorMsg{QString{"errorCode:%1"}.arg(succeedCnt)};
+    LOG_BAD("Get rows count failed, See details in logs", errorMsg);
     return succeedCnt;
   }
-  Notificator::goodNews(QString("Get rows count failed, code: %1").arg(succeedCnt), "See details in logs");
-  QMessageBox::information(this, "Get rows count succeed", QString("Count=%1").arg(succeedCnt));
+  const QString cntMsg{QString("Count=%1").arg(succeedCnt)};
+  LOG_GOOD("Get rows count succeed", cntMsg);
+  QMessageBox::information(this, "Get rows count succeed", cntMsg);
   return succeedCnt;
+}
+
+int MovieDBView::onSetStudio() {
+  if (!IsHasSelection("set studio")) {
+    return 0;
+  }
+  const auto& curInd = currentIndex();
+  const QString& fileName = _dbModel->fileName(curInd);
+
+  static StudiosManager& sm = StudiosManager::getIns();
+  const QString defStudio = sm(fileName);
+  int defIndex = m_studioCandidates.indexOf(defStudio);
+  if (defIndex == -1) {
+    m_studioCandidates.push_back(defStudio);
+    defIndex = m_studioCandidates.size() - 1;
+  }
+
+  bool isInputOk{false};
+  QString hintMsg{"Choose or select studio from drop down list"};
+  const QString& studio = QInputDialog::getItem(this, "Input an studio name", hintMsg,  //
+                                                m_studioCandidates,                     //
+                                                defIndex,                               //
+                                                true, &isInputOk);
+  if (!isInputOk) {
+    LOG_GOOD("User cancel set studio", "skip")
+    return 0;
+  }
+  if (studio.isEmpty()) {
+    LOG_BAD("Studio name can not be empty", "skip")
+    return 0;
+  }
+
+  if (m_studioCandidates.indexOf(studio) == -1) {
+    auto insertPos = std::upper_bound(m_studioCandidates.begin(), m_studioCandidates.end(), studio);
+    m_studioCandidates.insert(insertPos, studio);
+  }
+
+  const QModelIndexList& indexes = selectionModel()->selectedRows(MOVIE_TABLE::Studio);
+  _dbModel->SetStudio(indexes, studio);
+  const QString affectedRowsMsg{QString{"[Uncommit] %1 row(s) studio has been changed to"}.arg(indexes.size())};
+  LOG_GOOD(affectedRowsMsg, studio);
+  return indexes.size();
+}
+
+int MovieDBView::onSetCastOrTags(const FIELF_OP_TYPE type, const FIELD_OP_MODE mode) {
+  const QString fieldOperation{"Operation:" + FIELF_OP_TYPE_ARR[(int)type] + ' ' + FIELD_OP_MODE_ARR[(int)mode]};
+  if (!IsHasSelection(fieldOperation)) {
+    return 0;
+  }
+  QStringList& candidates = m_tagsCandidates[(int)type];
+  bool isInputOk{false};
+  const QString hintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
+  const QString& tagsOrCast = QInputDialog::getItem(this, fieldOperation, hintMsg,  //
+                                                    candidates,                     //
+                                                    candidates.size() - 1,          //
+                                                    true, &isInputOk);
+  if (!isInputOk) {
+    LOG_GOOD("[Skip] User cancel", fieldOperation)
+    return 0;
+  }
+  if (tagsOrCast.isEmpty()) {
+    LOG_BAD("[Abort] Input can not be empty", fieldOperation)
+    return 0;
+  }
+
+  candidates.push_back(tagsOrCast);
+  int fieldColumn = -1;
+  switch (type) {
+    case FIELF_OP_TYPE::CAST:
+      fieldColumn = MOVIE_TABLE::Cast;
+      break;
+    case FIELF_OP_TYPE::TAGS:
+      fieldColumn = MOVIE_TABLE::Tags;
+      break;
+    default:
+      LOG_BAD("Field Type invalid", QString::number((int)type));
+      return -1;
+  }
+
+  const QModelIndexList& indexes = selectionModel()->selectedRows(fieldColumn);
+  switch (mode) {
+    case FIELD_OP_MODE::SET:
+      _dbModel->SetCastOrTags(indexes, tagsOrCast);
+      break;
+    case FIELD_OP_MODE::APPEND:
+      _dbModel->AddCastOrTags(indexes, tagsOrCast);
+      break;
+    case FIELD_OP_MODE::REMOVE:
+      _dbModel->RmvCastOrTags(indexes, tagsOrCast);
+      break;
+    default:
+      LOG_BAD("Field Operation invalid", QString::number((int)mode));
+      return -2;
+  }
+  const QString affectedRowsMsg{QString{"[Uncommit] %1 row(s) %2"}.arg(indexes.size()).arg(fieldOperation)};
+  LOG_GOOD(affectedRowsMsg, tagsOrCast);
+  return indexes.size();
+}
+
+bool MovieDBView::IsHasSelection(const QString& msg) const {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO("Nothing selected", QString("Skip %1").arg(msg))
+    return false;
+  }
+  return true;
 }
 
 // #define __NAME__EQ__MAIN__ 1
