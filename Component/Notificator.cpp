@@ -28,12 +28,10 @@ Notificator::~Notificator() {
 }
 
 void Notificator::goodNews(const QString& title, const QString& message) {
-  qDebug("%s:%s", qPrintable(title), qPrintable(message));
   showMessage(QIcon(":img/SAVED"), title, message);
 }
 
 void Notificator::badNews(const QString& title, const QString& message) {
-  qWarning("%s:%s", qPrintable(title), qPrintable(message));
   showMessage(QIcon(":img/NOT_SAVED"), title, message);
 }
 
@@ -50,7 +48,6 @@ void Notificator::warning(const QString& title, const QString& message) {
 }
 
 void Notificator::information(const QString& title, const QString& message) {
-  qInfo("%s:%s", qPrintable(title), qPrintable(message));
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
   showMessage(icon, title, message);
 }

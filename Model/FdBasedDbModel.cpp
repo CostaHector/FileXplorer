@@ -1,6 +1,7 @@
 #include "FdBasedDbModel.h"
 #include "public/DisplayEnhancement.h"
 #include "public/PathTool.h"
+#include "Tools/NameTool.h"
 #include "Tools/FileDescriptor/MountHelper.h"
 #include <QSqlQuery>
 
@@ -36,4 +37,48 @@ QString FdBasedDbModel::absolutePath(const QModelIndex& curIndex) const {
   const QModelIndex& preRight = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight);
   return PATHTOOL::Path2Join(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(),  //
                              data(preRight, Qt::ItemDataRole::DisplayRole).toString());
+}
+
+void FdBasedDbModel::SetStudio(const QModelIndexList& tagColIndexes, const QString& studio) {
+  if (studio.isEmpty()) {
+    return;
+  }
+  foreach (const QModelIndex& ind, tagColIndexes) {
+    setData(ind, studio);
+  }
+}
+
+void FdBasedDbModel::SetCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence) {
+  if (sentence.isEmpty()) {
+    return;
+  }
+  foreach (const QModelIndex& ind, tagColIndexes) {
+    setData(ind, NameTool::CastTagString(sentence, true));
+  }
+}
+
+void FdBasedDbModel::AddCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence) {
+  if (sentence.isEmpty()) {
+    return;
+  }
+  QString beforeStr;
+  foreach (const QModelIndex& ind, tagColIndexes) {
+    beforeStr = QSqlTableModel::data(ind, Qt::DisplayRole).toString();
+    if (!beforeStr.isEmpty()) {
+      beforeStr += ',';
+    }
+    beforeStr += sentence;
+    setData(ind, NameTool::CastTagString(beforeStr, true));
+  }
+}
+
+void FdBasedDbModel::RmvCastOrTags(const QModelIndexList& tagColIndexes, const QString& cast) {
+  if (cast.isEmpty()) {
+    return;
+  }
+  foreach (const QModelIndex& ind, tagColIndexes) {
+    setData(ind, NameTool::CastTagStringRmv(                                 //
+                     QSqlTableModel::data(ind, Qt::DisplayRole).toString(),  //
+                     cast));
+  }
 }
