@@ -7,7 +7,7 @@
 class CastManagerTest : public MyTestSuite {
   Q_OBJECT
 public:
-  CastManagerTest() : MyTestSuite{true}, pm{CastManager::getIns()} {}
+  CastManagerTest() : MyTestSuite{false}, pm{CastManager::getIns()} {}
   const CastManager& pm;
 
 private slots:
