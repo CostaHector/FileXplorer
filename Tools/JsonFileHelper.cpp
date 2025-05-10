@@ -66,7 +66,7 @@ bool ConstructStudioCastByName::operator()(QVariantHash& dict) const {
 }
 
 AppendPerfsToDict::AppendPerfsToDict(const QString& perfsStr)  //
-    : performerList{NameTool()(perfsStr)}                      //
+  : performerList{NameTool()(perfsStr)}                      //
 {}
 
 bool AppendPerfsToDict::operator()(QVariantHash& dict) const {
@@ -149,35 +149,35 @@ QVariantHash GetJsonDictByMovieFile(const QString& vidFilePth, const QString& ca
   const QStringList& performersList = nt(castStr);
   const QFileInfo fi{vidFilePth};
   return QVariantHash{
-      {ENUM_TO_STRING(Name), fi.baseName()},                            //
-      {ENUM_TO_STRING(Cast), performersList},                           //
-      {ENUM_TO_STRING(Studio), studio},                                 //
-      {ENUM_TO_STRING(Uploaded), fi.birthTime().toString("yyyyMMdd")},  //
-      {ENUM_TO_STRING(Tags), JSON_DEF_VAL_Tags},                        //
-      {ENUM_TO_STRING(Rate), JSON_DEF_VAL_Rate},                        //
-      {ENUM_TO_STRING(Size), fi.size()},                                //
-      {ENUM_TO_STRING(Resolution), JSON_DEF_VAL_Resolution},            //
-      {ENUM_TO_STRING(Bitrate), JSON_DEF_VAL_Bitrate},                  //
-      {ENUM_TO_STRING(Hot), JSON_DEF_VAL_Hot},                          //
-      {ENUM_TO_STRING(Detail), JSON_DEF_VAL_Detail},                    //
-      {ENUM_TO_STRING(Duration), JSON_DEF_VAL_Duration}                 //
+    {ENUM_TO_STRING(Name), fi.baseName()},                            //
+    {ENUM_TO_STRING(Cast), performersList},                           //
+    {ENUM_TO_STRING(Studio), studio},                                 //
+    {ENUM_TO_STRING(Uploaded), fi.birthTime().toString("yyyyMMdd")},  //
+    {ENUM_TO_STRING(Tags), JSON_DEF_VAL_Tags},                        //
+    {ENUM_TO_STRING(Rate), JSON_DEF_VAL_Rate},                        //
+    {ENUM_TO_STRING(Size), fi.size()},                                //
+    {ENUM_TO_STRING(Resolution), JSON_DEF_VAL_Resolution},            //
+    {ENUM_TO_STRING(Bitrate), JSON_DEF_VAL_Bitrate},                  //
+    {ENUM_TO_STRING(Hot), JSON_DEF_VAL_Hot},                          //
+    {ENUM_TO_STRING(Detail), JSON_DEF_VAL_Detail},                    //
+    {ENUM_TO_STRING(Duration), JSON_DEF_VAL_Duration}                 //
   };
 }
 
 QVariantHash GetJsonDictDefault(const QString& vidName, const qint64& fileSz) {
   return QVariantHash{
-      {ENUM_TO_STRING(Name), vidName},                        //
-      {ENUM_TO_STRING(Cast), JSON_DEF_VAL_Cast},              //
-      {ENUM_TO_STRING(Studio), JSON_DEF_VAL_Studio},          //
-      {ENUM_TO_STRING(Uploaded), JSON_DEF_VAL_Uploaded},      //
-      {ENUM_TO_STRING(Tags), JSON_DEF_VAL_Tags},              //
-      {ENUM_TO_STRING(Rate), JSON_DEF_VAL_Rate},              //
-      {ENUM_TO_STRING(Size), fileSz},                         //
-      {ENUM_TO_STRING(Resolution), JSON_DEF_VAL_Resolution},  //
-      {ENUM_TO_STRING(Bitrate), JSON_DEF_VAL_Bitrate},        //
-      {ENUM_TO_STRING(Hot), JSON_DEF_VAL_Hot},                //
-      {ENUM_TO_STRING(Detail), JSON_DEF_VAL_Detail},          //
-      {ENUM_TO_STRING(Duration), JSON_DEF_VAL_Duration}       //
+    {ENUM_TO_STRING(Name), vidName},                        //
+    {ENUM_TO_STRING(Cast), JSON_DEF_VAL_Cast},              //
+    {ENUM_TO_STRING(Studio), JSON_DEF_VAL_Studio},          //
+    {ENUM_TO_STRING(Uploaded), JSON_DEF_VAL_Uploaded},      //
+    {ENUM_TO_STRING(Tags), JSON_DEF_VAL_Tags},              //
+    {ENUM_TO_STRING(Rate), JSON_DEF_VAL_Rate},              //
+    {ENUM_TO_STRING(Size), fileSz},                         //
+    {ENUM_TO_STRING(Resolution), JSON_DEF_VAL_Resolution},  //
+    {ENUM_TO_STRING(Bitrate), JSON_DEF_VAL_Bitrate},        //
+    {ENUM_TO_STRING(Hot), JSON_DEF_VAL_Hot},                //
+    {ENUM_TO_STRING(Detail), JSON_DEF_VAL_Detail},          //
+    {ENUM_TO_STRING(Duration), JSON_DEF_VAL_Duration}       //
   };
 }
 
@@ -198,28 +198,33 @@ bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth) {
   return true;
 }
 
-int ConstructJsonFileForVideosUnderPath(const QString& path, const QString& productionStudio, const QString& performersListStr) {
+int SyncJsonNameValue(const QString& path) {
   if (!QFileInfo(path).isDir()) {
-    qDebug("path[%s] not a directory", qPrintable(path));
+    qDebug("path[%s] is not a dir", qPrintable(path));
     return -1;
   }
   int succeedCnt = 0;
   int tryConstuctCnt = 0;
-  QDirIterator it{path, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+
+  QDirIterator it{path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
-    const QString& vidPath = it.filePath();
-    const QString jsonPath{PATHTOOL::FileExtReplacedWithJson(vidPath)};
-    if (QFile::exists(jsonPath)) {
-      qDebug("File jsonPath[%s] is not exist", qPrintable(jsonPath));
+    const QString& jsonPath = it.filePath();
+    QVariantHash dict = MovieJsonLoader(jsonPath);
+    auto it = dict.find(ENUM_TO_STRING(Name));
+    if (it == dict.cend()) {
       continue;
     }
-    const auto& dict = GetJsonDictByMovieFile(vidPath, performersListStr, productionStudio);
+    const QString& baseName = PATHTOOL::GetBaseName(jsonPath);
+    if (it.value().toString() == baseName) {
+      continue;
+    }
+    it->setValue(baseName);
     succeedCnt += DumpJsonDict(dict, jsonPath);
     ++tryConstuctCnt;
   }
   if (tryConstuctCnt != succeedCnt) {
-    qDebug("%d/%d json contructed succeed", succeedCnt, tryConstuctCnt);
+    qDebug("%d/%d json processed", succeedCnt, tryConstuctCnt);
   }
   return succeedCnt;
 }
@@ -232,7 +237,7 @@ int JsonFileKeyValueProcess(const QString& path, const DictEditOperator::JSON_DI
   int succeedCnt = 0;
   int tryConstuctCnt = 0;
 
-  QDirIterator it(path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+  QDirIterator it{path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
@@ -355,6 +360,36 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
 
 uint CalcFileHash(const QString& vidPth) {
   return qHash(PATHTOOL::GetFileNameExtRemoved(vidPth));
+}
+
+int JsonSyncKeyValueAccordingJsonFileName(const QString &path) {
+  if (!QFileInfo(path).isDir()) {
+    qDebug("path[%s] is not a dir", qPrintable(path));
+    return -1;
+  }
+  int succeedCnt = 0;
+  int tryConstuctCnt = 0;
+
+  QDirIterator it{path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  while (it.hasNext()) {
+    it.next();
+    const QString& jsonPath = it.filePath();
+    QVariantHash dict = MovieJsonLoader(jsonPath);
+    const QString& baseName = PATHTOOL::GetBaseName(jsonPath);
+    auto nameIt = dict.find(ENUM_TO_STRING(Name));
+    if (nameIt == dict.cend() || nameIt.value().toString() == baseName) {
+      continue;
+    }
+    nameIt->setValue(baseName);
+    succeedCnt += DumpJsonDict(dict, jsonPath);
+    ++tryConstuctCnt;
+  }
+  if (tryConstuctCnt != succeedCnt) {
+    qDebug("%d/%d json processed", succeedCnt, tryConstuctCnt);
+  }
+  return succeedCnt;
+
+
 }
 
 }  // namespace JsonFileHelper

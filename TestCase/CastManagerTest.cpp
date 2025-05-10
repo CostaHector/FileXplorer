@@ -23,9 +23,9 @@ class CastManagerTest : public MyTestSuite {
     const auto& wordsList = pm.SplitSentence({"Jesse Theo Brady Devin Franco Vincent O'Reilly Topher Di Maggio Aspen"});
     const auto& perfsList = pm.FilterPerformersOut(wordsList);
     const QSet<QString>& perfsSet{perfsList.cbegin(), perfsList.cend()};
-    QVERIFY2(perfsList.size() >= 5, "perfs list should contains >= 5 performers");
-
-    const QSet<QString>& realPerfs{{"Jesse"}, {"Theo Brady"}, {"Devin Franco"}, {"Vincent O'Reilly"}, {"Topher Di Maggio"}, {"Aspen"}};
+    QVERIFY2(perfsList.size() >= 4, "perfs list should contains >= 5 performers");
+    // 2 word cast are allowed, 1 word cast not allowed
+    const QSet<QString>& realPerfs{{"Theo Brady"}, {"Devin Franco"}, {"Vincent O'Reilly"}, {"Topher Di Maggio"}};
     QCOMPARE(perfsSet, realPerfs);
   }
 
