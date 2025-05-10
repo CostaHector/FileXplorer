@@ -10,6 +10,9 @@ class RibbonMovieDB : public QToolBar {
   QToolBar* m_extraFunctionTB{nullptr};
   QToolBar* m_functionsTB{nullptr};
   QToolBar* m_dbViewHideShowTB{nullptr};
+  QToolBar* m_studioTB{nullptr};
+  QToolBar* m_castEditTB{nullptr};
+  QToolBar* m_tagsEditTB{nullptr};
 };
 
 #endif  // RIBBONMOVIEDB_H
