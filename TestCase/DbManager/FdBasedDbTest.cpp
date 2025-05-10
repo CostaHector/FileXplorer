@@ -34,7 +34,7 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.DropTable("AGED"), 1);
     QCOMPARE(dbManager.DropTable("VOLUME_E"), 0);
     QCOMPARE(dbManager.DropTable("AGED"), 0);
-    QVERIFY(dbManager.DeleteDatabase());
+    QVERIFY(dbManager.DeleteDatabase(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 
@@ -61,7 +61,7 @@ class FdBasedDbTest : public MyTestSuite {
     QVERIFY(!QFileInfo{inexistPath}.isDir());
     QCOMPARE(dbManager.ReadADirectory(inexistTableName, rootpath), FD_TABLE_INEXIST);
 
-    QVERIFY(dbManager.DeleteDatabase());
+    QVERIFY(dbManager.DeleteDatabase(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 
@@ -98,7 +98,7 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.DeleteByWhereClause("VOLUME_E", qryWhereClause), 5);
     QCOMPARE(dbManager.CountRow("VOLUME_E"), 1);  // 1 *.mkv left
 
-    QVERIFY(dbManager.DeleteDatabase());
+    QVERIFY(dbManager.DeleteDatabase(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 
@@ -185,7 +185,7 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.SetDuration("VOLUME_E"), vids.size());
     QCOMPARE(dbManager.SetDuration("VOLUME_E"), 0);  // 0 duration need update
 
-    QVERIFY(dbManager.DeleteDatabase());
+    QVERIFY(dbManager.DeleteDatabase(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 
