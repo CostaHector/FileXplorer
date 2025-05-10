@@ -16,7 +16,7 @@ const QString DbManager::DELETE_TABLE_TEMPLATE{"DELETE FROM `%1`;"};
 constexpr int DbManager::MAX_BATCH_SIZE;
 
 DbManager::DbManager(const QString& dbName, const QString& connName, QObject* parent)  //
-    : QObject{parent}, mDbName{dbName}, mConnName{connName} {                          //
+  : QObject{parent}, mDbName{dbName}, mConnName{connName} {                          //
   if (dbName.isEmpty() || connName.isEmpty()) {
     qWarning("dbName[%s] or connName[%s] is empty", qPrintable(dbName), qPrintable(connName));
     return;
@@ -341,24 +341,28 @@ QString DbManager::GetRmvCmd(DROP_OR_DELETE dropOrDelete) {
 int DbManager::RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dropOrDelete, bool isFullMatch) {
   if (!mIsValid) {
     qWarning("invalid cannot drop table");
-    return -1;
+    return FD_NOT_INITED;
   }
-
-  const QRegularExpression regex{isFullMatch ? '^' + tableNameRegexPattern + '$' : tableNameRegexPattern};
+  QString matchStr{tableNameRegexPattern};
+  if (isFullMatch) {
+    matchStr.push_front('^');
+    matchStr.push_back('$');
+  }
+  const QRegularExpression regex{ matchStr };
   if (!regex.isValid()) {
     qWarning("regex[%s] is invalid", qPrintable(tableNameRegexPattern));
-    return -1;
+    return FD_TABLE_NAME_PATTERN_INVALID;
   }
 
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
-    return false;
+    return FD_DB_OPEN_FAILED;
   }
 
   const QString rmvCmdTemplate{GetRmvCmd(dropOrDelete)};
   if (rmvCmdTemplate.isEmpty()) {
     qWarning("rmvCmdTemplate empty. mode[%d] invalid", (int)dropOrDelete);
-    return false;
+    return FD_DB_INVALID;
   }
 
   int succeedDropCnt = 0;
@@ -372,7 +376,7 @@ int DbManager::RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dro
       qWarning("Drop table[%s] failed: %s",  //
                qPrintable(tableName), qPrintable(query.lastError().text()));
       db.rollback();
-      return -1;
+      return FD_EXEC_FAILED;
     }
     ++succeedDropCnt;
   }
@@ -381,16 +385,23 @@ int DbManager::RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dro
   return succeedDropCnt;
 }
 
-bool DbManager::DeleteDatabase() {
+bool DbManager::DeleteDatabase(bool bRecyle) {
   if (!mIsValid) {
     qWarning("invalid cannot drop database");
     return false;
   }
   ReleaseConnection();
-  if (QFile{mDbName}.exists()) {
-    if (!QFile(mDbName).moveToTrash()) {
-      qWarning("database[%s] move to trash failed", qPrintable(mDbName));
-      return false;
+  if (QFile::exists(mDbName)) {
+    if (bRecyle) {
+      if (!QFile::moveToTrash(mDbName)) {
+        qWarning("database[%s] move to trash failed", qPrintable(mDbName));
+        return false;
+      }
+    } else {
+      if (!QFile::remove(mDbName)) {
+        qWarning("database[%s] remove failed", qPrintable(mDbName));
+        return false;
+      }
     }
   }
   mIsValid = false;
