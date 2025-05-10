@@ -14,7 +14,7 @@ class CastManagerTest : public MyTestSuite {
   void test_performersDictNotEmpty() {  //
     QVERIFY2(!pm.m_performers.isEmpty(), "performers list should not be empty");
   }
-  void test_sentenseSplit() {
+  void test_sentenceSplit() {
     const auto& wordsList = pm.SplitSentence("Production Name - Movie Core Name - Nice & Devin Franco BB 4K");
     QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
   }
@@ -38,7 +38,7 @@ class CastManagerTest : public MyTestSuite {
     QVERIFY2(perfsList.contains("Theo Brady"), "\\0 sep");
   }
 
-  void test_sentenseWithPerfsAtLast() {
+  void test_sentenceWithPerfsAtLast() {
     const auto& wordsList = pm.SplitSentence("britishtwunk fucked by Craig Kennedy");
     QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
 
@@ -47,7 +47,7 @@ class CastManagerTest : public MyTestSuite {
     QVERIFY2(perfsList.size() >= 1, "perfs list should contains >= 1 performers");
   }
 
-  void test_sentenseWithNewLineSeperator() {
+  void test_sentenceWithNewLineSeperator() {
     const auto& wordsList = pm.SplitSentence("britishtwunk\r\nCraig Kennedy\nGabriel Clark");
     QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
 
