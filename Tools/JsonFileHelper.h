@@ -26,7 +26,7 @@ enum JSON_KEY_E {
 #define JSON_KEY_ITEM(enu, val, def) enu = val,
   JSON_KEY_MAPPING
 #undef JSON_KEY_ITEM
-      BUTT,
+  BUTT,
 };
 
 // Default Value: variable like JSON_DEF_VAL_Name
@@ -52,15 +52,15 @@ struct AppendPerfsToDict {
   AppendPerfsToDict(const QString& perfsStr);
   bool operator()(QVariantHash& dict) const;
 
- private:
+private:
   const QStringList performerList;
 };
 
 struct UpdateStudio {
-  UpdateStudio(const QString& _studio) : m_studio{_studio.trimmed()} {};
+  UpdateStudio(const QString& _studio) : m_studio{_studio.trimmed()} {}
   bool operator()(QVariantHash& dict) const;
 
- private:
+private:
   const QString m_studio;
 };
 
@@ -87,7 +87,6 @@ struct JsonDict2Table {
 
 uint CalcFileHash(const QString& vidPth);
 
-QVariantHash GetJsonDictByMovieFile(const QString& vidFilePth, const QString& castStr = "", const QString& studio = "");
 QVariantHash GetJsonDictDefault(const QString& vidName = "", const qint64& fileSz = 0);
 QVariantHash MovieJsonLoader(const QString& jsonFilePth);
 QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr);
@@ -95,8 +94,10 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
 bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth);
 QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path);
 
-int ConstructJsonFileForVideosUnderPath(const QString& path, const QString& productionStudio = "", const QString& performersListStr = "");
+int SyncJsonNameValue(const QString& path);
 int JsonFileKeyValueProcess(const QString& path, const DictEditOperator::JSON_DICT_PROCESS_T jDProc);
+int JsonSyncKeyValueAccordingJsonFileName(const QString& path);
+
 }  // namespace JsonFileHelper
 
 #endif  // JSONFILEHELPER_H
