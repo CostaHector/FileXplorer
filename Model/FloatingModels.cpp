@@ -1,5 +1,6 @@
 #include "FloatingModels.h"
 #include "public/PathTool.h"
+#include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 #include <QPixmap>
 #include <QFileIconProvider>
@@ -35,12 +36,13 @@ QString FloatingModels::filePath(const QModelIndex& index) const {
 }
 
 int FloatingModels::setDirPath(const QString& path, const QStringList& sFilters, bool loadAllIn1Time) {
-  QStringList datas;
-  QDir dir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
+  QDir dir{path, "", QDir::SortFlag::Name, QDir::Filter::Files};
   dir.setNameFilters(sFilters);
+  QStringList datas;
   foreach (QString name, dir.entryList()) {
     datas.append(path + '/' + name);
   }
+  ImagesNameSort(datas);
   if (loadAllIn1Time) {
     UpdateData(datas);
   } else {
