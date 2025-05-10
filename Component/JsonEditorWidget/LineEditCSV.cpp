@@ -13,7 +13,7 @@ QString LineEditCSV::GetFormName() const {
 }
 
 QStringList LineEditCSV::GetStringList() const {  // sort
-  return NameTool::CastTagStringProcess(text(), mEleUnique);
+  return NameTool::CastTagSentenceParse2Lst(text(), mEleUnique);
 }
 
 QVariantList LineEditCSV::GetVariantList() const {  // sort

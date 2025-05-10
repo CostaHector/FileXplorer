@@ -18,6 +18,7 @@ class MovieDBActions : public QObject {
   QAction* DELETE_FROM_TABLE{nullptr};
   QAction* UNION_TABLE{nullptr};
   QAction* AUDIT_A_TABLE{nullptr};
+  QAction* QUICK_WHERE_CLAUSE{nullptr};
   QActionGroup* DB_CONTROL_ACTIONS{nullptr};
 
   QAction* READ_DURATION_BY_VIDEO{nullptr};
@@ -25,7 +26,6 @@ class MovieDBActions : public QObject {
   QAction* UPDATE_STUDIO_CAST_TAGS_BY_JSON{nullptr};
   QActionGroup* EX_FUNCTION_ACTIONS{nullptr};
 
-  QAction *QUICK_WHERE_CLAUSE{nullptr};
   QAction *_COUNT{nullptr}, *_SUM{nullptr}, *_OPEN_DB_WITH_LOCAL_APP{nullptr};
 
   QAction *SET_STUDIO{nullptr};

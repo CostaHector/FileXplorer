@@ -25,6 +25,6 @@ class TorrDBAction : public QObject {
   QMenuBar* GetMenuBar() const;
 };
 
-TorrDBAction& g_torrentsManagerActions();
+TorrDBAction& g_torrActions();
 
 #endif  // TORRDBACTION_H
