@@ -1,9 +1,12 @@
 #include "DevicesDriveModel.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include "public/DisplayEnhancement.h"
+#include <QApplication>
+#include <QStyle>
+
 using namespace DEV_DRV_TABLE;
 DevicesDriveModel::DevicesDriveModel(QObject* parent, QSqlDatabase con)  //
-    : QSqlTableModel{parent, con} {
+  : QSqlTableModel{parent, con} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 }
 
@@ -12,7 +15,12 @@ QVariant DevicesDriveModel::data(const QModelIndex& idx, int role) const {
     return QVariant();
   }
   const int col = idx.column();
-  if (role == Qt::DisplayRole) {
+  if (role == Qt::DecorationRole) {
+    if (col == FIELD_E::ROOT_PATH) {
+      static const QIcon driveIcon = QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon);
+      return driveIcon;
+    }
+  } else if (role == Qt::DisplayRole) {
     if (col == FIELD_E::TOTAL_BYTES || col == FIELD_E::AVAIL_BYTES) {
       const qint64& sz = QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong();
       return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(sz);
