@@ -37,12 +37,15 @@ QSet<QString> CastManager::ReadOutPerformers() {
   }
   QTextStream stream(&performersFi);
   stream.setCodec("UTF-8");
+
+  static const QRegularExpression VALID_CAST_NAME{R"([@ _])"};
   decltype(m_performers) perfSet;
+  QString name;
   while (!stream.atEnd()) {
-    perfSet.insert(stream.readLine().toLower());
-  }
-  if (perfSet.contains("")) {
-    perfSet.remove("");
+    name = stream.readLine().toLower();
+    if (name.size() > 12 || name.contains(VALID_CAST_NAME)) { // at least 2 words, or 12 char
+      perfSet.insert(name);
+    }
   }
   performersFi.close();
   qDebug("%d performers read out", perfSet.size());

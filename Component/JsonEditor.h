@@ -26,6 +26,7 @@ class JsonEditor : public QMainWindow {
   int operator()(const QString& folderPath = "");
 
   auto onStageChanges() -> bool;
+  bool onSaveAndLastUnfinishedItem();
   bool onSaveAndNextUnfinishedItem();
   auto onLowercaseEachWord() -> void;
   auto onCapitalizeEachWord() -> void;

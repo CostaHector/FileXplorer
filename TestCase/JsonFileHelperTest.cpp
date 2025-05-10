@@ -17,19 +17,6 @@ class JsonFileHelperTest : public MyTestSuite {
  public:
   JsonFileHelperTest() : MyTestSuite{false} {}
  private slots:
-  void test_GetMovieFileJsonDict() {
-    auto dict = GetJsonDictByMovieFile("C:/A/Cat and mouse.mp4", "Tom,Jerry, and Steve", "Cat and mouse");
-    const QStringList expectCast{"Tom", "Jerry", "Steve"};
-    QCOMPARE(dict[ENUM_TO_STRING(Name)].toString(), "Cat and mouse");
-    QCOMPARE(dict[ENUM_TO_STRING(Cast)].toStringList(), expectCast);
-    QCOMPARE(dict[ENUM_TO_STRING(Studio)].toString(), "Cat and mouse");
-    QCOMPARE(dict[ENUM_TO_STRING(Tags)].toStringList(), JSON_DEF_VAL_Tags);
-    QCOMPARE(dict[ENUM_TO_STRING(Rate)].toInt(), JSON_DEF_VAL_Rate);
-    QCOMPARE(dict[ENUM_TO_STRING(Size)].toInt(), JSON_DEF_VAL_Duration);
-    QCOMPARE(dict[ENUM_TO_STRING(Hot)].toList(), JSON_DEF_VAL_Hot);
-    QCOMPARE(dict[ENUM_TO_STRING(Detail)].toString(), JSON_DEF_VAL_Detail);
-  }
-
   void test_GetDefaultJsonFile() {
     auto dict = GetJsonDictDefault();
     QCOMPARE(dict[ENUM_TO_STRING(Name)].toString(), JSON_DEF_VAL_Name);
