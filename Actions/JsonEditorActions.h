@@ -42,7 +42,7 @@ class JsonEditorActions : public QObject {
   QAction* _AI_HINT{nullptr};
   QAction* _LEARN_PERFORMERS_FROM_JSON{nullptr};
 
-  QAction* _CONSTRUCT_JSONS_FOR_VIDS{nullptr};
+  QAction* _SYNC_JSON_NAME_VALUE_BY_FILENAME{nullptr};
   QAction* _APPEND_PERFORMERS{nullptr};
   QAction* _SET_STUDIO{nullptr};
   QAction* _CONSTRUCT_STUDIO_CAST{nullptr};
