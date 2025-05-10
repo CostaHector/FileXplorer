@@ -42,6 +42,15 @@ class LineEditCSVTest : public MyTestSuite {
     QStringList expectFinalLst{"0", "A", "B", "C"};  // will auto sort when append called
     QCOMPARE(uniqueEleLe.AppendFromStringList(QStringList{"0"}), expectFinalLst.size());
     QCOMPARE(uniqueEleLe.GetStringList(), expectFinalLst);
+
+    // space trimmed
+    const QStringList castLst                                                //
+        {" Jobs",          "Jobs ",         " Jobs ",        "Jobs",         //
+         "Chris Evans ",   " Chris Evans",  " Chris Evans ", "Chris Evans",  //
+         " Henry Cavill ", " Henry Cavill", "Henry Cavill ", "Henry Cavill"};
+    const QStringList trimmedExpectAns{"Chris Evans", "Henry Cavill", "Jobs"};
+    QCOMPARE(uniqueEleLe.ReadFromStringList(castLst), trimmedExpectAns.size());
+    QCOMPARE(uniqueEleLe.GetStringList(), trimmedExpectAns);
   }
 
   void test_LineEditCSV_can_conflict() {  //
