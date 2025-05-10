@@ -34,9 +34,10 @@ class NameTool {
   static bool ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fTrans);
   static bool ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fTrans);
 
-  static QStringList CastTagStringProcess(const QString& sentense, bool bElementUnique);
-  static QString CastTagString(const QString& sentense, bool bElementUnique);
-  static QString CastTagStringRmv(const QString& sentense, const QString& cast);
+  static QStringList CastTagSentenceParse2Lst(const QString& sentense, bool bElementUnique);
+  static QString CastTagSentenceParse2Str(const QString& sentense, bool bElementUnique);
+  static QStringList CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast);
+  static QString CastTagSentenceRmvEle2Str(const QString& sentense, const QString& cast);
 
   static constexpr char CSV_COMMA = ',';
  private:
