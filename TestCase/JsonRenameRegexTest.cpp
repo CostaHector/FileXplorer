@@ -209,7 +209,7 @@ class JsonRenameRegexTest : public MyTestSuite {
 
   void test_DISCRAD_LETTER_COMP() {
     QVERIFY(DISCRAD_LETTER_COMP.isValid());
-    QString fileNameWithDiscardChar{"Hello <|/\\?:>world"};
+    QString fileNameWithDiscardChar{"Hello <|/\\?:>world.;"};
     const QString noDiscardChar{"Hello world"};
     fileNameWithDiscardChar.replace(DISCRAD_LETTER_COMP, "");
     QCOMPARE(fileNameWithDiscardChar, noDiscardChar);
