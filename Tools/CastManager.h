@@ -13,9 +13,9 @@ class CastManager {
   QSet<QString> ReadOutPerformers();
   int ForceReloadPerformers();
 
-  auto LearningFromAPath(const QString& path) -> int;
+  int LearningFromAPath(const QString& path);
 
-  static auto RmvBelongLetter(const QString& word) -> QString;
+  static QString RmvBelongLetter(const QString& word);
   static QStringList SplitSentence(QString sentence);
   QStringList FilterPerformersOut(const QStringList& words) const;
   QStringList operator()(const QString& sentence) const;
@@ -26,6 +26,8 @@ class CastManager {
 
  private:
   CastManager();
+  static const QRegularExpression EFFECTIVE_CAST_NAME;
+  static constexpr int EFFECTIVE_CAST_NAME_LEN = 12;
 };
 
 #endif  // CastManager_H
