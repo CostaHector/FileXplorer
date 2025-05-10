@@ -2,12 +2,9 @@
 #include "Tools/NameTool.h"
 #include <QRegularExpression>
 
-constexpr char LineEditCSV::CSV_COMMA;
-const QRegularExpression LineEditCSV::CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and )", QRegularExpression::PatternOption::CaseInsensitiveOption};
-
 LineEditCSV::LineEditCSV(const QString& formName, const QString& text, const bool bNoDuplicate, QWidget* parent)  //
     : QLineEdit{text, parent},                                                                                    //
-      mNoDuplicate{bNoDuplicate},                                                                                 //
+      mEleUnique{bNoDuplicate},                                                                                   //
       mFormName{formName}                                                                                         //
 {}
 
@@ -16,16 +13,7 @@ QString LineEditCSV::GetFormName() const {
 }
 
 QStringList LineEditCSV::GetStringList() const {  // sort
-  const QString& s = text();
-  if (s.isEmpty()) {
-    return {};
-  }
-  QStringList lst = s.split(CAST_STR_SPLITTER);
-  lst.sort();
-  if (mNoDuplicate) {
-    lst.removeDuplicates();
-  }
-  return lst;
+  return NameTool::CastTagStringProcess(text(), mEleUnique);
 }
 
 QVariantList LineEditCSV::GetVariantList() const {  // sort
@@ -50,7 +38,7 @@ int LineEditCSV::AppendFromStringList(const QStringList& sl) {  // sort
   QStringList curSl = GetStringList();
   curSl += sl;
   curSl.sort();
-  if (mNoDuplicate) {
+  if (mEleUnique) {
     curSl.removeDuplicates();
   }
   ReadFromStringList(curSl);
@@ -63,10 +51,10 @@ int LineEditCSV::ReadFromStringList(const QStringList& sl) {  // sort
     castLst.append(cast.trimmed());
   }
   castLst.sort();
-  if (mNoDuplicate) {
+  if (mEleUnique) {
     castLst.removeDuplicates();
   }
-  setText(castLst.join(CSV_COMMA));
+  setText(castLst.join(NameTool::CSV_COMMA));
   return castLst.size();
 }
 
@@ -88,10 +76,10 @@ int LineEditCSV::ReadFromVariantList(const QVariantList& vl) {  // sort
   for (auto spot : intLst) {
     hotSceneSL.append(QString::number(spot));
   }
-  if (mNoDuplicate) {
+  if (mEleUnique) {
     hotSceneSL.removeDuplicates();
   }
-  setText(hotSceneSL.join(CSV_COMMA));
+  setText(hotSceneSL.join(NameTool::CSV_COMMA));
   return hotSceneSL.size();
 }
 
@@ -99,10 +87,10 @@ void LineEditCSV::Format() {
   const QString& lineTxt = text();
   NameTool nt;
   QStringList lst = nt(lineTxt);
-  if (mNoDuplicate) {
+  if (mEleUnique) {
     lst.removeDuplicates();
   }
-  const QString& formatedLineTxt = lst.join(CSV_COMMA);
+  const QString& formatedLineTxt = lst.join(NameTool::CSV_COMMA);
   if (formatedLineTxt == lineTxt) {
     return;
   }
