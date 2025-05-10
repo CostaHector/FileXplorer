@@ -6,8 +6,9 @@
 
 class StudiosManagerTest : public MyTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+  StudiosManagerTest() : MyTestSuite{false}{}
+private slots:
   void test_performersDictNotEmpty() {
     const StudiosManager& psm{StudiosManager::getIns()};
     QVERIFY2(psm.count() > 0, "production studio hash table should not be empty");
@@ -41,6 +42,8 @@ class StudiosManagerTest : public MyTestSuite {
     QCOMPARE(psm("[Bait Bus] 2008 - Part.mp4"), "BaitBus");
     QCOMPARE(psm("[bait bus] 2008 - Part.mp4"), "BaitBus");
     QCOMPARE(psm("[baitbus] 2008 - Part.mp4"), "BaitBus");
+    QCOMPARE(psm("[treasure island media] 2008 - Part.mp4"), "TreasureIslandMedia");
+    QCOMPARE(psm("too long long long long name - Part.mp4"), "");
   }
 
   void test_hintStudioName() {
