@@ -27,6 +27,8 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);
   AUDIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/AUDIT"), "Audit This Table", this);
   CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
+  QUICK_WHERE_CLAUSE = new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_CLAUSE"), "Where clause", this);
+  CHECK_NULLPTR_RETURN_VOID(QUICK_WHERE_CLAUSE);
 
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
   SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> Manual Submit.").arg(SUBMIT->text(), SUBMIT->shortcut().toString()));
@@ -37,6 +39,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::MOVIES` WHERE CLAUSE");
   UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
   AUDIT_A_TABLE->setToolTip("Audit a table (Principle: Compare video records in table with an online disk);");
+  QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
 
   DB_CONTROL_ACTIONS = new (std::nothrow) QActionGroup(this);
   CHECK_NULLPTR_RETURN_VOID(DB_CONTROL_ACTIONS);
@@ -49,6 +52,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS->addAction(DROP_A_TABLE);
   DB_CONTROL_ACTIONS->addAction(UNION_TABLE);
   DB_CONTROL_ACTIONS->addAction(AUDIT_A_TABLE);
+  DB_CONTROL_ACTIONS->addAction(QUICK_WHERE_CLAUSE);
   DB_CONTROL_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   READ_DURATION_BY_VIDEO = new (std::nothrow) QAction(QIcon(":img/VIDEO_DURATION"), "Read Duration", this);
@@ -66,10 +70,6 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   EX_FUNCTION_ACTIONS->addAction(EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON);
   EX_FUNCTION_ACTIONS->addAction(UPDATE_STUDIO_CAST_TAGS_BY_JSON);
   EX_FUNCTION_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  QUICK_WHERE_CLAUSE = new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_CLAUSE"), "Where clause", this);
-  CHECK_NULLPTR_RETURN_VOID(QUICK_WHERE_CLAUSE);
-  QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
 
   _COUNT = new (std::nothrow) QAction(QIcon(":img/COUNTER"), "COUNT", this);
   CHECK_NULLPTR_RETURN_VOID(_COUNT);
