@@ -7,11 +7,11 @@ class LineEditCSV : public QLineEdit {
  public:
   explicit LineEditCSV(const QString& formName, const QString &text="", const bool bNoDuplicate = false, QWidget *parent = nullptr);
   int AppendFromStringList(const QStringList& sl);
-  void ReadFromStringList(const QStringList& sl);
-  void ReadFromVariantList(const QVariantList& vl);
+  int ReadFromStringList(QStringList sl);
+  int ReadFromVariantList(const QVariantList& vl);
   QString GetFormName() const;
   QStringList GetStringList() const;
-  QList<QVariant> GetVariantList() const;
+  QVariantList GetVariantList() const;
   void Format();
  private:
   const bool mNoDuplicate;
