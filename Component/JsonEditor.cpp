@@ -26,14 +26,14 @@
 const QString JsonEditor::TITLE_TEMPLATE = "Json Editor [Delta:%1/Total:%2]";
 
 JsonEditor::JsonEditor(QWidget* parent)
-    : QMainWindow{parent},
-      m_jsonFormLo{new QFormLayout},
-      m_jsonFormWid{new QWidget(this)},
+  : QMainWindow{parent},
+    m_jsonFormLo{new QFormLayout},
+    m_jsonFormWid{new QWidget(this)},
 
-      m_jsonModel{new JsonModel{this}},
-      m_jsonList(new JsonListView{m_jsonModel, this}),
-      m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
-      m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
+    m_jsonModel{new JsonModel{this}},
+    m_jsonList(new JsonListView{m_jsonModel, this}),
+    m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
+    m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
   mName = new LineEditStr{ENUM_TO_STRING(Name), "", this};
@@ -69,7 +69,7 @@ JsonEditor::JsonEditor(QWidget* parent)
   m_splitter->addWidget(m_jsonList);
   m_splitter->setStyleSheet(QString("QTextEdit {font-size: %1pt}"
                                     "QLineEdit {font-size: %1pt};")
-                                .arg(13));
+                            .arg(13));
   setCentralWidget(m_splitter);
 
   subscribe();
@@ -288,31 +288,35 @@ bool JsonEditor::onPerformersHint() {
 }
 
 auto JsonEditor::onExtractCapitalizedPerformersHint() -> bool {
+  static const NameTool nt;
   QStringList hintPerfs;
   if (mName->hasSelectedText()) {
     const QString& capitalizedStr = mName->selectedText();
-    hintPerfs += NameTool().castFromTitledSentence(capitalizedStr);
+    hintPerfs += nt.castFromTitledSentence(capitalizedStr);
   }
   if (mDetail->textCursor().hasSelection()) {
     const QString& capitalizedStr = mDetail->textCursor().selection().toPlainText();
-    hintPerfs += NameTool().castFromTitledSentence(capitalizedStr);
+    hintPerfs += nt.castFromTitledSentence(capitalizedStr);
   }
   mPerfsCsv->AppendFromStringList(hintPerfs);
   return true;
 }
 
 bool JsonEditor::onSelectedTextAppendToPerformers() {
-  QStringList selectedPerfs;
-
+  QString castStr;
   if (mName->hasSelectedText()) {
-    selectedPerfs += mName->selectedText();
+    castStr += mName->selectedText();
   }
-
   if (mDetail->textCursor().hasSelection()) {
-    selectedPerfs += mDetail->textCursor().selection().toPlainText();
+    castStr += ' ';
+    castStr += mDetail->textCursor().selection().toPlainText();
   }
-
-  mPerfsCsv->AppendFromStringList(selectedPerfs);
+  if (castStr.isEmpty()) {
+    qDebug("nothing selected");
+    return false;
+  }
+  const QStringList& appendCastLst{NameTool::CastTagSentenceParse2Lst(castStr, true)};
+  mPerfsCsv->AppendFromStringList(appendCastLst);
   return true;
 }
 
