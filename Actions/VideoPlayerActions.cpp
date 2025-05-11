@@ -73,10 +73,10 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
   _RENAME_VIDEO->setToolTip(
       QString("<b>%1 (%2)</b><br/> Rename both video and json file name if exists").arg(_RENAME_VIDEO->text(), _RENAME_VIDEO->shortcut().toString()));
 
-  _MOD_PERFORMERS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F2));
-  _MOD_PERFORMERS->setShortcutVisibleInContextMenu(true);
-  _MOD_PERFORMERS->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Mod performers in json file").arg(_MOD_PERFORMERS->text(), _MOD_PERFORMERS->shortcut().toString()));
+  _MOD_CAST->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F2));
+  _MOD_CAST->setShortcutVisibleInContextMenu(true);
+  _MOD_CAST->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Mod performers in json file").arg(_MOD_CAST->text(), _MOD_CAST->shortcut().toString()));
 
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
   _REVEAL_IN_EXPLORER->setToolTip(
@@ -102,7 +102,7 @@ QToolBar* VideoPlayerActions::GetPlayControlToolBar(QWidget* parent, QLabel* lab
   controlTB->addAction(g_videoPlayerActions()._GRAB_FRAME);
   controlTB->addSeparator();
   controlTB->addAction(g_videoPlayerActions()._RENAME_VIDEO);
-  controlTB->addAction(g_videoPlayerActions()._MOD_PERFORMERS);
+  controlTB->addAction(g_videoPlayerActions()._MOD_CAST);
   controlTB->addSeparator();
   controlTB->addActions(g_videoPlayerActions()._RATE_AG->actions());
   controlTB->addSeparator();
