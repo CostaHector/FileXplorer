@@ -130,6 +130,17 @@ class CastManagerTest : public MyTestSuite {
     QCOMPARE(castInst.LearningFromAPath(rootpath, false, &castLocalFileWrite), 2);
     QCOMPARE(castInst.m_performers, expectCastSet);
     QCOMPARE(castLocalFileWrite, false);
+
+    // do it again, nothing new should append
+    studioLocalFileWrite = true;
+    QCOMPARE(studioInst.LearningFromAPath(rootpath, false, &studioLocalFileWrite), 0);
+    QCOMPARE(studioInst.m_prodStudioMap, expectStudioSet);
+    QCOMPARE(studioLocalFileWrite, false);
+
+    castLocalFileWrite = true;
+    QCOMPARE(castInst.LearningFromAPath(rootpath, false, &castLocalFileWrite), 0);
+    QCOMPARE(castInst.m_performers, expectCastSet);
+    QCOMPARE(castLocalFileWrite, false);
   }
 };
 
