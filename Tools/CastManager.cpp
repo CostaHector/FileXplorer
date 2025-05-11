@@ -1,5 +1,4 @@
 #include "CastManager.h"
-#include "Component/Notificator.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
@@ -9,16 +8,12 @@
 #include <QDirIterator>
 #include <QTextStream>
 
-
 const QRegularExpression CastManager::EFFECTIVE_CAST_NAME{R"([@ _])"};
 constexpr int CastManager::EFFECTIVE_CAST_NAME_LEN;
 
-CastManager::CastManager()       //
-  : m_performers{ReadOutPerformers()},     //
-    perfsCompleter(m_performers.values())  //
+CastManager::CastManager()  //
 {
-  perfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
-  perfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
+  ForceReloadCast();
 }
 
 CastManager& CastManager::getIns() {
@@ -56,7 +51,7 @@ QSet<QString> CastManager::ReadOutPerformers() {
   return perfSet;
 }
 
-int CastManager::ForceReloadPerformers() {
+int CastManager::ForceReloadCast() {
   int beforeStudioNameCnt = m_performers.size();
   m_performers = CastManager::ReadOutPerformers();
   int afterStudioNameCnt = m_performers.size();
@@ -64,52 +59,66 @@ int CastManager::ForceReloadPerformers() {
   return afterStudioNameCnt - beforeStudioNameCnt;
 }
 
-int CastManager::LearningFromAPath(const QString& path) {
-  if (!QDir(path).exists()) {
+int CastManager::LearningFromAPath(const QString& path, const bool bWriteInLocalFile, bool* bHasWrite) {
+  if (bHasWrite != nullptr) {
+    *bHasWrite = false;
+  }
+
+  if (!QDir{path}.exists()) {
     qWarning("path[%s] not exist", qPrintable(path));
     return 0;
   }
   decltype(m_performers) castsIncrement;
-  QDirIterator it(path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+  QDirIterator it{path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  int jsonFilesCnt{0};
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
-    auto perfIt = dict.find(ENUM_TO_STRING(Cast));
-    if (perfIt != dict.cend()) {
+    auto perfIt = dict.constFind(ENUM_TO_STRING(Cast));
+    if (perfIt == dict.cend()) {
       continue;
     }
+    ++jsonFilesCnt;
     const QVariant& v = perfIt.value();
+    QString lowercaseCast;
     for (const QString& performer : v.toStringList()) {
-      if (performer.isEmpty() || m_performers.contains(performer)) {
+      lowercaseCast = performer.trimmed().toLower();
+      if (lowercaseCast.isEmpty() || m_performers.contains(lowercaseCast)) {
         continue;
       }
-      castsIncrement.insert(performer.toLower());
+      castsIncrement.insert(lowercaseCast);
     }
   }
-  qDebug("Learn extra %d performers from json files", castsIncrement.size());
+  qDebug("Learn extra %d cast from %d valid json files", castsIncrement.size(), jsonFilesCnt);
   if (castsIncrement.isEmpty()) {
+    return 0;
+  }
+  m_performers.unite(castsIncrement);
+  if (!bWriteInLocalFile) {  // test scenario, dont write in local file
     return castsIncrement.size();
   }
 
 #ifdef _WIN32
-  const QString perfsFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
+  const QString castFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
 #else
-  const QString perfsFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
+  const QString castFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
 #endif
-  QFile performersFi{perfsFilePath};
+  QFile performersFi{castFilePath};
   if (!performersFi.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-    qWarning("Open [%s] to write failed. Cast will not update.", qPrintable(perfsFilePath));
-    Notificator::warning("Open [%s] to write failed. Cast will not update.", perfsFilePath);
+    qWarning("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(castFilePath));
     return -1;
   }
-  QTextStream stream(&performersFi);
+  QTextStream stream{&performersFi};
   stream.setCodec("UTF-8");
   for (const QString& perf : castsIncrement) {
     stream << perf << '\n';
   }
   stream.flush();
   performersFi.close();
+  if (bHasWrite != nullptr) {
+    *bHasWrite = true;
+  }
   return castsIncrement.size();
 }
 
