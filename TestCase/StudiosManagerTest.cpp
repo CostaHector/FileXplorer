@@ -6,28 +6,28 @@
 
 class StudiosManagerTest : public MyTestSuite {
   Q_OBJECT
-public:
-  StudiosManagerTest() : MyTestSuite{false}{}
-private slots:
+ public:
+  StudiosManagerTest() : MyTestSuite{false} {}
+ private slots:
   void test_performersDictNotEmpty() {
     const StudiosManager& psm{StudiosManager::getIns()};
     QVERIFY2(psm.count() > 0, "production studio hash table should not be empty");
   }
   void test_standardProdStudioNameFrom() {
     const StudiosManager& psm{StudiosManager::getIns()};
-    const QStringList& fromLst = psm.StandardProductionStudioFrom("LucasEntertainment");
-    QVERIFY2(fromLst.contains("lucasentertainment"), "only lowercase edition");
-    QVERIFY2(fromLst.contains("lucas entertainment"), "split by A-Z0-9 and join by space");
+    const QStringList& fromLst = psm.GetCoarseStudioNames("LucasEntertainment");
+    const QStringList expectCaurseStudiosName{"lucasentertainment", "lucas entertainment"};
+    QCOMPARE(expectCaurseStudiosName, fromLst);
 
-    const QStringList& fromLstWithADigit = psm.StandardProductionStudioFrom("My9Inches");
+    const QStringList& fromLstWithADigit = psm.GetCoarseStudioNames("My9Inches");
     QVERIFY2(fromLstWithADigit.contains("my 9 inches"), "only lowercase edition");
     QVERIFY2(fromLstWithADigit.contains("my9inches"), "split by A-Z0-9 and join by space");
 
-    const QStringList& fromLstWithNumber = psm.StandardProductionStudioFrom("Studio2000");
+    const QStringList& fromLstWithNumber = psm.GetCoarseStudioNames("Studio2000");
     QVERIFY2(fromLstWithNumber.contains("studio2000"), "only lowercase edition");
     QVERIFY2(fromLstWithNumber.contains("studio 2000"), "split by A-Z0-9 and join by space");
 
-    const QStringList& fromLstFullCapitalizer = psm.StandardProductionStudioFrom("MEN");
+    const QStringList& fromLstFullCapitalizer = psm.GetCoarseStudioNames("MEN");
     QVERIFY2(fromLstFullCapitalizer.contains("men"), "only lowercase edition");
     QVERIFY2(fromLstFullCapitalizer.contains("m e n"), "split by A-Z0-9 and join by space");
   }
@@ -51,6 +51,7 @@ private slots:
     QCOMPARE(psm.hintStdStudioName("not a studio map at all - 2008 - Part.mp4"), "");
     QCOMPARE(psm.hintStdStudioName("Men at play - 2008 - Part.mp4"), "MenAtPlay");
   }
+
 };
 
 StudiosManagerTest g_StudiosManagerTest;
