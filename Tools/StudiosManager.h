@@ -1,35 +1,37 @@
 #ifndef STUDIOSMANAGER_H
 #define STUDIOSMANAGER_H
 
-#include <QMessageBox>
-#include <QRegularExpression>
-#include <QSet>
-#include <QVariantHash>
-#include <QWidget>
+#include <QHash>
+#include <QString>
 
 class StudiosManager {
  public:
   static StudiosManager& getIns();
   StudiosManager(const StudiosManager& rhs) noexcept = delete;
 
-  auto LearningFromAPath(const QString& path) -> int;
+  int LearningFromAPath(const QString& path, const bool bWriteInLocalFile = true, bool* bHasWrite = nullptr);
+  int ForceReloadCast();
 
   QString ProductionStudioFilterOut(const QString& words) const;
 
-  QStringList StandardProductionStudioFrom(QString standardPs) const;
+  QStringList GetCoarseStudioNames(QString standardPs) const;
 
   QString hintStdStudioName(const QString& sentence) const;  // from a studio name
 
   QString operator()(const QString& sentence) const;  // from a file name
   QString operator[](const QString& nm) const { return m_prodStudioMap.value(nm.toLower(), nm); }
 
-  int ForceReloadStdStudioName();
+  int ForceReloadStudio();
 
   inline int count() const { return m_prodStudioMap.size(); }
 
+  // coarse studio name -> std studio name
+  // warner bros. => WarnerBros.
+  // warnerbros. => WarnerBros.
+  QHash<QString, QString> m_prodStudioMap;
+
  protected:
   static QHash<QString, QString> ReadOutStdStudioName();
-  QHash<QString, QString> m_prodStudioMap;
 
  private:
   QString FileName2StudioNameSection(QString sentence) const;

@@ -5,11 +5,13 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QFormLayout>
+#include <QCompleter>
+#include <QVariantHash>
 
 class JsonPerformersListInputer : public QDialog {
-  Q_OBJECT
  public:
   explicit JsonPerformersListInputer(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  QSize sizeHint() const override;
   QString text() const { return m_perfsList->text(); }
 
   bool appendAPerformer();
@@ -19,7 +21,6 @@ class JsonPerformersListInputer : public QDialog {
 
   void subscribe();
 
-  QSize sizeHint() const override { return QSize(600, 100); }
 
  private:
   QLineEdit* m_onePerf{nullptr};
@@ -28,5 +29,6 @@ class JsonPerformersListInputer : public QDialog {
   QVariantHash* p_dict{nullptr};
 
   QFormLayout* lo{nullptr};
+  QCompleter mPerfsCompleter;
 };
 #endif  // PERFORMERSWIDGET_H
