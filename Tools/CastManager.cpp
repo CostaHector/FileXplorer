@@ -11,7 +11,23 @@
 const QRegularExpression CastManager::EFFECTIVE_CAST_NAME{R"([@ _])"};
 constexpr int CastManager::EFFECTIVE_CAST_NAME_LEN;
 
-CastManager::CastManager()  //
+QString CastManager::GetLocalFilePath(const QString& localFilePath)  //
+{
+  if (!localFilePath.isEmpty()) {
+    /* only used in LLT test */
+    return localFilePath;
+  }
+
+#ifdef _WIN32
+  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
+#else
+  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
+#endif
+  return perfFilePath;
+}
+
+CastManager::CastManager(const QString& localFilePath)  //
+    : mLocalFilePath{GetLocalFilePath(localFilePath)}   //
 {
   ForceReloadCast();
 }
@@ -22,19 +38,22 @@ CastManager& CastManager::getIns() {
   return ins;
 }
 
-QSet<QString> CastManager::ReadOutPerformers() {
-#ifdef _WIN32
-  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
-#else
-  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
-#endif
-
-  QFile performersFi{perfFilePath};
-  if (!performersFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qWarning("file[%s] not found or open for read failed.", qPrintable(performersFi.fileName()));
+QSet<QString> CastManager::ReadOutPerformers() const {
+  QFile castFi{mLocalFilePath};
+  if (!castFi.exists()) {
+    qDebug("Cast list file[%s] not exist", qPrintable(castFi.fileName()));
     return {};
   }
-  QTextStream stream(&performersFi);
+  if (castFi.size() <= 0) {
+    qDebug("Cast list file[%s] is empty", qPrintable(castFi.fileName()));
+    return {};
+  }
+  if (!castFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qDebug("File[%s] open for read failed", qPrintable(castFi.fileName()));
+    return {};
+  }
+
+  QTextStream stream(&castFi);
   stream.setCodec("UTF-8");
 
   decltype(m_performers) perfSet;
@@ -46,7 +65,7 @@ QSet<QString> CastManager::ReadOutPerformers() {
       perfSet.insert(name);
     }
   }
-  performersFi.close();
+  castFi.close();
   qDebug("%d performers read out", perfSet.size());
   return perfSet;
 }
@@ -59,7 +78,7 @@ int CastManager::ForceReloadCast() {
   return afterStudioNameCnt - beforeStudioNameCnt;
 }
 
-int CastManager::LearningFromAPath(const QString& path, const bool bWriteInLocalFile, bool* bHasWrite) {
+int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   if (bHasWrite != nullptr) {
     *bHasWrite = false;
   }
@@ -95,18 +114,10 @@ int CastManager::LearningFromAPath(const QString& path, const bool bWriteInLocal
     return 0;
   }
   m_performers.unite(castsIncrement);
-  if (!bWriteInLocalFile) {  // test scenario, dont write in local file
-    return castsIncrement.size();
-  }
 
-#ifdef _WIN32
-  const QString castFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
-#else
-  const QString castFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
-#endif
-  QFile performersFi{castFilePath};
+  QFile performersFi{mLocalFilePath};
   if (!performersFi.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-    qWarning("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(castFilePath));
+    qWarning("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(performersFi.fileName()));
     return -1;
   }
   QTextStream stream{&performersFi};
@@ -128,7 +139,7 @@ QStringList CastManager::SplitSentence(QString sentence) {
   }
   using namespace JSON_RENAME_REGEX;
   sentence.replace(DISCRAD_LETTER_COMP, " ");
-  sentence.replace(AND_COMP, " & ");
+  sentence.replace(AND_COMP, " ");
   sentence.remove(RESOLUTION_COMP);
   return sentence.split(AT_LEAST_1_SPACE_COMP);
 }
