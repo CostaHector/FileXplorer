@@ -165,7 +165,6 @@
 <file alias="OPEN_A_VIDEO">VideoPlayer/OPEN_A_VIDEO.svg</file>
 <file alias="PAUSE_VIDEO">VideoPlayer/PAUSE_VIDEO.svg</file>
 <file alias="PLAY_VIDEO">VideoPlayer/PLAY_VIDEO.svg</file>
-<file alias="RENAME_PERFORMERS">VideoPlayer/RENAME_PERFORMERS.svg</file>
 <file alias="VIDEO_PLAYER">VideoPlayer/VIDEO_PLAYER.svg</file>
 <file alias="VIDEOS_LIST_MENU">VideoPlayer/VIDEOS_LIST_MENU.svg</file>
 <file alias="VOLUME_UNMUTE">VideoPlayer/VOLUME_UNMUTE.svg</file>
