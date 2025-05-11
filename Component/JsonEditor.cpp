@@ -374,7 +374,6 @@ int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   JsonEditor jsonEditor;
   jsonEditor.show();
-  jsonEditor.load("./bin/JsonExample");
   a.exec();
   return 0;
 }
