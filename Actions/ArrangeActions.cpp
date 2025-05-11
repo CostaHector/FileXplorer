@@ -83,14 +83,14 @@ void ArrangeActions::subscribe() {
   connect(_EDIT_STUDIOS, &QAction::triggered, this, &onEditStudios);
   connect(_RELOAD_STUDIOS, &QAction::triggered, this, []() {
     static auto& psm = StudiosManager::getIns();
-    int itemsCntChanged = psm.ForceReloadStdStudioName();
+    int itemsCntChanged = psm.ForceReloadStudio();
     Notificator::goodNews("Reload studios", QString("delta %1 items").arg(itemsCntChanged));
   });
 
   connect(_EDIT_PERFS, &QAction::triggered, this, &onEditPerformers);
   connect(_RELOAD_PERFS, &QAction::triggered, this, []() {
     static auto& pm = CastManager::getIns();
-    int itemsCntChanged = pm.ForceReloadPerformers();
+    int itemsCntChanged = pm.ForceReloadCast();
     Notificator::goodNews("Reload performers", QString("delta %1 item(s)").arg(itemsCntChanged));
   });
 

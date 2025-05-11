@@ -5,15 +5,15 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QCompleter>
+#include <QStringListModel>
 #include "Tools/JsonFileHelper.h"
 #include "Tools/NameTool.h"
 #include "Tools/CastManager.h"
 #include "public/PublicMacro.h"
 
-const QString PERFS_JOIN_STR{", "};
-
 JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)  //
-    : QDialog{parent, f}                                                                  //
+    : QDialog{parent, f},                                                                 //
+      mPerfsCompleter{CastManager::getIns().m_performers.values()}                        //
 {
   m_onePerf = new (std::nothrow) QLineEdit;
   CHECK_NULLPTR_RETURN_VOID(m_onePerf);
@@ -22,7 +22,10 @@ JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::Window
   buttonBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   CHECK_NULLPTR_RETURN_VOID(buttonBox);
 
-  m_onePerf->setCompleter(&CastManager::getIns().perfsCompleter);
+  mPerfsCompleter.setCaseSensitivity(Qt::CaseInsensitive);
+  mPerfsCompleter.setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
+
+  m_onePerf->setCompleter(&mPerfsCompleter);
   m_onePerf->addAction(QIcon(":img/RENAME_PERFORMERS"), QLineEdit::LeadingPosition);
   m_onePerf->setClearButtonEnabled(true);
   m_perfsList->setClearButtonEnabled(true);
@@ -38,43 +41,30 @@ JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::Window
   setWindowTitle("Mod performers");
 }
 
+QSize JsonPerformersListInputer::sizeHint() const {  //
+  return QSize(600, 100);
+}
+
 bool JsonPerformersListInputer::appendAPerformer() {
   const QString& perf = m_onePerf->text().trimmed();
   if (perf.isEmpty()) {
     return true;
   }
-  QStringList stdPerfL = perf.split(' ');
-  for (auto& word : stdPerfL) {
-    if (word.isEmpty()) {
-      continue;
-    }
-    word[0] = word[0].toUpper();
-  }
-  const QString& stdPerf = stdPerfL.join(' ');
-
-  const QString& perfs = text();
-  QStringList perfsL = (perfs.isEmpty() ? QStringList() : NameTool()(perfs));
-
-  if (perfsL.contains(stdPerf)) {
-    return false;
-  }
-  perfsL.append(stdPerf);
-  m_perfsList->setText(perfsL.join(PERFS_JOIN_STR));
+  QString perfStr = text();
+  perfStr += NameTool::CSV_COMMA;
+  perfStr += perf;
+  m_perfsList->setText(NameTool::CastTagSentenceParse2Str(perfStr, true));
   return true;
 }
 
 void JsonPerformersListInputer::uniquePerformers() {
-  const QString& perfs = text();
-  if (perfs.isEmpty()) {
-    return;
-  }
-  const QStringList& perfL = NameTool()(perfs);
-  m_perfsList->setText(perfL.join(PERFS_JOIN_STR));
+  const QString newCastStr = NameTool::CastTagSentenceParse2Str(text(), true);
+  m_perfsList->setText(newCastStr);
 }
 
 bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
   const QString& jsonFilePath = windowFilePath();
-  if (not p_dict) {
+  if (p_dict == nullptr) {
     qDebug("Cannot submit. dict is nullptr");
     return false;
   }
@@ -89,25 +79,19 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
 
 bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& jsonFilePath, QVariantHash& dict) {
   p_dict = &dict;
-  if (not QFile::exists(jsonFilePath)) {
+  if (!QFile::exists(jsonFilePath)) {
     setWindowFilePath("");
-    qDebug("error path[%s] not exist", qPrintable(jsonFilePath));
+    qWarning("Error path[%s] not exist", qPrintable(jsonFilePath));
     return false;
   }
   setWindowFilePath(jsonFilePath);
-  if (!dict.contains(ENUM_TO_STRING(Cast))) {
+  auto castIt = dict.constFind(ENUM_TO_STRING(Cast));
+  if (castIt == dict.cend()) {
+    qDebug("No cast key in json[%s]", qPrintable(jsonFilePath));
     return false;
   }
-  static CastManager& pm = CastManager::getIns();
-  QStringList perfL = dict[ENUM_TO_STRING(Cast)].toStringList();
-  if (perfL.isEmpty()) {
-    auto nameIt = dict.find(ENUM_TO_STRING(Name));
-    if (nameIt != dict.cend()) {
-      perfL = pm(nameIt.value().toString());
-    }
-  }
-  perfL.removeDuplicates();
-  m_perfsList->setText(perfL.join(PERFS_JOIN_STR));
+  const QStringList& casts = castIt.value().toStringList();
+  m_perfsList->setText(casts.join(NameTool::CSV_COMMA));
   return true;
 }
 
