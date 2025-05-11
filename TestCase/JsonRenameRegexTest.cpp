@@ -240,11 +240,31 @@ class JsonRenameRegexTest : public MyTestSuite {
   }
 
   void test_SPLIT_BY_UPPERCASE() {
-    QVERIFY(SPLIT_BY_UPPERCASE_COMP.isValid());
+    QVERIFY(SPLIT_BY_UPPERCASE_COMP1.isValid());
+    QVERIFY(SPLIT_BY_UPPERCASE_COMP2.isValid());
+
     QString before = "KobiIsOneOfMyFavoriteBasketballPlayer";
     const QString after = "Kobi Is One Of My Favorite Basketball Player";
-    before.replace(SPLIT_BY_UPPERCASE_COMP, " \\1");
+    before.replace(SPLIT_BY_UPPERCASE_COMP1, "\\1 \\2");
     QCOMPARE(before, after);
+
+    QString sentence{"RealMadridCF"};
+    sentence.replace(SPLIT_BY_UPPERCASE_COMP1, "\\1 \\2");
+    QCOMPARE(sentence, "Real Madrid CF");
+
+    QString studio2000Sentence{"Studio2000"};
+    studio2000Sentence.replace(SPLIT_BY_UPPERCASE_COMP1, "\\1 \\2");
+    QCOMPARE(studio2000Sentence, "Studio2000");
+
+    QString my7InchesSentence{"My7Gifts"};
+    my7InchesSentence.replace(SPLIT_BY_UPPERCASE_COMP1, "\\1 \\2");
+    my7InchesSentence.replace(SPLIT_BY_UPPERCASE_COMP2, "\\1 \\2");
+    QCOMPARE(my7InchesSentence, "My 7 Gifts");
+
+    QString my2BSentence{"2B"};
+    my2BSentence.replace(SPLIT_BY_UPPERCASE_COMP1, "\\1 \\2");
+    my2BSentence.replace(SPLIT_BY_UPPERCASE_COMP2, "\\1 \\2");
+    QCOMPARE(my2BSentence, "2 B");
   }
 };
 

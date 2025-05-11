@@ -278,7 +278,7 @@ bool JsonEditor::onPerformersHint() {
   const int newPerfsCnt = mPerfsCsv->AppendFromStringList(hintPerfsList);
 
   static StudiosManager& psm = StudiosManager::getIns();
-  const QString& newProdStudioName = psm.hintStdStudioName(nameText);
+  const QString& newProdStudioName = psm[nameText];
   if (!newProdStudioName.isEmpty()) {
     mStudio->setText(newProdStudioName);
   }
