@@ -9,19 +9,16 @@ class StudiosManager {
   static StudiosManager& getIns();
   StudiosManager(const StudiosManager& rhs) noexcept = delete;
 
-  int LearningFromAPath(const QString& path, const bool bWriteInLocalFile = true, bool* bHasWrite = nullptr);
-  int ForceReloadCast();
+  QHash<QString, QString> ReadOutStdStudioName() const;
+  int ForceReloadStudio();
+
+  int LearningFromAPath(const QString& path, bool* bHasWrite = nullptr);
 
   QString ProductionStudioFilterOut(const QString& words) const;
-
-  QStringList GetCoarseStudioNames(QString standardPs) const;
-
-  QString hintStdStudioName(const QString& sentence) const;  // from a studio name
+  QSet<QString> GetCoarseStudioNames(QString standardPs) const;
 
   QString operator()(const QString& sentence) const;  // from a file name
   QString operator[](const QString& nm) const { return m_prodStudioMap.value(nm.toLower(), nm); }
-
-  int ForceReloadStudio();
 
   inline int count() const { return m_prodStudioMap.size(); }
 
@@ -30,13 +27,12 @@ class StudiosManager {
   // warnerbros. => WarnerBros.
   QHash<QString, QString> m_prodStudioMap;
 
- protected:
-  static QHash<QString, QString> ReadOutStdStudioName();
-
  private:
   QString FileName2StudioNameSection(QString sentence) const;
 
-  StudiosManager();
+  static QString GetLocalFilePath(const QString& localFilePath);
+  StudiosManager(const QString& localFilePath = ""); // valid localFilePath only used in llt
+  QString mLocalFilePath;
 };
 
 #endif  // STUDIOSMANAGER_H

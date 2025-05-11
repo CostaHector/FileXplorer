@@ -7,82 +7,131 @@
 #include "pub/MyTestSuite.h"
 
 // add necessary includes here
+#include "TestCase/pub/BeginToExposePrivateMember.h"
 #include "Tools/CastManager.h"
 #include "Tools/StudiosManager.h"
+#include "TestCase/pub/EndToExposePrivateMember.h"
+
 #include "public/PublicMacro.h"
 const QString rootpath = TestCaseRootPath() + "/test/TestEnv_JsonCastStudio";
+const QString gLocalFilePath{rootpath + "/cast_list.txt"};
+const QString gStudioLocalFilePath{rootpath + "/studio_list.txt"};
 
 class CastManagerTest : public MyTestSuite {
   Q_OBJECT
  public:
-  CastManagerTest() : MyTestSuite{false}, pm{CastManager::getIns()} {}
-  const CastManager& pm;
+  CastManagerTest() : MyTestSuite{false}, cmInLLT{gLocalFilePath}, smInLLT{gStudioLocalFilePath} {}
+  CastManager cmInLLT;
+  StudiosManager smInLLT;
 
  private slots:
-  void test_performersDictNotEmpty() {  //
-    QVERIFY2(!pm.m_performers.isEmpty(), "performers list should not be empty");
+  void cleanup() {
+    QFile fiCast{gLocalFilePath};
+    if (fiCast.size() > 0) {  // clear file
+      fiCast.resize(0);
+    }
+    QFile fiStudio{gStudioLocalFilePath};
+    if (fiStudio.size() > 0) {  // clear file
+      fiStudio.resize(0);
+    }
   }
+
+  void test_cast_list_file_empty_nothing_read_out() {
+    const QFile castListFi{gLocalFilePath};
+    QVERIFY2(castListFi.exists(), qPrintable(gLocalFilePath));  // file exist
+    QCOMPARE(castListFi.size(), 0);                             // empty file
+    QVERIFY2(cmInLLT.count() == 0, "Cast count in llt should be empty");
+  }
+
+  void test_cast_list_not_empty_in_service() {
+    const CastManager& pmInsService{CastManager::getIns()};
+    QVERIFY2(pmInsService.count() > 0, "Cast count in service should greater than 0");
+  }
+
   void test_sentenceSplit() {
-    const auto& wordsList = pm.SplitSentence("Production Name - Movie Core Name - Nice & Devin Franco BB 4K");
-    QVERIFY2(not wordsList.isEmpty(), "words list should not empty");
+    // precondition
+    const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
+    decltype(cmInLLT.m_performers) tempPerfs;
+    for (const QString& star : expectCastList) {
+      tempPerfs.insert(star.toLower());
+    }
+    cmInLLT.m_performers.swap(tempPerfs);
+    ON_SCOPE_EXIT {
+      cmInLLT.m_performers.swap(tempPerfs);
+    };
+    QVERIFY(!cmInLLT.m_performers.isEmpty());
+
+    // procedure
+    const QStringList& actualCastList = cmInLLT("Matt Dallas - Chris Pine and Jensen Ackles.");
+    QCOMPARE(actualCastList, expectCastList);
   }
 
   void test_filterOutNameFromWordsList() {
-    const auto& wordsList = pm.SplitSentence({"Jesse Theo Brady Devin Franco Vincent O'Reilly Topher Di Maggio Aspen"});
-    const auto& perfsList = pm.FilterPerformersOut(wordsList);
-    const QSet<QString>& perfsSet{perfsList.cbegin(), perfsList.cend()};
-    QVERIFY2(perfsList.size() >= 4, "perfs list should contains >= 5 performers");
-    // 2 word cast are allowed, 1 word cast not allowed
-    const QSet<QString>& realPerfs{"Theo Brady", "Devin Franco", "Vincent O'Reilly", "Topher Di Maggio"};
-    QCOMPARE(perfsSet, realPerfs);
+    // precondition
+    const QStringList allCastList{"Jean le Rond d'Alembert", "Frenkie de Jong", "L Hospital", "James"};
+    // 4 word(not support now), 3 word, 2 word, 1 word
+    const QStringList expectCastList{"Frenkie de Jong", "L Hospital", "James"};
+    decltype(cmInLLT.m_performers) tempPerfs;
+    for (const QString& star : allCastList) {
+      tempPerfs.insert(star.toLower());
+    }
+    cmInLLT.m_performers.swap(tempPerfs);
+    ON_SCOPE_EXIT {
+      cmInLLT.m_performers.swap(tempPerfs);
+    };
+    QVERIFY(!cmInLLT.m_performers.isEmpty());
+
+    // single quote not used to split
+    // and/And(insensitive) used to split
+    // continous /\ used to split
+    const QString sentence{"Jean le Rond d'Alembert AND Frenkie de Jong///L Hospital\\\\James"};
+    const QStringList& expectWordSection{"Jean", "le", "Rond", "d'Alembert", "Frenkie", "de", "Jong", "L", "Hospital", "James"};
+
+    const auto& actualWordsList = cmInLLT.SplitSentence(sentence);
+    QCOMPARE(actualWordsList, expectWordSection);
+
+    const auto& actualCast1 = cmInLLT.FilterPerformersOut(actualWordsList);
+    const auto& actualCast2 = cmInLLT(sentence);
+    QCOMPARE(actualCast1, actualCast2);
+
+    QCOMPARE(actualCast1, expectCastList);
   }
 
-  void test_OneLetterXNameCommaAddSep() {
-    QVERIFY(pm.m_performers.contains("gabriel clark"));
-    QVERIFY(pm.m_performers.contains("cutler x"));
-    QVERIFY(pm.m_performers.contains("theo brady"));
+  void test_one_char_seperator() {
+    // precondition
+    const QStringList expectCastList{"U", "V", "W", "X", "Y", "Z"};
+    decltype(cmInLLT.m_performers) tempPerfs;
+    for (const QString& star : expectCastList) {
+      tempPerfs.insert(star.toLower());
+    }
+    cmInLLT.m_performers.swap(tempPerfs);
+    ON_SCOPE_EXIT {
+      cmInLLT.m_performers.swap(tempPerfs);
+    };
+    QVERIFY(!cmInLLT.m_performers.isEmpty());
 
-    const auto& wordsList = pm.SplitSentence({"Gabriel Clark, Cutler X + Theo Brady"});
-    const auto& perfsList = pm.FilterPerformersOut(wordsList);
-    const QStringList expectCasts{"Gabriel Clark", "Cutler X", "Theo Brady"};
-    QCOMPARE(perfsList, expectCasts);
+    const auto& perfsList = cmInLLT("U! + V; / W. \\\\ X & Y and Z?");
+    QCOMPARE(perfsList, expectCastList);
   }
 
-  void test_cast_emdwith_comma_Period_colon_exclamation_question() {
-    QVERIFY(pm.m_performers.contains("gabriel clark"));
-    QVERIFY(pm.m_performers.contains("cutler x"));
-    QVERIFY(pm.m_performers.contains("theo brady"));
-    QVERIFY(pm.m_performers.contains("britishtwunk"));
-    const auto& wordsList = pm.SplitSentence({"Gabriel Clark! Cutler X. Theo Brady; britishtwunk?"});
-    const auto& perfsList = pm.FilterPerformersOut(wordsList);
-    const QStringList expectCasts{"Gabriel Clark", "Cutler X", "Theo Brady", "britishtwunk"};
-    QCOMPARE(perfsList, expectCasts);
+  void test_with_new_line_seperator() {
+    // precondition
+    const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
+    decltype(cmInLLT.m_performers) tempPerfs;
+    for (const QString& star : expectCastList) {
+      tempPerfs.insert(star.toLower());
+    }
+    cmInLLT.m_performers.swap(tempPerfs);
+    ON_SCOPE_EXIT {
+      cmInLLT.m_performers.swap(tempPerfs);
+    };
+    QVERIFY(!cmInLLT.m_performers.isEmpty());
+
+    const auto& perfsList = cmInLLT("Matt Dallas \n Chris Pine \r\n Jensen Ackles");
+    QCOMPARE(perfsList, expectCastList);
   }
 
-  void test_sentenceWithPerfsAtLast() {
-    QVERIFY(pm.m_performers.contains("britishtwunk"));
-    QVERIFY(pm.m_performers.contains("craig kennedy"));
-    const auto& wordsList = pm.SplitSentence("britishtwunk fucked by Craig Kennedy");
-    QVERIFY2(!wordsList.isEmpty(), "words list should not empty");
-
-    const auto& perfsList = pm.FilterPerformersOut(wordsList);
-    const QStringList expectCasts{"britishtwunk", "Craig Kennedy"};
-    QCOMPARE(perfsList, expectCasts);
-  }
-
-  void test_sentenceWithNewLineSeperator() {
-    QVERIFY(pm.m_performers.contains("britishtwunk"));
-    QVERIFY(pm.m_performers.contains("craig kennedy"));
-    QVERIFY(pm.m_performers.contains("gabriel clark"));
-    const auto& wordsList = pm.SplitSentence("britishtwunk\r\nCraig Kennedy\nGabriel Clark");
-    QVERIFY2(!wordsList.isEmpty(), "words list should not empty");
-
-    const auto& perfsList = pm.FilterPerformersOut(wordsList);
-    const QStringList expectCasts{"britishtwunk", "Craig Kennedy", "Gabriel Clark"};
-    QCOMPARE(perfsList, expectCasts);
-  }
-
-  void test_LearningFromAPath_no_write_localfile() {
+  void test_LearningFromAPath_write_local_file_succeed() {
     // precondition
     QDir dir{rootpath};
     const QString jsonAbsFile{dir.absoluteFilePath("My Good Boy.json")};
@@ -106,41 +155,45 @@ class CastManagerTest : public MyTestSuite {
     QCOMPARE(castIt.value().toStringList(), castLst);
 
     // procedure
-    auto& studioInst = StudiosManager::getIns();
     QHash<QString, QString> emptyStudioSet;
-    studioInst.m_prodStudioMap.swap(emptyStudioSet);
+    smInLLT.m_prodStudioMap.swap(emptyStudioSet);
     ON_SCOPE_EXIT {
-      studioInst.m_prodStudioMap.swap(emptyStudioSet);
+      smInLLT.m_prodStudioMap.swap(emptyStudioSet);
     };
 
-    auto& castInst = CastManager::getIns();
     QSet<QString> emptyCastSet;
-    castInst.m_performers.swap(emptyCastSet);
+    cmInLLT.m_performers.swap(emptyCastSet);
     ON_SCOPE_EXIT {
-      castInst.m_performers.swap(emptyCastSet);
+      cmInLLT.m_performers.swap(emptyCastSet);
     };
 
     // cached should updated, local file should not write
-    bool studioLocalFileWrite{true};
-    QCOMPARE(studioInst.LearningFromAPath(rootpath, false, &studioLocalFileWrite), 2);
-    QCOMPARE(studioInst.m_prodStudioMap, expectStudioSet);
-    QCOMPARE(studioLocalFileWrite, false);
+    bool studioLocalFileWrite{false};
+    QCOMPARE(smInLLT.LearningFromAPath(rootpath, &studioLocalFileWrite), 2);
+    QCOMPARE(smInLLT.m_prodStudioMap, expectStudioSet);
+    QCOMPARE(studioLocalFileWrite, true);
+    const QFile fiStudio{gStudioLocalFilePath};
+    QVERIFY(fiStudio.size() > 0);
 
-    bool castLocalFileWrite{true};
-    QCOMPARE(castInst.LearningFromAPath(rootpath, false, &castLocalFileWrite), 2);
-    QCOMPARE(castInst.m_performers, expectCastSet);
-    QCOMPARE(castLocalFileWrite, false);
+
+    bool castLocalFileWrite{false};
+    QCOMPARE(cmInLLT.LearningFromAPath(rootpath, &castLocalFileWrite), 2);
+    QCOMPARE(cmInLLT.m_performers, expectCastSet);
+    QCOMPARE(castLocalFileWrite, true);
+    const QFile fiCast{gLocalFilePath};
+    QVERIFY(fiCast.size() > 0);
+
 
     // do it again, nothing new should append
     studioLocalFileWrite = true;
-    QCOMPARE(studioInst.LearningFromAPath(rootpath, false, &studioLocalFileWrite), 0);
-    QCOMPARE(studioInst.m_prodStudioMap, expectStudioSet);
-    QCOMPARE(studioLocalFileWrite, false);
+    QCOMPARE(smInLLT.LearningFromAPath(rootpath, &studioLocalFileWrite), 0);
+    QCOMPARE(smInLLT.m_prodStudioMap, expectStudioSet);
+    QCOMPARE(studioLocalFileWrite, false);  // skipped, no write
 
     castLocalFileWrite = true;
-    QCOMPARE(castInst.LearningFromAPath(rootpath, false, &castLocalFileWrite), 0);
-    QCOMPARE(castInst.m_performers, expectCastSet);
-    QCOMPARE(castLocalFileWrite, false);
+    QCOMPARE(cmInLLT.LearningFromAPath(rootpath, &castLocalFileWrite), 0);
+    QCOMPARE(cmInLLT.m_performers, expectCastSet);
+    QCOMPARE(castLocalFileWrite, false);  // skipped, no write
   }
 };
 
