@@ -39,7 +39,7 @@ class VideoPlayer : public QMainWindow {
   auto subscribe() -> void;
 
   auto onModeName() -> bool;
-  auto onModPerformers() -> bool;
+  auto onModCast() -> bool;
 
   auto onGrabAFrame(const QVideoFrame& frame) -> bool;
   auto onMarkHotScenes() -> bool;
@@ -132,7 +132,7 @@ class VideoPlayer : public QMainWindow {
 
   static const QString PLAYLIST_DOCK_TITLE_TEMPLATE;
 
-  JsonPerformersListInputer* m_performerWid;
+  JsonPerformersListInputer* m_castEditDlg;
 
   QStatusBar* m_playerStatusBar;
 

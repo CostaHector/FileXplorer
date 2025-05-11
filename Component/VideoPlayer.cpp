@@ -30,7 +30,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
       m_playListModel{new VidModel{this}},
       m_playListWid{new VidsPlayListView{m_playListModel, this}},
       m_playlistSplitter(new QSplitter(Qt::Orientation::Horizontal, this)),
-      m_performerWid(nullptr),
+      m_castEditDlg(nullptr),
       m_playerStatusBar{new QStatusBar{this}} {
   m_probe->setSource(m_mediaPlayer);  // Returns true, hopefully.
 
@@ -297,7 +297,7 @@ auto VideoPlayer::loadVideoRate() -> void {
 }
 
 QString VideoPlayer::JsonFileValidCheck(const QString& op) {
-  if (not m_playListWid->currentIndex().isValid()) {
+  if (!m_playListWid->currentIndex().isValid()) {
     qDebug("current item is nullptr, cannot %s", qPrintable(op));
     return {};
   }
@@ -331,7 +331,7 @@ void VideoPlayer::subscribe() {
   });
 
   connect(g_videoPlayerActions()._RENAME_VIDEO, &QAction::triggered, this, &VideoPlayer::onModeName);
-  connect(g_videoPlayerActions()._MOD_PERFORMERS, &QAction::triggered, this, &VideoPlayer::onModPerformers);
+  connect(g_videoPlayerActions()._MOD_CAST, &QAction::triggered, this, &VideoPlayer::onModCast);
 
   connect(g_videoPlayerActions()._NEXT_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayNextVideo);
   connect(g_videoPlayerActions()._LAST_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayLastVideo);
@@ -412,20 +412,18 @@ bool VideoPlayer::onModeName() {
   return renameResult;
 }
 
-bool VideoPlayer::onModPerformers() {
-  const QString& jsonPath = JsonFileValidCheck("mod performers");
+bool VideoPlayer::onModCast() {
+  const QString& jsonPath = JsonFileValidCheck("mod cast");
   if (jsonPath.isEmpty()) {
+    qWarning("No corresponding json file find, cannot edit");
     return false;
   }
-  if (!m_performerWid) {
-    m_performerWid = new JsonPerformersListInputer(this);
+  if (!m_castEditDlg) {
+    m_castEditDlg = new (std::nothrow) JsonPerformersListInputer(this);
+    CHECK_NULLPTR_RETURN_FALSE(m_castEditDlg);
   }
-  if (!m_performerWid) {
-    qDebug("performer widget is nullptr");
-    return false;
-  }
-  m_performerWid->reloadPerformersFromJsonFile(jsonPath, m_dict);
-  m_performerWid->show();
+  m_castEditDlg->reloadPerformersFromJsonFile(jsonPath, m_dict);
+  m_castEditDlg->show();
   return true;
 }
 
