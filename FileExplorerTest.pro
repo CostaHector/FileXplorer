@@ -3,6 +3,9 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
+DEFINES += QT_TEST
+message($$DEFINES)
+
 SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp)
 SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
@@ -114,5 +117,3 @@ DISTFILES += \
 
 RESOURCES += \
     bin/themes/res.qrc
-
-DEFINES += QT_TEST
