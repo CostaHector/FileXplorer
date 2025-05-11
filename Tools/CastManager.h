@@ -9,10 +9,10 @@ class CastManager {
   static CastManager& getIns();
   CastManager(const CastManager& rhs) noexcept = delete;
 
-  QSet<QString> ReadOutPerformers();
+  QSet<QString> ReadOutPerformers() const;
   int ForceReloadCast();
 
-  int LearningFromAPath(const QString& path, const bool bWriteInLocalFile=true, bool* bHasWrite=nullptr);
+  int LearningFromAPath(const QString& path, bool* bHasWrite = nullptr);
 
   static QString RmvBelongLetter(const QString& word);
   static QStringList SplitSentence(QString sentence);
@@ -23,9 +23,12 @@ class CastManager {
   inline int count() const { return m_performers.size(); }
 
  private:
-  CastManager();
   static const QRegularExpression EFFECTIVE_CAST_NAME;
   static constexpr int EFFECTIVE_CAST_NAME_LEN = 12;
+
+  static QString GetLocalFilePath(const QString& localFilePath);
+  CastManager(const QString& localFilePath = "");  // valid localFilePath only used in llt
+  const QString mLocalFilePath;
 };
 
 #endif  // CastManager_H
