@@ -1,7 +1,6 @@
 #ifndef CastManager_H
 #define CastManager_H
 
-#include <QCompleter>
 #include <QSet>
 #include <QString>
 
@@ -11,16 +10,15 @@ class CastManager {
   CastManager(const CastManager& rhs) noexcept = delete;
 
   QSet<QString> ReadOutPerformers();
-  int ForceReloadPerformers();
+  int ForceReloadCast();
 
-  int LearningFromAPath(const QString& path);
+  int LearningFromAPath(const QString& path, const bool bWriteInLocalFile=true, bool* bHasWrite=nullptr);
 
   static QString RmvBelongLetter(const QString& word);
   static QStringList SplitSentence(QString sentence);
   QStringList FilterPerformersOut(const QStringList& words) const;
   QStringList operator()(const QString& sentence) const;
   QSet<QString> m_performers;
-  QCompleter perfsCompleter;
 
   inline int count() const { return m_performers.size(); }
 
