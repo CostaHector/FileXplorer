@@ -2,6 +2,7 @@
 #define ONSCOPEEXIT_H
 
 #define LAMBDA_OBJECT_NAME(name, lineNum) name##lineNum
+#define CONCAT(x, y) LAMBDA_OBJECT_NAME(x, y)  // 中间层，用于展开参数
 
 template <typename Func>
 class OnScopeExit {
@@ -20,6 +21,6 @@ OnScopeExit<Func> operator+(PLACEHOLDER_E, Func func) {
   return OnScopeExit<Func>{func};
 }
 
-#define ON_SCOPE_EXIT auto LAMBDA_OBJECT_NAME(exitor, __LINE__) = PLACEHOLDER_E{} + [&]()
+#define ON_SCOPE_EXIT auto CONCAT(exitor, __LINE__) = PLACEHOLDER_E{} + [&]()
 
 #endif  // ONSCOPEEXIT_H
