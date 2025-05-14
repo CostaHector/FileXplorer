@@ -1,6 +1,6 @@
 #include "FdBasedDb.h"
 #include "Tools/FileDescriptor/FileDescriptor.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/QMediaInfo.h"
 #include "public/PublicVariable.h"
 #include "public/PathTool.h"
@@ -279,7 +279,7 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
     query.bindValue(INSERT_FIELD_PrePathRight, prePathRight);
     query.bindValue(INSERT_FIELD_Name, vidName);
     query.bindValue(INSERT_FIELD_Size, QFile{absFilePath}.size());
-    query.bindValue(INSERT_FIELD_PathHash, JsonFileHelper::CalcFileHash(absFilePath));
+    query.bindValue(INSERT_FIELD_PathHash, JsonHelper::CalcFileHash(absFilePath));
 
     if (!query.exec()) {
       db.rollback();
@@ -379,7 +379,7 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
     query.bindValue(UPDATE_PATH_FILED_PrePathLeft, prePathLeft);
     query.bindValue(UPDATE_PATH_FILED_PrePathRight, prePathRight);
     query.bindValue(UPDATE_PATH_FILED_Name, vidName);
-    query.bindValue(UPDATE_PATH_FILED_PathHash, JsonFileHelper::CalcFileHash(absFilePath));
+    query.bindValue(UPDATE_PATH_FILED_PathHash, JsonHelper::CalcFileHash(absFilePath));
     query.bindValue(UPDATE_PATH_FILED_Fd, fdVal);
     if (!query.exec()) {
       db.rollback();
@@ -659,7 +659,7 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
   }
 
   int jsonFilesCnt = 0;
-  using namespace JsonFileHelper;
+  using namespace JsonHelper;
   for (auto it = pth2Info.cbegin(); it != pth2Info.cend(); ++it) {
     const auto& info = it.value();
     // if json file not exist, will create it first
@@ -684,7 +684,7 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
       return FD_DISK_OFFLINE;
     }
   }
-  using namespace JsonFileHelper;
+  using namespace JsonHelper;
   const QMap<uint, JsonDict2Table>& fileNameHash2Dict = ReadStudioCastTagsOut(peerPath);
   if (fileNameHash2Dict.isEmpty()) {
     return FD_OK;
