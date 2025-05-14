@@ -1,5 +1,5 @@
 #include "PerfBaseDb.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/NameTool.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "public/PublicTool.h"
@@ -206,7 +206,7 @@ int PerfBaseDb::LoadFromPJsonFile(const QString& imgsHostPath) {
   QDirIterator it{imgsHostPath, {"*.pjson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
-    const QVariantHash& pJson = JsonFileHelper::MovieJsonLoader(it.filePath());
+    const QVariantHash& pJson = JsonHelper::MovieJsonLoader(it.filePath());
     qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Name, pJson[PERFORMER_DB_HEADER_KEY::Name].toString());
     qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Rate, pJson[PERFORMER_DB_HEADER_KEY::Rate].toInt());
     qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::AKA, pJson[PERFORMER_DB_HEADER_KEY::AKA].toString());

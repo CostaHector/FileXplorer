@@ -6,7 +6,7 @@
 #include "public/MemoryKey.h"
 #include <QApplication>
 
-#define RUN_MAIN_FILE 1
+//#define RUN_MAIN_FILE 1
 #ifdef RUN_MAIN_FILE
 
 int main(int argc, char* argv[]) {
