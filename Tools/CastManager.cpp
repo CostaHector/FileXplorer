@@ -2,7 +2,7 @@
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include <QDir>
 #include <QDirIterator>
@@ -93,7 +93,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   while (it.hasNext()) {
     it.next();
     const QString& jsonPath = it.filePath();
-    const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonPath);
+    const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonPath);
     auto perfIt = dict.constFind(ENUM_TO_STRING(Cast));
     if (perfIt == dict.cend()) {
       continue;

@@ -6,7 +6,8 @@
 #include "TestCase/pub/OnScopeExit.h"
 #include "Tools/FileDescriptor/FdBasedDb.h"
 #include "Tools/FileDescriptor/TableFields.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonKey.h"
+#include "Tools/Json/JsonHelper.h"
 #include "public/PublicMacro.h"
 #include <QSqlRecord>
 
@@ -237,7 +238,7 @@ class FdBasedDbTest : public MyTestSuite {
     QVERIFY(dir.exists(MKV_FILENAME));
     QVERIFY(dir.exists(JSON_FILENAME));
 
-    using namespace JsonFileHelper;
+    using namespace JsonHelper;
     const QStringList expectCastLst{"Henry Cavill", " Chris Evans"};  // Atension,  here we use ',' to seperate not ", "
     const QStringList notExpectCastLst{"Henry Cavill", "Chris Evans"};
     const auto& dict = MovieJsonLoader(dir.absoluteFilePath(JSON_FILENAME));
@@ -251,7 +252,7 @@ class FdBasedDbTest : public MyTestSuite {
     FdBasedDb::VIDEOS_FILTER = QStringList{"*.mkv"};
     const QString MKV_FILENAME{"Big Buck Bunny SampleVideo_360x240_1mb 9s.mkv"};
     const QString JSON_FILE_NAME{"Big Buck Bunny SampleVideo_360x240_1mb 9s.json"};
-    using namespace JsonFileHelper;
+    using namespace JsonHelper;
 
     // precondition
     QDir dir{rootpath, "", QDir::SortFlag::Name, QDir::Filter::Files};

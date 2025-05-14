@@ -65,7 +65,7 @@ void FdBasedDbModel::AddCastOrTags(const QModelIndexList& tagColIndexes, const Q
   foreach (const QModelIndex& ind, tagColIndexes) {
     beforeStr = QSqlTableModel::data(ind, Qt::DisplayRole).toString();
     if (!beforeStr.isEmpty()) {
-      beforeStr += ',';
+      beforeStr += NameTool::CSV_COMMA;
     }
     beforeStr += sentence;
     setData(ind, NameTool::CastTagSentenceParse2Str(beforeStr, true));

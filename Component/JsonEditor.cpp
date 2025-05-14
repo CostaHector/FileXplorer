@@ -9,7 +9,7 @@
 
 #include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/StudiosManager.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/NameTool.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/CastManager.h"
@@ -104,7 +104,7 @@ void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
 
   const int rowIdx = curIndex.row();
   const QString& jAbsPth = m_jsonList->filePath(rowIdx);
-  const QVariantHash& jsonDict = JsonFileHelper::MovieJsonLoader(jAbsPth);
+  const QVariantHash& jsonDict = JsonHelper::MovieJsonLoader(jAbsPth);
   const int newCnt = jsonDict[ENUM_TO_STRING(Cast)].toStringList().size();
   m_jsonModel->updatePerfCount(rowIdx, newCnt);
   qDebug("Now json[%s] perfs cnt:%d", qPrintable(jAbsPth), newCnt);
@@ -190,7 +190,7 @@ bool JsonEditor::onStageChanges() {
   dict[mDetail->GetFormName()] = mDetail->toPlainText();
 
   const QString& curJsonPath = m_jsonList->filePath(curRow);
-  return JsonFileHelper::DumpJsonDict(dict, curJsonPath);
+  return JsonHelper::DumpJsonDict(dict, curJsonPath);
 }
 
 bool JsonEditor::onSaveAndLastUnfinishedItem() {
