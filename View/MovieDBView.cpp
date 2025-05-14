@@ -21,17 +21,6 @@
 #include <QMessageBox>
 #include <QInputDialog>
 
-QString MovieDBView::FIELF_OP_TYPE_ARR[(int)FIELF_OP_TYPE::BUTT]{
-    ENUM_TO_STRING(CAST),
-    ENUM_TO_STRING(TAGS),
-};
-
-QString MovieDBView::FIELD_OP_MODE_ARR[(int)FIELD_OP_MODE::BUTT]{
-    ENUM_TO_STRING(SET),
-    ENUM_TO_STRING(APPEND),
-    ENUM_TO_STRING(REMOVE),
-};
-
 MovieDBView::MovieDBView(FdBasedDbModel* model_,               //
                          DatabaseSearchToolBar* _dbSearchBar,  //
                          FdBasedDb& movieDb_,
@@ -95,12 +84,12 @@ void MovieDBView::subscribe() {
   connect(inst._OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
   // record studio/cast/tags manual batch edit
   connect(inst.SET_STUDIO, &QAction::triggered, this, &MovieDBView::onSetStudio);
-  connect(inst.SET_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::CAST, FIELD_OP_MODE::SET); });
-  connect(inst.APPEND_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::CAST, FIELD_OP_MODE::APPEND); });
-  connect(inst.REMOVE_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE); });
-  connect(inst.SET_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::TAGS, FIELD_OP_MODE::SET); });
-  connect(inst.APPEND_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND); });
-  connect(inst.REMOVE_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELF_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE); });
+  connect(inst.SET_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET); });
+  connect(inst.APPEND_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND); });
+  connect(inst.REMOVE_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE); });
+  connect(inst.SET_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET); });
+  connect(inst.APPEND_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND); });
+  connect(inst.REMOVE_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE); });
 
   addAction(g_fileBasicOperationsActions().COPY_FULL_PATH);
   addAction(g_fileBasicOperationsActions().COPY_NAME);
@@ -657,7 +646,7 @@ int MovieDBView::onSetStudio() {
   return indexes.size();
 }
 
-int MovieDBView::onSetCastOrTags(const FIELF_OP_TYPE type, const FIELD_OP_MODE mode) {
+int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode) {
   const QString fieldOperation{"Operation:" + FIELF_OP_TYPE_ARR[(int)type] + ' ' + FIELD_OP_MODE_ARR[(int)mode]};
   if (!IsHasSelection(fieldOperation)) {
     return 0;
@@ -681,10 +670,10 @@ int MovieDBView::onSetCastOrTags(const FIELF_OP_TYPE type, const FIELD_OP_MODE m
   candidates.push_back(tagsOrCast);
   int fieldColumn = -1;
   switch (type) {
-    case FIELF_OP_TYPE::CAST:
+    case FIELD_OP_TYPE::CAST:
       fieldColumn = MOVIE_TABLE::Cast;
       break;
-    case FIELF_OP_TYPE::TAGS:
+    case FIELD_OP_TYPE::TAGS:
       fieldColumn = MOVIE_TABLE::Tags;
       break;
     default:
