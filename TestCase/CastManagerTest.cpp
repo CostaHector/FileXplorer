@@ -3,7 +3,8 @@
 #include "TestCase/pub/GlbDataProtect.h"
 #include "TestCase/pub/OnScopeExit.h"
 #include "TestCase/PathRelatedTool.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonKey.h"
+#include "Tools/Json/JsonHelper.h"
 #include "pub/MyTestSuite.h"
 
 // add necessary includes here
@@ -137,8 +138,8 @@ class CastManagerTest : public MyTestSuite {
     const QString jsonAbsFile{dir.absoluteFilePath("My Good Boy.json")};
     QVERIFY(QFile::exists(jsonAbsFile));
 
-    using namespace JSON_KEY;
-    const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonAbsFile);
+    using namespace JsonKey;
+    const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonAbsFile);
 
     const auto studioIt = dict.constFind(ENUM_TO_STRING(Studio));
     QVERIFY(studioIt != dict.cend());

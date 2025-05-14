@@ -5,12 +5,12 @@
 #include "public/PublicVariable.h"
 #include "public/PublicMacro.h"
 #include "public/MemoryKey.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 
 JsonProperties::JsonProperties(const QString& path) : jsonPath{path}, perfsCount{getPerfsCount(path)} {}
 
 int JsonProperties::getPerfsCount(const QString& pth) {
-  const auto& dict = JsonFileHelper::MovieJsonLoader(pth);
+  const auto& dict = JsonHelper::MovieJsonLoader(pth);
   const auto it = dict.find(ENUM_TO_STRING(Cast));
   if (it == dict.cend()) {
     return 0;
