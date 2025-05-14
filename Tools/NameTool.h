@@ -40,6 +40,7 @@ class NameTool {
   static QString CastTagSentenceRmvEle2Str(const QString& sentense, const QString& cast);
 
   static constexpr char CSV_COMMA = ',';
+  static const QRegularExpression CAST_STR_SPLITTER;
  private:
   static const QString INVALID_CHARS;
   static const QSet<QChar> INVALID_FILE_NAME_CHAR_SET;

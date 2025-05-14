@@ -9,7 +9,7 @@
 #include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/FileDescriptor/TableFields.h"
@@ -278,7 +278,7 @@ int CastDBView::onDumpAllIntoPJsonFile() {
   for (int r = 0; r < m_perfDbMdl->rowCount(); ++r) {
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
+    succeedCnt += JsonHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
   qDebug("All %d record(s) dump into pjson file. succeed: %d/%d.", dumpCnt, succeedCnt, dumpCnt);
@@ -303,7 +303,7 @@ int CastDBView::onDumpIntoPJsonFile() {
     const int r = indr.row();
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
+    succeedCnt += JsonHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
 
