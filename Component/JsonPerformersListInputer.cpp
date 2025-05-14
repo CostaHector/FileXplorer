@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QCompleter>
 #include <QStringListModel>
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/NameTool.h"
 #include "Tools/CastManager.h"
 #include "public/PublicMacro.h"
@@ -74,7 +74,7 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
   }
   const QString& perfs = text();
   dict[ENUM_TO_STRING(Cast)] = NameTool()(perfs);
-  return JsonFileHelper::DumpJsonDict(dict, jsonFilePath);
+  return JsonHelper::DumpJsonDict(dict, jsonFilePath);
 }
 
 bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& jsonFilePath, QVariantHash& dict) {

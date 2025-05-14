@@ -129,13 +129,14 @@ JsonEditorActions::JsonEditorActions(QObject* parent)  //
   _SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Set Studio");
   _SET_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Input and set studio for json files under current path")  //
                               .arg(_SET_STUDIO->text(), _SET_STUDIO->shortcut().toString()));
-  _CONSTRUCT_STUDIO_CAST = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_LIST_FILE"), "Construct Studio/Cast");
+  _CONSTRUCT_STUDIO_CAST = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_LIST_FILE"), "Reconstruct Studio/Cast");
   _CONSTRUCT_STUDIO_CAST->setToolTip(QString("<b>%1 (%2)</b><br/>Construct and StudioCast key-value pair for json files under current path."
                                              "If studio/cast value is non-empty, skip it.")
                                          .arg(_CONSTRUCT_STUDIO_CAST->text(), _CONSTRUCT_STUDIO_CAST->shortcut().toString()));
-  _CLR_PERFORMERS_STUDIO_VALUE = new (std::nothrow) QAction("Clear Studio/Cast values");
-  _CLR_PERFORMERS_STUDIO_VALUE->setToolTip(QString("<b>%1 (%2)</b><br/>Clear both performers and studio values for json files under current path.")
-                                               .arg(_CLR_PERFORMERS_STUDIO_VALUE->text(), _CLR_PERFORMERS_STUDIO_VALUE->shortcut().toString()));
+  _RE_STUDIO_CAST_VALUE = new (std::nothrow) QAction{"Reconstruct Studio/Cast values"};
+  _RE_STUDIO_CAST_VALUE->setToolTip(QString("<b>%1 (%2)</b><br/>Reconstruct both Cast and Studio values for json files under current path.")  //
+                                        .arg(_RE_STUDIO_CAST_VALUE->text())                                                                   //
+                                        .arg(_RE_STUDIO_CAST_VALUE->shortcut().toString()));
   _STANDARDLIZE_JSON_KEY = new (std::nothrow) QAction("Standardlize Json Key");
   _BATCH_EDIT_TOOL_ACTIONS = new (std::nothrow) QActionGroup(this);
 
@@ -151,7 +152,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)  //
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_APPEND_PERFORMERS);
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_SET_STUDIO);
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_CONSTRUCT_STUDIO_CAST);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_CLR_PERFORMERS_STUDIO_VALUE);
+  _BATCH_EDIT_TOOL_ACTIONS->addAction(_RE_STUDIO_CAST_VALUE);
   _BATCH_EDIT_TOOL_ACTIONS->addAction(_STANDARDLIZE_JSON_KEY);
 }
 

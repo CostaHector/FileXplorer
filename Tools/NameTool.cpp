@@ -10,6 +10,7 @@ const QString NameTool::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
 
 constexpr char NameTool::CSV_COMMA;
+const QRegularExpression NameTool::CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 
 QStringList NameTool::operator()(const QString& s) const {
   QStringList ans;
@@ -117,7 +118,6 @@ bool NameTool::ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fT
   return true;
 }
 
-const QRegularExpression CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 QStringList NameTool::CastTagSentenceParse2Lst(const QString& sentense, bool bElementUnique) {
   if (sentense.isEmpty()) {
     return {};

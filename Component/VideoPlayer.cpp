@@ -2,7 +2,7 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Component/Notificator.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
 #include "public/MemoryKey.h"
 #include "public/PathTool.h"
@@ -266,7 +266,7 @@ void VideoPlayer::setUrl(const QUrl& url) {
     const QString& vidsPath = url.toLocalFile();
     setWindowFilePath(vidsPath);
     const QString& jsonPath = PATHTOOL::FileExtReplacedWithJson(vidsPath);
-    m_dict = JsonFileHelper::MovieJsonLoader(jsonPath);
+    m_dict = JsonHelper::MovieJsonLoader(jsonPath);
   } else {
     m_dict.clear();
   }
@@ -461,7 +461,7 @@ bool VideoPlayer::onMarkHotScenes() {
 
   QList<QVariant> hotVariantList(m_hotSceneList.cbegin(), m_hotSceneList.cend());
   m_dict.insert(ENUM_TO_STRING(Hot), hotVariantList);
-  bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
+  bool dumpRet = JsonHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Mark result: %d", dumpRet);
   return dumpRet;
 }
@@ -535,7 +535,7 @@ auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {
   }
   int score = checkedAction->text().back().toLatin1() - '0';
   m_dict.insert(ENUM_TO_STRING(Rate), score);
-  bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
+  bool dumpRet = JsonHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Rate result: %d", dumpRet);
   return dumpRet;
 }
