@@ -101,18 +101,22 @@ void SortedUniqueStrContainer::insertBatch_GT_5(const QStringList& newItems) {
 }
 
 bool SortedUniqueStrContainer::remove(const QString& target) {
-  if (!m_set.contains(target)) {
+  auto targetIt = m_set.find(target);
+  if (targetIt == m_set.end()) {
     return false;
   }
-
-  auto it = std::lower_bound(m_sortedCache.begin(), m_sortedCache.end(), target);
-  if (it != m_sortedCache.end() && *it == target) {
-    m_sortedCache.erase(it);
-    m_set.remove(target);
-    mJoinCalled = false;
-    return true;
+  mJoinCalled = false;
+  m_set.erase(targetIt);
+  if (m_sortedCache.size() > 5) {
+    auto it = std::lower_bound(m_sortedCache.begin(), m_sortedCache.end(), target);
+    if (it != m_sortedCache.end() && *it == target) {
+      m_sortedCache.erase(it);
+      return true;
+    }
+  } else {
+    m_sortedCache.removeOne(target);
   }
-  qWarning("m_set and m_sortedCache not correspond");
+  qWarning("[Error] m_set and m_sortedCache not correspond.");
   return false;
 }
 
