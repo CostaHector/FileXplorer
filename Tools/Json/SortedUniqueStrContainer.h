@@ -34,7 +34,7 @@ class SortedUniqueStrContainer {
     m_sortedCache.clear();
   }
 
-  QStringList toSortedList() const { return m_sortedCache; }
+  const QStringList& toSortedList() const { return m_sortedCache; }
   const QString& join() const;
 
   int count() const { return m_set.size(); }
