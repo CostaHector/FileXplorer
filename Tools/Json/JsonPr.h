@@ -14,7 +14,7 @@ struct JsonPr {
   QString jsonFileName;
 
 // Json Key and Value
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef) decltype(enhanceDef) m_##enu = enhanceDef;
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer) decltype(enhanceDefVal) m_##enu = enhanceDefVal;
   JSON_MODEL_FIELD_MAPPING
 #undef JSON_KEY_ITEM
 
