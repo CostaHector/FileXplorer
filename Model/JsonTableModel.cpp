@@ -1,6 +1,8 @@
 #include "JsonTableModel.h"
 #include "public/PublicVariable.h"
 #include "Tools/NameTool.h"
+#include "Tools/Json/DataFormatter.h"
+#include <QBrush>
 #include <QDir>
 #include <QDirIterator>
 
@@ -17,78 +19,60 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   const auto& item = mCachedJsons[index.row()];
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef) \
-  case enu:                                      \
-    return item.m_##enu;
-      JSON_MODEL_FIELD_MAPPING
-#undef JSON_KEY_ITEM
-      default:
-        return {};
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer) \
+  case enu:                                                      \
+    return format(item.m_##enu);  //
+      JSON_MODEL_FIELD_MAPPING    //
+#undef JSON_KEY_ITEM              //
+          default : return {};
     }
   }
   return {};
 }
 
 QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
-  if (role == Qt::TextAlignmentRole) {
-    if (orientation == Qt::Vertical) {
-      return Qt::AlignRight;
-    }
-  }
-  if (role == Qt::DisplayRole) {
-    if (orientation == Qt::Orientation::Vertical) {
-      return section + 1;
-    } else {
+  switch (role) {
+    case Qt::DisplayRole: {
+      if (orientation == Qt::Orientation::Vertical) {
+        return section + 1;
+      }
       return JsonKey::JSON_KEY_IND_2_NAME[section];
+    }
+    case Qt::TextAlignmentRole: {
+      if (orientation == Qt::Vertical) {
+        return Qt::AlignRight;
+      }
+      break;
+    }
+    case Qt::ForegroundRole: {
+      if (orientation == Qt::Vertical && m_modifiedRows.contains(section)) {
+        return QBrush(Qt::GlobalColor::red);
+      }
+      break;
     }
   }
   return QAbstractTableModel::headerData(section, orientation, role);
 }
 
 bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (index.column() == JsonKey::Prepath) {  // ignore it
+    return false;
+  }
   if (role == Qt::EditRole) {
+    auto& item = mCachedJsons[index.row()];
     switch (index.column()) {
-      case JsonKey::Cast: {
-        QString newCast = value.toString();
-        if (mCachedJsons[index.row()].m_Cast.join() == newCast) {
-          return true;
-        }
-        mCachedJsons[index.row()].m_Cast.setBatchFromSentence(newCast);
-        break;
-      }
-      case JsonKey::Studio: {
-        QString newStudio = value.toString();
-        if (mCachedJsons[index.row()].m_Studio == newStudio) {
-          return true;
-        }
-        mCachedJsons[index.row()].m_Studio.swap(newStudio);
-        break;
-      }
-      case JsonKey::Tags: {
-        QString newTags = value.toString();
-        if (mCachedJsons[index.row()].m_Tags.join() == newTags) {
-          return true;
-        }
-        mCachedJsons[index.row()].m_Tags.setBatchFromSentence(newTags);
-        break;
-      }
-      case JsonKey::Rate: {
-        int newRate = value.toInt();
-        if (mCachedJsons[index.row()].m_Rate == newRate) {
-          return true;
-        }
-        mCachedJsons[index.row()].m_Rate = newRate;
-        break;
-      }
-      case JsonKey::Detail: {
-        QString newDetail = value.toString();
-        if (mCachedJsons[index.row()].m_Detail == newDetail) {
-          return true;
-        }
-        mCachedJsons[index.row()].m_Detail.swap(newDetail);
-        break;
-      }
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer) \
+  case enu: {                                                    \
+    if (!writer(item.m_##enu, value)) {                          \
+      return false;                                              \
+    }                                                            \
+    break;                                                       \
+  }
+      JSON_MODEL_FIELD_MAPPING  //
+#undef JSON_KEY_ITEM            //
+          default : return false;
     }
+    setModified(index.row(), true);
     emit dataChanged(index, index, {Qt::DisplayRole});
   }
   return QAbstractItemModel::setData(index, value, role);
@@ -141,4 +125,13 @@ int JsonTableModel::AppendADirectory(const QString& path) {
   std::move(appendCachedJsons.begin(), appendCachedJsons.end(), std::back_inserter(mCachedJsons));
   RowsCountEndChange();
   return afterRowCnt;
+}
+
+void JsonTableModel::setModified(int row, bool modified) {
+  if (modified) {
+    m_modifiedRows.insert(row);
+  } else {
+    m_modifiedRows.remove(row);
+  }
+  emit headerDataChanged(Qt::Vertical, row, row);
 }
