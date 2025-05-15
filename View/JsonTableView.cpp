@@ -1,4 +1,5 @@
 #include "JsonTableView.h"
+#include <QHeaderView>
 
 JsonTableView::JsonTableView(QWidget* parent)     //
     : CustomTableView{"JSON_TABLE_VIEW", parent}  //
