@@ -1,25 +1,25 @@
-#include "SortedUniqueStrContainer.h"
+#include "SortedUniqStrLst.h"
 #include "Tools/NameTool.h"
 
-SortedUniqueStrContainer::SortedUniqueStrContainer(const QString& sentence) {
+SortedUniqStrLst::SortedUniqStrLst(const QString& sentence) {
   insertBatchFromSentence(sentence);
 }
 
-SortedUniqueStrContainer::SortedUniqueStrContainer(const QStringList& initList) {
+SortedUniqStrLst::SortedUniqStrLst(const QStringList& initList) {
   insertBatch(initList);
 }
 
-void SortedUniqueStrContainer::setBatchFromSentence(const QString& sentence) {
+void SortedUniqStrLst::setBatchFromSentence(const QString& sentence) {
   clear();
   insertBatchFromSentence(sentence);
 }
 
-void SortedUniqueStrContainer::setBatch(const QStringList& list) {
+void SortedUniqStrLst::setBatch(const QStringList& list) {
   clear();
   insertBatch(list);
 }
 
-void SortedUniqueStrContainer::insertBatchFromSentence(const QString& sentence) {
+void SortedUniqStrLst::insertBatchFromSentence(const QString& sentence) {
   QStringList newItems = sentence.trimmed().split(NameTool::CAST_STR_SPLITTER);
   newItems.removeAll("");
   if (newItems.isEmpty()) {
@@ -29,9 +29,10 @@ void SortedUniqueStrContainer::insertBatchFromSentence(const QString& sentence) 
   insertBatch(newItems);
 }
 
-void SortedUniqueStrContainer::insertBatch(const QStringList& newItems) {
+void SortedUniqStrLst::insertBatch(const QStringList& newItems) {
   switch (newItems.size()) {
     case 0:
+      mJoinCalled = false;
       return;
     case 1:
     case 2:
@@ -48,7 +49,7 @@ void SortedUniqueStrContainer::insertBatch(const QStringList& newItems) {
   }
 }
 
-void SortedUniqueStrContainer::insertBatch_LE_3(const QStringList& list) {
+void SortedUniqStrLst::insertBatch_LE_3(const QStringList& list) {
   for (const auto& str : list) {
     auto strIt = m_set.find(str);
     if (strIt != m_set.end()) {
@@ -61,7 +62,7 @@ void SortedUniqueStrContainer::insertBatch_LE_3(const QStringList& list) {
   mJoinCalled = false;
 }
 
-void SortedUniqueStrContainer::insertBatch_LE_5(const QStringList& list) {
+void SortedUniqStrLst::insertBatch_LE_5(const QStringList& list) {
   QStringList tmp;
   tmp.reserve(list.size());
   for (const auto& str : list) {
@@ -77,7 +78,7 @@ void SortedUniqueStrContainer::insertBatch_LE_5(const QStringList& list) {
   mJoinCalled = false;
 }
 
-void SortedUniqueStrContainer::insertBatch_GT_5(const QStringList& newItems) {
+void SortedUniqStrLst::insertBatch_GT_5(const QStringList& newItems) {
   QSet<QString> newSet(newItems.begin(), newItems.end());
   newSet.subtract(m_set);
   if (newSet.isEmpty()) {
@@ -100,7 +101,7 @@ void SortedUniqueStrContainer::insertBatch_GT_5(const QStringList& newItems) {
   mJoinCalled = false;
 }
 
-bool SortedUniqueStrContainer::remove(const QString& target) {
+bool SortedUniqStrLst::remove(const QString& target) {
   auto targetIt = m_set.find(target);
   if (targetIt == m_set.end()) {
     return false;
@@ -115,12 +116,13 @@ bool SortedUniqueStrContainer::remove(const QString& target) {
     }
   } else {
     m_sortedCache.removeOne(target);
+    return true;
   }
   qWarning("[Error] m_set and m_sortedCache not correspond.");
   return false;
 }
 
-const QString& SortedUniqueStrContainer::join() const {
+const QString& SortedUniqStrLst::join() const {
   if (!mJoinCalled) {
     mAnsCSV = m_sortedCache.join(NameTool::CSV_COMMA);
     mJoinCalled = true;

@@ -3,21 +3,26 @@
 
 #include <QVariantHash>
 #include "JsonKey.h"
-#include "SortedUniqueStrContainer.h"
+#include "SortedUniqStrLst.h"
 
 using namespace JsonKey;
 struct JsonPr {
+  static JsonPr fromJsonFile(const QString& jsonAbsFile);
+
   explicit JsonPr(const QString& jsonAbsFile);
+  explicit JsonPr(const QString& filePrePath, const QString& fileName, const QJsonObject& json);
+  bool operator==(const JsonPr& rhs) const;
+
   bool Reload();
   bool WriteIntoFiles() const;
   inline QString GetAbsPath() const { return m_Prepath + '/' + jsonFileName; }
-  QString jsonFileName;
 
 // Json Key and Value
-#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer) decltype(enhanceDefVal) m_##enu = enhanceDefVal;
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) decltype(enhanceDefVal) m_##enu = enhanceDefVal;
   JSON_MODEL_FIELD_MAPPING
 #undef JSON_KEY_ITEM
 
+  QString jsonFileName;
   mutable QString hintCast;
   mutable QString hintStudio;
 

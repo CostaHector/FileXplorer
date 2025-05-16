@@ -141,7 +141,7 @@ class CastManagerTest : public MyTestSuite {
     using namespace JsonKey;
     const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonAbsFile);
 
-    const auto studioIt = dict.constFind(ENUM_TO_STRING(Studio));
+    const auto studioIt = dict.constFind(ENUM_2_STR(Studio));
     QVERIFY(studioIt != dict.cend());
     const QString& studioName{"StudioNotExist"};
     // studio not exist, studionotexist => StudioNotExist
@@ -149,7 +149,7 @@ class CastManagerTest : public MyTestSuite {
                                             {"studio not exist", "StudioNotExist"}};
     QCOMPARE(studioIt.value().toString(), studioName);
 
-    const auto castIt = dict.constFind(ENUM_TO_STRING(Cast));
+    const auto castIt = dict.constFind(ENUM_2_STR(Cast));
     QVERIFY(castIt != dict.cend());
     const QStringList& castLst{"Cast1NotExist", "Cast2NotExist"};
     QSet<QString> expectCastSet{"cast1notexist", "cast2notexist"};

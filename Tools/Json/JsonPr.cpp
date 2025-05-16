@@ -11,12 +11,36 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include "DataFormatter.h"
+
+JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
+  QString prepath;
+  QString jsonFileName = PATHTOOL::GetPrepathAndFileName(jsonAbsFile, prepath);
+  const auto& json = JsonHelper::GetJsonObject(jsonAbsFile);
+  return JsonPr{prepath, jsonFileName, json};
+}
 
 JsonPr::JsonPr(const QString& jsonAbsFile) {  //
   QString prepath;
   jsonFileName = PATHTOOL::GetPrepathAndFileName(jsonAbsFile, prepath);
   m_Prepath.swap(prepath);
   Reload();
+}
+
+JsonPr::JsonPr(const QString& filePrePath, const QString& fileName, const QJsonObject& json)  //
+    : m_Prepath{filePrePath},                                                                 //
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) m_##enu{initer(json, ENUM_2_STR(enu), defValue)},
+      JSON_FILE_KEY_MAPPING
+#undef JSON_KEY_ITEM
+      jsonFileName{fileName} {  //
+}
+
+bool JsonPr::operator==(const JsonPr& rhs) const {
+  return
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) m_##enu == rhs.m_##enu&&
+      JSON_FILE_KEY_MAPPING
+#undef JSON_KEY_ITEM
+          jsonFileName == rhs.jsonFileName;
 }
 
 bool JsonPr::Reload() {
@@ -26,78 +50,9 @@ bool JsonPr::Reload() {
     return false;
   }
   const auto& json = JsonHelper::GetJsonObject(absPth);
-
-  auto it = json.constFind(ENUM_TO_STRING(Name));
-  if (it != json.constEnd()) {
-    m_Name = it->toString();
-  }
-
-  // 1. standardlize Performer=>Cast
-  it = json.constFind(ENUM_TO_STRING(CAST));
-  if (it != json.constEnd()) {
-    m_Cast.setBatch(it->toVariant().toStringList());
-  } else {
-    const auto performerIter = json.constFind(ENUM_TO_STRING(Performers));
-    if (performerIter != json.constEnd()) {
-      m_Cast.setBatch(performerIter->toVariant().toStringList());
-    }
-  }
-
-  // 2. standardlize ProductionStudio=>Studio
-  it = json.constFind(ENUM_TO_STRING(Studio));
-  if (it != json.constEnd()) {
-    m_Studio = it->toString();
-  } else {
-    const auto performerIter = json.constFind("ProductionStudio");
-    if (performerIter != json.constEnd()) {
-      m_Studio = performerIter->toString();
-    }
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Tags));
-  if (it != json.constEnd()) {
-    m_Tags.setBatch(it->toVariant().toStringList());
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Detail));
-  if (it != json.constEnd()) {
-    m_Detail = it->toString();
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Uploaded));
-  if (it != json.constEnd()) {
-    m_Uploaded = it->toString();
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Rate));
-  if (it != json.constEnd()) {
-    m_Rate = it->toInt();
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Size));
-  if (it != json.constEnd()) {
-    m_Size = it->toInt();
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Resolution));
-  if (it != json.constEnd()) {
-    m_Resolution = it->toString();
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Bitrate));
-  if (it != json.constEnd()) {
-    m_Bitrate = it->toString();
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Hot));
-  if (it != json.constEnd()) {
-    m_Hot.setBatch(it->toVariant().toStringList());
-  }
-
-  it = json.constFind(ENUM_TO_STRING(Duration));
-  if (it != json.constEnd()) {
-    m_Bitrate = it->toInt();
-  }
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) m_##enu = initer(json, ENUM_2_STR(enu), defValue);
+  JSON_FILE_KEY_MAPPING
+#undef JSON_KEY_ITEM
   return true;
 }
 
@@ -107,18 +62,10 @@ bool JsonPr::WriteIntoFiles() const {
     return false;
   }
   QJsonObject json;
-  json[ENUM_TO_STRING(Name)] = m_Name;
-  json[ENUM_TO_STRING(Cast)] = QJsonArray::fromStringList(m_Cast.toSortedList());
-  json[ENUM_TO_STRING(Studio)] = m_Studio;
-  json[ENUM_TO_STRING(Tags)] = QJsonArray::fromStringList(m_Tags.toSortedList());
-  json[ENUM_TO_STRING(Detail)] = m_Detail;
-  json[ENUM_TO_STRING(Uploaded)] = m_Uploaded;
-  json[ENUM_TO_STRING(Rate)] = m_Rate;
-  json[ENUM_TO_STRING(Size)] = m_Size;
-  json[ENUM_TO_STRING(Resolution)] = m_Resolution;
-  json[ENUM_TO_STRING(Bitrate)] = m_Bitrate;
-  json[ENUM_TO_STRING(Hot)] = QJsonArray::fromStringList(m_Hot.toSortedList());
-  json[ENUM_TO_STRING(Duration)] = m_Duration;
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) jsonWriter(json, ENUM_2_STR(enu), m_##enu);
+  JSON_FILE_KEY_MAPPING
+#undef JSON_KEY_ITEM
+
   const QByteArray& ba = QJsonDocument(json).toJson(QJsonDocument::Indented);
   return ByteArrayWriter(jsonPath, ba);
 }
@@ -214,7 +161,7 @@ bool JsonPr::SetStudio(const QString& studio) {
 }
 
 bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP_MODE fieldMode) {
-  SortedUniqueStrContainer* p2Lst{nullptr};
+  SortedUniqStrLst* p2Lst{nullptr};
   switch (fieldType) {
     case FIELD_OP_TYPE::CAST:
       p2Lst = &m_Cast;
