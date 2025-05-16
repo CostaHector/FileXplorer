@@ -327,9 +327,9 @@ QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query)
   }
   QStringList vidPath;
   while (query.next()) {
-    vidPath << PATHTOOL::Path3Join(query.value(ENUM_TO_STRING(PrePathLeft)).toString(),   //
-                                   query.value(ENUM_TO_STRING(PrePathRight)).toString(),  //
-                                   query.value(ENUM_TO_STRING(Name)).toString());
+    vidPath << PATHTOOL::Path3Join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
+                                   query.value(ENUM_2_STR(PrePathRight)).toString(),  //
+                                   query.value(ENUM_2_STR(Name)).toString());
   }
   qDebug("%d records finded", vidPath.size());
   return vidPath;

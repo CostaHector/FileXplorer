@@ -69,11 +69,11 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
     return false;
   }
   QVariantHash& dict = *p_dict;
-  if (!dict.contains(ENUM_TO_STRING(Cast))) {
+  if (!dict.contains(ENUM_2_STR(Cast))) {
     return false;
   }
   const QString& perfs = text();
-  dict[ENUM_TO_STRING(Cast)] = NameTool()(perfs);
+  dict[ENUM_2_STR(Cast)] = NameTool()(perfs);
   return JsonHelper::DumpJsonDict(dict, jsonFilePath);
 }
 
@@ -85,7 +85,7 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
     return false;
   }
   setWindowFilePath(jsonFilePath);
-  auto castIt = dict.constFind(ENUM_TO_STRING(Cast));
+  auto castIt = dict.constFind(ENUM_2_STR(Cast));
   if (castIt == dict.cend()) {
     qDebug("No cast key in json[%s]", qPrintable(jsonFilePath));
     return false;

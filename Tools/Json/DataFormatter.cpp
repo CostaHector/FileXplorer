@@ -1,10 +1,18 @@
 #include "DataFormatter.h"
-#include "SortedUniqueStrContainer.h"
+#include "SortedUniqStrLst.h"
+#include "Tools/NameTool.h"
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
 
 namespace DataFormatter {
 
-QVariant formatDefault(const QVariant& v) {  //
+const QVariant& formatDefault(const QVariant& v) {  //
   return v;
+}
+
+QString formatFloat2Prec(float value) {  //
+  return QString::number(value, 'f', 2);
 }
 
 bool writeQString(QString& dst, const QVariant& src) {
@@ -42,11 +50,58 @@ bool writeDouble(double& dst, const QVariant& src) {
   return true;
 }
 
-const QString& formatSortedLst(const SortedUniqueStrContainer& container) {
+QString initQString(const QJsonObject& json, const QString& key, const QString& defaultValue) {
+  return json.value(key).toString(defaultValue);
+}
+
+int initInt(const QJsonObject& json, const QString& key, const int& defaultValue) {
+  return json.value(key).toInt(defaultValue);
+}
+
+QStringList initQStringLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue) {
+  auto it = json.constFind(key);
+  return it == json.constEnd() ? defaultValue : it->toVariant().toStringList();
+}
+
+SortedUniqStrLst initSortedLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue) {
+  auto it = json.constFind(key);
+  QStringList values{it == json.constEnd() ? defaultValue : it->toVariant().toStringList()};
+  SortedUniqStrLst ans{values};
+  return ans;
+}
+
+SortedUniqStrLst initCastSortedLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue) {
+  // 1. standardlize Performer=>Cast
+  auto it = json.constFind(key);
+  if (it != json.constEnd()) {
+    return SortedUniqStrLst{it->toVariant().toStringList()};
+  }
+  const auto performerIter = json.constFind("Performers");
+  if (performerIter != json.constEnd()) {
+    return SortedUniqStrLst{performerIter->toVariant().toStringList()};
+  }
+  return SortedUniqStrLst{defaultValue};
+}
+
+QString initStudioQString(const QJsonObject& json, const QString& key, const QString& defaultValue) {
+  // 2. standardlize ProductionStudio=>Studio
+  auto it = json.constFind(key);
+  if (it != json.constEnd()) {
+    return it->toString();
+  } else {
+    const auto performerIter = json.constFind("ProductionStudio");
+    if (performerIter != json.constEnd()) {
+      return performerIter->toString();
+    }
+  }
+  return defaultValue;
+}
+
+const QString& formatSortedLst(const SortedUniqStrLst& container) {
   return container.join();
 }
 
-bool writeSortedLst(SortedUniqueStrContainer& container, const QVariant& src) {
+bool writeSortedLst(SortedUniqStrLst& container, const QVariant& src) {
   QString newTags = src.toString();
   if (container.join() == newTags) {
     return false;
@@ -55,9 +110,23 @@ bool writeSortedLst(SortedUniqueStrContainer& container, const QVariant& src) {
   return true;
 }
 
+QString formatQStringLst(const QStringList& container) {
+  return container.join(NameTool::CSV_COMMA);
+}
+
+bool writeQStringLst(QStringList& container, const QVariant& src) {
+  QStringList newTags = src.toString().split(NameTool::CSV_COMMA);
+  if (container == newTags) {
+    return false;
+  }
+  container.swap(newTags);
+  return true;
+}
+
 QString formatGender(Gender gen) {  //
   return (gen == Gender::male) ? "male" : "female";
 }
+
 bool writeGender(Gender& dst, const QVariant& src) {
   QString srcStr{src.toString()};
   Gender srcValue{srcStr == "male" ? Gender::male : Gender::female};
@@ -69,8 +138,9 @@ bool writeGender(Gender& dst, const QVariant& src) {
 }
 
 QString formatPhoneNumber(const QString& phone) {
-  if (phone.length() < 11)
+  if (phone.length() < 11) {
     return phone;
+  }
   return QString("%1-%2-%3-%4").arg(phone.left(2)).arg(phone.mid(2, 3)).arg(phone.mid(5, 4)).arg(phone.mid(9, 4));
 }
 bool writePhoneNumber(QString& dst, const QVariant& src) {
@@ -82,9 +152,6 @@ bool writePhoneNumber(QString& dst, const QVariant& src) {
   dst.swap(srcStr);
   return true;
 }
-QString formatFloat(float value) {  //
-  return QString::number(value, 'f', 2);
-}
 
 QString formatRateAnnual(const QList<char>& rates) {
   if (rates.isEmpty()) {
@@ -93,9 +160,10 @@ QString formatRateAnnual(const QList<char>& rates) {
   QString s;
   s.reserve(rates.size() * 2);
   for (char c : rates) {
-    s += ',';
     s += c;
+    s += ',';
   }
+  s.chop(1);
   return s;
 }
 
@@ -148,4 +216,40 @@ bool writeBool(bool& dst, const QVariant& src) {  //
   std::swap(dst, srcValue);
   return true;
 }
+
+void writeJsonObjectInt(QJsonObject& json, const QString& key, const int& val) {
+  json[key] = val;
+}
+void writeJsonObjectFloat(QJsonObject& json, const QString& key, const float& val) {
+  json[key] = val;
+}
+void writeJsonObjectDouble(QJsonObject& json, const QString& key, const double& val) {
+  json[key] = val;
+}
+void writeJsonObjectBool(QJsonObject& json, const QString& key, const bool& val) {
+  json[key] = val;
+}
+void writeJsonObjectQString(QJsonObject& json, const QString& key, const QString& val) {
+  json[key] = val;
+}
+void writeJsonObjectQStringLst(QJsonObject& json, const QString& key, const QStringList& val) {
+  json[key] = QJsonArray::fromStringList(val);
+}
+
+void writeJsonObjectQIntList(QJsonObject& json, const QString& key, const QList<int>& val) {
+  QJsonArray ja;
+  for (auto ele : val) {
+    ja.append(ele);
+  }
+  json[key] = ja;
+}
+
+void writeJsonObjectDefault(QJsonObject& json, const QString& key, const QVariant& val) {  //
+  json[key] = QJsonValue::fromVariant(val);
+}
+
+void writeJsonObjectSortedStrLst(QJsonObject& json, const QString& key, const SortedUniqStrLst& val) {
+  json[key] = QJsonArray::fromStringList(val.toSortedList());
+}
+
 };  // namespace DataFormatter

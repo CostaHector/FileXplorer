@@ -94,7 +94,7 @@ class FdBasedDbTest : public MyTestSuite {
 
     // total count = 8
     using namespace MOVIE_TABLE;
-    const QString qryWhereClause{QString(R"(`%1` like "%.mp4")").arg(ENUM_TO_STRING(Name))};
+    const QString qryWhereClause{QString(R"(`%1` like "%.mp4")").arg(ENUM_2_STR(Name))};
     QCOMPARE(dbManager.CountRow("VOLUME_E", qryWhereClause), 5);  // 5 *.mp4 removed
     QCOMPARE(dbManager.DeleteByWhereClause("VOLUME_E", qryWhereClause), 5);
     QCOMPARE(dbManager.CountRow("VOLUME_E"), 1);  // 1 *.mkv left
@@ -132,7 +132,7 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(adtRet.updateCnt, 0);
     // Also Check file name should only contain beforeMKVFileName
     QSet<QString> oldActualNames;
-    QVERIFY(dbManager.QueryPK("VOLUME_E", ENUM_TO_STRING(Name), oldActualNames));
+    QVERIFY(dbManager.QueryPK("VOLUME_E", ENUM_2_STR(Name), oldActualNames));
     QVERIFY(oldActualNames.contains(beforeMKVFileName));
     QVERIFY(!oldActualNames.contains(afterMKVFileName));
 
@@ -152,7 +152,7 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.CountRow("VOLUME_E"), 6);
     // Also Check file name should also sync to new one afterMKVFileName
     QSet<QString> newActualNames;
-    QVERIFY(dbManager.QueryPK("VOLUME_E", ENUM_TO_STRING(Name), newActualNames));
+    QVERIFY(dbManager.QueryPK("VOLUME_E", ENUM_2_STR(Name), newActualNames));
     QVERIFY(!newActualNames.contains(beforeMKVFileName));
     QVERIFY(newActualNames.contains(afterMKVFileName));
 
@@ -231,8 +231,8 @@ class FdBasedDbTest : public MyTestSuite {
     const QString updateCmd{                                                                              //
                             QString{R"(UPDATE %1 SET `%2` = "Henry Cavill, Chris Evans", `%3` = 6000;)"}  // Atension, here we write ", " in purpose
                                 .arg("VOLUME_E")                                                          //
-                                .arg(ENUM_TO_STRING(Cast))                                         //
-                                .arg(ENUM_TO_STRING(Duration))};
+                                .arg(ENUM_2_STR(Cast))                                         //
+                                .arg(ENUM_2_STR(Duration))};
     QCOMPARE(dbManager.UpdateForTest(updateCmd), vids.size());
     QCOMPARE(dbManager.ExportDurationStudioCastTagsToJson("VOLUME_E"), vids.size());
     QVERIFY(dir.exists(MKV_FILENAME));
@@ -242,8 +242,8 @@ class FdBasedDbTest : public MyTestSuite {
     const QStringList expectCastLst{"Henry Cavill", " Chris Evans"};  // Atension,  here we use ',' to seperate not ", "
     const QStringList notExpectCastLst{"Henry Cavill", "Chris Evans"};
     const auto& dict = MovieJsonLoader(dir.absoluteFilePath(JSON_FILENAME));
-    QCOMPARE(dict.value(ENUM_TO_STRING(Cast)).toStringList(), expectCastLst);
-    QVERIFY(dict.value(ENUM_TO_STRING(Cast)).toStringList() != notExpectCastLst);
+    QCOMPARE(dict.value(ENUM_2_STR(Cast)).toStringList(), expectCastLst);
+    QVERIFY(dict.value(ENUM_2_STR(Cast)).toStringList() != notExpectCastLst);
   }
 
   void test_UpdateStudioCastTagsByJson() {
@@ -280,17 +280,17 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
     // json studio not exits, but performers/tags not exist
-    QVariantHash keyValueNotFull{{ENUM_TO_STRING(Studio), ""},                                             //
-                                 {ENUM_TO_STRING(Cast), QStringList{"Chris Pine", "Henry Cavill"}},  //
-                                 {ENUM_TO_STRING(Tags), QStringList{"Action", "Science"}}};
+    QVariantHash keyValueNotFull{{ENUM_2_STR(Studio), ""},                                             //
+                                 {ENUM_2_STR(Cast), QStringList{"Chris Pine", "Henry Cavill"}},  //
+                                 {ENUM_2_STR(Tags), QStringList{"Action", "Science"}}};
     QVERIFY(DumpJsonDict(keyValueNotFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 0);
 
     // json studio/performers/tags all exists
-    QVariantHash keyFull{{ENUM_TO_STRING(Studio), "HongMeng"},
-                         {ENUM_TO_STRING(Cast), QStringList{"Chris Evans", "Henry Cavill"}},  //
-                         {ENUM_TO_STRING(Tags), QStringList{"Action", "Science"}}};
+    QVariantHash keyFull{{ENUM_2_STR(Studio), "HongMeng"},
+                         {ENUM_2_STR(Cast), QStringList{"Chris Evans", "Henry Cavill"}},  //
+                         {ENUM_2_STR(Tags), QStringList{"Action", "Science"}}};
     QVERIFY(DumpJsonDict(keyFull, JSON_ABS_PATH));
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 1);
