@@ -10,26 +10,44 @@ enum class Gender : int {
   female,
 };
 
-class SortedUniqueStrContainer;
+class SortedUniqStrLst;
 
 namespace DataFormatter {
 
-QVariant formatDefault(const QVariant& v);
+const QVariant& formatDefault(const QVariant& v);
+QString formatFloat2Prec(float value);
+
 bool writeQString(QString& dst, const QVariant& src);
 bool writeInt(int& dst, const QVariant& src);
 bool writeFloat(float& dst, const QVariant& src);
 bool writeDouble(double& dst, const QVariant& src);
+QString initQString(const QJsonObject& json, const QString& key, const QString& defaultValue);
+QString initStudioQString(const QJsonObject& json, const QString& key, const QString& defaultValue);
+int initInt(const QJsonObject& json, const QString& key, const int& defaultValue);
+QStringList initQStringLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue);
+SortedUniqStrLst initSortedLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue);
+SortedUniqStrLst initCastSortedLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue);
+void writeJsonObjectInt(QJsonObject& json, const QString& key, const int& val);
+void writeJsonObjectFloat(QJsonObject& json, const QString& key, const float& val);
+void writeJsonObjectDouble(QJsonObject& json, const QString& key, const double& val);
+void writeJsonObjectBool(QJsonObject& json, const QString& key, const bool& val);
+void writeJsonObjectQString(QJsonObject& json, const QString& key, const QString& val);
+void writeJsonObjectQStringLst(QJsonObject& json, const QString& key, const QStringList& val);
+void writeJsonObjectQIntList(QJsonObject& json, const QString& key, const QList<int>& val);
+void writeJsonObjectDefault(QJsonObject& json, const QString& key, const QVariant& val);
+void writeJsonObjectSortedStrLst(QJsonObject& json, const QString& key, const SortedUniqStrLst& val);
 
-const QString& formatSortedLst(const SortedUniqueStrContainer& container);
-bool writeSortedLst(SortedUniqueStrContainer& container, const QVariant& src);
+const QString& formatSortedLst(const SortedUniqStrLst& container);
+bool writeSortedLst(SortedUniqStrLst& container, const QVariant& src);
+
+QString formatQStringLst(const QStringList& container);
+bool writeQStringLst(QStringList& container, const QVariant& src);
 
 QString formatGender(Gender gen);
 bool writeGender(Gender& dst, const QVariant& src);
 
 QString formatPhoneNumber(const QString& phone);
 bool writePhoneNumber(QString& dst, const QVariant& src);
-
-QString formatFloat(float value);
 
 QString formatRateAnnual(const QList<char>& rates);
 bool writeRateAnnual(QList<char>& dst, const QVariant& src);

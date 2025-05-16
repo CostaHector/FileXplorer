@@ -19,7 +19,7 @@
 namespace DictEditOperator {
 
 bool ReCastAndStudio::operator()(QVariantHash& jsonDict) const {
-  auto nameIt = jsonDict.constFind(ENUM_TO_STRING(Name));
+  auto nameIt = jsonDict.constFind(ENUM_2_STR(Name));
   if (nameIt == jsonDict.cend()) {
     // json not contains key "Name", no need process
     return false;
@@ -29,7 +29,7 @@ bool ReCastAndStudio::operator()(QVariantHash& jsonDict) const {
 
   const QString& name = nameIt->toString();
   bool changed = false;
-  auto perfIt = jsonDict.find(ENUM_TO_STRING(Cast));
+  auto perfIt = jsonDict.find(ENUM_2_STR(Cast));
   if (perfIt != jsonDict.end()) {
     const QStringList cast = pm(name);
     if (cast != perfIt->toStringList()) {
@@ -38,7 +38,7 @@ bool ReCastAndStudio::operator()(QVariantHash& jsonDict) const {
     }
   }
 
-  auto studioIt = jsonDict.find(ENUM_TO_STRING(Studio));
+  auto studioIt = jsonDict.find(ENUM_2_STR(Studio));
   if (studioIt != jsonDict.end()) {
     const QString studio{psm(name)};
     if (studio != studioIt->toString()) {
@@ -50,7 +50,7 @@ bool ReCastAndStudio::operator()(QVariantHash& jsonDict) const {
 }
 
 bool ConstructStudioCastByName::operator()(QVariantHash& jsonDict) const {
-  auto nameIt = jsonDict.constFind(ENUM_TO_STRING(Name));
+  auto nameIt = jsonDict.constFind(ENUM_2_STR(Name));
   if (nameIt == jsonDict.cend()) {
     // json not contains key "Name", no need process
     return false;
@@ -58,15 +58,15 @@ bool ConstructStudioCastByName::operator()(QVariantHash& jsonDict) const {
   bool changed = false;
   static const auto& pm = CastManager::getIns();
   const QString& name = nameIt->toString();
-  auto perfIt = jsonDict.find(ENUM_TO_STRING(Cast));
+  auto perfIt = jsonDict.find(ENUM_2_STR(Cast));
   if (perfIt == jsonDict.end() || perfIt->toStringList().isEmpty()) {
-    jsonDict.insert(ENUM_TO_STRING(Cast), pm(name));
+    jsonDict.insert(ENUM_2_STR(Cast), pm(name));
     changed = true;
   }
   static const auto& psm = StudiosManager::getIns();
-  auto studioIt = jsonDict.find(ENUM_TO_STRING(Studio));
+  auto studioIt = jsonDict.find(ENUM_2_STR(Studio));
   if (studioIt == jsonDict.end() || studioIt->toString().isEmpty()) {
-    jsonDict.insert(ENUM_TO_STRING(Studio), psm(name));
+    jsonDict.insert(ENUM_2_STR(Studio), psm(name));
     changed = true;
   }
   return changed;
@@ -77,7 +77,7 @@ AppendPerfsToDict::AppendPerfsToDict(const QString& perfsStr)  //
 {}
 
 bool AppendPerfsToDict::operator()(QVariantHash& dict) const {
-  auto perfIt = dict.find(ENUM_TO_STRING(Cast));
+  auto perfIt = dict.find(ENUM_2_STR(Cast));
   QStringList afterLst;
   afterLst += performerList;
   if (perfIt != dict.cend()) {
@@ -91,15 +91,15 @@ bool AppendPerfsToDict::operator()(QVariantHash& dict) const {
   } else {
     afterLst.sort();
     afterLst.removeDuplicates();
-    dict[ENUM_TO_STRING(Cast)] = afterLst;
+    dict[ENUM_2_STR(Cast)] = afterLst;
   }
   return true;
 }
 
 bool UpdateStudio::operator()(QVariantHash& dict) const {
-  auto studioIt = dict.find(ENUM_TO_STRING(Studio));
+  auto studioIt = dict.find(ENUM_2_STR(Studio));
   if (studioIt == dict.end()) {
-    dict[ENUM_TO_STRING(Studio)] = m_studio;
+    dict[ENUM_2_STR(Studio)] = m_studio;
     return true;
   }
   if (studioIt->toString() == m_studio) {
@@ -112,15 +112,15 @@ bool UpdateStudio::operator()(QVariantHash& dict) const {
 bool StandardlizeJsonKey::operator()(QVariantHash& jsonDict) const {
   // Studio,xperf,Cast,Tags,Rate,Hot,Duration
   bool bHasChanged{false};
-  auto it = jsonDict.find(ENUM_TO_STRING(Performers));
+  auto it = jsonDict.find(ENUM_2_STR(Performers));
   if (it != jsonDict.cend()) {
     QStringList castsLst = it->toStringList();
     jsonDict.erase(it);
-    jsonDict[ENUM_TO_STRING(Cast)] = castsLst;  // Perf removed, cast may update or not
+    jsonDict[ENUM_2_STR(Cast)] = castsLst;  // Perf removed, cast may update or not
     bHasChanged = true;
   }
-  if (jsonDict.constFind(ENUM_TO_STRING(Cast)) == jsonDict.cend()) {
-    jsonDict[ENUM_TO_STRING(Cast)] = QStringList{};  // Cast added
+  if (jsonDict.constFind(ENUM_2_STR(Cast)) == jsonDict.cend()) {
+    jsonDict[ENUM_2_STR(Cast)] = QStringList{};  // Cast added
     bHasChanged = true;
   }
 
@@ -128,27 +128,27 @@ bool StandardlizeJsonKey::operator()(QVariantHash& jsonDict) const {
   if (it != jsonDict.cend()) {
     QString studio = it->toString();
     jsonDict.erase(it);
-    jsonDict[ENUM_TO_STRING(Studio)] = studio;  // ProductionStudio replaced by studio
+    jsonDict[ENUM_2_STR(Studio)] = studio;  // ProductionStudio replaced by studio
     bHasChanged = true;
-  } else if (jsonDict.constFind(ENUM_TO_STRING(Studio)) == jsonDict.cend()) {
-    jsonDict[ENUM_TO_STRING(Studio)] = QString{};  // Studio added
+  } else if (jsonDict.constFind(ENUM_2_STR(Studio)) == jsonDict.cend()) {
+    jsonDict[ENUM_2_STR(Studio)] = QString{};  // Studio added
     bHasChanged = true;
   }
 
-  if (jsonDict.constFind(ENUM_TO_STRING(Tags)) == jsonDict.cend()) {
-    jsonDict[ENUM_TO_STRING(Tags)] = QStringList{};  // Tags added
+  if (jsonDict.constFind(ENUM_2_STR(Tags)) == jsonDict.cend()) {
+    jsonDict[ENUM_2_STR(Tags)] = QStringList{};  // Tags added
     bHasChanged = true;
   }
-  if (jsonDict.constFind(ENUM_TO_STRING(Rate)) == jsonDict.cend()) {
-    jsonDict[ENUM_TO_STRING(Rate)] = 0;  // Rate added
+  if (jsonDict.constFind(ENUM_2_STR(Rate)) == jsonDict.cend()) {
+    jsonDict[ENUM_2_STR(Rate)] = 0;  // Rate added
     bHasChanged = true;
   }
-  if (jsonDict.constFind(ENUM_TO_STRING(Hot)) == jsonDict.cend()) {
-    jsonDict[ENUM_TO_STRING(Hot)] = QVariantList{};  // Hot added
+  if (jsonDict.constFind(ENUM_2_STR(Hot)) == jsonDict.cend()) {
+    jsonDict[ENUM_2_STR(Hot)] = QVariantList{};  // Hot added
     bHasChanged = true;
   }
-  if (jsonDict.constFind(ENUM_TO_STRING(Duration)) == jsonDict.cend()) {
-    jsonDict[ENUM_TO_STRING(Duration)] = 0;  // Duration added
+  if (jsonDict.constFind(ENUM_2_STR(Duration)) == jsonDict.cend()) {
+    jsonDict[ENUM_2_STR(Duration)] = 0;  // Duration added
     bHasChanged = true;
   }
   return bHasChanged;
@@ -188,7 +188,7 @@ int SyncJsonNameValue(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    auto it = dict.find(ENUM_TO_STRING(Name));
+    auto it = dict.find(ENUM_2_STR(Name));
     if (it == dict.cend()) {
       continue;
     }
@@ -281,14 +281,14 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
 
   QHash<QString, QVariant>::iterator it;
   if (duration != 0) {
-    it = dict.find(ENUM_TO_STRING(Duration));  // here size is the duration
+    it = dict.find(ENUM_2_STR(Duration));  // here size is the duration
     if (it != dict.cend() && it->toInt() != duration) {
       it->setValue(duration);
       changed = true;
     }
   }
   if (!studio.isEmpty()) {
-    it = dict.find(ENUM_TO_STRING(Studio));
+    it = dict.find(ENUM_2_STR(Studio));
     if (it != dict.cend() && it->toString() != studio) {
       it->setValue(studio);
       changed = true;
@@ -296,7 +296,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
   }
   if (!cast.isEmpty()) {
     const QStringList& castLst = cast.split(ELEMENT_JOINER);  // casts must seperated by comma only
-    it = dict.find(ENUM_TO_STRING(Cast));                     // here cast is the Performers
+    it = dict.find(ENUM_2_STR(Cast));                     // here cast is the Performers
     if (it != dict.cend() && it->toStringList() != castLst) {
       it->setValue(castLst);
       changed = true;
@@ -304,7 +304,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
   }
   if (!tags.isEmpty()) {
     const QStringList& tagsLst = tags.split(ELEMENT_JOINER);  // tags must seperated by comma only
-    it = dict.find(ENUM_TO_STRING(Tags));
+    it = dict.find(ENUM_2_STR(Tags));
     if (it != dict.cend() && it->toStringList() != tagsLst) {
       it->setValue(tagsLst);
       changed = true;
@@ -333,15 +333,15 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = MovieJsonLoader(jsonPath);
-    const QString& studio = dict.value(ENUM_TO_STRING(Studio), "").toString();
+    const QString& studio = dict.value(ENUM_2_STR(Studio), "").toString();
     if (studio.isEmpty()) {
       continue;
     }
-    const QStringList& cast = dict.value(ENUM_TO_STRING(Cast), {}).toStringList();
+    const QStringList& cast = dict.value(ENUM_2_STR(Cast), {}).toStringList();
     if (cast.isEmpty()) {
       continue;
     }
-    const QStringList& tags = dict.value(ENUM_TO_STRING(Tags), {}).toStringList();
+    const QStringList& tags = dict.value(ENUM_2_STR(Tags), {}).toStringList();
     if (tags.isEmpty()) {
       continue;
     }
@@ -369,7 +369,7 @@ int JsonSyncKeyValueAccordingJsonFileName(const QString& path) {
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
     const QString& baseName = PATHTOOL::GetBaseName(jsonPath);
-    auto nameIt = dict.find(ENUM_TO_STRING(Name));
+    auto nameIt = dict.find(ENUM_2_STR(Name));
     if (nameIt == dict.cend() || nameIt->toString() == baseName) {
       continue;
     }

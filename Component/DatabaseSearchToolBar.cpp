@@ -45,11 +45,11 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   m_searchLE->setClearButtonEnabled(true);
   m_searchCB->setLineEdit(m_searchLE);
   using namespace MOVIE_TABLE;
-  m_searchCB->addItem(QString{R"(%1 LIKE "%")"}.arg(ENUM_TO_STRING(Name)));
-  m_searchCB->addItem(QString{R"(%1 BETWEEN 0 AND 1000000)"}.arg(ENUM_TO_STRING(Size)));
-  m_searchCB->addItem(QString{R"(%1 = "E:/")"}.arg(ENUM_TO_STRING(Driver)));
-  m_searchCB->addItem(QString{R"(%1 IN ("Comedy", "Documentary"))"}.arg(ENUM_TO_STRING(Tags)));
-  m_searchCB->addItem(QString{R"(%1 LIKES "%Chris Evans%")"}.arg(ENUM_TO_STRING(Cast)));
+  m_searchCB->addItem(QString{R"(%1 LIKE "%")"}.arg(ENUM_2_STR(Name)));
+  m_searchCB->addItem(QString{R"(%1 BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
+  m_searchCB->addItem(QString{R"(%1 = "E:/")"}.arg(ENUM_2_STR(Driver)));
+  m_searchCB->addItem(QString{R"(%1 IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
+  m_searchCB->addItem(QString{R"(%1 LIKES "%Chris Evans%")"}.arg(ENUM_2_STR(Cast)));
   m_searchCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   addWidget(m_tables);
