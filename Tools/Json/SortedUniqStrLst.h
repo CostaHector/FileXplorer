@@ -1,20 +1,23 @@
-#ifndef SORTEDUNIQUESTRCONTAINER_H
-#define SORTEDUNIQUESTRCONTAINER_H
+#ifndef SORTEDUNIQSTRLST_H
+#define SORTEDUNIQSTRLST_H
 #include "qvariant.h"
 #include <QSet>
 #include <QString>
 
-class SortedUniqueStrContainer {
+class SortedUniqStrLst {
  public:
   friend struct JsonPr;
 
   operator QVariant() const { return join(); }
 
-  SortedUniqueStrContainer() = default;
-  explicit SortedUniqueStrContainer(const QString& sentence);
-  explicit SortedUniqueStrContainer(const QStringList& initList);
-  bool operator==(const SortedUniqueStrContainer& rhs) const {  //
+  SortedUniqStrLst() = default;
+  explicit SortedUniqStrLst(const QString& sentence);
+  explicit SortedUniqStrLst(const QStringList& initList);
+  bool operator==(const SortedUniqStrLst& rhs) const {  //
     return m_set == rhs.m_set;
+  }
+  bool operator!=(const SortedUniqStrLst& rhs) const {  //
+    return !(this->operator==(rhs));
   }
 
   void setBatchFromSentence(const QString& sentence);
@@ -32,6 +35,7 @@ class SortedUniqueStrContainer {
   void clear() {
     m_set.clear();
     m_sortedCache.clear();
+    mJoinCalled = false;
   }
 
   const QStringList& toSortedList() const { return m_sortedCache; }
@@ -47,4 +51,4 @@ class SortedUniqueStrContainer {
   mutable bool mJoinCalled{false};
 };
 
-#endif  // SORTEDUNIQUESTRCONTAINER_H
+#endif  // SORTEDUNIQSTRLST_H

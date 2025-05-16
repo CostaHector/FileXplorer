@@ -94,7 +94,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonPath);
-    auto perfIt = dict.constFind(ENUM_TO_STRING(Cast));
+    auto perfIt = dict.constFind(ENUM_2_STR(Cast));
     if (perfIt == dict.cend()) {
       continue;
     }

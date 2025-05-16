@@ -28,14 +28,11 @@ class JsonPrTest : public MyTestSuite {
     }
   }
 
-  void test_construct_ok() {
+  void test_fromJsonFile() {
     // precondition
     const QFile fixedFi{fixedAbsPath};
     QCOMPARE(fixedFi.size(), 0);
-
-    // procedure
-    // 1. load from empty file
-    JsonPr jPr{fixedFi.fileName()};
+    const auto& jPr = JsonPr::fromJsonFile(fixedFi.fileName());
     QCOMPARE(jPr.m_Prepath, rootpath);
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
 
@@ -53,15 +50,34 @@ class JsonPrTest : public MyTestSuite {
     QVERIFY(jPr.m_Bitrate.isEmpty());
     QVERIFY(jPr.m_Hot.isEmpty());
     QCOMPARE(jPr.m_Duration, 0);
+    QVERIFY(jPr.m_ImgName.isEmpty());
+    QVERIFY(jPr.m_VidName.isEmpty());
+
+    JsonPr jPr2{fixedFi.fileName()};
+    QCOMPARE(jPr, jPr2);
+  }
+
+  void test_construct_ok() {
+    // precondition
+    const QFile fixedFi{fixedAbsPath};
+    QCOMPARE(fixedFi.size(), 0);
+
+    // procedure
+    // 1. load from empty file
+    JsonPr jPr{fixedFi.fileName()};
+    QCOMPARE(jPr.m_Prepath, rootpath);
+    QCOMPARE(jPr.jsonFileName, fixedJsonName);
 
     // 3. prepare a json that contains deprecated key ProductionStudio, Performers
     using namespace JsonKey;
     QVariantHash dict;
-    dict[ENUM_TO_STRING(Name)] = "SuperMan - Henry Cavill [2020]";
+    dict[ENUM_2_STR(Name)] = "SuperMan - Henry Cavill [2020]";
     dict["ProductionStudio"] = "SuperMan";
-    dict[ENUM_TO_STRING(Performers)] = QStringList{"Henry Cavill", "Chris Evans"};
-    dict[ENUM_TO_STRING(Tags)] = QStringList{"friction", "science"};
-    dict[ENUM_TO_STRING(Detail)] = "Description of SuperMan - Henry Cavill";
+    dict[ENUM_2_STR(Performers)] = QStringList{"Henry Cavill", "Chris Evans"};
+    dict[ENUM_2_STR(Tags)] = QStringList{"friction", "science"};
+    dict[ENUM_2_STR(Detail)] = "Description of SuperMan - Henry Cavill";
+    dict[ENUM_2_STR(ImgName)] = QStringList{"A 2.jpg", "A 1.jpg"};
+    dict[ENUM_2_STR(VidName)] = "A.mp4";
     QVERIFY(JsonHelper::DumpJsonDict(dict, jPr.GetAbsPath()));
 
     // Reload deprecated should be replaced by m_Studio, m_Cast in cache
@@ -71,18 +87,22 @@ class JsonPrTest : public MyTestSuite {
     QCOMPARE(jPr.m_Cast.join(), "Chris Evans,Henry Cavill");
     QCOMPARE(jPr.m_Tags.join(), "friction,science");
     QCOMPARE(jPr.m_Detail, "Description of SuperMan - Henry Cavill");
+    QCOMPARE(jPr.m_ImgName, (QStringList{"A 2.jpg", "A 1.jpg"}));
+    QCOMPARE(jPr.m_VidName, "A.mp4");
 
     // 4. Write without deprecated key ProductionStudio, Performers should ok
     // Tags/Cast/Hot should be sorted and unique before write into json file
     QVERIFY(jPr.WriteIntoFiles());
     const auto& writedJson = JsonHelper::MovieJsonLoader(jPr.GetAbsPath());
     QVERIFY(!writedJson.contains("ProductionStudio"));
-    QVERIFY(!writedJson.contains(ENUM_TO_STRING(Performers)));
-    QCOMPARE(writedJson[ENUM_TO_STRING(Name)], dict[ENUM_TO_STRING(Name)]);
-    QCOMPARE(writedJson[ENUM_TO_STRING(Studio)], dict["ProductionStudio"]);
-    QCOMPARE(writedJson[ENUM_TO_STRING(Cast)], (QStringList{"Chris Evans", "Henry Cavill"}));  // Cast should sorted
-    QCOMPARE(writedJson[ENUM_TO_STRING(Tags)], (QStringList{"friction", "science"}));          // Tags should also sorted
-    QCOMPARE(writedJson[ENUM_TO_STRING(Detail)], dict[ENUM_TO_STRING(Detail)]);
+    QVERIFY(!writedJson.contains(ENUM_2_STR(Performers)));
+    QCOMPARE(writedJson[ENUM_2_STR(Name)], dict[ENUM_2_STR(Name)]);
+    QCOMPARE(writedJson[ENUM_2_STR(Studio)], dict["ProductionStudio"]);
+    QCOMPARE(writedJson[ENUM_2_STR(Cast)], (QStringList{"Chris Evans", "Henry Cavill"}));  // Cast should sorted
+    QCOMPARE(writedJson[ENUM_2_STR(Tags)], (QStringList{"friction", "science"}));          // Tags should also sorted
+    QCOMPARE(writedJson[ENUM_2_STR(Detail)], dict[ENUM_2_STR(Detail)]);
+    QCOMPARE(writedJson[ENUM_2_STR(ImgName)], dict[ENUM_2_STR(ImgName)]);
+    QCOMPARE(writedJson[ENUM_2_STR(VidName)], dict[ENUM_2_STR(VidName)]);
   }
 
   void test_Sync_Name_value_by_Json_file_basename() {

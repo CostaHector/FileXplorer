@@ -12,14 +12,14 @@ ViewActions& g_viewActions() {
 ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   using namespace ViewTypeTool;
 
-  _ADVANCE_SEARCH_VIEW = new (std::nothrow) QAction(QIcon(":img/SEARCH"), ENUM_TO_STRING(SEARCH));
-  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/SHOW_DATABASE"), ENUM_TO_STRING(MOVIE));
-  _LIST_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), ENUM_TO_STRING(LIST));
-  _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), ENUM_TO_STRING(TABLE));
-  _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), ENUM_TO_STRING(TREE));
-  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENE_TABLE_VIEW"), ENUM_TO_STRING(SCENE));
+  _ADVANCE_SEARCH_VIEW = new (std::nothrow) QAction(QIcon(":img/SEARCH"), ENUM_2_STR(SEARCH));
+  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/SHOW_DATABASE"), ENUM_2_STR(MOVIE));
+  _LIST_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), ENUM_2_STR(LIST));
+  _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), ENUM_2_STR(TABLE));
+  _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), ENUM_2_STR(TREE));
+  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENE_TABLE_VIEW"), ENUM_2_STR(SCENE));
   _FLOATING_PREVIEW = new (std::nothrow) QAction(QIcon(":img/FLOATING_PREVIEW"), "floating preview");
-  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_APP"), ENUM_TO_STRING(CAST));
+  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_APP"), ENUM_2_STR(CAST));
   _VIEWS_AG = GetViewsAG();
 
   NAVIGATION_PANE = new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"));

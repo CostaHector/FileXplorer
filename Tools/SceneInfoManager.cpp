@@ -167,7 +167,7 @@ std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const Q
     scnContent += '\n';
     scnContent += rawJsonDict.value("VidName", "").toString();
     scnContent += '\n';
-    scnContent += QString::number(rawJsonDict.value("VidSize", 0).toULongLong());
+    scnContent += QString::number(rawJsonDict.value("Size", 0).toULongLong());
     scnContent += '\n';
     scnContent += QString::number(rawJsonDict.value("Rate", 0).toInt());
     scnContent += '\n';
@@ -296,13 +296,13 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
         jsonNeedUpdate = true;
       }
 
-      it = rawJsonDict.find("VidSize");
+      it = rawJsonDict.find("Size");
       if (it == rawJsonDict.end()) {
-        // construct VidSize
-        rawJsonDict.insert("VidSize", vidFi.size());
+        // construct Size
+        rawJsonDict.insert("Size", vidFi.size());
         jsonNeedUpdate = true;
       } else if (it.value().toLongLong() != 0) {
-        // first set VidSize
+        // first set Size
         it->setValue(vidFi.size());
         jsonNeedUpdate = true;
       }
@@ -357,7 +357,7 @@ int JsonDataRefresher::GenerateScnFiles() {
       scnContent += '\n';
       scnContent += rawJsonDict.value("VidName", "").toString();
       scnContent += '\n';
-      scnContent += QString::number(rawJsonDict.value("VidSize", 0).toULongLong());
+      scnContent += QString::number(rawJsonDict.value("Size", 0).toULongLong());
       scnContent += '\n';
       scnContent += QString::number(rawJsonDict.value("Rate", 0).toInt());
       scnContent += '\n';
