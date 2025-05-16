@@ -4,7 +4,7 @@
 JsonTableView::JsonTableView(QWidget* parent)     //
     : CustomTableView{"JSON_TABLE_VIEW", parent}  //
 {
-  mJsonModel = new JsonTableModel{this};
+  mJsonModel = new (std::nothrow) JsonTableModel{this};
   setModel(mJsonModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
 

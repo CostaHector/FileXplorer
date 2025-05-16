@@ -20,14 +20,14 @@ class JsonFileHelperTest : public MyTestSuite {
  private slots:
   void test_GetDefaultJsonFile() {
     const auto dict = GetJsonDictDefault();
-    QCOMPARE(dict[ENUM_TO_STRING(Name)].toString(), JSON_DEF_VAL_Name);
-    QCOMPARE(dict[ENUM_TO_STRING(Cast)].toStringList(), JSON_DEF_VAL_Cast);
-    QCOMPARE(dict[ENUM_TO_STRING(Studio)].toString(), JSON_DEF_VAL_Studio);
-    QCOMPARE(dict[ENUM_TO_STRING(Tags)].toStringList(), JSON_DEF_VAL_Tags);
-    QCOMPARE(dict[ENUM_TO_STRING(Rate)].toInt(), JSON_DEF_VAL_Rate);
-    QCOMPARE(dict[ENUM_TO_STRING(Size)].toInt(), JSON_DEF_VAL_Size);
-    QCOMPARE(dict[ENUM_TO_STRING(Hot)].toStringList(), JSON_DEF_VAL_Hot);
-    QCOMPARE(dict[ENUM_TO_STRING(Detail)].toString(), JSON_DEF_VAL_Detail);
+    QCOMPARE(dict[ENUM_2_STR(Name)].toString(), JSON_DEF_VAL_Name);
+    QCOMPARE(dict[ENUM_2_STR(Cast)].toStringList(), JSON_DEF_VAL_Cast);
+    QCOMPARE(dict[ENUM_2_STR(Studio)].toString(), JSON_DEF_VAL_Studio);
+    QCOMPARE(dict[ENUM_2_STR(Tags)].toStringList(), JSON_DEF_VAL_Tags);
+    QCOMPARE(dict[ENUM_2_STR(Rate)].toInt(), JSON_DEF_VAL_Rate);
+    QCOMPARE(dict[ENUM_2_STR(Size)].toInt(), JSON_DEF_VAL_Size);
+    QCOMPARE(dict[ENUM_2_STR(Hot)].toStringList(), JSON_DEF_VAL_Hot);
+    QCOMPARE(dict[ENUM_2_STR(Detail)].toString(), JSON_DEF_VAL_Detail);
   }
 
   void test_JsonStr2Dict() {
@@ -46,26 +46,26 @@ class JsonFileHelperTest : public MyTestSuite {
         {"Cast", QStringList{"Chris Hemsworth Studio", "Keanu Reeves Studio"}},  //
         {"Name", "Marvel Film"}                                                  //
     };
-    QVERIFY(dictWithPerfAndStudio.contains(ENUM_TO_STRING(Cast)));
-    QVERIFY(!dictWithPerfAndStudio.contains(ENUM_TO_STRING(Studio)));
-    QVERIFY(!dictWithPerfAndStudio[ENUM_TO_STRING(Cast)].toStringList().isEmpty());
+    QVERIFY(dictWithPerfAndStudio.contains(ENUM_2_STR(Cast)));
+    QVERIFY(!dictWithPerfAndStudio.contains(ENUM_2_STR(Studio)));
+    QVERIFY(!dictWithPerfAndStudio[ENUM_2_STR(Cast)].toStringList().isEmpty());
     DictEditOperator::ReCastAndStudio cps;
     QVERIFY(cps(dictWithPerfAndStudio));
-    QVERIFY(dictWithPerfAndStudio.contains(ENUM_TO_STRING(Cast)));
-    QVERIFY(!dictWithPerfAndStudio.contains(ENUM_TO_STRING(Studio)));
-    QVERIFY(dictWithPerfAndStudio[ENUM_TO_STRING(Cast)].toStringList().isEmpty());
+    QVERIFY(dictWithPerfAndStudio.contains(ENUM_2_STR(Cast)));
+    QVERIFY(!dictWithPerfAndStudio.contains(ENUM_2_STR(Studio)));
+    QVERIFY(dictWithPerfAndStudio[ENUM_2_STR(Cast)].toStringList().isEmpty());
   }
 
   void test_reconstruct_skip_when_cast_studio_not_exist() {
     QVariantHash dictWithOnlyName{{"Name", "Chris Hemsworth life story"}};
-    QVERIFY(dictWithOnlyName.contains(ENUM_TO_STRING(Name)));
-    QVERIFY(!dictWithOnlyName.contains(ENUM_TO_STRING(Cast)));
-    QVERIFY(!dictWithOnlyName.contains(ENUM_TO_STRING(Studio)));
+    QVERIFY(dictWithOnlyName.contains(ENUM_2_STR(Name)));
+    QVERIFY(!dictWithOnlyName.contains(ENUM_2_STR(Cast)));
+    QVERIFY(!dictWithOnlyName.contains(ENUM_2_STR(Studio)));
     DictEditOperator::ReCastAndStudio cps;
     QVERIFY(!cps(dictWithOnlyName));
-    QVERIFY(dictWithOnlyName.contains(ENUM_TO_STRING(Name)));
-    QVERIFY(!dictWithOnlyName.contains(ENUM_TO_STRING(Cast)));
-    QVERIFY(!dictWithOnlyName.contains(ENUM_TO_STRING(Studio)));
+    QVERIFY(dictWithOnlyName.contains(ENUM_2_STR(Name)));
+    QVERIFY(!dictWithOnlyName.contains(ENUM_2_STR(Cast)));
+    QVERIFY(!dictWithOnlyName.contains(ENUM_2_STR(Studio)));
   }
 
   void test_ConstructStudioCastByName_ok() {
@@ -82,15 +82,15 @@ class JsonFileHelperTest : public MyTestSuite {
     // 1. name empty, all key added default
     dictWithPerfs["Name"] = JSON_DEF_VAL_Name;
     QVERIFY(ipdnh(dictWithPerfs));
-    auto nameIt = dictWithPerfs.find(ENUM_TO_STRING(Name));
+    auto nameIt = dictWithPerfs.find(ENUM_2_STR(Name));
     QVERIFY(nameIt != dictWithPerfs.end());
     QCOMPARE(nameIt.value().toString(), JSON_DEF_VAL_Name);
 
-    auto studioIt = dictWithPerfs.find(ENUM_TO_STRING(Studio));
+    auto studioIt = dictWithPerfs.find(ENUM_2_STR(Studio));
     QVERIFY(studioIt != dictWithPerfs.end());
     QCOMPARE(studioIt.value().toString(), JSON_DEF_VAL_Studio);
 
-    auto perfIt = dictWithPerfs.find(ENUM_TO_STRING(Cast));
+    auto perfIt = dictWithPerfs.find(ENUM_2_STR(Cast));
     QVERIFY(perfIt != dictWithPerfs.end());
     QCOMPARE(perfIt.value().toStringList(), JSON_DEF_VAL_Cast);
 
@@ -100,15 +100,15 @@ class JsonFileHelperTest : public MyTestSuite {
     dictWithPerfs["Cast"] = expectCast;
     QVERIFY(!ipdnh(dictWithPerfs));
 
-    nameIt = dictWithPerfs.find(ENUM_TO_STRING(Name));
+    nameIt = dictWithPerfs.find(ENUM_2_STR(Name));
     QVERIFY(nameIt != dictWithPerfs.end());
     QCOMPARE(nameIt.value().toString(), expectName);
 
-    studioIt = dictWithPerfs.find(ENUM_TO_STRING(Studio));
+    studioIt = dictWithPerfs.find(ENUM_2_STR(Studio));
     QVERIFY(studioIt != dictWithPerfs.end());
     QCOMPARE(studioIt.value().toString(), expectStudio);
 
-    perfIt = dictWithPerfs.find(ENUM_TO_STRING(Cast));
+    perfIt = dictWithPerfs.find(ENUM_2_STR(Cast));
     QVERIFY(perfIt != dictWithPerfs.end());
     QCOMPARE(perfIt.value().toStringList(), expectCast);
   }
@@ -119,9 +119,9 @@ class JsonFileHelperTest : public MyTestSuite {
 
     QVariantHash dictPerfs{{"Cast", QStringList{"A", "E"}}};
     const QStringList alreadyExistPerfs{"A", "E"};
-    QCOMPARE(dictPerfs[ENUM_TO_STRING(Cast)], alreadyExistPerfs);
+    QCOMPARE(dictPerfs[ENUM_2_STR(Cast)], alreadyExistPerfs);
     QVERIFY(apd(dictPerfs));  // B C D inserted ok, A E already exist
-    auto perfIt = dictPerfs.find(ENUM_TO_STRING(Cast));
+    auto perfIt = dictPerfs.find(ENUM_2_STR(Cast));
     QVERIFY(perfIt != dictPerfs.end());
     const QStringList afterInsertedPerfs{"A", "B", "C", "D", "E"};
     QCOMPARE(perfIt.value().toStringList(), afterInsertedPerfs);
@@ -133,9 +133,9 @@ class JsonFileHelperTest : public MyTestSuite {
 
     QVariantHash dictPerfs{{"Cast", QStringList{"A", "E"}}};
     const QStringList alreadyExistPerfs{"A", "E"};
-    QCOMPARE(dictPerfs[ENUM_TO_STRING(Cast)], alreadyExistPerfs);
+    QCOMPARE(dictPerfs[ENUM_2_STR(Cast)], alreadyExistPerfs);
     QVERIFY(!apd(dictPerfs));  // A E already exist, nothing inserted
-    auto perfIt = dictPerfs.find(ENUM_TO_STRING(Cast));
+    auto perfIt = dictPerfs.find(ENUM_2_STR(Cast));
     QVERIFY(perfIt != dictPerfs.end());
     QCOMPARE(perfIt.value().toStringList(), alreadyExistPerfs);
   }
@@ -144,19 +144,19 @@ class JsonFileHelperTest : public MyTestSuite {
     DictEditOperator::UpdateStudio us{"Fox"};
 
     QVariantHash dict{{"Name", ""}, {"Studio", "Fox"}};
-    QVERIFY(dict.contains(ENUM_TO_STRING(Studio)));
-    QCOMPARE(dict[ENUM_TO_STRING(Studio)].toString(), "Fox");
+    QVERIFY(dict.contains(ENUM_2_STR(Studio)));
+    QCOMPARE(dict[ENUM_2_STR(Studio)].toString(), "Fox");
     QVERIFY(!us(dict));
-    QVERIFY(dict.contains(ENUM_TO_STRING(Studio)));
-    QCOMPARE(dict[ENUM_TO_STRING(Studio)].toString(), "Fox");
+    QVERIFY(dict.contains(ENUM_2_STR(Studio)));
+    QCOMPARE(dict[ENUM_2_STR(Studio)].toString(), "Fox");
   }
 
   void test_UpdateStudio_studio_pair_insertOk() {
     DictEditOperator::UpdateStudio us{"Fox"};
     QVariantHash dict{{"Name", ""}};
-    QVERIFY(!dict.contains(ENUM_TO_STRING(Studio)));
+    QVERIFY(!dict.contains(ENUM_2_STR(Studio)));
     QVERIFY(us(dict));
-    auto studioIt = dict.find(ENUM_TO_STRING(Studio));
+    auto studioIt = dict.find(ENUM_2_STR(Studio));
     QVERIFY(studioIt != dict.end());
     QCOMPARE(studioIt.value().toString(), "Fox");
   }
@@ -164,10 +164,10 @@ class JsonFileHelperTest : public MyTestSuite {
   void test_UpdateStudio_studioName_ChangedOk() {
     DictEditOperator::UpdateStudio us{"Fox"};
     QVariantHash dict{{"Name", ""}, {"Studio", "Marvel"}};
-    QVERIFY(dict.contains(ENUM_TO_STRING(Studio)));
-    QCOMPARE(dict[ENUM_TO_STRING(Studio)].toString(), "Marvel");
+    QVERIFY(dict.contains(ENUM_2_STR(Studio)));
+    QCOMPARE(dict[ENUM_2_STR(Studio)].toString(), "Marvel");
     QVERIFY(us(dict));
-    auto studioIt = dict.find(ENUM_TO_STRING(Studio));
+    auto studioIt = dict.find(ENUM_2_STR(Studio));
     QVERIFY(studioIt != dict.end());
     QCOMPARE(studioIt.value().toString(), "Fox");
   }
@@ -198,10 +198,10 @@ class JsonFileHelperTest : public MyTestSuite {
     QCOMPARE(ret, CHANGED_OK);
 
     const auto& dict = MovieJsonLoader(jsonPth);
-    QCOMPARE(dict.value(ENUM_TO_STRING(Duration)).toInt(), 8);
-    QCOMPARE(dict.value(ENUM_TO_STRING(Studio)).toString(), "Fox 20 century");
-    QCOMPARE(dict.value(ENUM_TO_STRING(Cast)).toStringList(), expectCastLst);
-    QCOMPARE(dict.value(ENUM_TO_STRING(Tags)).toStringList(), expectTagsLst);
+    QCOMPARE(dict.value(ENUM_2_STR(Duration)).toInt(), 8);
+    QCOMPARE(dict.value(ENUM_2_STR(Studio)).toString(), "Fox 20 century");
+    QCOMPARE(dict.value(ENUM_2_STR(Cast)).toStringList(), expectCastLst);
+    QCOMPARE(dict.value(ENUM_2_STR(Tags)).toStringList(), expectTagsLst);
 
     // json unchange
     ret = InsertOrUpdateDurationStudioCastTags(jsonPth, 8, "Fox 20 century", expectCastLst.join(ELEMENT_JOINER), expectTagsLst.join(ELEMENT_JOINER));
@@ -221,23 +221,23 @@ class JsonFileHelperTest : public MyTestSuite {
     };
 
     // 1. empty value json
-    QVariantHash emptyValueDict{{ENUM_TO_STRING(Studio), ""}, {ENUM_TO_STRING(Cast), QStringList{}}, {ENUM_TO_STRING(Tags), QStringList{}}};
+    QVariantHash emptyValueDict{{ENUM_2_STR(Studio), ""}, {ENUM_2_STR(Cast), QStringList{}}, {ENUM_2_STR(Tags), QStringList{}}};
     QVERIFY(DumpJsonDict(emptyValueDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     QMap<uint, JsonDict2Table> fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 2. only contains studio and tags, but not performers
-    QVariantHash notFullDict{{ENUM_TO_STRING(Studio), "Fox 2000"}, {ENUM_TO_STRING(Tags), QStringList{"Happiness", "Comedy"}}};
+    QVariantHash notFullDict{{ENUM_2_STR(Studio), "Fox 2000"}, {ENUM_2_STR(Tags), QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(notFullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 3. contains studio and tags and performers
-    QVariantHash fullDict{{ENUM_TO_STRING(Studio), "Fox 2000"},                    //
-                          {ENUM_TO_STRING(Cast), QStringList{"Jocker", "Queen"}},  //
-                          {ENUM_TO_STRING(Tags), QStringList{"Happiness", "Comedy"}}};
+    QVariantHash fullDict{{ENUM_2_STR(Studio), "Fox 2000"},                    //
+                          {ENUM_2_STR(Cast), QStringList{"Jocker", "Queen"}},  //
+                          {ENUM_2_STR(Tags), QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(fullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
     fileNameHash2Json = ReadStudioCastTagsOut(rootpath);

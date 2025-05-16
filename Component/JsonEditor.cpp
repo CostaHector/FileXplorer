@@ -36,17 +36,17 @@ JsonEditor::JsonEditor(QWidget* parent)
     m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
-  mName = new LineEditStr{ENUM_TO_STRING(Name), "", this};
-  mPerfsCsv = new LineEditCSV{ENUM_TO_STRING(Cast), "", true, this};  // comma seperated
-  mStudio = new LineEditStr{ENUM_TO_STRING(Studio), "", this};
-  mUploaded = new LineEditStr{ENUM_TO_STRING(Uploaded), "", this};
-  mTagsCsv = new LineEditCSV{ENUM_TO_STRING(Tags), "", true, this};  // comma seperated
-  mRateInt = new LineEditInt{ENUM_TO_STRING(Rate), "", this};        // int
-  mSize = new LineEditInt{ENUM_TO_STRING(Size), "", this};
-  mResolution = new LineEditStr{ENUM_TO_STRING(Resolution), "", this};
-  mBitrate = new LineEditStr{ENUM_TO_STRING(Bitrate), "", this};
-  mHot = new LineEditCSV{ENUM_TO_STRING(Hot), "", true, this};        // QList<QVariant>
-  mDetail = new TextEditMultiLine{ENUM_TO_STRING(Detail), "", this};  // multi-line
+  mName = new LineEditStr{ENUM_2_STR(Name), "", this};
+  mPerfsCsv = new LineEditCSV{ENUM_2_STR(Cast), "", true, this};  // comma seperated
+  mStudio = new LineEditStr{ENUM_2_STR(Studio), "", this};
+  mUploaded = new LineEditStr{ENUM_2_STR(Uploaded), "", this};
+  mTagsCsv = new LineEditCSV{ENUM_2_STR(Tags), "", true, this};  // comma seperated
+  mRateInt = new LineEditInt{ENUM_2_STR(Rate), "", this};        // int
+  mSize = new LineEditInt{ENUM_2_STR(Size), "", this};
+  mResolution = new LineEditStr{ENUM_2_STR(Resolution), "", this};
+  mBitrate = new LineEditStr{ENUM_2_STR(Bitrate), "", this};
+  mHot = new LineEditCSV{ENUM_2_STR(Hot), "", true, this};        // QList<QVariant>
+  mDetail = new TextEditMultiLine{ENUM_2_STR(Detail), "", this};  // multi-line
 
   m_jsonFormLo->addRow(mName->GetFormName(), mName);
   m_jsonFormLo->addRow(mPerfsCsv->GetFormName(), mPerfsCsv);
@@ -105,21 +105,21 @@ void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
   const int rowIdx = curIndex.row();
   const QString& jAbsPth = m_jsonList->filePath(rowIdx);
   const QVariantHash& jsonDict = JsonHelper::MovieJsonLoader(jAbsPth);
-  const int newCnt = jsonDict[ENUM_TO_STRING(Cast)].toStringList().size();
+  const int newCnt = jsonDict[ENUM_2_STR(Cast)].toStringList().size();
   m_jsonModel->updatePerfCount(rowIdx, newCnt);
   qDebug("Now json[%s] perfs cnt:%d", qPrintable(jAbsPth), newCnt);
 
-  mName->setText(jsonDict[ENUM_TO_STRING(Name)].toString());
-  mPerfsCsv->ReadFromStringList(jsonDict[ENUM_TO_STRING(Cast)].toStringList());
-  mStudio->setText(jsonDict[ENUM_TO_STRING(Studio)].toString());
-  mUploaded->setText(jsonDict[ENUM_TO_STRING(Uploaded)].toString());
-  mTagsCsv->ReadFromStringList(jsonDict[ENUM_TO_STRING(Tags)].toStringList());
-  mRateInt->ReadFromInt(jsonDict[ENUM_TO_STRING(Rate)].toInt());
-  mSize->ReadFromInt(jsonDict[ENUM_TO_STRING(Size)].toInt());
-  mResolution->setText(jsonDict[ENUM_TO_STRING(Resolution)].toString());
-  mBitrate->setText(jsonDict[ENUM_TO_STRING(Bitrate)].toString());
-  mHot->ReadFromVariantList(jsonDict[ENUM_TO_STRING(Hot)].toList());
-  mDetail->setText(jsonDict[ENUM_TO_STRING(Detail)].toString());
+  mName->setText(jsonDict[ENUM_2_STR(Name)].toString());
+  mPerfsCsv->ReadFromStringList(jsonDict[ENUM_2_STR(Cast)].toStringList());
+  mStudio->setText(jsonDict[ENUM_2_STR(Studio)].toString());
+  mUploaded->setText(jsonDict[ENUM_2_STR(Uploaded)].toString());
+  mTagsCsv->ReadFromStringList(jsonDict[ENUM_2_STR(Tags)].toStringList());
+  mRateInt->ReadFromInt(jsonDict[ENUM_2_STR(Rate)].toInt());
+  mSize->ReadFromInt(jsonDict[ENUM_2_STR(Size)].toInt());
+  mResolution->setText(jsonDict[ENUM_2_STR(Resolution)].toString());
+  mBitrate->setText(jsonDict[ENUM_2_STR(Bitrate)].toString());
+  mHot->ReadFromVariantList(jsonDict[ENUM_2_STR(Hot)].toList());
+  mDetail->setText(jsonDict[ENUM_2_STR(Detail)].toString());
   // todo: user determine save or not
   m_jsonFormLo->itemAt(0, QFormLayout::ItemRole::FieldRole)->widget()->setFocus();
 }
