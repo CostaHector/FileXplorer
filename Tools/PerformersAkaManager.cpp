@@ -147,14 +147,14 @@ QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlReco
     perfs += LOGIC_OR_CHAR;
     perfs += akas.replace(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
   }
-  const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_TO_STRING(Name), perfs);
+  const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Name), perfs);
   // movies table
   using namespace MOVIE_TABLE;
   static const QString SELECT_NAME_TEMPLATE           //
       {QString{"SELECT `%1`, `%2`, `%3` FROM "}       //
-           .arg(ENUM_TO_STRING(PrePathLeft))   //
-           .arg(ENUM_TO_STRING(PrePathRight))  //
-           .arg(ENUM_TO_STRING(Name))          //
+           .arg(ENUM_2_STR(PrePathLeft))   //
+           .arg(ENUM_2_STR(PrePathRight))  //
+           .arg(ENUM_2_STR(Name))          //
        + "`%1` "                                      //
        + QString{"WHERE "}};
   return SELECT_NAME_TEMPLATE.arg(DB_TABLE::MOVIES) + whereClause;
