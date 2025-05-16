@@ -11,7 +11,7 @@ JsonProperties::JsonProperties(const QString& path) : jsonPath{path}, perfsCount
 
 int JsonProperties::getPerfsCount(const QString& pth) {
   const auto& dict = JsonHelper::MovieJsonLoader(pth);
-  const auto it = dict.find(ENUM_TO_STRING(Cast));
+  const auto it = dict.find(ENUM_2_STR(Cast));
   if (it == dict.cend()) {
     return 0;
   }

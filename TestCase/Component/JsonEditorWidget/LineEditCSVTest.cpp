@@ -13,7 +13,7 @@ class LineEditCSVTest : public MyTestSuite {
   LineEditCSVTest() : MyTestSuite{false} {}
  private slots:
   void test_hotSceneSL() {
-    LineEditCSV uniqueEleLe{ENUM_TO_STRING(CAST), "", true};
+    LineEditCSV uniqueEleLe{ENUM_2_STR(CAST), "", true};
     uniqueEleLe.setText("0,25,20,5");
 
     QVariantList expectVarLst{0, 5, 20, 25};
@@ -27,10 +27,10 @@ class LineEditCSVTest : public MyTestSuite {
 
   void test_LineEditCSV_unique() {  //
     const QStringList noConflictElement{"A", "B", "C"};
-    LineEditCSV uniqueEleLe{ENUM_TO_STRING(CAST), "", true};
+    LineEditCSV uniqueEleLe{ENUM_2_STR(CAST), "", true};
     uniqueEleLe.setText("A, B, B, C");
     QCOMPARE(uniqueEleLe.GetStringList(), noConflictElement);
-    QCOMPARE(uniqueEleLe.GetFormName(), ENUM_TO_STRING(CAST));
+    QCOMPARE(uniqueEleLe.GetFormName(), ENUM_2_STR(CAST));
     uniqueEleLe.clear();
 
     uniqueEleLe.ReadFromStringList(noConflictElement);
@@ -55,10 +55,10 @@ class LineEditCSVTest : public MyTestSuite {
 
   void test_LineEditCSV_can_conflict() {  //
     const QStringList conflictElement{"A", "B", "B", "C"};
-    LineEditCSV canDuplicateEleLe{ENUM_TO_STRING(CAST), "", false};
+    LineEditCSV canDuplicateEleLe{ENUM_2_STR(CAST), "", false};
     canDuplicateEleLe.setText("A, B, B, C");
     QCOMPARE(canDuplicateEleLe.GetStringList(), conflictElement);
-    QCOMPARE(canDuplicateEleLe.GetFormName(), ENUM_TO_STRING(CAST));
+    QCOMPARE(canDuplicateEleLe.GetFormName(), ENUM_2_STR(CAST));
     canDuplicateEleLe.clear();
 
     canDuplicateEleLe.ReadFromStringList(conflictElement);
