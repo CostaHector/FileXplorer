@@ -1,6 +1,5 @@
 #include "JsonTableModel.h"
 #include "public/PublicVariable.h"
-#include "Tools/NameTool.h"
 #include "Tools/Json/DataFormatter.h"
 #include <QBrush>
 #include <QDir>
@@ -19,8 +18,8 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   const auto& item = mCachedJsons[index.row()];
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer) \
-  case enu:                                                      \
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
+  case enu:                                                                          \
     return format(item.m_##enu);  //
       JSON_MODEL_FIELD_MAPPING    //
 #undef JSON_KEY_ITEM              //
@@ -61,12 +60,12 @@ bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, in
   if (role == Qt::EditRole) {
     auto& item = mCachedJsons[index.row()];
     switch (index.column()) {
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer) \
-  case enu: {                                                    \
-    if (!writer(item.m_##enu, value)) {                          \
-      return false;                                              \
-    }                                                            \
-    break;                                                       \
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
+  case enu: {                                                                        \
+    if (!writer(item.m_##enu, value)) {                                              \
+      return false;                                                                  \
+    }                                                                                \
+    break;                                                                           \
   }
       JSON_MODEL_FIELD_MAPPING  //
 #undef JSON_KEY_ITEM            //
@@ -87,7 +86,7 @@ int JsonTableModel::ReadADirectory(const QString& path) {
   QDirIterator it{path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
-    tempCachedJsons.append(JsonPr{it.filePath()});
+    tempCachedJsons.append(JsonPr::fromJsonFile(it.filePath()));
   }
 
   const int befRowCnt = mCachedJsons.size();
@@ -116,7 +115,7 @@ int JsonTableModel::AppendADirectory(const QString& path) {
     if (alreadyExistedSet.contains(jsonPth)) {
       continue;
     }
-    appendCachedJsons.append(JsonPr{jsonPth});
+    appendCachedJsons.append(JsonPr::fromJsonFile(jsonPth));
   }
   const int befRowCnt = mCachedJsons.size();
   const int afterRowCnt = mCachedJsons.size() + appendCachedJsons.size();

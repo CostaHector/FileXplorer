@@ -11,8 +11,8 @@
   ONE_FIELD_ITEM(gen, 1, Gender, Gender::male, DataFormatter::formatGender, DataFormatter::writeGender)                      \
   ONE_FIELD_ITEM(phoneNumber, 2, QString, QString{}, DataFormatter::formatPhoneNumber, DataFormatter::writePhoneNumber)      \
   ONE_FIELD_ITEM(age, 3, int, 0, DataFormatter::formatDefault, DataFormatter::writeInt)                                      \
-  ONE_FIELD_ITEM(height, 4, float, 0.f, DataFormatter::formatFloat, DataFormatter::writeFloat)                               \
-  ONE_FIELD_ITEM(weight, 5, float, 0.f, DataFormatter::formatFloat, DataFormatter::writeFloat)                               \
+  ONE_FIELD_ITEM(height, 4, float, 0.f, DataFormatter::formatFloat2Prec, DataFormatter::writeFloat)                               \
+  ONE_FIELD_ITEM(weight, 5, float, 0.f, DataFormatter::formatFloat2Prec, DataFormatter::writeFloat)                               \
   ONE_FIELD_ITEM(rateAnnual, 6, QList<char>, QList<char>{}, DataFormatter::formatRateAnnual, DataFormatter::writeRateAnnual) \
   ONE_FIELD_ITEM(hobbies, 7, QStringList, QStringList{}, DataFormatter::formatHobbies, DataFormatter::writeHobbies)          \
   ONE_FIELD_ITEM(isOd, 8, bool, true, DataFormatter::formatBool, DataFormatter::writeBool)
@@ -35,7 +35,7 @@ ALL_FIELD_ITEMS
 
 // 生成字符串映射数组
 const std::string MODEL_HORINDEX_2_FIELDNAME[BUTT] = {
-#define ONE_FIELD_ITEM(fieldEnum, fieldEnumVal, Type, defaultValue, formatter, cacheWriter) ENUM_TO_STRING(fieldEnum),
+#define ONE_FIELD_ITEM(fieldEnum, fieldEnumVal, Type, defaultValue, formatter, cacheWriter) ENUM_2_STR(fieldEnum),
     ALL_FIELD_ITEMS
 #undef ONE_FIELD_ITEM
 };

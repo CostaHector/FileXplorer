@@ -11,7 +11,7 @@ struct SCENE_INFO {
   QString name;      // name, key"Name"
   QStringList imgs;   // img, key"ImgName"
   QString vidName;   // video, key"VidName"
-  qint64 vidSize;    // video size, from json file, key"VidSize"
+  qint64 vidSize;    // video size, from json file, key"Size"
   int rate;          // video rate, from json file, key"Rate"
   QString uploaded;  // from json file, key"Uploaded"
 
