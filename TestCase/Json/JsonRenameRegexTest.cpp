@@ -1,6 +1,6 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pub/MyTestSuite.h"
 // add necessary includes here
 #include "Public/PublicVariable.h"
 #include "Tools/FileDescriptor/DbManager.h"

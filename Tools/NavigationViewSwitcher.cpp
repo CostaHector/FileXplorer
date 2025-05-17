@@ -18,7 +18,8 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
   switch (viewType) {
     case ViewType::LIST:
     case ViewType::TABLE:
-    case ViewType::TREE: {
+    case ViewType::TREE:
+    case ViewType::JSON: {
       if (_navigation->m_addressBar == nullptr) {
         _navigation->m_addressBar = new NavigationAndAddressBar;
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
@@ -33,7 +34,7 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         ActionWithPath::BindIntoNewPath(F_IntoNewPath);
       }
       naviIndex = _navigation->m_name2StackIndex[ViewType::TABLE];
-      qDebug("Switch toolbar to list/table/tree[%d]", (char)viewType);
+      qDebug("Switch toolbar to list/table/tree/json[%d]", (char)viewType);
       break;
     }
     case ViewType::MOVIE: {
@@ -193,6 +194,19 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _view->AddView(viewType, _view->m_castTableView);
       }
       _view->m_castTableView->setWindowTitle("Cast");
+      viewIndex = _view->m_name2ViewIndex[viewType];
+      qDebug("Switch view widget to cast[%d]", (char)viewType);
+      break;
+    }
+    case ViewType::JSON: {
+      if (_view->m_jsonTableView == nullptr) {
+        _view->m_jsonModel = new JsonTableModel{_view};
+        _view->m_jsonTableView = new JsonTableView(_view->m_jsonModel, _view);
+        _view->AddView(viewType, _view->m_jsonTableView);
+      }
+      const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
+      _view->m_jsonTableView->ReadADirectory(newPath);
+      _view->m_jsonTableView->setWindowTitle("Json");
       viewIndex = _view->m_name2ViewIndex[viewType];
       qDebug("Switch view widget to cast[%d]", (char)viewType);
       break;

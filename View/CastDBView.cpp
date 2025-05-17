@@ -9,7 +9,7 @@
 #include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/FileDescriptor/TableFields.h"
@@ -278,7 +278,7 @@ int CastDBView::onDumpAllIntoPJsonFile() {
   for (int r = 0; r < m_perfDbMdl->rowCount(); ++r) {
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
+    succeedCnt += JsonHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
   qDebug("All %d record(s) dump into pjson file. succeed: %d/%d.", dumpCnt, succeedCnt, dumpCnt);
@@ -303,7 +303,7 @@ int CastDBView::onDumpIntoPJsonFile() {
     const int r = indr.row();
     const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
     const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
-    succeedCnt += JsonFileHelper::DumpJsonDict(pJson, pJsonPath);
+    succeedCnt += JsonHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
 
@@ -327,9 +327,9 @@ QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query)
   }
   QStringList vidPath;
   while (query.next()) {
-    vidPath << PATHTOOL::Path3Join(query.value(ENUM_TO_STRING(PrePathLeft)).toString(),   //
-                                   query.value(ENUM_TO_STRING(PrePathRight)).toString(),  //
-                                   query.value(ENUM_TO_STRING(Name)).toString());
+    vidPath << PATHTOOL::Path3Join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
+                                   query.value(ENUM_2_STR(PrePathRight)).toString(),  //
+                                   query.value(ENUM_2_STR(Name)).toString());
   }
   qDebug("%d records finded", vidPath.size());
   return vidPath;
