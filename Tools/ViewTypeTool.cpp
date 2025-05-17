@@ -12,7 +12,8 @@ const QMap<QString, ViewType> ACTION_TEXT_2_VIEW_TYPE  //
         {ENUM_2_STR(SEARCH), ViewType::SEARCH},  //
         {ENUM_2_STR(MOVIE), ViewType::MOVIE},    //
         {ENUM_2_STR(SCENE), ViewType::SCENE},    //
-        {ENUM_2_STR(CAST), ViewType::CAST}       //
+        {ENUM_2_STR(CAST), ViewType::CAST},       //
+        {ENUM_2_STR(JSON), ViewType::JSON}       //
     };
 
 const char* GetViewTypeHumanFriendlyStr(ViewType viewType) {
@@ -24,6 +25,7 @@ const char* GetViewTypeHumanFriendlyStr(ViewType viewType) {
     CASE_BRANCH_ENUM_TO_STRING(MOVIE);
     CASE_BRANCH_ENUM_TO_STRING(SCENE);
     CASE_BRANCH_ENUM_TO_STRING(CAST);
+    CASE_BRANCH_ENUM_TO_STRING(JSON);
     default: {
       qWarning("viewType[%d] is invalid", viewType);
       return "";

@@ -641,7 +641,7 @@ int MovieDBView::onSetStudio() {
 
   const QModelIndexList& indexes = selectionModel()->selectedRows(MOVIE_TABLE::Studio);
   _dbModel->SetStudio(indexes, studio);
-  const QString affectedRowsMsg{QString{"[Uncommit] %1 row(s) studio has been changed to"}.arg(indexes.size())};
+  const QString affectedRowsMsg{QString{"[Uncommit] %1 row(s) studio has been changed to %s"}.arg(indexes.size()).arg(studio)};
   LOG_GOOD(affectedRowsMsg, studio);
   return indexes.size();
 }
@@ -651,24 +651,30 @@ int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE m
   if (!IsHasSelection(fieldOperation)) {
     return 0;
   }
-  QStringList& candidates = m_tagsCandidates[(int)type];
-  bool isInputOk{false};
-  const QString hintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
-  const QString& tagsOrCast = QInputDialog::getItem(this, fieldOperation, hintMsg,  //
-                                                    candidates,                     //
-                                                    candidates.size() - 1,          //
-                                                    true, &isInputOk);
-  if (!isInputOk) {
-    LOG_GOOD("[Skip] User cancel", fieldOperation)
-    return 0;
-  }
-  if (tagsOrCast.isEmpty()) {
-    LOG_BAD("[Abort] Input can not be empty", fieldOperation)
-    return 0;
-  }
 
-  candidates.push_back(tagsOrCast);
-  int fieldColumn = -1;
+  QString tagsOrCast;
+  if (mode == FIELD_OP_MODE::CLEAR) {
+    tagsOrCast = "";
+  } else {
+    QStringList& candidates = m_candidatesLst[(int)type];
+    bool isInputOk{false};
+    const QString hintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
+    const QString& tagsOrCast = QInputDialog::getItem(this, fieldOperation, hintMsg,  //
+                                                      candidates,                     //
+                                                      candidates.size() - 1,          //
+                                                      true, &isInputOk);
+    if (!isInputOk) {
+      LOG_GOOD("[Skip] User cancel", fieldOperation)
+      return 0;
+    }
+    if (tagsOrCast.isEmpty()) {
+      LOG_BAD("[Abort] Input can not be empty", fieldOperation)
+      return 0;
+    }
+
+    candidates.push_back(tagsOrCast);
+  }
+  MOVIE_TABLE::FIELD_E fieldColumn{MOVIE_TABLE::BUTT};
   switch (type) {
     case FIELD_OP_TYPE::CAST:
       fieldColumn = MOVIE_TABLE::Cast;
@@ -684,6 +690,7 @@ int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE m
   const QModelIndexList& indexes = selectionModel()->selectedRows(fieldColumn);
   switch (mode) {
     case FIELD_OP_MODE::SET:
+    case FIELD_OP_MODE::CLEAR:
       _dbModel->SetCastOrTags(indexes, tagsOrCast);
       break;
     case FIELD_OP_MODE::APPEND:
