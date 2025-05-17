@@ -164,6 +164,12 @@ QString PATHTOOL::FileExtReplacedWithJson(QString fileName) {
   return fileName.replace(lastIndexOfExtDot + 1, JSON_EXT_SIZE, "json");
 }
 
+QString PATHTOOL::GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
+  const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
+  prepath = fullpath.left(lastIndexOfSlash);
+  return fullpath.mid(lastIndexOfSlash + 1);
+}
+
 QString PATHTOOL::Path2Join(const QString& a, const QString& b) {
   QString ans;
   ans.reserve(a.size() + 1 + b.size());
