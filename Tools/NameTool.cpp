@@ -10,7 +10,7 @@ const QString NameTool::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
 
 constexpr char NameTool::CSV_COMMA;
-const QRegularExpression NameTool::CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
+const QRegularExpression NameTool::CAST_STR_SPLITTER{R"( & |&|\s*,\s*|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 
 QStringList NameTool::operator()(const QString& s) const {
   QStringList ans;
@@ -20,10 +20,12 @@ QStringList NameTool::operator()(const QString& s) const {
       ans.append(stdName);
     }
   }
+  ans.sort();
   ans.removeDuplicates();
   return ans;
 }
-QStringList NameTool::castFromTitledSentence(const QString& s) const {
+
+QStringList NameTool::castFromUpperCaseSentence(const QString& s) const {
   QRegularExpressionMatchIterator it = NAME_COMP.globalMatch(s);
   QStringList ans;
   QString srcCastName, stdCastName;
@@ -36,6 +38,7 @@ QStringList NameTool::castFromTitledSentence(const QString& s) const {
       ans.append(stdCastName);
     }
   }
+  ans.sort();
   ans.removeDuplicates();
   return ans;
 }

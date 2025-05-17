@@ -45,9 +45,10 @@ QString ContentPanel::getRootPath() const {
     case ViewType::TREE:
     case ViewType::SEARCH:
     case ViewType::SCENE:
+    case ViewType::JSON:
       return m_fsModel->rootPath();
     default:
-      qWarning("No rootpath in ViewType[%c]", char(vt));
+      qWarning("No rootpath in ViewType[%c]", int(vt));
       return "";
   }
 }
@@ -67,6 +68,8 @@ QString ContentPanel::getFilePath(const QModelIndex& ind) const {
       return m_scenesModel->filePath(ind);
     case ViewType::MOVIE:
       return m_dbModel->filePath(ind);
+    case ViewType::JSON:
+      return m_jsonModel->filePath(ind);
     default:
       qWarning("No FilePath in ViewType[%c]", char(vt));
       return "";
@@ -139,6 +142,12 @@ QStringList ContentPanel::getFileNames() const {
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
         names.append(m_dbModel->fileName(ind));
+      }
+      break;
+    }
+    case ViewType::JSON: {
+      for (const auto& ind : m_jsonTableView->selectionModel()->selectedRows()) {
+        names.append(m_jsonModel->fileName(ind));
       }
       break;
     }
@@ -609,6 +618,9 @@ QFileInfo ContentPanel::getFileInfo(const QModelIndex& ind) const {
     }
     case ViewType::SCENE: {
       return m_scenesModel->fileInfo(ind);
+    }
+    case ViewType::JSON: {
+      return m_jsonModel->fileInfo(ind);
     }
     case ViewType::MOVIE: {
       return m_dbModel->fileInfo(ind);

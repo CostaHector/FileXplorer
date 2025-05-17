@@ -14,6 +14,7 @@ class RibbonMenu : public QTabWidget {
   QToolBar* LeafView() const;
   QToolBar* LeafDatabase() const;
   QToolBar* LeafCast() const;
+  QToolBar* LeafJson() const;
   QToolBar* LeafScenesTools() const;
   QToolBar* LeafMediaTools() const;
 
@@ -23,16 +24,16 @@ class RibbonMenu : public QTabWidget {
   void on_currentTabChangedRecordIndex(const int tabIndex);
 
  private:
-  QToolBar* m_corner;
+  QToolBar* m_corner{nullptr};
 
-  QToolBar* m_leafFile;
-  QToolBar* m_leafHome;
-  QToolBar* m_leafView;
-  QToolBar* m_leafDatabase;
-  QToolBar* m_leafCast;
-  QToolBar* m_leafScenes;
-
-  QToolBar* m_leafMedia;
+  QToolBar* m_leafFile{nullptr};
+  QToolBar* m_leafHome{nullptr};
+  QToolBar* m_leafView{nullptr};
+  QToolBar* m_leafDatabase{nullptr};
+  QToolBar* m_leafCast{nullptr};
+  QToolBar* m_leafJson{nullptr};
+  QToolBar* m_leafScenes{nullptr};
+  QToolBar* m_leafMedia{nullptr};
 
   static constexpr int MAX_WIDGET_HEIGHT = 400;
 };

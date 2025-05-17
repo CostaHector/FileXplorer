@@ -59,6 +59,9 @@ bool HarFiles::operator()(const QString& harAbsPath) {
   init();
   mHarFilePath = harAbsPath;
   const QString& jsonStr = TextReader(harAbsPath);
+  if (jsonStr.isEmpty()) {
+    return false;
+  }
 
   QJsonParseError jsonErr;
   QJsonDocument json_doc = QJsonDocument::fromJson(jsonStr.toUtf8(), &jsonErr);

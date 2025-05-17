@@ -86,19 +86,19 @@ private slots:
   void test_2wordsCapitalizedName() {
     const QString& s = "AA BB and CC DD";
     const QStringList expect{"Aa Bb", "Cc Dd"};
-    const QStringList actual{m_nameTool.castFromTitledSentence(s)};
+    const QStringList actual{m_nameTool.castFromUpperCaseSentence(s)};
     QCOMPARE(expect, actual);
   }
 
   void test_3wordsCapitalizedName() {
     const QString& s = "AA BB CC, DD EE FF";
     const QStringList expects{"Aa Bb Cc", "Dd Ee Ff"};
-    QCOMPARE(expects, m_nameTool.castFromTitledSentence(s));
+    QCOMPARE(expects, m_nameTool.castFromUpperCaseSentence(s));
   }
 
   void test_invalid3wordCapitalizedName() {
     const QString& s = "A B'CC, DD E'F";  // should not process this one
-    const QStringList actual{m_nameTool.castFromTitledSentence(s)};
+    const QStringList actual{m_nameTool.castFromUpperCaseSentence(s)};
     const QStringList expect{"A B'Cc", "Dd E'F"};
     QVERIFY(expect != actual);
   }
@@ -106,13 +106,13 @@ private slots:
   void test_capitalizedNameWithApostrophe() {
     const QString& s = "AA B'CC, DD EE FF";
     const QStringList expects{"Aa B'Cc", "Dd Ee Ff"};
-    QCOMPARE(expects, m_nameTool.castFromTitledSentence(s));
+    QCOMPARE(expects, m_nameTool.castFromUpperCaseSentence(s));
   }
 
   void test_someFactoryDetail() {
     const QString& s = "ROND D'ALEMBERT, AA B'CDE. ROND D'ALEMBERT was a French mathematician, philosopher, and writer.";
     const QStringList expectCastLst{"Rond D'Alembert", "Aa B'Cde"};
-    QCOMPARE(expectCastLst, m_nameTool.castFromTitledSentence(s));
+    QCOMPARE(expectCastLst, m_nameTool.castFromUpperCaseSentence(s));
   }
 
   void test_Capital_ignore_other() {
