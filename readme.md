@@ -40,6 +40,46 @@ a log line example:
 
 ## Component
 
+### Json Ribbon
+**Submit**
+Submit selected lines
+
+**Sync cache/file system**
+Sync Name Field from json file base name
+reload json from disk
+Export studios/cast to diction
+
+**Case Control**
+lower all words
+capitalize first letter of each word
+
+**file Operation**
+Open json file
+Reveal in explorer
+rename json and related files
+
+**Studio/Cast/Tags Operation**
+Clear Studio fields
+Clear Cast fields
+
+Hint for Studio/Cast fields(from selected text)
+Format Cast/Studio
+
+Set Studio
+Construct Studio/Json Fields
+
+Set Cast
+Add Cast
+Rmv Cast
+
+Set Tags
+Add Tags
+Rmv Tags
+
+
+
+
+
 ### ContentPanel
 1 Table/Tree/List View:
 1. abstract view double clicked
