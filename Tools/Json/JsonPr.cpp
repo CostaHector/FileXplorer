@@ -67,10 +67,15 @@ bool JsonPr::WriteIntoFiles() const {
 #undef JSON_KEY_ITEM
 
   const QByteArray& ba = QJsonDocument(json).toJson(QJsonDocument::Indented);
-  return ByteArrayWriter(jsonPath, ba);
+  bool retResult{ByteArrayWriter(jsonPath, ba)};
+  if (retResult) {
+    hintCast.clear();
+    hintStudio.clear();
+  }
+  return retResult;
 }
 
-int JsonPr::Rename(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles) {
+int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles) {
   QString newJsonName{newJsonNameUserInput};
   QString newJsonBaseName{newJsonName};
   if (!newJsonName.endsWith(JsonHelper::JSON_EXT)) {
@@ -81,9 +86,13 @@ int JsonPr::Rename(const QString& newJsonNameUserInput, bool alsoRenameRelatedFi
   if (newJsonName == jsonFileName) {
     return E_OK;  // skip
   }
+
   QDir dir{m_Prepath, "", QDir::SortFlag::Name, QDir::Filter::Files};
   if (!dir.exists(jsonFileName)) {
     return E_JSON_NOT_EXIST;
+  }
+  if (dir.exists(newJsonName)) {
+    return E_JSON_NEW_NAME_OCCUPID;
   }
   if (!dir.rename(jsonFileName, newJsonName)) {
     qWarning("Rename json failed[%s]->[%s]", qPrintable(jsonFileName), qPrintable(newJsonName));
@@ -93,11 +102,11 @@ int JsonPr::Rename(const QString& newJsonNameUserInput, bool alsoRenameRelatedFi
   if (!alsoRenameRelatedFiles) {
     return renameCnt;
   }
-  const QString& oldJsonBaseName{PATHTOOL::GetBaseName(jsonFileName)};
+
   QString fileName, fileExt;
   QString newFileName;
-
-  for (const QString& oldName : dir.entryList()) {
+  const QString& oldJsonBaseName{PATHTOOL::GetBaseName(jsonFileName)};
+  for (const QString& oldName : dir.entryList({oldJsonBaseName + "*"})) {
     std::tie(fileName, fileExt) = PATHTOOL::GetBaseNameExt(oldName);
     if (fileName.leftRef(oldJsonBaseName.size()) != oldJsonBaseName) {
       continue;
@@ -198,33 +207,27 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
   return true;
 }
 
-void JsonPr::HintForCastStudio(const QString& selectedText) const {
+void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const {
   static StudiosManager& psm = StudiosManager::getIns();
-  hintStudio = psm[m_Name];
+  hintStudio = psm(m_Name);
+  if (m_Studio != hintStudio) {
+    studioChanged = true;
+  } else {
+    studioChanged = false;
+    hintStudio.clear();
+  }
 
   static CastManager& pm = CastManager::getIns();
   const QStringList& hintPerfsList = pm(m_Name + " " + selectedText);
   QSet<QString> elseCastSet{hintPerfsList.cbegin(), hintPerfsList.cend()};
   elseCastSet.subtract(m_Cast.m_set);
   hintCast = elseCastSet.values().join(NameTool::CSV_COMMA);
-}
-
-void JsonPr::AcceptCastHint() {
-  if (hintCast.isEmpty()) {
-    qDebug("hintCast is empty, skip accept cast hint");
-    return;
+  if (!elseCastSet.isEmpty()) {
+    castChanged = true;
+  } else {
+    castChanged = false;
+    hintCast.clear();
   }
-  m_Cast.insertBatchFromSentence(hintCast);
-  hintCast.clear();
-}
-
-void JsonPr::AcceptStudioHint() {
-  if (hintStudio.isEmpty()) {
-    qDebug("hintStudio is empty, skip accept studio hint");
-    return;
-  }
-  m_Studio = hintStudio;
-  hintStudio.clear();
 }
 
 void JsonPr::RejectCastHint() {

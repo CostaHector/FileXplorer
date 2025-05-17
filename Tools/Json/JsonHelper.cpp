@@ -244,6 +244,9 @@ QJsonObject GetJsonObject(const QString& filePath) {
   }
   QByteArray jsonData = file.readAll();
   file.close();
+  if (jsonData.isEmpty()) {
+    return {};
+  }
 
   QJsonParseError jsonErr;
   QJsonDocument json_doc = QJsonDocument::fromJson(jsonData, &jsonErr);

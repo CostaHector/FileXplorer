@@ -52,15 +52,15 @@ class CastManagerTest : public MyTestSuite {
   void test_sentenceSplit() {
     // precondition
     const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     // procedure
     const QStringList& actualCastList = cmInLLT("Matt Dallas - Chris Pine and Jensen Ackles.");
@@ -72,15 +72,15 @@ class CastManagerTest : public MyTestSuite {
     const QStringList allCastList{"Jean le Rond d'Alembert", "Frenkie de Jong", "L Hospital", "James"};
     // 4 word(not support now), 3 word, 2 word, 1 word
     const QStringList expectCastList{"Frenkie de Jong", "L Hospital", "James"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : allCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     // single quote not used to split
     // and/And(insensitive) used to split
@@ -101,15 +101,15 @@ class CastManagerTest : public MyTestSuite {
   void test_one_char_seperator() {
     // precondition
     const QStringList expectCastList{"U", "V", "W", "X", "Y", "Z"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     const auto& perfsList = cmInLLT("U! + V; / W. \\\\ X & Y and Z?");
     QCOMPARE(perfsList, expectCastList);
@@ -118,15 +118,15 @@ class CastManagerTest : public MyTestSuite {
   void test_with_new_line_seperator() {
     // precondition
     const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     const auto& perfsList = cmInLLT("Matt Dallas \n Chris Pine \r\n Jensen Ackles");
     QCOMPARE(perfsList, expectCastList);
@@ -163,9 +163,9 @@ class CastManagerTest : public MyTestSuite {
     };
 
     QSet<QString> emptyCastSet;
-    cmInLLT.m_performers.swap(emptyCastSet);
+    cmInLLT.m_casts.swap(emptyCastSet);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(emptyCastSet);
+      cmInLLT.m_casts.swap(emptyCastSet);
     };
 
     // cached should updated, local file should not write
@@ -179,7 +179,7 @@ class CastManagerTest : public MyTestSuite {
 
     bool castLocalFileWrite{false};
     QCOMPARE(cmInLLT.LearningFromAPath(rootpath, &castLocalFileWrite), 2);
-    QCOMPARE(cmInLLT.m_performers, expectCastSet);
+    QCOMPARE(cmInLLT.m_casts, expectCastSet);
     QCOMPARE(castLocalFileWrite, true);
     const QFile fiCast{gLocalFilePath};
     QVERIFY(fiCast.size() > 0);
@@ -193,7 +193,7 @@ class CastManagerTest : public MyTestSuite {
 
     castLocalFileWrite = true;
     QCOMPARE(cmInLLT.LearningFromAPath(rootpath, &castLocalFileWrite), 0);
-    QCOMPARE(cmInLLT.m_performers, expectCastSet);
+    QCOMPARE(cmInLLT.m_casts, expectCastSet);
     QCOMPARE(castLocalFileWrite, false);  // skipped, no write
   }
 };

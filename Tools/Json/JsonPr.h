@@ -9,6 +9,7 @@ using namespace JsonKey;
 struct JsonPr {
   static JsonPr fromJsonFile(const QString& jsonAbsFile);
 
+  JsonPr() = default;
   explicit JsonPr(const QString& jsonAbsFile);
   explicit JsonPr(const QString& filePrePath, const QString& fileName, const QJsonObject& json);
   bool operator==(const JsonPr& rhs) const;
@@ -27,20 +28,19 @@ struct JsonPr {
   mutable QString hintStudio;
 
   enum OP_RET {
-    E_JSON_NOT_EXIST = 0,          //
+    E_JSON_NOT_EXIST = -1000,      //
+    E_JSON_NEW_NAME_OCCUPID,       //
     E_JSON_FILE_RENAME_FAILED,     //
     E_RELATED_FILE_RENAME_FAILED,  //
-    E_OK,                          //
+    E_OK = 0,                      //
   };
-  int Rename(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles = true);
+  int RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles = true);
   bool SyncNameValueFromFileBaseName();
   bool ConstructCastStudioValue();  // contruct cast/studio
   bool ClearCastStudioValue();      // clear cast/studio
   bool SetStudio(const QString& studio);
   bool SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP_MODE fieldMode);
-  void HintForCastStudio(const QString& selectedText) const;
-  void AcceptCastHint();
-  void AcceptStudioHint();
+  void HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const;
 
   void RejectCastHint();
   void RejectStudioHint();
