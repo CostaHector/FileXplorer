@@ -1,31 +1,14 @@
-#ifndef JSONEDITORACTIONS_H
-#define JSONEDITORACTIONS_H
+#ifndef JsonActions_H
+#define JsonActions_H
 
 #include <QAction>
-#include <QActionGroup>
-#include <QMenu>
-#include <QMenuBar>
 #include <QObject>
 #include <QToolBar>
 
-class JsonEditorActions : public QObject {
+class JsonActions : public QObject {
  public:
-  explicit JsonEditorActions(QObject* parent = nullptr);
-
-  QToolBar* GetJsonToolBar();
+  explicit JsonActions(QObject* parent = nullptr);
   QToolBar* GetJsonRibbonToolBar();
-
-  QMenu* GetJsonToBeEdittedListMenu(QWidget* parent);
-
-  QAction* _SELECT_CURRENT_FOLDER{nullptr};
-  QAction* _CLR_JSON_FILE_LIST{nullptr};
-
-  QAction* _LAST_FILE{nullptr};
-  QAction* _NEXT_FILE{nullptr};
-  QAction* _DONE_AND_PREVIOUS{nullptr};
-  QAction* _DONE_AND_NEXT{nullptr};
-  QAction* _AUTO_SKIP{nullptr};
-  QAction* _SKIP_IF_CAST_CNT_GT{nullptr};
 
   // **Submit**
   QAction* _SAVE_CURRENT_CHANGES{nullptr};
@@ -43,7 +26,6 @@ class JsonEditorActions : public QObject {
   QAction* _OPEN_THIS_FILE{nullptr};
   QAction* _REVEAL_IN_EXPLORER{nullptr};
   QAction* _RENAME_JSON_AND_RELATED_FILES{nullptr};
-
 
   // **Studio/Cast/Tags Field Operation**
   QAction* _CLEAR_CAST{nullptr};
@@ -64,18 +46,10 @@ class JsonEditorActions : public QObject {
   QAction* _TAGS_FIELD_APPEND{nullptr};
   QAction* _TAGS_FIELD_RMV{nullptr};
 
-
-
-
-  QAction* _EXTRACT_UPPERCASE_CAST{nullptr};
-  QActionGroup* _TEXT_EDIT_ACTIONS{nullptr};
   QAction* _ADD_SELECTED_CAST_SENTENCE{nullptr};
-
-  QAction* _RE_STUDIO_CAST_VALUE{nullptr};
-  QAction* _STANDARDLIZE_JSON_KEY{nullptr};
-  QActionGroup* _BATCH_EDIT_TOOL_ACTIONS{nullptr};
+  QAction* _EXTRACT_UPPERCASE_CAST{nullptr};
 };
 
-JsonEditorActions& g_jsonEditorActions();
+JsonActions& g_JsonActions();
 
-#endif  // JSONEDITORACTIONS_H
+#endif  // JsonActions_H
