@@ -58,6 +58,7 @@ class MovieDBView : public CustomTableView {
 
   int onSetStudio();
   int onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode);
+
   // should not call ~destructure after getDb() and pass to QSqlTableModel
  private:
   bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected);
@@ -73,7 +74,7 @@ class MovieDBView : public CustomTableView {
   FdBasedDb& mDb;
 
   QStringList m_studioCandidates;
-  QStringList m_tagsCandidates[(int)FIELD_OP_TYPE::BUTT];
+  QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
 };
 
 #endif  // MOVIEDBVIEW_H

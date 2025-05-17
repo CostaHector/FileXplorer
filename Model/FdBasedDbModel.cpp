@@ -40,20 +40,15 @@ QString FdBasedDbModel::absolutePath(const QModelIndex& curIndex) const {
 }
 
 void FdBasedDbModel::SetStudio(const QModelIndexList& tagColIndexes, const QString& studio) {
-  if (studio.isEmpty()) {
-    return;
-  }
   foreach (const QModelIndex& ind, tagColIndexes) {
     setData(ind, studio);
   }
 }
 
 void FdBasedDbModel::SetCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence) {
-  if (sentence.isEmpty()) {
-    return;
-  }
+  QString strLst{NameTool::CastTagSentenceParse2Str(sentence, true)};
   foreach (const QModelIndex& ind, tagColIndexes) {
-    setData(ind, NameTool::CastTagSentenceParse2Str(sentence, true));
+    setData(ind, strLst);
   }
 }
 
