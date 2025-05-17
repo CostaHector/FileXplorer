@@ -10,6 +10,7 @@ const QString NameTool::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
 
 constexpr char NameTool::CSV_COMMA;
+const QRegularExpression NameTool::CAST_STR_SPLITTER{R"( & |&|\s*,\s*|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 
 QStringList NameTool::operator()(const QString& s) const {
   QStringList ans;
@@ -19,10 +20,19 @@ QStringList NameTool::operator()(const QString& s) const {
       ans.append(stdName);
     }
   }
+  // don't sort here
   ans.removeDuplicates();
   return ans;
 }
-QStringList NameTool::castFromTitledSentence(const QString& s) const {
+
+QStringList NameTool::castFromSentence(const QString& s) const {
+  QStringList cast = operator()(s);
+  cast.sort();
+  cast.removeDuplicates();
+  return cast;
+}
+
+QStringList NameTool::castFromUpperCaseSentence(const QString& s) const {
   QRegularExpressionMatchIterator it = NAME_COMP.globalMatch(s);
   QStringList ans;
   QString srcCastName, stdCastName;
@@ -35,6 +45,7 @@ QStringList NameTool::castFromTitledSentence(const QString& s) const {
       ans.append(stdCastName);
     }
   }
+  ans.sort();
   ans.removeDuplicates();
   return ans;
 }
@@ -117,7 +128,6 @@ bool NameTool::ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fT
   return true;
 }
 
-const QRegularExpression CAST_STR_SPLITTER{R"( & |&|, |,|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 QStringList NameTool::CastTagSentenceParse2Lst(const QString& sentense, bool bElementUnique) {
   if (sentense.isEmpty()) {
     return {};
@@ -134,7 +144,7 @@ QString NameTool::CastTagSentenceParse2Str(const QString& sentense, bool bElemen
   return CastTagSentenceParse2Lst(sentense, bElementUnique).join(CSV_COMMA);
 }
 
-QStringList NameTool::CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast){
+QStringList NameTool::CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast) {
   if (sentense.isEmpty()) {
     return {};
   }

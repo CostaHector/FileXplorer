@@ -12,6 +12,7 @@ enum ViewType {
   MOVIE,
   SCENE,
   CAST,
+  JSON,
   VIEW_TYPE_BUTT,
 };
 
