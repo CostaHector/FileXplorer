@@ -11,6 +11,7 @@ class QLineEdit;
 class NameTool {
  public:
   QStringList operator()(const QString& s) const;
+  QStringList castFromSentence(const QString& s) const;
   QStringList castFromUpperCaseSentence(const QString& s) const;
 
   static QString CapitaliseFirstLetterKeepOther(const QString& sentence);

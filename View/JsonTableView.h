@@ -21,6 +21,7 @@ class JsonTableView: public CustomTableView
   int onClearStudio();
   int onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode);
   int onAppendFromSelection(bool isUpperCaseSentence);
+  int onSelectionCaseOperation(bool isTitle);
  private:
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
