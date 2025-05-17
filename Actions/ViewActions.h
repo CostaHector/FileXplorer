@@ -19,6 +19,7 @@ class ViewActions : public QObject {
   QAction* _SCENE_VIEW{nullptr};
   QAction* _FLOATING_PREVIEW{nullptr};
   QAction* _CAST_VIEW{nullptr};
+  QAction* _JSON_VIEW{nullptr};
   QActionGroup* _VIEWS_AG{nullptr};
 
   QAction* NAVIGATION_PANE{nullptr};

@@ -8,6 +8,58 @@ class SortedUniqStrLstTest : public MyTestSuite {
  public:
   SortedUniqStrLstTest() : MyTestSuite{false} {}
  private slots:
+
+  void insertOneElementFromHint() {
+    // leading/trailing space will not process
+    // only if format called
+    QString userInputElement{"  A D,   E F "};
+    SortedUniqStrLst lst;
+    lst.insertOneElementFromHint(userInputElement);
+    QStringList expectLst{userInputElement};
+    QCOMPARE(lst.join(), userInputElement);
+    QCOMPARE(lst.toSortedList(), expectLst);
+
+    QStringList expectLst2{"A D", "E F"};
+    lst.format();
+    QCOMPARE(lst.join(), "A D,E F");
+    QCOMPARE(lst.toSortedList(), expectLst2);
+  }
+
+  void test_Sentence2StringList() {
+    QString sentence{" A, \nB, C ,,\r\n,  D,  \n, E, F   "};
+    QStringList expectLst{"A", "B", "C", "D", "E", "F"};
+    QCOMPARE(SortedUniqStrLst::Sentence2StringList(sentence), expectLst);
+  }
+
+  void test_operateIncDecEq() {
+    SortedUniqStrLst s89{QStringList{"8", "9"}};
+    SortedUniqStrLst s12{QStringList{"1", "2"}};
+    SortedUniqStrLst s7{QStringList{"7"}};
+    SortedUniqStrLst s;
+    QCOMPARE(s.join(), "");
+    s += s7;
+    QCOMPARE(s.join(), "7");
+    s += s89;
+    QCOMPARE(s.join(), "7,8,9");
+    s += s89;
+    QCOMPARE(s.join(), "7,8,9");
+    s += s12;
+    QCOMPARE(s.join(), "1,2,7,8,9");
+    s -= "2";
+    QCOMPARE(s.join(), "1,7,8,9");
+    s -= "9";
+    QCOMPARE(s.join(), "1,7,8");
+    s -= "1";
+    QCOMPARE(s.join(), "7,8");
+    s -= "7,8";
+    QCOMPARE(s.join(), "7,8");
+    s -= "7";
+    s -= "7";
+    QCOMPARE(s.join(), "8");
+    s -= "8";
+    QCOMPARE(s.join(), "");
+  }
+
   void test_contruct() {
     SortedUniqStrLst lst0;
     QCOMPARE(lst0.isEmpty(), true);
