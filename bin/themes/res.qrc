@@ -50,7 +50,6 @@
 <file alias="NAVIGATION_PANE">TopSideToolBarIcons/NAVIGATION_PANE.ico</file>
 <file alias="SHOW_FOLDER_PREVIEW_HTML">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW_HTML.ico</file>
 <file alias="SHOW_FOLDER_PREVIEW">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW.svg</file>
-<file alias="JSON_EDITOR">TopSideToolBarIcons/JSON_EDITOR.png</file>
 <file alias="COMPRESS_ITEM">TopSideToolBarIcons/COMPRESS_ITEM.png</file>
 <file alias="EXTRACT_ITEM">TopSideToolBarIcons/EXTRACT_ITEM.png</file>
 <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
@@ -132,14 +131,20 @@
 <file alias="EXPORT_TO">RightClickIcon/EXPORT_TO.svg</file>
 
 <!--JsonEditor Icon here        -->
+<file alias="JSON_EDITOR">JsonEditor/JSON_EDITOR.png</file>
 <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
 <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
-<file alias="CAST_APPEND">JsonEditor/CAST_APPEND.svg</file>
+<file alias="CAST">JsonEditor/CAST.svg</file>
+<file alias="CAST_SET">JsonEditor/CAST_SET.svg</file>
+<file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
 <file alias="CAST_REMOVE">JsonEditor/CAST_REMOVE.svg</file>
+<file alias="CAST_CLEAR">JsonEditor/CAST_CLEAR.svg</file>
+<file alias="CAST_APPEND_FROM_SENTENCE">JsonEditor/CAST_APPEND_FROM_SENTENCE.svg</file>
+<file alias="CAST_APPEND_FROM_UPPERCASE_SENTENCE">JsonEditor/CAST_APPEND_FROM_UPPERCASE_SENTENCE.svg</file>
+<file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
 <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
 <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
 <file alias="SAVED">JsonEditor/SAVED.svg</file>
-<file alias="SAVE_JSON">JsonEditor/SAVE_JSON.svg</file>
 <file alias="AI_IDEA">JsonEditor/AI_IDEA.svg</file>
 <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
 <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
@@ -154,6 +159,9 @@
 <file alias="TAGS_APPEND">JsonEditor/TAGS_APPEND.svg</file>
 <file alias="TAGS_REMOVE">JsonEditor/TAGS_REMOVE.svg</file>
 <file alias="TAGS_SET">JsonEditor/TAGS_SET.svg</file>
+<file alias="TAGS_CLEAR">JsonEditor/TAGS_CLEAR.svg</file>
+<file alias="STUDIO_CLEAR">JsonEditor/STUDIO_CLEAR.svg</file>
+<file alias="STUDIO">JsonEditor/STUDIO.svg</file>
 <!--VideoPlayer icon here-->
 <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
 <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
@@ -188,7 +196,6 @@
 <file alias="_CONTINUOUS_NUMBERING">NameStrIcon/_CONTINUOUS_NUMBERING.svg</file>
 <file alias="NAME_RULER">NameStrIcon/NAME_RULER.svg</file>
 <file alias="PRODUCTION_STUDIOS_LIST_FILE">NameStrIcon/PRODUCTION_STUDIOS_LIST_FILE.svg</file>
-<file alias="PERFORMERS_LIST_FILE">NameStrIcon/PERFORMERS_LIST_FILE.svg</file>
 <file alias="PERFORMER_AKA_LIST_FILE">NameStrIcon/PERFORMER_AKA_LIST_FILE.svg</file>
 <file alias="SHOW_PERFORMER_STUDIO_STATISTIC">NameStrIcon/SHOW_PERFORMER_STUDIO_STATISTIC.svg</file>
 

@@ -6,14 +6,14 @@
 #include <QPushButton>
 #include <QCompleter>
 #include <QStringListModel>
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/NameTool.h"
 #include "Tools/CastManager.h"
 #include "public/PublicMacro.h"
 
 JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)  //
     : QDialog{parent, f},                                                                 //
-      mPerfsCompleter{CastManager::getIns().m_performers.values()}                        //
+      mPerfsCompleter{CastManager::getIns().m_casts.values()}                        //
 {
   m_onePerf = new (std::nothrow) QLineEdit;
   CHECK_NULLPTR_RETURN_VOID(m_onePerf);
@@ -69,12 +69,12 @@ bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
     return false;
   }
   QVariantHash& dict = *p_dict;
-  if (!dict.contains(ENUM_TO_STRING(Cast))) {
+  if (!dict.contains(ENUM_2_STR(Cast))) {
     return false;
   }
   const QString& perfs = text();
-  dict[ENUM_TO_STRING(Cast)] = NameTool()(perfs);
-  return JsonFileHelper::DumpJsonDict(dict, jsonFilePath);
+  dict[ENUM_2_STR(Cast)] = NameTool()(perfs);
+  return JsonHelper::DumpJsonDict(dict, jsonFilePath);
 }
 
 bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& jsonFilePath, QVariantHash& dict) {
@@ -85,7 +85,7 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
     return false;
   }
   setWindowFilePath(jsonFilePath);
-  auto castIt = dict.constFind(ENUM_TO_STRING(Cast));
+  auto castIt = dict.constFind(ENUM_2_STR(Cast));
   if (castIt == dict.cend()) {
     qDebug("No cast key in json[%s]", qPrintable(jsonFilePath));
     return false;

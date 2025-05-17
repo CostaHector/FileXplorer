@@ -8,7 +8,7 @@
 #include "Actions/FileLeafAction.h"
 #include "Actions/FolderPreviewActions.h"
 #include "Actions/FramelessWindowActions.h"
-#include "Actions/JsonEditorActions.h"
+#include "Actions/JsonActions.h"
 #include "Actions/PreferenceActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
@@ -27,20 +27,24 @@
 #include "public/PublicMacro.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
-    : QTabWidget{parent},
-      m_corner(GetMenuRibbonCornerWid()),
-      m_leafFile(LeafFile()),
-      m_leafHome(LeafHome()),
-      m_leafView(LeafView()),
-      m_leafDatabase(LeafDatabase()),
-      m_leafCast(LeafCast()),
-      m_leafScenes(LeafScenesTools()),
-      m_leafMedia(LeafMediaTools()) {
+    : QTabWidget{parent}  //
+{
+  m_corner = GetMenuRibbonCornerWid();
+  m_leafFile = LeafFile();
+  m_leafHome = LeafHome();
+  m_leafView = LeafView();
+  m_leafDatabase = LeafDatabase();
+  m_leafCast = LeafCast();
+  m_leafJson = LeafJson();
+  m_leafScenes = LeafScenesTools();
+  m_leafMedia = LeafMediaTools();
+
   addTab(m_leafFile, "&File");
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
   addTab(m_leafDatabase, "&Database");
   addTab(m_leafCast, "&Cast");
+  addTab(m_leafJson, "&Json");
   addTab(m_leafScenes, "&Scene");
   addTab(m_leafMedia, "&Arrange");
 
@@ -266,6 +270,11 @@ QToolBar* RibbonMenu::LeafCast() const {
   return castToolBar;
 }
 
+QToolBar* RibbonMenu::LeafJson() const {
+  auto* jsonToolBar = g_JsonActions().GetJsonRibbonToolBar();
+  return jsonToolBar;
+}
+
 QToolBar* RibbonMenu::LeafMediaTools() const {
   QToolBar* folderRmv{new (std::nothrow) QToolBar{"Folder Remover"}};
   CHECK_NULLPTR_RETURN_NULLPTR(folderRmv);
@@ -295,10 +304,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
   nameRulerToolButton->setDefaultAction(g_fileBasicOperationsActions()._NAME_RULER);
   auto& viewIns = g_viewActions();
-  auto& jsonIns = g_jsonEditorActions();
-  auto* jsonEditorTB = new (std::nothrow) DropdownToolButton(jsonIns._BATCH_EDIT_TOOL_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  CHECK_NULLPTR_RETURN_NULLPTR(jsonEditorTB);
-  jsonEditorTB->setDefaultAction(viewIns._JSON_EDITOR_PANE);
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
   QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
@@ -313,8 +318,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addWidget(nameRulerToolButton);
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._PACK_FOLDERS);
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._UNPACK_FOLDERS);
-  archiveVidsTB->addSeparator();
-  archiveVidsTB->addWidget(jsonEditorTB);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(g_fileBasicOperationsActions()._LONG_PATH_FINDER);
   archiveVidsTB->addSeparator();

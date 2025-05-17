@@ -12,14 +12,15 @@ ViewActions& g_viewActions() {
 ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   using namespace ViewTypeTool;
 
-  _ADVANCE_SEARCH_VIEW = new (std::nothrow) QAction(QIcon(":img/SEARCH"), ENUM_TO_STRING(SEARCH));
-  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/SHOW_DATABASE"), ENUM_TO_STRING(MOVIE));
-  _LIST_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), ENUM_TO_STRING(LIST));
-  _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), ENUM_TO_STRING(TABLE));
-  _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), ENUM_TO_STRING(TREE));
-  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENE_TABLE_VIEW"), ENUM_TO_STRING(SCENE));
+  _ADVANCE_SEARCH_VIEW = new (std::nothrow) QAction(QIcon(":img/SEARCH"), ENUM_2_STR(SEARCH));
+  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/SHOW_DATABASE"), ENUM_2_STR(MOVIE));
+  _LIST_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), ENUM_2_STR(LIST));
+  _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), ENUM_2_STR(TABLE));
+  _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), ENUM_2_STR(TREE));
+  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENE_TABLE_VIEW"), ENUM_2_STR(SCENE));
   _FLOATING_PREVIEW = new (std::nothrow) QAction(QIcon(":img/FLOATING_PREVIEW"), "floating preview");
-  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_APP"), ENUM_TO_STRING(CAST));
+  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_APP"), ENUM_2_STR(CAST));
+  _JSON_VIEW = new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), ENUM_2_STR(JSON));
   _VIEWS_AG = GetViewsAG();
 
   NAVIGATION_PANE = new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"));
@@ -92,22 +93,25 @@ QActionGroup* ViewActions::GetViewsAG() {
   _MOVIE_VIEW->setToolTip(QString("Movie dictionary view aka Database view. (%1)").arg(_MOVIE_VIEW->shortcut().toString()));
   _MOVIE_VIEW->setCheckable(true);
 
-  _ADVANCE_SEARCH_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_F));
-  _ADVANCE_SEARCH_VIEW->setShortcutVisibleInContextMenu(true);
-  _ADVANCE_SEARCH_VIEW->setToolTip(QString("Show advanced search window. (%1)").arg(_ADVANCE_SEARCH_VIEW->shortcut().toString()));
-  _ADVANCE_SEARCH_VIEW->setCheckable(true);
-
-  _SCENE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
-  _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
-  _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
-  _SCENE_VIEW->setCheckable(true);
-
   _FLOATING_PREVIEW->setToolTip(QString("Show floating preview for a scene in scene view. (%1)").arg(_FLOATING_PREVIEW->shortcut().toString()));
   _FLOATING_PREVIEW->setCheckable(true);
   _FLOATING_PREVIEW->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool());
 
   _CAST_VIEW->setToolTip(QString("Show Cast database. (%1)").arg(_CAST_VIEW->shortcut().toString()));
   _CAST_VIEW->setCheckable(true);
+
+  _SCENE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
+  _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
+  _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
+  _SCENE_VIEW->setCheckable(true);
+
+  _JSON_VIEW->setToolTip(QString("Show Json editor tableview. (%1)").arg(_JSON_VIEW->shortcut().toString()));
+  _JSON_VIEW->setCheckable(true);
+
+  _ADVANCE_SEARCH_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_F));
+  _ADVANCE_SEARCH_VIEW->setShortcutVisibleInContextMenu(true);
+  _ADVANCE_SEARCH_VIEW->setToolTip(QString("Show advanced search window. (%1)").arg(_ADVANCE_SEARCH_VIEW->shortcut().toString()));
+  _ADVANCE_SEARCH_VIEW->setCheckable(true);
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
@@ -117,6 +121,7 @@ QActionGroup* ViewActions::GetViewsAG() {
   actionGroup->addAction(_MOVIE_VIEW);
   actionGroup->addAction(_CAST_VIEW);
   actionGroup->addAction(_SCENE_VIEW);
+  actionGroup->addAction(_JSON_VIEW);
   actionGroup->addAction(_ADVANCE_SEARCH_VIEW);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
   return actionGroup;

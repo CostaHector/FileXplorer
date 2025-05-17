@@ -63,6 +63,19 @@ bool TextWriter(const QString& fileName, const QString& content, const QIODevice
   return true;
 }
 
+bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
+  QFile fi{fileName};
+  if (!fi.open(QIODevice::WriteOnly)) {
+    qWarning("Open [%s] to write failed. fill will not update.", qPrintable(fileName));
+    return false;
+  }
+  QTextStream stream(&fi);
+  stream << ba;
+  stream.flush();
+  fi.close();
+  return true;
+}
+
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
   for (int i = 0; i < lay->count(); ++i) {
     lay->itemAt(i)->setAlignment(align);

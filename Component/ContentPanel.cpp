@@ -50,7 +50,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
   // isNewPath: bool Only differs in undo and redo operation.
   // True means newPath would be push into undo.
   // false not
-  if (not newPath.isEmpty() and not QFileInfo(newPath).isDir()) {
+  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) {
     qWarning("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
@@ -74,14 +74,27 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
     return true;
   }
 
-  const bool isFileSystem = isFSView();
-  if (isFileSystem) {
-    QAbstractItemView* fsView = GetCurView();
-    if (fsView != nullptr) {
-      fsView->setRootIndex(m_fsModel->setRootPath(newPath));
-      fsView->selectionModel()->clearCurrentIndex();
-      fsView->selectionModel()->clearSelection();
+  ViewTypeTool::ViewType vt = GetCurViewType();
+  switch (vt) {
+    case ViewType::LIST:
+    case ViewType::TABLE:
+    case ViewType::TREE: {
+      QAbstractItemView* fsView = GetCurView();
+      if (fsView != nullptr) {
+        fsView->setRootIndex(m_fsModel->setRootPath(newPath));
+        fsView->selectionModel()->clearCurrentIndex();
+        fsView->selectionModel()->clearSelection();
+      }
+      break;
     }
+    case ViewType::JSON: {
+      if (m_jsonTableView != nullptr) {
+        m_jsonTableView->ReadADirectory(newPath);
+      }
+      break;
+    }
+    default:
+      break;
   }
   return true;
 }
@@ -200,8 +213,7 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
     if (ArchiveFiles::isQZFile(fi)) {
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->trigger();
       return true;
-    }
-    if (HarFiles::IsHarFile(fi)) {
+    } else if (HarFiles::IsHarFile(fi)) {
       emit g_viewActions()._HAR_VIEW->trigger();
       return true;
     }

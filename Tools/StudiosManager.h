@@ -13,6 +13,8 @@ class StudiosManager {
   int ForceReloadStudio();
 
   int LearningFromAPath(const QString& path, bool* bHasWrite = nullptr);
+  int StudioIncrement(QHash<QString, QString>& increments, const QString& newStudio);
+  int WriteIntoLocalDictionaryFiles(const QHash<QString, QString>& increments) const;
 
   QString ProductionStudioFilterOut(const QString& words) const;
   QSet<QString> GetCoarseStudioNames(QString standardPs) const;
