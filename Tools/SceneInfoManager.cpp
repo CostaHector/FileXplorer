@@ -1,7 +1,7 @@
 #include "SceneInfoManager.h"
 #include "public/PublicVariable.h"
 #include "Tools/Classify/SceneMixed.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "public/PathTool.h"
 #include <QFileInfo>
 #include <QDirIterator>
@@ -167,7 +167,7 @@ std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const Q
     scnContent += '\n';
     scnContent += rawJsonDict.value("VidName", "").toString();
     scnContent += '\n';
-    scnContent += QString::number(rawJsonDict.value("VidSize", 0).toULongLong());
+    scnContent += QString::number(rawJsonDict.value("Size", 0).toULongLong());
     scnContent += '\n';
     scnContent += QString::number(rawJsonDict.value("Rate", 0).toInt());
     scnContent += '\n';
@@ -190,7 +190,7 @@ bool GenerateAScnFile(const QString& aPath) {
   QList<QVariantHash> jsonDicts;
   jsonDicts.reserve(jsonNames.size());
   for (const QString& jsonFileName : jsonNames) {
-    jsonDicts << JsonFileHelper::MovieJsonLoader(jsonDir.absoluteFilePath(jsonFileName));
+    jsonDicts << JsonHelper::MovieJsonLoader(jsonDir.absoluteFilePath(jsonFileName));
   }
   int jsonUsedCnt = 0;
   QString scnContent;
@@ -245,7 +245,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
   for (auto jsFileIt = sMixed.m_json2Name.cbegin(); jsFileIt != sMixed.m_json2Name.cend(); ++jsFileIt) {
     const QString& baseName = jsFileIt.key();
     const QString jPath = path + '/' + jsFileIt.value();
-    QVariantHash rawJsonDict = JsonFileHelper::MovieJsonLoader(jPath);
+    QVariantHash rawJsonDict = JsonHelper::MovieJsonLoader(jPath);
     if (rawJsonDict.isEmpty()) {
       qWarning("json file[%s] may corrupt read failed", qPrintable(jPath));
       continue;
@@ -296,13 +296,13 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
         jsonNeedUpdate = true;
       }
 
-      it = rawJsonDict.find("VidSize");
+      it = rawJsonDict.find("Size");
       if (it == rawJsonDict.end()) {
-        // construct VidSize
-        rawJsonDict.insert("VidSize", vidFi.size());
+        // construct Size
+        rawJsonDict.insert("Size", vidFi.size());
         jsonNeedUpdate = true;
       } else if (it.value().toLongLong() != 0) {
-        // first set VidSize
+        // first set Size
         it->setValue(vidFi.size());
         jsonNeedUpdate = true;
       }
@@ -314,7 +314,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     }
 
     if (jsonNeedUpdate) {
-      JsonFileHelper::DumpJsonDict(rawJsonDict, jPath);
+      JsonHelper::DumpJsonDict(rawJsonDict, jPath);
       ++updatedJsonFilesCnt;
     }
     ++usefullJsonCnt;
@@ -357,7 +357,7 @@ int JsonDataRefresher::GenerateScnFiles() {
       scnContent += '\n';
       scnContent += rawJsonDict.value("VidName", "").toString();
       scnContent += '\n';
-      scnContent += QString::number(rawJsonDict.value("VidSize", 0).toULongLong());
+      scnContent += QString::number(rawJsonDict.value("Size", 0).toULongLong());
       scnContent += '\n';
       scnContent += QString::number(rawJsonDict.value("Rate", 0).toInt());
       scnContent += '\n';
