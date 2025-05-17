@@ -2,7 +2,7 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Component/Notificator.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
 #include "public/MemoryKey.h"
 #include "public/PathTool.h"
@@ -266,7 +266,7 @@ void VideoPlayer::setUrl(const QUrl& url) {
     const QString& vidsPath = url.toLocalFile();
     setWindowFilePath(vidsPath);
     const QString& jsonPath = PATHTOOL::FileExtReplacedWithJson(vidsPath);
-    m_dict = JsonFileHelper::MovieJsonLoader(jsonPath);
+    m_dict = JsonHelper::MovieJsonLoader(jsonPath);
   } else {
     m_dict.clear();
   }
@@ -282,9 +282,9 @@ void VideoPlayer::setUrl(const QUrl& url) {
 }
 
 auto VideoPlayer::loadVideoRate() -> void {
-  if (m_dict.contains(ENUM_TO_STRING(Rate))) {
+  if (m_dict.contains(ENUM_2_STR(Rate))) {
     bool isInt = false;
-    int rate = m_dict[ENUM_TO_STRING(Rate)].toInt(&isInt);
+    int rate = m_dict[ENUM_2_STR(Rate)].toInt(&isInt);
     if (isInt and 0 <= rate and rate < g_videoPlayerActions()._RATE_LEVEL_COUNT) {
       g_videoPlayerActions()._RATE_AG->actions()[rate]->setChecked(true);
     }
@@ -460,16 +460,16 @@ bool VideoPlayer::onMarkHotScenes() {
   std::sort(m_hotSceneList.begin(), m_hotSceneList.end());
 
   QList<QVariant> hotVariantList(m_hotSceneList.cbegin(), m_hotSceneList.cend());
-  m_dict.insert(ENUM_TO_STRING(Hot), hotVariantList);
-  bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
+  m_dict.insert(ENUM_2_STR(Hot), hotVariantList);
+  bool dumpRet = JsonHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Mark result: %d", dumpRet);
   return dumpRet;
 }
 
 auto VideoPlayer::loadHotSceneList() -> void {
   m_hotSceneList.clear();
-  if (m_dict.contains(ENUM_TO_STRING(Hot))) {
-    for (const QVariant& pos : m_dict[ENUM_TO_STRING(Hot)].toList()) {
+  if (m_dict.contains(ENUM_2_STR(Hot))) {
+    for (const QVariant& pos : m_dict[ENUM_2_STR(Hot)].toList()) {
       m_hotSceneList.append(pos.toInt());
     }
   }
@@ -534,8 +534,8 @@ auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {
     return false;
   }
   int score = checkedAction->text().back().toLatin1() - '0';
-  m_dict.insert(ENUM_TO_STRING(Rate), score);
-  bool dumpRet = JsonFileHelper::DumpJsonDict(m_dict, jsonPath);
+  m_dict.insert(ENUM_2_STR(Rate), score);
+  bool dumpRet = JsonHelper::DumpJsonDict(m_dict, jsonPath);
   qDebug("Rate result: %d", dumpRet);
   return dumpRet;
 }

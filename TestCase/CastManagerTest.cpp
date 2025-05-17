@@ -3,7 +3,8 @@
 #include "TestCase/pub/GlbDataProtect.h"
 #include "TestCase/pub/OnScopeExit.h"
 #include "TestCase/PathRelatedTool.h"
-#include "Tools/JsonFileHelper.h"
+#include "Tools/Json/JsonKey.h"
+#include "Tools/Json/JsonHelper.h"
 #include "pub/MyTestSuite.h"
 
 // add necessary includes here
@@ -51,15 +52,15 @@ class CastManagerTest : public MyTestSuite {
   void test_sentenceSplit() {
     // precondition
     const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     // procedure
     const QStringList& actualCastList = cmInLLT("Matt Dallas - Chris Pine and Jensen Ackles.");
@@ -71,15 +72,15 @@ class CastManagerTest : public MyTestSuite {
     const QStringList allCastList{"Jean le Rond d'Alembert", "Frenkie de Jong", "L Hospital", "James"};
     // 4 word(not support now), 3 word, 2 word, 1 word
     const QStringList expectCastList{"Frenkie de Jong", "L Hospital", "James"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : allCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     // single quote not used to split
     // and/And(insensitive) used to split
@@ -100,15 +101,15 @@ class CastManagerTest : public MyTestSuite {
   void test_one_char_seperator() {
     // precondition
     const QStringList expectCastList{"U", "V", "W", "X", "Y", "Z"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     const auto& perfsList = cmInLLT("U! + V; / W. \\\\ X & Y and Z?");
     QCOMPARE(perfsList, expectCastList);
@@ -117,15 +118,15 @@ class CastManagerTest : public MyTestSuite {
   void test_with_new_line_seperator() {
     // precondition
     const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    decltype(cmInLLT.m_performers) tempPerfs;
+    decltype(cmInLLT.m_casts) tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT.m_performers.swap(tempPerfs);
+    cmInLLT.m_casts.swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(tempPerfs);
+      cmInLLT.m_casts.swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT.m_performers.isEmpty());
+    QVERIFY(!cmInLLT.m_casts.isEmpty());
 
     const auto& perfsList = cmInLLT("Matt Dallas \n Chris Pine \r\n Jensen Ackles");
     QCOMPARE(perfsList, expectCastList);
@@ -137,10 +138,10 @@ class CastManagerTest : public MyTestSuite {
     const QString jsonAbsFile{dir.absoluteFilePath("My Good Boy.json")};
     QVERIFY(QFile::exists(jsonAbsFile));
 
-    using namespace JSON_KEY;
-    const QVariantHash& dict = JsonFileHelper::MovieJsonLoader(jsonAbsFile);
+    using namespace JsonKey;
+    const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonAbsFile);
 
-    const auto studioIt = dict.constFind(ENUM_TO_STRING(Studio));
+    const auto studioIt = dict.constFind(ENUM_2_STR(Studio));
     QVERIFY(studioIt != dict.cend());
     const QString& studioName{"StudioNotExist"};
     // studio not exist, studionotexist => StudioNotExist
@@ -148,7 +149,7 @@ class CastManagerTest : public MyTestSuite {
                                             {"studio not exist", "StudioNotExist"}};
     QCOMPARE(studioIt.value().toString(), studioName);
 
-    const auto castIt = dict.constFind(ENUM_TO_STRING(Cast));
+    const auto castIt = dict.constFind(ENUM_2_STR(Cast));
     QVERIFY(castIt != dict.cend());
     const QStringList& castLst{"Cast1NotExist", "Cast2NotExist"};
     QSet<QString> expectCastSet{"cast1notexist", "cast2notexist"};
@@ -162,9 +163,9 @@ class CastManagerTest : public MyTestSuite {
     };
 
     QSet<QString> emptyCastSet;
-    cmInLLT.m_performers.swap(emptyCastSet);
+    cmInLLT.m_casts.swap(emptyCastSet);
     ON_SCOPE_EXIT {
-      cmInLLT.m_performers.swap(emptyCastSet);
+      cmInLLT.m_casts.swap(emptyCastSet);
     };
 
     // cached should updated, local file should not write
@@ -178,7 +179,7 @@ class CastManagerTest : public MyTestSuite {
 
     bool castLocalFileWrite{false};
     QCOMPARE(cmInLLT.LearningFromAPath(rootpath, &castLocalFileWrite), 2);
-    QCOMPARE(cmInLLT.m_performers, expectCastSet);
+    QCOMPARE(cmInLLT.m_casts, expectCastSet);
     QCOMPARE(castLocalFileWrite, true);
     const QFile fiCast{gLocalFilePath};
     QVERIFY(fiCast.size() > 0);
@@ -192,7 +193,7 @@ class CastManagerTest : public MyTestSuite {
 
     castLocalFileWrite = true;
     QCOMPARE(cmInLLT.LearningFromAPath(rootpath, &castLocalFileWrite), 0);
-    QCOMPARE(cmInLLT.m_performers, expectCastSet);
+    QCOMPARE(cmInLLT.m_casts, expectCastSet);
     QCOMPARE(castLocalFileWrite, false);  // skipped, no write
   }
 };
