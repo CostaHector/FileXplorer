@@ -20,9 +20,16 @@ QStringList NameTool::operator()(const QString& s) const {
       ans.append(stdName);
     }
   }
-  ans.sort();
+  // don't sort here
   ans.removeDuplicates();
   return ans;
+}
+
+QStringList NameTool::castFromSentence(const QString& s) const {
+  QStringList cast = operator()(s);
+  cast.sort();
+  cast.removeDuplicates();
+  return cast;
 }
 
 QStringList NameTool::castFromUpperCaseSentence(const QString& s) const {
@@ -137,7 +144,7 @@ QString NameTool::CastTagSentenceParse2Str(const QString& sentense, bool bElemen
   return CastTagSentenceParse2Lst(sentense, bElementUnique).join(CSV_COMMA);
 }
 
-QStringList NameTool::CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast){
+QStringList NameTool::CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast) {
   if (sentense.isEmpty()) {
     return {};
   }
