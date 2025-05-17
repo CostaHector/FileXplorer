@@ -50,7 +50,6 @@
 <file alias="NAVIGATION_PANE">TopSideToolBarIcons/NAVIGATION_PANE.ico</file>
 <file alias="SHOW_FOLDER_PREVIEW_HTML">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW_HTML.ico</file>
 <file alias="SHOW_FOLDER_PREVIEW">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW.svg</file>
-<file alias="JSON_EDITOR">TopSideToolBarIcons/JSON_EDITOR.png</file>
 <file alias="COMPRESS_ITEM">TopSideToolBarIcons/COMPRESS_ITEM.png</file>
 <file alias="EXTRACT_ITEM">TopSideToolBarIcons/EXTRACT_ITEM.png</file>
 <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
@@ -132,12 +131,17 @@
 <file alias="EXPORT_TO">RightClickIcon/EXPORT_TO.svg</file>
 
 <!--JsonEditor Icon here        -->
+<file alias="JSON_EDITOR">JsonEditor/JSON_EDITOR.png</file>
 <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
 <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
+<file alias="CAST">JsonEditor/CAST.svg</file>
 <file alias="CAST_SET">JsonEditor/CAST_SET.svg</file>
-<file alias="CAST_APPEND">JsonEditor/CAST_APPEND.svg</file>
+<file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
 <file alias="CAST_REMOVE">JsonEditor/CAST_REMOVE.svg</file>
 <file alias="CAST_CLEAR">JsonEditor/CAST_CLEAR.svg</file>
+<file alias="CAST_APPEND_FROM_SENTENCE">JsonEditor/CAST_APPEND_FROM_SENTENCE.svg</file>
+<file alias="CAST_APPEND_FROM_UPPERCASE_SENTENCE">JsonEditor/CAST_APPEND_FROM_UPPERCASE_SENTENCE.svg</file>
+<file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
 <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
 <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
 <file alias="SAVED">JsonEditor/SAVED.svg</file>

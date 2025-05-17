@@ -1,7 +1,8 @@
 #include "JsonTableView.h"
-#include "Actions/JsonEditorActions.h"
+#include "Actions/JsonActions.h"
 #include "Component/Notificator.h"
 #include "Tools/StudiosManager.h"
+#include "Tools/NameTool.h"
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -285,13 +286,46 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
   return cnt;
 }
 
+int JsonTableView::onSelectionCaseOperation(bool isTitle) {
+  const QModelIndex& curInd = currentIndex();
+  if (!curInd.isValid()) {
+    LOG_WARN("Current Index is invalid", "select a line first");
+    return -1;
+  }
+  QWidget* editor = indexWidget(curInd);
+  if (editor == nullptr) {
+    LOG_WARN("editor is nullptr", "failed");
+    return -1;
+  }
+  auto lineEdit = qobject_cast<QLineEdit*>(editor);
+  if (lineEdit == nullptr) {
+    LOG_WARN("lineEdit is nullptr", "failed");
+    return -1;
+  }
+  const QString userSelection{lineEdit->selectedText()};
+  if (userSelection.trimmed().isEmpty()) {
+    LOG_WARN("User selection text empty", "failed");
+    return -1;
+  }
+  bool ret = NameTool::ReplaceAndUpdateSelection(*lineEdit, (isTitle ? NameTool::CapitaliseFirstLetterKeepOther : NameTool::Lower));
+  if (!ret) {
+    LOG_BAD("Change selection case failed", "see detail in logs");
+    return -1;
+  }
+  LOG_GOOD("Change selection text case succeed", userSelection);
+  return 0;
+}
+
 void JsonTableView::subscribe() {
-  auto& inst = g_jsonEditorActions();
+  auto& inst = g_JsonActions();
 
   connect(inst._SAVE_CURRENT_CHANGES, &QAction::triggered, this, &JsonTableView::onSaveCurrentChanges);
 
   connect(inst._SYNC_NAME_FIELD_BY_FILENAME, &QAction::triggered, this, &JsonTableView::onSyncNameField);
   connect(inst._EXPORT_CAST_STUDIO_TO_DICTION, &QAction::triggered, this, &JsonTableView::onExportCastStudioToDictonary);
+
+  connect(inst._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, [this]() { onSelectionCaseOperation(true); });
+  connect(inst._LOWER_ALL_WORDS, &QAction::triggered, this, [this]() { onSelectionCaseOperation(false); });
 
   connect(inst._RENAME_JSON_AND_RELATED_FILES, &QAction::triggered, this, &JsonTableView::onRenameJsonAndRelated);
 
