@@ -8,12 +8,14 @@ message($$DEFINES)
 
 SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp)
 SOURCES += $$files(TestCase/DbManager/*.cpp)
+SOURCES += $$files(TestCase/Json/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
 SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(public/Memory/*.cpp)
 SOURCES += $$files(FileOperation/*.cpp)
 SOURCES += $$files(Tools/FileDescriptor/*.cpp)
+SOURCES += $$files(Tools/Json/*.cpp)
 
 SOURCES += \
     Actions/QuickWhereActions.cpp \
@@ -39,7 +41,6 @@ SOURCES += \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/ItemsPileCategory.cpp \
     Tools/ItemsPileCategory.cpp \
-    Tools/JsonFileHelper.cpp \
     Tools/LongPathFinder.cpp \
     Tools/MD5Calculator.cpp \
     Tools/NameSectionArrange.cpp \
@@ -66,6 +67,7 @@ HEADERS += $$files(public/*.h)
 HEADERS += $$files(public/Memory/*.h)
 HEADERS += $$files(FileOperation/*.h)
 HEADERS += $$files(Tools/FileDescriptor/*.h)
+HEADERS += $$files(Tools/Json/*.h)
 
 HEADERS += \
     Actions/QuickWhereActions.h \
@@ -91,7 +93,6 @@ HEADERS += \
     Tools/FolderNxtAndLastIterator.h \
     Tools/ItemsPileCategory.h \
     Tools/ItemsPileCategory.h \
-    Tools/JsonFileHelper.h \
     Tools/LongPathFinder.h \
     Tools/MD5Calculator.h \
     Tools/NameSectionArrange.h \

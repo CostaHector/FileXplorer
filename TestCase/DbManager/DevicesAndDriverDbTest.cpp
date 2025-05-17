@@ -135,8 +135,8 @@ class DevicesAndDriverDbTest : public MyTestSuite {
     using namespace DEV_DRV_TABLE;
     QSet<QString> actualMountPoint;
     QSet<int> actualAdtTimes;
-    mDb.QueryPK(DB_TABLE::DISKS, ENUM_TO_STRING(MOUNT_POINT), actualMountPoint);
-    mDb.QueryPK(DB_TABLE::DISKS, ENUM_TO_STRING(ADT_TIME), actualAdtTimes);
+    mDb.QueryPK(DB_TABLE::DISKS, ENUM_2_STR(MOUNT_POINT), actualMountPoint);
+    mDb.QueryPK(DB_TABLE::DISKS, ENUM_2_STR(ADT_TIME), actualAdtTimes);
     QSet<QString> expectMountPoint{"C:/DISK/mnt", "", ""};
     QSet<int> expectAdtTimes{9999, 0, 0};
     QCOMPARE(actualMountPoint, expectMountPoint);
