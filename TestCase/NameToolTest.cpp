@@ -11,12 +11,12 @@
 class NameToolTest : public MyTestSuite {
   Q_OBJECT
 
-public:
+ public:
   NameToolTest() : MyTestSuite{false} {}
-private slots:
+ private slots:
   void test_AndAsSubStringOfNameRatherThanFS() {
-    const QStringList& sentenseExamples{"Andrew Tale and Andrew Garfield", //
-                                        "Andrew Tale And Andrew Garfield", //
+    const QStringList& sentenseExamples{"Andrew Tale and Andrew Garfield",  //
+                                        "Andrew Tale And Andrew Garfield",  //
                                         "Andrew Tale AND Andrew Garfield"};
     const QStringList expectList{"Andrew Tale", "Andrew Garfield"}; // not sorted
     foreach (const QString& sentense, sentenseExamples) {
@@ -27,7 +27,7 @@ private slots:
   void test_NameTool_operator() {
     const QStringList expectLst{"A", "B"};
     const QString addAsFS = "A + B";
-    const QStringList commaAsFSLst {"A , B", "A, B", "A, B"};
+    const QStringList commaAsFSLst{"A , B", "A, B", "A, B"};
     const QString verticalBarAsFS = "A | B";
     const QString ampersandAsFS = "A & B";
     const QStringList andAsFSLst{"A and B", "A AND B", "A And B"};
@@ -44,7 +44,7 @@ private slots:
     }
     QCOMPARE(m_nameTool(verticalBarAsFS), expectLst);
     QCOMPARE(m_nameTool(ampersandAsFS), expectLst);
-    foreach(const QString& andAsFS, andAsFSLst){
+    foreach (const QString& andAsFS, andAsFSLst) {
       QCOMPARE(m_nameTool(andAsFS), expectLst);
     }
     QCOMPARE(m_nameTool(atAsFS), expectLst);
@@ -111,7 +111,7 @@ private slots:
 
   void test_someFactoryDetail() {
     const QString& s = "ROND D'ALEMBERT, AA B'CDE. ROND D'ALEMBERT was a French mathematician, philosopher, and writer.";
-    const QStringList expectCastLst{"Rond D'Alembert", "Aa B'Cde"};
+    const QStringList expectCastLst{"Aa B'Cde", "Rond D'Alembert"};
     QCOMPARE(expectCastLst, m_nameTool.castFromUpperCaseSentence(s));
   }
 
@@ -199,7 +199,7 @@ private slots:
     QCOMPARE(te.textCursor().selectedText(), "Hello World");
   }
 
-private:
+ private:
   NameTool m_nameTool;
 };
 

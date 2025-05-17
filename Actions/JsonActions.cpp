@@ -1,59 +1,12 @@
-#include "JsonEditorActions.h"
+#include "JsonActions.h"
 #include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
 #include <QApplication>
-#include <QMenu>
 #include <QStyle>
 
-JsonEditorActions::JsonEditorActions(QObject* parent)  //
+JsonActions::JsonActions(QObject* parent)  //
     : QObject{parent}                                  //
 {
-  _SELECT_CURRENT_FOLDER = new (std::nothrow) QAction{QIcon(":img/LOAD_A_PATH"), "Read Current path"};
-  _SELECT_CURRENT_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/>Load json files from current view root path.")  //
-                                         .arg(_SELECT_CURRENT_FOLDER->text(),                                    //
-                                              _SELECT_CURRENT_FOLDER->shortcut().toString()));
-  _CLR_JSON_FILE_LIST = new (std::nothrow) QAction(QIcon(":img/EMPTY_LISTWIDGET"), "Clear list", this);
-  _CLR_JSON_FILE_LIST->setToolTip(QString("<b>%1 (%2)</b><br/> Clear jsons files list")  //
-                                      .arg(_CLR_JSON_FILE_LIST->text())                  //
-                                      .arg(_CLR_JSON_FILE_LIST->shortcut().toString()));
-
-  _LAST_FILE = new (std::nothrow) QAction(QIcon{":img/JSON_FILE_PRECIOUS"}, "Last", this);
-  _LAST_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_BracketLeft));
-  _LAST_FILE->setShortcutVisibleInContextMenu(true);
-  _LAST_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Last one json(if exists)")  //
-                             .arg(_LAST_FILE->text())                             //
-                             .arg(_LAST_FILE->shortcut().toString()));
-  _NEXT_FILE = new (std::nothrow) QAction(QIcon{":img/JSON_FILE_NEXT"}, "Next", this);
-  _NEXT_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_BracketRight));
-  _NEXT_FILE->setShortcutVisibleInContextMenu(true);
-  _NEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Next one json(if exists)")  //
-                             .arg(_NEXT_FILE->text())                             //
-                             .arg(_NEXT_FILE->shortcut().toString()));
-  _DONE_AND_PREVIOUS = new (std::nothrow) QAction(QIcon{":img/JSON_FILE_NEXT_PREVIOUS"}, "Done & Last", this);
-  _DONE_AND_PREVIOUS->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_Return));
-  _DONE_AND_PREVIOUS->setShortcutVisibleInContextMenu(true);
-  _DONE_AND_PREVIOUS->setToolTip(QString("<b>%1 (%2)</b><br/> Mark item as done and selected to previous unfinished item")  //
-                                     .arg(_DONE_AND_PREVIOUS->text())                                                       //
-                                     .arg(_DONE_AND_PREVIOUS->shortcut().toString()));
-  _DONE_AND_NEXT = new (std::nothrow) QAction(QIcon{":img/JSON_FILE_NEXT_UNFINISHED"}, "Done & Next", this);
-  _DONE_AND_NEXT->setShortcut(QKeySequence(Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_Return));
-  _DONE_AND_NEXT->setShortcutVisibleInContextMenu(true);
-  _DONE_AND_NEXT->setToolTip(QString("<b>%1 (%2)</b><br/> Mark item as done and selected to next unfinished item")  //
-                                 .arg(_DONE_AND_NEXT->text())                                                       //
-                                 .arg(_DONE_AND_NEXT->shortcut().toString()));
-  _AUTO_SKIP = new (std::nothrow) QAction(QIcon(":img/AUTO_SKIP"), "Auto skip", this);
-  _AUTO_SKIP->setCheckable(true);
-  _AUTO_SKIP->setChecked(true);
-  _AUTO_SKIP->setShortcutVisibleInContextMenu(true);
-  _AUTO_SKIP->setToolTip(QString("<b>%1 (%2)</b><br/> When click next, it will skip cast count greater than 2")  //
-                             .arg(_AUTO_SKIP->text())                                                            //
-                             .arg(_AUTO_SKIP->shortcut().toString()));
-  _SKIP_IF_CAST_CNT_GT = new (std::nothrow) QAction(QIcon{":img/SKIP_IF"}, "Cast count GT", this);
-  _SKIP_IF_CAST_CNT_GT->setShortcutVisibleInContextMenu(true);
-  _SKIP_IF_CAST_CNT_GT->setToolTip(QString("<b>%1 (%2)</b><br/> Set json complete performer count")  //
-                                       .arg(_SKIP_IF_CAST_CNT_GT->text())                            //
-                                       .arg(_SKIP_IF_CAST_CNT_GT->shortcut().toString()));
-
   // **Submit**
   _SAVE_CURRENT_CHANGES = new (std::nothrow) QAction{QIcon(":img/SUBMIT"), "Submit", this};
   _SAVE_CURRENT_CHANGES->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
@@ -131,7 +84,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)  //
                              .arg(_FORMATTER->text())
                              .arg(_FORMATTER->shortcut().toString()));
 
-  _INIT_STUDIO_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_SET"), "Init Cast/Studio");
+  _INIT_STUDIO_CAST = new (std::nothrow) QAction(QIcon(":img/CAST"), "Init Cast/Studio");
   _INIT_STUDIO_CAST->setToolTip(QString("<b>%1 (%2)</b><br/>Init Cast/Studio Fields if empty.").arg(_INIT_STUDIO_CAST->text(), _INIT_STUDIO_CAST->shortcut().toString()));
   _STUDIO_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/STUDIO"), "Set Studio");
   _STUDIO_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input studio string and used to set Studio field")  //
@@ -139,7 +92,7 @@ JsonEditorActions::JsonEditorActions(QObject* parent)  //
   _CAST_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/CAST_SET"), "Set Cast");
   _CAST_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input a sentence used to set Cast field")  //
                                   .arg(_CAST_FIELD_SET->text(), _CAST_FIELD_SET->shortcut().toString()));
-  _CAST_FIELD_APPEND = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND"), "Add Cast");
+  _CAST_FIELD_APPEND = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), "Add Cast");
   _CAST_FIELD_APPEND->setToolTip(QString("<b>%1 (%2)</b><br/>Input a sentence append to Cast field")  //
                                      .arg(_CAST_FIELD_APPEND->text(), _CAST_FIELD_APPEND->shortcut().toString()));
   _CAST_FIELD_RMV = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), "Rmv Cast");
@@ -155,68 +108,19 @@ JsonEditorActions::JsonEditorActions(QObject* parent)  //
   _TAGS_FIELD_RMV->setToolTip(QString("<b>%1 (%2)</b><br/>Input a tag used to remove from Tags field")  //
                                   .arg(_TAGS_FIELD_RMV->text(), _TAGS_FIELD_RMV->shortcut().toString()));
 
-  _ADD_SELECTED_CAST_SENTENCE = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND"), "Add Cast", this);
+  _ADD_SELECTED_CAST_SENTENCE = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_FROM_SENTENCE"), "Cast from sentence", this);
   _ADD_SELECTED_CAST_SENTENCE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
   _ADD_SELECTED_CAST_SENTENCE->setShortcutVisibleInContextMenu(true);
-  _ADD_SELECTED_CAST_SENTENCE->setToolTip(QString("<b>%1 (%2)</b><br/> Append selection to performers lineeditor")  //
-                                          .arg(_ADD_SELECTED_CAST_SENTENCE->text())                                 //
-                                          .arg(_ADD_SELECTED_CAST_SENTENCE->shortcut().toString()));
-  _EXTRACT_UPPERCASE_CAST = new (std::nothrow) QAction("Add Cast\nfrom Capitalized sentence", this);
-  _EXTRACT_UPPERCASE_CAST->setToolTip(QString("<b>%1 (%2)</b><br/> Append capitalized name in selection to Cast lineeditor")  //
-                                                 .arg(_EXTRACT_UPPERCASE_CAST->text())                                        //
-                                                 .arg(_EXTRACT_UPPERCASE_CAST->shortcut().toString()));
-  _TEXT_EDIT_ACTIONS = new (std::nothrow) QActionGroup(this);
-
-  _RE_STUDIO_CAST_VALUE = new (std::nothrow) QAction{"Reconstruct Studio/Cast values"};
-  _RE_STUDIO_CAST_VALUE->setToolTip(QString("<b>%1 (%2)</b><br/>Reconstruct both Cast and Studio values for json files under current path.")  //
-                                        .arg(_RE_STUDIO_CAST_VALUE->text())                                                                   //
-                                        .arg(_RE_STUDIO_CAST_VALUE->shortcut().toString()));
-  _STANDARDLIZE_JSON_KEY = new (std::nothrow) QAction("Standardlize Json Key");
-  _BATCH_EDIT_TOOL_ACTIONS = new (std::nothrow) QActionGroup(this);
-
-  _TEXT_EDIT_ACTIONS->addAction(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
-  _TEXT_EDIT_ACTIONS->addAction(_LOWER_ALL_WORDS);
-  _TEXT_EDIT_ACTIONS->addAction(_FORMATTER);
-  _TEXT_EDIT_ACTIONS->addAction(_RELOAD_JSON_FROM_FROM_DISK);
-  _TEXT_EDIT_ACTIONS->addAction(_ADD_SELECTED_CAST_SENTENCE);
-  _TEXT_EDIT_ACTIONS->addAction(_EXTRACT_UPPERCASE_CAST);
-
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_SELECT_CURRENT_FOLDER);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_SYNC_NAME_FIELD_BY_FILENAME);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_CAST_FIELD_APPEND);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_STUDIO_FIELD_SET);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_INIT_STUDIO_CAST);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_RE_STUDIO_CAST_VALUE);
-  _BATCH_EDIT_TOOL_ACTIONS->addAction(_STANDARDLIZE_JSON_KEY);
+  _ADD_SELECTED_CAST_SENTENCE->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected sentence")  //
+                                              .arg(_ADD_SELECTED_CAST_SENTENCE->text())                       //
+                                              .arg(_ADD_SELECTED_CAST_SENTENCE->shortcut().toString()));
+  _EXTRACT_UPPERCASE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_FROM_UPPERCASE_SENTENCE"), "From uppercase sentence", this);
+  _EXTRACT_UPPERCASE_CAST->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected UPPERCASE sentence")  //
+                                          .arg(_EXTRACT_UPPERCASE_CAST->text())                                     //
+                                          .arg(_EXTRACT_UPPERCASE_CAST->shortcut().toString()));
 }
 
-QToolBar* JsonEditorActions::GetJsonToolBar() {
-  auto* m_editorToolBar = new (std::nothrow) QToolBar{"Json editor actions"};
-  m_editorToolBar->addAction(_SELECT_CURRENT_FOLDER);
-  m_editorToolBar->addAction(_CLR_JSON_FILE_LIST);
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(_LAST_FILE);
-  m_editorToolBar->addAction(_NEXT_FILE);
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(_DONE_AND_PREVIOUS);
-  m_editorToolBar->addAction(_DONE_AND_NEXT);
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(_AUTO_SKIP);
-  m_editorToolBar->addAction(_SKIP_IF_CAST_CNT_GT);
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addActions(_TEXT_EDIT_ACTIONS->actions());
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(_SAVE_CURRENT_CHANGES);
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(_AI_HINT_CAST_STUDIO);
-  m_editorToolBar->addAction(_EXPORT_CAST_STUDIO_TO_DICTION);
-  m_editorToolBar->addSeparator();
-  m_editorToolBar->addAction(_RENAME_JSON_AND_RELATED_FILES);
-  m_editorToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  return m_editorToolBar;
-}
-
-QToolBar* JsonEditorActions::GetJsonRibbonToolBar() {
+QToolBar* JsonActions::GetJsonRibbonToolBar() {
   auto* jsonRibbonTB = new (std::nothrow) QToolBar{"Json Ribbons"};
   CHECK_NULLPTR_RETURN_NULLPTR(jsonRibbonTB);
 
@@ -315,15 +219,7 @@ QToolBar* JsonEditorActions::GetJsonRibbonToolBar() {
   return jsonRibbonTB;
 }
 
-QMenu* JsonEditorActions::GetJsonToBeEdittedListMenu(QWidget* parent) {
-  auto* menu = new (std::nothrow) QMenu{"Json List Menu", parent};
-  menu->addAction(_RENAME_JSON_AND_RELATED_FILES);
-  menu->addAction(_REVEAL_IN_EXPLORER);
-  menu->addAction(_OPEN_THIS_FILE);
-  return menu;
-}
-
-JsonEditorActions& g_jsonEditorActions() {
-  static JsonEditorActions ins;
+JsonActions& g_JsonActions() {
+  static JsonActions ins;
   return ins;
 }
