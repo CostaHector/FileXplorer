@@ -22,7 +22,6 @@ class MyQFileSystemModel;
 class ContentPanel;
 class CustomStatusBar;
 class MyClipboard;
-class JsonEditor;
 class VideoPlayer;
 class AlertSystem;
 class AdvanceRenamer;
@@ -121,7 +120,6 @@ class FileExplorerEvent : public QObject {
 
   CustomStatusBar* _logger;
   MyClipboard* m_clipboard;
-  JsonEditor* m_jsonEditor{nullptr};
   VideoPlayer* videoPlayer{nullptr};
 
   AlertSystem* m_alertSystem{nullptr};
