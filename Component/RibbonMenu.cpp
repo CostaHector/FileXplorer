@@ -27,20 +27,24 @@
 #include "public/PublicMacro.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
-    : QTabWidget{parent},
-      m_corner(GetMenuRibbonCornerWid()),
-      m_leafFile(LeafFile()),
-      m_leafHome(LeafHome()),
-      m_leafView(LeafView()),
-      m_leafDatabase(LeafDatabase()),
-      m_leafCast(LeafCast()),
-      m_leafScenes(LeafScenesTools()),
-      m_leafMedia(LeafMediaTools()) {
+    : QTabWidget{parent}  //
+{
+  m_corner = GetMenuRibbonCornerWid();
+  m_leafFile = LeafFile();
+  m_leafHome = LeafHome();
+  m_leafView = LeafView();
+  m_leafDatabase = LeafDatabase();
+  m_leafCast = LeafCast();
+  m_leafJson = LeafJson();
+  m_leafScenes = LeafScenesTools();
+  m_leafMedia = LeafMediaTools();
+
   addTab(m_leafFile, "&File");
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
   addTab(m_leafDatabase, "&Database");
   addTab(m_leafCast, "&Cast");
+  addTab(m_leafJson, "&Json");
   addTab(m_leafScenes, "&Scene");
   addTab(m_leafMedia, "&Arrange");
 
@@ -264,6 +268,11 @@ QToolBar* RibbonMenu::LeafCast() const {
   auto* castToolBar{new (std::nothrow) RibbonCastDB("Leaf Cast Database")};
   CHECK_NULLPTR_RETURN_NULLPTR(castToolBar);
   return castToolBar;
+}
+
+QToolBar* RibbonMenu::LeafJson() const {
+  auto* jsonToolBar = g_jsonEditorActions().GetJsonRibbonToolBar();
+  return jsonToolBar;
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {

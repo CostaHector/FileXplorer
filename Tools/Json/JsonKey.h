@@ -14,11 +14,11 @@ namespace JsonKey {
 #define JSON_FILE_KEY_MAPPING                                                                                                                                                                      \
   JSON_KEY_ITEM(Name, 1, QString{}, QString{}, /*                             */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
                 DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Cast, 2, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initCastSortedLst,                  \
+  JSON_KEY_ITEM(Cast, 2, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initCastSortedLst,                          \
                 DataFormatter::writeJsonObjectSortedStrLst)                                                                                                                                        \
   JSON_KEY_ITEM(Studio, 3, QString{}, QString{}, /*                           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initStudioQString,                      \
                 DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Tags, 4, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst,                      \
+  JSON_KEY_ITEM(Tags, 4, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst,                              \
                 DataFormatter::writeJsonObjectSortedStrLst)                                                                                                                                        \
   JSON_KEY_ITEM(Detail, 5, QString{}, QString{}, /*                           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
                 DataFormatter::writeJsonObjectQString)                                                                                                                                             \
@@ -30,7 +30,7 @@ namespace JsonKey {
                 DataFormatter::writeJsonObjectQString)                                                                                                                                             \
   JSON_KEY_ITEM(Bitrate, 10, QString{}, QString{}, /*                         */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
                 DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Hot, 11, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst,                      \
+  JSON_KEY_ITEM(Hot, 11, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst,                              \
                 DataFormatter::writeJsonObjectSortedStrLst)                                                                                                                                        \
   JSON_KEY_ITEM(Duration, 12, (int)0, (int)0, /*                              */ DataFormatter::formatDefault, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::initInt)            \
   JSON_KEY_ITEM(ImgName, 13, QStringList{}, QStringList{}, /*                 */ DataFormatter::formatQStringLst, DataFormatter::writeQStringLst, DataFormatter::initQStringLst,                   \
@@ -64,7 +64,7 @@ static const QString FIELF_OP_TYPE_ARR[(int)FIELD_OP_TYPE::BUTT]{
     ENUM_2_STR(CAST),
     ENUM_2_STR(TAGS),
 };
-enum class FIELD_OP_MODE { SET = 0, APPEND = 1, REMOVE = 2, BUTT };
+enum class FIELD_OP_MODE { SET = 0, APPEND = 1, REMOVE = 2, CLEAR = 3, BUTT };
 static const QString FIELD_OP_MODE_ARR[(int)FIELD_OP_MODE::BUTT]{
     ENUM_2_STR(SET),
     ENUM_2_STR(APPEND),
