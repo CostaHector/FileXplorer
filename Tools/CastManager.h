@@ -13,14 +13,16 @@ class CastManager {
   int ForceReloadCast();
 
   int LearningFromAPath(const QString& path, bool* bHasWrite = nullptr);
+  int CastIncrement(QSet<QString>& increments, QSet<QString> delta);
+  int WriteIntoLocalDictionaryFiles(const QSet<QString>& increments) const;
 
   static QString RmvBelongLetter(const QString& word);
   static QStringList SplitSentence(QString sentence);
   QStringList FilterPerformersOut(const QStringList& words) const;
   QStringList operator()(const QString& sentence) const;
-  QSet<QString> m_performers;
+  QSet<QString> m_casts;
 
-  inline int count() const { return m_performers.size(); }
+  inline int count() const { return m_casts.size(); }
 
  private:
   static const QRegularExpression EFFECTIVE_CAST_NAME;

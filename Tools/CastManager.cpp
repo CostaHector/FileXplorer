@@ -56,7 +56,7 @@ QSet<QString> CastManager::ReadOutPerformers() const {
   QTextStream stream(&castFi);
   stream.setCodec("UTF-8");
 
-  decltype(m_performers) perfSet;
+  decltype(m_casts) perfSet;
   QString name;
   while (!stream.atEnd()) {
     name = stream.readLine().toLower();
@@ -71,9 +71,9 @@ QSet<QString> CastManager::ReadOutPerformers() const {
 }
 
 int CastManager::ForceReloadCast() {
-  int beforeStudioNameCnt = m_performers.size();
-  m_performers = CastManager::ReadOutPerformers();
-  int afterStudioNameCnt = m_performers.size();
+  int beforeStudioNameCnt = m_casts.size();
+  m_casts = CastManager::ReadOutPerformers();
+  int afterStudioNameCnt = m_casts.size();
   qDebug("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
   return afterStudioNameCnt - beforeStudioNameCnt;
 }
@@ -87,7 +87,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
     qWarning("path[%s] not exist", qPrintable(path));
     return 0;
   }
-  decltype(m_performers) castsIncrement;
+  decltype(m_casts) castsIncrement;
   QDirIterator it{path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   int jsonFilesCnt{0};
   while (it.hasNext()) {
@@ -99,38 +99,61 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
       continue;
     }
     ++jsonFilesCnt;
-    const QVariant& v = perfIt.value();
-    QString lowercaseCast;
-    for (const QString& performer : v.toStringList()) {
-      lowercaseCast = performer.trimmed().toLower();
-      if (lowercaseCast.isEmpty() || m_performers.contains(lowercaseCast)) {
-        continue;
-      }
-      castsIncrement.insert(lowercaseCast);
+    QSet<QString> lowerSet;
+    for (const auto& str : perfIt->toStringList()) {
+      lowerSet.insert(str.toLower());
     }
+    CastIncrement(castsIncrement, lowerSet);
   }
   qDebug("Learn extra %d cast from %d valid json files", castsIncrement.size(), jsonFilesCnt);
   if (castsIncrement.isEmpty()) {
     return 0;
   }
-  m_performers.unite(castsIncrement);
+  m_casts.unite(castsIncrement);
 
-  QFile performersFi{mLocalFilePath};
-  if (!performersFi.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-    qWarning("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(performersFi.fileName()));
-    return -1;
+  int cnt = WriteIntoLocalDictionaryFiles(castsIncrement);
+  if (cnt < 0) {
+    return cnt;
   }
-  QTextStream stream{&performersFi};
-  stream.setCodec("UTF-8");
-  for (const QString& perf : castsIncrement) {
-    stream << perf << '\n';
-  }
-  stream.flush();
-  performersFi.close();
   if (bHasWrite != nullptr) {
     *bHasWrite = true;
   }
-  return castsIncrement.size();
+  return cnt;
+}
+
+int CastManager::CastIncrement(QSet<QString>& increments, QSet<QString> delta) {
+  delta -= m_casts;
+  increments += delta;
+  m_casts += delta;
+  return delta.size();
+}
+
+int CastManager::WriteIntoLocalDictionaryFiles(const QSet<QString>& increments) const {
+  if (increments.isEmpty()) {
+    qDebug("Empty increments, skip writing.");
+    return 0;
+  }
+  QFile file{mLocalFilePath};
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+    qWarning("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(file.fileName()));
+    return -1;
+  }
+  QTextStream out(&file);
+  out.setCodec("UTF-8");
+
+  QString content;
+  content.reserve(increments.size() * 32);
+  for (const QString& item : increments) {
+    content.append(item).append('\n');
+  }
+  out << content;
+  if (out.status() != QTextStream::Ok) {
+    qCritical("Write failed: %s", qPrintable(file.errorString()));
+    return -2;
+  }
+  file.close();
+  qDebug("Successfully wrote %d cast items to file %s", increments.size(), qPrintable(mLocalFilePath));
+  return increments.size();
 }
 
 QStringList CastManager::SplitSentence(QString sentence) {
@@ -164,7 +187,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
   while (i < N) {
     if (i < N - 2) {
       const QString& w3 = words[i] + " " + words[i + 1] + " " + RmvBelongLetter(words[i + 2]);
-      if (m_performers.contains(w3.toLower())) {
+      if (m_casts.contains(w3.toLower())) {
         if (!performersList.contains(w3))
           performersList.append(w3);
         i += 3;
@@ -173,7 +196,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
     }
     if (i < N - 1) {
       const QString& w2 = words[i] + " " + RmvBelongLetter(words[i + 1]);
-      if (m_performers.contains(w2.toLower())) {
+      if (m_casts.contains(w2.toLower())) {
         if (!performersList.contains(w2)) {
           performersList.append(w2);
         }
@@ -182,7 +205,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
       }
     }
     const QString& w1 = RmvBelongLetter(words[i]);
-    if (!w1.isEmpty() && m_performers.contains(w1.toLower())) {
+    if (!w1.isEmpty() && m_casts.contains(w1.toLower())) {
       if (!performersList.contains(w1))
         performersList.append(w1);
       i += 1;

@@ -8,18 +8,30 @@ class SortedUniqStrLst {
  public:
   friend struct JsonPr;
 
+  static QStringList Sentence2StringList(const QString& sentence);
   operator QVariant() const { return join(); }
 
   SortedUniqStrLst() = default;
   explicit SortedUniqStrLst(const QString& sentence);
   explicit SortedUniqStrLst(const QStringList& initList);
+  SortedUniqStrLst(const SortedUniqStrLst& rhs);
+  SortedUniqStrLst& operator=(SortedUniqStrLst rhs) noexcept {
+    swap(rhs);
+    return *this;
+  }
+  void swap(SortedUniqStrLst& rhs) noexcept;
+
+  SortedUniqStrLst& operator+=(const SortedUniqStrLst& rhs) noexcept;
+  SortedUniqStrLst& operator-=(const QString& oneElement) noexcept;
+
   bool operator==(const SortedUniqStrLst& rhs) const {  //
     return m_set == rhs.m_set;
   }
   bool operator!=(const SortedUniqStrLst& rhs) const {  //
     return !(this->operator==(rhs));
-  }
+  }  
 
+  void setAlreadySortedBatch(const QStringList& list);
   void setBatchFromSentence(const QString& sentence);
   void setBatch(const QStringList& list);
 
@@ -30,7 +42,9 @@ class SortedUniqStrLst {
   void insertBatch_LE_5(const QStringList& list);
   void insertBatch_GT_5(const QStringList& newItems);
 
+  void insertOneElementFromHint(const QString& target);
   bool remove(const QString& target);
+  void format(); // call to format after insertOneElementFromHint
 
   void clear() {
     m_set.clear();
@@ -38,6 +52,7 @@ class SortedUniqStrLst {
     mJoinCalled = false;
   }
 
+  QSet<QString> toLowerSets() const;
   const QStringList& toSortedList() const { return m_sortedCache; }
   const QString& join() const;
 

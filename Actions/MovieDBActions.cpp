@@ -83,7 +83,8 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(_OPEN_DB_WITH_LOCAL_APP);
 
   SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Set Studio", this);
-  SET_CAST = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_LIST_FILE"), "Set Cast", this);
+
+  SET_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_SET"), "Set Cast", this);
   APPEND_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND"), "Add Cast", this);
   REMOVE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), "Rmv Cast", this);
 

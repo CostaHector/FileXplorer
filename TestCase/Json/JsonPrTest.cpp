@@ -7,6 +7,7 @@
 #include "Tools/Json/JsonPr.h"
 #include "Tools/CastManager.h"
 #include "Tools/StudiosManager.h"
+#include "Tools/NameTool.h"
 #include "public/PathTool.h"
 #include "public/PublicMacro.h"
 
@@ -28,10 +29,54 @@ class JsonPrTest : public MyTestSuite {
     }
   }
 
+  void test_HintForCastStudio() {  //
+    JsonPr jpr;
+    bool studioChange{true}, castChanged{true};
+    jpr.HintForCastStudio("", studioChange, castChanged);
+    QCOMPARE(studioChange, false);
+    QCOMPARE(castChanged, false);
+
+    auto& psm = StudiosManager::getIns();
+    decltype(psm.m_prodStudioMap) tempStudios;
+    tempStudios["marvelfilms"] = "MarvelFilms";
+    tempStudios["marvel films"] = "MarvelFilms";
+    tempStudios["realmadrid"] = "ReadMadrid";
+    tempStudios["real madrid"] = "ReadMadrid";
+    psm.m_prodStudioMap.swap(tempStudios);
+    ON_SCOPE_EXIT {
+      psm.m_prodStudioMap.swap(tempStudios);
+    };
+    auto& pm = CastManager::getIns();
+    decltype(pm.m_casts) tempCast{"a1 c1", "b1 d1", "a1 b1"};
+    pm.m_casts.swap(tempCast);
+    ON_SCOPE_EXIT {
+      pm.m_casts.swap(tempCast);
+    };
+
+    QString sentence{"A1 C1, G1, A1 B1, B1 D1.mp4"};
+    jpr.m_Name = "Marvel Films- Read Madrid - A1 C1, G1, A1 B1";
+
+    studioChange = false;
+    castChanged = false;
+    jpr.HintForCastStudio(sentence, studioChange, castChanged);
+    QCOMPARE(studioChange, true);
+    QCOMPARE(castChanged, true);
+
+    QSet<QString> expectHintCast{"A1 C1", "A1 B1", "B1 D1"};
+    QStringList actualHintCastLst{jpr.hintCast.split(NameTool::CSV_COMMA)};
+    QSet<QString> actualHintCast{actualHintCastLst.begin(), actualHintCastLst.end()};
+    QCOMPARE(jpr.hintStudio, "MarvelFilms");
+    QCOMPARE(expectHintCast, actualHintCast);  // hint cast no need sorted
+
+    QCOMPARE(jpr.m_Name, "Marvel Films- Read Madrid - A1 C1, G1, A1 B1");  // name not change
+    QVERIFY(jpr.m_Studio.isEmpty());                                       // studio not fill automatically
+    QVERIFY(jpr.m_Cast.isEmpty());                                         // cast not fill automatically
+  }
+
   void test_fromJsonFile() {
     // precondition
     const QFile fixedFi{fixedAbsPath};
-    QCOMPARE(fixedFi.size(), 0);
+    QCOMPARE(fixedFi.size(), 0);  // empty at first
     const auto& jPr = JsonPr::fromJsonFile(fixedFi.fileName());
     QCOMPARE(jPr.m_Prepath, rootpath);
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
@@ -55,6 +100,11 @@ class JsonPrTest : public MyTestSuite {
 
     JsonPr jPr2{fixedFi.fileName()};
     QCOMPARE(jPr, jPr2);
+
+    // default constructor and one path element constructor only differ in jsonFileName
+    JsonPr jPr3;
+    jPr3.jsonFileName = jPr2.jsonFileName;
+    QCOMPARE(jPr3, jPr2);
   }
 
   void test_construct_ok() {
@@ -90,9 +140,14 @@ class JsonPrTest : public MyTestSuite {
     QCOMPARE(jPr.m_ImgName, (QStringList{"A 2.jpg", "A 1.jpg"}));
     QCOMPARE(jPr.m_VidName, "A.mp4");
 
-    // 4. Write without deprecated key ProductionStudio, Performers should ok
+    // 4. Write without deprecated key ProductionStudio, Performers should ok, hint filed should be cleared
     // Tags/Cast/Hot should be sorted and unique before write into json file
+    jPr.hintCast = "Lalala..";
+    jPr.hintStudio = "BLA.BLA..";
     QVERIFY(jPr.WriteIntoFiles());
+    QVERIFY(jPr.hintCast.isEmpty());
+    QVERIFY(jPr.hintStudio.isEmpty());
+
     const auto& writedJson = JsonHelper::MovieJsonLoader(jPr.GetAbsPath());
     QVERIFY(!writedJson.contains("ProductionStudio"));
     QVERIFY(!writedJson.contains(ENUM_2_STR(Performers)));
@@ -125,12 +180,14 @@ class JsonPrTest : public MyTestSuite {
 
   void test_Rename_ok() {
     const QStringList relatedNames{
+        // environment exist MUST
         "SuperMan - Henry Cavill.json",    // fixedJsonName
         "SuperMan - Henry Cavill.jpg",     //
         "SuperMan - Henry Cavill 1.jpg",   //
         "SuperMan - Henry Cavill 999.mp4"  //
     };
     const QStringList newRelatedNames{
+        // environment not exist MUST
         "SuperMan - Chris Evans.json",    // newJsonName
         "SuperMan - Chris Evans.jpg",     //
         "SuperMan - Chris Evans 1.jpg",   //
@@ -156,7 +213,7 @@ class JsonPrTest : public MyTestSuite {
     // name equal skip rename
     {
       QVERIFY(dir.exists(fixedJsonName));
-      QCOMPARE(jPr.Rename(fixedJsonName), JsonPr::E_OK);
+      QCOMPARE(jPr.RenameJsonAndRelated(fixedJsonName), JsonPr::E_OK);
     }
 
     // json been moved
@@ -166,7 +223,7 @@ class JsonPrTest : public MyTestSuite {
       QVERIFY(dir.rename(fixedJsonName, movedFixedJsonName));
       QVERIFY(!dir.exists(fixedJsonName));
 
-      QCOMPARE(jPr.Rename(newJsonName), JsonPr::E_JSON_NOT_EXIST);
+      QCOMPARE(jPr.RenameJsonAndRelated(newJsonName), JsonPr::E_JSON_NOT_EXIST);
       ON_SCOPE_EXIT {
         QVERIFY(dir.rename(movedFixedJsonName, fixedJsonName));
       };
@@ -175,12 +232,12 @@ class JsonPrTest : public MyTestSuite {
     // new json name occupied
     {
       QVERIFY(dir.exists(occupiedJsonName));
-      QCOMPARE(jPr.Rename(occupiedJsonName), JsonPr::E_JSON_FILE_RENAME_FAILED);
+      QCOMPARE(jPr.RenameJsonAndRelated(occupiedJsonName), JsonPr::E_JSON_NEW_NAME_OCCUPID);
     }
 
     // cnt = itself + else file
     {
-      QCOMPARE(jPr.Rename(newJsonName), relatedNames.size());
+      QCOMPARE(jPr.RenameJsonAndRelated(newJsonName), relatedNames.size());
       for (const QString& name : relatedNames) {
         QVERIFY(!dir.exists(name));
       }
@@ -205,12 +262,12 @@ class JsonPrTest : public MyTestSuite {
 
     auto& pm = CastManager::getIns();
     auto& psm = StudiosManager::getIns();
-    decltype(pm.m_performers) tempCastsList{"chris hemsworth", "keanu reeves", "chris evans"};
+    decltype(pm.m_casts) tempCastsList{"chris hemsworth", "keanu reeves", "chris evans"};
     decltype(psm.m_prodStudioMap) tempStudiosMap{{"paramount pictures", "Paramount Pictures"}};
-    pm.m_performers.swap(tempCastsList);
+    pm.m_casts.swap(tempCastsList);
     psm.m_prodStudioMap.swap(tempStudiosMap);
     ON_SCOPE_EXIT {
-      pm.m_performers.swap(tempCastsList);
+      pm.m_casts.swap(tempCastsList);
       psm.m_prodStudioMap.swap(tempStudiosMap);
     };
 

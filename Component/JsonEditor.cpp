@@ -32,7 +32,7 @@ JsonEditor::JsonEditor(QWidget* parent)
 
     m_jsonModel{new JsonModel{this}},
     m_jsonList(new JsonListView{m_jsonModel, this}),
-    m_toolBar{g_jsonEditorActions().GetJsonToolBar(this)},
+    m_toolBar{g_jsonEditorActions().GetJsonToolBar()},
     m_splitter{new(std::nothrow) QSplitter{Qt::Orientation::Horizontal, this}} {
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_toolBar);
 
@@ -125,28 +125,28 @@ void JsonEditor::refreshEditPanel(const QModelIndex& curIndex) {
 }
 
 void JsonEditor::subscribe() {
-  connect(m_jsonList->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonEditor::refreshEditPanel);
+//  connect(m_jsonList->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonEditor::refreshEditPanel);
 
-  connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
-  connect(g_jsonEditorActions()._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, this, [this]() { refreshEditPanel(m_jsonList->currentIndex()); });
+//  connect(g_jsonEditorActions()._FORMATTER, &QAction::triggered, this, &JsonEditor::formatter);
+//  connect(g_jsonEditorActions()._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, this, [this]() { refreshEditPanel(m_jsonList->currentIndex()); });
 
-  connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, m_jsonList, &JsonListView::onNext);
-  connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, m_jsonList, &JsonListView::onLast);
-  connect(g_jsonEditorActions()._DONE_AND_PREVIOUS, &QAction::triggered, this, &JsonEditor::onSaveAndLastUnfinishedItem);
-  connect(g_jsonEditorActions()._DONE_AND_NEXT, &QAction::triggered, this, &JsonEditor::onSaveAndNextUnfinishedItem);
-  connect(g_jsonEditorActions()._SKIP_IF_CAST_CNT_GT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
+//  connect(g_jsonEditorActions()._NEXT_FILE, &QAction::triggered, m_jsonList, &JsonListView::onNext);
+//  connect(g_jsonEditorActions()._LAST_FILE, &QAction::triggered, m_jsonList, &JsonListView::onLast);
+//  connect(g_jsonEditorActions()._DONE_AND_PREVIOUS, &QAction::triggered, this, &JsonEditor::onSaveAndLastUnfinishedItem);
+//  connect(g_jsonEditorActions()._DONE_AND_NEXT, &QAction::triggered, this, &JsonEditor::onSaveAndNextUnfinishedItem);
+//  connect(g_jsonEditorActions()._SKIP_IF_CAST_CNT_GT, &QAction::triggered, m_jsonList, &JsonListView::onSetPerfCount);
 
-  connect(g_jsonEditorActions()._SAVE_CURRENT_CHANGES, &QAction::triggered, this, &JsonEditor::onStageChanges);
+//  connect(g_jsonEditorActions()._SAVE_CURRENT_CHANGES, &QAction::triggered, this, &JsonEditor::onStageChanges);
 
-  connect(g_jsonEditorActions()._ADD_SELECTED_PERFORMER, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
-  connect(g_jsonEditorActions()._EXTRACT_CAPITALIZED_PERFORMER, &QAction::triggered, this, &JsonEditor::onExtractCapitalizedPerformersHint);
+//  connect(g_jsonEditorActions()._ADD_SELECTED_CAST_SENTENCE, &QAction::triggered, this, &JsonEditor::onSelectedTextAppendToPerformers);
+//  connect(g_jsonEditorActions()._EXTRACT_UPPERCASE_CAST, &QAction::triggered, this, &JsonEditor::onExtractCapitalizedPerformersHint);
 
-  connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
-  connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
-  connect(g_jsonEditorActions()._LEARN_PERFORMERS_FROM_JSON, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
-  connect(g_jsonEditorActions()._AI_HINT, &QAction::triggered, this, &JsonEditor::onPerformersHint);
+//  connect(g_jsonEditorActions()._LOWER_ALL_WORDS, &QAction::triggered, this, &JsonEditor::onLowercaseEachWord);
+//  connect(g_jsonEditorActions()._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, &JsonEditor::onCapitalizeEachWord);
+//  connect(g_jsonEditorActions()._EXPORT_CAST_STUDIO_TO_DICTION, &QAction::triggered, this, &JsonEditor::onLearnPerfomersFromJsonFile);
+//  connect(g_jsonEditorActions()._AI_HINT_CAST_STUDIO, &QAction::triggered, this, &JsonEditor::onPerformersHint);
 
-  connect(g_jsonEditorActions()._RENAME_THIS_FILE, &QAction::triggered, this, &JsonEditor::onRenameJsonFile);
+//  connect(g_jsonEditorActions()._RENAME_JSON_AND_RELATED_FILES, &QAction::triggered, this, &JsonEditor::onRenameJsonFile);
 }
 
 int JsonEditor::operator()(const QString& folderPath) {
@@ -278,7 +278,7 @@ bool JsonEditor::onPerformersHint() {
   const int newPerfsCnt = mPerfsCsv->AppendFromStringList(hintPerfsList);
 
   static StudiosManager& psm = StudiosManager::getIns();
-  const QString& newProdStudioName = psm[nameText];
+  const QString& newProdStudioName = psm(nameText);
   if (!newProdStudioName.isEmpty()) {
     mStudio->setText(newProdStudioName);
   }
@@ -292,11 +292,11 @@ auto JsonEditor::onExtractCapitalizedPerformersHint() -> bool {
   QStringList hintPerfs;
   if (mName->hasSelectedText()) {
     const QString& capitalizedStr = mName->selectedText();
-    hintPerfs += nt.castFromTitledSentence(capitalizedStr);
+    hintPerfs += nt.castFromUpperCaseSentence(capitalizedStr);
   }
   if (mDetail->textCursor().hasSelection()) {
     const QString& capitalizedStr = mDetail->textCursor().selection().toPlainText();
-    hintPerfs += nt.castFromTitledSentence(capitalizedStr);
+    hintPerfs += nt.castFromUpperCaseSentence(capitalizedStr);
   }
   mPerfsCsv->AppendFromStringList(hintPerfs);
   return true;
