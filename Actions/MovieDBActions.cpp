@@ -85,7 +85,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Set Studio", this);
 
   SET_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_SET"), "Set Cast", this);
-  APPEND_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND"), "Add Cast", this);
+  APPEND_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), "Add Cast", this);
   REMOVE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), "Rmv Cast", this);
 
   SET_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_SET"), "Set Tags", this);

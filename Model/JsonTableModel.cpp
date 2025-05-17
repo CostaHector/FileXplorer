@@ -601,7 +601,7 @@ int JsonTableModel::AppendCastFromSentence(const QModelIndex& ind, const QString
     return -1;
   }
   static const NameTool nt;
-  const QStringList& newLst{isUpperCaseSentence ? nt.castFromUpperCaseSentence(sentence) : nt(sentence)};
+  const QStringList& newLst{isUpperCaseSentence ? nt.castFromUpperCaseSentence(sentence) : nt.castFromSentence(sentence)};
 
   auto& stCast = mCachedJsons[row].m_Cast;
   int beforeCastCnt = stCast.count();
