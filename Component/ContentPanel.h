@@ -13,6 +13,7 @@
 #include "View/FileSystemListView.h"
 #include "View/FileSystemTableView.h"
 #include "View/FileSystemTreeView.h"
+#include "View/JsonTableView.h"
 #include "View/MovieDBView.h"
 #include "View/SceneListView.h"
 #include "View/CastDBView.h"
@@ -85,6 +86,9 @@ class ContentPanel : public QStackedWidget {
     if (p == m_castTableView) {
       return ViewType::CAST;
     }
+    if (p == m_jsonTableView) {
+      return ViewType::JSON;
+    }
     qCritical("Current Index[%d] not find ViewType", currentIndex());
     return ViewType::VIEW_TYPE_BUTT;
   }
@@ -124,6 +128,7 @@ class ContentPanel : public QStackedWidget {
   AdvanceSearchModel* m_searchSrcModel{nullptr};
   SearchProxyModel* m_proxyModel{nullptr};
   ScenesListModel* m_scenesModel{nullptr};
+  JsonTableModel* m_jsonModel{nullptr};
 
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
@@ -133,6 +138,7 @@ class ContentPanel : public QStackedWidget {
   SceneListView* m_sceneTableView{nullptr};
 
   CastDBView* m_castTableView{nullptr};
+  JsonTableView* m_jsonTableView{nullptr};
 
   PreviewFolder* _previewFolder;
 
