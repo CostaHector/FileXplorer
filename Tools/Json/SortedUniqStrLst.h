@@ -24,6 +24,9 @@ class SortedUniqStrLst {
   SortedUniqStrLst& operator+=(const SortedUniqStrLst& rhs) noexcept;
   SortedUniqStrLst& operator-=(const QString& oneElement) noexcept;
 
+  bool operator==(const QSet<QString>& tempSet) const {  //
+    return m_set == tempSet;
+  }
   bool operator==(const SortedUniqStrLst& rhs) const {  //
     return m_set == rhs.m_set;
   }
