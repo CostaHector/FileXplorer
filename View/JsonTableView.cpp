@@ -6,8 +6,9 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QTextEdit>
 #include <QTextCursor>
+#include <QPlainTextEdit>
+#include <QStyleOptionViewItem>
 
 JsonTableView::JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProxyModel, QWidget* parent)  //
     : CustomTableView{"JSON_TABLE_VIEW", parent}                                                          //
@@ -22,6 +23,10 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProx
 
   setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
+
+  m_DetailEdit = new (std::nothrow) MultiLineEditDelegate;
+  CHECK_NULLPTR_RETURN_VOID(jsonModel);
+  setItemDelegateForColumn(JSON_KEY_E::Detail, m_DetailEdit);
 
   InitTableView();
   setWindowTitle("Json Table View");
@@ -185,7 +190,8 @@ int JsonTableView::onHintCastAndStudio() {
   }
 
   QString userSelection;
-  if (!GetSelectedTextInCell(userSelection)) {
+  EDITOR_WIDGET_TYPE edtWidType{EDITOR_WIDGET_TYPE::BUTT};
+  if (!GetSelectedTextInCell(userSelection, edtWidType)) {
     LOG_WARN("Get Selected Text in Selected Cell failed", "see detail in logs");
     return -1;
   }
@@ -290,40 +296,44 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
   return indexes.size();
 }
 
-bool JsonTableView::GetSelectedTextInCell(QString& selectedText) const {
+// current index invalid => false
+// no selection => false
+// no edit mode => true
+bool JsonTableView::GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_TYPE& edtWidType) const {
+  selectedText.clear();
+  edtWidType = EDITOR_WIDGET_TYPE::BUTT;
   const QModelIndex& curInd = currentIndex();
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
     return false;
   }
   QWidget* editor = indexWidget(curInd);
-  if (editor == nullptr) { // not in edit mode
-    qDebug("Cell not in edit", "Cannot get selection text in cell");
+  if (editor == nullptr) {  // not in edit mode
+    qDebug("Cell not in edit, cannot get selection text in cell");
     return true;
   }
-  QString userSelection;
-
-  const auto lineEdit = qobject_cast<QLineEdit*>(editor);
-  if (lineEdit == nullptr) {
-    const auto textEdit = qobject_cast<QTextEdit*>(editor);
-    if (textEdit == nullptr) {
-      LOG_WARN("lineEdit/textEdit are nullptr", "failed");
-      return false;
-    } else {
-      userSelection = textEdit->textCursor().selectedText();
-    }
+  if (auto lineEdit = qobject_cast<QLineEdit*>(editor)) {
+    selectedText = lineEdit->selectedText();
+    edtWidType = EDITOR_WIDGET_TYPE::LINE_EDIT;
+  } else if (auto textEdit = qobject_cast<QPlainTextEdit*>(editor)) {
+    selectedText = textEdit->textCursor().selectedText();
+    edtWidType = EDITOR_WIDGET_TYPE::PLAIN_TEXT_EDIT;
+  } else if (auto richTextEdit = qobject_cast<QTextEdit*>(editor)) {
+    selectedText = richTextEdit->textCursor().selectedText();
+    edtWidType = EDITOR_WIDGET_TYPE::TEXT_EDIT;
   } else {
-    userSelection = lineEdit->selectedText();
+    selectedText.clear();
+    edtWidType = EDITOR_WIDGET_TYPE::BUTT;
+    LOG_WARN("Unsupported editor type, current not QLineEdit/QPlainTextEdit/QTextEdit", "failed");
+    return false;
   }
-
-  selectedText.swap(userSelection);
   return true;
 }
 
-
 int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
+  EDITOR_WIDGET_TYPE edtWidType{EDITOR_WIDGET_TYPE::BUTT};
   QString userSelection;
-  if (!GetSelectedTextInCell(userSelection)) {
+  if (!GetSelectedTextInCell(userSelection, edtWidType)) {
     LOG_WARN("Get Selected Text in Selected Cell failed", "see detail in logs");
     return -1;
   }
@@ -352,28 +362,53 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
 
 int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   const QModelIndex& curInd = currentIndex();
-  const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
-  if (!curInd.isValid()) {
-    LOG_WARN("Current Index is invalid", "select a line first");
+
+  QString userSelection;
+  EDITOR_WIDGET_TYPE edtWidType{EDITOR_WIDGET_TYPE::BUTT};
+  if (!GetSelectedTextInCell(userSelection, edtWidType)) {
+    LOG_WARN("Index valid or no selection", "No need change case");
     return -1;
   }
+  if (userSelection.trimmed().isEmpty()) {
+    LOG_WARN("User selection empty", "No need change case");
+    return -1;
+  }
+
   QWidget* editor = indexWidget(curInd);
   if (editor == nullptr) {
     LOG_WARN("Cell not in edit", "Cannot change case of selection text");
     return -1;
   }
-  auto lineEdit = qobject_cast<QLineEdit*>(editor);
-  if (lineEdit == nullptr) {
-    LOG_WARN("lineEdit is nullptr", "failed");
-    return -1;
+
+  QString newText;
+  auto* pCaseFunc{isTitle ? NameTool::CapitaliseFirstLetterKeepOther : NameTool::Lower};
+  bool ret{false};
+  switch (edtWidType) {
+    case EDITOR_WIDGET_TYPE::LINE_EDIT: {
+      auto* lineEdit = qobject_cast<QLineEdit*>(editor);
+      ret = NameTool::ReplaceAndUpdateSelection(*lineEdit, pCaseFunc);
+      newText = lineEdit->text();
+      break;
+    }
+    case EDITOR_WIDGET_TYPE::PLAIN_TEXT_EDIT:{
+      auto* plainTextEdit = qobject_cast<QPlainTextEdit*>(editor);
+      ret = NameTool::ReplaceAndUpdateSelection(*plainTextEdit, pCaseFunc);
+      newText = plainTextEdit->toPlainText();
+      break;
+    }
+    case EDITOR_WIDGET_TYPE::TEXT_EDIT:{
+      auto* textEdit = qobject_cast<QTextEdit*>(editor);
+      ret = NameTool::ReplaceAndUpdateSelection(*textEdit, pCaseFunc);
+      newText = textEdit->toPlainText();
+      break;
+    }
+    case EDITOR_WIDGET_TYPE::BUTT: {
+      LOG_WARN("Editor type invalid", "Cannot change case of selection text");
+      break;
+    }
   }
-  const QString userSelection{lineEdit->selectedText()};
-  if (userSelection.trimmed().isEmpty()) {
-    LOG_WARN("User selection text empty", "failed");
-    return -1;
-  }
-  bool ret = NameTool::ReplaceAndUpdateSelection(*lineEdit, (isTitle ? NameTool::CapitaliseFirstLetterKeepOther : NameTool::Lower));
-  _JsonModel->setData(srcModelInd, lineEdit->text());
+  const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
+  _JsonModel->setData(srcModelInd, newText);
   if (!ret) {
     LOG_BAD("Change selection case failed", "see detail in logs");
     return -1;
