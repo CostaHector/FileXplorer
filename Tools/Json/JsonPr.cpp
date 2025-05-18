@@ -33,6 +33,7 @@ JsonPr::JsonPr(const QString& filePrePath, const QString& fileName, const QJsonO
       JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
       jsonFileName{fileName} {  //
+  m_Detail.replace("<br/>", "\n");
 }
 
 bool JsonPr::operator==(const JsonPr& rhs) const {
@@ -53,6 +54,7 @@ bool JsonPr::Reload() {
 #define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) m_##enu = initer(json, ENUM_2_STR(enu), defValue);
   JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
+  m_Detail.replace("<br/>", "\n");
   return true;
 }
 

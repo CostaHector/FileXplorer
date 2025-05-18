@@ -4,6 +4,7 @@
 #include "CustomTableView.h"
 #include "Model/JsonTableModel.h"
 #include "Model/JsonProxyModel.h"
+#include "Component/MultiLineEditDelegate.h"
 
 class JsonTableView : public CustomTableView {
  public:
@@ -27,12 +28,20 @@ class JsonTableView : public CustomTableView {
   int onAppendFromSelection(bool isUpperCaseSentence);
   int onSelectionCaseOperation(bool isTitle);
 
-  bool GetSelectedTextInCell(QString& selectedText) const;
+  enum class EDITOR_WIDGET_TYPE {
+    LINE_EDIT = 0,
+    PLAIN_TEXT_EDIT,
+    TEXT_EDIT,
+    BUTT,
+  };
+
+  bool GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_TYPE& edtWidType) const;
  private:
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};
   JsonProxyModel* _JsonProxyModel{nullptr};
+  MultiLineEditDelegate* m_DetailEdit{nullptr};
 };
 
 #endif  // JSONVIEW_H
