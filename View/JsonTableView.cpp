@@ -6,6 +6,8 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QTextEdit>
+#include <QTextCursor>
 
 JsonTableView::JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProxyModel, QWidget* parent)  //
     : CustomTableView{"JSON_TABLE_VIEW", parent}                                                          //
@@ -277,7 +279,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
 }
 
 int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
-  const QModelIndex& curInd = CurrentIndexSource();
+  const QModelIndex& curInd = currentIndex();
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
     return -1;
@@ -287,12 +289,21 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
     LOG_WARN("editor is nullptr", "failed");
     return -1;
   }
+  QString userSelection;
+
   auto lineEdit = qobject_cast<QLineEdit*>(editor);
   if (lineEdit == nullptr) {
-    LOG_WARN("lineEdit is nullptr", "failed");
-    return -1;
+    auto textEdit = qobject_cast<QTextEdit*>(editor);
+    if (textEdit == nullptr) {
+      LOG_WARN("lineEdit/textEdit are nullptr", "failed");
+      return -1;
+    } else {
+      userSelection = textEdit->textCursor().selectedText();
+    }
+  } else {
+    userSelection = lineEdit->selectedText();
   }
-  const QString userSelection{lineEdit->selectedText()};
+
   if (userSelection.trimmed().isEmpty()) {
     LOG_WARN("User selection text empty", "failed");
     return -1;
@@ -308,7 +319,7 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
 }
 
 int JsonTableView::onSelectionCaseOperation(bool isTitle) {
-  const QModelIndex& curInd = CurrentIndexSource();
+  const QModelIndex& curInd = currentIndex();
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
     return -1;
