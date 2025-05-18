@@ -20,7 +20,7 @@ const QString fixedAbsPath = rootpath + '/' + fixedJsonName;
 class JsonPrTest : public MyTestSuite {
   Q_OBJECT
  public:
-  JsonPrTest() : MyTestSuite{true} {}
+  JsonPrTest() : MyTestSuite{false} {}
  private slots:
   void init() {
     QFile fixedJsonFile{fixedAbsPath};
