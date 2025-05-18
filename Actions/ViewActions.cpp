@@ -74,7 +74,6 @@ QActionGroup* ViewActions::GetPlayersActions() {
 }
 
 QActionGroup* ViewActions::GetViewsAG() {
-  _LIST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_2));
   _LIST_VIEW->setShortcutVisibleInContextMenu(true);
   _LIST_VIEW->setToolTip(QString("Displays items by using large thumbnails. (%1)").arg(_LIST_VIEW->shortcut().toString()));
   _LIST_VIEW->setCheckable(true);
@@ -85,7 +84,6 @@ QActionGroup* ViewActions::GetViewsAG() {
   _TABLE_VIEW->setCheckable(true);
   _TABLE_VIEW->setChecked(true);
 
-  _TREE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_9));
   _TREE_VIEW->setShortcutVisibleInContextMenu(true);
   _TREE_VIEW->setToolTip(QString("Display files and folders achitecures. (%1)").arg(_TREE_VIEW->shortcut().toString()));
   _TREE_VIEW->setCheckable(true);
@@ -97,6 +95,8 @@ QActionGroup* ViewActions::GetViewsAG() {
   _FLOATING_PREVIEW->setCheckable(true);
   _FLOATING_PREVIEW->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool());
 
+  _CAST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_7));
+  _CAST_VIEW->setShortcutVisibleInContextMenu(true);
   _CAST_VIEW->setToolTip(QString("Show Cast database. (%1)").arg(_CAST_VIEW->shortcut().toString()));
   _CAST_VIEW->setCheckable(true);
 
@@ -105,6 +105,8 @@ QActionGroup* ViewActions::GetViewsAG() {
   _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
   _SCENE_VIEW->setCheckable(true);
 
+  _JSON_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_9));
+  _JSON_VIEW->setShortcutVisibleInContextMenu(true);
   _JSON_VIEW->setToolTip(QString("Show Json editor tableview. (%1)").arg(_JSON_VIEW->shortcut().toString()));
   _JSON_VIEW->setCheckable(true);
 
