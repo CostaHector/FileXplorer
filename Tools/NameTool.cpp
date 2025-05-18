@@ -75,6 +75,7 @@ QString NameTool::CapitaliseFirstLetterLowerOther(const QString& sentence) {
 
 QString NameTool::ToggleSentenceCase(const QString& sentence) {
   QString toggled;
+  toggled.reserve(sentence.size());
   for (QChar c : sentence) {
     if (c.isLetter()) {
       toggled += (c.toLatin1() ^ 0x20);  // trick upper to lower case by bitwise operator
