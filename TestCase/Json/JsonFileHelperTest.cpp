@@ -5,9 +5,10 @@
 #include "TestCase/pub/MyTestSuite.h"
 #include "Tools/Json/JsonKey.h"
 #include "Tools/Json/JsonHelper.h"
+#include "Tools/Json/JsonPr.h"
 #include "public/PublicMacro.h"
 
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
+const QString jsonRootPath = TestCaseRootPath() + "/test/TestEnv_JsonHelper";
 
 using namespace JsonHelper;
 using namespace JsonKey;
@@ -16,8 +17,9 @@ class JsonFileHelperTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  JsonFileHelperTest() : MyTestSuite{false} {}
+  JsonFileHelperTest() : MyTestSuite{true} {}
  private slots:
+
   void test_GetDefaultJsonFile() {
     const auto dict = GetJsonDictDefault();
     QCOMPARE(dict[ENUM_2_STR(Name)].toString(), JSON_DEF_VAL_Name);
@@ -172,9 +174,55 @@ class JsonFileHelperTest : public MyTestSuite {
     QCOMPARE(studioIt.value().toString(), "Fox");
   }
 
+
+  void test_GetJsonObject_ByteArrayWriter_contains_non_utf8_char_ok() { // priority: top 1
+    // contents in json file is below, will recover automatically
+    const char jsonStr[] = R"({
+    "Name": "Frank - 1",
+    "Cast": [],
+    "Studio": "Marvel",
+    "Duration": 0,
+    "Uploaded": "17:22 25-Apr-1999",
+    "Tags": [
+        "comedy"
+    ],
+    "Rate": 0,
+    "Size": "1.00 MiB",
+    "Resolution": "1080p",
+    "Bitrate": "5000 kbps",
+    "Detail": "Frank boy’s adventure."
+})";
+
+    // precondition
+    QDir dir{jsonRootPath};
+    const QString nonUtf8JsonFileName = "file_with_non_utf8_char.json";
+    QVERIFY(dir.exists(nonUtf8JsonFileName));
+    QFile jsonFi{dir.absoluteFilePath(nonUtf8JsonFileName)};
+    QVERIFY(jsonFi.size() > 0);
+    ON_SCOPE_EXIT{
+      QVERIFY(jsonFi.open(QIODevice::OpenModeFlag::WriteOnly));
+      QVERIFY(jsonFi.write(jsonStr) >= 0);
+      jsonFi.close();
+    };
+
+    const QString jsonAbsPath = dir.absoluteFilePath(nonUtf8JsonFileName);
+
+    // load ok (using bytearray)
+    JsonPr json1 = JsonPr::fromJsonFile(jsonAbsPath);
+    QCOMPARE(json1.m_Detail, "Frank boy’s adventure.");
+
+    // write ok (using bytearray)
+    QVERIFY(json1.WriteIntoFiles());
+
+    // reload ok (using bytearray)
+    JsonPr json2 = JsonPr::fromJsonFile(jsonFi.fileName());
+    QCOMPARE(json2.m_Detail, "Frank boy’s adventure.");
+
+    QCOMPARE(json1, json2);
+  }
+
   void test_InsertOrUpdateDurationStudioCastTags() {  //
-    const QString pth = QFileInfo(__FILE__).absolutePath();
-    QDir dir{pth};
+    QDir dir{jsonRootPath};
 
     const QString jsonName{"InsertOrUpdateDurationStudioCastTags.json"};
     const QString& jsonPth = dir.absoluteFilePath(jsonName);
@@ -209,7 +257,7 @@ class JsonFileHelperTest : public MyTestSuite {
   }
 
   void test_ReadStudioCastTagsOut() {
-    QDir dir{rootpath};
+    QDir dir{jsonRootPath};
     const QString jsonName{"ReadStudioCastTagsOut.json"};
     const QString& jsonPth = dir.absoluteFilePath(jsonName);
     // precondition, json not exist
@@ -224,14 +272,14 @@ class JsonFileHelperTest : public MyTestSuite {
     QVariantHash emptyValueDict{{ENUM_2_STR(Studio), ""}, {ENUM_2_STR(Cast), QStringList{}}, {ENUM_2_STR(Tags), QStringList{}}};
     QVERIFY(DumpJsonDict(emptyValueDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
-    QMap<uint, JsonDict2Table> fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
+    QMap<uint, JsonDict2Table> fileNameHash2Json = ReadStudioCastTagsOut(jsonRootPath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 2. only contains studio and tags, but not performers
     QVariantHash notFullDict{{ENUM_2_STR(Studio), "Fox 2000"}, {ENUM_2_STR(Tags), QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(notFullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
-    fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
+    fileNameHash2Json = ReadStudioCastTagsOut(jsonRootPath);
     QVERIFY(fileNameHash2Json.isEmpty());
 
     // 3. contains studio and tags and performers
@@ -240,7 +288,7 @@ class JsonFileHelperTest : public MyTestSuite {
                           {ENUM_2_STR(Tags), QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(fullDict, jsonPth));
     QVERIFY(dir.exists(jsonName));
-    fileNameHash2Json = ReadStudioCastTagsOut(rootpath);
+    fileNameHash2Json = ReadStudioCastTagsOut(jsonRootPath);
     QCOMPARE(fileNameHash2Json.size(), 1);
     const JsonDict2Table& info = fileNameHash2Json.cbegin().value();
     const QStringList expectCasts{"Jocker", "Queen"};
@@ -248,7 +296,7 @@ class JsonFileHelperTest : public MyTestSuite {
     QCOMPARE(info.Studio, "Fox 2000");
     QCOMPARE(info.Cast, expectCasts);
     QCOMPARE(info.Tags, expectTags);
-  };
+  }
 };
 
 #include "JsonFileHelperTest.moc"
