@@ -88,6 +88,8 @@ QActionGroup* ViewActions::GetViewsAG() {
   _TREE_VIEW->setToolTip(QString("Display files and folders achitecures. (%1)").arg(_TREE_VIEW->shortcut().toString()));
   _TREE_VIEW->setCheckable(true);
 
+  _MOVIE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_7));
+  _MOVIE_VIEW->setShortcutVisibleInContextMenu(true);
   _MOVIE_VIEW->setToolTip(QString("Movie dictionary view aka Database view. (%1)").arg(_MOVIE_VIEW->shortcut().toString()));
   _MOVIE_VIEW->setCheckable(true);
 
@@ -95,7 +97,6 @@ QActionGroup* ViewActions::GetViewsAG() {
   _FLOATING_PREVIEW->setCheckable(true);
   _FLOATING_PREVIEW->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool());
 
-  _CAST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_7));
   _CAST_VIEW->setShortcutVisibleInContextMenu(true);
   _CAST_VIEW->setToolTip(QString("Show Cast database. (%1)").arg(_CAST_VIEW->shortcut().toString()));
   _CAST_VIEW->setCheckable(true);
