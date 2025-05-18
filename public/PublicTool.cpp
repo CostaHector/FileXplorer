@@ -70,6 +70,7 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
     return false;
   }
   QTextStream stream(&fi);
+  stream.setCodec("UTF-8"); // must set here
   stream << ba;
   stream.flush();
   fi.close();
