@@ -11,7 +11,7 @@
 #include <QActionGroup>
 
 #include "Model/AdvanceSearchModel.h"
-#include "Tools/SearchProxyModel.h"
+#include "Model/SearchProxyModel.h"
 
 class FileSystemTypeFilter : public QToolButton {
   Q_OBJECT

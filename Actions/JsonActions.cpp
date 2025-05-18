@@ -195,6 +195,16 @@ QToolBar* JsonActions::GetJsonRibbonToolBar() {
   tagsEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   tagsEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
+  auto* castFromSentenceTb  = new (std::nothrow) QToolBar("Cast from sentence Toolbar", studioCastTagsFieldfOperationTB);
+  CHECK_NULLPTR_RETURN_NULLPTR(castFromSentenceTb);
+  castFromSentenceTb->addAction(_ADD_SELECTED_CAST_SENTENCE);
+  castFromSentenceTb->addSeparator();
+  castFromSentenceTb->addAction(_EXTRACT_UPPERCASE_CAST);
+  castFromSentenceTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  castFromSentenceTb->setOrientation(Qt::Orientation::Vertical);
+  castFromSentenceTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  castFromSentenceTb->setStyleSheet("QToolBar { max-width: 256px; }");
+
   studioCastTagsFieldfOperationTB->addWidget(constructFieldsTB);
   studioCastTagsFieldfOperationTB->addSeparator();
   studioCastTagsFieldfOperationTB->addWidget(hintFieldsTB);
@@ -202,6 +212,7 @@ QToolBar* JsonActions::GetJsonRibbonToolBar() {
   studioCastTagsFieldfOperationTB->addWidget(studioTB);
   studioCastTagsFieldfOperationTB->addWidget(castEditTB);
   studioCastTagsFieldfOperationTB->addWidget(tagsEditTB);
+  studioCastTagsFieldfOperationTB->addWidget(castFromSentenceTb);
 
   jsonRibbonTB->addAction(_SAVE_CURRENT_CHANGES);
   jsonRibbonTB->addAction(_RENAME_JSON_AND_RELATED_FILES);
@@ -211,9 +222,6 @@ QToolBar* JsonActions::GetJsonRibbonToolBar() {
   jsonRibbonTB->addWidget(caseControlTB);
   jsonRibbonTB->addSeparator();
   jsonRibbonTB->addWidget(studioCastTagsFieldfOperationTB);
-  jsonRibbonTB->addSeparator();
-  jsonRibbonTB->addAction(_ADD_SELECTED_CAST_SENTENCE);
-  jsonRibbonTB->addAction(_EXTRACT_UPPERCASE_CAST);
 
   jsonRibbonTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return jsonRibbonTB;
