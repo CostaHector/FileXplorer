@@ -100,8 +100,8 @@ bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, in
   return QAbstractItemModel::setData(index, value, role);
 }
 
-int JsonTableModel::setRootPath(const QString& path) {
-  if (mRootPath == path) {
+int JsonTableModel::setRootPath(const QString& path, bool isForce) {
+  if (mRootPath == path && !isForce) {
     qDebug("Path[%s] unchange", qPrintable(path));
     return 0;
   }
@@ -126,6 +126,10 @@ int JsonTableModel::setRootPath(const QString& path) {
   m_modifiedRows.reset();
   RowsCountEndChange();
   return afterRowCnt;
+}
+
+int JsonTableModel::forceReloadPath() {
+  return setRootPath(mRootPath, true);
 }
 
 QFileInfo JsonTableModel::fileInfo(const QModelIndex& index) const {
@@ -396,7 +400,7 @@ int JsonTableModel::InitCastAndStudio(const QModelIndexList& rowIndexes) {
   return cnt;
 }
 
-int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes) {
+int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes, const QString& sentence) {
   int studioCnt{0}, castCnt{0};
   int row{-1};
   int studioMinRow{INT_MAX}, studioMaxRow{-1};
@@ -410,7 +414,7 @@ int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes) {
       return studioCnt;
     }
     auto& item = mCachedJsons[row];
-    item.HintForCastStudio("", studioChanged, castChanged);
+    item.HintForCastStudio(sentence, studioChanged, castChanged);
     if (!studioChanged && !castChanged) {
       continue;
     }
