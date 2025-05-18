@@ -280,6 +280,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
 
 int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
   const QModelIndex& curInd = currentIndex();
+  const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
     return -1;
@@ -308,7 +309,8 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
     LOG_WARN("User selection text empty", "failed");
     return -1;
   }
-  int cnt = _JsonModel->AppendCastFromSentence(curInd, userSelection, isUpperCaseSentence);
+
+  int cnt = _JsonModel->AppendCastFromSentence(srcModelInd, userSelection, isUpperCaseSentence);
   if (cnt < 0) {
     LOG_BAD("append failed", "see detail in logs");
     return -1;
@@ -320,6 +322,7 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
 
 int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   const QModelIndex& curInd = currentIndex();
+  const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
     return -1;
@@ -340,6 +343,7 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
     return -1;
   }
   bool ret = NameTool::ReplaceAndUpdateSelection(*lineEdit, (isTitle ? NameTool::CapitaliseFirstLetterKeepOther : NameTool::Lower));
+  _JsonModel->setData(srcModelInd, lineEdit->text());
   if (!ret) {
     LOG_BAD("Change selection case failed", "see detail in logs");
     return -1;
