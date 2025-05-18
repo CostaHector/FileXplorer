@@ -159,6 +159,24 @@ QString JsonTableModel::fileBaseName(const QModelIndex& index) const {
   return PATHTOOL::GetBaseName(fileName(index));
 }
 
+QString JsonTableModel::absolutePath(const QModelIndex &index) const {
+  int row = index.row();
+  if (row < 0 || row >= rowCount()) {
+    qWarning("row: %d out of range", row);
+    return {};
+  }
+  return mCachedJsons[row].m_Prepath;
+}
+
+QString JsonTableModel::fullInfo(const QModelIndex &index) const {
+  int row = index.row();
+  if (row < 0 || row >= rowCount()) {
+    qWarning("row: %d out of range", row);
+    return {};
+  }
+  return mCachedJsons[row].GetJsonBA();
+}
+
 void JsonTableModel::setModified(int row, bool modified) {
   setModifiedNoEmit(row, modified);
   emit headerDataChanged(Qt::Vertical, row, row);

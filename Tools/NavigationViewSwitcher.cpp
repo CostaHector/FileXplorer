@@ -155,7 +155,6 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _view->m_proxyModel = new SearchProxyModel;
         _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_searchSrcModel, _view->m_proxyModel, _view);
         ContentPanel::connect(_view->m_advanceSearchView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
-
         _view->m_advanceSearchView->BindLogger(_view->_logger);
         if (_navigation->m_advanceSearchBar != nullptr) {
           _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_searchSrcModel);
@@ -201,7 +200,9 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     case ViewType::JSON: {
       if (_view->m_jsonTableView == nullptr) {
         _view->m_jsonModel = new JsonTableModel{_view};
-        _view->m_jsonTableView = new JsonTableView(_view->m_jsonModel, _view);
+        _view->m_jsonProxyModel = new JsonProxyModel{_view};
+        _view->m_jsonTableView = new JsonTableView(_view->m_jsonModel, _view->m_jsonProxyModel, _view);
+        ContentPanel::connect(_view->m_jsonTableView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_jsonTableView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
