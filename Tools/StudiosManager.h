@@ -29,6 +29,8 @@ class StudiosManager {
   // warnerbros. => WarnerBros.
   QHash<QString, QString> m_prodStudioMap;
 
+  static bool isHypenIndexValid(const QString& sentence, int& hypenIndex);
+  static constexpr int STUDIO_HYPEN_MAX_INDEX = 22;  // hypen index can be no greater then 22 char
  private:
   QString FileName2StudioNameSection(QString sentence) const;
 

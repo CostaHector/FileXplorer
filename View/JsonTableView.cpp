@@ -7,12 +7,18 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-JsonTableView::JsonTableView(JsonTableModel* _jsonModel, QWidget* parent)  //
-    : CustomTableView{"JSON_TABLE_VIEW", parent}                           //
+JsonTableView::JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProxyModel, QWidget* parent)  //
+    : CustomTableView{"JSON_TABLE_VIEW", parent}                                                          //
 {
-  CHECK_NULLPTR_RETURN_VOID(_jsonModel);
-  mJsonModel = _jsonModel;
-  setModel(mJsonModel);
+  CHECK_NULLPTR_RETURN_VOID(jsonModel);
+  _JsonModel = jsonModel;
+  CHECK_NULLPTR_RETURN_VOID(jsonProxyModel);
+  _JsonProxyModel = jsonProxyModel;
+
+  _JsonProxyModel->setSourceModel(_JsonModel);
+  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name);
+
+  setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
 
   InitTableView();
@@ -22,8 +28,23 @@ JsonTableView::JsonTableView(JsonTableModel* _jsonModel, QWidget* parent)  //
   subscribe();
 }
 
+QModelIndex JsonTableView::CurrentIndexSource() const {
+  const QModelIndex& proIndex = CustomTableView::currentIndex();
+  return _JsonProxyModel->mapToSource(proIndex);
+}
+
+QModelIndexList JsonTableView::selectedRowsSource(JSON_KEY_E column) const {
+  const QModelIndexList& proIndexes = CustomTableView::selectionModel()->selectedRows(column);
+  QModelIndexList srcIndexes;
+  srcIndexes.reserve(proIndexes.size());
+  for (const auto& proIndex : proIndexes) {
+    srcIndexes.append(_JsonProxyModel->mapToSource(proIndex));
+  }
+  return srcIndexes;
+}
+
 int JsonTableView::ReadADirectory(const QString& path) {
-  return mJsonModel->setRootPath(path);
+  return _JsonModel->setRootPath(path);
 }
 
 int JsonTableView::onSaveCurrentChanges() {
@@ -31,8 +52,8 @@ int JsonTableView::onSaveCurrentChanges() {
     LOG_INFO("nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Name);
-  const int cnt = mJsonModel->SaveCurrentChanges(indexes);
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
+  const int cnt = _JsonModel->SaveCurrentChanges(indexes);
   if (cnt < 0) {
     LOG_BAD(QString("Save failed, errorCode:%1").arg(cnt), "See detail in logs");
     return cnt;
@@ -47,8 +68,8 @@ int JsonTableView::onSyncNameField() {
     LOG_INFO("nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Name);
-  const int cnt = mJsonModel->SyncFieldNameByJsonBaseName(indexes);
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
+  const int cnt = _JsonModel->SyncFieldNameByJsonBaseName(indexes);
   const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) name field has been sync by json basename"}.arg(cnt).arg(indexes.size())};
   LOG_GOOD(affectedRowsMsg, "ok");
   return indexes.size();
@@ -59,9 +80,9 @@ int JsonTableView::onExportCastStudioToDictonary() {
     LOG_INFO("nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Name);
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
   int castCnt{0}, studioCnt{0};
-  std::tie(castCnt, studioCnt) = mJsonModel->ExportCastStudioToLocalDictionaryFile(indexes);
+  std::tie(castCnt, studioCnt) = _JsonModel->ExportCastStudioToLocalDictionaryFile(indexes);
   if (castCnt < 0 || studioCnt < 0) {
     LOG_BAD("Export cast/studio to local dictionary file failed", "see details in log");
     return -1;
@@ -77,8 +98,8 @@ int JsonTableView::onRenameJsonAndRelated() {
     LOG_INFO("nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndex& ind = currentIndex();
-  const QString oldJsonBaseName = mJsonModel->fileBaseName(ind);
+  const QModelIndex& ind = CurrentIndexSource();
+  const QString oldJsonBaseName = _JsonModel->fileBaseName(ind);
   bool isInputOk{false};
   const QString& newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
                                                          {oldJsonBaseName}, 0, true, &isInputOk);
@@ -90,7 +111,7 @@ int JsonTableView::onRenameJsonAndRelated() {
     LOG_BAD("New json base name can not be empty", "skip")
     return 0;
   }
-  int cnt = mJsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
+  int cnt = _JsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
   const QString msg{QString{"Rename Json\n[%1]\n[%2]\n and it's related file(s). retCode: %3"}.arg(oldJsonBaseName).arg(newJsonBaseName).arg(cnt)};
   if (cnt < JsonPr::E_OK) {
     LOG_BAD(msg, "Failed, see in detail in logs");
@@ -105,8 +126,8 @@ int JsonTableView::onSetStudio() {
     LOG_INFO("nothing selected", "skip");
     return 0;
   }
-  const auto& curInd = currentIndex();
-  const QString& fileBaseName = mJsonModel->fileBaseName(curInd);
+  const auto& curInd = CurrentIndexSource();
+  const QString& fileBaseName = _JsonModel->fileBaseName(curInd);
 
   static StudiosManager& sm = StudiosManager::getIns();
   const QString defStudio = sm(fileBaseName);
@@ -136,8 +157,8 @@ int JsonTableView::onSetStudio() {
     m_studioCandidates.insert(insertPos, studio);
   }
 
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Studio);
-  const int cnt = mJsonModel->SetStudio(indexes, studio);
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const int cnt = _JsonModel->SetStudio(indexes, studio);
   const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) studio has been changed to %s"}.arg(cnt).arg(indexes.size()).arg(studio)};
   LOG_GOOD(affectedRowsMsg, studio);
   return indexes.size();
@@ -148,8 +169,8 @@ int JsonTableView::onInitCastAndStudio() {
     LOG_INFO("nothing selected", "skip init cast/studio studio");
     return 0;
   }
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Studio);
-  const int cnt = mJsonModel->InitCastAndStudio(indexes);
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const int cnt = _JsonModel->InitCastAndStudio(indexes);
   const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) cast/studio has been inited"}.arg(cnt).arg(indexes.size())};
   LOG_GOOD(affectedRowsMsg, "ok");
   return indexes.size();
@@ -160,8 +181,8 @@ int JsonTableView::onHintCastAndStudio() {
     LOG_INFO("nothing selected", "skip hint cast/studio");
     return 0;
   }
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Studio);
-  const int cnt = mJsonModel->HintCastAndStudio(indexes);
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const int cnt = _JsonModel->HintCastAndStudio(indexes);
   const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) cast/studio has been hint"}.arg(cnt).arg(indexes.size())};
   LOG_GOOD(affectedRowsMsg, "ok");
   return indexes.size();
@@ -172,8 +193,8 @@ int JsonTableView::onFormatCast() {
     LOG_INFO("nothing selected", "skip cast format");
     return 0;
   }
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Cast);
-  const int cnt = mJsonModel->FormatCast(indexes);
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Cast);
+  const int cnt = _JsonModel->FormatCast(indexes);
   const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) cast has been format"}.arg(cnt).arg(indexes.size())};
   LOG_GOOD(affectedRowsMsg, "ok");
   return indexes.size();
@@ -184,8 +205,8 @@ int JsonTableView::onClearStudio() {
     LOG_INFO("nothing selected", "skip clear studio");
     return 0;
   }
-  const QModelIndexList& indexes = selectionModel()->selectedRows(JSON_KEY_E::Studio);
-  const int cnt = mJsonModel->SetStudio(indexes, "");
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const int cnt = _JsonModel->SetStudio(indexes, "");
   const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) studio has been cleared"}.arg(cnt).arg(indexes.size())};
   LOG_GOOD(affectedRowsMsg, "ok");
   return indexes.size();
@@ -234,17 +255,17 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
   }
 
   int cnt{0};
-  const QModelIndexList& indexes = selectionModel()->selectedRows(fieldColumn);
+  const QModelIndexList& indexes = selectedRowsSource(fieldColumn);
   switch (mode) {
     case FIELD_OP_MODE::SET:
     case FIELD_OP_MODE::CLEAR:
-      cnt = mJsonModel->SetCastOrTags(indexes, fieldColumn, tagsOrCast);
+      cnt = _JsonModel->SetCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
     case FIELD_OP_MODE::APPEND:
-      cnt = mJsonModel->AddCastOrTags(indexes, fieldColumn, tagsOrCast);
+      cnt = _JsonModel->AddCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
     case FIELD_OP_MODE::REMOVE:
-      cnt = mJsonModel->RmvCastOrTags(indexes, fieldColumn, tagsOrCast);
+      cnt = _JsonModel->RmvCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
     default:
       LOG_BAD("Field Operation invalid", QString::number((int)mode));
@@ -256,7 +277,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
 }
 
 int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
-  const QModelIndex& curInd = currentIndex();
+  const QModelIndex& curInd = CurrentIndexSource();
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
     return -1;
@@ -276,7 +297,7 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
     LOG_WARN("User selection text empty", "failed");
     return -1;
   }
-  int cnt = mJsonModel->AppendCastFromSentence(curInd, userSelection, isUpperCaseSentence);
+  int cnt = _JsonModel->AppendCastFromSentence(curInd, userSelection, isUpperCaseSentence);
   if (cnt < 0) {
     LOG_BAD("append failed", "see detail in logs");
     return -1;
@@ -287,7 +308,7 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
 }
 
 int JsonTableView::onSelectionCaseOperation(bool isTitle) {
-  const QModelIndex& curInd = currentIndex();
+  const QModelIndex& curInd = CurrentIndexSource();
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
     return -1;
