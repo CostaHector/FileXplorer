@@ -3,33 +3,10 @@
 #include "Tools/ViewTypeTool.h"
 
 using namespace ViewTypeTool;
-/*
-  auto vt = GetCurViewType();
-  switch (vt) {
-    case ViewType::TABLE: {
-    }
-    case ViewType::LIST: {
-    }
-    case ViewType::TREE: {
-    }
-    case ViewType::SEARCH: {
-    }
-    case ViewType::SCENE: {
-    }
-    case ViewType::MOVIE:{
-    }
-    default: {
-    }
-  }
-
- */
 
 QString ContentPanel::GetCurViewName() const {
   ViewType vt = GetCurViewType();
   const QString& viewName = GetViewTypeHumanFriendlyStr(vt);
-  if (viewName.isEmpty()) {
-    qCritical("View name[%c] not found", char(vt));
-  }
   return viewName;
 }
 
@@ -48,7 +25,7 @@ QString ContentPanel::getRootPath() const {
     case ViewType::JSON:
       return m_fsModel->rootPath();
     default:
-      qWarning("No rootpath in ViewType[%c]", int(vt));
+      qWarning("No rootpath in ViewType[%d]", int(vt));
       return "";
   }
 }
@@ -68,10 +45,12 @@ QString ContentPanel::getFilePath(const QModelIndex& ind) const {
       return m_scenesModel->filePath(ind);
     case ViewType::MOVIE:
       return m_dbModel->filePath(ind);
-    case ViewType::JSON:
-      return m_jsonModel->filePath(ind);
+    case ViewType::JSON: {
+      const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
+      return m_jsonModel->filePath(srcIndex);
+    }
     default:
-      qWarning("No FilePath in ViewType[%c]", char(vt));
+      qWarning("No FilePath in ViewType[%d]", int(vt));
       return "";
   }
 }
@@ -98,8 +77,10 @@ QModelIndexList ContentPanel::getSelectedRows() const {
     }
     case ViewType::MOVIE:
       return m_movieView->selectionModel()->selectedRows();
+    case ViewType::JSON:
+      return m_jsonTableView->selectionModel()->selectedRows();
     default:
-      qWarning("No SelectedRows in ViewType[%c]", char(vt));
+      qWarning("No SelectedRows in ViewType[%d]", int(vt));
       return {};
   }
 }
@@ -146,13 +127,14 @@ QStringList ContentPanel::getFileNames() const {
       break;
     }
     case ViewType::JSON: {
-      for (const auto& ind : m_jsonTableView->selectionModel()->selectedRows()) {
+      for (const auto& proInd : m_jsonTableView->selectionModel()->selectedRows()) {
+        const auto& ind = m_jsonProxyModel->mapToSource(proInd);
         names.append(m_jsonModel->fileName(ind));
       }
       break;
     }
     default:
-      qWarning("No SelectedRows in ViewType[%c]", char(vt));
+      qWarning("No SelectedRows in ViewType[%d]", int(vt));
       return {};
   }
   return names;
@@ -197,8 +179,15 @@ QStringList ContentPanel::getFullRecords() const {
       }
       break;
     }
+    case ViewType::JSON: {
+      for (const auto& ind : m_jsonTableView->selectionModel()->selectedRows()) {
+        const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
+        fullRecords.append(m_jsonModel->fullInfo(srcIndex));
+      }
+      break;
+    }
     default: {
-      qDebug("No getFullRecords");
+      qWarning("No getFullRecords ViewType:%d", (int)vt);
       break;
     }
   }
@@ -246,8 +235,15 @@ QStringList ContentPanel::getFilePaths() const {
       }
       break;
     }
+    case ViewType::JSON: {
+      for (const auto& ind : m_jsonTableView->selectionModel()->selectedRows()) {
+        const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
+        filePaths.append(m_jsonModel->filePath(srcIndex));
+      }
+      break;
+    }
     default: {
-      qDebug("No getFilePaths");
+      qDebug("No getFilePaths ViewType:%d", (int)vt);
       break;
     }
   }
@@ -304,8 +300,15 @@ QStringList ContentPanel::getFilePrepaths() const {
       }
       break;
     }
+    case ViewType::JSON: {
+      for (const auto& ind : m_jsonTableView->selectionModel()->selectedRows()) {
+        const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
+        prepaths.append(m_jsonModel->absolutePath(srcIndex));
+      }
+      break;
+    }
     default: {
-      qDebug("No getFilePrepaths");
+      qDebug("No getFilePrepaths ViewType:%d", (int)vt);
       break;
     }
   }
@@ -343,9 +346,9 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
     case ViewType::SEARCH: {
       for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
         const auto& srcIndex = m_proxyModel->mapToSource(ind);
-        const QFileInfo dirFi = m_searchSrcModel->fileInfo(ind);
+        const QFileInfo dirFi = m_searchSrcModel->fileInfo(srcIndex);
         const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(m_searchSrcModel->absolutePath(srcIndex));
+        prepaths.append(imagePath);
       }
       break;
     }
@@ -357,7 +360,16 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
         const QFileInfo dirFi = m_dbModel->fileInfo(ind);
         const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(m_dbModel->absolutePath(ind));
+        prepaths.append(imagePath);
+      }
+      break;
+    }
+    case ViewType::JSON: {
+      for (const auto& ind : m_jsonTableView->selectionModel()->selectedRows()) {
+        const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
+        const QFileInfo dirFi = m_jsonModel->fileInfo(srcIndex);
+        const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
+        prepaths.append(imagePath);
       }
       break;
     }
@@ -439,7 +451,7 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
       break;
     }
     default: {
-      qDebug("No getFilePathsAndUrls");
+      qWarning("No getFilePathsAndUrls ViewType:%d", (int)vt);
     }
   }
   return {filePaths, urls};
@@ -503,6 +515,16 @@ std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const b
       }
       break;
     }
+    case ViewType::JSON: {
+      QSet<QModelIndex> srcInds;
+      for (const auto& proInd : m_jsonTableView->selectionModel()->selectedRows()) {
+        const auto& ind = m_jsonProxyModel->mapToSource(proInd);
+        prepaths.append(m_jsonModel->absolutePath(ind));
+        names.append(m_jsonModel->fileName(ind));
+        srcInds.insert(ind);
+      }
+      break;
+    }
     default: {
       qDebug("No getFilePrepathsAndName");
       break;
@@ -537,6 +559,9 @@ int ContentPanel::getSelectedRowsCount() const {
     case ViewType::MOVIE: {
       return m_movieView->selectionModel()->selectedRows().size();
     }
+    case ViewType::JSON: {
+      return m_jsonTableView->selectionModel()->selectedRows().size();
+    }
     default: {
       qDebug("No getSelectedRowsCount");
     }
@@ -565,6 +590,9 @@ QString ContentPanel::getCurFilePath() const {
     case ViewType::MOVIE: {
       return m_dbModel->filePath(m_movieView->currentIndex());
     }
+    case ViewType::JSON: {
+      return m_jsonModel->filePath(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
+    }
     default: {
       qWarning("No getCurFilePath");
     }
@@ -588,11 +616,14 @@ QString ContentPanel::getCurFileName() const {
     case ViewType::SEARCH: {
       return m_searchSrcModel->fileName(m_proxyModel->mapToSource(m_advanceSearchView->currentIndex()));
     }
+    case ViewType::MOVIE: {
+      return m_dbModel->fileName(m_movieView->currentIndex());
+    }
     case ViewType::SCENE: {
       return m_scenesModel->fileName(m_sceneTableView->currentIndex());
     }
-    case ViewType::MOVIE: {
-      return m_dbModel->fileName(m_movieView->currentIndex());
+    case ViewType::JSON: {
+      return m_jsonModel->fileName(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
     }
     default: {
       qWarning("No getCurFileName");
@@ -604,12 +635,8 @@ QString ContentPanel::getCurFileName() const {
 QFileInfo ContentPanel::getFileInfo(const QModelIndex& ind) const {
   auto vt = GetCurViewType();
   switch (vt) {
-    case ViewType::TABLE: {
-      return m_fsModel->fileInfo(ind);
-    }
-    case ViewType::LIST: {
-      return m_fsModel->fileInfo(ind);
-    }
+    case ViewType::TABLE:
+    case ViewType::LIST:
     case ViewType::TREE: {
       return m_fsModel->fileInfo(ind);
     }
@@ -620,13 +647,13 @@ QFileInfo ContentPanel::getFileInfo(const QModelIndex& ind) const {
       return m_scenesModel->fileInfo(ind);
     }
     case ViewType::JSON: {
-      return m_jsonModel->fileInfo(ind);
+      return m_jsonModel->fileInfo(m_jsonProxyModel->mapToSource(ind));
     }
     case ViewType::MOVIE: {
       return m_dbModel->fileInfo(ind);
     }
     default: {
-      qDebug("No getFileInfo");
+      qWarning("No getFileInfo");
       break;
     }
   }

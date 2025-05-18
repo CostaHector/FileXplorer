@@ -3,10 +3,14 @@
 
 #include "CustomTableView.h"
 #include "Model/JsonTableModel.h"
-class JsonTableView: public CustomTableView
-{
+#include "Model/JsonProxyModel.h"
+
+class JsonTableView : public CustomTableView {
  public:
-  explicit JsonTableView(JsonTableModel* _jsonModel, QWidget* parent = nullptr);
+  explicit JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProxyModel, QWidget* parent = nullptr);
+  QModelIndex CurrentIndexSource() const;
+  QModelIndexList selectedRowsSource(JSON_KEY_E column = JSON_KEY_E::Name) const;
+
   int ReadADirectory(const QString& path);
   void subscribe();
 
@@ -22,10 +26,12 @@ class JsonTableView: public CustomTableView
   int onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode);
   int onAppendFromSelection(bool isUpperCaseSentence);
   int onSelectionCaseOperation(bool isTitle);
+
  private:
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
-  JsonTableModel* mJsonModel{nullptr};
+  JsonTableModel* _JsonModel{nullptr};
+  JsonProxyModel* _JsonProxyModel{nullptr};
 };
 
-#endif // JSONVIEW_H
+#endif  // JSONVIEW_H

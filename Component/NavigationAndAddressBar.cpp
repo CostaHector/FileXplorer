@@ -3,8 +3,7 @@
 #include "Actions/RightClickMenuActions.h"
 #include <QHBoxLayout>
 
-NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)
-  : QToolBar{title, parent} {
+NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {
   m_addressLine = new (std::nothrow) AddressELineEdit{this};
   if (m_addressLine == nullptr) {
     qCritical("m_addressLine is nullptr");
@@ -22,11 +21,13 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   }
 
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-
-  m_searchLE->setPlaceholderText("Wild card supported. e.g., *Abc*");
   m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
   m_searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  m_searchLE->setToolTip(
+      "For FileSystemModel(wildcard) e.g., *target*\n"
+      "For SceneModel(plain) e.g., target\n"
+      "For JsonModel(Regex) e.g., target1.*?target2");
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
@@ -44,10 +45,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   InitEventWhenViewChanged();
 }
 
-void NavigationAndAddressBar::BindFileSystemViewCallback(T_IntoNewPath IntoNewPath,
-                                                         T_on_searchTextChanged on_searchTextChanged,
-                                                         T_on_searchEnterKey on_searchEnterKey,
-                                                         QFileSystemModel* _fsm) {
+void NavigationAndAddressBar::BindFileSystemViewCallback(T_IntoNewPath IntoNewPath, T_on_searchTextChanged on_searchTextChanged, T_on_searchEnterKey on_searchEnterKey, QFileSystemModel* _fsm) {
   m_IntoNewPath = IntoNewPath;
   m_on_searchTextChanged = on_searchTextChanged;
   m_on_searchEnterKey = on_searchEnterKey;
@@ -150,7 +148,7 @@ bool NavigationAndAddressBar::onSearchTextReturnPressed() {
 #include <QApplication>
 
 class IntoNewPathMockClass {
-public:
+ public:
   bool IntoNewPath(QString a, bool b, bool c) {
     qDebug("IntoNewPath: %s, %d, %d", qPrintable(a), b, c);
     return true;
