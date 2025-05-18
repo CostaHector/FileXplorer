@@ -13,7 +13,7 @@ const QString gLocalFilePath{rootpath + "/not_exist_studio_list.txt"};
 class StudiosManagerTest : public MyTestSuite {
   Q_OBJECT
  public:
-  StudiosManagerTest() : MyTestSuite{true}, smInLLT{gLocalFilePath} {}
+  StudiosManagerTest() : MyTestSuite{false}, smInLLT{gLocalFilePath} {}
   StudiosManager smInLLT;
 
  private slots:
