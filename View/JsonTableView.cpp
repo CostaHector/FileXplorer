@@ -297,9 +297,9 @@ bool JsonTableView::GetSelectedTextInCell(QString& selectedText) const {
     return false;
   }
   QWidget* editor = indexWidget(curInd);
-  if (editor == nullptr) {
-    LOG_WARN("editor is nullptr", "failed");
-    return false;
+  if (editor == nullptr) { // not in edit mode
+    qDebug("Cell not in edit", "Cannot get selection text in cell");
+    return true;
   }
   QString userSelection;
 
@@ -359,7 +359,7 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   }
   QWidget* editor = indexWidget(curInd);
   if (editor == nullptr) {
-    LOG_WARN("editor is nullptr", "failed");
+    LOG_WARN("Cell not in edit", "Cannot change case of selection text");
     return -1;
   }
   auto lineEdit = qobject_cast<QLineEdit*>(editor);
