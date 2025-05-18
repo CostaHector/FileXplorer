@@ -3,7 +3,7 @@
 
 #include <QComboBox>
 
-#include "Tools/SearchProxyModel.h"
+#include "Model/SearchProxyModel.h"
 
 class SearchModeComboBox : public QComboBox {
  public:

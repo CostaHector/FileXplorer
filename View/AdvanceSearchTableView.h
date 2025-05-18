@@ -5,7 +5,7 @@
 #include "Component/AdvanceSearchMenu.h"
 #include "Component/CustomStatusBar.h"
 #include "CustomTableView.h"
-#include "Tools/SearchProxyModel.h"
+#include "Model/SearchProxyModel.h"
 
 class AdvanceSearchTableView : public CustomTableView {
  public:
