@@ -5,7 +5,9 @@ class QAction;
 #include <QString>
 namespace ViewTypeTool {
 enum ViewType {
-  LIST = 0,
+  VIEW_TYPE_BEGIN = 0,
+  // add after BEGIN
+  LIST = VIEW_TYPE_BEGIN,
   TABLE,
   TREE,
   SEARCH,
@@ -13,6 +15,7 @@ enum ViewType {
   SCENE,
   CAST,
   JSON,
+  // add before BYTT
   VIEW_TYPE_BUTT,
 };
 
