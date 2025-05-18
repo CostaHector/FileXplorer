@@ -20,7 +20,7 @@ const QString fixedAbsPath = rootpath + '/' + fixedJsonName;
 class JsonPrTest : public MyTestSuite {
   Q_OBJECT
  public:
-  JsonPrTest() : MyTestSuite{false} {}
+  JsonPrTest() : MyTestSuite{true} {}
  private slots:
   void init() {
     QFile fixedJsonFile{fixedAbsPath};
@@ -253,13 +253,6 @@ class JsonPrTest : public MyTestSuite {
   }
 
   void test_Construct_Clear_CastStudioValue() {
-    JsonPr jr{""};
-    QVERIFY(!jr.ConstructCastStudioValue());
-
-    const QString& expectName{"Paramount Pictures - Thunder - Keanu Reeves, Chris Hemsworth, Chris Evans"};
-    const QString& expectStudio{"Paramount Pictures"};
-    const QStringList& expectCast{"Chris Evans", "Chris Hemsworth", "Keanu Reeves"};
-
     auto& pm = CastManager::getIns();
     auto& psm = StudiosManager::getIns();
     decltype(pm.m_casts) tempCastsList{"chris hemsworth", "keanu reeves", "chris evans"};
@@ -270,6 +263,27 @@ class JsonPrTest : public MyTestSuite {
       pm.m_casts.swap(tempCastsList);
       psm.m_prodStudioMap.swap(tempStudiosMap);
     };
+
+    JsonPr jr{""};
+    // 1. Name Fields value is empty, skip
+    QVERIFY(jr.m_Name.isEmpty());
+    QVERIFY(!jr.ConstructCastStudioValue());
+    // 2.0 when inited studio/cast are empty, return false
+    jr.m_Name = "Marvil Films X Men HughX JackmanX, MichaelX FassbenderX";
+    QCOMPARE(pm.m_casts.contains(QString("HughX JackmanX").toLower()), false);
+    QCOMPARE(pm.m_casts.contains(QString("MichaelX FassbenderX").toLower()), false);
+    int isHypenIndexInvalid{-1};
+    QCOMPARE(StudiosManager::isHypenIndexValid(jr.m_Name, isHypenIndexInvalid), false);
+    QCOMPARE(isHypenIndexInvalid, -1);
+    // 2.1 should no change
+    QVERIFY(!jr.ConstructCastStudioValue());
+    QCOMPARE(jr.m_Studio.isEmpty(), true);
+    QCOMPARE(jr.m_Cast.isEmpty(), true);
+
+    const QString& expectName{"Paramount Pictures - Thunder - Keanu Reeves, Chris Hemsworth, Chris Evans"};
+    const QString& expectStudio{"Paramount Pictures"};
+    const QStringList& expectCast{"Chris Evans", "Chris Hemsworth", "Keanu Reeves"};
+
 
     jr.m_Name = expectName;
     // construct first time, change
@@ -376,3 +390,4 @@ class JsonPrTest : public MyTestSuite {
 
 #include "JsonPrTest.moc"
 JsonPrTest gJsonPrTest;
+

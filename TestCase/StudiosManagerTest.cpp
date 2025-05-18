@@ -13,13 +13,11 @@ const QString gLocalFilePath{rootpath + "/not_exist_studio_list.txt"};
 class StudiosManagerTest : public MyTestSuite {
   Q_OBJECT
  public:
-  StudiosManagerTest() : MyTestSuite{false}, smInLLT{gLocalFilePath} {}
+  StudiosManagerTest() : MyTestSuite{true}, smInLLT{gLocalFilePath} {}
   StudiosManager smInLLT;
 
  private slots:
-  void cleanup() {
-    QVERIFY(!QFile::exists(gLocalFilePath));
-  }
+  void cleanup() { QVERIFY(!QFile::exists(gLocalFilePath)); }
 
   void test_studio_list_file_not_exist_read_out() {
     QVERIFY2(!QFile::exists(gLocalFilePath), qPrintable(gLocalFilePath));  // file not exist
@@ -92,14 +90,48 @@ class StudiosManagerTest : public MyTestSuite {
     QCOMPARE(smInLLT("[FL]My3Gifts - Henry Cavill"), "My3Gifts");
     QCOMPARE(smInLLT("[GT]my3gifts - Henry Cavill"), "My3Gifts");
 
-    // studio not int dict, and length<=22, return itself
+    // studio not int dict, and hypen index exist and <=22, return itself
     QVERIFY(!tempStudioHash.contains("studio not in dict"));
     QVERIFY(!tempStudioHash.contains("studionotindict"));
     QCOMPARE(smInLLT("StudioNotInDict - Henry Cavill"), "StudioNotInDict");
 
-    // studio not int dict, and length>22, return empty
+    // studio not int dict, and hypen index exist and length>22, return empty
     QVERIFY(!tempStudioHash.contains("01234567890123456789012"));
     QCOMPARE(smInLLT("01234567890123456789012 - Henry Cavill"), "");
+
+    // studio not int dict, and hypen index not exist return empty
+    QVERIFY(!tempStudioHash.contains("01234567890123456789012"));
+    QCOMPARE(smInLLT("01234567890123456789012 Henry Cavill"), "");
+  }
+
+  void test_isHypenIndexValid() {
+    int hypenIndex{-1};
+    // no hypen, false
+    QCOMPARE(StudiosManager::isHypenIndexValid("", hypenIndex), false);
+    QCOMPARE(hypenIndex, -1);
+
+    // no any letter before hypen, false
+    QCOMPARE(StudiosManager::isHypenIndexValid("-", hypenIndex), false);
+    QCOMPARE(hypenIndex, 0);
+    // one letter before, true
+    QCOMPARE(StudiosManager::isHypenIndexValid("X- World", hypenIndex), true);
+    QCOMPARE(hypenIndex, 1);
+
+    QString studio22Char = "0123456789012345678901";
+    QCOMPARE(studio22Char.size(), StudiosManager::STUDIO_HYPEN_MAX_INDEX);
+    QString studio22CharAnd1Hypen = studio22Char + '-';
+    QCOMPARE(studio22CharAnd1Hypen.indexOf('-'), StudiosManager::STUDIO_HYPEN_MAX_INDEX);
+    QString studio23CharAnd1Hypen = studio22Char + " -";
+    QCOMPARE(studio23CharAnd1Hypen.indexOf('-'), StudiosManager::STUDIO_HYPEN_MAX_INDEX + 1);
+
+    // no hypen, false
+    QCOMPARE(StudiosManager::isHypenIndexValid(studio22Char, hypenIndex), false);
+    // hypen right at STUDIO_HYPEN_MAX_INDEX, true
+    QCOMPARE(StudiosManager::isHypenIndexValid(studio22CharAnd1Hypen, hypenIndex), true);
+    QCOMPARE(hypenIndex, studio22CharAnd1Hypen.indexOf('-'));
+    // hypen at STUDIO_HYPEN_MAX_INDEX + 1, false
+    QCOMPARE(StudiosManager::isHypenIndexValid(studio23CharAnd1Hypen, hypenIndex), false);
+    QCOMPARE(hypenIndex, studio23CharAnd1Hypen.indexOf('-'));
   }
 };
 
