@@ -183,8 +183,20 @@ int JsonTableView::onHintCastAndStudio() {
     LOG_INFO("nothing selected", "skip hint cast/studio");
     return 0;
   }
+
+  QString userSelection;
+  if (!GetSelectedTextInCell(userSelection)) {
+    LOG_WARN("Get Selected Text in Selected Cell failed", "see detail in logs");
+    return -1;
+  }
+
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
-  const int cnt = _JsonModel->HintCastAndStudio(indexes);
+  if (indexes.size() > 1 && !userSelection.isEmpty()) {
+    LOG_WARN("Dangerous! User select more than 1 line and text selected", "skip");
+    return -1;
+  }
+
+  const int cnt = _JsonModel->HintCastAndStudio(indexes, userSelection);
   const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) cast/studio has been hint"}.arg(cnt).arg(indexes.size())};
   LOG_GOOD(affectedRowsMsg, "ok");
   return indexes.size();
@@ -278,26 +290,25 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
   return indexes.size();
 }
 
-int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
+bool JsonTableView::GetSelectedTextInCell(QString& selectedText) const {
   const QModelIndex& curInd = currentIndex();
-  const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   if (!curInd.isValid()) {
     LOG_WARN("Current Index is invalid", "select a line first");
-    return -1;
+    return false;
   }
   QWidget* editor = indexWidget(curInd);
   if (editor == nullptr) {
     LOG_WARN("editor is nullptr", "failed");
-    return -1;
+    return false;
   }
   QString userSelection;
 
-  auto lineEdit = qobject_cast<QLineEdit*>(editor);
+  const auto lineEdit = qobject_cast<QLineEdit*>(editor);
   if (lineEdit == nullptr) {
-    auto textEdit = qobject_cast<QTextEdit*>(editor);
+    const auto textEdit = qobject_cast<QTextEdit*>(editor);
     if (textEdit == nullptr) {
       LOG_WARN("lineEdit/textEdit are nullptr", "failed");
-      return -1;
+      return false;
     } else {
       userSelection = textEdit->textCursor().selectedText();
     }
@@ -305,11 +316,30 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
     userSelection = lineEdit->selectedText();
   }
 
-  if (userSelection.trimmed().isEmpty()) {
-    LOG_WARN("User selection text empty", "failed");
+  selectedText.swap(userSelection);
+  return true;
+}
+
+
+int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
+  QString userSelection;
+  if (!GetSelectedTextInCell(userSelection)) {
+    LOG_WARN("Get Selected Text in Selected Cell failed", "see detail in logs");
     return -1;
   }
 
+  if (userSelection.trimmed().isEmpty()) {
+    LOG_WARN("User selection text empty", "failed");
+    return false;
+  }
+
+  const QModelIndex& curInd = currentIndex();
+  if (!curInd.isValid()) {
+    LOG_WARN("Current Index is invalid", "select a line first");
+    return -1;
+  }
+
+  const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   int cnt = _JsonModel->AppendCastFromSentence(srcModelInd, userSelection, isUpperCaseSentence);
   if (cnt < 0) {
     LOG_BAD("append failed", "see detail in logs");
@@ -358,6 +388,7 @@ void JsonTableView::subscribe() {
   connect(inst._SAVE_CURRENT_CHANGES, &QAction::triggered, this, &JsonTableView::onSaveCurrentChanges);
 
   connect(inst._SYNC_NAME_FIELD_BY_FILENAME, &QAction::triggered, this, &JsonTableView::onSyncNameField);
+  connect(inst._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, _JsonModel, &JsonTableModel::forceReloadPath);
   connect(inst._EXPORT_CAST_STUDIO_TO_DICTION, &QAction::triggered, this, &JsonTableView::onExportCastStudioToDictonary);
 
   connect(inst._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, [this]() { onSelectionCaseOperation(true); });
