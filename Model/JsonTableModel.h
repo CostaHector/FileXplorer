@@ -18,7 +18,8 @@ class JsonTableModel : public QAbstractTableModelPub {
     return Qt::ItemFlag::ItemIsEditable | Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
   }
 
-  int setRootPath(const QString& path);
+  int setRootPath(const QString& path, bool isForce = false);
+  int forceReloadPath();
 
   QFileInfo fileInfo(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
@@ -32,7 +33,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   int AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_KEY_E keyEnum, const QString& sentence);
   int RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_KEY_E keyEnum, const QString& oneElement);
   int InitCastAndStudio(const QModelIndexList& rowIndexes);
-  int HintCastAndStudio(const QModelIndexList& rowIndexes);
+  int HintCastAndStudio(const QModelIndexList& rowIndexes, const QString& sentence);
   int FormatCast(const QModelIndexList& rowIndexes);
   int SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes);
   int RenameJsonAndItsRelated(const QModelIndex& ind, const QString& newJsonBaseName);
