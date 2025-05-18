@@ -16,6 +16,7 @@ struct JsonPr {
 
   bool Reload();
   bool WriteIntoFiles() const;
+  QByteArray GetJsonBA() const;
   inline QString GetAbsPath() const { return m_Prepath + '/' + jsonFileName; }
 
 // Json Key and Value

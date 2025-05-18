@@ -16,7 +16,7 @@
 #include <QStandardItem>
 
 #include <QDesktopServices>
-
+#include <QRegularExpression>
 #include <QUrl>
 
 using namespace ViewTypeTool;
@@ -100,35 +100,61 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
 }
 
 auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
-  if (GetCurViewType() == ViewType::SCENE) {
-    if (m_scenesModel == nullptr) {
-      qWarning("m_scenesModel is nullptr");
-      return false;
+  const ViewTypeTool::ViewType vt{GetCurViewType()};
+
+  switch (vt) {
+    case LIST:
+    case TABLE:
+    case TREE: {
+      CHECK_NULLPTR_RETURN_FALSE(m_fsModel);
+      m_fsModel->setNameFilters({'*' + targetStr + '*'});
     }
-    m_scenesModel->setFilterRegularExpression(targetStr);
-    return true;
-  }
-  if (isFSView()) {
-    if (targetStr.isEmpty()) {
-      m_fsModel->setNameFilters({});
+    case ViewType::SCENE: {
+      CHECK_NULLPTR_RETURN_FALSE(m_scenesModel);
+      m_scenesModel->setFilterRegularExpression(targetStr);
+    }
+    case ViewType::JSON: {
+      static QHash<QString, QRegularExpression> exprHash;
+      auto it = exprHash.constFind(targetStr);
+      if (it == exprHash.cend()) {
+        QRegularExpression expr{targetStr};
+        it = exprHash.insert(targetStr, expr);
+      }
+      if (!it->isValid()) {
+        qDebug("Not a valid regular expression[%s]", qPrintable(targetStr));
+        return false;
+      }
+
+      CHECK_NULLPTR_RETURN_FALSE(m_jsonProxyModel);
+      m_jsonProxyModel->setFilterRegularExpression(it.value());
       return true;
     }
-    m_fsModel->setNameFilters({"*" + targetStr + "*"});
+    default: {
+      qWarning("ViewType[%d:%s] not support search text", (int)vt, GetViewTypeHumanFriendlyStr(vt));
+      return false;
+    }
   }
   return true;
 }
 
 auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
-  if (GetCurViewType() == ViewType::SCENE) {
-    if (m_scenesModel == nullptr) {
-      qWarning("m_scenesModel is nullptr");
+  const ViewTypeTool::ViewType vt{GetCurViewType()};
+  switch (vt) {
+    case LIST:
+    case TABLE:
+    case TREE:
+    case JSON: {
+      // ignore
+      return true;
+    }
+    case ViewType::SCENE: {
+      // ignore
+      return true;
+    }
+    default: {
+      qWarning("ViewType[%d:%s] not support search text", (int)vt, GetViewTypeHumanFriendlyStr(vt));
       return false;
     }
-    m_scenesModel->setFilterRegularExpression(targetStr);
-    return true;
-  }
-  if (isFSView()) {
-    return on_searchTextChanged(targetStr);
   }
   return true;
 }
@@ -176,13 +202,14 @@ void ContentPanel::BindLogger(CustomStatusBar* logger) {
 }
 
 auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool {
-  if (!clickedIndex.isValid())
+  if (!clickedIndex.isValid()) {
+    LOG_BAD("Current Index invalid", "double Click skip");
     return false;
+  }
   QFileInfo fi = getFileInfo(clickedIndex);
   qInfo("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
-    qWarning("path[%s] nit exists", qPrintable(fi.absoluteFilePath()));
-    Notificator::warning("path not exist", fi.absoluteFilePath());
+    LOG_BAD("path not exist", fi.absoluteFilePath());
     return false;
   }
   if (fi.isSymLink()) {
@@ -191,13 +218,12 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
 #else  // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
     const QString tarPath{fi.absoluteFilePath()};
 #endif
-    fi = QFileInfo(tarPath);
+    fi.setFile(tarPath);
     if (!fi.exists()) {
-      qWarning("link[%s] not exists", qPrintable(fi.absoluteFilePath()));
-      Notificator::warning("link not exists", fi.absoluteFilePath());
+      LOG_BAD("link not exists double click not work", tarPath);
       return false;
     }
-    qDebug("link[%s]", qPrintable(fi.absoluteFilePath()));
+    qDebug("linked to[%s]", qPrintable(fi.absoluteFilePath()));
   }
 
   // For File

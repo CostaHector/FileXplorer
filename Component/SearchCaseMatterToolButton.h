@@ -5,7 +5,7 @@
 #include <QAction>
 #include <QMenu>
 
-#include "Tools/SearchProxyModel.h"
+#include "Model/SearchProxyModel.h"
 
 class SearchCaseMatterToolButton:public QToolButton {
   Q_OBJECT
