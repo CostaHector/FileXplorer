@@ -7,8 +7,6 @@
 #include "Component/NavigationAndAddressBar.h"
 #include "Component/FolderPreview/PreviewFolder.h"
 
-#include "Model/MyQFileSystemModel.h"
-
 #include "View/AdvanceSearchTableView.h"
 #include "View/FileSystemListView.h"
 #include "View/FileSystemTableView.h"
@@ -119,32 +117,35 @@ class ContentPanel : public QStackedWidget {
   QMap<QString, Anchor> m_anchorTags;
 
   NavigationAndAddressBar* _addressBar{nullptr};
-  DatabaseSearchToolBar* _dbSearchBar{nullptr};
-  AdvanceSearchToolBar* _advanceSearchBar{nullptr};
-
   MyQFileSystemModel* m_fsModel{nullptr};
-  FdBasedDbModel* m_dbModel{nullptr};
-  FdBasedDb mMovieDb;
-  AdvanceSearchModel* m_searchSrcModel{nullptr};
-  SearchProxyModel* m_proxyModel{nullptr};
-  ScenesListModel* m_scenesModel{nullptr};
-  JsonTableModel* m_jsonModel{nullptr};
-
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
+
+  DatabaseSearchToolBar* _dbSearchBar{nullptr};
+  FdBasedDb mMovieDb;
+  FdBasedDbModel* m_dbModel{nullptr};
   MovieDBView* m_movieView{nullptr};
+
+  AdvanceSearchToolBar* _advanceSearchBar{nullptr};
+  SearchProxyModel* m_proxyModel{nullptr};
+  AdvanceSearchModel* m_searchSrcModel{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
+
+  ScenesListModel* m_scenesModel{nullptr};
   SceneListView* m_sceneTableView{nullptr};
 
   CastDBView* m_castTableView{nullptr};
+
+  JsonProxyModel* m_jsonProxyModel{nullptr};
+  JsonTableModel* m_jsonModel{nullptr};
   JsonTableView* m_jsonTableView{nullptr};
 
-  PreviewFolder* _previewFolder;
+  PreviewFolder* _previewFolder{nullptr};
 
-  CustomStatusBar* _logger {nullptr};
+  CustomStatusBar* _logger{nullptr};
 
-  QWidget* m_parent;
+  QWidget* m_parent{nullptr};
 
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;

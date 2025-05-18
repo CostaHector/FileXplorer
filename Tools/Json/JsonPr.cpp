@@ -61,18 +61,21 @@ bool JsonPr::WriteIntoFiles() const {
   if (!QFile::exists(jsonPath)) {
     return false;
   }
+  const QByteArray& ba{GetJsonBA()};
+  bool writeResult{ByteArrayWriter(jsonPath, ba)};
+  if (writeResult) {
+    hintCast.clear();
+    hintStudio.clear();
+  }
+  return writeResult;
+}
+
+QByteArray JsonPr::GetJsonBA() const {
   QJsonObject json;
 #define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) jsonWriter(json, ENUM_2_STR(enu), m_##enu);
   JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
-
-  const QByteArray& ba = QJsonDocument(json).toJson(QJsonDocument::Indented);
-  bool retResult{ByteArrayWriter(jsonPath, ba)};
-  if (retResult) {
-    hintCast.clear();
-    hintStudio.clear();
-  }
-  return retResult;
+  return QJsonDocument(json).toJson(QJsonDocument::Indented);
 }
 
 int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles) {
@@ -135,15 +138,21 @@ bool JsonPr::ConstructCastStudioValue() {
     return false;
   }
   bool changed = false;
-  static const auto& pm = CastManager::getIns();
   if (m_Cast.isEmpty()) {
-    m_Cast.setBatch(pm(m_Name));
-    changed = true;
+    static const auto& pm = CastManager::getIns();
+    QStringList newCastLst = pm(m_Name);
+    if (!newCastLst.isEmpty()) {
+      m_Cast.setBatch(newCastLst);
+      changed = true;
+    }
   }
-  static const auto& psm = StudiosManager::getIns();
   if (m_Studio.isEmpty()) {
-    m_Studio = psm(m_Name);
-    changed = true;
+    static const auto& psm = StudiosManager::getIns();
+    QString newStudio = psm(m_Name);
+    if (!newStudio.isEmpty()) {
+      m_Studio.swap(newStudio);
+      changed = true;
+    }
   }
   return changed;
 }

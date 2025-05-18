@@ -6,7 +6,7 @@
 #include "Component/SearchModeComboBox.h"
 
 #include "Model/AdvanceSearchModel.h"
-#include "Tools/SearchProxyModel.h"
+#include "Model/SearchProxyModel.h"
 
 #include <QLineEdit>
 #include <QMainWindow>
