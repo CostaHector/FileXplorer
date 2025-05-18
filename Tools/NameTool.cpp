@@ -1,4 +1,8 @@
 #include "NameTool.h"
+#include <QPlainTextEdit>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QTextDocumentFragment>
 
 const char* NameTool::FIELD_SEPERATOR{"&|\\band\\b|,|\t|\n|@|#|\\+|\\||/|\\\\"};
 const QRegularExpression NameTool::FS_COMP(FIELD_SEPERATOR, QRegularExpression::PatternOption::CaseInsensitiveOption);
@@ -80,9 +84,30 @@ QString NameTool::ToggleSentenceCase(const QString& sentence) {
   }
   return toggled;
 }
-#include <QTextEdit>
-#include <QLineEdit>
-#include <QTextDocumentFragment>
+
+bool NameTool::ReplaceAndUpdateSelection(QPlainTextEdit& te, SentenceProcessorFunc fTrans) {
+  if (fTrans == nullptr) {
+    qWarning("fTrans is nullptr");
+    return false;
+  }
+  if (!te.textCursor().hasSelection()) {
+    qDebug("skip no text selected in QTextEdit");
+    return true;
+  }
+
+  QTextCursor curSelection = te.textCursor();
+  const int startPos = curSelection.selectionStart();
+  const QString& before = curSelection.selection().toPlainText();
+  curSelection.removeSelectedText();
+  const QString& after = fTrans(before);
+  curSelection.insertText(after);
+  const int endPos = startPos + after.size();
+  curSelection.setPosition(startPos);
+  curSelection.setPosition(endPos, QTextCursor::KeepAnchor);
+  te.setTextCursor(curSelection);
+  return true;
+}
+
 bool NameTool::ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fTrans) {
   if (fTrans == nullptr) {
     qWarning("fTrans is nullptr");

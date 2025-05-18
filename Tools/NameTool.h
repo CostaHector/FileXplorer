@@ -5,6 +5,7 @@
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
 #include <QSet>
+class QPlainTextEdit;
 class QTextEdit;
 class QLineEdit;
 
@@ -32,6 +33,7 @@ class NameTool {
   }
 
   typedef std::function<QString(const QString&)> SentenceProcessorFunc;
+  static bool ReplaceAndUpdateSelection(QPlainTextEdit& te, SentenceProcessorFunc fTrans);
   static bool ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fTrans);
   static bool ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fTrans);
 
