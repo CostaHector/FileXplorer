@@ -27,6 +27,7 @@ class JsonTableView : public CustomTableView {
   int onAppendFromSelection(bool isUpperCaseSentence);
   int onSelectionCaseOperation(bool isTitle);
 
+  bool GetSelectedTextInCell(QString& selectedText) const;
  private:
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
