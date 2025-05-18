@@ -108,10 +108,12 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
     case TREE: {
       CHECK_NULLPTR_RETURN_FALSE(m_fsModel);
       m_fsModel->setNameFilters({'*' + targetStr + '*'});
+      return true;
     }
     case ViewType::SCENE: {
       CHECK_NULLPTR_RETURN_FALSE(m_scenesModel);
       m_scenesModel->setFilterRegularExpression(targetStr);
+      return true;
     }
     case ViewType::JSON: {
       static QHash<QString, QRegularExpression> exprHash;
