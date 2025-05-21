@@ -17,7 +17,7 @@ class JsonFileHelperTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  JsonFileHelperTest() : MyTestSuite{true} {}
+  JsonFileHelperTest() : MyTestSuite{false} {}
  private slots:
 
   void test_GetDefaultJsonFile() {

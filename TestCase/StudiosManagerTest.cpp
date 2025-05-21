@@ -12,11 +12,11 @@ const QString rootpath = TestCaseRootPath() + "/test/TestEnv_JsonCastStudio";
 const QString gLocalFilePath{rootpath + "/not_exist_studio_list.txt"};
 class StudiosManagerTest : public MyTestSuite {
   Q_OBJECT
- public:
+public:
   StudiosManagerTest() : MyTestSuite{false}, smInLLT{gLocalFilePath} {}
   StudiosManager smInLLT;
 
- private slots:
+private slots:
   void cleanup() { QVERIFY(!QFile::exists(gLocalFilePath)); }
 
   void test_studio_list_file_not_exist_read_out() {
@@ -27,6 +27,29 @@ class StudiosManagerTest : public MyTestSuite {
   void test_studio_list_not_empty_in_service() {
     const StudiosManager& psm{StudiosManager::getIns()};
     QVERIFY2(psm.count() > 0, "studio list should not be empty");
+  }
+
+  void test_studio_name_in_last_section_ok() {
+    // precondition
+    decltype(smInLLT.m_prodStudioMap) tempStudioHash;
+    tempStudioHash["realmadridcf"] = "RealMadridCF";
+    tempStudioHash["real madrid cf"] = "RealMadridCF";
+    tempStudioHash["juventus"] = "Juventus";
+
+    smInLLT.m_prodStudioMap.swap(tempStudioHash);
+    ON_SCOPE_EXIT {
+      smInLLT.m_prodStudioMap.swap(tempStudioHash);
+    };
+    QVERIFY(!smInLLT.m_prodStudioMap.isEmpty());
+
+    QCOMPARE(smInLLT("Raphaël Varane, Kaka - RealMadridCF"), "RealMadridCF");
+    QCOMPARE(smInLLT("Raphaël Varane, Cristiano Ronaldo - Real Madrid CF"), "RealMadridCF");
+    QCOMPARE(smInLLT("Raphaël Varane, Álvaro Morata - Real Madrid CF"), "RealMadridCF");
+
+    QCOMPARE(smInLLT("Cristiano Ronaldo, Kaka - RealMadridCF DVD"), "RealMadridCF");
+    QCOMPARE(smInLLT("Cristiano Ronaldo, Álvaro Morata - Real Madrid CF DVD"), "RealMadridCF");
+
+    QCOMPARE(smInLLT("juventus - Cristiano Ronaldo, Kaka - RealMadridCF DVD"), "Juventus");
   }
 
   void test_standardStudioNameFrom_ok() {
