@@ -20,7 +20,9 @@ class StudiosManager {
   QSet<QString> GetCoarseStudioNames(QString standardPs) const;
 
   QString operator()(const QString& sentence) const;  // from a file name
-  QString operator[](const QString& nm) const { return m_prodStudioMap.value(nm.toLower(), nm); }
+  QString operator[](const QString& nm) const { // name standardlize not change sequence
+    return m_prodStudioMap.value(nm.toLower(), nm);
+  }
 
   inline int count() const { return m_prodStudioMap.size(); }
 
@@ -30,9 +32,11 @@ class StudiosManager {
   QHash<QString, QString> m_prodStudioMap;
 
   static bool isHypenIndexValid(const QString& sentence, int& hypenIndex);
+  static bool isHypenIndexValidReverse(const QString& sentence, int& hypenIndex);
   static constexpr int STUDIO_HYPEN_MAX_INDEX = 22;  // hypen index can be no greater then 22 char
  private:
   QString FileName2StudioNameSection(QString sentence) const;
+  QString FileNameLastSection2StudioNameSection(QString sentence) const;
 
   static QString GetLocalFilePath(const QString& localFilePath);
   StudiosManager(const QString& localFilePath = ""); // valid localFilePath only used in llt
