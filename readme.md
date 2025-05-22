@@ -1,24 +1,15 @@
 # FileExplorerReadyOnly
 
-## Coding Style
+This application preview as follows:
+
+![FileXplorer](bin/images/FileXplorer.png)
+
+## Coding Style About this project
 
 variable of class data memeber:
 
 1. class itself has ownership, start with "m_" or start with "m";
 2. only transfer, no ownership, start with "m_" or start with "m" and endwith "_";
-
-## Devoloping Settings
-```md
-git update-index --assume-unchange FileExplorerReadOnly.pro.user
-git update-index --assume-unchange FileExplorerTest.pro.user
-git update-index --assume-unchange bin/logs_info.log
-
-git update-index --no-assume-unchange FileExplorerReadOnly.pro.user
-git update-index --no-assume-unchange FileExplorerTest.pro.user
-git update-index --no-assume-unchange bin/logs_info.log
-
-```
-
 
 ## Introduction
 
@@ -41,6 +32,7 @@ a log line example:
 ## Component
 
 ### Json Ribbon
+
 **Submit**
 Submit selected lines
 
@@ -77,9 +69,6 @@ Add Tags
 Rmv Tags
 
 
-
-
-
 ### ContentPanel
 1 Table/Tree/List View:
 1. abstract view double clicked
@@ -91,6 +80,7 @@ onActionAndViewNavigate
 ### NavigationAndAddressBar
 
 3 Actions and 1 LineEdit:
+
 1. UpTo
 2. BackTo
 3. ForwardTo
@@ -151,14 +141,7 @@ level2: searchModeComboBox, CaseSensitiveToolButton, searchColumnComboBox, e.g.,
 
 # Install Suggestion
 
-## 1. fsearch
-
-Install in app store:
-
-https://github.com/cboxdoerfer/fsearch/wiki/Snap-is-no-longer-officially-supported
-
-
-## 2. How QTextEdit Show image from ByteArray
+## 1. How QTextEdit Show image from ByteArray
 
 ```cpp
 if (not qzPath.toLower().endsWith(".qz")) {
@@ -196,62 +179,19 @@ for (int i = 0; i < paths.size(); ++i) {
 }
 ```
 
-## 需求文档:
-### 文件整理功能增强:
-#### 要求:
+## Demands:
+### File Classify:
 
-1.1 视频文件
-1. 模式类似`name scene \d.vid`
+## Devoloping Settings for developer
+```md
+git update-index --assume-unchange FileExplorerReadOnly.pro.user
+git update-index --assume-unchange FileExplorerTest.pro.user
+git update-index --assume-unchange bin/logs_info.log
 
-    -- 期望归入文件夹`name scene \d`
-2. 其他`name.vid`
-
-    -- 期望归入文件夹`name`
-
-1.2 图片文件
-1. 模式类似`name scene \d \d.img`
-
-    -- 期望归入文件夹`name scene \d`
-2. 模式类似`name \d.img`
-
-    -- 期望归入文件夹`name`
-
-须知!
-Notice!
-
-
-
-
-## Read from table
-```cpp
-QSqlQuery query(db);
-query.prepare(QString("SELECT "
-                      "	`SIZE`,"
-                      "	COUNT(`SIZE`)"
-                      "FROM "
-                      "	`%1`"
-                      "GROUP BY "
-                      "	`SIZE`"
-                      "HAVING "
-                      "	COUNT(`SIZE`) > 1")
-                  .arg(tableName));
-const bool selectRet = query.exec();
-if (!selectRet) {
-  qWarning("Select error[%s]", qPrintable(query.lastError().text()));
-  return -1;
-}
-
-QSqlQuery queryFullPath(db);
-queryFullPath.prepare(QString("SELECT "
-                              "	`ABSOLUTE_PATH`"
-                              "FROM "
-                              "	`%1`"
-                              "WHERE"
-                              "	`SIZE` == (?)")
-                          .arg(tableName));
+git update-index --no-assume-unchange FileExplorerReadOnly.pro.user
+git update-index --no-assume-unchange FileExplorerTest.pro.user
+git update-index --no-assume-unchange bin/logs_info.log
 ```
-
-
 
 
 
