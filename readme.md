@@ -1,4 +1,53 @@
-# FileExplorerReadyOnly
+# FileXplorer - Ultimate File Management Suite
+
+## Overview
+
+FileXplorer, a explorer that can be used in both windows and linux platform, revolutionizes file management by combining an explorer-like interface with professional-grade file operations. Designed for photographers, video editors, developers, and data organizers.
+
+![FileXplorer](bin/FileXplorer.png)
+
+## Core Features
+
+1. File/Folder Navigation
+
+        - Dual-pane explorer interface
+        - Thumbnail/preview for 100+ file formats
+        - Dark/light theme support
+
+2. Advanced Batch Renaming
+
+        - Plain Text Insert/replace/Delete
+        - Regex String Insert/replace/Delete
+        - Case operations: UPPER/lower/Title/toggleCase
+        - Segment swapping (e.g., "Marvil - S01E02 - 2012" → "Marvil - 2012 - S01E02")
+        - Auto-numbering with customizable templates
+
+3. Professional Tools
+
+        - Media Management:
+        - Duplicate image detection
+        - Batch video duration viewer
+        - Media metadata to database export
+        - Cast and their films database by media database export 
+
+4. Developer Features:
+
+        - HAR file previewer
+        - JSON batch editor (build media databases)
+        - MD5 checksum comparator
+
+4. Smart Operations
+
+        - F1 quick-search across files
+        - One-click file organization by patterns
+        - Multi-path synchronization
+
+5. Content-aware search
+
+        - Search by filename
+        - Search by file content
+        - Search by filename + file content
+
 
 ## Coding Style
 
@@ -8,6 +57,7 @@ variable of class data memeber:
 2. only transfer, no ownership, start with "m_" or start with "m" and endwith "_";
 
 ## Devoloping Settings
+we suggest you to do following setting in git bash
 ```md
 git update-index --assume-unchange FileExplorerReadOnly.pro.user
 git update-index --assume-unchange FileExplorerTest.pro.user
@@ -16,18 +66,12 @@ git update-index --assume-unchange bin/logs_info.log
 git update-index --no-assume-unchange FileExplorerReadOnly.pro.user
 git update-index --no-assume-unchange FileExplorerTest.pro.user
 git update-index --no-assume-unchange bin/logs_info.log
-
 ```
-
-
-## Introduction
-
-An File Explorer that can be used in windows and linux.
 
 ## New Feature
 1. Logs Control
 
-## Log Control
+### Log Control
 Interactive function:
 1. Open latest log file
 2. Open logs folder
@@ -38,127 +82,7 @@ Interactive function:
 a log line example:
 > `hh:mm:ss.zzz E functionName msg [fileName:fileNo]`
 
-## Component
-
-### Json Ribbon
-**Submit**
-Submit selected lines
-
-**Sync cache/file system**
-Sync Name Field from json file base name
-reload json from disk
-Export studios/cast to diction
-
-**Case Control**
-lower all words
-capitalize first letter of each word
-
-**file Operation**
-Open json file
-Reveal in explorer
-rename json and related files
-
-**Studio/Cast/Tags Operation**
-Clear Studio fields
-Clear Cast fields
-
-Hint for Studio/Cast fields(from selected text)
-Format Cast/Studio
-
-Set Studio
-Construct Studio/Json Fields
-
-Set Cast
-Add Cast
-Rmv Cast
-
-Set Tags
-Add Tags
-Rmv Tags
-
-
-
-
-
-### ContentPanel
-1 Table/Tree/List View:
-1. abstract view double clicked
-
-
-onActionAndViewNavigate
-onActionAndViewNavigate
-
-### NavigationAndAddressBar
-
-3 Actions and 1 LineEdit:
-1. UpTo
-2. BackTo
-3. ForwardTo
-4. Search LineEdit Text changed
-5. Search LineEdit Return Pressed
-
-
-#### AddressELineEdit
-
-1 Action and 1 LineEdit:
-1. path action
-2. return pressed
-
-1. CustomTableView + QAbstractTableModel + QSortProxyModel + AdvanceSearchToolBar => SearchPane
-#? merge QAbstractTableModel into QSortProxyModel? and discard the former
-        adv: no more mapToSource, mapSelectionToSource
-# ?? use or not Signal of QSortProxyModel filterCaseSensitivityChanged connect to startfilter
-        a. when switch view to "search" 
-                i. QAbstractTableModel 
-                        1) setRootPathAndFilter(path, typeFilter)
-                        2) call QDirIterator it(path, typeFilter, iteratorFlag)
-        b. when searchLineEdit text changed
-                i. QSortProxyModel
-                        1) --- change m_text
-                        2) --- startFilter(m_text and m_searchMode)
-                                a) setFilterFixedString
-                                b) setFilterRegularExpression
-                                c) setFilterWildcard
-                                d) setFilterCustomNameAndContent
-        c. when typeToolButton nameFilterDisables triggered
-                i. QSortProxyModel 
-                        1) m_isNameFilterDisable
-                        2) --- PostReturn() 
-                                a) QAbstractTableModel
-                                        i) m_disablesList.append
-        d. when searchModeComboBox mode changed
-                i. QSortProxyModel
-                        1) --- change m_searchMode
-                        2) --- startFilter(m_text and m_searchMode)
-        e. searchCaseToolButton contents/name --- filterAcceptRow
-                i. QSortProxyModel
-                        1) --- change m_nameCaseSensitive, m_contentCaseSensitive
-                        2) --- setIgnoreCase
-                        3) --- startFilter(m_text and m_searchMode)
-        f. GetSelection
-                i. CustomTableView
-                        1) selectionIndexes: mapToSource, mapSelectionToSource
-2. CustomTableView + QSqlModel => PerformersPane, TorrPane
-3. CustomTableView + QFileSystemModel => FileSystemPane
-4. ListView + QFileSystemModel =>  FileSystemPane
-5. TreeView + QFileSystemModel  => FileSystemPane
-
-Extract AdvanceSearchToolBar out
-level0: name/contentsLineEdit e.g., QSqlTableModel
-level1: typeFilterToolButton FileSystemModel
-level2: searchModeComboBox, CaseSensitiveToolButton, searchColumnComboBox, e.g., SortFilterMode
-
-
-# Install Suggestion
-
-## 1. fsearch
-
-Install in app store:
-
-https://github.com/cboxdoerfer/fsearch/wiki/Snap-is-no-longer-officially-supported
-
-
-## 2. How QTextEdit Show image from ByteArray
+## How QTextEdit Show image from ByteArray
 
 ```cpp
 if (not qzPath.toLower().endsWith(".qz")) {
@@ -195,64 +119,3 @@ for (int i = 0; i < paths.size(); ++i) {
   cursor.insertText("\n");
 }
 ```
-
-## 需求文档:
-### 文件整理功能增强:
-#### 要求:
-
-1.1 视频文件
-1. 模式类似`name scene \d.vid`
-
-    -- 期望归入文件夹`name scene \d`
-2. 其他`name.vid`
-
-    -- 期望归入文件夹`name`
-
-1.2 图片文件
-1. 模式类似`name scene \d \d.img`
-
-    -- 期望归入文件夹`name scene \d`
-2. 模式类似`name \d.img`
-
-    -- 期望归入文件夹`name`
-
-须知!
-Notice!
-
-
-
-
-## Read from table
-```cpp
-QSqlQuery query(db);
-query.prepare(QString("SELECT "
-                      "	`SIZE`,"
-                      "	COUNT(`SIZE`)"
-                      "FROM "
-                      "	`%1`"
-                      "GROUP BY "
-                      "	`SIZE`"
-                      "HAVING "
-                      "	COUNT(`SIZE`) > 1")
-                  .arg(tableName));
-const bool selectRet = query.exec();
-if (!selectRet) {
-  qWarning("Select error[%s]", qPrintable(query.lastError().text()));
-  return -1;
-}
-
-QSqlQuery queryFullPath(db);
-queryFullPath.prepare(QString("SELECT "
-                              "	`ABSOLUTE_PATH`"
-                              "FROM "
-                              "	`%1`"
-                              "WHERE"
-                              "	`SIZE` == (?)")
-                          .arg(tableName));
-```
-
-
-
-
-
-
