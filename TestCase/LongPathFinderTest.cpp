@@ -57,4 +57,4 @@ class LongPathFinderTest : public MyTestSuite {
 };
 
 #include "LongPathFinderTest.moc"
-MyTestSuite g_LongPathFinderTest;
+LongPathFinderTest g_LongPathFinderTest;
