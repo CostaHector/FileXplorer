@@ -71,6 +71,12 @@ git update-index --no-assume-unchange FileExplorerTest.pro.user
 git update-index --no-assume-unchange bin/logs_info.log
 ```
 
+Edit right click menu in windows register edit:
+Computer\HKEY_CLASSES_ROOT\Directory\Background\Shell\FileExplorerDesktop\command
+Modify and set Value data to
+"C:\home\Ariel\qtcpp\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\release\FileExplorerReadOnly.exe" "%V"
+
+
 ```md
 git filter-branch --force --index-filter   "git rm --cached --ignore-unmatch bin/AKA_PERFORMERS.txt"   --prune-empty --tag-name-filter cat -- --all  
 rm -rf .git/refs/original/
