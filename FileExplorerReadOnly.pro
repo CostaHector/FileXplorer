@@ -7,8 +7,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 LIBS += -L$$PWD/lib -lMediaInfo
 
-SOURCES += $$files(Actions/*.cpp) \
-    TestCase/pub/FileSystemHelperTest.cpp
+SOURCES += $$files(Actions/*.cpp)
 SOURCES += $$files(Model/*.cpp)
 SOURCES += $$files(View/*.cpp)
 SOURCES += $$files(Component/*.cpp)
