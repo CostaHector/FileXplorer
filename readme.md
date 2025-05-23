@@ -71,6 +71,20 @@ git update-index --no-assume-unchange FileExplorerTest.pro.user
 git update-index --no-assume-unchange bin/logs_info.log
 ```
 
+```md
+git filter-branch --force --index-filter   "git rm --cached --ignore-unmatch bin/AKA_PERFORMERS.txt"   --prune-empty --tag-name-filter cat -- --all  
+rm -rf .git/refs/original/
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+
+git remote set-url git@github.com:CostaHector/FileXplorer.git
+git remote -v
+git remote remove origin
+git remote add origin git@github.com:CostaHector/FileXplorer.git
+git push -u origin fileXplor:master -f
+git remote add origin git@github.com:CostaHector/FileExplorerReadOnly.git
+```
+
 ## New Feature
 1. Logs Control
 
