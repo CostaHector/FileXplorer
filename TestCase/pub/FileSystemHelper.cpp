@@ -111,11 +111,11 @@ const FileSystemHelper& FileSystemHelper::operator<<(const FileSystemNode& node)
   };
   if (node.isDir) {
     bool mkDirRet = QDir(m_path).mkdir(node.fileName);
-    qDebug("\t-%d %64s", mkDirRet, qPrintable(node.fileName));
+    qDebug("[folder bRet:%d] %s", mkDirRet, qPrintable(node.fileName));
   } else {
     bool touchRet = CreateATextFile(node.fileName, node.fileContents);
     const QString dispContent = STRIP_FIRST_AND_LAST(node.fileContents);
-    qDebug("\t %d %64s\t[%d char(s):%s]", touchRet, qPrintable(node.fileName), node.fileContents.size(), qPrintable(dispContent));
+    qDebug("[file   bRet:%d] %s[%d char(s) content:%s]", touchRet, qPrintable(node.fileName), node.fileContents.size(), qPrintable(dispContent));
   }
   return *this;
 }
