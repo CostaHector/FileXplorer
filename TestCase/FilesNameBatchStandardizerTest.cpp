@@ -3,13 +3,14 @@
 
 // add necessary includes here
 #include "Tools/FilesNameBatchStandardizer.h"
-#include "pub/FileSystemRelatedTest.h"
+#include "pub/FileSystemTestSuite.h"
 
-class FilesNameBatchStandardizerTest : public FileSystemRelatedTest {
+class FilesNameBatchStandardizerTest : public FileSystemTestSuite {
   Q_OBJECT
 
  public:
-  FilesNameBatchStandardizerTest() : FileSystemRelatedTest{"TestEnv_FilesNameBatchStandardizer"} {}
+  FilesNameBatchStandardizerTest() : FileSystemTestSuite{"TestEnv_FilesNameBatchStandardizer", true, false} {  //
+  }
   FilesNameBatchStandardizer frr;
 
  private slots:
@@ -23,32 +24,32 @@ class FilesNameBatchStandardizerTest : public FileSystemRelatedTest {
   }
 
   void test_files_batch_rename() {
-    QVERIFY2(QDir(ROOT_DIR).exists("A - .txt"), "Precondition not required.");
-    QVERIFY2(QDir(ROOT_DIR).exists("---C.txt"), "Precondition not required.");
-    QVERIFY2(QDir(ROOT_DIR).exists("A       B/C [A/C (A.txt"), "Precondition not required.");
+    QVERIFY2(QDir(mTestPath).exists("A - .txt"), "Precondition not required.");
+    QVERIFY2(QDir(mTestPath).exists("---C.txt"), "Precondition not required.");
+    QVERIFY2(QDir(mTestPath).exists("A       B/C [A/C (A.txt"), "Precondition not required.");
 
     frr = FilesNameBatchStandardizer();
-    frr(ROOT_DIR);
+    frr(mTestPath);
 
-    QVERIFY(QDir(ROOT_DIR).exists("A.txt"));
-    QVERIFY(QDir(ROOT_DIR).exists("- C.txt"));
-    QVERIFY(QDir(ROOT_DIR).exists("A B/C - A/C - A.txt"));
+    QVERIFY(QDir(mTestPath).exists("A.txt"));
+    QVERIFY(QDir(mTestPath).exists("- C.txt"));
+    QVERIFY(QDir(mTestPath).exists("A B/C - A/C - A.txt"));
   }
   void test_files_folders_rename() {
-    QVERIFY2(QDir(ROOT_DIR).exists("- .C"), "Precondition not required.");
-    QVERIFY2(QDir(ROOT_DIR).exists("A       B"), "Precondition not required.");
-    QVERIFY2(QDir(ROOT_DIR).exists("Movie – C"), "Precondition not required.");
-    QVERIFY2(QDir(ROOT_DIR).exists("A       B/C [A"), "Precondition not required.");
+    QVERIFY2(QDir(mTestPath).exists("- .C"), "Precondition not required.");
+    QVERIFY2(QDir(mTestPath).exists("A       B"), "Precondition not required.");
+    QVERIFY2(QDir(mTestPath).exists("Movie – C"), "Precondition not required.");
+    QVERIFY2(QDir(mTestPath).exists("A       B/C [A"), "Precondition not required.");
 
     frr = FilesNameBatchStandardizer();
-    frr(ROOT_DIR);
+    frr(mTestPath);
 
-    QVERIFY(QDir(ROOT_DIR).exists(".C"));
-    QVERIFY(QDir(ROOT_DIR).exists("A B"));
-    QVERIFY(QDir(ROOT_DIR).exists("Movie - C"));
-    QVERIFY(QDir(ROOT_DIR).exists("A B/C - A"));
+    QVERIFY(QDir(mTestPath).exists(".C"));
+    QVERIFY(QDir(mTestPath).exists("A B"));
+    QVERIFY(QDir(mTestPath).exists("Movie - C"));
+    QVERIFY(QDir(mTestPath).exists("A B/C - A"));
   }
 };
 
-//QTEST_MAIN(FilesNameBatchStandardizerTest)
 #include "FilesNameBatchStandardizerTest.moc"
+FilesNameBatchStandardizerTest g_FilesNameBatchStandardizerTest;

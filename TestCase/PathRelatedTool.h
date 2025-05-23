@@ -1,6 +1,6 @@
 #ifndef PATHRELATEDTOOL_H
 #define PATHRELATEDTOOL_H
-#include <QFileInfo>
+#include <QString>
 
 QString TestCaseRootPath();
 

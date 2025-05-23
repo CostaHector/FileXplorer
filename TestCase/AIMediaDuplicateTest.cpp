@@ -4,23 +4,22 @@
 #include "TestCase/pub/BeginToExposePrivateMember.h"
 #include "Tools/AIMediaDuplicate.h"
 #include "TestCase/pub/EndToExposePrivateMember.h"
-#include "pub/FileSystemRelatedTest.h"
+#include "pub/FileSystemTestSuite.h"
 
-class AIMediaDuplicateTest : public FileSystemRelatedTest {
+class AIMediaDuplicateTest : public FileSystemTestSuite {
   Q_OBJECT
  public:
-  AIMediaDuplicateTest() : FileSystemRelatedTest("TestEnv_AIMediaDuplicate", false) {
-  }
-  ~AIMediaDuplicateTest() {
+  AIMediaDuplicateTest() : FileSystemTestSuite("TestEnv_AIMediaDuplicate", false, false) {}
+  const FileSystemHelper m_rootHelper{mTestPath};
+  const QString AI_MEDIA_DUPLICATE_DIR_EMPTY = mTestPath + "/empty";
+  const QString AI_MEDIA_DUPLICATE_DIR_FOLDER_1 = mTestPath + "/folder_1";
+  const QString AI_MEDIA_DUPLICATE_DIR_NO_MEDIA = mTestPath + "/no_media";
+
+ private slots:
+  void cleanupTestCase() {  //
     m_rootHelper.EraseFileSystemTree(true);
   }
 
-  const FileSystemHelper m_rootHelper{ROOT_DIR};
-  const QString AI_MEDIA_DUPLICATE_DIR_EMPTY = ROOT_DIR + "/empty";
-  const QString AI_MEDIA_DUPLICATE_DIR_FOLDER_1 = ROOT_DIR + "/folder_1";
-  const QString AI_MEDIA_DUPLICATE_DIR_NO_MEDIA = ROOT_DIR + "/no_media";
-
- private slots:
   void initTestCase() {
     // empty, folder_1{movie 1 duplicate.mp4, movie 2 duplicate.mp4, movie 3 unique.mkv}, no_media{any text.txt}
     std::string size102Str(102, '0');
@@ -35,19 +34,29 @@ class AIMediaDuplicateTest : public FileSystemRelatedTest {
     AIMediaDuplicate::IS_TEST = true;
   }
 
-  void cleanup() {}
+  void test_Basic() {  //
+    QCOMPARE("123", GetEffectiveName("123"));
+  }
 
-  void test_Basic() { QCOMPARE("123", GetEffectiveName("123")); }
+  void test_SimplePath() {  //
+    QCOMPARE("B/C.ext", GetEffectiveName("C:/A/B/C.ext"));
+  }
 
-  void test_SimplePath() { QCOMPARE("B/C.ext", GetEffectiveName("C:/A/B/C.ext")); }
+  void test_VideosPath() {  //
+    QCOMPARE("A/Videos/C.ext", GetEffectiveName("C:/A/Videos/C.ext"));
+  }
 
-  void test_VideosPath() { QCOMPARE("A/Videos/C.ext", GetEffectiveName("C:/A/Videos/C.ext")); }
+  void test_VideoPath() {  //
+    QCOMPARE("A/Video/C.ext", GetEffectiveName("C:/A/Video/C.ext"));
+  }
 
-  void test_VideoPath() { QCOMPARE("A/Video/C.ext", GetEffectiveName("C:/A/Video/C.ext")); }
+  void test_VidPath() {  //
+    QCOMPARE("A/Vid/C.ext", GetEffectiveName("C:/A/Vid/C.ext"));
+  }
 
-  void test_VidPath() { QCOMPARE("A/Vid/C.ext", GetEffectiveName("C:/A/Vid/C.ext")); }
-
-  void test_VIDEO_TSPath() { QCOMPARE("A/VIDEO_TS/C.ext", GetEffectiveName("C:/A/VIDEO_TS/C.ext")); }
+  void test_VIDEO_TSPath() {  //
+    QCOMPARE("A/VIDEO_TS/C.ext", GetEffectiveName("C:/A/VIDEO_TS/C.ext"));
+  }
 
   void test_ignoreCasePath() {
     QCOMPARE("A/VID/C.ext", GetEffectiveName("C:/A/VID/C.ext"));
@@ -144,5 +153,5 @@ class AIMediaDuplicateTest : public FileSystemRelatedTest {
   }
 };
 
-//QTEST_MAIN(AIMediaDuplicateTest)
 #include "AIMediaDuplicateTest.moc"
+AIMediaDuplicateTest g_AIMediaDuplicateTest;
