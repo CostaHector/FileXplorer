@@ -2,12 +2,12 @@
 #include <QtTest>
 
 #include "Tools/RenameNamesUnique.h"
-#include "pub/FileSystemRelatedTest.h"
+#include "pub/FileSystemTestSuite.h"
 
-class RenameUnqiueCheckTest : public FileSystemRelatedTest {
+class RenameUnqiueCheckTest : public FileSystemTestSuite {
   Q_OBJECT
  public:
-  RenameUnqiueCheckTest() : FileSystemRelatedTest{"TestEnv_RenameNamesUnique", false} {}
+  RenameUnqiueCheckTest() : FileSystemTestSuite{"TestEnv_RenameNamesUnique", false, false} {}
 
  private slots:
   void initTestCase() {
@@ -21,10 +21,12 @@ class RenameUnqiueCheckTest : public FileSystemRelatedTest {
     m_rootHelper.GetSubHelper("renameDiretoryNameShouldNotConflict").GetSubHelper("dirName") << FileSystemNode{"dirName"} << FileSystemNode{"file1"};
   }
 
-  void cleanupTestCase() { FileSystemHelper(ROOT_DIR).EraseFileSystemTree(true); }
+  void cleanupTestCase() {  //
+    FileSystemHelper(mTestPath).EraseFileSystemTree(true);
+  }
 
   void occupiedNameOfrename12To45Basic() {
-    const QString pre = QDir(ROOT_DIR).absoluteFilePath("rename12To45Basic");
+    const QString pre = QDir(mTestPath).absoluteFilePath("rename12To45Basic");
     const QSet<QString>& occupied = RenameNamesUnique::getOccupiedPostPath(pre, {"", ""}, {"1", "2"}, true);
     const QSet<QString> actual{"1", "2"};
     QCOMPARE(occupied, actual);
@@ -51,7 +53,7 @@ class RenameUnqiueCheckTest : public FileSystemRelatedTest {
   }
 
   void occupiedNameOfrenameDiretoryNameShouldNotConflict() {
-    const QString pre = QDir(ROOT_DIR).absoluteFilePath("renameDiretoryNameShouldNotConflict");
+    const QString pre = QDir(mTestPath).absoluteFilePath("renameDiretoryNameShouldNotConflict");
     const QSet<QString>& occupied = RenameNamesUnique::getOccupiedPostPath(pre, {"", "dirName", "dirName"}, {"dirName", "file1", "dirName"}, true);
     const QSet<QString> actual{"dirName", "dirName/file1", "dirName/dirName"};
     QCOMPARE(occupied, actual);
@@ -60,7 +62,10 @@ class RenameUnqiueCheckTest : public FileSystemRelatedTest {
   void renameDiretoryNameShouldNotConflict() {
     // dirName/file1, dirName
     // dir Name/file 1, dir Name
-    bool ans = RenameNamesUnique::CheckConflict({"dirName", "dirName/file1", "dirName/dirName"}, {"", "dirName", "dirName"}, {"dirName", "file1", "dirName"}, {"dir Name", "file 1", "dir Name"},
+    bool ans = RenameNamesUnique::CheckConflict({"dirName", "dirName/file1", "dirName/dirName"},  //
+                                                {"", "dirName", "dirName"},                       //
+                                                {"dirName", "file1", "dirName"},                  //
+                                                {"dir Name", "file 1", "dir Name"},               //
                                                 m_conflictNames);
     QVERIFY(ans);
   }
@@ -69,5 +74,5 @@ class RenameUnqiueCheckTest : public FileSystemRelatedTest {
   QStringList m_conflictNames;
 };
 
-//QTEST_MAIN(RenameUnqiueCheckTest)
 #include "RenameUnqiueCheckTest.moc"
+RenameUnqiueCheckTest g_RenameUnqiueCheckTest;
