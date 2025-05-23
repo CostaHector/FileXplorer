@@ -62,6 +62,9 @@ we suggest you to do following setting in git bash
 git update-index --assume-unchange FileExplorerReadOnly.pro.user
 git update-index --assume-unchange FileExplorerTest.pro.user
 git update-index --assume-unchange bin/logs_info.log
+git update-index --assume-unchange bin/AKA_PERFORMERS.txt
+git update-index --assume-unchange bin/PERFORMERS_TABLE.txt
+git update-index --assume-unchange bin/STANDARD_STUDIO_NAME.txt
 
 git update-index --no-assume-unchange FileExplorerReadOnly.pro.user
 git update-index --no-assume-unchange FileExplorerTest.pro.user
