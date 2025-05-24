@@ -2,7 +2,7 @@
 
 ## Overview
 
-FileXplorer, a explorer that can be used in both windows and linux platform, revolutionizes file management by combining an explorer-like interface with professional-grade file operations. Designed for photographers, video editors, developers, and data organizers.
+FileXplorer is a cross-platform professional file management system engineered for photographers and videographers handling large-scale media files, offering advanced file operations across both Windows and Linux environments.
 
 ![FileXplorer](bin/FileXplorer.png)
 
@@ -48,6 +48,13 @@ FileXplorer, a explorer that can be used in both windows and linux platform, rev
         - Search by file content
         - Search by filename + file content
 
+6. File/Folder Operation Recoverable
+
+        - Each operation will be saved in memory. Operation can be undo(recovered) by shortcut `Ctrl+Z` and Redo by shortcut `Ctrl+Y`.
+
+        Attention:
+                - All undo history purges upon application termination/restart. So operation cannot be recovered after restart;
+                - Permanent deletion operations cannot be recovered;
 
 ## Coding Style
 
@@ -106,6 +113,8 @@ Interactive function:
 
 a log line example:
 > `hh:mm:ss.zzz E functionName msg [fileName:fileNo]`
+
+
 
 ## How QTextEdit Show image from ByteArray
 
