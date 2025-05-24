@@ -8,7 +8,6 @@
 #include "Actions/FileLeafAction.h"
 #include "Actions/FolderPreviewActions.h"
 #include "Actions/FramelessWindowActions.h"
-#include "Actions/JsonActions.h"
 #include "Actions/PreferenceActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
@@ -19,6 +18,7 @@
 #include "Actions/ThumbnailProcessActions.h"
 #include "Actions/LogActions.h"
 #include "Component/RibbonCastDB.h"
+#include "Component/RibbonJson.h"
 #include "Component/RibbonMovieDB.h"
 #include "Component/DropListToolButton.h"
 #include "public/PublicTool.h"
@@ -259,19 +259,20 @@ QToolBar* RibbonMenu::LeafView() const {
 }
 
 QToolBar* RibbonMenu::LeafDatabase() const {
-  auto* databaseToolBar{new (std::nothrow) RibbonMovieDB("Leaf Movie Database")};
+  auto* databaseToolBar{new (std::nothrow) RibbonMovieDB{"Leaf Movie Database"}};
   CHECK_NULLPTR_RETURN_NULLPTR(databaseToolBar);
   return databaseToolBar;
 }
 
 QToolBar* RibbonMenu::LeafCast() const {
-  auto* castToolBar{new (std::nothrow) RibbonCastDB("Leaf Cast Database")};
+  auto* castToolBar{new (std::nothrow) RibbonCastDB{"Leaf Cast Database"}};
   CHECK_NULLPTR_RETURN_NULLPTR(castToolBar);
   return castToolBar;
 }
 
 QToolBar* RibbonMenu::LeafJson() const {
-  auto* jsonToolBar = g_JsonActions().GetJsonRibbonToolBar();
+  auto* jsonToolBar{new (std::nothrow) RibbonJson{"Leaf Json"}};
+  CHECK_NULLPTR_RETURN_NULLPTR(jsonToolBar);
   return jsonToolBar;
 }
 
@@ -303,7 +304,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
       new (std::nothrow) DropdownToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
   nameRulerToolButton->setDefaultAction(g_fileBasicOperationsActions()._NAME_RULER);
-  auto& viewIns = g_viewActions();
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
   QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
