@@ -1,5 +1,5 @@
 #include "FileExplorerEvent.h"
-#include "FileExplorerReadOnly.h"
+#include "FileXplorer.h"
 #include "Tools/ExtraViewVisibilityControl.h"
 #include "Tools/LogHandler.h"
 #include "public/PublicTool.h"
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     LoadCNLanguagePack(translator);
   }
 
-  FileExplorerReadOnly fileExplorer{argc, argv, nullptr};
+  FileXplorer fileExplorer{argc, argv, nullptr};
   FileExplorerEvent::GetFileExlorerEvent(fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer.m_statusBar);
   ExtraViewVisibilityControl extraViewVisibility{fileExplorer.centralWidget()};
   fileExplorer.show();

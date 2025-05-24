@@ -3,12 +3,10 @@
 
 #include <QAction>
 #include <QObject>
-#include <QToolBar>
 
 class JsonActions : public QObject {
  public:
   explicit JsonActions(QObject* parent = nullptr);
-  QToolBar* GetJsonRibbonToolBar();
 
   // **Submit**
   QAction* _SAVE_CURRENT_CHANGES{nullptr};

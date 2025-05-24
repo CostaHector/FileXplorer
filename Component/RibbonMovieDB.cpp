@@ -6,17 +6,19 @@
 #include "public/PublicMacro.h"
 
 RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
-  : QToolBar(title, parent)                                        //
+    : QToolBar(title, parent)                                        //
 {
+  auto& inst = g_dbAct();
+
   m_dbControlTB = new (std::nothrow) QToolBar("DB Control", this);
   CHECK_NULLPTR_RETURN_VOID(m_dbControlTB);
-  m_dbControlTB->addActions(g_dbAct().DB_CONTROL_ACTIONS->actions());
+  m_dbControlTB->addActions(inst.DB_CONTROL_ACTIONS->actions());
   m_dbControlTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   m_dbControlTB->setOrientation(Qt::Orientation::Horizontal);
 
   m_extraFunctionTB = new (std::nothrow) QToolBar("Video DB Extra Function", this);
   CHECK_NULLPTR_RETURN_VOID(m_extraFunctionTB);
-  m_extraFunctionTB->addActions(g_dbAct().EX_FUNCTION_ACTIONS->actions());
+  m_extraFunctionTB->addActions(inst.EX_FUNCTION_ACTIONS->actions());
   m_extraFunctionTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_extraFunctionTB->setOrientation(Qt::Orientation::Vertical);
   m_extraFunctionTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
@@ -24,9 +26,9 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
 
   m_functionsTB = new (std::nothrow) QToolBar("Function", this);
   CHECK_NULLPTR_RETURN_VOID(m_functionsTB);
-  m_functionsTB->addAction(g_dbAct()._SUM);
-  m_functionsTB->addAction(g_dbAct()._COUNT);
-  m_functionsTB->addAction(g_dbAct()._OPEN_DB_WITH_LOCAL_APP);
+  m_functionsTB->addAction(inst._SUM);
+  m_functionsTB->addAction(inst._COUNT);
+  m_functionsTB->addAction(inst._OPEN_DB_WITH_LOCAL_APP);
   m_functionsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_functionsTB->setOrientation(Qt::Orientation::Vertical);
   m_functionsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
@@ -34,15 +36,15 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
 
   m_studioTB = new (std::nothrow) QToolBar("Studio Edit Toolbar", this);
   CHECK_NULLPTR_RETURN_VOID(m_studioTB);
-  m_studioTB->addAction(g_dbAct().SET_STUDIO);
+  m_studioTB->addAction(inst.SET_STUDIO);
   m_studioTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   m_studioTB->setOrientation(Qt::Orientation::Horizontal);
 
   m_castEditTB = new (std::nothrow) QToolBar("Cast Edit Toolbar", this);
   CHECK_NULLPTR_RETURN_VOID(m_castEditTB);
-  m_castEditTB->addAction(g_dbAct().SET_CAST);
-  m_castEditTB->addAction(g_dbAct().APPEND_CAST);
-  m_castEditTB->addAction(g_dbAct().REMOVE_CAST);
+  m_castEditTB->addAction(inst.SET_CAST);
+  m_castEditTB->addAction(inst.APPEND_CAST);
+  m_castEditTB->addAction(inst.REMOVE_CAST);
   m_castEditTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_castEditTB->setOrientation(Qt::Orientation::Vertical);
   m_castEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
@@ -50,9 +52,9 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
 
   m_tagsEditTB = new (std::nothrow) QToolBar("Tags Edit Toolbar", this);
   CHECK_NULLPTR_RETURN_VOID(m_tagsEditTB);
-  m_tagsEditTB->addAction(g_dbAct().SET_TAGS);
-  m_tagsEditTB->addAction(g_dbAct().APPEND_TAGS);
-  m_tagsEditTB->addAction(g_dbAct().REMOVE_TAGS);
+  m_tagsEditTB->addAction(inst.SET_TAGS);
+  m_tagsEditTB->addAction(inst.APPEND_TAGS);
+  m_tagsEditTB->addAction(inst.REMOVE_TAGS);
   m_tagsEditTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_tagsEditTB->setOrientation(Qt::Orientation::Vertical);
   m_tagsEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
@@ -68,6 +70,8 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_dbViewHideShowTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
   m_dbViewHideShowTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
+  addWidget(m_dbViewHideShowTB);
+  addSeparator();
   addWidget(m_dbControlTB);
   addSeparator();
   addWidget(m_extraFunctionTB);
@@ -77,8 +81,6 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   addWidget(m_studioTB);
   addWidget(m_castEditTB);
   addWidget(m_tagsEditTB);
-  addSeparator();
-  addWidget(m_dbViewHideShowTB);
 }
 
 // #define __NAME__EQ__MAIN__ 1
