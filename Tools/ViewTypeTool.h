@@ -2,9 +2,9 @@
 #define TYPEVIEWSTOOL_H
 
 class QAction;
-#include <QString>
+
 namespace ViewTypeTool {
-enum ViewType {
+enum class ViewType {
   VIEW_TYPE_BEGIN = 0,
   // add after BEGIN
   LIST = VIEW_TYPE_BEGIN,
@@ -15,7 +15,7 @@ enum ViewType {
   SCENE,
   CAST,
   JSON,
-  // add before BYTT
+  // add before BUTT
   VIEW_TYPE_BUTT,
 };
 
@@ -23,8 +23,13 @@ inline bool isFSView(ViewType vt) {
   return (vt == ViewType::LIST || vt == ViewType::TABLE || vt == ViewType::TREE);
 }
 
+inline bool IsUseFileSystemSearchBar(ViewType vt) {
+  return (vt == ViewType::LIST || vt == ViewType::TABLE || vt == ViewType::TREE || vt == ViewType::JSON);
+}
+
 const char* GetViewTypeHumanFriendlyStr(ViewType viewType);
-ViewType GetViewTypeByActionText(const QAction* viewAct);
+
+ViewType GetViewTypeByActionText(const QAction* pViewAct);
 }  // namespace ViewTypeTool
 
 #endif  // TYPEVIEWSTOOL_H
