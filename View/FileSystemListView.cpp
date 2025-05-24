@@ -62,7 +62,7 @@ void FileSystemListView::dragLeaveEvent(QDragLeaveEvent* event) {
 }
 
 auto FileSystemListView::keyPressEvent(QKeyEvent* e) -> void {
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
     emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
     return;
   }

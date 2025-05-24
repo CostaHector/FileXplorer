@@ -24,7 +24,6 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _VIEWS_AG = GetViewsAG();
 
   NAVIGATION_PANE = new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"));
-  _JSON_EDITOR_PANE = new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), tr("Json Editor"));
   _VIDEO_PLAYER_EMBEDDED = new (std::nothrow) QAction(QIcon(":img/VIDEO_PLAYER"), tr("Embedded Player"));
   _VIEW_ACTIONS = Get_NAVIGATION_PANE_Actions();
   _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"));
@@ -37,9 +36,6 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   NAVIGATION_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
   NAVIGATION_PANE->setCheckable(true);
 
-  _JSON_EDITOR_PANE->setCheckable(true);
-  _JSON_EDITOR_PANE->setToolTip(QString("<b>%1 (%2)</b><br/>Show Json Edit Pane.").arg(_JSON_EDITOR_PANE->text(), _JSON_EDITOR_PANE->shortcut().toString()));
-
   _VIDEO_PLAYER_EMBEDDED->setShortcutVisibleInContextMenu(true);
   _VIDEO_PLAYER_EMBEDDED->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.").arg(_VIDEO_PLAYER_EMBEDDED->text(), _VIDEO_PLAYER_EMBEDDED->shortcut().toString()));
@@ -47,7 +43,6 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   auto* actionGroup = new (std::nothrow) QActionGroup(this);
   CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
   actionGroup->addAction(NAVIGATION_PANE);
-  actionGroup->addAction(_JSON_EDITOR_PANE);
   actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
@@ -118,9 +113,7 @@ QActionGroup* ViewActions::GetViewsAG() {
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
-  actionGroup->addAction(_LIST_VIEW);
   actionGroup->addAction(_TABLE_VIEW);
-  actionGroup->addAction(_TREE_VIEW);
   actionGroup->addAction(_MOVIE_VIEW);
   actionGroup->addAction(_CAST_VIEW);
   actionGroup->addAction(_SCENE_VIEW);
