@@ -23,7 +23,6 @@ class ViewActions : public QObject {
   QActionGroup* _VIEWS_AG{nullptr};
 
   QAction* NAVIGATION_PANE{nullptr};
-  QAction* _JSON_EDITOR_PANE{nullptr};
   QAction* _VIDEO_PLAYER_EMBEDDED{nullptr};
   QActionGroup* _VIEW_ACTIONS{nullptr};
 

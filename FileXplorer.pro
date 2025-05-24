@@ -43,7 +43,7 @@ HEADERS += $$files(bin/*.h)
 HEADERS += $$files(*.h)
 
 TRANSLATIONS += \
-    Translate/FileExplorerReadOnly_zh_CN.ts
+    Translate/FileXplorer_zh_CN.ts
 
 CONFIG += lupdate
 CONFIG += lrelease
@@ -61,7 +61,7 @@ RESOURCES += \
 
 DISTFILES += \
     Experiment.py \
-    Translate/FileExplorerReadOnly_zh_CN.ts \
+    Translate/FileXplorer_zh_CN.ts \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat \
     bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh \
     readme.md
