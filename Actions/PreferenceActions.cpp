@@ -93,7 +93,15 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
     qssFile.setFileName(":stylesheet/dark.qss");
   } else {  // "default" or any stylesheet except light/dark
     qDebug("qApp->setStyleSheet: default[%s]", qPrintable(stylesheetName));
-    qApp->setStyleSheet("");
+    qApp->setStyleSheet(
+        "QMainWindow::separator {"
+        "    width: 1px;"
+        "    height: 0px;"
+        "}"
+        "QDockWidget::separator {"
+        "    width: 0px;"
+        "    height: 0px;"
+        "}");
     return false;
   }
   if (!qssFile.open(QFile::ReadOnly | QFile::Text)) {
