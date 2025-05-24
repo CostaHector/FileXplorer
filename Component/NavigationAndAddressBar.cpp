@@ -28,9 +28,9 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
       "For FileSystemModel(wildcard) e.g., *target*\n"
       "For SceneModel(plain) e.g., target\n"
       "For JsonModel(Regex) e.g., target1.*?target2");
+  m_searchLE->setMinimumWidth(40);
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
-  addSeparator();
   addWidget(m_addressLine);
   addAction(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL);
   addSeparator();
