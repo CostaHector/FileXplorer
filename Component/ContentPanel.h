@@ -44,8 +44,8 @@ class ContentPanel : public QStackedWidget {
   auto on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool;
   void connectSelectionChanged(ViewTypeTool::ViewType vt);
   void disconnectSelectionChanged(ViewTypeTool::ViewType vt);
-  auto on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) -> bool;
-  auto onAfterDirectoryLoaded(const QString& loadedPath) -> bool;
+  bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  bool onAfterDirectoryLoaded(const QString& loadedPath);
 
   auto keyPressEvent(QKeyEvent* e) -> void override;
 
@@ -55,8 +55,11 @@ class ContentPanel : public QStackedWidget {
   }
 
   QModelIndex getRootIndex() const;
-  inline QAbstractItemView* GetCurView() const { return dynamic_cast<QAbstractItemView*>(currentWidget()); }
+  inline QAbstractItemView* GetCurView() const {  //
+    return dynamic_cast<QAbstractItemView*>(currentWidget());
+  }
   QString GetCurViewName() const;
+
   inline ViewTypeTool::ViewType GetCurViewType() const {
     using namespace ViewTypeTool;
     const auto* p = currentWidget();
