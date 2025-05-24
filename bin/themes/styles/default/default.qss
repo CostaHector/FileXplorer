@@ -1,0 +1,44 @@
+QMainWindow::separator {
+	width: 1px;
+	height: 0px;
+}
+QDockWidget::separator {
+	width: 0px;
+	height: 0px;
+}
+QTabBar::close-button {
+    image: url(":/qss_icons/default/rc/CLOSE.svg");
+    subcontrol-position: right;
+}
+QTabBar::close-button:hover {
+    image: url(":/qss_icons/default/rc/CLOSE_HOVER.svg");
+}
+QTabWidget::pane {
+    background-color: rgba(240, 240, 240, 255);       
+    border-top: 1px solid rgba(160, 160, 160, 255);   
+    position: absolute;
+    top: -1px;
+    border-bottom: 1px solid rgba(160, 160, 160, 255);
+}
+QTabBar::tab {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 1px;
+}
+QTabBar::tab:!selected {
+    border-bottom: 1px solid rgba(160, 160, 160, 255);
+}
+QTabBar::tab:selected {
+    background-color: rgba(240, 240, 240, 255);
+    border-top: 1px solid rgba(160, 160, 160, 255);
+    border-right: 1px solid rgba(160, 160, 160, 255);
+    border-left: 1px solid rgba(160, 160, 160, 255);
+    border-bottom: 1px solid rgba(240, 240, 240, 255);}
+QTabBar::tab:hover{
+    background-color: rgba(205, 232, 255, 255);
+}
+QTabBar::tab::selected:hover {
+    background-color: rgba(240, 240, 240, 255);
+}
