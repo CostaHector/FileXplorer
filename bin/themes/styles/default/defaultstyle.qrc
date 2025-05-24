@@ -1,0 +1,8 @@
+
+<RCC warning="WARNING! File created programmatically. All changes made in this file will be lost!">
+  <qresource prefix="qss_icons/default">
+  </qresource>
+  <qresource prefix="stylesheet">
+      <file>default.qss</file>
+  </qresource>
+</RCC>

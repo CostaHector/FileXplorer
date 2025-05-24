@@ -58,6 +58,7 @@ RESOURCES += \
     bin/themes/res.qrc \
     bin/themes/styles/dark/darkstyle.qrc\
     bin/themes/styles/light/lightstyle.qrc\
+    bin/themes/styles/default/defaultstyle.qrc\
 
 DISTFILES += \
     Experiment.py \
