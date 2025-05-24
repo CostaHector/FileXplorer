@@ -92,9 +92,7 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   } else if (stylesheetName == "dark") {
     qssFile.setFileName(":stylesheet/dark.qss");
   } else {  // "default" or any stylesheet except light/dark
-    qDebug("qApp->setStyleSheet: default[%s]", qPrintable(stylesheetName));
-    qApp->setStyleSheet("");
-    return false;
+    qssFile.setFileName(":stylesheet/default.qss");
   }
   if (!qssFile.open(QFile::ReadOnly | QFile::Text)) {
     qWarning("Unable to set stylesheet, file[%s] not found", qPrintable(qssFile.fileName()));
