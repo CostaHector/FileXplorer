@@ -248,6 +248,7 @@
 <file alias="RESIZE_COLUMN_TO_CONTENTS">View/RESIZE_COLUMN_TO_CONTENTS.svg</file>
 <file alias="RESIZE_ROW_TO_CONTENTS">View/RESIZE_ROW_TO_CONTENTS.svg</file>
 <file alias="HAR_VIEW">View/HAR_VIEW.svg</file>
+<file alias="ARRANGE">View/ARRANGE.svg</file>
 <file alias="PAGINATION_START">View/PAGINATION_START.svg</file>
 <file alias="PAGINATION_END">View/PAGINATION_END.svg</file>
 <file alias="PAGINATION_LAST">View/PAGINATION_LAST.svg</file>
