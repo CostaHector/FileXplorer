@@ -353,7 +353,7 @@ auto ContentPanel::keyPressEvent(QKeyEvent* e) -> void {
         }
         return;
       }
-      case Qt::Key_Enter: {
+      case Qt::Key_Return: {
         on_cellDoubleClicked(GetCurView()->currentIndex());
         return;
       }
