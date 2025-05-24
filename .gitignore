@@ -16,4 +16,5 @@ build/*
 *.pro.user
 *.pro.user.*
 FileExplorerReadOnly.pro.user
+FileXplorer.pro.user
 
