@@ -30,6 +30,7 @@ ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
   layout()->setContentsMargins(0, 0, 0, 0);
   layout()->setSpacing(0);
   subscribe();
+  setFocusPolicy(Qt::StrongFocus);
 }
 
 auto ContentPanel::onActionAndViewNavigate(QString newPath, bool isNewPath, bool /*isF5Force*/) -> bool {
@@ -103,9 +104,9 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
   const ViewTypeTool::ViewType vt{GetCurViewType()};
 
   switch (vt) {
-    case LIST:
-    case TABLE:
-    case TREE: {
+    case ViewType::LIST:
+    case ViewType::TABLE:
+    case ViewType::TREE: {
       CHECK_NULLPTR_RETURN_FALSE(m_fsModel);
       m_fsModel->setNameFilters({'*' + targetStr + '*'});
       return true;
@@ -142,10 +143,10 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
 auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
   const ViewTypeTool::ViewType vt{GetCurViewType()};
   switch (vt) {
-    case LIST:
-    case TABLE:
-    case TREE:
-    case JSON: {
+    case ViewType::LIST:
+    case ViewType::TABLE:
+    case ViewType::TREE:
+    case ViewType::JSON: {
       // ignore
       return true;
     }
@@ -257,12 +258,12 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
   return true;
 }
 
-auto ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, const QItemSelection& /* deselected */) -> bool {
-  if (not isFSView()) {
+bool ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, const QItemSelection& /* deselected */) {
+  if (!isFSView()) {
     return false;
   }
   const int selectCnt = getSelectedRowsCount();
-  if (_logger) {
+  if (_logger != nullptr) {
     _logger->pathInfo(selectCnt, 1);
   }
   if (selectCnt <= 0) {
@@ -275,14 +276,14 @@ auto ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, con
   }
   const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
   if (selectCnt == 1 && firstFileInfo.isFile()) {
-    if (_logger) {
+    if (_logger != nullptr) {
       _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(firstFileInfo.size()));
     }
   }
 
   QString pth = m_fsModel->rootPath();
 #ifdef _WIN32
-  if (not pth.isEmpty() and pth.back() == ':') {
+  if (!pth.isEmpty() && pth.back() == ':') {
     pth += '/';
   }
 #endif
@@ -327,13 +328,13 @@ void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
 
 bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
   qInfo("Directory loaded [%s]", qPrintable(loadedPath));
-  if (not m_anchorTags.contains(loadedPath)) {
+  if (!m_anchorTags.contains(loadedPath)) {
     qDebug("AnchorTags[%s] not exist. cancel scroll", qPrintable(loadedPath));
     return false;
   }
   const QModelIndex rootIndex = m_fsTableView->rootIndex();
   const QModelIndex anchorInd = m_fsModel->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
-  if (not anchorInd.isValid()) {
+  if (!anchorInd.isValid()) {
     qDebug("anchorTags[%s] invalid. cancel scroll", qPrintable(loadedPath));
     m_anchorTags.remove(loadedPath);
     return false;
@@ -344,27 +345,21 @@ bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
 }
 
 auto ContentPanel::keyPressEvent(QKeyEvent* e) -> void {
-  switch (e->modifiers()) {
-    case Qt::KeyboardModifier::NoModifier: {
-      switch (e->key()) {
-        case Qt::Key_Backspace: {
-          if (_addressBar != nullptr) {
-            _addressBar->onUpTo();
-          }
-          return;
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier) {
+    switch (e->key()) {
+      case Qt::Key_Backspace: {
+        if (_addressBar != nullptr) {
+          _addressBar->onUpTo();
         }
-        case Qt::Key_Enter:
-        case Qt::Key_Return: {  // enter or return
-          on_cellDoubleClicked(GetCurView()->currentIndex());
-          return;
-        }
-        default:
-          break;
+        return;
       }
-      break;
+      case Qt::Key_Enter: {
+        on_cellDoubleClicked(GetCurView()->currentIndex());
+        return;
+      }
+      default:
+        break;
     }
-    default:
-      break;
   }
   QStackedWidget::keyPressEvent(e);
 }
