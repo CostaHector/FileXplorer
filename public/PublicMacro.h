@@ -20,6 +20,7 @@
   }
 
 #define ENUM_2_STR(enum_val) #enum_val
+#define CLASSNAME_2_STR(className) #className
 
 #define CASE_BRANCH_ENUM_TO_STRING(enum_val) \
   case enum_val:                             \

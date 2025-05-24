@@ -59,14 +59,14 @@ variable of class data memeber:
 ## Devoloping Settings
 we suggest you to do following setting in git bash
 ```md
-git update-index --assume-unchange FileExplorerReadOnly.pro.user
+git update-index --assume-unchange FileXplorer.pro.user
 git update-index --assume-unchange FileExplorerTest.pro.user
 git update-index --assume-unchange bin/logs_info.log
 git update-index --assume-unchange bin/AKA_PERFORMERS.txt
 git update-index --assume-unchange bin/PERFORMERS_TABLE.txt
 git update-index --assume-unchange bin/STANDARD_STUDIO_NAME.txt
 
-git update-index --no-assume-unchange FileExplorerReadOnly.pro.user
+git update-index --no-assume-unchange FileXplorer.pro.user
 git update-index --no-assume-unchange FileExplorerTest.pro.user
 git update-index --no-assume-unchange bin/logs_info.log
 ```
@@ -75,6 +75,8 @@ Edit right click menu in windows register edit:
 Computer\HKEY_CLASSES_ROOT\Directory\Background\Shell\FileExplorerDesktop\command
 Modify and set Value data to
 "C:\home\Ariel\qtcpp\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\release\FileExplorerReadOnly.exe" "%V"
+
+"C:\home\Ariel\qtcpp\build-FileExplorerReadOnly-Desktop_Qt_5_15_2_MinGW_64_bit-release\release\FileXplorer.exe" "%V"
 
 
 ```md

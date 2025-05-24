@@ -100,7 +100,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
 
 void LoadCNLanguagePack(QTranslator& translator) {
   qDebug("Load Chinese pack");
-  const QString baseName = "FileExplorerReadOnly_zh_CN";
+  const QString baseName = "FileXplorer_zh_CN";
   if (translator.load(":/i18n/" + baseName)) {
     qDebug("Load language pack succeed %s", qPrintable(baseName));
     QCoreApplication::installTranslator(&translator);
@@ -111,7 +111,7 @@ void LoadSysLanaguagePack(QTranslator& translator) {
   qDebug("Load System Language pack");
   const QStringList uiLanguages = QLocale::system().uiLanguages();
   for (const QString& locale : uiLanguages) {
-    const QString baseName = "FileExplorerReadOnly" + QLocale(locale).name();
+    const QString baseName = "FileXplorer" + QLocale(locale).name();
     if (translator.load(":/i18n/" + baseName)) {
       qDebug("Load language pack succeed %s", qPrintable(baseName));
       QCoreApplication::installTranslator(&translator);
