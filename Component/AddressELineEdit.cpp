@@ -69,8 +69,6 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
       "QToolBar{"
       "border-left: 1px solid gray;"
       "border-right: 1px solid gray;"
-      "border-top: 1px solid gray;"
-      "border-bottom: 1px solid gray;"
       "};");
   m_dropPanel->setStyleSheet(
       "QLabel{"
@@ -102,7 +100,7 @@ auto AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) -
   }
   qDebug("set Path [%s]", qPrintable(fullpath));
   for (const QString& pt : fullpath.split(PATHTOOL::PATH_SEP_CHAR)) {
-    m_pathActionsTB->addAction(new (std::nothrow) QAction(pt));
+    m_pathActionsTB->addAction(new (std::nothrow) QAction{pt, m_pathActionsTB});
   }
 
   if (not pathComboBox->hasFocus()) {  // in disp mode
