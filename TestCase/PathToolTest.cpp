@@ -3,21 +3,20 @@
 
 // add necessary includes here
 #include <QFileInfo>
+#include "TestCase/PathRelatedTool.h"
 #include "pub/MyTestSuite.h"
 #include "public/PathTool.h"
 
-using namespace ::PATHTOOL;
+using namespace ::PathTool;
+
+const QString rootpath = TestCaseRootPath() + "/test/TestEnv_FileOsWalker";
 
 class PathToolTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  PathToolTest() : MyTestSuite{false} {}
+  PathToolTest() : MyTestSuite{true} {}
  private slots:
-  void initTestCase() { qDebug() << "PathToolTest start"; }
-
-  void cleanupTestCase() { qDebug() << "PathToolTest end"; }
-
   void test_GetWinStdPath() {
 #ifdef WIN32
     QCOMPARE(GetWinStdPath("C:"), "C:/");
@@ -239,7 +238,7 @@ class PathToolTest : public MyTestSuite {
 #endif
   }
 
-  bool EnvCheck(const QString& pre) {
+  static bool EnvCheck(const QString& pre) {
     // under path test/TestEnv_FileOsWalker, there are 3 item(s) in total as follow:
     // ABC - DEF - name sc.1
     // -  ABC - DEF - name sc.1.m
@@ -261,13 +260,13 @@ class PathToolTest : public MyTestSuite {
   }
 
   void test_FileOsWalker_WithSub() {
-    const QString pre = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOsWalker");
+    const QString pre = rootpath;
     QVERIFY(EnvCheck(pre));
     const QStringList rels{"ABC - DEF - name sc.1",  //
                            "ABC - DEF - name sc.1.txt"};
     FileOsWalker fow{pre, false};
     const bool includeDirectory = true;
-    const auto ans = fow(rels, includeDirectory);
+    fow(rels, includeDirectory);
 
     const QStringList relToNames{"",                       //
                                  "ABC - DEF - name sc.1",  //
@@ -277,20 +276,20 @@ class PathToolTest : public MyTestSuite {
                                     "ABC - DEF - name sc.1"};
     const QStringList suffixs{"", ".m", ".txt"};
     const QList<bool> isFiles{false, true, true};
-    QCOMPARE(ans.relToNames, relToNames);
-    QCOMPARE(ans.completeNames, completeNames);
-    QCOMPARE(ans.suffixs, suffixs);
-    QCOMPARE(ans.isFiles, isFiles);
+    QCOMPARE(fow.relToNames, relToNames);
+    QCOMPARE(fow.completeNames, completeNames);
+    QCOMPARE(fow.suffixs, suffixs);
+    QCOMPARE(fow.isFiles, isFiles);
   }
 
   void test_FileOsWalker_WithNoSub() {
-    const QString pre = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOsWalker");
+    const QString pre = rootpath;
     QVERIFY(EnvCheck(pre));
     const QStringList rels{"ABC - DEF - name sc.1",  //
                            "ABC - DEF - name sc.1.txt"};
     const bool includeDirectory = false;
     FileOsWalker fow{pre, false};
-    const auto ans = fow(rels, includeDirectory);
+    fow(rels, includeDirectory);
 
     const QStringList relToNames{"",  //
                                  ""};
@@ -298,34 +297,34 @@ class PathToolTest : public MyTestSuite {
                                     "ABC - DEF - name sc.1"};
     const QStringList suffixs{"", ".txt"};
     const QList<bool> isFiles{false, true};
-    QCOMPARE(ans.relToNames, relToNames);
-    QCOMPARE(ans.completeNames, completeNames);
-    QCOMPARE(ans.suffixs, suffixs);
-    QCOMPARE(ans.isFiles, isFiles);
+    QCOMPARE(fow.relToNames, relToNames);
+    QCOMPARE(fow.completeNames, completeNames);
+    QCOMPARE(fow.suffixs, suffixs);
+    QCOMPARE(fow.isFiles, isFiles);
   }
 
   void test_FileOsWalker_SufInside() {
-    const QString pre = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_FileOsWalker");
+    const QString pre = rootpath;
     QVERIFY(EnvCheck(pre));
     const QStringList rels{"ABC - DEF - name sc.1",  //
                            "ABC - DEF - name sc.1.txt"};
     const bool suffixInsideFilename = true;
     FileOsWalker fow{pre, suffixInsideFilename};
     const bool includeDirectory = true;
-    const auto ans = fow(rels, includeDirectory);
+    fow(rels, includeDirectory);
 
-    const QStringList relToNames{"",                       //
-                                 "ABC - DEF - name sc.1",  //
-                                 ""};
-    const QStringList completeNames{"ABC - DEF - name sc.1",    //
-                                    "ABC - DEF - name sc.1.m",  //
-                                    "ABC - DEF - name sc.1.txt"};
+    const QStringList relToNames{"",                               //
+                                 "ABC - DEF - name sc.1",          //
+                                 ""};                              //
+    const QStringList completeNames{"ABC - DEF - name sc.1",       //
+                                    "ABC - DEF - name sc.1.m",     //
+                                    "ABC - DEF - name sc.1.txt"};  //
     const QStringList suffixs{"", "", ""};
     const QList<bool> isFiles{false, true, true};
-    QCOMPARE(ans.relToNames, relToNames);
-    QCOMPARE(ans.completeNames, completeNames);
-    QCOMPARE(ans.suffixs, suffixs);
-    QCOMPARE(ans.isFiles, isFiles);
+    QCOMPARE(fow.relToNames, relToNames);
+    QCOMPARE(fow.completeNames, completeNames);
+    QCOMPARE(fow.suffixs, suffixs);
+    QCOMPARE(fow.isFiles, isFiles);
   }
 
   void test_path_part_split() {
@@ -334,29 +333,49 @@ class PathToolTest : public MyTestSuite {
     QCOMPARE(QString{"C:/A/B/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "C:");
     QCOMPARE(preRight, "A/B");
-    QCOMPARE(PATHTOOL::Path3Join("C:", "A/B", "C.mp4"), "C:/A/B/C.mp4");
+    QCOMPARE(Path3Join("C:", "A/B", "C.mp4"), "C:/A/B/C.mp4");
 
     lastSlashIndex = GetPrepathParts("C:/A/C.mp4", preLeft, preRight);
     QCOMPARE(QString{"C:/A/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "");
     QCOMPARE(preRight, "C:/A");
-    QCOMPARE(PATHTOOL::Path3Join("", "C:/A", "C.mp4"), "C:/A/C.mp4");
+    QCOMPARE(Path3Join("", "C:/A", "C.mp4"), "C:/A/C.mp4");
 
     lastSlashIndex = GetPrepathParts("C:/C.mp4", preLeft, preRight);
     QCOMPARE(QString{"C:/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "");
     QCOMPARE(preRight, "C:");
-    QCOMPARE(PATHTOOL::Path3Join("", "C:", "C.mp4"), "C:/C.mp4");
+    QCOMPARE(Path3Join("", "C:", "C.mp4"), "C:/C.mp4");
 
     lastSlashIndex = GetPrepathParts("C.mp4", preLeft, preRight);
     QCOMPARE(QString{"C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
     QCOMPARE(preLeft, "");
     QCOMPARE(preRight, "");
-    QCOMPARE(PATHTOOL::Path3Join("", "", "C.mp4"), "C.mp4");
+    QCOMPARE(Path3Join("", "", "C.mp4"), "C.mp4");
+  }
+
+  void test_GetPrepathAndFileName() {
+    QString prepath, name;
+    QCOMPARE(GetPrepathAndFileName("C:/home/to/path", prepath), "path");
+    QCOMPARE(prepath, "C:/home/to");
+    QCOMPARE(Path2Join("C:/home/to", "path"), "C:/home/to/path");
+
+    QCOMPARE(GetPrepathAndFileName("C:/", prepath), "");
+    QCOMPARE(prepath, "C:");
+    QCOMPARE(Path2Join("C:", ""), "C:/");
+
+    QCOMPARE(GetPrepathAndFileName("", prepath), "");
+    QCOMPARE(prepath, "");
+    QCOMPARE(Path2Join("", ""), "");
+  }
+
+  void test_join() {
+    QCOMPARE(join("C:/", "home/to/path"), "C:/home/to/path");
+    QCOMPARE(join("C:", "home/to/path"), "C:/home/to/path");
+    QCOMPARE(join("C:", ""), "C:");
+    QCOMPARE(join("", "/home/to/path"), "/home/to/path");
   }
 };
 
 #include "PathToolTest.moc"
-
 PathToolTest g_pathToolTest;
-// QTEST_MAIN(PathToolTest)

@@ -38,7 +38,7 @@ SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter, cons
   QDirIterator jsonIt(path, {"*.scn"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (jsonIt.hasNext()) {
     const QString& scnFullPath{jsonIt.next()};
-    const QString& rel2JsonFile = PATHTOOL::RelativePath2File(PATH_N, scnFullPath);
+    const QString& rel2JsonFile = PathTool::RelativePath2File(PATH_N, scnFullPath);
     scnTotals += ScnFileParser(scnFullPath, rel2JsonFile, needFilter, pattern, pScnFiltered);
     ++scnFilesCnt;
   }
@@ -201,7 +201,7 @@ bool GenerateAScnFile(const QString& aPath) {
     return false;
   }
 
-  QFile scnFi{aPath + '/' + PATHTOOL::fileName(aPath) + ".scn"};
+  QFile scnFi{aPath + '/' + PathTool::fileName(aPath) + ".scn"};
   if (!scnFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qCritical("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
     return false;
@@ -372,7 +372,7 @@ int JsonDataRefresher::GenerateScnFiles() {
     if (scnContent.isEmpty()) {
       return false;
     }
-    QFile scnFi{path2Jsons + '/' + PATHTOOL::fileName(path2Jsons) + ".scn"};
+    QFile scnFi{path2Jsons + '/' + PathTool::fileName(path2Jsons) + ".scn"};
     if (!scnFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
       qCritical("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
       return false;

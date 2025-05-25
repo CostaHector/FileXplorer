@@ -29,7 +29,7 @@ bool ExtractPileItemsOutFolder::CanExtractOut(const QStringList& items) {
   QRegularExpressionMatch result;
   for (const QString& medName : items) {
     QString baseName, ext;
-    std::tie(baseName, ext) = PATHTOOL::GetBaseNameExt(medName);
+    std::tie(baseName, ext) = PathTool::GetBaseNameExt(medName);
     noNumberName = baseName;
     auto typeEnum = DOT_EXT_2_TYPE.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
     switch (typeEnum) {
