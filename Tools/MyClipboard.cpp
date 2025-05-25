@@ -20,7 +20,7 @@ int MyClipboard::FillIntoClipboardKeepFilesLevelBehavior(const QStringList& path
   }
   QString fromPath;
   QStringList lRels;
-  std::tie(fromPath, lRels) = PATHTOOL::GetLAndRels(pathsList);
+  std::tie(fromPath, lRels) = PathTool::GetLAndRels(pathsList);
 
   MimeDataCX* mimedata = new MimeDataCX(fromPath, lRels, cutCopy);
   mimedata->setUrls(urls);
@@ -36,7 +36,7 @@ int MyClipboard::FillIntoClipboardFSKeepFilesLevelBehavior(const QString& fromPa
   if (pathsList.isEmpty()) {
     return 0;
   }
-  const QStringList& lRels = PATHTOOL::GetRels(fromPath.size(), pathsList);
+  const QStringList& lRels = PathTool::GetRels(fromPath.size(), pathsList);
   MimeDataCX* mimedata = new MimeDataCX(fromPath, lRels, cutCopy);
   mimedata->setUrls(urls);
   mimedata->setText(lRels.join('\n'));

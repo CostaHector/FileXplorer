@@ -198,11 +198,12 @@ void AdvanceRenamer::InitTextContent(const QString& p, const QStringList& r) {
 
   const bool bSubDir = m_recursiveCB->isChecked();
   const bool bSuffixInside = m_extensionInNameCB->isChecked();
-  FileOSWalkerRet osWalkerRet = FileOsWalker(m_pre, bSuffixInside)(rels, bSubDir);
-  const auto& relToNames = osWalkerRet.relToNames;
-  completeNames = osWalkerRet.completeNames;  // may baseName only or baseName+extension, depend on includingSuffixState
-  const auto& suffixs = osWalkerRet.suffixs;
-  isFiles = osWalkerRet.isFiles;
+  FileOsWalker osWalker{m_pre, bSuffixInside};
+  osWalker(rels, bSubDir);
+  const auto& relToNames = osWalker.relToNames;
+  completeNames = osWalker.completeNames;  // may baseName only or baseName+extension, depend on includingSuffixState
+  const auto& suffixs = osWalker.suffixs;
+  isFiles = osWalker.isFiles;
 
   m_relNameTE->setPlainText(relToNames.join('\n'));
 

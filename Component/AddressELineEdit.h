@@ -27,7 +27,7 @@ class FocusEventWatch : public QObject {
   void focusChanged(bool hasFocus);
 
  private:
-  bool mouseButtonPressedBefore = false;
+  bool mouseButtonPressedBefore{false};
 };
 
 class AddressELineEdit : public QStackedWidget {
@@ -35,38 +35,41 @@ class AddressELineEdit : public QStackedWidget {
  public:
   explicit AddressELineEdit(QWidget* parent = nullptr);
 
-  inline auto pathFromLineEdit() const -> QString {
-    return PATHTOOL::StripTrailingSlash(PATHTOOL::normPath(pathLineEdit->text()));
+  inline QString pathFromLineEdit() const {  //
+    return PathTool::StripTrailingSlash(PathTool::normPath(pathLineEdit->text()));
   }
-  inline auto pathFromFullActions() const -> QString {
+
+  inline QString pathFromFullActions() const {  //
     return pathFromCursorAction(nullptr);
   }
-  inline auto pathFromCursorAction(const QAction* cursorAtAction) const -> QString {
+
+  inline QString pathFromCursorAction(const QAction* cursorAtAction) const {  //
     // if cursor at NOTHING, should return the full path
     QString path;
-    for (QAction* action : m_pathActionsTB->actions()) {
-      path += action->text() + PATHTOOL::PATH_SEP_CHAR;
-      if (action == cursorAtAction) {
+    for (const QAction* pAct : m_pathActionsTB->actions()) {
+      if (pAct == nullptr) {
+        continue;
+      }
+      path += pAct->text();
+      if (pAct == cursorAtAction) {
         break;
       }
+      path += PathTool::PATH_SEP_CHAR;
     }
-    return PATHTOOL::StripTrailingSlash(path);
+    return PathTool::StripTrailingSlash(path);
   }
 
-  inline auto dirname() const -> QString {
-    return PATHTOOL::absolutePath(pathFromLineEdit());
+  inline QString dirname() const {  //
+    return PathTool::absolutePath(pathFromLineEdit());
   }
 
-  auto onPathActionTriggered(const QAction* cursorAt) -> void;
-  auto onReturnPressed() -> void;
-
-  auto ChangePath(const QString& path) -> bool;
-
-  auto onFocusChange(bool hasFocus) -> void;
-
-  auto clickMode() -> void;
-  auto inputMode() -> void;
-  auto subscribe() -> void;
+  void onPathActionTriggered(const QAction* cursorAt);
+  void onReturnPressed();
+  bool ChangePath(const QString& path);
+  void onFocusChange(bool hasFocus);
+  void clickMode();
+  void inputMode();
+  void subscribe();
 
   void mousePressEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* e) override;
@@ -85,12 +88,15 @@ class AddressELineEdit : public QStackedWidget {
   void updateAddressToolBarPathActions(const QString& newPath);
 
  private:
-  QToolBar* m_pathActionsTB;
-  QLineEdit* pathLineEdit;
-  QComboBox* pathComboBox;
+  static constexpr int MAX_PATH_SECTIONS_CNT = 260;
+  QAction mPathSections[MAX_PATH_SECTIONS_CNT];
+
+  QToolBar* m_pathActionsTB{nullptr};
+  QLineEdit* pathLineEdit{nullptr};
+  QComboBox* pathComboBox{nullptr};
+  QLabel* m_dropPanel{nullptr};
+  FocusEventWatch* pathComboBoxFocusWatcher{nullptr};
   static const QString DRAG_HINT_MSG;
   static const QString RELEASE_HINT_MSG;
-  QLabel* m_dropPanel;
-  FocusEventWatch* pathComboBoxFocusWatcher;
 };
 #endif  // ADDRESSELINEEDIT_H

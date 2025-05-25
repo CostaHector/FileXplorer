@@ -42,7 +42,7 @@ class SceneViewTest : public QObject {
     if (QDir(TEST_DIR).exists()) {
       QDir(TEST_DIR).removeRecursively();
     }
-    auto ret = PATHTOOL::copyDirectoryFiles(SCENE_VIEW_PATH, TEST_DIR);
+    auto ret = PathTool::copyDirectoryFiles(SCENE_VIEW_PATH, TEST_DIR);
     assert(ret);  // should copied ok
   }
   void cleanup() {
@@ -118,7 +118,7 @@ class SceneViewTest : public QObject {
   }
 
   void test_WriteScenesIntoScnFile() {
-    const QString scnFileName = PATHTOOL::fileName(TEST_DIR) + ".scn";
+    const QString scnFileName = PathTool::fileName(TEST_DIR) + ".scn";
     QVERIFY2(!QDir(TEST_DIR).exists(scnFileName), "*.scn file should not exists yet");
     QCOMPARE(SceneInfoManager::GenerateScnFilesDirectly(TEST_DIR), 1);
     QVERIFY2(QDir(TEST_DIR).exists(scnFileName), "*.scn file should exists");
