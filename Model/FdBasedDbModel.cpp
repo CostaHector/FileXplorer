@@ -35,7 +35,7 @@ QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {
 QString FdBasedDbModel::absolutePath(const QModelIndex& curIndex) const {
   const QModelIndex& preLeft = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathLeft);
   const QModelIndex& preRight = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight);
-  return PATHTOOL::Path2Join(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(),  //
+  return PathTool::Path2Join(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(),  //
                              data(preRight, Qt::ItemDataRole::DisplayRole).toString());
 }
 

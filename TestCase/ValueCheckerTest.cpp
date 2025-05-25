@@ -8,19 +8,19 @@ class ValueCheckerTest : public MyTestSuite {
  public:
  private slots:
   void fileExtensionBasic() {
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.mp4"), ".mp4");
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.json"), ".json");
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.z01"), ".z01");
+    QCOMPARE(PathTool::GetFileExtension("AAA.mp4"), ".mp4");
+    QCOMPARE(PathTool::GetFileExtension("AAA.json"), ".json");
+    QCOMPARE(PathTool::GetFileExtension("AAA.z01"), ".z01");
   }
 
   void fileExtension_1Char() {
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.h"), ".h");
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.m"), ".m");
+    QCOMPARE(PathTool::GetFileExtension("AAA.h"), ".h");
+    QCOMPARE(PathTool::GetFileExtension("AAA.m"), ".m");
   }
 
   void fileExtension_NoExtension() {
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.5"), ".5");
-    QCOMPARE(PATHTOOL::GetFileExtension("AAA.51"), ".51");
+    QCOMPARE(PathTool::GetFileExtension("AAA.5"), ".5");
+    QCOMPARE(PathTool::GetFileExtension("AAA.51"), ".51");
   }
 };
 

@@ -265,7 +265,7 @@ void VideoPlayer::setUrl(const QUrl& url) {
   if (url.isLocalFile()) {
     const QString& vidsPath = url.toLocalFile();
     setWindowFilePath(vidsPath);
-    const QString& jsonPath = PATHTOOL::FileExtReplacedWithJson(vidsPath);
+    const QString& jsonPath = PathTool::FileExtReplacedWithJson(vidsPath);
     m_dict = JsonHelper::MovieJsonLoader(jsonPath);
   } else {
     m_dict.clear();
@@ -301,7 +301,7 @@ QString VideoPlayer::JsonFileValidCheck(const QString& op) {
     qDebug("current item is nullptr, cannot %s", qPrintable(op));
     return {};
   }
-  const QString& jsonPath = PATHTOOL::FileExtReplacedWithJson(m_playListWid->currentFilePath());
+  const QString& jsonPath = PathTool::FileExtReplacedWithJson(m_playListWid->currentFilePath());
   if (not QFile::exists(jsonPath)) {
     qDebug("json file[%s] not exists. cannot %s", qPrintable(jsonPath), qPrintable(op));
     return {};
@@ -368,7 +368,7 @@ bool VideoPlayer::onModeName() {
     return true;
   }
   const QFileInfo vidFi{m_playListWid->currentFilePath()};
-  const QFileInfo jsonFi{PATHTOOL::FileExtReplacedWithJson(vidFi.absoluteFilePath())};
+  const QFileInfo jsonFi{PathTool::FileExtReplacedWithJson(vidFi.absoluteFilePath())};
   if (not vidFi.exists()) {
     return true;
   }
@@ -396,7 +396,7 @@ bool VideoPlayer::onModeName() {
   } else {
     // rename vid ok, rename json now if exist
     if (jsonFi.exists()) {
-      const QString& newJsonAbsPath = PATHTOOL::FileExtReplacedWithJson(newFileAbsPath);
+      const QString& newJsonAbsPath = PathTool::FileExtReplacedWithJson(newFileAbsPath);
       const bool renameJsonResult = QFile::rename(jsonFi.absoluteFilePath(), newJsonAbsPath);
       if (!renameJsonResult) {
         const QString& msg = QString("Rename Json [%1] -> [%2] failed").arg(vidFi.fileName()).arg(newFileName);

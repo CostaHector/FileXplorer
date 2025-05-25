@@ -192,7 +192,7 @@ int SyncJsonNameValue(const QString& path) {
     if (it == dict.cend()) {
       continue;
     }
-    const QString& baseName = PATHTOOL::GetBaseName(jsonPath);
+    const QString& baseName = PathTool::GetBaseName(jsonPath);
     if (it->toString() == baseName) {
       continue;
     }
@@ -277,7 +277,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
   if (QFile::exists(jsonPth)) {
     dict = MovieJsonLoader(jsonPth);
   } else {
-    const QString& name = PATHTOOL::GetBaseName(jsonPth);
+    const QString& name = PathTool::GetBaseName(jsonPth);
     dict = JsonKey::GetJsonDictDefault(name);
     changed = true;
   }
@@ -355,7 +355,7 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
 }
 
 uint CalcFileHash(const QString& vidPth) {
-  return qHash(PATHTOOL::GetFileNameExtRemoved(vidPth));
+  return qHash(PathTool::GetFileNameExtRemoved(vidPth));
 }
 
 int JsonSyncKeyValueAccordingJsonFileName(const QString& path) {
@@ -371,7 +371,7 @@ int JsonSyncKeyValueAccordingJsonFileName(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     QVariantHash dict = MovieJsonLoader(jsonPath);
-    const QString& baseName = PATHTOOL::GetBaseName(jsonPath);
+    const QString& baseName = PathTool::GetBaseName(jsonPath);
     auto nameIt = dict.find(ENUM_2_STR(Name));
     if (nameIt == dict.cend() || nameIt->toString() == baseName) {
       continue;

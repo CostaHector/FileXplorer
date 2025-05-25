@@ -23,7 +23,7 @@ class MimeDataCX : public QMimeData {
   MimeDataCX(const std::pair<QString, QStringList>& lAndRels, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP)
       : MimeDataCX(lAndRels.first, lAndRels.second, cutCopy_) {}
   
-  MimeDataCX(const QStringList& lAbsPathList, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP) : MimeDataCX(PATHTOOL::GetLAndRels(lAbsPathList), cutCopy_) {}
+  MimeDataCX(const QStringList& lAbsPathList, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP) : MimeDataCX(PathTool::GetLAndRels(lAbsPathList), cutCopy_) {}
   
   MimeDataCX(const QMimeData& parent, const CCMMode::Mode cutCopy_ = CCMMode::ERROR_OP);
 
