@@ -82,7 +82,7 @@ class JsonPrTest : public MyTestSuite {
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
 
     // 2. "Name" find, other key need insert by StandardlizeKeyValue ok
-    QVERIFY(jPr.m_Name != PATHTOOL::GetBaseName(fixedJsonName));  // should not be replaced automatically
+    QVERIFY(jPr.m_Name != PathTool::GetBaseName(fixedJsonName));  // should not be replaced automatically
     QCOMPARE(jPr.m_Name, "");
     QVERIFY(jPr.m_Cast.isEmpty());
     QVERIFY(jPr.m_Studio.isEmpty());
@@ -164,7 +164,7 @@ class JsonPrTest : public MyTestSuite {
     // precondition
     const QFile fixedFi{fixedAbsPath};
     QCOMPARE(fixedFi.size(), 0);
-    QCOMPARE(fixedJsonBaseName, PATHTOOL::GetBaseName(fixedJsonName));
+    QCOMPARE(fixedJsonBaseName, PathTool::GetBaseName(fixedJsonName));
 
     // procedure
     JsonPr jPr{fixedFi.fileName()};
