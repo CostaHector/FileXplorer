@@ -1,6 +1,6 @@
 #include "AddressELineEdit.h"
 #include "View/ViewHelper.h"
-
+#include "public/PublicMacro.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
@@ -10,43 +10,63 @@
 #include <QToolTip>
 #include <Qt>
 
-FocusEventWatch::FocusEventWatch(QObject* parent) : mouseButtonPressedBefore(false) {
-  if (parent == nullptr) {
-    qDebug("Focus Event not works for a nullptr.");
-    return;
-  }
+FocusEventWatch::FocusEventWatch(QObject* parent)  //
+{
+  CHECK_NULLPTR_RETURN_VOID(parent);
   parent->installEventFilter(this);
 }
 
 bool FocusEventWatch::eventFilter(QObject* watched, QEvent* event) {
-  if (event->type() == QEvent::Type::MouseButtonPress) {
-    mouseButtonPressedBefore = true;
-  } else if (event->type() == QEvent::Type::MouseButtonRelease) {
-    ;
-  } else if (event->type() == QEvent::Type::FocusOut) {
-    if (not mouseButtonPressedBefore) {  // block until next time focus out
-      emit focusChanged(false);
+  switch (event->type()) {
+    case QEvent::Type::MouseButtonPress: {
+      mouseButtonPressedBefore = true;
+      break;
     }
-    mouseButtonPressedBefore = false;
-  } else if (event->type() == QEvent::Type::FocusIn) {
-    if (not mouseButtonPressedBefore) {  // block until next time focus out
-      emit focusChanged(true);
+    case QEvent::Type::MouseButtonRelease: {
+      break;
     }
-    mouseButtonPressedBefore = false;
+    case QEvent::Type::FocusIn: {
+      if (!mouseButtonPressedBefore) {  // block until next time focus out
+        emit focusChanged(true);
+      }
+      mouseButtonPressedBefore = false;
+      break;
+    }
+    case QEvent::Type::FocusOut: {
+      if (!mouseButtonPressedBefore) {  // block until next time focus out
+        emit focusChanged(false);
+      }
+      mouseButtonPressedBefore = false;
+      break;
+    }
+    default:
+      break;
   }
   return QObject::eventFilter(watched, event);
 }
 
+constexpr int AddressELineEdit::MAX_PATH_SECTIONS_CNT;
 const QString AddressELineEdit::DRAG_HINT_MSG = "Drag some files/folders here";
 const QString AddressELineEdit::RELEASE_HINT_MSG = "Drop item(s) to [%1]";
 
-AddressELineEdit::AddressELineEdit(QWidget* parent)
-    : QStackedWidget(parent),
-      m_pathActionsTB(new QToolBar(this)),
-      pathLineEdit(new QLineEdit),
-      pathComboBox(new QComboBox),
-      m_dropPanel(new QLabel(DRAG_HINT_MSG)),
-      pathComboBoxFocusWatcher(new FocusEventWatch(pathComboBox)) {
+AddressELineEdit::AddressELineEdit(QWidget* parent)  //
+    : QStackedWidget(parent)                         //
+{
+  m_pathActionsTB = new (std::nothrow) QToolBar{this};
+  CHECK_NULLPTR_RETURN_VOID(m_pathActionsTB);
+
+  pathComboBox = new (std::nothrow) QComboBox{this};
+  CHECK_NULLPTR_RETURN_VOID(pathComboBox);
+
+  pathLineEdit = new (std::nothrow) QLineEdit{pathComboBox};
+  CHECK_NULLPTR_RETURN_VOID(pathLineEdit);
+
+  m_dropPanel = new (std::nothrow) QLabel(DRAG_HINT_MSG, this);
+  CHECK_NULLPTR_RETURN_VOID(m_dropPanel);
+
+  pathComboBoxFocusWatcher = new (std::nothrow) FocusEventWatch(pathComboBox);
+  CHECK_NULLPTR_RETURN_VOID(pathComboBoxFocusWatcher);
+
 #ifdef _WIN32
   const QFileInfoList& drives = QDir::drives();
   for (const auto& d : drives) {
@@ -83,7 +103,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)
 
 auto AddressELineEdit::onPathActionTriggered(const QAction* cursorAt) -> void {
   const QString& rawPath = pathFromCursorAction(cursorAt);
-  const QString& fullPth = PATHTOOL::StripTrailingSlash(rawPath);
+  const QString& fullPth = PathTool::StripTrailingSlash(rawPath);
   qDebug("Path triggered [%s]", qPrintable(fullPth));
   ChangePath(fullPth);
 }
@@ -92,18 +112,31 @@ void AddressELineEdit::onReturnPressed() {
   ChangePath(pathFromLineEdit());
 }
 
-auto AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) -> void {
-  m_pathActionsTB->clear();
-  const QString& fullpath = PATHTOOL::StripTrailingSlash(PATHTOOL::normPath(newPath));
+void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
+  const QString& fullpath = PathTool::StripTrailingSlash(PathTool::normPath(newPath));
   if (fullpath != pathLineEdit->text()) {
     pathLineEdit->setText(fullpath);
   }
   qDebug("set Path [%s]", qPrintable(fullpath));
-  for (const QString& pt : fullpath.split(PATHTOOL::PATH_SEP_CHAR)) {
-    m_pathActionsTB->addAction(new (std::nothrow) QAction{pt, m_pathActionsTB});
+
+  int n = m_pathActionsTB->actions().count();
+  for (int i = 0; i < n; ++i) {
+    m_pathActionsTB->removeAction(&mPathSections[i]);
   }
 
-  if (not pathComboBox->hasFocus()) {  // in disp mode
+  const QStringList sections{fullpath.split(PathTool::PATH_SEP_CHAR)};
+  const int N = sections.size();
+  if (N > MAX_PATH_SECTIONS_CNT) {
+    qWarning("Path[%s] contains more than %d sections", qPrintable(fullpath), sections.size());
+    return;
+  }
+
+  for (int i = 0; i < N; ++i) {
+    mPathSections[i].setText(sections[i]);
+    m_pathActionsTB->addAction(&mPathSections[i]);
+  }
+
+  if (!pathComboBox->hasFocus()) {  // in disp mode
     pathComboBox->insertItem(0, fullpath);
   } else {  // in edit mode, when return pressed it would auto append one text to the back
     pathComboBox->insertItem(0, fullpath);
@@ -117,9 +150,9 @@ auto AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) -
 auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   const QString& pth = QDir::fromNativeSeparators(path);
 #ifdef WIN32
-  if (not pth.isEmpty() and not QFile::exists(pth)) {
+  if (!pth.isEmpty() && !QFile::exists(pth)) {
 #else
-  if (not QFile::exists(pth)) {
+  if (!QFile::exists(pth)) {
 #endif
     const QString& pathInexist = QString("Return pressed with inexist path [%1].").arg(pth);
     qDebug("%s", qPrintable(pathInexist));

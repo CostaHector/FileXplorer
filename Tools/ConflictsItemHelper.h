@@ -50,7 +50,7 @@ class ConflictsItemHelper {
   }
 
   explicit ConflictsItemHelper(const QStringList& lAbsPathList, const QString& r_, const CCMMode::Mode mode)
-      : ConflictsItemHelper(PATHTOOL::GetLAndRels(lAbsPathList), r_, mode) {}
+      : ConflictsItemHelper(PathTool::GetLAndRels(lAbsPathList), r_, mode) {}
 
   operator bool() const { return not commonList.isEmpty(); }
   void saveLeftRelPathList() {

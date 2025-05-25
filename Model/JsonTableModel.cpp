@@ -160,7 +160,7 @@ QString JsonTableModel::fileName(const QModelIndex& index) const {
 }
 
 QString JsonTableModel::fileBaseName(const QModelIndex& index) const {
-  return PATHTOOL::GetBaseName(fileName(index));
+  return PathTool::GetBaseName(fileName(index));
 }
 
 QString JsonTableModel::absolutePath(const QModelIndex &index) const {

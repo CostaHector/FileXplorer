@@ -120,7 +120,7 @@ auto FileExplorerEvent::on_NewJsonFile() -> bool {  // not effect by selection;
   const QString& path = _fileSysModel->rootPath();
   for (const QString& fileItem : selectedItems()) {
     QString jsonBaseName, ext;
-    std::tie(jsonBaseName, ext) = PATHTOOL::GetBaseNameExt(fileItem);
+    std::tie(jsonBaseName, ext) = PathTool::GetBaseNameExt(fileItem);
     const QString jsonAbsPath = path + '/' + jsonBaseName + ".json";
     const QFile fi{jsonAbsPath};
     if (fi.exists()) {
@@ -262,10 +262,10 @@ QModelIndexList FileExplorerEvent::selectedIndexes() const {
 
 bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   const QString& absFilePath = _contentPane->getCurFilePath();
-  const QString& noExtAbsFilePath = PATHTOOL::GetFileNameExtRemoved(absFilePath);
+  const QString& noExtAbsFilePath = PathTool::GetFileNameExtRemoved(absFilePath);
   const QString& imgFileAbsPathGuess = QDir::toNativeSeparators(noExtAbsFilePath) + ' ';
   QApplication::clipboard()->setText(imgFileAbsPathGuess, QClipboard::Mode::Clipboard);
-  QString fileBaseName = PATHTOOL::GetBaseName(absFilePath);
+  QString fileBaseName = PathTool::GetBaseName(absFilePath);
   const QString& forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, " ");
   QStringList searchKeyWordArgs;
   if (!forSearch.isEmpty()) {
@@ -646,7 +646,7 @@ auto FileExplorerEvent::__CanNewItem() const -> bool {
     Notificator::information("Reject", QString("Not file system view[%s]").arg(_contentPane->GetCurViewName()));
     return false;
   }
-  if (PATHTOOL::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
+  if (PathTool::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
     qDebug("Reject. Don't create item under path[%s]", qPrintable(_fileSysModel->rootPath()));
     Notificator::information("Reject", QString("Don't create item under path[%s]").arg(_fileSysModel->rootPath()));
     return false;
@@ -732,7 +732,7 @@ bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
 }
 
 bool FileExplorerEvent::on_compress() {
-  if (not((_contentPane->isFSView() or _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) and not PATHTOOL::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
+  if (not((_contentPane->isFSView() or _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) and not PathTool::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
     qInfo("[Compress] Only available on FileSytemView/search[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_contentPane->getRootPath()));
     Notificator::information("[Compress] Only available on FileSytemView/search[%1] and non-empty-path[%2]", _contentPane->GetCurViewName() + '|' + _contentPane->getRootPath());
     return false;
@@ -753,7 +753,7 @@ bool FileExplorerEvent::on_compress() {
 }
 
 bool FileExplorerEvent::on_deCompress() {
-  if (!((_contentPane->isFSView() || _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) && !PATHTOOL::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
+  if (!((_contentPane->isFSView() || _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) && !PathTool::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
     qInfo("[Decompress] Only available on FileSytemView/search[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_contentPane->getRootPath()));
     Notificator::warning("[Decompress] Only available on FileSytemView/search[%1] and non-empty-path[%2]", _contentPane->GetCurViewName() + '|' + _contentPane->getRootPath());
     return false;
@@ -800,7 +800,7 @@ bool FileExplorerEvent::on_archivePreview() {
     return false;
   }
   const QString pth = _contentPane->getRootPath();
-  if (PATHTOOL::isLinuxRootOrWinEmpty(pth)) {
+  if (PathTool::isLinuxRootOrWinEmpty(pth)) {
     qInfo("[ArchivePreivew] Only available on FileSytemView/search[%c] and non-empty-path[%s]", (char)vt, qPrintable(pth));
     Notificator::warning("[ArchivePreivew] Only available on FileSytemView/search and non-empty-path", QString::number((int)vt) + '|' + pth);
     return false;
@@ -827,7 +827,7 @@ bool FileExplorerEvent::on_moveToTrashBin() {
     return false;
   }
   const QString pth = _contentPane->getRootPath();
-  if (PATHTOOL::isLinuxRootOrWinEmpty(pth)) {
+  if (PathTool::isLinuxRootOrWinEmpty(pth)) {
     qInfo("[Move to trashbin] Only available on FileSytemView/search[%c] and non-empty-path[%s]", (char)vt, qPrintable(pth));
     Notificator::warning("[Move to trashbin] Only available on FileSytemView/search and non-empty-path", QString::number((int)vt) + '|' + pth);
     return false;
@@ -860,7 +860,7 @@ bool FileExplorerEvent::on_deletePermanently() {
     return false;
   }
   const QString pth = _contentPane->getRootPath();
-  if (PATHTOOL::isLinuxRootOrWinEmpty(pth)) {
+  if (PathTool::isLinuxRootOrWinEmpty(pth)) {
     qInfo("[Delete Permanently] Only available on FileSytemView[%c] and non-empty-path[%s]", (char)vt, qPrintable(pth));
     Notificator::warning("[Delete Permanently] Only available on FileSytemView and non-empty-path", QString::number((int)vt) + '|' + pth);
     return false;
@@ -983,7 +983,7 @@ auto FileExplorerEvent::on_PlaySelectedItemsInView() -> bool {
 }
 
 bool FileExplorerEvent::on_PlayCurrentPathOfView() {
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qInfo("[Play current folder] only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[Play current folder] only available on FileSytemView", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1011,7 +1011,7 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
   if (playPath.isEmpty() && _contentPane->isFSView()) {
     playPath = _fileSysModel->rootPath();
   }
-  if (PATHTOOL::isRootOrEmpty(playPath)) {
+  if (PathTool::isRootOrEmpty(playPath)) {
     qWarning("Play skip. Empty path or root path[%s]", qPrintable(playPath));
     Notificator::warning("Play skip. Empty path or root path", playPath);
     return true;
@@ -1028,7 +1028,7 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
 
 bool FileExplorerEvent::on_Merge(const bool isReverse) {
   // reverse left right folder;
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     return false;
   }
   if (selectedIndexes().size() != 2) {
@@ -1099,7 +1099,7 @@ auto FileExplorerEvent::on_Cut() -> bool {
 }
 
 bool FileExplorerEvent::on_Paste() {
-  if (!_contentPane->isFSView() || PATHTOOL::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
+  if (!_contentPane->isFSView() || PathTool::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
     qInfo("[Paste] only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[Paste] only available on FileSytemView", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1141,7 +1141,7 @@ bool FileExplorerEvent::on_Paste() {
 }
 
 bool FileExplorerEvent::on_NameStandardize() {
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[Name Standardize] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[Name Standardize] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1179,7 +1179,7 @@ bool FileExplorerEvent::on_NameStandardize() {
 }
 
 bool FileExplorerEvent::on_FileClassify() {
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[File Classify] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[File Classify] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1203,7 +1203,7 @@ bool FileExplorerEvent::on_FileClassify() {
 }
 
 bool FileExplorerEvent::on_FileUnclassify() {
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[File Unclassify] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[File Classify] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1246,7 +1246,7 @@ bool FileExplorerEvent::on_FileUnclassify() {
 }
 
 bool FileExplorerEvent::on_LongPathFolderFinder() {
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[Long path folder finder] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[Long path folder finder] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1263,7 +1263,7 @@ bool FileExplorerEvent::on_LongPathFolderFinder() {
 }
 
 bool FileExplorerEvent::on_RemoveDuplicateImages() {
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[on_RemoveDuplicateImages] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[on_RemoveDuplicateImages] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1289,7 +1289,7 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
 }
 
 bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
-  if (not _contentPane->isFSView() or PATHTOOL::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[Remove redundant item] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[Remove redundant item] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1321,7 +1321,7 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const CCMMode::Mode operationNa
     Notificator::warning("[Move/Copy to] for [%s view] use Copy/Cut/Paste to filesytem instead", _contentPane->GetCurViewName());
     return false;
   }
-  if (!ViewTypeTool::isFSView(vt) || PATHTOOL::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
+  if (!ViewTypeTool::isFSView(vt) || PathTool::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
     qDebug("[Move/Copy to] only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::warning("[Move/Copy to] only available on FileSytemView[%1] and non-empty-path[%2]", _contentPane->GetCurViewName() + '|' + _contentPane->GetCurViewName());
     return false;
