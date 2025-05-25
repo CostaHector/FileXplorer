@@ -172,7 +172,12 @@ void ContentPanel::BindNavigationAddressBar(NavigationAndAddressBar* addressBar)
     return;
   }
   _addressBar = addressBar;
-  connect(_addressBar->m_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed, this, [this](const QString& newPath) { onAddressToolbarPathChanged(newPath, true); });
+  connect(_addressBar->m_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed,  //
+          this,                                                                                        //
+          [this](const QString& newPath) {                                                             //
+            onAddressToolbarPathChanged(newPath, true);                                                //
+          }                                                                                            //
+  );
 }
 
 void ContentPanel::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar) {

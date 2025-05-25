@@ -15,14 +15,14 @@
 
 JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
   QString prepath;
-  QString jsonFileName = PATHTOOL::GetPrepathAndFileName(jsonAbsFile, prepath);
+  QString jsonFileName = PathTool::GetPrepathAndFileName(jsonAbsFile, prepath);
   const auto& json = JsonHelper::GetJsonObject(jsonAbsFile);
   return JsonPr{prepath, jsonFileName, json};
 }
 
 JsonPr::JsonPr(const QString& jsonAbsFile) {  //
   QString prepath;
-  jsonFileName = PATHTOOL::GetPrepathAndFileName(jsonAbsFile, prepath);
+  jsonFileName = PathTool::GetPrepathAndFileName(jsonAbsFile, prepath);
   m_Prepath.swap(prepath);
   Reload();
 }
@@ -110,9 +110,9 @@ int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoR
 
   QString fileName, fileExt;
   QString newFileName;
-  const QString& oldJsonBaseName{PATHTOOL::GetBaseName(jsonFileName)};
+  const QString& oldJsonBaseName{PathTool::GetBaseName(jsonFileName)};
   for (const QString& oldName : dir.entryList({oldJsonBaseName + "*"})) {
-    std::tie(fileName, fileExt) = PATHTOOL::GetBaseNameExt(oldName);
+    std::tie(fileName, fileExt) = PathTool::GetBaseNameExt(oldName);
     if (fileName.leftRef(oldJsonBaseName.size()) != oldJsonBaseName) {
       continue;
     }
@@ -127,7 +127,7 @@ int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoR
 }
 
 bool JsonPr::SyncNameValueFromFileBaseName() {
-  const QString newbaseName{PATHTOOL::GetBaseName(jsonFileName)};
+  const QString newbaseName{PathTool::GetBaseName(jsonFileName)};
   if (newbaseName == m_Name) {
     return false;
   }
