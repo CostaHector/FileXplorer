@@ -3,15 +3,8 @@
 
 #include <QString>
 #include <QStringList>
-class QFileInfo;
-struct FileOSWalkerRet {
-  QStringList relToNames;
-  QStringList completeNames;
-  QStringList suffixs;
-  QList<bool> isFiles;
-};
 
-namespace PATHTOOL {
+namespace PathTool {
 constexpr char PATH_SEP_CHAR = '/';
 constexpr int EXTENSION_MAX_LENGTH = 5;  // ".json"
 
@@ -74,19 +67,21 @@ std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 QString GetFileExtension(const QString& path);
 bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 
-}  // namespace PATHTOOL
+}  // namespace PathTool
 
+class QFileInfo;
 class FileOsWalker {
  public:
   FileOsWalker(const QString& pre, bool sufInside);
-  FileOSWalkerRet operator()(const QStringList& rels, const bool includingSub);
+  void operator()(const QStringList& rels, const bool includingSub);
 
- private:
-  void FillByFileInfo(const QFileInfo& fi);
   QStringList relToNames;
   QStringList completeNames;
   QStringList suffixs;
   QList<bool> isFiles;
+
+ private:
+  void FillByFileInfo(const QFileInfo& fi);
 
   QString mPrepathWithSlash;
   int N;

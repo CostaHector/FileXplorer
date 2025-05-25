@@ -4,7 +4,7 @@
 #include <QFileInfo>
 #include <QDirIterator>
 
-QString PATHTOOL::StripTrailingSlash(QString path) {
+QString PathTool::StripTrailingSlash(QString path) {
   // drive letter will be kept while trailing path seperator will be trunc
   // i.e.,
   // "XX:/A/"  -> "XX:/A" and "XX:/" -> same
@@ -16,23 +16,23 @@ QString PATHTOOL::StripTrailingSlash(QString path) {
 #endif
 }
 
-QString PATHTOOL::linkPath(const QString& localPath) {
+QString PathTool::linkPath(const QString& localPath) {
   return "file:///" + localPath;
 }
-QString PATHTOOL::localPath(const QString& linkPath) {
+QString PathTool::localPath(const QString& linkPath) {
   return linkPath.mid(8);
 }
-QString PATHTOOL::sysPath(QString fullPath) {
+QString PathTool::sysPath(QString fullPath) {
 #ifdef _WIN32
   return fullPath.replace('/', '\\');
 #else
   return fullPath.replace('\\', '/');
 #endif
 }
-QString PATHTOOL::normPath(QString fullPath) {
+QString PathTool::normPath(QString fullPath) {
   return fullPath.replace('\\', '/');
 }
-QString PATHTOOL::absolutePath(const QString& fullPath) {
+QString PathTool::absolutePath(const QString& fullPath) {
   // "C:/A/" => "C:/" => ""
   // same as "C:/A"
   // "/home/to/" => "/home" => "/" => ""
@@ -53,10 +53,10 @@ QString PATHTOOL::absolutePath(const QString& fullPath) {
 
 #endif
 }
-QString PATHTOOL::relativePath(const QString& fullPath, const int rootpathLen) {
+QString PathTool::relativePath(const QString& fullPath, const int rootpathLen) {
   return fullPath.mid(rootpathLen + 1);
 }
-QString PATHTOOL::forSearchPath(const QString& fullPath) {
+QString PathTool::forSearchPath(const QString& fullPath) {
   // get QString for database index last three sectors
   int forwardSlashLetterCnt = 0;
   for (int i = fullPath.size() - 1; i > -1; --i) {
@@ -66,7 +66,7 @@ QString PATHTOOL::forSearchPath(const QString& fullPath) {
   }
   return fullPath;
 }
-QString PATHTOOL::dirName(const QString& fullPath) {
+QString PathTool::dirName(const QString& fullPath) {
   int first = 0, end = 0;
   for (int i = fullPath.size() - 1; i > -1; --i) {
     if (fullPath[i] == '/') {
@@ -80,12 +80,12 @@ QString PATHTOOL::dirName(const QString& fullPath) {
   }
   return fullPath.mid(first + 1, end - (first + 1));
 }
-QString PATHTOOL::fileName(const QString& fullPath) {
+QString PathTool::fileName(const QString& fullPath) {
   int forwardSlashIndex = fullPath.lastIndexOf('/');
   return forwardSlashIndex == -1 ? fullPath : fullPath.mid(forwardSlashIndex + 1);
 }
 
-QString PATHTOOL::RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen) {
+QString PathTool::RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen) {
   if (fileNameLen > 0) {
     return fullPath.mid(rootPathLen, fullPath.size() - fileNameLen - rootPathLen);
   }
@@ -109,7 +109,7 @@ bool HasLetter(const QString& fullpath, int startIdx) {
   return false;
 }
 
-std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
+std::pair<QString, QString> PathTool::GetBaseNameExt(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
   if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
@@ -124,7 +124,7 @@ std::pair<QString, QString> PATHTOOL::GetBaseNameExt(const QString& fullpath) {
                         fullpath.mid(lastIndexOfExtDot));                                              // extension
 }
 
-QString PATHTOOL::GetBaseName(const QString& fullpath) {
+QString PathTool::GetBaseName(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
   if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
@@ -138,7 +138,7 @@ QString PATHTOOL::GetBaseName(const QString& fullpath) {
   return fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1);
 }
 
-QString PATHTOOL::GetFileNameExtRemoved(const QString& fileName) {
+QString PathTool::GetFileNameExtRemoved(const QString& fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
   if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
     return fileName;
@@ -146,7 +146,7 @@ QString PATHTOOL::GetFileNameExtRemoved(const QString& fileName) {
   return fileName.left(lastIndexOfExtDot);
 }
 
-QString PATHTOOL::GetFileNameExtRemoved(QString&& fileName) {
+QString PathTool::GetFileNameExtRemoved(QString&& fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
   if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
     return fileName;
@@ -154,7 +154,7 @@ QString PATHTOOL::GetFileNameExtRemoved(QString&& fileName) {
   return fileName.left(lastIndexOfExtDot);
 }
 
-QString PATHTOOL::FileExtReplacedWithJson(QString fileName) {
+QString PathTool::FileExtReplacedWithJson(QString fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
   if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
     fileName += ".json";
@@ -164,13 +164,13 @@ QString PATHTOOL::FileExtReplacedWithJson(QString fileName) {
   return fileName.replace(lastIndexOfExtDot + 1, JSON_EXT_SIZE, "json");
 }
 
-QString PATHTOOL::GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
+QString PathTool::GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   prepath = fullpath.left(lastIndexOfSlash);
   return fullpath.mid(lastIndexOfSlash + 1);
 }
 
-QString PATHTOOL::Path2Join(const QString& a, const QString& b) {
+QString PathTool::Path2Join(const QString& a, const QString& b) {
   QString ans;
   ans.reserve(a.size() + 1 + b.size());
   if (!a.isEmpty()) {
@@ -180,7 +180,7 @@ QString PATHTOOL::Path2Join(const QString& a, const QString& b) {
   return ans += b;
 }
 
-QString PATHTOOL::Path3Join(const QString& a, const QString& b, const QString& c) {
+QString PathTool::Path3Join(const QString& a, const QString& b, const QString& c) {
   QString ans;
   ans.reserve(a.size() + 1 + b.size() + 1 + c.size());
   if (!a.isEmpty()) {
@@ -194,7 +194,7 @@ QString PATHTOOL::Path3Join(const QString& a, const QString& b, const QString& c
   return ans += c;
 }
 
-int PATHTOOL::GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight) {
+int PathTool::GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight) {
   outPrePathLeft.clear();
   outPrePathRight.clear();
   const int lastHashIndex = absPath.lastIndexOf('/');  // 找到最后一个/的位置
@@ -217,20 +217,20 @@ int PATHTOOL::GetPrepathParts(const QString& absPath, QString& outPrePathLeft, Q
   return lastHashIndex;
 }
 
-QString PATHTOOL::join(const QString& prefix, const QString& relative) {
+QString PathTool::join(const QString& prefix, const QString& relative) {
   if (prefix.isEmpty()) {
     return relative;
   }
   if (relative.isEmpty()) {
     return prefix;
   }
-  if (not prefix.isEmpty() and prefix.back() == '/') {
+  if (!prefix.isEmpty() && prefix.back() == '/') {
     // C:/ a
     return prefix + relative;
   }
   return prefix + '/' + relative;
 }
-QString PATHTOOL::driver(const QString& fullPath) {
+QString PathTool::driver(const QString& fullPath) {
 #ifdef _WIN32
   int colonIndex = fullPath.indexOf(':');
   return colonIndex != -1 ? fullPath.left(colonIndex) : "";
@@ -238,7 +238,7 @@ QString PATHTOOL::driver(const QString& fullPath) {
   return "";
 #endif
 }
-QString PATHTOOL::commonPrefix(const QString& path1, const QString& path2) {
+QString PathTool::commonPrefix(const QString& path1, const QString& path2) {
   const int length = std::min(path1.size(), path2.size());
   int index = 0;
   while (index < length && path1[index] == path2[index]) {
@@ -247,15 +247,15 @@ QString PATHTOOL::commonPrefix(const QString& path1, const QString& path2) {
   return path1.left(index);
 }
 
-bool PATHTOOL::isLinuxRootOrWinEmpty(const QString& path) {
+bool PathTool::isLinuxRootOrWinEmpty(const QString& path) {
   return path.isEmpty() or path == "/";
 }
 
-bool PATHTOOL::isRootOrEmpty(const QString& path) {
+bool PathTool::isRootOrEmpty(const QString& path) {
   return path.isEmpty() or path == "/" or QDir(path).isRoot();
 }
 
-QStringList PATHTOOL::GetRels(int prefixLen, const QStringList& lAbsPathList) {
+QStringList PathTool::GetRels(int prefixLen, const QStringList& lAbsPathList) {
   // "/home/rel2entry", "/home", prefixLen = 4
   const int rel2EntryN = prefixLen + 1;
   QStringList lRels;
@@ -265,7 +265,7 @@ QStringList PATHTOOL::GetRels(int prefixLen, const QStringList& lAbsPathList) {
   return lRels;
 }
 
-std::pair<QString, QStringList> PATHTOOL::GetLAndRels(const QStringList& lAbsPathList) {
+std::pair<QString, QStringList> PathTool::GetLAndRels(const QStringList& lAbsPathList) {
   if (lAbsPathList.isEmpty()) {
     return {"", lAbsPathList};
   }
@@ -276,7 +276,7 @@ std::pair<QString, QStringList> PATHTOOL::GetLAndRels(const QStringList& lAbsPat
   return {prefixPath, lRels};
 }
 
-QString PATHTOOL::longestCommonPrefix(const QStringList& strs) {
+QString PathTool::longestCommonPrefix(const QStringList& strs) {
   if (strs.isEmpty()) {
     return "";
   }
@@ -303,11 +303,11 @@ QString PATHTOOL::longestCommonPrefix(const QStringList& strs) {
   return slashIndex == -1 ? prefix : prefix.left(slashIndex);
 }
 
-QString PATHTOOL::GetFileExtension(const QString& path) {
+QString PathTool::GetFileExtension(const QString& path) {
   return '.' + QFileInfo(path).suffix();
 }
 
-bool PATHTOOL::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
+bool PathTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
   QDir sourceDir(fromDir);
   QDir targetDir(toDir);
   if (!targetDir.exists()) { /* if directory don't exists, build it */
@@ -345,12 +345,13 @@ bool PATHTOOL::copyDirectoryFiles(const QString& fromDir, const QString& toDir, 
 }
 
 FileOsWalker::FileOsWalker(const QString& pre, bool sufInside)
-    : mPrepathWithSlash{PATHTOOL::normPath(pre) + '/'},  // "rel/"
+    : mPrepathWithSlash{PathTool::normPath(pre) + '/'},  // "rel/"
       N{mPrepathWithSlash.size()},                       // N = len("rel/")
       mSufInside{sufInside}                              // a.txt
-{}
+{                                                        //
+}
 
-FileOSWalkerRet FileOsWalker::operator()(const QStringList& rels, const bool includingSub) {
+void FileOsWalker::operator()(const QStringList& rels, const bool includingSub) {
   // Reverse the return value, One can get bottom To Top result like os.walk
   for (const QString& rel : rels) {
     const QFileInfo fi{mPrepathWithSlash + rel};
@@ -369,7 +370,6 @@ FileOSWalkerRet FileOsWalker::operator()(const QStringList& rels, const bool inc
       FillByFileInfo(subFi);
     }
   }
-  return {relToNames, completeNames, suffixs, isFiles};
 }
 
 void FileOsWalker::FillByFileInfo(const QFileInfo& fi) {
@@ -380,7 +380,7 @@ void FileOsWalker::FillByFileInfo(const QFileInfo& fi) {
     completeNames.append(fi.fileName());
     suffixs.append("");
   } else {
-    std::tie(completeNm, dotSuf) = PATHTOOL::GetBaseNameExt(fi.fileName());
+    std::tie(completeNm, dotSuf) = PathTool::GetBaseNameExt(fi.fileName());
     completeNames.append(completeNm);
     suffixs.append(dotSuf);
   }

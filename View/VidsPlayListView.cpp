@@ -35,13 +35,13 @@ void VidsPlayListView::onRevealInSystemExplorer() {
     return;
   }
   const QString& filePath = currentFilePath();
-  const QString& dirPath = PATHTOOL::absolutePath(filePath);
+  const QString& dirPath = PathTool::absolutePath(filePath);
   if (not QFile::exists(filePath)) {
     qInfo("Cannot reveal. dirpath[%s] not exists", qPrintable(dirPath));
     Notificator::information("Cannot reveal", QString("dirpath[%1] not exists").arg(dirPath));
     return;
   }
-  const QString& dirUrl = PATHTOOL::linkPath(dirPath);
+  const QString& dirUrl = PathTool::linkPath(dirPath);
   QDesktopServices::openUrl(dirUrl);
 }
 
