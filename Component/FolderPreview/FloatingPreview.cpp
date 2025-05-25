@@ -149,7 +149,7 @@ void FloatingPreview::operator()(const QSqlRecord& record, const QString& imgHos
 
 QString GetDetailDescription(const QString& fileAbsPath) {
   QString fileName, extension;
-  std::tie(fileName, extension) = PATHTOOL::GetBaseNameExt(fileAbsPath);
+  std::tie(fileName, extension) = PathTool::GetBaseNameExt(fileAbsPath);
   const QFileInfo fi{fileAbsPath};
   QString detail;
   detail += QString(R"(<h1>%1</h1>)").arg(fileName);

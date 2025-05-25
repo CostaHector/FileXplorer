@@ -270,7 +270,7 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
   QString absFilePath, prePathLeft, prePathRight, vidName;
   for (const qint64& fdVal : needInsertFds) {
     absFilePath = newFd2Pth[fdVal];
-    lastSlashIndex = PATHTOOL::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
+    lastSlashIndex = PathTool::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
     vidName = absFilePath.mid(lastSlashIndex + 1);
 
     // 绑定参数
@@ -374,7 +374,7 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
   QString absFilePath, prePathLeft, prePathRight, vidName;
   for (const qint64& fdVal : needUpdateFds) {
     absFilePath = newFd2Pth[fdVal];
-    lastSlashIndex = PATHTOOL::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
+    lastSlashIndex = PathTool::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
     vidName = absFilePath.mid(lastSlashIndex + 1);
     query.bindValue(UPDATE_PATH_FILED_PrePathLeft, prePathLeft);
     query.bindValue(UPDATE_PATH_FILED_PrePathRight, prePathRight);
@@ -529,7 +529,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   QString absFilePath;
   qint64 fdVal{0};
   while (query.next()) {
-    absFilePath = PATHTOOL::Path3Join(query.value(QUERY_DURATION_0_FILED_PrePathLeft).toString(),   //
+    absFilePath = PathTool::Path3Join(query.value(QUERY_DURATION_0_FILED_PrePathLeft).toString(),   //
                                       query.value(QUERY_DURATION_0_FILED_PrePathRight).toString(),  //
                                       query.value(QUERY_DURATION_0_FILED_Name).toString());
     fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toLongLong();
@@ -634,11 +634,11 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
   QString jsonFileName;
   QString jsonPrepath;
   while (query.next()) {
-    jsonFileName = PATHTOOL::FileExtReplacedWithJson(query.value(EXPORT_TO_JSON_FIELD_Name).toString());  //
-    jsonPrepath = PATHTOOL::Path2Join(query.value(EXPORT_TO_JSON_FIELD_PrePathLeft).toString(),           //
+    jsonFileName = PathTool::FileExtReplacedWithJson(query.value(EXPORT_TO_JSON_FIELD_Name).toString());  //
+    jsonPrepath = PathTool::Path2Join(query.value(EXPORT_TO_JSON_FIELD_PrePathLeft).toString(),           //
                                       query.value(EXPORT_TO_JSON_FIELD_PrePathRight).toString());         //
     pathJsonsIn << jsonPrepath;
-    jsonAbsFilePath = PATHTOOL::Path2Join(jsonPrepath, jsonFileName);
+    jsonAbsFilePath = PathTool::Path2Join(jsonPrepath, jsonFileName);
     pth2Info[jsonAbsFilePath] = DurStudioCastTags{query.value(EXPORT_TO_JSON_FIELD_Duration).toInt(),   //
                                                   query.value(EXPORT_TO_JSON_FIELD_Studio).toString(),  //
                                                   query.value(EXPORT_TO_JSON_FIELD_Cast).toString(),    //
