@@ -64,7 +64,7 @@ auto AdvanceSearchModel::updateSearchResultList() -> void {
 auto AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory) -> bool {
   // when you need to call updateSearchResultList after checkPathNeed.
   // queryWhenSearchUnderLargeDirectory is most likely set to be true
-  const QString& stdPath = PATHTOOL::GetWinStdPath(path);
+  const QString& stdPath = PathTool::GetWinStdPath(path);
   if (stdPath.isEmpty()) {
     return false;
   }

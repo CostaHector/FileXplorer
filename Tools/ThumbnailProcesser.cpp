@@ -8,7 +8,7 @@
 #include <QDir>
 #include <QPixmap>
 
-using namespace PATHTOOL;
+using namespace PathTool;
 
 ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist) : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist} {}
 
