@@ -13,7 +13,7 @@ QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole: {
       switch (index.column()) {
         case 0:
-          return PATHTOOL::fileName(m_paf->operator[](index.row()).filePath);
+          return PathTool::fileName(m_paf->operator[](index.row()).filePath);
         case 1:
           return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->operator[](index.row()).size);
         case 2:
