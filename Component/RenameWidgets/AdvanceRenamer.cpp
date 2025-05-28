@@ -187,33 +187,38 @@ void AdvanceRenamer::onIncludingSub(int includingSubState) {
 void AdvanceRenamer::onIncludeSuffix(int includingSuffixState) {
   const bool isNameIncludingExtension = includingSuffixState == Qt::Checked;
   PreferenceSettings().setValue(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, isNameIncludingExtension);
-  m_oExtTE->setVisible(not isNameIncludingExtension);
-  m_nExtTE->setVisible(not isNameIncludingExtension);
+  m_oExtTE->setVisible(!isNameIncludingExtension);
+  m_nExtTE->setVisible(!isNameIncludingExtension);
   InitTextContent(m_pre, rels);
 }
 
 void AdvanceRenamer::InitTextContent(const QString& p, const QStringList& r) {
-  m_pre = p;
-  rels = r;
+  static constexpr char NAME_SEP = '\n';
+
+  m_pre = p;  // will not change
+  rels = r;   // will never change
 
   const bool bSubDir = m_recursiveCB->isChecked();
   const bool bSuffixInside = m_extensionInNameCB->isChecked();
+
   FileOsWalker osWalker{m_pre, bSuffixInside};
   osWalker(rels, bSubDir);
-  const auto& relToNames = osWalker.relToNames;
-  completeNames = osWalker.completeNames;  // may baseName only or baseName+extension, depend on includingSuffixState
-  const auto& suffixs = osWalker.suffixs;
-  isFiles = osWalker.isFiles;
+  FilterNames(osWalker);
 
-  m_relNameTE->setPlainText(relToNames.join('\n'));
+  const QStringList& relToNames = osWalker.relToNames;
+  completeNames.swap(osWalker.completeNames);
+  const QString& suffixLines = osWalker.suffixs.join(NAME_SEP);
 
-  m_oBaseTE->setPlainText(completeNames.join('\n'));
-  m_oExtTE->setPlainText(suffixs.join('\n'));
+  m_relNameTE->setPlainText(relToNames.join(NAME_SEP));
+
+  m_oBaseTE->setPlainText(completeNames.join(NAME_SEP));
+  m_oExtTE->setPlainText(suffixLines);
+
+  const auto& newCompleteNames = RenameCore(completeNames);
+  m_nBaseTE->setPlainText(newCompleteNames.join(NAME_SEP));
+  m_nExtTE->setPlainText(suffixLines);
 
   setWindowTitle(windowTitleFormat.arg(completeNames.size()).arg(m_pre));
-  const auto& newCompleteNames = RenameCore(completeNames);
-  m_nBaseTE->setPlainText(newCompleteNames.join('\n'));
-  m_nExtTE->setPlainText(suffixs.join('\n'));
 }
 
 void AdvanceRenamer::OnlyTriggerRenameCore() {

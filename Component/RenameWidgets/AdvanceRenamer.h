@@ -15,8 +15,9 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidget>
-
 #include "Component/StateLabel.h"
+
+class FileOsWalker;
 
 class AdvanceRenamer : public QDialog {
  public:
@@ -33,6 +34,7 @@ class AdvanceRenamer : public QDialog {
   void onIncludingSub(int includingSubState);
   void onIncludeSuffix(int includingSuffixState);
 
+  virtual void FilterNames(FileOsWalker& /*walker*/) const {};
   void InitTextContent(const QString& p, const QStringList& r);
   void OnlyTriggerRenameCore();
 
@@ -48,7 +50,6 @@ class AdvanceRenamer : public QDialog {
   QString m_pre;
   QStringList rels;
   QStringList completeNames;
-  QList<bool> isFiles;
 
   QCheckBox* m_extensionInNameCB{nullptr};
   QCheckBox* m_recursiveCB{nullptr};

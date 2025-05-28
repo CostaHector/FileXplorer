@@ -14,14 +14,16 @@ auto RedunParentFolderRem::CleanEmptyFolderCore(const QString& folderPath) -> in
   }
   QDir dir{folderPath, "", QDir::SortFlag::NoSort, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
   const int dirNameLen = dir.dirName().size();
-  for (const QString& sub: dir.entryList()) {
+  for (const QString& sub : dir.entryList()) {
     QDir subDir{dir.absoluteFilePath(sub), "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot};
     switch (subDir.count()) {
       case 0: {
+        // empty folder => recycle
         m_cmds.append(ACMD{MOVETOTRASH, {folderPath, sub}});
         break;
       }
       case 1: {
+        // 1 file folder and delta(length)>TOLERANCE_LETTER_CNT => no recycle
         const QString& itemName = dir.entryList().front();
         if (std::abs(itemName.size() - dirNameLen) > TOLERANCE_LETTER_CNT) {
           qDebug("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
@@ -56,6 +58,9 @@ auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
 auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderPath) -> int {
   m_cmds.clear();
   const auto isFolderNeedRecycle = [](const QString& subfolderPath) -> bool {
+    // contains directory =>no recycle
+    // contains 10 files  =>no recycle
+    // contains video     =>no recycle
     QDir dir{subfolderPath, "*", QDir::SortFlag::NoSort, QDir::AllEntries | QDir::NoDotAndDotDot};
     if (!dir.isEmpty(QDir::Dirs | QDir::NoDotAndDotDot)) {
       return false;
@@ -64,14 +69,13 @@ auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderP
       return false;
     }
     dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
-    if (dir.isEmpty(QDir::Files)) {
-      return true;
+    if (!dir.isEmpty(QDir::Files)) {
+      return false;
     }
-    return false;
+    return true;
   };
 
-  QDirIterator rIt{
-      folderPath, {"*" + m_keyword + "*"}, QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator rIt{folderPath, {"*" + m_keyword + "*"}, QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
   while (rIt.hasNext()) {
     rIt.next();
     if (!rIt.fileName().contains(m_keyword)) {
@@ -86,4 +90,3 @@ auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderP
   }
   return m_cmds.size();
 }
-
