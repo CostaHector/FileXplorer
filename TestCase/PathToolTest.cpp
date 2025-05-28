@@ -15,7 +15,7 @@ class PathToolTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  PathToolTest() : MyTestSuite{true} {}
+  PathToolTest() : MyTestSuite{false} {}
  private slots:
   void test_GetWinStdPath() {
 #ifdef WIN32
