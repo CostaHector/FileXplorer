@@ -285,7 +285,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
   folderRmv->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_REDUN_PARENT_FOLDER);
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
 
