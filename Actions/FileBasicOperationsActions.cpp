@@ -5,53 +5,53 @@
 
 FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
     : QObject(parent),
-      _REVEAL_IN_EXPLORER{new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this)},
-      _OPEN_IN_TERMINAL{new (std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this)},
+      _REVEAL_IN_EXPLORER{new(std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this)},
+      _OPEN_IN_TERMINAL{new(std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this)},
       OPEN_AG(GetOPENActions()),
 
-      COPY_FULL_PATH{new (std::nothrow) QAction(QIcon(":img/COPY_FULL_PATH"), "Copy fullpath")},
-      COPY_PATH{new (std::nothrow) QAction(QIcon(":img/COPY_PATH"), "Copy path")},
-      COPY_NAME{new (std::nothrow) QAction(QIcon(":img/COPY_NAME"), "Copy name")},
+      COPY_FULL_PATH{new(std::nothrow) QAction(QIcon(":img/COPY_FULL_PATH"), "Copy fullpath")},
+      COPY_PATH{new(std::nothrow) QAction(QIcon(":img/COPY_PATH"), "Copy path")},
+      COPY_NAME{new(std::nothrow) QAction(QIcon(":img/COPY_NAME"), "Copy name")},
 
-      COPY_THE_PATH{new (std::nothrow) QAction(QIcon(":img/COPY_THE_PATH"), "Copy the path")},
-      COPY_RECORDS{new (std::nothrow) QAction(QIcon(":img/COPY_RECORD"), "Copy records")},
+      COPY_THE_PATH{new(std::nothrow) QAction(QIcon(":img/COPY_THE_PATH"), "Copy the path")},
+      COPY_RECORDS{new(std::nothrow) QAction(QIcon(":img/COPY_RECORD"), "Copy records")},
       COPY_PATH_AG(GetCOPY_PATHActions()),
-      NEW_FOLDER{new (std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), "New folder")},
+      NEW_FOLDER{new(std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), "New folder")},
 
-      NEW_TEXT_FILE{new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), "New text")},
-      NEW_JSON_FILE{new (std::nothrow) QAction(QIcon(":img/NEW_JSON_FILE"), "New json")},
-      BATCH_NEW_FILES{new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), "New Files")},
+      NEW_TEXT_FILE{new(std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), "New text")},
+      NEW_JSON_FILE{new(std::nothrow) QAction(QIcon(":img/NEW_JSON_FILE"), "New json")},
+      BATCH_NEW_FILES{new(std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), "New Files")},
 
-      BATCH_NEW_FOLDERS{new (std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), "New Folders")},
+      BATCH_NEW_FOLDERS{new(std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), "New Folders")},
       NEW(GetNEWActions()),
 
-      _MOVE_TO{new (std::nothrow) QAction(QIcon(":img/MV_TO_COMMAND_PATH"), "Move to")},
-      _COPY_TO{new (std::nothrow) QAction(QIcon(":img/CP_TO_COMMAND_PATH"), "Copy to")},
+      _MOVE_TO{new(std::nothrow) QAction(QIcon(":img/MV_TO_COMMAND_PATH"), "Move to")},
+      _COPY_TO{new(std::nothrow) QAction(QIcon(":img/CP_TO_COMMAND_PATH"), "Copy to")},
       MOVE_COPY_TO(GetMOVE_COPY_TOActions()),
 
       MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
       COPY_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY)),
 
-      MOVE_TO_TRASHBIN{new (std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle")},
-      DELETE_PERMANENTLY{new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently")},
+      MOVE_TO_TRASHBIN{new(std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle")},
+      DELETE_PERMANENTLY{new(std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently")},
       DELETE_ACTIONS(GetDeleteActions()),
 
-      UNDO_OPERATION{new (std::nothrow) QAction(QIcon(":img/UNDO"), "Undo", this)},
-      REDO_OPERATION{new (std::nothrow) QAction(QIcon(":img/REDO"), "Redo", this)},
+      UNDO_OPERATION{new(std::nothrow) QAction(QIcon(":img/UNDO"), "Undo", this)},
+      REDO_OPERATION{new(std::nothrow) QAction(QIcon(":img/REDO"), "Redo", this)},
       UNDO_REDO_RIBBONS(Get_UNDO_REDO_OPERATIONS_Actions()),
 
-      CUT{new (std::nothrow) QAction(QIcon(":img/CUT_ITEM"), "Cut")},
-      COPY{new (std::nothrow) QAction(QIcon(":img/COPY_ITEM"), "Copy")},
-      PASTE{new (std::nothrow) QAction(QIcon(":img/PASTE_ITEM"), "Paste")},
+      CUT{new(std::nothrow) QAction(QIcon(":img/CUT_ITEM"), "Cut")},
+      COPY{new(std::nothrow) QAction(QIcon(":img/COPY_ITEM"), "Copy")},
+      PASTE{new(std::nothrow) QAction(QIcon(":img/PASTE_ITEM"), "Paste")},
       CUT_COPY_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
 
-      MERGE{new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), "Merged to front")},
-      MERGE_REVERSE{new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), "Merge to back")},
+      MERGE{new(std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), "Merged to front")},
+      MERGE_REVERSE{new(std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), "Merge to back")},
       FOLDER_MERGE(FolderMergeActions()),
 
-      SELECT_ALL{new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all")},
-      SELECT_NONE{new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none")},
-      SELECT_INVERT{new (std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), "Invert selection")},
+      SELECT_ALL{new(std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all")},
+      SELECT_NONE{new(std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none")},
+      SELECT_INVERT{new(std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), "Invert selection")},
       SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()) {
   FolderFileCategoryProcess();
 }
@@ -59,13 +59,11 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
 QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
   MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
   MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
-  MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.")
-                                   .arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
+  MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.").arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
 
   DELETE_PERMANENTLY->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Delete));
   DELETE_PERMANENTLY->setShortcutVisibleInContextMenu(true);
-  DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
-                                     .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
+  DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently").arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(MOVE_TO_TRASHBIN);
@@ -75,11 +73,9 @@ QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
 
 QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
   _MOVE_TO->setShortcutVisibleInContextMenu(true);
-  _MOVE_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location one specified later")
-                           .arg(_MOVE_TO->text(), _MOVE_TO->shortcut().toString()));
+  _MOVE_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location one specified later").arg(_MOVE_TO->text(), _MOVE_TO->shortcut().toString()));
   _COPY_TO->setShortcutVisibleInContextMenu(true);
-  _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later")
-                           .arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
+  _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later").arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_MOVE_TO);
@@ -110,8 +106,7 @@ QActionGroup* FileBasicOperationsActions::Get_CUT_COPY_PASTE_OPERATIONS_Actions(
 
   PASTE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_V));
   PASTE->setShortcutVisibleInContextMenu(true);
-  PASTE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Paste the contents of clipboard to the current location.").arg(PASTE->text(), PASTE->shortcut().toString()));
+  PASTE->setToolTip(QString("<b>%1 (%2)</b><br/> Paste the contents of clipboard to the current location.").arg(PASTE->text(), PASTE->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(CUT);
@@ -133,7 +128,7 @@ QActionGroup* FileBasicOperationsActions::Get_UNDO_REDO_OPERATIONS_Actions() {
   actionGroup->addAction(UNDO_OPERATION);
   actionGroup->addAction(REDO_OPERATION);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  foreach(QAction* act, actionGroup->actions()) {
+  foreach (QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -155,7 +150,7 @@ QActionGroup* FileBasicOperationsActions::Get_SELECTION_RIBBON_Action() {
   actionGroup->addAction(SELECT_NONE);
   actionGroup->addAction(SELECT_INVERT);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  foreach(QAction* act, actionGroup->actions()) {
+  foreach (QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -164,8 +159,7 @@ QActionGroup* FileBasicOperationsActions::Get_SELECTION_RIBBON_Action() {
 auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer")
-                                      .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
+  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer").arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
 
   _OPEN_IN_TERMINAL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::AltModifier | Qt::Key_T));
   _OPEN_IN_TERMINAL->setShortcutVisibleInContextMenu(true);
@@ -178,7 +172,7 @@ auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
   actionGroup->addAction(_REVEAL_IN_EXPLORER);
   actionGroup->addAction(_OPEN_IN_TERMINAL);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  foreach(QAction* act, actionGroup->actions()) {
+  foreach (QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -187,17 +181,14 @@ auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
 QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
   COPY_FULL_PATH->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_Insert));
   COPY_FULL_PATH->setToolTip(
-      QString("<b>%1 (%2)</b><br/>. <b>path/name</b> <br/>Copy the absolute file name of the selected item(s) to the clipboard.")
-          .arg(COPY_FULL_PATH->text(), COPY_FULL_PATH->shortcut().toString()));
+      QString("<b>%1 (%2)</b><br/>. <b>path/name</b> <br/>Copy the absolute file name of the selected item(s) to the clipboard.").arg(COPY_FULL_PATH->text(), COPY_FULL_PATH->shortcut().toString()));
   COPY_FULL_PATH->setShortcutVisibleInContextMenu(true);
 
-  COPY_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>path</b>/name <br/>Copy the directory of the selected item(s) to the clipboard.")
-                            .arg(COPY_PATH->text(), COPY_PATH->shortcut().toString()));
+  COPY_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>path</b>/name <br/>Copy the directory of the selected item(s) to the clipboard.").arg(COPY_PATH->text(), COPY_PATH->shortcut().toString()));
   COPY_PATH->setShortcutVisibleInContextMenu(true);
 
   COPY_NAME->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_Insert));
-  COPY_NAME->setToolTip(QString("<b>%1 (%2)</b><br/> path/<b>name</b> <br/>Copy the name of the selected item(s) to the clipboard.")
-                            .arg(COPY_NAME->text(), COPY_NAME->shortcut().toString()));
+  COPY_NAME->setToolTip(QString("<b>%1 (%2)</b><br/> path/<b>name</b> <br/>Copy the name of the selected item(s) to the clipboard.").arg(COPY_NAME->text(), COPY_NAME->shortcut().toString()));
   COPY_NAME->setShortcutVisibleInContextMenu(true);
 
   COPY_THE_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>pth/itemName.jpg</b> <br/>Given current selected item named 'itemName' and its path "
@@ -206,8 +197,7 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
   COPY_THE_PATH->setShortcutVisibleInContextMenu(true);
 
   COPY_RECORDS->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_C));
-  COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> <b>Copy the selected records, especially name, size, and prepath")
-                               .arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
+  COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> <b>Copy the selected records, especially name, size, and prepath").arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
   COPY_RECORDS->setShortcutVisibleInContextMenu(true);
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
@@ -218,7 +208,7 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
   actionGroup->addAction(COPY_RECORDS);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  foreach(QAction* act, actionGroup->actions()) {
+  foreach (QAction* act, actionGroup->actions()) {
     act->setCheckable(false);
   }
   return actionGroup;
@@ -227,20 +217,17 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
 QActionGroup* FileBasicOperationsActions::GetNEWActions() {
   NEW_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_N));
   NEW_FOLDER->setShortcutVisibleInContextMenu(true);
-  NEW_FOLDER->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Create a new folder in current view.").arg(NEW_FOLDER->text(), NEW_FOLDER->shortcut().toString()));
+  NEW_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Create a new folder in current view.").arg(NEW_FOLDER->text(), NEW_FOLDER->shortcut().toString()));
   NEW_FOLDER->setCheckable(false);
 
   NEW_TEXT_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_T));
   NEW_TEXT_FILE->setShortcutVisibleInContextMenu(true);
-  NEW_TEXT_FILE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Create a new text document in current view.").arg(NEW_TEXT_FILE->text(), NEW_TEXT_FILE->shortcut().toString()));
+  NEW_TEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Create a new text document in current view.").arg(NEW_TEXT_FILE->text(), NEW_TEXT_FILE->shortcut().toString()));
   NEW_TEXT_FILE->setCheckable(false);
 
   NEW_JSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_J));
   NEW_JSON_FILE->setShortcutVisibleInContextMenu(true);
-  NEW_JSON_FILE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
+  NEW_JSON_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
   NEW_JSON_FILE->setCheckable(false);
 
   BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
@@ -270,8 +257,7 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
 
   MERGE_REVERSE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_M));
   MERGE_REVERSE->setShortcutVisibleInContextMenu(true);
-  MERGE_REVERSE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE_REVERSE->text(), MERGE_REVERSE->shortcut().toString()));
+  MERGE_REVERSE->setToolTip(QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE_REVERSE->text(), MERGE_REVERSE->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(MERGE);
@@ -302,16 +288,19 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "Given: [A - 480p, A - 720p, A - 1080p, A - 2160p, A - 4K]<br/>"
       "Result: only A - 2160p will be kept, and others will moved to trashbin.");
 
-  _RMV_REDUN_PARENT_FOLDER->setToolTip(
-      "<b>Remove redundant Files/Folders under current view path</b><br/>"
-      "An empty folder or one item folder(sub name like parent folder name)<br/>"
-      "Upgrade sub file(if it exists) to its upper level. And erase the parent folder");
+  _RMV_01_FILE_FOLDER->setToolTip(
+      "<b>Remove empty folders or 1 file folders under current view path</b><br/>"
+      "1. Delete empty folders;<br/>"
+      "2. If a folder contains only a SINGLE file and the difference between the file name length and the folder name length <= 5 characters,<br/>"
+      "first move the file up one level (to the parent directory) and then delete the folder.");
   _RMV_EMPTY_FOLDER_R->setToolTip(
       "<b>Remove Empty folders under current view path recusively</b><br/>"
       "Only Empty folder will be removed");
   _RMV_FOLDER_BY_KEYWORD->setToolTip(
-      "<b>Remove Empty folders name contains keyword under current view path </b><br/>"
-      "Only folder items count <= 10 and not contains videos will be removed");
+      "<b>Remove folders whose name contain the specified keyword under current view path </b><br/>"
+      "1. skip if folder contains sub directory;"
+      "2. skip if folder items count;"
+      "3. skip if folder contains videos;");
   _DUPLICATE_VIDEOS_FINDER->setToolTip(
       "<b>Differ videos by duration or filesize</b><br/>"
       "to let it easy to find duplicate one");
