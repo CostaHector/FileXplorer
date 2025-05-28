@@ -80,11 +80,12 @@ class FileOsWalker {
   QStringList suffixs;
   QList<bool> isFiles;
 
+  const QString mPrepathWithSlash;
+  const int N;
+
  private:
   void FillByFileInfo(const QFileInfo& fi);
 
-  QString mPrepathWithSlash;
-  int N;
   bool mSufInside;
 };
 

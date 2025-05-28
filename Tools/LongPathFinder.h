@@ -1,44 +1,28 @@
 #ifndef LONGPATHFINDER_H
 #define LONGPATHFINDER_H
 
-#include <QString>
-#include <QList>
+#include <QStringList>
 
-
-class LongPathFinder
-{
+class LongPathFinder {
  public:
   LongPathFinder() = default;
+  static bool IsTooLong(const QString& pth);
+  static bool IsTooLong(int pathLength);
+
   int operator()(const QString& path);
-  // folderName/folderName.jpeg, i.e. 2 * N + 1(slash) + 5(dot and extension)
-  static inline bool IsFolderLengthShort(const int& folderPathLen) {
-    return 2 * folderPathLen + 1 + 5 < MAX_PATH_LENGTH;
-  }
-  // len(Prefix/folderName) = N
-  // folderNameLen = N - backSlashInd - 1
-  // N + 1(slash) + folderNameLen + 5(dot and ext) = 2N - backSlashInd + 5
-  static bool IsLengthBelowSysLimit(const QString& path) {
-    const int N = path.size();
-    if (IsFolderLengthShort(N)) {
-      return true;
-    }
-    const int backSlashInd = path.lastIndexOf('/');
-    return 2 * N - backSlashInd + 5 < MAX_PATH_LENGTH;
-  }
+
+  QStringList GetNamesAfterSectionDropped(const QStringList& srcLst) const;
 
   void SetDropSectionWhenTooLong(int section);
   QString GetNewFolderName(const QString& oldName) const;
-  int StillTooLongPathCount() const {
-    return m_status.size() - pres.size();
-  }
-  int CheckTooLongPathCount();
+  int CheckTooLongPathCount() const;
 
-  QStringList pres;
-  QStringList olds;
-  QStringList news;
-  QString m_status;
-  int dropSection{-1};
-  static constexpr int MAX_PATH_LENGTH = 260 - 1; // path[260] and the last '\0'
+  mutable QString m_status;
+  // -1:drop last section, 0: no drop; 1: drop first section
+  int mDropSection{-1};
+  // 260 = "C:\" + 256 + '\0' = 3+256+1
+  // driver letter=3; effective path=256; end=1
+  static constexpr int MAX_PATH_LENGTH = 260;
 };
 
-#endif // LONGPATHFINDER_H
+#endif  // LONGPATHFINDER_H
