@@ -27,7 +27,7 @@
 #include "Component/VideoPlayer.h"
 #include "Component/ContentPanel.h"
 #include "Component/RenameWidgets/AdvanceRenamer.h"
-#include "Component/RenameWidgets/LongPathFolderRenamer.h"
+#include "Component/RenameWidgets/RenameWidget_LongPath.h"
 #include "Component/RenameWidgets/RenameWidget_ArrangeSection.h"
 #include "Component/RenameWidgets/RenameWidget_ConsecutiveFileNo.h"
 #include "Component/RenameWidgets/RenameWidget_ConvertBoldUnicodeCharset2Ascii.h"
@@ -471,9 +471,8 @@ void FileExplorerEvent::subscribe() {
     auto* _NAME_RULER = g_fileBasicOperationsActions()._NAME_RULER;
     auto* _PACK_FOLDERS = g_fileBasicOperationsActions()._PACK_FOLDERS;
     auto* _UNPACK_FOLDERS = g_fileBasicOperationsActions()._UNPACK_FOLDERS;
-    auto* _LONG_PATH_FINDER = g_fileBasicOperationsActions()._LONG_PATH_FINDER;
     auto* _DUPLICATE_ITEMS_REMOVER = g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER;
-    auto* _RMV_REDUN_PARENT_FOLDER = g_fileBasicOperationsActions()._RMV_REDUN_PARENT_FOLDER;
+    auto* _RMV_01_FILE_FOLDER = g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER;
     auto* _REMOVE_EMPTY_FOLDER = g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R;
     auto* _REMOVE_FOLDER_BY_KEYWORD = g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD;
     auto* _DUPLICATE_VIDEOS_FINDER = g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER;
@@ -481,9 +480,8 @@ void FileExplorerEvent::subscribe() {
     connect(_NAME_RULER, &QAction::triggered, this, &FileExplorerEvent::on_NameStandardize);
     connect(_PACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileClassify);
     connect(_UNPACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileUnclassify);
-    connect(_LONG_PATH_FINDER, &QAction::triggered, this, &FileExplorerEvent::on_LongPathFolderFinder);
     connect(_DUPLICATE_ITEMS_REMOVER, &QAction::triggered, this, &FileExplorerEvent::on_RemoveDuplicateImages);
-    connect(_RMV_REDUN_PARENT_FOLDER, &QAction::triggered, this, [this]() {
+    connect(_RMV_01_FILE_FOLDER, &QAction::triggered, this, [this]() {
       RedunParentFolderRem rfr;
       FileExplorerEvent::on_RemoveRedundantItem(rfr);
     });
@@ -568,6 +566,12 @@ void FileExplorerEvent::subscribe() {
     connect(g_renameAg()._CONVERT_UNICODE_TO_ASCII, &QAction::triggered, this, [this]() -> void {
       auto* pToAscii = new RenameWidget_ConvertBoldUnicodeCharset2Ascii(_contentPane);
       onRename(pToAscii);
+    });
+
+    auto* _LONG_PATH_FINDER = g_fileBasicOperationsActions()._LONG_PATH_FINDER;
+    connect(_LONG_PATH_FINDER, &QAction::triggered, this, [this]() -> void {
+      auto* pToLongPath = new RenameWidget_LongPath(_contentPane);
+      onRename(pToLongPath);
     });
   }
 
@@ -1245,23 +1249,6 @@ bool FileExplorerEvent::on_FileUnclassify() {
   return true;
 }
 
-bool FileExplorerEvent::on_LongPathFolderFinder() {
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
-    qDebug("[Long path folder finder] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("[Long path folder finder] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
-    return false;
-  }
-  const QString& currentPath = _fileSysModel->rootPath();
-  if (m_longPathFolderFinder == nullptr) {
-    m_longPathFolderFinder = new LongPathFolderRenamer{this->_contentPane};
-  }
-  m_longPathFolderFinder->InitTextContent(currentPath);
-  m_longPathFolderFinder->show();
-  m_longPathFolderFinder->activateWindow();
-  m_longPathFolderFinder->raise();
-  return true;
-}
-
 bool FileExplorerEvent::on_RemoveDuplicateImages() {
   if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[on_RemoveDuplicateImages] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
@@ -1289,7 +1276,7 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
 }
 
 bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (! _contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[Remove redundant item] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[Remove redundant item] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
