@@ -26,8 +26,6 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) : QListView
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
 
-  setStyleSheet(ViewStyleSheet::GetDefaultListViewStyleSheet());
-
   _ORIENTATION_LEFT_TO_RIGHT = new (std::nothrow) QAction{"left to right", this};
   _ORIENTATION_TOP_TO_BOTTOM = new (std::nothrow) QAction{"top to bottom", this};
   _ORIENTATION_GRP = new (std::nothrow) QActionGroup{this};
