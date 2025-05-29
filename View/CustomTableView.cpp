@@ -1,7 +1,6 @@
 #include "CustomTableView.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
-#include "ViewStyleSheet.h"
 
 #include <QHeaderView>
 #include <QInputDialog>
@@ -108,8 +107,6 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
   horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  setStyleSheet(ViewStyleSheet::GetDefaultTableViewStyleSheet());
-
   SubscribeHeaderActions();
 }
 
@@ -184,7 +181,7 @@ bool CustomTableView::onShowHideColumn() {
   QString switches;
   for (int i = 0; i < horizontalHeader()->count(); ++i) {
     const QChar SEP = (i != 0 and i % SWITCHS_BATCH_COUNT == 0) ? '\n' : ',';
-    if (not m_horHeaderTitlesInit) {
+    if (!m_horHeaderTitlesInit) {
       m_horHeaderTitles += model_->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() + SEP;
     }
     switches += m_columnsShowSwitch[i] + SEP;
@@ -317,6 +314,7 @@ void CustomTableView::InitTableView() {
   }
   horizontalHeader()->restoreState(PreferenceSettings().value(m_horizontalHeaderStateKey, QByteArray()).toByteArray());
   ShowOrHideColumnCore();
+//  sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
 }
 
 void CustomTableView::onHorizontalHeaderMenuRequest(const QPoint& pnt) {
