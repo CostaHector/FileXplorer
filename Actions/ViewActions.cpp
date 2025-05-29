@@ -1,6 +1,7 @@
 #include "ViewActions.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
+#include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 #include "Tools/ViewTypeTool.h"
 
@@ -113,7 +114,9 @@ QActionGroup* ViewActions::GetViewsAG() {
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
+  actionGroup->addAction(_LIST_VIEW);
   actionGroup->addAction(_TABLE_VIEW);
+  actionGroup->addAction(_TREE_VIEW);
   actionGroup->addAction(_MOVIE_VIEW);
   actionGroup->addAction(_CAST_VIEW);
   actionGroup->addAction(_SCENE_VIEW);
@@ -123,10 +126,29 @@ QActionGroup* ViewActions::GetViewsAG() {
   return actionGroup;
 }
 
+QToolBar* ViewActions::GetFileSystemViewTB(QWidget* parent) {
+  auto* fileSystemViewTb = new (std::nothrow) QToolBar("Navigation Preview Switch", parent);
+  CHECK_NULLPTR_RETURN_NULLPTR(fileSystemViewTb);
+  fileSystemViewTb->setOrientation(Qt::Orientation::Vertical);
+  fileSystemViewTb->addAction(_LIST_VIEW);
+  fileSystemViewTb->addAction(_TABLE_VIEW);
+  fileSystemViewTb->addAction(_TREE_VIEW);
+  fileSystemViewTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  fileSystemViewTb->setStyleSheet("QToolBar { max-width: 256px; }");
+  fileSystemViewTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  SetLayoutAlightment(fileSystemViewTb->layout(), Qt::AlignmentFlag::AlignLeft);
+  return fileSystemViewTb;
+}
+
 QToolBar* ViewActions::GetViewTB(QWidget* parent) {
   auto* pTb = new (std::nothrow) QToolBar{"views switch", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(pTb);
-  pTb->addActions(_VIEWS_AG->actions());
+  pTb->addAction(_TABLE_VIEW);
+  pTb->addAction(_MOVIE_VIEW);
+  pTb->addAction(_CAST_VIEW);
+  pTb->addAction(_SCENE_VIEW);
+  pTb->addAction(_JSON_VIEW);
+  pTb->addAction(_ADVANCE_SEARCH_VIEW);
   pTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   pTb->setOrientation(Qt::Orientation::Horizontal);
   pTb->setStyleSheet("QToolBar { max-width: 256px; }");
