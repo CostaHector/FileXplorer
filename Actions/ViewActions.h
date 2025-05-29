@@ -9,6 +9,7 @@ class ViewActions : public QObject {
  public:
   explicit ViewActions(QObject* parent = nullptr);
 
+  QToolBar* GetFileSystemViewTB(QWidget* parent = nullptr);
   QToolBar* GetViewTB(QWidget* parent = nullptr);
 
   QAction* _ADVANCE_SEARCH_VIEW{nullptr};
