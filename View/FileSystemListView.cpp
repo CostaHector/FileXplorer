@@ -23,6 +23,8 @@ FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* pa
   setDropIndicatorShown(true);
 
   subscribe();
+
+  setFlow(QListView::Flow::TopToBottom);
 }
 
 void FileSystemListView::subscribe() {
