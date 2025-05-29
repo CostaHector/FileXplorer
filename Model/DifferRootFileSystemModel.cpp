@@ -1,6 +1,6 @@
 #include "DifferRootFileSystemModel.h"
 
-DifferRootFileSystemModel::DifferRootFileSystemModel(QObject* parent)
+DifferRootFileSystemModel::DifferRootFileSystemModel(QObject* /*parent*/)
 {
 
 }
