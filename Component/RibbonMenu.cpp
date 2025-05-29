@@ -227,16 +227,8 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* leafViewWid = new (std::nothrow) QToolBar("Leaf View");
   CHECK_NULLPTR_RETURN_NULLPTR(leafViewWid);
 
-  auto* fileSystemView = new (std::nothrow) QToolBar("Navigation Preview Switch");
+  auto* fileSystemView = g_viewActions().GetFileSystemViewTB(leafViewWid);
   CHECK_NULLPTR_RETURN_NULLPTR(fileSystemView);
-  fileSystemView->setOrientation(Qt::Orientation::Vertical);
-  fileSystemView->addAction(g_viewActions()._LIST_VIEW);
-  fileSystemView->addAction(g_viewActions()._TABLE_VIEW);
-  fileSystemView->addAction(g_viewActions()._TREE_VIEW);
-  fileSystemView->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  fileSystemView->setStyleSheet("QToolBar { max-width: 256px; }");
-  fileSystemView->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  SetLayoutAlightment(fileSystemView->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
   folderPreviewToolBar->setOrientation(Qt::Orientation::Vertical);
@@ -288,6 +280,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
+  SetLayoutAlightment(folderRmv->layout(), Qt::AlignmentFlag::AlignRight);
 
   QToolBar* mediaDupFinder{new (std::nothrow) QToolBar{"Duplicate Medias Finder"}};
   CHECK_NULLPTR_RETURN_NULLPTR(mediaDupFinder);
@@ -298,6 +291,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER);
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._LOW_RESOLUTION_IMGS_RMV);
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
+  SetLayoutAlightment(mediaDupFinder->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto& arrangeIns = g_ArrangeActions();
   QList<QAction*> studiosActions{arrangeIns._EDIT_STUDIOS,  arrangeIns._RELOAD_STUDIOS,  nullptr, arrangeIns._EDIT_PERFS,      arrangeIns._RELOAD_PERFS, nullptr,
