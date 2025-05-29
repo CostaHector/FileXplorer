@@ -36,7 +36,7 @@ SOURCES += \
     Tools/Classify/SceneMixed.cpp \
     Tools/ConflictsItemHelper.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
-    Tools/DuplicateImagesRemover.cpp \
+    Tools/LowResImgsRemover.cpp \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
@@ -88,7 +88,7 @@ HEADERS += \
     Tools/Classify/SceneMixed.h \
     Tools/ConflictsItemHelper.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
-    Tools/DuplicateImagesRemover.h \
+    Tools/LowResImgsRemover.h \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/FolderNxtAndLastIterator.h \

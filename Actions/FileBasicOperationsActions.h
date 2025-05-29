@@ -5,8 +5,7 @@
 #include <QActionGroup>
 #include <QObject>
 
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+struct KV;
 
 class FileBasicOperationsActions : public QObject {
  public:
@@ -20,51 +19,51 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* Get_SELECTION_RIBBON_Action();
 
   QActionGroup* GetOPENActions();
-  QAction *_REVEAL_IN_EXPLORER, *_OPEN_IN_TERMINAL;
-  QActionGroup* OPEN_AG;
+  QAction *_REVEAL_IN_EXPLORER{nullptr}, *_OPEN_IN_TERMINAL{nullptr};
+  QActionGroup* OPEN_AG{nullptr};
 
   QActionGroup* GetCOPY_PATHActions();
-  QAction *COPY_FULL_PATH, *COPY_PATH, *COPY_NAME, *COPY_THE_PATH, *COPY_RECORDS;
-  QActionGroup* COPY_PATH_AG;
+  QAction *COPY_FULL_PATH{nullptr}, *COPY_PATH{nullptr}, *COPY_NAME{nullptr}, *COPY_THE_PATH{nullptr}, *COPY_RECORDS{nullptr};
+  QActionGroup* COPY_PATH_AG{nullptr};
 
   QActionGroup* GetNEWActions();
-  QAction *NEW_FOLDER, *NEW_TEXT_FILE, *NEW_JSON_FILE, *BATCH_NEW_FILES, *BATCH_NEW_FOLDERS;
-  QActionGroup* NEW;
+  QAction *NEW_FOLDER{nullptr}, *NEW_TEXT_FILE{nullptr}, *NEW_JSON_FILE{nullptr}, *BATCH_NEW_FILES{nullptr}, *BATCH_NEW_FOLDERS{nullptr};
+  QActionGroup* NEW{nullptr};
 
   QActionGroup* Get_Advance_Search_Actions();
   QActionGroup* FolderMergeActions();
 
   void FolderFileCategoryProcess();
-  QAction* _NAME_RULER{new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), "Name Ruler")};
-  QAction* _PACK_FOLDERS{new (std::nothrow) QAction(QIcon(":img/PACK_FOLDERS"), "Packer")};
-  QAction* _UNPACK_FOLDERS{new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker")};
-  QAction* _LONG_PATH_FINDER{new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder")};
-  QAction* _DUPLICATE_ITEMS_REMOVER{new (std::nothrow) QAction(QIcon(":img/DEDUPLICATE"), "Deduplicator")};
-  QAction* _RMV_01_FILE_FOLDER{new (std::nothrow) QAction(QIcon(":img/ONE_FILE_IN_ONE_FOLDER"), "Rmv 0/1 file folders")};
-  QAction* _RMV_EMPTY_FOLDER_R{new (std::nothrow) QAction(QIcon(":img/EMPTY_FOLDER"), "Rmv empty folders")};
-  QAction* _RMV_FOLDER_BY_KEYWORD{new (std::nothrow) QAction(QIcon(""), "Rmv folders by keyword")};
-  QAction* _DUPLICATE_VIDEOS_FINDER{new (std::nothrow) QAction(QIcon(":img/DUPLICATE_VIDEOS_FINDER"), "Duplicate Videos Finder")};
-  QAction* _REDUNDANT_IMAGES_FINDER{new (std::nothrow) QAction(QIcon(":img/REDUNDANT_IMAGE_FINDER"), "Useless Images Finder")};
+  QAction* _NAME_RULER{nullptr};
+  QAction* _PACK_FOLDERS{nullptr};
+  QAction* _UNPACK_FOLDERS{nullptr};
+  QAction* _LONG_PATH_FINDER{nullptr};
+  QAction* _RMV_EMPTY_FOLDER_R{nullptr};
+  QAction* _RMV_01_FILE_FOLDER{nullptr};
+  QAction* _RMV_FOLDER_BY_KEYWORD{nullptr};
+  QAction* _DUPLICATE_IMAGES_FINDER{nullptr};
+  QAction* _LOW_RESOLUTION_IMGS_RMV{nullptr};
+  QAction* _DUPLICATE_VIDEOS_FINDER{nullptr};
 
-  QAction *_MOVE_TO, *_COPY_TO;
-  QActionGroup* MOVE_COPY_TO;
-  QActionGroup* MOVE_TO_PATH_HISTORY;
-  QActionGroup* COPY_TO_PATH_HISTORY;
+  QAction *_MOVE_TO{nullptr}, *_COPY_TO{nullptr};
+  QActionGroup* MOVE_COPY_TO{nullptr};
+  QActionGroup* MOVE_TO_PATH_HISTORY{nullptr};
+  QActionGroup* COPY_TO_PATH_HISTORY{nullptr};
 
-  QAction *MOVE_TO_TRASHBIN, *DELETE_PERMANENTLY;
-  QActionGroup* DELETE_ACTIONS;
+  QAction *MOVE_TO_TRASHBIN{nullptr}, *DELETE_PERMANENTLY{nullptr};
+  QActionGroup* DELETE_ACTIONS{nullptr};
 
-  QAction *UNDO_OPERATION, *REDO_OPERATION;
-  QActionGroup* UNDO_REDO_RIBBONS;
+  QAction *UNDO_OPERATION{nullptr}, *REDO_OPERATION{nullptr};
+  QActionGroup* UNDO_REDO_RIBBONS{nullptr};
 
-  QAction *CUT, *COPY, *PASTE;
-  QActionGroup* CUT_COPY_PASTE;
+  QAction *CUT{nullptr}, *COPY{nullptr}, *PASTE{nullptr};
+  QActionGroup* CUT_COPY_PASTE{nullptr};
 
-  QAction *MERGE, *MERGE_REVERSE;
-  QActionGroup* FOLDER_MERGE;
+  QAction *MERGE{nullptr}, *MERGE_REVERSE{nullptr};
+  QActionGroup* FOLDER_MERGE{nullptr};
 
-  QAction *SELECT_ALL, *SELECT_NONE, *SELECT_INVERT;
-  QActionGroup* SELECTION_RIBBONS;
+  QAction *SELECT_ALL{nullptr}, *SELECT_NONE{nullptr}, *SELECT_INVERT{nullptr};
+  QActionGroup* SELECTION_RIBBONS{nullptr};
 };
 
 FileBasicOperationsActions& g_fileBasicOperationsActions();
