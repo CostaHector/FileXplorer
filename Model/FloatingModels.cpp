@@ -42,7 +42,7 @@ int FloatingModels::setDirPath(const QString& path, const QStringList& sFilters,
   foreach (QString name, dir.entryList()) {
     datas.append(path + '/' + name);
   }
-  ImagesNameSort(datas);
+  ImgsSortNameLengthFirst(datas);
   if (loadAllIn1Time) {
     UpdateData(datas);
   } else {

@@ -76,7 +76,7 @@ RedundantParentFolder
     //  - randomFile.txt
     const QString EMPTY_TEST_DIR = mTestPath + "/EmptyFolder";
     QCOMPARE(QDir(EMPTY_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 3);
-    EmptyFolderRemove efr;
+    EmptyFolderRmv efr;
     const int recycleCmdCnt = efr(EMPTY_TEST_DIR);
     QCOMPARE(recycleCmdCnt, 2);
     QCOMPARE(efr.m_cmds.size(), 2);
@@ -94,7 +94,7 @@ RedundantParentFolder
     const QString REDUN_PARENT_TEST_DIR = mTestPath + "/RedundantParentFolder";
     QCOMPARE(QDir(REDUN_PARENT_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 2);
 
-    RedunParentFolderRem rpfr;
+    ZeroOrOneItemFolderProc rpfr;
     const int cmdCnt = rpfr(REDUN_PARENT_TEST_DIR);
     QCOMPARE(cmdCnt, 2);
     QCOMPARE(rpfr.m_cmds.size(), 2);
@@ -110,17 +110,17 @@ RedundantParentFolder
     QCOMPARE(QDir(KEYWORD_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 3);
     int recycleCmdCnt = -1;
 
-    RedundantItemsRemoverByKeyword rirbkFalcon{"Falcon"};
+    FolderNameContainKeyRmv rirbkFalcon{"Falcon"};
     recycleCmdCnt = rirbkFalcon(KEYWORD_TEST_DIR);
     QCOMPARE(recycleCmdCnt, 1);
     QCOMPARE(rirbkFalcon.m_cmds.size(), 1);
 
-    RedundantItemsRemoverByKeyword rirbkRaging{"Fox"};
+    FolderNameContainKeyRmv rirbkRaging{"Fox"};
     recycleCmdCnt = rirbkRaging(KEYWORD_TEST_DIR);
     QCOMPARE(recycleCmdCnt, 0);
     QVERIFY(rirbkRaging.m_cmds.isEmpty());
 
-    RedundantItemsRemoverByKeyword rirbkKristen{"Marvel"};
+    FolderNameContainKeyRmv rirbkKristen{"Marvel"};
     recycleCmdCnt = rirbkKristen(KEYWORD_TEST_DIR);
     QCOMPARE(recycleCmdCnt, 0);
     QVERIFY(rirbkKristen.m_cmds.isEmpty());

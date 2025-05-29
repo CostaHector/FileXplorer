@@ -7,7 +7,7 @@ SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {
   return ins;
 }
 
-SyncFileSystemModificationActions::SyncFileSystemModificationActions(QObject* parent) {
+SyncFileSystemModificationActions::SyncFileSystemModificationActions(QObject* /*parent*/) {
   _SYNC_MOD_SWITCH->setCheckable(true);
   _SYNC_REVERSE_SWITCH->setCheckable(true);
 
