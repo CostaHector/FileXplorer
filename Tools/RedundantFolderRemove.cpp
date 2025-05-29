@@ -1,12 +1,34 @@
 #include "RedundantFolderRemove.h"
 #include "public/PublicVariable.h"
+#include "public/UndoRedo.h"
+#include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
 #include <cmath>
-using namespace FileOperatorType;
-constexpr int RedunParentFolderRem::TOLERANCE_LETTER_CNT;
 
-auto RedunParentFolderRem::CleanEmptyFolderCore(const QString& folderPath) -> int {
+int RedundantRmv::operator()(const QString& path) {
+  QFileInfo fi(path);
+  if (!fi.isDir()) {
+    qWarning("path[%s] is not a directory", qPrintable(path));
+    return 0;
+  }
+  return CleanEmptyFolderCore(fi.absoluteFilePath());
+}
+
+bool RedundantRmv::Exec() {
+  if (m_cmds.isEmpty()) {
+    qDebug("nothing to remove");
+    return true;
+  }
+  const bool isAllSucceed = g_undoRedo.Do(m_cmds);
+  m_cmds.clear();
+  return isAllSucceed;
+}
+
+using namespace FileOperatorType;
+constexpr int ZeroOrOneItemFolderProc::TOLERANCE_LETTER_CNT;
+
+auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) -> int {
   m_cmds.clear();
   if (!QFileInfo(folderPath).isDir()) {
     qDebug("Path[%s] is not a folder", qPrintable(folderPath));
@@ -40,7 +62,7 @@ auto RedunParentFolderRem::CleanEmptyFolderCore(const QString& folderPath) -> in
   return m_cmds.size();
 }
 
-auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
+auto EmptyFolderRmv::CleanEmptyFolderCore(const QString& folderPath) -> int {
   // as recursive calling, m_cmds will not clean automatically
   QDir dir(folderPath);
   if (dir.isEmpty()) {
@@ -55,7 +77,7 @@ auto EmptyFolderRemove::CleanEmptyFolderCore(const QString& folderPath) -> int {
   return totalCount;
 }
 
-auto RedundantItemsRemoverByKeyword::CleanEmptyFolderCore(const QString& folderPath) -> int {
+auto FolderNameContainKeyRmv::CleanEmptyFolderCore(const QString& folderPath) -> int {
   m_cmds.clear();
   const auto isFolderNeedRecycle = [](const QString& subfolderPath) -> bool {
     // contains directory =>no recycle
