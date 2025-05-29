@@ -1,58 +1,71 @@
 #include "FileBasicOperationsActions.h"
+#include "public/MemoryKey.h"
+#include "public/PublicVariable.h"
 #include <QApplication>
 #include <QStyle>
-#include "public/MemoryKey.h"
 
 FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
-    : QObject(parent),
-      _REVEAL_IN_EXPLORER{new(std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this)},
-      _OPEN_IN_TERMINAL{new(std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this)},
-      OPEN_AG(GetOPENActions()),
+    : QObject(parent)  //
+{
+  _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this);
+  _OPEN_IN_TERMINAL = new (std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this);
+  OPEN_AG = GetOPENActions();
 
-      COPY_FULL_PATH{new(std::nothrow) QAction(QIcon(":img/COPY_FULL_PATH"), "Copy fullpath")},
-      COPY_PATH{new(std::nothrow) QAction(QIcon(":img/COPY_PATH"), "Copy path")},
-      COPY_NAME{new(std::nothrow) QAction(QIcon(":img/COPY_NAME"), "Copy name")},
+  COPY_FULL_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_FULL_PATH"), "Copy fullpath");
+  COPY_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_PATH"), "Copy path");
+  COPY_NAME = new (std::nothrow) QAction(QIcon(":img/COPY_NAME"), "Copy name");
 
-      COPY_THE_PATH{new(std::nothrow) QAction(QIcon(":img/COPY_THE_PATH"), "Copy the path")},
-      COPY_RECORDS{new(std::nothrow) QAction(QIcon(":img/COPY_RECORD"), "Copy records")},
-      COPY_PATH_AG(GetCOPY_PATHActions()),
-      NEW_FOLDER{new(std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), "New folder")},
+  COPY_THE_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_THE_PATH"), "Copy the path");
+  COPY_RECORDS = new (std::nothrow) QAction(QIcon(":img/COPY_RECORD"), "Copy records");
+  COPY_PATH_AG = GetCOPY_PATHActions();
+  NEW_FOLDER = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), "New folder");
 
-      NEW_TEXT_FILE{new(std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), "New text")},
-      NEW_JSON_FILE{new(std::nothrow) QAction(QIcon(":img/NEW_JSON_FILE"), "New json")},
-      BATCH_NEW_FILES{new(std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), "New Files")},
+  NEW_TEXT_FILE = new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), "New text");
+  NEW_JSON_FILE = new (std::nothrow) QAction(QIcon(":img/NEW_JSON_FILE"), "New json");
+  BATCH_NEW_FILES = new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), "New Files");
 
-      BATCH_NEW_FOLDERS{new(std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), "New Folders")},
-      NEW(GetNEWActions()),
+  BATCH_NEW_FOLDERS = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), "New Folders");
+  NEW = GetNEWActions();
 
-      _MOVE_TO{new(std::nothrow) QAction(QIcon(":img/MV_TO_COMMAND_PATH"), "Move to")},
-      _COPY_TO{new(std::nothrow) QAction(QIcon(":img/CP_TO_COMMAND_PATH"), "Copy to")},
-      MOVE_COPY_TO(GetMOVE_COPY_TOActions()),
+  _MOVE_TO = new (std::nothrow) QAction(QIcon(":img/MV_TO_COMMAND_PATH"), "Move to");
+  _COPY_TO = new (std::nothrow) QAction(QIcon(":img/CP_TO_COMMAND_PATH"), "Copy to");
+  MOVE_COPY_TO = GetMOVE_COPY_TOActions();
 
-      MOVE_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY)),
-      COPY_TO_PATH_HISTORY(GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY)),
+  MOVE_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY);
+  COPY_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY);
 
-      MOVE_TO_TRASHBIN{new(std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle")},
-      DELETE_PERMANENTLY{new(std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently")},
-      DELETE_ACTIONS(GetDeleteActions()),
+  MOVE_TO_TRASHBIN = new (std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle");
+  DELETE_PERMANENTLY = new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently");
+  DELETE_ACTIONS = GetDeleteActions();
 
-      UNDO_OPERATION{new(std::nothrow) QAction(QIcon(":img/UNDO"), "Undo", this)},
-      REDO_OPERATION{new(std::nothrow) QAction(QIcon(":img/REDO"), "Redo", this)},
-      UNDO_REDO_RIBBONS(Get_UNDO_REDO_OPERATIONS_Actions()),
+  UNDO_OPERATION = new (std::nothrow) QAction(QIcon(":img/UNDO"), "Undo", this);
+  REDO_OPERATION = new (std::nothrow) QAction(QIcon(":img/REDO"), "Redo", this);
+  UNDO_REDO_RIBBONS = Get_UNDO_REDO_OPERATIONS_Actions();
 
-      CUT{new(std::nothrow) QAction(QIcon(":img/CUT_ITEM"), "Cut")},
-      COPY{new(std::nothrow) QAction(QIcon(":img/COPY_ITEM"), "Copy")},
-      PASTE{new(std::nothrow) QAction(QIcon(":img/PASTE_ITEM"), "Paste")},
-      CUT_COPY_PASTE(Get_CUT_COPY_PASTE_OPERATIONS_Actions()),
+  CUT = new (std::nothrow) QAction(QIcon(":img/CUT_ITEM"), "Cut");
+  COPY = new (std::nothrow) QAction(QIcon(":img/COPY_ITEM"), "Copy");
+  PASTE = new (std::nothrow) QAction(QIcon(":img/PASTE_ITEM"), "Paste");
+  CUT_COPY_PASTE = Get_CUT_COPY_PASTE_OPERATIONS_Actions();
 
-      MERGE{new(std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), "Merged to front")},
-      MERGE_REVERSE{new(std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), "Merge to back")},
-      FOLDER_MERGE(FolderMergeActions()),
+  MERGE = new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), "Merged to front");
+  MERGE_REVERSE = new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), "Merge to back");
+  FOLDER_MERGE = FolderMergeActions();
 
-      SELECT_ALL{new(std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all")},
-      SELECT_NONE{new(std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none")},
-      SELECT_INVERT{new(std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), "Invert selection")},
-      SELECTION_RIBBONS(Get_SELECTION_RIBBON_Action()) {
+  SELECT_ALL = new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all");
+  SELECT_NONE = new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none");
+  SELECT_INVERT = new (std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), "Invert selection");
+  SELECTION_RIBBONS = Get_SELECTION_RIBBON_Action();
+
+  _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), "Name Ruler");
+  _PACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/PACK_FOLDERS"), "Packer");
+  _UNPACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker");
+  _LONG_PATH_FINDER = new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder");
+  _RMV_EMPTY_FOLDER_R = new (std::nothrow) QAction(QIcon(":img/EMPTY_FOLDER"), "Rmv empty folders");
+  _RMV_01_FILE_FOLDER = new (std::nothrow) QAction("Rmv 0/1 file folders");
+  _RMV_FOLDER_BY_KEYWORD = new (std::nothrow) QAction("Rmv folders by keyword");
+  _DUPLICATE_IMAGES_FINDER = new (std::nothrow) QAction(QIcon(":img/DUPLICATE_IMAGES_FINDER"), "Duplicate Images Finder");
+  _LOW_RESOLUTION_IMGS_RMV = new (std::nothrow) QAction(QIcon(":img/LOW_RESOLUTION_IMGS_RMV"), "Low resolution imgs Rmv");
+  _DUPLICATE_VIDEOS_FINDER = new (std::nothrow) QAction(QIcon(":img/DUPLICATE_VIDEOS_FINDER"), "Duplicate Videos Finder");
   FolderFileCategoryProcess();
 }
 
@@ -281,8 +294,8 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
   _LONG_PATH_FINDER->setToolTip(
       "<b>Long path finder</b><br/>"
       "find out all too long path(s), then chop one section from full path, say the second to last section");
-  _DUPLICATE_ITEMS_REMOVER->setToolTip(
-      "<b>Remove Files/Folders whose names with a certern pattern under current view path</b><br/>"
+  _LOW_RESOLUTION_IMGS_RMV->setToolTip(
+      "<b>Remove Files/Folders whose names in specified pattern under current view path</b><br/>"
       "NAME - {$resolution}.FILETYPE<br/>"
       "It work for any file name meet following resolution pattern.<br/>"
       "Given: [A - 480p, A - 720p, A - 1080p, A - 2160p, A - 4K]<br/>"
@@ -291,25 +304,24 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
   _RMV_01_FILE_FOLDER->setToolTip(
       "<b>Remove empty folders or 1 file folders under current view path</b><br/>"
       "1. Delete empty folders;<br/>"
-      "2. If a folder contains only a SINGLE file and the difference between the file name length and the folder name length <= 5 characters,<br/>"
-      "first move the file up one level (to the parent directory) and then delete the folder.");
+      "2. If a folder contains only a SINGLE file and the difference between the file name length and the folder name length <= 5 characters.<br/>"
+      "Move the file up one level (to the parent directory) and then delete the folder.");
   _RMV_EMPTY_FOLDER_R->setToolTip(
       "<b>Remove Empty folders under current view path recusively</b><br/>"
       "Only Empty folder will be removed");
   _RMV_FOLDER_BY_KEYWORD->setToolTip(
       "<b>Remove folders whose name contain the specified keyword under current view path </b><br/>"
-      "1. skip if folder contains sub directory;"
-      "2. skip if folder items count;"
+      "1. skip if folder contains sub directory;<br/>"
+      "2. skip if folder items count > 10;<br/>"
       "3. skip if folder contains videos;");
   _DUPLICATE_VIDEOS_FINDER->setToolTip(
       "<b>Differ videos by duration or filesize</b><br/>"
-      "to let it easy to find duplicate one");
+      "Let it easy to find duplicate videos from videos size/duration/file name dimension.");
   _DUPLICATE_VIDEOS_FINDER->setCheckable(true);
-
-  _REDUNDANT_IMAGES_FINDER->setToolTip(
-      "<b>Find empty or redundant images</b>"
-      "to let it easy to find duplicate one");
-  _REDUNDANT_IMAGES_FINDER->setCheckable(true);
+  _DUPLICATE_IMAGES_FINDER->setToolTip(
+      "<b>Find empty or duplicate images</b><br/>"
+      "Let it easy to operate on empty or duplicate(already exist) images");
+  _DUPLICATE_IMAGES_FINDER->setCheckable(true);
 }
 
 FileBasicOperationsActions& g_fileBasicOperationsActions() {
