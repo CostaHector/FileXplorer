@@ -21,8 +21,6 @@ FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* pa
   setDropIndicatorShown(true);
 
   FileSystemTreeView::subscribe();
-
-  setStyleSheet(ViewStyleSheet::GetDefaultTreeViewStyleSheet());
 }
 
 void FileSystemTreeView::subscribe() {
