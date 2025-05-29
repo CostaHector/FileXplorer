@@ -12,8 +12,8 @@
 class ArchiverModel : public QAbstractTableModelPub {
  public:
   explicit ArchiverModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
-  int rowCount(const QModelIndex& parent = {}) const override { return m_paf != nullptr ? m_paf->size() : 0; }
-  int columnCount(const QModelIndex& parent = {}) const override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
+  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return m_paf != nullptr ? m_paf->size() : 0; }
+  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
     if (m_paf == nullptr or not index.isValid()) {
       return QVariant();

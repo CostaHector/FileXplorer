@@ -140,7 +140,7 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
   return true;
 }
 
-auto ContentPanel::on_searchEnterKey(const QString& targetStr) -> bool {
+auto ContentPanel::on_searchEnterKey(const QString& /*targetStr*/) -> bool {
   const ViewTypeTool::ViewType vt{GetCurViewType()};
   switch (vt) {
     case ViewType::LIST:
@@ -312,7 +312,7 @@ void ContentPanel::connectSelectionChanged(ViewTypeTool::ViewType vt) {
       ContentPanel::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
       break;
     default:
-      qDebug("selection changed signal connect skip. current view type[%d]", vt);
+      qDebug("selection changed signal connect skip. current view type[%d]", (int)vt);
   }
 }
 void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
@@ -327,7 +327,7 @@ void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
       ContentPanel::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
       break;
     default:
-      qDebug("selection changed signal disconnect skip. current view type[%d]", vt);
+      qDebug("selection changed signal disconnect skip. current view type[%d]", (int)vt);
   }
 }
 
