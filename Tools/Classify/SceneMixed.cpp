@@ -129,7 +129,7 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
   }
 
   for (QStringList& imgs : m_img2Name) {
-    ImagesNameSort(imgs);
+    ImgsSortNameLengthFirst(imgs);
   }
 
   qDebug("%d,%d,%d piles of img/vid/json found from %d item(s) given", m_img2Name.size(), m_vid2Name.size(), m_json2Name.size(), files.size());
