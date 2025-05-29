@@ -53,7 +53,7 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
 
   m_imgModel->setRootPath(&m_imgsBunch);
 
-  setWindowIcon(QIcon(":img/REDUNDANT_IMAGE_FINDER"));
+  setWindowIcon(QIcon(":img/DUPLICATE_IMAGES_FINDER"));
   setWindowTitle("Redundant Images Finder");
 
   mRedunLibs.LearnSizeAndHashFromRedunImgPath(mRedunLibs.GetRedunPath());
@@ -71,7 +71,7 @@ void RedundantImageFinder::ReadSetting() {
 }
 
 void RedundantImageFinder::closeEvent(QCloseEvent* event) {
-  g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER->setChecked(false);
+  g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER->setChecked(false);
   PreferenceSettings().setValue(RedunImgFinderKey::GEOMETRY.name, saveGeometry());
   QMainWindow::closeEvent(event);
 }
