@@ -148,7 +148,7 @@ int PerfBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
     }
   }
   for (auto it = name2Imgs.begin(); it != name2Imgs.end(); ++it) {
-    ImagesNameSort(it.value());
+    ImgsSortNameLengthFirst(it.value());
   }
 
   static const QString PERF_PH{':' + PERFORMER_DB_HEADER_KEY::Name};

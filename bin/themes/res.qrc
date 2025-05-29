@@ -17,14 +17,15 @@
 <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF">LOG/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF.svg</file>
 
 <!--Media icon here-->
+<file alias="DUPLICATE_IMAGES_FINDER">Media/DUPLICATE_IMAGES_FINDER.png</file>
+<file alias="LOW_RESOLUTION_IMGS_RMV">Media/LOW_RESOLUTION_IMGS_RMV.svg</file>
+<file alias="DUPLICATE_VIDEOS_FINDER">Media/DUPLICATE_VIDEOS_FINDER.png</file>
 <file alias="FULL_CALCULATE">Media/FULL_CALCULATE.png</file>
 <file alias="INCREMENTAL_CALCULATE">Media/INCREMENTAL_CALCULATE.png</file>
 <file alias="UPDATE_JSON_THEN_SCN">Media/UPDATE_JSON_THEN_SCN.svg</file>
 <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
 <file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
-<file alias="DEDUPLICATE">Media/DEDUPLICATE.png</file>
 <file alias="EMPTY_FOLDER">Media/EMPTY_FOLDER.svg</file>
-<file alias="ONE_FILE_IN_ONE_FOLDER">Media/ONE_FILE_IN_ONE_FOLDER.svg</file>
 <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
 <file alias="PACK_FOLDERS">Media/PACK_FOLDERS.svg</file>
 <file alias="UNPACK_FOLDERS">Media/UNPACK_FOLDERS.svg</file>
@@ -234,8 +235,6 @@
 <!--View icon here-->
 <file alias="UNDO">View/UNDO.svg</file>
 <file alias="REDO">View/REDO.svg</file>
-<file alias="DUPLICATE_VIDEOS_FINDER">View/DUPLICATE_VIDEOS_FINDER.png</file>
-<file alias="REDUNDANT_IMAGE_FINDER">View/REDUNDANT_IMAGE_FINDER.png</file>
 <file alias="DISPLAY_DETAIL_INFOMATIONS">View/DISPLAY_DETAIL_INFOMATIONS.png</file>
 <file alias="DISPLAY_LARGE_THUMBNAILS">View/DISPLAY_LARGE_THUMBNAILS.png</file>
 <file alias="DISPLAY_TREE_VIEW">View/DISPLAY_TREE_VIEW.svg</file>

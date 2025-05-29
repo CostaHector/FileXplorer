@@ -44,7 +44,7 @@
 #include "Tools/ArchiveFiles.h"
 #include "Tools/Classify/ItemsClassifier.h"
 #include "Tools/CopyItemPropertiesToClipboardIF.h"
-#include "Tools/DuplicateImagesRemover.h"
+#include "Tools/LowResImgsRemover.h"
 #include "Tools/FilesNameBatchStandardizer.h"
 #include "Tools/Json/JsonHelper.h"
 #include "Tools/MimeDataCX.h"
@@ -57,6 +57,7 @@
 #include "public/OnCheckedPopupOrHideAWidget.h"
 #include "public/PublicTool.h"
 #include "public/MemoryKey.h"
+#include "public/UndoRedo.h"
 
 using namespace ViewTypeTool;
 
@@ -471,22 +472,22 @@ void FileExplorerEvent::subscribe() {
     auto* _NAME_RULER = g_fileBasicOperationsActions()._NAME_RULER;
     auto* _PACK_FOLDERS = g_fileBasicOperationsActions()._PACK_FOLDERS;
     auto* _UNPACK_FOLDERS = g_fileBasicOperationsActions()._UNPACK_FOLDERS;
-    auto* _DUPLICATE_ITEMS_REMOVER = g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER;
+    auto* _LOW_RESOLUTION_IMGS_RMV = g_fileBasicOperationsActions()._LOW_RESOLUTION_IMGS_RMV;
     auto* _RMV_01_FILE_FOLDER = g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER;
     auto* _REMOVE_EMPTY_FOLDER = g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R;
     auto* _REMOVE_FOLDER_BY_KEYWORD = g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD;
     auto* _DUPLICATE_VIDEOS_FINDER = g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER;
-    auto* _REDUNDANT_IMAGES_FINDER = g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER;
+    auto* _DUPLICATE_IMAGES_FINDER = g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER;
     connect(_NAME_RULER, &QAction::triggered, this, &FileExplorerEvent::on_NameStandardize);
     connect(_PACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileClassify);
     connect(_UNPACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileUnclassify);
-    connect(_DUPLICATE_ITEMS_REMOVER, &QAction::triggered, this, &FileExplorerEvent::on_RemoveDuplicateImages);
+    connect(_LOW_RESOLUTION_IMGS_RMV, &QAction::triggered, this, &FileExplorerEvent::on_RemoveDuplicateImages);
     connect(_RMV_01_FILE_FOLDER, &QAction::triggered, this, [this]() {
-      RedunParentFolderRem rfr;
+      ZeroOrOneItemFolderProc rfr;
       FileExplorerEvent::on_RemoveRedundantItem(rfr);
     });
     connect(_REMOVE_EMPTY_FOLDER, &QAction::triggered, this, [this]() {
-      EmptyFolderRemove efr;
+      EmptyFolderRmv efr;
       FileExplorerEvent::on_RemoveRedundantItem(efr);
     });
     connect(_REMOVE_FOLDER_BY_KEYWORD, &QAction::triggered, this, [this]() {
@@ -495,7 +496,7 @@ void FileExplorerEvent::subscribe() {
         QMessageBox::warning(_contentPane, "Ignore", "keyword too short:" + keyword);
         return;
       }
-      RedundantItemsRemoverByKeyword rirbk{keyword};
+      FolderNameContainKeyRmv rirbk{keyword};
       FileExplorerEvent::on_RemoveRedundantItem(rirbk);
     });
     connect(_DUPLICATE_VIDEOS_FINDER, &QAction::triggered, this,                                                                 //
@@ -505,7 +506,7 @@ void FileExplorerEvent::subscribe() {
                 (*m_duplicateVideosFinder)(_contentPane->getRootPath());                                                         //
               }
             });
-    connect(_REDUNDANT_IMAGES_FINDER, &QAction::triggered, this,                                                              //
+    connect(_DUPLICATE_IMAGES_FINDER, &QAction::triggered, this,                                                              //
             [this](const bool checked) {                                                                                      //
               m_redundantImageFinder = PopupHideWidget<RedundantImageFinder>(m_redundantImageFinder, checked, _contentPane);  //
               if (checked) {                                                                                                  //
@@ -1250,7 +1251,7 @@ bool FileExplorerEvent::on_FileUnclassify() {
 }
 
 bool FileExplorerEvent::on_RemoveDuplicateImages() {
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     qDebug("[on_RemoveDuplicateImages] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     Notificator::information("[on_RemoveDuplicateImages] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
     return false;
@@ -1267,7 +1268,7 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
       _logger->msg("User Cancel remove", STATUS_STR_TYPE::NORMAL);
     return false;
   }
-  int removedCnt = DuplicateImagesRemover()(currentPath);
+  int removedCnt = LowResImgsRemover()(currentPath);
   if (_logger) {
     _logger->msg(QString("Remove duplicate %1 image(s) Finished").arg(removedCnt), STATUS_STR_TYPE::NORMAL);
     _logger->SetProgressValue(100);
