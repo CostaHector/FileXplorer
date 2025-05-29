@@ -1,6 +1,6 @@
 #include "ThumbnailProcessActions.h"
 
-ThumbnailProcessActions::ThumbnailProcessActions(QObject* parent) {
+ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
   _EXTRACT_1ST_IMG = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_1"), "Thumbnail Extractor");
   _EXTRACT_1ST_IMG->setToolTip("Extract the 1st image from thumbnails under current view path");
   _EXTRACT_2ND_IMGS = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_2"), "Extract [0, 2) imgs");

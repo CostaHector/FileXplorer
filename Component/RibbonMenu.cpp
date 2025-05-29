@@ -285,8 +285,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
   folderRmv->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
+  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
 
   QToolBar* mediaDupFinder{new (std::nothrow) QToolBar{"Duplicate Medias Finder"}};
@@ -295,8 +295,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mediaDupFinder->setStyleSheet("QToolBar { max-width: 256px; }");
   mediaDupFinder->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_ITEMS_REMOVER);
-  mediaDupFinder->addAction(g_fileBasicOperationsActions()._REDUNDANT_IMAGES_FINDER);
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER);
+  mediaDupFinder->addAction(g_fileBasicOperationsActions()._LOW_RESOLUTION_IMGS_RMV);
   mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
 
   auto& arrangeIns = g_ArrangeActions();
