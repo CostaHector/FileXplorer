@@ -90,5 +90,5 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
 
   SET_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_SET"), "Set Tags", this);
   APPEND_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_APPEND"), "Add Tags", this);
-  REMOVE_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_REMOVE"), "Rmv Tags", this);
+  REMOVE_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_REMOVE"), "Rmv Tag", this);
 }
