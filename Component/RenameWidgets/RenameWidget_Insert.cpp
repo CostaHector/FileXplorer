@@ -50,15 +50,21 @@ void RenameWidget_Insert::InitExtraCommonVariable() {
 }
 
 QToolBar* RenameWidget_Insert::InitControlTB() {
-  QToolBar* replaceControl = new QToolBar;
-  replaceControl->addWidget(new QLabel("String:"));
-  replaceControl->addWidget(insertStrCB);
-  replaceControl->addWidget(new QLabel("Index:"));
-  replaceControl->addWidget(insertAtCB);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(m_extensionInNameCB);
-  replaceControl->addWidget(m_recursiveCB);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(regexValidLabel);
-  return replaceControl;
+  QToolBar* insertControlTb{new (std::nothrow) QToolBar{"Insert string", this}};
+  CHECK_NULLPTR_RETURN_NULLPTR(insertControlTb);
+  auto* insertStringLabel = new (std::nothrow) QLabel{"String:", insertControlTb};
+  CHECK_NULLPTR_RETURN_NULLPTR(insertStringLabel);
+  auto* insertAtLabel = new (std::nothrow) QLabel{"Index:", insertControlTb};
+  CHECK_NULLPTR_RETURN_NULLPTR(insertAtLabel);
+
+  insertControlTb->addWidget(insertStringLabel);
+  insertControlTb->addWidget(insertStrCB);
+  insertControlTb->addWidget(insertAtLabel);
+  insertControlTb->addWidget(insertAtCB);
+  insertControlTb->addSeparator();
+  insertControlTb->addWidget(m_nameExtIndependent);
+  insertControlTb->addWidget(m_recursiveCB);
+  insertControlTb->addSeparator();
+  insertControlTb->addWidget(regexValidLabel);
+  return insertControlTb;
 }
