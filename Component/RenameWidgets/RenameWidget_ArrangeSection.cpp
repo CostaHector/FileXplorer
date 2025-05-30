@@ -1,5 +1,6 @@
 #include "RenameWidget_ArrangeSection.h"
 #include "Component/Notificator.h"
+#include "public/PublicMacro.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "Tools/NameSectionArrange.h"
@@ -28,13 +29,15 @@ RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
   m_indexes->setLineEdit(m_2IndexesInput);
   m_indexes->setEditable(true);
   m_indexes->setCompleter(nullptr);
+  m_indexes->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   m_sectionsUsedToJoin->setCompleter(nullptr);
   m_sectionsUsedToJoin->setEditable(true);
   m_sectionsUsedToJoin->setToolTip("Section join with user input sequence");
+  m_sectionsUsedToJoin->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  m_extensionInNameCB->setEnabled(false);
-  m_extensionInNameCB->setChecked(false);
+  m_nameExtIndependent->setEnabled(false);
+  m_nameExtIndependent->setChecked(false);
 
   m_strictMode->setCheckable(true);
   m_strictMode->setChecked(true);
@@ -108,20 +111,19 @@ void RenameWidget_ArrangeSection::InitExtraCommonVariable() {
 }
 
 QToolBar* RenameWidget_ArrangeSection::InitControlTB() {
-  QToolBar* replaceControl(new QToolBar);
+  QToolBar* arrangeControlTb{new (std::nothrow) QToolBar{"section arrange", this}};
+  CHECK_NULLPTR_RETURN_NULLPTR(arrangeControlTb);
   auto& inst = ArrangeSectionActions::GetInst();
-  replaceControl->addAction(inst._SWAP_SECTION_AT_2_INDEXES);
-  replaceControl->addWidget(m_indexes);
-  replaceControl->addSeparator();
-  replaceControl->addAction(inst._SECTION_JOIN_WITH_SELECT_INDEXES);
-  replaceControl->addWidget(m_sectionsUsedToJoin);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(m_strictMode);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(m_recursiveCB);
-  replaceControl->addWidget(m_extensionInNameCB);
-  replaceControl->addWidget(regexValidLabel);
-  m_indexes->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  m_sectionsUsedToJoin->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  return replaceControl;
+  arrangeControlTb->addAction(inst._SWAP_SECTION_AT_2_INDEXES);
+  arrangeControlTb->addWidget(m_indexes);
+  arrangeControlTb->addSeparator();
+  arrangeControlTb->addAction(inst._SECTION_JOIN_WITH_SELECT_INDEXES);
+  arrangeControlTb->addWidget(m_sectionsUsedToJoin);
+  arrangeControlTb->addSeparator();
+  arrangeControlTb->addWidget(m_strictMode);
+  arrangeControlTb->addSeparator();
+  arrangeControlTb->addWidget(m_recursiveCB);
+  arrangeControlTb->addWidget(m_nameExtIndependent);
+  arrangeControlTb->addWidget(regexValidLabel);
+  return arrangeControlTb;
 }

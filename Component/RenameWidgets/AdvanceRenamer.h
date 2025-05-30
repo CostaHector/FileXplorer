@@ -32,10 +32,11 @@ class AdvanceRenamer : public QDialog {
   bool onApply(const bool isOnlyHelp = false, const bool isInterative = false);
   void onRegex(const int regexState);
   void onIncludingSub(int includingSubState);
-  void onIncludeSuffix(int includingSuffixState);
+  void onNameExtRespective(int includingSuffixState);
 
   virtual void FilterNames(FileOsWalker& /*walker*/) const {};
-  void InitTextContent(const QString& p, const QStringList& r);
+  void UpdateNameAndExt();
+  void InitTextEditContent(const QString& workPath, const QStringList& selectedNames);
   void OnlyTriggerRenameCore();
 
   virtual void InitExtraCommonVariable() = 0;
@@ -47,11 +48,12 @@ class AdvanceRenamer : public QDialog {
  public:
   QString windowTitleFormat;
 
-  QString m_pre;
-  QStringList rels;
-  QStringList completeNames;
+  QString mWorkPath;
+  QStringList mSelectedNames;
+  QStringList mNames;  // with extension or without
+  QStringList mExts;   // dot and extension
 
-  QCheckBox* m_extensionInNameCB{nullptr};
+  QCheckBox* m_nameExtIndependent{nullptr};
   QCheckBox* m_recursiveCB{nullptr};
   StateLabel* regexValidLabel{nullptr};
 
@@ -65,11 +67,13 @@ class AdvanceRenamer : public QDialog {
 
   QDialogButtonBox* m_buttonBox{nullptr};
 
-  QToolBar* m_replaceControlBar{nullptr};
+  QToolBar* m_controlBar{nullptr};
   QHBoxLayout* m_nameEditLayout{nullptr};
   QVBoxLayout* m_mainLayout{nullptr};
 
   QPlainTextEdit* m_commandsPreview{nullptr};
+
+  static constexpr char NAME_SEP = '\n';
 };
 
 #endif  // ADVANCERENAMER_H
