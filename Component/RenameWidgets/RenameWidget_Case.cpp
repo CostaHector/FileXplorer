@@ -1,6 +1,7 @@
 #include "RenameWidget_Case.h"
 #include "Tools/NameTool.h"
 #include "Actions/RenameActions.h"
+#include "public/PublicMacro.h"
 
 typedef enum tagRENAME_CASE_E {
   UPPER_CASE = 0,
@@ -62,13 +63,14 @@ void RenameWidget_Case::InitExtraCommonVariable() {
 }
 
 QToolBar* RenameWidget_Case::InitControlTB() {
-  QToolBar* replaceControl{new QToolBar};
-  replaceControl->addActions(g_renameAg().NAME_CASE->actions());
-  replaceControl->addSeparator();
-  replaceControl->addWidget(m_extensionInNameCB);
-  replaceControl->addWidget(m_recursiveCB);
-  replaceControl->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  return replaceControl;
+  QToolBar* caseControlTb{new (std::nothrow) QToolBar{"Case", this}};
+  CHECK_NULLPTR_RETURN_NULLPTR(caseControlTb);
+  caseControlTb->addActions(g_renameAg().NAME_CASE->actions());
+  caseControlTb->addSeparator();
+  caseControlTb->addWidget(m_nameExtIndependent);
+  caseControlTb->addWidget(m_recursiveCB);
+  caseControlTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  return caseControlTb;
 }
 
 void RenameWidget_Case::extraSubscribe() {                   //
