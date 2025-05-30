@@ -1,11 +1,13 @@
 #include "RenameWidget_ConvertBoldUnicodeCharset2Ascii.h"
 #include "Tools/ConvertUnicodeCharsetToAscii.h"
+#include "public/PublicMacro.h"
 
 QToolBar* RenameWidget_ConvertBoldUnicodeCharset2Ascii::InitControlTB() {
-  QToolBar* replaceControl = new QToolBar;
-  replaceControl->addWidget(m_extensionInNameCB);
-  replaceControl->addWidget(m_recursiveCB);
-  return replaceControl;
+  QToolBar* unicode2AsciiTb = new QToolBar{"Unicode 2 ASCII", this};
+  CHECK_NULLPTR_RETURN_NULLPTR(unicode2AsciiTb);
+  unicode2AsciiTb->addWidget(m_nameExtIndependent);
+  unicode2AsciiTb->addWidget(m_recursiveCB);
+  return unicode2AsciiTb;
 }
 
 QStringList RenameWidget_ConvertBoldUnicodeCharset2Ascii::RenameCore(const QStringList& replaceeList) {
