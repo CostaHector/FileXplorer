@@ -7,7 +7,6 @@
 #include "Actions/ArrangeActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/FileLeafAction.h"
-#include "Actions/JsonActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "Actions/SyncFileSystemModificationActions.h"
@@ -637,7 +636,7 @@ void FileExplorerEvent::onRename(AdvanceRenamer* renameWid) {
   }
   renameWid->init();
   renameWid->show();
-  renameWid->InitTextContent(filePath, preNames);
+  renameWid->InitTextEditContent(filePath, preNames);
   renameWid->exec();
 
   if (preNames.size() > 100) {
