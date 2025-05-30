@@ -5,7 +5,8 @@
 #include "public/PublicMacro.h"
 
 RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
-    : AdvanceRenamer(parent) {
+    : AdvanceRenamer{parent}                                 //
+{
   m_oldStrCB = new (std::nothrow) QComboBox;
   CHECK_NULLPTR_RETURN_VOID(m_oldStrCB)
   m_newStrCB = new (std::nothrow) QComboBox;
@@ -16,18 +17,19 @@ RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
 
 QToolBar* RenameWidget_Replace::InitControlTB() {
   QToolBar* replaceControl = new (std::nothrow) QToolBar;
-  CHECK_NULLPTR_RETURN_NULLPTR(replaceControl)
-  auto* pOldLabel = new (std::nothrow) QLabel("Old:");
-  CHECK_NULLPTR_RETURN_NULLPTR(pOldLabel)
-  auto* pNewLabel = new (std::nothrow) QLabel("New:");
-  CHECK_NULLPTR_RETURN_NULLPTR(pNewLabel)
+  CHECK_NULLPTR_RETURN_NULLPTR(replaceControl);
+  auto* pOldLabel = new (std::nothrow) QLabel{"Old:", replaceControl};
+  CHECK_NULLPTR_RETURN_NULLPTR(pOldLabel);
+  auto* pNewLabel = new (std::nothrow) QLabel{"New:", replaceControl};
+  CHECK_NULLPTR_RETURN_NULLPTR(pNewLabel);
+
   replaceControl->addWidget(pOldLabel);
   replaceControl->addWidget(m_oldStrCB);
   replaceControl->addWidget(pNewLabel);
   replaceControl->addWidget(m_newStrCB);
   replaceControl->addSeparator();
   replaceControl->addWidget(m_regexCB);
-  replaceControl->addWidget(m_extensionInNameCB);
+  replaceControl->addWidget(m_nameExtIndependent);
   replaceControl->addWidget(m_recursiveCB);
   replaceControl->addSeparator();
   replaceControl->addWidget(regexValidLabel);
@@ -91,3 +93,18 @@ void RenameWidget_Delete::InitExtraCommonVariable() {
   setWindowTitle(windowTitleFormat);
   setWindowIcon(QIcon(":img/NAME_STR_DELETER_PATH"));
 }
+
+// #define __NAME__EQ__MAIN__ 1
+// #ifdef __NAME__EQ__MAIN__
+// #include <QApplication>
+// int main(int argc, char* argv[]) {
+//   QDir dir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath());
+//   QStringList rels = dir.entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsFirst);
+//   QApplication a(argc, argv);
+//   RenameWidget_Replace winR;
+//   winR.init();
+//   winR.InitTextEditContent(dir.absolutePath(), rels);
+//   winR.show();
+//   return a.exec();
+// }
+// #endif
