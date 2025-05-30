@@ -13,19 +13,21 @@ RenameWidget_LongPath::RenameWidget_LongPath(QWidget* parent)  //
 }
 
 QToolBar* RenameWidget_LongPath::InitControlTB() {
-  m_dropControlBar = new (std::nothrow) QToolBar{"Drop Control Toolbar", this};
-  auto* pDropSectionLabel = new (std::nothrow) QLabel{"Drop Section:", m_dropControlBar};
-  auto* pMaxPathLength = new (std::nothrow) QLabel{"Max path length:", m_dropControlBar};
+  auto* chopSectionTb = new (std::nothrow) QToolBar{"Drop Control Toolbar", this};
+  CHECK_NULLPTR_RETURN_NULLPTR(chopSectionTb);
+  auto* pDropSectionLabel = new (std::nothrow) QLabel{"Drop Section:", chopSectionTb};
+  CHECK_NULLPTR_RETURN_NULLPTR(pDropSectionLabel);
+  auto* pMaxPathLength = new (std::nothrow) QLabel{"Max path length:", chopSectionTb};
+  CHECK_NULLPTR_RETURN_NULLPTR(pMaxPathLength);
 
-  CHECK_NULLPTR_RETURN_NULLPTR(m_dropControlBar);
-  m_dropControlBar->addWidget(pDropSectionLabel);
-  m_dropControlBar->addWidget(m_dropSectionLE);
-  m_dropControlBar->addSeparator();
-  m_dropControlBar->addWidget(pMaxPathLength);
-  m_dropControlBar->addWidget(m_maxPathLengthLE);
-  m_dropControlBar->addSeparator();
-  m_dropControlBar->addWidget(m_recursiveCB);
-  return m_dropControlBar;
+  chopSectionTb->addWidget(pDropSectionLabel);
+  chopSectionTb->addWidget(m_dropSectionLE);
+  chopSectionTb->addSeparator();
+  chopSectionTb->addWidget(pMaxPathLength);
+  chopSectionTb->addWidget(m_maxPathLengthLE);
+  chopSectionTb->addSeparator();
+  chopSectionTb->addWidget(m_recursiveCB);
+  return chopSectionTb;
 }
 
 void RenameWidget_LongPath::extraSubscribe() {

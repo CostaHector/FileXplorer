@@ -5,7 +5,7 @@
 #include "Tools/RenameHelper.h"
 
 RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent) : AdvanceRenamer(parent) {
-  m_extensionInNameCB->setCheckState(Qt::CheckState::Unchecked);
+  m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
   m_recursiveCB->setEnabled(false);
   m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 }
@@ -39,19 +39,21 @@ void RenameWidget_Numerize::InitExtraCommonVariable() {
 }
 
 QToolBar* RenameWidget_Numerize::InitControlTB() {
-  QToolBar* replaceControl{new QToolBar};
-  replaceControl->addWidget(new QLabel("Base name:"));
-  replaceControl->addWidget(m_completeBaseName);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(new QLabel("Start index:"));
-  replaceControl->addWidget(m_startNo);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(new QLabel("No. format:"));
-  replaceControl->addWidget(m_numberPattern);
-  replaceControl->addSeparator();
-  replaceControl->addWidget(m_extensionInNameCB);
-  replaceControl->addWidget(m_recursiveCB);
-  return replaceControl;
+  QToolBar* numerizeControlTb{new (std::nothrow) QToolBar{this}};
+  CHECK_NULLPTR_RETURN_NULLPTR(numerizeControlTb);
+
+  numerizeControlTb->addWidget(new (std::nothrow) QLabel{"Base name:", numerizeControlTb});
+  numerizeControlTb->addWidget(m_completeBaseName);
+  numerizeControlTb->addSeparator();
+  numerizeControlTb->addWidget(new (std::nothrow) QLabel{"Start index:", numerizeControlTb});
+  numerizeControlTb->addWidget(m_startNo);
+  numerizeControlTb->addSeparator();
+  numerizeControlTb->addWidget(new (std::nothrow) QLabel{"No. format:", numerizeControlTb});
+  numerizeControlTb->addWidget(m_numberPattern);
+  numerizeControlTb->addSeparator();
+  numerizeControlTb->addWidget(m_nameExtIndependent);
+  numerizeControlTb->addWidget(m_recursiveCB);
+  return numerizeControlTb;
 }
 void RenameWidget_Numerize::extraSubscribe() {
   connect(m_startNo, &QLineEdit::textChanged, this, [this](const QString& startNoStr) -> void {
