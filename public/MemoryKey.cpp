@@ -62,7 +62,7 @@ const KV MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE{"SEARCH_CONTENTS_CASE_SENSITI
 const KV MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE("ADVANCE_SEARCH_LINEEDIT_VALUE", "", ValueChecker{PLAIN_STR});
 const KV MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER{"DISABLE_ENTRIES_DONT_PASS_FILTER", true, ValueChecker{PLAIN_BOOL}};
 
-const KV MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION{"RENAMER_INCLUDING_FILE_EXTENSION", false, ValueChecker{PLAIN_BOOL}};
+const KV MemoryKey::RENAMER_NAME_EXT_INDEPENDENT{"RENAMER_NAME_EXT_INDEPENDENT", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::RENAMER_INCLUDING_DIR{"RENAMER_INCLUDING_DIR", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::RENAMER_OLD_STR_LIST{"RENAMER_OLD_STR_LIST",                                                                           //
                                          QStringList{"", "^(.*?)$", " BB ", " BB",                                                         //
