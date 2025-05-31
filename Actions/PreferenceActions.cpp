@@ -30,22 +30,17 @@ PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {
   STYLE_AG->addAction(STYLE_MACOS);
   STYLE_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
-  STYLESHEET_DEFAULT = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_DEFAULT"), "default"};
-  STYLESHEET_DEFAULT->setCheckable(true);
-  STYLESHEET_DEFAULT->setChecked(true);
-  STYLESHEET_DEFAULT->setToolTip("Change stylesheet to default");
-
-  STYLESHEET_LIGHT_THEME_SUN = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_LIGHT_THEME_SUN"), "light"};
-  STYLESHEET_LIGHT_THEME_SUN->setCheckable(true);
-  STYLESHEET_LIGHT_THEME_SUN->setToolTip("Change stylesheet to light");
+  STYLESHEET_DEFAULT_LIGHT = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_LIGHT_THEME_SUN"), "default"};
+  STYLESHEET_DEFAULT_LIGHT->setCheckable(true);
+  STYLESHEET_DEFAULT_LIGHT->setChecked(true);
+  STYLESHEET_DEFAULT_LIGHT->setToolTip("Change stylesheet to default");
 
   STYLESHEET_DARK_THEME_MOON_FOG = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_DARK_THEME_MOON_FOG"), "dark"};
   STYLESHEET_DARK_THEME_MOON_FOG->setCheckable(true);
   STYLESHEET_DARK_THEME_MOON_FOG->setToolTip("Change stylesheet to dark");
 
   STYLESHEET = new (std::nothrow) QActionGroup(this);
-  STYLESHEET->addAction(STYLESHEET_DEFAULT);
-  STYLESHEET->addAction(STYLESHEET_LIGHT_THEME_SUN);
+  STYLESHEET->addAction(STYLESHEET_DEFAULT_LIGHT);
   STYLESHEET->addAction(STYLESHEET_DARK_THEME_MOON_FOG);
   STYLESHEET->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
@@ -74,6 +69,35 @@ bool PreferenceActions::onSetAppStyle(QAction* pAct) {
   return true;
 }
 
+void setGlobalDarkMode(bool enable);
+
+#if defined(Q_OS_WIN)
+#include <windows.h>
+#include <dwmapi.h> // make sure "dwm.exe" already running in task manager at first
+void setDarkTitleBar(QWidget* widget, bool enable) {
+  if (widget == nullptr) {
+    return;
+  }
+  HWND hwnd = reinterpret_cast<HWND>(widget->winId());
+  BOOL darkMode = enable;
+  // 19: DWMWA_USE_IMMERSIVE_DARK_MODE_OLD <- Windows 10 Build 18368.418（19H1）
+  // 20: DWMWA_USE_IMMERSIVE_DARK_MODE
+  DwmSetWindowAttribute(hwnd, 19 /*DWMWA_USE_IMMERSIVE_DARK_MODE*/, &darkMode, sizeof(darkMode));
+}
+
+void setGlobalDarkMode(bool enable) {
+  foreach (QWidget* widget, qApp->topLevelWidgets()) {
+    setDarkTitleBar(widget, enable);
+  }
+}
+#else
+void setGlobalDarkMode(bool enable) {
+  if (enable) {
+    qDebug("Not suport dark mode now");
+  }
+}
+#endif
+
 bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   if (pAct == nullptr) {
     qWarning("pAct is nullptr");
@@ -87,12 +111,12 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   }
   PreferenceSettings().setValue("STYLESHEET_NAME", stylesheetName);
   QFile qssFile;
-  if (stylesheetName == "light") {
-    qssFile.setFileName(":stylesheet/light.qss");
-  } else if (stylesheetName == "dark") {
+  if (stylesheetName == "dark") {
     qssFile.setFileName(":stylesheet/dark.qss");
+    setGlobalDarkMode(true);
   } else {  // "default" or any stylesheet except light/dark
     qssFile.setFileName(":stylesheet/default.qss");
+    setGlobalDarkMode(false);
   }
   if (!qssFile.open(QFile::ReadOnly | QFile::Text)) {
     qWarning("Unable to set stylesheet, file[%s] not found", qPrintable(qssFile.fileName()));
@@ -125,7 +149,7 @@ bool PreferenceActions::PostActions() {
     qDebug("last time styleName is %s", qPrintable(styleName));
     break;
   }
-  const QString& stylesheetName = PreferenceSettings().value("STYLESHEET_NAME", STYLESHEET_DEFAULT->text()).toString();
+  const QString& stylesheetName = PreferenceSettings().value("STYLESHEET_NAME", STYLESHEET_DEFAULT_LIGHT->text()).toString();
   for (auto* pAct : STYLESHEET->actions()) {
     if (pAct == nullptr) {
       qWarning("pAct is nullptr");
