@@ -2,6 +2,7 @@
 #include "Actions/ViewActions.h"
 #include "Model/ScenesListModel.h"
 #include "Tools/PlayVideo.h"
+#include "public/PublicMacro.h"
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -30,7 +31,9 @@ class AlignDelegate : public QStyledItemDelegate {
 };
 
 SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
-    : CustomListView{"SCENES_TABLE", parent}, _sceneModel{sceneModel} {
+    : CustomListView{"SCENES_TABLE", parent},                               //
+      _sceneModel{sceneModel}                                               //
+{
   if (_sceneModel == nullptr) {
     qCritical("sceneModel is nullptr");
     return;
@@ -47,14 +50,20 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   setWrapping(true);
   setFlow(QListView::Flow::LeftToRight);
 
-  mAlignDelegate = new AlignDelegate;
+  mAlignDelegate = new (std::nothrow) AlignDelegate;
+  CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  m_fPrev = new FloatingPreview;
+  m_fPrev = new (std::nothrow) FloatingPreview{"FloatingList", this};
+  CHECK_NULLPTR_RETURN_VOID(m_fPrev)
 
-  QMenu* m_menu = new QMenu{"scene table view menu", this};
+  QMenu* m_menu = new (std::nothrow) QMenu{"scene table view menu", this};
+  CHECK_NULLPTR_RETURN_VOID(m_menu)
   COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction("copy basename", m_menu);
+  CHECK_NULLPTR_RETURN_VOID(COPY_BASENAME_FROM_SCENE)
   OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction("play this folder", m_menu);
+  CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
+
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
   m_menu->addSeparator();

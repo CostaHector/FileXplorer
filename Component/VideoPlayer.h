@@ -10,45 +10,42 @@
 #include <QSplitter>
 #include <QToolBar>
 #include <QVideoProbe>
-#include <QWidget>
 #include <QTime>
 
 #include "Component/ClickableSlider.h"
 #include "Component/JsonPerformersListInputer.h"
 
-#include "public/PublicVariable.h"
 #include "Model/VidModel.h"
 #include "View/VidsPlayListView.h"
 
 QT_BEGIN_NAMESPACE
-class QAbstractButton;
 class QLabel;
 class QUrl;
 QT_END_NAMESPACE
 
-class VideoPlayer : public QMainWindow {
+class VideoPlayer final : public QMainWindow {
   Q_OBJECT
  public:
   explicit VideoPlayer(QWidget* parent = nullptr);
   ~VideoPlayer();
 
-  auto operator()(const QString& path) -> bool;                 // one file or one folder
-  auto operator()(const QStringList& fileAbsPathList) -> bool;  // selections
+  bool operator()(const QString& path);                 // one file or one folder
+  bool operator()(const QStringList& fileAbsPathList);  // selections
 
   void setUrl(const QUrl& url);
-  auto subscribe() -> void;
+  void subscribe();
 
-  auto onModeName() -> bool;
-  auto onModCast() -> bool;
+  bool onModeName();
+  bool onModCast();
 
-  auto onGrabAFrame(const QVideoFrame& frame) -> bool;
-  auto onMarkHotScenes() -> bool;
+  bool onGrabAFrame(const QVideoFrame& frame);
+  bool onMarkHotScenes();
 
-  auto onJumpToNextHotScene() -> bool;
-  auto onJumpToLastHotScene() -> bool;
-  auto onPositionAdd(const int ms = 10 * 1000) -> bool;
+  bool onJumpToNextHotScene();
+  bool onJumpToLastHotScene();
+  bool onPositionAdd(const int ms = 10 * 1000);
 
-  auto onRateForThisMovie(const QAction* checkedAction) -> bool;
+  bool onRateForThisMovie(const QAction* checkedAction);
   void onPlayLastVideo();
   void onPlayNextVideo();
 
@@ -65,22 +62,10 @@ class VideoPlayer : public QMainWindow {
   void onVolumeMute(const bool isMute);
   void onVolumeValueChange(const int logScaleValue);
 
-  auto updateWindowsSize() -> void {
-    if (PreferenceSettings().contains("VideoPlayerGeometry")) {
-      restoreGeometry(PreferenceSettings().value("VideoPlayerGeometry").toByteArray());
-    } else {
-      setGeometry(QRect(0, 0, 600, 400));
-    }
-    m_playlistSplitter->restoreState(PreferenceSettings().value("VideoPlayerSplitterState", QByteArray()).toByteArray());
-  }
+  void updateWindowsSize();
 
-  auto closeEvent(QCloseEvent* event) -> void override {
-    setUrl({});
-    PreferenceSettings().setValue("VideoPlayerGeometry", saveGeometry());
-    qDebug("Video Player geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
-    PreferenceSettings().setValue("VideoPlayerSplitterState", m_playlistSplitter->saveState());
-    QMainWindow::closeEvent(event);
-  }
+  void showEvent(QShowEvent* event) override;
+  void closeEvent(QCloseEvent* event) override;
 
   auto keyPressEvent(QKeyEvent* e) -> void override;
 
@@ -98,11 +83,13 @@ class VideoPlayer : public QMainWindow {
   void handleError();
 
  private:
-  static inline QString MillionSecond2hhmmss(qint64 ms) { return QTime(0, 0, 0, 0).addMSecs(ms).toString("hh:mm:ss"); }
+  static inline QString MillionSecond2hhmmss(qint64 ms) {  //
+    return QTime(0, 0, 0, 0).addMSecs(ms).toString("hh:mm:ss");
+  }
 
-  auto loadHotSceneList() -> void;
-  auto loadVideoRate() -> void;
-  inline auto JsonFileValidCheck(const QString& op = "do this") -> QString;
+  void loadHotSceneList();
+  void loadVideoRate();
+  inline QString JsonFileValidCheck(const QString& op = "do this");
 
   QUrl m_playingUrl;
   QMediaPlayer* m_mediaPlayer;
