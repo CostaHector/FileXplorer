@@ -4,10 +4,10 @@
 #include "public/PublicMacro.h"
 #include "Tools/RenameHelper.h"
 
-RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent) : AdvanceRenamer(parent) {
-  m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
+RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent)  //
+    : AdvanceRenamer{parent}                                   //
+{                                                              //
   m_recursiveCB->setEnabled(false);
-  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 }
 
 void RenameWidget_Numerize::InitExtraMemberWidget() {
@@ -30,6 +30,9 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   } else {
     m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
   }
+
+  m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
+  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 }
 
 void RenameWidget_Numerize::InitExtraCommonVariable() {
@@ -91,7 +94,7 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
     }
     m_baseNameInited = true;
   }
-  const QStringList& suffixs = m_oExtTE->toPlainText().split('\n');
+  const QStringList& suffixs = m_oExtTE->toPlainText().split(NAME_SEP);
   const QString& baseName = m_completeBaseName->text();
   return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
 }
