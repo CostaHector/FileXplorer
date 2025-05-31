@@ -16,7 +16,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
  private:
   QLineEdit* m_startNo{nullptr};
   QComboBox* m_numberPattern{nullptr};
-  QLineEdit* m_completeBaseName{new QLineEdit};
+  QLineEdit* m_completeBaseName{nullptr};
   bool m_baseNameInited = false;
 };
 #endif // RENAMEWIDGET_NUMERIZE_H

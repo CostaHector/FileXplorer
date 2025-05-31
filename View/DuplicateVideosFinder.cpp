@@ -2,6 +2,7 @@
 #include "Actions/DuplicateVideosFinderActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 #include "public/UndoRedo.h"
 
 #include <QDesktopServices>
@@ -136,6 +137,11 @@ void DuplicateVideosFinder::updateWindowsSize() {
     setGeometry(DEFAULT_GEOMETRY);
   }
   m_mainWidget->restoreState(PreferenceSettings().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
+}
+
+void DuplicateVideosFinder::showEvent(QShowEvent *event) {
+  QMainWindow::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
 }
 
 void DuplicateVideosFinder::closeEvent(QCloseEvent* event) {

@@ -15,6 +15,7 @@ class PropertiesWindow : public QDialog {
   bool operator()(const QSqlTableModel* model, const QTableView* tv);
 
   void ReadSetting();
+  void showEvent(QShowEvent *event) override;
   void closeEvent(QCloseEvent* event) override;
 
  protected:

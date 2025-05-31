@@ -10,6 +10,7 @@ class RedundantImageFinder : public QMainWindow {
   explicit RedundantImageFinder(QWidget* parent = nullptr);
   ~RedundantImageFinder();
   void ReadSetting();
+  void showEvent(QShowEvent *event) override;
   void closeEvent(QCloseEvent* event) override;
 
   void operator()(const QString& folderPath);

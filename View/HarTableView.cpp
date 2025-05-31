@@ -1,6 +1,7 @@
 #include "HarTableView.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/StyleSheet.h"
 #include <QFileDialog>
 #include <QLabel>
 
@@ -112,6 +113,11 @@ void HarTableView::updateWindowsSize() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
+}
+
+void HarTableView::showEvent(QShowEvent *event) {
+  CustomTableView::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
 }
 
 void HarTableView::closeEvent(QCloseEvent* event) {

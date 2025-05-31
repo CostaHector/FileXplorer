@@ -5,6 +5,7 @@
 
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/StyleSheet.h"
 
 #include "Tools/FolderPreviewSwitcher.h"
 #include "Tools/NavigationViewSwitcher.h"
@@ -58,6 +59,11 @@ void FileXplorer::closeEvent(QCloseEvent* event) {
   PreferenceSettings().setValue(CLASSNAME_2_STR(FileXplorer) "_Docker_Height", m_previewFolder->height());
   PreferenceSettings().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
   return QMainWindow::closeEvent(event);
+}
+
+void FileXplorer::showEvent(QShowEvent *event) {
+  QMainWindow::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
 }
 
 QString FileXplorer::ReadSettings(const int argc, char const* const argv[]) {

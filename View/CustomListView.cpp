@@ -1,7 +1,8 @@
 #include "CustomListView.h"
+
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
-#include "ViewStyleSheet.h"
+#include "public/StyleSheet.h"
 
 #include <QContextMenuEvent>
 
@@ -76,5 +77,5 @@ void CustomListView::onOrientationChange(const QAction* pOrientation) {
 }
 
 void CustomListView::InitListView() {
-  sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
+  sizeHintForRow(StyleSheet::ROW_SECTION_HEIGHT);
 }
