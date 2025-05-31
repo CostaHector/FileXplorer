@@ -13,8 +13,8 @@ class RenameActions : public QObject {
   auto Get_Rename_Actions() -> QActionGroup*;
 
   QAction* _NUMERIZER {nullptr};
-  QAction* _SECTIONS_SWAPPER {nullptr};
-  QAction* _SWAP_2_NAMES {nullptr};
+  QAction* _SECTIONS_ARRANGE {nullptr};
+  QAction* _REVERSE_NAMES_LIST {nullptr};
   QAction* _CASE_NAME {nullptr};
   QAction* _STR_INSERTER {nullptr};
   QAction* _STR_DELETER {nullptr};
