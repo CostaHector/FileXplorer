@@ -1,26 +1,16 @@
 #include "NavigationAndAddressBar.h"
 #include "Actions/AddressBarActions.h"
 #include "Actions/RightClickMenuActions.h"
+#include "public/PublicMacro.h"
 #include <QHBoxLayout>
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {
   m_addressLine = new (std::nothrow) AddressELineEdit{this};
-  if (m_addressLine == nullptr) {
-    qCritical("m_addressLine is nullptr");
-    return;
-  }
-  m_searchLE = new (std::nothrow) QLineEdit{this};
-  if (m_searchLE == nullptr) {
-    qCritical("m_searchLE is nullptr");
-    return;
-  }
-  m_fsFilter = new (std::nothrow) FileSystemTypeFilter;
-  if (m_fsFilter == nullptr) {
-    qCritical("m_fsFilter is nullptr");
-    return;
-  }
-
+  CHECK_NULLPTR_RETURN_VOID(m_addressLine)
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+
+  m_searchLE = new (std::nothrow) QLineEdit{this};
+  CHECK_NULLPTR_RETURN_VOID(m_searchLE)
   m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
   m_searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
@@ -30,7 +20,11 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
       "For JsonModel(Regex) e.g., target1.*?target2");
   m_searchLE->setMinimumWidth(40);
 
+  m_fsFilter = new (std::nothrow) FileSystemTypeFilter;
+  CHECK_NULLPTR_RETURN_VOID(m_fsFilter)
+
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
+  addSeparator();
   addWidget(m_addressLine);
   addAction(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL);
   addSeparator();
