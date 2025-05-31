@@ -199,6 +199,7 @@ QToolBar {
 QToolBar QToolButton {
     background: transparent;
     color: #d4d4d4;
+    border: 1px solid transparent; /* 预先占用边框空间 */
 }
 
 /* 悬停状态 */
