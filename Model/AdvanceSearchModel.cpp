@@ -185,7 +185,7 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
     if (m_recycleSet.contains(index)) {
       return QBrush(Qt::GlobalColor::red);
     }
-    return QBrush(Qt::GlobalColor::black);
+    return {};
   }
   return QVariant();
 }

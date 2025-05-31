@@ -535,11 +535,11 @@ void FileExplorerEvent::subscribe() {
       auto* pNumerize = new RenameWidget_Numerize(_contentPane);
       onRename(pNumerize);
     });
-    connect(g_renameAg()._SECTIONS_SWAPPER, &QAction::triggered, this, [this]() -> void {
+    connect(g_renameAg()._SECTIONS_ARRANGE, &QAction::triggered, this, [this]() -> void {
       auto* pArrange = new RenameWidget_ArrangeSection(_contentPane);
       onRename(pArrange);
     });
-    connect(g_renameAg()._SWAP_2_NAMES, &QAction::triggered, this, [this]() -> void {
+    connect(g_renameAg()._REVERSE_NAMES_LIST, &QAction::triggered, this, [this]() -> void {
       auto* pReverse = new RenameWidget_ReverseNames(_contentPane);
       onRename(pReverse);
     });
