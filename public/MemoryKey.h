@@ -58,7 +58,7 @@ struct MemoryKey {
   static const KV ADVANCE_SEARCH_LINEEDIT_VALUE;
   static const KV DISABLE_ENTRIES_DONT_PASS_FILTER;
 
-  static const KV RENAMER_INCLUDING_FILE_EXTENSION;
+  static const KV RENAMER_NAME_EXT_INDEPENDENT;
   static const KV RENAMER_INCLUDING_DIR;
   static const KV RENAMER_OLD_STR_LIST;
   static const KV RENAMER_NEW_STR_LIST;
