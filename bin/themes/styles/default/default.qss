@@ -24,9 +24,10 @@ QTabWidget::pane {
 QTabBar::tab {
     padding-top: 5px;
     padding-bottom: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
     margin-top: 1px;
+    min-width: 60px;
 }
 QTabBar::tab:!selected {
     border-bottom: 1px solid rgba(160, 160, 160, 255);
@@ -36,7 +37,9 @@ QTabBar::tab:selected {
     border-top: 1px solid rgba(160, 160, 160, 255);
     border-right: 1px solid rgba(160, 160, 160, 255);
     border-left: 1px solid rgba(160, 160, 160, 255);
-    border-bottom: 1px solid rgba(240, 240, 240, 255);}
+    border-bottom: 1px solid rgba(240, 240, 240, 255);
+    font-weight: bold; /* 选中状态加粗 */
+}
 QTabBar::tab:hover{
     background-color: rgba(205, 232, 255, 255);
 }
