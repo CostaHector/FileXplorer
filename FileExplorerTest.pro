@@ -1,6 +1,9 @@
 QT += testlib gui core sql widgets
 CONFIG += qt warn_on depend_includepath testcase
 CONFIG += c++11
+win32 {
+    LIBS += -ldwmapi
+}
 
 TEMPLATE = app
 
