@@ -183,8 +183,8 @@
 <file alias="RENAME">NameStrIcon/RENAME.svg</file>
 <file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.svg</file>
 <file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/NAME_STR_NUMERIZER_PATH.svg</file>
-<file alias="NAME_SECTIONS_SWAP">NameStrIcon/NAME_SECTIONS_SWAP.svg</file>
-<file alias="RENAME_SWAP_2_NAMES">NameStrIcon/RENAME_SWAP_2_NAMES.svg</file>
+<file alias="NAME_SECTIONS_ARRANGE">NameStrIcon/NAME_SECTIONS_ARRANGE.svg</file>
+<file alias="RENAME_REVERSE_NAMES_LIST">NameStrIcon/RENAME_REVERSE_NAMES_LIST.svg</file>
 <file alias="UNICODE_TO_ASCII_TEXT">NameStrIcon/UNICODE_TO_ASCII_TEXT.png</file>
 <file alias="RENAME_LOWER_CASE">NameStrIcon/RENAME_LOWER_CASE.png</file>
 <file alias="RENAME_UPPER_CASE">NameStrIcon/RENAME_UPPER_CASE.png</file>
@@ -228,7 +228,6 @@
 <file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
 <file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
 <file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
-<file alias="STYLESHEET_DEFAULT">styles/STYLESHEET_DEFAULT.svg</file>
 <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
 <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
 
