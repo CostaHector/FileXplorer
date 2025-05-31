@@ -44,11 +44,11 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   addTab(m_leafFile, "&File");
   addTab(m_leafHome, "&Home");
   addTab(m_leafView, "&View");
-  addTab(m_leafDatabase, viewIns._MOVIE_VIEW->icon(), "&" + viewIns._MOVIE_VIEW->text());
-  addTab(m_leafCast, viewIns._CAST_VIEW->icon(), "&" + viewIns._CAST_VIEW->text());
-  addTab(m_leafJson, viewIns._JSON_VIEW->icon(), "&" + viewIns._JSON_VIEW->text());
-  addTab(m_leafScenes, viewIns._SCENE_VIEW->icon(), "&" + viewIns._SCENE_VIEW->text());
-  addTab(m_leafMedia, QIcon(":img/ARRANGE"), "&Arrange");
+  addTab(m_leafDatabase, "&" + viewIns._MOVIE_VIEW->text());
+  addTab(m_leafCast, "&" + viewIns._CAST_VIEW->text());
+  addTab(m_leafJson, "&" + viewIns._JSON_VIEW->text());
+  addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
+  addTab(m_leafMedia, "&Arrange");
 
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
@@ -69,7 +69,7 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 
 QToolBar* RibbonMenu::LeafFile() const {
   auto* styleToolButton = new DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
-  styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "style");
+  styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "Change Style");
   QToolButton* logToolButton = new DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   logToolButton->setDefaultAction(g_LogActions()._LOG_FILE);
 
