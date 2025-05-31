@@ -60,12 +60,14 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
 
   pathLineEdit = new (std::nothrow) QLineEdit{pathComboBox};
   CHECK_NULLPTR_RETURN_VOID(pathLineEdit);
+  pathLineEdit->setClearButtonEnabled(true);
 
   m_dropPanel = new (std::nothrow) QLabel(DRAG_HINT_MSG, this);
   CHECK_NULLPTR_RETURN_VOID(m_dropPanel);
-
-  pathComboBoxFocusWatcher = new (std::nothrow) FocusEventWatch(pathComboBox);
-  CHECK_NULLPTR_RETURN_VOID(pathComboBoxFocusWatcher);
+  m_dropPanel->setStyleSheet(
+      "QLabel{"
+      "border: 3px solid cyan;"
+      "};");
 
 #ifdef _WIN32
   const QFileInfoList& drives = QDir::drives();
@@ -74,6 +76,10 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
   }
 #endif
   pathComboBox->setLineEdit(pathLineEdit);
+  pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+
+  pathComboBoxFocusWatcher = new (std::nothrow) FocusEventWatch(pathComboBox);
+  CHECK_NULLPTR_RETURN_VOID(pathComboBoxFocusWatcher);
 
   addWidget(m_pathActionsTB);
   addWidget(pathComboBox);
@@ -82,18 +88,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
   clickMode();
   subscribe();
 
-  pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
-  m_pathActionsTB->setStyleSheet(
-      "QToolBar{"
-      "border-left: 1px solid gray;"
-      "border-right: 1px solid gray;"
-      "};");
-  m_dropPanel->setStyleSheet(
-      "QLabel{"
-      "border: 3px solid cyan;"
-      "};");
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
