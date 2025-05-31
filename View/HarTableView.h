@@ -16,6 +16,7 @@ class HarTableView : public CustomTableView {
   bool PreviewImage();
 
   void updateWindowsSize();
+  void showEvent(QShowEvent *event) override;
   void closeEvent(QCloseEvent* event) override;
  private:
   QString GetWinTitleStr(const QString& harFile={}) const;

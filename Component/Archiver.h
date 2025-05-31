@@ -21,6 +21,7 @@ class Archiver : public QMainWindow {
   void ChangeWindowTitle(const QString& name, const int& Bytes);
 
   void UpdateWindowsSize();
+  void showEvent(QShowEvent *event) override;
   void closeEvent(QCloseEvent* event) override;
 
  private:

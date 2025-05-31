@@ -1,13 +1,14 @@
 #include "FileSystemTreeView.h"
-#include "Actions/RightClickMenuActions.h"
 #include "View/ViewHelper.h"
-#include "View/ViewStyleSheet.h"
+#include "public/StyleSheet.h"
 
-#include <QHeaderView>
-#include <QMouseEvent>
+#include "Actions/RightClickMenuActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
+
+#include <QHeaderView>
+#include <QMouseEvent>
 
 FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* parent) : QTreeView(parent) {
   setModel(fsmModel);
@@ -24,8 +25,7 @@ FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* pa
 }
 
 void FileSystemTreeView::subscribe() {
-  connect(header(), &QHeaderView::sectionResized, this,
-          [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
+  connect(header(), &QHeaderView::sectionResized, this, [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
 
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
@@ -55,7 +55,7 @@ auto FileSystemTreeView::InitViewSettings() -> void {
   if (PreferenceSettings().contains("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW")) {
     header()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW").toByteArray());
   }
-  sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
+  sizeHintForRow(StyleSheet::ROW_SECTION_HEIGHT);
   FileSystemTreeView::UpdateItemViewFontSize();
 }
 
