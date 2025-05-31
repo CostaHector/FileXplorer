@@ -7,7 +7,7 @@
 
 #include "View/FileSystemListView.h"
 #include "View/ViewHelper.h"
-#include "View/ViewStyleSheet.h"
+#include "public/StyleSheet.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>

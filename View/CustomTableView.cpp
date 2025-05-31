@@ -314,7 +314,7 @@ void CustomTableView::InitTableView() {
   }
   horizontalHeader()->restoreState(PreferenceSettings().value(m_horizontalHeaderStateKey, QByteArray()).toByteArray());
   ShowOrHideColumnCore();
-//  sizeHintForRow(ViewStyleSheet::ROW_SECTION_HEIGHT);
+//  sizeHintForRow(StyleSheet::ROW_SECTION_HEIGHT);
 }
 
 void CustomTableView::onHorizontalHeaderMenuRequest(const QPoint& pnt) {

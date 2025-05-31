@@ -3,8 +3,7 @@
 
 #include <QAbstractTableModel>
 #include <QIcon>
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+class KV;
 
 struct AlertItem {
  public:

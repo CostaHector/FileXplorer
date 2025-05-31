@@ -15,7 +15,9 @@ class FloatingPreview : public QSplitter {
  public:
   enum PANE_TYPE { DETAIL, TYPE_DISPLAY_CONTROL, IMAGE, VIDEO, OTHER, BUTT };
 
-  FloatingPreview(QWidget* parent = nullptr);
+  FloatingPreview(const QString& memoryName, QWidget* parent = nullptr);
+  void showEvent(QShowEvent *event) override;
+
   void ReadSettings();
   void SaveSettings();
   void SaveState();
@@ -86,6 +88,7 @@ class FloatingPreview : public QSplitter {
   QString mLastName;
 
   SplitterInsertIndexHelper m_insertIndex{BUTT};
+  const QString mMemoryName;
 };
 
 #endif  // FLOATINGPREVIEW_H

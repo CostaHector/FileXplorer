@@ -4,6 +4,7 @@
 #include <QIODevice>
 #include <QTextStream>
 #include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 
 PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {
   STYLE_WINDOWS_VISTA = new (std::nothrow) QAction{QIcon(":img/STYLE_WINDOWS_VISTA"), "windowsvista"};
@@ -30,12 +31,13 @@ PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {
   STYLE_AG->addAction(STYLE_MACOS);
   STYLE_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
-  STYLESHEET_DEFAULT_LIGHT = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_LIGHT_THEME_SUN"), "default"};
+  using namespace StyleSheet;
+  STYLESHEET_DEFAULT_LIGHT = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_LIGHT_THEME_SUN"), ENUM_2_STR(DEFAULT)};
   STYLESHEET_DEFAULT_LIGHT->setCheckable(true);
   STYLESHEET_DEFAULT_LIGHT->setChecked(true);
   STYLESHEET_DEFAULT_LIGHT->setToolTip("Change stylesheet to default");
 
-  STYLESHEET_DARK_THEME_MOON_FOG = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_DARK_THEME_MOON_FOG"), "dark"};
+  STYLESHEET_DARK_THEME_MOON_FOG = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_DARK_THEME_MOON_FOG"), ENUM_2_STR(DARK)};
   STYLESHEET_DARK_THEME_MOON_FOG->setCheckable(true);
   STYLESHEET_DARK_THEME_MOON_FOG->setToolTip("Change stylesheet to dark");
 
@@ -69,63 +71,36 @@ bool PreferenceActions::onSetAppStyle(QAction* pAct) {
   return true;
 }
 
-void setGlobalDarkMode(bool enable);
-
-#if defined(Q_OS_WIN)
-#include <windows.h>
-#include <dwmapi.h> // make sure "dwm.exe" already running in task manager at first
-void setDarkTitleBar(QWidget* widget, bool enable) {
-  if (widget == nullptr) {
-    return;
-  }
-  HWND hwnd = reinterpret_cast<HWND>(widget->winId());
-  BOOL darkMode = enable;
-  // 19: DWMWA_USE_IMMERSIVE_DARK_MODE_OLD <- Windows 10 Build 18368.418（19H1）
-  // 20: DWMWA_USE_IMMERSIVE_DARK_MODE
-  DwmSetWindowAttribute(hwnd, 19 /*DWMWA_USE_IMMERSIVE_DARK_MODE*/, &darkMode, sizeof(darkMode));
-}
-
-void setGlobalDarkMode(bool enable) {
-  foreach (QWidget* widget, qApp->topLevelWidgets()) {
-    setDarkTitleBar(widget, enable);
-  }
-}
-#else
-void setGlobalDarkMode(bool enable) {
-  if (enable) {
-    qDebug("Not suport dark mode now");
-  }
-}
-#endif
-
 bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   if (pAct == nullptr) {
     qWarning("pAct is nullptr");
     return false;
   }
-  const QString& stylesheetName = pAct->text();
-  static const QStringList stylesheets{"default", "light", "dark"};
-  if (!stylesheets.contains(stylesheetName)) {
-    qWarning("stylesheetName[%s] is not supported", qPrintable(stylesheetName));
-    return false;
+  using namespace StyleSheet;
+  const QString& themeName = pAct->text();
+  const THEME theme = GetThemeFromString(themeName);
+  CurrentTheme(&theme);
+  PreferenceSettings().setValue("STYLESHEET_NAME", theme);
+  qDebug("ThemeName[%d]: %s", (int)theme, qPrintable(themeName));
+
+  static QString theme2QssContent[THEME::THEME_BUTT]{};
+  if (theme2QssContent[theme].isEmpty()) {
+    QFile qssFile;
+    if (theme == THEME::DARK) {
+      qssFile.setFileName(":stylesheet/dark.qss");
+    } else {  // "default" or any stylesheet except light/dark
+      qssFile.setFileName(":stylesheet/default.qss");
+    }
+    if (!qssFile.open(QFile::ReadOnly | QFile::Text)) {
+      qWarning("Unable to set stylesheet, file[%s] not found", qPrintable(qssFile.fileName()));
+      return false;
+    }
+    QTextStream ts(&qssFile);
+    theme2QssContent[theme] = ts.readAll();
+    qssFile.close();
   }
-  PreferenceSettings().setValue("STYLESHEET_NAME", stylesheetName);
-  QFile qssFile;
-  if (stylesheetName == "dark") {
-    qssFile.setFileName(":stylesheet/dark.qss");
-    setGlobalDarkMode(true);
-  } else {  // "default" or any stylesheet except light/dark
-    qssFile.setFileName(":stylesheet/default.qss");
-    setGlobalDarkMode(false);
-  }
-  if (!qssFile.open(QFile::ReadOnly | QFile::Text)) {
-    qWarning("Unable to set stylesheet, file[%s] not found", qPrintable(qssFile.fileName()));
-    return false;
-  }
-  QTextStream ts(&qssFile);
-  qApp->setStyleSheet(ts.readAll());
-  qssFile.close();
-  qDebug("qApp->setStyleSheet: %s", qPrintable(stylesheetName));
+  qApp->setStyleSheet(theme2QssContent[theme]);
+  qWarning("ThemeName Changed to [%d]: %s", (int)theme, qPrintable(themeName));
   return true;
 }
 
@@ -149,18 +124,20 @@ bool PreferenceActions::PostActions() {
     qDebug("last time styleName is %s", qPrintable(styleName));
     break;
   }
-  const QString& stylesheetName = PreferenceSettings().value("STYLESHEET_NAME", STYLESHEET_DEFAULT_LIGHT->text()).toString();
+
+  int themeInt = StyleSheet::CurrentTheme();
+  const QString& themeName = StyleSheet::THEME_2_STRING[themeInt];
   for (auto* pAct : STYLESHEET->actions()) {
     if (pAct == nullptr) {
       qWarning("pAct is nullptr");
       continue;
     }
-    if (pAct->text() != stylesheetName) {
+    if (pAct->text() != themeName) {
       continue;
     }
     pAct->setChecked(true);
     emit pAct->triggered(true);
-    qDebug("last time stylesheetName is %s", qPrintable(stylesheetName));
+    qDebug("last time themeName is %s", qPrintable(themeName));
     break;
   }
   return true;
