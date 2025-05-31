@@ -6,6 +6,10 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 LIBS += -L$$PWD/lib -lMediaInfo
+win32 {
+    LIBS += -ldwmapi
+}
+
 
 SOURCES += $$files(Actions/*.cpp)
 SOURCES += $$files(Model/*.cpp)
@@ -57,7 +61,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     bin/themes/res.qrc \
     bin/themes/styles/dark/darkstyle.qrc\
-    bin/themes/styles/light/lightstyle.qrc\
     bin/themes/styles/default/defaultstyle.qrc\
 
 DISTFILES += \
