@@ -7,10 +7,11 @@
 
 #include "Actions/PropertiesWindowActions.h"
 #include "Tools/FileDescriptor/TableFields.h"
-#include "public/PublicVariable.h"
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
 #include "Tools/VidsDurationDisplayString.h"
+#include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 #include "public/DisplayEnhancement.h"
 
 const QString PropertiesWindow::STRING_SPLITTER{60, '-'};
@@ -137,6 +138,11 @@ void PropertiesWindow::ReadSetting() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
+}
+
+void PropertiesWindow::showEvent(QShowEvent* event) {
+  QDialog::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
 }
 
 void PropertiesWindow::closeEvent(QCloseEvent* event) {

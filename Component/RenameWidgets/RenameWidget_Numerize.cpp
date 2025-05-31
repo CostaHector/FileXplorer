@@ -30,9 +30,11 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   } else {
     m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
   }
-
   m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
   m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
+
+  m_completeBaseName = new (std::nothrow) QLineEdit{this};
+  CHECK_NULLPTR_RETURN_VOID(m_completeBaseName)
 }
 
 void RenameWidget_Numerize::InitExtraCommonVariable() {

@@ -1,7 +1,9 @@
 #include "TorrentsManagerWidget.h"
-#include "Actions/TorrDBAction.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
+#include "public/StyleSheet.h"
+
+#include "Actions/TorrDBAction.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include "Component/Notificator.h"
 
@@ -13,17 +15,20 @@
 #include <QSqlQuery>
 #include <QDateTime>
 
+#include <QVBoxLayout>
 #include <QDirIterator>
 #include <QInputDialog>
 
 TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
     : QMainWindow{parent},
-      mDb{SystemPath::TORRENTS_DATABASE, "torrent_connection"},
-      m_searchLE{new QLineEdit(QString("Name like \"%\""))},
-      m_torrentsListView(new CustomTableView("TORRENT_TABLE", parent)),
-      m_torrentsCentralWidget(new QWidget),
-      m_torrentsDBModel(nullptr) {
-  auto* mainLo = new QVBoxLayout;
+      mDb{SystemPath::TORRENTS_DATABASE, "torrent_connection"},          //
+      m_searchLE{new QLineEdit(QString("Name like \"%\""))},             //
+      m_torrentsListView(new CustomTableView("TORRENT_TABLE", parent)),  //
+      m_torrentsCentralWidget(new QWidget),                              //
+      m_torrentsDBModel(nullptr)                                         //
+{
+  auto* mainLo = new (std::nothrow) QVBoxLayout{this};
+  CHECK_NULLPTR_RETURN_VOID(mainLo);
   mainLo->addWidget(m_searchLE);
   mainLo->addWidget(m_torrentsListView);
   m_torrentsCentralWidget->setLayout(mainLo);
@@ -32,22 +37,21 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   setCentralWidget(m_torrentsCentralWidget);
 
   QSqlDatabase con = mDb.GetDb();
-  m_torrentsDBModel = new QSqlTableModel(this, con);
+  m_torrentsDBModel = new (std::nothrow) QSqlTableModel(this, con);
+  CHECK_NULLPTR_RETURN_VOID(m_torrentsDBModel);
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
     m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
   }
   m_torrentsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
   m_torrentsDBModel->submitAll();
-
   m_torrentsListView->setModel(m_torrentsDBModel);
-
   m_torrentsListView->InitTableView();
 
   subscribe();
 
+  updateWindowsSize();
   setWindowTitle("Torrents Manager Widget");
   setWindowIcon(QIcon(":img/TORRENTS_MANAGER"));
-  updateWindowsSize();
 }
 
 void TorrentsManagerWidget::subscribe() {
@@ -228,6 +232,11 @@ bool TorrentsManagerWidget::onSubmit() {
 
   Notificator::goodNews("Submit succeed", DB_TABLE::TORRENTS);
   return true;
+}
+
+void TorrentsManagerWidget::showEvent(QShowEvent* event) {
+  QMainWindow::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
 }
 
 void TorrentsManagerWidget::closeEvent(QCloseEvent* event) {

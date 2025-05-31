@@ -4,6 +4,7 @@
 #include "Model/QAbstractTableModelPub.h"
 #include "View/CustomTableView.h"
 #include "public/DisplayEnhancement.h"
+#include "public/StyleSheet.h"
 
 #include <QAbstractTableModel>
 #include <QLabel>
@@ -102,6 +103,11 @@ void Archiver::UpdateWindowsSize() {
     setGeometry(DEFAULT_GEOMETRY);
   }
   m_splitter->restoreState(PreferenceSettings().value("ArchiverSplitterState", QByteArray()).toByteArray());
+}
+
+void Archiver::showEvent(QShowEvent *event) {
+  QMainWindow::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
 }
 
 void Archiver::closeEvent(QCloseEvent* event) {
