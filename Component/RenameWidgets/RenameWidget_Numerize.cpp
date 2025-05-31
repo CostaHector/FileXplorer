@@ -77,7 +77,6 @@ void RenameWidget_Numerize::extraSubscribe() {
     PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
     OnlyTriggerRenameCore();
   });
-  connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
 }
 
 QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
@@ -94,6 +93,7 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
       m_completeBaseName->setText(replaceeList[0]);
       m_completeBaseName->selectAll();
     }
+    connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
     m_baseNameInited = true;
   }
   const QStringList& suffixs = m_oExtTE->toPlainText().split(NAME_SEP);
