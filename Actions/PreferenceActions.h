@@ -1,7 +1,6 @@
 #ifndef PREFERENCEACTIONS_H
 #define PREFERENCEACTIONS_H
 
-
 #include <QObject>
 #include <QAction>
 #include <QActionGroup>
@@ -19,7 +18,7 @@ public:
   QAction *STYLE_WINDOWS_VISTA{nullptr}, *STYLE_WINDOWS{nullptr}, *STYLE_FUSION{nullptr}, *STYLE_MACOS{nullptr};
   QActionGroup* STYLE_AG{nullptr};
 
-  QAction *STYLESHEET_DEFAULT{nullptr}, *STYLESHEET_LIGHT_THEME_SUN{nullptr}, *STYLESHEET_DARK_THEME_MOON_FOG{nullptr};
+  QAction *STYLESHEET_DEFAULT_LIGHT{nullptr}, *STYLESHEET_DARK_THEME_MOON_FOG{nullptr};
   QActionGroup *STYLESHEET{nullptr};
 
   QList<QAction*> PREFERENCE_LIST;

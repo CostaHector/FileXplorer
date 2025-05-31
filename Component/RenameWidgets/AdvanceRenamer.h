@@ -45,6 +45,9 @@ class AdvanceRenamer : public QDialog {
   virtual void extraSubscribe() = 0;
   virtual QStringList RenameCore(const QStringList& replaceeList) = 0;
 
+ protected:
+  static constexpr char NAME_SEP = '\n';
+
  public:
   QString windowTitleFormat;
 
@@ -72,8 +75,6 @@ class AdvanceRenamer : public QDialog {
   QVBoxLayout* m_mainLayout{nullptr};
 
   QPlainTextEdit* m_commandsPreview{nullptr};
-
-  static constexpr char NAME_SEP = '\n';
 };
 
 #endif  // ADVANCERENAMER_H

@@ -2,7 +2,7 @@
 #include <QRegularExpression>
 
 bool SubscriptsStr2Int(const QString& subscripts, QList<int>& sortedIndLst) {
-  static const QRegularExpression SORT_INDEX_SEP{", |,| "};
+  static const QRegularExpression SORT_INDEX_SEP{R"(,\s*|\s+)"};
   const QStringList& sortedIndLstStr = subscripts.split(SORT_INDEX_SEP);
   sortedIndLst.reserve(sortedIndLstStr.size());
   int ind = 0;
@@ -32,11 +32,11 @@ const QStringList NameSectionArrange::PATTERN_INDEX_FREQ{"0213456", "0132456"};
 const QStringList NameSectionArrange::SWAP_INDEX_FREQ{"1,2", "2,3", "1,3", "0,1", "0,2", "0,3"};
 const QList<int> NameSectionArrange::INDEX_ARR{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-NameSectionArrange::NameSectionArrange() : m_strictMode{true} {  //
+NameSectionArrange::NameSectionArrange() : m_recordWasted{true} {  //
 }
 
 NameSectionArrange::NameSectionArrange(const QList<int>& sortedIndlst, const bool strictMode)  //
-    : m_strictMode{strictMode},                                                                //
+    : m_recordWasted{strictMode},                                                              //
       m_seq{sortedIndlst} {                                                                    //
 }
 
@@ -71,10 +71,9 @@ QString NameSectionArrange::operator()(const QString& names) {
     }
     newNameSec << section[index].trimmed();
   }
-  if (m_strictMode && newNameSec.size() < section.size()) {  // Attention: some section part is wasted
+  if (m_recordWasted && newNameSec.size() < section.size()) {  // Attention: some section part is wasted
     m_wastedList.push_back(names);
   }
   static const QString SECTION_JOIN_SEP = " - ";
   return newNameSec.join(SECTION_JOIN_SEP);
-  ;
 }
