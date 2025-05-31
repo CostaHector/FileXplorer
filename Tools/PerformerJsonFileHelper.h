@@ -12,8 +12,8 @@ namespace PERFORMER_DB_HEADER_KEY {
 const QString Name = "Name";
 const QString Rate = "Rate";
 const QString AKA = "AKA";
-const QString Tags = "Tags";        // "Daddy", "BBC", "White cock", "Mature", "bodybuilder", "atheletic", "beard", "asian", "leather"
-const QString Orientation = "Ori";  // ["bi", "gay", "hetero"]
+const QString Tags = "Tags";
+const QString Orientation = "Ori";
 const QString Vids = "Vids";
 const QString Imgs = "Imgs";
 const QString Detail = "Detail";
