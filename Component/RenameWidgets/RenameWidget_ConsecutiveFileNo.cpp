@@ -4,14 +4,10 @@
 #include "public/PublicMacro.h"
 
 RenameWidget_ConsecutiveFileNo::RenameWidget_ConsecutiveFileNo(QWidget* parent)  //
-    : AdvanceRenamer(parent) {
-  m_fileNoStartIndex = new (std::nothrow) QLineEdit{"0", this};
-  CHECK_NULLPTR_RETURN_VOID(m_fileNoStartIndex)
-
-  m_nameExtIndependent->setCheckState(Qt::CheckState::Checked);
+    : AdvanceRenamer(parent)                                                     //
+{
   m_recursiveCB->setEnabled(false);
-  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
-};
+}
 
 QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replaceeList) {
   if (replaceeList.isEmpty()) {
@@ -20,16 +16,20 @@ QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replac
   const QString& startNoStr = m_fileNoStartIndex->text();
   bool isnumeric = false;
   int startNo = startNoStr.toInt(&isnumeric);
-  if (not isnumeric) {
-    qCritical("start no[%s] must be a number", qPrintable(startNoStr));
-    Notificator::critical("start no[%s] must be a number", startNoStr);
+  if (!isnumeric) {
+    LOG_CRITICAL("Start no must be a number", startNoStr);
     return replaceeList;
   }
   return ToConsecutiveFileNameNo(startNo)(replaceeList);
 }
 
 void RenameWidget_ConsecutiveFileNo::InitExtraCommonVariable() {
-  windowTitleFormat = QString("Consecutive file number | %1 item(s) under [%2]");
+  m_fileNoStartIndex = new (std::nothrow) QLineEdit{"0", this};
+  CHECK_NULLPTR_RETURN_VOID(m_fileNoStartIndex)
+  m_nameExtIndependent->setCheckState(Qt::CheckState::Checked);
+  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
+
+  windowTitleFormat = "Consecutive file number | %1 item(s) under [%2]";
   setWindowTitle(windowTitleFormat);
 }
 

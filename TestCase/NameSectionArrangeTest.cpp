@@ -14,7 +14,7 @@ class NameSectionArrangeTest : public MyTestSuite {
 
   void test_SubscriptsStr2Int() {
     // seperated by comma, space-comma, space
-    const QStringList strLst{"5,10,2,3,4", "5 10 2 3 4", "5 10 2 3 4"};
+    const QStringList strLst{"5,10,2,3,4", "5 10 2 3 4", "5 10 2 3 4", "5  10 2,3, 4"};
     const QList<int> expectLst{5, 10, 2, 3, 4};
     for (const QString& str : strLst) {
       QList<int> sortedIndLst;

@@ -22,7 +22,7 @@ class NameSectionArrange {
   static const QList<int> INDEX_ARR;
 
  private:
-  bool m_strictMode;
+  bool m_recordWasted;
   QList<int> m_seq;
 
   QStringList m_wastedList;  // remember to check this member when m_strictMode is false.
