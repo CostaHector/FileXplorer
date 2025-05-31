@@ -16,8 +16,14 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
 {
   m_nameExtIndependent = new (std::nothrow) QCheckBox{"Name Ext Independent"};
   CHECK_NULLPTR_RETURN_VOID(m_nameExtIndependent)
+  m_nameExtIndependent->setToolTip(
+      "Show file base name and extension respectively.\n"
+      "So rename rules will work/or not work on extension");
   m_recursiveCB = new (std::nothrow) QCheckBox{"Recursive"};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
+  m_recursiveCB->setToolTip(
+      "Recursive rename.\n"
+      "Rules will also work on itself and its subdirectories");
   regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state"};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
   m_relNameTE = new (std::nothrow) QPlainTextEdit;
@@ -34,16 +40,6 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   CHECK_NULLPTR_RETURN_VOID(m_buttonBox)
   m_commandsPreview = new (std::nothrow) QPlainTextEdit;
   CHECK_NULLPTR_RETURN_VOID(m_commandsPreview)
-
-  m_nameExtIndependent->setToolTip(
-      "Show file base name and extension respectively.\n"
-      "So rename rules will work/or not work on extension");
-  m_nameExtIndependent->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.v).toBool());
-
-  m_recursiveCB->setToolTip(
-      "Recursive rename.\n"
-      "Rules will also work on itself and its subdirectories");
-  m_recursiveCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
 
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
   auto* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok);
@@ -94,13 +90,6 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   m_nameEditLayout->setSpacing(0);
   m_nameEditLayout->setContentsMargins(0, 0, 0, 0);
 
-  const bool bNameExtIndependent{m_nameExtIndependent->checkState() == Qt::Checked};
-  m_oExtTE->setVisible(bNameExtIndependent);
-  m_nExtTE->setVisible(bNameExtIndependent);
-
-  setLayout(m_mainLayout);
-
-  Subscribe();
   ReadSettings();
 
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
@@ -132,7 +121,18 @@ void AdvanceRenamer::init() {
   m_mainLayout->addWidget(m_controlBar);
   m_mainLayout->addLayout(m_nameEditLayout);
   m_mainLayout->addWidget(m_buttonBox);
+  setLayout(m_mainLayout);
+
+  /* don't move this section up (Don't set state before UI)*/
+  m_recursiveCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
+  const bool bNameExtIndependent{PreferenceSettings().value(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.v).toBool()};
+  m_nameExtIndependent->setChecked(bNameExtIndependent);
+  m_oExtTE->setVisible(bNameExtIndependent);
+  m_nExtTE->setVisible(bNameExtIndependent);
+  /* don't move this section up */
+
   extraSubscribe();
+  Subscribe();
 }
 
 void AdvanceRenamer::Subscribe() {
@@ -203,7 +203,7 @@ void AdvanceRenamer::onIncludingSub(int includingSubState) {
 
 void AdvanceRenamer::onNameExtRespective(int includingSuffixState) {
   const bool bNameExtIndependent{includingSuffixState == Qt::Checked};
-  PreferenceSettings().setValue(MemoryKey::RENAMER_INCLUDING_FILE_EXTENSION.name, bNameExtIndependent);
+  PreferenceSettings().setValue(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, bNameExtIndependent);
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);
   if (bNameExtIndependent) {
