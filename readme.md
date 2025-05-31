@@ -4,7 +4,7 @@
 
 FileXplorer is a cross-platform professional file management system engineered for photographers and videographers handling large-scale media files, offering advanced file operations across both Windows and Linux environments.
 
-![FileXplorer](bin/FileXplorer.png)
+![FileXplorer](bin/FileXplorer_Dark.png)
 
 ## Core Features
 
@@ -55,6 +55,11 @@ FileXplorer is a cross-platform professional file management system engineered f
         Attention:
                 - All undo history purges upon application termination/restart. So operation cannot be recovered after restart;
                 - Permanent deletion operations cannot be recovered;
+
+7. Dark/Light theme switch support
+![FileXplorer](bin/FileXplorer_Light.png)
+
+
 
 ## Coding Style
 
