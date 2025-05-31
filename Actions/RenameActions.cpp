@@ -2,8 +2,8 @@
 
 RenameActions::RenameActions(QObject* parent) : QObject{parent} {
   _NUMERIZER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), "Rename (ith)");
-  _SECTIONS_SWAPPER = new (std::nothrow) QAction(QIcon(":img/NAME_SECTIONS_SWAP"), "Sections Swap");
-  _SWAP_2_NAMES = new (std::nothrow) QAction(QIcon(":img/RENAME_SWAP_2_NAMES"), "Swap 2 names");
+  _SECTIONS_ARRANGE = new (std::nothrow) QAction(QIcon(":img/NAME_SECTIONS_ARRANGE"), "Sections Arrange");
+  _REVERSE_NAMES_LIST = new (std::nothrow) QAction(QIcon(":img/RENAME_REVERSE_NAMES_LIST"), "Reverse names list");
   _CASE_NAME = new (std::nothrow) QAction(QIcon(":img/NAME_STR_CASE"), "Case Change");
   _STR_INSERTER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), "String Insert");
   _STR_DELETER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_DELETER_PATH"), "String Delete");
@@ -52,15 +52,15 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   _NUMERIZER->setShortcut(QKeySequence(Qt::Key_F2));
   _NUMERIZER->setToolTip(QString("<b>%1 (%2)</b><br/> Numerizer each file in a sequence.").arg(_NUMERIZER->text()).arg(_NUMERIZER->shortcut().toString()));
 
-  _SECTIONS_SWAPPER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F2));
-  _SECTIONS_SWAPPER->setToolTip(QString("<b>%1 (%2)</b><br/> Swap sections in name. e.g., A-B-C -> A-C-B.").arg(_SECTIONS_SWAPPER->text()).arg(_SECTIONS_SWAPPER->shortcut().toString()));
+  _SECTIONS_ARRANGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F2));
+  _SECTIONS_ARRANGE->setToolTip(QString("<b>%1 (%2)</b><br/> Swap sections in name. e.g., A-B-C -> A-C-B.").arg(_SECTIONS_ARRANGE->text()).arg(_SECTIONS_ARRANGE->shortcut().toString()));
 
-  _SWAP_2_NAMES->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_R));
-  _SWAP_2_NAMES->setToolTip(QString("<b>%1 (%2)</b><br/> Swap 2 filenames.<br/>"
+  _REVERSE_NAMES_LIST->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_R));
+  _REVERSE_NAMES_LIST->setToolTip(QString("<b>%1 (%2)</b><br/> Swap 2 filenames.<br/>"
                                     "e.g.,<br/>"
                                     "file1, file2 -> file2, file1")
-                                .arg(_SWAP_2_NAMES->text())
-                                .arg(_SWAP_2_NAMES->shortcut().toString()));
+                                .arg(_REVERSE_NAMES_LIST->text())
+                                .arg(_REVERSE_NAMES_LIST->shortcut().toString()));
 
   _STR_INSERTER->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_I));
   _STR_INSERTER->setToolTip(QString("<b>%1 (%2)</b><br/> Insert a string into file name.").arg(_STR_INSERTER->text()).arg(_STR_INSERTER->shortcut().toString()));
@@ -80,8 +80,8 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
-  actionGroup->addAction(_SECTIONS_SWAPPER);
-  actionGroup->addAction(_SWAP_2_NAMES);
+  actionGroup->addAction(_SECTIONS_ARRANGE);
+  actionGroup->addAction(_REVERSE_NAMES_LIST);
   actionGroup->addAction(_CASE_NAME);
   actionGroup->addAction(_STR_INSERTER);
   actionGroup->addAction(_STR_DELETER);

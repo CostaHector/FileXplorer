@@ -15,10 +15,10 @@ QTabBar::close-button:hover {
 }
 QTabWidget::pane {
     background-color: rgba(255, 255, 255, 255);
-    border-top: 1px solid rgba(160, 160, 160, 255);
+    border-top: 1px solid rgba(160, 160, 160, 255); /* tabWidget addTab top */
     position: absolute;
     top: -1px;
-    border-bottom: 1px solid rgba(160, 160, 160, 255);
+    border-bottom: 1px solid rgba(160, 160, 160, 255);  /* tabWidget addTab bottom */
 }
 QTabBar::tab {
     padding-top: 5px;
