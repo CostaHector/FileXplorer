@@ -7,14 +7,13 @@
 #include <QVBoxLayout>
 
 #include "Actions/FileLeafAction.h"
-#include "Notificator.h"
 #include "public/PublicVariable.h"
+#include "Notificator.h"
 
 AlertSystem::AlertSystem(QWidget* parent)
     : QDialog{parent},
       m_failItemCnt{new QLabel("0", this)},
-      m_recheckButtonBox{
-          new QDialogButtonBox(QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry, Qt::Orientation::Horizontal, this)} {
+      m_recheckButtonBox{new QDialogButtonBox(QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry, Qt::Orientation::Horizontal, this)} {
   m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open)->setIcon(QIcon(":img/CONFIGURE"));
   m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setText("Recheck");
   m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setIcon(QIcon(":img/RELOAD_FROM_DISK"));
@@ -33,16 +32,29 @@ AlertSystem::AlertSystem(QWidget* parent)
   connect(m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open), &QPushButton::clicked, this, &AlertSystem::onEditPreferenceSetting);
   connect(m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry), &QPushButton::clicked, this, &AlertSystem::RefreshWindowIcon);
 
-
   connect(m_alertModel, &QAbstractItemModel::dataChanged, this, &AlertSystem::RefreshWindowIcon);
 
   ReadSettings();
   RefreshWindowIcon();
 }
 
+void AlertSystem::ReadSettings() {
+  if (PreferenceSettings().contains("ALERT_SYSTEM_GEOMETRY")) {
+    restoreGeometry(PreferenceSettings().value("ALERT_SYSTEM_GEOMETRY").toByteArray());
+  } else {
+    setGeometry(DEFAULT_GEOMETRY);
+  }
+  m_alertsTable->InitTableView();
+}
+
 void AlertSystem::hideEvent(QHideEvent* event) {
   g_fileLeafActions()._ALERT_ITEMS->setChecked(false);
   QDialog::hideEvent(event);
+}
+
+void AlertSystem::closeEvent(QCloseEvent* event) {
+  PreferenceSettings().setValue("ALERT_SYSTEM_GEOMETRY", saveGeometry());
+  return QDialog::closeEvent(event);
 }
 
 void AlertSystem::RefreshWindowIcon() {
@@ -77,7 +89,7 @@ void AlertSystem::onEditPreferenceSetting() const {
   Notificator::information("Remember to reload", "don't forget it");
 }
 
-//#define __NAME__EQ__MAIN__ 1
+// #define __NAME__EQ__MAIN__ 1
 
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>

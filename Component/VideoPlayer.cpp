@@ -1,13 +1,18 @@
 #include "VideoPlayer.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
+
 #include "Component/Notificator.h"
+
 #include "Tools/Json/JsonHelper.h"
 #include "Tools/VideoPlayerWatcher.h"
+
 #include "public/MemoryKey.h"
 #include "public/PathTool.h"
 #include "public/UndoRedo.h"
 #include "public/PublicMacro.h"
+#include "public/StyleSheet.h"
+#include "public/PublicVariable.h"
 
 #include <QVideoWidget>
 #include <QtWidgets>
@@ -78,8 +83,9 @@ VideoPlayer::VideoPlayer(QWidget* parent)
   subscribe();
   m_watcher = new VideoPlayerWatcher(this, m_videoWidget, m_playListWid);
 
-  setWindowIcon(QIcon(":img/VIDEO_PLAYER"));
   updateWindowsSize();
+  setWindowTitle("Video Player");
+  setWindowIcon(QIcon(":img/VIDEO_PLAYER"));
 }
 
 VideoPlayer::~VideoPlayer() {}
@@ -96,7 +102,7 @@ bool VideoPlayer::operator()(const QString& path) {
   return true;
 }
 
-auto VideoPlayer::operator()(const QStringList& fileAbsPathList) -> bool {
+bool VideoPlayer::operator()(const QStringList& fileAbsPathList) {
   const int rowToPlay = m_playListWid->count();
   const int vidCntDelta = m_playListWid->appendToPlayList(fileAbsPathList);
   if (vidCntDelta <= 0) {
@@ -114,9 +120,7 @@ auto VideoPlayer::operator()(const QStringList& fileAbsPathList) -> bool {
 void VideoPlayer::openFile(const QString& filePath) {
   QUrl fileUrl = QUrl::fromLocalFile(filePath);
   if (not QFileInfo(filePath).isFile()) {
-    QFileDialog fileDialog(
-        this, "Open Movie",
-        PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString());
+    QFileDialog fileDialog(this, "Open Movie", PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString());
     fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
     QStringList supportedMimeTypes = m_mediaPlayer->supportedMimeTypes();
     if (!supportedMimeTypes.isEmpty()) {
@@ -140,8 +144,7 @@ void VideoPlayer::openFile(const QString& filePath) {
 void VideoPlayer::openAFolder(const QString& folderPath) {
   QString loadFromPath = folderPath;
   if (not QFileInfo(loadFromPath).isDir()) {
-    const QString& loadFromDefaultPath =
-        PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
+    const QString& loadFromDefaultPath = PreferenceSettings().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
     loadFromPath = QFileDialog::getExistingDirectory(this, "load videos from a folder", loadFromDefaultPath);
   }
   QFileInfo loadFromFi(loadFromPath);
@@ -179,7 +182,29 @@ void VideoPlayer::onVolumeValueChange(const int logScaleValue) {
   PreferenceSettings().setValue(MemoryKey::VIDEO_PLAYER_VOLUME.name, logScaleValue);
 }
 
-auto VideoPlayer::keyPressEvent(QKeyEvent* e) -> void {
+void VideoPlayer::updateWindowsSize() {
+  if (PreferenceSettings().contains("VideoPlayerGeometry")) {
+    restoreGeometry(PreferenceSettings().value("VideoPlayerGeometry").toByteArray());
+  } else {
+    setGeometry(DEFAULT_GEOMETRY);
+  }
+  m_playlistSplitter->restoreState(PreferenceSettings().value("VideoPlayerSplitterState", QByteArray()).toByteArray());
+}
+
+void VideoPlayer::showEvent(QShowEvent* event) {
+  QMainWindow::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
+}
+
+void VideoPlayer::closeEvent(QCloseEvent* event) {
+  setUrl({});
+  PreferenceSettings().setValue("VideoPlayerGeometry", saveGeometry());
+  qDebug("Video Player geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
+  PreferenceSettings().setValue("VideoPlayerSplitterState", m_playlistSplitter->saveState());
+  QMainWindow::closeEvent(event);
+}
+
+void VideoPlayer::keyPressEvent(QKeyEvent* e) {
   if (e->modifiers() == Qt::AltModifier and (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return)) {
     m_playListWid->hide();
     m_sliderTB->show();
@@ -281,11 +306,11 @@ void VideoPlayer::setUrl(const QUrl& url) {
   m_mediaPlayer->setMedia(url);
 }
 
-auto VideoPlayer::loadVideoRate() -> void {
+void VideoPlayer::loadVideoRate() {
   if (m_dict.contains(ENUM_2_STR(Rate))) {
     bool isInt = false;
     int rate = m_dict[ENUM_2_STR(Rate)].toInt(&isInt);
-    if (isInt and 0 <= rate and rate < g_videoPlayerActions()._RATE_LEVEL_COUNT) {
+    if (isInt && 0 <= rate && rate < g_videoPlayerActions()._RATE_LEVEL_COUNT) {
       g_videoPlayerActions()._RATE_AG->actions()[rate]->setChecked(true);
     }
     return;
@@ -335,8 +360,7 @@ void VideoPlayer::subscribe() {
 
   connect(g_videoPlayerActions()._NEXT_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayNextVideo);
   connect(g_videoPlayerActions()._LAST_VIDEO, &QAction::triggered, this, &VideoPlayer::onPlayLastVideo);
-  connect(g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO, &QAction::triggered,
-          [](const bool checked) { PreferenceSettings().setValue(MemoryKey::AUTO_PLAY_NEXT_VIDEO.name, checked); });
+  connect(g_videoPlayerActions()._AUTO_PLAY_NEXT_VIDEO, &QAction::triggered, [](const bool checked) { PreferenceSettings().setValue(MemoryKey::AUTO_PLAY_NEXT_VIDEO.name, checked); });
 
   connect(g_videoPlayerActions()._OPEN_A_VIDEO, &QAction::triggered, this, [this]() { openFile(); });
   connect(g_videoPlayerActions()._LOAD_A_PATH, &QAction::triggered, this, [this]() { openAFolder(); });
@@ -440,8 +464,7 @@ bool VideoPlayer::onGrabAFrame(const QVideoFrame& frame) {
   }
   const int seconds = m_timeSlider->value() / MICROSECOND;
   const QFileInfo fi(m_playListWid->currentFilePath());
-  const QString& imgAbsPath =
-      QString("%1/%2 %3.png").arg(fi.absolutePath()).arg(fi.completeBaseName()).arg(seconds, DURATION_PLACEHOLDER_LENGTH, 10, QChar('0'));
+  const QString& imgAbsPath = QString("%1/%2 %3.png").arg(fi.absolutePath()).arg(fi.completeBaseName()).arg(seconds, DURATION_PLACEHOLDER_LENGTH, 10, QChar('0'));
   qDebug("Grabbed image named: %s", qPrintable(imgAbsPath));
   const auto& outputImage = img.mirrored(false, true);
   const bool ret = outputImage.save(imgAbsPath);
@@ -466,7 +489,7 @@ bool VideoPlayer::onMarkHotScenes() {
   return dumpRet;
 }
 
-auto VideoPlayer::loadHotSceneList() -> void {
+void VideoPlayer::loadHotSceneList() {
   m_hotSceneList.clear();
   if (m_dict.contains(ENUM_2_STR(Hot))) {
     for (const QVariant& pos : m_dict[ENUM_2_STR(Hot)].toList()) {
@@ -475,7 +498,7 @@ auto VideoPlayer::loadHotSceneList() -> void {
   }
 }
 
-auto VideoPlayer::onJumpToNextHotScene() -> bool {
+bool VideoPlayer::onJumpToNextHotScene() {
   if (m_hotSceneList.isEmpty()) {
     qInfo("[Skip] Hot scenes list is empty");
     return false;
@@ -491,7 +514,7 @@ auto VideoPlayer::onJumpToNextHotScene() -> bool {
   return false;
 }
 
-auto VideoPlayer::onJumpToLastHotScene() -> bool {
+bool VideoPlayer::onJumpToLastHotScene() {
   if (m_hotSceneList.isEmpty()) {
     qDebug("empty hot scenes list");
     return false;
@@ -527,7 +550,7 @@ bool VideoPlayer::onPositionAdd(const int ms) {
   return true;
 }
 
-auto VideoPlayer::onRateForThisMovie(const QAction* checkedAction) -> bool {
+bool VideoPlayer::onRateForThisMovie(const QAction* checkedAction) {
   qDebug("Rate: %s score.", qPrintable(checkedAction->text()));
   const QString& jsonPath = JsonFileValidCheck("rate movie");
   if (jsonPath.isEmpty()) {

@@ -7,6 +7,7 @@
 
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
+#include "public/StyleSheet.h"
 
 MD5Window::MD5Window(const QString& root, const QStringList& items, QWidget* parent)
     : QDialog(parent),
@@ -15,10 +16,10 @@ MD5Window::MD5Window(const QString& root, const QStringList& items, QWidget* par
       m_md5FileName(QFileInfo(m_root).fileName() + ".md5"),
       m_md5TextEdit(new QPlainTextEdit(this)),
       m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Orientation::Horizontal, this)),
-      m_incrementRefresh(new (std::nothrow) QAction(QIcon(":img/INCREMENTAL_CALCULATE"), tr("Incremental Calc"), this)),
-      m_reloadFromFile(new (std::nothrow) QAction(tr("Reload"), this)),
-      m_dumpMD5IntoFile(new (std::nothrow) QAction(tr("Dump"), this)),
-      m_fullRefresh(new (std::nothrow) QAction(QIcon(":img/FULL_CALCULATE"), tr("Full Calc"), this)),
+      m_incrementRefresh(new(std::nothrow) QAction(QIcon(":img/INCREMENTAL_CALCULATE"), "Incremental Calc", this)),
+      m_reloadFromFile(new(std::nothrow) QAction("Reload", this)),
+      m_dumpMD5IntoFile(new(std::nothrow) QAction("Dump", this)),
+      m_fullRefresh(new(std::nothrow) QAction(QIcon(":img/FULL_CALCULATE"), "Full Calc", this)),
       m_md5InfoTB(new QToolBar("Extra Info", this)) {
   m_md5TextEdit->setReadOnly(true);
   m_md5TextEdit->setFont(QFont("Consolas"));
@@ -50,6 +51,11 @@ MD5Window::MD5Window(const QString& root, const QStringList& items, QWidget* par
   onLoadFromMD5Files();
 }
 
+void MD5Window::showEvent(QShowEvent* event) {
+  QDialog::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
+}
+
 bool MD5Window::onIncrementalCalculateMD5() {
   const auto& fileLst = FileSystemItemFilter::FilesOut(m_items);
   const int ROOT_PATH_LEN = m_root.size();
@@ -72,8 +78,7 @@ bool MD5Window::onIncrementalCalculateMD5() {
   }
 
   const auto& md5Lst = MD5Calculator::GetBatchFileMD5(toUpdateFileLst);
-  setWindowTitle(
-      QString("MD5 | +%1-%2/%3 file(s) update | %4").arg(toUpdateFileLst.size()).arg(toEraseFileList.size()).arg(fileLst.size()).arg(m_root));
+  setWindowTitle(QString("MD5 | +%1-%2/%3 file(s) update | %4").arg(toUpdateFileLst.size()).arg(toEraseFileList.size()).arg(fileLst.size()).arg(m_root));
   // add new files
   for (int i = 0; i < toUpdateFileLst.size(); ++i) {
     m_fileMD5Map[toUpdateFileLst[i].mid(ROOT_PATH_LEN + 1)] = md5Lst[i];

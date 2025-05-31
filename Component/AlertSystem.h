@@ -13,20 +13,9 @@ class AlertSystem : public QDialog {
  public:
   explicit AlertSystem(QWidget* parent = nullptr);
 
-  void ReadSettings() {
-    if (PreferenceSettings().contains("ALERT_SYSTEM_GEOMETRY")) {
-      restoreGeometry(PreferenceSettings().value("ALERT_SYSTEM_GEOMETRY").toByteArray());
-    } else {
-      setGeometry(DEFAULT_GEOMETRY);
-    }
-    m_alertsTable->InitTableView();
-  }
-
+  void ReadSettings();
   virtual void hideEvent(QHideEvent* event) override;
-  virtual void closeEvent(QCloseEvent* event) override{
-    PreferenceSettings().setValue("ALERT_SYSTEM_GEOMETRY", saveGeometry());
-    return QDialog::closeEvent(event);
-  }
+  virtual void closeEvent(QCloseEvent* event) override;
 
   void RefreshWindowIcon();
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;

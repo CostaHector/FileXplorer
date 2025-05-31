@@ -60,6 +60,7 @@ class DuplicateVideosFinder : public QMainWindow {
 
   void updateWindowsSize();
 
+  void showEvent(QShowEvent *event) override;
   void closeEvent(QCloseEvent* event) override;
 
   void keyPressEvent(QKeyEvent* e) override;

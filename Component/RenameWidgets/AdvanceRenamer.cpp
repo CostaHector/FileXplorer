@@ -4,6 +4,7 @@
 #include "public/PathTool.h"
 #include "public/UndoRedo.h"
 #include "public/PublicMacro.h"
+#include "public/StyleSheet.h"
 #include "Component/Notificator.h"
 #include "Tools/RenameNamesUnique.h"
 
@@ -97,8 +98,6 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);
 
-  m_mainLayout->addLayout(m_nameEditLayout);
-  m_mainLayout->addWidget(m_buttonBox);
   setLayout(m_mainLayout);
 
   Subscribe();
@@ -106,6 +105,11 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
 
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
+}
+
+void AdvanceRenamer::showEvent(QShowEvent* event) {
+  QDialog::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
 }
 
 void AdvanceRenamer::closeEvent(QCloseEvent* event) {
@@ -125,7 +129,9 @@ void AdvanceRenamer::init() {
   InitExtraCommonVariable();
   InitExtraMemberWidget();
   m_controlBar = InitControlTB();
-  m_mainLayout->insertWidget(0, m_controlBar);
+  m_mainLayout->addWidget(m_controlBar);
+  m_mainLayout->addLayout(m_nameEditLayout);
+  m_mainLayout->addWidget(m_buttonBox);
   extraSubscribe();
 }
 

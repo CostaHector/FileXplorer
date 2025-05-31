@@ -2,17 +2,7 @@
 #define TORRENTSMANAGERWIDGET_H
 
 #include <QMainWindow>
-
-#include <QToolBar>
-#include <QWidget>
-#include <QTextBrowser>
-#include <QVBoxLayout>
 #include <QSqlTableModel>
-
-#include <QAction>
-#include <QMenu>
-#include <QMenuBar>
-
 #include <QLineEdit>
 #include "CustomTableView.h"
 #include "Tools/FileDescriptor/TorrDb.h"
@@ -30,7 +20,8 @@ class TorrentsManagerWidget : public QMainWindow {
 
   bool onSubmit();
 
-  void closeEvent(QCloseEvent* event);
+  void showEvent(QShowEvent *event) override;
+  void closeEvent(QCloseEvent* event) override;
   void updateWindowsSize();
 
   TorrDb mDb;
