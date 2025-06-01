@@ -188,6 +188,10 @@ QTableView {
     background-color: #323232;  /* 基础背景色 */
     gridline-color: #3c3c3c;  /* 网格线颜色 */
 }
+QTableView::item {
+    border-left: 2px solid transparent; /* preserve 2 px for focus */
+    border-right: 2px solid transparent; /* preserve 2 px for focus */
+}
 QTableView::item:alternate {
 }
 QTableView::item:selected {
@@ -200,8 +204,12 @@ QTableView::item:selected:!active {
 QTableView::item:selected:active {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);
     color: #000000;
-    border-top: 2px solid #CCEBFF;
     border-bottom: 2px solid #CCEBFF;
+}
+/* Current Cell that has Focus */
+QTableView::item:focus {
+    border-left: 2px solid #FFFFFF;
+    border-right: 2px solid #FFFFFF;
 }
 QTableView::item:hover {
     background: #3c3c3c;
