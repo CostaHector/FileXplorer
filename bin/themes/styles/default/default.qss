@@ -79,6 +79,10 @@ QListView::item:hover {
 QTableView {
     show-decoration-selected: 1;
 }
+QTableView::item {
+    border-left: 2px solid transparent; /* preserve 2 px for focus */
+    border-right: 2px solid transparent; /* preserve 2 px for focus */
+}
 QTableView::item:alternate {
 }
 QTableView::item:selected {
@@ -93,6 +97,11 @@ QTableView::item:selected:active {
     color: #000000;
     border-top: 2px solid #CCEBFF;
     border-bottom: 2px solid #CCEBFF;
+}
+/* Current Cell that has Focus */
+QTableView::item:focus {
+    border-left: 2px solid #FFFFFF;
+    border-right: 2px solid #FFFFFF;
 }
 QTableView::item:hover {
     background: #CCEBFF;
