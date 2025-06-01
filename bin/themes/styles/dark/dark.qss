@@ -46,7 +46,7 @@ QMenuBar {
     background-color: #252525;
 }
 
-QMenuBar, QToolBar {
+QMenuBar {
     border: none;
 }
 
@@ -281,7 +281,7 @@ QScrollBar:horizontal {
 
 /* 工具栏基础样式 */
 QToolBar {
-    background: #323232;
+    background: #4F4B49;
     margin: 1px;
     padding: 1px;
 }
