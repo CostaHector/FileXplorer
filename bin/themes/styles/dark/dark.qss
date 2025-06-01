@@ -1,18 +1,18 @@
 /* 基础设置 */
 QWidget {
-    background-color: #1e1e1e;
+    background-color: #000000;
     color: #d4d4d4;
     selection-background-color: #264f78;
 }
 
 /* 主窗口 */
 QMainWindow {
-    background-color: #252526;
+    background-color: #252525;
 }
 
 /* 文本编辑区 */
 QPlainTextEdit, QTextEdit {
-    background-color: #1e1e1e;
+    background-color: #252525;
     color: #d4d4d4;
     selection-background-color: #264f78;
 }
@@ -30,18 +30,20 @@ QPushButton:hover {
 
 /* 输入框 */
 QLineEdit {
+    background-color: #252525;
     border: 1px solid rgb(160, 160, 160);
     margin: 1px;
-    color: #FFFFFF
+    color: #FFFFFF;
 }
 
 QComboBox {
+    background-color: #252525;
     color: #FFFFFF;
 }
 
 /* 菜单栏 */
 QMenuBar {
-    background-color: #252526;
+    background-color: #252525;
 }
 
 QMenuBar, QToolBar {
@@ -58,7 +60,7 @@ QMenuBar::item:selected {
 
 /* 滚动条 */
 QScrollBar:vertical {
-    background: #252526;
+    background: #252525;
     width: 12px;
 }
 
@@ -87,21 +89,28 @@ QDockWidget::separator {
     height: 0px;
 }
 
+QTabWidget {
+    background-color: #252525;  /* 右侧空白区域背景色 */
+    border: none;
+}
+
+QTabBar {
+    background-color: #252525;  /* 右侧空白区域背景色 */
+}
+
 QTabWidget::tab {
     background: #252525;
     color: #d4d4d4;
     border: 1px solid #3c3c3c;
     border-bottom: none;
 }
-
 QTabWidget::pane {
-    background-color: rgba(255, 255, 255, 255);
+    background-color: rgb(255, 255, 255);
     border-top: 1px solid rgba(160, 160, 160, 255); /* tabWidget addTab top */
     position: absolute;
     top: -1px; /* overlap to tab */
     border-bottom: 1px solid rgba(160, 160, 160, 255);  /* tabWidget addTab bottom */
 }
-
 QTabBar::tab {
     background-color: #252525;
     padding-top: 5px;
@@ -110,38 +119,35 @@ QTabBar::tab {
     padding-right: 15px;
     margin-top: 1px;
     min-width: 60px;
+    font-size: 15px;
 }
-
 QTabBar::tab:!selected {
     border-bottom: 1px solid rgba(160, 160, 160, 255);
 }
-
 QTabBar::tab:selected {
-    background-color: #847545;
+    background-color: rgb(117, 106, 61);
     border-top: 1px solid rgba(160, 160, 160, 255);
     border-right: 1px solid rgba(160, 160, 160, 255);
     border-left: 1px solid rgba(160, 160, 160, 255);
     font-weight: bold; /* 选中状态加粗 */
 }
-
 QTabBar::tab:hover {
     background-color: rgba(62, 62, 64, 1.0);
     border: 1px solid #5e5e60;
 }
-
 QTabBar::tab:selected:hover {
     background-color: rgba(30, 30, 30, 0.9);
 }
 
 QHeaderView::section {
-    background-color: #252526;
+    background-color: #252525;
     color: #d4d4d4;
     border: 1px solid #3c3c3c;
 }
 
 /* 左上角全选按钮基础样式 */
 QTableView QTableCornerButton::section {
-    background-color: #252526;
+    background-color: #252525;
     border: 1px solid #3c3c3c;
     border-right: none;
     border-bottom: none;
@@ -156,26 +162,85 @@ QTableView QTableCornerButton::section:hover {
 QTableView QTableCornerButton::section:pressed {
     background-color: #4e4e50;
 }
-
-QTableView {
+QListView {
+    show-decoration-selected: 1;
     alternate-background-color: #2a2a2a;  /* 交替行颜色 */
     background-color: #1e1e1e;  /* 基础背景色 */
-    gridline-color: #3c3c3c;  /* 网格线颜色 */
+}
+QListView::item:alternate {
+}
+QListView::item:selected {
+    border-bottom: 1px inherit #FFFFFF;
+}
+QListView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EEEEEE, stop: 1 #999999);
+    color: #000000;
+}
+QListView::item:selected:active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);
+    color: #000000;
+    border-top: 2px solid #CCEBFF;
+    border-bottom: 2px solid #CCEBFF;
+}
+QListView::item:hover {
+    background: #3c3c3c;
+    color: #FFFFFF;
 }
 
+QTableView {
+    show-decoration-selected: 1;
+    alternate-background-color: #2a2a2a;  /* 交替行颜色 */
+    background-color: #323232;  /* 基础背景色 */
+    gridline-color: #3c3c3c;  /* 网格线颜色 */
+}
+QTableView::item:alternate {
+}
+QTableView::item:selected {
+    border-bottom: 1px inherit #FFFFFF;
+}
+QTableView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EEEEEE, stop: 1 #999999);
+    color: #000000;
+}
+QTableView::item:selected:active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);
+    color: #000000;
+    border-top: 2px solid #CCEBFF;
+    border-bottom: 2px solid #CCEBFF;
+}
 QTableView::item:hover {
     background: #3c3c3c;
     color: #FFFFFF;
 }
 
-QListView,QTreeView {
+QTreeView {
+    show-decoration-selected: 1;
     alternate-background-color: #2a2a2a;  /* 交替行颜色 */
     background-color: #1e1e1e;  /* 基础背景色 */
+}
+QTreeView::item:alternate {
+}
+QTreeView::item:selected {
+    border-bottom: 1px inherit #FFFFFF;
+}
+QTreeView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EEEEEE, stop: 1 #999999);
+    color: #000000;
+}
+QTreeView::item:selected:active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);
+    color: #000000;
+    border-top: 2px solid #CCEBFF;
+    border-bottom: 2px solid #CCEBFF;
+}
+QTreeView::item:hover {
+    background: #3c3c3c;
+    color: #FFFFFF;
 }
 
 /* 通用滚动条样式 */
 QScrollBar {
-    background: #1e1e1e;
+    background: #323232;
     border-radius: 3px;
     width: 12px;
     height: 12px;
@@ -201,7 +266,7 @@ QScrollBar::handle:pressed {
 
 /* 滚动条背景区域 */
 QScrollBar::add-page, QScrollBar::sub-page {
-    background: #252526;
+    background: #252525;
 }
 
 /* 垂直滚动条特定样式 */
@@ -216,7 +281,7 @@ QScrollBar:horizontal {
 
 /* 工具栏基础样式 */
 QToolBar {
-    background: #4F4B49;
+    background: #323232;
     margin: 1px;
     padding: 1px;
 }
@@ -232,6 +297,7 @@ QToolBar QToolButton {
     background: transparent;
     color: #d4d4d4;
     border: 1px solid transparent; /* 预先占用边框空间 */
+    font-size: 15px;
 }
 
 /* 悬停状态 */
@@ -243,27 +309,29 @@ QToolBar QToolButton:hover {
 
 /* 按下状态 */
 QToolBar QToolButton:pressed {
-    background: #CCEBFF;
-    color: #000000;
+    background: #6F6F6F;
+    color: #FFFFFF;
 }
 
 /* checked状态 */
 QToolBar QToolButton:checked {
-    background: #CCEBFF;
-    color: #000000;
-    border: 1px solid #ECEBFF;
+    background: #5F5F5F;
+    color: #FFFFFF;
+    border: 1px solid #7F7F7F;
 }
 
 /* checked时的悬停状态 */
 QToolBar QToolButton:checked:hover {
-    background: #CCEBFF;
-    border: 1px solid rgb(85, 151, 243);
+    background: #6F6F6F;
+    color: #FFFFFF;
+    border: 1px solid #7F7F7F;
 }
 
 /* !checked时的悬停状态 */
 QToolBar QToolButton:!checked:hover {
-    background: #CCEBFF;
-    border: 1px solid rgb(85, 151, 243);
+    background: #5F5F5F;
+    color: #FFFFFF;
+    border: 1px solid #7F7F7F;
 }
 
 /* 禁用状态 */
@@ -273,7 +341,7 @@ QToolBar QToolButton:disabled {
 
 /* 基础进度条样式 */
 QProgressBar {
-    background-color: #1e1e1e;
+    background-color: #323232;
     border: 1px solid #444;
     text-align: center;
     color: #E0E0E0;  /* 文字颜色 */
@@ -306,26 +374,26 @@ QToolButton QMenu::item {
     background-color: transparent;
     color: #d0d0d0;
     padding: 6px 24px;
-    margin: 2px;
+    margin: 1px;
     min-width: 140px;
 }
 
 /* 选中状态（checked） */
 QToolButton QMenu::item:checked {
-    background-color: rgba(60, 163, 160, 1);
-    color: #ffffff;
+    background-color: #5F5F5F;
+    color: #FFFFFF;
 }
 
 /* 悬停状态 */
 QToolButton QMenu::item:selected {
-    background-color: rgba(60, 163, 160, 1);
-    color: #ffffff;
-    border-right: 5px solid #FFFFFF;
+    background-color: #5F5F5F;
+    color: #FFFFFF;
+    border-right: 5px solid #CCEBFF;
 }
 
 /* 分隔线样式 */
 QToolButton QMenu::separator {
     height: 1px;
-    background-color: #4a4a4a;
+    background-color: #CCEBFF;
     margin: 4px 8px;
 }
