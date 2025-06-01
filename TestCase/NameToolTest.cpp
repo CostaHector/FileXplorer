@@ -56,6 +56,12 @@ class NameToolTest : public MyTestSuite {
     QCOMPARE(m_nameTool(newlineAndCommaAsFS), expectLst);
   }
 
+  void test_multiline_selection_ok() {
+    const QString& s = "Chris Evans\nHenry Cavill\n";
+    const QStringList perf2{"Chris Evans", "Henry Cavill"};
+    QCOMPARE(m_nameTool(s), perf2);
+  }
+
   void test_moreThan2Perfs() {
     const QString& s = "A, B, and C";
     const QStringList perf3{"A", "B", "C"};
@@ -183,7 +189,7 @@ class NameToolTest : public MyTestSuite {
     QVERIFY(NameTool::ReplaceAndUpdateSelection(te, NameTool::Lower));  // no selected
     QVERIFY(!te.textCursor().hasSelection());                           // has no selection
 
-    static const QString SRC_TEXT = "HELLO WORLD";
+    static const QString SRC_TEXT = "HELLO\n WORLD";
     te.setText(SRC_TEXT);
     QTextCursor curSelection = te.textCursor();
     curSelection.setPosition(0);
@@ -191,12 +197,13 @@ class NameToolTest : public MyTestSuite {
     te.setTextCursor(curSelection);
     QVERIFY(NameTool::ReplaceAndUpdateSelection(te, NameTool::Lower));
 
+    static constexpr QChar NEW_LINE_UNICODE{0x2029}; // 0x2029 will not be seemed as a white char
     QVERIFY(te.textCursor().hasSelection());
-    QCOMPARE(te.textCursor().selectedText(), "hello world");
+    QCOMPARE(te.textCursor().selectedText(), QString{"hello"} + NEW_LINE_UNICODE + " world");
 
     QVERIFY(NameTool::ReplaceAndUpdateSelection(te, NameTool::CapitaliseFirstLetterKeepOther));
     QVERIFY(te.textCursor().hasSelection());
-    QCOMPARE(te.textCursor().selectedText(), "Hello World");
+    QCOMPARE(te.textCursor().selectedText(), QString{"Hello"} + NEW_LINE_UNICODE + " World");
   }
 
  private:
