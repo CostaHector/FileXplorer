@@ -41,14 +41,14 @@ RibbonMenu::RibbonMenu(QWidget* parent)
 
   const auto& viewIns = g_viewActions();
 
-  addTab(m_leafFile, "&File");
-  addTab(m_leafHome, "&Home");
-  addTab(m_leafView, "&View");
+  addTab(m_leafFile, "&FILE");
+  addTab(m_leafHome, "&HOME");
+  addTab(m_leafView, "&VIEW");
   addTab(m_leafDatabase, "&" + viewIns._MOVIE_VIEW->text());
   addTab(m_leafCast, "&" + viewIns._CAST_VIEW->text());
   addTab(m_leafJson, "&" + viewIns._JSON_VIEW->text());
   addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
-  addTab(m_leafMedia, "&Arrange");
+  addTab(m_leafMedia, "&ARRANGE");
 
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
