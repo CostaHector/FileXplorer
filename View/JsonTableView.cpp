@@ -316,7 +316,8 @@ bool JsonTableView::GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_T
     selectedText = lineEdit->selectedText();
     edtWidType = EDITOR_WIDGET_TYPE::LINE_EDIT;
   } else if (auto textEdit = qobject_cast<QPlainTextEdit*>(editor)) {
-    selectedText = textEdit->textCursor().selectedText();
+    // Unicode U+2029 used for segment splitter
+    selectedText = textEdit->textCursor().selectedText().replace(QChar(0x2029), '\n');
     edtWidType = EDITOR_WIDGET_TYPE::PLAIN_TEXT_EDIT;
   } else if (auto richTextEdit = qobject_cast<QTextEdit*>(editor)) {
     selectedText = richTextEdit->textCursor().selectedText();
