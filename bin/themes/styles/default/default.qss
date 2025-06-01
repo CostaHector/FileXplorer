@@ -34,6 +34,7 @@ QTabBar::tab {
     padding-right: 15px;
     margin-top: 1px;
     min-width: 60px;
+    font-size: 15px;
 }
 QTabBar::tab:!selected {
     border-bottom: 1px solid rgba(160, 160, 160, 255);
@@ -45,10 +46,10 @@ QTabBar::tab:selected {
     border-left: 1px solid rgba(160, 160, 160, 255);
     font-weight: bold; /* 选中状态加粗 */
 }
-QTabBar::tab:hover{
+QTabBar::tab:hover {
     background-color: rgba(205, 232, 255, 255);
 }
-QTabBar::tab::selected:hover {
+QTabBar::tab:selected:hover {
     background-color: rgba(240, 240, 240, 255);
 }
 
@@ -136,6 +137,7 @@ QToolButton {
 /* 基础样式 */
 QToolBar QToolButton {
     border: 1px solid transparent; /* 预先占用边框空间 */
+    font-size: 15px;
 }
 /* 悬停状态 */
 QToolBar QToolButton:hover {
@@ -168,4 +170,44 @@ QToolBar QToolButton:!checked:hover {
 /* 禁用状态 */
 QToolBar QToolButton:disabled {
     color: #7f7f7f;
+}
+
+/* 主按钮选中状态 */
+QToolButton:pressed,
+QToolButton:checked {
+    background-color: #3CA3A0;
+}
+
+
+/* 菜单容器 */
+QToolButton QMenu {
+    border: 3px solid transparent; /* 预先占用边框空间 */
+    padding: 0px;
+    margin: 0;
+}
+
+/* 菜单项基础样式 */
+QToolButton QMenu::item {
+    background-color: transparent;
+    padding: 6px 24px;
+    margin: 1px;
+    min-width: 140px;
+}
+
+/* 选中状态（checked） */
+QToolButton QMenu::item:checked {
+    background-color: #CCEBFF;
+}
+
+/* 悬停状态 */
+QToolButton QMenu::item:selected {
+    background-color: #CCEBFF;
+    border-right: 5px solid #3c3c3c;
+}
+
+/* 分隔线样式 */
+QToolButton QMenu::separator {
+    height: 1px;
+    background-color: #3c3c3c;
+    margin: 4px 8px;
 }
