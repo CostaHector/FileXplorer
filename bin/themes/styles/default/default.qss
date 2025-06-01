@@ -1,3 +1,9 @@
+/* 输入框 */
+QLineEdit {
+    border: 1px solid;
+    margin: 1px;
+}
+
 QMainWindow::separator {
     width: 1px;
     height: 0px;
@@ -18,7 +24,7 @@ QTabWidget::pane {
     background-color: rgba(255, 255, 255, 255);
     border-top: 1px solid rgba(160, 160, 160, 255); /* tabWidget addTab top */
     position: absolute;
-    top: -1px;
+    top: -1px; /* overlap to tab */
     border-bottom: 1px solid rgba(160, 160, 160, 255);  /* tabWidget addTab bottom */
 }
 QTabBar::tab {
@@ -37,7 +43,6 @@ QTabBar::tab:selected {
     border-top: 1px solid rgba(160, 160, 160, 255);
     border-right: 1px solid rgba(160, 160, 160, 255);
     border-left: 1px solid rgba(160, 160, 160, 255);
-    border-bottom: 1px solid rgba(240, 240, 240, 255);
     font-weight: bold; /* 选中状态加粗 */
 }
 QTabBar::tab:hover{
@@ -114,4 +119,53 @@ QTreeView::item:selected:active {
 QTreeView::item:hover {
     background: #CCEBFF;
     color: #000000;
+}
+
+/* 工具栏基础样式 */
+QToolBar {
+    margin: 1px;
+    padding: 1px;
+}
+
+/* 主按钮样式 */
+QToolButton {
+    padding-right: 0px;  /* 默认无箭头时不预留 */
+    spacing: 0px;        /* 图标与箭头的间距 */
+}
+
+/* 基础样式 */
+QToolBar QToolButton {
+    border: 1px solid transparent; /* 预先占用边框空间 */
+}
+/* 悬停状态 */
+QToolBar QToolButton:hover {
+    border: 1px solid #5e5e60;
+}
+
+/* 按下状态 */
+QToolBar QToolButton:pressed {
+    background: #CCEBFF;
+}
+
+/* checked状态 */
+QToolBar QToolButton:checked {
+    background: #CCEBFF;
+    border: 1px solid #ECEBFF;
+}
+
+/* checked时的悬停状态 */
+QToolBar QToolButton:checked:hover {
+    background: #CCEBFF;
+    border: 1px solid rgb(85, 151, 243);
+}
+
+/* !checked时的悬停状态 */
+QToolBar QToolButton:!checked:hover {
+    background: #CCEBFF;
+    border: 1px solid rgb(85, 151, 243);
+}
+
+/* 禁用状态 */
+QToolBar QToolButton:disabled {
+    color: #7f7f7f;
 }
