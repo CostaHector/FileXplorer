@@ -30,14 +30,14 @@ QPushButton:hover {
 
 /* 输入框 */
 QLineEdit {
-    background-color: #252525;
+    background-color: #4F4B49;
     border: 1px solid rgb(160, 160, 160);
     margin: 1px;
     color: #FFFFFF;
 }
 
-QComboBox {
-    background-color: #252525;
+QComboBox, QStatusBar, QLabel, QRadioButton, QCheckBox {
+    background-color: #4F4B49;
     color: #FFFFFF;
 }
 
@@ -67,11 +67,6 @@ QScrollBar:vertical {
 QScrollBar::handle:vertical {
     background: #3c3c3c;
     min-height: 20px;
-}
-
-/* 标签 */
-QLabel {
-    color: #d4d4d4;
 }
 
 /* 禁用状态 */
