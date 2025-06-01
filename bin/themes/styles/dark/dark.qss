@@ -118,7 +118,7 @@ QTabBar::tab {
     padding-left: 15px;
     padding-right: 15px;
     margin-top: 1px;
-    min-width: 60px;
+    min-width: 75px;
     font-size: 15px;
 }
 QTabBar::tab:!selected {
