@@ -7,7 +7,7 @@
 RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent)  //
     : AdvanceRenamer{parent}                                   //
 {                                                              //
-  m_recursiveCB->setEnabled(false);
+  m_recursiveCB->setToolTip("Usually we don't suggest user enable numberize file names recursively.");
 }
 
 void RenameWidget_Numerize::InitExtraMemberWidget() {
