@@ -324,7 +324,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
   m_updatedJsonFilesCnt += updatedJsonFilesCnt;
   m_usefullJsonCnt += usefullJsonCnt;
   return updatedJsonFilesCnt;
-};
+}
 
 int JsonDataRefresher::operator()(const QString& rootPath) {  // will iterate all sub
   if (!QFileInfo(rootPath).isDir()) {
