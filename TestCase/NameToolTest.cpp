@@ -125,6 +125,7 @@ class NameToolTest : public MyTestSuite {
     QCOMPARE(NameTool::CapitaliseFirstLetterKeepOther("henry cavill"), "Henry Cavill");
     QCOMPARE(NameTool::CapitaliseFirstLetterKeepOther("HENRY CAVILL"), "HENRY CAVILL");
     QCOMPARE(NameTool::CapitaliseFirstLetterKeepOther("NBA"), "NBA");
+    QCOMPARE(NameTool::CapitaliseFirstLetterKeepOther("henry cavill\nchris evans"), "Henry Cavill\nChris Evans");
   }
 
   void test_Capital_lower_other() {
@@ -134,6 +135,7 @@ class NameToolTest : public MyTestSuite {
     // Apostrophe
     QCOMPARE(NameTool::CapitaliseFirstLetterLowerOther("ROND D'ALEMBERT"), "Rond D'Alembert");
     QCOMPARE(NameTool::CapitaliseFirstLetterLowerOther("MICHAEL O'JUMPING"), "Michael O'Jumping");
+    QCOMPARE(NameTool::CapitaliseFirstLetterLowerOther("MICHAEL O'"), "Michael O'");
   }
 
   void test_ToggleCase() {  //
