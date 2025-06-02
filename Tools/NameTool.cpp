@@ -55,17 +55,24 @@ QStringList NameTool::castFromUpperCaseSentence(const QString& s) const {
 }
 
 QString NameTool::CapitaliseFirstLetterKeepOther(const QString& sentence) {
-  QStringList words = sentence.split(' ', Qt::SkipEmptyParts);
-  for (QString& word : words) {
-    word.front() = word.front().toUpper();
+  QStringList lines = sentence.split('\n');
+  QStringList processedLines;
+  foreach (const QString& line, lines) {
+      // dont use Qt::SkipEmptyParts; " world" => we want this {" ","world"} instead {"world"}
+      QStringList words = line.split(' ');
+      for (QString& word : words) {
+          if (!word.isEmpty()) {
+              word[0] = word[0].toUpper();
+              // d'alembert => D'Alembert
+              int apostrophePos = word.indexOf('\'');
+              if (apostrophePos != -1 && apostrophePos + 1 < word.length()) {
+                  word[apostrophePos + 1] = word[apostrophePos + 1].toUpper();
+              }
+          }
+      }
+      processedLines << words.join(' ');
   }
-  // ROND D'ALEMBERT => Rond D'Alembert
-  QString caurse = words.join(' ');
-  int apostrophyIndex = caurse.indexOf('\'');
-  if (apostrophyIndex != -1 && apostrophyIndex + 1 < caurse.size()) {
-    caurse[apostrophyIndex + 1] = caurse[apostrophyIndex + 1].toUpper();
-  }
-  return caurse;
+  return processedLines.join('\n');
 }
 
 QString NameTool::CapitaliseFirstLetterLowerOther(const QString& sentence) {
@@ -98,7 +105,7 @@ bool NameTool::ReplaceAndUpdateSelection(QPlainTextEdit& te, SentenceProcessorFu
 
   QTextCursor curSelection = te.textCursor();
   const int startPos = curSelection.selectionStart();
-  const QString& before = curSelection.selection().toPlainText();
+  QString before = curSelection.selection().toPlainText().replace(QChar(0x2029), '\n');
   curSelection.removeSelectedText();
   const QString& after = fTrans(before);
   curSelection.insertText(after);
@@ -121,7 +128,7 @@ bool NameTool::ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fT
 
   QTextCursor curSelection = te.textCursor();
   const int startPos = curSelection.selectionStart();
-  const QString& before = curSelection.selection().toPlainText();
+  QString before = curSelection.selection().toPlainText().replace(QChar(0x2029), '\n');
   curSelection.removeSelectedText();
   const QString& after = fTrans(before);
   curSelection.insertText(after);
