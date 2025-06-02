@@ -95,7 +95,10 @@ bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, in
           default : return false;
     }
     setModified(index.row(), true);
-    emit dataChanged(index, index, {Qt::DisplayRole});
+    // what you see is what you get, no need emit change signal; avoid cursor selection be cleared
+    if (index.column() != JsonKey::Detail) {
+      emit dataChanged(index, index, {Qt::DisplayRole});
+    }
   }
   return QAbstractItemModel::setData(index, value, role);
 }
