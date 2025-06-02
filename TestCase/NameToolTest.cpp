@@ -6,6 +6,7 @@
 #include "Tools/NameTool.h"
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QTextDocumentFragment>
 
 class NameToolTest : public MyTestSuite {
@@ -183,6 +184,29 @@ class NameToolTest : public MyTestSuite {
     QVERIFY(NameTool::ReplaceAndUpdateSelection(le, NameTool::CapitaliseFirstLetterKeepOther));
     QVERIFY(le.hasSelectedText());
     QCOMPARE(le.selectedText(), "Hello World");
+  }
+
+  void test_ReplaceAndUpdateSelection_QPlainTextEdit() {  //
+    QPlainTextEdit te;
+    QVERIFY(!NameTool::ReplaceAndUpdateSelection(te, nullptr));         // function nullptr
+    QVERIFY(NameTool::ReplaceAndUpdateSelection(te, NameTool::Lower));  // no selected
+    QVERIFY(!te.textCursor().hasSelection());                           // has no selection
+
+    static const QString SRC_TEXT = "HELLO\n WORLD";
+    te.setPlainText(SRC_TEXT);
+    QTextCursor curSelection = te.textCursor();
+    curSelection.setPosition(0);
+    curSelection.setPosition(SRC_TEXT.size(), QTextCursor::KeepAnchor);
+    te.setTextCursor(curSelection);
+    QVERIFY(NameTool::ReplaceAndUpdateSelection(te, NameTool::Lower));
+
+    static constexpr QChar NEW_LINE_UNICODE{0x2029}; // 0x2029 will not be seemed as a white char
+    QVERIFY(te.textCursor().hasSelection());
+    QCOMPARE(te.textCursor().selectedText(), QString{"hello"} + NEW_LINE_UNICODE + " world");
+
+    QVERIFY(NameTool::ReplaceAndUpdateSelection(te, NameTool::CapitaliseFirstLetterKeepOther));
+    QVERIFY(te.textCursor().hasSelection());
+    QCOMPARE(te.textCursor().selectedText(), QString{"Hello"} + NEW_LINE_UNICODE + " World");
   }
 
   void test_ReplaceAndUpdateSelection_QTextEdit() {  //
