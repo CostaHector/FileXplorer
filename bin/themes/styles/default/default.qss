@@ -4,6 +4,7 @@ QLineEdit {
     margin: 1px;
 }
 
+
 QMainWindow::separator {
     width: 1px;
     height: 0px;
@@ -13,6 +14,7 @@ QDockWidget::separator {
     width: 0px;
     height: 0px;
 }
+
 QTabBar::close-button {
     image: url(":/qss_icons/default/rc/CLOSE.svg");
     subcontrol-position: right;
@@ -95,7 +97,6 @@ QTableView::item:selected:!active {
 QTableView::item:selected:active {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);
     color: #000000;
-    border-top: 2px solid #CCEBFF;
     border-bottom: 2px solid #CCEBFF;
 }
 /* Current Cell that has Focus */
@@ -131,10 +132,43 @@ QTreeView::item:hover {
     color: #000000;
 }
 
+/* 垂直滚动条基础样式 */
+QScrollBar:vertical {
+    width: 12px;
+    background: #323232;
+    border-radius: 3px;
+    margin: 0px 0 0px 0;  /* 为箭头按钮预留空间 */
+}
+
+/* 水平滚动条基础样式 */
+QScrollBar:horizontal {
+    height: 12px;
+    background: #323232;
+    border-radius: 3px;
+    margin: 0 0px 0 0px;  /* 为箭头按钮预留空间 */
+}
+QScrollBar::handle {
+    border-radius: 4px;
+    background: #DADADA;
+}
+
+/* 滑块悬停状态 */
+QScrollBar::handle:hover {
+    background: #CCEBFF;
+}
+
+/* 滑块按下状态 */
+QScrollBar::handle:pressed {
+    background: #99D1FF;
+}
+
+/* 滚动条背景区域 */
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: #FFFFFF;
+}
+
 /* 工具栏基础样式 */
 QToolBar {
-    margin: 1px;
-    padding: 1px;
 }
 
 /* 主按钮样式 */
@@ -189,34 +223,29 @@ QToolButton:checked {
 
 
 /* 菜单容器 */
-QToolButton QMenu {
-    border: 3px solid transparent; /* 预先占用边框空间 */
-    padding: 0px;
-    margin: 0;
+QMenu {
+    border-right: 3px solid transparent; /* 预先占用边框空间 */
+    font-size: 15px;
 }
 
 /* 菜单项基础样式 */
-QToolButton QMenu::item {
+QMenu::item {
     background-color: transparent;
-    padding: 6px 24px;
-    margin: 1px;
-    min-width: 140px;
 }
 
 /* 选中状态（checked） */
-QToolButton QMenu::item:checked {
+QMenu::item:checked {
     background-color: #CCEBFF;
 }
 
 /* 悬停状态 */
-QToolButton QMenu::item:selected {
+QMenu::item:selected {
     background-color: #CCEBFF;
     border-right: 5px solid #3c3c3c;
 }
 
 /* 分隔线样式 */
-QToolButton QMenu::separator {
+QMenu::separator {
     height: 1px;
     background-color: #3c3c3c;
-    margin: 4px 8px;
 }
