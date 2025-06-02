@@ -105,7 +105,7 @@ bool NameTool::ReplaceAndUpdateSelection(QPlainTextEdit& te, SentenceProcessorFu
 
   QTextCursor curSelection = te.textCursor();
   const int startPos = curSelection.selectionStart();
-  QString before = curSelection.selection().toPlainText().replace(QChar(0x2029), '\n');
+  QString before = curSelection.selectedText().replace(QChar(0x2029), '\n');
   curSelection.removeSelectedText();
   const QString& after = fTrans(before);
   curSelection.insertText(after);
@@ -128,7 +128,7 @@ bool NameTool::ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fT
 
   QTextCursor curSelection = te.textCursor();
   const int startPos = curSelection.selectionStart();
-  QString before = curSelection.selection().toPlainText().replace(QChar(0x2029), '\n');
+  QString before = curSelection.selectedText().replace(QChar(0x2029), '\n');
   curSelection.removeSelectedText();
   const QString& after = fTrans(before);
   curSelection.insertText(after);
@@ -190,3 +190,33 @@ QStringList NameTool::CastTagSentenceRmvEle2Lst(const QString& sentense, const Q
 QString NameTool::CastTagSentenceRmvEle2Str(const QString& sentense, const QString& cast) {
   return CastTagSentenceRmvEle2Lst(sentense, cast).join(CSV_COMMA);
 }
+
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+#include <QApplication>
+#include <QCheckBox>
+#include <QVBoxLayout>
+int main(int argc, char* argv[]) {
+  QApplication a(argc, argv);
+  QWidget mw;
+  QVBoxLayout lo{&mw};
+  QPlainTextEdit te;
+  te.setPlainText("Hello world");
+  QCheckBox btn{"title/lowercase", &mw};
+  btn.setTristate(false);
+  lo.addWidget(&btn);
+  lo.addWidget(&te);
+  mw.show();
+  QObject::connect(&btn, &QCheckBox::stateChanged, [&](int state){
+    if (state == Qt::CheckState::Checked) {
+      NameTool::ReplaceAndUpdateSelection(te, NameTool::CapitaliseFirstLetterKeepOther);
+    } else {
+      NameTool::ReplaceAndUpdateSelection(te, NameTool::Lower);
+    }
+  });
+  a.exec();
+  return 0;
+}
+#endif
+
+
