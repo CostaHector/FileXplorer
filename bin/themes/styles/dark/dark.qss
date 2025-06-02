@@ -44,9 +44,6 @@ QComboBox, QStatusBar, QLabel, QRadioButton, QCheckBox {
 /* 菜单栏 */
 QMenuBar {
     background-color: #252525;
-}
-
-QMenuBar {
     border: none;
 }
 
@@ -56,17 +53,6 @@ QMenuBar::item {
 
 QMenuBar::item:selected {
     background: #3c3c3c;
-}
-
-/* 滚动条 */
-QScrollBar:vertical {
-    background: #252525;
-    width: 12px;
-}
-
-QScrollBar::handle:vertical {
-    background: #3c3c3c;
-    min-height: 20px;
 }
 
 /* 禁用状态 */
@@ -241,20 +227,24 @@ QTreeView::item:hover {
     color: #FFFFFF;
 }
 
-/* 通用滚动条样式 */
-QScrollBar {
+/* 垂直滚动条基础样式 */
+QScrollBar:vertical {
+    width: 12px;
     background: #323232;
     border-radius: 3px;
-    width: 12px;
-    height: 12px;
+    margin: 0px 0 0px 0;  /* 为箭头按钮预留空间 */
 }
 
-/* 滚动条滑块 */
+/* 水平滚动条基础样式 */
+QScrollBar:horizontal {
+    height: 12px;
+    background: #323232;
+    border-radius: 3px;
+    margin: 0 0px 0 0px;  /* 为箭头按钮预留空间 */
+}
 QScrollBar::handle {
-    background: #3c3c3c;
-    min-height: 20px;
-    min-width: 20px;
     border-radius: 4px;
+    background: #c0c0c0;
 }
 
 /* 滑块悬停状态 */
@@ -272,21 +262,9 @@ QScrollBar::add-page, QScrollBar::sub-page {
     background: #252525;
 }
 
-/* 垂直滚动条特定样式 */
-QScrollBar:vertical {
-    width: 12px;
-}
-
-/* 水平滚动条特定样式 */
-QScrollBar:horizontal {
-    height: 12px;
-}
-
 /* 工具栏基础样式 */
 QToolBar {
     background: #4F4B49;
-    margin: 1px;
-    padding: 1px;
 }
 
 /* 主按钮样式 */
@@ -302,7 +280,6 @@ QToolBar QToolButton {
     border: 1px solid transparent; /* 预先占用边框空间 */
     font-size: 15px;
 }
-
 /* 悬停状态 */
 QToolBar QToolButton:hover {
     background: #CCEBFF;
@@ -360,43 +337,38 @@ QProgressBar:indeterminate::chunk {
 QToolButton:pressed,
 QToolButton:checked {
     background-color: #3CA3A0;
-    color: white;
+    color: #FFFFFF;
 }
 
 
 /* 菜单容器 */
-QToolButton QMenu {
+QMenu {
     background-color: #333333;
-    border: 3px solid #444444; /* 预先占用边框空间 */
-    padding: 0px;
-    margin: 0;
+    border-right: 3px solid #444444; /* 预先占用边框空间 */
+    font-size: 15px;
 }
 
 /* 菜单项基础样式 */
-QToolButton QMenu::item {
+QMenu::item {
     background-color: transparent;
     color: #d0d0d0;
-    padding: 6px 24px;
-    margin: 1px;
-    min-width: 140px;
 }
 
 /* 选中状态（checked） */
-QToolButton QMenu::item:checked {
+QMenu::item:checked {
     background-color: #5F5F5F;
     color: #FFFFFF;
 }
 
 /* 悬停状态 */
-QToolButton QMenu::item:selected {
+QMenu::item:selected {
     background-color: #5F5F5F;
     color: #FFFFFF;
     border-right: 5px solid #CCEBFF;
 }
 
 /* 分隔线样式 */
-QToolButton QMenu::separator {
+QMenu::separator {
     height: 1px;
     background-color: #CCEBFF;
-    margin: 4px 8px;
 }
