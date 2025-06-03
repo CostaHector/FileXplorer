@@ -1,4 +1,4 @@
-#include "FolderPreviewActions.h"
+﻿#include "FolderPreviewActions.h"
 #include "public/MemoryKey.h"
 #include "public/PublicVariable.h"
 
@@ -8,10 +8,11 @@ FolderPreviewActions& g_folderPreviewActions() {
 }
 
 FolderPreviewActions::FolderPreviewActions(QObject* parent) : QObject{parent} {
-  LISTS = {new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LISTS"), "3-lists", this}};
-  BROWSER = {new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_BROWSER"), "browser", this}};
-  LABELS = {new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LABELS"), "labels", this}};
+  LISTS = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LISTS"), "3-lists", this};
+  BROWSER = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_BROWSER"), "browser", this};
+  LABELS = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LABELS"), "labels", this};
 
+  LISTS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_P));
   LISTS->setToolTip(QString("<b>%1 (%2)</b><br/> IMAGE/VIDEO/OTHER list item view.")  //
                         .arg(LISTS->text(), LISTS->shortcut().toString()));
   BROWSER->setToolTip(QString("<b>%1 (%2)</b><br/> QPlainTextEdit(images count dynamic expansion).")  //

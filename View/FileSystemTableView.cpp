@@ -1,4 +1,5 @@
-#include "View/FileSystemTableView.h"
+﻿#include "View/FileSystemTableView.h"
+#include "Actions/FolderPreviewActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "View/ViewHelper.h"
@@ -8,8 +9,8 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/ViewActions.h"
 
-FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent) //
- : CustomTableView("FILE_SYSTEM", parent) //
+FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent)  //
+    : CustomTableView("FILE_SYSTEM", parent)                                             //
 {
   BindMenu(m_fsMenu);
   setModel(fsmModel);
@@ -24,7 +25,7 @@ FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* 
   setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  InitTableView();  
+  InitTableView();
 }
 
 void FileSystemTableView::subscribe() {
@@ -48,6 +49,8 @@ void FileSystemTableView::subscribe() {
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
 
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
+
+  addAction(g_folderPreviewActions().LISTS);
 }
 
 void FileSystemTableView::dropEvent(QDropEvent* event) {
