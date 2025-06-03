@@ -1,4 +1,4 @@
-#include "FolderPreviewSwitcher.h"
+﻿#include "FolderPreviewSwitcher.h"
 #include "Actions/FolderPreviewActions.h"
 #include "public/PublicMacro.h"
 
@@ -42,6 +42,10 @@ void FolderPreviewSwitcher::onSwitchByViewType(const QString& viewType) {
 }
 
 void FolderPreviewSwitcher::onSwitchByViewAction(const QAction* activatedAction) {
+  if (activatedAction == nullptr) {
+    qDebug("Nothing preview type selected, skip preview");
+    return;
+  }
   const QString& viewType = activatedAction->text();
   onSwitchByViewType(viewType);
 }

@@ -1,4 +1,4 @@
-#ifndef ADDRESSELINEEDIT_H
+﻿#ifndef ADDRESSELINEEDIT_H
 #define ADDRESSELINEEDIT_H
 
 #include "public/PathTool.h"
@@ -56,6 +56,11 @@ class AddressELineEdit : public QStackedWidget {
       }
       path += PathTool::PATH_SEP_CHAR;
     }
+#ifdef _WIN32
+    if (!path.isEmpty()) {
+      path = path.mid(1);  // in windows 1st action is fixed all drives entrance
+    }
+#endif
     return PathTool::StripTrailingSlash(path);
   }
 
@@ -79,8 +84,6 @@ class AddressELineEdit : public QStackedWidget {
   void dropEvent(QDropEvent* event) override;
   void dragMoveEvent(QDragMoveEvent* event) override;
 
-  void dragLeaveEvent(QDragLeaveEvent* event) override;
-
  signals:
   void pathActionsTriggeredOrLineEditReturnPressed(const QString&);
 
@@ -88,15 +91,11 @@ class AddressELineEdit : public QStackedWidget {
   void updateAddressToolBarPathActions(const QString& newPath);
 
  private:
-  static constexpr int MAX_PATH_SECTIONS_CNT = 260;
-  QAction mPathSections[MAX_PATH_SECTIONS_CNT];
-
   QToolBar* m_pathActionsTB{nullptr};
   QLineEdit* pathLineEdit{nullptr};
   QComboBox* pathComboBox{nullptr};
-  QLabel* m_dropPanel{nullptr};
   FocusEventWatch* pathComboBoxFocusWatcher{nullptr};
-  static const QString DRAG_HINT_MSG;
+
   static const QString RELEASE_HINT_MSG;
 };
 #endif  // ADDRESSELINEEDIT_H
