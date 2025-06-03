@@ -1,4 +1,4 @@
-#include "NavigationToolBar.h"
+﻿#include "NavigationToolBar.h"
 #include "Actions/ActionWithPath.h"
 #include "Actions/DevicesDrivesActions.h"
 #include "public/OnCheckedPopupOrHideAWidget.h"
@@ -25,7 +25,6 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
   addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Documents"), QIcon(":img/FOLDER_OF_FAVORITE"), "Favorites", this});
   addSeparator();
   // 3. all volumes
-  addAction(new (std::nothrow) ActionWithPath{"", QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_ComputerIcon), "Computer", this});
   foreach (const QFileInfo& fi, QDir::drives()) {
     addAction(new (std::nothrow) ActionWithPath{fi.absoluteFilePath(), fi.absoluteFilePath(), this});
   }
