@@ -1,4 +1,4 @@
-#include "Actions/FileLeafAction.h"
+﻿#include "Actions/FileLeafAction.h"
 #include "public/MemoryKey.h"
 #include "public/PublicVariable.h"
 
@@ -36,7 +36,6 @@ QActionGroup* FileLeafActions::GetLeafTabActions() {
   }
 
   _ALERT_ITEMS->setCheckable(true);
-  _ALERT_ITEMS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
   _ALERT_ITEMS->setShortcutVisibleInContextMenu(true);
   _ALERT_ITEMS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_ALERT_ITEMS->text(), _ALERT_ITEMS->shortcut().toString()));
 
