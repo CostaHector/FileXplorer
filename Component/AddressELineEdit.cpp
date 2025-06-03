@@ -1,4 +1,4 @@
-#include "AddressELineEdit.h"
+﻿#include "AddressELineEdit.h"
 #include "View/ViewHelper.h"
 #include "public/PublicMacro.h"
 #include <QDesktopServices>
@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QToolTip>
 #include <Qt>
+#include <QApplication>
 
 FocusEventWatch::FocusEventWatch(QObject* parent)  //
 {
@@ -45,12 +46,10 @@ bool FocusEventWatch::eventFilter(QObject* watched, QEvent* event) {
   return QObject::eventFilter(watched, event);
 }
 
-constexpr int AddressELineEdit::MAX_PATH_SECTIONS_CNT;
-const QString AddressELineEdit::DRAG_HINT_MSG = "Drag some files/folders here";
-const QString AddressELineEdit::RELEASE_HINT_MSG = "Drop item(s) to [%1]";
+const QString AddressELineEdit::RELEASE_HINT_MSG = "<b>Drop item(s) to ...?</b>:<br/>";
 
 AddressELineEdit::AddressELineEdit(QWidget* parent)  //
-    : QStackedWidget(parent)                         //
+    : QStackedWidget{parent}                         //
 {
   m_pathActionsTB = new (std::nothrow) QToolBar{this};
   CHECK_NULLPTR_RETURN_VOID(m_pathActionsTB);
@@ -61,13 +60,6 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
   pathLineEdit = new (std::nothrow) QLineEdit{pathComboBox};
   CHECK_NULLPTR_RETURN_VOID(pathLineEdit);
   pathLineEdit->setClearButtonEnabled(true);
-
-  m_dropPanel = new (std::nothrow) QLabel(DRAG_HINT_MSG, this);
-  CHECK_NULLPTR_RETURN_VOID(m_dropPanel);
-  m_dropPanel->setStyleSheet(
-      "QLabel{"
-      "border: 3px solid cyan;"
-      "};");
 
 #ifdef _WIN32
   const QFileInfoList& drives = QDir::drives();
@@ -83,7 +75,6 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
 
   addWidget(m_pathActionsTB);
   addWidget(pathComboBox);
-  addWidget(m_dropPanel);
 
   clickMode();
   subscribe();
@@ -113,22 +104,13 @@ void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
     pathLineEdit->setText(fullpath);
   }
   qDebug("set Path [%s]", qPrintable(fullpath));
-
-  int n = m_pathActionsTB->actions().count();
-  for (int i = 0; i < n; ++i) {
-    m_pathActionsTB->removeAction(&mPathSections[i]);
-  }
-
-  const QStringList sections{fullpath.split(PathTool::PATH_SEP_CHAR)};
-  const int N = sections.size();
-  if (N > MAX_PATH_SECTIONS_CNT) {
-    qWarning("Path[%s] contains more than %d sections", qPrintable(fullpath), sections.size());
-    return;
-  }
-
-  for (int i = 0; i < N; ++i) {
-    mPathSections[i].setText(sections[i]);
-    m_pathActionsTB->addAction(&mPathSections[i]);
+  m_pathActionsTB->clear();
+#ifdef WIN32
+  m_pathActionsTB->addAction(QIcon(":img/FOLDER_OF_DRIVES"), "");
+#endif
+  for (const QString& pathSec : fullpath.split(PathTool::PATH_SEP_CHAR)) {
+    m_pathActionsTB->addAction(pathSec);
+    qobject_cast<QWidget*>(m_pathActionsTB->children().last())->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
   }
 
   if (!pathComboBox->hasFocus()) {  // in disp mode
@@ -155,7 +137,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
     pathLineEdit->setText(pathFromFullActions());
     return false;
   }
-  const QFileInfo fi(pth);
+  const QFileInfo fi{pth};
   if (fi.isFile()) {
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
     qDebug("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
@@ -205,37 +187,35 @@ void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
 void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
   const QString& draggedEnterPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   View::changeDropAction(event);
-  qDebug("dragged enter[%s]", qPrintable(draggedEnterPath));
-  m_dropPanel->setText(RELEASE_HINT_MSG.arg(draggedEnterPath));
-  setCurrentWidget(m_dropPanel);
+  const QString& dragEnterMsg{RELEASE_HINT_MSG + draggedEnterPath};
+  qDebug("%s", qPrintable(dragEnterMsg));
+  QToolTip::showText(mapToGlobal(event->pos()), dragEnterMsg);
   event->accept();
 }
 
 void AddressELineEdit::dropEvent(QDropEvent* event) {
   setCurrentWidget(m_pathActionsTB);
   const QString& to = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
+  qDebug("Drop items to path[%s]", qPrintable(to));
   View::onDropMimeData(event->mimeData(), event->dropAction(), to);
   QStackedWidget::dropEvent(event);
 }
 
 void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
-  if (not event->mimeData()->hasUrls()) {
+  if (!event->mimeData()->hasUrls()) {
     qDebug("no urls dragMoveEvent");
     return;
   }
   const QString& droppedPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
-  m_dropPanel->setText(RELEASE_HINT_MSG.arg(droppedPath));
-  qDebug("release to drop here [%s]", qPrintable(droppedPath));
+  const QString& dragMoveMsg{RELEASE_HINT_MSG + droppedPath};
+  QToolTip::showText(mapToGlobal(event->pos()), dragMoveMsg);
   View::changeDropAction(event);
   QStackedWidget::dragMoveEvent(event);
 }
 
-void AddressELineEdit::dragLeaveEvent(QDragLeaveEvent* event) {
-  m_dropPanel->setText(DRAG_HINT_MSG);
-  setCurrentWidget(m_pathActionsTB);
-  QStackedWidget::dragLeaveEvent(event);
-}
-
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+#include <QApplication>
 class TestAddressELineEdit : public QWidget {
   Q_OBJECT
  public:
@@ -258,12 +238,7 @@ class TestAddressELineEdit : public QWidget {
 
     add->updateAddressToolBarPathActions(QFileInfo(__FILE__).absolutePath());
   }
- signals:
 };
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);

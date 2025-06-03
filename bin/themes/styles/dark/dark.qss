@@ -266,11 +266,9 @@ QScrollBar::add-page, QScrollBar::sub-page {
 QToolBar {
     background: #4F4B49;
 }
-
-/* 主按钮样式 */
-QToolButton {
-    padding-right: 0px;  /* 默认无箭头时不预留 */
-    spacing: 0px;        /* 图标与箭头的间距 */
+QToolBar QToolBar {
+    margin: 0px;
+    border: 0px;
 }
 
 /* 基础样式 */
@@ -319,19 +317,9 @@ QToolBar QToolButton:disabled {
     color: #7f7f7f;
 }
 
-/* 基础进度条样式 */
-QProgressBar {
-    background-color: #323232;
-    border: 1px solid #444;
-    text-align: center;
-    color: #E0E0E0;  /* 文字颜色 */
+QToolButton[popupMode="1"] {
+    padding-right:16px;
 }
-
-/* 不确定模式动画 */
-QProgressBar:indeterminate::chunk {
-    background-color: #555;
-}
-
 
 /* 主按钮选中状态 */
 QToolButton:pressed,
@@ -339,8 +327,23 @@ QToolButton:checked {
     background-color: #3CA3A0;
     color: #FFFFFF;
 }
+QToolButton::menu-button {
+    border-left:1px solid #333333;
+}
 
+QToolButton::menu-button:pressed {
+    background-color: #6F6F6F;
+}
+QToolButton::menu-button:hover {
+    background: #5F5F5F;
+    border: 1px solid #7F7F7F;
+}
+QToolButton::menu-indicator {
+    image:none;
+}
+QToolButton::menu-arrow {
 
+}
 /* 菜单容器 */
 QMenu {
     background-color: #333333;
@@ -371,4 +374,17 @@ QMenu::item:selected {
 QMenu::separator {
     height: 1px;
     background-color: #CCEBFF;
+}
+
+/* 基础进度条样式 */
+QProgressBar {
+    background-color: #323232;
+    border: 1px solid #444;
+    text-align: center;
+    color: #E0E0E0;  /* 文字颜色 */
+}
+
+/* 不确定模式动画 */
+QProgressBar:indeterminate::chunk {
+    background-color: #555;
 }
