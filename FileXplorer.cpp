@@ -1,4 +1,4 @@
-#include "FileXplorer.h"
+﻿#include "FileXplorer.h"
 
 #include "Actions/FolderPreviewActions.h"
 #include "Actions/ViewActions.h"
@@ -61,7 +61,7 @@ void FileXplorer::closeEvent(QCloseEvent* event) {
   return QMainWindow::closeEvent(event);
 }
 
-void FileXplorer::showEvent(QShowEvent *event) {
+void FileXplorer::showEvent(QShowEvent* event) {
   QMainWindow::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
@@ -125,7 +125,11 @@ void FileXplorer::subscribe() {
     previewHtmlDock->setVisible(checked);
 
     const QString& previewType = triggeredActions->text();
-    PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
+    if (!triggeredActions->isChecked()) {  // clear preview type
+      PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, "");
+    } else {
+      PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
+    }
     m_previewSwitcher->onSwitchByViewType(previewType);
   });
   connect(vA._VIEWS_AG, &QActionGroup::triggered, m_naviSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
