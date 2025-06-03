@@ -170,11 +170,9 @@ QScrollBar::add-page, QScrollBar::sub-page {
 /* 工具栏基础样式 */
 QToolBar {
 }
-
-/* 主按钮样式 */
-QToolButton {
-    padding-right: 0px;  /* 默认无箭头时不预留 */
-    spacing: 0px;        /* 图标与箭头的间距 */
+QToolBar QToolBar {
+    margin: 0px;
+    border: 0px;
 }
 
 /* 基础样式 */
@@ -201,18 +199,21 @@ QToolBar QToolButton:checked {
 /* checked时的悬停状态 */
 QToolBar QToolButton:checked:hover {
     background: #CCEBFF;
-    border: 1px solid rgb(85, 151, 243);
+    border: 1px solid #5597F3;
 }
 
 /* !checked时的悬停状态 */
 QToolBar QToolButton:!checked:hover {
     background: #CCEBFF;
-    border: 1px solid rgb(85, 151, 243);
+    border: 1px solid #5597F3;
 }
 
 /* 禁用状态 */
 QToolBar QToolButton:disabled {
     color: #7f7f7f;
+}
+QToolButton[popupMode="1"] {
+    padding-right:16px;
 }
 
 /* 主按钮选中状态 */
@@ -220,8 +221,23 @@ QToolButton:pressed,
 QToolButton:checked {
     background-color: #3CA3A0;
 }
+QToolButton::menu-button {
 
+}
 
+QToolButton::menu-button:pressed {
+    background-color: #CCEBFF;
+}
+QToolButton::menu-button:hover {
+    background-color: #CCEBFF;
+    border: 1px solid #5597F3;
+}
+QToolButton::menu-indicator {
+    image:none;
+}
+QToolButton::menu-arrow {
+
+}
 /* 菜单容器 */
 QMenu {
     border-right: 3px solid transparent; /* 预先占用边框空间 */
