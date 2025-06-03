@@ -1,4 +1,4 @@
-#include "ViewHelper.h"
+﻿#include "ViewHelper.h"
 #include "Component/ConflictsRecycle.h"
 #include "public/MemoryKey.h"
 #include "Model/MyQFileSystemModel.h"
@@ -20,7 +20,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
   if (URLS_SIZE == 0) {
     return true;
   }
-  qDebug() << action << QString("%1 item(s) and dropped in [%2]").arg(URLS_SIZE).arg(to);
+  qWarning("DropAction:%d, %d item(s) and dropped in [%s]", action, URLS_SIZE, qPrintable(to));
   QStringList selectedItems;
   selectedItems.reserve(URLS_SIZE);
   for (const QUrl& url : data->urls()) {
@@ -66,8 +66,7 @@ QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, cons
     static QFont font("arial", 18, QFont::Weight::ExtraBold, true);
     painter.setFont(font);
 #ifdef _WIN32
-    painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN * 2, DRGA_PIXMAP_SIDE_LEN * 2), Qt::AlignRight | Qt::AlignBottom,
-                     QString("x%1").arg(selectedCnt));
+    painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN * 2, DRGA_PIXMAP_SIDE_LEN * 2), Qt::AlignRight | Qt::AlignBottom, QString("x%1").arg(selectedCnt));
 #else
     painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN), Qt::AlignRight | Qt::AlignBottom, QString("x%1").arg(selectedCnt));
 #endif

@@ -1,4 +1,4 @@
-<RCC>
+﻿<RCC>
 <qresource prefix="txt">
 </qresource>
 <qresource prefix="img">
@@ -72,6 +72,7 @@
 <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>
 <file alias="PATH_BACK_TO">AddressControl/PATH_BACK_TO.svg</file>
 <file alias="PATH_FORWARD_TO">AddressControl/PATH_FORWARD_TO.svg</file>
+<file alias="PATH_SLASH">AddressControl/PATH_SLASH.svg</file>
 <file alias="LAST_FOLDER">AddressControl/LAST_FOLDER.svg</file>
 <file alias="NEXT_FOLDER">AddressControl/NEXT_FOLDER.svg</file>
 <file alias="SEARCH">AddressControl/SEARCH.svg</file>
