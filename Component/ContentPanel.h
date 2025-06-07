@@ -1,4 +1,4 @@
-#ifndef CONTENTPANEL_H
+﻿#ifndef CONTENTPANEL_H
 #define CONTENTPANEL_H
 
 #include <QStackedWidget>
@@ -18,6 +18,7 @@
 
 #include "Tools/ViewTypeTool.h"
 #include "Tools/FileDescriptor/FdBasedDb.h"
+
 
 class NavigationViewSwitcher;
 
@@ -104,6 +105,8 @@ class ContentPanel : public QStackedWidget {
   QStringList getFilePrepaths() const;
   QStringList getTheJpgFolderPaths() const;
   QStringList getFullRecords() const;
+
+  PathTool::SelectionInfo GetSelectionInfo(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false) const;
 
@@ -131,7 +134,7 @@ class ContentPanel : public QStackedWidget {
   MovieDBView* m_movieView{nullptr};
 
   AdvanceSearchToolBar* _advanceSearchBar{nullptr};
-  SearchProxyModel* m_proxyModel{nullptr};
+  SearchProxyModel* m_searchProxyModel{nullptr};
   AdvanceSearchModel* m_searchSrcModel{nullptr};
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
 
