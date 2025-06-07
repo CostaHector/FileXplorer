@@ -1,4 +1,4 @@
-#include "SearchTools.h"
+﻿#include "SearchTools.h"
 
 namespace SearchTools {
 QHash<QString, SEARCH_MODE> RevertKeyValuePair(const QString (&strArr)[(unsigned char)SEARCH_MODE::MODE_BUTT]) {
@@ -9,7 +9,7 @@ QHash<QString, SEARCH_MODE> RevertKeyValuePair(const QString (&strArr)[(unsigned
   return ans;
 }
 
-static const QString SEARCHMODE_ENUM2STR[(unsigned char)SEARCH_MODE::MODE_BUTT]{"Normal", "Wildcard", "Regex", "Search for File Content"};
+static const QString SEARCHMODE_ENUM2STR[(unsigned char)SEARCH_MODE::MODE_BUTT]{"Normal", "Regex", "File Contents"};
 
 static const QHash<QString, SEARCH_MODE> SEARCHMODE_STR2ENUM{RevertKeyValuePair(SEARCHMODE_ENUM2STR)};
 
@@ -39,12 +39,7 @@ QString GetSearchModeStr(unsigned char searchMode) {
   return GetSearchModeStr(GetSearchModeEnum(searchMode));
 }
 
-QStringList GetSearchModeStrList() {
-  QStringList ans;
-  for (unsigned char i = 0; i < (unsigned char)SEARCH_MODE::MODE_BUTT; ++i) {
-    ans.append(SEARCHMODE_ENUM2STR[i]);
-  }
-  return ans;
+QString GetDefaultSearchModeStr() {
+  return GetSearchModeStr(SEARCH_MODE::REGEX);
 }
-
 };  // namespace SearchTools

@@ -76,6 +76,10 @@
 <file alias="LAST_FOLDER">AddressControl/LAST_FOLDER.svg</file>
 <file alias="NEXT_FOLDER">AddressControl/NEXT_FOLDER.svg</file>
 <file alias="SEARCH">AddressControl/SEARCH.svg</file>
+<file alias="MATCH_REGEX">AddressControl/MATCH_REGEX.svg</file>
+<file alias="MATCH_EQUAL">AddressControl/MATCH_EQUAL.svg</file>
+<file alias="SERACH_SCOPE_FILENAME">AddressControl/SERACH_SCOPE_FILENAME.svg</file>
+<file alias="SEARCH_SCOPE_CONTENT">AddressControl/SEARCH_SCOPE_CONTENT.svg</file>
 
 <!--FILTER_TYPE icon here-->
 <file alias="FILE_SYSTEM_FILTER">AddressControl/FILTER.svg</file>

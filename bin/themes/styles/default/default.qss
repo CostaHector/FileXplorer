@@ -169,6 +169,7 @@ QScrollBar::add-page, QScrollBar::sub-page {
 
 /* 工具栏基础样式 */
 QToolBar {
+    border: 1px solid #FFFFFF;
 }
 QToolBar QToolBar {
     margin: 0px;
@@ -238,6 +239,24 @@ QToolButton::menu-indicator {
 QToolButton::menu-arrow {
 
 }
+
+QComboBox {
+    padding: 0px;
+    font-size: 15px;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: #CCEBFF;
+    selection-color: #000000;
+}
+
+QComboBox QLineEdit {
+    margin: 0px;
+    padding: 0px 1px;
+    border: none;          /* 移除QLineEdit自身边框 */
+    color: #000000;
+}
+
 /* 菜单容器 */
 QMenu {
     border-right: 3px solid transparent; /* 预先占用边框空间 */
