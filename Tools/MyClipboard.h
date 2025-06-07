@@ -1,25 +1,18 @@
-#ifndef MYCLIPBOARD_H
+﻿#ifndef MYCLIPBOARD_H
 #define MYCLIPBOARD_H
 
-#include <QAbstractItemView>
-#include <QClipboard>
-#include <QFileSystemModel>
+#include "public/PathTool.h"
 #include "public/PublicVariable.h"
+#include <QClipboard>
 
 class MyClipboard : public QObject {
-  Q_OBJECT
  public:
   explicit MyClipboard(QObject* parent = nullptr);
+  int FillClipboardFromSelectionInfo(const PathTool::SelectionInfo& info, const CCMMode::Mode cutCopy);
 
-  int FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy);
-  int FillIntoClipboardKeepFilesLevelBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy);
-  int FillIntoClipboardFSKeepFilesLevelBehavior(const QString& fromPath, const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy);
-
-  int FillSelectionIntoClipboard(QAbstractItemView* _view, QFileSystemModel* _fileSysModel, const CCMMode::Mode cutCopy);
-
-  const QMimeData* mimeData(QClipboard::Mode /*mode*/ = QClipboard::Clipboard) const { return m_clipboard->mimeData(); }
-
- signals:
+  const QMimeData* mimeData(QClipboard::Mode /*mode*/ = QClipboard::Clipboard) const {  //
+    return m_clipboard->mimeData();
+  }
 
  private:
   QClipboard* m_clipboard;
