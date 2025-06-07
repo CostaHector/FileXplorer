@@ -1,16 +1,14 @@
-#ifndef ADVANCESEARCHMODEL_H
+﻿#ifndef ADVANCESEARCHMODEL_H
 #define ADVANCESEARCHMODEL_H
 
-#include <QComboBox>
 #include <QDateTime>
-#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileIconProvider>
 #include <QFileInfo>
-#include <QSortFilterProxyModel>
-#include <QWidget>
-#include "Component/CustomStatusBar.h"
+#include <QSet>
+#include "QAbstractTableModelPub.h"
+#include <QDataStream>
 
 struct FileProperty {
   QString name;
@@ -18,19 +16,30 @@ struct FileProperty {
   QString type;
   QDateTime modifiedDate;
   QString relPath;
+  static QString mRootPath;
 };
 
-class AdvanceSearchModel : public QAbstractTableModel {
+// QDataStream& operator<<(QDataStream& dsIn, const FileProperty& fp) {
+//   dsIn << fp.name << fp.size << fp.type << fp.modifiedDate << fp.relPath;
+//   return dsIn;
+// }
+// QDataStream& operator>>(QDataStream& dsOut, FileProperty& fp) {
+//   dsOut >> fp.name >> fp.size >> fp.type >> fp.modifiedDate >> fp.relPath;
+//   return dsOut;
+// }
+
+class AdvanceSearchModel : public QAbstractTableModelPub {
  public:
   explicit AdvanceSearchModel(QObject* parent = nullptr);
 
-  void BindLogger(CustomStatusBar* logger);
-
-  auto filter() const -> QDir::Filters { return m_filters; }
-  auto updateSearchResultList() -> void;
-
+  QDir::Filters filter() const { return m_filters; }
   QString rootPath() const { return m_rootPath; }
-  auto checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory = true) -> bool;
+  QDir rootDirectory(const QString& /*placeHolder*/ = "") const {  //
+    return QDir(rootPath());
+  }
+
+  void updateSearchResultList();
+  bool checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory = true);
   auto initRootPath(const QString& path) -> void;
   auto setRootPath(const QString& path) -> void;
   auto forceRefresh() -> void { setRootPath(m_rootPath); }
@@ -46,10 +55,10 @@ class AdvanceSearchModel : public QAbstractTableModel {
     updateSearchResultList();
   }
 
-  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_planetList.size(); }
-  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return HORIZONTAL_HEADER_NAMES.size(); }
-  auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
-  auto headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const -> QVariant override;
+  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return m_itemsLst.size(); }
+  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return HORIZONTAL_HEADER_NAMES.size(); }
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   void setNameFilterDisables(bool enable) = delete;
   // call setNameFilterDisables or proxy model instead
@@ -68,40 +77,75 @@ class AdvanceSearchModel : public QAbstractTableModel {
   void RecycleSomething(const QSet<QModelIndex>& recycleIndexes);
   void ClearRecycle();
 
-  QDir rootDirectory(const QString& /*placeHolder*/ = "") const {  //
-    return QDir(rootPath());
-  }
-
   QString absolutePath(const QModelIndex& curIndex) const {  //
-    return data(curIndex.siblingAtColumn(4), Qt::ItemDataRole::DisplayRole).toString();
+    const int row = curIndex.row();
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    return m_rootPath + '/' + m_itemsLst[row].relPath;
   }
 
   QString fileName(const QModelIndex& curIndex) const {  //
-    return data(curIndex.siblingAtColumn(0), Qt::ItemDataRole::DisplayRole).toString();
+    const int row = curIndex.row();
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    return m_itemsLst[row].name;
   }
 
   QString filePath(const QModelIndex& curIndex) const {  //
-    return QDir(absolutePath(curIndex)).absoluteFilePath(fileName(curIndex));
+    const int row = curIndex.row();
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    return m_rootPath + '/' + m_itemsLst[row].relPath + m_itemsLst[row].name;
   }
 
   QFileInfo fileInfo(const QModelIndex& curIndex) const {  //
     return QFileInfo{filePath(curIndex)};
   }
 
-  QString fullInfo(const QModelIndex& curIndex) const {    //
-    return data(curIndex.siblingAtColumn(0)).toString()    //
-           + '\t'                                          //
-           + data(curIndex.siblingAtColumn(1)).toString()  //
-           + '\t'                                          //
-           + data(curIndex.siblingAtColumn(4)).toString();
+  QString fullInfo(const QModelIndex& curIndex) const {  //
+    const int row = curIndex.row();
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    return m_itemsLst[row].name                                 //
+           + '\t'                                               //
+           + QString::number(m_itemsLst[row].size) + "Byte(s)"  //
+           + '\t'                                               //
+           + m_rootPath + '/' + m_itemsLst[row].relPath;
+  }
+
+  QString GetARelSelection(const int& row) const {
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    //  info.relSelections.append();
+    const auto& item = m_itemsLst[row];
+    return item.relPath + item.name;
+  }
+  QString GetARootPath(const int& row) const {
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    //  info.rootPaths.append();
+    return m_rootPath + '/' + m_itemsLst[row].relPath;
+  }
+  QString GetASelection(const int& row) const {
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    //  info.selections.append();
+    return m_itemsLst[row].name;
   }
 
  private:
-  CustomStatusBar* _logger{nullptr};
-
   QString m_rootPath;
-  QList<FileProperty> m_planetList;
+  QList<FileProperty> m_itemsLst;
+  mutable QHash<QString, QIcon> m_ext2Icon;
   QFileIconProvider m_iconProvider;
+
   QDir::Filters m_filters;
   QDirIterator::IteratorFlags m_iteratorFlags;
 

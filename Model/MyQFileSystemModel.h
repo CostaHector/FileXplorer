@@ -1,4 +1,4 @@
-#ifndef MYQFILESYSTEMMODEL_H
+﻿#ifndef MYQFILESYSTEMMODEL_H
 #define MYQFILESYSTEMMODEL_H
 
 #include "Component/CustomStatusBar.h"
@@ -61,18 +61,18 @@ class MyQFileSystemModel : public QFileSystemModel {
   }
 
   void CutSomething(const QModelIndexList& cutIndexes, bool appendMode = false) {
-    if (not appendMode) {
+    if (!appendMode) {
       ClearCutDict();
     }
     ClearCopiedDict();
-    if (not m_cutMap.contains(rootPath())) {
+    if (!m_cutMap.contains(rootPath())) {
       m_cutMap[rootPath()] = {};
     }
     m_cutMap[rootPath()] += cutIndexes;
   }
 
   void CopiedSomething(const QModelIndexList& copiedIndexes, bool appendMode = false) {
-    if (not appendMode) {
+    if (!appendMode) {
       ClearCopiedDict();
     }
     ClearCutDict();
@@ -105,10 +105,10 @@ class MyQFileSystemModel : public QFileSystemModel {
       if (m_draggedHoverIndex == index) {
         return QBrush(Qt::green);
       }
-      if (m_cutMap.contains(rootPath()) and m_cutMap[rootPath()].contains(index)) {
+      if (m_cutMap.contains(rootPath()) && m_cutMap[rootPath()].contains(index)) {
         return QBrush(Qt::GlobalColor::darkGray, Qt::BrushStyle::Dense4Pattern);
       }
-      if (m_copiedMap.contains(rootPath()) and m_copiedMap[rootPath()].contains(index)) {
+      if (m_copiedMap.contains(rootPath()) && m_copiedMap[rootPath()].contains(index)) {
         return QBrush(Qt::GlobalColor::yellow, Qt::BrushStyle::CrossPattern);
       }
       return QBrush(Qt::transparent);

@@ -152,12 +152,12 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     case ViewType::SEARCH: {
       if (_view->m_advanceSearchView == nullptr) {
         _view->m_searchSrcModel = new AdvanceSearchModel;
-        _view->m_proxyModel = new SearchProxyModel;
-        _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_searchSrcModel, _view->m_proxyModel, _view);
+        _view->m_searchProxyModel = new SearchProxyModel;
+        _view->m_advanceSearchView = new AdvanceSearchTableView(_view->m_searchSrcModel, _view->m_searchProxyModel, _view);
         ContentPanel::connect(_view->m_advanceSearchView, &QAbstractItemView::doubleClicked, _view, &ContentPanel::on_cellDoubleClicked);
         _view->m_advanceSearchView->BindLogger(_view->_logger);
         if (_navigation->m_advanceSearchBar != nullptr) {
-          _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_proxyModel, _view->m_searchSrcModel);
+          _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_searchProxyModel, _view->m_searchSrcModel);
         }
         _view->AddView(viewType, _view->m_advanceSearchView);
         _view->m_searchSrcModel->initFilter(QDir::Filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()});

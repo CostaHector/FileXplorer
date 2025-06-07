@@ -1,4 +1,4 @@
-#include "AdvanceSearchTableView.h"
+﻿#include "AdvanceSearchTableView.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/ViewActions.h"
 #include "CustomTableView.h"
@@ -47,8 +47,6 @@ void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {
     return;
   }
   _logger = logger;
-  _sourceModel->BindLogger(_logger);
-  //  _searchProxyModel->BindLogger(_logger);
 }
 
 auto AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) -> void {
