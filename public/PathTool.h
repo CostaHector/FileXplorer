@@ -1,10 +1,34 @@
-#ifndef PATHTOOL_H
+﻿#ifndef PATHTOOL_H
 #define PATHTOOL_H
 
 #include <QString>
 #include <QStringList>
 
 namespace PathTool {
+struct SelectionInfo {
+  // 1. move(keep file system structure)
+  /*
+C:/home/to/path     		file				      toPath	file
+C:/home/to/path     		folder				    toPath	folder
+C:/home/to/path     		folder1/file11		toPath	folder1/file11
+C:/home/to/path     		folder2/folder21	toPath	folder2/folder21
+C:/home/to/path     		folder1				     ------------------ignore
+   */
+  QString rootPath;
+  QStringList relSelections;
+  // 2. move(flatten file system structure)
+  // 3. only rename file name(not move)
+  /*
+C:/home/to/path           file                toPath	file
+C:/home/to/path           folder              toPath	folder
+C:/home/to/path/folder1		file11              toPath	file11
+C:/home/to/path/folder2		folder21            toPath	folder21
+C:/home/to/path           folder1				------------------ignore
+   */
+  QString rootPaths;
+  QStringList selections;
+};
+
 constexpr char PATH_SEP_CHAR = '/';
 constexpr int EXTENSION_MAX_LENGTH = 5;  // ".json"
 
@@ -55,7 +79,7 @@ int GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& ou
 
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
-QString commonPrefix(const QString& path1, const QString& path2);
+QString StrCommonPrefix(const QString& path1, const QString& path2);
 bool isLinuxRootOrWinEmpty(const QString& path);  // loose
 bool isRootOrEmpty(const QString& path);          // strict
 
@@ -68,25 +92,4 @@ QString GetFileExtension(const QString& path);
 bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 
 }  // namespace PathTool
-
-class QFileInfo;
-class FileOsWalker {
- public:
-  FileOsWalker(const QString& pre, bool sufInside);
-  void operator()(const QStringList& rels, const bool includingSub);
-  inline int size() const { return completeNames.size(); };
-
-  QStringList relToNames;
-  QStringList completeNames;
-  QStringList suffixs;
-  QList<bool> isFiles;
-
-  const QString mPrepathWithSlash;
-  const int N;
-
- private:
-  void FillByFileInfo(const QFileInfo& fi);
-  const bool mSufInside;
-};
-
 #endif  // PATHTOOL_H
