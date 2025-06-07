@@ -82,7 +82,7 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_rootPath + m_itemsLst[row].relPath;
+    return m_rootPath + '/' + m_itemsLst[row].relPath;
   }
 
   QString fileName(const QModelIndex& curIndex) const {  //
@@ -98,7 +98,7 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_rootPath + m_itemsLst[row].relPath + m_itemsLst[row].name;
+    return m_rootPath + '/' + m_itemsLst[row].relPath + m_itemsLst[row].name;
   }
 
   QFileInfo fileInfo(const QModelIndex& curIndex) const {  //
@@ -114,7 +114,30 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
            + '\t'                                               //
            + QString::number(m_itemsLst[row].size) + "Byte(s)"  //
            + '\t'                                               //
-           + m_rootPath + m_itemsLst[row].relPath;
+           + m_rootPath + '/' + m_itemsLst[row].relPath;
+  }
+
+  QString GetARelSelection(const int& row) const {
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    //  info.relSelections.append();
+    const auto& item = m_itemsLst[row];
+    return item.relPath + item.name;
+  }
+  QString GetARootPath(const int& row) const {
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    //  info.rootPaths.append();
+    return m_rootPath + '/' + m_itemsLst[row].relPath;
+  }
+  QString GetASelection(const int& row) const {
+    if (row < 0 || row >= m_itemsLst.size()) {
+      return {};
+    }
+    //  info.selections.append();
+    return m_itemsLst[row].name;
   }
 
  private:

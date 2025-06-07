@@ -1,4 +1,4 @@
-#ifndef PUBLICVARIABLE_H
+﻿#ifndef PUBLICVARIABLE_H
 #define PUBLICVARIABLE_H
 
 #include <QDir>
@@ -81,13 +81,20 @@ class CCMMode {
   static const char MCCL2STR[BUTT][MCCL2STR_MAX_LEN];
 };
 
+enum class FILE_STRUCTURE_MODE {
+  KEEP = 0,
+  FLATTEN = 1,
+  BUTT,
+};
+
 #include <QRegularExpression>
 namespace JSON_RENAME_REGEX {
 const QRegularExpression INVALID_CHARS_IN_FILENAME{R"([#\\/:*?<>|])", QRegularExpression::OptimizeOnFirstUsageOption};  // #\/:*?<>|
 const QRegularExpression INVALID_QUOTE_IN_FILENAME{R"([’“”"])", QRegularExpression::OptimizeOnFirstUsageOption};        //'
 
-const QRegularExpression TORRENT_LEADING_STR_COMP{R"(^((\[GT\])|(\[FFL\])|(\[FL\])))", QRegularExpression::PatternOption::CaseInsensitiveOption|QRegularExpression::OptimizeOnFirstUsageOption};  // delete it
-const QRegularExpression LEADING_OPEN_BRACKET_COMP{R"(^[\[\{\(])", QRegularExpression::OptimizeOnFirstUsageOption};                                //-
+const QRegularExpression TORRENT_LEADING_STR_COMP{R"(^((\[GT\])|(\[FFL\])|(\[FL\])))",
+                                                  QRegularExpression::PatternOption::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption};  // delete it
+const QRegularExpression LEADING_OPEN_BRACKET_COMP{R"(^[\[\{\(])", QRegularExpression::OptimizeOnFirstUsageOption};                                            //-
 
 const QRegularExpression CONTINOUS_SPACE_COMP{R"(\s\s+)", QRegularExpression::OptimizeOnFirstUsageOption};  //' '
 
