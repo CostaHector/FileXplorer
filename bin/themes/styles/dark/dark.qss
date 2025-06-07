@@ -1,4 +1,4 @@
-/* 基础设置 */
+﻿/* 基础设置 */
 QWidget {
     background-color: #000000;
     color: #d4d4d4;
@@ -36,7 +36,7 @@ QLineEdit {
     color: #FFFFFF;
 }
 
-QComboBox, QStatusBar, QLabel, QRadioButton, QCheckBox {
+QStatusBar, QLabel, QRadioButton, QCheckBox {
     background-color: #4F4B49;
     color: #FFFFFF;
 }
@@ -265,6 +265,7 @@ QScrollBar::add-page, QScrollBar::sub-page {
 /* 工具栏基础样式 */
 QToolBar {
     background: #4F4B49;
+    border: 1px solid #000000;
 }
 QToolBar QToolBar {
     margin: 0px;
@@ -344,6 +345,26 @@ QToolButton::menu-indicator {
 QToolButton::menu-arrow {
 
 }
+
+QComboBox {
+    padding: 0px;
+    background-color: #4F4B49;
+    color: #d0d0d0;
+    font-size: 15px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #333333;
+    selection-background-color: #5F5F5F;
+    selection-color: #FFFFFF;
+}
+
+QComboBox QLineEdit {
+    margin: 0px;
+    padding: 0px 1px;
+    border: none;          /* 移除QLineEdit自身边框 */
+}
+
 /* 菜单容器 */
 QMenu {
     background-color: #333333;
