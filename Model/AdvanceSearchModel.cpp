@@ -1,4 +1,4 @@
-#include "AdvanceSearchModel.h"
+﻿#include "AdvanceSearchModel.h"
 #include "Component/Notificator.h"
 #include "public/PathTool.h"
 #include "public/MemoryKey.h"
@@ -8,57 +8,37 @@
 const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size", "type", "date", "relative path"};
 
 AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
-    : QAbstractTableModel(parent),
+    : QAbstractTableModelPub{parent},
       m_filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
-      m_iteratorFlags{bool2IteratorFlag(
-          PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())} {}
-
-void AdvanceSearchModel::BindLogger(CustomStatusBar* logger) {
-  if (logger == nullptr) {
-    qWarning("Don't try to bind nullptr to _logger");
-    return;
-  }
-  if (_logger != nullptr) {
-    qWarning("Don't try to rebind logger to non nullptr _logger");
-    return;
-  }
-  _logger = logger;
+      m_iteratorFlags{bool2IteratorFlag(PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())}  //
+{
+  m_ext2Icon[""] = m_iconProvider.icon(QFileIconProvider::IconType::Folder);
 }
 
-auto AdvanceSearchModel::updateSearchResultList() -> void {
+void AdvanceSearchModel::updateSearchResultList() {
   ClearRecycle();
-  if (m_rootPath.isEmpty()) {
-    qDebug("reject do under path \"\"");
-    return;
-  }
-  if (not QFileInfo(m_rootPath).isDir()) {
-    return;
-  }
-
-  //  emit dataChanged(index(0, 0), index(r, c), {Qt::DisplayRole, Qt::DecorationRole});
-  this->beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
-  m_planetList.clear();
-  this->endRemoveRows();
-
-  decltype(m_planetList) newPlanetList;
-  QDirIterator it(m_rootPath, m_filters, m_iteratorFlags);
+  decltype(m_itemsLst) newPlanetList;
+  QDirIterator it{m_rootPath, m_filters, m_iteratorFlags};
+  QString fileName;
+  const int ROOT_PATH_N = m_rootPath.size();
   while (it.hasNext()) {
+    using namespace PathTool;
     it.next();
     QFileInfo fi = it.fileInfo();
-    const auto name = fi.fileName();
-    const auto absPath = fi.absoluteFilePath();
-    newPlanetList.append(FileProperty{name, fi.size(), fi.suffix(), fi.lastModified(), absPath.left(absPath.size() - name.size())});
+    fileName = fi.fileName();
+    newPlanetList.append(FileProperty{
+        fileName, fi.size(),                                            //
+        GetFileExtension(fileName),                                     //
+        fi.lastModified(),                                              //
+        RelativePath2File(ROOT_PATH_N, fi.filePath(), fileName.size())  //
+    });
   }
   // C:/A/B/C
   // C:/A   file
-  qDebug("> %d item(s) | QDir::Filters: %d | under [%s]", newPlanetList.size(), int(m_filters), qPrintable(m_rootPath));
-  if (_logger) {
-    _logger->pathInfo(newPlanetList.size(), 0);
-    _logger->msg(QString("QDir::Filters: %1 | under [%2]").arg(int(m_filters)).arg(m_rootPath));
-  }
-  this->beginInsertRows(QModelIndex(), 0, newPlanetList.size() - 1);
-  newPlanetList.swap(m_planetList);
-  this->endInsertRows();
+  qDebug("%d item(s) find out under path [%s] with QDir::Filters[%d]", newPlanetList.size(), qPrintable(m_rootPath), int(m_filters));
+  beginResetModel();
+  newPlanetList.swap(m_itemsLst);
+  endResetModel();
 }
 
 auto AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory) -> bool {
@@ -66,13 +46,17 @@ auto AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
   // queryWhenSearchUnderLargeDirectory is most likely set to be true
   const QString& stdPath = PathTool::GetWinStdPath(path);
   if (stdPath.isEmpty()) {
+    qWarning("reject search under empty path");
     return false;
   }
-  if (not QFileInfo(stdPath).isDir()) {
+  if (!QFileInfo(stdPath).isDir()) {
+    qWarning("reject search under inexist path[%s]", qPrintable(stdPath));
     return false;
   }
-  if (queryWhenSearchUnderLargeDirectory and stdPath.count('/') < 2) {  // C:/A
-    auto retBtn = QMessageBox::warning(this->_logger, "Confirm search?", "large directory: " + stdPath,
+  if (queryWhenSearchUnderLargeDirectory && stdPath.count('/') < 2) {  // C:/A
+    auto retBtn = QMessageBox::warning(nullptr,
+                                       "Confirm search?",              //
+                                       "large directory: " + stdPath,  //
                                        QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
     if (retBtn == QMessageBox::StandardButton::Yes) {
       return true;
@@ -88,20 +72,20 @@ auto AdvanceSearchModel::initRootPath(const QString& path) -> void {
   if (m_rootPath == path) {
     return;
   }
-  if (not checkPathNeed(path, false)) {
+  if (!checkPathNeed(path, false)) {
     return;
   }
   m_rootPath = path;
-  qDebug() << "AdvanceSearchModel::initRootPath(%s)" << m_rootPath;
+  qDebug("init rootPath:%s", qPrintable(m_rootPath));
 }
 
 auto AdvanceSearchModel::setRootPath(const QString& path) -> void {
-  if (not checkPathNeed(path)) {
+  if (!checkPathNeed(path)) {
     return;
   }
   initRootPath(path);
+  qDebug("set rootPath:%s", qPrintable(m_rootPath));
   updateSearchResultList();
-  qDebug() << "AdvanceSearchModel::setRootPath" << m_rootPath;
 }
 
 auto AdvanceSearchModel::initFilter(QDir::Filters initialFilters) -> void {
@@ -110,18 +94,18 @@ auto AdvanceSearchModel::initFilter(QDir::Filters initialFilters) -> void {
 
 auto AdvanceSearchModel::setFilter(QDir::Filters newFilters) -> void {
   initFilter(newFilters);
-  if (not checkPathNeed(m_rootPath)) {
+  if (!checkPathNeed(m_rootPath)) {
     return;
   }
   updateSearchResultList();
-  qDebug() << "AdvanceSearchModel::setFilter" << m_filters;
+  qDebug("setFilter: %d", (int)m_filters);
 }
 
 void AdvanceSearchModel::setRootPathAndFilter(const QString& path, QDir::Filters filters) {
-  if (m_rootPath == path and m_filters == filters) {
+  if (m_rootPath == path && m_filters == filters) {
     return;
   }
-  if (not checkPathNeed(path)) {
+  if (!checkPathNeed(path)) {
     return;
   }
   m_rootPath = path;
@@ -138,30 +122,35 @@ void AdvanceSearchModel::initIteratorFlag(QDirIterator::IteratorFlag initialFlag
 }
 
 QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
-  if (not index.isValid()) {
+  if (!index.isValid()) {
     return QVariant();
   }
-  if (not(0 <= index.row() and index.row() < rowCount())) {
+  if (index.row() < 0 || index.row() >= rowCount()) {
     return QVariant();
   }
   if (role == Qt::DisplayRole) {
     switch (index.column()) {
       case 0:
-        return m_planetList[index.row()].name;
+        return m_itemsLst[index.row()].name;
       case 1:
-        return m_planetList[index.row()].size;
+        return m_itemsLst[index.row()].size;
       case 2:
-        return m_planetList[index.row()].type;
+        return m_itemsLst[index.row()].type;
       case 3:
-        return m_planetList[index.row()].modifiedDate;
+        return m_itemsLst[index.row()].modifiedDate;
       case 4:
-        return m_planetList[index.row()].relPath;
+        return m_itemsLst[index.row()].relPath;
       default:
         return QVariant();
     }
   } else if (role == Qt::DecorationRole) {
     if (index.column() == 0) {
-      return m_iconProvider.icon(QFileInfo(m_planetList[index.row()].relPath + m_planetList[index.row()].name));
+      const QString& extExtDot{m_itemsLst[index.row()].type};
+      auto it = m_ext2Icon.constFind(extExtDot);
+      if (it != m_ext2Icon.constEnd()) {
+        return *it;
+      }
+      return m_ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo(extExtDot));
     }
     return QVariant();
   } else if (role == Qt::TextAlignmentRole) {
@@ -190,7 +179,7 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
-auto AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
+QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const {
   if (role == Qt::TextAlignmentRole) {
     if (orientation == Qt::Vertical) {
       return Qt::AlignRight;
@@ -265,7 +254,7 @@ void AdvanceSearchModel::appendDisable(const QModelIndex& ind) {
 }
 
 void AdvanceSearchModel::removeDisable(const QModelIndex& ind) {
-  if (not m_disableList.contains(ind))
+  if (!m_disableList.contains(ind))
     return;
   m_disableList.remove(ind);
   emit dataChanged(ind, ind, {Qt::ForegroundRole});
@@ -291,4 +280,3 @@ void AdvanceSearchModel::ClearRecycle() {
     emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
   }
 }
-
