@@ -126,15 +126,17 @@
 <file alias="COPY_PATH">RightClickIcon/COPY_PATH.svg</file>
 <file alias="COPY_NAME">RightClickIcon/COPY_NAME.svg</file>
 <file alias="COPY_THE_PATH">RightClickIcon/COPY_THE_PATH.svg</file>
-<file alias="COPY_ITEM">RightClickIcon/COPY.png</file>
+<file alias="COPY_ITEM">RightClickIcon/COPY_ITEM.svg</file>
 <file alias="COPY_RECORD">RightClickIcon/COPY_RECORD.svg</file>
-<file alias="CUT_ITEM">RightClickIcon/CUT.png</file>
-<file alias="PASTE_ITEM">RightClickIcon/PASTE.png</file>
+<file alias="CUT_ITEM">RightClickIcon/CUT_ITEM.svg</file>
+<file alias="PASTE_ITEM">RightClickIcon/PASTE_ITEM.svg</file>
 <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5FileIdentifier.png</file>
 <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
 <file alias="REFRESH_SEARCH_SOURCE">RightClickIcon/REFRESH_SEARCH_SOURCE.svg</file>
 <file alias="_SEARCH_IN_NET_EXPLORER">RightClickIcon/_SEARCH_IN_NET_EXPLORER.svg</file>
 <file alias="EXPORT_TO">RightClickIcon/EXPORT_TO.svg</file>
+<file alias="FILE_STRUCTURE_FLATTEN">RightClickIcon/FILE_STRUCTURE_FLATTEN.svg</file>
+<file alias="FILE_STRUCTURE_KEEP">RightClickIcon/FILE_STRUCTURE_KEEP.svg</file>
 
 <!--JsonEditor Icon here        -->
 <file alias="JSON_EDITOR">JsonEditor/JSON_EDITOR.png</file>

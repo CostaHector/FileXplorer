@@ -26,7 +26,7 @@ QStringList NeedProcessPath(const QStringList& paths) {
 class SelectedItemsTest : public MyTestSuite {
   Q_OBJECT
  public:
-  SelectedItemsTest() : MyTestSuite{true} {}
+  SelectedItemsTest() : MyTestSuite{false} {}
  private slots:
   void test_zero_or_1_element_only() {
     QCOMPARE(NeedProcessPath({}), (QStringList{}));

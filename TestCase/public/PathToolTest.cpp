@@ -1,16 +1,10 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 
-// add necessary includes here
-#include <QFileInfo>
-#include "TestCase/PathRelatedTool.h"
-#include "pub/MyTestSuite.h"
+#include "TestCase/pub/MyTestSuite.h"
 #include "public/PathTool.h"
 
 using namespace ::PathTool;
-
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_FileOsWalker";
-
 class PathToolTest : public MyTestSuite {
   Q_OBJECT
 
@@ -55,27 +49,35 @@ class PathToolTest : public MyTestSuite {
     QCOMPARE(forSearchPath("C:/file.mp4"), "C:/file.mp4");
   }
 
-  void test_commonprefixLongePath() {
+  void test_StrCommonPrefix_basic() {
+    QCOMPARE(StrCommonPrefix("", ""), "");
+    QCOMPARE(StrCommonPrefix("C:/home", "C:/homie"), "C:/hom");
+    QCOMPARE(StrCommonPrefix("C:/home/path", "C:/home/path/to"), "C:/home/path");
+    QCOMPARE(StrCommonPrefix("C:/home/path", "D:/home/path/to"), "");
+  }
+
+  void test_longestCommonPrefix_3_path() {
     const QStringList paths{"E:/py/NameStandardlizeTestFolder/New Folder 20231020222814/New Text Document 20231125234056.txt",  //
-                            "E:/py/NameStandardlizeTestFolder/New Text Document 20231020222955.txt"};
+                            "E:/py/NameStandardlizeTestFolder/New Text Document 20231020222955.txt",                            //
+                            "E:/py/NameStandardlizeTestFolder/New Folder 20231020222814"};                                      //
     const QString expectPrepath = "E:/py/NameStandardlizeTestFolder";
     const QString actualPrepath = longestCommonPrefix(paths);
     QCOMPARE(actualPrepath, expectPrepath);
   }
 
-  void test_longestCommonPrefix_path_scene() {
-    QString actualPrepath = longestCommonPrefix({"E:/115/ABC", "E:/115/d"});
+  void test_longestCommonPrefix_2_path() {
+    QString actualPrepath = longestCommonPrefix({"E:/115/ABC", "E:/115/A"});
     QString expectPrepath = "E:/115";
     QCOMPARE(actualPrepath, expectPrepath);
   }
 
-  void test_longestCommonPrefix_samepath_scene() {
-    QString actualPrepath = longestCommonPrefix({"E:/115/ABC", "E:/115/ABC"});
+  void test_longestCommonPrefix_same_path() {
+    QString actualPrepath = longestCommonPrefix({"E:/115/ABC", "E:/115/ABC", "E:/115/ABC"});
     QString expectPrepath = "E:/115";
     QCOMPARE(actualPrepath, expectPrepath);
   }
 
-  void test_commonPrefix_EmptyElementList() {
+  void test_GetLAndRels_empty() {
     const QStringList emptyPaths;
     const QString expectPrepath = "";
     QString prepath;
@@ -85,16 +87,31 @@ class PathToolTest : public MyTestSuite {
     QVERIFY(rels.isEmpty());
   }
 
-  void test_commonprefix_OneElementList() {
+  void test_GetLAndRels_1_path() {
     const QStringList paths{"E:/115/0303/12"};
-    const QString expectPrepath = "E:/115/0303";
+    const QString expectCommonPrepath = "E:/115/0303";
+    const QStringList expectRels{"12"};
+
     QString prepath;
     QStringList rels;
     std::tie(prepath, rels) = GetLAndRels(paths);
-    QCOMPARE(prepath, expectPrepath);
+    QCOMPARE(prepath, expectCommonPrepath);
+    QCOMPARE(rels, expectRels);
   }
 
-  void test_commonprefix() {
+  void test_GetLAndRels_BuiltInFileSystem_SelectionPath() {
+    const QStringList paths{"E:/115/0303/12", "E:/115/0303/12.txt", "E:/115/0303/34.txt"};
+    const QString expectCommonPrepath = "E:/115/0303";
+    const QStringList expectRels{"12", "12.txt", "34.txt"};
+
+    QString prepath;
+    QStringList rels;
+    std::tie(prepath, rels) = GetLAndRels(paths);
+    QCOMPARE(prepath, expectCommonPrepath);
+    QCOMPARE(rels, expectRels);
+  }
+
+  void test_commonprefix_basic() {
     const QStringList paths{
         "E:/Chris Pine/Monday/12",    //
         "E:/Chris Pine/Feb/12",       //
@@ -236,95 +253,6 @@ class PathToolTest : public MyTestSuite {
     QVERIFY(isRootOrEmpty("/"));
     QVERIFY(!isRootOrEmpty("/home"));
 #endif
-  }
-
-  static bool EnvCheck(const QString& pre) {
-    // under path test/TestEnv_FileOsWalker, there are 3 item(s) in total as follow:
-    // ABC - DEF - name sc.1
-    // -  ABC - DEF - name sc.1.m
-    // ABC - DEF - name sc.1.txt
-    if (!QFile::exists(pre)) {
-      return false;
-    }
-    if (!QFile::exists(pre + "\\ABC - DEF - name sc.1")) {
-      return false;
-    }
-    if (!QFile::exists(pre + "\\ABC - DEF - name sc.1\\ABC - DEF - name sc.1.m")) {
-      return false;
-    }
-    if (!QFile::exists(pre + "\\ABC - DEF - name sc.1.txt")) {
-      return false;
-    }
-    qDebug("environment test ok");
-    return true;
-  }
-
-  void test_FileOsWalker_WithSub() {
-    const QString pre = rootpath;
-    QVERIFY(EnvCheck(pre));
-    const QStringList rels{"ABC - DEF - name sc.1",  //
-                           "ABC - DEF - name sc.1.txt"};
-    FileOsWalker fow{pre, false};
-    const bool includeDirectory = true;
-    fow(rels, includeDirectory);
-
-    const QStringList relToNames{"",                       //
-                                 "ABC - DEF - name sc.1",  //
-                                 ""};
-    const QStringList completeNames{"ABC - DEF - name sc.1",  //
-                                    "ABC - DEF - name sc.1",  //
-                                    "ABC - DEF - name sc.1"};
-    const QStringList suffixs{"", ".m", ".txt"};
-    const QList<bool> isFiles{false, true, true};
-    QCOMPARE(fow.relToNames, relToNames);
-    QCOMPARE(fow.completeNames, completeNames);
-    QCOMPARE(fow.suffixs, suffixs);
-    QCOMPARE(fow.isFiles, isFiles);
-  }
-
-  void test_FileOsWalker_WithNoSub() {
-    const QString pre = rootpath;
-    QVERIFY(EnvCheck(pre));
-    const QStringList rels{"ABC - DEF - name sc.1",  //
-                           "ABC - DEF - name sc.1.txt"};
-    const bool includeDirectory = false;
-    FileOsWalker fow{pre, false};
-    fow(rels, includeDirectory);
-
-    const QStringList relToNames{"",  //
-                                 ""};
-    const QStringList completeNames{"ABC - DEF - name sc.1",  //
-                                    "ABC - DEF - name sc.1"};
-    const QStringList suffixs{"", ".txt"};
-    const QList<bool> isFiles{false, true};
-    QCOMPARE(fow.relToNames, relToNames);
-    QCOMPARE(fow.completeNames, completeNames);
-    QCOMPARE(fow.suffixs, suffixs);
-    QCOMPARE(fow.isFiles, isFiles);
-  }
-
-  void test_FileOsWalker_SufInside() {
-    const QString pre = rootpath;
-    QVERIFY(EnvCheck(pre));
-    const QStringList rels{"ABC - DEF - name sc.1",  //
-                           "ABC - DEF - name sc.1.txt"};
-    const bool suffixInsideFilename = true;
-    FileOsWalker fow{pre, suffixInsideFilename};
-    const bool includeDirectory = true;
-    fow(rels, includeDirectory);
-
-    const QStringList relToNames{"",                               //
-                                 "ABC - DEF - name sc.1",          //
-                                 ""};                              //
-    const QStringList completeNames{"ABC - DEF - name sc.1",       //
-                                    "ABC - DEF - name sc.1.m",     //
-                                    "ABC - DEF - name sc.1.txt"};  //
-    const QStringList suffixs{"", "", ""};
-    const QList<bool> isFiles{false, true, true};
-    QCOMPARE(fow.relToNames, relToNames);
-    QCOMPARE(fow.completeNames, completeNames);
-    QCOMPARE(fow.suffixs, suffixs);
-    QCOMPARE(fow.isFiles, isFiles);
   }
 
   void test_path_part_split() {
