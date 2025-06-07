@@ -1,4 +1,4 @@
-#ifndef MEMORYKEY_H
+﻿#ifndef MEMORYKEY_H
 #define MEMORYKEY_H
 
 #include "Memory/KV.h"
@@ -56,7 +56,9 @@ struct MemoryKey {
   static const KV SEARCH_NAME_CASE_SENSITIVE;
   static const KV SEARCH_CONTENTS_CASE_SENSITIVE;
   static const KV ADVANCE_SEARCH_LINEEDIT_VALUE;
+  static const KV ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE;
   static const KV DISABLE_ENTRIES_DONT_PASS_FILTER;
+  static const KV ADVANCE_SEARCH_MODE;
 
   static const KV RENAMER_NAME_EXT_INDEPENDENT;
   static const KV RENAMER_INCLUDING_DIR;
