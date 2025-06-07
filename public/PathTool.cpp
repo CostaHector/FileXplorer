@@ -1,4 +1,4 @@
-#include "PathTool.h"
+﻿#include "PathTool.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -238,7 +238,7 @@ QString PathTool::driver(const QString& fullPath) {
   return "";
 #endif
 }
-QString PathTool::commonPrefix(const QString& path1, const QString& path2) {
+QString PathTool::StrCommonPrefix(const QString& path1, const QString& path2) {
   const int length = std::min(path1.size(), path2.size());
   int index = 0;
   while (index < length && path1[index] == path2[index]) {
@@ -248,11 +248,11 @@ QString PathTool::commonPrefix(const QString& path1, const QString& path2) {
 }
 
 bool PathTool::isLinuxRootOrWinEmpty(const QString& path) {
-  return path.isEmpty() or path == "/";
+  return path.isEmpty() || path == "/";
 }
 
 bool PathTool::isRootOrEmpty(const QString& path) {
-  return path.isEmpty() or path == "/" or QDir(path).isRoot();
+  return path.isEmpty() || path == "/" || QDir(path).isRoot();
 }
 
 QStringList PathTool::GetRels(int prefixLen, const QStringList& lAbsPathList) {
@@ -269,7 +269,7 @@ std::pair<QString, QStringList> PathTool::GetLAndRels(const QStringList& lAbsPat
   if (lAbsPathList.isEmpty()) {
     return {"", lAbsPathList};
   }
-  const auto& prefixPath = longestCommonPrefix(lAbsPathList);
+  const QString& prefixPath = longestCommonPrefix(lAbsPathList);
   // "/home/rel2entry" => rel2EntryN = 5+1
   const int prefixLen = prefixPath.size();
   QStringList lRels = GetRels(prefixLen, lAbsPathList);
@@ -281,30 +281,34 @@ QString PathTool::longestCommonPrefix(const QStringList& strs) {
     return "";
   }
   if (strs.size() == 1) {
-    return QFileInfo(strs[0]).absolutePath();
+    return absolutePath(strs[0]);
   }
 
   QString prefix = strs[0];
   int count = strs.size();
   for (int i = 1; i < count; ++i) {
-    prefix = commonPrefix(prefix, strs[i]);
+    prefix = StrCommonPrefix(prefix, strs[i]);
     if (!prefix.size()) {
       break;
     }
   }
 
-  // source         => plain prefix   => path prefix
-  // /home/costa    => /home/costa    => /home
+  // source         => string common prefix   => path common prefix
+  // /home/costa    => /home/costa            => /home
   // /home/costa/H  => /home/costa
 
-  // return path without trailing '/'
-
+  // return path should without trailing '/'
   const int slashIndex = prefix.lastIndexOf('/');
   return slashIndex == -1 ? prefix : prefix.left(slashIndex);
 }
 
+// contains dot itself
 QString PathTool::GetFileExtension(const QString& path) {
-  return '.' + QFileInfo(path).suffix();
+  const int lastIndexOfDot = path.lastIndexOf('.');
+  if (lastIndexOfDot == -1) {
+    return {};
+  }
+  return path.mid(lastIndexOfDot);
 }
 
 bool PathTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
@@ -342,46 +346,4 @@ bool PathTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir, 
     }
   }
   return true;
-}
-
-FileOsWalker::FileOsWalker(const QString& pre, bool sufInside)
-    : mPrepathWithSlash{PathTool::normPath(pre) + '/'},  // "rel/"
-      N{mPrepathWithSlash.size()},                       // N = len("rel/")
-      mSufInside{sufInside}                              // a.txt
-{                                                        //
-}
-
-void FileOsWalker::operator()(const QStringList& rels, const bool includingSub) {
-  // Reverse the return value, One can get bottom To Top result like os.walk
-  for (const QString& rel : rels) {
-    const QFileInfo fi{mPrepathWithSlash + rel};
-    FillByFileInfo(fi);
-    if (!includingSub) {
-      continue;
-    }
-    if (!fi.isDir()) {
-      continue;
-    }
-    // folders
-    QDirIterator it(fi.absoluteFilePath(), {}, QDir::Filter::NoDotAndDotDot | QDir::Filter::AllEntries, QDirIterator::IteratorFlag::Subdirectories);
-    while (it.hasNext()) {
-      it.next();
-      const QFileInfo subFi{it.fileInfo()};
-      FillByFileInfo(subFi);
-    }
-  }
-}
-
-void FileOsWalker::FillByFileInfo(const QFileInfo& fi) {
-  QString completeNm, dotSuf;
-  isFiles.append(fi.isFile());
-  relToNames.append(fi.absolutePath().mid(N));
-  if (mSufInside) {
-    completeNames.append(fi.fileName());
-    suffixs.append("");
-  } else {
-    std::tie(completeNm, dotSuf) = PathTool::GetBaseNameExt(fi.fileName());
-    completeNames.append(completeNm);
-    suffixs.append(dotSuf);
-  }
 }
