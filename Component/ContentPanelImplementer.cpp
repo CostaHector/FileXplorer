@@ -1,4 +1,4 @@
-#include "Component/ContentPanel.h"
+﻿#include "Component/ContentPanel.h"
 #include "Model/ScenesListModel.h"
 #include "Tools/ViewTypeTool.h"
 
@@ -38,7 +38,7 @@ QString ContentPanel::getFilePath(const QModelIndex& ind) const {
     case ViewType::TREE:
       return m_fsModel->filePath(ind);
     case ViewType::SEARCH: {
-      const auto srcIndex = m_proxyModel->mapToSource(ind);
+      const auto srcIndex = m_searchProxyModel->mapToSource(ind);
       return m_searchSrcModel->filePath(srcIndex);
     }
     case ViewType::SCENE:
@@ -68,7 +68,7 @@ QModelIndexList ContentPanel::getSelectedRows() const {
       const auto& proxyIndexesLst = m_advanceSearchView->selectionModel()->selectedRows();
       QModelIndexList srcIndexesLst;
       for (const auto& ind : proxyIndexesLst) {
-        srcIndexesLst.append(m_proxyModel->mapToSource(ind));
+        srcIndexesLst.append(m_searchProxyModel->mapToSource(ind));
       }
       return srcIndexesLst;
     }
@@ -109,7 +109,7 @@ QStringList ContentPanel::getFileNames() const {
     }
     case ViewType::SEARCH: {
       for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& srcIndex = m_proxyModel->mapToSource(ind);
+        const auto& srcIndex = m_searchProxyModel->mapToSource(ind);
         names.append(m_searchSrcModel->fileName(srcIndex));
       }
       break;
@@ -164,7 +164,7 @@ QStringList ContentPanel::getFullRecords() const {
     }
     case ViewType::SEARCH: {
       for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& srcIndex = m_proxyModel->mapToSource(ind);
+        const auto& srcIndex = m_searchProxyModel->mapToSource(ind);
         fullRecords.append(m_searchSrcModel->fullInfo(srcIndex));
       }
       break;
@@ -218,7 +218,7 @@ QStringList ContentPanel::getFilePaths() const {
     }
     case ViewType::SEARCH: {
       for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& srcIndex = m_proxyModel->mapToSource(ind);
+        const auto& srcIndex = m_searchProxyModel->mapToSource(ind);
         filePaths.append(m_searchSrcModel->filePath(srcIndex));
       }
       break;
@@ -283,7 +283,7 @@ QStringList ContentPanel::getFilePrepaths() const {
     }
     case ViewType::SEARCH: {
       for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& srcIndex = m_proxyModel->mapToSource(ind);
+        const auto& srcIndex = m_searchProxyModel->mapToSource(ind);
         prepaths.append(m_searchSrcModel->absolutePath(srcIndex));
       }
       break;
@@ -345,7 +345,7 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
     }
     case ViewType::SEARCH: {
       for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& srcIndex = m_proxyModel->mapToSource(ind);
+        const auto& srcIndex = m_searchProxyModel->mapToSource(ind);
         const QFileInfo dirFi = m_searchSrcModel->fileInfo(srcIndex);
         const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
         prepaths.append(imagePath);
@@ -380,13 +380,75 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
   return prepaths;
 }
 
+PathTool::SelectionInfo ContentPanel::GetSelectionInfo(const Qt::DropAction dropAct) const {
+  PathTool::SelectionInfo info;
+  static const auto Fill = [&info](MyQFileSystemModel* fsModel, const QModelIndexList& inds, const Qt::DropAction dropAct) {
+    if (fsModel == nullptr) {
+      return;
+    }
+    info.rootPath = fsModel->rootPath();
+    QString name;
+    for (const auto& ind : inds) {
+      name = fsModel->fileName(ind);
+      info.relSelections.append(name);
+//      info.rootPaths.append(info.rootPath);
+//      info.selections.append(name);
+    }
+    if (dropAct == Qt::CopyAction) {
+      fsModel->CopiedSomething(inds);
+    } else if (dropAct == Qt::MoveAction) {
+      fsModel->CutSomething(inds);
+    }
+  };
+
+  auto vt = GetCurViewType();
+  switch (vt) {
+    case ViewType::LIST: {
+      const QModelIndexList& inds = m_fsListView->selectionModel()->selectedRows();
+      Fill(m_fsModel, inds, dropAct);
+      break;
+    }
+    case ViewType::TABLE: {
+      const QModelIndexList& inds = m_fsTableView->selectionModel()->selectedRows();
+      Fill(m_fsModel, inds, dropAct);
+      break;
+    }
+    case ViewType::TREE: {
+      const QModelIndexList& inds = m_fsTreeView->selectionModel()->selectedRows();
+      Fill(m_fsModel, inds, dropAct);
+      break;
+    }
+    case ViewType::SEARCH: {
+      QModelIndexList srcInds;
+      info.rootPath = m_searchSrcModel->rootPath();
+      for (const auto& proInd : m_advanceSearchView->selectionModel()->selectedRows()) {
+        const auto& ind = m_searchProxyModel->mapToSource(proInd);
+        srcInds.append(ind);
+        int row = ind.row();
+        info.relSelections.append(m_searchSrcModel->GetARelSelection(row));
+//        info.rootPaths.append(m_searchSrcModel->GetARootPath(row));
+//        info.selections.append(m_searchSrcModel->GetASelection(row));
+      }
+      if (dropAct == Qt::CopyAction) {
+        m_searchSrcModel->CopiedSomething(srcInds);
+      } else if (dropAct == Qt::MoveAction) {
+        m_searchSrcModel->CutSomething(srcInds);
+      }
+      break;
+    }
+    default:
+      qWarning("GetSelectionInfo not support ViewType:%d", (int)vt);
+  }
+  return info;
+}
+
 std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::DropAction dropAct) const {
   QStringList filePaths;
   QList<QUrl> urls;
   auto vt = GetCurViewType();
   switch (vt) {
-    case ViewType::TABLE: {
-      const auto& inds = m_fsTableView->selectionModel()->selectedRows();
+    case ViewType::LIST: {
+      const auto& inds = m_fsListView->selectionModel()->selectedRows();
       for (const auto& ind : inds) {
         filePaths.append(m_fsModel->filePath(ind));
         urls.append(QUrl::fromLocalFile(filePaths.back()));
@@ -398,8 +460,8 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
       }
       break;
     }
-    case ViewType::LIST: {
-      const auto& inds = m_fsListView->selectionModel()->selectedRows();
+    case ViewType::TABLE: {
+      const auto& inds = m_fsTableView->selectionModel()->selectedRows();
       for (const auto& ind : inds) {
         filePaths.append(m_fsModel->filePath(ind));
         urls.append(QUrl::fromLocalFile(filePaths.back()));
@@ -427,7 +489,7 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
     case ViewType::SEARCH: {
       QModelIndexList srcInds;
       for (const auto& proInd : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& ind = m_proxyModel->mapToSource(proInd);
+        const auto& ind = m_searchProxyModel->mapToSource(proInd);
         srcInds.append(ind);
         filePaths.append(m_searchSrcModel->filePath(ind));
         urls.append(QUrl::fromLocalFile(filePaths.back()));
@@ -494,7 +556,7 @@ std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const b
     case ViewType::SEARCH: {
       QSet<QModelIndex> srcInds;
       for (const auto& proInd : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& ind = m_proxyModel->mapToSource(proInd);
+        const auto& ind = m_searchProxyModel->mapToSource(proInd);
         prepaths.append(m_searchSrcModel->absolutePath(ind));
         names.append(m_searchSrcModel->fileName(ind));
         srcInds.insert(ind);
@@ -582,7 +644,7 @@ QString ContentPanel::getCurFilePath() const {
       return m_fsModel->filePath(m_fsTreeView->currentIndex());
     }
     case ViewType::SEARCH: {
-      return m_searchSrcModel->filePath(m_proxyModel->mapToSource(m_advanceSearchView->currentIndex()));
+      return m_searchSrcModel->filePath(m_searchProxyModel->mapToSource(m_advanceSearchView->currentIndex()));
     }
     case ViewType::SCENE: {
       return m_scenesModel->filePath(m_sceneTableView->currentIndex());
@@ -614,7 +676,7 @@ QString ContentPanel::getCurFileName() const {
       return m_fsModel->fileName(m_fsTreeView->currentIndex());
     }
     case ViewType::SEARCH: {
-      return m_searchSrcModel->fileName(m_proxyModel->mapToSource(m_advanceSearchView->currentIndex()));
+      return m_searchSrcModel->fileName(m_searchProxyModel->mapToSource(m_advanceSearchView->currentIndex()));
     }
     case ViewType::MOVIE: {
       return m_dbModel->fileName(m_movieView->currentIndex());
@@ -641,7 +703,7 @@ QFileInfo ContentPanel::getFileInfo(const QModelIndex& ind) const {
       return m_fsModel->fileInfo(ind);
     }
     case ViewType::SEARCH: {
-      return m_searchSrcModel->fileInfo(m_proxyModel->mapToSource(ind));
+      return m_searchSrcModel->fileInfo(m_searchProxyModel->mapToSource(ind));
     }
     case ViewType::SCENE: {
       return m_scenesModel->fileInfo(ind);

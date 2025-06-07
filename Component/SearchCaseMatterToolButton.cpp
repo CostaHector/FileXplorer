@@ -1,30 +1,26 @@
-#include "SearchCaseMatterToolButton.h"
+﻿#include "SearchCaseMatterToolButton.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 
 SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolButton(parent) {
-  m_searchCaseMenu->addSection(tr("search type(name or contents)"));
+  m_searchCaseMenu->addSection("search type(name or contents)");
   m_searchCaseMenu->addAction(SEARCH_NAME_CASE_SENSITIVE);
   m_searchCaseMenu->addAction(SEARCH_CONTENTS_CASE_SENSITIVE);
 
   m_searchCaseMenu->setToolTipsVisible(true);
 
   for (auto* act : m_searchCaseMenu->actions()) {
-    if (act->isSeparator()) {
+    if (act == nullptr || act->isSeparator()) {
       continue;
     }
     act->setCheckable(true);
   }
 
-  SEARCH_NAME_CASE_SENSITIVE->setChecked(
-      PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool());
-  SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(
-      PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool());
+  SEARCH_NAME_CASE_SENSITIVE->setChecked(PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool());
+  SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool());
 
-  SEARCH_NAME_CASE_SENSITIVE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Name Case matter.").arg(SEARCH_NAME_CASE_SENSITIVE->text(), SEARCH_NAME_CASE_SENSITIVE->shortcut().toString()));
-  SEARCH_CONTENTS_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Content Case matter.")
-                                                 .arg(SEARCH_CONTENTS_CASE_SENSITIVE->text(), SEARCH_CONTENTS_CASE_SENSITIVE->shortcut().toString()));
+  SEARCH_NAME_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Name Case matter.").arg(SEARCH_NAME_CASE_SENSITIVE->text(), SEARCH_NAME_CASE_SENSITIVE->shortcut().toString()));
+  SEARCH_CONTENTS_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Content Case matter.").arg(SEARCH_CONTENTS_CASE_SENSITIVE->text(), SEARCH_CONTENTS_CASE_SENSITIVE->shortcut().toString()));
 
   setIcon(QIcon(":img/NAME_STR_CASE"));
   setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);

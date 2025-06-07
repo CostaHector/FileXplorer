@@ -1,13 +1,16 @@
-#include "SearchModeComboBox.h"
+﻿#include "SearchModeComboBox.h"
 #include <QLayout>
 #include "public/PublicVariable.h"
 #include "Tools/SearchTools.h"
 using namespace SearchTools;
 
 SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox{parent} {
-  addItems(GetSearchModeStrList());
-  setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  addItem(QIcon(":img/MATCH_EQUAL"), GetSearchModeStr(SEARCH_MODE::NORMAL));
+  addItem(QIcon(":img/MATCH_REGEX"), GetSearchModeStr(SEARCH_MODE::REGEX));
+  insertSeparator(count());
+  addItem(QIcon(":img/SEARCH_SCOPE_CONTENT"), GetSearchModeStr(SEARCH_MODE::FILE_CONTENTS));
 
+  setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   setCurrentText(PreferenceSettings().value("ADVANCE_SEARCH_MODE", "Wildcard").toString());
 }
 

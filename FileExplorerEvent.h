@@ -1,4 +1,4 @@
-#ifndef FILEEXPLOREREVENT_H
+﻿#ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
 #include <QAbstractButton>
 #include <QAbstractTableModel>
@@ -99,9 +99,9 @@ class FileExplorerEvent : public QObject {
   auto on_PlayVideo() const -> bool;
 
   auto on_Merge(const bool reverse = false) -> bool;
-  auto on_Copy() -> bool;
-  auto on_Cut() -> bool;
-  auto on_Paste() -> bool;
+  bool on_Copy();
+  bool on_Cut();
+  bool on_Paste();
 
   auto on_NameStandardize() -> bool;
   bool on_FileClassify();
@@ -127,6 +127,7 @@ class FileExplorerEvent : public QObject {
  signals:
  private:
   CCMMode::Mode QueryCopyOrCut();
+  FILE_STRUCTURE_MODE QueryKeepStructureOrFlatten(); // true: keep, false: flatten
 };
 
 #endif  // FILEEXPLOREREVENT_H
