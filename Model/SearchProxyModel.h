@@ -1,11 +1,10 @@
-#ifndef SEARCHPROXYMODEL_H
+﻿#ifndef SEARCHPROXYMODEL_H
 #define SEARCHPROXYMODEL_H
 
 #include <QAbstractItemModel>
 #include <QSortFilterProxyModel>
 #include "Model/AdvanceSearchModel.h"
 #include "Tools/SearchTools.h"
-
 
 class SearchProxyModel : public QSortFilterProxyModel {
  public:
@@ -19,24 +18,18 @@ class SearchProxyModel : public QSortFilterProxyModel {
     QSortFilterProxyModel::setSourceModel(sourceModel);
   }
 
-  auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override { return sourceModel()->headerData(section, orientation, role); }
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override { return sourceModel()->headerData(section, orientation, role); }
 
-  auto initSearchMode(const QString& searchMode) -> void;
-  auto setSearchMode(const QString& searchMode) -> void;
+  void initSearchMode(const QString& searchMode);
+  void setSearchMode(const QString& searchMode);
 
-  auto startFilterWhenTextChanged(const QString& searchText) -> void;
-  auto startFilterWhenTextChanges(const QString& searchText) -> void;
+  void startFilterWhenTextChanged(const QString& nameText, const QString& contentText);
+  void startFilterWhenTextChanges(const QString& nameText, const QString& contentText);
+  void setContentFilter(const QString& contentText);
 
-  auto ReturnPostOperation(const bool isPass, const QModelIndex& index) const -> bool;
+  bool ReturnPostOperation(const bool isPass, const QModelIndex& index) const;
 
-  auto filterAcceptsRow(int source_row, const QModelIndex& source_parent) const -> bool override;
-
-  void Reset() {
-    m_fileContentFilter.clear();
-    m_nameFilters.setPattern("");
-  }
-
-  void changeCustomSearchNameAndContents(const QString& searchText);
+  bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
 
   void initNameFilterDisables(bool hide) { m_nameFilterDisableOrHide = hide; }
   void setNameFilterDisables(bool hide);
@@ -48,18 +41,16 @@ class SearchProxyModel : public QSortFilterProxyModel {
   void setFileNameFiltersCaseSensitive(bool sensitive);
 
  private:
-  auto CheckIfContentsContained(const QString& filePath, const QString& contained) const -> bool;
+  void PrintRegexDebugMessage() const;
+  bool CheckIfContentsContained(const QString& filePath, const QString& contained) const;
   AdvanceSearchModel* _searchSourceModel{nullptr};
 
   SearchTools::SEARCH_MODE m_searchMode;
-  QString m_searchSourceString;
+  QString m_nameRawString;
+  QString m_contentRawText;
 
-  QString m_fileContentFilter;
-  QRegularExpression m_nameFilters;
-
-  bool m_fileContentsCaseSensitive;
-  bool m_nameFiltersCaseSensitive;
-
-  bool m_nameFilterDisableOrHide;
+  bool m_nameFiltersCaseSensitive{false};
+  bool m_fileContentsCaseSensitive{false};
+  bool m_nameFilterDisableOrHide{false};  // true: disable, false: hide
 };
 #endif  // SEARCHPROXYMODEL_H
