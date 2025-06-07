@@ -20,7 +20,7 @@ void AdvanceSearchModel::updateSearchResultList() {
   decltype(m_itemsLst) newPlanetList;
   QDirIterator it{m_rootPath, m_filters, m_iteratorFlags};
   QString fileName;
-  const int ROOT_PATH_N = m_rootPath.size();
+  const int ROOT_PATH_N = m_rootPath.size() + 1;
   while (it.hasNext()) {
     using namespace PathTool;
     it.next();
