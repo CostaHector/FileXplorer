@@ -1,4 +1,4 @@
-#include "PathTool.h"
+﻿#include "PathTool.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -303,8 +303,13 @@ QString PathTool::longestCommonPrefix(const QStringList& strs) {
   return slashIndex == -1 ? prefix : prefix.left(slashIndex);
 }
 
+// contains dot itself
 QString PathTool::GetFileExtension(const QString& path) {
-  return '.' + QFileInfo(path).suffix();
+  const int lastIndexOfDot = path.lastIndexOf('.');
+  if (lastIndexOfDot == -1) {
+    return {};
+  }
+  return path.mid(lastIndexOfDot);
 }
 
 bool PathTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist) {
