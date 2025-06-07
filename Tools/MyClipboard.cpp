@@ -1,63 +1,13 @@
-#include "MyClipboard.h"
-#include <QGuiApplication>
+﻿#include "MyClipboard.h"
 #include "MimeDataCX.h"
-#include "ViewSelection.h"
+#include <QGuiApplication>
 
-MyClipboard::MyClipboard(QObject* parent) : QObject{parent}, m_clipboard(QGuiApplication::clipboard()) {}
-
-int MyClipboard::FillIntoClipboardSystemBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode /* cutCopy */) {
-  QMimeData* mimedata = new QMimeData;
-  mimedata->setUrls(urls);
-  // files in pathsList will drop its former level relation
-  mimedata->setText(pathsList.join('\n'));
-  m_clipboard->setMimeData(mimedata);
-  return urls.size();
+MyClipboard::MyClipboard(QObject* parent)                           //
+    : QObject{parent}, m_clipboard(QGuiApplication::clipboard()) {  //
 }
 
-int MyClipboard::FillIntoClipboardKeepFilesLevelBehavior(const QStringList& pathsList, const QList<QUrl>& urls, const CCMMode::Mode cutCopy) {
-  if (pathsList.isEmpty()) {
-    return 0;
-  }
-  QString fromPath;
-  QStringList lRels;
-  std::tie(fromPath, lRels) = PathTool::GetLAndRels(pathsList);
-
-  MimeDataCX* mimedata = new MimeDataCX(fromPath, lRels, cutCopy);
-  mimedata->setUrls(urls);
-  mimedata->setText(lRels.join('\n'));
+int MyClipboard::FillClipboardFromSelectionInfo(const PathTool::SelectionInfo& info, const CCMMode::Mode cutCopy) {
+  MimeDataCX* mimedata = new MimeDataCX{info, cutCopy};
   m_clipboard->setMimeData(mimedata);
-  return pathsList.size();
-}
-
-int MyClipboard::FillIntoClipboardFSKeepFilesLevelBehavior(const QString& fromPath,
-                                                           const QStringList& pathsList,
-                                                           const QList<QUrl>& urls,
-                                                           const CCMMode::Mode cutCopy) {
-  if (pathsList.isEmpty()) {
-    return 0;
-  }
-  const QStringList& lRels = PathTool::GetRels(fromPath.size(), pathsList);
-  MimeDataCX* mimedata = new MimeDataCX(fromPath, lRels, cutCopy);
-  mimedata->setUrls(urls);
-  mimedata->setText(lRels.join('\n'));
-  m_clipboard->setMimeData(mimedata);
-  return pathsList.size();
-}
-
-auto MyClipboard::FillSelectionIntoClipboard(QAbstractItemView* _view, QFileSystemModel* _fileSysModel, const CCMMode::Mode cutCopy) -> int {
-  QStringList lRels;
-  QList<QUrl> urls;
-  for (const QModelIndex& ind : ViewSelection::selectedIndexes(_view)) {
-    lRels.append(_fileSysModel->fileName(ind));
-    urls.append(QUrl::fromLocalFile(lRels.back()));
-  }
-  if (lRels.isEmpty()) {
-    return 0;
-  }
-  const QString& fromPath = _fileSysModel->rootPath();
-  MimeDataCX* mimedata = new MimeDataCX(fromPath, lRels, cutCopy);
-  mimedata->setUrls(urls);
-  mimedata->setText(lRels.join('\n'));
-  m_clipboard->setMimeData(mimedata);
-  return urls.size();
+  return info.relSelections.size();
 }
