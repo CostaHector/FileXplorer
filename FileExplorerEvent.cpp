@@ -1,7 +1,9 @@
 ﻿#include "FileExplorerEvent.h"
+#include <QGuiApplication>
 #include <QApplication>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QProcess>
 
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/ArrangeActions.h"
@@ -16,7 +18,6 @@
 
 #include "Component/AlertSystem.h"
 #include "Component/Archiver.h"
-#include "Component/ConflictsRecycle.h"
 #include "Component/CustomStatusBar.h"
 #include "Component/MD5Window.h"
 #include "Component/Notificator.h"
@@ -46,7 +47,6 @@
 #include "Tools/LowResImgsRemover.h"
 #include "Tools/FilesNameBatchStandardizer.h"
 #include "Tools/Json/JsonHelper.h"
-#include "Tools/MimeDataCX.h"
 #include "Tools/PlayVideo.h"
 #include "Tools/SysTerminal.h"
 #include "Tools/ViewSelection.h"
@@ -57,6 +57,7 @@
 #include "public/PublicTool.h"
 #include "public/MemoryKey.h"
 #include "public/UndoRedo.h"
+#include "FileOperation/ComplexOperation.h"
 
 using namespace ViewTypeTool;
 
@@ -79,10 +80,15 @@ FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(MyQFileSystemModel* fs
 }
 
 FileExplorerEvent::FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent)
-    : QObject(parent), _fileSysModel(fsm), _contentPane(view), _logger(logger), m_clipboard(new MyClipboard(this)) {}
+    : QObject(parent),                             //
+      _fileSysModel(fsm),                          //
+      _contentPane(view),                          //
+      _logger(logger),                             //
+      m_clipboard{QGuiApplication::clipboard()} {  //
+}
 
 auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& contents) -> bool {  // not effect by selection;
-  if (not __CanNewItem()) {
+  if (!__CanNewItem()) {
     return false;
   }
   if (newTextName.isEmpty()) {
@@ -1037,7 +1043,7 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
 
 bool FileExplorerEvent::on_Merge(const bool isReverse) {
   // reverse left right folder;
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (!_contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     return false;
   }
   if (selectedIndexes().size() != 2) {
@@ -1051,41 +1057,56 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   if ((l.toLower() < r.toLower()) == isReverse) {  // ignore case compare
     l.swap(r);
   }
-  if (not(QFileInfo(l).isDir() and QFileInfo(r).isDir())) {
-    qInfo("[Merge Folder Skip]. Only two folder can merged[%s][%s]", qPrintable(l), qPrintable(r));
-    Notificator::information("[Merge Folder Skip]. Only select two directory", l + '|' + r);
+  const QString msg{l + "\n" + r};
+  if (!QFileInfo{l}.isDir() || !QFileInfo{r}.isDir()) {
+    LOG_INFO("[Merge Folder Skip]. Select two folder", msg);
     return false;
   }
-  ConflictsItemHelper conflictIF(l, r, CCMMode::MERGE_OP);
-  auto* tfm = new ConflictsRecycle(conflictIF);
-  if (!conflictIF) {
-    const bool mergeRet = tfm->on_completeMerge();
-    if (_logger) {
-      _logger->msg(QString("[%1] merged to [%2], Not conflict result:%3").arg(l).arg(r).arg(mergeRet));
-    }
-  } else {
-    tfm->show();
+
+  using namespace ComplexOperation;
+  ComplexMerge cm;
+  BATCH_COMMAND_LIST_TYPE aBatch = cm.Merge(l, r);
+  const bool isAllSucceed{g_undoRedo.Do(aBatch)};
+  if (!isAllSucceed) {
+    LOG_WARN("Merge partial failed", msg);
+    return false;
   }
-  if (_logger) {
-    _logger->msg(QString("[%1] merged to [%2].").arg(l, r));
-  }
+  LOG_GOOD("Merge partial failed", msg);
   return true;
 }
 
 bool FileExplorerEvent::on_Copy() {
-  PathTool::SelectionInfo infos{_contentPane->GetSelectionInfo(Qt::CopyAction)};
-  int cnt = m_clipboard->FillClipboardFromSelectionInfo(infos, CCMMode::COPY_OP);
+  QStringList absPaths;
+  QList<QUrl> urls;
+  std::tie(absPaths, urls) = _contentPane->getFilePathsAndUrls(Qt::CopyAction);
+  QMimeData* pMimeData = new (std::nothrow) QMimeData;
+  pMimeData->setText(absPaths.join('\n'));
+  pMimeData->setUrls(urls);
+  if (!SetMimeDataCutCopy(*pMimeData, Qt::CopyAction)) {
+    LOG_BAD("Set Copy Action in QMimedata failed", "Abort");
+    return false;
+  }
+  m_clipboard->setMimeData(pMimeData);
   if (_logger != nullptr) {
-    _logger->msg(QString("%1 path(s) been copied").arg(cnt), STATUS_STR_TYPE::NORMAL);
+    _logger->msg(QString("%1 path(s) been copied").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
   }
   return true;
 }
 
 bool FileExplorerEvent::on_Cut() {
-  PathTool::SelectionInfo infos{_contentPane->GetSelectionInfo(Qt::MoveAction)};
-  int cnt = m_clipboard->FillClipboardFromSelectionInfo(infos, CCMMode::CUT_OP);
+  QStringList absPaths;
+  QList<QUrl> urls;
+  std::tie(absPaths, urls) = _contentPane->getFilePathsAndUrls(Qt::MoveAction);
+  QMimeData* pMimeData = new (std::nothrow) QMimeData;
+  pMimeData->setText(absPaths.join('\n'));
+  pMimeData->setUrls(urls);
+  if (!SetMimeDataCutCopy(*pMimeData, Qt::MoveAction)) {
+    LOG_BAD("Set Cut Action in QMimedata failed", "Abort");
+    return false;
+  }
+  m_clipboard->setMimeData(pMimeData);
   if (_logger != nullptr) {
-    _logger->msg(QString("%1 path(s) been cut").arg(cnt), STATUS_STR_TYPE::NORMAL);
+    _logger->msg(QString("%1 path(s) been cut").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
   }
   return true;
 }
@@ -1109,41 +1130,28 @@ bool FileExplorerEvent::on_Paste() {
     LOG_CRITICAL("[Paste Skip] pMimeData is nullptr", "Cannot paste here");
     return false;
   }
-  MimeDataCX dataInClipboard{MimeDataCX::FromNativeMimeData(pMimeData)};
-  if (!dataInClipboard.hasUrls()) {
-    LOG_INFO("[Paste Skip] No urls at all", "Skip");
+  if (!pMimeData->hasUrls()) {
+    LOG_CRITICAL("[Paste Skip] no urls in Clipboard", "Cannot paste here");
     return false;
   }
-
-  if (dataInClipboard.IsFileSystemStuctureMatter()) {
-    const FILE_STRUCTURE_MODE fileStuctureMode = QueryKeepStructureOrFlatten();
-    if (fileStuctureMode == FILE_STRUCTURE_MODE::BUTT) {
-      LOG_INFO("[Paste Skip] User cancel", "Skip");
+  using namespace ComplexOperation;
+  FILE_STRUCTURE_MODE fileStructMode{GetDefaultFileStructMode()};
+  if (fileStructMode == FILE_STRUCTURE_MODE::QUERY) {
+    if (!QueryKeepStructureOrFlatten(fileStructMode)) {
+      LOG_GOOD("User cancel paste", "neither flatten or keep");
       return true;
     }
   }
-
-  if (dataInClipboard.m_cutCopy == CCMMode::ERROR_OP) {
-    const CCMMode::Mode retMode = QueryCopyOrCut();
-    if (retMode == CCMMode::ERROR_OP) {
-      LOG_INFO("[Paste Skip] User cancel", "Skip");
-      return true;
-    }
-    dataInClipboard.determineMode(retMode);
+  Qt::DropAction dropAction = GetCutCopyModeFromNativeMimeData(*pMimeData);
+  int ret = DoDropAction(dropAction, pMimeData->urls(), rTo, fileStructMode);
+  if (ret < 0) {
+    LOG_BAD("Paste operation partially failed", rTo);
+    return false;
   }
-
+  LOG_GOOD("Paste operation all succeed", rTo);
   _fileSysModel->ClearCopyAndCutDict();
   if (_contentPane->m_searchSrcModel != nullptr) {
     _contentPane->m_searchSrcModel->ClearCopyAndCutDict();
-  }
-
-  ConflictsItemHelper conflictIF{dataInClipboard.mRootPath, rTo, dataInClipboard.mRelSelections, dataInClipboard.m_cutCopy};
-  auto* tfm = new (std::nothrow) ConflictsRecycle(conflictIF);
-  if (!conflictIF) {
-    const bool ret = tfm->on_completeMerge();
-    qDebug("No conflict, paste result:%d", ret);
-  } else {
-    tfm->show();
   }
   return true;
 }
@@ -1280,17 +1288,19 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
 }
 
 bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
-  if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
-    qDebug("[Remove redundant item] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("[Remove redundant item] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
+  if (!_contentPane->isFSView()) {
+    LOG_INFO("[Remove redundant item] Only available on FileSytemView", "Skip");
+    return false;
+  }
+  const QString& path = _fileSysModel->rootPath();
+  if (!PathTool::isRootOrEmpty(path)) {
+    LOG_INFO("[Remove redundant item] Path invalid", path);
     return false;
   }
 
-  const QString& path = _fileSysModel->rootPath();
   int cmdCnt = remover(path);
   if (cmdCnt == 0) {
-    qInfo("Skip. Nothing to remove");
-    Notificator::information("Skip", "Nothing to remove");
+    LOG_INFO("Skip", "Nothing to remove");
     return true;
   }
   auto* msgBox = new QMessageBox(QMessageBox::Icon::Warning, QString("Confirm %1 command(s)?").arg(cmdCnt), "Remove Redundant folder");
@@ -1299,46 +1309,42 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   msgBox->setDetailedText(QString(remover));
   const auto ret = msgBox->exec();
   if (ret != QMessageBox::StandardButton::Yes) {
-    qDebug("User cancel");
+    LOG_GOOD("User cancel remove redundant item", "skip");
     return true;
   }
   return remover.Exec();
 }
 
-bool FileExplorerEvent::on_MoveCopyEventSkeleton(const CCMMode::Mode operationName, QString r) {
+bool FileExplorerEvent::on_MoveCopyEventSkeleton(const CCMMode::Mode operationName, QString dest) {
   const auto vt = _contentPane->GetCurViewType();
-  if (vt == ViewType::SEARCH) {
-    qDebug("[Move/Copy to] for [%s view] use Copy/Cut/Paste to filesytem instead", qPrintable(_contentPane->GetCurViewName()));
-    Notificator::warning("[Move/Copy to] for [%s view] use Copy/Cut/Paste to filesytem instead", _contentPane->GetCurViewName());
+  if (!ViewTypeTool::isFSView(vt)) {
+    LOG_WARN("[Move/Copy to] only available on FileSytemView", QString::number((int)vt));
     return false;
   }
-  if (!ViewTypeTool::isFSView(vt) || PathTool::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
-    qDebug("[Move/Copy to] only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::warning("[Move/Copy to] only available on FileSytemView[%1] and non-empty-path[%2]", _contentPane->GetCurViewName() + '|' + _contentPane->GetCurViewName());
-    return false;
-  }
+  const char* const pOperationNameStr = CCMMode::MCCL2STR[operationName];
   auto* view = _contentPane->GetCurView();
-  if (not view->selectionModel()->hasSelection()) {
-    qInfo("Select Some File/Folder First. %s", CCMMode::MCCL2STR[operationName]);
-    Notificator::information("Select Some File/Folder First", CCMMode::MCCL2STR[operationName]);
+  if (!view->selectionModel()->hasSelection()) {
+    LOG_INFO("Select Some File/Folder First", pOperationNameStr);
     return true;
   }
   const QString& l = _fileSysModel->rootPath();
-  if (r.isEmpty()) {
-    r = ChooseCopyDestination(l, view);
+  if (dest.isEmpty()) {
+    dest = ChooseCopyDestination(l, view);
   }
-  if (r.isEmpty() || !QFileInfo{r}.isDir()) {
-    qWarning("Destination[%s] of [%s to] Error", qPrintable(r), CCMMode::MCCL2STR[operationName]);
-    Notificator::warning("Destination[%1] of [%2 to] Error", r + '|' + CCMMode::MCCL2STR[operationName]);
+  if (dest.isEmpty() || !QFileInfo{dest}.isDir()) {
+    LOG_WARN("Destination path invalid", dest);
     return true;
   }
 
+  Qt::DropAction dropAction{Qt::DropAction::IgnoreAction};
   if (operationName == CCMMode::CUT_OP) {
-    const QString& newPathHistory = MoveToNewPathAutoUpdateActionText(r, g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY);
-    PreferenceSettings().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name, newPathHistory);
+    PreferenceSettings().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name,  //
+                                  MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY));
+    dropAction = Qt::DropAction::MoveAction;
   } else if (operationName == CCMMode::COPY_OP) {
-    const QString& newPathHistory = MoveToNewPathAutoUpdateActionText(r, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY);
-    PreferenceSettings().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name, newPathHistory);
+    PreferenceSettings().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
+                                  MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
+    dropAction = Qt::DropAction::CopyAction;
   } else {
     qDebug("OperationName[%s] is invalid", CCMMode::MCCL2STR[operationName]);
     return false;
@@ -1346,48 +1352,21 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const CCMMode::Mode operationNa
 
   QStringList lRels;
   for (const QModelIndex ind : selectedIndexes()) {
-    lRels.append(_fileSysModel->fileName(ind));
+    lRels.append(_fileSysModel->filePath(ind));
   }
-  ConflictsItemHelper conflictIF(l, r, lRels, operationName);
-  auto* tfm = new ConflictsRecycle(conflictIF);
-  if (not conflictIF) {
-    tfm->on_completeMerge();
-  } else {
-    tfm->show();
+  using namespace ComplexOperation;
+  int ret = DoDropAction(dropAction, lRels, dest, FILE_STRUCTURE_MODE::KEEP);
+  if (ret < 0) {
+    LOG_BAD(pOperationNameStr, "Failed. See details in logs");
+    return false;
   }
-
-  qInfo("[%s to] Destination[%s] Finished.", CCMMode::MCCL2STR[operationName], qPrintable(r));
-  Notificator::information("[%1 to] Destination[%2] Finished", r + '|' + CCMMode::MCCL2STR[operationName]);
+  LOG_GOOD(pOperationNameStr, "Succeed. All succeed");
   return true;
 }
 
-CCMMode::Mode FileExplorerEvent::QueryCopyOrCut() {
-  auto* msgBox = new (std::nothrow) QMessageBox(QMessageBox::Icon::Information, QString("Move or Copy?"), "Choose One");
-  msgBox->setWindowIcon(QIcon(":img/MV_TO_COMMAND_PATH"));
-
-  msgBox->setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Apply);
-  msgBox->button(QMessageBox::StandardButton::Apply)->setText("Copy To");
-  msgBox->button(QMessageBox::StandardButton::Apply)->setIcon(QIcon(":img/CP_TO_COMMAND_PATH"));
-
-  msgBox->button(QMessageBox::StandardButton::Yes)->setText("Move To");
-  msgBox->button(QMessageBox::StandardButton::Yes)->setIcon(QIcon(":img/MV_TO_COMMAND_PATH"));
-  msgBox->button(QMessageBox::StandardButton::Yes)->setStyleSheet(SUBMIT_BTN_STYLE);
-
-  msgBox->setDefaultButton(QMessageBox::StandardButton::Cancel);
-  const auto ret = msgBox->exec();
-  switch (ret) {
-    case QMessageBox::StandardButton::Apply:
-      return CCMMode::COPY_OP;
-    case QMessageBox::StandardButton::Yes:
-      return CCMMode::CUT_OP;
-    default:
-      return CCMMode::ERROR_OP;
-  }
-}
-
-FILE_STRUCTURE_MODE FileExplorerEvent::QueryKeepStructureOrFlatten() {
+bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode) {
   auto* msgBox = new (std::nothrow) QMessageBox(QMessageBox::Icon::Information, QString("Keep or Flatten System Structure?"), "Keep file system structure or flatten");
-  msgBox->setWindowIcon(QIcon(":img/FILE_STRUCTURE_KEEP"));
+  msgBox->setWindowIcon(QIcon(":img/PASTE_ITEM"));
   msgBox->setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Apply);
 
   msgBox->button(QMessageBox::StandardButton::Apply)->setText("Keep");
@@ -1396,17 +1375,46 @@ FILE_STRUCTURE_MODE FileExplorerEvent::QueryKeepStructureOrFlatten() {
 
   msgBox->button(QMessageBox::StandardButton::Yes)->setText("Flatten");
   msgBox->button(QMessageBox::StandardButton::Yes)->setIcon(QIcon(":img/FILE_STRUCTURE_FLATTEN"));
-  msgBox->button(QMessageBox::StandardButton::Yes)->setEnabled(false);
-  msgBox->button(QMessageBox::StandardButton::Yes)->setToolTip("Now flatten is not available, but you can paste it in file system view directly");
 
   msgBox->setDefaultButton(QMessageBox::StandardButton::Apply);
+
   const auto ret = msgBox->exec();
   switch (ret) {
-    case QMessageBox::StandardButton::Apply:
-      return FILE_STRUCTURE_MODE::KEEP;
-    case QMessageBox::StandardButton::Yes:
-      return FILE_STRUCTURE_MODE::FLATTEN;
+    case QMessageBox::StandardButton::Apply: {
+      mode = ComplexOperation::FILE_STRUCTURE_MODE::KEEP;
+      break;
+    }
+    case QMessageBox::StandardButton::Yes: {
+      mode = ComplexOperation::FILE_STRUCTURE_MODE::FLATTEN;
+      break;
+    }
     default:
-      return FILE_STRUCTURE_MODE::BUTT;
+      return false;
   }
+  return true;
+}
+
+bool FileExplorerEvent::SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction) {
+#ifdef _WIN32
+  QByteArray preferred(4, 0x0);
+  if (dropAction == Qt::DropAction::MoveAction) {  // # 2 for cut and 5 for copy
+    preferred[0] = 0x2;
+  } else if (dropAction == Qt::DropAction::CopyAction) {
+    preferred[0] = 0x5;
+  } else {
+    qWarning("cannot refill base DropEffect");
+    return false;
+  }
+  mimeData.setData("Preferred DropEffect", preferred);
+#else
+  if (dropAction == Qt::DropAction::MoveAction) {
+    mimeData.setData("XdndAction", "XdndActionMove");  // 剪切操作标识符:ml-citation{ref="10" data="citationList"}
+  } else if (dropAction == Qt::DropAction::CopyAction) {
+    mimeData.setData("XdndAction", "XdndActionCopy");  // 复制操作标识符:ml-citation{ref="10" data="citationList"}
+  } else {
+    qWarning("cannot refill base DropEffect");
+    return false;
+  }
+#endif
+  return true;
 }

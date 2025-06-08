@@ -1,4 +1,4 @@
-#include "Component/ContentPanel.h"
+﻿#include "Component/ContentPanel.h"
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/ViewActions.h"
 #include "Actions/FolderPreviewActions.h"
@@ -332,7 +332,6 @@ void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
 }
 
 bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
-  qInfo("Directory loaded [%s]", qPrintable(loadedPath));
   if (!m_anchorTags.contains(loadedPath)) {
     qDebug("AnchorTags[%s] not exist. cancel scroll", qPrintable(loadedPath));
     return false;
