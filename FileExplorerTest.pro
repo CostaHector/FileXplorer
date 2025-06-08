@@ -15,6 +15,7 @@ SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/Json/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/public/*.cpp)
+SOURCES += $$files(TestCase/FileOperation/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
 SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(public/Memory/*.cpp)
@@ -34,11 +35,9 @@ SOURCES += \
     Component/StateLabel.cpp \
     Component/SyncModifiyFileSystem.cpp \
     Component/JsonEditorWidget/LineEditCSV.cpp \
-    model/ConflictsFileSystemModel.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/Classify/ItemsClassifier.cpp \
     Tools/Classify/SceneMixed.cpp \
-    Tools/ConflictsItemHelper.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/LowResImgsRemover.cpp \
     Tools/ExtractPileItemsOutFolder.cpp \
@@ -86,11 +85,9 @@ HEADERS += \
     Component/StateLabel.h \
     Component/SyncModifiyFileSystem.h \
     Component/JsonEditorWidget/LineEditCSV.h \
-    model/ConflictsFileSystemModel.h \
     Tools/AIMediaDuplicate.h \
     Tools/Classify/ItemsClassifier.h \
     Tools/Classify/SceneMixed.h \
-    Tools/ConflictsItemHelper.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/LowResImgsRemover.h \
     Tools/ExtractPileItemsOutFolder.h \

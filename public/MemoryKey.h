@@ -34,6 +34,7 @@ struct MemoryKey {
   static const KV DEFAULT_EXTRACT_CHOICE;
   static const KV MOVE_TO_PATH_HISTORY;
   static const KV COPY_TO_PATH_HISTORY;
+  static const KV FILE_SYSTEM_STRUCTURE_WAY;
   static const KV WHERE_CLAUSE_HISTORY;
 
   static const KV MENU_RIBBON_CURRENT_TAB_INDEX;
