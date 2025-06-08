@@ -1,7 +1,8 @@
 ﻿#include "ViewHelper.h"
-#include "Component/ConflictsRecycle.h"
+#include "Component/Notificator.h"
 #include "public/MemoryKey.h"
 #include "Model/MyQFileSystemModel.h"
+#include "FileOperation/ComplexOperation.h"
 #include <QFileIconProvider>
 
 void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
@@ -15,44 +16,19 @@ void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
   view->setFont(defaultFont);
 }
 
-bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to) {
-  const unsigned URLS_SIZE = data->urls().size();
-  if (URLS_SIZE == 0) {
+bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& dest) {
+  if (!data->hasUrls()) {
     return true;
   }
-  qWarning("DropAction:%d, %d item(s) and dropped in [%s]", action, URLS_SIZE, qPrintable(to));
-  QStringList selectedItems;
-  selectedItems.reserve(URLS_SIZE);
-  for (const QUrl& url : data->urls()) {
-    if (url.isLocalFile()) {
-      selectedItems.append(url.toLocalFile());
-    }
-  }
-  CCMMode::Mode opMode = CCMMode::ERROR_OP;
-  switch (action) {
-    case Qt::DropAction::CopyAction:
-      opMode = CCMMode::COPY_OP;
-      break;
-    case Qt::DropAction::MoveAction:
-      opMode = CCMMode::CUT_OP;
-      break;
-    case Qt::DropAction::LinkAction:
-      opMode = CCMMode::LINK_OP;
-      break;  // should not conflict
-    default:
-      qWarning() << "[Err] Unknown action:" << action;
-      return false;
-  }
-  ConflictsItemHelper conflictIF(selectedItems, to, opMode);
-  auto* tfm = new ConflictsRecycle(conflictIF);
-  if (to == conflictIF.l and opMode != CCMMode::LINK_OP) {
+  const QList<QUrl>& urls = data->urls();
+  qWarning("DropAction[%d] %d item(s) will be dropped in path[%s].", action, urls.size(), qPrintable(dest));
+  using namespace ComplexOperation;
+  int ret = DoDropAction(action, urls, dest, ComplexOperation::FILE_STRUCTURE_MODE::KEEP);
+  if (ret < 0) {
+    LOG_WARN("Drop into partial failed", dest);
     return false;
   }
-  if (not conflictIF) {  // conflict
-    tfm->on_completeMerge();
-  } else {
-    tfm->exec();
-  }
+  LOG_GOOD("Drop into all succeed", dest);
   return true;
 }
 
@@ -112,7 +88,7 @@ void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
   }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-  if (not(m_fsm->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
+  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedIndexes().contains(ind))) {
     qDebug("reject drag and move. not allowed or self drop");
     m_fsm->DragRelease();
     event->ignore();

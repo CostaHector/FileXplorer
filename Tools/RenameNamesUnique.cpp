@@ -1,4 +1,4 @@
-#include "RenameNamesUnique.h"
+﻿#include "RenameNamesUnique.h"
 
 #include <QDebug>
 #include <QDir>
@@ -42,7 +42,7 @@ QSet<QString> RenameNamesUnique::getOccupiedPostPath(const QString& pre, const Q
   // only filename is viable
   // rel2Names is not viable. when directory name need change. directory would just become filename
   // m_occupiedNames only need to store postPath
-  const QStringList itemsInPre = QDir(pre, "*", QDir::SortFlag::NoSort, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList();
+  const QStringList itemsInPre = QDir{pre}.entryList({}, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::NoSort);
   QSet<QString> occupied{itemsInPre.cbegin(), itemsInPre.cend()};
   if (!includeSub) {
     return occupied;
@@ -51,7 +51,7 @@ QSet<QString> RenameNamesUnique::getOccupiedPostPath(const QString& pre, const Q
     QFileInfo fi{pre + '/' + leftRoots[i]};
     if (fi.isDir()) {
       const QStringList& itemsInLeftRoot =
-          join2Path(leftRoots[i], QDir(pre + '/' + leftRoots[i], "*", QDir::SortFlag::NoSort, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot).entryList());
+          join2Path(leftRoots[i], QDir(pre + '/' + leftRoots[i]).entryList({}, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::NoSort));
       occupied.unite(QSet<QString>{itemsInLeftRoot.cbegin(), itemsInLeftRoot.cend()});
 
       continue;

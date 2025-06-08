@@ -1,4 +1,4 @@
-#include "FileOperation.h"
+﻿#include "FileOperation.h"
 
 #include <QDateTime>
 #include <QStringList>
@@ -40,21 +40,24 @@ RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
 }
 
 RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) {
-  static const QMap<FileOperator, std::function<RETURN_TYPE(const QStringList&)>> LAMBDA_TABLE = {{RMFILE, rmfileAgent}, {RMPATH, rmpathAgent}, {RMDIR, rmdirAgent},   {MOVETOTRASH, moveToTrashAgent},
-                                                                                                  {TOUCH, touchAgent},   {MKPATH, mkpathAgent}, {RENAME, renameAgent}, {CPFILE, cpfileAgent},
-                                                                                                  {CPDIR, cpdirAgent},   {LINK, linkAgent},     {UNLINK, unlinkAgent}};
-  BATCH_COMMAND_LIST_TYPE recoverList;
-  QStringList failCmd;
+  typedef std::function<RETURN_TYPE(const QStringList&)> FILE_OPERATION_FUNC;
+  static const FILE_OPERATION_FUNC LAMBDA_TABLE[FILE_OPERATOR_E::OPERATOR_BUTT]{
+#define FILE_OPERATOR_KEY_ITEM(enu, val, func) func,
+      FILE_OPERATOR_TYPE_FIELD_MAPPING
+#undef FILE_OPERATOR_KEY_ITEM
+  };
 
+  BATCH_COMMAND_LIST_TYPE recoverList;
   for (int i = 0; i < aBatch.size(); ++i) {
     const ACMD& cmds = aBatch[i];
-    if (cmds.isEmpty()) {
+    if (cmds.isEmpty() || cmds.op >= FILE_OPERATOR_E::OPERATOR_BUTT) {
       continue;
     }
 
     const RETURN_TYPE returnEle = LAMBDA_TABLE[cmds.op](cmds.lst);
     if (!returnEle) {
-      failCmd << cmds.toStr();
+      qCritical("Error: %s", qPrintable(cmds.toStr(returnEle.ret)));
+      return RETURN_TYPE{returnEle.ret, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
     }
 
     if (cmds.op == MOVETOTRASH && !srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
@@ -69,14 +72,8 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
     }
     recoverList += returnEle;
   }
-
-  ErrorCode errorCode = ErrorCode::OK;
-  if (!failCmd.isEmpty()) {
-    errorCode = ErrorCode::UNKNOWN_ERROR;
-    qCritical("Below %d command(s) failed:\n%s", failCmd.size(), qPrintable(failCmd.join('\n')));
-  }
   // in-place reverse
-  return RETURN_TYPE{errorCode, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
+  return RETURN_TYPE{ErrorCode::OK, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
 }
 
 RETURN_TYPE rmpathAgent(const QStringList& parms) {
@@ -136,12 +133,11 @@ RETURN_TYPE rmfileAgent(const QStringList& parms) {
 }
 
 RETURN_TYPE rmfile(const QString& pre, const QString& rel) {
-  const QString& pth = QDir(pre).absoluteFilePath(rel);
-  if (not QFileInfo::exists(pth)) {
+  const QString& pth = QDir{pre}.absoluteFilePath(rel);
+  if (!QFile::exists(pth)) {
     return {OK, {}};
   }
-  auto ret = QDir(pre).remove(rel);
-  if (ret) {
+  if (QDir{pre}.remove(rel)) {
     return {OK, {}};
   } else {
     return {CANNOT_REMOVE_FILE, {}};
@@ -159,11 +155,10 @@ RETURN_TYPE rmdirAgent(const QStringList& parms) {
 
 RETURN_TYPE rmdir(const QString& pre, const QString& rel) {
   const QString& pth = QDir(pre).absoluteFilePath(rel);
-  if (not QDir(pth).exists()) {
+  if (!QDir{pth}.exists()) {
     return {OK, {}};
   }
-  auto ret = QDir(pth).removeRecursively();
-  if (ret) {
+  if (QDir{pth}.removeRecursively()) {
     return {OK, {}};
   } else {
     return {CANNOT_REMOVE_DIR, {}};
@@ -192,29 +187,29 @@ RETURN_TYPE renameAgent(const QStringList& parms) {
 
 RETURN_TYPE rename(const QString& pre, const QString& rel, const QString& to, const QString& toRel) {
   // a/b -> a/b skip
-  const QString& pth = QDir(pre).absoluteFilePath(rel);
-  if (not QFile::exists(pth)) {
+  const QString& pth = QDir{pre}.absoluteFilePath(rel);
+  if (!QFile::exists(pth)) {
     return {SRC_INEXIST, {}};
   }
-  const QString& absNewPath = QDir(to).absoluteFilePath(toRel);
+  const QString& absNewPath = QDir{to}.absoluteFilePath(toRel);
 
   const bool isOnlyCaseDiffer = rel != toRel and rel.toLower() == toRel.toLower();
-  if (QFile(absNewPath).exists() and not isOnlyCaseDiffer) {
+  if (QFile{absNewPath}.exists() && !isOnlyCaseDiffer) {
     // rename item -> FILE. but there is {file} already. Reject to rename to avoid override {file}
     return {DST_FILE_OR_PATH_ALREADY_EXIST, {}};
   }
 
   FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
   const QString& preNewPathFolder = QFileInfo(absNewPath).absolutePath();
-  if (not QDir(preNewPathFolder).exists()) {
-    auto preNewPathFolderRet = QDir().mkpath(preNewPathFolder);  // only remove dirs
-    if (not preNewPathFolderRet) {
+  if (!QDir{preNewPathFolder}.exists()) {
+    auto preNewPathFolderRet = QDir{}.mkpath(preNewPathFolder);  // only remove dirs
+    if (!preNewPathFolderRet) {
       return {DST_PRE_DIR_CANNOT_MAKE, {}};
     }
     cmds.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {"", preNewPathFolder}});
   }
   auto ret = QFile::rename(pth, absNewPath);
-  if (not ret) {
+  if (!ret) {
     return {UNKNOWN_ERROR, cmds};
   }
   cmds.append(FileOperatorType::ACMD{FileOperatorType::RENAME, {to, toRel, pre, rel}});
@@ -230,29 +225,29 @@ RETURN_TYPE cpfileAgent(const QStringList& parms) {
   return FileOperation::cpfile(pre, rel, to);
 }
 RETURN_TYPE cpfile(const QString& pre, const QString& rel, const QString& to) {
-  const QString& pth = QDir(pre).absoluteFilePath(rel);
-  if (not QFile::exists(pth)) {
+  const QString& pth = QDir{pre}.absoluteFilePath(rel);
+  if (!QFile::exists(pth)) {
     return {SRC_INEXIST, {}};
   }
-  if (not QDir(to).exists()) {
+  if (!QDir(to).exists()) {
     return {DST_DIR_INEXIST, {}};
   }
-  const QString& toPth = QDir(to).absoluteFilePath(rel);
+  const QString& toPth = QDir{to}.absoluteFilePath(rel);
   if (QFile::exists(toPth)) {
     return {DST_FILE_ALREADY_EXIST, {}};
   }
 
   FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
-  const QString& prePath = QFileInfo(toPth).absolutePath();
-  if (not QDir(prePath).exists()) {
-    auto prePathRet = QDir().mkpath(prePath);  // only remove dirs
-    if (not prePathRet) {
+  const QString& prePath = QFileInfo{toPth}.absolutePath();
+  if (!QDir{prePath}.exists()) {
+    auto prePathRet = QDir{}.mkpath(prePath);  // only remove dirs
+    if (!prePathRet) {
       return {DST_PRE_DIR_CANNOT_MAKE, {}};
     }
     cmds.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {"", prePath}});
   }
-  auto ret = QFile(pth).copy(toPth);
-  if (not ret) {
+  auto ret = QFile{pth}.copy(toPth);
+  if (!ret) {
     return {UNKNOWN_ERROR, cmds};
   }
   cmds.append(FileOperatorType::ACMD{FileOperatorType::RMFILE, {to, rel}});
@@ -369,33 +364,33 @@ RETURN_TYPE linkAgent(const QStringList& parms) {
 }
 
 RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to) {
-  const QString pth = QDir(pre).absoluteFilePath(rel);
-  if (not QFile::exists(pth)) {
+  const QString pth = QDir{pre}.absoluteFilePath(rel);
+  if (!QFile::exists(pth)) {
     return {SRC_INEXIST, {}};
   }
-  if (not QDir(to).exists()) {
+  if (!QDir{to}.exists()) {
     return {DST_DIR_INEXIST, {}};
   }
-  QString toPath(QDir(to).absoluteFilePath(rel) + ".lnk");
-  QFile toFile(toPath);
+  QString toPath{QDir{to}.absoluteFilePath(rel) + ".lnk"};
+  QFile toFile{toPath};
 
   FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
   if (toFile.exists()) {
-    if (not QFile(toPath).moveToTrash()) {
+    if (!QFile{toPath}.moveToTrash()) {
       return {CANNOT_REMOVE_FILE, cmds};
     }
     cmds.append(FileOperatorType::ACMD{FileOperatorType::RENAME, {"", toFile.fileName(), "", toPath}});
   }
 
-  QString prePath(QFileInfo(toPath).absolutePath());
-  if (not QDir(prePath).exists()) {
-    const auto prePathRet = QDir().mkpath(prePath);
-    if (not prePathRet) {
+  QString prePath{QFileInfo{toPath}.absolutePath()};
+  if (!QDir{prePath}.exists()) {
+    const auto prePathRet = QDir{}.mkpath(prePath);
+    if (!prePathRet) {
       return {DST_PRE_DIR_CANNOT_MAKE, cmds};
     }
     cmds.append(FileOperatorType::ACMD{FileOperatorType::RMPATH, {"", prePath}});
   }
-  if (not QFile::link(pth, toPath)) {
+  if (!QFile::link(pth, toPath)) {
     return {CANNOT_MAKE_LINK, cmds};
   }
 

@@ -1,4 +1,4 @@
-#include "UndoRedo.h"
+﻿#include "UndoRedo.h"
 #include "Component/SyncModifiyFileSystem.h"
 #include "FileOperation/FileOperation.h"
 using namespace FileOperatorType;
@@ -44,7 +44,7 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
       if (!syncRetEle) {
         qWarning("sync commands failed");
       }
-      exeRetEle.ret = exeRetEle.ret && syncRetEle.ret;
+      exeRetEle.ret = (exeRetEle.ret == ErrorCode::OK && syncRetEle.ret == ErrorCode::OK ? ErrorCode::OK : ErrorCode::UNKNOWN_ERROR);
       exeRetEle.cmds = syncRetEle.cmds + exeRetEle.cmds;
     }
   }
@@ -53,7 +53,7 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
 }
 
 bool UndoRedo::on_Undo() {
-  if (not g_undoRedo.undoAvailable()) {
+  if (!g_undoRedo.undoAvailable()) {
     qInfo("[skip] Nothing to undo");
     return true;
   }
@@ -64,7 +64,7 @@ bool UndoRedo::on_Undo() {
 }
 
 bool UndoRedo::on_Redo() {
-  if (not g_undoRedo.redoAvailable()) {
+  if (!g_undoRedo.redoAvailable()) {
     qInfo("[skip] Nothing to redo");
     return true;
   }
@@ -75,7 +75,7 @@ bool UndoRedo::on_Redo() {
 }
 
 UndoRedo::UNDO_REDO_RETURN UndoRedo::Undo() {
-  if (not undoAvailable()) {
+  if (!undoAvailable()) {
     qDebug("Skip Cannot undo");
     return qMakePair<bool, OperationStream>(true, OperationStream());
   }
@@ -87,7 +87,7 @@ UndoRedo::UNDO_REDO_RETURN UndoRedo::Undo() {
 }
 
 UndoRedo::UNDO_REDO_RETURN UndoRedo::Redo() {
-  if (not redoAvailable()) {
+  if (!redoAvailable()) {
     qDebug("Skip Cannot redo");
     return qMakePair<bool, OperationStream>(true, OperationStream());
   }
