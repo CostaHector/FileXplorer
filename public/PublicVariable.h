@@ -81,12 +81,6 @@ class CCMMode {
   static const char MCCL2STR[BUTT][MCCL2STR_MAX_LEN];
 };
 
-enum class FILE_STRUCTURE_MODE {
-  KEEP = 0,
-  FLATTEN = 1,
-  BUTT,
-};
-
 #include <QRegularExpression>
 namespace JSON_RENAME_REGEX {
 const QRegularExpression INVALID_CHARS_IN_FILENAME{R"([#\\/:*?<>|])", QRegularExpression::OptimizeOnFirstUsageOption};  // #\/:*?<>|

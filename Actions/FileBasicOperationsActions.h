@@ -1,4 +1,4 @@
-#ifndef FILEBASICOPERATIONSACTIONS_H
+﻿#ifndef FILEBASICOPERATIONSACTIONS_H
 #define FILEBASICOPERATIONSACTIONS_H
 
 #include <QAction>
@@ -50,6 +50,10 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* MOVE_TO_PATH_HISTORY{nullptr};
   QActionGroup* COPY_TO_PATH_HISTORY{nullptr};
 
+  QAction *FILE_STRUCTURE_QRY_BEFORE_PASTE{nullptr}, *FILE_STRUCTURE_KEEP{nullptr}, *FILE_STRUCTURE_FLATTEN{nullptr};
+  QActionGroup* FILE_STRUCTURE_AGS{nullptr};
+  QActionGroup* FileStructureActions();
+
   QAction *MOVE_TO_TRASHBIN{nullptr}, *DELETE_PERMANENTLY{nullptr};
   QActionGroup* DELETE_ACTIONS{nullptr};
 
@@ -67,5 +71,6 @@ class FileBasicOperationsActions : public QObject {
 };
 
 FileBasicOperationsActions& g_fileBasicOperationsActions();
+bool IsNeedQueryBeforePaste();
 
 #endif  // FILEBASICOPERATIONSACTIONS_H

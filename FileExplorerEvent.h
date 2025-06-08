@@ -1,27 +1,13 @@
 ﻿#ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
-#include <QAbstractButton>
-#include <QAbstractTableModel>
 #include <QClipboard>
-#include <QCryptographicHash>
-#include <QDateTime>
-#include <QFileInfo>
-#include <QFileSystemModel>
-#include <QGuiApplication>
-#include <QItemSelectionModel>
-#include <QListView>
-#include <QMessageBox>
-#include <QObject>
-#include <QProcess>
-#include <QTextStream>
-#include "Tools/MyClipboard.h"
+#include "FileOperation/ComplexOperation.h"
 #include "Tools/RedundantFolderRemove.h"
-
+#include "public/PublicVariable.h"
 #include "Model/MyQFileSystemModel.h"
-class MyQFileSystemModel;
+
 class ContentPanel;
 class CustomStatusBar;
-class MyClipboard;
 class VideoPlayer;
 class AlertSystem;
 class AdvanceRenamer;
@@ -117,17 +103,17 @@ class FileExplorerEvent : public QObject {
   ContentPanel* _contentPane;
 
   CustomStatusBar* _logger;
-  MyClipboard* m_clipboard;
+  QClipboard* m_clipboard;
   VideoPlayer* videoPlayer{nullptr};
 
   AlertSystem* m_alertSystem{nullptr};
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};
- signals:
+
  private:
-  CCMMode::Mode QueryCopyOrCut();
-  FILE_STRUCTURE_MODE QueryKeepStructureOrFlatten(); // true: keep, false: flatten
+  bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten
+  static bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction);
 };
 
 #endif  // FILEEXPLOREREVENT_H
