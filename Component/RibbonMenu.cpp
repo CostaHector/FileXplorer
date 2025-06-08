@@ -292,9 +292,9 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER);
   folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
-  SetLayoutAlightment(folderRmv->layout(), Qt::AlignmentFlag::AlignRight);
+  SetLayoutAlightment(folderRmv->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  QToolBar* mediaDupFinder{new (std::nothrow) QToolBar{"Duplicate Medias Finder"}};
+  QToolBar* mediaDupFinder{new (std::nothrow) QToolBar{"Duplicate Media Finder"}};
   CHECK_NULLPTR_RETURN_NULLPTR(mediaDupFinder);
   mediaDupFinder->setOrientation(Qt::Orientation::Vertical);
   mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
