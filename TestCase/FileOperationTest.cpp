@@ -1,4 +1,4 @@
-#include <QtTest>
+﻿#include <QtTest>
 #include <QCoreApplication>
 
 // add necessary includes here
@@ -31,19 +31,32 @@ class FileOperationTest : public FileSystemTestSuite {
 
   void test_file_to_trashbin();
 
-  void test_file_copy();
-
+  // cpfile
+  void test_absolute_file_copy();
+  void test_relative_file_copy();
   void test_inexist_file_copy();
-  void test_folder_copy_including_its_articles();
-  void test_inexist_folder_copy_including_its_articles();
+
+  // cpdir
+  void test_absolute_folder_copy();
+  void test_relative_folder_copy();
+  void test_inexist_folder_copy();
+
+  // rename file same folder
   void test_file_move_same_directory_unique_name();
   void test_file_move_same_directory_conflict_name();
+  // rename folder same folder
   void test_folder_move_same_directory_unique_name();
   void test_folder_move_same_directory_conflict_name();
+
+  // rename file differ folder
   void test_file_move_jump_directory_unique_name();
   void test_file_move_jump_directory_conflict_name();
+  // rename folder differ folder
   void test_folder_move_jump_directory_unique_name();
   void test_folder_move_jump_directory_conflict_name();
+
+  void test_rename_relative_file();
+
   void test_touch_a_json_file_in_direct_path();
   void test_touch_a_json_file_in_relative_path();
   void test_touch_an_existed_txt_file_in_direct_path();
@@ -58,6 +71,8 @@ class FileOperationTest : public FileSystemTestSuite {
 
   void test_rename_a_txt_To_A_TXT_Not_Exists();
   void test_rename_b_txt_To_A_TXT_Already_Exists();
+
+  void test_executer_return_if_any_cmd_failed();
 };
 
 void FileOperationTest::test_file_remove() {
@@ -104,7 +119,7 @@ void FileOperationTest::test_file_to_trashbin() {
   QVERIFY(QDir(mTestPath).exists("a.txt"));
 }
 
-void FileOperationTest::test_file_copy() {
+void FileOperationTest::test_absolute_file_copy() {
   QString existFile("a.txt");
   QVERIFY(QDir(mTestPath).exists(existFile));
   QVERIFY(QDir(mTestPath).exists("b"));
@@ -131,6 +146,37 @@ void FileOperationTest::test_file_copy() {
   QVERIFY(not QDir(mTestPath).exists(QString("b/%1").arg(existFile)));
 }
 
+// a, b, a.txt, b.txt
+// a{a1{a2{a3,a3.txt}, a2.txt}, a1.txt}
+// b{b1{b2, b2.txt}, b1.txt}
+
+void FileOperationTest::test_relative_file_copy() {
+  QString relativeExistFile("a/a1.txt");
+  QVERIFY(QDir(mTestPath).exists(relativeExistFile));
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(relativeExistFile)));
+
+  FileOperatorType::RETURN_TYPE retEle = FileOperation::cpfile(mTestPath, relativeExistFile, QString("%1/b").arg(mTestPath));
+  auto ret = retEle.ret;
+  auto aBatch = retEle.cmds;
+
+  QCOMPARE(ret, ErrorCode::OK);
+  QVERIFY(QDir(mTestPath).exists(QString("b/%1").arg(relativeExistFile)));
+
+  QVERIFY(!aBatch.isEmpty());
+
+  BATCH_COMMAND_LIST_TYPE srcCommand;
+  BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
+
+  const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+  const auto recoverRet = exeRetEle.ret;
+
+  QCOMPARE(recoverRet, 0);
+  QVERIFY(QDir(mTestPath).exists(relativeExistFile));
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(relativeExistFile)));
+}
+
 void FileOperationTest::test_inexist_file_copy() {
   QString inexistFileName("an inexist file blablablabla.txt");
   QVERIFY(!QDir(mTestPath).exists(inexistFileName));
@@ -148,7 +194,7 @@ void FileOperationTest::test_inexist_file_copy() {
   QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(inexistFileName)));
 }
 
-void FileOperationTest::test_folder_copy_including_its_articles() {
+void FileOperationTest::test_absolute_folder_copy() {
   QString existFolder("a");
   QString subDir("a/a1");
   QString subFile("a/a1.txt");
@@ -188,8 +234,52 @@ void FileOperationTest::test_folder_copy_including_its_articles() {
   QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(subDir)));
   QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(subFile)));
 }
+// a, b, a.txt, b.txt
+// a{a1{a2{a3,a3.txt}, a2.txt}, a1.txt}
+// b{b1{b2, b2.txt}, b1.txt}
+void FileOperationTest::test_relative_folder_copy() {
+  QString relativeExistFolder{"a/a1/a2"};
+  QString subDir("a/a1/a2/a3");
+  QString subFile("a/a1/a2/a3.txt");
 
-void FileOperationTest::test_inexist_folder_copy_including_its_articles() {
+  QVERIFY(QDir(mTestPath).exists(relativeExistFolder));
+  QVERIFY(QDir(mTestPath).exists(subDir));
+  QVERIFY(QDir(mTestPath).exists(subFile));
+
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(relativeExistFolder)));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(subDir)));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(subFile)));
+  FileOperatorType::RETURN_TYPE retEle = FileOperation::cpdir(mTestPath, relativeExistFolder, QString("%1/b").arg(mTestPath));
+
+  auto ret = retEle.ret;
+  auto aBatch = retEle.cmds;
+
+  QCOMPARE(ret, ErrorCode::OK);
+  QVERIFY(QDir(mTestPath).exists(relativeExistFolder));
+  QVERIFY(QDir(mTestPath).exists(subDir));
+  QVERIFY(QDir(mTestPath).exists(subFile));
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(QDir(mTestPath).exists(QString("b/%1").arg(subDir)));
+  QVERIFY(QDir(mTestPath).exists(QString("b/%1").arg(relativeExistFolder)));
+  QVERIFY(QDir(mTestPath).exists(QString("b/%1").arg(subFile)));
+  QVERIFY(!aBatch.isEmpty());
+  BATCH_COMMAND_LIST_TYPE srcCommand;
+  const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
+  const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+  const auto recoverRet = exeRetEle.ret;
+
+  QCOMPARE(recoverRet, 0);
+  QVERIFY(QDir(mTestPath).exists(relativeExistFolder));
+  QVERIFY(QDir(mTestPath).exists(subDir));
+  QVERIFY(QDir(mTestPath).exists(subFile));
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(relativeExistFolder)));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(subDir)));
+  QVERIFY(!QDir(mTestPath).exists(QString("b/%1").arg(subFile)));
+}
+
+void FileOperationTest::test_inexist_folder_copy() {
   QString inexistFolder("an inexist folder blablablabla");
   QVERIFY(not QDir(mTestPath).exists(inexistFolder));
   QVERIFY(QDir(mTestPath).exists("b"));
@@ -208,7 +298,7 @@ void FileOperationTest::test_inexist_folder_copy_including_its_articles() {
 
 void FileOperationTest::test_file_move_same_directory_unique_name() {
   QVERIFY(QDir(mTestPath).exists("a.txt"));
-  QVERIFY(not QDir(mTestPath).exists("a moved.txt"));
+  QVERIFY(!QDir(mTestPath).exists("a moved.txt"));
   FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(mTestPath, "a.txt", mTestPath, "a moved.txt");
   auto ret = retEle.ret;
   auto aBatch = retEle.cmds;
@@ -226,6 +316,7 @@ void FileOperationTest::test_file_move_same_directory_unique_name() {
   QVERIFY(QDir(mTestPath).exists("a.txt"));
   QVERIFY(not QDir(mTestPath).exists("a moved.txt"));
 }
+
 void FileOperationTest::test_file_move_same_directory_conflict_name() {
   QVERIFY(QDir(mTestPath).exists("a.txt"));
   QVERIFY(QDir(mTestPath).exists("b.txt"));
@@ -272,7 +363,7 @@ void FileOperationTest::test_file_move_jump_directory_unique_name() {
   const QString& TO = QDir(mTestPath).absoluteFilePath("b");
   QVERIFY(QDir(mTestPath).exists("a.txt"));
   QVERIFY(QDir(mTestPath).exists("b"));
-  QVERIFY(not QDir(TO).exists("path/to/a moved.txt"));
+  QVERIFY(!QDir(TO).exists("path/to/a moved.txt"));
   FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(mTestPath, "a.txt", TO, "path/to/a moved.txt");
   auto ret = retEle.ret;
   auto aBatch = retEle.cmds;
@@ -291,6 +382,7 @@ void FileOperationTest::test_file_move_jump_directory_unique_name() {
   QVERIFY(QDir(mTestPath).exists("b"));
   QVERIFY(not QDir(TO).exists("path/to/a moved.txt"));
 }
+
 void FileOperationTest::test_file_move_jump_directory_conflict_name() {
   const QString& TO = QDir(mTestPath).absoluteFilePath("b");
   QVERIFY(QDir(mTestPath).exists("a.txt"));
@@ -336,6 +428,34 @@ void FileOperationTest::test_folder_move_jump_directory_unique_name() {
   QVERIFY(QDir(mTestPath).exists("b"));
   QVERIFY(not QDir(TO).exists("path/to/a moved"));
 }
+
+void FileOperationTest::test_rename_relative_file() {
+  // a, b, a.txt, b.txt
+  // a{a1{a2{a3,a3.txt}, a2.txt}, a1.txt}
+  // b{b1{b2, b2.txt}, b1.txt}
+  const QString& TO = QDir(mTestPath).absoluteFilePath("b");
+  QVERIFY(QDir(mTestPath).exists("a/a1.txt"));
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(!QDir(TO).exists("path/to/a moved"));
+  FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(mTestPath, "a/a1.txt", TO, "a/a1.txt");
+  auto ret = retEle.ret;
+  auto aBatch = retEle.cmds;
+  QCOMPARE(ret, ErrorCode::OK);
+  QVERIFY(!QDir(mTestPath).exists("a/a1.txt"));
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(QDir(TO).exists("a/a1.txt"));
+  QVERIFY(!aBatch.isEmpty());
+  BATCH_COMMAND_LIST_TYPE srcCommand;
+  const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
+  const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+  const auto recoverRet = exeRetEle.ret;
+
+  QCOMPARE(recoverRet, 0);
+  QVERIFY(QDir(mTestPath).exists("a/a1.txt"));
+  QVERIFY(QDir(mTestPath).exists("b"));
+  QVERIFY(!QDir(TO).exists("a/a1.txt"));
+}
+
 void FileOperationTest::test_folder_move_jump_directory_conflict_name() {
   const QString& TO = QDir(mTestPath).absoluteFilePath("b");
   QVERIFY(QDir(mTestPath).exists("a"));
@@ -514,6 +634,25 @@ void FileOperationTest::test_rename_b_txt_To_A_TXT_Already_Exists() {
 
   FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(mTestPath, "b.txt", mTestPath, onlyCaseDifferName);
   QVERIFY2(retEle.ret != ErrorCode::OK, "should reject this rename and override operation");
+}
+
+void FileOperationTest::test_executer_return_if_any_cmd_failed() {
+  QString inexistFolder("inexistFolder");
+  QString existFile("b.txt");
+  QVERIFY(!QDir(mTestPath).exists(inexistFolder));
+  QVERIFY(QDir(mTestPath).exists(existFile));
+
+  BATCH_COMMAND_LIST_TYPE aBatch, srcCommand;
+  aBatch.append(ACMD{FILE_OPERATOR_E::RENAME,  //
+                     {mTestPath, inexistFolder, mTestPath, "NewName inexistFolder"}});
+  aBatch.append(ACMD{FILE_OPERATOR_E::RENAME,  //
+                     {mTestPath, existFile, mTestPath, "NewName b.txt"}});
+
+  FileOperatorType::RETURN_TYPE retEle = FileOperation::executer(aBatch, srcCommand);
+  QCOMPARE(retEle.ret, ErrorCode::SRC_INEXIST);
+  QVERIFY(!QDir(mTestPath).exists("NewName inexistFolder"));
+  QVERIFY(!QDir(mTestPath).exists("NewName b.txt"));
+  QVERIFY(QDir(mTestPath).exists(existFile));
 }
 
 #include "FileOperationTest.moc"
