@@ -1293,7 +1293,7 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
     return false;
   }
   const QString& path = _fileSysModel->rootPath();
-  if (!PathTool::isRootOrEmpty(path)) {
+  if (PathTool::isRootOrEmpty(path)) {
     LOG_INFO("[Remove redundant item] Path invalid", path);
     return false;
   }
