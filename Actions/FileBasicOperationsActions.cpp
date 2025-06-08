@@ -1,4 +1,5 @@
-#include "FileBasicOperationsActions.h"
+﻿#include "FileBasicOperationsActions.h"
+#include "FileOperation/ComplexOperation.h"
 #include "public/MemoryKey.h"
 #include "public/PublicVariable.h"
 #include <QApplication>
@@ -33,6 +34,12 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
 
   MOVE_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY);
   COPY_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY);
+
+  using namespace ComplexOperation;
+  FILE_STRUCTURE_QRY_BEFORE_PASTE = new (std::nothrow) QAction{QIcon(":img/PASTE_ITEM"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::QUERY]};
+  FILE_STRUCTURE_KEEP = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_KEEP"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::KEEP]};
+  FILE_STRUCTURE_FLATTEN = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_FLATTEN"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::FLATTEN]};
+  FILE_STRUCTURE_AGS = FileStructureActions();
 
   MOVE_TO_TRASHBIN = new (std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle");
   DELETE_PERMANENTLY = new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently");
@@ -324,11 +331,44 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
   _DUPLICATE_IMAGES_FINDER->setCheckable(true);
 }
 
+QActionGroup* FileBasicOperationsActions::FileStructureActions() {
+  FILE_STRUCTURE_QRY_BEFORE_PASTE->setToolTip("Query file structure before each paste operation.");
+  FILE_STRUCTURE_QRY_BEFORE_PASTE->setCheckable(true);
+  FILE_STRUCTURE_KEEP->setToolTip("Set keep file structure by default");
+  FILE_STRUCTURE_KEEP->setCheckable(true);
+  FILE_STRUCTURE_FLATTEN->setToolTip("Set flatten file structure by default");
+  FILE_STRUCTURE_FLATTEN->setCheckable(true);
+
+  auto* FILE_STRUCTURE_AGS = new (std::nothrow) QActionGroup{this};
+  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_QRY_BEFORE_PASTE);
+  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_KEEP);
+  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_FLATTEN);
+  FILE_STRUCTURE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+
+  int fileStructureWay = PreferenceSettings()
+                             .value(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name,  //
+                                    MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.v)
+                             .toInt();
+  const QList<QAction*> acts = FILE_STRUCTURE_AGS->actions();
+  if (fileStructureWay < 0 || fileStructureWay >= acts.size()) {
+    qWarning("FileSystemStructure Way set 0 instead");
+    fileStructureWay = 0;
+  }
+  acts[fileStructureWay]->setChecked(true);
+  ComplexOperation::SetDefaultFileStructMode(acts[fileStructureWay]);
+
+  connect(FILE_STRUCTURE_AGS, &QActionGroup::triggered, &ComplexOperation::SetDefaultFileStructMode);
+  return FILE_STRUCTURE_AGS;
+}
+
 FileBasicOperationsActions& g_fileBasicOperationsActions() {
   static FileBasicOperationsActions fileOpIns;
   return fileOpIns;
 }
 
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+#include <QApplication>
 #include <QToolBar>
 
 class FileOperationActionIllustration : public QToolBar {
@@ -343,10 +383,6 @@ class FileOperationActionIllustration : public QToolBar {
     addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
   }
 };
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);

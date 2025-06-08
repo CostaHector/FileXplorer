@@ -1,9 +1,9 @@
-#include "ViewSelection.h"
+﻿#include "ViewSelection.h"
 
 #include <QListView>
 #include <QTableView>
 #include <QTreeView>
-auto ViewSelection::selectedIndexes(const QAbstractItemView* view) -> QModelIndexList {
+QModelIndexList ViewSelection::selectedIndexes(const QAbstractItemView* view) {
   if (view == nullptr) {
     return {};
   }
