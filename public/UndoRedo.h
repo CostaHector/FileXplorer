@@ -1,4 +1,4 @@
-#ifndef UNDOREDO_H
+﻿#ifndef UNDOREDO_H
 #define UNDOREDO_H
 #include <QPair>
 #include <QStack>
@@ -19,9 +19,9 @@ class UndoRedo {
 
   UNDO_REDO_RETURN Redo();
 
-  inline bool undoAvailable() { return not undoList.isEmpty(); }
+  inline bool undoAvailable() { return !undoList.isEmpty(); }
 
-  inline bool redoAvailable() { return not redoList.isEmpty(); }
+  inline bool redoAvailable() { return !redoList.isEmpty(); }
 
   inline void clear() {
     decltype(undoList) emptyUndoList;
