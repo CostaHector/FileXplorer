@@ -1,4 +1,4 @@
-#include "Component/RibbonMenu.h"
+﻿#include "Component/RibbonMenu.h"
 #include <QMenu>
 #include <QTabBar>
 #include <QToolButton>
@@ -141,16 +141,27 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(moveCopyItemsToTB->layout(), Qt::AlignmentFlag::AlignTop);
   }
 
+  QToolBar* fileSystemStructureWayToolBar = new (std::nothrow) QToolBar{"File System Structure Way"};
+  CHECK_NULLPTR_RETURN_NULLPTR(fileSystemStructureWayToolBar);
+  {
+    fileSystemStructureWayToolBar->setOrientation(Qt::Orientation::Vertical);
+    fileSystemStructureWayToolBar->addActions(g_fileBasicOperationsActions().FILE_STRUCTURE_AGS->actions());
+    fileSystemStructureWayToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+    fileSystemStructureWayToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+    fileSystemStructureWayToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+    SetLayoutAlightment(fileSystemStructureWayToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+  }
+
   QToolButton* recycleItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
   recycleItemsTB->setDefaultAction(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN);
 
-  QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar("ArchievePreview");
+  QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar{"ArchievePreview"};
   CHECK_NULLPTR_RETURN_NULLPTR(archievePreviewToolBar);
   archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
   archievePreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   archievePreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  QToolBar* selectionToolBar = new (std::nothrow) QToolBar("Selection");
+  QToolBar* selectionToolBar = new (std::nothrow) QToolBar{"Selection"};
   CHECK_NULLPTR_RETURN_NULLPTR(selectionToolBar);
   {
     selectionToolBar->addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
@@ -161,7 +172,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(selectionToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  QToolBar* compressToolBar = new (std::nothrow) QToolBar("Compress/Decompress");
+  QToolBar* compressToolBar = new (std::nothrow) QToolBar{"Compress/Decompress"};
   CHECK_NULLPTR_RETURN_NULLPTR(compressToolBar);
   {
     compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_HERE);
@@ -205,6 +216,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addWidget(propertiesTB);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(moveCopyItemsToTB);
+  leafHomeWid->addWidget(fileSystemStructureWayToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(recycleItemsTB);
   leafHomeWid->addWidget(renameItemsTB);
