@@ -1,17 +1,9 @@
-#ifndef RENAMENAMESUNIQUE_H
+﻿#ifndef RENAMENAMESUNIQUE_H
 #define RENAMENAMESUNIQUE_H
 
-#include <iterator>
-#include <sstream>
-#include <string>
-#include <unordered_set>
-#include <vector>
 #include <QSet>
 #include <QString>
-
 #include "FileOperation/FileOperatorPub.h"
-
-using std::ostringstream;
 
 class RenameNamesUnique {
  public:
