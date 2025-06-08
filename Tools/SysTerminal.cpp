@@ -1,5 +1,5 @@
 #include "SysTerminal.h"
-#include "Public/PublicVariable.h"
+#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include <QDesktopServices>
 #include <QDir>

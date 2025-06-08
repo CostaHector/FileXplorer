@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 #include "TestCase/pub/MyTestSuite.h"
 // add necessary includes here
-#include "Public/PublicVariable.h"
+#include "public/PublicVariable.h"
 #include "Tools/FileDescriptor/DbManager.h"
 
 using namespace JSON_RENAME_REGEX;

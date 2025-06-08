@@ -383,16 +383,13 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
 PathTool::SelectionInfo ContentPanel::GetSelectionInfo(const Qt::DropAction dropAct) const {
   PathTool::SelectionInfo info;
   static const auto Fill = [&info](MyQFileSystemModel* fsModel, const QModelIndexList& inds, const Qt::DropAction dropAct) {
-    if (fsModel == nullptr) {
-      return;
-    }
     info.rootPath = fsModel->rootPath();
     QString name;
     for (const auto& ind : inds) {
       name = fsModel->fileName(ind);
       info.relSelections.append(name);
-//      info.rootPaths.append(info.rootPath);
-//      info.selections.append(name);
+      //      info.rootPaths.append(info.rootPath);
+      //      info.selections.append(name);
     }
     if (dropAct == Qt::CopyAction) {
       fsModel->CopiedSomething(inds);
@@ -426,8 +423,8 @@ PathTool::SelectionInfo ContentPanel::GetSelectionInfo(const Qt::DropAction drop
         srcInds.append(ind);
         int row = ind.row();
         info.relSelections.append(m_searchSrcModel->GetARelSelection(row));
-//        info.rootPaths.append(m_searchSrcModel->GetARootPath(row));
-//        info.selections.append(m_searchSrcModel->GetASelection(row));
+        //        info.rootPaths.append(m_searchSrcModel->GetARootPath(row));
+        //        info.selections.append(m_searchSrcModel->GetASelection(row));
       }
       if (dropAct == Qt::CopyAction) {
         m_searchSrcModel->CopiedSomething(srcInds);
@@ -445,45 +442,34 @@ PathTool::SelectionInfo ContentPanel::GetSelectionInfo(const Qt::DropAction drop
 std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::DropAction dropAct) const {
   QStringList filePaths;
   QList<QUrl> urls;
+
+  static const auto Fill = [&filePaths, &urls](MyQFileSystemModel* fsModel, const QModelIndexList& inds, const Qt::DropAction dropAct) {
+    for (const auto& ind : inds) {
+      filePaths.append(fsModel->filePath(ind));
+      urls.append(QUrl::fromLocalFile(filePaths.back()));
+    }
+    if (dropAct == Qt::CopyAction) {
+      fsModel->CopiedSomething(inds);
+    } else if (dropAct == Qt::MoveAction) {
+      fsModel->CutSomething(inds);
+    }
+  };
+
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::LIST: {
       const auto& inds = m_fsListView->selectionModel()->selectedRows();
-      for (const auto& ind : inds) {
-        filePaths.append(m_fsModel->filePath(ind));
-        urls.append(QUrl::fromLocalFile(filePaths.back()));
-      }
-      if (dropAct == Qt::CopyAction) {
-        m_fsModel->CopiedSomething(inds);
-      } else if (dropAct == Qt::MoveAction) {
-        m_fsModel->CutSomething(inds);
-      }
+      Fill(m_fsModel, inds, dropAct);
       break;
     }
     case ViewType::TABLE: {
       const auto& inds = m_fsTableView->selectionModel()->selectedRows();
-      for (const auto& ind : inds) {
-        filePaths.append(m_fsModel->filePath(ind));
-        urls.append(QUrl::fromLocalFile(filePaths.back()));
-      }
-      if (dropAct == Qt::CopyAction) {
-        m_fsModel->CopiedSomething(inds);
-      } else if (dropAct == Qt::MoveAction) {
-        m_fsModel->CutSomething(inds);
-      }
+      Fill(m_fsModel, inds, dropAct);
       break;
     }
     case ViewType::TREE: {
       const auto& inds = m_fsTreeView->selectionModel()->selectedRows();
-      for (const auto& ind : inds) {
-        filePaths.append(m_fsModel->filePath(ind));
-        urls.append(QUrl::fromLocalFile(filePaths.back()));
-      }
-      if (dropAct == Qt::CopyAction) {
-        m_fsModel->CopiedSomething(inds);
-      } else if (dropAct == Qt::MoveAction) {
-        m_fsModel->CutSomething(inds);
-      }
+      Fill(m_fsModel, inds, dropAct);
       break;
     }
     case ViewType::SEARCH: {
