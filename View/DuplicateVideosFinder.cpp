@@ -78,7 +78,7 @@ void RightDuplicateDetails::onRecycleSelection() {
   recycleCmds.reserve(SELECTED_CNT);
   for (const auto& proInd : selectionModel()->selectedRows()) {
     const auto& srcInd = m_sortProxy->mapToSource(proInd);
-    recycleCmds.append(ACMD{MOVETOTRASH, {"", m_detailsModel->filePath(srcInd)}});
+    recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_detailsModel->filePath(srcInd)));
   }
   auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
   qDebug("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);

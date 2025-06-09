@@ -1,4 +1,4 @@
-#include "ExtractPileItemsOutFolder.h"
+﻿#include "ExtractPileItemsOutFolder.h"
 #include "public/PathTool.h"
 #include "Tools/ItemsPileCategory.h"
 #include "public/UndoRedo.h"
@@ -80,12 +80,12 @@ int ExtractPileItemsOutFolder::operator()(const QString& path,                  
         qDebug("%s/%s already exist outside, move will failed, skip it", qPrintable(path), qPrintable(file));
         continue;
       }
-      m_cmds.append(ACMD{RENAME, {path + '/' + folderName, file, path, file}});
+      m_cmds.append(ACMD::GetInstRENAME(path + '/' + folderName, file, path, file));
       ++filesExtractedCnt;
     }
     itemsExtractedOutCnt += filesExtractedCnt;
     // recycle path + '/' + folderName
-    m_cmds.append(ACMD{MOVETOTRASH, {path, folderName}});
+    m_cmds.append(ACMD::GetInstMOVETOTRASH(path, folderName));
     ++foldersNeedExtractCnt;
     qDebug("Extract %d pile item(s) out of folder[%s]", files.size(), qPrintable(it.key()));
   }

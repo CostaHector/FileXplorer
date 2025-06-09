@@ -1,4 +1,4 @@
-#include "FilesNameBatchStandardizer.h"
+﻿#include "FilesNameBatchStandardizer.h"
 #include <QSet>
 #include <QDirIterator>
 #include "public/UndoRedo.h"
@@ -34,7 +34,7 @@ bool FilesNameBatchStandardizer::operator()(const QString& rootPath) {
     if (oldNm == newNm) {
       continue;
     }
-    cmds.append(ACMD{RENAME, {pathList[i], oldNm, pathList[i], newNm}});
+    cmds.append(ACMD::GetInstRENAME(pathList[i], oldNm, pathList[i], newNm));
   }
   auto isAllSuccess = g_undoRedo.Do(cmds);
   return isAllSuccess;
