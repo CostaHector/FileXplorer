@@ -55,14 +55,14 @@ BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths
     QString prepath;
     for (const QString& pth : selectionAbsFilePaths) {
       QString name = PathTool::GetPrepathAndFileName(pth, prepath);
-      lst.append(ACMD{RENAME, {prepath, name, dest, name}});
+      lst.append(ACMD::GetInstRENAME(prepath, name, dest, name));
     }
   } else if (mode == FILE_STRUCTURE_MODE::KEEP) {
     QString rootPath;
     QStringList rel2Selections;  // indirect or direct
     std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
     for (const QString& rel2Section : rel2Selections) {
-      lst.append(ACMD{RENAME, {rootPath, rel2Section, dest, rel2Section}});
+      lst.append(ACMD::GetInstRENAME(rootPath, rel2Section, dest, rel2Section));
     }
   } else {
     qWarning("File Structure Mode[%d] not support", (int)mode);
@@ -77,9 +77,9 @@ BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths
     for (const QString& pth : selectionAbsFilePaths) {
       QString name = PathTool::GetPrepathAndFileName(pth, prepath);
       if (QFileInfo{pth}.isDir()) {
-        lst.append(ACMD{CPDIR, {prepath, name, dest}});
+        lst.append(ACMD::GetInstCPDIR(prepath, name, dest));
       } else {
-        lst.append(ACMD{CPFILE, {prepath, name, dest}});
+        lst.append(ACMD::GetInstCPFILE(prepath, name, dest));
       }
     }
   } else if (mode == FILE_STRUCTURE_MODE::KEEP) {
@@ -88,9 +88,9 @@ BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths
     std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
     for (const QString& rel2Section : rel2Selections) {
       if (QFileInfo{rootPath + '/' + rel2Section}.isDir()) {
-        lst.append(ACMD{CPDIR, {rootPath, rel2Section, dest}});
+        lst.append(ACMD::GetInstCPDIR(rootPath, rel2Section, dest));
       } else {
-        lst.append(ACMD{CPFILE, {rootPath, rel2Section, dest}});
+        lst.append(ACMD::GetInstCPFILE(rootPath, rel2Section, dest));
       }
     }
   } else {
@@ -105,7 +105,7 @@ BATCH_COMMAND_LIST_TYPE ComplexLink::To(const QStringList& selectionAbsFilePaths
   QStringList rel2Selections;  // indirect or direct
   std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
   for (const QString& rel2Section : rel2Selections) {
-    lst.append(ACMD{LINK, {rootPath, rel2Section, dest}});
+    lst.append(ACMD::GetInstLINK(rootPath, rel2Section, dest));
   }
   return lst;
 }
@@ -121,7 +121,7 @@ BATCH_COMMAND_LIST_TYPE ComplexMerge::Merge(const QString& src, const QString& d
   auto ans = cm.To(selectionAbsFilePaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
   QString prepath;
   QString srcFileName = PathTool::GetPrepathAndFileName(src, prepath);
-  ans.append(ACMD{RMDIR, {prepath, srcFileName}});
+  ans.append(ACMD::GetInstRMDIR(prepath, srcFileName));
   return ans;
 }
 

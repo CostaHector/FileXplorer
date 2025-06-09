@@ -109,7 +109,7 @@ void RedundantImageFinder::RecycleSelection() {
   BATCH_COMMAND_LIST_TYPE recycleCmds;
   recycleCmds.reserve(SELECTED_CNT);
   for (const auto& srcInd : sel) {
-    recycleCmds.append(ACMD{MOVETOTRASH, {"", m_imgModel->filePath(srcInd)}});
+    recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_imgModel->filePath(srcInd)));
   }
   auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
   qDebug("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
