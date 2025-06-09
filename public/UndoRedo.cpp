@@ -49,7 +49,7 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
     }
   }
   undoList.append(OperationStream{cmd + syncCmd, exeRetEle.cmds});
-  return exeRetEle;
+  return (bool)exeRetEle;
 }
 
 bool UndoRedo::on_Undo() {
@@ -77,22 +77,22 @@ bool UndoRedo::on_Redo() {
 UndoRedo::UNDO_REDO_RETURN UndoRedo::Undo() {
   if (!undoAvailable()) {
     qDebug("Skip Cannot undo");
-    return qMakePair<bool, OperationStream>(true, OperationStream());
+    return {true, OperationStream{}};
   }
   OperationStream ele = undoList.pop();
   const auto& exeRetEle = FileOperation::executer(ele.recoverCmd, ele.doCmd);
   redoList.append(ele);  // you can not just update do_cmd in ele. Because it is not equivelant as rmfile has no recover
   // compromise method: when pass the do_cmd list into it
-  return qMakePair<bool, OperationStream>(exeRetEle, ele);
+  return {(bool)exeRetEle, ele};
 }
 
 UndoRedo::UNDO_REDO_RETURN UndoRedo::Redo() {
   if (!redoAvailable()) {
     qDebug("Skip Cannot redo");
-    return qMakePair<bool, OperationStream>(true, OperationStream());
+    return {true, OperationStream()};
   }
   OperationStream ele = redoList.pop();
   const auto& exeRetEle = FileOperation::executer(ele.doCmd, ele.recoverCmd);
   undoList.append(ele);
-  return qMakePair<bool, OperationStream>(exeRetEle, ele);
+  return {(bool)exeRetEle, ele};
 }

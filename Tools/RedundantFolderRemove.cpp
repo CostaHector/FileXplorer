@@ -1,4 +1,4 @@
-#include "RedundantFolderRemove.h"
+﻿#include "RedundantFolderRemove.h"
 #include "public/PublicVariable.h"
 #include "public/UndoRedo.h"
 #include <QFileInfo>
@@ -41,7 +41,7 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
     switch (subDir.count()) {
       case 0: {
         // empty folder => recycle
-        m_cmds.append(ACMD{MOVETOTRASH, {folderPath, sub}});
+        m_cmds.append(ACMD::GetInstMOVETOTRASH(folderPath, sub));
         break;
       }
       case 1: {
@@ -51,8 +51,8 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
           qDebug("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
           break;
         }
-        m_cmds.append(ACMD{RENAME, {subDir.absolutePath(), itemName, folderPath, itemName}});
-        m_cmds.append(ACMD{MOVETOTRASH, {folderPath, sub}});
+        m_cmds.append(ACMD::GetInstRENAME(subDir.absolutePath(), itemName, folderPath, itemName));
+        m_cmds.append(ACMD::GetInstMOVETOTRASH(folderPath, sub));
         break;
       }
       default:
@@ -66,7 +66,7 @@ auto EmptyFolderRmv::CleanEmptyFolderCore(const QString& folderPath) -> int {
   // as recursive calling, m_cmds will not clean automatically
   QDir dir(folderPath);
   if (dir.isEmpty()) {
-    m_cmds.append(ACMD{MOVETOTRASH, {"", folderPath}});
+    m_cmds.append(ACMD::GetInstMOVETOTRASH("", folderPath));
     return 1;
   }
   dir.setFilter(QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot);
@@ -108,7 +108,7 @@ auto FolderNameContainKeyRmv::CleanEmptyFolderCore(const QString& folderPath) ->
       continue;
     }
     // recycle this folder
-    m_cmds.append(ACMD{MOVETOTRASH, {"", subfolderPath}});
+    m_cmds.append(ACMD::GetInstMOVETOTRASH("", subfolderPath));
   }
   return m_cmds.size();
 }
