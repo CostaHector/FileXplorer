@@ -1,7 +1,8 @@
-#ifndef FILESYSTEMHELPER_H
+﻿#ifndef FILESYSTEMHELPER_H
 #define FILESYSTEMHELPER_H
 
 #include <QString>
+bool CreateAFile(const QString& absFilePath, const QString& contents);
 
 struct FileSystemNode {
   FileSystemNode(QString&& _nm, bool _isDir = true, QString&& _cont = "") : fileName{_nm}, isDir{_isDir}, fileContents{_cont} {}

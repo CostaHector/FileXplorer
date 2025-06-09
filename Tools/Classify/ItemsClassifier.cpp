@@ -1,4 +1,4 @@
-#include "ItemsClassifier.h"
+﻿#include "ItemsClassifier.h"
 #include "Tools/Classify/SceneMixed.h"
 #include "public/UndoRedo.h"
 
@@ -21,7 +21,7 @@ int ItemsClassifier::operator()(const QString& path, const QMap<QString, QString
     QDir underDir(underPath);
     if (!underDir.exists()) {
       // create a folder path + '/' + folderName
-      m_cmds.append(ACMD{MKPATH, {path, folderName}});
+      m_cmds.append(ACMD::GetInstMKPATH(path, folderName));
       ++pathCreatedCnt;
     }
     for (const QString& file : files) {
@@ -33,7 +33,7 @@ int ItemsClassifier::operator()(const QString& path, const QMap<QString, QString
         qDebug("%s/%s already exist, move will failed, skip it", qPrintable(underPath), qPrintable(file));
         continue;
       }
-      m_cmds.append(ACMD{RENAME, {path, file, underPath, file}});
+      m_cmds.append(ACMD::GetInstRENAME(path, file, underPath, file));
       ++filesRearrangedCnt;
     }
   }
