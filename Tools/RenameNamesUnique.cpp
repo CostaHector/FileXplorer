@@ -104,25 +104,18 @@ bool RenameNamesUnique::operator()() {
 
 using namespace FileOperatorType;
 BATCH_COMMAND_LIST_TYPE RenameNamesUnique::getRenameCommands() const {
-  if (!this->operator bool()) {
+  if (!operator bool()) {
     return {};
   }
-
-  QStringList olds;
-  QStringList news;
-  for (auto i = 0; i < m_oldCompleteNameList.size(); ++i) {
-    QString relTmp = m_relNameList[i] + (m_relNameList[i].isEmpty() ? "" : "/");
-    olds.append(relTmp + m_leftNames[i]);
-    news.append(relTmp + m_rightNames[i]);
-  }
-
-  using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds;
-  for (int i = 0; i < olds.size(); ++i) {
-    if (olds[i] == news[i]) {
+  for (auto i = 0; i < m_oldCompleteNameList.size(); ++i) {
+    if (m_leftNames[i] == m_rightNames[i]) {
       continue;
     }
-    cmds.append(ACMD{RENAME, {m_pre, olds[i], m_pre, news[i]}});
+    const QString relTmp = m_relNameList[i] + (m_relNameList[i].isEmpty() ? "" : "/");
+    const QString leftOld = relTmp + m_leftNames[i];
+    const QString rightOld = relTmp + m_rightNames[i];
+    cmds.append(ACMD::GetInstRENAME(m_pre, leftOld, m_pre, rightOld));
   }
   return {cmds.crbegin(), cmds.crend()};  // rename files first, than its folders;
 }

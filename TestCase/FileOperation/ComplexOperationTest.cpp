@@ -53,8 +53,8 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(selectionAbsPaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath + "/" + "a", "a1.txt", dest, "a1.txt"}},  //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath + "/" + "a", "a1", dest, "a1"}},          //
+        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1.txt", dest, "a1.txt"),  //
+        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1", dest, "a1"),          //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -65,10 +65,10 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath + '/' + "a/a1", "a11.txt", dest, "a11.txt"}},  //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath + '/' + "a", "a1.txt", dest, "a1.txt"}},       //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath + '/' + "b", "b.md", dest, "b.md"}},           //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath, "c", dest, "c"}},                             //
+        ACMD::GetInstRENAME(rootpath + '/' + "a/a1", "a11.txt", dest, "a11.txt"),  //
+        ACMD::GetInstRENAME(rootpath + '/' + "a", "a1.txt", dest, "a1.txt"),       //
+        ACMD::GetInstRENAME(rootpath + '/' + "b", "b.md", dest, "b.md"),           //
+        ACMD::GetInstRENAME(rootpath, "c", dest, "c"),                             //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -79,10 +79,10 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::KEEP);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath, "a/a1/a11.txt", dest, "a/a1/a11.txt"}},  //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath, "a/a1.txt", dest, "a/a1.txt"}},          //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath, "b/b.md", dest, "b/b.md"}},              //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath, "c", dest, "c"}},                        //
+        ACMD::GetInstRENAME(rootpath, "a/a1/a11.txt", dest, "a/a1/a11.txt"),  //
+        ACMD::GetInstRENAME(rootpath, "a/a1.txt", dest, "a/a1.txt"),          //
+        ACMD::GetInstRENAME(rootpath, "b/b.md", dest, "b/b.md"),              //
+        ACMD::GetInstRENAME(rootpath, "c", dest, "c"),                        //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -106,8 +106,8 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(selectionAbsPaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::CPFILE, {rootpath + "/" + "a", "a1.txt", dest}},  //
-        ACMD{FILE_OPERATOR_E::CPDIR, {rootpath + "/" + "a", "a1", dest}},      //
+        ACMD::GetInstCPFILE(rootpath + "/" + "a", "a1.txt", dest),  //
+        ACMD::GetInstCPDIR(rootpath + "/" + "a", "a1", dest),       //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -118,10 +118,10 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::CPFILE, {rootpath + "/" + "a/a1", "a11.txt", dest}},  //
-        ACMD{FILE_OPERATOR_E::CPFILE, {rootpath + "/" + "a", "a1.txt", dest}},      //
-        ACMD{FILE_OPERATOR_E::CPFILE, {rootpath + "/" + "b", "b.md", dest}},        //
-        ACMD{FILE_OPERATOR_E::CPDIR, {rootpath, "c", dest}},                        //
+        ACMD::GetInstCPFILE(rootpath + "/" + "a/a1", "a11.txt", dest),  //
+        ACMD::GetInstCPFILE(rootpath + "/" + "a", "a1.txt", dest),      //
+        ACMD::GetInstCPFILE(rootpath + "/" + "b", "b.md", dest),        //
+        ACMD::GetInstCPDIR(rootpath, "c", dest),                        //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -131,10 +131,10 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::KEEP);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::CPFILE, {rootpath, "a/a1/a11.txt", dest}},  //
-        ACMD{FILE_OPERATOR_E::CPFILE, {rootpath, "a/a1.txt", dest}},      //
-        ACMD{FILE_OPERATOR_E::CPFILE, {rootpath, "b/b.md", dest}},        //
-        ACMD{FILE_OPERATOR_E::CPDIR, {rootpath, "c", dest}},              //
+        ACMD::GetInstCPFILE(rootpath, "a/a1/a11.txt", dest),  //
+        ACMD::GetInstCPFILE(rootpath, "a/a1.txt", dest),      //
+        ACMD::GetInstCPFILE(rootpath, "b/b.md", dest),        //
+        ACMD::GetInstCPDIR(rootpath, "c", dest),              //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -152,9 +152,9 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.Merge(path1, emptyPath);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath + "/" + "a", "a1.txt", emptyPath, "a1.txt"}},  //
-        ACMD{FILE_OPERATOR_E::RENAME, {rootpath + "/" + "a", "a1", emptyPath, "a1"}},          //
-        ACMD{FILE_OPERATOR_E::RMDIR, {rootpath, "a"}},                                         //
+        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1.txt", emptyPath, "a1.txt"),  //
+        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1", emptyPath, "a1"),          //
+        ACMD::GetInstRMDIR(rootpath, "a"),                                         //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -168,7 +168,7 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.Merge(emptyPath, path1);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::RMDIR, {rootpath, "c"}},  //
+        ACMD::GetInstRMDIR(rootpath, "c"),  //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -182,7 +182,7 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.Merge(emptyPath1, emptyPath2);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD{FILE_OPERATOR_E::RMDIR, {rootpath, "c"}},  //
+        ACMD::GetInstRMDIR(rootpath, "c"),  //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);

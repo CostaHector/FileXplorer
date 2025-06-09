@@ -3,6 +3,7 @@
 #include <QPair>
 #include <QStack>
 #include "FileOperation/FileOperatorPub.h"
+#include <utility>
 
 struct OperationStream {
   FileOperatorType::BATCH_COMMAND_LIST_TYPE doCmd;
@@ -11,7 +12,7 @@ struct OperationStream {
 
 class UndoRedo {
  public:
-  using UNDO_REDO_RETURN = QPair<bool, OperationStream>;
+  using UNDO_REDO_RETURN = std::pair<bool, OperationStream>;
 
   bool Do(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& cmd);
 

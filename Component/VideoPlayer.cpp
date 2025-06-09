@@ -1,4 +1,4 @@
-#include "VideoPlayer.h"
+﻿#include "VideoPlayer.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/VideoPlayerActions.h"
 
@@ -264,7 +264,7 @@ int VideoPlayer::onRecycleSelectedItems() {
   recycleCmds.reserve(rmvFilesLst.size());
   for (const QString& pth : rmvFilesLst) {
     QFileInfo fi(pth);
-    recycleCmds.append(ACMD{MOVETOTRASH, {fi.absolutePath(), fi.fileName()}});
+    recycleCmds.append(ACMD::GetInstMOVETOTRASH(fi.absolutePath(), fi.fileName()));
   }
 
   if (recycleCmds.isEmpty()) {

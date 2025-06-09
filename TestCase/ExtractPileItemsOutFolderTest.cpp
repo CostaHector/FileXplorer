@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 #include "pub/MyTestSuite.h"
 #include "FileOperation/FileOperatorPub.h"
@@ -63,10 +63,10 @@ class ExtractPileItemsOutFolderTest : public MyTestSuite {
              foldersNeedExtractCnt);
     using namespace FileOperatorType;
     QCOMPARE(epiof.m_cmds.size(), 11);  // 10 move out commands, 1 remove commands
-    QVERIFY(epiof.m_cmds.contains(ACMD{MOVETOTRASH, {curPath, "a_pile"}}));
-    QVERIFY(epiof.m_cmds.contains(ACMD{RENAME, {curPath + "/a_pile", "name.mp4", curPath, "name.mp4"}}));
-    QVERIFY(epiof.m_cmds.contains(ACMD{RENAME, {curPath + "/a_pile", "name 10.png", curPath, "name 10.png"}}));
-    bool ret = epiof.m_cmds.contains(ACMD{RENAME, {curPath + "/a_pile", "name - 10.png", curPath, "name - 10.png"}});
+    QVERIFY(epiof.m_cmds.contains(ACMD::GetInstMOVETOTRASH(curPath, "a_pile")));
+    QVERIFY(epiof.m_cmds.contains(ACMD::GetInstRENAME(curPath + "/a_pile", "name.mp4", curPath, "name.mp4")));
+    QVERIFY(epiof.m_cmds.contains(ACMD::GetInstRENAME(curPath + "/a_pile", "name 10.png", curPath, "name 10.png")));
+    bool ret = epiof.m_cmds.contains(ACMD::GetInstRENAME(curPath + "/a_pile", "name - 10.png", curPath, "name - 10.png"));
     QVERIFY(!ret);
   }
 };

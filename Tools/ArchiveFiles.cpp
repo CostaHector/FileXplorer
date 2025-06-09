@@ -236,7 +236,7 @@ int ArchiveImagesRecusive::CompressImgRecur(const QString& rootPath) {
     BATCH_COMMAND_LIST_TYPE recycleCmds;
     recycleCmds.reserve(m_allPres.size());
     for (int i = 0; i < m_allPres.size(); ++i) {
-      recycleCmds.append(ACMD{MOVETOTRASH, {m_allPres[i], m_allNames[i]}});
+      recycleCmds.append(ACMD::GetInstMOVETOTRASH(m_allPres[i], m_allNames[i]));
     }
 
     bool recycleRet = g_undoRedo.Do(recycleCmds);
