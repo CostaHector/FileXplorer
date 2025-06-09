@@ -50,7 +50,7 @@ int LowResImgsRemover::operator()(const QString& imgPath) {
   BATCH_COMMAND_LIST_TYPE removeCmds;
   removeCmds.reserve(imgsToDel.size());
   for (const auto& nm : imgsToDel) {
-    removeCmds.append(ACMD{MOVETOTRASH, {imgPath, nm}});
+    removeCmds.append(ACMD::GetInstMOVETOTRASH(imgPath, nm));
   }
   bool bAllSucceed = g_undoRedo.Do(removeCmds);
   qDebug("delete %d images items, bAllSucceed[%d]", imgsToDel.size(), bAllSucceed);

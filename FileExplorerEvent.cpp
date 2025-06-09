@@ -99,7 +99,7 @@ auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& conte
     return false;
   }
   using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE cmds{ACMD{TOUCH, {_fileSysModel->rootPath(), newTextName}}};
+  BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstTOUCH(_fileSysModel->rootPath(), newTextName)};
   const auto isAllSucceed = g_undoRedo.Do(cmds);
   if (!isAllSucceed) {
     qWarning("[Error] touch command failed when create plain text file.");
@@ -161,7 +161,7 @@ auto FileExplorerEvent::on_NewFolder() -> bool {  // not effect by selection;
     return false;
   }
   using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE cmds{ACMD{MKPATH, {_fileSysModel->rootPath(), newFolderName}}};
+  BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstMKPATH(_fileSysModel->rootPath(), newFolderName)};
   const auto isAllSucceed = g_undoRedo.Do(cmds);
   if (!isAllSucceed) {
     qWarning("[Error] Make path failed[%s/%s]", qPrintable(_fileSysModel->rootPath()), qPrintable(newFolderName));
@@ -188,7 +188,11 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(const char* namePattern, int s
       qInfo("Skip. File/Folder[%s] already exists in folder[%s]", fileNameArray, qPrintable(createInPath));
       continue;
     }
-    cmds.append(ACMD{isFolder ? MKPATH : TOUCH, {createInPath, fileNameArray}});
+    if (isFolder) {
+      cmds.append(ACMD::GetInstMKPATH(createInPath, fileNameArray));
+    } else {
+      cmds.append(ACMD::GetInstTOUCH(createInPath, fileNameArray));
+    }
   }
   const auto isAllSucceed = g_undoRedo.Do(cmds);
   if (not isAllSucceed) {
@@ -858,7 +862,7 @@ bool FileExplorerEvent::on_moveToTrashBin() {
   BATCH_COMMAND_LIST_TYPE removeCmds;
   removeCmds.reserve(prepaths.size());
   for (int i = 0; i < prepaths.size(); ++i) {
-    removeCmds.append(ACMD{MOVETOTRASH, {prepaths[i], names[i]}});
+    removeCmds.append(ACMD::GetInstMOVETOTRASH(prepaths[i], names[i]));
   }
   const bool isAllSucceed = g_undoRedo.Do(removeCmds);
   if (isAllSucceed) {
@@ -885,9 +889,9 @@ bool FileExplorerEvent::on_deletePermanently() {
   for (const QModelIndex ind : selectedIndexes()) {
     QFileInfo fi = _fileSysModel->fileInfo(ind);
     if (fi.isDir()) {
-      cmds.append(ACMD{RMDIR, {pth, fi.fileName()}});
+      cmds.append(ACMD::GetInstRMDIR(pth, fi.fileName()));
     } else if (fi.isFile()) {
-      cmds.append(ACMD{RMFILE, {pth, fi.fileName()}});
+      cmds.append(ACMD::GetInstRMFILE(pth, fi.fileName()));
     } else {
       qInfo("Here may some types not removed [%s]", qPrintable(fi.filePath()));
     }
