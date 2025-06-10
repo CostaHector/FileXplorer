@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 
 #include "TestCase/pub/BeginToExposePrivateMember.h"
@@ -98,7 +98,7 @@ RedundantParentFolder
     const int cmdCnt = rpfr(REDUN_PARENT_TEST_DIR);
     QCOMPARE(cmdCnt, 2);
     QCOMPARE(rpfr.m_cmds.size(), 2);
-    QCOMPARE(rpfr.m_cmds[0].op, FileOperatorType::RENAME);
+    QCOMPARE(rpfr.m_cmds[0].op, FileOperatorType::MV);
     QCOMPARE(rpfr.m_cmds[1].op, FileOperatorType::MOVETOTRASH);
   }
 
