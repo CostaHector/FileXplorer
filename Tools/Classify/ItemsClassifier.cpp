@@ -33,7 +33,7 @@ int ItemsClassifier::operator()(const QString& path, const QMap<QString, QString
         qDebug("%s/%s already exist, move will failed, skip it", qPrintable(underPath), qPrintable(file));
         continue;
       }
-      m_cmds.append(ACMD::GetInstRENAME(path, file, underPath, file));
+      m_cmds.append(ACMD::GetInstMV(path, file, underPath));
       ++filesRearrangedCnt;
     }
   }

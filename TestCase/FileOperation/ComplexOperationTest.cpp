@@ -53,8 +53,8 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(selectionAbsPaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1.txt", dest, "a1.txt"),  //
-        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1", dest, "a1"),          //
+        ACMD::GetInstMV(rootpath + "/" + "a", "a1.txt", dest),  //
+        ACMD::GetInstMV(rootpath + "/" + "a", "a1", dest),          //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -65,10 +65,10 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD::GetInstRENAME(rootpath + '/' + "a/a1", "a11.txt", dest, "a11.txt"),  //
-        ACMD::GetInstRENAME(rootpath + '/' + "a", "a1.txt", dest, "a1.txt"),       //
-        ACMD::GetInstRENAME(rootpath + '/' + "b", "b.md", dest, "b.md"),           //
-        ACMD::GetInstRENAME(rootpath, "c", dest, "c"),                             //
+        ACMD::GetInstMV(rootpath + '/' + "a/a1", "a11.txt", dest),  //
+        ACMD::GetInstMV(rootpath + '/' + "a", "a1.txt", dest),       //
+        ACMD::GetInstMV(rootpath + '/' + "b", "b.md", dest),           //
+        ACMD::GetInstMV(rootpath, "c", dest),                             //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -79,10 +79,10 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::KEEP);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD::GetInstRENAME(rootpath, "a/a1/a11.txt", dest, "a/a1/a11.txt"),  //
-        ACMD::GetInstRENAME(rootpath, "a/a1.txt", dest, "a/a1.txt"),          //
-        ACMD::GetInstRENAME(rootpath, "b/b.md", dest, "b/b.md"),              //
-        ACMD::GetInstRENAME(rootpath, "c", dest, "c"),                        //
+        ACMD::GetInstMV(rootpath, "a/a1/a11.txt", dest),  //
+        ACMD::GetInstMV(rootpath, "a/a1.txt", dest),          //
+        ACMD::GetInstMV(rootpath, "b/b.md", dest),              //
+        ACMD::GetInstMV(rootpath, "c", dest),                        //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -152,8 +152,8 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE actualCmds = cm.Merge(path1, emptyPath);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
-        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1.txt", emptyPath, "a1.txt"),  //
-        ACMD::GetInstRENAME(rootpath + "/" + "a", "a1", emptyPath, "a1"),          //
+        ACMD::GetInstMV(rootpath + "/" + "a", "a1.txt", emptyPath),  //
+        ACMD::GetInstMV(rootpath + "/" + "a", "a1", emptyPath),          //
         ACMD::GetInstRMDIR(rootpath, "a"),                                         //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());

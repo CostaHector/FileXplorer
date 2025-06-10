@@ -1,4 +1,5 @@
 ﻿#include "RenameNamesUnique.h"
+#include "public/PathTool.h"
 
 #include <QDebug>
 #include <QDir>
@@ -112,10 +113,12 @@ BATCH_COMMAND_LIST_TYPE RenameNamesUnique::getRenameCommands() const {
     if (m_leftNames[i] == m_rightNames[i]) {
       continue;
     }
-    const QString relTmp = m_relNameList[i] + (m_relNameList[i].isEmpty() ? "" : "/");
-    const QString leftOld = relTmp + m_leftNames[i];
-    const QString rightOld = relTmp + m_rightNames[i];
-    cmds.append(ACMD::GetInstRENAME(m_pre, leftOld, m_pre, rightOld));
+    QString prePath{m_pre};
+    if (!m_relNameList[i].isEmpty()) {
+      prePath += '/';
+      prePath += m_relNameList[i];
+    }
+    cmds.append(ACMD::GetInstRENAME(prePath, m_leftNames[i], m_rightNames[i]));
   }
   return {cmds.crbegin(), cmds.crend()};  // rename files first, than its folders;
 }

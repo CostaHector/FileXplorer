@@ -158,3 +158,35 @@ for (int i = 0; i < paths.size(); ++i) {
   cursor.insertText("\n");
 }
 ```
+
+## Testcase
+### Table 1.0 Expected Behavior of rename Functions
+```cpp
+RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const QString& newCompleteName)
+```
+| srcPath | oldCompleteName | newCompleteName | exist items in srcPath | result |
+|---------|-----------------|-----------------|---------------------------------------------------|--------|
+| home | a | A | {a} | OK |
+| home | a | A | {a, A} | In windows platform no need consider this one as system may prevent two items(Only differ in case) place/create/moved in one folder;<br/>Linux return DST_FILE_OR_PATH_ALREADY_EXIST |
+| home | a | a | {a} | SKIP |
+| home | a | b | {a} | OK |
+| home | a | b | {a,b} | windows/linux return DST_FILE_OR_PATH_ALREADY_EXIST|
+| home | a | B | {a,B} | windows/linux return DST_FILE_OR_PATH_ALREADY_EXIST|
+| home | a | b | {a,B} | windows return DST_FILE_OR_PATH_ALREADY_EXIST;<br/>Linux return OK|
+| home | a | B | {a,b} | windows return DST_FILE_OR_PATH_ALREADY_EXIST;<br/>Linux return OK|
+
+### Table 1.1 Expected Behavior of mv Functions
+```cpp
+RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& dstPath)`
+```
+| srcPath | relToItem | dstPath | exist items in dstPath | result |
+|---------|-----------|---------|---------------------------------------------------|--------|
+| home | any1 | home | {any1} | OK, SKIP |
+| home | any1 | HOME | {any1} | OK, SKIP. It is not recommend to create two folder only differ in name case in Linux platform. |
+| home | a | bin | {} | OK |
+| home | a | bin | {a} | windows/linux return DST_FILE_OR_PATH_ALREADY_EXIST |
+| home | a | bin | {A} | windows return DST_FILE_OR_PATH_ALREADY_EXIST;<br/>linux return OK |
+| home | path/to/a | bin | {} | OK |
+| home | path/to/a | bin | {path/to} | OK |
+| home | path/to/a | bin | {path/to/a} | windows/linux return DST_FILE_OR_PATH_ALREADY_EXIST |
+| home | path/to/a.txt | bin | {} | OK |

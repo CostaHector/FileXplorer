@@ -1,21 +1,11 @@
 ﻿#include "FileSystemHelper.h"
+#include "TDir.h"
 #include <QDirIterator>
 #include <QDir>
 #include <QFileInfo>
 #include <QIODevice>
 #include <QTextStream>
 #include <QDataStream>
-
-bool CreateAFile(const QString& absFilePath, const QString& contents) {
-  QFile file{absFilePath};
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    return false;
-  }
-  QTextStream out(&file);
-  out << contents;
-  file.close();
-  return true;
-}
 
 bool FileSystemNode::operator==(const FileSystemNode& rhs) const {
   if (fileName != rhs.fileName) {
@@ -100,7 +90,7 @@ QString FileSystemHelper::GetFileContent(const QString& fileName, bool bIsText) 
 }
 
 bool FileSystemHelper::CreateATextFile(const QString& fileName, const QString& contents) const {
-  return CreateAFile(m_path + '/' + fileName, contents);
+  return CreateAFile(m_path + '/' + fileName, contents.toUtf8());
 }
 
 const FileSystemHelper& FileSystemHelper::operator<<(const FileSystemNode& node) const {

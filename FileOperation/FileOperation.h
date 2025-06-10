@@ -30,7 +30,10 @@ RETURN_TYPE moveToTrashAgent(const QStringList& parms);
 RETURN_TYPE moveToTrash(const QString& pres, const QString& rels);
 
 RETURN_TYPE renameAgent(const QStringList& parms);
-RETURN_TYPE rename(const QString& pre, const QString& rel, const QString& to, const QString& toRel);
+RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const QString& newCompleteName);
+
+RETURN_TYPE mvAgent(const QStringList& parms);
+RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& dstPath);
 
 RETURN_TYPE cpfileAgent(const QStringList& parms);
 RETURN_TYPE cpfile(const QString& pre, const QString& rel, const QString& to);
