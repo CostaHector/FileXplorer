@@ -55,14 +55,14 @@ BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths
     QString prepath;
     for (const QString& pth : selectionAbsFilePaths) {
       QString name = PathTool::GetPrepathAndFileName(pth, prepath);
-      lst.append(ACMD::GetInstRENAME(prepath, name, dest, name));
+      lst.append(ACMD::GetInstMV(prepath, name, dest));
     }
   } else if (mode == FILE_STRUCTURE_MODE::KEEP) {
     QString rootPath;
     QStringList rel2Selections;  // indirect or direct
     std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
     for (const QString& rel2Section : rel2Selections) {
-      lst.append(ACMD::GetInstRENAME(rootPath, rel2Section, dest, rel2Section));
+      lst.append(ACMD::GetInstMV(rootPath, rel2Section, dest));
     }
   } else {
     qWarning("File Structure Mode[%d] not support", (int)mode);

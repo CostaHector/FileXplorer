@@ -70,7 +70,7 @@ RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
       qCritical("The file[%s] name in trashbin is not accessible", qPrintable(pth));
       return {UNKNOWN_ERROR, revertCmds};
     }
-    revertCmds.append(ACMD::GetInstRENAME("", file.fileName(), "", pth));
+    revertCmds.append(ACMD::GetInstRENAME("", file.fileName(), pth));
   } else {
     return {UNKNOWN_ERROR, revertCmds};
   }
@@ -219,45 +219,97 @@ RETURN_TYPE moveToTrashAgent(const QStringList& parms) {
 }
 
 RETURN_TYPE renameAgent(const QStringList& parms) {
-  if (parms.size() != 4) {
+  if (parms.size() != 3) {
     return {OPERATION_PARMS_NOT_MATCH, {}};
   }
-  const QString& pre = parms[0];
-  const QString& rel = parms[1];
-  const QString& to = parms[2];
-  const QString& toRel = parms[3];
-  return FileOperation::rename(pre, rel, to, toRel);
+  const QString& srcPath = parms[0];
+  const QString& oldCompleteName = parms[1];
+  const QString& newCompleteName = parms[2];
+  return FileOperation::rename(srcPath, oldCompleteName, newCompleteName);
 }
 
-RETURN_TYPE rename(const QString& pre, const QString& rel, const QString& to, const QString& toRel) {
-  // a/b -> a/b skip
-  const QString& pth = PathTool::Path2Join(pre, rel);
-  if (!QFile::exists(pth)) {
+RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const QString& newCompleteName) {
+  if (oldCompleteName == newCompleteName) {
+    // name unchange, no need continue. return right now
+    return {};
+  }
+  const QString& absOldPath = PathTool::Path2Join(srcPath, oldCompleteName);
+  if (!QFile::exists(absOldPath)) {
+    // source item not exist at all. return right now
     return {SRC_INEXIST, {}};
   }
+  const QString& absNewPath = PathTool::Path2Join(srcPath, newCompleteName);
+  // name now differ in case/char/char count
 
-  const bool isOnlyCaseDiffer = rel != toRel && rel.toLower() == toRel.toLower();
-  const QString& absNewPath = PathTool::Path2Join(to, toRel);
-  if (QFile{absNewPath}.exists() && !isOnlyCaseDiffer) {
-    // rename item -> FILE. but there is {file} already. Reject to rename to avoid override {file}
+  if (oldCompleteName.toLower() == newCompleteName.toLower()) {
+    // only differ in case
+#ifndef _WIN32
+    // Linux system allow two item name only differ in case. QFile::rename("a.txt", "A.txt") will cause file overwrite
+    if (QFile::exists(absNewPath)) {
+      return {DST_FILE_OR_PATH_ALREADY_EXIST, {}};
+    }
+#endif
+    // Windows system may prevent two items(Only differ in case) place/create/moved in one folder. so newCompleteName will not exist under srcPath
+    if (!QFile::rename(absOldPath, absNewPath)) {
+      return {CANNOT_RENAME, {}};  // file being occupied by others or permission
+    }
+    return {OK, {ACMD::GetInstRENAME(srcPath, newCompleteName, oldCompleteName)}};
+  }
+
+  // name now differ in char/char count
+  if (QFile::exists(absNewPath)) {  // windows QFile::exists is case-insensitive, linux case-sensitive matter
     return {DST_FILE_OR_PATH_ALREADY_EXIST, {}};
   }
 
-  BATCH_COMMAND_LIST_TYPE cmds;
+  if (!QFile::rename(absOldPath, absNewPath)) {
+    return {CANNOT_RENAME, {}};  // file being occupied by others or permission
+  }
+  return {OK, {ACMD::GetInstRENAME(srcPath, newCompleteName, oldCompleteName)}};
+}
+
+RETURN_TYPE mvAgent(const QStringList& parms) {
+  if (parms.size() != 3) {
+    return {OPERATION_PARMS_NOT_MATCH, {}};
+  }
+  const QString& srcPath = parms[0];
+  const QString& relToItem = parms[1];
+  const QString& dstPath = parms[2];
+  return FileOperation::mv(srcPath, relToItem, dstPath);
+}
+
+RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& dstPath) {
+  if (srcPath.toLower() == dstPath.toLower()) {  // folder belong dstPath no change
+    return {};
+  }
+  const QString& absOldPath = PathTool::Path2Join(srcPath, relToItem);
+  if (!QFile::exists(absOldPath)) {
+    return {SRC_INEXIST, {}};
+  }
+  const QString& absNewPath = PathTool::Path2Join(dstPath, relToItem);
+  if (QFile::exists(absNewPath)) {  // already exist, ignore file or folder
+    return {DST_FILE_OR_PATH_ALREADY_EXIST, {}};
+  }
+
+  BATCH_COMMAND_LIST_TYPE revertCmds;
   const QString& preNewPathFolder = PathTool::absolutePath(absNewPath);
-  if (!QDir{preNewPathFolder}.exists()) {
-    // only remove dirs
+  if (QFile::exists(preNewPathFolder)) {
+    if (!QFileInfo{preNewPathFolder}.isDir()) {
+      return {DST_PRE_DIR_OCCUPIED_BY_FILE, {}};
+    }
+  } else {
     if (!QDir{}.mkpath(preNewPathFolder)) {
       return {DST_PRE_DIR_CANNOT_MAKE, {}};
     }
-    cmds.append(ACMD::GetInstRMPATH("", preNewPathFolder));
+    revertCmds.append(ACMD::GetInstRMPATH("", preNewPathFolder));
   }
-  if (!QFile::rename(pth, absNewPath)) {
-    return {UNKNOWN_ERROR, cmds};
+  if (!QFile::rename(absOldPath, absNewPath)) {
+    return {CANNOT_MV, revertCmds};
   }
-  cmds.append(ACMD::GetInstRENAME(to, toRel, pre, rel));
-  return {OK, cmds};
+
+  revertCmds.append(ACMD::GetInstMV(dstPath, relToItem, srcPath));
+  return {OK, revertCmds};
 }
+
 RETURN_TYPE cpfileAgent(const QStringList& parms) {
   if (parms.size() != 3) {
     return {OPERATION_PARMS_NOT_MATCH, {}};
@@ -374,9 +426,6 @@ RETURN_TYPE touchAgent(const QStringList& parms) {
 }
 
 RETURN_TYPE touch(const QString& pre, const QString& rel) {
-  if (not QDir(pre).exists()) {
-    return {DST_DIR_INEXIST, {}};
-  }
   const QString& pth = PathTool::Path2Join(pre, rel);
   QFile textFile(pth);
   if (textFile.exists()) {
@@ -427,7 +476,7 @@ RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to) {
     if (!QFile{toPath}.moveToTrash()) {
       return {CANNOT_REMOVE_FILE, cmds};
     }
-    cmds.append(ACMD::GetInstRENAME("", toFile.fileName(), "", toPath));
+    cmds.append(ACMD::GetInstRENAME("", toFile.fileName(), toPath));
   }
 
   QString prePath{PathTool::absolutePath(toPath)};
