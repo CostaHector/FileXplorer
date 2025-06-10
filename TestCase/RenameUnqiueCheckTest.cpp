@@ -124,9 +124,9 @@ class RenameUnqiueCheckTest : public MyTestSuite {
     QCOMPARE(actualCmds.size(), 3);
     BATCH_COMMAND_LIST_TYPE expectAns  //
         {
-            ACMD::GetInstRENAME("C:/home", "d", "C:/home", "d.cpp"),      //
-            ACMD::GetInstRENAME("C:/home", "B.md", "C:/home", "b.md"),    //
-            ACMD::GetInstRENAME("C:/home", "a.mp4", "C:/home", "A.mp4"),  //
+            ACMD::GetInstRENAME("C:/home", "d", "d.cpp"),      //
+            ACMD::GetInstRENAME("C:/home", "B.md", "b.md"),    //
+            ACMD::GetInstRENAME("C:/home", "a.mp4", "A.mp4"),  //
         };                                                                //
     QCOMPARE(actualCmds, expectAns);
   }
@@ -151,8 +151,8 @@ class RenameUnqiueCheckTest : public MyTestSuite {
     QCOMPARE(actualCmds.size(), 2);
     BATCH_COMMAND_LIST_TYPE expectAns  //
         {
-            ACMD::GetInstRENAME("C:/home", "path/b.mp4", "C:/home", "path/B.MP4"),  //
-            ACMD::GetInstRENAME("C:/home", "path", "C:/home", "PATH"),              //
+            ACMD::GetInstRENAME("C:/home/path", "b.mp4", "B.MP4"),  //
+            ACMD::GetInstRENAME("C:/home", "path", "PATH"),              //
         };                                                                          //
     QCOMPARE(actualCmds, expectAns);
   }

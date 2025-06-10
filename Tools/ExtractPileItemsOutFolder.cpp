@@ -80,7 +80,7 @@ int ExtractPileItemsOutFolder::operator()(const QString& path,                  
         qDebug("%s/%s already exist outside, move will failed, skip it", qPrintable(path), qPrintable(file));
         continue;
       }
-      m_cmds.append(ACMD::GetInstRENAME(path + '/' + folderName, file, path, file));
+      m_cmds.append(ACMD::GetInstMV(path + '/' + folderName, file, path));
       ++filesExtractedCnt;
     }
     itemsExtractedOutCnt += filesExtractedCnt;

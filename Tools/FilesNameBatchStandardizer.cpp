@@ -34,7 +34,7 @@ bool FilesNameBatchStandardizer::operator()(const QString& rootPath) {
     if (oldNm == newNm) {
       continue;
     }
-    cmds.append(ACMD::GetInstRENAME(pathList[i], oldNm, pathList[i], newNm));
+    cmds.append(ACMD::GetInstRENAME(pathList[i], oldNm, newNm));
   }
   auto isAllSuccess = g_undoRedo.Do(cmds);
   return isAllSuccess;

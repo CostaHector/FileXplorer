@@ -31,6 +31,9 @@ namespace FileOperatorType {
   FILE_OPERATOR_ERROR_KEY_ITEM(OPERATION_PARMS_NOT_MATCH)      \
   FILE_OPERATOR_ERROR_KEY_ITEM(RECYCLE_OCCUPIED_FILE_FAILED)   \
   FILE_OPERATOR_ERROR_KEY_ITEM(PATH_NAME_LIST_NOT_EQUAL)       \
+  FILE_OPERATOR_ERROR_KEY_ITEM(CANNOT_RENAME)                  \
+  FILE_OPERATOR_ERROR_KEY_ITEM(CANNOT_MV)                      \
+  FILE_OPERATOR_ERROR_KEY_ITEM(DST_PRE_DIR_OCCUPIED_BY_FILE)   \
   FILE_OPERATOR_ERROR_KEY_ITEM(COMMAND_TYPE_UNSUPPORT)
 
 enum ErrorCode {
@@ -56,11 +59,12 @@ const QString FILE_OPERATOR_ERROR_TO_STR[ERROR_BUTT + 1] = {
   FILE_OPERATOR_KEY_ITEM(TOUCH, 5, touchAgent, TWO_PARAMS, TWO_ARGVS)                 \
   FILE_OPERATOR_KEY_ITEM(MKPATH, 6, mkpathAgent, TWO_PARAMS, TWO_ARGVS)               \
   FILE_OPERATOR_KEY_ITEM(MKDIR, 7, mkdirAgent, TWO_PARAMS, TWO_ARGVS)                 \
-  FILE_OPERATOR_KEY_ITEM(RENAME, 8, renameAgent, FOUR_PARAMS, FOUR_ARGVS)             \
-  FILE_OPERATOR_KEY_ITEM(CPFILE, 9, cpfileAgent, THREE_PARAMS, THREE_ARGVS)           \
-  FILE_OPERATOR_KEY_ITEM(CPDIR, 10, cpdirAgent, THREE_PARAMS, THREE_ARGVS)            \
-  FILE_OPERATOR_KEY_ITEM(LINK, 11, linkAgent, THREE_PARAMS, THREE_ARGVS)              \
-  FILE_OPERATOR_KEY_ITEM(UNLINK, 12, unlinkAgent, THREE_PARAMS, THREE_ARGVS)
+  FILE_OPERATOR_KEY_ITEM(RENAME, 8, renameAgent, THREE_PARAMS, THREE_ARGVS)           \
+  FILE_OPERATOR_KEY_ITEM(MV, 9, mvAgent, THREE_PARAMS, THREE_ARGVS)                   \
+  FILE_OPERATOR_KEY_ITEM(CPFILE, 10, cpfileAgent, THREE_PARAMS, THREE_ARGVS)          \
+  FILE_OPERATOR_KEY_ITEM(CPDIR, 11, cpdirAgent, THREE_PARAMS, THREE_ARGVS)            \
+  FILE_OPERATOR_KEY_ITEM(LINK, 12, linkAgent, THREE_PARAMS, THREE_ARGVS)              \
+  FILE_OPERATOR_KEY_ITEM(UNLINK, 13, unlinkAgent, THREE_PARAMS, THREE_ARGVS)
 
 enum FILE_OPERATOR_E {
   BEGIN,
@@ -78,40 +82,31 @@ const QString FILE_OPERATOR_TO_STR[OPERATOR_BUTT + 1] = {
 };
 
 struct ACMD {
-  FILE_OPERATOR_E op;
-  QStringList lst;
-
 #define TWO_PARAMS const QString &pre, const QString &rel
 #define TWO_ARGVS pre, rel
 #define THREE_PARAMS const QString &pre, const QString &rel, const QString &to
 #define THREE_ARGVS pre, rel, to
-#define FOUR_PARAMS const QString &pre, const QString &rel, const QString &to, const QString &toRel
-#define FOUR_ARGVS pre, rel, to, toRel
 
 #define FILE_OPERATOR_KEY_ITEM(enu, val, func, FACTORY_PARAMS, FACTORY_ARGVS) \
   static ACMD GetInst##enu(FACTORY_PARAMS) { return {enu, {FACTORY_ARGVS}}; }
   FILE_OPERATOR_TYPE_FIELD_MAPPING  // Factory Mode
 #undef FILE_OPERATOR_KEY_ITEM
 
-#undef FOUR_ARGVS
-#undef FOUR_PARAMS
-#undef THREE_ARGVS
 #undef THREE_ARGVS
 #undef THREE_PARAMS
 #undef TWO_ARGVS
 #undef TWO_PARAMS
 
-      int
-      size() const {
-    return lst.size();
-  }
+      FILE_OPERATOR_E op;
+  QStringList lst;
+
+  int size() const { return lst.size(); }
   QString& operator[](int i) { return lst[i]; }
 
   void clear() {
     op = FILE_OPERATOR_E::OPERATOR_BUTT;
     lst.clear();
   };
-
   explicit operator bool() const {  //
     return !isEmpty();
   }
@@ -121,10 +116,11 @@ struct ACMD {
   }
 
   QString toStr() const {  //
-    return FILE_OPERATOR_TO_STR[op] + ":" + lst.join('\t');
+    return FILE_OPERATOR_TO_STR[op] + ":" + lst.join(';');
   }
+
   QString toStr(ErrorCode code) const {  //
-    return FILE_OPERATOR_ERROR_TO_STR[code] + '\t' + FILE_OPERATOR_TO_STR[op] + ":" + lst.join('\t');
+    return '[' + FILE_OPERATOR_ERROR_TO_STR[code] + ']' + FILE_OPERATOR_TO_STR[op] + ":" + lst.join(';');
   }
   bool operator==(const ACMD& rhs) const;
 };
@@ -139,6 +135,7 @@ struct RETURN_TYPE {
 
   explicit operator bool() const { return ret == ErrorCode::OK; }
   int size() const { return cmds.size(); }
+  bool isRecoverable() const { return !cmds.isEmpty(); };
 
   ACMD& operator[](int i) { return cmds[i]; }
   const ACMD& operator[](int i) const { return cmds[i]; }
