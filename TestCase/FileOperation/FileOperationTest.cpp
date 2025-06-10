@@ -18,7 +18,7 @@ class FileOperationTest : public MyTestSuite {
   Q_OBJECT
 
  public:
-  FileOperationTest() : MyTestSuite{false} {}
+  FileOperationTest() : MyTestSuite{true} {}
   FileSystemHelper m_rootHelper{g_rootPath};
  private slots:
   void test_file_remove_not_recoverable() {
@@ -287,6 +287,125 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(!g_rootDir.exists(QString("b/%1").arg(inexistFileName)));
   }
 
+  // link
+  void test_link_a_file() {
+    QVERIFY(CreateAFile(g_rootPath + "/a.txt", "contents in a.txt"));
+    ON_SCOPE_EXIT {
+      if (g_rootDir.exists("a.txt.lnk")) {
+        QVERIFY(g_rootDir.remove("a.txt.lnk"));
+      }
+      if (g_rootDir.exists("a.txt")) {
+        QVERIFY(g_rootDir.remove("a.txt"));
+      }
+    };
+
+    QVERIFY2(g_rootDir.exists("a.txt"), "Precondition not required.");
+
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::link(g_rootPath, "a.txt", g_rootPath);
+    auto aBatch = retEle.cmds;
+    QCOMPARE(retEle.ret, ErrorCode::OK);
+
+    QVERIFY(g_rootDir.exists("a.txt"));
+    QVERIFY(g_rootDir.exists("a.txt.lnk"));
+    QVERIFY(!aBatch.isEmpty());  // can recover
+
+    BATCH_COMMAND_LIST_TYPE srcCommand;
+    const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    QCOMPARE(exeRetEle.ret, ErrorCode::OK);
+    QCOMPARE(exeRetEle.isRecoverable(), true);
+
+    // lnk was removed, file linked to not removed
+    QVERIFY(g_rootDir.exists("a.txt"));
+    QVERIFY(!g_rootDir.exists("a.txt.lnk"));
+  }
+
+  void test_link_a_relative_file() {
+    QVERIFY(g_rootDir.mkpath("a"));
+    QVERIFY(CreateAFile(g_rootPath + "/a/a1.txt", "contents in a/a1.txt"));
+    ON_SCOPE_EXIT {
+      if (g_rootDir.exists("a")) {
+        QVERIFY(QDir(g_rootPath + "/a").removeRecursively());
+      }
+    };
+
+    QVERIFY2(g_rootDir.exists("a/a1.txt"), "Precondition not required.");
+
+    FileOperatorType::RETURN_TYPE retEle = FileOperation::link(g_rootPath, "a/a1.txt", g_rootPath);
+    auto aBatch = retEle.cmds;
+    QCOMPARE(retEle.ret, ErrorCode::OK);
+    QCOMPARE(retEle.isRecoverable(), true);
+
+    QVERIFY(g_rootDir.exists("a/a1.txt"));
+    QVERIFY(g_rootDir.exists("a/a1.txt.lnk"));
+
+    BATCH_COMMAND_LIST_TYPE srcCommand;
+    const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto recoverRet = exeRetEle.ret;
+    QCOMPARE(recoverRet, 0);
+    QVERIFY(g_rootDir.exists("a/a1.txt"));
+    QVERIFY(!g_rootDir.exists("a/a1.txt.lnk"));
+  }
+
+  void test_rename_a_txt_To_A_TXT_Not_Exists() {
+    const QString lowerCaseName = "a.txt";
+    const QString upperCaseName = "A.TXT";
+    QVERIFY(CreateAFile(g_rootPath + "/" + lowerCaseName, "contents in a.txt"));
+    ON_SCOPE_EXIT {
+      QVERIFY(g_rootDir.entryList(QDir::Filter::Files).contains(lowerCaseName));
+      QVERIFY(g_rootDir.remove(lowerCaseName));
+    };
+    QVERIFY2(g_rootDir.entryList(QDir::Filter::Files).contains(lowerCaseName), "A.txt should be recover to a.txt");
+
+    RETURN_TYPE retEle =  //
+        FileOperation::rename(g_rootPath, lowerCaseName, g_rootPath, upperCaseName);
+    QCOMPARE(retEle.ret, ErrorCode::OK);
+    QCOMPARE(retEle.isRecoverable(), true);
+    QVERIFY2(g_rootDir.entryList(QDir::Filter::Files).contains(upperCaseName), "A.txt should be recover to a.txt");
+
+    auto aBatch = retEle.cmds;
+    BATCH_COMMAND_LIST_TYPE srcCommand;
+    const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    QCOMPARE(exeRetEle.ret, ErrorCode::OK);
+    QCOMPARE(exeRetEle.isRecoverable(), true);
+    QVERIFY2(g_rootDir.entryList(QDir::Filter::Files).contains(lowerCaseName), "A.txt should be recover to a.txt");
+  }
+
+  void test_rename_b_txt_to_A_TXT_failed_if_a_txt_already_exists() {
+    QVERIFY(CreateAFile(g_rootPath + "/b.txt", "contents in b.txt"));
+    QVERIFY(CreateAFile(g_rootPath + "/a.txt", "contents in a.txt"));
+    ON_SCOPE_EXIT {
+      QVERIFY(g_rootDir.remove("a.txt"));
+      QVERIFY(g_rootDir.remove("b.txt"));
+    };
+
+    QVERIFY2(g_rootDir.exists("b.txt"), "Environment should met first");
+    QVERIFY2(g_rootDir.exists("a.txt"), "Environment should met first");
+    // rename b.txt -> A.TXT while {a.txt} already exist in destination
+    const QString fileNameATXTDifferInCase = "A.TXT";
+    RETURN_TYPE retEle =  //
+        FileOperation::rename(g_rootPath, "b.txt", g_rootPath, fileNameATXTDifferInCase);
+
+    QCOMPARE(retEle.ret, DST_FILE_OR_PATH_ALREADY_EXIST);
+    QCOMPARE(retEle.isRecoverable(), false);
+  }
+
+  void test_rename_a_to_A_ok() {
+    QVERIFY(g_rootDir.mkdir("a"));
+    ON_SCOPE_EXIT {
+      QVERIFY(g_rootDir.rmdir("A"));
+    };
+
+    QVERIFY2(g_rootDir.exists("a"), "Environment should met first");
+    RETURN_TYPE retEle =  //
+        FileOperation::rename(g_rootPath, "a", g_rootPath, "A");
+
+    QCOMPARE(retEle.ret, OK);
+    QCOMPARE(retEle.isRecoverable(), true);
+    QVERIFY2(g_rootDir.entryList(QDir::Filter::Dirs).contains("A"), "A should exist");
+  }
 };
 #include "FileOperationTest.moc"
 FileOperationTest g_FileOperationTest;

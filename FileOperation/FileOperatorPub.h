@@ -78,9 +78,6 @@ const QString FILE_OPERATOR_TO_STR[OPERATOR_BUTT + 1] = {
 };
 
 struct ACMD {
-  FILE_OPERATOR_E op;
-  QStringList lst;
-
 #define TWO_PARAMS const QString &pre, const QString &rel
 #define TWO_ARGVS pre, rel
 #define THREE_PARAMS const QString &pre, const QString &rel, const QString &to
@@ -101,17 +98,16 @@ struct ACMD {
 #undef TWO_ARGVS
 #undef TWO_PARAMS
 
-      int
-      size() const {
-    return lst.size();
-  }
+      FILE_OPERATOR_E op;
+  QStringList lst;
+
+  int size() const { return lst.size(); }
   QString& operator[](int i) { return lst[i]; }
 
   void clear() {
     op = FILE_OPERATOR_E::OPERATOR_BUTT;
     lst.clear();
   };
-
   explicit operator bool() const {  //
     return !isEmpty();
   }
@@ -139,6 +135,7 @@ struct RETURN_TYPE {
 
   explicit operator bool() const { return ret == ErrorCode::OK; }
   int size() const { return cmds.size(); }
+  bool isRecoverable() const {return !cmds.isEmpty();};
 
   ACMD& operator[](int i) { return cmds[i]; }
   const ACMD& operator[](int i) const { return cmds[i]; }

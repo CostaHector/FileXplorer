@@ -56,12 +56,6 @@ class FileOperationExTest : public FileSystemTestSuite {
   void test_touch_an_existed_folder_in_direct_path();
   void test_touch_an_existed_folder_in_relative_path();
 
-  void test_link_a_file();
-  void test_link_a_relative_file();
-
-  void test_rename_a_txt_To_A_TXT_Not_Exists();
-  void test_rename_b_txt_To_A_TXT_Already_Exists();
-
   void test_executer_return_if_any_cmd_failed();
 };
 
@@ -441,70 +435,6 @@ void FileOperationExTest::test_touch_an_existed_folder_in_relative_path() {
   QCOMPARE(ret, ErrorCode::OK);
   QVERIFY(aBatch.isEmpty());
   QVERIFY(QDir(mTestPath).exists("a/a1"));
-}
-
-void FileOperationExTest::test_link_a_file() {
-  QVERIFY2(QDir(mTestPath).exists("a.txt"), "Precondition not required.");
-
-  FileOperatorType::RETURN_TYPE retEle = FileOperation::link(mTestPath, "a.txt");
-  auto ret = retEle.ret;
-  auto aBatch = retEle.cmds;
-
-  QCOMPARE(ret, ErrorCode::OK);
-
-  QVERIFY(QDir(mTestPath).exists("a.txt"));
-  QVERIFY(QDir(SystemPath::STARRED_PATH).exists("a.txt.lnk"));
-  QVERIFY(not aBatch.isEmpty());
-
-  BATCH_COMMAND_LIST_TYPE srcCommand;
-  const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-  const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
-  const auto recoverRet = exeRetEle.ret;
-  QCOMPARE(recoverRet, 0);
-  QVERIFY(QDir(mTestPath).exists("a.txt"));
-  QVERIFY(not QDir(SystemPath::STARRED_PATH).exists("a.txt.lnk"));
-}
-
-void FileOperationExTest::test_link_a_relative_file() {
-  QVERIFY2(QDir(mTestPath).exists("a/a1.txt"), "Precondition not required.");
-
-  FileOperatorType::RETURN_TYPE retEle = FileOperation::link(mTestPath, "a/a1.txt");
-  auto ret = retEle.ret;
-  auto aBatch = retEle.cmds;
-
-  QCOMPARE(ret, ErrorCode::OK);
-
-  QVERIFY(QDir(mTestPath).exists("a/a1.txt"));
-  QVERIFY(QDir(SystemPath::STARRED_PATH).exists("a/a1.txt.lnk"));
-  QVERIFY(not aBatch.isEmpty());
-
-  BATCH_COMMAND_LIST_TYPE srcCommand;
-  const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-  const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
-  const auto recoverRet = exeRetEle.ret;
-  QCOMPARE(recoverRet, 0);
-  QVERIFY(QDir(mTestPath).exists("a/a1.txt"));
-  QVERIFY(not QDir(SystemPath::STARRED_PATH).exists("a/a1.txt.lnk"));
-}
-
-void FileOperationExTest::test_rename_a_txt_To_A_TXT_Not_Exists() {
-  const QString lowerCaseName = "a.txt";
-  QVERIFY2(QDir(mTestPath).entryList(QDir::Filter::AllEntries).contains(lowerCaseName), "Environment should met first");
-
-  const QString upperCaseName = "A.TXT";
-  FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(mTestPath, lowerCaseName, mTestPath, upperCaseName);
-  QCOMPARE(retEle.ret, ErrorCode::OK);
-  QVERIFY2(QDir(mTestPath).entryList(QDir::Filter::AllEntries).contains(upperCaseName), "a.txt should be renamed to A.TXT");
-}
-
-void FileOperationExTest::test_rename_b_txt_To_A_TXT_Already_Exists() {
-  QVERIFY2(QDir(mTestPath).entryList(QDir::Filter::AllEntries).contains("b.txt"), "Environment should met first");
-  QVERIFY2(QDir(mTestPath).entryList(QDir::Filter::AllEntries).contains("a.txt"), "Environment should met first");
-  // rename b.txt -> A.TXT while {a.txt} already exist in destination
-  const QString onlyCaseDifferName = "A.TXT";
-
-  FileOperatorType::RETURN_TYPE retEle = FileOperation::rename(mTestPath, "b.txt", mTestPath, onlyCaseDifferName);
-  QVERIFY2(retEle.ret != ErrorCode::OK, "should reject this rename and override operation");
 }
 
 void FileOperationExTest::test_executer_return_if_any_cmd_failed() {
