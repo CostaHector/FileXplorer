@@ -62,7 +62,7 @@ class UndoRedoTest : public FileSystemTestSuite {
     UndoRedo ur;
 
     // rename "012.txt" -> "210.txt"
-    BATCH_COMMAND_LIST_TYPE renameCommands1{ACMD::GetInstRENAME(mTestPath, "012.txt", mTestPath, "210.txt")};
+    BATCH_COMMAND_LIST_TYPE renameCommands1{ACMD::GetInstRENAME(mTestPath, "012.txt", "210.txt")};
     QVERIFY2(ur.Do(renameCommands1), "rename \"012.txt\" -> \"210.txt\" should succeed");
     QVERIFY2(!QDir(mTestPath).exists("012.txt"), "file 012.txt should not exist");
     QVERIFY2(QDir(mTestPath).exists("210.txt"), "file 210.txt should exist");
@@ -71,7 +71,7 @@ class UndoRedoTest : public FileSystemTestSuite {
     QVERIFY(!ur.redoAvailable());
 
     // rename "012.txt" -> "210.txt" -> "999.txt"
-    BATCH_COMMAND_LIST_TYPE renameCommands2{ACMD::GetInstRENAME(mTestPath, "210.txt", mTestPath, "999.txt")};
+    BATCH_COMMAND_LIST_TYPE renameCommands2{ACMD::GetInstRENAME(mTestPath, "210.txt", "999.txt")};
     QVERIFY2(ur.Do(renameCommands2), "rename \"210.txt\" -> \"999.txt\" should succeed");
     QVERIFY2(!QDir(mTestPath).exists("210.txt"), "file 210.txt should not exist");
     QVERIFY2(QDir(mTestPath).exists("999.txt"), "file 999.txt should exist");

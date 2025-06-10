@@ -51,7 +51,7 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
           qDebug("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
           break;
         }
-        m_cmds.append(ACMD::GetInstRENAME(subDir.absolutePath(), itemName, folderPath, itemName));
+        m_cmds.append(ACMD::GetInstMV(subDir.absolutePath(), itemName, folderPath));
         m_cmds.append(ACMD::GetInstMOVETOTRASH(folderPath, sub));
         break;
       }

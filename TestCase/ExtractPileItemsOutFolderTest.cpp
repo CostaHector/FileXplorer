@@ -64,9 +64,9 @@ class ExtractPileItemsOutFolderTest : public MyTestSuite {
     using namespace FileOperatorType;
     QCOMPARE(epiof.m_cmds.size(), 11);  // 10 move out commands, 1 remove commands
     QVERIFY(epiof.m_cmds.contains(ACMD::GetInstMOVETOTRASH(curPath, "a_pile")));
-    QVERIFY(epiof.m_cmds.contains(ACMD::GetInstRENAME(curPath + "/a_pile", "name.mp4", curPath, "name.mp4")));
-    QVERIFY(epiof.m_cmds.contains(ACMD::GetInstRENAME(curPath + "/a_pile", "name 10.png", curPath, "name 10.png")));
-    bool ret = epiof.m_cmds.contains(ACMD::GetInstRENAME(curPath + "/a_pile", "name - 10.png", curPath, "name - 10.png"));
+    QVERIFY(epiof.m_cmds.contains(ACMD::GetInstMV(curPath + "/a_pile", "name.mp4", curPath)));
+    QVERIFY(epiof.m_cmds.contains(ACMD::GetInstMV(curPath + "/a_pile", "name 10.png", curPath)));
+    bool ret = epiof.m_cmds.contains(ACMD::GetInstMV(curPath + "/a_pile", "name - 10.png", curPath));
     QVERIFY(!ret);
   }
 };
