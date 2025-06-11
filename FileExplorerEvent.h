@@ -95,9 +95,9 @@ class FileExplorerEvent : public QObject {
   auto on_RemoveDuplicateImages() -> bool;
   auto on_RemoveRedundantItem(RedundantRmv& remover) -> bool;
 
-  auto on_MoveCopyEventSkeleton(const CCMMode::Mode operationName, QString r) -> bool;
-  auto on_MoveTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::CUT_OP, r); }
-  auto on_CopyTo(const QString& r = "") -> bool { return this->on_MoveCopyEventSkeleton(CCMMode::COPY_OP, r); }
+  bool on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString r);
+  bool on_MoveTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::MoveAction, r); }
+  bool on_CopyTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::CopyAction, r); }
 
   MyQFileSystemModel* _fileSysModel;
   ContentPanel* _contentPane;

@@ -15,7 +15,7 @@ class AlertSystem : public QDialog {
 
   void ReadSettings();
   virtual void hideEvent(QHideEvent* event) override;
-  virtual void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent* event) override;
 
   void RefreshWindowIcon();
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
