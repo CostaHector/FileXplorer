@@ -1,6 +1,6 @@
-#include "SceneMixed.h"
+﻿#include "SceneMixed.h"
+#include "ItemsPileCategory.h"
 #include "public/PathTool.h"
-#include "Tools/ItemsPileCategory.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 
@@ -15,7 +15,7 @@ void SetElementIndexFirstIfValueFirst(QStringList& lst) {
     lst.front().swap(*minIt);
   }
 }
-
+// Used for Floating Preview
 QMap<QString, QStringList> ScenesMixed::operator()(const QString& path) {
   QDir mediaDir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
   mediaDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET + TYPE_FILTER::IMAGE_TYPE_SET + TYPE_FILTER::JSON_TYPE_SET);
@@ -39,13 +39,13 @@ bool ScenesMixed::NeedCombine2Folder(const QString& folderNameLhs, const QString
 
   return true;
 }
-
+// Used for Name Ruler
 QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
-  struct ImageName {
+  struct stImg {
     QString baseName;
-    QString extension;
+    QString fullName;
   };
-  QList<ImageName> imageNames;
+  QList<stImg> imageNames;
 
   QMap<QString, QStringList> batches;
 
@@ -55,7 +55,7 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
     SCENE_COMPONENT_TYPE typeEnum = DOT_EXT_2_TYPE.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
     switch (typeEnum) {
       case IMG: {
-        imageNames.append({baseName, ext});
+        imageNames.append({baseName, medName});
         break;
       }
       case VID: {
@@ -76,26 +76,18 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
   }
 
   // classify images into m_img2Name
-  QRegularExpressionMatch result;
-  for (const ImageName& imageName : imageNames) {
-    QString imagefullname = imageName.baseName + imageName.extension;
-    if (batches.contains(imageName.baseName)) {
-      // a part 1.jpg => folder name "a part 1"
-      m_img2Name[imageName.baseName].append(imagefullname);
-      batches[imageName.baseName].append(imagefullname);
-      continue;
+  QRegularExpressionMatch matchResult;
+  for (const stImg& img : imageNames) {
+    QString imgGrpName{img.baseName};
+    if (batches.contains(img.baseName)) {
+      // Poster of a movie "Golden Island part 1.mp4" named "Golden Island part 1.jpg" should be in group "Golden Island part 1"
+    } else if ((matchResult = IMG_PILE_NAME_PATTERN.match(img.baseName)).hasMatch()) {  // ^(.*?)( | - )(\\d{1,3})?$
+      // Screenshot of a movie "Golden Island part 1.mp4" named "Golden Island part 1 0.jpg",  "Golden Island part 1 1.jpg" should be in group "Golden Island part 1"
+      imgGrpName = matchResult.captured(1);
     }
-    if ((result = IMG_PILE_NAME_PATTERN.match(imageName.baseName)).hasMatch()) {
-      // ^(.*?)( | - )(\\d{1,3})?$
-      // a.jpg => folder name "a"
-      // a 1.json
-      // a - 1.json
-      // a.json
-      m_img2Name[result.captured(1)].append(imagefullname);
-      batches[result.captured(1)].append(imagefullname);
-      continue;
-    }
-    batches[imageName.baseName].append(imagefullname);
+    // Image is neither a post nor a screenshot of a movie should be in a seperate group
+    m_img2Name[imgGrpName].append(img.fullName);
+    batches[imgGrpName].append(img.fullName);
   }
 
   if (batches.size() > 1) {

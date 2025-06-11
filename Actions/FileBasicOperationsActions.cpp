@@ -1,7 +1,9 @@
 ﻿#include "FileBasicOperationsActions.h"
 #include "FileOperation/ComplexOperation.h"
 #include "public/MemoryKey.h"
+#include "public/PublicTool.h"
 #include "public/PublicVariable.h"
+#include <QToolBar>
 #include <QApplication>
 #include <QStyle>
 
@@ -36,8 +38,8 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   COPY_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY);
 
   using namespace ComplexOperation;
-  FILE_STRUCTURE_QRY_BEFORE_PASTE = new (std::nothrow) QAction{QIcon(":img/PASTE_ITEM"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::QUERY]};
-  FILE_STRUCTURE_KEEP = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_KEEP"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::KEEP]};
+  FILE_STRUCTURE_QRY_BEFORE_PASTE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_QUERY"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::QUERY]};
+  FILE_STRUCTURE_PRESERVE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_PRESERVE"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::PRESERVE]};
   FILE_STRUCTURE_FLATTEN = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_FLATTEN"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::FLATTEN]};
   FILE_STRUCTURE_AGS = FileStructureActions();
 
@@ -332,16 +334,16 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
 }
 
 QActionGroup* FileBasicOperationsActions::FileStructureActions() {
-  FILE_STRUCTURE_QRY_BEFORE_PASTE->setToolTip("Query file structure before each paste operation.");
+  FILE_STRUCTURE_QRY_BEFORE_PASTE->setToolTip("Query file structure before procceed each paste operation.");
   FILE_STRUCTURE_QRY_BEFORE_PASTE->setCheckable(true);
-  FILE_STRUCTURE_KEEP->setToolTip("Set keep file structure by default");
-  FILE_STRUCTURE_KEEP->setCheckable(true);
+  FILE_STRUCTURE_PRESERVE->setToolTip("Set preserve file structure by default");
+  FILE_STRUCTURE_PRESERVE->setCheckable(true);
   FILE_STRUCTURE_FLATTEN->setToolTip("Set flatten file structure by default");
   FILE_STRUCTURE_FLATTEN->setCheckable(true);
 
   auto* FILE_STRUCTURE_AGS = new (std::nothrow) QActionGroup{this};
   FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_QRY_BEFORE_PASTE);
-  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_KEEP);
+  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_PRESERVE);
   FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_FLATTEN);
   FILE_STRUCTURE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
@@ -359,6 +361,30 @@ QActionGroup* FileBasicOperationsActions::FileStructureActions() {
 
   connect(FILE_STRUCTURE_AGS, &QActionGroup::triggered, &ComplexOperation::SetDefaultFileStructMode);
   return FILE_STRUCTURE_AGS;
+}
+
+QToolBar* FileBasicOperationsActions::GetFolderOperationModeTb(QWidget* parent) {
+  auto* folderOperationModeTB = new (std::nothrow) QToolBar{"File System Structure Mode", parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(folderOperationModeTB);
+  folderOperationModeTB->setOrientation(Qt::Orientation::Vertical);
+  folderOperationModeTB->addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
+  folderOperationModeTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  folderOperationModeTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  folderOperationModeTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(folderOperationModeTB->layout(), Qt::AlignmentFlag::AlignLeft);
+  return folderOperationModeTB;
+}
+
+QToolBar* FileBasicOperationsActions::GetCutCopyPasteTb(QWidget* parent) {
+  auto* cutCopyPaste = new (std::nothrow) QToolBar{"Copy/Cut/Paste", parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(cutCopyPaste);
+  cutCopyPaste->setOrientation(Qt::Orientation::Vertical);
+  cutCopyPaste->addActions(g_fileBasicOperationsActions().FILE_STRUCTURE_AGS->actions());
+  cutCopyPaste->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  cutCopyPaste->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  cutCopyPaste->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(cutCopyPaste->layout(), Qt::AlignmentFlag::AlignLeft);
+  return cutCopyPaste;
 }
 
 FileBasicOperationsActions& g_fileBasicOperationsActions() {
