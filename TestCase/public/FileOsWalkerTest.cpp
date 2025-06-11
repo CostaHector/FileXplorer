@@ -1,31 +1,25 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/PathRelatedTool.h"
 #include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/TDir.h"
 #include "public/FileOsWalker.h"
-
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_FileOsWalker";
 
 class FileOsWalkerTest : public MyTestSuite {
   Q_OBJECT
  public:
-  FileOsWalkerTest() : MyTestSuite{false} {}
+  FileOsWalkerTest() : MyTestSuite{false}, mRootpath{mDir.path()} {}
+  TDir mDir;
+  const QString mRootpath;
  private slots:
-  void init() {
-    // under path test/TestEnv_FileOsWalker, there are 3 item(s) in total as follow:
-    // ABC - DEF - name sc.1
-    // -  ABC - DEF - name sc.1.m
-    // ABC - DEF - name sc.1.txt
-    QVERIFY(QFile::exists(rootpath));
-    QVERIFY(QFile::exists(rootpath + "\\ABC - DEF - name sc.1"));
-    QVERIFY(QFile::exists(rootpath + "\\ABC - DEF - name sc.1\\ABC - DEF - name sc.1.m"));
-    QVERIFY(QFile::exists(rootpath + "\\ABC - DEF - name sc.1.txt"));
+  void initTestCase() {
+    QVERIFY(mDir.touch("ABC - DEF - name sc.1/ABC - DEF - name sc.1.m", ""));
+    QVERIFY(mDir.touch("ABC - DEF - name sc.1.txt", ""));
   }
 
   void test_FileOsWalker_WithSub() {
     const QStringList rels{"ABC - DEF - name sc.1",  //
                            "ABC - DEF - name sc.1.txt"};
-    FileOsWalker fow{rootpath, false};
+    FileOsWalker fow{mRootpath, false};
     const bool includeDirectory = true;
     fow(rels, includeDirectory);
 
@@ -44,11 +38,11 @@ class FileOsWalkerTest : public MyTestSuite {
   }
 
   void test_FileOsWalker_WithNoSub() {
-    const QString pre = rootpath;
+    const QString pre = mRootpath;
     const QStringList rels{"ABC - DEF - name sc.1",  //
                            "ABC - DEF - name sc.1.txt"};
     const bool includeDirectory = false;
-    FileOsWalker fow{rootpath, false};
+    FileOsWalker fow{mRootpath, false};
     fow(rels, includeDirectory);
 
     const QStringList relToNames{"",  //
@@ -67,7 +61,7 @@ class FileOsWalkerTest : public MyTestSuite {
     const QStringList rels{"ABC - DEF - name sc.1",  //
                            "ABC - DEF - name sc.1.txt"};
     const bool suffixInsideFilename = true;
-    FileOsWalker fow{rootpath, suffixInsideFilename};
+    FileOsWalker fow{mRootpath, suffixInsideFilename};
     const bool includeDirectory = true;
     fow(rels, includeDirectory);
 

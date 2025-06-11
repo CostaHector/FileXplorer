@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 
 #include "pub/MyTestSuite.h"
@@ -103,6 +103,5 @@ class VideosDurationGetterTest : public MyTestSuite {
   //  }
 };
 
-// QTEST_MAIN(VideosDurationGetterTest)
 #include "VideosDurationGetterTest.moc"
 VideosDurationGetterTest g_VideosDurationGetterTest;
