@@ -1,10 +1,9 @@
-#ifndef RIGHTCLICKMENUACTIONS_H
+﻿#ifndef RIGHTCLICKMENUACTIONS_H
 #define RIGHTCLICKMENUACTIONS_H
 
 #include <QObject>
 #include <QAction>
 class RightClickMenuActions : public QObject {
-  Q_OBJECT
  public:
   explicit RightClickMenuActions(QObject *parent = nullptr);
 

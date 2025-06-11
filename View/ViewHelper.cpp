@@ -23,7 +23,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
   const QList<QUrl>& urls = data->urls();
   qWarning("DropAction[%d] %d item(s) will be dropped in path[%s].", action, urls.size(), qPrintable(dest));
   using namespace ComplexOperation;
-  int ret = DoDropAction(action, urls, dest, ComplexOperation::FILE_STRUCTURE_MODE::KEEP);
+  int ret = DoDropAction(action, urls, dest, ComplexOperation::FILE_STRUCTURE_MODE::PRESERVE);
   if (ret < 0) {
     LOG_WARN("Drop into partial failed", dest);
     return false;

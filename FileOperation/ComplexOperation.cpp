@@ -57,7 +57,7 @@ BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths
       QString name = PathTool::GetPrepathAndFileName(pth, prepath);
       lst.append(ACMD::GetInstMV(prepath, name, dest));
     }
-  } else if (mode == FILE_STRUCTURE_MODE::KEEP) {
+  } else if (mode == FILE_STRUCTURE_MODE::PRESERVE) {
     QString rootPath;
     QStringList rel2Selections;  // indirect or direct
     std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
@@ -82,7 +82,7 @@ BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths
         lst.append(ACMD::GetInstCPFILE(prepath, name, dest));
       }
     }
-  } else if (mode == FILE_STRUCTURE_MODE::KEEP) {
+  } else if (mode == FILE_STRUCTURE_MODE::PRESERVE) {
     QString rootPath;
     QStringList rel2Selections;  // indirect or direct
     std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
