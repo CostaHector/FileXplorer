@@ -34,7 +34,7 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
 
     const RETURN_TYPE returnEle = LAMBDA_TABLE[cmds.op](cmds.lst);
     if (!returnEle) {
-      qCritical("Error: %s", qPrintable(cmds.toStr(returnEle.ret)));
+      qCritical("[Error]%s", qPrintable(cmds.toStr(returnEle.ret)));
       return RETURN_TYPE{returnEle.ret, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
     }
 

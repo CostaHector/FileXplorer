@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 #include "pub/MyTestSuite.h"
 #include "Tools/Classify/SceneMixed.h"
@@ -6,6 +6,7 @@
 class ScenesMixedTest : public MyTestSuite {
   Q_OBJECT
  public:
+  ScenesMixedTest() : MyTestSuite{false} {}
  private slots:
   void test_basicFileNames() {
     QStringList files;
@@ -29,11 +30,14 @@ class ScenesMixedTest : public MyTestSuite {
 
     // in ascii table ' ' = 0x20, ' ' = 0x2E
     // but here we want length shorter rather than ascii less
-    QStringList imgsSorted{"X-Man - The Last Stand.jpg", "X-Man - The Last Stand.png", "X-Man - The Last Stand 1.png", "X-Man - The Last Stand 33.png"};
+    const QStringList imgsSorted{"X-Man - The Last Stand.jpg",    //
+                                 "X-Man - The Last Stand.png",    //
+                                 "X-Man - The Last Stand 1.png",  //
+                                 "X-Man - The Last Stand 33.png"};
     QCOMPARE(sMixed.m_img2Name["X-Man - The Last Stand"], imgsSorted);
   }
 
-  void test_VideoWithoutPartNumber() {
+  void test_video_without_part_number() {
     QStringList files;
     files << "Tarzan.mp4"
           << "Tarzan.mkv"
@@ -68,7 +72,7 @@ class ScenesMixedTest : public MyTestSuite {
     QCOMPARE(sMixed.m_json2Name["another Tarzan"], "another Tarzan.json");
   }
 
-  void test_FolderNameNotStartWith_notCombine() {
+  void test_video_poster_images_sceenshot_images() {
     QStringList files;
     files << "Superman - The Inked Meat Part 1.mp4"
           << "Superman - The Inked Meat Part 1.json"
@@ -97,8 +101,9 @@ class ScenesMixedTest : public MyTestSuite {
     QCOMPARE(sMixed.m_img2Name["Superman - The Inked Meat Part 2"], part2SortedLst);
   }
 
-  void test_folder2NameStartWithFolder1_folder2HasJson_NotCombine() {
-    // both part 1 and part 2 have a json file, no combine
+  void test_folder2_contains_json_no_need_combined() {
+    // folder 2 start with folder 1
+    // both folder 1 and folder 2 have a json file, no need combine
     QStringList files;
     files << "Captain America - Henry Carvill, Chris Evans.json"
           << "Captain America - Henry Carvill, Chris Evans.mp4"
@@ -117,8 +122,9 @@ class ScenesMixedTest : public MyTestSuite {
     QCOMPARE(sMixed.m_img2Name.size(), 1);
   }
 
-  void test_folder2NameStartWithFolder1_folder2NoJson_Combine2Front() {
-    // part 1 and part 2 share a json file
+  void test_folder2_contains_no_json_combined_2_front_ok() {
+    // folder 2 start with folder 1
+    // folder 1, folder 2 share a json file
     QStringList files;
     files << "Captain America - Henry Carvill, Chris Evans.json"
           << "Captain America - Henry Carvill, Chris Evans.mp4"
@@ -139,7 +145,7 @@ class ScenesMixedTest : public MyTestSuite {
     QVERIFY(sMixed.m_img2Name.contains("Captain America - Henry Carvill, Chris Evans"));
   }
 
-  void test_VidAndFoldersMixed() {
+  void test_videos_and_folder_mixed() {
     QStringList vidAndFolders;
     vidAndFolders << "a078d0708b9ed65258070434c23b14cd66b34256"
                   << "a078d0708b9ed65258070434c23b14cd66b34276"
@@ -150,7 +156,7 @@ class ScenesMixedTest : public MyTestSuite {
     QCOMPARE(folder2Items.size(), 4);
   }
 
-  void test_folderWithoutJson_CombinedToFront() {
+  void test_folder_without_json_combined_to_front_ok() {
     QStringList aMovie;
     aMovie << "MovieName - Micheal, Jensen Ankles.mp4"
            << "MovieName - Micheal, Jensen Ankles.avi"
@@ -165,15 +171,15 @@ class ScenesMixedTest : public MyTestSuite {
     QCOMPARE(folder2Items["MovieName - Micheal, Jensen Ankles"].size(), 6);
   }
 
-  void test_imgNameWithIndex_chop_index() {
+  void test_imgName_with_index_chop_index() {
     QStringList imgs;
-    imgs << "Name 1.png"                          // Name
-         << "Name - 1.png"                        // Name
-         << "Name 1 - 1.png"                      // Name 1
-         << "Name - 1 - 1.png"                    // Name - 1
-         << "LE - Sporty - Malik, King.png"       // LE - Sporty - Malik, King
-         << "LE - Sporty - Malik, King - 1.png"   // LE - Sporty - Malik, King
-         << "LE - Sporty - Malik, King - 2.png";  // LE - Sporty - Malik, King
+    imgs << "Name 1.png"                                  // Name
+         << "Name - 1.png"                                // Name
+         << "Name 1 - 1.png"                              // Name 1
+         << "Name - 1 - 1.png"                            // Name - 1
+         << "Fox - Sporty - Chris Evans, Henry.png"       // Fox - Sporty - Chris Evans, Henry
+         << "Fox - Sporty - Chris Evans, Henry - 1.png"   // Fox - Sporty - Chris Evans, Henry
+         << "Fox - Sporty - Chris Evans, Henry - 2.png";  // Fox - Sporty - Chris Evans, Henry
     ScenesMixed sMixed;
     const auto& folder2Items = sMixed(imgs);
     QCOMPARE(folder2Items.size(), 2);
@@ -181,8 +187,8 @@ class ScenesMixedTest : public MyTestSuite {
     QVERIFY(folder2Items.contains("Name"));
     QCOMPARE(folder2Items["Name"].size(), 4);
 
-    QVERIFY(folder2Items.contains("LE - Sporty - Malik, King"));
-    QCOMPARE(folder2Items["LE - Sporty - Malik, King"].size(), 3);
+    QVERIFY(folder2Items.contains("Fox - Sporty - Chris Evans, Henry"));
+    QCOMPARE(folder2Items["Fox - Sporty - Chris Evans, Henry"].size(), 3);
   }
 };
 
