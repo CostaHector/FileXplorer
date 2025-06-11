@@ -1,4 +1,4 @@
-#include "PropertiesWindow.h"
+﻿#include "PropertiesWindow.h"
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -16,9 +16,9 @@
 
 const QString PropertiesWindow::STRING_SPLITTER{60, '-'};
 
-PropertiesWindow::PropertiesWindow(QWidget* parent) : QDialog{parent} {
-  m_propertiesInfoTextEdit->setFont(QFont("Consolas"));
-
+PropertiesWindow::PropertiesWindow(QWidget* parent)  //
+    : QDialog{parent}                                //
+{
   m_propertyTB = g_propertiesWindowAct().getPropertiesToolBar(this);
 
   m_mainLo->addWidget(m_propertyTB);
@@ -27,9 +27,11 @@ PropertiesWindow::PropertiesWindow(QWidget* parent) : QDialog{parent} {
 
   subscribe();
   setWindowFlags(Qt::Window);  // show maximize, minimize button at title bar
-  setWindowIcon(QIcon(":img/PROPERTIES"));
 
+  layout()->setSpacing(0);
+  layout()->setContentsMargins(0, 0, 0, 0);
   ReadSetting();
+  setWindowIcon(QIcon(":img/PROPERTIES"));
 }
 
 bool PropertiesWindow::UpdateMessage() {
@@ -80,9 +82,9 @@ void PropertiesWindow::InitFileIndentifierInfo() {
 
 bool PropertiesWindow::operator()(const QStringList& items) {
   m_items = items;
-  setWindowTitle(QString("Property | [%1] item(s)").arg(m_items.first()));
+  setWindowTitle(QString("Property | [%1] item(s)").arg(m_items.size()));
   if (m_items.isEmpty()) {
-    m_propertiesInfoTextEdit->setPlainText("nothing item selected");
+    m_propertiesInfoTextEdit->setPlainText("Nothing selected");
     return true;
   }
   m_commonInfomation.clear();
@@ -138,6 +140,8 @@ void PropertiesWindow::ReadSetting() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
+  static const QFont font{"Consolas", 15};
+  m_propertiesInfoTextEdit->setFont(font);
 }
 
 void PropertiesWindow::showEvent(QShowEvent* event) {
