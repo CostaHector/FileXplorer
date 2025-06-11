@@ -1319,13 +1319,18 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   return remover.Exec();
 }
 
-bool FileExplorerEvent::on_MoveCopyEventSkeleton(const CCMMode::Mode operationName, QString dest) {
+bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString dest) {
   const auto vt = _contentPane->GetCurViewType();
   if (!ViewTypeTool::isFSView(vt)) {
     LOG_WARN("[Move/Copy to] only available on FileSytemView", QString::number((int)vt));
     return false;
   }
-  const char* const pOperationNameStr = CCMMode::MCCL2STR[operationName];
+  static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{
+      {Qt::DropAction::CopyAction, "COPY"},
+      {Qt::DropAction::MoveAction, "MOVE"},
+      {Qt::DropAction::IgnoreAction, "IGNORE"}
+  };
+  const QString& pOperationNameStr = DROP_ACTION_2_STR.value(dropAct, "IGNORE");
   auto* view = _contentPane->GetCurView();
   if (!view->selectionModel()->hasSelection()) {
     LOG_INFO("Select Some File/Folder First", pOperationNameStr);
@@ -1341,16 +1346,14 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const CCMMode::Mode operationNa
   }
 
   Qt::DropAction dropAction{Qt::DropAction::IgnoreAction};
-  if (operationName == CCMMode::CUT_OP) {
+  if (dropAct == Qt::DropAction::MoveAction) {
     PreferenceSettings().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name,  //
                                   MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY));
-    dropAction = Qt::DropAction::MoveAction;
-  } else if (operationName == CCMMode::COPY_OP) {
+  } else if (dropAct == Qt::DropAction::CopyAction) {
     PreferenceSettings().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
                                   MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
-    dropAction = Qt::DropAction::CopyAction;
   } else {
-    qDebug("OperationName[%s] is invalid", CCMMode::MCCL2STR[operationName]);
+    qDebug("DropAction[%d] is invalid", (int)dropAct);
     return false;
   }
 
@@ -1359,7 +1362,7 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const CCMMode::Mode operationNa
     lRels.append(_fileSysModel->filePath(ind));
   }
   using namespace ComplexOperation;
-  int ret = DoDropAction(dropAction, lRels, dest, FILE_STRUCTURE_MODE::KEEP);
+  int ret = DoDropAction(dropAction, lRels, dest, FILE_STRUCTURE_MODE::PRESERVE);
   if (ret < 0) {
     LOG_BAD(pOperationNameStr, "Failed. See details in logs");
     return false;
@@ -1374,7 +1377,7 @@ bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUC
   msgBox->setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Apply);
 
   msgBox->button(QMessageBox::StandardButton::Apply)->setText("Keep");
-  msgBox->button(QMessageBox::StandardButton::Apply)->setIcon(QIcon(":img/FILE_STRUCTURE_KEEP"));
+  msgBox->button(QMessageBox::StandardButton::Apply)->setIcon(QIcon(":img/FILE_STRUCTURE_PRESERVE"));
   msgBox->button(QMessageBox::StandardButton::Apply)->setStyleSheet(SUBMIT_BTN_STYLE);
 
   msgBox->button(QMessageBox::StandardButton::Yes)->setText("Flatten");
@@ -1385,7 +1388,7 @@ bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUC
   const auto ret = msgBox->exec();
   switch (ret) {
     case QMessageBox::StandardButton::Apply: {
-      mode = ComplexOperation::FILE_STRUCTURE_MODE::KEEP;
+      mode = ComplexOperation::FILE_STRUCTURE_MODE::PRESERVE;
       break;
     }
     case QMessageBox::StandardButton::Yes: {

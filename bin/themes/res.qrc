@@ -135,8 +135,9 @@
 <file alias="REFRESH_SEARCH_SOURCE">RightClickIcon/REFRESH_SEARCH_SOURCE.svg</file>
 <file alias="_SEARCH_IN_NET_EXPLORER">RightClickIcon/_SEARCH_IN_NET_EXPLORER.svg</file>
 <file alias="EXPORT_TO">RightClickIcon/EXPORT_TO.svg</file>
+<file alias="FILE_STRUCTURE_QUERY">RightClickIcon/FILE_STRUCTURE_QUERY.svg</file>
 <file alias="FILE_STRUCTURE_FLATTEN">RightClickIcon/FILE_STRUCTURE_FLATTEN.svg</file>
-<file alias="FILE_STRUCTURE_KEEP">RightClickIcon/FILE_STRUCTURE_KEEP.svg</file>
+<file alias="FILE_STRUCTURE_PRESERVE">RightClickIcon/FILE_STRUCTURE_PRESERVE.svg</file>
 
 <!--JsonEditor Icon here        -->
 <file alias="JSON_EDITOR">JsonEditor/JSON_EDITOR.png</file>
@@ -206,6 +207,8 @@
 <file alias="PRODUCTION_STUDIOS_LIST_FILE">NameStrIcon/PRODUCTION_STUDIOS_LIST_FILE.svg</file>
 <file alias="PERFORMER_AKA_LIST_FILE">NameStrIcon/PERFORMER_AKA_LIST_FILE.svg</file>
 <file alias="SHOW_PERFORMER_STUDIO_STATISTIC">NameStrIcon/SHOW_PERFORMER_STUDIO_STATISTIC.svg</file>
+<file alias="COPY_TEXT">NameStrIcon/COPY_TEXT.svg</file>
+<file alias="COMMAND_PREVIEW">NameStrIcon/COMMAND_PREVIEW.svg</file>
 
 <!--PreferenceIcons icon here-->
 <file alias="BACKGROUND_IMAGE_PATH">PreferenceIcons/BACKGROUND_IMAGE_PATH.ico</file>
@@ -227,7 +230,7 @@
 <file alias="LEFT_TO_RIGHT">PreferenceIcons/LEFT_TO_RIGHT.png</file>
 <file alias="TOP_TO_BOTTOM">PreferenceIcons/TOP_TO_BOTTOM.png</file>
 <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
-<file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.png</file>
+<file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.svg</file>
 <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
 
 <!--Style icon here-->

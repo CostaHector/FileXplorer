@@ -8,6 +8,7 @@
 #include "public/StyleSheet.h"
 #include "Component/Notificator.h"
 #include "Tools/RenameNamesUnique.h"
+#include "CommandsPreview.h"
 
 constexpr char AdvanceRenamer::NAME_SEP;
 
@@ -39,8 +40,6 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   CHECK_NULLPTR_RETURN_VOID(m_nExtTE)
   m_buttonBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help};
   CHECK_NULLPTR_RETURN_VOID(m_buttonBox)
-  m_commandsPreview = new (std::nothrow) QPlainTextEdit;
-  CHECK_NULLPTR_RETURN_VOID(m_commandsPreview)
 
   m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
   auto* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok);
@@ -48,6 +47,7 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
                          .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
   pOkBtn->setStyleSheet(SUBMIT_BTN_STYLE);
+  m_buttonBox->button(QDialogButtonBox::Help)->setIcon(QIcon(":img/COMMAND_PREVIEW"));
   m_buttonBox->button(QDialogButtonBox::Help)->setText("See commands...");
 
   m_mainLayout = new (std::nothrow) QVBoxLayout();
@@ -164,18 +164,22 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   renameHelper();
   if (!renameHelper) {
     const QString& rejectMsg = renameHelper.Details();
-    qWarning("Cannot do rename commands[%s]", qPrintable(rejectMsg));
-    Notificator::badNews("Cannot do rename commands", rejectMsg);
+    LOG_BAD("Cannot do rename commands", rejectMsg);
     return false;
   }
-  const auto& reversedcmds(renameHelper.getRenameCommands());  // rename files first, than its folders;
-
+  // rename files first, than its folders;
+  using namespace FileOperatorType;
+  const BATCH_COMMAND_LIST_TYPE& reversedcmds(renameHelper.getRenameCommands());
   if (isOnlyHelp) {
-    for (const auto& cmd : reversedcmds) {
+    if (m_commandsPreview == nullptr) {
+      m_commandsPreview = new (std::nothrow) CommandsPreview{};
+      CHECK_NULLPTR_RETURN_FALSE(m_commandsPreview);
+    }
+    m_commandsPreview->clear();
+    for (const ACMD& cmd : reversedcmds) {
       m_commandsPreview->appendPlainText(cmd.toStr());
     }
     m_commandsPreview->setWindowTitle(QString("Rename names unique | Total %1 Command(s)").arg(reversedcmds.size()));
-    m_commandsPreview->setMinimumWidth(1024);
     m_commandsPreview->raise();
     m_commandsPreview->show();
     return true;
@@ -183,13 +187,15 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   bool isAllSuccess = g_undoRedo.Do(reversedcmds);
   if (isInterative) {
     if (isAllSuccess) {
-      qInfo("Batch rename ok %d command(s).", reversedcmds.size());
-      Notificator::goodNews("Batch rename ok", QString("%1 command(s).").arg(reversedcmds.size()));
+      LOG_GOOD("Batch commands rename ok", QString::number(reversedcmds.size()));
+    } else {
+      LOG_BAD("Batch commands partially failed", "See details in log");
     }
   }
   close();
   return isAllSuccess;
 }
+
 void AdvanceRenamer::onRegex(const int regexState) {
   const bool isRegexEnabled{regexState == Qt::Checked};
   PreferenceSettings().setValue(MemoryKey::RENAMER_REGEX_ENABLED.name, isRegexEnabled);
