@@ -67,20 +67,6 @@ const QStringList BUILTIN_COMPRESSED_TYPE_SET = {"*.qz"};
 const QStringList HAR_TYPE_SET = {"*.har"};
 }  // namespace TYPE_FILTER
 
-class CCMMode {
- public:
-  enum Mode {
-    MERGE_OP = 0,  //
-    COPY_OP = 1,   //
-    CUT_OP = 2,    //
-    LINK_OP = 3,   //
-    ERROR_OP = 4,  //
-    BUTT
-  };
-  static constexpr int MCCL2STR_MAX_LEN = 20;
-  static const char MCCL2STR[BUTT][MCCL2STR_MAX_LEN];
-};
-
 #include <QRegularExpression>
 namespace JSON_RENAME_REGEX {
 const QRegularExpression INVALID_CHARS_IN_FILENAME{R"([#\\/:*?<>|])", QRegularExpression::OptimizeOnFirstUsageOption};  // #\/:*?<>|

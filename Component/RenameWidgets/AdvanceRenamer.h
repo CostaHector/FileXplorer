@@ -1,4 +1,4 @@
-#ifndef ADVANCERENAMER_H
+﻿#ifndef ADVANCERENAMER_H
 #define ADVANCERENAMER_H
 
 #include <QCheckBox>
@@ -24,7 +24,7 @@ class AdvanceRenamer : public QDialog {
   explicit AdvanceRenamer(QWidget* parent = nullptr);
 
   void showEvent(QShowEvent* event) override;
-  virtual void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent* event) override;
   void ReadSettings();
 
   void init();
