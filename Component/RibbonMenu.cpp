@@ -141,16 +141,8 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(moveCopyItemsToTB->layout(), Qt::AlignmentFlag::AlignTop);
   }
 
-  QToolBar* fileSystemStructureWayToolBar = new (std::nothrow) QToolBar{"File System Structure Way"};
-  CHECK_NULLPTR_RETURN_NULLPTR(fileSystemStructureWayToolBar);
-  {
-    fileSystemStructureWayToolBar->setOrientation(Qt::Orientation::Vertical);
-    fileSystemStructureWayToolBar->addActions(g_fileBasicOperationsActions().FILE_STRUCTURE_AGS->actions());
-    fileSystemStructureWayToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    fileSystemStructureWayToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-    fileSystemStructureWayToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
-    SetLayoutAlightment(fileSystemStructureWayToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-  }
+  QToolBar* cutCopyPasterTb = g_fileBasicOperationsActions().GetCutCopyPasteTb();
+  QToolBar* folderOpModeTb = g_fileBasicOperationsActions().GetFolderOperationModeTb();
 
   QToolButton* recycleItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
   recycleItemsTB->setDefaultAction(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN);
@@ -215,8 +207,11 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(propertiesTB);
   leafHomeWid->addSeparator();
+  leafHomeWid->addWidget(folderOpModeTb);
+  leafHomeWid->addSeparator();
+  leafHomeWid->addWidget(cutCopyPasterTb);
+  leafHomeWid->addSeparator();
   leafHomeWid->addWidget(moveCopyItemsToTB);
-  leafHomeWid->addWidget(fileSystemStructureWayToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(recycleItemsTB);
   leafHomeWid->addWidget(renameItemsTB);

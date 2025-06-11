@@ -76,7 +76,7 @@ class ComplexOperationTest : public MyTestSuite {
 
   void test_cut_keep() {  //
     ComplexMove cm;
-    BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::KEEP);
+    BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::PRESERVE);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
         ACMD::GetInstMV(rootpath, "a/a1/a11.txt", dest),  //
@@ -128,7 +128,7 @@ class ComplexOperationTest : public MyTestSuite {
   }
   void test_copy_keep() {  //
     ComplexCopy cm;
-    BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::KEEP);
+    BATCH_COMMAND_LIST_TYPE actualCmds = cm.To(absPaths, dest, FILE_STRUCTURE_MODE::PRESERVE);
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
         ACMD::GetInstCPFILE(rootpath, "a/a1/a11.txt", dest),  //

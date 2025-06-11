@@ -3,6 +3,8 @@ CONFIG += qt warn_on depend_includepath testcase
 CONFIG += c++11
 win32 {
     LIBS += -ldwmapi
+    LIBS += -lshlwapi
+    # target_link_libraries(project_name Shlwapi) in CMakeLists
 }
 
 TEMPLATE = app
@@ -21,6 +23,7 @@ SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(public/Memory/*.cpp)
 SOURCES += $$files(FileOperation/*.cpp)
 SOURCES += $$files(Tools/FileDescriptor/*.cpp)
+SOURCES += $$files(Tools/Classify/*.cpp)
 SOURCES += $$files(Tools/Json/*.cpp)
 
 SOURCES += \
@@ -32,19 +35,16 @@ SOURCES += \
     Component/Notificator.cpp \
     Component/QuickWhereClause.cpp \
     Component/RenameWidgets/AdvanceRenamer.cpp \
+    Component/RenameWidgets/CommandsPreview.cpp \
     Component/StateLabel.cpp \
     Component/SyncModifiyFileSystem.cpp \
     Component/JsonEditorWidget/LineEditCSV.cpp \
     Tools/AIMediaDuplicate.cpp \
-    Tools/Classify/ItemsClassifier.cpp \
-    Tools/Classify/SceneMixed.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/LowResImgsRemover.cpp \
     Tools/ExtractPileItemsOutFolder.cpp \
     Tools/FilesNameBatchStandardizer.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
-    Tools/ItemsPileCategory.cpp \
-    Tools/ItemsPileCategory.cpp \
     Tools/LongPathFinder.cpp \
     Tools/MD5Calculator.cpp \
     Tools/NameSectionArrange.cpp \
@@ -71,6 +71,7 @@ HEADERS += $$files(public/*.h)
 HEADERS += $$files(public/Memory/*.h)
 HEADERS += $$files(FileOperation/*.h)
 HEADERS += $$files(Tools/FileDescriptor/*.h)
+SOURCES += $$files(Tools/Classify/*.h)
 HEADERS += $$files(Tools/Json/*.h)
 
 HEADERS += \
@@ -82,19 +83,16 @@ HEADERS += \
     Component/Notificator.h \
     Component/QuickWhereClause.h \
     Component/RenameWidgets/AdvanceRenamer.h \
+    Component/RenameWidgets/CommandsPreview.h \
     Component/StateLabel.h \
     Component/SyncModifiyFileSystem.h \
     Component/JsonEditorWidget/LineEditCSV.h \
     Tools/AIMediaDuplicate.h \
-    Tools/Classify/ItemsClassifier.h \
-    Tools/Classify/SceneMixed.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/LowResImgsRemover.h \
     Tools/ExtractPileItemsOutFolder.h \
     Tools/FilesNameBatchStandardizer.h \
     Tools/FolderNxtAndLastIterator.h \
-    Tools/ItemsPileCategory.h \
-    Tools/ItemsPileCategory.h \
     Tools/LongPathFinder.h \
     Tools/MD5Calculator.h \
     Tools/NameSectionArrange.h \
