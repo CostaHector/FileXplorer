@@ -6,6 +6,7 @@
 #include <QObject>
 
 struct KV;
+class QToolBar;
 
 class FileBasicOperationsActions : public QObject {
  public:
@@ -50,7 +51,8 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* MOVE_TO_PATH_HISTORY{nullptr};
   QActionGroup* COPY_TO_PATH_HISTORY{nullptr};
 
-  QAction *FILE_STRUCTURE_QRY_BEFORE_PASTE{nullptr}, *FILE_STRUCTURE_KEEP{nullptr}, *FILE_STRUCTURE_FLATTEN{nullptr};
+  QToolBar* GetFolderOperationModeTb(QWidget* parent=nullptr);
+  QAction *FILE_STRUCTURE_QRY_BEFORE_PASTE{nullptr}, *FILE_STRUCTURE_PRESERVE{nullptr}, *FILE_STRUCTURE_FLATTEN{nullptr};
   QActionGroup* FILE_STRUCTURE_AGS{nullptr};
   QActionGroup* FileStructureActions();
 
@@ -60,6 +62,7 @@ class FileBasicOperationsActions : public QObject {
   QAction *UNDO_OPERATION{nullptr}, *REDO_OPERATION{nullptr};
   QActionGroup* UNDO_REDO_RIBBONS{nullptr};
 
+  QToolBar* GetCutCopyPasteTb(QWidget* parent=nullptr);
   QAction *CUT{nullptr}, *COPY{nullptr}, *PASTE{nullptr};
   QActionGroup* CUT_COPY_PASTE{nullptr};
 

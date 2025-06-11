@@ -1,4 +1,4 @@
-#ifndef REDUNDANTFOLDERREMOVE_H
+﻿#ifndef REDUNDANTFOLDERREMOVE_H
 #define REDUNDANTFOLDERREMOVE_H
 #include "FileOperation/FileOperatorPub.h"
 class RedundantRmv {
@@ -14,8 +14,9 @@ class RedundantRmv {
 
   operator QString() const {
     QString s;
-    for (const auto& l : m_cmds) {
-      s += (l.toStr() + '|');
+    for (const auto& cmd : m_cmds) {
+      s += cmd.toStr();
+      s += '\n';
     }
     return s;
   }
