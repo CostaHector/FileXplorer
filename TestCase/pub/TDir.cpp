@@ -1,7 +1,15 @@
 ﻿#include "TDir.h"
 #include "public/PathTool.h"
-
 #include <QTextStream>
+
+bool FsNodeEntry::operator==(const FsNodeEntry& rhs) const {
+  return relativePathToNode == rhs.relativePathToNode && isDir == rhs.isDir && (!isDir && contents == rhs.contents);
+}
+
+bool FsNodeEntry::operator<(const FsNodeEntry& rhs) const {
+  return relativePathToNode < rhs.relativePathToNode;
+}
+
 bool CreateAFile(const QString& absFilePath, const QByteArray& contents) {
   QFile file{absFilePath};
   if (!file.open(QIODevice::WriteOnly)) {
@@ -12,12 +20,55 @@ bool CreateAFile(const QString& absFilePath, const QByteArray& contents) {
   return true;
 }
 
+#ifdef _WIN32
+#include <shlwapi.h>  // PathFindFileNameW needed
+bool EntryExistsWindowsCaseSensitive(const QString& path, QDir::Filters filter = QDir::NoFilter) {
+  const std::wstring wPath = path.toStdWString();
+  LPCWSTR inputPath = wPath.c_str();
+  WIN32_FIND_DATAW findData;
+  HANDLE hFind = FindFirstFileW(inputPath, &findData);
+  if (hFind == INVALID_HANDLE_VALUE) {  // entry not exist
+    return false;
+  }
+  FindClose(hFind);
+  if (filter == QDir::Filter::NoFilter) {  // files or dirs
+    return true;
+  }
+  if (bool(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)  //
+      != (filter == QDir::Filter::Dirs)) {                        //
+    return false;                                                 // type not match, need dir but here is file
+  }
+  const std::wstring& actualName = PathFindFileNameW(findData.cFileName);
+  const std::wstring& inputName = PathFindFileNameW(inputPath);
+  return inputName == actualName;
+}
+#endif
+
 TDir::TDir() : mTempPath{mTempDir.path()}, mDir{mTempPath} {
   if (!IsValid()) {
     // dir.path() returns the unique directory path
     qWarning("mTempDir is invalid");
     return;
   }
+}
+
+int TDir::createEntries(const QList<FsNodeEntry>& entries) {
+  if (entries.isEmpty()) {
+    return 0;
+  }
+  int filesCreatedSucceedCnt{0}, filesEntryCnt{0};
+  int folderCreatedSucceedCnt{0}, foldersEntryCnt{0};
+  for (const auto& entry : entries) {
+    if (entry.isDir) {
+      ++foldersEntryCnt;
+      folderCreatedSucceedCnt += mkpath(entry.relativePathToNode);
+    } else {
+      ++filesEntryCnt;
+      filesCreatedSucceedCnt += touch(entry.relativePathToNode, entry.contents);
+    }
+  }
+  qDebug("Files:%d/%d, Folders:%d/%d created succeed", filesEntryCnt, filesCreatedSucceedCnt, foldersEntryCnt, folderCreatedSucceedCnt);
+  return filesCreatedSucceedCnt + folderCreatedSucceedCnt;
 }
 
 bool TDir::touch(const QString& relativePathToFile, const QByteArray& contents) const {
@@ -44,26 +95,32 @@ bool TDir::touch(const QString& relativePathToFile, const QByteArray& contents) 
   }
   return CreateAFile(fileAbsPath, contents);
 }
-// for bWinCaseSensitive=true, file cannot be relative
+
 bool TDir::fileExists(const QString& file, bool bWinCaseSensitive) const {
   if (file.isEmpty()) {
     return false;
   }
   const QString absFilePath{mTempPath + '/' + file};
 #ifdef _WIN32
-  return bWinCaseSensitive ? mDir.entryList(QDir::Filter::Files).contains(file) : QFileInfo{absFilePath}.isFile();
+  if (!bWinCaseSensitive) {
+    return QFileInfo{absFilePath}.isFile();
+  }
+  return EntryExistsWindowsCaseSensitive(QDir::toNativeSeparators(absFilePath), QDir::Filter::Files);
 #else  // in linux always case-sensitive
   return QFileInfo{absFilePath}.isFile();
 #endif
 }
-// for bWinCaseSensitive=true, folder cannot be relative
+
 bool TDir::dirExists(const QString& folder, bool bWinCaseSensitive) const {
   if (folder.isEmpty()) {
     return false;
   }
   const QString absFilePath{mTempPath + '/' + folder};
 #ifdef _WIN32
-  return bWinCaseSensitive ? mDir.entryList(QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot).contains(folder) : QFileInfo{absFilePath}.isDir();
+  if (!bWinCaseSensitive) {
+    return QFileInfo{absFilePath}.isDir();
+  }
+  return EntryExistsWindowsCaseSensitive(QDir::toNativeSeparators(absFilePath), QDir::Filter::Dirs);
 #else  // in linux always case-sensitive
   return QFileInfo{absFilePath}.isDir();
 #endif
