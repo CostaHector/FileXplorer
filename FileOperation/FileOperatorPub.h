@@ -115,13 +115,16 @@ struct ACMD {
     return op == FILE_OPERATOR_E::OPERATOR_BUTT || lst.isEmpty();
   }
 
-  QString toStr() const {  //
-    return FILE_OPERATOR_TO_STR[op] + ":" + lst.join(';');
+  QString toStr() const {
+    if (lst.isEmpty()) {
+      return FILE_OPERATOR_TO_STR[op] + "[]";
+    }
+    return FILE_OPERATOR_TO_STR[op] + "[\"" + lst.join(R"(",")") + "\"]";
+  }
+  QString toStr(ErrorCode code) const {  //
+    return FILE_OPERATOR_ERROR_TO_STR[code] + ':' + toStr();
   }
 
-  QString toStr(ErrorCode code) const {  //
-    return '[' + FILE_OPERATOR_ERROR_TO_STR[code] + ']' + FILE_OPERATOR_TO_STR[op] + ":" + lst.join(';');
-  }
   bool operator==(const ACMD& rhs) const;
 };
 
@@ -142,8 +145,6 @@ struct RETURN_TYPE {
 };
 
 BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_TYPE& rhs);
-
-QString BatchCommands2String(const BATCH_COMMAND_LIST_TYPE& cmds);
 
 }  // namespace FileOperatorType
 

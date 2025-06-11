@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg version="1.1" id="Uploaded to svgrepo.com" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 width="800px" height="800px" viewBox="0 0 32 32" xml:space="preserve">
+<style type="text/css">
+	.flatshadows_een{fill:#FDFFFF;}
+	.flatshadows_twee{fill:#E1E5E5;}
+	.flatshadows_drie{fill:#C4CCCC;}
+	.flatshadows_vijf{fill:#8D9999;}
+	.st0{fill:#A3AFAF;}
+	.st1{fill:#C4CCCC;}
+	.st2{fill:#404041;}
+	.st3{fill:#737F7F;}
+</style>
+<g>
+	<path class="flatshadows_twee" d="M16,2C8.268,2,2,8.268,2,16s6.268,14,14,14s14-6.268,14-14S23.732,2,16,2z"/>
+	<circle class="flatshadows_een" cx="16" cy="16" r="12"/>
+	<path class="flatshadows_twee" d="M15,25l2.844,2.844c5.287-0.818,9.432-5.075,10.064-10.421c-3.572-3.572-6.761-6.761-7.666-7.666
+		c-0.018-0.018-0.038-0.024-0.057-0.042C19.105,8.658,17.632,8,16,8c-3.314,0-6,2.686-6,6l5,4.995V22l1,1h-1V25z"/>
+	<g>
+		<g>
+			<rect x="15" y="23" class="flatshadows_vijf" width="2" height="2"/>
+			<path class="flatshadows_vijf" d="M22,14c0-3.314-2.686-6-6-6s-6,2.686-6,6h2c0-2.209,1.791-4,4-4s4,1.791,4,4
+				c0,2.209-1.791,4-4,4h-1v4h2v-2.09C19.837,19.433,22,16.972,22,14z"/>
+		</g>
+		<g>
+			<rect x="15" y="23" class="flatshadows_vijf" width="2" height="2"/>
+			<path class="flatshadows_vijf" d="M22,14c0-3.314-2.686-6-6-6s-6,2.686-6,6h2c0-2.209,1.791-4,4-4s4,1.791,4,4
+				c0,2.209-1.791,4-4,4h-1v4h2v-2.09C19.837,19.433,22,16.972,22,14z"/>
+		</g>
+	</g>
+	<path class="flatshadows_vijf" d="M22,14c0-3.314-2.686-6-6-6s-6,2.686-6,6h2c0-2.209,1.791-4,4-4s4,1.791,4,4c0,2.209-1.791,4-4,4
+		h-1v4h2v-2.09C19.837,19.433,22,16.972,22,14z"/>
+	<path class="flatshadows_drie" d="M27.908,17.423c-0.633,5.346-4.777,9.603-10.064,10.421l1.689,1.689
+		c5.017-1.307,8.933-5.315,10.099-10.386C29.052,18.567,28.476,17.991,27.908,17.423z"/>
+</g>
+</svg>
