@@ -17,7 +17,7 @@ namespace FileOperation {
 
 using namespace FileOperatorType;
 
-RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand) {
+RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
   typedef std::function<RETURN_TYPE(const QStringList&)> FILE_OPERATION_FUNC;
   static const FILE_OPERATION_FUNC LAMBDA_TABLE[FILE_OPERATOR_E::OPERATOR_BUTT]{
 #define FILE_OPERATOR_KEY_ITEM(enu, val, func, FACTORY_PARAMS, FACTORY_ARGVS) func,
@@ -38,16 +38,6 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_T
       return RETURN_TYPE{returnEle.ret, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
     }
 
-    if (cmds.op == MOVETOTRASH && !srcCommand.isEmpty()) {  // name in trashbin is now changed compared with last time in trashbin
-      if (returnEle.size() > 1) {
-        qCritical("moveToTrash recover commands count[%d] can only <= 1", returnEle.size());
-        return {UNKNOWN_ERROR, {}};
-      } else if (returnEle.size() == 1) {
-        srcCommand.rbegin()[i] = returnEle[0];
-      } else {
-        srcCommand.rbegin()[i].clear();
-      }
-    }
     recoverList += returnEle;
   }
   // in-place reverse
