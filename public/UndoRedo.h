@@ -5,20 +5,14 @@
 #include "FileOperation/FileOperatorPub.h"
 #include <utility>
 
-struct OperationStream {
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE doCmd;
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE recoverCmd;
-};
 
 class UndoRedo {
  public:
-  using UNDO_REDO_RETURN = std::pair<bool, OperationStream>;
-
   bool Do(const FileOperatorType::BATCH_COMMAND_LIST_TYPE& cmd);
 
-  UNDO_REDO_RETURN Undo();
+  bool Undo();
 
-  UNDO_REDO_RETURN Redo();
+  bool Redo();
 
   inline bool undoAvailable() { return !undoList.isEmpty(); }
 
@@ -34,8 +28,7 @@ class UndoRedo {
   static bool on_Undo();
   static bool on_Redo();
 
-  QStack<OperationStream> undoList;
-  QStack<OperationStream> redoList;
+  QStack<FileOperatorType::BATCH_COMMAND_LIST_TYPE> undoList, redoList;
 };
 
 extern UndoRedo g_undoRedo;
