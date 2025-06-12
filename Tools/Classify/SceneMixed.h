@@ -1,4 +1,4 @@
-#ifndef SCENES_MIXED_H
+﻿#ifndef SCENES_MIXED_H
 #define SCENES_MIXED_H
 
 #include <QString>
@@ -16,7 +16,7 @@ class ScenesMixed {
   QMap<QString, QStringList> m_vid2Name;
   QMap<QString, QString> m_json2Name;
  private:
-  bool NeedCombine2Folder(const QString& folderNameLhs, const QString& folderNameRhs);
+  bool NeedCombine2Folder(const QString& folderNameLhs, const QString& folderNameRhs) const;
 };
 
 #endif
