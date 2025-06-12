@@ -219,7 +219,7 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
   COPY_THE_PATH->setShortcutVisibleInContextMenu(true);
 
   COPY_RECORDS->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_C));
-  COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> <b>Copy the selected records, especially name, size, and prepath").arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
+  COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected records, especially name, size, and prepath").arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
   COPY_RECORDS->setShortcutVisibleInContextMenu(true);
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
