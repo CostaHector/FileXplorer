@@ -32,15 +32,13 @@ BATCH_COMMAND_LIST_TYPE syncExecuterconst(const BATCH_COMMAND_LIST_TYPE& aBatch)
 }
 
 bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
-  BATCH_COMMAND_LIST_TYPE srcCommand;
-  auto exeRetEle = FileOperation::executer(cmd, srcCommand);
+  RETURN_TYPE exeRetEle = FileOperation::executer(cmd);
 
   BATCH_COMMAND_LIST_TYPE syncCmd;
   if (SyncModifiyFileSystem::m_syncModifyFileSystemSwitch) {
     syncCmd = syncExecuterconst(cmd);
     if (!syncCmd.isEmpty()) {
-      BATCH_COMMAND_LIST_TYPE syncSrcCommand;
-      const auto& syncRetEle = FileOperation::executer(syncCmd, syncSrcCommand);
+      const auto& syncRetEle = FileOperation::executer(syncCmd);
       if (!syncRetEle) {
         qWarning("sync commands failed");
       }
@@ -48,7 +46,7 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
       exeRetEle.cmds = syncRetEle.cmds + exeRetEle.cmds;
     }
   }
-  undoList.append(OperationStream{cmd + syncCmd, exeRetEle.cmds});
+  undoList.append(exeRetEle.cmds);
   return (bool)exeRetEle;
 }
 
@@ -57,7 +55,7 @@ bool UndoRedo::on_Undo() {
     qInfo("[skip] Nothing to undo");
     return true;
   }
-  const bool isAllSucceed = g_undoRedo.Undo().first;
+  const bool isAllSucceed = g_undoRedo.Undo();
   const char* undoMsg = isAllSucceed ? "All undo succeed" : "Some undo failed.";
   qDebug("%s", undoMsg);
   return isAllSucceed;
@@ -68,31 +66,33 @@ bool UndoRedo::on_Redo() {
     qInfo("[skip] Nothing to redo");
     return true;
   }
-  const bool isAllSucceed = g_undoRedo.Redo().first;
+  const bool isAllSucceed = g_undoRedo.Redo();
   const char* redoMsg = isAllSucceed ? "All redo succeed" : "Some redo failed.";
   qDebug("%s", redoMsg);
   return isAllSucceed;
 }
 
-UndoRedo::UNDO_REDO_RETURN UndoRedo::Undo() {
+bool UndoRedo::Undo() {
   if (!undoAvailable()) {
     qDebug("Skip Cannot undo");
-    return {true, OperationStream{}};
+    return true;
   }
-  OperationStream ele = undoList.pop();
-  const auto& exeRetEle = FileOperation::executer(ele.recoverCmd, ele.doCmd);
-  redoList.append(ele);  // you can not just update do_cmd in ele. Because it is not equivelant as rmfile has no recover
+  const BATCH_COMMAND_LIST_TYPE& undoEles = undoList.top();
+  const RETURN_TYPE& redoEles = FileOperation::executer(undoEles);
+  undoList.pop();
+  redoList.append(std::move(redoEles.cmds));  // you can not just update do_cmd in ele. Because it is not equivelant as rmfile has no recover
   // compromise method: when pass the do_cmd list into it
-  return {(bool)exeRetEle, ele};
+  return (bool)redoEles;
 }
 
-UndoRedo::UNDO_REDO_RETURN UndoRedo::Redo() {
+bool UndoRedo::Redo() {
   if (!redoAvailable()) {
     qDebug("Skip Cannot redo");
-    return {true, OperationStream()};
+    return true;
   }
-  OperationStream ele = redoList.pop();
-  const auto& exeRetEle = FileOperation::executer(ele.doCmd, ele.recoverCmd);
-  undoList.append(ele);
-  return {(bool)exeRetEle, ele};
+  const BATCH_COMMAND_LIST_TYPE& redoEles = redoList.top();
+  const RETURN_TYPE& undoEles = FileOperation::executer(redoEles);
+  redoList.pop();
+  undoList.append(std::move(undoEles.cmds));
+  return (bool)undoEles;
 }
