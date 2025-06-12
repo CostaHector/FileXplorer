@@ -37,7 +37,6 @@ SOURCES += \
     Component/RenameWidgets/AdvanceRenamer.cpp \
     Component/RenameWidgets/CommandsPreview.cpp \
     Component/StateLabel.cpp \
-    Component/SyncModifiyFileSystem.cpp \
     Component/JsonEditorWidget/LineEditCSV.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
@@ -64,6 +63,7 @@ SOURCES += \
     Tools/LogHandler.cpp \
     Tools/FileSystemItemFilter.cpp \
     Tools/RedunImgLibs.cpp \
+    Tools/SyncModifiyFileSystem.cpp \
 
 HEADERS += $$files(TestCase/pub/*.h)
 HEADERS += $$files(TestCase/*.h)
@@ -73,6 +73,7 @@ HEADERS += $$files(FileOperation/*.h)
 HEADERS += $$files(Tools/FileDescriptor/*.h)
 SOURCES += $$files(Tools/Classify/*.h)
 HEADERS += $$files(Tools/Json/*.h)
+HEADERS += $$files(Tools/*.h)
 
 HEADERS += \
     Actions/QuickWhereActions.h \
@@ -85,7 +86,6 @@ HEADERS += \
     Component/RenameWidgets/AdvanceRenamer.h \
     Component/RenameWidgets/CommandsPreview.h \
     Component/StateLabel.h \
-    Component/SyncModifiyFileSystem.h \
     Component/JsonEditorWidget/LineEditCSV.h \
     Tools/AIMediaDuplicate.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
@@ -112,6 +112,7 @@ HEADERS += \
     Tools/LogHandler.h \
     Tools/FileSystemItemFilter.h \
     Tools/RedunImgLibs.h \
+    Tools/SyncModifiyFileSystem.h \
 
 DISTFILES += \
     readme.md
