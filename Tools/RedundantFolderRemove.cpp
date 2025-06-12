@@ -36,7 +36,8 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
   }
   QDir dir{folderPath, "", QDir::SortFlag::NoSort, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
   const int dirNameLen = dir.dirName().size();
-  for (const QString& sub : dir.entryList()) {
+  const QStringList folders{dir.entryList()};
+  for (const QString& sub : folders) {
     QDir subDir{dir.absoluteFilePath(sub), "", QDir::SortFlag::NoSort, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot};
     switch (subDir.count()) {
       case 0: {
@@ -46,7 +47,7 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
       }
       case 1: {
         // 1 file folder and delta(length)>TOLERANCE_LETTER_CNT => no recycle
-        const QString& itemName = dir.entryList().front();
+        const QString& itemName = folders.front();
         if (std::abs(itemName.size() - dirNameLen) > TOLERANCE_LETTER_CNT) {
           qDebug("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
           break;

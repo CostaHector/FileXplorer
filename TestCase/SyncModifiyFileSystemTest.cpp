@@ -2,7 +2,7 @@
 #include <QtTest>
 #include "pub/MyTestSuite.h"
 // add necessary includes here
-#include "Component/SyncModifiyFileSystem.h"
+#include "Tools/SyncModifiyFileSystem.h"
 
 class SyncModifiyFileSystemTest : public MyTestSuite {
   Q_OBJECT
