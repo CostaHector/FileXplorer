@@ -85,7 +85,7 @@ int ExtractPileItemsOutFolder::operator()(const QString& path,                  
     }
     itemsExtractedOutCnt += filesExtractedCnt;
     // recycle path + '/' + folderName
-    m_cmds.append(ACMD::GetInstMOVETOTRASH(path, folderName));
+    m_cmds.append(ACMD::GetInstRMDIR(path, folderName));
     ++foldersNeedExtractCnt;
     qDebug("Extract %d pile item(s) out of folder[%s]", files.size(), qPrintable(it.key()));
   }

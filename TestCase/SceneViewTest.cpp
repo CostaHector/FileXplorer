@@ -7,12 +7,12 @@
 #include "TestCase/pub/TDir.h"
 
 using namespace SceneInfoManager;
-QList<FsNodeEntry> gEntryNodes;
 
 class SceneViewTest : public MyTestSuite {
   Q_OBJECT
  public:
   SceneViewTest() : MyTestSuite{false} {}
+  QList<FsNodeEntry> gEntryNodes;
  private slots:
   void initTestCase() {
     // somejsonfile1.json

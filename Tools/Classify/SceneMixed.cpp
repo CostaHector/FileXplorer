@@ -22,18 +22,18 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QString& path) {
   return operator()(mediaDir.entryList());
 }
 
-bool ScenesMixed::NeedCombine2Folder(const QString& folderNameLhs, const QString& folderNameRhs) {
-  // lhs: a
-  // rhs: a part 2 contains not json file
-  if (folderNameLhs.size() >= folderNameRhs.size()) {
+bool ScenesMixed::NeedCombine2Folder(const QString& srcGrpName, const QString& dstGrpName) const {
+  // srcGrpName: movie
+  // dstGrpName: movie part 2. and contains no json file
+  if (dstGrpName.size() >= srcGrpName.size()) {
     return false;
   }
 
-  if (!folderNameRhs.startsWith(folderNameLhs)) {
+  if (!srcGrpName.startsWith(dstGrpName)) {
     return false;
   }
 
-  if (m_json2Name.contains(folderNameRhs)) {
+  if (m_json2Name.contains(srcGrpName)) {
     return false;
   }
 
@@ -91,31 +91,28 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
   }
 
   if (batches.size() > 1) {
-    auto it1 = batches.begin();
-    auto it2 = it1 + 1;
-    while (it1 != it2 && it1 != batches.end() && it2 != batches.end()) {
-      // combine items in it2 into it1
-      const QString& it1FolderName = it1.key();
-      const QString& it2FolderName = it2.key();
-      bool needCombine = NeedCombine2Folder(it1FolderName, it2FolderName);
-      if (!needCombine) {
+    static const auto merge2ValuesInMapByKey = [](decltype(batches)& mp, const QString& srcKey, const QString& destKey) {
+      auto srcIt = mp.find(srcKey);
+      if (srcIt == mp.end()) {
+        return;
+      }
+      mp[destKey] += std::move(srcIt.value()); // if no destKey in mp, then default construct mp[destKey] to QStringList{}
+      mp.erase(srcIt);
+    };
+
+    auto it1 = batches.begin(); // dst
+    auto it2 = it1 + 1; // src
+    while (it2 != batches.end()) {
+      const QString& srcKey{it2.key()};
+      const QString& dstKey{it1.key()};
+      if (!NeedCombine2Folder(srcKey, dstKey)) {
         ++it1;
         ++it2;
         continue;
       }
-
-      auto tmpImgIt = m_img2Name.find(it2FolderName);
-      if (tmpImgIt != m_img2Name.end()) {
-        m_img2Name[it1FolderName] += tmpImgIt.value();
-        m_img2Name.erase(tmpImgIt);
-      }
-      auto tmpVidIt = m_vid2Name.find(it2FolderName);
-      if (tmpVidIt != m_vid2Name.end()) {
-        m_vid2Name[it1FolderName] += tmpVidIt.value();
-        m_vid2Name.erase(tmpVidIt);
-      }
-
-      it1.value() += it2.value();
+      merge2ValuesInMapByKey(m_img2Name, srcKey, dstKey);
+      merge2ValuesInMapByKey(m_vid2Name, srcKey, dstKey);
+      it1.value() += std::move(it2.value());
       it2 = batches.erase(it2);
     }
   }
