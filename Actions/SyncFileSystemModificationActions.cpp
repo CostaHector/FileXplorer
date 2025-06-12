@@ -1,5 +1,5 @@
-#include "SyncFileSystemModificationActions.h"
-#include "Component/SyncModifiyFileSystem.h"
+﻿#include "SyncFileSystemModificationActions.h"
+#include "Tools/SyncModifiyFileSystem.h"
 #include "public/PublicVariable.h"
 
 SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {
