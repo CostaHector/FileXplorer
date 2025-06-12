@@ -22,13 +22,14 @@ class TDir {
   bool IsValid() const { return mTempDir.isValid(); }
 
   int createEntries(const QList<FsNodeEntry>& entries);
+  QList<FsNodeEntry> getEntries(const QDir::Filters filters = QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, bool bFileContentMatter = false) const;
   bool touch(const QString& relativePathToFile, const QByteArray& contents = "") const;
   bool mkdir(const QString& folderName) const { return mDir.mkdir(folderName); }
   bool mkpath(const QString& dirPath) const { return mDir.mkpath(dirPath); }
   bool exists(const QString& path2Item) const { return mDir.exists(path2Item); }
   bool fileExists(const QString& file, bool bWinCaseSensitive = false) const;
   bool dirExists(const QString& folder, bool bWinCaseSensitive = false) const;
-  QStringList entryList(QDir::Filters filters = QDir::NoFilter, QDir::SortFlags sort = QDir::NoSort) const;
+  QStringList entryList(const QDir::Filters filters = QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, const QDir::SortFlags sort = QDir::NoSort) const;
   QString path() const { return mTempPath; }
   QString itemPath(const QString& itemName) const { return mTempPath + '/' + itemName; };
 

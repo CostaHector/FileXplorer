@@ -1,9 +1,10 @@
 ﻿#include "TDir.h"
 #include "public/PathTool.h"
 #include <QTextStream>
+#include <QDirIterator>
 
 bool FsNodeEntry::operator==(const FsNodeEntry& rhs) const {
-  return relativePathToNode == rhs.relativePathToNode && isDir == rhs.isDir && (!isDir && contents == rhs.contents);
+  return relativePathToNode == rhs.relativePathToNode && isDir == rhs.isDir && (isDir || contents == rhs.contents);
 }
 
 bool FsNodeEntry::operator<(const FsNodeEntry& rhs) const {
@@ -18,6 +19,14 @@ bool CreateAFile(const QString& absFilePath, const QByteArray& contents) {
   file.write(contents);
   file.close();
   return true;
+}
+
+QByteArray ReadAFile(const QString& absFilePath) {
+  QFile file{absFilePath};
+  if (!file.open(QIODevice::ReadOnly)) {
+    return {};
+  }
+  return file.readAll();
 }
 
 #ifdef _WIN32
@@ -69,6 +78,26 @@ int TDir::createEntries(const QList<FsNodeEntry>& entries) {
   }
   qDebug("Files:%d/%d, Folders:%d/%d created succeed", filesEntryCnt, filesCreatedSucceedCnt, foldersEntryCnt, folderCreatedSucceedCnt);
   return filesCreatedSucceedCnt + folderCreatedSucceedCnt;
+}
+
+QList<FsNodeEntry> TDir::getEntries(const QDir::Filters filters, bool bFileContentMatter) const {
+  if (!IsValid()) {
+    return {};
+  }
+  QList<FsNodeEntry> ans;
+  QDirIterator it{mTempPath, {}, filters, QDirIterator::IteratorFlag::Subdirectories};
+  int n = mTempPath.size() + 1;
+  while (it.hasNext()) {
+    const QString absPath = it.next();
+    bool isDir = it.fileInfo().isDir();
+    if (isDir || bFileContentMatter) {
+      ans.append({absPath.mid(n), isDir, {}});
+      continue;
+    }
+    ans.append({absPath.mid(n), false, ReadAFile(absPath)});
+  }
+  std::sort(ans.begin(), ans.end());
+  return ans;
 }
 
 bool TDir::touch(const QString& relativePathToFile, const QByteArray& contents) const {
@@ -126,6 +155,6 @@ bool TDir::dirExists(const QString& folder, bool bWinCaseSensitive) const {
 #endif
 }
 
-QStringList TDir::entryList(QDir::Filters filters, QDir::SortFlags sort) const {
+QStringList TDir::entryList(const QDir::Filters filters, const QDir::SortFlags sort) const {
   return mDir.entryList(filters, sort);
 }
