@@ -1,8 +1,8 @@
-#include <QtTest>
+﻿#include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/PathRelatedTool.h"
 #include "TestCase/pub/OnScopeExit.h"
 #include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/TDir.h"
 #include "Tools/Json/JsonHelper.h"
 #include "Tools/Json/JsonPr.h"
 #include "Tools/CastManager.h"
@@ -11,17 +11,55 @@
 #include "public/PathTool.h"
 #include "public/PublicMacro.h"
 
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_JsonCastStudio";
-const QString fixedJsonName = "SuperMan - Henry Cavill.json";
-const QString fixedJsonBaseName = "SuperMan - Henry Cavill";
-const QString newJsonName = "SuperMan - Chris Evans.json";
-const QString occupiedJsonName = "My Good Boy.json";
-const QString fixedAbsPath = rootpath + '/' + fixedJsonName;
 class JsonPrTest : public MyTestSuite {
   Q_OBJECT
  public:
   JsonPrTest() : MyTestSuite{false} {}
+  TDir mDir;
+  QString rootpath{mDir.path()};
+  QList<FsNodeEntry> gNodeEntries;
+  const QString fixedJsonName = "SuperMan - Henry Cavill.json";
+  const QString fixedJsonBaseName = "SuperMan - Henry Cavill";
+  const QString newJsonName = "SuperMan - Chris Evans.json";
+  const QString occupiedJsonName = "My Good Boy.json";
+  const QString fixedAbsPath{rootpath + '/' + fixedJsonName};
  private slots:
+  void initTestCase() {
+    static const char JSON_CONTENTS[]{R"({
+    "Bitrate": "",
+    "Cast": [
+        "Cast1NotExist",
+        "Cast2NotExist"
+    ],
+    "Detail": "This is just a json example.",
+    "Duration": 0,
+    "Hot": [
+    ],
+    "Name": "My Good Boy",
+    "Rate": 4,
+    "Resolution": "720p",
+    "Size": "126113854",
+    "Studio": "StudioNotExist",
+    "Tags": [
+        "nonporn"
+    ],
+    "Uploaded": "20231022"
+}
+)"};
+    QVERIFY(mDir.IsValid());
+    gNodeEntries = QList<FsNodeEntry>  //
+        {
+            FsNodeEntry{"cast_list.txt", false, {}},                    //
+            FsNodeEntry{"My Good Boy.json", false, JSON_CONTENTS},      //
+            FsNodeEntry{"studio_list.txt", false, {}},                  //
+            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},    //
+            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},  //
+            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},      //
+            FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
+        };
+    mDir.createEntries(gNodeEntries);
+  }
+
   void init() {
     QFile fixedJsonFile{fixedAbsPath};
     if (fixedJsonFile.size() != 0) {
@@ -284,7 +322,6 @@ class JsonPrTest : public MyTestSuite {
     const QString& expectStudio{"Paramount Pictures"};
     const QStringList& expectCast{"Chris Evans", "Chris Hemsworth", "Keanu Reeves"};
 
-
     jr.m_Name = expectName;
     // construct first time, change
     QVERIFY(jr.ConstructCastStudioValue());
@@ -390,4 +427,3 @@ class JsonPrTest : public MyTestSuite {
 
 #include "JsonPrTest.moc"
 JsonPrTest gJsonPrTest;
-
