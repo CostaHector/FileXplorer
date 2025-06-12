@@ -28,30 +28,54 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(retEle.cmds.isEmpty());  // not_recoverable
   }
 
-  void test_rmpath() {
-    // protect_remove_parent
+  void test_mkpath_direct_or_relative_path_ok() {
+    TDir dir;
+    QVERIFY(dir.IsValid());
+    const QString workPath{dir.path()};
+
+    QVERIFY(!QFile::exists(workPath + "srcPathInexist"));
+    const auto& mkpath_a_failed = FileOperation::mkpath(workPath + "srcPathInexist", "a");
+    QCOMPARE(mkpath_a_failed.ret, ErrorCode::DST_DIR_INEXIST);
+    // direct:
+    const auto& mkpath_a_Ok = FileOperation::mkpath(workPath, "a");
+    QCOMPARE(mkpath_a_Ok.ret, ErrorCode::OK);
+    QCOMPARE(mkpath_a_Ok.cmds.size(), 1);
+
+    const auto& mkpath_a_a1_Ok = FileOperation::mkpath(workPath, "a/a1");
+    QCOMPARE(mkpath_a_a1_Ok.ret, ErrorCode::OK);
+    QCOMPARE(mkpath_a_a1_Ok.cmds.size(), 1);
+
+    const auto& mkpath_a_a1_again_Ok = FileOperation::mkpath(workPath, "a/a1");
+    QCOMPARE(mkpath_a_a1_again_Ok.ret, ErrorCode::OK);
+    QCOMPARE(mkpath_a_a1_again_Ok.cmds.size(), 0);
+
+    // relative:
+    const auto& mkpath_b_b1_b2_in_1_time_Ok = FileOperation::mkpath(workPath, "b/b1/b2");
+    QCOMPARE(mkpath_b_b1_b2_in_1_time_Ok.ret, ErrorCode::OK);
+    QCOMPARE(mkpath_b_b1_b2_in_1_time_Ok.cmds.size(), 3);
+  }
+
+  void test_rmpath_direct_file_no_side_effect() {
     // a
     // a/a1
-    // a/a1.txt
     TDir dir;
-    QVERIFY(dir.touch("a/a1/a2.txt", "contents in a/a1/a2.txt"));
-    QVERIFY(dir.mkpath("protect_remove_parent"));
+    QVERIFY(dir.touch("a/a1.txt", "contents in a/a1.txt"));
     const QString workPath{dir.path()};
 
     // a/a1
-    // cannot remove at all because there is "a2.txt" under "a/a1"
-    const auto& rmpthFailed = FileOperation::rmpath(workPath, "a/a1");
-    QCOMPARE(rmpthFailed.ret, CANNOT_REMOVE_PATH);
-    QVERIFY(dir.fileExists("a/a1/a2.txt", false));
+    // cannot remove at all because there is "a1.txt" under "a"
+    const auto& rmpthFailed = FileOperation::rmpath(workPath, "a");
+    QCOMPARE(rmpthFailed.ret, CANNOT_REMOVE_DIR);
+    QVERIFY(dir.fileExists("a/a1.txt", false));
 
     // remove the file
-    QVERIFY(QDir{workPath}.remove("a/a1/a2.txt"));
+    QVERIFY(QDir{workPath}.remove("a/a1.txt"));
     // a
     // a/a1
     // can remove both
-    // parent contains protect_remove_parent.txt, will not remove parent
-    const auto& rmpthok = FileOperation::rmpath(workPath, "a/a1");
+    const auto& rmpthok = FileOperation::rmpath(workPath, "a");
     QCOMPARE(rmpthok.ret, OK);
+    QVERIFY(QFile::exists(workPath));
     QVERIFY(!dir.dirExists("a", false));
 
     auto aBatch = rmpthok.cmds;
@@ -62,18 +86,54 @@ class FileOperationTest : public MyTestSuite {
 
     const auto& rmpthRecOk = FileOperation::executer(reversedaBatch, srcCommand);
     QCOMPARE(rmpthRecOk.ret, OK);
+    QVERIFY(QFile::exists(workPath));  // no unintended side effect. this folder should keep here
+    QVERIFY(dir.dirExists("a", false));
+  }
+
+  void test_rmpath_relative_path_no_side_effectn() {
+    // a
+    // a/a1
+    // a/a1.txt
+    TDir dir;
+    QVERIFY(dir.touch("a/a1/a2.txt", "contents in a/a1/a2.txt"));
+    const QString workPath{dir.path()};
+
+    // a/a1
+    // cannot remove at all because there is "a2.txt" under "a/a1"
+    const auto& rmpthFailed = FileOperation::rmpath(workPath, "a/a1");
+    QCOMPARE(rmpthFailed.ret, CANNOT_REMOVE_DIR);
+    QVERIFY(dir.fileExists("a/a1/a2.txt", false));
+
+    // remove the file
+    QVERIFY(QDir{workPath}.remove("a/a1/a2.txt"));
+    // a
+    // a/a1
+    // can remove both
+    const auto& rmpthok = FileOperation::rmpath(workPath, "a/a1");
+    QCOMPARE(rmpthok.ret, OK);
+    QVERIFY(QFile::exists(workPath));
+    QVERIFY(!dir.dirExists("a/a1", false));
+    QVERIFY(!dir.dirExists("a", false));
+
+    auto aBatch = rmpthok.cmds;
+    QVERIFY(!aBatch.isEmpty());
+
+    BATCH_COMMAND_LIST_TYPE srcCommand;
+    BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
+
+    const auto& rmpthRecOk = FileOperation::executer(reversedaBatch, srcCommand);
+    QCOMPARE(rmpthRecOk.ret, OK);
+    QVERIFY(QFile::exists(workPath));  // no unintended side effect. this folder should keep here
+    QVERIFY(dir.dirExists("a", false));
     QVERIFY(dir.dirExists("a/a1", false));
   }
 
-  void test_rmdir() {
-    // protect_remove_parent
+  void test_rmdir_no_side_effect() {
     // a
     // a/a1
     // a/a1/a2.txt
-
     TDir dir;
     QVERIFY(dir.touch("a/a1/a2.txt", "contents in a/a1/a2.txt"));
-    QVERIFY(dir.mkpath("protect_remove_parent"));
     const QString workPath{dir.path()};
 
     // a/a1
@@ -87,11 +147,11 @@ class FileOperationTest : public MyTestSuite {
     // a
     // a/a1
     // can remove both
-    // parent contains protect_remove_parent.txt, will not remove parent
     const auto& rmDirOk = FileOperation::rmdir(workPath, "a/a1");
     QCOMPARE(rmDirOk.ret, OK);
     QVERIFY(!dir.dirExists("a/a1", false));
     QVERIFY(dir.dirExists("a", false));
+    QVERIFY(QFile::exists(workPath));
 
     auto aBatch = rmDirOk.cmds;
     QVERIFY(!aBatch.isEmpty());
@@ -197,7 +257,7 @@ class FileOperationTest : public MyTestSuite {
     RETURN_TYPE retEle =                                    //
         FileOperation::cpfile(workPath, relativeExistFile,  //
                               QString("%1/b").arg(workPath));
-    auto aBatch = retEle.cmds;
+    const auto& aBatch = retEle.cmds;
 
     QCOMPARE(retEle.ret, ErrorCode::OK);
     QVERIFY(dir.exists(QString("b/%1").arg(relativeExistFile)));
@@ -212,7 +272,7 @@ class FileOperationTest : public MyTestSuite {
 
     QCOMPARE(recoverRet, ErrorCode::OK);
     QVERIFY(dir.exists(relativeExistFile));
-    QVERIFY(!dir.exists("b"));  // "b" was removed by "RMPATH" in reversedaBatch
+    QVERIFY(dir.exists("b"));
   }
 
   void test_inexist_file_copy() {
@@ -593,7 +653,7 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.dirExists(existFolder, false));
     QVERIFY(dir.dirExists(subDir, false));
     QVERIFY(dir.fileExists(subFile, false));
-    QVERIFY(!dir.dirExists("b", false));  // mkpath -> rmpath vice function
+    QVERIFY(dir.dirExists("b", false));
     QVERIFY(!dir.dirExists(QString("b/%1").arg(existFolder), false));
     QVERIFY(!dir.dirExists(QString("b/%1").arg(subDir), false));
     QVERIFY(!dir.fileExists(QString("b/%1").arg(subFile), false));
@@ -640,7 +700,7 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.dirExists(relativeExistFolder, false));
     QVERIFY(dir.dirExists(subDir, false));
     QVERIFY(dir.fileExists(subFile, false));
-    QVERIFY(!dir.dirExists("b", false));  // mkpath->rmpath vice function
+    QVERIFY(dir.dirExists("b", false));
     QVERIFY(!dir.dirExists(QString("b/%1").arg(relativeExistFolder), false));
     QVERIFY(!dir.dirExists(QString("b/%1").arg(subDir), false));
     QVERIFY(!dir.fileExists(QString("b/%1").arg(subFile), false));

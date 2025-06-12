@@ -190,3 +190,26 @@ RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& 
 | home | path/to/a | bin | {path/to} | OK |
 | home | path/to/a | bin | {path/to/a} | windows/linux return DST_FILE_OR_PATH_ALREADY_EXIST |
 | home | path/to/a.txt | bin | {} | OK |
+
+### Table 1.2 rmpath Behavior of mv Functions
+```cpp
+RETURN_TYPE rmpath(const QString& pre, const QString& dirPath)
+```
+| srcPath | relToItem | exist items in srcPath | result |
+|---------|-----------|---------------------------------------------------|--------|
+| home | a/a1 | {a/a1, a/a1/a2.txt} | CANNOT_REMOVE_DIR |
+| home | a/a1 | {a/a1} | OK |
+| home | a | {a/a.txt} | CANNOT_REMOVE_DIR |
+| home | a | {a} | OK |
+
+### Table 1.3 mkpath Behavior of mv Functions
+```cpp
+RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
+```
+| srcPath | relToItem | exist items in srcPath | result |
+|---------|-----------|---------------------------------------------------|--------|
+| home | a/a1 | srcPath not exist | DST_DIR_INEXIST |
+| home | a/a1 | {} | OK |
+| home | a/a1 | {a} | OK |
+| home | a/a1 | {a/a1} | OK |
+| home | a | {} | OK |

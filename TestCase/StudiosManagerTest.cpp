@@ -1,26 +1,27 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/PathRelatedTool.h"
 #include "TestCase/pub/OnScopeExit.h"
+#include "pub/TDir.h"
 #include "pub/MyTestSuite.h"
 // add necessary includes here
 #include "pub/BeginToExposePrivateMember.h"
 #include "Tools/StudiosManager.h"
 #include "pub/EndToExposePrivateMember.h"
 
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_JsonCastStudio";
-const QString gLocalFilePath{rootpath + "/not_exist_studio_list.txt"};
 class StudiosManagerTest : public MyTestSuite {
   Q_OBJECT
-public:
-  StudiosManagerTest() : MyTestSuite{false}, smInLLT{gLocalFilePath} {}
-  StudiosManager smInLLT;
-
-private slots:
-  void cleanup() { QVERIFY(!QFile::exists(gLocalFilePath)); }
+ public:
+  StudiosManagerTest() : MyTestSuite{false} {}
+  TDir mDir;
+  const QString rootpath{mDir.path()};
+  const QString gLocalFilePath{rootpath + "/not_exist_studio_list.txt"};
+  StudiosManager smInLLT{gLocalFilePath};
+  QList<FsNodeEntry> gNodeEntries;
+ private slots:
+  void initTestCase() {}
 
   void test_studio_list_file_not_exist_read_out() {
-    QVERIFY2(!QFile::exists(gLocalFilePath), qPrintable(gLocalFilePath));  // file not exist
+    QVERIFY2(!mDir.exists(gLocalFilePath), qPrintable(gLocalFilePath));  // file not exist
     QVERIFY2(smInLLT.count() == 0, "Studio count in llt should be empty");
   }
 
