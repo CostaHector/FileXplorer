@@ -1,5 +1,6 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
+#include "TestCase/pub/GlbDataProtect.h"
 #include "pub/MyTestSuite.h"
 // add necessary includes here
 #include "Tools/SyncModifiyFileSystem.h"
@@ -18,6 +19,7 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   void cleanupTestCase() { qDebug("End SyncModifiyFileSystemTest..."); }
 
   void test_syncSwitchOff() {
+    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
     syncMod.m_syncModifyFileSystemSwitch = false;
     syncMod.m_alsoSyncReversebackSwitch = true;
     // rename: path/oldItemName => path/newItemName
@@ -27,6 +29,7 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_renameSyncBack() {
+    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
     syncMod.m_syncModifyFileSystemSwitch = true;
     syncMod.m_alsoSyncReversebackSwitch = true;
     // rename: path1/oldItemName => path2/newItemName
@@ -45,6 +48,7 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_renameNoSyncBack() {
+    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
     syncMod.m_syncModifyFileSystemSwitch = true;
     syncMod.m_alsoSyncReversebackSwitch = false;
     // rename: path/oldItemName => path/newItemName
@@ -59,6 +63,7 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_whenSimilarPath() {
+    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
     syncMod.m_syncModifyFileSystemSwitch = true;
     syncMod.m_alsoSyncReversebackSwitch = true;
     syncMod.SetBasicPath("C:/Program Files");
