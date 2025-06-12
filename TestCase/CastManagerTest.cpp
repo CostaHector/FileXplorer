@@ -1,8 +1,8 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 #include "TestCase/pub/GlbDataProtect.h"
 #include "TestCase/pub/OnScopeExit.h"
-#include "TestCase/PathRelatedTool.h"
+#include "TestCase/pub/TDir.h"
 #include "Tools/Json/JsonKey.h"
 #include "Tools/Json/JsonHelper.h"
 #include "pub/MyTestSuite.h"
@@ -14,18 +14,54 @@
 #include "TestCase/pub/EndToExposePrivateMember.h"
 
 #include "public/PublicMacro.h"
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_JsonCastStudio";
-const QString gLocalFilePath{rootpath + "/cast_list.txt"};
-const QString gStudioLocalFilePath{rootpath + "/studio_list.txt"};
 
 class CastManagerTest : public MyTestSuite {
   Q_OBJECT
  public:
-  CastManagerTest() : MyTestSuite{false}, cmInLLT{gLocalFilePath}, smInLLT{gStudioLocalFilePath} {}
-  CastManager cmInLLT;
-  StudiosManager smInLLT;
-
+  CastManagerTest() : MyTestSuite{false} {}
+  TDir mDir;
+  const QString rootpath{mDir.path()};
+  const QString gLocalFilePath{rootpath + "/cast_list.txt"};
+  const QString gStudioLocalFilePath{rootpath + "/studio_list.txt"};
+  QList<FsNodeEntry> gNodeEntries;
+  CastManager cmInLLT{gLocalFilePath};
+  StudiosManager smInLLT{gStudioLocalFilePath};
  private slots:
+  void initTestCase() {
+    static const char JSON_CONTENTS[]{R"({
+    "Bitrate": "",
+    "Cast": [
+        "Cast1NotExist",
+        "Cast2NotExist"
+    ],
+    "Detail": "This is just a json example.",
+    "Duration": 0,
+    "Hot": [
+    ],
+    "Name": "My Good Boy",
+    "Rate": 4,
+    "Resolution": "720p",
+    "Size": "126113854",
+    "Studio": "StudioNotExist",
+    "Tags": [
+        "nonporn"
+    ],
+    "Uploaded": "20231022"
+}
+)"};
+    QVERIFY(mDir.IsValid());
+    gNodeEntries = QList<FsNodeEntry>  //
+        {
+            FsNodeEntry{"cast_list.txt", false, {}},                    //
+            FsNodeEntry{"My Good Boy.json", false, JSON_CONTENTS},      //
+            FsNodeEntry{"studio_list.txt", false, {}},                  //
+            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},    //
+            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},  //
+            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},      //
+            FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
+        };
+    mDir.createEntries(gNodeEntries);
+  }
   void cleanup() {
     QFile fiCast{gLocalFilePath};
     if (fiCast.size() > 0) {  // clear file
@@ -176,14 +212,12 @@ class CastManagerTest : public MyTestSuite {
     const QFile fiStudio{gStudioLocalFilePath};
     QVERIFY(fiStudio.size() > 0);
 
-
     bool castLocalFileWrite{false};
     QCOMPARE(cmInLLT.LearningFromAPath(rootpath, &castLocalFileWrite), 2);
     QCOMPARE(cmInLLT.m_casts, expectCastSet);
     QCOMPARE(castLocalFileWrite, true);
     const QFile fiCast{gLocalFilePath};
     QVERIFY(fiCast.size() > 0);
-
 
     // do it again, nothing new should append
     studioLocalFileWrite = true;

@@ -111,15 +111,32 @@ RETURN_TYPE rmpath(const QString& pre, const QString& dirPath) {
   if (!QFile::exists(pth)) {
     return {};  // already inexists
   }
-  if (!QDir{pre}.rmpath(dirPath)) {
-    return {CANNOT_REMOVE_PATH, {}};
+  BATCH_COMMAND_LIST_TYPE revertCmds;
+  QDir realDir{pre};
+  if (realDir.exists(dirPath)) {
+    if (!realDir.rmdir(dirPath)) {
+      return {CANNOT_REMOVE_DIR, revertCmds};
+    }
+    revertCmds.append(ACMD::GetInstMKDIR(pre, dirPath));
   }
+  int lastSlashIndex = dirPath.lastIndexOf('/');
+  while (lastSlashIndex != -1) {
+    const QString& currentFolder = dirPath.left(lastSlashIndex);
+    if (realDir.exists(currentFolder)) {
+      if (!realDir.rmdir(currentFolder)) {
+        return {CANNOT_REMOVE_DIR, revertCmds};
+      }
+      revertCmds.append(ACMD::GetInstMKDIR(pre, currentFolder));
+    }
+    lastSlashIndex = dirPath.lastIndexOf('/', lastSlashIndex - 1);
+  }
+  return {OK, revertCmds};
+  // in built-in rmpath
   // last level of dirPath is empty, say "home/to/path" contains nothing, removed
   // second to last level of dirPath is empty, say "home/to", contains nothing, removed
   // first level of dirPath is empty, say "home", contains nothing, removed
 
   // rel and subfolder under rel will or be removed
-  return {OK, {ACMD::GetInstMKPATH(pre, dirPath)}};
 }
 
 RETURN_TYPE mkpathAgent(const QStringList& parms) {
@@ -131,18 +148,39 @@ RETURN_TYPE mkpathAgent(const QStringList& parms) {
   return FileOperation::mkpath(pre, rel);
 }
 
+ErrorCode mkpathCore(const QString& pre, const QString& dirPath, BATCH_COMMAND_LIST_TYPE& revertCmds) {
+  QDir preDir{pre};
+  int firstIndexOfSlash = dirPath.indexOf('/');
+  while (firstIndexOfSlash != -1) {
+    const QString& currentFolder = dirPath.left(firstIndexOfSlash);
+    if (!preDir.exists(currentFolder)) {
+      if (!preDir.mkdir(currentFolder)) {
+        return CANNOT_MAKE_DIR;
+      }
+      revertCmds.append(ACMD::GetInstRMDIR(pre, currentFolder));
+    }
+    firstIndexOfSlash = dirPath.indexOf('/', firstIndexOfSlash + 1);
+  }
+  if (!preDir.exists(dirPath)) {
+    if (!preDir.mkdir(dirPath)) {
+      return CANNOT_MAKE_DIR;
+    }
+    revertCmds.append(ACMD::GetInstRMDIR(pre, dirPath));
+  }
+  return OK;
+}
+
 RETURN_TYPE mkpath(const QString& pre, const QString& dirPath) {
-  QDir preDir(pre);
+  QDir preDir{pre};
   if (!preDir.exists()) {
     return {DST_DIR_INEXIST, {}};
   }
   if (preDir.exists(dirPath)) {
     return {};  // already exists
   }
-  if (!preDir.mkpath(dirPath)) {
-    return {CANNOT_MAKE_PATH, {}};
-  }
-  return {OK, {ACMD::GetInstRMPATH(pre, dirPath)}};
+  BATCH_COMMAND_LIST_TYPE revertCmds;
+  ErrorCode errorCode = mkpathCore(pre, dirPath, revertCmds);
+  return {errorCode, revertCmds};
 }
 
 RETURN_TYPE rmfileAgent(const QStringList& parms) {
@@ -297,10 +335,11 @@ RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& 
       return {DST_PRE_DIR_OCCUPIED_BY_FILE, {}};
     }
   } else {
-    if (!QDir{}.mkpath(preNewPathFolder)) {
-      return {DST_PRE_DIR_CANNOT_MAKE, {}};
+    const QString relativeToItem{preNewPathFolder.mid(dstPath.size() + 1)};
+    ErrorCode errorCode = mkpathCore(dstPath, relativeToItem, revertCmds);
+    if (errorCode != OK) {
+      return {errorCode, revertCmds};
     }
-    revertCmds.append(ACMD::GetInstRMPATH("", preNewPathFolder));
   }
   if (!QFile::rename(absOldPath, absNewPath)) {
     return {CANNOT_MV, revertCmds};
@@ -336,11 +375,11 @@ RETURN_TYPE cpfile(const QString& pre, const QString& rel, const QString& to) {
   BATCH_COMMAND_LIST_TYPE cmds;
   const QString& prePath = PathTool::absolutePath(toPth);
   if (!QDir{prePath}.exists()) {
-    auto prePathRet = QDir{}.mkpath(prePath);  // only remove dirs
-    if (!prePathRet) {
-      return {DST_PRE_DIR_CANNOT_MAKE, {}};
+    const QString relToPath{prePath.mid(to.size() + 1)};
+    ErrorCode errorCode = mkpathCore(to, relToPath, cmds);
+    if (errorCode != OK) {
+      return {errorCode, cmds};
     }
-    cmds.append(ACMD::GetInstRMPATH("", prePath));
   }
   auto ret = QFile{pth}.copy(toPth);
   if (!ret) {
@@ -431,20 +470,21 @@ RETURN_TYPE touch(const QString& pre, const QString& rel) {
   if (textFile.exists()) {
     return {};  // after all it exists
   }
-  BATCH_COMMAND_LIST_TYPE cmds;
+  BATCH_COMMAND_LIST_TYPE revertCmds;
   const QString& prePath = PathTool::absolutePath(pth);
   if (!QDir{prePath}.exists()) {
-    if (!QDir().mkpath(prePath)) {
-      return {DST_PRE_DIR_CANNOT_MAKE, cmds};
+    const QString relativeToItem{prePath.mid(pre.size() + 1)};
+    ErrorCode errorCode = mkpathCore(pre, relativeToItem, revertCmds);
+    if (errorCode != OK) {
+      return {errorCode, revertCmds};
     }
-    cmds.append(ACMD::GetInstRMPATH("", prePath));
   }
   if (!textFile.open(QIODevice::NewOnly)) {
-    return {UNKNOWN_ERROR, cmds};
+    return {UNKNOWN_ERROR, revertCmds};
   }
   textFile.close();
-  cmds.append(ACMD::GetInstRMFILE(pre, rel));
-  return {OK, cmds};
+  revertCmds.append(ACMD::GetInstRMFILE(pre, rel));
+  return {OK, revertCmds};
 }
 
 RETURN_TYPE linkAgent(const QStringList& parms) {

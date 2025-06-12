@@ -1,38 +1,53 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
 #include "TestCase/pub/MyTestSuite.h"
-#include "TestCase/PathRelatedTool.h"
+#include "TestCase/pub/TDir.h"
 #include "FileOperation/ComplexOperation.h"
 #include "public/PathTool.h"
 
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_ComplexOperation";
 using namespace ComplexOperation;
-
-const QStringList absPaths{
-    rootpath + '/' + "a/a1/a11.txt",
-    rootpath + '/' + "a/a1.txt",
-    rootpath + '/' + "b/b.md",
-    rootpath + '/' + "c",
-};
-const QString dest{
-    rootpath + '/' + "d",
-};
 
 class ComplexOperationTest : public MyTestSuite {
   Q_OBJECT
  public:
-  ComplexOperationTest() : MyTestSuite{false} {}
+  ComplexOperationTest() : MyTestSuite{false}, rootpath{mDir.path()} {}
+  TDir mDir;
+  const QString rootpath;
+  const QStringList absPaths{
+      rootpath + '/' + "a/a1/a11.txt",
+      rootpath + '/' + "a/a1.txt",
+      rootpath + '/' + "b/b.md",
+      rootpath + '/' + "c",
+  };
+  const QString dest{
+      rootpath + '/' + "d",
+  };
  private slots:
   // a{a1{a11.txt}, a1.txt},
   // b{b.md}
   // c
   // d
   void initTestCase() {
-    QVERIFY(QFile::exists(rootpath + "/a/a1.txt"));
-    QVERIFY(QFile::exists(rootpath + "/b/b.md"));
-    QVERIFY(QFile::exists(rootpath + "/a/a1/a11.txt"));
-    QVERIFY(QFile::exists(rootpath + "/c"));
-    QVERIFY(QFile::exists(rootpath + "/d"));
+    QVERIFY(mDir.IsValid());
+    const QList<FsNodeEntry> gNodeEntries{
+        FsNodeEntry{"a/a1.txt", false, {}},      // . 46
+        FsNodeEntry{"a/a1/a11.txt", false, {}},  // / 47
+        FsNodeEntry{"b/b.md", false, {}},        //
+        FsNodeEntry{"c", true, {}},              //
+        FsNodeEntry{"d", true, {}},              //
+    };
+    QVERIFY(mDir.createEntries(gNodeEntries) >= gNodeEntries.size());
+    const QList<FsNodeEntry> fullEntriesList{
+        FsNodeEntry{"a", true, {}},              // . 46
+        FsNodeEntry{"a/a1", true, {}},           // / 47
+        FsNodeEntry{"a/a1.txt", false, {}},      // . 46
+        FsNodeEntry{"a/a1/a11.txt", false, {}},  // / 47
+        FsNodeEntry{"b", true, {}},              //
+        FsNodeEntry{"b/b.md", false, {}},        //
+        FsNodeEntry{"c", true, {}},              //
+        FsNodeEntry{"d", true, {}},              //
+    };
+    QCOMPARE(mDir.getEntries(), fullEntriesList);
   }
 
   void test_cut_mimedata_flatten() {  //
@@ -54,7 +69,7 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
         ACMD::GetInstMV(rootpath + "/" + "a", "a1.txt", dest),  //
-        ACMD::GetInstMV(rootpath + "/" + "a", "a1", dest),          //
+        ACMD::GetInstMV(rootpath + "/" + "a", "a1", dest),      //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -66,9 +81,9 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
         ACMD::GetInstMV(rootpath + '/' + "a/a1", "a11.txt", dest),  //
-        ACMD::GetInstMV(rootpath + '/' + "a", "a1.txt", dest),       //
-        ACMD::GetInstMV(rootpath + '/' + "b", "b.md", dest),           //
-        ACMD::GetInstMV(rootpath, "c", dest),                             //
+        ACMD::GetInstMV(rootpath + '/' + "a", "a1.txt", dest),      //
+        ACMD::GetInstMV(rootpath + '/' + "b", "b.md", dest),        //
+        ACMD::GetInstMV(rootpath, "c", dest),                       //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -80,9 +95,9 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
         ACMD::GetInstMV(rootpath, "a/a1/a11.txt", dest),  //
-        ACMD::GetInstMV(rootpath, "a/a1.txt", dest),          //
-        ACMD::GetInstMV(rootpath, "b/b.md", dest),              //
-        ACMD::GetInstMV(rootpath, "c", dest),                        //
+        ACMD::GetInstMV(rootpath, "a/a1.txt", dest),      //
+        ACMD::GetInstMV(rootpath, "b/b.md", dest),        //
+        ACMD::GetInstMV(rootpath, "c", dest),             //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
@@ -153,8 +168,8 @@ class ComplexOperationTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE expectCmds{
         //
         ACMD::GetInstMV(rootpath + "/" + "a", "a1.txt", emptyPath),  //
-        ACMD::GetInstMV(rootpath + "/" + "a", "a1", emptyPath),          //
-        ACMD::GetInstRMDIR(rootpath, "a"),                                         //
+        ACMD::GetInstMV(rootpath + "/" + "a", "a1", emptyPath),      //
+        ACMD::GetInstRMDIR(rootpath, "a"),                           //
     };
     QCOMPARE(actualCmds.size(), expectCmds.size());
     QCOMPARE(actualCmds, expectCmds);
