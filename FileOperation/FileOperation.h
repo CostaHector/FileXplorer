@@ -6,7 +6,7 @@
 namespace FileOperation {
 using namespace FileOperatorType;
 
-RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch, BATCH_COMMAND_LIST_TYPE& srcCommand);
+RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch);
 
 RETURN_TYPE rmFolderForceAgent(const QStringList& parms);
 RETURN_TYPE rmFolderForce(const QString& pre, const QString& dirName);
