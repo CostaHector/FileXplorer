@@ -81,10 +81,9 @@ class FileOperationTest : public MyTestSuite {
     auto aBatch = rmpthok.cmds;
     QVERIFY(!aBatch.isEmpty());
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
-    const auto& rmpthRecOk = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& rmpthRecOk = FileOperation::executer(reversedaBatch);
     QCOMPARE(rmpthRecOk.ret, OK);
     QVERIFY(QFile::exists(workPath));  // no unintended side effect. this folder should keep here
     QVERIFY(dir.dirExists("a", false));
@@ -118,10 +117,10 @@ class FileOperationTest : public MyTestSuite {
     auto aBatch = rmpthok.cmds;
     QVERIFY(!aBatch.isEmpty());
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
-    const auto& rmpthRecOk = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& rmpthRecOk = FileOperation::executer(reversedaBatch);
     QCOMPARE(rmpthRecOk.ret, OK);
     QVERIFY(QFile::exists(workPath));  // no unintended side effect. this folder should keep here
     QVERIFY(dir.dirExists("a", false));
@@ -156,10 +155,10 @@ class FileOperationTest : public MyTestSuite {
     auto aBatch = rmDirOk.cmds;
     QVERIFY(!aBatch.isEmpty());
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
-    const auto& rmDirRecOk = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& rmDirRecOk = FileOperation::executer(reversedaBatch);
     QCOMPARE(rmDirRecOk.ret, OK);
     QVERIFY(dir.dirExists("a/a1", false));
   }
@@ -198,9 +197,9 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(!dir.fileExists("a.txt", false));
     QVERIFY(!aBatch.isEmpty());
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QVERIFY(dir.fileExists("a.txt", false));
   }
@@ -231,10 +230,10 @@ class FileOperationTest : public MyTestSuite {
 
     QVERIFY(!aBatch.isEmpty());
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     const auto recoverRet = exeRetEle.ret;
 
     QCOMPARE(recoverRet, ErrorCode::OK);
@@ -264,10 +263,10 @@ class FileOperationTest : public MyTestSuite {
 
     QVERIFY(!aBatch.isEmpty());
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     const auto recoverRet = exeRetEle.ret;
 
     QCOMPARE(recoverRet, ErrorCode::OK);
@@ -313,9 +312,9 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.exists("a.txt.lnk"));
     QVERIFY(!aBatch.isEmpty());  // can recover
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QCOMPARE(exeRetEle.isRecoverable(), true);
 
@@ -339,9 +338,9 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.exists("a/a1.txt"));
     QVERIFY(dir.exists("a/a1.txt.lnk"));
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QCOMPARE(exeRetEle.isRecoverable(), true);
     QVERIFY(dir.exists("a/a1.txt"));
@@ -363,9 +362,9 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY2(dir.fileExists(upperCaseName, true), "a.txt should be renamed to A.txt");
 
     auto aBatch = retEle.cmds;
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QCOMPARE(exeRetEle.isRecoverable(), true);
     QVERIFY2(dir.fileExists(lowerCaseName, true), "A.txt should be recover to a.txt");
@@ -524,9 +523,9 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.fileExists("bin/a.txt", false));
 
     auto aBatch = retEle.cmds;
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QCOMPARE(exeRetEle.isRecoverable(), true);
     QVERIFY(dir.fileExists("home/a.txt", false));
@@ -645,9 +644,9 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.dirExists(QString("b/%1").arg(existFolder), false));
     QVERIFY(dir.fileExists(QString("b/%1").arg(subFile), false));
     QVERIFY(!aBatch.isEmpty());
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
 
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QVERIFY(dir.dirExists(existFolder, false));
@@ -692,9 +691,9 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.fileExists(QString("b/%1").arg(subFile), false));
     QVERIFY(!aBatch.isEmpty());
 
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
 
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QVERIFY(dir.dirExists(relativeExistFolder, false));
@@ -736,11 +735,11 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.fileExists(existFile, false));
 
     const QString mTestPath{dir.path()};
-    BATCH_COMMAND_LIST_TYPE aBatch, srcCommand;
+    BATCH_COMMAND_LIST_TYPE aBatch;
     aBatch.append(ACMD::GetInstRENAME(mTestPath, inexistFolder, "NewName inexistFolder"));
     aBatch.append(ACMD::GetInstRENAME(mTestPath, existFile, "NewName b.txt"));
 
-    RETURN_TYPE retEle = FileOperation::executer(aBatch, srcCommand);
+    RETURN_TYPE retEle = FileOperation::executer(aBatch);
     QCOMPARE(retEle.ret, ErrorCode::SRC_INEXIST);
     QVERIFY(!dir.dirExists("NewName inexistFolder", false));
     QVERIFY(!dir.fileExists("NewName b.txt"));
@@ -756,9 +755,9 @@ class FileOperationTest : public MyTestSuite {
     QCOMPARE(retEle.ret, ErrorCode::OK);
     QVERIFY(QDir(mTestPath).exists("a new json file.json"));
     QVERIFY(!aBatch.isEmpty());
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
     QVERIFY(!dir.fileExists("a new json file.json", false));
   }
@@ -774,9 +773,9 @@ class FileOperationTest : public MyTestSuite {
     QCOMPARE(retEle.ret, ErrorCode::OK);
     QVERIFY(dir.fileExists("path/to/a new json file.json", false));
     QVERIFY(!aBatch.isEmpty());
-    BATCH_COMMAND_LIST_TYPE srcCommand;
+
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
-    const auto& exeRetEle = FileOperation::executer(reversedaBatch, srcCommand);
+    const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     const auto recoverRet = exeRetEle.ret;
 
     QCOMPARE(recoverRet, ErrorCode::OK);
