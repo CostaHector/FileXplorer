@@ -902,7 +902,7 @@ bool FileExplorerEvent::on_deletePermanently() {
   for (int i = 0; i < cmds.size(); ++i) {
     const ACMD& sl = cmds[i];
     if (i < fileNameMaximumCntWhenShowDeleteQueryDialog) {
-      fileNames += (sl.lst.back() + "\n");
+      fileNames += (sl.parms.back() + "\n");
     }
     deleteCmds += (sl.toStr() + "\n");
   }
