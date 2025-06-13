@@ -25,6 +25,7 @@ namespace FileOperatorType {
   FILE_OPERATOR_ERROR_KEY_ITEM(CANNOT_MAKE_PATH)               \
   FILE_OPERATOR_ERROR_KEY_ITEM(CANNOT_MAKE_DIR)                \
   FILE_OPERATOR_ERROR_KEY_ITEM(CANNOT_MAKE_LINK)               \
+  FILE_OPERATOR_ERROR_KEY_ITEM(CANNOT_COPY_FILE)               \
   FILE_OPERATOR_ERROR_KEY_ITEM(DST_LINK_INEXIST)               \
   FILE_OPERATOR_ERROR_KEY_ITEM(CANNOT_REMOVE_LINK)             \
   FILE_OPERATOR_ERROR_KEY_ITEM(OPERATION_NOT_AVAILABLE)        \
@@ -82,6 +83,39 @@ const QString FILE_OPERATOR_TO_STR[OPERATOR_BUTT + 1] = {
 };
 
 struct ACMD {
+  ACMD(const FILE_OPERATOR_E op_, const QStringList& lst_) : op{op_}, parms{lst_} {}
+  ACMD(const ACMD& rhs) noexcept : op{rhs.op}, parms{rhs.parms} {}
+  ACMD(ACMD&& rhs) noexcept : op{rhs.op}, parms{std::move(rhs.parms)} {}
+  ACMD& operator=(ACMD rhs) noexcept {
+    this->swap(rhs);
+    return *this;
+  }
+  void swap(ACMD& rhs) noexcept {
+    op = rhs.op;
+    parms.swap(rhs.parms);
+  }
+  inline bool operator==(const ACMD& rhs) const noexcept { return op == rhs.op && parms == rhs.parms; }
+  inline int size() const noexcept { return parms.size(); }
+  inline QString& operator[](int i) noexcept { return parms[i]; }
+  inline const QString& operator[](int i) const noexcept { return parms[i]; }
+  explicit inline operator bool() const noexcept { return !isEmpty(); }
+  inline bool isEmpty() const noexcept { return op == FILE_OPERATOR_E::OPERATOR_BUTT || parms.isEmpty(); }
+  inline void clear() noexcept {
+    op = FILE_OPERATOR_E::OPERATOR_BUTT;
+    parms.clear();
+  }
+  inline QString toStr() const noexcept {
+    if (parms.isEmpty()) {
+      return FILE_OPERATOR_TO_STR[op] + "[]";
+    }
+    return FILE_OPERATOR_TO_STR[op] + "[\"" + parms.join(R"(",")") + "\"]";
+  }
+  inline QString toStr(ErrorCode code) const noexcept {  //
+    return FILE_OPERATOR_ERROR_TO_STR[code] + ':' + toStr();
+  }
+  FILE_OPERATOR_E op;
+  QStringList parms;
+
 #define TWO_PARAMS const QString &pre, const QString &rel
 #define TWO_ARGVS pre, rel
 #define THREE_PARAMS const QString &pre, const QString &rel, const QString &to
@@ -96,52 +130,27 @@ struct ACMD {
 #undef THREE_PARAMS
 #undef TWO_ARGVS
 #undef TWO_PARAMS
-
-      FILE_OPERATOR_E op;
-  QStringList lst;
-
-  int size() const { return lst.size(); }
-  QString& operator[](int i) { return lst[i]; }
-
-  void clear() {
-    op = FILE_OPERATOR_E::OPERATOR_BUTT;
-    lst.clear();
-  };
-  explicit operator bool() const {  //
-    return !isEmpty();
-  }
-
-  bool isEmpty() const {  //
-    return op == FILE_OPERATOR_E::OPERATOR_BUTT || lst.isEmpty();
-  }
-
-  QString toStr() const {
-    if (lst.isEmpty()) {
-      return FILE_OPERATOR_TO_STR[op] + "[]";
-    }
-    return FILE_OPERATOR_TO_STR[op] + "[\"" + lst.join(R"(",")") + "\"]";
-  }
-  QString toStr(ErrorCode code) const {  //
-    return FILE_OPERATOR_ERROR_TO_STR[code] + ':' + toStr();
-  }
-
-  bool operator==(const ACMD& rhs) const;
 };
+
+inline void swap(ACMD& lhs, ACMD& rhs) noexcept {
+  lhs.swap(rhs);
+}
 
 using BATCH_COMMAND_LIST_TYPE = QList<ACMD>;
 
 struct RETURN_TYPE {
-  RETURN_TYPE(ErrorCode ret_ = ErrorCode::OK, const BATCH_COMMAND_LIST_TYPE& cmds_ = {})  //
-      : ret{ret_}, cmds{cmds_} {}
+  RETURN_TYPE(ErrorCode ret_ = ErrorCode::OK, const BATCH_COMMAND_LIST_TYPE& cmds_ = {}) : ret{ret_}, cmds{cmds_} {}
+  RETURN_TYPE(ErrorCode ret_, BATCH_COMMAND_LIST_TYPE&& cmds_) : ret{ret_}, cmds{cmds_} {}
+
+  explicit inline operator bool() const noexcept { return ret == ErrorCode::OK; }
+  inline int size() const noexcept { return cmds.size(); }
+  inline bool isRecoverable() const noexcept { return !cmds.isEmpty(); };
+
+  inline ACMD& operator[](int i) noexcept { return cmds[i]; }
+  inline const ACMD& operator[](int i) const noexcept { return cmds[i]; }
+
   ErrorCode ret;
   BATCH_COMMAND_LIST_TYPE cmds;
-
-  explicit operator bool() const { return ret == ErrorCode::OK; }
-  int size() const { return cmds.size(); }
-  bool isRecoverable() const { return !cmds.isEmpty(); };
-
-  ACMD& operator[](int i) { return cmds[i]; }
-  const ACMD& operator[](int i) const { return cmds[i]; }
 };
 
 BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_TYPE& rhs);

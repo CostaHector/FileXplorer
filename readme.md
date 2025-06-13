@@ -191,7 +191,7 @@ RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& 
 | home | path/to/a | bin | {path/to/a} | windows/linux return DST_FILE_OR_PATH_ALREADY_EXIST |
 | home | path/to/a.txt | bin | {} | OK |
 
-### Table 1.2 rmpath Behavior of mv Functions
+### Table 1.2 Expected Behavior of rmpath Functions
 ```cpp
 RETURN_TYPE rmpath(const QString& pre, const QString& dirPath)
 ```
@@ -202,7 +202,7 @@ RETURN_TYPE rmpath(const QString& pre, const QString& dirPath)
 | home | a | {a/a.txt} | CANNOT_REMOVE_DIR |
 | home | a | {a} | OK |
 
-### Table 1.3 mkpath Behavior of mv Functions
+### Table 1.3 Expected Behavior of mkpath Functions
 ```cpp
 RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
 ```
@@ -213,3 +213,65 @@ RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
 | home | a/a1 | {a} | OK |
 | home | a/a1 | {a/a1} | OK |
 | home | a | {} | OK |
+
+
+### Undo/Redo/Executor Sequence Diagram
+```mermaid
+sequenceDiagram
+    participant User
+    participant UndoRedo
+    participant Executor
+    participant FILE_OPERATION_FUNC
+    participant FileSystem
+
+    User->>UndoRedo: Do(cmds)
+    UndoRedo->>Executor: executer(cmds)
+    loop 对每个ACMD
+        Executor->>FILE_OPERATION_FUNC: 根据op选择函数
+        FILE_OPERATION_FUNC->>FileSystem: 执行操作
+        FileSystem-->>FILE_OPERATION_FUNC: 结果
+        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(结果, recoverCmds)
+        Executor->>Executor: allRecoverCmds+=recoverCmds
+    end
+
+    Executor-->>UndoRedo: RETURN_TYPE(结果, allRecoverCmds)
+    UndoRedo->>UndoRedo: 将allRecoverCmds压入undoList
+    UndoRedo-->>User: 执行结果
+
+    User->>UndoRedo: Undo()
+    UndoRedo->>UndoRedo: undoList弹栈到undoEles并反序
+    UndoRedo->>Executor: executer(undoEles)
+    loop 对每个ACMD
+        Executor->>FILE_OPERATION_FUNC: 根据op选择函数
+        FILE_OPERATION_FUNC->>FileSystem: 执行撤销操作
+        FileSystem-->>FILE_OPERATION_FUNC: 结果
+        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(结果, recoverCmds)
+        Executor->>Executor: allRecoverCmds+=recoverCmds
+    end
+
+    Executor-->>UndoRedo: RETURN_TYPE(结果, allRecoverCmds)
+    UndoRedo->>UndoRedo: 将allRecoverCmds作为redoEles压入redoList
+    UndoRedo-->>User: 执行结果
+
+    User->>UndoRedo: Undo()
+    UndoRedo->>UndoRedo: 检查undoList为空
+    UndoRedo-->>User: 跳过
+
+    User->>UndoRedo: Redo()
+    UndoRedo->>UndoRedo: redoList弹栈到redoEles并反序
+    UndoRedo->>Executor: executer(redoEles)
+    loop 对每个ACMD
+        Executor->>FILE_OPERATION_FUNC: 根据op选择函数
+        FILE_OPERATION_FUNC->>FileSystem: 执行重做操作
+        FileSystem-->>FILE_OPERATION_FUNC: 结果
+        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(结果, recoverCmds)
+        Executor->>Executor: allRecoverCmds+=recoverCmds
+    end
+
+    Executor-->>UndoRedo: RETURN_TYPE(结果, allRecoverCmds)
+    UndoRedo->>UndoRedo: 将allRecoverCmds作为undoEles压入undoList
+    UndoRedo-->>User: 执行结果
+    User->>UndoRedo: Redo()
+    UndoRedo->>UndoRedo: 检查redoList为空
+    UndoRedo-->>User: 跳过*/
+```
