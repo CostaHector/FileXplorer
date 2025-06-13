@@ -25,23 +25,21 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
 #undef FILE_OPERATOR_KEY_ITEM
   };
 
-  BATCH_COMMAND_LIST_TYPE recoverList;
+  BATCH_COMMAND_LIST_TYPE allRecoverList;
+  allRecoverList.reserve(aBatch.size());
   for (int i = 0; i < aBatch.size(); ++i) {
     const ACMD& cmds = aBatch[i];
     if (cmds.isEmpty() || cmds.op >= FILE_OPERATOR_E::OPERATOR_BUTT) {
       continue;
     }
-
-    const RETURN_TYPE returnEle = LAMBDA_TABLE[cmds.op](cmds.lst);
+    const RETURN_TYPE returnEle = LAMBDA_TABLE[cmds.op](cmds.parms);
     if (!returnEle) {
       qCritical("[Error]%s", qPrintable(cmds.toStr(returnEle.ret)));
-      return RETURN_TYPE{returnEle.ret, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
+      return {returnEle.ret, allRecoverList};
     }
-
-    recoverList += returnEle;
+    allRecoverList += returnEle;
   }
-  // in-place reverse
-  return RETURN_TYPE{ErrorCode::OK, QList<ACMD>(recoverList.crbegin(), recoverList.crend())};
+  return {ErrorCode::OK, allRecoverList};
 }
 
 RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
@@ -362,21 +360,21 @@ RETURN_TYPE cpfile(const QString& pre, const QString& rel, const QString& to) {
     return {DST_FILE_ALREADY_EXIST, {}};
   }
 
-  BATCH_COMMAND_LIST_TYPE cmds;
+  BATCH_COMMAND_LIST_TYPE revertCmds;
   const QString& prePath = PathTool::absolutePath(toPth);
   if (!QDir{prePath}.exists()) {
     const QString relToPath{prePath.mid(to.size() + 1)};
-    ErrorCode errorCode = mkpathCore(to, relToPath, cmds);
+    ErrorCode errorCode = mkpathCore(to, relToPath, revertCmds);
     if (errorCode != OK) {
-      return {errorCode, cmds};
+      return {errorCode, revertCmds};
     }
   }
   auto ret = QFile{pth}.copy(toPth);
   if (!ret) {
-    return {UNKNOWN_ERROR, cmds};
+    return {UNKNOWN_ERROR, revertCmds};
   }
-  cmds.append(ACMD::GetInstRMFILE(to, rel));
-  return {OK, cmds};
+  revertCmds.append(ACMD::GetInstRMFILE(to, rel));
+  return {OK, revertCmds};
 }
 
 RETURN_TYPE cpdirAgent(const QStringList& parms) {
@@ -399,12 +397,12 @@ RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
   if (QFileInfo{to, rel}.isDir()) {
     return {DST_FOLDER_ALREADY_EXIST, {}};  // dir or file
   }
-  BATCH_COMMAND_LIST_TYPE recoverList;
+  BATCH_COMMAND_LIST_TYPE revertCmds;
   if (!QDir{to}.mkpath(rel)) {
     qWarning("Failed QDir(%s).mkpath(%s)", qPrintable(to), qPrintable(rel));
-    return {CANNOT_MAKE_PATH, recoverList};
+    return {CANNOT_MAKE_PATH, revertCmds};
   }
-  recoverList.append(ACMD::GetInstRMPATH(to, rel));
+  revertCmds.append(ACMD::GetInstRMPATH(to, rel));
 
   const QString& pth = PathTool::Path2Join(pre, rel);
   const QString& toPth = PathTool::Path2Join(to, rel);
@@ -412,37 +410,36 @@ RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
   QDirIterator src{pth, {}, QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files, QDirIterator::Subdirectories};
   int relN = pth.size() + 1;
   while (src.hasNext()) {
-    src.next();
-    const QString& fromPth = src.filePath();
+    const QString& fromPth = src.next();
+    const QFileInfo& srcFile{src.fileInfo()};
     const QString& toRel = fromPth.mid(relN);
     const QString& toPath = PathTool::Path2Join(toPth, toRel);
-    const QFileInfo& srcFile{src.fileInfo()};
     const QFileInfo dstFile{toPath};
     if (dstFile.exists()) {
       if (dstFile.isDir() && srcFile.isDir()) {
         continue;
       }
-      qWarning("conflict two item:\nsrc: %lld Byte(s)[%s]\ndst: %lld Byte(s)[%s]",  //
+      qWarning("Conflict two item:\nsrc: %lld Byte(s)[%s]\ndst: %lld Byte(s)[%s]",  //
                srcFile.size(), qPrintable(fromPth),                                 //
                dstFile.size(), qPrintable(toPath));
-      return {DST_FILE_ALREADY_EXIST, recoverList};
+      return {DST_FILE_ALREADY_EXIST, revertCmds};
     }
     if (srcFile.isDir()) {  // dir
       // dir not exist, create it
-      if (!QDir(toPth).mkpath(toRel)) {
-        qWarning("Failed QDir(%s).mkpath(%s)", qPrintable(toPth), qPrintable(toRel));
-        return {UNKNOWN_ERROR, recoverList};
+      if (!QDir{toPth}.mkpath(toRel)) {
+        qWarning("Failed to mkpath[%s]", qPrintable(toPath));
+        return {CANNOT_MAKE_PATH, revertCmds};
       }
-      recoverList.append(ACMD::GetInstRMPATH(toPth, toRel));
+      revertCmds.append(ACMD::GetInstRMPATH(toPth, toRel));
     } else {  // file
-      if (!QFile(fromPth).copy(toPath)) {
-        qWarning("Failed QFile(%s).copy(%s)", qPrintable(fromPth), qPrintable(toPath));
-        return {UNKNOWN_ERROR, recoverList};
+      if (!QFile{fromPth}.copy(toPath)) {
+        qWarning("Failed to copy from [%s] to [%s]", qPrintable(fromPth), qPrintable(toPath));
+        return {CANNOT_COPY_FILE, revertCmds};
       }
-      recoverList.append(ACMD::GetInstRMFILE(toPth, toRel));
+      revertCmds.append(ACMD::GetInstRMFILE(toPth, toRel));
     }
   }
-  return {OK, recoverList};
+  return {OK, revertCmds};
 }
 
 RETURN_TYPE touchAgent(const QStringList& parms) {
@@ -478,7 +475,7 @@ RETURN_TYPE touch(const QString& pre, const QString& rel) {
 }
 
 RETURN_TYPE linkAgent(const QStringList& parms) {
-  if (parms.size() != 2 and parms.size() != 3) {
+  if (parms.size() != 2 && parms.size() != 3) {
     return {OPERATION_PARMS_NOT_MATCH, {}};
   }
   const QString& pre = parms[0];
@@ -498,35 +495,35 @@ RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to) {
   if (!QDir{to}.exists()) {
     return {DST_DIR_INEXIST, {}};
   }
-  QString toPath{PathTool::Path2Join(to, rel) + ".lnk"};
+  const QString toPath{PathTool::Path2Join(to, rel) + ".lnk"};
 
-  BATCH_COMMAND_LIST_TYPE cmds;
+  BATCH_COMMAND_LIST_TYPE revertCmds;
   QFile toFile{toPath};
   if (toFile.exists()) {
     if (!QFile{toPath}.moveToTrash()) {
-      return {CANNOT_REMOVE_FILE, cmds};
+      return {CANNOT_REMOVE_FILE, revertCmds};
     }
-    cmds.append(ACMD::GetInstRENAME("", toFile.fileName(), toPath));
+    revertCmds.append(ACMD::GetInstRENAME("", toFile.fileName(), toPath));
   }
 
   QString prePath{PathTool::absolutePath(toPath)};
   if (!QDir{prePath}.exists()) {
     const auto prePathRet = QDir{}.mkpath(prePath);
     if (!prePathRet) {
-      return {DST_PRE_DIR_CANNOT_MAKE, cmds};
+      return {DST_PRE_DIR_CANNOT_MAKE, revertCmds};
     }
-    cmds.append(ACMD::GetInstRMPATH("", prePath));
+    revertCmds.append(ACMD::GetInstRMPATH("", prePath));
   }
   if (!QFile::link(pth, toPath)) {
-    return {CANNOT_MAKE_LINK, cmds};
+    return {CANNOT_MAKE_LINK, revertCmds};
   }
 
-  cmds.append(ACMD::GetInstUNLINK(pre, rel + ".lnk", to));
-  return {OK, cmds};
+  revertCmds.append(ACMD::GetInstUNLINK(pre, rel + ".lnk", to));
+  return {OK, revertCmds};
 }
 
 RETURN_TYPE unlinkAgent(const QStringList& parms) {
-  if (parms.size() != 2 and parms.size() != 3) {
+  if (parms.size() != 2 && parms.size() != 3) {
     return {OPERATION_PARMS_NOT_MATCH, {}};
   }
   const QString& pre = parms[0];
@@ -539,17 +536,16 @@ RETURN_TYPE unlinkAgent(const QStringList& parms) {
 }
 
 RETURN_TYPE unlink(const QString& pre, const QString& rel, const QString& to) {
-  BATCH_COMMAND_LIST_TYPE cmds;
   QString toPath(PathTool::Path2Join(to, rel));
   if (!QFile::exists(toPath)) {
-    return {OK, cmds};  // after all it not exist
+    return {OK, {}};  // after all it not exist
   }
 
   if (!QDir().remove(toPath)) {
-    return {CANNOT_REMOVE_LINK, cmds};
+    return {CANNOT_REMOVE_LINK, {}};
   }
-  cmds.append(ACMD::GetInstLINK(pre, rel.left(rel.size() - 4), to));  // move the trailing ".lnk"
-  return {OK, cmds};
+  // move the trailing ".lnk"
+  return {OK, {ACMD::GetInstLINK(pre, rel.left(rel.size() - 4), to)}};
 }
 
 }  // namespace FileOperation
