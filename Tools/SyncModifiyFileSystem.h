@@ -1,7 +1,7 @@
-#ifndef SYNCMODIFIYFILESYSTEM_H
+﻿#ifndef SYNCMODIFIYFILESYSTEM_H
 #define SYNCMODIFIYFILESYSTEM_H
 
-#include <QStringList>
+#include <QString>
 
 // when rename items under basicPath, synchronized to the specified path
 

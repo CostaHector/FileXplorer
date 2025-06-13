@@ -13,7 +13,7 @@ BATCH_COMMAND_LIST_TYPE syncExecuterconst(const BATCH_COMMAND_LIST_TYPE& aBatch)
   syncBatch.reserve(aBatch.size());
   const SyncModifiyFileSystem syncMod;
   for (int i = 0; i < aBatch.size(); ++i) {
-    auto cmds = aBatch[i];
+    ACMD cmds = aBatch[i];
     if (!cmds) {
       continue;
     }
@@ -43,10 +43,10 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
         qWarning("sync commands failed");
       }
       exeRetEle.ret = (exeRetEle.ret == ErrorCode::OK && syncRetEle.ret == ErrorCode::OK ? ErrorCode::OK : ErrorCode::UNKNOWN_ERROR);
-      exeRetEle.cmds = syncRetEle.cmds + exeRetEle.cmds;
+      exeRetEle.cmds += syncRetEle.cmds;
     }
   }
-  undoList.append(exeRetEle.cmds);
+  mUndoStk.append(exeRetEle.cmds);
   return (bool)exeRetEle;
 }
 
@@ -74,25 +74,26 @@ bool UndoRedo::on_Redo() {
 
 bool UndoRedo::Undo() {
   if (!undoAvailable()) {
-    qDebug("Skip Cannot undo");
+    qDebug("Skip. Cannot undo");
     return true;
   }
-  const BATCH_COMMAND_LIST_TYPE& undoEles = undoList.top();
-  const RETURN_TYPE& redoEles = FileOperation::executer(undoEles);
-  undoList.pop();
-  redoList.append(std::move(redoEles.cmds));  // you can not just update do_cmd in ele. Because it is not equivelant as rmfile has no recover
-  // compromise method: when pass the do_cmd list into it
+  BATCH_COMMAND_LIST_TYPE& undoCmds = mUndoStk.top();
+  std::reverse(undoCmds.begin(), undoCmds.end());
+  const RETURN_TYPE& redoEles = FileOperation::executer(undoCmds);
+  mUndoStk.pop();
+  mRedoStk.append(std::move(redoEles.cmds));
   return (bool)redoEles;
 }
 
 bool UndoRedo::Redo() {
   if (!redoAvailable()) {
-    qDebug("Skip Cannot redo");
+    qDebug("Skip. Cannot redo");
     return true;
   }
-  const BATCH_COMMAND_LIST_TYPE& redoEles = redoList.top();
-  const RETURN_TYPE& undoEles = FileOperation::executer(redoEles);
-  redoList.pop();
-  undoList.append(std::move(undoEles.cmds));
+  BATCH_COMMAND_LIST_TYPE& redoCmds = mRedoStk.top();
+  std::reverse(redoCmds.begin(), redoCmds.end());
+  const RETURN_TYPE& undoEles = FileOperation::executer(redoCmds);
+  mRedoStk.pop();
+  mUndoStk.append(std::move(undoEles.cmds));
   return (bool)undoEles;
 }

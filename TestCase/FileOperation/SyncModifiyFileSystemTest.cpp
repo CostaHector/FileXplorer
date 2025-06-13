@@ -1,74 +1,80 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "TestCase/pub/GlbDataProtect.h"
-#include "pub/MyTestSuite.h"
+#include "TestCase/pub/TDir.h"
+#include "TestCase/pub/MyTestSuite.h"
 // add necessary includes here
 #include "Tools/SyncModifiyFileSystem.h"
 
 class SyncModifiyFileSystemTest : public MyTestSuite {
   Q_OBJECT
  public:
+  SyncModifiyFileSystemTest() : MyTestSuite{false} {}
   SyncModifiyFileSystem syncMod;
-
+  TDir mDir;
+  const QString mBasicPath{mDir.path() + "/home"};
+  const QString mSyncToPath{mDir.path() + "/bin"};
  private slots:
   void initTestCase() {
-    syncMod.SetBasicPath("C:/Program Files");
-    syncMod.SetSynchronizedToPaths("C:/Users");
-    qDebug("Start SyncModifiyFileSystemTest...");
+    QVERIFY(mDir.IsValid());
+    QVERIFY(mDir.mkpath("home"));
+    QVERIFY(mDir.mkpath("bin"));
+    syncMod.SetBasicPath(mBasicPath);
+    syncMod.SetSynchronizedToPaths(mSyncToPath);
   }
-  void cleanupTestCase() { qDebug("End SyncModifiyFileSystemTest..."); }
 
-  void test_syncSwitchOff() {
+  void test_sync_switchoff_no_sync() {
     GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
     syncMod.m_syncModifyFileSystemSwitch = false;
     syncMod.m_alsoSyncReversebackSwitch = true;
     // rename: path/oldItemName => path/newItemName
-    QString path = "C:/Program Files";
+    QString path = mBasicPath;
     QVERIFY2(!syncMod(path), "switch is off, no sync");
-    QCOMPARE(path, "C:/Program Files");
+    QCOMPARE(path, mBasicPath);
   }
 
-  void test_renameSyncBack() {
+  void test_rename_sync_back_ok() {
     GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
+    GlbDataProtect<bool> bkpReverse{syncMod.m_alsoSyncReversebackSwitch};
     syncMod.m_syncModifyFileSystemSwitch = true;
     syncMod.m_alsoSyncReversebackSwitch = true;
     // rename: path1/oldItemName => path2/newItemName
     QString path1 = "D:/home/to/randompath";
-    QString path2 = "D:/home";
     QVERIFY2(!syncMod(path1), "should no need to sync");
 
-    path1 = "C:/Program Files";
-    path2 = "D:/home";
+    path1 = mBasicPath;
     QVERIFY2(syncMod(path1), "should sync");
-    QCOMPARE(path1, "C:/Users");
+    QCOMPARE(path1, mSyncToPath);
 
-    path1 = "C:/Users";
+    path1 = mSyncToPath;
     QVERIFY2(syncMod(path1), "should sync");
-    QCOMPARE(path1, "C:/Program Files");
+    QCOMPARE(path1, mBasicPath);
   }
 
-  void test_renameNoSyncBack() {
+  void test_rename_no_sync_back() {
     GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
+    GlbDataProtect<bool> bkpReverse{syncMod.m_alsoSyncReversebackSwitch};
     syncMod.m_syncModifyFileSystemSwitch = true;
     syncMod.m_alsoSyncReversebackSwitch = false;
     // rename: path/oldItemName => path/newItemName
-    QString path = "C:/Program Files";
+    QString path = mBasicPath;
 
     QVERIFY2(syncMod(path), "should sync");
-    QCOMPARE(path, "C:/Users");
+    QCOMPARE(path, mSyncToPath);
 
-    path = "C:/Users";
+    path = mSyncToPath;
     QVERIFY2(!syncMod(path), "no sync back");
-    QCOMPARE(path, "C:/Users");
+    QCOMPARE(path, mSyncToPath);
   }
 
-  void test_whenSimilarPath() {
+  void test_when_same_path_skip() {
     GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
+    GlbDataProtect<bool> bkpReverse{syncMod.m_alsoSyncReversebackSwitch};
     syncMod.m_syncModifyFileSystemSwitch = true;
     syncMod.m_alsoSyncReversebackSwitch = true;
-    syncMod.SetBasicPath("C:/Program Files");
-    syncMod.SetSynchronizedToPaths("C:/Users");
-    // mod on items under "C:/Program Files (x86)" should not influence "C:/Program Files"
+    syncMod.SetBasicPath(mBasicPath);
+    syncMod.SetSynchronizedToPaths(mSyncToPath);
+    // mod on items under "C:/Program Files (x86)" should not influence mBasicPath
     QString path = "C:/Program Files (x86)";
     QVERIFY(!syncMod(path));
     QCOMPARE(path, "C:/Program Files (x86)");
