@@ -1,4 +1,4 @@
-#include "SyncModifiyFileSystem.h"
+﻿#include "SyncModifiyFileSystem.h"
 #include <QDir>
 #include <QFileInfo>
 #include "public/PublicVariable.h"
@@ -26,6 +26,7 @@ void SyncModifiyFileSystem::LoadFromMemory() {
 
   mInited = true;
 }
+
 bool SyncModifiyFileSystem::operator()(QString& path) const {
   if (!m_syncModifyFileSystemSwitch) {
     return false;
