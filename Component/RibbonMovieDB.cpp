@@ -23,6 +23,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_extraFunctionTB->setOrientation(Qt::Orientation::Vertical);
   m_extraFunctionTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_extraFunctionTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(m_extraFunctionTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_functionsTB = new (std::nothrow) QToolBar{"Function", this};
   CHECK_NULLPTR_RETURN_VOID(m_functionsTB);
@@ -49,6 +50,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_castEditTB->setOrientation(Qt::Orientation::Vertical);
   m_castEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_castEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(m_castEditTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_tagsEditTB = new (std::nothrow) QToolBar{"Tags Edit Toolbar", this};
   CHECK_NULLPTR_RETURN_VOID(m_tagsEditTB);
@@ -59,6 +61,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_tagsEditTB->setOrientation(Qt::Orientation::Vertical);
   m_tagsEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_tagsEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(m_tagsEditTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_dbViewHideShowTB = new (std::nothrow) QToolBar{"Show/Hide Database View", this};
   CHECK_NULLPTR_RETURN_VOID(m_dbViewHideShowTB);

@@ -140,8 +140,7 @@ void PropertiesWindow::ReadSetting() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  static const QFont font{"Consolas", 15};
-  m_propertiesInfoTextEdit->setFont(font);
+  m_propertiesInfoTextEdit->setFont(StyleSheet::TEXT_EDIT_FONT);
 }
 
 void PropertiesWindow::showEvent(QShowEvent* event) {
