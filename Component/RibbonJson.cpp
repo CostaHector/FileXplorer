@@ -1,5 +1,6 @@
-#include "RibbonJson.h"
+﻿#include "RibbonJson.h"
 #include "public/PublicMacro.h"
+#include "public/StyleSheet.h"
 #include "public/PublicVariable.h"
 #include "Actions/JsonActions.h"
 #include "Actions/ViewActions.h"

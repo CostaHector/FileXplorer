@@ -1,7 +1,7 @@
-#include "DuplicateVideosFinder.h"
+﻿#include "DuplicateVideosFinder.h"
 #include "Actions/DuplicateVideosFinderActions.h"
 #include "Actions/FileBasicOperationsActions.h"
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "public/StyleSheet.h"
 #include "public/UndoRedo.h"
 

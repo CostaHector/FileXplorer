@@ -1,8 +1,8 @@
-#include "AiMediaDupTableView.h"
+﻿#include "AiMediaDupTableView.h"
 
 #include "Actions/DuplicateVideosFinderActions.h"
 #include "Component/Notificator.h"
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include <QItemSelectionModel>
 
 #include <QFileDialog>
