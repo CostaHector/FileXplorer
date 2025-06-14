@@ -1,9 +1,9 @@
-#include "PreferenceActions.h"
+﻿#include "PreferenceActions.h"
 #include <QApplication>
 #include <QFile>
 #include <QIODevice>
 #include <QTextStream>
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "public/StyleSheet.h"
 
 PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {

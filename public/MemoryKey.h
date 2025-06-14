@@ -2,6 +2,12 @@
 #define MEMORYKEY_H
 
 #include "Memory/KV.h"
+#include <QSettings>
+
+static inline QSettings& PreferenceSettings() {
+  static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", "FileExplorerReadOnly");
+  return settings;
+}
 
 struct MemoryKey {
   static const KV DEFAULT_OPEN_PATH;

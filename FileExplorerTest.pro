@@ -18,6 +18,7 @@ SOURCES += $$files(TestCase/Json/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
 SOURCES += $$files(TestCase/public/*.cpp)
 SOURCES += $$files(TestCase/FileOperation/*.cpp)
+SOURCES += $$files(TestCase/rename/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
 SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(public/Memory/*.cpp)
@@ -41,8 +42,6 @@ SOURCES += \
     Tools/AIMediaDuplicate.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/LowResImgsRemover.cpp \
-    Tools/ExtractPileItemsOutFolder.cpp \
-    Tools/FilesNameBatchStandardizer.cpp \
     Tools/FolderNxtAndLastIterator.cpp \
     Tools/LongPathFinder.cpp \
     Tools/MD5Calculator.cpp \
@@ -90,8 +89,6 @@ HEADERS += \
     Tools/AIMediaDuplicate.h \
     Tools/ConvertUnicodeCharsetToAscii.h\
     Tools/LowResImgsRemover.h \
-    Tools/ExtractPileItemsOutFolder.h \
-    Tools/FilesNameBatchStandardizer.h \
     Tools/FolderNxtAndLastIterator.h \
     Tools/LongPathFinder.h \
     Tools/MD5Calculator.h \
