@@ -1,4 +1,4 @@
-#ifndef PUBLICTOOL_H
+﻿#ifndef PUBLICTOOL_H
 #define PUBLICTOOL_H
 
 #include <QActionGroup>
@@ -11,7 +11,6 @@ QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGrou
 QString TextReader(const QString& textPath);
 bool TextWriter(const QString& fileName, const QString& content = "", const QIODevice::OpenMode openMode = QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
 bool ByteArrayWriter(const QString& fileName, const QByteArray& ba);
-void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent = nullptr);
 
 inline void ImgsSortFileSizeFirst(QStringList& imgs) {
