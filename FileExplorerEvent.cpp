@@ -11,7 +11,6 @@
 #include "Actions/FileLeafAction.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
-#include "Actions/SyncFileSystemModificationActions.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Actions/ThumbnailProcessActions.h"
@@ -39,15 +38,14 @@
 #include "View/DuplicateVideosFinder.h"
 #include "View/HarTableview.h"
 
-#include "Tools/ExtractPileItemsOutFolder.h"
+#include "Tools/Classify/ExtractPileItemsOutFolder.h"
 #include "Tools/ArchiveFiles.h"
 #include "Tools/Classify/ItemsClassifier.h"
 #include "Tools/CopyItemPropertiesToClipboardIF.h"
 #include "Tools/LowResImgsRemover.h"
-#include "Tools/FilesNameBatchStandardizer.h"
+#include "Tools/Classify/FilesNameBatchStandardizer.h"
 #include "Tools/Json/JsonHelper.h"
 #include "Tools/PlayVideo.h"
-#include "Tools/SyncModifiyFileSystem.h"
 #include "Tools/SysTerminal.h"
 #include "Tools/ViewSelection.h"
 #include "Tools/ViewTypeTool.h"
@@ -56,6 +54,7 @@
 #include "public/OnCheckedPopupOrHideAWidget.h"
 #include "public/PublicTool.h"
 #include "public/MemoryKey.h"
+#include "public/StyleSheet.h"
 #include "public/UndoRedo.h"
 #include "FileOperation/ComplexOperation.h"
 
@@ -593,32 +592,6 @@ void FileExplorerEvent::subscribe() {
   {
     connect(g_videoPlayerActions()._PLAY_SELECTION, &QAction::triggered, this, &FileExplorerEvent::on_PlaySelectedItemsInView);
     connect(g_videoPlayerActions()._PLAY_CURRENT_PATH, &QAction::triggered, this, &FileExplorerEvent::on_PlayCurrentPathOfView);
-  }
-
-  {
-    auto& syncMod = g_syncFileSystemModificationActions();
-    connect(syncMod._SYNC_MOD_SWITCH, &QAction::triggered, this, [&syncMod](const bool sw) {
-      if (sw) {
-        SyncModifiyFileSystem::LoadFromMemory();
-      }
-      SyncModifiyFileSystem::m_syncModifyFileSystemSwitch = sw;
-      syncMod._BASIC_PATH->setEnabled(sw);
-      syncMod._SYNC_TO_PATH->setEnabled(sw);
-      syncMod._SYNC_REVERSE_SWITCH->setEnabled(sw);
-      PreferenceSettings().setValue("SYNC_FS_MOD", sw);
-    });
-    connect(syncMod._SYNC_REVERSE_SWITCH, &QAction::triggered, this, [](const bool sw) {
-      SyncModifiyFileSystem::m_alsoSyncReversebackSwitch = sw;
-      PreferenceSettings().setValue("SYNC_REVERSE_BACK", sw);
-    });
-    connect(syncMod._BASIC_PATH, &QLineEdit::returnPressed, this, [&syncMod]() {
-      SyncModifiyFileSystem::SetBasicPath(syncMod._BASIC_PATH->text());
-      PreferenceSettings().setValue("SYNC_BASIC_PATH", SyncModifiyFileSystem::m_basicPath);
-    });
-    connect(syncMod._SYNC_TO_PATH, &QLineEdit::returnPressed, this, [&syncMod]() {
-      SyncModifiyFileSystem::SetSynchronizedToPaths(syncMod._SYNC_TO_PATH->text());
-      PreferenceSettings().setValue("SYNC_TO_PATH", SyncModifiyFileSystem::m_synchronizedToPath);
-    });
   }
 
   g_ArrangeActions().subscribe();
@@ -1378,7 +1351,7 @@ bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUC
 
   msgBox->button(QMessageBox::StandardButton::Apply)->setText("Keep");
   msgBox->button(QMessageBox::StandardButton::Apply)->setIcon(QIcon(":img/FILE_STRUCTURE_PRESERVE"));
-  msgBox->button(QMessageBox::StandardButton::Apply)->setStyleSheet(SUBMIT_BTN_STYLE);
+  msgBox->button(QMessageBox::StandardButton::Apply)->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
 
   msgBox->button(QMessageBox::StandardButton::Yes)->setText("Flatten");
   msgBox->button(QMessageBox::StandardButton::Yes)->setIcon(QIcon(":img/FILE_STRUCTURE_FLATTEN"));

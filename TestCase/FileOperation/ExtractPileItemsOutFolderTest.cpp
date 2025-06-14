@@ -1,21 +1,15 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
 #include "FileOperation/FileOperatorPub.h"
-#include "pub/BeginToExposePrivateMember.h"
-#include "Tools/ExtractPileItemsOutFolder.h"
-#include "pub/EndToExposePrivateMember.h"
+#include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/BeginToExposePrivateMember.h"
+#include "Tools/Classify/ExtractPileItemsOutFolder.h"
+#include "TestCase/pub/EndToExposePrivateMember.h"
 
 class ExtractPileItemsOutFolderTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
-
-  void init() {}
-  void cleanup() {}
-
   void test_cannotExtract_ok() {
     QStringList noStrictAPileFiles;
     noStrictAPileFiles << "random name.mp4";

@@ -1,8 +1,9 @@
-#include "FloatingPreview.h"
-#include "public/PublicVariable.h"
+﻿#include "FloatingPreview.h"
+#include "public/MemoryKey.h"
 #include "public/PathTool.h"
 #include "public/DisplayEnhancement.h"
 #include "Tools/QMediaInfo.h"
+#include "public/PublicVariable.h"
 #include "public/StyleSheet.h"
 #include <QDir>
 #include <QHeaderView>

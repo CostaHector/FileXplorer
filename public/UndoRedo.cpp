@@ -6,7 +6,7 @@ using namespace FileOperatorType;
 UndoRedo g_undoRedo;
 
 BATCH_COMMAND_LIST_TYPE syncExecuterconst(const BATCH_COMMAND_LIST_TYPE& aBatch) {
-  if (!SyncModifiyFileSystem::m_syncModifyFileSystemSwitch) {
+  if (!SyncModifiyFileSystem::m_syncOperationSw) {
     return {};
   }
   BATCH_COMMAND_LIST_TYPE syncBatch;
@@ -35,7 +35,7 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
   RETURN_TYPE exeRetEle = FileOperation::executer(cmd);
 
   BATCH_COMMAND_LIST_TYPE syncCmd;
-  if (SyncModifiyFileSystem::m_syncModifyFileSystemSwitch) {
+  if (SyncModifiyFileSystem::m_syncOperationSw) {
     syncCmd = syncExecuterconst(cmd);
     if (!syncCmd.isEmpty()) {
       const auto& syncRetEle = FileOperation::executer(syncCmd);
