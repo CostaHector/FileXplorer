@@ -39,8 +39,7 @@ void CommandsPreview::ReadSettings() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  static const QFont font{"Consolas", 15};
-  setFont(font);
+  setFont(StyleSheet::TEXT_EDIT_FONT);
   setWindowIcon(QIcon(":img/COMMAND_PREVIEW"));
 }
 
