@@ -1,9 +1,9 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
-#include "pub/BeginToExposePrivateMember.h"
+#include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/BeginToExposePrivateMember.h"
 #include "Tools/LongPathFinder.h"
-#include "pub/EndToExposePrivateMember.h"
+#include "TestCase/pub/EndToExposePrivateMember.h"
 
 class LongPathFinderTest : public MyTestSuite {
   Q_OBJECT

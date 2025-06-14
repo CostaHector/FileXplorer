@@ -1,4 +1,4 @@
-#include "ArrangeActions.h"
+﻿#include "ArrangeActions.h"
 #include "Component/Notificator.h"
 #include "Tools/CastManager.h"
 #include "Tools/StudiosManager.h"
@@ -7,6 +7,7 @@
 #include "public/MemoryKey.h"
 #include <QDesktopServices>
 #include <QUrl>
+#include <QFile>
 
 void onEditStudios() {
 #ifdef _WIN32

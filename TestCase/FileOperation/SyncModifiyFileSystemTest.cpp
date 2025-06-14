@@ -3,7 +3,6 @@
 #include "TestCase/pub/GlbDataProtect.h"
 #include "TestCase/pub/TDir.h"
 #include "TestCase/pub/MyTestSuite.h"
-// add necessary includes here
 #include "Tools/SyncModifiyFileSystem.h"
 
 class SyncModifiyFileSystemTest : public MyTestSuite {
@@ -24,9 +23,9 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_sync_switchoff_no_sync() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
-    syncMod.m_syncModifyFileSystemSwitch = false;
-    syncMod.m_alsoSyncReversebackSwitch = true;
+    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
+    syncMod.m_syncOperationSw = false;
+    syncMod.m_syncBackSw = true;
     // rename: path/oldItemName => path/newItemName
     QString path = mBasicPath;
     QVERIFY2(!syncMod(path), "switch is off, no sync");
@@ -34,10 +33,10 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_rename_sync_back_ok() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
-    GlbDataProtect<bool> bkpReverse{syncMod.m_alsoSyncReversebackSwitch};
-    syncMod.m_syncModifyFileSystemSwitch = true;
-    syncMod.m_alsoSyncReversebackSwitch = true;
+    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> bkpReverse{syncMod.m_syncBackSw};
+    syncMod.m_syncOperationSw = true;
+    syncMod.m_syncBackSw = true;
     // rename: path1/oldItemName => path2/newItemName
     QString path1 = "D:/home/to/randompath";
     QVERIFY2(!syncMod(path1), "should no need to sync");
@@ -52,10 +51,10 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_rename_no_sync_back() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
-    GlbDataProtect<bool> bkpReverse{syncMod.m_alsoSyncReversebackSwitch};
-    syncMod.m_syncModifyFileSystemSwitch = true;
-    syncMod.m_alsoSyncReversebackSwitch = false;
+    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> bkpReverse{syncMod.m_syncBackSw};
+    syncMod.m_syncOperationSw = true;
+    syncMod.m_syncBackSw = false;
     // rename: path/oldItemName => path/newItemName
     QString path = mBasicPath;
 
@@ -68,10 +67,10 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_when_same_path_skip() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncModifyFileSystemSwitch};
-    GlbDataProtect<bool> bkpReverse{syncMod.m_alsoSyncReversebackSwitch};
-    syncMod.m_syncModifyFileSystemSwitch = true;
-    syncMod.m_alsoSyncReversebackSwitch = true;
+    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> bkpReverse{syncMod.m_syncBackSw};
+    syncMod.m_syncOperationSw = true;
+    syncMod.m_syncBackSw = true;
     syncMod.SetBasicPath(mBasicPath);
     syncMod.SetSynchronizedToPaths(mSyncToPath);
     // mod on items under "C:/Program Files (x86)" should not influence mBasicPath

@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 #include "TestCase/PathRelatedTool.h"
 #include "TestCase/pub/MyTestSuite.h"

@@ -1,6 +1,8 @@
 ﻿#include "SyncFileSystemModificationActions.h"
 #include "Tools/SyncModifiyFileSystem.h"
-#include "public/PublicVariable.h"
+#include "Component/Notificator.h"
+#include "public/PublicMacro.h"
+#include "public/StyleSheet.h"
 
 SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {
   static SyncFileSystemModificationActions ins;
@@ -8,59 +10,86 @@ SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {
 }
 
 SyncFileSystemModificationActions::SyncFileSystemModificationActions(QObject* /*parent*/) {
+  _SYNC_MOD_SWITCH = new (std::nothrow) QAction{QIcon(":img/SYNC_MODIFICATION_SWITCH"), "Sync", this};
   _SYNC_MOD_SWITCH->setCheckable(true);
-  _SYNC_REVERSE_SWITCH->setCheckable(true);
-
   _SYNC_MOD_SWITCH->setToolTip(
       "Modification on basic path will also syncronized to destination path,"
       "including\n1.file rename\n2.file move/into into\n3.file recycle\n4.file delete\nWarning: When copy/cut items out of these 2 paths, only first commands will succeed.");
+
+  _SYNC_REVERSE_SWITCH = new (std::nothrow) QAction{QIcon(":img/SYNC_REVERSE_SWITCH"), "reverse back", this};
+  _SYNC_REVERSE_SWITCH->setCheckable(true);
   _SYNC_REVERSE_SWITCH->setToolTip("Also sync modification reverse back to basic path");
+
+  SyncModifiyFileSystem::LoadFromMemory();
 }
 
 QToolBar* SyncFileSystemModificationActions::GetSyncSwitchToolbar() {
-  const bool syncSwOn = PreferenceSettings().value("SYNC_FS_MOD", SyncModifiyFileSystem::m_syncModifyFileSystemSwitch).toBool();
-  const bool syncBackOn = PreferenceSettings().value("SYNC_REVERSE_BACK", SyncModifiyFileSystem::m_alsoSyncReversebackSwitch).toBool();
-  _SYNC_MOD_SWITCH->setChecked(syncSwOn);
-  _SYNC_REVERSE_SWITCH->setChecked(syncBackOn);
+  _SYNC_MOD_SWITCH->setChecked(SyncModifiyFileSystem::m_syncOperationSw);
+  _SYNC_REVERSE_SWITCH->setChecked(SyncModifiyFileSystem::m_syncBackSw);
 
-  QToolBar* syncTb = new (std::nothrow) QToolBar("Sync Switch");
-  if (syncTb == nullptr) {
-    qCritical("syncTb is nullptr");
-    return nullptr;
-  }
-  syncTb->addAction(_SYNC_MOD_SWITCH);
-  return syncTb;
+  QToolBar* syncSwTb = new (std::nothrow) QToolBar{"Sync Switch"};
+  CHECK_NULLPTR_RETURN_NULLPTR(syncSwTb)
+  syncSwTb->addAction(_SYNC_MOD_SWITCH);
+  syncSwTb->setStyleSheet("QToolBar { max-width: 256px; }");
+  syncSwTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  return syncSwTb;
 }
 
 QToolBar* SyncFileSystemModificationActions::GetSyncPathToolbar() {
-  const QString& basicPath = PreferenceSettings().value("SYNC_BASIC_PATH", "").toString();
-  const QString& toPath = PreferenceSettings().value("SYNC_TO_PATH", "").toString();
+  QToolBar* syncTb = new (std::nothrow) QToolBar{"Sync Path Widget"};
+  CHECK_NULLPTR_RETURN_NULLPTR(syncTb)
 
-  QToolBar* syncTb = new (std::nothrow) QToolBar("Sync Path Widget");
-  if (syncTb == nullptr) {
-    qCritical("syncTb is nullptr");
-    return nullptr;
-  }
-  _BASIC_PATH = new (std::nothrow) QLineEdit(basicPath, syncTb);
-  if (_BASIC_PATH == nullptr) {
-    qCritical("_BASIC_PATH is nullptr");
-    return nullptr;
-  }
+  _BASIC_PATH = new (std::nothrow) QLineEdit{SyncModifiyFileSystem::m_basicPath, syncTb};
+  CHECK_NULLPTR_RETURN_NULLPTR(_BASIC_PATH)
+  _BASIC_PATH->setClearButtonEnabled(true);
   _BASIC_PATH->setToolTip("Basic path");
-  _SYNC_TO_PATH = new (std::nothrow) QLineEdit(toPath, syncTb);
-  if (_SYNC_TO_PATH == nullptr) {
-    qCritical("_SYNC_TO_PATH is nullptr");
-    return nullptr;
-  }
-  _SYNC_TO_PATH->setToolTip("Modification synchronized to destination path");
+
+  _SYNC_TO_PATH = new (std::nothrow) QLineEdit{SyncModifiyFileSystem::m_syncToPath, syncTb};
+  CHECK_NULLPTR_RETURN_NULLPTR(_SYNC_TO_PATH)
+  _SYNC_TO_PATH->setClearButtonEnabled(true);
+  _SYNC_TO_PATH->setToolTip("Path modification will also synchronized to");
 
   syncTb->addAction(_SYNC_REVERSE_SWITCH);
   syncTb->addWidget(_BASIC_PATH);
   syncTb->addWidget(_SYNC_TO_PATH);
+  syncTb->setOrientation(Qt::Orientation::Vertical);
+  syncTb->setStyleSheet("QToolBar { max-width: 512px; }");
+  syncTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  syncTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
 
-  bool syncSwOn = _SYNC_MOD_SWITCH->isChecked();
+  const bool syncSwOn{SyncModifiyFileSystem::m_syncOperationSw};
   _BASIC_PATH->setEnabled(syncSwOn);
   _SYNC_TO_PATH->setEnabled(syncSwOn);
   _SYNC_REVERSE_SWITCH->setEnabled(syncSwOn);
+
+  connect(_SYNC_MOD_SWITCH, &QAction::triggered, this, [this](const bool sw) {
+    SyncModifiyFileSystem::SetSyncOperationSwitch(sw);
+    _BASIC_PATH->setEnabled(sw);
+    _SYNC_TO_PATH->setEnabled(sw);
+    _SYNC_REVERSE_SWITCH->setEnabled(sw);
+  });
+
+  connect(_SYNC_REVERSE_SWITCH, &QAction::triggered, &SyncModifiyFileSystem::SetSyncReverseBackSwitch);
+
+  connect(_BASIC_PATH, &QLineEdit::returnPressed, this, [this]() {
+    const QString& basicPath{_BASIC_PATH->text()};
+    const bool setResult = SyncModifiyFileSystem::SetBasicPath(basicPath);
+    if (!setResult) {
+      LOG_BAD("Cannot set basic path:", basicPath);
+    } else {
+      LOG_GOOD("Set basic path", basicPath);
+    }
+  });
+
+  connect(_SYNC_TO_PATH, &QLineEdit::returnPressed, this, [this]() {
+    const QString& syncToPath{_SYNC_TO_PATH->text()};
+    const bool setResult = SyncModifiyFileSystem::SetSynchronizedToPaths(syncToPath);
+    if (!setResult) {
+      LOG_BAD("Cannot set operation sync to path:", syncToPath);
+    } else {
+      LOG_GOOD("Set operation sync to path:", syncToPath);
+    }
+  });
+
   return syncTb;
 }

@@ -1,6 +1,7 @@
 ﻿#include "FolderPreviewActions.h"
 #include "public/MemoryKey.h"
 #include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 
 FolderPreviewActions& g_folderPreviewActions() {
   static FolderPreviewActions ins;
@@ -33,4 +34,14 @@ FolderPreviewActions::FolderPreviewActions(QObject* parent) : QObject{parent} {
       ag->setChecked(true);
     }
   }
+}
+
+QToolBar* FolderPreviewActions::GetPreviewsToolbar(QWidget* parent) {
+  auto* previewTB = new (std::nothrow) QToolBar{"previews toolbar", parent};
+  previewTB->addActions(PREVIEW_AG->actions());
+  previewTB->setOrientation(Qt::Orientation::Vertical);
+  previewTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  previewTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  previewTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  return previewTB;
 }
