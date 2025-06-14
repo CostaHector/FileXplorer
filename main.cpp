@@ -1,4 +1,4 @@
-#include "FileExplorerEvent.h"
+﻿#include "FileExplorerEvent.h"
 #include "FileXplorer.h"
 #include "Tools/ExtraViewVisibilityControl.h"
 #include "Tools/LogHandler.h"

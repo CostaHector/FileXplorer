@@ -2,6 +2,7 @@
 #include "MemoryKey.h"
 #include <QApplication>
 #include <QWidget>
+#include <QVBoxLayout>
 #include <QMap>
 #include <QString>
 
@@ -70,3 +71,13 @@ constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_24;
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_48;
 int IMAGE_SIZE::IMG_WIDTH = 420;
 int IMAGE_SIZE::IMG_HEIGHT = 320;
+
+void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
+  if (lay == nullptr) {
+    return;
+  }
+  // Only QToolBar and QToolButton need to set alignment. (QWidget like QSeperator not need)
+  for (int i = 0; i < lay->count(); ++i) {
+    lay->itemAt(i)->setAlignment(align);
+  }
+}

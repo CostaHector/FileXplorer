@@ -297,17 +297,18 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
 }
 
 bool FileExplorerEvent::on_calcMD5() const {
+  auto* md5W = new (std::nothrow) MD5Window{this->_contentPane};
+  CHECK_NULLPTR_RETURN_FALSE(md5W);
+  md5W->show();
   if (!_contentPane->isFSView()) {
-    qWarning("MD5 only support on File System Model");
-    return false;
+    return true;
   }
   const QStringList& items = selectedItems();
-  if (items.empty()) {
-    qDebug("Nothing selected, no need calc MD5");
-    return false;
+  if (items.isEmpty()) {
+    return true;
   }
-  auto* md5W = new MD5Window(_fileSysModel->rootPath(), items, this->_contentPane);
-  md5W->show();
+  const int filesCnt = md5W->operator()(items);
+  qDebug("%d md5(s) calculate.", filesCnt);
   return true;
 }
 
@@ -1298,11 +1299,7 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
     LOG_WARN("[Move/Copy to] only available on FileSytemView", QString::number((int)vt));
     return false;
   }
-  static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{
-      {Qt::DropAction::CopyAction, "COPY"},
-      {Qt::DropAction::MoveAction, "MOVE"},
-      {Qt::DropAction::IgnoreAction, "IGNORE"}
-  };
+  static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{{Qt::DropAction::CopyAction, "COPY"}, {Qt::DropAction::MoveAction, "MOVE"}, {Qt::DropAction::IgnoreAction, "IGNORE"}};
   const QString& pOperationNameStr = DROP_ACTION_2_STR.value(dropAct, "IGNORE");
   auto* view = _contentPane->GetCurView();
   if (!view->selectionModel()->hasSelection()) {
