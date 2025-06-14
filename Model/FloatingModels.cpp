@@ -1,7 +1,7 @@
-#include "FloatingModels.h"
+﻿#include "FloatingModels.h"
 #include "public/PathTool.h"
 #include "public/PublicTool.h"
-#include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 #include <QPixmap>
 #include <QFileIconProvider>
 #include <QDir>

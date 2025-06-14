@@ -3,6 +3,7 @@
 #include "public/PathTool.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
+#include <QDir>
 
 using namespace ItemsPileCategory;
 

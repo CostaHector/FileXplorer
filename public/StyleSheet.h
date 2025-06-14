@@ -1,7 +1,9 @@
-#ifndef STYLESHEET_H
+﻿#ifndef STYLESHEET_H
 #define STYLESHEET_H
-#include <QString>
 #include "PublicMacro.h"
+#include <QString>
+#include <QRect>
+#include <QSize>
 
 class QWidget;
 
@@ -31,6 +33,29 @@ THEME GetThemeFromString(const QString& themeStr);
 void UpdateTitleBar(QWidget* widget);
 void setDarkTitleBar(QWidget* widget, bool enable);
 void setGlobalDarkMode(bool enable);
+
+const char SUBMIT_BTN_STYLE[] =
+    "QPushButton{"
+    "    color: #fff;"
+    "    background-color: DodgerBlue;"
+    "    border-color: DodgerBlue;"
+    "}"
+    "QPushButton:hover {"
+    "    color: #fff;"
+    "    background-color: rgb(36, 118, 199);"
+    "    border-color: rgb(36, 118, 199);"
+    "}";
 }  // namespace StyleSheet
+
+constexpr QRect DEFAULT_GEOMETRY{0, 0, 1024, 768};
+constexpr QSize DOCKER_DEFAULT_SIZE{DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height()};
+
+struct IMAGE_SIZE {
+  static constexpr int TABS_ICON_IN_MENU_16 = 16;
+  static constexpr int TABS_ICON_IN_MENU_24 = 24;
+  static constexpr int TABS_ICON_IN_MENU_48 = 48;
+  static int IMG_WIDTH;
+  static int IMG_HEIGHT;
+};
 
 #endif  // STYLESHEET_H
