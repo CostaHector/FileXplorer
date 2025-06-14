@@ -1,13 +1,15 @@
-#ifndef ARCHIVEFILESACTIONS_H
+﻿#ifndef ARCHIVEFILESACTIONS_H
 #define ARCHIVEFILESACTIONS_H
 
 #include <QAction>
 #include <QActionGroup>
 #include <QObject>
+#include <QToolBar>
 
 class ArchiveFilesActions : public QObject {
  public:
   explicit ArchiveFilesActions(QObject* parent = nullptr);
+  QToolBar* GetArchiveTooBar();
 
   QAction* COMPRESSED_HERE{new (std::nothrow) QAction{QIcon(":img/COMPRESSED"), "Compressd here", this}};
   QAction* COMPRESSED_TO{new (std::nothrow) QAction{"Compressd to", this}};

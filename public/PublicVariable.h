@@ -1,54 +1,26 @@
 ﻿#ifndef PUBLICVARIABLE_H
 #define PUBLICVARIABLE_H
 
-#include <QDir>
-#include <QRect>
-#include <QSettings>
-#include <QSize>
-
-constexpr QRect DEFAULT_GEOMETRY{0, 0, 1024, 768};
-constexpr QSize DOCKER_DEFAULT_SIZE{DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height()};
-const char SUBMIT_BTN_STYLE[] =
-    "QPushButton{"
-    "    color: #fff;"
-    "    background-color: DodgerBlue;"
-    "    border-color: DodgerBlue;"
-    "}"
-    "QPushButton:hover {"
-    "    color: #fff;"
-    "    background-color: rgb(36, 118, 199);"
-    "    border-color: rgb(36, 118, 199);"
-    "}";
-
-struct IMAGE_SIZE {
-  static constexpr int TABS_ICON_IN_MENU_16 = 16;
-  static constexpr int TABS_ICON_IN_MENU_24 = 24;
-  static constexpr int TABS_ICON_IN_MENU_48 = 48;
-  static int IMG_WIDTH;
-  static int IMG_HEIGHT;
-};
-
-static inline QSettings& PreferenceSettings() {
-  static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", "FileExplorerReadOnly");
-  return settings;
-}
+#include <QString>
+#include <QStringList>
+#include <functional>
 
 typedef std::function<bool(QString, bool, bool)> T_IntoNewPath;
 typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
 typedef std::function<void()> T_SwitchStackWidget;
 
-namespace SystemPath {
-const QString HOME_PATH{QDir::homePath()};
-const QString STARRED_PATH{HOME_PATH + "/Documents"};
-const QString VIDS_DATABASE{HOME_PATH + "/FileExplorerReadOnly/VIDS_DATABASE.db"};
-const QString DEVICES_AND_DRIVES_DATABASE{HOME_PATH + "/FileExplorerReadOnly/DEVICES_AND_DRIVES.db"};
-const QString AI_MEDIA_DUP_DATABASE{HOME_PATH + "/FileExplorerReadOnly/DUPLICATES_DB.db"};
-const QString RECYCLE_BIN_DATABASE{HOME_PATH + "/FileExplorerReadOnly/RECYCLE_BIN_DATABASE.db"};
-const QString PEFORMERS_DATABASE{HOME_PATH + "/FileExplorerReadOnly/PERFORMERS_DATABASE.db"};
-const QString TORRENTS_DATABASE{HOME_PATH + "/FileExplorerReadOnly/TORRENTS_DATABASE.db"};
-const QString PRODUCTION_STUDIOS_DATABASE{HOME_PATH + "/FileExplorerReadOnly/PRODUCTION_STUDIOS_DATABASE.db"};
-}  // namespace SystemPath
+struct SystemPath {
+  static const QString HOME_PATH;
+  static const QString STARRED_PATH;
+  static const QString VIDS_DATABASE;
+  static const QString DEVICES_AND_DRIVES_DATABASE;
+  static const QString AI_MEDIA_DUP_DATABASE;
+  static const QString RECYCLE_BIN_DATABASE;
+  static const QString PEFORMERS_DATABASE;
+  static const QString TORRENTS_DATABASE;
+  static const QString PRODUCTION_STUDIOS_DATABASE;
+};
 
 namespace DB_TABLE {
 const QString MOVIES = "MOVIES";

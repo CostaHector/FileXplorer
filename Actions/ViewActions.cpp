@@ -1,8 +1,9 @@
-#include "ViewActions.h"
+﻿#include "ViewActions.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 #include "Tools/ViewTypeTool.h"
 
 ViewActions& g_viewActions() {

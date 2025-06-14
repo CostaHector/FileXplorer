@@ -1,6 +1,6 @@
 ﻿#include "SearchModeComboBox.h"
 #include <QLayout>
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Tools/SearchTools.h"
 using namespace SearchTools;
 

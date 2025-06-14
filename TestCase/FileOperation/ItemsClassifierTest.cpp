@@ -4,7 +4,7 @@
 #include "TestCase/pub/TDir.h"
 #include "TestCase/pub/BeginToExposePrivateMember.h"
 #include "Tools/Classify/ItemsClassifier.h"
-#include "Tools/ExtractPileItemsOutFolder.h"
+#include "Tools/Classify/ExtractPileItemsOutFolder.h"
 #include "TestCase/pub/EndToExposePrivateMember.h"
 #include "Tools/Classify/SceneMixed.h"
 #include "Tools/SyncModifiyFileSystem.h"
@@ -27,7 +27,7 @@ class ItemsClassifierTest : public MyTestSuite {
 [file] isolated file.json
    */
   void initTestCase() {
-    SyncModifiyFileSystem::m_syncModifyFileSystemSwitch = false;
+    SyncModifiyFileSystem::m_syncOperationSw = false;
     QVERIFY(mDir.IsValid());
     gNodeEntries = QList<FsNodeEntry>{
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese", true, {}},         //

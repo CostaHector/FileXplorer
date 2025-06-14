@@ -1,17 +1,12 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pub/MyTestSuite.h"
 #include "Tools/NameSectionArrange.h"
 
 class NameSectionArrangeTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
-  void init() {}
-  void cleanup() {}
-
   void test_SubscriptsStr2Int() {
     // seperated by comma, space-comma, space
     const QStringList strLst{"5,10,2,3,4", "5 10 2 3 4", "5 10 2 3 4", "5  10 2,3, 4"};

@@ -1,4 +1,4 @@
-#include "QuickWhereClause.h"
+﻿#include "QuickWhereClause.h"
 
 #include <QButtonGroup>
 
@@ -16,6 +16,7 @@
 #include "public/PublicMacro.h"
 #include "Tools/PerformersAkaManager.h"
 #include "Tools/FileDescriptor/TableFields.h"
+#include "public/StyleSheet.h"
 
 QuickWhereClause::QuickWhereClause(QWidget* parent) : QDialog{parent} {
   m_Name = new QLineEdit;
@@ -38,8 +39,8 @@ QuickWhereClause::QuickWhereClause(QWidget* parent) : QDialog{parent} {
   m_Cast->setPlaceholderText(R"(Henry Cavill&Chris Evans)");  //
   m_Tags->setPlaceholderText(R"(Comedy|Documentary)");        //
 
-  dbb = new QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
-  dbb->button(QDialogButtonBox::StandardButton::Ok)->setStyleSheet(SUBMIT_BTN_STYLE);
+  dbb = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
+  dbb->button(QDialogButtonBox::StandardButton::Ok)->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
 
   using namespace MOVIE_TABLE;
   QFormLayout* lo = new QFormLayout(this);

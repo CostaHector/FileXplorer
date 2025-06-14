@@ -1,6 +1,7 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 #include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/TDir.h"
 #include "Tools/FileDescriptor/FileDescriptor.h"
 #include "public/PublicTool.h"
 
@@ -8,20 +9,24 @@
 #include <windows.h>
 #endif
 
-const QString rootpath = QFileInfo(__FILE__).absolutePath() + "/FileDescriptor";
-const QString fi5Char = rootpath + "/5CharFile.txt";
-const QString fi10Char = rootpath + "/10CharFile.txt";
-const QString fiFileTemp = rootpath + "/Temp.txt";
-const QString fiPathTemp = rootpath + "/NotExistPath/Temp.txt";
 class FileDescriptorTest : public MyTestSuite {
   Q_OBJECT
  public:
   FileDescriptorTest() : MyTestSuite{false} {}
+  TDir mDir;
+  const QString mWorkPath{mDir.path()};
+  const QString fi5Char{mWorkPath + "/5CharFile.txt"};
+  const QString fi10Char{mWorkPath + "/10CharFile.txt"};
+  const QString fiFileTemp{mWorkPath + "/Temp.txt"};
+  const QString fiPathTemp{mWorkPath + "/NotExistPath/Temp.txt"};
  private slots:
-  void init() {
-    QVERIFY(QFile::exists(fi5Char));
-    QVERIFY(QFile::exists(fi10Char));
-    QVERIFY(!QFile::exists(fiFileTemp));
+  void initTestCase() {
+    QVERIFY(mDir.IsValid());
+    const QList<FsNodeEntry> gNode{
+        FsNodeEntry{"5CharFile.txt", false, "ABCDE"},
+        FsNodeEntry{"10CharFile.txt", false, ""},
+    };
+    QCOMPARE(mDir.createEntries(gNode), 2);
   }
 
 #ifdef Q_OS_WIN
