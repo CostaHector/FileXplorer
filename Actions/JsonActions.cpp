@@ -1,4 +1,4 @@
-#include "JsonActions.h"
+﻿#include "JsonActions.h"
 #include <QApplication>
 #include <QStyle>
 
@@ -14,7 +14,7 @@ JsonActions::JsonActions(QObject* parent)  //
                                         .arg(_SAVE_CURRENT_CHANGES->shortcut().toString()));
 
   // **Sync cache/file system**
-  _SYNC_NAME_FIELD_BY_FILENAME = new (std::nothrow) QAction(QIcon(":img/SYNC_MODIFICATION_SWITCH"), "Sync Json Name Value");
+  _SYNC_NAME_FIELD_BY_FILENAME = new (std::nothrow) QAction(QIcon(":img/NAME_FROM_JSON_FILENAME"), "Sync Json Name Value");
   _SYNC_NAME_FIELD_BY_FILENAME->setToolTip(QString("<b>%1 (%2)</b><br/>Sync Name Field from json file base name.")  //
                                                .arg(_SYNC_NAME_FIELD_BY_FILENAME->text(), _SYNC_NAME_FIELD_BY_FILENAME->shortcut().toString()));
 
