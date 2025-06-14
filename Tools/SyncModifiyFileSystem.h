@@ -10,16 +10,15 @@ class SyncModifiyFileSystem {
   bool operator()(QString& path) const;
 
   static void LoadFromMemory();
-
+  static void SetSyncOperationSwitch(const bool bOn);
+  static void SetSyncReverseBackSwitch(const bool bReverse);
   static bool SetBasicPath(const QString& basicPath);
-  static bool SetSynchronizedToPaths(const QString& synchronizedToPath);
+  static bool SetSynchronizedToPaths(const QString& syncToPath);
 
-  static bool m_syncModifyFileSystemSwitch;
-  static bool m_alsoSyncReversebackSwitch;
-
+  static bool m_syncOperationSw;
+  static bool m_syncBackSw;
   static QString m_basicPath;
-  static QString m_synchronizedToPath;
-  static bool mInited;
+  static QString m_syncToPath;
 };
 
 #endif  // SYNCMODIFIYFILESYSTEM_H

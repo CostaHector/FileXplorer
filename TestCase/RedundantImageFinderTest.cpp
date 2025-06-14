@@ -1,42 +1,63 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/TDir.h"
 #include "Tools/RedunImgLibs.h"
 
-const QString rootpath = QFileInfo(__FILE__).absolutePath() + "/test/TestEnv_RedundantImageFinderTest";
 class RedundantImageFinderTest : public MyTestSuite {
   Q_OBJECT
  public:
+  RedundantImageFinderTest() : MyTestSuite{false} {}
+  TDir mDir;
+  const QString mWorkPath{mDir.path()};
+  const QString mBenchmarkRedunFolder{mWorkPath + "/benchmark"};
+  const QString mFolderToFindRedun{mWorkPath + "/ToFindRedun"};
  private slots:
-  void test_ReplaceRename_invalid_regex_failed() {
-    // precondition
-    const QFile fiA{rootpath + "/a.jpg"};
-    const QFile fiB{rootpath + "/b.png"};
-    const QFile fiCEmpty{rootpath + "/c.webp"};
-    QVERIFY(fiA.exists());
-    QVERIFY(fiB.exists());
-    QVERIFY(fiCEmpty.exists());
-    QCOMPARE(fiA.size(), 3);
-    QCOMPARE(fiB.size(), 3);
-    QCOMPARE(fiCEmpty.size(), 0);
+  void initTestCase() {
+    QVERIFY(mDir.IsValid());
+    const QList<FsNodeEntry> gNode{
+        FsNodeEntry{"benchmark/a.jpg", false, "123"},           //
+        FsNodeEntry{"benchmark/aDuplicate.png", false, "123"},  //
+        FsNodeEntry{"benchmark/b.png", false, "456"},           //
+        FsNodeEntry{"ToFindRedun/aRedun.jpg", false, "123"},    //
+        FsNodeEntry{"ToFindRedun/bRedun.png", false, "456"},    //
+        FsNodeEntry{"ToFindRedun/cEmpty.webp", false, ""},      //
+    };
+    QVERIFY(mDir.createEntries(gNode) >= gNode.size());
+  }
 
+  void test_redundant_images_find_ok() {
     // procedure
     RedunImgLibs redunImgLib;
-    QCOMPARE(redunImgLib.LearnSizeAndHashFromRedunImgPath(rootpath), 3);  // 3 hash
-    QCOMPARE(redunImgLib.m_commonFileHash.size(), 3);
-    QCOMPARE(redunImgLib.m_commonFileSizeSet.size(), 2);
+    QCOMPARE(redunImgLib.LearnSizeAndHashFromRedunImgPath(mBenchmarkRedunFolder), 3);  // 3 files
+    QCOMPARE(redunImgLib.m_commonFileHash.size(), 2);                                  // hash {hash1, hash1, hash2}
+    QCOMPARE(redunImgLib.m_commonFileSizeSet.size(), 1);                               // size {3,3,3}
 
-    const bool before = PreferenceSettings().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
-    PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, true);
-    const auto& itemsEmptyAlsoRedun = redunImgLib.FindRedunImgs(rootpath);
-    QCOMPARE(itemsEmptyAlsoRedun.size(), 3);
+    static const auto GetNames = [](const REDUNDANT_IMG_BUNCH& imgs) -> QStringList {
+      QStringList imgNames;
+      for (const auto& img : imgs) {
+        imgNames.append(img.filePath);
+      }
+      imgNames.sort();
+      return imgNames;
+    };
 
-    PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, false);
-    const auto& itemsEmptyNotRedun = redunImgLib.FindRedunImgs(rootpath);
-    QCOMPARE(itemsEmptyNotRedun.size(), 2);
-    PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, before);
+    const auto& itemsEmptyAlsoRedun = redunImgLib.FindRedunImgs(mFolderToFindRedun, true);
+    QCOMPARE(GetNames(itemsEmptyAlsoRedun),  //
+             (QStringList{
+                 mFolderToFindRedun + "/aRedun.jpg",  //
+                 mFolderToFindRedun + "/bRedun.png",  //
+                 mFolderToFindRedun + "/cEmpty.webp",
+             })  //
+    );
+
+    const auto& itemsEmptyNotRedun = redunImgLib.FindRedunImgs(mFolderToFindRedun, false);
+    QCOMPARE(GetNames(itemsEmptyNotRedun),  //
+             (QStringList{
+                 mFolderToFindRedun + "/aRedun.jpg",  //
+                 mFolderToFindRedun + "/bRedun.png",  //
+             })                                       //
+    );                                                //
   }
 };
 

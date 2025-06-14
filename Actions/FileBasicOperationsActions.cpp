@@ -3,6 +3,7 @@
 #include "public/MemoryKey.h"
 #include "public/PublicTool.h"
 #include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 #include <QToolBar>
 #include <QApplication>
 #include <QStyle>
