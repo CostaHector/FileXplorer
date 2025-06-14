@@ -18,12 +18,13 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
     QVERIFY(mDir.IsValid());
     QVERIFY(mDir.mkpath("home"));
     QVERIFY(mDir.mkpath("bin"));
-    syncMod.SetBasicPath(mBasicPath);
-    syncMod.SetSynchronizedToPaths(mSyncToPath);
+    SyncModifiyFileSystem::m_basicPath = mBasicPath;
+    SyncModifiyFileSystem::m_syncToPath = mSyncToPath;
   }
 
   void test_sync_switchoff_no_sync() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> opSwBkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> syncBackSwbkp{syncMod.m_syncBackSw};
     syncMod.m_syncOperationSw = false;
     syncMod.m_syncBackSw = true;
     // rename: path/oldItemName => path/newItemName
@@ -33,8 +34,8 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_rename_sync_back_ok() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
-    GlbDataProtect<bool> bkpReverse{syncMod.m_syncBackSw};
+    GlbDataProtect<bool> opSwBkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> syncBackSwbkp{syncMod.m_syncBackSw};
     syncMod.m_syncOperationSw = true;
     syncMod.m_syncBackSw = true;
     // rename: path1/oldItemName => path2/newItemName
@@ -51,8 +52,8 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_rename_no_sync_back() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
-    GlbDataProtect<bool> bkpReverse{syncMod.m_syncBackSw};
+    GlbDataProtect<bool> opSwBkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> syncBackSwbkp{syncMod.m_syncBackSw};
     syncMod.m_syncOperationSw = true;
     syncMod.m_syncBackSw = false;
     // rename: path/oldItemName => path/newItemName
@@ -67,12 +68,10 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
   }
 
   void test_when_same_path_skip() {
-    GlbDataProtect<bool> bkp{syncMod.m_syncOperationSw};
-    GlbDataProtect<bool> bkpReverse{syncMod.m_syncBackSw};
+    GlbDataProtect<bool> opSwBkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> syncBackSwbkp{syncMod.m_syncBackSw};
     syncMod.m_syncOperationSw = true;
     syncMod.m_syncBackSw = true;
-    syncMod.SetBasicPath(mBasicPath);
-    syncMod.SetSynchronizedToPaths(mSyncToPath);
     // mod on items under "C:/Program Files (x86)" should not influence mBasicPath
     QString path = "C:/Program Files (x86)";
     QVERIFY(!syncMod(path));
