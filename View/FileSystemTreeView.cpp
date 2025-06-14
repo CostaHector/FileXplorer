@@ -1,6 +1,7 @@
-#include "FileSystemTreeView.h"
+﻿#include "FileSystemTreeView.h"
 #include "View/ViewHelper.h"
 #include "public/StyleSheet.h"
+#include "public/MemoryKey.h"
 
 #include "Actions/RightClickMenuActions.h"
 #include "Actions/FileBasicOperationsActions.h"

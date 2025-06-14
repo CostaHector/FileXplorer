@@ -10,7 +10,7 @@
 #include "Tools/FileSystemItemFilter.h"
 #include "Tools/MD5Calculator.h"
 #include "Tools/VidsDurationDisplayString.h"
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "public/StyleSheet.h"
 #include "public/DisplayEnhancement.h"
 

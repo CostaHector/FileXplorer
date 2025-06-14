@@ -1,10 +1,11 @@
-#include "PerformersAkaManager.h"
+﻿#include "PerformersAkaManager.h"
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include "public/MemoryKey.h"
 #include "public/PublicVariable.h"
 #include "public/PublicMacro.h"
 #include <QTextStream>
+#include <QFile>
 
 const QHash<QChar, QString> PerformersAkaManager::op2Str = {{'&', "AND"}, {'|', "OR"}};
 constexpr char PerformersAkaManager::LOGIC_OR_CHAR;
@@ -97,7 +98,7 @@ QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
   const QString akaPerfFilePath =  //
       PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name, MemoryKey::LINUX_AKA_PERFORMERS.v).toString();
 #endif
-  QFile file(akaPerfFilePath);
+  QFile file{akaPerfFilePath};
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("File not found: %s.", qPrintable(file.fileName()));
     return {};

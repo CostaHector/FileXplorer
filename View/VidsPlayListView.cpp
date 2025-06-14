@@ -1,4 +1,4 @@
-#include "VidsPlayListView.h"
+﻿#include "VidsPlayListView.h"
 #include "Actions/VideoPlayerActions.h"
 #include "Component/Notificator.h"
 
@@ -7,6 +7,8 @@
 
 #include <QDesktopServices>
 #include <QUrl>
+#include <QFile>
+#include <QFileInfo>
 
 VidsPlayListView::VidsPlayListView(VidModel* model_, QWidget* parent)
     : CustomListView{"VID_PLAYLIST_VIEW", parent}, m_vidModel{model_}, m_vidMenu{new QMenu("playList", this)} {
@@ -36,7 +38,7 @@ void VidsPlayListView::onRevealInSystemExplorer() {
   }
   const QString& filePath = currentFilePath();
   const QString& dirPath = PathTool::absolutePath(filePath);
-  if (not QFile::exists(filePath)) {
+  if (!QFile::exists(filePath)) {
     qInfo("Cannot reveal. dirpath[%s] not exists", qPrintable(dirPath));
     Notificator::information("Cannot reveal", QString("dirpath[%1] not exists").arg(dirPath));
     return;

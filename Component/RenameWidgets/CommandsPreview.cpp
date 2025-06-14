@@ -1,5 +1,5 @@
 ﻿#include "CommandsPreview.h"
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "public/StyleSheet.h"
 
 #include <QClipboard>

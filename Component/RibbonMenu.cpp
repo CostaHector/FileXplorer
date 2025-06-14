@@ -187,18 +187,8 @@ QToolBar* RibbonMenu::LeafHome() const {
   advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
   QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
-  {
-    syncSwitchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
-    syncSwitchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  }
   QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
-  {
-    syncPathToolBar->setOrientation(Qt::Orientation::Vertical);
-    syncPathToolBar->setStyleSheet("QToolBar { max-width: 512px; }");
-    syncPathToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-    syncPathToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-  }
+  SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
   QToolBar* leafHomeWid = new (std::nothrow) QToolBar("LeafHome");
   CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
@@ -238,13 +228,9 @@ QToolBar* RibbonMenu::LeafView() const {
   CHECK_NULLPTR_RETURN_NULLPTR(fileSystemView);
 
   auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
-  folderPreviewToolBar->setOrientation(Qt::Orientation::Vertical);
-  folderPreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  folderPreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
-  folderPreviewToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  auto* embeddedPlayerTB = new DropdownToolButton(g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  auto* embeddedPlayerTB = new (std::nothrow) DropdownToolButton(g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   embeddedPlayerTB->setDefaultAction(g_viewActions()._VIDEO_PLAYER_EMBEDDED);
   leafViewWid->setToolTip("View Leaf");
   leafViewWid->addAction(g_viewActions().NAVIGATION_PANE);
@@ -373,6 +359,10 @@ void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
   PreferenceSettings().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
 }
 
+// #define __NAME__EQ__MAIN__ 1
+#ifdef __NAME__EQ__MAIN__
+#include <QApplication>
+
 #include <QMainWindow>
 #include <QToolBar>
 
@@ -391,10 +381,6 @@ class RibbonMenuIllu : public QMainWindow {
     setMinimumWidth(1024);
   }
 };
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
