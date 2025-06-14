@@ -4,11 +4,14 @@
 #include <QString>
 #include <QRect>
 #include <QSize>
+#include <QFont>
 
 class QWidget;
+class QLayout;
 
 namespace StyleSheet {
 constexpr int ROW_SECTION_HEIGHT = 10;
+static const QFont TEXT_EDIT_FONT{"Consolas", 15};
 
 #define STYLE_ITEMS_MAPPING \
   STYLE_ITEM(DEFAULT, 0)    \
@@ -58,4 +61,5 @@ struct IMAGE_SIZE {
   static int IMG_HEIGHT;
 };
 
+void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 #endif  // STYLESHEET_H

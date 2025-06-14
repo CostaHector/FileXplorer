@@ -69,7 +69,7 @@ void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
   }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-  if (not(m_fsm->canItemsBeDragged(ind) or m_fsm->canItemsDroppedHere(ind))) {
+  if (!(m_fsm->canItemsBeDragged(ind) || m_fsm->canItemsDroppedHere(ind))) {
     qDebug("reject drag/drop not allowed.");
     m_fsm->DragRelease();
     event->ignore();
@@ -111,7 +111,7 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
   // allowed dropped and not contains
-  if (not(m_fsm->canItemsDroppedHere(ind) and not view->selectionModel()->selectedIndexes().contains(ind))) {
+  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedIndexes().contains(ind))) {
     qDebug("reject drop here. not allowed or self drop");
     event->ignore();
     return;
