@@ -1,5 +1,5 @@
-#include "Archiver.h"
-#include "public/PublicVariable.h"
+﻿#include "Archiver.h"
+#include "public/MemoryKey.h"
 #include "Tools/ArchiveFiles.h"
 #include "Model/QAbstractTableModelPub.h"
 #include "View/CustomTableView.h"

@@ -22,7 +22,7 @@ class TDir {
   bool IsValid() const { return mTempDir.isValid(); }
 
   int createEntries(const QList<FsNodeEntry>& entries);
-  QList<FsNodeEntry> getEntries(const QDir::Filters filters = QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, bool bFileContentMatter = false) const;
+  QList<FsNodeEntry> getEntries(bool bFileContentMatter = false, const QDir::Filters filters = QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot) const;
   bool touch(const QString& relativePathToFile, const QByteArray& contents = "") const;
   bool mkdir(const QString& folderName) const { return mDir.mkdir(folderName); }
   bool mkpath(const QString& dirPath) const { return mDir.mkpath(dirPath); }

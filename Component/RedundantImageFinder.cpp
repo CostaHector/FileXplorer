@@ -1,4 +1,4 @@
-#include "RedundantImageFinder.h"
+﻿#include "RedundantImageFinder.h"
 
 #include <QAbstractTableModel>
 #include <QDir>
@@ -137,7 +137,8 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
 }
 
 void RedundantImageFinder::operator()(const QString& folderPath) {
-  REDUNDANT_IMG_BUNCH newImgs = mRedunLibs.FindRedunImgs(folderPath);
+  const bool recycleEmptyImage = PreferenceSettings().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
+  REDUNDANT_IMG_BUNCH newImgs = mRedunLibs.FindRedunImgs(folderPath, recycleEmptyImage);
 
   int beforeRowCnt = m_imgsBunch.size();
   int afterRowCnt = newImgs.size();

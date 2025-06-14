@@ -165,10 +165,10 @@ class UndoRedoTest : public MyTestSuite {
   }
 
   void test_sync_edit_switch_off_switch_on_two_direction_ok() {
-    GlbDataProtect<bool> bkp{SyncModifiyFileSystem::m_syncModifyFileSystemSwitch};
-    SyncModifiyFileSystem::m_syncModifyFileSystemSwitch = false;
-    GlbDataProtect<bool> bkpBackDirection{SyncModifiyFileSystem::m_alsoSyncReversebackSwitch};
-    SyncModifiyFileSystem::m_alsoSyncReversebackSwitch = false;
+    GlbDataProtect<bool> bkp{SyncModifiyFileSystem::m_syncOperationSw};
+    SyncModifiyFileSystem::m_syncOperationSw = false;
+    GlbDataProtect<bool> bkpBackDirection{SyncModifiyFileSystem::m_syncBackSw};
+    SyncModifiyFileSystem::m_syncBackSw = false;
 
     // switch off
     TDir mdir;
@@ -204,11 +204,11 @@ class UndoRedoTest : public MyTestSuite {
     ur.clear(); // clear two stack
 
     // switch on
-    SyncModifiyFileSystem::m_syncModifyFileSystemSwitch = true;
+    SyncModifiyFileSystem::m_syncOperationSw = true;
 
     // sync-back off
     // from -> dest: ok, dest -> from: nok
-    SyncModifiyFileSystem::m_alsoSyncReversebackSwitch = false;
+    SyncModifiyFileSystem::m_syncBackSw = false;
 
     QVERIFY(ur.Do({renameCmd}));
     QVERIFY(mdir.fileExists("from/newAnyfile.txt", false));
@@ -247,7 +247,7 @@ class UndoRedoTest : public MyTestSuite {
 
     // sync-back on
     // from -> dest: ok, dest -> from: ok
-    SyncModifiyFileSystem::m_alsoSyncReversebackSwitch = true;
+    SyncModifiyFileSystem::m_syncBackSw = true;
     QVERIFY(ur.Do({syncRenameCmd}));
     QVERIFY(mdir.fileExists("from/newAnyfile.txt", false));
     QVERIFY(mdir.fileExists("dest/newAnyfile.txt", false));
