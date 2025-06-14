@@ -30,6 +30,7 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   m_FileSystemOp->setOrientation(Qt::Orientation::Vertical);
   m_FileSystemOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_FileSystemOp->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(m_FileSystemOp->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_LoadExtentOp = new (std::nothrow) QToolBar{"Load Extend Data Operation", this};
   CHECK_NULLPTR_RETURN_VOID(m_LoadExtentOp);
