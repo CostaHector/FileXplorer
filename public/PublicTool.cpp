@@ -1,4 +1,4 @@
-#include "public/PublicTool.h"
+﻿#include "public/PublicTool.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 
@@ -75,13 +75,6 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
   stream.flush();
   fi.close();
   return true;
-}
-
-void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
-  for (int i = 0; i < lay->count(); ++i) {
-    lay->itemAt(i)->setAlignment(align);
-  }
-  // Only QToolBar and QToolButton need to set alignment. (QWidget like QSeperator not need)
 }
 
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {

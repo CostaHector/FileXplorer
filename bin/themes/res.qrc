@@ -171,6 +171,7 @@
 <file alias="TAGS_CLEAR">JsonEditor/TAGS_CLEAR.svg</file>
 <file alias="STUDIO_CLEAR">JsonEditor/STUDIO_CLEAR.svg</file>
 <file alias="STUDIO">JsonEditor/STUDIO.svg</file>
+<file alias="NAME_FROM_JSON_FILENAME">JsonEditor/NAME_FROM_JSON_FILENAME.svg</file>
 <!--VideoPlayer icon here-->
 <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
 <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
@@ -281,15 +282,6 @@
 <file alias="REVERT">Database/REVERT.svg</file>
 
 <file alias="ZIP">TopSideToolBarIcons/ZIP.ico</file>
-
-<!--RenameConflict Icons here-->
-<file alias="FILESIZE_SCALE">RenameConflictIcons/FILESIZE_SCALE.png</file>
-<file alias="MIRROR_REVERT">RenameConflictIcons/MIRROR_REVERT.svg</file>
-<file alias="RESET">RenameConflictIcons/RESET.svg</file>
-<file alias="TIME_AXIS">RenameConflictIcons/TIME_AXIS.svg</file>
-<file alias="CONFLICT">RenameConflictIcons/CONFLICT.svg</file>
-<file alias="RECYCLE">RenameConflictIcons/RECYCLE.svg</file>
-<file alias="RESTORE">RenameConflictIcons/RESTORE.svg</file>
 
 <!--AlertSystem icon here-->
 <file alias="ALERT">AlertSystem/ALERT.svg</file>
