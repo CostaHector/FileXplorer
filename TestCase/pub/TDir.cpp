@@ -80,7 +80,7 @@ int TDir::createEntries(const QList<FsNodeEntry>& entries) {
   return filesCreatedSucceedCnt + folderCreatedSucceedCnt;
 }
 
-QList<FsNodeEntry> TDir::getEntries(const QDir::Filters filters, bool bFileContentMatter) const {
+QList<FsNodeEntry> TDir::getEntries(bool bFileContentMatter, const QDir::Filters filters) const {
   if (!IsValid()) {
     return {};
   }
@@ -90,7 +90,7 @@ QList<FsNodeEntry> TDir::getEntries(const QDir::Filters filters, bool bFileConte
   while (it.hasNext()) {
     const QString absPath = it.next();
     bool isDir = it.fileInfo().isDir();
-    if (isDir || bFileContentMatter) {
+    if (isDir || !bFileContentMatter) {
       ans.append({absPath.mid(n), isDir, {}});
       continue;
     }

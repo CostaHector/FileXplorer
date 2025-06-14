@@ -1,37 +1,36 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "pub/MyTestSuite.h"
-#include "TestCase/PathRelatedTool.h"
-
-#include "pub/BeginToExposePrivateMember.h"
+#include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pub/TDir.h"
+#include "TestCase/pub/BeginToExposePrivateMember.h"
 #include "Tools/RenameNamesUnique.h"
-#include "pub/EndToExposePrivateMember.h"
-
-const QString gTestPath{TestCaseRootPath() + "/test/TestEnv_RenameNamesUnique"};
+#include "TestCase/pub/EndToExposePrivateMember.h"
 
 class RenameUnqiueCheckTest : public MyTestSuite {
   Q_OBJECT
  public:
   RenameUnqiueCheckTest() : MyTestSuite{false} {}
-
+  TDir mDir;
+  QString mWorkPath{mDir.path()};
  private slots:
   void initTestCase() {
     /*
     rename12To45Basic{1, 2}
     renameDiretoryNameShouldNotConflict{dirName{dirName, file1}}
     */
-    const QDir dir{gTestPath};
-    QVERIFY(dir.exists("rename12To45Basic/1"));
-    QVERIFY(dir.exists("rename12To45Basic/2"));
-    QVERIFY(dir.exists("renameDiretoryNameShouldNotConflict/dirName/dirName"));
-    QVERIFY(dir.exists("renameDiretoryNameShouldNotConflict/dirName/file1"));
+    QVERIFY(mDir.IsValid());
+    const QList<FsNodeEntry> gNodes{
+        FsNodeEntry{"rename12To45Basic/1", true, ""},
+        FsNodeEntry{"rename12To45Basic/2", true, ""},
+        FsNodeEntry{"renameDiretoryNameShouldNotConflict/dirName/dirName", true, ""},
+        FsNodeEntry{"renameDiretoryNameShouldNotConflict/dirName/file1", true, ""},
+    };
+    QVERIFY(mDir.createEntries(gNodes) >= gNodes.size());
   }
 
-  void cleanupTestCase() {}
-
   void test_get_occupied_name_ok_basic() {
-    const QString pre = QDir(gTestPath).absoluteFilePath("rename12To45Basic");
+    const QString pre = QDir(mWorkPath).absoluteFilePath("rename12To45Basic");
     const QSet<QString>& occupied =                  //
         RenameNamesUnique::getOccupiedPostPath(pre,  //
                                                {"", ""}, {"1", "2"}, true);
@@ -40,7 +39,7 @@ class RenameUnqiueCheckTest : public MyTestSuite {
   }
 
   void test_get_occupied_name_ok_include_subdir() {
-    const QString pre = QDir(gTestPath).absoluteFilePath("renameDiretoryNameShouldNotConflict");
+    const QString pre = QDir(mWorkPath).absoluteFilePath("renameDiretoryNameShouldNotConflict");
     const QSet<QString>& occupied =                  //
         RenameNamesUnique::getOccupiedPostPath(pre,  //
                                                {"dirName", "dirName"}, {"dirName", "file1"}, true);
@@ -85,7 +84,7 @@ class RenameUnqiueCheckTest : public MyTestSuite {
   }
 
   void occupiedNameOfrenameDiretoryNameShouldNotConflict() {
-    const QString pre = QDir(gTestPath).absoluteFilePath("renameDiretoryNameShouldNotConflict");
+    const QString pre = QDir(mWorkPath).absoluteFilePath("renameDiretoryNameShouldNotConflict");
     const QSet<QString>& occupied = RenameNamesUnique::getOccupiedPostPath(pre, {"", "dirName", "dirName"}, {"dirName", "file1", "dirName"}, true);
     const QSet<QString> actual{"dirName", "dirName/file1", "dirName/dirName"};
     QCOMPARE(occupied, actual);
@@ -127,7 +126,7 @@ class RenameUnqiueCheckTest : public MyTestSuite {
             ACMD::GetInstRENAME("C:/home", "d", "d.cpp"),      //
             ACMD::GetInstRENAME("C:/home", "B.md", "b.md"),    //
             ACMD::GetInstRENAME("C:/home", "a.mp4", "A.mp4"),  //
-        };                                                                //
+        };                                                     //
     QCOMPARE(actualCmds, expectAns);
   }
 
@@ -152,8 +151,8 @@ class RenameUnqiueCheckTest : public MyTestSuite {
     BATCH_COMMAND_LIST_TYPE expectAns  //
         {
             ACMD::GetInstRENAME("C:/home/path", "b.mp4", "B.MP4"),  //
-            ACMD::GetInstRENAME("C:/home", "path", "PATH"),              //
-        };                                                                          //
+            ACMD::GetInstRENAME("C:/home", "path", "PATH"),         //
+        };                                                          //
     QCOMPARE(actualCmds, expectAns);
   }
 

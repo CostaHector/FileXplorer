@@ -1,22 +1,22 @@
-#include "RibbonMovieDB.h"
+﻿#include "RibbonMovieDB.h"
 #include "Actions/MovieDBActions.h"
 #include "Actions/TorrDBAction.h"
 #include "Actions/ViewActions.h"
-#include "public/PublicVariable.h"
+#include "public/StyleSheet.h"
 #include "public/PublicMacro.h"
 
 RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
-    : QToolBar(title, parent)                                        //
+    : QToolBar{title, parent}                                        //
 {
   auto& inst = g_dbAct();
 
-  m_dbControlTB = new (std::nothrow) QToolBar("DB Control", this);
+  m_dbControlTB = new (std::nothrow) QToolBar{"DB Control", this};
   CHECK_NULLPTR_RETURN_VOID(m_dbControlTB);
   m_dbControlTB->addActions(inst.DB_CONTROL_ACTIONS->actions());
   m_dbControlTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   m_dbControlTB->setOrientation(Qt::Orientation::Horizontal);
 
-  m_extraFunctionTB = new (std::nothrow) QToolBar("Video DB Extra Function", this);
+  m_extraFunctionTB = new (std::nothrow) QToolBar{"Video DB Extra Function", this};
   CHECK_NULLPTR_RETURN_VOID(m_extraFunctionTB);
   m_extraFunctionTB->addActions(inst.EX_FUNCTION_ACTIONS->actions());
   m_extraFunctionTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
@@ -24,7 +24,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_extraFunctionTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_extraFunctionTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  m_functionsTB = new (std::nothrow) QToolBar("Function", this);
+  m_functionsTB = new (std::nothrow) QToolBar{"Function", this};
   CHECK_NULLPTR_RETURN_VOID(m_functionsTB);
   m_functionsTB->addAction(inst._SUM);
   m_functionsTB->addAction(inst._COUNT);
@@ -50,7 +50,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_castEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_castEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  m_tagsEditTB = new (std::nothrow) QToolBar("Tags Edit Toolbar", this);
+  m_tagsEditTB = new (std::nothrow) QToolBar{"Tags Edit Toolbar", this};
   CHECK_NULLPTR_RETURN_VOID(m_tagsEditTB);
   m_tagsEditTB->addAction(inst.SET_TAGS);
   m_tagsEditTB->addAction(inst.APPEND_TAGS);
@@ -60,7 +60,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_tagsEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_tagsEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  m_dbViewHideShowTB = new (std::nothrow) QToolBar("Show/Hide Database View", this);
+  m_dbViewHideShowTB = new (std::nothrow) QToolBar{"Show/Hide Database View", this};
   CHECK_NULLPTR_RETURN_VOID(m_dbViewHideShowTB);
   m_dbViewHideShowTB->addAction(g_viewActions()._MOVIE_VIEW);
   m_dbViewHideShowTB->addSeparator();
