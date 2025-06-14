@@ -1,37 +1,28 @@
-#ifndef MD5WINDOW_H
+﻿#ifndef MD5WINDOW_H
 #define MD5WINDOW_H
-#include <QAction>
 #include <QDialog>
-#include <QDialogButtonBox>
+#include <QToolBar>
 #include <QPlainTextEdit>
 #include <QStringList>
-#include <QToolBar>
 #include <QMap>
+#include <QVBoxLayout>
 
 class MD5Window : public QDialog {
  public:
-  explicit MD5Window(const QString& root, const QStringList& items, QWidget* parent = nullptr);
-  QSize sizeHint() const override { return QSize(600, 400); }
-  void showEvent(QShowEvent *event) override;
+  explicit MD5Window(QWidget* parent = nullptr);
+  void ReadSetting();
+  void showEvent(QShowEvent* event) override;
+  void closeEvent(QCloseEvent* event) override;
+  int operator()(const QStringList& absPaths);
 
-  bool onIncrementalCalculateMD5();
-  bool onFullCalculateMD5();
-  bool onLoadFromMD5Files();
-  bool onDumpIntoMD5Files();
+  void dropEvent(QDropEvent* event) override;
+  void dragEnterEvent(QDragEnterEvent* event) override;
 
  private:
-  void subscribe();
-
-  QString m_root;
-  QStringList m_items;
-  QString m_md5FileName;
-  QPlainTextEdit* m_md5TextEdit;
-  QDialogButtonBox* m_buttonBox;
-  QAction* m_incrementRefresh;
-  QAction* m_reloadFromFile;
-  QAction* m_dumpMD5IntoFile;
-  QAction* m_fullRefresh;
-  QToolBar* m_md5InfoTB;
+  QPlainTextEdit* m_md5TextEdit{nullptr};
+  QAction* _ONLY_FIRST_BYTE{nullptr};
+  QToolBar* m_md5InfoTB{nullptr};
+  QVBoxLayout* mMainLayout{nullptr};
 
   QMap<QString, QString> m_fileMD5Map;
 };
