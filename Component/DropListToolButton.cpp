@@ -1,4 +1,5 @@
-#include "DropListToolButton.h"
+﻿#include "DropListToolButton.h"
+#include "public/MemoryKey.h"
 #include <QMenu>
 
 DropdownToolButton::DropdownToolButton(QList<QAction*> dropdownActions,             //

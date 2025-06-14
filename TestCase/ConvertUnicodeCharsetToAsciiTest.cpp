@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
 #include "pub/MyTestSuite.h"
 #include "Tools/ConvertUnicodeCharsetToAscii.h"
@@ -7,11 +7,6 @@ class ConvertUnicodeCharsetToAsciiTest : public MyTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
-  void init() {}
-  void cleanup() {}
-
   void CodingTest() {
     QString startOfBoldA = QChar{0xD835};
     startOfBoldA.append(QChar{0XDDD4});

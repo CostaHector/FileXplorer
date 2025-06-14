@@ -214,6 +214,12 @@ RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
 | home | a/a1 | {a/a1} | OK |
 | home | a | {} | OK |
 
+### Table 1.4 Expected Behavior of RedundantImageFinder class
+| imgs in benchmarkPath<br/>name(contents) | imgs in pathToFindRedundent<br/>name(contents) | also find empty  | result |
+|---------|-----------|---------------------------------------------------|--------|
+| {a.jpg("123"),<br/>aDuplicate.png("123"),<br/>b.png("456")} | {aRedun.jpg("123"),<br/>bRedun.png("456"),<br/>cEmpty.webp("")} | true | {aRedun.jpg,<br/>bRedun.png,<br/>cEmpty.webp} |
+| {a.jpg("123"),<br/>aDuplicate.png("123"),<br/>b.png("456")} | {aRedun.jpg("123"),<br/>bRedun.png("456"),<br/>cEmpty.webp("")} | false | {aRedun.jpg,<br/>bRedun.png} |
+
 
 ### Undo/Redo/Executor Sequence Diagram
 ```mermaid
@@ -226,52 +232,52 @@ sequenceDiagram
 
     User->>UndoRedo: Do(cmds)
     UndoRedo->>Executor: executer(cmds)
-    loop 对每个ACMD
-        Executor->>FILE_OPERATION_FUNC: 根据op选择函数
-        FILE_OPERATION_FUNC->>FileSystem: 执行操作
-        FileSystem-->>FILE_OPERATION_FUNC: 结果
-        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(结果, recoverCmds)
+    loop for each ACMD
+        Executor->>FILE_OPERATION_FUNC: get function by op
+        FILE_OPERATION_FUNC->>FileSystem: do one operation
+        FileSystem-->>FILE_OPERATION_FUNC: result bool
+        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(resultCode, recoverCmds)
         Executor->>Executor: allRecoverCmds+=recoverCmds
     end
 
-    Executor-->>UndoRedo: RETURN_TYPE(结果, allRecoverCmds)
-    UndoRedo->>UndoRedo: 将allRecoverCmds压入undoList
-    UndoRedo-->>User: 执行结果
+    Executor-->>UndoRedo: RETURN_TYPE(resultCode, allRecoverCmds)
+    UndoRedo->>UndoRedo: undoList.push(allRecoverCmds)
+    UndoRedo-->>User: result bool
 
     User->>UndoRedo: Undo()
-    UndoRedo->>UndoRedo: undoList弹栈到undoEles并反序
+    UndoRedo->>UndoRedo: undoEles = undoList.pop().reverse()
     UndoRedo->>Executor: executer(undoEles)
-    loop 对每个ACMD
-        Executor->>FILE_OPERATION_FUNC: 根据op选择函数
-        FILE_OPERATION_FUNC->>FileSystem: 执行撤销操作
-        FileSystem-->>FILE_OPERATION_FUNC: 结果
-        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(结果, recoverCmds)
+    loop for each ACMD
+        Executor->>FILE_OPERATION_FUNC: get function by op
+        FILE_OPERATION_FUNC->>FileSystem: do one operation
+        FileSystem-->>FILE_OPERATION_FUNC: result bool
+        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(resultCode, recoverCmds)
         Executor->>Executor: allRecoverCmds+=recoverCmds
     end
 
-    Executor-->>UndoRedo: RETURN_TYPE(结果, allRecoverCmds)
-    UndoRedo->>UndoRedo: 将allRecoverCmds作为redoEles压入redoList
-    UndoRedo-->>User: 执行结果
+    Executor-->>UndoRedo: RETURN_TYPE(resultCode, allRecoverCmds)
+    UndoRedo->>UndoRedo: redoList.push(allRecoverCmds)
+    UndoRedo-->>User: result bool
 
     User->>UndoRedo: Undo()
-    UndoRedo->>UndoRedo: 检查undoList为空
-    UndoRedo-->>User: 跳过
+    UndoRedo->>UndoRedo: undoList.isEmpty()
+    UndoRedo-->>User: skip
 
     User->>UndoRedo: Redo()
-    UndoRedo->>UndoRedo: redoList弹栈到redoEles并反序
+    UndoRedo->>UndoRedo: redoEles=redoList.pop().reverse()
     UndoRedo->>Executor: executer(redoEles)
-    loop 对每个ACMD
-        Executor->>FILE_OPERATION_FUNC: 根据op选择函数
-        FILE_OPERATION_FUNC->>FileSystem: 执行重做操作
-        FileSystem-->>FILE_OPERATION_FUNC: 结果
-        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(结果, recoverCmds)
+    loop for each ACMD
+        Executor->>FILE_OPERATION_FUNC: get function by op
+        FILE_OPERATION_FUNC->>FileSystem: do one operation
+        FileSystem-->>FILE_OPERATION_FUNC: result bool
+        FILE_OPERATION_FUNC-->>Executor: RETURN_TYPE(resultCode, recoverCmds)
         Executor->>Executor: allRecoverCmds+=recoverCmds
     end
 
-    Executor-->>UndoRedo: RETURN_TYPE(结果, allRecoverCmds)
-    UndoRedo->>UndoRedo: 将allRecoverCmds作为undoEles压入undoList
-    UndoRedo-->>User: 执行结果
+    Executor-->>UndoRedo: RETURN_TYPE(resultCode, allRecoverCmds)
+    UndoRedo->>UndoRedo: undoList.push(allRecoverCmds)
+    UndoRedo-->>User: result bool
     User->>UndoRedo: Redo()
-    UndoRedo->>UndoRedo: 检查redoList为空
-    UndoRedo-->>User: 跳过*/
+    UndoRedo->>UndoRedo: redoList.isEmpty()
+    UndoRedo-->>User: skip*/
 ```
