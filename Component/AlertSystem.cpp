@@ -1,4 +1,4 @@
-#include "AlertSystem.h"
+﻿#include "AlertSystem.h"
 #include <QDesktopServices>
 #include <QFileIconProvider>
 #include <QHeaderView>
@@ -7,8 +7,9 @@
 #include <QVBoxLayout>
 
 #include "Actions/FileLeafAction.h"
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 #include "Notificator.h"
+#include "public/StyleSheet.h"
 
 AlertSystem::AlertSystem(QWidget* parent)
     : QDialog{parent},

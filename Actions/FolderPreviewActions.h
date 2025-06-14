@@ -1,4 +1,4 @@
-#ifndef FOLDERPREVIEWACTIONS_H
+﻿#ifndef FOLDERPREVIEWACTIONS_H
 #define FOLDERPREVIEWACTIONS_H
 
 #include <QAction>
@@ -10,11 +10,7 @@
 class FolderPreviewActions : public QObject {
  public:
   explicit FolderPreviewActions(QObject* parent = nullptr);
-  QToolBar* GetPreviewsToolbar(QWidget* parent) {
-    auto* previewTB = new QToolBar{"previews toolbar", parent};
-    previewTB->addActions(PREVIEW_AG->actions());
-    return previewTB;
-  }
+  QToolBar* GetPreviewsToolbar(QWidget* parent);
 
   QAction* LISTS{nullptr};
   QAction* BROWSER{nullptr};

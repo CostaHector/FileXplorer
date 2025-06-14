@@ -101,7 +101,7 @@ int ExtractPileItemsOutFolder::operator()(const QString& path) {
 }
 
 bool ExtractPileItemsOutFolder::StartToRearrange() {
-  const auto isAllSuccess = g_undoRedo.Do(m_cmds);
+  const bool isAllSuccess = g_undoRedo.Do(m_cmds);
   qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;
 }

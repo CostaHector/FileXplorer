@@ -46,7 +46,7 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
                          .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
-  pOkBtn->setStyleSheet(SUBMIT_BTN_STYLE);
+  pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
   m_buttonBox->button(QDialogButtonBox::Help)->setIcon(QIcon(":img/COMMAND_PREVIEW"));
   m_buttonBox->button(QDialogButtonBox::Help)->setText("See commands...");
 

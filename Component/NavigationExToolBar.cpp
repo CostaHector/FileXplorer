@@ -1,7 +1,7 @@
-#include "NavigationExToolBar.h"
+﻿#include "NavigationExToolBar.h"
 #include "Actions/ActionWithPath.h"
 #include "public/PublicMacro.h"
-#include "public/PublicVariable.h"
+#include "public/MemoryKey.h"
 
 #include <QMimeData>
 #include <QFileInfo>

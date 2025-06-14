@@ -1,6 +1,6 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pub/MyTestSuite.h"
 
 // add necessary includes here
 #include "Tools/NameTool.h"
