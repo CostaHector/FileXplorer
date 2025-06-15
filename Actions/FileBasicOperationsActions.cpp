@@ -68,7 +68,7 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), "Name Ruler");
   _PACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/PACK_FOLDERS"), "Packer");
   _UNPACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker");
-  _RETURN_ERROR_CODE_UPON_ANY_FAILURE = new (std::nothrow) QAction(QIcon(":img/FAST_FAIL"), "Fast Fail");
+  _RETURN_ERROR_CODE_UPON_ANY_FAILURE = new (std::nothrow) QAction(QIcon(":img/FAIL_FAST"), "Fail fast");
   _LONG_PATH_FINDER = new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder");
   _RMV_EMPTY_FOLDER_R = new (std::nothrow) QAction(QIcon(":img/EMPTY_FOLDER"), "Rmv empty folders");
   _RMV_01_FILE_FOLDER = new (std::nothrow) QAction("Rmv 0/1 file folders");
@@ -303,7 +303,7 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "To path");
   _RETURN_ERROR_CODE_UPON_ANY_FAILURE->setCheckable(true);
   _RETURN_ERROR_CODE_UPON_ANY_FAILURE->setToolTip(
-      "<b>Fast fail</b><br/>"
+      "<b>Fail fast</b><br/>"
       "When enabled, <b>immediately return</b> error code if any command fails.<br/>"
       "Otherwise, <b>continue executing</b> remaining commands despite partial failures.");
   _LONG_PATH_FINDER->setToolTip(
