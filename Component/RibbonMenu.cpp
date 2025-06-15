@@ -21,8 +21,6 @@
 #include "Component/RibbonJson.h"
 #include "Component/RibbonMovieDB.h"
 #include "Component/DropListToolButton.h"
-#include "public/PublicTool.h"
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
 
@@ -60,6 +58,8 @@ RibbonMenu::RibbonMenu(QWidget* parent)
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar("corner tools", attached)};
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
+  menuRibbonCornerWid->addAction(g_LogActions()._LOG_FILE);
+  menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_framelessWindowAg()._EXPAND_RIBBONS);
@@ -264,15 +264,17 @@ QToolBar* RibbonMenu::LeafJson() const {
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
+  const auto& fileOpAgInst = g_fileBasicOperationsActions();
+
   QToolBar* folderRmv{new (std::nothrow) QToolBar{"Folder Remover"}};
   CHECK_NULLPTR_RETURN_NULLPTR(folderRmv);
   folderRmv->setOrientation(Qt::Orientation::Vertical);
   folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
   folderRmv->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R);
-  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER);
-  folderRmv->addAction(g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD);
+  folderRmv->addAction(fileOpAgInst._RMV_EMPTY_FOLDER_R);
+  folderRmv->addAction(fileOpAgInst._RMV_01_FILE_FOLDER);
+  folderRmv->addAction(fileOpAgInst._RMV_FOLDER_BY_KEYWORD);
   SetLayoutAlightment(folderRmv->layout(), Qt::AlignmentFlag::AlignLeft);
 
   QToolBar* mediaDupFinder{new (std::nothrow) QToolBar{"Duplicate Media Finder"}};
@@ -281,9 +283,9 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mediaDupFinder->setStyleSheet("QToolBar { max-width: 256px; }");
   mediaDupFinder->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER);
-  mediaDupFinder->addAction(g_fileBasicOperationsActions()._LOW_RESOLUTION_IMGS_RMV);
-  mediaDupFinder->addAction(g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER);
+  mediaDupFinder->addAction(fileOpAgInst._DUPLICATE_IMAGES_FINDER);
+  mediaDupFinder->addAction(fileOpAgInst._LOW_RESOLUTION_IMGS_RMV);
+  mediaDupFinder->addAction(fileOpAgInst._DUPLICATE_VIDEOS_FINDER);
   SetLayoutAlightment(mediaDupFinder->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto& arrangeIns = g_ArrangeActions();
@@ -292,7 +294,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   QToolButton* nameRulerToolButton =
       new (std::nothrow) DropdownToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
-  nameRulerToolButton->setDefaultAction(g_fileBasicOperationsActions()._NAME_RULER);
+  nameRulerToolButton->setDefaultAction(fileOpAgInst._NAME_RULER);
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
   QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
@@ -305,10 +307,12 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
   archiveVidsTB->addWidget(nameRulerToolButton);
-  archiveVidsTB->addAction(g_fileBasicOperationsActions()._PACK_FOLDERS);
-  archiveVidsTB->addAction(g_fileBasicOperationsActions()._UNPACK_FOLDERS);
+  archiveVidsTB->addAction(fileOpAgInst._PACK_FOLDERS);
+  archiveVidsTB->addAction(fileOpAgInst._UNPACK_FOLDERS);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addAction(g_fileBasicOperationsActions()._LONG_PATH_FINDER);
+  archiveVidsTB->addAction(fileOpAgInst._RETURN_ERROR_CODE_UPON_ANY_FAILURE);
+  archiveVidsTB->addSeparator();
+  archiveVidsTB->addAction(fileOpAgInst._LONG_PATH_FINDER);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(folderRmv);
   archiveVidsTB->addSeparator();
