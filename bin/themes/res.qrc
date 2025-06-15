@@ -38,7 +38,7 @@
 <file alias="PLAY_BUTTON_TRIANGLE">Media/PLAY_BUTTON_TRIANGLE.svg</file>
 <file alias="STAR">Media/STAR.svg</file>
 <file alias="FOLDER_OPEN">Media/FOLDER_OPEN.svg</file>
-<file alias="FAST_FAIL">Media/FAST_FAIL.svg</file>
+<file alias="FAIL_FAST">Media/FAIL_FAST.svg</file>
 
 <!--FramelessWindow Icon here-->
 <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
