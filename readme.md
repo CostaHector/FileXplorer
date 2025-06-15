@@ -1,4 +1,4 @@
-# FileXplorer - Ultimate File Management Suite
+﻿# FileXplorer - Ultimate File Management Suite
 
 ## Overview
 
@@ -219,6 +219,17 @@ RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
 |---------|-----------|---------------------------------------------------|--------|
 | {a.jpg("123"),<br/>aDuplicate.png("123"),<br/>b.png("456")} | {aRedun.jpg("123"),<br/>bRedun.png("456"),<br/>cEmpty.webp("")} | true | {aRedun.jpg,<br/>bRedun.png,<br/>cEmpty.webp} |
 | {a.jpg("123"),<br/>aDuplicate.png("123"),<br/>b.png("456")} | {aRedun.jpg("123"),<br/>bRedun.png("456"),<br/>cEmpty.webp("")} | false | {aRedun.jpg,<br/>bRedun.png} |
+
+
+### Table 1.5 Expected Behavior of function FileOperation::executer
+```cpp
+RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
+```
+| QList<ACMD> | precondition | bFastFail | ErrorCode | AllRecoverCmds |
+|-------------|--------------|-----------|--------|-------|
+|ACMD[RNAME,home,filea,fileb];<br/>ACMD[RNAME,home,fileb,filec];| exists:  {home/filea} | not matter | OK | ACMD[RNAME,home,fileb,filea];<br/>ACMD[RNAME,home,filec,fileb];|
+|ACMD[RNAME,home,filea,nfilea];<br/>ACMD[RNAME,home,fileb,nfileb];| exists:  {home/fileb} | true | SRC_INEXIST | empty|
+|ACMD[RNAME,home,filea,nfilea];<br/>ACMD[RNAME,home,fileb,nfileb];| exists:  {home/fileb} | true | EXEC_PARTIAL_FAILED | ACMD[RNAME,home,nfileb,fileb];|
 
 
 ### Undo/Redo/Executor Sequence Diagram
