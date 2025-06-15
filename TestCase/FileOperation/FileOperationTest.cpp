@@ -2,11 +2,16 @@
 #include <QCoreApplication>
 
 // add necessary includes here
+#include "TestCase/pub/GlbDataProtect.h"
 #include "TestCase/pub/TDir.h"
 #include "TestCase/pub/MyTestSuite.h"
 #include "FileOperation/FileOperation.h"
 
 using namespace FileOperatorType;
+
+namespace FileOperatorType {
+extern bool g_bReturnErrorCodeUponAnyFailure;
+}
 
 class FileOperationTest : public MyTestSuite {
   Q_OBJECT
@@ -117,7 +122,6 @@ class FileOperationTest : public MyTestSuite {
     auto aBatch = rmpthok.cmds;
     QVERIFY(!aBatch.isEmpty());
 
-
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
     const auto& rmpthRecOk = FileOperation::executer(reversedaBatch);
@@ -154,7 +158,6 @@ class FileOperationTest : public MyTestSuite {
 
     auto aBatch = rmDirOk.cmds;
     QVERIFY(!aBatch.isEmpty());
-
 
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
@@ -197,7 +200,6 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(!dir.fileExists("a.txt", false));
     QVERIFY(!aBatch.isEmpty());
 
-
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
     const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
@@ -230,7 +232,6 @@ class FileOperationTest : public MyTestSuite {
 
     QVERIFY(!aBatch.isEmpty());
 
-
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
     const auto& exeRetEle = FileOperation::executer(reversedaBatch);
@@ -262,7 +263,6 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.exists(QString("b/%1").arg(relativeExistFile)));
 
     QVERIFY(!aBatch.isEmpty());
-
 
     BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
 
@@ -312,7 +312,6 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.exists("a.txt.lnk"));
     QVERIFY(!aBatch.isEmpty());  // can recover
 
-
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
     const auto& exeRetEle = FileOperation::executer(reversedaBatch);
     QCOMPARE(exeRetEle.ret, ErrorCode::OK);
@@ -337,7 +336,6 @@ class FileOperationTest : public MyTestSuite {
 
     QVERIFY(dir.exists("a/a1.txt"));
     QVERIFY(dir.exists("a/a1.txt.lnk"));
-
 
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
     const auto& exeRetEle = FileOperation::executer(reversedaBatch);
@@ -691,7 +689,6 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(dir.fileExists(QString("b/%1").arg(subFile), false));
     QVERIFY(!aBatch.isEmpty());
 
-
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
     const auto& exeRetEle = FileOperation::executer(reversedaBatch);
 
@@ -723,27 +720,6 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(!dir.dirExists(inexistFolder, false));
     QVERIFY(dir.dirExists("b", false));
     QVERIFY(!dir.dirExists(QString("b/%1").arg(inexistFolder), false));
-  }
-
-  void test_executer_return_if_any_cmd_failed() {
-    QString inexistFolder("inexistFolder");
-    QString existFile("b.txt");
-
-    TDir dir;
-    QVERIFY(dir.touch("b.txt", "contents in b.txt"));
-    QVERIFY(!dir.dirExists(inexistFolder, false));
-    QVERIFY(dir.fileExists(existFile, false));
-
-    const QString mTestPath{dir.path()};
-    BATCH_COMMAND_LIST_TYPE aBatch;
-    aBatch.append(ACMD::GetInstRENAME(mTestPath, inexistFolder, "NewName inexistFolder"));
-    aBatch.append(ACMD::GetInstRENAME(mTestPath, existFile, "NewName b.txt"));
-
-    RETURN_TYPE retEle = FileOperation::executer(aBatch);
-    QCOMPARE(retEle.ret, ErrorCode::SRC_INEXIST);
-    QVERIFY(!dir.dirExists("NewName inexistFolder", false));
-    QVERIFY(!dir.fileExists("NewName b.txt"));
-    QVERIFY(dir.fileExists(existFile));
   }
 
   void test_touch_file_ok() {
@@ -802,6 +778,63 @@ class FileOperationTest : public MyTestSuite {
     QCOMPARE(retEle.ret, ErrorCode::OK);
     QVERIFY(aBatch.isEmpty());
     QVERIFY(dir.fileExists("a/a.txt", false));
+  }
+
+  void test_executer_immediate_return_errorCode_if_any_cmd_fail() {
+    GlbDataProtect<bool> fastFailBkp{g_bReturnErrorCodeUponAnyFailure};
+    g_bReturnErrorCodeUponAnyFailure = true;
+
+    QString inexistFolder("inexistFolder");
+    QString existFile("b.txt");
+
+    TDir dir;
+    QVERIFY(dir.touch("b.txt", "contents in b.txt"));
+    QVERIFY(!dir.dirExists(inexistFolder, false));
+    QVERIFY(dir.fileExists(existFile, false));
+
+    const QString mTestPath{dir.path()};
+    BATCH_COMMAND_LIST_TYPE aBatch;
+    aBatch.append(ACMD::GetInstRENAME(mTestPath, inexistFolder, "NewName inexistFolder"));
+    aBatch.append(ACMD::GetInstRENAME(mTestPath, existFile, "NewName b.txt"));
+    const QList<ACMD> expectEmptyRecoverCmds{
+        // no need recover the former operation because of failure
+        // last command not execute so no recover command
+    };
+
+    RETURN_TYPE retEle = FileOperation::executer(aBatch);
+    QCOMPARE(retEle.ret, ErrorCode::SRC_INEXIST);
+    QCOMPARE(retEle.cmds, expectEmptyRecoverCmds);  // recover commands should be empty
+    QVERIFY(!dir.dirExists("NewName inexistFolder", false));
+    QVERIFY(!dir.fileExists("NewName b.txt", false));
+    QVERIFY(dir.fileExists(existFile, false));
+  }
+
+  void test_executer_continue_executing_remaining_despite_failures() {
+    GlbDataProtect<bool> fastFailBkp{g_bReturnErrorCodeUponAnyFailure};
+    FileOperatorType::g_bReturnErrorCodeUponAnyFailure = false;
+
+    QString inexistFolder("inexistFolder");
+    QString existFile("b.txt");
+
+    TDir dir;
+    QVERIFY(dir.touch("b.txt", "contents in b.txt"));
+    QVERIFY(!dir.dirExists(inexistFolder, false));
+    QVERIFY(dir.fileExists(existFile, false));
+
+    const QString mTestPath{dir.path()};
+    BATCH_COMMAND_LIST_TYPE aBatch;
+    aBatch.append(ACMD::GetInstRENAME(mTestPath, inexistFolder, "NewName inexistFolder"));
+    aBatch.append(ACMD::GetInstRENAME(mTestPath, existFile, "NewName b.txt"));
+    const QList<ACMD> expectRecoverCmds{// no need recover the former operation because of failure
+                                        // can recover the last operation
+                                        ACMD::GetInstRENAME(mTestPath, "NewName b.txt", existFile)};
+
+    RETURN_TYPE retEle = FileOperation::executer(aBatch);
+    QCOMPARE(retEle.ret, ErrorCode::EXEC_PARTIAL_FAILED);
+    QCOMPARE(retEle.cmds, expectRecoverCmds);
+    QVERIFY(!dir.dirExists("NewName inexistFolder", false));
+    QVERIFY(!dir.fileExists(existFile, false));
+    QVERIFY(dir.fileExists("NewName b.txt", false));
   }
 };
 #include "FileOperationTest.moc"
