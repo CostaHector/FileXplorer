@@ -1,4 +1,4 @@
-#include "MyQFileSystemModel.h"
+﻿#include "MyQFileSystemModel.h"
 #include "public/PathTool.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include <QDebug>
@@ -81,8 +81,6 @@ Qt::DropActions MyQFileSystemModel::supportedDropActions() const {
 Qt::DropActions MyQFileSystemModel::supportedDragActions() const {
   return Qt::MoveAction | Qt::CopyAction | Qt::LinkAction;
 }
-
-#include "public/PublicVariable.h"
 
 void MyQFileSystemModel::whenRootPathChanged(const QString& /*newpath*/) {
   previewsCnt = 0;
