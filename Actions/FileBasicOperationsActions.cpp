@@ -1,8 +1,7 @@
 ﻿#include "FileBasicOperationsActions.h"
+#include "FileOperation/FileOperatorPub.h"
 #include "FileOperation/ComplexOperation.h"
 #include "public/MemoryKey.h"
-#include "public/PublicTool.h"
-#include "public/PublicVariable.h"
 #include "public/StyleSheet.h"
 #include <QToolBar>
 #include <QApplication>
@@ -69,6 +68,7 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), "Name Ruler");
   _PACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/PACK_FOLDERS"), "Packer");
   _UNPACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker");
+  _RETURN_ERROR_CODE_UPON_ANY_FAILURE = new (std::nothrow) QAction(QIcon(":img/FAST_FAIL"), "Fast Fail");
   _LONG_PATH_FINDER = new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder");
   _RMV_EMPTY_FOLDER_R = new (std::nothrow) QAction(QIcon(":img/EMPTY_FOLDER"), "Rmv empty folders");
   _RMV_01_FILE_FOLDER = new (std::nothrow) QAction("Rmv 0/1 file folders");
@@ -301,6 +301,11 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "<b>Unpack items from folders to current view path</b><br/>"
       "Move 3 item(s) under path/{A.mp4, A.jpg, A.json}<br/>"
       "To path");
+  _RETURN_ERROR_CODE_UPON_ANY_FAILURE->setCheckable(true);
+  _RETURN_ERROR_CODE_UPON_ANY_FAILURE->setToolTip(
+      "<b>Fast fail</b><br/>"
+      "When enabled, <b>immediately return</b> error code if any command fails.<br/>"
+      "Otherwise, <b>continue executing</b> remaining commands despite partial failures.");
   _LONG_PATH_FINDER->setToolTip(
       "<b>Long path finder</b><br/>"
       "find out all too long path(s), then chop one section from full path, say the second to last section");
@@ -332,6 +337,11 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "<b>Find empty or duplicate images</b><br/>"
       "Let it easy to operate on empty or duplicate(already exist) images");
   _DUPLICATE_IMAGES_FINDER->setCheckable(true);
+
+  FileOperatorType::InitReturnErrorCodeUponAnyFailureSw();
+  const bool bFastFail = FileOperatorType::IsReturnErrorCodeUponAnyFailureSw();
+  _RETURN_ERROR_CODE_UPON_ANY_FAILURE->setChecked(bFastFail);
+  connect(_RETURN_ERROR_CODE_UPON_ANY_FAILURE, &QAction::triggered, &FileOperatorType::SetReturnErrorCodeUponAnyFailureSw);
 }
 
 QActionGroup* FileBasicOperationsActions::FileStructureActions() {

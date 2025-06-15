@@ -1,5 +1,4 @@
-#include "RenameWidget_Numerize.h"
-#include "public/PublicVariable.h"
+﻿#include "RenameWidget_Numerize.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
 #include "Tools/RenameHelper.h"
@@ -11,12 +10,16 @@ RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent)  //
 }
 
 void RenameWidget_Numerize::InitExtraMemberWidget() {
-  int startIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_START_INDEX.v).toInt();
-  m_startNo = new (std::nothrow) QLineEdit(QString::number(startIndex));  // "0"
+  m_completeBaseName = new (std::nothrow) QLineEdit{this};
+  CHECK_NULLPTR_RETURN_VOID(m_completeBaseName)
+  m_completeBaseName->setClearButtonEnabled(true);
+  m_completeBaseName->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+
+  m_startNo = new (std::nothrow) QLineEdit{QString::number(mStartNoInt), this};  // "0"
   CHECK_NULLPTR_RETURN_VOID(m_startNo)
   m_startNo->setMaximumWidth(20);
 
-  m_numberPattern = new (std::nothrow) QComboBox;  // " - %1"
+  m_numberPattern = new (std::nothrow) QComboBox{this};  // " - %1"
   CHECK_NULLPTR_RETURN_VOID(m_numberPattern)
   m_numberPattern->setEditable(true);
   m_numberPattern->setDuplicatesEnabled(false);
@@ -32,9 +35,6 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   }
   m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
   m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
-
-  m_completeBaseName = new (std::nothrow) QLineEdit{this};
-  CHECK_NULLPTR_RETURN_VOID(m_completeBaseName)
 }
 
 void RenameWidget_Numerize::InitExtraCommonVariable() {
@@ -68,7 +68,7 @@ void RenameWidget_Numerize::extraSubscribe() {
       qWarning("%s is not valid start number", qPrintable(startNoStr));
       return;
     }
-    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_START_INDEX.name, startNo);
+    mStartNoInt = startNo;
     OnlyTriggerRenameCore();
   });
 
@@ -80,23 +80,17 @@ void RenameWidget_Numerize::extraSubscribe() {
 }
 
 QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
-  const QString& namePattern = m_numberPattern->currentText();
-  QString startNoStr = m_startNo->text();
-  bool isnumeric = false;
-  const int startInd = startNoStr.toInt(&isnumeric);
-  if (!isnumeric) {
-    qWarning("start index is not number[%s]", qPrintable(startNoStr));
-    return replaceeList;
-  }
-  if (!m_baseNameInited) {  // init lineedit only at first time. when lineedit editted by user. lineedit should not init
+  if (!m_baseNameInited) {
+    // init lineedit only at first time. when lineedit editted by user. lineedit should not init
+    m_baseNameInited = true;
     if (!replaceeList.isEmpty()) {
       m_completeBaseName->setText(replaceeList[0]);
       m_completeBaseName->selectAll();
     }
     connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
-    m_baseNameInited = true;
   }
   const QStringList& suffixs = m_oExtTE->toPlainText().split(NAME_SEP);
   const QString& baseName = m_completeBaseName->text();
-  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+  const QString& namePattern = m_numberPattern->currentText();
+  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, mStartNoInt, namePattern);
 }
