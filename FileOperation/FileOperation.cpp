@@ -1,20 +1,15 @@
 ﻿#include "FileOperation.h"
 #include "public/PathTool.h"
 
-#include <QDateTime>
 #include <QStringList>
-
 #include <QDir>
 #include <QFile>
 #include <QDirIterator>
 #include <QFileInfo>
 
-#include <QPair>
-#include <QMap>
 #include <functional>
 
 namespace FileOperation {
-
 using namespace FileOperatorType;
 
 RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
@@ -25,6 +20,9 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
 #undef FILE_OPERATOR_KEY_ITEM
   };
 
+  const bool b_fastFail{IsReturnErrorCodeUponAnyFailureSw()};
+  int failedCnt{0};
+  QString failedCmds;
   BATCH_COMMAND_LIST_TYPE allRecoverList;
   allRecoverList.reserve(aBatch.size());
   for (int i = 0; i < aBatch.size(); ++i) {
@@ -34,10 +32,23 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
     }
     const RETURN_TYPE returnEle = LAMBDA_TABLE[cmds.op](cmds.parms);
     if (!returnEle) {
-      qCritical("[Error]%s", qPrintable(cmds.toStr(returnEle.ret)));
-      return {returnEle.ret, allRecoverList};
+      const QString& cmdStr{cmds.toStr(returnEle.ret)};
+      if (b_fastFail) {
+        qCritical("[Error] Stop at the %d+1th cmd: %s", i + 1, qPrintable(cmdStr));
+        return {returnEle.ret, allRecoverList};
+      }
+      failedCmds += QString::number(i);
+      failedCmds += '\t';
+      failedCmds += cmdStr;
+      failedCmds += '\n';
+      ++failedCnt;
     }
     allRecoverList += returnEle;
+  }
+
+  if (failedCnt > 0) {
+    qCritical("\nFollowing %d command(s) failed:\n%s", failedCnt, qPrintable(failedCmds));
+    return {ErrorCode::EXEC_PARTIAL_FAILED, allRecoverList};
   }
   return {ErrorCode::OK, allRecoverList};
 }
@@ -475,14 +486,11 @@ RETURN_TYPE touch(const QString& pre, const QString& rel) {
 }
 
 RETURN_TYPE linkAgent(const QStringList& parms) {
-  if (parms.size() != 2 && parms.size() != 3) {
+  if (parms.size() != 3) {
     return {OPERATION_PARMS_NOT_MATCH, {}};
   }
   const QString& pre = parms[0];
   const QString& rel = parms[1];
-  if (parms.size() == 2) {
-    return FileOperation::link(pre, rel);
-  }
   const QString& to = parms[2];
   return FileOperation::link(pre, rel, to);
 }
@@ -523,14 +531,11 @@ RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to) {
 }
 
 RETURN_TYPE unlinkAgent(const QStringList& parms) {
-  if (parms.size() != 2 && parms.size() != 3) {
+  if (parms.size() != 3) {
     return {OPERATION_PARMS_NOT_MATCH, {}};
   }
   const QString& pre = parms[0];
   const QString& rel = parms[1];
-  if (parms.size() == 2) {
-    return FileOperation::unlink(pre, rel);
-  }
   const QString& to = parms[2];
   return FileOperation::unlink(pre, rel, to);
 }

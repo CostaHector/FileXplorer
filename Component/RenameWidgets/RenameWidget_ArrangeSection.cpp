@@ -1,7 +1,6 @@
-#include "RenameWidget_ArrangeSection.h"
+﻿#include "RenameWidget_ArrangeSection.h"
 #include "Component/Notificator.h"
 #include "public/PublicMacro.h"
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "Tools/NameSectionArrange.h"
 
@@ -48,8 +47,8 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
 
   m_sectionsUsedToJoin = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_sectionsUsedToJoin)
-  m_sectionsUsedToJoin->setCompleter(nullptr);
   m_sectionsUsedToJoin->setEditable(true);
+  m_sectionsUsedToJoin->setCompleter(nullptr);
   m_sectionsUsedToJoin->setToolTip("Section join with user input sequence");
   m_sectionsUsedToJoin->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_sectionsUsedToJoin->addItem("0123456789");

@@ -75,7 +75,6 @@ struct MemoryKey {
   static const KV RENAMER_ARRANGE_SECTION_INDEX;
   static const KV RENAMER_REGEX_ENABLED;
 
-  static const KV RENAMER_NUMERIAZER_START_INDEX;
   static const KV RENAMER_NUMERIAZER_NO_FORMAT;
   static const KV RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX;
 
@@ -98,6 +97,7 @@ struct MemoryKey {
   static const KV DUPLICATE_FINDER_DEVIATION_FILESIZE;  // 2kB ~ 30MB
 
   static const KV SHOW_HAR_IMAGE_PREVIEW;
+  static const KV RETURN_ERRORCODE_UPON_ANY_FAILURE;
 };
 
 
