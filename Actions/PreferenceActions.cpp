@@ -100,7 +100,7 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
     qssFile.close();
   }
   qApp->setStyleSheet(theme2QssContent[theme]);
-  qWarning("ThemeName Changed to [%d]: %s", (int)theme, qPrintable(themeName));
+  qDebug("ThemeName Changed to [%d]: %s", (int)theme, qPrintable(themeName));
   return true;
 }
 

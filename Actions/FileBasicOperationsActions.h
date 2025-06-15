@@ -38,6 +38,7 @@ class FileBasicOperationsActions : public QObject {
   QAction* _NAME_RULER{nullptr};
   QAction* _PACK_FOLDERS{nullptr};
   QAction* _UNPACK_FOLDERS{nullptr};
+  QAction* _RETURN_ERROR_CODE_UPON_ANY_FAILURE{nullptr};
   QAction* _LONG_PATH_FINDER{nullptr};
   QAction* _RMV_EMPTY_FOLDER_R{nullptr};
   QAction* _RMV_01_FILE_FOLDER{nullptr};

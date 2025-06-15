@@ -1,10 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 25.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg width="800px" height="800px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 16 16;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#000000;stroke-miterlimit:133.3333;}
-</style>
-<path class="st0" d="M0.9,5.8h14.3 M0.9,10.2h14.3 M5.3,1.3v13.4 M3.7,14.7h8.6c1,0,1.5,0,1.9-0.2c0.3-0.2,0.6-0.4,0.8-0.8
-	c0.2-0.4,0.2-0.9,0.2-1.9V4.2c0-1,0-1.5-0.2-1.9c-0.2-0.3-0.4-0.6-0.8-0.8c-0.4-0.2-0.9-0.2-1.9-0.2H3.7c-1,0-1.5,0-1.9,0.2
-	C1.5,1.7,1.2,2,1.1,2.3C0.9,2.7,0.9,3.2,0.9,4.2v7.7c0,1,0,1.5,0.2,1.9c0.2,0.3,0.4,0.6,0.8,0.8C2.2,14.7,2.7,14.7,3.7,14.7z"/>
+<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg fill="#000000" width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 24.245v3.036h-6.521v-3.036zM0 24.104h15.339v3.031h-15.339v-3.036zM17.188 24.104h6.521v3.031h-6.521v-3.036zM25.479 19.297h6.521v3.031h-6.521zM0 19.156h15.339v3.031h-15.339zM17.188 19.156h6.521v3.031h-6.521zM25.479 14.693h6.521v3.031h-6.521zM0 14.552h15.339v3.031h-15.339zM17.188 14.552h6.521v3.031h-6.521zM25.479 9.745h6.521v3.036h-6.521zM0 9.609h15.339v3.031h-15.339v-3.042zM17.188 9.609h6.521v3.031h-6.521v-3.042zM25.479 4.865h6.521v3.036h-6.521v-3.042zM0 4.719h15.339v3.036h-15.339zM17.188 4.719h6.521v3.036h-6.521z"/>
 </svg>
