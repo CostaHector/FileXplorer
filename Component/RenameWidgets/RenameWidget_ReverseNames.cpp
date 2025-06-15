@@ -1,4 +1,4 @@
-#include "RenameWidget_ReverseNames.h"
+﻿#include "RenameWidget_ReverseNames.h"
 #include "public/PublicMacro.h"
 
 RenameWidget_ReverseNames::RenameWidget_ReverseNames(QWidget* parent)  //
@@ -11,6 +11,7 @@ void RenameWidget_ReverseNames::InitExtraCommonVariable() {
   setWindowTitle(windowTitleFormat);
   setWindowIcon(QIcon(""));
 }
+
 QToolBar* RenameWidget_ReverseNames::InitControlTB() {
   QToolBar* reverseLstTb{new (std::nothrow) QToolBar{"Reverse names list", this}};
   CHECK_NULLPTR_RETURN_NULLPTR(reverseLstTb);

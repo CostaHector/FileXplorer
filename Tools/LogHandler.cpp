@@ -1,4 +1,4 @@
-#include "LogHandler.h"
+﻿#include "LogHandler.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "Actions/LogActions.h"
@@ -92,7 +92,9 @@ void LogHandler::myMessageOutput(QtMsgType type, const QMessageLogContext& conte
 bool LogHandler::OpenLogFile() {
   LogHandler::ManualFlush();
   const bool openLogFileResult{QDesktopServices::openUrl(QUrl::fromLocalFile(mLogFile.fileName()))};
-  qDebug("open log file[%s] bResult:%d", qPrintable(mLogFile.fileName()), openLogFileResult);
+  if (!openLogFileResult)  {
+    qDebug("Open log file[%s] failed", qPrintable(mLogFile.fileName()));
+  }
   return openLogFileResult;
 }
 
@@ -159,6 +161,7 @@ bool LogHandler::ManualFlush() {
     return false;
   }
   mLogTextStream.flush();
+  mLogFile.flush();
   return true;
 }
 

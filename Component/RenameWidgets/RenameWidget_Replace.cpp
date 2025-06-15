@@ -1,6 +1,5 @@
-#include "RenameWidget_Replace.h"
+﻿#include "RenameWidget_Replace.h"
 #include "Tools/RenameHelper.h"
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
 
@@ -35,6 +34,7 @@ QToolBar* RenameWidget_Replace::InitControlTB() {
   replaceControl->addWidget(regexValidLabel);
   return replaceControl;
 }
+
 void RenameWidget_Replace::extraSubscribe() {
   connect(m_oldStrCB, &QComboBox::currentTextChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
   connect(m_regexCB, &QCheckBox::stateChanged, this, &RenameWidget_Replace::onRegex);

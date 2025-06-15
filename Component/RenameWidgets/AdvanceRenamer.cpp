@@ -1,5 +1,4 @@
 ﻿#include "AdvanceRenamer.h"
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/PathTool.h"
 #include "public/FileOsWalker.h"
@@ -9,6 +8,7 @@
 #include "Component/Notificator.h"
 #include "Tools/RenameNamesUnique.h"
 #include "CommandsPreview.h"
+#include <QDataStream>
 
 constexpr char AdvanceRenamer::NAME_SEP;
 
@@ -88,11 +88,8 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   m_nameEditLayout->setStretch(2, 1);
   m_nameEditLayout->setStretch(3, 8);
   m_nameEditLayout->setStretch(4, 1);
-  m_nameEditLayout->setSpacing(0);
-  m_nameEditLayout->setContentsMargins(0, 0, 0, 0);
 
   ReadSettings();
-
   // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
 }
@@ -102,8 +99,17 @@ void AdvanceRenamer::showEvent(QShowEvent* event) {
   StyleSheet::UpdateTitleBar(this);
 }
 
+#include <QApplication>
+#include <QScreen>
+bool NeedSaveCurrentGeometry(const QWidget& w) {
+  const QScreen* pScreen = w.screen();
+  return pScreen != nullptr && pScreen->availableGeometry().contains(w.geometry());
+}
+
 void AdvanceRenamer::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("ADVANCE_RENAMER_GEOMETRY", saveGeometry());
+  if (NeedSaveCurrentGeometry(*this)) {
+    PreferenceSettings().setValue("ADVANCE_RENAMER_GEOMETRY", saveGeometry());
+  }
   QDialog::closeEvent(event);
 }
 
@@ -123,6 +129,8 @@ void AdvanceRenamer::init() {
   m_mainLayout->addLayout(m_nameEditLayout);
   m_mainLayout->addWidget(m_buttonBox);
   setLayout(m_mainLayout);
+  m_mainLayout->setSpacing(0);
+  m_mainLayout->setContentsMargins(5, 5, 5, 5);
 
   /* don't move this section up (Don't set state before UI)*/
   m_recursiveCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
