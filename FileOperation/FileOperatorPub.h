@@ -8,6 +8,7 @@ namespace FileOperatorType {
 #define FILE_OPERATOR_ERROR_FIELD_MAPPING                      \
   FILE_OPERATOR_ERROR_KEY_ITEM(OK)                             \
   FILE_OPERATOR_ERROR_KEY_ITEM(UNKNOWN_ERROR)                  \
+  FILE_OPERATOR_ERROR_KEY_ITEM(EXEC_PARTIAL_FAILED)            \
   FILE_OPERATOR_ERROR_KEY_ITEM(SRC_PRE_DIR_INEXIST)            \
   FILE_OPERATOR_ERROR_KEY_ITEM(SRC_FILE_INEXIST)               \
   FILE_OPERATOR_ERROR_KEY_ITEM(SRC_DIR_INEXIST)                \
@@ -154,6 +155,10 @@ struct RETURN_TYPE {
 };
 
 BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_TYPE& rhs);
+
+bool IsReturnErrorCodeUponAnyFailureSw();
+void SetReturnErrorCodeUponAnyFailureSw(bool sw);
+void InitReturnErrorCodeUponAnyFailureSw();
 
 }  // namespace FileOperatorType
 
