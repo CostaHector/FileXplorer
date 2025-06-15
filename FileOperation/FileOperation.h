@@ -1,6 +1,5 @@
 ﻿#ifndef FILEOPERATION_H
 #define FILEOPERATION_H
-#include "public/PublicVariable.h"
 #include "FileOperatorPub.h"
 
 namespace FileOperation {
@@ -45,10 +44,10 @@ RETURN_TYPE touchAgent(const QStringList& parms);
 RETURN_TYPE touch(const QString& pre, const QString& rel);
 
 RETURN_TYPE linkAgent(const QStringList& parms);
-RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to = SystemPath::STARRED_PATH);
+RETURN_TYPE link(const QString& pre, const QString& rel, const QString& to);
 
 RETURN_TYPE unlinkAgent(const QStringList& parms);
-RETURN_TYPE unlink(const QString& pre, const QString& rel, const QString& to = SystemPath::STARRED_PATH);
+RETURN_TYPE unlink(const QString& pre, const QString& rel, const QString& to);
 }  // namespace FileOperation
 
 #endif  // FILEOPERATION_H
