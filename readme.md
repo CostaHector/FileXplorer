@@ -225,7 +225,8 @@ RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
 ```cpp
 RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
 ```
-| QList<ACMD> | precondition | bFastFail | ErrorCode | AllRecoverCmds |
+
+| `QList<ACMD>` | precondition | `bFastFail` | `ErrorCode` | `AllRecoverCmds` |
 |-------------|--------------|-----------|--------|-------|
 |ACMD[RNAME,home,filea,fileb];<br/>ACMD[RNAME,home,fileb,filec];| exists:  {home/filea} | not matter | OK | ACMD[RNAME,home,fileb,filea];<br/>ACMD[RNAME,home,filec,fileb];|
 |ACMD[RNAME,home,filea,nfilea];<br/>ACMD[RNAME,home,fileb,nfileb];| exists:  {home/fileb} | true | SRC_INEXIST | empty|
