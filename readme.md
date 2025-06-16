@@ -162,7 +162,7 @@ for (int i = 0; i < paths.size(); ++i) {
 ## Testcase
 ### Table 1.0 Expected Behavior of rename Functions
 ```cpp
-RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const QString& newCompleteName)
+RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const QString& newCompleteName);
 ```
 | srcPath | oldCompleteName | newCompleteName | exist items in srcPath | result |
 |---------|-----------------|-----------------|---------------------------------------------------|--------|
@@ -177,7 +177,7 @@ RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const
 
 ### Table 1.1 Expected Behavior of mv Functions
 ```cpp
-RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& dstPath)`
+RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& dstPath);
 ```
 | srcPath | relToItem | dstPath | exist items in dstPath | result |
 |---------|-----------|---------|---------------------------------------------------|--------|
@@ -193,7 +193,7 @@ RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& 
 
 ### Table 1.2 Expected Behavior of rmpath Functions
 ```cpp
-RETURN_TYPE rmpath(const QString& pre, const QString& dirPath)
+RETURN_TYPE rmpath(const QString& pre, const QString& dirPath);
 ```
 | srcPath | relToItem | exist items in srcPath | result |
 |---------|-----------|---------------------------------------------------|--------|
@@ -204,7 +204,7 @@ RETURN_TYPE rmpath(const QString& pre, const QString& dirPath)
 
 ### Table 1.3 Expected Behavior of mkpath Functions
 ```cpp
-RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
+RETURN_TYPE mkpath(const QString& pre, const QString& dirPath);
 ```
 | srcPath | relToItem | exist items in srcPath | result |
 |---------|-----------|---------------------------------------------------|--------|
@@ -223,7 +223,7 @@ RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
 
 ### Table 1.5 Expected Behavior of function FileOperation::executer
 ```cpp
-RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
+RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch);
 ```
 
 | `QList<ACMD>` | precondition | `bFastFail` | `ErrorCode` | `AllRecoverCmds` |
