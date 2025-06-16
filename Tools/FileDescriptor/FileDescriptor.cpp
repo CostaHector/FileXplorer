@@ -3,8 +3,6 @@
 
 #ifdef Q_OS_WIN
 #include <windows.h>
-#endif
-
 // 将FILETIME转换为Unix时间戳（秒）
 qint64 FileTimeToUnixTimestamp(const FILETIME& ft) {
   constexpr const auto WINDOWS_TICK = 10000000LL;          // 10^7，FILETIME的计数间隔是100纳秒
@@ -18,12 +16,13 @@ qint64 FileTimeToUnixTimestamp(const FILETIME& ft) {
              / WINDOWS_TICK                                      //
          - SEC_TO_UNIX_EPOCH;
 }
+#endif
 
 qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
 #ifndef Q_OS_WIN
   qDebug("only support in windows system");
   return -1;
-#endif
+#else
   const HANDLE hFile = CreateFileW((wchar_t*)fileAbsPath.utf16(),       //
                                    0,                                   //
                                    FILE_SHARE_READ | FILE_SHARE_WRITE,  //
@@ -45,7 +44,9 @@ qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
   }
   CloseHandle(hFile);
   return ((qint64)fileInfo.nFileIndexHigh << 32) | fileInfo.nFileIndexLow;
+#endif
 }
+
 
 QList<qint64> FileDescriptor::GetFileUniquedIds(const QStringList& files) {
 #ifndef Q_OS_WIN
