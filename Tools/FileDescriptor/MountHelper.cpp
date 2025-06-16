@@ -1,4 +1,4 @@
-#include "MountHelper.h"
+﻿#include "MountHelper.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QMap>
@@ -7,47 +7,32 @@
 #include <QProcess>
 
 #ifndef WIN32
-QString findVolumeGuidByLabel(const QString& label) {
-  return "";
-}
-bool isVolumeAvailable(const QString& volumeGuid) {
-  return false;
-}
-bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) {
-  return false;
-}
-bool UnmountVolume(const QString& volMountPoint) {
-  return false;
-}
-QStringList GetMountPointsByVolumeName(const wchar_t* volumeName) {
-  return {};
-}
-QMap<QString, QStringList> GetVolumeName2MountPointsMap() {
-  return {};
-}
-QString resolveFilePath(const QString& relativePath, const QString& volumeGuid) {
-  return "";
-}
-QMap<QString, QString> GetGuid2LabelMap() {
-  return {};
-}
-bool GetVolumeInfo(const QString& path, QString& volName) {
-  return false;
-}
-bool GetGuidByDrive(const QString& driveStr, QString& guid) {
-  return false;
-}
-bool IsAdministrator() {
-  return false;
-}
-bool RunAsAdmin() {
-  return false;
-}
-QString getVolumeGUIDByMountPoint(const QString& mountPath) {
-  return {};
-}
-QString FindRootByGUIDWin(const QString& targetGuid) {
-  return {};
+namespace MountHelper{
+
+QString ExtractGuidFromVolumeName(const QString& volume) { return {}; }
+QString ExtractGuidFromVolumeName(const wchar_t* p2volume) { return {}; }
+
+QString findVolumeGuidByLabel(const QString& label) { return {}; }
+bool isVolumeAvailable(const QString& volumeGuid) { return false; }
+bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) { return false; }
+bool UnmountVolume(const QString& volMountPoint) { return false; }
+QSet<QString> GetMountPointsByVolumeName(const wchar_t* volumeName) { return {}; }
+QMap<QString, QSet<QString>> Volumes2ContainedMountPnts() { return {}; }
+
+QString resolveFilePath(const QString& relativePath, const QString& volumeGuid) { return {}; }
+QMap<QString, QString> GetGuid2LabelMap() { return {}; }
+bool GetVolumeInfo(const QString& path, QString& volName) { return false; }
+bool GetGuidByDrive(const QString& driveStr, QString& guid) { return false; }
+bool IsAdministrator() { return false; }
+bool RunAsAdmin() { return false; }
+
+QString FindRootByGUIDWin(const QString& targetGuid) { return {}; }
+const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh = false) { return {}; }
+QString GetDisplayNameByGuidTableName(QString guidTableName) { return {}; }
+QMap<QString, QString> GetGuidTableName2DisplayName() { return {}; }
+QStringList GetGuidJoinDisplayName() { return {}; }
+QString ChoppedDisplayName(const QString& guidJoinDisplayName) { return {}; }
+
 }
 #else
 

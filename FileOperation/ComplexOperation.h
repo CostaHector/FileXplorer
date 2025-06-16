@@ -1,7 +1,7 @@
 ﻿#ifndef COMPLEXOPERATION_H
 #define COMPLEXOPERATION_H
 #include <QString>
-#include <QMimedata>
+#include <QMimeData>
 #include "FileOperatorPub.h"
 class QAction;
 

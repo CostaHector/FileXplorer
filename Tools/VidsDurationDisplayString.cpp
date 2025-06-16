@@ -6,9 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <QFileInfo>
+
+#ifdef _WIN32
 #include "QMediaInfo.h"
+#endif
 
 QString VidsDurationDisplayString::DisplayVideosDuration(const QStringList& fileAbsPaths) {
+#ifdef _WIN32
   QMediaInfo mi;
   if (!mi.StartToGet()) {
     qDebug("StartToGet failed");
@@ -16,6 +20,9 @@ QString VidsDurationDisplayString::DisplayVideosDuration(const QStringList& file
   }
   const QList<int>& durationLst = mi.batchVidsDurationLength(fileAbsPaths);
   return DurationPrepathName2Table(durationLst, fileAbsPaths);
+#else
+  return {};
+#endif
 }
 
 QString VidsDurationDisplayString::DurationPrepathName2Table(const QList<int>& durationLst, const QStringList& fileAbsPaths) {
