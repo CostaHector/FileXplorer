@@ -1,5 +1,5 @@
 #include "DevicesDrivesActions.h"
-#include "Public/PublicMacro.h"
+#include "public/PublicMacro.h"
 #include <QMenu>
 #include <QApplication>
 #include <QStyle>
