@@ -1,7 +1,6 @@
 #include "FdBasedDb.h"
 #include "Tools/FileDescriptor/FileDescriptor.h"
 #include "Tools/Json/JsonHelper.h"
-#include "Tools/QMediaInfo.h"
 #include "public/PublicVariable.h"
 #include "public/PathTool.h"
 #include "public/PublicMacro.h"
@@ -10,6 +9,9 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSet>
+#ifdef _WIN32
+#include "Tools/QMediaInfo.h"
+#endif
 
 using namespace MOVIE_TABLE;
 
@@ -510,6 +512,9 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     return FD_OK;  // no need set duration
   }
 
+#ifndef _WIN32
+  return FD_OK;
+#else
   QMediaInfo mi;
   if (!mi.StartToGet()) {
     qWarning("Video duration getter is nullptr");
@@ -591,6 +596,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   query.finish();
   qDebug("%d record(s) to be updated", fd2Duration.size());
   return fd2Duration.size();
+#endif
 }
 
 struct DurStudioCastTags {
