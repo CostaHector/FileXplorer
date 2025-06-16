@@ -7,6 +7,7 @@
 #include <QProcess>
 
 #ifndef WIN32
+namespace MountHelper{
 QString findVolumeGuidByLabel(const QString& label) {
   return "";
 }
@@ -19,7 +20,7 @@ bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMo
 bool UnmountVolume(const QString& volMountPoint) {
   return false;
 }
-QStringList GetMountPointsByVolumeName(const wchar_t* volumeName) {
+QStringList GetMountPointsByVolumeName(const char* volumeName) {
   return {};
 }
 QMap<QString, QStringList> GetVolumeName2MountPointsMap() {
@@ -48,6 +49,22 @@ QString getVolumeGUIDByMountPoint(const QString& mountPath) {
 }
 QString FindRootByGUIDWin(const QString& targetGuid) {
   return {};
+}
+QMap<QString, QString> GetGuidTableName2DisplayName() {
+  return {};
+}
+QStringList GetGuidJoinDisplayName() {
+  return {};
+}
+QString ChoppedDisplayName(const QString& guidJoinDisplayName) {
+  return {};
+}
+QString GetDisplayNameByGuidTableName(QString guidTableName) {
+  return {};
+}
+const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
+  return {};
+}
 }
 #else
 

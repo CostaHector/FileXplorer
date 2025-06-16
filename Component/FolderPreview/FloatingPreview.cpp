@@ -2,7 +2,6 @@
 #include "public/MemoryKey.h"
 #include "public/PathTool.h"
 #include "public/DisplayEnhancement.h"
-#include "Tools/QMediaInfo.h"
 #include "public/PublicVariable.h"
 #include "public/StyleSheet.h"
 #include <QDir>
@@ -13,6 +12,9 @@
 #include <QIcon>
 #include <QFileIconProvider>
 #include <QBuffer>
+#ifdef _WIN32
+#include "Tools/QMediaInfo.h"
+#endif
 
 FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
     : QSplitter{parent},
@@ -171,12 +173,15 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   detail += QString(R"(<h1>%1</h1>)").arg(fileName);
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
   if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)) {
+    int dur = 0;
+#ifdef _WIN32
     QMediaInfo mi;
     if (!mi.StartToGet()) {
       qWarning("Start to Get failed");
       return {};
     }
-    const int dur = mi.VidDurationLengthQuick(fileAbsPath);
+    dur = mi.VidDurationLengthQuick(fileAbsPath);
+#endif
     detail += QString(R"(<h3>Length: %1</h3><br/>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
   }
 
