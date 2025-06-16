@@ -2,8 +2,10 @@
 #include <QtTest>
 
 #include "pub/MyTestSuite.h"
-#include "Tools/QMediaInfo.h"
 #include <chrono>
+#ifdef _WIN32
+#include "Tools/QMediaInfo.h"
+#endif
 
 const QString VIDEOS_DURATION_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_VideosDurationGetter");
 
@@ -27,6 +29,7 @@ class VideosDurationGetterTest : public MyTestSuite {
       QVERIFY2(mp4Dir.exists(mp4FileName), qPrintable(mp4FileName));
     }
 
+#ifdef _WIN32
     QMediaInfo mi;
     QVERIFY2(mi.StartToGet(), "Should start succeed");
     for (int i = 0; i < mp4VidsLst.size(); ++i) {
@@ -38,6 +41,7 @@ class VideosDurationGetterTest : public MyTestSuite {
       // duration differs value should not large than 3s
       QVERIFY2((std::abs(duration / 1000 - durationsLst[i]) < 3), qPrintable(vidPath));
     }
+#endif
   }
 
   void test_all_video_types() {
@@ -54,7 +58,7 @@ class VideosDurationGetterTest : public MyTestSuite {
     foreach (const QString mp4FileName, mp4VidsLst) {
       QVERIFY2(mp4Dir.exists(mp4FileName), qPrintable(mp4FileName));
     }
-
+#ifdef _WIN32
     QMediaInfo mi;
     QVERIFY2(mi.StartToGet(), "Should start succeed");
     for (int i = 0; i < mp4VidsLst.size(); ++i) {
@@ -66,6 +70,7 @@ class VideosDurationGetterTest : public MyTestSuite {
       // duration differs value should not large than 3s
       QVERIFY2((std::abs(duration / 1000 - durationsLst[i]) < 3), qPrintable(vidPath));
     }
+#endif
   }
 
   //  void test_compareSpeed() {
