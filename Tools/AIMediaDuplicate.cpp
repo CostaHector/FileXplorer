@@ -1,12 +1,14 @@
-#include "AIMediaDuplicate.h"
+﻿#include "AIMediaDuplicate.h"
 #include "public/PublicVariable.h"
 #include "Tools/MD5Calculator.h"
-#include "Tools/QMediaInfo.h"
 #include <QDebug>
 #include <QDirIterator>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QDateTime>
+#ifdef _WIN32
+#include "Tools/QMediaInfo.h"
+#endif
 
 QString GetEffectiveName(const QString& itemPath) {
   static const QSet<QString> specialSegments{"videos", "video", "vid", "video_ts"};
@@ -127,18 +129,24 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
   query.prepare(QString("REPLACE INTO `%1` (EFFECTIVE_NAME, SIZE, DURATION, DATE, ABSOLUTE_PATH) VALUES (?, ?, ?, ?, ?)").arg(tableName));
   // 开始事务
   db.transaction();
+#ifdef _WIN32
   QMediaInfo mi;
-  if (!SKIP_GETTER_DURATION && !mi.StartToGet()) {
+  if (!mi.StartToGet()) {
     qWarning("Video duration getter is nullptr");
     return false;
   }
+#endif
   QDirIterator it(path, TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories);
   while (it.hasNext()) {
     const QFileInfo file_info = it.next();
     const QString file_path = file_info.absoluteFilePath();
     query.bindValue(0, GetEffectiveName(file_path));
     query.bindValue(1, file_info.size());
+#ifdef _WIN32
     query.bindValue(2, SKIP_GETTER_DURATION ? 0 : mi.VidDurationLengthQuick(file_path));
+#else
+    query.bindValue(2, 0);
+#endif
     query.bindValue(3, file_info.birthTime().toMSecsSinceEpoch());
     query.bindValue(4, file_path);
     if (!query.exec()) {
