@@ -9,12 +9,12 @@
 <file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
 
 <!--LOG icon here-->
-<file alias="RUNNING_LOGS">LOG/RUNNING_LOGS.svg</file>
-<file alias="AGING_LOGS">LOG/AGING_LOGS.svg</file>
-<file alias="LOG_LEVEL_DEBUG">LOG/LOG_LEVEL_DEBUG.svg</file>
-<file alias="LOG_LEVEL_WARNING">LOG/LOG_LEVEL_WARNING.svg</file>
-<file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON">LOG/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON.svg</file>
-<file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF">LOG/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF.svg</file>
+<file alias="RUNNING_LOGS">Log/RUNNING_LOGS.svg</file>
+<file alias="AGING_LOGS">Log/AGING_LOGS.svg</file>
+<file alias="LOG_LEVEL_DEBUG">Log/LOG_LEVEL_DEBUG.svg</file>
+<file alias="LOG_LEVEL_WARNING">Log/LOG_LEVEL_WARNING.svg</file>
+<file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON.svg</file>
+<file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF.svg</file>
 
 <!--Media icon here-->
 <file alias="DUPLICATE_IMAGES_FINDER">Media/DUPLICATE_IMAGES_FINDER.png</file>
