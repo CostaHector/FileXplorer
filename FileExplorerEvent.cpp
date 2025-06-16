@@ -36,7 +36,7 @@
 #include "Component/RenameWidgets/RenameWidget_ReverseNames.h"
 
 #include "View/DuplicateVideosFinder.h"
-#include "View/HarTableview.h"
+#include "View/HarTableView.h"
 
 #include "Tools/Classify/ExtractPileItemsOutFolder.h"
 #include "Tools/ArchiveFiles.h"
