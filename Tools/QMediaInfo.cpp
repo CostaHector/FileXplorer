@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #include "QMediaInfo.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
@@ -55,9 +57,14 @@ const MediaInfo_Char* QMediaInfo::Get(MediaInfo_stream_C streamKind, int streamN
   return get(_pMedia, streamKind, streamNumber, parameter, infoKind, searchKind);
 }
 
+#ifdef _WIN32
 const MediaInfo_Char QMediaInfo::m_prop[]{
-    L""
-    "Duration/String3"};
+                                          L"Duration/String3"};
+#else
+const MediaInfo_Char QMediaInfo::m_prop[]{
+                                          "Duration/String3"};
+#endif
+
 
 bool QMediaInfo::IsLoaded() const {
   return pLib != nullptr && pLib->isLoaded();
@@ -329,3 +336,4 @@ QString QMediaInfo::FileExtension() const {
   InitMediaInfo_CharArr(prop, "FileExtension");
   return QStringFromMediaInfoc_str(Get(MediaInfo_Stream_General, 0, prop, MediaInfo_Info_Text, MediaInfo_Info_Name));
 }
+#endif
