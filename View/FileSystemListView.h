@@ -1,12 +1,10 @@
-#ifndef FILESYSTEMLISTVIEW_H
+﻿#ifndef FILESYSTEMLISTVIEW_H
 #define FILESYSTEMLISTVIEW_H
 
 #include "Component/RightClickMenu.h"
 #include "View/CustomListView.h"
-
 #include "Model/MyQFileSystemModel.h"
 
-#include <QContextMenuEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
@@ -37,6 +35,7 @@ class FileSystemListView : public CustomListView {
 
  private:
   QMenu* m_fsMenu = new RightClickMenu("Right click menu", this);
+  QPoint mDragStartPosition;
 };
 
 #endif  // FILESYSTEMLISTVIEW_H
