@@ -1,10 +1,9 @@
-#ifndef FILESYSTEMTREEVIEW_H
+﻿#ifndef FILESYSTEMTREEVIEW_H
 #define FILESYSTEMTREEVIEW_H
 
 #include "Component/RightClickMenu.h"
 #include "Model/MyQFileSystemModel.h"
 
-#include <QContextMenuEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
@@ -41,6 +40,7 @@ class FileSystemTreeView : public QTreeView {
 
  private:
   QMenu* m_fsMenu = new RightClickMenu("Right click menu", this);
+  QPoint mDragStartPosition;
 };
 
 #endif  // FILESYSTEMTREEVIEW_H
