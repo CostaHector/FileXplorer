@@ -1,4 +1,4 @@
-#include "NavigationAndAddressBar.h"
+﻿#include "NavigationAndAddressBar.h"
 #include "Actions/AddressBarActions.h"
 #include "Actions/RightClickMenuActions.h"
 #include "public/PublicMacro.h"
@@ -46,7 +46,7 @@ void NavigationAndAddressBar::BindFileSystemViewCallback(T_IntoNewPath IntoNewPa
   m_fsFilter->BindFileSystemModel(_fsm);
 }
 
-auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {
+void NavigationAndAddressBar::InitEventWhenViewChanged() {
   connect(g_addressBarActions()._BACK_TO, &QAction::triggered, this, &NavigationAndAddressBar::onBackward);
   connect(g_addressBarActions()._FORWARD_TO, &QAction::triggered, this, &NavigationAndAddressBar::onForward);
   connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onUpTo);
@@ -58,7 +58,7 @@ auto NavigationAndAddressBar::InitEventWhenViewChanged() -> void {
   connect(m_searchLE, &QLineEdit::returnPressed, this, &NavigationAndAddressBar::onSearchTextReturnPressed);
 }
 
-auto NavigationAndAddressBar::onBackward() -> bool {
+bool NavigationAndAddressBar::onBackward() {
   if (!m_pathRD.undoAvailable()) {
     qDebug("[Skip] backward paths pool empty");
     return false;
@@ -71,7 +71,7 @@ auto NavigationAndAddressBar::onBackward() -> bool {
   return backwardRes;
 }
 
-auto NavigationAndAddressBar::onForward() -> bool {
+bool NavigationAndAddressBar::onForward() {
   if (!m_pathRD.redoAvailable()) {
     qDebug("[Skip] Forward paths pool empty");
     return false;
@@ -84,7 +84,7 @@ auto NavigationAndAddressBar::onForward() -> bool {
   return forwardRes;
 }
 
-auto NavigationAndAddressBar::onUpTo() -> bool {
+bool NavigationAndAddressBar::onUpTo() {
   const QString& upPath = m_addressLine->dirname();
   bool upRes{true};
   if (m_IntoNewPath != nullptr) {
