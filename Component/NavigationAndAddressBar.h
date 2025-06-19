@@ -1,4 +1,4 @@
-#ifndef NAVIGATIONANDADDRESSBAR_H
+﻿#ifndef NAVIGATIONANDADDRESSBAR_H
 #define NAVIGATIONANDADDRESSBAR_H
 
 #include "AddressELineEdit.h"
@@ -25,13 +25,11 @@ class NavigationAndAddressBar : public QToolBar {
                                   T_on_searchEnterKey on_searchEnterKey,
                                   QFileSystemModel* _fsm);
 
-  auto InitEventWhenViewChanged() -> void;
+  void InitEventWhenViewChanged();
 
-  auto onBackward() -> bool;
-
-  auto onForward() -> bool;
-
-  auto onUpTo() -> bool;
+  bool onBackward();
+  bool onForward();
+  bool onUpTo();
 
   bool onIteratorToNextFolder();
   bool onIteratorToLastFolder();

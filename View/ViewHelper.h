@@ -41,6 +41,7 @@ class View {
 
   static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
   static constexpr int START_DRAG_DIST{32};
+  static constexpr int START_DRAG_DIST_MIN{10};
 };
 
 #endif  // VIEWHELPER_H
