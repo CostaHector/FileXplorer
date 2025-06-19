@@ -7,11 +7,12 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
-
 #include <QHeaderView>
 #include <QMouseEvent>
 
-FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* parent) : QTreeView(parent) {
+FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* parent)  //
+    : QTreeView{parent}                                                                //
+{
   setModel(fsmModel);
   InitViewSettings();
 
@@ -92,11 +93,17 @@ void FileSystemTreeView::mousePressEvent(QMouseEvent* event) {
   if (View::onMouseSidekeyBackwardForward(event->button())) {
     return;
   }
+  if (event->button() & Qt::LeftButton) {
+    mDragStartPosition = event->pos();
+  }
   return QTreeView::mousePressEvent(event);
 }
 
 void FileSystemTreeView::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::MouseButton::LeftButton) {
+    if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST) {
+      return;
+    }
     View::mouseMoveEventCore(this, event);
     return;
   }
