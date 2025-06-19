@@ -1,9 +1,29 @@
 ﻿#include "ViewHelper.h"
-#include "Component/Notificator.h"
 #include "public/MemoryKey.h"
 #include "Model/MyQFileSystemModel.h"
+#include "Component/Notificator.h"
 #include "FileOperation/ComplexOperation.h"
+#include "Actions/AddressBarActions.h"
+
 #include <QFileIconProvider>
+#include <QApplication>
+#include <QDrag>
+#include <QPainter>
+
+constexpr int View::START_DRAG_DIST; // QApplication::startDragDistance()
+
+bool View::onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton) {
+  switch (mousebutton) {
+    case Qt::MouseButton::BackButton:
+      g_addressBarActions()._BACK_TO->triggered(false);
+      return true;
+    case Qt::MouseButton::ForwardButton:
+      g_addressBarActions()._FORWARD_TO->triggered(false);
+      return true;
+    default:
+      return false;
+  }
+}
 
 void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
   if (view == nullptr) {
