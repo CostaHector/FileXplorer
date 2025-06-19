@@ -1,11 +1,10 @@
-#ifndef FILESYSTEMTABLEVIEW_H
+﻿#ifndef FILESYSTEMTABLEVIEW_H
 #define FILESYSTEMTABLEVIEW_H
 
-#include "Component/RightClickMenu.h"
 #include "CustomTableView.h"
+#include "Component/RightClickMenu.h"
 #include "Model/MyQFileSystemModel.h"
 
-#include <QContextMenuEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
@@ -35,6 +34,7 @@ class FileSystemTableView : public CustomTableView {
 
  private:
   QMenu* m_fsMenu = new RightClickMenu("Right click menu", this);
+  QPoint mDragStartPosition;
 };
 
 #endif  // FILESYSTEMTABLEVIEW_H
