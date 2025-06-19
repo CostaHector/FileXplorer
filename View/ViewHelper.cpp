@@ -11,6 +11,7 @@
 #include <QPainter>
 
 constexpr int View::START_DRAG_DIST; // QApplication::startDragDistance()
+constexpr int View::START_DRAG_DIST_MIN;
 
 bool View::onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton) {
   switch (mousebutton) {
