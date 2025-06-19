@@ -1,5 +1,4 @@
 ﻿#include "NavigationToolBar.h"
-#include "Actions/ActionWithPath.h"
 #include "Actions/DevicesDrivesActions.h"
 #include "public/OnCheckedPopupOrHideAWidget.h"
 #include "public/PublicMacro.h"
@@ -9,24 +8,45 @@
 #include <QStyle>
 
 NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
-    : QToolBar{title} {
+    : QToolBar{title}                                                     //
+{
   setObjectName(title);
   // 1. devices and drives
 
   addAction(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES);
   addSeparator();
   // 2. all home links
-  static const QString TEMPLATE{QDir::homePath() + "/%1"};
-  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Desktop"), QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop", this});
-  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Documents"), QIcon(":img/FOLDER_OF_DOCUMENTS"), "Documents", this});
-  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Downloads"), QIcon(":img/FOLDER_OF_DOWNLOADS"), "Downloads", this});
-  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Pictures"), QIcon(":img/FOLDER_OF_PICTURES"), "Pictures", this});
-  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Videos"), QIcon(":img/FOLDER_OF_VIDEOS"), "Videos", this});
-  addAction(new (std::nothrow) ActionWithPath{TEMPLATE.arg("Documents"), QIcon(":img/FOLDER_OF_FAVORITE"), "Favorites", this});
+  auto* desktop = new (std::nothrow) QAction{QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop", this};
+  CHECK_NULLPTR_RETURN_VOID(desktop)
+  desktop->setToolTip(QDir::homePath() + "/Desktop");
+  addAction(desktop);
+  auto* pDocument = new (std::nothrow) QAction{QIcon(":img/FOLDER_OF_DOCUMENTS"), "Documents", this};
+  CHECK_NULLPTR_RETURN_VOID(pDocument)
+  pDocument->setToolTip(QDir::homePath() + "/Documents");
+  addAction(pDocument);
+  auto* pDownloads = new (std::nothrow) QAction{QIcon(":img/FOLDER_OF_DOWNLOADS"), "Downloads", this};
+  CHECK_NULLPTR_RETURN_VOID(pDownloads)
+  pDownloads->setToolTip(QDir::homePath() + "/Downloads");
+  addAction(pDownloads);
+  auto* pPictures = new (std::nothrow) QAction{QIcon(":img/FOLDER_OF_PICTURES"), "Pictures", this};
+  CHECK_NULLPTR_RETURN_VOID(pPictures)
+  pPictures->setToolTip(QDir::homePath() + "/Pictures");
+  addAction(pPictures);
+  auto* pVideos = new (std::nothrow) QAction{QIcon(":img/FOLDER_OF_VIDEOS"), "Videos", this};
+  CHECK_NULLPTR_RETURN_VOID(pVideos)
+  pVideos->setToolTip(QDir::homePath() + "/Videos");
+  addAction(pVideos);
+  auto* pFavorite = new (std::nothrow) QAction{QIcon(":img/FOLDER_OF_FAVORITE"), "Favorites", this};
+  CHECK_NULLPTR_RETURN_VOID(pFavorite)
+  pFavorite->setToolTip(QDir::homePath() + "/Documents");
+  addAction(pFavorite);
   addSeparator();
   // 3. all volumes
   foreach (const QFileInfo& fi, QDir::drives()) {
-    addAction(new (std::nothrow) ActionWithPath{fi.absoluteFilePath(), fi.absoluteFilePath(), this});
+    auto* pVolume = new (std::nothrow) QAction{fi.absoluteFilePath(), this};
+    CHECK_NULLPTR_RETURN_VOID(pVolume)
+    pVolume->setToolTip(fi.absoluteFilePath());
+    addAction(pVolume);
   }
   addSeparator();
   // 4. all collections
@@ -46,9 +66,10 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
 }
 
 void NavigationToolBar::subscribe() {
-  connect(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES, &QAction::triggered, this, [this](const bool checked) {  //
+  connect(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES, &QAction::triggered, this, [this](const bool checked) -> void {  //
     mDevDriveTV = PopupHideWidget<DevicesDrivesTV>(mDevDriveTV, checked, nullptr);
   });
+  connect(this, &QToolBar::actionTriggered, &NavigationExToolBar::onPathActionTriggered);
 }
 
 // #define __MAIN__EQ__NAME__ 1
