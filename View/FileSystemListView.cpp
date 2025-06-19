@@ -1,4 +1,4 @@
-#include "FileSystemListView.h"
+﻿#include "FileSystemListView.h"
 
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
@@ -7,12 +7,13 @@
 
 #include "View/FileSystemListView.h"
 #include "View/ViewHelper.h"
-#include "public/StyleSheet.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>
 
-FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* parent) : CustomListView{"FILE_SYSTEM_LIST", parent} {
+FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* parent)  //
+    : CustomListView{"FILE_SYSTEM_LIST", parent}                                       //
+{
   BindMenu(m_fsMenu);
   setModel(fsmModel);
 
@@ -75,11 +76,17 @@ void FileSystemListView::mousePressEvent(QMouseEvent* event) {
   if (View::onMouseSidekeyBackwardForward(event->button())) {
     return;
   }
+  if (event->button() & Qt::LeftButton) {
+    mDragStartPosition = event->pos();
+  }
   return QListView::mousePressEvent(event);
 }
 
 void FileSystemListView::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::MouseButton::LeftButton) {
+    if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST) {
+      return;
+    }
     View::mouseMoveEventCore(this, event);
     return;
   }
