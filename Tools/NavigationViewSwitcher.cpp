@@ -1,12 +1,10 @@
-#include "NavigationViewSwitcher.h"
-#include "Component/Notificator.h"
+﻿#include "NavigationViewSwitcher.h"
 #include "View/CastDBView.h"
 #include "View/SceneActionsSubscribe.h"
 #include "View/SceneListView.h"
-#include "Model/ScenesListModel.h"
-#include "public/PublicTool.h"
 #include "public/MemoryKey.h"
-#include "Actions/ActionWithPath.h"
+#include "Component/NavigationToolBar.h"
+#include "Model/ScenesListModel.h"
 #include "Tools/ViewTypeTool.h"
 using namespace ViewTypeTool;
 
@@ -25,13 +23,26 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
         _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
-        static auto F_IntoNewPath = [this](QString newPath, bool isNewPath, bool isF5Force) -> bool { return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force); };
-        static auto F_SearchTextChanged = [this](const QString& targetStr) -> bool { return _view->on_searchTextChanged(targetStr); };
-        static auto F_SearchEnterKey = [this](const QString& targetStr) -> bool { return _view->on_searchEnterKey(targetStr); };
-
-        _navigation->m_addressBar->BindFileSystemViewCallback(F_IntoNewPath, F_SearchTextChanged, F_SearchEnterKey, _view->m_fsModel);
-
-        ActionWithPath::BindIntoNewPath(F_IntoNewPath);
+        static T_IntoNewPath fIntoNewPath  //
+            {
+                [this](QString newPath, bool isNewPath, bool isF5Force) -> bool {        //
+                  return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force);  //
+                }                                                                        //
+            };
+        static T_on_searchTextChanged fSearchTextChanged  //
+            {
+                [this](const QString& targetStr) -> bool {        //
+                  return _view->on_searchTextChanged(targetStr);  //
+                }                                                 //
+            };
+        static T_on_searchEnterKey fSearchEnterKey  //
+            {
+                [this](const QString& targetStr) -> bool {     //
+                  return _view->on_searchEnterKey(targetStr);  //
+                }                                              //
+            };
+        _navigation->m_addressBar->BindFileSystemViewCallback(fIntoNewPath, fSearchTextChanged, fSearchEnterKey, _view->m_fsModel);
+        NavigationExToolBar::BindIntoNewPath(fIntoNewPath);
       }
       naviIndex = _navigation->m_name2StackIndex[ViewType::TABLE];
       qDebug("Switch toolbar to list/table/tree/json[%d]", (char)viewType);
