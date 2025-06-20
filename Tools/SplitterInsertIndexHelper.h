@@ -1,16 +1,9 @@
-#ifndef SPLITTERINSERTINDEXHELPER_H
+﻿#ifndef SPLITTERINSERTINDEXHELPER_H
 #define SPLITTERINSERTINDEXHELPER_H
 
-class SplitterInsertIndexHelper {
- public:
-  SplitterInsertIndexHelper(int maxCount);
-  ~SplitterInsertIndexHelper();
-  int operator()(int sequence);  //  should insert at
-  int GetOccupiedCnt() const;
+#include <QVector>
+void MoveElementFrontOf(QVector<int>& v, int fromIndex, int destIndex);
 
- private:
-  bool* m_occupied;
-  const int m_maxCount;
-};
-
+bool IsValidMediaTypeSeq(const QString& seqStr, QVector<int>& result);
+QString MediaTypeSeqStr(const QVector<int>& result);
 #endif  // SPLITTERINSERTINDEXHELPER_H

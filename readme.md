@@ -8,11 +8,15 @@ FileXplorer is a cross-platform professional file management system engineered f
 
 ## Core Features
 
-1. File/Folder Navigation
+1. File/Folder Preview & ‌Sidebar Navigation‌
 
-        - Dual-pane explorer interface
-        - Thumbnail/preview for 100+ file formats
-        - Dark/light theme support
+        - Enables categorized preview of folder contents without opening them
+        - Simply select any folder to view its items in the right-side preview panel
+        - Configurable file type filters and customizable default display order
+        - Supports drag-and-drop bookmarking for multiple folders simultaneously;
+        - Provides both automatic (alphabetical/path-based) and manual sorting options;
+        - All bookmark configurations persist to local settings file;
+
 
 2. Advanced Batch Renaming
 
