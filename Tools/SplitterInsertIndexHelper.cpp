@@ -1,48 +1,48 @@
-#include "SplitterInsertIndexHelper.h"
+﻿#include "SplitterInsertIndexHelper.h"
 #include <QDebug>
-SplitterInsertIndexHelper::SplitterInsertIndexHelper(int maxCount) : m_maxCount{maxCount} {
-  if (m_maxCount <= 0 || m_maxCount > 100) {
-    qWarning("maxCount[%d] out of bound[0, 100)", m_maxCount);
+#include <set>
+
+void MoveElementFrontOf(QVector<int>& v, int fromIndex, int destIndex) {
+  if (fromIndex < 0 || fromIndex >= v.size() || destIndex < 0 || destIndex > v.size()) {
     return;
   }
-  m_occupied = new (std::nothrow) bool[m_maxCount]{false};
-  if (m_occupied == nullptr) {
-    qCritical("m_occupied is nullptr");
+
+  if (fromIndex == destIndex || fromIndex + 1 == destIndex) {
     return;
   }
+
+  int val = v[fromIndex];
+  v.erase(v.begin() + fromIndex);
+  v.insert(v.begin() + (destIndex > fromIndex ? destIndex - 1 : destIndex), val);
 }
 
-SplitterInsertIndexHelper::~SplitterInsertIndexHelper() {
-  if (m_occupied == nullptr) {
-    return;
+bool IsValidMediaTypeSeq(const QString& seqStr, QVector<int>& result) {
+  const int N = seqStr.size();
+  if (N == 0 || N > 10) {
+    return false;
   }
-  delete[] m_occupied;
-  m_occupied = nullptr;
+  result.clear();
+  result.reserve(N);
+  for (QChar ch : seqStr) {
+    if (!ch.isDigit()) {
+      return false;
+    }
+    int num = ch.digitValue();
+    result.append(num);
+  }
+
+  // 检查范围[0,N)和连续性
+  const std::set<int> uniqueSorted(result.begin(), result.end());
+  return ((int)uniqueSorted.size() == N) && (*uniqueSorted.begin() == 0) && (*uniqueSorted.rbegin() == N - 1);
+
+  return true;
 }
 
-int SplitterInsertIndexHelper::operator()(int sequence) {
-  if (m_occupied == nullptr) {
-    qCritical("m_occupied is nullptr");
-    return -1;
+QString MediaTypeSeqStr(const QVector<int>& result) {
+  QString ans;
+  ans.reserve(result.size());
+  for(int digit : result) {
+    ans.append(QChar('0' + digit));
   }
-  if (sequence < 0 && sequence >= m_maxCount) {
-    qWarning("sequence[%d] out of bound[0, %d)", sequence, m_maxCount);
-    return -1;
-  }
-  if (m_occupied[sequence]) {
-    qWarning("sequence[%d] is already occupied", sequence);
-    return -2;
-  }
-  // _____ _____
-  int ansIndex = std::accumulate<bool*>(m_occupied, m_occupied + sequence, 0);
-  m_occupied[sequence] = true;
-  return ansIndex;
-}
-
-int SplitterInsertIndexHelper::GetOccupiedCnt() const {
-  if (m_occupied == nullptr) {
-    qCritical("m_occupied is nullptr");
-    return -1;
-  }
-  return std::accumulate<bool*>(m_occupied, m_occupied + m_maxCount, 0);
+  return ans;
 }
