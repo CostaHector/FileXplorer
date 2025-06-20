@@ -2,16 +2,12 @@
 #define NAVIGATIONEXTOOLBAR_H
 
 #include "public/PublicVariable.h"
-#include <QDragEnterEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QToolBar>
+#include "ReorderableToolBar.h"
 
-class NavigationExToolBar : public QToolBar {
+class NavigationExToolBar : public ReorderableToolBar {
   Q_OBJECT
  public:
   explicit NavigationExToolBar(const QString& title, QWidget* parent = nullptr);
-  void addDraggableAction(QAction* act);
 
   void dragEnterEvent(QDragEnterEvent* event) override;
   void dropEvent(QDropEvent* event) override;
@@ -31,11 +27,7 @@ class NavigationExToolBar : public QToolBar {
   static void BindIntoNewPath(T_IntoNewPath IntoNewPath) { m_IntoNewPath = IntoNewPath; }
   static bool onPathActionTriggered(const QAction* pAct);
 
- signals:
-  void widgetMoved(int fromIndex, int destIndex);
-
  private:
-  bool MoveToolbuttonInToolBar(int fromIndex, int destIndex);
   static T_IntoNewPath m_IntoNewPath;
 
   QPoint mRightClickAtPnt;
