@@ -2,7 +2,6 @@
 #define NAVIGATIONTOOLBAR_H
 
 #include "NavigationExToolBar.h"
-#include "public/PublicVariable.h"
 class DevicesDrivesTV;
 class NavigationToolBar : public QToolBar {
  public:
