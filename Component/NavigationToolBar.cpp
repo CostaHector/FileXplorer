@@ -12,7 +12,6 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
 {
   setObjectName(title);
   // 1. devices and drives
-
   addAction(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES);
   addSeparator();
   // 2. all home links
