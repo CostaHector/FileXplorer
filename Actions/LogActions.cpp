@@ -1,46 +1,32 @@
 ﻿#include "LogActions.h"
 #include "public/MemoryKey.h"
+#include "public/PublicMacro.h"
 #include <QStyle>
 #include <QApplication>
 
-LogActions::LogActions(QObject* parent) : QObject{parent} {
+LogActions::LogActions(QObject* parent)  //
+    : QObject{parent}                    //
+{
   _LOG_FILE = new (std::nothrow) QAction{QIcon(":img/RUNNING_LOGS"), "Logs"};
-  if (_LOG_FILE == nullptr) {
-    qCritical("_LOG_FILE is nullptr");
-    return;
-  }
-  _LOG_FOLDER = new (std::nothrow) QAction{"Logs folder"};
-  if (_LOG_FOLDER == nullptr) {
-    qCritical("_LOG_FOLDER is nullptr");
-    return;
-  }
-  _LOG_AGING = new (std::nothrow) QAction{QIcon(":img/AGING_LOGS"), "Aging logs"};
-  if (_LOG_AGING == nullptr) {
-    qCritical("_LOG_AGING is nullptr");
-    return;
-  }
-  _LOG_LEVEL_DEBUG = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_DEBUG"), "Debug"};
-  if (_LOG_LEVEL_DEBUG == nullptr) {
-    qCritical("_LOG_LEVEL_DEBUG is nullptr");
-    return;
-  }
-  _LOG_LEVEL_WARNING = new (std::nothrow) QAction{qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning), "Warning"};
-  if (_LOG_LEVEL_WARNING == nullptr) {
-    qCritical("_LOG_LEVEL_WARNING is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(_LOG_FILE)
 
-  _FLUSH_INSTANTLY = new (std::nothrow) QAction{"Flush instantly"};
-  if (_FLUSH_INSTANTLY == nullptr) {
-    qCritical("_FLUSH_INSTANTLY is nullptr");
-    return;
-  }
+  _LOG_FOLDER = new (std::nothrow) QAction{"Logs folder"};
+  CHECK_NULLPTR_RETURN_VOID(_LOG_FOLDER)
+
+  _LOG_AGING = new (std::nothrow) QAction{QIcon(":img/AGING_LOGS"), "Aging logs"};
+  CHECK_NULLPTR_RETURN_VOID(_LOG_AGING)
+
+  _LOG_LEVEL_DEBUG = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_DEBUG"), "Debug"};
+  CHECK_NULLPTR_RETURN_VOID(_LOG_LEVEL_DEBUG)
+
+  _LOG_LEVEL_WARNING = new (std::nothrow) QAction{qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning), "Warning"};
+  CHECK_NULLPTR_RETURN_VOID(_LOG_LEVEL_WARNING)
+
+  _FLUSH_INSTANTLY = new (std::nothrow) QAction{"Auto Flush Buffer"};
+  CHECK_NULLPTR_RETURN_VOID(_FLUSH_INSTANTLY)
 
   _LOG_LEVEL_AG = new (std::nothrow) QActionGroup{this};
-  if (_LOG_LEVEL_AG == nullptr) {
-    qCritical("_LOG_LEVEL_AG is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(_LOG_LEVEL_AG)
 
   _LOG_FILE->setCheckable(false);
   _LOG_FILE->setShortcut(QKeySequence(Qt::Key::Key_F12));
@@ -63,7 +49,7 @@ LogActions::LogActions(QObject* parent) : QObject{parent} {
   _LOG_LEVEL_WARNING->setShortcutVisibleInContextMenu(true);
   _LOG_LEVEL_WARNING->setToolTip(QString("<b>%1 (%2)</b><br/>Set log level to warning.").arg(_LOG_LEVEL_WARNING->text(), _LOG_LEVEL_WARNING->shortcut().toString()));
 
-  if (PreferenceSettings().value(MemoryKey::LOG_DEVEL_DEBUG.name, MemoryKey::LOG_DEVEL_DEBUG.v).toBool()) {
+  if (PreferenceSettings().value(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.v).toBool()) {
     _LOG_LEVEL_DEBUG->setChecked(true);
   } else {
     _LOG_LEVEL_WARNING->setChecked(true);
@@ -76,7 +62,7 @@ LogActions::LogActions(QObject* parent) : QObject{parent} {
   _FLUSH_INSTANTLY->setCheckable(true);
   _FLUSH_INSTANTLY->setChecked(false);
   _FLUSH_INSTANTLY->setShortcutVisibleInContextMenu(true);
-  _FLUSH_INSTANTLY->setToolTip(QString("<b>%1 (%2)</b><br/>Flush log stashed in buffers into log file instantly.").arg(_FLUSH_INSTANTLY->text(), _FLUSH_INSTANTLY->shortcut().toString()));
+  _FLUSH_INSTANTLY->setToolTip(QString("<b>%1 (%2)</b><br/>Auto flush log stashed in buffers into log file instantly.").arg(_FLUSH_INSTANTLY->text(), _FLUSH_INSTANTLY->shortcut().toString()));
 
   _DROPDOWN_LIST << _LOG_FILE << _LOG_FOLDER << nullptr << _LOG_AGING << nullptr << _LOG_LEVEL_DEBUG << _LOG_LEVEL_WARNING << nullptr << _FLUSH_INSTANTLY;
 }
