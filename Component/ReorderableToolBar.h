@@ -18,14 +18,6 @@ class ReorderableToolBar : public QToolBar {
   void dragMoveEvent(QDragMoveEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
   void dropEvent(QDropEvent* event) override;
-
- private:
-  bool MoveToolbuttonInToolBar(int fromIndex, int destIndex);
 };
-
-#include <QSplitter>
-#include <QBoxLayout>
-bool MoveWidgetAtFromIndexInFrontOfDestIndex(int fromIndex, int destIndex, QSplitter& splitter);
-bool MoveWidgetAtFromIndexInFrontOfDestIndex(int fromIndex, int destIndex, QBoxLayout& layout);
 
 #endif // REORDERABLETOOLBAR_H
