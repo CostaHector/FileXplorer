@@ -11,6 +11,18 @@ win32 {
     LIBS += -lMediaInfo
 }
 
+CONFIG(debug, debug|release) {
+    DEFINES += QT_MESSAGELOGCONTEXT
+}
+
+CONFIG(release, debug|release) {
+#DEFINES -= QT_NO_MESSAGELOGCONTEXT
+#DEFINES += QT_MESSAGELOGCONTEXT
+## GCC/Clang
+#QMAKE_CXXFLAGS_RELEASE += -g
+## MSVC
+#QMAKE_CXXFLAGS_RELEASE += /Zi
+}
 
 SOURCES += $$files(Actions/*.cpp)
 SOURCES += $$files(Model/*.cpp)

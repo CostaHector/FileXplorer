@@ -83,7 +83,7 @@ struct MemoryKey {
   static const KV WIN32_AKA_PERFORMERS;
   static const KV WIN32_STANDARD_STUDIO_NAME;
   static const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH;
-  static const KV LOG_DEVEL_DEBUG;
+  static const KV LOG_LEVEL_PRINT_INSTANTLY;
   static const KV WIN32_RUNLOG;
 
   static const KV LINUX_MEDIAINFO_LIB_PATH;
