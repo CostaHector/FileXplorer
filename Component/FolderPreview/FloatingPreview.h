@@ -5,6 +5,7 @@
 #include "View/ItemView.h"
 #include "Model/FloatingModels.h"
 #include "ClickableTextBrowser.h"
+#include "Tools/WidgetReorderHelper.h"
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QAction>
@@ -17,7 +18,6 @@
 class FloatingPreview : public QStackedWidget {
  public:
   enum class PANE_TYPE : int { BEGIN = 0, DETAIL = BEGIN, IMG_VID_OTH, BUTT };
-  enum class MEDIA_TYPE : int { BEGIN = 0, IMG = BEGIN, VID, OTH, BUTT };
 
   FloatingPreview(const QString& memoryName, QWidget* parent = nullptr);
   void showEvent(QShowEvent* event) override;
@@ -56,7 +56,11 @@ class FloatingPreview : public QStackedWidget {
   void onOthBtnClicked(bool checked);
   void onTypesBtnClicked(bool checked = true);
   using MediaBtnHandlerFunc = void (FloatingPreview::*)(bool);
-  static constexpr MediaBtnHandlerFunc MEDIA_HANDLERS_MAP[(int)MEDIA_TYPE::BUTT] = {&FloatingPreview::onImgBtnClicked, &FloatingPreview::onVidBtnClicked, &FloatingPreview::onOthBtnClicked};
+  static constexpr MediaBtnHandlerFunc MEDIA_HANDLERS_MAP[(int)PREVIEW_ITEM_TYPE::BUTT]{
+      &FloatingPreview::onImgBtnClicked,  //
+      &FloatingPreview::onVidBtnClicked,  //
+      &FloatingPreview::onOthBtnClicked   //
+  };
   void onImgVidOthActTriggered(const QAction* pAct);
 
   bool onReorder(int fromIndex, int destIndex);
@@ -70,12 +74,16 @@ class FloatingPreview : public QStackedWidget {
   QAction *_IMG_ACT{nullptr}, *_VID_ACT{nullptr}, *_OTH_ACT{nullptr};
   bool m_bImgVisible{true}, m_bVidVisible{true}, m_bOthVisible{true};
   ReorderableToolBar* mTypeToDisplayTB{nullptr};
-  PANE_TYPE m_curIndex{PANE_TYPE::IMG_VID_OTH};
+  PANE_TYPE m_curIndex{PANE_TYPE::DETAIL};
   QSplitter* mImgVidOtherSplitter{nullptr};
 
   QString mLastName;
   const QString mMemoryName;
-  QVector<int> mMediaSequence{(int)MEDIA_TYPE::IMG, (int)MEDIA_TYPE::VID, (int)MEDIA_TYPE::OTH};
+  QVector<int> mMediaSequence{
+      (int)PREVIEW_ITEM_TYPE::IMG,  //
+      (int)PREVIEW_ITEM_TYPE::VID,  //
+      (int)PREVIEW_ITEM_TYPE::OTH   //
+  };
 };
 
 #endif  // FLOATINGPREVIEW_H
