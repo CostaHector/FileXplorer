@@ -291,7 +291,6 @@ bool FloatingPreview::onReorder(int fromIndex, int destIndex) {
 }
 
 void FloatingPreview::onImgBtnClicked(bool checked) {
-  qWarning("img checked, %d", checked);
   m_bImgVisible = checked;
   if (mImgTv == nullptr) {
     mImgModel = new (std::nothrow) ImgsModel;
