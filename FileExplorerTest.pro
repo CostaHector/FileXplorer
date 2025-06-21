@@ -58,11 +58,11 @@ SOURCES += \
     Tools/SceneInfoManager.cpp \
     Tools/ThumbnailProcesser.cpp \
     Tools/ToConsecutiveFileNameNo.cpp \
-    Tools/SplitterInsertIndexHelper.cpp \
     Tools/LogHandler.cpp \
     Tools/FileSystemItemFilter.cpp \
     Tools/RedunImgLibs.cpp \
     Tools/SyncModifiyFileSystem.cpp \
+    Tools/WidgetReorderHelper.cpp
 
 HEADERS += $$files(TestCase/pub/*.h)
 HEADERS += $$files(TestCase/*.h)
@@ -105,11 +105,11 @@ HEADERS += \
     Tools/SceneInfoManager.h \
     Tools/ThumbnailProcesser.h \
     Tools/ToConsecutiveFileNameNo.h \
-    Tools/SplitterInsertIndexHelper.h \
     Tools/LogHandler.h \
     Tools/FileSystemItemFilter.h \
     Tools/RedunImgLibs.h \
     Tools/SyncModifiyFileSystem.h \
+    Tools/WidgetReorderHelper.h
 
 DISTFILES += \
     readme.md
