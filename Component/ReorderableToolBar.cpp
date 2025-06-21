@@ -1,6 +1,7 @@
 ﻿#include "ReorderableToolBar.h"
 #include "DraggableToolButton.h"
 #include "public/PublicMacro.h"
+#include "Tools/WidgetReorderHelper.h"
 #include <QMimeData>
 #include <QLayout>
 #include <QToolTip>
@@ -33,72 +34,6 @@ bool IsSourceValid(QObject* source, QWidget* parent) {
   if (!source->isWidgetType()) {
     qWarning("source is not widget, skip");
     return false;
-  }
-  return true;
-}
-
-bool MoveWidgetAtFromIndexInFrontOfDestIndex(int fromIndex, int destIndex, QSplitter& splitter) {
-  if (fromIndex == destIndex || fromIndex + 1 == destIndex) {
-    qDebug("no need move widget at index[%d] to destination in front of index[%d]", fromIndex, destIndex);
-    return false;
-  }
-  const int N = splitter.count();
-  if (fromIndex < 0 || fromIndex >= N) {
-    qWarning("fromIndex[%d] out of bound[0, %d)", fromIndex, N);
-    return false;
-  }
-  if (destIndex < 0 || destIndex > N) {
-    qWarning("destIndex[%d] out of bound[0, %d]", destIndex, N);
-    return false;
-  }
-  //  qDebug("layout.metaObject().className(): %s", layout->metaObject()->className());
-  QWidget* fromWidget = splitter.widget(fromIndex);
-  if (fromWidget == nullptr) {
-    qWarning("Only Widget can move");
-    return false;
-  }
-  qDebug("move widget(index at %d) in front of %d", fromIndex, destIndex);
-  if (destIndex >= N) {
-    splitter.addWidget(fromWidget);
-  } else {
-    if (destIndex <= 0) {
-      splitter.insertWidget(destIndex, fromWidget);
-    } else {
-      splitter.insertWidget(destIndex - 1, fromWidget);
-    }
-  }
-  return true;
-}
-
-bool MoveWidgetAtFromIndexInFrontOfDestIndex(int fromIndex, int destIndex, QBoxLayout& layout) {
-  if (fromIndex == destIndex || fromIndex + 1 == destIndex) {
-    qDebug("no need move widget at index[%d] to destination in front of index[%d]", fromIndex, destIndex);
-    return false;
-  }
-  const int N = layout.count();
-  if (fromIndex < 0 || fromIndex >= N) {
-    qWarning("fromIndex[%d] out of bound[0, %d)", fromIndex, N);
-    return false;
-  }
-  if (destIndex < 0 || destIndex > N) {
-    qWarning("destIndex[%d] out of bound[0, %d]", destIndex, N);
-    return false;
-  }
-  //  qDebug("layout.metaObject().className(): %s", layout->metaObject()->className());
-  QWidget* fromWidget = layout.takeAt(fromIndex)->widget();
-  if (!fromWidget) {
-    qWarning("Only Widget can move");
-    return false;
-  }
-  qDebug("move widget(index at %d) in front of %d", fromIndex, destIndex);
-  if (destIndex >= N) {
-    layout.addWidget(fromWidget);
-  } else {
-    if (destIndex <= 0) {
-      layout.insertWidget(destIndex, fromWidget);
-    } else {
-      layout.insertWidget(destIndex - 1, fromWidget);
-    }
   }
   return true;
 }
@@ -229,45 +164,8 @@ void ReorderableToolBar::dropEvent(QDropEvent* event) {
     ++destIndex;
   }
   event->acceptProposedAction();
-  if (!MoveToolbuttonInToolBar(fromIndex, destIndex)) {
+  if (!MoveWidgetAtFromIndexInFrontOfDestIndex(fromIndex, destIndex, *this)) {
     return;
   }
   emit widgetMoved(fromIndex, destIndex);
-}
-
-bool ReorderableToolBar::MoveToolbuttonInToolBar(int fromIndex, int destIndex) {
-  if (fromIndex == destIndex || fromIndex + 1 == destIndex) {
-    qDebug("no need move widget at index[%d] to destination in front of index[%d]", fromIndex, destIndex);
-    return false;
-  }
-  const int N = actions().size();
-  if (fromIndex < 0 || fromIndex >= N) {
-    qWarning("fromIndex[%d] out of bound[0, %d)", fromIndex, N);
-    return false;
-  }
-  if (destIndex < 0 || destIndex > N) {
-    qWarning("destIndex[%d] out of bound[0, %d]", destIndex, N);
-    return false;
-  }
-  const QList<QAction*>& oldActs = actions();
-  QWidget* widget = widgetForAction(oldActs[fromIndex]);
-  if (widget == nullptr) {
-    qWarning("fromIndex[%d] widget is None", fromIndex);
-    return false;
-  }
-  qDebug("move widget(index at %d) in front of %d", fromIndex, destIndex);
-  if (destIndex >= N) {
-    addWidget(widget);
-    const QList<QAction*>& newActs = actions();
-    removeAction(newActs[fromIndex]);
-  } else {
-    insertWidget(oldActs[destIndex], widget);
-    const QList<QAction*>& newActs = actions();
-    if (fromIndex > destIndex) {
-      removeAction(newActs[fromIndex + 1]);
-    } else {
-      removeAction(newActs[fromIndex]);
-    }
-  }
-  return true;
 }
