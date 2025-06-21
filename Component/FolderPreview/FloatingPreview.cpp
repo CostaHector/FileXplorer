@@ -4,13 +4,12 @@
 #include "public/DisplayEnhancement.h"
 #include "public/PublicVariable.h"
 #include "public/StyleSheet.h"
-#include "Tools/SplitterInsertIndexHelper.h"
-
 #include <QDir>
 #include <QLayout>
 #include <QIcon>
 #include <QFileIconProvider>
 #include <QBuffer>
+
 #ifdef _WIN32
 #include "Tools/QMediaInfo.h"
 #endif
@@ -52,7 +51,7 @@ FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
   if (IsValidMediaTypeSeq(seqStr, mediaSequenceMemory) && mediaSequenceMemory.size() == mMediaSequence.size()) {
     mMediaSequence.swap(mediaSequenceMemory);
   }
-  const bool visibility[(int)MEDIA_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
+  const bool visibility[(int)PREVIEW_ITEM_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
   for (int mediaTypeInd : mMediaSequence) {
     (this->*MEDIA_HANDLERS_MAP[mediaTypeInd])(visibility[mediaTypeInd]);
   }
@@ -64,7 +63,9 @@ FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
 
   addWidget(mDetailsPane);
   addWidget(mImgVidOtherSplitter);
-  setCurrentIndex((int)m_curIndex);
+  if (currentIndex() != (int)m_curIndex) {
+    setCurrentIndex((int)m_curIndex);
+  }
 
   subscribe();
   ReadSettings();
@@ -279,7 +280,10 @@ void FloatingPreview::subscribe() {
 
 bool FloatingPreview::onReorder(int fromIndex, int destIndex) {
   CHECK_NULLPTR_RETURN_FALSE(mImgVidOtherSplitter);
-  MoveElementFrontOf(mMediaSequence, fromIndex, destIndex);
+  if (!MoveElementFrontOf(mMediaSequence, fromIndex, destIndex)) {
+    qWarning("failed, move widget at index[%d] in front of widget at[%d]", fromIndex, destIndex);
+    return false;
+  }
   const QString& newMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
   PreferenceSettings().setValue("FLOATING_MEDIA_TYPE_SEQ", newMediaTypeSeq);
   qDebug("New media type seq[%s]", qPrintable(newMediaTypeSeq));
@@ -299,7 +303,9 @@ void FloatingPreview::onImgBtnClicked(bool checked) {
     mImgVidOtherSplitter->addWidget(mImgTv);
   }
   PreferenceSettings().setValue("FLOATING_IMAGE_VIEW_SHOW", checked);
-  mImgTv->setVisible(m_bImgVisible);
+  if (mImgTv->isVisible() != checked) {
+    mImgTv->setVisible(checked);
+  }
 }
 
 void FloatingPreview::onVidBtnClicked(bool checked) {
@@ -314,7 +320,7 @@ void FloatingPreview::onVidBtnClicked(bool checked) {
     mImgVidOtherSplitter->addWidget(mVidTv);
   }
   PreferenceSettings().setValue("FLOATING_VIDEO_VIEW_SHOW", checked);
-  mVidTv->setVisible(m_bVidVisible);
+  mVidTv->setVisible(checked);
 }
 
 void FloatingPreview::onOthBtnClicked(bool checked) {
@@ -329,7 +335,7 @@ void FloatingPreview::onOthBtnClicked(bool checked) {
     mImgVidOtherSplitter->addWidget(mOthTv);
   }
   PreferenceSettings().setValue("FLOATING_OTHER_VIEW_SHOW", checked);
-  mOthTv->setVisible(m_bOthVisible);
+  mOthTv->setVisible(checked);
 }
 
 void FloatingPreview::onTypesBtnClicked(bool checked) {
@@ -338,7 +344,7 @@ void FloatingPreview::onTypesBtnClicked(bool checked) {
     CHECK_NULLPTR_RETURN_VOID(mTypeToDisplayTB)
     mTypeToDisplayTB->setOrientation(Qt::Orientation::Horizontal);
     mTypeToDisplayTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    static QAction* MEDIA_TYPE_2_ACTS[(int)MEDIA_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
+    static QAction* MEDIA_TYPE_2_ACTS[(int)PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
     for (int mediaTypeInd : mMediaSequence) {
       mTypeToDisplayTB->addAction(MEDIA_TYPE_2_ACTS[mediaTypeInd]);
     }
