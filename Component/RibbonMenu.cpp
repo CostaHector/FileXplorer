@@ -68,20 +68,28 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 }
 
 QToolBar* RibbonMenu::LeafFile() const {
-  auto* styleToolButton = new DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
+  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
+  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
+  SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+
+  auto* styleToolButton =
+      new (std::nothrow) DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "Change Style");
-  QToolButton* logToolButton = new DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
+  QToolButton* logToolButton =
+      new (std::nothrow) DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   logToolButton->setDefaultAction(g_LogActions()._LOG_FILE);
 
   QToolBar* leafFileWid{new (std::nothrow) QToolBar};
   CHECK_NULLPTR_RETURN_NULLPTR(leafFileWid);
   leafFileWid->addActions(g_fileLeafActions()._LEAF_FILE->actions());
   leafFileWid->addSeparator();
+  leafFileWid->addWidget(syncSwitchToolBar);
+  leafFileWid->addWidget(syncPathToolBar);
+  leafFileWid->addSeparator();
   leafFileWid->addWidget(styleToolButton);
   leafFileWid->addSeparator();
   leafFileWid->addWidget(logToolButton);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-
   return leafFileWid;
 }
 
@@ -119,7 +127,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  auto* newItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  auto* newItemsTB = new (std::nothrow) DropdownToolButton(g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   newItemsTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_NEW_CHOICE.name, MemoryKey::DEFAULT_NEW_CHOICE.v).toString());
   newItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_NEW_CHOICE.name);
 
@@ -144,7 +152,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolBar* cutCopyPasterTb = g_fileBasicOperationsActions().GetCutCopyPasteTb();
   QToolBar* folderOpModeTb = g_fileBasicOperationsActions().GetFolderOperationModeTb();
 
-  QToolButton* recycleItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
+  QToolButton* recycleItemsTB = new (std::nothrow) DropdownToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
   recycleItemsTB->setDefaultAction(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN);
 
   QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar{"ArchievePreview"};
@@ -186,11 +194,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
-  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
-  SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-
-  QToolBar* leafHomeWid = new (std::nothrow) QToolBar("LeafHome");
+  QToolBar* leafHomeWid = new (std::nothrow) QToolBar{"LeafHome"};
   CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
   leafHomeWid->setToolTip("Home Leaf ToolBar");
   leafHomeWid->addWidget(openItemsTB);
@@ -214,9 +218,6 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addWidget(compressToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(advanceSearchToolBar);
-  leafHomeWid->addSeparator();
-  leafHomeWid->addWidget(syncSwitchToolBar);
-  leafHomeWid->addWidget(syncPathToolBar);
   return leafHomeWid;
 }
 
