@@ -1,4 +1,4 @@
-#ifndef VIEWACTIONS_H
+﻿#ifndef VIEWACTIONS_H
 #define VIEWACTIONS_H
 
 #include <QAction>
@@ -18,7 +18,6 @@ class ViewActions : public QObject {
   QAction* _TABLE_VIEW{nullptr};
   QAction* _TREE_VIEW{nullptr};
   QAction* _SCENE_VIEW{nullptr};
-  QAction* _FLOATING_PREVIEW{nullptr};
   QAction* _CAST_VIEW{nullptr};
   QAction* _JSON_VIEW{nullptr};
   QActionGroup* _VIEWS_AG{nullptr};
