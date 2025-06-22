@@ -1,4 +1,4 @@
-#include "SceneInfoManager.h"
+﻿#include "SceneInfoManager.h"
 #include "public/PublicVariable.h"
 #include "Tools/Classify/SceneMixed.h"
 #include "Tools/Json/JsonHelper.h"
@@ -99,7 +99,10 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, boo
       qWarning("read imgs line failed");
       return {};
     }
-    aScene.imgs = imgsSeperatedByVerticalBar.split('|');
+    aScene.imgs.clear();
+    if (!imgsSeperatedByVerticalBar.isEmpty()) {
+      aScene.imgs = imgsSeperatedByVerticalBar.split('|');
+    }
     // Video Name: video.mp4
     if (!stream.readLineInto(&aScene.vidName, 256)) {
       qWarning("read video name line failed");
