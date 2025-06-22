@@ -16,7 +16,7 @@ const KV MemoryKey::PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./
 
 const KV MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW{"KEEP_VIDEOS_PLAYLIST_SHOW", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false, ValueChecker{PLAIN_BOOL});
-const KV MemoryKey::SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true, ValueChecker{PLAIN_BOOL});
+const KV MemoryKey::SHOW_FOLDER_PREVIEW("SHOW_FOLDER_PREVIEW", true, ValueChecker{PLAIN_BOOL});
 const KV MemoryKey::FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels", ValueChecker{{"3-lists", "browser", "lists"}, CANDIDATE_STRING}};
 const KV MemoryKey::SHOW_FLOATING_PREVIEW{"SHOW_FLOATING_PREVIEW", true, ValueChecker{PLAIN_BOOL}};
 
