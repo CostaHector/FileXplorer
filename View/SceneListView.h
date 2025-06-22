@@ -1,4 +1,4 @@
-#ifndef SCENELISTVIEW_H
+﻿#ifndef SCENELISTVIEW_H
 #define SCENELISTVIEW_H
 
 #include "View/CustomListView.h"
@@ -12,18 +12,19 @@ class SceneActionsSubscribe;
 class SceneListView : public CustomListView {
  public:
   explicit SceneListView(ScenesListModel* sceneModel, QWidget* parent = nullptr);
+  void setFloatingPreview(FloatingPreview* floatingPreview);
   void setRootPath(const QString& rootPath);
   void subscribe();
   void onCopyBaseName();
   void onOpenCorrespondingFolder();
+  void onClickEvent(const QModelIndex& idx);
 
  private:
-  void mouseMoveEvent(QMouseEvent *event) override;
   QAction* COPY_BASENAME_FROM_SCENE{nullptr};
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
   ScenesListModel* _sceneModel;
   QStyledItemDelegate* mAlignDelegate{nullptr};
-  FloatingPreview* m_fPrev{nullptr};
+  FloatingPreview* mPrev_{nullptr};
 };
 
 #endif  // SCENELISTVIEW_H
