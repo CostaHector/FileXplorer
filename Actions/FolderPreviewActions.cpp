@@ -1,6 +1,5 @@
 ﻿#include "FolderPreviewActions.h"
 #include "public/MemoryKey.h"
-#include "public/PublicVariable.h"
 #include "public/StyleSheet.h"
 
 FolderPreviewActions& g_folderPreviewActions() {

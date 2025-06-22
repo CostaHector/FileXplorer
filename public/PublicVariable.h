@@ -59,6 +59,7 @@ const QRegularExpression TRAILING_HYPEN_COMP{"-$", QRegularExpression::OptimizeO
 
 const QRegularExpression DISCRAD_LETTER_COMP{R"([^A-Zãáéíóúüñ¿¡0-9_@# '])", QRegularExpression::PatternOption::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption};
 const QRegularExpression INVALID_TABLE_NAME_LETTER{R"([^A-Z0-9_])", QRegularExpression::PatternOption::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption};
+const QRegularExpression INVALID_GOOGLE_SEARCH_LETTER{R"([^A-Z0-9])", QRegularExpression::PatternOption::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption};
 const QRegularExpression AND_COMP{R"( and | fucked by | fucked | fucks | fuck |/+|\+)", QRegularExpression::PatternOption::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption};
 const QRegularExpression RESOLUTION_COMP{R"(2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD)", QRegularExpression::PatternOption::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption};
 const QRegularExpression AT_LEAST_1_SPACE_COMP{R"(\s+)", QRegularExpression::OptimizeOnFirstUsageOption};

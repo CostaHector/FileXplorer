@@ -1,11 +1,14 @@
-#include "RightClickMenu.h"
+﻿#include "RightClickMenu.h"
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/ViewActions.h"
 #include "Actions/RightClickMenuActions.h"
 
-RightClickMenu::RightClickMenu(const QString& title, QWidget* parent) : QMenu(title, parent), NEW_MENU{GetNewMenu()}, VIEW_MENU{GetViewMenu()} {
+RightClickMenu::RightClickMenu(const QString& title, QWidget* parent)  //
+    : QMenu{title, parent},                                            //
+      NEW_MENU{GetNewMenu()}                                           //
+{
   setToolTipsVisible(true);
 
   addActions(g_viewActions()._VIDEO_PLAYERS->actions());
@@ -16,7 +19,6 @@ RightClickMenu::RightClickMenu(const QString& title, QWidget* parent) : QMenu(ti
   addSeparator();
 
   addMenu(NEW_MENU);
-  addMenu(VIEW_MENU);
   addSeparator();
   addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
   addSeparator();
@@ -35,30 +37,11 @@ RightClickMenu::RightClickMenu(const QString& title, QWidget* parent) : QMenu(ti
 }
 
 QMenu* RightClickMenu::GetNewMenu() {
-  auto* _newMenuLevel2 = new QMenu(tr("&New"), this);
+  auto* _newMenuLevel2 = new (std::nothrow) QMenu{"&New", this};
   _newMenuLevel2->setIcon(QIcon(":img/NEW_FILE_FOLDER_PATH"));
   _newMenuLevel2->setToolTipsVisible(true);
   _newMenuLevel2->addActions(g_fileBasicOperationsActions().NEW->actions());
   return _newMenuLevel2;
-}
-
-QMenu* RightClickMenu::GetViewMenu() {
-  auto* viewMenuL2 = new QMenu(tr("&View"), this);
-  viewMenuL2->setIcon(QIcon(":img/SORTING_FILE_FOLDER"));
-  viewMenuL2->setToolTipsVisible(true);
-  //    viewMenuL2->addActions(g_viewActions().SORT_INDICATOR_ORDER->actions());
-  //  viewMenuL2->addSeparator();
-  //  viewMenuL2->addActions(g_viewActions().SORT_INDICATOR_LOGICAL_INDEX->actions());
-  //  viewMenuL2->addSeparator();
-  //  viewMenuL2->addActions(g_viewActions().TRIPLE_VIEW->actions());
-  //  viewMenuL2->addSeparator();
-  //  viewMenuL2->addActions(g_viewActions().LISTVIEW_VIEWMODE->actions());
-  //  viewMenuL2->addSeparator();
-  //  viewMenuL2->addActions(g_viewActions().LISTVIEW_FLOW->actions());
-  //  viewMenuL2->addSeparator();
-  //  viewMenuL2->addActions(g_viewActions().LISTVIEW_GRIDSIZE_LEVEL->actions());
-  //  viewMenuL2->addSeparator();
-  return viewMenuL2;
 }
 
 QMenu* RightClickMenu::GetRenameMenu() {

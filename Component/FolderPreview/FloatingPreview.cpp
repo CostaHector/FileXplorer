@@ -22,11 +22,11 @@ FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
 {
   mDetailsPane = new (std::nothrow) ClickableTextBrowser(this);
 
-  _IMG_ACT = new (std::nothrow) QAction(QIcon(":img/IMAGE"), "Images", this);
+  _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "Images", this};
   CHECK_NULLPTR_RETURN_VOID(_IMG_ACT)
-  _VID_ACT = new (std::nothrow) QAction(QIcon(":img/VIDEO"), "Videos", this);
+  _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, "Videos", this};
   CHECK_NULLPTR_RETURN_VOID(_VID_ACT)
-  _OTH_ACT = new (std::nothrow) QAction(QIcon(":img/FILE"), "Others", this);
+  _OTH_ACT = new (std::nothrow) QAction{QIcon{":img/FILE"}, "Others", this};
   CHECK_NULLPTR_RETURN_VOID(_OTH_ACT)
 
   _IMG_ACT->setCheckable(true);
@@ -70,11 +70,6 @@ FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
   subscribe();
   ReadSettings();
   setWindowIcon(QIcon(":img/FLOATING_PREVIEW"));
-}
-
-void FloatingPreview::showEvent(QShowEvent* event) {
-  QStackedWidget::showEvent(event);
-  StyleSheet::UpdateTitleBar(this);
 }
 
 void FloatingPreview::ReadSettings() {
