@@ -15,7 +15,7 @@ class ArchiveFilesActions : public QObject {
   QAction* COMPRESSED_TO{new (std::nothrow) QAction{"Compressd to", this}};
 
   QAction* DECOMPRESSED_TO{new (std::nothrow) QAction{"Decompressd to", this}};
-  QAction* DECOMPRESSED_HERE{new (std::nothrow) QAction{"Decompressd here", this}};
+  QAction* DECOMPRESSED_HERE{new (std::nothrow) QAction{QIcon{":img/EXTRACT_ITEM"}, "Decompressd here", this}};
 
   QAction* COMPRESSED_IMAGES{new (std::nothrow) QAction{"Compress Images", this}};
 

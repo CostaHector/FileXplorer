@@ -1,4 +1,9 @@
 ﻿#include "AlertSystem.h"
+#include "Notificator.h"
+#include "public/MemoryKey.h"
+#include "public/StyleSheet.h"
+#include "Actions/FileLeafAction.h"
+
 #include <QDesktopServices>
 #include <QFileIconProvider>
 #include <QHeaderView>
@@ -6,23 +11,29 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "Actions/FileLeafAction.h"
-#include "public/MemoryKey.h"
-#include "Notificator.h"
-#include "public/StyleSheet.h"
-
 AlertSystem::AlertSystem(QWidget* parent)
-    : QDialog{parent},
-      m_failItemCnt{new QLabel("0", this)},
-      m_recheckButtonBox{new QDialogButtonBox(QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry, Qt::Orientation::Horizontal, this)} {
-  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open)->setIcon(QIcon(":img/CONFIGURE"));
-  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setText("Recheck");
-  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setIcon(QIcon(":img/RELOAD_FROM_DISK"));
+    : QDialog{parent}  //
+{
+  m_failItemCnt = new (std::nothrow) QLabel{"", this};
+  CHECK_NULLPTR_RETURN_VOID(m_failItemCnt)
+  m_failItemCnt->setFont(StyleSheet::TEXT_EDIT_FONT);
+
+  m_alertModel = new (std::nothrow) PreferenceModel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_alertModel)
+  m_alertsTable = new (std::nothrow) CustomTableView{"ALERT_SYSTEM", this};
+  CHECK_NULLPTR_RETURN_VOID(m_alertsTable)
   m_alertModel->setRootPath("");
   m_alertsTable->setModel(m_alertModel);
   m_alertsTable->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
 
-  auto* lo = new QVBoxLayout(this);
+  m_recheckButtonBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry, Qt::Orientation::Horizontal, this};
+  CHECK_NULLPTR_RETURN_VOID(m_recheckButtonBox)
+  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Open)->setIcon(QIcon(":img/CONFIGURE"));
+  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setText("Recheck");
+  m_recheckButtonBox->button(QDialogButtonBox::StandardButton::Retry)->setIcon(QIcon(":img/RELOAD_FROM_DISK"));
+
+  auto* lo = new (std::nothrow) QVBoxLayout{this};
+  CHECK_NULLPTR_RETURN_VOID(lo)
   lo->addWidget(m_failItemCnt);
   lo->addWidget(m_alertsTable);
   lo->addWidget(m_recheckButtonBox);
@@ -48,6 +59,11 @@ void AlertSystem::ReadSettings() {
   m_alertsTable->InitTableView();
 }
 
+void AlertSystem::showEvent(QShowEvent* event) {
+  QDialog::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
+}
+
 void AlertSystem::hideEvent(QHideEvent* event) {
   g_fileLeafActions()._ALERT_ITEMS->setChecked(false);
   QDialog::hideEvent(event);
@@ -59,17 +75,26 @@ void AlertSystem::closeEvent(QCloseEvent* event) {
 }
 
 void AlertSystem::RefreshWindowIcon() {
-  qInfo("Alert System RefreshWindowIcon");
+  const int totalCnt{m_alertModel->rowCount()};
   const int failsCnt = m_alertModel->failCount();
-  setWindowIcon(QIcon(failsCnt > 0 ? ":img/ALERT_ACTIVE" : ":img/ALERT"));
-  QString msg;
-  if (failsCnt > 0) {
-    msg = QString("<b><font color=\"#FF0000\">%1</font></b>").arg(failsCnt);
+  static const QIcon NO_ALERT{":img/ALERT"};
+  static const QIcon ACTIVE_ALERT{":img/ALERT_ACTIVE"};
+  setWindowIcon(failsCnt != 0 ? ACTIVE_ALERT : NO_ALERT);
+
+  QString msg{R"(<b>)"};
+  QString plainText;
+  if (failsCnt != 0) {
+    msg += R"(<font color="#FF0000">)";
+    plainText = QString{"%1 in %2 setting(s) error"}.arg(failsCnt).arg(totalCnt);
+    msg += plainText;
+    msg += R"(</font>)";
   } else {
-    msg = QString("<b>%1</b>").arg(failsCnt);
+    plainText = QString("All %1 setting passed").arg(totalCnt);
+    msg += plainText;
   }
-  m_failItemCnt->setText("Fail item(s): " + msg);
-  setWindowTitle(QString("Alarm System | %1/%2 Fail(s)").arg(failsCnt).arg(m_alertModel->rowCount()));
+  msg += R"(</b>)";
+  m_failItemCnt->setText(msg);
+  setWindowTitle("Alert System | " + plainText);
 }
 
 bool AlertSystem::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
@@ -82,8 +107,7 @@ bool AlertSystem::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
 void AlertSystem::onEditPreferenceSetting() const {
   QString fileAbsPath = PreferenceSettings().fileName();
   if (!QFile::exists(fileAbsPath)) {
-    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::critical("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));

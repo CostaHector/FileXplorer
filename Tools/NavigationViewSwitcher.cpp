@@ -191,6 +191,9 @@ void NavigationViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
           sceneSub->operator()();
         }
       }
+      auto* fFloatingPrev{_view->_previewFolder != nullptr ? _view->_previewFolder->m_lists : nullptr};
+      _view->m_sceneTableView->setFloatingPreview(fFloatingPrev);
+
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_sceneTableView->setRootPath(newPath);
       viewIndex = _view->m_name2ViewIndex[viewType];
