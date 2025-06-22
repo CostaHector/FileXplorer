@@ -1,11 +1,9 @@
-#ifndef ALERTSYSTEM_H
+﻿#ifndef ALERTSYSTEM_H
 #define ALERTSYSTEM_H
 
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QLabel>
-#include <QTableWidget>
-#include <QWidget>
 #include "Model/PreferenceModel.h"
 #include "View/CustomTableView.h"
 
@@ -14,6 +12,7 @@ class AlertSystem : public QDialog {
   explicit AlertSystem(QWidget* parent = nullptr);
 
   void ReadSettings();
+  void showEvent(QShowEvent* event) override;
   virtual void hideEvent(QHideEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
@@ -23,13 +22,11 @@ class AlertSystem : public QDialog {
   void onEditPreferenceSetting() const;
   bool operator()(const QString& /**/) {return true;}
 
- signals:
-
  private:
-  QLabel* m_failItemCnt;
-  PreferenceModel* m_alertModel{new PreferenceModel{this}};
-  CustomTableView* m_alertsTable{new CustomTableView{"ALERT_SYSTEM", this}};
-  QDialogButtonBox* m_recheckButtonBox;
+  QLabel* m_failItemCnt{nullptr};
+  PreferenceModel* m_alertModel{nullptr};
+  CustomTableView* m_alertsTable{nullptr};
+  QDialogButtonBox* m_recheckButtonBox{nullptr};
 };
 
 #endif  // ALERTSYSTEM_H
