@@ -20,8 +20,6 @@
 <file alias="DUPLICATE_IMAGES_FINDER">Media/DUPLICATE_IMAGES_FINDER.png</file>
 <file alias="LOW_RESOLUTION_IMGS_RMV">Media/LOW_RESOLUTION_IMGS_RMV.svg</file>
 <file alias="DUPLICATE_VIDEOS_FINDER">Media/DUPLICATE_VIDEOS_FINDER.png</file>
-<file alias="FULL_CALCULATE">Media/FULL_CALCULATE.png</file>
-<file alias="INCREMENTAL_CALCULATE">Media/INCREMENTAL_CALCULATE.png</file>
 <file alias="UPDATE_JSON_THEN_SCN">Media/UPDATE_JSON_THEN_SCN.svg</file>
 <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
 <file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
@@ -36,7 +34,6 @@
 <file alias="MUSIC_PLAYER">Media/MUSIC_PLAYER.svg</file>
 <file alias="PLAY_BUTTON_ROUND">Media/PLAY_BUTTON_ROUND.svg</file>
 <file alias="PLAY_BUTTON_TRIANGLE">Media/PLAY_BUTTON_TRIANGLE.svg</file>
-<file alias="STAR">Media/STAR.svg</file>
 <file alias="FOLDER_OPEN">Media/FOLDER_OPEN.svg</file>
 <file alias="FAIL_FAST">Media/FAIL_FAST.svg</file>
 
@@ -48,10 +45,8 @@
 <!--TopSideToolBar Icons here-->
 <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
 <file alias="OPEN_IN_TERMINAL">TopSideToolBarIcons/OPEN_IN_TERMINAL2.png</file>
-<file alias="CLOSE_WINDOW">TopSideToolBarIcons/CLOSE_WINDOW.svg</file>
 <file alias="NAVIGATION_PANE">TopSideToolBarIcons/NAVIGATION_PANE.ico</file>
-<file alias="SHOW_FOLDER_PREVIEW_HTML">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW_HTML.ico</file>
-<file alias="SHOW_FOLDER_PREVIEW">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW.svg</file>
+<file alias="SHOW_FOLDER_PREVIEW">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW.ico</file>
 <file alias="COMPRESS_ITEM">TopSideToolBarIcons/COMPRESS_ITEM.png</file>
 <file alias="EXTRACT_ITEM">TopSideToolBarIcons/EXTRACT_ITEM.png</file>
 <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
@@ -64,10 +59,9 @@
 <file alias="SELECT_NONE">TopSideToolBarIcons/SELECT_NONE.ico</file>
 <file alias="SYNC_MODIFICATION_SWITCH">TopSideToolBarIcons/SYNC_MODIFICATION_SWITCH.svg</file>
 <file alias="SYNC_REVERSE_SWITCH">TopSideToolBarIcons/SYNC_REVERSE_SWITCH.svg</file>
-<file alias="SORT_BY">TopSideToolBarIcons/SORT_BY.ico</file>
-<file alias="SORTING_FILE_FOLDER">TopSideToolBarIcons/sorting.png</file>
-<file alias="ASCENDING_ORDER">TopSideToolBarIcons/ascendingOrder.png</file>
-<file alias="DESCENDING_ORDER">TopSideToolBarIcons/descendingOrder.png</file>
+<file alias="SORTING_FILE_FOLDER">TopSideToolBarIcons/SORTING_FILE_FOLDER.png</file>
+<file alias="ASCENDING_ORDER">TopSideToolBarIcons/ASCENDING_ORDER.png</file>
+<file alias="DESCENDING_ORDER">TopSideToolBarIcons/DESCENDING_ORDER.png</file>
 
 <!--AddressControl icon here-->
 <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>
@@ -110,10 +104,9 @@
 <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
 <file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
 <file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
-<file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.ico</file>
+<file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.png</file>
 <file alias="FOLDER_MERGE_TO_FIRST">RightClickIcon/FOLDER_MERGE_TO_FIRST.svg</file>
 <file alias="FOLDER_MERGE_TO_LAST">RightClickIcon/FOLDER_MERGE_TO_LAST.svg</file>
-<file alias="REMOVE_HTML_PATH">RightClickIcon/REMOVE_HTML_CACHE.png</file>
 <file alias="NEW_FILE_FOLDER_PATH">RightClickIcon/NEW.svg</file>
 <file alias="NEW_FOLDER">RightClickIcon/NEW_FOLDER.svg</file>
 <file alias="NEW_FOLDERS">RightClickIcon/NEW_FOLDERS.svg</file>
@@ -282,19 +275,15 @@
 <file alias="AUDIT">Database/AUDIT.svg</file>
 <file alias="REVERT">Database/REVERT.svg</file>
 
-<file alias="ZIP">TopSideToolBarIcons/ZIP.ico</file>
-
 <!--AlertSystem icon here-->
 <file alias="ALERT">AlertSystem/ALERT.svg</file>
 <file alias="ALERT_ACTIVE">AlertSystem/ALERT_ACTIVE.svg</file>
 <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
-<file alias="RECHECK">AlertSystem/RECHECK.svg</file>
 
 <!--RecycleBin icon here-->
 <file alias="RESTORE_ALL_ITEMS">RecycleBin/RESTORE_ALL_ITEMS.ico</file>
 <file alias="RESTORE_SELECTED_ITEMS">RecycleBin/RESTORE_SELECTED_ITEMS.ico</file>
 <file alias="EMPTY_RECYCLE_BIN">RecycleBin/EMPTY_RECYCLE_BIN.ico</file>
-<file alias="DELETE_SELECTED_ITEMS">RecycleBin/DELETE_SELECTED_ITEMS.svg</file>
 <file alias="DIRTY_STATUS">RecycleBin/DIRTY_STATUS.ico</file>
 <file alias="CLEAN_STATUS">RecycleBin/CLEAN_STATUS.ico</file>
 <file alias="SQLITE_APP">RecycleBin/SQLITE_APP.svg</file>
