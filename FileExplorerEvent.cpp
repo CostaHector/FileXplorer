@@ -275,7 +275,7 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   const QString& imgFileAbsPathGuess = QDir::toNativeSeparators(noExtAbsFilePath) + ' ';
   QApplication::clipboard()->setText(imgFileAbsPathGuess, QClipboard::Mode::Clipboard);
   QString fileBaseName = PathTool::GetBaseName(absFilePath);
-  const QString& forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, " ");
+  const QString& forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_GOOGLE_SEARCH_LETTER, " ");
   QStringList searchKeyWordArgs;
   if (!forSearch.isEmpty()) {
     const static QString HTML_URL_TEMPLATE{"https://www.google.com/search?&q=%1&udm=2"};

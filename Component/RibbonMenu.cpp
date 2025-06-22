@@ -58,6 +58,8 @@ RibbonMenu::RibbonMenu(QWidget* parent)
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar("corner tools", attached)};
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
+  menuRibbonCornerWid->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
+  menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_LogActions()._LOG_FILE);
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
@@ -320,8 +322,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(thumbnailToolButton);
-  archiveVidsTB->addSeparator();
-  archiveVidsTB->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
@@ -343,8 +343,6 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addWidget(ag.mEnablePageTB);
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mImageSizeTB);
-  sceneTB->addSeparator();
-  sceneTB->addAction(g_viewActions()._FLOATING_PREVIEW);
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }
