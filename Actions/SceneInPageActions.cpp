@@ -76,9 +76,9 @@ bool SceneInPageActions::InitWidget() {
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar() {
-  auto* orderToolButton = new DropdownToolButton(_ORDER_AG->actions(), QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24);
+  auto* orderToolButton = new (std::nothrow) DropdownToolButton(_ORDER_AG->actions(), QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24);
   orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, "Sort");
-  auto* orderTB = new (std::nothrow) QToolBar("Scene Order");
+  auto* orderTB = new (std::nothrow) QToolBar{"Scene Order"};
   orderTB->addWidget(orderToolButton);
   orderTB->addAction(_REVERSE_SORT);
   orderTB->setOrientation(Qt::Orientation::Vertical);

@@ -18,9 +18,7 @@
 class FloatingPreview : public QStackedWidget {
  public:
   enum class PANE_TYPE : int { BEGIN = 0, DETAIL = BEGIN, IMG_VID_OTH, BUTT };
-
   FloatingPreview(const QString& memoryName, QWidget* parent = nullptr);
-  void showEvent(QShowEvent* event) override;
 
   void ReadSettings();
   void SaveSettings();
@@ -38,8 +36,16 @@ class FloatingPreview : public QStackedWidget {
   inline bool NeedUpdateImgs() const { return m_curIndex == PANE_TYPE::IMG_VID_OTH && m_bImgVisible; }
   inline bool NeedUpdateVids() const { return m_curIndex == PANE_TYPE::IMG_VID_OTH && m_bVidVisible; }
   inline bool NeedUpdateOthers() const { return m_curIndex == PANE_TYPE::IMG_VID_OTH && m_bOthVisible; }
-  inline void BeforeDisplayAFileDetail() { setCurrentIndex((int)PANE_TYPE::DETAIL); }
-  inline void BeforeDisplayAFolder() { setCurrentIndex((int)PANE_TYPE::IMG_VID_OTH); }
+  inline void BeforeDisplayAFileDetail() {
+    if (m_curIndex != PANE_TYPE::DETAIL) {
+      setCurrentIndex((int)PANE_TYPE::DETAIL);
+    }
+  }
+  inline void BeforeDisplayAFolder() {
+    if (m_curIndex != PANE_TYPE::IMG_VID_OTH) {
+      setCurrentIndex((int)PANE_TYPE::IMG_VID_OTH);
+    }
+  }
   void setCurrentIndex(int index) {
     if (index < (int)PANE_TYPE::BEGIN || index >= (int)PANE_TYPE::BUTT) {
       qWarning("Current index[%d] out of bound[%d, %d)", index, (int)PANE_TYPE::BEGIN, (int)PANE_TYPE::BUTT);
