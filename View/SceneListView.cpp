@@ -1,4 +1,4 @@
-#include "SceneListView.h"
+﻿#include "SceneListView.h"
 #include "Actions/ViewActions.h"
 #include "Model/ScenesListModel.h"
 #include "Tools/PlayVideo.h"
@@ -54,14 +54,11 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  m_fPrev = new (std::nothrow) FloatingPreview{"FloatingList", this};
-  CHECK_NULLPTR_RETURN_VOID(m_fPrev)
-
   QMenu* m_menu = new (std::nothrow) QMenu{"scene table view menu", this};
   CHECK_NULLPTR_RETURN_VOID(m_menu)
-  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction("copy basename", m_menu);
+  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{"copy basename", m_menu};
   CHECK_NULLPTR_RETURN_VOID(COPY_BASENAME_FROM_SCENE)
-  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction("play this folder", m_menu);
+  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{"play this folder", m_menu};
   CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
 
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
@@ -70,8 +67,10 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   m_menu->addActions(_ORIENTATION_GRP->actions());
   BindMenu(m_menu);
   subscribe();
+}
 
-  setMouseTracking(g_viewActions()._FLOATING_PREVIEW->isChecked());
+void SceneListView::setFloatingPreview(FloatingPreview* floatingPreview) {
+  mPrev_ = floatingPreview;
 }
 
 void SceneListView::onCopyBaseName() {
@@ -92,7 +91,7 @@ void SceneListView::onOpenCorrespondingFolder() {
 void SceneListView::subscribe() {
   connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneListView::onCopyBaseName);
   connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
-  connect(g_viewActions()._FLOATING_PREVIEW, &QAction::triggered, this, &SceneListView::setMouseTracking);
+  connect(this, &QListView::clicked, this, &SceneListView::onClickEvent);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
@@ -107,33 +106,20 @@ void SceneListView::setRootPath(const QString& rootPath) {
   _sceneModel->setRootPath(rootPath);
 }
 
-void SceneListView::mouseMoveEvent(QMouseEvent* event) {
-  if (m_fPrev == nullptr) {
-    return;
-  }
-  const QPoint& pnt = event->pos();
-  const QModelIndex& idx = indexAt(pnt);
+void SceneListView::onClickEvent(const QModelIndex& idx) {
+  CHECK_NULLPTR_RETURN_VOID(mPrev_)
   if (!idx.isValid()) {
-    m_fPrev->SaveSettings();
-    m_fPrev->hide();
     return;
   }
-  const QString& name = _sceneModel->data(idx, Qt::ItemDataRole::DisplayRole).toString();
-  if (!m_fPrev->NeedUpdate(name)) {
+  const QString& name = _sceneModel->baseName(idx);
+  if (!mPrev_->NeedUpdate(name)) {
     return;
   }
-  m_fPrev->move(event->globalPos() + QPoint{20, 20});
-  if (m_fPrev->NeedUpdateImgs()) {
-    m_fPrev->UpdateImgs(name, _sceneModel->GetImgs(idx));
+  mPrev_->BeforeDisplayAFolder();
+  if (mPrev_->NeedUpdateImgs()) {
+    mPrev_->UpdateImgs(name, _sceneModel->GetImgs(idx));
   }
-  if (m_fPrev->NeedUpdateVids()) {
-    m_fPrev->UpdateVids(_sceneModel->GetVids(idx));
+  if (mPrev_->NeedUpdateVids()) {
+    mPrev_->UpdateVids(_sceneModel->GetVids(idx));
   }
-  if (m_fPrev->NeedUpdateOthers()) {
-    // todo:
-  }
-  if (m_fPrev->isHidden()) {
-    m_fPrev->show();
-  }
-  m_fPrev->raise();
 }

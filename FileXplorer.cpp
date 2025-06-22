@@ -15,10 +15,20 @@
 #include <QFileInfo>
 #include <functional>
 
+class DockWidget : public QDockWidget {
+ public:
+  using QDockWidget::QDockWidget;
+  void showEvent(QShowEvent* event) override {
+    QDockWidget::showEvent(event);
+    StyleSheet::UpdateTitleBar(this);
+  }
+};
+
 FileXplorer::FileXplorer(const int argc, char const* const argv[], QWidget* parent)  //
     : QMainWindow(parent)                                                            //
 {
-  previewHtmlDock = new (std::nothrow) QDockWidget("Preview", this);
+  previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this};
+
   m_previewFolder = new (std::nothrow) PreviewFolder{previewHtmlDock};
   m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, previewHtmlDock};
   m_stackedBar = new (std::nothrow) StackedToolBar;
@@ -100,7 +110,7 @@ void FileXplorer::InitComponentVisibility() {
     m_navigationToolBar->setVisible(false);
   }
 
-  const bool showFolderPrev{PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, MemoryKey::SHOW_FOLDER_PREVIEW_HTML.v).toBool()};
+  const bool showFolderPrev{PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW.name, MemoryKey::SHOW_FOLDER_PREVIEW.v).toBool()};
   const bool showPrev{m_fsPanel->isFSView() && showFolderPrev};
   if (!showPrev) {
     previewHtmlDock->setVisible(false);
@@ -120,7 +130,7 @@ void FileXplorer::subscribe() {
       return;
     }
     const bool checked{triggeredActions->isChecked()};
-    PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW_HTML.name, checked);
+    PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW.name, checked);
     previewHtmlDock->setVisible(checked);
 
     const QString& previewType = triggeredActions->text();
