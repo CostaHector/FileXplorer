@@ -134,11 +134,11 @@ class SceneViewTest : public MyTestSuite {
 
     const SCENES_TYPE& afterScenes = SceneInfoManager::GetScenesFromPath(TEST_DIR);
     QCOMPARE(afterScenes[0].name, "somejsonfile1");
-    QCOMPARE(afterScenes[0].imgs, (QStringList{""}));
+    QCOMPARE(afterScenes[0].imgs, (QStringList{}));
     QCOMPARE(afterScenes[0].vidName, "");
 
     QCOMPARE(afterScenes[1].name, "somejsonfile2");
-    QCOMPARE(afterScenes[1].imgs, (QStringList{""}));
+    QCOMPARE(afterScenes[1].imgs, (QStringList{}));
     QCOMPARE(afterScenes[1].vidName, "");
 
     QCOMPARE(afterScenes[2].name, "somejsonfileEmpty");
