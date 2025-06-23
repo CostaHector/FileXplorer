@@ -32,6 +32,7 @@ SOURCES += \
     Actions/RenameActions.cpp \
     Actions/LogActions.cpp \
     Actions/MovieDBActions.cpp \
+    Actions/ActionsRecorder.cpp \
     Component/NotificatorPrivate.cpp \
     Component/Notificator.cpp \
     Component/QuickWhereClause.cpp \
@@ -79,6 +80,7 @@ HEADERS += \
     Actions/RenameActions.h \
     Actions/LogActions.h \
     Actions/MovieDBActions.h \
+    Actions/ActionsRecorder.h \
     Component/NotificatorPrivate.h \
     Component/Notificator.h \
     Component/QuickWhereClause.h \
