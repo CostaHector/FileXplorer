@@ -2,6 +2,8 @@
 #include <QMenu>
 #include <QTabBar>
 #include <QToolButton>
+#include "Actions/ActionsRecorder.h"
+#include "Actions/ActionsSearcher.h"
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/ArrangeActions.h"
 #include "Actions/FileBasicOperationsActions.h"
@@ -27,7 +29,6 @@
 RibbonMenu::RibbonMenu(QWidget* parent)
     : QTabWidget{parent}  //
 {
-  m_corner = GetMenuRibbonCornerWid();
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
   m_leafView = LeafView();
@@ -48,16 +49,23 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
   addTab(m_leafMedia, "&ARRANGE");
 
+  auto& inst = ActionsRecorder::GetInst();
+  inst.FromToolbar(m_leafMedia);
+
+  m_corner = GetMenuRibbonCornerWid();
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
   Subscribe();
-
   setCurrentIndex(PreferenceSettings().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
 }
 
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar("corner tools", attached)};
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
+  ActionsSearcher* mActSearcher{new (std::nothrow) ActionsSearcher{menuRibbonCornerWid}};
+  CHECK_NULLPTR_RETURN_NULLPTR(mActSearcher);
+  menuRibbonCornerWid->addWidget(mActSearcher);
+  menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_LogActions()._LOG_FILE);
