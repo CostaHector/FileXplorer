@@ -50,6 +50,8 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   addTab(m_leafMedia, "&ARRANGE");
 
   auto& inst = ActionsRecorder::GetInst();
+  inst.FromToolbar(m_leafFile);
+  inst.FromToolbar(m_leafView);
   inst.FromToolbar(m_leafMedia);
 
   m_corner = GetMenuRibbonCornerWid();
@@ -60,7 +62,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
 }
 
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
-  QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar("corner tools", attached)};
+  QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar{"corner tools", attached}};
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
   ActionsSearcher* mActSearcher{new (std::nothrow) ActionsSearcher{menuRibbonCornerWid}};
   CHECK_NULLPTR_RETURN_NULLPTR(mActSearcher);

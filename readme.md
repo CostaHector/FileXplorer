@@ -10,59 +10,54 @@ FileXplorer is a cross-platform professional file management system engineered f
 
 1. File/Folder Preview & ‌Sidebar Navigation‌
 
-        - Enables categorized preview of folder contents without opening them
-        - Simply select any folder to view its items in the right-side preview panel
-        - Configurable file type filters and customizable default display order
-        - Supports drag-and-drop bookmarking for multiple folders simultaneously;
-        - Provides both automatic (alphabetical/path-based) and manual sorting options;
-        - All bookmark configurations persist to local settings file;
+        (1). Enables categorized preview of folder contents without opening them;
 
+        (2). Simply select any folder to view its items in the right-side preview pane;
 
-2. Advanced Batch Renaming
+        (3). Configurable file type filters and customizable default display order
 
-        - Plain Text Insert/replace/Delete
-        - Regex String Insert/replace/Delete
-        - Case operations: UPPER/lower/Title/toggleCase
-        - Segment swapping (e.g., "Marvil - S01E02 - 2012" → "Marvil - 2012 - S01E02")
-        - Auto-numbering with customizable templates
+        (4). Supports drag-and-drop bookmarking for multiple folders simultaneously;
 
-3. Professional Tools
+        (5). Provides both automatic (alphabetical/path-based) and manual sorting options;
 
-        - Media Management:
-        - Duplicate image detection
-        - Batch video duration viewer
-        - Media metadata to database export
-        - Cast and their films database by media database export 
+        (6). All bookmark configurations persist to local settings file;
 
-4. Developer Features:
+2. File Batch Renaming Operations (with Preview Window)
 
-        - HAR file previewer
-        - JSON batch editor (build media databases)
-        - MD5 checksum comparator
+        (1). Basic string operations (add/delete/replace) with regex support (e.g. "wifi" → "Wi-Fi");
 
-4. Smart Operations
+        (2). Case conversion: UPPERCASE/lowercase/Title Case/Sentence case/tOgGlE cAsE;
 
-        - F1 quick-search across files
-        - One-click file organization by patterns
-        - Multi-path synchronization
+        (3). Columnize strings by delimiter and reorder segments (e.g. "Marvel - S01E02 - 2012" → "Marvel - 2012 - S01E02");
 
-5. Content-aware search
+        (4). Sequential numbering with customizable patterns/start values (e.g. "Trip - Scenery - %d", start=3);
 
-        - Search by filename
-        - Search by file content
-        - Search by filename + file content
+3. Multi-path Synchronization
+Automatically mirrors operations from source folder to designated mirror folders;
 
-6. File/Folder Operation Recoverable
+4. Deep Search Functionality
+File/folder search by: filename, content, or combined criteria;
 
-        - Each operation will be saved in memory. Operation can be undo(recovered) by shortcut `Ctrl+Z` and Redo by shortcut `Ctrl+Y`.
+5. Accessibility
+Fuzzy matching of action names in dropdowns to bypass hierarchical menu navigation;
 
-        Attention:
-                - All undo history purges upon application termination/restart. So operation cannot be recovered after restart;
-                - Permanent deletion operations cannot be recovered;
+6. Advanced Features:
 
-7. Dark/Light theme switch support
+        (1)‌. Image Deduplication‌: Preview detected duplicates for manual confirmation before deletion;
+
+        (2)‌. ‌Video Deduplication‌: Compares filename, size, duration, and partial hash (first XX MB);
+
+        (3)‌. ‌‌One-click Categorization‌: Group related images/videos/documents into folders with undo support;
+
+        (4)‌. ‌‌Video Metadata Export‌: Saves to MOVIES table (filename/size/duration/MD5) with VIDEOS view for management;
+
+        (5)‌. ‌‌Audit Trail‌: Manual/scheduled updates to MOVIES table after file changes, logging modification counts;
+
+        (6)‌. ‌‌File Comparison‌: Quick MD5/size checks for identity verification
+
+7. UI Themes
+Light/Dark theme support with automatic time-based switching or manual lock;
 ![FileXplorer](bin/FileXplorer_Light.png)
-
 
 
 ## Coding Style
