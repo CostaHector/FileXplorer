@@ -13,15 +13,23 @@ class ActionsRecorderTest : public MyTestSuite {
  private slots:
   void test_record_actions_from_nullptr_ok() {
     ActionsRecorder actRecorder;
+    QCOMPARE(actRecorder.isDirty, true);
+    QCOMPARE(actRecorder.GetKeys(), (QStringList{}));
+    QCOMPARE(actRecorder.isDirty, false);
     QCOMPARE(actRecorder.FromToolbar(nullptr), 0);
     QCOMPARE(actRecorder.FromMenu(nullptr), 0);
     QCOMPARE(actRecorder.FromActionGroup(nullptr), 0);
+    QCOMPARE(actRecorder.isDirty, false);
   }
 
   void test_record_actions_from_empty_toolbar_ok() {
     QToolBar rootToolbar;
     ActionsRecorder actRecorder;
+    QCOMPARE(actRecorder.isDirty, true);
+    QCOMPARE(actRecorder.GetKeys(), (QStringList{}));
+    QCOMPARE(actRecorder.isDirty, false);
     QCOMPARE(actRecorder.FromToolbar(&rootToolbar), 0);
+    QCOMPARE(actRecorder.isDirty, false);
   }
 
   void test_record_actions_from_flatten_toolbar_ok() {
@@ -31,12 +39,22 @@ class ActionsRecorderTest : public MyTestSuite {
     rootToolbar.addAction(&file);
     rootToolbar.addSeparator();
     rootToolbar.addAction(&help);
+
+    const QMap<QString, QAction*> expectKeys2Action{
+        {"file/root", &file},
+        {"help/root", &help},
+    };
     ActionsRecorder actRecorder;
-    QCOMPARE(actRecorder.FromToolbar(&rootToolbar), 2);
-    QCOMPARE(actRecorder.GetKeys(), (QStringList{"file/root", "help/root"}));  // may sort needed
+    QCOMPARE(actRecorder.isDirty, true);
+    QCOMPARE(actRecorder.GetKeys(), (QStringList{}));
+    QCOMPARE(actRecorder.isDirty, false);
+    QCOMPARE(actRecorder.FromToolbar(&rootToolbar), expectKeys2Action.size());
+    QCOMPARE(actRecorder.isDirty, true);
+    QCOMPARE(actRecorder.GetKeys(), expectKeys2Action.keys());
+    QCOMPARE(actRecorder.isDirty, false);
   }
 
-  void test_no_text_ction_ok() {
+  void test_no_text_action_ok() {
     QAction noTextAction{};
     QToolBar rootToolbar{"root"};
     rootToolbar.addAction(&noTextAction);
@@ -63,14 +81,17 @@ class ActionsRecorderTest : public MyTestSuite {
     rootToolbar.addSeparator();
     rootToolbar.addWidget(&helpToolBar);
 
-    ActionsRecorder actRecorder;
-    QCOMPARE(actRecorder.FromToolbar(&rootToolbar), 4);
-    QStringList expectsLst{
-        "open/file/root",   //
-        "close/file/root",  //
-        "edit/root",        //
-        "about/help/root",  //
+    const QMap<QString, QAction*> expectKeys2Action{
+        {"open/file/root", &open},    //
+        {"close/file/root", &close},  //
+        {"edit/root", &edit},         //
+        {"about/help/root", &about},
     };
+
+    ActionsRecorder actRecorder;
+    QCOMPARE(actRecorder.FromToolbar(&rootToolbar), expectKeys2Action.size());
+
+    QStringList expectsLst{expectKeys2Action.keys()};
     expectsLst.sort();
     QStringList actualList = actRecorder.GetKeys();
     actualList.sort();
@@ -78,19 +99,26 @@ class ActionsRecorderTest : public MyTestSuite {
   }
 
   void test_widget_skip() {
-    QWidget* placeHolder = new QWidget();
+    QWidget* placeHolder = new QWidget{};
     placeHolder->setWindowTitle("placeholder");
 
     QToolBar* rootToolbar = new QToolBar{"root"};
-    /*QAction* pAction = */ rootToolbar->addWidget(placeHolder);
-    rootToolbar->addAction(new QAction{"hello"});
+    QAction* pPlaceHolderWidget = rootToolbar->addWidget(placeHolder);
+    QVERIFY(pPlaceHolderWidget != nullptr);
+    QAction* hello = new QAction{"hello"};
+    rootToolbar->addAction(hello);
+
+    const QMap<QString, QAction*> expectKeys2Action{
+        {"hello/root", hello},  // not contains pPlaceHolderWidget
+    };
 
     ActionsRecorder actRecorder;
-    QCOMPARE(actRecorder.FromToolbar(rootToolbar), 1);
-    QCOMPARE(actRecorder.GetKeys(), QStringList{"hello/root"});
+    QCOMPARE(actRecorder.FromToolbar(rootToolbar), expectKeys2Action.size());
+    QCOMPARE(actRecorder.mTextToActionMap, expectKeys2Action);
+    QCOMPARE(actRecorder.GetKeys(), expectKeys2Action.keys());
   }
 
-  void test_toolbutton_default_action_first() {
+  void test_toolbar_with_toolbutton_with_default_action_ok() {
     QAction* defaultAction{new QAction{"Query Before"}};
 
     QToolButton* toolButton{new QToolButton{nullptr}};
@@ -100,9 +128,41 @@ class ActionsRecorderTest : public MyTestSuite {
     QToolBar* rootToolbar{new QToolBar{"root"}};
     rootToolbar->addWidget(toolButton);  // should not in answer
 
+    const QMap<QString, QAction*> expectKeys2Action{
+        {"Query Before/root", defaultAction},
+    };
+
     ActionsRecorder actRecorder;
-    QCOMPARE(actRecorder.FromToolbar(rootToolbar), 1);
-    QCOMPARE(actRecorder.GetKeys(), QStringList{"Query Before/root"});
+    QCOMPARE(actRecorder.FromToolbar(rootToolbar), expectKeys2Action.size());
+    QCOMPARE(actRecorder.GetKeys(), expectKeys2Action.keys());
+  }
+
+  void test_toolbutton_with_default_action_and_qmenu_ok() {
+    QAction* defaultAction{new QAction{"Query Before"}};
+    QAction* deleteDirectly{new QAction{"Delete Directly"}};
+    QAction* recycleThem{new QAction{"Recycle Them"}};
+
+    QToolButton* toolButton{new QToolButton{nullptr}};
+    toolButton->setText("Toolbutton itself text(any plain Button)");
+    toolButton->setDefaultAction(defaultAction);
+
+    QMenu* menu{new QMenu{"Operation Preference", toolButton}};
+    menu->addAction(defaultAction);
+    menu->addSeparator();
+    menu->addAction(deleteDirectly);
+    menu->addAction(recycleThem);
+    toolButton->setMenu(menu);
+
+    const QMap<QString, QAction*> expectKeys2Action{
+        {"Query Before/OP", defaultAction},
+        {"Query Before/Operation Preference/OP", defaultAction},
+        {"Delete Directly/Operation Preference/OP", deleteDirectly},
+        {"Recycle Them/Operation Preference/OP", recycleThem},
+    };
+
+    ActionsRecorder actRecorder;
+    QCOMPARE(actRecorder.FromToolButton(toolButton, "OP"), expectKeys2Action.size());
+    QCOMPARE(actRecorder.GetKeys(), expectKeys2Action.keys());
   }
 
   void test_menu_nested_ok() {

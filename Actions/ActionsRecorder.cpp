@@ -6,11 +6,38 @@
 using std::pair;
 using std::stack;
 
+int ActionsRecorder::FromToolButton(QToolButton* toolButton, const QString postPath) {
+  if (toolButton == nullptr) {
+    return 0;
+  }
+  QMap<QString, QAction*> actionMap;
+  if (toolButton->defaultAction() != nullptr) {
+    auto* defaultAction = toolButton->defaultAction();
+    const QString rootPath = postPath.isEmpty() ? defaultAction->text() : defaultAction->text() + '/' + postPath;
+    actionMap[rootPath] = defaultAction;
+  }
+
+  int actionsFromMenuCnt = FromMenu(toolButton->menu(), postPath);
+
+  if (actionMap.isEmpty() && actionsFromMenuCnt == 0) {
+    return 0;
+  }
+
+  if (!actionMap.isEmpty()) {
+    mTextToActionMap.insert(actionMap);
+    isDirty = true;
+  }
+
+  return actionMap.size() + actionsFromMenuCnt;
+}
+
 int ActionsRecorder::FromToolbar(QToolBar* tb) {
   if (tb == nullptr) {
     return 0;
   }
   QMap<QString, QAction*> actionMap;
+
+  int actionsfromToolButtonCnt = 0;
 
   stack<pair<QToolBar*, QString>> stack;
   stack.emplace(tb, tb->windowTitle());
@@ -40,29 +67,32 @@ int ActionsRecorder::FromToolbar(QToolBar* tb) {
       }
       if (strcmp(pType, "QToolButton") == 0) {  // QAction or QToolButton
         auto* toolButton = qobject_cast<QToolButton*>(widget);
-        QAction* pTemp = action;
-        if (toolButton->defaultAction() != nullptr) {
-          pTemp = toolButton->defaultAction();
+        if (toolButton->defaultAction() != nullptr) {  // qtoolbar
+          actionsfromToolButtonCnt += FromToolButton(toolButton, currentPath);
+        } else {  // plain action
+          QString actionKey = action->text() + '/' + currentPath;
+          actionMap[actionKey] = action;
         }
-        QString actionKey = pTemp->text() + '/' + currentPath;
-        actionMap[actionKey] = action;
         continue;
       }
     }
   }
-  mTextToActionMap.insert(actionMap);
-  isDirty = true;
-  return actionMap.size();
+  if (!actionMap.isEmpty()) {
+    mTextToActionMap.insert(actionMap);
+    isDirty = true;
+  }
+  return actionMap.size() + actionsfromToolButtonCnt;
 }
 
-int ActionsRecorder::FromMenu(QMenu* menu) {
+int ActionsRecorder::FromMenu(QMenu* menu, const QString postPath) {
   if (menu == nullptr) {
     return 0;
   }
   QMap<QString, QAction*> actionMap;
 
+  const QString rootPath = postPath.isEmpty() ? menu->title() : menu->title() + '/' + postPath;
   stack<pair<QMenu*, QString>> menuStack;
-  menuStack.emplace(menu, menu->title());
+  menuStack.emplace(menu, rootPath);
   while (!menuStack.empty()) {
     auto currentPr = menuStack.top();
     QMenu* current = currentPr.first;
