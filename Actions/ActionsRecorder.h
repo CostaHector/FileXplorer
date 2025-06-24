@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QActionGroup>
+#include <QToolButton>
 
 class ActionsSearcher;
 class ActionsRecorder {
@@ -23,8 +24,9 @@ class ActionsRecorder {
     }
     return keys;
   }
+  int FromToolButton(QToolButton* toolButton, const QString postPath = "");
   int FromToolbar(QToolBar* tb);
-  int FromMenu(QMenu* menu);
+  int FromMenu(QMenu* menu, const QString postPath = "");
   int FromMenuBar(QMenuBar* mb);
   int FromActionGroup(const QActionGroup* actGrp);
 

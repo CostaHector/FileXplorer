@@ -1,22 +1,18 @@
 ﻿#ifndef ACTIONSSEARCHER_H
 #define ACTIONSSEARCHER_H
 
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QToolButton>
 #include <QComboBox>
 #include <QStringListModel>
 
-class ActionsSearcher : public QWidget {
+class ActionsSearcher : public QComboBox {
  public:
   ActionsSearcher(QWidget* parent = nullptr);
   void subscribe();
  private:
   void onActionSearchTextEdit(const QString& text);
-  QHBoxLayout* mLo{nullptr};
-  QToolButton* mActionTb{nullptr};
-  QComboBox* mActionsCb{nullptr};
+  QLineEdit* actionKeyLineEdit{nullptr};
   QStringListModel* mActionsTextModel{nullptr};
+  QAction* mLastValidAct{nullptr};
 };
 
 #endif  // ACTIONSSEARCHER_H
