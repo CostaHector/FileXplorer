@@ -158,6 +158,32 @@ for (int i = 0; i < paths.size(); ++i) {
 }
 ```
 
+## get video duration using FFmpeg/libav
+Download `ffmpeg-7.1.1-full_build-shared.7z` and extract to a path. then add this path to system environment path.
+
+Here we assume path is "C:\home\ffmpeg"
+
+```pro
+win32 {
+    # FFmpeg headers path
+    INCLUDEPATH += "C:/home/ffmpeg/include"
+    # FFmpeg libs path
+    LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec  -lavutil -lswscale -lws2_32 -lsecur32
+}
+```
+
+```cpp
+#include <QDebug>
+extern C{
+#include <libavformat/avformat.h>
+}
+void testFFmpeg() {
+    avformat_network_init();
+    qDebug() << "FFmpeg version:" << avformat_version();
+}
+```
+
+
 ## Testcase
 ### Table 1.0 Expected Behavior of rename Functions
 ```cpp

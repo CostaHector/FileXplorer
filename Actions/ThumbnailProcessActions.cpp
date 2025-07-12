@@ -1,6 +1,13 @@
-#include "ThumbnailProcessActions.h"
+﻿#include "ThumbnailProcessActions.h"
 
 ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
+  _CREATE_1_BY_1_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_1_BY_1"), "Create 1x1 thumbnail");
+  _CREATE_1_BY_1_THUMBNAIL->setToolTip("Create a thumbnail for video(s), each image width:720px");
+  _CREATE_2_BY_2_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_2_BY_2"), "Create 2x2 thumbnail");
+  _CREATE_2_BY_2_THUMBNAIL->setToolTip("Create a 2x2 thumbnails for video(s), each image width:720px");
+  _CREATE_3_BY_3_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_3_BY_3"), "Create 3x3 thumbnail");
+  _CREATE_3_BY_3_THUMBNAIL->setToolTip("Create a 3x3 thumbnails for video(s), each image width:720px");
+
   _EXTRACT_1ST_IMG = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_1"), "Thumbnail Extractor");
   _EXTRACT_1ST_IMG->setToolTip("Extract the 1st image from thumbnails under current view path");
   _EXTRACT_2ND_IMGS = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_2"), "Extract [0, 2) imgs");

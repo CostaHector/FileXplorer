@@ -330,4 +330,13 @@ QString QMediaInfo::FileExtension() const {
   InitMediaInfo_CharArr(prop, "FileExtension");
   return QStringFromMediaInfoc_str(Get(MediaInfo_Stream_General, 0, prop, MediaInfo_Info_Text, MediaInfo_Info_Name));
 }
+
+extern "C" {
+#include <libavformat/avformat.h>
+}
+void testFFmpeg() {
+  avformat_network_init();
+  qWarning("FFmpeg version:%u", avformat_version());
+}
+
 #endif
