@@ -1,17 +1,19 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-
+#include "TestCase/PathRelatedTool.h"
 #include "pub/MyTestSuite.h"
 #include <chrono>
 #ifdef _WIN32
 #include "Tools/QMediaInfo.h"
+#include "Tools/VideoDurationGetter.h"
 #endif
 
-const QString VIDEOS_DURATION_DIR = QDir(QFileInfo(__FILE__).absolutePath()).absoluteFilePath("test/TestEnv_VideosDurationGetter");
+const QString VIDEOS_DURATION_DIR = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
 
 class VideosDurationGetterTest : public MyTestSuite {
   Q_OBJECT
  public:
+  VideosDurationGetterTest() : MyTestSuite{false} {}
  private slots:
   void test_duration_of_mp4_files() {
     QStringList mp4VidsLst;
@@ -50,25 +52,34 @@ class VideosDurationGetterTest : public MyTestSuite {
                << "Big Buck Bunny SampleVideo_360x240_1mb 9s.mkv"
                << "Big Buck Bunny SampleVideo_360x240_1mb 10s.flv"
                << "Big Buck Bunny SampleVideo_360x240_1mb 13s.mp4";
-    QList<int> durationsLst{15, 9, 10, 13};
+    QStringList mp4AbsPath;
+    mp4AbsPath.reserve(mp4VidsLst.size());
+    QList<int> expectDurationsLst{15, 9, 10, 13};
+
     // precondition 1: "list length should same"
-    QCOMPARE(durationsLst.size(), mp4VidsLst.size());
+    QCOMPARE(expectDurationsLst.size(), mp4VidsLst.size());
     // precondition 2: "video file should exist"
     const QDir mp4Dir{VIDEOS_DURATION_DIR};
     foreach (const QString mp4FileName, mp4VidsLst) {
       QVERIFY2(mp4Dir.exists(mp4FileName), qPrintable(mp4FileName));
+      mp4AbsPath.append(mp4Dir.absoluteFilePath(mp4FileName));
     }
+
 #ifdef _WIN32
     QMediaInfo mi;
     QVERIFY2(mi.StartToGet(), "Should start succeed");
-    for (int i = 0; i < mp4VidsLst.size(); ++i) {
-      const QString& name = mp4VidsLst[i];
-      const QString& vidPath = mp4Dir.absoluteFilePath(name);
+    for (int i = 0; i < mp4AbsPath.size(); ++i) {
+      const QString& vidPath = mp4AbsPath[i];
       const int duration = mi.VidDurationLengthQuick(vidPath);  // msec
       // duration should not be zero
-      QVERIFY2((duration > 0), qPrintable(name));
+      QVERIFY2((duration > 0), qPrintable(vidPath));
       // duration differs value should not large than 3s
-      QVERIFY2((std::abs(duration / 1000 - durationsLst[i]) < 3), qPrintable(vidPath));
+      QVERIFY2((std::abs(duration / 1000 - expectDurationsLst[i]) < 3), qPrintable(vidPath));
+    }
+
+    const QList<double> durationsFromFFmpeg = VideoDurationGetter::ReadVideos(mp4AbsPath);
+    for (int i = 0; i < mp4AbsPath.size(); ++i) {
+      QVERIFY2((std::abs(durationsFromFFmpeg[i] - expectDurationsLst[i]) < 3), qPrintable(mp4AbsPath[i]));
     }
 #endif
   }
