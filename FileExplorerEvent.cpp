@@ -116,7 +116,8 @@ auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& conte
   __FocusNewItem(txtFilePath);
   return isAllSucceed;
 }
-auto FileExplorerEvent::on_NewJsonFile() -> bool {  // not effect by selection;
+
+bool FileExplorerEvent::on_NewJsonFile() {
   if (not __CanNewItem()) {
     return false;
   }
@@ -226,6 +227,36 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   PreferenceSettings().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, userInputRule);
 
   return on_BatchNewFilesOrFolders(namePattern, startIndex, endIndex, isFolder);
+}
+
+bool FileExplorerEvent::on_createThumbnailImages(int dimensionX, int dimensionY, int widthPx) {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  if (!(1 <= dimensionX && dimensionX <= 3)) {
+    Notificator::information("Dimension of row invalid", QString::number(dimensionX));
+    return false;
+  }
+  if (!(1 <= dimensionY && dimensionY <= 3)) {
+    Notificator::information("Dimension of column invalid", QString::number(dimensionY));
+    return false;
+  }
+  if (!(widthPx == 360 || widthPx == 480 || widthPx == 720 || widthPx == 1080)) {
+    Notificator::information("images width invalid", QString::number(widthPx));
+    return false;
+  }
+  const QStringList& selectedFiles = selectedItems();
+  if (selectedFiles.isEmpty()) {
+    Notificator::information("Skip nothing selected", "selected some video(s) first");
+    return true;
+  }
+  int cnt = ThumbnailProcesser::CreateThumbnailImages(dimensionX, dimensionY, widthPx, selectedFiles, true);
+  if (cnt < 0) {
+    Notificator::badNews("Create thumbnail failed", "see details in log");
+    return false;
+  }
+  Notificator::goodNews("Create thumbnail(s) for video(s) succeed. count: ", QString::number(cnt));
+  return true;
 }
 
 bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist) {
@@ -364,6 +395,16 @@ void FileExplorerEvent::subsribeFileActions() {
 
 void FileExplorerEvent::subscribeThumbnailActions() {
   auto& ins = g_ThumbnailProcessActions();
+  connect(ins._CREATE_1_BY_1_THUMBNAIL, &QAction::triggered, this, [this]() {
+    on_createThumbnailImages(1, 1, 720);
+  });
+  connect(ins._CREATE_2_BY_2_THUMBNAIL, &QAction::triggered, this, [this]() {
+    on_createThumbnailImages(2, 2, 720);
+  });
+  connect(ins._CREATE_3_BY_3_THUMBNAIL, &QAction::triggered, this, [this]() {
+    on_createThumbnailImages(3, 3, 720);
+  });
+
   connect(ins._EXTRACT_1ST_IMG, &QAction::triggered, this, [this, &ins]() {
     bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
     on_ExtractImagesFromThumbnail(0, 1, bSkipExist);
