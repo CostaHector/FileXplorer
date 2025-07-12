@@ -5,6 +5,10 @@ win32 {
     LIBS += -ldwmapi
     LIBS += -lshlwapi
     # target_link_libraries(project_name Shlwapi) in CMakeLists
+    # FFmpeg headers path
+    INCLUDEPATH += "C:/home/ffmpeg/include"
+    # FFmpeg libs path
+    LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec -lavutil -lswscale -lws2_32 # Windows network avformat_network_init need
 }
 
 TEMPLATE = app
@@ -12,7 +16,8 @@ TEMPLATE = app
 DEFINES += QT_TEST
 message($$DEFINES)
 
-SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp)
+SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp) \
+    Tools/VideoDurationGetter.cpp
 SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/Json/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
@@ -65,7 +70,8 @@ SOURCES += \
     Tools/SyncModifiyFileSystem.cpp \
     Tools/WidgetReorderHelper.cpp
 
-HEADERS += $$files(TestCase/pub/*.h)
+HEADERS += $$files(TestCase/pub/*.h) \
+    Tools/VideoDurationGetter.h
 HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(public/*.h)
 HEADERS += $$files(public/Memory/*.h)

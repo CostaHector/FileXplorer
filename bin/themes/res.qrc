@@ -27,6 +27,9 @@
 <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
 <file alias="PACK_FOLDERS">Media/PACK_FOLDERS.svg</file>
 <file alias="UNPACK_FOLDERS">Media/UNPACK_FOLDERS.svg</file>
+<file alias="THUMBNAILS_1_BY_1">Media/THUMBNAILS_1_BY_1.svg</file>
+<file alias="THUMBNAILS_2_BY_2">Media/THUMBNAILS_2_BY_2.svg</file>
+<file alias="THUMBNAILS_3_BY_3">Media/THUMBNAILS_3_BY_3.svg</file>
 <file alias="THUMBNAIL_EXTRACTOR_0_1">Media/THUMBNAIL_EXTRACTOR_0_1.svg</file>
 <file alias="THUMBNAIL_EXTRACTOR_0_2">Media/THUMBNAIL_EXTRACTOR_0_2.svg</file>
 <file alias="THUMBNAIL_EXTRACTOR_0_4">Media/THUMBNAIL_EXTRACTOR_0_4.svg</file>

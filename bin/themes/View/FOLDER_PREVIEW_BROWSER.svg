@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M11.9 19C15.6694 19 18.725 15.866 18.725 12C18.725 8.13401 15.6694 5 11.9 5C8.13067 5 5.07501 8.13401 5.07501 12C5.07501 15.866 8.13067 19 11.9 19Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5.5459 14.561C11.9 10.833 15.3125 13.167 18.254 14.561" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg fill="#000000" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 218.207 218.207" xml:space="preserve">
+<g>
+	<g>
+		<g>
+			<path d="M214.31,27.276H58.448H3.897C1.743,27.276,0,29.019,0,31.172v155.862c0,2.154,1.743,3.897,3.897,3.897h54.552H214.31
+				c2.154,0,3.897-1.743,3.897-3.897V31.172C218.207,29.019,216.464,27.276,214.31,27.276z M54.552,183.138H7.793V35.069h46.759
+				V183.138z M210.414,183.138H62.345V35.069h148.069V183.138z"/>
+			<rect x="11.69" y="42.862" width="38.966" height="7.793"/>
+			<rect x="11.69" y="77.931" width="31.172" height="7.793"/>
+			<rect x="11.69" y="93.517" width="31.172" height="7.793"/>
+			<rect x="11.69" y="109.103" width="31.172" height="7.793"/>
+			<rect x="11.69" y="124.69" width="31.172" height="7.793"/>
+			<path d="M77.931,159.759h116.897c2.154,0,3.897-1.743,3.897-3.897V62.345c0-2.154-1.743-3.897-3.897-3.897H77.931
+				c-2.154,0-3.897,1.743-3.897,3.897v93.517C74.034,158.016,75.777,159.759,77.931,159.759z M81.828,66.241h109.103v85.724H81.828
+				V66.241z"/>
+		</g>
+	</g>
+</g>
 </svg>
