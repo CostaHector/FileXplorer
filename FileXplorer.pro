@@ -9,6 +9,10 @@ LIBS += -L$$PWD/lib
 win32 {
     LIBS += -ldwmapi
     LIBS += -lMediaInfo
+    # FFmpeg headers path
+    INCLUDEPATH += "C:/home/ffmpeg/include"
+    # FFmpeg libs path
+    LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec -lavutil -lswscale -lws2_32 # Windows network avformat_network_init need
 }
 
 CONFIG(debug, debug|release) {
