@@ -310,12 +310,27 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   nameRulerToolButton->setDefaultAction(fileOpAgInst._NAME_RULER);
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
-  QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
-                                   thumbnailIns._SKIP_IF_ALREADY_EXIST};
-  auto* thumbnailToolButton = new (std::nothrow) DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
-  CHECK_NULLPTR_RETURN_NULLPTR(thumbnailToolButton);
-  thumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
-  thumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
+  QList<QAction*> createThumbnailActions{thumbnailIns._CREATE_1_BY_1_THUMBNAIL,  //
+                                         thumbnailIns._CREATE_2_BY_2_THUMBNAIL,  //
+                                         thumbnailIns._CREATE_3_BY_3_THUMBNAIL};
+  auto* createThumbnailToolButton =
+      new (std::nothrow) DropdownToolButton{createThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
+  CHECK_NULLPTR_RETURN_NULLPTR(createThumbnailToolButton);
+  createThumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name, MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.v).toString());
+  createThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name);
+
+  QList<QAction*> extractThumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,    //
+                                          thumbnailIns._EXTRACT_2ND_IMGS,   //
+                                          thumbnailIns._EXTRACT_4TH_IMGS,   //
+                                          nullptr,                          //
+                                          thumbnailIns._CUSTOM_RANGE_IMGS,  //
+                                          nullptr,                          //
+                                          thumbnailIns._SKIP_IF_ALREADY_EXIST};
+  auto* extractThumbnailToolButton =
+      new (std::nothrow) DropdownToolButton{extractThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
+  CHECK_NULLPTR_RETURN_NULLPTR(extractThumbnailToolButton);
+  extractThumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
+  extractThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
@@ -331,7 +346,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addWidget(thumbnailToolButton);
+  archiveVidsTB->addWidget(createThumbnailToolButton);
+  archiveVidsTB->addWidget(extractThumbnailToolButton);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
