@@ -1,12 +1,9 @@
-./FileExplorerReadOnly.pro.user
+FileXplorer.pro.user
+FileXplorer.pro.user.*
+FileXplorer_zh_CN.qm
 
-./FileExplorerReadOnly.pro.user.*
-
-./FileExplorerReadOnly_zh_CN.qm
-
-./FileExplorerTest.pro.*
-
-./FileExplorerTest.pro.user.*
+FileExplorerTest.pro.*
+FileExplorerTest.pro.user.*
 
 bin/RUNLOG/*.log
 bin/lib/*
@@ -17,6 +14,6 @@ bin/.gitignore
 build/*
 *.pro.user
 *.pro.user.*
-FileExplorerReadOnly.pro.user
-FileXplorer.pro.user
+
+
 

@@ -159,10 +159,12 @@ for (int i = 0; i < paths.size(); ++i) {
 ```
 
 ## get video duration using FFmpeg/libav
-Download `ffmpeg-7.1.1-full_build-shared.7z` and extract to a path. then add this path to system environment path.
+### in windows:
+step1: Download `ffmpeg-7.1.1-full_build-shared.7z` and extract to a path. then add this path to system environment path.
 
-Here we assume path is "C:\home\ffmpeg"
+step2: Here we assume path is "C:\home\ffmpeg"
 
+step3: add following snippet in .pro file
 ```pro
 win32 {
     # FFmpeg headers path
@@ -180,6 +182,22 @@ extern C{
 void testFFmpeg() {
     avformat_network_init();
     qDebug() << "FFmpeg version:" << avformat_version();
+}
+```
+
+### in ubuntu
+
+step1: install following items. and test if it was intalled succeed
+```sh
+sudo apt install libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
+sudo apt install ffmpeg
+ffmpeg
+```
+
+step3: add following snippet in .pro file
+```
+linux {
+    LIBS += -lavformat -lavcodec -lavutil -lswscale
 }
 ```
 

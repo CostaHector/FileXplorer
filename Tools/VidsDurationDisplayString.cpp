@@ -1,4 +1,5 @@
 #include "VidsDurationDisplayString.h"
+#include "Tools/VideoDurationGetter.h"
 #include <QTime>
 #include <math.h>
 #include <stdint.h>
@@ -7,22 +8,13 @@
 #include <string.h>
 #include <QFileInfo>
 
-#ifdef _WIN32
-#include "QMediaInfo.h"
-#endif
-
 QString VidsDurationDisplayString::DisplayVideosDuration(const QStringList& fileAbsPaths) {
-#ifdef _WIN32
-  QMediaInfo mi;
+  VideoDurationGetter mi;
   if (!mi.StartToGet()) {
-    qDebug("StartToGet failed");
     return {};
   }
-  const QList<int>& durationLst = mi.batchVidsDurationLength(fileAbsPaths);
+  const QList<int>& durationLst = mi.GetLengthsQuick(fileAbsPaths);
   return DurationPrepathName2Table(durationLst, fileAbsPaths);
-#else
-  return {};
-#endif
 }
 
 QString VidsDurationDisplayString::DurationPrepathName2Table(const QList<int>& durationLst, const QStringList& fileAbsPaths) {
@@ -30,7 +22,7 @@ QString VidsDurationDisplayString::DurationPrepathName2Table(const QList<int>& d
   fileNames.reserve(durationLst.size());
   fileDirs.reserve(durationLst.size());
   for (const auto& pth : fileAbsPaths) {
-    const QFileInfo fi(pth);
+    const QFileInfo fi{pth};
     fileNames.append(fi.fileName());
     fileDirs.append(fi.absolutePath());
   }
