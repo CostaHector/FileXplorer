@@ -1,14 +1,17 @@
-#ifndef LOGHANDLER_H
+﻿#ifndef LOGHANDLER_H
 #define LOGHANDLER_H
 #include <QFile>
 #include <QTextStream>
 
-class LogHandler : QObject {
+void SetQtDebugMessagePattern();
+
+class LogHandler: QObject {
  public:
-  explicit LogHandler(QObject* parent = nullptr, const QString& logPath = "");
+  explicit LogHandler(const QString& logPath = "", const int msgType = -1, QObject* parent = nullptr);
   ~LogHandler();
-  static bool subscribe();
-  static bool AgingLogFiles(const int AGING_FILE_ABOVE_B = 2 * 1024 * 1024, QString* pAgedLogPath = nullptr);
+  static bool IsLogModuleOk();
+  static void subscribe();
+  static bool AgingLogFiles(const int AGING_FILE_ABOVE_B = 2 * 1024 * 1024, QString* pAgedLogFileName = nullptr);
 
  private:
   static void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
@@ -20,7 +23,7 @@ class LogHandler : QObject {
   static bool ManualFlush();
 
   static QtMsgType OUTPUT_LOG_LEVEL;
-  static bool mFlushLogInBufferInstantly;
+  static bool mAutoFlushLogBuffer;
   static QString mLogFolderPath;
 
   static QFile mLogFile;

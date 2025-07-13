@@ -1,16 +1,16 @@
 ﻿#include "View/FileSystemTableView.h"
+#include "View/ViewHelper.h"
 #include "Actions/FolderPreviewActions.h"
 #include "Actions/RenameActions.h"
 #include "Actions/RightClickMenuActions.h"
-#include "View/ViewHelper.h"
-
-#include <QHeaderView>
-#include <QMouseEvent>
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/ViewActions.h"
 
+#include <QHeaderView>
+#include <QMouseEvent>
+
 FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent)  //
-    : CustomTableView("FILE_SYSTEM", parent)                                             //
+    : CustomTableView{"FILE_SYSTEM", parent}                                             //
 {
   BindMenu(m_fsMenu);
   setModel(fsmModel);
@@ -81,11 +81,19 @@ void FileSystemTableView::mousePressEvent(QMouseEvent* event) {
   if (View::onMouseSidekeyBackwardForward(event->button())) {
     return;
   }
+  if (event->button() & Qt::LeftButton) {
+    mDragStartPosition = event->pos();
+  }
   return QTableView::mousePressEvent(event);
 }
 
 void FileSystemTableView::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::MouseButton::LeftButton) {
+    // ‌To prevent accidental drag operations that move files/folders, a drag threshold is added.
+    // The drag event triggers only when the drag distance exceeds [specified number] pixels.
+    if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST) {
+      return;
+    }
     View::mouseMoveEventCore(this, event);
     return;
   }
