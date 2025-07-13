@@ -1,4 +1,4 @@
-#ifndef PREFERENCEMODEL_H
+﻿#ifndef PREFERENCEMODEL_H
 #define PREFERENCEMODEL_H
 
 #include <QAbstractTableModel>
@@ -67,7 +67,7 @@ class PreferenceModel : public QAbstractTableModel {
   }
 
   QString filePath(const QModelIndex& index) const {
-    if (not index.isValid()) {
+    if (!index.isValid()) {
       return "";
     }
     return m_alerts[index.row()].value2Str();
