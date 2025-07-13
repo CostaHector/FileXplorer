@@ -1,20 +1,10 @@
-#ifndef VIEWHELPER_H
+﻿#ifndef VIEWHELPER_H
 #define VIEWHELPER_H
 
 #include <QFileSystemModel>
-#include <QTableView>
-
 #include <QListView>
-#include <QPushButton>
-
-#include "Actions/AddressBarActions.h"
-#include "public/PublicVariable.h"
-
-#include <QDrag>
 #include <QDragMoveEvent>
 #include <QMimeData>
-#include <QPainter>
-#include <QToolTip>
 
 class View {
  public:
@@ -24,22 +14,14 @@ class View {
 
   virtual void UpdateItemViewFontSize() = 0;
 
-  static auto onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton) -> bool {
-    switch (mousebutton) {
-      case Qt::MouseButton::BackButton:
-        g_addressBarActions()._BACK_TO->triggered();
-        return true;
-      case Qt::MouseButton::ForwardButton:
-        g_addressBarActions()._FORWARD_TO->triggered();
-        return true;
-      default:
-        return false;
-    }
-  }
+  static bool onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton);
 
   static void UpdateItemViewFontSizeCore(QAbstractItemView* view);
 
   static inline QModelIndexList selectedIndexes(QAbstractItemView* view) {  // ignore other column, keep the first column
+    if (view == nullptr) {
+      return {};
+    }
     if (dynamic_cast<QListView*>(view) != nullptr) {
       return view->selectionModel()->selectedIndexes();
     }
@@ -58,6 +40,8 @@ class View {
   static void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
 
   static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
+  static constexpr int START_DRAG_DIST{32};
+  static constexpr int START_DRAG_DIST_MIN{10};
 };
 
 #endif  // VIEWHELPER_H

@@ -1,4 +1,4 @@
-#include "AIMediaDuplicate.h"
+﻿#include "AIMediaDuplicate.h"
 #include "public/PublicVariable.h"
 #include "Tools/MD5Calculator.h"
 #include <QDebug>
@@ -131,7 +131,7 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
   db.transaction();
 #ifdef _WIN32
   QMediaInfo mi;
-  if (!SKIP_GETTER_DURATION && !mi.StartToGet()) {
+  if (!mi.StartToGet()) {
     qWarning("Video duration getter is nullptr");
     return false;
   }
