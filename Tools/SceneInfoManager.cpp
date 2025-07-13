@@ -290,12 +290,18 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
       const QFileInfo vidFi{path + '/' + vidFileName};
       it = rawJsonDict.find("Uploaded");
       if (it == rawJsonDict.end()) {
-        // construct birth Time
+#ifdef _WIN32
         rawJsonDict.insert("Uploaded", vidFi.birthTime().toString("yyyyMMdd hh:mm:ss"));
+#else
+        rawJsonDict.insert("Uploaded", vidFi.metadataChangeTime().toString("yyyyMMdd hh:mm:ss"));
+#endif
         jsonNeedUpdate = true;
       } else if (it.value().toString().isEmpty()) {
-        // first set change birth Time
+#ifdef _WIN32
         it->setValue(vidFi.birthTime().toString("yyyyMMdd hh:mm:ss"));
+#else
+        it->setValue(vidFi.metadataChangeTime().toString("yyyyMMdd hh:mm:ss"));
+#endif
         jsonNeedUpdate = true;
       }
 
