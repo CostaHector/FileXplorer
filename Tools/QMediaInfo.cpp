@@ -1,21 +1,12 @@
 #ifdef _WIN32
-
 #include "QMediaInfo.h"
 #include "public/MemoryKey.h"
 #include <QFileInfo>
 #include <QTime>
-
-#ifdef WIN32
 #define QString2MediaInfoc_str(qstr) (qstr).toStdWString().c_str()
 #define QStringFromMediaInfoc_str(cStr) QString::fromStdWString(cStr)
 #define InitMediaInfo_CharArr(arrayName, initialLiteralString) MediaInfo_Char arrayName[] = L"" initialLiteralString
-#else
-#define QString2MediaInfoc_str(qstr) (qstr).toStdString().c_str()
-#define QStringFromMediaInfoc_str(cStr) QString::fromStdString(cStr)
-#define InitMediaInfo_CharArr(arrayName, initialLiteralString) MediaInfo_Char arrayName[] = initialLiteralString
-#endif
 
-#ifdef _WIN32
 QMediaInfo::~QMediaInfo() {
   if (pLib != nullptr) {
     MEDIAINFO_Delete d = (MEDIAINFO_Delete)pLib->resolve("MediaInfo_Delete");
@@ -73,11 +64,7 @@ bool QMediaInfo::StartToGet() {
     return true;
   }
 
-#ifdef _WIN32
   const QString libPath = PreferenceSettings().value(MemoryKey::WIN32_MEDIAINFO_LIB_PATH.name).toString();
-#else
-  const QString libPath = PreferenceSettings().value(MemoryKey::LINUX_MEDIAINFO_LIB_PATH.name).toString();
-#endif
   if (!QFile::exists(libPath)) {
     qWarning("lib path[%s] not found", qPrintable(libPath));
     return false;
@@ -332,13 +319,4 @@ QString QMediaInfo::FileExtension() const {
   InitMediaInfo_CharArr(prop, "FileExtension");
   return QStringFromMediaInfoc_str(Get(MediaInfo_Stream_General, 0, prop, MediaInfo_Info_Text, MediaInfo_Info_Name));
 }
-
-extern "C" {
-#include <libavformat/avformat.h>
-}
-void testFFmpeg() {
-  avformat_network_init();
-  qWarning("FFmpeg version:%u", avformat_version());
-}
-
 #endif

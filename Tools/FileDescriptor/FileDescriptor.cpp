@@ -1,7 +1,7 @@
 #include "FileDescriptor.h"
 #include <QList>
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #include <windows.h>
 // 将FILETIME转换为Unix时间戳（秒）
 qint64 FileTimeToUnixTimestamp(const FILETIME& ft) {
@@ -16,12 +16,31 @@ qint64 FileTimeToUnixTimestamp(const FILETIME& ft) {
              / WINDOWS_TICK                                      //
          - SEC_TO_UNIX_EPOCH;
 }
+#else
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <errno.h>
 #endif
 
 qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
-#ifndef Q_OS_WIN
-  qDebug("only support in windows system");
-  return -1;
+#ifndef _WIN32
+  // Open the file (equivalent to CreateFileW)
+  int fd = open(fileAbsPath.toUtf8().constData(), O_RDONLY);
+  if (fd == -1) {
+    qWarning("Get fd[%s] error: %d", fileAbsPath, errno);
+    return -errno;
+  }
+
+  // Get file information (equivalent to GetFileInformationByHandle)
+  struct stat file_stat;
+  if (fstat(fd, &file_stat) == -1) {
+    close(fd);
+    return -errno;
+  }
+
+  close(fd);
+  return file_stat.st_ino;  // Returns the inode number as unique file identifier
 #else
   const HANDLE hFile = CreateFileW((wchar_t*)fileAbsPath.utf16(),       //
                                    0,                                   //
