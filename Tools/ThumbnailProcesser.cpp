@@ -120,7 +120,6 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
   }
 
   int succeedCnt{0};
-#ifdef _WIN32
   const QString ffmpegExePath = "ffmpeg";
   // ffmpeg.exe -i "aa.mp4" -vf "select=key,scale=1080:-1,tile=2x2:margin=0:padding=0" -frames:v 1 -q:v 2 "aa 22.jpg"
   // for key frame: select=key
@@ -155,9 +154,6 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
       return succeedCnt;
     }
   }
-#else
-  qWarning("Create thumbnail image(s) only support in windoes platform now");
-#endif
   return succeedCnt;
 }
 

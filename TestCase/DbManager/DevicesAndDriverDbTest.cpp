@@ -9,6 +9,7 @@
 #include "public/PublicVariable.h"
 #include "public/PublicMacro.h"
 
+#ifdef _WIN32
 const QString rootpath = QFileInfo(__FILE__).absolutePath();
 const QString dbName = rootpath + "/DeviceAndDriver.db";
 
@@ -146,3 +147,5 @@ class DevicesAndDriverDbTest : public MyTestSuite {
 
 DevicesAndDriverDbTest g_DevicesAndDriverDbTest;
 #include "DevicesAndDriverDbTest.moc"
+
+#endif
