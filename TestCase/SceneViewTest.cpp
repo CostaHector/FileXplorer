@@ -148,7 +148,7 @@ class SceneViewTest : public MyTestSuite {
     QCOMPARE(afterScenes[2].vidName, "somejsonfileEmpty.mp4");
     QVERIFY(afterScenes[2].vidSize > 0);
     QCOMPARE(afterScenes[2].rate, 0);
-    QCOMPARE(afterScenes[2].uploaded, "");
+    QCOMPARE(afterScenes[2].uploaded.isEmpty(), false); // "yyyyMMdd hh:mm:ss"
   }
 
   void test_WriteScenesIntoScnFile() {
