@@ -9,13 +9,7 @@
 #include <QIcon>
 #include <QFileIconProvider>
 #include <QBuffer>
-#ifdef _WIN32
-#include "Tools/QMediaInfo.h"
-#endif
-
-#ifdef _WIN32
-#include "Tools/QMediaInfo.h"
-#endif
+#include "Tools/VideoDurationGetter.h"
 
 constexpr FloatingPreview::MediaBtnHandlerFunc FloatingPreview::MEDIA_HANDLERS_MAP[];
 
@@ -181,14 +175,11 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
   if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)) {
     int dur = 0;
-#ifdef _WIN32
-    QMediaInfo mi;
+    VideoDurationGetter mi;
     if (!mi.StartToGet()) {
-      qWarning("Start to Get failed");
       return {};
     }
-    dur = mi.VidDurationLengthQuick(fileAbsPath);
-#endif
+    dur = mi.GetLengthQuick(fileAbsPath);
     detail += QString(R"(<h3>Length: %1</h3><br/>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
   }
 
