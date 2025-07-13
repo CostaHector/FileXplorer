@@ -32,15 +32,15 @@ const KV MemoryKey::DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", 
 const KV MemoryKey::DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
                                           "Rename (ith)",
                                           ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"}, CANDIDATE_STRING});
-const KV MemoryKey::DEFAULT_THUMBNAILS_DIMENSION("DEFAULT_THUMBNAILS_DIMENSION",
-                                           "Create 2x2 thumbnail", ValueChecker{PLAIN_STR});
+const KV MemoryKey::DEFAULT_THUMBNAILS_DIMENSION("DEFAULT_THUMBNAILS_DIMENSION", "Create 2x2 thumbnail", ValueChecker{PLAIN_STR});
+const KV MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD{"DEFAULT_THUMBNAIL_SAMPLE_PERIOD", 20, ValueChecker{1, 300}};
 const KV MemoryKey::DEFAULT_EXTRACT_CHOICE("DEFAULT_EXTRACT_CHOICE",
                                            "Extract [0, 2) imgs",
                                            ValueChecker{{"Thumbnail Extractor", "Extract [0, 2) imgs", "Extract [0, 4) imgs", "Extract [b, e) imgs"}, CANDIDATE_STRING});
 
 const KV MemoryKey::MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
 const KV MemoryKey::COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
-const KV MemoryKey::FILE_SYSTEM_STRUCTURE_WAY{"FILE_SYSTEM_STRUCTURE_WAY", 0, ValueChecker{PLAIN_INT, 0}};
+const KV MemoryKey::FILE_SYSTEM_STRUCTURE_WAY{"FILE_SYSTEM_STRUCTURE_WAY", 0, ValueChecker{PLAIN_INT}};
 const KV MemoryKey::WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{PLAIN_STR});
 
 const KV MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, ValueChecker{0});
@@ -109,4 +109,3 @@ const KV RedunImgFinderKey::GEOMETRY{"RedunImgFinderKey/GEOMETRY", {}, ValueChec
 const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
 const KV RedunImgFinderKey::WIN32_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
 const KV RedunImgFinderKey::LINUX_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
-

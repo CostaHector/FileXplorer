@@ -1,22 +1,44 @@
 ﻿#include "ThumbnailProcesser.h"
 #include "public/PathTool.h"
 #include "public/PublicVariable.h"
-#include "Tools/VideoDurationGetter.h"
 #include <QRegularExpression>
 #include <utility>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QDir>
 #include <QPixmap>
+#include <QSet>
 
-using namespace PathTool;
+const QList<int> ThumbnailProcesser::mAllowedPixelList{360, 480, 720, 1080};
+constexpr int ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX;  // [1, 300)
 
-ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist) : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist} {}
+bool ThumbnailProcesser::IsDimensionXValid(int dimensionX) {
+  static constexpr int DIMENSION_X_MIN{1}, DIMENSION_X_MAX{8 + 1};  // [1, 8)
+  return DIMENSION_X_MIN <= dimensionX && dimensionX <= DIMENSION_X_MAX;
+}
+
+bool ThumbnailProcesser::IsDimensionYValid(int dimensionY) {
+  static constexpr int DIMENSION_Y_MIN{1}, DIMENSION_Y_MAX{8 + 1};  // [1, 8)
+  return DIMENSION_Y_MIN <= dimensionY && dimensionY <= DIMENSION_Y_MAX;
+}
+
+bool ThumbnailProcesser::IsWidthPixelAllowed(int widthPixel) {
+  static const QSet<int> mAllowedPixelSet{mAllowedPixelList.begin(), mAllowedPixelList.cend()};
+  return mAllowedPixelSet.contains(widthPixel);
+}
+
+bool ThumbnailProcesser::IsSamplePeriodAllowed(int samplePeriod) {
+  return SAMPLE_PERIOD_MIN <= samplePeriod && samplePeriod < SAMPLE_PERIOD_MAX;
+}
+
+ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist)  //
+    : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist}               //
+{}
 
 bool ThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
   QString imgBaseName;
   QString ext;
-  std::tie(imgBaseName, ext) = GetBaseNameExt(imgAbsPath);
+  std::tie(imgBaseName, ext) = PathTool::GetBaseNameExt(imgAbsPath);
   if (!TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + ext)) {  // not an image
     return false;
   }
@@ -44,33 +66,36 @@ bool ThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseNam
   int row = -1;
   int column = -1;
   std::tie(row, column) = GetThumbnailDimension(imgBaseName);
-  if (row == 1) {  // 11, 12, ..., 19 -> false
+  if (!IsDimensionXValid(row) || !IsDimensionXValid(column)) {  // 0x, x0, row>=9 or column>=9
     return false;
   }
-  if (column == 1) {  // 21, 31, 41, 51, ..., 91 -> true
+  if (row == 1) {  // 1x -> false
+    return false;
+  }
+  if (column == 1) {  // 21, 31, 41, 51, ..., 81 -> true
     return true;
   }
-  if (row == column && (2 <= row && row <= 5)) {  // square 22,33,44,55
+  if (row == column) {  // square 22,33,44,55,66,77,88
     return true;
   }
   return false;
 }
 
-int ThumbnailProcesser::CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx, const QStringList& files, const bool isJpg, const int timePeriod) {
-  if (!(1 <= dimensionX && dimensionX <= 3)) {
-    qWarning("Dimension of row[%d] invalid", dimensionX);
+int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const int timePeriod, const bool isJpg) {
+  if (!IsDimensionXValid(dimensionX)) {
+    qWarning("Dimension of row[%d] out of range", dimensionX);
     return -1;
   }
-  if (!(1 <= dimensionY && dimensionY <= 3)) {
-    qWarning("Dimension of column[%d] invalid", dimensionY);
+  if (!IsDimensionYValid(dimensionY)) {
+    qWarning("Dimension of column[%d] out of range", dimensionY);
     return -1;
   }
-  if (!(widthPx == 360 || widthPx == 480 || widthPx == 720 || widthPx == 1080)) {
+  if (!IsWidthPixelAllowed(widthPx)) {
     qWarning("images width %d pixel(s) invalid", widthPx);
     return -1;
   }
-  if (timePeriod <= 0) {
-    qWarning("timePeriod: %d second invalid", widthPx);
+  if (!IsSamplePeriodAllowed(timePeriod)) {
+    qWarning("timePeriod: %d second invalid", timePeriod);
     return -1;
   }
 
@@ -80,7 +105,7 @@ int ThumbnailProcesser::CreateThumbnailImages(int dimensionX, int dimensionY, in
     if (!fi.isFile()) {
       continue;
     }
-    if (fi.size() < 10) {  // skip file size under 10 byte(s)
+    if (fi.size() < 10 * 1024) {  // skip file size under 10k byte(s)
       continue;
     }
     const QString& ext = fi.suffix();
@@ -110,21 +135,17 @@ int ThumbnailProcesser::CreateThumbnailImages(int dimensionX, int dimensionY, in
   if (isJpg) {
     config += " -q:v 2";
   }
-  const QString dimensionStr = QString::number(dimensionX) + QString::number(dimensionY);
   const QString imgthumbnailImgExt{isJpg ? ".jpg" : ".png"};
-  // e.g., " 33.png"
-  const QString imgThumbnailSuffix{" " + dimensionStr + imgthumbnailImgExt};
+  // imgThumbnailSuffix e.g., " 33.png", " 24.jpg"
+  const QString imgThumbnailSuffix{" " + QString::number(dimensionX) + QString::number(dimensionY) + imgthumbnailImgExt};
   for (auto it = vidPath2ImgBaseName.cbegin(); it != vidPath2ImgBaseName.cend(); ++it) {
     const QString ffmpegCmdTemplate = ffmpegExePath     // executable path
                                       + R"( -i "%1" )"  // input path
                                       + config          //
                                       + R"( "%2")";     // output path
-
     const QString vidPath = PathTool::sysPath(it.key());
     const QString& path2imgBaseName = PathTool::sysPath(it.value()) + imgThumbnailSuffix;
     const QString ffmpegCmd{ffmpegCmdTemplate.arg(vidPath, path2imgBaseName)};
-    qWarning("cmd:%s", qPrintable(ffmpegCmd));
-
     QByteArray cmdBytes = ffmpegCmd.toLocal8Bit();
     int result = system(cmdBytes.constData());
     if (result == 0) {
@@ -167,33 +188,40 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
     if (!IsImageAnThumbnail(imgAbsPath)) {
       continue;
     }
-    int row{-1}, column{-1};
 
     QString thumbnailImgBaseName;
     QString ext;
-    std::tie(thumbnailImgBaseName, ext) = GetBaseNameExt(imgAbsPath);
-    const QString ImgBaseName = thumbnailImgBaseName.chopped(3);  // " 33"
+    // e.g., imgAbsPath="an image 44.jpeg"
+    // thumbnailImgBaseName = "an image 44", ext=".jpeg", ImgBaseName = "an image"
+    std::tie(thumbnailImgBaseName, ext) = PathTool::GetBaseNameExt(imgAbsPath);
+    const QString ImgBaseName = thumbnailImgBaseName.chopped(3);  // "an image"
 
+    // get thumbnail dimension by file name last 3 charactor
+    int row{-1}, column{-1};
     std::tie(row, column) = GetThumbnailDimension(thumbnailImgBaseName);
     const int imgsCntIntThumbnail = row * column;
     const int endIndex = std::min(end, imgsCntIntThumbnail);
     if (beg >= endIndex) {
       continue;
     }
-    QPixmap pixmap(imgAbsPath);
-    int wPixels = pixmap.width();
-    int hPixels = pixmap.height();
+    QPixmap pixmap{imgAbsPath};
+    const int wPixels = pixmap.width(), hPixels = pixmap.height();
     if (wPixels % row != 0 || hPixels % column != 0) {
-      qDebug(
-          "thumbnail[%s] %d-by-%d pixels cannot be seperated into "
-          "%d x %d screenshot",
-          qPrintable(imgAbsPath), wPixels, hPixels, row, column);
+      qDebug("thumbnail[%s] %d-by-%d pixels cannot be seperated into %d x %d screenshot",  //
+             qPrintable(imgAbsPath), wPixels, hPixels, row, column);
       continue;
     }
-    int eachImgWidth{wPixels / row}, eachImgHeight{hPixels / column};
-    if (!(eachImgWidth == 360 || eachImgWidth == 480 || eachImgWidth == 720 || eachImgWidth == 1080)) {
+    const int eachImgWidth{wPixels / row}, eachImgHeight{hPixels / column};
+    if (!IsWidthPixelAllowed(eachImgWidth)) {
       continue;
     }
+
+    QString imgAbsolutePthTemplate = PathTool::absolutePath(imgAbsPath);
+    imgAbsolutePthTemplate += '/';
+    imgAbsolutePthTemplate += ImgBaseName;
+    imgAbsolutePthTemplate += ' ';
+    imgAbsolutePthTemplate += "%1";
+    imgAbsolutePthTemplate += ext;
 
     for (int imgInd = beg; imgInd < endIndex; ++imgInd) {
       int iRow = imgInd / column;
@@ -201,24 +229,19 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
       int x = iRow * eachImgWidth;
       int y = jColumn * eachImgHeight;
 
-      QString newImageAbsPath = absolutePath(imgAbsPath);
-      newImageAbsPath += '/';
-      newImageAbsPath += ImgBaseName;
-      newImageAbsPath += ' ';
-      newImageAbsPath += QString::number(imgInd);
-      newImageAbsPath += ext;
-      if (QFile::exists(newImageAbsPath)) {
+      const QString newImgAbsPth = imgAbsolutePthTemplate.arg(imgInd);
+      if (QFile::exists(newImgAbsPth)) {
         if (mSkipImageIfAlreadyExist) {
           continue;
         }
         ++mRewriteImagesCnt;
-        qWarning("Rewrite image[%s]", qPrintable(newImageAbsPath));
-        mErrImg << QString("Rewrite image[%1]\n").arg(newImageAbsPath);
+        qWarning("Rewrite image[%s]", qPrintable(newImgAbsPth));
+        mErrImg << QString("Rewrite image[%1]\n").arg(newImgAbsPth);
       }
       QPixmap newPixmap = pixmap.copy(x, y, eachImgWidth, eachImgHeight);
-      if (!newPixmap.save(newImageAbsPath)) {
-        qCritical("Save image failed[%s]", qPrintable(newImageAbsPath));
-        mErrImg << QString("Save image failed[%1]\n").arg(newImageAbsPath);
+      if (!newPixmap.save(newImgAbsPth)) {
+        qCritical("Save image failed[%s]", qPrintable(newImgAbsPth));
+        mErrImg << QString("Save image failed[%1]\n").arg(newImgAbsPth);
         continue;
       }
       ++mExtractImagesCnt;

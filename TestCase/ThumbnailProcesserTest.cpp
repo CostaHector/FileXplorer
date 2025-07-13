@@ -32,7 +32,7 @@ class ThumbnailProcesserTest : public MyTestSuite {
 
   void test_no_video_need_to_create_thumbnail_imgs() {
     QStringList invalidVideosPath{"", "inexist file", __FILE__};
-    QCOMPARE(ThumbnailProcesser::CreateThumbnailImages(2, 2, 720, invalidVideosPath), 0);
+    QCOMPARE(ThumbnailProcesser::CreateThumbnailImages(invalidVideosPath, 2, 2, 720), 0);
   }
 
   void test_2_videos_need_to_create_thumbnail_imgs() {
@@ -56,10 +56,10 @@ class ThumbnailProcesserTest : public MyTestSuite {
     QStringList validVideosPath{"",                                                                     //
                                 dir.absoluteFilePath("Big Buck Bunny SampleVideo_360x240_1mb 9s.mkv"),  //
                                 dir.absoluteFilePath("Big Buck Bunny SampleVideo_360x240_1mb 10s.flv")};
-    QCOMPARE(ThumbnailProcesser::CreateThumbnailImages(2, 2, 720, validVideosPath, true, 2), 2);
+    QCOMPARE(ThumbnailProcesser::CreateThumbnailImages(validVideosPath, 2, 2, 720, 2, true), 2);
     QVERIFY(dir.exists("Big Buck Bunny SampleVideo_360x240_1mb 9s 22.jpg"));
     QVERIFY(dir.exists("Big Buck Bunny SampleVideo_360x240_1mb 10s 22.jpg"));
-    QCOMPARE(ThumbnailProcesser::CreateThumbnailImages(1, 3, 720, validVideosPath, false, 2), 2);
+    QCOMPARE(ThumbnailProcesser::CreateThumbnailImages(validVideosPath, 1, 3, 720, 2, false), 2);
     QVERIFY(dir.exists("Big Buck Bunny SampleVideo_360x240_1mb 9s 13.png"));
     QVERIFY(dir.exists("Big Buck Bunny SampleVideo_360x240_1mb 10s 13.png"));
   }
@@ -76,10 +76,10 @@ class ThumbnailProcesserTest : public MyTestSuite {
     QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 61"));
     QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 71"));
     QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 81"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 91"));
   }
 
   void test_IsImageNameLooksLikeThumbnail_no() {
+    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 00"));
     QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 11"));
     QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 12"));
     QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 13"));
