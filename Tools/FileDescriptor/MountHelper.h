@@ -4,6 +4,7 @@
 #include <QString>
 
 namespace MountHelper {
+typedef QMap<QString, QSet<QString>> GUID_2_PNTS_SET;
 
 constexpr char GUID_HYPEN = '-', TABLE_UNDERSCORE = '_';
 // GUID_LEN|ROOTPATH
@@ -32,7 +33,6 @@ bool IsAdministrator();
 bool RunAsAdmin();
 
 QString FindRootByGUIDWin(const QString& targetGuid);
-typedef QMap<QString, QSet<QString>> GUID_2_PNTS_SET;
 const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh = false);
 QString GetDisplayNameByGuidTableName(QString guidTableName);
 QMap<QString, QString> GetGuidTableName2DisplayName();
