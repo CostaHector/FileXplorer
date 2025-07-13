@@ -8,13 +8,16 @@ CONFIG += c++11
 LIBS += -L$$PWD/lib
 win32 {
     LIBS += -ldwmapi
-    LIBS += -lMediaInfo
+    LIBS += -lmediaInfo
     # FFmpeg headers path
     INCLUDEPATH += "C:/home/ffmpeg/include"
     # FFmpeg libs path
     LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec -lavutil -lswscale -lws2_32 # Windows network avformat_network_init need
 }
 
+linux {
+    LIBS += -lavformat -lavcodec -lavutil -lswscale
+}
 CONFIG(debug, debug|release) {
     DEFINES += QT_MESSAGELOGCONTEXT
 }
