@@ -88,8 +88,6 @@ struct MemoryKey {
   static const KV LOG_LEVEL_PRINT_INSTANTLY;
   static const KV WIN32_RUNLOG;
 
-  static const KV LINUX_MEDIAINFO_LIB_PATH;
-
   static const KV LINUX_PERFORMERS_TABLE;
   static const KV LINUX_AKA_PERFORMERS;
   static const KV LINUX_STANDARD_STUDIO_NAME;

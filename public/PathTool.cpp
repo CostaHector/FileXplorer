@@ -1,8 +1,8 @@
 ﻿#include "PathTool.h"
 
 #include <QDir>
-#include <QFileInfo>
 #include <QDirIterator>
+#include <QFileInfo>
 
 QString PathTool::StripTrailingSlash(QString path) {
   // drive letter will be kept while trailing path seperator will be trunc
@@ -17,11 +17,21 @@ QString PathTool::StripTrailingSlash(QString path) {
 }
 
 QString PathTool::linkPath(const QString& localPath) {
-  return "file:///" + localPath;
+#ifdef _WIN32
+  return "file:///" + localPath;  // file:///C:/to/path
+#else
+  return "file://" + localPath;  // file:///home/to/path
+#endif
 }
+
 QString PathTool::localPath(const QString& linkPath) {
+#ifdef _WIN32
   return linkPath.mid(8);
+#else
+  return linkPath.mid(7);
+#endif
 }
+
 QString PathTool::sysPath(QString fullPath) {
 #ifdef _WIN32
   return fullPath.replace('/', '\\');

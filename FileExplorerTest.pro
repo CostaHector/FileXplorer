@@ -10,6 +10,9 @@ win32 {
     # FFmpeg libs path
     LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec -lavutil -lswscale -lws2_32 # Windows network avformat_network_init need
 }
+linux {
+    LIBS += -lavformat -lavcodec -lavutil -lswscale
+}
 
 TEMPLATE = app
 
