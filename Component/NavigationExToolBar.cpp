@@ -1,17 +1,25 @@
 ﻿#include "NavigationExToolBar.h"
-#include "Actions/ActionWithPath.h"
 #include "public/PublicMacro.h"
 #include "public/MemoryKey.h"
 
+#include <QDragEnterEvent>
+#include <QToolTip>
+#include <QToolButton>
+#include <QMenu>
+
+#include <QActionGroup>
 #include <QMimeData>
 #include <QFileInfo>
 #include <QApplication>
 #include <QLayout>
-#include <QMenu>
 #include <QStyle>
 
+T_IntoNewPath NavigationExToolBar::m_IntoNewPath;
+
+// toolbar
 NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent)  //
-    : QToolBar{title, parent} {
+    : ReorderableToolBar{title, parent}                                          //
+{
   setObjectName(title);
 
   UNPIN_THIS = new (std::nothrow) QAction{QIcon{":img/UNPIN"}, "Unpin this", this};
@@ -19,7 +27,7 @@ NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent) 
   UNPIN_ALL = new (std::nothrow) QAction{QIcon{":img/UNPIN_ALL"}, "Unpin All", this};
   CHECK_NULLPTR_RETURN_VOID(UNPIN_ALL);
 
-  mMenu = new (std::nothrow) QMenu{this};
+  mMenu = new (std::nothrow) QMenu{"pin and unpin", this};
   CHECK_NULLPTR_RETURN_VOID(mMenu);
   mMenu->addAction(UNPIN_THIS);
   mMenu->addSeparator();
@@ -39,47 +47,73 @@ NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent) 
 void NavigationExToolBar::dragEnterEvent(QDragEnterEvent* event) {
   const QMimeData* pMimeData = event->mimeData();
   CHECK_NULLPTR_RETURN_VOID(pMimeData);
-  qDebug("mimeData urls cnt[%d]", pMimeData->urls().size());
+  if (pMimeData->hasUrls()) {
+    qDebug("mimeData urls cnt[%d]", pMimeData->urls().size());
+    event->acceptProposedAction();
+  } else if (pMimeData->hasText()) {
+    ReorderableToolBar::dragEnterEvent(event);
+    return;
+  }
   event->accept();
 }
 
 void NavigationExToolBar::dropEvent(QDropEvent* event) {
-  if (!event->mimeData()->hasUrls()) {
+  auto* pMimeData = event->mimeData();
+  if (pMimeData->hasUrls()) {
+    const auto& urlsLst = pMimeData->urls();
+    QMap<QString, QString> folderName2AbsPath;
+    foreach (const QUrl& url, urlsLst) {
+      const QString pth{url.toLocalFile()};
+      const QFileInfo fi{pth};
+      if (!fi.isDir()) {
+        continue;
+      }
+      const QString nameShown{fi.isRoot() ? pth : fi.completeBaseName()};
+      folderName2AbsPath[nameShown] = fi.absoluteFilePath();
+    }
+    qDebug("%d link action(s) dropped here...", folderName2AbsPath.size());
+    AppendExtraActions(folderName2AbsPath);
+    SaveName2PathLink();
+  } else {
+    ReorderableToolBar::dropEvent(event);
     return;
   }
-  const auto& urlsLst = event->mimeData()->urls();
-  QMap<QString, QString> folderName2AbsPath;
-  foreach (const QUrl& url, urlsLst) {
-    const QString pth{url.toLocalFile()};
-    const QFileInfo fi(pth);
-    if (!fi.isDir()) {
-      continue;
-    }
-    const QString nameShown{fi.isRoot() ? pth : fi.completeBaseName()};
-    folderName2AbsPath[nameShown] = fi.absoluteFilePath();
-  }
-  qDebug("%d link action(s) dropped here...", folderName2AbsPath.size());
-  AppendExtraActions(folderName2AbsPath);
-  SaveName2PathLink();
-  return QToolBar::dropEvent(event);
+  QToolBar::dropEvent(event);
 }
 
 // accept drag movements only if the target supports drops
 void NavigationExToolBar::dragMoveEvent(QDragMoveEvent* event) {
-  if (!event->mimeData()->hasUrls()) {
+  if (event->mimeData()->hasText()) {
+    ReorderableToolBar::dragMoveEvent(event);
     return;
+  } else if (event->mimeData()->hasUrls()) {
+    // no text has url?
+    event->acceptProposedAction();
+    QToolBar::dragMoveEvent(event);
   }
-  return QToolBar::dragMoveEvent(event);
 }
 
 void NavigationExToolBar::SaveName2PathLink() {
   const QList<QAction*>& actsList = actions();
   PreferenceSettings().beginWriteArray("ExtraNavigationDict", actsList.size());
   int extraIndex = 0;
-  foreach (const QAction* pAct, actsList) {
+
+  foreach (QAction* pAct, actsList) {
+    const QWidget* pWid = widgetForAction(pAct);
+    if (pWid == nullptr) {
+      continue;
+    }
+    const QToolButton* pToolButton = qobject_cast<const QToolButton*>(pWid);
+    if (pToolButton == nullptr) {
+      continue;
+    }
+    const QAction* pPathAct = pToolButton->defaultAction();
+    if (pPathAct == nullptr) {
+      continue;
+    }
     PreferenceSettings().setArrayIndex(extraIndex);
-    PreferenceSettings().setValue("folderName", pAct->text());
-    PreferenceSettings().setValue("absPath", pAct->toolTip());
+    PreferenceSettings().setValue("folderName", pPathAct->text());
+    PreferenceSettings().setValue("absPath", pPathAct->toolTip());
     ++extraIndex;
   }
   PreferenceSettings().endArray();
@@ -101,6 +135,7 @@ void NavigationExToolBar::Subscribe() {
   connect(this, &QToolBar::customContextMenuRequested, this, &NavigationExToolBar::CustomContextMenuEvent);
   connect(UNPIN_THIS, &QAction::triggered, this, &NavigationExToolBar::UnpinThis);
   connect(UNPIN_ALL, &QAction::triggered, this, &NavigationExToolBar::UnpinAll);
+  connect(mCollectPathAgs, &QActionGroup::triggered, this, &NavigationExToolBar::onPathActionTriggered);
 }
 
 void NavigationExToolBar::UnpinThis() {
@@ -131,11 +166,23 @@ void NavigationExToolBar::AlighLeft() {
 }
 
 void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
+  static const auto dirIcon = QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon);
   for (auto it = folderName2AbsPath.cbegin(); it != folderName2AbsPath.cend(); ++it) {
     const QString& folderName = it.key();
     const QString& absPath = it.value();
-    QAction* TEMP_ACTIONS = new ActionWithPath{absPath, QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), folderName, this};
-    addAction(TEMP_ACTIONS);
+    QAction* pCollectionAct = new (std::nothrow) QAction{dirIcon, folderName, this};
+    CHECK_NULLPTR_RETURN_VOID(pCollectionAct)
+    pCollectionAct->setToolTip(absPath);
+    addAction(pCollectionAct);
+    //    connect(pCollectionAct, &QAction::triggered, [pCollectionAct]() {  //
+    //      NavigationExToolBar::onPathActionTriggered(pCollectionAct);      //
+    //    });
   }
   AlighLeft();
+}
+
+bool NavigationExToolBar::onPathActionTriggered(const QAction* pAct) {
+  CHECK_NULLPTR_RETURN_FALSE(m_IntoNewPath);
+  CHECK_NULLPTR_RETURN_FALSE(pAct);
+  return m_IntoNewPath(pAct->toolTip(), true, true);
 }

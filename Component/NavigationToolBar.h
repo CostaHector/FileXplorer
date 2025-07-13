@@ -1,4 +1,4 @@
-#ifndef NAVIGATIONTOOLBAR_H
+﻿#ifndef NAVIGATIONTOOLBAR_H
 #define NAVIGATIONTOOLBAR_H
 
 #include "NavigationExToolBar.h"

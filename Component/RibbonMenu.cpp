@@ -2,6 +2,8 @@
 #include <QMenu>
 #include <QTabBar>
 #include <QToolButton>
+#include "Actions/ActionsRecorder.h"
+#include "Actions/ActionsSearcher.h"
 #include "Actions/ArchiveFilesActions.h"
 #include "Actions/ArrangeActions.h"
 #include "Actions/FileBasicOperationsActions.h"
@@ -27,7 +29,6 @@
 RibbonMenu::RibbonMenu(QWidget* parent)
     : QTabWidget{parent}  //
 {
-  m_corner = GetMenuRibbonCornerWid();
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
   m_leafView = LeafView();
@@ -48,16 +49,27 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
   addTab(m_leafMedia, "&ARRANGE");
 
+  auto& inst = ActionsRecorder::GetInst();
+  inst.FromToolbar(m_leafFile);
+  inst.FromToolbar(m_leafView);
+  inst.FromToolbar(m_leafMedia);
+
+  m_corner = GetMenuRibbonCornerWid();
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
   Subscribe();
-
   setCurrentIndex(PreferenceSettings().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
 }
 
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
-  QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar("corner tools", attached)};
+  QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar{"corner tools", attached}};
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
+  ActionsSearcher* mActSearcher{new (std::nothrow) ActionsSearcher{menuRibbonCornerWid}};
+  CHECK_NULLPTR_RETURN_NULLPTR(mActSearcher);
+  menuRibbonCornerWid->addWidget(mActSearcher);
+  menuRibbonCornerWid->addSeparator();
+  menuRibbonCornerWid->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
+  menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_LogActions()._LOG_FILE);
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
@@ -68,20 +80,28 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 }
 
 QToolBar* RibbonMenu::LeafFile() const {
-  auto* styleToolButton = new DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
+  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
+  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
+  SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+
+  auto* styleToolButton =
+      new (std::nothrow) DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "Change Style");
-  QToolButton* logToolButton = new DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
+  QToolButton* logToolButton =
+      new (std::nothrow) DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   logToolButton->setDefaultAction(g_LogActions()._LOG_FILE);
 
   QToolBar* leafFileWid{new (std::nothrow) QToolBar};
   CHECK_NULLPTR_RETURN_NULLPTR(leafFileWid);
   leafFileWid->addActions(g_fileLeafActions()._LEAF_FILE->actions());
   leafFileWid->addSeparator();
+  leafFileWid->addWidget(syncSwitchToolBar);
+  leafFileWid->addWidget(syncPathToolBar);
+  leafFileWid->addSeparator();
   leafFileWid->addWidget(styleToolButton);
   leafFileWid->addSeparator();
   leafFileWid->addWidget(logToolButton);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-
   return leafFileWid;
 }
 
@@ -119,7 +139,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  auto* newItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  auto* newItemsTB = new (std::nothrow) DropdownToolButton(g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   newItemsTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_NEW_CHOICE.name, MemoryKey::DEFAULT_NEW_CHOICE.v).toString());
   newItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_NEW_CHOICE.name);
 
@@ -144,7 +164,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolBar* cutCopyPasterTb = g_fileBasicOperationsActions().GetCutCopyPasteTb();
   QToolBar* folderOpModeTb = g_fileBasicOperationsActions().GetFolderOperationModeTb();
 
-  QToolButton* recycleItemsTB = new DropdownToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
+  QToolButton* recycleItemsTB = new (std::nothrow) DropdownToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
   recycleItemsTB->setDefaultAction(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN);
 
   QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar{"ArchievePreview"};
@@ -186,11 +206,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
-  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
-  SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-
-  QToolBar* leafHomeWid = new (std::nothrow) QToolBar("LeafHome");
+  QToolBar* leafHomeWid = new (std::nothrow) QToolBar{"LeafHome"};
   CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
   leafHomeWid->setToolTip("Home Leaf ToolBar");
   leafHomeWid->addWidget(openItemsTB);
@@ -214,9 +230,6 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addWidget(compressToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(advanceSearchToolBar);
-  leafHomeWid->addSeparator();
-  leafHomeWid->addWidget(syncSwitchToolBar);
-  leafHomeWid->addWidget(syncPathToolBar);
   return leafHomeWid;
 }
 
@@ -297,12 +310,27 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   nameRulerToolButton->setDefaultAction(fileOpAgInst._NAME_RULER);
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
-  QList<QAction*> thumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,      thumbnailIns._EXTRACT_2ND_IMGS, thumbnailIns._EXTRACT_4TH_IMGS, nullptr, thumbnailIns._CUSTOM_RANGE_IMGS, nullptr,
-                                   thumbnailIns._SKIP_IF_ALREADY_EXIST};
-  auto* thumbnailToolButton = new (std::nothrow) DropdownToolButton(thumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
-  CHECK_NULLPTR_RETURN_NULLPTR(thumbnailToolButton);
-  thumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
-  thumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
+  QList<QAction*> crtThumbnailActions;
+  crtThumbnailActions += thumbnailIns._CREATE_THUMBNAIL_AG->actions();
+  crtThumbnailActions.push_back(nullptr);
+  crtThumbnailActions.push_back(thumbnailIns._THUMBNAIL_SAMPLE_PERIOD);
+  auto* createThumbnailToolButton =
+      new (std::nothrow) DropdownToolButton{crtThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
+  CHECK_NULLPTR_RETURN_NULLPTR(createThumbnailToolButton);
+  createThumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name, MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.v).toString());
+  createThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name);
+
+  QList<QAction*> extractThumbnailActions;
+  extractThumbnailActions += thumbnailIns._EXTRACT_THUMBNAIL_AG->actions();
+  extractThumbnailActions.push_back(nullptr);
+  extractThumbnailActions.push_back(thumbnailIns._CUSTOM_RANGE_IMGS);
+  extractThumbnailActions.push_back(nullptr);
+  extractThumbnailActions.push_back(thumbnailIns._SKIP_IF_ALREADY_EXIST);
+  auto* extractThumbnailToolButton =
+      new (std::nothrow) DropdownToolButton{extractThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
+  CHECK_NULLPTR_RETURN_NULLPTR(extractThumbnailToolButton);
+  extractThumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
+  extractThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
@@ -318,9 +346,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addWidget(thumbnailToolButton);
-  archiveVidsTB->addSeparator();
-  archiveVidsTB->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
+  archiveVidsTB->addWidget(createThumbnailToolButton);
+  archiveVidsTB->addWidget(extractThumbnailToolButton);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
@@ -342,8 +369,6 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addWidget(ag.mEnablePageTB);
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mImageSizeTB);
-  sceneTB->addSeparator();
-  sceneTB->addAction(g_viewActions()._FLOATING_PREVIEW);
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }

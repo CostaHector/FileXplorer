@@ -20,7 +20,6 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), ENUM_2_STR(TABLE));
   _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), ENUM_2_STR(TREE));
   _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENE_TABLE_VIEW"), ENUM_2_STR(SCENE));
-  _FLOATING_PREVIEW = new (std::nothrow) QAction(QIcon(":img/FLOATING_PREVIEW"), "floating preview");
   _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_APP"), ENUM_2_STR(CAST));
   _JSON_VIEW = new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), ENUM_2_STR(JSON));
   _VIEWS_AG = GetViewsAG();
@@ -89,10 +88,6 @@ QActionGroup* ViewActions::GetViewsAG() {
   _MOVIE_VIEW->setShortcutVisibleInContextMenu(true);
   _MOVIE_VIEW->setToolTip(QString("Movie dictionary view aka Database view. (%1)").arg(_MOVIE_VIEW->shortcut().toString()));
   _MOVIE_VIEW->setCheckable(true);
-
-  _FLOATING_PREVIEW->setToolTip(QString("Show floating preview for a scene in scene view. (%1)").arg(_FLOATING_PREVIEW->shortcut().toString()));
-  _FLOATING_PREVIEW->setCheckable(true);
-  _FLOATING_PREVIEW->setChecked(PreferenceSettings().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool());
 
   _CAST_VIEW->setShortcutVisibleInContextMenu(true);
   _CAST_VIEW->setToolTip(QString("Show Cast database. (%1)").arg(_CAST_VIEW->shortcut().toString()));

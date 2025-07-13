@@ -116,7 +116,8 @@ auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& conte
   __FocusNewItem(txtFilePath);
   return isAllSucceed;
 }
-auto FileExplorerEvent::on_NewJsonFile() -> bool {  // not effect by selection;
+
+bool FileExplorerEvent::on_NewJsonFile() {
   if (not __CanNewItem()) {
     return false;
   }
@@ -228,6 +229,41 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   return on_BatchNewFilesOrFolders(namePattern, startIndex, endIndex, isFolder);
 }
 
+bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx) {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  const QStringList& selectedFiles = selectedItems();
+  if (selectedFiles.isEmpty()) {
+    Notificator::information("Skip nothing selected", "selected some video(s) first");
+    return true;
+  }
+  if (!ThumbnailProcesser::IsDimensionXValid(dimensionX)) {
+    Notificator::information("Dimension of row invalid", QString::number(dimensionX));
+    return false;
+  }
+  if (!ThumbnailProcesser::IsDimensionYValid(dimensionY)) {
+    Notificator::information("Dimension of column invalid", QString::number(dimensionY));
+    return false;
+  }
+  if (!ThumbnailProcesser::IsWidthPixelAllowed(widthPx)) {
+    Notificator::information("images width invalid", QString::number(widthPx));
+    return false;
+  }
+  const int curSamplePeriod = PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
+  if (!ThumbnailProcesser::IsSamplePeriodAllowed(curSamplePeriod)) {
+    Notificator::information("Sample period not allowed", QString::number(curSamplePeriod));
+    return false;
+  }
+  const int cnt = ThumbnailProcesser::CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, curSamplePeriod, true);
+  if (cnt <= 0) {
+    Notificator::badNews("Create thumbnail failed", "see details in log");
+    return false;
+  }
+  Notificator::goodNews("Create thumbnail(s) for video(s) succeed. count: ", QString::number(cnt));
+  return true;
+}
+
 bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist) {
   if (!__CanNewItem()) {
     return false;
@@ -275,7 +311,7 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   const QString& imgFileAbsPathGuess = QDir::toNativeSeparators(noExtAbsFilePath) + ' ';
   QApplication::clipboard()->setText(imgFileAbsPathGuess, QClipboard::Mode::Clipboard);
   QString fileBaseName = PathTool::GetBaseName(absFilePath);
-  const QString& forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, " ");
+  const QString& forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_GOOGLE_SEARCH_LETTER, " ");
   QStringList searchKeyWordArgs;
   if (!forSearch.isEmpty()) {
     const static QString HTML_URL_TEMPLATE{"https://www.google.com/search?&q=%1&udm=2"};
@@ -364,31 +400,67 @@ void FileExplorerEvent::subsribeFileActions() {
 
 void FileExplorerEvent::subscribeThumbnailActions() {
   auto& ins = g_ThumbnailProcessActions();
-  connect(ins._EXTRACT_1ST_IMG, &QAction::triggered, this, [this, &ins]() {
-    bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    on_ExtractImagesFromThumbnail(0, 1, bSkipExist);
+  connect(ins._CREATE_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* createThumbnailAct) {
+    auto it = ins.mCreateThumbnailDimension.find(createThumbnailAct);
+    if (it == ins.mCreateThumbnailDimension.cend()) {
+      qWarning("create thumbnail action[%p] not support", createThumbnailAct);
+      return;
+    }
+    int dimensionX = it->x, dimensionY = it->y, widthPixel = it->width;
+    on_CreateThumbnailImages(dimensionX, dimensionY, widthPixel);
   });
-  connect(ins._EXTRACT_2ND_IMGS, &QAction::triggered, this, [this, &ins]() {
-    bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    on_ExtractImagesFromThumbnail(0, 2, bSkipExist);
-  });
-  connect(ins._EXTRACT_4TH_IMGS, &QAction::triggered, this, [this, &ins]() {
-    bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    on_ExtractImagesFromThumbnail(0, 4, bSkipExist);
-  });
-  connect(ins._CUSTOM_RANGE_IMGS, &QAction::triggered, this, [this, &ins]() {
-    bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
+
+  connect(ins._THUMBNAIL_SAMPLE_PERIOD, &QAction::triggered, this, [this]() {
     bool bok = false;
-    int beg = QInputDialog::getInt(this->_contentPane, "Extract image start index", "beg=", 0, 0, 100, 1, &bok);
+    const int curSamplePeriod = PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
+    const int newSamplePeriod = QInputDialog::getInt(this->_contentPane, "Thumbnail Sample Period(seconds)",                              //
+                                                     "Set thumbnail image sample period to:", curSamplePeriod,             //
+                                                     ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX, 1,  //
+                                                     &bok);
     if (!bok) {
-      qWarning("User input image start index invalid");
+      Notificator::information("User input[%s] invalid or canceled", QString::number(newSamplePeriod));
       return;
     }
-    int end = QInputDialog::getInt(this->_contentPane, "Extract image end index", "end=", 9, beg, 9, 1, &bok);
-    if (!bok) {
-      qWarning("User input image end index invalid");
+    if (newSamplePeriod == curSamplePeriod) {
       return;
     }
+    PreferenceSettings().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, newSamplePeriod);
+    Notificator::goodNews("New thumbnail image sample period has been set to", QString::number(newSamplePeriod));
+  });
+
+  connect(ins._EXTRACT_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* extractThumbnailAct) {
+    auto it = ins.mExtractThumbnailRange.find(extractThumbnailAct);
+    if (it == ins.mExtractThumbnailRange.cend()) {
+      qWarning("extract thumbnail action[%p] not support", extractThumbnailAct);
+      return;
+    }
+    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
+    const int startIndex = it->startIndex, endIndex = it->endIndex;
+    on_ExtractImagesFromThumbnail(startIndex, endIndex, bSkipExist);
+  });
+
+  connect(ins._CUSTOM_RANGE_IMGS, &QAction::triggered, this, [this, &ins]() {
+    bool ok = false;
+    const QString input = QInputDialog::getText(this->_contentPane, "Extract image range",  //
+                                                "Enter range (e.g., 1,3; 1,4; 1,7):",       //
+                                                QLineEdit::Normal, "0,9", &ok);             //
+    if (!ok || input.isEmpty()) {
+      Notificator::information("User input[%s] invalid or canceled", qPrintable(input));
+      return;
+    }
+    static const QRegularExpression regex(R"(^\d,\d$)");
+    QRegularExpressionMatch match = regex.match(input);
+    if (!match.hasMatch()) {
+      Notificator::warning("Invalid format[%s]! Expected format: \\d,\\d", input);
+      return;
+    }
+    const int beg = match.captured(1).toInt();
+    const int end = match.captured(2).toInt();
+    if (beg < 0 || end < beg) {
+      Notificator::warning("Invalid range[%s]! Ensure 0 < beg <= end", input);
+      return;
+    }
+    bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
     on_ExtractImagesFromThumbnail(beg, end, bSkipExist);
   });
 }
@@ -1385,9 +1457,9 @@ bool FileExplorerEvent::SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAc
   mimeData.setData("Preferred DropEffect", preferred);
 #else
   if (dropAction == Qt::DropAction::MoveAction) {
-    mimeData.setData("XdndAction", "XdndActionMove");  // 剪切操作标识符:ml-citation{ref="10" data="citationList"}
+    mimeData.setData("XdndAction", "XdndActionMove");
   } else if (dropAction == Qt::DropAction::CopyAction) {
-    mimeData.setData("XdndAction", "XdndActionCopy");  // 复制操作标识符:ml-citation{ref="10" data="citationList"}
+    mimeData.setData("XdndAction", "XdndActionCopy");
   } else {
     qWarning("cannot refill base DropEffect");
     return false;
