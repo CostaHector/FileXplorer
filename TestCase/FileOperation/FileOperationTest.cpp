@@ -561,7 +561,8 @@ class FileOperationTest : public MyTestSuite {
     QVERIFY(!dir.fileExists("home/a.txt", false));
 
     QDir binDir{dir.itemPath("bin")};
-    QCOMPARE(binDir.entryList(QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name), (QStringList{"A.TXT", "a.txt"}));
+    QCOMPARE(binDir.entryList(QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name), //
+             (QStringList{"A.TXT", "a.txt"}));
 #endif
   }
 
