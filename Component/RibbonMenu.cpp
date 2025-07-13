@@ -310,22 +310,22 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   nameRulerToolButton->setDefaultAction(fileOpAgInst._NAME_RULER);
 
   auto& thumbnailIns = g_ThumbnailProcessActions();
-  QList<QAction*> createThumbnailActions{thumbnailIns._CREATE_1_BY_1_THUMBNAIL,  //
-                                         thumbnailIns._CREATE_2_BY_2_THUMBNAIL,  //
-                                         thumbnailIns._CREATE_3_BY_3_THUMBNAIL};
+  QList<QAction*> crtThumbnailActions;
+  crtThumbnailActions += thumbnailIns._CREATE_THUMBNAIL_AG->actions();
+  crtThumbnailActions.push_back(nullptr);
+  crtThumbnailActions.push_back(thumbnailIns._THUMBNAIL_SAMPLE_PERIOD);
   auto* createThumbnailToolButton =
-      new (std::nothrow) DropdownToolButton{createThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
+      new (std::nothrow) DropdownToolButton{crtThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
   CHECK_NULLPTR_RETURN_NULLPTR(createThumbnailToolButton);
   createThumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name, MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.v).toString());
   createThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name);
 
-  QList<QAction*> extractThumbnailActions{thumbnailIns._EXTRACT_1ST_IMG,    //
-                                          thumbnailIns._EXTRACT_2ND_IMGS,   //
-                                          thumbnailIns._EXTRACT_4TH_IMGS,   //
-                                          nullptr,                          //
-                                          thumbnailIns._CUSTOM_RANGE_IMGS,  //
-                                          nullptr,                          //
-                                          thumbnailIns._SKIP_IF_ALREADY_EXIST};
+  QList<QAction*> extractThumbnailActions;
+  extractThumbnailActions += thumbnailIns._EXTRACT_THUMBNAIL_AG->actions();
+  extractThumbnailActions.push_back(nullptr);
+  extractThumbnailActions.push_back(thumbnailIns._CUSTOM_RANGE_IMGS);
+  extractThumbnailActions.push_back(nullptr);
+  extractThumbnailActions.push_back(thumbnailIns._SKIP_IF_ALREADY_EXIST);
   auto* extractThumbnailToolButton =
       new (std::nothrow) DropdownToolButton{extractThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
   CHECK_NULLPTR_RETURN_NULLPTR(extractThumbnailToolButton);
