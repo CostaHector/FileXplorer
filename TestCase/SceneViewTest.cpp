@@ -136,17 +136,19 @@ class SceneViewTest : public MyTestSuite {
     QCOMPARE(afterScenes[0].name, "somejsonfile1");
     QCOMPARE(afterScenes[0].imgs, (QStringList{}));
     QCOMPARE(afterScenes[0].vidName, "");
+    QCOMPARE(afterScenes[0].uploaded, "06:40 23-Sep-2024");
 
     QCOMPARE(afterScenes[1].name, "somejsonfile2");
     QCOMPARE(afterScenes[1].imgs, (QStringList{}));
     QCOMPARE(afterScenes[1].vidName, "");
+    QCOMPARE(afterScenes[1].uploaded, "06:40 23-Sep-2024");
 
     QCOMPARE(afterScenes[2].name, "somejsonfileEmpty");
     QCOMPARE(afterScenes[2].imgs, QStringList{"somejsonfileEmpty.png"});
     QCOMPARE(afterScenes[2].vidName, "somejsonfileEmpty.mp4");
     QVERIFY(afterScenes[2].vidSize > 0);
     QCOMPARE(afterScenes[2].rate, 0);
-    QCOMPARE(afterScenes[2].uploaded.size(), QString("yyyyMMdd hh:mm:ss").size());
+    QCOMPARE(afterScenes[2].uploaded, "");
   }
 
   void test_WriteScenesIntoScnFile() {
