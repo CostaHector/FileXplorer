@@ -16,7 +16,7 @@ const KV MemoryKey::PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./
 
 const KV MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW{"KEEP_VIDEOS_PLAYLIST_SHOW", false, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::AUTO_PLAY_NEXT_VIDEO("AUTO_PLAY_NEXT_VIDEO", false, ValueChecker{PLAIN_BOOL});
-const KV MemoryKey::SHOW_FOLDER_PREVIEW_HTML("SHOW_FOLDER_PREVIEW_HTML", true, ValueChecker{PLAIN_BOOL});
+const KV MemoryKey::SHOW_FOLDER_PREVIEW("SHOW_FOLDER_PREVIEW", true, ValueChecker{PLAIN_BOOL});
 const KV MemoryKey::FOLDER_PREVIEW_TYPE{"FOLDER_PREVIEW_TYPE", "labels", ValueChecker{{"3-lists", "browser", "lists"}, CANDIDATE_STRING}};
 const KV MemoryKey::SHOW_FLOATING_PREVIEW{"SHOW_FLOATING_PREVIEW", true, ValueChecker{PLAIN_BOOL}};
 
@@ -32,13 +32,15 @@ const KV MemoryKey::DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", 
 const KV MemoryKey::DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
                                           "Rename (ith)",
                                           ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"}, CANDIDATE_STRING});
+const KV MemoryKey::DEFAULT_THUMBNAILS_DIMENSION("DEFAULT_THUMBNAILS_DIMENSION", "Create 2x2 thumbnail", ValueChecker{PLAIN_STR});
+const KV MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD{"DEFAULT_THUMBNAIL_SAMPLE_PERIOD", 20, ValueChecker{1, 300}};
 const KV MemoryKey::DEFAULT_EXTRACT_CHOICE("DEFAULT_EXTRACT_CHOICE",
                                            "Extract [0, 2) imgs",
                                            ValueChecker{{"Thumbnail Extractor", "Extract [0, 2) imgs", "Extract [0, 4) imgs", "Extract [b, e) imgs"}, CANDIDATE_STRING});
 
 const KV MemoryKey::MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
 const KV MemoryKey::COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
-const KV MemoryKey::FILE_SYSTEM_STRUCTURE_WAY{"FILE_SYSTEM_STRUCTURE_WAY", 0, ValueChecker{PLAIN_INT, 0}};
+const KV MemoryKey::FILE_SYSTEM_STRUCTURE_WAY{"FILE_SYSTEM_STRUCTURE_WAY", 0, ValueChecker{PLAIN_INT}};
 const KV MemoryKey::WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{PLAIN_STR});
 
 const KV MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, ValueChecker{0});
@@ -87,7 +89,7 @@ const KV MemoryKey::WIN32_PERFORMERS_TABLE("PERFORMERS_TABLE", "../bin/PERFORMER
 const KV MemoryKey::WIN32_AKA_PERFORMERS("AKA_PERFORMERS", "../bin/AKA_PERFORMERS.txt", ValueChecker{{".txt"}, EXT_SPECIFIED_FILE_PATH});
 const KV MemoryKey::WIN32_STANDARD_STUDIO_NAME("STANDARD_STUDIO_NAME", "../bin/STANDARD_STUDIO_NAME.txt", ValueChecker{{".txt"}, EXT_SPECIFIED_FILE_PATH});
 const KV MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH("TERMINAL_OPEN_BATCH_FILE_PATH", "../bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat", ValueChecker{{".bat"}, EXT_SPECIFIED_FILE_PATH});
-const KV MemoryKey::LOG_DEVEL_DEBUG{"LOG_DEVEL_DEBUG", false, ValueChecker{PLAIN_BOOL}};
+const KV MemoryKey::LOG_LEVEL_PRINT_INSTANTLY{"LOG_LEVEL_PRINT_INSTANTLY", QtMsgType::QtWarningMsg, ValueChecker{PLAIN_INT}};
 const KV MemoryKey::WIN32_RUNLOG("RUNLOG", "../bin", ValueChecker{FOLDER_PATH});
 
 const KV MemoryKey::LINUX_MEDIAINFO_LIB_PATH("MEDIAINFO_LIB_PATH", "../lib/MediaInfo.dll", ValueChecker{{".dll"}, EXT_SPECIFIED_FILE_PATH});
@@ -107,4 +109,3 @@ const KV RedunImgFinderKey::GEOMETRY{"RedunImgFinderKey/GEOMETRY", {}, ValueChec
 const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
 const KV RedunImgFinderKey::WIN32_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
 const KV RedunImgFinderKey::LINUX_RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
-

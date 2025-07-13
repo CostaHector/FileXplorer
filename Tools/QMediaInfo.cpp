@@ -1,7 +1,6 @@
 #ifdef _WIN32
 
 #include "QMediaInfo.h"
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include <QFileInfo>
 #include <QTime>
@@ -16,6 +15,7 @@
 #define InitMediaInfo_CharArr(arrayName, initialLiteralString) MediaInfo_Char arrayName[] = initialLiteralString
 #endif
 
+#ifdef _WIN32
 QMediaInfo::~QMediaInfo() {
   if (pLib != nullptr) {
     MEDIAINFO_Delete d = (MEDIAINFO_Delete)pLib->resolve("MediaInfo_Delete");
@@ -58,13 +58,10 @@ const MediaInfo_Char* QMediaInfo::Get(MediaInfo_stream_C streamKind, int streamN
 }
 
 #ifdef _WIN32
-const MediaInfo_Char QMediaInfo::m_prop[]{
-                                          L"Duration/String3"};
+const MediaInfo_Char QMediaInfo::m_prop[]{L"Duration/String3"};
 #else
-const MediaInfo_Char QMediaInfo::m_prop[]{
-                                          "Duration/String3"};
+const MediaInfo_Char QMediaInfo::m_prop[]{"Duration/String3"};
 #endif
-
 
 bool QMediaInfo::IsLoaded() const {
   return pLib != nullptr && pLib->isLoaded();
@@ -163,7 +160,6 @@ QList<int> QMediaInfo::batchVidsDurationLength(const QStringList& vidsAbsPath) c
   }
   if (!IsLoaded()) {
     qWarning("_lib not loaded");
-
   }
   MEDIAINFO_Get get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
   if (!get) {
@@ -336,4 +332,13 @@ QString QMediaInfo::FileExtension() const {
   InitMediaInfo_CharArr(prop, "FileExtension");
   return QStringFromMediaInfoc_str(Get(MediaInfo_Stream_General, 0, prop, MediaInfo_Info_Text, MediaInfo_Info_Name));
 }
+
+extern "C" {
+#include <libavformat/avformat.h>
+}
+void testFFmpeg() {
+  avformat_network_init();
+  qWarning("FFmpeg version:%u", avformat_version());
+}
+
 #endif

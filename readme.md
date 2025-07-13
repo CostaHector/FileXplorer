@@ -8,57 +8,56 @@ FileXplorer is a cross-platform professional file management system engineered f
 
 ## Core Features
 
-1. File/Folder Navigation
+1. File/Folder Preview & ‌Sidebar Navigation‌
 
-        - Dual-pane explorer interface
-        - Thumbnail/preview for 100+ file formats
-        - Dark/light theme support
+        (1). Enables categorized preview of folder contents without opening them;
 
-2. Advanced Batch Renaming
+        (2). Simply select any folder to view its items in the right-side preview pane;
 
-        - Plain Text Insert/replace/Delete
-        - Regex String Insert/replace/Delete
-        - Case operations: UPPER/lower/Title/toggleCase
-        - Segment swapping (e.g., "Marvil - S01E02 - 2012" → "Marvil - 2012 - S01E02")
-        - Auto-numbering with customizable templates
+        (3). Configurable file type filters and customizable default display order
 
-3. Professional Tools
+        (4). Supports drag-and-drop bookmarking for multiple folders simultaneously;
 
-        - Media Management:
-        - Duplicate image detection
-        - Batch video duration viewer
-        - Media metadata to database export
-        - Cast and their films database by media database export 
+        (5). Provides both automatic (alphabetical/path-based) and manual sorting options;
 
-4. Developer Features:
+        (6). All bookmark configurations persist to local settings file;
 
-        - HAR file previewer
-        - JSON batch editor (build media databases)
-        - MD5 checksum comparator
+2. File Batch Renaming Operations (with Preview Window)
 
-4. Smart Operations
+        (1). Basic string operations (add/delete/replace) with regex support (e.g. "wifi" → "Wi-Fi");
 
-        - F1 quick-search across files
-        - One-click file organization by patterns
-        - Multi-path synchronization
+        (2). Case conversion: UPPERCASE/lowercase/Title Case/Sentence case/tOgGlE cAsE;
 
-5. Content-aware search
+        (3). Columnize strings by delimiter and reorder segments (e.g. "Marvel - S01E02 - 2012" → "Marvel - 2012 - S01E02");
 
-        - Search by filename
-        - Search by file content
-        - Search by filename + file content
+        (4). Sequential numbering with customizable patterns/start values (e.g. "Trip - Scenery - %d", start=3);
 
-6. File/Folder Operation Recoverable
+3. Multi-path Synchronization
+Automatically mirrors operations from source folder to designated mirror folders;
 
-        - Each operation will be saved in memory. Operation can be undo(recovered) by shortcut `Ctrl+Z` and Redo by shortcut `Ctrl+Y`.
+4. Deep Search Functionality
+File/folder search by: filename, content, or combined criteria;
 
-        Attention:
-                - All undo history purges upon application termination/restart. So operation cannot be recovered after restart;
-                - Permanent deletion operations cannot be recovered;
+5. Accessibility
+Fuzzy matching of action names in dropdowns to bypass hierarchical menu navigation;
 
-7. Dark/Light theme switch support
+6. Advanced Features:
+
+        (1)‌. Image Deduplication‌: Preview detected duplicates for manual confirmation before deletion;
+
+        (2)‌. ‌Video Deduplication‌: Compares filename, size, duration, and partial hash (first XX MB);
+
+        (3)‌. ‌‌One-click Categorization‌: Group related images/videos/documents into folders with undo support;
+
+        (4)‌. ‌‌Video Metadata Export‌: Saves to MOVIES table (filename/size/duration/MD5) with VIDEOS view for management;
+
+        (5)‌. ‌‌Audit Trail‌: Manual/scheduled updates to MOVIES table after file changes, logging modification counts;
+
+        (6)‌. ‌‌File Comparison‌: Quick MD5/size checks for identity verification
+
+7. UI Themes
+Light/Dark theme support with automatic time-based switching or manual lock;
 ![FileXplorer](bin/FileXplorer_Light.png)
-
 
 
 ## Coding Style
@@ -159,10 +158,36 @@ for (int i = 0; i < paths.size(); ++i) {
 }
 ```
 
+## get video duration using FFmpeg/libav
+Download `ffmpeg-7.1.1-full_build-shared.7z` and extract to a path. then add this path to system environment path.
+
+Here we assume path is "C:\home\ffmpeg"
+
+```pro
+win32 {
+    # FFmpeg headers path
+    INCLUDEPATH += "C:/home/ffmpeg/include"
+    # FFmpeg libs path
+    LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec  -lavutil -lswscale -lws2_32 -lsecur32
+}
+```
+
+```cpp
+#include <QDebug>
+extern C{
+#include <libavformat/avformat.h>
+}
+void testFFmpeg() {
+    avformat_network_init();
+    qDebug() << "FFmpeg version:" << avformat_version();
+}
+```
+
+
 ## Testcase
 ### Table 1.0 Expected Behavior of rename Functions
 ```cpp
-RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const QString& newCompleteName)
+RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const QString& newCompleteName);
 ```
 | srcPath | oldCompleteName | newCompleteName | exist items in srcPath | result |
 |---------|-----------------|-----------------|---------------------------------------------------|--------|
@@ -177,7 +202,7 @@ RETURN_TYPE rename(const QString& srcPath, const QString& oldCompleteName, const
 
 ### Table 1.1 Expected Behavior of mv Functions
 ```cpp
-RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& dstPath)`
+RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& dstPath);
 ```
 | srcPath | relToItem | dstPath | exist items in dstPath | result |
 |---------|-----------|---------|---------------------------------------------------|--------|
@@ -193,7 +218,7 @@ RETURN_TYPE mv(const QString& srcPath, const QString& relToItem, const QString& 
 
 ### Table 1.2 Expected Behavior of rmpath Functions
 ```cpp
-RETURN_TYPE rmpath(const QString& pre, const QString& dirPath)
+RETURN_TYPE rmpath(const QString& pre, const QString& dirPath);
 ```
 | srcPath | relToItem | exist items in srcPath | result |
 |---------|-----------|---------------------------------------------------|--------|
@@ -204,7 +229,7 @@ RETURN_TYPE rmpath(const QString& pre, const QString& dirPath)
 
 ### Table 1.3 Expected Behavior of mkpath Functions
 ```cpp
-RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
+RETURN_TYPE mkpath(const QString& pre, const QString& dirPath);
 ```
 | srcPath | relToItem | exist items in srcPath | result |
 |---------|-----------|---------------------------------------------------|--------|
@@ -223,7 +248,7 @@ RETURN_TYPE mkpath(const QString& pre, const QString& dirPath)
 
 ### Table 1.5 Expected Behavior of function FileOperation::executer
 ```cpp
-RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
+RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch);
 ```
 
 | `QList<ACMD>` | precondition | `bFastFail` | `ErrorCode` | `AllRecoverCmds` |

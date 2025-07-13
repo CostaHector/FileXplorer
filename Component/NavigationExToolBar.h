@@ -1,12 +1,11 @@
-#ifndef NAVIGATIONEXTOOLBAR_H
+﻿#ifndef NAVIGATIONEXTOOLBAR_H
 #define NAVIGATIONEXTOOLBAR_H
 
-#include <QDragEnterEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QToolBar>
+#include "public/PublicVariable.h"
+#include "ReorderableToolBar.h"
 
-class NavigationExToolBar : public QToolBar {
+class NavigationExToolBar : public ReorderableToolBar {
+  Q_OBJECT
  public:
   explicit NavigationExToolBar(const QString& title, QWidget* parent = nullptr);
 
@@ -24,13 +23,17 @@ class NavigationExToolBar : public QToolBar {
   void CustomContextMenuEvent(const QPoint& pnt);
 
   void AlighLeft();
-
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
+  static void BindIntoNewPath(T_IntoNewPath IntoNewPath) { m_IntoNewPath = IntoNewPath; }
+  static bool onPathActionTriggered(const QAction* pAct);
 
  private:
+  static T_IntoNewPath m_IntoNewPath;
+
   QPoint mRightClickAtPnt;
-  QAction *UNPIN_THIS, *UNPIN_ALL;
-  QMenu* mMenu;
+  QPoint mDragStartPosition;
+  QAction *UNPIN_THIS{nullptr}, *UNPIN_ALL{nullptr};
+  QMenu* mMenu{nullptr};
 };
 
 #endif  // NAVIGATIONEXTOOLBAR_H

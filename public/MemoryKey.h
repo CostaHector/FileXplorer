@@ -23,7 +23,7 @@ struct MemoryKey {
 
   static const KV KEEP_VIDEOS_PLAYLIST_SHOW;
   static const KV AUTO_PLAY_NEXT_VIDEO;
-  static const KV SHOW_FOLDER_PREVIEW_HTML;
+  static const KV SHOW_FOLDER_PREVIEW;
   static const KV FOLDER_PREVIEW_TYPE;
   static const KV SHOW_FLOATING_PREVIEW;
 
@@ -37,6 +37,8 @@ struct MemoryKey {
   static const KV DEFAULT_NEW_CHOICE;
   static const KV DEFAULT_COPY_CHOICE;
   static const KV DEFAULT_RENAME_CHOICE;
+  static const KV DEFAULT_THUMBNAILS_DIMENSION;
+  static const KV DEFAULT_THUMBNAIL_SAMPLE_PERIOD;
   static const KV DEFAULT_EXTRACT_CHOICE;
   static const KV MOVE_TO_PATH_HISTORY;
   static const KV COPY_TO_PATH_HISTORY;
@@ -83,7 +85,7 @@ struct MemoryKey {
   static const KV WIN32_AKA_PERFORMERS;
   static const KV WIN32_STANDARD_STUDIO_NAME;
   static const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH;
-  static const KV LOG_DEVEL_DEBUG;
+  static const KV LOG_LEVEL_PRINT_INSTANTLY;
   static const KV WIN32_RUNLOG;
 
   static const KV LINUX_MEDIAINFO_LIB_PATH;
