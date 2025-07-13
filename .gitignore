@@ -5,9 +5,7 @@ FileXplorer_zh_CN.qm
 FileExplorerTest.pro.*
 FileExplorerTest.pro.user.*
 
-bin/RUNLOG/*.log
-bin/lib/*
-bin/lib/*
+bin/*.txt
 bin/.gitignore
 ./*.json
 *.idx
