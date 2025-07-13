@@ -22,6 +22,7 @@ class PathToolTest : public MyTestSuite {
 #endif
   }
   void test_StripTrailingSlash() {
+#ifdef _WIN32
     // Disk A to Disk Z
     QCOMPARE(StripTrailingSlash("A:/"), "A:/");
     QCOMPARE(StripTrailingSlash("C:/"), "C:/");
@@ -29,19 +30,24 @@ class PathToolTest : public MyTestSuite {
     QCOMPARE(StripTrailingSlash("XX:/A/"), "XX:/A");
     QCOMPARE(StripTrailingSlash("XX:/"), "XX:/");
     QCOMPARE(StripTrailingSlash("XX:"), "XX:");
+#endif
     QCOMPARE(StripTrailingSlash("/home/user/"), "/home/user");
     QCOMPARE(StripTrailingSlash("/home/user"), "/home/user");
     QCOMPARE(StripTrailingSlash("/"), "/");
   }
 
   void test_linkAndLocalPath() {
+#ifdef _WIN32
     QCOMPARE(linkPath("anyfile.txt"), "file:///anyfile.txt");
-    QCOMPARE(linkPath("kmeans.data"), "file:///kmeans.data");
-    QCOMPARE(linkPath("henry cavill.png"), "file:///henry cavill.png");
+    QCOMPARE(linkPath("C:/henry cavill.png"), "file:///C:/henry cavill.png");
 
     QCOMPARE(localPath("file:///anyfile.txt"), "anyfile.txt");
-    QCOMPARE(localPath("file:///kmeans.data"), "kmeans.data");
-    QCOMPARE(localPath("file:///henry cavill.png"), "henry cavill.png");
+    QCOMPARE(localPath("file:///C:/henry cavill.png"), "C:/henry cavill.png");
+#else
+    // absolute path must
+    QCOMPARE(linkPath("/home/henry cavill.png"), "file:///home/henry cavill.png");
+    QCOMPARE(localPath("file:///home/henry cavill.png"), "/home/henry cavill.png");
+#endif
   }
 
   void test_forSearchPath() {
@@ -206,7 +212,8 @@ class PathToolTest : public MyTestSuite {
     QCOMPARE(GetBaseNameExt("C:/home/file.m"), std::make_pair(QString("file"), QString(".m")));
     QCOMPARE(GetBaseNameExt("a.txt"), std::make_pair(QString("a"), QString(".txt")));
     QCOMPARE(GetBaseNameExt("a"), std::make_pair(QString("a"), QString("")));
-    QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"), std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));
+    QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"),
+             std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));
   }
 
   void test_GetBaseNameExt_Scene01() {

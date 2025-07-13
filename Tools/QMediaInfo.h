@@ -1,15 +1,8 @@
 #ifndef QMEDIAINFO_H
 #define QMEDIAINFO_H
 
-#include <QLibrary>
-#include <string>
-#include "lib/MediaInfoDLL.h"
-
 #ifdef _WIN32
-typedef wchar_t MediaInfo_Char;
-#else
-typedef char MediaInfo_Char;
-#endif
+#include <QLibrary>
 
 // typedef void* (*MEDIAINFO_New)();
 // typedef void (*MEDIAINFO_Delete)(void*);
@@ -17,6 +10,8 @@ typedef char MediaInfo_Char;
 // typedef MediaInfo_Char* (*MEDIAINFO_Inform)(void*, long);
 // typedef MediaInfo_Char* (*MEDIAINFO_Get)(void*, int, int, MediaInfo_Char *, int, int);
 
+#include "lib/MediaInfoDLL.h"
+typedef wchar_t MediaInfo_Char;
 class QMediaInfo {
  public:
   QMediaInfo() = default;
@@ -66,5 +61,6 @@ class QMediaInfo {
   MEDIAINFO_Open m_open{nullptr};
   static const MediaInfo_Char m_prop[];
 };
+#endif
 
 #endif  // QMEDIAINFO_H
