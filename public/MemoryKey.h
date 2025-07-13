@@ -38,6 +38,7 @@ struct MemoryKey {
   static const KV DEFAULT_COPY_CHOICE;
   static const KV DEFAULT_RENAME_CHOICE;
   static const KV DEFAULT_THUMBNAILS_DIMENSION;
+  static const KV DEFAULT_THUMBNAIL_SAMPLE_PERIOD;
   static const KV DEFAULT_EXTRACT_CHOICE;
   static const KV MOVE_TO_PATH_HISTORY;
   static const KV COPY_TO_PATH_HISTORY;
