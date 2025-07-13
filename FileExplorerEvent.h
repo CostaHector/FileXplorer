@@ -41,7 +41,7 @@ class FileExplorerEvent : public QObject {
   auto on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false) -> bool;
   auto on_BatchNewFilesOrFolders(bool isFolder = false) -> bool;
 
-  bool on_createThumbnailImages(int dimensionX, int dimensionY, int widthPx);
+  bool on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx);
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
 
   auto selectedIndexesProxyToSource() const -> QModelIndexList;
