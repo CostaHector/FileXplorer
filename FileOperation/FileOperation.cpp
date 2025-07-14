@@ -34,7 +34,7 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
     if (!returnEle) {
       const QString& cmdStr{cmds.toStr(returnEle.ret)};
       if (b_fastFail) {
-        qCritical("[Error] Stop at the %d+1th cmd: %s", i + 1, qPrintable(cmdStr));
+        qCritical("[Error] Stop at the %dth cmd: %s", i + 1, qPrintable(cmdStr));
         return {returnEle.ret, allRecoverList};
       }
       failedCmds += QString::number(i);
