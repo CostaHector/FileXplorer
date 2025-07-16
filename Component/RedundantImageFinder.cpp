@@ -89,9 +89,14 @@ void RedundantImageFinder::subscribe() {
   connect(inst.ALSO_EMPTY_IMAGE, &QAction::triggered, this, [](bool recycleEmptyImage) -> void {  //
     PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, recycleEmptyImage);
   });
-  connect(inst.FIND_DUPLICATE_IMGS_BY_LIBRARY, &QAction::triggered, this, [this]() { this->operator()(this->mCurrentPath); });
+  connect(inst.FIND_DUPLICATE_IMGS_BY_LIBRARY, &QAction::triggered, this, [this]() {  //
+    this->operator()(this->mCurrentPath);
+  });
   connect(inst.OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered, this, []() {  //
     QDesktopServices::openUrl(QUrl::fromLocalFile(mRedunLibs.GetRedunPath()));
+  });
+  connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& clickedIndex) {  //
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_imgModel->filePath(clickedIndex)));
   });
 }
 

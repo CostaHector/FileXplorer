@@ -51,7 +51,7 @@ QString PathTool::absolutePath(const QString& fullPath) {
     return fullPath;
   }
   QString noSingleTrailingSlash = fullPath;
-  if (fullPath.size() > 1 and fullPath.back() == '/') {
+  if (fullPath.size() > 1 && fullPath.back() == '/') {
     noSingleTrailingSlash.chop(1);
   }
 #ifdef WIN32
@@ -70,7 +70,7 @@ QString PathTool::forSearchPath(const QString& fullPath) {
   // get QString for database index last three sectors
   int forwardSlashLetterCnt = 0;
   for (int i = fullPath.size() - 1; i > -1; --i) {
-    if (fullPath[i] == '/' and ++forwardSlashLetterCnt == 3) {
+    if (fullPath[i] == '/' && ++forwardSlashLetterCnt == 3) {
       return fullPath.mid(i + 1);
     }
   }
