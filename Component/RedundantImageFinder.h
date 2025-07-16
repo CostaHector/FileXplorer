@@ -1,4 +1,4 @@
-#ifndef REDUNDANTIMAGEFINDER_H
+﻿#ifndef REDUNDANTIMAGEFINDER_H
 #define REDUNDANTIMAGEFINDER_H
 
 #include "Model/RedundantImageModel.h"
@@ -8,9 +8,9 @@
 class RedundantImageFinder : public QMainWindow {
  public:
   explicit RedundantImageFinder(QWidget* parent = nullptr);
-  ~RedundantImageFinder();
+  ~RedundantImageFinder() = default;
   void ReadSetting();
-  void showEvent(QShowEvent *event) override;
+  void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
   void operator()(const QString& folderPath);
@@ -28,7 +28,7 @@ class RedundantImageFinder : public QMainWindow {
 
   RedundantImageModel* m_imgModel{nullptr};
   CustomTableView* m_table{nullptr};
-
+  QString mCurrentPath;
   static RedunImgLibs mRedunLibs;
 };
 
