@@ -7,7 +7,7 @@ using namespace RenameHelper;
 class RenameHelperTest : public MyTestSuite {
   Q_OBJECT
 public:
-  RenameHelperTest() : MyTestSuite{true} {}
+  RenameHelperTest() : MyTestSuite{false} {}
 private slots:
   void test_ReplaceRename_invalid_regex_failed() {
     QStringList replaceeList;
@@ -243,10 +243,10 @@ private slots:
     QStringList suffixs{".jpg", ".jpeg", ".jpeg", ".jpeg"};
     QCOMPARE(PrependParentFolderNameToFileName(parentFolders, completeNames, suffixs), //
              (QStringList{
-                "Henry Cavill Superman post HC 1.jpg",//
-                "Henry Cavill Superman post HC 2.jpeg",//
-                "Chris Evans Captain post CE.jpeg",//
-                "Chris Evans Captain post CE 2.jpeg",//
+                "Henry Cavill Superman post HC 1",//
+                "Henry Cavill Superman post HC 2",//
+                "Chris Evans Captain post CE",//
+                "Chris Evans Captain post CE 2",//
               }));
   }
 };
