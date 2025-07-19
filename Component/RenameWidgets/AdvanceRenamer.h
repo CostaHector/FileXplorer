@@ -35,7 +35,7 @@ class AdvanceRenamer : public QDialog {
   void onIncludingSub(int includingSubState);
   void onNameExtRespective(int includingSuffixState);
 
-  virtual void FilterNames(FileOsWalker& /*walker*/) const {};
+  virtual void FilterNames(FileOsWalker& /*walker*/) const {}
   void UpdateNameAndExt();
   void InitTextEditContent(const QString& workPath, const QStringList& selectedNames);
   void OnlyTriggerRenameCore();
@@ -54,6 +54,7 @@ class AdvanceRenamer : public QDialog {
 
   QString mWorkPath;
   QStringList mSelectedNames;
+  QStringList mRelToNameWithNoRoot; // (no root) relative path to file
   QStringList mNames;  // with extension or without
   QStringList mExts;   // dot and extension
 
