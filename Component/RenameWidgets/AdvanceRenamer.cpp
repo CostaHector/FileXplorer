@@ -254,9 +254,10 @@ void AdvanceRenamer::InitTextEditContent(const QString& workPath, const QStringL
   FileOsWalker osWalker{mWorkPath, bSuffixInsideFilename};
   osWalker(mSelectedNames, bSubDir);
   FilterNames(osWalker);
+  mRelToNameWithNoRoot.swap(osWalker.relToNames);
   mNames.swap(osWalker.completeNames);
   mExts.swap(osWalker.suffixs);
-  m_relNameTE->setPlainText(osWalker.relToNames.join(NAME_SEP));
+  m_relNameTE->setPlainText(mRelToNameWithNoRoot.join(NAME_SEP));
 
   UpdateNameAndExt();
 

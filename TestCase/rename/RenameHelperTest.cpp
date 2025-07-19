@@ -6,8 +6,9 @@ using namespace RenameHelper;
 
 class RenameHelperTest : public MyTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+  RenameHelperTest() : MyTestSuite{true} {}
+private slots:
   void test_ReplaceRename_invalid_regex_failed() {
     QStringList replaceeList;
     replaceeList << "AAAAAAA"
@@ -214,6 +215,39 @@ class RenameHelperTest : public MyTestSuite {
     const int insertAt{512};
     QStringList ansLst = InsertRename(replaceeList, insertString, insertAt);
     QCOMPARE(ansLst, expectList);
+  }
+
+  void test_PrependParentFolderNameToFileName_skip() {
+    QStringList parentFolders;
+    QStringList completeNames;
+    QStringList suffixs;
+    QCOMPARE(PrependParentFolderNameToFileName(parentFolders, completeNames, suffixs), (QStringList{}));
+
+    // elements count inequal
+    parentFolders.push_back("path/to");
+    completeNames.push_back("a");
+    QCOMPARE(PrependParentFolderNameToFileName(parentFolders, completeNames, suffixs), (QStringList{}));
+
+    // not a file
+    suffixs.push_back("");
+    QCOMPARE(PrependParentFolderNameToFileName(parentFolders, completeNames, suffixs), completeNames);
+  }
+
+  void test_PrependParentFolderNameToFileName_ok() {
+    QStringList parentFolders{"Henry Cavill/Superman/post",//
+                              "Henry Cavill/Superman/post",//
+                              "Chris Evans/Captain/post",//
+                              "Chris Evans/Captain/post",//
+                             };
+    QStringList completeNames{"HC 1", "HC 2", "CE", "CE 2"};
+    QStringList suffixs{".jpg", ".jpeg", ".jpeg", ".jpeg"};
+    QCOMPARE(PrependParentFolderNameToFileName(parentFolders, completeNames, suffixs), //
+             (QStringList{
+                "Henry Cavill Superman post HC 1.jpg",//
+                "Henry Cavill Superman post HC 2.jpeg",//
+                "Chris Evans Captain post CE.jpeg",//
+                "Chris Evans Captain post CE 2.jpeg",//
+              }));
   }
 };
 
