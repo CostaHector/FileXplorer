@@ -63,7 +63,7 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
   const QString& newString = m_newStrCB->currentText();
   const bool regexEnable = m_regexCB->isChecked();
   if (regexEnable) {
-    QRegularExpression repRegex(oldString);
+    QRegularExpression repRegex{oldString};
     if (repRegex.isValid()) {
       regexValidLabel->ToSaved();
     } else {
