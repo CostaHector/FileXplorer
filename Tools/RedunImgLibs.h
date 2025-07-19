@@ -12,6 +12,8 @@ struct REDUNDANT_IMG_INFO {
 typedef QList<REDUNDANT_IMG_INFO> REDUNDANT_IMG_BUNCH;
 
 struct RedunImgLibs {
+  static REDUNDANT_IMG_BUNCH FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty = true);
+
   RedunImgLibs(const QString& libPath = "") : m_libPath{libPath} {}
   static QString GetRedunPath();
   int ReadLib();
