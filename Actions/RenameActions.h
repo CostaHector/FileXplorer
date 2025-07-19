@@ -21,6 +21,7 @@ class RenameActions : public QObject {
   QAction* _STR_REPLACER {nullptr};
   QAction* _CONTINUOUS_NUMBERING {nullptr};
   QAction* _CONVERT_UNICODE_TO_ASCII {nullptr};
+  QAction* _PREPEND_PARENT_FOLDER_NAMES {nullptr};
   QActionGroup* RENAME_RIBBONS {nullptr};
 
   QAction* _UPPER_CASE {nullptr};
