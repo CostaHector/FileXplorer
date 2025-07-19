@@ -63,7 +63,7 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
 
   QStringList numerizedNames;
   for (const QString& suf : suffixs) {
-    if (not sufCurIndex.contains(suf)) {  // no need to no. because this extension count <= 1
+    if (!sufCurIndex.contains(suf)) {  // no need to no. because this extension count <= 1
       numerizedNames.append(baseName);
       continue;
     }
@@ -106,11 +106,11 @@ QStringList PrependParentFolderNameToFileName(const QStringList& parentFolders, 
   ansNames.reserve(N1);
   for (int i = 0; i < parentFolders.size(); ++i) {
     if (suffixs[i].isEmpty()) { // only works for files
-      ansNames.push_back(completeNames[i] + suffixs[i]);
+      ansNames.push_back(completeNames[i]);
       continue;
     }
     QString prepath{parentFolders[i]};
-    ansNames.push_back(prepath.replace('/', ' ') + ' ' + completeNames[i] + suffixs[i]);
+    ansNames.push_back(prepath.replace('/', ' ') + ' ' + completeNames[i]);
   }
   return ansNames;
 }
