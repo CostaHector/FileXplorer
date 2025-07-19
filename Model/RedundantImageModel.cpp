@@ -1,39 +1,41 @@
-#include "RedundantImageModel.h"
+﻿#include "RedundantImageModel.h"
 #include "public/PathTool.h"
 #include "public/DisplayEnhancement.h"
 #include <QPixmap>
 
-const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview"};
+const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview", "absPath"};
 
 QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
   if (m_paf == nullptr or not index.isValid()) {
-    return QVariant();
+    return {};
   }
+  const REDUNDANT_IMG_INFO& item = m_paf->operator[](index.row());
   switch (role) {
     case Qt::DisplayRole: {
       switch (index.column()) {
         case 0:
-          return PathTool::fileName(m_paf->operator[](index.row()).filePath);
+          return PathTool::fileName(item.filePath);
         case 1:
-          return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->operator[](index.row()).size);
+          return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(item.size);
         case 2:
-          return m_paf->operator[](index.row()).md5;
+          return item.md5;
+        case 4:
+          return PathTool::absolutePath(item.filePath);
         default:
-          return QVariant();
+          return {};
       }
       break;
     }
     case Qt::DecorationRole: {
       if (index.column() == HORIZONTAL_HEADER.size() - 1) {
-        QPixmap pm{m_paf->operator[](index.row()).filePath};
-        return pm.scaledToWidth(128);
+        return QPixmap{item.filePath}.scaledToWidth(128);
       }
       break;
     }
     default:
       break;
   }
-  return QVariant();
+  return {};
 }
 
 QVariant RedundantImageModel::headerData(int section, Qt::Orientation orientation, int role) const {
