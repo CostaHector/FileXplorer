@@ -34,7 +34,7 @@
 #include "Component/RenameWidgets/RenameWidget_Numerize.h"
 #include "Component/RenameWidgets/RenameWidget_Replace.h"
 #include "Component/RenameWidgets/RenameWidget_ReverseNames.h"
-
+#include "Component/RenameWidgets/RenameWidget_PrependParentFolderName.h"
 #include "View/DuplicateVideosFinder.h"
 #include "View/HarTableView.h"
 
@@ -648,6 +648,10 @@ void FileExplorerEvent::subscribe() {
     connect(g_renameAg()._CONVERT_UNICODE_TO_ASCII, &QAction::triggered, this, [this]() -> void {
       auto* pToAscii = new RenameWidget_ConvertBoldUnicodeCharset2Ascii(_contentPane);
       onRename(pToAscii);
+    });
+    connect(g_renameAg()._PREPEND_PARENT_FOLDER_NAMES, &QAction::triggered, this, [this]() -> void {
+      auto* pPrependName = new RenameWidget_PrependParentFolderName(_contentPane);
+      onRename(pPrependName);
     });
 
     auto* _LONG_PATH_FINDER = g_fileBasicOperationsActions()._LONG_PATH_FINDER;

@@ -9,19 +9,18 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldStr
   if (oldString.isEmpty()) {
     return {};
   }
+  QStringList replacedLst{replaceeList};
   if (!regexEnable) {
-    QStringList replacedLst(replaceeList);
     for (QString& s : replacedLst) {
       s.replace(oldString, newString);
     }
     return replacedLst;
   }
-  const QRegularExpression repRegex(oldString);
+  const QRegularExpression repRegex{oldString};
   if (!repRegex.isValid()) {
     qWarning("regular expression error[%s]", qPrintable(oldString));
     return {};
   }
-  QStringList replacedLst(replaceeList);
   for (QString& s : replacedLst) {
     s.replace(repRegex, newString);
   }
@@ -93,4 +92,28 @@ QStringList InsertRename(const QStringList& replaceeList, const QString& insertS
   return afterInsert;
 }
 
+QStringList PrependParentFolderNameToFileName(const QStringList& parentFolders, const QStringList& completeNames, const QStringList& suffixs) {
+  const int N1 = parentFolders.size();
+  const int N2 = completeNames.size();
+  const int N3 = suffixs.size();
+  if (N1 == 0) {
+    return {};
+  }
+  if (N1 != N2 || N2 != N3) {
+    return {};
+  }
+  QStringList ansNames;
+  ansNames.reserve(N1);
+  for (int i = 0; i < parentFolders.size(); ++i) {
+    if (suffixs[i].isEmpty()) { // only works for files
+      ansNames.push_back(completeNames[i] + suffixs[i]);
+      continue;
+    }
+    QString prepath{parentFolders[i]};
+    ansNames.push_back(prepath.replace('/', ' ') + ' ' + completeNames[i] + suffixs[i]);
+  }
+  return ansNames;
+}
+
 }  // namespace RenameHelper
+
