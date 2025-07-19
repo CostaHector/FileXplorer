@@ -14,7 +14,6 @@
 #include "Actions/FileBasicOperationsActions.h"
 #include "Actions/RedundantImageFinderActions.h"
 #include "Component/Notificator.h"
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/StyleSheet.h"
 #include "public/UndoRedo.h"
@@ -61,8 +60,6 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
   ReadSetting();
 }
 
-RedundantImageFinder::~RedundantImageFinder() {}
-
 void RedundantImageFinder::ReadSetting() {
   if (PreferenceSettings().contains(RedunImgFinderKey::GEOMETRY.name)) {
     restoreGeometry(PreferenceSettings().value(RedunImgFinderKey::GEOMETRY.name).toByteArray());
@@ -71,7 +68,7 @@ void RedundantImageFinder::ReadSetting() {
   }
 }
 
-void RedundantImageFinder::showEvent(QShowEvent *event) {
+void RedundantImageFinder::showEvent(QShowEvent* event) {
   QMainWindow::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
@@ -87,16 +84,20 @@ void RedundantImageFinder::ChangeWindowTitle(const QString& rootPath) {
 }
 
 void RedundantImageFinder::subscribe() {
-  connect(g_redunImgFinderAg().RECYLE_NOW, &QAction::triggered,  //
-          this, &RedundantImageFinder::RecycleSelection);
-  connect(g_redunImgFinderAg().RECYCLE_EMPTY_IMAGE, &QAction::triggered,  //
-          this, [](bool recycleEmptyImage) -> void {                      //
-            PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, recycleEmptyImage);
-          });
-  connect(g_redunImgFinderAg().OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered,  //
-          this, [this]() {                                                         //
-            QDesktopServices::openUrl(QUrl::fromLocalFile(mRedunLibs.GetRedunPath()));
-          });
+  auto& inst = g_redunImgFinderAg();
+  connect(inst.RECYLE_NOW, &QAction::triggered, this, &RedundantImageFinder::RecycleSelection);
+  connect(inst.ALSO_EMPTY_IMAGE, &QAction::triggered, this, [](bool recycleEmptyImage) -> void {  //
+    PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, recycleEmptyImage);
+  });
+  connect(inst.FIND_DUPLICATE_IMGS_BY_LIBRARY, &QAction::triggered, this, [this]() {  //
+    this->operator()(this->mCurrentPath);
+  });
+  connect(inst.OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered, this, []() {  //
+    QDesktopServices::openUrl(QUrl::fromLocalFile(mRedunLibs.GetRedunPath()));
+  });
+  connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& clickedIndex) {  //
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_imgModel->filePath(clickedIndex)));
+  });
 }
 
 void RedundantImageFinder::RecycleSelection() {
@@ -138,12 +139,20 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
 
 void RedundantImageFinder::operator()(const QString& folderPath) {
   const bool recycleEmptyImage = PreferenceSettings().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
-  REDUNDANT_IMG_BUNCH newImgs = mRedunLibs.FindRedunImgs(folderPath, recycleEmptyImage);
-
+  const auto& inst = g_redunImgFinderAg();
+  const bool byBenchmarkLib = inst.FIND_DUPLICATE_IMGS_BY_LIBRARY->isChecked();
+  REDUNDANT_IMG_BUNCH newImgs = byBenchmarkLib ?  //
+                                    mRedunLibs.FindRedunImgs(folderPath, recycleEmptyImage)
+                                               :  //
+                                    RedunImgLibs::FindDuplicateImgs(folderPath, recycleEmptyImage);
+  mCurrentPath = folderPath;
   int beforeRowCnt = m_imgsBunch.size();
   int afterRowCnt = newImgs.size();
   m_imgModel->RowsCountBeginChange(beforeRowCnt, afterRowCnt);
   m_imgsBunch.swap(newImgs);
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(folderPath);
+  const QString msg{QString{"%1 duplicate images(s) found under path[%2]"}.arg(afterRowCnt).arg(mCurrentPath)};
+  const QString title{byBenchmarkLib ? "By benchmark library" : "MD5 checksums in current directory"};
+  Notificator::goodNews(title, msg);
 }
