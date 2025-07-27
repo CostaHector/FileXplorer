@@ -33,7 +33,6 @@ struct MemoryKey {
   static const KV QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA;
 
   static const KV ITEM_VIEW_FONT_SIZE;
-  static const KV DEFAULT_VIDEO_PLAYER;
   static const KV DEFAULT_NEW_CHOICE;
   static const KV DEFAULT_COPY_CHOICE;
   static const KV DEFAULT_RENAME_CHOICE;
