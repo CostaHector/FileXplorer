@@ -23,12 +23,9 @@ class ViewActions : public QObject {
   QActionGroup* _VIEWS_AG{nullptr};
 
   QAction* NAVIGATION_PANE{nullptr};
-  QAction* _VIDEO_PLAYER_EMBEDDED{nullptr};
   QActionGroup* _VIEW_ACTIONS{nullptr};
 
   QAction* _SYS_VIDEO_PLAYERS{nullptr};
-  QActionGroup* _VIDEO_PLAYERS{nullptr};
-
   QAction* _HAR_VIEW{nullptr};
 
  private:

@@ -135,10 +135,10 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
     return false;
   }
 
-  QDirIterator it(path, TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories);
+  QDirIterator it{path, TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   while (it.hasNext()) {
-    const QFileInfo file_info = it.next();
-    const QString file_path = file_info.absoluteFilePath();
+    const QString file_path = it.next();
+    const QFileInfo file_info {file_path};
     query.bindValue(0, GetEffectiveName(file_path));
     query.bindValue(1, file_info.size());
     query.bindValue(2, SKIP_GETTER_DURATION ? 0 : mi.GetLengthQuick(file_path));
