@@ -25,10 +25,13 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _VIEWS_AG = GetViewsAG();
 
   NAVIGATION_PANE = new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"));
-  _VIDEO_PLAYER_EMBEDDED = new (std::nothrow) QAction(QIcon(":img/VIDEO_PLAYER"), tr("Embedded Player"));
   _VIEW_ACTIONS = Get_NAVIGATION_PANE_Actions();
   _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"));
-  _VIDEO_PLAYERS = GetPlayersActions();
+  _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
+  _SYS_VIDEO_PLAYERS->setShortcutVisibleInContextMenu(true);
+  _SYS_VIDEO_PLAYERS->setToolTip(QString("<b>%1 (%2)</b><br/>"
+                                         "Play the selected item(s) in default system player.")
+                                     .arg(_SYS_VIDEO_PLAYERS->text(), _SYS_VIDEO_PLAYERS->shortcut().toString()));
 
   _HAR_VIEW = new (std::nothrow) QAction{QIcon(":img/HAR_VIEW"), "Har View"};
 }
@@ -37,35 +40,12 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   NAVIGATION_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
   NAVIGATION_PANE->setCheckable(true);
 
-  _VIDEO_PLAYER_EMBEDDED->setShortcutVisibleInContextMenu(true);
-  _VIDEO_PLAYER_EMBEDDED->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Open the selected item in embedded video player.").arg(_VIDEO_PLAYER_EMBEDDED->text(), _VIDEO_PLAYER_EMBEDDED->shortcut().toString()));
-
   auto* actionGroup = new (std::nothrow) QActionGroup(this);
   CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
   actionGroup->addAction(NAVIGATION_PANE);
-  actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   NAVIGATION_PANE->setChecked(PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
-  return actionGroup;
-}
-
-QActionGroup* ViewActions::GetPlayersActions() {
-  _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
-  _SYS_VIDEO_PLAYERS->setShortcutVisibleInContextMenu(true);
-  _SYS_VIDEO_PLAYERS->setToolTip(QString("<b>%1 (%2)</b><br/>"
-                                         "Play the selected item(s) in default system player.")
-                                     .arg(_SYS_VIDEO_PLAYERS->text(), _SYS_VIDEO_PLAYERS->shortcut().toString()));
-  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
-  CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
-  actionGroup->addAction(_SYS_VIDEO_PLAYERS);
-  actionGroup->addAction(_VIDEO_PLAYER_EMBEDDED);
-  actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  foreach (QAction* act, actionGroup->actions()) {
-    act->setCheckable(false);
-  }
   return actionGroup;
 }
 

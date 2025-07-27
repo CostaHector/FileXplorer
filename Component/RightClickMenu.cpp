@@ -11,7 +11,7 @@ RightClickMenu::RightClickMenu(const QString& title, QWidget* parent)  //
 {
   setToolTipsVisible(true);
 
-  addActions(g_viewActions()._VIDEO_PLAYERS->actions());
+  addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
   addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
   addSeparator();
