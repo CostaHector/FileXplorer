@@ -30,7 +30,7 @@ void AdvanceSearchTableView::subscribe() {
   });
   connect(m_searchMenu->_FORCE_REFRESH_SEARCH_SOURCE, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
 
-  addActions(g_viewActions()._VIDEO_PLAYERS->actions());
+  addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
   addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
   addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());

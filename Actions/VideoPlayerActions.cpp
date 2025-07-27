@@ -81,9 +81,6 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
   _REVEAL_IN_EXPLORER->setToolTip(
       QString("<b>%1 (%2)</b><br/> Reveal file in explorer").arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
-
-  _BATCH_VIDEO_ACTIONS->addAction(_PLAY_CURRENT_PATH);
-  _BATCH_VIDEO_ACTIONS->addAction(_PLAY_SELECTION);
 }
 
 QToolBar* VideoPlayerActions::GetPlayControlToolBar(QWidget* parent, QLabel* label) {

@@ -1,9 +1,9 @@
 #include "CustomListView.h"
 
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/StyleSheet.h"
 
+#include <QActionGroup>
 #include <QContextMenuEvent>
 
 QSet<QString> CustomListView::LISTS_SET;

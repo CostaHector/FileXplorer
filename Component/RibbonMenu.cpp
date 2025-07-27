@@ -15,7 +15,6 @@
 #include "Actions/RightClickMenuActions.h"
 #include "Actions/SceneInPageActions.h"
 #include "Actions/SyncFileSystemModificationActions.h"
-#include "Actions/VideoPlayerActions.h"
 #include "Actions/ViewActions.h"
 #include "Actions/ThumbnailProcessActions.h"
 #include "Actions/LogActions.h"
@@ -106,14 +105,10 @@ QToolBar* RibbonMenu::LeafFile() const {
 }
 
 QToolBar* RibbonMenu::LeafHome() const {
-  auto* playTB = new DropdownToolButton(g_viewActions()._VIDEO_PLAYERS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  playTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_VIDEO_PLAYER.name, MemoryKey::DEFAULT_VIDEO_PLAYER.v).toString());
-  playTB->MemorizeCurrentAction(MemoryKey::DEFAULT_VIDEO_PLAYER.name);
-
   QToolBar* openItemsTB = new (std::nothrow) QToolBar("Open");
   CHECK_NULLPTR_RETURN_NULLPTR(openItemsTB);
   {
-    openItemsTB->addWidget(playTB);
+    openItemsTB->addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
     openItemsTB->addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
     openItemsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     openItemsTB->setOrientation(Qt::Orientation::Vertical);
@@ -241,17 +236,14 @@ QToolBar* RibbonMenu::LeafView() const {
   CHECK_NULLPTR_RETURN_NULLPTR(fileSystemView);
 
   auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
+  CHECK_NULLPTR_RETURN_NULLPTR(folderPreviewToolBar);
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  auto* embeddedPlayerTB = new (std::nothrow) DropdownToolButton(g_videoPlayerActions()._BATCH_VIDEO_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  embeddedPlayerTB->setDefaultAction(g_viewActions()._VIDEO_PLAYER_EMBEDDED);
   leafViewWid->setToolTip("View Leaf");
   leafViewWid->addAction(g_viewActions().NAVIGATION_PANE);
   leafViewWid->addWidget(fileSystemView);
   leafViewWid->addSeparator();
   leafViewWid->addWidget(folderPreviewToolBar);
-  leafViewWid->addSeparator();
-  leafViewWid->addWidget(embeddedPlayerTB);
   leafViewWid->addSeparator();
   leafViewWid->addAction(g_viewActions()._HAR_VIEW);
   leafViewWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
