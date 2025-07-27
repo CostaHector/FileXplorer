@@ -1,10 +1,10 @@
 #include "CustomTableView.h"
-#include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QActionGroup>
 
 QSet<QString> CustomTableView::TABLES_SET;
 

@@ -33,7 +33,7 @@ void FileSystemTableView::subscribe() {
   addAction(g_rightClickActions()._PROPERTIES);
 
   addActions(g_viewActions()._VIEW_ACTIONS->actions());
-  addActions(g_viewActions()._VIDEO_PLAYERS->actions());
+  addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());

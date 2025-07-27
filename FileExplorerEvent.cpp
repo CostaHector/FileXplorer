@@ -22,7 +22,6 @@
 #include "Component/Notificator.h"
 #include "Component/PropertiesWindow.h"
 #include "Component/RedundantImageFinder.h"
-#include "Component/VideoPlayer.h"
 #include "Component/ContentPanel.h"
 #include "Component/RenameWidgets/AdvanceRenamer.h"
 #include "Component/RenameWidgets/RenameWidget_LongPath.h"
@@ -662,13 +661,7 @@ void FileExplorerEvent::subscribe() {
   }
 
   {
-    connect(g_viewActions()._VIDEO_PLAYER_EMBEDDED, &QAction::triggered, this, &FileExplorerEvent::on_PlaySelectedItemsInView);
     connect(g_viewActions()._HAR_VIEW, &QAction::triggered, this, &FileExplorerEvent::on_HarView);
-  }
-
-  {
-    connect(g_videoPlayerActions()._PLAY_SELECTION, &QAction::triggered, this, &FileExplorerEvent::on_PlaySelectedItemsInView);
-    connect(g_videoPlayerActions()._PLAY_CURRENT_PATH, &QAction::triggered, this, &FileExplorerEvent::on_PlayCurrentPathOfView);
   }
 
   g_ArrangeActions().subscribe();
@@ -1033,35 +1026,6 @@ bool FileExplorerEvent::on_HarView() {
   harTableview->show();
   harTableview->raise();
   return true;
-}
-
-auto FileExplorerEvent::on_PlaySelectedItemsInView() -> bool {
-  if (videoPlayer == nullptr) {
-    videoPlayer = new VideoPlayer(this->_contentPane);
-  }
-  videoPlayer->show();
-  const QStringList& filesList = _contentPane->getFilePaths();
-  if (filesList.size() == 0) {
-    return true;
-  }
-  if (filesList.size() == 1) {
-    (*videoPlayer)(filesList.front());
-    return true;
-  }
-  return (*videoPlayer)(filesList);
-}
-
-bool FileExplorerEvent::on_PlayCurrentPathOfView() {
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
-    qInfo("[Play current folder] only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("[Play current folder] only available on FileSytemView", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
-    return false;
-  }
-  if (videoPlayer == nullptr) {
-    videoPlayer = new VideoPlayer(this->_contentPane);
-  }
-  videoPlayer->show();
-  return videoPlayer->operator()(_fileSysModel->rootPath());
 }
 
 auto FileExplorerEvent::on_PlayVideo() const -> bool {
