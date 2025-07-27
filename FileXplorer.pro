@@ -1,4 +1,4 @@
-QT       += core gui sql multimedia multimediawidgets
+QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -12,7 +12,7 @@ win32 {
     # FFmpeg headers path
     INCLUDEPATH += "C:/home/ffmpeg/include"
     # FFmpeg libs path
-    LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec -lavutil -lswscale -lws2_32 # Windows network avformat_network_init need
+    LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec -lavutil # Windows network avformat_network_init need
 }
 
 linux {
