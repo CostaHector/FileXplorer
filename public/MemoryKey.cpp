@@ -26,7 +26,6 @@ const KV MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", t
 const KV MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false, ValueChecker{PLAIN_BOOL});
 
 const KV MemoryKey::ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, ValueChecker{8, 25 + 1});
-const KV MemoryKey::DEFAULT_VIDEO_PLAYER("DEFAULT_VIDEO_PLAYER", "Play", ValueChecker{{"Play in embedded player", "Play"}, CANDIDATE_STRING});
 const KV MemoryKey::DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", "New folder", ValueChecker{{"New folder", "New text", "New json", "New folder html"}, CANDIDATE_STRING});
 const KV MemoryKey::DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", ValueChecker{{"Copy fullpath", "Copy path", "Copy name", "Copy the path"}, CANDIDATE_STRING});
 const KV MemoryKey::DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
