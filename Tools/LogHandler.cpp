@@ -57,9 +57,9 @@ LogHandler::LogHandler(const QString& logPath, const int msgType, QObject* paren
     mLogFolderPath = logPath;
   } else {
 #ifdef _WIN32
-    QString logFileName{PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name).toString()};
+    QString logFileName{PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name, MemoryKey::WIN32_RUNLOG.v).toString()};
 #else
-    QString logFileName{PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name).toString()};
+    QString logFileName{PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name, MemoryKey::LINUX_RUNLOG.v).toString()};
 #endif
     mLogFolderPath = logFileName + "/logs_info.log";
   }

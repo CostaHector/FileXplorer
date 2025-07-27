@@ -8,7 +8,6 @@
 
 class ContentPanel;
 class CustomStatusBar;
-class VideoPlayer;
 class AlertSystem;
 class AdvanceRenamer;
 class PropertiesWindow;
@@ -80,8 +79,6 @@ class FileExplorerEvent : public QObject {
   auto on_SelectInvert() -> void;
 
   bool on_HarView();
-  auto on_PlaySelectedItemsInView() -> bool;
-  auto on_PlayCurrentPathOfView() -> bool;
 
   auto on_PlayVideo() const -> bool;
 
@@ -105,7 +102,6 @@ class FileExplorerEvent : public QObject {
 
   CustomStatusBar* _logger;
   QClipboard* m_clipboard;
-  VideoPlayer* videoPlayer{nullptr};
 
   AlertSystem* m_alertSystem{nullptr};
   Archiver* m_archivePreview{nullptr};

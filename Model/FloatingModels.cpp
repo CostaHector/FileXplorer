@@ -110,7 +110,7 @@ QVariant VidsModel::data(const QModelIndex& index, int role) const {
     return PathTool::GetBaseName(mDataLst[rw]);
   } else if (role == Qt::DecorationRole) {
     static QFileIconProvider ip;
-    return ip.icon(mDataLst[rw]);
+    return ip.icon(QFileInfo{mDataLst[rw]});
   }
   return {};
 }
