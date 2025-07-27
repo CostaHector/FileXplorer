@@ -29,9 +29,6 @@ class VideoPlayerActions : public QObject {
   QAction* _OPEN_A_VIDEO{new (std::nothrow) QAction(QIcon(":img/OPEN_A_VIDEO"), tr("open a video"), this)};
   QAction* _LOAD_A_PATH{new (std::nothrow) QAction(QIcon(":img/OPEN_A_FOLDER"), tr("load a path"), this)};
   QAction* _CLEAR_VIDEOS_LIST{new (std::nothrow) QAction(QIcon(":img/EMPTY_LISTWIDGET"), tr("clear playlist"), this)};
-  QAction* _PLAY_CURRENT_PATH{new (std::nothrow) QAction(QIcon(":img/OPEN_A_FOLDER"), tr("Play current path"), this)};
-  QAction* _PLAY_SELECTION{new (std::nothrow) QAction(tr("Play selection"), this)};
-  QActionGroup* _BATCH_VIDEO_ACTIONS{new (std::nothrow) QActionGroup(this)};
 
   QAction* _SHOW_VIDEOS_LIST{new (std::nothrow) QAction(QIcon(":img/VIDEOS_LIST_MENU"), tr("keep show playlist"), this)};
   QAction* _MARK_HOT_SCENE{new (std::nothrow) QAction(QIcon(":img/MARK_HOT_SCENE_POSITION"), tr("mark"), this)};

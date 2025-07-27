@@ -160,9 +160,9 @@ for (int i = 0; i < paths.size(); ++i) {
 
 ## get video duration using FFmpeg/libav
 ### in windows:
-step1: Download `ffmpeg-7.1.1-full_build-shared.7z` and extract to a path. then add this path to system environment path.
+step1: Download `ffmpeg-7.1.1-full_build-shared.7z` and extract to a ${path}. then add this "${path}/bin" to system environment path.
 
-step2: Here we assume path is "C:\home\ffmpeg"
+step2: Here we assume path added to system variable is "C:/home/ffmpeg/bin", i.e. SET(path "C:/home/ffmpeg")
 
 step3: add following snippet in .pro file
 ```pro
@@ -174,9 +174,21 @@ win32 {
 }
 ```
 
+step3: add following snippet in .pro file for CMakelists.txt
+```cmake
+set(ffmpegpath "C:/home/ffmpeg")
+target_include_directories(ThumbnailsGetterFFmpeg PRIVATE "${ffmpegpath}/include")
+target_link_libraries(ThumbnailsGetterFFmpeg PRIVATE ws2_32 Qt5::Core
+	"${ffmpegpath}/lib/avformat.lib"
+	"${ffmpegpath}/lib/avcodec.lib"
+	"${ffmpegpath}/lib/avutil.lib"
+	"${ffmpegpath}/lib/swscale.lib")
+```
+
+step4: run the following code snippet. It should says "FFmpeg version: 3999588"
 ```cpp
 #include <QDebug>
-extern C{
+extern "C"{
 #include <libavformat/avformat.h>
 }
 void testFFmpeg() {
@@ -201,6 +213,15 @@ linux {
 }
 ```
 
+For windows user who want to add FileXplorer in right click menu.
+Just open regedit, and in following path
+`Computer\HKEY_CLASSES_ROOT\Directory\Background\shell\`
+New a key "FileXplorer" under "shell";
+New a key "command" under "FileXplorer";
+Modify command (Default) value data to following string.
+`"C:\home\aria\code\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\release\FileXplorer.exe" "%V"`
+
+And don't forget to add "C:\Qt\5.15.2\mingw81_64\bin" to system environment path
 
 ## Testcase
 ### Table 1.0 Expected Behavior of rename Functions
