@@ -5,10 +5,14 @@ FileXplorer_zh_CN.qm
 FileExplorerTest.pro.*
 FileExplorerTest.pro.user.*
 
+CMakeLists.txt.user
+
 bin/AKA_PERFORMERS.txt
 bin/PERFORMERS_TABLE.txt
 bin/STANDARD_STUDIO_NAME.txt
+
 bin/.gitignore
+
 ./*.json
 *.idx
 build/*

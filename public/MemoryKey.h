@@ -5,7 +5,7 @@
 #include <QSettings>
 
 static inline QSettings& PreferenceSettings() {
-  static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", "FileExplorerReadOnly");
+  static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", PROJECT_NAME);
   return settings;
 }
 

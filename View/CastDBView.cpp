@@ -201,6 +201,7 @@ int CastDBView::onLoadFromPerformersList() {
 bool CastDBView::onLocateImageHost() {
   const QString& locatePath = QFileDialog::getExistingDirectory(this, "Locate imagehost folder", m_imageHostPath);
   if (!QFile::exists(locatePath)) {
+    Notificator::badNews("cannot open", "locate path not exist");
     qWarning("locate path not exist");
     return false;
   }
