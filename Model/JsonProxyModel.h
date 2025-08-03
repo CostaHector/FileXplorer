@@ -5,10 +5,7 @@
 
 class JsonProxyModel : public QSortFilterProxyModel {
  public:
-  explicit JsonProxyModel(QObject* parent = nullptr);
-
-  void invalidateFilterPublic() { invalidateFilter(); }
-
+  using QSortFilterProxyModel::QSortFilterProxyModel;
  protected:
   bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 };

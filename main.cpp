@@ -16,15 +16,19 @@ int main(int argc, char* argv[]) {
     qInfo("argc[%d].", argc);
   }
 
+  if (!CreateUserPath()) {
+    return -1;
+  }
+
   QApplication a(argc, argv);
 #ifdef QT_DEBUG
   SetQtDebugMessagePattern();
 #else
-LogHandler mo;
-if (!mo.IsLogModuleOk()) {
+LogHandler logModule;
+if (!logModule.IsLogModuleOk()) {
   return -1;
 }
-mo.subscribe();
+logModule.subscribe();
 #endif
 
   QTranslator translator;  // cannot define in local. will be release.
