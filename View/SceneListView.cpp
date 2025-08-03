@@ -1,5 +1,4 @@
 ﻿#include "SceneListView.h"
-#include "Actions/ViewActions.h"
 #include "Model/ScenesListModel.h"
 #include "Tools/PlayVideo.h"
 #include "public/PublicMacro.h"

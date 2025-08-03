@@ -13,7 +13,6 @@
 #include <QString>
 #include <QDockWidget>
 #include <QFileInfo>
-#include <functional>
 
 class DockWidget : public QDockWidget {
  public:
@@ -76,7 +75,7 @@ void FileXplorer::showEvent(QShowEvent* event) {
 }
 
 QString FileXplorer::ReadSettings(const int argc, char const* const argv[]) {
-  qDebug("FileXplorer running in [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
+  qDebug(PROJECT_NAME " running in [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
   // executing the program with or without command-line arguments
   QString path{(argc > 1) ? argv[1] : ""};
   if (path.endsWith('"')) {
@@ -90,17 +89,17 @@ QString FileXplorer::ReadSettings(const int argc, char const* const argv[]) {
   if (!fi.isDir()) {
     path = fi.absolutePath();
   }
-  qDebug("FileXplorer open path[%s].", qPrintable(path));
+  qDebug(PROJECT_NAME "open path[%s].", qPrintable(path));
   return path;
 }
 
 void FileXplorer::RestoreWindowStateAndSetupUI() {
-  if (PreferenceSettings().contains(CLASSNAME_2_STR(FileXplorer) "_Geometry")) {
-    restoreGeometry(PreferenceSettings().value(CLASSNAME_2_STR(FileXplorer) "_Geometry").toByteArray());
+  if (PreferenceSettings().contains(PROJECT_NAME "_Geometry")) {
+    restoreGeometry(PreferenceSettings().value(PROJECT_NAME "_Geometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  setWindowTitle(CLASSNAME_2_STR(FileXplorer));
+  setWindowTitle(PROJECT_NAME);
   setWindowIcon(QIcon(":img/APP_ICON_PATH"));
 }
 

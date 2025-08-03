@@ -43,4 +43,5 @@ inline void ImgsSortNameLengthFirst(QStringList& imgs) {
 void LoadCNLanguagePack(QTranslator& translator);
 void LoadSysLanaguagePack(QTranslator& translator);
 
+bool CreateUserPath();
 #endif  // PUBLICTOOL_H

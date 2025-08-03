@@ -82,14 +82,6 @@ git update-index --no-assume-unchange FileExplorerTest.pro.user
 git update-index --no-assume-unchange bin/logs_info.log
 ```
 
-Edit right click menu in windows register edit:
-Computer\HKEY_CLASSES_ROOT\Directory\Background\Shell\FileExplorerDesktop\command
-Modify and set Value data to
-"C:\home\Ariel\qtcpp\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\release\FileExplorerReadOnly.exe" "%V"
-
-"C:\home\Ariel\qtcpp\build-FileExplorerReadOnly-Desktop_Qt_5_15_2_MinGW_64_bit-release\release\FileXplorer.exe" "%V"
-
-
 ```md
 git filter-branch --force --index-filter   "git rm --cached --ignore-unmatch bin/AKA_PERFORMERS.txt"   --prune-empty --tag-name-filter cat -- --all  
 rm -rf .git/refs/original/
@@ -101,7 +93,7 @@ git remote -v
 git remote remove origin
 git remote add origin git@github.com:CostaHector/FileXplorer.git
 git push -u origin fileXplor:master -f
-git remote add origin git@github.com:CostaHector/FileExplorerReadOnly.git
+git remote add origin git@github.com:CostaHector/FileXplorer.git
 ```
 
 ## New Feature
@@ -160,7 +152,7 @@ for (int i = 0; i < paths.size(); ++i) {
 
 ## get video duration using FFmpeg/libav
 ### in windows:
-step1: Download `ffmpeg-7.1.1-full_build-shared.7z` and extract to a ${path}. then add this "${path}/bin" to system environment path.
+step1: Download dynamic library `ffmpeg-7.1.1-full_build-shared.7z` and extract to a ${path}. then add this "${path}/bin" to system environment path.
 
 step2: Here we assume path added to system variable is "C:/home/ffmpeg/bin", i.e. SET(path "C:/home/ffmpeg")
 
@@ -219,7 +211,8 @@ Just open regedit, and in following path
 New a key "FileXplorer" under "shell";
 New a key "command" under "FileXplorer";
 Modify command (Default) value data to following string.
-`"C:\home\aria\code\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\release\FileXplorer.exe" "%V"`
+`"C:\home\aria\code\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\FileXplorer.exe" "%V"`
+
 
 And don't forget to add "C:\Qt\5.15.2\mingw81_64\bin" to system environment path
 
