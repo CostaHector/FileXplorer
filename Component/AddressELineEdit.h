@@ -2,6 +2,7 @@
 #define ADDRESSELINEEDIT_H
 
 #include "public/PathTool.h"
+#include "FocusEventWatch.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QToolBar>
@@ -16,19 +17,6 @@
 #include <QMimeData>
 
 #include <QStackedWidget>
-
-class FocusEventWatch : public QObject {
-  Q_OBJECT
- public:
-  explicit FocusEventWatch(QObject* parent = nullptr);
-  bool eventFilter(QObject* watched, QEvent* event) override;
-
- signals:
-  void focusChanged(bool hasFocus);
-
- private:
-  bool mouseButtonPressedBefore{false};
-};
 
 class AddressELineEdit : public QStackedWidget {
   Q_OBJECT
@@ -98,4 +86,5 @@ class AddressELineEdit : public QStackedWidget {
 
   static const QString RELEASE_HINT_MSG;
 };
+
 #endif  // ADDRESSELINEEDIT_H
