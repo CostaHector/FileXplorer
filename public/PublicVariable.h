@@ -12,6 +12,7 @@ typedef std::function<void()> T_SwitchStackWidget;
 
 struct SystemPath {
   static const QString HOME_PATH;
+  static const QString WORK_PATH;
   static const QString STARRED_PATH;
   static const QString VIDS_DATABASE;
   static const QString DEVICES_AND_DRIVES_DATABASE;
