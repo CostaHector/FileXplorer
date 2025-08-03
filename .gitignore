@@ -7,11 +7,7 @@ FileExplorerTest.pro.user.*
 
 CMakeLists.txt.user
 
-bin/AKA_PERFORMERS.txt
-bin/PERFORMERS_TABLE.txt
-bin/STANDARD_STUDIO_NAME.txt
-
-bin/.gitignore
+bin/logs_info.log
 
 ./*.json
 *.idx
