@@ -9,42 +9,6 @@
 #include <QMessageBox>
 #include <QToolTip>
 #include <Qt>
-#include <QApplication>
-
-FocusEventWatch::FocusEventWatch(QObject* parent)  //
-{
-  CHECK_NULLPTR_RETURN_VOID(parent);
-  parent->installEventFilter(this);
-}
-
-bool FocusEventWatch::eventFilter(QObject* watched, QEvent* event) {
-  switch (event->type()) {
-    case QEvent::Type::MouseButtonPress: {
-      mouseButtonPressedBefore = true;
-      break;
-    }
-    case QEvent::Type::MouseButtonRelease: {
-      break;
-    }
-    case QEvent::Type::FocusIn: {
-      if (!mouseButtonPressedBefore) {  // block until next time focus out
-        emit focusChanged(true);
-      }
-      mouseButtonPressedBefore = false;
-      break;
-    }
-    case QEvent::Type::FocusOut: {
-      if (!mouseButtonPressedBefore) {  // block until next time focus out
-        emit focusChanged(false);
-      }
-      mouseButtonPressedBefore = false;
-      break;
-    }
-    default:
-      break;
-  }
-  return QObject::eventFilter(watched, event);
-}
 
 const QString AddressELineEdit::RELEASE_HINT_MSG = "<b>Drop item(s) to ...?</b>:<br/>";
 
@@ -217,7 +181,6 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
 class TestAddressELineEdit : public QWidget {
-  Q_OBJECT
  public:
   explicit TestAddressELineEdit(QWidget* parent = nullptr) : QWidget(parent) {
     AddressELineEdit* add = new AddressELineEdit;
