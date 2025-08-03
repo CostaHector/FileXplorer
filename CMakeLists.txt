@@ -148,8 +148,8 @@ if(WIN32)
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
         "${ffmpegpath}/lib/swscale.lib")
-    elseif(UNIX AND NOT APPLE)  # Linux
-        target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
+elseif(UNIX AND NOT APPLE)  # Linux
+    target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
