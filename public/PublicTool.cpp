@@ -92,11 +92,12 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
 }
 
 void LoadCNLanguagePack(QTranslator& translator) {
-  qDebug("Load Chinese pack");
-  const QString baseName = "FileXplorer_zh_CN";
-  if (translator.load(":/i18n/" + baseName)) {
-    qDebug("Load language pack succeed %s", qPrintable(baseName));
+  const QString baseName = PROJECT_NAME "_zh_CN.qm";
+  if (translator.load(baseName)) {
+    qDebug("Load language[%s] pack succeed", qPrintable(baseName));
     QCoreApplication::installTranslator(&translator);
+  } else {
+    qCritical("Load language[%s] pack failed", qPrintable(baseName));
   }
 }
 
@@ -104,8 +105,8 @@ void LoadSysLanaguagePack(QTranslator& translator) {
   qDebug("Load System Language pack");
   const QStringList uiLanguages = QLocale::system().uiLanguages();
   for (const QString& locale : uiLanguages) {
-    const QString baseName = "FileXplorer" + QLocale(locale).name();
-    if (translator.load(":/i18n/" + baseName)) {
+    const QString baseName = PROJECT_NAME + QLocale(locale).name() + ".qm";
+    if (translator.load(baseName)) {
       qDebug("Load language pack succeed %s", qPrintable(baseName));
       QCoreApplication::installTranslator(&translator);
       break;
@@ -113,4 +114,15 @@ void LoadSysLanaguagePack(QTranslator& translator) {
       qDebug("No need to load language pack %s", qPrintable(baseName));
     }
   }
+}
+
+bool CreateUserPath() {
+  if (QFile::exists(SystemPath::WORK_PATH)) {
+    return true;
+  }
+  if (!QDir{}.mkpath(SystemPath::WORK_PATH)) {
+    qCritical("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path", qPrintable(SystemPath::WORK_PATH));
+    return false;
+  }
+  return true;
 }
