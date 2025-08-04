@@ -2,6 +2,7 @@
 #include "Tools/PerformerJsonFileHelper.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include "public/MemoryKey.h"
+#include "public/PathTool.h"
 #include "public/PublicVariable.h"
 #include "public/PublicMacro.h"
 #include <QTextStream>
@@ -91,13 +92,8 @@ QString PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(const QString& ke
 PerformersAkaManager::PerformersAkaManager() : m_akaPerf(ReadOutAkaName()) {}
 
 QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
-#ifdef _WIN32
-  const QString akaPerfFilePath =  //
-      PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name, MemoryKey::WIN32_AKA_PERFORMERS.v).toString();
-#else
-  const QString akaPerfFilePath =  //
-      PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name, MemoryKey::LINUX_AKA_PERFORMERS.v).toString();
-#endif
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString akaPerfFilePath = PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS);
   QFile file{akaPerfFilePath};
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug("File not found: %s.", qPrintable(file.fileName()));
