@@ -107,46 +107,6 @@ Interactive function:
 a log line example:
 > `hh:mm:ss.zzz E functionName msg [fileName:fileNo]`
 
-
-
-## How QTextEdit Show image from ByteArray
-
-```cpp
-if (not qzPath.toLower().endsWith(".qz")) {
-  qWarning("Not a qz file");
-  setWindowTitle(QString("ArchiveFilesPreview | [%1] not a qz file").arg(qzPath));
-  return false;
-}
-
-ArchiveFiles af(qzPath, ArchiveFiles::ONLY_IMAGE);
-static constexpr int K = 4;
-// Todo, loading more button
-QStringList paths;
-QList<QByteArray> datas;
-paths.reserve(K);
-datas.reserve(K);
-
-if (not af.ReadFirstKItemsOut(K, paths, datas)) {
-  setWindowTitle(QString("ArchiveFilesPreview | [%1] read failed").arg(qzPath));
-  return false;
-}
-setWindowTitle(QString("ArchiveFilesPreview | %1 item(s)").arg(paths.size()));
-
-QTextDocument* textDocument = document();
-for (int i = 0; i < paths.size(); ++i) {
-  QUrl url{paths[i]};
-  textDocument->addResource(QTextDocument::ImageResource, url, QVariant(datas[i]));
-  QTextImageFormat imageFormat;
-  imageFormat.setName(url.toString());
-
-  QTextCursor cursor = textCursor();
-  cursor.insertText(url.toString());
-  cursor.insertText("\n");
-  cursor.insertImage(imageFormat);
-  cursor.insertText("\n");
-}
-```
-
 ## get video duration using FFmpeg/libav
 ### in windows:
 step1: Download dynamic library `ffmpeg-7.1.1-full_build-shared.7z` and extract to a ${path}. then add this "${path}/bin" to system environment path.
