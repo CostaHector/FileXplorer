@@ -1,6 +1,10 @@
+DEFINES += PROJECT_NAME=\\\"FileXplorer\\\"
 QT += testlib gui core sql widgets
 CONFIG += qt warn_on depend_includepath testcase
 CONFIG += c++11
+CONFIG -= debug_and_release
+DESTDIR = $$OUT_PWD
+
 win32 {
     LIBS += -ldwmapi
     LIBS += -lshlwapi
@@ -19,8 +23,7 @@ TEMPLATE = app
 DEFINES += QT_TEST
 message($$DEFINES)
 
-SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp) \
-    Tools/VideoDurationGetter.cpp
+SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp)
 SOURCES += $$files(TestCase/DbManager/*.cpp)
 SOURCES += $$files(TestCase/Json/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
@@ -71,10 +74,10 @@ SOURCES += \
     Tools/FileSystemItemFilter.cpp \
     Tools/RedunImgLibs.cpp \
     Tools/SyncModifiyFileSystem.cpp \
-    Tools/WidgetReorderHelper.cpp
+    Tools/WidgetReorderHelper.cpp \
+    Tools/VideoDurationGetter.cpp
 
-HEADERS += $$files(TestCase/pub/*.h) \
-    Tools/VideoDurationGetter.h
+HEADERS += $$files(TestCase/pub/*.h)
 HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(public/*.h)
 HEADERS += $$files(public/Memory/*.h)
@@ -97,30 +100,7 @@ HEADERS += \
     Component/RenameWidgets/CommandsPreview.h \
     Component/StateLabel.h \
     Component/JsonEditorWidget/LineEditCSV.h \
-    Tools/AIMediaDuplicate.h \
-    Tools/ConvertUnicodeCharsetToAscii.h\
-    Tools/LowResImgsRemover.h \
-    Tools/FolderNxtAndLastIterator.h \
-    Tools/LongPathFinder.h \
-    Tools/MD5Calculator.h \
-    Tools/NameSectionArrange.h \
-    Tools/NameStandardizer.h \
-    Tools/NameTool.h\
-    Tools/PerformersAkaManager.h \
-    Tools/CastManager.h \
-    Tools/StudiosManager.h \
-    Tools/QMediaInfo.h \
-    Tools/RedundantFolderRemove.h \
-    Tools/RenameHelper.h \
-    Tools/RenameNamesUnique.h \
-    Tools/SceneInfoManager.h \
-    Tools/ThumbnailProcesser.h \
-    Tools/ToConsecutiveFileNameNo.h \
-    Tools/LogHandler.h \
-    Tools/FileSystemItemFilter.h \
-    Tools/RedunImgLibs.h \
-    Tools/SyncModifiyFileSystem.h \
-    Tools/WidgetReorderHelper.h
+
 
 DISTFILES += \
     readme.md
