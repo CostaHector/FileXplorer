@@ -2,6 +2,7 @@
 #include <QtTest>
 
 #include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/PathRelatedTool.h"
 #include "public/PathTool.h"
 
 using namespace ::PathTool;
@@ -11,6 +12,31 @@ class PathToolTest : public MyTestSuite {
  public:
   PathToolTest() : MyTestSuite{false} {}
  private slots:
+  void test_project_name_from_marco() {
+    QCOMPARE(PROJECT_NAME, QString("FileXplorer"));
+  }
+
+  void test_lib_files_path_correct() {
+    QString libPath = GetPathByApplicationDirPath(FILE_REL_PATH::MEDIA_INFO_DLL);
+    QVERIFY(QFile::exists(libPath));
+
+    QString testRootDir = TestCaseRootPath();
+    QString libPath2 = QDir::cleanPath(QDir(testRootDir).absoluteFilePath("../lib/MediaInfo.dll"));
+    QCOMPARE(libPath, libPath2);
+
+    QString batPath = GetPathByApplicationDirPath(FILE_REL_PATH::TERMINAL_OPEN_BATCH_FILE_PATH);
+    QVERIFY(QFile::exists(batPath));
+  }
+
+  void test_cast_studio_file_path_exists() {
+    QString perfPath = GetPathByApplicationDirPath(FILE_REL_PATH::PERFORMERS_TABLE);
+    QVERIFY(QFile::exists(perfPath));
+    QString akaPath = GetPathByApplicationDirPath(FILE_REL_PATH::AKA_PERFORMERS);
+    QVERIFY(QFile::exists(akaPath));
+    QString stdStudioPath = GetPathByApplicationDirPath(FILE_REL_PATH::STANDARD_STUDIO_NAME);
+    QVERIFY(QFile::exists(stdStudioPath));
+  }
+
   void test_GetWinStdPath() {
 #ifdef WIN32
     QCOMPARE(GetWinStdPath("C:"), "C:/");

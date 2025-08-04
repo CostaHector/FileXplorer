@@ -2,6 +2,7 @@
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include "public/PublicMacro.h"
+#include "public/PathTool.h"
 #include "Tools/Json/JsonHelper.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include <QDir>
@@ -13,16 +14,11 @@ constexpr int CastManager::EFFECTIVE_CAST_NAME_LEN;
 
 QString CastManager::GetLocalFilePath(const QString& localFilePath)  //
 {
-  if (!localFilePath.isEmpty()) {
-    /* only used in LLT test */
+  if (!localFilePath.isEmpty()) { /* only used in LLT test */
     return localFilePath;
   }
-
-#ifdef _WIN32
-  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
-#else
-  const QString& perfFilePath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
-#endif
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString perfFilePath = PathTool::GetPathByApplicationDirPath(PERFORMERS_TABLE);
   return perfFilePath;
 }
 
