@@ -1,5 +1,6 @@
 #include "StudiosManager.h"
 
+#include "public/PathTool.h"
 #include "public/PublicVariable.h"
 #include "public/PublicMacro.h"
 #include "public/MemoryKey.h"
@@ -23,18 +24,11 @@ bool StudiosManager::isHypenIndexValidReverse(const QString& sentence, int& hype
 }
 
 QString StudiosManager::GetLocalFilePath(const QString& localFilePath) {
-  if (!localFilePath.isEmpty()) {
-    /* only used in LLT test */
+  if (!localFilePath.isEmpty()) { /* only used in LLT test */
     return localFilePath;
   }
-
-#ifdef _WIN32
-  const QString stdStudiosFilePath =  //
-      PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name, "").toString();
-#else
-  const QString stdStudiosFilePath =  //
-      PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name, "").toString();
-#endif
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString stdStudiosFilePath = PathTool::GetPathByApplicationDirPath(STANDARD_STUDIO_NAME);
   return stdStudiosFilePath;
 }
 

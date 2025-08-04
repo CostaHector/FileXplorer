@@ -5,12 +5,7 @@
 #include <QDirIterator>
 
 QString RedunImgLibs::GetRedunPath() {
-  QString redunPath;
-#ifdef _WIN32
-  redunPath = PreferenceSettings().value(RedunImgFinderKey::WIN32_RUND_IMG_PATH.name, RedunImgFinderKey::WIN32_RUND_IMG_PATH.v).toString();
-#else
-  redunPath = PreferenceSettings().value(RedunImgFinderKey::LINUX_RUND_IMG_PATH.name, RedunImgFinderKey::LINUX_RUND_IMG_PATH.v).toString();
-#endif
+  QString redunPath = PreferenceSettings().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.v).toString();
   return redunPath;
 }
 
