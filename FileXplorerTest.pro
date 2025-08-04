@@ -100,3 +100,10 @@ HEADERS += \
     Component/RenameWidgets/CommandsPreview.h \
     Component/StateLabel.h \
     Component/JsonEditorWidget/LineEditCSV.h \
+
+
+DISTFILES += \
+    readme.md
+
+RESOURCES += \
+    bin/themes/res.qrc
