@@ -1,8 +1,13 @@
 ﻿#include "PathTool.h"
-
+#include <QCoreApplication>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
+
+QString PathTool::GetPathByApplicationDirPath(const QString& relativePath) {
+  static const QDir appDir {QCoreApplication::applicationDirPath()};
+  return QDir::cleanPath(appDir.absoluteFilePath(relativePath));
+}
 
 QString PathTool::StripTrailingSlash(QString path) {
   // drive letter will be kept while trailing path seperator will be trunc

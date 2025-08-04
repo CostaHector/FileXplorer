@@ -29,6 +29,14 @@ C:/home/to/path           folder1				------------------ignore
   QStringList selections;
 };
 
+namespace FILE_REL_PATH{
+constexpr char MEDIA_INFO_DLL[] {"../../lib/MediaInfo.dll"};
+constexpr char TERMINAL_OPEN_BATCH_FILE_PATH[]{"../../bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat"};
+constexpr char PERFORMERS_TABLE[]{"../../../CastStudioList/PERFORMERS_TABLE.txt"};
+constexpr char AKA_PERFORMERS[]{"../../../CastStudioList/AKA_PERFORMERS.txt"};
+constexpr char STANDARD_STUDIO_NAME[]{"../../../CastStudioList/STANDARD_STUDIO_NAME.txt"};
+}
+
 constexpr char PATH_SEP_CHAR = '/';
 constexpr int EXTENSION_MAX_LENGTH = 5;  // ".json"
 
@@ -40,6 +48,7 @@ inline QString GetWinStdPath(const QString& path) {
 #endif
   return path;
 }
+QString GetPathByApplicationDirPath(const QString& relativePath);
 
 QString StripTrailingSlash(QString path);
 QString linkPath(const QString& localPath);

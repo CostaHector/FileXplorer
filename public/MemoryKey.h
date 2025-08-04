@@ -79,18 +79,7 @@ struct MemoryKey {
   static const KV RENAMER_NUMERIAZER_NO_FORMAT;
   static const KV RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX;
 
-  static const KV WIN32_MEDIAINFO_LIB_PATH;
-  static const KV WIN32_PERFORMERS_TABLE;
-  static const KV WIN32_AKA_PERFORMERS;
-  static const KV WIN32_STANDARD_STUDIO_NAME;
-  static const KV WIN32_TERMINAL_OPEN_BATCH_FILE_PATH;
   static const KV LOG_LEVEL_PRINT_INSTANTLY;
-  static const KV WIN32_RUNLOG;
-
-  static const KV LINUX_PERFORMERS_TABLE;
-  static const KV LINUX_AKA_PERFORMERS;
-  static const KV LINUX_STANDARD_STUDIO_NAME;
-  static const KV LINUX_RUNLOG;
 
   static const KV DUPLICATE_FINDER_DEVIATION_DURATION;  // 2s ~ 20s
   static const KV DUPLICATE_FINDER_DEVIATION_FILESIZE;  // 2kB ~ 30MB
@@ -103,8 +92,7 @@ struct MemoryKey {
 struct RedunImgFinderKey {
 static const KV GEOMETRY;
 static const KV ALSO_RECYCLE_EMPTY_IMAGE;
-static const KV WIN32_RUND_IMG_PATH;
-static const KV LINUX_RUND_IMG_PATH;
+static const KV RUND_IMG_PATH;
 };
 
 #endif  // MEMORYKEY_H

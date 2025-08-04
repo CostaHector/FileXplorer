@@ -147,7 +147,6 @@
 <file alias="CAST_CLEAR">JsonEditor/CAST_CLEAR.svg</file>
 <file alias="CAST_APPEND_FROM_SENTENCE">JsonEditor/CAST_APPEND_FROM_SENTENCE.svg</file>
 <file alias="CAST_APPEND_FROM_UPPERCASE_SENTENCE">JsonEditor/CAST_APPEND_FROM_UPPERCASE_SENTENCE.svg</file>
-<file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
 <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
 <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
 <file alias="SAVED">JsonEditor/SAVED.svg</file>

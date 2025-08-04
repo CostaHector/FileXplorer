@@ -1,6 +1,7 @@
 #ifdef _WIN32
 #include "QMediaInfo.h"
 #include "public/MemoryKey.h"
+#include "public/PathTool.h"
 #include <QFileInfo>
 #include <QTime>
 #define QString2MediaInfoc_str(qstr) (qstr).toStdWString().c_str()
@@ -63,13 +64,12 @@ bool QMediaInfo::StartToGet() {
     qDebug("already loaded skip load");
     return true;
   }
-
-  const QString libPath = PreferenceSettings().value(MemoryKey::WIN32_MEDIAINFO_LIB_PATH.name).toString();
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString libPath = PathTool::GetPathByApplicationDirPath(MEDIA_INFO_DLL);
   if (!QFile::exists(libPath)) {
-    qWarning("lib path[%s] not found", qPrintable(libPath));
+    qCritical("lib path[%s] not found", qPrintable(libPath));
     return false;
   }
-  qDebug("lib path[%s]", qPrintable(libPath));
   if (pLib == nullptr) {
     pLib = new (std::nothrow) QLibrary(libPath);
     if (pLib == nullptr) {
@@ -80,7 +80,7 @@ bool QMediaInfo::StartToGet() {
 
   if (!pLib->load()) {
     // if error says: ERROR_BAD_EXE_FORMAT: 0x0x000000c1 use win64 archi
-    qWarning("load lib FAILED, message: %s", qPrintable(pLib->errorString()));
+    qCritical("load lib FAILED, message: %s", qPrintable(pLib->errorString()));
     delete pLib;
     pLib = nullptr;
     return false;

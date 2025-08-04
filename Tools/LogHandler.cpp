@@ -2,6 +2,7 @@
 #include "public/MemoryKey.h"
 #include "Actions/LogActions.h"
 #include "public/PathTool.h"
+#include "public/PublicVariable.h"
 
 #include <QDesktopServices>
 #include <QMessageLogContext>
@@ -55,13 +56,8 @@ LogHandler::LogHandler(const QString& logPath, const int msgType, QObject* paren
 
   if (!logPath.isEmpty()) {  // log path valid
     mLogFolderPath = logPath;
-  } else {
-#ifdef _WIN32
-    QString logFileName{PreferenceSettings().value(MemoryKey::WIN32_RUNLOG.name, MemoryKey::WIN32_RUNLOG.v).toString()};
-#else
-    QString logFileName{PreferenceSettings().value(MemoryKey::LINUX_RUNLOG.name, MemoryKey::LINUX_RUNLOG.v).toString()};
-#endif
-    mLogFolderPath = logFileName + "/logs_info.log";
+  } else {    
+    mLogFolderPath = SystemPath::WORK_PATH + "/logs_info.log";
   }
   mLogFile.setFileName(mLogFolderPath);
   if (!mLogFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
