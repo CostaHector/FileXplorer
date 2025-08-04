@@ -2,18 +2,13 @@ FileXplorer.pro.user
 FileXplorer.pro.user.*
 FileXplorer_zh_CN.qm
 
-FileExplorerTest.pro.*
-FileExplorerTest.pro.user.*
+FileXplorerTest.pro.user
+FileXplorerTest.pro.user.*
 
 CMakeLists.txt.user
-
-bin/logs_info.log
 
 ./*.json
 *.idx
 build/*
 *.pro.user
 *.pro.user.*
-
-
-
