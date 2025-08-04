@@ -3,6 +3,7 @@
 #include "Tools/CastManager.h"
 #include "Tools/StudiosManager.h"
 #include "Tools/PerformersAkaManager.h"
+#include "public/PathTool.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include <QDesktopServices>
@@ -10,11 +11,8 @@
 #include <QFile>
 
 void onEditStudios() {
-#ifdef _WIN32
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_STANDARD_STUDIO_NAME.name).toString();
-#else
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_STANDARD_STUDIO_NAME.name).toString();
-#endif
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(STANDARD_STUDIO_NAME);
   if (!QFile::exists(fileAbsPath)) {
     qWarning("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
     Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
@@ -25,12 +23,9 @@ void onEditStudios() {
 }
 
 void onEditPerformers() {
-#ifdef _WIN32
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_PERFORMERS_TABLE.name).toString();
-#else
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_PERFORMERS_TABLE.name).toString();
-#endif
-  if (not QFile::exists(fileAbsPath)) {
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(PERFORMERS_TABLE);
+  if (!QFile::exists(fileAbsPath)) {
     qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
     Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
     return;
@@ -40,12 +35,9 @@ void onEditPerformers() {
 }
 
 void onEditAkaPerformer() {
-#ifdef _WIN32
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::WIN32_AKA_PERFORMERS.name).toString();
-#else
-  QString fileAbsPath = PreferenceSettings().value(MemoryKey::LINUX_AKA_PERFORMERS.name).toString();
-#endif
-  if (not QFile::exists(fileAbsPath)) {
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS);
+  if (!QFile::exists(fileAbsPath)) {
     qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
     Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
     return;

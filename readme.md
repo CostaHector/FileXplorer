@@ -71,11 +71,11 @@ variable of class data memeber:
 we suggest you to do following setting in git bash
 ```md
 git update-index --assume-unchange FileXplorer.pro.user
-git update-index --assume-unchange FileExplorerTest.pro.user
+git update-index --assume-unchange FileXplorerTest.pro.user
 git update-index --assume-unchange bin/logs_info.log
 
 git update-index --no-assume-unchange FileXplorer.pro.user
-git update-index --no-assume-unchange FileExplorerTest.pro.user
+git update-index --no-assume-unchange FileXplorerTest.pro.user
 git update-index --no-assume-unchange bin/logs_info.log
 ```
 
