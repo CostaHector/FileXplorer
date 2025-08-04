@@ -1,4 +1,5 @@
 #include "SysTerminal.h"
+#include "public/PathTool.h"
 #include "public/PublicVariable.h"
 #include "public/MemoryKey.h"
 #include <QDesktopServices>
@@ -11,7 +12,8 @@
 
 #ifdef _WIN32
 QString SysTerminal::UpdateBatFile(const QString& command) const {
-  const QString batFileAbsPath{PreferenceSettings().value(MemoryKey::WIN32_TERMINAL_OPEN_BATCH_FILE_PATH.name).toString()};
+  using namespace PathTool::FILE_REL_PATH;
+  static const QString batFileAbsPath = PathTool::GetPathByApplicationDirPath(TERMINAL_OPEN_BATCH_FILE_PATH);
   QFile fi{batFileAbsPath};
   if (!fi.open(QIODevice::Text | QIODevice::WriteOnly)) {
     qWarning("bat file[%s] open for write failed", qPrintable(batFileAbsPath));
