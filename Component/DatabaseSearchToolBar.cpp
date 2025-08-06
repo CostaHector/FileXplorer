@@ -2,9 +2,6 @@
 #include "public/PublicMacro.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/FileDescriptor/MountHelper.h"
-#include <QLayout>
-#include <QStackedWidget>
-#include <QToolButton>
 
 Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{parent} {
   setEditable(false);
