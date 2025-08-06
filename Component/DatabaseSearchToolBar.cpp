@@ -4,10 +4,20 @@
 #include "Tools/FileDescriptor/MountHelper.h"
 #include <QLayout>
 
-Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{parent} {}
+Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{parent} {
+  setEditable(true);
+}
 
 void Guid2RootPathComboxBox::AddItem(const QString& guidUnderscore, const QString& rootPath) {
+  const int index = count();
   addItem(guidUnderscore + MountHelper::JOINER_STR + rootPath);
+  QString toolHint;
+  toolHint.reserve(50);
+  toolHint += "GUID:<br/>";
+  toolHint += "<b>" + guidUnderscore + "</b><br/>";
+  toolHint += "Path:<br/>";
+  toolHint += "<b>" + rootPath + "</b>";
+  setItemData(index, toolHint, Qt::ToolTipRole);
 }
 
 QString Guid2RootPathComboxBox::CurrentTableName() const {
@@ -30,30 +40,31 @@ QStringList Guid2RootPathComboxBox::ToQStringList() const {
 }
 
 DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent)  //
-    : QToolBar(title, parent) {
-  m_tables = new (std::nothrow) Guid2RootPathComboxBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_tables);
+  : QToolBar(title, parent) {
   m_searchLE = new (std::nothrow) QLineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(m_searchLE);
-  m_searchCB = new (std::nothrow) QComboBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_searchCB);
-
-  m_tables->setEditable(false);
-  m_tables->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-
   m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
+
+  m_searchCB = new (std::nothrow) QComboBox{this};
+  CHECK_NULLPTR_RETURN_VOID(m_searchCB);
   m_searchCB->setLineEdit(m_searchLE);
   using namespace MOVIE_TABLE;
-  m_searchCB->addItem(QString{R"(%1 LIKE "%")"}.arg(ENUM_2_STR(Name)));
-  m_searchCB->addItem(QString{R"(%1 BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
-  m_searchCB->addItem(QString{R"(%1 = "E:/")"}.arg(ENUM_2_STR(Driver)));
-  m_searchCB->addItem(QString{R"(%1 IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
-  m_searchCB->addItem(QString{R"(%1 LIKES "%Chris Evans%")"}.arg(ENUM_2_STR(Cast)));
+  m_searchCB->addItem(QString{R"('%1' LIKE "%")"}.arg(ENUM_2_STR(Name)));
+  m_searchCB->addItem(QString{R"('%1' BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
+  m_searchCB->addItem(QString{R"('%1' = "E:/")"}.arg(ENUM_2_STR(Driver)));
+  m_searchCB->addItem(QString{R"('%1' IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
+  m_searchCB->addItem(QString{R"('%1' LIKES "%Chris Evans%")"}.arg(ENUM_2_STR(Cast)));
   m_searchCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  addWidget(m_tables);
+  m_tables = new (std::nothrow) Guid2RootPathComboxBox{this};
+  CHECK_NULLPTR_RETURN_VOID(m_tables);
+  m_tables->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
+  m_tables->setMinimumWidth(120);
+
   addWidget(m_searchCB);
+  addAction(QIcon{":img/TABLES"}, "Tables");
+  addWidget(m_tables);
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);

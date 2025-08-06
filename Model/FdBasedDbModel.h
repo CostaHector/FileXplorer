@@ -7,7 +7,7 @@
 #include "Tools/FileDescriptor/TableFields.h"
 
 class FdBasedDbModel : public QSqlTableModel {
- public:
+public:
   explicit FdBasedDbModel(QObject* parent = nullptr, QSqlDatabase con = QSqlDatabase());
 
   void setTable(const QString& tableName) override;
@@ -46,10 +46,10 @@ class FdBasedDbModel : public QSqlTableModel {
 
   QString fullInfo(const QModelIndex& curIndex) const {
     return data(curIndex.siblingAtColumn(MOVIE_TABLE::Name)).toString()    //
-           + '\t'                                                          //
-           + data(curIndex.siblingAtColumn(MOVIE_TABLE::Size)).toString()  //
-           + '\t'                                                          //
-           + data(curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight)).toString();
+        + '\t'                                                          //
+        + data(curIndex.siblingAtColumn(MOVIE_TABLE::Size)).toString()  //
+        + '\t'                                                          //
+        + data(curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight)).toString();
   }
 
   void SetStudio(const QModelIndexList& tagColIndexes, const QString& studio);
@@ -57,7 +57,7 @@ class FdBasedDbModel : public QSqlTableModel {
   void AddCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence);
   void RmvCastOrTags(const QModelIndexList& tagColIndexes, const QString& cast);
 
- private:
+private:
   QString m_rootPath;
 };
 
