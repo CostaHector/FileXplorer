@@ -271,6 +271,22 @@ QToolBar QToolBar {
     margin: 0px;
     border: 0px;
 }
+QToolBar QComboBox {
+    margin: 0px;
+    border: 0px;
+    border: 1px solid #d0d0d0;
+}
+
+QToolBar QLineEdit {
+    margin: 0px;
+    border: 1px solid #d0d0d0;
+}
+
+QComboBox QLineEdit {
+    margin: 0px;
+    border: 0px;
+    border: 1px solid #d0d0d0;
+}
 
 /* 基础样式 */
 QToolBar QToolButton {

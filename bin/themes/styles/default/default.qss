@@ -1,10 +1,3 @@
-/* 输入框 */
-QLineEdit {
-    border: 1px solid;
-    margin: 1px;
-}
-
-
 QMainWindow::separator {
     width: 1px;
     height: 0px;
@@ -171,9 +164,27 @@ QScrollBar::add-page, QScrollBar::sub-page {
 QToolBar {
     border: 1px solid #FFFFFF;
 }
+
 QToolBar QToolBar {
     margin: 0px;
     border: 0px;
+}
+
+QToolBar QComboBox {
+    margin: 0px;
+    border: 0px;
+    border: 1px solid #000000;
+}
+
+QToolBar QLineEdit {
+    margin: 0px;
+    border: 1px solid #000000;
+}
+
+QComboBox QLineEdit {
+    margin: 0px;
+    border: 0px;
+    border: 1px solid #000000;
 }
 
 /* 基础样式 */
