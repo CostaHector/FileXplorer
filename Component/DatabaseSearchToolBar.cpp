@@ -3,14 +3,16 @@
 #include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/FileDescriptor/MountHelper.h"
 #include <QLayout>
+#include <QStackedWidget>
+#include <QToolButton>
 
 Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{parent} {
-  setEditable(true);
+  setEditable(false);
 }
 
 void Guid2RootPathComboxBox::AddItem(const QString& guidUnderscore, const QString& rootPath) {
   const int index = count();
-  addItem(guidUnderscore + MountHelper::JOINER_STR + rootPath);
+  addItem(QIcon(":img/TABLES"), guidUnderscore + MountHelper::JOINER_STR + rootPath);
   QString toolHint;
   toolHint.reserve(50);
   toolHint += "GUID:<br/>";
@@ -40,11 +42,11 @@ QStringList Guid2RootPathComboxBox::ToQStringList() const {
 }
 
 DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent)  //
-  : QToolBar(title, parent) {
-  m_searchLE = new (std::nothrow) QLineEdit{this};
+  : QWidget{parent} {
+  m_searchLE = new (std::nothrow) QLineEdit;
   CHECK_NULLPTR_RETURN_VOID(m_searchLE);
-  m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchLE->setClearButtonEnabled(true);
+  m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
 
   m_searchCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_searchCB);
@@ -57,14 +59,15 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   m_searchCB->addItem(QString{R"('%1' LIKES "%Chris Evans%")"}.arg(ENUM_2_STR(Cast)));
   m_searchCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  m_tables = new (std::nothrow) Guid2RootPathComboxBox{this};
+  m_tables = new (std::nothrow) Guid2RootPathComboxBox;
   CHECK_NULLPTR_RETURN_VOID(m_tables);
-  m_tables->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
-  m_tables->setMinimumWidth(120);
+  m_tables->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
-  addWidget(m_searchCB);
-  addAction(QIcon{":img/TABLES"}, "Tables");
-  addWidget(m_tables);
+  mLo = new QHBoxLayout;
+  CHECK_NULLPTR_RETURN_VOID(mLo);
+  mLo->addWidget(m_searchCB, 8);
+  mLo->addWidget(m_tables, 2);
+  setLayout(mLo);
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
