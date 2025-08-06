@@ -24,7 +24,7 @@ class LogHandler: QObject {
 
   static QtMsgType OUTPUT_LOG_LEVEL;
   static bool mAutoFlushLogBuffer;
-  static QString mLogFolderPath;
+  static QString mLogFilePath;
 
   static QFile mLogFile;
   static QTextStream mLogTextStream;
