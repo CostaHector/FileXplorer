@@ -128,10 +128,10 @@ bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<QStrin
   if (!CheckValidAndOpen(db)) {
     return false;
   }
-  const QString& qryCmd = QString{"SELECT `%1` FROM %2"}.arg(pk).arg(tableName);
+  const QString qryCmd {QString{"SELECT `%1` FROM `%2`"}.arg(pk).arg(tableName)};
   QSqlQuery qry{qryCmd, db};
   if (!qry.exec()) {
-    qWarning("cmd[%s] failed:%s", qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    qWarning("cmd[%s] failed:%s", qPrintable(qry.lastQuery()), qPrintable(qry.lastError().text()));
     db.rollback();
     return false;
   }
@@ -151,10 +151,10 @@ bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<int>& 
   if (!CheckValidAndOpen(db)) {
     return false;
   }
-  const QString& qryCmd = QString{"SELECT `%1` FROM %2"}.arg(pk).arg(tableName);
+  const QString qryCmd {QString{"SELECT `%1` FROM `%2`"}.arg(pk).arg(tableName)};
   QSqlQuery qry{qryCmd, db};
   if (!qry.exec()) {
-    qWarning("cmd[%s] failed:%s", qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+    qWarning("cmd[%s] failed:%s", qPrintable(qry.lastQuery()), qPrintable(qry.lastError().text()));
     db.rollback();
     return false;
   }
@@ -174,10 +174,10 @@ bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<qint64
   if (!CheckValidAndOpen(db)) {
     return false;
   }
-  const QString& qryCmd = QString{"SELECT `%1` FROM %2"}.arg(pk).arg(tableName);
-  QSqlQuery qry{qryCmd, db};
-  if (!qry.exec()) {
-    qWarning("cmd[%s] failed:%s", qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+  const QString qryCmd {QString{"SELECT `%1` FROM `%2`"}.arg(pk).arg(tableName)};
+  QSqlQuery qry{db};
+  if (!qry.exec(qryCmd)) {
+    qWarning("cmd[%s] failed:%s", qPrintable(qry.lastQuery()), qPrintable(qry.lastError().text()));
     db.rollback();
     return false;
   }
