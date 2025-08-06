@@ -11,10 +11,11 @@ FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
 }
 
 void FdBasedDbModel::setTable(const QString& tableName) {
-  QSqlTableModel::setTable(tableName);
+  const QString validTableName = tableName;
+  QSqlTableModel::setTable(validTableName);
   const QString& guidFromTableName = GUID();
   m_rootPath = MountHelper::FindRootByGUIDWin(guidFromTableName);
-  qDebug("GUID:%s, m_rootPath:%s", qPrintable(guidFromTableName), qPrintable(m_rootPath));
+  qDebug("tableName:%s, GUID:%s, m_rootPath:%s", qPrintable(this->tableName()), qPrintable(guidFromTableName), qPrintable(m_rootPath));
 }
 
 QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {

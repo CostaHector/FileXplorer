@@ -168,6 +168,7 @@
 <file alias="STUDIO_CLEAR">JsonEditor/STUDIO_CLEAR.svg</file>
 <file alias="STUDIO">JsonEditor/STUDIO.svg</file>
 <file alias="NAME_FROM_JSON_FILENAME">JsonEditor/NAME_FROM_JSON_FILENAME.svg</file>
+
 <!--VideoPlayer icon here-->
 <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
 <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
@@ -259,6 +260,7 @@
 <file alias="PAGINATION_LAST">View/PAGINATION_LAST.svg</file>
 <file alias="PAGINATION_NEXT">View/PAGINATION_NEXT.svg</file>
 <file alias="FLOATING_PREVIEW">View/FLOATING_PREVIEW.svg</file>
+
 <!--Database icon here-->
 <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
 <file alias="CREATE_TABLE">Database/CREATE_TABLE.svg</file>
@@ -276,6 +278,7 @@
 <file alias="UNION">Database/UNION.svg</file>
 <file alias="AUDIT">Database/AUDIT.svg</file>
 <file alias="REVERT">Database/REVERT.svg</file>
+<file alias="TABLES">Database/TABLES.svg</file>
 
 <!--AlertSystem icon here-->
 <file alias="ALERT">AlertSystem/ALERT.svg</file>
