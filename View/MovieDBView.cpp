@@ -354,7 +354,7 @@ bool MovieDBView::onDeleteFromTable() {
 
   bool okClicked = false;
   const QString& whereClause = QInputDialog::getItem(this, "DELETE WHERE clause",                //
-                                                     QString{"DELETE FROM %1 WHERE "}.arg(tbl),  //
+                                                     QString{"DELETE FROM `%1` WHERE "}.arg(tbl),  //
                                                      candidates, 0, true, &okClicked);
   if (!okClicked) {
     LOG_GOOD("[skip] User cancel delete row", "")
