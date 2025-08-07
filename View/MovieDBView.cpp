@@ -259,7 +259,7 @@ void MovieDBView::onCreateATable() {
   const QStringList& tables = con.tables();
   QStringList candidates = MountHelper::GetGuidJoinDisplayName();
   candidates.push_back(DB_TABLE::MOVIES);
-  const QString& msgs = QString("current %1 table names occupied as following:\n%2").arg(candidates.size()).arg(candidates.join('\n'));
+  const QString msgs {QString("current %1 table names occupied as following:\n%2").arg(candidates.size()).arg(candidates.join('\n'))};
   const QString& crtTbl = QInputDialog::getItem(this, "Input an table name", msgs, candidates, 0,  //
                                                 true, &isInputOk);
   if (!isInputOk) {
@@ -301,7 +301,7 @@ bool MovieDBView::onDropATable() {
   }
   const QStringList& candidates = _tablesDropDownList->ToQStringList();
   const int defaultDropIndex = _tablesDropDownList->currentIndex();
-  const QString& msgs = QString("There are %1 table(s) as following:\n%2").arg(candidates.size()).arg(candidates.join('\n'));
+  const QString msgs {QString("There are %1 table(s) as following:\n%2").arg(candidates.size()).arg(candidates.join('\n'))};
 
   bool okUserSelect = false;
   const QString& drpTbl = QInputDialog::getItem(this, "CONFIRM DROP? (NOT RECOVERABLE)",  //
@@ -364,7 +364,7 @@ bool MovieDBView::onDeleteFromTable() {
     qWarning("All record(s) in table[%s] to be deleted.", qPrintable(tbl));
   }
   qDebug("Where clause[%s]", qPrintable(whereClause));
-  const QString deleteCmd{QString{"DELETE FROM %1\nWHERE [%2];"}.arg(tbl, whereClause)};
+  const QString deleteCmd{QString{"DELETE FROM `%1` WHERE [%2];"}.arg(tbl, whereClause)};
   if (QMessageBox::question(this, "CONFIRM DELETE? (OPERATION NOT RECOVERABLE)", deleteCmd,  //
                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
       != QMessageBox::Yes) {
@@ -414,7 +414,7 @@ bool MovieDBView::onUnionTables() {
     return true;
   }
 
-  const QString& confirmUnionHintMsg = QString("All %1 tables into Table[%2]").arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES);
+  const QString confirmUnionHintMsg {QString{"All %1 tables into Table[%2]"}.arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES)};
   if (QMessageBox::question(this, "Confirm Union?", confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
     LOG_GOOD("[Skip] User cancel union tables", "cancel");
     return true;
@@ -426,16 +426,16 @@ bool MovieDBView::onUnionTables() {
     if (srcTable == DB_TABLE::MOVIES) {
       continue;
     }
-    unionSrcTbs << QString("SELECT * FROM `%1`").arg(srcTable);
+    unionSrcTbs << (QString{"SELECT * FROM `%1`"}.arg(srcTable));
   }
 
   // REPLACE INTO `MOVIES` SELECT * FROM `A568` UNION SELECT * FROM `AASAD`;
-  const QString& unionStr = unionSrcTbs.join(" UNION ");
-  const QString& unionCmd = QString("REPLACE INTO `%1` %2").arg(DB_TABLE::MOVIES).arg(unionStr);
+  const QString unionStr {unionSrcTbs.join(" UNION ")};
+  const QString unionCmd {QString{"REPLACE INTO `%1` %2"}.arg(DB_TABLE::MOVIES).arg(unionStr)};
   QSqlQuery unionTableQry{con};
   if (!unionTableQry.exec(unionCmd)) {
-    const QString& title = QString("Union %1 table(s) into [%2]").arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES);
-    const QString& msg = QString("cmd: %1 failed: %2").arg(unionTableQry.executedQuery()).arg(unionTableQry.lastError().text());
+    const QString title {QString{"Union %1 table(s) into [%2]"}.arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES)};
+    const QString msg {QString{"cmd: %1 failed: %2"}.arg(unionTableQry.executedQuery()).arg(unionTableQry.lastError().text())};
     LOG_GOOD(title, msg);
     QMessageBox::warning(this, title, msg);
     con.rollback();
@@ -479,7 +479,7 @@ bool MovieDBView::onAuditATable() {
     return false;
   }
   _dbModel->select();
-  QString adtMsg = QString{"Audit table[%1] by selectPath[%2] succeed"}.arg(curTblName).arg(selectPath);
+  QString adtMsg{QString{"Audit table[%1] by selectPath[%2] succeed"}.arg(curTblName).arg(selectPath)};
   QString retMsg{QString{"Insert: %1/Delete: %2/Update: %3"}.arg(adtResult.insertCnt).arg(adtResult.deleteCnt).arg(adtResult.updateCnt)};
   LOG_GOOD(adtMsg, retMsg);
 
@@ -532,7 +532,7 @@ bool MovieDBView::onExportToJson() {
   }
   const QString& tblPeerPath = GetMovieTableRootPath();
   if (!QFileInfo{tblPeerPath}.isDir()) {
-    const QString offLineMsg = QString{"[Skip] Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath);
+    const QString offLineMsg {QString{"[Skip] Table[%1] Peer Path[%2] not exist(Disk Maybe Offline)"}.arg(curTblName).arg(tblPeerPath)};
     LOG_WARN(offLineMsg, "Skip now");
     return false;
   }
@@ -543,7 +543,7 @@ bool MovieDBView::onExportToJson() {
         return false;
   }
   _dbModel->select();
-  QString jsonAffectedMsg = QString{"%1 json file(s) get update"}.arg(retCnt);
+  QString jsonAffectedMsg {QString{"%1 json file(s) get update"}.arg(retCnt)};
   LOG_GOOD("[OK] Export to json succeed", jsonAffectedMsg);
   return true;
 }
