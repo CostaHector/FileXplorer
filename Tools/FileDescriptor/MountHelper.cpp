@@ -284,6 +284,9 @@ const MountHelper::GUID_2_PNTS_SET& MountHelper::Guids2MntPntSet(bool forceRefre
 }
 
 QString MountHelper::GetDisplayNameByGuidTableName(QString guidTableName) {
+  if (guidTableName.size() != MountHelper::GUID_LEN) {
+    return guidTableName;
+  }
   const QString& stdVolumeName = VOLUME_NAME_TEMPLATE.arg(guidTableName.replace(TABLE_UNDERSCORE, GUID_HYPEN));
   const auto& mountedVolLst = QStorageInfo::mountedVolumes();
   for (const auto& si : mountedVolLst) {

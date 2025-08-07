@@ -256,7 +256,8 @@ void MovieDBView::onCreateATable() {
 
   bool isInputOk{false};
   const QStringList& tables = con.tables();
-  const QStringList& candidates = MountHelper::GetGuidJoinDisplayName();
+  QStringList candidates = MountHelper::GetGuidJoinDisplayName();
+  candidates.push_back(DB_TABLE::MOVIES);
   const QString& msgs = QString("current %1 table names occupied as following:\n%2").arg(candidates.size()).arg(candidates.join('\n'));
   const QString& crtTbl = QInputDialog::getItem(this, "Input an table name", msgs, candidates, 0,  //
                                                 true, &isInputOk);
@@ -402,7 +403,7 @@ bool MovieDBView::onUnionTables() {
 
   const QStringList& tbs = con.tables();
   if (!tbs.contains(DB_TABLE::MOVIES)) {
-    QMessageBox::warning(this, "Destination table not exist. Create it at first", DB_TABLE::MOVIES);
+    LOG_INFO("Destination table not exist. Create it at first", DB_TABLE::MOVIES);
     return false;
   }
 
