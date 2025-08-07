@@ -303,7 +303,7 @@ void CustomTableView::onHorizontalHeaderChanged() const {
 }
 void CustomTableView::onVerticalHeaderChanged() const {}
 
-void CustomTableView::InitTableView() {
+void CustomTableView::InitTableView(const bool bHideShowCol) {
   horizontalHeader()->setVisible(SHOW_HORIZONTAL_HEADER->isChecked());
   verticalHeader()->setVisible(SHOW_VERTICAL_HEADER->isChecked());
   if (PreferenceSettings().value(m_rowResizeToContentKey, false).toBool()) {
@@ -313,7 +313,9 @@ void CustomTableView::InitTableView() {
     verticalHeader()->setDefaultSectionSize(m_defaultTableRowHeight);
   }
   horizontalHeader()->restoreState(PreferenceSettings().value(m_horizontalHeaderStateKey, QByteArray{}).toByteArray());
-  ShowOrHideColumnCore();
+  if (bHideShowCol) {
+    ShowOrHideColumnCore();
+  }
 }
 
 void CustomTableView::onHorizontalHeaderMenuRequest(const QPoint& pnt) {
