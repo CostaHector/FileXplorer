@@ -19,7 +19,7 @@ bool FdBasedDb::CHECK_TABLE_VOLUME_ONLINE{true};
 
 const QString FdBasedDb::CREATE_TABLE_TEMPLATE  //
     {
-        "CREATE TABLE IF NOT EXISTS '%1' ("          // TABLE_NAME
+        "CREATE TABLE IF NOT EXISTS `%1` ("          // TABLE_NAME
         + QString{"`%1` BIGINT NOT NULL, "           // fd BIGINT
                   "`%2` NCHAR(260) DEFAULT '', "     // PrePathLeft
                   "`%3` NCHAR(260) DEFAULT '', "     // PrePathRight
@@ -46,7 +46,7 @@ const QString FdBasedDb::CREATE_TABLE_TEMPLATE  //
 
 const QString FdBasedDb::INSERT_MOVIE_RECORD_FULL_TEMPLATE  //
     {
-        "REPLACE INTO '%1' "                                                        // TABLE_NAME
+        "REPLACE INTO `%1` "                                                        // TABLE_NAME
         + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`) "  //
                   "VALUES "                                                         //
                   "(:%1, :%2, :%3, :%4, :%5, :%6, :%7, :%8, :%9, :%10);"}           //
@@ -64,7 +64,7 @@ const QString FdBasedDb::INSERT_MOVIE_RECORD_FULL_TEMPLATE  //
 
 const QString FdBasedDb::INSERT_MOVIE_RECORD_TEMPLATE  //
     {
-        "REPLACE INTO '%1' "                               // TABLE_NAME
+        "REPLACE INTO `%1` "                               // TABLE_NAME
         + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`) "  //
                   "VALUES "                                //
                   "(:%1, :%2, :%3, :%4, :%5, :%6);"}       //
@@ -95,7 +95,7 @@ enum UPDATE_PATH_FIELED {
 
 const QString FdBasedDb::UPDATE_PATH_TEMPLATE  //
     {
-        "UPDATE '%1' "  //
+        "UPDATE `%1` "  //
         + QString("SET `%1` = :%1, `%2` = :%2, `%3` = :%3, `%4` = :%4 "
                   "WHERE `%5` = :%5;")
               .arg(ENUM_2_STR(PrePathLeft))   //
@@ -114,12 +114,12 @@ enum QUERY_DURATION_0_FILED {
 
 const QString FdBasedDb::SELECT_DURATION_0_TEMPLATE  //
     {
-        QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM "}  //
+        QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM"}  //
             .arg(ENUM_2_STR(PrePathLeft))    //
             .arg(ENUM_2_STR(PrePathRight))   //
             .arg(ENUM_2_STR(Name))           //
             .arg(ENUM_2_STR(Fd))             //
-        + "'%1' "                                       //
+        + " `%1` "                                       //
         + QString{"WHERE `%1` = 0;"}                    //
               .arg(ENUM_2_STR(Duration))     //
     };
@@ -131,7 +131,7 @@ enum UPDATE_DURATION_0_FILED {
 
 const QString FdBasedDb::UPDATE_DURATION_0_TEMPLATE  //
     {
-        "UPDATE '%1' "  //
+        "UPDATE `%1` "  //
         + QString("SET `%1` = :%1 "
                   "WHERE `%2` = :%2;")
               .arg(ENUM_2_STR(Duration))  //
@@ -140,7 +140,7 @@ const QString FdBasedDb::UPDATE_DURATION_0_TEMPLATE  //
 
 const QString FdBasedDb::SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE  //
     {
-        QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7` FROM "}            //
+        QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7` FROM"}            //
             .arg(ENUM_2_STR(PrePathLeft))                                //
             .arg(ENUM_2_STR(PrePathRight))                               //
             .arg(ENUM_2_STR(Name))                                       //
@@ -148,7 +148,7 @@ const QString FdBasedDb::SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE  //
             .arg(ENUM_2_STR(Studio))                                     //
             .arg(ENUM_2_STR(Cast))                                       //
             .arg(ENUM_2_STR(Tags))                                       //
-        + "'%1' "                                                                   //
+        + " `%1` "                                                                   //
         + QString{R"(WHERE `%1` != 0 OR `%2` != '' OR `%3` != '' OR `%4` != '';)"}  //
               .arg(ENUM_2_STR(Duration))                                 //
               .arg(ENUM_2_STR(Studio))                                   //
@@ -165,7 +165,7 @@ enum UPDATE_STUDIO_CAST_TAGS_FIELED {
 
 const QString FdBasedDb::UPDATE_STUDIO_CAST_TAGS_TEMPLATE  //
     {
-        "UPDATE '%1' "                                       //
+        "UPDATE `%1` "                                       //
         + QString("SET `%1` = :%1, `%2` = :%2, `%3` = :%3 "  //
                   "WHERE `%4` = :%4;")                       //
               .arg(ENUM_2_STR(Studio))            //
@@ -324,7 +324,7 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
     return FD_OK;
   }
   const QString& placeholders = GetDeleteInPlaceholders(needDeleteFds.size());
-  const QString qryCmd = QString{R"(DELETE FROM '%1' WHERE `%2` IN (%3);)"}
+  const QString qryCmd = QString{R"(DELETE FROM `%1` WHERE `%2` IN (%3);)"}
                              .arg(tableName)                  //
                              .arg(ENUM_2_STR(Fd))  //
                              .arg(placeholders);
