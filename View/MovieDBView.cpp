@@ -126,10 +126,11 @@ bool MovieDBView::setCurrentMovieTable(const QString& guidJoinRootPath) {
   qDebug("Set current table[%s] from GuidJoinRooPath[%s]",
          qPrintable(newTableName), qPrintable(guidJoinRootPath));
 
-  InitTableView(); // restore state must ahead of data load
+  InitTableView(false); // restore state must ahead of data load
   PreferenceSettings().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, guidJoinRootPath);
   _dbModel->setTable(newTableName);
   _dbModel->select();
+  ShowOrHideColumnCore();
   return true;
 }
 
