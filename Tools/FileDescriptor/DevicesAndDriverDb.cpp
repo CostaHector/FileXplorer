@@ -212,7 +212,7 @@ FD_ERROR_CODE DevicesAndDriverDb::Delete(const QString& tableName, const QSet<QS
   if (needDeleteGuids.isEmpty()) {
     return FD_OK;
   }
-  QString qryCmd = QString(R"(DELETE FROM %1 WHERE `%2` IN (")").arg(tableName, ENUM_2_STR(GUID));
+  QString qryCmd = QString(R"(DELETE FROM `%1` WHERE `%2` IN (")").arg(tableName, ENUM_2_STR(GUID));
   const QStringList guids{needDeleteGuids.cbegin(), needDeleteGuids.cend()};
   qryCmd += guids.join(R"(",")");
   qryCmd += R"(");)";

@@ -195,7 +195,7 @@ int DbManager::CountRow(const QString& tableName, const QString& whereClause) {
     return FD_INVALID;
   }
 
-  QString countCmd = QString("SELECT COUNT(*) FROM %1").arg(tableName);
+  QString countCmd = QString("SELECT COUNT(*) FROM `%1`").arg(tableName);
   if (!whereClause.isEmpty()) {
     countCmd += (" WHERE " + whereClause);
   }
@@ -217,7 +217,7 @@ bool DbManager::IsTableEmpty(const QString& tableName) const {
     return true;
   }
   QSqlQuery qry{db};
-  qry.prepare(QString{"SELECT * FROM %1"}.arg(tableName));
+  qry.prepare(QString{"SELECT * FROM `%1`"}.arg(tableName));
   if (!qry.exec()) {
     qWarning("select[%s] failed: %s",  //
              qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
