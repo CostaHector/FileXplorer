@@ -26,7 +26,7 @@ QString Guid2RootPathComboxBox::CurrentGuid() const {
   return CurrentTableName().replace(MountHelper::TABLE_UNDERSCORE, MountHelper::GUID_HYPEN);
 }
 QString Guid2RootPathComboxBox::CurrentRootPath() const {
-  return currentText().mid(MountHelper::ROOTPATH_START);
+  return currentText().contains(MountHelper::JOINER_STR) ? currentText().mid(MountHelper::ROOTPATH_START) : "";
 }
 QStringList Guid2RootPathComboxBox::ToQStringList() const {
   const int cnt = count();
@@ -49,11 +49,11 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   CHECK_NULLPTR_RETURN_VOID(m_searchCB);
   m_searchCB->setLineEdit(m_searchLE);
   using namespace MOVIE_TABLE;
-  m_searchCB->addItem(QString{R"('%1' LIKE "%")"}.arg(ENUM_2_STR(Name)));
-  m_searchCB->addItem(QString{R"('%1' BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
-  m_searchCB->addItem(QString{R"('%1' = "E:/")"}.arg(ENUM_2_STR(Driver)));
-  m_searchCB->addItem(QString{R"('%1' IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
-  m_searchCB->addItem(QString{R"('%1' LIKES "%Chris Evans%")"}.arg(ENUM_2_STR(Cast)));
+  m_searchCB->addItem(QString{R"(`%1` LIKE "%")"}.arg(ENUM_2_STR(Name)));
+  m_searchCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
+  m_searchCB->addItem(QString{R"(`%1` = "E:/")"}.arg(ENUM_2_STR(Driver)));
+  m_searchCB->addItem(QString{R"(`%1` IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
+  m_searchCB->addItem(QString{R"(`%1` LIKES "%Chris Evans%")"}.arg(ENUM_2_STR(Cast)));
   m_searchCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   m_tables = new (std::nothrow) Guid2RootPathComboxBox;

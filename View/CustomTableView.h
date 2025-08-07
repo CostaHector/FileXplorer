@@ -50,7 +50,7 @@ class CustomTableView : public QTableView {
   void onHorizontalHeaderChanged() const;
   void onVerticalHeaderChanged() const;
 
-  void InitTableView();
+  void InitTableView(const bool bHideShowCol = true);
   void SubscribeHeaderActions();
 
  private:
