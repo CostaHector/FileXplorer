@@ -26,7 +26,7 @@ QString Guid2RootPathComboxBox::CurrentGuid() const {
   return CurrentTableName().replace(MountHelper::TABLE_UNDERSCORE, MountHelper::GUID_HYPEN);
 }
 QString Guid2RootPathComboxBox::CurrentRootPath() const {
-  return currentText().mid(MountHelper::ROOTPATH_START);
+  return currentText().contains(MountHelper::JOINER_STR) ? currentText().mid(MountHelper::ROOTPATH_START) : "";
 }
 QStringList Guid2RootPathComboxBox::ToQStringList() const {
   const int cnt = count();
