@@ -184,6 +184,18 @@ enum EXPORT_TO_JSON {
   EXPORT_TO_JSON_FIELD_Tags,             //
 };
 
+const QString FdBasedDb::QUERY_KEY_INFO_TEMPLATE//
+    {
+        QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM"}//
+            .arg(ENUM_2_STR(PrePathLeft))                      //
+            .arg(ENUM_2_STR(PrePathRight))                 //
+            .arg(ENUM_2_STR(Name))                         //
+            .arg(ENUM_2_STR(Size))                         //
+        + " `%1` "                                     //
+        + QString{R"(WHERE `%1` LIKE "%2";)"}//
+              .arg(ENUM_2_STR(Name))                             //
+    };
+
 // Incremental
 int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbsPath) {
   if (tableName.isEmpty()) {

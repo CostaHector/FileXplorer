@@ -38,14 +38,14 @@ class NavigationAndAddressBar : public QToolBar {
   bool onSearchTextReturnPressed();
 
   void onGetFocus() {
-    m_searchLE->setFocus();
-    m_searchLE->selectAll();
+    mFsSearchLE->setFocus();
+    mFsSearchLE->selectAll();
   }
 
   AddressELineEdit* m_addressLine{nullptr};
   PathUndoRedoer m_pathRD;
   FolderNxtAndLastIterator mFolderNxtLstIt;
-  QLineEdit* m_searchLE{nullptr};
+  QLineEdit* mFsSearchLE{nullptr};
   FileSystemTypeFilter* m_fsFilter{nullptr};
 
  private:
