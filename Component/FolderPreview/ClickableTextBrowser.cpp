@@ -90,7 +90,7 @@ QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& sea
     return QString{"<b>Query command failed</b>[%1]"}.arg(qryCmd);
   }
   if (records.isEmpty()) {
-    return QString{"<b>Not in database</b>[%1]"}.arg(qryCmd);
+    return QString{"<b>Not in database</b>[%1]"}.arg(searchText);
   }
   static constexpr char BR_ARR_STRING[] {"<br/>"};
   QString searchResult;
