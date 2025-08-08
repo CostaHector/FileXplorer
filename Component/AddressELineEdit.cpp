@@ -4,26 +4,32 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
-#include <QHBoxLayout>
-#include <QList>
 #include <QMessageBox>
 #include <QToolTip>
 #include <Qt>
+#include <QCompleter>
+#include <QApplication>
+#include <QStyle>
 
 const QString AddressELineEdit::RELEASE_HINT_MSG = "<b>Drop item(s) to ...?</b>:<br/>";
 
 AddressELineEdit::AddressELineEdit(QWidget* parent)  //
-    : QStackedWidget{parent}                         //
+  : QStackedWidget{parent}                         //
 {
   m_pathActionsTB = new (std::nothrow) QToolBar{this};
   CHECK_NULLPTR_RETURN_VOID(m_pathActionsTB);
 
   pathComboBox = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(pathComboBox);
+  pathComboBox->setEditable(true);
+  pathComboBox->setInsertPolicy(QComboBox::InsertAtTop);
+  pathComboBox->lineEdit()->addAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirOpenIcon), QLineEdit::ActionPosition::LeadingPosition);
+  pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  pathLineEdit = new (std::nothrow) QLineEdit{pathComboBox};
-  CHECK_NULLPTR_RETURN_VOID(pathLineEdit);
-  pathLineEdit->setClearButtonEnabled(true);
+  QCompleter* pCompleter = new QCompleter{this};
+  CHECK_NULLPTR_RETURN_VOID(pCompleter);
+  pCompleter->setCaseSensitivity(Qt::CaseSensitive);
+  pathComboBox->setCompleter(pCompleter);
 
 #ifdef _WIN32
   const QFileInfoList& drives = QDir::drives();
@@ -31,8 +37,6 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
     pathComboBox->addItem(d.filePath());
   }
 #endif
-  pathComboBox->setLineEdit(pathLineEdit);
-  pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   pathComboBoxFocusWatcher = new (std::nothrow) FocusEventWatch(pathComboBox);
   CHECK_NULLPTR_RETURN_VOID(pathComboBoxFocusWatcher);
@@ -53,7 +57,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
 
 auto AddressELineEdit::onPathActionTriggered(const QAction* cursorAt) -> void {
   const QString& rawPath = pathFromCursorAction(cursorAt);
-  const QString& fullPth = PathTool::StripTrailingSlash(rawPath);
+  const QString fullPth {PathTool::StripTrailingSlash(rawPath)};
   qDebug("Path triggered [%s]", qPrintable(fullPth));
   ChangePath(fullPth);
 }
@@ -64,27 +68,15 @@ void AddressELineEdit::onReturnPressed() {
 
 void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
   const QString& fullpath = PathTool::StripTrailingSlash(PathTool::normPath(newPath));
-  if (fullpath != pathLineEdit->text()) {
-    pathLineEdit->setText(fullpath);
-  }
+  pathComboBox->setCurrentText(fullpath);
   qDebug("set Path [%s]", qPrintable(fullpath));
   m_pathActionsTB->clear();
 #ifdef WIN32
-  m_pathActionsTB->addAction(QIcon(":img/FOLDER_OF_DRIVES"), "");
+  m_pathActionsTB->addAction(QIcon{":img/FOLDER_OF_DRIVES"}, "");
 #endif
   for (const QString& pathSec : fullpath.split(PathTool::PATH_SEP_CHAR)) {
     m_pathActionsTB->addAction(pathSec);
     qobject_cast<QWidget*>(m_pathActionsTB->children().last())->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-  }
-
-  if (!pathComboBox->hasFocus()) {  // in disp mode
-    pathComboBox->insertItem(0, fullpath);
-  } else {  // in edit mode, when return pressed it would auto append one text to the back
-    pathComboBox->insertItem(0, fullpath);
-    pathComboBox->removeItem(pathComboBox->count() - 1);
-  }
-  if (pathComboBox->count() != 0) {
-    pathComboBox->setCurrentIndex(0);
   }
 }
 
@@ -95,17 +87,17 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
 #else
   if (!QFile::exists(pth)) {
 #endif
-    const QString& pathInexist = QString("Return pressed with inexist path [%1].").arg(pth);
-    qDebug("%s", qPrintable(pathInexist));
+    pathComboBox->setCurrentText(pth);
+    const QString pathInexist{QString{"Return pressed with inexist path [%1]."}.arg(pth)};
+    qWarning("Into path[%s] failed", qPrintable(pathInexist));
     QMessageBox::warning(this, "Into path failed", pathInexist);
-    pathLineEdit->setText(pathFromFullActions());
     return false;
   }
   const QFileInfo fi{pth};
   if (fi.isFile()) {
+    pathComboBox->setCurrentText(pth);
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
     qDebug("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
-    pathLineEdit->setText(pathFromFullActions());
   } else {
     updateAddressToolBarPathActions(pth);
     emit pathActionsTriggeredOrLineEditReturnPressed(pth);
@@ -116,7 +108,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
 
 auto AddressELineEdit::subscribe() -> void {
   connect(m_pathActionsTB, &QToolBar::actionTriggered, this, &AddressELineEdit::onPathActionTriggered);
-  connect(pathLineEdit, &QLineEdit::returnPressed, this, &AddressELineEdit::onReturnPressed);
+  connect(pathComboBox->lineEdit(), &QLineEdit::returnPressed, this, &AddressELineEdit::onReturnPressed);
   connect(pathComboBoxFocusWatcher, &FocusEventWatch::focusChanged, this, &AddressELineEdit::onFocusChange);
 }
 
@@ -138,8 +130,8 @@ auto AddressELineEdit::inputMode() -> void {
 
 void AddressELineEdit::mousePressEvent(QMouseEvent* /* event */) {
   emit pathComboBoxFocusWatcher->focusChanged(true);
-  pathLineEdit->setFocus();
-  pathLineEdit->selectAll();
+  pathComboBox->setFocus();
+  pathComboBox->lineEdit()->selectAll();
 }
 
 void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
@@ -180,8 +172,9 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
 // #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
+#include <QHBoxLayout>
 class TestAddressELineEdit : public QWidget {
- public:
+public:
   explicit TestAddressELineEdit(QWidget* parent = nullptr) : QWidget(parent) {
     AddressELineEdit* add = new AddressELineEdit;
 
