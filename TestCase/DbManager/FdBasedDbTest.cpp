@@ -295,7 +295,7 @@ class FdBasedDbTest : public MyTestSuite {
     QVERIFY(dir.exists(JSON_FILE_NAME));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson("VOLUME_E", rootpath), 1);
 
-    const QString selectAllTemp{"SELECT * FROM %1"};
+    const QString selectAllTemp{"SELECT * FROM `%1`"};
     QList<QSqlRecord> ansList;
     QVERIFY(dbManager.QueryForTest(selectAllTemp.arg("VOLUME_E"), ansList));
     QCOMPARE(ansList.size(), 1);  // 1 mkv file -> 1 record

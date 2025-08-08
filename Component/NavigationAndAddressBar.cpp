@@ -9,16 +9,16 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   CHECK_NULLPTR_RETURN_VOID(m_addressLine)
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  m_searchLE = new (std::nothrow) QLineEdit{this};
-  CHECK_NULLPTR_RETURN_VOID(m_searchLE)
-  m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
-  m_searchLE->setClearButtonEnabled(true);
-  m_searchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-  m_searchLE->setToolTip(
+  mFsSearchLE = new (std::nothrow) QLineEdit{this};
+  CHECK_NULLPTR_RETURN_VOID(mFsSearchLE)
+  mFsSearchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
+  mFsSearchLE->setClearButtonEnabled(true);
+  mFsSearchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  mFsSearchLE->setToolTip(
       "For FileSystemModel(wildcard) e.g., *target*\n"
       "For SceneModel(plain) e.g., target\n"
       "For JsonModel(Regex) e.g., target1.*?target2");
-  m_searchLE->setMinimumWidth(40);
+  mFsSearchLE->setMinimumWidth(40);
 
   m_fsFilter = new (std::nothrow) FileSystemTypeFilter;
   CHECK_NULLPTR_RETURN_VOID(m_fsFilter)
@@ -32,7 +32,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   addSeparator();
   addWidget(m_fsFilter);
   addSeparator();
-  addWidget(m_searchLE);
+  addWidget(mFsSearchLE);
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -54,8 +54,8 @@ void NavigationAndAddressBar::InitEventWhenViewChanged() {
   connect(g_addressBarActions()._LAST_FOLDER, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToLastFolder);
   connect(g_addressBarActions()._NEXT_FOLDER, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToNextFolder);
 
-  connect(m_searchLE, &QLineEdit::textChanged, this, &NavigationAndAddressBar::onSearchTextChanged);
-  connect(m_searchLE, &QLineEdit::returnPressed, this, &NavigationAndAddressBar::onSearchTextReturnPressed);
+  connect(mFsSearchLE, &QLineEdit::textChanged, this, &NavigationAndAddressBar::onSearchTextChanged);
+  connect(mFsSearchLE, &QLineEdit::returnPressed, this, &NavigationAndAddressBar::onSearchTextReturnPressed);
 }
 
 bool NavigationAndAddressBar::onBackward() {
@@ -126,13 +126,13 @@ bool NavigationAndAddressBar::onIteratorToLastFolder() {
 
 bool NavigationAndAddressBar::onSearchTextChanged() {
   if (m_on_searchTextChanged != nullptr) {
-    m_on_searchTextChanged(m_searchLE->text());
+    m_on_searchTextChanged(mFsSearchLE->text());
   }
   return true;
 }
 bool NavigationAndAddressBar::onSearchTextReturnPressed() {
   if (m_on_searchEnterKey != nullptr) {
-    m_on_searchEnterKey(m_searchLE->text());
+    m_on_searchEnterKey(mFsSearchLE->text());
   }
   return true;
 }
