@@ -24,10 +24,10 @@ class FloatingPreview : public QStackedWidget {
   void SaveSettings();
   void SaveState();
 
-  void operator()(const QSqlRecord& record, const QString& imgHost, const int imgHeight);  // cast
-  void operator()(const QString& pth);                                                     // file system
-  void operator()(const QString& name, const QString& pth);                                // scene
-  void UpdateImgs(const QString& name, const QStringList& imgPthLst);                      // scene
+  void operator()(const QSqlRecord& record, const QString& imgHost, const int imgHeight);  // cast view
+  void operator()(const QString& pth);                                                     // file system view
+  void operator()(const QString& name, const QString& pth);                                // scene view
+  void UpdateImgs(const QString& name, const QStringList& imgPthLst);
   void UpdateVids(const QStringList& dataLst);
   void UpdateOthers(const QStringList& dataLst);
 

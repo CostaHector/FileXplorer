@@ -31,9 +31,9 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,               //
   CHECK_NULLPTR_RETURN_VOID(model_);
   _dbModel = model_;
   CHECK_NULLPTR_RETURN_VOID(_dbSearchBar);
-  _tablesDropDownList = _dbSearchBar->m_tables;
+  _tablesDropDownList = _dbSearchBar->m_tablesCB;
   CHECK_NULLPTR_RETURN_VOID(_tablesDropDownList);
-  _searchWhereLineEdit = _dbSearchBar->m_searchLE;
+  _searchWhereLineEdit = _dbSearchBar->m_searchCB->lineEdit();
   CHECK_NULLPTR_RETURN_VOID(_searchWhereLineEdit);
 
   m_movieMenu = new MovieDatabaseMenu{"Movie Right click menu", this};
