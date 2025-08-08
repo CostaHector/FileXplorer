@@ -41,6 +41,7 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
 }
 
 QString ClickableTextBrowser::GetStandardSearchKeyWords(QString text) {
+  text = text.trimmed();
   static const QRegularExpression SPACES_AMPERSAND {R"(\s+&\s+)"};
   text.replace(JSON_RENAME_REGEX::AND_COMP, QChar{'&'});
   text.replace(',', QChar{'&'});
@@ -62,7 +63,7 @@ void ClickableTextBrowser::onEditSelectionBeforeSearchRequested() {
   QStringList candidates;
   candidates.reserve(3);
 
-  const QString rawSelectedStr{textCursor().selectedText()};
+  QString rawSelectedStr{textCursor().selectedText().trimmed()};
   candidates.push_back(GetStandardSearchKeyWords(rawSelectedStr));
   candidates.push_back(rawSelectedStr); // full match
   candidates.push_back('%' + rawSelectedStr + '%'); // contains
