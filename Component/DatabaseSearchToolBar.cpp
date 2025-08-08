@@ -2,6 +2,7 @@
 #include "public/PublicMacro.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/FileDescriptor/MountHelper.h"
+#include <QCompleter>
 
 Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{parent} {
   setEditable(false);
@@ -40,14 +41,18 @@ QStringList Guid2RootPathComboxBox::ToQStringList() const {
 
 DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent)  //
   : QWidget{parent} {
-  m_searchLE = new (std::nothrow) QLineEdit;
-  CHECK_NULLPTR_RETURN_VOID(m_searchLE);
-  m_searchLE->setClearButtonEnabled(true);
-  m_searchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
-
   m_searchCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_searchCB);
-  m_searchCB->setLineEdit(m_searchLE);
+  m_searchCB->setEditable(true);
+  m_searchCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
+  m_searchCB->lineEdit()->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
+  m_searchCB->lineEdit()->setClearButtonEnabled(true);
+
+  QCompleter* pCompleter = new QCompleter{this};
+  CHECK_NULLPTR_RETURN_VOID(pCompleter);
+  pCompleter->setCaseSensitivity(Qt::CaseSensitive);
+  m_searchCB->setCompleter(pCompleter);
+
   using namespace MOVIE_TABLE;
   m_searchCB->addItem(QString{R"(`%1` LIKE "%")"}.arg(ENUM_2_STR(Name)));
   m_searchCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
@@ -56,14 +61,14 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   m_searchCB->addItem(QString{R"(`%1` LIKES "%Chris Evans%")"}.arg(ENUM_2_STR(Cast)));
   m_searchCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  m_tables = new (std::nothrow) Guid2RootPathComboxBox;
-  CHECK_NULLPTR_RETURN_VOID(m_tables);
-  m_tables->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
+  m_tablesCB = new (std::nothrow) Guid2RootPathComboxBox;
+  CHECK_NULLPTR_RETURN_VOID(m_tablesCB);
+  m_tablesCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
   mLo = new QHBoxLayout;
   CHECK_NULLPTR_RETURN_VOID(mLo);
   mLo->addWidget(m_searchCB, 8);
-  mLo->addWidget(m_tables, 2);
+  mLo->addWidget(m_tablesCB, 2);
   setLayout(mLo);
 
   layout()->setSpacing(0);

@@ -4,18 +4,18 @@
 #include "public/DisplayEnhancement.h"
 #include "public/PublicVariable.h"
 #include "public/StyleSheet.h"
+#include "Tools/VideoDurationGetter.h"
+#include <QBuffer>
+#include <QIcon>
 #include <QDir>
 #include <QLayout>
-#include <QIcon>
 #include <QFileIconProvider>
-#include <QBuffer>
-#include "Tools/VideoDurationGetter.h"
 
 constexpr FloatingPreview::MediaBtnHandlerFunc FloatingPreview::MEDIA_HANDLERS_MAP[];
 
 FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
-    : QStackedWidget{parent},
-      mMemoryName{memoryName}  //
+  : QStackedWidget{parent},
+  mMemoryName{memoryName}  //
 {
   mDetailsPane = new (std::nothrow) ClickableTextBrowser(this);
 
@@ -107,7 +107,7 @@ QString GetCastHtml(const QSqlRecord& record, const QString& imgHost, const int 
   const QStringList& m_imgsLst = PerformerJsonFileHelper::InitImgsList(imgs);
   const QString& firstImgPath{m_imgsLst.isEmpty() ? "" : dir.absoluteFilePath(m_imgsLst.front())};
   static const QString PERFORMER_HTML_TEMPLATE{
-      R"(
+                                               R"(
 <html><head></head>
 <style>
 perf{
@@ -173,30 +173,36 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   QString detail;
   detail += QString(R"(<h1>%1</h1>)").arg(fileName);
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
-  if (TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)) {
-    int dur = 0;
+  const bool isFileAVideo{TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)};
+  if (isFileAVideo) {
     VideoDurationGetter mi;
     if (!mi.StartToGet()) {
       return {};
     }
-    dur = mi.GetLengthQuick(fileAbsPath);
-    detail += QString(R"(<h3>Length: %1</h3><br/>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
+    int dur = mi.GetLengthQuick(fileAbsPath);
+    detail += QString(R"(<h3>Length: %1</h3>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
   }
 
   QString imgStr;
   if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + extension)) {
     imgStr = QString(R"(<img src="%1" width="480" alt="%1" />)").arg(fileAbsPath);
   } else {
-    static QFileIconProvider iconProv;
-    const QIcon& ic = iconProv.icon(fi);
-    const QPixmap pm{ic.pixmap(64, 64)};
-    QByteArray bArray;
-    QBuffer buffer(&bArray);
-    buffer.open(QIODevice::WriteOnly);
-    pm.save(&buffer, "PNG");
-    imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="128" alt="%1">)").arg(fileAbsPath);
+    static QMap<QString, QString> fileTypeImgIcons;
+    auto it = fileTypeImgIcons.find(extension);
+    if (it == fileTypeImgIcons.end()) {
+      static QFileIconProvider iconProv;
+      const QIcon& ic = iconProv.icon(extension);
+      const QPixmap pm{ic.pixmap(64, 64)};
+      QByteArray bArray;
+      QBuffer buffer(&bArray);
+      buffer.open(QIODevice::WriteOnly);
+      pm.save(&buffer, "PNG");
+      imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="128">)");
+      fileTypeImgIcons[extension] = imgStr;
+    } else {
+      imgStr = it.value();
+    }
   }
-
   detail += QString(R"(<h3><a href="file:///%1">%2<br/>%1</a></h3>)").arg(fileAbsPath, imgStr);
   detail += QString(R"(<body>)");
   detail += QString(R"(<font size="+2">)");
@@ -208,7 +214,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   return detail;
 }
 
-void FloatingPreview::operator()(const QString& pth) {  // file system
+void FloatingPreview::operator()(const QString& pth) {  // file system view
   if (!NeedUpdate(pth)) {
     return;
   }
@@ -235,7 +241,7 @@ void FloatingPreview::operator()(const QString& pth) {  // file system
   }
 }
 
-void FloatingPreview::operator()(const QString& name, const QString& pth) {  // scene
+void FloatingPreview::operator()(const QString& name, const QString& pth) {  // scene view
   mLastName = name;
   setWindowTitle(mLastName);
   CHECK_NULLPTR_RETURN_VOID(mImgModel)
