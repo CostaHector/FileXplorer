@@ -20,6 +20,14 @@ class FdBasedDb : public DbManager {
   static const QString UPDATE_DURATION_0_TEMPLATE;
   static const QString SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE;
   static const QString UPDATE_STUDIO_CAST_TAGS_TEMPLATE;
+
+  enum class QUERY_KEY_INFO_FIELED {
+    PrePathLeft = 0,
+    PrePathRight,
+    Name,
+    Size,
+  };
+  static const QString QUERY_KEY_INFO_TEMPLATE;
   static QStringList VIDEOS_FILTER;
   static bool SKIP_GETTER_DURATION;
   static bool CHECK_TABLE_VOLUME_ONLINE;
