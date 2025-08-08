@@ -21,9 +21,8 @@ class DatabaseSearchToolBar : public QWidget {
 public:
   explicit DatabaseSearchToolBar(const QString& title = "Database Search Toolbar", //
                                  QWidget* parent = nullptr);
-  QLineEdit* m_searchLE{nullptr};
   QComboBox* m_searchCB{nullptr};
-  Guid2RootPathComboxBox* m_tables{nullptr};
+  Guid2RootPathComboxBox* m_tablesCB{nullptr};
   QHBoxLayout* mLo{nullptr};
 };
 #endif // DATABASESEARCHTOOLBAR_H
