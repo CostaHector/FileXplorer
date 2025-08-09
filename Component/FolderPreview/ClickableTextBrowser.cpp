@@ -204,15 +204,16 @@ void ClickableTextBrowser::SearchAndAppendParagraphOfResult(const QString& searc
 }
 
 QString ClickableTextBrowser::BuildMultiKeywordLikeCondition(const QStringList &keywords) {
-  QString conditions;
-  conditions.reserve(30);
+  QStringList conditions;
+  conditions.reserve(keywords.size());
   for (const QString &keyword : keywords) {
     if (keyword.isEmpty()) {
       continue;
     }
-    conditions += FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg('%' + keyword + '%');
-    conditions += " AND ";
+    conditions.push_back(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg('%' + keyword + '%'));
   }
-  conditions += "1=1";
-  return conditions;
+  if (conditions.isEmpty()) {
+    return "1=1";
+  }
+  return conditions.join(" AND ");
 }
