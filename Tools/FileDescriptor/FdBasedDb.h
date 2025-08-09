@@ -28,6 +28,7 @@ class FdBasedDb : public DbManager {
     Size,
   };
   static const QString QUERY_KEY_INFO_TEMPLATE;
+  static const QString WHERE_NAME_CORE_TEMPLATE;
   static QStringList VIDEOS_FILTER;
   static bool SKIP_GETTER_DURATION;
   static bool CHECK_TABLE_VOLUME_ONLINE;
