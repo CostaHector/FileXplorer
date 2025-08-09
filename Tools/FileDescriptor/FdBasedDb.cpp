@@ -191,10 +191,12 @@ const QString FdBasedDb::QUERY_KEY_INFO_TEMPLATE//
             .arg(ENUM_2_STR(PrePathRight))                 //
             .arg(ENUM_2_STR(Name))                         //
             .arg(ENUM_2_STR(Size))                         //
-        + " `%1` "                                     //
-        + QString{R"(WHERE `%1` LIKE "%2";)"}//
-              .arg(ENUM_2_STR(Name))                             //
+        + " `%1` WHERE %2"                                     //
     };
+
+const QString FdBasedDb::WHERE_NAME_CORE_TEMPLATE{//
+    QString{R"(`%1` LIKE )"}.arg(ENUM_2_STR(Name)) + R"("%1")"
+};
 
 // Incremental
 int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbsPath) {
