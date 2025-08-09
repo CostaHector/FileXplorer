@@ -3,8 +3,12 @@
 
 #include <QTextBrowser>
 #include <QContextMenuEvent>
+#include <QMouseEvent>
+#include <QKeyEvent>
+#include <QResizeEvent>
 #include <QMenu>
 #include <QAction>
+#include <QToolBar>
 
 class ClickableTextBrowser : public QTextBrowser {
 public:
@@ -14,26 +18,67 @@ public:
   static const QString HTML_H1_TEMPLATE;
   static constexpr int HTML_IMG_FIXED_WIDTH{600};
 
-  void contextMenuEvent(QContextMenuEvent *event) override {
-    const bool bHasSelectionText{!textCursor().selectedText().isEmpty()};
-    m_searchSelectionAction->setEnabled(bHasSelectionText);
-    m_editBeforeSearchAction->setEnabled(bHasSelectionText);
-    m_menu->exec(event->globalPos());
+  QStringList GetSelectedTexts() const {
+    QStringList texts;
+    for (const auto& sel : mMultiSelections) {
+      texts << sel.cursor.selectedText();
+    }
+    return texts;
   }
 
-  void onSearchSelectionRequested();
-  void onEditSelectionBeforeSearchRequested();
+  QString GetCurrentSelectedText() const {
+    return textCursor().selectedText();
+  }
 
-  static QString GetStandardSearchKeyWords(QString text);
+  void contextMenuEvent(QContextMenuEvent *event) override {
+    if (m_menu != nullptr) {
+      m_menu->exec(event->globalPos());
+    }
+  }
+
+  void onSearchSelectionReq();
+  void onSearchSelectionAdvanceReq();
+  void onSearchMultiSelectionReq();
+
+  static QString FormatSearchSentence(QString text);
   static QString GetSearchResultParagraphDisplay(const QString& searchText);
+  static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
+
+protected:
+  void mouseDoubleClickEvent(QMouseEvent *e) override;
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseMoveEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
+  void resizeEvent(QResizeEvent *event) override {
+    QTextBrowser::resizeEvent(event);
+    AdjustButtonPosition();
+  }
+
+  void AdjustButtonPosition() {
+    if (mFloatingTb == nullptr) {return;}
+    static constexpr int marginX = 32, marginY = 32;
+    mFloatingTb->move(width() - mFloatingTb->width() - marginX, height() - mFloatingTb->height() - marginY);
+    mFloatingTb->raise();
+  }
 
 private:
+  void AppendASelection(const QTextCursor &cursor);
+  void ClearAllSelections();
   void SearchAndAppendParagraphOfResult(const QString& searchText);
 
   bool onAnchorClicked(const QUrl& url);
+
   QMenu *m_menu{nullptr};
-  QAction *m_searchSelectionAction{nullptr};
-  QAction *m_editBeforeSearchAction{nullptr};
+  QAction *m_searchCurSelect{nullptr};
+  QAction *m_searchCurSelectAdvance{nullptr};
+  QAction *m_searchMultiSelect{nullptr};
+  QAction *m_clearMultiSelections{nullptr};
+  QToolBar* mFloatingTb{nullptr};
+
+  bool mbDragging = false;                  // 是否正在拖拽
+  QPoint mDraggingStartPos;                      // 拖拽起始坐标
+  QList<QTextEdit::ExtraSelection> mMultiSelections;  // 存储多个选区
+  static constexpr int MIN_KEYWORD_LEN{7};
 };
 
 #endif  // CLICKABLETEXTBROWSER_H
