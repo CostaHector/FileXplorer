@@ -5,8 +5,10 @@
 #include <QContextMenuEvent>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QResizeEvent>
 #include <QMenu>
 #include <QAction>
+#include <QToolBar>
 
 class ClickableTextBrowser : public QTextBrowser {
 public:
@@ -29,11 +31,9 @@ public:
   }
 
   void contextMenuEvent(QContextMenuEvent *event) override {
-    const bool bHasSelectionText{!GetCurrentSelectedText().isEmpty()};
-    m_searchCurSelect->setEnabled(bHasSelectionText);
-    m_searchCurSelectAdvance->setEnabled(bHasSelectionText);
-    m_clearMultiSelections->setEnabled(!mMultiSelections.isEmpty());
-    m_menu->exec(event->globalPos());
+    if (m_menu != nullptr) {
+      m_menu->exec(event->globalPos());
+    }
   }
 
   void onSearchSelectionReq();
@@ -42,13 +42,24 @@ public:
 
   static QString FormatSearchSentence(QString text);
   static QString GetSearchResultParagraphDisplay(const QString& searchText);
-  static QString BuildMultiKeywordLikeCondition(const QStringList& keywords);
+  static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
 
 protected:
   void mouseDoubleClickEvent(QMouseEvent *e) override;
   void mousePressEvent(QMouseEvent *e) override;
   void mouseMoveEvent(QMouseEvent *e) override;
   void mouseReleaseEvent(QMouseEvent *e) override;
+  void resizeEvent(QResizeEvent *event) override {
+    QTextBrowser::resizeEvent(event);
+    AdjustButtonPosition();
+  }
+
+  void AdjustButtonPosition() {
+    if (mFloatingTb == nullptr) {return;}
+    static constexpr int marginX = 32, marginY = 32;
+    mFloatingTb->move(width() - mFloatingTb->width() - marginX, height() - mFloatingTb->height() - marginY);
+    mFloatingTb->raise();
+  }
 
 private:
   void AppendASelection(const QTextCursor &cursor);
@@ -62,10 +73,12 @@ private:
   QAction *m_searchCurSelectAdvance{nullptr};
   QAction *m_searchMultiSelect{nullptr};
   QAction *m_clearMultiSelections{nullptr};
+  QToolBar* mFloatingTb{nullptr};
 
   bool mbDragging = false;                  // 是否正在拖拽
   QPoint mDraggingStartPos;                      // 拖拽起始坐标
   QList<QTextEdit::ExtraSelection> mMultiSelections;  // 存储多个选区
+  static constexpr int MIN_KEYWORD_LEN{7};
 };
 
 #endif  // CLICKABLETEXTBROWSER_H

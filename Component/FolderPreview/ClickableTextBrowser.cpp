@@ -17,6 +17,7 @@ const QString ClickableTextBrowser::HTML_H1_TEMPLATE{R"(<a href="file:///%1">%2<
 const QString ClickableTextBrowser::HTML_IMG_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a><br/>\n)"};
 const QString ClickableTextBrowser::VID_LINK_TEMPLATE{R"(<a href="file:///%1">&#9654;%2</a>)"};
 constexpr int ClickableTextBrowser::HTML_IMG_FIXED_WIDTH;
+constexpr int ClickableTextBrowser::MIN_KEYWORD_LEN;
 
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{parent} {
   setReadOnly(true);
@@ -25,23 +26,26 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{paren
 
   m_menu = new (std::nothrow) QMenu{this};
   m_menu->addSection("search");
-  m_searchCurSelect = m_menu->addAction(QIcon(":img/SEARCH"), "Search current selection text");
+  m_searchCurSelect = m_menu->addAction(QIcon{":img/SEARCH"}, "Search current selection text");
   m_searchCurSelect->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F));
-  m_searchCurSelectAdvance = m_menu->addAction("Search current selection text(Edit allowed)");
-
+  m_searchCurSelectAdvance = m_menu->addAction(QIcon{":img/SEARCH_CHOICE"}, "Search current selection text(Edit allowed)");
   m_menu->addSeparator();
-  m_searchMultiSelect = m_menu->addAction("Search multi-selection text");
-
+  m_searchMultiSelect = m_menu->addAction(QIcon{":img/SEARCH_MULTI_KEYWORDS"}, "Search multi-selection text");
   m_menu->addSection("clear");
-  m_clearMultiSelections = m_menu->addAction("Clear Multi-Selections");
+  m_clearMultiSelections = m_menu->addAction(QIcon{":img/SELECT_NONE"}, "Clear Multi-Selections");
 
-  addAction(m_searchCurSelect);
+  mFloatingTb = new (std::nothrow) QToolBar{"Clickable Browser Toolbar", this};
+  mFloatingTb->setOrientation(Qt::Orientation::Vertical);
+  mFloatingTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
+  mFloatingTb->addActions(m_menu->actions());
 
   connect(m_searchCurSelect, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionReq);
   connect(m_searchCurSelectAdvance, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionAdvanceReq);
   connect(m_searchMultiSelect, &QAction::triggered, this, &ClickableTextBrowser::onSearchMultiSelectionReq);
   connect(m_clearMultiSelections, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
+
+  AdjustButtonPosition();
 }
 
 bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
@@ -65,6 +69,10 @@ QString ClickableTextBrowser::FormatSearchSentence(QString text) {
 
 void ClickableTextBrowser::onSearchSelectionReq() {
   QString searchKeyString = FormatSearchSentence(GetCurrentSelectedText());
+  if (searchKeyString.size() < MIN_KEYWORD_LEN) {
+    LOG_WARN("Skip search, too short searchText:", searchKeyString);
+    return;
+  }
   qDebug("Search:[%s]", qPrintable(searchKeyString));
   SearchAndAppendParagraphOfResult(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg(searchKeyString));
 }
@@ -81,11 +89,15 @@ void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
   bool bInputOk{false};
   const QString searchKeyString = //
       QInputDialog::getItem(this, //
-                            "Search?", //
-                            QString::number(candidates.size()) + " candidates as following...", //
+                            "Search from below text?", //
+                            "There are " + QString::number(candidates.size()) + "candidates you can use as following...", //
                             candidates, 0, true, &bInputOk);
   if (!bInputOk) {
     qDebug("User cancel search by selection");
+    return;
+  }
+  if (searchKeyString.size() < MIN_KEYWORD_LEN) {
+    LOG_WARN("Skip search, too short searchText:", searchKeyString);
     return;
   }
   qDebug("Search:[%s]", qPrintable(searchKeyString));
@@ -98,7 +110,12 @@ void ClickableTextBrowser::onSearchMultiSelectionReq() {
     LOG_WARN("Skip search", "Nothing selected");
     return;
   }
-  const QString whereClause = BuildMultiKeywordLikeCondition(keywords);
+  bool bNeedSearchDb{false};
+  const QString whereClause = BuildMultiKeywordLikeCondition(keywords, bNeedSearchDb);
+  if (!bNeedSearchDb) {
+    LOG_WARN("Skip search, too short whereClause:", whereClause);
+    return;
+  }
   qDebug("Search:[%s]", qPrintable(whereClause));
   SearchAndAppendParagraphOfResult(whereClause);
 }
@@ -203,14 +220,26 @@ void ClickableTextBrowser::SearchAndAppendParagraphOfResult(const QString& searc
   cursor.insertHtml(para);
 }
 
-QString ClickableTextBrowser::BuildMultiKeywordLikeCondition(const QStringList &keywords) {
+QString ClickableTextBrowser::BuildMultiKeywordLikeCondition(const QStringList &keywords, bool& pNeedSearchDb) {
+  pNeedSearchDb = false;
+
   QStringList conditions;
   conditions.reserve(keywords.size());
+
+  QString searchText;
+  searchText.reserve(20);
   for (const QString &keyword : keywords) {
     if (keyword.isEmpty()) {
       continue;
     }
-    conditions.push_back(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg('%' + keyword + '%'));
+    searchText.clear();
+    searchText += '%';
+    searchText += keyword;
+    searchText += '%';
+    if (searchText.size() >= MIN_KEYWORD_LEN) {
+      pNeedSearchDb = true;
+    }
+    conditions.push_back(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg(searchText));
   }
   if (conditions.isEmpty()) {
     return "1=1";

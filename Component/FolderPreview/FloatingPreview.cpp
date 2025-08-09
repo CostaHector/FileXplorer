@@ -1,70 +1,30 @@
 ﻿#include "FloatingPreview.h"
-#include "public/MemoryKey.h"
-#include "public/PathTool.h"
 #include "public/DisplayEnhancement.h"
+#include "public/PublicMacro.h"
+#include "public/PathTool.h"
 #include "public/PublicVariable.h"
-#include "public/StyleSheet.h"
+#include "public/MemoryKey.h"
 #include "Tools/VideoDurationGetter.h"
 #include <QBuffer>
 #include <QIcon>
 #include <QDir>
-#include <QLayout>
 #include <QFileIconProvider>
 
-constexpr FloatingPreview::MediaBtnHandlerFunc FloatingPreview::MEDIA_HANDLERS_MAP[];
-
 FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
-  : QStackedWidget{parent},
-  mMemoryName{memoryName}  //
+  : QStackedWidget{parent}
 {
-  mDetailsPane = new (std::nothrow) ClickableTextBrowser(this);
+  mDetailsPane = new (std::nothrow) ClickableTextBrowser{this};
+  CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
 
-  _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "Images", this};
-  CHECK_NULLPTR_RETURN_VOID(_IMG_ACT)
-  _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, "Videos", this};
-  CHECK_NULLPTR_RETURN_VOID(_VID_ACT)
-  _OTH_ACT = new (std::nothrow) QAction{QIcon{":img/FILE"}, "Others", this};
-  CHECK_NULLPTR_RETURN_VOID(_OTH_ACT)
-
-  _IMG_ACT->setCheckable(true);
-  _VID_ACT->setCheckable(true);
-  _OTH_ACT->setCheckable(true);
-
-  m_bImgVisible = PreferenceSettings().value("FLOATING_IMAGE_VIEW_SHOW", true).toBool();
-  m_bVidVisible = PreferenceSettings().value("FLOATING_VIDEO_VIEW_SHOW", false).toBool();
-  m_bOthVisible = PreferenceSettings().value("FLOATING_OTHER_VIEW_SHOW", false).toBool();
-
-  _IMG_ACT->setChecked(m_bImgVisible);
-  _VID_ACT->setChecked(m_bVidVisible);
-  _OTH_ACT->setChecked(m_bOthVisible);
-
-  mImgVidOtherSplitter = new (std::nothrow) QSplitter{this};
-  CHECK_NULLPTR_RETURN_VOID(mImgVidOtherSplitter)
-  mImgVidOtherSplitter->setOrientation(Qt::Orientation::Vertical);
-
-  const QString& defaultMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
-  const QString& seqStr = PreferenceSettings().value("FLOATING_MEDIA_TYPE_SEQ", defaultMediaTypeSeq).toString();
-  decltype(mMediaSequence) mediaSequenceMemory;
-  if (IsValidMediaTypeSeq(seqStr, mediaSequenceMemory) && mediaSequenceMemory.size() == mMediaSequence.size()) {
-    mMediaSequence.swap(mediaSequenceMemory);
-  }
-  const bool visibility[(int)PREVIEW_ITEM_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
-  for (int mediaTypeInd : mMediaSequence) {
-    (this->*MEDIA_HANDLERS_MAP[mediaTypeInd])(visibility[mediaTypeInd]);
-  }
-
-  onImgBtnClicked(m_bImgVisible);
-  onVidBtnClicked(m_bVidVisible);
-  onOthBtnClicked(m_bOthVisible);
-  onTypesBtnClicked(true);
+  mImgVidOtherPane = new (std::nothrow) ImgVidOthWid{memoryName, this};
+  CHECK_NULLPTR_RETURN_VOID(mImgVidOtherPane)
 
   addWidget(mDetailsPane);
-  addWidget(mImgVidOtherSplitter);
+  addWidget(mImgVidOtherPane);
   if (currentIndex() != (int)m_curIndex) {
     setCurrentIndex((int)m_curIndex);
   }
 
-  subscribe();
   ReadSettings();
   setWindowIcon(QIcon(":img/FLOATING_PREVIEW"));
 }
@@ -72,7 +32,6 @@ FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
 void FloatingPreview::ReadSettings() {
   if (PreferenceSettings().contains("FLOATING_PREVIEW_GEOMETRY")) {
     restoreGeometry(PreferenceSettings().value("FLOATING_PREVIEW_GEOMETRY").toByteArray());
-    mImgVidOtherSplitter->restoreState(PreferenceSettings().value("FLOATING_PREVIEW_STATE").toByteArray());
   } else {
     setGeometry(QRect(0, 0, 480, 1080));
   }
@@ -80,10 +39,6 @@ void FloatingPreview::ReadSettings() {
 
 void FloatingPreview::SaveSettings() {
   PreferenceSettings().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
-}
-
-void FloatingPreview::SaveState() {
-  PreferenceSettings().setValue("FLOATING_PREVIEW_STATE", mImgVidOtherSplitter->saveState());
 }
 
 #include "Tools/PerformerJsonFileHelper.h"
@@ -227,137 +182,12 @@ void FloatingPreview::operator()(const QString& pth) {  // file system view
     return;
   }
   BeforeDisplayAFolder();
-  if (NeedUpdateImgs()) {
-    const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
-    _IMG_ACT->setText(QString("%1 Images").arg(imgCnt, 3, 10));
-  }
-  if (NeedUpdateVids()) {
-    const int vidCnt = mVidsModel->setDirPath(pth, TYPE_FILTER::VIDEO_TYPE_SET, true);
-    _VID_ACT->setText(QString("%1 Videos").arg(vidCnt, 3, 10));
-  }
-  if (NeedUpdateOthers()) {
-    const int othCnt = mOthModel->setDirPath(pth, TYPE_FILTER::TEXT_TYPE_SET, true);
-    _OTH_ACT->setText(QString("%1 Others").arg(othCnt, 3, 10));
-  }
+  mImgVidOtherPane->operator()(pth);
 }
 
 void FloatingPreview::operator()(const QString& name, const QString& pth) {  // scene view
   mLastName = name;
   setWindowTitle(mLastName);
-  CHECK_NULLPTR_RETURN_VOID(mImgModel)
-  QDir dir{pth, "", QDir::SortFlag::Name, QDir::Filter::Files};
-  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
-  mImgModel->UpdateData(dir.entryList());
+  mImgVidOtherPane->operator()(name, pth);
 }
 
-void FloatingPreview::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
-  mLastName = name;
-  setWindowTitle(mLastName);
-  CHECK_NULLPTR_RETURN_VOID(mImgModel)
-  mImgModel->UpdateData(imgPthLst);
-}
-
-void FloatingPreview::UpdateVids(const QStringList& dataLst) {
-  CHECK_NULLPTR_RETURN_VOID(mVidsModel)
-  mVidsModel->UpdateData(dataLst);
-}
-
-void FloatingPreview::UpdateOthers(const QStringList& dataLst) {
-  CHECK_NULLPTR_RETURN_VOID(mOthModel)
-  mOthModel->UpdateData(dataLst);
-}
-
-void FloatingPreview::subscribe() {
-  connect(mTypeToDisplayTB, &ReorderableToolBar::widgetMoved, this, &FloatingPreview::onReorder);
-  connect(mTypeToDisplayTB->mCollectPathAgs, &QActionGroup::triggered, this, &FloatingPreview::onImgVidOthActTriggered);
-  connect(mImgVidOtherSplitter, &QSplitter::splitterMoved, this, &FloatingPreview::SaveState);
-}
-
-bool FloatingPreview::onReorder(int fromIndex, int destIndex) {
-  CHECK_NULLPTR_RETURN_FALSE(mImgVidOtherSplitter);
-  if (!MoveElementFrontOf(mMediaSequence, fromIndex, destIndex)) {
-    qWarning("failed, move widget at index[%d] in front of widget at[%d]", fromIndex, destIndex);
-    return false;
-  }
-  const QString& newMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
-  PreferenceSettings().setValue("FLOATING_MEDIA_TYPE_SEQ", newMediaTypeSeq);
-  qDebug("New media type seq[%s]", qPrintable(newMediaTypeSeq));
-  return MoveWidgetAtFromIndexInFrontOfDestIndex(fromIndex, destIndex, *mImgVidOtherSplitter);
-}
-
-void FloatingPreview::onImgBtnClicked(bool checked) {
-  m_bImgVisible = checked;
-  if (mImgTv == nullptr) {
-    mImgModel = new (std::nothrow) ImgsModel;
-    CHECK_NULLPTR_RETURN_VOID(mImgModel)
-    mImgTv = new (std::nothrow) ItemView{mMemoryName + "_IMAGE", this};
-    CHECK_NULLPTR_RETURN_VOID(mImgTv)
-    mImgTv->SetCurrentModel(mImgModel);
-    mImgTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-    mImgVidOtherSplitter->addWidget(mImgTv);
-  }
-  PreferenceSettings().setValue("FLOATING_IMAGE_VIEW_SHOW", checked);
-  if (mImgTv->isVisible() != checked) {
-    mImgTv->setVisible(checked);
-  }
-}
-
-void FloatingPreview::onVidBtnClicked(bool checked) {
-  m_bVidVisible = checked;
-  if (mVidTv == nullptr) {
-    mVidsModel = new (std::nothrow) VidsModel;
-    CHECK_NULLPTR_RETURN_VOID(mVidsModel)
-    mVidTv = new (std::nothrow) ItemView{mMemoryName + "_VIDEO", this};
-    CHECK_NULLPTR_RETURN_VOID(mVidTv)
-    mVidTv->SetCurrentModel(mVidsModel);
-    mVidTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-    mImgVidOtherSplitter->addWidget(mVidTv);
-  }
-  PreferenceSettings().setValue("FLOATING_VIDEO_VIEW_SHOW", checked);
-  mVidTv->setVisible(checked);
-}
-
-void FloatingPreview::onOthBtnClicked(bool checked) {
-  m_bOthVisible = checked;
-  if (mOthTv == nullptr) {
-    mOthModel = new (std::nothrow) OthersModel;
-    CHECK_NULLPTR_RETURN_VOID(mOthModel)
-    mOthTv = new (std::nothrow) ItemView{mMemoryName + "_OTHER", this};
-    CHECK_NULLPTR_RETURN_VOID(mOthTv)
-    mOthTv->SetCurrentModel(mOthModel);
-    mOthTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-    mImgVidOtherSplitter->addWidget(mOthTv);
-  }
-  PreferenceSettings().setValue("FLOATING_OTHER_VIEW_SHOW", checked);
-  mOthTv->setVisible(checked);
-}
-
-void FloatingPreview::onTypesBtnClicked(bool checked) {
-  if (mTypeToDisplayTB == nullptr) {
-    mTypeToDisplayTB = new (std::nothrow) ReorderableToolBar{"Type To Display", this};
-    CHECK_NULLPTR_RETURN_VOID(mTypeToDisplayTB)
-    mTypeToDisplayTB->setOrientation(Qt::Orientation::Horizontal);
-    mTypeToDisplayTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    static QAction* MEDIA_TYPE_2_ACTS[(int)PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
-    for (int mediaTypeInd : mMediaSequence) {
-      mTypeToDisplayTB->addAction(MEDIA_TYPE_2_ACTS[mediaTypeInd]);
-    }
-    mTypeToDisplayTB->setMaximumHeight(35);
-    mImgVidOtherSplitter->addWidget(mTypeToDisplayTB);
-  }
-  mTypeToDisplayTB->setVisible(checked);
-}
-
-void FloatingPreview::onImgVidOthActTriggered(const QAction* pAct) {
-  CHECK_NULLPTR_RETURN_VOID(pAct);
-  const bool checked{pAct->isChecked()};
-  if (pAct == _IMG_ACT) {
-    onImgBtnClicked(checked);
-  } else if (pAct == _VID_ACT) {
-    onVidBtnClicked(checked);
-  } else if (pAct == _OTH_ACT) {
-    onOthBtnClicked(checked);
-  } else {
-    qWarning("Action[%s] not supported", qPrintable(pAct->text()));
-  }
-}
