@@ -3,6 +3,7 @@
 #include "public/DisplayEnhancement.h"
 #include "Tools/FileDescriptor/TableFields.h"
 #include "Tools/FileDescriptor/FdBasedDb.h"
+#include "Component/Notificator.h"
 #include <QKeySequence>
 #include <QInputDialog>
 #include <QDesktopServices>
@@ -10,6 +11,7 @@
 #include <QTextCursor>
 #include <QSqlRecord>
 #include <QSqlField>
+#include <QDebug>
 
 const QString ClickableTextBrowser::HTML_H1_TEMPLATE{R"(<a href="file:///%1">%2</a>)"};
 const QString ClickableTextBrowser::HTML_IMG_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a><br/>\n)"};
@@ -21,15 +23,24 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{paren
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
-  m_menu = new QMenu{this};
-  m_searchSelectionAction = m_menu->addAction(QIcon(":img/SEARCH"), "Search by selection");
-  m_searchSelectionAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F));
-  m_editBeforeSearchAction = m_menu->addAction("Edit selection then Search");
+  m_menu = new (std::nothrow) QMenu{this};
+  m_menu->addSection("search");
+  m_searchCurSelect = m_menu->addAction(QIcon(":img/SEARCH"), "Search current selection text");
+  m_searchCurSelect->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F));
+  m_searchCurSelectAdvance = m_menu->addAction("Search current selection text(Edit allowed)");
 
-  addAction(m_searchSelectionAction);
+  m_menu->addSeparator();
+  m_searchMultiSelect = m_menu->addAction("Search multi-selection text");
 
-  connect(m_searchSelectionAction, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionRequested);
-  connect(m_editBeforeSearchAction, &QAction::triggered, this, &ClickableTextBrowser::onEditSelectionBeforeSearchRequested);
+  m_menu->addSection("clear");
+  m_clearMultiSelections = m_menu->addAction("Clear Multi-Selections");
+
+  addAction(m_searchCurSelect);
+
+  connect(m_searchCurSelect, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionReq);
+  connect(m_searchCurSelectAdvance, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionAdvanceReq);
+  connect(m_searchMultiSelect, &QAction::triggered, this, &ClickableTextBrowser::onSearchMultiSelectionReq);
+  connect(m_clearMultiSelections, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 }
 
@@ -40,31 +51,30 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
   return QDesktopServices::openUrl(url);
 }
 
-QString ClickableTextBrowser::GetStandardSearchKeyWords(QString text) {
+QString ClickableTextBrowser::FormatSearchSentence(QString text) {
   text = text.trimmed();
+  if (text.isEmpty()) {
+    return "%";
+  }
   static const QRegularExpression SPACES_AMPERSAND {R"(\s*&\s*)"};
   text.replace(JSON_RENAME_REGEX::AND_COMP, QChar{'&'});
   text.replace(',', QChar{'&'});
   text.replace(SPACES_AMPERSAND, QChar{'%'});
-  QString stdKeyString;
-  stdKeyString += '%';
-  stdKeyString += text;
-  stdKeyString += '%';
-  return stdKeyString;
+  return '%' + text + '%';
 }
 
-void ClickableTextBrowser::onSearchSelectionRequested() {
-  QString searchKeyString = GetStandardSearchKeyWords(textCursor().selectedText());
+void ClickableTextBrowser::onSearchSelectionReq() {
+  QString searchKeyString = FormatSearchSentence(GetCurrentSelectedText());
   qDebug("Search:[%s]", qPrintable(searchKeyString));
-  SearchAndAppendParagraphOfResult(searchKeyString);
+  SearchAndAppendParagraphOfResult(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg(searchKeyString));
 }
 
-void ClickableTextBrowser::onEditSelectionBeforeSearchRequested() {
+void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
   QStringList candidates;
   candidates.reserve(3);
 
-  QString rawSelectedStr{textCursor().selectedText().trimmed()};
-  candidates.push_back(GetStandardSearchKeyWords(rawSelectedStr));
+  QString rawSelectedStr{GetCurrentSelectedText().trimmed()};
+  candidates.push_back(FormatSearchSentence(rawSelectedStr));
   candidates.push_back(rawSelectedStr); // full match
   candidates.push_back('%' + rawSelectedStr + '%'); // contains
 
@@ -79,23 +89,34 @@ void ClickableTextBrowser::onEditSelectionBeforeSearchRequested() {
     return;
   }
   qDebug("Search:[%s]", qPrintable(searchKeyString));
-  SearchAndAppendParagraphOfResult(searchKeyString);
+  SearchAndAppendParagraphOfResult(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg(searchKeyString));
 }
 
-QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& searchText) {
+void ClickableTextBrowser::onSearchMultiSelectionReq() {
+  const QStringList keywords = GetSelectedTexts();
+  if (keywords.isEmpty()) {
+    LOG_WARN("Skip search", "Nothing selected");
+    return;
+  }
+  const QString whereClause = BuildMultiKeywordLikeCondition(keywords);
+  qDebug("Search:[%s]", qPrintable(whereClause));
+  SearchAndAppendParagraphOfResult(whereClause);
+}
+
+QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whereText) {
   FdBasedDb movieDbManager{SystemPath::VIDS_DATABASE, "EXIST_THEN_QRY_MOVIE_DB"};
-  QString qryCmd = FdBasedDb::QUERY_KEY_INFO_TEMPLATE.arg(DB_TABLE::MOVIES, searchText);
+  QString qryCmd = FdBasedDb::QUERY_KEY_INFO_TEMPLATE.arg(DB_TABLE::MOVIES, whereText);
   QList<QSqlRecord> records;
   if (!movieDbManager.QueryForTest(qryCmd, records)) {
     return QString{"<b>Query command failed</b>[%1]"}.arg(qryCmd);
   }
   if (records.isEmpty()) {
-    return QString{"<b>Not in database</b>[%1]"}.arg(searchText);
+    return QString{"<b>Not in database</b>[%1]"}.arg(whereText);
   }
 
   QString searchResult;
   searchResult.reserve(512);
-  searchResult += QString{"<b>%1 record(s) found</b> by key[%2]. They are:"}.arg(records.size()).arg(searchText);
+  searchResult += QString{"<b>%1 record(s) found</b> by key[%2]. They are:"}.arg(records.size()).arg(whereText);
   searchResult += "<table border='1' cellpadding='4' style='border-collapse: collapse;'>";
   searchResult += "<thead><tr><th>Size</th><th>Name</th><th>Path</th></tr></thead>";
   searchResult += "<tbody>";
@@ -117,6 +138,57 @@ QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& sea
   return searchResult;
 }
 
+void ClickableTextBrowser::mouseDoubleClickEvent(QMouseEvent *e) {
+  if (e->button() == Qt::LeftButton) {
+    QTextCursor cursor = textCursor();
+    cursor.select(QTextCursor::WordUnderCursor);
+    AppendASelection(cursor);
+  }
+  QTextBrowser::mouseDoubleClickEvent(e);
+}
+
+void ClickableTextBrowser::mousePressEvent(QMouseEvent *e) {
+  if (e->button() == Qt::LeftButton) {
+    mbDragging = true;
+    mDraggingStartPos = e->pos();
+  }
+  QTextBrowser::mousePressEvent(e);
+}
+
+void ClickableTextBrowser::mouseMoveEvent(QMouseEvent *e) {
+  if (mbDragging) {
+    QTextCursor cursor = textCursor();
+    cursor.setPosition(cursorForPosition(mDraggingStartPos).position());
+    cursor.setPosition(cursorForPosition(e->pos()).position(), QTextCursor::KeepAnchor);
+    setTextCursor(cursor);
+  }
+  QTextBrowser::mouseMoveEvent(e);
+}
+
+void ClickableTextBrowser::mouseReleaseEvent(QMouseEvent *e) {
+  if (e->button() == Qt::LeftButton && mbDragging) {
+    mbDragging = false;
+    AppendASelection(textCursor());
+  }
+  QTextBrowser::mouseReleaseEvent(e);
+}
+
+void ClickableTextBrowser::AppendASelection(const QTextCursor &cursor) {
+  if (!cursor.hasSelection()) {
+    return; // ignore empty selection
+  }
+  QTextEdit::ExtraSelection extra;
+  extra.cursor = cursor;
+  extra.format.setBackground(Qt::yellow);
+  mMultiSelections.append(extra);
+  setExtraSelections(mMultiSelections);
+}
+
+void ClickableTextBrowser::ClearAllSelections() {
+  mMultiSelections.clear();
+  setExtraSelections(mMultiSelections);
+}
+
 void ClickableTextBrowser::SearchAndAppendParagraphOfResult(const QString& searchText) {
   QTextDocument *doc = document();
   QTextCursor cursor{doc};
@@ -129,4 +201,18 @@ void ClickableTextBrowser::SearchAndAppendParagraphOfResult(const QString& searc
   para += GetSearchResultParagraphDisplay(searchText);
   para += "</font>";
   cursor.insertHtml(para);
+}
+
+QString ClickableTextBrowser::BuildMultiKeywordLikeCondition(const QStringList &keywords) {
+  QString conditions;
+  conditions.reserve(30);
+  for (const QString &keyword : keywords) {
+    if (keyword.isEmpty()) {
+      continue;
+    }
+    conditions += FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg('%' + keyword + '%');
+    conditions += " AND ";
+  }
+  conditions += "1=1";
+  return conditions;
 }
