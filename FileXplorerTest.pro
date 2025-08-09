@@ -51,6 +51,7 @@ SOURCES += \
     Component/RenameWidgets/CommandsPreview.cpp \
     Component/StateLabel.cpp \
     Component/JsonEditorWidget/LineEditCSV.cpp \
+    Component/FolderPreview/ClickableTextBrowser.cpp \
     Tools/AIMediaDuplicate.cpp \
     Tools/ConvertUnicodeCharsetToAscii.cpp \
     Tools/LowResImgsRemover.cpp \
@@ -100,3 +101,4 @@ HEADERS += \
     Component/RenameWidgets/CommandsPreview.h \
     Component/StateLabel.h \
     Component/JsonEditorWidget/LineEditCSV.h \
+    Component/FolderPreview/ClickableTextBrowser.h \
