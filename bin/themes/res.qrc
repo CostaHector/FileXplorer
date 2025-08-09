@@ -74,6 +74,8 @@
 <file alias="LAST_FOLDER">AddressControl/LAST_FOLDER.svg</file>
 <file alias="NEXT_FOLDER">AddressControl/NEXT_FOLDER.svg</file>
 <file alias="SEARCH">AddressControl/SEARCH.svg</file>
+<file alias="SEARCH_CHOICE">AddressControl/SEARCH_CHOICE.svg</file>
+<file alias="SEARCH_MULTI_KEYWORDS">AddressControl/SEARCH_MULTI_KEYWORDS.svg</file>
 <file alias="MATCH_REGEX">AddressControl/MATCH_REGEX.svg</file>
 <file alias="MATCH_EQUAL">AddressControl/MATCH_EQUAL.svg</file>
 <file alias="SERACH_SCOPE_FILENAME">AddressControl/SERACH_SCOPE_FILENAME.svg</file>

@@ -603,9 +603,9 @@ void FileExplorerEvent::subscribe() {
   }
 
   {
-    auto* SELECT_ALL = g_fileBasicOperationsActions().SELECTION_RIBBONS->actions()[0];
-    auto* SELECT_NONE = g_fileBasicOperationsActions().SELECTION_RIBBONS->actions()[1];
-    auto* SELECT_INVERT = g_fileBasicOperationsActions().SELECTION_RIBBONS->actions()[2];
+    auto* SELECT_ALL = g_fileBasicOperationsActions().SELECT_ALL;
+    auto* SELECT_NONE = g_fileBasicOperationsActions().SELECT_NONE;
+    auto* SELECT_INVERT = g_fileBasicOperationsActions().SELECT_INVERT;
 
     connect(SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
     connect(SELECT_NONE, &QAction::triggered, this, &FileExplorerEvent::on_SelectNone);
