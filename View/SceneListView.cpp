@@ -115,10 +115,6 @@ void SceneListView::onClickEvent(const QModelIndex& idx) {
     return;
   }
   mPrev_->BeforeDisplayAFolder();
-  if (mPrev_->NeedUpdateImgs()) {
-    mPrev_->UpdateImgs(name, _sceneModel->GetImgs(idx));
-  }
-  if (mPrev_->NeedUpdateVids()) {
-    mPrev_->UpdateVids(_sceneModel->GetVids(idx));
-  }
+  mPrev_->UpdateImgs(name, _sceneModel->GetImgs(idx));
+  mPrev_->UpdateVids(_sceneModel->GetVids(idx));
 }
