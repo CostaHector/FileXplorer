@@ -25,14 +25,24 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{paren
   setOpenExternalLinks(true);
 
   m_menu = new (std::nothrow) QMenu{this};
-  m_menu->addSection("search");
-  m_searchCurSelect = m_menu->addAction(QIcon{":img/SEARCH"}, "Search current selection text");
-  m_searchCurSelect->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F));
-  m_searchCurSelectAdvance = m_menu->addAction(QIcon{":img/SEARCH_CHOICE"}, "Search current selection text(Edit allowed)");
+
+  m_menu->addSection("Search");
+  m_searchCurSelect = m_menu->addAction(QIcon{":img/SEARCH"}, "Search Current Text");
+  m_searchCurSelect->setToolTip(QString{"<b>%1 (%2)</b><br/>Search for currently selected text in database"}//
+                                    .arg(m_searchCurSelect->text(), m_searchCurSelect->shortcut().toString()));
+
+  m_searchMultiSelect = m_menu->addAction(QIcon{":img/SEARCH_MULTI_KEYWORDS"}, "Search Multiple Texts");
+  m_searchMultiSelect->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F));
+  m_searchMultiSelect->setToolTip(QString{"<b>%1 (%2)</b><br/>Search for multiple selected texts (order insensitive) in database"}//
+                                      .arg(m_searchMultiSelect->text(), m_searchMultiSelect->shortcut().toString()));
+
   m_menu->addSeparator();
-  m_searchMultiSelect = m_menu->addAction(QIcon{":img/SEARCH_MULTI_KEYWORDS"}, "Search multi-selection text");
-  m_menu->addSection("clear");
-  m_clearMultiSelections = m_menu->addAction(QIcon{":img/SELECT_NONE"}, "Clear Multi-Selections");
+  m_searchCurSelectAdvance = m_menu->addAction(QIcon{":img/SEARCH_CHOICE"}, "Advanced Text Search");
+
+  m_menu->addSection("Clear");
+  m_clearMultiSelections = m_menu->addAction(QIcon{":img/SELECT_NONE"}, "Clear All Selections");
+  m_clearMultiSelections->setToolTip(QString{"<b>%1 (%2)</b><br/>Clear all text selections in current browser"}//
+                                         .arg(m_clearMultiSelections->text(), m_clearMultiSelections->shortcut().toString()));
 
   mFloatingTb = new (std::nothrow) QToolBar{"Clickable Browser Toolbar", this};
   mFloatingTb->setOrientation(Qt::Orientation::Vertical);
