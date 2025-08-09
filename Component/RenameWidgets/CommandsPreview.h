@@ -18,7 +18,6 @@ class CommandsPreview : public QPlainTextEdit {
  private:
   QAction* COPY_TEXT{nullptr};
   QToolButton* mToolButton{nullptr};
-  void setupCopyButton();
   void adjustButtonPosition();
 };
 
