@@ -92,22 +92,28 @@ QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& sea
   if (records.isEmpty()) {
     return QString{"<b>Not in database</b>[%1]"}.arg(searchText);
   }
-  static constexpr char BR_ARR_STRING[] {"<br/>"};
+
   QString searchResult;
+  searchResult.reserve(512);
   searchResult += QString{"<b>%1 record(s) found</b> by key[%2]. They are:"}.arg(records.size()).arg(searchText);
-  searchResult += BR_ARR_STRING;
+  searchResult += "<table border='1' cellpadding='4' style='border-collapse: collapse;'>";
+  searchResult += "<thead><tr><th>Size</th><th>Name</th><th>Path</th></tr></thead>";
+  searchResult += "<tbody>";
+
   static constexpr int NAME_FILED_IND {(int)FdBasedDb::QUERY_KEY_INFO_FIELED::Name};
   static constexpr int SIZE_FILED_IND {(int)FdBasedDb::QUERY_KEY_INFO_FIELED::Size};
   static constexpr int PREPATH_R_FILED_IND {(int)FdBasedDb::QUERY_KEY_INFO_FIELED::PrePathRight};
+
   for (const auto& record: records) {
-    const int sz = record.field(SIZE_FILED_IND).value().toInt();
-    searchResult += FILE_PROPERTY_DSP::sizeToHumanReadFriendly(sz);
-    searchResult += '\t';
-    searchResult += record.field(NAME_FILED_IND).value().toString();
-    searchResult += '\t';
-    searchResult += record.field(PREPATH_R_FILED_IND).value().toString();
-    searchResult += BR_ARR_STRING;
+    const qint64 sz = record.field(SIZE_FILED_IND).value().toLongLong();
+    searchResult += "<tr>";
+    searchResult += QString{"<td>%1</td>"}.arg(FILE_PROPERTY_DSP::sizeToHumanReadFriendly(sz));
+    searchResult += QString{"<td>%1</td>"}.arg(record.field(NAME_FILED_IND).value().toString());
+    searchResult += QString{"<td>%1</td>"}.arg(record.field(PREPATH_R_FILED_IND).value().toString());
+    searchResult += "</tr>";
   }
+
+  searchResult += "</tbody></table>";
   return searchResult;
 }
 

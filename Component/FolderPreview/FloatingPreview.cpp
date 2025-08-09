@@ -197,7 +197,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
       QBuffer buffer(&bArray);
       buffer.open(QIODevice::WriteOnly);
       pm.save(&buffer, "PNG");
-      imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="128">)");
+      imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="64">)");
       fileTypeImgIcons[extension] = imgStr;
     } else {
       imgStr = it.value();
