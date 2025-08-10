@@ -1,12 +1,12 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pub/OnScopeExit.h"
-#include "pub/TDir.h"
-#include "pub/MyTestSuite.h"
+#include "OnScopeExit.h"
+#include "TDir.h"
+#include "MyTestSuite.h"
 // add necessary includes here
-#include "pub/BeginToExposePrivateMember.h"
-#include "Tools/StudiosManager.h"
-#include "pub/EndToExposePrivateMember.h"
+#include "BeginToExposePrivateMember.h"
+#include "StudiosManager.h"
+#include "EndToExposePrivateMember.h"
 
 class StudiosManagerTest : public MyTestSuite {
   Q_OBJECT

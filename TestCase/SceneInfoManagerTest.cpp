@@ -1,9 +1,9 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "MyTestSuite.h"
 
-#include "Tools/SceneInfoManager.h"
-#include "Tools/Json/JsonHelper.h"
+#include "SceneInfoManager.h"
+#include "JsonHelper.h"
 using namespace SceneInfoManager;
 
 class SceneInfoManagerTest : public MyTestSuite {

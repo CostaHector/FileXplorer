@@ -1,19 +1,19 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pub/GlbDataProtect.h"
-#include "TestCase/pub/OnScopeExit.h"
-#include "TestCase/pub/TDir.h"
-#include "Tools/Json/JsonKey.h"
-#include "Tools/Json/JsonHelper.h"
-#include "pub/MyTestSuite.h"
+#include "GlbDataProtect.h"
+#include "OnScopeExit.h"
+#include "TDir.h"
+#include "JsonKey.h"
+#include "JsonHelper.h"
+#include "MyTestSuite.h"
 
 // add necessary includes here
-#include "TestCase/pub/BeginToExposePrivateMember.h"
-#include "Tools/CastManager.h"
-#include "Tools/StudiosManager.h"
-#include "TestCase/pub/EndToExposePrivateMember.h"
+#include "BeginToExposePrivateMember.h"
+#include "CastManager.h"
+#include "StudiosManager.h"
+#include "EndToExposePrivateMember.h"
 
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 
 class CastManagerTest : public MyTestSuite {
   Q_OBJECT

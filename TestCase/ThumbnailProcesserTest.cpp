@@ -1,12 +1,12 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/PathRelatedTool.h"
-#include "TestCase/pub/MyTestSuite.h"
-#include "TestCase/pub/TDir.h"
-#include "TestCase/pub/OnScopeExit.h"
-#include "pub/BeginToExposePrivateMember.h"
-#include "Tools/ThumbnailProcesser.h"
-#include "pub/EndToExposePrivateMember.h"
+#include "PathRelatedTool.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "OnScopeExit.h"
+#include "BeginToExposePrivateMember.h"
+#include "ThumbnailProcesser.h"
+#include "EndToExposePrivateMember.h"
 
 #include <QImage>
 bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int height = 1080) {

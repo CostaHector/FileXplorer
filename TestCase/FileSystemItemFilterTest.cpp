@@ -1,8 +1,8 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pub/MyTestSuite.h"
-#include "TestCase/pub/TDir.h"
-#include "Tools/FileSystemItemFilter.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "FileSystemItemFilter.h"
 
 using namespace FileSystemItemFilter;
 class FileSystemItemFilterTest : public MyTestSuite {
