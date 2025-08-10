@@ -375,7 +375,7 @@ void FileExplorerEvent::subsribeCompress() {
 }
 
 void FileExplorerEvent::subsribeFileActions() {
-  connect(g_fileLeafActions()._ALERT_ITEMS, &QAction::triggered, this,                           //
+  connect(g_fileLeafActions()._SETTINGS, &QAction::triggered, this,                           //
           [this](const bool checked) {                                                           //
             m_alertSystem = PopupHideWidget<AlertSystem>(m_alertSystem, checked, _contentPane);  //
             if (checked) {                                                                       //
