@@ -1,5 +1,5 @@
 #include "TorrDb.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 #include "TableFields.h"
 
 using namespace TORRENTS_DB_HEADER_KEY;

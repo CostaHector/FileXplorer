@@ -1,5 +1,5 @@
 #include "FileSystemItemFilter.h"
-#include "public/PublicVariable.h"
+#include "PublicVariable.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>

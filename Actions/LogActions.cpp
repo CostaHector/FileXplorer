@@ -1,6 +1,6 @@
 ﻿#include "LogActions.h"
-#include "public/MemoryKey.h"
-#include "public/PublicMacro.h"
+#include "MemoryKey.h"
+#include "PublicMacro.h"
 #include <QStyle>
 #include <QApplication>
 

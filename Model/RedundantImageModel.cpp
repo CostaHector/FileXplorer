@@ -1,6 +1,6 @@
 ﻿#include "RedundantImageModel.h"
-#include "public/PathTool.h"
-#include "public/DisplayEnhancement.h"
+#include "PathTool.h"
+#include "DisplayEnhancement.h"
 #include <QPixmap>
 
 const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview", "absPath"};

@@ -1,10 +1,10 @@
 #ifndef IMGVIDOTHWID_H
 #define IMGVIDOTHWID_H
 
-#include "View/ItemView.h"
-#include "Model/FloatingModels.h"
-#include "Component/ReorderableToolBar.h"
-#include "Tools/WidgetReorderHelper.h"
+#include "ItemView.h"
+#include "FloatingModels.h"
+#include "ReorderableToolBar.h"
+#include "WidgetReorderHelper.h"
 #include <QVBoxLayout>
 
 class ImgVidOthWid: public QWidget {

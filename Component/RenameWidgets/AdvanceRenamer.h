@@ -15,7 +15,7 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidget>
-#include "Component/StateLabel.h"
+#include "StateLabel.h"
 
 class FileOsWalker;
 

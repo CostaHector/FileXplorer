@@ -28,7 +28,7 @@ qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
   // Open the file (equivalent to CreateFileW)
   int fd = open(fileAbsPath.toUtf8().constData(), O_RDONLY);
   if (fd == -1) {
-    qWarning("Get fd[%s] error: %d", fileAbsPath, errno);
+    qWarning("Get fd[%s] error: %d", qPrintable(fileAbsPath), errno);
     return -errno;
   }
 

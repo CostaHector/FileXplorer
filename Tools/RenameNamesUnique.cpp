@@ -1,5 +1,5 @@
 ﻿#include "RenameNamesUnique.h"
-#include "public/PathTool.h"
+#include "PathTool.h"
 
 #include <QDebug>
 #include <QDir>

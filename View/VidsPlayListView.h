@@ -4,8 +4,8 @@
 #include <QMenu>
 #include <QStandardItemModel>
 
-#include "Model/VidModel.h"
-#include "View/CustomListView.h"
+#include "VidModel.h"
+#include "CustomListView.h"
 
 class VidsPlayListView : public CustomListView {
  public:

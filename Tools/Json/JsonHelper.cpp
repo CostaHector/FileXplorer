@@ -1,12 +1,12 @@
 #include "JsonHelper.h"
 #include "JsonKey.h"
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
-#include "public/PublicTool.h"
-#include "public/PublicMacro.h"
-#include "Tools/NameTool.h"
-#include "Tools/CastManager.h"
-#include "Tools/StudiosManager.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
+#include "PublicTool.h"
+#include "PublicMacro.h"
+#include "NameTool.h"
+#include "CastManager.h"
+#include "StudiosManager.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>

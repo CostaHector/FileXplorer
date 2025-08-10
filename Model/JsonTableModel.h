@@ -1,7 +1,7 @@
 #ifndef JSONTABLEMODEL_H
 #define JSONTABLEMODEL_H
 #include "QAbstractTableModelPub.h"
-#include "Tools/Json/JsonPr.h"
+#include "JsonPr.h"
 #include <QFileInfo>
 #include <bitset>
 

@@ -1,9 +1,9 @@
 #include "ExtraViewVisibilityControl.h"
-#include "Actions/CastDBActions.h"
-#include "Actions/TorrDBAction.h"
+#include "CastDBActions.h"
+#include "TorrDBAction.h"
 
-#include "View/CastDBView.h"
-#include "View/TorrentsManagerWidget.h"
+#include "CastDBView.h"
+#include "TorrentsManagerWidget.h"
 
 #include <QDebug>
 

@@ -1,14 +1,14 @@
 #ifndef MOVIEDBVIEW_H
 #define MOVIEDBVIEW_H
 
-#include "Component/DatabaseSearchToolBar.h"
-#include "Component/MovieDatabaseMenu.h"
-#include "Component/QuickWhereClause.h"
+#include "DatabaseSearchToolBar.h"
+#include "MovieDatabaseMenu.h"
+#include "QuickWhereClause.h"
 
-#include "Tools/FileDescriptor/FdBasedDb.h"
-#include "Model/FdBasedDbModel.h"
-#include "View/CustomTableView.h"
-#include "Tools/Json/JsonKey.h"
+#include "FdBasedDb.h"
+#include "FdBasedDbModel.h"
+#include "CustomTableView.h"
+#include "JsonKey.h"
 
 class MovieDBView : public CustomTableView {
  public:

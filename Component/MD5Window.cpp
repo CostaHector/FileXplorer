@@ -1,8 +1,8 @@
 ﻿#include "MD5Window.h"
-#include "Component/Notificator.h"
-#include "Tools/MD5Calculator.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "Notificator.h"
+#include "MD5Calculator.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>

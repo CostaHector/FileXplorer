@@ -1,7 +1,7 @@
 ﻿#include "AIMediaDuplicate.h"
-#include "public/PublicVariable.h"
-#include "Tools/MD5Calculator.h"
-#include "Tools/VideoDurationGetter.h"
+#include "PublicVariable.h"
+#include "MD5Calculator.h"
+#include "VideoDurationGetter.h"
 
 #include <QDebug>
 #include <QDirIterator>

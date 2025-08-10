@@ -1,8 +1,8 @@
 ﻿#include "SyncFileSystemModificationActions.h"
-#include "Tools/SyncModifiyFileSystem.h"
-#include "Component/Notificator.h"
-#include "public/PublicMacro.h"
-#include "public/StyleSheet.h"
+#include "SyncModifiyFileSystem.h"
+#include "Notificator.h"
+#include "PublicMacro.h"
+#include "StyleSheet.h"
 
 SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {
   static SyncFileSystemModificationActions ins;

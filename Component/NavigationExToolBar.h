@@ -1,7 +1,7 @@
 ﻿#ifndef NAVIGATIONEXTOOLBAR_H
 #define NAVIGATIONEXTOOLBAR_H
 
-#include "public/PublicVariable.h"
+#include "PublicVariable.h"
 #include "ReorderableToolBar.h"
 
 class NavigationExToolBar : public ReorderableToolBar {

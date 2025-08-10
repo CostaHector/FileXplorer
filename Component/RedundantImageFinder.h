@@ -1,8 +1,8 @@
 ﻿#ifndef REDUNDANTIMAGEFINDER_H
 #define REDUNDANTIMAGEFINDER_H
 
-#include "Model/RedundantImageModel.h"
-#include "View/CustomTableView.h"
+#include "RedundantImageModel.h"
+#include "CustomTableView.h"
 #include <QMainWindow>
 
 class RedundantImageFinder : public QMainWindow {

@@ -3,8 +3,8 @@
 #include <QFile>
 #include <QIODevice>
 #include <QTextStream>
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 
 PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {
   STYLE_WINDOWS_VISTA = new (std::nothrow) QAction{QIcon(":img/STYLE_WINDOWS_VISTA"), "windowsvista"};
