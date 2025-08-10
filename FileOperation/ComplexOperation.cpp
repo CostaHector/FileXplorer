@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QUrl>
 #include <QAction>
+#include <QDebug>
 
 namespace ComplexOperation {
 FILE_STRUCTURE_MODE g_fileStructureMode{FILE_STRUCTURE_MODE::QUERY};
@@ -215,7 +216,16 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
     qWarning("Preferred DropEffect value[%d] invalid", (int)ba[0]);
   }
 #else
-  if (native.hasFormat("XdndAction")) {
+  if (native.hasFormat("x-special/gnome-copied-files")) {
+    QByteArray ba = native.data("x-special/gnome-copied-files");
+    const QString cutOrCopyAction = QString::fromUtf8(ba);
+    if (cutOrCopyAction.startsWith("cut")) {
+      return Qt::DropAction::MoveAction;
+    } else if (cutOrCopyAction.startsWith("copy")) {
+      return Qt::DropAction::CopyAction;
+    }
+    qWarning("x-special/gnome-copied-files value[%s] invalid", qPrintable(cutOrCopyAction));
+  } else if (native.hasFormat("XdndAction")) {
     QByteArray ba = native.data("XdndAction");
     const QString cutOrCopyAction = QString::fromUtf8(ba);
     if (cutOrCopyAction == "XdndActionMove") {  // 0xx
@@ -226,6 +236,7 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
     qWarning("XdndAction value[%s] invalid", qPrintable(cutOrCopyAction));
   }
 #endif
+  qWarning() << "Action not found. Supported Available format:" << native.formats();
   return Qt::DropAction::IgnoreAction;
 }
 

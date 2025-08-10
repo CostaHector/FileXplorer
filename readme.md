@@ -4,7 +4,8 @@
 
 FileXplorer is a cross-platform professional file management system engineered for photographers and videographers handling large-scale media files, offering advanced file operations across both Windows and Linux environments.
 
-![FileXplorer](bin/FileXplorer_Dark.png)
+![FileXplorer dark windows](bin/FileXplorer_Dark.png)
+![FileXplorer dark ubuntu](bin/FileXplorer_Dark_ubuntu.png)
 
 ## Core Features
 
@@ -57,7 +58,8 @@ Fuzzy matching of action names in dropdowns to bypass hierarchical menu navigati
 
 7. UI Themes
 Light/Dark theme support with automatic time-based switching or manual lock;
-![FileXplorer](bin/FileXplorer_Light.png)
+![FileXplorer light windows](bin/FileXplorer_Light.png)
+![FileXplorer light ubuntu](bin/FileXplorer_Light_ubuntu.png)
 
 
 ## Coding Style
@@ -162,7 +164,9 @@ linux {
 }
 ```
 
-For windows user who want to add FileXplorer in right click menu.
+## Add this application to file system view
+
+### For windows user
 Just open regedit, and in following path
 `Computer\HKEY_CLASSES_ROOT\Directory\Background\shell\`
 New a key "FileXplorer" under "shell";
@@ -172,6 +176,36 @@ Modify command (Default) value data to following string.
 
 
 And don't forget to add "C:\Qt\5.15.2\mingw81_64\bin" to system environment path
+
+### for Ubuntu user
+using fma-config-tool
+```sh
+sudo apt install nautilus-actions
+fma-config-tool
+```
+
+in menu bar "FileManager Action Configuration Tool", uncheck following action
+
+> Preference > Runtime Preference > Nautilus menu layout > Create a root "FileManager-Actions" menu
+
+Define a new action
+
+1. set Action tab below:
+
+    check the action display item in selection context menu 
+
+    check the action display item in location context menu 
+
+    icon: /home/ariel/code/FileXplorer/bin/themes/AppIcons/FOLDER_OF_PICTURES.png
+
+2. set Commands tab below:
+
+    Path: /home/ariel/code/FileXplorer/build/Desktop_Qt_5_15_2_GCC_64bit-Release/FileXplorer
+
+    Parameter: "%d"
+
+save the items tree
+
 
 ## Testcase
 ### Table 1.0 Expected Behavior of rename Functions
