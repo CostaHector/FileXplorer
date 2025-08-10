@@ -1,8 +1,8 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "MyTestSuite.h"
 // add necessary includes here
-#include "Tools/LowResImgsRemover.h"
+#include "LowResImgsRemover.h"
 
 class LowResImgsRemoverTest : public MyTestSuite {
   Q_OBJECT

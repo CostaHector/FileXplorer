@@ -1,9 +1,9 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "MyTestSuite.h"
 
 // add necessary includes here
-#include "pub/OnScopeExit.h"
+#include "OnScopeExit.h"
 
 class OnScopeExitTest : public MyTestSuite {
   Q_OBJECT

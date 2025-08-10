@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
-#include "Tools/MD5Calculator.h"
+#include "MyTestSuite.h"
+#include "MD5Calculator.h"
 using namespace MD5Calculator;
 
 class MD5CalculatorTest : public MyTestSuite {
