@@ -3,8 +3,8 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QLabel>
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 
 DuplicateVideosFinderActions& g_dupVidFinderAg() {
   static DuplicateVideosFinderActions ins;

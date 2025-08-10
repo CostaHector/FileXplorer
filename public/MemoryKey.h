@@ -1,7 +1,7 @@
 ﻿#ifndef MEMORYKEY_H
 #define MEMORYKEY_H
 
-#include "Memory/KV.h"
+#include "KV.h"
 #include <QSettings>
 
 static inline QSettings& PreferenceSettings() {

@@ -1,7 +1,7 @@
 #include "DevicesAndDriverDb.h"
 #include "MountHelper.h"
 #include "TableFields.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 #include <QStorageInfo>
 #include <QSqlQuery>
 #include <QSqlError>

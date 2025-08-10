@@ -1,6 +1,6 @@
 #include "DataFormatter.h"
 #include "SortedUniqStrLst.h"
-#include "Tools/NameTool.h"
+#include "NameTool.h"
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>

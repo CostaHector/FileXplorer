@@ -1,7 +1,7 @@
 #include "RenameWidget_Case.h"
-#include "Tools/NameTool.h"
-#include "Actions/RenameActions.h"
-#include "public/PublicMacro.h"
+#include "NameTool.h"
+#include "RenameActions.h"
+#include "PublicMacro.h"
 
 typedef enum tagRENAME_CASE_E {
   UPPER_CASE = 0,

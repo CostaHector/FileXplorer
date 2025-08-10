@@ -1,7 +1,7 @@
 ﻿#ifndef MYQFILESYSTEMMODEL_H
 #define MYQFILESYSTEMMODEL_H
 
-#include "Component/CustomStatusBar.h"
+#include "CustomStatusBar.h"
 
 #include <QDebug>
 #include <QFileSystemModel>

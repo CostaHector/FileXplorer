@@ -5,7 +5,7 @@
 #include <QSqlTableModel>
 #include <QLineEdit>
 #include "CustomTableView.h"
-#include "Tools/FileDescriptor/TorrDb.h"
+#include "TorrDb.h"
 
 class TorrentsManagerWidget : public QMainWindow {
  public:

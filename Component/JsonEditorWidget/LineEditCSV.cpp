@@ -1,5 +1,5 @@
 #include "LineEditCSV.h"
-#include "Tools/NameTool.h"
+#include "NameTool.h"
 #include <QRegularExpression>
 
 LineEditCSV::LineEditCSV(const QString& formName, const QString& text, const bool bNoDuplicate, QWidget* parent)  //

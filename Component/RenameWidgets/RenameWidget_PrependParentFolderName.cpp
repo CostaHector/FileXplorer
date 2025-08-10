@@ -1,7 +1,7 @@
 #include "RenameWidget_PrependParentFolderName.h"
-#include "public/PublicMacro.h"
-#include "Tools/RenameHelper.h"
-#include "Component/SpacerWidget.h"
+#include "PublicMacro.h"
+#include "RenameHelper.h"
+#include "SpacerWidget.h"
 
 RenameWidget_PrependParentFolderName::RenameWidget_PrependParentFolderName(QWidget* parent)  //
   : AdvanceRenamer{parent} {

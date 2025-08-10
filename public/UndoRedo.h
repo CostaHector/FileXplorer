@@ -1,7 +1,7 @@
 ﻿#ifndef UNDOREDO_H
 #define UNDOREDO_H
 #include <QStack>
-#include "FileOperation/FileOperatorPub.h"
+#include "FileOperatorPub.h"
 
 class UndoRedo {
  public:

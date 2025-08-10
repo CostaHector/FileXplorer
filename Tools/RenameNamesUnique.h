@@ -3,7 +3,7 @@
 
 #include <QSet>
 #include <QString>
-#include "FileOperation/FileOperatorPub.h"
+#include "FileOperatorPub.h"
 
 class RenameNamesUnique {
  public:

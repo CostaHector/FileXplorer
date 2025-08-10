@@ -1,6 +1,6 @@
 ﻿#include "ArchiveFilesActions.h"
-#include "public/PublicMacro.h"
-#include "public/StyleSheet.h"
+#include "PublicMacro.h"
+#include "StyleSheet.h"
 
 ArchiveFilesActions::ArchiveFilesActions(QObject* parent) : QObject{parent} {
   COMPRESSED_HERE->setToolTip("Compresse selected files to current path.\n(folders not supported now)");

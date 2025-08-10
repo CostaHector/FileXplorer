@@ -1,7 +1,7 @@
 ﻿#include "RedundantImageFinderActions.h"
 
-#include "public/PublicMacro.h"
-#include "public/MemoryKey.h"
+#include "PublicMacro.h"
+#include "MemoryKey.h"
 
 RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
     : QObject{parent} {

@@ -2,8 +2,8 @@
 #define NAVIGATIONVIEWSWITCHER_H
 
 #include <QObject>
-#include "Component/StackedToolBar.h"
-#include "Component/ContentPanel.h"
+#include "StackedToolBar.h"
+#include "ContentPanel.h"
 
 class NavigationViewSwitcher : public QObject {
  public:

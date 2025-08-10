@@ -1,6 +1,6 @@
 ﻿#include "AdvanceSearchTableView.h"
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/ViewActions.h"
+#include "FileBasicOperationsActions.h"
+#include "ViewActions.h"
 #include "CustomTableView.h"
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
@@ -61,7 +61,7 @@ auto AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) -> void {
 #ifdef __NAME__EQ__MAIN__
 
 #include <QMainWindow>
-#include "public/MemoryKey.h"
+#include "MemoryKey.h"
 class AdvanceSearchTableViewWindowTest : public QMainWindow {
  public:
   explicit AdvanceSearchTableViewWindowTest(QWidget* parent = nullptr) : QMainWindow(parent) {

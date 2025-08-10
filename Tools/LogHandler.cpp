@@ -1,8 +1,8 @@
 ﻿#include "LogHandler.h"
-#include "Actions/LogActions.h"
-#include "public/MemoryKey.h"
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
+#include "LogActions.h"
+#include "MemoryKey.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
 
 #include <QDateTime>
 #include <QDesktopServices>

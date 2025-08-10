@@ -1,10 +1,10 @@
 ﻿#ifndef FILEEXPLOREREVENT_H
 #define FILEEXPLOREREVENT_H
 #include <QClipboard>
-#include "FileOperation/ComplexOperation.h"
-#include "Tools/RedundantFolderRemove.h"
-#include "public/PublicVariable.h"
-#include "Model/MyQFileSystemModel.h"
+#include "ComplexOperation.h"
+#include "RedundantFolderRemove.h"
+#include "PublicVariable.h"
+#include "MyQFileSystemModel.h"
 
 class ContentPanel;
 class CustomStatusBar;

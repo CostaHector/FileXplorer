@@ -1,7 +1,7 @@
 #ifndef VIDMODEL_H
 #define VIDMODEL_H
 
-#include "Model/DifferRootFileSystemModel.h"
+#include "DifferRootFileSystemModel.h"
 
 #include <QDebug>
 #include <QItemSelectionModel>

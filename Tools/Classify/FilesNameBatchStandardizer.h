@@ -1,7 +1,7 @@
 #ifndef FILESNAMEBATCHSTANDARDIZER_H
 #define FILESNAMEBATCHSTANDARDIZER_H
 
-#include "Tools/NameStandardizer.h"
+#include "NameStandardizer.h"
 #include <QString>
 
 class FilesNameBatchStandardizer {

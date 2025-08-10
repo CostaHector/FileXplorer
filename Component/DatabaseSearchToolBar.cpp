@@ -1,7 +1,7 @@
 #include "DatabaseSearchToolBar.h"
-#include "public/PublicMacro.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "Tools/FileDescriptor/MountHelper.h"
+#include "PublicMacro.h"
+#include "TableFields.h"
+#include "MountHelper.h"
 #include <QCompleter>
 
 Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{parent} {

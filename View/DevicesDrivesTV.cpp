@@ -1,15 +1,15 @@
 ﻿#include "DevicesDrivesTV.h"
-#include "public/PublicMacro.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "Actions/DevicesDrivesActions.h"
-#include "Tools/FileDescriptor/MountHelper.h"
-#include "Component/Notificator.h"
+#include "PublicMacro.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "DevicesDrivesActions.h"
+#include "MountHelper.h"
+#include "Notificator.h"
 #include <QPainter>
 #include <QApplication>
 #include <QDate>
-#include "Tools/FileDescriptor/TableFields.h"
-#include "public/StyleSheet.h"
+#include "TableFields.h"
+#include "StyleSheet.h"
 
 using namespace DEV_DRV_TABLE;
 class ProgressDelegate : public QStyledItemDelegate {

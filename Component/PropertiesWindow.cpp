@@ -5,14 +5,14 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "Actions/PropertiesWindowActions.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "Tools/FileSystemItemFilter.h"
-#include "Tools/MD5Calculator.h"
-#include "Tools/VidsDurationDisplayString.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
-#include "public/DisplayEnhancement.h"
+#include "PropertiesWindowActions.h"
+#include "TableFields.h"
+#include "FileSystemItemFilter.h"
+#include "MD5Calculator.h"
+#include "VidsDurationDisplayString.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
+#include "DisplayEnhancement.h"
 
 const QString PropertiesWindow::STRING_SPLITTER{60, '-'};
 

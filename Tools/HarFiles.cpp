@@ -1,6 +1,6 @@
 #include "HarFiles.h"
-#include "public/PublicVariable.h"
-#include "public/PublicTool.h"
+#include "PublicVariable.h"
+#include "PublicTool.h"
 #include <QFile>
 #include <QDir>
 #include <QIODevice>

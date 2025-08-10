@@ -1,10 +1,10 @@
 ﻿#include "Archiver.h"
-#include "public/MemoryKey.h"
-#include "Tools/ArchiveFiles.h"
-#include "Model/QAbstractTableModelPub.h"
-#include "View/CustomTableView.h"
-#include "public/DisplayEnhancement.h"
-#include "public/StyleSheet.h"
+#include "MemoryKey.h"
+#include "ArchiveFiles.h"
+#include "QAbstractTableModelPub.h"
+#include "CustomTableView.h"
+#include "DisplayEnhancement.h"
+#include "StyleSheet.h"
 
 #include <QAbstractTableModel>
 #include <QLabel>

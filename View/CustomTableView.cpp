@@ -1,5 +1,5 @@
 #include "CustomTableView.h"
-#include "public/MemoryKey.h"
+#include "MemoryKey.h"
 
 #include <QHeaderView>
 #include <QInputDialog>
