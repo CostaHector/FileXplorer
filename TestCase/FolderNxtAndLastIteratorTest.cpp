@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
-#include "Tools/FolderNxtAndLastIterator.h"
+#include "MyTestSuite.h"
+#include "FolderNxtAndLastIterator.h"
 
 class FolderNxtAndLastIteratorTest : public MyTestSuite {
   Q_OBJECT

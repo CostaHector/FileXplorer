@@ -1,8 +1,8 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "MyTestSuite.h"
 // add necessary includes here
-#include "Tools/PerformersAkaManager.h"
+#include "PerformersAkaManager.h"
 class QuickWhereClauseTest : public MyTestSuite {
   Q_OBJECT
 

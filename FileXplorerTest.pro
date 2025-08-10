@@ -23,13 +23,13 @@ TEMPLATE = app
 DEFINES += QT_TEST
 message($$DEFINES)
 
-SOURCES += $$files(TestCase/Component/JsonEditorWidget/*.cpp)
-SOURCES += $$files(TestCase/DbManager/*.cpp)
-SOURCES += $$files(TestCase/Json/*.cpp)
+SOURCES += $$files(TestCase/ComponentTest/JsonEditorWidgetTest/*.cpp)
+SOURCES += $$files(TestCase/DbManagerTest/*.cpp)
+SOURCES += $$files(TestCase/JsonTest/*.cpp)
 SOURCES += $$files(TestCase/pub/*.cpp)
-SOURCES += $$files(TestCase/public/*.cpp)
-SOURCES += $$files(TestCase/FileOperation/*.cpp)
-SOURCES += $$files(TestCase/rename/*.cpp)
+SOURCES += $$files(TestCase/pubTestTool/*.cpp)
+SOURCES += $$files(TestCase/FileOperationTest/*.cpp)
+SOURCES += $$files(TestCase/RenameTest/*.cpp)
 SOURCES += $$files(TestCase/*.cpp)
 SOURCES += $$files(public/*.cpp)
 SOURCES += $$files(public/Memory/*.cpp)
@@ -78,7 +78,7 @@ SOURCES += \
     Tools/WidgetReorderHelper.cpp \
     Tools/VideoDurationGetter.cpp
 
-HEADERS += $$files(TestCase/pub/*.h)
+HEADERS += $$files(TestCase/pubTestTool/*.h)
 HEADERS += $$files(TestCase/*.h)
 HEADERS += $$files(public/*.h)
 HEADERS += $$files(public/Memory/*.h)

@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
-#include "Tools/WidgetReorderHelper.h"
+#include "MyTestSuite.h"
+#include "WidgetReorderHelper.h"
 #include <QLabel>
 
 QStringList GetLabelTextsFromBoxLayout(const QBoxLayout& layout) {

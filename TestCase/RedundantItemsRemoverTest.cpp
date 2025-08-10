@@ -1,10 +1,10 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "TestCase/pub/BeginToExposePrivateMember.h"
-#include "Tools/RedundantFolderRemove.h"
-#include "TestCase/pub/EndToExposePrivateMember.h"
-#include "pub/FileSystemTestSuite.h"
+#include "BeginToExposePrivateMember.h"
+#include "RedundantFolderRemove.h"
+#include "EndToExposePrivateMember.h"
+#include "FileSystemTestSuite.h"
 
 class RedundantItemsRemoverTest : public FileSystemTestSuite {
   Q_OBJECT
