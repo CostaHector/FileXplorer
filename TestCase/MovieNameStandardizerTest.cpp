@@ -2,8 +2,8 @@
 #include <QCoreApplication>
 
 // add necessary includes here
-#include "TestCase/pub/OnScopeExit.h"
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/OnScopeExit.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 #include "Tools/NameStandardizer.h"
 #include "Tools/StudiosManager.h"
 

@@ -1,4 +1,4 @@
-#include "TestCase/pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 #include <QtTest/QtTest>
 
 #define RUN_UT_MAIN_FILE 1
