@@ -1,10 +1,10 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "public/PathTool.h"
-#include "Tools/SceneInfoManager.h"
-#include "TestCase/pub/MyTestSuite.h"
-#include "TestCase/pub/TDir.h"
+#include "PathTool.h"
+#include "SceneInfoManager.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
 
 using namespace SceneInfoManager;
 
