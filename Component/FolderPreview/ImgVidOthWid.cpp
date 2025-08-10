@@ -30,12 +30,17 @@ ImgVidOthWid::ImgVidOthWid(const QString& memoryName, QWidget* parent)://
   mImgVidOtherSplitter->restoreState(PreferenceSettings().value("FLOATING_PREVIEW_STATE").toByteArray());
 
   // init for actions
-  _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "Images", this};
+  _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "0", this};
   CHECK_NULLPTR_RETURN_VOID(_IMG_ACT)
-  _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, "Videos", this};
+  _IMG_ACT->setToolTip("Image(s) file count");
+
+  _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, "0", this};
   CHECK_NULLPTR_RETURN_VOID(_VID_ACT)
-  _OTH_ACT = new (std::nothrow) QAction{QIcon{":img/FILE"}, "Others", this};
+  _VID_ACT->setToolTip("Video(s) file count");
+
+  _OTH_ACT = new (std::nothrow) QAction{QIcon{":img/FILE"}, "0", this};
   CHECK_NULLPTR_RETURN_VOID(_OTH_ACT)
+  _OTH_ACT->setToolTip("Other(s) file count");
 
   _IMG_ACT->setCheckable(true);
   _VID_ACT->setCheckable(true);
@@ -68,15 +73,15 @@ ImgVidOthWid::ImgVidOthWid(const QString& memoryName, QWidget* parent)://
 void ImgVidOthWid::operator()(const QString& pth) {  // file system view
   if (NeedUpdateImgs()) {
     const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
-    _IMG_ACT->setToolTip(QString("%1").arg(imgCnt, 3, 10));
+    _IMG_ACT->setText(QString::number(imgCnt));
   }
   if (NeedUpdateVids()) {
     const int vidCnt = mVidsModel->setDirPath(pth, TYPE_FILTER::VIDEO_TYPE_SET, true);
-    _VID_ACT->setText(QString("%1").arg(vidCnt, 3, 10));
+    _VID_ACT->setText(QString::number(vidCnt));
   }
   if (NeedUpdateOthers()) {
     const int othCnt = mOthModel->setDirPath(pth, TYPE_FILTER::TEXT_TYPE_SET, true);
-    _OTH_ACT->setToolTip(QString("%1").arg(othCnt, 3, 10));
+    _OTH_ACT->setText(QString::number(othCnt));
   }
 }
 
