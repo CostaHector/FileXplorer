@@ -1,8 +1,8 @@
 #ifndef HARTABLEVIEW_H
 #define HARTABLEVIEW_H
 
-#include "View/CustomTableView.h"
-#include "Model/HarModel.h"
+#include "CustomTableView.h"
+#include "HarModel.h"
 #include <QSortFilterProxyModel>
 #include <QMenu>
 #include <QLabel>

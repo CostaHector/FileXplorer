@@ -1,16 +1,16 @@
 #include "MovieDBView.h"
 
-#include "Actions/MovieDBActions.h"
-#include "Actions/FileBasicOperationsActions.h"
+#include "MovieDBActions.h"
+#include "FileBasicOperationsActions.h"
 
-#include "Component/QuickWhereClause.h"
-#include "Component/Notificator.h"
+#include "QuickWhereClause.h"
+#include "Notificator.h"
 
-#include "Tools/FileDescriptor/MountHelper.h"
-#include "Tools/StudiosManager.h"
-#include "public/PublicMacro.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "MountHelper.h"
+#include "StudiosManager.h"
+#include "PublicMacro.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 
 #include <QHeaderView>
 
@@ -714,7 +714,7 @@ bool MovieDBView::IsHasSelection(const QString& msg) const {
 // #define __NAME__EQ__MAIN__ 1
 #ifdef __NAME__EQ__MAIN__
 #include <QApplication>
-#include "Tools/SubscribeDatabase.h"
+#include "SubscribeDatabase.h"
 #include <QMainWindow>
 class MoviesDatabase : public QMainWindow {
 public:

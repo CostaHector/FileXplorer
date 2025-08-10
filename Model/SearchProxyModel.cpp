@@ -1,7 +1,7 @@
 ﻿#include "SearchProxyModel.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "public/PublicTool.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "PublicTool.h"
 
 SearchProxyModel::SearchProxyModel(QObject* parent)
     : QSortFilterProxyModel{parent}  //

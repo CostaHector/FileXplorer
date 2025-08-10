@@ -2,7 +2,7 @@
 #define RENAMEMODEL_H
 
 #include "QAbstractTableModelPub.h"
-#include "public/PathTool.h"
+#include "PathTool.h"
 
 class RenameModel : public QAbstractTableModelPub {
  public:

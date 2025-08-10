@@ -11,14 +11,14 @@
 #include <QToolBar>
 #include <QDesktopServices>
 
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/RedundantImageFinderActions.h"
-#include "Component/Notificator.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
-#include "public/UndoRedo.h"
-#include "public/PublicMacro.h"
-#include "Model/QAbstractTableModelPub.h"
+#include "FileBasicOperationsActions.h"
+#include "RedundantImageFinderActions.h"
+#include "Notificator.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
+#include "UndoRedo.h"
+#include "PublicMacro.h"
+#include "QAbstractTableModelPub.h"
 
 RedunImgLibs RedundantImageFinder::mRedunLibs{"redunSizeHashlib"};
 

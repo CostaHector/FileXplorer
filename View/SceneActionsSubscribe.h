@@ -6,7 +6,7 @@
 #include <QLineEdit>
 #include <QListView>
 
-#include "Model/ScenesListModel.h"
+#include "ScenesListModel.h"
 
 class SceneActionsSubscribe : public QObject {
  public:

@@ -1,8 +1,8 @@
 #include "FdBasedDbModel.h"
-#include "public/DisplayEnhancement.h"
-#include "public/PathTool.h"
-#include "Tools/NameTool.h"
-#include "Tools/FileDescriptor/MountHelper.h"
+#include "DisplayEnhancement.h"
+#include "PathTool.h"
+#include "NameTool.h"
+#include "MountHelper.h"
 #include <QSqlQuery>
 
 FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //

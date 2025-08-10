@@ -1,7 +1,7 @@
 #include "CustomListView.h"
 
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>

@@ -1,7 +1,7 @@
 #include "ArchiveFiles.h"
-#include "FileOperation/FileOperatorPub.h"
-#include "public/PublicVariable.h"
-#include "public/UndoRedo.h"
+#include "FileOperatorPub.h"
+#include "PublicVariable.h"
+#include "UndoRedo.h"
 
 #include <QDir>
 #include <QDirIterator>

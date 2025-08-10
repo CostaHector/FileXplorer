@@ -3,7 +3,7 @@
 #include <QList>
 #include <QString>
 #ifdef _WIN32
-#include "Tools/QMediaInfo.h"
+#include "QMediaInfo.h"
 #endif
 
 class VideoDurationGetter {

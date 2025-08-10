@@ -1,8 +1,8 @@
 ﻿#include "AdvanceSearchModel.h"
-#include "Component/Notificator.h"
-#include "public/PathTool.h"
-#include "public/MemoryKey.h"
-#include "public/PublicVariable.h"
+#include "Notificator.h"
+#include "PathTool.h"
+#include "MemoryKey.h"
+#include "PublicVariable.h"
 #include <QMessageBox>
 
 const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size", "type", "date", "relative path"};

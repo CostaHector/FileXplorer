@@ -1,5 +1,5 @@
 #include "VidModel.h"
-#include "public/PublicVariable.h"
+#include "PublicVariable.h"
 
 #include <QBrush>
 #include <QDirIterator>

@@ -1,11 +1,11 @@
 #include "JsonPr.h"
-#include "public/PathTool.h"
-#include "public/PublicMacro.h"
-#include "Tools/CastManager.h"
-#include "Tools/StudiosManager.h"
-#include "Tools/NameTool.h"
+#include "PathTool.h"
+#include "PublicMacro.h"
+#include "CastManager.h"
+#include "StudiosManager.h"
+#include "NameTool.h"
 #include "JsonHelper.h"
-#include "public/PublicTool.h"
+#include "PublicTool.h"
 #include <QFile>
 #include <QDir>
 #include <QJsonObject>

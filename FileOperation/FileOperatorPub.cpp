@@ -1,5 +1,5 @@
 ﻿#include "FileOperatorPub.h"
-#include "public/MemoryKey.h"
+#include "MemoryKey.h"
 namespace FileOperatorType {
 
 BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_TYPE& rhs) {

@@ -1,8 +1,8 @@
 ﻿#include "ComplexOperation.h"
-#include "public/PathTool.h"
-#include "public/MemoryKey.h"
-#include "public/PublicVariable.h"
-#include "public/UndoRedo.h"
+#include "PathTool.h"
+#include "MemoryKey.h"
+#include "PublicVariable.h"
+#include "UndoRedo.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QUrl>

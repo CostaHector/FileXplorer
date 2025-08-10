@@ -1,7 +1,7 @@
 #include "AdvanceSearchMenu.h"
 
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/ViewActions.h"
+#include "FileBasicOperationsActions.h"
+#include "ViewActions.h"
 
 AdvanceSearchMenu::AdvanceSearchMenu(const QString& title, QWidget* parent) : QMenu(title, parent) {
   setToolTipsVisible(true);
@@ -25,7 +25,7 @@ AdvanceSearchMenu::AdvanceSearchMenu(const QString& title, QWidget* parent) : QM
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QTableView>
-#include "Model/AdvanceSearchModel.h"
+#include "AdvanceSearchModel.h"
 class AdvanceSearchMenuTest : public QTableView {
  public:
   explicit AdvanceSearchMenuTest(QWidget* parent = nullptr) : QTableView(parent) {

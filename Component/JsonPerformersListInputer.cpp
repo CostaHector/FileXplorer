@@ -6,10 +6,10 @@
 #include <QPushButton>
 #include <QCompleter>
 #include <QStringListModel>
-#include "Tools/Json/JsonHelper.h"
-#include "Tools/NameTool.h"
-#include "Tools/CastManager.h"
-#include "public/PublicMacro.h"
+#include "JsonHelper.h"
+#include "NameTool.h"
+#include "CastManager.h"
+#include "PublicMacro.h"
 
 JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)  //
     : QDialog{parent, f},                                                                 //

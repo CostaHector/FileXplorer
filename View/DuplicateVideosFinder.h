@@ -1,10 +1,10 @@
 #ifndef DUPLICATEVIDEOSFINDER_H
 #define DUPLICATEVIDEOSFINDER_H
 
-#include "View/CustomTableView.h"
-#include "View/AiMediaDupTableView.h"
+#include "CustomTableView.h"
+#include "AiMediaDupTableView.h"
 
-#include "Model/DuplicateVideoModel.h"
+#include "DuplicateVideoModel.h"
 
 #include <QLabel>
 #include <QLineEdit>

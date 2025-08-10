@@ -1,7 +1,7 @@
 #include "SysTerminal.h"
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFile>

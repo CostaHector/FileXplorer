@@ -1,5 +1,5 @@
 ﻿#include "RenameWidget_ReverseNames.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 
 RenameWidget_ReverseNames::RenameWidget_ReverseNames(QWidget* parent)  //
     : AdvanceRenamer(parent) {

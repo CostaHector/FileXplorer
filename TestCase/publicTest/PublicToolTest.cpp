@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pub/MyTestSuite.h"
-#include "public/PublicTool.h"
+#include "MyTestSuite.h"
+#include "PublicTool.h"
 
 class PublicToolTest : public MyTestSuite {
   Q_OBJECT
