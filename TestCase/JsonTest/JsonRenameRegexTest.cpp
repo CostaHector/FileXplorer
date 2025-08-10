@@ -1,9 +1,9 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "MyTestSuite.h"
 // add necessary includes here
-#include "public/PublicVariable.h"
-#include "Tools/FileDescriptor/DbManager.h"
+#include "PublicVariable.h"
+#include "DbManager.h"
 
 using namespace JSON_RENAME_REGEX;
 class JsonRenameRegexTest : public MyTestSuite {

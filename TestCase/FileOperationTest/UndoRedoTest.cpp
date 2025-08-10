@@ -1,13 +1,13 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
-#include "public/UndoRedo.h"
-#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
-#include "TestCase/pubTestTool/GlbDataProtect.h"
-#include "Tools/SyncModifiyFileSystem.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "BeginToExposePrivateMember.h"
+#include "UndoRedo.h"
+#include "EndToExposePrivateMember.h"
+#include "GlbDataProtect.h"
+#include "SyncModifiyFileSystem.h"
 
 using namespace FileOperatorType;
 

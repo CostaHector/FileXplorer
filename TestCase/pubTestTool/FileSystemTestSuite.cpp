@@ -2,7 +2,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QString>
-#include "TestCase/PathRelatedTool.h"
+#include "PathRelatedTool.h"
 
 FileSystemTestSuite::FileSystemTestSuite(const char* testSuiteName, bool autoCleanUp, bool bExculsive)
     : MyTestSuite{bExculsive},                                                 //

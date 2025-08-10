@@ -2,10 +2,10 @@
 #include <QCoreApplication>
 
 // add necessary includes here
-#include "TestCase/pubTestTool/GlbDataProtect.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "FileOperation/FileOperation.h"
+#include "GlbDataProtect.h"
+#include "TDir.h"
+#include "MyTestSuite.h"
+#include "FileOperation.h"
 
 using namespace FileOperatorType;
 

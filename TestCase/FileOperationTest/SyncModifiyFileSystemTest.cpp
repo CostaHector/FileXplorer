@@ -1,9 +1,9 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/GlbDataProtect.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/SyncModifiyFileSystem.h"
+#include "GlbDataProtect.h"
+#include "TDir.h"
+#include "MyTestSuite.h"
+#include "SyncModifiyFileSystem.h"
 
 class SyncModifiyFileSystemTest : public MyTestSuite {
   Q_OBJECT

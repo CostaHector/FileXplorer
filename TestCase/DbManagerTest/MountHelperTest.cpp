@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/FileDescriptor/MountHelper.h"
+#include "MyTestSuite.h"
+#include "MountHelper.h"
 
 using namespace MountHelper;
 

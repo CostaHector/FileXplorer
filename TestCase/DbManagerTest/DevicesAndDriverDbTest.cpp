@@ -3,11 +3,11 @@
 #include <QSqlRecord>
 #include <QStorageInfo>
 
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/FileDescriptor/DevicesAndDriverDb.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "public/PublicVariable.h"
-#include "public/PublicMacro.h"
+#include "MyTestSuite.h"
+#include "DevicesAndDriverDb.h"
+#include "TableFields.h"
+#include "PublicVariable.h"
+#include "PublicMacro.h"
 
 #ifdef _WIN32
 const QString rootpath = QFileInfo(__FILE__).absolutePath();

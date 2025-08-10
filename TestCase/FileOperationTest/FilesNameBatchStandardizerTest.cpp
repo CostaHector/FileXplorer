@@ -1,9 +1,9 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
 
-#include "Tools/Classify/FilesNameBatchStandardizer.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
+#include "FilesNameBatchStandardizer.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
 
 /*
 ‌ASCII码表（字典序核心区间）‌
