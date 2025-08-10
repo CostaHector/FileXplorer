@@ -1,6 +1,6 @@
 #include "DevicesDriveModel.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "public/DisplayEnhancement.h"
+#include "TableFields.h"
+#include "DisplayEnhancement.h"
 #include <QApplication>
 #include <QStyle>
 

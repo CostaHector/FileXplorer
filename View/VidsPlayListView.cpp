@@ -1,9 +1,9 @@
 ﻿#include "VidsPlayListView.h"
-#include "Actions/VideoPlayerActions.h"
-#include "Component/Notificator.h"
+#include "VideoPlayerActions.h"
+#include "Notificator.h"
 
-#include "public/PublicVariable.h"
-#include "public/PathTool.h"
+#include "PublicVariable.h"
+#include "PathTool.h"
 
 #include <QDesktopServices>
 #include <QUrl>

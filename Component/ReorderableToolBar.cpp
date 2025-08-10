@@ -1,7 +1,7 @@
 ﻿#include "ReorderableToolBar.h"
 #include "DraggableToolButton.h"
-#include "public/PublicMacro.h"
-#include "Tools/WidgetReorderHelper.h"
+#include "PublicMacro.h"
+#include "WidgetReorderHelper.h"
 #include <QActionGroup>
 #include <QMimeData>
 #include <QLayout>

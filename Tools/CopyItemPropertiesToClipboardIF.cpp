@@ -1,5 +1,5 @@
 #include "CopyItemPropertiesToClipboardIF.h"
-#include "Model/FdBasedDbModel.h"
+#include "FdBasedDbModel.h"
 #include "ViewSelection.h"
 
 #include <QFileSystemModel>

@@ -2,7 +2,7 @@
 #define REDUNDANTIMAGEMODEL_H
 
 #include "QAbstractTableModelPub.h"
-#include "Tools/RedunImgLibs.h"
+#include "RedunImgLibs.h"
 
 class RedundantImageFinder;
 class RedundantImageModel : public QAbstractTableModelPub {

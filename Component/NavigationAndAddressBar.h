@@ -2,10 +2,10 @@
 #define NAVIGATIONANDADDRESSBAR_H
 
 #include "AddressELineEdit.h"
-#include "public/PathUndoRedoer.h"
-#include "public/PublicVariable.h"
+#include "PathUndoRedoer.h"
+#include "PublicVariable.h"
 
-#include "Component/FileSystemTypeFilter.h"
+#include "FileSystemTypeFilter.h"
 
 #include <QHBoxLayout>
 #include <QToolBar>
@@ -14,7 +14,7 @@
 #include <QPushButton>
 #include <QToolButton>
 
-#include "Tools/FolderNxtAndLastIterator.h"
+#include "FolderNxtAndLastIterator.h"
 
 class NavigationAndAddressBar : public QToolBar {
  public:

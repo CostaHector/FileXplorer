@@ -1,10 +1,10 @@
-﻿#include "View/FileSystemTableView.h"
-#include "View/ViewHelper.h"
-#include "Actions/FolderPreviewActions.h"
-#include "Actions/RenameActions.h"
-#include "Actions/RightClickMenuActions.h"
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/ViewActions.h"
+﻿#include "FileSystemTableView.h"
+#include "ViewHelper.h"
+#include "FolderPreviewActions.h"
+#include "RenameActions.h"
+#include "RightClickMenuActions.h"
+#include "FileBasicOperationsActions.h"
+#include "ViewActions.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>

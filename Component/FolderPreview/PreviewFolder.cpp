@@ -1,6 +1,6 @@
 ﻿#include "PreviewFolder.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 
 constexpr int PreviewFolder::NEXT_FOLDER_TIME_INTERVAL;  // ms
 

@@ -4,7 +4,7 @@
 #include <QFileInfo>
 #include <QSqlTableModel>
 #include <QDir>
-#include "Tools/FileDescriptor/TableFields.h"
+#include "TableFields.h"
 
 class FdBasedDbModel : public QSqlTableModel {
 public:

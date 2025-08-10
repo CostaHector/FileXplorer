@@ -3,13 +3,13 @@
 
 #include <QMainWindow>
 
-#include "Component/CustomStatusBar.h"
-#include "Component/NavigationToolBar.h"
-#include "Component/FolderPreview/PreviewFolder.h"
-#include "Component/StackedToolBar.h"
+#include "CustomStatusBar.h"
+#include "NavigationToolBar.h"
+#include "PreviewFolder.h"
+#include "StackedToolBar.h"
 
-#include "Component/ContentPanel.h"
-#include "Component/RibbonMenu.h"
+#include "ContentPanel.h"
+#include "RibbonMenu.h"
 
 class FileXplorer : public QMainWindow {
  public:

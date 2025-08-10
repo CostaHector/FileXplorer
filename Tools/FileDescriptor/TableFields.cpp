@@ -1,6 +1,6 @@
 #include "TableFields.h"
 #include <QDebug>
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 
 const char* DEV_DRV_TABLE::GetFILEDString(FIELD_E enum_val) {
   switch (enum_val) {

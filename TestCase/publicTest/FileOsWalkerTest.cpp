@@ -1,8 +1,8 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/pub/MyTestSuite.h"
-#include "TestCase/pub/TDir.h"
-#include "public/FileOsWalker.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "FileOsWalker.h"
 
 class FileOsWalkerTest : public MyTestSuite {
   Q_OBJECT

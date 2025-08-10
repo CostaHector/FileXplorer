@@ -1,9 +1,9 @@
 ﻿#include "FileExplorerEvent.h"
 #include "FileXplorer.h"
-#include "Tools/ExtraViewVisibilityControl.h"
-#include "Tools/LogHandler.h"
-#include "public/PublicTool.h"
-#include "public/MemoryKey.h"
+#include "ExtraViewVisibilityControl.h"
+#include "LogHandler.h"
+#include "PublicTool.h"
+#include "MemoryKey.h"
 #include <QApplication>
 
 #define RUN_MAIN_FILE 1

@@ -2,8 +2,8 @@
 #define FILESYSTEMTABLEVIEW_H
 
 #include "CustomTableView.h"
-#include "Component/RightClickMenu.h"
-#include "Model/MyQFileSystemModel.h"
+#include "RightClickMenu.h"
+#include "MyQFileSystemModel.h"
 
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>

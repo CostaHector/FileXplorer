@@ -1,6 +1,6 @@
-﻿#include "Actions/FileLeafAction.h"
-#include "public/MemoryKey.h"
-#include "public/PublicVariable.h"
+﻿#include "FileLeafAction.h"
+#include "MemoryKey.h"
+#include "PublicVariable.h"
 
 FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _ALERT_ITEMS = new (std::nothrow) QAction{QIcon(":img/ALERT"), "Alerts"};

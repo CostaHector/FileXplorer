@@ -10,7 +10,7 @@
 // typedef MediaInfo_Char* (*MEDIAINFO_Inform)(void*, long);
 // typedef MediaInfo_Char* (*MEDIAINFO_Get)(void*, int, int, MediaInfo_Char *, int, int);
 
-#include "lib/MediaInfoDLL.h"
+#include "MediaInfoDLL.h"
 typedef wchar_t MediaInfo_Char;
 class QMediaInfo {
  public:

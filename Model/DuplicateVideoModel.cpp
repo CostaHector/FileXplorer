@@ -1,9 +1,9 @@
 #include "DuplicateVideoModel.h"
 
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "public/DisplayEnhancement.h"
-#include "Tools/MD5Calculator.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "DisplayEnhancement.h"
+#include "MD5Calculator.h"
 
 #include <QDir>
 #include <QDirIterator>

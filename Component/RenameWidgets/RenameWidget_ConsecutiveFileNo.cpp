@@ -1,7 +1,7 @@
 #include "RenameWidget_ConsecutiveFileNo.h"
-#include "Tools/ToConsecutiveFileNameNo.h"
-#include "Component/Notificator.h"
-#include "public/PublicMacro.h"
+#include "ToConsecutiveFileNameNo.h"
+#include "Notificator.h"
+#include "PublicMacro.h"
 
 RenameWidget_ConsecutiveFileNo::RenameWidget_ConsecutiveFileNo(QWidget* parent)  //
     : AdvanceRenamer(parent)                                                     //

@@ -1,7 +1,7 @@
 ﻿#include "NavigationAndAddressBar.h"
-#include "Actions/AddressBarActions.h"
-#include "Actions/RightClickMenuActions.h"
-#include "public/PublicMacro.h"
+#include "AddressBarActions.h"
+#include "RightClickMenuActions.h"
+#include "PublicMacro.h"
 #include <QHBoxLayout>
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {

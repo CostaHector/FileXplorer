@@ -1,7 +1,7 @@
 #ifndef ITEMSCLASSIFIER_H
 #define ITEMSCLASSIFIER_H
 
-#include "FileOperation/FileOperatorPub.h"
+#include "FileOperatorPub.h"
 #include <QString>
 
 class ItemsClassifier {

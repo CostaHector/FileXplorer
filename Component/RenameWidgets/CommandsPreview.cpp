@@ -1,6 +1,6 @@
 ﻿#include "CommandsPreview.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 
 #include <QClipboard>
 #include <QApplication>

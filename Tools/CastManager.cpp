@@ -1,10 +1,10 @@
 #include "CastManager.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "public/PublicMacro.h"
-#include "public/PathTool.h"
-#include "Tools/Json/JsonHelper.h"
-#include "Tools/FileDescriptor/TableFields.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "PublicMacro.h"
+#include "PathTool.h"
+#include "JsonHelper.h"
+#include "TableFields.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QTextStream>

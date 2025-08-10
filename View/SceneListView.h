@@ -1,8 +1,8 @@
 ﻿#ifndef SCENELISTVIEW_H
 #define SCENELISTVIEW_H
 
-#include "View/CustomListView.h"
-#include "Component/FolderPreview/FloatingPreview.h"
+#include "CustomListView.h"
+#include "FloatingPreview.h"
 #include <QMenu>
 
 class ScenesListModel;

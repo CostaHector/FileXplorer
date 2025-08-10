@@ -1,8 +1,8 @@
 #ifndef HARMODEL_H
 #define HARMODEL_H
 
-#include "Model/QAbstractTableModelPub.h"
-#include "Tools/HarFiles.h"
+#include "QAbstractTableModelPub.h"
+#include "HarFiles.h"
 #include <QItemSelectionModel>
 #include <QFileIconProvider>
 
