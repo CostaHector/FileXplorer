@@ -9,7 +9,7 @@ class FileLeafActions : public QObject {
 
   QActionGroup* GetLeafTabActions();
 
-  QAction* _ALERT_ITEMS{nullptr};
+  QAction* _SETTINGS{nullptr};
   QAction* _ABOUT_FILE_EXPLORER{nullptr};
   QAction* _LANUAGE{nullptr};
 
