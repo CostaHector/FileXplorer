@@ -80,9 +80,10 @@
 <file alias="MATCH_EQUAL">AddressControl/MATCH_EQUAL.svg</file>
 <file alias="SERACH_SCOPE_FILENAME">AddressControl/SERACH_SCOPE_FILENAME.svg</file>
 <file alias="SEARCH_SCOPE_CONTENT">AddressControl/SEARCH_SCOPE_CONTENT.svg</file>
+<file alias="FILE_SYSTEM_FILTER">AddressControl/FILTER.svg</file>
+<file alias="EDITOR_MODE">AddressControl/EDITOR_MODE.svg</file>
 
 <!--FILTER_TYPE icon here-->
-<file alias="FILE_SYSTEM_FILTER">AddressControl/FILTER.svg</file>
 <file alias="FILE">FILTER_TYPE/FILE.svg</file>
 <file alias="FOLDER">FILTER_TYPE/FOLDER.png</file>
 <file alias="HIDDEN">FILTER_TYPE/HIDDEN.png</file>
