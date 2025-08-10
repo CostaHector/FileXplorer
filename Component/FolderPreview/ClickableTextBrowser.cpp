@@ -1,4 +1,5 @@
 #include "ClickableTextBrowser.h"
+#include "BrowserActions.h"
 #include "PublicVariable.h"
 #include "DisplayEnhancement.h"
 #include "TableFields.h"
@@ -20,39 +21,20 @@ constexpr int ClickableTextBrowser::HTML_IMG_FIXED_WIDTH;
 constexpr int ClickableTextBrowser::MIN_KEYWORD_LEN;
 
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{parent} {
-  setReadOnly(true);
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
-  m_menu = new (std::nothrow) QMenu{this};
+  auto& inst = BrowserActions::GetInst();
+  mBrowserMenu = inst.GetSearchInDBMenu(this);
+  mFloatingTb = inst.GetSearchInDBToolbar(this);
 
-  m_menu->addSection("Search");
-  m_searchCurSelect = m_menu->addAction(QIcon{":img/SEARCH"}, "Search Current Text");
-  m_searchCurSelect->setToolTip(QString{"<b>%1 (%2)</b><br/>Search for currently selected text in database"}//
-                                    .arg(m_searchCurSelect->text(), m_searchCurSelect->shortcut().toString()));
+  setReadOnly(!inst.EDITOR_MODE->isChecked());
 
-  m_searchMultiSelect = m_menu->addAction(QIcon{":img/SEARCH_MULTI_KEYWORDS"}, "Search Multiple Texts");
-  m_searchMultiSelect->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F));
-  m_searchMultiSelect->setToolTip(QString{"<b>%1 (%2)</b><br/>Search for multiple selected texts (order insensitive) in database"}//
-                                      .arg(m_searchMultiSelect->text(), m_searchMultiSelect->shortcut().toString()));
-
-  m_menu->addSeparator();
-  m_searchCurSelectAdvance = m_menu->addAction(QIcon{":img/SEARCH_CHOICE"}, "Advanced Text Search");
-
-  m_menu->addSection("Clear");
-  m_clearMultiSelections = m_menu->addAction(QIcon{":img/SELECT_NONE"}, "Clear All Selections");
-  m_clearMultiSelections->setToolTip(QString{"<b>%1 (%2)</b><br/>Clear all text selections in current browser"}//
-                                         .arg(m_clearMultiSelections->text(), m_clearMultiSelections->shortcut().toString()));
-
-  mFloatingTb = new (std::nothrow) QToolBar{"Clickable Browser Toolbar", this};
-  mFloatingTb->setOrientation(Qt::Orientation::Vertical);
-  mFloatingTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
-  mFloatingTb->addActions(m_menu->actions());
-
-  connect(m_searchCurSelect, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionReq);
-  connect(m_searchCurSelectAdvance, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionAdvanceReq);
-  connect(m_searchMultiSelect, &QAction::triggered, this, &ClickableTextBrowser::onSearchMultiSelectionReq);
-  connect(m_clearMultiSelections, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
+  connect(inst.SEARCH_CUR_TEXT, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionReq);
+  connect(inst.ADVANCED_TEXT_SEARCH, &QAction::triggered, this, &ClickableTextBrowser::onSearchSelectionAdvanceReq);
+  connect(inst.SEARCH_MULTIPLE_TEXTS, &QAction::triggered, this, &ClickableTextBrowser::onSearchMultiSelectionReq);
+  connect(inst.CLEAR_ALL_SELECTIONS, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
+  connect(inst.EDITOR_MODE, &QAction::triggered, this, [this](bool bEditable){ setReadOnly(!bEditable);});
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 
   AdjustButtonPosition();
