@@ -1,10 +1,10 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include <QToolButton>
-#include "pub/MyTestSuite.h"
-#include "pub/BeginToExposePrivateMember.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
 #include "Actions/ActionsRecorder.h"
-#include "pub/EndToExposePrivateMember.h"
+#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
 
 class ActionsRecorderTest : public MyTestSuite {
   Q_OBJECT

@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 #include "Tools/WidgetReorderHelper.h"
 #include <QLabel>
 

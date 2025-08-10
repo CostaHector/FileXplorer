@@ -1,11 +1,11 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pub/GlbDataProtect.h"
-#include "pub/MyTestSuite.h"
-#include "pub/TDir.h"
-#include "pub/BeginToExposePrivateMember.h"
+#include "TestCase/pubTestTool/GlbDataProtect.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "TestCase/pubTestTool/TDir.h"
+#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
 #include "Tools/LogHandler.h"
-#include "pub/EndToExposePrivateMember.h"
+#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
 
 class LogHandlerTest : public MyTestSuite {
   Q_OBJECT

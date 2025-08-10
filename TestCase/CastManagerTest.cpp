@@ -1,17 +1,17 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pub/GlbDataProtect.h"
-#include "TestCase/pub/OnScopeExit.h"
-#include "TestCase/pub/TDir.h"
+#include "TestCase/pubTestTool/GlbDataProtect.h"
+#include "TestCase/pubTestTool/OnScopeExit.h"
+#include "TestCase/pubTestTool/TDir.h"
 #include "Tools/Json/JsonKey.h"
 #include "Tools/Json/JsonHelper.h"
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 
 // add necessary includes here
-#include "TestCase/pub/BeginToExposePrivateMember.h"
+#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
 #include "Tools/CastManager.h"
 #include "Tools/StudiosManager.h"
-#include "TestCase/pub/EndToExposePrivateMember.h"
+#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
 
 #include "public/PublicMacro.h"
 

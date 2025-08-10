@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 // add necessary includes here
 #include "Tools/LowResImgsRemover.h"
 

@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pub/MyTestSuite.h"
-#include "TestCase/pub/TDir.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "TestCase/pubTestTool/TDir.h"
 #include "Tools/FileSystemItemFilter.h"
 
 using namespace FileSystemItemFilter;

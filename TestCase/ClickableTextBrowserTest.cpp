@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
 #include "Component/FolderPreview/ClickableTextBrowser.h"
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 
 class ClickableTextBrowserTest : public MyTestSuite {
   Q_OBJECT

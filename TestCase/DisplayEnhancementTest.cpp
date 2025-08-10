@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 #include "public/DisplayEnhancement.h"
 
 using namespace FILE_PROPERTY_DSP;
