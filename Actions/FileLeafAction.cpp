@@ -3,8 +3,8 @@
 #include "PublicVariable.h"
 
 FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
-  _ALERT_ITEMS = new (std::nothrow) QAction{QIcon(":img/ALERT"), "Alerts"};
-  if (_ALERT_ITEMS == nullptr) {
+  _SETTINGS = new (std::nothrow) QAction{QIcon(":img/SETTINGS"), "Settings"};
+  if (_SETTINGS == nullptr) {
     qCritical("_ALERT_ITEMS is nullptr");
     return;
   }
@@ -35,14 +35,14 @@ QActionGroup* FileLeafActions::GetLeafTabActions() {
     return nullptr;
   }
 
-  _ALERT_ITEMS->setCheckable(true);
-  _ALERT_ITEMS->setShortcutVisibleInContextMenu(true);
-  _ALERT_ITEMS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_ALERT_ITEMS->text(), _ALERT_ITEMS->shortcut().toString()));
+  _SETTINGS->setCheckable(true);
+  _SETTINGS->setShortcutVisibleInContextMenu(true);
+  _SETTINGS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_SETTINGS->text(), _SETTINGS->shortcut().toString()));
 
   _LANUAGE->setCheckable(true);
   _LANUAGE->setChecked(PreferenceSettings().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
 
-  leafFile->addAction(_ALERT_ITEMS);
+  leafFile->addAction(_SETTINGS);
   leafFile->addAction(_ABOUT_FILE_EXPLORER);
   leafFile->addAction(_LANUAGE);
   leafFile->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
