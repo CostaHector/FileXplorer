@@ -1,11 +1,11 @@
 #include "StudiosManager.h"
 
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
-#include "public/PublicMacro.h"
-#include "public/MemoryKey.h"
-#include "Tools/Json/JsonKey.h"
-#include "Tools/Json/JsonHelper.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
+#include "PublicMacro.h"
+#include "MemoryKey.h"
+#include "JsonKey.h"
+#include "JsonHelper.h"
 #include <QVariantHash>
 #include <QDir>
 #include <QDirIterator>

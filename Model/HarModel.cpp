@@ -1,5 +1,5 @@
 #include "HarModel.h"
-#include "public/DisplayEnhancement.h"
+#include "DisplayEnhancement.h"
 HarModel::HarModel(QObject* parent) : QAbstractTableModelPub{parent} {}
 
 QVariant HarModel::data(const QModelIndex& index, int role) const {

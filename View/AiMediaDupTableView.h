@@ -1,8 +1,8 @@
 #ifndef AIMEDIADUPTABLEVIEW_H
 #define AIMEDIADUPTABLEVIEW_H
 
-#include "View/CustomTableView.h"
-#include "Model/AiMediaTablesModel.h"
+#include "CustomTableView.h"
+#include "AiMediaTablesModel.h"
 class QSortFilterProxyModel;
 
 class AiMediaDupTableView : public CustomTableView {

@@ -1,6 +1,6 @@
-﻿#include "public/PublicTool.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+﻿#include "PublicTool.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 
 #include <QAction>
 #include <QFileDialog>

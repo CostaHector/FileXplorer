@@ -1,8 +1,8 @@
 ﻿#include "SceneActionsSubscribe.h"
-#include "Actions/SceneInPageActions.h"
-#include "Tools/SceneInfoManager.h"
-#include "Component/Notificator.h"
-#include "public/MemoryKey.h"
+#include "SceneInPageActions.h"
+#include "SceneInfoManager.h"
+#include "Notificator.h"
+#include "MemoryKey.h"
 #include <QToolBar>
 #include <QMessageBox>
 

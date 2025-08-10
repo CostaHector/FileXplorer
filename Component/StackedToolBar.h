@@ -1,14 +1,14 @@
 #ifndef STACKEDTOOLBAR_H
 #define STACKEDTOOLBAR_H
-#include "Component/AdvanceSearchToolBar.h"
-#include "Component/DatabaseSearchToolBar.h"
-#include "Component/NavigationAndAddressBar.h"
+#include "AdvanceSearchToolBar.h"
+#include "DatabaseSearchToolBar.h"
+#include "NavigationAndAddressBar.h"
 
 #include <QHash>
 #include <QLayout>
 #include <QStackedWidget>
 #include <QToolBar>
-#include "Tools/ViewTypeTool.h"
+#include "ViewTypeTool.h"
 
 class NavigationViewSwitcher;
 

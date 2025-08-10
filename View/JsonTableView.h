@@ -2,9 +2,9 @@
 #define JSONVIEW_H
 
 #include "CustomTableView.h"
-#include "Model/JsonTableModel.h"
-#include "Model/JsonProxyModel.h"
-#include "Component/MultiLineEditDelegate.h"
+#include "JsonTableModel.h"
+#include "JsonProxyModel.h"
+#include "MultiLineEditDelegate.h"
 
 class JsonTableView : public CustomTableView {
  public:

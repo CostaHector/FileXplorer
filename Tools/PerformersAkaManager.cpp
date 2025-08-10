@@ -1,10 +1,10 @@
 ﻿#include "PerformersAkaManager.h"
-#include "Tools/PerformerJsonFileHelper.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "public/MemoryKey.h"
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
-#include "public/PublicMacro.h"
+#include "PerformerJsonFileHelper.h"
+#include "TableFields.h"
+#include "MemoryKey.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
+#include "PublicMacro.h"
 #include <QTextStream>
 #include <QFile>
 

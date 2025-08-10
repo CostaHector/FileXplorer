@@ -1,6 +1,6 @@
 ﻿#include "DraggableToolButton.h"
-#include "public/PublicMacro.h"
-#include "View/ViewHelper.h"
+#include "PublicMacro.h"
+#include "ViewHelper.h"
 #include <QMimeData>
 #include <QDrag>
 #include <QPainter>

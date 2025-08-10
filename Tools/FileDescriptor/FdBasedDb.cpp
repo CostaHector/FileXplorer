@@ -1,10 +1,10 @@
 #include "FdBasedDb.h"
-#include "Tools/FileDescriptor/FileDescriptor.h"
-#include "Tools/Json/JsonHelper.h"
-#include "Tools/VideoDurationGetter.h"
-#include "public/PublicVariable.h"
-#include "public/PathTool.h"
-#include "public/PublicMacro.h"
+#include "FileDescriptor.h"
+#include "JsonHelper.h"
+#include "VideoDurationGetter.h"
+#include "PublicVariable.h"
+#include "PathTool.h"
+#include "PublicMacro.h"
 #include "TableFields.h"
 #include <QDirIterator>
 #include <QSqlError>
@@ -693,7 +693,7 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
 int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QString& peerPath) const {
   if (CHECK_TABLE_VOLUME_ONLINE) {
     if (!IsTableVolumeOnline(tableName)) {
-      qWarning("");
+      qWarning("Table Volum offline");
       return FD_DISK_OFFLINE;
     }
   }

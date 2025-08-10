@@ -1,6 +1,6 @@
 ﻿#ifndef DROPLISTTOOLBUTTON_H
 #define DROPLISTTOOLBUTTON_H
-#include "public/StyleSheet.h"
+#include "StyleSheet.h"
 #include <QToolButton>
 #include <QString>
 #include <QList>

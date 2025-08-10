@@ -1,11 +1,11 @@
 #ifndef ADVANCESEARCHTABLEVIEW_H
 #define ADVANCESEARCHTABLEVIEW_H
 
-#include "Model/AdvanceSearchModel.h"
-#include "Component/AdvanceSearchMenu.h"
-#include "Component/CustomStatusBar.h"
+#include "AdvanceSearchModel.h"
+#include "AdvanceSearchMenu.h"
+#include "CustomStatusBar.h"
 #include "CustomTableView.h"
-#include "Model/SearchProxyModel.h"
+#include "SearchProxyModel.h"
 
 class AdvanceSearchTableView : public CustomTableView {
  public:

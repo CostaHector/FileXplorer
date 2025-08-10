@@ -1,8 +1,8 @@
 #ifndef CASTDBVIEW_H
 #define CASTDBVIEW_H
 
-#include "Tools/FileDescriptor/PerfBaseDb.h"
-#include "View/CustomTableView.h"
+#include "PerfBaseDb.h"
+#include "CustomTableView.h"
 #include <QSqlTableModel>
 #include <QToolBar>
 #include <QLineEdit>

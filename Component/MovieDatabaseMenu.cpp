@@ -1,7 +1,7 @@
 #include "MovieDatabaseMenu.h"
 
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/ViewActions.h"
+#include "FileBasicOperationsActions.h"
+#include "ViewActions.h"
 
 MovieDatabaseMenu::MovieDatabaseMenu(const QString& title, QWidget* parent) : QMenu(title, parent) {
   setToolTipsVisible(true);

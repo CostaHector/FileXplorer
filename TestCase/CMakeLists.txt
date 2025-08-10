@@ -38,11 +38,11 @@ file(GLOB SOURCES
     ../View/*.cpp
     *.cpp
     ComponentTest/JsonEditorWidgetTest/*.cpp
-    FileOperationTest/*.cpp
     DbManagerTest/*.cpp
-    pub/*.cpp
-    pubTestTool/*.cpp
+    FileOperationTest/*.cpp
     JsonTest/*.cpp
+    publicTest/*.cpp
+    pubTestTool/*.cpp
     RenameTest/*.cpp
 )
 list(LENGTH SOURCES src_cpp_count)

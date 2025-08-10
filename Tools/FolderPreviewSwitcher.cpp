@@ -1,6 +1,6 @@
 ﻿#include "FolderPreviewSwitcher.h"
-#include "Actions/FolderPreviewActions.h"
-#include "public/PublicMacro.h"
+#include "FolderPreviewActions.h"
+#include "PublicMacro.h"
 
 FolderPreviewSwitcher::FolderPreviewSwitcher(PreviewFolder* folderPreview, QWidget* parentDocker, QObject* parent) : QObject{parent}, _folderPreview{folderPreview}, _parentDocker{parentDocker} {
   auto* checkedPreviewType = g_folderPreviewActions().PREVIEW_AG->checkedAction();

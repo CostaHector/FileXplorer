@@ -1,12 +1,12 @@
 ﻿#include "FileSystemTreeView.h"
-#include "View/ViewHelper.h"
-#include "public/StyleSheet.h"
-#include "public/MemoryKey.h"
+#include "ViewHelper.h"
+#include "StyleSheet.h"
+#include "MemoryKey.h"
 
-#include "Actions/RightClickMenuActions.h"
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/RenameActions.h"
-#include "Actions/ViewActions.h"
+#include "RightClickMenuActions.h"
+#include "FileBasicOperationsActions.h"
+#include "RenameActions.h"
+#include "ViewActions.h"
 #include <QHeaderView>
 #include <QMouseEvent>
 

@@ -1,8 +1,8 @@
 ﻿#include "SceneInfoManager.h"
-#include "public/PublicVariable.h"
-#include "Tools/Classify/SceneMixed.h"
-#include "Tools/Json/JsonHelper.h"
-#include "public/PathTool.h"
+#include "PublicVariable.h"
+#include "SceneMixed.h"
+#include "JsonHelper.h"
+#include "PathTool.h"
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>

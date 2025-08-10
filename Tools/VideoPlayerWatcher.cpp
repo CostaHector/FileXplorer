@@ -1,6 +1,6 @@
 #include "VideoPlayerWatcher.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 
 #include <QDebug>
 #include <QMouseEvent>

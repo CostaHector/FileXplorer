@@ -1,9 +1,9 @@
 ﻿#include "RibbonMovieDB.h"
-#include "Actions/MovieDBActions.h"
-#include "Actions/TorrDBAction.h"
-#include "Actions/ViewActions.h"
-#include "public/StyleSheet.h"
-#include "public/PublicMacro.h"
+#include "MovieDBActions.h"
+#include "TorrDBAction.h"
+#include "ViewActions.h"
+#include "StyleSheet.h"
+#include "PublicMacro.h"
 
 RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
     : QToolBar{title, parent}                                        //

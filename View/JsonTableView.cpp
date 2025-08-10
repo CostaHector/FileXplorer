@@ -1,8 +1,8 @@
 #include "JsonTableView.h"
-#include "Actions/JsonActions.h"
-#include "Component/Notificator.h"
-#include "Tools/StudiosManager.h"
-#include "Tools/NameTool.h"
+#include "JsonActions.h"
+#include "Notificator.h"
+#include "StudiosManager.h"
+#include "NameTool.h"
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>

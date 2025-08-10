@@ -1,12 +1,12 @@
 ﻿#ifndef ADVANCESEARCHTOOLBAR_H
 #define ADVANCESEARCHTOOLBAR_H
 
-#include "Component/FileSystemTypeFilter.h"
-#include "Component/SearchCaseMatterToolButton.h"
-#include "Component/SearchModeComboBox.h"
+#include "FileSystemTypeFilter.h"
+#include "SearchCaseMatterToolButton.h"
+#include "SearchModeComboBox.h"
 
-#include "Model/AdvanceSearchModel.h"
-#include "Model/SearchProxyModel.h"
+#include "AdvanceSearchModel.h"
+#include "SearchProxyModel.h"
 
 #include <QLineEdit>
 #include <QToolBar>

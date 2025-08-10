@@ -1,7 +1,7 @@
 #include "ImgVidOthWid.h"
-#include "public/PublicMacro.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "PublicMacro.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 #include <QDir>
 
 constexpr ImgVidOthWid::MediaBtnHandlerFunc ImgVidOthWid::MEDIA_HANDLERS_MAP[];

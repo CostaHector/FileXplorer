@@ -1,5 +1,5 @@
 #include "ItemView.h"
-#include "Component/Notificator.h"
+#include "Notificator.h"
 #include <QActionGroup>
 #include <QDesktopServices>
 #include <QUrl>

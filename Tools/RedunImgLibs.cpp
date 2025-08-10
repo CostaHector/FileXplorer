@@ -1,7 +1,7 @@
 ﻿#include "RedunImgLibs.h"
-#include "Tools/MD5Calculator.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "MD5Calculator.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 #include <QDirIterator>
 
 QString RedunImgLibs::GetRedunPath() {

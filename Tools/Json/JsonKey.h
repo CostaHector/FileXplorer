@@ -1,6 +1,6 @@
 #ifndef JSONKEY_H
 #define JSONKEY_H
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 #include <QString>
 #include <QVariant>
 

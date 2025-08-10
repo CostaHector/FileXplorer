@@ -1,5 +1,5 @@
 ﻿#include "PropertiesWindowActions.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 #include <QToolBar>
 
 PropertiesWindowActions::PropertiesWindowActions(QObject* parent)  //
