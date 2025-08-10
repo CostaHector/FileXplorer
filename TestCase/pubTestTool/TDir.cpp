@@ -1,5 +1,5 @@
 ﻿#include "TDir.h"
-#include "public/PathTool.h"
+#include "PathTool.h"
 #include <QTextStream>
 #include <QDirIterator>
 

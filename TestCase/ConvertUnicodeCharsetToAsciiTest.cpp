@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/ConvertUnicodeCharsetToAscii.h"
+#include "MyTestSuite.h"
+#include "ConvertUnicodeCharsetToAscii.h"
 
 class ConvertUnicodeCharsetToAsciiTest : public MyTestSuite {
   Q_OBJECT

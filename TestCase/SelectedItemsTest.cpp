@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "MyTestSuite.h"
 
 QStringList NeedProcessPath(const QStringList& paths) {
   if (paths.size() < 2) {

@@ -1,11 +1,11 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
-#include "Tools/RenameNamesUnique.h"
-#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "BeginToExposePrivateMember.h"
+#include "RenameNamesUnique.h"
+#include "EndToExposePrivateMember.h"
 
 class RenameUnqiueCheckTest : public MyTestSuite {
   Q_OBJECT

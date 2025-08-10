@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "public/PathTool.h"
+#include "MyTestSuite.h"
+#include "PathTool.h"
 
 class ValueCheckerTest : public MyTestSuite {
   Q_OBJECT

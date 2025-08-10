@@ -1,14 +1,14 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/PathRelatedTool.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/GlbDataProtect.h"
-#include "TestCase/pubTestTool/OnScopeExit.h"
-#include "Tools/FileDescriptor/FdBasedDb.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "Tools/Json/JsonKey.h"
-#include "Tools/Json/JsonHelper.h"
-#include "public/PublicMacro.h"
+#include "PathRelatedTool.h"
+#include "MyTestSuite.h"
+#include "GlbDataProtect.h"
+#include "OnScopeExit.h"
+#include "FdBasedDb.h"
+#include "TableFields.h"
+#include "JsonKey.h"
+#include "JsonHelper.h"
+#include "PublicMacro.h"
 #include <QSqlRecord>
 
 const QString rootpath = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";

@@ -1,11 +1,11 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include <chrono>
-#include "TestCase/PathRelatedTool.h"
-#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
-#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
-#include "Tools/VideoDurationGetter.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "PathRelatedTool.h"
+#include "BeginToExposePrivateMember.h"
+#include "EndToExposePrivateMember.h"
+#include "VideoDurationGetter.h"
+#include "MyTestSuite.h"
 
 const QString VIDEOS_DURATION_DIR = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
 class VideosDurationGetterTest : public MyTestSuite {

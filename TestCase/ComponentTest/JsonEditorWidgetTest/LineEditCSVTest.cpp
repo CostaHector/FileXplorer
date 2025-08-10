@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "public/PublicMacro.h"
+#include "MyTestSuite.h"
+#include "PublicMacro.h"
 
 // add necessary includes here
-#include "Component/JsonEditorWidget/LineEditCSV.h"
+#include "LineEditCSV.h"
 
 class LineEditCSVTest : public MyTestSuite {
   Q_OBJECT

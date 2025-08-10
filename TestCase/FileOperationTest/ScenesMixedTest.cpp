@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/Classify/SceneMixed.h"
+#include "MyTestSuite.h"
+#include "SceneMixed.h"
 
 class ScenesMixedTest : public MyTestSuite {
   Q_OBJECT

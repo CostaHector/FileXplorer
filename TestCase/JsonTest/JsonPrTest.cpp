@@ -1,15 +1,15 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/pubTestTool/OnScopeExit.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "Tools/Json/JsonHelper.h"
-#include "Tools/Json/JsonPr.h"
-#include "Tools/CastManager.h"
-#include "Tools/StudiosManager.h"
-#include "Tools/NameTool.h"
-#include "public/PathTool.h"
-#include "public/PublicMacro.h"
+#include "OnScopeExit.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "JsonHelper.h"
+#include "JsonPr.h"
+#include "CastManager.h"
+#include "StudiosManager.h"
+#include "NameTool.h"
+#include "PathTool.h"
+#include "PublicMacro.h"
 
 class JsonPrTest : public MyTestSuite {
   Q_OBJECT
