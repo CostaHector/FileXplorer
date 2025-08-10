@@ -26,7 +26,7 @@ public:
 
   void AdjustButtonPosition() {
     if (mTypeToDisplayTB == nullptr) {return;}
-    static constexpr int marginX = 32, marginY = 32;
+    static constexpr int marginX = 16, marginY = 32;
     mTypeToDisplayTB->move(width() - mTypeToDisplayTB->width() - marginX, height() - mTypeToDisplayTB->height() - marginY);
     mTypeToDisplayTB->raise();
   }

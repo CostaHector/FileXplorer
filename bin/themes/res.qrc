@@ -284,8 +284,7 @@
 <file alias="TABLES">Database/TABLES.svg</file>
 
 <!--AlertSystem icon here-->
-<file alias="ALERT">AlertSystem/ALERT.svg</file>
-<file alias="ALERT_ACTIVE">AlertSystem/ALERT_ACTIVE.svg</file>
+<file alias="SETTINGS">AlertSystem/SETTINGS.svg</file>
 <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
 
 <!--RecycleBin icon here-->
