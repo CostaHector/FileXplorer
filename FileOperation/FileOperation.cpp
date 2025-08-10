@@ -1,5 +1,5 @@
 ﻿#include "FileOperation.h"
-#include "public/PathTool.h"
+#include "PathTool.h"
 
 #include <QStringList>
 #include <QDir>

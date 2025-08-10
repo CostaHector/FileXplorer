@@ -1,11 +1,11 @@
 ﻿#include "NavigationViewSwitcher.h"
-#include "View/CastDBView.h"
-#include "View/SceneActionsSubscribe.h"
-#include "View/SceneListView.h"
-#include "public/MemoryKey.h"
-#include "Component/NavigationToolBar.h"
-#include "Model/ScenesListModel.h"
-#include "Tools/ViewTypeTool.h"
+#include "CastDBView.h"
+#include "SceneActionsSubscribe.h"
+#include "SceneListView.h"
+#include "MemoryKey.h"
+#include "NavigationToolBar.h"
+#include "ScenesListModel.h"
+#include "ViewTypeTool.h"
 using namespace ViewTypeTool;
 
 NavigationViewSwitcher::NavigationViewSwitcher(StackedToolBar* navigation, ContentPanel* view, QObject* parent) : QObject(parent), _navigation(navigation), _view(view) {}

@@ -1,6 +1,6 @@
 ﻿#include "UndoRedo.h"
-#include "Tools/SyncModifiyFileSystem.h"
-#include "FileOperation/FileOperation.h"
+#include "SyncModifiyFileSystem.h"
+#include "FileOperation.h"
 using namespace FileOperatorType;
 
 UndoRedo g_undoRedo;

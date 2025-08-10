@@ -1,6 +1,6 @@
 ﻿#include "NavigationExToolBar.h"
-#include "public/PublicMacro.h"
-#include "public/MemoryKey.h"
+#include "PublicMacro.h"
+#include "MemoryKey.h"
 
 #include <QDragEnterEvent>
 #include <QToolTip>

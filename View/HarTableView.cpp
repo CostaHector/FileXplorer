@@ -1,7 +1,7 @@
 #include "HarTableView.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 #include <QFileDialog>
 #include <QLabel>
 

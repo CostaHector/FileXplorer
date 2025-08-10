@@ -1,10 +1,10 @@
 ﻿#include "FloatingPreview.h"
-#include "public/DisplayEnhancement.h"
-#include "public/PublicMacro.h"
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "Tools/VideoDurationGetter.h"
+#include "DisplayEnhancement.h"
+#include "PublicMacro.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "VideoDurationGetter.h"
 #include <QBuffer>
 #include <QIcon>
 #include <QDir>
@@ -41,7 +41,7 @@ void FloatingPreview::SaveSettings() {
   PreferenceSettings().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
 }
 
-#include "Tools/PerformerJsonFileHelper.h"
+#include "PerformerJsonFileHelper.h"
 QString GetCastHtml(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
   const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString();
   const QString& ori = record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString();

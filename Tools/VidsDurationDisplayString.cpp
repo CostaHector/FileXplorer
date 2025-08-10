@@ -1,5 +1,5 @@
 #include "VidsDurationDisplayString.h"
-#include "Tools/VideoDurationGetter.h"
+#include "VideoDurationGetter.h"
 #include <QTime>
 #include <math.h>
 #include <stdint.h>

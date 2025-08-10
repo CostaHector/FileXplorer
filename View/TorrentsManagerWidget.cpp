@@ -1,11 +1,11 @@
 #include "TorrentsManagerWidget.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 
-#include "Actions/TorrDBAction.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "Component/Notificator.h"
+#include "TorrDBAction.h"
+#include "TableFields.h"
+#include "Notificator.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>

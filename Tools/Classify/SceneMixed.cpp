@@ -1,8 +1,8 @@
 ﻿#include "SceneMixed.h"
 #include "ItemsPileCategory.h"
-#include "public/PathTool.h"
-#include "public/PublicTool.h"
-#include "public/PublicVariable.h"
+#include "PathTool.h"
+#include "PublicTool.h"
+#include "PublicVariable.h"
 #include <QDir>
 
 using namespace ItemsPileCategory;

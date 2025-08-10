@@ -1,5 +1,5 @@
 #include "PlayVideo.h"
-#include "public/PublicVariable.h"
+#include "PublicVariable.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFile>

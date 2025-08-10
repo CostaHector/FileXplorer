@@ -1,7 +1,7 @@
 ﻿#include "AdvanceSearchToolBar.h"
-#include "public/PublicMacro.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
+#include "PublicMacro.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
 #include <QLayout>
 
 AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent)  //

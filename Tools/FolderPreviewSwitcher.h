@@ -1,7 +1,7 @@
 #ifndef FOLDERPREVIEWSWITCHER_H
 #define FOLDERPREVIEWSWITCHER_H
 
-#include "Component/FolderPreview/PreviewFolder.h"
+#include "PreviewFolder.h"
 
 class FolderPreviewSwitcher : public QObject {
  public:

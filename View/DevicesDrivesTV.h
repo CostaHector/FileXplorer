@@ -2,8 +2,8 @@
 #define DEVICESDRIVESTV_H
 
 #include "CustomTableView.h"
-#include "Tools/FileDescriptor/DevicesAndDriverDb.h"
-#include "Model/DevicesDriveModel.h"
+#include "DevicesAndDriverDb.h"
+#include "DevicesDriveModel.h"
 #include <QStyledItemDelegate>
 
 class DevicesDrivesTV : public CustomTableView {

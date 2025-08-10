@@ -1,5 +1,5 @@
 #include "SortedUniqStrLst.h"
-#include "Tools/NameTool.h"
+#include "NameTool.h"
 
 QStringList SortedUniqStrLst::Sentence2StringList(const QString& sentence) {
   QStringList newItems = sentence.trimmed().split(NameTool::CAST_STR_SPLITTER, Qt::SkipEmptyParts);

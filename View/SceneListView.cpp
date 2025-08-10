@@ -1,7 +1,7 @@
 ﻿#include "SceneListView.h"
-#include "Model/ScenesListModel.h"
-#include "Tools/PlayVideo.h"
-#include "public/PublicMacro.h"
+#include "ScenesListModel.h"
+#include "PlayVideo.h"
+#include "PublicMacro.h"
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>

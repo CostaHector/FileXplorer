@@ -1,9 +1,9 @@
 #include "ClickableTextBrowser.h"
-#include "public/PublicVariable.h"
-#include "public/DisplayEnhancement.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "Tools/FileDescriptor/FdBasedDb.h"
-#include "Component/Notificator.h"
+#include "PublicVariable.h"
+#include "DisplayEnhancement.h"
+#include "TableFields.h"
+#include "FdBasedDb.h"
+#include "Notificator.h"
 #include <QKeySequence>
 #include <QInputDialog>
 #include <QDesktopServices>

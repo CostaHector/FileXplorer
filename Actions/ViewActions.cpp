@@ -1,10 +1,10 @@
 ﻿#include "ViewActions.h"
-#include "public/MemoryKey.h"
-#include "public/PublicMacro.h"
-#include "public/PublicTool.h"
-#include "public/PublicVariable.h"
-#include "public/StyleSheet.h"
-#include "Tools/ViewTypeTool.h"
+#include "MemoryKey.h"
+#include "PublicMacro.h"
+#include "PublicTool.h"
+#include "PublicVariable.h"
+#include "StyleSheet.h"
+#include "ViewTypeTool.h"
 
 ViewActions& g_viewActions() {
   static ViewActions ins;

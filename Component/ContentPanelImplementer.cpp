@@ -1,6 +1,6 @@
-﻿#include "Component/ContentPanel.h"
-#include "Model/ScenesListModel.h"
-#include "Tools/ViewTypeTool.h"
+﻿#include "ContentPanel.h"
+#include "ScenesListModel.h"
+#include "ViewTypeTool.h"
 
 using namespace ViewTypeTool;
 

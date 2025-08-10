@@ -1,10 +1,10 @@
 #include "JsonTableModel.h"
-#include "Tools/NameTool.h"
-#include "Tools/StudiosManager.h"
-#include "public/PublicVariable.h"
-#include "Tools/Json/DataFormatter.h"
-#include "Tools/CastManager.h"
-#include "public/PathTool.h"
+#include "NameTool.h"
+#include "StudiosManager.h"
+#include "PublicVariable.h"
+#include "DataFormatter.h"
+#include "CastManager.h"
+#include "PathTool.h"
 #include <QBrush>
 #include <QDir>
 #include <QDirIterator>
