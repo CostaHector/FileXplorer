@@ -2,10 +2,10 @@
 #include <QCoreApplication>
 
 // add necessary includes here
-#include "TestCase/pubTestTool/OnScopeExit.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/NameStandardizer.h"
-#include "Tools/StudiosManager.h"
+#include "OnScopeExit.h"
+#include "MyTestSuite.h"
+#include "NameStandardizer.h"
+#include "StudiosManager.h"
 
 class MovieNameStandardizerTest : public MyTestSuite {
   Q_OBJECT

@@ -2,8 +2,8 @@
 #include <QVector>
 #include <QString>
 
-#include "Tools/Json/DataFormatter.h"
-#include "public/PublicMacro.h"
+#include "DataFormatter.h"
+#include "PublicMacro.h"
 
 // 定义主宏（放在头文件）
 #define ALL_FIELD_ITEMS                                                                                                      \

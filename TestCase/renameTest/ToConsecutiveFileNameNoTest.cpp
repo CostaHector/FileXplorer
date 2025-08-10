@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "Tools/ToConsecutiveFileNameNo.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "ToConsecutiveFileNameNo.h"
+#include "MyTestSuite.h"
 
 class ToConsecutiveFileNameNoTest : public MyTestSuite {
   Q_OBJECT

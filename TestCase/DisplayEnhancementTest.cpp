@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "public/DisplayEnhancement.h"
+#include "MyTestSuite.h"
+#include "DisplayEnhancement.h"
 
 using namespace FILE_PROPERTY_DSP;
 class DisplayEnhancementTest : public MyTestSuite {

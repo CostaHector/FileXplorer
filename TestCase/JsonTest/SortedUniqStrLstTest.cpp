@@ -1,7 +1,7 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/Json/SortedUniqStrLst.h"
+#include "MyTestSuite.h"
+#include "SortedUniqStrLst.h"
 
 class SortedUniqStrLstTest : public MyTestSuite {
   Q_OBJECT
