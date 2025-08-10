@@ -31,8 +31,8 @@ public:
   }
 
   void contextMenuEvent(QContextMenuEvent *event) override {
-    if (m_menu != nullptr) {
-      m_menu->exec(event->globalPos());
+    if (mBrowserMenu != nullptr) {
+      mBrowserMenu->exec(event->globalPos());
     }
   }
 
@@ -68,11 +68,7 @@ private:
 
   bool onAnchorClicked(const QUrl& url);
 
-  QMenu *m_menu{nullptr};
-  QAction *m_searchCurSelect{nullptr};
-  QAction *m_searchCurSelectAdvance{nullptr};
-  QAction *m_searchMultiSelect{nullptr};
-  QAction *m_clearMultiSelections{nullptr};
+  QMenu *mBrowserMenu{nullptr};
   QToolBar* mFloatingTb{nullptr};
 
   bool mbDragging = false;                  // 是否正在拖拽
