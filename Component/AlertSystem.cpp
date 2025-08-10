@@ -47,6 +47,7 @@ AlertSystem::AlertSystem(QWidget* parent)
   connect(m_alertModel, &QAbstractItemModel::dataChanged, this, &AlertSystem::RefreshWindowIcon);
 
   ReadSettings();
+  setWindowIcon(QIcon{":img/SETTINGS"});
   RefreshWindowIcon();
 }
 
@@ -65,7 +66,7 @@ void AlertSystem::showEvent(QShowEvent* event) {
 }
 
 void AlertSystem::hideEvent(QHideEvent* event) {
-  g_fileLeafActions()._ALERT_ITEMS->setChecked(false);
+  g_fileLeafActions()._SETTINGS->setChecked(false);
   QDialog::hideEvent(event);
 }
 
@@ -77,9 +78,6 @@ void AlertSystem::closeEvent(QCloseEvent* event) {
 void AlertSystem::RefreshWindowIcon() {
   const int totalCnt{m_alertModel->rowCount()};
   const int failsCnt = m_alertModel->failCount();
-  static const QIcon NO_ALERT{":img/ALERT"};
-  static const QIcon ACTIVE_ALERT{":img/ALERT_ACTIVE"};
-  setWindowIcon(failsCnt != 0 ? ACTIVE_ALERT : NO_ALERT);
 
   QString msg{R"(<b>)"};
   QString plainText;
