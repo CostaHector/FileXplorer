@@ -2,7 +2,7 @@
 #define SCENESLISTMODEL_H
 
 #include "QAbstractListModelPub.h"
-#include "Tools/SceneInfoManager.h"
+#include "SceneInfoManager.h"
 #include <utility>
 #include <QSet>
 #include <QFileInfo>

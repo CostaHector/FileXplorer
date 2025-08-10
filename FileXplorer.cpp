@@ -1,14 +1,14 @@
 ﻿#include "FileXplorer.h"
 
-#include "Actions/FolderPreviewActions.h"
-#include "Actions/ViewActions.h"
+#include "FolderPreviewActions.h"
+#include "ViewActions.h"
 
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 
-#include "Tools/FolderPreviewSwitcher.h"
-#include "Tools/NavigationViewSwitcher.h"
-#include "Tools/ViewTypeTool.h"
+#include "FolderPreviewSwitcher.h"
+#include "NavigationViewSwitcher.h"
+#include "ViewTypeTool.h"
 
 #include <QString>
 #include <QDockWidget>

@@ -2,22 +2,22 @@
 #define CONTENTPANEL_H
 
 #include <QStackedWidget>
-#include "Component/AdvanceSearchToolBar.h"
-#include "Component/CustomStatusBar.h"
-#include "Component/NavigationAndAddressBar.h"
-#include "Component/FolderPreview/PreviewFolder.h"
+#include "AdvanceSearchToolBar.h"
+#include "CustomStatusBar.h"
+#include "NavigationAndAddressBar.h"
+#include "PreviewFolder.h"
 
-#include "View/AdvanceSearchTableView.h"
-#include "View/FileSystemListView.h"
-#include "View/FileSystemTableView.h"
-#include "View/FileSystemTreeView.h"
-#include "View/JsonTableView.h"
-#include "View/MovieDBView.h"
-#include "View/SceneListView.h"
-#include "View/CastDBView.h"
+#include "AdvanceSearchTableView.h"
+#include "FileSystemListView.h"
+#include "FileSystemTableView.h"
+#include "FileSystemTreeView.h"
+#include "JsonTableView.h"
+#include "MovieDBView.h"
+#include "SceneListView.h"
+#include "CastDBView.h"
 
-#include "Tools/ViewTypeTool.h"
-#include "Tools/FileDescriptor/FdBasedDb.h"
+#include "ViewTypeTool.h"
+#include "FdBasedDb.h"
 
 
 class NavigationViewSwitcher;

@@ -1,7 +1,7 @@
 ﻿#include "RenameWidget_Numerize.h"
-#include "public/MemoryKey.h"
-#include "public/PublicMacro.h"
-#include "Tools/RenameHelper.h"
+#include "MemoryKey.h"
+#include "PublicMacro.h"
+#include "RenameHelper.h"
 
 RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent)  //
     : AdvanceRenamer{parent}                                   //

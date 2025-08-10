@@ -1,6 +1,6 @@
 #ifndef ArchiveFilesPreview_H
 #define ArchiveFilesPreview_H
-#include "Tools/ArchiveFiles.h"
+#include "ArchiveFiles.h"
 class QLabel;
 class CustomTableView;
 class ArchiverModel;

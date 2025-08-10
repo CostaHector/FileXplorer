@@ -1,5 +1,5 @@
 #include "PreviewBrowser.h"
-#include "public/PublicVariable.h"
+#include "PublicVariable.h"
 
 #include <QScrollBar>
 #include <QTextCursor>

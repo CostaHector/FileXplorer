@@ -1,6 +1,6 @@
 ﻿#include "RenameWidget_LongPath.h"
-#include "public/PublicMacro.h"
-#include "public/FileOsWalker.h"
+#include "PublicMacro.h"
+#include "FileOsWalker.h"
 #include <QLabel>
 
 RenameWidget_LongPath::RenameWidget_LongPath(QWidget* parent)  //

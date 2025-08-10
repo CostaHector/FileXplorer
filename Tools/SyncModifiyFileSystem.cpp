@@ -1,7 +1,7 @@
 ﻿#include "SyncModifiyFileSystem.h"
 #include <QDir>
 #include <QFileInfo>
-#include "public/MemoryKey.h"
+#include "MemoryKey.h"
 
 bool SyncModifiyFileSystem::m_syncOperationSw = false;
 bool SyncModifiyFileSystem::m_syncBackSw = true;

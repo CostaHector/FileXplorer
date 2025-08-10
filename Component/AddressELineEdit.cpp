@@ -1,6 +1,6 @@
 ﻿#include "AddressELineEdit.h"
-#include "View/ViewHelper.h"
-#include "public/PublicMacro.h"
+#include "ViewHelper.h"
+#include "PublicMacro.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>

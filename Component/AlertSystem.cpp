@@ -1,8 +1,8 @@
 ﻿#include "AlertSystem.h"
 #include "Notificator.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
-#include "Actions/FileLeafAction.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
+#include "FileLeafAction.h"
 
 #include <QDesktopServices>
 #include <QFileIconProvider>

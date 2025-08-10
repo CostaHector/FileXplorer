@@ -1,12 +1,12 @@
-﻿#include "Component/ContentPanel.h"
-#include "Actions/ArchiveFilesActions.h"
-#include "Actions/ViewActions.h"
-#include "Actions/FolderPreviewActions.h"
-#include "Component/Notificator.h"
-#include "Tools/ArchiveFiles.h"
-#include "Tools/HarFiles.h"
-#include "Model/ScenesListModel.h"
-#include "public/DisplayEnhancement.h"
+﻿#include "ContentPanel.h"
+#include "ArchiveFilesActions.h"
+#include "ViewActions.h"
+#include "FolderPreviewActions.h"
+#include "Notificator.h"
+#include "ArchiveFiles.h"
+#include "HarFiles.h"
+#include "ScenesListModel.h"
+#include "DisplayEnhancement.h"
 
 #include <QLineEdit>
 #include <QTableView>

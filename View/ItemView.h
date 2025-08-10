@@ -1,7 +1,7 @@
 #ifndef ITEMVIEW_H
 #define ITEMVIEW_H
 #include "CustomListView.h"
-#include "Model/FloatingModels.h"
+#include "FloatingModels.h"
 
 class ItemView : public CustomListView {
  public:

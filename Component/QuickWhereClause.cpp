@@ -9,14 +9,14 @@
 #include <QPushButton>
 #include <QStack>
 
-#include "Actions/MovieDBActions.h"
-#include "Actions/QuickWhereActions.h"
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "public/PublicMacro.h"
-#include "Tools/PerformersAkaManager.h"
-#include "Tools/FileDescriptor/TableFields.h"
-#include "public/StyleSheet.h"
+#include "MovieDBActions.h"
+#include "QuickWhereActions.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "PublicMacro.h"
+#include "PerformersAkaManager.h"
+#include "TableFields.h"
+#include "StyleSheet.h"
 
 QuickWhereClause::QuickWhereClause(QWidget* parent) : QDialog{parent} {
   m_Name = new QLineEdit;

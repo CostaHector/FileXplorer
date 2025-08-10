@@ -1,6 +1,6 @@
 ﻿#include "MyQFileSystemModel.h"
-#include "public/PathTool.h"
-#include "Tools/FileDescriptor/TableFields.h"
+#include "PathTool.h"
+#include "TableFields.h"
 #include <QDebug>
 #include <QMimeData>
 #include <QUrl>

@@ -1,9 +1,9 @@
 #include "PerfBaseDb.h"
-#include "Tools/Json/JsonHelper.h"
-#include "Tools/NameTool.h"
-#include "Tools/PerformerJsonFileHelper.h"
-#include "public/PublicTool.h"
-#include "public/PublicVariable.h"
+#include "JsonHelper.h"
+#include "NameTool.h"
+#include "PerformerJsonFileHelper.h"
+#include "PublicTool.h"
+#include "PublicVariable.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDirIterator>

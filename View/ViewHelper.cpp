@@ -1,9 +1,9 @@
 ﻿#include "ViewHelper.h"
-#include "public/MemoryKey.h"
-#include "Model/MyQFileSystemModel.h"
-#include "Component/Notificator.h"
-#include "FileOperation/ComplexOperation.h"
-#include "Actions/AddressBarActions.h"
+#include "MemoryKey.h"
+#include "MyQFileSystemModel.h"
+#include "Notificator.h"
+#include "ComplexOperation.h"
+#include "AddressBarActions.h"
 
 #include <QFileIconProvider>
 #include <QApplication>

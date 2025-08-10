@@ -27,7 +27,10 @@ bool IsAdministrator() { return false; }
 bool RunAsAdmin() { return false; }
 
 QString FindRootByGUIDWin(const QString& targetGuid) { return {}; }
-const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) { return {}; }
+const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
+  const static GUID_2_PNTS_SET emptySet;
+  return emptySet;
+}
 QString GetDisplayNameByGuidTableName(QString guidTableName) { return {}; }
 QMap<QString, QString> GetGuidTableName2DisplayName() { return {}; }
 QStringList GetGuidJoinDisplayName() { return {}; }

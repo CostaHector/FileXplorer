@@ -1,8 +1,8 @@
 #include "VideoPlayerActions.h"
 
-#include "Component/SpacerWidget.h"
-#include "public/MemoryKey.h"
-#include "public/PublicVariable.h"
+#include "SpacerWidget.h"
+#include "MemoryKey.h"
+#include "PublicVariable.h"
 
 VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
   _VOLUME_CTRL_MUTE->setCheckable(true);
