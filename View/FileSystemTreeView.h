@@ -1,8 +1,8 @@
 ﻿#ifndef FILESYSTEMTREEVIEW_H
 #define FILESYSTEMTREEVIEW_H
 
-#include "Component/RightClickMenu.h"
-#include "Model/MyQFileSystemModel.h"
+#include "RightClickMenu.h"
+#include "MyQFileSystemModel.h"
 
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>

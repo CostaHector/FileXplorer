@@ -1,7 +1,7 @@
 ﻿#include "ExtractPileItemsOutFolder.h"
-#include "public/PathTool.h"
-#include "Tools/Classify/ItemsPileCategory.h"
-#include "public/UndoRedo.h"
+#include "PathTool.h"
+#include "ItemsPileCategory.h"
+#include "UndoRedo.h"
 #include <QRegularExpression>
 #include <QDir>
 

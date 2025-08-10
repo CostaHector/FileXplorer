@@ -1,5 +1,5 @@
 #include "CustomStatusBar.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 
 CustomStatusBar::CustomStatusBar(QToolBar* views, QWidget* parent)  //
     : QStatusBar{parent},                                           //

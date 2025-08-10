@@ -1,6 +1,6 @@
 ﻿#include "ThumbnailProcesser.h"
-#include "public/PathTool.h"
-#include "public/PublicVariable.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
 #include <QRegularExpression>
 #include <utility>
 #include <QDirIterator>

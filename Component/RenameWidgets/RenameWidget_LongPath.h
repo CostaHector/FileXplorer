@@ -1,8 +1,8 @@
 #ifndef RENAMEWIDGET_LONGPATH_H
 #define RENAMEWIDGET_LONGPATH_H
 
-#include "Component/RenameWidgets/AdvanceRenamer.h"
-#include "Tools/LongPathFinder.h"
+#include "AdvanceRenamer.h"
+#include "LongPathFinder.h"
 
 class RenameWidget_LongPath : public AdvanceRenamer {
  public:

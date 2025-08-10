@@ -1,9 +1,9 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "TestCase/pub/MyTestSuite.h"
-#include "TestCase/PathRelatedTool.h"
-#include "public/PathTool.h"
+#include "MyTestSuite.h"
+#include "PathRelatedTool.h"
+#include "PathTool.h"
 
 using namespace ::PathTool;
 class PathToolTest : public MyTestSuite {

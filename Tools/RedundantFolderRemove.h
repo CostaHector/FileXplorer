@@ -1,6 +1,6 @@
 ﻿#ifndef REDUNDANTFOLDERREMOVE_H
 #define REDUNDANTFOLDERREMOVE_H
-#include "FileOperation/FileOperatorPub.h"
+#include "FileOperatorPub.h"
 class RedundantRmv {
  public:
   RedundantRmv() = default;

@@ -1,9 +1,9 @@
 ﻿#ifndef FILESYSTEMLISTVIEW_H
 #define FILESYSTEMLISTVIEW_H
 
-#include "Component/RightClickMenu.h"
-#include "View/CustomListView.h"
-#include "Model/MyQFileSystemModel.h"
+#include "RightClickMenu.h"
+#include "CustomListView.h"
+#include "MyQFileSystemModel.h"
 
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>

@@ -1,10 +1,10 @@
 ﻿#include "RibbonJson.h"
-#include "public/PublicMacro.h"
-#include "public/PublicTool.h"
-#include "public/StyleSheet.h"
-#include "public/PublicVariable.h"
-#include "Actions/JsonActions.h"
-#include "Actions/ViewActions.h"
+#include "PublicMacro.h"
+#include "PublicTool.h"
+#include "StyleSheet.h"
+#include "PublicVariable.h"
+#include "JsonActions.h"
+#include "ViewActions.h"
 
 RibbonJson::RibbonJson(const QString& title, QWidget* parent)  //
     : QToolBar{title, parent}                                  //

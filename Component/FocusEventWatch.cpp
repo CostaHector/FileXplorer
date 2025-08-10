@@ -1,5 +1,5 @@
 #include "FocusEventWatch.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 
 FocusEventWatch::FocusEventWatch(QObject* parent)
   : QObject{parent} {

@@ -4,8 +4,8 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QLabel>
-#include "Model/PreferenceModel.h"
-#include "View/CustomTableView.h"
+#include "PreferenceModel.h"
+#include "CustomTableView.h"
 
 class AlertSystem : public QDialog {
  public:

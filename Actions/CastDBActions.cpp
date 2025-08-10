@@ -1,9 +1,9 @@
 #include "CastDBActions.h"
 #include <QMenu>
 #include <QActionGroup>
-#include "public/PublicVariable.h"
-#include "public/MemoryKey.h"
-#include "public/PublicMacro.h"
+#include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "PublicMacro.h"
 
 CastDBActions::CastDBActions(QObject* parent)  //
     : QObject{parent}                          //

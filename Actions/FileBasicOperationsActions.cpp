@@ -1,8 +1,8 @@
 ﻿#include "FileBasicOperationsActions.h"
-#include "FileOperation/FileOperatorPub.h"
-#include "FileOperation/ComplexOperation.h"
-#include "public/MemoryKey.h"
-#include "public/StyleSheet.h"
+#include "FileOperatorPub.h"
+#include "ComplexOperation.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 #include <QToolBar>
 #include <QApplication>
 #include <QStyle>

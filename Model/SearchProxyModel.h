@@ -3,8 +3,8 @@
 
 #include <QAbstractItemModel>
 #include <QSortFilterProxyModel>
-#include "Model/AdvanceSearchModel.h"
-#include "Tools/SearchTools.h"
+#include "AdvanceSearchModel.h"
+#include "SearchTools.h"
 
 class SearchProxyModel : public QSortFilterProxyModel {
  public:

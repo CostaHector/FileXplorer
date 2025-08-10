@@ -1,6 +1,6 @@
 ﻿#include "SceneInPageActions.h"
-#include "Component/DropListToolButton.h"
-#include "public/MemoryKey.h"
+#include "DropListToolButton.h"
+#include "MemoryKey.h"
 #include <QLineEdit>
 #include <QToolBar>
 #include <QLabel>

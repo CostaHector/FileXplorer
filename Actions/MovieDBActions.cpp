@@ -1,5 +1,5 @@
 #include "MovieDBActions.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 
 MovieDBActions& g_dbAct() {
   static MovieDBActions ins;

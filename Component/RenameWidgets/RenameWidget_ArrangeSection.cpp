@@ -1,8 +1,8 @@
 ﻿#include "RenameWidget_ArrangeSection.h"
-#include "Component/Notificator.h"
-#include "public/PublicMacro.h"
-#include "public/MemoryKey.h"
-#include "Tools/NameSectionArrange.h"
+#include "Notificator.h"
+#include "PublicMacro.h"
+#include "MemoryKey.h"
+#include "NameSectionArrange.h"
 
 RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
     : AdvanceRenamer{parent}                                               //

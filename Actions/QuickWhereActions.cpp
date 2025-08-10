@@ -1,7 +1,7 @@
 #include "QuickWhereActions.h"
 
-#include "public/MemoryKey.h"
-#include "public/PublicVariable.h"
+#include "MemoryKey.h"
+#include "PublicVariable.h"
 #include <QDesktopServices>
 
 QuickWhereActions::QuickWhereActions(QObject* parent)

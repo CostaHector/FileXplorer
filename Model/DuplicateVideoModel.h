@@ -6,7 +6,7 @@
 #include <QMap>
 #include <QSet>
 #include <QString>
-#include "Tools/AIMediaDuplicate.h"
+#include "AIMediaDuplicate.h"
 
 enum class DIFFER_BY_TYPE {
   DURATION = 0,

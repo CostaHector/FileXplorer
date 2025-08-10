@@ -1,5 +1,5 @@
 #include "KV.h"
-#include "public/PathTool.h"
+#include "PathTool.h"
 #include <QFileInfo>
 
 using namespace VALUE_CHECKER_TYPE;

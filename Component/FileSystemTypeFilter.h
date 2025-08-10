@@ -10,8 +10,8 @@
 #include <QToolButton>
 #include <QActionGroup>
 
-#include "Model/AdvanceSearchModel.h"
-#include "Model/SearchProxyModel.h"
+#include "AdvanceSearchModel.h"
+#include "SearchProxyModel.h"
 
 class FileSystemTypeFilter : public QToolButton {
   Q_OBJECT

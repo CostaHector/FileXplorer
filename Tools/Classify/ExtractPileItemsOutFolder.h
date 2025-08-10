@@ -1,7 +1,7 @@
 #ifndef EXTRACTPILEITEMSOUTFOLDER_H
 #define EXTRACTPILEITEMSOUTFOLDER_H
 
-#include "FileOperation/FileOperatorPub.h"
+#include "FileOperatorPub.h"
 #include <QString>
 #include <QMap>
 

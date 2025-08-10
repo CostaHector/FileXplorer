@@ -1,5 +1,5 @@
 #include "ViewTypeTool.h"
-#include "public/PublicMacro.h"
+#include "PublicMacro.h"
 #include <QAction>
 #include <QMap>
 #include <QString>

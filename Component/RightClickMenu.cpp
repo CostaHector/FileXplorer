@@ -1,9 +1,9 @@
 ﻿#include "RightClickMenu.h"
-#include "Actions/ArchiveFilesActions.h"
-#include "Actions/FileBasicOperationsActions.h"
-#include "Actions/RenameActions.h"
-#include "Actions/ViewActions.h"
-#include "Actions/RightClickMenuActions.h"
+#include "ArchiveFilesActions.h"
+#include "FileBasicOperationsActions.h"
+#include "RenameActions.h"
+#include "ViewActions.h"
+#include "RightClickMenuActions.h"
 
 RightClickMenu::RightClickMenu(const QString& title, QWidget* parent)  //
     : QMenu{title, parent},                                            //

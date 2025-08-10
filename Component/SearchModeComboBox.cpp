@@ -1,7 +1,7 @@
 ﻿#include "SearchModeComboBox.h"
 #include <QLayout>
-#include "public/MemoryKey.h"
-#include "Tools/SearchTools.h"
+#include "MemoryKey.h"
+#include "SearchTools.h"
 using namespace SearchTools;
 
 SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox{parent} {

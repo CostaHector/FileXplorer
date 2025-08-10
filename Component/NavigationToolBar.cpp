@@ -1,8 +1,8 @@
 ﻿#include "NavigationToolBar.h"
-#include "Actions/DevicesDrivesActions.h"
-#include "public/OnCheckedPopupOrHideAWidget.h"
-#include "public/PublicMacro.h"
-#include "View/DevicesDrivesTV.h"
+#include "DevicesDrivesActions.h"
+#include "OnCheckedPopupOrHideAWidget.h"
+#include "PublicMacro.h"
+#include "DevicesDrivesTV.h"
 #include <QApplication>
 #include <QDir>
 #include <QStyle>

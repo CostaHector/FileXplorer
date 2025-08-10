@@ -1,5 +1,5 @@
 #include "RatingSqlTableModel.h"
-#include "Tools/PerformerJsonFileHelper.h"
+#include "PerformerJsonFileHelper.h"
 #include <QPainter>
 #include <QPixmap>
 
