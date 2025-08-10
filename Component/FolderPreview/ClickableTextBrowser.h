@@ -12,7 +12,7 @@
 
 class ClickableTextBrowser : public QTextBrowser {
 public:
-  ClickableTextBrowser(QWidget* parent = nullptr);
+  explicit ClickableTextBrowser(QWidget* parent = nullptr);
   static const QString VID_LINK_TEMPLATE;
   static const QString HTML_IMG_TEMPLATE;
   static const QString HTML_H1_TEMPLATE;
@@ -20,8 +20,9 @@ public:
 
   QStringList GetSelectedTexts() const {
     QStringList texts;
+    texts.reserve(mMultiSelections.size());
     for (const auto& sel : mMultiSelections) {
-      texts << sel.cursor.selectedText();
+      texts << sel.cursor.selectedText().trimmed();
     }
     return texts;
   }
@@ -56,7 +57,7 @@ protected:
 
   void AdjustButtonPosition() {
     if (mFloatingTb == nullptr) {return;}
-    static constexpr int marginX = 32, marginY = 32;
+    static constexpr int marginX = 16, marginY = 32;
     mFloatingTb->move(width() - mFloatingTb->width() - marginX, height() - mFloatingTb->height() - marginY);
     mFloatingTb->raise();
   }
