@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-#include "TestCase/pub/BeginToExposePrivateMember.h"
+#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
 #include "Tools/AIMediaDuplicate.h"
-#include "TestCase/pub/EndToExposePrivateMember.h"
-#include "pub/FileSystemTestSuite.h"
+#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
+#include "TestCase/pubTestTool/FileSystemTestSuite.h"
 
 class AIMediaDuplicateTest : public FileSystemTestSuite {
   Q_OBJECT

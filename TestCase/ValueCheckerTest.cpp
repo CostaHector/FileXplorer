@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 #include "public/PathTool.h"
 
 class ValueCheckerTest : public MyTestSuite {

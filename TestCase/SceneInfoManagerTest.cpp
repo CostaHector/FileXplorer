@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "pub/MyTestSuite.h"
+#include "TestCase/pubTestTool/MyTestSuite.h"
 
 #include "Tools/SceneInfoManager.h"
 #include "Tools/Json/JsonHelper.h"
