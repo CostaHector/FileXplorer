@@ -4,8 +4,8 @@ set(PROJECT_NAME FileXplorerTest)
 project(${PROJECT_NAME} LANGUAGES CXX)
 add_definitions(-DPROJECT_NAME="FileXplorer")
 add_definitions(-DUNICODE -D_UNICODE)
-add_definitions(-DQT_TEST)
 # on windows platform. MediaInfoDLL.h defined a typdef needed
+add_definitions(-DQT_TEST)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
