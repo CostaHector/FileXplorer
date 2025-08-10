@@ -53,6 +53,7 @@ set(SRV_HEADER_PATH
     Component/JsonEditorWidget
     Component/RenameWidgets
     FileOperation
+    lib
     Model
     public
     public/Memory
@@ -73,6 +74,7 @@ file(GLOB HEADERS
     Component/JsonEditorWidget/*.h
     Component/RenameWidgets/*.h
     FileOperation/*.h
+    lib/*.h
     Model/*.h
     public/*.h
     public/Memory/*.h
