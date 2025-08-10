@@ -1,9 +1,9 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "Tools/FileDescriptor/FileDescriptor.h"
-#include "public/PublicTool.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "FileDescriptor.h"
+#include "PublicTool.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>

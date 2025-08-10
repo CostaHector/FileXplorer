@@ -4,8 +4,8 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
 // ok 3e435dc4_72d5_4709_8bea_94da297050a9
 // nok 20ff7c6b_2d89_4fd0_aafe_8db6eb547e79
 #define TABLE_NAME_IN_QUOTE "'20ff7c6b_2d89_4fd0_aafe_8db6eb547e79'"

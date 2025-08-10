@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/NameSectionArrange.h"
+#include "MyTestSuite.h"
+#include "NameSectionArrange.h"
 
 class NameSectionArrangeTest : public MyTestSuite {
   Q_OBJECT

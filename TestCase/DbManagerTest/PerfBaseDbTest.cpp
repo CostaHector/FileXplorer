@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
 #include <QSqlRecord>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/FileDescriptor/PerfBaseDb.h"
-#include "Tools/PerformerJsonFileHelper.h"
-#include "public/PublicVariable.h"
+#include "MyTestSuite.h"
+#include "PerfBaseDb.h"
+#include "PerformerJsonFileHelper.h"
+#include "PublicVariable.h"
 
 const QString rootpath = QFileInfo(__FILE__).absolutePath();
 const QString imgHostPath = rootpath + "/PerfImgHost";

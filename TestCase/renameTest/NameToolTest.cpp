@@ -1,9 +1,9 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
+#include "MyTestSuite.h"
 
 // add necessary includes here
-#include "Tools/NameTool.h"
+#include "NameTool.h"
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QPlainTextEdit>

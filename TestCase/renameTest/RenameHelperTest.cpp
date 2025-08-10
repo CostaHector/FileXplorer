@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/RenameHelper.h"
+#include "MyTestSuite.h"
+#include "RenameHelper.h"
 using namespace RenameHelper;
 
 class RenameHelperTest : public MyTestSuite {

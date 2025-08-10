@@ -1,13 +1,13 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
-#include "Tools/Classify/ItemsClassifier.h"
-#include "Tools/Classify/ExtractPileItemsOutFolder.h"
-#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
-#include "Tools/Classify/SceneMixed.h"
-#include "Tools/SyncModifiyFileSystem.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "BeginToExposePrivateMember.h"
+#include "ItemsClassifier.h"
+#include "ExtractPileItemsOutFolder.h"
+#include "EndToExposePrivateMember.h"
+#include "SceneMixed.h"
+#include "SyncModifiyFileSystem.h"
 
 class ItemsClassifierTest : public MyTestSuite {
   Q_OBJECT

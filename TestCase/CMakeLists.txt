@@ -4,6 +4,7 @@ set(PROJECT_NAME FileXplorerTest)
 project(${PROJECT_NAME} LANGUAGES CXX)
 add_definitions(-DPROJECT_NAME="FileXplorer")
 add_definitions(-DUNICODE -D_UNICODE)
+add_definitions(-DQT_TEST)
 # on windows platform. MediaInfoDLL.h defined a typdef needed
 
 set(CMAKE_AUTOMOC ON)
@@ -14,8 +15,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Search for Qt libraries in the order of Qt6, Qt5
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Sql Widgets LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets)
 
 
 file(GLOB SOURCES
@@ -60,6 +61,7 @@ set(SRV_HEADER_PATH
     ../Component/JsonEditorWidget
     ../Component/RenameWidgets
     ../FileOperation
+    ../lib
     ../Model
     ../public
     ../public/Memory
@@ -81,6 +83,7 @@ file(GLOB HEADERS
     ../Component/JsonEditorWidget/*.h
     ../Component/RenameWidgets/*.h
     ../FileOperation/*.h
+    ../lib/*.h
     ../Model/*.h
     ../public/*.h
     ../public/Memory/*.h
@@ -119,15 +122,19 @@ target_sources(${PROJECT_NAME} PUBLIC
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SRV_HEADER_PATH})
 target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Test
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Widgets
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE dwmapi mediaInfo)
+    find_library(DWMWAPI_LIBRARY dwmapi)
+    find_library(SHLWAPI_LIBRARY shlwapi)
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE dwmapi shlwapi mediaInfo)
     set(ffmpegpath "C:/home/ffmpeg")
 
     target_include_directories(${PROJECT_NAME} PRIVATE "${ffmpegpath}/include")
@@ -143,20 +150,4 @@ endif()
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     $<$<CONFIG:Debug>:QT_MESSAGELOGCONTEXT>
-)
-
-# 安装规则
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-
-# 安装额外文件
-install(FILES
-    "Translate/FileXplorer_zh_CN.ts"
-    "bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat"
-    "bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh"
-    "readme.md"
-    DESTINATION share/${PROJECT_NAME}
 )

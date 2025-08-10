@@ -1,9 +1,9 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "FileOperation/ComplexOperation.h"
-#include "public/PathTool.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "ComplexOperation.h"
+#include "PathTool.h"
 
 using namespace ComplexOperation;
 

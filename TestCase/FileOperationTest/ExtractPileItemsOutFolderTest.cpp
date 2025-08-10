@@ -1,10 +1,10 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "FileOperation/FileOperatorPub.h"
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/BeginToExposePrivateMember.h"
-#include "Tools/Classify/ExtractPileItemsOutFolder.h"
-#include "TestCase/pubTestTool/EndToExposePrivateMember.h"
+#include "FileOperatorPub.h"
+#include "MyTestSuite.h"
+#include "BeginToExposePrivateMember.h"
+#include "ExtractPileItemsOutFolder.h"
+#include "EndToExposePrivateMember.h"
 
 class ExtractPileItemsOutFolderTest : public MyTestSuite {
   Q_OBJECT

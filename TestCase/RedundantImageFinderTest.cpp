@@ -1,8 +1,8 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "TestCase/pubTestTool/TDir.h"
-#include "Tools/RedunImgLibs.h"
+#include "MyTestSuite.h"
+#include "TDir.h"
+#include "RedunImgLibs.h"
 
 const auto GetNames = [](const REDUNDANT_IMG_BUNCH& imgs) -> QStringList {
   QStringList imgNames;

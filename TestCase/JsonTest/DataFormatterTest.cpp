@@ -1,9 +1,9 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "TestCase/pubTestTool/MyTestSuite.h"
-#include "Tools/Json/DataFormatter.h"
-#include "Tools/Json/JsonKey.h"
-#include "Tools/Json/SortedUniqStrLst.h"
+#include "MyTestSuite.h"
+#include "DataFormatter.h"
+#include "JsonKey.h"
+#include "SortedUniqStrLst.h"
 #include <QJsonValue>
 
 using namespace DataFormatter;
