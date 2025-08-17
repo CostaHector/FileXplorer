@@ -2,9 +2,10 @@
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "PublicTool.h"
+#include "PathTool.h"
 
 SearchProxyModel::SearchProxyModel(QObject* parent)
-    : QSortFilterProxyModel{parent}  //
+  : QSortFilterProxyModel{parent}  //
 {                                    //
   m_fileContentsCaseSensitive = PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool();
   m_nameFiltersCaseSensitive = PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool();
@@ -129,8 +130,9 @@ bool SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
   // 2. Check if file content pass the content filter
   if (isFileNamePass) {
     const QString filePath = _searchSourceModel->filePath(nameModelIndex);
+    const bool isFilePlainText{TYPE_FILTER::TEXT_TYPE_SET.contains('*' + PathTool::GetFileExtension(filePath))};
     // if search content is empty. always pass
-    const bool isContentPass = m_contentRawText.isEmpty() || CheckIfContentsContained(filePath, m_contentRawText);
+    const bool isContentPass = isFilePlainText && (m_contentRawText.isEmpty() || CheckIfContentsContained(filePath, m_contentRawText));
     return ReturnPostOperation(isContentPass, nameModelIndex);
   }
   return ReturnPostOperation(false, nameModelIndex);

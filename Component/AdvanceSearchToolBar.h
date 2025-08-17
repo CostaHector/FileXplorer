@@ -35,9 +35,9 @@ class AdvanceSearchToolBar : public QToolBar {
 
   QComboBox* m_contentCB{nullptr};  // used for content search
 
-  FileSystemTypeFilter* m_typeFilterButton = new FileSystemTypeFilter(this);
-  SearchModeComboBox* m_searchModeComboBox = new SearchModeComboBox;
-  SearchCaseMatterToolButton* m_searchCaseButton = new SearchCaseMatterToolButton(this);
+  FileSystemTypeFilter* m_typeFilterButton {nullptr};
+  SearchModeComboBox* m_searchModeComboBox {nullptr};
+  SearchCaseMatterToolButton* m_searchCaseButton {nullptr};
 
   SearchProxyModel* _searchProxyModel = nullptr;
   AdvanceSearchModel* _searchSourceModel = nullptr;
