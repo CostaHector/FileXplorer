@@ -333,7 +333,6 @@ void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
 
 bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
   if (!m_anchorTags.contains(loadedPath)) {
-    qDebug("AnchorTags[%s] not exist. cancel scroll", qPrintable(loadedPath));
     return false;
   }
   const QModelIndex rootIndex = m_fsTableView->rootIndex();

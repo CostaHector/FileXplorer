@@ -15,7 +15,7 @@
 #include <QFileInfo>
 
 class DockWidget : public QDockWidget {
- public:
+public:
   using QDockWidget::QDockWidget;
   void showEvent(QShowEvent* event) override {
     QDockWidget::showEvent(event);
@@ -23,8 +23,8 @@ class DockWidget : public QDockWidget {
   }
 };
 
-FileXplorer::FileXplorer(const int argc, char const* const argv[], QWidget* parent)  //
-    : QMainWindow(parent)                                                            //
+FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
+  : QMainWindow(parent)                                                            //
 {
   previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this};
 
@@ -41,7 +41,7 @@ FileXplorer::FileXplorer(const int argc, char const* const argv[], QWidget* pare
   m_fsPanel->BindLogger(m_statusBar);
   m_naviSwitcher->onSwitchByViewType(ViewTypeTool::ViewType::TABLE);
 
-  const QString& defaultPath = ReadSettings(argc, argv);
+  const QString& defaultPath = ReadSettings(args);
   m_fsPanel->onActionAndViewNavigate(defaultPath, true);
 
   setCentralWidget(m_fsPanel);
@@ -74,22 +74,23 @@ void FileXplorer::showEvent(QShowEvent* event) {
   StyleSheet::UpdateTitleBar(this);
 }
 
-QString FileXplorer::ReadSettings(const int argc, char const* const argv[]) {
-  qDebug(PROJECT_NAME " running in [%s]", qPrintable(QFileInfo(".").absoluteFilePath()));
+QString FileXplorer::ReadSettings(const QStringList& args) {
+  qDebug("Program:'" PROJECT_NAME R"(' running with given args["%s"])", qPrintable(args.join(R"(",")")));
   // executing the program with or without command-line arguments
-  QString path{(argc > 1) ? argv[1] : ""};
-  if (path.endsWith('"')) {
-    path.chop(1);
-  }
+  QString path{(args.size() > 1) ? args[1] : ""};
   // when argv[1] path invalid, use last time path in preference setting
   if (!QFile::exists(path)) {
-    path = PreferenceSettings().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
+    QString lastTimePath = PreferenceSettings().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
+    qDebug("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
+    path.swap(lastTimePath);
   }
   const QFileInfo fi{path};
   if (!fi.isDir()) {
-    path = fi.absolutePath();
+    QString parentPath = fi.absolutePath();
+    qDebug("path[%s] not exists or is a file. Try using its parent path[%s] instead", qPrintable(path), qPrintable(parentPath));
+    path.swap(parentPath);
   }
-  qDebug(PROJECT_NAME "open path[%s].", qPrintable(path));
+  qDebug("Default path is %s.", qPrintable(path));
   return path;
 }
 
