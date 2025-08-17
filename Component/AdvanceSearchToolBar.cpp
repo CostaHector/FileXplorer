@@ -11,35 +11,49 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   CHECK_NULLPTR_RETURN_VOID(m_nameFilter)
   m_nameFilter->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_nameFilter->setClearButtonEnabled(true);
-  m_nameFilter->setPlaceholderText("Normal[full match]\nRegex[\\d{4}]");
+  m_nameFilter->setPlaceholderText("Search file names here");
 
   m_nameFilterCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_nameFilterCB)
+  m_nameFilterCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
+  m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
   m_nameFilterCB->setLineEdit(m_nameFilter);
   m_nameFilterCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
   m_nameFilterCB->addItem("\\.xltd$");
   m_nameFilterCB->addItem("\\.torrent$");
   m_nameFilterCB->addItem("\\.!ut$");
-  m_nameFilterCB->addItem(QIcon(":img/_SEARCH_IN_NET_EXPLORER"), "\\.html$");
-  m_nameFilterCB->addItem(QIcon(":img/PLAIN_TEXT"), "\\.txt$");
-  m_nameFilterCB->addItem(QIcon(":img/NEW_JSON_FILE"), "\\.json$");
-  m_nameFilterCB->addItem(QIcon(":img/UPDATE_SCN_FILE"), "\\.scn$");
+  m_nameFilterCB->addItem("\\.html$");
+  m_nameFilterCB->addItem("\\.txt$");
+  m_nameFilterCB->addItem("\\.json$");
+  m_nameFilterCB->addItem("\\.scn$");
   m_nameFilterCB->addItem("\\.md$");
   m_nameFilterCB->addItem("\\.pjson$");
-  m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+
+  m_typeFilterButton = new FileSystemTypeFilter{this};
+  CHECK_NULLPTR_RETURN_VOID(m_typeFilterButton)
+  m_typeFilterButton->setToolTip("Filter file types by extension");
+
+  m_searchModeComboBox = new SearchModeComboBox{this};
+  CHECK_NULLPTR_RETURN_VOID(m_searchModeComboBox)
+  m_searchModeComboBox->setToolTip("Search Mode:\n1. full match\n2. regex\n3. regex+file name");
+
+  m_searchCaseButton = new SearchCaseMatterToolButton{this};
+  CHECK_NULLPTR_RETURN_VOID(m_searchCaseButton)
+  m_searchCaseButton->setToolTip("Match Case Switch");
 
   m_contentCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_contentCB)
   m_contentCB->setEditable(true);
   m_contentCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
-  m_contentCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
+  m_contentCB->setToolTip("Search plain text file contents here");
   m_contentCB->addItem("nonporn");
+  m_contentCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
 
   addWidget(m_nameFilterCB);
   addWidget(m_typeFilterButton);
+  addSeparator();
   addWidget(m_searchModeComboBox);
   addWidget(m_searchCaseButton);
-  addSeparator();
   addWidget(m_contentCB);
   onSearchModeChanged(m_searchModeComboBox->currentText());
 

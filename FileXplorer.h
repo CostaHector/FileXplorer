@@ -13,11 +13,11 @@
 
 class FileXplorer : public QMainWindow {
  public:
-  FileXplorer(const int argc = 1, char const* const argv[] = nullptr, QWidget* parent = nullptr);
+  FileXplorer(const QStringList& args, QWidget* parent = nullptr);
   ~FileXplorer() = default;
   void closeEvent(QCloseEvent* event) override;
   void showEvent(QShowEvent *event) override;
-  static QString ReadSettings(const int argc, char const* const argv[]);
+  static QString ReadSettings(const QStringList& args);
   void RestoreWindowStateAndSetupUI();
   void InitComponentVisibility();
   void subscribe();
