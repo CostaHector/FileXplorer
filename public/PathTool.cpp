@@ -6,6 +6,9 @@
 
 QString PathTool::GetPathByApplicationDirPath(const QString& relativePath) {
   static const QDir appDir {QCoreApplication::applicationDirPath()};
+  // QFileInfo{"."}.absoluteFilePath() may be same as appDir.
+  // "." can be modified by QDir::setCurrent("newpwd"),
+  // while appDir is not influenced by setCurrent. it reamins exe file path.
   return QDir::cleanPath(appDir.absoluteFilePath(relativePath));
 }
 
