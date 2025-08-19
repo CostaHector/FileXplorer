@@ -124,8 +124,10 @@ void FloatingPreview::operator()(const QSqlRecord& record, const QString& imgHos
 QString GetDetailDescription(const QString& fileAbsPath) {
   QString fileName, extension;
   std::tie(fileName, extension) = PathTool::GetBaseNameExt(fileAbsPath);
-  const QFileInfo fi{fileAbsPath};
+  QString starDotExtensionLowerCase = '*' + extension.toLower();
+
   QString detail;
+  detail.reserve(200);
   detail += QString(R"(<h1>%1</h1>)").arg(fileName);
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
   const bool isFileAVideo{TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)};
@@ -139,25 +141,26 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   }
 
   QString imgStr;
-  if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + extension)) {
+  if (TYPE_FILTER::IMAGE_TYPE_SET.contains(starDotExtensionLowerCase)) {
     imgStr = QString(R"(<img src="%1" width="480" alt="%1" />)").arg(fileAbsPath);
   } else {
     static QMap<QString, QString> fileTypeImgIcons;
-    auto it = fileTypeImgIcons.find(extension);
+    auto it = fileTypeImgIcons.find(starDotExtensionLowerCase);
     if (it == fileTypeImgIcons.end()) {
       static QFileIconProvider iconProv;
-      const QIcon& ic = iconProv.icon(extension);
+      const QIcon& ic = iconProv.icon(starDotExtensionLowerCase);
       const QPixmap pm{ic.pixmap(64, 64)};
       QByteArray bArray;
       QBuffer buffer(&bArray);
       buffer.open(QIODevice::WriteOnly);
       pm.save(&buffer, "PNG");
       imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="64">)");
-      fileTypeImgIcons[extension] = imgStr;
+      fileTypeImgIcons[starDotExtensionLowerCase] = imgStr;
     } else {
       imgStr = it.value();
     }
   }
+  const QFileInfo fi{fileAbsPath};
   detail += QString(R"(<h3><a href="file:///%1">%2</a></h3>)").arg(fileAbsPath, imgStr);
   detail += QString(R"(<body>)");
   detail += QString(R"(<font size="+2">)");
