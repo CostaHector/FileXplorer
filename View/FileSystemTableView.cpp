@@ -1,16 +1,16 @@
 ﻿#include "FileSystemTableView.h"
-#include "ViewHelper.h"
+#include "FileBasicOperationsActions.h"
 #include "FolderPreviewActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
-#include "FileBasicOperationsActions.h"
 #include "ViewActions.h"
+#include "ViewHelper.h"
 
 #include <QHeaderView>
 #include <QMouseEvent>
 
-FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent)  //
-    : CustomTableView{"FILE_SYSTEM", parent}                                             //
+FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent) //
+  : CustomTableView{"FILE_SYSTEM", parent}                                              //
 {
   BindMenu(m_fsMenu);
   setModel(fsmModel);

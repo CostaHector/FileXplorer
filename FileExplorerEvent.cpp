@@ -60,18 +60,9 @@
 using namespace ViewTypeTool;
 
 FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent) {
-  if (fsm == nullptr) {
-    qWarning() << "MyQFileSystemModel* is nullptr";
-    return nullptr;
-  }
-  if (view == nullptr) {
-    qWarning() << "ContentPanel* is nullptr";
-    return nullptr;
-  }
-  if (logger == nullptr) {
-    qWarning() << "CustomStatusBar* is nullptr";
-    return nullptr;
-  }
+  CHECK_NULLPTR_RETURN_NULLPTR(fsm)
+  CHECK_NULLPTR_RETURN_NULLPTR(view)
+  CHECK_NULLPTR_RETURN_NULLPTR(logger)
   static FileExplorerEvent eve(fsm, view, logger, parent);
   eve.subscribe();
   return &eve;
