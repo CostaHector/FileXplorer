@@ -9,7 +9,7 @@
 #include <QHeaderView>
 #include <QMouseEvent>
 
-FileSystemTableView::FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent) //
+FileSystemTableView::FileSystemTableView(FileSystemModel* fsmModel, QWidget* parent) //
   : CustomTableView{"FILE_SYSTEM", parent}                                              //
 {
   BindMenu(m_fsMenu);

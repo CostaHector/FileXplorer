@@ -380,111 +380,53 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
   return prepaths;
 }
 
-PathTool::SelectionInfo ContentPanel::GetSelectionInfo(const Qt::DropAction dropAct) const {
-  PathTool::SelectionInfo info;
-  static const auto Fill = [&info](MyQFileSystemModel* fsModel, const QModelIndexList& inds, const Qt::DropAction dropAct) {
-    info.rootPath = fsModel->rootPath();
-    QString name;
-    for (const auto& ind : inds) {
-      name = fsModel->fileName(ind);
-      info.relSelections.append(name);
-      //      info.rootPaths.append(info.rootPath);
-      //      info.selections.append(name);
-    }
-    if (dropAct == Qt::CopyAction) {
-      fsModel->CopiedSomething(inds);
-    } else if (dropAct == Qt::MoveAction) {
-      fsModel->CutSomething(inds);
-    }
-  };
-
-  auto vt = GetCurViewType();
-  switch (vt) {
-    case ViewType::LIST: {
-      const QModelIndexList& inds = m_fsListView->selectionModel()->selectedRows();
-      Fill(m_fsModel, inds, dropAct);
-      break;
-    }
-    case ViewType::TABLE: {
-      const QModelIndexList& inds = m_fsTableView->selectionModel()->selectedRows();
-      Fill(m_fsModel, inds, dropAct);
-      break;
-    }
-    case ViewType::TREE: {
-      const QModelIndexList& inds = m_fsTreeView->selectionModel()->selectedRows();
-      Fill(m_fsModel, inds, dropAct);
-      break;
-    }
-    case ViewType::SEARCH: {
-      QModelIndexList srcInds;
-      info.rootPath = m_searchSrcModel->rootPath();
-      for (const auto& proInd : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& ind = m_searchProxyModel->mapToSource(proInd);
-        srcInds.append(ind);
-        int row = ind.row();
-        info.relSelections.append(m_searchSrcModel->GetARelSelection(row));
-        //        info.rootPaths.append(m_searchSrcModel->GetARootPath(row));
-        //        info.selections.append(m_searchSrcModel->GetASelection(row));
-      }
-      if (dropAct == Qt::CopyAction) {
-        m_searchSrcModel->CopiedSomething(srcInds);
-      } else if (dropAct == Qt::MoveAction) {
-        m_searchSrcModel->CutSomething(srcInds);
-      }
-      break;
-    }
-    default:
-      qWarning("GetSelectionInfo not support ViewType:%d", (int)vt);
-  }
-  return info;
-}
-
 std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::DropAction dropAct) const {
   QStringList filePaths;
   QList<QUrl> urls;
 
-  static const auto Fill = [&filePaths, &urls](MyQFileSystemModel* fsModel, const QModelIndexList& inds, const Qt::DropAction dropAct) {
-    for (const auto& ind : inds) {
+  static const auto Fill = [&filePaths, &urls](FileSystemModel* fsModel, const QItemSelection& indRngs, const Qt::DropAction dropAct) {
+    for (const auto& ind : indRngs.indexes()) {
       filePaths.append(fsModel->filePath(ind));
       urls.append(QUrl::fromLocalFile(filePaths.back()));
     }
     if (dropAct == Qt::CopyAction) {
-      fsModel->CopiedSomething(inds);
+      fsModel->CopiedSomething(indRngs);
     } else if (dropAct == Qt::MoveAction) {
-      fsModel->CutSomething(inds);
+      fsModel->CutSomething(indRngs);
     }
   };
+
+  static const auto FillInSearchModel = [&filePaths, &urls](AdvanceSearchModel* searchSrcModel, const QItemSelection& indRngs, const Qt::DropAction dropAct) {
+    for (const auto& ind : indRngs.indexes()) {
+      filePaths.append(searchSrcModel->filePath(ind));
+      urls.append(QUrl::fromLocalFile(filePaths.back()));
+    }
+    if (dropAct == Qt::CopyAction) {
+      searchSrcModel->CopiedSomething(indRngs);
+    } else if (dropAct == Qt::MoveAction) {
+      searchSrcModel->CutSomething(indRngs);
+    }
+  };
+
 
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::LIST: {
-      const auto& inds = m_fsListView->selectionModel()->selectedRows();
-      Fill(m_fsModel, inds, dropAct);
+      Fill(m_fsModel, m_fsListView->selectionModel()->selection(), dropAct);
       break;
     }
     case ViewType::TABLE: {
-      const auto& inds = m_fsTableView->selectionModel()->selectedRows();
-      Fill(m_fsModel, inds, dropAct);
+      Fill(m_fsModel, m_fsTableView->selectionModel()->selection(), dropAct);
       break;
     }
     case ViewType::TREE: {
-      const auto& inds = m_fsTreeView->selectionModel()->selectedRows();
-      Fill(m_fsModel, inds, dropAct);
+      Fill(m_fsModel, m_fsTreeView->selectionModel()->selection(), dropAct);
       break;
     }
     case ViewType::SEARCH: {
-      QModelIndexList srcInds;
-      for (const auto& proInd : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& ind = m_searchProxyModel->mapToSource(proInd);
-        srcInds.append(ind);
-        filePaths.append(m_searchSrcModel->filePath(ind));
-        urls.append(QUrl::fromLocalFile(filePaths.back()));
-      }
-      if (dropAct == Qt::CopyAction) {
-        m_searchSrcModel->CopiedSomething(srcInds);
-      } else if (dropAct == Qt::MoveAction) {
-        m_searchSrcModel->CutSomething(srcInds);
-      }
+      const QItemSelection& indProxyRngs = m_advanceSearchView->selectionModel()->selection();
+      const QItemSelection& indRngs = m_searchProxyModel->mapSelectionToSource(indProxyRngs);
+      FillInSearchModel(m_searchSrcModel, indRngs, dropAct);
       break;
     }
     case ViewType::SCENE: {
