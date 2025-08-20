@@ -1,6 +1,6 @@
 ﻿#include "ViewHelper.h"
 #include "MemoryKey.h"
-#include "MyQFileSystemModel.h"
+#include "FileSystemModel.h"
 #include "Notificator.h"
 #include "ComplexOperation.h"
 #include "AddressBarActions.h"
@@ -83,7 +83,7 @@ void View::changeDropAction(QDropEvent* event) {
 }
 
 void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
-  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
     qDebug("m_fsm is nullptr");
     return;
@@ -102,7 +102,7 @@ void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
 }
 
 void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
-  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
     qDebug("m_fsm is nullptr");
     return;
@@ -123,7 +123,7 @@ void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
 void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
   // In mouse drag and move event, we can get DropAction directly.
   // So no need to get from mimedata.data("Preferred DropEffect").
-  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
     qDebug("m_fsm is nullptr");
     return;
@@ -142,11 +142,11 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
   // otherwise. accept() and True return here
   View::changeDropAction(event);
   onDropMimeData(event->mimeData(), event->dropAction(), ind.isValid() ? m_fsm->filePath(ind) : m_fsm->rootPath());
-  qDebug() << event->dropAction() << QString("DropEvent Finished with %1 url(s)").arg(event->mimeData()->urls().size());
+  qDebug("DropEvent[%d] finished with %d url(s)", event->dropAction(), event->mimeData()->urls().size());
 }
 
 void View::dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
-  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
     qDebug("m_fsm is nullptr");
     return;
@@ -161,7 +161,7 @@ void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
   if (rows.isEmpty()) {
     return;
   }
-  auto* m_fsm = dynamic_cast<MyQFileSystemModel*>(view->model());
+  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
     qDebug("[mouseMove] m_fsm is nullptr");
     return;

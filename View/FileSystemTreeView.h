@@ -2,7 +2,7 @@
 #define FILESYSTEMTREEVIEW_H
 
 #include "RightClickMenu.h"
-#include "MyQFileSystemModel.h"
+#include "FileSystemModel.h"
 
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
@@ -14,7 +14,7 @@
 
 class FileSystemTreeView : public QTreeView {
  public:
-  FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* parent = nullptr);
+  FileSystemTreeView(FileSystemModel* fsmModel, QWidget* parent = nullptr);
 
   void subscribe();
   auto InitViewSettings() -> void;

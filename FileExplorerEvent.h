@@ -4,7 +4,7 @@
 #include "ComplexOperation.h"
 #include "RedundantFolderRemove.h"
 #include "PublicVariable.h"
-#include "MyQFileSystemModel.h"
+#include "FileSystemModel.h"
 
 class ContentPanel;
 class CustomStatusBar;
@@ -19,10 +19,10 @@ class FileExplorerEvent : public QObject {
   Q_OBJECT
 
  public:
-  static FileExplorerEvent* GetFileExlorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent = nullptr);
+  static FileExplorerEvent* GetFileExlorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent = nullptr);
 
  private:
-  FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent);
+  FileExplorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent);
   void subscribe();
   void subsribeCompress();
   void subsribeFileActions();
@@ -97,7 +97,7 @@ class FileExplorerEvent : public QObject {
   bool on_MoveTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::MoveAction, r); }
   bool on_CopyTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::CopyAction, r); }
 
-  MyQFileSystemModel* _fileSysModel;
+  FileSystemModel* _fileSysModel;
   ContentPanel* _contentPane;
 
   CustomStatusBar* _logger;
