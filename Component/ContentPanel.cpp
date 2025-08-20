@@ -26,7 +26,7 @@ ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
       _previewFolder{previewFolder},  //
       m_parent(parent)                //
 {
-  m_fsModel = new (std::nothrow) MyQFileSystemModel(this);
+  m_fsModel = new (std::nothrow) FileSystemModel(this);
   layout()->setContentsMargins(0, 0, 0, 0);
   layout()->setSpacing(0);
   subscribe();
@@ -163,7 +163,7 @@ auto ContentPanel::on_searchEnterKey(const QString& /*targetStr*/) -> bool {
 }
 
 void ContentPanel::subscribe() {
-  connect(m_fsModel, &MyQFileSystemModel::directoryLoaded, this, &ContentPanel::onAfterDirectoryLoaded);
+  connect(m_fsModel, &FileSystemModel::directoryLoaded, this, &ContentPanel::onAfterDirectoryLoaded);
 }
 
 void ContentPanel::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {

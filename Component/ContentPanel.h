@@ -106,7 +106,6 @@ class ContentPanel : public QStackedWidget {
   QStringList getTheJpgFolderPaths() const;
   QStringList getFullRecords() const;
 
-  PathTool::SelectionInfo GetSelectionInfo(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false) const;
 
@@ -123,7 +122,7 @@ class ContentPanel : public QStackedWidget {
   QMap<QString, Anchor> m_anchorTags;
 
   NavigationAndAddressBar* _addressBar{nullptr};
-  MyQFileSystemModel* m_fsModel{nullptr};
+  FileSystemModel* m_fsModel{nullptr};
   FileSystemTableView* m_fsTableView{nullptr};
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};

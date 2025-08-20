@@ -3,7 +3,7 @@
 
 #include "RightClickMenu.h"
 #include "CustomListView.h"
-#include "MyQFileSystemModel.h"
+#include "FileSystemModel.h"
 
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
@@ -15,7 +15,7 @@
 
 class FileSystemListView : public CustomListView {
  public:
-  FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* parent=nullptr);
+  FileSystemListView(FileSystemModel* fsmModel, QWidget* parent=nullptr);
 
   void subscribe();
 
