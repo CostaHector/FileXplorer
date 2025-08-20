@@ -11,7 +11,7 @@
 #include <QSettings>
 
 class MyQFileSystemModel : public QFileSystemModel {
- public:
+public:
   explicit MyQFileSystemModel(QObject* parent = nullptr);
 
   void BindLogger(CustomStatusBar* logger);
@@ -39,25 +39,25 @@ class MyQFileSystemModel : public QFileSystemModel {
     // continous cut made index not exist but valid can emit not exist make it crash down.
     // so we need remove index before emit dataChanged
     // bugs here. so we need check if DoNotUseParent is true
-    for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-      for (auto ind : it.value()) {
-        if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
-          continue;
-        emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
-      }
-    }
+    // for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
+    //   for (auto ind : it.value()) {
+    //     if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+    //       continue;
+    //     emit dataChanged(ind, ind, {Qt::ItemDataRole::DecorationRole});
+    //   }
+    // }
   }
 
   void ClearCopiedDict() {
     decltype(m_copiedMap) tmp;
     tmp.swap(m_copiedMap);
-    for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-      for (auto ind : it.value()) {
-         if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
-          continue;
-        emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
-      }
-    }
+    // for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
+    //   for (auto ind : it.value()) {
+    //     if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
+    //       continue;
+    //     emit dataChanged(ind, ind, {Qt::ItemDataRole::DecorationRole});
+    //   }
+    // }
   }
 
   void CutSomething(const QModelIndexList& cutIndexes, bool appendMode = false) {
@@ -65,10 +65,8 @@ class MyQFileSystemModel : public QFileSystemModel {
       ClearCutDict();
     }
     ClearCopiedDict();
-    if (!m_cutMap.contains(rootPath())) {
-      m_cutMap[rootPath()] = {};
-    }
     m_cutMap[rootPath()] += cutIndexes;
+    CheckedIndexesDecorationRoleChanges(cutIndexes);
   }
 
   void CopiedSomething(const QModelIndexList& copiedIndexes, bool appendMode = false) {
@@ -76,45 +74,29 @@ class MyQFileSystemModel : public QFileSystemModel {
       ClearCopiedDict();
     }
     ClearCutDict();
-    if (not m_copiedMap.contains(rootPath())) {
-      m_copiedMap[rootPath()] = {};
-    }
     m_copiedMap[rootPath()] += copiedIndexes;
+    CheckedIndexesDecorationRoleChanges(copiedIndexes);
   }
 
   void DragHover(const QModelIndex index) {
-    if (m_draggedHoverIndex.row() == index.row() and m_draggedHoverIndex.column() == index.column()) {
+    if (m_draggedHoverIndex.row() == index.row() && m_draggedHoverIndex.column() == index.column()) {
       return;
     }
-    emit dataChanged(m_draggedHoverIndex, m_draggedHoverIndex, {Qt::ItemDataRole::BackgroundRole});
-    emit dataChanged(index, index, {Qt::ItemDataRole::BackgroundRole});
+    emit dataChanged(m_draggedHoverIndex, m_draggedHoverIndex, {Qt::ItemDataRole::ForegroundRole});
+    emit dataChanged(index, index, {Qt::ItemDataRole::ForegroundRole});
     m_draggedHoverIndex = index;
   }
 
   void DragRelease() {
-    if (not m_draggedHoverIndex.isValid()) {
-      return;  // already invalid index
+    if (!m_draggedHoverIndex.isValid()) {
+      return; // already invalid index
     }
     QModelIndex tmpIndex = m_draggedHoverIndex;
-    m_draggedHoverIndex = QModelIndex();
-    emit dataChanged(tmpIndex, tmpIndex, {Qt::ItemDataRole::BackgroundRole});
+    m_draggedHoverIndex = QModelIndex{};
+    emit dataChanged(tmpIndex, tmpIndex, {Qt::ItemDataRole::ForegroundRole});
   }
 
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
-    if (role == Qt::BackgroundRole) {
-      if (m_draggedHoverIndex == index) {
-        return QBrush(Qt::green);
-      }
-      if (m_cutMap.contains(rootPath()) && m_cutMap[rootPath()].contains(index)) {
-        return QBrush(Qt::GlobalColor::darkGray, Qt::BrushStyle::Dense4Pattern);
-      }
-      if (m_copiedMap.contains(rootPath()) && m_copiedMap[rootPath()].contains(index)) {
-        return QBrush(Qt::GlobalColor::yellow, Qt::BrushStyle::CrossPattern);
-      }
-      return QBrush(Qt::transparent);
-    }
-    return QFileSystemModel::data(index, role);
-  }
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
     if (orientation == Qt::Vertical) {
@@ -125,11 +107,11 @@ class MyQFileSystemModel : public QFileSystemModel {
     return QFileSystemModel::headerData(section, orientation, role);
   }
 
- public slots:
+public slots:
   void whenRootPathChanged(const QString& newpath);
   void whenDirectoryLoaded(const QString& path);
 
- protected:
+protected:
   CustomStatusBar* _logger;
   int m_imagesSizeLoaded = 0;
 
@@ -137,11 +119,21 @@ class MyQFileSystemModel : public QFileSystemModel {
   static constexpr int cacheWidth = 256;
   static constexpr int cacheHeight = 256;
 
-  static constexpr int IMAGES_COUNT_LOAD_ONCE_MAX = 3;  // 10 pics
- private:
+  static constexpr int IMAGES_COUNT_LOAD_ONCE_MAX = 3; // 10 pics
+
+private:
+  void CheckedIndexesDecorationRoleChanges(const QModelIndexList& indexes) {
+    if (indexes.isEmpty()) {
+      return;
+    }
+    const QModelIndex& topLeft = indexes.first();
+    const QModelIndex& bottomRight = indexes.last();
+    emit dataChanged(topLeft, bottomRight, {Qt::DecorationRole});
+  }
+
   QHash<QString, QModelIndexList> m_copiedMap;
   QHash<QString, QModelIndexList> m_cutMap;
   QModelIndex m_draggedHoverIndex;
 };
 
-#endif  // MYQFILESYSTEMMODEL_H
+#endif // MYQFILESYSTEMMODEL_H

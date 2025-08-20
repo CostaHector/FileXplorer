@@ -138,6 +138,7 @@
 <file alias="FILE_STRUCTURE_QUERY">RightClickIcon/FILE_STRUCTURE_QUERY.svg</file>
 <file alias="FILE_STRUCTURE_FLATTEN">RightClickIcon/FILE_STRUCTURE_FLATTEN.svg</file>
 <file alias="FILE_STRUCTURE_PRESERVE">RightClickIcon/FILE_STRUCTURE_PRESERVE.svg</file>
+<file alias="CHECKED">RightClickIcon/CHECKED.png</file>
 
 <!--JsonEditor Icon here        -->
 <file alias="JSON_EDITOR">JsonEditor/JSON_EDITOR.png</file>

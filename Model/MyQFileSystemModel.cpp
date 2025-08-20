@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QMimeData>
 #include <QUrl>
+#include <QApplication>
+#include <QStyle>
 
 int MyQFileSystemModel::previewsCnt = 0;
 constexpr int MyQFileSystemModel::cacheWidth;
@@ -80,6 +82,27 @@ Qt::DropActions MyQFileSystemModel::supportedDropActions() const {
 
 Qt::DropActions MyQFileSystemModel::supportedDragActions() const {
   return Qt::MoveAction | Qt::CopyAction | Qt::LinkAction;
+}
+
+QVariant MyQFileSystemModel::data(const QModelIndex& index, int role) const {
+  if (role == Qt::DecorationRole && index.column() == 0) {
+    static QIcon CHECKED_ICON{":img/CHECKED"};
+    if (m_cutMap.contains(rootPath())) {
+      if (m_cutMap[rootPath()].contains(index)) {
+        return CHECKED_ICON;
+      }
+    }
+    if (m_copiedMap.contains(rootPath())) {
+      if (m_copiedMap[rootPath()].contains(index)) {
+        return CHECKED_ICON;
+      }
+    }
+  } else if (role == Qt::ForegroundRole) {
+    if (m_draggedHoverIndex == index) {
+      return QColor(Qt::cyan);
+    }
+  }
+  return QFileSystemModel::data(index, role);
 }
 
 void MyQFileSystemModel::whenRootPathChanged(const QString& /*newpath*/) {
