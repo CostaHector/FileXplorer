@@ -3,7 +3,7 @@
 
 #include "CustomTableView.h"
 #include "RightClickMenu.h"
-#include "MyQFileSystemModel.h"
+#include "FileSystemModel.h"
 
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
@@ -14,7 +14,7 @@
 
 class FileSystemTableView : public CustomTableView {
  public:
-  FileSystemTableView(MyQFileSystemModel* fsmModel, QWidget* parent = nullptr);
+  FileSystemTableView(FileSystemModel* fsmModel, QWidget* parent = nullptr);
 
   void subscribe();
 

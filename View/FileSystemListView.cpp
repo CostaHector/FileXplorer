@@ -11,7 +11,7 @@
 #include <QHeaderView>
 #include <QMouseEvent>
 
-FileSystemListView::FileSystemListView(MyQFileSystemModel* fsmModel, QWidget* parent)  //
+FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* parent)  //
     : CustomListView{"FILE_SYSTEM_LIST", parent}                                       //
 {
   BindMenu(m_fsMenu);
