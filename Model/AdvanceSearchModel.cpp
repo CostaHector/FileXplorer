@@ -8,11 +8,10 @@
 const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size", "type", "date", "relative path"};
 
 AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
-    : QAbstractTableModelPub{parent},
-      m_filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
-      m_iteratorFlags{bool2IteratorFlag(PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())}  //
+  : QAbstractTableModelPub{parent},
+  m_filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
+  m_iteratorFlags{bool2IteratorFlag(PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())}  //
 {
-  m_ext2Icon[""] = m_iconProvider.icon(QFileIconProvider::IconType::Folder);
 }
 
 void AdvanceSearchModel::updateSearchResultList() {
@@ -123,10 +122,10 @@ void AdvanceSearchModel::initIteratorFlag(QDirIterator::IteratorFlag initialFlag
 
 QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
-    return QVariant();
+    return {};
   }
   if (index.row() < 0 || index.row() >= rowCount()) {
-    return QVariant();
+    return {};
   }
   if (role == Qt::DisplayRole) {
     switch (index.column()) {
@@ -141,42 +140,41 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
       case 4:
         return m_itemsLst[index.row()].relPath;
       default:
-        return QVariant();
+        return {};
     }
   } else if (role == Qt::DecorationRole) {
     if (index.column() == 0) {
-      const QString& extExtDot{m_itemsLst[index.row()].type};
-      auto it = m_ext2Icon.constFind(extExtDot);
-      if (it != m_ext2Icon.constEnd()) {
-        return *it;
+      if (mCutIndexes.contain(rootPath(), index)) {
+        static const QIcon CUT_ICON{":img/CUT_ITEM"};
+        return CUT_ICON;
+      } else if (mCopyIndexes.contain(rootPath(), index)) {
+        static const QIcon COPY_ICON{":img/COPY_ITEM"};
+        return COPY_ICON;
       }
-      return m_ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo(extExtDot));
+      static QHash<QString, QIcon> ext2Icon{{"", m_iconProvider.icon(QFileIconProvider::IconType::Folder)}};
+      const QString& extExtDot{m_itemsLst[index.row()].type};
+      auto it = ext2Icon.constFind(extExtDot);
+      if (it == ext2Icon.constEnd()) {
+        return ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo{extExtDot});
+      }
+      return it.value();
     }
-    return QVariant();
   } else if (role == Qt::TextAlignmentRole) {
     if (index.column() == 1) {
       // Todo  | Qt::AlignVCenter
       return Qt::AlignRight;
     }
     return int(Qt::AlignLeft | Qt::AlignTop);
-  } else if (role == Qt::BackgroundRole) {
-    if (m_cutMap.contains(rootPath()) and m_cutMap[rootPath()].contains(index)) {
-      return QBrush(Qt::GlobalColor::darkGray, Qt::BrushStyle::Dense4Pattern);
-    }
-    if (m_copiedMap.contains(rootPath()) and m_copiedMap[rootPath()].contains(index)) {
-      return QBrush(Qt::GlobalColor::yellow, Qt::BrushStyle::CrossPattern);
-    }
-    return QBrush(Qt::transparent);
   } else if (role == Qt::ForegroundRole) {
     if (m_disableList.contains(index)) {
-      return QBrush(Qt::GlobalColor::lightGray);
+      static const QColor DISABLE_COLOR{Qt::GlobalColor::lightGray};
+      return DISABLE_COLOR;
+    } else if (m_recycleSet.contains(index)) {
+      static const QColor RECYCLE_COLOR{Qt::GlobalColor::red};
+      return RECYCLE_COLOR;
     }
-    if (m_recycleSet.contains(index)) {
-      return QBrush(Qt::GlobalColor::red);
-    }
-    return {};
   }
-  return QVariant();
+  return {};
 }
 
 QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -192,58 +190,6 @@ QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation
     return section + 1;
   }
   return QAbstractTableModel::headerData(section, orientation, role);
-}
-
-void AdvanceSearchModel::ClearCopyAndCutDict() {
-  ClearCutDict();
-  ClearCopiedDict();
-}
-
-void AdvanceSearchModel::ClearCutDict() {
-  decltype(m_cutMap) tmp;
-  tmp.swap(m_cutMap);
-  return;
-  for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-    for (auto ind : it.value()) {
-      if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
-        continue;
-      emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
-    }
-  }
-}
-
-void AdvanceSearchModel::ClearCopiedDict() {
-  decltype(m_copiedMap) tmp;
-  tmp.swap(m_copiedMap);
-  for (auto it = tmp.cbegin(); it != tmp.cend(); ++it) {
-    for (auto ind : it.value()) {
-      if (checkIndex(ind, CheckIndexOption::DoNotUseParent))
-        continue;
-      emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
-    }
-  }
-}
-
-void AdvanceSearchModel::CutSomething(const QModelIndexList& cutIndexes, bool appendMode) {
-  if (not appendMode) {
-    ClearCutDict();
-  }
-  ClearCopiedDict();
-  if (not m_cutMap.contains(rootPath())) {
-    m_cutMap[rootPath()] = {};
-  }
-  m_cutMap[rootPath()] += cutIndexes;
-}
-
-void AdvanceSearchModel::CopiedSomething(const QModelIndexList& copiedIndexes, bool appendMode) {
-  if (not appendMode) {
-    ClearCopiedDict();
-  }
-  ClearCutDict();
-  if (not m_copiedMap.contains(rootPath())) {
-    m_copiedMap[rootPath()] = {};
-  }
-  m_copiedMap[rootPath()] += copiedIndexes;
 }
 
 void AdvanceSearchModel::appendDisable(const QModelIndex& ind) {

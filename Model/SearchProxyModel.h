@@ -39,9 +39,9 @@ class SearchProxyModel : public QSortFilterProxyModel {
 
   inline void initFileNameFiltersCaseSensitive(bool sensitive) { m_nameFiltersCaseSensitive = sensitive; }
   void setFileNameFiltersCaseSensitive(bool sensitive);
+  void PrintRegexDebugMessage() const;
 
  private:
-  void PrintRegexDebugMessage() const;
   bool CheckIfContentsContained(const QString& filePath, const QString& contained) const;
   AdvanceSearchModel* _searchSourceModel{nullptr};
 

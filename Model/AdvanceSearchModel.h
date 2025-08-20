@@ -1,13 +1,15 @@
 ﻿#ifndef ADVANCESEARCHMODEL_H
 #define ADVANCESEARCHMODEL_H
 
+#include "QAbstractTableModelPub.h"
+#include "SelectionsRangeHelper.h"
+
 #include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QSet>
-#include "QAbstractTableModelPub.h"
 #include <QDataStream>
 
 struct FileProperty {
@@ -33,9 +35,9 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
   explicit AdvanceSearchModel(QObject* parent = nullptr);
 
   QDir::Filters filter() const { return m_filters; }
-  QString rootPath() const { return m_rootPath; }
+  const QString& rootPath() const { return m_rootPath; }
   QDir rootDirectory(const QString& /*placeHolder*/ = "") const {  //
-    return QDir(rootPath());
+    return QDir{rootPath()};
   }
 
   void updateSearchResultList();
@@ -64,11 +66,31 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
   // call setNameFilterDisables or proxy model instead
   void initNameFilterDisables(bool enable) = delete;
 
-  void ClearCopyAndCutDict();
-  void ClearCutDict();
-  void ClearCopiedDict();
-  void CutSomething(const QModelIndexList& cutIndexes, bool appendMode = false);
-  void CopiedSomething(const QModelIndexList& copiedIndexes, bool appendMode = false);
+  void ClearCopyAndCutDict() {
+    ClearCutDict();
+    ClearCopiedDict();
+  }
+  void ClearCutDict() { mCutIndexes.clear(); }
+  void ClearCopiedDict() { mCopyIndexes.clear();}
+  void CutSomething(const QItemSelection& cutIndexes) {
+    auto changedLst = mCutIndexes.GetTopBottomRange();
+    ClearCopyAndCutDict();
+    mCutIndexes.Set(rootPath(), cutIndexes);
+    changedLst += mCutIndexes.GetTopBottomRange();
+    for (const auto& startEnd: changedLst) {
+      emit dataChanged(startEnd.first, startEnd.second, {Qt::ItemDataRole::DecorationRole});
+    }
+  }
+
+  void CopiedSomething(const QItemSelection& copiedIndexes) {
+    auto changedLst = mCopyIndexes.GetTopBottomRange();
+    ClearCopyAndCutDict();
+    mCopyIndexes.Set(rootPath(), copiedIndexes);
+    changedLst += mCopyIndexes.GetTopBottomRange();
+    for (const auto& startEnd: changedLst) {
+      emit dataChanged(startEnd.first, startEnd.second, {Qt::ItemDataRole::DecorationRole});
+    }
+  }
 
   void appendDisable(const QModelIndex& ind);
   void removeDisable(const QModelIndex& ind);
@@ -143,14 +165,12 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
  private:
   QString m_rootPath;
   QList<FileProperty> m_itemsLst;
-  mutable QHash<QString, QIcon> m_ext2Icon;
   QFileIconProvider m_iconProvider;
 
   QDir::Filters m_filters;
   QDirIterator::IteratorFlags m_iteratorFlags;
 
-  QHash<QString, QModelIndexList> m_copiedMap;
-  QHash<QString, QModelIndexList> m_cutMap;
+  SelectionsRangeHelper mCutIndexes, mCopyIndexes;
   QSet<QModelIndex> m_disableList;  // QFileSystemModel: only setNameFilter will effect this
                                     // SearchModel: both setNameFilter and contents will effect this
   QSet<QModelIndex> m_recycleSet;

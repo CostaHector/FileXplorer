@@ -115,6 +115,7 @@ void AdvanceSearchToolBar::onSearchEnterAndApply() {
     return;
   }
   _searchProxyModel->startFilterWhenTextChanged(m_nameFilterCB->currentText(), m_contentCB->currentText());
+  _searchProxyModel->PrintRegexDebugMessage();
 }
 
 void AdvanceSearchToolBar::onSearchModeChanged(const QString& newSearchModeText) {
