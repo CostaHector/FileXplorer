@@ -10,7 +10,7 @@
 #include <QHeaderView>
 #include <QMouseEvent>
 
-FileSystemTreeView::FileSystemTreeView(MyQFileSystemModel* fsmModel, QWidget* parent)  //
+FileSystemTreeView::FileSystemTreeView(FileSystemModel* fsmModel, QWidget* parent)  //
     : QTreeView{parent}                                                                //
 {
   setModel(fsmModel);

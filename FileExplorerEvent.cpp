@@ -1,9 +1,4 @@
 ﻿#include "FileExplorerEvent.h"
-#include <QGuiApplication>
-#include <QApplication>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QProcess>
 
 #include "ArchiveFilesActions.h"
 #include "ArrangeActions.h"
@@ -57,9 +52,16 @@
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
 
+#include <QGuiApplication>
+#include <QApplication>
+#include <QInputDialog>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QProcess>
+
 using namespace ViewTypeTool;
 
-FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent) {
+FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(fsm)
   CHECK_NULLPTR_RETURN_NULLPTR(view)
   CHECK_NULLPTR_RETURN_NULLPTR(logger)
@@ -68,7 +70,7 @@ FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(MyQFileSystemModel* fs
   return &eve;
 }
 
-FileExplorerEvent::FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent)
+FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent)
     : QObject(parent),                             //
       _fileSysModel(fsm),                          //
       _contentPane(view),                          //
