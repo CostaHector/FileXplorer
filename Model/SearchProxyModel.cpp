@@ -63,7 +63,6 @@ void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const
       break;
     case SEARCH_MODE::REGEX:
       setFilterRegularExpression(nameText);
-      PrintRegexDebugMessage();
       break;
     case SEARCH_MODE::FILE_CONTENTS:
       setContentFilter(contentText);
@@ -73,7 +72,6 @@ void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const
       qWarning("Search mode[%d] not support", (int)m_searchMode);
       break;
   }
-  PrintRegexDebugMessage();
 }
 
 void SearchProxyModel::startFilterWhenTextChanges(const QString& nameText, const QString& contentText) {
@@ -94,7 +92,6 @@ void SearchProxyModel::startFilterWhenTextChanges(const QString& nameText, const
       qWarning("Search mode[%d] not support", (int)m_searchMode);
       break;
   }
-  PrintRegexDebugMessage();
 }
 
 void SearchProxyModel::setContentFilter(const QString& contentText) {
