@@ -1,9 +1,4 @@
 ﻿#include "FileExplorerEvent.h"
-#include <QGuiApplication>
-#include <QApplication>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QProcess>
 
 #include "ArchiveFilesActions.h"
 #include "ArrangeActions.h"
@@ -57,27 +52,25 @@
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
 
+#include <QGuiApplication>
+#include <QApplication>
+#include <QInputDialog>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QProcess>
+
 using namespace ViewTypeTool;
 
-FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent) {
-  if (fsm == nullptr) {
-    qWarning() << "MyQFileSystemModel* is nullptr";
-    return nullptr;
-  }
-  if (view == nullptr) {
-    qWarning() << "ContentPanel* is nullptr";
-    return nullptr;
-  }
-  if (logger == nullptr) {
-    qWarning() << "CustomStatusBar* is nullptr";
-    return nullptr;
-  }
+FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent) {
+  CHECK_NULLPTR_RETURN_NULLPTR(fsm)
+  CHECK_NULLPTR_RETURN_NULLPTR(view)
+  CHECK_NULLPTR_RETURN_NULLPTR(logger)
   static FileExplorerEvent eve(fsm, view, logger, parent);
   eve.subscribe();
   return &eve;
 }
 
-FileExplorerEvent::FileExplorerEvent(MyQFileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent)
+FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent)
     : QObject(parent),                             //
       _fileSysModel(fsm),                          //
       _contentPane(view),                          //
