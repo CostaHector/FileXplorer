@@ -922,10 +922,10 @@ bool FileExplorerEvent::on_deletePermanently() {
   }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds;
-  for (const QModelIndex ind : selectedIndexes()) {
+  for (const QModelIndex& ind : selectedIndexes()) {
     QFileInfo fi = _fileSysModel->fileInfo(ind);
     if (fi.isDir()) {
-      cmds.append(ACMD::GetInstRMDIR(pth, fi.fileName()));
+      cmds.append(ACMD::GetInstRMFOLDERFORCE(pth, fi.fileName()));
     } else if (fi.isFile()) {
       cmds.append(ACMD::GetInstRMFILE(pth, fi.fileName()));
     } else {

@@ -66,16 +66,17 @@ private:
   void AppendASelection(const QTextCursor &cursor);
   void ClearAllSelections();
   void SearchAndAppendParagraphOfResult(const QString& searchText);
-
+  void CopySelectedTextToClipboard() const;
   bool onAnchorClicked(const QUrl& url);
 
   QMenu *mBrowserMenu{nullptr};
   QToolBar* mFloatingTb{nullptr};
 
-  bool mbDragging = false;                  // 是否正在拖拽
-  QPoint mDraggingStartPos;                      // 拖拽起始坐标
+  bool mbDragging = false;                            // 是否正在拖拽
+  QPoint mDraggingStartPos;                           // 拖拽起始坐标
   QList<QTextEdit::ExtraSelection> mMultiSelections;  // 存储多个选区
-  static constexpr int MIN_KEYWORD_LEN{7};
+  static constexpr int MIN_SINGLE_SEARCH_PATTERN_LEN{2 + 4}; // "%keyword%"
+  static constexpr int MIN_EACH_KEYWORD_LEN{4};       // "%" + "keyword" + "%"
 };
 
 #endif  // CLICKABLETEXTBROWSER_H
