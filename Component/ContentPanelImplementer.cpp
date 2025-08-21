@@ -384,27 +384,38 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
   QStringList filePaths;
   QList<QUrl> urls;
 
-  static const auto Fill = [&filePaths, &urls](FileSystemModel* fsModel, const QItemSelection& indRngs, const Qt::DropAction dropAct) {
-    for (const auto& ind : indRngs.indexes()) {
+  static const auto Fill = [&filePaths, &urls](FileSystemModel* fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct) {
+    filePaths.reserve(indexes.size());
+    urls.reserve(indexes.size());
+    for (const auto& ind : indexes) {
       filePaths.append(fsModel->filePath(ind));
       urls.append(QUrl::fromLocalFile(filePaths.back()));
     }
     if (dropAct == Qt::CopyAction) {
-      fsModel->CopiedSomething(indRngs);
+      fsModel->CopiedSomething(indexes);
     } else if (dropAct == Qt::MoveAction) {
-      fsModel->CutSomething(indRngs);
+      fsModel->CutSomething(indexes);
     }
   };
 
-  static const auto FillInSearchModel = [&filePaths, &urls](AdvanceSearchModel* searchSrcModel, const QItemSelection& indRngs, const Qt::DropAction dropAct) {
-    for (const auto& ind : indRngs.indexes()) {
-      filePaths.append(searchSrcModel->filePath(ind));
+  static const auto FillInSearchModel = [&filePaths, &urls](
+                                            AdvanceSearchModel* searchSrcModel, SearchProxyModel* searchProxyModel,
+                                            const QModelIndexList& proIndexes, const Qt::DropAction dropAct) {
+
+    QModelIndexList srcIndexes;
+    srcIndexes.reserve(proIndexes.size());
+    filePaths.reserve(proIndexes.size());
+    urls.reserve(proIndexes.size());
+    for (const auto& proInd : proIndexes) {
+      const auto& srcind = searchProxyModel->mapToSource(proInd);
+      srcIndexes.append(srcind);
+      filePaths.append(searchSrcModel->filePath(srcind));
       urls.append(QUrl::fromLocalFile(filePaths.back()));
     }
     if (dropAct == Qt::CopyAction) {
-      searchSrcModel->CopiedSomething(indRngs);
+      searchSrcModel->CopiedSomething(srcIndexes);
     } else if (dropAct == Qt::MoveAction) {
-      searchSrcModel->CutSomething(indRngs);
+      searchSrcModel->CutSomething(srcIndexes);
     }
   };
 
@@ -412,21 +423,19 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::LIST: {
-      Fill(m_fsModel, m_fsListView->selectionModel()->selection(), dropAct);
+      Fill(m_fsModel, m_fsListView->selectionModel()->selectedRows(), dropAct);
       break;
     }
     case ViewType::TABLE: {
-      Fill(m_fsModel, m_fsTableView->selectionModel()->selection(), dropAct);
+      Fill(m_fsModel, m_fsTableView->selectionModel()->selectedRows(), dropAct);
       break;
     }
     case ViewType::TREE: {
-      Fill(m_fsModel, m_fsTreeView->selectionModel()->selection(), dropAct);
+      Fill(m_fsModel, m_fsTreeView->selectionModel()->selectedRows(), dropAct);
       break;
     }
     case ViewType::SEARCH: {
-      const QItemSelection& indProxyRngs = m_advanceSearchView->selectionModel()->selection();
-      const QItemSelection& indRngs = m_searchProxyModel->mapSelectionToSource(indProxyRngs);
-      FillInSearchModel(m_searchSrcModel, indRngs, dropAct);
+      FillInSearchModel(m_searchSrcModel, m_searchProxyModel, m_advanceSearchView->selectionModel()->selectedRows(), dropAct);
       break;
     }
     case ViewType::SCENE: {

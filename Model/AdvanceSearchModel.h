@@ -72,23 +72,26 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
   }
   void ClearCutDict() { mCutIndexes.clear(); }
   void ClearCopiedDict() { mCopyIndexes.clear();}
-  void CutSomething(const QItemSelection& cutIndexes) {
-    auto changedLst = mCutIndexes.GetTopBottomRange();
+  void CutSomething(const QModelIndexList& cutIndexes) {
+    auto beRngLst = mCutIndexes.GetTopBottomRange();
     ClearCopyAndCutDict();
     mCutIndexes.Set(rootPath(), cutIndexes);
-    changedLst += mCutIndexes.GetTopBottomRange();
-    for (const auto& startEnd: changedLst) {
-      emit dataChanged(startEnd.first, startEnd.second, {Qt::ItemDataRole::DecorationRole});
+    beRngLst += mCutIndexes.GetTopBottomRange();
+    foreach (auto beRng, beRngLst) {
+      if (beRng.first.isValid() && beRng.second.isValid()) {
+        emit dataChanged(beRng.first, beRng.second, {Qt::ItemDataRole::DecorationRole});
+      }
     }
   }
-
-  void CopiedSomething(const QItemSelection& copiedIndexes) {
-    auto changedLst = mCopyIndexes.GetTopBottomRange();
+  void CopiedSomething(const QModelIndexList& copiedIndexes) {
+    auto beRngLst = mCutIndexes.GetTopBottomRange();
     ClearCopyAndCutDict();
     mCopyIndexes.Set(rootPath(), copiedIndexes);
-    changedLst += mCopyIndexes.GetTopBottomRange();
-    for (const auto& startEnd: changedLst) {
-      emit dataChanged(startEnd.first, startEnd.second, {Qt::ItemDataRole::DecorationRole});
+    beRngLst += mCutIndexes.GetTopBottomRange();
+    foreach (auto beRng, beRngLst) {
+      if (beRng.first.isValid() && beRng.second.isValid()) {
+        emit dataChanged(beRng.first, beRng.second, {Qt::ItemDataRole::DecorationRole});
+      }
     }
   }
 
