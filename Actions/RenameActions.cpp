@@ -10,7 +10,7 @@ RenameActions::RenameActions(QObject* parent) : QObject{parent} {
   _STR_REPLACER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_REPLACER_PATH"), "String Replace");
   _CONTINUOUS_NUMBERING = new (std::nothrow) QAction(QIcon(":img/_CONTINUOUS_NUMBERING"), "Name Continous");
   _CONVERT_UNICODE_TO_ASCII = new (std::nothrow) QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), "Unicode Char to ASCII");
-  _PREPEND_PARENT_FOLDER_NAMES = new (std::nothrow) QAction{"Prepend parent folder names"};
+  _PREPEND_PARENT_FOLDER_NAMES = new (std::nothrow) QAction{QIcon{":img/PREPEND_PARENT_FOLDER_NAMES"}, "Prepend parent folder names"};
   RENAME_RIBBONS = Get_Rename_Actions();
 
   _UPPER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_UPPER_CASE"), "Uppercase");
@@ -80,7 +80,7 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
         QString("<b>%1 (%2)</b><br/> Convert unicode charset in name to ascii").arg(_CONVERT_UNICODE_TO_ASCII->text(), _CONVERT_UNICODE_TO_ASCII->shortcut().toString()));
 
   _PREPEND_PARENT_FOLDER_NAMES->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Prepend parent folder name to file selected").arg(_PREPEND_PARENT_FOLDER_NAMES->text(), _PREPEND_PARENT_FOLDER_NAMES->shortcut().toString()));
+        QString("<b>%1 (%2)</b><br/> Prepend parent folder name to files under user selected folders").arg(_PREPEND_PARENT_FOLDER_NAMES->text(), _PREPEND_PARENT_FOLDER_NAMES->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
