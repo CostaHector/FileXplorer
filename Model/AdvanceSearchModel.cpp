@@ -142,23 +142,14 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
       default:
         return {};
     }
-  } else if (role == Qt::DecorationRole) {
-    if (index.column() == 0) {
-      if (mCutIndexes.contain(rootPath(), index)) {
-        static const QIcon CUT_ICON{":img/CUT_ITEM"};
-        return CUT_ICON;
-      } else if (mCopyIndexes.contain(rootPath(), index)) {
-        static const QIcon COPY_ICON{":img/COPY_ITEM"};
-        return COPY_ICON;
-      }
-      static QHash<QString, QIcon> ext2Icon{{"", m_iconProvider.icon(QFileIconProvider::IconType::Folder)}};
-      const QString& extExtDot{m_itemsLst[index.row()].type};
-      auto it = ext2Icon.constFind(extExtDot);
-      if (it == ext2Icon.constEnd()) {
-        return ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo{extExtDot});
-      }
-      return it.value();
+  } else if (role == Qt::DecorationRole && index.column() == 0) {
+    static QHash<QString, QIcon> ext2Icon{{"", m_iconProvider.icon(QFileIconProvider::IconType::Folder)}};
+    const QString& extExtDot{m_itemsLst[index.row()].type};
+    auto it = ext2Icon.constFind(extExtDot);
+    if (it == ext2Icon.constEnd()) {
+      return ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo{extExtDot});
     }
+    return it.value();
   } else if (role == Qt::TextAlignmentRole) {
     if (index.column() == 1) {
       // Todo  | Qt::AlignVCenter
@@ -178,13 +169,20 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
 }
 
 QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const {
-  if (role == Qt::TextAlignmentRole) {
-    if (orientation == Qt::Vertical) {
+  if (orientation == Qt::Vertical) {
+    if (role == Qt::TextAlignmentRole) {
       return Qt::AlignRight;
+    } else if (role == Qt::DecorationRole) {
+      if (mCutIndexes.contains(rootPath(), section)) {
+        static const QIcon CUT_ICON{":img/CUT_ITEM"};
+        return CUT_ICON;
+      } else if (mCopyIndexes.contains(rootPath(), section)) {
+        static const QIcon COPY_ICON{":img/COPY_ITEM"};
+        return COPY_ICON;
+      }
     }
-  }
-  if (role == Qt::DisplayRole) {
-    if (orientation == Qt::Orientation::Horizontal) {
+  } else if (orientation == Qt::Orientation::Horizontal) {
+    if (role == Qt::DisplayRole) {
       return HORIZONTAL_HEADER_NAMES[section];
     }
     return section + 1;

@@ -31,7 +31,7 @@ struct FileProperty {
 // }
 
 class AdvanceSearchModel : public QAbstractTableModelPub {
- public:
+public:
   explicit AdvanceSearchModel(QObject* parent = nullptr);
 
   QDir::Filters filter() const { return m_filters; }
@@ -42,13 +42,13 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
 
   void updateSearchResultList();
   bool checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory = true);
-  auto initRootPath(const QString& path) -> void;
-  auto setRootPath(const QString& path) -> void;
-  auto forceRefresh() -> void { setRootPath(m_rootPath); }
+  void initRootPath(const QString& path);
+  void setRootPath(const QString& path);
+  void forceRefresh() { setRootPath(m_rootPath); }
 
-  auto initFilter(QDir::Filters initialFilters) -> void;
-  auto setFilter(QDir::Filters newFilters) -> void;
-  auto setRootPathAndFilter(const QString& path, QDir::Filters filters = QDir::Files) -> void;
+  void initFilter(QDir::Filters initialFilters);
+  void setFilter(QDir::Filters newFilters);
+  void setRootPathAndFilter(const QString& path, QDir::Filters filters = QDir::Files);
 
   QDirIterator::IteratorFlag bool2IteratorFlag(const bool isIncludeEnabled) const;
   void initIteratorFlag(QDirIterator::IteratorFlag initialFlags);
@@ -78,9 +78,7 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
     mCutIndexes.Set(rootPath(), cutIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
     foreach (auto beRng, beRngLst) {
-      if (beRng.first.isValid() && beRng.second.isValid()) {
-        emit dataChanged(beRng.first, beRng.second, {Qt::ItemDataRole::DecorationRole});
-      }
+      emit headerDataChanged(Qt::Orientation::Vertical, beRng.first, beRng.second);
     }
   }
   void CopiedSomething(const QModelIndexList& copiedIndexes) {
@@ -89,9 +87,7 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
     mCopyIndexes.Set(rootPath(), copiedIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
     foreach (auto beRng, beRngLst) {
-      if (beRng.first.isValid() && beRng.second.isValid()) {
-        emit dataChanged(beRng.first, beRng.second, {Qt::ItemDataRole::DecorationRole});
-      }
+      emit headerDataChanged(Qt::Orientation::Vertical, beRng.first, beRng.second);
     }
   }
 
@@ -165,7 +161,7 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
     return m_itemsLst[row].name;
   }
 
- private:
+private:
   QString m_rootPath;
   QList<FileProperty> m_itemsLst;
   QFileIconProvider m_iconProvider;
@@ -175,7 +171,7 @@ class AdvanceSearchModel : public QAbstractTableModelPub {
 
   SelectionsRangeHelper mCutIndexes, mCopyIndexes;
   QSet<QModelIndex> m_disableList;  // QFileSystemModel: only setNameFilter will effect this
-                                    // SearchModel: both setNameFilter and contents will effect this
+  // SearchModel: both setNameFilter and contents will effect this
   QSet<QModelIndex> m_recycleSet;
   static const QStringList HORIZONTAL_HEADER_NAMES;
 };

@@ -1,6 +1,7 @@
 #include "ClickableTextBrowser.h"
 #include "BrowserActions.h"
 #include "PublicVariable.h"
+#include "PublicMacro.h"
 #include "DisplayEnhancement.h"
 #include "TableFields.h"
 #include "FdBasedDb.h"
@@ -12,13 +13,18 @@
 #include <QTextCursor>
 #include <QSqlRecord>
 #include <QSqlField>
+#include <QDrag>
+#include <QMimeData>
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 
 const QString ClickableTextBrowser::HTML_H1_TEMPLATE{R"(<a href="file:///%1">%2</a>)"};
 const QString ClickableTextBrowser::HTML_IMG_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a><br/>\n)"};
 const QString ClickableTextBrowser::VID_LINK_TEMPLATE{R"(<a href="file:///%1">&#9654;%2</a>)"};
 constexpr int ClickableTextBrowser::HTML_IMG_FIXED_WIDTH;
-constexpr int ClickableTextBrowser::MIN_KEYWORD_LEN;
+constexpr int ClickableTextBrowser::MIN_SINGLE_SEARCH_PATTERN_LEN;
+constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;
 
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{parent} {
   setOpenLinks(false);
@@ -35,6 +41,7 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{paren
   connect(inst.SEARCH_MULTIPLE_TEXTS, &QAction::triggered, this, &ClickableTextBrowser::onSearchMultiSelectionReq);
   connect(inst.CLEAR_ALL_SELECTIONS, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
   connect(inst.EDITOR_MODE, &QAction::triggered, this, [this](bool bEditable){ setReadOnly(!bEditable);});
+  connect(inst.COPY_SELECTED_TEXT, &QAction::triggered, this, &ClickableTextBrowser::CopySelectedTextToClipboard);
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 
   AdjustButtonPosition();
@@ -61,7 +68,7 @@ QString ClickableTextBrowser::FormatSearchSentence(QString text) {
 
 void ClickableTextBrowser::onSearchSelectionReq() {
   QString searchKeyString = FormatSearchSentence(GetCurrentSelectedText());
-  if (searchKeyString.size() < MIN_KEYWORD_LEN) {
+  if (searchKeyString.size() < MIN_SINGLE_SEARCH_PATTERN_LEN) {
     LOG_WARN("Skip search, too short searchText:", searchKeyString);
     return;
   }
@@ -88,8 +95,9 @@ void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
     qDebug("User cancel search by selection");
     return;
   }
-  if (searchKeyString.size() < MIN_KEYWORD_LEN) {
-    LOG_WARN("Skip search, too short searchText:", searchKeyString);
+  if (searchKeyString.size() < MIN_SINGLE_SEARCH_PATTERN_LEN) {
+    QString msg = QString{"searchText[%1] should >= %2 chars]"}.arg(searchKeyString).arg(MIN_SINGLE_SEARCH_PATTERN_LEN);
+    LOG_WARN("Skip search, too short", msg);
     return;
   }
   qDebug("Search:[%s]", qPrintable(searchKeyString));
@@ -105,7 +113,8 @@ void ClickableTextBrowser::onSearchMultiSelectionReq() {
   bool bNeedSearchDb{false};
   const QString whereClause = BuildMultiKeywordLikeCondition(keywords, bNeedSearchDb);
   if (!bNeedSearchDb) {
-    LOG_WARN("Skip search, too short whereClause:", whereClause);
+    QString msg = QString{"Max Sub-Conditon keyword of whereClause[%1] should >= %2 chars]"}.arg(whereClause).arg(MIN_EACH_KEYWORD_LEN);
+    LOG_WARN("Skip search, too short", msg);
     return;
   }
   qDebug("Search:[%s]", qPrintable(whereClause));
@@ -134,7 +143,7 @@ QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whe
   static constexpr int SIZE_FILED_IND {(int)FdBasedDb::QUERY_KEY_INFO_FIELED::Size};
   static constexpr int PREPATH_R_FILED_IND {(int)FdBasedDb::QUERY_KEY_INFO_FIELED::PrePathRight};
 
-  for (const auto& record: records) {
+  for (const QSqlRecord& record: records) {
     const qint64 sz = record.field(SIZE_FILED_IND).value().toLongLong();
     searchResult += "<tr>";
     searchResult += QString{"<td>%1</td>"}.arg(FILE_PROPERTY_DSP::sizeToHumanReadFriendly(sz));
@@ -165,11 +174,19 @@ void ClickableTextBrowser::mousePressEvent(QMouseEvent *e) {
 }
 
 void ClickableTextBrowser::mouseMoveEvent(QMouseEvent *e) {
-  if (mbDragging) {
-    QTextCursor cursor = textCursor();
-    cursor.setPosition(cursorForPosition(mDraggingStartPos).position());
-    cursor.setPosition(cursorForPosition(e->pos()).position(), QTextCursor::KeepAnchor);
-    setTextCursor(cursor);
+  if (!mbDragging) {
+    if (e->buttons() & Qt::LeftButton) {
+      const QString& curString = GetCurrentSelectedText();
+      if (!curString.isEmpty()) {
+        QMimeData *mimeData = new (std::nothrow) QMimeData;
+        CHECK_NULLPTR_RETURN_VOID(mimeData);
+        mimeData->setText(curString);
+        QDrag *drag = new (std::nothrow) QDrag{this};
+        CHECK_NULLPTR_RETURN_VOID(drag);
+        drag->setMimeData(mimeData);
+        drag->exec(Qt::CopyAction);
+      }
+    }
   }
   QTextBrowser::mouseMoveEvent(e);
 }
@@ -224,17 +241,26 @@ QString ClickableTextBrowser::BuildMultiKeywordLikeCondition(const QStringList &
     if (keyword.isEmpty()) {
       continue;
     }
+    if (keyword.size() >= MIN_EACH_KEYWORD_LEN) {
+      pNeedSearchDb = true;
+    }
     searchText.clear();
     searchText += '%';
     searchText += keyword;
     searchText += '%';
-    if (searchText.size() >= MIN_KEYWORD_LEN) {
-      pNeedSearchDb = true;
-    }
     conditions.push_back(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg(searchText));
   }
   if (conditions.isEmpty()) {
     return "1=1";
   }
   return conditions.join(" AND ");
+}
+
+void ClickableTextBrowser::CopySelectedTextToClipboard() const {
+  QClipboard* pClipboard = QApplication::clipboard();
+  if (pClipboard == nullptr) {
+    LOG_BAD("Copy failed", "pClipboard is nullptr");
+    return;
+  }
+  pClipboard->setText(GetCurrentSelectedText());
 }

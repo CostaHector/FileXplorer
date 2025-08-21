@@ -23,6 +23,7 @@ public:
   QAction *CLEAR_ALL_SELECTIONS{nullptr};
   QAction *EDITOR_MODE{nullptr};
 
+  QAction* COPY_SELECTED_TEXT{nullptr};
 private:
   explicit BrowserActions(QObject *parent=nullptr);
 };

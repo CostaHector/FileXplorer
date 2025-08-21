@@ -71,22 +71,24 @@ Qt::DropActions FileSystemModel::supportedDragActions() const {
   return Qt::MoveAction | Qt::CopyAction | Qt::LinkAction;
 }
 
-QVariant FileSystemModel::data(const QModelIndex& index, int role) const {
-  if (role == Qt::DecorationRole && index.column() == 0) {
-    if (mCutIndexes.contain(rootPath(), index)) {
-      static const QIcon CUT_ICON{":img/CUT_ITEM"};
-      return CUT_ICON;
-    } else if (mCopyIndexes.contain(rootPath(), index)) {
-      static const QIcon COPY_ICON{":img/COPY_ITEM"};
-      return COPY_ICON;
-    }
-  } else if (role == Qt::ForegroundRole) {
-    if (m_draggedHoverIndex == index) {
-      static const QColor DRAG_HOVER_COLOR {Qt::cyan};
-      return DRAG_HOVER_COLOR;
+QVariant FileSystemModel::headerData(int section, Qt::Orientation orientation, int role) const {
+  if (orientation == Qt::Vertical) {
+    if (role == Qt::TextAlignmentRole) {
+      return Qt::AlignRight;
+    } else if (role == Qt::DecorationRole) {
+      if (m_draggedHoverIndex.row() == section) {
+        static const QIcon DROP_HERE_ICON{":img/DROP_HERE"};
+        return DROP_HERE_ICON;
+      } else if (mCutIndexes.contains(rootPath(), section)) {
+        static const QIcon CUT_ICON{":img/CUT_ITEM"};
+        return CUT_ICON;
+      } else if (mCopyIndexes.contains(rootPath(), section)) {
+        static const QIcon COPY_ICON{":img/COPY_ITEM"};
+        return COPY_ICON;
+      }
     }
   }
-  return QFileSystemModel::data(index, role);
+  return QFileSystemModel::headerData(section, orientation, role);
 }
 
 void FileSystemModel::whenDirectoryLoaded(const QString& path) {
