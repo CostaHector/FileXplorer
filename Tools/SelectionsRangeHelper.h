@@ -2,7 +2,6 @@
 #define SELECTIONSRANGEHELPER_H
 
 #include <QModelIndex>
-#include <QItemSelection>
 #include <QSet>
 
 struct SelectionsRangeHelper {
@@ -13,35 +12,38 @@ public:
 
   void clear() {
     currentPath.clear();
-    selections.clear();
+    topLeft2BottomLeftLst.clear();
     indexesSet.clear();
   }
 
-  void Set(const QString& rootpath, const QItemSelection& rhs) {
+  void Set(const QString& rootpath, const QModelIndexList& rhs) {
     currentPath = rootpath;
-    selections = rhs;
-    const auto& indexesList = rhs.indexes();
-    QSet<QModelIndex> indexesAppend {indexesList.cbegin(), indexesList.cend()};
+    if (rhs.isEmpty()) {return;}
+    int begin = 0;
+    int end = 0;
+    for (int i = 1; i < rhs.size(); ++i) {
+      const QModelIndex& current = rhs[i];
+      if (current.row() == rhs[end].row() + 1) {
+        end = i;
+      } else {
+        topLeft2BottomLeftLst.append({rhs[begin], rhs[end]});
+        begin = i;
+        end = i;
+      }
+    }
+    topLeft2BottomLeftLst.append({rhs[begin], rhs[end]});
+
+    QSet<QModelIndex> indexesAppend {rhs.cbegin(), rhs.cend()};
     indexesSet.swap(indexesAppend);
   }
 
   QList<std::pair<QModelIndex, QModelIndex>> GetTopBottomRange() const {
-    if (selections.isEmpty()) {
-      return {};
-    }
-    decltype(GetTopBottomRange()) ans;
-    ans.reserve(selections.size());
-    const auto& mdl = selections.front().model();
-    const auto& par = selections.front().parent();
-    for (const auto& rng: selections) {
-      ans.push_back(std::make_pair(rng.topLeft(), mdl->index(rng.bottom(), rng.left(), par)));
-    }
-    return ans;
+    return topLeft2BottomLeftLst;
   }
 
 private:
   QString currentPath;
-  QItemSelection selections;
+  QList<std::pair<QModelIndex, QModelIndex>> topLeft2BottomLeftLst;
   QSet<QModelIndex> indexesSet;
 };
 
