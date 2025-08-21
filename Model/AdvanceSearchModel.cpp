@@ -169,7 +169,11 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
 }
 
 QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const {
-  if (orientation == Qt::Vertical) {
+  if (orientation == Qt::Orientation::Horizontal) {
+    if (role == Qt::DisplayRole) {
+      return HORIZONTAL_HEADER_NAMES[section];
+    }
+  } else if (orientation == Qt::Vertical) {
     if (role == Qt::TextAlignmentRole) {
       return Qt::AlignRight;
     } else if (role == Qt::DecorationRole) {
@@ -180,12 +184,9 @@ QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation
         static const QIcon COPY_ICON{":img/COPY_ITEM"};
         return COPY_ICON;
       }
+    } else if (role == Qt::DisplayRole){
+      return section + 1;
     }
-  } else if (orientation == Qt::Orientation::Horizontal) {
-    if (role == Qt::DisplayRole) {
-      return HORIZONTAL_HEADER_NAMES[section];
-    }
-    return section + 1;
   }
   return QAbstractTableModel::headerData(section, orientation, role);
 }
