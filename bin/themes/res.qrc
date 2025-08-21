@@ -130,6 +130,7 @@
 <file alias="COPY_RECORD">RightClickIcon/COPY_RECORD.svg</file>
 <file alias="CUT_ITEM">RightClickIcon/CUT_ITEM.svg</file>
 <file alias="PASTE_ITEM">RightClickIcon/PASTE_ITEM.svg</file>
+<file alias="DROP_HERE">RightClickIcon/DROP_HERE.svg</file>
 <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5FileIdentifier.png</file>
 <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
 <file alias="REFRESH_SEARCH_SOURCE">RightClickIcon/REFRESH_SEARCH_SOURCE.svg</file>
