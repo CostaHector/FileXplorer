@@ -138,7 +138,6 @@
 <file alias="FILE_STRUCTURE_QUERY">RightClickIcon/FILE_STRUCTURE_QUERY.svg</file>
 <file alias="FILE_STRUCTURE_FLATTEN">RightClickIcon/FILE_STRUCTURE_FLATTEN.svg</file>
 <file alias="FILE_STRUCTURE_PRESERVE">RightClickIcon/FILE_STRUCTURE_PRESERVE.svg</file>
-<file alias="CHECKED">RightClickIcon/CHECKED.png</file>
 
 <!--JsonEditor Icon here        -->
 <file alias="JSON_EDITOR">JsonEditor/JSON_EDITOR.png</file>
@@ -211,6 +210,7 @@
 <file alias="SHOW_PERFORMER_STUDIO_STATISTIC">NameStrIcon/SHOW_PERFORMER_STUDIO_STATISTIC.svg</file>
 <file alias="COPY_TEXT">NameStrIcon/COPY_TEXT.svg</file>
 <file alias="COMMAND_PREVIEW">NameStrIcon/COMMAND_PREVIEW.svg</file>
+<file alias="PREPEND_PARENT_FOLDER_NAMES">NameStrIcon/PREPEND_PARENT_FOLDER_NAMES.svg</file>
 
 <!--PreferenceIcons icon here-->
 <file alias="BACKGROUND_IMAGE_PATH">PreferenceIcons/BACKGROUND_IMAGE_PATH.ico</file>
