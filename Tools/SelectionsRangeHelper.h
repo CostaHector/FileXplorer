@@ -2,58 +2,52 @@
 #define SELECTIONSRANGEHELPER_H
 
 #include <QModelIndex>
-#include <QSet>
+#include <bitset>
 
-struct SelectionsRangeHelper {
+class SelectionsRangeHelper {
 public:
-  bool contains(const QString& rootpath, int row) const {
-    return currentPath == rootpath && indexesSet.contains(row);
+  bool contains(const QString& rootpath, unsigned row) const {
+    return currentPath == rootpath && row < MAX_INDEX_CNT && mSelectedRowBits.test(row);
   }
 
   void clear() {
     currentPath.clear();
-    topLeft2BottomLeftLst.clear();
-    indexesSet.clear();
+    mRowRangeList.clear();
+    mSelectedRowBits.reset();
   }
 
-  void Set(const QString& rootpath, const QModelIndexList& rhs) {
+  void Set(const QString& rootpath, const QModelIndexList& selectedRows) {
     clear();
     currentPath = rootpath;
 
-    if (rhs.isEmpty()) {return;}
-
-    for (const QModelIndex& ind: rhs) {
-      indexesSet.insert(ind.row());
+    if (selectedRows.isEmpty()) {return;}
+    for (const QModelIndex& ind: selectedRows) {
+      mSelectedRowBits.set(ind.row());
     }
-
-    if (rhs.size() == rhs.back().row() - rhs.front().row() + 1) { // [topRow, bottomRow]
-      topLeft2BottomLeftLst.append({rhs.front().row(), rhs.back().row()});
+    if (selectedRows.size() == selectedRows.back().row() - selectedRows.front().row() + 1) { // [topRow, bottomRow]
+      mRowRangeList.append({selectedRows.front().row(), selectedRows.back().row()});
       return;
     }
 
-    int top = 0;
-    int bottom = 0; // [top, bottom]
-    for (int i = 1; i < rhs.size(); ++i) {
-      const QModelIndex& current = rhs[i];
-      if (current.row() == rhs[bottom].row() + 1) {
-        bottom = i;
-      } else {
-        topLeft2BottomLeftLst.append({rhs[top].row(), rhs[bottom].row()});
+    int top = 0, bottom = 0; // [top, bottom]
+    for (int i = 1; i < selectedRows.size(); ++i) {
+      if (selectedRows[i].row() != selectedRows[bottom].row() + 1) {
+        mRowRangeList.append({selectedRows[top].row(), selectedRows[bottom].row()});
         top = i;
-        bottom = i;
       }
+      bottom = i;
     }
-    topLeft2BottomLeftLst.append({rhs[top].row(), rhs[bottom].row()});
+    mRowRangeList.append({selectedRows[top].row(), selectedRows[bottom].row()});
   }
 
   QList<std::pair<int, int>> GetTopBottomRange() const {
-    return topLeft2BottomLeftLst;
+    return mRowRangeList;
   }
 
 private:
   QString currentPath;
-  QList<std::pair<int, int>> topLeft2BottomLeftLst; // [front, back] contain endpoint
-  QSet<int> indexesSet;
+  QList<std::pair<int, int>> mRowRangeList; // [front, back] contain endpoint
+  static constexpr int MAX_INDEX_CNT = 4096;
+  std::bitset<MAX_INDEX_CNT> mSelectedRowBits{0};
 };
-
 #endif // SELECTIONSRANGEHELPER_H

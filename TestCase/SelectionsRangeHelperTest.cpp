@@ -31,15 +31,15 @@ private slots:
 
     rngHelper.Set("/home/to/path", {ind00});
     QCOMPARE(rngHelper.currentPath, "/home/to/path");
-    QCOMPARE(rngHelper.topLeft2BottomLeftLst, (QList<std::pair<int, int>>{{0,0}}));
-    QCOMPARE(rngHelper.indexesSet, (QSet<int>{0}));
+    QCOMPARE(rngHelper.mRowRangeList, (QList<std::pair<int, int>>{{0,0}}));
+    QVERIFY(rngHelper.mSelectedRowBits.any());
     QVERIFY(rngHelper.contains("/home/to/path", 0));
     QVERIFY(!rngHelper.contains("/home/to/path", 1));
 
     rngHelper.clear();
     QVERIFY(rngHelper.currentPath.isEmpty());
-    QVERIFY(rngHelper.topLeft2BottomLeftLst.isEmpty());
-    QVERIFY(rngHelper.indexesSet.isEmpty());
+    QVERIFY(rngHelper.mRowRangeList.isEmpty());
+    QVERIFY(rngHelper.mSelectedRowBits.none());
 
     QModelIndex ind10 = model.index(1, 0);
     rngHelper.Set("/home/to/path", {ind10});
@@ -57,13 +57,15 @@ private slots:
 
     rngHelper.Set("/home/to/path", {ind00, ind10, ind20, ind30});
     QCOMPARE(rngHelper.currentPath, "/home/to/path");
-    QCOMPARE(rngHelper.topLeft2BottomLeftLst, (QList<std::pair<int, int>>{{0,3}}));
+    QCOMPARE(rngHelper.mRowRangeList, (QList<std::pair<int, int>>{{0,3}}));
     QCOMPARE(rngHelper.GetTopBottomRange().size(), 1);
-    QCOMPARE(rngHelper.indexesSet, (QSet<int>{0,1,2,3}));
+    QVERIFY(rngHelper.mSelectedRowBits.any());
     QVERIFY(rngHelper.contains("/home/to/path", 0));
     QVERIFY(rngHelper.contains("/home/to/path", 1));
     QVERIFY(rngHelper.contains("/home/to/path", 2));
     QVERIFY(rngHelper.contains("/home/to/path", 3));
+    QVERIFY(!rngHelper.contains("/home/to/path", 4096));
+    QVERIFY(!rngHelper.contains("/home/to/path", 4097));
   }
 
   void test_discete_index_ok() {
@@ -79,9 +81,9 @@ private slots:
 
     rngHelper.Set("/home/to/path", {ind00, ind10, ind30, ind50, ind60});
     QCOMPARE(rngHelper.currentPath, "/home/to/path");
-    QCOMPARE(rngHelper.topLeft2BottomLeftLst, (QList<std::pair<int, int>>{{0,1}, {3,3}, {5,6}}));
+    QCOMPARE(rngHelper.mRowRangeList, (QList<std::pair<int, int>>{{0,1}, {3,3}, {5,6}}));
     QCOMPARE(rngHelper.GetTopBottomRange().size(), 3);
-    QCOMPARE(rngHelper.indexesSet, (QSet<int>{0,1,3,5,6}));
+    QVERIFY(rngHelper.mSelectedRowBits.any());
 
     QVERIFY(rngHelper.contains("/home/to/path", 0));
     QVERIFY(rngHelper.contains("/home/to/path", 6));
