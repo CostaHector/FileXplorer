@@ -4,11 +4,9 @@
 #include "CustomTableView.h"
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
-    : CustomTableView("ADVANCE_SEARCH_SYSTEM", parent),
-      m_searchMenu{new AdvanceSearchMenu("Search right click menu", this)},
-      _sourceModel(sourceModel),
-      _searchProxyModel(searchProxyModel) {
-  BindMenu(m_searchMenu);
+  : CustomTableView{"ADVANCE_SEARCH_SYSTEM", parent},
+  _sourceModel(sourceModel),
+  _searchProxyModel(searchProxyModel) {
 
   _searchProxyModel->setSourceModel(_sourceModel);
   setModel(_searchProxyModel);
@@ -24,17 +22,19 @@ AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, 
 
 void AdvanceSearchTableView::subscribe() {
   connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, [this](const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
-    if (_logger) {
+    if (_logger != nullptr) {
       _logger->pathInfo(selectionModel()->selectedRows().size(), 1);
     }
   });
-  connect(m_searchMenu->_FORCE_REFRESH_SEARCH_SOURCE, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
+
+  auto& fileOpInst = g_fileBasicOperationsActions();
+  connect(fileOpInst._FORCE_RESEARCH, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
 
   addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
-  addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
-  addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
-  addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
-  addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+  addActions(fileOpInst.OPEN_AG->actions());
+  addActions(fileOpInst.COPY_PATH_AG->actions());
+  addActions(fileOpInst.CUT_COPY_PASTE->actions());
+  addActions(fileOpInst.DELETE_ACTIONS->actions());
 }
 
 void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {
@@ -49,8 +49,8 @@ void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {
   _logger = logger;
 }
 
-auto AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) -> void {
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
+void AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) {
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
     emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
     return;
   }
@@ -63,11 +63,11 @@ auto AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) -> void {
 #include <QMainWindow>
 #include "MemoryKey.h"
 class AdvanceSearchTableViewWindowTest : public QMainWindow {
- public:
+public:
   explicit AdvanceSearchTableViewWindowTest(QWidget* parent = nullptr) : QMainWindow(parent) {
     const QString restoredPath = "D:/extra";
     QDir::Filters restoredFilters{
-        PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()};
+                                  PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()};
     m_searchSrcModel->setRootPathAndFilter(restoredPath, restoredFilters);
     m_proxyModel->setSourceModel(m_searchSrcModel);
 
@@ -90,7 +90,7 @@ class AdvanceSearchTableViewWindowTest : public QMainWindow {
     return true;
   }
 
- private:
+private:
   AdvanceSearchToolBar* m_tb = new AdvanceSearchToolBar("advance search tb", this);
   AdvanceSearchModel* m_searchSrcModel = new AdvanceSearchModel;
   SearchProxyModel* m_proxyModel = new SearchProxyModel;

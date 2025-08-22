@@ -87,7 +87,7 @@ JsonActions::JsonActions(QObject* parent)  //
   _STUDIO_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/STUDIO"), "Set Studio");
   _STUDIO_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input studio string and used to set Studio field")  //
                                     .arg(_STUDIO_FIELD_SET->text(), _STUDIO_FIELD_SET->shortcut().toString()));
-  _CAST_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/CAST_SET"), "Set Cast");
+  _CAST_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), "Set Cast");
   _CAST_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input a sentence used to set Cast field")  //
                                   .arg(_CAST_FIELD_SET->text(), _CAST_FIELD_SET->shortcut().toString()));
   _CAST_FIELD_APPEND = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), "Add Cast");

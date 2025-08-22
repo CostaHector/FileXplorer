@@ -29,7 +29,7 @@ QString SysTerminal::UpdateBatFile(const QString& command) const {
 #endif
 
 bool SysTerminal::operator()(const QString& path) {
-  const QFileInfo fi(path);
+  const QFileInfo fi{path};
   if (!fi.exists()) {
     qDebug("path[%s] not exist", qPrintable(path));
     return false;

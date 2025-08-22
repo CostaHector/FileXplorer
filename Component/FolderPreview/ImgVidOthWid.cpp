@@ -33,20 +33,19 @@ ImgVidOthWid::ImgVidOthWid(const QString& memoryName, QWidget* parent)://
   _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "0", this};
   CHECK_NULLPTR_RETURN_VOID(_IMG_ACT)
   _IMG_ACT->setToolTip("Image(s) file count");
+  _IMG_ACT->setCheckable(true);
+  _IMG_ACT->setChecked(m_bImgVisible);
 
   _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, "0", this};
   CHECK_NULLPTR_RETURN_VOID(_VID_ACT)
   _VID_ACT->setToolTip("Video(s) file count");
+  _VID_ACT->setCheckable(true);
+  _VID_ACT->setChecked(m_bVidVisible);
 
   _OTH_ACT = new (std::nothrow) QAction{QIcon{":img/FILE"}, "0", this};
   CHECK_NULLPTR_RETURN_VOID(_OTH_ACT)
   _OTH_ACT->setToolTip("Other(s) file count");
-
-  _IMG_ACT->setCheckable(true);
-  _VID_ACT->setCheckable(true);
   _OTH_ACT->setCheckable(true);
-  _IMG_ACT->setChecked(m_bImgVisible);
-  _VID_ACT->setChecked(m_bVidVisible);
   _OTH_ACT->setChecked(m_bOthVisible);
 
   // init for mTypeToDisplayTB

@@ -2,7 +2,23 @@
 #include "AddressBarActions.h"
 #include "RightClickMenuActions.h"
 #include "PublicMacro.h"
-#include <QHBoxLayout>
+#include <QKeySequence>
+
+SplitToolButton::SplitToolButton(QWidget *parent) : QToolButton{parent} {
+  topShortcut = new (std::nothrow) QShortcut{QKeySequence{Qt::ControlModifier | Qt::Key_BracketLeft}, this};
+  CHECK_NULLPTR_RETURN_VOID(topShortcut)
+  connect(topShortcut, &QShortcut::activated, this, &SplitToolButton::topHalfClicked);
+
+  bottomShortcut = new (std::nothrow) QShortcut{QKeySequence{Qt::ControlModifier | Qt::Key_BracketRight}, this};
+  CHECK_NULLPTR_RETURN_VOID(bottomShortcut)
+  connect(bottomShortcut, &QShortcut::activated, this, &SplitToolButton::bottomHalfClicked);
+}
+
+QString SplitToolButton::GetShortcutString(const QString& topAction, const QString& bottomAction) const {
+  return QString{"%1(%2)<br/>%3(%4)"}//
+      .arg(topAction).arg(topShortcut->key().toString())//
+      .arg(bottomAction).arg(bottomShortcut->key().toString());
+}
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {
   m_addressLine = new (std::nothrow) AddressELineEdit{this};
@@ -20,15 +36,22 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
       "For JsonModel(Regex) e.g., target1.*?target2");
   mFsSearchLE->setMinimumWidth(40);
 
-  m_fsFilter = new (std::nothrow) FileSystemTypeFilter;
+  m_fsFilter = new (std::nothrow) FileSystemTypeFilter{this};
   CHECK_NULLPTR_RETURN_VOID(m_fsFilter)
+
+  mLastNextFolderTb = new (std::nothrow) SplitToolButton{this};
+  CHECK_NULLPTR_RETURN_VOID(mLastNextFolderTb)
+  mLastNextFolderTb->setIcon(QIcon(":img/NEXT_OR_LAST_FOLDER"));
+  QString iteratorToolbuttonTooltip = "Into ";
+  iteratorToolbuttonTooltip += mLastNextFolderTb->GetShortcutString("Last folder", "Next Folder");
+  mLastNextFolderTb->setToolTip(iteratorToolbuttonTooltip);
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
   addWidget(m_addressLine);
   addAction(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL);
   addSeparator();
-  addActions(g_addressBarActions()._FOLDER_ITER_CONTROLS->actions());
+  addWidget(mLastNextFolderTb);
   addSeparator();
   addWidget(m_fsFilter);
   addSeparator();
@@ -51,8 +74,8 @@ void NavigationAndAddressBar::InitEventWhenViewChanged() {
   connect(g_addressBarActions()._FORWARD_TO, &QAction::triggered, this, &NavigationAndAddressBar::onForward);
   connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onUpTo);
 
-  connect(g_addressBarActions()._LAST_FOLDER, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToLastFolder);
-  connect(g_addressBarActions()._NEXT_FOLDER, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToNextFolder);
+  connect(mLastNextFolderTb, &SplitToolButton::topHalfClicked, this, &NavigationAndAddressBar::onIteratorToLastFolder);
+  connect(mLastNextFolderTb, &SplitToolButton::bottomHalfClicked, this, &NavigationAndAddressBar::onIteratorToNextFolder);
 
   connect(mFsSearchLE, &QLineEdit::textChanged, this, &NavigationAndAddressBar::onSearchTextChanged);
   connect(mFsSearchLE, &QLineEdit::returnPressed, this, &NavigationAndAddressBar::onSearchTextReturnPressed);
@@ -142,7 +165,7 @@ bool NavigationAndAddressBar::onSearchTextReturnPressed() {
 #include <QApplication>
 
 class IntoNewPathMockClass {
- public:
+public:
   bool IntoNewPath(QString a, bool b, bool c) {
     qDebug("IntoNewPath: %s, %d, %d", qPrintable(a), b, c);
     return true;

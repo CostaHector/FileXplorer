@@ -14,9 +14,8 @@
 #include "SearchProxyModel.h"
 
 class FileSystemTypeFilter : public QToolButton {
-  Q_OBJECT
- public:
-  FileSystemTypeFilter(QWidget* parent = nullptr);
+public:
+  explicit FileSystemTypeFilter(QWidget* parent = nullptr);
   void BindFileSystemModel(QFileSystemModel* newModel);
   void BindFileSystemModel(AdvanceSearchModel* newModel, SearchProxyModel* newProxyModel);
   void onSwitchChanged(bool isOn);
@@ -35,29 +34,29 @@ class FileSystemTypeFilter : public QToolButton {
 
   static const QDir::Filters DEFAULT_FILTER_FLAG;
 
- private:
-  QAction* FILTER_SWITCH = new (std::nothrow) QAction(QIcon(":img/FILE_SYSTEM_FILTER"), "Filter", this);
+private:
+  QAction* FILTER_SWITCH = new (std::nothrow) QAction{QIcon{":img/FILE_SYSTEM_FILTER"}, "Filter", this};
 
-  QMenu* fileTypeFilterMenu = new QMenu(tr("Filter Menu"), this);
-  QAction* FILES = new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_FileIcon), "Files", fileTypeFilterMenu);
-  QAction* DIRS = new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), "Dirs", fileTypeFilterMenu);
-  QAction* DRIVES = new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon), "Drives", fileTypeFilterMenu);
-  QAction* HIDDEN = new (std::nothrow) QAction(QIcon(":img/HIDDEN"), "Hidden", fileTypeFilterMenu);
-  QAction* NO_DOT = new (std::nothrow) QAction(QIcon(":img/NO_DOT"), "NoDot", fileTypeFilterMenu);
-  QAction* NO_DOT_DOT = new (std::nothrow) QAction(QIcon(":img/NO_DOT_DOT"), "NoDotDot", fileTypeFilterMenu);
-  QAction* CASE_SENSITIVE = new (std::nothrow) QAction(QIcon(":img/NAME_STR_CASE"), "Case Sensitive", fileTypeFilterMenu);
-  QAction* DISABLE_ENTRIES_DONT_PASS_FILTER = new (std::nothrow) QAction(tr("disable the entries don't pass name filter"), fileTypeFilterMenu);
-  QAction* INCLUDING_SUBDIRECTORIES = new (std::nothrow) QAction(tr("Including Subdirs"), fileTypeFilterMenu);
+  QMenu* fileTypeFilterMenu{new (std::nothrow) QMenu{"Filter Menu", this}};
+  QAction* FILES {new (std::nothrow) QAction{QIcon{":img/FILE"}, "Files", fileTypeFilterMenu}};
+  QAction* DIRS  {new (std::nothrow) QAction{QIcon{":img/FOLDER"}, "Dirs", fileTypeFilterMenu}};
+  QAction* DRIVES{new (std::nothrow) QAction{QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon), "Drives", fileTypeFilterMenu}};
+  QAction* HIDDEN{new (std::nothrow) QAction{QIcon{":img/HIDDEN"}, "Hidden", fileTypeFilterMenu}};
+  QAction* NO_DOT{new (std::nothrow) QAction{QIcon{":img/NO_DOT"}, "NoDot", fileTypeFilterMenu}};
+  QAction* NO_DOT_DOT{new (std::nothrow) QAction{QIcon{":img/NO_DOT_DOT"}, "NoDotDot", fileTypeFilterMenu}};
+  QAction* CASE_SENSITIVE{new (std::nothrow) QAction{QIcon{":img/NAME_STR_CASE"}, "Case Sensitive", fileTypeFilterMenu}};
+  QAction* DISABLE_ENTRIES_DONT_PASS_FILTER{new (std::nothrow) QAction{"disable the entries don't pass name filter", fileTypeFilterMenu}};
+  QAction* INCLUDING_SUBDIRECTORIES{new (std::nothrow) QAction{"Including Subdirs", fileTypeFilterMenu}};
 
-  QActionGroup* m_FILTER_FLAG_AGS = new (std::nothrow) QActionGroup(this);
+  QActionGroup* m_FILTER_FLAG_AGS{new (std::nothrow) QActionGroup{this}};
 
-  QHash<QString, QDir::Filter> m_text2FilterFlag = {{FILES->text(), QDir::Files},
-                                                    {DIRS->text(), QDir::Dirs},
-                                                    {DRIVES->text(), QDir::Drives},
-                                                    {HIDDEN->text(), QDir::Hidden},
-                                                    {NO_DOT->text(), QDir::NoDot},
-                                                    {NO_DOT_DOT->text(), QDir::NoDotDot},
-                                                    {CASE_SENSITIVE->text(), QDir::CaseSensitive}};
+  const QHash<QString, QDir::Filter> m_text2FilterFlag {{FILES->text(), QDir::Files},
+                                                       {DIRS->text(), QDir::Dirs},
+                                                       {DRIVES->text(), QDir::Drives},
+                                                       {HIDDEN->text(), QDir::Hidden},
+                                                       {NO_DOT->text(), QDir::NoDot},
+                                                       {NO_DOT_DOT->text(), QDir::NoDotDot},
+                                                       {CASE_SENSITIVE->text(), QDir::CaseSensitive}};
 
   QFileSystemModel* _fsmModel{nullptr};
   AdvanceSearchModel* _searchSourceModel{nullptr};

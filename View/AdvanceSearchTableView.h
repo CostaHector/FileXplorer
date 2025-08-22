@@ -2,7 +2,6 @@
 #define ADVANCESEARCHTABLEVIEW_H
 
 #include "AdvanceSearchModel.h"
-#include "AdvanceSearchMenu.h"
 #include "CustomStatusBar.h"
 #include "CustomTableView.h"
 #include "SearchProxyModel.h"
@@ -19,10 +18,9 @@ class AdvanceSearchTableView : public CustomTableView {
 
   void BindLogger(CustomStatusBar* logger);
 
-  auto keyPressEvent(QKeyEvent* e) -> void override;
+  void keyPressEvent(QKeyEvent* e) override;
 
  private:
-  AdvanceSearchMenu* m_searchMenu;
   AdvanceSearchModel* _sourceModel;
   SearchProxyModel* _searchProxyModel;
   CustomStatusBar* _logger{nullptr};

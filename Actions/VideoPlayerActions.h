@@ -34,7 +34,7 @@ class VideoPlayerActions : public QObject {
   QAction* _MARK_HOT_SCENE{new (std::nothrow) QAction(QIcon(":img/MARK_HOT_SCENE_POSITION"), tr("mark"), this)};
   QAction* _GRAB_FRAME{new (std::nothrow) QAction(QIcon(":img/GRAB_FRAME"), tr("grab"), this)};
   QAction* _RENAME_VIDEO{new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("rename"), this)};
-  QAction* _MOD_CAST{new (std::nothrow) QAction(QIcon(":img/CAST_SET"), tr("mod performers"), this)};
+  QAction* _MOD_CAST{new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("mod performers"), this)};
 
   QActionGroup* _RATE_AG{GetRateActionGroups()};
   QAction* _REVEAL_IN_EXPLORER{new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"), this)};
