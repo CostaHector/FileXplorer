@@ -5,7 +5,7 @@
 #include "PublicVariable.h"
 #include <QMessageBox>
 
-const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"name", "size", "type", "date", "relative path"};
+const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"Name", "Size", "Type", "Date", "Relative path"};
 
 AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
   : QAbstractTableModelPub{parent},
@@ -20,10 +20,10 @@ void AdvanceSearchModel::updateSearchResultList() {
   QDirIterator it{m_rootPath, m_filters, m_iteratorFlags};
   QString fileName;
   const int ROOT_PATH_N = m_rootPath.size() + 1;
+  using namespace PathTool;
   while (it.hasNext()) {
-    using namespace PathTool;
     it.next();
-    QFileInfo fi = it.fileInfo();
+    QFileInfo fi{it.fileInfo()};
     fileName = fi.fileName();
     newPlanetList.append(FileProperty{
         fileName, fi.size(),                                            //
@@ -124,32 +124,41 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
     return {};
   }
-  if (index.row() < 0 || index.row() >= rowCount()) {
+  const int r = index.row();
+  if (r < 0 || r >= rowCount()) {
     return {};
   }
   if (role == Qt::DisplayRole) {
     switch (index.column()) {
       case 0:
-        return m_itemsLst[index.row()].name;
+        return m_itemsLst[r].name;
       case 1:
-        return m_itemsLst[index.row()].size;
+        return m_itemsLst[r].size;
       case 2:
-        return m_itemsLst[index.row()].type;
+        return m_itemsLst[r].type;
       case 3:
-        return m_itemsLst[index.row()].modifiedDate;
+        return m_itemsLst[r].modifiedDate;
       case 4:
-        return m_itemsLst[index.row()].relPath;
+        return m_itemsLst[r].relPath;
       default:
         return {};
     }
   } else if (role == Qt::DecorationRole && index.column() == 0) {
-    static QHash<QString, QIcon> ext2Icon{{"", m_iconProvider.icon(QFileIconProvider::IconType::Folder)}};
-    const QString& extExtDot{m_itemsLst[index.row()].type};
-    auto it = ext2Icon.constFind(extExtDot);
-    if (it == ext2Icon.constEnd()) {
-      return ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo{extExtDot});
+    if (mCutIndexes.contains(rootPath(), r)) {
+      static const QIcon CUT_ICON{":img/CUT_ITEM"};
+      return CUT_ICON;
+    } else if (mCopyIndexes.contains(rootPath(), r)) {
+      static const QIcon COPY_ICON{":img/COPY_ITEM"};
+      return COPY_ICON;
+    } else {
+      static QHash<QString, QIcon> ext2Icon{{"", m_iconProvider.icon(QFileIconProvider::IconType::Folder)}};
+      const QString& extExtDot{m_itemsLst[r].type};
+      auto it = ext2Icon.constFind(extExtDot);
+      if (it == ext2Icon.constEnd()) {
+        return ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo{extExtDot});
+      }
+      return it.value();
     }
-    return it.value();
   } else if (role == Qt::TextAlignmentRole) {
     if (index.column() == 1) {
       // Todo  | Qt::AlignVCenter
@@ -176,14 +185,6 @@ QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation
   } else if (orientation == Qt::Vertical) {
     if (role == Qt::TextAlignmentRole) {
       return Qt::AlignRight;
-    } else if (role == Qt::DecorationRole) {
-      if (mCutIndexes.contains(rootPath(), section)) {
-        static const QIcon CUT_ICON{":img/CUT_ITEM"};
-        return CUT_ICON;
-      } else if (mCopyIndexes.contains(rootPath(), section)) {
-        static const QIcon COPY_ICON{":img/COPY_ITEM"};
-        return COPY_ICON;
-      }
     } else if (role == Qt::DisplayRole){
       return section + 1;
     }
