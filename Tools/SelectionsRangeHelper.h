@@ -8,6 +8,8 @@ class SelectionsRangeHelper {
 public:
   typedef QList<std::pair<QModelIndex, QModelIndex>> ROW_RANGES_LST;
 
+  QString GetCurrentPath() const {return currentPath;}
+
   bool contains(const QString& rootpath, unsigned row) const {
     return currentPath == rootpath && row < MAX_INDEX_CNT && mSelectedRowBits.test(row);
   }
@@ -42,7 +44,7 @@ public:
     mRowRangeList.append({selectedRows[top], selectedRows[bottom]});
   }
 
-  ROW_RANGES_LST GetTopBottomRange() const {
+  const ROW_RANGES_LST& GetTopBottomRange() const {
     return mRowRangeList;
   }
 

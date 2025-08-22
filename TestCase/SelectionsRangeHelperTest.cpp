@@ -31,7 +31,7 @@ private slots:
 
     rngHelper.Set("/home/to/path", {ind00});
     QCOMPARE(rngHelper.currentPath, "/home/to/path");
-    QCOMPARE(rngHelper.mRowRangeList, (QList<std::pair<int, int>>{{0,0}}));
+    QCOMPARE(rngHelper.mRowRangeList, (SelectionsRangeHelper::ROW_RANGES_LST{{ind00,ind00}}));
     QVERIFY(rngHelper.mSelectedRowBits.any());
     QVERIFY(rngHelper.contains("/home/to/path", 0));
     QVERIFY(!rngHelper.contains("/home/to/path", 1));
@@ -57,7 +57,7 @@ private slots:
 
     rngHelper.Set("/home/to/path", {ind00, ind10, ind20, ind30});
     QCOMPARE(rngHelper.currentPath, "/home/to/path");
-    QCOMPARE(rngHelper.mRowRangeList, (QList<std::pair<int, int>>{{0,3}}));
+    QCOMPARE(rngHelper.mRowRangeList, (SelectionsRangeHelper::ROW_RANGES_LST{{ind00,ind30}}));
     QCOMPARE(rngHelper.GetTopBottomRange().size(), 1);
     QVERIFY(rngHelper.mSelectedRowBits.any());
     QVERIFY(rngHelper.contains("/home/to/path", 0));
@@ -81,7 +81,8 @@ private slots:
 
     rngHelper.Set("/home/to/path", {ind00, ind10, ind30, ind50, ind60});
     QCOMPARE(rngHelper.currentPath, "/home/to/path");
-    QCOMPARE(rngHelper.mRowRangeList, (QList<std::pair<int, int>>{{0,1}, {3,3}, {5,6}}));
+    QCOMPARE(rngHelper.mRowRangeList,
+             (SelectionsRangeHelper::ROW_RANGES_LST{{ind00,ind10}, {ind30,ind30}, {ind50,ind60}}));
     QCOMPARE(rngHelper.GetTopBottomRange().size(), 3);
     QVERIFY(rngHelper.mSelectedRowBits.any());
 

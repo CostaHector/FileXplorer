@@ -77,18 +77,14 @@ public:
     ClearCopyAndCutDict();
     mCutIndexes.Set(rootPath(), cutIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
-    foreach (auto beRng, beRngLst) {
-      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
-    }
+    EmitDecorationRoleChange(beRngLst);
   }
   void CopiedSomething(const QModelIndexList& copiedIndexes) {
     auto beRngLst = mCutIndexes.GetTopBottomRange();
     ClearCopyAndCutDict();
     mCopyIndexes.Set(rootPath(), copiedIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
-    foreach (auto beRng, beRngLst) {
-      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
-    }
+    EmitDecorationRoleChange(beRngLst);
   }
 
   void appendDisable(const QModelIndex& ind);
@@ -159,6 +155,14 @@ public:
   }
 
 private:
+  void EmitDecorationRoleChange(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {
+    foreach (auto beRng, beRngLst) {
+      if (beRng.first.isValid() && beRng.first.row() < rowCount() && beRng.second.isValid() && beRng.second.row() < rowCount()) {
+        emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
+      }
+    }
+  }
+
   QString m_rootPath;
   QList<FileProperty> m_itemsLst;
   QFileIconProvider m_iconProvider;
