@@ -11,7 +11,7 @@ RenameWidget_PrependParentFolderName::RenameWidget_PrependParentFolderName(QWidg
 void RenameWidget_PrependParentFolderName::InitExtraCommonVariable() {
   windowTitleFormat = "Prepend parend folder names | %1 item(s) under [%2]";
   setWindowTitle(windowTitleFormat);
-  setWindowIcon(QIcon(""));
+  setWindowIcon(QIcon(":img/PREPEND_PARENT_FOLDER_NAMES"));
 }
 
 QToolBar* RenameWidget_PrependParentFolderName::InitControlTB() {

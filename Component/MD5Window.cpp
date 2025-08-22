@@ -10,14 +10,27 @@
 #include <QMimeData>
 
 MD5Window::MD5Window(QWidget* parent)
-    : QDialog{parent}  //
+  : QDialog{parent}  //
 {
-  _ONLY_FIRST_BYTE = new (std::nothrow) QAction{"Only First Byte", this};
-  _ONLY_FIRST_BYTE->setCheckable(true);
-  _ONLY_FIRST_BYTE->setChecked(false);
+  _ONLY_FIRST_8_BYTES = new (std::nothrow) QAction{QIcon{":img/ONLY_FIRST_8_BYTES"}, "Only First 8 Bytes", this};
+  _ONLY_FIRST_8_BYTES->setCheckable(true);
+  _ONLY_FIRST_8_BYTES->setChecked(true);
 
-  m_md5InfoTB = new (std::nothrow) QToolBar{"Extra Info", this};
-  m_md5InfoTB->addAction(_ONLY_FIRST_BYTE);
+  _ONLY_FIRST_16_BYTES = new (std::nothrow) QAction{QIcon{":img/ONLY_FIRST_16_BYTES"}, "Only First 16 Bytes", this};
+  _ONLY_FIRST_16_BYTES->setCheckable(true);
+
+  _ONLY_EVERY_BYTES = new (std::nothrow) QAction{QIcon{":img/ONLY_EVERY_BYTES"}, "Only Every Bytes", this};
+  _ONLY_EVERY_BYTES->setCheckable(true);
+
+  _CALC_BYTES_RANGE = new (std::nothrow) QActionGroup{this};
+  _CALC_BYTES_RANGE->addAction(_ONLY_FIRST_8_BYTES);
+  _CALC_BYTES_RANGE->addAction(_ONLY_FIRST_16_BYTES);
+  _CALC_BYTES_RANGE->addAction(_ONLY_EVERY_BYTES);
+  _CALC_BYTES_RANGE->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+
+  m_md5InfoTB = new (std::nothrow) QToolBar{"Calculate MD5 Parms", this};
+  m_md5InfoTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  m_md5InfoTB->addActions(_CALC_BYTES_RANGE->actions());
 
   m_md5TextEdit = new (std::nothrow) QPlainTextEdit{this};
 
@@ -27,14 +40,14 @@ MD5Window::MD5Window(QWidget* parent)
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
-  setWindowTitle("MD5 Window");
+  setWindowTitle("MD5 Window | Drop files here");
   setWindowIcon(QIcon(":img/MD5_FILE_IDENTIFIER_PATH"));
 
   m_md5TextEdit->setAcceptDrops(false);
-  //  m_md5TextEdit->installEventFilter(this);
   setAcceptDrops(true);
 
   ReadSetting();
+  subscribe();
 }
 
 void MD5Window::ReadSetting() {
@@ -57,21 +70,26 @@ void MD5Window::closeEvent(QCloseEvent* event) {
 }
 
 int MD5Window::operator()(const QStringList& absPaths) {
-  const int firstByte{_ONLY_FIRST_BYTE->isChecked() ? 8 : 0};
+  const int bytesRange = GetBytesRange();
+  const QString bytesRangeStr{QString("%1").arg(bytesRange, 3, 10, QChar{' '})};
+  int fileCnt{0};
   for (const QString& absPath : absPaths) {
-    if (m_fileMD5Map.contains(absPath)) {
-      continue;
-    }
     const QFileInfo fi{absPath};
     if (!fi.isFile()) {
       continue;
     }
-    const QString md5{MD5Calculator::GetFileMD5(absPath, firstByte)};
-    m_fileMD5Map[absPath] = md5;
-    m_md5TextEdit->appendPlainText(md5 + ':' + absPath);
+    if (!mPathsSet.contains(absPath)) {
+      mPathsList.append(absPath);
+      mPathsSet.insert(absPath);
+    }
+    ++fileCnt;
+    const QString md5{MD5Calculator::GetFileMD5(absPath, bytesRange)};
+    m_md5TextEdit->appendPlainText(md5 + ':' + bytesRangeStr + ':' + absPath);
   }
-  setWindowTitle(QString("MD5 | %1 file(s)").arg(m_fileMD5Map.size()));
-  return m_fileMD5Map.size();
+  const QString fileCntStr{QString::number(fileCnt)};
+  setWindowTitle(QString("MD5 | %1 file(s)").arg(fileCntStr));
+  LOG_GOOD("MD5 calculated ok", fileCntStr);
+  return fileCnt;
 }
 
 void MD5Window::dropEvent(QDropEvent* event) {
@@ -90,8 +108,7 @@ void MD5Window::dropEvent(QDropEvent* event) {
   for (const QUrl& url : urls) {
     absPaths.append(url.toLocalFile());
   }
-  const int filesCnt = operator()(absPaths);
-  LOG_GOOD("MD5 files count calculated", QString::number(filesCnt));
+  operator()(absPaths);
   event->accept();
 }
 
@@ -106,6 +123,28 @@ void MD5Window::dragEnterEvent(QDragEnterEvent* event) {
     return;
   }
   event->accept();
+}
+
+void MD5Window::subscribe() {
+  connect(_CALC_BYTES_RANGE, &QActionGroup::triggered, this, &MD5Window::Recalculate);
+}
+
+int MD5Window::GetBytesRange() const {
+  if (_CALC_BYTES_RANGE == nullptr)  {
+    return -1;
+  }
+  auto* pAct = _CALC_BYTES_RANGE->checkedAction();
+  if (pAct == _ONLY_FIRST_8_BYTES) {
+    return 16;
+  } else if (pAct == _ONLY_FIRST_16_BYTES) {
+    return 64;
+  } else {
+    return -1;
+  }
+}
+
+void MD5Window::Recalculate() {
+  operator()(mPathsList);
 }
 
 //#define __NAME__EQ__MAIN__ 1
