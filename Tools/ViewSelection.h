@@ -6,6 +6,6 @@
 
 namespace ViewSelection {
 QModelIndexList selectedIndexes(const QAbstractItemView* view);
-};
+}
 
 #endif // VIEWSELECTION_H

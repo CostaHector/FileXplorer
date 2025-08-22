@@ -4,9 +4,13 @@
 <qresource prefix="img">
 <!--App Icons here-->
 <file alias="APP_ICON_PATH">AppIcons/FOLDER_OF_PICTURES.png</file>
-<file alias="PERFORMERS_APP">AppIcons/PERFORMERS_APP.svg</file>
 <file alias="QUICK_WHERE_CLAUSE">AppIcons/QUICK_WHERE_CLAUSE.svg</file>
-<file alias="TORRENTS_MANAGER">AppIcons/TORRENTS_MANAGER.svg</file>
+<file alias="TORRENTS_VIEW">AppIcons/TORRENTS_VIEW.svg</file>
+<file alias="REVEAL_IN_EXPLORER">AppIcons/REVEAL_IN_EXPLORER.png</file>
+<file alias="SCENES_VIEW">AppIcons/SCENES_VIEW.svg</file>
+<file alias="MOVIES_VIEW">AppIcons/MOVIES_VIEW.svg</file>
+<file alias="JSON_EDITOR">AppIcons/JSON_EDITOR.svg</file>
+<file alias="CAST_VIEW">AppIcons/CAST_VIEW.svg</file>
 
 <!--LOG icon here-->
 <file alias="RUNNING_LOGS">Log/RUNNING_LOGS.svg</file>
@@ -22,11 +26,7 @@
 <file alias="DUPLICATE_VIDEOS_FINDER">Media/DUPLICATE_VIDEOS_FINDER.png</file>
 <file alias="UPDATE_JSON_THEN_SCN">Media/UPDATE_JSON_THEN_SCN.svg</file>
 <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
-<file alias="ITEMS_ORGANIZER">Media/ITEMS_ORGANIZER.svg</file>
-<file alias="EMPTY_FOLDER">Media/EMPTY_FOLDER.svg</file>
 <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
-<file alias="PACK_FOLDERS">Media/PACK_FOLDERS.svg</file>
-<file alias="UNPACK_FOLDERS">Media/UNPACK_FOLDERS.svg</file>
 <file alias="THUMBNAILS_1_BY_1">Media/THUMBNAILS_1_BY_1.svg</file>
 <file alias="THUMBNAILS_2_BY_2">Media/THUMBNAILS_2_BY_2.svg</file>
 <file alias="THUMBNAILS_3_BY_3">Media/THUMBNAILS_3_BY_3.svg</file>
@@ -36,9 +36,8 @@
 <file alias="THUMBNAIL_EXTRACTOR_B_E">Media/THUMBNAIL_EXTRACTOR_B_E.svg</file>
 <file alias="MUSIC_PLAYER">Media/MUSIC_PLAYER.svg</file>
 <file alias="PLAY_BUTTON_ROUND">Media/PLAY_BUTTON_ROUND.svg</file>
-<file alias="PLAY_BUTTON_TRIANGLE">Media/PLAY_BUTTON_TRIANGLE.svg</file>
-<file alias="FOLDER_OPEN">Media/FOLDER_OPEN.svg</file>
 <file alias="FAIL_FAST">Media/FAIL_FAST.svg</file>
+<file alias="PLAY_ALL_VIDEO">Media/PLAY_ALL_VIDEO.ico</file>
 
 <!--FramelessWindow Icon here-->
 <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
@@ -47,15 +46,13 @@
 
 <!--TopSideToolBar Icons here-->
 <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
-<file alias="OPEN_IN_TERMINAL">TopSideToolBarIcons/OPEN_IN_TERMINAL2.png</file>
+<file alias="OPEN_IN_TERMINAL">TopSideToolBarIcons/OPEN_IN_TERMINAL.png</file>
 <file alias="NAVIGATION_PANE">TopSideToolBarIcons/NAVIGATION_PANE.ico</file>
 <file alias="SHOW_FOLDER_PREVIEW">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW.ico</file>
 <file alias="COMPRESS_ITEM">TopSideToolBarIcons/COMPRESS_ITEM.png</file>
 <file alias="EXTRACT_ITEM">TopSideToolBarIcons/EXTRACT_ITEM.png</file>
 <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
 <file alias="ADD_TO_MUSIC_PLAYLIST">TopSideToolBarIcons/ADD_TO_MUSIC_PLAYLIST.png</file>
-<file alias="MOVE_TO_TRASH_BIN">TopSideToolBarIcons/MOVE_TO_TRASH_BIN.svg</file>
-<file alias="DELETE_ITEMS_PERMANENTLY">TopSideToolBarIcons/DELETE_ITEMS_PERMANENTLY.svg</file>
 <file alias="ABOUT">TopSideToolBarIcons/ABOUT.svg</file>
 <file alias="SELECT_ALL">TopSideToolBarIcons/SELECT_ALL.ico</file>
 <file alias="SELECT_INVERT">TopSideToolBarIcons/SELECT_INVERT.ico</file>
@@ -70,18 +67,13 @@
 <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>
 <file alias="PATH_BACK_TO">AddressControl/PATH_BACK_TO.svg</file>
 <file alias="PATH_FORWARD_TO">AddressControl/PATH_FORWARD_TO.svg</file>
-<file alias="PATH_SLASH">AddressControl/PATH_SLASH.svg</file>
-<file alias="LAST_FOLDER">AddressControl/LAST_FOLDER.svg</file>
-<file alias="NEXT_FOLDER">AddressControl/NEXT_FOLDER.svg</file>
+<file alias="NEXT_OR_LAST_FOLDER">AddressControl/NEXT_OR_LAST_FOLDER.svg</file>
 <file alias="SEARCH">AddressControl/SEARCH.svg</file>
-<file alias="SEARCH_CHOICE">AddressControl/SEARCH_CHOICE.svg</file>
-<file alias="SEARCH_MULTI_KEYWORDS">AddressControl/SEARCH_MULTI_KEYWORDS.svg</file>
 <file alias="MATCH_REGEX">AddressControl/MATCH_REGEX.svg</file>
 <file alias="MATCH_EQUAL">AddressControl/MATCH_EQUAL.svg</file>
 <file alias="SERACH_SCOPE_FILENAME">AddressControl/SERACH_SCOPE_FILENAME.svg</file>
 <file alias="SEARCH_SCOPE_CONTENT">AddressControl/SEARCH_SCOPE_CONTENT.svg</file>
 <file alias="FILE_SYSTEM_FILTER">AddressControl/FILTER.svg</file>
-<file alias="EDITOR_MODE">AddressControl/EDITOR_MODE.svg</file>
 
 <!--FILTER_TYPE icon here-->
 <file alias="FILE">FILTER_TYPE/FILE.svg</file>
@@ -94,7 +86,44 @@
 <file alias="VIDEO">FILTER_TYPE/VIDEO.png</file>
 <file alias="EXE">FILTER_TYPE/EXE.png</file>
 <file alias="COMPRESSED">FILTER_TYPE/COMPRESSED.webp</file>
-<file alias="DOCUMENT">FILTER_TYPE/DOCUMENT.png</file>
+
+<!--FileOperation here-->
+<file alias="COPY_ITEM">FileOperation/COPY_ITEM.svg</file>
+<file alias="CUT_ITEM">FileOperation/CUT_ITEM.svg</file>
+<file alias="PASTE_ITEM">FileOperation/PASTE_ITEM.svg</file>
+<file alias="DROP_ITEM_HERE">FileOperation/DROP_ITEM_HERE.svg</file>
+<file alias="COPY_TO">FileOperation/COPY_TO.webp</file>
+<file alias="MOVE_TO">FileOperation/MOVE_TO.webp</file>
+<file alias="MV_TO_COMMAND_PATH">FileOperation/MV_TO_COMMAND_PATH.png</file>
+<file alias="CP_TO_COMMAND_PATH">FileOperation/CP_TO_COMMAND_PATH.png</file>
+<file alias="PACK_FOLDERS">FileOperation/PACK_FOLDERS.svg</file>
+<file alias="UNPACK_FOLDERS">FileOperation/UNPACK_FOLDERS.svg</file>
+<file alias="ITEMS_ORGANIZER">FileOperation/ITEMS_ORGANIZER.svg</file>
+<file alias="FOLDER_OPEN">FileOperation/FOLDER_OPEN.svg</file>
+<file alias="CATEGORIZER">FileOperation/CATEGORIZER.svg</file>
+<file alias="SELECT_FOLDER">FileOperation/SELECT_FOLDER.svg</file>
+<file alias="STUDIOS_LIST_FILE">FileOperation/STUDIOS_LIST_FILE.svg</file>
+<file alias="CAST_LIST_FILE">FileOperation/CAST_LIST_FILE.svg</file>
+<file alias="CAST_AKA_LIST_FILE">FileOperation/CAST_AKA_LIST_FILE.svg</file>
+<file alias="SHOW_CAST_STUDIO_STATISTIC">FileOperation/SHOW_CAST_STUDIO_STATISTIC.svg</file>
+<file alias="FOLDER_MERGE_TO_FIRST">FileOperation/FOLDER_MERGE_TO_FIRST.svg</file>
+<file alias="FOLDER_MERGE_TO_LAST">FileOperation/FOLDER_MERGE_TO_LAST.svg</file>
+<file alias="NEW_FILE_FOLDER_PATH">FileOperation/NEW.svg</file>
+<file alias="NEW_FOLDER">FileOperation/NEW_FOLDER.svg</file>
+<file alias="NEW_FOLDERS">FileOperation/NEW_FOLDERS.svg</file>
+<file alias="NEW_TEXT_DOCUMENT">FileOperation/NEW_TEXT_DOCUMENT.svg</file>
+<file alias="NEW_TEXT_DOCUMENTS">FileOperation/NEW_TEXT_DOCUMENTS.svg</file>
+<file alias="NEW_JSON_FILE">FileOperation/NEW_JSON_FILE.svg</file>
+<file alias="FILE_STRUCTURE_QUERY">FileOperation/FILE_STRUCTURE_QUERY.svg</file>
+<file alias="FILE_STRUCTURE_FLATTEN">FileOperation/FILE_STRUCTURE_FLATTEN.svg</file>
+<file alias="FILE_STRUCTURE_PRESERVE">FileOperation/FILE_STRUCTURE_PRESERVE.svg</file>
+<file alias="EXPORT_TO">FileOperation/EXPORT_TO.svg</file>
+<file alias="_SEARCH_IN_NET_EXPLORER">FileOperation/_SEARCH_IN_NET_EXPLORER.svg</file>
+<file alias="FORCE_RESEARCH">FileOperation/FORCE_RESEARCH.svg</file>
+<file alias="SQLITE_APP">FileOperation/SQLITE_APP.svg</file>
+<file alias="MOVE_TO_TRASH_BIN">FileOperation/MOVE_TO_TRASH_BIN.svg</file>
+<file alias="DELETE_ITEMS_PERMANENTLY">FileOperation/DELETE_ITEMS_PERMANENTLY.svg</file>
+<file alias="ARRANGE">FileOperation/ARRANGE.svg</file>
 
 <!--LeftSideToolBarIcons here-->
 <file alias="HOME">LeftSideToolBarIcons/HOME.png</file>
@@ -109,46 +138,21 @@
 <file alias="PIN">LeftSideToolBarIcons/PIN.svg</file>
 <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
 <file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
-<file alias="PLAY_ALL_VIDEO">RightClickIcon/PLAY_ALL_VIDEO.ico</file>
-<file alias="REVEAL_IN_EXPLORER">RightClickIcon/REVEAL_IN_EXPLORER.png</file>
-<file alias="FOLDER_MERGE_TO_FIRST">RightClickIcon/FOLDER_MERGE_TO_FIRST.svg</file>
-<file alias="FOLDER_MERGE_TO_LAST">RightClickIcon/FOLDER_MERGE_TO_LAST.svg</file>
-<file alias="NEW_FILE_FOLDER_PATH">RightClickIcon/NEW.svg</file>
-<file alias="NEW_FOLDER">RightClickIcon/NEW_FOLDER.svg</file>
-<file alias="NEW_FOLDERS">RightClickIcon/NEW_FOLDERS.svg</file>
-<file alias="NEW_TEXT_DOCUMENT">RightClickIcon/NEW_TEXT_DOCUMENT.svg</file>
-<file alias="NEW_TEXT_DOCUMENTS">RightClickIcon/NEW_TEXT_DOCUMENTS.svg</file>
-<file alias="NEW_JSON_FILE">RightClickIcon/NEW_JSON_FILE.svg</file>
-<file alias="MV_TO_COMMAND_PATH">RightClickIcon/MvToCommand.png</file>
-<file alias="CP_TO_COMMAND_PATH">RightClickIcon/CpToCommand.png</file>
+
+<!--RightClickIcon here-->
 <file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH_THIS_PATH.svg</file>
 <file alias="COPY_FULL_PATH">RightClickIcon/COPY_FULL_PATH.png</file>
 <file alias="COPY_PATH">RightClickIcon/COPY_PATH.svg</file>
 <file alias="COPY_NAME">RightClickIcon/COPY_NAME.svg</file>
 <file alias="COPY_THE_PATH">RightClickIcon/COPY_THE_PATH.svg</file>
-<file alias="COPY_ITEM">RightClickIcon/COPY_ITEM.svg</file>
 <file alias="COPY_RECORD">RightClickIcon/COPY_RECORD.svg</file>
-<file alias="CUT_ITEM">RightClickIcon/CUT_ITEM.svg</file>
-<file alias="PASTE_ITEM">RightClickIcon/PASTE_ITEM.svg</file>
-<file alias="DROP_HERE">RightClickIcon/DROP_HERE.svg</file>
-<file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5FileIdentifier.png</file>
-<file alias="ONLY_FIRST_8_BYTES">RightClickIcon/ONLY_FIRST_8_BYTES.svg</file>
-<file alias="ONLY_FIRST_16_BYTES">RightClickIcon/ONLY_FIRST_16_BYTES.svg</file>
-<file alias="ONLY_EVERY_BYTES">RightClickIcon/ONLY_EVERY_BYTES.svg</file>
+<file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5_FILE_IDENTIFIER_PATH.svg</file>
 <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
-<file alias="REFRESH_SEARCH_SOURCE">RightClickIcon/REFRESH_SEARCH_SOURCE.svg</file>
-<file alias="_SEARCH_IN_NET_EXPLORER">RightClickIcon/_SEARCH_IN_NET_EXPLORER.svg</file>
-<file alias="EXPORT_TO">RightClickIcon/EXPORT_TO.svg</file>
-<file alias="FILE_STRUCTURE_QUERY">RightClickIcon/FILE_STRUCTURE_QUERY.svg</file>
-<file alias="FILE_STRUCTURE_FLATTEN">RightClickIcon/FILE_STRUCTURE_FLATTEN.svg</file>
-<file alias="FILE_STRUCTURE_PRESERVE">RightClickIcon/FILE_STRUCTURE_PRESERVE.svg</file>
 
 <!--JsonEditor Icon here        -->
-<file alias="JSON_EDITOR">JsonEditor/JSON_EDITOR.png</file>
 <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
 <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
 <file alias="CAST">JsonEditor/CAST.svg</file>
-<file alias="CAST_SET">JsonEditor/CAST_SET.svg</file>
 <file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
 <file alias="CAST_REMOVE">JsonEditor/CAST_REMOVE.svg</file>
 <file alias="CAST_CLEAR">JsonEditor/CAST_CLEAR.svg</file>
@@ -193,28 +197,33 @@
 <file alias="VOLUME_MUTE">VideoPlayer/VOLUME_MUTE.svg</file>
 
 <!--NameStr Icon here-->
-<file alias="RENAME">NameStrIcon/RENAME.svg</file>
-<file alias="NAME_STR_CASE">NameStrIcon/NAME_STR_CASE.svg</file>
-<file alias="NAME_STR_NUMERIZER_PATH">NameStrIcon/NAME_STR_NUMERIZER_PATH.svg</file>
-<file alias="NAME_SECTIONS_ARRANGE">NameStrIcon/NAME_SECTIONS_ARRANGE.svg</file>
-<file alias="RENAME_REVERSE_NAMES_LIST">NameStrIcon/RENAME_REVERSE_NAMES_LIST.svg</file>
-<file alias="UNICODE_TO_ASCII_TEXT">NameStrIcon/UNICODE_TO_ASCII_TEXT.png</file>
-<file alias="RENAME_LOWER_CASE">NameStrIcon/RENAME_LOWER_CASE.png</file>
-<file alias="RENAME_UPPER_CASE">NameStrIcon/RENAME_UPPER_CASE.png</file>
-<file alias="CAPITALIZE_KEEP_OTHER">NameStrIcon/CAPITALIZE_KEEP_OTHER.svg</file>
-<file alias="CAPITALIZE_LOWER_OTHER">NameStrIcon/CAPITALIZE_LOWER_OTHER.svg</file>
-<file alias="RENAME_TOGGLE_CASE">NameStrIcon/RENAME_TOGGLE_CASE.svg</file>
-<file alias="NAME_STR_INSERTER_PATH">NameStrIcon/NAME_STR_INSERTER_PATH.svg</file>
-<file alias="NAME_STR_DELETER_PATH">NameStrIcon/NAME_STR_DELETER_PATH.svg</file>
-<file alias="NAME_STR_REPLACER_PATH">NameStrIcon/Replacer.png</file>
-<file alias="_CONTINUOUS_NUMBERING">NameStrIcon/_CONTINUOUS_NUMBERING.svg</file>
-<file alias="NAME_RULER">NameStrIcon/NAME_RULER.svg</file>
-<file alias="PRODUCTION_STUDIOS_LIST_FILE">NameStrIcon/PRODUCTION_STUDIOS_LIST_FILE.svg</file>
-<file alias="PERFORMER_AKA_LIST_FILE">NameStrIcon/PERFORMER_AKA_LIST_FILE.svg</file>
-<file alias="SHOW_PERFORMER_STUDIO_STATISTIC">NameStrIcon/SHOW_PERFORMER_STUDIO_STATISTIC.svg</file>
-<file alias="COPY_TEXT">NameStrIcon/COPY_TEXT.svg</file>
-<file alias="COMMAND_PREVIEW">NameStrIcon/COMMAND_PREVIEW.svg</file>
-<file alias="PREPEND_PARENT_FOLDER_NAMES">NameStrIcon/PREPEND_PARENT_FOLDER_NAMES.svg</file>
+<file alias="RENAME">Rename/RENAME.svg</file>
+<file alias="NAME_STR_CASE">Rename/NAME_STR_CASE.svg</file>
+<file alias="NAME_STR_NUMERIZER_PATH">Rename/NAME_STR_NUMERIZER_PATH.svg</file>
+<file alias="NAME_SECTIONS_ARRANGE">Rename/NAME_SECTIONS_ARRANGE.svg</file>
+<file alias="RENAME_REVERSE_NAMES_LIST">Rename/RENAME_REVERSE_NAMES_LIST.svg</file>
+<file alias="UNICODE_TO_ASCII_TEXT">Rename/UNICODE_TO_ASCII_TEXT.png</file>
+<file alias="RENAME_LOWER_CASE">Rename/RENAME_LOWER_CASE.png</file>
+<file alias="RENAME_UPPER_CASE">Rename/RENAME_UPPER_CASE.png</file>
+<file alias="CAPITALIZE_KEEP_OTHER">Rename/CAPITALIZE_KEEP_OTHER.svg</file>
+<file alias="CAPITALIZE_LOWER_OTHER">Rename/CAPITALIZE_LOWER_OTHER.svg</file>
+<file alias="RENAME_TOGGLE_CASE">Rename/RENAME_TOGGLE_CASE.svg</file>
+<file alias="NAME_STR_INSERTER_PATH">Rename/NAME_STR_INSERTER_PATH.svg</file>
+<file alias="NAME_STR_DELETER_PATH">Rename/NAME_STR_DELETER_PATH.svg</file>
+<file alias="NAME_STR_REPLACER_PATH">Rename/Replacer.png</file>
+<file alias="_CONTINUOUS_NUMBERING">Rename/_CONTINUOUS_NUMBERING.svg</file>
+<file alias="NAME_RULER">Rename/NAME_RULER.svg</file>
+<file alias="PREPEND_PARENT_FOLDER_NAMES">Rename/PREPEND_PARENT_FOLDER_NAMES.svg</file>
+<file alias="COMMAND_PREVIEW">Rename/COMMAND_PREVIEW.svg</file>
+
+<!--Browser Icon here-->
+<file alias="COPY_TEXT">Browser/COPY_TEXT.svg</file>
+<file alias="ONLY_FIRST_8_BYTES">Browser/ONLY_FIRST_8_BYTES.svg</file>
+<file alias="ONLY_FIRST_16_BYTES">Browser/ONLY_FIRST_16_BYTES.svg</file>
+<file alias="ONLY_EVERY_BYTES">Browser/ONLY_EVERY_BYTES.svg</file>
+<file alias="SEARCH_MULTI_KEYWORDS">Browser/SEARCH_MULTI_KEYWORDS.svg</file>
+<file alias="SEARCH_CHOICE">Browser/SEARCH_CHOICE.svg</file>
+<file alias="EDITOR_MODE">Browser/EDITOR_MODE.svg</file>
 
 <!--PreferenceIcons icon here-->
 <file alias="BACKGROUND_IMAGE_PATH">PreferenceIcons/BACKGROUND_IMAGE_PATH.ico</file>
@@ -256,13 +265,11 @@
 <file alias="FOLDER_PREVIEW_LABELS">View/FOLDER_PREVIEW_LABELS.svg</file>
 <file alias="FOLDER_PREVIEW_BROWSER">View/FOLDER_PREVIEW_BROWSER.svg</file>
 <file alias="FOLDER_PREVIEW_LISTS">View/FOLDER_PREVIEW_LISTS.svg</file>
-<file alias="SCENE_TABLE_VIEW">View/SCENE_TABLE_VIEW.svg</file>
 <file alias="DEFAULT_COLUMN_WIDTH">View/DEFAULT_COLUMN_WIDTH.svg</file>
 <file alias="DEFAULT_ROW_HEIGHT">View/DEFAULT_ROW_HEIGHT.svg</file>
 <file alias="RESIZE_COLUMN_TO_CONTENTS">View/RESIZE_COLUMN_TO_CONTENTS.svg</file>
 <file alias="RESIZE_ROW_TO_CONTENTS">View/RESIZE_ROW_TO_CONTENTS.svg</file>
 <file alias="HAR_VIEW">View/HAR_VIEW.svg</file>
-<file alias="ARRANGE">View/ARRANGE.svg</file>
 <file alias="PAGINATION_START">View/PAGINATION_START.svg</file>
 <file alias="PAGINATION_END">View/PAGINATION_END.svg</file>
 <file alias="PAGINATION_LAST">View/PAGINATION_LAST.svg</file>
@@ -279,7 +286,6 @@
 <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
 <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
 <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
-<file alias="SHOW_DATABASE">Database/SHOW_DATABASE.svg</file>
 <file alias="WHERE_CLAUSE_HISTORY">Database/WHERE_CLAUSE_HISTORY.svg</file>
 <file alias="COUNTER">Database/COUNTER.svg</file>
 <file alias="SUM">Database/SUM.svg</file>
@@ -291,14 +297,6 @@
 <!--AlertSystem icon here-->
 <file alias="SETTINGS">AlertSystem/SETTINGS.svg</file>
 <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
-
-<!--RecycleBin icon here-->
-<file alias="RESTORE_ALL_ITEMS">RecycleBin/RESTORE_ALL_ITEMS.ico</file>
-<file alias="RESTORE_SELECTED_ITEMS">RecycleBin/RESTORE_SELECTED_ITEMS.ico</file>
-<file alias="EMPTY_RECYCLE_BIN">RecycleBin/EMPTY_RECYCLE_BIN.ico</file>
-<file alias="DIRTY_STATUS">RecycleBin/DIRTY_STATUS.ico</file>
-<file alias="CLEAN_STATUS">RecycleBin/CLEAN_STATUS.ico</file>
-<file alias="SQLITE_APP">RecycleBin/SQLITE_APP.svg</file>
 </qresource>
 
 </RCC>

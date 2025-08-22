@@ -8,9 +8,9 @@
 const QDir::Filters FileSystemTypeFilter::DEFAULT_FILTER_FLAG{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
 
 FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
-    : QToolButton(parent),
-      m_flagWhenFilterEnabled{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
-      m_isIncludingSubdirectory{PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool()} {
+  : QToolButton{parent},
+  m_flagWhenFilterEnabled{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
+  m_isIncludingSubdirectory{PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool()} {
   FILTER_SWITCH->setCheckable(true);
   FILTER_SWITCH->setChecked(PreferenceSettings().value("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", true).toBool());
   FILTER_SWITCH->setToolTip(
@@ -234,7 +234,7 @@ void FileSystemTypeFilter::changeSearchModelIteratorFlagAgent(const bool includi
 
 #include <QTableView>
 class FileSystemFilter : public QSplitter {
- public:
+public:
   FileSystemFilter(QWidget* parent = nullptr) : QSplitter(parent) {
     auto* m_tv = new QTableView(this);
     auto* m_model = new QFileSystemModel(this);

@@ -15,18 +15,18 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   using namespace ViewTypeTool;
 
   _ADVANCE_SEARCH_VIEW = new (std::nothrow) QAction(QIcon(":img/SEARCH"), ENUM_2_STR(SEARCH));
-  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/SHOW_DATABASE"), ENUM_2_STR(MOVIE));
+  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/MOVIES_VIEW"), ENUM_2_STR(MOVIE));
   _LIST_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), ENUM_2_STR(LIST));
   _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), ENUM_2_STR(TABLE));
   _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), ENUM_2_STR(TREE));
-  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENE_TABLE_VIEW"), ENUM_2_STR(SCENE));
-  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/PERFORMERS_APP"), ENUM_2_STR(CAST));
+  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENES_VIEW"), ENUM_2_STR(SCENE));
+  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/CAST_VIEW"), ENUM_2_STR(CAST));
   _JSON_VIEW = new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), ENUM_2_STR(JSON));
   _VIEWS_AG = GetViewsAG();
 
   NAVIGATION_PANE = new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"));
   _VIEW_ACTIONS = Get_NAVIGATION_PANE_Actions();
-  _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/PLAY_BUTTON_TRIANGLE"), tr("Play"));
+  _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/PLAY_BUTTON_ROUND"), tr("Play"));
   _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
   _SYS_VIDEO_PLAYERS->setShortcutVisibleInContextMenu(true);
   _SYS_VIDEO_PLAYERS->setToolTip(QString("<b>%1 (%2)</b><br/>"
