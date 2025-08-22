@@ -170,7 +170,6 @@ install(TARGETS ${PROJECT_NAME}
 install(FILES
     "Translate/FileXplorer_zh_CN.ts"
     "bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat"
-    "bin/TERMINAL_OPEN_BATCH_FILE_PATH.sh"
     "readme.md"
     DESTINATION share/${PROJECT_NAME}
 )

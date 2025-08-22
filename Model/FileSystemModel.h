@@ -41,20 +41,19 @@ public:
   void ClearCutDict() { mCutIndexes.clear(); }
   void ClearCopiedDict() { mCopyIndexes.clear(); }
   void CutSomething(const QModelIndexList& cutIndexes) {
-    auto beRngLst = mCutIndexes.GetTopBottomRange();
+    // don't emit decoration role change for the former indexes here
+    // SIGSEGV sigmentation error here.
+    // when files are already cut to another path, and one still cut all items in former path again
     ClearCopyAndCutDict();
     mCutIndexes.Set(rootPath(), cutIndexes);
-    beRngLst += mCutIndexes.GetTopBottomRange();
-    foreach (auto beRng, beRngLst) {
+    foreach (auto beRng, mCutIndexes.GetTopBottomRange()) {
       emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
     }
   }
   void CopiedSomething(const QModelIndexList& copiedIndexes) {
-    auto beRngLst = mCutIndexes.GetTopBottomRange();
     ClearCopyAndCutDict();
     mCopyIndexes.Set(rootPath(), copiedIndexes);
-    beRngLst += mCutIndexes.GetTopBottomRange();
-    foreach (auto beRng, beRngLst) {
+    foreach (auto beRng, mCopyIndexes.GetTopBottomRange()) {
       emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
     }
   }

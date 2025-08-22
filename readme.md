@@ -75,6 +75,7 @@ we suggest you to do following setting in git bash
 git update-index --assume-unchange FileXplorer.pro.user
 git update-index --assume-unchange FileXplorerTest.pro.user
 git update-index --assume-unchange bin/logs_info.log
+git update-index --assume-unchange bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat
 
 git update-index --no-assume-unchange FileXplorer.pro.user
 git update-index --no-assume-unchange FileXplorerTest.pro.user
