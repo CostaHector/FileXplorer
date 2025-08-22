@@ -46,7 +46,7 @@ public:
     mCutIndexes.Set(rootPath(), cutIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
     foreach (auto beRng, beRngLst) {
-      emit headerDataChanged(Qt::Orientation::Vertical, beRng.first, beRng.second);
+      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
     }
   }
   void CopiedSomething(const QModelIndexList& copiedIndexes) {
@@ -55,7 +55,7 @@ public:
     mCopyIndexes.Set(rootPath(), copiedIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
     foreach (auto beRng, beRngLst) {
-      emit headerDataChanged(Qt::Orientation::Vertical, beRng.first, beRng.second);
+      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
     }
   }
 
@@ -78,6 +78,7 @@ public:
     emit headerDataChanged(Qt::Orientation::Vertical, beforeRow, beforeRow);
   }
 
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
 public slots:

@@ -78,7 +78,7 @@ public:
     mCutIndexes.Set(rootPath(), cutIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
     foreach (auto beRng, beRngLst) {
-      emit headerDataChanged(Qt::Orientation::Vertical, beRng.first, beRng.second);
+      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
     }
   }
   void CopiedSomething(const QModelIndexList& copiedIndexes) {
@@ -87,7 +87,7 @@ public:
     mCopyIndexes.Set(rootPath(), copiedIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
     foreach (auto beRng, beRngLst) {
-      emit headerDataChanged(Qt::Orientation::Vertical, beRng.first, beRng.second);
+      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
     }
   }
 
@@ -142,7 +142,6 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    //  info.relSelections.append();
     const auto& item = m_itemsLst[row];
     return item.relPath + item.name;
   }
@@ -150,14 +149,12 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    //  info.rootPaths.append();
     return m_rootPath + '/' + m_itemsLst[row].relPath;
   }
   QString GetASelection(const int& row) const {
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    //  info.selections.append();
     return m_itemsLst[row].name;
   }
 
