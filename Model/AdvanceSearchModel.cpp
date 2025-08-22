@@ -40,7 +40,7 @@ void AdvanceSearchModel::updateSearchResultList() {
   endResetModel();
 }
 
-auto AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory) -> bool {
+bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory) {
   // when you need to call updateSearchResultList after checkPathNeed.
   // queryWhenSearchUnderLargeDirectory is most likely set to be true
   const QString& stdPath = PathTool::GetWinStdPath(path);
@@ -67,7 +67,7 @@ auto AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
   return true;
 }
 
-auto AdvanceSearchModel::initRootPath(const QString& path) -> void {
+void AdvanceSearchModel::initRootPath(const QString& path) {
   if (m_rootPath == path) {
     return;
   }
@@ -78,7 +78,7 @@ auto AdvanceSearchModel::initRootPath(const QString& path) -> void {
   qDebug("init rootPath:%s", qPrintable(m_rootPath));
 }
 
-auto AdvanceSearchModel::setRootPath(const QString& path) -> void {
+void AdvanceSearchModel::setRootPath(const QString& path) {
   if (!checkPathNeed(path)) {
     return;
   }
@@ -87,11 +87,11 @@ auto AdvanceSearchModel::setRootPath(const QString& path) -> void {
   updateSearchResultList();
 }
 
-auto AdvanceSearchModel::initFilter(QDir::Filters initialFilters) -> void {
+void AdvanceSearchModel::initFilter(QDir::Filters initialFilters) {
   m_filters = initialFilters;
 }
 
-auto AdvanceSearchModel::setFilter(QDir::Filters newFilters) -> void {
+void AdvanceSearchModel::setFilter(QDir::Filters newFilters) {
   initFilter(newFilters);
   if (!checkPathNeed(m_rootPath)) {
     return;
