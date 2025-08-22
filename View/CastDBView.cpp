@@ -65,7 +65,7 @@ CastDBView::CastDBView(QLineEdit* perfSearchLE, FloatingPreview* floatingPreview
 
   subscribe();
   setWindowTitle("Cast Manager Widget");
-  setWindowIcon(QIcon(":img/PERFORMERS_APP"));
+  setWindowIcon(QIcon(":img/CAST_VIEW"));
 }
 
 void CastDBView::subscribe() {

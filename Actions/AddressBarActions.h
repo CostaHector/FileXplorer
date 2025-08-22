@@ -5,10 +5,9 @@
 #include <QAction>
 #include <QActionGroup>
 
-class AddressBarActions : public QObject
-{
+class AddressBarActions : public QObject {
   Q_OBJECT
- public:
+public:
   explicit AddressBarActions(QObject *parent = nullptr);
 
   QActionGroup* GetAddressBarActions();
@@ -16,11 +15,6 @@ class AddressBarActions : public QObject
   QAction* _FORWARD_TO{nullptr};
   QAction* _UP_TO{nullptr};
   QActionGroup* ADDRESS_CONTROLS{nullptr};
-
-  QActionGroup* GetFolderIteratorActions();
-  QAction* _LAST_FOLDER{nullptr};
-  QAction* _NEXT_FOLDER{nullptr};
-  QActionGroup* _FOLDER_ITER_CONTROLS{nullptr};
 };
 
 AddressBarActions& g_addressBarActions();

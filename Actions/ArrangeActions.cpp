@@ -47,16 +47,16 @@ void onEditAkaPerformer() {
 }
 
 ArrangeActions::ArrangeActions(QObject* parent) : QObject{parent} {
-  _EDIT_STUDIOS = new (std::nothrow) QAction(QIcon(":img/PRODUCTION_STUDIOS_LIST_FILE"), "Edit studios list file", this);
+  _EDIT_STUDIOS = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), "Edit studios list file", this);
   _RELOAD_STUDIOS = new (std::nothrow) QAction("Reload studios", this);
 
-  _EDIT_PERFS = new (std::nothrow) QAction(QIcon(":img/CAST_SET"), "Edit performers list file", this);
+  _EDIT_PERFS = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), "Edit performers list file", this);
   _RELOAD_PERFS = new (std::nothrow) QAction("Reload performers", this);
 
-  _EDIT_PERF_AKA = new (std::nothrow) QAction(QIcon(":img/PERFORMER_AKA_LIST_FILE"), "Edit performers AKA list file", this);
+  _EDIT_PERF_AKA = new (std::nothrow) QAction(QIcon(":img/CAST_AKA_LIST_FILE"), "Edit performers AKA list file", this);
   _RELOAD_PERF_AKA = new (std::nothrow) QAction("Reload performers AKA", this);
 
-  _RENAME_RULE_STAT = new (std::nothrow) QAction(QIcon(":img/SHOW_PERFORMER_STUDIO_STATISTIC"), "Rename rule statistics", this);
+  _RENAME_RULE_STAT = new (std::nothrow) QAction(QIcon(":img/SHOW_CAST_STUDIO_STATISTIC"), "Rename rule statistics", this);
 }
 
 void onShowRenameRuleStatistics() {

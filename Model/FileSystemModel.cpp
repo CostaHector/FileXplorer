@@ -77,7 +77,7 @@ QVariant FileSystemModel::headerData(int section, Qt::Orientation orientation, i
       return Qt::AlignRight;
     } else if (role == Qt::DecorationRole) {
       if (m_draggedHoverIndex.row() == section) {
-        static const QIcon DROP_HERE_ICON{":img/DROP_HERE"};
+        static const QIcon DROP_HERE_ICON{":img/DROP_ITEM_HERE"};
         return DROP_HERE_ICON;
       } else if (mCutIndexes.contains(rootPath(), section)) {
         static const QIcon CUT_ICON{":img/CUT_ITEM"};
