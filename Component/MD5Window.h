@@ -8,7 +8,7 @@
 #include <QVBoxLayout>
 
 class MD5Window : public QDialog {
- public:
+public:
   explicit MD5Window(QWidget* parent = nullptr);
   void ReadSetting();
   void showEvent(QShowEvent* event) override;
@@ -18,13 +18,23 @@ class MD5Window : public QDialog {
   void dropEvent(QDropEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
 
- private:
-  QPlainTextEdit* m_md5TextEdit{nullptr};
-  QAction* _ONLY_FIRST_BYTE{nullptr};
+  void subscribe();
+private:
+  int GetBytesRange() const;
+  void Recalculate();
+
+  QAction* _ONLY_FIRST_8_BYTES{nullptr};
+  QAction* _ONLY_FIRST_16_BYTES{nullptr};
+  QAction* _ONLY_EVERY_BYTES{nullptr};
+  QActionGroup* _CALC_BYTES_RANGE{nullptr};
   QToolBar* m_md5InfoTB{nullptr};
+
+  QPlainTextEdit* m_md5TextEdit{nullptr};
+
   QVBoxLayout* mMainLayout{nullptr};
 
-  QMap<QString, QString> m_fileMD5Map;
+  QStringList mPathsList;
+  QSet<QString> mPathsSet;
 };
 
 #endif  // MD5WINDOW_H
