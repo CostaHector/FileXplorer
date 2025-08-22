@@ -2,6 +2,7 @@
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "FileBasicOperationsActions.h"
 #include <QLayout>
 
 AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent)  //
@@ -50,6 +51,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_contentCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
 
   addWidget(m_nameFilterCB);
+  addAction(g_fileBasicOperationsActions()._FORCE_RESEARCH);
   addWidget(m_typeFilterButton);
   addSeparator();
   addWidget(m_searchModeComboBox);

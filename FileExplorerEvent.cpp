@@ -755,7 +755,7 @@ bool FileExplorerEvent::on_revealInExplorer() const {
 }
 
 bool FileExplorerEvent::on_OpenInTerminal() const {
-  if (not(_contentPane->isFSView() or _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH))) {
+  if (!(_contentPane->isFSView() || _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH))) {
     qWarning("[Open in Terminal] only support in filesystem/search/movie but[%s]", qPrintable(_contentPane->GetCurViewName()));
     Notificator::warning("[Reveal in Terminal] only support in filesystem/search/movie but[%1]", _contentPane->GetCurViewName());
     return false;

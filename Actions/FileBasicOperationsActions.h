@@ -72,6 +72,8 @@ class FileBasicOperationsActions : public QObject {
 
   QAction *SELECT_ALL{nullptr}, *SELECT_NONE{nullptr}, *SELECT_INVERT{nullptr};
   QActionGroup* SELECTION_RIBBONS{nullptr};
+
+  QAction* _FORCE_RESEARCH{nullptr};
 };
 
 FileBasicOperationsActions& g_fileBasicOperationsActions();

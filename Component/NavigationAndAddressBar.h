@@ -4,20 +4,38 @@
 #include "AddressELineEdit.h"
 #include "PathUndoRedoer.h"
 #include "PublicVariable.h"
-
 #include "FileSystemTypeFilter.h"
-
-#include <QHBoxLayout>
-#include <QToolBar>
-
-#include <QLineEdit>
-#include <QPushButton>
-#include <QToolButton>
-
 #include "FolderNxtAndLastIterator.h"
 
+#include <QLineEdit>
+#include <QToolBar>
+#include <QToolButton>
+#include <QShortcut>
+
+class SplitToolButton : public QToolButton {
+  Q_OBJECT
+public:
+  explicit SplitToolButton(QWidget *parent = nullptr);
+  QString GetShortcutString(const QString& topAction, const QString& bottomAction) const;
+signals:
+  void topHalfClicked();
+  void bottomHalfClicked();
+
+protected:
+  void mousePressEvent(QMouseEvent *event) override {
+    if (event->y() < height() / 2) {
+      emit topHalfClicked();
+    } else {
+      emit bottomHalfClicked();
+    }
+    QToolButton::mousePressEvent(event);
+  }
+private:
+  QShortcut* topShortcut{nullptr}, *bottomShortcut{nullptr};
+};
+
 class NavigationAndAddressBar : public QToolBar {
- public:
+public:
   explicit NavigationAndAddressBar(const QString& title = "Address Toolbar", QWidget* parent = nullptr);
 
   void BindFileSystemViewCallback(T_IntoNewPath IntoNewPath,
@@ -48,9 +66,9 @@ class NavigationAndAddressBar : public QToolBar {
   QLineEdit* mFsSearchLE{nullptr};
   FileSystemTypeFilter* m_fsFilter{nullptr};
 
- private:
+private:
   bool onIteratorToAnotherFolderCore(bool isNext);
-
+  SplitToolButton* mLastNextFolderTb{nullptr};
   T_IntoNewPath m_IntoNewPath{nullptr};
   T_on_searchTextChanged m_on_searchTextChanged{nullptr};
   T_on_searchEnterKey m_on_searchEnterKey{nullptr};

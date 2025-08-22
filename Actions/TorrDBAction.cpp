@@ -11,7 +11,7 @@ TorrDBAction::TorrDBAction(QObject* parent)
       DELETE_FROM_TABLE{new (std::nothrow) QAction(tr("&Delete from table"), this)},
       DROP_TABLE{new (std::nothrow) QAction(tr("Drop table(complete table))"), this)},
       SUBMIT{new (std::nothrow) QAction(tr("&Submit"), this)},
-      SHOW_TORRENTS_MANAGER{new (std::nothrow) QAction(QIcon(":img/TORRENTS_MANAGER"), tr("&Torrents"), this)} {
+      SHOW_TORRENTS_MANAGER{new (std::nothrow) QAction(QIcon(":img/TORRENTS_VIEW"), tr("&Torrents"), this)} {
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
   OPEN_DB_WITH_LOCAL_APP->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")

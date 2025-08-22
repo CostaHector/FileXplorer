@@ -51,7 +51,7 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
 
   updateWindowsSize();
   setWindowTitle("Torrents Manager Widget");
-  setWindowIcon(QIcon(":img/TORRENTS_MANAGER"));
+  setWindowIcon(QIcon(":img/TORRENTS_VIEW"));
 }
 
 void TorrentsManagerWidget::subscribe() {

@@ -1,1 +1,1 @@
-cmd.exe /K "C: && cd C:\home\Ariel\qtcpp\FileXplorer\lib"
+cmd.exe /K "C: && cd C:\home\aria\code\FileXplorer\bin\themes"
