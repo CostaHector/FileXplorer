@@ -77,14 +77,17 @@ public:
     ClearCopyAndCutDict();
     mCutIndexes.Set(rootPath(), cutIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
-    EmitDecorationRoleChange(beRngLst);
+    // No need to CheckIndex(ind, Option::DoNotUseParent)
+    // because model always valid(cut/copy will not invalidate index and model)
+    // unless rootpath changed
+    EmitAfterDecorationRoleChange(beRngLst);
   }
   void CopiedSomething(const QModelIndexList& copiedIndexes) {
     auto beRngLst = mCutIndexes.GetTopBottomRange();
     ClearCopyAndCutDict();
     mCopyIndexes.Set(rootPath(), copiedIndexes);
     beRngLst += mCutIndexes.GetTopBottomRange();
-    EmitDecorationRoleChange(beRngLst);
+    EmitAfterDecorationRoleChange(beRngLst);
   }
 
   void appendDisable(const QModelIndex& ind);
@@ -155,7 +158,7 @@ public:
   }
 
 private:
-  void EmitDecorationRoleChange(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {
+  void EmitAfterDecorationRoleChange(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {
     foreach (auto beRng, beRngLst) {
       if (beRng.first.isValid() && beRng.first.row() < rowCount() && beRng.second.isValid() && beRng.second.row() < rowCount()) {
         emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});

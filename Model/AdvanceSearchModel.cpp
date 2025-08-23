@@ -79,6 +79,7 @@ void AdvanceSearchModel::initRootPath(const QString& path) {
 }
 
 void AdvanceSearchModel::setRootPath(const QString& path) {
+  ClearCopyAndCutDict();
   if (!checkPathNeed(path)) {
     return;
   }
