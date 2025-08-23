@@ -158,7 +158,7 @@ QToolBar* SceneInPageActions::GetImageSizeToolBar() {
   connect(mImageSize, &QLineEdit::textChanged, &onImageSizeChanged);
 
   QToolBar* imageSizeTB = new (std::nothrow) QToolBar{"Image size toolbar"};
-  imageSizeTB->addWidget(new QLabel{"Image width-by-height"});
+  imageSizeTB->addWidget(new (std::nothrow) QLabel{"Image width-by-height"});
   imageSizeTB->addWidget(mImageSize);
   imageSizeTB->setStyleSheet("QToolBar { max-width: 512px; }");
   imageSizeTB->setOrientation(Qt::Orientation::Vertical);
