@@ -12,14 +12,13 @@ class CustomListView : public QListView {
   virtual void contextMenuEvent(QContextMenuEvent* event) override;
 
   void BindMenu(QMenu* menu);
-  void onOrientationChange(const QAction* pOrientation);
+  void onOrientationChange(bool isLeftToRight);
 
   void InitListView();
 
  protected:
   QString m_name;
-  QAction *_ORIENTATION_LEFT_TO_RIGHT{nullptr}, *_ORIENTATION_TOP_TO_BOTTOM{nullptr};
-  QActionGroup* _ORIENTATION_GRP{nullptr};
+  QAction *_FLOW_ORIENTATION_ACT{nullptr};
 
  private:
   QMenu* m_menu = nullptr;

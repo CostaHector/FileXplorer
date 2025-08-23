@@ -20,8 +20,6 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent)//
   _PLAY_ITEM = new (std::nothrow) QAction{"Play", this};
   mItemMenu = new (std::nothrow) QMenu{"Item Menu", this};
   mItemMenu->addAction(_PLAY_ITEM);
-  mItemMenu->addSeparator();
-  mItemMenu->addActions(_ORIENTATION_GRP->actions());
   BindMenu(mItemMenu);
 
   subscribe();

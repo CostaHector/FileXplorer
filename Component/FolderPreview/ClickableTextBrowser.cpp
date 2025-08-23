@@ -19,10 +19,6 @@
 #include <QClipboard>
 #include <QDebug>
 
-const QString ClickableTextBrowser::HTML_H1_TEMPLATE{R"(<a href="file:///%1">%2</a>)"};
-const QString ClickableTextBrowser::HTML_IMG_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a><br/>\n)"};
-const QString ClickableTextBrowser::VID_LINK_TEMPLATE{R"(<a href="file:///%1">&#9654;%2</a>)"};
-constexpr int ClickableTextBrowser::HTML_IMG_FIXED_WIDTH;
 constexpr int ClickableTextBrowser::MIN_SINGLE_SEARCH_PATTERN_LEN;
 constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;
 
@@ -48,10 +44,21 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{paren
 }
 
 bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
-  if (!url.isLocalFile()) {
-    return false;
+  if (url.isLocalFile()) {
+    return QDesktopServices::openUrl(url);
   }
-  return QDesktopServices::openUrl(url);
+  bool hideOrShowRelated{false};
+  if (url.toString() == "hideRelatedVideos") {
+    hideOrShowRelated = true;
+    mCastVideosVisisble = !mCastVideosVisisble;
+  } else if (url.toString() == "hideRelatedImages") {
+    hideOrShowRelated = true;
+    mCastImagesVisisble = !mCastImagesVisisble;
+  }
+  if (hideOrShowRelated) {
+    UpdateHtmlContents();
+  }
+  return true;
 }
 
 QString ClickableTextBrowser::FormatSearchSentence(QString text) {

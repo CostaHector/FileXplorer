@@ -11,9 +11,9 @@ bool PerformerJsonFileHelper::ImgHumanSorter(const QString& lhs, const QString& 
 }
 
 QStringList PerformerJsonFileHelper::InitImgsList(const QString& imgs) {
+  // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
   QStringList imgsLst = imgs.split(IMG_VID_SEP_COMP);
   std::sort(imgsLst.begin(), imgsLst.end(), ImgHumanSorter);
-  // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
   return imgsLst;
 }
 
