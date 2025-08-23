@@ -97,11 +97,11 @@ class FileExplorerEvent : public QObject {
   bool on_MoveTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::MoveAction, r); }
   bool on_CopyTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::CopyAction, r); }
 
-  FileSystemModel* _fileSysModel;
-  ContentPanel* _contentPane;
+  FileSystemModel* _fileSysModel{nullptr};
+  ContentPanel* _contentPane{nullptr};
 
-  CustomStatusBar* _logger;
-  QClipboard* m_clipboard;
+  CustomStatusBar* _logger{nullptr};
+  QClipboard* m_clipboard{nullptr};
 
   AlertSystem* m_alertSystem{nullptr};
   Archiver* m_archivePreview{nullptr};
