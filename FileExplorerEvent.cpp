@@ -52,7 +52,6 @@
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
 
-#include <QGuiApplication>
 #include <QApplication>
 #include <QInputDialog>
 #include <QTextStream>
@@ -71,11 +70,12 @@ FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(FileSystemModel* fsm, 
 }
 
 FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent)
-    : QObject(parent),                             //
-      _fileSysModel(fsm),                          //
-      _contentPane(view),                          //
-      _logger(logger),                             //
-      m_clipboard{QGuiApplication::clipboard()} {  //
+  : QObject{parent} {  //
+  _fileSysModel = fsm;
+  _contentPane = view;
+  _logger = logger;
+  m_clipboard = QApplication::clipboard();
+  // connect(m_clipboard, &QClipboard::dataChanged, this, &FileExplorerEvent::onSystemClipboardDataChanged);
 }
 
 auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& contents) -> bool {  // not effect by selection;
@@ -97,7 +97,7 @@ auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& conte
     return false;
   }
   const QString& txtFilePath = _fileSysModel->rootDirectory().absoluteFilePath(newTextName);
-  if (not contents.isEmpty()) {
+  if (!contents.isEmpty()) {
     QFile file(txtFilePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
       QTextStream stream(&file);
@@ -1091,6 +1091,7 @@ bool FileExplorerEvent::on_Copy() {
   QList<QUrl> urls;
   std::tie(absPaths, urls) = _contentPane->getFilePathsAndUrls(Qt::CopyAction);
   QMimeData* pMimeData = new (std::nothrow) QMimeData;
+  CHECK_NULLPTR_RETURN_FALSE(pMimeData)
   pMimeData->setText(absPaths.join('\n'));
   pMimeData->setUrls(urls);
   if (!SetMimeDataCutCopy(*pMimeData, Qt::CopyAction)) {
