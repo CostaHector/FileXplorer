@@ -37,6 +37,7 @@ file(GLOB SOURCES
     ../Tools/Json/*.cpp
     ../View/*.cpp
     *.cpp
+    ComponentTest/*.cpp
     ComponentTest/JsonEditorWidgetTest/*.cpp
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp

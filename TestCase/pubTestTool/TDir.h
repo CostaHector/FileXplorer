@@ -31,7 +31,7 @@ class TDir {
   bool dirExists(const QString& folder, bool bWinCaseSensitive = false) const;
   QStringList entryList(const QDir::Filters filters = QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::NoDotAndDotDot | QDir::Filter::Hidden, const QDir::SortFlags sort = QDir::NoSort) const;
   QString path() const { return mTempPath; }
-  QString itemPath(const QString& itemName) const { return mTempPath + '/' + itemName; };
+  QString itemPath(const QString& itemName) const { return mTempPath + '/' + itemName; }
 
  private:
   QTemporaryDir mTempDir;
