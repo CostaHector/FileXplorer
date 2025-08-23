@@ -5,20 +5,20 @@
 class PreviewBrowser : public ClickableTextBrowser {
  public:
   explicit PreviewBrowser(QWidget* parent = nullptr);
-  auto operator()(const QString& path) -> bool;
+  bool operator()(const QString& path);
   void subscribe();
 
   void setDockerWindowTitle(int vidCnt) {
     if (m_parentDocker == nullptr) {
       return;
     }
-    m_parentDocker->setWindowTitle(QString::number(vidCnt) + '|' + QString::number(m_imgsLst.size()));
+    m_parentDocker->setWindowTitle(QString{"%1|%2"}.arg(vidCnt).arg(m_imgsLst.size()));
   }
 
   QStringList InitImgsList(const QString& dirPath) const;
   bool hasNextImgs() const;
   QString nextImgsHTMLSrc();
-  auto ShowRemainImages(const int val) -> bool;
+  bool ShowRemainImages(const int val);
 
   static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 50, INT_MAX};  // never remove last element "INT_MAX"
   static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(SHOW_IMGS_CNT_LIST[0]);
@@ -26,7 +26,7 @@ class PreviewBrowser : public ClickableTextBrowser {
 
   QString dirPath;
   QStringList m_imgsLst;
-  QWidget* m_parentDocker;
+  QWidget* m_parentDocker{nullptr};
 };
 
 #endif  // PREVIEWBROWSER_H

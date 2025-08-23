@@ -27,27 +27,18 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) : QListView
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
 
-  _ORIENTATION_LEFT_TO_RIGHT = new (std::nothrow) QAction{"left to right", this};
-  _ORIENTATION_TOP_TO_BOTTOM = new (std::nothrow) QAction{"top to bottom", this};
-  _ORIENTATION_GRP = new (std::nothrow) QActionGroup{this};
-  _ORIENTATION_GRP->addAction(_ORIENTATION_LEFT_TO_RIGHT);
-  _ORIENTATION_GRP->addAction(_ORIENTATION_TOP_TO_BOTTOM);
-  _ORIENTATION_LEFT_TO_RIGHT->setCheckable(true);
-  _ORIENTATION_TOP_TO_BOTTOM->setCheckable(true);
-  _ORIENTATION_GRP->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+  _FLOW_ORIENTATION_ACT = new (std::nothrow) QAction{m_name + " Flow Orientation", this};
+  _FLOW_ORIENTATION_ACT->setCheckable(true);
+  _FLOW_ORIENTATION_ACT->setToolTip("Toggle ListView Flow Direction LeftToRight/TopToBottom");
+  const bool isFlowLeftToRight = PreferenceSettings().value(m_name + "_ORIENTATION_LEFT_TO_RIGHT", true).toBool();
+  _FLOW_ORIENTATION_ACT->setChecked(isFlowLeftToRight);
+  onOrientationChange(isFlowLeftToRight);
 
-  if (PreferenceSettings().value(m_name + "_ORIENTATION_LEFT_TO_RIGHT", true).toBool()) {
-    _ORIENTATION_LEFT_TO_RIGHT->setChecked(true);
-    onOrientationChange(_ORIENTATION_LEFT_TO_RIGHT);
-  } else {
-    _ORIENTATION_TOP_TO_BOTTOM->setChecked(true);
-    onOrientationChange(_ORIENTATION_TOP_TO_BOTTOM);
-  }
-  connect(_ORIENTATION_GRP, &QActionGroup::triggered, this, &CustomListView::onOrientationChange);
+  connect(_FLOW_ORIENTATION_ACT, &QAction::toggled, this, &CustomListView::onOrientationChange);
 }
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
-  if (m_menu) {
+  if (m_menu != nullptr) {
     m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
     return;
   }
@@ -59,23 +50,26 @@ void CustomListView::BindMenu(QMenu* menu) {
     qWarning("Don't bind a nullptr menu");
     return;
   }
-  m_menu = menu;
-}
-
-void CustomListView::onOrientationChange(const QAction* pOrientation) {
-  if (pOrientation == nullptr) {
-    qCritical("pOrientation is nullptr");
+  if (m_menu != nullptr) {
+    qWarning("Don't rebind menu. m_menu is already not nullptr");
     return;
   }
-  if (pOrientation->text() == "left to right") {
-    setFlow(QListView::Flow::LeftToRight);
-    PreferenceSettings().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", true);
+  m_menu = menu;
+  m_menu->addSeparator();
+  m_menu->addAction(_FLOW_ORIENTATION_ACT);
+}
+
+void CustomListView::onOrientationChange(bool isLeftToRight) {
+  setFlow(isLeftToRight ? QListView::Flow::LeftToRight : QListView::Flow::TopToBottom);
+  PreferenceSettings().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", isLeftToRight);
+  if (isLeftToRight) {
+    _FLOW_ORIENTATION_ACT->setIcon(QIcon{":img/ALIGN_HORIZONTAL_LEFT"});
+    _FLOW_ORIENTATION_ACT->setText(m_name + " Flow: Left to Right");
   } else {
-    setFlow(QListView::Flow::TopToBottom);
-    PreferenceSettings().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", false);
+    _FLOW_ORIENTATION_ACT->setIcon(QIcon{":img/ALIGN_VERTICAL_TOP"});
+    _FLOW_ORIENTATION_ACT->setText(m_name + " Flow: Top to Bottom");
   }
 }
 
 void CustomListView::InitListView() {
-  sizeHintForRow(StyleSheet::ROW_SECTION_HEIGHT);
 }

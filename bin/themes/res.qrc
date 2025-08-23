@@ -275,6 +275,8 @@
 <file alias="PAGINATION_LAST">View/PAGINATION_LAST.svg</file>
 <file alias="PAGINATION_NEXT">View/PAGINATION_NEXT.svg</file>
 <file alias="FLOATING_PREVIEW">View/FLOATING_PREVIEW.svg</file>
+<file alias="ALIGN_HORIZONTAL_LEFT">View/ALIGN_HORIZONTAL_LEFT.svg</file>
+<file alias="ALIGN_VERTICAL_TOP">View/ALIGN_VERTICAL_TOP.svg</file>
 
 <!--Database icon here-->
 <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
