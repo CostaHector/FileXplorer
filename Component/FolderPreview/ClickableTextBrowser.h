@@ -9,15 +9,12 @@
 #include <QMenu>
 #include <QAction>
 #include <QToolBar>
+#include <QScrollBar>
+#include "CastBrowserHelper.h"
 
 class ClickableTextBrowser : public QTextBrowser {
 public:
   explicit ClickableTextBrowser(QWidget* parent = nullptr);
-  static const QString VID_LINK_TEMPLATE;
-  static const QString HTML_IMG_TEMPLATE;
-  static const QString HTML_H1_TEMPLATE;
-  static constexpr int HTML_IMG_FIXED_WIDTH{600};
-
   QStringList GetSelectedTexts() const {
     QStringList texts;
     texts.reserve(mMultiSelections.size());
@@ -44,6 +41,23 @@ public:
   static QString FormatSearchSentence(QString text);
   static QString GetSearchResultParagraphDisplay(const QString& searchText);
   static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
+
+  void SetCastHtmlParts(const stCastHtml& castHtmls) {mCastHtmls = castHtmls;}
+  void UpdateHtmlContents() {
+    setHtml(mCastHtmls.body);
+    int scrollPos = verticalScrollBar()->value();
+    if (mCastVideosVisisble) {
+      append(mCastHtmls.vidPart);
+    }
+    if (mCastImagesVisisble) {
+      append(mCastHtmls.imgPart);
+    }
+    if (mCastVideosVisisble || mCastImagesVisisble) {
+      verticalScrollBar()->setValue(scrollPos);
+    }
+  }
+  stCastHtml mCastHtmls;
+  bool mCastVideosVisisble{true}, mCastImagesVisisble{true};
 
 protected:
   void mouseDoubleClickEvent(QMouseEvent *e) override;

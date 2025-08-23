@@ -25,7 +25,9 @@ FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* paren
 
   subscribe();
 
-  setFlow(QListView::Flow::TopToBottom);
+  setFlow(QListView::Flow::LeftToRight);
+  setWrapping(true);
+  setUniformItemSizes(true);
 }
 
 void FileSystemListView::subscribe() {

@@ -62,8 +62,6 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
 
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
-  m_menu->addSeparator();
-  m_menu->addActions(_ORIENTATION_GRP->actions());
   BindMenu(m_menu);
   subscribe();
 }
