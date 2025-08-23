@@ -47,7 +47,6 @@ public:
   const ROW_RANGES_LST& GetTopBottomRange() const {
     return mRowRangeList;
   }
-
 private:
   QString currentPath;
   ROW_RANGES_LST mRowRangeList; // [front, back] contain endpoint

@@ -41,21 +41,18 @@ public:
   void ClearCutDict() { mCutIndexes.clear(); }
   void ClearCopiedDict() { mCopyIndexes.clear(); }
   void CutSomething(const QModelIndexList& cutIndexes) {
-    // don't emit decoration role change for the former indexes here
-    // SIGSEGV sigmentation error here.
-    // when files are already cut to another path, and one still cut all items in former path again
+    auto beRngLst = mCutIndexes.GetTopBottomRange();
     ClearCopyAndCutDict();
     mCutIndexes.Set(rootPath(), cutIndexes);
-    foreach (auto beRng, mCutIndexes.GetTopBottomRange()) {
-      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
-    }
+    EmitBeforeDecorationRoleRevert(beRngLst);
+    EmitAfterDecorationRoleChange(mCutIndexes.GetTopBottomRange());
   }
   void CopiedSomething(const QModelIndexList& copiedIndexes) {
+    auto beRngLst = mCopyIndexes.GetTopBottomRange();
     ClearCopyAndCutDict();
     mCopyIndexes.Set(rootPath(), copiedIndexes);
-    foreach (auto beRng, mCopyIndexes.GetTopBottomRange()) {
-      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
-    }
+    EmitBeforeDecorationRoleRevert(beRngLst);
+    EmitAfterDecorationRoleChange(mCopyIndexes.GetTopBottomRange());
   }
 
   void DragHover(const QModelIndex index) {
@@ -87,6 +84,22 @@ protected:
   mutable CustomStatusBar* _mPLogger{nullptr};
 
 private:
+  void EmitBeforeDecorationRoleRevert(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {
+    foreach (auto beRng, beRngLst) {
+      if (checkIndex(beRng.first, CheckIndexOption::DoNotUseParent) || checkIndex(beRng.second, CheckIndexOption::DoNotUseParent)) {
+        qDebug("parent model of indexes[(%d,%d), (%d,%d)] is invalid",//
+               beRng.first.row(), beRng.first.column(),//
+               beRng.second.row(), beRng.second.column());//
+        break;
+      }
+      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
+    }
+  }
+  void EmitAfterDecorationRoleChange(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {
+    foreach (auto beRng, beRngLst) {
+      emit dataChanged(beRng.first, beRng.second, {Qt::DecorationRole});
+    }
+  }
   SelectionsRangeHelper mCutIndexes, mCopyIndexes;
   QModelIndex m_draggedHoverIndex;
   QModelIndex mRootIndex;

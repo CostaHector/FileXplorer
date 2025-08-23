@@ -384,7 +384,7 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
   QStringList filePaths;
   QList<QUrl> urls;
 
-  static const auto Fill = [&filePaths, &urls](FileSystemModel* fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct) {
+  const auto Fill = [&filePaths, &urls](FileSystemModel* fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct) {
     filePaths.reserve(indexes.size());
     urls.reserve(indexes.size());
     for (const auto& ind : indexes) {
@@ -398,9 +398,9 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
     }
   };
 
-  static const auto FillInSearchModel = [&filePaths, &urls](
-                                            AdvanceSearchModel* searchSrcModel, SearchProxyModel* searchProxyModel,
-                                            const QModelIndexList& proIndexes, const Qt::DropAction dropAct) {
+  const auto FillInSearchModel = [&filePaths, &urls](
+                                     AdvanceSearchModel* searchSrcModel, SearchProxyModel* searchProxyModel,
+                                     const QModelIndexList& proIndexes, const Qt::DropAction dropAct) {
 
     QModelIndexList srcIndexes;
     srcIndexes.reserve(proIndexes.size());
