@@ -1,28 +1,33 @@
-#include "PreviewLabels.h"
+#include "ImagesInFolderSlider.h"
 #include "PublicVariable.h"
-
 #include "ArchiveFiles.h"
-constexpr int PreviewLabels::SLIDE_TO_NEXT_IMG_TIME_INTERVAL;  // ms
-constexpr int PreviewLabels::MAX_LABEL_CNT;
 
-void PreviewLabels::setDockerWindowTitle() {
-  if (m_parentDocker == nullptr) {
-    return;
+constexpr int ImagesInFolderSlider::SLIDE_TO_NEXT_IMG_TIME_INTERVAL;  // ms
+constexpr int ImagesInFolderSlider::MAX_LABEL_CNT;
+
+ImagesInFolderSlider::ImagesInFolderSlider(QWidget* parent)
+  : QScrollArea{parent},//
+  m_labelsLayout{new (std::nothrow) QVBoxLayout{this}}
+{
+  m_imgLabelsList.reserve(MAX_LABEL_CNT);
+  for (int imgCnt = 0; imgCnt < MAX_LABEL_CNT; ++imgCnt) {
+    m_imgLabelsList.append(new (std::nothrow) QLabel{this});
+    m_labelsLayout->addWidget(m_imgLabelsList[imgCnt]);
   }
-  QString title;
-  title += QString::number(m_vidsCountUnderAPath);
-  title += '|';
-  title += QString::number(m_imgsUnderAPath != nullptr ? m_imgsUnderAPath->size() : 0);
-  m_parentDocker->setWindowTitle(title);
+  setWidgetResizable(true);
+  setLayout(m_labelsLayout);
+
+  m_nextImgTimer->setInterval(SLIDE_TO_NEXT_IMG_TIME_INTERVAL);
+  m_nextImgTimer->setSingleShot(false);
+  connect(m_nextImgTimer, &QTimer::timeout, this, &ImagesInFolderSlider::nxtImgInFolder);
 }
 
-void PreviewLabels::operator()(const QString& folderPath) {
+void ImagesInFolderSlider::operator()(const QString& folderPath) {
   if (m_nextImgTimer->isActive()) {
     m_nextImgTimer->stop();
   }
   m_inFolderImgIndex = 0;
   getImgsPathAndVidsCount(folderPath);
-  setDockerWindowTitle();
   if (m_imgsUnderAPath != nullptr and m_imgsUnderAPath->isEmpty()) {
     clearLabelContents();
     return;
@@ -34,7 +39,7 @@ void PreviewLabels::operator()(const QString& folderPath) {
   }
 }
 
-void PreviewLabels::ResetImgsList(FilesListBase* pImgsList) {
+void ImagesInFolderSlider::ResetImgsList(FilesListBase* pImgsList) {
   if (m_imgsUnderAPath == nullptr) {
     m_imgsUnderAPath = pImgsList;
     return;
@@ -43,13 +48,13 @@ void PreviewLabels::ResetImgsList(FilesListBase* pImgsList) {
   m_imgsUnderAPath = pImgsList;
 }
 
-bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
+bool ImagesInFolderSlider::getImgsPathAndVidsCount(const QString& path) {
   if (m_imgsUnderAPath != nullptr) {
     m_imgsUnderAPath->clear();
   }
   m_vidsCountUnderAPath = 0;
 
-  QFileInfo pathFi(path);
+  const QFileInfo pathFi{path};
   if (pathFi.isFile()) {
     const QString& suffix = "*." + QFileInfo(path).suffix().toLower();
     if (TYPE_FILTER::IMAGE_TYPE_SET.contains(suffix)) {
@@ -61,10 +66,8 @@ bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
       m_vidsCountUnderAPath = 1;
     }
     return true;
-  }
-
-  if (pathFi.isDir()) {
-    QDir dir(path, "", QDir::SortFlag::NoSort, QDir::Filter::Files);
+  } else if (pathFi.isDir()) {
+    QDir dir{path, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
     dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
     QStringList imgs;
     for (const QString& imgName : dir.entryList()) {
@@ -72,15 +75,15 @@ bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
     }
 
     // show .qz as image preview only when images not exist
-    if (not imgs.isEmpty()) {
-      ResetImgsList(new PlainStringList(imgs));
+    if (!imgs.isEmpty()) {
+      ResetImgsList(new (std::nothrow) PlainStringList(imgs));
     } else {
       dir.setNameFilters(TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET);
       const QStringList& qzNamesList = dir.entryList();
       if (not qzNamesList.isEmpty()) {
         // only show first qz file
         const QString& qzFilePath = dir.absoluteFilePath(qzNamesList.front());
-        ResetImgsList(new ArchiveFiles{qzFilePath});
+        ResetImgsList(new (std::nothrow) ArchiveFiles{qzFilePath});
       }
     }
     dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
@@ -90,7 +93,7 @@ bool PreviewLabels::getImgsPathAndVidsCount(const QString& path) {
   return true;
 }
 
-auto PreviewLabels::nxtImgInFolder() -> void {
+auto ImagesInFolderSlider::nxtImgInFolder() -> void {
   if (m_imgsUnderAPath == nullptr) {
     return;
   }
@@ -135,7 +138,7 @@ auto PreviewLabels::nxtImgInFolder() -> void {
 #include <Qt>
 
 class PreviewLabelTest : public QMainWindow {
- public:
+public:
   QTableView* m_tv{new QTableView{this}};
   QFileSystemModel* m_fsm{new QFileSystemModel{this}};
   PreviewLabel* m_dc{new PreviewLabel{this}};

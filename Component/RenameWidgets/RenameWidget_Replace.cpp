@@ -42,20 +42,20 @@ void RenameWidget_Replace::extraSubscribe() {
 }
 
 auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
-  m_oldStrCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
+  m_oldStrCB->addItems(Configuration().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
   m_oldStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_oldStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_oldStrCB->setEditable(true);
   m_oldStrCB->setCompleter(nullptr);  // block auto complete
 
-  m_newStrCB->addItems(PreferenceSettings().value(MemoryKey::RENAMER_NEW_STR_LIST.name, MemoryKey::RENAMER_NEW_STR_LIST.v).toStringList());
+  m_newStrCB->addItems(Configuration().value(MemoryKey::RENAMER_NEW_STR_LIST.name, MemoryKey::RENAMER_NEW_STR_LIST.v).toStringList());
   m_newStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_newStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_newStrCB->setEditable(true);
   m_newStrCB->setCompleter(nullptr);
 
   m_regexCB->setToolTip("Enable regex");
-  m_regexCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_REGEX_ENABLED.name, MemoryKey::RENAMER_REGEX_ENABLED.v).toBool());
+  m_regexCB->setChecked(Configuration().value(MemoryKey::RENAMER_REGEX_ENABLED.name, MemoryKey::RENAMER_REGEX_ENABLED.v).toBool());
 }
 
 QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {

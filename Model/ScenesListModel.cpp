@@ -9,7 +9,7 @@
 
 ScenesListModel::ScenesListModel(QObject* object)  //
     : QAbstractListModelPub(object) {
-  int sceneCnt1Page = PreferenceSettings().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
+  int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
   SCENES_CNT_1_PAGE = sceneCnt1Page;
 }
 

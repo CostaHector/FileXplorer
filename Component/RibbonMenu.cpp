@@ -57,7 +57,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
   Subscribe();
-  setCurrentIndex(PreferenceSettings().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
+  setCurrentIndex(Configuration().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
 }
 
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
@@ -118,7 +118,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   }
 
   auto* copyTB = new DropdownToolButton(g_fileBasicOperationsActions().COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  copyTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_COPY_CHOICE.name, MemoryKey::DEFAULT_COPY_CHOICE.v).toString());
+  copyTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_COPY_CHOICE.name, MemoryKey::DEFAULT_COPY_CHOICE.v).toString());
   copyTB->MemorizeCurrentAction(MemoryKey::DEFAULT_COPY_CHOICE.name);
 
   QToolBar* propertiesTB = new (std::nothrow) QToolBar("Properties");
@@ -135,7 +135,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   }
 
   auto* newItemsTB = new (std::nothrow) DropdownToolButton(g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  newItemsTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_NEW_CHOICE.name, MemoryKey::DEFAULT_NEW_CHOICE.v).toString());
+  newItemsTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_NEW_CHOICE.name, MemoryKey::DEFAULT_NEW_CHOICE.v).toString());
   newItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_NEW_CHOICE.name);
 
   QToolBar* moveCopyItemsToTB = new (std::nothrow) QToolBar("Move/Copy item(s) To ToolBar");
@@ -193,7 +193,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   }
 
   auto* renameItemsTB = new DropdownToolButton(g_renameAg().RENAME_RIBBONS->actions(), QToolButton::MenuButtonPopup);
-  renameItemsTB->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_RENAME_CHOICE.name, MemoryKey::DEFAULT_RENAME_CHOICE.v).toString());
+  renameItemsTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_RENAME_CHOICE.name, MemoryKey::DEFAULT_RENAME_CHOICE.v).toString());
   renameItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_RENAME_CHOICE.name);
   QToolBar* advanceSearchToolBar = new (std::nothrow) QToolBar("AdvanceSearch");
   CHECK_NULLPTR_RETURN_NULLPTR(advanceSearchToolBar);
@@ -309,7 +309,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto* createThumbnailToolButton =
       new (std::nothrow) DropdownToolButton{crtThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
   CHECK_NULLPTR_RETURN_NULLPTR(createThumbnailToolButton);
-  createThumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name, MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.v).toString());
+  createThumbnailToolButton->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name, MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.v).toString());
   createThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name);
 
   QList<QAction*> extractThumbnailActions;
@@ -321,7 +321,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   auto* extractThumbnailToolButton =
       new (std::nothrow) DropdownToolButton{extractThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
   CHECK_NULLPTR_RETURN_NULLPTR(extractThumbnailToolButton);
-  extractThumbnailToolButton->FindAndSetDefaultAction(PreferenceSettings().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
+  extractThumbnailToolButton->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
   extractThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
@@ -372,12 +372,12 @@ void RibbonMenu::Subscribe() {
 }
 
 void RibbonMenu::on_officeStyleWidgetVisibilityChanged(const bool vis) {
-  PreferenceSettings().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
+  Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
   setMaximumHeight(vis ? RibbonMenu::MAX_WIDGET_HEIGHT : tabBar()->height());
 }
 
 void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
-  PreferenceSettings().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
+  Configuration().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
 }
 
 // #define __NAME__EQ__MAIN__ 1

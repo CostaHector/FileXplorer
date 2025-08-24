@@ -109,7 +109,7 @@ bool SceneActionsSubscribe::SetScenesPerColumn() {
     qDebug("Page scenes count str[%s] invalid", qPrintable(scenesCnt1PageStr));
     return false;
   }
-  PreferenceSettings().setValue("SCENES_COUNT_EACH_PAGE", scenesCnt1Page);
+  Configuration().setValue("SCENES_COUNT_EACH_PAGE", scenesCnt1Page);
   _model->ChangeItemsCntIn1Page(scenesCnt1Page);
   return true;
 }

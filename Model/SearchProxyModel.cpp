@@ -7,10 +7,10 @@
 SearchProxyModel::SearchProxyModel(QObject* parent)
   : QSortFilterProxyModel{parent}  //
 {                                    //
-  m_fileContentsCaseSensitive = PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool();
-  m_nameFiltersCaseSensitive = PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool();
-  m_nameFilterDisableOrHide = PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool();
-  const QString searchModeStr = PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_MODE.name, MemoryKey::ADVANCE_SEARCH_MODE.v).toString();
+  m_fileContentsCaseSensitive = Configuration().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool();
+  m_nameFiltersCaseSensitive = Configuration().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool();
+  m_nameFilterDisableOrHide = Configuration().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool();
+  const QString searchModeStr = Configuration().value(MemoryKey::ADVANCE_SEARCH_MODE.name, MemoryKey::ADVANCE_SEARCH_MODE.v).toString();
   initSearchMode(searchModeStr);
 
   static const Qt::CaseSensitivity CASE_SENSITIVE_BOOL_2_ENUM[2] = {Qt::CaseInsensitive, Qt::CaseSensitive};
@@ -26,7 +26,7 @@ void SearchProxyModel::initSearchMode(const QString& searchMode) {
 }
 
 void SearchProxyModel::setSearchMode(const QString& searchMode) {
-  PreferenceSettings().setValue(MemoryKey::ADVANCE_SEARCH_MODE.name, searchMode);
+  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_MODE.name, searchMode);
   initSearchMode(searchMode);
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }
@@ -136,19 +136,19 @@ bool SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
 }
 
 void SearchProxyModel::setNameFilterDisables(bool hide) {
-  PreferenceSettings().setValue(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, hide);
+  Configuration().setValue(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, hide);
   initNameFilterDisables(hide);
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }
 
 void SearchProxyModel::setFileContentsCaseSensitive(bool sensitive) {
-  PreferenceSettings().setValue(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, sensitive);
+  Configuration().setValue(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, sensitive);
   initFileContentsCaseSensitive(sensitive);
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }
 
 void SearchProxyModel::setFileNameFiltersCaseSensitive(bool sensitive) {
-  PreferenceSettings().setValue(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, sensitive);
+  Configuration().setValue(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, sensitive);
   initFileNameFiltersCaseSensitive(sensitive);
   const auto nameCaseSensitive = sensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
   if (filterCaseSensitivity() != nameCaseSensitive) {

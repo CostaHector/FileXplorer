@@ -108,14 +108,14 @@ bool NeedSaveCurrentGeometry(const QWidget& w) {
 
 void AdvanceRenamer::closeEvent(QCloseEvent* event) {
   if (NeedSaveCurrentGeometry(*this)) {
-    PreferenceSettings().setValue("ADVANCE_RENAMER_GEOMETRY", saveGeometry());
+    Configuration().setValue("ADVANCE_RENAMER_GEOMETRY", saveGeometry());
   }
   QDialog::closeEvent(event);
 }
 
 void AdvanceRenamer::ReadSettings() {
-  if (PreferenceSettings().contains("ADVANCE_RENAMER_GEOMETRY")) {
-    restoreGeometry(PreferenceSettings().value("ADVANCE_RENAMER_GEOMETRY").toByteArray());
+  if (Configuration().contains("ADVANCE_RENAMER_GEOMETRY")) {
+    restoreGeometry(Configuration().value("ADVANCE_RENAMER_GEOMETRY").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -133,8 +133,8 @@ void AdvanceRenamer::init() {
   m_mainLayout->setContentsMargins(5, 5, 5, 5);
 
   /* don't move this section up (Don't set state before UI)*/
-  m_recursiveCB->setChecked(PreferenceSettings().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
-  const bool bNameExtIndependent{PreferenceSettings().value(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.v).toBool()};
+  m_recursiveCB->setChecked(Configuration().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
+  const bool bNameExtIndependent{Configuration().value(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.v).toBool()};
   m_nameExtIndependent->setChecked(bNameExtIndependent);
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);
@@ -206,19 +206,19 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
 
 void AdvanceRenamer::onRegex(const int regexState) {
   const bool isRegexEnabled{regexState == Qt::Checked};
-  PreferenceSettings().setValue(MemoryKey::RENAMER_REGEX_ENABLED.name, isRegexEnabled);
+  Configuration().setValue(MemoryKey::RENAMER_REGEX_ENABLED.name, isRegexEnabled);
   OnlyTriggerRenameCore();
 }
 
 void AdvanceRenamer::onIncludingSub(int includingSubState) {
   const bool isIncludingDir = includingSubState == Qt::Checked;
-  PreferenceSettings().setValue(MemoryKey::RENAMER_INCLUDING_DIR.name, isIncludingDir);
+  Configuration().setValue(MemoryKey::RENAMER_INCLUDING_DIR.name, isIncludingDir);
   InitTextEditContent(mWorkPath, mSelectedNames);
 }
 
 void AdvanceRenamer::onNameExtRespective(int includingSuffixState) {
   const bool bNameExtIndependent{includingSuffixState == Qt::Checked};
-  PreferenceSettings().setValue(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, bNameExtIndependent);
+  Configuration().setValue(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, bNameExtIndependent);
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);
   if (bNameExtIndependent) {

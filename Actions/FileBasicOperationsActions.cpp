@@ -109,7 +109,7 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
 }
 
 QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey) {
-  QString historyStr = PreferenceSettings().value(memoryKey.name, memoryKey.v).toString();
+  QString historyStr = Configuration().value(memoryKey.name, memoryKey.v).toString();
   QStringList historyList = historyStr.split('\n');
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   for (const QString& path : historyList) {
@@ -360,7 +360,7 @@ QActionGroup* FileBasicOperationsActions::FileStructureActions() {
   FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_FLATTEN);
   FILE_STRUCTURE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
-  int fileStructureWay = PreferenceSettings()
+  int fileStructureWay = Configuration()
                              .value(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name,  //
                                     MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.v)
                              .toInt();

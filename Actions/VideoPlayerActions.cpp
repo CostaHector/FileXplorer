@@ -6,7 +6,7 @@
 
 VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
   _VOLUME_CTRL_MUTE->setCheckable(true);
-  _VOLUME_CTRL_MUTE->setChecked(PreferenceSettings().value(MemoryKey::VIDEO_PLAYER_MUTE.name, MemoryKey::VIDEO_PLAYER_MUTE.v).toBool());
+  _VOLUME_CTRL_MUTE->setChecked(Configuration().value(MemoryKey::VIDEO_PLAYER_MUTE.name, MemoryKey::VIDEO_PLAYER_MUTE.v).toBool());
   if (_VOLUME_CTRL_MUTE->isChecked()) {
     _VOLUME_CTRL_MUTE->setIcon(QIcon(":img/VOLUME_MUTE"));
   } else {
@@ -43,7 +43,7 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
   _NEXT_10_SECONDS->setToolTip(QString("<b>%1 (%2)</b><br/> plus 10s").arg(_NEXT_10_SECONDS->text(), _NEXT_10_SECONDS->shortcut().toString()));
 
   _AUTO_PLAY_NEXT_VIDEO->setCheckable(true);
-  _AUTO_PLAY_NEXT_VIDEO->setChecked(PreferenceSettings().value(MemoryKey::AUTO_PLAY_NEXT_VIDEO.name, MemoryKey::AUTO_PLAY_NEXT_VIDEO.v).toBool());
+  _AUTO_PLAY_NEXT_VIDEO->setChecked(Configuration().value(MemoryKey::AUTO_PLAY_NEXT_VIDEO.name, MemoryKey::AUTO_PLAY_NEXT_VIDEO.v).toBool());
   _AUTO_PLAY_NEXT_VIDEO->setToolTip(QString("<b>%1 (%2)</b><br/> Auto play next video when current finished").arg(_AUTO_PLAY_NEXT_VIDEO->text(), _AUTO_PLAY_NEXT_VIDEO->shortcut().toString()));
 
   _PLAY_PAUSE->setEnabled(false);
@@ -57,7 +57,7 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent) : QObject{parent} {
 
   _SHOW_VIDEOS_LIST->setCheckable(true);
   _SHOW_VIDEOS_LIST->setChecked(
-      PreferenceSettings().value(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.v).toBool());
+      Configuration().value(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.v).toBool());
 
   _MARK_HOT_SCENE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_P));
   _MARK_HOT_SCENE->setShortcutVisibleInContextMenu(true);

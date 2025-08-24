@@ -41,7 +41,7 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   m_swap2Index->setEditable(true);
   m_swap2Index->setCompleter(nullptr);
   m_swap2Index->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  const QString& defaultUserInput = PreferenceSettings().value(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.v).toString();
+  const QString& defaultUserInput = Configuration().value(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.v).toString();
   m_swap2Index->addItem(defaultUserInput);
   m_swap2Index->addItems(NameSectionArrange::SWAP_INDEX_FREQ);
 
@@ -76,7 +76,7 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
       regexValidLabel->ToNotSaved();
       return {};
     }
-    PreferenceSettings().setValue(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, m_swap2Index->currentText());
+    Configuration().setValue(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, m_swap2Index->currentText());
     nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), bRecordWasted);
   } else if (_SECTIONS_USED_TO_JOIN->isChecked()) {
     if (!SubscriptsDigitChar2Int(m_sectionsUsedToJoin->currentText(), sortedSequenceIndex)) {

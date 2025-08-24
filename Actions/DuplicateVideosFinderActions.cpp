@@ -40,7 +40,7 @@ QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
   m_tb->addAction(DIFFER_BY_DURATION);
   if (durationDevLE == nullptr) {
     int durDev =
-        PreferenceSettings().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
+        Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
     durationDevLE = new QLineEdit{QString::number(durDev), m_tb};
   }
   m_tb->addWidget(durationDevLE);
@@ -48,7 +48,7 @@ QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
   m_tb->addAction(DIFFER_BY_SIZE);
   if (sizeDevLE == nullptr) {
     int szDev =
-        PreferenceSettings().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
+        Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
     sizeDevLE = new QLineEdit{QString::number(szDev), m_tb};
   }
   m_tb->addWidget(sizeDevLE);

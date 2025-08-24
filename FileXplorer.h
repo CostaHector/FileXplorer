@@ -5,10 +5,10 @@
 
 #include "CustomStatusBar.h"
 #include "NavigationToolBar.h"
-#include "PreviewFolder.h"
-#include "StackedToolBar.h"
+#include "SelectionPreviewer.h"
+#include "StackedAddressAndSearchToolBar.h"
 
-#include "ContentPanel.h"
+#include "ViewsStackedWidget.h"
 #include "RibbonMenu.h"
 
 class FileXplorer : public QMainWindow {
@@ -26,13 +26,13 @@ class FileXplorer : public QMainWindow {
 
   QDockWidget* previewHtmlDock{nullptr};
 
-  PreviewFolder* m_previewFolder{nullptr};
+  SelectionPreviewer* m_previewFolder{nullptr};
   FolderPreviewSwitcher* m_previewSwitcher{nullptr};
 
-  ContentPanel* m_fsPanel{nullptr};
-  StackedToolBar* m_stackedBar{nullptr};
+  ViewsStackedWidget* m_fsPanel{nullptr};
+  StackedAddressAndSearchToolBar* m_stackedBar{nullptr};
 
-  NavigationViewSwitcher* m_naviSwitcher{nullptr};
+  ToolBarAndViewSwitcher* m_naviSwitcher{nullptr};
   QToolBar* m_viewsSwitcher{nullptr};
 
   NavigationToolBar* m_navigationToolBar{nullptr};

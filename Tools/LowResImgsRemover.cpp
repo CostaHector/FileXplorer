@@ -4,6 +4,7 @@
 #include <QHash>
 #include "PublicTool.h"
 #include "PublicVariable.h"
+#include "StringTool.h"
 #include "UndoRedo.h"
 
 using namespace FileOperatorType;
@@ -22,12 +23,13 @@ QStringList LowResImgsRemover::GetLowResImgsToDel(const QStringList& imgs) const
     }
   }
 
+  using namespace StringTool;
   QStringList imgsToBeDel;
   for (auto& imgs : imgsResGrp.values()) {
     if (imgs.size() < 2) {  // only 1 image; no other resolution images
       continue;
     }
-    ImgsSortFileSizeFirst(imgs);  // last image size is largest should keepm, so skip
+    ImgsSortFileSizeFirst(imgs);  // last image size is largest should keep, so skip
     imgs.pop_back();
     imgsToBeDel += imgs;
   }

@@ -172,9 +172,9 @@ constexpr int VidInfoModel::NAME_LEVEL_COUNT;
 
 VidInfoModel::VidInfoModel(QObject* parent) : QAbstractTableModel{parent} {
   m_deviationSz =
-      PreferenceSettings().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
+      Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
   m_deviationDur =
-      PreferenceSettings().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
+      Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
 }
 
 QVariant VidInfoModel::data(const QModelIndex& index, int role) const {
@@ -245,7 +245,7 @@ void VidInfoModel::setDeviationDuration(int newDuration) {
   if (newDuration == m_deviationDur) {
     return;
   }
-  PreferenceSettings().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, newDuration);
+  Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, newDuration);
   m_deviationDur = newDuration;
   setDataChangedFlag();
   UpdateMemberList();
@@ -256,7 +256,7 @@ void VidInfoModel::setDeviationSize(int newSize) {
   if (newSize == m_deviationSz) {
     return;
   }
-  PreferenceSettings().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, newSize);
+  Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, newSize);
   m_deviationSz = newSize;
   setDataChangedFlag();
   UpdateMemberList();

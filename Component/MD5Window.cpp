@@ -51,8 +51,8 @@ MD5Window::MD5Window(QWidget* parent)
 }
 
 void MD5Window::ReadSetting() {
-  if (PreferenceSettings().contains("MD5WindowGeometry")) {
-    restoreGeometry(PreferenceSettings().value("MD5WindowGeometry").toByteArray());
+  if (Configuration().contains("MD5WindowGeometry")) {
+    restoreGeometry(Configuration().value("MD5WindowGeometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -65,7 +65,7 @@ void MD5Window::showEvent(QShowEvent* event) {
 }
 
 void MD5Window::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("MD5WindowGeometry", saveGeometry());
+  Configuration().setValue("MD5WindowGeometry", saveGeometry());
   QDialog::closeEvent(event);
 }
 

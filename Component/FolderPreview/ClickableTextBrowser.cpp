@@ -1,11 +1,13 @@
 #include "ClickableTextBrowser.h"
 #include "BrowserActions.h"
+#include "DisplayEnhancement.h"
+#include "FdBasedDb.h"
+#include "MemoryKey.h"
+#include "Notificator.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
-#include "DisplayEnhancement.h"
 #include "TableFields.h"
-#include "FdBasedDb.h"
-#include "Notificator.h"
+
 #include <QKeySequence>
 #include <QInputDialog>
 #include <QDesktopServices>
@@ -22,7 +24,11 @@
 constexpr int ClickableTextBrowser::MIN_SINGLE_SEARCH_PATTERN_LEN;
 constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;
 
-ClickableTextBrowser::ClickableTextBrowser(QWidget* parent) : QTextBrowser{parent} {
+ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
+  : QTextBrowser{parent},//
+  mCastVideosVisisble{Configuration().value(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.v).toBool()},
+  mCastImagesVisisble{Configuration().value(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.v).toBool()}
+{
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
@@ -51,9 +57,11 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
   if (url.toString() == "hideRelatedVideos") {
     hideOrShowRelated = true;
     mCastVideosVisisble = !mCastVideosVisisble;
+    Configuration().setValue(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, mCastVideosVisisble);
   } else if (url.toString() == "hideRelatedImages") {
     hideOrShowRelated = true;
     mCastImagesVisisble = !mCastImagesVisisble;
+    Configuration().setValue(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, mCastImagesVisisble);
   }
   if (hideOrShowRelated) {
     UpdateHtmlContents();

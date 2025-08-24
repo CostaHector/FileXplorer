@@ -97,12 +97,12 @@ void Archiver::ChangeWindowTitle(const QString& name, const int& Bytes) {
 }
 
 void Archiver::UpdateWindowsSize() {
-  if (PreferenceSettings().contains("ArchiverGeometry")) {
-    restoreGeometry(PreferenceSettings().value("ArchiverGeometry").toByteArray());
+  if (Configuration().contains("ArchiverGeometry")) {
+    restoreGeometry(Configuration().value("ArchiverGeometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_splitter->restoreState(PreferenceSettings().value("ArchiverSplitterState", QByteArray()).toByteArray());
+  m_splitter->restoreState(Configuration().value("ArchiverSplitterState", QByteArray()).toByteArray());
 }
 
 void Archiver::showEvent(QShowEvent *event) {
@@ -111,9 +111,9 @@ void Archiver::showEvent(QShowEvent *event) {
 }
 
 void Archiver::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("ArchiverGeometry", saveGeometry());
+  Configuration().setValue("ArchiverGeometry", saveGeometry());
   qDebug("Archiver geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
-  PreferenceSettings().setValue("ArchiverSplitterState", m_splitter->saveState());
+  Configuration().setValue("ArchiverSplitterState", m_splitter->saveState());
   QMainWindow::closeEvent(event);
 }
 

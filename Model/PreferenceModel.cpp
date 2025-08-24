@@ -11,14 +11,14 @@ QVariant AlertItem::getStoredValue() {
   if (m_kv == nullptr) {
     return "";
   }
-  return PreferenceSettings().value(m_kv->name, m_kv->v);
+  return Configuration().value(m_kv->name, m_kv->v);
 }
 
 bool AlertItem::isStoredValuePass() const {
   if (m_kv == nullptr) {
     return true;
   }
-  const QVariant& v = PreferenceSettings().value(m_kv->name, m_kv->v);
+  const QVariant& v = Configuration().value(m_kv->name, m_kv->v);
   return m_kv->checker(v);
 }
 
@@ -37,7 +37,7 @@ void AlertItem::setValue(const QVariant& newValue) {
   value = newValue;  // change value and pass
   checkRes = isPass(newValue);
   if (checkRes) {
-    PreferenceSettings().setValue(name, newValue);
+    Configuration().setValue(name, newValue);
   }
 }
 

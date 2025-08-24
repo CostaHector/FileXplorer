@@ -8,7 +8,7 @@
 
 namespace StyleSheet {
 THEME CurrentTheme(const THEME* const pNewTheme) {
-  static int themeInt = PreferenceSettings().value("STYLESHEET_NAME", THEME::DEFAULT).toInt();
+  static int themeInt = Configuration().value("STYLESHEET_NAME", THEME::DEFAULT).toInt();
   if (pNewTheme != nullptr) {
     themeInt = *pNewTheme;
   }

@@ -7,7 +7,7 @@
 #include "StyleSheet.h"
 
 #include "FolderPreviewSwitcher.h"
-#include "NavigationViewSwitcher.h"
+#include "ToolBarAndViewSwitcher.h"
 #include "ViewTypeTool.h"
 
 #include <QString>
@@ -28,15 +28,15 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
 {
   previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this};
 
-  m_previewFolder = new (std::nothrow) PreviewFolder{previewHtmlDock};
-  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, previewHtmlDock};
-  m_stackedBar = new (std::nothrow) StackedToolBar;
+  m_previewFolder = new (std::nothrow) SelectionPreviewer{previewHtmlDock};
+  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this};
+  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar;
   m_viewsSwitcher = g_viewActions().GetViewTB();
   m_navigationToolBar = new (std::nothrow) NavigationToolBar;
   m_ribbonMenu = new (std::nothrow) RibbonMenu{this};
   m_statusBar = new (std::nothrow) CustomStatusBar{m_viewsSwitcher, this};
-  m_fsPanel = new (std::nothrow) ContentPanel(m_previewFolder, this);
-  m_naviSwitcher = new (std::nothrow) NavigationViewSwitcher{m_stackedBar, m_fsPanel};
+  m_fsPanel = new (std::nothrow) ViewsStackedWidget(m_previewFolder, this);
+  m_naviSwitcher = new (std::nothrow) ToolBarAndViewSwitcher{m_stackedBar, m_fsPanel};
 
   m_fsPanel->BindLogger(m_statusBar);
   m_naviSwitcher->onSwitchByViewType(ViewTypeTool::ViewType::TABLE);
@@ -62,10 +62,10 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
 }
 
 void FileXplorer::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue(CLASSNAME_2_STR(FileXplorer) "_Geometry", saveGeometry());
-  PreferenceSettings().setValue(CLASSNAME_2_STR(FileXplorer) "_Docker_Width", m_previewFolder->width());
-  PreferenceSettings().setValue(CLASSNAME_2_STR(FileXplorer) "_Docker_Height", m_previewFolder->height());
-  PreferenceSettings().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
+  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Geometry", saveGeometry());
+  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Docker_Width", m_previewFolder->width());
+  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Docker_Height", m_previewFolder->height());
+  Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
   return QMainWindow::closeEvent(event);
 }
 
@@ -80,7 +80,7 @@ QString FileXplorer::ReadSettings(const QStringList& args) {
   QString path{(args.size() > 1) ? args[1] : ""};
   // when argv[1] path invalid, use last time path in preference setting
   if (!QFile::exists(path)) {
-    QString lastTimePath = PreferenceSettings().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
+    QString lastTimePath = Configuration().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
     qDebug("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
     path.swap(lastTimePath);
   }
@@ -95,8 +95,8 @@ QString FileXplorer::ReadSettings(const QStringList& args) {
 }
 
 void FileXplorer::RestoreWindowStateAndSetupUI() {
-  if (PreferenceSettings().contains(PROJECT_NAME "_Geometry")) {
-    restoreGeometry(PreferenceSettings().value(PROJECT_NAME "_Geometry").toByteArray());
+  if (Configuration().contains(PROJECT_NAME "_Geometry")) {
+    restoreGeometry(Configuration().value(PROJECT_NAME "_Geometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -105,12 +105,12 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 }
 
 void FileXplorer::InitComponentVisibility() {
-  const bool showNavi{PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
+  const bool showNavi{Configuration().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
   if (!showNavi) {
     m_navigationToolBar->setVisible(false);
   }
 
-  const bool showFolderPrev{PreferenceSettings().value(MemoryKey::SHOW_FOLDER_PREVIEW.name, MemoryKey::SHOW_FOLDER_PREVIEW.v).toBool()};
+  const bool showFolderPrev{Configuration().value(MemoryKey::SHOW_FOLDER_PREVIEW.name, MemoryKey::SHOW_FOLDER_PREVIEW.v).toBool()};
   const bool showPrev{m_fsPanel->isFSView() && showFolderPrev};
   if (!showPrev) {
     previewHtmlDock->setVisible(false);
@@ -120,7 +120,7 @@ void FileXplorer::InitComponentVisibility() {
 void FileXplorer::subscribe() {
   auto& vA = g_viewActions();
   connect(vA.NAVIGATION_PANE, &QAction::triggered, this, [this](const bool checked) {
-    PreferenceSettings().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
+    Configuration().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
     m_navigationToolBar->setVisible(checked);
   });
 
@@ -130,18 +130,18 @@ void FileXplorer::subscribe() {
       return;
     }
     const bool checked{triggeredActions->isChecked()};
-    PreferenceSettings().setValue(MemoryKey::SHOW_FOLDER_PREVIEW.name, checked);
+    Configuration().setValue(MemoryKey::SHOW_FOLDER_PREVIEW.name, checked);
     previewHtmlDock->setVisible(checked);
 
     const QString& previewType = triggeredActions->text();
     if (!triggeredActions->isChecked()) {  // clear preview type
-      PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, "");
+      Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, "");
     } else {
-      PreferenceSettings().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
+      Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
     }
     m_previewSwitcher->onSwitchByViewType(previewType);
   });
-  connect(vA._VIEWS_AG, &QActionGroup::triggered, m_naviSwitcher, &NavigationViewSwitcher::onSwitchByViewAction);
+  connect(vA._VIEWS_AG, &QActionGroup::triggered, m_naviSwitcher, &ToolBarAndViewSwitcher::onSwitchByViewAction);
 }
 
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {
