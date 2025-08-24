@@ -9,8 +9,8 @@ const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"Name", "Size",
 
 AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
   : QAbstractTableModelPub{parent},
-  m_filters{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
-  m_iteratorFlags{bool2IteratorFlag(PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())}  //
+  m_filters{Configuration().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
+  m_iteratorFlags{bool2IteratorFlag(Configuration().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())}  //
 {
 }
 

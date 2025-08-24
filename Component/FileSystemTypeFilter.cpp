@@ -9,17 +9,17 @@ const QDir::Filters FileSystemTypeFilter::DEFAULT_FILTER_FLAG{MemoryKey::DIR_FIL
 
 FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
   : QToolButton{parent},
-  m_flagWhenFilterEnabled{PreferenceSettings().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
-  m_isIncludingSubdirectory{PreferenceSettings().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool()} {
+  m_flagWhenFilterEnabled{Configuration().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
+  m_isIncludingSubdirectory{Configuration().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool()} {
   FILTER_SWITCH->setCheckable(true);
-  FILTER_SWITCH->setChecked(PreferenceSettings().value("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", true).toBool());
+  FILTER_SWITCH->setChecked(Configuration().value("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", true).toBool());
   FILTER_SWITCH->setToolTip(
       "1. QFileSystemModel->setFilter()\n"
       "2. SearchModel->setFilter()");
 
   DISABLE_ENTRIES_DONT_PASS_FILTER->setCheckable(true);
   DISABLE_ENTRIES_DONT_PASS_FILTER->setChecked(
-      PreferenceSettings().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool());
+      Configuration().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool());
   DISABLE_ENTRIES_DONT_PASS_FILTER->setToolTip(
       "This property holds whether files that don't pass the name filter are disable(true) or hide(false)\n"
       "This property is true disable by default.\n"
@@ -111,7 +111,7 @@ void FileSystemTypeFilter::BindFileSystemModel(AdvanceSearchModel* newModel, Sea
 }
 
 void FileSystemTypeFilter::onSwitchChanged(bool isOn) {
-  PreferenceSettings().setValue("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", isOn);
+  Configuration().setValue("FILE_SYSTEM_IS_FILTER_SWITCH_ON_RESTORED", isOn);
   if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
   }
@@ -125,7 +125,7 @@ void FileSystemTypeFilter::onSwitchChanged(bool isOn) {
 }
 
 void FileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
-  PreferenceSettings().setValue(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, isGray);
+  Configuration().setValue(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, isGray);
   if (m_flagWhenFilterEnabled == INVALID_MODEL) {
     return;
   }
@@ -138,7 +138,7 @@ void FileSystemTypeFilter::onTypeChecked(QAction* act) {
   } else {
     m_flagWhenFilterEnabled &= ~m_text2FilterFlag[act->text()];
   }
-  PreferenceSettings().setValue(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, int(m_flagWhenFilterEnabled));
+  Configuration().setValue(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, int(m_flagWhenFilterEnabled));
   if (FILTER_SWITCH->isChecked()) {  // take into effect only switch is on. Record changes even switch is off
     setFilterAgent(m_flagWhenFilterEnabled);
   }
@@ -223,7 +223,7 @@ void FileSystemTypeFilter::initSearchModelIteratorFlagAgent() {
 }
 
 void FileSystemTypeFilter::changeSearchModelIteratorFlagAgent(const bool including) {
-  PreferenceSettings().setValue(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, including);
+  Configuration().setValue(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, including);
   m_isIncludingSubdirectory = including;
   if (m_modelType != SEARCH_MODEL) {
     return;

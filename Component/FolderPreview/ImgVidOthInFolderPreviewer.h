@@ -1,5 +1,5 @@
-#ifndef IMGVIDOTHWID_H
-#define IMGVIDOTHWID_H
+#ifndef IMGVIDOTHINFOLDERPREVIEWER_H
+#define IMGVIDOTHINFOLDERPREVIEWER_H
 
 #include "ItemView.h"
 #include "FloatingModels.h"
@@ -7,9 +7,9 @@
 #include "WidgetReorderHelper.h"
 #include <QVBoxLayout>
 
-class ImgVidOthWid: public QWidget {
+class ImgVidOthInFolderPreviewer: public QWidget {
 public:
-  explicit ImgVidOthWid(const QString& memoryName, QWidget* parent = nullptr);
+  explicit ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
   void operator()(const QString& pth); // file system view
   void operator()(const QString& name, const QString& pth); // scene view
 
@@ -41,11 +41,11 @@ private:
   void onVidBtnClicked(bool checked);
   void onOthBtnClicked(bool checked);
   void onTypesBtnClicked(bool checked = true);
-  using MediaBtnHandlerFunc = void (ImgVidOthWid::*)(bool);
+  using MediaBtnHandlerFunc = void (ImgVidOthInFolderPreviewer::*)(bool);
   static constexpr MediaBtnHandlerFunc MEDIA_HANDLERS_MAP[(int)PREVIEW_ITEM_TYPE::BUTT]{
-      &ImgVidOthWid::onImgBtnClicked,  //
-      &ImgVidOthWid::onVidBtnClicked,  //
-      &ImgVidOthWid::onOthBtnClicked   //
+      &ImgVidOthInFolderPreviewer::onImgBtnClicked,  //
+      &ImgVidOthInFolderPreviewer::onVidBtnClicked,  //
+      &ImgVidOthInFolderPreviewer::onOthBtnClicked   //
   };
   void onImgVidOthActTriggered(const QAction* pAct);
   bool onReorder(int fromIndex, int destIndex);

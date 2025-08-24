@@ -29,13 +29,13 @@ void CommandsPreview::showEvent(QShowEvent* event) {
 }
 
 void CommandsPreview::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("COMMANDS_PREVIEW_GEOMETRY", saveGeometry());
+  Configuration().setValue("COMMANDS_PREVIEW_GEOMETRY", saveGeometry());
   QPlainTextEdit::closeEvent(event);
 }
 
 void CommandsPreview::ReadSettings() {
-  if (PreferenceSettings().contains("COMMANDS_PREVIEW_GEOMETRY")) {
-    restoreGeometry(PreferenceSettings().value("COMMANDS_PREVIEW_GEOMETRY").toByteArray());
+  if (Configuration().contains("COMMANDS_PREVIEW_GEOMETRY")) {
+    restoreGeometry(Configuration().value("COMMANDS_PREVIEW_GEOMETRY").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }

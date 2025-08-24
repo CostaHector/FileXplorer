@@ -1,17 +1,18 @@
 #include "CastDBView.h"
 
 #include "CastDBActions.h"
-#include "FloatingPreview.h"
-#include "RatingSqlTableModel.h"
-#include "Notificator.h"
 #include "FdBasedDb.h"
-#include "PathTool.h"
-#include "PublicMacro.h"
-#include "PublicVariable.h"
-#include "MemoryKey.h"
+#include "FileFolderPreviewer.h"
 #include "JsonHelper.h"
+#include "MemoryKey.h"
+#include "Notificator.h"
+#include "PathTool.h"
 #include "PerformerJsonFileHelper.h"
 #include "PerformersAkaManager.h"
+#include "PublicMacro.h"
+#include "PublicVariable.h"
+#include "RatingSqlTableModel.h"
+#include "StringTool.h"
 #include "TableFields.h"
 
 #include <QDesktopServices>
@@ -27,15 +28,15 @@
 #include <QSqlRecord>
 #include <QFileDialog>
 
-CastDBView::CastDBView(QLineEdit* perfSearchLE, FloatingPreview* floatingPreview, QWidget* parent)
+CastDBView::CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent)
     : CustomTableView{"PERFORMERS_TABLE", parent},  //
       m_perfSearch{perfSearchLE},
       _floatingPreview{floatingPreview},
-      m_imageHostPath{PreferenceSettings()
+      m_imageHostPath{Configuration()
                           .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
                                  MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)
                           .toString()},  //
-      m_performerImageHeight{PreferenceSettings()
+      m_performerImageHeight{Configuration()
                                  .value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name,  //
                                         MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v)
                                  .toInt()},  //
@@ -205,7 +206,7 @@ bool CastDBView::onLocateImageHost() {
     qWarning("locate path not exist");
     return false;
   }
-  PreferenceSettings().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, m_imageHostPath = locatePath);
+  Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, m_imageHostPath = locatePath);
   g_castAct().LOCATE_IMAGEHOST->setToolTip(m_imageHostPath);
   return true;
 }
@@ -218,7 +219,7 @@ bool CastDBView::onChangePerformerImageHeight() {
   }
   m_performerImageHeight = height;
   g_castAct().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT->setToolTip(QString::number(height));
-  PreferenceSettings().setValue(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, m_performerImageHeight);
+  Configuration().setValue(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, m_performerImageHeight);
   return true;
 }
 
@@ -334,7 +335,7 @@ QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query)
   }
   qDebug("%d records finded", vidPath.size());
   return vidPath;
-};
+}
 
 int CastDBView::onForceRefreshRecordsVids() {
   if (!selectionModel()->hasSelection()) {
@@ -356,7 +357,7 @@ int CastDBView::onForceRefreshRecordsVids() {
     const int r = indr.row();
     auto record = m_perfDbMdl->record(r);
     const QStringList& vidsList = GetVidsListFromVidsTable(record, qur);
-    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR));
+    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR));
     m_perfDbMdl->setRecord(r, record);  // update back
     vidsCnt += vidsList.size();
     if (recordsCnt == 0) {  // update display html content of first selected record

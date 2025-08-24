@@ -61,8 +61,8 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
 }
 
 void RedundantImageFinder::ReadSetting() {
-  if (PreferenceSettings().contains(RedunImgFinderKey::GEOMETRY.name)) {
-    restoreGeometry(PreferenceSettings().value(RedunImgFinderKey::GEOMETRY.name).toByteArray());
+  if (Configuration().contains(RedunImgFinderKey::GEOMETRY.name)) {
+    restoreGeometry(Configuration().value(RedunImgFinderKey::GEOMETRY.name).toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -75,7 +75,7 @@ void RedundantImageFinder::showEvent(QShowEvent* event) {
 
 void RedundantImageFinder::closeEvent(QCloseEvent* event) {
   g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER->setChecked(false);
-  PreferenceSettings().setValue(RedunImgFinderKey::GEOMETRY.name, saveGeometry());
+  Configuration().setValue(RedunImgFinderKey::GEOMETRY.name, saveGeometry());
   QMainWindow::closeEvent(event);
 }
 
@@ -87,7 +87,7 @@ void RedundantImageFinder::subscribe() {
   auto& inst = g_redunImgFinderAg();
   connect(inst.RECYLE_NOW, &QAction::triggered, this, &RedundantImageFinder::RecycleSelection);
   connect(inst.ALSO_EMPTY_IMAGE, &QAction::triggered, this, [](bool recycleEmptyImage) -> void {  //
-    PreferenceSettings().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, recycleEmptyImage);
+    Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, recycleEmptyImage);
   });
   connect(inst.FIND_DUPLICATE_IMGS_BY_LIBRARY, &QAction::triggered, this, [this]() {  //
     this->operator()(this->mCurrentPath);
@@ -138,7 +138,7 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
 }
 
 void RedundantImageFinder::operator()(const QString& folderPath) {
-  const bool recycleEmptyImage = PreferenceSettings().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
+  const bool recycleEmptyImage = Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
   const auto& inst = g_redunImgFinderAg();
   const bool byBenchmarkLib = inst.FIND_DUPLICATE_IMGS_BY_LIBRARY->isChecked();
   REDUNDANT_IMG_BUNCH newImgs = byBenchmarkLib ?  //

@@ -17,7 +17,7 @@ HarTableView::HarTableView(QWidget* parent)
   mEXPORT_TO = new (std::nothrow) QAction{QIcon{":img/EXPORT_TO"}, "Export to", this};
   mEXPORT_TO->setToolTip(QString("<b>%1</b><br/> Export the selection items to local path.").arg(mEXPORT_TO->text()));
 
-  mShowImagePreview = PreferenceSettings().value(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, MemoryKey::SHOW_HAR_IMAGE_PREVIEW.v).toBool();
+  mShowImagePreview = Configuration().value(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, MemoryKey::SHOW_HAR_IMAGE_PREVIEW.v).toBool();
   mQUICK_PREVIEW = new (std::nothrow) QAction{"Quick Preview", this};
   mQUICK_PREVIEW->setCheckable(true);
   mQUICK_PREVIEW->setChecked(mShowImagePreview);
@@ -52,7 +52,7 @@ void HarTableView::subscribe() {
   connect(mEXPORT_TO, &QAction::triggered, this, &HarTableView::SaveSelectionFilesTo);
   connect(mQUICK_PREVIEW, &QAction::triggered, this, [this](const bool bChecked) {
     mShowImagePreview = bChecked;
-    PreferenceSettings().setValue(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, bChecked);
+    Configuration().setValue(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, bChecked);
   });
   connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &HarTableView::PreviewImage);
 }
@@ -108,8 +108,8 @@ bool HarTableView::PreviewImage() {
 }
 
 void HarTableView::updateWindowsSize() {
-  if (PreferenceSettings().contains("HAR_TABLEVIEW_GEOMETRY")) {
-    restoreGeometry(PreferenceSettings().value("HAR_TABLEVIEW_GEOMETRY").toByteArray());
+  if (Configuration().contains("HAR_TABLEVIEW_GEOMETRY")) {
+    restoreGeometry(Configuration().value("HAR_TABLEVIEW_GEOMETRY").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -121,7 +121,7 @@ void HarTableView::showEvent(QShowEvent *event) {
 }
 
 void HarTableView::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("HAR_TABLEVIEW_GEOMETRY", saveGeometry());
+  Configuration().setValue("HAR_TABLEVIEW_GEOMETRY", saveGeometry());
   mPreviewLabel->close();
   CustomTableView::closeEvent(event);
 }

@@ -27,7 +27,7 @@ FileSystemTreeView::FileSystemTreeView(FileSystemModel* fsmModel, QWidget* paren
 }
 
 void FileSystemTreeView::subscribe() {
-  connect(header(), &QHeaderView::sectionResized, this, [this]() { PreferenceSettings().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
+  connect(header(), &QHeaderView::sectionResized, this, [this]() { Configuration().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
 
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
@@ -54,8 +54,8 @@ auto FileSystemTreeView::InitViewSettings() -> void {
   setSortingEnabled(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  if (PreferenceSettings().contains("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW")) {
-    header()->restoreState(PreferenceSettings().value("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW").toByteArray());
+  if (Configuration().contains("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW")) {
+    header()->restoreState(Configuration().value("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW").toByteArray());
   }
   sizeHintForRow(StyleSheet::ROW_SECTION_HEIGHT);
   FileSystemTreeView::UpdateItemViewFontSize();

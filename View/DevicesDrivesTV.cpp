@@ -82,13 +82,13 @@ DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)                          //
 void DevicesDrivesTV::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(_DEVICE_AND_DRIVES);
   _DEVICE_AND_DRIVES->setChecked(false);
-  PreferenceSettings().setValue("DevicesDriveTableViewGeometry", saveGeometry());
+  Configuration().setValue("DevicesDriveTableViewGeometry", saveGeometry());
   CustomTableView::closeEvent(event);
 }
 
 void DevicesDrivesTV::ReadSettings() {
-  if (PreferenceSettings().contains("DevicesDriveTableViewGeometry")) {
-    restoreGeometry(PreferenceSettings().value("DevicesDriveTableViewGeometry").toByteArray());
+  if (Configuration().contains("DevicesDriveTableViewGeometry")) {
+    restoreGeometry(Configuration().value("DevicesDriveTableViewGeometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }

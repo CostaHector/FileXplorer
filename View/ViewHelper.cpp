@@ -31,7 +31,7 @@ void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
     qDebug("UpdateItemViewFontSizeCore view* pointer is nullptr");
     return;
   }
-  const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
+  const auto fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
   QFont defaultFont(view->font());
   defaultFont.setPointSize(fontSize);
   view->setFont(defaultFont);

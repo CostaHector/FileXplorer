@@ -1,22 +1,5 @@
 #include "PerformerJsonFileHelper.h"
 
-const QRegularExpression PerformerJsonFileHelper::IMG_VID_SEP_COMP("\\||\r\n|\n");
-constexpr char PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR;
-
-bool PerformerJsonFileHelper::ImgHumanSorter(const QString& lhs, const QString& rhs) {
-  if (lhs.size() != rhs.size()) {
-    return lhs.size() < rhs.size();
-  }
-  return lhs < rhs;
-}
-
-QStringList PerformerJsonFileHelper::InitImgsList(const QString& imgs) {
-  // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
-  QStringList imgsLst = imgs.split(IMG_VID_SEP_COMP);
-  std::sort(imgsLst.begin(), imgsLst.end(), ImgHumanSorter);
-  return imgsLst;
-}
-
 QVariantHash PerformerJsonFileHelper::PerformerJsonJoiner(const QSqlRecord& record) {
   const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
   const int rates = record.field(PERFORMER_DB_HEADER_KEY::Rate_INDEX).value().toInt();
@@ -75,5 +58,5 @@ QString PerformerJsonFileHelper::PerformerInsertSQL(const QString& tableName,
     updateValue << '\"' + detail.replace('"', "\"\"") + '\"';
   }
 
-  return QString("REPLACE INTO `%1` (%2) VALUES(%3);").arg(tableName).arg(updateKey.join(',')).arg(updateValue.join(','));
+  return QString{"REPLACE INTO `%1` (%2) VALUES(%3);"}.arg(tableName).arg(updateKey.join(',')).arg(updateValue.join(','));
 }

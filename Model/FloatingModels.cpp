@@ -2,6 +2,8 @@
 #include "PathTool.h"
 #include "PublicTool.h"
 #include "StyleSheet.h"
+#include "StringTool.h"
+
 #include <QPixmap>
 #include <QFileIconProvider>
 #include <QDir>
@@ -42,7 +44,7 @@ int FloatingModels::setDirPath(const QString& path, const QStringList& sFilters,
   foreach (QString name, dir.entryList()) {
     datas.append(path + '/' + name);
   }
-  ImgsSortNameLengthFirst(datas);
+  StringTool::ImgsSortNameLengthFirst(datas);
   if (loadAllIn1Time) {
     UpdateData(datas);
   } else {

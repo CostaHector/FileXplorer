@@ -26,7 +26,7 @@ FolderPreviewActions::FolderPreviewActions(QObject* parent) : QObject{parent} {
   PREVIEW_AG->addAction(LABELS);
   PREVIEW_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
 
-  const QString& folderPreviewType = PreferenceSettings().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.v).toString();
+  const QString& folderPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.v).toString();
   for (auto* ag : PREVIEW_AG->actions()) {
     ag->setCheckable(true);
     if (ag->text() == folderPreviewType) {
