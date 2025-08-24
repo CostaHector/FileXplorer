@@ -80,7 +80,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   return detail;
 }
 
-CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
+CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost) {
   const QString castName {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
   const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString()};
   const QString imgsStr {record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString()};
@@ -121,7 +121,7 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
       <!-- Right self portrait -->
       <td width="30%" align="right" valign="top">
         <a href="file:///%2">
-          <img src="file:///%2" alt="Photo" width="%3" style="border:1px solid #ddd">
+          <img src="file:///%2" alt="Portrait" width="%3" style="border:1px solid #ddd">
         </a>
       </td>
     </tr>
@@ -132,7 +132,7 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
   htmlSrc += CAST_BRIEF_INTRODUCTION_TEMPLATE                                         //
                  .arg(castName)                                                       //
                  .arg(portraitImg)                                                    //
-                 .arg(imgHeight)                                                      //
+                 .arg(IMAGE_SIZE::PORTAIT_IMG_WIDTH)                                                      //
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::Rate).value().toInt())    //
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString())  //
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString()) //

@@ -104,9 +104,9 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       if (_view->m_fsListView == nullptr) {
         _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
         ViewsStackedWidget::connect(_view->m_fsListView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
-        _view->connectSelectionChanged(viewType);
         _view->AddView(viewType, _view->m_fsListView);
       }
+      _view->connectSelectionChanged(viewType);
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
@@ -121,9 +121,9 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       if (_view->m_fsTableView == nullptr) {
         _view->m_fsTableView = new FileSystemTableView(_view->m_fsModel);
         ViewsStackedWidget::connect(_view->m_fsTableView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
-        _view->connectSelectionChanged(viewType);
         _view->AddView(viewType, _view->m_fsTableView);
       }
+      _view->connectSelectionChanged(viewType);
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
@@ -138,9 +138,9 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       if (_view->m_fsTreeView == nullptr) {
         _view->m_fsTreeView = new FileSystemTreeView(_view->m_fsModel);
         ViewsStackedWidget::connect(_view->m_fsTreeView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
-        _view->connectSelectionChanged(viewType);
         _view->AddView(viewType, _view->m_fsTreeView);
       }
+      _view->connectSelectionChanged(viewType);
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {

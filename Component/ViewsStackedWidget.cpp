@@ -300,34 +300,19 @@ bool ViewsStackedWidget::on_selectionChanged(const QItemSelection& /* selected *
 }
 
 void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
-  disconnectSelectionChanged(vt);
+  disconnectSelectionChanged();
   switch (vt) {
     case ViewType::TABLE:
-      ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     case ViewType::LIST:
-      ViewsStackedWidget::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     case ViewType::TREE:
-      ViewsStackedWidget::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     default:
       qDebug("selection changed signal connect skip. current view type[%d]", (int)vt);
-  }
-}
-void ViewsStackedWidget::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
-  switch (vt) {
-    case ViewType::TABLE:
-      ViewsStackedWidget::disconnect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-      break;
-    case ViewType::LIST:
-      ViewsStackedWidget::disconnect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-      break;
-    case ViewType::TREE:
-      ViewsStackedWidget::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-      break;
-    default:
-      qDebug("selection changed signal disconnect skip. current view type[%d]", (int)vt);
   }
 }
 

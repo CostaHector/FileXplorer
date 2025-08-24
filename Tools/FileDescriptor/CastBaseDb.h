@@ -1,11 +1,11 @@
-#ifndef PERFBASEDB_H
-#define PERFBASEDB_H
+#ifndef CASTBASEDB_H
+#define CASTBASEDB_H
 
 #include "DbManager.h"
 
-class PerfBaseDb : public DbManager {
+class CastBaseDb : public DbManager {
  public:
-  PerfBaseDb(const QString& dbName, const QString& connName, QObject* parent = nullptr)  //
+  CastBaseDb(const QString& dbName, const QString& connName, QObject* parent = nullptr)  //
       : DbManager{dbName, connName, parent} {}
   int InsertPerformers(const QStringList& perfList);
   int ReadFromImageHost(const QString& imgsHostPath);
@@ -16,4 +16,4 @@ class PerfBaseDb : public DbManager {
   static QMap<QString, QString> GetFreqName2AkaNames(const QString& perfsText);
 };
 
-#endif  // PERFBASEDB_H
+#endif  // CASTBASEDB_H

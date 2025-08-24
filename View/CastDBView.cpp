@@ -28,40 +28,35 @@
 #include <QSqlRecord>
 #include <QFileDialog>
 
+QString CastDBView::GetImageHostPath() {
+  return Configuration().value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
+                               MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)
+      .toString();
+}
+
 CastDBView::CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent)
-    : CustomTableView{"PERFORMERS_TABLE", parent},  //
-      m_perfSearch{perfSearchLE},
-      _floatingPreview{floatingPreview},
-      m_imageHostPath{Configuration()
-                          .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
-                                 MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)
-                          .toString()},  //
-      m_performerImageHeight{Configuration()
-                                 .value(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name,  //
-                                        MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.v)
-                                 .toInt()},  //
-      mDb{SystemPath::PEFORMERS_DATABASE, "perfs_connection"}
+  : CustomTableView{"PERFORMERS_TABLE", parent},  //
+  m_perfSearch{perfSearchLE},
+  _floatingPreview{floatingPreview},
+  mDb{SystemPath::PEFORMERS_DATABASE, "perfs_connection"}
 
 {
   CHECK_NULLPTR_RETURN_VOID(m_perfSearch);
-
   BindMenu(g_castAct().GetRightClickMenu());
-  AppendVerticalHeaderMenuAGS(g_castAct().GetVerAGS());
-  AppendHorizontalHeaderMenuAGS(g_castAct().GetHorAGS());
 
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
     qWarning("open failed");
     return;
   }
-  m_perfDbMdl = new (std::nothrow) RatingSqlTableModel{this, con};
-  CHECK_NULLPTR_RETURN_VOID(m_perfDbMdl);
+  m_castModel = new (std::nothrow) RatingSqlTableModel{this, con};
+  CHECK_NULLPTR_RETURN_VOID(m_castModel);
   if (con.tables().contains(DB_TABLE::PERFORMERS)) {
-    m_perfDbMdl->setTable(DB_TABLE::PERFORMERS);
-    m_perfDbMdl->submitAll();
+    m_castModel->setTable(DB_TABLE::PERFORMERS);
+    m_castModel->submitAll();
   }
 
-  setModel(m_perfDbMdl);
+  setModel(m_castModel);
   InitTableView();
 
   subscribe();
@@ -72,7 +67,7 @@ CastDBView::CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPre
 void CastDBView::subscribe() {
   connect(m_perfSearch, &QLineEdit::returnPressed, this, [this]() {
     const QString& searchPattern = m_perfSearch->text();
-    m_perfDbMdl->setFilter(searchPattern);
+    m_castModel->setFilter(searchPattern);
   });
 
   connect(g_castAct().SUBMIT, &QAction::triggered, this, &CastDBView::onSubmit);
@@ -83,33 +78,30 @@ void CastDBView::subscribe() {
   connect(g_castAct().DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DROP); });
   connect(g_castAct().DELETE_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DELETE); });
 
-  connect(g_castAct().REFRESH_SELECTED_RECORDS_VIDS, &QAction::triggered, this, &CastDBView::onForceRefreshRecordsVids);
-  connect(g_castAct().REFRESH_ALL_RECORDS_VIDS, &QAction::triggered, this, &CastDBView::onForceRefreshAllRecordsVids);
+  connect(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshRecordsVids);
+  connect(g_castAct().SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshAllRecordsVids);
 
   connect(g_castAct().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
   connect(g_castAct().OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &CastDBView::onOpenRecordInFileSystem);
-  connect(g_castAct().LOCATE_IMAGEHOST, &QAction::triggered, this, &CastDBView::onLocateImageHost);
 
-  connect(g_castAct().LOAD_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
-  connect(g_castAct().LOAD_FROM_PERFORMERS_LIST, &QAction::triggered, this, &CastDBView::onLoadFromPerformersList);
-  connect(g_castAct().LOAD_FROM_PJSON_PATH, &QAction::triggered, this, &CastDBView::onLoadFromPJsonDirectory);
+  connect(g_castAct().APPEND_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
+  connect(g_castAct().APPEND_FROM_MULTILINES_INPUT, &QAction::triggered, this, &CastDBView::onLoadFromPerformersList);
+  connect(g_castAct().APPEND_FROM_PJSON_FILES, &QAction::triggered, this, &CastDBView::onLoadFromPJsonDirectory);
 
   connect(g_castAct().DUMP_ALL_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &CastDBView::onDumpAllIntoPJsonFile);
   connect(g_castAct().DUMP_SELECTED_RECORDS_INTO_PJSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPJsonFile);
-
-  connect(g_castAct().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT, &QAction::triggered, this, &CastDBView::onChangePerformerImageHeight);
 
   connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::on_selectionChanged);
 }
 
 void CastDBView::onInitATable() {
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
-  if (!mDb.CreateTable(DB_TABLE::PERFORMERS, PerfBaseDb::CREATE_PERF_TABLE_TEMPLATE)) {
+  if (!mDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE)) {
     qWarning("Table[%s] create failed.", qPrintable(DB_TABLE::PERFORMERS));
     return;
   }
-  m_perfDbMdl->setTable(DB_TABLE::PERFORMERS);
-  m_perfDbMdl->submitAll();
+  m_castModel->setTable(DB_TABLE::PERFORMERS);
+  m_castModel->submitAll();
   qDebug("Table[%s] create succeed", qPrintable(DB_TABLE::PERFORMERS));
 }
 
@@ -133,7 +125,7 @@ bool CastDBView::onInsertIntoTable() {
                              .arg(insertedSucceedCnt)
                              .arg(perfsLst.size()));
   }
-  m_perfDbMdl->submitAll();
+  m_castModel->submitAll();
   Notificator::goodNews(QString("%1 performer(s) inserted ok").arg(perfsLst.size()), names);
   return true;
 }
@@ -149,33 +141,34 @@ bool CastDBView::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete)
   }
   int rmvedTableCnt = mDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
   if (rmvedTableCnt < 0) {
-    QMessageBox::warning(this, "Drop/Delete failed", "see details in log");
+    Notificator::badNews("Drop/Delete failed", "see details in log");
     return false;
   }
-  m_perfDbMdl->submitAll();
+  m_castModel->submitAll();
   Notificator::goodNews(QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(DB_TABLE::PERFORMERS),  //
                         QString("Drop(0)/Delete(1). %1 table removed").arg(rmvedTableCnt));
   return rmvedTableCnt >= 0;
 }
 
 int CastDBView::onLoadFromFileSystemStructure() {
-  if (m_perfDbMdl->isDirty()) {
+  if (m_castModel->isDirty()) {
     Notificator::badNews("Table dirty", "submit before load from file-system structure");
     return false;
   }
-  int succeedCnt = mDb.ReadFromImageHost(m_imageHostPath);
+  const QString imageHostPath{GetImageHostPath()};
+  int succeedCnt = mDb.ReadFromImageHost(imageHostPath);
   if (succeedCnt < 0) {
-    Notificator::warning(QString("Load perfs from path[%1] failed").arg(m_imageHostPath),  //
+    Notificator::warning(QString("Load perfs from path[%1] failed").arg(imageHostPath),  //
                          QString("see detail in description"));
     return 0;
   }
-  m_perfDbMdl->submitAll();
-  Notificator::goodNews(QString("load %1 performer(s) succeed").arg(succeedCnt), m_imageHostPath);
+  m_castModel->submitAll();
+  Notificator::goodNews(QString("load %1 performer(s) succeed").arg(succeedCnt), imageHostPath);
   return succeedCnt;
 }
 
 int CastDBView::onLoadFromPerformersList() {
-  if (m_perfDbMdl->isDirty()) {
+  if (m_castModel->isDirty()) {
     Notificator::badNews("Table dirty", "submit before load from file-system structure");
     return false;
   }
@@ -183,7 +176,7 @@ int CastDBView::onLoadFromPerformersList() {
   const QString& perfsText =                             //
       QInputDialog::getMultiLineText(this,               //
                                      "Cast List",  //
-                                     "Example:\n Guardiola, Pep\nHuge Jackman, Slu", "", &ok);
+                                     "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine", "", &ok);
   if (!ok) {
     Notificator::information("User cancel", "skip");
     return 0;
@@ -194,51 +187,24 @@ int CastDBView::onLoadFromPerformersList() {
                          QString("see detail in description"));
     return 0;
   }
-  m_perfDbMdl->submitAll();
+  m_castModel->submitAll();
   Notificator::goodNews(QString("load %1 performer(s) succeed").arg(succeedCnt), perfsText);
   return succeedCnt;
 }
 
-bool CastDBView::onLocateImageHost() {
-  const QString& locatePath = QFileDialog::getExistingDirectory(this, "Locate imagehost folder", m_imageHostPath);
-  if (!QFile::exists(locatePath)) {
-    Notificator::badNews("cannot open", "locate path not exist");
-    qWarning("locate path not exist");
-    return false;
-  }
-  Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, m_imageHostPath = locatePath);
-  g_castAct().LOCATE_IMAGEHOST->setToolTip(m_imageHostPath);
-  return true;
-}
+bool CastDBView::onSubmit() {
+  CHECK_NULLPTR_RETURN_FALSE(m_castModel)
 
-bool CastDBView::onChangePerformerImageHeight() {
-  bool ok = false;
-  int height = QInputDialog::getInt(this, "Cast image height(px)", QString::number(m_performerImageHeight), m_performerImageHeight, 0, INT_MAX, 1, &ok);
-  if (!ok) {
-    return false;
-  }
-  m_performerImageHeight = height;
-  g_castAct().CHANGE_PERFORMER_IMAGE_FIXED_HEIGHT->setToolTip(QString::number(height));
-  Configuration().setValue(MemoryKey::PERFORMER_IMAGE_FIXED_HEIGHT.name, m_performerImageHeight);
-  return true;
-}
-
-inline bool CastDBView::onSubmit() {
-  if (m_perfDbMdl == nullptr) {
-    qCritical("_dbModel is nullptr");
-    return false;
-  }
-
-  if (!m_perfDbMdl->isDirty()) {
+  if (!m_castModel->isDirty()) {
     Notificator::goodNews("Table not dirty, Skip", DB_TABLE::PERFORMERS);
     return true;
   }
-  if (!m_perfDbMdl->submitAll()) {
+  if (!m_castModel->submitAll()) {
     Notificator::badNews("Submit failed. see details in logs", DB_TABLE::PERFORMERS);
     return false;
   }
 
-  Notificator::goodNews("Submit succeed", DB_TABLE::PERFORMERS);
+  Notificator::goodNews("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
   return true;
 }
 
@@ -247,39 +213,43 @@ bool CastDBView::on_selectionChanged(const QItemSelection& /*selected*/, const Q
     return true;
   }
   CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
-  const auto& record = m_perfDbMdl->record(currentIndex().row());
-  _floatingPreview->operator()(record, m_imageHostPath, m_performerImageHeight);
+  const auto& record = m_castModel->record(currentIndex().row());
+  const QString imageHostPath{GetImageHostPath()};
+  _floatingPreview->operator()(record, imageHostPath);
   return true;
 }
 
 int CastDBView::onLoadFromPJsonDirectory() {
-  if (m_perfDbMdl->isDirty()) {
+  CHECK_NULLPTR_RETURN_FALSE(m_castModel)
+
+  if (m_castModel->isDirty()) {
     Notificator::badNews("Table dirty", "submit before load pjson");
     return false;
   }
-
-  auto succeedCnt = mDb.LoadFromPJsonFile(m_imageHostPath);
+  const QString imageHostPath{GetImageHostPath()};
+  int succeedCnt = mDb.LoadFromPJsonFile(imageHostPath);
   if (succeedCnt < 0) {
-    Notificator::warning(QString("Load perfs from pJson[%1/*.pjson] failed").arg(m_imageHostPath),  //
+    Notificator::warning(QString("Load perfs from pJson[%1/*.pjson] failed").arg(imageHostPath),  //
                          QString("see detail in description"));
     return 0;
   }
-  m_perfDbMdl->submitAll();
+  m_castModel->submitAll();
 
-  Notificator::goodNews(QString("%1 pjson file load succeed").arg(succeedCnt), m_imageHostPath);
+  Notificator::goodNews(QString("%1 pjson file load succeed").arg(succeedCnt), imageHostPath);
   return succeedCnt;
 }
 
 int CastDBView::onDumpAllIntoPJsonFile() {
-  if (!QDir(m_imageHostPath).exists()) {
-    Notificator::badNews("Path[pjson dump to] not exist", m_imageHostPath);
+  const QString imageHostPath{GetImageHostPath()};
+  if (!QDir(imageHostPath).exists()) {
+    Notificator::badNews("Path[pjson dump to] not exist", imageHostPath);
     return 0;
   }
   int dumpCnt = 0;
   int succeedCnt = 0;
-  for (int r = 0; r < m_perfDbMdl->rowCount(); ++r) {
-    const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
-    const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
+  for (int r = 0; r < m_castModel->rowCount(); ++r) {
+    const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_castModel->record(r));
+    const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(imageHostPath, pJson);
     succeedCnt += JsonHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
@@ -289,22 +259,31 @@ int CastDBView::onDumpAllIntoPJsonFile() {
 }
 
 int CastDBView::onDumpIntoPJsonFile() {
-  if (!QDir(m_imageHostPath).exists()) {
-    Notificator::badNews("Path[pjson dump to] not exist", m_imageHostPath);
+  const QString imageHostPath{GetImageHostPath()};
+  if (!QDir{imageHostPath}.exists()) {
+    Notificator::badNews("Path[pjson dump to] not exist", imageHostPath);
     return 0;
   }
 
   if (!selectionModel()->hasSelection()) {
-    Notificator::badNews("Nothing was selected", "Select some row to dump");
+    Notificator::information("Nothing was selected", "Select some row to dump");
     return 0;
   }
 
+  QDir imageHostDir{imageHostPath};
   int dumpCnt = 0;
   int succeedCnt = 0;
   for (const auto& indr : selectionModel()->selectedRows()) {
     const int r = indr.row();
-    const auto& pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_perfDbMdl->record(r));
-    const QString& pJsonPath = PerformerJsonFileHelper::PJsonPath(m_imageHostPath, pJson);
+    const QVariantHash pJson = PerformerJsonFileHelper::PerformerJsonJoiner(m_castModel->record(r));
+    const QString ori {pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString()};
+    const QString castName {pJson[PERFORMER_DB_HEADER_KEY::Name].toString()};
+    const QString prepath {ori + '/' + castName};
+    if (!imageHostDir.exists(prepath) && !imageHostDir.mkpath(prepath)) {
+      qWarning("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(imageHostPath));
+      continue;
+    }
+    const QString pJsonPath {PerformerJsonFileHelper::PJsonPath(imageHostPath, ori, castName)};
     succeedCnt += JsonHelper::DumpJsonDict(pJson, pJsonPath);
     ++dumpCnt;
   }
@@ -314,7 +293,8 @@ int CastDBView::onDumpIntoPJsonFile() {
 }
 
 int CastDBView::onForceRefreshAllRecordsVids() {
-  QMessageBox::information(this, QString("Oops function not support now"), QString("But you could selected all record(s) and then force refresh instead."));
+  selectAll();
+  LOG_INFO("Refresh all records may cause lag", "Click Refresh Selected action if you are sure");
   return 0;
 }
 
@@ -323,15 +303,15 @@ QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query)
   static auto& dbTM = PerformersAkaManager::getIns();
   const QString& searchCommand = dbTM.GetMovieTablePerformerSelectCommand(record);
   if (!query.exec(searchCommand)) {
-    qWarning("Query[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    qWarning("Query[%s] failed: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return {};
   }
   QStringList vidPath;
+  vidPath.reserve(query.size());
   while (query.next()) {
-    vidPath << PathTool::Path3Join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
-                                   query.value(ENUM_2_STR(PrePathRight)).toString(),  //
-                                   query.value(ENUM_2_STR(Name)).toString());
+    vidPath.push_back(PathTool::Path3Join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
+                                          query.value(ENUM_2_STR(PrePathRight)).toString(),  //
+                                          query.value(ENUM_2_STR(Name)).toString()));
   }
   qDebug("%d records finded", vidPath.size());
   return vidPath;
@@ -349,32 +329,34 @@ int CastDBView::onForceRefreshRecordsVids() {
     qWarning("Open failed:%s", qPrintable(con.lastError().text()));
     return 0;
   }
-
+  const QString imageHostPath{GetImageHostPath()};
   QSqlQuery qur{con};
   int recordsCnt = 0;
   int vidsCnt = 0;
   for (const auto& indr : selectionModel()->selectedRows()) {
     const int r = indr.row();
-    auto record = m_perfDbMdl->record(r);
+    auto record = m_castModel->record(r);
     const QStringList& vidsList = GetVidsListFromVidsTable(record, qur);
     record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR));
-    m_perfDbMdl->setRecord(r, record);  // update back
+    m_castModel->setRecord(r, record);  // update back
+
     vidsCnt += vidsList.size();
-    if (recordsCnt == 0) {  // update display html content of first selected record
-      CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
-      const auto& record = m_perfDbMdl->record(currentIndex().row());
-      _floatingPreview->operator()(record, m_imageHostPath, m_performerImageHeight);
+    if (recordsCnt == 0 && _floatingPreview != nullptr) {  // update cast browser for first selected record
+      const auto& record = m_castModel->record(currentIndex().row());
+      _floatingPreview->operator()(record, imageHostPath);
     }
     ++recordsCnt;
   }
-  qDebug("Selected %d record(s) updated %d vid(s).", recordsCnt, vidsCnt);
-  QMessageBox::information(this, QString("Selected %1 record(s) updated.").arg(recordsCnt), QString("%1 vid(s)").arg(vidsCnt));
+  QString msgTitle{QString{"%1 records selection"}.arg(recordsCnt)};
+  QString msgDetail{QString{"%1 videos(s) updated succeed"}.arg(vidsCnt)};
+  Notificator::goodNews(msgTitle, msgDetail);
   return recordsCnt;
 }
 
 bool CastDBView::onOpenRecordInFileSystem() const {
-  if (!QDir(m_imageHostPath).exists()) {
-    qWarning("imgHost [%s] not exists", qPrintable(m_imageHostPath));
+  const QString imageHostPath{GetImageHostPath()};
+  if (!QDir(imageHostPath).exists()) {
+    qWarning("imgHost [%s] not exists", qPrintable(imageHostPath));
     return false;
   }
   if (!selectionModel()->hasSelection()) {
@@ -382,9 +364,9 @@ bool CastDBView::onOpenRecordInFileSystem() const {
     return false;
   }
 
-  const auto& record = m_perfDbMdl->record(currentIndex().row());
+  const auto& record = m_castModel->record(currentIndex().row());
   QString folderPath = QString{"%1/%2/%3"}                                                              //
-                           .arg(m_imageHostPath)                                                        //
+                           .arg(imageHostPath)                                                        //
                            .arg(record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString())  //
                            .arg(record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString());
   if (currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail_INDEX) {
@@ -408,12 +390,12 @@ int CastDBView::onDeleteRecords() {
   for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
     int startRow = it->top();  // [top, bottom]
     int size = it->bottom() - startRow + 1;
-    bool ret = m_perfDbMdl->removeRows(startRow, size);
+    bool ret = m_castModel->removeRows(startRow, size);
     qDebug("drop[%d] records [%d, %d]", ret, startRow, it->bottom());
     deleteCnt += size;
     succeedCnt += ((int)ret * size);
   }
-  m_perfDbMdl->submitAll();
+  m_castModel->submitAll();
   Notificator::goodNews("delete records result", QString("%1/%2 succeed").arg(succeedCnt).arg(deleteCnt));
   return succeedCnt;
 }

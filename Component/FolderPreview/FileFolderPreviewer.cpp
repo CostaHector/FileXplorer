@@ -37,7 +37,7 @@ void FileFolderPreviewer::SaveSettings() {
   Configuration().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
 }
 
-void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
+void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& imgHost) {
   CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
   if (record.isEmpty()) {
     mDetailsPane->setHtml("");
@@ -47,7 +47,7 @@ void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& im
   setWindowTitle(mLastName);
   BeforeDisplayAFileDetail();
   using namespace CastBrowserHelper;
-  const CastHtmlParts castHtmls = GetCastHtmlParts(record, imgHost, imgHeight);
+  const CastHtmlParts castHtmls = GetCastHtmlParts(record, imgHost);
   mDetailsPane->SetCastHtmlParts(castHtmls);
   mDetailsPane->UpdateHtmlContents();
 }

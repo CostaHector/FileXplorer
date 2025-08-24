@@ -26,8 +26,8 @@ class ViewsStackedWidget : public QStackedWidget {
   Q_OBJECT
  public:
   friend class ToolBarAndViewSwitcher;
-
   explicit ViewsStackedWidget(SelectionPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
+
  public slots:
   bool onActionAndViewNavigate(QString newPath, bool isNewPath = true, bool isF5Force = false);
   bool onAddressToolbarPathChanged(QString newPath, bool isNewPath = true);
@@ -44,7 +44,9 @@ class ViewsStackedWidget : public QStackedWidget {
 
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex);
   void connectSelectionChanged(ViewTypeTool::ViewType vt);
-  void disconnectSelectionChanged(ViewTypeTool::ViewType vt);
+  void disconnectSelectionChanged() {
+    ViewsStackedWidget::disconnect(mSelectionChangedConn);
+  }
   bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
 
@@ -154,6 +156,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
+  QMetaObject::Connection mSelectionChangedConn;
 };
 
 #endif  // VIEWSSTACKEDWIDGET_H

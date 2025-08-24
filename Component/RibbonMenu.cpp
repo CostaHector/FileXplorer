@@ -277,7 +277,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
   folderRmv->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  folderRmv->addAction(fileOpAgInst._RMV_EMPTY_FOLDER_R);
+  folderRmv->addAction(fileOpAgInst._RMV_EMPTY_FOLDER);
   folderRmv->addAction(fileOpAgInst._RMV_01_FILE_FOLDER);
   folderRmv->addAction(fileOpAgInst._RMV_FOLDER_BY_KEYWORD);
   SetLayoutAlightment(folderRmv->layout(), Qt::AlignmentFlag::AlignLeft);
@@ -324,8 +324,9 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   extractThumbnailToolButton->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
   extractThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
 
-  QToolBar* archiveVidsTB{new (std::nothrow) QToolBar("Leaf Arrange Files")};
+  QToolBar* archiveVidsTB{new (std::nothrow) QToolBar{"Leaf Arrange Files"}};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
+  archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   archiveVidsTB->addWidget(nameRulerToolButton);
   archiveVidsTB->addAction(fileOpAgInst._PACK_FOLDERS);
   archiveVidsTB->addAction(fileOpAgInst._UNPACK_FOLDERS);
@@ -340,7 +341,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(createThumbnailToolButton);
   archiveVidsTB->addWidget(extractThumbnailToolButton);
-  archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return archiveVidsTB;
 }
 

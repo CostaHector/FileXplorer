@@ -28,7 +28,7 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   m_FileSystemOp->addActions(inst.FILE_SYSTEM_OP->actions());
   m_FileSystemOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_FileSystemOp->setOrientation(Qt::Orientation::Vertical);
-  m_FileSystemOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  m_FileSystemOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
   m_FileSystemOp->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(m_FileSystemOp->layout(), Qt::AlignmentFlag::AlignLeft);
 
