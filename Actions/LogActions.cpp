@@ -49,7 +49,7 @@ LogActions::LogActions(QObject* parent)  //
   _LOG_LEVEL_WARNING->setShortcutVisibleInContextMenu(true);
   _LOG_LEVEL_WARNING->setToolTip(QString("<b>%1 (%2)</b><br/>Set log level to warning.").arg(_LOG_LEVEL_WARNING->text(), _LOG_LEVEL_WARNING->shortcut().toString()));
 
-  if (PreferenceSettings().value(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.v).toBool()) {
+  if (Configuration().value(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.v).toBool()) {
     _LOG_LEVEL_DEBUG->setChecked(true);
   } else {
     _LOG_LEVEL_WARNING->setChecked(true);

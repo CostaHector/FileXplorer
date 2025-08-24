@@ -45,7 +45,7 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,               //
   setEditTriggers(QAbstractItemView::EditKeyPressed);  // only F2 works.
 
   InitMoviesTables();
-  const QString defaultTableName = PreferenceSettings().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString();
+  const QString defaultTableName = Configuration().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString();
   const int defaultDisplayIndex = _tablesDropDownList->findText(defaultTableName, Qt::MatchStartsWith);
   if (defaultDisplayIndex != -1) {
     _tablesDropDownList->setCurrentIndex(defaultDisplayIndex);
@@ -127,7 +127,7 @@ bool MovieDBView::setCurrentMovieTable(const QString& guidJoinRootPath) {
          qPrintable(newTableName), qPrintable(guidJoinRootPath));
 
   InitTableView(false); // restore state must ahead of data load
-  PreferenceSettings().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, guidJoinRootPath);
+  Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, guidJoinRootPath);
   _dbModel->setTable(newTableName);
   _dbModel->select();
   ShowOrHideColumnCore();
@@ -137,7 +137,7 @@ bool MovieDBView::setCurrentMovieTable(const QString& guidJoinRootPath) {
 bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) {
   const QString& curTblName = GetMovieTableName(); // 16 GUID
   const QString& tblPeerPath = GetMovieTableRootPath(); // ROOT PATH
-  QString lastPath = PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString();
+  QString lastPath = Configuration().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString();
   if (!QFileInfo(lastPath).isDir()) {  // fallback
     lastPath = tblPeerPath;
   }
@@ -156,7 +156,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
     return false;
   }
 
-  PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
+  Configuration().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
   userSelected.swap(selectPath);
   qDebug("[%s] User selectPath[%s] PeerPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
   return true;

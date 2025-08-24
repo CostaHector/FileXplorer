@@ -5,14 +5,28 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "StyleSheet.h"
+#include "StringTool.h"
 #include <QBuffer>
 #include <QDir>
 #include <QFileIconProvider>
 
+QString CastHtmlParts::fullHtml(bool castVideosVisisble, bool castImagesVisisble) const {
+  QString fullHtmlContents;
+  fullHtmlContents.reserve(12 + length() + 14);
+  fullHtmlContents += "<html><body>"; // 12
+  fullHtmlContents += body;
+  fullHtmlContents += vidPart[0].arg(castVideosVisisble ? "▼" : "▶");
+  fullHtmlContents += castVideosVisisble ? vidPart[1] : "";
+  fullHtmlContents += imgPart[0].arg(castImagesVisisble ? "▼" : "▶");
+  fullHtmlContents += castImagesVisisble ? imgPart[1] : "";
+  fullHtmlContents += "</body></html>"; // 14
+  return fullHtmlContents;
+}
+
 namespace CastBrowserHelper {
 const QString HTML_H1_TEMPLATE{R"(<a href="file:///%1">%2</a>)"};
-const QString HTML_IMG_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a>\n)"};
-const QString VID_LINK_TEMPLATE{R"(<a href="file:///%1">&#9654;%2</a>)"};
+const QString HTML_IMG_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a>)"};
+const QString VID_LINK_TEMPLATE{R"(<a href="file:///%1" title="%1" style="cursor:pointer">&#9654;%2</a>)"};
 
 QString GetDetailDescription(const QString& fileAbsPath) {
   QString fileName, extension;
@@ -66,14 +80,14 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   return detail;
 }
 
-stCastHtml GetCastHtml(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
+CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
   const QString castName {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
   const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString()};
   const QString imgsStr {record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString()};
-  const QStringList imgsLst {PerformerJsonFileHelper::InitImgsList(imgsStr)};
+  const QStringList imgsLst {StringTool::InitImgsList(imgsStr)};
   const QDir imgDir {imgHost + '/' + orientation + '/' + castName};
   const QString portraitImg {imgsLst.isEmpty() ? "" : imgDir.absoluteFilePath(imgsLst.front())};
-  const QString details{record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString().replace(PerformerJsonFileHelper::IMG_VID_SEP_COMP, "<br/>")};
+  const QString details{record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString().replace(StringTool::IMG_VID_SEP_COMP, "<br/>")};
 
   const auto GetVidsLinks = [](const QString& vidsStr) -> QString {
     if (vidsStr.isEmpty()) {
@@ -81,8 +95,8 @@ stCastHtml GetCastHtml(const QSqlRecord& record, const QString& imgHost, const i
     }
     QString vidsLinks;
     vidsLinks.reserve(500);
-    foreach (const QString vidPath, vidsStr.split(PerformerJsonFileHelper::IMG_VID_SEP_COMP)) {
-      vidsLinks += VID_LINK_TEMPLATE.arg(vidPath, vidPath);
+    foreach (const QString vidPath, vidsStr.split(StringTool::IMG_VID_SEP_COMP)) {
+      vidsLinks += VID_LINK_TEMPLATE.arg(vidPath, PathTool::forSearchPath(vidPath));
       vidsLinks += "<br/>";
     }
     return vidsLinks;
@@ -114,8 +128,7 @@ stCastHtml GetCastHtml(const QSqlRecord& record, const QString& imgHost, const i
   </table>
 )"};
   QString htmlSrc;
-  htmlSrc.reserve(1500);
-  htmlSrc += "<html><body>";
+  htmlSrc.reserve(CAST_BRIEF_INTRODUCTION_TEMPLATE.size() + 200);
   htmlSrc += CAST_BRIEF_INTRODUCTION_TEMPLATE                                         //
                  .arg(castName)                                                       //
                  .arg(portraitImg)                                                    //
@@ -126,28 +139,26 @@ stCastHtml GetCastHtml(const QSqlRecord& record, const QString& imgHost, const i
                  .arg(orientation)                                                    //
                  .arg(details);
 
-  htmlSrc += R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedVideos">▼ Related Videos</a></h3>)" "\n";
-  htmlSrc += R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedImages">▼ Related Images</a></h3>)" "\n";
-  htmlSrc += "</body><html>";
-
   // Videos here
-  QString vidsPart;
-  vidsPart.reserve(200);
-  vidsPart += R"(<div style="margin-top:15px">)" "\n";
-  vidsPart += GetVidsLinks(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString());
-  vidsPart += R"(</div>)" "\n";
+  QString vidsPartHead {R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedVideos">%1 Related Videos</a></h3>)" "\n"};
+  QString vidsPartBody;
+  vidsPartBody.reserve(200);
+  vidsPartBody += R"(<div style="margin-top:15px;">)" "\n";
+  vidsPartBody += GetVidsLinks(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString());
+  vidsPartBody += R"(</div>)" "\n";
 
   // Images here
-  QString imgsPart;
-  imgsPart.reserve(50 * imgsLst.size());
-  imgsPart += R"(<div style="margin-top:20px">)" "\n";
+  QString imgsPartHead {R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedImages">%1 Related Images</a></h3>)" "\n"};
+  QString imgsPartBody;
+  imgsPartBody.reserve(50 * imgsLst.size());
+  imgsPartBody += R"(<div style="margin-top:20px;">)" "\n";
   for (int i = 1; i < imgsLst.size(); ++i) {
-    imgsPart += HTML_IMG_TEMPLATE  //
+    imgsPartBody += HTML_IMG_TEMPLATE  //
                     .arg(imgDir.absoluteFilePath(imgsLst[i]))  //
                     .arg(imgsLst[i])                        //
                     .arg(IMAGE_SIZE::IMG_WIDTH);
   }
-  imgsPart += "</div>";
-  return {htmlSrc, vidsPart, imgsPart};
+  imgsPartBody += "</div>";
+  return {htmlSrc, {vidsPartHead, vidsPartBody}, {imgsPartHead, imgsPartBody}};
 }
 }

@@ -92,6 +92,9 @@ const KV MemoryKey::SHOW_HAR_IMAGE_PREVIEW{"SHOW_HAR_IMAGE_PREVIEW", false, Valu
 
 const KV MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE{"RETURN_ERRORCODE_UPON_ANY_FAILURE", true, ValueChecker{PLAIN_BOOL}};
 
+const KV MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES{"Cast/PreviewBrowser/ShowRelatedImages", true, ValueChecker{PLAIN_BOOL}};
+const KV MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS{"Cast/PreviewBrowser/ShowImagesImages", true, ValueChecker{PLAIN_BOOL}};
+
 const KV RedunImgFinderKey::GEOMETRY{"RedunImgFinderKey/GEOMETRY", {}, ValueChecker{QBYTEARRAY}};
 const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
 const KV RedunImgFinderKey::RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});

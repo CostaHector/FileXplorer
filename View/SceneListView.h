@@ -2,7 +2,7 @@
 #define SCENELISTVIEW_H
 
 #include "CustomListView.h"
-#include "FloatingPreview.h"
+#include "FileFolderPreviewer.h"
 #include <QMenu>
 
 class ScenesListModel;
@@ -12,7 +12,7 @@ class SceneActionsSubscribe;
 class SceneListView : public CustomListView {
  public:
   explicit SceneListView(ScenesListModel* sceneModel, QWidget* parent = nullptr);
-  void setFloatingPreview(FloatingPreview* floatingPreview);
+  void setFloatingPreview(FileFolderPreviewer* floatingPreview);
   void setRootPath(const QString& rootPath);
   void subscribe();
   void onCopyBaseName();
@@ -24,7 +24,7 @@ class SceneListView : public CustomListView {
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
   ScenesListModel* _sceneModel;
   QStyledItemDelegate* mAlignDelegate{nullptr};
-  FloatingPreview* mPrev_{nullptr};
+  FileFolderPreviewer* mPrev_{nullptr};
 };
 
 #endif  // SCENELISTVIEW_H

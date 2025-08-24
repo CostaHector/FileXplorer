@@ -40,7 +40,7 @@ QActionGroup* FileLeafActions::GetLeafTabActions() {
   _SETTINGS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_SETTINGS->text(), _SETTINGS->shortcut().toString()));
 
   _LANUAGE->setCheckable(true);
-  _LANUAGE->setChecked(PreferenceSettings().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
+  _LANUAGE->setChecked(Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
 
   leafFile->addAction(_SETTINGS);
   leafFile->addAction(_ABOUT_FILE_EXPLORER);

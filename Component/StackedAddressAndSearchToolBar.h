@@ -1,5 +1,5 @@
-#ifndef STACKEDTOOLBAR_H
-#define STACKEDTOOLBAR_H
+#ifndef STACKEDADDRESSANDSEARCHTOOLBAR_H
+#define STACKEDADDRESSANDSEARCHTOOLBAR_H
 #include "AdvanceSearchToolBar.h"
 #include "DatabaseSearchToolBar.h"
 #include "NavigationAndAddressBar.h"
@@ -10,12 +10,12 @@
 #include <QToolBar>
 #include "ViewTypeTool.h"
 
-class NavigationViewSwitcher;
+class ToolBarAndViewSwitcher;
 
-class StackedToolBar : public QToolBar {
+class StackedAddressAndSearchToolBar : public QToolBar {
  public:
-  friend class NavigationViewSwitcher;
-  explicit StackedToolBar(const QString& title = "Stacked Toolbar", QWidget* parent = nullptr);
+  friend class ToolBarAndViewSwitcher;
+  explicit StackedAddressAndSearchToolBar(const QString& title = "Stacked Toolbar", QWidget* parent = nullptr);
   int AddToolBar(ViewTypeTool::ViewType vt, QWidget* tb);
 
   NavigationAndAddressBar* m_addressBar{nullptr};
@@ -24,11 +24,11 @@ class StackedToolBar : public QToolBar {
   QLineEdit* m_perfSearch{nullptr};
 
  private:
-  QStackedWidget* m_stackedToolBar;
+  QStackedWidget* m_stackedToolBar{nullptr};
   QMap<ViewTypeTool::ViewType, int> m_name2StackIndex;
 };
 
 
 
 
-#endif  // STACKEDTOOLBAR_H
+#endif  // STACKEDADDRESSANDSEARCHTOOLBAR_H

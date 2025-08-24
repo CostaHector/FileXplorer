@@ -95,7 +95,7 @@ void NavigationExToolBar::dragMoveEvent(QDragMoveEvent* event) {
 
 void NavigationExToolBar::SaveName2PathLink() {
   const QList<QAction*>& actsList = actions();
-  PreferenceSettings().beginWriteArray("ExtraNavigationDict", actsList.size());
+  Configuration().beginWriteArray("ExtraNavigationDict", actsList.size());
   int extraIndex = 0;
 
   foreach (QAction* pAct, actsList) {
@@ -111,23 +111,23 @@ void NavigationExToolBar::SaveName2PathLink() {
     if (pPathAct == nullptr) {
       continue;
     }
-    PreferenceSettings().setArrayIndex(extraIndex);
-    PreferenceSettings().setValue("folderName", pPathAct->text());
-    PreferenceSettings().setValue("absPath", pPathAct->toolTip());
+    Configuration().setArrayIndex(extraIndex);
+    Configuration().setValue("folderName", pPathAct->text());
+    Configuration().setValue("absPath", pPathAct->toolTip());
     ++extraIndex;
   }
-  PreferenceSettings().endArray();
+  Configuration().endArray();
 }
 
 void NavigationExToolBar::ReadSettings() {
-  int lnkCnt = PreferenceSettings().beginReadArray("ExtraNavigationDict");
+  int lnkCnt = Configuration().beginReadArray("ExtraNavigationDict");
   QMap<QString, QString> folderName2AbsPath;
   for (int extraIndex = 0; extraIndex < lnkCnt; ++extraIndex) {
-    PreferenceSettings().setArrayIndex(extraIndex);
-    folderName2AbsPath[PreferenceSettings().value("folderName").toString()]  //
-        = PreferenceSettings().value("absPath").toString();
+    Configuration().setArrayIndex(extraIndex);
+    folderName2AbsPath[Configuration().value("folderName").toString()]  //
+        = Configuration().value("absPath").toString();
   }
-  PreferenceSettings().endArray();
+  Configuration().endArray();
   AppendExtraActions(folderName2AbsPath);
 }
 

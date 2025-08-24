@@ -131,12 +131,12 @@ void DuplicateVideosFinder::UpdateWindowsTitle() {
 }
 
 void DuplicateVideosFinder::updateWindowsSize() {
-  if (PreferenceSettings().contains("DuplicateVideosFinderGeometry")) {
-    restoreGeometry(PreferenceSettings().value("DuplicateVideosFinderGeometry").toByteArray());
+  if (Configuration().contains("DuplicateVideosFinderGeometry")) {
+    restoreGeometry(Configuration().value("DuplicateVideosFinderGeometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_mainWidget->restoreState(PreferenceSettings().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
+  m_mainWidget->restoreState(Configuration().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
 }
 
 void DuplicateVideosFinder::showEvent(QShowEvent *event) {
@@ -145,8 +145,8 @@ void DuplicateVideosFinder::showEvent(QShowEvent *event) {
 }
 
 void DuplicateVideosFinder::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("DuplicateVideosFinderGeometry", saveGeometry());
-  PreferenceSettings().setValue("DuplicateVideosFinderSplitterState", m_mainWidget->saveState());
+  Configuration().setValue("DuplicateVideosFinderGeometry", saveGeometry());
+  Configuration().setValue("DuplicateVideosFinderSplitterState", m_mainWidget->saveState());
   QMainWindow::closeEvent(event);
 }
 

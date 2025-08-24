@@ -2,37 +2,36 @@
 #include "FolderPreviewActions.h"
 #include "PublicMacro.h"
 
-FolderPreviewSwitcher::FolderPreviewSwitcher(PreviewFolder* folderPreview, QWidget* parentDocker, QObject* parent) : QObject{parent}, _folderPreview{folderPreview}, _parentDocker{parentDocker} {
+FolderPreviewSwitcher::FolderPreviewSwitcher(SelectionPreviewer* folderPreview, QObject* parent)//
+  : QObject{parent}, _folderPreview{folderPreview} //
+{
   auto* checkedPreviewType = g_folderPreviewActions().PREVIEW_AG->checkedAction();
   onSwitchByViewAction(checkedPreviewType);
 }
 
 void FolderPreviewSwitcher::onSwitchByViewType(const QString& viewType) {
-  if (_folderPreview == nullptr) {
-    qWarning("_folderPreview cannot be empty");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(_folderPreview)
   if (viewType == g_folderPreviewActions().LISTS->text()) {
-    if (_folderPreview->m_lists == nullptr) {
-      _folderPreview->m_lists = new (std::nothrow) FloatingPreview{"DockerList", _parentDocker};
-      CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_lists)
-      _folderPreview->AddView(viewType, _folderPreview->m_lists);
+    if (_folderPreview->m_fileFolderPreviewStackedWid == nullptr) {
+      _folderPreview->m_fileFolderPreviewStackedWid = new (std::nothrow) FileFolderPreviewer{"DockerList", _folderPreview};
+      CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_fileFolderPreviewStackedWid)
+      _folderPreview->AddView(viewType, _folderPreview->m_fileFolderPreviewStackedWid);
     }
-    _folderPreview->m_lists->operator()(_folderPreview->GetCurPath());
+    _folderPreview->m_fileFolderPreviewStackedWid->operator()(_folderPreview->GetCurPath());
   } else if (viewType == g_folderPreviewActions().BROWSER->text()) {
-    if (_folderPreview->m_browser == nullptr) {
-      _folderPreview->m_browser = new (std::nothrow) PreviewBrowser{_parentDocker};
-      CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_browser)
-      _folderPreview->AddView(viewType, _folderPreview->m_browser);
+    if (_folderPreview->m_imgInFolderBrowser == nullptr) {
+      _folderPreview->m_imgInFolderBrowser = new (std::nothrow) ImagesInFolderBrowser{_folderPreview};
+      CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_imgInFolderBrowser)
+      _folderPreview->AddView(viewType, _folderPreview->m_imgInFolderBrowser);
     }
-    _folderPreview->m_browser->operator()(_folderPreview->GetCurPath());
+    _folderPreview->m_imgInFolderBrowser->operator()(_folderPreview->GetCurPath());
   } else if (viewType == g_folderPreviewActions().LABELS->text()) {
-    if (_folderPreview->m_labels == nullptr) {
-      _folderPreview->m_labels = new (std::nothrow) PreviewLabels{_parentDocker};
-      CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_labels)
-      _folderPreview->AddView(viewType, _folderPreview->m_labels);
+    if (_folderPreview->m_imgInFolderLabels == nullptr) {
+      _folderPreview->m_imgInFolderLabels = new (std::nothrow) ImagesInFolderSlider{_folderPreview};
+      CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_imgInFolderLabels)
+      _folderPreview->AddView(viewType, _folderPreview->m_imgInFolderLabels);
     }
-    _folderPreview->m_labels->operator()(_folderPreview->GetCurPath());
+    _folderPreview->m_imgInFolderLabels->operator()(_folderPreview->GetCurPath());
   } else {
     qWarning("previewType[%s] not support now.", qPrintable(viewType));
     return;

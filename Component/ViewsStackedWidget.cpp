@@ -1,4 +1,4 @@
-﻿#include "ContentPanel.h"
+﻿#include "ViewsStackedWidget.h"
 #include "ArchiveFilesActions.h"
 #include "ViewActions.h"
 #include "FolderPreviewActions.h"
@@ -20,7 +20,7 @@
 #include <QUrl>
 
 using namespace ViewTypeTool;
-ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
+ViewsStackedWidget::ViewsStackedWidget(SelectionPreviewer* previewFolder, QWidget* parent)
     : QStackedWidget(parent),  //
       mMovieDb{SystemPath::VIDS_DATABASE, "DBMOVIE_CONNECT"},
       _previewFolder{previewFolder},  //
@@ -33,7 +33,7 @@ ContentPanel::ContentPanel(PreviewFolder* previewFolder, QWidget* parent)
   setFocusPolicy(Qt::StrongFocus);
 }
 
-auto ContentPanel::onActionAndViewNavigate(QString newPath, bool isNewPath, bool /*isF5Force*/) -> bool {
+auto ViewsStackedWidget::onActionAndViewNavigate(QString newPath, bool isNewPath, bool /*isF5Force*/) -> bool {
   // can only be triggered by path action clicked/upTo/backTo/backTo/table view double clicked
   bool ret = onAddressToolbarPathChanged(newPath, isNewPath);
   if (not ret) {
@@ -46,7 +46,7 @@ auto ContentPanel::onActionAndViewNavigate(QString newPath, bool isNewPath, bool
   return true;
 }
 
-bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) {
+bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNewPath) {
   // can only be triggered by lineedit return pressed
   // isNewPath: bool Only differs in undo and redo operation.
   // True means newPath would be push into undo.
@@ -100,7 +100,7 @@ bool ContentPanel::onAddressToolbarPathChanged(QString newPath, bool isNewPath) 
   return true;
 }
 
-auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
+auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool {
   const ViewTypeTool::ViewType vt{GetCurViewType()};
 
   switch (vt) {
@@ -140,7 +140,7 @@ auto ContentPanel::on_searchTextChanged(const QString& targetStr) -> bool {
   return true;
 }
 
-auto ContentPanel::on_searchEnterKey(const QString& /*targetStr*/) -> bool {
+auto ViewsStackedWidget::on_searchEnterKey(const QString& /*targetStr*/) -> bool {
   const ViewTypeTool::ViewType vt{GetCurViewType()};
   switch (vt) {
     case ViewType::LIST:
@@ -162,11 +162,11 @@ auto ContentPanel::on_searchEnterKey(const QString& /*targetStr*/) -> bool {
   return true;
 }
 
-void ContentPanel::subscribe() {
-  connect(m_fsModel, &FileSystemModel::directoryLoaded, this, &ContentPanel::onAfterDirectoryLoaded);
+void ViewsStackedWidget::subscribe() {
+  connect(m_fsModel, &FileSystemModel::directoryLoaded, this, &ViewsStackedWidget::onAfterDirectoryLoaded);
 }
 
-void ContentPanel::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
+void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
   if (addressBar == nullptr) {
     qWarning("Bind Navigation AddressBar failed. nullptr passed here");
     return;
@@ -180,7 +180,7 @@ void ContentPanel::BindNavigationAddressBar(NavigationAndAddressBar* addressBar)
   );
 }
 
-void ContentPanel::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar) {
+void ViewsStackedWidget::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar) {
   if (dbSearchBar == nullptr) {
     qWarning("Bind DatabaseSearchToolBar failed. nullptr passed here");
     return;
@@ -188,7 +188,7 @@ void ContentPanel::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar)
   _dbSearchBar = dbSearchBar;
 }
 
-void ContentPanel::BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar) {
+void ViewsStackedWidget::BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar) {
   if (advanceSearchBar == nullptr) {
     qWarning("Bind AdvanceSearchToolBar failed. nullptr passed here");
     return;
@@ -196,7 +196,7 @@ void ContentPanel::BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchB
   _advanceSearchBar = advanceSearchBar;
 }
 
-void ContentPanel::BindLogger(CustomStatusBar* logger) {
+void ViewsStackedWidget::BindLogger(CustomStatusBar* logger) {
   if (logger == nullptr) {
     qWarning("Bind CustomStatusBar for contentPanel and FileSystemModel failed. nullptr passed here");
     return;
@@ -209,7 +209,7 @@ void ContentPanel::BindLogger(CustomStatusBar* logger) {
   m_fsModel->BindLogger(_logger);
 }
 
-auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool {
+auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool {
   if (!clickedIndex.isValid()) {
     LOG_BAD("Current Index invalid", "double Click skip");
     return false;
@@ -263,7 +263,7 @@ auto ContentPanel::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool
   return true;
 }
 
-bool ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, const QItemSelection& /* deselected */) {
+bool ViewsStackedWidget::on_selectionChanged(const QItemSelection& /* selected */, const QItemSelection& /* deselected */) {
   if (!isFSView()) {
     return false;
   }
@@ -299,39 +299,39 @@ bool ContentPanel::on_selectionChanged(const QItemSelection& /* selected */, con
   return true;
 }
 
-void ContentPanel::connectSelectionChanged(ViewTypeTool::ViewType vt) {
+void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
   disconnectSelectionChanged(vt);
   switch (vt) {
     case ViewType::TABLE:
-      ContentPanel::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     case ViewType::LIST:
-      ContentPanel::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      ViewsStackedWidget::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     case ViewType::TREE:
-      ContentPanel::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      ViewsStackedWidget::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     default:
       qDebug("selection changed signal connect skip. current view type[%d]", (int)vt);
   }
 }
-void ContentPanel::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
+void ViewsStackedWidget::disconnectSelectionChanged(ViewTypeTool::ViewType vt) {
   switch (vt) {
     case ViewType::TABLE:
-      ContentPanel::disconnect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      ViewsStackedWidget::disconnect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     case ViewType::LIST:
-      ContentPanel::disconnect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      ViewsStackedWidget::disconnect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     case ViewType::TREE:
-      ContentPanel::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ContentPanel::on_selectionChanged);
+      ViewsStackedWidget::disconnect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
       break;
     default:
       qDebug("selection changed signal disconnect skip. current view type[%d]", (int)vt);
   }
 }
 
-bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
+bool ViewsStackedWidget::onAfterDirectoryLoaded(const QString& loadedPath) {
   if (!m_anchorTags.contains(loadedPath)) {
     return false;
   }
@@ -347,7 +347,7 @@ bool ContentPanel::onAfterDirectoryLoaded(const QString& loadedPath) {
   return true;
 }
 
-auto ContentPanel::keyPressEvent(QKeyEvent* e) -> void {
+auto ViewsStackedWidget::keyPressEvent(QKeyEvent* e) -> void {
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier) {
     switch (e->key()) {
       case Qt::Key_Backspace: {
@@ -367,7 +367,7 @@ auto ContentPanel::keyPressEvent(QKeyEvent* e) -> void {
   QStackedWidget::keyPressEvent(e);
 }
 
-QModelIndex ContentPanel::getRootIndex() const {
+QModelIndex ViewsStackedWidget::getRootIndex() const {
   if (!isFSView()) {
     return QModelIndex();
   }

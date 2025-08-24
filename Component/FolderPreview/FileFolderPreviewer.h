@@ -1,15 +1,15 @@
-﻿#ifndef FLOATINGPREVIEW_H
-#define FLOATINGPREVIEW_H
+#ifndef FILEFOLDERPREVIEWER_H
+#define FILEFOLDERPREVIEWER_H
 
-#include "ImgVidOthWid.h"
+#include "ImgVidOthInFolderPreviewer.h"
 #include "ClickableTextBrowser.h"
 #include <QStackedWidget>
 #include <QSqlRecord>
 
-class FloatingPreview : public QStackedWidget {
+class FileFolderPreviewer : public QStackedWidget {
 public:
   enum class PANE_TYPE : int { BEGIN = 0, DETAIL = BEGIN, IMG_VID_OTH, BUTT };
-  FloatingPreview(const QString& memoryName, QWidget* parent = nullptr);
+  FileFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
 
   void ReadSettings();
   void SaveSettings();
@@ -56,7 +56,7 @@ private:
   PANE_TYPE m_curIndex{PANE_TYPE::DETAIL};
 
   ClickableTextBrowser* mDetailsPane{nullptr};
-  ImgVidOthWid* mImgVidOtherPane{nullptr};
+  ImgVidOthInFolderPreviewer* mImgVidOtherPane{nullptr};
 };
 
-#endif  // FLOATINGPREVIEW_H
+#endif  // FILEFOLDERPREVIEWER_H

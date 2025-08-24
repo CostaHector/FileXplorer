@@ -42,22 +42,8 @@ public:
   static QString GetSearchResultParagraphDisplay(const QString& searchText);
   static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
 
-  void SetCastHtmlParts(const stCastHtml& castHtmls) {mCastHtmls = castHtmls;}
-  void UpdateHtmlContents() {
-    setHtml(mCastHtmls.body);
-    int scrollPos = verticalScrollBar()->value();
-    if (mCastVideosVisisble) {
-      append(mCastHtmls.vidPart);
-    }
-    if (mCastImagesVisisble) {
-      append(mCastHtmls.imgPart);
-    }
-    if (mCastVideosVisisble || mCastImagesVisisble) {
-      verticalScrollBar()->setValue(scrollPos);
-    }
-  }
-  stCastHtml mCastHtmls;
-  bool mCastVideosVisisble{true}, mCastImagesVisisble{true};
+  void SetCastHtmlParts(const CastHtmlParts& castHtmls) {mCastHtmls = castHtmls;}
+  void UpdateHtmlContents() { setHtml(mCastHtmls.fullHtml(mCastVideosVisisble, mCastImagesVisisble)); }
 
 protected:
   void mouseDoubleClickEvent(QMouseEvent *e) override;
@@ -91,6 +77,9 @@ private:
   QList<QTextEdit::ExtraSelection> mMultiSelections;  // 存储多个选区
   static constexpr int MIN_SINGLE_SEARCH_PATTERN_LEN{2 + 4}; // "%keyword%"
   static constexpr int MIN_EACH_KEYWORD_LEN{4};       // "%" + "keyword" + "%"
+
+  CastHtmlParts mCastHtmls;
+  bool mCastVideosVisisble, mCastImagesVisisble;
 };
 
 #endif  // CLICKABLETEXTBROWSER_H

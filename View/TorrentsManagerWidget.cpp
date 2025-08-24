@@ -113,7 +113,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     return false;
   }
 
-  const QString& defaultOpenDir = PreferenceSettings().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
+  const QString& defaultOpenDir = Configuration().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
   const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Load torrents from", defaultOpenDir);
   QFileInfo loadFromFi(loadFromPath);
   if (not loadFromFi.isDir()) {
@@ -121,7 +121,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     qDebug("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(loadFromPath));
     return false;
   }
-  PreferenceSettings().setValue(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, loadFromFi.absoluteFilePath());
+  Configuration().setValue(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, loadFromFi.absoluteFilePath());
 
   QSqlQuery query{con};
   if (!query.prepare(TorrDb::REPLACE_INTO_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
@@ -241,13 +241,13 @@ void TorrentsManagerWidget::showEvent(QShowEvent* event) {
 
 void TorrentsManagerWidget::closeEvent(QCloseEvent* event) {
   g_torrActions().SHOW_TORRENTS_MANAGER->setChecked(false);
-  PreferenceSettings().setValue("TorrentsManagerWidgetGeometry", saveGeometry());
+  Configuration().setValue("TorrentsManagerWidgetGeometry", saveGeometry());
   QMainWindow::closeEvent(event);
 }
 
 void TorrentsManagerWidget::updateWindowsSize() {
-  if (PreferenceSettings().contains("TorrentsManagerWidgetGeometry")) {
-    restoreGeometry(PreferenceSettings().value("TorrentsManagerWidgetGeometry").toByteArray());
+  if (Configuration().contains("TorrentsManagerWidgetGeometry")) {
+    restoreGeometry(Configuration().value("TorrentsManagerWidgetGeometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
