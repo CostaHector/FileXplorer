@@ -28,7 +28,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_nameFilterCB->addItem("\\.json$");
   m_nameFilterCB->addItem("\\.scn$");
   m_nameFilterCB->addItem("\\.md$");
-  m_nameFilterCB->addItem("\\.pjson$");
+  m_nameFilterCB->addItem("\\.pson$");
 
   m_typeFilterButton = new FileSystemTypeFilter{this};
   CHECK_NULLPTR_RETURN_VOID(m_typeFilterButton)

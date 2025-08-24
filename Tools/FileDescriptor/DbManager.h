@@ -82,7 +82,7 @@ class DbManager : public QObject {
   int DeleteByWhereClause(const QString& tableName, const QString& whereClause);
 
   bool IsTableVolumeOnline(const QString& tableName) const;
-
+public slots:
   bool ShowInFileSystemView() const;
  protected:
   static QString GetDeleteInPlaceholders(int n);

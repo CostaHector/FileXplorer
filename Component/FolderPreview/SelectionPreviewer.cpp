@@ -31,7 +31,7 @@ void SelectionPreviewer::UpdatePreview() {
 }
 
 QSize SelectionPreviewer::sizeHint() const {
-  static const int w {Configuration().value("SELECTION_PREVIEWER_WIDGET", DOCKER_DEFAULT_SIZE.width()).toInt()};
+  static const int w {Configuration().value("SELECTION_PREVIEWER_WIDTH", DOCKER_DEFAULT_SIZE.width()).toInt()};
   static const int h {Configuration().value("SELECTION_PREVIEWER_HEIGHT", DOCKER_DEFAULT_SIZE.height()).toInt()};
   static const QSize sz{w, h};
   return sz;

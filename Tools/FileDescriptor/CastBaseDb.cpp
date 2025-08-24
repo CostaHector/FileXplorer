@@ -1,4 +1,4 @@
-#include "PerfBaseDb.h"
+#include "CastBaseDb.h"
 #include "JsonHelper.h"
 #include "NameTool.h"
 #include "PerformerJsonFileHelper.h"
@@ -10,7 +10,7 @@
 #include <QSqlError>
 #include <QDirIterator>
 
-const QString PerfBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
+const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
     {"CREATE TABLE IF NOT EXISTS `%1`"                //
      + QString(R"((
 `%1` TEXT NOT NULL,
@@ -38,7 +38,7 @@ const QString INSERT_FULL_FIELDS_TEMPLATE  //
     {"REPLACE INTO `%1` "                  //
      + QString(R"(
 (`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`)
-VALUES(:%1, :%2, :%3, :%4, :%5, :%6, :%7, :%8);)")
+VALUES(:1, :2, :3, :4, :5, :6, :7, :8);)")
            .arg(PERFORMER_DB_HEADER_KEY::Name)
            .arg(PERFORMER_DB_HEADER_KEY::Rate)
            .arg(PERFORMER_DB_HEADER_KEY::AKA)
@@ -48,62 +48,50 @@ VALUES(:%1, :%2, :%3, :%4, :%5, :%6, :%7, :%8);)")
            .arg(PERFORMER_DB_HEADER_KEY::Imgs)
            .arg(PERFORMER_DB_HEADER_KEY::Detail)};
 
-const QString INSERT_NAME_ORI_IMGS_TEMPLATE  //
-    {"INSERT INTO %1"                        //
-     + QString{R"(
-(`%1`, `%2`, `%3`)
-VALUES (:%1, :%2, :%3)
-ON CONFLICT(%1)
-DO UPDATE SET `%2`=:%2, `%3`=:%3;)"}
-           .arg(PERFORMER_DB_HEADER_KEY::Name, PERFORMER_DB_HEADER_KEY::Orientation, PERFORMER_DB_HEADER_KEY::Imgs)};
+enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name = 0,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail,
+};
 
+/* When Name is the only primary key and no other fields.
+ * INSERT INTO `TABLE` (`%1`, `%2`, `%3`) VALUES (:%1, :%2, :%3) ON CONFLICT(%1) DO UPDATE SET `%2`=:%2, `%3`=:%3;
+ * is same as follows. Otherwise field not specified will be null or default(replace into: delete and insert) */
+const QString INSERT_NAME_ORI_IMGS_TEMPLATE  //
+    {"INSERT INTO `%1`" + QString{R"((`%1`, `%2`, `%3`) VALUES (?1, ?2, ?3) ON CONFLICT(`%1`) DO UPDATE SET `%2`=?4, `%3`=?5;)"}
+                              .arg(PERFORMER_DB_HEADER_KEY::Name, PERFORMER_DB_HEADER_KEY::Orientation, PERFORMER_DB_HEADER_KEY::Imgs)};
+
+enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD { //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
+  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name = 0,
+  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation,
+  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs,
+  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE,
+  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE,
+  };
+
+// 数值参数占位符即便要填入的值一样也不可重用, 例如:1, :2, :2, 有两个:2会出错, 需要改占位符:1, :2, :3
+/* INSERT INTO `%1` (`%1`,`%2`) VALUES (:1, :2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:3; */
+// 命名占位符:Name, :AKA则可重复
+/* INSERT INTO `TABLE` (`%1`,`%2`) VALUES (:%1, :%2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:%2;).arg("Name", "AKA") */
 const QString INSERT_PERF_AND_AKA_TEMPLATE  //
     {"INSERT INTO `%1` "                    //
      + QString{R"(
 (`%1`,`%2`) VALUES
-(:%1, :%2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:%2;)"}
+(:1, :2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:3;)"}
            .arg(PERFORMER_DB_HEADER_KEY::Name, PERFORMER_DB_HEADER_KEY::AKA)};
 
-const QString INSERT_ONLY_PERFS_NAME_TEMPLAE  //
-    {"INSERT INTO `%1` "                      //
-     + QString(R"(
-(`%2`) VALUES(:%2);)")
-           .arg(PERFORMER_DB_HEADER_KEY::Name)};
+enum INSERT_PERF_AND_AKA_TEMPLATE_FIELD {
+  INSERT_PERF_AND_AKA_TEMPLATE_FIELD_Name = 0,
+  INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA,
+  INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE,
+};
 
-int PerfBaseDb::InsertPerformers(const QStringList& perfList) {
-  auto db = GetDb();
-  if (!CheckValidAndOpen(db)) {
-    qWarning("Open failed");
-    return FD_DB_OPEN_FAILED;
-  }
-  QSqlQuery qry{db};
-  if (!qry.prepare(INSERT_ONLY_PERFS_NAME_TEMPLAE.arg(DB_TABLE::PERFORMERS))) {
-    qWarning("prepare cmd[%s] failed: %s",  //
-             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-    return FD_PREPARE_FAILED;
-  }
-  int succeedCnt = 0;
-  static const QString pHKey{":" + PERFORMER_DB_HEADER_KEY::Name};
-  foreach (const QString& perf, perfList) {
-    if (perf.isEmpty()) {
-      continue;
-    }
-    qry.bindValue(pHKey, perf);
-    if (!qry.exec()) {
-      db.rollback();
-      qWarning("exec cmd[%s] failed: %s",  //
-               qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-      return FD_EXEC_FAILED;
-    }
-    ++succeedCnt;
-  }
-  qry.finish();
-  qDebug("%d/%d performer(s) add succeed by specified string:%s",  //
-         succeedCnt, perfList.size(), qPrintable(perfList.join('|')));
-  return succeedCnt;
-}
-
-int PerfBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
+int CastBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
   if (!QFileInfo(imgsHostPath).isDir()) {
     qWarning("Directory[%s] not exist", qPrintable(imgsHostPath));
     return FD_NOT_DIR;
@@ -129,7 +117,7 @@ int PerfBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
   int succeedCnt = 0;
   QMap<QString, QString> name2Ori;
   QMap<QString, QStringList> name2Imgs;
-  QDirIterator it(imgsHostPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+  QDirIterator it{imgsHostPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     const QStringList& imgPathParts = it.filePath().split('/');
@@ -154,15 +142,15 @@ int PerfBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
     ImgsSortNameLengthFirst(it.value());
   }
 
-  static const QString PERF_PH{':' + PERFORMER_DB_HEADER_KEY::Name};
-  static const QString ORI_PH{':' + PERFORMER_DB_HEADER_KEY::Orientation};
-  static const QString IMGS_PH{':' + PERFORMER_DB_HEADER_KEY::Imgs};
   for (auto mpIt = name2Ori.cbegin(); mpIt != name2Ori.cend(); ++mpIt) {
     const QString& perf = mpIt.key();
     const QString& imgs = name2Imgs[perf].join(PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
-    qry.bindValue(PERF_PH, perf);
-    qry.bindValue(ORI_PH, mpIt.value());
-    qry.bindValue(IMGS_PH, imgs);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name, perf);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation, mpIt.value());
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs, imgs);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE, mpIt.value());
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE, imgs);
+
     if (!qry.exec()) {
       qWarning("replace[%s] failed: %s",  //
                qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
@@ -182,7 +170,7 @@ int PerfBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
   return succeedCnt;
 }
 
-int PerfBaseDb::LoadFromPJsonFile(const QString& imgsHostPath) {
+int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
   if (!QFileInfo(imgsHostPath).isDir()) {
     qWarning("Directory[%s] not exist", qPrintable(imgsHostPath));
     return FD_NOT_DIR;
@@ -206,18 +194,18 @@ int PerfBaseDb::LoadFromPJsonFile(const QString& imgsHostPath) {
   }
 
   int succeedCnt = 0;
-  QDirIterator it{imgsHostPath, {"*.pjson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{imgsHostPath, {"*.pson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
-    const QVariantHash& pJson = JsonHelper::MovieJsonLoader(it.filePath());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Name, pJson[PERFORMER_DB_HEADER_KEY::Name].toString());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Rate, pJson[PERFORMER_DB_HEADER_KEY::Rate].toInt());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::AKA, pJson[PERFORMER_DB_HEADER_KEY::AKA].toString());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Tags, pJson[PERFORMER_DB_HEADER_KEY::Tags].toString());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Orientation, pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Vids, pJson[PERFORMER_DB_HEADER_KEY::Vids].toString());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Imgs, pJson[PERFORMER_DB_HEADER_KEY::Imgs].toString());
-    qry.bindValue(':' + PERFORMER_DB_HEADER_KEY::Detail, pJson[PERFORMER_DB_HEADER_KEY::Detail].toString());
+    const QVariantHash& pson = JsonHelper::MovieJsonLoader(it.filePath());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name, pson[PERFORMER_DB_HEADER_KEY::Name].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate, pson[PERFORMER_DB_HEADER_KEY::Rate].toInt());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,  pson[PERFORMER_DB_HEADER_KEY::AKA].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags, pson[PERFORMER_DB_HEADER_KEY::Tags].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation, pson[PERFORMER_DB_HEADER_KEY::Orientation].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids, pson[PERFORMER_DB_HEADER_KEY::Vids].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, pson[PERFORMER_DB_HEADER_KEY::Imgs].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail, pson[PERFORMER_DB_HEADER_KEY::Detail].toString());
 
     if (!qry.exec()) {
       qWarning("replace[%s] failed: %s",  //
@@ -238,7 +226,7 @@ int PerfBaseDb::LoadFromPJsonFile(const QString& imgsHostPath) {
   return succeedCnt;
 }
 
-QMap<QString, QString> PerfBaseDb::GetFreqName2AkaNames(const QString& perfsText) {
+QMap<QString, QString> CastBaseDb::GetFreqName2AkaNames(const QString& perfsText) {
   QMap<QString, QString> perfs;
   for (const QString& line : perfsText.split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR)) {
     if (line.isEmpty()) {
@@ -255,7 +243,7 @@ QMap<QString, QString> PerfBaseDb::GetFreqName2AkaNames(const QString& perfsText
   return perfs;
 }
 
-int PerfBaseDb::ReadFromUserInputSentence(const QString& perfsText) {
+int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
   const auto& perfs = GetFreqName2AkaNames(perfsText);
   if (perfs.isEmpty()) {
     qDebug("Read no perfs out from text");
@@ -273,19 +261,18 @@ int PerfBaseDb::ReadFromUserInputSentence(const QString& perfsText) {
     return FD_TRANSACTION_FAILED;
   }
 
-  QSqlQuery qry(db);
+  QSqlQuery qry{db};
   if (!qry.prepare(INSERT_PERF_AND_AKA_TEMPLATE.arg(DB_TABLE::PERFORMERS))) {
     qWarning("prepare command[%s] failed: %s",  //
              qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   int succeedCnt = 0;
-  static const QString NAME_PH{':' + PERFORMER_DB_HEADER_KEY::Name};
-  static const QString AKA_PH{':' + PERFORMER_DB_HEADER_KEY::AKA};
   // update aka by new value if name conflict
   for (auto it = perfs.cbegin(); it != perfs.cend(); ++it) {
-    qry.bindValue(NAME_PH, it.key());
-    qry.bindValue(AKA_PH, it.value());
+    qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_Name, it.key());
+    qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA, it.value());
+    qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE, it.value());
     if (!qry.exec()) {
       qWarning("replace[%s] failed: %s",  //
                qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
@@ -302,4 +289,28 @@ int PerfBaseDb::ReadFromUserInputSentence(const QString& perfsText) {
   qry.finish();
   qDebug("Read %d perfs out from text user input[%s] succeed", succeedCnt, qPrintable(perfsText));
   return succeedCnt;
+}
+
+bool CastBaseDb::UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& imageHostPath) {
+  QDir castDir{GetCastPath(sqlRecord, imageHostPath)};
+  castDir.setFilter(QDir::Filter::Files);
+  castDir.setSorting(QDir::SortFlag::Name);
+  castDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  if (!castDir.exists()) {
+    return false;
+  }
+  sqlRecord.setValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, castDir.entryList().join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR));
+  return true;
+}
+
+QString CastBaseDb::GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
+  return imageHostPath + '/'//
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation).value().toString() + '/'//
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString();//
+}
+
+QString CastBaseDb::GetCastFilePath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
+  return GetCastPath(sqlRecord, imageHostPath) + '/'//
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString()//
+         + ".pson";
 }
