@@ -148,12 +148,12 @@ QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlReco
   const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Name), perfs);
   // movies table
   using namespace MOVIE_TABLE;
-  static const QString SELECT_NAME_TEMPLATE           //
-      {QString{"SELECT `%1`, `%2`, `%3` FROM "}       //
-           .arg(ENUM_2_STR(PrePathLeft))   //
-           .arg(ENUM_2_STR(PrePathRight))  //
-           .arg(ENUM_2_STR(Name))          //
-       + "`%1` "                                      //
-       + QString{"WHERE "}};
-  return SELECT_NAME_TEMPLATE.arg(DB_TABLE::MOVIES) + whereClause;
+  static const QString SELECT_NAME_TEMPLATE {//
+      QString{"SELECT `%1`, `%2`, `%3` FROM `%4`"}       //
+          .arg(ENUM_2_STR(PrePathLeft))   //
+          .arg(ENUM_2_STR(PrePathRight))  //
+          .arg(ENUM_2_STR(Name))//
+          .arg(DB_TABLE::MOVIES)
+  };
+  return SELECT_NAME_TEMPLATE + " WHERE " + whereClause;
 }

@@ -110,7 +110,7 @@ auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& conte
 }
 
 bool FileExplorerEvent::on_NewJsonFile() {
-  if (not __CanNewItem()) {
+  if (!__CanNewItem()) {
     return false;
   }
   QStringList jsonFilesNameCreated;
@@ -143,8 +143,9 @@ bool FileExplorerEvent::on_NewJsonFile() {
   }
   return true;
 }
-auto FileExplorerEvent::on_NewFolder() -> bool {  // not effect by selection;
-  if (not __CanNewItem()) {
+
+bool FileExplorerEvent::on_NewFolder() {  // not effect by selection;
+  if (!__CanNewItem()) {
     return false;
   }
   const QString& newFolderName = QString("New Folder %1").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss"));
@@ -163,8 +164,9 @@ auto FileExplorerEvent::on_NewFolder() -> bool {  // not effect by selection;
   __FocusNewItem(folderPath);
   return isAllSucceed;
 }
+
 bool FileExplorerEvent::on_BatchNewFilesOrFolders(const char* namePattern, int startIndex, int endIndex, bool isFolder) {
-  if (not __CanNewItem()) {
+  if (!__CanNewItem()) {
     return false;
   }
   const QDir createInDir = _fileSysModel->rootDirectory();
@@ -461,109 +463,56 @@ void FileExplorerEvent::subscribe() {
   subsribeCompress();
   subsribeFileActions();
   subscribeThumbnailActions();
-  {
-    auto* NEW_FOLDER = g_fileBasicOperationsActions().NEW_FOLDER;
-    auto* NEW_TEXT_FILE = g_fileBasicOperationsActions().NEW_TEXT_FILE;
-    auto* NEW_JSON_FILE = g_fileBasicOperationsActions().NEW_JSON_FILE;
-    auto* BATCH_NEW_FILES = g_fileBasicOperationsActions().BATCH_NEW_FILES;
-    auto* BATCH_NEW_FOLDERS = g_fileBasicOperationsActions().BATCH_NEW_FOLDERS;
-    connect(NEW_FOLDER, &QAction::triggered, this, &FileExplorerEvent::on_NewFolder);
-    connect(NEW_TEXT_FILE, &QAction::triggered, this, [this]() { this->on_NewTextFile(); });
-    connect(NEW_JSON_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewJsonFile);
-    connect(BATCH_NEW_FILES, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(false); });
-    connect(BATCH_NEW_FOLDERS, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(true); });
-  }
 
   {
-    auto* _PLAY_VIDEOS = g_viewActions()._SYS_VIDEO_PLAYERS;
-    auto* _REVEAL_IN_EXPLORER = g_fileBasicOperationsActions()._REVEAL_IN_EXPLORER;
-    auto* _OPEN_IN_TERMINAL = g_fileBasicOperationsActions()._OPEN_IN_TERMINAL;
-    connect(_PLAY_VIDEOS, &QAction::triggered, this, &FileExplorerEvent::on_PlayVideo);
-    connect(_REVEAL_IN_EXPLORER, &QAction::triggered, this, &FileExplorerEvent::on_revealInExplorer);
-    connect(_OPEN_IN_TERMINAL, &QAction::triggered, this, &FileExplorerEvent::on_OpenInTerminal);
-  }
-  {
-    auto* UNDO_OPERATION = g_fileBasicOperationsActions().UNDO_OPERATION;
-    auto* REDO_OPERATION = g_fileBasicOperationsActions().REDO_OPERATION;
-    connect(UNDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Undo);
-    connect(REDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Redo);
-  }
-  {
-    auto* COPY_FULL_PATH = g_fileBasicOperationsActions().COPY_FULL_PATH;
-    auto* COPY_PATH = g_fileBasicOperationsActions().COPY_PATH;
-    auto* COPY_NAME = g_fileBasicOperationsActions().COPY_NAME;
-    auto* COPY_THE_PATH = g_fileBasicOperationsActions().COPY_THE_PATH;
-    auto* COPY_RECORDS = g_fileBasicOperationsActions().COPY_RECORDS;
-    connect(COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFilePaths(), "absolute-file-path"); });
-    connect(COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFilePrepaths(), "absolute-path"); });
-    connect(COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFileNames(), "file-name"); });
-    connect(COPY_THE_PATH, &QAction::triggered, _contentPane,
-            [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getTheJpgFolderPaths(), "absolute-file-path+folderName+.jpg(in local seperator)"); });
-    connect(COPY_RECORDS, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFullRecords(), "full-record"); });
-  }
+    auto& fileOpInst = g_fileBasicOperationsActions();
+    connect(fileOpInst.NEW_FOLDER, &QAction::triggered, this, &FileExplorerEvent::on_NewFolder);
+    connect(fileOpInst.NEW_TEXT_FILE, &QAction::triggered, this, [this]() { this->on_NewTextFile(); });
+    connect(fileOpInst.NEW_JSON_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewJsonFile);
+    connect(fileOpInst.BATCH_NEW_FILES, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(false); });
+    connect(fileOpInst.BATCH_NEW_FOLDERS, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(true); });
 
-  {
-    auto* MOVE_TO_TRASHBIN = g_fileBasicOperationsActions().MOVE_TO_TRASHBIN;
-    auto* DELETE_PERMANENTLY = g_fileBasicOperationsActions().DELETE_PERMANENTLY;
-    connect(MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileExplorerEvent::on_moveToTrashBin);
-    connect(DELETE_PERMANENTLY, &QAction::triggered, this, &FileExplorerEvent::on_deletePermanently);
-  }
+    connect(fileOpInst._REVEAL_IN_EXPLORER, &QAction::triggered, this, &FileExplorerEvent::on_revealInExplorer);
+    connect(fileOpInst._OPEN_IN_TERMINAL, &QAction::triggered, this, &FileExplorerEvent::on_OpenInTerminal);
 
-  {
-    QList<QAction*> FOLDER_MERGEList = g_fileBasicOperationsActions().FOLDER_MERGE->actions();
-    auto* MERGE = FOLDER_MERGEList[0];
-    auto* MERGE_REVERSE = FOLDER_MERGEList[1];
-    connect(MERGE, &QAction::triggered, this, [this]() { on_Merge(false); });
-    connect(MERGE_REVERSE, &QAction::triggered, this, [this]() { on_Merge(true); });
-  }
+    connect(fileOpInst.UNDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Undo);
+    connect(fileOpInst.REDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Redo);
 
-  {
-    auto* MOVE_TO = g_fileBasicOperationsActions()._MOVE_TO;
-    auto* COPY_TO = g_fileBasicOperationsActions()._COPY_TO;
+    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFilePaths(), "absolute-file-path"); });
+    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFilePrepaths(), "absolute-path"); });
+    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFileNames(), "file-name"); });
+    connect(fileOpInst.COPY_THE_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getTheJpgFolderPaths(), "absolute-file-path+folderName+.jpg(in local seperator)"); });
+    connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFullRecords(), "full-record"); });
 
-    connect(MOVE_TO, &QAction::triggered, this, [this]() { this->on_MoveTo(); });
-    connect(COPY_TO, &QAction::triggered, this, [this]() { this->on_CopyTo(); });
+    connect(fileOpInst.MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileExplorerEvent::on_moveToTrashBin);
+    connect(fileOpInst.DELETE_PERMANENTLY, &QAction::triggered, this, &FileExplorerEvent::on_deletePermanently);
 
-    auto MOVE_TO_PATH_HISTORY = g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY;
-    auto COPY_TO_PATH_HISTORY = g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY;
+    connect(fileOpInst.MERGE, &QAction::triggered, this, [this]() { on_Merge(false); });
+    connect(fileOpInst.MERGE_REVERSE, &QAction::triggered, this, [this]() { on_Merge(true); });
 
-    connect(MOVE_TO_PATH_HISTORY, &QActionGroup::triggered, this, [this](const QAction* const act) { on_MoveTo(act->text()); });
-    connect(COPY_TO_PATH_HISTORY, &QActionGroup::triggered, this, [this](const QAction* const act) { on_CopyTo(act->text()); });
-  }
+    connect(fileOpInst._MOVE_TO, &QAction::triggered, this, [this]() { this->on_MoveTo(); });
+    connect(fileOpInst._COPY_TO, &QAction::triggered, this, [this]() { this->on_CopyTo(); });
 
-  {
-    auto* CUT = g_fileBasicOperationsActions().CUT;
-    auto* COPY = g_fileBasicOperationsActions().COPY;
-    auto* PASTE = g_fileBasicOperationsActions().PASTE;
+    connect(fileOpInst.MOVE_TO_PATH_HISTORY, &QActionGroup::triggered, this, [this](const QAction* const act) { on_MoveTo(act->text()); });
+    connect(fileOpInst.COPY_TO_PATH_HISTORY, &QActionGroup::triggered, this, [this](const QAction* const act) { on_CopyTo(act->text()); });
 
-    connect(CUT, &QAction::triggered, this, &FileExplorerEvent::on_Cut);
-    connect(COPY, &QAction::triggered, this, &FileExplorerEvent::on_Copy);
-    connect(PASTE, &QAction::triggered, this, &FileExplorerEvent::on_Paste);
-  }
+    connect(fileOpInst.CUT, &QAction::triggered, this, &FileExplorerEvent::on_Cut);
+    connect(fileOpInst.COPY, &QAction::triggered, this, &FileExplorerEvent::on_Copy);
+    connect(fileOpInst.PASTE, &QAction::triggered, this, &FileExplorerEvent::on_Paste);
 
-  {
-    auto* _NAME_RULER = g_fileBasicOperationsActions()._NAME_RULER;
-    auto* _PACK_FOLDERS = g_fileBasicOperationsActions()._PACK_FOLDERS;
-    auto* _UNPACK_FOLDERS = g_fileBasicOperationsActions()._UNPACK_FOLDERS;
-    auto* _LOW_RESOLUTION_IMGS_RMV = g_fileBasicOperationsActions()._LOW_RESOLUTION_IMGS_RMV;
-    auto* _RMV_01_FILE_FOLDER = g_fileBasicOperationsActions()._RMV_01_FILE_FOLDER;
-    auto* _REMOVE_EMPTY_FOLDER = g_fileBasicOperationsActions()._RMV_EMPTY_FOLDER_R;
-    auto* _REMOVE_FOLDER_BY_KEYWORD = g_fileBasicOperationsActions()._RMV_FOLDER_BY_KEYWORD;
-    auto* _DUPLICATE_VIDEOS_FINDER = g_fileBasicOperationsActions()._DUPLICATE_VIDEOS_FINDER;
-    auto* _DUPLICATE_IMAGES_FINDER = g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER;
-    connect(_NAME_RULER, &QAction::triggered, this, &FileExplorerEvent::on_NameStandardize);
-    connect(_PACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileClassify);
-    connect(_UNPACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileUnclassify);
-    connect(_LOW_RESOLUTION_IMGS_RMV, &QAction::triggered, this, &FileExplorerEvent::on_RemoveDuplicateImages);
-    connect(_RMV_01_FILE_FOLDER, &QAction::triggered, this, [this]() {
+    connect(fileOpInst._NAME_RULER, &QAction::triggered, this, &FileExplorerEvent::on_NameStandardize);
+    connect(fileOpInst._PACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileClassify);
+    connect(fileOpInst._UNPACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileUnclassify);
+    connect(fileOpInst._LOW_RESOLUTION_IMGS_RMV, &QAction::triggered, this, &FileExplorerEvent::on_RemoveDuplicateImages);
+    connect(fileOpInst._RMV_01_FILE_FOLDER, &QAction::triggered, this, [this]() {
       ZeroOrOneItemFolderProc rfr;
       FileExplorerEvent::on_RemoveRedundantItem(rfr);
     });
-    connect(_REMOVE_EMPTY_FOLDER, &QAction::triggered, this, [this]() {
+    connect(fileOpInst._RMV_EMPTY_FOLDER, &QAction::triggered, this, [this]() {
       EmptyFolderRmv efr;
       FileExplorerEvent::on_RemoveRedundantItem(efr);
     });
-    connect(_REMOVE_FOLDER_BY_KEYWORD, &QAction::triggered, this, [this]() {
+    connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, [this]() {
       const QString& keyword = QInputDialog::getItem(_contentPane, "Input keyword here", "filter", {"Marvil Films", "Fox"});
       if (keyword.size() < 3) {
         QMessageBox::warning(_contentPane, "Ignore", "keyword too short:" + keyword);
@@ -572,89 +521,87 @@ void FileExplorerEvent::subscribe() {
       FolderNameContainKeyRmv rirbk{keyword};
       FileExplorerEvent::on_RemoveRedundantItem(rirbk);
     });
-    connect(_DUPLICATE_VIDEOS_FINDER, &QAction::triggered, this,                                                                 //
+    connect(fileOpInst._DUPLICATE_VIDEOS_FINDER, &QAction::triggered, this,                                                                 //
             [this](const bool checked) {                                                                                         //
               m_duplicateVideosFinder = PopupHideWidget<DuplicateVideosFinder>(m_duplicateVideosFinder, checked, _contentPane);  //
               if (checked) {                                                                                                     //
                 (*m_duplicateVideosFinder)(_contentPane->getRootPath());                                                         //
               }
             });
-    connect(_DUPLICATE_IMAGES_FINDER, &QAction::triggered, this,                                                              //
+    connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::triggered, this,                                                              //
             [this](const bool checked) {                                                                                      //
               m_redundantImageFinder = PopupHideWidget<RedundantImageFinder>(m_redundantImageFinder, checked, _contentPane);  //
               if (checked) {                                                                                                  //
                 (*m_redundantImageFinder)(_contentPane->getRootPath());                                                       //
               }
             });
+
+    connect(fileOpInst.SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
+    connect(fileOpInst.SELECT_NONE, &QAction::triggered, this, &FileExplorerEvent::on_SelectNone);
+    connect(fileOpInst.SELECT_INVERT, &QAction::triggered, this, &FileExplorerEvent::on_SelectInvert);
+
+    connect(fileOpInst._LONG_PATH_FINDER, &QAction::triggered, this, [this]() -> void {
+      auto* pToLongPath = new RenameWidget_LongPath(_contentPane);
+      onRename(pToLongPath);
+    });
+
   }
 
   {
-    connect(g_rightClickActions()._SEARCH_IN_NET_EXPLORER, &QAction::triggered, this, &FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer);
-    connect(g_rightClickActions()._CALC_MD5_ACT, &QAction::triggered, this, &FileExplorerEvent::on_calcMD5);
-    connect(g_rightClickActions()._PROPERTIES, &QAction::triggered, this, &FileExplorerEvent::on_properties);
-    connect(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL, &QAction::triggered, this, &FileExplorerEvent::on_forceRefreshFileSystemModel);
+    auto& rightClickMenuInst = g_rightClickActions();
+    connect(rightClickMenuInst._SEARCH_IN_NET_EXPLORER, &QAction::triggered, this, &FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer);
+    connect(rightClickMenuInst._CALC_MD5_ACT, &QAction::triggered, this, &FileExplorerEvent::on_calcMD5);
+    connect(rightClickMenuInst._PROPERTIES, &QAction::triggered, this, &FileExplorerEvent::on_properties);
+    connect(rightClickMenuInst._FORCE_REFRESH_FILESYSTEMMODEL, &QAction::triggered, this, &FileExplorerEvent::on_forceRefreshFileSystemModel);
   }
 
   {
-    auto* SELECT_ALL = g_fileBasicOperationsActions().SELECT_ALL;
-    auto* SELECT_NONE = g_fileBasicOperationsActions().SELECT_NONE;
-    auto* SELECT_INVERT = g_fileBasicOperationsActions().SELECT_INVERT;
-
-    connect(SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
-    connect(SELECT_NONE, &QAction::triggered, this, &FileExplorerEvent::on_SelectNone);
-    connect(SELECT_INVERT, &QAction::triggered, this, &FileExplorerEvent::on_SelectInvert);
-  }
-  {
-    connect(g_renameAg()._NUMERIZER, &QAction::triggered, this, [this]() -> void {
+    auto& renameInst = g_renameAg();
+    connect(renameInst._NUMERIZER, &QAction::triggered, this, [this]() -> void {
       auto* pNumerize = new RenameWidget_Numerize(_contentPane);
       onRename(pNumerize);
     });
-    connect(g_renameAg()._SECTIONS_ARRANGE, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._SECTIONS_ARRANGE, &QAction::triggered, this, [this]() -> void {
       auto* pArrange = new RenameWidget_ArrangeSection(_contentPane);
       onRename(pArrange);
     });
-    connect(g_renameAg()._REVERSE_NAMES_LIST, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._REVERSE_NAMES_LIST, &QAction::triggered, this, [this]() -> void {
       auto* pReverse = new RenameWidget_ReverseNames(_contentPane);
       onRename(pReverse);
     });
-    connect(g_renameAg()._CASE_NAME, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._CASE_NAME, &QAction::triggered, this, [this]() -> void {
       auto* pCase = new RenameWidget_Case(_contentPane);
       onRename(pCase);
     });
-    connect(g_renameAg()._STR_INSERTER, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._STR_INSERTER, &QAction::triggered, this, [this]() -> void {
       auto* pInsert = new RenameWidget_Insert(_contentPane);
       onRename(pInsert);
     });
-    connect(g_renameAg()._STR_DELETER, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._STR_DELETER, &QAction::triggered, this, [this]() -> void {
       auto* pDelete = new RenameWidget_Delete(_contentPane);
       onRename(pDelete);
     });
-    connect(g_renameAg()._STR_REPLACER, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._STR_REPLACER, &QAction::triggered, this, [this]() -> void {
       auto* pReplacer = new RenameWidget_Replace(_contentPane);
       onRename(pReplacer);
     });
-    connect(g_renameAg()._CONTINUOUS_NUMBERING, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._CONTINUOUS_NUMBERING, &QAction::triggered, this, [this]() -> void {
       auto* pNoConsecutive = new RenameWidget_ConsecutiveFileNo(_contentPane);
       onRename(pNoConsecutive);
     });
-    connect(g_renameAg()._CONVERT_UNICODE_TO_ASCII, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._CONVERT_UNICODE_TO_ASCII, &QAction::triggered, this, [this]() -> void {
       auto* pToAscii = new RenameWidget_ConvertBoldUnicodeCharset2Ascii(_contentPane);
       onRename(pToAscii);
     });
-    connect(g_renameAg()._PREPEND_PARENT_FOLDER_NAMES, &QAction::triggered, this, [this]() -> void {
+    connect(renameInst._PREPEND_PARENT_FOLDER_NAMES, &QAction::triggered, this, [this]() -> void {
       auto* pPrependName = new RenameWidget_PrependParentFolderName(_contentPane);
       onRename(pPrependName);
-    });
-
-    auto* _LONG_PATH_FINDER = g_fileBasicOperationsActions()._LONG_PATH_FINDER;
-    connect(_LONG_PATH_FINDER, &QAction::triggered, this, [this]() -> void {
-      auto* pToLongPath = new RenameWidget_LongPath(_contentPane);
-      onRename(pToLongPath);
     });
   }
 
   {
     connect(g_viewActions()._HAR_VIEW, &QAction::triggered, this, &FileExplorerEvent::on_HarView);
+    connect(g_viewActions()._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileExplorerEvent::on_PlayVideo);
   }
 
   g_ArrangeActions().subscribe();
@@ -690,7 +637,7 @@ void FileExplorerEvent::onRename(AdvanceRenamer* renameWid) {
   }
 }
 
-auto FileExplorerEvent::__CanNewItem() const -> bool {
+bool FileExplorerEvent::__CanNewItem() const {
   if (!_contentPane->isFSView()) {
     qDebug("Reject. Only new item in file system view[%s]", qPrintable(_contentPane->GetCurViewName()));
     Notificator::information("Reject", QString("Not file system view[%s]").arg(_contentPane->GetCurViewName()));
@@ -991,7 +938,7 @@ auto FileExplorerEvent::on_SelectInvert() -> void {
   const QModelIndex& rootIndex = view->rootIndex();
   const int row = _fileSysModel->rowCount(rootIndex);
   const int col = (viewType == ViewType::LIST) ? 1 : _fileSysModel->columnCount(rootIndex);
-  _contentPane->disconnectSelectionChanged(viewType);  // Avoid lags when selection changed frequently
+  _contentPane->disconnectSelectionChanged();  // Avoid lags when selection changed frequently
   qInfo("Path[%s] Dimension of file system model %d-by-%d", qPrintable(_fileSysModel->rootPath()), row, col);
   const QModelIndex& topLeft = _fileSysModel->index(0, 0, rootIndex);
   const QModelIndex& bottomRight = _fileSysModel->index(row - 1, col - 1, rootIndex);

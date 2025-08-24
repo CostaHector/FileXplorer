@@ -34,12 +34,12 @@ const int Detail_INDEX = DB_HEADER.indexOf(Detail);
 
 class PerformerJsonFileHelper {
  public:
-  static QString PJsonPath(const QString& m_imageHostPath, const QVariantHash& pJson) {
-    return PJsonPath(m_imageHostPath, pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString(), pJson[PERFORMER_DB_HEADER_KEY::Name].toString());
+  static QString PJsonPath(const QString& imageHostPath, const QVariantHash& pJson) {
+    return PJsonPath(imageHostPath, pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString(), pJson[PERFORMER_DB_HEADER_KEY::Name].toString());
   }
 
-  static QString PJsonPath(const QString& m_imageHostPath, const QString& ori, const QString& performerName) {
-    return m_imageHostPath + '/' + ori + '/' + performerName + '/' + performerName + ".pjson";
+  static QString PJsonPath(const QString& imageHostPath, const QString& ori, const QString& castName) {
+    return imageHostPath + '/' + ori + '/' + castName + '/' + castName + ".pjson";
   }
 
   static QVariantHash PerformerJsonJoiner(const QSqlRecord& record);

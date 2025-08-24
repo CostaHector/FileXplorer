@@ -1,7 +1,7 @@
 #ifndef CASTDBVIEW_H
 #define CASTDBVIEW_H
 
-#include "PerfBaseDb.h"
+#include "CastBaseDb.h"
 #include "CustomTableView.h"
 #include <QSqlTableModel>
 #include <QToolBar>
@@ -23,9 +23,6 @@ class CastDBView : public CustomTableView {
 
   int onLoadFromPerformersList();
 
-  bool onLocateImageHost();
-  bool onChangePerformerImageHeight();
-
   bool onSubmit();
 
   bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -39,13 +36,13 @@ class CastDBView : public CustomTableView {
   bool onOpenRecordInFileSystem() const;
 
  private:
-  QLineEdit* m_perfSearch{nullptr};
-  QSqlTableModel* m_perfDbMdl{nullptr};
-  FileFolderPreviewer* _floatingPreview{nullptr};
-  QString m_imageHostPath;
-  int m_performerImageHeight;
+  static QString GetImageHostPath();
 
-  PerfBaseDb mDb;
+  QLineEdit* m_perfSearch{nullptr};
+  QSqlTableModel* m_castModel{nullptr};
+  FileFolderPreviewer* _floatingPreview{nullptr};
+
+  CastBaseDb mDb;
 };
 
 #endif  // CASTDBVIEW_H

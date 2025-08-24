@@ -49,7 +49,6 @@ struct MemoryKey {
 
   static const KV TABLE_DEFAULT_SECTION_SIZE;
   static const KV TABLE_DEFAULT_COLUMN_SECTION_SIZE;
-  static const KV PERFORMER_IMAGE_FIXED_HEIGHT;
 
   static const KV VIDS_LAST_TABLE_NAME;
 
