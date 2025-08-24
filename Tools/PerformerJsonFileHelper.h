@@ -34,12 +34,12 @@ const int Detail_INDEX = DB_HEADER.indexOf(Detail);
 
 class PerformerJsonFileHelper {
  public:
-  static QString PJsonPath(const QString& m_imageHostPath, const QVariantHash& pJson) {
-    return PJsonPath(m_imageHostPath, pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString(), pJson[PERFORMER_DB_HEADER_KEY::Name].toString());
+  static QString PsonPath(const QString& imageHostPath, const QVariantHash& pson) {
+    return PsonPath(imageHostPath, pson[PERFORMER_DB_HEADER_KEY::Orientation].toString(), pson[PERFORMER_DB_HEADER_KEY::Name].toString());
   }
 
-  static QString PJsonPath(const QString& m_imageHostPath, const QString& ori, const QString& performerName) {
-    return m_imageHostPath + '/' + ori + '/' + performerName + '/' + performerName + ".pjson";
+  static QString PsonPath(const QString& imageHostPath, const QString& ori, const QString& castName) {
+    return imageHostPath + '/' + ori + '/' + castName + '/' + castName + ".pson";
   }
 
   static QVariantHash PerformerJsonJoiner(const QSqlRecord& record);
@@ -57,11 +57,11 @@ class PerformerJsonFileHelper {
             {PERFORMER_DB_HEADER_KEY::Imgs, imgs}, {PERFORMER_DB_HEADER_KEY::Detail, detail}};
   }
 
-  static QString PerformerInsertSQL(const QString& tableName, const QVariantHash& pJson) {
-    return PerformerInsertSQL(tableName, pJson[PERFORMER_DB_HEADER_KEY::Name].toString(), pJson[PERFORMER_DB_HEADER_KEY::Rate].toInt(),
-                              pJson[PERFORMER_DB_HEADER_KEY::AKA].toString(), pJson[PERFORMER_DB_HEADER_KEY::Tags].toString(),
-                              pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString(), pJson[PERFORMER_DB_HEADER_KEY::Vids].toString(),
-                              pJson[PERFORMER_DB_HEADER_KEY::Imgs].toString(), pJson[PERFORMER_DB_HEADER_KEY::Detail].toString());
+  static QString PerformerInsertSQL(const QString& tableName, const QVariantHash& pson) {
+    return PerformerInsertSQL(tableName, pson[PERFORMER_DB_HEADER_KEY::Name].toString(), pson[PERFORMER_DB_HEADER_KEY::Rate].toInt(),
+                              pson[PERFORMER_DB_HEADER_KEY::AKA].toString(), pson[PERFORMER_DB_HEADER_KEY::Tags].toString(),
+                              pson[PERFORMER_DB_HEADER_KEY::Orientation].toString(), pson[PERFORMER_DB_HEADER_KEY::Vids].toString(),
+                              pson[PERFORMER_DB_HEADER_KEY::Imgs].toString(), pson[PERFORMER_DB_HEADER_KEY::Detail].toString());
   }
 
   static QString PerformerInsertSQL(const QString& tableName,

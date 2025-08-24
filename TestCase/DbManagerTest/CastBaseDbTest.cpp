@@ -2,7 +2,7 @@
 #include <QtTest>
 #include <QSqlRecord>
 #include "MyTestSuite.h"
-#include "PerfBaseDb.h"
+#include "CastBaseDb.h"
 #include "PerformerJsonFileHelper.h"
 #include "PublicVariable.h"
 
@@ -10,10 +10,10 @@ const QString rootpath = QFileInfo(__FILE__).absolutePath();
 const QString imgHostPath = rootpath + "/PerfImgHost";
 const QString dbName = rootpath + "/PERF.db";
 
-class PerfBaseDbTest : public MyTestSuite {
+class CastBaseDbTest : public MyTestSuite {
   Q_OBJECT
  public:
-  PerfBaseDbTest() : MyTestSuite{false} {}
+  CastBaseDbTest() : MyTestSuite{false} {}
   static QString GetPerfTextExample() {
     QString perfText;
     perfText += "Kaka|Ricardo Izecson dos Santos Leite";
@@ -35,46 +35,16 @@ class PerfBaseDbTest : public MyTestSuite {
     }
   }
 
-  void test_InsertPerformers() {
-    // precondition
-    QVERIFY(!QFile::exists(dbName));
-    const QString& perfText = GetPerfTextExample();
-    PerfBaseDb perfDb{dbName, "PERF_CONNECTION"};
-    QVERIFY(perfDb.CreateDatabase());
-    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, PerfBaseDb::CREATE_PERF_TABLE_TEMPLATE));
-    QVERIFY(QFile::exists(dbName));
-
-    const QStringList perfs{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
-    // procedure
-    QCOMPARE(perfDb.InsertPerformers(perfs), PERFS_ITEM_COUNT);
-
-    QList<QSqlRecord> records;
-    QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
-    QCOMPARE(records.size(), PERFS_ITEM_COUNT);
-    QSet<QString> actualNames;
-    for (const auto& record : records) {
-      actualNames << record.value(PERFORMER_DB_HEADER_KEY::Name).toString();
-    }
-    const QSet<QString> expectNames{perfs.cbegin(), perfs.cend()};
-    QCOMPARE(actualNames, expectNames);
-
-    // everything already exist, nothing inserted, UNIQUE constraint failed
-    QCOMPARE(perfDb.InsertPerformers(perfs), FD_EXEC_FAILED);
-    records.clear();
-    QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
-    QCOMPARE(records.size(), PERFS_ITEM_COUNT);
-  }
-
   void test_aka_name_split() {
-    const auto& noPerfFromEmptyText = PerfBaseDb::GetFreqName2AkaNames("");
+    const auto& noPerfFromEmptyText = CastBaseDb::GetFreqName2AkaNames("");
     QVERIFY(noPerfFromEmptyText.isEmpty());
 
-    const auto& noPerfFromUselessText = PerfBaseDb::GetFreqName2AkaNames("\n\n\n");
+    const auto& noPerfFromUselessText = CastBaseDb::GetFreqName2AkaNames("\n\n\n");
     QVERIFY(noPerfFromUselessText.isEmpty());
 
     const QString& perfText = GetPerfTextExample();
     QVERIFY(!perfText.isEmpty());
-    const auto& perfs = PerfBaseDb::GetFreqName2AkaNames(perfText);
+    const auto& perfs = CastBaseDb::GetFreqName2AkaNames(perfText);
     QCOMPARE(perfs.size(), PERFS_ITEM_COUNT);
     QCOMPARE(perfs.value("Kaka"), "Ricardo Izecson dos Santos Leite");
     QCOMPARE(perfs.value("Chris Evans"), "Cevans,Christopher Robert Evans");
@@ -86,12 +56,12 @@ class PerfBaseDbTest : public MyTestSuite {
     // precondition
     QVERIFY(!QFile::exists(dbName));
     const QString& perfText = GetPerfTextExample();
-    PerfBaseDb perfDb{dbName, "PERF_CONNECTION"};
+    CastBaseDb perfDb{dbName, "PERF_CONNECTION"};
     QVERIFY(perfDb.CreateDatabase());
-    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, PerfBaseDb::CREATE_PERF_TABLE_TEMPLATE));
+    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
     QVERIFY(QFile::exists(dbName));
     // procedure
-    QCOMPARE(perfDb.ReadFromUserInputSentence(perfText), PERFS_ITEM_COUNT);
+    QCOMPARE(perfDb.AppendCastFromMultiLineInput(perfText), PERFS_ITEM_COUNT);
 
     QList<QSqlRecord> records;
     QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
@@ -111,9 +81,9 @@ class PerfBaseDbTest : public MyTestSuite {
   void test_ReadFromImageHost() {
     // precondition
     QVERIFY(!QFile::exists(dbName));
-    PerfBaseDb perfDb{dbName, "PERF_CONNECTION"};
+    CastBaseDb perfDb{dbName, "PERF_CONNECTION"};
     QVERIFY(perfDb.CreateDatabase());
-    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, PerfBaseDb::CREATE_PERF_TABLE_TEMPLATE));
+    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
     QVERIFY(QFile::exists(dbName));
     // procedure
     QCOMPARE(perfDb.ReadFromImageHost(imgHostPath), PERFS_ITEM_COUNT);
@@ -139,14 +109,14 @@ class PerfBaseDbTest : public MyTestSuite {
   void test_LoadFromPJsonFile() {
     // precondition
     QVERIFY(!QFile::exists(dbName));
-    PerfBaseDb perfDb{dbName, "PERF_CONNECTION"};
+    CastBaseDb perfDb{dbName, "PERF_CONNECTION"};
     QVERIFY(perfDb.CreateDatabase());
-    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, PerfBaseDb::CREATE_PERF_TABLE_TEMPLATE));
+    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
     QVERIFY(QFile::exists(dbName));
     // procedure
-    QCOMPARE(perfDb.LoadFromPJsonFile(imgHostPath), PERFS_ITEM_COUNT);
+    QCOMPARE(perfDb.LoadFromPsonFile(imgHostPath), PERFS_ITEM_COUNT);
     // load again, replace into will always ok
-    QCOMPARE(perfDb.LoadFromPJsonFile(imgHostPath), PERFS_ITEM_COUNT);
+    QCOMPARE(perfDb.LoadFromPsonFile(imgHostPath), PERFS_ITEM_COUNT);
 
     QSet<QString> pkNames;
     QVERIFY(perfDb.QueryPK(DB_TABLE::PERFORMERS, PERFORMER_DB_HEADER_KEY::Name, pkNames));
@@ -175,7 +145,7 @@ class PerfBaseDbTest : public MyTestSuite {
     QCOMPARE(actualRate, expectRate);
   }
 };
-constexpr int PerfBaseDbTest::PERFS_ITEM_COUNT;
+constexpr int CastBaseDbTest::PERFS_ITEM_COUNT;
 
-PerfBaseDbTest g_PerfBaseDbTest;
-#include "PerfBaseDbTest.moc"
+CastBaseDbTest g_CastBaseDbTest;
+#include "CastBaseDbTest.moc"

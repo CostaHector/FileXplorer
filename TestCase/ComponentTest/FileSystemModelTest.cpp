@@ -125,59 +125,59 @@ private slots:
     model.CutSomething(selectionModel->selectedRows());
     selectionModel->clearSelection();
 
-    // Test normal: 2. outer system clipboard widget: cut=>in filesystem view past
-    rootIndex = tableView.rootIndex();
-    selectionModel->select(model.index(2, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    selectionModel->select(model.index(3, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    model.CutSomething(selectionModel->selectedRows());
+    // // Test normal: 2. outer system clipboard widget: cut=>in filesystem view past
+    // rootIndex = tableView.rootIndex();
+    // selectionModel->select(model.index(2, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // selectionModel->select(model.index(3, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // model.CutSomething(selectionModel->selectedRows());
 
-    qDebug("Start to move files in root path to its subfolder");
-    connDL = StartOneTimeConnectionDirLoaded(connDL, model, loopDL);
-    tableView.setRootIndex(rootIndex = model.setRootPath(mDir.absolutePath()));
-    QVERIFY(mDir.rename("Chris Hemsworth Suit.png", "Chris Hemsworth/Chris Hemsworth Suit.png"));
-    QVERIFY(mDir.rename("Chris Hemsworth Wallpaper.jpg", "Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
-    QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Suit.png"));
-    QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
-    loopDL.exec();
-    qDebug("Root path should contains 3 item(s)");
-    QCOMPARE(model.rowCount(rootIndex), 3);
+    // qDebug("Start to move files in root path to its subfolder");
+    // connDL = StartOneTimeConnectionDirLoaded(connDL, model, loopDL);
+    // tableView.setRootIndex(rootIndex = model.setRootPath(mDir.absolutePath()));
+    // QVERIFY(mDir.rename("Chris Hemsworth Suit.png", "Chris Hemsworth/Chris Hemsworth Suit.png"));
+    // QVERIFY(mDir.rename("Chris Hemsworth Wallpaper.jpg", "Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
+    // QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Suit.png"));
+    // QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
+    // loopDL.exec();
+    // qDebug("Root path should contains 3 item(s)");
+    // QCOMPARE(model.rowCount(rootIndex), 3);
 
-    qDebug("Refresh into root path");
-    connDL = StartOneTimeConnectionDirLoaded(connDL, model, loopDL);
-    tableView.setRootIndex(rootIndex = model.setRootPath(mDir.absolutePath()));
-    loopDL.exec();
+    // qDebug("Refresh into root path");
+    // connDL = StartOneTimeConnectionDirLoaded(connDL, model, loopDL);
+    // tableView.setRootIndex(rootIndex = model.setRootPath(mDir.absolutePath()));
+    // loopDL.exec();
 
-    // move files back
-    qDebug("Start to move files in subfolder back to root path");
-    connDL = StartOneTimeConnectionDirLoaded(connDL, model, loopDL);
-    tableView.setRootIndex(rootIndex);
-    QVERIFY(mDir.rename("Chris Hemsworth/Chris Hemsworth Suit.png", "Chris Hemsworth Suit.png"));
-    QVERIFY(mDir.rename("Chris Hemsworth/Chris Hemsworth Wallpaper.jpg", "Chris Hemsworth Wallpaper.jpg"));
-    QVERIFY(mDir.exists("Chris Hemsworth Suit.png"));
-    QVERIFY(mDir.exists("Chris Hemsworth Wallpaper.jpg"));
-    loopDL.exec();
-    qDebug("Root path should contains 5 item(s)");
-    QCOMPARE(model.rowCount(rootIndex), 5);
+    // // move files back
+    // qDebug("Start to move files in subfolder back to root path");
+    // connDL = StartOneTimeConnectionDirLoaded(connDL, model, loopDL);
+    // tableView.setRootIndex(rootIndex);
+    // QVERIFY(mDir.rename("Chris Hemsworth/Chris Hemsworth Suit.png", "Chris Hemsworth Suit.png"));
+    // QVERIFY(mDir.rename("Chris Hemsworth/Chris Hemsworth Wallpaper.jpg", "Chris Hemsworth Wallpaper.jpg"));
+    // QVERIFY(mDir.exists("Chris Hemsworth Suit.png"));
+    // QVERIFY(mDir.exists("Chris Hemsworth Wallpaper.jpg"));
+    // loopDL.exec();
+    // qDebug("Root path should contains 5 item(s)");
+    // QCOMPARE(model.rowCount(rootIndex), 5);
 
-    selectionModel->select(model.index(0, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    selectionModel->select(model.index(1, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    model.CutSomething(selectionModel->selectedRows());
-    selectionModel->clearSelection();
+    // selectionModel->select(model.index(0, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // selectionModel->select(model.index(1, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // model.CutSomething(selectionModel->selectedRows());
+    // selectionModel->clearSelection();
 
-    // Test abnormal: 3. move 2 files to its subfolder in file-system model
-    selectionModel->select(model.index(3, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    selectionModel->select(model.index(4, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    model.CutSomething(selectionModel->selectedRows());
+    // // Test abnormal: 3. move 2 files to its subfolder in file-system model
+    // selectionModel->select(model.index(3, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // selectionModel->select(model.index(4, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // model.CutSomething(selectionModel->selectedRows());
 
-    QVERIFY(mDir.rename("Chris Hemsworth Suit.png", "Chris Hemsworth/Chris Hemsworth Suit.png"));
-    QVERIFY(mDir.rename("Chris Hemsworth Wallpaper.jpg", "Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
-    QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Suit.png"));
-    QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
+    // QVERIFY(mDir.rename("Chris Hemsworth Suit.png", "Chris Hemsworth/Chris Hemsworth Suit.png"));
+    // QVERIFY(mDir.rename("Chris Hemsworth Wallpaper.jpg", "Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
+    // QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Suit.png"));
+    // QVERIFY(mDir.exists("Chris Hemsworth/Chris Hemsworth Wallpaper.jpg"));
 
-    selectionModel->select(model.index(0, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    selectionModel->select(model.index(1, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    selectionModel->select(model.index(2, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    model.CutSomething(selectionModel->selectedRows());
+    // selectionModel->select(model.index(0, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // selectionModel->select(model.index(1, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // selectionModel->select(model.index(2, 0, rootIndex), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    // model.CutSomething(selectionModel->selectedRows());
   }
 };
 

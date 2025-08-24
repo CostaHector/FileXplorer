@@ -70,7 +70,7 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   _UNPACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker");
   _RETURN_ERROR_CODE_UPON_ANY_FAILURE = new (std::nothrow) QAction(QIcon(":img/FAIL_FAST"), "Fail fast");
   _LONG_PATH_FINDER = new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), "Long path finder");
-  _RMV_EMPTY_FOLDER_R = new (std::nothrow) QAction("Rmv empty folders");
+  _RMV_EMPTY_FOLDER = new (std::nothrow) QAction("Rmv empty folders");
   _RMV_01_FILE_FOLDER = new (std::nothrow) QAction("Rmv 0/1 file folders");
   _RMV_FOLDER_BY_KEYWORD = new (std::nothrow) QAction("Rmv folders by keyword");
   _DUPLICATE_IMAGES_FINDER = new (std::nothrow) QAction(QIcon(":img/DUPLICATE_IMAGES_FINDER"), "Duplicate Images Finder");
@@ -323,7 +323,7 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
       "1. Delete empty folders;<br/>"
       "2. If a folder contains only a SINGLE file and the difference between the file name length and the folder name length <= 5 characters.<br/>"
       "Move the file up one level (to the parent directory) and then delete the folder.");
-  _RMV_EMPTY_FOLDER_R->setToolTip(
+  _RMV_EMPTY_FOLDER->setToolTip(
       "<b>Remove Empty folders under current view path recusively</b><br/>"
       "Only Empty folder will be removed");
   _RMV_FOLDER_BY_KEYWORD->setToolTip(
