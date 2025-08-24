@@ -45,7 +45,7 @@ QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
   actionGroup->addAction(NAVIGATION_PANE);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  NAVIGATION_PANE->setChecked(PreferenceSettings().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
+  NAVIGATION_PANE->setChecked(Configuration().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
   return actionGroup;
 }
 

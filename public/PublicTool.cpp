@@ -3,10 +3,10 @@
 #include "MemoryKey.h"
 
 #include <QAction>
+#include <QFile>
 #include <QFileDialog>
 #include <QCoreApplication>
 #include <QDir>
-#include <QDirIterator>
 #include <QTextStream>
 
 QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG) {
@@ -79,7 +79,7 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
 
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   if (!QFileInfo(defaultPath).isDir()) {
-    defaultPath = PreferenceSettings().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
+    defaultPath = Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
   }
   const auto selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
   QFileInfo dstFi(selectPath);
@@ -87,7 +87,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
     qDebug("selectPath[%s] is not a directory", qPrintable(selectPath));
     return "";
   }
-  PreferenceSettings().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
+  Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
   return dstFi.absoluteFilePath();
 }
 

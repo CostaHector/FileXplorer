@@ -6,11 +6,11 @@
 #include <QSqlTableModel>
 #include <QToolBar>
 #include <QLineEdit>
-class FloatingPreview;
+class FileFolderPreviewer;
 
 class CastDBView : public CustomTableView {
  public:
-  explicit CastDBView(QLineEdit* perfSearchLE, FloatingPreview* floatingPreview, QWidget* parent = nullptr);
+  explicit CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent = nullptr);
   void subscribe();
 
  private:
@@ -41,7 +41,7 @@ class CastDBView : public CustomTableView {
  private:
   QLineEdit* m_perfSearch{nullptr};
   QSqlTableModel* m_perfDbMdl{nullptr};
-  FloatingPreview* _floatingPreview{nullptr};
+  FileFolderPreviewer* _floatingPreview{nullptr};
   QString m_imageHostPath;
   int m_performerImageHeight;
 

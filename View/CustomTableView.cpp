@@ -28,14 +28,14 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
     return;
   }
   TABLES_SET.insert(m_name);
-  if (PreferenceSettings().contains(m_DEFAULT_SECTION_SIZE_KEY)) {
-    m_defaultTableRowHeight = PreferenceSettings().value(m_DEFAULT_SECTION_SIZE_KEY).toInt();
+  if (Configuration().contains(m_DEFAULT_SECTION_SIZE_KEY)) {
+    m_defaultTableRowHeight = Configuration().value(m_DEFAULT_SECTION_SIZE_KEY).toInt();
   }
-  if (PreferenceSettings().contains(m_DEFAULT_COLUMN_SECTION_SIZE_KEY)) {
-    m_defaultTableColumnWidth = PreferenceSettings().value(m_DEFAULT_COLUMN_SECTION_SIZE_KEY).toInt();
+  if (Configuration().contains(m_DEFAULT_COLUMN_SECTION_SIZE_KEY)) {
+    m_defaultTableColumnWidth = Configuration().value(m_DEFAULT_COLUMN_SECTION_SIZE_KEY).toInt();
   }
-  if (PreferenceSettings().contains(m_columnVisibiltyKey)) {
-    m_columnsShowSwitch = PreferenceSettings().value(m_columnVisibiltyKey).toString();
+  if (Configuration().contains(m_columnVisibiltyKey)) {
+    m_columnsShowSwitch = Configuration().value(m_columnVisibiltyKey).toString();
   }
 
   setAlternatingRowColors(true);
@@ -47,13 +47,13 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
 
-  const int fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
+  const int fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
   QFont defaultFont(font());
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
 
   STRETCH_DETAIL_SECTION->setCheckable(true);
-  STRETCH_DETAIL_SECTION->setChecked(PreferenceSettings().value(m_stretchLastSectionKey, true).toBool());
+  STRETCH_DETAIL_SECTION->setChecked(Configuration().value(m_stretchLastSectionKey, true).toBool());
   horizontalHeader()->setStretchLastSection(STRETCH_DETAIL_SECTION->isChecked());
   horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
   horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
@@ -61,16 +61,16 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   horizontalHeader()->setDefaultSectionSize(m_defaultTableColumnWidth);
 
   ENABLE_COLUMN_SORT->setCheckable(true);
-  ENABLE_COLUMN_SORT->setChecked(PreferenceSettings().value(m_sortByColumnSwitchKey, true).toBool());
+  ENABLE_COLUMN_SORT->setChecked(Configuration().value(m_sortByColumnSwitchKey, true).toBool());
   ENABLE_COLUMN_SORT->setToolTip(QString("<b>%1 (%2)</b><br/> Enable/Disable sort by click on horizontal header").arg(ENABLE_COLUMN_SORT->text(), ENABLE_COLUMN_SORT->shortcut().toString()));
   setSortingEnabled(ENABLE_COLUMN_SORT->isChecked());
 
   SHOW_HORIZONTAL_HEADER->setCheckable(true);
-  SHOW_HORIZONTAL_HEADER->setChecked(PreferenceSettings().value(m_showHorizontalHeaderKey, true).toBool());
+  SHOW_HORIZONTAL_HEADER->setChecked(Configuration().value(m_showHorizontalHeaderKey, true).toBool());
   SHOW_HORIZONTAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide or Show the horizontal header").arg(SHOW_VERTICAL_HEADER->text(), SHOW_VERTICAL_HEADER->shortcut().toString()));
 
   SHOW_VERTICAL_HEADER->setCheckable(true);
-  SHOW_VERTICAL_HEADER->setChecked(PreferenceSettings().value(m_showVerticalHeaderKey, true).toBool());
+  SHOW_VERTICAL_HEADER->setChecked(Configuration().value(m_showVerticalHeaderKey, true).toBool());
   SHOW_VERTICAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide or Show the vertical header").arg(SHOW_VERTICAL_HEADER->text(), SHOW_VERTICAL_HEADER->shortcut().toString()));
 
   RESIZE_COLUMN_TO_CONTENTS->setCheckable(true);
@@ -78,7 +78,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
                                         .arg(RESIZE_COLUMN_TO_CONTENTS->text(), RESIZE_COLUMN_TO_CONTENTS->shortcut().toString()));
 
   RESIZE_ROW_TO_CONTENTS->setCheckable(true);
-  RESIZE_ROW_TO_CONTENTS->setChecked(PreferenceSettings().value(m_rowResizeToContentKey, true).toBool());
+  RESIZE_ROW_TO_CONTENTS->setChecked(Configuration().value(m_rowResizeToContentKey, true).toBool());
   RESIZE_ROW_TO_CONTENTS->setToolTip(
         QString("<b>%1 (%2)</b><br/> Resize row to contents when enabled. row height interactive when disabled").arg(RESIZE_ROW_TO_CONTENTS->text(), RESIZE_ROW_TO_CONTENTS->shortcut().toString()));
 
@@ -162,7 +162,7 @@ bool CustomTableView::ShowOrHideColumnCore() {
   for (int c = 0; c < tableColumnsCount; ++c) {
     setColumnHidden(c, m_columnsShowSwitch[c] == '0');
   }
-  PreferenceSettings().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
+  Configuration().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
   return true;
 }
 
@@ -220,21 +220,21 @@ bool CustomTableView::onHideThisColumn() {
   }
   m_columnsShowSwitch[c] = '0';
   setColumnHidden(c, m_columnsShowSwitch[c] == '0');
-  PreferenceSettings().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
+  Configuration().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
   return true;
 }
 
 void CustomTableView::onStretchLastSection(const bool checked) {
   horizontalHeader()->setStretchLastSection(checked);
-  PreferenceSettings().setValue(m_stretchLastSectionKey, checked);
+  Configuration().setValue(m_stretchLastSectionKey, checked);
 }
 void CustomTableView::onEnableColumnSort(const bool enableChecked) {
   setSortingEnabled(enableChecked);
-  PreferenceSettings().setValue(m_sortByColumnSwitchKey, enableChecked);
+  Configuration().setValue(m_sortByColumnSwitchKey, enableChecked);
 }
 
 void CustomTableView::onResizeRowToContents(const bool checked) {
-  PreferenceSettings().setValue(m_rowResizeToContentKey, checked);
+  Configuration().setValue(m_rowResizeToContentKey, checked);
   if (checked) {
     verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
   } else {
@@ -273,7 +273,7 @@ void CustomTableView::onSetRowDefaultSectionSize() {
   }
   m_defaultTableRowHeight = size;
   verticalHeader()->setDefaultSectionSize(size);
-  PreferenceSettings().setValue(m_DEFAULT_SECTION_SIZE_KEY, size);
+  Configuration().setValue(m_DEFAULT_SECTION_SIZE_KEY, size);
 }
 
 void CustomTableView::onSetColumnDefaultSectionSize() {
@@ -285,34 +285,34 @@ void CustomTableView::onSetColumnDefaultSectionSize() {
   }
   m_defaultTableColumnWidth = size;
   horizontalHeader()->setDefaultSectionSize(size);
-  PreferenceSettings().setValue(m_DEFAULT_COLUMN_SECTION_SIZE_KEY, size);
+  Configuration().setValue(m_DEFAULT_COLUMN_SECTION_SIZE_KEY, size);
 }
 
 void CustomTableView::onShowHorizontalHeader(bool showChecked) {
   horizontalHeader()->setVisible(showChecked);
-  PreferenceSettings().setValue(m_showHorizontalHeaderKey, showChecked);
+  Configuration().setValue(m_showHorizontalHeaderKey, showChecked);
 }
 
 void CustomTableView::onShowVerticalHeader(bool showChecked) {
   verticalHeader()->setVisible(showChecked);
-  PreferenceSettings().setValue(m_showVerticalHeaderKey, showChecked);
+  Configuration().setValue(m_showVerticalHeaderKey, showChecked);
 }
 
 void CustomTableView::onHorizontalHeaderChanged() const {
-  PreferenceSettings().setValue(m_horizontalHeaderStateKey, horizontalHeader()->saveState());
+  Configuration().setValue(m_horizontalHeaderStateKey, horizontalHeader()->saveState());
 }
 void CustomTableView::onVerticalHeaderChanged() const {}
 
 void CustomTableView::InitTableView(const bool bHideShowCol) {
   horizontalHeader()->setVisible(SHOW_HORIZONTAL_HEADER->isChecked());
   verticalHeader()->setVisible(SHOW_VERTICAL_HEADER->isChecked());
-  if (PreferenceSettings().value(m_rowResizeToContentKey, false).toBool()) {
+  if (Configuration().value(m_rowResizeToContentKey, false).toBool()) {
     verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
   } else {
     verticalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Interactive);
     verticalHeader()->setDefaultSectionSize(m_defaultTableRowHeight);
   }
-  horizontalHeader()->restoreState(PreferenceSettings().value(m_horizontalHeaderStateKey, QByteArray{}).toByteArray());
+  horizontalHeader()->restoreState(Configuration().value(m_horizontalHeaderStateKey, QByteArray{}).toByteArray());
   if (bHideShowCol) {
     ShowOrHideColumnCore();
   }

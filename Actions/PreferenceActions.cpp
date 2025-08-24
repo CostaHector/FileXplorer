@@ -65,7 +65,7 @@ bool PreferenceActions::onSetAppStyle(QAction* pAct) {
     qWarning("styleName[%s] is not supported", qPrintable(styleName));
     return false;
   }
-  PreferenceSettings().setValue("STYLE_NAME", styleName);
+  Configuration().setValue("STYLE_NAME", styleName);
   qApp->setStyle(styleName);
   qDebug("qApp->setStyle: %s", qPrintable(styleName));
   return true;
@@ -80,7 +80,7 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   const QString& themeName = pAct->text();
   const THEME theme = GetThemeFromString(themeName);
   CurrentTheme(&theme);
-  PreferenceSettings().setValue("STYLESHEET_NAME", theme);
+  Configuration().setValue("STYLESHEET_NAME", theme);
   qDebug("ThemeName[%d]: %s", (int)theme, qPrintable(themeName));
 
   static QString theme2QssContent[THEME::THEME_BUTT]{};
@@ -110,7 +110,7 @@ void PreferenceActions::subscribe() {
 }
 
 bool PreferenceActions::PostActions() {
-  const QString& styleName = PreferenceSettings().value("STYLE_NAME", STYLE_WINDOWS_VISTA->text()).toString();
+  const QString& styleName = Configuration().value("STYLE_NAME", STYLE_WINDOWS_VISTA->text()).toString();
   for (auto* pAct : STYLE_AG->actions()) {
     if (pAct == nullptr) {
       qWarning("pAct is nullptr");

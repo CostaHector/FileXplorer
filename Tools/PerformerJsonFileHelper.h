@@ -34,16 +34,6 @@ const int Detail_INDEX = DB_HEADER.indexOf(Detail);
 
 class PerformerJsonFileHelper {
  public:
-  static const QRegularExpression IMG_VID_SEP_COMP;
-  static bool ImgHumanSorter(const QString& lhs, const QString& rhs);
-  static QStringList InitImgsList(const QString& imgs);
-
-  static QString GetFirstPerformerImgPath(const QString& m_imageHostPath, const QString& ori, const QString& performerName, const QString& imgs) {
-    const int i = imgs.indexOf(IMG_VID_SEP_COMP);
-    const QString& firstImg = (i == -1) ? imgs : imgs.left(i);
-    return (firstImg.isEmpty()) ? "" : m_imageHostPath + '/' + ori + '/' + performerName + '/' + firstImg;
-  }
-
   static QString PJsonPath(const QString& m_imageHostPath, const QVariantHash& pJson) {
     return PJsonPath(m_imageHostPath, pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString(), pJson[PERFORMER_DB_HEADER_KEY::Name].toString());
   }
@@ -83,8 +73,6 @@ class PerformerJsonFileHelper {
                                     const QString& vids = "",
                                     const QString& imgs = "",
                                     QString detail = "");
-
-  static constexpr char PERFS_VIDS_IMGS_SPLIT_CHAR = '\n';
 };
 
 #endif  // PERFORMERJSONFILEHELPER_H

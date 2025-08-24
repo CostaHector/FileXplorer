@@ -65,5 +65,5 @@ void DropdownToolButton::onToolButtonActTriggered(QAction* pAct) {
   if (m_memoryKey.isEmpty()) {
     return;
   }
-  PreferenceSettings().setValue(m_memoryKey, pAct->text());
+  Configuration().setValue(m_memoryKey, pAct->text());
 };

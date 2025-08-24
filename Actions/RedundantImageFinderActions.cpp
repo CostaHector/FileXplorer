@@ -22,7 +22,7 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
   ALSO_EMPTY_IMAGE = new (std::nothrow) QAction{QIcon(":img/FILE"), "Also empty image", this};
   CHECK_NULLPTR_RETURN_VOID(ALSO_EMPTY_IMAGE);
   ALSO_EMPTY_IMAGE->setCheckable(true);
-  ALSO_EMPTY_IMAGE->setChecked(PreferenceSettings().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool());
+  ALSO_EMPTY_IMAGE->setChecked(Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool());
   ALSO_EMPTY_IMAGE->setToolTip(QString("<b>%1 (%2)</b><br/> Blank images (with a file size of 0Byte) will also be considered redundant images.")  //
                                    .arg(ALSO_EMPTY_IMAGE->text(), ALSO_EMPTY_IMAGE->shortcut().toString()));
 

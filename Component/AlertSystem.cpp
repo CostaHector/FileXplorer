@@ -52,8 +52,8 @@ AlertSystem::AlertSystem(QWidget* parent)
 }
 
 void AlertSystem::ReadSettings() {
-  if (PreferenceSettings().contains("ALERT_SYSTEM_GEOMETRY")) {
-    restoreGeometry(PreferenceSettings().value("ALERT_SYSTEM_GEOMETRY").toByteArray());
+  if (Configuration().contains("ALERT_SYSTEM_GEOMETRY")) {
+    restoreGeometry(Configuration().value("ALERT_SYSTEM_GEOMETRY").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -71,7 +71,7 @@ void AlertSystem::hideEvent(QHideEvent* event) {
 }
 
 void AlertSystem::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("ALERT_SYSTEM_GEOMETRY", saveGeometry());
+  Configuration().setValue("ALERT_SYSTEM_GEOMETRY", saveGeometry());
   return QDialog::closeEvent(event);
 }
 
@@ -103,7 +103,7 @@ bool AlertSystem::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
 }
 
 void AlertSystem::onEditPreferenceSetting() const {
-  QString fileAbsPath = PreferenceSettings().fileName();
+  QString fileAbsPath = Configuration().fileName();
   if (!QFile::exists(fileAbsPath)) {
     Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
     return;

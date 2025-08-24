@@ -17,7 +17,7 @@
 #include "Notificator.h"
 #include "PropertiesWindow.h"
 #include "RedundantImageFinder.h"
-#include "ContentPanel.h"
+#include "ViewsStackedWidget.h"
 #include "AdvanceRenamer.h"
 #include "RenameWidget_LongPath.h"
 #include "RenameWidget_ArrangeSection.h"
@@ -60,7 +60,7 @@
 
 using namespace ViewTypeTool;
 
-FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent) {
+FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(fsm)
   CHECK_NULLPTR_RETURN_NULLPTR(view)
   CHECK_NULLPTR_RETURN_NULLPTR(logger)
@@ -69,7 +69,7 @@ FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(FileSystemModel* fsm, 
   return &eve;
 }
 
-FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent)
+FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent)
   : QObject{parent} {  //
   _fileSysModel = fsm;
   _contentPane = view;
@@ -195,8 +195,8 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(const char* namePattern, int s
 }
 
 bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
-  const QString defNamePattern = isFolder ? PreferenceSettings().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v).toString()
-                                          : PreferenceSettings().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v).toString();
+  const QString defNamePattern = isFolder ? Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v).toString()
+                                          : Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v).toString();
 
   const QString userInputRule =
       QInputDialog::getText(_contentPane, QString("Create Batch %1").arg(isFolder ? "Folders" : "Files"), "Rule Pattern: C-styleFormatString%StartIndex$EndIndex", QLineEdit::Normal, defNamePattern);
@@ -216,7 +216,7 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
     Notificator::information(QString("Skip").arg(userInputRule), QString("%1 file/folders").arg(endIndex - startIndex));
     return true;
   }
-  PreferenceSettings().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, userInputRule);
+  Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, userInputRule);
 
   return on_BatchNewFilesOrFolders(namePattern, startIndex, endIndex, isFolder);
 }
@@ -242,7 +242,7 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
     Notificator::information("images width invalid", QString::number(widthPx));
     return false;
   }
-  const int curSamplePeriod = PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
+  const int curSamplePeriod = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
   if (!ThumbnailProcesser::IsSamplePeriodAllowed(curSamplePeriod)) {
     Notificator::information("Sample period not allowed", QString::number(curSamplePeriod));
     return false;
@@ -384,7 +384,7 @@ void FileExplorerEvent::subsribeFileActions() {
   });
 
   connect(g_fileLeafActions()._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
-    PreferenceSettings().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);
+    Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);
     qDebug("Language will be changed next time open");
     Notificator::information("Language switch", "work after reopen");
   });
@@ -404,7 +404,7 @@ void FileExplorerEvent::subscribeThumbnailActions() {
 
   connect(ins._THUMBNAIL_SAMPLE_PERIOD, &QAction::triggered, this, [this]() {
     bool bok = false;
-    const int curSamplePeriod = PreferenceSettings().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
+    const int curSamplePeriod = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
     const int newSamplePeriod = QInputDialog::getInt(this->_contentPane, "Thumbnail Sample Period(seconds)",                              //
                                                      "Set thumbnail image sample period to:", curSamplePeriod,             //
                                                      ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX, 1,  //
@@ -416,7 +416,7 @@ void FileExplorerEvent::subscribeThumbnailActions() {
     if (newSamplePeriod == curSamplePeriod) {
       return;
     }
-    PreferenceSettings().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, newSamplePeriod);
+    Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, newSamplePeriod);
     Notificator::goodNews("New thumbnail image sample period has been set to", QString::number(newSamplePeriod));
   });
 
@@ -782,7 +782,7 @@ bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
 }
 
 bool FileExplorerEvent::on_compress() {
-  if (not((_contentPane->isFSView() or _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) and not PathTool::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
+  if (!((_contentPane->isFSView() || _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) && !PathTool::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
     qInfo("[Compress] Only available on FileSytemView/search[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_contentPane->getRootPath()));
     Notificator::information("[Compress] Only available on FileSytemView/search[%1] and non-empty-path[%2]", _contentPane->GetCurViewName() + '|' + _contentPane->getRootPath());
     return false;
@@ -1351,10 +1351,10 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
 
   Qt::DropAction dropAction{Qt::DropAction::IgnoreAction};
   if (dropAct == Qt::DropAction::MoveAction) {
-    PreferenceSettings().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name,  //
+    Configuration().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name,  //
                                   MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY));
   } else if (dropAct == Qt::DropAction::CopyAction) {
-    PreferenceSettings().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
+    Configuration().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
                                   MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
   } else {
     qDebug("DropAction[%d] is invalid", (int)dropAct);

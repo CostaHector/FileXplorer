@@ -24,10 +24,10 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   m_numberPattern->setEditable(true);
   m_numberPattern->setDuplicatesEnabled(false);
   m_numberPattern->setMaximumWidth(60);
-  const QStringList& noFormatCandidate{PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
+  const QStringList& noFormatCandidate{Configuration().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
   m_numberPattern->addItems(noFormatCandidate);
 
-  const int noFormatDefaultIndex = PreferenceSettings().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
+  const int noFormatDefaultIndex = Configuration().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
   if (noFormatDefaultIndex < 0 && noFormatDefaultIndex >= noFormatCandidate.size()) {
     qWarning("number[%d] pattern out of bound[%d, %d)", noFormatDefaultIndex, 0, noFormatCandidate.size());
   } else {
@@ -74,7 +74,7 @@ void RenameWidget_Numerize::extraSubscribe() {
 
   connect(m_numberPattern, &QComboBox::currentTextChanged, this, [this]() -> void {
     int defaultFormateInd = m_numberPattern->currentIndex();
-    PreferenceSettings().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
+    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
     OnlyTriggerRenameCore();
   });
 }
