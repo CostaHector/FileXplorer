@@ -5,7 +5,7 @@
 using namespace ViewTypeTool;
 
 QString ViewsStackedWidget::GetCurViewName() const {
-  ViewType vt = GetCurViewType();
+  ViewType vt = GetVt();
   const QString& viewName = GetViewTypeHumanFriendlyStr(vt);
   return viewName;
 }
@@ -15,7 +15,7 @@ int ViewsStackedWidget::AddView(ViewType vt, QWidget* w) {
 }
 
 QString ViewsStackedWidget::getRootPath() const {
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:
     case ViewType::LIST:
@@ -31,7 +31,7 @@ QString ViewsStackedWidget::getRootPath() const {
 }
 
 QString ViewsStackedWidget::getFilePath(const QModelIndex& ind) const {
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:
     case ViewType::LIST:
@@ -56,7 +56,7 @@ QString ViewsStackedWidget::getFilePath(const QModelIndex& ind) const {
 }
 
 QModelIndexList ViewsStackedWidget::getSelectedRows() const {
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:
       return m_fsTableView->selectionModel()->selectedRows();
@@ -87,7 +87,7 @@ QModelIndexList ViewsStackedWidget::getSelectedRows() const {
 
 QStringList ViewsStackedWidget::getFileNames() const {
   QStringList names;
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       for (const auto& ind : m_fsTableView->selectionModel()->selectedRows()) {
@@ -142,7 +142,7 @@ QStringList ViewsStackedWidget::getFileNames() const {
 
 QStringList ViewsStackedWidget::getFullRecords() const {
   QStringList fullRecords;
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       for (const auto& ind : m_fsTableView->selectionModel()->selectedRows()) {
@@ -196,7 +196,7 @@ QStringList ViewsStackedWidget::getFullRecords() const {
 
 QStringList ViewsStackedWidget::getFilePaths() const {
   QStringList filePaths;
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::LIST: {
       for (const auto& ind : m_fsListView->selectionModel()->selectedRows()) {
@@ -252,7 +252,7 @@ QStringList ViewsStackedWidget::getFilePaths() const {
 
 QStringList ViewsStackedWidget::getFilePrepaths() const {
   QStringList prepaths;
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       int rowCnt = m_fsTableView->selectionModel()->selectedRows().size();
@@ -317,7 +317,7 @@ QStringList ViewsStackedWidget::getFilePrepaths() const {
 
 QStringList ViewsStackedWidget::getTheJpgFolderPaths() const {
   QStringList prepaths;
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       for (const auto& ind : m_fsTableView->selectionModel()->selectedRows()) {
@@ -420,7 +420,7 @@ std::pair<QStringList, QList<QUrl>> ViewsStackedWidget::getFilePathsAndUrls(cons
   };
 
 
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::LIST: {
       Fill(m_fsModel, m_fsListView->selectionModel()->selectedRows(), dropAct);
@@ -461,7 +461,7 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
   QStringList names;
   prepaths.reserve(10);
   names.reserve(10);
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       const QString prepath = m_fsModel->rootPath();
@@ -538,7 +538,7 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
 }
 
 int ViewsStackedWidget::getSelectedRowsCount() const {
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       return m_fsTableView->selectionModel()->selectedRows().size();
@@ -569,7 +569,7 @@ int ViewsStackedWidget::getSelectedRowsCount() const {
 }
 
 QString ViewsStackedWidget::getCurFilePath() const {
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       return m_fsModel->filePath(m_fsTableView->currentIndex());
@@ -586,6 +586,9 @@ QString ViewsStackedWidget::getCurFilePath() const {
     case ViewType::SCENE: {
       return m_scenesModel->filePath(m_sceneTableView->currentIndex());
     }
+    case ViewType::CAST: {
+      return m_castTableView->filePath(m_castTableView->currentIndex());
+    }
     case ViewType::MOVIE: {
       return m_dbModel->filePath(m_movieView->currentIndex());
     }
@@ -601,7 +604,7 @@ QString ViewsStackedWidget::getCurFilePath() const {
 }
 
 QString ViewsStackedWidget::getCurFileName() const {
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
       return m_fsModel->fileName(m_fsTableView->currentIndex());
@@ -632,7 +635,7 @@ QString ViewsStackedWidget::getCurFileName() const {
 }
 
 QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind) const {
-  auto vt = GetCurViewType();
+  auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:
     case ViewType::LIST:

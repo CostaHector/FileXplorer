@@ -64,7 +64,7 @@ enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
  * is same as follows. Otherwise field not specified will be null or default(replace into: delete and insert) */
 const QString INSERT_NAME_ORI_IMGS_TEMPLATE  //
     {"INSERT INTO `%1`" + QString{R"((`%1`, `%2`, `%3`) VALUES (?1, ?2, ?3) ON CONFLICT(`%1`) DO UPDATE SET `%2`=?4, `%3`=?5;)"}
-           .arg(PERFORMER_DB_HEADER_KEY::Name, PERFORMER_DB_HEADER_KEY::Orientation, PERFORMER_DB_HEADER_KEY::Imgs)};
+                              .arg(PERFORMER_DB_HEADER_KEY::Name, PERFORMER_DB_HEADER_KEY::Orientation, PERFORMER_DB_HEADER_KEY::Imgs)};
 
 enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD { //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name = 0,
@@ -72,7 +72,7 @@ enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD { //  DO UPDATE SET `%2`=:%3, `%3`=:%4;
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE,
-};
+  };
 
 // 数值参数占位符即便要填入的值一样也不可重用, 例如:1, :2, :2, 有两个:2会出错, 需要改占位符:1, :2, :3
 /* INSERT INTO `%1` (`%1`,`%2`) VALUES (:1, :2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:3; */
@@ -90,48 +90,6 @@ enum INSERT_PERF_AND_AKA_TEMPLATE_FIELD {
   INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA,
   INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE,
 };
-
-const QString INSERT_ONLY_PERFS_NAME_TEMPLAE  //
-    {"INSERT INTO `%1` "                      //
-     + QString(R"(
-(`%1`) VALUES(:1);)")
-           .arg(PERFORMER_DB_HEADER_KEY::Name)};
-
-enum INSERT_ONLY_PERFS_NAME_TEMPLAE_FIELD {
-  INSERT_ONLY_PERFS_NAME_TEMPLAE_FIELD_Name = 0,
-};
-
-int CastBaseDb::InsertPerformers(const QStringList& perfList) {
-  auto db = GetDb();
-  if (!CheckValidAndOpen(db)) {
-    qWarning("Open failed");
-    return FD_DB_OPEN_FAILED;
-  }
-  QSqlQuery qry{db};
-  if (!qry.prepare(INSERT_ONLY_PERFS_NAME_TEMPLAE.arg(DB_TABLE::PERFORMERS))) {
-    qWarning("prepare cmd[%s] failed: %s",  //
-             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-    return FD_PREPARE_FAILED;
-  }
-  int succeedCnt = 0;
-  foreach (const QString& perf, perfList) {
-    if (perf.isEmpty()) {
-      continue;
-    }
-    qry.bindValue(INSERT_ONLY_PERFS_NAME_TEMPLAE_FIELD_Name, perf);
-    if (!qry.exec()) {
-      db.rollback();
-      qWarning("exec cmd[%s] failed: %s",  //
-               qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-      return FD_EXEC_FAILED;
-    }
-    ++succeedCnt;
-  }
-  qry.finish();
-  qDebug("%d/%d performer(s) add succeed by specified string:%s",  //
-         succeedCnt, perfList.size(), qPrintable(perfList.join('|')));
-  return succeedCnt;
-}
 
 int CastBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
   if (!QFileInfo(imgsHostPath).isDir()) {
@@ -212,7 +170,7 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
   return succeedCnt;
 }
 
-int CastBaseDb::LoadFromPJsonFile(const QString& imgsHostPath) {
+int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
   if (!QFileInfo(imgsHostPath).isDir()) {
     qWarning("Directory[%s] not exist", qPrintable(imgsHostPath));
     return FD_NOT_DIR;
@@ -236,18 +194,18 @@ int CastBaseDb::LoadFromPJsonFile(const QString& imgsHostPath) {
   }
 
   int succeedCnt = 0;
-  QDirIterator it{imgsHostPath, {"*.pjson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{imgsHostPath, {"*.pson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
-    const QVariantHash& pJson = JsonHelper::MovieJsonLoader(it.filePath());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name, pJson[PERFORMER_DB_HEADER_KEY::Name].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate, pJson[PERFORMER_DB_HEADER_KEY::Rate].toInt());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,  pJson[PERFORMER_DB_HEADER_KEY::AKA].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags, pJson[PERFORMER_DB_HEADER_KEY::Tags].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation, pJson[PERFORMER_DB_HEADER_KEY::Orientation].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids, pJson[PERFORMER_DB_HEADER_KEY::Vids].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, pJson[PERFORMER_DB_HEADER_KEY::Imgs].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail, pJson[PERFORMER_DB_HEADER_KEY::Detail].toString());
+    const QVariantHash& pson = JsonHelper::MovieJsonLoader(it.filePath());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name, pson[PERFORMER_DB_HEADER_KEY::Name].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate, pson[PERFORMER_DB_HEADER_KEY::Rate].toInt());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,  pson[PERFORMER_DB_HEADER_KEY::AKA].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags, pson[PERFORMER_DB_HEADER_KEY::Tags].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation, pson[PERFORMER_DB_HEADER_KEY::Orientation].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids, pson[PERFORMER_DB_HEADER_KEY::Vids].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, pson[PERFORMER_DB_HEADER_KEY::Imgs].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail, pson[PERFORMER_DB_HEADER_KEY::Detail].toString());
 
     if (!qry.exec()) {
       qWarning("replace[%s] failed: %s",  //
@@ -285,7 +243,7 @@ QMap<QString, QString> CastBaseDb::GetFreqName2AkaNames(const QString& perfsText
   return perfs;
 }
 
-int CastBaseDb::ReadFromUserInputSentence(const QString& perfsText) {
+int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
   const auto& perfs = GetFreqName2AkaNames(perfsText);
   if (perfs.isEmpty()) {
     qDebug("Read no perfs out from text");
@@ -331,4 +289,28 @@ int CastBaseDb::ReadFromUserInputSentence(const QString& perfsText) {
   qry.finish();
   qDebug("Read %d perfs out from text user input[%s] succeed", succeedCnt, qPrintable(perfsText));
   return succeedCnt;
+}
+
+bool CastBaseDb::UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& imageHostPath) {
+  QDir castDir{GetCastPath(sqlRecord, imageHostPath)};
+  castDir.setFilter(QDir::Filter::Files);
+  castDir.setSorting(QDir::SortFlag::Name);
+  castDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  if (!castDir.exists()) {
+    return false;
+  }
+  sqlRecord.setValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, castDir.entryList().join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR));
+  return true;
+}
+
+QString CastBaseDb::GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
+  return imageHostPath + '/'//
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation).value().toString() + '/'//
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString();//
+}
+
+QString CastBaseDb::GetCastFilePath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
+  return GetCastPath(sqlRecord, imageHostPath) + '/'//
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString()//
+         + ".pson";
 }

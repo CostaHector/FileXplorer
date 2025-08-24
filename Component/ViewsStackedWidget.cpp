@@ -66,7 +66,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
     }
   }
 
-  if (GetCurViewType() == ViewType::SCENE) {
+  if (GetVt() == ViewType::SCENE) {
     if (m_sceneTableView == nullptr) {
       qWarning("m_scenesModel is nullptr");
       return false;
@@ -75,7 +75,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
     return true;
   }
 
-  ViewTypeTool::ViewType vt = GetCurViewType();
+  ViewTypeTool::ViewType vt = GetVt();
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:
@@ -101,7 +101,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
 }
 
 auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool {
-  const ViewTypeTool::ViewType vt{GetCurViewType()};
+  const ViewTypeTool::ViewType vt{GetVt()};
 
   switch (vt) {
     case ViewType::LIST:
@@ -141,7 +141,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
 }
 
 auto ViewsStackedWidget::on_searchEnterKey(const QString& /*targetStr*/) -> bool {
-  const ViewTypeTool::ViewType vt{GetCurViewType()};
+  const ViewTypeTool::ViewType vt{GetVt()};
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:

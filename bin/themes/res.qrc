@@ -299,6 +299,12 @@
 <!--AlertSystem icon here-->
 <file alias="SETTINGS">AlertSystem/SETTINGS.svg</file>
 <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
+
+<!--Cast icon here-->
+<file alias="DUMP_INTO_PSON_FILE">Cast/DUMP_INTO_PSON_FILE.svg</file>
+<file alias="SYNC_FROM_DISK">Cast/SYNC_FROM_DISK.svg</file>
+<file alias="SYNC_FROM_DB">Cast/SYNC_FROM_DB.svg</file>
+
 </qresource>
 
 </RCC>
