@@ -5,7 +5,7 @@
 #include "StyleSheet.h"
 
 RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
-    : QToolBar{title, parent}                                      //
+  : QToolBar{title, parent}                                      //
 {
   auto& inst = g_castAct();
 
@@ -15,13 +15,29 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   m_BasicTableOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   m_BasicTableOp->setOrientation(Qt::Orientation::Horizontal);
 
-  m_RefreshOp = new (std::nothrow) QToolBar{"Refresh Operation", this};
-  CHECK_NULLPTR_RETURN_VOID(m_RefreshOp);
-  m_RefreshOp->addActions(inst.REFRESH_OP->actions());
-  m_RefreshOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  m_RefreshOp->setOrientation(Qt::Orientation::Vertical);
-  m_RefreshOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
-  m_RefreshOp->setStyleSheet("QToolBar { max-width: 256px; }");
+  m_SyncImgsFromDbOp = new (std::nothrow) QToolBar{"Sync Imgs From Db Operation", this};
+  CHECK_NULLPTR_RETURN_VOID(m_SyncImgsFromDbOp);
+  m_SyncImgsFromDbOp->addActions(inst._SYNC_IMGS_OP->actions());
+  m_SyncImgsFromDbOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  m_SyncImgsFromDbOp->setOrientation(Qt::Orientation::Vertical);
+  m_SyncImgsFromDbOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  m_SyncImgsFromDbOp->setStyleSheet("QToolBar { max-width: 256px; }");
+
+  m_SyncVidsFromDbOp = new (std::nothrow) QToolBar{"Sync Vids From Db Operation", this};
+  CHECK_NULLPTR_RETURN_VOID(m_SyncVidsFromDbOp);
+  m_SyncVidsFromDbOp->addActions(inst._SYNC_VIDS_OP->actions());
+  m_SyncVidsFromDbOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  m_SyncVidsFromDbOp->setOrientation(Qt::Orientation::Vertical);
+  m_SyncVidsFromDbOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  m_SyncVidsFromDbOp->setStyleSheet("QToolBar { max-width: 256px; }");
+
+  m_ExportToOp = new (std::nothrow) QToolBar{"Export to Operation", this};
+  CHECK_NULLPTR_RETURN_VOID(m_ExportToOp);
+  m_ExportToOp->addActions(inst.EXPORT_OP->actions());
+  m_ExportToOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  m_ExportToOp->setOrientation(Qt::Orientation::Vertical);
+  m_ExportToOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  m_ExportToOp->setStyleSheet("QToolBar { max-width: 256px; }");
 
   m_FileSystemOp = new (std::nothrow) QToolBar{"File System Operation", this};
   CHECK_NULLPTR_RETURN_VOID(m_FileSystemOp);
@@ -32,33 +48,20 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   m_FileSystemOp->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(m_FileSystemOp->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  m_LoadExtentOp = new (std::nothrow) QToolBar{"Load Extend Data Operation", this};
-  CHECK_NULLPTR_RETURN_VOID(m_LoadExtentOp);
-  m_LoadExtentOp->addActions(inst.LOAD_EXTEND_OP->actions());
-  m_LoadExtentOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  m_LoadExtentOp->setOrientation(Qt::Orientation::Vertical);
-  m_LoadExtentOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  m_LoadExtentOp->setStyleSheet("QToolBar { max-width: 256px; }");
-
-  m_ExportToOp = new (std::nothrow) QToolBar{"Export to Operation", this};
-  CHECK_NULLPTR_RETURN_VOID(m_ExportToOp);
-  m_ExportToOp->addActions(inst.EXPORT_OP->actions());
-  m_ExportToOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  m_ExportToOp->setOrientation(Qt::Orientation::Vertical);
-  m_ExportToOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
-  m_ExportToOp->setStyleSheet("QToolBar { max-width: 256px; }");
+  auto* castAppendToolbutton = inst.GetAppendCastToolButton(this);
 
   addAction(g_viewActions()._CAST_VIEW);
   addSeparator();
+  addAction(inst.SUBMIT);
+  addSeparator();
+  addWidget(castAppendToolbutton);
   addWidget(m_BasicTableOp);
   addSeparator();
-  addWidget(m_RefreshOp);
+  addWidget(m_SyncImgsFromDbOp);
+  addWidget(m_SyncVidsFromDbOp);
+  addWidget(m_ExportToOp);
   addSeparator();
   addWidget(m_FileSystemOp);
-  addSeparator();
-  addWidget(m_LoadExtentOp);
-  addSeparator();
-  addWidget(m_ExportToOp);
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }
 

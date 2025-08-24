@@ -53,7 +53,7 @@ class ViewsStackedWidget : public QStackedWidget {
   void keyPressEvent(QKeyEvent* e) override;
 
   inline bool isFSView() const {
-    ViewTypeTool::ViewType vt = GetCurViewType();
+    ViewTypeTool::ViewType vt = GetVt();
     return ViewTypeTool::isFSView(vt);
   }
 
@@ -62,40 +62,6 @@ class ViewsStackedWidget : public QStackedWidget {
     return dynamic_cast<QAbstractItemView*>(currentWidget());
   }
   QString GetCurViewName() const;
-
-  inline ViewTypeTool::ViewType GetCurViewType() const {
-    using namespace ViewTypeTool;
-    const auto* p = currentWidget();
-    if (p == nullptr) {
-      return ViewType::VIEW_TYPE_BUTT;
-    }
-    if (p == m_fsTableView) {
-      return ViewType::TABLE;
-    }
-    if (p == m_fsListView) {
-      return ViewType::LIST;
-    }
-    if (p == m_fsTreeView) {
-      return ViewType::TREE;
-    }
-    if (p == m_movieView) {
-      return ViewType::MOVIE;
-    }
-    if (p == m_advanceSearchView) {
-      return ViewType::SEARCH;
-    }
-    if (p == m_sceneTableView) {
-      return ViewType::SCENE;
-    }
-    if (p == m_castTableView) {
-      return ViewType::CAST;
-    }
-    if (p == m_jsonTableView) {
-      return ViewType::JSON;
-    }
-    qCritical("Current Index[%d] not find ViewType", currentIndex());
-    return ViewType::VIEW_TYPE_BUTT;
-  }
 
   int AddView(ViewTypeTool::ViewType vt, QWidget* w);
 
@@ -154,9 +120,17 @@ class ViewsStackedWidget : public QStackedWidget {
 
   QWidget* m_parent{nullptr};
 
+  ViewTypeTool::ViewType GetVt() const {
+    return mVt;
+  }
+  void SetVt(ViewTypeTool::ViewType newVt) {
+    mVt = newVt;
+  }
+
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
   QMetaObject::Connection mSelectionChangedConn;
+  ViewTypeTool::ViewType mVt{ViewTypeTool::ViewType::TABLE};
 };
 
 #endif  // VIEWSSTACKEDWIDGET_H

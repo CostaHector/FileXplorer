@@ -63,8 +63,8 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
 
 void FileXplorer::closeEvent(QCloseEvent* event) {
   Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Geometry", saveGeometry());
-  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Docker_Width", m_previewFolder->width());
-  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Docker_Height", m_previewFolder->height());
+  Configuration().setValue("SELECTION_PREVIEWER_WIDTH", m_previewFolder->width());
+  Configuration().setValue("SELECTION_PREVIEWER_HEIGHT", m_previewFolder->height());
   Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
   return QMainWindow::closeEvent(event);
 }
@@ -147,7 +147,7 @@ void FileXplorer::subscribe() {
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {
   switch (ev->key()) {
     case Qt::Key_F3: {  // F3 Search
-      const auto viewType = m_fsPanel->GetCurViewType();
+      const auto viewType = m_fsPanel->GetVt();
       if (ViewTypeTool::IsUseFileSystemSearchBar(viewType)) {  // for filesytem view
         if (m_fsPanel->_addressBar != nullptr) {
           m_fsPanel->_addressBar->onGetFocus();

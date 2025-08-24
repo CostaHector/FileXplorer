@@ -92,10 +92,14 @@ class FileExplorerEvent : public QObject {
   bool on_FileUnclassify();
   bool on_RemoveDuplicateImages();
   bool on_RemoveRedundantItem(RedundantRmv& remover);
+  void on_DUPLICATE_VIDEOS_FINDER(const bool checked);
+  void on_DUPLICATE_IMAGES_FINDER(const bool checked);
 
   bool on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString r);
   bool on_MoveTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::MoveAction, r); }
   bool on_CopyTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::CopyAction, r); }
+
+  void on_RMV_FOLDER_BY_KEYWORD();
 
   FileSystemModel* _fileSysModel{nullptr};
   ViewsStackedWidget* _contentPane{nullptr};

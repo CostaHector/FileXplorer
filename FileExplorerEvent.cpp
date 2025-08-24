@@ -300,12 +300,16 @@ QModelIndexList FileExplorerEvent::selectedIndexes() const {
 }
 
 bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
-  const QString& absFilePath = _contentPane->getCurFilePath();
-  const QString& noExtAbsFilePath = PathTool::GetFileNameExtRemoved(absFilePath);
-  const QString& imgFileAbsPathGuess = QDir::toNativeSeparators(noExtAbsFilePath) + ' ';
+  ViewTypeTool::ViewType vt = _contentPane->GetVt();
+  if (!(_contentPane->isFSView() || vt == ViewTypeTool::ViewType::CAST)) {
+    qDebug("View[%d] not suport", (int)vt);
+  }
+  QString absFilePath = _contentPane->getCurFilePath();
+  QString noExtAbsFilePath = PathTool::GetFileNameExtRemoved(absFilePath);
+  QString imgFileAbsPathGuess = QDir::toNativeSeparators(noExtAbsFilePath) + ' ';
   QApplication::clipboard()->setText(imgFileAbsPathGuess, QClipboard::Mode::Clipboard);
   QString fileBaseName = PathTool::GetBaseName(absFilePath);
-  const QString& forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_GOOGLE_SEARCH_LETTER, " ");
+  QString forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_GOOGLE_SEARCH_LETTER, " ");
   QStringList searchKeyWordArgs;
   if (!forSearch.isEmpty()) {
     const static QString HTML_URL_TEMPLATE{"https://www.google.com/search?&q=%1&udm=2"};
@@ -351,7 +355,7 @@ bool FileExplorerEvent::on_properties() const {
     pW->operator()(items);
     return true;
   }
-  if (_contentPane->GetCurViewType() == ViewType::MOVIE) {
+  if (_contentPane->GetVt() == ViewType::MOVIE) {
     pW = new PropertiesWindow(this->_contentPane);
     pW->show();
     pW->operator()(_contentPane->m_dbModel, _contentPane->m_movieView);
@@ -512,29 +516,9 @@ void FileExplorerEvent::subscribe() {
       EmptyFolderRmv efr;
       FileExplorerEvent::on_RemoveRedundantItem(efr);
     });
-    connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, [this]() {
-      const QString& keyword = QInputDialog::getItem(_contentPane, "Input keyword here", "filter", {"Marvil Films", "Fox"});
-      if (keyword.size() < 3) {
-        QMessageBox::warning(_contentPane, "Ignore", "keyword too short:" + keyword);
-        return;
-      }
-      FolderNameContainKeyRmv rirbk{keyword};
-      FileExplorerEvent::on_RemoveRedundantItem(rirbk);
-    });
-    connect(fileOpInst._DUPLICATE_VIDEOS_FINDER, &QAction::triggered, this,                                                                 //
-            [this](const bool checked) {                                                                                         //
-              m_duplicateVideosFinder = PopupHideWidget<DuplicateVideosFinder>(m_duplicateVideosFinder, checked, _contentPane);  //
-              if (checked) {                                                                                                     //
-                (*m_duplicateVideosFinder)(_contentPane->getRootPath());                                                         //
-              }
-            });
-    connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::triggered, this,                                                              //
-            [this](const bool checked) {                                                                                      //
-              m_redundantImageFinder = PopupHideWidget<RedundantImageFinder>(m_redundantImageFinder, checked, _contentPane);  //
-              if (checked) {                                                                                                  //
-                (*m_redundantImageFinder)(_contentPane->getRootPath());                                                       //
-              }
-            });
+    connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
+    connect(fileOpInst._DUPLICATE_VIDEOS_FINDER, &QAction::toggled, this, &FileExplorerEvent::on_DUPLICATE_VIDEOS_FINDER);
+    connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileExplorerEvent::on_DUPLICATE_IMAGES_FINDER);
 
     connect(fileOpInst.SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
     connect(fileOpInst.SELECT_NONE, &QAction::triggered, this, &FileExplorerEvent::on_SelectNone);
@@ -600,8 +584,9 @@ void FileExplorerEvent::subscribe() {
   }
 
   {
-    connect(g_viewActions()._HAR_VIEW, &QAction::triggered, this, &FileExplorerEvent::on_HarView);
-    connect(g_viewActions()._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileExplorerEvent::on_PlayVideo);
+    auto& viewInst = g_viewActions();
+    connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileExplorerEvent::on_HarView);
+    connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileExplorerEvent::on_PlayVideo);
   }
 
   g_ArrangeActions().subscribe();
@@ -792,7 +777,7 @@ bool FileExplorerEvent::on_compressImgsByGroup() {
 }
 
 bool FileExplorerEvent::on_archivePreview() {
-  auto vt = _contentPane->GetCurViewType();
+  auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt) && vt != ViewType::SEARCH) {
     return false;
   }
@@ -819,7 +804,7 @@ bool FileExplorerEvent::on_archivePreview() {
 }
 
 bool FileExplorerEvent::on_moveToTrashBin() {
-  ViewTypeTool::ViewType vt = _contentPane->GetCurViewType();
+  ViewTypeTool::ViewType vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt) && vt != ViewType::SEARCH) {
     LOG_WARN("[Move to trashbin] Not FileSytemView/Search View, viewType:", QString::number((int)vt));
     return false;
@@ -857,7 +842,7 @@ bool FileExplorerEvent::on_moveToTrashBin() {
 }
 
 bool FileExplorerEvent::on_deletePermanently() {
-  auto vt = _contentPane->GetCurViewType();
+  auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     return false;
   }
@@ -928,7 +913,7 @@ auto FileExplorerEvent::on_SelectNone() -> void {
 }
 
 auto FileExplorerEvent::on_SelectInvert() -> void {
-  ViewType viewType = _contentPane->GetCurViewType();
+  ViewType viewType = _contentPane->GetVt();
   if (!isFSView(viewType)) {
     qDebug("[selection invert] only available on FileSytemView but[%c]", (char)viewType);
     return;
@@ -969,7 +954,7 @@ bool FileExplorerEvent::on_HarView() {
 }
 
 auto FileExplorerEvent::on_PlayVideo() const -> bool {
-  auto vt = _contentPane->GetCurViewType();
+  auto vt = _contentPane->GetVt();
   const bool supportViewType{vt == ViewTypeTool::ViewType::LIST         //
                              || vt == ViewTypeTool::ViewType::TABLE     //
                              || vt == ViewTypeTool::ViewType::TREE      //
@@ -1274,8 +1259,22 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   return remover.Exec();
 }
 
+void FileExplorerEvent::on_DUPLICATE_VIDEOS_FINDER(const bool checked) {
+  m_duplicateVideosFinder = PopupHideWidget<DuplicateVideosFinder>(m_duplicateVideosFinder, checked, _contentPane);  //
+  if (checked) {                                                                                                     //
+    (*m_duplicateVideosFinder)(_contentPane->getRootPath());                                                         //
+  }
+}
+
+void FileExplorerEvent::on_DUPLICATE_IMAGES_FINDER(const bool checked) {
+  m_redundantImageFinder = PopupHideWidget<RedundantImageFinder>(m_redundantImageFinder, checked, _contentPane);  //
+  if (checked) {                                                                                                  //
+    (*m_redundantImageFinder)(_contentPane->getRootPath());                                                       //
+  }
+}
+
 bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString dest) {
-  const auto vt = _contentPane->GetCurViewType();
+  const auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     LOG_WARN("[Move/Copy to] only available on FileSytemView", QString::number((int)vt));
     return false;
@@ -1320,6 +1319,16 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
   }
   LOG_GOOD(pOperationNameStr, "Succeed. All succeed");
   return true;
+}
+
+void FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD() {
+  const QString& keyword = QInputDialog::getItem(_contentPane, "Input keyword here", "filter", {"Marvil Films", "Fox"});
+  if (keyword.size() < 3) {
+    QMessageBox::warning(_contentPane, "Ignore", "keyword too short:" + keyword);
+    return;
+  }
+  FolderNameContainKeyRmv rirbk{keyword};
+  FileExplorerEvent::on_RemoveRedundantItem(rirbk);
 }
 
 bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode) {

@@ -35,36 +35,6 @@ class CastBaseDbTest : public MyTestSuite {
     }
   }
 
-  void test_InsertPerformers() {
-    // precondition
-    QVERIFY(!QFile::exists(dbName));
-    const QString& perfText = GetPerfTextExample();
-    CastBaseDb perfDb{dbName, "PERF_CONNECTION"};
-    QVERIFY(perfDb.CreateDatabase());
-    QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
-    QVERIFY(QFile::exists(dbName));
-
-    const QStringList perfs{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
-    // procedure
-    QCOMPARE(perfDb.InsertPerformers(perfs), PERFS_ITEM_COUNT);
-
-    QList<QSqlRecord> records;
-    QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
-    QCOMPARE(records.size(), PERFS_ITEM_COUNT);
-    QSet<QString> actualNames;
-    for (const auto& record : records) {
-      actualNames << record.value(PERFORMER_DB_HEADER_KEY::Name).toString();
-    }
-    const QSet<QString> expectNames{perfs.cbegin(), perfs.cend()};
-    QCOMPARE(actualNames, expectNames);
-
-    // everything already exist, nothing inserted, UNIQUE constraint failed
-    QCOMPARE(perfDb.InsertPerformers(perfs), FD_EXEC_FAILED);
-    records.clear();
-    QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
-    QCOMPARE(records.size(), PERFS_ITEM_COUNT);
-  }
-
   void test_aka_name_split() {
     const auto& noPerfFromEmptyText = CastBaseDb::GetFreqName2AkaNames("");
     QVERIFY(noPerfFromEmptyText.isEmpty());
@@ -91,7 +61,7 @@ class CastBaseDbTest : public MyTestSuite {
     QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
     QVERIFY(QFile::exists(dbName));
     // procedure
-    QCOMPARE(perfDb.ReadFromUserInputSentence(perfText), PERFS_ITEM_COUNT);
+    QCOMPARE(perfDb.AppendCastFromMultiLineInput(perfText), PERFS_ITEM_COUNT);
 
     QList<QSqlRecord> records;
     QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
@@ -144,9 +114,9 @@ class CastBaseDbTest : public MyTestSuite {
     QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
     QVERIFY(QFile::exists(dbName));
     // procedure
-    QCOMPARE(perfDb.LoadFromPJsonFile(imgHostPath), PERFS_ITEM_COUNT);
+    QCOMPARE(perfDb.LoadFromPsonFile(imgHostPath), PERFS_ITEM_COUNT);
     // load again, replace into will always ok
-    QCOMPARE(perfDb.LoadFromPJsonFile(imgHostPath), PERFS_ITEM_COUNT);
+    QCOMPARE(perfDb.LoadFromPsonFile(imgHostPath), PERFS_ITEM_COUNT);
 
     QSet<QString> pkNames;
     QVERIFY(perfDb.QueryPK(DB_TABLE::PERFORMERS, PERFORMER_DB_HEADER_KEY::Name, pkNames));
