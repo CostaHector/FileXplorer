@@ -1,7 +1,7 @@
 #ifndef CASTDBVIEW_H
 #define CASTDBVIEW_H
 
-#include "PerfBaseDb.h"
+#include "CastBaseDb.h"
 #include "CustomTableView.h"
 #include <QSqlTableModel>
 #include <QToolBar>
@@ -9,43 +9,48 @@
 class FileFolderPreviewer;
 
 class CastDBView : public CustomTableView {
- public:
+public:
   explicit CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent = nullptr);
   void subscribe();
+  QString filePath(const QModelIndex& index) const;
 
- private:
+public slots:
+  bool onOpenRecordInFileSystem() const;
+
+private:
   void onInitATable();
-  bool onInsertIntoTable();
+  int onAppendCasts();
   int onDeleteRecords();
 
   bool onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete);
   bool DropSqlDatabase();
-
-  int onLoadFromPerformersList();
-
-  bool onLocateImageHost();
-  bool onChangePerformerImageHeight();
 
   bool onSubmit();
 
   bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
   int onLoadFromFileSystemStructure();
-  int onLoadFromPJsonDirectory();
-  int onDumpAllIntoPJsonFile();
-  int onDumpIntoPJsonFile();
+  int onLoadFromPsonDirectory();
+
+  int onSyncAllImgsFieldFromImageHost();
+  int onSyncImgsFieldFromImageHost();
+
+  int onDumpAllIntoPsonFile();
+  int onDumpIntoPsonFile();
+
   int onForceRefreshAllRecordsVids();
   int onForceRefreshRecordsVids();
-  bool onOpenRecordInFileSystem() const;
 
- private:
+private:
+  static QString GetImageHostPath();
+  void RefreshHtmlContents();
+
+
   QLineEdit* m_perfSearch{nullptr};
-  QSqlTableModel* m_perfDbMdl{nullptr};
+  QSqlTableModel* m_castModel{nullptr};
   FileFolderPreviewer* _floatingPreview{nullptr};
-  QString m_imageHostPath;
-  int m_performerImageHeight;
 
-  PerfBaseDb mDb;
+  CastBaseDb mDb;
 };
 
 #endif  // CASTDBVIEW_H

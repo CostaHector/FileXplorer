@@ -71,6 +71,7 @@ constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_24;
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_48;
 int IMAGE_SIZE::IMG_WIDTH = 420;
 int IMAGE_SIZE::IMG_HEIGHT = 320;
+constexpr int IMAGE_SIZE::PORTAIT_IMG_WIDTH;
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
   if (lay == nullptr) {

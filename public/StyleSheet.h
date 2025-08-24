@@ -59,6 +59,7 @@ struct IMAGE_SIZE {
   static constexpr int TABS_ICON_IN_MENU_48 = 48;
   static int IMG_WIDTH;
   static int IMG_HEIGHT;
+  static constexpr int PORTAIT_IMG_WIDTH {256};
 };
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
