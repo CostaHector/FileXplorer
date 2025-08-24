@@ -5,7 +5,7 @@
 
 namespace StringTool {
 extern const QRegularExpression IMG_VID_SEP_COMP;
-constexpr char PERFS_VIDS_IMGS_SPLIT_CHAR = '\n';
+constexpr char PERFS_VIDS_IMGS_SPLIT_CHAR {'\n'};
 
 bool ImgHumanSorter(const QString& lhs, const QString& rhs);
 bool ImgLengthSorter(const QString& lhs, const QString& rhs);

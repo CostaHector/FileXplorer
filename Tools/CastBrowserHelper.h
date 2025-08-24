@@ -21,7 +21,7 @@ extern const QString HTML_IMG_TEMPLATE;
 extern const QString VID_LINK_TEMPLATE;
 
 QString GetDetailDescription(const QString& fileAbsPath);
-CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const int imgHeight);
+CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost);
 }
 
 #endif
