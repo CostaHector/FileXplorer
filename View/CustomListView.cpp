@@ -22,7 +22,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) : QListView
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
 
-  const auto fontSize = PreferenceSettings().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
+  const auto fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
   QFont defaultFont(font());
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
@@ -30,7 +30,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) : QListView
   _FLOW_ORIENTATION_ACT = new (std::nothrow) QAction{m_name + " Flow Orientation", this};
   _FLOW_ORIENTATION_ACT->setCheckable(true);
   _FLOW_ORIENTATION_ACT->setToolTip("Toggle ListView Flow Direction LeftToRight/TopToBottom");
-  const bool isFlowLeftToRight = PreferenceSettings().value(m_name + "_ORIENTATION_LEFT_TO_RIGHT", true).toBool();
+  const bool isFlowLeftToRight = Configuration().value(m_name + "_ORIENTATION_LEFT_TO_RIGHT", true).toBool();
   _FLOW_ORIENTATION_ACT->setChecked(isFlowLeftToRight);
   onOrientationChange(isFlowLeftToRight);
 
@@ -61,7 +61,7 @@ void CustomListView::BindMenu(QMenu* menu) {
 
 void CustomListView::onOrientationChange(bool isLeftToRight) {
   setFlow(isLeftToRight ? QListView::Flow::LeftToRight : QListView::Flow::TopToBottom);
-  PreferenceSettings().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", isLeftToRight);
+  Configuration().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", isLeftToRight);
   if (isLeftToRight) {
     _FLOW_ORIENTATION_ACT->setIcon(QIcon{":img/ALIGN_HORIZONTAL_LEFT"});
     _FLOW_ORIENTATION_ACT->setText(m_name + " Flow: Left to Right");

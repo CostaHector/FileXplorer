@@ -19,7 +19,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_nameFilterCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
   m_nameFilterCB->setLineEdit(m_nameFilter);
-  m_nameFilterCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
+  m_nameFilterCB->addItem(Configuration().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
   m_nameFilterCB->addItem("\\.xltd$");
   m_nameFilterCB->addItem("\\.torrent$");
   m_nameFilterCB->addItem("\\.!ut$");
@@ -48,7 +48,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_contentCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
   m_contentCB->setToolTip("Search plain text file contents here");
   m_contentCB->addItem("nonporn");
-  m_contentCB->addItem(PreferenceSettings().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
+  m_contentCB->addItem(Configuration().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
 
   addWidget(m_nameFilterCB);
   addAction(g_fileBasicOperationsActions()._FORCE_RESEARCH);
@@ -111,8 +111,8 @@ void AdvanceSearchToolBar::onSearchTextChanges() {
 }
 
 void AdvanceSearchToolBar::onSearchEnterAndApply() {
-  PreferenceSettings().setValue(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, m_nameFilterCB->currentText());
-  PreferenceSettings().setValue(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, m_contentCB->currentText());
+  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, m_nameFilterCB->currentText());
+  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, m_contentCB->currentText());
   if (_searchProxyModel == nullptr) {
     return;
   }

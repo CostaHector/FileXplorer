@@ -16,8 +16,8 @@ SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolB
     act->setCheckable(true);
   }
 
-  SEARCH_NAME_CASE_SENSITIVE->setChecked(PreferenceSettings().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool());
-  SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(PreferenceSettings().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool());
+  SEARCH_NAME_CASE_SENSITIVE->setChecked(Configuration().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool());
+  SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(Configuration().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool());
 
   SEARCH_NAME_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Name Case matter.").arg(SEARCH_NAME_CASE_SENSITIVE->text(), SEARCH_NAME_CASE_SENSITIVE->shortcut().toString()));
   SEARCH_CONTENTS_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Content Case matter.").arg(SEARCH_CONTENTS_CASE_SENSITIVE->text(), SEARCH_CONTENTS_CASE_SENSITIVE->shortcut().toString()));

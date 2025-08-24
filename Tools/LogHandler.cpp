@@ -45,7 +45,7 @@ LogHandler::LogHandler(const QString& logPath, const int msgType, QObject* paren
     OUTPUT_LOG_LEVEL = static_cast<QtMsgType>(msgType);
   } else {
     const int debugLvl
-        = PreferenceSettings().value(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.v).toInt();
+        = Configuration().value(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.v).toInt();
     if (debugLvl >= QtDebugMsg && debugLvl <= QtSystemMsg) { // memory valid log level type
       OUTPUT_LOG_LEVEL = static_cast<QtMsgType>(debugLvl);
     } else {
@@ -139,11 +139,11 @@ bool LogHandler::OpenLogFolder() {
 
 void LogHandler::SetLogLevelError() {
   OUTPUT_LOG_LEVEL = QtWarningMsg;
-  PreferenceSettings().setValue(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, false);
+  Configuration().setValue(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, false);
 }
 void LogHandler::SetLogLevelDebug() {
   OUTPUT_LOG_LEVEL = QtDebugMsg;
-  PreferenceSettings().setValue(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, true);
+  Configuration().setValue(MemoryKey::LOG_LEVEL_PRINT_INSTANTLY.name, true);
 }
 
 void LogHandler::SetFlushInstantly(bool flushInstant) {

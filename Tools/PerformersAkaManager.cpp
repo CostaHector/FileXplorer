@@ -5,6 +5,7 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
+#include "StringTool.h"
 #include <QTextStream>
 #include <QFile>
 
@@ -142,7 +143,7 @@ QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlReco
   QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
   if (!akas.isEmpty()) {
     perfs += LOGIC_OR_CHAR;
-    perfs += akas.replace(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
+    perfs += akas.replace(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
   }
   const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Name), perfs);
   // movies table

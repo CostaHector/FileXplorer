@@ -11,7 +11,7 @@ constexpr int VideoPlayerWatcher::RIGHT_EDGE_WIDTH_PIXEL;
 
 VideoPlayerWatcher::VideoPlayerWatcher(QObject* parent, QWidget* watched, QListView* controlled)
     : QObject(parent), m_watched(watched), m_controlled(controlled) {
-  m_keepListShow = PreferenceSettings().value(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.v).toBool();
+  m_keepListShow = Configuration().value(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.v).toBool();
   if (m_watched == nullptr or m_controlled == nullptr) {
     qWarning("m_watched or m_controlled nullptr find");
     return;

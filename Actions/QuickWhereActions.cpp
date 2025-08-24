@@ -15,14 +15,14 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
       m_historyWhereClauseMenu(new QMenu(HIST_WHERE)),
       m_whereClauseTB(new QToolBar("Quick")) {
   m_historyWhereClauseMenu->setToolTipsVisible(true);
-  const QString& histories = PreferenceSettings().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
+  const QString& histories = Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
   for (const QString& where : histories.split('\n')) {
     m_historyWhereClauseMenu->addAction(new (std::nothrow) QAction(where, m_historyWhereClauseMenu));
   }
 
   AUTO_COMPLETE_AKA_SWITCH->setCheckable(true);
   AUTO_COMPLETE_AKA_SWITCH->setChecked(
-      PreferenceSettings().value(MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA.name, MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA.v).toBool());
+      Configuration().value(MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA.name, MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA.v).toBool());
   AUTO_COMPLETE_AKA_SWITCH->setToolTip(QString("<b>%1 (%2)</b><br/>Auto replace performers with its ALL AKA")
                                            .arg(AUTO_COMPLETE_AKA_SWITCH->text(), AUTO_COMPLETE_AKA_SWITCH->shortcut().toString()));
   APPLY_AND_CLOSE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
@@ -49,11 +49,11 @@ QuickWhereActions::QuickWhereActions(QObject* parent)
 
 void QuickWhereActions::onClauseClear() {
   m_historyWhereClauseMenu->clear();
-  PreferenceSettings().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, "");
+  Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, "");
 }
 
 void QuickWhereActions::onAkaHint(const bool autoCompleteAkaSwitch) {
-  PreferenceSettings().setValue(MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA.name, autoCompleteAkaSwitch);
+  Configuration().setValue(MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA.name, autoCompleteAkaSwitch);
 }
 
 QuickWhereActions& g_quickWhereAg() {

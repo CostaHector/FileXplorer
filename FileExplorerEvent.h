@@ -6,7 +6,7 @@
 #include "PublicVariable.h"
 #include "FileSystemModel.h"
 
-class ContentPanel;
+class ViewsStackedWidget;
 class CustomStatusBar;
 class AlertSystem;
 class AdvanceRenamer;
@@ -19,10 +19,10 @@ class FileExplorerEvent : public QObject {
   Q_OBJECT
 
  public:
-  static FileExplorerEvent* GetFileExlorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent = nullptr);
+  static FileExplorerEvent* GetFileExlorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent = nullptr);
 
  private:
-  FileExplorerEvent(FileSystemModel* fsm, ContentPanel* view, CustomStatusBar* logger, QObject* parent);
+  FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent);
   void subscribe();
   void subsribeCompress();
   void subsribeFileActions();
@@ -30,22 +30,22 @@ class FileExplorerEvent : public QObject {
 
   void onRename(AdvanceRenamer* renameWid);
 
-  auto __CanNewItem() const -> bool;
+  bool __CanNewItem() const;
 
-  auto __FocusNewItem(const QString& itemPath) -> bool;
+  bool __FocusNewItem(const QString& itemPath);
 
-  auto on_NewTextFile(QString newTextName = "", const QString& contents = "") -> bool;
-  auto on_NewJsonFile() -> bool;
-  auto on_NewFolder() -> bool;
-  auto on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false) -> bool;
-  auto on_BatchNewFilesOrFolders(bool isFolder = false) -> bool;
+  bool on_NewTextFile(QString newTextName = "", const QString& contents = "");
+  bool on_NewJsonFile();
+  bool on_NewFolder();
+  bool on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false);
+  bool on_BatchNewFilesOrFolders(bool isFolder = false);
 
   bool on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx);
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
 
-  auto selectedIndexesProxyToSource() const -> QModelIndexList;
-  auto selectedIndexes() const -> QModelIndexList;
-  auto selectedItems() const -> QStringList {
+  QModelIndexList selectedIndexesProxyToSource() const;
+  QModelIndexList selectedIndexes() const;
+  QStringList selectedItems() const {
     const auto& inds = selectedIndexes();
     QStringList filePaths;
     filePaths.reserve(inds.size());
@@ -70,35 +70,35 @@ class FileExplorerEvent : public QObject {
   bool on_compressImgsByGroup();
   bool on_archivePreview();
 
-  auto on_moveToTrashBin() -> bool;
+  bool on_moveToTrashBin();
 
-  auto on_deletePermanently() -> bool;
+  bool on_deletePermanently();
 
-  auto on_SelectAll() -> void;
-  auto on_SelectNone() -> void;
-  auto on_SelectInvert() -> void;
+  void on_SelectAll();
+  void on_SelectNone();
+  void on_SelectInvert();
 
   bool on_HarView();
 
-  auto on_PlayVideo() const -> bool;
+  bool on_PlayVideo() const;
 
-  auto on_Merge(const bool reverse = false) -> bool;
+  bool on_Merge(const bool reverse = false);
   bool on_Copy();
   bool on_Cut();
   bool on_Paste();
 
-  auto on_NameStandardize() -> bool;
+  bool on_NameStandardize();
   bool on_FileClassify();
   bool on_FileUnclassify();
-  auto on_RemoveDuplicateImages() -> bool;
-  auto on_RemoveRedundantItem(RedundantRmv& remover) -> bool;
+  bool on_RemoveDuplicateImages();
+  bool on_RemoveRedundantItem(RedundantRmv& remover);
 
   bool on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString r);
   bool on_MoveTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::MoveAction, r); }
   bool on_CopyTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::CopyAction, r); }
 
   FileSystemModel* _fileSysModel{nullptr};
-  ContentPanel* _contentPane{nullptr};
+  ViewsStackedWidget* _contentPane{nullptr};
 
   CustomStatusBar* _logger{nullptr};
   QClipboard* m_clipboard{nullptr};

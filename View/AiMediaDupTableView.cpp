@@ -44,7 +44,7 @@ QStringList AiMediaDupTableView::GetSelectedAiTables() const {
 }
 
 void AiMediaDupTableView::onScanAPath() {
-  const QString& defaultOpenDir = PreferenceSettings().value("DUPLICATE_VIDEOS_SELECT_FROM", ".").toString();
+  const QString& defaultOpenDir = Configuration().value("DUPLICATE_VIDEOS_SELECT_FROM", ".").toString();
   const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
 
   QFileInfo loadFromFi(loadFromPath);
@@ -54,7 +54,7 @@ void AiMediaDupTableView::onScanAPath() {
     qWarning("Failed when select a folder. Not a folder:\n%s", qPrintable(absPath));
     return;
   }
-  PreferenceSettings().setValue("DUPLICATE_VIDEOS_SELECT_FROM", absPath);
+  Configuration().setValue("DUPLICATE_VIDEOS_SELECT_FROM", absPath);
   auto& aimd = AIMediaDuplicate::GetInst();
   const bool scanRet = aimd.ScanALocation(absPath, false, true);
   aimd.FillHashFieldIfSizeConflict(absPath);

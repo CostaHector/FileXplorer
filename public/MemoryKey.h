@@ -4,7 +4,7 @@
 #include "KV.h"
 #include <QSettings>
 
-static inline QSettings& PreferenceSettings() {
+static inline QSettings& Configuration() {
   static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", PROJECT_NAME);
   return settings;
 }
@@ -86,6 +86,9 @@ struct MemoryKey {
 
   static const KV SHOW_HAR_IMAGE_PREVIEW;
   static const KV RETURN_ERRORCODE_UPON_ANY_FAILURE;
+
+  static const KV CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES;
+  static const KV CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS;
 };
 
 

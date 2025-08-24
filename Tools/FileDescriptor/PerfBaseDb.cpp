@@ -4,6 +4,8 @@
 #include "PerformerJsonFileHelper.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
+#include "StringTool.h"
+
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDirIterator>
@@ -147,6 +149,7 @@ int PerfBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
       name2Ori[perfName] = ori;
     }
   }
+  using namespace StringTool;
   for (auto it = name2Imgs.begin(); it != name2Imgs.end(); ++it) {
     ImgsSortNameLengthFirst(it.value());
   }
@@ -156,7 +159,7 @@ int PerfBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
   static const QString IMGS_PH{':' + PERFORMER_DB_HEADER_KEY::Imgs};
   for (auto mpIt = name2Ori.cbegin(); mpIt != name2Ori.cend(); ++mpIt) {
     const QString& perf = mpIt.key();
-    const QString& imgs = name2Imgs[perf].join(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
+    const QString& imgs = name2Imgs[perf].join(PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
     qry.bindValue(PERF_PH, perf);
     qry.bindValue(ORI_PH, mpIt.value());
     qry.bindValue(IMGS_PH, imgs);
@@ -237,7 +240,7 @@ int PerfBaseDb::LoadFromPJsonFile(const QString& imgsHostPath) {
 
 QMap<QString, QString> PerfBaseDb::GetFreqName2AkaNames(const QString& perfsText) {
   QMap<QString, QString> perfs;
-  for (const QString& line : perfsText.split(PerformerJsonFileHelper::PERFS_VIDS_IMGS_SPLIT_CHAR)) {
+  for (const QString& line : perfsText.split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR)) {
     if (line.isEmpty()) {
       continue;
     }

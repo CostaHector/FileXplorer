@@ -18,7 +18,7 @@ void SetDefaultFileStructMode(const QAction* pDefaultMode) {
     return;
   }
   g_fileStructureMode = FILE_STRUCTURE_MODE_STR_2_ENUM.value(pDefaultMode->text(), FILE_STRUCTURE_MODE::QUERY);
-  PreferenceSettings().setValue(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name, (int)g_fileStructureMode);
+  Configuration().setValue(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name, (int)g_fileStructureMode);
 }
 
 FILE_STRUCTURE_MODE GetDefaultFileStructMode() {

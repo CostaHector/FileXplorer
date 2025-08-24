@@ -81,8 +81,8 @@ QuickWhereClause::QuickWhereClause(QWidget* parent) : QDialog{parent} {
 void QuickWhereClause::onClauseSave() {
   const QString& curClause = GetWhereString();
   g_quickWhereAg().m_historyWhereClauseMenu->addAction(new (std::nothrow) QAction(curClause, this));
-  const QString& before = PreferenceSettings().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
-  PreferenceSettings().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, curClause + '\n' + GetWhereString());
+  const QString& before = Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
+  Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, curClause + '\n' + GetWhereString());
 }
 
 void QuickWhereClause::onClauseChanged() {
