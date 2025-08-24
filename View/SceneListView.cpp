@@ -66,7 +66,7 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   subscribe();
 }
 
-void SceneListView::setFloatingPreview(FloatingPreview* floatingPreview) {
+void SceneListView::setFloatingPreview(FileFolderPreviewer* floatingPreview) {
   mPrev_ = floatingPreview;
 }
 

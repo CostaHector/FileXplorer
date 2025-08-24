@@ -11,7 +11,7 @@ SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox{parent} {
   addItem(QIcon(":img/SEARCH_SCOPE_CONTENT"), GetSearchModeStr(SEARCH_MODE::FILE_CONTENTS));
 
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-  setCurrentText(PreferenceSettings().value("ADVANCE_SEARCH_MODE", "Wildcard").toString());
+  setCurrentText(Configuration().value("ADVANCE_SEARCH_MODE", "Wildcard").toString());
 }
 
 void SearchModeComboBox::BindSearchModel(SearchProxyModel* searchProxyModel) {

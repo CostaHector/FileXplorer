@@ -1,20 +1,20 @@
-﻿#include "ContentPanel.h"
+﻿#include "ViewsStackedWidget.h"
 #include "ScenesListModel.h"
 #include "ViewTypeTool.h"
 
 using namespace ViewTypeTool;
 
-QString ContentPanel::GetCurViewName() const {
+QString ViewsStackedWidget::GetCurViewName() const {
   ViewType vt = GetCurViewType();
   const QString& viewName = GetViewTypeHumanFriendlyStr(vt);
   return viewName;
 }
 
-int ContentPanel::AddView(ViewType vt, QWidget* w) {
+int ViewsStackedWidget::AddView(ViewType vt, QWidget* w) {
   return m_name2ViewIndex[vt] = addWidget(w);
 }
 
-QString ContentPanel::getRootPath() const {
+QString ViewsStackedWidget::getRootPath() const {
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::TABLE:
@@ -30,7 +30,7 @@ QString ContentPanel::getRootPath() const {
   }
 }
 
-QString ContentPanel::getFilePath(const QModelIndex& ind) const {
+QString ViewsStackedWidget::getFilePath(const QModelIndex& ind) const {
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::TABLE:
@@ -55,7 +55,7 @@ QString ContentPanel::getFilePath(const QModelIndex& ind) const {
   }
 }
 
-QModelIndexList ContentPanel::getSelectedRows() const {
+QModelIndexList ViewsStackedWidget::getSelectedRows() const {
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::TABLE:
@@ -85,7 +85,7 @@ QModelIndexList ContentPanel::getSelectedRows() const {
   }
 }
 
-QStringList ContentPanel::getFileNames() const {
+QStringList ViewsStackedWidget::getFileNames() const {
   QStringList names;
   auto vt = GetCurViewType();
   switch (vt) {
@@ -140,7 +140,7 @@ QStringList ContentPanel::getFileNames() const {
   return names;
 }
 
-QStringList ContentPanel::getFullRecords() const {
+QStringList ViewsStackedWidget::getFullRecords() const {
   QStringList fullRecords;
   auto vt = GetCurViewType();
   switch (vt) {
@@ -194,7 +194,7 @@ QStringList ContentPanel::getFullRecords() const {
   return fullRecords;
 }
 
-QStringList ContentPanel::getFilePaths() const {
+QStringList ViewsStackedWidget::getFilePaths() const {
   QStringList filePaths;
   auto vt = GetCurViewType();
   switch (vt) {
@@ -250,7 +250,7 @@ QStringList ContentPanel::getFilePaths() const {
   return filePaths;
 }
 
-QStringList ContentPanel::getFilePrepaths() const {
+QStringList ViewsStackedWidget::getFilePrepaths() const {
   QStringList prepaths;
   auto vt = GetCurViewType();
   switch (vt) {
@@ -315,7 +315,7 @@ QStringList ContentPanel::getFilePrepaths() const {
   return prepaths;
 }
 
-QStringList ContentPanel::getTheJpgFolderPaths() const {
+QStringList ViewsStackedWidget::getTheJpgFolderPaths() const {
   QStringList prepaths;
   auto vt = GetCurViewType();
   switch (vt) {
@@ -380,7 +380,7 @@ QStringList ContentPanel::getTheJpgFolderPaths() const {
   return prepaths;
 }
 
-std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::DropAction dropAct) const {
+std::pair<QStringList, QList<QUrl>> ViewsStackedWidget::getFilePathsAndUrls(const Qt::DropAction dropAct) const {
   QStringList filePaths;
   QList<QUrl> urls;
 
@@ -456,7 +456,7 @@ std::pair<QStringList, QList<QUrl>> ContentPanel::getFilePathsAndUrls(const Qt::
   return {filePaths, urls};
 }
 
-std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const bool isSearchRecycle) const {
+std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(const bool isSearchRecycle) const {
   QStringList prepaths;
   QStringList names;
   prepaths.reserve(10);
@@ -537,7 +537,7 @@ std::pair<QStringList, QStringList> ContentPanel::getFilePrepathsAndName(const b
   return {prepaths, names};
 }
 
-int ContentPanel::getSelectedRowsCount() const {
+int ViewsStackedWidget::getSelectedRowsCount() const {
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::TABLE: {
@@ -568,7 +568,7 @@ int ContentPanel::getSelectedRowsCount() const {
   return -1;
 }
 
-QString ContentPanel::getCurFilePath() const {
+QString ViewsStackedWidget::getCurFilePath() const {
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::TABLE: {
@@ -600,7 +600,7 @@ QString ContentPanel::getCurFilePath() const {
   return "";
 }
 
-QString ContentPanel::getCurFileName() const {
+QString ViewsStackedWidget::getCurFileName() const {
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::TABLE: {
@@ -631,7 +631,7 @@ QString ContentPanel::getCurFileName() const {
   return "";
 }
 
-QFileInfo ContentPanel::getFileInfo(const QModelIndex& ind) const {
+QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind) const {
   auto vt = GetCurViewType();
   switch (vt) {
     case ViewType::TABLE:

@@ -87,7 +87,7 @@ QToolBar* SceneInPageActions::GetOrderToolBar() {
 }
 
 QToolBar* SceneInPageActions::GetPagesRowByColumnToolBar() {
-  int sceneCnt1Page = PreferenceSettings().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
+  int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
   mPageDimensionLE = new (std::nothrow) QLineEdit(QString::number(sceneCnt1Page));
   mPageDimensionLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
   mPageDimensionLE->setToolTip("Scenes count each page");
@@ -138,15 +138,15 @@ void onImageSizeChanged(const QString& newImageSize) {
     return;
   }
   qDebug("Image size changed to %dx%d pixels", w, h);
-  PreferenceSettings().setValue("FLOATING_WINDOW_IMG_WIDTH", w);
-  PreferenceSettings().setValue("FLOATING_WINDOW_IMG_HEIGHT", h);
+  Configuration().setValue("FLOATING_WINDOW_IMG_WIDTH", w);
+  Configuration().setValue("FLOATING_WINDOW_IMG_HEIGHT", h);
   IMAGE_SIZE::IMG_WIDTH = w;
   IMAGE_SIZE::IMG_HEIGHT = h;
 }
 
 QToolBar* SceneInPageActions::GetImageSizeToolBar() {
-  const int width = PreferenceSettings().value("FLOATING_WINDOW_IMG_WIDTH", 480).toInt();
-  const int height = PreferenceSettings().value("FLOATING_WINDOW_IMG_HEIGHT", 280).toInt();
+  const int width = Configuration().value("FLOATING_WINDOW_IMG_WIDTH", 480).toInt();
+  const int height = Configuration().value("FLOATING_WINDOW_IMG_HEIGHT", 280).toInt();
   IMAGE_SIZE::IMG_WIDTH = width;
   IMAGE_SIZE::IMG_HEIGHT = height;
   const QString& imageSize = QString::number(width) + "x" + QString::number(height);

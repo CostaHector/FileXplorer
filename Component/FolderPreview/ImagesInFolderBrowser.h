@@ -1,19 +1,12 @@
-#ifndef PREVIEWBROWSER_H
-#define PREVIEWBROWSER_H
+#ifndef IMAGESINFOLDERBROWSER_H
+#define IMAGESINFOLDERBROWSER_H
 #include "ClickableTextBrowser.h"
 
-class PreviewBrowser : public ClickableTextBrowser {
+class ImagesInFolderBrowser : public ClickableTextBrowser {
  public:
-  explicit PreviewBrowser(QWidget* parent = nullptr);
+  explicit ImagesInFolderBrowser(QWidget* parent = nullptr);
   bool operator()(const QString& path);
   void subscribe();
-
-  void setDockerWindowTitle(int vidCnt) {
-    if (m_parentDocker == nullptr) {
-      return;
-    }
-    m_parentDocker->setWindowTitle(QString{"%1|%2"}.arg(vidCnt).arg(m_imgsLst.size()));
-  }
 
   QStringList InitImgsList(const QString& dirPath) const;
   bool hasNextImgs() const;
@@ -24,9 +17,9 @@ class PreviewBrowser : public ClickableTextBrowser {
   static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(SHOW_IMGS_CNT_LIST[0]);
   int m_curImgCntIndex = 0;
 
-  QString dirPath;
+  QString m_dirPath;
   QStringList m_imgsLst;
   QWidget* m_parentDocker{nullptr};
 };
 
-#endif  // PREVIEWBROWSER_H
+#endif  // IMAGESINFOLDERBROWSER_H

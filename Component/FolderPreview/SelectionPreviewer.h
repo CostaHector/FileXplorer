@@ -1,32 +1,22 @@
-#ifndef PREVIEWFOLDER_H
-#define PREVIEWFOLDER_H
+#ifndef SELECTIONPREVIEWER_H
+#define SELECTIONPREVIEWER_H
 
 #include <QHash>
 #include <QStackedWidget>
 
-#include "PreviewBrowser.h"
-#include "PreviewLabels.h"
-#include "FloatingPreview.h"
+#include "ImagesInFolderBrowser.h"
+#include "ImagesInFolderSlider.h"
+#include "FileFolderPreviewer.h"
 
 class FolderPreviewSwitcher;
-class NavigationViewSwitcher;
+class ToolBarAndViewSwitcher;
 
-class PreviewFolder : public QStackedWidget {
+class SelectionPreviewer : public QStackedWidget {
  public:
   friend class FolderPreviewSwitcher;
-  friend class NavigationViewSwitcher;
-  explicit PreviewFolder(QWidget* parent = nullptr);
+  friend class ToolBarAndViewSwitcher;
+  explicit SelectionPreviewer(QWidget* parent = nullptr);
 
-  QString GetCurViewName() const {
-    const int curInd = currentIndex();
-    for (auto it = m_name2PreviewIndex.cbegin(); it != m_name2PreviewIndex.cend(); ++it) {
-      if (it.value() == curInd) {
-        return it.key();
-      }
-    }
-    qWarning("no view name find for index[%d]", curInd);
-    return "";
-  }
   int AddView(const QString& viewType, QWidget* w) {  //
     return m_name2PreviewIndex[viewType] = addWidget(w);
   }
@@ -40,12 +30,11 @@ class PreviewFolder : public QStackedWidget {
     m_nextFolderTimer->start();
   }
 
-  inline bool isTimerDisabled() const { return PreviewFolder::NEXT_FOLDER_TIME_INTERVAL <= 0; }
+  inline bool isTimerDisabled() const { return SelectionPreviewer::NEXT_FOLDER_TIME_INTERVAL <= 0; }
 
   void UpdatePreview();
 
   QString GetCurPath() const { return m_curPath; }
-
   QSize sizeHint() const override;
 
  private:
@@ -53,9 +42,9 @@ class PreviewFolder : public QStackedWidget {
   QWidget* m_parentDocker;
 
   QString m_curPath;
-  PreviewBrowser* m_browser{nullptr};
-  PreviewLabels* m_labels{nullptr};
-  FloatingPreview* m_lists{nullptr};
+  ImagesInFolderBrowser* m_imgInFolderBrowser{nullptr};
+  ImagesInFolderSlider* m_imgInFolderLabels{nullptr};
+  FileFolderPreviewer* m_fileFolderPreviewStackedWid{nullptr};
 
   QTimer* m_nextFolderTimer = new QTimer{this};
 
@@ -63,4 +52,4 @@ class PreviewFolder : public QStackedWidget {
   // ms, when NEXT_FOLDER_TIME_INTERVAL <= 0. update preview imgs imediately(may cause lag).
 };
 
-#endif  // PREVIEWFOLDER_H
+#endif  // SELECTIONPREVIEWER_H

@@ -1,24 +1,24 @@
-#include "ImgVidOthWid.h"
+#include "ImgVidOthInFolderPreviewer.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include <QDir>
 
-constexpr ImgVidOthWid::MediaBtnHandlerFunc ImgVidOthWid::MEDIA_HANDLERS_MAP[];
+constexpr ImgVidOthInFolderPreviewer::MediaBtnHandlerFunc ImgVidOthInFolderPreviewer::MEDIA_HANDLERS_MAP[];
 
-ImgVidOthWid::ImgVidOthWid(const QString& memoryName, QWidget* parent)://
+ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent)://
   QWidget{parent}, mMemoryName{memoryName} {
   mImgVidOtherSplitter = new (std::nothrow) QSplitter{this};
   CHECK_NULLPTR_RETURN_VOID(mImgVidOtherSplitter)
   mImgVidOtherSplitter->setOrientation(Qt::Orientation::Vertical);
 
-  m_bImgVisible = PreferenceSettings().value("FLOATING_IMAGE_VIEW_SHOW", true).toBool();
-  m_bVidVisible = PreferenceSettings().value("FLOATING_VIDEO_VIEW_SHOW", false).toBool();
-  m_bOthVisible = PreferenceSettings().value("FLOATING_OTHER_VIEW_SHOW", false).toBool();
+  m_bImgVisible = Configuration().value("FLOATING_IMAGE_VIEW_SHOW", true).toBool();
+  m_bVidVisible = Configuration().value("FLOATING_VIDEO_VIEW_SHOW", false).toBool();
+  m_bOthVisible = Configuration().value("FLOATING_OTHER_VIEW_SHOW", false).toBool();
 
   // init for mImgVidOtherSplitter
   const QString& defaultMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
-  const QString& seqStr = PreferenceSettings().value("FLOATING_MEDIA_TYPE_SEQ", defaultMediaTypeSeq).toString();
+  const QString& seqStr = Configuration().value("FLOATING_MEDIA_TYPE_SEQ", defaultMediaTypeSeq).toString();
   decltype(mMediaSequence) mediaSequenceMemory;
   if (IsValidMediaTypeSeq(seqStr, mediaSequenceMemory) && mediaSequenceMemory.size() == mMediaSequence.size()) {
     mMediaSequence.swap(mediaSequenceMemory);
@@ -27,7 +27,7 @@ ImgVidOthWid::ImgVidOthWid(const QString& memoryName, QWidget* parent)://
   for (int mediaTypeInd : mMediaSequence) { // hide or show each widget in splitter
     (this->*MEDIA_HANDLERS_MAP[mediaTypeInd])(visibility[mediaTypeInd]);
   }
-  mImgVidOtherSplitter->restoreState(PreferenceSettings().value("FLOATING_PREVIEW_STATE").toByteArray());
+  mImgVidOtherSplitter->restoreState(Configuration().value("FLOATING_PREVIEW_STATE").toByteArray());
 
   // init for actions
   _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "0", this};
@@ -69,7 +69,7 @@ ImgVidOthWid::ImgVidOthWid(const QString& memoryName, QWidget* parent)://
   AdjustButtonPosition();
 }
 
-void ImgVidOthWid::operator()(const QString& pth) {  // file system view
+void ImgVidOthInFolderPreviewer::operator()(const QString& pth) {  // file system view
   if (NeedUpdateImgs()) {
     const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
     _IMG_ACT->setText(QString::number(imgCnt));
@@ -84,14 +84,14 @@ void ImgVidOthWid::operator()(const QString& pth) {  // file system view
   }
 }
 
-void ImgVidOthWid::operator()(const QString& /*name*/, const QString& pth) {  // scene view
+void ImgVidOthInFolderPreviewer::operator()(const QString& /*name*/, const QString& pth) {  // scene view
   CHECK_NULLPTR_RETURN_VOID(mImgModel)
   QDir dir{pth, "", QDir::SortFlag::Name, QDir::Filter::Files};
   dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
   mImgModel->UpdateData(dir.entryList());
 }
 
-void ImgVidOthWid::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
+void ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
   if (!NeedUpdateImgs()) {
     return;
   }
@@ -100,7 +100,7 @@ void ImgVidOthWid::UpdateImgs(const QString& name, const QStringList& imgPthLst)
   mImgModel->UpdateData(imgPthLst);
 }
 
-void ImgVidOthWid::UpdateVids(const QStringList& dataLst) {
+void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& dataLst) {
   if (!NeedUpdateVids()) {
     return;
   }
@@ -108,7 +108,7 @@ void ImgVidOthWid::UpdateVids(const QStringList& dataLst) {
   mVidsModel->UpdateData(dataLst);
 }
 
-void ImgVidOthWid::UpdateOthers(const QStringList& dataLst) {
+void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) {
   if (!NeedUpdateOthers()) {
     return;
   }
@@ -116,29 +116,29 @@ void ImgVidOthWid::UpdateOthers(const QStringList& dataLst) {
   mOthModel->UpdateData(dataLst);
 }
 
-bool ImgVidOthWid::onReorder(int fromIndex, int destIndex) {
+bool ImgVidOthInFolderPreviewer::onReorder(int fromIndex, int destIndex) {
   CHECK_NULLPTR_RETURN_FALSE(mImgVidOtherSplitter);
   if (!MoveElementFrontOf(mMediaSequence, fromIndex, destIndex)) {
     qWarning("failed, move widget at index[%d] in front of widget at[%d]", fromIndex, destIndex);
     return false;
   }
   const QString& newMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
-  PreferenceSettings().setValue("FLOATING_MEDIA_TYPE_SEQ", newMediaTypeSeq);
+  Configuration().setValue("FLOATING_MEDIA_TYPE_SEQ", newMediaTypeSeq);
   qDebug("New media type seq[%s]", qPrintable(newMediaTypeSeq));
   return MoveWidgetAtFromIndexInFrontOfDestIndex(fromIndex, destIndex, *mImgVidOtherSplitter);
 }
 
-void ImgVidOthWid::SaveState() {
-  PreferenceSettings().setValue("FLOATING_PREVIEW_STATE", mImgVidOtherSplitter->saveState());
+void ImgVidOthInFolderPreviewer::SaveState() {
+  Configuration().setValue("FLOATING_PREVIEW_STATE", mImgVidOtherSplitter->saveState());
 }
 
-void ImgVidOthWid::subscribe() {
-  connect(mTypeToDisplayTB, &ReorderableToolBar::widgetMoved, this, &ImgVidOthWid::onReorder);
-  connect(mTypeToDisplayTB->mCollectPathAgs, &QActionGroup::triggered, this, &ImgVidOthWid::onImgVidOthActTriggered);
-  connect(mImgVidOtherSplitter, &QSplitter::splitterMoved, this, &ImgVidOthWid::SaveState);
+void ImgVidOthInFolderPreviewer::subscribe() {
+  connect(mTypeToDisplayTB, &ReorderableToolBar::widgetMoved, this, &ImgVidOthInFolderPreviewer::onReorder);
+  connect(mTypeToDisplayTB->mCollectPathAgs, &QActionGroup::triggered, this, &ImgVidOthInFolderPreviewer::onImgVidOthActTriggered);
+  connect(mImgVidOtherSplitter, &QSplitter::splitterMoved, this, &ImgVidOthInFolderPreviewer::SaveState);
 }
 
-void ImgVidOthWid::onImgBtnClicked(bool checked) {
+void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
   m_bImgVisible = checked;
   if (mImgTv == nullptr) {
     mImgModel = new (std::nothrow) ImgsModel;
@@ -149,13 +149,13 @@ void ImgVidOthWid::onImgBtnClicked(bool checked) {
     mImgTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     mImgVidOtherSplitter->addWidget(mImgTv);
   }
-  PreferenceSettings().setValue("FLOATING_IMAGE_VIEW_SHOW", checked);
+  Configuration().setValue("FLOATING_IMAGE_VIEW_SHOW", checked);
   if (mImgTv->isVisible() != checked) {
     mImgTv->setVisible(checked);
   }
 }
 
-void ImgVidOthWid::onVidBtnClicked(bool checked) {
+void ImgVidOthInFolderPreviewer::onVidBtnClicked(bool checked) {
   m_bVidVisible = checked;
   if (mVidTv == nullptr) {
     mVidsModel = new (std::nothrow) VidsModel;
@@ -166,11 +166,11 @@ void ImgVidOthWid::onVidBtnClicked(bool checked) {
     mVidTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     mImgVidOtherSplitter->addWidget(mVidTv);
   }
-  PreferenceSettings().setValue("FLOATING_VIDEO_VIEW_SHOW", checked);
+  Configuration().setValue("FLOATING_VIDEO_VIEW_SHOW", checked);
   mVidTv->setVisible(checked);
 }
 
-void ImgVidOthWid::onOthBtnClicked(bool checked) {
+void ImgVidOthInFolderPreviewer::onOthBtnClicked(bool checked) {
   m_bOthVisible = checked;
   if (mOthTv == nullptr) {
     mOthModel = new (std::nothrow) OthersModel;
@@ -181,11 +181,11 @@ void ImgVidOthWid::onOthBtnClicked(bool checked) {
     mOthTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     mImgVidOtherSplitter->addWidget(mOthTv);
   }
-  PreferenceSettings().setValue("FLOATING_OTHER_VIEW_SHOW", checked);
+  Configuration().setValue("FLOATING_OTHER_VIEW_SHOW", checked);
   mOthTv->setVisible(checked);
 }
 
-void ImgVidOthWid::onImgVidOthActTriggered(const QAction* pAct) {
+void ImgVidOthInFolderPreviewer::onImgVidOthActTriggered(const QAction* pAct) {
   CHECK_NULLPTR_RETURN_VOID(pAct);
   const bool checked{pAct->isChecked()};
   if (pAct == _IMG_ACT) {

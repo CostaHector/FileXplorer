@@ -135,8 +135,8 @@ bool PropertiesWindow::operator()(const QSqlTableModel* model, const QTableView*
 }
 
 void PropertiesWindow::ReadSetting() {
-  if (PreferenceSettings().contains("PropertiesWindowGeometry")) {
-    restoreGeometry(PreferenceSettings().value("PropertiesWindowGeometry").toByteArray());
+  if (Configuration().contains("PropertiesWindowGeometry")) {
+    restoreGeometry(Configuration().value("PropertiesWindowGeometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -149,7 +149,7 @@ void PropertiesWindow::showEvent(QShowEvent* event) {
 }
 
 void PropertiesWindow::closeEvent(QCloseEvent* event) {
-  PreferenceSettings().setValue("PropertiesWindowGeometry", saveGeometry());
+  Configuration().setValue("PropertiesWindowGeometry", saveGeometry());
   QDialog::closeEvent(event);
 }
 

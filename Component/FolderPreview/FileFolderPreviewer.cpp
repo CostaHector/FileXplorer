@@ -1,4 +1,4 @@
-﻿#include "FloatingPreview.h"
+﻿#include "FileFolderPreviewer.h"
 #include "CastBrowserHelper.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
@@ -6,13 +6,13 @@
 #include <QIcon>
 #include <QFileInfo>
 
-FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
+FileFolderPreviewer::FileFolderPreviewer(const QString& memoryName, QWidget* parent)
   : QStackedWidget{parent}
 {
   mDetailsPane = new (std::nothrow) ClickableTextBrowser{this};
   CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
 
-  mImgVidOtherPane = new (std::nothrow) ImgVidOthWid{memoryName, this};
+  mImgVidOtherPane = new (std::nothrow) ImgVidOthInFolderPreviewer{memoryName, this};
   CHECK_NULLPTR_RETURN_VOID(mImgVidOtherPane)
 
   addWidget(mDetailsPane);
@@ -25,19 +25,19 @@ FloatingPreview::FloatingPreview(const QString& memoryName, QWidget* parent)
   setWindowIcon(QIcon(":img/FLOATING_PREVIEW"));
 }
 
-void FloatingPreview::ReadSettings() {
-  if (PreferenceSettings().contains("FLOATING_PREVIEW_GEOMETRY")) {
-    restoreGeometry(PreferenceSettings().value("FLOATING_PREVIEW_GEOMETRY").toByteArray());
+void FileFolderPreviewer::ReadSettings() {
+  if (Configuration().contains("FLOATING_PREVIEW_GEOMETRY")) {
+    restoreGeometry(Configuration().value("FLOATING_PREVIEW_GEOMETRY").toByteArray());
   } else {
     setGeometry(QRect(0, 0, 480, 1080));
   }
 }
 
-void FloatingPreview::SaveSettings() {
-  PreferenceSettings().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
+void FileFolderPreviewer::SaveSettings() {
+  Configuration().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
 }
 
-void FloatingPreview::operator()(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
+void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& imgHost, const int imgHeight) {
   CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
   if (record.isEmpty()) {
     mDetailsPane->setHtml("");
@@ -47,12 +47,12 @@ void FloatingPreview::operator()(const QSqlRecord& record, const QString& imgHos
   setWindowTitle(mLastName);
   BeforeDisplayAFileDetail();
   using namespace CastBrowserHelper;
-  const stCastHtml castHtmls = GetCastHtml(record, imgHost, imgHeight);
+  const CastHtmlParts castHtmls = GetCastHtmlParts(record, imgHost, imgHeight);
   mDetailsPane->SetCastHtmlParts(castHtmls);
   mDetailsPane->UpdateHtmlContents();
 }
 
-void FloatingPreview::operator()(const QString& pth) {  // file system view
+void FileFolderPreviewer::operator()(const QString& pth) {  // file system view
   if (!NeedUpdate(pth)) {
     return;
   }
@@ -68,7 +68,7 @@ void FloatingPreview::operator()(const QString& pth) {  // file system view
   mImgVidOtherPane->operator()(pth);
 }
 
-void FloatingPreview::operator()(const QString& name, const QString& pth) {  // scene view
+void FileFolderPreviewer::operator()(const QString& name, const QString& pth) {  // scene view
   mLastName = name;
   setWindowTitle(mLastName);
   mImgVidOtherPane->operator()(name, pth);

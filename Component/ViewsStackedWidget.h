@@ -1,11 +1,11 @@
-﻿#ifndef CONTENTPANEL_H
-#define CONTENTPANEL_H
+#ifndef VIEWSSTACKEDWIDGET_H
+#define VIEWSSTACKEDWIDGET_H
 
 #include <QStackedWidget>
 #include "AdvanceSearchToolBar.h"
 #include "CustomStatusBar.h"
 #include "NavigationAndAddressBar.h"
-#include "PreviewFolder.h"
+#include "SelectionPreviewer.h"
 
 #include "AdvanceSearchTableView.h"
 #include "FileSystemListView.h"
@@ -20,35 +20,35 @@
 #include "FdBasedDb.h"
 
 
-class NavigationViewSwitcher;
+class ToolBarAndViewSwitcher;
 
-class ContentPanel : public QStackedWidget {
+class ViewsStackedWidget : public QStackedWidget {
   Q_OBJECT
  public:
-  friend class NavigationViewSwitcher;
+  friend class ToolBarAndViewSwitcher;
 
-  explicit ContentPanel(PreviewFolder* previewFolder = nullptr, QWidget* parent = nullptr);
+  explicit ViewsStackedWidget(SelectionPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
  public slots:
   bool onActionAndViewNavigate(QString newPath, bool isNewPath = true, bool isF5Force = false);
   bool onAddressToolbarPathChanged(QString newPath, bool isNewPath = true);
 
  public:
-  auto on_searchTextChanged(const QString& targetStr) -> bool;
-  auto on_searchEnterKey(const QString& targetStr) -> bool;
+  bool on_searchTextChanged(const QString& targetStr);
+  bool on_searchEnterKey(const QString& targetStr);
 
-  auto subscribe() -> void;
+  void subscribe();
   void BindNavigationAddressBar(NavigationAndAddressBar* addressBar);
   void BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar);
   void BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar);
   void BindLogger(CustomStatusBar* logger);
 
-  auto on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool;
+  bool on_cellDoubleClicked(const QModelIndex& clickedIndex);
   void connectSelectionChanged(ViewTypeTool::ViewType vt);
   void disconnectSelectionChanged(ViewTypeTool::ViewType vt);
   bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
 
-  auto keyPressEvent(QKeyEvent* e) -> void override;
+  void keyPressEvent(QKeyEvent* e) override;
 
   inline bool isFSView() const {
     ViewTypeTool::ViewType vt = GetCurViewType();
@@ -146,7 +146,7 @@ class ContentPanel : public QStackedWidget {
   JsonTableModel* m_jsonModel{nullptr};
   JsonTableView* m_jsonTableView{nullptr};
 
-  PreviewFolder* _previewFolder{nullptr};
+  SelectionPreviewer* _previewFolder{nullptr};
 
   CustomStatusBar* _logger{nullptr};
 
@@ -156,4 +156,4 @@ class ContentPanel : public QStackedWidget {
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
 };
 
-#endif  // CONTENTPANEL_H
+#endif  // VIEWSSTACKEDWIDGET_H
