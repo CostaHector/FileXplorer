@@ -234,6 +234,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
   }
   _view->setCurrentIndex(viewIndex);
+  _view->SetVt(viewType);
 }
 
 void ToolBarAndViewSwitcher::onSwitchByViewAction(const QAction* activatedAction) {
