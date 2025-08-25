@@ -4,6 +4,7 @@
 #include "NameTool.h"
 #include "MountHelper.h"
 #include <QSqlQuery>
+#include "TableFields.h"
 
 FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
     : QSqlTableModel{parent, con} {
@@ -38,6 +39,19 @@ QString FdBasedDbModel::absolutePath(const QModelIndex& curIndex) const {
   const QModelIndex& preRight = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight);
   return PathTool::Path2Join(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(),  //
                              data(preRight, Qt::ItemDataRole::DisplayRole).toString());
+}
+
+QString FdBasedDbModel::fileName(const QModelIndex& curIndex) const {
+  const QModelIndex& nameIndex = curIndex.siblingAtColumn(MOVIE_TABLE::Name);
+  return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
+}
+
+QString FdBasedDbModel::fullInfo(const QModelIndex& curIndex) const {
+  return data(curIndex.siblingAtColumn(MOVIE_TABLE::Name)).toString()    //
+         + '\t'                                                          //
+         + data(curIndex.siblingAtColumn(MOVIE_TABLE::Size)).toString()  //
+         + '\t'                                                          //
+         + data(curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight)).toString();
 }
 
 void FdBasedDbModel::SetStudio(const QModelIndexList& tagColIndexes, const QString& studio) {

@@ -17,18 +17,6 @@ class CustomTableView : public QTableView {
 
   bool ShowOrHideColumnCore();
   bool onShowHideColumn();
-  inline bool onShowAllColumn() {
-    m_columnsShowSwitch.replace('0', '1');
-    return ShowOrHideColumnCore();
-  }
-  inline bool onReverseVisibility() {
-    m_columnsShowSwitch.replace('0', 'T');
-    m_columnsShowSwitch.replace('1', 'F');
-    m_columnsShowSwitch.replace('T', '1');
-    m_columnsShowSwitch.replace('F', '0');
-    return ShowOrHideColumnCore();
-  }
-
   bool onHideThisColumn();
 
   void onStretchLastSection(const bool checked);
@@ -54,9 +42,8 @@ class CustomTableView : public QTableView {
   void SubscribeHeaderActions();
 
  private:
-  QAction* COLUMNS_VISIBILITY = new (std::nothrow) QAction("column title visibility", this);
-  QAction* HIDE_THIS_COLUMN = new (std::nothrow) QAction("hide this column", this);
-  QAction* SHOW_ALL_COLUMNS = new (std::nothrow) QAction("show all columns", this);
+  QAction* COLUMNS_VISIBILITY = new (std::nothrow) QAction(QIcon{":img/COLUMN_VISIBILITY"}, "column visibility", this);
+  QAction* HIDE_THIS_COLUMN = new (std::nothrow) QAction(QIcon{":img/HIDE_THIS_COLUMN"}, "hide this column", this);
   QAction* STRETCH_DETAIL_SECTION = new (std::nothrow) QAction("stretch last column", this);
   QAction* ENABLE_COLUMN_SORT = new (std::nothrow) QAction("enable column sort", this);
   QAction* RESIZE_COLUMN_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), "resize cols to content", this);
@@ -83,8 +70,7 @@ class CustomTableView : public QTableView {
   int m_defaultTableRowHeight;
   int m_defaultTableColumnWidth;
 
-  QString m_horHeaderTitles;
-  bool m_horHeaderTitlesInit = false;
+  QStringList m_horHeaderTitles;
   QString m_columnsShowSwitch;  // 111110000011111
   static constexpr int SWITCHS_BATCH_COUNT = 5;
   QMenu* m_menu = nullptr;

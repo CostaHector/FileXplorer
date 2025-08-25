@@ -4,7 +4,7 @@
 #include "RenameHelper.h"
 
 RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent)  //
-    : AdvanceRenamer{parent}                                   //
+  : AdvanceRenamer{parent}                                   //
 {                                                              //
   m_recursiveCB->setToolTip("Usually we don't suggest user enable numberize file names recursively.");
 }
@@ -23,7 +23,8 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
                                             "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
                                             "✖ Disabled: Each extension gets an independent counter (e.g., 'A 1.jpeg', 'A 2.jpg').\n"
                                             "Use case: Preserve version links for multi-format files (e.g., JPEG/WEBP variants).");
-  m_isUniqueCounterPerExtension->setCheckState(Qt::CheckState::Checked);
+  const bool uniqueCnter{Configuration().value(MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.name, MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.v).toBool()};
+  m_isUniqueCounterPerExtension->setChecked(uniqueCnter);
 
   m_numberPattern = new (std::nothrow) QComboBox{this};  // " - %1"
   CHECK_NULLPTR_RETURN_VOID(m_numberPattern)
@@ -58,6 +59,7 @@ QToolBar* RenameWidget_Numerize::InitControlTB() {
   numerizeControlTb->addSeparator();
   numerizeControlTb->addWidget(new (std::nothrow) QLabel{"Start index:", numerizeControlTb});
   numerizeControlTb->addWidget(m_startNo);
+  numerizeControlTb->addSeparator();
   numerizeControlTb->addWidget(m_isUniqueCounterPerExtension);
   numerizeControlTb->addSeparator();
   numerizeControlTb->addWidget(new (std::nothrow) QLabel{"No. format:", numerizeControlTb});
@@ -79,7 +81,10 @@ void RenameWidget_Numerize::extraSubscribe() {
     OnlyTriggerRenameCore();
   });
 
-  connect(m_isUniqueCounterPerExtension, &QCheckBox::stateChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(m_isUniqueCounterPerExtension, &QCheckBox::stateChanged, this, [this](int checked)->void{
+    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.name, checked == Qt::Checked);
+    OnlyTriggerRenameCore();
+  });
 
   connect(m_numberPattern, &QComboBox::currentTextChanged, this, [this]() -> void {
     int defaultFormateInd = m_numberPattern->currentIndex();

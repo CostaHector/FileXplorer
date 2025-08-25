@@ -23,8 +23,8 @@ inline bool isFSView(ViewType vt) {
   return (vt == ViewType::LIST || vt == ViewType::TABLE || vt == ViewType::TREE);
 }
 
-inline bool IsUseFileSystemSearchBar(ViewType vt) {
-  return (vt == ViewType::LIST || vt == ViewType::TABLE || vt == ViewType::TREE || vt == ViewType::JSON);
+inline bool IsUseFileSystemSearchBar(ViewType vt) { // share filesystem search bar
+  return (vt == ViewType::LIST || vt == ViewType::TABLE || vt == ViewType::TREE || vt == ViewType::SCENE || vt == ViewType::JSON);
 }
 
 const char* GetViewTypeHumanFriendlyStr(ViewType viewType);
