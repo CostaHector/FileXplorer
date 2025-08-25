@@ -3,6 +3,7 @@
 
 #include <QToolBar>
 #include <QComboBox>
+#include <QLineEdit>
 
 // GUID_IN_UNDERSCORE | ROOTPATH
 class Guid2RootPathComboxBox : public QComboBox {
@@ -28,13 +29,18 @@ public:
   inline QString GetCurrentWhereClause() const {
     return m_searchCB->currentText();
   }
-  void SetWhereClause(const QString& newWhereClause) {
+  inline void SetWhereClause(const QString& newWhereClause) {
     m_searchCB->setCurrentText(newWhereClause);
   }
   QString AskUserDropWhichTable();
   void AddATable(const QString& newTableName);
   void InitTables(const QStringList& tbls);
   void InitCurrentIndex();
+
+  inline void onGetFocus() {
+    m_searchCB->setFocus();
+    m_searchCB->lineEdit()->selectAll();
+  }
 signals:
   void movieTableChanged(const QString& newTable);
   void whereClauseChanged(const QString& whereClause);
@@ -48,6 +54,10 @@ class CastDatabaseSearchToolBar : public QToolBar {
   Q_OBJECT
 public:
   explicit CastDatabaseSearchToolBar(const QString& title, QWidget* parent);
+  inline void onGetFocus() {
+    m_nameClauseCB->setFocus();
+    m_nameClauseCB->lineEdit()->selectAll();
+  }
 signals:
   void whereClauseChanged(const QString& whereClause);
 private:

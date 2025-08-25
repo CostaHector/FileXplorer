@@ -86,6 +86,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       if (_navigation->m_castSearchBar == nullptr) {
         _navigation->m_castSearchBar = new (std::nothrow) CastDatabaseSearchToolBar{"CastSearch", _navigation};
         _navigation->AddToolBar(viewType, _navigation->m_castSearchBar);
+        _view->BindCastSearchToolBar(_navigation->m_castSearchBar);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
       qDebug("Switch toolbar to cast[%d]", (char)viewType);
@@ -153,8 +154,8 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::MOVIE: {
       if (_view->m_movieView == nullptr) {
-        _view->m_dbModel = new (std::nothrow) FdBasedDbModel{_view, _view->mMovieDb.GetDb()};
-        _view->m_movieView = new (std::nothrow) MovieDBView(_view->m_dbModel, _view->_dbSearchBar, _view->mMovieDb, _view);
+        _view->m_movieDbModel = new (std::nothrow) FdBasedDbModel{_view, _view->mMovieDb.GetDb()};
+        _view->m_movieView = new (std::nothrow) MovieDBView(_view->m_movieDbModel, _view->_movieSearchBar, _view->mMovieDb, _view);
         ViewsStackedWidget::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_movieView);
       }
@@ -205,7 +206,8 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     case ViewType::CAST: {
       if (_view->m_castTableView == nullptr) {
         auto* pFuncSelectionChangeCallback{_view->_previewFolder != nullptr ? _view->_previewFolder->m_fileFolderPreviewStackedWid : nullptr};
-        _view->m_castTableView = new CastDBView(_navigation->m_castSearchBar, pFuncSelectionChangeCallback, _view);
+        _view->m_castDbModel = new CastDbModel{_view, _view->mCastDb.GetDb()};
+        _view->m_castTableView = new CastDBView(_view->m_castDbModel, _navigation->m_castSearchBar, pFuncSelectionChangeCallback, _view->mCastDb, _view);
         _view->AddView(viewType, _view->m_castTableView);
       }
       _view->m_castTableView->setWindowTitle("Cast");
