@@ -4,11 +4,16 @@
 #include "PerformerJsonFileHelper.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
+#include "PublicMacro.h"
 #include "StringTool.h"
+#include "TableFields.h"
 
 #include <QSqlQuery>
+#include <QSqlField>
 #include <QSqlError>
 #include <QDirIterator>
+
+using namespace PERFORMER_DB_HEADER_KEY;
 
 const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
     {"CREATE TABLE IF NOT EXISTS `%1`"                //
@@ -23,30 +28,30 @@ const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
 `%10` TEXT DEFAULT "",
  PRIMARY KEY (%1)
 );)")
-           .arg(PERFORMER_DB_HEADER_KEY::Name)
-           .arg(PERFORMER_DB_HEADER_KEY::Rate)
-           .arg(PERFORMER_DB_HEADER_KEY::DEFAULT_RATE)
-           .arg(PERFORMER_DB_HEADER_KEY::AKA)
-           .arg(PERFORMER_DB_HEADER_KEY::Tags)
-           .arg(PERFORMER_DB_HEADER_KEY::Orientation)
-           .arg(PERFORMER_DB_HEADER_KEY::DEFAULT_ORIENTATION)
-           .arg(PERFORMER_DB_HEADER_KEY::Vids)
-           .arg(PERFORMER_DB_HEADER_KEY::Imgs)
-           .arg(PERFORMER_DB_HEADER_KEY::Detail)};
+           .arg(ENUM_2_STR(Name))
+           .arg(ENUM_2_STR(Rate))
+           .arg(ENUM_2_STR(DEFAULT_RATE))
+           .arg(ENUM_2_STR(AKA))
+           .arg(ENUM_2_STR(Tags))
+           .arg(ENUM_2_STR(Orientation))
+           .arg(ENUM_2_STR(DEFAULT_ORIENTATION))
+           .arg(ENUM_2_STR(Vids))
+           .arg(ENUM_2_STR(Imgs))
+           .arg(ENUM_2_STR(Detail))};
 
 const QString INSERT_FULL_FIELDS_TEMPLATE  //
     {"REPLACE INTO `%1` "                  //
      + QString(R"(
 (`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`)
 VALUES(:1, :2, :3, :4, :5, :6, :7, :8);)")
-           .arg(PERFORMER_DB_HEADER_KEY::Name)
-           .arg(PERFORMER_DB_HEADER_KEY::Rate)
-           .arg(PERFORMER_DB_HEADER_KEY::AKA)
-           .arg(PERFORMER_DB_HEADER_KEY::Tags)
-           .arg(PERFORMER_DB_HEADER_KEY::Orientation)
-           .arg(PERFORMER_DB_HEADER_KEY::Vids)
-           .arg(PERFORMER_DB_HEADER_KEY::Imgs)
-           .arg(PERFORMER_DB_HEADER_KEY::Detail)};
+           .arg(ENUM_2_STR(Name))
+           .arg(ENUM_2_STR(Rate))
+           .arg(ENUM_2_STR(AKA))
+           .arg(ENUM_2_STR(Tags))
+           .arg(ENUM_2_STR(Orientation))
+           .arg(ENUM_2_STR(Vids))
+           .arg(ENUM_2_STR(Imgs))
+           .arg(ENUM_2_STR(Detail))};
 
 enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name = 0,
@@ -64,7 +69,7 @@ enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
  * is same as follows. Otherwise field not specified will be null or default(replace into: delete and insert) */
 const QString INSERT_NAME_ORI_IMGS_TEMPLATE  //
     {"INSERT INTO `%1`" + QString{R"((`%1`, `%2`, `%3`) VALUES (?1, ?2, ?3) ON CONFLICT(`%1`) DO UPDATE SET `%2`=?4, `%3`=?5;)"}
-                              .arg(PERFORMER_DB_HEADER_KEY::Name, PERFORMER_DB_HEADER_KEY::Orientation, PERFORMER_DB_HEADER_KEY::Imgs)};
+                              .arg(ENUM_2_STR(Name), ENUM_2_STR(Ori), ENUM_2_STR(Imgs))};
 
 enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD { //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name = 0,
@@ -83,7 +88,7 @@ const QString INSERT_PERF_AND_AKA_TEMPLATE  //
      + QString{R"(
 (`%1`,`%2`) VALUES
 (:1, :2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:3;)"}
-           .arg(PERFORMER_DB_HEADER_KEY::Name, PERFORMER_DB_HEADER_KEY::AKA)};
+           .arg(ENUM_2_STR(Name), ENUM_2_STR(AKA))};
 
 enum INSERT_PERF_AND_AKA_TEMPLATE_FIELD {
   INSERT_PERF_AND_AKA_TEMPLATE_FIELD_Name = 0,
@@ -195,17 +200,18 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
 
   int succeedCnt = 0;
   QDirIterator it{imgsHostPath, {"*.pson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  using namespace PERFORMER_DB_HEADER_KEY;
   while (it.hasNext()) {
     it.next();
     const QVariantHash& pson = JsonHelper::MovieJsonLoader(it.filePath());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name, pson[PERFORMER_DB_HEADER_KEY::Name].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate, pson[PERFORMER_DB_HEADER_KEY::Rate].toInt());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,  pson[PERFORMER_DB_HEADER_KEY::AKA].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags, pson[PERFORMER_DB_HEADER_KEY::Tags].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation, pson[PERFORMER_DB_HEADER_KEY::Orientation].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids, pson[PERFORMER_DB_HEADER_KEY::Vids].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, pson[PERFORMER_DB_HEADER_KEY::Imgs].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail, pson[PERFORMER_DB_HEADER_KEY::Detail].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name,        pson[ENUM_2_STR(Name)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate,        pson[ENUM_2_STR(Rate)].toInt());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,         pson[ENUM_2_STR(AKA)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags,        pson[ENUM_2_STR(Tags)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation, pson[ENUM_2_STR(Ori)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids,        pson[ENUM_2_STR(Vids)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs,        pson[ENUM_2_STR(Imgs)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail,      pson[ENUM_2_STR(Detail)].toString());
 
     if (!qry.exec()) {
       qWarning("replace[%s] failed: %s",  //
