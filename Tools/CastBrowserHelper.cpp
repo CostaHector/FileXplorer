@@ -1,6 +1,6 @@
 #include "CastBrowserHelper.h"
 #include "DisplayEnhancement.h"
-#include "PerformerJsonFileHelper.h"
+#include "TableFields.h"
 #include "VideoDurationGetter.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
@@ -9,6 +9,7 @@
 #include <QBuffer>
 #include <QDir>
 #include <QFileIconProvider>
+#include <QSqlField>
 
 QString CastHtmlParts::fullHtml(bool castVideosVisisble, bool castImagesVisisble) const {
   QString fullHtmlContents;
@@ -84,7 +85,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
 
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost) {
   const QString castName {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-  const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Orientation).value().toString()};
+  const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
   const QString imgsStr {record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString()};
   const QStringList imgsLst {StringTool::InitImgsList(imgsStr)};
   const QDir imgDir {imgHost + '/' + orientation + '/' + castName};

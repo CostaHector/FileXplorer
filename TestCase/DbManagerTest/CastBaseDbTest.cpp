@@ -3,8 +3,9 @@
 #include <QSqlRecord>
 #include "MyTestSuite.h"
 #include "CastBaseDb.h"
-#include "PerformerJsonFileHelper.h"
+#include "TableFields.h"
 #include "PublicVariable.h"
+#include "PublicMacro.h"
 
 const QString rootpath = QFileInfo(__FILE__).absolutePath();
 const QString imgHostPath = rootpath + "/PerfImgHost";
@@ -95,7 +96,7 @@ class CastBaseDbTest : public MyTestSuite {
     QSet<QString> actualImgs;
     for (const auto& record : records) {
       actualNames << record.value(PERFORMER_DB_HEADER_KEY::Name).toString();
-      actualOris << record.value(PERFORMER_DB_HEADER_KEY::Orientation).toString();
+      actualOris << record.value(PERFORMER_DB_HEADER_KEY::Ori).toString();
       actualImgs << record.value(PERFORMER_DB_HEADER_KEY::Imgs).toString();
     }
     QSet<QString> expectNames{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
@@ -119,7 +120,10 @@ class CastBaseDbTest : public MyTestSuite {
     QCOMPARE(perfDb.LoadFromPsonFile(imgHostPath), PERFS_ITEM_COUNT);
 
     QSet<QString> pkNames;
-    QVERIFY(perfDb.QueryPK(DB_TABLE::PERFORMERS, PERFORMER_DB_HEADER_KEY::Name, pkNames));
+    {
+      using namespace PERFORMER_DB_HEADER_KEY;
+      QVERIFY(perfDb.QueryPK(DB_TABLE::PERFORMERS, ENUM_2_STR(Name), pkNames));
+    }
     QSet<QString> expectNames{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
     QCOMPARE(pkNames, expectNames);
 
@@ -132,7 +136,7 @@ class CastBaseDbTest : public MyTestSuite {
     QSet<int> actualRate;
     for (const auto& record : records) {
       actualNames << record.value(PERFORMER_DB_HEADER_KEY::Name).toString();
-      actualOris << record.value(PERFORMER_DB_HEADER_KEY::Orientation).toString();
+      actualOris << record.value(PERFORMER_DB_HEADER_KEY::Ori).toString();
       actualImgs << record.value(PERFORMER_DB_HEADER_KEY::Imgs).toString();
       actualRate << record.value(PERFORMER_DB_HEADER_KEY::Rate).toInt();
     }

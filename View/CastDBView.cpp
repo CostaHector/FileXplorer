@@ -37,7 +37,7 @@ CastDBView::CastDBView(CastDatabaseSearchToolBar* castDbSearchBar_, FileFolderPr
                                    MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)
                  .toString()}
 {
-  if (QFileInfo{mImageHost}.isDir()) {
+  if (!QFileInfo{mImageHost}.isDir()) {
     LOG_CRITICAL("Image host path not exist", mImageHost);
     return;
   }
@@ -71,9 +71,9 @@ bool CastDBView::onOpenRecordInFileSystem() const {
     return false;
   }
   const auto& record = m_castModel->record(currentIndex().row());
-  QString revealPath{currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail_INDEX ?
-                         CastBaseDb::GetCastFilePath(record, mImageHost):
-                         CastBaseDb::GetCastPath(record, mImageHost)};
+  QString revealPath{currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail ?
+                     CastBaseDb::GetCastFilePath(record, mImageHost):
+                     CastBaseDb::GetCastPath(record, mImageHost)};
   if (!QFile::exists(revealPath)) {
     LOG_WARN("Path not exists", revealPath);
     return false;
@@ -316,7 +316,7 @@ int CastDBView::onDumpIntoPsonFile() {
   for (const auto& indr : selectionModel()->selectedRows()) {
     const int r = indr.row();
     const auto& record = m_castModel->record(r);
-    const QString ori {record.value(PERFORMER_DB_HEADER_KEY::Orientation).toString()};
+    const QString ori {record.value(PERFORMER_DB_HEADER_KEY::Ori).toString()};
     const QString castName {record.value(PERFORMER_DB_HEADER_KEY::Name).toString()};
     const QString prepath {ori + '/' + castName};
     if (!imageHostDir.exists(prepath) && !imageHostDir.mkpath(prepath)) {
