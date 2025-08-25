@@ -53,7 +53,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::MOVIE: {
       if (_navigation->m_dbSearchBar == nullptr) {
-        _navigation->m_dbSearchBar = new DatabaseSearchToolBar;
+        _navigation->m_dbSearchBar = new MovieDBSearchToolBar{"Movie Search", _navigation};
         _navigation->AddToolBar(viewType, _navigation->m_dbSearchBar);
 
         _view->BindDatabaseSearchToolBar(_navigation->m_dbSearchBar);
@@ -84,7 +84,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::CAST: {
       if (_navigation->m_perfSearch == nullptr) {
-        _navigation->m_perfSearch = new (std::nothrow) QLineEdit{R"(Name like "%")"};
+        _navigation->m_perfSearch = new (std::nothrow) CastDatabaseSearchToolBar{"CastSearch", _navigation};
         _navigation->AddToolBar(viewType, _navigation->m_perfSearch);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
