@@ -21,7 +21,7 @@ class StackedAddressAndSearchToolBar : public QToolBar {
   NavigationAndAddressBar* m_addressBar{nullptr};
   MovieDBSearchToolBar* m_dbSearchBar{nullptr};
   AdvanceSearchToolBar* m_advanceSearchBar{nullptr};
-  CastDatabaseSearchToolBar* m_perfSearch{nullptr};
+  CastDatabaseSearchToolBar* m_castSearchBar{nullptr};
 
  private:
   QStackedWidget* m_stackedToolBar{nullptr};

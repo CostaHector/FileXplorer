@@ -12,7 +12,7 @@
 const QHash<QChar, QString> PerformersAkaManager::op2Str = {{'&', "AND"}, {'|', "OR"}};
 constexpr char PerformersAkaManager::LOGIC_OR_CHAR;
 constexpr char PerformersAkaManager::LOGIC_AND_CHAR;
-const QString PerformersAkaManager::FUZZY_LIKE{R"(%1 like "%%2%")"};
+const QString PerformersAkaManager::FUZZY_LIKE{R"(INSTR(`%1`, "%2") > 0)"}; // %1 like "%%2%"
 
 PerformersAkaManager& PerformersAkaManager::getIns() {
   static PerformersAkaManager ins;

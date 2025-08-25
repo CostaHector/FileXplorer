@@ -36,7 +36,7 @@ private:
 
 class NavigationAndAddressBar : public QToolBar {
 public:
-  explicit NavigationAndAddressBar(const QString& title = "Address Toolbar", QWidget* parent = nullptr);
+  explicit NavigationAndAddressBar(const QString& title, QWidget* parent);
 
   void BindFileSystemViewCallback(T_IntoNewPath IntoNewPath,
                                   T_on_searchTextChanged on_searchTextChanged,

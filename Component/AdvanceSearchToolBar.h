@@ -13,7 +13,7 @@
 
 class AdvanceSearchToolBar : public QToolBar {
  public:
-  explicit AdvanceSearchToolBar(const QString& title = "Advance Search Toolbar", QWidget* parent = nullptr);
+  explicit AdvanceSearchToolBar(const QString& title, QWidget* parent);
 
   void BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel);
 
@@ -22,8 +22,8 @@ class AdvanceSearchToolBar : public QToolBar {
   void onSearchModeChanged(const QString& newSearchModeText);
 
   void onGetFocus() {
-    m_nameFilter->setFocus();
-    m_nameFilter->selectAll();
+    m_nameFilterCB->setFocus();
+    m_nameFilterCB->lineEdit()->selectAll();
   }
 
  private:
@@ -31,7 +31,6 @@ class AdvanceSearchToolBar : public QToolBar {
   void BindSearchSourceModel(AdvanceSearchModel* searchSourceModel);
 
   QComboBox* m_nameFilterCB{nullptr};
-  QLineEdit* m_nameFilter{nullptr};
 
   QComboBox* m_contentCB{nullptr};  // used for content search
 
