@@ -13,7 +13,7 @@
 class MovieDBView : public CustomTableView {
  public:
   MovieDBView(FdBasedDbModel* model_,              //
-              DatabaseSearchToolBar* dbSearchBar,  //
+              MovieDBSearchToolBar* dbSearchBar,  //
               FdBasedDb& movieDb_,                 //
               QWidget* parent = nullptr);
 
@@ -68,7 +68,6 @@ class MovieDBView : public CustomTableView {
   MovieDatabaseMenu* m_movieMenu{nullptr};
   Guid2RootPathComboxBox* _tablesDropDownList{nullptr};
   QLineEdit* _searchWhereLineEdit{nullptr};
-  QComboBox* _searchCB{nullptr};
 
   QuickWhereClause* m_quickWhereClause{nullptr};
   FdBasedDb& mDb;
