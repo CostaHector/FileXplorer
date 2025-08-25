@@ -23,7 +23,7 @@
 #include <QDebug>
 
 MovieDBView::MovieDBView(FdBasedDbModel* model_,               //
-                         DatabaseSearchToolBar* _dbSearchBar,  //
+                         MovieDBSearchToolBar* _dbSearchBar,  //
                          FdBasedDb& movieDb_,
                          QWidget* parent)      //
   : CustomTableView("MOVIE_TABLE", parent),  //

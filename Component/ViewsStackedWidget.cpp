@@ -180,7 +180,7 @@ void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addre
   );
 }
 
-void ViewsStackedWidget::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar) {
+void ViewsStackedWidget::BindDatabaseSearchToolBar(MovieDBSearchToolBar* dbSearchBar) {
   if (dbSearchBar == nullptr) {
     qWarning("Bind DatabaseSearchToolBar failed. nullptr passed here");
     return;

@@ -3,6 +3,7 @@
 
 #include "CastBaseDb.h"
 #include "CustomTableView.h"
+#include "DatabaseSearchToolBar.h"
 #include <QSqlTableModel>
 #include <QToolBar>
 #include <QLineEdit>
@@ -10,7 +11,7 @@ class FileFolderPreviewer;
 
 class CastDBView : public CustomTableView {
 public:
-  explicit CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent = nullptr);
+  explicit CastDBView(CastDatabaseSearchToolBar* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent = nullptr);
   void subscribe();
   QString filePath(const QModelIndex& index) const;
 
@@ -46,7 +47,7 @@ private:
   void RefreshHtmlContents();
 
 
-  QLineEdit* m_perfSearch{nullptr};
+  CastDatabaseSearchToolBar* m_perfSearch{nullptr};
   QSqlTableModel* m_castModel{nullptr};
   FileFolderPreviewer* _floatingPreview{nullptr};
 

@@ -38,7 +38,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
   void subscribe();
   void BindNavigationAddressBar(NavigationAndAddressBar* addressBar);
-  void BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar);
+  void BindDatabaseSearchToolBar(MovieDBSearchToolBar* dbSearchBar);
   void BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar);
   void BindLogger(CustomStatusBar* logger);
 
@@ -95,7 +95,7 @@ class ViewsStackedWidget : public QStackedWidget {
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
 
-  DatabaseSearchToolBar* _dbSearchBar{nullptr};
+  MovieDBSearchToolBar* _dbSearchBar{nullptr};
   FdBasedDb mMovieDb;
   FdBasedDbModel* m_dbModel{nullptr};
   MovieDBView* m_movieView{nullptr};

@@ -34,7 +34,7 @@ QString CastDBView::GetImageHostPath() {
       .toString();
 }
 
-CastDBView::CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent)
+CastDBView::CastDBView(CastDatabaseSearchToolBar* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent)
   : CustomTableView{"PERFORMERS_TABLE", parent},  //
   m_perfSearch{perfSearchLE},
   _floatingPreview{floatingPreview},
@@ -84,10 +84,7 @@ bool CastDBView::onOpenRecordInFileSystem() const {
 
 
 void CastDBView::subscribe() {
-  connect(m_perfSearch, &QLineEdit::returnPressed, this, [this]() {
-    const QString& searchPattern = m_perfSearch->text();
-    m_castModel->setFilter(searchPattern);
-  });
+  connect(m_perfSearch, &CastDatabaseSearchToolBar::whereClauseChanged, m_castModel, &QSqlTableModel::setFilter);
 
   auto& castInst = g_castAct();
   connect(castInst.SUBMIT, &QAction::triggered, this, &CastDBView::onSubmit);
@@ -152,7 +149,7 @@ int CastDBView::onAppendCasts() {
   int succeedCnt = mDb.AppendCastFromMultiLineInput(perfsText);
   if (succeedCnt < 0) {
     Notificator::warning(QString("Load perfs from text[%1] failed").arg(perfsText),  //
-                         QString("see detail in description"));
+                         "see detail in description");
     return 0;
   }
   m_castModel->submitAll();
@@ -189,7 +186,7 @@ int CastDBView::onLoadFromFileSystemStructure() {
   int succeedCnt = mDb.ReadFromImageHost(imageHostPath);
   if (succeedCnt < 0) {
     Notificator::warning(QString("Load perfs from path[%1] failed").arg(imageHostPath),  //
-                         QString("see detail in description"));
+                         "see detail in description");
     return 0;
   }
   m_castModel->submitAll();
@@ -235,7 +232,7 @@ int CastDBView::onLoadFromPsonDirectory() {
   int succeedCnt = mDb.LoadFromPsonFile(imageHostPath);
   if (succeedCnt < 0) {
     Notificator::warning(QString("Load perfs from pJson[%1/*.pson] failed").arg(imageHostPath),  //
-                         QString("see detail in description"));
+                         "see detail in description");
     return succeedCnt;
   }
   m_castModel->submitAll();
