@@ -69,7 +69,7 @@ QToolBar* SyncFileSystemModificationActions::GetSyncPathToolbar() {
     _SYNC_REVERSE_SWITCH->setEnabled(sw);
   });
 
-  connect(_SYNC_REVERSE_SWITCH, &QAction::triggered, &SyncModifiyFileSystem::SetSyncReverseBackSwitch);
+  connect(_SYNC_REVERSE_SWITCH, &QAction::toggled, &SyncModifiyFileSystem::SetSyncReverseBackSwitch);
 
   connect(_BASIC_PATH, &QLineEdit::returnPressed, this, [this]() {
     const QString& basicPath{_BASIC_PATH->text()};

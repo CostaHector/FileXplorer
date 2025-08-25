@@ -31,7 +31,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
   m_leafView = LeafView();
-  m_leafDatabase = LeafDatabase();
+  m_leafMovie = LeafMovie();
   m_leafCast = LeafCast();
   m_leafJson = LeafJson();
   m_leafScenes = LeafScenesTools();
@@ -42,7 +42,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   addTab(m_leafFile, "&FILE");
   addTab(m_leafHome, "&HOME");
   addTab(m_leafView, "&VIEW");
-  addTab(m_leafDatabase, "&" + viewIns._MOVIE_VIEW->text());
+  addTab(m_leafMovie, "&" + viewIns._MOVIE_VIEW->text());
   addTab(m_leafCast, "&" + viewIns._CAST_VIEW->text());
   addTab(m_leafJson, "&" + viewIns._JSON_VIEW->text());
   addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
@@ -250,7 +250,7 @@ QToolBar* RibbonMenu::LeafView() const {
   return leafViewWid;
 }
 
-QToolBar* RibbonMenu::LeafDatabase() const {
+QToolBar* RibbonMenu::LeafMovie() const {
   auto* databaseToolBar{new (std::nothrow) RibbonMovieDB{"Leaf Movie Database"}};
   CHECK_NULLPTR_RETURN_NULLPTR(databaseToolBar);
   return databaseToolBar;

@@ -126,7 +126,7 @@
 <file alias="ARRANGE">FileOperation/ARRANGE.svg</file>
 
 <!--LeftSideToolBarIcons here-->
-<file alias="HOME">LeftSideToolBarIcons/HOME.png</file>
+<file alias="DISKS">LeftSideToolBarIcons/DISKS.svg</file>
 <file alias="FOLDER_OF_DESKTOP">LeftSideToolBarIcons/FOLDER_OF_DESKTOP.ico</file>
 <file alias="FOLDER_OF_DOCUMENTS">LeftSideToolBarIcons/FOLDER_OF_DOCUMENTS.ico</file>
 <file alias="FOLDER_OF_DOWNLOADS">LeftSideToolBarIcons/FOLDER_OF_DOWNLOADS.ico</file>

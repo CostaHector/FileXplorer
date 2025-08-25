@@ -28,20 +28,21 @@
 #include <QSqlRecord>
 #include <QFileDialog>
 
-QString CastDBView::GetImageHostPath() {
-  return Configuration().value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
-                               MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)
-      .toString();
-}
-
-CastDBView::CastDBView(CastDatabaseSearchToolBar* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent)
+CastDBView::CastDBView(CastDatabaseSearchToolBar* castDbSearchBar_, FileFolderPreviewer* floatingPreview_, QWidget* parent)
   : CustomTableView{"PERFORMERS_TABLE", parent},  //
-  m_perfSearch{perfSearchLE},
-  _floatingPreview{floatingPreview},
-  mDb{SystemPath::PEFORMERS_DATABASE, "perfs_connection"}
-
+  _castDbSearchBar{castDbSearchBar_},
+  _floatingPreview{floatingPreview_},
+  mDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"},
+  mImageHost{Configuration().value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
+                                   MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)
+                 .toString()}
 {
-  CHECK_NULLPTR_RETURN_VOID(m_perfSearch);
+  if (QFileInfo{mImageHost}.isDir()) {
+    LOG_CRITICAL("Image host path not exist", mImageHost);
+    return;
+  }
+
+  CHECK_NULLPTR_RETURN_VOID(_castDbSearchBar);
   BindMenu(g_castAct().GetRightClickMenu(this));
 
   QSqlDatabase con = mDb.GetDb();
@@ -65,16 +66,14 @@ CastDBView::CastDBView(CastDatabaseSearchToolBar* perfSearchLE, FileFolderPrevie
 }
 
 bool CastDBView::onOpenRecordInFileSystem() const {
-  const QString imageHostPath{GetImageHostPath()};
   if (!selectionModel()->hasSelection()) {
     LOG_INFO("Nothing was selected.", "Select a row to open pson folder");
     return false;
   }
-
   const auto& record = m_castModel->record(currentIndex().row());
   QString revealPath{currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail_INDEX ?
-                         CastBaseDb::GetCastFilePath(record, imageHostPath):
-                         CastBaseDb::GetCastPath(record, imageHostPath)};
+                         CastBaseDb::GetCastFilePath(record, mImageHost):
+                         CastBaseDb::GetCastPath(record, mImageHost)};
   if (!QFile::exists(revealPath)) {
     LOG_WARN("Path not exists", revealPath);
     return false;
@@ -84,7 +83,7 @@ bool CastDBView::onOpenRecordInFileSystem() const {
 
 
 void CastDBView::subscribe() {
-  connect(m_perfSearch, &CastDatabaseSearchToolBar::whereClauseChanged, m_castModel, &QSqlTableModel::setFilter);
+  connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, m_castModel, &QSqlTableModel::setFilter);
 
   auto& castInst = g_castAct();
   connect(castInst.SUBMIT, &QAction::triggered, this, &CastDBView::onSubmit);
@@ -116,9 +115,8 @@ QString CastDBView::filePath(const QModelIndex& index) const {
   if (m_castModel == nullptr || !index.isValid()){
     return "";
   }
-  const QString imageHostPath{GetImageHostPath()};
   const auto& record = m_castModel->record(currentIndex().row());
-  return CastBaseDb::GetCastFilePath(record, imageHostPath);
+  return CastBaseDb::GetCastFilePath(record, mImageHost);
 }
 
 void CastDBView::onInitATable() {
@@ -182,15 +180,14 @@ int CastDBView::onLoadFromFileSystemStructure() {
     Notificator::badNews("Table dirty", "submit before load from file-system structure");
     return false;
   }
-  const QString imageHostPath{GetImageHostPath()};
-  int succeedCnt = mDb.ReadFromImageHost(imageHostPath);
+  int succeedCnt = mDb.ReadFromImageHost(mImageHost);
   if (succeedCnt < 0) {
-    Notificator::warning(QString("Load perfs from path[%1] failed").arg(imageHostPath),  //
+    Notificator::warning(QString("Load perfs from path[%1] failed").arg(mImageHost),  //
                          "see detail in description");
     return 0;
   }
   m_castModel->submitAll();
-  Notificator::goodNews(QString("load %1 performer(s) succeed").arg(succeedCnt), imageHostPath);
+  Notificator::goodNews(QString("load %1 performer(s) succeed").arg(succeedCnt), mImageHost);
   return succeedCnt;
 }
 
@@ -216,36 +213,27 @@ bool CastDBView::on_selectionChanged(const QItemSelection& /*selected*/, const Q
   }
   CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
   const auto& record = m_castModel->record(currentIndex().row());
-  const QString imageHostPath{GetImageHostPath()};
-  _floatingPreview->operator()(record, imageHostPath);
+  _floatingPreview->operator()(record, mImageHost);
   return true;
 }
 
 int CastDBView::onLoadFromPsonDirectory() {
-  CHECK_NULLPTR_RETURN_FALSE(m_castModel)
-
   if (m_castModel->isDirty()) {
     Notificator::badNews("Table dirty", "submit before load pson");
     return 0;
   }
-  const QString imageHostPath{GetImageHostPath()};
-  int succeedCnt = mDb.LoadFromPsonFile(imageHostPath);
+  int succeedCnt = mDb.LoadFromPsonFile(mImageHost);
   if (succeedCnt < 0) {
-    Notificator::warning(QString("Load perfs from pJson[%1/*.pson] failed").arg(imageHostPath),  //
+    Notificator::warning(QString("Load perfs from pJson[%1/*.pson] failed").arg(mImageHost),  //
                          "see detail in description");
     return succeedCnt;
   }
   m_castModel->submitAll();
-  Notificator::goodNews(QString("%1 pson file load succeed").arg(succeedCnt), imageHostPath);
+  Notificator::goodNews(QString("%1 pson file load succeed").arg(succeedCnt), mImageHost);
   return succeedCnt;
 }
 
 int CastDBView::onSyncAllImgsFieldFromImageHost() {
-  const QString imageHostPath{GetImageHostPath()};
-  if (!QDir{imageHostPath}.exists()) {
-    Notificator::badNews("ImageHost path not exist sync skip", imageHostPath);
-    return 0;
-  }
   const int totalCnt{m_castModel->rowCount()};
   if (totalCnt == 0) {
     LOG_INFO("No records at all skip", "No need sync");
@@ -254,7 +242,7 @@ int CastDBView::onSyncAllImgsFieldFromImageHost() {
   int succeedCnt = 0;
   for (int r = 0; r < m_castModel->rowCount(); ++r) {
     QSqlRecord sqlRecord = m_castModel->record(r);
-    succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, imageHostPath);
+    succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, mImageHost);
     m_castModel->setRecord(r, sqlRecord);
   }
   RefreshHtmlContents();
@@ -269,11 +257,6 @@ int CastDBView::onSyncAllImgsFieldFromImageHost() {
 }
 
 int CastDBView::onSyncImgsFieldFromImageHost() {
-  const QString imageHostPath{GetImageHostPath()};
-  if (!QDir{imageHostPath}.exists()) {
-    Notificator::badNews("ImageHost path not exist sync skip", imageHostPath);
-    return 0;
-  }
   if (!selectionModel()->hasSelection()) {
     Notificator::information("Nothing was selected", "Select some row to sync imgs fields");
     return 0;
@@ -285,7 +268,7 @@ int CastDBView::onSyncImgsFieldFromImageHost() {
   for (const auto& indr : selectionModel()->selectedRows()) {
     const int r = indr.row();
     QSqlRecord sqlRecord = m_castModel->record(r);
-    succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, imageHostPath);
+    succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, mImageHost);
     m_castModel->setRecord(r, sqlRecord);
   }
   RefreshHtmlContents();
@@ -300,11 +283,6 @@ int CastDBView::onSyncImgsFieldFromImageHost() {
 }
 
 int CastDBView::onDumpAllIntoPsonFile() {
-  const QString imageHostPath{GetImageHostPath()};
-  if (!QDir(imageHostPath).exists()) {
-    Notificator::badNews("Path[pson dump to] not exist", imageHostPath);
-    return 0;
-  }
   const int totalCnt{m_castModel->rowCount()};
   if (totalCnt == 0) {
     LOG_INFO("No records at all skip", "No need dump");
@@ -313,7 +291,7 @@ int CastDBView::onDumpAllIntoPsonFile() {
   int succeedCnt = 0;
   for (int r = 0; r < m_castModel->rowCount(); ++r) {
     const auto& pson = PerformerJsonFileHelper::PerformerJsonJoiner(m_castModel->record(r));
-    const QString& psonPath = PerformerJsonFileHelper::PsonPath(imageHostPath, pson);
+    const QString& psonPath = PerformerJsonFileHelper::PsonPath(mImageHost, pson);
     succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
   QString msgTitle{QString("All %1 record(s) dumped result").arg(totalCnt)};
@@ -327,18 +305,12 @@ int CastDBView::onDumpAllIntoPsonFile() {
 }
 
 int CastDBView::onDumpIntoPsonFile() {
-  const QString imageHostPath{GetImageHostPath()};
-  if (!QDir{imageHostPath}.exists()) {
-    Notificator::badNews("Path[pson dump to] not exist", imageHostPath);
-    return 0;
-  }
-
   if (!selectionModel()->hasSelection()) {
     Notificator::information("Nothing was selected", "Select some row to dump");
     return 0;
   }
 
-  QDir imageHostDir{imageHostPath};
+  QDir imageHostDir{mImageHost};
   int totalCnt {selectionModel()->selectedRows().size()};
   int succeedCnt = 0;
   for (const auto& indr : selectionModel()->selectedRows()) {
@@ -348,10 +320,10 @@ int CastDBView::onDumpIntoPsonFile() {
     const QString castName {record.value(PERFORMER_DB_HEADER_KEY::Name).toString()};
     const QString prepath {ori + '/' + castName};
     if (!imageHostDir.exists(prepath) && !imageHostDir.mkpath(prepath)) {
-      qWarning("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(imageHostPath));
+      qWarning("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(mImageHost));
       continue;
     }
-    const QString psonPath {PerformerJsonFileHelper::PsonPath(imageHostPath, ori, castName)};
+    const QString psonPath {PerformerJsonFileHelper::PsonPath(mImageHost, ori, castName)};
     const QVariantHash pson = PerformerJsonFileHelper::PerformerJsonJoiner(record);
     succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
@@ -447,9 +419,8 @@ void CastDBView::RefreshHtmlContents() {
   if (_floatingPreview == nullptr || !selectionModel()->hasSelection()) {
     return;
   }
-  const QString imageHostPath{GetImageHostPath()};
   const auto& record = m_castModel->record(currentIndex().row());
-  _floatingPreview->operator()(record, imageHostPath);
+  _floatingPreview->operator()(record, mImageHost);
 }
 
 
