@@ -22,7 +22,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     case ViewType::TREE:
     case ViewType::JSON: {
       if (_navigation->m_addressBar == nullptr) {
-        _navigation->m_addressBar = new NavigationAndAddressBar;
+        _navigation->m_addressBar = new (std::nothrow) NavigationAndAddressBar{"FileSystem Address/Search", _navigation};
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
         _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
@@ -64,7 +64,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::SEARCH: {
       if (_navigation->m_advanceSearchBar == nullptr) {
-        _navigation->m_advanceSearchBar = new AdvanceSearchToolBar;
+        _navigation->m_advanceSearchBar = new (std::nothrow) AdvanceSearchToolBar{"Advance search", _navigation};
         _navigation->AddToolBar(viewType, _navigation->m_advanceSearchBar);
 
         _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
@@ -75,7 +75,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::SCENE: {
       if (_navigation->m_addressBar == nullptr) {
-        _navigation->m_addressBar = new NavigationAndAddressBar;
+        _navigation->m_addressBar = new (std::nothrow) NavigationAndAddressBar{"FileSystem Address/Search", _navigation};
         _navigation->AddToolBar(viewType, _navigation->m_addressBar);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
@@ -83,9 +83,9 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
       break;
     }
     case ViewType::CAST: {
-      if (_navigation->m_perfSearch == nullptr) {
-        _navigation->m_perfSearch = new (std::nothrow) CastDatabaseSearchToolBar{"CastSearch", _navigation};
-        _navigation->AddToolBar(viewType, _navigation->m_perfSearch);
+      if (_navigation->m_castSearchBar == nullptr) {
+        _navigation->m_castSearchBar = new (std::nothrow) CastDatabaseSearchToolBar{"CastSearch", _navigation};
+        _navigation->AddToolBar(viewType, _navigation->m_castSearchBar);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
       qDebug("Switch toolbar to cast[%d]", (char)viewType);
@@ -158,7 +158,6 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         ViewsStackedWidget::connect(_view->m_movieView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_movieView);
       }
-      _view->m_movieView->setWindowTitle(QString("Movie[%1]").arg(_view->m_movieView->GetMovieTableName()));
       viewIndex = _view->m_name2ViewIndex[viewType];
       qDebug("Switch view widget to movie[%d]", (char)viewType);
       break;
@@ -206,7 +205,7 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     case ViewType::CAST: {
       if (_view->m_castTableView == nullptr) {
         auto* pFuncSelectionChangeCallback{_view->_previewFolder != nullptr ? _view->_previewFolder->m_fileFolderPreviewStackedWid : nullptr};
-        _view->m_castTableView = new CastDBView(_navigation->m_perfSearch, pFuncSelectionChangeCallback, _view);
+        _view->m_castTableView = new CastDBView(_navigation->m_castSearchBar, pFuncSelectionChangeCallback, _view);
         _view->AddView(viewType, _view->m_castTableView);
       }
       _view->m_castTableView->setWindowTitle("Cast");

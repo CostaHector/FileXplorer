@@ -20,7 +20,10 @@ QString SplitToolButton::GetShortcutString(const QString& topAction, const QStri
       .arg(bottomAction).arg(bottomShortcut->key().toString());
 }
 
-NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {
+NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)//
+  : QToolBar{title, parent} {
+  CHECK_NULLPTR_RETURN_VOID(parent)
+
   m_addressLine = new (std::nothrow) AddressELineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(m_addressLine)
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
@@ -34,7 +37,6 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
       "For FileSystemModel(wildcard) e.g., *target*\n"
       "For SceneModel(plain) e.g., target\n"
       "For JsonModel(Regex) e.g., target1.*?target2");
-  mFsSearchLE->setMinimumWidth(40);
 
   m_fsFilter = new (std::nothrow) FileSystemTypeFilter{this};
   CHECK_NULLPTR_RETURN_VOID(m_fsFilter)

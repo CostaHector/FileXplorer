@@ -1,10 +1,8 @@
 #ifndef DATABASESEARCHTOOLBAR_H
 #define DATABASESEARCHTOOLBAR_H
 
+#include <QToolBar>
 #include <QComboBox>
-#include <QLineEdit>
-#include <QWidget>
-#include <QHBoxLayout>
 
 // GUID_IN_UNDERSCORE | ROOTPATH
 class Guid2RootPathComboxBox : public QComboBox {
@@ -17,11 +15,31 @@ public:
   QStringList ToQStringList() const;
 };
 
-#include <QToolBar>
 class MovieDBSearchToolBar : public QToolBar {
+  Q_OBJECT
 public:
-  explicit MovieDBSearchToolBar(const QString& title = "Movie Database Search Toolbar", //
-                                 QWidget* parent = nullptr);
+  explicit MovieDBSearchToolBar(const QString& title, QWidget* parent);
+  inline QString GetCurrentTableName() const {
+    return m_tablesCB->CurrentTableName();
+  }
+  inline QString GetMovieTableRootPath() const {
+    return m_tablesCB->CurrentRootPath();
+  }
+  inline QString GetCurrentWhereClause() const {
+    return m_searchCB->currentText();
+  }
+  void SetWhereClause(const QString& newWhereClause) {
+    m_searchCB->setCurrentText(newWhereClause);
+  }
+  QString AskUserDropWhichTable();
+  void AddATable(const QString& newTableName);
+  void InitTables(const QStringList& tbls);
+  void InitCurrentIndex();
+signals:
+  void movieTableChanged(const QString& newTable);
+  void whereClauseChanged(const QString& whereClause);
+private:
+  void subscribe();
   QComboBox* m_searchCB{nullptr};
   Guid2RootPathComboxBox* m_tablesCB{nullptr};
 };
@@ -29,14 +47,13 @@ public:
 class CastDatabaseSearchToolBar : public QToolBar {
   Q_OBJECT
 public:
-  explicit CastDatabaseSearchToolBar(const QString& title = "Cast Database Search Toolbar", //
-                                 QWidget* parent = nullptr);
-  QComboBox* m_nameClauseCB{nullptr};
-  QComboBox* m_otherClauseCB{nullptr};
+  explicit CastDatabaseSearchToolBar(const QString& title, QWidget* parent);
 signals:
   void whereClauseChanged(const QString& whereClause);
 private:
   void subscribe();
   void Emit();
+  QComboBox* m_nameClauseCB{nullptr};
+  QComboBox* m_otherClauseCB{nullptr};
 };
 #endif // DATABASESEARCHTOOLBAR_H
