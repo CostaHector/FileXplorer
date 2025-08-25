@@ -1,5 +1,8 @@
 #include "CustomTableView.h"
+#include "ColumnVisibilityDialog.h"
 #include "MemoryKey.h"
+#include "PublicMacro.h"
+#include "Notificator.h"
 
 #include <QHeaderView>
 #include <QInputDialog>
@@ -10,19 +13,19 @@ QSet<QString> CustomTableView::TABLES_SET;
 
 CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   : QTableView(parent),
-    m_name{name},
-    m_columnVisibiltyKey{m_name + "_COLUMN_VISIBILITY"},
-    m_stretchLastSectionKey{m_name + "_STRETCH_LAST_SECTION"},
-    m_DEFAULT_SECTION_SIZE_KEY{m_name + "_DEFAULT_SECTION_SIZE"},
-    m_DEFAULT_COLUMN_SECTION_SIZE_KEY{m_name + "_DEFAULT_COLUMN_SECTION_SIZE"},
-    m_horizontalHeaderStateKey{m_name + "_HEADER_GEOMETRY"},
-    m_showHorizontalHeaderKey{m_name + "_SHOW_HORIZONTAL_HEADER"},
-    m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"},
-    m_sortByColumnSwitchKey{m_name + "_SORT_BY_COLUMN_SWITCH"},
-    m_rowResizeToContentKey{m_name + "_ROW_RESIZE_TO_CONTENT"},
-    m_defaultTableRowHeight{MemoryKey::TABLE_DEFAULT_SECTION_SIZE.v.toInt()},
-    m_defaultTableColumnWidth{MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE.v.toInt()},
-    m_columnsShowSwitch{"11111,11111,11111,11111,11111,11111"} {
+  m_name{name},
+  m_columnVisibiltyKey{m_name + "_COLUMN_VISIBILITY"},
+  m_stretchLastSectionKey{m_name + "_STRETCH_LAST_SECTION"},
+  m_DEFAULT_SECTION_SIZE_KEY{m_name + "_DEFAULT_SECTION_SIZE"},
+  m_DEFAULT_COLUMN_SECTION_SIZE_KEY{m_name + "_DEFAULT_COLUMN_SECTION_SIZE"},
+  m_horizontalHeaderStateKey{m_name + "_HEADER_GEOMETRY"},
+  m_showHorizontalHeaderKey{m_name + "_SHOW_HORIZONTAL_HEADER"},
+  m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"},
+  m_sortByColumnSwitchKey{m_name + "_SORT_BY_COLUMN_SWITCH"},
+  m_rowResizeToContentKey{m_name + "_ROW_RESIZE_TO_CONTENT"},
+  m_defaultTableRowHeight{MemoryKey::TABLE_DEFAULT_SECTION_SIZE.v.toInt()},
+  m_defaultTableColumnWidth{MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE.v.toInt()},
+  m_columnsShowSwitch{"11111,11111,11111,11111,11111,11111"} {
   if (isNameExists(m_name)) {
     qWarning("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
     return;
@@ -75,19 +78,18 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
 
   RESIZE_COLUMN_TO_CONTENTS->setCheckable(true);
   RESIZE_COLUMN_TO_CONTENTS->setToolTip(QString("<b>%1 (%2)</b><br/> Resize column to contents when enabled. column width to default section  when disabled")
-                                        .arg(RESIZE_COLUMN_TO_CONTENTS->text(), RESIZE_COLUMN_TO_CONTENTS->shortcut().toString()));
+                                            .arg(RESIZE_COLUMN_TO_CONTENTS->text(), RESIZE_COLUMN_TO_CONTENTS->shortcut().toString()));
 
   RESIZE_ROW_TO_CONTENTS->setCheckable(true);
   RESIZE_ROW_TO_CONTENTS->setChecked(Configuration().value(m_rowResizeToContentKey, true).toBool());
   RESIZE_ROW_TO_CONTENTS->setToolTip(
-        QString("<b>%1 (%2)</b><br/> Resize row to contents when enabled. row height interactive when disabled").arg(RESIZE_ROW_TO_CONTENTS->text(), RESIZE_ROW_TO_CONTENTS->shortcut().toString()));
+      QString("<b>%1 (%2)</b><br/> Resize row to contents when enabled. row height interactive when disabled").arg(RESIZE_ROW_TO_CONTENTS->text(), RESIZE_ROW_TO_CONTENTS->shortcut().toString()));
 
   m_horMenu->addAction(SHOW_VERTICAL_HEADER);
   m_horMenu->addAction(SHOW_HORIZONTAL_HEADER);
+  m_horMenu->addAction(COLUMNS_VISIBILITY);
   m_horMenu->addSeparator();
   m_horMenu->addAction(HIDE_THIS_COLUMN);
-  m_horMenu->addAction(COLUMNS_VISIBILITY);
-  m_horMenu->addAction(SHOW_ALL_COLUMNS);
   m_horMenu->addSeparator();
   m_horMenu->addAction(STRETCH_DETAIL_SECTION);
   m_horMenu->addAction(ENABLE_COLUMN_SORT);
@@ -98,6 +100,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
 
   m_verMenu->addAction(SHOW_VERTICAL_HEADER);
   m_verMenu->addAction(SHOW_HORIZONTAL_HEADER);
+  m_verMenu->addAction(COLUMNS_VISIBILITY);
   m_verMenu->addSeparator();
   m_verMenu->addAction(RESIZE_ROW_TO_CONTENTS);
   m_verMenu->addAction(SET_ROWS_DEFAULT_SECTION_SIZE);
@@ -111,7 +114,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
 }
 
 void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
-  if (m_menu) {
+  if (m_menu != nullptr) {
     m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
     return;
   }
@@ -119,10 +122,7 @@ void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
 }
 
 void CustomTableView::BindMenu(QMenu* menu) {
-  if (menu == nullptr) {
-    qWarning("Don't bind a nullptr menu");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(menu)
   m_menu = menu;
 }
 
@@ -150,10 +150,7 @@ bool CustomTableView::ShowOrHideColumnCore() {
     return false;
   }
   auto* model_ = this->model();
-  if (model_ == nullptr) {
-    qWarning("Skip set visibility of horizontal header. model is nullptr.");
-    return false;
-  }
+  CHECK_NULLPTR_RETURN_FALSE(model_)
   const int tableColumnsCount = model_->columnCount();
   if (tableColumnsCount > m_columnsShowSwitch.size()) {
     qWarning("Skip set visibility of horizontal header. switchs count less than columns count.");
@@ -168,58 +165,46 @@ bool CustomTableView::ShowOrHideColumnCore() {
 
 bool CustomTableView::onShowHideColumn() {
   auto* model_ = this->model();
-  if (model_ == nullptr) {
-    qWarning("Skip set visibility of horizontal header. model is nullptr.");
-    return false;
-  }
-  const int tableColumnsCount = model_->columnCount();
-  if (m_columnsShowSwitch.size() < tableColumnsCount) {
-    qWarning("switches must contain at least %d element[actual: %d]", tableColumnsCount, m_columnsShowSwitch.size());
-    return false;
-  }
+  CHECK_NULLPTR_RETURN_FALSE(model_)
 
-  QString switches;
-  for (int i = 0; i < horizontalHeader()->count(); ++i) {
-    const QChar SEP = (i != 0 and i % SWITCHS_BATCH_COUNT == 0) ? '\n' : ',';
-    if (!m_horHeaderTitlesInit) {
-      m_horHeaderTitles += model_->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() + SEP;
+  const int tableColumnsCount {horizontalHeader()->count()};
+  QString tempSwitches;
+  if (tableColumnsCount < m_columnsShowSwitch.size()) {
+    tempSwitches = m_columnsShowSwitch.left(tableColumnsCount);
+  } else {
+    tempSwitches += m_columnsShowSwitch;
+    tempSwitches += QString{tableColumnsCount - m_columnsShowSwitch.size(), QChar{'1'}};
+  }
+  // get column title(s)
+  if (m_horHeaderTitles.size() != tableColumnsCount) {
+    m_horHeaderTitles.clear();
+    for (int i = 0; i < tableColumnsCount; ++i) {
+      m_horHeaderTitles.push_back(model_->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
     }
-    switches += m_columnsShowSwitch[i] + SEP;
   }
-  m_horHeaderTitlesInit = true;
 
-  bool ok = false;
-  QString userInputArray =
-      QInputDialog::getText(this, QString("Table column visibility(0:hide, 1:show) at least %1 element(s)\n").arg(tableColumnsCount), m_horHeaderTitles, QLineEdit::Normal, switches, &ok);
-  if (not ok) {
-    qInfo("User cancel change horizontal header visibility");
+  ColumnVisibilityDialog dialog{m_horHeaderTitles, tempSwitches, this};
+  if (dialog.exec() != QDialog::Accepted) {
+    qInfo("User canceled column visibility change");
     return false;
   }
-  userInputArray.remove(',').remove('\n');
-  if (userInputArray.size() < tableColumnsCount) {
-    qWarning("Input must contain at least %d element[actual: %d]", tableColumnsCount, userInputArray.size());
-    QMessageBox::warning(this, "Skip", QString("Input must contain at least %1 element(s)[actual: %2]").arg(tableColumnsCount).arg(userInputArray.size()));
-    return false;
-  }
-  m_columnsShowSwitch = userInputArray;
+  m_columnsShowSwitch = dialog.getSwitches();
   ShowOrHideColumnCore();
   return true;
 }
 
 bool CustomTableView::onHideThisColumn() {
   const int c = GetClickedHorIndex();
-  if (not(0 <= c and c < m_columnsShowSwitch.size())) {
-    qWarning("invalid %dth column  not in [0, %d)", c, m_columnsShowSwitch.size());
-    QMessageBox::warning(this, "Invalid column index", "Skip HideThisColumn");
+  if (!(0 <= c && c < m_columnsShowSwitch.size())) {
+    LOG_WARN(QString{"Invalid column index[%1]"}.arg(c), "Skip HideThisColumn");
     return false;
   }
   if (m_columnsShowSwitch[c] == '0') {
-    qDebug("Column[%dth] is already hide. Select another column to hide", c);
-    QMessageBox::information(this, QString("Column[%1th] is already hide").arg(c), "Select another column to hide");
+    LOG_INFO(QString("Column[%1th] is already hide").arg(c), "Select another column to hide");
     return true;
   }
   m_columnsShowSwitch[c] = '0';
-  setColumnHidden(c, m_columnsShowSwitch[c] == '0');
+  setColumnHidden(c, true);
   Configuration().setValue(m_columnVisibiltyKey, m_columnsShowSwitch);
   return true;
 }
@@ -329,7 +314,6 @@ void CustomTableView::onVerticalHeaderMenuRequest(const QPoint& pnt) {
 void CustomTableView::SubscribeHeaderActions() {
   connect(COLUMNS_VISIBILITY, &QAction::triggered, this, &CustomTableView::onShowHideColumn);
   connect(HIDE_THIS_COLUMN, &QAction::triggered, this, &CustomTableView::onHideThisColumn);
-  connect(SHOW_ALL_COLUMNS, &QAction::triggered, this, &CustomTableView::onShowAllColumn);
   connect(STRETCH_DETAIL_SECTION, &QAction::triggered, this, &CustomTableView::onStretchLastSection);
   connect(ENABLE_COLUMN_SORT, &QAction::triggered, this, &CustomTableView::onEnableColumnSort);
   connect(RESIZE_COLUMN_TO_CONTENTS, &QAction::triggered, this, &CustomTableView::onResizeColumnToContents);

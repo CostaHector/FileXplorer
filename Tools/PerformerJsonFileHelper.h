@@ -23,7 +23,6 @@ class PerformerJsonFileHelper {
                                           const QString& vids = "",
                                           const QString& imgs = "",
                                           const QString& detail = "");
-private:
   static constexpr int DEFAULT_RATE{0};
   static const QString DEFAULT_ORIENTATION;
 };
