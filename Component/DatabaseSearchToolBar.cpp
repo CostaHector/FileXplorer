@@ -58,10 +58,10 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   m_searchCB->lineEdit()->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_searchCB->lineEdit()->setClearButtonEnabled(true);
   using namespace MOVIE_TABLE;
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, ""))"}.arg(ENUM_2_STR(Name)));
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, ""))"}.arg(ENUM_2_STR(Name)));
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, "") AND INSTR(`%1`, ""))"}.arg(ENUM_2_STR(PrePathRight)));
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, ""))"}.arg(ENUM_2_STR(PrePathRight)));
+  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
+  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
   m_searchCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
   m_searchCB->addItem(QString{R"(`%1` = "E:/")"}.arg(ENUM_2_STR(Driver)));
   m_searchCB->addItem(QString{R"(`%1` IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
@@ -137,6 +137,7 @@ void MovieDBSearchToolBar::InitCurrentIndex() {
     m_tablesCB->setCurrentIndex(defaultDisplayIndex);
   }
 }
+
 // -------------------------------- CastDatabaseSearchToolBar --------------------------------
 CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent)//
   : QToolBar{title, parent} {
@@ -148,10 +149,11 @@ CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidg
   m_nameClauseCB->lineEdit()->addAction(QIcon{":img/SEARCH"}, QLineEdit::LeadingPosition);
   m_nameClauseCB->lineEdit()->setClearButtonEnabled(true);
   m_nameClauseCB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  m_nameClauseCB->addItem("");
   if (!PERFORMER_DB_HEADER_KEY::DB_HEADER.isEmpty()) {
-    m_nameClauseCB->addItem(QString{R"(INSTR(`%1`, "%"))"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER.front()));
+    m_nameClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER.front()));
+    m_nameClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER.front()));
   }
+  m_nameClauseCB->addItem(QString{50, QChar{' '}});
 
   m_otherClauseCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_nameClauseCB);
@@ -162,8 +164,9 @@ CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidg
   m_otherClauseCB->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
   m_otherClauseCB->addItem("");
   for (int i = 1; i < PERFORMER_DB_HEADER_KEY::DB_HEADER.size(); ++i) {
-    m_otherClauseCB->addItem(QString{R"(INSTR(`%1`, "%"))"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER[i]));
+    m_otherClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER[i]));
   }
+  m_otherClauseCB->addItem(QString{50, QChar{' '}});
 
   addWidget(m_nameClauseCB);
   addWidget(m_otherClauseCB);
