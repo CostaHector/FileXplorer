@@ -43,14 +43,13 @@ private:
   int onForceRefreshRecordsVids();
 
 private:
-  static QString GetImageHostPath();
   void RefreshHtmlContents();
 
-
-  CastDatabaseSearchToolBar* m_perfSearch{nullptr};
+  CastDatabaseSearchToolBar* _castDbSearchBar{nullptr};
   QSqlTableModel* m_castModel{nullptr};
   FileFolderPreviewer* _floatingPreview{nullptr};
 
+  const QString mImageHost;
   CastBaseDb mDb;
 };
 

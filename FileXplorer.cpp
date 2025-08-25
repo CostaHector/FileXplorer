@@ -119,7 +119,7 @@ void FileXplorer::InitComponentVisibility() {
 
 void FileXplorer::subscribe() {
   auto& vA = g_viewActions();
-  connect(vA.NAVIGATION_PANE, &QAction::triggered, this, [this](const bool checked) {
+  connect(vA.NAVIGATION_PANE, &QAction::toggled, this, [this](const bool checked) {
     Configuration().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
     m_navigationToolBar->setVisible(checked);
   });

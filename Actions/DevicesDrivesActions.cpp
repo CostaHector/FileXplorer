@@ -1,12 +1,10 @@
 #include "DevicesDrivesActions.h"
 #include "PublicMacro.h"
 #include <QMenu>
-#include <QApplication>
-#include <QStyle>
 
 DevicesDrivesActions::DevicesDrivesActions(QObject* parent)  //
     : QObject{parent} {                                      //
-  DEVICES_AND_DRIVES = new (std::nothrow) QAction{QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon), "Devices and Drives", this};
+  DEVICES_AND_DRIVES = new (std::nothrow) QAction{QIcon(":img/DISKS"), "Devices and Drives", this};
   CHECK_NULLPTR_RETURN_VOID(DEVICES_AND_DRIVES);
   DEVICES_AND_DRIVES->setCheckable(true);
 
