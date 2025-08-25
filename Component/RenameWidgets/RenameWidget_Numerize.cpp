@@ -18,6 +18,12 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   m_startNo = new (std::nothrow) QLineEdit{QString::number(mStartNoInt), this};  // "0"
   CHECK_NULLPTR_RETURN_VOID(m_startNo)
   m_startNo->setMaximumWidth(20);
+  m_isUniqueCounterPerExtension = new (std::nothrow) QCheckBox{"Extension Unique Counter", this};
+  m_isUniqueCounterPerExtension->setToolTip("Controls whether file renaming uses a shared counter across extensions:\n"
+                                            "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
+                                            "✖ Disabled: Each extension gets an independent counter (e.g., 'A 1.jpeg', 'A 2.jpg').\n"
+                                            "Use case: Preserve version links for multi-format files (e.g., JPEG/WEBP variants).");
+  m_isUniqueCounterPerExtension->setCheckState(Qt::CheckState::Checked);
 
   m_numberPattern = new (std::nothrow) QComboBox{this};  // " - %1"
   CHECK_NULLPTR_RETURN_VOID(m_numberPattern)
@@ -52,6 +58,7 @@ QToolBar* RenameWidget_Numerize::InitControlTB() {
   numerizeControlTb->addSeparator();
   numerizeControlTb->addWidget(new (std::nothrow) QLabel{"Start index:", numerizeControlTb});
   numerizeControlTb->addWidget(m_startNo);
+  numerizeControlTb->addWidget(m_isUniqueCounterPerExtension);
   numerizeControlTb->addSeparator();
   numerizeControlTb->addWidget(new (std::nothrow) QLabel{"No. format:", numerizeControlTb});
   numerizeControlTb->addWidget(m_numberPattern);
@@ -71,6 +78,8 @@ void RenameWidget_Numerize::extraSubscribe() {
     mStartNoInt = startNo;
     OnlyTriggerRenameCore();
   });
+
+  connect(m_isUniqueCounterPerExtension, &QCheckBox::stateChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
 
   connect(m_numberPattern, &QComboBox::currentTextChanged, this, [this]() -> void {
     int defaultFormateInd = m_numberPattern->currentIndex();
@@ -92,5 +101,6 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
   const QStringList& suffixs = m_oExtTE->toPlainText().split(NAME_SEP);
   const QString& baseName = m_completeBaseName->text();
   const QString& namePattern = m_numberPattern->currentText();
-  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, mStartNoInt, namePattern);
+  const bool bUniqueExtCounter = m_isUniqueCounterPerExtension->checkState() == Qt::Checked;
+  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, mStartNoInt, namePattern, bUniqueExtCounter);
 }

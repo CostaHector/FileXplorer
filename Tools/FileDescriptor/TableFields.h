@@ -1,6 +1,7 @@
 #ifndef TABLEFIELDS_H
 #define TABLEFIELDS_H
 
+#include <QStringList>
 namespace DEV_DRV_TABLE {
 enum FIELD_E {
   ROOT_PATH = 0,  //
@@ -12,11 +13,8 @@ enum FIELD_E {
   ADT_TIME,       //
   FILED_BUTT
 };
-// 使用一个函数来返回枚举项的字符串表示
 const char* GetFILEDString(FIELD_E enum_val);
 }  // namespace DEV_DRV_TABLE
-
-#define VOLUME_ENUM_TO_COLON_STRING(enum_val) ":" #enum_val
 
 namespace MainKey {
 enum FIELD_E {
@@ -53,5 +51,26 @@ enum FIELD_E {
   BUTT,
 };
 }  // namespace TORRENTS_DB_HEADER_KEY
+
+
+namespace PERFORMER_DB_HEADER_KEY {
+#define PERFORMER_TABLE_FIELD_MAPPING    \
+PERFORMER_TABLE_KEY_ITEM(Name, 0)      \
+    PERFORMER_TABLE_KEY_ITEM(Rate, 1)      \
+    PERFORMER_TABLE_KEY_ITEM(AKA, 2)       \
+    PERFORMER_TABLE_KEY_ITEM(Tags, 3)      \
+    PERFORMER_TABLE_KEY_ITEM(Ori, 4)       \
+    PERFORMER_TABLE_KEY_ITEM(Vids, 5)      \
+    PERFORMER_TABLE_KEY_ITEM(Imgs, 6)      \
+    PERFORMER_TABLE_KEY_ITEM(Detail, 7)    \
+
+    enum FIELD_E {
+#define PERFORMER_TABLE_KEY_ITEM(enu, val) enu = val,
+      PERFORMER_TABLE_FIELD_MAPPING
+#undef PERFORMER_TABLE_KEY_ITEM
+    };
+const char* GetFILEDString(FIELD_E enum_val);
+extern const QStringList DB_HEADER;
+}  // namespace PERFORMER_DB_HEADER_KEY
 
 #endif  // TABLEFIELDS_H
