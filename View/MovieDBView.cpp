@@ -1,17 +1,13 @@
 #include "MovieDBView.h"
-
 #include "MovieDBActions.h"
 #include "FileBasicOperationsActions.h"
-
 #include "QuickWhereClause.h"
 #include "Notificator.h"
-
 #include "MemoryKey.h"
 #include "MountHelper.h"
 #include "StudiosManager.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
-
 
 #include <QSqlError>
 #include <QSqlQuery>
@@ -25,7 +21,7 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,               //
                          MovieDBSearchToolBar* dbSearchBar_,  //
                          FdBasedDb& movieDb_,
                          QWidget* parent)      //
-  : CustomTableView("MOVIE_TABLE", parent),  //
+  : CustomTableView{"MOVIE_TABLE", parent},  //
   _fdBasedDb{movieDb_}, //
   _movieDbSearchBar{dbSearchBar_},
   _dbModel{model_}
