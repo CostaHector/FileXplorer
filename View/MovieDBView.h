@@ -38,7 +38,6 @@ public:
   bool onExportToJson();
   bool onUpdateByJson();
 
-  bool onQuickWhereClause();
   int onCountRow();
 
   int onSetStudio();
@@ -53,7 +52,6 @@ private:
   MovieDatabaseMenu* m_movieMenu{nullptr};
   MovieDBSearchToolBar* _movieDbSearchBar{nullptr};
 
-  QuickWhereClause* m_quickWhereClause{nullptr};
   FdBasedDb& _fdBasedDb;
 
   QStringList m_studioCandidates;

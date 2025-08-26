@@ -12,6 +12,7 @@ class PerformersAkaManager {
  public:
   static PerformersAkaManager& getIns();
   static const QString FUZZY_LIKE;
+  static const QString OPEATOR_RELATION;
   static QString PlainLogicSentence2FuzzySqlWhere(const QString& keyName,                       //,
                                                   const QString& tokens,                        //
                                                   const QString& binaryCondition = FUZZY_LIKE,  //
