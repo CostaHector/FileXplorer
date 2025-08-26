@@ -25,6 +25,8 @@ class CastDBActions : public QObject {
   QAction* DELETE_TABLE{nullptr};
   QActionGroup* BASIC_TABLE_OP{nullptr};
 
+  QAction* _QUICK_WHERE_CLAUSE_CAST{nullptr};
+
   QAction* SYNC_SELECTED_RECORDS_IMGS_FROM_DISK{nullptr};
   QAction* SYNC_ALL_RECORDS_IMGS_FROM_DISK{nullptr};
   QActionGroup* _SYNC_IMGS_OP{nullptr};

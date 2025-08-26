@@ -5,6 +5,8 @@
 #include "TableFields.h"
 #include "MemoryKey.h"
 #include "MountHelper.h"
+#include "MovieDBActions.h"
+#include "CastDBActions.h"
 #include <QLineEdit>
 #include <QCompleter>
 #include <QInputDialog>
@@ -76,7 +78,11 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom); // not editable
   m_tablesCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   addWidget(m_searchCB);
+  addSeparator();
   addWidget(m_tablesCB);
+  addSeparator();
+  addAction(g_dbAct()._QUICK_WHERE_CLAUSE_MOVIE);
+  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -84,9 +90,26 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   subscribe();
 }
 
+void MovieDBSearchToolBar::onQuickWhereClause() {
+  if (m_quickWhereClause == nullptr) {
+    m_quickWhereClause = new (std::nothrow) QuickWhereClause{this};
+    CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
+  }
+  auto retCode = m_quickWhereClause->exec();
+  if (retCode != QDialog::DialogCode::Accepted) {
+    LOG_INFO("User cancel quick where clause", "skip")
+    return;
+  }
+  const QString& whereClause {m_quickWhereClause->GetWhereString()};
+  qDebug("Quick where clause: [%s]", qPrintable(whereClause));
+  SetWhereClause(whereClause);
+  emit whereClauseChanged(whereClause);
+}
+
 void MovieDBSearchToolBar::subscribe() {
   connect(m_searchCB->lineEdit(), &QLineEdit::returnPressed, [this]() { emit whereClauseChanged(m_searchCB->currentText()); });
   connect(m_tablesCB, &QComboBox::currentTextChanged, this, &MovieDBSearchToolBar::movieTableChanged);
+  connect(g_dbAct()._QUICK_WHERE_CLAUSE_MOVIE, &QAction::triggered, this, &MovieDBSearchToolBar::onQuickWhereClause);
 }
 
 QString MovieDBSearchToolBar::AskUserDropWhichTable() {
@@ -149,27 +172,19 @@ CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidg
   m_nameClauseCB->lineEdit()->addAction(QIcon{":img/SEARCH"}, QLineEdit::LeadingPosition);
   m_nameClauseCB->lineEdit()->setClearButtonEnabled(true);
   m_nameClauseCB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  if (!PERFORMER_DB_HEADER_KEY::DB_HEADER.isEmpty()) {
-    m_nameClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER.front()));
-    m_nameClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER.front()));
-  }
-  m_nameClauseCB->addItem(QString{50, QChar{' '}});
 
-  m_otherClauseCB = new (std::nothrow) QComboBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_nameClauseCB);
-  m_otherClauseCB->setEditable(true);
-  m_otherClauseCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
-  m_otherClauseCB->lineEdit()->addAction(QIcon{":img/FILE_SYSTEM_FILTER"}, QLineEdit::LeadingPosition);
-  m_otherClauseCB->lineEdit()->setClearButtonEnabled(true);
-  m_otherClauseCB->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  m_otherClauseCB->addItem("");
-  for (int i = 1; i < PERFORMER_DB_HEADER_KEY::DB_HEADER.size(); ++i) {
-    m_otherClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(PERFORMER_DB_HEADER_KEY::DB_HEADER[i]));
+  {
+    using namespace PERFORMER_DB_HEADER_KEY;
+    for (const auto& field: DB_HEADER) {
+      m_nameClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(field));
+    }
+    m_nameClauseCB->addItem(QString{R"(`%1`="")"}.arg(ENUM_2_STR(Ori)));
   }
-  m_otherClauseCB->addItem(QString{50, QChar{' '}});
 
   addWidget(m_nameClauseCB);
-  addWidget(m_otherClauseCB);
+  addSeparator();
+  addAction(g_castAct()._QUICK_WHERE_CLAUSE_CAST);
+  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -177,28 +192,29 @@ CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidg
   subscribe();
 }
 
+void CastDatabaseSearchToolBar::onQuickWhereClause() {
+  if (m_quickWhereClause == nullptr) {
+    m_quickWhereClause = new (std::nothrow) QuickWhereClause{this};
+    CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
+  }
+  auto retCode = m_quickWhereClause->exec();
+  if (retCode != QDialog::DialogCode::Accepted) {
+    LOG_INFO("User cancel quick where clause", "skip")
+    return;
+  }
+  const QString& whereClause {m_quickWhereClause->GetWhereString()};
+  qDebug("Quick where clause: [%s]", qPrintable(whereClause));
+  SetWhereClause(whereClause);
+  emit whereClauseChanged(whereClause);
+}
+
 void CastDatabaseSearchToolBar::subscribe() {
   connect(m_nameClauseCB->lineEdit(), &QLineEdit::returnPressed, this, &CastDatabaseSearchToolBar::Emit);
-  connect(m_otherClauseCB->lineEdit(), &QLineEdit::returnPressed, this, &CastDatabaseSearchToolBar::Emit);
+  connect(g_castAct()._QUICK_WHERE_CLAUSE_CAST, &QAction::triggered, this, &CastDatabaseSearchToolBar::onQuickWhereClause);
 }
 
 void CastDatabaseSearchToolBar::Emit() {
-  QStringList fullClauseList;
-  fullClauseList.reserve(2);
-  const QString& nameClause = m_nameClauseCB->currentText();
-  if (!nameClause.isEmpty()) {
-    fullClauseList.push_back(nameClause);
-  }
-  const QString& oriClause = m_otherClauseCB->currentText();
-  if (!oriClause.isEmpty()) {
-    fullClauseList.push_back(oriClause);
-  }
-  QString fullWhereClause;
-  if (!fullClauseList.isEmpty()) {
-    fullWhereClause += '(';
-    fullWhereClause += fullClauseList.join(R"() AND ()");
-    fullWhereClause += ')';
-  }
-  qDebug("Cast where[%s]", qPrintable(fullWhereClause));
-  emit whereClauseChanged(fullWhereClause);
+  const QString& clause = m_nameClauseCB->currentText();
+  qDebug("Cast where[%s]", qPrintable(clause));
+  emit whereClauseChanged(clause);
 }
