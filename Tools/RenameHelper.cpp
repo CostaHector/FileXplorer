@@ -27,7 +27,7 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldStr
   return replacedLst;
 }
 
-QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& suffixs, const QString& baseName, const int startInd, const QString& namePattern) {
+QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& suffixs, const QString& baseName, const int startInd, const QString& namePattern, bool bUniqueExtCounter) {
   if (replaceeList.isEmpty()) {
     return {};
   }
@@ -35,46 +35,59 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
     qWarning("namePattern[%s] must contain at least one '%%1'", qPrintable(namePattern));
     return {};
   }
-  QMap<QString, int> sufCntMap;
-  for (const QString& suf : suffixs) {
-    auto extIt = sufCntMap.find(suf);
-    if (extIt != sufCntMap.end()) {
-      ++extIt.value();
-    } else {
-      sufCntMap[suf] = 1;
-    }
-  }
-
-  QMap<QString, int> sufCurIndex;  // each extension no. start
-  QMap<QString, int> suf2fieldWidth;
-  for (auto ext2Cnt = sufCntMap.cbegin(); ext2Cnt != sufCntMap.cend(); ++ext2Cnt) {
-    if (ext2Cnt.value() <= 1) {
-      continue;
-    }
-    sufCurIndex[ext2Cnt.key()] = startInd;
-    int fieldWidth = 0;
-    int val = startInd + ext2Cnt.value() - 1;  // start 9, len 1, max index should be 9, not 10
+  QStringList numerizedNames;
+  numerizedNames.reserve(suffixs.size());
+  if (!bUniqueExtCounter) { // 不区分后缀, 统一计数
+    int fieldWidth{0};
+    int val = startInd + suffixs.size() - 1;  // start 9, len 1, max index should be 9, not 10
     while (val != 0) {
       val /= 10;
       ++fieldWidth;
     }
-    suf2fieldWidth[ext2Cnt.key()] = fieldWidth;
-  }
-
-  QStringList numerizedNames;
-  for (const QString& suf : suffixs) {
-    if (!sufCurIndex.contains(suf)) {  // no need to no. because this extension count <= 1
-      numerizedNames.append(baseName);
-      continue;
+    // 补充0到fieldWidth位
+    for (int i = 0; i < suffixs.size(); ++i) {
+      numerizedNames.append(baseName + namePattern.arg(i + startInd, fieldWidth, 10, QChar{'0'}));
     }
-    QString newBaseName = baseName;
-    if (!baseName.isEmpty()) {
+    return numerizedNames;
+  } else { // 区分后缀, 独立计数
+    QMap<QString, int> sufCntMap;
+    for (const QString& suf : suffixs) {
+      auto extIt = sufCntMap.find(suf);
+      if (extIt != sufCntMap.end()) {
+        ++extIt.value();
+      } else {
+        sufCntMap[suf] = 1;
+      }
+    }
+    QMap<QString, int> sufCurIndex;  // each extension no. start
+    QMap<QString, int> suf2fieldWidth;
+    for (auto ext2Cnt = sufCntMap.cbegin(); ext2Cnt != sufCntMap.cend(); ++ext2Cnt) {
+      if (ext2Cnt.value() <= 1) {
+        continue;
+      }
+      sufCurIndex[ext2Cnt.key()] = startInd;
+      int fieldWidth = 0;
+      int val = startInd + ext2Cnt.value() - 1;  // start 9, len 1, max index should be 9, not 10
+      while (val != 0) {
+        val /= 10;
+        ++fieldWidth;
+      }
+      suf2fieldWidth[ext2Cnt.key()] = fieldWidth;
+    }
+    for (const QString& suf : suffixs) {
+      if (!sufCurIndex.contains(suf)) {  // no need to no. because this extension count <= 1
+        numerizedNames.append(baseName);
+        continue;
+      }
+      QString newBaseName = baseName;
+      // if (!baseName.isEmpty()) {
       newBaseName += namePattern.arg(sufCurIndex[suf], suf2fieldWidth[suf], 10, QChar('0'));
+      // }
+      numerizedNames.append(newBaseName);
+      sufCurIndex[suf] += 1;
     }
-    numerizedNames.append(newBaseName);
-    sufCurIndex[suf] += 1;
+    return numerizedNames;
   }
-  return numerizedNames;
 }
 
 QStringList InsertRename(const QStringList& replaceeList, const QString& insertString, const int insertAt) {

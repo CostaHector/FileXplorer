@@ -22,8 +22,11 @@ QString ViewsStackedWidget::getRootPath() const {
     case ViewType::TREE:
     case ViewType::SEARCH:
     case ViewType::SCENE:
-    case ViewType::JSON:
+    case ViewType::JSON: {
       return m_fsModel->rootPath();
+    }
+    case ViewType::CAST:
+      return m_castDbModel->rootPath();
     default:
       qWarning("No rootpath in ViewType[%d]", int(vt));
       return "";
@@ -41,10 +44,12 @@ QString ViewsStackedWidget::getFilePath(const QModelIndex& ind) const {
       const auto srcIndex = m_searchProxyModel->mapToSource(ind);
       return m_searchSrcModel->filePath(srcIndex);
     }
+    case ViewType::MOVIE:
+      return m_movieDbModel->filePath(ind);
     case ViewType::SCENE:
       return m_scenesModel->filePath(ind);
-    case ViewType::MOVIE:
-      return m_dbModel->filePath(ind);
+    case ViewType::CAST:
+      return m_castDbModel->filePath(ind);
     case ViewType::JSON: {
       const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
       return m_jsonModel->filePath(srcIndex);
@@ -122,7 +127,7 @@ QStringList ViewsStackedWidget::getFileNames() const {
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        names.append(m_dbModel->fileName(ind));
+        names.append(m_movieDbModel->fileName(ind));
       }
       break;
     }
@@ -175,7 +180,7 @@ QStringList ViewsStackedWidget::getFullRecords() const {
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        fullRecords.append(m_dbModel->fullInfo(ind));
+        fullRecords.append(m_movieDbModel->fullInfo(ind));
       }
       break;
     }
@@ -231,7 +236,7 @@ QStringList ViewsStackedWidget::getFilePaths() const {
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        filePaths.append(m_dbModel->filePath(ind));
+        filePaths.append(m_movieDbModel->filePath(ind));
       }
       break;
     }
@@ -296,7 +301,7 @@ QStringList ViewsStackedWidget::getFilePrepaths() const {
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        prepaths.append(m_dbModel->absolutePath(ind));
+        prepaths.append(m_movieDbModel->absolutePath(ind));
       }
       break;
     }
@@ -358,7 +363,7 @@ QStringList ViewsStackedWidget::getTheJpgFolderPaths() const {
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        const QFileInfo dirFi = m_dbModel->fileInfo(ind);
+        const QFileInfo dirFi = m_movieDbModel->fileInfo(ind);
         const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
         prepaths.append(imagePath);
       }
@@ -444,7 +449,7 @@ std::pair<QStringList, QList<QUrl>> ViewsStackedWidget::getFilePathsAndUrls(cons
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        filePaths.append(m_dbModel->filePath(ind));
+        filePaths.append(m_movieDbModel->filePath(ind));
         urls.append(QUrl::fromLocalFile(filePaths.back()));
       }
       break;
@@ -509,8 +514,8 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        prepaths.append(m_dbModel->absolutePath(ind));
-        names.append(m_dbModel->fileName(ind));
+        prepaths.append(m_movieDbModel->absolutePath(ind));
+        names.append(m_movieDbModel->fileName(ind));
       }
       break;
     }
@@ -590,7 +595,7 @@ QString ViewsStackedWidget::getCurFilePath() const {
       return m_castTableView->filePath(m_castTableView->currentIndex());
     }
     case ViewType::MOVIE: {
-      return m_dbModel->filePath(m_movieView->currentIndex());
+      return m_movieDbModel->filePath(m_movieView->currentIndex());
     }
     case ViewType::JSON: {
       return m_jsonModel->filePath(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
@@ -619,7 +624,7 @@ QString ViewsStackedWidget::getCurFileName() const {
       return m_searchSrcModel->fileName(m_searchProxyModel->mapToSource(m_advanceSearchView->currentIndex()));
     }
     case ViewType::MOVIE: {
-      return m_dbModel->fileName(m_movieView->currentIndex());
+      return m_movieDbModel->fileName(m_movieView->currentIndex());
     }
     case ViewType::SCENE: {
       return m_scenesModel->fileName(m_sceneTableView->currentIndex());
@@ -652,7 +657,7 @@ QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind) const {
       return m_jsonModel->fileInfo(m_jsonProxyModel->mapToSource(ind));
     }
     case ViewType::MOVIE: {
-      return m_dbModel->fileInfo(ind);
+      return m_movieDbModel->fileInfo(ind);
     }
     default: {
       qWarning("No getFileInfo");

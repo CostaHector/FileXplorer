@@ -358,7 +358,7 @@ bool FileExplorerEvent::on_properties() const {
   if (_contentPane->GetVt() == ViewType::MOVIE) {
     pW = new PropertiesWindow(this->_contentPane);
     pW->show();
-    pW->operator()(_contentPane->m_dbModel, _contentPane->m_movieView);
+    pW->operator()(_contentPane->m_movieDbModel, _contentPane->m_movieView);
     return true;
   }
   qDebug("Reject. not support in view[%s]", qPrintable(_contentPane->GetCurViewName()));
@@ -658,21 +658,19 @@ bool FileExplorerEvent::on_revealInExplorer() const {
   QModelIndex curIndex = view->selectionModel()->currentIndex();
 
   QStringList args;
-  QString reveal_path;
   if (!curIndex.isValid()) {
     args << QDir::toNativeSeparators(_contentPane->getRootPath());
   } else {
-    const QFileInfo fi{_contentPane->getFilePath(curIndex)};
-    if (!fi.exists()) {
-      qWarning("Reveal path[%s] not exists", qPrintable(fi.absoluteFilePath()));
-      Notificator::warning("Reveal path[%1] not exists", fi.absoluteFilePath());
+    const QString absPth{_contentPane->getFilePath(curIndex)};
+    if (!QFile::exists(absPth)) {
+      Notificator::warning("Reveal path[%1] not exists", absPth);
       return false;
     }
 #ifdef _WIN32
     args << "/e,"
          << "/select,";
 #endif
-    args << QDir::toNativeSeparators(fi.absoluteFilePath());
+    args << PathTool::sysPath(absPth);
   }
   QProcess process;
 #ifdef _WIN32

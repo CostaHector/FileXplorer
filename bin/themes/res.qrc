@@ -62,6 +62,9 @@
 <file alias="SORTING_FILE_FOLDER">TopSideToolBarIcons/SORTING_FILE_FOLDER.png</file>
 <file alias="ASCENDING_ORDER">TopSideToolBarIcons/ASCENDING_ORDER.png</file>
 <file alias="DESCENDING_ORDER">TopSideToolBarIcons/DESCENDING_ORDER.png</file>
+<file alias="COLUMN_VISIBILITY">TopSideToolBarIcons/COLUMN_VISIBILITY.svg</file>
+<file alias="HIDE_THIS_COLUMN">TopSideToolBarIcons/HIDE_THIS_COLUMN.svg</file>
+<file alias="QUICK_MULTI_SELECT">TopSideToolBarIcons/QUICK_MULTI_SELECT.svg</file>
 
 <!--AddressControl icon here-->
 <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>
@@ -126,7 +129,7 @@
 <file alias="ARRANGE">FileOperation/ARRANGE.svg</file>
 
 <!--LeftSideToolBarIcons here-->
-<file alias="HOME">LeftSideToolBarIcons/HOME.png</file>
+<file alias="DISKS">LeftSideToolBarIcons/DISKS.svg</file>
 <file alias="FOLDER_OF_DESKTOP">LeftSideToolBarIcons/FOLDER_OF_DESKTOP.ico</file>
 <file alias="FOLDER_OF_DOCUMENTS">LeftSideToolBarIcons/FOLDER_OF_DOCUMENTS.ico</file>
 <file alias="FOLDER_OF_DOWNLOADS">LeftSideToolBarIcons/FOLDER_OF_DOWNLOADS.ico</file>
