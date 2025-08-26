@@ -3,12 +3,11 @@
 #include "MyTestSuite.h"
 // add necessary includes here
 #include "PerformersAkaManager.h"
-class QuickWhereClauseTest : public MyTestSuite {
+class PerformersAkaManagerTest : public MyTestSuite {
   Q_OBJECT
-
- public:
-  QuickWhereClauseTest() : MyTestSuite{false} {}
- private slots:
+public:
+  PerformersAkaManagerTest() : MyTestSuite{false} {}
+private slots:
   void test_SearchSpaceString() {
     PerformersAkaManager& dbTM{PerformersAkaManager::getIns()};
     const QString& sSpace = "  ";
@@ -60,11 +59,10 @@ class QuickWhereClauseTest : public MyTestSuite {
 
   void SearchSizeRelationExpression() {
     const QString& rangeStr = ">=10&<50|=99";
-    const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere("Duration", rangeStr, "%1%2");
-    QCOMPARE(whereClause, R"(((Duration>=10 AND Duration<50) OR Duration=99))");
+    const QString& whereClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere("Duration", rangeStr, PerformersAkaManager::OPEATOR_RELATION);
+    QCOMPARE(whereClause, R"(((`Duration`>=10 AND `Duration`<50) OR `Duration`=99))");
   }
-
 };
 
-QuickWhereClauseTest g_QuickWhereClauseTest;
-#include "QuickWhereClauseTest.moc"
+#include "PerformersAkaManagerTest.moc"
+PerformersAkaManagerTest g_PerformersAkaManagerTest;
