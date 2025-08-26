@@ -15,9 +15,9 @@ struct FsNodeEntry {
 bool CreateAFile(const QString& absFilePath, const QByteArray& contents = "");
 
 class TDir {
- public:
+public:
   TDir();
-
+  ~TDir() = default;
   operator QDir() const { return mDir; }
   bool IsValid() const { return mTempDir.isValid(); }
 
@@ -33,7 +33,8 @@ class TDir {
   QString path() const { return mTempPath; }
   QString itemPath(const QString& itemName) const { return mTempPath + '/' + itemName; }
 
- private:
+  void remove() { mTempDir.remove(); }
+private:
   QTemporaryDir mTempDir;
   QString mTempPath;
   QDir mDir;
