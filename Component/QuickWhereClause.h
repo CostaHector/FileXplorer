@@ -7,18 +7,18 @@
 #include <QFormLayout>
 
 class QuickWhereClause : public QDialog {
- public:
+public:
   explicit QuickWhereClause(QWidget* parent = nullptr);
 
-  QSize sizeHint() const override { return QSize(600, 200); }
+  QSize sizeHint() const override { return QSize{600, 200}; }
   virtual void accept() override;
 
   void onClauseSave();
   void onClauseChanged();
 
   QString GetWhereString() const { return m_whereLineEdit->text(); }
-
- private:
+  void subscribe();
+private:
   QLineEdit* m_Name{nullptr};
   QLineEdit* m_Size{nullptr};
   QLineEdit* m_Duration{nullptr};
@@ -26,9 +26,9 @@ class QuickWhereClause : public QDialog {
   QLineEdit* m_Cast{nullptr};
   QLineEdit* m_Tags{nullptr};
   QLineEdit* m_whereLineEdit{nullptr};
-  QDialogButtonBox* dbb{nullptr};
+  QDialogButtonBox* mDialogButtonBox{nullptr};
 
-  QFormLayout* lo{nullptr};
+  QFormLayout* m_Layout{nullptr};
   QStringList m_whereAndClause;
 };
 

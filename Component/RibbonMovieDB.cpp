@@ -34,6 +34,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_functionsTB->setOrientation(Qt::Orientation::Vertical);
   m_functionsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   m_functionsTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(m_functionsTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_studioTB = new (std::nothrow) QToolBar("Studio Edit Toolbar", this);
   CHECK_NULLPTR_RETURN_VOID(m_studioTB);

@@ -23,6 +23,7 @@ using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(SelectionPreviewer* previewFolder, QWidget* parent)
     : QStackedWidget(parent),  //
       mMovieDb{SystemPath::VIDS_DATABASE, "DBMOVIE_CONNECT"},
+      mCastDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"},
       _previewFolder{previewFolder},  //
       m_parent(parent)                //
 {
@@ -167,10 +168,7 @@ void ViewsStackedWidget::subscribe() {
 }
 
 void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
-  if (addressBar == nullptr) {
-    qWarning("Bind Navigation AddressBar failed. nullptr passed here");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(addressBar)
   _addressBar = addressBar;
   connect(_addressBar->m_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed,  //
           this,                                                                                        //
@@ -180,20 +178,19 @@ void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addre
   );
 }
 
-void ViewsStackedWidget::BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar) {
-  if (dbSearchBar == nullptr) {
-    qWarning("Bind DatabaseSearchToolBar failed. nullptr passed here");
-    return;
-  }
-  _dbSearchBar = dbSearchBar;
+void ViewsStackedWidget::BindDatabaseSearchToolBar(MovieDBSearchToolBar* dbSearchBar) {
+  CHECK_NULLPTR_RETURN_VOID(dbSearchBar)
+  _movieSearchBar = dbSearchBar;
 }
 
 void ViewsStackedWidget::BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar) {
-  if (advanceSearchBar == nullptr) {
-    qWarning("Bind AdvanceSearchToolBar failed. nullptr passed here");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(advanceSearchBar)
   _advanceSearchBar = advanceSearchBar;
+}
+
+void ViewsStackedWidget::BindCastSearchToolBar(CastDatabaseSearchToolBar* castSearchBar) {
+CHECK_NULLPTR_RETURN_VOID(castSearchBar)
+  _castSearchBar = castSearchBar;
 }
 
 void ViewsStackedWidget::BindLogger(CustomStatusBar* logger) {

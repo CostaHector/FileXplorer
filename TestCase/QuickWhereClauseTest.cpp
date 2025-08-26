@@ -13,7 +13,7 @@ class QuickWhereClauseTest : public MyTestSuite {
     PerformersAkaManager& dbTM{PerformersAkaManager::getIns()};
     const QString& sSpace = "  ";
     const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere("Name", sSpace);
-    QCOMPARE(whereClause, "Name like \"%  %\"");
+    QCOMPARE(whereClause, R"(INSTR(`Name`,"  ")>0)");
   }
 
   void test_SearchEmptyString() {
@@ -27,35 +27,35 @@ class QuickWhereClauseTest : public MyTestSuite {
     PerformersAkaManager& dbTM{PerformersAkaManager::getIns()};
     const QString& s1 = "(Ricky Martin)";
     const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere("Name", s1);
-    QCOMPARE(whereClause, "Name like \"%Ricky Martin%\"");
+    QCOMPARE(whereClause, R"(INSTR(`Name`,"Ricky Martin")>0)");
   }
 
   void SearchTwoPerfAAndB() {
     PerformersAkaManager& dbTM{PerformersAkaManager::getIns()};
     const QString& s2 = "Ricky Martin&Darin Zanyar";
     const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere("Name", s2);
-    QCOMPARE(whereClause, "(Name like \"%Ricky Martin%\" AND Name like \"%Darin Zanyar%\")");
+    QCOMPARE(whereClause, R"((INSTR(`Name`,"Ricky Martin")>0 AND INSTR(`Name`,"Darin Zanyar")>0))");
   }
 
   void SearchTwoPerfAOrB() {
     PerformersAkaManager& dbTM{PerformersAkaManager::getIns()};
     const QString& s2 = "Ricky Martin|Darin Zanyar";
     const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere("Name", s2);
-    QCOMPARE(whereClause, "(Name like \"%Ricky Martin%\" OR Name like \"%Darin Zanyar%\")");
+    QCOMPARE(whereClause, R"((INSTR(`Name`,"Ricky Martin")>0 OR INSTR(`Name`,"Darin Zanyar")>0))");
   }
 
   void SearchTwoPerfA1AkaA2OrB() {
     PerformersAkaManager& dbTM{PerformersAkaManager::getIns()};
     const QString& s2 = "(Ricky Martin|Ricky)&Darin Zanyar";
     const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere("Name", s2);
-    QCOMPARE(whereClause, "((Name like \"%Ricky Martin%\" OR Name like \"%Ricky%\") AND Name like \"%Darin Zanyar%\")");
+    QCOMPARE(whereClause, R"(((INSTR(`Name`,"Ricky Martin")>0 OR INSTR(`Name`,"Ricky")>0) AND INSTR(`Name`,"Darin Zanyar")>0))");
   }
 
   void SearchThreePerfsABC() {
     PerformersAkaManager& dbTM{PerformersAkaManager::getIns()};
     const QString& s3 = "A&B&C";
     const QString& whereClause = dbTM.PlainLogicSentence2FuzzySqlWhere("Name", s3);
-    QCOMPARE(whereClause, "((Name like \"%A%\" AND Name like \"%B%\") AND Name like \"%C%\")");
+    QCOMPARE(whereClause, R"(((INSTR(`Name`,"A")>0 AND INSTR(`Name`,"B")>0) AND INSTR(`Name`,"C")>0))");
   }
 
   void SearchSizeRelationExpression() {

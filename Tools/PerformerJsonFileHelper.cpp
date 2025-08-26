@@ -1,62 +1,47 @@
 #include "PerformerJsonFileHelper.h"
+#include "TableFields.h"
+#include "PublicMacro.h"
+#include <QSqlField>
 
-QVariantHash PerformerJsonFileHelper::PerformerJsonJoiner(const QSqlRecord& record) {
-  const QString& name = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
-  const int rates = record.field(PERFORMER_DB_HEADER_KEY::Rate_INDEX).value().toInt();
-  const QString& akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
-  const QString& tags = record.field(PERFORMER_DB_HEADER_KEY::Tags_INDEX).value().toString();
-  const QString& oris = record.field(PERFORMER_DB_HEADER_KEY::Orientation_INDEX).value().toString();
-  const QString& vids = record.field(PERFORMER_DB_HEADER_KEY::Vids_INDEX).value().toString();
-  const QString& imgs = record.field(PERFORMER_DB_HEADER_KEY::Imgs_INDEX).value().toString();
-  const QString& details = record.field(PERFORMER_DB_HEADER_KEY::Detail_INDEX).value().toString();
-  return PerformerJsonFileHelper::PerformerJsonJoiner(name, rates, akas, tags, oris, vids, imgs, details);
+constexpr int PerformerJsonFileHelper::DEFAULT_RATE;
+const QString PerformerJsonFileHelper::DEFAULT_ORIENTATION{"gay"};
+
+QString PerformerJsonFileHelper::PsonPath(const QString& imageHostPath, const QVariantHash& pson) {
+  using namespace PERFORMER_DB_HEADER_KEY;
+  return PsonPath(imageHostPath, pson[ENUM_2_STR(Ori)].toString(), pson[ENUM_2_STR(Name)].toString());
 }
 
-QString PerformerJsonFileHelper::PerformerInsertSQL(const QString& tableName,
-                                                    const QString& name,
-                                                    const int rate,
-                                                    const QString& aka,
-                                                    const QString& tags,
-                                                    const QString& ori,
-                                                    const QString& vids,
-                                                    const QString& imgs,
-                                                    QString detail) {
-  if (name.isEmpty()) {
-    qDebug("main key cannot be null.");
-    return "";
-  }
+QVariantHash PerformerJsonFileHelper::PerformerJsonJoiner(const QSqlRecord& record) {
+  using namespace PERFORMER_DB_HEADER_KEY;
+  const QString& name =   record.field(Name).value().toString();
+  const int rate =        record.field(Rate).value().toInt();
+  const QString& aka =    record.field(AKA).value().toString();
+  const QString& tags =   record.field(Tags).value().toString();
+  const QString& ori =    record.field(Ori).value().toString();
+  const QString& vids =   record.field(Vids).value().toString();
+  const QString& imgs =   record.field(Imgs).value().toString();
+  const QString& detail = record.field(Detail).value().toString();
+  return PerformerJsonFileHelper::PerformerJsonJoiner(name, rate, aka, tags, ori, vids, imgs, detail);
+}
 
-  QStringList updateKey{PERFORMER_DB_HEADER_KEY::Name};
-  QStringList updateValue;
-  updateValue << "\"" + name + "\"";
-  if (rate != PERFORMER_DB_HEADER_KEY::DEFAULT_RATE) {
-    updateKey << PERFORMER_DB_HEADER_KEY::Rate;
-    updateValue << QString::number(rate);
-  }
-  if (not aka.isEmpty()) {
-    updateKey << PERFORMER_DB_HEADER_KEY::AKA;
-    updateValue << "\"" + aka + "\"";
-  }
-  if (not tags.isEmpty()) {
-    updateKey << PERFORMER_DB_HEADER_KEY::Tags;
-    updateValue << "\"" + tags + "\"";
-  }
-  if (not ori.isEmpty()) {
-    updateKey << PERFORMER_DB_HEADER_KEY::Orientation;
-    updateValue << "\"" + ori + "\"";
-  }
-  if (not vids.isEmpty()) {
-    updateKey << PERFORMER_DB_HEADER_KEY::Vids;
-    updateValue << "\"" + vids + "\"";
-  }
-  if (not imgs.isEmpty()) {
-    updateKey << PERFORMER_DB_HEADER_KEY::Imgs;
-    updateValue << "\"" + imgs + "\"";
-  }
-  if (not detail.isEmpty()) {
-    updateKey << PERFORMER_DB_HEADER_KEY::Detail;
-    updateValue << '\"' + detail.replace('"', "\"\"") + '\"';
-  }
-
-  return QString{"REPLACE INTO `%1` (%2) VALUES(%3);"}.arg(tableName).arg(updateKey.join(',')).arg(updateValue.join(','));
+QVariantHash PerformerJsonFileHelper::PerformerJsonJoiner(//
+    const QString& name,
+    const int rate,
+    const QString& aka,
+    const QString& tags,
+    const QString& ori,
+    const QString& vids,
+    const QString& imgs,
+    const QString& detail) {
+  using namespace PERFORMER_DB_HEADER_KEY;
+  return {
+      {ENUM_2_STR(Name), name}, //
+      {ENUM_2_STR(Rate), rate}, //
+      {ENUM_2_STR(AKA), aka}, //
+      {ENUM_2_STR(Tags), tags}, //
+      {ENUM_2_STR(Ori), ori}, //
+      {ENUM_2_STR(Vids), vids}, //
+      {ENUM_2_STR(Imgs), imgs}, //
+      {ENUM_2_STR(Detail), detail} //
+  };
 }

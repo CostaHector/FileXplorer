@@ -38,8 +38,9 @@ class ViewsStackedWidget : public QStackedWidget {
 
   void subscribe();
   void BindNavigationAddressBar(NavigationAndAddressBar* addressBar);
-  void BindDatabaseSearchToolBar(DatabaseSearchToolBar* dbSearchBar);
+  void BindDatabaseSearchToolBar(MovieDBSearchToolBar* dbSearchBar);
   void BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar);
+  void BindCastSearchToolBar(CastDatabaseSearchToolBar* castSearchBar);
   void BindLogger(CustomStatusBar* logger);
 
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex);
@@ -95,9 +96,9 @@ class ViewsStackedWidget : public QStackedWidget {
   FileSystemListView* m_fsListView{nullptr};
   FileSystemTreeView* m_fsTreeView{nullptr};
 
-  DatabaseSearchToolBar* _dbSearchBar{nullptr};
+  MovieDBSearchToolBar* _movieSearchBar{nullptr};
   FdBasedDb mMovieDb;
-  FdBasedDbModel* m_dbModel{nullptr};
+  FdBasedDbModel* m_movieDbModel{nullptr};
   MovieDBView* m_movieView{nullptr};
 
   AdvanceSearchToolBar* _advanceSearchBar{nullptr};
@@ -108,6 +109,9 @@ class ViewsStackedWidget : public QStackedWidget {
   ScenesListModel* m_scenesModel{nullptr};
   SceneListView* m_sceneTableView{nullptr};
 
+  CastDatabaseSearchToolBar* _castSearchBar{nullptr}; // Only for F3 to get focus
+  CastBaseDb mCastDb;
+  CastDbModel* m_castDbModel{nullptr};
   CastDBView* m_castTableView{nullptr};
 
   JsonProxyModel* m_jsonProxyModel{nullptr};

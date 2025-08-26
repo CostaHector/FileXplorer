@@ -19,7 +19,7 @@ CastDBActions::CastDBActions(QObject* parent)  //
   APPEND_FROM_PSON_FILES = new (std::nothrow) QAction{"Append from pson files", this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_PSON_FILES);
   APPEND_FROM_PSON_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>Append casts records from *.pson files under ${ImageHost}. Override if primary key conflict")
-                                         .arg(APPEND_FROM_PSON_FILES->text(), APPEND_FROM_PSON_FILES->shortcut().toString()));
+    .arg(APPEND_FROM_PSON_FILES->text(), APPEND_FROM_PSON_FILES->shortcut().toString()));
   APPEND_FROM_FILE_SYSTEM_STRUCTURE = new (std::nothrow) QAction{"Append from file-system structure", this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_FILE_SYSTEM_STRUCTURE);
   APPEND_FROM_FILE_SYSTEM_STRUCTURE->setToolTip("Append casts records from file-system structure under ${ImageHost}");
@@ -46,7 +46,7 @@ CastDBActions::CastDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setShortcut(QKeySequence(Qt::Key::Key_F5));
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setToolTip(QString{"<b>%1 (%2)</b><br/> Sync selected record(s) Imgs field from disk"}//
-                                                       .arg(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->text(), SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->shortcut().toString()));
+    .arg(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->text(), SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->shortcut().toString()));
   SYNC_ALL_RECORDS_IMGS_FROM_DISK = new (std::nothrow) QAction{"Sync all imgs field", this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_ALL_RECORDS_IMGS_FROM_DISK);
   SYNC_ALL_RECORDS_IMGS_FROM_DISK->setToolTip("Sync all record(s) Imgs field from disk");
@@ -70,7 +70,7 @@ CastDBActions::CastDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(OPEN_RECORD_IN_FILE_SYSTEM);
   OPEN_RECORD_IN_FILE_SYSTEM->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   OPEN_RECORD_IN_FILE_SYSTEM->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal selected cast location in system file explorer")
-                                             .arg(OPEN_RECORD_IN_FILE_SYSTEM->text(), OPEN_RECORD_IN_FILE_SYSTEM->shortcut().toString()));
+    .arg(OPEN_RECORD_IN_FILE_SYSTEM->text(), OPEN_RECORD_IN_FILE_SYSTEM->shortcut().toString()));
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "Open Database", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
@@ -84,7 +84,7 @@ CastDBActions::CastDBActions(QObject* parent)  //
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{QIcon{":img/DUMP_INTO_PSON_FILE"}, "Dump records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_S));
-  DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setToolTip(QString{"Dump selected records to its pson file"}//
+  DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setToolTip(QString{"<b>%1 (%2)</b><br/> Dump selected records to its pson file"}//
     .arg(DUMP_SELECTED_RECORDS_INTO_PSON_FILE->text(), DUMP_SELECTED_RECORDS_INTO_PSON_FILE->shortcut().toString()));
   DUMP_ALL_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{"Dump all records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_ALL_RECORDS_INTO_PSON_FILE);

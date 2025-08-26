@@ -119,7 +119,7 @@ void FileXplorer::InitComponentVisibility() {
 
 void FileXplorer::subscribe() {
   auto& vA = g_viewActions();
-  connect(vA.NAVIGATION_PANE, &QAction::triggered, this, [this](const bool checked) {
+  connect(vA.NAVIGATION_PANE, &QAction::toggled, this, [this](const bool checked) {
     Configuration().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
     m_navigationToolBar->setVisible(checked);
   });
@@ -148,14 +148,37 @@ void FileXplorer::keyPressEvent(QKeyEvent* ev) {
   switch (ev->key()) {
     case Qt::Key_F3: {  // F3 Search
       const auto viewType = m_fsPanel->GetVt();
-      if (ViewTypeTool::IsUseFileSystemSearchBar(viewType)) {  // for filesytem view
-        if (m_fsPanel->_addressBar != nullptr) {
-          m_fsPanel->_addressBar->onGetFocus();
+      switch (viewType) {
+        case ViewTypeTool::ViewType::LIST:
+        case ViewTypeTool::ViewType::TABLE:
+        case ViewTypeTool::ViewType::TREE:
+        case ViewTypeTool::ViewType::SCENE:
+        case ViewTypeTool::ViewType::JSON: {
+          if (m_fsPanel->_addressBar != nullptr) {
+            m_fsPanel->_addressBar->onGetFocus();
+          }
+          break;
         }
-      } else if (viewType == ViewTypeTool::ViewType::SEARCH) {
-        if (m_fsPanel->_advanceSearchBar != nullptr) {
-          m_fsPanel->_advanceSearchBar->onGetFocus();
+        case ViewTypeTool::ViewType::SEARCH:{
+          if (m_fsPanel->_advanceSearchBar != nullptr) {
+            m_fsPanel->_advanceSearchBar->onGetFocus();
+          }
+          break;
         }
+        case ViewTypeTool::ViewType::MOVIE:{
+          if (m_fsPanel->_movieSearchBar != nullptr) {
+            m_fsPanel->_movieSearchBar->onGetFocus();
+          }
+          break;
+        }
+        case ViewTypeTool::ViewType::CAST:{
+          if (m_fsPanel->_castSearchBar != nullptr) {
+            m_fsPanel->_castSearchBar->onGetFocus();
+          }
+          break;
+        }
+        default:
+          break;
       }
       return;
     }

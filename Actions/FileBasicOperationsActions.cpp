@@ -343,7 +343,7 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
   FileOperatorType::InitReturnErrorCodeUponAnyFailureSw();
   const bool bFastFail = FileOperatorType::IsReturnErrorCodeUponAnyFailureSw();
   _RETURN_ERROR_CODE_UPON_ANY_FAILURE->setChecked(bFastFail);
-  connect(_RETURN_ERROR_CODE_UPON_ANY_FAILURE, &QAction::triggered, &FileOperatorType::SetReturnErrorCodeUponAnyFailureSw);
+  connect(_RETURN_ERROR_CODE_UPON_ANY_FAILURE, &QAction::toggled, &FileOperatorType::SetReturnErrorCodeUponAnyFailureSw);
 }
 
 QActionGroup* FileBasicOperationsActions::FileStructureActions() {

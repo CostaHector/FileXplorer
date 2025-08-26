@@ -2,15 +2,20 @@
 #define CASTDBVIEW_H
 
 #include "CastBaseDb.h"
+#include "CastDbModel.h"
 #include "CustomTableView.h"
-#include <QSqlTableModel>
+#include "DatabaseSearchToolBar.h"
 #include <QToolBar>
 #include <QLineEdit>
 class FileFolderPreviewer;
 
 class CastDBView : public CustomTableView {
 public:
-  explicit CastDBView(QLineEdit* perfSearchLE, FileFolderPreviewer* floatingPreview, QWidget* parent = nullptr);
+  explicit CastDBView(CastDbModel* castDbModel_,
+                      CastDatabaseSearchToolBar* castDbSearchBar_,
+                      FileFolderPreviewer* floatingPreview_,
+                      CastBaseDb& castDb_,
+                      QWidget* parent = nullptr);
   void subscribe();
   QString filePath(const QModelIndex& index) const;
 
@@ -42,15 +47,14 @@ private:
   int onForceRefreshRecordsVids();
 
 private:
-  static QString GetImageHostPath();
   void RefreshHtmlContents();
 
-
-  QLineEdit* m_perfSearch{nullptr};
-  QSqlTableModel* m_castModel{nullptr};
+  CastDatabaseSearchToolBar* _castDbSearchBar{nullptr};
+  CastDbModel* _castModel{nullptr};
   FileFolderPreviewer* _floatingPreview{nullptr};
 
-  CastBaseDb mDb;
+  const QString mImageHost;
+  CastBaseDb& _castDb;
 };
 
 #endif  // CASTDBVIEW_H

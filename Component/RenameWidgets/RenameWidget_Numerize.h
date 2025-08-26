@@ -7,7 +7,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
  public:
   explicit RenameWidget_Numerize(QWidget* parent = nullptr);
 
-  auto InitExtraMemberWidget() -> void override;
+  void InitExtraMemberWidget() override;
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;
@@ -15,6 +15,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
 
  private:
   QLineEdit* m_startNo{nullptr};
+  QCheckBox* m_isUniqueCounterPerExtension{nullptr};
   QComboBox* m_numberPattern{nullptr};
   QLineEdit* m_completeBaseName{nullptr};
   bool m_baseNameInited = false;
