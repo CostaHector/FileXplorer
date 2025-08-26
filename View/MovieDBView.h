@@ -11,9 +11,9 @@
 #include "JsonKey.h"
 
 class MovieDBView : public CustomTableView {
- public:
+public:
   MovieDBView(FdBasedDbModel* model_,              //
-              DatabaseSearchToolBar* dbSearchBar,  //
+              MovieDBSearchToolBar* dbSearchBar,  //
               FdBasedDb& movieDb_,                 //
               QWidget* parent = nullptr);
 
@@ -41,37 +41,20 @@ class MovieDBView : public CustomTableView {
   bool onQuickWhereClause();
   int onCountRow();
 
-  QString GetMovieTableName() const {  // Table Name
-    if (_tablesDropDownList == nullptr) {
-      qWarning("_tablesDropDownList is nullptr");
-      return "";
-    }
-    return _tablesDropDownList->CurrentTableName();
-  }
-  QString GetMovieTableRootPath() const {  // Peer Path
-    if (_tablesDropDownList == nullptr) {
-      qWarning("_tablesDropDownList is nullptr");
-      return "";
-    }
-    return _tablesDropDownList->CurrentRootPath();
-  }
-
   int onSetStudio();
   int onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode);
 
   // should not call ~destructure after getDb() and pass to QSqlTableModel
- private:
+private:
   bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected);
   bool IsHasSelection(const QString& msg = "") const;
 
   FdBasedDbModel* _dbModel{nullptr};
   MovieDatabaseMenu* m_movieMenu{nullptr};
-  Guid2RootPathComboxBox* _tablesDropDownList{nullptr};
-  QLineEdit* _searchWhereLineEdit{nullptr};
-  QComboBox* _searchCB{nullptr};
+  MovieDBSearchToolBar* _movieDbSearchBar{nullptr};
 
   QuickWhereClause* m_quickWhereClause{nullptr};
-  FdBasedDb& mDb;
+  FdBasedDb& _fdBasedDb;
 
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];

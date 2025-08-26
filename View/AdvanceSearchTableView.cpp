@@ -17,6 +17,10 @@ AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, 
   setSortingEnabled(true);
 
   subscribe();
+
+  setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
   InitTableView();
 }
 

@@ -83,7 +83,24 @@ private slots:
     QVERIFY(ReplaceRename({}, "A", "B", false).isEmpty());
   }
 
-  void test_NumerizeReplace_with_extension_startIndx_0_ok() {
+  void test_NumerizeReplace_with_extension_startIndx_0_CommonExtCounter_ok() {
+    QStringList replaceeList;
+    replaceeList << "A"
+                 << "A";
+    QStringList suffixs;
+    suffixs << ".jpeg"
+            << ".jpg";
+    QStringList expectList; // 不同后缀共用同一个计数器, 序号也是唯一的
+    expectList << "B (0)"
+               << "B (1)";
+    const QString baseName{"B"};
+    const int startInd{0};
+    const QString namePattern{" (%1)"};
+    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern, false);
+    QCOMPARE(ansLst, expectList);
+  }
+
+  void test_NumerizeReplace_with_extension_startIndx_0_uniqueExtCounter_ok() {
     QStringList replaceeList;
     replaceeList << "la - hello world"
                  << "la - hello world 2"
@@ -96,7 +113,7 @@ private slots:
             << ".mp4"
             << ".json"
             << ".jpeg";
-    QStringList expectList;
+    QStringList expectList; // 不同后缀用不同计数器, 序号可以重复
     expectList << "LosAngle - hello world (0)"
                << "LosAngle - hello world (1)"
                << "LosAngle - hello world (2)"
@@ -105,11 +122,11 @@ private slots:
     const QString& baseName{"LosAngle - hello world"};
     const int startInd{0};
     const QString& namePattern{" (%1)"};
-    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern, true);
     QCOMPARE(ansLst, expectList);
   }
 
-  void test_NumerizeReplace_startIndx_99_filled_with_0_ok() {
+  void test_NumerizeReplace_startIndx_99_filled_with_0_uniqueExtCounter_ok() {
     QStringList replaceeList;
     replaceeList << "la - hello world 99"
                  << "la - hello world 10"
@@ -128,7 +145,7 @@ private slots:
     const QString& baseName{"LosAngle - hello world"};
     const int startInd{99};
     const QString& namePattern{" %1"};
-    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern, true);
     QCOMPARE(ansLst, expectList);
   }
 

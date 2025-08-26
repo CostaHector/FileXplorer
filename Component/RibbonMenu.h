@@ -12,7 +12,7 @@ class RibbonMenu : public QTabWidget {
   QToolBar* LeafFile() const;
   QToolBar* LeafHome() const;
   QToolBar* LeafView() const;
-  QToolBar* LeafDatabase() const;
+  QToolBar* LeafMovie() const;
   QToolBar* LeafCast() const;
   QToolBar* LeafJson() const;
   QToolBar* LeafScenesTools() const;
@@ -29,7 +29,7 @@ class RibbonMenu : public QTabWidget {
   QToolBar* m_leafFile{nullptr};
   QToolBar* m_leafHome{nullptr};
   QToolBar* m_leafView{nullptr};
-  QToolBar* m_leafDatabase{nullptr};
+  QToolBar* m_leafMovie{nullptr};
   QToolBar* m_leafCast{nullptr};
   QToolBar* m_leafJson{nullptr};
   QToolBar* m_leafScenes{nullptr};

@@ -4,7 +4,6 @@
 #include <QFileInfo>
 #include <QSqlTableModel>
 #include <QDir>
-#include "TableFields.h"
 
 class FdBasedDbModel : public QSqlTableModel {
 public:
@@ -13,17 +12,14 @@ public:
   void setTable(const QString& tableName) override;
 
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
-
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-    if (orientation == Qt::Vertical) {
-      if (role == Qt::TextAlignmentRole) {
-        return Qt::AlignRight;
-      }
+    if (orientation == Qt::Vertical && role == Qt::TextAlignmentRole) {
+      return Qt::AlignRight;
     }
     return QSqlTableModel::headerData(section, orientation, role);
   }
 
-  QDir rootDirectory(const QString& /*placeHolder*/ = "") const { return QDir(rootPath()); }
+  QDir rootDirectory(const QString& /*placeHolder*/ = "") const { return QDir{rootPath()}; }
 
   QString rootPath(const QString& /*placeHolder*/ = "") const { return m_rootPath; }
 
@@ -31,10 +27,7 @@ public:
 
   QString absolutePath(const QModelIndex& curIndex) const;
 
-  QString fileName(const QModelIndex& curIndex) const {
-    const QModelIndex& nameIndex = curIndex.siblingAtColumn(MOVIE_TABLE::Name);
-    return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
-  }
+  QString fileName(const QModelIndex& curIndex) const;
 
   QString filePath(const QModelIndex& curIndex) const {  //
     return QDir{absolutePath(curIndex)}.absoluteFilePath(fileName(curIndex));
@@ -44,13 +37,7 @@ public:
     return QFileInfo{filePath(curIndex)};
   }
 
-  QString fullInfo(const QModelIndex& curIndex) const {
-    return data(curIndex.siblingAtColumn(MOVIE_TABLE::Name)).toString()    //
-        + '\t'                                                          //
-        + data(curIndex.siblingAtColumn(MOVIE_TABLE::Size)).toString()  //
-        + '\t'                                                          //
-        + data(curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight)).toString();
-  }
+  QString fullInfo(const QModelIndex& curIndex) const;
 
   void SetStudio(const QModelIndexList& tagColIndexes, const QString& studio);
   void SetCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence);

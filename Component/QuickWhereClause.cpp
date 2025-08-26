@@ -19,58 +19,48 @@
 #include "StyleSheet.h"
 
 QuickWhereClause::QuickWhereClause(QWidget* parent) : QDialog{parent} {
-  m_Name = new QLineEdit;
-  m_Size = new QLineEdit;
-  m_Duration = new QLineEdit;
-  m_Studio = new QLineEdit;
-  m_Cast = new QLineEdit;
-  m_Tags = new QLineEdit;
-  m_whereLineEdit = new QLineEdit;
-
+  m_Name = new (std::nothrow) QLineEdit{this};
   m_Name->setPlaceholderText("Henry Cavill&Chris Evans");
   m_Name->setToolTip(                      //
       "A: search 1 person\n"               //
       "A & B: search 2 person BOTH\n"      //
       "A1 | A2: search 2 person EITHER\n"  //
       "(A1|A2)&B: search 2 person BOTH(One person also known as A2)");
+
+  m_Size = new (std::nothrow) QLineEdit{this};
   m_Size->setPlaceholderText(">1000000000&<1500000000");
+
+  m_Duration = new (std::nothrow) QLineEdit{this};
   m_Duration->setPlaceholderText(">6000");                    // 6s
+  m_Duration->setToolTip("unit: ms");
+
+  m_Studio = new (std::nothrow) QLineEdit{this};
   m_Studio->setPlaceholderText(R"(Fox|Hong Meng)");           //
+
+  m_Cast = new (std::nothrow) QLineEdit{this};
   m_Cast->setPlaceholderText(R"(Henry Cavill&Chris Evans)");  //
+
+  m_Tags = new (std::nothrow) QLineEdit{this};
   m_Tags->setPlaceholderText(R"(Comedy|Documentary)");        //
 
-  dbb = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
-  dbb->button(QDialogButtonBox::StandardButton::Ok)->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
+  m_whereLineEdit = new (std::nothrow) QLineEdit{this};
+
+  mDialogButtonBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
+  mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok)->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
 
   using namespace MOVIE_TABLE;
-  QFormLayout* lo = new QFormLayout(this);
-  lo->addRow(g_quickWhereAg().m_whereClauseTB);
-  lo->addRow(ENUM_2_STR(Name), m_Name);  // (Ricky Martin|Ricky)&Adam Lambert
-  lo->addRow(ENUM_2_STR(Size), m_Size);
-  lo->addRow(ENUM_2_STR(Duration), m_Duration);
-  lo->addRow(ENUM_2_STR(Studio), m_Studio);
-  lo->addRow(ENUM_2_STR(Cast), m_Cast);
-  lo->addRow(ENUM_2_STR(Tags), m_Tags);
-  lo->addRow(m_whereLineEdit);
-  lo->addWidget(dbb);
+  m_Layout = new (std::nothrow) QFormLayout{this};
+  m_Layout->addRow(g_quickWhereAg().m_whereClauseTB);
+  m_Layout->addRow(ENUM_2_STR(Name), m_Name);  // (Ricky Martin|Ricky)&Adam Lambert
+  m_Layout->addRow(ENUM_2_STR(Size), m_Size);
+  m_Layout->addRow(ENUM_2_STR(Duration), m_Duration);
+  m_Layout->addRow(ENUM_2_STR(Studio), m_Studio);
+  m_Layout->addRow(ENUM_2_STR(Cast), m_Cast);
+  m_Layout->addRow(ENUM_2_STR(Tags), m_Tags);
+  m_Layout->addRow(m_whereLineEdit);
+  m_Layout->addRow(mDialogButtonBox);
 
-  connect(m_Name, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
-  connect(m_Size, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
-  connect(m_Duration, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
-  connect(m_Studio, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
-  connect(m_Cast, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
-  connect(m_Tags, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
-
-  connect(dbb->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QuickWhereClause::accept);
-  connect(dbb->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &QDialog::reject);
-  connect(g_quickWhereAg().SAVE_WHERE, &QAction::triggered, this, &QuickWhereClause::onClauseSave);
-  connect(g_quickWhereAg().HIST_WHERE, &QToolButton::triggered, this, [this](QAction* act) {  //
-    m_whereLineEdit->setText(act->text());
-  });
-  connect(g_quickWhereAg().APPLY_AND_CLOSE, &QAction::triggered, this, [this]() {
-    dbb->setFocus();
-    accept();
-  });
+  subscribe();
 
   setWindowIcon(g_dbAct().QUICK_WHERE_CLAUSE->icon());
   setWindowTitle(g_dbAct().QUICK_WHERE_CLAUSE->text());
@@ -125,10 +115,30 @@ void QuickWhereClause::onClauseChanged() {
 }
 
 void QuickWhereClause::accept() {
-  if (not dbb->hasFocus()) {
+  if (not mDialogButtonBox->hasFocus()) {
     return;
   }
   QDialog::accept();
+}
+
+void QuickWhereClause::subscribe() {
+  connect(m_Name, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
+  connect(m_Size, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
+  connect(m_Duration, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
+  connect(m_Studio, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
+  connect(m_Cast, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
+  connect(m_Tags, &QLineEdit::returnPressed, this, &QuickWhereClause::onClauseChanged);
+
+  connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QuickWhereClause::accept);
+  connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &QDialog::reject);
+
+  auto& quickWhereInst =g_quickWhereAg();
+  connect(quickWhereInst.SAVE_WHERE, &QAction::triggered, this, &QuickWhereClause::onClauseSave);
+  connect(quickWhereInst.HIST_WHERE, &QToolButton::triggered, this, [this](QAction* act) { m_whereLineEdit->setText(act->text()); });
+  connect(quickWhereInst.APPLY_AND_CLOSE, &QAction::triggered, this, [this]() {
+    mDialogButtonBox->setFocus();
+    accept();
+  });
 }
 
 //#define __NAME__EQ__MAIN__ 1

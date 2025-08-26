@@ -6,13 +6,14 @@
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "StringTool.h"
+#include <QSqlField>
 #include <QTextStream>
 #include <QFile>
 
 const QHash<QChar, QString> PerformersAkaManager::op2Str = {{'&', "AND"}, {'|', "OR"}};
 constexpr char PerformersAkaManager::LOGIC_OR_CHAR;
 constexpr char PerformersAkaManager::LOGIC_AND_CHAR;
-const QString PerformersAkaManager::FUZZY_LIKE{R"(%1 like "%%2%")"};
+const QString PerformersAkaManager::FUZZY_LIKE{R"(INSTR(`%1`,"%2")>0)"}; // %1 like "%%2%"
 
 PerformersAkaManager& PerformersAkaManager::getIns() {
   static PerformersAkaManager ins;
@@ -139,8 +140,9 @@ void PerformersAkaManager::OperatorJoinOperands(QStack<QString>& values, QStack<
 }
 
 QString PerformersAkaManager::GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const {
-  QString perfs = record.field(PERFORMER_DB_HEADER_KEY::Name_INDEX).value().toString();
-  QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA_INDEX).value().toString();
+  // here QSqlRecord is from model directly. so all fields contained
+  QString perfs = record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString();
+  QString akas = record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString();
   if (!akas.isEmpty()) {
     perfs += LOGIC_OR_CHAR;
     perfs += akas.replace(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
