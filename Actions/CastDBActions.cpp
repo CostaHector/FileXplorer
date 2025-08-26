@@ -42,6 +42,12 @@ CastDBActions::CastDBActions(QObject* parent)  //
   BASIC_TABLE_OP->addAction(DELETE_TABLE);
   BASIC_TABLE_OP->addAction(DROP_TABLE);
 
+  _QUICK_WHERE_CLAUSE_CAST = new (std::nothrow) QAction(QIcon(":img/FILE_SYSTEM_FILTER"), "Where clause", this);
+  CHECK_NULLPTR_RETURN_VOID(_QUICK_WHERE_CLAUSE_CAST);
+  _QUICK_WHERE_CLAUSE_CAST->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_H));
+  _QUICK_WHERE_CLAUSE_CAST->setToolTip(QString{"<b>%1 (%2)</b><br/> Construct where clause quickly for `CAST` table;"}
+    .arg(_QUICK_WHERE_CLAUSE_CAST->text(), _QUICK_WHERE_CLAUSE_CAST->shortcut().toString()));
+
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK = new (std::nothrow) QAction{QIcon{":img/SYNC_FROM_DISK"}, "Sync imgs field", this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setShortcut(QKeySequence(Qt::Key::Key_F5));

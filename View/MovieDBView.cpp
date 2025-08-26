@@ -34,8 +34,6 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,               //
   CHECK_NULLPTR_RETURN_VOID(m_movieMenu)
   BindMenu(m_movieMenu);
 
-  m_quickWhereClause = new (std::nothrow) QuickWhereClause{this};
-  CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
   setModel(_dbModel);
 
   setEditTriggers(QAbstractItemView::EditKeyPressed);  // only F2 works.
@@ -65,8 +63,6 @@ void MovieDBView::subscribe() {
   connect(inst.READ_DURATION_BY_VIDEO, &QAction::triggered, this, &MovieDBView::onSetDurationByVideo);
   connect(inst.EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON, &QAction::triggered, this, &MovieDBView::onExportToJson);
   connect(inst.UPDATE_STUDIO_CAST_TAGS_BY_JSON, &QAction::triggered, this, &MovieDBView::onUpdateByJson);
-  // assistance actions
-  connect(inst.QUICK_WHERE_CLAUSE, &QAction::triggered, this, &MovieDBView::onQuickWhereClause);
   // common function actions
   connect(inst._COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
   connect(inst._OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_fdBasedDb, &DbManager::ShowInFileSystemView);
@@ -323,18 +319,6 @@ bool MovieDBView::onDeleteFromTable() {
   const QString affectedRowsMsg {QString{"%1 record(s) affected"}.arg(affectedRows)};
   LOG_GOOD(deleteCmd, affectedRowsMsg);
   _dbModel->submitAll();
-  return true;
-}
-
-bool MovieDBView::onQuickWhereClause() {
-  auto retCode = m_quickWhereClause->exec();
-  if (retCode != QDialog::DialogCode::Accepted) {
-    return false;
-  }
-  const QString& whereClause {m_quickWhereClause->GetWhereString()};
-  qDebug("Quick where clause: [%s]", qPrintable(whereClause));
-  _movieDbSearchBar->SetWhereClause(whereClause);
-  emit _movieDbSearchBar->whereClauseChanged(whereClause);
   return true;
 }
 

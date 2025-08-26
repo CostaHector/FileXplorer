@@ -4,6 +4,7 @@
 #include <QToolBar>
 #include <QComboBox>
 #include <QLineEdit>
+#include "QuickWhereClause.h"
 
 // GUID_IN_UNDERSCORE | ROOTPATH
 class Guid2RootPathComboxBox : public QComboBox {
@@ -45,9 +46,12 @@ signals:
   void movieTableChanged(const QString& newTable);
   void whereClauseChanged(const QString& whereClause);
 private:
+  void onQuickWhereClause();
+
   void subscribe();
   QComboBox* m_searchCB{nullptr};
   Guid2RootPathComboxBox* m_tablesCB{nullptr};
+  QuickWhereClause* m_quickWhereClause{nullptr};
 };
 
 class CastDatabaseSearchToolBar : public QToolBar {
@@ -58,12 +62,17 @@ public:
     m_nameClauseCB->setFocus();
     m_nameClauseCB->lineEdit()->selectAll();
   }
+  inline void SetWhereClause(const QString& newWhereClause) {
+    m_nameClauseCB->setCurrentText(newWhereClause);
+  }
 signals:
   void whereClauseChanged(const QString& whereClause);
 private:
+  void onQuickWhereClause();
+
   void subscribe();
   void Emit();
   QComboBox* m_nameClauseCB{nullptr};
-  QComboBox* m_otherClauseCB{nullptr};
+  QuickWhereClause* m_quickWhereClause{nullptr};
 };
 #endif // DATABASESEARCHTOOLBAR_H
