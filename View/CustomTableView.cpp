@@ -25,7 +25,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   m_rowResizeToContentKey{m_name + "_ROW_RESIZE_TO_CONTENT"},
   m_defaultTableRowHeight{MemoryKey::TABLE_DEFAULT_SECTION_SIZE.v.toInt()},
   m_defaultTableColumnWidth{MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE.v.toInt()},
-  m_columnsShowSwitch{"11111,11111,11111,11111,11111,11111"} {
+  m_columnsShowSwitch{QString{50, QChar{'1'}}} {
   if (isNameExists(m_name)) {
     qWarning("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
     return;
@@ -183,7 +183,7 @@ bool CustomTableView::onShowHideColumn() {
     }
   }
 
-  ColumnVisibilityDialog dialog{m_horHeaderTitles, tempSwitches, this};
+  ColumnVisibilityDialog dialog{m_horHeaderTitles, tempSwitches, m_name, this};
   if (dialog.exec() != QDialog::Accepted) {
     qInfo("User canceled column visibility change");
     return false;

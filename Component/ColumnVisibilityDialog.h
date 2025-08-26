@@ -3,23 +3,27 @@
 
 #include <QDialog>
 #include <QCheckBox>
-#include <QVBoxLayout>
+#include <QFormLayout>
 #include <QDialogButtonBox>
 #include <QToolButton>
 
 class ColumnVisibilityDialog : public QDialog {
 public:
   explicit ColumnVisibilityDialog(const QStringList& headers,
-                                  const QString& currentSwitches,
+                                  const QString& initSwitches,
+                                  const QString& name = "",
                                   QWidget* parent = nullptr);
+  void setAllCheckboxes(bool checked);
+  void toggleAllCheckboxes();
+  void revertCheckboxes(const QString& initSwitches);
   QString getSwitches() const;
+  void showEvent(QShowEvent* event) override;
 
 private:
   QToolButton* mSelectToolButton{nullptr};
-
+  QFormLayout *m_layout{nullptr};
+  QDialogButtonBox* buttons{nullptr};
   QList<QCheckBox*> m_checkboxes;
-  QVBoxLayout *m_layout;
-  QDialogButtonBox* buttons;
 };
 
 #endif // COLUMNVISIBILITYDIALOG_H
