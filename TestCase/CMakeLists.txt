@@ -3,10 +3,11 @@ cmake_minimum_required(VERSION 3.5)
 set(PROJECT_NAME FileXplorerTest)
 project(${PROJECT_NAME} LANGUAGES CXX)
 add_definitions(-DPROJECT_NAME="FileXplorer")
+add_definitions(-DRUNNING_UNIT_TESTS=1)
 add_definitions(-DUNICODE -D_UNICODE)
 # on windows platform. MediaInfoDLL.h defined a typdef needed
 add_definitions(-DQT_TEST)
-
+message("Test CMakelists Start")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
