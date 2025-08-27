@@ -3,17 +3,17 @@
 #include "OnScopeExit.h"
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
-#include "QuickWhereClause.h"
+#include "QuickWhereClauseDialog.h"
 #include "EndToExposePrivateMember.h"
 
-class QuickWhereClauseTest : public MyTestSuite {
+class QuickWhereClauseDialogTest : public MyTestSuite {
   Q_OBJECT
 public:
-  QuickWhereClauseTest() : MyTestSuite{false} {
-    fprintf(stdout, "QuickWhereClauseTest object created\n");
+  QuickWhereClauseDialogTest() : MyTestSuite{false} {
+    fprintf(stdout, "QuickWhereClauseDialogTest object created\n");
     std::fflush(stdout);
   }
-  ~QuickWhereClauseTest() {
+  ~QuickWhereClauseDialogTest() {
     if (dialog != nullptr) delete dialog;
     dialog = nullptr;
   }
@@ -21,7 +21,7 @@ public:
 private slots:
   // constuctor, initTestCase, {{init, test_XXX,cleanup}_i}, cleanupTestCase, destructor
   void initTestCase() {
-    dialog = new (std::nothrow) QuickWhereClause;
+    dialog = new (std::nothrow) QuickWhereClauseDialog;
     QVERIFY(dialog != nullptr);
     dialog->mStrListModel->setStringList(initialHistory);
   }
@@ -117,15 +117,15 @@ private slots:
     dialog->onEditHistory();
     QCOMPARE(dialog->WriteUniqueHistoryToQSetting(), 3);
 
-    const QString expectNewHistStr{QString{"A"} + QuickWhereClause::WHERE_HIST_SPLIT_CHAR + "B" + QuickWhereClause::WHERE_HIST_SPLIT_CHAR + "C"};
+    const QString expectNewHistStr{QString{"A"} + QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR + "B" + QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR + "C"};
     QCOMPARE(expectNewHistStr, "A\nB\nC");
     QCOMPARE(Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name).toString(), expectNewHistStr);
   }
 
 private:
-  QuickWhereClause* dialog {nullptr};
+  QuickWhereClauseDialog* dialog {nullptr};
   const QStringList initialHistory{"INSTR(`NAME`, \"\")>0", "`Size`>1024000000"};
 };
 
-#include "QuickWhereClauseTest.moc"
-QuickWhereClauseTest g_QuickWhereClauseTest;
+#include "QuickWhereClauseDialogTest.moc"
+QuickWhereClauseDialogTest g_QuickWhereClauseDialogTest;
