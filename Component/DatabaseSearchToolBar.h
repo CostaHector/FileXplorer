@@ -4,6 +4,7 @@
 #include <QToolBar>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QAction>
 #include "QuickWhereClause.h"
 
 // GUID_IN_UNDERSCORE | ROOTPATH
@@ -17,7 +18,34 @@ public:
   QStringList ToQStringList() const;
 };
 
-class MovieDBSearchToolBar : public QToolBar {
+class DatabaseSearchToolBar: public QToolBar{
+  Q_OBJECT
+public:
+  explicit DatabaseSearchToolBar(const QString& title, QWidget* parent);
+  inline QString GetCurrentWhereClause() const {
+    return m_whereCB->currentText();
+  }
+  inline void SetWhereClause(const QString& newWhereClause) {
+    m_whereCB->setCurrentText(newWhereClause);
+  }
+  inline void onGetFocus() {
+    m_whereCB->setFocus();
+    m_whereCB->lineEdit()->selectAll();
+  }
+signals:
+  void whereClauseChanged(const QString& whereClause);
+protected:
+  void onQuickWhereClause();
+  void subscribe();
+  virtual void extraSignalSubscribe() = 0;
+  QComboBox* m_whereCB{nullptr};
+  QuickWhereClause* m_quickWhereClause{nullptr};
+  QAction* _QUICK_WHERE_CLAUSE_ACT{nullptr};
+private:
+  void EmitWhereClauseChangedSignal();
+};
+
+class MovieDBSearchToolBar : public DatabaseSearchToolBar {
   Q_OBJECT
 public:
   explicit MovieDBSearchToolBar(const QString& title, QWidget* parent);
@@ -27,52 +55,21 @@ public:
   inline QString GetMovieTableRootPath() const {
     return m_tablesCB->CurrentRootPath();
   }
-  inline QString GetCurrentWhereClause() const {
-    return m_searchCB->currentText();
-  }
-  inline void SetWhereClause(const QString& newWhereClause) {
-    m_searchCB->setCurrentText(newWhereClause);
-  }
   QString AskUserDropWhichTable();
   void AddATable(const QString& newTableName);
   void InitTables(const QStringList& tbls);
   void InitCurrentIndex();
-
-  inline void onGetFocus() {
-    m_searchCB->setFocus();
-    m_searchCB->lineEdit()->selectAll();
-  }
 signals:
   void movieTableChanged(const QString& newTable);
-  void whereClauseChanged(const QString& whereClause);
 private:
-  void onQuickWhereClause();
-
-  void subscribe();
-  QComboBox* m_searchCB{nullptr};
+  void extraSignalSubscribe() override;
   Guid2RootPathComboxBox* m_tablesCB{nullptr};
-  QuickWhereClause* m_quickWhereClause{nullptr};
 };
 
-class CastDatabaseSearchToolBar : public QToolBar {
-  Q_OBJECT
+class CastDatabaseSearchToolBar : public DatabaseSearchToolBar {
 public:
   explicit CastDatabaseSearchToolBar(const QString& title, QWidget* parent);
-  inline void onGetFocus() {
-    m_nameClauseCB->setFocus();
-    m_nameClauseCB->lineEdit()->selectAll();
-  }
-  inline void SetWhereClause(const QString& newWhereClause) {
-    m_nameClauseCB->setCurrentText(newWhereClause);
-  }
-signals:
-  void whereClauseChanged(const QString& whereClause);
 private:
-  void onQuickWhereClause();
-
-  void subscribe();
-  void Emit();
-  QComboBox* m_nameClauseCB{nullptr};
-  QuickWhereClause* m_quickWhereClause{nullptr};
+  void extraSignalSubscribe() override {}
 };
 #endif // DATABASESEARCHTOOLBAR_H
