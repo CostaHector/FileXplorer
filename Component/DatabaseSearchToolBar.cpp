@@ -48,68 +48,91 @@ QStringList Guid2RootPathComboxBox::ToQStringList() const {
   return ans;
 }
 
-// -------------------------------- MovieDBSearchToolBar --------------------------------
-MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent)  //
-  : QToolBar{title, parent} {
+
+// -------------------------------- DatabaseSearchToolBar --------------------------------
+DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent) :
+  QToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
-  m_searchCB = new (std::nothrow) QComboBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_searchCB);
-  m_searchCB->setEditable(true);
-  m_searchCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
-  m_searchCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  m_searchCB->lineEdit()->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
-  m_searchCB->lineEdit()->setClearButtonEnabled(true);
+  m_whereCB = new (std::nothrow) QComboBox{this};
+  CHECK_NULLPTR_RETURN_VOID(m_whereCB);
+  m_whereCB->setEditable(true);
+  m_whereCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
+  m_whereCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+  m_whereCB->lineEdit()->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
+  m_whereCB->lineEdit()->setClearButtonEnabled(true);
   using namespace MOVIE_TABLE;
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
-  m_searchCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
-  m_searchCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
-  m_searchCB->addItem(QString{R"(`%1` = "E:/")"}.arg(ENUM_2_STR(Driver)));
-  m_searchCB->addItem(QString{R"(`%1` IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
-  m_searchCB->addItem(QString{R"(`%1` LIKES "Chris Evans%")"}.arg(ENUM_2_STR(Cast))); // Don't use leading wildcard!
+  m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+  m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+
   QCompleter* pCompleter = new (std::nothrow) QCompleter{this};
   CHECK_NULLPTR_RETURN_VOID(pCompleter);
   pCompleter->setCaseSensitivity(Qt::CaseSensitive);
-  m_searchCB->setCompleter(pCompleter);
+  m_whereCB->setCompleter(pCompleter);
 
-  m_tablesCB = new (std::nothrow) Guid2RootPathComboxBox;
-  CHECK_NULLPTR_RETURN_VOID(m_tablesCB);
-  m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom); // not editable
-  m_tablesCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-  addWidget(m_searchCB);
-  addSeparator();
-  addWidget(m_tablesCB);
-  addSeparator();
-  addAction(g_dbAct()._QUICK_WHERE_CLAUSE_MOVIE);
+  _QUICK_WHERE_CLAUSE_ACT = new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_FILTERS"), "Where clause", this);
+  CHECK_NULLPTR_RETURN_VOID(_QUICK_WHERE_CLAUSE_ACT);
+  _QUICK_WHERE_CLAUSE_ACT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_H));
+  _QUICK_WHERE_CLAUSE_ACT->setToolTip(QString{"<b>%1 (%2)</b><br/> Construct where clause quickly for `MOVIE/CAST` table;"}
+                                          .arg(_QUICK_WHERE_CLAUSE_ACT->text(), _QUICK_WHERE_CLAUSE_ACT->shortcut().toString()));
+
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
-
+  addWidget(m_whereCB);
+  addAction(_QUICK_WHERE_CLAUSE_ACT);
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
-
   subscribe();
 }
 
-void MovieDBSearchToolBar::onQuickWhereClause() {
+void DatabaseSearchToolBar::onQuickWhereClause() {
   if (m_quickWhereClause == nullptr) {
     m_quickWhereClause = new (std::nothrow) QuickWhereClause{this};
     CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
   }
   auto retCode = m_quickWhereClause->exec();
   if (retCode != QDialog::DialogCode::Accepted) {
-    LOG_INFO("User cancel quick where clause", "skip")
+    LOG_INFO("User cancel quick where clause", QString::number(retCode))
     return;
   }
   const QString& whereClause {m_quickWhereClause->GetWhereString()};
-  qDebug("Quick where clause: [%s]", qPrintable(whereClause));
+  qDebug("QuickWhereClause: [%s]", qPrintable(whereClause));
   SetWhereClause(whereClause);
   emit whereClauseChanged(whereClause);
 }
 
-void MovieDBSearchToolBar::subscribe() {
-  connect(m_searchCB->lineEdit(), &QLineEdit::returnPressed, [this]() { emit whereClauseChanged(m_searchCB->currentText()); });
+void DatabaseSearchToolBar::subscribe() {
+  connect(m_whereCB->lineEdit(), &QLineEdit::returnPressed, this, MovieDBSearchToolBar::EmitWhereClauseChangedSignal);
+  connect(_QUICK_WHERE_CLAUSE_ACT, &QAction::triggered, this, &MovieDBSearchToolBar::onQuickWhereClause);
+}
+
+void DatabaseSearchToolBar::EmitWhereClauseChangedSignal() {
+  const QString& clause = GetCurrentWhereClause();
+  qDebug("WhereClauseChanged signal[%s]", qPrintable(clause));
+  emit whereClauseChanged(clause);
+}
+
+// -------------------------------- MovieDBSearchToolBar --------------------------------
+MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent)  //
+  : DatabaseSearchToolBar{title, parent} {
+  CHECK_NULLPTR_RETURN_VOID(parent);
+
+  m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
+  m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
+  m_whereCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
+  m_whereCB->addItem(QString{R"(`%1` = "E:/")"}.arg(ENUM_2_STR(Driver)));
+  m_whereCB->addItem(QString{R"(`%1` IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
+  m_whereCB->addItem(QString{R"(`%1` LIKES "Chris Evans%")"}.arg(ENUM_2_STR(Cast))); // Don't use leading wildcard!
+
+  m_tablesCB = new (std::nothrow) Guid2RootPathComboxBox;
+  CHECK_NULLPTR_RETURN_VOID(m_tablesCB);
+  m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom); // not editable
+  m_tablesCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  auto* tblAct = insertWidget(_QUICK_WHERE_CLAUSE_ACT, m_tablesCB);
+  insertSeparator(tblAct);
+  MovieDBSearchToolBar::extraSignalSubscribe();
+}
+
+void MovieDBSearchToolBar::extraSignalSubscribe() {
   connect(m_tablesCB, &QComboBox::currentTextChanged, this, &MovieDBSearchToolBar::movieTableChanged);
-  connect(g_dbAct()._QUICK_WHERE_CLAUSE_MOVIE, &QAction::triggered, this, &MovieDBSearchToolBar::onQuickWhereClause);
 }
 
 QString MovieDBSearchToolBar::AskUserDropWhichTable() {
@@ -163,58 +186,13 @@ void MovieDBSearchToolBar::InitCurrentIndex() {
 
 // -------------------------------- CastDatabaseSearchToolBar --------------------------------
 CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent)//
-  : QToolBar{title, parent} {
-  CHECK_NULLPTR_RETURN_VOID(parent)
-  m_nameClauseCB = new (std::nothrow) QComboBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_nameClauseCB);
-  m_nameClauseCB->setEditable(true);
-  m_nameClauseCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
-  m_nameClauseCB->lineEdit()->addAction(QIcon{":img/SEARCH"}, QLineEdit::LeadingPosition);
-  m_nameClauseCB->lineEdit()->setClearButtonEnabled(true);
-  m_nameClauseCB->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
+  : DatabaseSearchToolBar{title, parent} {
   {
     using namespace PERFORMER_DB_HEADER_KEY;
     for (const auto& field: DB_HEADER) {
-      m_nameClauseCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(field));
+      m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(field));
     }
-    m_nameClauseCB->addItem(QString{R"(`%1`="")"}.arg(ENUM_2_STR(Ori)));
+    m_whereCB->addItem(QString{R"(`%1`="")"}.arg(ENUM_2_STR(Ori)));
   }
-
-  addWidget(m_nameClauseCB);
-  addSeparator();
-  addAction(g_castAct()._QUICK_WHERE_CLAUSE_CAST);
-  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
-
-  layout()->setSpacing(0);
-  layout()->setContentsMargins(0, 0, 0, 0);
-
-  subscribe();
-}
-
-void CastDatabaseSearchToolBar::onQuickWhereClause() {
-  if (m_quickWhereClause == nullptr) {
-    m_quickWhereClause = new (std::nothrow) QuickWhereClause{this};
-    CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
-  }
-  auto retCode = m_quickWhereClause->exec();
-  if (retCode != QDialog::DialogCode::Accepted) {
-    LOG_INFO("User cancel quick where clause", "skip")
-    return;
-  }
-  const QString& whereClause {m_quickWhereClause->GetWhereString()};
-  qDebug("Quick where clause: [%s]", qPrintable(whereClause));
-  SetWhereClause(whereClause);
-  emit whereClauseChanged(whereClause);
-}
-
-void CastDatabaseSearchToolBar::subscribe() {
-  connect(m_nameClauseCB->lineEdit(), &QLineEdit::returnPressed, this, &CastDatabaseSearchToolBar::Emit);
-  connect(g_castAct()._QUICK_WHERE_CLAUSE_CAST, &QAction::triggered, this, &CastDatabaseSearchToolBar::onQuickWhereClause);
-}
-
-void CastDatabaseSearchToolBar::Emit() {
-  const QString& clause = m_nameClauseCB->currentText();
-  qDebug("Cast where[%s]", qPrintable(clause));
-  emit whereClauseChanged(clause);
+  CastDatabaseSearchToolBar::extraSignalSubscribe();
 }

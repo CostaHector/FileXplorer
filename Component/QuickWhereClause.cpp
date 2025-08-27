@@ -253,10 +253,7 @@ void QuickWhereClause::subscribe() {
   connect(_ADD_WHERE_CLAUSE_TO_HISTORY, &QAction::triggered, this, &QuickWhereClause::onAddAHistory);
   connect(_EDIT_WHERE_CLAUSE_HISTORY, &QAction::triggered, this, &QuickWhereClause::onEditHistory);
 
-  connect(m_whereComboBox, &QComboBox::currentTextChanged, this, [this](const QString& text){
-    qWarning("currentTextChanged: %s", qPrintable(text));
-    m_whereLineEdit->setText(text);
-  });
+  connect(m_whereComboBox, &QComboBox::textActivated, m_whereLineEdit, &QLineEdit::setText);
 }
 
 bool QuickWhereClause::onRemoveAHistory() {

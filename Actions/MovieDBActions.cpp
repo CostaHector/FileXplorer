@@ -45,12 +45,6 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
   AUDIT_A_TABLE->setToolTip("Audit a table (Principle: Compare video records in table with an online disk);");
 
-  _QUICK_WHERE_CLAUSE_MOVIE = new (std::nothrow) QAction(QIcon(":img/FILE_SYSTEM_FILTER"), "Where clause", this);
-  CHECK_NULLPTR_RETURN_VOID(_QUICK_WHERE_CLAUSE_MOVIE);
-  _QUICK_WHERE_CLAUSE_MOVIE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_H));
-  _QUICK_WHERE_CLAUSE_MOVIE->setToolTip(QString{"<b>%1 (%2)</b><br/> Construct where clause quickly for `MOVIE` table;"}
-                                            .arg(_QUICK_WHERE_CLAUSE_MOVIE->text(), _QUICK_WHERE_CLAUSE_MOVIE->shortcut().toString()));
-
   DB_CONTROL_ACTIONS = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(DB_CONTROL_ACTIONS);
   DB_CONTROL_ACTIONS->addAction(SUBMIT);
