@@ -1,6 +1,6 @@
 ﻿#include "VidsPlayListView.h"
 #include "VideoPlayerActions.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 
 #include "PublicVariable.h"
 #include "PathTool.h"
@@ -31,16 +31,14 @@ void VidsPlayListView::subscribe() {
 }
 
 void VidsPlayListView::onRevealInSystemExplorer() {
-  if (not currentIndex().isValid()) {
-    qInfo("Cannot reveal. nothing selected");
-    Notificator::information("Cannot reveal", "nothing selected");
+  if (!currentIndex().isValid()) {
+    LOG_INFO_NP("Cannot reveal", "nothing selected");
     return;
   }
   const QString& filePath = currentFilePath();
   const QString& dirPath = PathTool::absolutePath(filePath);
   if (!QFile::exists(filePath)) {
-    qInfo("Cannot reveal. dirpath[%s] not exists", qPrintable(dirPath));
-    Notificator::information("Cannot reveal", QString("dirpath[%1] not exists").arg(dirPath));
+    LOG_INFO_P("Cannot reveal", "dirpath[%s] not exists", qPrintable(dirPath));
     return;
   }
   const QString& dirUrl = PathTool::linkPath(dirPath);

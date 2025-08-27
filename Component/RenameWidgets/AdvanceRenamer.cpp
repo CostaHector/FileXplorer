@@ -5,7 +5,7 @@
 #include "UndoRedo.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "RenameNamesUnique.h"
 #include "CommandsPreview.h"
 #include <QDataStream>
@@ -172,7 +172,7 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   renameHelper();
   if (!renameHelper) {
     const QString& rejectMsg = renameHelper.Details();
-    LOG_BAD("Cannot do rename commands", rejectMsg);
+    LOG_BAD_NP("Cannot do rename commands", rejectMsg);
     return false;
   }
   // rename files first, than its folders;
@@ -195,9 +195,9 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   bool isAllSuccess = g_undoRedo.Do(reversedcmds);
   if (isInterative) {
     if (isAllSuccess) {
-      LOG_GOOD("Batch commands rename ok", QString::number(reversedcmds.size()));
+      LOG_GOOD_P("[Ok]Batch commands rename", "Commands count %d", reversedcmds.size());
     } else {
-      LOG_BAD("Batch commands partially failed", "See details in log");
+      LOG_BAD_NP("Batch commands partially failed", "See details in log");
     }
   }
   close();
