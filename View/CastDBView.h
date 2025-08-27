@@ -5,7 +5,7 @@
 #include "CastDbModel.h"
 #include "CustomTableView.h"
 #include "DatabaseSearchToolBar.h"
-#include "QuickWhereClause.h"
+#include "QuickWhereClauseDialog.h"
 #include <QToolBar>
 #include <QLineEdit>
 

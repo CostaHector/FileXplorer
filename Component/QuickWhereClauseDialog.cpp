@@ -1,4 +1,4 @@
-﻿#include "QuickWhereClause.h"
+﻿#include "QuickWhereClauseDialog.h"
 
 #include "PublicMacro.h"
 #include "PerformersAkaManager.h"
@@ -10,9 +10,9 @@
 #include <QPushButton>
 #include <QInputDialog>
 
-constexpr char QuickWhereClause::WHERE_HIST_SPLIT_CHAR;
+constexpr char QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR;
 
-QuickWhereClause::QuickWhereClause(QWidget* parent) : QDialog{parent} {
+QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent) : QDialog{parent} {
   AUTO_COMPLETE_AKA_SWITCH = new (std::nothrow) QAction{"Name Alias", this};
   AUTO_COMPLETE_AKA_SWITCH->setCheckable(true);
   AUTO_COMPLETE_AKA_SWITCH->setChecked(false);
@@ -154,13 +154,13 @@ QuickWhereClause::QuickWhereClause(QWidget* parent) : QDialog{parent} {
   m_Name->setFocus();
 }
 
-QuickWhereClause::~QuickWhereClause() {
+QuickWhereClauseDialog::~QuickWhereClauseDialog() {
 #ifndef RUNNING_UNIT_TESTS
   WriteUniqueHistoryToQSetting();
 #endif
 }
 
-int QuickWhereClause::WriteUniqueHistoryToQSetting() {
+int QuickWhereClauseDialog::WriteUniqueHistoryToQSetting() {
   QStringList hists = mStrListModel->stringList();
   std::sort(hists.begin(), hists.end());
   auto firstDupIt = std::unique(hists.begin(), hists.end());
@@ -170,7 +170,7 @@ int QuickWhereClause::WriteUniqueHistoryToQSetting() {
   return hists.size();
 }
 
-void QuickWhereClause::onConditionsChanged() {
+void QuickWhereClauseDialog::onConditionsChanged() {
   QStringList conditionsLst;
   conditionsLst.reserve(20);
   {
@@ -225,38 +225,38 @@ void QuickWhereClause::onConditionsChanged() {
   m_whereLineEdit->setText(conditionsLst.join(" AND "));
 }
 
-void QuickWhereClause::accept() {
+void QuickWhereClauseDialog::accept() {
   if (!mDialogButtonBox->hasFocus()) {
     return;
   }
   QDialog::accept();
 }
 
-void QuickWhereClause::subscribe() {
+void QuickWhereClauseDialog::subscribe() {
   {
-    connect(m_Name, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
-    connect(m_Size, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
-    connect(m_Duration, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
-    connect(m_Studio, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
-    connect(m_Cast, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
-    connect(m_Tags, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
+    connect(m_Name, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
+    connect(m_Size, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
+    connect(m_Duration, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
+    connect(m_Studio, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
+    connect(m_Cast, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
+    connect(m_Tags, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
   }
   {
-    connect(m_Rate, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
-    connect(m_Ori, &QLineEdit::returnPressed, this, &QuickWhereClause::onConditionsChanged);
+    connect(m_Rate, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
+    connect(m_Ori, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
   }
-  connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QuickWhereClause::accept);
+  connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QuickWhereClauseDialog::accept);
   connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &QDialog::reject);
 
-  connect(_RMV_WHERE_CLAUSE_FROM_HISTORY, &QAction::triggered, this, &QuickWhereClause::onRemoveAHistory);
-  connect(_CLEAR_WHERE_CLAUSE_FROM_HISTORY, &QAction::triggered, this, &QuickWhereClause::onClearHistory);
-  connect(_ADD_WHERE_CLAUSE_TO_HISTORY, &QAction::triggered, this, &QuickWhereClause::onAddAHistory);
-  connect(_EDIT_WHERE_CLAUSE_HISTORY, &QAction::triggered, this, &QuickWhereClause::onEditHistory);
+  connect(_RMV_WHERE_CLAUSE_FROM_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onRemoveAHistory);
+  connect(_CLEAR_WHERE_CLAUSE_FROM_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onClearHistory);
+  connect(_ADD_WHERE_CLAUSE_TO_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onAddAHistory);
+  connect(_EDIT_WHERE_CLAUSE_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onEditHistory);
 
   connect(m_whereComboBox, &QComboBox::textActivated, m_whereLineEdit, &QLineEdit::setText);
 }
 
-bool QuickWhereClause::onRemoveAHistory() {
+bool QuickWhereClauseDialog::onRemoveAHistory() {
   int n = mStrListModel->rowCount();
   if (n <= 0) {
     qDebug("History already empty, skip delete");
@@ -271,7 +271,7 @@ bool QuickWhereClause::onRemoveAHistory() {
   return true;
 }
 
-int QuickWhereClause::onClearHistory() {
+int QuickWhereClauseDialog::onClearHistory() {
   const int n = mStrListModel->rowCount();
   if (n <= 0) {
     qDebug("model already empty, skip clear");
@@ -281,7 +281,7 @@ int QuickWhereClause::onClearHistory() {
   return n;
 }
 
-bool QuickWhereClause::onAddAHistory() {
+bool QuickWhereClauseDialog::onAddAHistory() {
   const QString newHistLine{m_whereLineEdit->text().trimmed()};
   if (newHistLine.isEmpty()) {
     qDebug("Where clause[%s] empty or already exist. skip insert", qPrintable(newHistLine));
@@ -291,7 +291,7 @@ bool QuickWhereClause::onAddAHistory() {
   mStrListModel->setData(mStrListModel->index(0), newHistLine);
   return true;
 }
-int QuickWhereClause::onEditHistory() {
+int QuickWhereClauseDialog::onEditHistory() {
   int beforeRowCnt = mStrListModel->rowCount();
   QString curHists = mStrListModel->stringList().join(WHERE_HIST_SPLIT_CHAR);
 #ifndef RUNNING_UNIT_TESTS
