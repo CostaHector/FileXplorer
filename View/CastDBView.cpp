@@ -5,7 +5,7 @@
 #include "FileFolderPreviewer.h"
 #include "JsonHelper.h"
 #include "MemoryKey.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "PerformerJsonFileHelper.h"
 #include "PerformersAkaManager.h"
@@ -41,7 +41,7 @@ CastDBView::CastDBView(CastDbModel* castDbModel_,
 {
   if (!QFileInfo{mImageHost}.isDir()) {
     QString titleMsg{QString{"ImageHostPath[%1] not exist"}.arg(mImageHost)};
-    LOG_CRITICAL(titleMsg, mImageHost);
+    LOG_CRIT_NP(titleMsg, mImageHost);
     QMessageBox::critical(this, titleMsg, "Path not exist. Fix it in .ini file at first");
     return;
   }
@@ -60,14 +60,14 @@ CastDBView::CastDBView(CastDbModel* castDbModel_,
 
 bool CastDBView::onOpenRecordInFileSystem() const {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("Nothing was selected.", "Select a row to open pson folder");
+    LOG_INFO_NP("Nothing was selected.", "Select a row to open pson folder");
     return false;
   }
   const QModelIndex ind{currentIndex()};
   // when column in detail. open pson file. Otherwise open folder contains pson
   QString revealPath{currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail ? _castModel->psonFilePath(ind): _castModel->filePath(ind)};
   if (!QFile::exists(revealPath)) {
-    LOG_WARN("Path not exists", revealPath);
+    LOG_WARN_NP("Path not exists", revealPath);
     return false;
   }
   return QDesktopServices::openUrl(QUrl::fromLocalFile(revealPath));
@@ -124,7 +124,7 @@ void CastDBView::onInitATable() {
 
 int CastDBView::onAppendCasts() {
   if (_castModel->isDirty()) {
-    Notificator::badNews("Table dirty", "submit before load from file-system structure");
+    LOG_BAD_NP("Table dirty", "submit before load from file-system structure");
     return false;
   }
   bool ok = false;
@@ -133,17 +133,16 @@ int CastDBView::onAppendCasts() {
                                      "Input 'Casts, aka'",  //
                                      "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine", "", &ok);
   if (!ok) {
-    Notificator::information("User cancel", "skip");
+    LOG_INFO_NP("[skip] User cancel", "return");
     return 0;
   }
   int succeedCnt = _castDb.AppendCastFromMultiLineInput(perfsText);
   if (succeedCnt < 0) {
-    Notificator::warning(QString("Load perfs from text[%1] failed").arg(perfsText),  //
-                         "see detail in description");
+    LOG_WARN_P("Load perfs from text failed", "perfsText:%s, errorCode: %d", qPrintable(perfsText), succeedCnt);
     return 0;
   }
   _castModel->submitAll();
-  Notificator::goodNews(QString("load %1 performer(s) succeed").arg(succeedCnt), perfsText);
+  LOG_GOOD_P("[Ok] load performer(s)", "perfsText:%s, count: %d", qPrintable(perfsText), succeedCnt);
   return succeedCnt;
 }
 
@@ -158,28 +157,28 @@ bool CastDBView::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete)
   }
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
   if (rmvedTableCnt < 0) {
-    Notificator::badNews("Drop/Delete failed", "see details in log");
+    LOG_BAD_P("Drop/Delete failed", "errorCode: %d", rmvedTableCnt);
     return false;
   }
   _castModel->submitAll();
-  Notificator::goodNews(QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(DB_TABLE::PERFORMERS),  //
-                        QString("Drop(0)/Delete(1). %1 table removed").arg(rmvedTableCnt));
+  const QString title = QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(DB_TABLE::PERFORMERS);
+  const QString msg = QString("Drop(0)/Delete(1). %1 table removed").arg(rmvedTableCnt);
+  LOG_GOOD_NP(title, msg);
   return rmvedTableCnt >= 0;
 }
 
 int CastDBView::onLoadFromFileSystemStructure() {
   if (_castModel->isDirty()) {
-    Notificator::badNews("Table dirty", "submit before load from file-system structure");
+    LOG_BAD_NP("[Abort] Table dirty", "submit before load from file-system structure");
     return false;
   }
   int succeedCnt = _castDb.ReadFromImageHost(mImageHost);
   if (succeedCnt < 0) {
-    Notificator::warning(QString("Load perfs from path[%1] failed").arg(mImageHost),  //
-                         "see detail in description");
+    LOG_BAD_P("[Failed] Load perfs", "errorCode: %d", succeedCnt)
     return 0;
   }
   _castModel->submitAll();
-  Notificator::goodNews(QString("load %1 performer(s) succeed").arg(succeedCnt), mImageHost);
+  LOG_GOOD_P("Load perf(s) succeed", "count: %d", succeedCnt)
   return succeedCnt;
 }
 
@@ -187,14 +186,14 @@ bool CastDBView::onSubmit() {
   CHECK_NULLPTR_RETURN_FALSE(_castModel)
 
   if (!_castModel->isDirty()) {
-    Notificator::goodNews("Table not dirty, Skip", DB_TABLE::PERFORMERS);
+    LOG_GOOD_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
     return true;
   }
   if (!_castModel->submitAll()) {
-    LOG_WARN("Submit failed. see details in logs", _castModel->lastError().text());
+    LOG_WARN_NP("Submit failed", _castModel->lastError().text());
     return false;
   }
-  Notificator::goodNews("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
+  LOG_GOOD_NP("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
   return true;
 }
 
@@ -210,24 +209,23 @@ bool CastDBView::on_selectionChanged(const QItemSelection& /*selected*/, const Q
 
 int CastDBView::onLoadFromPsonDirectory() {
   if (_castModel->isDirty()) {
-    Notificator::badNews("Table dirty", "submit before load pson");
+    LOG_BAD_NP("Table dirty", "submit before load pson");
     return 0;
   }
   int succeedCnt = _castDb.LoadFromPsonFile(mImageHost);
   if (succeedCnt < 0) {
-    Notificator::warning(QString("Load perfs from pJson[%1/*.pson] failed").arg(mImageHost),  //
-                         "see detail in description");
+    LOG_WARN_P("[Failed] Load perfs from pJson", "[%s/*.pson] errorCode:%d", qPrintable(mImageHost), succeedCnt);
     return succeedCnt;
   }
   _castModel->submitAll();
-  Notificator::goodNews(QString("%1 pson file load succeed").arg(succeedCnt), mImageHost);
+  LOG_GOOD_P("[Ok] pson file(s) load succeed", "count: %d", succeedCnt);
   return succeedCnt;
 }
 
 int CastDBView::onSyncAllImgsFieldFromImageHost() {
   const int totalCnt{_castModel->rowCount()};
   if (totalCnt == 0) {
-    LOG_INFO("No records at all skip", "No need sync");
+    LOG_INFO_NP("[skip] No records at all skip", "No need sync");
     return 0;
   }
   int succeedCnt = 0;
@@ -240,16 +238,16 @@ int CastDBView::onSyncAllImgsFieldFromImageHost() {
   QString msgTitle{QString("All %1 record(s) imgs field been sync").arg(totalCnt)};
   QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
   if (totalCnt != succeedCnt) {
-    LOG_WARN(msgTitle, msgDetail);
+    LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    Notificator::goodNews(msgTitle, msgDetail);
+    LOG_GOOD_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
 
 int CastDBView::onSyncImgsFieldFromImageHost() {
   if (!selectionModel()->hasSelection()) {
-    Notificator::information("Nothing was selected", "Select some row to sync imgs fields");
+    LOG_INFO_NP("Nothing was selected", "Select some row to sync imgs fields");
     return 0;
   }
   currentIndex();
@@ -266,9 +264,9 @@ int CastDBView::onSyncImgsFieldFromImageHost() {
   QString msgTitle{QString("%1 record(s) selected imgs field been sync").arg(totalCnt)};
   QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
   if (totalCnt != succeedCnt) {
-    LOG_WARN(msgTitle, msgDetail);
+    LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    Notificator::goodNews(msgTitle, msgDetail);
+    LOG_GOOD_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
@@ -276,7 +274,7 @@ int CastDBView::onSyncImgsFieldFromImageHost() {
 int CastDBView::onDumpAllIntoPsonFile() {
   const int totalCnt{_castModel->rowCount()};
   if (totalCnt == 0) {
-    LOG_INFO("No records at all skip", "No need dump");
+    LOG_INFO_NP("[Skip] No records at all skip", "No need dump");
     return 0;
   }
   int succeedCnt = 0;
@@ -288,16 +286,16 @@ int CastDBView::onDumpAllIntoPsonFile() {
   QString msgTitle{QString("All %1 record(s) dumped result").arg(totalCnt)};
   QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
   if (totalCnt != succeedCnt) {
-    LOG_WARN(msgTitle, msgDetail);
+    LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    Notificator::goodNews(msgTitle, msgDetail);
+    LOG_GOOD_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
 
 int CastDBView::onDumpIntoPsonFile() {
   if (!selectionModel()->hasSelection()) {
-    Notificator::information("Nothing was selected", "Select some row to dump");
+    LOG_INFO_NP("Nothing was selected", "Select some row to dump");
     return 0;
   }
 
@@ -322,16 +320,16 @@ int CastDBView::onDumpIntoPsonFile() {
   QString msgTitle{QString("Selected %1 record(s) dumped result").arg(totalCnt)};
   QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
   if (totalCnt != succeedCnt) {
-    LOG_WARN(msgTitle, msgDetail);
+    LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    Notificator::goodNews(msgTitle, msgDetail);
+    LOG_GOOD_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
 
 int CastDBView::onForceRefreshAllRecordsVids() {
   selectAll();
-  LOG_INFO("Refresh all records may cause lag", "Click Refresh Selected action if you are sure");
+  LOG_INFO_NP("Refresh all records may cause lag", "Click Refresh Selected action if you are sure");
   return 0;
 }
 
@@ -356,7 +354,7 @@ QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query)
 
 int CastDBView::onForceRefreshRecordsVids() {
   if (!selectionModel()->hasSelection()) {
-    Notificator::badNews("Nothing was selected", "Select some row to refresh");
+    LOG_BAD_NP("Nothing was selected", "Select some row to refresh");
     return 0;
   }
 
@@ -379,15 +377,13 @@ int CastDBView::onForceRefreshRecordsVids() {
     ++recordsCnt;
   }
   RefreshHtmlContents();
-  QString msgTitle{QString{"%1 records selection"}.arg(recordsCnt)};
-  QString msgDetail{QString{"%1 videos(s) updated succeed"}.arg(vidsCnt)};
-  Notificator::goodNews(msgTitle, msgDetail);
+  LOG_GOOD_P("[ok]Videos(s) updated", "%d records selection, %d videos", recordsCnt, vidsCnt);
   return recordsCnt;
 }
 
 int CastDBView::onDeleteRecords() {
   if (!selectionModel()->hasSelection()) {
-    Notificator::badNews("Nothing was selected", "Select some row(s) to delete");
+    LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
     return 0;
   }
   int deleteCnt = 0;
@@ -402,7 +398,7 @@ int CastDBView::onDeleteRecords() {
     succeedCnt += ((int)ret * size);
   }
   _castModel->submitAll();
-  Notificator::goodNews("delete records result", QString("%1/%2 succeed").arg(succeedCnt).arg(deleteCnt));
+  LOG_GOOD_P("Delete records result", "%d/%d succeed", succeedCnt, deleteCnt);
   return succeedCnt;
 }
 

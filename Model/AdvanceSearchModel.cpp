@@ -1,5 +1,5 @@
 ﻿#include "AdvanceSearchModel.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "MemoryKey.h"
 #include "PublicVariable.h"
@@ -60,8 +60,7 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
     if (retBtn == QMessageBox::StandardButton::Yes) {
       return true;
     }
-    qInfo("User cancel search under large directory[%s] as it may cause lag", qPrintable(stdPath));
-    Notificator::information("User cancel search under large directory[%s] as it may cause lag", stdPath);
+    LOG_INFO_NP("User cancel search under large directory(may lag)", stdPath);
     return false;
   }
   return true;

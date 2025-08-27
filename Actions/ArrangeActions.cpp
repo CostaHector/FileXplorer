@@ -1,5 +1,5 @@
 ﻿#include "ArrangeActions.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "CastManager.h"
 #include "StudiosManager.h"
 #include "PerformersAkaManager.h"
@@ -14,36 +14,33 @@ void onEditStudios() {
   using namespace PathTool::FILE_REL_PATH;
   static const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(STANDARD_STUDIO_NAME);
   if (!QFile::exists(fileAbsPath)) {
-    qWarning("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    LOG_WARN_P("Cannot edit", "File[%s] not found", qPrintable(fileAbsPath));
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Modify work after reload", "Reload now?");
+  LOG_INFO_NP("Modify work after reload", "Reload now?");
 }
 
 void onEditPerformers() {
   using namespace PathTool::FILE_REL_PATH;
   static const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(PERFORMERS_TABLE);
   if (!QFile::exists(fileAbsPath)) {
-    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    LOG_WARN_NP("[File Inexists] Cannot edit", fileAbsPath);
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Remember to reload", "don't forget it");
+  LOG_INFO_NP("Remember to reload", "don't forget it");
 }
 
 void onEditAkaPerformer() {
   using namespace PathTool::FILE_REL_PATH;
   static const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS);
   if (!QFile::exists(fileAbsPath)) {
-    qDebug("Cannot edit. File[%s] not found", qPrintable(fileAbsPath));
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    LOG_WARN_P("Cannot edit", "File[%s] not found", qPrintable(fileAbsPath));
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Work after reopen", "changes not work now");
+  LOG_INFO_NP("Work after reopen", "changes not work now");
 }
 
 ArrangeActions::ArrangeActions(QObject* parent) : QObject{parent} {
@@ -69,7 +66,7 @@ void onShowRenameRuleStatistics() {
   statictsContent += '\n';
   statictsContent += "AKA number\t";
   statictsContent += QString::number(PerformersAkaManager::getIns().count());
-  Notificator::information("Rename rule statistics", statictsContent);
+  LOG_INFO_NP("Rename rule statistics", statictsContent);
 }
 
 void ArrangeActions::subscribe() {
@@ -77,21 +74,21 @@ void ArrangeActions::subscribe() {
   connect(_RELOAD_STUDIOS, &QAction::triggered, this, []() {
     static auto& psm = StudiosManager::getIns();
     int itemsCntChanged = psm.ForceReloadStudio();
-    Notificator::goodNews("Reload studios", QString("delta %1 items").arg(itemsCntChanged));
+    LOG_GOOD_P("Reload studios", "delta %d items", itemsCntChanged);
   });
 
   connect(_EDIT_PERFS, &QAction::triggered, this, &onEditPerformers);
   connect(_RELOAD_PERFS, &QAction::triggered, this, []() {
     static auto& pm = CastManager::getIns();
     int itemsCntChanged = pm.ForceReloadCast();
-    Notificator::goodNews("Reload performers", QString("delta %1 item(s)").arg(itemsCntChanged));
+    LOG_GOOD_P("Reload performers", "delta %d item(s)", itemsCntChanged);
   });
 
   connect(_EDIT_PERF_AKA, &QAction::triggered, this, &onEditAkaPerformer);
   connect(_RELOAD_PERF_AKA, &QAction::triggered, this, []() {
     static auto& dbTM = PerformersAkaManager::getIns();
     int itemsCntChanged = dbTM.ForceReloadAkaName();
-    Notificator::goodNews("Reload performers AKA", QString("delta %1 item(s)").arg(itemsCntChanged));
+    LOG_GOOD_P("Reload performers AKA", "delta %d item(s)", itemsCntChanged);
   });
 
   connect(_RENAME_RULE_STAT, &QAction::triggered, this, &onShowRenameRuleStatistics);

@@ -1,6 +1,6 @@
 #include "JsonTableView.h"
 #include "JsonActions.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "StudiosManager.h"
 #include "NameTool.h"
 #include <QHeaderView>
@@ -11,7 +11,7 @@
 #include <QStyleOptionViewItem>
 
 JsonTableView::JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProxyModel, QWidget* parent)  //
-    : CustomTableView{"JSON_TABLE_VIEW", parent}                                                          //
+  : CustomTableView{"JSON_TABLE_VIEW", parent}                                                          //
 {
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
   _JsonModel = jsonModel;
@@ -56,53 +56,52 @@ int JsonTableView::ReadADirectory(const QString& path) {
 
 int JsonTableView::onSaveCurrentChanges() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip sync name field");
+    LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
   const int cnt = _JsonModel->SaveCurrentChanges(indexes);
   if (cnt < 0) {
-    LOG_BAD(QString("Save failed, errorCode:%1").arg(cnt), "See detail in logs");
+    LOG_BAD_P("Save failed", "errorCode:%d", cnt);
     return cnt;
   }
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) of changes have been saved"}.arg(cnt).arg(indexes.size())};
-  LOG_GOOD(affectedRowsMsg, "ok");
+  LOG_GOOD_P("Changes have been saved", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
 int JsonTableView::onSyncNameField() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip sync name field");
+    LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
   const int cnt = _JsonModel->SyncFieldNameByJsonBaseName(indexes);
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) name field has been sync by json basename"}.arg(cnt).arg(indexes.size())};
-  LOG_GOOD(affectedRowsMsg, "ok");
+
+  LOG_GOOD_P("Name field has been sync by json basename", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
 int JsonTableView::onExportCastStudioToDictonary() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip sync name field");
+    LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
   int castCnt{0}, studioCnt{0};
   std::tie(castCnt, studioCnt) = _JsonModel->ExportCastStudioToLocalDictionaryFile(indexes);
   if (castCnt < 0 || studioCnt < 0) {
-    LOG_BAD("Export cast/studio to local dictionary file failed", "see details in log");
+    LOG_BAD_NP("Export cast/studio to local dictionary file failed", "see details in log");
     return -1;
   }
   const QString affectedRowsMsg = QString{"Increment cast:%1/studio:%2\nby %3 selected row(s)"}.arg(castCnt).arg(studioCnt).arg(indexes.size());
-  LOG_GOOD(affectedRowsMsg, "ok");
+  LOG_GOOD_NP("Export succeed", affectedRowsMsg);
   QMessageBox::information(this, "Export succeed", affectedRowsMsg);
   return castCnt + studioCnt;
 }
 
 int JsonTableView::onRenameJsonAndRelated() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip sync name field");
+    LOG_INFO_NP("nothing selected", "skip sync name field");
     return 0;
   }
   const QModelIndex& ind = CurrentIndexSource();
@@ -111,26 +110,26 @@ int JsonTableView::onRenameJsonAndRelated() {
   const QString& newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
                                                          {oldJsonBaseName}, 0, true, &isInputOk);
   if (!isInputOk) {
-    LOG_GOOD("User cancel rename json and related files", "skip")
+    LOG_GOOD_NP("[skip] User cancel rename json and related files", "return")
     return 0;
   }
   if (newJsonBaseName.isEmpty()) {
-    LOG_BAD("New json base name can not be empty", "skip")
+    LOG_BAD_NP("[skip] New json base name can not be empty", "return")
     return 0;
   }
   int cnt = _JsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
   const QString msg{QString{"Rename Json\n[%1]\n[%2]\n and it's related file(s). retCode: %3"}.arg(oldJsonBaseName).arg(newJsonBaseName).arg(cnt)};
   if (cnt < JsonPr::E_OK) {
-    LOG_BAD(msg, "Failed, see in detail in logs");
+    LOG_BAD_P(msg, "Failed, errorCode:%d", cnt);
     return cnt;
   }
-  LOG_GOOD(msg, "All succeed");
+  LOG_GOOD_NP(msg, "All succeed");
   return 0;
 }
 
 int JsonTableView::onSetStudio() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip");
+    LOG_INFO_NP("nothing selected", "skip");
     return 0;
   }
   const auto& curInd = CurrentIndexSource();
@@ -151,11 +150,11 @@ int JsonTableView::onSetStudio() {
                                                 defIndex,                               //
                                                 true, &isInputOk);
   if (!isInputOk) {
-    LOG_GOOD("User cancel set studio", "skip")
+    LOG_GOOD_NP("[skip] User cancel set studio", "return")
     return 0;
   }
   if (studio.isEmpty()) {
-    LOG_BAD("Studio name can not be empty", "skip")
+    LOG_BAD_NP("[skip] Studio name can not be empty", "return")
     return 0;
   }
 
@@ -166,76 +165,75 @@ int JsonTableView::onSetStudio() {
 
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   const int cnt = _JsonModel->SetStudio(indexes, studio);
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) studio has been changed to %s"}.arg(cnt).arg(indexes.size()).arg(studio)};
-  LOG_GOOD(affectedRowsMsg, studio);
+
+  LOG_GOOD_P("studio has been changed", "%d/%d row(s) to %s", cnt, indexes.size(), qPrintable(studio));
   return indexes.size();
 }
 
 int JsonTableView::onInitCastAndStudio() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip init cast/studio studio");
+    LOG_INFO_NP("nothing selected", "skip init cast/studio studio");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   const int cnt = _JsonModel->InitCastAndStudio(indexes);
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) cast/studio has been inited"}.arg(cnt).arg(indexes.size())};
-  LOG_GOOD(affectedRowsMsg, "ok");
+
+  LOG_GOOD_P("cast/studio has been inited", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
 int JsonTableView::onHintCastAndStudio() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip hint cast/studio");
+    LOG_INFO_NP("nothing selected", "skip hint cast/studio");
     return 0;
   }
 
   QString userSelection;
   EDITOR_WIDGET_TYPE edtWidType{EDITOR_WIDGET_TYPE::BUTT};
   if (!GetSelectedTextInCell(userSelection, edtWidType)) {
-    LOG_WARN("Get Selected Text in Selected Cell failed", "see detail in logs");
+    LOG_WARN_NP("Get Selected Text in Selected Cell failed", "see detail in logs");
     return -1;
   }
 
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   if (indexes.size() > 1 && !userSelection.isEmpty()) {
-    LOG_WARN("Dangerous! User select more than 1 line and text selected", "skip");
+    LOG_WARN_NP("Dangerous! User select more than 1 line and text selected", "skip");
     return -1;
   }
 
   const int cnt = _JsonModel->HintCastAndStudio(indexes, userSelection);
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) cast/studio has been hint"}.arg(cnt).arg(indexes.size())};
-  LOG_GOOD(affectedRowsMsg, "ok");
+
+  LOG_GOOD_P("cast/studio has been hint", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
 int JsonTableView::onFormatCast() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip cast format");
+    LOG_INFO_NP("[Skip]nothing selected", "skip cast format");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Cast);
   const int cnt = _JsonModel->FormatCast(indexes);
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) cast has been format"}.arg(cnt).arg(indexes.size())};
-  LOG_GOOD(affectedRowsMsg, "ok");
+
+  LOG_GOOD_P("Cast has been format", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
 int JsonTableView::onClearStudio() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected", "skip clear studio");
+    LOG_INFO_NP("[Skip]nothing selected", "skip clear studio");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   const int cnt = _JsonModel->SetStudio(indexes, "");
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) studio has been cleared"}.arg(cnt).arg(indexes.size())};
-  LOG_GOOD(affectedRowsMsg, "ok");
+  LOG_GOOD_P("studio has been cleared", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
 int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode) {
   const QString fieldOperation{"Operation:" + FIELF_OP_TYPE_ARR[(int)type] + ' ' + FIELD_OP_MODE_ARR[(int)mode]};
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO("nothing selected. skip", fieldOperation);
+    LOG_INFO_NP("nothing selected. skip", fieldOperation);
     return 0;
   }
 
@@ -251,11 +249,11 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
                                        candidates.size() - 1,          //
                                        true, &isInputOk);
     if (!isInputOk) {
-      LOG_GOOD("[Skip] User cancel", fieldOperation)
+      LOG_GOOD_NP("[Skip] User cancel", fieldOperation)
       return 0;
     }
     if (tagsOrCast.isEmpty()) {
-      LOG_BAD("[Abort] Input can not be empty", fieldOperation)
+      LOG_BAD_NP("[Abort] Input can not be empty", fieldOperation)
       return 0;
     }
     candidates.push_back(tagsOrCast);
@@ -270,7 +268,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
       fieldColumn = JSON_KEY_E::Tags;
       break;
     default:
-      LOG_BAD("Field Type invalid", QString::number((int)type));
+      LOG_BAD_P("Field Type invalid", "field: %d", (int)type);
       return -1;
   }
 
@@ -288,11 +286,10 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
       cnt = _JsonModel->RmvCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
     default:
-      LOG_BAD("Field Operation invalid", QString::number((int)mode));
+      LOG_BAD_P("Field Operation invalid", "mode: %d", (int)mode);
       return -2;
   }
-  const QString affectedRowsMsg{QString{"[Uncommit] %1/%2 row(s) affected by [%3]"}.arg(cnt).arg(indexes.size()).arg(fieldOperation)};
-  LOG_GOOD(affectedRowsMsg, tagsOrCast);
+  LOG_GOOD_P("SetCastOrTags", "%d/%d row(s) affected by [%s]", cnt, indexes.size(), qPrintable(fieldOperation));
   return indexes.size();
 }
 
@@ -304,7 +301,7 @@ bool JsonTableView::GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_T
   edtWidType = EDITOR_WIDGET_TYPE::BUTT;
   const QModelIndex& curInd = currentIndex();
   if (!curInd.isValid()) {
-    LOG_WARN("Current Index is invalid", "select a line first");
+    LOG_WARN_NP("Current Index is invalid", "select a line first");
     return false;
   }
   QWidget* editor = indexWidget(curInd);
@@ -325,7 +322,7 @@ bool JsonTableView::GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_T
   } else {
     selectedText.clear();
     edtWidType = EDITOR_WIDGET_TYPE::BUTT;
-    LOG_WARN("Unsupported editor type, current not QLineEdit/QPlainTextEdit/QTextEdit", "failed");
+    LOG_WARN_NP("Unsupported editor type, current not QLineEdit/QPlainTextEdit/QTextEdit", "failed");
     return false;
   }
   return true;
@@ -335,29 +332,28 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
   EDITOR_WIDGET_TYPE edtWidType{EDITOR_WIDGET_TYPE::BUTT};
   QString userSelection;
   if (!GetSelectedTextInCell(userSelection, edtWidType)) {
-    LOG_WARN("Get Selected Text in Selected Cell failed", "see detail in logs");
+    LOG_WARN_NP("Get Selected Text in Selected Cell failed", "see detail in logs");
     return -1;
   }
 
   if (userSelection.trimmed().isEmpty()) {
-    LOG_WARN("User selection text empty", "failed");
+    LOG_WARN_NP("User selection text empty", "failed");
     return false;
   }
 
   const QModelIndex& curInd = currentIndex();
   if (!curInd.isValid()) {
-    LOG_WARN("Current Index is invalid", "select a line first");
+    LOG_WARN_NP("Current Index is invalid", "select a line first");
     return -1;
   }
 
   const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   int cnt = _JsonModel->AppendCastFromSentence(srcModelInd, userSelection, isUpperCaseSentence);
   if (cnt < 0) {
-    LOG_BAD("append failed", "see detail in logs");
+    LOG_BAD_NP("Cast append failed", "see detail in logs");
     return -1;
   }
-  QString msg{QString{"%1 cast append succeed"}.arg(cnt)};
-  LOG_GOOD(msg, userSelection);
+  LOG_GOOD_P("Cast append succeed", "cnt %d", cnt);
   return cnt;
 }
 
@@ -367,17 +363,17 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   QString userSelection;
   EDITOR_WIDGET_TYPE edtWidType{EDITOR_WIDGET_TYPE::BUTT};
   if (!GetSelectedTextInCell(userSelection, edtWidType)) {
-    LOG_WARN("Index valid or no selection", "No need change case");
+    LOG_WARN_NP("Index valid or no selection", "No need change case");
     return -1;
   }
   if (userSelection.trimmed().isEmpty()) {
-    LOG_WARN("User selection empty", "No need change case");
+    LOG_WARN_NP("User selection empty", "No need change case");
     return -1;
   }
 
   QWidget* editor = indexWidget(curInd);
   if (editor == nullptr) {
-    LOG_WARN("Cell not in edit", "Cannot change case of selection text");
+    LOG_WARN_NP("Cell not in edit", "Cannot change case of selection text");
     return -1;
   }
 
@@ -404,17 +400,17 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
       break;
     }
     case EDITOR_WIDGET_TYPE::BUTT: {
-      LOG_WARN("Editor type invalid", "Cannot change case of selection text");
+      LOG_WARN_NP("Editor type invalid", "Cannot change case of selection text");
       break;
     }
   }
   const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   _JsonModel->setData(srcModelInd, newText);
   if (!ret) {
-    LOG_BAD("Change selection case failed", "see detail in logs");
+    LOG_BAD_NP("Change selection case failed", "see detail in logs");
     return -1;
   }
-  LOG_GOOD("Change selection text case succeed", userSelection);
+  LOG_GOOD_NP("Change selection text case succeed", userSelection);
   return 0;
 }
 

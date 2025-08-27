@@ -1,5 +1,5 @@
 ﻿#include "MD5Window.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "MD5Calculator.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
@@ -86,9 +86,9 @@ int MD5Window::operator()(const QStringList& absPaths) {
     const QString md5{MD5Calculator::GetFileMD5(absPath, bytesRange)};
     m_md5TextEdit->appendPlainText(md5 + ':' + bytesRangeStr + ':' + absPath);
   }
-  const QString fileCntStr{QString::number(fileCnt)};
-  setWindowTitle(QString("MD5 | %1 file(s)").arg(fileCntStr));
-  LOG_GOOD("MD5 calculated ok", fileCntStr);
+
+  setWindowTitle(QString("MD5 | %1 file(s)").arg(fileCnt));
+  LOG_GOOD_P("MD5 calculated ok", "%d file(s)", fileCnt);
   return fileCnt;
 }
 

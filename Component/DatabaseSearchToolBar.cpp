@@ -1,5 +1,5 @@
 #include "DatabaseSearchToolBar.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "PerformerJsonFileHelper.h"
 #include "TableFields.h"
@@ -90,7 +90,7 @@ void DatabaseSearchToolBar::onQuickWhereClause() {
   }
   auto retCode = m_quickWhereClause->exec();
   if (retCode != QDialog::DialogCode::Accepted) {
-    LOG_INFO("User cancel quick where clause", QString::number(retCode))
+    LOG_INFO_P("[Skip] User cancel quick where clause", "dialogCode:%d", retCode)
     return;
   }
   const QString& whereClause {m_quickWhereClause->GetWhereString()};
@@ -138,7 +138,7 @@ void MovieDBSearchToolBar::extraSignalSubscribe() {
 QString MovieDBSearchToolBar::AskUserDropWhichTable() {
   const QStringList& candidates = m_tablesCB->ToQStringList();
   if (candidates.isEmpty()) {
-    LOG_INFO("There is no table exists", "skip drop");
+    LOG_INFO_NP("There is no table exists", "skip drop");
     return "";
   }
   const int defaultDropIndex = m_tablesCB->currentIndex();
@@ -151,12 +151,12 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
                                                 false,                                    //
                                                 &okUserSelect);
   if (!okUserSelect) {
-    LOG_GOOD("[skip] Drop table", "User cancel")
+    LOG_GOOD_NP("[skip] Drop table", "User cancel")
     return "";
   }
   const QString& deleteTbl = MountHelper::ChoppedDisplayName(drpTbl);
   if (deleteTbl.isEmpty()) {
-    LOG_BAD("[Abort] Table name is empty, cannot drop", deleteTbl)
+    LOG_BAD_NP("[Abort] Table name is empty, cannot drop", deleteTbl)
     return "";
   }
   return deleteTbl;
