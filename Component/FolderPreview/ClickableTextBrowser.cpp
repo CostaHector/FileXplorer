@@ -3,7 +3,7 @@
 #include "DisplayEnhancement.h"
 #include "FdBasedDb.h"
 #include "MemoryKey.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "TableFields.h"
@@ -82,9 +82,9 @@ QString ClickableTextBrowser::FormatSearchSentence(QString text) {
 }
 
 void ClickableTextBrowser::onSearchSelectionReq() {
-  QString searchKeyString = FormatSearchSentence(GetCurrentSelectedText());
+  const QString& searchKeyString {FormatSearchSentence(GetCurrentSelectedText())};
   if (searchKeyString.size() < MIN_SINGLE_SEARCH_PATTERN_LEN) {
-    LOG_WARN("Skip search, too short searchText:", searchKeyString);
+    LOG_WARN_NP("Skip search, too short searchText:", searchKeyString);
     return;
   }
   qDebug("Search:[%s]", qPrintable(searchKeyString));
@@ -111,8 +111,7 @@ void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
     return;
   }
   if (searchKeyString.size() < MIN_SINGLE_SEARCH_PATTERN_LEN) {
-    QString msg = QString{"searchText[%1] should >= %2 chars]"}.arg(searchKeyString).arg(MIN_SINGLE_SEARCH_PATTERN_LEN);
-    LOG_WARN("Skip search, too short", msg);
+    LOG_WARN_P("[Skip search] too short", "searchText[%d] should >= %d chars]", qPrintable(searchKeyString), MIN_SINGLE_SEARCH_PATTERN_LEN);
     return;
   }
   qDebug("Search:[%s]", qPrintable(searchKeyString));
@@ -122,14 +121,14 @@ void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
 void ClickableTextBrowser::onSearchMultiSelectionReq() {
   const QStringList keywords = GetSelectedTexts();
   if (keywords.isEmpty()) {
-    LOG_WARN("Skip search", "Nothing selected");
+    LOG_WARN_NP("Skip search", "Nothing selected");
     return;
   }
   bool bNeedSearchDb{false};
   const QString whereClause = BuildMultiKeywordLikeCondition(keywords, bNeedSearchDb);
   if (!bNeedSearchDb) {
-    QString msg = QString{"Max Sub-Conditon keyword of whereClause[%1] should >= %2 chars]"}.arg(whereClause).arg(MIN_EACH_KEYWORD_LEN);
-    LOG_WARN("Skip search, too short", msg);
+    LOG_WARN_P("[Skip search] too short", "Max Sub-Conditon keyword of whereClause[%s] should >= %d chars]",
+               qPrintable(whereClause), MIN_EACH_KEYWORD_LEN);
     return;
   }
   qDebug("Search:[%s]", qPrintable(whereClause));
@@ -274,7 +273,7 @@ QString ClickableTextBrowser::BuildMultiKeywordLikeCondition(const QStringList &
 void ClickableTextBrowser::CopySelectedTextToClipboard() const {
   QClipboard* pClipboard = QApplication::clipboard();
   if (pClipboard == nullptr) {
-    LOG_BAD("Copy failed", "pClipboard is nullptr");
+    LOG_BAD_NP("Copy failed", "pClipboard is nullptr");
     return;
   }
   pClipboard->setText(GetCurrentSelectedText());

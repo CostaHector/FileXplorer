@@ -5,8 +5,10 @@
 #include "CastDbModel.h"
 #include "CustomTableView.h"
 #include "DatabaseSearchToolBar.h"
+#include "QuickWhereClauseDialog.h"
 #include <QToolBar>
 #include <QLineEdit>
+
 class FileFolderPreviewer;
 
 class CastDBView : public CustomTableView {

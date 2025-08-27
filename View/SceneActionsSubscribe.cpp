@@ -1,8 +1,9 @@
 ﻿#include "SceneActionsSubscribe.h"
 #include "SceneInPageActions.h"
 #include "SceneInfoManager.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "MemoryKey.h"
+#include "PublicMacro.h"
 #include <QToolBar>
 #include <QMessageBox>
 
@@ -151,18 +152,18 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
   JsonDataRefresher jdr;
   int jsonUpdatedCnt = jdr(rootPath);
   if (jsonUpdatedCnt >= 0) {
-    Notificator::goodNews(QString("%1 Json(s) Update succeed").arg(jsonUpdatedCnt), qPrintable(rootPath));
+    LOG_GOOD_P("Json(s) Update succeed", "count: %d, rootpath:%s", jsonUpdatedCnt, qPrintable(rootPath));
   }
   int scnFileCnt = jdr.GenerateScnFiles();
   if (scnFileCnt == -1) {
-    Notificator::badNews("Combine scn file failed. May path not exist", qPrintable(rootPath));
+    LOG_BAD_NP("Combine scn file failed. May path not exist", rootPath);
     return;
   }
   if (scnFileCnt == 0) {
-    Notificator::goodNews("Skip. No json file find, No need to combine scn file", qPrintable(rootPath));
+    LOG_GOOD_NP("Skip. No json file find, No need to combine scn file", rootPath);
     return;
   }
-  Notificator::goodNews(QString("Update %1 scn file(s) succeed").arg(scnFileCnt), qPrintable(rootPath));
+  LOG_GOOD_P("Update scn file(s) succeed", "cnt: %d, rootpath:%s", scnFileCnt, qPrintable(rootPath));
   _model->setRootPath(rootPath, true);
 }
 
@@ -171,27 +172,29 @@ void SceneActionsSubscribe::UpdateScnFilesOnly() {
     qDebug("_model or _tableView is nullptr");
     return;
   }
+  CHECK_NULLPTR_RETURN_VOID(_model)
+  CHECK_NULLPTR_RETURN_VOID(_tableView)
   const QString& rootPath = _model->rootPath();
   if (rootPath.count('/') < 2) {  // large folder
     qDebug("Update Scn file may cause lag. As [%s] contains a large json(s)", qPrintable(rootPath));
     const auto ret =
         QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
-      qDebug("User cancel Update Scn file on a large path[%s]", qPrintable(rootPath));
+      LOG_INFO_NP("User cancel Update Scn file on a large path", rootPath);
       return;
     }
   }
 
   int scnFileCnt = SceneInfoManager::GenerateAScnFile(rootPath);
   if (scnFileCnt == -1) {
-    Notificator::badNews("Update scn file failed. May path not exist", qPrintable(rootPath));
+    LOG_BAD_NP("Update scn file failed. May path not exist", rootPath);
     return;
   }
   if (scnFileCnt == 0) {
-    Notificator::goodNews("Skip. No json file find, No need to update scn file at all", qPrintable(rootPath));
+    LOG_GOOD_NP("[Skip] No json file find, No need to update scn file at all", rootPath);
     return;
   }
-  Notificator::goodNews(QString("Update %1 scn file(s) succeed").arg(scnFileCnt), qPrintable(rootPath));
+  LOG_GOOD_P("[Ok] Update scn file(s)", "count: %d, rootPath: %s", scnFileCnt, qPrintable(rootPath));
   _model->setRootPath(rootPath);
 }
 

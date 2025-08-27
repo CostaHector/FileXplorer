@@ -50,24 +50,4 @@ class Notificator : public QFrame {
   static QList<Notificator*> instances;
 };
 
-#define LOG_GOOD(title, message)                           \
-  qDebug("%s:%s", qPrintable(title), qPrintable(message)); \
-  Notificator::goodNews(title, message);
-
-#define LOG_BAD(title, message)                              \
-  qWarning("%s:%s", qPrintable(title), qPrintable(message)); \
-  Notificator::badNews(title, message);
-
-#define LOG_INFO(title, message)                          \
-  qInfo("%s:%s", qPrintable(title), qPrintable(message)); \
-  Notificator::information(title, message);
-
-#define LOG_WARN(title, message)                             \
-  qWarning("%s:%s", qPrintable(title), qPrintable(message)); \
-  Notificator::warning(title, message);
-
-#define LOG_CRITICAL(title, message)                          \
-  qCritical("%s:%s", qPrintable(title), qPrintable(message)); \
-  Notificator::critical(title, message);
-
 #endif  // NOTIFICATOR_H

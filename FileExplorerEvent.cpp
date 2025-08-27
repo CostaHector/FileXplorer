@@ -14,7 +14,7 @@
 #include "Archiver.h"
 #include "CustomStatusBar.h"
 #include "MD5Window.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "PropertiesWindow.h"
 #include "RedundantImageFinder.h"
 #include "ViewsStackedWidget.h"
@@ -131,15 +131,12 @@ bool FileExplorerEvent::on_NewJsonFile() {
     }
   }
   if (!jsonFileAlreadyExist.isEmpty()) {
-    qDebug("Json already exists, skip these %d item(s): \n%s", jsonFileAlreadyExist.size(), qPrintable(jsonFileAlreadyExist.join('\n')));
-    Notificator::information(QString("Json already exists, skip these %1 item(s)").arg(jsonFileAlreadyExist.size()), jsonFileAlreadyExist.join('\n'));
+    LOG_INFO_P("Partial Json file(s) already exists", "%d exists as follows:\n%s", jsonFileAlreadyExist.size(), qPrintable(jsonFileAlreadyExist.join('\n')));
   }
   if (!jsonFilesNameCreated.isEmpty()) {
-    qDebug("Create %d json files succeed, json file name as follows:\n%s", jsonFilesNameCreated.size(), qPrintable(jsonFilesNameCreated.join('\n')));
-    Notificator::goodNews(QString("Create %1 json files succeed").arg(jsonFilesNameCreated.size()), jsonFilesNameCreated.join('\n'));
+    LOG_GOOD_P("Partial Json file(s) Create succeed", "%d exists as follows:\n%s", jsonFilesNameCreated.size(), qPrintable(jsonFilesNameCreated.join('\n')));
   } else {
-    qDebug("No jsons need created under path[%s]", qPrintable(path));
-    Notificator::goodNews("No jsons need created under path", path);
+    LOG_GOOD_NP("No jsons need created under path", path);
   }
   return true;
 }
@@ -200,22 +197,25 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   const QString defNamePattern = isFolder ? Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v).toString()
                                           : Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v).toString();
 
-  const QString userInputRule =
-      QInputDialog::getText(_contentPane, QString("Create Batch %1").arg(isFolder ? "Folders" : "Files"), "Rule Pattern: C-styleFormatString%StartIndex$EndIndex", QLineEdit::Normal, defNamePattern);
+  const QString userInputRule = QInputDialog::getText(//
+        _contentPane, //
+        QString("Create Batch %1").arg(isFolder ? "Folders" : "Files"),
+        "Rule Pattern: C-styleFormatString%StartIndex$EndIndex",
+        QLineEdit::Normal,
+        defNamePattern);
   const QStringList& userInputLst = userInputRule.split('$');
-  if (userInputLst.size() != 3 or userInputLst.size() >= 280) {
-    qWarning("[Error] Invalid Rule pattern[%s]. It must contains exactly 3 parts but now %d. and must below 280 letter but now %d", qPrintable(userInputRule), userInputLst.size(),
-             userInputRule.size());
-    Notificator::warning(QString("Invalid Rule pattern[%1]").arg(userInputRule), QString("3 parts[%1] and below 280 letters[%2]").arg(userInputLst.size()).arg(userInputRule.size()));
+  if (userInputLst.size() != 3) {
+    LOG_WARN_P("[Error] Invalid Rule pattern",
+               "Rule pattern[%s] should contains 3 parts seperated by '$', but there are %d parts",
+               qPrintable(userInputRule), userInputLst.size());
     return false;
   }
-  char namePattern[280] = "\0";
-  strncpy(namePattern, userInputLst[0].toStdString().c_str(), sizeof(namePattern));
+  char namePattern[260] = "\0";
+  strncpy(namePattern, userInputLst[0].toStdString().c_str(), sizeof(namePattern) - 1);
   int startIndex = userInputLst[1].toInt();
   int endIndex = userInputLst[2].toInt();
   if (startIndex >= endIndex) {
-    qInfo("Skip Create %d file/folders", endIndex - startIndex);
-    Notificator::information(QString("Skip").arg(userInputRule), QString("%1 file/folders").arg(endIndex - startIndex));
+    LOG_INFO_P("Skip", "Create %d file/folders", endIndex - startIndex)
     return true;
   }
   Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, userInputRule);
@@ -229,32 +229,32 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
   }
   const QStringList& selectedFiles = selectedItems();
   if (selectedFiles.isEmpty()) {
-    Notificator::information("Skip nothing selected", "selected some video(s) first");
+    LOG_INFO_NP("Skip nothing selected", "selected some video(s) first");
     return true;
   }
   if (!ThumbnailProcesser::IsDimensionXValid(dimensionX)) {
-    Notificator::information("Dimension of row invalid", QString::number(dimensionX));
+    LOG_INFO_NP("Dimension of row invalid", QString::number(dimensionX));
     return false;
   }
   if (!ThumbnailProcesser::IsDimensionYValid(dimensionY)) {
-    Notificator::information("Dimension of column invalid", QString::number(dimensionY));
+    LOG_INFO_NP("Dimension of column invalid", QString::number(dimensionY));
     return false;
   }
   if (!ThumbnailProcesser::IsWidthPixelAllowed(widthPx)) {
-    Notificator::information("images width invalid", QString::number(widthPx));
+    LOG_INFO_NP("images width invalid", QString::number(widthPx));
     return false;
   }
   const int curSamplePeriod = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
   if (!ThumbnailProcesser::IsSamplePeriodAllowed(curSamplePeriod)) {
-    Notificator::information("Sample period not allowed", QString::number(curSamplePeriod));
+    LOG_INFO_NP("Sample period not allowed", QString::number(curSamplePeriod));
     return false;
   }
   const int cnt = ThumbnailProcesser::CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, curSamplePeriod, true);
   if (cnt <= 0) {
-    Notificator::badNews("Create thumbnail failed", "see details in log");
+    LOG_BAD_NP("Create thumbnail failed", "see details in log");
     return false;
   }
-  Notificator::goodNews("Create thumbnail(s) for video(s) succeed. count: ", QString::number(cnt));
+  LOG_GOOD_P("Create thumbnail(s) for video(s) succeed", "count: %d", cnt);
   return true;
 }
 
@@ -272,24 +272,20 @@ bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool ski
     msgBox->setDefaultButton(QMessageBox::Ok);
     const auto ret = msgBox->exec();
     if (ret != QMessageBox::Ok) {
-      qInfo("User cancel. Skip extract images out of thumbnail");
-      Notificator::information("User cancel", "Skip extract images out of thumbnail");
+      LOG_INFO_NP("User cancel", "Skip extract images out of thumbnail")
       return true;
     }
   }
   ThumbnailProcesser tp{skipIfExist};
   int extractedOutCnt = tp(currentPath, beg, end);
-  if (tp.mErrImg.isEmpty()) {
-    if (extractedOutCnt == 0) {
-      qDebug("Nothing need extracted out in [%s]", qPrintable(currentPath));
-      Notificator::goodNews("Nothing need extracted out", currentPath);
-    } else {
-      qDebug("Extract %d from [%s] all succeed", extractedOutCnt, qPrintable(currentPath));
-      Notificator::goodNews(QString("Extract %1 from [%2]").arg(extractedOutCnt).arg(currentPath), "all succeed");
-    }
+  if (!tp.mErrImg.isEmpty()) {
+    LOG_INFO_P("Extract Failed", "%d images, as follows:\n", extractedOutCnt, qPrintable(tp.mErrImg.join('\n')));
+    return false;
+  }
+  if (extractedOutCnt == 0) {
+    LOG_GOOD_NP("Nothing need extracted out", currentPath);
   } else {
-    qWarning("extract %d images out from %s. error msg: %s", extractedOutCnt, qPrintable(currentPath), qPrintable(tp.mErrImg.join('\n')));
-    Notificator::information(QString("extract %1 images out from %2. error msg:").arg(extractedOutCnt).arg(currentPath), tp.mErrImg.join('\n'));
+    LOG_GOOD_P("[Ok] Extract", "%d image(s) from path[%s]", extractedOutCnt, qPrintable(currentPath));
   }
   return true;
 }
@@ -361,8 +357,7 @@ bool FileExplorerEvent::on_properties() const {
     pW->operator()(_contentPane->m_movieDbModel, _contentPane->m_movieView);
     return true;
   }
-  qDebug("Reject. not support in view[%s]", qPrintable(_contentPane->GetCurViewName()));
-  Notificator::information("Reject", QString("Not support in view[%s]").arg(_contentPane->GetCurViewName()));
+  LOG_INFO_P("Reject", "Not support in view[%s]", qPrintable(_contentPane->GetCurViewName()));
   return false;
 }
 
@@ -391,8 +386,7 @@ void FileExplorerEvent::subsribeFileActions() {
 
   connect(g_fileLeafActions()._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
     Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);
-    qDebug("Language will be changed next time open");
-    Notificator::information("Language switch", "work after reopen");
+    LOG_INFO_NP("Language switch", "work after reopen")
   });
 }
 
@@ -416,14 +410,14 @@ void FileExplorerEvent::subscribeThumbnailActions() {
                                                      ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX, 1,  //
                                                      &bok);
     if (!bok) {
-      Notificator::information("User input[%s] invalid or canceled", QString::number(newSamplePeriod));
+      LOG_INFO_NP("[Skip] User cancel set sample period", "return")
       return;
     }
     if (newSamplePeriod == curSamplePeriod) {
       return;
     }
     Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, newSamplePeriod);
-    Notificator::goodNews("New thumbnail image sample period has been set to", QString::number(newSamplePeriod));
+    LOG_GOOD_P("ThumbnailSamplePeriod", "T=%d", newSamplePeriod);
   });
 
   connect(ins._EXTRACT_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* extractThumbnailAct) {
@@ -443,19 +437,19 @@ void FileExplorerEvent::subscribeThumbnailActions() {
                                                 "Enter range (e.g., 1,3; 1,4; 1,7):",       //
                                                 QLineEdit::Normal, "0,9", &ok);             //
     if (!ok || input.isEmpty()) {
-      Notificator::information("User input[%s] invalid or canceled", qPrintable(input));
+      LOG_INFO_P("[Skip]User canceled or invalid input", "input[%s]", qPrintable(input));
       return;
     }
     static const QRegularExpression regex(R"(^\d,\d$)");
     QRegularExpressionMatch match = regex.match(input);
     if (!match.hasMatch()) {
-      Notificator::warning("Invalid format[%s]! Expected format: \\d,\\d", input);
+      LOG_WARN_NP("Invalid Range Format", input)
       return;
     }
     const int beg = match.captured(1).toInt();
     const int end = match.captured(2).toInt();
     if (beg < 0 || end < beg) {
-      Notificator::warning("Invalid range[%s]! Ensure 0 < beg <= end", input);
+      LOG_WARN_P("Invalid range", "Ensure 0 < beg <= end but[%s]", qPrintable(input));
       return;
     }
     bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
@@ -624,13 +618,11 @@ void FileExplorerEvent::onRename(AdvanceRenamer* renameWid) {
 
 bool FileExplorerEvent::__CanNewItem() const {
   if (!_contentPane->isFSView()) {
-    qDebug("Reject. Only new item in file system view[%s]", qPrintable(_contentPane->GetCurViewName()));
-    Notificator::information("Reject", QString("Not file system view[%s]").arg(_contentPane->GetCurViewName()));
+    LOG_INFO_P("Reject New", "view name[%s]", qPrintable(_contentPane->GetCurViewName()));
     return false;
   }
   if (PathTool::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
-    qDebug("Reject. Don't create item under path[%s]", qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("Reject", QString("Don't create item under path[%s]").arg(_fileSysModel->rootPath()));
+    LOG_INFO_P("Reject New", "Don't create item under path[%s]", qPrintable(_fileSysModel->rootPath()));
     return false;
   }
   return true;
@@ -663,7 +655,7 @@ bool FileExplorerEvent::on_revealInExplorer() const {
   } else {
     const QString absPth{_contentPane->getFilePath(curIndex)};
     if (!QFile::exists(absPth)) {
-      Notificator::warning("Reveal path[%1] not exists", absPth);
+      LOG_WARN_NP("Reveal path not exists", absPth);
       return false;
     }
 #ifdef _WIN32
@@ -686,8 +678,7 @@ bool FileExplorerEvent::on_revealInExplorer() const {
 
 bool FileExplorerEvent::on_OpenInTerminal() const {
   if (!(_contentPane->isFSView() || _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH))) {
-    qWarning("[Open in Terminal] only support in filesystem/search/movie but[%s]", qPrintable(_contentPane->GetCurViewName()));
-    Notificator::warning("[Reveal in Terminal] only support in filesystem/search/movie but[%1]", _contentPane->GetCurViewName());
+    LOG_WARN_NP("[Skip] Open In Terminal", _contentPane->GetCurViewName());
     return false;
   }
   return SysTerminal()(_contentPane->getRootPath());
@@ -695,8 +686,7 @@ bool FileExplorerEvent::on_OpenInTerminal() const {
 
 bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
   if (!_contentPane->isFSView()) {
-    qWarning("[Refresh] only support in filesystem but[%s]", qPrintable(_contentPane->GetCurViewName()));
-    Notificator::warning("[Refresh] only support in filesystem but[%1]", _contentPane->GetCurViewName());
+    LOG_WARN_NP("[Skip] Refresh", _contentPane->GetCurViewName());
     return false;
   }
   QAbstractItemView* fsView = _contentPane->GetCurView();
@@ -706,21 +696,19 @@ bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
   const QString& path = _fileSysModel->rootPath();
   _fileSysModel->setRootPath("");
   fsView->setRootIndex(_fileSysModel->setRootPath(path));
-  qDebug("Refresh filesytemmodel of path: %s", qPrintable(path));
-  Notificator::goodNews("Refresh filesytemmodel of path: ", path);
+  LOG_GOOD_NP("Refresh filesytemmodel of path: ", path);
   return true;
 }
 
 bool FileExplorerEvent::on_compress() {
   if (!((_contentPane->isFSView() || _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) && !PathTool::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
-    qInfo("[Compress] Only available on FileSytemView/search[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_contentPane->getRootPath()));
-    Notificator::information("[Compress] Only available on FileSytemView/search[%1] and non-empty-path[%2]", _contentPane->GetCurViewName() + '|' + _contentPane->getRootPath());
+    LOG_INFO_P("[Skip] Compress", "viewName:%s, rootPath:%s",
+               qPrintable(_contentPane->GetCurViewName()), qPrintable(_contentPane->getRootPath()));
     return false;
   }
   const QStringList& filesPath = _contentPane->getFilePaths();
   if (filesPath.isEmpty()) {
-    qDebug("skip nothing selected");
-    Notificator::information("[Compress] skip", "nothing selected");
+    LOG_INFO_NP("[Skip] Compress", "nothing selected");
     return false;
   }
   const QString& compressedTo = _contentPane->getRootPath();
@@ -728,19 +716,18 @@ bool FileExplorerEvent::on_compress() {
   const QString& archievePath = QDir(compressedTo).absoluteFilePath(archieveName);
   ArchiveFiles af{archievePath, ArchiveFiles::NO_FILTER};
   bool compressedResult = af.CompressNow(ArchiveFiles::OPERATION_TYPE::FILES, filesPath, false);
-  Notificator::information("Compressed result bool:", QString::number(compressedResult));
+  LOG_INFO_P("Compressed:", "bResult: %d", compressedResult);
   return compressedResult;
 }
 
 bool FileExplorerEvent::on_deCompress() {
   if (!((_contentPane->isFSView() || _contentPane->GetCurViewName() == ENUM_2_STR(SEARCH)) && !PathTool::isLinuxRootOrWinEmpty(_contentPane->getRootPath()))) {
-    qInfo("[Decompress] Only available on FileSytemView/search[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_contentPane->getRootPath()));
-    Notificator::warning("[Decompress] Only available on FileSytemView/search[%1] and non-empty-path[%2]", _contentPane->GetCurViewName() + '|' + _contentPane->getRootPath());
+    LOG_INFO_P("[Skip] Decompress", "viewName:%s, rootPath:%s", qPrintable(_contentPane->GetCurViewName()), qPrintable(_contentPane->getRootPath()));
     return false;
   }
   const QStringList& filesPath = _contentPane->getFilePaths();
   if (filesPath.isEmpty()) {
-    Notificator::warning("Skip", "Nothing need decompress");
+    LOG_INFO_P("Skip Decompress", "Nothing selected");
     return true;
   }
   QStringList failsQzFiles;
@@ -752,25 +739,24 @@ bool FileExplorerEvent::on_deCompress() {
       failsQzFiles << filePath;
     }
   }
-  qInfo("decompress %d file(s), %d failed", filesPath.size(), failsQzFiles.size());
-  if (failsQzFiles.isEmpty()) {
-    Notificator::goodNews("All decompress ok", QString("%1 qz files").arg(filesPath.size()));
+  qInfo("Decompress %d file(s), %d failed", filesPath.size(), failsQzFiles.size());
+  if (!failsQzFiles.isEmpty()) {
+    LOG_BAD_P("[Partially Failed] Decompress qz", "following %d file(s) failed:\n%s", failsQzFiles.size(), qPrintable(failsQzFiles.join('\n')));
   } else {
-    qWarning("decompress failed item(s) as following:\n%s", qPrintable(failsQzFiles.join('\n')));
-    Notificator::badNews(QString("Decompressed following %1 file(s) failed").arg(failsQzFiles.size()), failsQzFiles.join('\n'));
+    LOG_GOOD_P("[Ok] Decompress qz", "%d qz files decompressed ok", filesPath.size());
   }
   return failsQzFiles.isEmpty();
 }
 
 bool FileExplorerEvent::on_compressImgsByGroup() {
   if (!_contentPane->isFSView()) {
-    qDebug("[Compress images] only available on FileSystemModel but[%s]", qPrintable(_contentPane->GetCurViewName()));
+    LOG_INFO_P("[Skip] Compress images", "viewName:%s", qPrintable(_contentPane->GetCurViewName()));
     return false;
   }
   const QString& pth = _contentPane->getRootPath();
   ArchiveImagesRecusive air{true};
   int compressFolderCnt = air.CompressImgRecur(pth);
-  Notificator::information("Compress images result bool:", QString::number(compressFolderCnt));
+  LOG_INFO_P("[Ok] Compress images", "count: %d", compressFolderCnt)
   return true;
 }
 
@@ -781,14 +767,12 @@ bool FileExplorerEvent::on_archivePreview() {
   }
   const QString pth = _contentPane->getRootPath();
   if (PathTool::isLinuxRootOrWinEmpty(pth)) {
-    qInfo("[ArchivePreivew] Only available on FileSytemView/search[%c] and non-empty-path[%s]", (char)vt, qPrintable(pth));
-    Notificator::warning("[ArchivePreivew] Only available on FileSytemView/search and non-empty-path", QString::number((int)vt) + '|' + pth);
+    LOG_WARN_P("[Abort ArchivePreivew]", "Path[%s] root or empty", qPrintable(pth));
     return false;
   }
   const QStringList& filesPath = _contentPane->getFilePaths();
   if (filesPath.isEmpty() || filesPath.size() > 1) {
-    qWarning("Can ArchivePreivew only 1 qz files");
-    Notificator::warning("[ArchivePreivew] Can ArchivePreivew only 1 qz files", QString("real: %1 count").arg(filesPath.size()));
+    LOG_WARN_P("[Abort ArchivePreivew]", "archives files count[%d]", filesPath.size());
     return false;
   }
   if (m_archivePreview == nullptr) {
@@ -804,23 +788,23 @@ bool FileExplorerEvent::on_archivePreview() {
 bool FileExplorerEvent::on_moveToTrashBin() {
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt) && vt != ViewType::SEARCH) {
-    LOG_WARN("[Move to trashbin] Not FileSytemView/Search View, viewType:", QString::number((int)vt));
+    LOG_WARN_P("[Skip Move to trashbin] Not FileSytemView/Search View", "viewType %d", (int)vt);
     return false;
   }
   const QString pth = _contentPane->getRootPath();
   if (PathTool::isLinuxRootOrWinEmpty(pth)) {
-    LOG_WARN("[Move to trashbin] Path not support", pth);
+    LOG_WARN_NP("[Skip Move to trashbin] Path not support", pth);
     return false;
   }
 
   QStringList prepaths, names;
   std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(true);
   if (names.size() <= 0) {
-    LOG_INFO("[Move to trashbin] Nothing selected", "Skip");
+    LOG_INFO_NP("[Skip Move to trashbin]", "Nothing selected");
     return true;
   }
   if (prepaths.size() != names.size()) {
-    LOG_INFO("[Move to trashbin]", "Prepaths and Names length Inequal");
+    LOG_INFO_P("[Skip Move to trashbin]", "Prepaths[%d] and Names[%d] length Inequal", prepaths.size(), names.size());
     return true;
   }
 
@@ -832,9 +816,9 @@ bool FileExplorerEvent::on_moveToTrashBin() {
   }
   const bool isAllSucceed = g_undoRedo.Do(removeCmds);
   if (isAllSucceed) {
-    LOG_GOOD("Move to trash all succeed, count:", QString::number(removeCmds.size()));
+    LOG_GOOD_P("Move to trash all succeed", "Commands count %d", removeCmds.size());
   } else {
-    LOG_BAD("Move to trash partially failed", "Some item(s) move to trashbin failed");
+    LOG_BAD_NP("Move to trash partially failed", "Some item(s) move to trashbin failed");
   }
   return isAllSucceed;
 }
@@ -846,8 +830,7 @@ bool FileExplorerEvent::on_deletePermanently() {
   }
   const QString pth = _contentPane->getRootPath();
   if (PathTool::isLinuxRootOrWinEmpty(pth)) {
-    qInfo("[Delete Permanently] Only available on FileSytemView[%c] and non-empty-path[%s]", (char)vt, qPrintable(pth));
-    Notificator::warning("[Delete Permanently] Only available on FileSytemView and non-empty-path", QString::number((int)vt) + '|' + pth);
+    LOG_INFO_P("[Abort] Delete Permanently", "viewName:%s, rootPath:%s", qPrintable(_contentPane->GetCurViewName()), qPrintable(pth));
     return false;
   }
   using namespace FileOperatorType;
@@ -932,13 +915,11 @@ auto FileExplorerEvent::on_SelectInvert() -> void {
 bool FileExplorerEvent::on_HarView() {
   const QString& fileAbsPath = _contentPane->getCurFilePath();
   if (!fileAbsPath.toLower().endsWith(".har")) {
-    qWarning("file[%s] type is not .har", qPrintable(fileAbsPath));
-    Notificator::warning("file[%s] type is not .har", fileAbsPath);
+    LOG_WARN_NP("File extension is not .har", fileAbsPath);
     return false;
   }
   if (!QFile::exists(fileAbsPath)) {
-    qWarning("Har file[%s] not exist", qPrintable(fileAbsPath));
-    Notificator::warning("Har file[%s] not exist", fileAbsPath);
+    LOG_WARN_NP("Har file not exist", fileAbsPath);
     return false;
   }
   static HarTableView* harTableview{nullptr};
@@ -959,7 +940,7 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
                              || vt == ViewTypeTool::ViewType::MOVIE     //
                              || vt == ViewTypeTool::ViewType::SEARCH};  //
   if (!supportViewType) {
-    qDebug("[Play Video] only available on list/table/tree/movie/search [%s]", qPrintable(_contentPane->GetCurViewName()));
+    LOG_INFO_P("[Skip] Play Video", "viewName:%s", qPrintable(_contentPane->GetCurViewName()));
     return false;
   }
   // select an item or select nothing
@@ -968,17 +949,14 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
     playPath = _fileSysModel->rootPath();
   }
   if (PathTool::isRootOrEmpty(playPath)) {
-    qWarning("Play skip. Empty path or root path[%s]", qPrintable(playPath));
-    Notificator::warning("Play skip. Empty path or root path", playPath);
+    LOG_INFO_P("[Abort] Play", "playPath[%s]", qPrintable(playPath));
     return true;
   }
   if (!on_ShiftEnterPlayVideo(playPath)) {
-    qInfo("Play[%s] failed", qPrintable(playPath));
-    Notificator::information("Play failed", playPath);
+    LOG_INFO_NP("[Failed] Play", playPath);
     return false;
   }
-  qInfo("Playing[%s]", qPrintable(playPath));
-  Notificator::information("Playing...", playPath);
+  LOG_INFO_NP("Playing...", playPath);
   return true;
 }
 
@@ -1000,7 +978,7 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   }
   const QString msg{l + "\n" + r};
   if (!QFileInfo{l}.isDir() || !QFileInfo{r}.isDir()) {
-    LOG_INFO("[Merge Folder Skip]. Select two folder", msg);
+    LOG_INFO_NP("[Merge Folder Skip]. Select two folder", msg);
     return false;
   }
 
@@ -1009,10 +987,10 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   BATCH_COMMAND_LIST_TYPE aBatch = cm.Merge(l, r);
   const bool isAllSucceed{g_undoRedo.Do(aBatch)};
   if (!isAllSucceed) {
-    LOG_WARN("Merge partial failed", msg);
+    LOG_WARN_NP("Merge partial failed", msg);
     return false;
   }
-  LOG_GOOD("Merge partial failed", msg);
+  LOG_GOOD_NP("[ok] Merged", msg);
   return true;
 }
 
@@ -1025,7 +1003,7 @@ bool FileExplorerEvent::on_Copy() {
   pMimeData->setText(absPaths.join('\n'));
   pMimeData->setUrls(urls);
   if (!SetMimeDataCutCopy(*pMimeData, Qt::CopyAction)) {
-    LOG_BAD("Set Copy Action in QMimedata failed", "Abort");
+    LOG_BAD_NP("Set Copy Action in QMimedata failed", "Abort");
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
@@ -1043,7 +1021,7 @@ bool FileExplorerEvent::on_Cut() {
   pMimeData->setText(absPaths.join('\n'));
   pMimeData->setUrls(urls);
   if (!SetMimeDataCutCopy(*pMimeData, Qt::MoveAction)) {
-    LOG_BAD("Set Cut Action in QMimedata failed", "Abort");
+    LOG_BAD_NP("Set Cut Action in QMimedata failed", "Abort");
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
@@ -1055,42 +1033,42 @@ bool FileExplorerEvent::on_Cut() {
 
 bool FileExplorerEvent::on_Paste() {
   if (!_contentPane->isFSView()) {
-    LOG_WARN("[Paste Skip] Only available on FileSytemView", "Skip");
+    LOG_WARN_NP("[Paste Skip] Only available on FileSytemView", "Skip");
     return false;
   }
   const QString& rTo = _fileSysModel->rootPath();
   if (rTo == "C:/") {
-    LOG_WARN("Paste destination cannot be C:/", "Do this operation on system explorer.");
+    LOG_WARN_NP("Paste destination cannot be C:/", "Do this operation on system explorer.");
     return false;
   }
   if (PathTool::isLinuxRootOrWinEmpty(rTo)) {
-    LOG_WARN("[Paste Skip] Paste destination cannot be empty", rTo);
+    LOG_WARN_NP("[Paste Skip] Paste destination cannot be empty", rTo);
     return false;
   }
   auto* pMimeData = m_clipboard->mimeData();
   if (pMimeData == nullptr) {
-    LOG_CRITICAL("[Paste Skip] pMimeData is nullptr", "Cannot paste here");
+    LOG_CRIT_NP("[Paste Skip] pMimeData is nullptr", "Cannot paste here");
     return false;
   }
   if (!pMimeData->hasUrls()) {
-    LOG_CRITICAL("[Paste Skip] no urls in Clipboard", "Cannot paste here");
+    LOG_CRIT_NP("[Paste Skip] no urls in Clipboard", "Cannot paste here");
     return false;
   }
   using namespace ComplexOperation;
   FILE_STRUCTURE_MODE fileStructMode{GetDefaultFileStructMode()};
   if (fileStructMode == FILE_STRUCTURE_MODE::QUERY) {
     if (!QueryKeepStructureOrFlatten(fileStructMode)) {
-      LOG_GOOD("User cancel paste", "neither flatten or keep");
+      LOG_GOOD_NP("User cancel paste", "neither flatten or keep");
       return true;
     }
   }
   Qt::DropAction dropAction = GetCutCopyModeFromNativeMimeData(*pMimeData);
   int ret = DoDropAction(dropAction, pMimeData->urls(), rTo, fileStructMode);
   if (ret < 0) {
-    LOG_BAD("Paste operation partially failed", rTo);
+    LOG_BAD_NP("Paste operation partially failed", rTo);
     return false;
   }
-  LOG_GOOD("Paste operation all succeed", rTo);
+  LOG_GOOD_NP("Paste operation all succeed", rTo);
   _fileSysModel->ClearCopyAndCutDict();
   if (_contentPane->m_searchSrcModel != nullptr) {
     _contentPane->m_searchSrcModel->ClearCopyAndCutDict();
@@ -1099,18 +1077,12 @@ bool FileExplorerEvent::on_Paste() {
 }
 
 bool FileExplorerEvent::on_NameStandardize() {
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
-    qDebug("[Name Standardize] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("[Name Standardize] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
+  if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+    LOG_INFO_P("[Skip] NameStandardize", "viewName:%s, rootPath:%s",
+               qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     return false;
   }
-  const QDir pathdir = this->_fileSysModel->rootDirectory();
-  const QString& currentPath = pathdir.absolutePath();
-  if (currentPath.isEmpty() or pathdir.isRoot()) {
-    qWarning("Abort. Cannot work on [%s]", qPrintable(currentPath));
-    Notificator::warning("Abort", QString("Cannot work on [%1]").arg(currentPath));
-    return false;
-  }
+  const QString currentPath{_fileSysModel->rootPath()};
   auto* msgBox = new QMessageBox(QMessageBox::Icon::Question, "Name Standardlizer Confirm?", QString("All item(s) under [%1] will be RENAMED RECURSIVELY!").arg(currentPath));
   msgBox->setWindowIcon(QIcon(":img/NAME_RULER"));
   msgBox->setInformativeText(QString("Work path [%1]?").arg(currentPath));
@@ -1119,27 +1091,24 @@ bool FileExplorerEvent::on_NameStandardize() {
   msgBox->setDefaultButton(QMessageBox::Ok);
   const auto ret = msgBox->exec();
   if (ret != QMessageBox::Ok) {
-    qInfo("User cancel. Name standardlize");
-    Notificator::information("User cancel", "Name standardlize");
+    LOG_INFO_NP("User cancel", "Name standardlize");
     return true;
   }
-  qInfo("Name standardlize Start...");
-  Notificator::information("Name standardlize", "Start...");
+  LOG_INFO_NP("Name standardlize", "Start...");
   FilesNameBatchStandardizer fnbs;
-  const auto isAllSuccess = fnbs(currentPath);
-  qInfo(isAllSuccess ? "Name standardlize Finshed" : "Name standardlize Some Failed");
+  const bool isAllSuccess = fnbs(currentPath);
   if (isAllSuccess) {
-    Notificator::goodNews("Name standardlize", "Finshed");
+    LOG_GOOD_NP("[Ok] Name standardlize", "Finshed");
   } else {
-    Notificator::badNews("Name standardlize", "Some Failed");
+    LOG_BAD_NP("[Partial Failed] Name standardlize", "Some Failed");
   }
   return isAllSuccess;
 }
 
 bool FileExplorerEvent::on_FileClassify() {
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
-    qDebug("[File Classify] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("[File Classify] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
+  if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+    LOG_INFO_P("[Skip] FileClassify", "viewName:%s, rootPath:%s",
+               qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     return false;
   }
   const auto beforeOpt = _fileSysModel->options();
@@ -1148,12 +1117,10 @@ bool FileExplorerEvent::on_FileClassify() {
   ItemsClassifier classfier;
   classfier(currentPath);
   QString startMsg = "Item(s) Classify Start... total:" + QString::number(classfier.CommandsCnt()) + "cmd(s)..";
-  qInfo("%s", qPrintable(startMsg));
-  Notificator::information(startMsg, currentPath);
+  LOG_INFO_NP(startMsg, currentPath);
   bool classifyResult = classfier.StartToRearrange();
   QString endMsg = "Item(s) Classify Finished... bAllSucceed:" + QString::number(classifyResult);
-  qInfo("%s", qPrintable(endMsg));
-  Notificator::goodNews(endMsg, currentPath);
+  LOG_GOOD_NP(endMsg, currentPath);
   _fileSysModel->setOptions(beforeOpt);
   _fileSysModel->setRootPath("");
   _contentPane->GetCurView()->setRootIndex(_fileSysModel->setRootPath(currentPath));
@@ -1161,16 +1128,15 @@ bool FileExplorerEvent::on_FileClassify() {
 }
 
 bool FileExplorerEvent::on_FileUnclassify() {
-  if (not _contentPane->isFSView() or PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
-    qDebug("[File Unclassify] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("[File Classify] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
+  if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+    LOG_INFO_P("[Skip] FileUnclassify", "viewName:%s, rootPath:%s",
+      qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     return false;
   }
   const QDir pathdir = this->_fileSysModel->rootDirectory();
   const QString& currentPath = pathdir.absolutePath();
-  if (currentPath.isEmpty() or pathdir.isRoot()) {
-    qWarning("Abort. Unclassify cannot work on [%s]", qPrintable(currentPath));
-    Notificator::warning("Abort", QString("Unclassify cannot work on [%1]").arg(currentPath));
+  if (currentPath.isEmpty() || pathdir.isRoot()) {
+    LOG_WARN_P("[Skip] FileUnclassify", "current path[%s]", qPrintable(currentPath));
     return false;
   }
 
@@ -1182,8 +1148,7 @@ bool FileExplorerEvent::on_FileUnclassify() {
   msgBox->setDefaultButton(QMessageBox::Ok);
   const auto ret = msgBox->exec();
   if (ret != QMessageBox::Ok) {
-    qInfo("User cancel. Skip unpile");
-    Notificator::information("User cancel", "Skip unpile");
+    LOG_INFO_NP("User cancel", "Skip unpile");
     return true;
   }
   const auto beforeOpt = _fileSysModel->options();
@@ -1191,12 +1156,10 @@ bool FileExplorerEvent::on_FileUnclassify() {
   ExtractPileItemsOutFolder unclassfier;
   unclassfier(currentPath);
   QString startMsg = "Item(s) Unclassify Start... total:" + QString::number(unclassfier.CommandsCnt()) + "cmd(s)..";
-  qInfo("%s", qPrintable(startMsg));
-  Notificator::information(startMsg, currentPath);
+  LOG_INFO_NP(startMsg, currentPath);
   bool classifyResult = unclassfier.StartToRearrange();
   QString endMsg = "Item(s) Unclassify Finished... bAllSucceed:" + QString::number(classifyResult);
-  qInfo("%s", qPrintable(endMsg));
-  Notificator::goodNews(endMsg, currentPath);
+  LOG_GOOD_NP(endMsg, currentPath);
   _fileSysModel->setOptions(beforeOpt);
   _fileSysModel->setRootPath("");
   _contentPane->GetCurView()->setRootIndex(_fileSysModel->setRootPath(currentPath));
@@ -1205,8 +1168,8 @@ bool FileExplorerEvent::on_FileUnclassify() {
 
 bool FileExplorerEvent::on_RemoveDuplicateImages() {
   if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
-    qDebug("[on_RemoveDuplicateImages] Only available on FileSytemView[%s] and non-empty-path[%s]", qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
-    Notificator::information("[on_RemoveDuplicateImages] Only available on FileSytemView and non-empty-path", _contentPane->GetCurViewName() + '|' + _fileSysModel->rootPath());
+    LOG_INFO_P("[Skip] RemoveDuplicateImages", "viewName:%s, rootPath:%s",
+             qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     return false;
   }
 
@@ -1231,18 +1194,18 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
 
 bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   if (!_contentPane->isFSView()) {
-    LOG_INFO("[Remove redundant item] Only available on FileSytemView", "Skip");
+    LOG_INFO_NP("[Remove redundant item] Only available on FileSytemView", "Skip");
     return false;
   }
   const QString& path = _fileSysModel->rootPath();
   if (PathTool::isRootOrEmpty(path)) {
-    LOG_INFO("[Remove redundant item] Path invalid", path);
+    LOG_INFO_NP("[Remove redundant item] Path invalid", path);
     return false;
   }
 
   int cmdCnt = remover(path);
   if (cmdCnt == 0) {
-    LOG_INFO("Skip", "Nothing to remove");
+    LOG_INFO_NP("Skip", "Nothing to remove");
     return true;
   }
   auto* msgBox = new QMessageBox(QMessageBox::Icon::Warning, QString("Confirm %1 command(s)?").arg(cmdCnt), "Remove Redundant folder");
@@ -1251,7 +1214,7 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   msgBox->setDetailedText(QString(remover));
   const auto ret = msgBox->exec();
   if (ret != QMessageBox::StandardButton::Yes) {
-    LOG_GOOD("User cancel remove redundant item", "skip");
+    LOG_GOOD_NP("[Skip]User cancel remove redundant item", "return");
     return true;
   }
   return remover.Exec();
@@ -1274,14 +1237,14 @@ void FileExplorerEvent::on_DUPLICATE_IMAGES_FINDER(const bool checked) {
 bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString dest) {
   const auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
-    LOG_WARN("[Move/Copy to] only available on FileSytemView", QString::number((int)vt));
+    LOG_WARN_P("[Move/Copy to] only available on FileSytemView", "Now: %d", (int)vt);
     return false;
   }
   static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{{Qt::DropAction::CopyAction, "COPY"}, {Qt::DropAction::MoveAction, "MOVE"}, {Qt::DropAction::IgnoreAction, "IGNORE"}};
   const QString& pOperationNameStr = DROP_ACTION_2_STR.value(dropAct, "IGNORE");
   auto* view = _contentPane->GetCurView();
   if (!view->selectionModel()->hasSelection()) {
-    LOG_INFO("Select Some File/Folder First", pOperationNameStr);
+    LOG_INFO_NP("Select Some File/Folder First", pOperationNameStr);
     return true;
   }
   const QString& l = _fileSysModel->rootPath();
@@ -1289,7 +1252,7 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
     dest = ChooseCopyDestination(l, view);
   }
   if (dest.isEmpty() || !QFileInfo{dest}.isDir()) {
-    LOG_WARN("Destination path invalid", dest);
+    LOG_WARN_NP("Destination path invalid", dest);
     return true;
   }
 
@@ -1312,10 +1275,10 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
   using namespace ComplexOperation;
   int ret = DoDropAction(dropAction, lRels, dest, FILE_STRUCTURE_MODE::PRESERVE);
   if (ret < 0) {
-    LOG_BAD(pOperationNameStr, "Failed. See details in logs");
+    LOG_BAD_P(pOperationNameStr, "Failed. errorCode:%d", ret);
     return false;
   }
-  LOG_GOOD(pOperationNameStr, "Succeed. All succeed");
+  LOG_GOOD_NP(pOperationNameStr, "All succeed");
   return true;
 }
 

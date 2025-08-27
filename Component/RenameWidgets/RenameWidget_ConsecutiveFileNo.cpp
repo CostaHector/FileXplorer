@@ -1,6 +1,6 @@
 #include "RenameWidget_ConsecutiveFileNo.h"
 #include "ToConsecutiveFileNameNo.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "PublicMacro.h"
 
 RenameWidget_ConsecutiveFileNo::RenameWidget_ConsecutiveFileNo(QWidget* parent)  //
@@ -17,7 +17,7 @@ QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replac
   bool isnumeric = false;
   int startNo = startNoStr.toInt(&isnumeric);
   if (!isnumeric) {
-    LOG_CRITICAL("Start no must be a number", startNoStr);
+    LOG_CRIT_NP("Start no must be a number", startNoStr);
     return replaceeList;
   }
   return ToConsecutiveFileNameNo(startNo)(replaceeList);
