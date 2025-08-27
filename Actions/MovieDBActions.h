@@ -18,7 +18,6 @@ class MovieDBActions : public QObject {
   QAction* DELETE_FROM_TABLE{nullptr};
   QAction* UNION_TABLE{nullptr};
   QAction* AUDIT_A_TABLE{nullptr};
-  QAction* QUICK_WHERE_CLAUSE{nullptr};
   QActionGroup* DB_CONTROL_ACTIONS{nullptr};
 
   QAction* READ_DURATION_BY_VIDEO{nullptr};

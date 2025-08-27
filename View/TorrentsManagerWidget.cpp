@@ -5,7 +5,7 @@
 
 #include "TorrDBAction.h"
 #include "TableFields.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -216,21 +216,18 @@ bool TorrentsManagerWidget::onDeleteFromTable() {
 }
 
 bool TorrentsManagerWidget::onSubmit() {
-  if (m_torrentsDBModel == nullptr) {
-    qCritical("_dbModel is nullptr");
-    return false;
-  }
+  CHECK_NULLPTR_RETURN_FALSE(m_torrentsDBModel)
 
   if (!m_torrentsDBModel->isDirty()) {
-    Notificator::goodNews("Table not dirty, Skip", DB_TABLE::TORRENTS);
+    LOG_GOOD_NP("[Skip] Table not dirty", DB_TABLE::TORRENTS);
     return true;
   }
   if (!m_torrentsDBModel->submitAll()) {
-    Notificator::badNews("Submit failed. see details in logs", DB_TABLE::TORRENTS);
+    LOG_BAD_NP("[Submit failed]", m_torrentsDBModel->lastError().text());
     return false;
   }
 
-  Notificator::goodNews("Submit succeed", DB_TABLE::TORRENTS);
+  LOG_GOOD_NP("Submit succeed", DB_TABLE::TORRENTS);
   return true;
 }
 

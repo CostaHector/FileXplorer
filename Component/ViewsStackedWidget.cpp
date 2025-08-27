@@ -2,7 +2,7 @@
 #include "ArchiveFilesActions.h"
 #include "ViewActions.h"
 #include "FolderPreviewActions.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "ArchiveFiles.h"
 #include "HarFiles.h"
 #include "ScenesListModel.h"
@@ -208,13 +208,13 @@ void ViewsStackedWidget::BindLogger(CustomStatusBar* logger) {
 
 auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool {
   if (!clickedIndex.isValid()) {
-    LOG_BAD("Current Index invalid", "double Click skip");
+    LOG_BAD_NP("Current Index invalid", "double Click skip");
     return false;
   }
   QFileInfo fi = getFileInfo(clickedIndex);
   qInfo("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
-    LOG_BAD("path not exist", fi.absoluteFilePath());
+    LOG_BAD_NP("path not exist", fi.absoluteFilePath());
     return false;
   }
   if (fi.isSymLink()) {
@@ -225,7 +225,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
 #endif
     fi.setFile(tarPath);
     if (!fi.exists()) {
-      LOG_BAD("link not exists double click not work", tarPath);
+      LOG_BAD_NP("link not exists double click not work", tarPath);
       return false;
     }
     qDebug("linked to[%s]", qPrintable(fi.absoluteFilePath()));

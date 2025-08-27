@@ -13,7 +13,7 @@
 
 #include "FileBasicOperationsActions.h"
 #include "RedundantImageFinderActions.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
@@ -23,7 +23,7 @@
 RedunImgLibs RedundantImageFinder::mRedunLibs{"redunSizeHashlib"};
 
 RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
-    : QMainWindow{parent} {
+  : QMainWindow{parent} {
   m_imgModel = new (std::nothrow) RedundantImageModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_imgModel);
   m_table = new (std::nothrow) CustomTableView{"RedundantImageTable", this};
@@ -115,9 +115,9 @@ void RedundantImageFinder::RecycleSelection() {
   auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
   qDebug("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
   if (isRenameAllSucceed) {
-    Notificator::goodNews("Recyle redundant images succeed", QString::number(SELECTED_CNT));
+    LOG_GOOD_P("Recyle redundant images succeed", "selected count: %d", SELECTED_CNT);
   } else {
-    Notificator::badNews("Recyle redundant images failed", QString::number(SELECTED_CNT));
+    LOG_BAD_P("Recyle redundant images failed", "selected count: %d", SELECTED_CNT);
   }
   UpdateDisplayWhenRecycled();
 }
@@ -154,5 +154,5 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   ChangeWindowTitle(folderPath);
   const QString msg{QString{"%1 duplicate images(s) found under path[%2]"}.arg(afterRowCnt).arg(mCurrentPath)};
   const QString title{byBenchmarkLib ? "By benchmark library" : "MD5 checksums in current directory"};
-  Notificator::goodNews(title, msg);
+  LOG_GOOD_NP(title, msg);
 }

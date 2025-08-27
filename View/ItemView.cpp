@@ -1,5 +1,5 @@
 #include "ItemView.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include <QActionGroup>
 #include <QDesktopServices>
 #include <QUrl>
@@ -39,5 +39,9 @@ void ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
   }
   const QString& path = mModels->filePath(clickedIndex);
   const bool ret = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
-  Notificator::information(QString("Try open\n[%1]:").arg(path), QString::number(ret));
+  if (ret) {
+    LOG_GOOD_NP("[Ok] Open", path);
+  } else {
+    LOG_BAD_NP("[Failed] Open", path);
+  }
 }

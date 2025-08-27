@@ -7,41 +7,45 @@ MovieDBActions& g_dbAct() {
 }
 
 MovieDBActions::MovieDBActions(QObject* parent)  //
-    : QObject{parent}                            //
+  : QObject{parent}                            //
 {
   SUBMIT = new (std::nothrow) QAction(QIcon(":img/SUBMIT"), "Submit", this);
   CHECK_NULLPTR_RETURN_VOID(SUBMIT);
-  REVERT = new (std::nothrow) QAction(QIcon(":img/REVERT"), "Revert", this);
-  CHECK_NULLPTR_RETURN_VOID(REVERT);
-  INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), "Create Database", this);
-  CHECK_NULLPTR_RETURN_VOID(INIT_A_DATABASE);
-  INIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/CREATE_TABLE"), "Create Table", this);
-  CHECK_NULLPTR_RETURN_VOID(INIT_A_TABLE);
-  DROP_A_TABLE = new (std::nothrow) QAction(QIcon(":img/DROP_TABLE"), "Drop Table", this);
-  CHECK_NULLPTR_RETURN_VOID(DROP_A_TABLE);
-  INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), "Insert Into", this);
-  CHECK_NULLPTR_RETURN_VOID(INSERT_A_PATH);
-  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), "Delete Where", this);
-  CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
-  UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), "Union Into", this);
-  CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);
-  AUDIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/AUDIT"), "Audit This Table", this);
-  CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
-  QUICK_WHERE_CLAUSE = new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_CLAUSE"), "Where clause", this);
-  CHECK_NULLPTR_RETURN_VOID(QUICK_WHERE_CLAUSE);
-
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
   SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> Manual Submit.").arg(SUBMIT->text(), SUBMIT->shortcut().toString()));
-  INIT_A_DATABASE->setToolTip("CREATE DATABASE `DB_NAME`;");
-  INIT_A_TABLE->setToolTip("CREATE TABLE IF NOT EXISTS `DB_TABLE::MOVIES`(`COLUMN_NAME` TEXT NOT NULL, PRIMARY KEY (COLUMN_NAME));");
-  DROP_A_TABLE->setToolTip("DROP TABLE `DB_TABLE::MOVIES`;");
-  INSERT_A_PATH->setToolTip("INSERT INTO `DB_TABLE::MOVIES`(COLUMN_NAME) VALUES (VALUE);");
-  DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::MOVIES` WHERE CLAUSE");
-  UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
-  AUDIT_A_TABLE->setToolTip("Audit a table (Principle: Compare video records in table with an online disk);");
-  QUICK_WHERE_CLAUSE->setToolTip("Construct where clause quickly;");
 
-  DB_CONTROL_ACTIONS = new (std::nothrow) QActionGroup(this);
+  REVERT = new (std::nothrow) QAction(QIcon(":img/REVERT"), "Revert", this);
+  CHECK_NULLPTR_RETURN_VOID(REVERT);
+
+  INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), "Create Database", this);
+  CHECK_NULLPTR_RETURN_VOID(INIT_A_DATABASE);
+  INIT_A_DATABASE->setToolTip("CREATE DATABASE `DB_NAME`;");
+
+  INIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/CREATE_TABLE"), "Create Table", this);
+  CHECK_NULLPTR_RETURN_VOID(INIT_A_TABLE);
+  INIT_A_TABLE->setToolTip("CREATE TABLE IF NOT EXISTS `DB_TABLE::MOVIES`(`COLUMN_NAME` TEXT NOT NULL, PRIMARY KEY (COLUMN_NAME));");
+
+  DROP_A_TABLE = new (std::nothrow) QAction(QIcon(":img/DROP_TABLE"), "Drop Table", this);
+  CHECK_NULLPTR_RETURN_VOID(DROP_A_TABLE);
+  DROP_A_TABLE->setToolTip("DROP TABLE `DB_TABLE::MOVIES`;");
+
+  INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), "Insert Into", this);
+  CHECK_NULLPTR_RETURN_VOID(INSERT_A_PATH);
+  INSERT_A_PATH->setToolTip("INSERT INTO `DB_TABLE::MOVIES`(COLUMN_NAME) VALUES (VALUE);");
+
+  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), "Delete Where", this);
+  CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
+  DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::MOVIES` WHERE CLAUSE");
+
+  UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), "Union Into", this);
+  CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);
+  UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
+
+  AUDIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/AUDIT"), "Audit This Table", this);
+  CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
+  AUDIT_A_TABLE->setToolTip("Audit a table (Principle: Compare video records in table with an online disk);");
+
+  DB_CONTROL_ACTIONS = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(DB_CONTROL_ACTIONS);
   DB_CONTROL_ACTIONS->addAction(SUBMIT);
   DB_CONTROL_ACTIONS->addAction(REVERT);
@@ -52,7 +56,6 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS->addAction(DROP_A_TABLE);
   DB_CONTROL_ACTIONS->addAction(UNION_TABLE);
   DB_CONTROL_ACTIONS->addAction(AUDIT_A_TABLE);
-  DB_CONTROL_ACTIONS->addAction(QUICK_WHERE_CLAUSE);
   DB_CONTROL_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
   READ_DURATION_BY_VIDEO = new (std::nothrow) QAction(QIcon(":img/VIDEO_DURATION"), "Read Duration", this);
