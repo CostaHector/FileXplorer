@@ -1,7 +1,7 @@
 ﻿#include "ViewHelper.h"
 #include "MemoryKey.h"
 #include "FileSystemModel.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "ComplexOperation.h"
 #include "AddressBarActions.h"
 
@@ -46,10 +46,10 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
   using namespace ComplexOperation;
   int ret = DoDropAction(action, urls, dest, ComplexOperation::FILE_STRUCTURE_MODE::PRESERVE);
   if (ret < 0) {
-    LOG_WARN("Drop into partial failed", dest);
+    LOG_WARN_NP("[Failed] Drop into partial", dest);
     return false;
   }
-  LOG_GOOD("Drop into all succeed", dest);
+  LOG_GOOD_NP("[Ok] Drop into all", dest);
   return true;
 }
 

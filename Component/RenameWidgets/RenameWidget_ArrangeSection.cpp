@@ -1,5 +1,5 @@
 ﻿#include "RenameWidget_ArrangeSection.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
 #include "NameSectionArrange.h"
@@ -96,7 +96,7 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
   const QStringList& newNames = nsa.BatchSwapper(replaceeList);
   if (bRecordWasted && nsa.HasWasted()) {
     const QString& wastedNames = nsa.GetWastedNames();
-    Notificator::warning("wasted section found", wastedNames);
+    LOG_WARN_NP("wasted section found", wastedNames);
     qWarning("Following name contains some section wasted. [%s]", qPrintable(wastedNames));
   }
   return newNames;

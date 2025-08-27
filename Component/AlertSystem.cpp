@@ -1,5 +1,5 @@
 ﻿#include "AlertSystem.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "FileLeafAction.h"
@@ -98,18 +98,22 @@ void AlertSystem::RefreshWindowIcon() {
 bool AlertSystem::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
   const QString& path = m_alertModel->filePath(clickedIndex);
   const auto ret = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
-  Notificator::information(QString("Try open [%1]:").arg(path), QString::number(ret));
+  if (ret) {
+    LOG_GOOD_NP("[ok] Open", path);
+  } else {
+    LOG_BAD_NP("[Failed] Open", path);
+  }
   return ret;
 }
 
 void AlertSystem::onEditPreferenceSetting() const {
   QString fileAbsPath = Configuration().fileName();
   if (!QFile::exists(fileAbsPath)) {
-    Notificator::warning("Cannot edit", QString("File[%1] not found").arg(fileAbsPath));
+    LOG_WARN_P("Cannot edit", "File[%d] not found", qPrintable(fileAbsPath));
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(fileAbsPath));
-  Notificator::information("Remember to reload", "don't forget it");
+  LOG_INFO_NP("Remember to reload", "don't forget it");
 }
 
 // #define __NAME__EQ__MAIN__ 1

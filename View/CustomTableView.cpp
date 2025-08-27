@@ -2,7 +2,7 @@
 #include "ColumnVisibilityDialog.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 
 #include <QHeaderView>
 #include <QInputDialog>
@@ -196,11 +196,11 @@ bool CustomTableView::onShowHideColumn() {
 bool CustomTableView::onHideThisColumn() {
   const int c = GetClickedHorIndex();
   if (!(0 <= c && c < m_columnsShowSwitch.size())) {
-    LOG_WARN(QString{"Invalid column index[%1]"}.arg(c), "Skip HideThisColumn");
+    LOG_WARN_P("[Skip] HideThisColumn", "Invalid column index[%d]", c);
     return false;
   }
   if (m_columnsShowSwitch[c] == '0') {
-    LOG_INFO(QString("Column[%1th] is already hide").arg(c), "Select another column to hide");
+    LOG_INFO_P("[Skip] Column already hide", "Select another column[not %d] to hide", c);
     return true;
   }
   m_columnsShowSwitch[c] = '0';
