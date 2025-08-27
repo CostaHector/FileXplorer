@@ -5,7 +5,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QAction>
-#include "QuickWhereClause.h"
+#include "QuickWhereClauseDialog.h"
 
 // GUID_IN_UNDERSCORE | ROOTPATH
 class Guid2RootPathComboxBox : public QComboBox {
@@ -39,7 +39,7 @@ protected:
   void subscribe();
   virtual void extraSignalSubscribe() = 0;
   QComboBox* m_whereCB{nullptr};
-  QuickWhereClause* m_quickWhereClause{nullptr};
+  QuickWhereClauseDialog* m_quickWhereClause{nullptr};
   QAction* _QUICK_WHERE_CLAUSE_ACT{nullptr};
 private:
   void EmitWhereClauseChangedSignal();

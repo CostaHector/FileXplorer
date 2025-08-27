@@ -19,7 +19,7 @@ Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{pare
 
 void Guid2RootPathComboxBox::AddItem(const QString& guidUnderscore, const QString& rootPath) {
   const int index = count();
-  addItem(QIcon(":img/TABLES"), guidUnderscore + MountHelper::JOINER_STR + rootPath);
+  addItem(guidUnderscore + MountHelper::JOINER_STR + rootPath);
   QString toolHint;
   toolHint.reserve(50);
   toolHint += "GUID:<br/>";
@@ -85,7 +85,7 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
 
 void DatabaseSearchToolBar::onQuickWhereClause() {
   if (m_quickWhereClause == nullptr) {
-    m_quickWhereClause = new (std::nothrow) QuickWhereClause{this};
+    m_quickWhereClause = new (std::nothrow) QuickWhereClauseDialog{this};
     CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
   }
   auto retCode = m_quickWhereClause->exec();

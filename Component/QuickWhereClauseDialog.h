@@ -1,5 +1,5 @@
-#ifndef QUICKWHERECLAUSE_H
-#define QUICKWHERECLAUSE_H
+#ifndef QUICKWHERECLAUSEDIALOG_H
+#define QUICKWHERECLAUSEDIALOG_H
 
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -11,10 +11,10 @@
 #include <QFormLayout>
 #include <QStringListModel>
 
-class QuickWhereClause : public QDialog {
+class QuickWhereClauseDialog : public QDialog {
 public:
-  explicit QuickWhereClause(QWidget* parent = nullptr);
-  ~QuickWhereClause();
+  explicit QuickWhereClauseDialog(QWidget* parent = nullptr);
+  ~QuickWhereClauseDialog();
   int WriteUniqueHistoryToQSetting();
 
   QSize sizeHint() const override { return QSize{600, 200}; }
@@ -73,4 +73,4 @@ private:
   static constexpr char WHERE_HIST_SPLIT_CHAR{'\n'};
 };
 
-#endif  // QUICKWHERECLAUSE_H
+#endif  // QUICKWHERECLAUSEDIALOG_H
