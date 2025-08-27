@@ -4,7 +4,7 @@
 #include "MemoryKey.h"
 #include "DevicesDrivesActions.h"
 #include "MountHelper.h"
-#include "Notificator.h"
+#include "NotificatorMacro.h"
 #include <QPainter>
 #include <QApplication>
 #include <QDate>
@@ -13,9 +13,9 @@
 
 using namespace DEV_DRV_TABLE;
 class ProgressDelegate : public QStyledItemDelegate {
- public:
+public:
   ProgressDelegate(QSqlTableModel* model, QObject* parent = nullptr)  //
-      : QStyledItemDelegate(parent), mModel{model} {}
+    : QStyledItemDelegate(parent), mModel{model} {}
   QSqlTableModel* mModel;
 
   inline float GetUsedPercentage(const QModelIndex& index) const {
@@ -40,8 +40,8 @@ class ProgressDelegate : public QStyledItemDelegate {
 };
 
 DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)                          //
-    : CustomTableView{"DevicesAndDrives", parent},                         //
-      mDb{SystemPath::DEVICES_AND_DRIVES_DATABASE, "DeviceAndDriverConn"}  //
+  : CustomTableView{"DevicesAndDrives", parent},                         //
+  mDb{SystemPath::DEVICES_AND_DRIVES_DATABASE, "DeviceAndDriverConn"}  //
 {
   if (!mDb.CreateDatabase()) {
     qWarning("CreateDatabase failed");
@@ -110,10 +110,11 @@ void DevicesDrivesTV::onUpdateVolumes() {
   VolumeUpdateResult resStat{0};
   const int ret = mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &resStat);
   if (ret != FD_OK) {
-    Notificator::badNews(QString{"Update Volume(s) FAILED, errorCode:%1"}.arg(ret), "See details in log");
+    LOG_BAD_P("Update Volume(s) FAILED", "errorCode:%d", ret)
     return;
   }
-  Notificator::goodNews("Update Volume(s) ok", QString{"Insert:%1, Delete:%2, Update:%3"}.arg(resStat.insertCnt).arg(resStat.deleteCnt).arg(resStat.updateCnt));
+  LOG_GOOD_P("Update Volume(s) Ok", "Insert:%d, Delete:%d, Update:%d",
+             resStat.insertCnt, resStat.deleteCnt, resStat.updateCnt)
   mDevModel->select();
 }
 
@@ -126,10 +127,10 @@ void DevicesDrivesTV::onMountADriver() {
   const QString label{"D" + QDate::currentDate().toString("yyMM")};
   QString volMountPoint;
   if (!MountHelper::MountVolume(guid, label, volMountPoint)) {
-    Notificator::badNews(QString{"Mount Volume(s)[%1] FAILED"}.arg(guid), "See details in log");
+    LOG_BAD_P("Mount Volume(s) failed", "guid:%s", qPrintable(guid))
     return;
   }
-  Notificator::goodNews(QString{"Mount Volume(s)[%1] ok"}.arg(guid), label + " in " + volMountPoint);
+  LOG_GOOD_P("Mount Volume(s) ok", "guid:%s label:%s, volMountPoint:%s", qPrintable(guid), qPrintable(label), qPrintable(volMountPoint))
   auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), volMountPoint);
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
@@ -146,10 +147,10 @@ void DevicesDrivesTV::onUnmountADriver() {
   }
   const QString& guid = mDevModel->GetGuid(index);
   if (!MountHelper::UnmountVolume(mountedPnt)) {
-    Notificator::badNews(QString{"Unmount Volume(s)[%1] from pnt:%2 FAILED"}.arg(guid).arg(mountedPnt), "See details in log");
+    LOG_BAD_P("Unmount Failed", "Unmount Volume(s)[%s] from pnt:%s", qPrintable(guid), qPrintable(mountedPnt))
     return;
   }
-  Notificator::goodNews(QString{"Unmount Volume(s)[%1] from pnt:%2 ok"}.arg(guid).arg(mountedPnt), "NULL");
+  LOG_GOOD_P("Unmount Ok", "Unmount Volume(s)[%s] from pnt:%s", qPrintable(guid), qPrintable(mountedPnt))
   auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), "");
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
@@ -162,7 +163,7 @@ void DevicesDrivesTV::onAdtADriver() {
   }
   const QString& guid = mDevModel->GetGuid(index);
   const QString& rootPath = mDevModel->GetRootPath(index);
-  Notificator::badNews(QString{"Adt Volume(s)[%1] %2 FAILED"}.arg(guid).arg(rootPath), "No support now...");
+  LOG_BAD_P("Adt Volume(s) FAILED", "guid[%s]\nrootPath[%s]", qPrintable(guid), qPrintable(rootPath))
   auto setRet = mDevModel->setData(index.siblingAtColumn(ADT_TIME), QDateTime::currentMSecsSinceEpoch());
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);

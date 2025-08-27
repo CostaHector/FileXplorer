@@ -36,13 +36,11 @@ void Notificator::badNews(const QString& title, const QString& message) {
 }
 
 void Notificator::critical(const QString& title, const QString& message) {
-  qCritical("%s:%s", qPrintable(title), qPrintable(message));
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
   showMessage(icon, title, message);
 }
 
 void Notificator::warning(const QString& title, const QString& message) {
-  qWarning("%s:%s", qPrintable(title), qPrintable(message));
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
   showMessage(icon, title, message);
 }
@@ -53,7 +51,6 @@ void Notificator::information(const QString& title, const QString& message) {
 }
 
 void Notificator::question(const QString& title, const QString& message) {
-  qDebug("%s:%s", qPrintable(title), qPrintable(message));
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion);
   showMessage(icon, title, message);
 }

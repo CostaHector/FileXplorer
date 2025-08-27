@@ -291,22 +291,24 @@
 <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
 <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
 <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
-<file alias="WHERE_CLAUSE_HISTORY">Database/WHERE_CLAUSE_HISTORY.svg</file>
+<file alias="WHERE_CLAUSE_HISTORY_REMOVED">Database/WHERE_CLAUSE_HISTORY_REMOVED.svg</file>
+<file alias="WHERE_CLAUSE_HISTORY_CLEAR">Database/WHERE_CLAUSE_HISTORY_CLEAR.png</file>
+<file alias="WHERE_CLAUSE_HISTORY_ADD">Database/WHERE_CLAUSE_HISTORY_ADD.svg</file>
+<file alias="WHERE_CLAUSE_HISTORY_EDIT">Database/WHERE_CLAUSE_HISTORY_EDIT.png</file>
 <file alias="COUNTER">Database/COUNTER.svg</file>
 <file alias="SUM">Database/SUM.svg</file>
 <file alias="UNION">Database/UNION.svg</file>
 <file alias="AUDIT">Database/AUDIT.svg</file>
 <file alias="REVERT">Database/REVERT.svg</file>
 <file alias="TABLES">Database/TABLES.svg</file>
+<file alias="QUICK_WHERE_FILTERS">Database/QUICK_WHERE_FILTERS.svg</file>
+<file alias="DUMP_INTO_PSON_FILE">Database/DUMP_INTO_PSON_FILE.svg</file>
+<file alias="SYNC_FROM_DISK">Database/SYNC_FROM_DISK.svg</file>
+<file alias="SYNC_FROM_DB">Database/SYNC_FROM_DB.svg</file>
 
 <!--AlertSystem icon here-->
 <file alias="SETTINGS">AlertSystem/SETTINGS.svg</file>
 <file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
-
-<!--Cast icon here-->
-<file alias="DUMP_INTO_PSON_FILE">Cast/DUMP_INTO_PSON_FILE.svg</file>
-<file alias="SYNC_FROM_DISK">Cast/SYNC_FROM_DISK.svg</file>
-<file alias="SYNC_FROM_DB">Cast/SYNC_FROM_DB.svg</file>
 
 </qresource>
 

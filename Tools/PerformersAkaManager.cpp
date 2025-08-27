@@ -13,7 +13,8 @@
 const QHash<QChar, QString> PerformersAkaManager::op2Str = {{'&', "AND"}, {'|', "OR"}};
 constexpr char PerformersAkaManager::LOGIC_OR_CHAR;
 constexpr char PerformersAkaManager::LOGIC_AND_CHAR;
-const QString PerformersAkaManager::FUZZY_LIKE{R"(INSTR(`%1`,"%2")>0)"}; // %1 like "%%2%"
+const QString PerformersAkaManager::FUZZY_LIKE{R"(INSTR(`%1`,"%2")>0)"}; // `Name%1` like "%Henry%2%". here %1 is field, %2 is value
+const QString PerformersAkaManager::OPEATOR_RELATION{R"(`%1`%2)"}; // >10 => `Rate%1`>8%2. here %1 is field, %2 is value
 
 PerformersAkaManager& PerformersAkaManager::getIns() {
   static PerformersAkaManager ins;
