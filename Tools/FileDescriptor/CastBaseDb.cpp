@@ -234,11 +234,12 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
 
 QMap<QString, QString> CastBaseDb::GetFreqName2AkaNames(const QString& perfsText) {
   QMap<QString, QString> perfs;
+  static NameTool nt;
   for (const QString& line : perfsText.split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR)) {
     if (line.isEmpty()) {
       continue;
     }
-    QStringList aka = NameTool()(line);
+    QStringList aka = nt(line);
     if (aka.isEmpty()) {
       continue;
     }
@@ -320,3 +321,4 @@ QString CastBaseDb::GetCastFilePath(const QSqlRecord& sqlRecord, const QString& 
          + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString()//
          + ".pson";
 }
+
