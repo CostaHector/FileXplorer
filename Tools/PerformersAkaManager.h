@@ -9,15 +9,8 @@
 #include <QWidget>
 
 class PerformersAkaManager {
- public:
+public:
   static PerformersAkaManager& getIns();
-  static const QString FUZZY_LIKE;
-  static const QString OPEATOR_RELATION;
-  static QString PlainLogicSentence2FuzzySqlWhere(const QString& keyName,                       //,
-                                                  const QString& tokens,                        //
-                                                  const QString& binaryCondition = FUZZY_LIKE,  //
-                                                  const QHash<QString, QString>& ALSO_DICT = {});
-
   PerformersAkaManager(const PerformersAkaManager& rhs) noexcept = delete;
 
   QHash<QString, QString> ReadOutAkaName();
@@ -25,17 +18,11 @@ class PerformersAkaManager {
 
   static int UpdateAKAHash(const bool isForce = false);
   QHash<QString, QString> m_akaPerf;
-  QString GetMovieTablePerformerSelectCommand(const QSqlRecord& record) const;
 
   inline int count() const { return m_akaPerf.size(); }
 
- private:
+private:
   PerformersAkaManager();
-
-  static void OperatorJoinOperands(QStack<QString>& values, QStack<QChar>& ops);
-  static const QHash<QChar, QString> op2Str;
-  static constexpr char LOGIC_OR_CHAR = '|';
-  static constexpr char LOGIC_AND_CHAR = '&';
 };
 
 #endif  // PERFORMERSAKAMANAGER_H

@@ -9,16 +9,21 @@
 #include "JsonKey.h"
 #include "JsonHelper.h"
 #include "PublicMacro.h"
+#include "PublicVariable.h"
+#include "QuickWhereClauseHelper.h"
+#include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSqlError>
+#include <QSqlDriver>
 
 const QString rootpath = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
 const QString dbName = TestCaseRootPath() + "/FD_MOVIE_DB_CONN.db";
 
 class FdBasedDbTest : public MyTestSuite {
   Q_OBJECT
- public:
+public:
   FdBasedDbTest() : MyTestSuite{false} {}
- private slots:
+private slots:
   void cleanup() {
     if (QFile{dbName}.exists()) {
       QFile{dbName}.remove();
@@ -37,6 +42,67 @@ class FdBasedDbTest : public MyTestSuite {
     QCOMPARE(dbManager.DropTable("AGED"), 0);
     QVERIFY(dbManager.DeleteDatabase(false));
     QVERIFY(!QFile{dbName}.exists());
+  }
+
+
+  void test_GetSelectMovieByCastStatement_ok() {
+    FdBasedDb dbManager{dbName, "FD_MOVIE_DB_CONN"};
+    const QString tableName{"RANDOM_TABLE_NAME"};
+    QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
+
+    QVERIFY(QFile{dbName}.exists());  // should created
+    auto db = dbManager.GetDb();
+    QVERIFY(db.isOpen());
+    QSqlQuery query{db};
+    QVERIFY(query.prepare(FdBasedDb::INSERT_MOVIE_RECORD_TEMPLATE.arg(tableName)));
+
+    const QList<QStringList> items//
+        { // PrePathLeft, PrePathRight, Name, PathHash
+         {"C:", "home/to/Cpath", "Kaka - Real Madrid"},
+         {"D:", "home/to/Dpath", "Kaka Leite - Real Madrid"},
+         {"E:", "home/to/Epath", "Chris Evans - Captain"},
+         {"F:", "home/to/Fpath", "Captain America 2022"},
+         {"G:", "home/to/Gpath", "Chris Hemsworth - Thor"},
+         };
+
+    const QSet<QString> expectMovieNameSet {
+        "E:/home/to/Epath/Chris Evans - Captain",
+        "F:/home/to/Fpath/Captain America 2022",
+        "G:/home/to/Gpath/Chris Hemsworth - Thor",
+    };
+
+    qint64 fdVal = 0;
+    uint hashId = 0;
+    using namespace MOVIE_TABLE;
+    for (const auto& item: items) {
+      ++fdVal;
+      ++hashId;
+      query.bindValue(":" ENUM_2_STR(Fd), fdVal);
+      query.bindValue(":" ENUM_2_STR(PrePathLeft), item[0]);
+      query.bindValue(":" ENUM_2_STR(PrePathRight), item[1]);
+      query.bindValue(":" ENUM_2_STR(Name), item[2]);
+      query.bindValue(":" ENUM_2_STR(Size), 1024);
+      query.bindValue(":" ENUM_2_STR(PathHash), hashId);
+      QVERIFY(query.exec());
+    }
+
+    using namespace QuickWhereClauseHelper;
+    const QString selectStatement = GetSelectMovieByCastStatement("Chris Evans", "Captain|Chris", tableName);
+    QVERIFY(selectStatement.contains("Chris Evans"));
+    QVERIFY(selectStatement.contains("Captain"));
+    QVERIFY(selectStatement.contains("Chris"));
+    QVERIFY(selectStatement.contains(tableName));
+    QVERIFY(query.exec(selectStatement));
+    QSet<QString> actualMovieNameSet;
+    if (db.driver()->hasFeature(QSqlDriver::QuerySize)) {
+      QCOMPARE(query.size(), 3);
+    } else {
+      qDebug("QuerySize feature not support");
+    }
+    while (query.next()) {
+      actualMovieNameSet.insert(GetMovieFullPathFromSqlQry(query));
+    }
+    QCOMPARE(actualMovieNameSet, expectMovieNameSet);
   }
 
   void test_ReadADirectory_invalid() {
