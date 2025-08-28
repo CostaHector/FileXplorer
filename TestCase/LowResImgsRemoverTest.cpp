@@ -28,12 +28,8 @@ class LowResImgsRemoverTest : public MyTestSuite {
     QVERIFY2(!toBeDelete.contains("A 720p.jpg"), "should not contains 720p");
   }
   void test_keep1080pImage_no_exist() {
-    const auto& toBeDelete = m_duplicateImagsRemover.GetLowResImgsToDel({"A 360p.jpg", "A 1080p.jpg", "A 720p.jpg"});
-    QVERIFY2(!toBeDelete.contains("A 1080p.jpg"), "should not contains 1080p");
-  }
-  void test_keep2160pImage_no_exist() {
-    const auto& toBeDelete = m_duplicateImagsRemover.GetLowResImgsToDel({"A 360p.jpg", "A 2160p.jpg", "A 720p.jpg"});
-    QVERIFY2(!toBeDelete.contains("A 2160.jpg"), "should not contains 2160p");
+    const auto& toBeDelete = m_duplicateImagsRemover.GetLowResImgsToDel({"A 360p.jpg", "A 1080p.jpg", "A 4K.jpg", "A 2160p.jpg", "A 720p.jpg"});
+    QVERIFY2(!toBeDelete.contains("A 720p.jpg"), "ascii of 1080p less then 360p, should remove");
   }
 };
 

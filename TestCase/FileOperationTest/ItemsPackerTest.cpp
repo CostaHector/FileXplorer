@@ -3,21 +3,60 @@
 #include "MyTestSuite.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
-#include "ItemsClassifier.h"
-#include "ExtractPileItemsOutFolder.h"
+#include "ItemsPacker.h"
+#include "ItemsUnpacker.h"
 #include "EndToExposePrivateMember.h"
 #include "SceneMixed.h"
 #include "SyncModifiyFileSystem.h"
 
-class ItemsClassifierTest : public MyTestSuite {
+class ItemsPackerTest : public MyTestSuite {
   Q_OBJECT
- public:
-  ItemsClassifierTest() : MyTestSuite{false}, mTestPath{mDir.path()} {}
-  TDir mDir;
-  const QString mTestPath;
-  QList<FsNodeEntry> gNodeEntries, expectsPackerEntries, expectsUnpackerEntries;
- private slots:
-  /* create a folder contains
+public:
+  ItemsPackerTest() : MyTestSuite{false} {}
+private slots:
+  /* create a folder tDir contains
+[file] "H.C..jpg"
+[file] "H.C..json"
+   */
+  void test_group_folder_endwith_dot() {
+    const QList<FsNodeEntry> baseNameWithDotNodes // already sort name ascending
+        {
+         FsNodeEntry{"H.C..jpg", false, ""},
+         FsNodeEntry{"H.C..json", false, ""},
+         };
+    TDir tDir;
+    QCOMPARE(tDir.createEntries(baseNameWithDotNodes), baseNameWithDotNodes.size());
+    QString tPath{tDir.path()};
+    ScenesMixed sMixed;
+    const QMap<QString, QStringList>& actualGrps = sMixed(tPath);
+    const QMap<QString, QStringList> expectGrps{
+        {"H.C.", {"H.C..json", "H.C..jpg"}} // ImgsSortNameLengthFirst used
+    };
+    QCOMPARE(actualGrps, expectGrps);
+
+    ItemsPacker packer;
+    int filesRearrangedCnt = packer(tPath, expectGrps);
+    QCOMPARE(packer.m_cmds.size(), 3); // 3 = 1 create folder + 2 move file cmds
+    QCOMPARE(filesRearrangedCnt, 2);
+
+    QVERIFY(packer.StartToRearrange());
+    QVERIFY(tDir.exists("H.C."));
+    QVERIFY(tDir.exists("H.C")); // file-system thought that trailing dot can be chopped
+    QVERIFY(tDir.exists("H.C./H.C..json"));
+    QVERIFY(tDir.exists("H.C./H.C..jpg"));
+
+    // unpacker
+    ItemsUnpacker unpacker;
+    int upackedFoldersCnt = unpacker(tPath);
+    QCOMPARE(upackedFoldersCnt, 1);
+    QCOMPARE(unpacker.m_cmds.size(), 3);  // 3 = move 2 files, recycle 1 path
+    QVERIFY(unpacker.StartToRearrange());
+    auto actualNodes{tDir.getEntries()};
+    std::sort(actualNodes.begin(), actualNodes.end());
+    QCOMPARE(actualNodes, baseNameWithDotNodes);
+  }
+
+  /* create a folder mDir contains
 [folder] Forbes - Movie Name - Chris Evans, John Reese
 [folder] isolated folder
 [file] Forbes - Movie Name - Chris Evans, John Reese 1.jpg
@@ -26,10 +65,12 @@ class ItemsClassifierTest : public MyTestSuite {
 [file] Marvel - Heated.mp4
 [file] isolated file.json
    */
-  void initTestCase() {
+  void test_imgs_vids_isolated_existed_folder_pack_and_unpack_ok() {
     SyncModifiyFileSystem::m_syncOperationSw = false;
-    QVERIFY(mDir.IsValid());
-    gNodeEntries = QList<FsNodeEntry>{
+
+    TDir tDir;
+    const QString tPath{tDir.path()};
+    const QList<FsNodeEntry> envNodeEntries {
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese", true, {}},         //
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese 1.jpg", false, {}},  //
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese.json", false, {}},   //
@@ -38,9 +79,7 @@ class ItemsClassifierTest : public MyTestSuite {
         FsNodeEntry{"isolated folder", true, {}},                                       //
         FsNodeEntry{"isolated file.json", false, {}},                                   //
     };
-    QCOMPARE(mDir.createEntries(gNodeEntries), gNodeEntries.size());
-
-    expectsPackerEntries = QList<FsNodeEntry>{
+    const QList<FsNodeEntry> expectsPackerEntries{
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese", true, {}},                                                       //
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese/Forbes - Movie Name - Chris Evans, John Reese 1.jpg", false, {}},  //
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese/Forbes - Movie Name - Chris Evans, John Reese.json", false, {}},   //
@@ -50,9 +89,8 @@ class ItemsClassifierTest : public MyTestSuite {
         FsNodeEntry{"isolated file.json", false, {}},                                                                                 //
         FsNodeEntry{"isolated folder", true, {}},                                                                                     //
     };
-
     // After unpack, empty folder "Forbes - Movie Name - Chris Evans, John Reese" will be removed
-    expectsUnpackerEntries = QList<FsNodeEntry>{
+    const QList<FsNodeEntry> expectsUnpackerEntries{
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese 1.jpg", false, {}},  //
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese.json", false, {}},   //
         FsNodeEntry{"Marvel - Heated.avi", false, {}},                                  //
@@ -60,9 +98,10 @@ class ItemsClassifierTest : public MyTestSuite {
         FsNodeEntry{"isolated file.json", false, {}},                                   //
         FsNodeEntry{"isolated folder", true, {}},                                       //
     };
-  }
 
-  void test_imgs_vids_isolated_existed_folder_pack_and_unpack_ok() {
+    QVERIFY(tDir.IsValid());
+    QCOMPARE(tDir.createEntries(envNodeEntries), envNodeEntries.size());
+
     // packer
     const QMap<QString, QStringList> expectGrps{
         {"isolated file", {"isolated file.json"}},                            // isolated not rearrange
@@ -73,27 +112,27 @@ class ItemsClassifierTest : public MyTestSuite {
         },                                                                                                                 //
     };
     ScenesMixed sMixed;
-    const QMap<QString, QStringList>& actualGrps = sMixed(mTestPath);
+    const QMap<QString, QStringList>& actualGrps = sMixed(tPath);
     QCOMPARE(expectGrps, actualGrps);
 
-    ItemsClassifier packer;
-    int filesRearrangedCnt = packer(mTestPath, expectGrps);
+    ItemsPacker packer;
+    int filesRearrangedCnt = packer(tPath, expectGrps);
     // mkpath "Marvel - Heated": 1
     // move files [jpg, json, avi, mp4]: 4
     QCOMPARE(packer.m_cmds.size(), 5);
     QCOMPARE(filesRearrangedCnt, 4);
     QVERIFY(packer.StartToRearrange());
-    QCOMPARE(mDir.getEntries(), expectsPackerEntries);
+    QCOMPARE(tDir.getEntries(), expectsPackerEntries);
 
     // unpacker
-    ExtractPileItemsOutFolder unpacker;
-    int upackedFoldersCnt = unpacker(mTestPath);
+    ItemsUnpacker unpacker;
+    int upackedFoldersCnt = unpacker(tPath);
     QCOMPARE(upackedFoldersCnt, 2);
     QCOMPARE(unpacker.m_cmds.size(), 6);  // recyle 2 path + move 4 files
     QVERIFY(unpacker.StartToRearrange());
-    QCOMPARE(mDir.getEntries(), expectsUnpackerEntries);
+    QCOMPARE(tDir.getEntries(), expectsUnpackerEntries);
   }
 };
 
-#include "ItemsClassifierTest.moc"
-ItemsClassifierTest g_ItemsClassifierTest;
+#include "ItemsPackerTest.moc"
+ItemsPackerTest g_ItemsPackerTest;

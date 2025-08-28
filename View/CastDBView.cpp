@@ -8,11 +8,11 @@
 #include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "PerformerJsonFileHelper.h"
-#include "PerformersAkaManager.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "StringTool.h"
 #include "TableFields.h"
+#include "QuickWhereClauseHelper.h"
 
 #include <QDesktopServices>
 #include <QDirIterator>
@@ -54,7 +54,7 @@ CastDBView::CastDBView(CastDbModel* castDbModel_,
   InitTableView();
 
   subscribe();
-  setWindowTitle("Cast Manager Widget");
+  setWindowTitle("Cast View");
   setWindowIcon(QIcon(":img/CAST_VIEW"));
 }
 
@@ -129,8 +129,7 @@ int CastDBView::onAppendCasts() {
   }
   bool ok = false;
   const QString& perfsText =                             //
-      QInputDialog::getMultiLineText(this,               //
-                                     "Input 'Casts, aka'",  //
+      QInputDialog::getMultiLineText(this, "Input 'Casts, aka'",  //
                                      "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine", "", &ok);
   if (!ok) {
     LOG_INFO_NP("[skip] User cancel", "return");
@@ -194,6 +193,16 @@ bool CastDBView::onSubmit() {
     return false;
   }
   LOG_GOOD_NP("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
+  return true;
+}
+
+bool CastDBView::onRevert() {
+  if (!_castModel->isDirty()) {
+    LOG_GOOD_NP("Table not dirty.", "Skip revert");
+    return true;
+  }
+  _castModel->revertAll();
+  LOG_GOOD_NP("Revert succeed", "All changes revert");
   return true;
 }
 
@@ -329,27 +338,8 @@ int CastDBView::onDumpIntoPsonFile() {
 
 int CastDBView::onForceRefreshAllRecordsVids() {
   selectAll();
-  LOG_INFO_NP("Refresh all records may cause lag", "Click Refresh Selected action if you are sure");
+  LOG_INFO_NP("Refresh all records may lag", "Click Refresh Selected action if you are sure");
   return 0;
-}
-
-QStringList GetVidsListFromVidsTable(const QSqlRecord& record, QSqlQuery& query) {
-  using namespace MOVIE_TABLE;
-  static auto& dbTM = PerformersAkaManager::getIns();
-  const QString& searchCommand = dbTM.GetMovieTablePerformerSelectCommand(record);
-  if (!query.exec(searchCommand)) {
-    qWarning("Query[%s] failed: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
-    return {};
-  }
-  QStringList vidPath;
-  vidPath.reserve(query.size());
-  while (query.next()) {
-    vidPath.push_back(PathTool::Path3Join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
-                                          query.value(ENUM_2_STR(PrePathRight)).toString(),  //
-                                          query.value(ENUM_2_STR(Name)).toString()));
-  }
-  qDebug("%d records finded", vidPath.size());
-  return vidPath;
 }
 
 int CastDBView::onForceRefreshRecordsVids() {
@@ -362,22 +352,43 @@ int CastDBView::onForceRefreshRecordsVids() {
   QSqlDatabase con = movieDb.GetDb();  // videos table
   if (!movieDb.CheckValidAndOpen(con)) {
     qWarning("Open failed:%s", qPrintable(con.lastError().text()));
-    return 0;
+    return -1;
   }
   QSqlQuery qur{con};
   int recordsCnt = 0;
   int vidsCnt = 0;
   for (const auto& indr : selectionModel()->selectedRows()) {
     const int r = indr.row();
-    auto record = _castModel->record(r);
-    const QStringList& vidsList = GetVidsListFromVidsTable(record, qur);
-    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidsList.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR));
+    QSqlRecord record = _castModel->record(r);
+    const QString& perfs {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
+    const QString& akas {record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString()};
+    const QString& selectStr {QuickWhereClauseHelper::GetSelectMovieByCastStatement(perfs, akas, DB_TABLE::MOVIES)};
+
+    if (!qur.exec(selectStr)) {
+      qWarning("Query[%s] failed: %s", qPrintable(qur.executedQuery()), qPrintable(qur.lastError().text()));
+      return -1;
+    }
+
+    int curCastVidCnt{0};
+    QString vidPaths;
+    while (qur.next()) {
+      vidPaths += QuickWhereClauseHelper::GetMovieFullPathFromSqlQry(qur);
+      vidPaths += StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR;
+      ++curCastVidCnt;
+    }
+    if (!vidPaths.isEmpty()) { // remove suffix \n
+      vidPaths.chop(1);
+    }
+    qDebug("cast[%s] %d records finded", qPrintable(perfs), curCastVidCnt);
+
+    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidPaths);
     _castModel->setRecord(r, record);  // update back
-    vidsCnt += vidsList.size();
+
+    vidsCnt += curCastVidCnt;
     ++recordsCnt;
   }
   RefreshHtmlContents();
-  LOG_GOOD_P("[ok]Videos(s) updated", "%d records selection, %d videos", recordsCnt, vidsCnt);
+  LOG_GOOD_P("[ok]Videos(s) updated", "%d records selection, total %d videos", recordsCnt, vidsCnt);
   return recordsCnt;
 }
 
@@ -397,8 +408,7 @@ int CastDBView::onDeleteRecords() {
     deleteCnt += size;
     succeedCnt += ((int)ret * size);
   }
-  _castModel->submitAll();
-  LOG_GOOD_P("Delete records result", "%d/%d succeed", succeedCnt, deleteCnt);
+  LOG_GOOD_P("[Ok]Delete records(need submit)", "%d/%d succeed", succeedCnt, deleteCnt);
   return succeedCnt;
 }
 

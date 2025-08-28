@@ -3,10 +3,10 @@
 #include <QSet>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QDirIterator>
-#include <QVariant>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QDirIterator>
+#include <QVariant>
 #include <QRegularExpression>
 #include <QDesktopServices>
 #include <QUrl>
