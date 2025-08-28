@@ -39,15 +39,6 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   m_ExportToOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
   m_ExportToOp->setStyleSheet("QToolBar { max-width: 256px; }");
 
-  m_FileSystemOp = new (std::nothrow) QToolBar{"File System Operation", this};
-  CHECK_NULLPTR_RETURN_VOID(m_FileSystemOp);
-  m_FileSystemOp->addActions(inst.FILE_SYSTEM_OP->actions());
-  m_FileSystemOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  m_FileSystemOp->setOrientation(Qt::Orientation::Vertical);
-  m_FileSystemOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
-  m_FileSystemOp->setStyleSheet("QToolBar { max-width: 256px; }");
-  SetLayoutAlightment(m_FileSystemOp->layout(), Qt::AlignmentFlag::AlignLeft);
-
   auto* castAppendToolbutton = inst.GetAppendCastToolButton(this);
 
   addAction(g_viewActions()._CAST_VIEW);
@@ -61,7 +52,7 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   addWidget(m_SyncVidsFromDbOp);
   addWidget(m_ExportToOp);
   addSeparator();
-  addWidget(m_FileSystemOp);
+  addAction(inst.OPEN_DB_WITH_LOCAL_APP);
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }
 

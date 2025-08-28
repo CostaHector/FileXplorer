@@ -58,22 +58,6 @@ CastDBView::CastDBView(CastDbModel* castDbModel_,
   setWindowIcon(QIcon(":img/CAST_VIEW"));
 }
 
-bool CastDBView::onOpenRecordInFileSystem() const {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("Nothing was selected.", "Select a row to open pson folder");
-    return false;
-  }
-  const QModelIndex ind{currentIndex()};
-  // when column in detail. open pson file. Otherwise open folder contains pson
-  QString revealPath{currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail ? _castModel->psonFilePath(ind): _castModel->filePath(ind)};
-  if (!QFile::exists(revealPath)) {
-    LOG_WARN_NP("Path not exists", revealPath);
-    return false;
-  }
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(revealPath));
-}
-
-
 void CastDBView::subscribe() {
   connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, _castModel, &QSqlTableModel::setFilter);
 
@@ -92,7 +76,6 @@ void CastDBView::subscribe() {
   connect(castInst.SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshAllRecordsVids);
 
   connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::ShowInFileSystemView);
-  connect(castInst.OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &CastDBView::onOpenRecordInFileSystem);
 
   connect(castInst.APPEND_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
   connect(castInst.APPEND_FROM_PSON_FILES, &QAction::triggered, this, &CastDBView::onLoadFromPsonDirectory);
@@ -100,15 +83,8 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_ALL_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpAllIntoPsonFile);
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::on_selectionChanged);
-}
-
-QString CastDBView::filePath(const QModelIndex& index) const {
-  if (_castModel == nullptr || !index.isValid()){
-    return "";
-  }
-  const auto& record = _castModel->record(currentIndex().row());
-  return CastBaseDb::GetCastFilePath(record, mImageHost);
+  connect(this, &CastDBView::doubleClicked, this, &CastDBView::onCastRowDoubleClicked);
+  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::onCastRowSelectionChanged);
 }
 
 void CastDBView::onInitATable() {
@@ -142,6 +118,26 @@ int CastDBView::onAppendCasts() {
   }
   _castModel->submitAll();
   LOG_GOOD_P("[Ok] load performer(s)", "perfsText:%s, count: %d", qPrintable(perfsText), succeedCnt);
+  return succeedCnt;
+}
+
+int CastDBView::onDeleteRecords() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
+    return 0;
+  }
+  int deleteCnt = 0;
+  int succeedCnt = 0;
+  const auto& itemSelection = selectionModel()->selection();
+  for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
+    int startRow = it->top();  // [top, bottom]
+    int size = it->bottom() - startRow + 1;
+    bool ret = _castModel->removeRows(startRow, size);
+    qDebug("drop[%d] records [%d, %d]", ret, startRow, it->bottom());
+    deleteCnt += size;
+    succeedCnt += ((int)ret * size);
+  }
+  LOG_GOOD_P("[Ok]Delete records(need submit)", "%d/%d succeed", succeedCnt, deleteCnt);
   return succeedCnt;
 }
 
@@ -203,16 +199,6 @@ bool CastDBView::onRevert() {
   }
   _castModel->revertAll();
   LOG_GOOD_NP("Revert succeed", "All changes revert");
-  return true;
-}
-
-bool CastDBView::on_selectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
-  if (!currentIndex().isValid()) {
-    return true;
-  }
-  CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
-  const auto& record = _castModel->record(currentIndex().row());
-  _floatingPreview->operator()(record, mImageHost);
   return true;
 }
 
@@ -392,24 +378,28 @@ int CastDBView::onForceRefreshRecordsVids() {
   return recordsCnt;
 }
 
-int CastDBView::onDeleteRecords() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
-    return 0;
+bool CastDBView::onCastRowSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
+  if (!currentIndex().isValid()) {
+    return true;
   }
-  int deleteCnt = 0;
-  int succeedCnt = 0;
-  const auto& itemSelection = selectionModel()->selection();
-  for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
-    int startRow = it->top();  // [top, bottom]
-    int size = it->bottom() - startRow + 1;
-    bool ret = _castModel->removeRows(startRow, size);
-    qDebug("drop[%d] records [%d, %d]", ret, startRow, it->bottom());
-    deleteCnt += size;
-    succeedCnt += ((int)ret * size);
+  CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
+  const auto& record = _castModel->record(currentIndex().row());
+  _floatingPreview->operator()(record, mImageHost);
+  return true;
+}
+
+bool CastDBView::onCastRowDoubleClicked(const QModelIndex &index) {
+  if (!index.isValid()) {
+    LOG_INFO_P("index invalid", "(%d, %d)", index.row(), index.column());
+    return false;
   }
-  LOG_GOOD_P("[Ok]Delete records(need submit)", "%d/%d succeed", succeedCnt, deleteCnt);
-  return succeedCnt;
+  const QString castFolderPath = _castModel->filePath(index);
+  if (!QFileInfo{castFolderPath}.isDir()) {
+    LOG_BAD_NP("Folder not exists", castFolderPath);
+    return false;
+  }
+  LOG_GOOD_NP("Switch to File-System View", castFolderPath);
+  return true;
 }
 
 void CastDBView::RefreshHtmlContents() {
