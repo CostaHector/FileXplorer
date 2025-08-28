@@ -7,17 +7,21 @@ namespace StringTool {
 extern const QRegularExpression IMG_VID_SEP_COMP;
 constexpr char PERFS_VIDS_IMGS_SPLIT_CHAR {'\n'};
 
-bool ImgHumanSorter(const QString& lhs, const QString& rhs);
-bool ImgLengthSorter(const QString& lhs, const QString& rhs);
+bool FileNameLengthSorter(const QString& lhs, const QString& rhs);
+bool FileSizeSorter(const QString& lhs, const QString& rhs);
 
-QStringList InitImgsList(const QString& imgs);
-
+QStringList GetImgsListFromField(const QString& imgsField);
+QStringList GetVidsListFromField(const QString& vidsField);
 inline void ImgsSortFileSizeFirst(QStringList& imgs) {
-  std::sort(imgs.begin(), imgs.end(), ImgLengthSorter);
+  std::sort(imgs.begin(), imgs.end(), FileSizeSorter);
 }
 inline void ImgsSortNameLengthFirst(QStringList& imgs) {
-  std::sort(imgs.begin(), imgs.end(), ImgHumanSorter);
+  std::sort(imgs.begin(), imgs.end(), FileNameLengthSorter);
 }
+
+int RemoveDuplicateKeepSequence(QStringList& hists);
+int TrimEachElementAndRemoveEmpty(QStringList& keywords);
+void SearchHistoryListProc(QStringList& hists);
 }
 
 #endif // STRINGTOOL_H

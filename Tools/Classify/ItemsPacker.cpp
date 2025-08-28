@@ -1,4 +1,4 @@
-﻿#include "ItemsClassifier.h"
+﻿#include "ItemsPacker.h"
 #include "SceneMixed.h"
 #include "UndoRedo.h"
 
@@ -6,7 +6,7 @@
 #include <QMap>
 #include <QRegularExpression>
 
-int ItemsClassifier::operator()(const QString& path, const QMap<QString, QStringList>& pilesMap) {
+int ItemsPacker::operator()(const QString& path, const QMap<QString, QStringList>& pilesMap) {
   using namespace FileOperatorType;
   int filesRearrangedCnt = 0;
   int pathCreatedCnt = 0;
@@ -42,7 +42,7 @@ int ItemsClassifier::operator()(const QString& path, const QMap<QString, QString
   return filesRearrangedCnt;
 }
 
-int ItemsClassifier::operator()(const QString& path) {
+int ItemsPacker::operator()(const QString& path) {
   QDir pathdir(path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
   if (!pathdir.exists()) {
     qDebug("path[%s] is not an existed directory", qPrintable(path));
@@ -53,7 +53,7 @@ int ItemsClassifier::operator()(const QString& path) {
   return operator()(path, pilesMap);
 }
 
-bool ItemsClassifier::StartToRearrange() {
+bool ItemsPacker::StartToRearrange() {
   const auto isAllSuccess = g_undoRedo.Do(m_cmds);
   qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;

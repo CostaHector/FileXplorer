@@ -54,7 +54,7 @@ CastDBView::CastDBView(CastDbModel* castDbModel_,
   InitTableView();
 
   subscribe();
-  setWindowTitle("Cast Manager Widget");
+  setWindowTitle("Cast View");
   setWindowIcon(QIcon(":img/CAST_VIEW"));
 }
 
@@ -129,8 +129,7 @@ int CastDBView::onAppendCasts() {
   }
   bool ok = false;
   const QString& perfsText =                             //
-      QInputDialog::getMultiLineText(this,               //
-                                     "Input 'Casts, aka'",  //
+      QInputDialog::getMultiLineText(this, "Input 'Casts, aka'",  //
                                      "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine", "", &ok);
   if (!ok) {
     LOG_INFO_NP("[skip] User cancel", "return");
