@@ -75,7 +75,8 @@ void CastDBView::subscribe() {
   connect(castInst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshRecordsVids);
   connect(castInst.SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshAllRecordsVids);
 
-  connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::ShowInFileSystemView);
+  connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::onShowInFileSystemView);
+  connect(castInst.MIGRATE_CAST_TO, &QAction::triggered, this, &CastDBView::onMigrateCastTo);
 
   connect(castInst.APPEND_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
   connect(castInst.APPEND_FROM_PSON_FILES, &QAction::triggered, this, &CastDBView::onLoadFromPsonDirectory);
@@ -398,8 +399,54 @@ bool CastDBView::onCastRowDoubleClicked(const QModelIndex &index) {
     LOG_BAD_NP("Folder not exists", castFolderPath);
     return false;
   }
-  LOG_GOOD_NP("Switch to File-System View", castFolderPath);
-  return true;
+  return QDesktopServices::openUrl(QUrl::fromLocalFile(castFolderPath));
+}
+
+int CastDBView::onMigrateCastTo() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("Nothing was selected.", "Select at least one row before migrate");
+    return 0;
+  }
+  const QString destPath = QFileDialog::getExistingDirectory(this, "Migrate to (folder under[" + mImageHost+ "])", mImageHost);
+  if (destPath.isEmpty()) {
+    LOG_GOOD_NP("[Skip] User cancel migrate", "return");
+    return false;
+  }
+  QString newOri;
+  if (!CastBaseDb::IsNewOriFolderPathValid(destPath, mImageHost, newOri)) {
+    LOG_BAD_P("Abort Migrate", "destPath[%s] or newOri[%s] invalid", qPrintable(destPath), qPrintable(newOri));
+    return -1;
+  }
+
+  const QModelIndexList indexes{selectionModel()->selectedRows()};
+  QDir imageHostDir{mImageHost};
+  int migrateCastCnt{0};
+  for (const auto& indr : indexes) {
+    const int r = indr.row();
+    QSqlRecord record = _castModel->record(r);
+    const int ret = CastBaseDb::MigrateToNewOriFolder(record, imageHostDir, newOri);
+    if (ret < FD_ERROR_CODE::FD_SKIP) {
+      qWarning("Migrate ErrorCode: %d", ret);
+      return -1;
+    }
+    if (ret == FD_ERROR_CODE::FD_SKIP) {
+      continue;
+    }
+    ++migrateCastCnt;
+    _castModel->setRecord(r, record);
+  }
+  if (migrateCastCnt == 0) {
+    LOG_GOOD_P("No need Migrate", "%d/%d Cast(s) to %s", migrateCastCnt, indexes.size(), qPrintable(newOri))
+    return 0;
+  }
+  if (!_castModel->submitAll()) {
+    LOG_BAD_P("Submit failed", "%d/%d Cast(s) to %s.\nerror[%s]",
+              migrateCastCnt, indexes.size(), qPrintable(newOri), qPrintable(_castModel->lastError().text()))
+    return -1;
+  }
+  LOG_GOOD_P("Migrate succeed", "%d/%d Cast(s) to %s",
+             migrateCastCnt, indexes.size(), qPrintable(newOri))
+  return migrateCastCnt;
 }
 
 void CastDBView::RefreshHtmlContents() {

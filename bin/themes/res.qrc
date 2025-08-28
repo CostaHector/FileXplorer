@@ -305,6 +305,7 @@
 <file alias="DUMP_INTO_PSON_FILE">Database/DUMP_INTO_PSON_FILE.svg</file>
 <file alias="SYNC_FROM_DISK">Database/SYNC_FROM_DISK.svg</file>
 <file alias="SYNC_FROM_DB">Database/SYNC_FROM_DB.svg</file>
+<file alias="MIGRATE_CAST_TO">Database/MIGRATE_CAST_TO.svg</file>
 
 <!--AlertSystem icon here-->
 <file alias="SETTINGS">AlertSystem/SETTINGS.svg</file>

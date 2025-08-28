@@ -326,3 +326,38 @@ QString CastBaseDb::GetCastFilePath(const QSqlRecord& sqlRecord, const QString& 
          + ".pson";
 }
 
+bool CastBaseDb::IsNewOriFolderPathValid(const QString& destPath, const QString& imageHost, QString& newOri) {
+  if (!QFileInfo{destPath}.isDir()) {
+    qDebug("Abort Migrate, path[%s] not a directory", qPrintable(destPath));
+    return false;
+  }
+  if (!destPath.startsWith(imageHost + '/')) {
+    qWarning("Abort Migrate, Path[%s] not under imageHost[%s]", qPrintable(destPath), qPrintable(imageHost));
+    return false;
+  }
+  QString newOriFolder = destPath.mid(imageHost.size() + 1);
+  if (newOriFolder.isEmpty() || newOriFolder.contains('/')) {
+    qWarning("Abort Migrate, Ori Folder Name[%s] invalid", qPrintable(newOriFolder));
+    return false;
+  }
+  newOri.swap(newOriFolder);
+  return true;
+}
+
+int CastBaseDb::MigrateToNewOriFolder(QSqlRecord &sqlRecord, QDir& imageHostDir, const QString &newOri) {
+  const QString oldOri {sqlRecord.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
+  if (newOri == oldOri) {
+    return FD_ERROR_CODE::FD_SKIP;
+  }
+  // Migrate old folder from oldOri to newOri
+  const QString castName {sqlRecord.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
+  if (imageHostDir.exists(oldOri + '/' + castName)) { // folder oldOri not exist
+    if (!imageHostDir.rename(oldOri + '/' + castName, newOri + '/' + castName)) {
+      qWarning("Migrate folder failed, castName[%s] from oldOri[%s] to newOri[%s]", qPrintable(castName), qPrintable(oldOri), qPrintable(newOri));
+      return FD_ERROR_CODE::FD_RENAME_FAILED;
+    }
+  }
+  sqlRecord.setValue(PERFORMER_DB_HEADER_KEY::Ori, newOri);
+  return FD_ERROR_CODE::FD_OK;
+}
+
