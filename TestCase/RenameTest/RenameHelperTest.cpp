@@ -7,7 +7,7 @@ using namespace RenameHelper;
 class RenameHelperTest : public MyTestSuite {
   Q_OBJECT
 public:
-  RenameHelperTest() : MyTestSuite{false} {}
+  RenameHelperTest() : MyTestSuite{true} {}
 private slots:
   void test_ReplaceRename_invalid_regex_failed() {
     QStringList replaceeList;
@@ -161,6 +161,17 @@ private slots:
                << "LosAngle - hello world 1";
     const QString& baseName{"LosAngle - hello world"};
     const int startInd{0};
+    const QString& namePattern{" %1"};
+    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+    QCOMPARE(ansLst, expectList);
+  }
+
+  void test_NumerizeReplace_1_item_no_need_add_number() {
+    QStringList replaceeList {"la - hello world.jpg"};
+    QStringList suffixs {""};
+    QStringList expectList {"LosAngle - hello world"};
+    QString baseName {"LosAngle - hello world"};
+    const int startInd{22};
     const QString& namePattern{" %1"};
     QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
     QCOMPARE(ansLst, expectList);

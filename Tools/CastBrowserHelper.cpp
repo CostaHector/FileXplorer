@@ -86,8 +86,8 @@ QString GetDetailDescription(const QString& fileAbsPath) {
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost) {
   const QString castName {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
   const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
-  const QStringList& vidsLst {StringTool::GetVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
-  const QStringList& imgsLst {StringTool::GetImgsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString())};
+  const QStringList& vidsLst {StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
+  const QStringList& imgsLst {StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString())};
   const QDir imgDir {imgHost + '/' + orientation + '/' + castName};
   const QString portraitImg {imgsLst.isEmpty() ? "" : imgDir.absoluteFilePath(imgsLst.front())};
 
