@@ -1,4 +1,4 @@
-﻿#include "ExtractPileItemsOutFolder.h"
+﻿#include "ItemsUnpacker.h"
 #include "PathTool.h"
 #include "ItemsPileCategory.h"
 #include "UndoRedo.h"
@@ -8,7 +8,7 @@
 using namespace ItemsPileCategory;
 using namespace FileOperatorType;
 
-QMap<QString, QStringList> ExtractPileItemsOutFolder::GetFolder2ItemsMapByCurPath(const QString& path) {
+QMap<QString, QStringList> ItemsUnpacker::GetFolder2ItemsMapByCurPath(const QString& path) {
   QDir rootPathDir(path, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
   QMap<QString, QStringList> folder2PileItems;
   for (const QString& subPath : rootPathDir.entryList()) {
@@ -22,7 +22,7 @@ QMap<QString, QStringList> ExtractPileItemsOutFolder::GetFolder2ItemsMapByCurPat
   return folder2PileItems;
 }
 
-bool ExtractPileItemsOutFolder::CanExtractOut(const QStringList& items) {
+bool ItemsUnpacker::CanExtractOut(const QStringList& items) {
   QString stdName;
 
   QString noNumberName;
@@ -58,7 +58,7 @@ bool ExtractPileItemsOutFolder::CanExtractOut(const QStringList& items) {
   return true;
 }
 
-int ExtractPileItemsOutFolder::operator()(const QString& path,                                 //
+int ItemsUnpacker::operator()(const QString& path,                                 //
                                           const QMap<QString, QStringList>& folder2PileItems,  //
                                           const QStringList& alreadyExistItems) {
   int foldersNeedExtractCnt = 0, itemsExtractedOutCnt = 0;
@@ -93,14 +93,14 @@ int ExtractPileItemsOutFolder::operator()(const QString& path,                  
   return foldersNeedExtractCnt;
 }
 
-int ExtractPileItemsOutFolder::operator()(const QString& path) {
+int ItemsUnpacker::operator()(const QString& path) {
   QDir dirIt{path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
   const QStringList& alreadyExistItems = dirIt.entryList();
   const QMap<QString, QStringList>& folder2PileItems = GetFolder2ItemsMapByCurPath(path);
   return operator()(path, folder2PileItems, alreadyExistItems);
 }
 
-bool ExtractPileItemsOutFolder::StartToRearrange() {
+bool ItemsUnpacker::StartToRearrange() {
   const bool isAllSuccess = g_undoRedo.Do(m_cmds);
   qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;

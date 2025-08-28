@@ -33,6 +33,7 @@ private:
   bool DropSqlDatabase();
 
   bool onSubmit();
+  bool onRevert();
 
   bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 

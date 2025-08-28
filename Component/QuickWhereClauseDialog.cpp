@@ -1,10 +1,11 @@
 ﻿#include "QuickWhereClauseDialog.h"
-
-#include "PublicMacro.h"
+#include "QuickWhereClauseHelper.h"
 #include "PerformersAkaManager.h"
+#include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "StringTool.h"
 #include "TableFields.h"
 #include <QHash>
 #include <QPushButton>
@@ -162,10 +163,7 @@ QuickWhereClauseDialog::~QuickWhereClauseDialog() {
 
 int QuickWhereClauseDialog::WriteUniqueHistoryToQSetting() {
   QStringList hists = mStrListModel->stringList();
-  std::sort(hists.begin(), hists.end());
-  auto firstDupIt = std::unique(hists.begin(), hists.end());
-  hists.erase(firstDupIt, hists.end());
-
+  StringTool::SearchHistoryListProc(hists);
   Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, hists.join(WHERE_HIST_SPLIT_CHAR));
   return hists.size();
 }
@@ -184,27 +182,28 @@ void QuickWhereClauseDialog::onConditionsChanged() {
 
     // DB_TABLE::MOVIES
     using namespace MOVIE_TABLE;
-    const QString& nameClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Name), m_Name->text(), PerformersAkaManager::FUZZY_LIKE, *p2AkaHash);
+    using namespace QuickWhereClauseHelper;
+    const QString& nameClause = InfixNotation2RPN2Value(ENUM_2_STR(Name), m_Name->text(), FUZZY_LIKE, *p2AkaHash);
     if (!nameClause.isEmpty()) {
       conditionsLst << nameClause;
     }
-    const QString& sizeClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Size), m_Size->text(), PerformersAkaManager::OPEATOR_RELATION);
+    const QString& sizeClause = InfixNotation2RPN2Value(ENUM_2_STR(Size), m_Size->text(), OPEATOR_RELATION);
     if (!sizeClause.isEmpty()) {
       conditionsLst << sizeClause;
     }
-    const QString& durationClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Duration), m_Duration->text(), PerformersAkaManager::OPEATOR_RELATION);
+    const QString& durationClause = InfixNotation2RPN2Value(ENUM_2_STR(Duration), m_Duration->text(), OPEATOR_RELATION);
     if (!durationClause.isEmpty()) {
       conditionsLst << durationClause;
     }
-    const QString& studioClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Studio), m_Studio->text());
+    const QString& studioClause = InfixNotation2RPN2Value(ENUM_2_STR(Studio), m_Studio->text());
     if (!studioClause.isEmpty()) {
       conditionsLst << studioClause;
     }
-    const QString& castClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Cast), m_Cast->text());
+    const QString& castClause = InfixNotation2RPN2Value(ENUM_2_STR(Cast), m_Cast->text());
     if (!castClause.isEmpty()) {
       conditionsLst << castClause;
     }
-    const QString& tagsClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Tags), m_Tags->text());
+    const QString& tagsClause = InfixNotation2RPN2Value(ENUM_2_STR(Tags), m_Tags->text());
     if (!tagsClause.isEmpty()) {
       conditionsLst << tagsClause;
     }
@@ -212,11 +211,12 @@ void QuickWhereClauseDialog::onConditionsChanged() {
   {
     // DB_TABLE::PERFORMERS
     using namespace PERFORMER_DB_HEADER_KEY;
-    const QString& rateClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Rate), m_Rate->text(), PerformersAkaManager::OPEATOR_RELATION);
+    using namespace QuickWhereClauseHelper;
+    const QString& rateClause = InfixNotation2RPN2Value(ENUM_2_STR(Rate), m_Rate->text(), OPEATOR_RELATION);
     if (!rateClause.isEmpty()) {
       conditionsLst << rateClause;
     }
-    const QString& oriClause = PerformersAkaManager::PlainLogicSentence2FuzzySqlWhere(ENUM_2_STR(Ori), m_Ori->text());
+    const QString& oriClause = InfixNotation2RPN2Value(ENUM_2_STR(Ori), m_Ori->text());
     if (!oriClause.isEmpty()) {
       conditionsLst << oriClause;
     }

@@ -2,11 +2,13 @@
 #include "BrowserActions.h"
 #include "DisplayEnhancement.h"
 #include "FdBasedDb.h"
+#include "CastBaseDb.h"
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "TableFields.h"
+#include "StringTool.h"
 
 #include <QKeySequence>
 #include <QInputDialog>
@@ -44,6 +46,7 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
   connect(inst.CLEAR_ALL_SELECTIONS, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
   connect(inst.EDITOR_MODE, &QAction::triggered, this, [this](bool bEditable){ setReadOnly(!bEditable);});
   connect(inst.COPY_SELECTED_TEXT, &QAction::triggered, this, &ClickableTextBrowser::CopySelectedTextToClipboard);
+  connect(inst.ADD_SELECTIONS_2_CAST_TABLE, &QAction::triggered, this, &ClickableTextBrowser::onAppendMultiSelectionToCastDbReq);
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 
   AdjustButtonPosition();
@@ -134,6 +137,37 @@ void ClickableTextBrowser::onSearchMultiSelectionReq() {
   qDebug("Search:[%s]", qPrintable(whereClause));
   SearchAndAppendParagraphOfResult(whereClause);
 }
+
+int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
+  CastBaseDb castDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"};
+  const auto db = castDb.GetDb();
+  if (!db.tables().contains(DB_TABLE::PERFORMERS)) {
+    LOG_BAD_NP("[Abort] Cast Table not exist", DB_TABLE::PERFORMERS);
+    return -1;
+  }
+
+  QStringList keywords = GetSelectedTexts();
+  StringTool::SearchHistoryListProc(keywords);
+  const QString& rawStringFromSelection {keywords.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR)};
+  bool ok = false;
+  const QString& perfsText =                             //
+      QInputDialog::getMultiLineText(this, "Edit 'Casts(, aka)'",  //
+                                     "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine",
+                                     rawStringFromSelection, &ok);
+  if (!ok) {
+    LOG_GOOD_NP("[skip] User cancel append", "return");
+    return 0;
+  }
+  const int insertOrUpdateCnt = castDb.AppendCastFromMultiLineInput(perfsText);
+  if (insertOrUpdateCnt < FD_OK) {
+    LOG_BAD_P("[Failed] Cast Inserted/Update", "errorCode: %d", insertOrUpdateCnt);
+    return insertOrUpdateCnt;
+  }
+  LOG_GOOD_P("[Ok]Cast Inserted/Update", "%d casts added as follows:",
+             insertOrUpdateCnt, qPrintable(perfsText));
+  return insertOrUpdateCnt;
+}
+
 
 QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whereText) {
   FdBasedDb movieDbManager{SystemPath::VIDS_DATABASE, "EXIST_THEN_QRY_MOVIE_DB"};

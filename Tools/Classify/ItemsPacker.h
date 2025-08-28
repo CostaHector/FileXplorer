@@ -1,10 +1,10 @@
-#ifndef ITEMSCLASSIFIER_H
-#define ITEMSCLASSIFIER_H
+#ifndef ITEMSPACKER_H
+#define ITEMSPACKER_H
 
 #include "FileOperatorPub.h"
 #include <QString>
 
-class ItemsClassifier {
+class ItemsPacker {
  public:
   int operator()(const QString& path, const QMap<QString, QStringList>& pilesMap);
   int operator()(const QString& path);
@@ -15,4 +15,4 @@ class ItemsClassifier {
   FileOperatorType::BATCH_COMMAND_LIST_TYPE m_cmds;
 };
 
-#endif  // ITEMSCLASSIFIER_H
+#endif  // ITEMSPACKER_H
