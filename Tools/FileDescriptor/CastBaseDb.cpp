@@ -232,10 +232,10 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
   return succeedCnt;
 }
 
-QMap<QString, QString> CastBaseDb::GetFreqName2AkaNames(const QString& perfsText) {
+QMap<QString, QString> CastBaseDb::GetFreqName2AkaNames(const QStringList& perfsList) {
   QMap<QString, QString> perfs;
   static NameTool nt;
-  for (const QString& line : perfsText.split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR)) {
+  for (const QString& line : perfsList) {
     if (line.isEmpty()) {
       continue;
     }
@@ -248,6 +248,11 @@ QMap<QString, QString> CastBaseDb::GetFreqName2AkaNames(const QString& perfsText
     perfs.insert(mostFreqUsedName, aka.join(","));
   }
   return perfs;
+}
+
+QMap<QString, QString> CastBaseDb::GetFreqName2AkaNames(const QString& perfsText) {
+  const QStringList& perfsList{perfsText.split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR, Qt::SkipEmptyParts)};
+  return GetFreqName2AkaNames(perfsList);
 }
 
 int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
@@ -263,8 +268,7 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
     return FD_DB_OPEN_FAILED;
   }
   if (!db.transaction()) {
-    qWarning("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+    qWarning("start the %dth transaction failed: %s", 1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
@@ -281,7 +285,7 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
     qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA, it.value());
     qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE, it.value());
     if (!qry.exec()) {
-      qWarning("replace[%s] failed: %s",  //
+      qWarning("Insert[%s] failed: %s",  //
                qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
       db.rollback();
       return FD_EXEC_FAILED;

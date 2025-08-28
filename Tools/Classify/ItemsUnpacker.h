@@ -1,11 +1,11 @@
-#ifndef EXTRACTPILEITEMSOUTFOLDER_H
-#define EXTRACTPILEITEMSOUTFOLDER_H
+#ifndef ITEMSUNPACKER_H
+#define ITEMSUNPACKER_H
 
 #include "FileOperatorPub.h"
 #include <QString>
 #include <QMap>
 
-class ExtractPileItemsOutFolder {
+class ItemsUnpacker {
  public:
   static QMap<QString, QStringList> GetFolder2ItemsMapByCurPath(const QString& path);
 
@@ -21,4 +21,4 @@ class ExtractPileItemsOutFolder {
   FileOperatorType::BATCH_COMMAND_LIST_TYPE m_cmds;
 };
 
-#endif  // EXTRACTPILEITEMSOUTFOLDER_H
+#endif  // ITEMSUNPACKER_H

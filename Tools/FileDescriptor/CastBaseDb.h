@@ -12,6 +12,7 @@ class CastBaseDb : public DbManager {
   int LoadFromPsonFile(const QString& imgsHostPath);
   static const QString CREATE_PERF_TABLE_TEMPLATE;
 
+  static QMap<QString, QString> GetFreqName2AkaNames(const QStringList& perfsList);
   static QMap<QString, QString> GetFreqName2AkaNames(const QString& perfsText);
   static bool UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& imageHostPath);
   static QString GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath);
