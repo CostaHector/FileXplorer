@@ -45,6 +45,8 @@ private:
   bool onCastRowSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onCastRowDoubleClicked(const QModelIndex &index);
 
+  int onMigrateCastTo();
+
 private:
   void RefreshHtmlContents();
 

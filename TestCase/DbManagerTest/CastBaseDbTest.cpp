@@ -4,12 +4,11 @@
 #include <QSqlField>
 #include "MyTestSuite.h"
 #include "CastBaseDb.h"
+#include "TDir.h"
 #include "TableFields.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
-#include "TableFields.h"
 #include "StringTool.h"
-#include <QDir>
 #include <QMap>
 
 QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const QString& imgs) {
@@ -266,6 +265,54 @@ private slots:
     QVERIFY(newImgs.contains("Chris Evans 2.jpg")); // 2 file "A.jpg\nB.jpg" in filesystem-depend sequence
     QVERIFY(newImgs.contains("Chris Evans.jpg"));
     QCOMPARE(newImgs.count('\n'), 1);
+  }
+
+  void test_IsNewOriFolderPathValid() {
+    const QList<FsNodeEntry> envNodes //
+        {
+         {"ImageHostDoc", true, ""},
+         {"ImageHost/Superhero/Jane Grey", true, ""}, // sub sub
+         {"ImageHost/Captain America/Jane Grey", true, ""},
+         {"ImageHost/X-MEN", true, ""},
+         };
+    TDir tdir;
+    QCOMPARE(tdir.createEntries(envNodes), envNodes.size());
+    const QString imageHost{tdir.itemPath("ImageHost")};
+
+    QString newOri;
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHost"), imageHost, newOri));
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHostDoc"), imageHost, newOri));
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHost/Superhero/Jane Grey"), imageHost, newOri));
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath(""), imageHost, newOri));
+    QCOMPARE(newOri, "");
+
+    QVERIFY(CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHost/Captain America"), imageHost, newOri));
+    QCOMPARE(newOri, "Captain America");
+
+    using namespace PERFORMER_DB_HEADER_KEY;
+    // 1. folder not exist should skip update
+    QSqlRecord henryCavillRecord = GetACastRecordLine("Jane Grey", "Superhero", "");
+
+    QDir imageHostDir{imageHost};
+    QCOMPARE(CastBaseDb::MigrateToNewOriFolder(henryCavillRecord, imageHostDir, "Superhero"),
+             FD_ERROR_CODE::FD_SKIP);
+    QCOMPARE(henryCavillRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "Superhero");
+
+    QCOMPARE(CastBaseDb::MigrateToNewOriFolder(henryCavillRecord, imageHostDir, "Captain America"),
+             FD_ERROR_CODE::FD_RENAME_FAILED); // rename conflict
+    QCOMPARE(henryCavillRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "Superhero");
+
+    QCOMPARE(CastBaseDb::MigrateToNewOriFolder(henryCavillRecord, imageHostDir, "X-MEN"),
+             FD_ERROR_CODE::FD_OK); // migrate from X-MEN to Superhero
+    QCOMPARE(henryCavillRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "X-MEN");
+
+    QVERIFY(!imageHostDir.exists("Superhero/Jane Grey"));
+    QVERIFY(imageHostDir.exists("X-MEN/Jane Grey"));
   }
 };
 
