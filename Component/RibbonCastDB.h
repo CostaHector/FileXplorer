@@ -12,6 +12,7 @@ class RibbonCastDB : public QToolBar {
   QToolBar* m_SyncVidsFromDbOp{nullptr};
   QToolBar* m_LoadExtentOp{nullptr};
   QToolBar* m_ExportToOp{nullptr};
+  QToolBar* m_FileSystemOp{nullptr};
 };
 
 

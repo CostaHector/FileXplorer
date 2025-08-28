@@ -34,6 +34,7 @@ enum FD_ERROR_CODE {
   FD_COMMIT_FAILED,
   FD_QRY_PK_FAILED,
   FD_JSON_PATH_NOT_EXIST,
+  FD_RENAME_FAILED,
   FD_INVALID,
   FD_SKIP,
   FD_OK = 0,
@@ -83,7 +84,7 @@ class DbManager : public QObject {
 
   bool IsTableVolumeOnline(const QString& tableName) const;
 public slots:
-  bool ShowInFileSystemView() const;
+  bool onShowInFileSystemView() const;
  protected:
   static QString GetDeleteInPlaceholders(int n);
   void ReleaseConnection();
