@@ -66,20 +66,11 @@ CastDBActions::CastDBActions(QObject* parent)  //
   _SYNC_VIDS_OP->addAction(SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
   _SYNC_VIDS_OP->addAction(SYNC_ALL_RECORDS_VIDS_FROM_DB);
 
-  OPEN_RECORD_IN_FILE_SYSTEM = new (std::nothrow) QAction{QIcon(":img/FOLDER_OF_PICTURES"), "Show in FileSystem", this};
-  CHECK_NULLPTR_RETURN_VOID(OPEN_RECORD_IN_FILE_SYSTEM);
-  OPEN_RECORD_IN_FILE_SYSTEM->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
-  OPEN_RECORD_IN_FILE_SYSTEM->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal selected cast location in system file explorer")
-    .arg(OPEN_RECORD_IN_FILE_SYSTEM->text(), OPEN_RECORD_IN_FILE_SYSTEM->shortcut().toString()));
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "Open Database", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
   OPEN_DB_WITH_LOCAL_APP->setToolTip(QString("<b>%1 (%2)</b><br/> Open *.db file in local app(DB Browser sqlite). Precondition: It has been set as default app")
     .arg(OPEN_DB_WITH_LOCAL_APP->text(), OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
-  FILE_SYSTEM_OP = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(FILE_SYSTEM_OP);
-  FILE_SYSTEM_OP->addAction(OPEN_RECORD_IN_FILE_SYSTEM);
-  FILE_SYSTEM_OP->addAction(OPEN_DB_WITH_LOCAL_APP);
 
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{QIcon{":img/DUMP_INTO_PSON_FILE"}, "Dump records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
@@ -112,7 +103,6 @@ QMenu* CastDBActions::GetRightClickMenu(QWidget* parent) const {
   auto* m_performerTableMenu = new (std::nothrow) QMenu{"Cast book RightClickMenu", parent};
   m_performerTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
   m_performerTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
-  m_performerTableMenu->addAction(g_castAct().OPEN_RECORD_IN_FILE_SYSTEM);
   m_performerTableMenu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
   m_performerTableMenu->setToolTipsVisible(true);
   return m_performerTableMenu;
