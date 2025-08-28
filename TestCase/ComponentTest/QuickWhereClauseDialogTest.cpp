@@ -113,12 +113,11 @@ private slots:
     ON_SCOPE_EXIT {
       Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, beforeCfg);
     };
-    dialog->newWhereHistsList = QStringList{"A", "B", "A", "C", "A"};
+    dialog->newWhereHistsList = QStringList{"\t  \n", "", " A", "C ", "A \t", "\t B", "A"};
     dialog->onEditHistory();
     QCOMPARE(dialog->WriteUniqueHistoryToQSetting(), 3);
 
-    const QString expectNewHistStr{QString{"A"} + QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR + "B" + QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR + "C"};
-    QCOMPARE(expectNewHistStr, "A\nB\nC");
+    const QString expectNewHistStr{"A\nC\nB"};
     QCOMPARE(Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name).toString(), expectNewHistStr);
   }
 

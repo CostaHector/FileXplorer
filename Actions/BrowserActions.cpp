@@ -27,6 +27,10 @@ BrowserActions::BrowserActions(QObject *parent) : QObject{parent} {
   EDITOR_MODE->setCheckable(true);
   EDITOR_MODE->setChecked(false);
 
+  ADD_SELECTIONS_2_CAST_TABLE = new QAction{QIcon{":img/CAST_VIEW"}, "Add to CAST table", this};
+  ADD_SELECTIONS_2_CAST_TABLE->setToolTip(QString{"<b>%1 (%2)</b><br/>Add current multi-selection text as casts name to `CAST` Table"}//
+                                             .arg(ADD_SELECTIONS_2_CAST_TABLE->text(), ADD_SELECTIONS_2_CAST_TABLE->shortcut().toString()));
+
   COPY_SELECTED_TEXT = new QAction{QIcon{":img/COPY_TEXT"}, "Copy Selected Text", this};
   COPY_SELECTED_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_3));
 }
@@ -39,6 +43,8 @@ QMenu* BrowserActions::GetSearchInDBMenu(QWidget* parent) {
   pMenu->addAction(SEARCH_CUR_TEXT);
   pMenu->addAction(SEARCH_MULTIPLE_TEXTS);
   pMenu->addAction(ADVANCED_TEXT_SEARCH);
+  pMenu->addSeparator();
+  pMenu->addAction(ADD_SELECTIONS_2_CAST_TABLE);
   pMenu->setToolTipsVisible(true);
   return pMenu;
 }
