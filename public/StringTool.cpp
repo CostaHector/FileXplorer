@@ -21,15 +21,8 @@ bool FileSizeSorter(const QString& lhs, const QString& rhs) { // not consider fi
   return lhs < rhs; // name ascii second
 }
 
-QStringList GetImgsListFromField(const QString& imgsField) {
-  // images human sort 0 < 1 < ... < 9 < 10. not in alphabeit
-  QStringList imgsLst = imgsField.split(IMG_VID_SEP_COMP, Qt::SkipEmptyParts);
-  std::sort(imgsLst.begin(), imgsLst.end(), FileNameLengthSorter);
-  return imgsLst;
-}
-
-QStringList GetVidsListFromField(const QString& vidsField) {
-  return vidsField.split(IMG_VID_SEP_COMP, Qt::SkipEmptyParts);
+QStringList GetImgsVidsListFromField(const QString& imgsField) {
+  return imgsField.split(IMG_VID_SEP_COMP, Qt::SkipEmptyParts);
 }
 
 int RemoveDuplicateKeepSequence(QStringList& hists) {

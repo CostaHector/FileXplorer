@@ -31,10 +31,15 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
   if (replaceeList.isEmpty()) {
     return {};
   }
+  if (replaceeList.size() == 1) { // no need add number
+    return {baseName};
+  }
+
   if (!namePattern.contains("%1")) {
     qWarning("namePattern[%s] must contain at least one '%%1'", qPrintable(namePattern));
     return {};
   }
+
   QStringList numerizedNames;
   numerizedNames.reserve(suffixs.size());
   if (!bUniqueExtCounter) { // 不区分后缀, 统一计数
