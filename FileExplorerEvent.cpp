@@ -32,9 +32,9 @@
 #include "DuplicateVideosFinder.h"
 #include "HarTableView.h"
 
-#include "ExtractPileItemsOutFolder.h"
+#include "ItemsUnpacker.h"
 #include "ArchiveFiles.h"
-#include "ItemsClassifier.h"
+#include "ItemsPacker.h"
 #include "CopyItemPropertiesToClipboardIF.h"
 #include "LowResImgsRemover.h"
 #include "FilesNameBatchStandardizer.h"
@@ -1114,7 +1114,7 @@ bool FileExplorerEvent::on_FileClassify() {
   const auto beforeOpt = _fileSysModel->options();
   _fileSysModel->setOptions(QFileSystemModel::DontWatchForChanges);
   const QString& currentPath = _fileSysModel->rootPath();
-  ItemsClassifier classfier;
+  ItemsPacker classfier;
   classfier(currentPath);
   QString startMsg = "Item(s) Classify Start... total:" + QString::number(classfier.CommandsCnt()) + "cmd(s)..";
   LOG_INFO_NP(startMsg, currentPath);
@@ -1153,7 +1153,7 @@ bool FileExplorerEvent::on_FileUnclassify() {
   }
   const auto beforeOpt = _fileSysModel->options();
   _fileSysModel->setOptions(QFileSystemModel::DontWatchForChanges);
-  ExtractPileItemsOutFolder unclassfier;
+  ItemsUnpacker unclassfier;
   unclassfier(currentPath);
   QString startMsg = "Item(s) Unclassify Start... total:" + QString::number(unclassfier.CommandsCnt()) + "cmd(s)..";
   LOG_INFO_NP(startMsg, currentPath);

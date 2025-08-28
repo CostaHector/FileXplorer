@@ -3,7 +3,7 @@
 #include "FileOperatorPub.h"
 #include "MyTestSuite.h"
 #include "BeginToExposePrivateMember.h"
-#include "ExtractPileItemsOutFolder.h"
+#include "ItemsUnpacker.h"
 #include "EndToExposePrivateMember.h"
 
 class ExtractPileItemsOutFolderTest : public MyTestSuite {
@@ -14,7 +14,7 @@ class ExtractPileItemsOutFolderTest : public MyTestSuite {
     QStringList noStrictAPileFiles;
     noStrictAPileFiles << "random name.mp4";
     noStrictAPileFiles << "another random name.mp4";
-    QVERIFY(!ExtractPileItemsOutFolder::CanExtractOut(noStrictAPileFiles));
+    QVERIFY(!ItemsUnpacker::CanExtractOut(noStrictAPileFiles));
   }
 
   void test_canExtract_ok() {
@@ -30,7 +30,7 @@ class ExtractPileItemsOutFolderTest : public MyTestSuite {
                << "name 2.webp"
                << "name 10.png"
                << "name - 10.png";
-    QVERIFY(ExtractPileItemsOutFolder::CanExtractOut(aPileFiles));
+    QVERIFY(ItemsUnpacker::CanExtractOut(aPileFiles));
   }
 
   void test_foldersCntNeedExtract_ok() {
@@ -52,7 +52,7 @@ class ExtractPileItemsOutFolderTest : public MyTestSuite {
     const int foldersNeedExtractCnt = 1;
     const QString curPath{"not existed out directory"};
 
-    ExtractPileItemsOutFolder epiof;
+    ItemsUnpacker epiof;
     QCOMPARE(epiof(curPath, folder2PileItems, alreadyExistItems),  //
              foldersNeedExtractCnt);
     using namespace FileOperatorType;

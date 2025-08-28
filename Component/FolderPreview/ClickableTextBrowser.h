@@ -7,9 +7,7 @@
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QMenu>
-#include <QAction>
 #include <QToolBar>
-#include <QScrollBar>
 #include "CastBrowserHelper.h"
 
 class ClickableTextBrowser : public QTextBrowser {
@@ -34,14 +32,16 @@ public:
     }
   }
 
-  void onSearchSelectionReq();
-  void onSearchSelectionAdvanceReq();
-  void onSearchMultiSelectionReq();
+  void onSearchSelectionReq(); // search selection in DB_TABLE::MOVIES
+  void onSearchSelectionAdvanceReq(); // search selection(editable) in DB_TABLE::MOVIES
+  void onSearchMultiSelectionReq(); // search multi selection in DB_TABLE::MOVIES
+  int onAppendMultiSelectionToCastDbReq(); // append selections to DB_TABLE::PERFORMERS
 
   static QString FormatSearchSentence(QString text);
   static QString GetSearchResultParagraphDisplay(const QString& searchText);
   static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
 
+/* for cast preview only below */
   void SetCastHtmlParts(const CastHtmlParts& castHtmls) {mCastHtmls = castHtmls;}
   void UpdateHtmlContents() { setHtml(mCastHtmls.fullHtml(mCastVideosVisisble, mCastImagesVisisble)); }
 

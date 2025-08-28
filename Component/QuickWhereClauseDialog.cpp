@@ -5,6 +5,7 @@
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "StringTool.h"
 #include "TableFields.h"
 #include <QHash>
 #include <QPushButton>
@@ -162,10 +163,7 @@ QuickWhereClauseDialog::~QuickWhereClauseDialog() {
 
 int QuickWhereClauseDialog::WriteUniqueHistoryToQSetting() {
   QStringList hists = mStrListModel->stringList();
-  std::sort(hists.begin(), hists.end());
-  auto firstDupIt = std::unique(hists.begin(), hists.end());
-  hists.erase(firstDupIt, hists.end());
-
+  StringTool::SearchHistoryListProc(hists);
   Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, hists.join(WHERE_HIST_SPLIT_CHAR));
   return hists.size();
 }
