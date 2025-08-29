@@ -22,6 +22,7 @@ class CastBaseDb : public DbManager {
   static bool IsNewOriFolderPathValid(const QString& destPath, const QString& imageHost, QString& newOri);
   static int MigrateToNewOriFolder(QSqlRecord& sqlRecord, QDir& imageHostDir, const QString& newOriFolder);
   static auto FromFileSystemStructure(const QString& imgsHostPath) -> TCast2OriImgs;
+  static int WhenCastNameRenamed(const QString& imgsHostOriPath, const QString& oldName, const QString& newName);
 };
 
 #endif  // CASTBASEDB_H

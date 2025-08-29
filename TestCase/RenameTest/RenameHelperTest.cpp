@@ -7,7 +7,7 @@ using namespace RenameHelper;
 class RenameHelperTest : public MyTestSuite {
   Q_OBJECT
 public:
-  RenameHelperTest() : MyTestSuite{true} {}
+  RenameHelperTest() : MyTestSuite{false} {}
 private slots:
   void test_ReplaceRename_invalid_regex_failed() {
     QStringList replaceeList;

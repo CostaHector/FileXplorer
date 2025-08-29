@@ -1,7 +1,7 @@
 #include "CastBaseDb.h"
 #include "JsonHelper.h"
 #include "NameTool.h"
-#include "PerformerJsonFileHelper.h"
+#include "CastPsonFileHelper.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
@@ -30,11 +30,11 @@ const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
 );)")
            .arg(ENUM_2_STR(Name))
            .arg(ENUM_2_STR(Rate))
-           .arg(PerformerJsonFileHelper::DEFAULT_RATE)
+           .arg(CastPsonFileHelper::DEFAULT_RATE)
            .arg(ENUM_2_STR(AKA))
            .arg(ENUM_2_STR(Tags))
            .arg(ENUM_2_STR(Ori))
-           .arg(PerformerJsonFileHelper::DEFAULT_ORIENTATION)
+           .arg(CastPsonFileHelper::DEFAULT_ORIENTATION)
            .arg(ENUM_2_STR(Vids))
            .arg(ENUM_2_STR(Imgs))
            .arg(ENUM_2_STR(Detail))};
@@ -96,9 +96,9 @@ enum INSERT_PERF_AND_AKA_TEMPLATE_FIELD {
   INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE,
 };
 
-int CastBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
-  if (!QFileInfo(imgsHostPath).isDir()) {
-    qWarning("Directory[%s] not exist", qPrintable(imgsHostPath));
+int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
+  if (!QFileInfo(imgsHostOriPath).isDir()) {
+    qWarning("Directory[%s] not exist", qPrintable(imgsHostOriPath));
     return FD_NOT_DIR;
   }
 
@@ -119,7 +119,7 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
     return FD_PREPARE_FAILED;
   }
 
-  const TCast2OriImgs& cast2OriImgs = FromFileSystemStructure(imgsHostPath);
+  const TCast2OriImgs& cast2OriImgs = FromFileSystemStructure(imgsHostOriPath);
 
   int succeedCnt = 0;
   for (auto mpIt = cast2OriImgs.cbegin(); mpIt != cast2OriImgs.cend(); ++mpIt) {
@@ -146,13 +146,13 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
     return FD_COMMIT_FAILED;
   }
   qry.finish();
-  qDebug("Read %d perfs out from path[%s] succeed", succeedCnt, qPrintable(imgsHostPath));
+  qDebug("Read %d perfs out from path[%s] succeed", succeedCnt, qPrintable(imgsHostOriPath));
   return succeedCnt;
 }
 
-int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
-  if (!QFileInfo(imgsHostPath).isDir()) {
-    qWarning("Directory[%s] not exist", qPrintable(imgsHostPath));
+int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
+  if (!QFileInfo(imgsHostOriPath).isDir()) {
+    qWarning("Directory[%s] not exist", qPrintable(imgsHostOriPath));
     return FD_NOT_DIR;
   }
 
@@ -174,7 +174,7 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
   }
 
   int succeedCnt = 0;
-  QDirIterator it{imgsHostPath, {"*.pson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{imgsHostOriPath, {"*.pson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   using namespace PERFORMER_DB_HEADER_KEY;
   while (it.hasNext()) {
     it.next();
@@ -203,7 +203,7 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostPath) {
     return FD_COMMIT_FAILED;
   }
   qry.finish();
-  qDebug("Read %d perfs out from path[%s] succeed", succeedCnt, qPrintable(imgsHostPath));
+  qDebug("Read %d perfs out from path[%s] succeed", succeedCnt, qPrintable(imgsHostOriPath));
   return succeedCnt;
 }
 
@@ -319,15 +319,15 @@ bool CastBaseDb::IsNewOriFolderPathValid(const QString& destPath, const QString&
   return true;
 }
 
-int CastBaseDb::MigrateToNewOriFolder(QSqlRecord &sqlRecord, QDir& imageHostDir, const QString &newOri) {
+int CastBaseDb::MigrateToNewOriFolder(QSqlRecord &sqlRecord, QDir& imageoriDir, const QString &newOri) {
   const QString oldOri {sqlRecord.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
   if (newOri == oldOri) {
     return FD_ERROR_CODE::FD_SKIP;
   }
   // Migrate old folder from oldOri to newOri
   const QString castName {sqlRecord.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-  if (imageHostDir.exists(oldOri + '/' + castName)) { // folder oldOri not exist
-    if (!imageHostDir.rename(oldOri + '/' + castName, newOri + '/' + castName)) {
+  if (imageoriDir.exists(oldOri + '/' + castName)) { // folder oldOri not exist
+    if (!imageoriDir.rename(oldOri + '/' + castName, newOri + '/' + castName)) {
       qWarning("Migrate folder failed, castName[%s] from oldOri[%s] to newOri[%s]", qPrintable(castName), qPrintable(oldOri), qPrintable(newOri));
       return FD_ERROR_CODE::FD_RENAME_FAILED;
     }
@@ -336,10 +336,10 @@ int CastBaseDb::MigrateToNewOriFolder(QSqlRecord &sqlRecord, QDir& imageHostDir,
   return FD_ERROR_CODE::FD_OK;
 }
 
-auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostPath) -> TCast2OriImgs {
+auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostOriPath) -> TCast2OriImgs {
   TCast2OriImgs cast2OriImgs;
-  const int IMG_RELPATH_START_INDEX = imgsHostPath.size() + 1; // "C:/home/to/imageHost/"   "ori/cast/cast.jpg"
-  QDirIterator it{imgsHostPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  const int IMG_RELPATH_START_INDEX = imgsHostOriPath.size() + 1; // "C:/home/to/imageHost/"   "ori/cast/cast.jpg"
+  QDirIterator it{imgsHostOriPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     const QString imgRelativePath = it.filePath().mid(IMG_RELPATH_START_INDEX);
@@ -365,4 +365,43 @@ auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostPath) -> TCast2O
     ImgsSortNameFirst(it.value().second);
   }
   return cast2OriImgs;
+}
+
+int CastBaseDb::WhenCastNameRenamed(const QString& imgsHostOriPath, const QString& oldName, const QString& newName) {
+  if (oldName == newName) {
+    return 0;
+  }
+  if (NameTool::IsFileNameInvalid(newName)) {
+    qWarning("New name[%s] invalid", qPrintable(newName));
+    return -1;
+  }
+  if (newName.contains('/') || newName.contains('\\')) {
+    qWarning("New name[%s] invalid should not contain slash", qPrintable(newName));
+    return -1;
+  }
+  QDir oriDir{imgsHostOriPath};
+  if (!oriDir.exists()) {
+    qDebug("Host Image Path[%s] does not exist.", qPrintable(imgsHostOriPath));
+    return -1;
+  }
+
+  int renameCount = 0;
+  // 1. imgsHostOriPath/oldName -> imgsHostOriPath/newName
+  if (!oriDir.rename(oldName, newName)) {
+    qWarning("Renamed directory from %s->%s failed.", qPrintable(oldName), qPrintable(newName));
+    return -1;
+  }
+  ++renameCount;
+  // 2. imgsHostOriPath/newName/oldNameXX -> imgsHostOriPath/newName/newNameXX
+  QDir newDir{imgsHostOriPath + "/" + newName, oldName+"*", QDir::SortFlag::Name, QDir::Filter::Files};
+  int OLD_NAME_LENGTH = oldName.size();
+  for (QString oldFileName: newDir.entryList()) {
+    QString newFileName = newName + oldFileName.mid(OLD_NAME_LENGTH);
+    if (!newDir.rename(oldFileName, newFileName)) {
+      qWarning("Rename file from %s->%s failed.", qPrintable(oldFileName), qPrintable(newFileName));
+      return -1;
+    }
+    ++renameCount;
+  }
+  return renameCount;
 }

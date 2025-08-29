@@ -1,4 +1,5 @@
 #include "CastDbModel.h"
+#include "CastBaseDb.h"
 #include "CastDBActions.h"
 #include "MemoryKey.h"
 #include "PublicVariable.h"
@@ -77,8 +78,18 @@ QVariant CastDbModel::data(const QModelIndex& index, int role) const {
 }
 
 bool CastDbModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-  if (index.column() == PERFORMER_DB_HEADER_KEY::AKA) {
-    qDebug("Old Value: %s, new Value: %s", qPrintable(data(index, Qt::DisplayRole).toString()), qPrintable(value.toString()));
+  if (index.column() == PERFORMER_DB_HEADER_KEY::Name) {
+    const QString oldName{data(index, Qt::DisplayRole).toString()};
+    const QString newName{value.toString()};
+    if (oldName == newName) {
+      return false;
+    }
+    // rename folder and files
+    const QString imgOriPath {oriPath(index)};
+    if (CastBaseDb::WhenCastNameRenamed(imgOriPath, oldName, newName) < 0) {
+      qCritical("Rename failed, not write into db");
+      return false;
+    }
   }
   return QSqlTableModel::setData(index, value, role);
 }
@@ -89,8 +100,12 @@ QString CastDbModel::fileName(const QModelIndex& curIndex) const {
 }
 
 QString CastDbModel::filePath(const QModelIndex& curIndex) const {
+  return oriPath(curIndex) + '/' + fileName(curIndex);
+}
+
+QString CastDbModel::oriPath(const QModelIndex& curIndex) const {
   const QModelIndex& oriIndex = curIndex.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Ori);
-  return m_imageHostPath + '/' + data(oriIndex, Qt::ItemDataRole::DisplayRole).toString() + '/' + fileName(curIndex);
+  return m_imageHostPath + '/' + data(oriIndex, Qt::ItemDataRole::DisplayRole).toString();
 }
 
 QString CastDbModel::portaitPath(const QModelIndex& curIndex) const {
