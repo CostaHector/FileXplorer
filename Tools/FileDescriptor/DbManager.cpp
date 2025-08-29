@@ -258,8 +258,7 @@ bool DbManager::IsTableVolumeOnline(const QString& tableName) const {
   return MountHelper::isVolumeAvailable(stdGuidPart);
 }
 
-bool DbManager::onShowInFileSystemView() const
-{
+bool DbManager::onShowInFileSystemView() const {
   if (!QFile::exists(mDbName)) {
     qWarning("Database[%s] not exist, open failed", qPrintable(mDbName));
     return false;
