@@ -124,9 +124,17 @@ int CastDBView::onDeleteRecords() {
     LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
     return 0;
   }
+  const auto& itemSelection = selectionModel()->selection();
+  QString hintText{QString{"%1 record(s) are about to removed! (Attention: Not recoverable)"}};
+  if (QMessageBox::question(this, "CONFIRM DELETE? (OPERATION NOT RECOVERABLE)", hintText,  //
+                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
+      != QMessageBox::Yes) {
+    LOG_GOOD_NP("[Skip] User Cancel delete records", "return");
+    return 0;
+  }
+
   int totalCnt = 0;
   int succeedCnt = 0;
-  const auto& itemSelection = selectionModel()->selection();
   for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
     int startRow = it->top();  // [top, bottom]
     int curRowsCnt = it->bottom() - startRow + 1;
