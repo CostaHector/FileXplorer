@@ -60,7 +60,7 @@ void TorrentsManagerWidget::subscribe() {
     m_torrentsDBModel->setFilter(searchPattern);
   });
 
-  connect(g_torrActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::ShowInFileSystemView);
+  connect(g_torrActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::onShowInFileSystemView);
 
   connect(g_torrActions().INIT_DATABASE, &QAction::triggered, this, &TorrentsManagerWidget::onInitDataBase);
   connect(g_torrActions().INIT_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInitATable);

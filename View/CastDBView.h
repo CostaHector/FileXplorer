@@ -19,11 +19,6 @@ public:
                       CastBaseDb& castDb_,
                       QWidget* parent = nullptr);
   void subscribe();
-  QString filePath(const QModelIndex& index) const;
-
-public slots:
-  bool onOpenRecordInFileSystem() const;
-
 private:
   void onInitATable();
   int onAppendCasts();
@@ -34,8 +29,6 @@ private:
 
   bool onSubmit();
   bool onRevert();
-
-  bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
   int onLoadFromFileSystemStructure();
   int onLoadFromPsonDirectory();
@@ -48,6 +41,11 @@ private:
 
   int onForceRefreshAllRecordsVids();
   int onForceRefreshRecordsVids();
+
+  bool onCastRowSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  bool onCastRowDoubleClicked(const QModelIndex &index);
+
+  int onMigrateCastTo();
 
 private:
   void RefreshHtmlContents();

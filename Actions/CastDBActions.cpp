@@ -1,9 +1,10 @@
 #include "CastDBActions.h"
-#include <QMenu>
-#include <QActionGroup>
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
+
+#include <QMenu>
+#include <QActionGroup>
 
 CastDBActions::CastDBActions(QObject* parent)  //
   : QObject{parent}                          //
@@ -19,7 +20,7 @@ CastDBActions::CastDBActions(QObject* parent)  //
   APPEND_FROM_PSON_FILES = new (std::nothrow) QAction{"Append from pson files", this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_PSON_FILES);
   APPEND_FROM_PSON_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>Append casts records from *.pson files under ${ImageHost}. Override if primary key conflict")
-    .arg(APPEND_FROM_PSON_FILES->text(), APPEND_FROM_PSON_FILES->shortcut().toString()));
+                                         .arg(APPEND_FROM_PSON_FILES->text(), APPEND_FROM_PSON_FILES->shortcut().toString()));
   APPEND_FROM_FILE_SYSTEM_STRUCTURE = new (std::nothrow) QAction{"Append from file-system structure", this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_FILE_SYSTEM_STRUCTURE);
   APPEND_FROM_FILE_SYSTEM_STRUCTURE->setToolTip("Append casts records from file-system structure under ${ImageHost}");
@@ -46,7 +47,7 @@ CastDBActions::CastDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setShortcut(QKeySequence(Qt::Key::Key_F5));
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setToolTip(QString{"<b>%1 (%2)</b><br/> Sync selected record(s) Imgs field from disk"}//
-    .arg(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->text(), SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->shortcut().toString()));
+                                                       .arg(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->text(), SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->shortcut().toString()));
   SYNC_ALL_RECORDS_IMGS_FROM_DISK = new (std::nothrow) QAction{"Sync all imgs field", this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_ALL_RECORDS_IMGS_FROM_DISK);
   SYNC_ALL_RECORDS_IMGS_FROM_DISK->setToolTip("Sync all record(s) Imgs field from disk");
@@ -66,26 +67,25 @@ CastDBActions::CastDBActions(QObject* parent)  //
   _SYNC_VIDS_OP->addAction(SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
   _SYNC_VIDS_OP->addAction(SYNC_ALL_RECORDS_VIDS_FROM_DB);
 
-  OPEN_RECORD_IN_FILE_SYSTEM = new (std::nothrow) QAction{QIcon(":img/FOLDER_OF_PICTURES"), "Show in FileSystem", this};
-  CHECK_NULLPTR_RETURN_VOID(OPEN_RECORD_IN_FILE_SYSTEM);
-  OPEN_RECORD_IN_FILE_SYSTEM->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
-  OPEN_RECORD_IN_FILE_SYSTEM->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal selected cast location in system file explorer")
-    .arg(OPEN_RECORD_IN_FILE_SYSTEM->text(), OPEN_RECORD_IN_FILE_SYSTEM->shortcut().toString()));
+  MIGRATE_CAST_TO = new (std::nothrow) QAction{QIcon(":img/MIGRATE_CAST_TO"), "Migrate to", this};
+  CHECK_NULLPTR_RETURN_VOID(MIGRATE_CAST_TO);
+  MIGRATE_CAST_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Migrate selected cast path to user specified one")
+                                  .arg(MIGRATE_CAST_TO->text(), MIGRATE_CAST_TO->shortcut().toString()));
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "Open Database", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
   OPEN_DB_WITH_LOCAL_APP->setToolTip(QString("<b>%1 (%2)</b><br/> Open *.db file in local app(DB Browser sqlite). Precondition: It has been set as default app")
-    .arg(OPEN_DB_WITH_LOCAL_APP->text(), OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
+                                         .arg(OPEN_DB_WITH_LOCAL_APP->text(), OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
   FILE_SYSTEM_OP = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(FILE_SYSTEM_OP);
-  FILE_SYSTEM_OP->addAction(OPEN_RECORD_IN_FILE_SYSTEM);
+  FILE_SYSTEM_OP->addAction(MIGRATE_CAST_TO);
   FILE_SYSTEM_OP->addAction(OPEN_DB_WITH_LOCAL_APP);
 
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{QIcon{":img/DUMP_INTO_PSON_FILE"}, "Dump records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_S));
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setToolTip(QString{"<b>%1 (%2)</b><br/> Dump selected records to its pson file"}//
-    .arg(DUMP_SELECTED_RECORDS_INTO_PSON_FILE->text(), DUMP_SELECTED_RECORDS_INTO_PSON_FILE->shortcut().toString()));
+                                                       .arg(DUMP_SELECTED_RECORDS_INTO_PSON_FILE->text(), DUMP_SELECTED_RECORDS_INTO_PSON_FILE->shortcut().toString()));
   DUMP_ALL_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{"Dump all records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_ALL_RECORDS_INTO_PSON_FILE);
   DUMP_ALL_RECORDS_INTO_PSON_FILE->setToolTip("Dump all records to its pson file");
@@ -109,13 +109,14 @@ QToolButton* CastDBActions::GetAppendCastToolButton(QWidget* parent) {
 }
 
 QMenu* CastDBActions::GetRightClickMenu(QWidget* parent) const {
-  auto* m_performerTableMenu = new (std::nothrow) QMenu{"Cast book RightClickMenu", parent};
-  m_performerTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
-  m_performerTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
-  m_performerTableMenu->addAction(g_castAct().OPEN_RECORD_IN_FILE_SYSTEM);
-  m_performerTableMenu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
-  m_performerTableMenu->setToolTipsVisible(true);
-  return m_performerTableMenu;
+  auto* castTableMenu = new (std::nothrow) QMenu{"Cast book RightClickMenu", parent};
+  castTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
+  castTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
+  castTableMenu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
+  castTableMenu->addSeparator();
+  castTableMenu->addAction(MIGRATE_CAST_TO);
+  castTableMenu->setToolTipsVisible(true);
+  return castTableMenu;
 }
 
 CastDBActions& g_castAct() {

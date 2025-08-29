@@ -592,7 +592,7 @@ QString ViewsStackedWidget::getCurFilePath() const {
       return m_scenesModel->filePath(m_sceneTableView->currentIndex());
     }
     case ViewType::CAST: {
-      return m_castTableView->filePath(m_castTableView->currentIndex());
+      return m_castDbModel->filePath(m_castTableView->currentIndex());
     }
     case ViewType::MOVIE: {
       return m_movieDbModel->filePath(m_movieView->currentIndex());

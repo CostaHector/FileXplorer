@@ -4,12 +4,12 @@
 #include <QSqlField>
 #include "MyTestSuite.h"
 #include "CastBaseDb.h"
+#include "TDir.h"
 #include "TableFields.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
-#include "TableFields.h"
 #include "StringTool.h"
-#include <QDir>
+#include "CastPsonFileHelper.h"
 #include <QMap>
 
 QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const QString& imgs) {
@@ -35,29 +35,7 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
   return rec;
 }
 
-const QString rootpath = QFileInfo(__FILE__).absolutePath();
-const QString imgHostPath = rootpath + "/PerfImgHost";
-const QString dbName = rootpath + "/PERF.db";
-
-/* file system structure
-root: PerfImgHost, subitems as follow
-gay
-  Ricky Martin
-    Ricky Martin.jpg
-    Ricky Martin.pson
-hetero
-  Chris Evans
-    Chris Evans.jpg
-    Chris Evans 2.jpg
-    Chris Evans.pson
-  Huge Jackman
-    Huge Jackman.jpg
-    Huge Jackman.pson
-  Kaka
-    Kaka.jpg
-    Kaka.pson
-*/
-
+using namespace CastPsonFileHelper;
 struct CastStructureProperty {
   QString ori;
   QSet<QString> imgsStr;
@@ -68,17 +46,63 @@ class CastBaseDbTest : public MyTestSuite {
   Q_OBJECT
 public:
   CastBaseDbTest() : MyTestSuite{false} {}
+  TDir mDir;
+  QString dbName{mDir.itemPath("PERF.db")};
+  QString imgHostPath{mDir.path()};
 
+  /* file system structure
+root: PerfImgHost, subitems as follow
+Music
+  Ricky Martin
+    Ricky Martin.jpg
+    Ricky Martin.pson 10
+Movie
+  Chris Evans
+    Chris Evans.jpg
+    Chris Evans 2.jpg
+    Chris Evans.pson   9
+  Huge Jackman
+    Huge Jackman.jpg
+    Huge Jackman.pson  8
+  Kaka
+    Kaka.jpg
+    Kaka.pson          10
+escape folder
+  not allowed img.jpg
+*/
+  const QList<FsNodeEntry> mNodeEntries//
+      {
+       {"Music/Ricky Martin/Ricky Martin.jpg", false, ""},
+       {"Music/Ricky Martin/Ricky Martin.pson", false, CastValues2PsonStr("Ricky Martin", 10, "", "", "Music", "", "Ricky Martin.jpg", "")},
+
+       {"Movie/Chris Evans/Chris Evans.jpg", false, ""},
+       {"Movie/Chris Evans/Chris Evans 2.jpg", false, ""},
+       {"Movie/Chris Evans/Chris Evans.pson", false, CastValues2PsonStr("Chris Evans", 9, "", "", "Movie", "", "Chris Evans 2.jpg\nChris Evans.jpg", "")},
+
+       {"Movie/Huge Jackman/Huge Jackman.jpg", false, ""},
+       {"Movie/Huge Jackman/Huge Jackman.pson", false, CastValues2PsonStr("Huge Jackman", 8, "", "", "Movie", "", "Huge Jackman.jpg", "")},
+
+       {"Movie/Kaka/Kaka.jpg", false, ""},
+       {"Movie/Kaka/Kaka.pson", false, CastValues2PsonStr("Kaka", 10, "", "", "Movie", "", "Kaka.jpg", "")},
+
+       {"escape folder/not allowed img.jpg", false, ""},
+       };
+
+  const QMap<QString, CastStructureProperty> gExpectName2Property //
+      {
+       {"Kaka", {"Movie", QSet<QString>{"Kaka.jpg"}, 10}},
+       {"Chris Evans", {"Movie", QSet<QString>{"Chris Evans.jpg", "Chris Evans 2.jpg"}, 9}},
+       {"Huge Jackman", {"Movie", QSet<QString>{"Huge Jackman.jpg"}, 8}},
+       {"Ricky Martin", {"Music", QSet<QString>{"Ricky Martin.jpg"}, 10}},
+       };
+
+  const QString mPerfAkaMultiLineText {
+      "Kaka|Ricardo Izecson dos Santos Leite\n"
+      "Chris Evans,Cevans and Christopher Robert Evans\n"
+      "Huge Jackman @ Wolverine\n"
+      "Ricky Martin, Enrique Martin Morales"
+  };
   // itself
-  QString GetPerfAkaMultiLineText() const { // 4
-    static const QString perfAndItsAkaText {
-        "Kaka|Ricardo Izecson dos Santos Leite\n"
-        "Chris Evans,Cevans and Christopher Robert Evans\n"
-        "Huge Jackman @ Wolverine\n"
-        "Ricky Martin, Enrique Martin Morales"
-    };
-    return perfAndItsAkaText;
-  }
   const QMap<QString, QString> mPerf2AkaMaps // 4
       { //
        {"Kaka", "Ricardo Izecson dos Santos Leite"},
@@ -87,17 +111,14 @@ public:
        {"Ricky Martin", "Enrique Martin Morales"},
        };
   // others
-  QString GetPerfOtherOrNoneAkaMultiLineText() const { // 6
-    static const QString perfAndOtherAkaText {
-        "Chris Evans, Captain America\n"
-        "Huge Jackman\n"
-        "Ricky Martin, Enrique Martin Morales\n"
-        "Jake Gyllenhaal,Jacob Benjamin Gyllenhaal\n"
-        "Brad Pitt,William Bradley Pitt\n"
-        "Frank Grillo,Crossbones"
-    };
-    return perfAndOtherAkaText;
-  }
+  const QString mPerfOtherOrNoneAkaMultiLineText {
+      "Chris Evans, Captain America\n"
+      "Huge Jackman\n"
+      "Ricky Martin, Enrique Martin Morales\n"
+      "Jake Gyllenhaal,Jacob Benjamin Gyllenhaal\n"
+      "Brad Pitt,William Bradley Pitt\n"
+      "Frank Grillo,Crossbones"
+  };
   const QMap<QString, QString> mPerf2OtherAkaMaps // 6
       { //
           {"Chris Evans", "Captain America"},
@@ -107,21 +128,10 @@ public:
           {"Brad Pitt", "William Bradley Pitt"},
           {"Frank Grillo", "Crossbones"}
       };
-
-  const QMap<QString, CastStructureProperty> gExpectName2Property //
-      {
-       {"Kaka", {"hetero", QSet<QString>{"Kaka.jpg"}, 10}},
-       {"Chris Evans", {"hetero", QSet<QString>{"Chris Evans.jpg", "Chris Evans 2.jpg"}, 9}},
-       {"Huge Jackman", {"hetero", QSet<QString>{"Huge Jackman.jpg"}, 8}},
-       {"Ricky Martin", {"gay", QSet<QString>{"Ricky Martin.jpg"}, 10}},
-       };
-
 private slots:
-  void cleanup() {
-    // post-condition
-    if (QFile{dbName}.exists()) {
-      QFile{dbName}.remove();
-    }
+  void initTestCase() {
+    QVERIFY(mDir.IsValid());
+    QCOMPARE(mDir.createEntries(mNodeEntries), mNodeEntries.size());
   }
 
   void test_aka_name_split() {
@@ -131,16 +141,18 @@ private slots:
     const auto& noPerfFromUselessText = CastBaseDb::GetFreqName2AkaNames("\n\n\n");
     QVERIFY(noPerfFromUselessText.isEmpty());
 
-    const QMap<QString, QString> actualPerf2AkaMaps = CastBaseDb::GetFreqName2AkaNames(GetPerfAkaMultiLineText());
+    const QMap<QString, QString> actualPerf2AkaMaps = CastBaseDb::GetFreqName2AkaNames(mPerfAkaMultiLineText);
     QCOMPARE(actualPerf2AkaMaps, mPerf2AkaMaps);
 
-    const QMap<QString, QString> actualPerfs2OtherAkaMaps = CastBaseDb::GetFreqName2AkaNames(GetPerfOtherOrNoneAkaMultiLineText());
+    const QMap<QString, QString> actualPerfs2OtherAkaMaps = CastBaseDb::GetFreqName2AkaNames(mPerfOtherOrNoneAkaMultiLineText);
     QCOMPARE(actualPerfs2OtherAkaMaps, mPerf2OtherAkaMaps);
   }
 
   void test_ReadFromUserInputSentence() {
     // precondition
-    QVERIFY(!QFile::exists(dbName));
+    if (QFile{dbName}.exists()) {
+      QVERIFY(QFile{dbName}.remove());
+    }
 
     CastBaseDb perfDb{dbName, "PERF_CONNECTION"};
     QVERIFY(perfDb.CreateDatabase());
@@ -149,9 +161,9 @@ private slots:
 
     // procedure
     // 1. add from 4 lines text
-    QCOMPARE(perfDb.AppendCastFromMultiLineInput(GetPerfAkaMultiLineText()), 4);
+    QCOMPARE(perfDb.AppendCastFromMultiLineInput(mPerfAkaMultiLineText), 4);
     // 2. add from other 6 lines text
-    QCOMPARE(perfDb.AppendCastFromMultiLineInput(GetPerfOtherOrNoneAkaMultiLineText()), 6);
+    QCOMPARE(perfDb.AppendCastFromMultiLineInput(mPerfOtherOrNoneAkaMultiLineText), 6);
     // INSERT INTO ON CONFLICT SET used in AppendCastFromMultiLineInput when PRIMARY KEY CONFLICTS, aka get updated
 
     const auto& oldMap = mPerf2AkaMaps;
@@ -174,13 +186,16 @@ private slots:
 
   void test_ReadFromImageHost() { // from local file system structure
     // precondition
-    QVERIFY(!QFile::exists(dbName));
+    if (QFile{dbName}.exists()) {
+      QVERIFY(QFile{dbName}.remove());
+    }
     CastBaseDb perfDb{dbName, "PERF_CONNECTION"};
     QVERIFY(perfDb.CreateDatabase());
     QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
     QVERIFY(QFile::exists(dbName));
 
     // procedure
+    // "escape folder" should not in table
     QCOMPARE(perfDb.ReadFromImageHost(imgHostPath), 4);
     QList<QSqlRecord> records;
     QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
@@ -201,7 +216,9 @@ private slots:
 
   void test_LoadFromPJsonFile() { // from local file system pson file
     // precondition
-    QVERIFY(!QFile::exists(dbName));
+    if (QFile{dbName}.exists()) {
+      QVERIFY(QFile{dbName}.remove());
+    }
     CastBaseDb perfDb{dbName, "PERF_CONNECTION"};
     QVERIFY(perfDb.CreateDatabase());
     QVERIFY(perfDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE));
@@ -244,20 +261,20 @@ private slots:
 
     using namespace PERFORMER_DB_HEADER_KEY;
     // 1. folder not exist should skip update
-    QSqlRecord chrisHenmworthRecord = GetACastRecordLine("Chris Hemsworth", "Hetero", defaultImgs);
+    QSqlRecord chrisHenmworthRecord = GetACastRecordLine("Chris Hemsworth", "Movie", defaultImgs);
     QCOMPARE(chrisHenmworthRecord.value(PERFORMER_DB_HEADER_KEY::Name).toString(), "Chris Hemsworth");
-    QCOMPARE(chrisHenmworthRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "Hetero");
+    QCOMPARE(chrisHenmworthRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "Movie");
     QCOMPARE(chrisHenmworthRecord.value(ENUM_2_STR(Name)).toString(), "Chris Hemsworth");
-    QCOMPARE(chrisHenmworthRecord.value(ENUM_2_STR(Ori)).toString(), "Hetero");
-    const QString castFolderPath{imgHostPath + "/Hetero/Chris Hemsworth"};
-    const QString castPsonPath{imgHostPath + "/Hetero/Chris Hemsworth/Chris Hemsworth.pson"};
+    QCOMPARE(chrisHenmworthRecord.value(ENUM_2_STR(Ori)).toString(), "Movie");
+    const QString castFolderPath{imgHostPath + "/Movie/Chris Hemsworth"};
+    const QString castPsonPath{imgHostPath + "/Movie/Chris Hemsworth/Chris Hemsworth.pson"};
     QVERIFY2(!QDir{castFolderPath}.exists(), "Precondition: Chris Hemsworth path should not exist");
     QCOMPARE(CastBaseDb::GetCastPath(chrisHenmworthRecord, imgHostPath), castFolderPath);
     QCOMPARE(CastBaseDb::GetCastFilePath(chrisHenmworthRecord, imgHostPath), castPsonPath);
     QVERIFY(!CastBaseDb::UpdateRecordImgsField(chrisHenmworthRecord, imgHostPath)); // path no exist
 
     // 2. folder exist should update img fields only
-    QSqlRecord chrisEvansRecord = GetACastRecordLine("Chris Evans", "Hetero", defaultImgs);
+    QSqlRecord chrisEvansRecord = GetACastRecordLine("Chris Evans", "Movie", defaultImgs);
     const QString& oldImgs = chrisEvansRecord.value(PERFORMER_DB_HEADER_KEY::Imgs).toString();
     QCOMPARE(oldImgs, defaultImgs);
     QVERIFY(CastBaseDb::UpdateRecordImgsField(chrisEvansRecord, imgHostPath));
@@ -266,6 +283,65 @@ private slots:
     QVERIFY(newImgs.contains("Chris Evans 2.jpg")); // 2 file "A.jpg\nB.jpg" in filesystem-depend sequence
     QVERIFY(newImgs.contains("Chris Evans.jpg"));
     QCOMPARE(newImgs.count('\n'), 1);
+  }
+
+  void test_IsNewOriFolderPathValid() {
+    const QList<FsNodeEntry> envNodes //
+        {
+         {"ImageHostDoc", true, ""},
+         {"ImageHost/Superhero/Jane Grey", true, ""}, // sub sub
+         {"ImageHost/Captain America/Jane Grey", true, ""},
+         {"ImageHost/X-MEN", true, ""},
+         };
+    TDir tdir;
+    QCOMPARE(tdir.createEntries(envNodes), envNodes.size());
+    const QString imageHost{tdir.itemPath("ImageHost")};
+
+    QString newOri;
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHost"), imageHost, newOri));
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHostDoc"), imageHost, newOri));
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHost/Superhero/Jane Grey"), imageHost, newOri));
+    QVERIFY(!CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath(""), imageHost, newOri));
+    QCOMPARE(newOri, "");
+
+    QVERIFY(CastBaseDb::IsNewOriFolderPathValid(
+        tdir.itemPath("ImageHost/Captain America"), imageHost, newOri));
+    QCOMPARE(newOri, "Captain America");
+
+    using namespace PERFORMER_DB_HEADER_KEY;
+    // 1. folder not exist should skip update
+    QSqlRecord henryCavillRecord = GetACastRecordLine("Jane Grey", "Superhero", "");
+
+    QDir imageHostDir{imageHost};
+    QCOMPARE(CastBaseDb::MigrateToNewOriFolder(henryCavillRecord, imageHostDir, "Superhero"),
+             FD_ERROR_CODE::FD_SKIP);
+    QCOMPARE(henryCavillRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "Superhero");
+
+    QCOMPARE(CastBaseDb::MigrateToNewOriFolder(henryCavillRecord, imageHostDir, "Captain America"),
+             FD_ERROR_CODE::FD_RENAME_FAILED); // rename conflict
+    QCOMPARE(henryCavillRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "Superhero");
+
+    QCOMPARE(CastBaseDb::MigrateToNewOriFolder(henryCavillRecord, imageHostDir, "X-MEN"),
+             FD_ERROR_CODE::FD_OK); // migrate from X-MEN to Superhero
+    QCOMPARE(henryCavillRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "X-MEN");
+
+    QVERIFY(!imageHostDir.exists("Superhero/Jane Grey"));
+    QVERIFY(imageHostDir.exists("X-MEN/Jane Grey"));
+  }
+
+  void test_WhenCastNameRenamed_skip() { // must last test here
+    QCOMPARE(CastBaseDb::WhenCastNameRenamed("inexists path", "a", "b"), -1); // not exist
+
+    QString imgHostPathOri = mDir.itemPath("Movie");
+    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "Kaka"), 0); // skip
+    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "<a|\">"), -1); // invalid chars
+    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "Kaka/Football"), -1); // move files up or down
+
+    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "Kaka Leite"), 3); // move files up or down
   }
 };
 

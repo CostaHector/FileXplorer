@@ -52,7 +52,7 @@ QString TextReader(const QString& textPath) {
 bool TextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
   QFile fi{fileName};
   if (!fi.open(openMode)) {
-    qWarning("Open [%s] to write failed. fill will not update.", qPrintable(fileName));
+    qWarning("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int)openMode);
     return false;
   }
   QTextStream stream(&fi);

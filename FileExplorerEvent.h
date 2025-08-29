@@ -34,10 +34,11 @@ class FileExplorerEvent : public QObject {
 
   bool __FocusNewItem(const QString& itemPath);
 
-  bool on_NewTextFile(QString newTextName = "", const QString& contents = "");
+  bool on_NewTextFile();
   bool on_NewJsonFile();
   bool on_NewFolder();
-  bool on_BatchNewFilesOrFolders(const char* namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false);
+
+  bool on_BatchNewFilesOrFolders(const QString& namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false);
   bool on_BatchNewFilesOrFolders(bool isFolder = false);
 
   bool on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx);
@@ -59,6 +60,7 @@ class FileExplorerEvent : public QObject {
   bool on_calcMD5() const;
 
   bool on_properties() const;
+  void on_settings(const bool checked);
 
   bool on_revealInExplorer() const;
   bool on_OpenInTerminal() const;
