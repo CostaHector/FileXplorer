@@ -1,7 +1,9 @@
 #include "CastDbModel.h"
-#include "TableFields.h"
+#include "CastDBActions.h"
 #include "MemoryKey.h"
 #include "PublicVariable.h"
+#include "TableFields.h"
+#include "PublicMacro.h"
 #include <QPainter>
 #include <QPixmap>
 #include <QSqlError>
@@ -41,6 +43,9 @@ CastDbModel::CastDbModel(QObject *parent, QSqlDatabase db) : //
   if (!QFileInfo{m_imageHostPath}.isDir()) {
     qWarning("ImageHostPath[%s] is not a directory or not exist. cast view function abnormal", qPrintable(m_imageHostPath));
   }
+  mSubmitAllAction = g_castAct().SUBMIT;
+  CHECK_NULLPTR_RETURN_VOID(mSubmitAllAction)
+
   if (!db.isValid()) {
     qWarning("db invalid[%s]", qPrintable(db.lastError().text()));
     return;
@@ -54,6 +59,9 @@ CastDbModel::CastDbModel(QObject *parent, QSqlDatabase db) : //
     submitAll();
   }
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
+
+  onUpdateSubmitAllAction();
+  connect(this, &QSqlTableModel::dataChanged, this, &CastDbModel::onUpdateSubmitAllAction);
 }
 
 QVariant CastDbModel::data(const QModelIndex& index, int role) const {
@@ -68,6 +76,13 @@ QVariant CastDbModel::data(const QModelIndex& index, int role) const {
   return QSqlTableModel::data(index, role);
 }
 
+bool CastDbModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+  if (index.column() == PERFORMER_DB_HEADER_KEY::AKA) {
+    qDebug("Old Value: %s, new Value: %s", qPrintable(data(index, Qt::DisplayRole).toString()), qPrintable(value.toString()));
+  }
+  return QSqlTableModel::setData(index, value, role);
+}
+
 QString CastDbModel::fileName(const QModelIndex& curIndex) const {
   const QModelIndex& nameIndex = curIndex.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Name);
   return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
@@ -76,4 +91,29 @@ QString CastDbModel::fileName(const QModelIndex& curIndex) const {
 QString CastDbModel::filePath(const QModelIndex& curIndex) const {
   const QModelIndex& oriIndex = curIndex.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Ori);
   return m_imageHostPath + '/' + data(oriIndex, Qt::ItemDataRole::DisplayRole).toString() + '/' + fileName(curIndex);
+}
+
+bool CastDbModel::submitAll() {
+  QSqlDatabase db = database();
+  if (!db.transaction()) {
+    qWarning("Begin transaction failed: %s", qPrintable(db.lastError().text()));
+    return false;
+  }
+  if (!QSqlTableModel::submitAll()) {
+    qWarning("SubmitAll failed[%s], rollback now", qPrintable(lastError().text()));
+    if (!db.rollback()) {
+      qWarning("Rollback also failed: %s", qPrintable(db.lastError().text()));
+    }
+    return false;
+  }
+  if (!db.commit()) {
+    qWarning("Commit failed[%s]", qPrintable(db.lastError().text()));
+    return false;
+  }
+  onUpdateSubmitAllAction();
+  return true;
+}
+
+void CastDbModel::onUpdateSubmitAllAction() {
+  mSubmitAllAction->setEnabled(isDirty());
 }
