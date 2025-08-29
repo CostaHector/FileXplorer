@@ -61,7 +61,7 @@ CastDBView::CastDBView(CastDbModel* castDbModel_,
 void CastDBView::subscribe() {
   connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, _castModel, &QSqlTableModel::setFilter);
 
-  auto& castInst = g_castAct();
+  static auto& castInst = g_castAct();
   connect(castInst.SUBMIT, &QAction::triggered, this, &CastDBView::onSubmit);
   connect(castInst.APPEND_FROM_MULTILINES_INPUT, &QAction::triggered, this, &CastDBView::onAppendCasts);
   connect(castInst.DELETE_RECORDS, &QAction::triggered, this, &CastDBView::onDeleteRecords);
@@ -179,8 +179,6 @@ int CastDBView::onLoadFromFileSystemStructure() {
 }
 
 bool CastDBView::onSubmit() {
-  CHECK_NULLPTR_RETURN_FALSE(_castModel)
-
   if (!_castModel->isDirty()) {
     LOG_GOOD_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
     return true;
