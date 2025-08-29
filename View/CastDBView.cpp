@@ -15,9 +15,6 @@
 #include "QuickWhereClauseHelper.h"
 
 #include <QDesktopServices>
-#include <QDirIterator>
-#include <QDockWidget>
-#include <QHeaderView>
 #include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QMessageBox>
@@ -378,11 +375,12 @@ int CastDBView::onForceRefreshRecordsVids() {
 }
 
 bool CastDBView::onCastRowSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
-  if (!currentIndex().isValid()) {
-    return true;
+  if (_floatingPreview == nullptr) {return true;}
+  const auto& curInd{currentIndex()};
+  if (!curInd.isValid()) {
+    return false;
   }
-  CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
-  const auto& record = _castModel->record(currentIndex().row());
+  const QSqlRecord& record = _castModel->record(curInd.row());
   _floatingPreview->operator()(record, mImageHost);
   return true;
 }

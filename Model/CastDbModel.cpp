@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QSqlError>
+#include <QSqlRecord>
 
 QPixmap GetRatePixmap(int r, bool hasBorder = false) {
   if (r < 0 || r > CastDbModel::MAX_RATE) {
@@ -67,12 +68,11 @@ CastDbModel::CastDbModel(QObject *parent, QSqlDatabase db) : //
 QVariant CastDbModel::data(const QModelIndex& index, int role) const {
   static const QPixmap PERFORMER_SCORE_BOARD[MAX_RATE + 1] = {GetRatePixmap(0), GetRatePixmap(1), GetRatePixmap(2), GetRatePixmap(3), GetRatePixmap(4), GetRatePixmap(5),
                                                               GetRatePixmap(6), GetRatePixmap(7), GetRatePixmap(8), GetRatePixmap(9), GetRatePixmap(10)};
-  if (index.column() == PERFORMER_DB_HEADER_KEY::Rate) {
+  if (role == Qt::DecorationRole && index.column() == PERFORMER_DB_HEADER_KEY::Rate) {
     const int sc = QSqlTableModel::data(index, Qt::DisplayRole).toInt();
-    if (role == Qt::DecorationRole) {
-      return PERFORMER_SCORE_BOARD[(sc > MAX_RATE) ? MAX_RATE : (sc < 0 ? 0 : sc)];
-    }
+    return PERFORMER_SCORE_BOARD[(sc > MAX_RATE) ? MAX_RATE : (sc < 0 ? 0 : sc)];
   }
+
   return QSqlTableModel::data(index, role);
 }
 
@@ -91,6 +91,18 @@ QString CastDbModel::fileName(const QModelIndex& curIndex) const {
 QString CastDbModel::filePath(const QModelIndex& curIndex) const {
   const QModelIndex& oriIndex = curIndex.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Ori);
   return m_imageHostPath + '/' + data(oriIndex, Qt::ItemDataRole::DisplayRole).toString() + '/' + fileName(curIndex);
+}
+
+QString CastDbModel::portaitPath(const QModelIndex& curIndex) const {
+  const auto& rec = record(curIndex.row());
+  const QString& imgs = rec.value(PERFORMER_DB_HEADER_KEY::Imgs).toString();
+  if (imgs.isEmpty()) {
+    return "";
+  }
+  return m_imageHostPath +
+         '/' + rec.value(PERFORMER_DB_HEADER_KEY::Ori).toString() +
+         '/' + rec.value(PERFORMER_DB_HEADER_KEY::Name).toString() +
+         '/' + imgs.left(imgs.indexOf('\n'));
 }
 
 bool CastDbModel::submitAll() {
