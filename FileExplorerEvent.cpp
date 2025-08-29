@@ -75,38 +75,27 @@ FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* v
   _contentPane = view;
   _logger = logger;
   m_clipboard = QApplication::clipboard();
-  // connect(m_clipboard, &QClipboard::dataChanged, this, &FileExplorerEvent::onSystemClipboardDataChanged);
 }
 
-auto FileExplorerEvent::on_NewTextFile(QString newTextName, const QString& contents) -> bool {  // not effect by selection;
+bool FileExplorerEvent::on_NewTextFile() {  // not effect by selection;
   if (!__CanNewItem()) {
     return false;
   }
-  if (newTextName.isEmpty()) {
-    newTextName = QString("New Text Document %1.txt").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss"));
-  }
-  if (_fileSysModel->rootDirectory().exists(newTextName)) {
-    qInfo("Skipped. There is already a file[%s] in folder[%s].", qPrintable(newTextName), qPrintable(_fileSysModel->rootPath()));
-    return false;
+  const QString plainTextFileName {QString("New Text Document %1.txt").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss"))};
+  const QDir curDir{_fileSysModel->rootDirectory()};
+  if (curDir.exists(plainTextFileName)) {
+    LOG_GOOD_NP("Plain text file already exist", plainTextFileName);
+    return true;
   }
   using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstTOUCH(_fileSysModel->rootPath(), newTextName)};
-  const auto isAllSucceed = g_undoRedo.Do(cmds);
-  if (!isAllSucceed) {
-    qWarning("[Error] touch command failed when create plain text file.");
+  BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstTOUCH(curDir.absolutePath(), plainTextFileName)};
+  if (!g_undoRedo.Do(cmds)) {
+    LOG_BAD_NP("[Failed] Touch file", plainTextFileName);
     return false;
   }
-  const QString& txtFilePath = _fileSysModel->rootDirectory().absoluteFilePath(newTextName);
-  if (!contents.isEmpty()) {
-    QFile file(txtFilePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      QTextStream stream(&file);
-      stream << contents;
-    }
-    file.close();
-  }
-  __FocusNewItem(txtFilePath);
-  return isAllSucceed;
+  const QString textAbsPath{curDir.absoluteFilePath(plainTextFileName)};
+  __FocusNewItem(textAbsPath);
+  return true;
 }
 
 bool FileExplorerEvent::on_NewJsonFile() {
@@ -162,19 +151,17 @@ bool FileExplorerEvent::on_NewFolder() {  // not effect by selection;
   return isAllSucceed;
 }
 
-bool FileExplorerEvent::on_BatchNewFilesOrFolders(const char* namePattern, int startIndex, int endIndex, bool isFolder) {
+bool FileExplorerEvent::on_BatchNewFilesOrFolders(const QString& namePattern, int startIndex, int endIndex, bool isFolder) {
   if (!__CanNewItem()) {
     return false;
   }
-  const QDir createInDir = _fileSysModel->rootDirectory();
-  const QString& createInPath = _fileSysModel->rootPath();
+  const QDir createInDir {_fileSysModel->rootDirectory()};
+  const QString& createInPath {createInDir.absolutePath()};
+
   using namespace FileOperatorType;
   FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
-
-  char fileNameArray[256] = "\0";
   for (int itemIndex = startIndex; itemIndex < endIndex; ++itemIndex) {
-    memset(fileNameArray, '\0', sizeof(fileNameArray));
-    sprintf(fileNameArray, namePattern, itemIndex);
+    QString fileNameArray = QString::asprintf(qPrintable(namePattern), itemIndex);
     if (createInDir.exists(fileNameArray)) {
       qInfo("Skip. File/Folder[%s] already exists in folder[%s]", fileNameArray, qPrintable(createInPath));
       continue;
@@ -185,8 +172,7 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(const char* namePattern, int s
       cmds.append(ACMD::GetInstTOUCH(createInPath, fileNameArray));
     }
   }
-  const auto isAllSucceed = g_undoRedo.Do(cmds);
-  if (not isAllSucceed) {
+  if (!g_undoRedo.Do(cmds)) {
     qWarning("[Error] Some commands failed when create %d file/folder(s).", cmds.size());
     return false;
   }
@@ -194,15 +180,16 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(const char* namePattern, int s
 }
 
 bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
-  const QString defNamePattern = isFolder ? Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v).toString()
-                                          : Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v).toString();
+  QString title{"Create Batch "};
+  title += (isFolder ? "Folders" : "Files");
 
-  const QString userInputRule = QInputDialog::getText(//
-        _contentPane, //
-        QString("Create Batch %1").arg(isFolder ? "Folders" : "Files"),
-        "Rule Pattern: C-styleFormatString%StartIndex$EndIndex",
-        QLineEdit::Normal,
-        defNamePattern);
+  const QString defNamePattern { isFolder ? //
+                                   Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v).toString()
+                                        : Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v).toString()};
+
+  const QString userInputRule = QInputDialog::getText(_contentPane, title,
+                                                      "Rule Pattern: C-style Format String$StartIndex$EndIndex",
+                                                      QLineEdit::Normal, defNamePattern);
   const QStringList& userInputLst = userInputRule.split('$');
   if (userInputLst.size() != 3) {
     LOG_WARN_P("[Error] Invalid Rule pattern",
@@ -210,16 +197,14 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
                qPrintable(userInputRule), userInputLst.size());
     return false;
   }
-  char namePattern[260] = "\0";
-  strncpy(namePattern, userInputLst[0].toStdString().c_str(), sizeof(namePattern) - 1);
-  int startIndex = userInputLst[1].toInt();
-  int endIndex = userInputLst[2].toInt();
+  const QString namePattern = userInputLst[0];
+  const int startIndex = userInputLst[1].toInt();
+  const int endIndex = userInputLst[2].toInt();
   if (startIndex >= endIndex) {
     LOG_INFO_P("Skip", "Create %d file/folders", endIndex - startIndex)
     return true;
   }
   Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, userInputRule);
-
   return on_BatchNewFilesOrFolders(namePattern, startIndex, endIndex, isFolder);
 }
 
@@ -361,6 +346,16 @@ bool FileExplorerEvent::on_properties() const {
   return false;
 }
 
+void FileExplorerEvent::on_settings(const bool checked) {
+  if (m_alertSystem == nullptr) {
+    m_alertSystem = PopupHideWidget<AlertSystem>(m_alertSystem, checked, _contentPane);
+  }
+  CHECK_NULLPTR_RETURN_VOID(m_alertSystem)
+  if (checked) {                                                                       //
+    (*m_alertSystem)(_contentPane->getRootPath());                                     //
+  }                                                                                    //
+}
+
 void FileExplorerEvent::subsribeCompress() {
   connect(g_AchiveFilesActions().COMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_compress);
   connect(g_AchiveFilesActions().DECOMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_deCompress);
@@ -369,13 +364,7 @@ void FileExplorerEvent::subsribeCompress() {
 }
 
 void FileExplorerEvent::subsribeFileActions() {
-  connect(g_fileLeafActions()._SETTINGS, &QAction::triggered, this,                           //
-          [this](const bool checked) {                                                           //
-            m_alertSystem = PopupHideWidget<AlertSystem>(m_alertSystem, checked, _contentPane);  //
-            if (checked) {                                                                       //
-              (*m_alertSystem)(_contentPane->getRootPath());                                     //
-            }                                                                                    //
-          });
+  connect(g_fileLeafActions()._SETTINGS, &QAction::triggered, this, &FileExplorerEvent::on_settings);
 
   connect(g_fileLeafActions()._ABOUT_FILE_EXPLORER, &QAction::triggered, this, [this]() {
     QMessageBox::about(_contentPane, "FileExplorer",
@@ -437,7 +426,7 @@ void FileExplorerEvent::subscribeThumbnailActions() {
                                                 "Enter range (e.g., 1,3; 1,4; 1,7):",       //
                                                 QLineEdit::Normal, "0,9", &ok);             //
     if (!ok || input.isEmpty()) {
-      LOG_INFO_P("[Skip]User canceled or invalid input", "input[%s]", qPrintable(input));
+      LOG_INFO_P("[Skip] User canceled or invalid input", "input[%s]", qPrintable(input));
       return;
     }
     static const QRegularExpression regex(R"(^\d,\d$)");
@@ -465,7 +454,7 @@ void FileExplorerEvent::subscribe() {
   {
     auto& fileOpInst = g_fileBasicOperationsActions();
     connect(fileOpInst.NEW_FOLDER, &QAction::triggered, this, &FileExplorerEvent::on_NewFolder);
-    connect(fileOpInst.NEW_TEXT_FILE, &QAction::triggered, this, [this]() { this->on_NewTextFile(); });
+    connect(fileOpInst.NEW_TEXT_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewTextFile);
     connect(fileOpInst.NEW_JSON_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewJsonFile);
     connect(fileOpInst.BATCH_NEW_FILES, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(false); });
     connect(fileOpInst.BATCH_NEW_FOLDERS, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(true); });
@@ -1130,7 +1119,7 @@ bool FileExplorerEvent::on_FileClassify() {
 bool FileExplorerEvent::on_FileUnclassify() {
   if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     LOG_INFO_P("[Skip] FileUnclassify", "viewName:%s, rootPath:%s",
-      qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
+               qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     return false;
   }
   const QDir pathdir = this->_fileSysModel->rootDirectory();
@@ -1169,7 +1158,7 @@ bool FileExplorerEvent::on_FileUnclassify() {
 bool FileExplorerEvent::on_RemoveDuplicateImages() {
   if (!_contentPane->isFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
     LOG_INFO_P("[Skip] RemoveDuplicateImages", "viewName:%s, rootPath:%s",
-             qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
+               qPrintable(_contentPane->GetCurViewName()), qPrintable(_fileSysModel->rootPath()));
     return false;
   }
 
@@ -1259,10 +1248,10 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
   Qt::DropAction dropAction{Qt::DropAction::IgnoreAction};
   if (dropAct == Qt::DropAction::MoveAction) {
     Configuration().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name,  //
-                                  MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY));
+                             MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY));
   } else if (dropAct == Qt::DropAction::CopyAction) {
     Configuration().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
-                                  MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
+                             MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
   } else {
     qDebug("DropAction[%d] is invalid", (int)dropAct);
     return false;
