@@ -119,43 +119,18 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostPath) {
     return FD_PREPARE_FAILED;
   }
 
+  const TCast2OriImgs& cast2OriImgs = FromFileSystemStructure(imgsHostPath);
+
   int succeedCnt = 0;
-  QMap<QString, QString> name2Ori;
-  QMap<QString, QStringList> name2Imgs;
-  QDirIterator it{imgsHostPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-  while (it.hasNext()) {
-    it.next();
-    const QStringList& imgPathParts = it.filePath().split('/');
-    const int pathSectionSize = imgPathParts.size();
-    if (pathSectionSize < 3) {
-      qWarning("Path[%s] section count[%d] invalid", qPrintable(it.filePath()), pathSectionSize);
-      continue;
-    }
-    const QString& imgName = imgPathParts[pathSectionSize - 1];
-    const QString& perfName = imgPathParts[pathSectionSize - 2];
-    const QString& ori = imgPathParts[pathSectionSize - 3];
-    auto it = name2Imgs.find(perfName);
-    if (it != name2Imgs.end()) {
-      it.value().append(imgName);
-    } else {
-      name2Imgs.insert(perfName, {imgName});
-      name2Ori[perfName] = ori;
-    }
-  }
-  using namespace StringTool;
-  for (auto it = name2Imgs.begin(); it != name2Imgs.end(); ++it) {
-    ImgsSortNameLengthFirst(it.value());
-  }
-
-  for (auto mpIt = name2Ori.cbegin(); mpIt != name2Ori.cend(); ++mpIt) {
+  for (auto mpIt = cast2OriImgs.cbegin(); mpIt != cast2OriImgs.cend(); ++mpIt) {
     const QString& perf = mpIt.key();
-    const QString& imgs = name2Imgs[perf].join(PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
+    const QString& ori = mpIt.value().first;
+    const QString& imgsStr = mpIt.value().second.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);   // img seperated by \n
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name, perf);
-    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation, mpIt.value());
-    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs, imgs);
-    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE, mpIt.value());
-    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE, imgs);
-
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation, ori);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs, imgsStr);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE, ori);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE, imgsStr);
     if (!qry.exec()) {
       qWarning("replace[%s] failed: %s",  //
                qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
@@ -361,3 +336,33 @@ int CastBaseDb::MigrateToNewOriFolder(QSqlRecord &sqlRecord, QDir& imageHostDir,
   return FD_ERROR_CODE::FD_OK;
 }
 
+auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostPath) -> TCast2OriImgs {
+  TCast2OriImgs cast2OriImgs;
+  const int IMG_RELPATH_START_INDEX = imgsHostPath.size() + 1; // "C:/home/to/imageHost/"   "ori/cast/cast.jpg"
+  QDirIterator it{imgsHostPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  while (it.hasNext()) {
+    it.next();
+    const QString imgRelativePath = it.filePath().mid(IMG_RELPATH_START_INDEX);
+    const QStringList& imgPathParts = imgRelativePath.split('/'); // ori/cast/img
+    const int pathSectionSize = imgPathParts.size();
+    if (pathSectionSize != 3) {
+      qDebug("Relative2ImagePath[%s] sections count[%d] != 3", qPrintable(imgRelativePath), pathSectionSize);
+      continue;
+    }
+    const QString& ori{imgPathParts[0]};
+    const QString& castName{imgPathParts[1]};
+    const QString& imgName{imgPathParts[2]};
+
+    auto it = cast2OriImgs.find(castName);
+    if (it == cast2OriImgs.end()) {
+      cast2OriImgs[castName] = std::make_pair(ori, QStringList{imgName});
+    } else {
+      it.value().second.push_back(imgName);
+    }
+  }
+  using namespace StringTool;
+  for (auto it = cast2OriImgs.begin(); it != cast2OriImgs.end(); ++it) {
+    ImgsSortNameFirst(it.value().second);
+  }
+  return cast2OriImgs;
+}

@@ -124,18 +124,24 @@ int CastDBView::onDeleteRecords() {
     LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
     return 0;
   }
-  int deleteCnt = 0;
+  int totalCnt = 0;
   int succeedCnt = 0;
   const auto& itemSelection = selectionModel()->selection();
   for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
     int startRow = it->top();  // [top, bottom]
-    int size = it->bottom() - startRow + 1;
-    bool ret = _castModel->removeRows(startRow, size);
-    qDebug("drop[%d] records [%d, %d]", ret, startRow, it->bottom());
-    deleteCnt += size;
-    succeedCnt += ((int)ret * size);
+    int curRowsCnt = it->bottom() - startRow + 1;
+    bool ret = _castModel->removeRows(startRow, curRowsCnt);
+    qDebug("drop[%d] records [%d, %d] ret: %d", ret, startRow, it->bottom(), ret);
+    if (ret) {
+      succeedCnt += curRowsCnt;
+    }
+    totalCnt += curRowsCnt;
   }
-  LOG_GOOD_P("[Ok]Delete records(need submit)", "%d/%d succeed", succeedCnt, deleteCnt);
+  if (totalCnt == 0) {
+    return 0;
+  }
+  bool submitResult = onSubmit();
+  LOG_GOOD_P("[Ok]Delete records", "%d/%d bSubmit[%d]", succeedCnt, totalCnt, submitResult);
   return succeedCnt;
 }
 
