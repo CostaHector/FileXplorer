@@ -4,7 +4,7 @@
 #include <QToolBar>
 
 class RibbonCastDB : public QToolBar {
- public:
+public:
   explicit RibbonCastDB(const QString& title, QWidget* parent = nullptr);
 
   QToolBar* m_BasicTableOp{nullptr};
