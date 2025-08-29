@@ -7,7 +7,7 @@
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
-#include "PerformerJsonFileHelper.h"
+#include "CastPsonFileHelper.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "StringTool.h"
@@ -276,8 +276,8 @@ int CastDBView::onDumpAllIntoPsonFile() {
   }
   int succeedCnt = 0;
   for (int r = 0; r < _castModel->rowCount(); ++r) {
-    const auto& pson = PerformerJsonFileHelper::PerformerJsonJoiner(_castModel->record(r));
-    const QString& psonPath = PerformerJsonFileHelper::PsonPath(mImageHost, pson);
+    const auto& pson = CastPsonFileHelper::PerformerJsonJoiner(_castModel->record(r));
+    const QString& psonPath = CastPsonFileHelper::PsonPath(mImageHost, pson);
     succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
   QString msgTitle{QString("All %1 record(s) dumped result").arg(totalCnt)};
@@ -309,8 +309,8 @@ int CastDBView::onDumpIntoPsonFile() {
       qWarning("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(mImageHost));
       continue;
     }
-    const QString psonPath {PerformerJsonFileHelper::PsonPath(mImageHost, ori, castName)};
-    const QVariantHash pson = PerformerJsonFileHelper::PerformerJsonJoiner(record);
+    const QString psonPath {CastPsonFileHelper::PsonPath(mImageHost, ori, castName)};
+    const QVariantHash pson = CastPsonFileHelper::PerformerJsonJoiner(record);
     succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
 

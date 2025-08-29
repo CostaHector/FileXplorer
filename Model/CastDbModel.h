@@ -31,6 +31,8 @@ public:
     return QFileInfo{filePath(curIndex)};
   }
 
+  QString oriPath(const QModelIndex& curIndex) const;
+
   QString psonFilePath(const QModelIndex& curIndex) const {
     return filePath(curIndex) + '/' + fileName(curIndex) + ".pson";
   }
