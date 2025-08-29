@@ -511,7 +511,6 @@ void FileExplorerEvent::subscribe() {
       auto* pToLongPath = new RenameWidget_LongPath(_contentPane);
       onRename(pToLongPath);
     });
-
   }
 
   {
