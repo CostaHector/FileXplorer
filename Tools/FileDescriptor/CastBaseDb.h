@@ -5,6 +5,8 @@
 
 class CastBaseDb : public DbManager {
  public:
+  typedef QMap<QString, std::pair<QString, QStringList>> TCast2OriImgs;
+
   CastBaseDb(const QString& dbName, const QString& connName, QObject* parent = nullptr)  //
       : DbManager{dbName, connName, parent} {}
   int ReadFromImageHost(const QString& imgsHostPath);
@@ -19,6 +21,7 @@ class CastBaseDb : public DbManager {
   static QString GetCastFilePath(const QSqlRecord& sqlRecord, const QString& imageHostPath);
   static bool IsNewOriFolderPathValid(const QString& destPath, const QString& imageHost, QString& newOri);
   static int MigrateToNewOriFolder(QSqlRecord& sqlRecord, QDir& imageHostDir, const QString& newOriFolder);
+  static auto FromFileSystemStructure(const QString& imgsHostPath) -> TCast2OriImgs;
 };
 
 #endif  // CASTBASEDB_H

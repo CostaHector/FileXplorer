@@ -55,6 +55,8 @@ hetero
   Kaka
     Kaka.jpg
     Kaka.pson
+escape folder
+  not allowed img.jpg
 */
 
 struct CastStructureProperty {
@@ -66,7 +68,7 @@ struct CastStructureProperty {
 class CastBaseDbTest : public MyTestSuite {
   Q_OBJECT
 public:
-  CastBaseDbTest() : MyTestSuite{false} {}
+  CastBaseDbTest() : MyTestSuite{true} {}
 
   // itself
   QString GetPerfAkaMultiLineText() const { // 4
@@ -180,6 +182,7 @@ private slots:
     QVERIFY(QFile::exists(dbName));
 
     // procedure
+    // "escape folder" should not in table
     QCOMPARE(perfDb.ReadFromImageHost(imgHostPath), 4);
     QList<QSqlRecord> records;
     QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));

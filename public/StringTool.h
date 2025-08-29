@@ -18,6 +18,9 @@ inline void ImgsSortFileSizeFirst(QStringList& imgs) {
 inline void ImgsSortNameLengthFirst(QStringList& imgs) {
   std::sort(imgs.begin(), imgs.end(), FileNameLengthSorter);
 }
+inline void ImgsSortNameFirst(QStringList& imgs) {
+  std::sort(imgs.begin(), imgs.end());
+}
 
 int RemoveDuplicateKeepSequence(QStringList& hists);
 int TrimEachElementAndRemoveEmpty(QStringList& keywords);
