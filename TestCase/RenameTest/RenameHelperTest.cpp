@@ -166,6 +166,17 @@ private slots:
     QCOMPARE(ansLst, expectList);
   }
 
+  void test_NumerizeReplace_1_item_no_need_add_number() {
+    QStringList replaceeList {"la - hello world.jpg"};
+    QStringList suffixs {""};
+    QStringList expectList {"LosAngle - hello world"};
+    QString baseName {"LosAngle - hello world"};
+    const int startInd{22};
+    const QString& namePattern{" %1"};
+    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+    QCOMPARE(ansLst, expectList);
+  }
+
   void test_InsertRename_push_front_ok() {
     QStringList replaceeList;
     replaceeList << "la - hello world 99"

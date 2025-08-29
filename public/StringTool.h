@@ -10,13 +10,16 @@ constexpr char PERFS_VIDS_IMGS_SPLIT_CHAR {'\n'};
 bool FileNameLengthSorter(const QString& lhs, const QString& rhs);
 bool FileSizeSorter(const QString& lhs, const QString& rhs);
 
-QStringList GetImgsListFromField(const QString& imgsField);
-QStringList GetVidsListFromField(const QString& vidsField);
+QStringList GetImgsVidsListFromField(const QString& imgVidsField);
+
 inline void ImgsSortFileSizeFirst(QStringList& imgs) {
   std::sort(imgs.begin(), imgs.end(), FileSizeSorter);
 }
 inline void ImgsSortNameLengthFirst(QStringList& imgs) {
   std::sort(imgs.begin(), imgs.end(), FileNameLengthSorter);
+}
+inline void ImgsSortNameFirst(QStringList& imgs) {
+  std::sort(imgs.begin(), imgs.end());
 }
 
 int RemoveDuplicateKeepSequence(QStringList& hists);

@@ -86,46 +86,26 @@ QString GetDetailDescription(const QString& fileAbsPath) {
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost) {
   const QString castName {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
   const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
-  const QStringList& vidsLst {StringTool::GetVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
-  const QStringList& imgsLst {StringTool::GetImgsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString())};
-  const QDir imgDir {imgHost + '/' + orientation + '/' + castName};
-  const QString portraitImg {imgsLst.isEmpty() ? "" : imgDir.absoluteFilePath(imgsLst.front())};
+  const QStringList& vidsLst {StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
+  const QStringList& imgsLst {StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString())};
 
   static const QString CAST_BRIEF_INTRODUCTION_TEMPLATE//
       { R"(
   <table width="100%" border="0" cellspacing="0" cellpadding="10">
-    <tr>
-      <!-- Left Brief Introduction -->
-      <td width="70%" valign="top">
-        <h1 style="margin:0;">%1</h1>
-        <hr style="border-top:1px solid #ccc;margin:5px 0">
-        <table cellpadding="5">
-          <tr><td><b>Rate:</b></td><td>%4</td></tr>
-          <tr><td><b>AKA:</b></td><td>%5</td></tr>
-          <tr><td><b>Tags:</b></td><td>%6</td></tr>
-          <tr><td><b>Orientation:</b></td><td>%7</td></tr>
-          <tr><td><b>Details:</b></td><td>%8</td></tr>
-        </table>
-      </td>
-      <!-- Right self portrait -->
-      <td width="30%" align="right" valign="top">
-        <a href="file:///%2">
-          <img src="file:///%2" alt="Portrait" width="%3" style="border:1px solid #ddd">
-        </a>
-      </td>
-    </tr>
+    <h1 style="margin:0;">%1 | %2 | %3</h1>
+    <hr style="border-top:1px solid #ccc;margin:5px 0">
+    <tr><td><b>Tags:</b>%4 | %5 | %6</td></tr>
   </table>
+
 )"};
   QString htmlSrc;
   htmlSrc.reserve(CAST_BRIEF_INTRODUCTION_TEMPLATE.size() + 200);
   htmlSrc += CAST_BRIEF_INTRODUCTION_TEMPLATE                                         //
                  .arg(castName)                                                       //
-                 .arg(portraitImg)                                                    //
-                 .arg(IMAGE_SIZE::PORTAIT_IMG_WIDTH)                                                      //
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::Rate).value().toInt())    //
-                 .arg(record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString())  //
-                 .arg(record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString()) //
                  .arg(orientation)                                                    //
+                 .arg(record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString()) //
+                 .arg(record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString())  //
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString());
 
   // Videos here
@@ -141,6 +121,7 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost)
   vidsPartBody += R"(</div>)" "\n";
 
   // Images here
+  const QDir imgDir {imgHost + '/' + orientation + '/' + castName};
   const int imgsCnt{imgsLst.size()};
   QString imgsPartHead {R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedImages"> %1 )" + QString::number(imgsCnt) + R"( Related Images</a></h3>)" "\n"};
   QString imgsPartBody;

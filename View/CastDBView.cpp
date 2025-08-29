@@ -7,7 +7,7 @@
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
-#include "PerformerJsonFileHelper.h"
+#include "CastPsonFileHelper.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "StringTool.h"
@@ -15,9 +15,6 @@
 #include "QuickWhereClauseHelper.h"
 
 #include <QDesktopServices>
-#include <QDirIterator>
-#include <QDockWidget>
-#include <QHeaderView>
 #include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QMessageBox>
@@ -58,26 +55,10 @@ CastDBView::CastDBView(CastDbModel* castDbModel_,
   setWindowIcon(QIcon(":img/CAST_VIEW"));
 }
 
-bool CastDBView::onOpenRecordInFileSystem() const {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("Nothing was selected.", "Select a row to open pson folder");
-    return false;
-  }
-  const QModelIndex ind{currentIndex()};
-  // when column in detail. open pson file. Otherwise open folder contains pson
-  QString revealPath{currentIndex().column() == PERFORMER_DB_HEADER_KEY::Detail ? _castModel->psonFilePath(ind): _castModel->filePath(ind)};
-  if (!QFile::exists(revealPath)) {
-    LOG_WARN_NP("Path not exists", revealPath);
-    return false;
-  }
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(revealPath));
-}
-
-
 void CastDBView::subscribe() {
   connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, _castModel, &QSqlTableModel::setFilter);
 
-  auto& castInst = g_castAct();
+  static auto& castInst = g_castAct();
   connect(castInst.SUBMIT, &QAction::triggered, this, &CastDBView::onSubmit);
   connect(castInst.APPEND_FROM_MULTILINES_INPUT, &QAction::triggered, this, &CastDBView::onAppendCasts);
   connect(castInst.DELETE_RECORDS, &QAction::triggered, this, &CastDBView::onDeleteRecords);
@@ -91,8 +72,8 @@ void CastDBView::subscribe() {
   connect(castInst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshRecordsVids);
   connect(castInst.SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshAllRecordsVids);
 
-  connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::ShowInFileSystemView);
-  connect(castInst.OPEN_RECORD_IN_FILE_SYSTEM, &QAction::triggered, this, &CastDBView::onOpenRecordInFileSystem);
+  connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::onShowInFileSystemView);
+  connect(castInst.MIGRATE_CAST_TO, &QAction::triggered, this, &CastDBView::onMigrateCastTo);
 
   connect(castInst.APPEND_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
   connect(castInst.APPEND_FROM_PSON_FILES, &QAction::triggered, this, &CastDBView::onLoadFromPsonDirectory);
@@ -100,15 +81,8 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_ALL_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpAllIntoPsonFile);
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::on_selectionChanged);
-}
-
-QString CastDBView::filePath(const QModelIndex& index) const {
-  if (_castModel == nullptr || !index.isValid()){
-    return "";
-  }
-  const auto& record = _castModel->record(currentIndex().row());
-  return CastBaseDb::GetCastFilePath(record, mImageHost);
+  connect(this, &CastDBView::doubleClicked, this, &CastDBView::onCastRowDoubleClicked);
+  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::onCastRowSelectionChanged);
 }
 
 void CastDBView::onInitATable() {
@@ -142,6 +116,32 @@ int CastDBView::onAppendCasts() {
   }
   _castModel->submitAll();
   LOG_GOOD_P("[Ok] load performer(s)", "perfsText:%s, count: %d", qPrintable(perfsText), succeedCnt);
+  return succeedCnt;
+}
+
+int CastDBView::onDeleteRecords() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
+    return 0;
+  }
+  int totalCnt = 0;
+  int succeedCnt = 0;
+  const auto& itemSelection = selectionModel()->selection();
+  for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
+    int startRow = it->top();  // [top, bottom]
+    int curRowsCnt = it->bottom() - startRow + 1;
+    bool ret = _castModel->removeRows(startRow, curRowsCnt);
+    qDebug("drop[%d] records [%d, %d] ret: %d", ret, startRow, it->bottom(), ret);
+    if (ret) {
+      succeedCnt += curRowsCnt;
+    }
+    totalCnt += curRowsCnt;
+  }
+  if (totalCnt == 0) {
+    return 0;
+  }
+  bool submitResult = onSubmit();
+  LOG_GOOD_P("[Ok]Delete records", "%d/%d bSubmit[%d]", succeedCnt, totalCnt, submitResult);
   return succeedCnt;
 }
 
@@ -182,8 +182,6 @@ int CastDBView::onLoadFromFileSystemStructure() {
 }
 
 bool CastDBView::onSubmit() {
-  CHECK_NULLPTR_RETURN_FALSE(_castModel)
-
   if (!_castModel->isDirty()) {
     LOG_GOOD_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
     return true;
@@ -203,16 +201,6 @@ bool CastDBView::onRevert() {
   }
   _castModel->revertAll();
   LOG_GOOD_NP("Revert succeed", "All changes revert");
-  return true;
-}
-
-bool CastDBView::on_selectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
-  if (!currentIndex().isValid()) {
-    return true;
-  }
-  CHECK_NULLPTR_RETURN_FALSE(_floatingPreview);
-  const auto& record = _castModel->record(currentIndex().row());
-  _floatingPreview->operator()(record, mImageHost);
   return true;
 }
 
@@ -288,8 +276,8 @@ int CastDBView::onDumpAllIntoPsonFile() {
   }
   int succeedCnt = 0;
   for (int r = 0; r < _castModel->rowCount(); ++r) {
-    const auto& pson = PerformerJsonFileHelper::PerformerJsonJoiner(_castModel->record(r));
-    const QString& psonPath = PerformerJsonFileHelper::PsonPath(mImageHost, pson);
+    const auto& pson = CastPsonFileHelper::PerformerJsonJoiner(_castModel->record(r));
+    const QString& psonPath = CastPsonFileHelper::PsonPath(mImageHost, pson);
     succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
   QString msgTitle{QString("All %1 record(s) dumped result").arg(totalCnt)};
@@ -321,8 +309,8 @@ int CastDBView::onDumpIntoPsonFile() {
       qWarning("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(mImageHost));
       continue;
     }
-    const QString psonPath {PerformerJsonFileHelper::PsonPath(mImageHost, ori, castName)};
-    const QVariantHash pson = PerformerJsonFileHelper::PerformerJsonJoiner(record);
+    const QString psonPath {CastPsonFileHelper::PsonPath(mImageHost, ori, castName)};
+    const QVariantHash pson = CastPsonFileHelper::PerformerJsonJoiner(record);
     succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
 
@@ -392,24 +380,75 @@ int CastDBView::onForceRefreshRecordsVids() {
   return recordsCnt;
 }
 
-int CastDBView::onDeleteRecords() {
+bool CastDBView::onCastRowSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
+  if (_floatingPreview == nullptr) {return true;}
+  const auto& curInd{currentIndex()};
+  if (!curInd.isValid()) {
+    return false;
+  }
+  const QSqlRecord& record = _castModel->record(curInd.row());
+  _floatingPreview->operator()(record, mImageHost);
+  return true;
+}
+
+bool CastDBView::onCastRowDoubleClicked(const QModelIndex &index) {
+  if (!index.isValid()) {
+    LOG_INFO_P("index invalid", "(%d, %d)", index.row(), index.column());
+    return false;
+  }
+  const QString castFolderPath = _castModel->filePath(index);
+  if (!QFileInfo{castFolderPath}.isDir()) {
+    LOG_BAD_NP("Folder not exists", castFolderPath);
+    return false;
+  }
+  return QDesktopServices::openUrl(QUrl::fromLocalFile(castFolderPath));
+}
+
+int CastDBView::onMigrateCastTo() {
   if (!selectionModel()->hasSelection()) {
-    LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
+    LOG_INFO_NP("Nothing was selected.", "Select at least one row before migrate");
     return 0;
   }
-  int deleteCnt = 0;
-  int succeedCnt = 0;
-  const auto& itemSelection = selectionModel()->selection();
-  for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
-    int startRow = it->top();  // [top, bottom]
-    int size = it->bottom() - startRow + 1;
-    bool ret = _castModel->removeRows(startRow, size);
-    qDebug("drop[%d] records [%d, %d]", ret, startRow, it->bottom());
-    deleteCnt += size;
-    succeedCnt += ((int)ret * size);
+  const QString destPath = QFileDialog::getExistingDirectory(this, "Migrate to (folder under[" + mImageHost+ "])", mImageHost);
+  if (destPath.isEmpty()) {
+    LOG_GOOD_NP("[Skip] User cancel migrate", "return");
+    return false;
   }
-  LOG_GOOD_P("[Ok]Delete records(need submit)", "%d/%d succeed", succeedCnt, deleteCnt);
-  return succeedCnt;
+  QString newOri;
+  if (!CastBaseDb::IsNewOriFolderPathValid(destPath, mImageHost, newOri)) {
+    LOG_BAD_P("Abort Migrate", "destPath[%s] or newOri[%s] invalid", qPrintable(destPath), qPrintable(newOri));
+    return -1;
+  }
+
+  const QModelIndexList indexes{selectionModel()->selectedRows()};
+  QDir imageHostDir{mImageHost};
+  int migrateCastCnt{0};
+  for (const auto& indr : indexes) {
+    const int r = indr.row();
+    QSqlRecord record = _castModel->record(r);
+    const int ret = CastBaseDb::MigrateToNewOriFolder(record, imageHostDir, newOri);
+    if (ret < FD_ERROR_CODE::FD_SKIP) {
+      qWarning("Migrate ErrorCode: %d", ret);
+      return -1;
+    }
+    if (ret == FD_ERROR_CODE::FD_SKIP) {
+      continue;
+    }
+    ++migrateCastCnt;
+    _castModel->setRecord(r, record);
+  }
+  if (migrateCastCnt == 0) {
+    LOG_GOOD_P("No need Migrate", "%d/%d Cast(s) to %s", migrateCastCnt, indexes.size(), qPrintable(newOri))
+    return 0;
+  }
+  if (!_castModel->submitAll()) {
+    LOG_BAD_P("Submit failed", "%d/%d Cast(s) to %s.\nerror[%s]",
+              migrateCastCnt, indexes.size(), qPrintable(newOri), qPrintable(_castModel->lastError().text()))
+    return -1;
+  }
+  LOG_GOOD_P("Migrate succeed", "%d/%d Cast(s) to %s",
+             migrateCastCnt, indexes.size(), qPrintable(newOri))
+  return migrateCastCnt;
 }
 
 void CastDBView::RefreshHtmlContents() {

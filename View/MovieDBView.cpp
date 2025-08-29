@@ -65,7 +65,7 @@ void MovieDBView::subscribe() {
   connect(inst.UPDATE_STUDIO_CAST_TAGS_BY_JSON, &QAction::triggered, this, &MovieDBView::onUpdateByJson);
   // common function actions
   connect(inst._COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
-  connect(inst._OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_fdBasedDb, &DbManager::ShowInFileSystemView);
+  connect(inst._OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_fdBasedDb, &DbManager::onShowInFileSystemView);
   // record studio/cast/tags manual batch edit
   connect(inst.SET_STUDIO, &QAction::triggered, this, &MovieDBView::onSetStudio);
   connect(inst.SET_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET); });

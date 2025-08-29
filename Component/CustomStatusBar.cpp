@@ -36,7 +36,6 @@ void CustomStatusBar::msg(const QString& text, const STATUS_STR_TYPE statusStrTy
     qWarning("%s", qPrintable(text));
   } else {  // normal;
     mLabelsLst[MSG]->setStyleSheet("");
-    qDebug("%s", qPrintable(text));
   }
   mLabelsLst[MSG]->setText(text);
 }

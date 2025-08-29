@@ -34,7 +34,7 @@ class CastDBActions : public QObject {
   QActionGroup* _SYNC_VIDS_OP{nullptr};
 
   QAction* OPEN_DB_WITH_LOCAL_APP{nullptr};
-  QAction* OPEN_RECORD_IN_FILE_SYSTEM{nullptr};
+  QAction* MIGRATE_CAST_TO{nullptr};
   QActionGroup* FILE_SYSTEM_OP{nullptr};
 
   QAction* DUMP_SELECTED_RECORDS_INTO_PSON_FILE{nullptr};
