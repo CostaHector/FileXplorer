@@ -34,6 +34,7 @@ public:
   QString psonFilePath(const QModelIndex& curIndex) const {
     return filePath(curIndex) + '/' + fileName(curIndex) + ".pson";
   }
+  QString portaitPath(const QModelIndex& curIndex) const;
 
   bool submitAll();
 
