@@ -159,7 +159,7 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
   if (!ThumbnailProcesser::CheckParameters(dimensionX, dimensionY, widthPx)) {
     return false;
   }
-  const int cnt = ThumbnailProcesser::CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, curSamplePeriod, true);
+  const int cnt = ThumbnailProcesser::CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, true);
   if (cnt <= 0) {
     LOG_BAD_NP("Create thumbnail failed", "see details in log");
     return false;
@@ -213,16 +213,9 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   QString absFilePath = _contentPane->getCurFilePath();
   QString noExtAbsFilePath = PathTool::GetFileNameExtRemoved(absFilePath);
   QString imgFileAbsPathGuess = QDir::toNativeSeparators(noExtAbsFilePath) + ' ';
-  QApplication::clipboard()->setText(imgFileAbsPathGuess, QClipboard::Mode::Clipboard);
+  m_clipboard->setText(imgFileAbsPathGuess, QClipboard::Mode::Clipboard);
   QString fileBaseName = PathTool::GetBaseName(absFilePath);
   QString forSearch = fileBaseName.replace(JSON_RENAME_REGEX::INVALID_GOOGLE_SEARCH_LETTER, " ");
-  // QStringList searchKeyWordArgs;
-  // if (!forSearch.isEmpty()) {
-  //   const static QString HTML_URL_TEMPLATE{"https://www.google.com/search?&q=%1&udm=2"};
-  //   searchKeyWordArgs << HTML_URL_TEMPLATE.arg(forSearch);
-  // } else {
-  //   searchKeyWordArgs << "https://www.google.com/";
-  // }
 
   QString url;
   if (!forSearch.isEmpty()) {
@@ -622,9 +615,8 @@ bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
     return false;
   }
   QAbstractItemView* fsView = _contentPane->GetCurView();
-  if (fsView == nullptr) {
-    return false;
-  }
+  CHECK_NULLPTR_RETURN_FALSE(fsView)
+
   const QString& path = _fileSysModel->rootPath();
   _fileSysModel->setRootPath("");
   fsView->setRootIndex(_fileSysModel->setRootPath(path));
@@ -707,23 +699,18 @@ bool FileExplorerEvent::on_compressImgsByGroup() {
 
 bool FileExplorerEvent::on_archivePreview() {
   auto vt = _contentPane->GetVt();
-  if (!ViewTypeTool::isFSView(vt) && vt != ViewType::SEARCH) {
+  if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
     return false;
   }
-  const QString pth = _contentPane->getRootPath();
-  if (PathTool::isLinuxRootOrWinEmpty(pth)) {
-    LOG_WARN_P("[Abort ArchivePreivew]", "Path[%s] root or empty", qPrintable(pth));
-    return false;
-  }
-  const QStringList& filesPath = _contentPane->getFilePaths();
-  if (filesPath.isEmpty() || filesPath.size() > 1) {
-    LOG_WARN_P("[Abort ArchivePreivew]", "archives files count[%d]", filesPath.size());
+  const QString filePath = _contentPane->getCurFilePath();
+  if (filePath.isEmpty()) {
+    LOG_WARN_NP("[Abort ArchivePreivew]", "path empty");
     return false;
   }
   if (m_archivePreview == nullptr) {
-    m_archivePreview = new Archiver;
+    m_archivePreview = new (std::nothrow) Archiver;
   }
-  bool previewRet = m_archivePreview->operator()(filesPath.front());
+  bool previewRet = m_archivePreview->operator()(filePath);
   m_archivePreview->show();
   m_archivePreview->activateWindow();
   m_archivePreview->raise();
@@ -732,24 +719,24 @@ bool FileExplorerEvent::on_archivePreview() {
 
 bool FileExplorerEvent::on_moveToTrashBin() {
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
-  if (!ViewTypeTool::isFSView(vt) && vt != ViewType::SEARCH) {
-    LOG_WARN_P("[Skip Move to trashbin] Not FileSytemView/Search View", "viewType %d", (int)vt);
+  if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
+    LOG_WARN_P("[Abort] Current view not support MoveToTrashbin", _contentPane->GetCurViewName());
     return false;
   }
   const QString pth = _contentPane->getRootPath();
   if (PathTool::isLinuxRootOrWinEmpty(pth)) {
-    LOG_WARN_NP("[Skip Move to trashbin] Path not support", pth);
+    LOG_WARN_NP("[Abort] Path not recyclable", pth);
     return false;
   }
 
   QStringList prepaths, names;
   std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(true);
   if (names.size() <= 0) {
-    LOG_INFO_NP("[Skip Move to trashbin]", "Nothing selected");
+    LOG_INFO_NP("[Skip]", "Nothing selected");
     return true;
   }
   if (prepaths.size() != names.size()) {
-    LOG_INFO_P("[Skip Move to trashbin]", "Prepaths[%d] and Names[%d] length Inequal", prepaths.size(), names.size());
+    LOG_INFO_P("[Skip]", "Prepaths[%d] and Names[%d] length Inequal", prepaths.size(), names.size());
     return true;
   }
 
@@ -759,13 +746,12 @@ bool FileExplorerEvent::on_moveToTrashBin() {
   for (int i = 0; i < prepaths.size(); ++i) {
     removeCmds.append(ACMD::GetInstMOVETOTRASH(prepaths[i], names[i]));
   }
-  const bool isAllSucceed = g_undoRedo.Do(removeCmds);
-  if (isAllSucceed) {
-    LOG_GOOD_P("Move to trash all succeed", "Commands count %d", removeCmds.size());
-  } else {
-    LOG_BAD_NP("Move to trash partially failed", "Some item(s) move to trashbin failed");
+  if (!g_undoRedo.Do(removeCmds)) {
+    LOG_BAD_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
+    return false;
   }
-  return isAllSucceed;
+  LOG_GOOD_P("[MoveToTrash] All succeed", "Commands count %d", removeCmds.size());
+  return true;
 }
 
 bool FileExplorerEvent::on_deletePermanently() {
@@ -825,7 +811,7 @@ bool FileExplorerEvent::on_deletePermanently() {
 
 auto FileExplorerEvent::on_SelectAll() -> void {
   auto* view = _contentPane->GetCurView();
-  if (not view->hasFocus()) {
+  if (!view->hasFocus()) {
     return;
   }
   view->selectAll();
@@ -833,7 +819,7 @@ auto FileExplorerEvent::on_SelectAll() -> void {
 
 auto FileExplorerEvent::on_SelectNone() -> void {
   auto* view = _contentPane->GetCurView();
-  if (not view->hasFocus()) {
+  if (!view->hasFocus()) {
     return;
   }
   view->clearSelection();
@@ -868,25 +854,25 @@ bool FileExplorerEvent::on_HarView() {
     LOG_WARN_NP("Har file not exist", fileAbsPath);
     return false;
   }
-  static HarTableView* harTableview{nullptr};
-  if (harTableview == nullptr) {
-    harTableview = new HarTableView;
+  if (m_harTableview == nullptr) {
+    m_harTableview = new (std::nothrow) HarTableView{_contentPane};
   }
-  harTableview->operator()(fileAbsPath);
-  harTableview->show();
-  harTableview->raise();
+  m_harTableview->operator()(fileAbsPath);
+  m_harTableview->show();
+  m_harTableview->raise();
   return true;
 }
 
 auto FileExplorerEvent::on_PlayVideo() const -> bool {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsOpenVideosAvail(vt)) {
-    LOG_INFO_NP("[Abort] Current view not support Play Video", _contentPane->GetCurViewName());
+    LOG_INFO_NP("[Abort] Current view not support Play Video", ViewTypeTool::c_str(vt));
     return false;
   }
-  // select an item or select nothing
+  // if select an item, path selected path
   QString playPath = _contentPane->getCurFilePath();
-  if (playPath.isEmpty() && _contentPane->IsCurFSView()) {
+  if (playPath.isEmpty() && ViewTypeTool::isFSView(vt)) {
+    // if select nothing and file-system model, play current path
     playPath = _fileSysModel->rootPath();
   }
   if (PathTool::isRootOrEmpty(playPath)) {
@@ -897,17 +883,21 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
     LOG_INFO_NP("[Failed] Play", playPath);
     return false;
   }
-  LOG_INFO_NP("Playing...", playPath);
+  LOG_GOOD_NP("Playing...", playPath);
   return true;
 }
 
 bool FileExplorerEvent::on_Merge(const bool isReverse) {
   // reverse left right folder;
-  if (!_contentPane->IsCurFSView() || PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (!_contentPane->IsCurFSView()) {
     return false;
   }
+  if (PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+    return false;
+  }
+
   if (selectedIndexes().size() != 2) {
-    QMessageBox::warning(_contentPane, "Merge tasks skip", "Only select two directory.");
+    LOG_WARN_NP("[Skip] Merge tasks", "Only select two directory.");
     return false;
   }
   // l < r and not isReverse => merge into r
@@ -931,7 +921,7 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
     LOG_WARN_NP("Merge partial failed", msg);
     return false;
   }
-  LOG_GOOD_NP("[ok] Merged", msg);
+  LOG_GOOD_NP("[Ok] Merged", msg);
   return true;
 }
 

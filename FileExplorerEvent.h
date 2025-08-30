@@ -14,6 +14,7 @@ class PropertiesWindow;
 class DuplicateVideosFinder;
 class RedundantImageFinder;
 class Archiver;
+class HarTableView;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
@@ -112,6 +113,8 @@ class FileExplorerEvent : public QObject {
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};
+
+  HarTableView* m_harTableview{nullptr};
 
  private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten
