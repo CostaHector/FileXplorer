@@ -134,7 +134,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
       return true;
     }
     default: {
-      qWarning("ViewType[%d:%s] not support search text", (int)vt, GetViewTypeHumanFriendlyStr(vt));
+      qWarning("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
       return false;
     }
   }
@@ -156,7 +156,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& /*targetStr*/) -> bool
       return true;
     }
     default: {
-      qWarning("ViewType[%d:%s] not support search text", (int)vt, GetViewTypeHumanFriendlyStr(vt));
+      qWarning("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
       return false;
     }
   }
@@ -252,7 +252,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   }
 
   if (fi.isDir()) {
-    if (isFSView()) {
+    if (IsCurFSView()) {
       return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
     }
     return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
@@ -261,7 +261,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
 }
 
 bool ViewsStackedWidget::on_selectionChanged(const QItemSelection& /* selected */, const QItemSelection& /* deselected */) {
-  if (!isFSView()) {
+  if (!IsCurFSView()) {
     return false;
   }
   const int selectCnt = getSelectedRowsCount();
@@ -350,7 +350,7 @@ auto ViewsStackedWidget::keyPressEvent(QKeyEvent* e) -> void {
 }
 
 QModelIndex ViewsStackedWidget::getRootIndex() const {
-  if (!isFSView()) {
+  if (!IsCurFSView()) {
     return QModelIndex();
   }
   return GetCurView()->rootIndex();

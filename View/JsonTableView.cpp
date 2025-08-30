@@ -110,11 +110,11 @@ int JsonTableView::onRenameJsonAndRelated() {
   const QString& newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
                                                          {oldJsonBaseName}, 0, true, &isInputOk);
   if (!isInputOk) {
-    LOG_GOOD_NP("[skip] User cancel rename json and related files", "return")
+    LOG_GOOD_NP("[skip] User cancel rename json and related files", "return");
     return 0;
   }
   if (newJsonBaseName.isEmpty()) {
-    LOG_BAD_NP("[skip] New json base name can not be empty", "return")
+    LOG_BAD_NP("[skip] New json base name can not be empty", "return");
     return 0;
   }
   int cnt = _JsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
@@ -150,11 +150,11 @@ int JsonTableView::onSetStudio() {
                                                 defIndex,                               //
                                                 true, &isInputOk);
   if (!isInputOk) {
-    LOG_GOOD_NP("[skip] User cancel set studio", "return")
+    LOG_GOOD_NP("[skip] User cancel set studio", "return");
     return 0;
   }
   if (studio.isEmpty()) {
-    LOG_BAD_NP("[skip] Studio name can not be empty", "return")
+    LOG_BAD_NP("[skip] Studio name can not be empty", "return");
     return 0;
   }
 
@@ -249,11 +249,11 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
                                        candidates.size() - 1,          //
                                        true, &isInputOk);
     if (!isInputOk) {
-      LOG_GOOD_NP("[Skip] User cancel", fieldOperation)
+      LOG_GOOD_NP("[Skip] User cancel", fieldOperation);
       return 0;
     }
     if (tagsOrCast.isEmpty()) {
-      LOG_BAD_NP("[Abort] Input can not be empty", fieldOperation)
+      LOG_BAD_NP("[Abort] Input can not be empty", fieldOperation);
       return 0;
     }
     candidates.push_back(tagsOrCast);
