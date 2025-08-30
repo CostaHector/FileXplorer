@@ -13,7 +13,9 @@
 <file alias="CAST_VIEW">AppIcons/CAST_VIEW.svg</file>
 
 <!--LOG icon here-->
-<file alias="RUNNING_LOGS">Log/RUNNING_LOGS.svg</file>
+<file alias="LOG_FILES_PREVIEW">Log/LOG_FILES_PREVIEW.svg</file>
+<file alias="LOG_FILES">Log/LOG_FILES.svg</file>
+<file alias="LOG_FOLDERS">Log/LOG_FOLDERS.svg</file>
 <file alias="AGING_LOGS">Log/AGING_LOGS.svg</file>
 <file alias="LOG_LEVEL_DEBUG">Log/LOG_LEVEL_DEBUG.svg</file>
 <file alias="LOG_LEVEL_WARNING">Log/LOG_LEVEL_WARNING.svg</file>
