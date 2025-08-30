@@ -156,21 +156,7 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
     LOG_INFO_NP("Skip nothing selected", "selected some video(s) first");
     return true;
   }
-  if (!ThumbnailProcesser::IsDimensionXValid(dimensionX)) {
-    LOG_INFO_NP("Dimension of row invalid", QString::number(dimensionX));
-    return false;
-  }
-  if (!ThumbnailProcesser::IsDimensionYValid(dimensionY)) {
-    LOG_INFO_NP("Dimension of column invalid", QString::number(dimensionY));
-    return false;
-  }
-  if (!ThumbnailProcesser::IsWidthPixelAllowed(widthPx)) {
-    LOG_INFO_NP("images width invalid", QString::number(widthPx));
-    return false;
-  }
-  const int curSamplePeriod = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
-  if (!ThumbnailProcesser::IsSamplePeriodAllowed(curSamplePeriod)) {
-    LOG_INFO_NP("Sample period not allowed", QString::number(curSamplePeriod));
+  if (!ThumbnailProcesser::CheckParameters(dimensionX, dimensionY, widthPx)) {
     return false;
   }
   const int cnt = ThumbnailProcesser::CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, curSamplePeriod, true);

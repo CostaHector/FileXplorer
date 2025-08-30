@@ -7,6 +7,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "ThumbnailProcesser.h"
 #include "EndToExposePrivateMember.h"
+#include "MemoryKey.h"
 
 #include <QImage>
 bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int height = 1080) {
@@ -25,10 +26,39 @@ const QString VIDEOS_DURATION_DIR = TestCaseRootPath() + "/test/TestEnv_VideosDu
 
 class ThumbnailProcesserTest : public MyTestSuite {
   Q_OBJECT
- public:
+public:
   ThumbnailProcesserTest() : MyTestSuite{false} {}
- private slots:
+private slots:
   void cleanupTestCase() {}
+
+  void test_CheckParameters() {
+    int backupValue = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, //
+                                            MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
+    ON_SCOPE_EXIT{
+      Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, backupValue);
+    };
+
+    Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, 0);
+    QVERIFY(!ThumbnailProcesser::CheckParameters(1, 1,  360));
+    Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, 301);
+    QVERIFY(!ThumbnailProcesser::CheckParameters(1, 1,  360));
+
+    Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, 5);
+    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1,  360));
+    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1,  480));
+    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1,  720));
+    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1, 1080));
+
+    QVERIFY(ThumbnailProcesser::CheckParameters(3, 4,  360));
+    QVERIFY(ThumbnailProcesser::CheckParameters(6, 8,  480));
+    QVERIFY(ThumbnailProcesser::CheckParameters(2, 9,  720));
+    QVERIFY(ThumbnailProcesser::CheckParameters(9, 4, 1080));
+
+    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9,  360));
+    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9,  480));
+    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9,  720));
+    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9, 1080));
+  }
 
   void test_no_video_need_to_create_thumbnail_imgs() {
     QStringList invalidVideosPath{"", "inexist file", __FILE__};
