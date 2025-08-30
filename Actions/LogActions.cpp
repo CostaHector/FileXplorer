@@ -27,7 +27,6 @@ LogActions::LogActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(_LOG_LEVEL_AG)
 
   _LOG_FILE->setCheckable(false);
-  _LOG_FILE->setShortcut(QKeySequence(Qt::Key::Key_F12));
   _LOG_FILE->setShortcutVisibleInContextMenu(true);
   _LOG_FILE->setToolTip(QString("<b>%1 (%2)</b><br/>Flush all buffered logs to file and open it in default editor").arg(_LOG_FILE->text(), _LOG_FILE->shortcut().toString()));
 
