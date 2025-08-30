@@ -38,7 +38,6 @@ class FileExplorerEvent : public QObject {
   bool on_NewJsonFile();
   bool on_NewFolder();
 
-  bool on_BatchNewFilesOrFolders(const QString& namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false);
   bool on_BatchNewFilesOrFolders(bool isFolder = false);
 
   bool on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx);
