@@ -3,6 +3,7 @@
 
 #include <QTabWidget>
 #include <QToolBar>
+class LogFloatingPreviewer;
 
 class RibbonMenu : public QTabWidget {
  public:
@@ -24,6 +25,7 @@ class RibbonMenu : public QTabWidget {
   void on_currentTabChangedRecordIndex(const int tabIndex);
 
  private:
+  LogFloatingPreviewer* m_logPrev{nullptr};
   QToolBar* m_corner{nullptr};
 
   QToolBar* m_leafFile{nullptr};
