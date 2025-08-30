@@ -1,16 +1,14 @@
 ﻿#include "LogActions.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
-#include <QStyle>
-#include <QApplication>
 
 LogActions::LogActions(QObject* parent)  //
-    : QObject{parent}                    //
+  : QObject{parent}                    //
 {
-  _LOG_FILE = new (std::nothrow) QAction{QIcon(":img/RUNNING_LOGS"), "Logs"};
+  _LOG_FILE = new (std::nothrow) QAction{QIcon{":img/LOG_FILES"}, "Open logs file"};
   CHECK_NULLPTR_RETURN_VOID(_LOG_FILE)
 
-  _LOG_FOLDER = new (std::nothrow) QAction{"Logs folder"};
+  _LOG_FOLDER = new (std::nothrow) QAction{QIcon{":img/LOG_FOLDERS"}, "Open logs folder"};
   CHECK_NULLPTR_RETURN_VOID(_LOG_FOLDER)
 
   _LOG_AGING = new (std::nothrow) QAction{QIcon(":img/AGING_LOGS"), "Aging logs"};
@@ -19,7 +17,7 @@ LogActions::LogActions(QObject* parent)  //
   _LOG_LEVEL_DEBUG = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_DEBUG"), "Debug"};
   CHECK_NULLPTR_RETURN_VOID(_LOG_LEVEL_DEBUG)
 
-  _LOG_LEVEL_WARNING = new (std::nothrow) QAction{qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning), "Warning"};
+  _LOG_LEVEL_WARNING = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_WARNING"), "Warning"};
   CHECK_NULLPTR_RETURN_VOID(_LOG_LEVEL_WARNING)
 
   _FLUSH_INSTANTLY = new (std::nothrow) QAction{"Auto Flush Buffer"};
@@ -29,7 +27,6 @@ LogActions::LogActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(_LOG_LEVEL_AG)
 
   _LOG_FILE->setCheckable(false);
-  _LOG_FILE->setShortcut(QKeySequence(Qt::Key::Key_F12));
   _LOG_FILE->setShortcutVisibleInContextMenu(true);
   _LOG_FILE->setToolTip(QString("<b>%1 (%2)</b><br/>Flush all buffered logs to file and open it in default editor").arg(_LOG_FILE->text(), _LOG_FILE->shortcut().toString()));
 
@@ -65,6 +62,14 @@ LogActions::LogActions(QObject* parent)  //
   _FLUSH_INSTANTLY->setToolTip(QString("<b>%1 (%2)</b><br/>Auto flush log stashed in buffers into log file instantly.").arg(_FLUSH_INSTANTLY->text(), _FLUSH_INSTANTLY->shortcut().toString()));
 
   _DROPDOWN_LIST << _LOG_FILE << _LOG_FOLDER << nullptr << _LOG_AGING << nullptr << _LOG_LEVEL_DEBUG << _LOG_LEVEL_WARNING << nullptr << _FLUSH_INSTANTLY;
+}
+
+QToolButton* LogActions::GetLogPreviewerToolButton(QWidget* parent) {
+  QToolButton* logPreviewerTb = new (std::nothrow) QToolButton{parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(logPreviewerTb)
+  logPreviewerTb->setIcon(QIcon(":img/LOG_FILES_PREVIEW"));
+  logPreviewerTb->setCheckable(true);
+  return logPreviewerTb;
 }
 
 LogActions& g_LogActions() {

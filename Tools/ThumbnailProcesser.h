@@ -6,11 +6,12 @@
 class ThumbnailProcesser {
  public:
   static const QList<int> mAllowedPixelList;
-  static constexpr int SAMPLE_PERIOD_MIN{1}, SAMPLE_PERIOD_MAX{300 + 1};  // [1, 300)
+  static constexpr int SAMPLE_PERIOD_MIN{1}, SAMPLE_PERIOD_MAX{300 + 1};  // [1, 300+1)
   static bool IsDimensionXValid(int dimensionX);
   static bool IsDimensionYValid(int dimensionY);
   static bool IsWidthPixelAllowed(int widthPixel);
   static bool IsSamplePeriodAllowed(int samplePeriod);
+  static bool CheckParameters(int dimensionX, int dimensionY, int widthPixel);
 
   static bool IsImageAnThumbnail(const QString& imgAbsPath);
   static bool IsImageNameLooksLikeThumbnail(const QString& imgBaseName);
