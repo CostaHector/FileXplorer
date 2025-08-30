@@ -190,6 +190,40 @@ bool LogHandler::AgingLogFiles(const int AGING_FILE_ABOVE_B, QString* pAgedLogFi
   return true;
 }
 
+QByteArray LogHandler::GetLastNLinesOfLogs(const int maxLines) {
+  QFile logFile(SystemPath::WORK_PATH + "/logs_info.log");
+  if (!logFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qWarning("Cannot Open LogFile[%s]: %s", qPrintable(logFile.fileName()), qPrintable(logFile.errorString()));
+    return "Cannot Open LogFile";
+  }
+
+  qint64 fileSize = logFile.size();
+  qint64 pos = fileSize - 1;
+  int lineCount = 0;
+  QByteArray buffer;
+
+  while (pos >= 0 && lineCount <= maxLines) {
+    logFile.seek(pos);
+    char ch;
+    if (!logFile.getChar(&ch)) {
+      break;
+    }
+    if (ch == '\n') {
+      lineCount++;
+      if (lineCount == maxLines) {
+        break;
+      }
+    }
+    pos--;
+  }
+
+  // 定位到目标行的起始位置（跳过最后找到的换行符）
+  logFile.seek(pos + 1);
+  buffer = logFile.readAll();
+  logFile.close();
+  return buffer;
+}
+
 bool LogHandler::ManualFlush() {
   if (!IsLogModuleOk()) {
     return false;

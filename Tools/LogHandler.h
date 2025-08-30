@@ -12,6 +12,7 @@ class LogHandler: QObject {
   static bool IsLogModuleOk();
   static void subscribe();
   static bool AgingLogFiles(const int AGING_FILE_ABOVE_B = 2 * 1024 * 1024, QString* pAgedLogFileName = nullptr);
+  static QByteArray GetLastNLinesOfLogs(const int maxLines = 100);
 
  private:
   static void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
