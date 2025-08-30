@@ -14,10 +14,10 @@ public:
   }
 
 protected:
+  void keyPressEvent(QKeyEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
-  void UpdateLogsContents(const int maxLines = 100);
+  void UpdateLogsContents(const int maxLines = 100, bool bMoveToEnd=true);
   void onHideShow(bool checked);
-
 private:
   void MovePosition();
 

@@ -69,10 +69,11 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 
   QToolButton* logPrevTb = g_LogActions().GetLogPreviewerToolButton(menuRibbonCornerWid);
   CHECK_NULLPTR_RETURN_NULLPTR(logPrevTb);
+  logPrevTb->setShortcut(QKeySequence(Qt::Key::Key_F12));
+  logPrevTb->setToolTip(QString{"<b>Logs Contents Viewer(%1)</b><br/> Show last 100 lines of log file"}.arg(logPrevTb->shortcut().toString()));
 
   m_logPrev = new (std::nothrow) LogFloatingPreviewer{attached};
   CHECK_NULLPTR_RETURN_NULLPTR(m_logPrev);
-  m_logPrev->setToolTip("Logs Contents Preview");
   m_logPrev->BindToolButton(logPrevTb);
 
   menuRibbonCornerWid->addWidget(mActSearcher);
