@@ -51,6 +51,7 @@
 #include "StyleSheet.h"
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
+#include "CreateFileFolderHelper.h"
 
 #include <QApplication>
 #include <QInputDialog>
@@ -83,109 +84,49 @@ bool FileExplorerEvent::on_NewTextFile() {  // not effect by selection;
   if (!__CanNewItem()) {
     return false;
   }
-  const QString plainTextFileName {QString("New Text Document %1.txt").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss"))};
-  const QDir curDir{_fileSysModel->rootDirectory()};
-  if (curDir.exists(plainTextFileName)) {
-    LOG_GOOD_NP("Plain text file already exist", plainTextFileName);
-    return true;
-  }
-  using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstTOUCH(curDir.absolutePath(), plainTextFileName)};
-  if (!g_undoRedo.Do(cmds)) {
-    LOG_BAD_NP("[Failed] Touch file", plainTextFileName);
+  QString createIn{_contentPane->getRootPath()};
+  QString textAbsPath;
+  bool ret = CreateFileFolderHelper::NewPlainTextFile(createIn, &textAbsPath);
+  if (!ret) {
     return false;
   }
-  const QString textAbsPath{curDir.absoluteFilePath(plainTextFileName)};
   __FocusNewItem(textAbsPath);
-  return true;
+  return ret;
 }
 
 bool FileExplorerEvent::on_NewJsonFile() {
   if (!__CanNewItem()) {
     return false;
   }
-  const QStringList& selectedItemsPaths = selectedItems();
-  if (selectedItemsPaths.isEmpty()) {
-    LOG_INFO_NP("[Skip] New Json file, nothing selected", "return");
-    return true;
-  }
-  int crtSucceed{0};
-  int totalNeedCnd{0};
-  const QString& path = _fileSysModel->rootPath();
-  QString jsonBaseName, ext;
-  for (const QString& fileItem : selectedItemsPaths) {
-    std::tie(jsonBaseName, ext) = PathTool::GetBaseNameExt(fileItem);
-    const QString jPath = path + '/' + jsonBaseName + ".json";
-    if (QFile::exists(jPath)) {
-      continue;
-    }
-    ++totalNeedCnd;
-    const auto& dict = JsonKey::GetJsonDictDefault(jsonBaseName);
-    if (JsonHelper::DumpJsonDict(dict, jPath)) {
-      ++crtSucceed;
-    }
-  }
-  LOG_GOOD_P("[Ok]Json file(s) create", "count: succ:%d/total:%d/selected:%d", crtSucceed, totalNeedCnd, selectedItemsPaths.size());
-  return true;
+  const QString& createIn = _fileSysModel->rootPath();
+  const QStringList& basedOnFileNames = selectedItems();
+  return CreateFileFolderHelper::NewJsonFile(createIn, basedOnFileNames) >= 0;
 }
 
 bool FileExplorerEvent::on_NewFolder() {  // not effect by selection;
   if (!__CanNewItem()) {
     return false;
   }
-  const QString createInPath{_fileSysModel->rootPath()};
-  QDir createInDir{createInPath};
-  const QString& newFolderName = QString("New Folder %1").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss"));
-  if (createInDir.exists(newFolderName)) {
-    LOG_INFO_NP("[Skip] folder already exist", newFolderName);
+  const QString createIn{_fileSysModel->rootPath()};
+  QString folderAbsPath;
+  bool ret = CreateFileFolderHelper::NewFolder(createIn, &folderAbsPath);
+  if (!ret) {
     return false;
   }
-  using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstMKPATH(createInPath, newFolderName)};
-  if (!g_undoRedo.Do(cmds)) {
-    LOG_WARN_P("[Error] Make path failed", "%s/%s", qPrintable(createInPath), qPrintable(newFolderName));
-    return false;
-  }
-  const QString& folderPath = createInDir.absoluteFilePath(newFolderName);
-  __FocusNewItem(folderPath);
-  return true;
-}
-
-bool FileExplorerEvent::on_BatchNewFilesOrFolders(const QString& namePattern, int startIndex, int endIndex, bool isFolder) {
-  if (!__CanNewItem()) {
-    return false;
-  }
-  const QString& createInPath {_fileSysModel->rootPath()};
-  const QDir createInDir {createInPath};
-  using namespace FileOperatorType;
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE cmds;
-  for (int itemIndex = startIndex; itemIndex < endIndex; ++itemIndex) {
-    QString fileNameArray = QString::asprintf(qPrintable(namePattern), itemIndex);
-    if (createInDir.exists(fileNameArray)) {
-      qInfo("Skip. File/Folder[%s] already exists in folder[%s]", fileNameArray, qPrintable(createInPath));
-      continue;
-    }
-    if (isFolder) {
-      cmds.append(ACMD::GetInstMKPATH(createInPath, fileNameArray));
-    } else {
-      cmds.append(ACMD::GetInstTOUCH(createInPath, fileNameArray));
-    }
-  }
-  if (!g_undoRedo.Do(cmds)) {
-    LOG_WARN_P("[Error] Some commands failed",  "commands count: %d", cmds.size());
-    return false;
-  }
+  __FocusNewItem(folderAbsPath);
   return true;
 }
 
 bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
+  if (!__CanNewItem()) {
+    return false;
+  }
+
   QString title{"Create Batch "};
   title += (isFolder ? "Folders" : "Files");
-
   const QString defNamePattern { isFolder ? //
                                    Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v).toString()
                                         : Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v).toString()};
-
   const QString userInputRule = QInputDialog::getText(_contentPane, title,
                                                       "Rule Pattern: C-style Format String$StartIndex$EndIndex",
                                                       QLineEdit::Normal, defNamePattern);
@@ -199,12 +140,11 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   const QString& namePattern = userInputLst[0];
   const int startIndex = userInputLst[1].toInt();
   const int endIndex = userInputLst[2].toInt();
-  if (startIndex >= endIndex) {
-    LOG_WARN_P("[Abort] invalid range", "[%d, %d)", startIndex, endIndex);
-    return true;
-  }
-  Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, userInputRule);
-  return on_BatchNewFilesOrFolders(namePattern, startIndex, endIndex, isFolder);
+  Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name//
+                                    : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name,//
+                           userInputRule);
+  const QString createIn {_fileSysModel->rootPath()};
+  return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
 }
 
 bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx) {
