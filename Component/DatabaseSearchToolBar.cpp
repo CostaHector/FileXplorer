@@ -90,7 +90,7 @@ void DatabaseSearchToolBar::onQuickWhereClause() {
   }
   auto retCode = m_quickWhereClause->exec();
   if (retCode != QDialog::DialogCode::Accepted) {
-    LOG_INFO_P("[Skip] User cancel quick where clause", "dialogCode:%d", retCode)
+    LOG_INFO_P("[Skip] User cancel quick where clause", "dialogCode:%d", retCode);
     return;
   }
   const QString& whereClause {m_quickWhereClause->GetWhereString()};
@@ -151,12 +151,12 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
                                                 false,                                    //
                                                 &okUserSelect);
   if (!okUserSelect) {
-    LOG_GOOD_NP("[skip] Drop table", "User cancel")
+    LOG_GOOD_NP("[skip] Drop table", "User cancel");
     return "";
   }
   const QString& deleteTbl = MountHelper::ChoppedDisplayName(drpTbl);
   if (deleteTbl.isEmpty()) {
-    LOG_BAD_NP("[Abort] Table name is empty, cannot drop", deleteTbl)
+    LOG_BAD_NP("[Abort] Table name is empty, cannot drop", deleteTbl);
     return "";
   }
   return deleteTbl;

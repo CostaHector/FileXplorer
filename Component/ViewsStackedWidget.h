@@ -53,7 +53,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
   void keyPressEvent(QKeyEvent* e) override;
 
-  inline bool isFSView() const {
+  inline bool IsCurFSView() const {
     ViewTypeTool::ViewType vt = GetVt();
     return ViewTypeTool::isFSView(vt);
   }
@@ -62,7 +62,7 @@ class ViewsStackedWidget : public QStackedWidget {
   inline QAbstractItemView* GetCurView() const {  //
     return dynamic_cast<QAbstractItemView*>(currentWidget());
   }
-  QString GetCurViewName() const;
+  const char* GetCurViewName() const;
 
   int AddView(ViewTypeTool::ViewType vt, QWidget* w);
 

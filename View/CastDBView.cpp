@@ -181,11 +181,11 @@ int CastDBView::onLoadFromFileSystemStructure() {
   }
   int succeedCnt = _castDb.ReadFromImageHost(mImageHost);
   if (succeedCnt < 0) {
-    LOG_BAD_P("[Failed] Load perfs", "errorCode: %d", succeedCnt)
+    LOG_BAD_P("[Failed] Load perfs", "errorCode: %d", succeedCnt);
     return 0;
   }
   _castModel->submitAll();
-  LOG_GOOD_P("Load perf(s) succeed", "count: %d", succeedCnt)
+  LOG_GOOD_P("Load perf(s) succeed", "count: %d", succeedCnt);
   return succeedCnt;
 }
 
@@ -446,16 +446,16 @@ int CastDBView::onMigrateCastTo() {
     _castModel->setRecord(r, record);
   }
   if (migrateCastCnt == 0) {
-    LOG_GOOD_P("No need Migrate", "%d/%d Cast(s) to %s", migrateCastCnt, indexes.size(), qPrintable(newOri))
+    LOG_GOOD_P("No need Migrate", "%d/%d Cast(s) to %s", migrateCastCnt, indexes.size(), qPrintable(newOri));
     return 0;
   }
   if (!_castModel->submitAll()) {
     LOG_BAD_P("Submit failed", "%d/%d Cast(s) to %s.\nerror[%s]",
-              migrateCastCnt, indexes.size(), qPrintable(newOri), qPrintable(_castModel->lastError().text()))
+              migrateCastCnt, indexes.size(), qPrintable(newOri), qPrintable(_castModel->lastError().text()));
     return -1;
   }
   LOG_GOOD_P("Migrate succeed", "%d/%d Cast(s) to %s",
-             migrateCastCnt, indexes.size(), qPrintable(newOri))
+             migrateCastCnt, indexes.size(), qPrintable(newOri));
   return migrateCastCnt;
 }
 
