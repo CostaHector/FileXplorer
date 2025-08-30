@@ -9,20 +9,29 @@ const int ICON_SIZE = 32;
 const int PRELOADER_SIZE = 20;
 }  // namespace
 
-NotificatorPrivate::NotificatorPrivate(bool autohide) : m_autoHide(autohide), m_icon(0), m_title(0), m_message(0), m_preloader(0), m_progress(0) {}
+NotificatorPrivate::NotificatorPrivate(bool autohide) : m_autoHide(autohide) {}
 
 NotificatorPrivate::~NotificatorPrivate() {
-  if (icon()->parent() == 0) {
-    delete icon();
+  if (m_icon != nullptr && m_icon->parent() == nullptr) {
+    delete m_icon;
+    m_icon = nullptr;
   }
-  if (title()->parent() == 0) {
-    delete title();
+  if (m_title != nullptr && m_title->parent() == nullptr) {
+    delete m_title;
+    m_title = nullptr;
   }
-  if (message()->parent() == 0) {
-    delete message();
+  if (m_message != nullptr && m_message->parent() == nullptr) {
+    delete m_message;
+    m_message = nullptr;
   }
-  if (preloader()->parent() == 0) {
-    delete preloader();
+  if (m_preloader != nullptr && m_preloader->parent() == nullptr) {
+    delete m_preloader;
+    m_preloader = nullptr;
+  }
+
+  if (m_progress != nullptr && m_preloader->parent() == nullptr) {
+    delete m_progress;
+    m_progress = nullptr;
   }
 }
 
@@ -42,8 +51,8 @@ bool NotificatorPrivate::autoHide() const {
 }
 
 QLabel* NotificatorPrivate::icon() {
-  if (m_icon == 0) {
-    m_icon = new QLabel;
+  if (m_icon == nullptr) {
+    m_icon = new (std::nothrow) QLabel;
     m_icon->setObjectName("icon");
     m_icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   }
@@ -51,8 +60,8 @@ QLabel* NotificatorPrivate::icon() {
 }
 
 QLabel* NotificatorPrivate::title() {
-  if (m_title == 0) {
-    m_title = new QLabel;
+  if (m_title == nullptr) {
+    m_title = new (std::nothrow) QLabel;
     m_title->setObjectName("title");
     m_title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   }
@@ -60,8 +69,8 @@ QLabel* NotificatorPrivate::title() {
 }
 
 QLabel* NotificatorPrivate::message() {
-  if (m_message == 0) {
-    m_message = new QLabel;
+  if (m_message == nullptr) {
+    m_message = new (std::nothrow) QLabel;
     m_message->setObjectName("message");
     m_message->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     m_message->setTextFormat(Qt::RichText);
@@ -72,8 +81,8 @@ QLabel* NotificatorPrivate::message() {
 }
 
 QLabel* NotificatorPrivate::preloader() {
-  if (m_preloader == 0) {
-    m_preloader = new QLabel;
+  if (m_preloader == nullptr) {
+    m_preloader = new (std::nothrow) QLabel;
     m_preloader->setObjectName("preloader");
     m_preloader->setMinimumSize(PRELOADER_SIZE, PRELOADER_SIZE);
     m_preloader->setMaximumSize(PRELOADER_SIZE, PRELOADER_SIZE);
@@ -89,8 +98,8 @@ QLabel* NotificatorPrivate::preloader() {
 }
 
 QProgressBar* NotificatorPrivate::progress() {
-  if (m_progress == 0) {
-    m_progress = new QProgressBar;
+  if (m_progress == nullptr) {
+    m_progress = new (std::nothrow) QProgressBar;
     m_progress->setObjectName("progress");
 #ifdef Q_OS_WIN
     m_progress->setMaximumHeight(20);

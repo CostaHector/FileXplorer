@@ -110,11 +110,11 @@ void DevicesDrivesTV::onUpdateVolumes() {
   VolumeUpdateResult resStat{0};
   const int ret = mDb.AdtDeviceAndDriver(DB_TABLE::DISKS, &resStat);
   if (ret != FD_OK) {
-    LOG_BAD_P("Update Volume(s) FAILED", "errorCode:%d", ret)
+    LOG_BAD_P("Update Volume(s) FAILED", "errorCode:%d", ret);
     return;
   }
   LOG_GOOD_P("Update Volume(s) Ok", "Insert:%d, Delete:%d, Update:%d",
-             resStat.insertCnt, resStat.deleteCnt, resStat.updateCnt)
+             resStat.insertCnt, resStat.deleteCnt, resStat.updateCnt);
   mDevModel->select();
 }
 
@@ -127,10 +127,10 @@ void DevicesDrivesTV::onMountADriver() {
   const QString label{"D" + QDate::currentDate().toString("yyMM")};
   QString volMountPoint;
   if (!MountHelper::MountVolume(guid, label, volMountPoint)) {
-    LOG_BAD_P("Mount Volume(s) failed", "guid:%s", qPrintable(guid))
+    LOG_BAD_P("Mount Volume(s) failed", "guid:%s", qPrintable(guid));
     return;
   }
-  LOG_GOOD_P("Mount Volume(s) ok", "guid:%s label:%s, volMountPoint:%s", qPrintable(guid), qPrintable(label), qPrintable(volMountPoint))
+  LOG_GOOD_P("Mount Volume(s) ok", "guid:%s label:%s, volMountPoint:%s", qPrintable(guid), qPrintable(label), qPrintable(volMountPoint));
   auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), volMountPoint);
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
@@ -147,10 +147,10 @@ void DevicesDrivesTV::onUnmountADriver() {
   }
   const QString& guid = mDevModel->GetGuid(index);
   if (!MountHelper::UnmountVolume(mountedPnt)) {
-    LOG_BAD_P("Unmount Failed", "Unmount Volume(s)[%s] from pnt:%s", qPrintable(guid), qPrintable(mountedPnt))
+    LOG_BAD_P("Unmount Failed", "Unmount Volume(s)[%s] from pnt:%s", qPrintable(guid), qPrintable(mountedPnt));
     return;
   }
-  LOG_GOOD_P("Unmount Ok", "Unmount Volume(s)[%s] from pnt:%s", qPrintable(guid), qPrintable(mountedPnt))
+  LOG_GOOD_P("Unmount Ok", "Unmount Volume(s)[%s] from pnt:%s", qPrintable(guid), qPrintable(mountedPnt));
   auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), "");
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);
@@ -163,7 +163,7 @@ void DevicesDrivesTV::onAdtADriver() {
   }
   const QString& guid = mDevModel->GetGuid(index);
   const QString& rootPath = mDevModel->GetRootPath(index);
-  LOG_BAD_P("Adt Volume(s) FAILED", "guid[%s]\nrootPath[%s]", qPrintable(guid), qPrintable(rootPath))
+  LOG_BAD_P("Adt Volume(s) FAILED", "guid[%s]\nrootPath[%s]", qPrintable(guid), qPrintable(rootPath));
   auto setRet = mDevModel->setData(index.siblingAtColumn(ADT_TIME), QDateTime::currentMSecsSinceEpoch());
   auto submitRet = mDevModel->submitAll();
   qDebug("setData:%d, submitAll: %d", setRet, submitRet);

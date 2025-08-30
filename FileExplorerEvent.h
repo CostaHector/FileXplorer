@@ -14,6 +14,7 @@ class PropertiesWindow;
 class DuplicateVideosFinder;
 class RedundantImageFinder;
 class Archiver;
+class HarTableView;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
@@ -38,7 +39,6 @@ class FileExplorerEvent : public QObject {
   bool on_NewJsonFile();
   bool on_NewFolder();
 
-  bool on_BatchNewFilesOrFolders(const QString& namePattern = "Page %03d.txt", int startIndex = 1, int endIndex = 11, bool isFolder = false);
   bool on_BatchNewFilesOrFolders(bool isFolder = false);
 
   bool on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx);
@@ -113,6 +113,8 @@ class FileExplorerEvent : public QObject {
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};
+
+  HarTableView* m_harTableview{nullptr};
 
  private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten

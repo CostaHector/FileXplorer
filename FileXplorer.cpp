@@ -111,7 +111,7 @@ void FileXplorer::InitComponentVisibility() {
   }
 
   const bool showFolderPrev{Configuration().value(MemoryKey::SHOW_FOLDER_PREVIEW.name, MemoryKey::SHOW_FOLDER_PREVIEW.v).toBool()};
-  const bool showPrev{m_fsPanel->isFSView() && showFolderPrev};
+  const bool showPrev{m_fsPanel->IsCurFSView() && showFolderPrev};
   if (!showPrev) {
     previewHtmlDock->setVisible(false);
   }

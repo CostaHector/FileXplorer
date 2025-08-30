@@ -4,10 +4,8 @@
 
 using namespace ViewTypeTool;
 
-QString ViewsStackedWidget::GetCurViewName() const {
-  ViewType vt = GetVt();
-  const QString& viewName = GetViewTypeHumanFriendlyStr(vt);
-  return viewName;
+const char* ViewsStackedWidget::GetCurViewName() const {
+  return ViewTypeTool::c_str(GetVt());
 }
 
 int ViewsStackedWidget::AddView(ViewType vt, QWidget* w) {

@@ -9,13 +9,13 @@ class QProgressBar;
 class QPropertyAnimation;
 
 class NotificatorPrivate {
- public:
+public:
   NotificatorPrivate(bool autoHide = true);
   ~NotificatorPrivate();
 
   void initialize(const QIcon& icon, const QString& title, const QString& message);
 
- public:
+public:
   bool autoHide() const;
   QLabel* icon();
   QLabel* title();
@@ -23,13 +23,13 @@ class NotificatorPrivate {
   QLabel* preloader();
   QProgressBar* progress();
 
- private:
+private:
   bool m_autoHide;
-  QLabel* m_icon;
-  QLabel* m_title;
-  QLabel* m_message;
-  QLabel* m_preloader;
-  QProgressBar* m_progress;
+  QLabel* m_icon {nullptr};
+  QLabel* m_title {nullptr};
+  QLabel* m_message {nullptr};
+  QLabel* m_preloader {nullptr};
+  QProgressBar* m_progress {nullptr};
 };
 
 #endif  // NOTIFICATORPRIVATE_H
