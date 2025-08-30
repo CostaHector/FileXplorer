@@ -28,31 +28,43 @@ Notificator::~Notificator() {
 }
 
 void Notificator::goodNews(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
   showMessage(QIcon(":img/SAVED"), title, message);
+#endif
 }
 
 void Notificator::badNews(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
   showMessage(QIcon(":img/NOT_SAVED"), title, message);
+#endif
 }
 
 void Notificator::critical(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
   showMessage(icon, title, message);
+#endif
 }
 
 void Notificator::warning(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
   showMessage(icon, title, message);
+#endif
 }
 
 void Notificator::information(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
   showMessage(icon, title, message);
+#endif
 }
 
 void Notificator::question(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion);
   showMessage(icon, title, message);
+#endif
 }
 
 void Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message) {
@@ -135,7 +147,7 @@ void Notificator::initializeUI() {
       "stop: 1 #1e9bda );  }"
       //				"QProgressBar::chunk { background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #9bd66d, stop: 0.4999
       // #81d142, stop: 0.5 #81d143, stop: 1 #58bf08 );  }"
-  );
+      );
   setAutoFillBackground(true);
   setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
 }

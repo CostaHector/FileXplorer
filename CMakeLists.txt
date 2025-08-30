@@ -169,7 +169,6 @@ install(TARGETS ${PROJECT_NAME}
 # 安装额外文件
 install(FILES
     "Translate/FileXplorer_zh_CN.ts"
-    "bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat"
     "readme.md"
     DESTINATION share/${PROJECT_NAME}
 )
