@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QAction>
 #include <QActionGroup>
+#include <QToolButton>
 
 class LogActions : public QObject {
  public:
@@ -21,6 +22,7 @@ class LogActions : public QObject {
 
   QList<QAction*> _DROPDOWN_LIST;
 
+  QToolButton* GetLogPreviewerToolButton(QWidget* parent);
 };
 
 LogActions& g_LogActions();

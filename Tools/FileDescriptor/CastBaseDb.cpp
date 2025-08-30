@@ -177,8 +177,12 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
   QDirIterator it{imgsHostOriPath, {"*.pson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   using namespace PERFORMER_DB_HEADER_KEY;
   while (it.hasNext()) {
-    it.next();
-    const QVariantHash& pson = JsonHelper::MovieJsonLoader(it.filePath());
+    const QString psonPath = it.next();
+    const QVariantHash& pson = JsonHelper::MovieJsonLoader(psonPath);
+    if (pson.isEmpty()) {
+      qDebug("psonPath[%s] is empty", qPrintable(psonPath));
+      continue;
+    }
     qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name,        pson[ENUM_2_STR(Name)].toString());
     qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate,        pson[ENUM_2_STR(Rate)].toInt());
     qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,         pson[ENUM_2_STR(AKA)].toString());

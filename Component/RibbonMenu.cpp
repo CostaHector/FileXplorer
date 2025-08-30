@@ -24,9 +24,10 @@
 #include "DropListToolButton.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
+#include "LogFloatingPreviewer.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
-    : QTabWidget{parent}  //
+  : QTabWidget{parent}  //
 {
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
@@ -65,11 +66,21 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
   ActionsSearcher* mActSearcher{new (std::nothrow) ActionsSearcher{menuRibbonCornerWid}};
   CHECK_NULLPTR_RETURN_NULLPTR(mActSearcher);
+
+  QToolButton* logPrevTb = g_LogActions().GetLogPreviewerToolButton(menuRibbonCornerWid);
+  CHECK_NULLPTR_RETURN_NULLPTR(logPrevTb);
+  logPrevTb->setShortcut(QKeySequence(Qt::Key::Key_F12));
+  logPrevTb->setToolTip(QString{"<b>Logs Contents Viewer(%1)</b><br/> Show last 100 lines of log file"}.arg(logPrevTb->shortcut().toString()));
+
+  m_logPrev = new (std::nothrow) LogFloatingPreviewer{attached};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_logPrev);
+  m_logPrev->BindToolButton(logPrevTb);
+
   menuRibbonCornerWid->addWidget(mActSearcher);
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
   menuRibbonCornerWid->addSeparator();
-  menuRibbonCornerWid->addAction(g_LogActions()._LOG_FILE);
+  menuRibbonCornerWid->addWidget(logPrevTb);
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
   menuRibbonCornerWid->addSeparator();
@@ -388,7 +399,7 @@ void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
 #include <QToolBar>
 
 class RibbonMenuIllu : public QMainWindow {
- public:
+public:
   explicit RibbonMenuIllu(QWidget* parent = nullptr) : QMainWindow(parent) {
     setWindowFlag(Qt::WindowType::WindowStaysOnTopHint);
 

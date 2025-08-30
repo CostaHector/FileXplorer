@@ -1,6 +1,8 @@
 ﻿#include "ThumbnailProcesser.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "NotificatorMacro.h"
+#include "MemoryKey.h"
 #include <QRegularExpression>
 #include <utility>
 #include <QDirIterator>
@@ -13,12 +15,12 @@ const QList<int> ThumbnailProcesser::mAllowedPixelList{360, 480, 720, 1080};
 constexpr int ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX;  // [1, 300)
 
 bool ThumbnailProcesser::IsDimensionXValid(int dimensionX) {
-  static constexpr int DIMENSION_X_MIN{1}, DIMENSION_X_MAX{8 + 1};  // [1, 8)
+  static constexpr int DIMENSION_X_MIN{1}, DIMENSION_X_MAX{10+1};  // [1, 10+1)
   return DIMENSION_X_MIN <= dimensionX && dimensionX <= DIMENSION_X_MAX;
 }
 
 bool ThumbnailProcesser::IsDimensionYValid(int dimensionY) {
-  static constexpr int DIMENSION_Y_MIN{1}, DIMENSION_Y_MAX{8 + 1};  // [1, 8)
+  static constexpr int DIMENSION_Y_MIN{1}, DIMENSION_Y_MAX{10+1};  // [1, 10+1)
   return DIMENSION_Y_MIN <= dimensionY && dimensionY <= DIMENSION_Y_MAX;
 }
 
@@ -29,6 +31,27 @@ bool ThumbnailProcesser::IsWidthPixelAllowed(int widthPixel) {
 
 bool ThumbnailProcesser::IsSamplePeriodAllowed(int samplePeriod) {
   return SAMPLE_PERIOD_MIN <= samplePeriod && samplePeriod < SAMPLE_PERIOD_MAX;
+}
+
+bool ThumbnailProcesser::CheckParameters(int dimensionX, int dimensionY, int widthPixel) {
+  if (!IsDimensionXValid(dimensionX)) {
+    LOG_INFO_P("Dimension of row invalid", "%d", dimensionX);
+    return false;
+  }
+  if (!IsDimensionYValid(dimensionY)) {
+    LOG_INFO_P("Dimension of column invalid", "%d", dimensionY);
+    return false;
+  }
+  if (!IsWidthPixelAllowed(widthPixel)) {
+    LOG_INFO_P("images width invalid", "%d", widthPixel);
+    return false;
+  }
+  const int samplePeriod = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
+  if (!IsSamplePeriodAllowed(samplePeriod)) {
+    LOG_INFO_P("Sample period not allowed", "%d", samplePeriod);
+    return false;
+  }
+  return true;
 }
 
 ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist)  //

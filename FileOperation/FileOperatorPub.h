@@ -145,7 +145,7 @@ struct RETURN_TYPE {
 
   explicit inline operator bool() const noexcept { return ret == ErrorCode::OK; }
   inline int size() const noexcept { return cmds.size(); }
-  inline bool isRecoverable() const noexcept { return !cmds.isEmpty(); };
+  inline bool isRecoverable() const noexcept { return !cmds.isEmpty(); }
 
   inline ACMD& operator[](int i) noexcept { return cmds[i]; }
   inline const ACMD& operator[](int i) const noexcept { return cmds[i]; }

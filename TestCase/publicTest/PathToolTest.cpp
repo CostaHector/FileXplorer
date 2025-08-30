@@ -23,9 +23,6 @@ class PathToolTest : public MyTestSuite {
     QString testRootDir = TestCaseRootPath();
     QString libPath2 = QDir::cleanPath(QDir(testRootDir).absoluteFilePath("../lib/MediaInfo.dll"));
     QCOMPARE(libPath, libPath2);
-
-    QString batPath = GetPathByApplicationDirPath(FILE_REL_PATH::TERMINAL_OPEN_BATCH_FILE_PATH);
-    QVERIFY(QFile::exists(batPath));
   }
 
   void test_cast_studio_file_path_exists() {
