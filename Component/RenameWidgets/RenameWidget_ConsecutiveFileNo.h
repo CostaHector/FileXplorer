@@ -5,16 +5,16 @@
 
 class RenameWidget_ConsecutiveFileNo : public AdvanceRenamer {
  public:
-  RenameWidget_ConsecutiveFileNo(QWidget* parent = nullptr);
-
-  QLineEdit* m_fileNoStartIndex{nullptr};
-
+  explicit RenameWidget_ConsecutiveFileNo(QWidget* parent = nullptr);
+  void initExclusiveSetting() override;
   void InitExtraCommonVariable() override;
+  void InitExtraMemberWidget() override;
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;
 
-  void InitExtraMemberWidget() override {}
   QStringList RenameCore(const QStringList& replaceeList) override;
+private:
+  QLineEdit* m_fileNoStartIndex{nullptr};
 };
 
 #endif // RENAMEWIDGET_CONSECUTIVEFILENO_H

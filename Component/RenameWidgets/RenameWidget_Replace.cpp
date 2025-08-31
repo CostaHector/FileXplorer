@@ -5,14 +5,7 @@
 
 RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
     : AdvanceRenamer{parent}                                 //
-{
-  m_oldStrCB = new (std::nothrow) QComboBox;
-  CHECK_NULLPTR_RETURN_VOID(m_oldStrCB)
-  m_newStrCB = new (std::nothrow) QComboBox;
-  CHECK_NULLPTR_RETURN_VOID(m_newStrCB)
-  m_regexCB = new (std::nothrow) QCheckBox("Regex");
-  CHECK_NULLPTR_RETURN_VOID(m_regexCB)
-}
+{ }
 
 QToolBar* RenameWidget_Replace::InitControlTB() {
   QToolBar* replaceControl = new (std::nothrow) QToolBar;
@@ -42,18 +35,24 @@ void RenameWidget_Replace::extraSubscribe() {
 }
 
 auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
+  m_oldStrCB = new (std::nothrow) QComboBox;
+  CHECK_NULLPTR_RETURN_VOID(m_oldStrCB)
   m_oldStrCB->addItems(Configuration().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
   m_oldStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_oldStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_oldStrCB->setEditable(true);
   m_oldStrCB->setCompleter(nullptr);  // block auto complete
 
+  m_newStrCB = new (std::nothrow) QComboBox;
+  CHECK_NULLPTR_RETURN_VOID(m_newStrCB)
   m_newStrCB->addItems(Configuration().value(MemoryKey::RENAMER_NEW_STR_LIST.name, MemoryKey::RENAMER_NEW_STR_LIST.v).toStringList());
   m_newStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_newStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_newStrCB->setEditable(true);
   m_newStrCB->setCompleter(nullptr);
 
+  m_regexCB = new (std::nothrow) QCheckBox{"Regex"};
+  CHECK_NULLPTR_RETURN_VOID(m_regexCB)
   m_regexCB->setToolTip("Enable regex");
   m_regexCB->setChecked(Configuration().value(MemoryKey::RENAMER_REGEX_ENABLED.name, MemoryKey::RENAMER_REGEX_ENABLED.v).toBool());
 }
@@ -83,6 +82,9 @@ void RenameWidget_Replace::InitExtraCommonVariable() {
 
 RenameWidget_Delete::RenameWidget_Delete(QWidget* parent)  //
     : RenameWidget_Replace(parent) {
+}
+
+void RenameWidget_Delete::initExclusiveSetting() {
   m_newStrCB->setCurrentText("");
   m_newStrCB->setEnabled(false);
   m_newStrCB->setToolTip("New str is identically equal to empty str");

@@ -4,13 +4,8 @@
 #include <QLabel>
 
 RenameWidget_LongPath::RenameWidget_LongPath(QWidget* parent)  //
-    : AdvanceRenamer{parent}                                   //
-{
-  m_dropSectionLE = new (std::nothrow) QLineEdit("-1", this);
-  CHECK_NULLPTR_RETURN_VOID(m_dropSectionLE);
-  m_maxPathLengthLE = new (std::nothrow) QLineEdit("260", this);
-  CHECK_NULLPTR_RETURN_VOID(m_maxPathLengthLE);
-}
+  : AdvanceRenamer{parent}                                   //
+{ }
 
 QToolBar* RenameWidget_LongPath::InitControlTB() {
   auto* chopSectionTb = new (std::nothrow) QToolBar{"Drop Control Toolbar", this};
@@ -32,10 +27,14 @@ QToolBar* RenameWidget_LongPath::InitControlTB() {
 
 void RenameWidget_LongPath::extraSubscribe() {
   connect(m_dropSectionLE, &QLineEdit::textEdited, this, &RenameWidget_LongPath::DropSectionChanged);
+  connect(m_maxPathLengthLE, &QLineEdit::textChanged, &LongPathFinder::SetMaxPathLength);
 }
 
 void RenameWidget_LongPath::InitExtraMemberWidget() {
-  //
+  m_dropSectionLE = new (std::nothrow) QLineEdit{"-1", this};
+  CHECK_NULLPTR_RETURN_VOID(m_dropSectionLE);
+  m_maxPathLengthLE = new (std::nothrow) QLineEdit{"260", this};
+  CHECK_NULLPTR_RETURN_VOID(m_maxPathLengthLE);
 }
 
 // only keep path length < 260

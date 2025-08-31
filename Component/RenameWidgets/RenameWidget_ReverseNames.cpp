@@ -3,13 +3,16 @@
 
 RenameWidget_ReverseNames::RenameWidget_ReverseNames(QWidget* parent)  //
     : AdvanceRenamer(parent) {
+}
+
+void RenameWidget_ReverseNames::initExclusiveSetting() {
   m_nameExtIndependent->setEnabled(false);
   m_nameExtIndependent->setChecked(false);
 }
+
 void RenameWidget_ReverseNames::InitExtraCommonVariable() {
   windowTitleFormat = "Reverse file names | %1 item(s) under [%2]";
   setWindowTitle(windowTitleFormat);
-  setWindowIcon(QIcon(""));
 }
 
 QToolBar* RenameWidget_ReverseNames::InitControlTB() {
@@ -23,10 +26,6 @@ QToolBar* RenameWidget_ReverseNames::InitControlTB() {
   reverseLstTb->addWidget(m_nameExtIndependent);
   return reverseLstTb;
 }
-
-void RenameWidget_ReverseNames::extraSubscribe() {}
-
-void RenameWidget_ReverseNames::InitExtraMemberWidget() {}
 
 QStringList RenameWidget_ReverseNames::RenameCore(const QStringList& replaceeList) {
   if (replaceeList.isEmpty()) {

@@ -8,6 +8,8 @@
 class RenameWidget_ArrangeSection : public AdvanceRenamer {
  public:
   explicit RenameWidget_ArrangeSection(QWidget* parent = nullptr);
+  void initExclusiveSetting() override;
+
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;
