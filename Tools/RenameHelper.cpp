@@ -9,6 +9,9 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldStr
   if (oldString.isEmpty()) {
     return {};
   }
+  if (oldString == newString) {
+    return replaceeList;
+  }
   QStringList replacedLst{replaceeList};
   if (!regexEnable) {
     for (QString& s : replacedLst) {
@@ -85,9 +88,7 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
         continue;
       }
       QString newBaseName = baseName;
-      // if (!baseName.isEmpty()) {
       newBaseName += namePattern.arg(sufCurIndex[suf], suf2fieldWidth[suf], 10, QChar('0'));
-      // }
       numerizedNames.append(newBaseName);
       sufCurIndex[suf] += 1;
     }
@@ -128,7 +129,11 @@ QStringList PrependParentFolderNameToFileName(const QStringList& parentFolders, 
       continue;
     }
     QString prepath{parentFolders[i]};
-    ansNames.push_back(prepath.replace('/', ' ') + ' ' + completeNames[i]);
+    if (prepath.isEmpty()) {
+      ansNames.append(completeNames[i]); // not parent folder
+    } else {
+      ansNames.push_back(prepath.replace('/', ' ') + ' ' + completeNames[i]);
+    }
   }
   return ansNames;
 }

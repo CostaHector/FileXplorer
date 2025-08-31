@@ -1,6 +1,7 @@
 ﻿#include "RenameWidget_Numerize.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
+#include "NotificatorMacro.h"
 #include "RenameHelper.h"
 
 RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent)  //
@@ -15,7 +16,7 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   m_completeBaseName->setClearButtonEnabled(true);
   m_completeBaseName->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 
-  m_startNo = new (std::nothrow) QLineEdit{QString::number(mStartNoInt), this};  // "0"
+  m_startNo = new (std::nothrow) QLineEdit{"0", this};  // "0"
   CHECK_NULLPTR_RETURN_VOID(m_startNo)
   m_startNo->setMaximumWidth(20);
   m_isUniqueCounterPerExtension = new (std::nothrow) QCheckBox{"Extension Unique Counter", this};
@@ -47,7 +48,9 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
 void RenameWidget_Numerize::InitExtraCommonVariable() {
   windowTitleFormat = "Numerize name string | %1 item(s) under [%2]";
   setWindowTitle(windowTitleFormat);
+#ifndef RUNNING_UNIT_TESTS
   setWindowIcon(QIcon(":img/NAME_STR_NUMERIZER_PATH"));
+#endif
 }
 
 QToolBar* RenameWidget_Numerize::InitControlTB() {
@@ -74,10 +77,9 @@ void RenameWidget_Numerize::extraSubscribe() {
     bool isNumber = false;
     int startNo = startNoStr.toInt(&isNumber);
     if (!isNumber) {
-      qWarning("%s is not valid start number", qPrintable(startNoStr));
+      LOG_BAD_P("[Abort] Start number str invalid", "[%s] use %d instead", qPrintable(startNoStr), startNo);
       return;
     }
-    mStartNoInt = startNo;
     OnlyTriggerRenameCore();
   });
 
@@ -103,9 +105,11 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
     }
     connect(m_completeBaseName, &QLineEdit::textChanged, this, &RenameWidget_Numerize::OnlyTriggerRenameCore);
   }
-  const QStringList& suffixs = m_oExtTE->toPlainText().split(NAME_SEP);
+  const QStringList& suffixs = mExts;
   const QString& baseName = m_completeBaseName->text();
   const QString& namePattern = m_numberPattern->currentText();
   const bool bUniqueExtCounter = m_isUniqueCounterPerExtension->checkState() == Qt::Checked;
-  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, mStartNoInt, namePattern, bUniqueExtCounter);
+
+  const int startNoInt = m_startNo->text().toInt();
+  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, startNoInt, namePattern, bUniqueExtCounter);
 }
