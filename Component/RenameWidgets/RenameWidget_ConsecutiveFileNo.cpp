@@ -5,7 +5,9 @@
 
 RenameWidget_ConsecutiveFileNo::RenameWidget_ConsecutiveFileNo(QWidget* parent)  //
     : AdvanceRenamer(parent)                                                     //
-{
+{ }
+
+void RenameWidget_ConsecutiveFileNo::initExclusiveSetting() {
   m_recursiveCB->setEnabled(false);
 }
 
@@ -23,12 +25,14 @@ QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replac
   return ToConsecutiveFileNameNo(startNo)(replaceeList);
 }
 
-void RenameWidget_ConsecutiveFileNo::InitExtraCommonVariable() {
+void RenameWidget_ConsecutiveFileNo::InitExtraMemberWidget() {
   m_fileNoStartIndex = new (std::nothrow) QLineEdit{"0", this};
   CHECK_NULLPTR_RETURN_VOID(m_fileNoStartIndex)
   m_nameExtIndependent->setCheckState(Qt::CheckState::Checked);
   m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
+}
 
+void RenameWidget_ConsecutiveFileNo::InitExtraCommonVariable() {
   windowTitleFormat = "Consecutive file number | %1 item(s) under [%2]";
   setWindowTitle(windowTitleFormat);
 }

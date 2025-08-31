@@ -27,6 +27,8 @@ public:
   void closeEvent(QCloseEvent* event) override;
   void ReadSettings();
 
+  void initCommonSetting();
+  virtual void initExclusiveSetting() {}
   void init();
 
   void Subscribe();
@@ -40,10 +42,10 @@ public:
   void InitTextEditContent(const QString& workPath, const QStringList& selectedNames);
   void OnlyTriggerRenameCore();
 
-  virtual void InitExtraCommonVariable() = 0;
-  virtual void InitExtraMemberWidget() = 0;
+  virtual void InitExtraCommonVariable() {}
+  virtual void InitExtraMemberWidget() {}
   virtual QToolBar* InitControlTB() = 0;
-  virtual void extraSubscribe() = 0;
+  virtual void extraSubscribe() {}
   virtual QStringList RenameCore(const QStringList& replaceeList) = 0;
 
   QString windowTitleFormat;
