@@ -93,18 +93,3 @@ void RenameWidget_Delete::InitExtraCommonVariable() {
   setWindowTitle(windowTitleFormat);
   setWindowIcon(QIcon(":img/NAME_STR_DELETER_PATH"));
 }
-
-// #define __NAME__EQ__MAIN__ 1
-// #ifdef __NAME__EQ__MAIN__
-// #include <QApplication>
-// int main(int argc, char* argv[]) {
-//   QDir dir(QFileInfo(QFileInfo(__FILE__).absolutePath()).absolutePath());
-//   QStringList rels = dir.entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsFirst);
-//   QApplication a(argc, argv);
-//   RenameWidget_Replace winR;
-//   winR.init();
-//   winR.InitTextEditContent(dir.absolutePath(), rels);
-//   winR.show();
-//   return a.exec();
-// }
-// #endif

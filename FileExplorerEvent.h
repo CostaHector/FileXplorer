@@ -29,7 +29,7 @@ class FileExplorerEvent : public QObject {
   void subsribeFileActions();
   void subscribeThumbnailActions();
 
-  void onRename(AdvanceRenamer* renameWid);
+  void onRename(AdvanceRenamer& renameWid);
 
   bool __CanNewItem() const;
 
