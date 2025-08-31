@@ -6,14 +6,16 @@
 
 RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
     : AdvanceRenamer{parent}                                               //
-{                                                                          //
+{ }
+
+void RenameWidget_ArrangeSection::initExclusiveSetting() {
   m_nameExtIndependent->setEnabled(false);
   m_nameExtIndependent->setChecked(false);
 }
 
 auto RenameWidget_ArrangeSection::extraSubscribe() -> void {
-  connect(_SWAP_SECTION_AT_2_INDEXES, &QAction::triggered, this, &AdvanceRenamer::OnlyTriggerRenameCore);
-  connect(_SECTIONS_USED_TO_JOIN, &QAction::triggered, this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(_SWAP_SECTION_AT_2_INDEXES, &QAction::toggled, this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(_SECTIONS_USED_TO_JOIN, &QAction::toggled, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(m_swap2Index, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(m_sectionsUsedToJoin, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(m_recordWasted, &QCheckBox::stateChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
@@ -40,6 +42,8 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   CHECK_NULLPTR_RETURN_VOID(m_swap2Index)
   m_swap2Index->setEditable(true);
   m_swap2Index->setCompleter(nullptr);
+  m_swap2Index->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
+  m_swap2Index->setToolTip("Section at two indexes will be swapped");
   m_swap2Index->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   const QString& defaultUserInput = Configuration().value(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.v).toString();
   m_swap2Index->addItem(defaultUserInput);
@@ -49,7 +53,8 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   CHECK_NULLPTR_RETURN_VOID(m_sectionsUsedToJoin)
   m_sectionsUsedToJoin->setEditable(true);
   m_sectionsUsedToJoin->setCompleter(nullptr);
-  m_sectionsUsedToJoin->setToolTip("Section join with user input sequence");
+  m_sectionsUsedToJoin->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
+  m_sectionsUsedToJoin->setToolTip("Section will be joined with user input sequence");
   m_sectionsUsedToJoin->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_sectionsUsedToJoin->addItem("0123456789");
 
@@ -76,7 +81,9 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
       regexValidLabel->ToNotSaved();
       return {};
     }
+#ifndef RUNNING_UNIT_TESTS
     Configuration().setValue(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, m_swap2Index->currentText());
+#endif
     nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), bRecordWasted);
   } else if (_SECTIONS_USED_TO_JOIN->isChecked()) {
     if (!SubscriptsDigitChar2Int(m_sectionsUsedToJoin->currentText(), sortedSequenceIndex)) {
@@ -96,8 +103,7 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
   const QStringList& newNames = nsa.BatchSwapper(replaceeList);
   if (bRecordWasted && nsa.HasWasted()) {
     const QString& wastedNames = nsa.GetWastedNames();
-    LOG_WARN_NP("wasted section found", wastedNames);
-    qWarning("Following name contains some section wasted. [%s]", qPrintable(wastedNames));
+    LOG_WARN_NP("wasted section found as follows:", wastedNames);
   }
   return newNames;
 }

@@ -120,6 +120,14 @@ void AdvanceRenamer::ReadSettings() {
   }
 }
 
+void AdvanceRenamer::initCommonSetting() {
+  m_recursiveCB->setChecked(Configuration().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
+  const bool bNameExtIndependent{Configuration().value(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.v).toBool()};
+  m_nameExtIndependent->setChecked(bNameExtIndependent);
+  m_oExtTE->setVisible(bNameExtIndependent);
+  m_nExtTE->setVisible(bNameExtIndependent);
+}
+
 void AdvanceRenamer::init() {
   InitExtraCommonVariable();
   InitExtraMemberWidget();
@@ -132,11 +140,8 @@ void AdvanceRenamer::init() {
   m_mainLayout->setContentsMargins(5, 5, 5, 5);
 
   /* don't move this section up (Don't set state before UI)*/
-  m_recursiveCB->setChecked(Configuration().value(MemoryKey::RENAMER_INCLUDING_DIR.name, MemoryKey::RENAMER_INCLUDING_DIR.v).toBool());
-  const bool bNameExtIndependent{Configuration().value(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.v).toBool()};
-  m_nameExtIndependent->setChecked(bNameExtIndependent);
-  m_oExtTE->setVisible(bNameExtIndependent);
-  m_nExtTE->setVisible(bNameExtIndependent);
+  initCommonSetting(); // 共用配置
+  initExclusiveSetting(); // 独有配置
   /* don't move this section up */
 
   Subscribe();
