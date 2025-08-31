@@ -1,6 +1,14 @@
 #include "LongPathFinder.h"
 
-constexpr int LongPathFinder::MAX_PATH_LENGTH;
+int LongPathFinder::MAX_PATH_LENGTH {260};
+void LongPathFinder::SetMaxPathLength(const QString& maxPathLengthStr) {
+  bool isnumeric = false;
+  int maxPathLength = maxPathLengthStr.toInt(&isnumeric);
+  if (!isnumeric) {
+    qWarning("Insert index[%s] must be a number, unchange", qPrintable(maxPathLengthStr));
+  }
+  MAX_PATH_LENGTH = maxPathLength;
+}
 
 bool LongPathFinder::IsTooLong(const QString& pth) {
   return pth.size() >= MAX_PATH_LENGTH;

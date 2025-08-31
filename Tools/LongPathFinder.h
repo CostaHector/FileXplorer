@@ -5,6 +5,7 @@
 
 class LongPathFinder {
  public:
+  static void SetMaxPathLength(const QString& maxPathLengthStr);
   LongPathFinder() = default;
   static bool IsTooLong(const QString& pth);
   static bool IsTooLong(int pathLength);
@@ -22,7 +23,7 @@ class LongPathFinder {
   int mDropSection{-1};
   // 260 = "C:\" + 256 + '\0' = 3+256+1
   // driver letter=3; effective path=256; end=1
-  static constexpr int MAX_PATH_LENGTH = 260;
+  static int MAX_PATH_LENGTH;
 };
 
 #endif  // LONGPATHFINDER_H
