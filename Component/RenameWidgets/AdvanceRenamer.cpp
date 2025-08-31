@@ -90,7 +90,6 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   m_nameEditLayout->setStretch(4, 1);
 
   ReadSettings();
-  // Qt.FramelessWindowHint|Qt.WindowSystemMenuHint;
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
 }
 
@@ -140,8 +139,8 @@ void AdvanceRenamer::init() {
   m_nExtTE->setVisible(bNameExtIndependent);
   /* don't move this section up */
 
-  extraSubscribe();
   Subscribe();
+  extraSubscribe();
 }
 
 void AdvanceRenamer::Subscribe() {

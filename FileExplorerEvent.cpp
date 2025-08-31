@@ -18,7 +18,6 @@
 #include "PropertiesWindow.h"
 #include "RedundantImageFinder.h"
 #include "ViewsStackedWidget.h"
-#include "AdvanceRenamer.h"
 #include "RenameWidget_LongPath.h"
 #include "RenameWidget_ArrangeSection.h"
 #include "RenameWidget_ConsecutiveFileNo.h"
@@ -427,7 +426,7 @@ void FileExplorerEvent::subscribe() {
     connect(fileOpInst.SELECT_INVERT, &QAction::triggered, this, &FileExplorerEvent::on_SelectInvert);
 
     connect(fileOpInst._LONG_PATH_FINDER, &QAction::triggered, this, [this]() -> void {
-      auto* pToLongPath = new RenameWidget_LongPath(_contentPane);
+      RenameWidget_LongPath pToLongPath{_contentPane};
       onRename(pToLongPath);
     });
   }
@@ -443,43 +442,43 @@ void FileExplorerEvent::subscribe() {
   {
     auto& renameInst = g_renameAg();
     connect(renameInst._NUMERIZER, &QAction::triggered, this, [this]() -> void {
-      auto* pNumerize = new RenameWidget_Numerize(_contentPane);
+      RenameWidget_Numerize pNumerize{_contentPane};
       onRename(pNumerize);
     });
     connect(renameInst._SECTIONS_ARRANGE, &QAction::triggered, this, [this]() -> void {
-      auto* pArrange = new RenameWidget_ArrangeSection(_contentPane);
+      RenameWidget_ArrangeSection pArrange{_contentPane};
       onRename(pArrange);
     });
     connect(renameInst._REVERSE_NAMES_LIST, &QAction::triggered, this, [this]() -> void {
-      auto* pReverse = new RenameWidget_ReverseNames(_contentPane);
+      RenameWidget_ReverseNames pReverse{_contentPane};
       onRename(pReverse);
     });
     connect(renameInst._CASE_NAME, &QAction::triggered, this, [this]() -> void {
-      auto* pCase = new RenameWidget_Case(_contentPane);
+      RenameWidget_Case pCase{_contentPane};
       onRename(pCase);
     });
     connect(renameInst._STR_INSERTER, &QAction::triggered, this, [this]() -> void {
-      auto* pInsert = new RenameWidget_Insert(_contentPane);
+      RenameWidget_Insert pInsert{_contentPane};
       onRename(pInsert);
     });
     connect(renameInst._STR_DELETER, &QAction::triggered, this, [this]() -> void {
-      auto* pDelete = new RenameWidget_Delete(_contentPane);
+      RenameWidget_Delete pDelete{_contentPane};
       onRename(pDelete);
     });
     connect(renameInst._STR_REPLACER, &QAction::triggered, this, [this]() -> void {
-      auto* pReplacer = new RenameWidget_Replace(_contentPane);
+      RenameWidget_Replace pReplacer{_contentPane};
       onRename(pReplacer);
     });
     connect(renameInst._CONTINUOUS_NUMBERING, &QAction::triggered, this, [this]() -> void {
-      auto* pNoConsecutive = new RenameWidget_ConsecutiveFileNo(_contentPane);
+      RenameWidget_ConsecutiveFileNo pNoConsecutive{_contentPane};
       onRename(pNoConsecutive);
     });
     connect(renameInst._CONVERT_UNICODE_TO_ASCII, &QAction::triggered, this, [this]() -> void {
-      auto* pToAscii = new RenameWidget_ConvertBoldUnicodeCharset2Ascii(_contentPane);
+      RenameWidget_ConvertBoldUnicodeCharset2Ascii pToAscii{_contentPane};
       onRename(pToAscii);
     });
     connect(renameInst._PREPEND_PARENT_FOLDER_NAMES, &QAction::triggered, this, [this]() -> void {
-      auto* pPrependName = new RenameWidget_PrependParentFolderName(_contentPane);
+      RenameWidget_PrependParentFolderName pPrependName{_contentPane};
       onRename(pPrependName);
     });
   }
@@ -493,32 +492,34 @@ void FileExplorerEvent::subscribe() {
   g_ArrangeActions().subscribe();
 }
 
-void FileExplorerEvent::onRename(AdvanceRenamer* renameWid) {
-  if (renameWid == nullptr) {
-    qCritical("renameWid is nullptr");
-    return;
-  }
+void FileExplorerEvent::onRename(AdvanceRenamer& renameWid) {
   if (!_contentPane->IsCurFSView()) {
-    qWarning("[Rename] only available on FileSystemModel but[%s]", _contentPane->GetCurViewName());
+    LOG_WARN_NP("[Rename] Current view not support rename", _contentPane->GetCurViewName());
     return;
   }
-  const QString& filePath = _fileSysModel->rootPath();
+  const QString& currentPath {_fileSysModel->rootPath()};
+  if (PathTool::isRootOrEmpty(currentPath)) {
+    LOG_WARN_NP("[Abort] Path root or empty", currentPath);
+    return;
+  }
+
   const QStringList& preNames = _contentPane->getFileNames();
   if (preNames.isEmpty()) {
-    qDebug("nothing item(s) selected, skip rename");
+    LOG_WARN_NP("[Skip] Nothing selected", "return");
     return;
   }
-
+  const bool bDontWatch {preNames.size() > 100};
   const auto beforeOption = _fileSysModel->options();
-  if (preNames.size() > 100) {
+  if (bDontWatch) {
     _fileSysModel->setOptions(QFileSystemModel::DontWatchForChanges);
   }
-  renameWid->init();
-  renameWid->show();
-  renameWid->InitTextEditContent(filePath, preNames);
-  renameWid->exec();
-
-  if (preNames.size() > 100) {
+  renameWid.init();
+  renameWid.setModal(true);
+  renameWid.InitTextEditContent(currentPath, preNames);
+  if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
+    LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", preNames.size());
+  }
+  if (bDontWatch) {
     _fileSysModel->setOptions(beforeOption);
   }
 }

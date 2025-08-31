@@ -31,6 +31,5 @@ QStringList RenameWidget_PrependParentFolderName::RenameCore(const QStringList& 
   if (replaceeList.isEmpty() || mRelToNameWithNoRoot.isEmpty()) {
     return replaceeList;
   }
-  const QStringList& suffixs = m_oExtTE->toPlainText().split(NAME_SEP);
-  return RenameHelper::PrependParentFolderNameToFileName(mRelToNameWithNoRoot, replaceeList, suffixs);
+  return RenameHelper::PrependParentFolderNameToFileName(mRelToNameWithNoRoot, replaceeList, mExts);
 }
