@@ -8,9 +8,7 @@
 class ToolBarAndViewSwitcher : public QObject {
  public:
   explicit ToolBarAndViewSwitcher(StackedAddressAndSearchToolBar* navigation, ViewsStackedWidget* view, QObject* parent = nullptr);
-
   void onSwitchByViewType(ViewTypeTool::ViewType);
-  void onSwitchByViewAction(const QAction* activatedAction);
 
  private:
   StackedAddressAndSearchToolBar* _navigation;

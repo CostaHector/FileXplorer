@@ -70,10 +70,10 @@ QActionGroup* ViewActions::GetViewsAG() {
   _MOVIE_VIEW->setCheckable(true);
 
   _CAST_VIEW->setShortcutVisibleInContextMenu(true);
+  _CAST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
   _CAST_VIEW->setToolTip(QString("Show Cast database. (%1)").arg(_CAST_VIEW->shortcut().toString()));
   _CAST_VIEW->setCheckable(true);
 
-  _SCENE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
   _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
   _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
   _SCENE_VIEW->setCheckable(true);
