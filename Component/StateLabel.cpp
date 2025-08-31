@@ -13,47 +13,22 @@ QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status) {
 }
 
 StateLabel::StateLabel(const QString& text, QWidget* parent)  //
-    : QLabel{text, parent} {
+  : QLabel{text, parent} {
+#ifndef RUNNING_UNIT_TESTS
   setPixmap(GetLabelStatusPixmap(m_currentState));
+#endif
   setAlignment(Qt::AlignRight);
 }
 
 void StateLabel::ToSaved() {
   m_currentState = SAVED;
+#ifndef RUNNING_UNIT_TESTS
   setPixmap(GetLabelStatusPixmap(m_currentState));
+#endif
 }
 void StateLabel::ToNotSaved() {
   m_currentState = NOT_SAVED;
+#ifndef RUNNING_UNIT_TESTS
   setPixmap(GetLabelStatusPixmap(m_currentState));
-}
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-
-#include <QHBoxLayout>
-#include <QPushButton>
-class StateLabelWidget : public QWidget {
- public:
-  QPushButton* save;
-  QPushButton* change;
-  explicit StateLabelWidget(QWidget* parent = nullptr) : QWidget(parent), save(new QPushButton("Save")), change(new QPushButton("Change")) {
-    StateLabel* textEdit = new StateLabel("none");
-    QHBoxLayout* toasterLayout = new QHBoxLayout;
-    toasterLayout->addWidget(textEdit);
-    toasterLayout->addWidget(save);
-    toasterLayout->addWidget(change);
-    connect(save, &QPushButton::clicked, this, [textEdit]() -> void { textEdit->ToSaved(); });
-    connect(change, &QPushButton::clicked, this, [textEdit]() -> void { textEdit->ToNotSaved(); });
-    setLayout(toasterLayout);
-  }
-};
-
-#include <QApplication>
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  StateLabelWidget wid;
-  wid.show();
-  return a.exec();
-}
 #endif
+}

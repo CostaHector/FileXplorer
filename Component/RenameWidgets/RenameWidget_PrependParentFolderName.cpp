@@ -4,10 +4,13 @@
 #include "SpacerWidget.h"
 
 RenameWidget_PrependParentFolderName::RenameWidget_PrependParentFolderName(QWidget* parent)  //
-  : AdvanceRenamer{parent} {
+  : AdvanceRenamer{parent} {}
+
+void RenameWidget_PrependParentFolderName::initExclusiveSetting() {
   m_recursiveCB->setEnabled(true);
   m_recursiveCB->setChecked(true);
 }
+
 void RenameWidget_PrependParentFolderName::InitExtraCommonVariable() {
   windowTitleFormat = "Prepend parend folder names | %1 item(s) under [%2]";
   setWindowTitle(windowTitleFormat);
@@ -22,10 +25,6 @@ QToolBar* RenameWidget_PrependParentFolderName::InitControlTB() {
   prependTb->addWidget(m_recursiveCB);
   return prependTb;
 }
-
-void RenameWidget_PrependParentFolderName::extraSubscribe() {}
-
-void RenameWidget_PrependParentFolderName::InitExtraMemberWidget() {}
 
 QStringList RenameWidget_PrependParentFolderName::RenameCore(const QStringList& replaceeList) {
   if (replaceeList.isEmpty() || mRelToNameWithNoRoot.isEmpty()) {

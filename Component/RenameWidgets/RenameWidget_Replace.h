@@ -4,7 +4,7 @@
 
 class RenameWidget_Replace : public AdvanceRenamer {
  public:
-  RenameWidget_Replace(QWidget* parent = nullptr);
+  explicit RenameWidget_Replace(QWidget* parent = nullptr);
 
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
@@ -23,7 +23,8 @@ class RenameWidget_Replace : public AdvanceRenamer {
 
 class RenameWidget_Delete : public RenameWidget_Replace {
  public:
-  RenameWidget_Delete(QWidget* parent = nullptr);
+  explicit RenameWidget_Delete(QWidget* parent = nullptr);
+  void initExclusiveSetting() override;
   void InitExtraCommonVariable() override;
 };
 

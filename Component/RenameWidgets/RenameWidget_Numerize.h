@@ -7,6 +7,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
  public:
   explicit RenameWidget_Numerize(QWidget* parent = nullptr);
 
+  void initExclusiveSetting() override;
   void InitExtraMemberWidget() override;
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
