@@ -20,7 +20,7 @@
 class FileOsWalker;
 
 class AdvanceRenamer : public QDialog {
- public:
+public:
   explicit AdvanceRenamer(QWidget* parent = nullptr);
 
   void showEvent(QShowEvent* event) override;
@@ -46,21 +46,21 @@ class AdvanceRenamer : public QDialog {
   virtual void extraSubscribe() = 0;
   virtual QStringList RenameCore(const QStringList& replaceeList) = 0;
 
- protected:
-  static constexpr char NAME_SEP = '\n';
-
- public:
   QString windowTitleFormat;
 
-  QString mWorkPath;
-  QStringList mSelectedNames;
-  QStringList mRelToNameWithNoRoot; // (no root) relative path to file
-  QStringList mNames;  // with extension or without
-  QStringList mExts;   // dot and extension
+protected:
+  static constexpr char NAME_SEP = '\n';
 
   QCheckBox* m_nameExtIndependent{nullptr};
   QCheckBox* m_recursiveCB{nullptr};
   StateLabel* regexValidLabel{nullptr};
+
+  QString mWorkPath;
+  QStringList mSelectedNames;
+  QStringList mRelToNameWithNoRoot; // (no root) relative path to file
+
+  QStringList mNames;  // with extension or without
+  QStringList mExts;   // dot and extension
 
   QPlainTextEdit* m_relNameTE{nullptr};
 
@@ -70,6 +70,7 @@ class AdvanceRenamer : public QDialog {
   QPlainTextEdit* m_nBaseTE{nullptr};
   QPlainTextEdit* m_nExtTE{nullptr};
 
+private:
   QDialogButtonBox* m_buttonBox{nullptr};
 
   QToolBar* m_controlBar{nullptr};

@@ -10,6 +10,7 @@ class RenameWidget_Insert : public AdvanceRenamer {
   void extraSubscribe() override;
   void InitExtraMemberWidget() override;
   QStringList RenameCore(const QStringList& replaceeList) override;
+private:
   QComboBox* insertStrCB{nullptr};
   QComboBox* insertAtCB{nullptr};
 };
