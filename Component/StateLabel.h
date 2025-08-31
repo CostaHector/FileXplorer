@@ -12,6 +12,7 @@ class StateLabel : public QLabel {
     BUTT = 2
   } LABEL_STATUS_E;
   explicit StateLabel(const QString& text, QWidget* parent = nullptr);
+  LABEL_STATUS_E state() const {return m_currentState;}
  public slots:
   void ToSaved();
   void ToNotSaved();
