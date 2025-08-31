@@ -10,7 +10,8 @@ using namespace ViewTypeTool;
 
 ToolBarAndViewSwitcher::ToolBarAndViewSwitcher(StackedAddressAndSearchToolBar* navigation, ViewsStackedWidget* view, QObject* parent)//
   : QObject{parent}, _navigation{navigation}, _view{view} { //
-
+  CHECK_NULLPTR_RETURN_VOID(_navigation)
+  CHECK_NULLPTR_RETURN_VOID(_view)
 }
 
 void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
@@ -236,9 +237,4 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
   }
   _view->setCurrentIndex(viewIndex);
   _view->SetVt(viewType);
-}
-
-void ToolBarAndViewSwitcher::onSwitchByViewAction(const QAction* activatedAction) {
-  ViewType vt = GetViewTypeByActionText(activatedAction);
-  onSwitchByViewType(vt);
 }
