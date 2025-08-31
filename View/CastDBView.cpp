@@ -194,9 +194,13 @@ bool CastDBView::onSubmit() {
     LOG_GOOD_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
     return true;
   }
+  const QModelIndex oldIndex = currentIndex();
   if (!_castModel->submitAll()) {
     LOG_WARN_NP("Submit failed", _castModel->lastError().text());
     return false;
+  }
+  if (oldIndex.isValid() && currentIndex() != oldIndex) {
+    setCurrentIndex(oldIndex);
   }
   LOG_GOOD_NP("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
   return true;
