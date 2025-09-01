@@ -3,15 +3,14 @@
 
 #include <QAction>
 #include <QActionGroup>
-#include <QToolBar>
 
 class RedundantImageFinderActions : public QObject {
  public:
   explicit RedundantImageFinderActions(QObject* parent = nullptr);
 
-  QToolBar* GetRedunImgTB(QWidget* parent = nullptr);
-
   QAction* FIND_DUPLICATE_IMGS_BY_LIBRARY{nullptr};
+  QAction* FIND_DUPLICATE_IMGS_IN_A_PATH{nullptr};
+  QActionGroup* FIND_DUPLICATE_IMGS_AG{nullptr};
 
   QAction* RECYLE_NOW{nullptr};
   QAction* ALSO_EMPTY_IMAGE{nullptr};

@@ -29,24 +29,28 @@
 RibbonMenu::RibbonMenu(QWidget* parent)
   : QTabWidget{parent}  //
 {
+  std::fill(mViewType2LeafTabIndex, mViewType2LeafTabIndex + (int)ViewTypeTool::ViewType::VIEW_TYPE_BUTT, -1);
+
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
   m_leafView = LeafView();
   m_leafMovie = LeafMovie();
   m_leafCast = LeafCast();
-  m_leafJson = LeafJson();
   m_leafScenes = LeafScenesTools();
+  m_leafJson = LeafJson();
   m_leafMedia = LeafMediaTools();
-
-  const auto& viewIns = g_viewActions();
 
   addTab(m_leafFile, "&FILE");
   addTab(m_leafHome, "&HOME");
   addTab(m_leafView, "&VIEW");
-  addTab(m_leafMovie, "&" + viewIns._MOVIE_VIEW->text());
-  addTab(m_leafCast, "&" + viewIns._CAST_VIEW->text());
-  addTab(m_leafJson, "&" + viewIns._JSON_VIEW->text());
-  addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
+  {
+    const auto& viewIns = g_viewActions();
+    using namespace ViewTypeTool;
+    mViewType2LeafTabIndex[(int)ViewType::MOVIE] = addTab(m_leafMovie, "&" + viewIns._MOVIE_VIEW->text());
+    mViewType2LeafTabIndex[(int)ViewType::CAST] = addTab(m_leafCast, "&" + viewIns._CAST_VIEW->text());
+    mViewType2LeafTabIndex[(int)ViewType::SCENE] = addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
+    mViewType2LeafTabIndex[(int)ViewType::JSON] = addTab(m_leafJson, "&" + viewIns._JSON_VIEW->text());
+  }
   addTab(m_leafMedia, "&ARRANGE");
 
   auto& inst = ActionsRecorder::GetInst();
@@ -279,6 +283,27 @@ QToolBar* RibbonMenu::LeafJson() const {
   return jsonToolBar;
 }
 
+QToolBar* RibbonMenu::LeafScenesTools() const {
+  auto& ag = g_SceneInPageActions();
+  if (!ag.InitWidget()) {
+    return nullptr;
+  }
+
+  auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
+  sceneTB->addAction(g_viewActions()._SCENE_VIEW);
+  sceneTB->addSeparator();
+  sceneTB->addAction(ag._COMBINE_MEDIAINFOS_JSON);
+  sceneTB->addAction(ag._UPDATE_SCN_ONLY);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mOrderTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mEnablePageTB);
+  sceneTB->addSeparator();
+  sceneTB->addWidget(ag.mImageSizeTB);
+  sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  return sceneTB;
+}
+
 QToolBar* RibbonMenu::LeafMediaTools() const {
   const auto& fileOpAgInst = g_fileBasicOperationsActions();
 
@@ -355,27 +380,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   return archiveVidsTB;
 }
 
-QToolBar* RibbonMenu::LeafScenesTools() const {
-  auto& ag = g_SceneInPageActions();
-  if (!ag.InitWidget()) {
-    return nullptr;
-  }
-
-  auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
-  sceneTB->addAction(g_viewActions()._SCENE_VIEW);
-  sceneTB->addSeparator();
-  sceneTB->addAction(ag._COMBINE_MEDIAINFOS_JSON);
-  sceneTB->addAction(ag._UPDATE_SCN_ONLY);
-  sceneTB->addSeparator();
-  sceneTB->addWidget(ag.mOrderTB);
-  sceneTB->addSeparator();
-  sceneTB->addWidget(ag.mEnablePageTB);
-  sceneTB->addSeparator();
-  sceneTB->addWidget(ag.mImageSizeTB);
-  sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  return sceneTB;
-}
-
 void RibbonMenu::Subscribe() {
   connect(g_framelessWindowAg()._EXPAND_RIBBONS, &QAction::triggered, this, &RibbonMenu::on_officeStyleWidgetVisibilityChanged);
   on_officeStyleWidgetVisibilityChanged(g_framelessWindowAg()._EXPAND_RIBBONS->isChecked());
@@ -389,6 +393,14 @@ void RibbonMenu::on_officeStyleWidgetVisibilityChanged(const bool vis) {
 
 void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
   Configuration().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
+}
+
+void RibbonMenu::whenViewTypeChanged(ViewTypeTool::ViewType vt) {
+  const int destLeafTabIndex = mViewType2LeafTabIndex[(int)vt];
+  if (destLeafTabIndex == -1) {
+    return;
+  }
+  setCurrentIndex(destLeafTabIndex);
 }
 
 // #define __NAME__EQ__MAIN__ 1

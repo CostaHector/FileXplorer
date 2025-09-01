@@ -38,5 +38,8 @@ class FileXplorer : public QMainWindow {
   NavigationToolBar* m_navigationToolBar{nullptr};
   RibbonMenu* m_ribbonMenu{nullptr};
   CustomStatusBar* m_statusBar{nullptr};
+private:
+  void onPreviewSwitched(const QAction* prevWidAct);
+  void onViewTypeChanged(const QAction* pViewAct);
 };
 #endif  // FILEXPLORER_H

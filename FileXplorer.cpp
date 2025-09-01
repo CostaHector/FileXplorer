@@ -125,23 +125,8 @@ void FileXplorer::subscribe() {
   });
 
   auto& fpAG = g_folderPreviewActions();
-  connect(fpAG.PREVIEW_AG, &QActionGroup::triggered, this, [this](QAction* triggeredActions) {
-    if (triggeredActions == nullptr) {
-      return;
-    }
-    const bool checked{triggeredActions->isChecked()};
-    Configuration().setValue(MemoryKey::SHOW_FOLDER_PREVIEW.name, checked);
-    previewHtmlDock->setVisible(checked);
-
-    const QString& previewType = triggeredActions->text();
-    if (!triggeredActions->isChecked()) {  // clear preview type
-      Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, "");
-    } else {
-      Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
-    }
-    m_previewSwitcher->onSwitchByViewType(previewType);
-  });
-  connect(vA._VIEWS_AG, &QActionGroup::triggered, m_naviSwitcher, &ToolBarAndViewSwitcher::onSwitchByViewAction);
+  connect(fpAG.PREVIEW_AG, &QActionGroup::triggered, this, &FileXplorer::onPreviewSwitched);
+  connect(vA._VIEWS_AG, &QActionGroup::triggered, this, &FileXplorer::onViewTypeChanged);
 }
 
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {
@@ -189,4 +174,28 @@ void FileXplorer::keyPressEvent(QKeyEvent* ev) {
       break;
   }
   QMainWindow::keyPressEvent(ev);
+}
+
+void FileXplorer::onPreviewSwitched(const QAction* prevWidAct) {
+  if (prevWidAct == nullptr) {
+    return;
+  }
+  const bool checked{prevWidAct->isChecked()};
+  Configuration().setValue(MemoryKey::SHOW_FOLDER_PREVIEW.name, checked);
+  previewHtmlDock->setVisible(checked);
+
+  const QString& previewType = prevWidAct->text();
+  if (!prevWidAct->isChecked()) {  // clear preview type
+    Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, "");
+  } else {
+    Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
+  }
+  m_previewSwitcher->onSwitchByViewType(previewType);
+}
+
+void FileXplorer::onViewTypeChanged(const QAction* pViewAct) {
+  using namespace ViewTypeTool;
+  ViewType vt = GetViewTypeByActionText(pViewAct);
+  m_naviSwitcher->onSwitchByViewType(vt);
+  m_ribbonMenu->whenViewTypeChanged(vt);
 }

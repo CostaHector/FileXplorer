@@ -125,7 +125,7 @@ int CastDBView::onDeleteRecords() {
     return 0;
   }
   const auto& itemSelection = selectionModel()->selection();
-  QString hintText{QString{"%1 record(s) are about to removed! (Attention: Not recoverable)"}};
+  QString hintText{QString{"Risk: %1 record(s) are about to removed! (Attention: Not recoverable)"}};
   if (QMessageBox::question(this, "CONFIRM DELETE? (OPERATION NOT RECOVERABLE)", hintText,  //
                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
       != QMessageBox::Yes) {
@@ -194,9 +194,13 @@ bool CastDBView::onSubmit() {
     LOG_GOOD_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
     return true;
   }
+  const QModelIndex oldIndex = currentIndex();
   if (!_castModel->submitAll()) {
     LOG_WARN_NP("Submit failed", _castModel->lastError().text());
     return false;
+  }
+  if (oldIndex.isValid() && currentIndex() != oldIndex) {
+    setCurrentIndex(oldIndex);
   }
   LOG_GOOD_NP("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
   return true;
@@ -215,6 +219,13 @@ bool CastDBView::onRevert() {
 int CastDBView::onLoadFromPsonDirectory() {
   if (_castModel->isDirty()) {
     LOG_BAD_NP("Table dirty", "submit before load pson");
+    return 0;
+  }
+  const QString hintText{"Risk: records in database will be override if differs from local pson file."};
+  if (QMessageBox::question(this, "CONFIRM Load from pson? (OVERRIDE NOT RECOVERABLE)", hintText,  //
+                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
+      != QMessageBox::Yes) {
+    LOG_GOOD_NP("[Skip] User cancel load records from pson", "return");
     return 0;
   }
   int succeedCnt = _castDb.LoadFromPsonFile(mImageHost);
