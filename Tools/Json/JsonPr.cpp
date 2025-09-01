@@ -83,7 +83,7 @@ QByteArray JsonPr::GetJsonBA() const {
 int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles) {
   QString newJsonName{newJsonNameUserInput};
   QString newJsonBaseName{newJsonName};
-  if (!newJsonName.endsWith(JsonHelper::JSON_EXT)) {
+  if (!newJsonName.endsWith(JsonHelper::JSON_EXT, Qt::CaseInsensitive)) {
     newJsonName += JsonHelper::JSON_EXT;
   } else {
     newJsonBaseName.chop(JsonHelper::JSON_EXT_LENGTH);
