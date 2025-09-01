@@ -70,6 +70,8 @@ class FileBasicOperationsActions : public QObject {
   QAction *MERGE{nullptr}, *MERGE_REVERSE{nullptr};
   QActionGroup* FOLDER_MERGE{nullptr};
 
+  QAction* _TS_FILES_MERGE{nullptr};
+
   QAction *SELECT_ALL{nullptr}, *SELECT_NONE{nullptr}, *SELECT_INVERT{nullptr};
   QActionGroup* SELECTION_RIBBONS{nullptr};
 

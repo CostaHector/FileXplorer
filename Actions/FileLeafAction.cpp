@@ -1,25 +1,22 @@
 ﻿#include "FileLeafAction.h"
 #include "MemoryKey.h"
 #include "PublicVariable.h"
-
+#include "PublicMacro.h"
 FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _SETTINGS = new (std::nothrow) QAction{QIcon(":img/SETTINGS"), "Settings"};
-  if (_SETTINGS == nullptr) {
-    qCritical("_ALERT_ITEMS is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(_SETTINGS);
+  _SETTINGS->setCheckable(true);
+  _SETTINGS->setShortcutVisibleInContextMenu(true);
+  _SETTINGS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_SETTINGS->text(), _SETTINGS->shortcut().toString()));
+
 
   _ABOUT_FILE_EXPLORER = new (std::nothrow) QAction{QIcon(":img/ABOUT"), "About"};
-  if (_ABOUT_FILE_EXPLORER == nullptr) {
-    qCritical("_ABOUT_FILE_EXPLORER is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(_ABOUT_FILE_EXPLORER);
 
   _LANUAGE = new (std::nothrow) QAction{QIcon(":img/LANGUAGE"), "Language"};
-  if (_LANUAGE == nullptr) {
-    qCritical("_LANUAGE is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(_LANUAGE);
+  _LANUAGE->setCheckable(true);
+  _LANUAGE->setChecked(Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
 
   _LEAF_FILE = GetLeafTabActions();
   if (_LEAF_FILE == nullptr) {
@@ -30,18 +27,7 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
 
 QActionGroup* FileLeafActions::GetLeafTabActions() {
   auto* leafFile{new (std::nothrow) QActionGroup(nullptr)};
-  if (leafFile == nullptr) {
-    qCritical("_LANUAGE is nullptr");
-    return nullptr;
-  }
-
-  _SETTINGS->setCheckable(true);
-  _SETTINGS->setShortcutVisibleInContextMenu(true);
-  _SETTINGS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_SETTINGS->text(), _SETTINGS->shortcut().toString()));
-
-  _LANUAGE->setCheckable(true);
-  _LANUAGE->setChecked(Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
-
+  CHECK_NULLPTR_RETURN_NULLPTR(leafFile)
   leafFile->addAction(_SETTINGS);
   leafFile->addAction(_ABOUT_FILE_EXPLORER);
   leafFile->addAction(_LANUAGE);

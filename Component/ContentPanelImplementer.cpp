@@ -12,11 +12,36 @@ int ViewsStackedWidget::AddView(ViewType vt, QWidget* w) {
   return m_name2ViewIndex[vt] = addWidget(w);
 }
 
+bool ViewsStackedWidget::hasSelection() const {
+  auto vt = GetVt();
+  switch (vt) {
+    case ViewType::LIST:
+      return m_fsListView->selectionModel()->hasSelection();
+    case ViewType::TABLE:
+      return m_fsTableView->selectionModel()->hasSelection();
+    case ViewType::TREE:
+      return m_fsTreeView->selectionModel()->hasSelection();
+    case ViewType::SEARCH:
+      return m_advanceSearchView->selectionModel()->hasSelection();
+    case ViewType::MOVIE:
+      return m_movieView->selectionModel()->hasSelection();
+    case ViewType::SCENE:
+      return m_sceneTableView->selectionModel()->hasSelection();
+    case ViewType::CAST:
+      return m_castTableView->selectionModel()->hasSelection();
+    case ViewType::JSON:
+      return m_jsonTableView->selectionModel()->hasSelection();
+    default:
+      qWarning("No SelectedRows in ViewType[%d]", int(vt));
+      return false;
+  }
+}
+
 QString ViewsStackedWidget::getRootPath() const {
   auto vt = GetVt();
   switch (vt) {
-    case ViewType::TABLE:
     case ViewType::LIST:
+    case ViewType::TABLE:
     case ViewType::TREE:
     case ViewType::SEARCH:
     case ViewType::SCENE:

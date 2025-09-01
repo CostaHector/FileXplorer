@@ -245,7 +245,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->trigger();
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
-      emit g_viewActions()._HAR_VIEW->trigger();
+      emit g_viewActions()._HAR_VIEW->triggered();
       return true;
     }
     return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
