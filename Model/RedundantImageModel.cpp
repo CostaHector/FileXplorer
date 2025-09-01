@@ -5,8 +5,11 @@
 
 const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview", "absPath"};
 
+RedundantImageModel:: RedundantImageModel(QObject* parent) //
+  : QAbstractTableModelPub{parent} { }
+
 QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
-  if (m_paf == nullptr or not index.isValid()) {
+  if (m_paf == nullptr || !index.isValid()) {
     return {};
   }
   const REDUNDANT_IMG_INFO& item = m_paf->operator[](index.row());

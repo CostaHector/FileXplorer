@@ -5,24 +5,32 @@
 #include <QDirIterator>
 
 QString RedunImgLibs::GetRedunPath() {
-  QString redunPath = Configuration().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.v).toString();
-  return redunPath;
+  return Configuration().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.v).toString();
+}
+
+bool RedunImgLibs::mBInited{false};
+RedunImgLibs& RedunImgLibs::GetInst(const QString& benchMarkPath) {
+  static RedunImgLibs redunLibs;
+  if (!mBInited) {
+    redunLibs.LearnSizeAndHashFromRedunImgPath(benchMarkPath);
+    mBInited = true;
+  }
+  return redunLibs;
 }
 
 int RedunImgLibs::LearnSizeAndHashFromRedunImgPath(const QString& folderPath) {
-  qDebug("Benchmark redundant images located in [%s]", qPrintable(folderPath));
+  qDebug("Benchmark RedundantImage located in [%s]", qPrintable(folderPath));
   int filesCnt = 0;
   QDirIterator it{folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
-    QFileInfo imgFi{it.next()};
-    const QString fileAbsPath = imgFi.absoluteFilePath();
-    const qint64 sz = imgFi.size();
-    m_commonFileSizeSet.insert(sz);
+    const QString fileAbsPath = it.next();
+    const qint64 sz = QFile{fileAbsPath}.size();
     const QString& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
+    m_commonFileSizeSet.insert(sz);
     m_commonFileHash.insert(md5);
     ++filesCnt;
   }
-  qDebug("redundant image info size[%d] and hash[%d]", m_commonFileSizeSet.size(), m_commonFileHash.size());
+  qDebug("RedundantImage sizeSet count[%d] and hashSet count[%d]", m_commonFileSizeSet.size(), m_commonFileHash.size());
   return filesCnt;
 }
 
