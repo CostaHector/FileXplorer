@@ -1,14 +1,15 @@
 ﻿#ifndef REDUNDANTIMAGEFINDER_H
 #define REDUNDANTIMAGEFINDER_H
 
-#include "RedundantImageModel.h"
 #include "CustomTableView.h"
+#include "RedundantImageModel.h"
 #include <QMainWindow>
+#include <QToolButton>
+#include <QToolBar>
 
 class RedundantImageFinder : public QMainWindow {
- public:
+public:
   explicit RedundantImageFinder(QWidget* parent = nullptr);
-  ~RedundantImageFinder() = default;
   void ReadSetting();
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
@@ -21,15 +22,18 @@ class RedundantImageFinder : public QMainWindow {
 
   void ChangeWindowTitle(const QString& rootPath);
 
- private:
+private:
+  void whenModeChanged();
   void UpdateDisplayWhenRecycled();
-
+  QToolButton* mFindImgByTb{nullptr};
+  QToolBar* m_toolBar{nullptr};
   REDUNDANT_IMG_BUNCH m_imgsBunch;
 
   RedundantImageModel* m_imgModel{nullptr};
   CustomTableView* m_table{nullptr};
   QString mCurrentPath;
-  static RedunImgLibs mRedunLibs;
+  void setResultAlsoContainEmptyImage(bool alsoContain) { mResultAlsoContainEmptyImage = alsoContain; }
+  bool mResultAlsoContainEmptyImage;
 };
 
 #endif  // REDUNDANTIMAGEFINDER_H
