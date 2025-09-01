@@ -337,28 +337,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
   nameRulerToolButton->setDefaultAction(fileOpAgInst._NAME_RULER);
 
-  auto& thumbnailIns = g_ThumbnailProcessActions();
-  QList<QAction*> crtThumbnailActions;
-  crtThumbnailActions += thumbnailIns._CREATE_THUMBNAIL_AG->actions();
-  crtThumbnailActions.push_back(nullptr);
-  crtThumbnailActions.push_back(thumbnailIns._THUMBNAIL_SAMPLE_PERIOD);
-  auto* createThumbnailToolButton =
-      new (std::nothrow) DropdownToolButton{crtThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
-  CHECK_NULLPTR_RETURN_NULLPTR(createThumbnailToolButton);
-  createThumbnailToolButton->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name, MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.v).toString());
-  createThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name);
-
-  QList<QAction*> extractThumbnailActions;
-  extractThumbnailActions += thumbnailIns._EXTRACT_THUMBNAIL_AG->actions();
-  extractThumbnailActions.push_back(nullptr);
-  extractThumbnailActions.push_back(thumbnailIns._CUSTOM_RANGE_IMGS);
-  extractThumbnailActions.push_back(nullptr);
-  extractThumbnailActions.push_back(thumbnailIns._SKIP_IF_ALREADY_EXIST);
-  auto* extractThumbnailToolButton =
-      new (std::nothrow) DropdownToolButton{extractThumbnailActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16};
-  CHECK_NULLPTR_RETURN_NULLPTR(extractThumbnailToolButton);
-  extractThumbnailToolButton->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
-  extractThumbnailToolButton->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
+  auto& thumbInst = g_ThumbnailProcessActions();
+  auto* thumbnailTb = thumbInst.GetThumbnailToolbar();
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar{"Leaf Arrange Files"}};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
@@ -375,8 +355,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addWidget(createThumbnailToolButton);
-  archiveVidsTB->addWidget(extractThumbnailToolButton);
+  archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
+  archiveVidsTB->addWidget(thumbnailTb);
   return archiveVidsTB;
 }
 

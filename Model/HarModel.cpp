@@ -1,5 +1,8 @@
 #include "HarModel.h"
 #include "DisplayEnhancement.h"
+
+const QStringList HarModel::HAR_VERTICAL_HEAD {"Name", "Size(Byte)", "Type", "Url"};
+
 HarModel::HarModel(QObject* parent) : QAbstractTableModelPub{parent} {}
 
 QVariant HarModel::data(const QModelIndex& index, int role) const {

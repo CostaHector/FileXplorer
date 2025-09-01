@@ -60,6 +60,9 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   MERGE_REVERSE = new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), "Merge to back");
   FOLDER_MERGE = FolderMergeActions();
 
+  _TS_FILES_MERGE = new (std::nothrow) QAction(QIcon(":img/TS_FILES_MERGE"), "Merged ts files");
+  _TS_FILES_MERGE->setToolTip("Merge at least 2 selected ts files into a large one");
+
   SELECT_ALL = new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all");
   SELECT_NONE = new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none");
   SELECT_INVERT = new (std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), "Invert selection");

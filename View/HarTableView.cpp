@@ -6,23 +6,29 @@
 #include <QLabel>
 
 HarTableView::HarTableView(QWidget* parent)
-    : CustomTableView{"HAR_TABLEVIEW", parent},
-      mHarModel{new HarModel{this}},                      // .har file model
-      mSortProxyModel{new QSortFilterProxyModel{this}} {  // for sort
+  : CustomTableView{"HAR_TABLEVIEW", parent} {
+  mHarModel = new (std::nothrow) HarModel{this};                      // .har file model
+  CHECK_NULLPTR_RETURN_VOID(mHarModel)
+  mSortProxyModel = new (std::nothrow) QSortFilterProxyModel{this};  // for sort
+  CHECK_NULLPTR_RETURN_VOID(mSortProxyModel)
   mSortProxyModel->setSourceModel(mHarModel);
   setModel(mSortProxyModel);
+
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   InitTableView();
 
-  mEXPORT_TO = new (std::nothrow) QAction{QIcon{":img/EXPORT_TO"}, "Export to", this};
+  mEXPORT_TO = new (std::nothrow) QAction{QIcon{":img/EXPORT_TO"}, "Export Selections to", this};
+  CHECK_NULLPTR_RETURN_VOID(mEXPORT_TO)
   mEXPORT_TO->setToolTip(QString("<b>%1</b><br/> Export the selection items to local path.").arg(mEXPORT_TO->text()));
 
   mShowImagePreview = Configuration().value(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, MemoryKey::SHOW_HAR_IMAGE_PREVIEW.v).toBool();
-  mQUICK_PREVIEW = new (std::nothrow) QAction{"Quick Preview", this};
+  mQUICK_PREVIEW = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "Enable Images Preview", this};
+  CHECK_NULLPTR_RETURN_VOID(mQUICK_PREVIEW)
   mQUICK_PREVIEW->setCheckable(true);
   mQUICK_PREVIEW->setChecked(mShowImagePreview);
 
-  mMenu = new QMenu{"Har Operation Menu", this};
+  mMenu = new (std::nothrow) QMenu{"Har Operation Menu", this};
+  CHECK_NULLPTR_RETURN_VOID(mMenu)
   mMenu->addAction(mEXPORT_TO);
   mMenu->addAction(mQUICK_PREVIEW);
   mMenu->setToolTipsVisible(true);
@@ -31,6 +37,8 @@ HarTableView::HarTableView(QWidget* parent)
   subscribe();
   updateWindowsSize();
   setWindowTitle(GetWinTitleStr());
+  setWindowFlags(Qt::Window);
+  setAttribute(Qt::WA_DeleteOnClose, true);
 }
 
 QString HarTableView::GetWinTitleStr(const QString& harFile) const {
@@ -50,10 +58,7 @@ int HarTableView::operator()(const QString& harAbsPath) {
 
 void HarTableView::subscribe() {
   connect(mEXPORT_TO, &QAction::triggered, this, &HarTableView::SaveSelectionFilesTo);
-  connect(mQUICK_PREVIEW, &QAction::triggered, this, [this](const bool bChecked) {
-    mShowImagePreview = bChecked;
-    Configuration().setValue(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, bChecked);
-  });
+  connect(mQUICK_PREVIEW, &QAction::triggered, this, [this](const bool bChecked) { mShowImagePreview = bChecked; });
   connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &HarTableView::PreviewImage);
 }
 
@@ -85,6 +90,7 @@ bool HarTableView::PreviewImage() {
   const QModelIndex srcIndex = mSortProxyModel->mapToSource(currentIndex());
   const int srcRow = srcIndex.row();
   const auto& entryItem = mHarModel->GetHarEntryItem(srcRow);
+  static const QSet<QString> IMAGE_PREVIEW_SUPPORTED {".jpeg", ".jpg", ".png", ".webp", ".gif", "tif", "tiff"};
   if (!IMAGE_PREVIEW_SUPPORTED.contains(entryItem.type)) {
     qDebug("file type[%s] cannot preview", qPrintable(entryItem.type));
     return true;
@@ -97,8 +103,11 @@ bool HarTableView::PreviewImage() {
     return false;
   }
   if (mPreviewLabel == nullptr) {
-    mPreviewLabel = new QLabel{nullptr};
+    mPreviewLabel = new QLabel{this};
+    mPreviewLabel->setWindowFlags(Qt::Window);
+    mPreviewLabel->setAttribute(Qt::WA_DeleteOnClose);
     mPreviewLabel->move(geometry().x() + width(), geometry().y());
+    mPreviewLabel->setMinimumSize(600, 400);
   }
   mPreviewLabel->setPixmap(QPixmap::fromImage(image));
   mPreviewLabel->setWindowTitle(QString("%1 | %2 Byte(s)").arg(fileName).arg(entryItem.content.size()));
@@ -122,19 +131,6 @@ void HarTableView::showEvent(QShowEvent *event) {
 
 void HarTableView::closeEvent(QCloseEvent* event) {
   Configuration().setValue("HAR_TABLEVIEW_GEOMETRY", saveGeometry());
-  mPreviewLabel->close();
+  Configuration().setValue(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, mShowImagePreview);
   CustomTableView::closeEvent(event);
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  auto* m_model = new HarModel;
-  HarTableView win{m_model, nullptr};
-  win("E:/har261/RAM261.har");
-  win.show();
-  return a.exec();
-}
-#endif

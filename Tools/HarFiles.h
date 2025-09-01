@@ -13,12 +13,8 @@ struct HAR_FILE_ITEM {
   QString url;
 };
 
-const QStringList HAR_VERTICAL_HEAD {"Name", "Size(Byte)", "Type", "Url"};
-const QSet<QString> IMAGE_PREVIEW_SUPPORTED {".jpeg", ".jpg", ".png", ".webp"};
-
-class HarFiles
-{
- public:
+class HarFiles {
+public:
   HarFiles();
   void init();
   int size() const {return mHarItems.size();}
@@ -28,7 +24,7 @@ class HarFiles
   bool operator()(const QString& harAbsPath);
   int SaveToLocal(QString dstRootpath = "", const QList<int>& selectedRows = {});
   static bool IsHarFile(const QFileInfo& fi);
- private:
+private:
   QString mHarFilePath;
   QList<HAR_FILE_ITEM> mHarItems;
   static const QMap<QString, QString> SUPPORTED_MIMETYPES;
