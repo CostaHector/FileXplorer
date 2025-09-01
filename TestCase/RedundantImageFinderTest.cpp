@@ -2,7 +2,10 @@
 #include <QtTest>
 #include "MyTestSuite.h"
 #include "TDir.h"
+
+#include "BeginToExposePrivateMember.h"
 #include "RedunImgLibs.h"
+#include "EndToExposePrivateMember.h"
 
 const auto GetNames = [](const REDUNDANT_IMG_BUNCH& imgs) -> QStringList {
   QStringList imgNames;
@@ -15,13 +18,13 @@ const auto GetNames = [](const REDUNDANT_IMG_BUNCH& imgs) -> QStringList {
 
 class RedundantImageFinderTest : public MyTestSuite {
   Q_OBJECT
- public:
-  RedundantImageFinderTest() : MyTestSuite{false} {}
+public:
+  RedundantImageFinderTest() : MyTestSuite{true} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   const QString mBenchmarkRedunFolder{mWorkPath + "/benchmark"};
   const QString mFolderToFindRedun{mWorkPath + "/ToFindRedun"};
- private slots:
+private slots:
   void initTestCase() {
     QVERIFY(mDir.IsValid());
     const QList<FsNodeEntry> gNode{
@@ -63,8 +66,7 @@ class RedundantImageFinderTest : public MyTestSuite {
 
   void test_redundant_images_in_library_find_ok() {
     // procedure
-    RedunImgLibs redunImgLib;
-    QCOMPARE(redunImgLib.LearnSizeAndHashFromRedunImgPath(mBenchmarkRedunFolder), 3);  // 3 files
+    RedunImgLibs& redunImgLib = RedunImgLibs::GetInst(mBenchmarkRedunFolder);
     QCOMPARE(redunImgLib.m_commonFileHash.size(), 2);                                  // hash {hash1, hash1, hash2}
     QCOMPARE(redunImgLib.m_commonFileSizeSet.size(), 1);                               // size {3,3,3}
 
@@ -75,7 +77,7 @@ class RedundantImageFinderTest : public MyTestSuite {
                  mFolderToFindRedun + "/bRedun.png",  //
                  mFolderToFindRedun + "/cEmpty.webp",
              })  //
-    );
+             );
 
     const auto& itemsEmptyNotRedun = redunImgLib.FindRedunImgs(mFolderToFindRedun, false);
     QCOMPARE(GetNames(itemsEmptyNotRedun),  //
@@ -83,7 +85,7 @@ class RedundantImageFinderTest : public MyTestSuite {
                  mFolderToFindRedun + "/aRedun.jpg",  //
                  mFolderToFindRedun + "/bRedun.png",  //
              })                                       //
-    );                                                //
+             );                                                //
   }
 };
 
