@@ -3,6 +3,7 @@
 
 #include <QAction>
 #include <QActionGroup>
+#include <QToolBar>
 
 struct ThumbnailDimension {
   int x;
@@ -34,6 +35,8 @@ class ThumbnailProcessActions : public QObject {
   QMap<QAction*, ThumbnailExtractIndexRange> mExtractThumbnailRange;
   QAction* _CUSTOM_RANGE_IMGS{nullptr};
   QAction* _SKIP_IF_ALREADY_EXIST{nullptr};
+
+  QToolBar* GetThumbnailToolbar(QWidget* parent = nullptr);
 };
 
 ThumbnailProcessActions& g_ThumbnailProcessActions();

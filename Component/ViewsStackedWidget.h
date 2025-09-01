@@ -66,6 +66,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
   int AddView(ViewTypeTool::ViewType vt, QWidget* w);
 
+  bool hasSelection() const;
   QString getRootPath() const;
   QString getFilePath(const QModelIndex& ind) const;
   QModelIndexList getSelectedRows() const;
