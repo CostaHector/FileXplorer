@@ -88,7 +88,10 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
     if (mPixCache.find(mDataLst[rw], &pm)) {
       return pm;
     }
-    pm = QPixmap{mDataLst[rw]};
+    if (QFile(mDataLst[rw]).size() > 10 * 1024 * 1024) { // 10MB
+      return {}; // files too large
+    }
+    pm.load(mDataLst[rw]);
     // w/h > 480/280 = 48 / 28 = 12 / 7
     if (pm.width() * IMAGE_SIZE::IMG_HEIGHT >= pm.height() * IMAGE_SIZE::IMG_WIDTH) {
       pm = pm.scaledToWidth(IMAGE_SIZE::IMG_WIDTH);

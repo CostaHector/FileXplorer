@@ -11,17 +11,19 @@ struct REDUNDANT_IMG_INFO {
 
 typedef QList<REDUNDANT_IMG_INFO> REDUNDANT_IMG_BUNCH;
 
-struct RedunImgLibs {
+class RedunImgLibs {
+public:
   static REDUNDANT_IMG_BUNCH FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty = true);
-
-  RedunImgLibs(const QString& libPath = "") : m_libPath{libPath} {}
   static QString GetRedunPath();
-  int ReadLib();
-  int WriteLib();
-  int LearnSizeAndHashFromRedunImgPath(const QString& folderPath);
+  static RedunImgLibs& GetInst(const QString& benchMarkPath = "");
+
   REDUNDANT_IMG_BUNCH FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty = true);
-  const QString m_libPath;
+private:
+  RedunImgLibs() = default;
+  int LearnSizeAndHashFromRedunImgPath(const QString& folderPath);
+
   QSet<qint64> m_commonFileSizeSet;
   QSet<QString> m_commonFileHash;
+  static bool mBInited;
 };
 #endif  // REDUNIMGLIBS_H
