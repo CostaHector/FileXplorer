@@ -81,6 +81,7 @@ class CustomTableView : public QTableView {
 
   inline bool isNameExists(const QString& name) const { return TABLES_SET.contains(name); }
   static QSet<QString> TABLES_SET;
+  static QSet<QString> SETTING_SHARING_WIDGET;
 };
 
 #endif  // CUSTOMTABLEVIEW_H

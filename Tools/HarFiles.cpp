@@ -10,12 +10,12 @@
 #include <QJsonObject>
 
 const QMap<QString, QString> HarFiles::SUPPORTED_MIMETYPES = {{"image/webp", ".webp"}, {"image/jpeg", ".jpeg"},  // *.jpg files have two possible extensions
-                                                                     {"image/jpeg", ".jpg"},                            //   (but .jpeg is official and thus preferred)
-                                                                     {"image/png", ".png"},   {"image/svg+xml", ".svg"}, {"image/avif", ".avif"},
-                                                                     {"image/bmp", ".bmp"},   {"image/gif", ".gif"},     {"image/vnd.microsoft.icon", ".ico"},
-                                                                     {"image/tiff", ".tif"},   // *.tiff files have two possible extensions
-                                                                     {"image/tiff", ".tiff"},  //   (but .tiff is what I know and prefer)
-                                                                     {"video/mp2t", ".ts"}};
+                                                              {"image/jpeg", ".jpg"},                            //   (but .jpeg is official and thus preferred)
+                                                              {"image/png", ".png"},   {"image/svg+xml", ".svg"}, {"image/avif", ".avif"},
+                                                              {"image/bmp", ".bmp"},   {"image/gif", ".gif"},     {"image/vnd.microsoft.icon", ".ico"},
+                                                              {"image/tiff", ".tif"},   // *.tiff files have two possible extensions
+                                                              {"image/tiff", ".tiff"},  //   (but .tiff is what I know and prefer)
+                                                              {"video/mp2t", ".ts"}};
 
 HarFiles::HarFiles() {}
 

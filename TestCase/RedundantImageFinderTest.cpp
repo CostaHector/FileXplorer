@@ -19,7 +19,7 @@ const auto GetNames = [](const REDUNDANT_IMG_BUNCH& imgs) -> QStringList {
 class RedundantImageFinderTest : public MyTestSuite {
   Q_OBJECT
 public:
-  RedundantImageFinderTest() : MyTestSuite{true} {}
+  RedundantImageFinderTest() : MyTestSuite{false} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   const QString mBenchmarkRedunFolder{mWorkPath + "/benchmark"};

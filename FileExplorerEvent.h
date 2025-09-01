@@ -14,7 +14,6 @@ class PropertiesWindow;
 class DuplicateVideosFinder;
 class RedundantImageFinder;
 class Archiver;
-class HarTableView;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
@@ -109,13 +108,10 @@ class FileExplorerEvent : public QObject {
   CustomStatusBar* _logger{nullptr};
   QClipboard* m_clipboard{nullptr};
 
-  AlertSystem* m_alertSystem{nullptr};
+  AlertSystem* m_settingSys{nullptr};
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};
-
-  HarTableView* m_harTableview{nullptr};
-
  private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten
   static bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction);
