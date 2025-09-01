@@ -8,8 +8,9 @@
 #include <QLabel>
 
 class HarTableView : public CustomTableView {
- public:
+public:
   explicit HarTableView(QWidget* parent = nullptr);
+  ~HarTableView() = default;
   int operator()(const QString& harAbsPath);
   void subscribe();
   int SaveSelectionFilesTo() const;
@@ -18,12 +19,12 @@ class HarTableView : public CustomTableView {
   void updateWindowsSize();
   void showEvent(QShowEvent *event) override;
   void closeEvent(QCloseEvent* event) override;
- private:
+private:
   QString GetWinTitleStr(const QString& harFile={}) const;
   QString mHarAbsPath;
   bool mShowImagePreview;
-  HarModel* mHarModel;
-  QSortFilterProxyModel *mSortProxyModel;
+  HarModel* mHarModel{nullptr};
+  QSortFilterProxyModel* mSortProxyModel{nullptr};
   QMenu *mMenu {nullptr};
   QAction *mEXPORT_TO {nullptr};
   QAction *mQUICK_PREVIEW{nullptr};

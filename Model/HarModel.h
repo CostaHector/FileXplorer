@@ -44,6 +44,7 @@ class HarModel : public QAbstractTableModelPub {
  private:
   HarFiles mHarParser;
   QFileIconProvider m_iconProvider;
+  static const QStringList HAR_VERTICAL_HEAD;
 };
 
 #endif // HARMODEL_H

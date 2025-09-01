@@ -265,12 +265,12 @@ bool FileExplorerEvent::on_properties() const {
 }
 
 void FileExplorerEvent::on_settings(const bool checked) {
-  if (m_alertSystem == nullptr) {
-    m_alertSystem = PopupHideWidget<AlertSystem>(m_alertSystem, checked, _contentPane);
+  if (m_settingSys == nullptr) {
+    m_settingSys = PopupHideWidget<AlertSystem>(m_settingSys, checked, _contentPane);
   }
-  CHECK_NULLPTR_RETURN_VOID(m_alertSystem)
+  CHECK_NULLPTR_RETURN_VOID(m_settingSys)
   if (checked) {                                                                       //
-    (*m_alertSystem)(_contentPane->getRootPath());                                     //
+    (*m_settingSys)(_contentPane->getRootPath());                                     //
   }                                                                                    //
 }
 
@@ -282,7 +282,7 @@ void FileExplorerEvent::subsribeCompress() {
 }
 
 void FileExplorerEvent::subsribeFileActions() {
-  connect(g_fileLeafActions()._SETTINGS, &QAction::triggered, this, &FileExplorerEvent::on_settings);
+  connect(g_fileLeafActions()._SETTINGS, &QAction::toggled, this, &FileExplorerEvent::on_settings);
 
   connect(g_fileLeafActions()._ABOUT_FILE_EXPLORER, &QAction::triggered, this, [this]() {
     QMessageBox::about(_contentPane, "FileExplorer",
@@ -847,7 +847,7 @@ auto FileExplorerEvent::on_SelectInvert() -> void {
 
 bool FileExplorerEvent::on_HarView() {
   const QString& fileAbsPath = _contentPane->getCurFilePath();
-  if (!fileAbsPath.toLower().endsWith(".har")) {
+  if (!fileAbsPath.endsWith(".har", Qt::CaseInsensitive)) {
     LOG_WARN_NP("File extension is not .har", fileAbsPath);
     return false;
   }
@@ -855,12 +855,11 @@ bool FileExplorerEvent::on_HarView() {
     LOG_WARN_NP("Har file not exist", fileAbsPath);
     return false;
   }
-  if (m_harTableview == nullptr) {
-    m_harTableview = new (std::nothrow) HarTableView{_contentPane};
-  }
-  m_harTableview->operator()(fileAbsPath);
-  m_harTableview->show();
-  m_harTableview->raise();
+  auto* harTableview = new (std::nothrow) HarTableView{_contentPane};
+  CHECK_NULLPTR_RETURN_FALSE(harTableview);
+  harTableview->operator()(fileAbsPath);
+  harTableview->raise();
+  harTableview->show();
   return true;
 }
 
