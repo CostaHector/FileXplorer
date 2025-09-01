@@ -3,6 +3,8 @@
 
 #include <QTabWidget>
 #include <QToolBar>
+#include "ViewTypeTool.h"
+
 class LogFloatingPreviewer;
 
 class RibbonMenu : public QTabWidget {
@@ -15,15 +17,15 @@ class RibbonMenu : public QTabWidget {
   QToolBar* LeafView() const;
   QToolBar* LeafMovie() const;
   QToolBar* LeafCast() const;
-  QToolBar* LeafJson() const;
   QToolBar* LeafScenesTools() const;
+  QToolBar* LeafJson() const;
   QToolBar* LeafMediaTools() const;
 
   void Subscribe();
 
   void on_officeStyleWidgetVisibilityChanged(const bool vis);
   void on_currentTabChangedRecordIndex(const int tabIndex);
-
+  void whenViewTypeChanged(ViewTypeTool::ViewType vt);
  private:
   LogFloatingPreviewer* m_logPrev{nullptr};
   QToolBar* m_corner{nullptr};
@@ -33,10 +35,11 @@ class RibbonMenu : public QTabWidget {
   QToolBar* m_leafView{nullptr};
   QToolBar* m_leafMovie{nullptr};
   QToolBar* m_leafCast{nullptr};
-  QToolBar* m_leafJson{nullptr};
   QToolBar* m_leafScenes{nullptr};
+  QToolBar* m_leafJson{nullptr};
   QToolBar* m_leafMedia{nullptr};
 
+  int mViewType2LeafTabIndex[(int)ViewTypeTool::ViewType::VIEW_TYPE_BUTT] {0};
   static constexpr int MAX_WIDGET_HEIGHT = 400;
 };
 
