@@ -9,6 +9,7 @@
 #include "VideoPlayerActions.h"
 #include "ViewActions.h"
 #include "ThumbnailProcessActions.h"
+#include "TSFilesMerger.h"
 
 #include "AlertSystem.h"
 #include "Archiver.h"
@@ -394,6 +395,7 @@ void FileExplorerEvent::subscribe() {
 
     connect(fileOpInst.MERGE, &QAction::triggered, this, [this]() { on_Merge(false); });
     connect(fileOpInst.MERGE_REVERSE, &QAction::triggered, this, [this]() { on_Merge(true); });
+    connect(fileOpInst._TS_FILES_MERGE, &QAction::triggered, this, &FileExplorerEvent::on_TsFilesMerge);
 
     connect(fileOpInst._MOVE_TO, &QAction::triggered, this, [this]() { this->on_MoveTo(); });
     connect(fileOpInst._COPY_TO, &QAction::triggered, this, [this]() { this->on_CopyTo(); });
@@ -846,9 +848,13 @@ auto FileExplorerEvent::on_SelectInvert() -> void {
 }
 
 bool FileExplorerEvent::on_HarView() {
+  if (!_contentPane->hasSelection()) {
+    LOG_INFO_NP("Nothing selected", "return");
+    return false;
+  }
   const QString& fileAbsPath = _contentPane->getCurFilePath();
   if (!fileAbsPath.endsWith(".har", Qt::CaseInsensitive)) {
-    LOG_WARN_NP("File extension is not .har", fileAbsPath);
+    LOG_INFO_NP("File extension is not .har", fileAbsPath);
     return false;
   }
   if (!QFile::exists(fileAbsPath)) {
@@ -923,6 +929,32 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   }
   LOG_GOOD_NP("[Ok] Merged", msg);
   return true;
+}
+
+void FileExplorerEvent::on_TsFilesMerge() {
+  auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::isFSView(vt)) {
+    LOG_WARN_NP("[Skip] Current view type not support ts merge", ViewTypeTool::c_str(vt));
+    return;
+  }
+  if (!_contentPane->hasSelection()) {
+    LOG_INFO_P("[Skip] User select nothing", "return");
+    return;
+  }
+  const QStringList& tsNames = _contentPane->getFileNames();
+  if (tsNames.size() < 2) {
+    LOG_INFO_P("[Skip] User select too less file", "%d file", tsNames.size());
+    return;
+  }
+  const QString& currentPath = _contentPane->getRootPath();
+  bool mergeResult{false};
+  QString largeTsAbsFilePath;
+  std::tie(mergeResult, largeTsAbsFilePath) = TSFilesMerger::mergeTsFiles(currentPath, tsNames);
+  if (!mergeResult) {
+    LOG_BAD_P("[Failed] Merge ts file failed", "User selected %d file(s)", mergeResult);
+    return;
+  }
+  LOG_BAD_P("[Ok] Merge ts file succeed", "%d file(s) to\n%s", mergeResult, qPrintable(largeTsAbsFilePath));
 }
 
 bool FileExplorerEvent::on_Copy() {

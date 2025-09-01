@@ -115,6 +115,7 @@
 <file alias="SHOW_CAST_STUDIO_STATISTIC">FileOperation/SHOW_CAST_STUDIO_STATISTIC.svg</file>
 <file alias="FOLDER_MERGE_TO_FIRST">FileOperation/FOLDER_MERGE_TO_FIRST.svg</file>
 <file alias="FOLDER_MERGE_TO_LAST">FileOperation/FOLDER_MERGE_TO_LAST.svg</file>
+<file alias="TS_FILES_MERGE">FileOperation/TS_FILES_MERGE.svg</file>
 <file alias="NEW_FILE_FOLDER_PATH">FileOperation/NEW.svg</file>
 <file alias="NEW_FOLDER">FileOperation/NEW_FOLDER.svg</file>
 <file alias="NEW_FOLDERS">FileOperation/NEW_FOLDERS.svg</file>
