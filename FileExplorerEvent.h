@@ -84,6 +84,8 @@ class FileExplorerEvent : public QObject {
   bool on_PlayVideo() const;
 
   bool on_Merge(const bool reverse = false);
+  void on_TsFilesMerge();
+
   bool on_Copy();
   bool on_Cut();
   bool on_Paste();
