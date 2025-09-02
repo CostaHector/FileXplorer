@@ -165,16 +165,36 @@ linux {
 }
 ```
 
-## Add this application to file system view
+## Add this application to file system context menu
 
 ### For windows user
-Just open regedit, and in following path
-`Computer\HKEY_CLASSES_ROOT\Directory\Background\shell\`
-New a key "FileXplorer" under "shell";
-New a key "command" under "FileXplorer";
-Modify command (Default) value data to following string.
-`"C:\home\aria\code\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\FileXplorer.exe" "%V"`
 
+Way1: (Recommend)
+
+![Add a shortcut action to system right click context menu](bin/AddThisProgramToSystemContextMenu.png)
+
+```md
+In "File" Tab Widget;
+
+Click "System Menu/Add";
+
+In the popup UAC Window click allow this app to make changes;
+```
+
+Way2: 
+```md
+Open regedit;
+
+Into following path `Computer\HKEY_CLASSES_ROOT\Directory\Background\shell\`;
+
+New a key "FileXplorer" under "shell";
+
+New a key "command" under "FileXplorer";
+
+Modify command (Default) value data to following string;
+
+`"C:\home\aria\code\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\FileXplorer.exe" "%V"`
+```
 
 And don't forget to add "C:\Qt\5.15.2\mingw81_64\bin" to system environment path
 

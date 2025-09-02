@@ -23,7 +23,6 @@ public:
 
 private:
   void subsribeCompress();
-  void subsribeFileActions();
   void subscribeThumbnailActions();
 
   void onRename(AdvanceRenamer& renameWid);
@@ -57,7 +56,6 @@ private:
   bool on_calcMD5() const;
 
   bool on_properties() const;
-  void on_settings(const bool checked);
 
   bool on_revealInExplorer() const;
   bool on_OpenInTerminal() const;
