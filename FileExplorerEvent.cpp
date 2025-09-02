@@ -63,17 +63,13 @@
 
 using namespace ViewTypeTool;
 
-FileExplorerEvent* FileExplorerEvent::GetFileExlorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent) {
-  CHECK_NULLPTR_RETURN_NULLPTR(fsm)
-  CHECK_NULLPTR_RETURN_NULLPTR(view)
-  CHECK_NULLPTR_RETURN_NULLPTR(logger)
-  static FileExplorerEvent eve(fsm, view, logger, parent);
-  eve.subscribe();
-  return &eve;
-}
+FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger)
+  : QObject{view} {  //
 
-FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent)
-  : QObject{parent} {  //
+  CHECK_NULLPTR_RETURN_VOID(fsm)
+  CHECK_NULLPTR_RETURN_VOID(view)
+  CHECK_NULLPTR_RETURN_VOID(logger)
+
   _fileSysModel = fsm;
   _contentPane = view;
   _logger = logger;
@@ -954,7 +950,7 @@ void FileExplorerEvent::on_TsFilesMerge() {
     LOG_BAD_P("[Failed] Merge ts file failed", "User selected %d file(s)", mergeResult);
     return;
   }
-  LOG_BAD_P("[Ok] Merge ts file succeed", "%d file(s) to\n%s", mergeResult, qPrintable(largeTsAbsFilePath));
+  LOG_GOOD_P("[Ok] Merge ts file succeed", "%d file(s) to\n%s", mergeResult, qPrintable(largeTsAbsFilePath));
 }
 
 bool FileExplorerEvent::on_Copy() {
@@ -970,9 +966,7 @@ bool FileExplorerEvent::on_Copy() {
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
-  if (_logger != nullptr) {
-    _logger->msg(QString("%1 path(s) been copied").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
-  }
+  _logger->msg(QString("%1 path(s) been copied").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
   return true;
 }
 
@@ -988,9 +982,7 @@ bool FileExplorerEvent::on_Cut() {
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
-  if (_logger != nullptr) {
-    _logger->msg(QString("%1 path(s) been cut").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
-  }
+  _logger->msg(QString("%1 path(s) been cut").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
   return true;
 }
 
