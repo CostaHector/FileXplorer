@@ -11,8 +11,6 @@ class RightClickMenuActions : public QObject {
   QAction* _CALC_MD5_ACT{nullptr};
   QAction* _PROPERTIES{nullptr};
   QAction* _FORCE_REFRESH_FILESYSTEMMODEL{nullptr};
- signals:
-
 };
 RightClickMenuActions& g_rightClickActions();
 #endif // RIGHTCLICKMENUACTIONS_H

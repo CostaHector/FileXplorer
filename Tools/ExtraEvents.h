@@ -4,14 +4,19 @@
 #include <QWidget>
 
 class TorrentsManagerWidget;
+class ConfigsTable;
 class ExtraEvents : public QObject {
 public:
   explicit ExtraEvents(QWidget* parent = nullptr);
   void subscribe();
 private:
-  void on_showTorrentsManager(const bool checked);
   QWidget* parentWidget{nullptr};
+
+  void on_showTorrentsManager(const bool checked);
   TorrentsManagerWidget* mTorrentsManager{nullptr};
+
+  void on_settings(const bool checked);
+  ConfigsTable* m_settingSys{nullptr};
 };
 
 #endif  // EXTRAEVENTS_H
