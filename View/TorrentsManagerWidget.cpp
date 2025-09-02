@@ -9,46 +9,42 @@
 
 #include <QDesktopServices>
 #include <QFileDialog>
-#include <QHeaderView>
 #include <QMessageBox>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDateTime>
-
-#include <QVBoxLayout>
 #include <QDirIterator>
 #include <QInputDialog>
 
 TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
-    : QMainWindow{parent},
-      mDb{SystemPath::TORRENTS_DATABASE, "torrent_connection"},          //
-      m_searchLE{new QLineEdit(QString("Name like \"%\""))},             //
-      m_torrentsListView(new CustomTableView("TORRENT_TABLE", parent)),  //
-      m_torrentsCentralWidget(new QWidget),                              //
-      m_torrentsDBModel(nullptr)                                         //
-{
-  auto* mainLo = new (std::nothrow) QVBoxLayout{this};
-  CHECK_NULLPTR_RETURN_VOID(mainLo);
-  mainLo->addWidget(m_searchLE);
-  mainLo->addWidget(m_torrentsListView);
-  m_torrentsCentralWidget->setLayout(mainLo);
+  : QMainWindow{parent},
+  mDb{SystemPath::TORRENTS_DATABASE, "torrent_connection"} {
+  CHECK_NULLPTR_RETURN_VOID(parent);
 
   setMenuBar(g_torrActions().GetMenuBar());
-  setCentralWidget(m_torrentsCentralWidget);
+
+  m_searchToobar = new (std::nothrow) QToolBar{"search toolbar", this};
+  m_searchLE = new (std::nothrow) QLineEdit{"Name like \"%\"", m_searchToobar};
+  m_searchLE->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  m_searchToobar->addWidget(m_searchLE);
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_searchToobar);
 
   QSqlDatabase con = mDb.GetDb();
-  m_torrentsDBModel = new (std::nothrow) QSqlTableModel(this, con);
+  m_torrentsDBModel = new (std::nothrow) QSqlTableModel{this, con};
   CHECK_NULLPTR_RETURN_VOID(m_torrentsDBModel);
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
     m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
   }
   m_torrentsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
   m_torrentsDBModel->submitAll();
+
+  m_torrentsListView = new (std::nothrow) CustomTableView{"TORRENT_TABLE", this};
   m_torrentsListView->setModel(m_torrentsDBModel);
+  setCentralWidget(m_torrentsListView);
   m_torrentsListView->InitTableView();
 
-  subscribe();
 
+  subscribe();
   updateWindowsSize();
   setWindowTitle("Torrents Manager Widget");
   setWindowIcon(QIcon(":img/TORRENTS_VIEW"));
@@ -57,11 +53,11 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
 void TorrentsManagerWidget::subscribe() {
   connect(m_searchLE, &QLineEdit::returnPressed, this, [this]() {
     const QString& searchPattern = m_searchLE->text();
+    LOG_GOOD_NP("[New where clause]", searchPattern);
     m_torrentsDBModel->setFilter(searchPattern);
   });
 
   connect(g_torrActions().OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &mDb, &DbManager::onShowInFileSystemView);
-
   connect(g_torrActions().INIT_DATABASE, &QAction::triggered, this, &TorrentsManagerWidget::onInitDataBase);
   connect(g_torrActions().INIT_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInitATable);
   connect(g_torrActions().INSERT_INTO_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInsertIntoTable);
@@ -77,12 +73,12 @@ bool TorrentsManagerWidget::onInitDataBase() {
 void TorrentsManagerWidget::onInitATable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    LOG_BAD_NP("Open db failed", con.lastError().text());
     return;
   }
 
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
-    qDebug("Table[%s] already exists in database[%s]", qPrintable(DB_TABLE::TORRENTS), qPrintable(con.databaseName()));
+    LOG_GOOD_NP("[Skip] Table already exists", DB_TABLE::TORRENTS);
     return;
   }
 
@@ -90,47 +86,43 @@ void TorrentsManagerWidget::onInitATable() {
 
   QSqlQuery createTableQuery(con);
   if (!createTableQuery.exec(TorrDb::CREATE_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
-    qDebug("Exec[%s] failed:%s", qPrintable(createTableQuery.executedQuery()),  //
-           qPrintable(createTableQuery.lastError().text()));
+    LOG_BAD_NP("[failed] Exec failed", createTableQuery.lastError().text());
     return;
   }
   m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
   m_torrentsDBModel->submitAll();
-  qDebug("Table[%s] create succeed", qPrintable(DB_TABLE::TORRENTS));
+  LOG_GOOD_NP("Table create succeed", DB_TABLE::TORRENTS);
 }
 
 bool TorrentsManagerWidget::onInsertIntoTable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    LOG_BAD_NP("Open db failed", con.lastError().text());
     return false;
   }
 
   if (!con.tables().contains(DB_TABLE::TORRENTS)) {
-    const QString& tablesNotExistsMsg = QString("Cannot insert, table[%1] not exist.").arg(DB_TABLE::TORRENTS);
-    qDebug("Table [%s] not exists", qPrintable(tablesNotExistsMsg));
-    QMessageBox::warning(this, "Abort", tablesNotExistsMsg);
+    LOG_BAD_NP("[Failed] cannot insert, table not exists", DB_TABLE::TORRENTS);
     return false;
   }
 
   const QString& defaultOpenDir = Configuration().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
   const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Load torrents from", defaultOpenDir);
   QFileInfo loadFromFi(loadFromPath);
-  if (not loadFromFi.isDir()) {
-    QMessageBox::warning(this, "Failed when Load torrents from a folder", QString("Not a folder:\n%1").arg(loadFromPath));
-    qDebug("Failed when Load json from a folder. Not a folder:\n%s", qPrintable(loadFromPath));
+  if (!loadFromFi.isDir()) {
+    LOG_BAD_NP("[Failed] not a folder", loadFromPath);
     return false;
   }
   Configuration().setValue(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, loadFromFi.absoluteFilePath());
 
   QSqlQuery query{con};
   if (!query.prepare(TorrDb::REPLACE_INTO_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
-    qWarning("Prepare failed: %s", qPrintable(query.lastError().text()));
+    LOG_BAD_NP("Prepare failed", query.lastError().text());
     return false;
   }
 
   if (!con.transaction()) {
-    qDebug("Failed to start transaction[%s]", qPrintable(con.lastError().text()));
+    LOG_BAD_NP("Failed to start transaction", con.lastError().text());
     return 0;
   }
 
@@ -147,22 +139,20 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     query.bindValue(TORRENTS_DB_HEADER_KEY::PrePath, fi.absolutePath());
     if (!query.exec()) {
       con.rollback();
-      qDebug("Error[%s] fail: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      qWarning("Error when[%s] fail: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return 0;
     }
     ++succeedItemCnt;
     ++totalItemCnt;
   }
-
   if (!con.commit()) {
-    qDebug("Failed to commit, all will be rollback");
+    LOG_BAD_NP("[Failed] commit failed, all will be rollback", con.lastError().text());
     con.rollback();
     succeedItemCnt = 0;
   }
   query.finish();
-  const QString& msg = QString("%1/%2 item(s) add succeed. %3").arg(succeedItemCnt).arg(totalItemCnt).arg(loadFromPath);
-  QMessageBox::information(this, QString("Finish insert into table[%1]").arg(DB_TABLE::TORRENTS), qPrintable(msg));
   m_torrentsDBModel->submitAll();
+  LOG_GOOD_P("[Ok] Insert into succeed", "%1/%2 item(s) -> Table[%s]", succeedItemCnt, totalItemCnt, qPrintable(DB_TABLE::TORRENTS));
   return true;
 }
 
@@ -170,28 +160,30 @@ bool TorrentsManagerWidget::onDropATable() {
   const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(DB_TABLE::TORRENTS);
   auto retBtn = QMessageBox::warning(this, "CONFIRM DROP?", "(NOT recoverable)\n" + sqlCmd, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
   if (retBtn != QMessageBox::StandardButton::Yes) {
-    qDebug("User Cancel");
+    LOG_GOOD_NP("User Cancel Drop", "return");
     return true;
   }
 
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    LOG_BAD_NP("Open db failed", con.lastError().text());
     return false;
   }
 
   if (!con.tables().contains(DB_TABLE::TORRENTS)) {
-    qDebug("Table[%s] already not exists", qPrintable(DB_TABLE::TORRENTS));
+    LOG_BAD_NP("[Skip] Table already not exists", DB_TABLE::TORRENTS);
     return true;
   }
 
   QSqlQuery dropQry(con);
   const auto dropTableRet = dropQry.exec(sqlCmd);
-  if (not dropTableRet) {
-    qDebug("Drop Table[%s] failed. %s", qPrintable(DB_TABLE::TORRENTS), qPrintable(con.lastError().databaseText()));
+  if (!dropTableRet) {
+    LOG_BAD_NP("[failed] Drop Table", con.lastError().databaseText());
+    return false;
   }
   dropQry.finish();
   m_torrentsDBModel->submitAll();
+  LOG_GOOD_NP("Table been Dropped", DB_TABLE::TORRENTS);
   QMessageBox::information(this, "Table been Dropped", DB_TABLE::TORRENTS);
   return dropTableRet;
 }
@@ -199,18 +191,23 @@ bool TorrentsManagerWidget::onDropATable() {
 bool TorrentsManagerWidget::onDeleteFromTable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    qWarning("Open db failed:%s", qPrintable(con.lastError().text()));
+    LOG_BAD_NP("Open db failed", con.lastError().text());
     return false;
   }
   const QString& whereClause = QInputDialog::getItem(this, "Where Clause", "Input clause below",  //
                                                      {"Name", "Size"}, 0, true);
   if (whereClause.isEmpty()) {
+    LOG_BAD_NP("Where clause empty", "return");
     return false;
   }
   const QString& deleteCmd = QString("DELETE FROM \"%1\" WHERE %2").arg(DB_TABLE::TORRENTS, whereClause);
   QSqlQuery seleteQry(con);
-  const auto deleteRes = seleteQry.exec(deleteCmd);
-  qDebug("delete from result %d", deleteRes);
+  const bool deleteRes = seleteQry.exec(deleteCmd);
+  if (!deleteRes) {
+    LOG_BAD_NP("[Failed] delete command failed", seleteQry.lastError().text());
+    return false;
+  }
+  LOG_GOOD_NP("[Ok] delete command exec ok", deleteCmd);
   m_torrentsDBModel->submitAll();
   return deleteRes;
 }
@@ -249,15 +246,3 @@ void TorrentsManagerWidget::updateWindowsSize() {
     setGeometry(DEFAULT_GEOMETRY);
   }
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  TorrentsManagerWidget torrManaWid;
-  torrManaWid.show();
-  a.exec();
-  return 0;
-}
-#endif
