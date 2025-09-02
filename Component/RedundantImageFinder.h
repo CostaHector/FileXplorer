@@ -34,6 +34,7 @@ private:
   QString mCurrentPath;
   void setResultAlsoContainEmptyImage(bool alsoContain) { mResultAlsoContainEmptyImage = alsoContain; }
   bool mResultAlsoContainEmptyImage;
+  static constexpr char GEOMETRY_KEY[]{"RedunImgFinderKey/GEOMETRY"};
 };
 
 #endif  // REDUNDANTIMAGEFINDER_H

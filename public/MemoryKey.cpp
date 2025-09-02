@@ -1,16 +1,32 @@
 ﻿#include "MemoryKey.h"
 #include <QDir>
 
+QList<const KV*> KV::mEditableKVs;
+
+KV::KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_, bool bUserEditable)//
+  : name{name_}, v{v_}, checker{checker_} {
+  if (bUserEditable) {
+    mEditableKVs.push_back(this);
+  }
+}
+
+QString KV::InitialValueToString() const {
+  return checker.valueToString(v);
+}
+
+QString KV::valueToString(const QVariant& v_) const {
+  return checker.valueToString(v_);
+}
+
+
 using namespace VALUE_CHECKER_TYPE;
 
 const KV MemoryKey::DEFAULT_OPEN_PATH{"DEFAULT_OPEN_PATH", "./", ValueChecker{FOLDER_PATH}};
 const KV MemoryKey::LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{PLAIN_BOOL});
-const KV MemoryKey::BACKGROUND_IMAGE("BACKGROUND_IMAGE", "", ValueChecker{{".png", ".webp", ".jpg", ".jpeg"}, EXT_SPECIFIED_FILE_PATH});
-const KV MemoryKey::SHOW_BACKGOUND_IMAGE("SHOW_BACKGOUND_IMAGE", false, ValueChecker{PLAIN_BOOL});
 const KV MemoryKey::PATH_LAST_TIME_COPY_TO("PATH_LAST_TIME_COPY_TO", "", ValueChecker{FOLDER_PATH});
 const KV MemoryKey::PATH_JSON_EDITOR_LOAD_FROM("PATH_JSON_EDITOR_LOAD_FROM", "", ValueChecker{FOLDER_PATH});
 const KV MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH("PATH_VIDEO_PLAYER_OPEN_PATH", "./", ValueChecker{FOLDER_PATH});
-const KV MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./", ValueChecker{FOLDER_PATH});
+const KV MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./", ValueChecker{FOLDER_PATH}, true);
 const KV MemoryKey::PATH_DB_INSERT_VIDS_FROM("PATH_DB_INSERT_VIDS_FROM", "./", ValueChecker{FOLDER_PATH});
 const KV MemoryKey::PATH_DB_INSERT_TORRENTS_FROM("PATH_DB_INSERT_VIDS_FROM", "./", ValueChecker{FOLDER_PATH});
 
@@ -40,7 +56,7 @@ const KV MemoryKey::DEFAULT_EXTRACT_CHOICE("DEFAULT_EXTRACT_CHOICE",
 const KV MemoryKey::MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
 const KV MemoryKey::COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
 const KV MemoryKey::FILE_SYSTEM_STRUCTURE_WAY{"FILE_SYSTEM_STRUCTURE_WAY", 0, ValueChecker{PLAIN_INT}};
-const KV MemoryKey::WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{PLAIN_STR});
+const KV MemoryKey::WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{PLAIN_STR}, true);
 
 const KV MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX("MENU_RIBBON_CURRENT_TAB_INDEX", 0, ValueChecker{0});
 const KV MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT("COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT", 2, ValueChecker{0});
@@ -48,7 +64,7 @@ const KV MemoryKey::COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT("COMPLETE_JSON_FILE_
 const KV MemoryKey::TABLE_DEFAULT_SECTION_SIZE("TABLE_DEFAULT_SECTION_SIZE", 24, ValueChecker{0});
 const KV MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE("TABLE_DEFAULT_COLUMN_SECTION_SIZE", 200, ValueChecker{0});
 
-const KV MemoryKey::VIDS_LAST_TABLE_NAME("VIDS_LAST_TABLE_NAME", "", ValueChecker{PLAIN_STR});
+const KV MemoryKey::VIDS_LAST_TABLE_NAME("VIDS_LAST_TABLE_NAME", "", ValueChecker{PLAIN_STR}, true);
 
 const KV MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES("NAME_PATTERN_USED_CREATE_BATCH_FILES", "Page %03d%1$1$11.html", ValueChecker{PLAIN_STR});
 const KV MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS("NAME_PATTERN_USED_CREATE_BATCH_FOLDERS", "Page %03d%1$1$11", ValueChecker{PLAIN_STR});
@@ -95,6 +111,5 @@ const KV MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE{"RETURN_ERRORCODE_UPON_ANY
 const KV MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES{"Cast/PreviewBrowser/ShowRelatedImages", true, ValueChecker{PLAIN_BOOL}};
 const KV MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS{"Cast/PreviewBrowser/ShowImagesImages", true, ValueChecker{PLAIN_BOOL}};
 
-const KV RedunImgFinderKey::GEOMETRY{"RedunImgFinderKey/GEOMETRY", {}, ValueChecker{QBYTEARRAY}};
 const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
-const KV RedunImgFinderKey::RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH});
+const KV RedunImgFinderKey::RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH}, true);
