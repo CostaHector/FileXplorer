@@ -3,7 +3,6 @@
 #include "ArchiveFilesActions.h"
 #include "ArrangeActions.h"
 #include "FileBasicOperationsActions.h"
-#include "FileLeafAction.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
 #include "VideoPlayerActions.h"
@@ -261,32 +260,11 @@ bool FileExplorerEvent::on_properties() const {
   return false;
 }
 
-void FileExplorerEvent::on_settings(const bool checked) {
-  m_settingSys = PopupHideWidget<ConfigsTable>(m_settingSys, checked, _contentPane);
-  CHECK_NULLPTR_RETURN_VOID(m_settingSys)                                                                              //
-}
-
 void FileExplorerEvent::subsribeCompress() {
   connect(g_AchiveFilesActions().COMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_compress);
   connect(g_AchiveFilesActions().DECOMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_deCompress);
   connect(g_AchiveFilesActions().COMPRESSED_IMAGES, &QAction::triggered, this, &FileExplorerEvent::on_compressImgsByGroup);
   connect(g_AchiveFilesActions().ARCHIVE_PREVIEW, &QAction::triggered, this, &FileExplorerEvent::on_archivePreview);
-}
-
-void FileExplorerEvent::subsribeFileActions() {
-  connect(g_fileLeafActions()._SETTINGS, &QAction::toggled, this, &FileExplorerEvent::on_settings);
-
-  connect(g_fileLeafActions()._ABOUT_FILE_EXPLORER, &QAction::triggered, this, [this]() {
-    QMessageBox::about(_contentPane, "FileExplorer",
-                       "Version: 46.0\n"
-                       "Introduction: A minimalism app for image/video/json/folder explorer\n"
-                       "Platform-supported: Linux and Win");
-  });
-
-  connect(g_fileLeafActions()._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
-    Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);
-    LOG_INFO_NP("Language switch", "work after reopen");
-  });
 }
 
 void FileExplorerEvent::subscribeThumbnailActions() {
@@ -358,7 +336,6 @@ void FileExplorerEvent::subscribeThumbnailActions() {
 
 void FileExplorerEvent::subscribe() {
   subsribeCompress();
-  subsribeFileActions();
   subscribeThumbnailActions();
 
   {

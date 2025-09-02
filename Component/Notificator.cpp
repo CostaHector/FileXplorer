@@ -8,7 +8,8 @@
 #include <QtGui>
 
 namespace NOTIFICATOR_SETTING {
-constexpr int DEFAULT_MESSAGE_SHOW_TIME = 3000;
+constexpr int SHORT_MESSAGE_SHOW_TIME = 3000;
+constexpr int LONG_MESSAGE_SHOW_TIME = 5000;
 constexpr float WINDOW_TRANSPARENT_OPACITY = 0.7;
 constexpr float WINDOW_NONTRANSPARENT_OPACITY = 1.0;
 constexpr int NOTIFICATION_MARGIN = 10;
@@ -29,50 +30,50 @@ Notificator::~Notificator() {
 
 void Notificator::goodNews(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  showMessage(QIcon(":img/SAVED"), title, message);
+  showMessage(QIcon(":img/SAVED"), title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::badNews(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  showMessage(QIcon(":img/NOT_SAVED"), title, message);
+  showMessage(QIcon(":img/NOT_SAVED"), title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::critical(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
-  showMessage(icon, title, message);
+  showMessage(icon, title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::warning(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
-  showMessage(icon, title, message);
+  showMessage(icon, title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::information(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
-  showMessage(icon, title, message);
+  showMessage(icon, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::question(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
   static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion);
-  showMessage(icon, title, message);
+  showMessage(icon, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
-void Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message) {
+void Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, int timeLength) {
   Notificator* instance = new Notificator;
   configureInstance(instance);
 
   instance->notify(icon, title, message);
-  QTimer::singleShot(DEFAULT_MESSAGE_SHOW_TIME, instance, &Notificator::close);
+  QTimer::singleShot(timeLength, instance, &Notificator::close);
 }
 
 Notificator* Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
