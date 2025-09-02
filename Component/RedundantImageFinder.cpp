@@ -15,6 +15,8 @@
 #include <QDesktopServices>
 #include <QMenu>
 
+constexpr char RedundantImageFinder::GEOMETRY_KEY[];
+
 RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
   : QMainWindow{parent},
   mResultAlsoContainEmptyImage{//
@@ -69,8 +71,8 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
 }
 
 void RedundantImageFinder::ReadSetting() {
-  if (Configuration().contains(RedunImgFinderKey::GEOMETRY.name)) {
-    restoreGeometry(Configuration().value(RedunImgFinderKey::GEOMETRY.name).toByteArray());
+  if (Configuration().contains(GEOMETRY_KEY)) {
+    restoreGeometry(Configuration().value(GEOMETRY_KEY).toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -83,7 +85,7 @@ void RedundantImageFinder::showEvent(QShowEvent* event) {
 
 void RedundantImageFinder::closeEvent(QCloseEvent* event) {
   g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER->setChecked(false);
-  Configuration().setValue(RedunImgFinderKey::GEOMETRY.name, saveGeometry());
+  Configuration().setValue(GEOMETRY_KEY, saveGeometry());
   Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, mResultAlsoContainEmptyImage);
   QMainWindow::closeEvent(event);
 }

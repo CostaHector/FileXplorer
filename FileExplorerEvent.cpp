@@ -11,7 +11,7 @@
 #include "ThumbnailProcessActions.h"
 #include "TSFilesMerger.h"
 
-#include "AlertSystem.h"
+#include "ConfigsTable.h"
 #include "Archiver.h"
 #include "CustomStatusBar.h"
 #include "MD5Window.h"
@@ -262,13 +262,8 @@ bool FileExplorerEvent::on_properties() const {
 }
 
 void FileExplorerEvent::on_settings(const bool checked) {
-  if (m_settingSys == nullptr) {
-    m_settingSys = PopupHideWidget<AlertSystem>(m_settingSys, checked, _contentPane);
-  }
-  CHECK_NULLPTR_RETURN_VOID(m_settingSys)
-  if (checked) {                                                                       //
-    (*m_settingSys)(_contentPane->getRootPath());                                     //
-  }                                                                                    //
+  m_settingSys = PopupHideWidget<ConfigsTable>(m_settingSys, checked, _contentPane);
+  CHECK_NULLPTR_RETURN_VOID(m_settingSys)                                                                              //
 }
 
 void FileExplorerEvent::subsribeCompress() {
