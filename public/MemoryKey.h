@@ -1,7 +1,7 @@
 ﻿#ifndef MEMORYKEY_H
 #define MEMORYKEY_H
 
-#include "KV.h"
+#include "ValueChecker.h"
 #include <QSettings>
 
 static inline QSettings& Configuration() {
@@ -9,11 +9,25 @@ static inline QSettings& Configuration() {
   return settings;
 }
 
+class ConfigsModel;
+class KV {
+public:
+  friend class ConfigsModel;
+  KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_, bool bUserEditable=false);
+
+  QString InitialValueToString() const;
+  QString valueToString(const QVariant& v_) const;
+
+  QString name;
+  QVariant v;
+private:
+  static QList<const KV*> mEditableKVs;
+  ValueChecker checker;
+};
+
 struct MemoryKey {
   static const KV DEFAULT_OPEN_PATH;
   static const KV LANGUAGE_ZH_CN;
-  static const KV BACKGROUND_IMAGE;
-  static const KV SHOW_BACKGOUND_IMAGE;
   static const KV PATH_LAST_TIME_COPY_TO;
   static const KV PATH_JSON_EDITOR_LOAD_FROM;
   static const KV PATH_VIDEO_PLAYER_OPEN_PATH;
@@ -93,9 +107,8 @@ struct MemoryKey {
 
 
 struct RedunImgFinderKey {
-static const KV GEOMETRY;
-static const KV ALSO_RECYCLE_EMPTY_IMAGE;
-static const KV RUND_IMG_PATH;
+  static const KV ALSO_RECYCLE_EMPTY_IMAGE;
+  static const KV RUND_IMG_PATH;
 };
 
 #endif  // MEMORYKEY_H
