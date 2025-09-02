@@ -12,8 +12,8 @@ class SyncFileSystemModificationActions : public QObject {
  public:
   explicit SyncFileSystemModificationActions(QObject* parent = nullptr);
 
-  QToolBar* GetSyncSwitchToolbar();
-  QToolBar* GetSyncPathToolbar();
+  QToolBar* GetSyncSwitchToolbar(QWidget* parent = nullptr);
+  QToolBar* GetSyncPathToolbar(QWidget* parent = nullptr);
 
   QLineEdit* _BASIC_PATH{nullptr};
   QLineEdit* _SYNC_TO_PATH{nullptr};

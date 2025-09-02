@@ -69,6 +69,9 @@
 <file alias="COLUMN_VISIBILITY">TopSideToolBarIcons/COLUMN_VISIBILITY.svg</file>
 <file alias="HIDE_THIS_COLUMN">TopSideToolBarIcons/HIDE_THIS_COLUMN.svg</file>
 <file alias="QUICK_MULTI_SELECT">TopSideToolBarIcons/QUICK_MULTI_SELECT.svg</file>
+<file alias="CONTEXT_MENU_SYSTEM">TopSideToolBarIcons/CONTEXT_MENU_SYSTEM.svg</file>
+<file alias="CONTEXT_MENU_ADD_THIS_PROGRAM">TopSideToolBarIcons/CONTEXT_MENU_ADD_THIS_PROGRAM.svg</file>
+<file alias="CONTEXT_MENU_RMV_THIS_PROGRAM">TopSideToolBarIcons/CONTEXT_MENU_RMV_THIS_PROGRAM.svg</file>
 
 <!--AddressControl icon here-->
 <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>

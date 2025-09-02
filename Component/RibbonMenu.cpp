@@ -94,20 +94,24 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
 }
 
 QToolBar* RibbonMenu::LeafFile() const {
-  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar();
-  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar();
+  QToolBar* leafFileWid{new (std::nothrow) QToolBar};
+  CHECK_NULLPTR_RETURN_NULLPTR(leafFileWid)
+
+  QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar(leafFileWid);
+  QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar(leafFileWid);
   SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  auto* styleToolButton =
-      new (std::nothrow) DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
+  auto* styleToolButton = new (std::nothrow) DropdownToolButton(g_PreferenceActions().PREFERENCE_LIST, QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16, leafFileWid);
   styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "Change Style");
-  QToolButton* logToolButton =
-      new (std::nothrow) DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
+  QToolButton* logToolButton = new (std::nothrow) DropdownToolButton(g_LogActions()._DROPDOWN_LIST, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16, leafFileWid);
   logToolButton->setDefaultAction(g_LogActions()._LOG_FILE);
 
-  QToolBar* leafFileWid{new (std::nothrow) QToolBar};
+  auto& fileLeafInst = g_fileLeafActions();
+  auto* systemContextMenuTb = fileLeafInst.GetSystemContextMenu(leafFileWid);
+
   CHECK_NULLPTR_RETURN_NULLPTR(leafFileWid);
-  leafFileWid->addActions(g_fileLeafActions()._LEAF_FILE->actions());
+  leafFileWid->addActions(fileLeafInst._LEAF_FILE->actions());
+  leafFileWid->addWidget(systemContextMenuTb);
   leafFileWid->addSeparator();
   leafFileWid->addWidget(syncSwitchToolBar);
   leafFileWid->addWidget(syncPathToolBar);
