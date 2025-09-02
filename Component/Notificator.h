@@ -22,7 +22,7 @@ class Notificator : public QFrame {
   static void warning(const QString& title, const QString& message);
   static void information(const QString& title, const QString& message);
   static void question(const QString& title, const QString& message);
-  static void showMessage(const QIcon& icon, const QString& title, const QString& message);
+  static void showMessage(const QIcon& icon, const QString& title, const QString& message, int timeLength = 3000);
   static Notificator* showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal);
 
  public slots:
