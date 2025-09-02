@@ -32,7 +32,9 @@ ConfigsTable::ConfigsTable(QWidget* parent)
   pOk->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOk->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
   auto* pOpen = dlgBtnBox->button(QDialogButtonBox::StandardButton::Open);
+  pOpen->setText("Edit");
   pOpen->setIcon(QIcon(":img/CONFIGURE"));
+  pOpen->setToolTip("Edit in config file directly");
   auto* pRetry = dlgBtnBox->button(QDialogButtonBox::StandardButton::Retry);
   pRetry->setText("Recheck");
   pRetry->setIcon(QIcon(":img/RELOAD_FROM_DISK"));
