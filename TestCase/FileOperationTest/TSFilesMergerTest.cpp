@@ -24,9 +24,9 @@ private slots:
   void test_checkTsFilesConsistent_ok() {
     QDir dir{rootpath};
     const QStringList tsFilesAbsPath {dir.absoluteFilePath("File need to merge seg-1-v1-a1.ts"),//
-                                     dir.absoluteFilePath("File need to merge seg-2-v1-a1.ts")};
-    // QVERIFY(TSFilesMerger::checkTsFilesConsistent(tsFilesAbsPath));
-    QVERIFY(true);
+                                     dir.absoluteFilePath("Files no need to merge sample-ts-files-sample_640x360.ts")};
+    QVERIFY(!TSFilesMerger::checkTsFilesConsistent(tsFilesAbsPath));
+    // uhmmm {"File need to merge seg-1-v1-a1.ts", "File need to merge seg-2-v1-a1.txt"} also return false
   }
 
   void test_mergeTsFiles_skip() {
