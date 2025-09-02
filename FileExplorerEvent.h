@@ -17,13 +17,11 @@ class Archiver;
 
 class FileExplorerEvent : public QObject {
   Q_OBJECT
-
- public:
-  static FileExplorerEvent* GetFileExlorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent = nullptr);
-
- private:
-  FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger, QObject* parent);
+public:
+  FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger);
   void subscribe();
+
+private:
   void subsribeCompress();
   void subsribeFileActions();
   void subscribeThumbnailActions();
@@ -114,7 +112,7 @@ class FileExplorerEvent : public QObject {
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};
- private:
+private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten
   static bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction);
 };

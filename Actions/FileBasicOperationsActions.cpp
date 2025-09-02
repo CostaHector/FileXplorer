@@ -8,7 +8,7 @@
 #include <QStyle>
 
 FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
-    : QObject(parent)  //
+  : QObject(parent)  //
 {
   _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this);
   _OPEN_IN_TERMINAL = new (std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this);
@@ -61,7 +61,8 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   FOLDER_MERGE = FolderMergeActions();
 
   _TS_FILES_MERGE = new (std::nothrow) QAction(QIcon(":img/TS_FILES_MERGE"), "Merged ts files");
-  _TS_FILES_MERGE->setToolTip("Merge at least 2 selected ts files into a large one");
+  _TS_FILES_MERGE->setToolTip("Merges selected TS files in your chosen order (minimum 2 files).<br/>"
+                              "<b>Warning: Output sequence in merged file matches your selection order.</b>");
 
   SELECT_ALL = new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all");
   SELECT_NONE = new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none");
@@ -414,7 +415,7 @@ FileBasicOperationsActions& g_fileBasicOperationsActions() {
 #include <QToolBar>
 
 class FileOperationActionIllustration : public QToolBar {
- public:
+public:
   explicit FileOperationActionIllustration(const QString& title, QWidget* parent = nullptr) : QToolBar(title, parent) {
     addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
     addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
