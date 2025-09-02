@@ -1,4 +1,4 @@
-#include "KV.h"
+#include "ValueChecker.h"
 #include "PathTool.h"
 #include <QFileInfo>
 
@@ -109,14 +109,4 @@ QVariant ValueChecker::strToQVariant(const QString& v) const {
     default:
       return QVariant();
   }
-}
-
-KV::KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_) : name(name_), v(v_), checker(checker_) {}
-
-QString KV::valueToString() const {
-  return checker.valueToString(v);
-}
-
-QString KV::valueToString(const QVariant& v_) const {
-  return checker.valueToString(v_);
 }

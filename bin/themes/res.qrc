@@ -312,9 +312,11 @@
 <file alias="SYNC_FROM_DB">Database/SYNC_FROM_DB.svg</file>
 <file alias="MIGRATE_CAST_TO">Database/MIGRATE_CAST_TO.svg</file>
 
-<!--AlertSystem icon here-->
-<file alias="SETTINGS">AlertSystem/SETTINGS.svg</file>
-<file alias="CONFIGURE">AlertSystem/CONFIGURE.svg</file>
+<!--ConfigsTable icon here-->
+<file alias="SETTINGS">ConfigsTable/SETTINGS.svg</file>
+<file alias="CONFIGURE">ConfigsTable/CONFIGURE.svg</file>
+<file alias="CORRECT">ConfigsTable/CORRECT.svg</file>
+<file alias="WRONG">ConfigsTable/WRONG.svg</file>
 
 </qresource>
 
