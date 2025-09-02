@@ -1,6 +1,6 @@
 ﻿#include "FileExplorerEvent.h"
 #include "FileXplorer.h"
-#include "ExtraViewVisibilityControl.h"
+#include "ExtraEvents.h"
 #include "LogHandler.h"
 #include "PublicTool.h"
 #include "MemoryKey.h"
@@ -37,8 +37,13 @@ int main(int argc, char* argv[]) {
   }
 
   FileXplorer fileExplorer{args, nullptr};
-  FileExplorerEvent::GetFileExlorerEvent(fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer.m_statusBar);
-  ExtraViewVisibilityControl extraViewVisibility{fileExplorer.centralWidget()};
+
+  FileExplorerEvent commonEvent{fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer.m_statusBar};
+  commonEvent.subscribe();
+
+  ExtraEvents extraViewVisibility{fileExplorer.m_fsPanel};
+  extraViewVisibility.subscribe();
+
   fileExplorer.show();
   app.exec();
   return 0;

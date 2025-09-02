@@ -26,17 +26,16 @@ public:
 FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
   : QMainWindow(parent)                                                            //
 {
-  previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this};
-
-  m_previewFolder = new (std::nothrow) SelectionPreviewer{previewHtmlDock};
-  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this};
-  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar;
-  m_viewsSwitcher = g_viewActions().GetViewTB();
-  m_navigationToolBar = new (std::nothrow) NavigationToolBar;
-  m_ribbonMenu = new (std::nothrow) RibbonMenu{this};
-  m_statusBar = new (std::nothrow) CustomStatusBar{m_viewsSwitcher, this};
-  m_fsPanel = new (std::nothrow) ViewsStackedWidget(m_previewFolder, this);
-  m_naviSwitcher = new (std::nothrow) ToolBarAndViewSwitcher{m_stackedBar, m_fsPanel};
+  previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this}; //  docker
+  m_previewFolder = new (std::nothrow) SelectionPreviewer{previewHtmlDock}; // previewer in docker
+  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this}; // previewer switcher
+  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar; // searchToolBar
+  m_viewsSwitcher = g_viewActions().GetViewTB(); // right-down corner permanent widget
+  m_navigationToolBar = new (std::nothrow) NavigationToolBar; // left navigation bar
+  m_ribbonMenu = new (std::nothrow) RibbonMenu{this}; // ribbon menu
+  m_statusBar = new (std::nothrow) CustomStatusBar{m_viewsSwitcher, this}; // status bar
+  m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
+  m_naviSwitcher = new (std::nothrow) ToolBarAndViewSwitcher{m_stackedBar, m_fsPanel}; // view/searchToolBar switcher
 
   m_fsPanel->BindLogger(m_statusBar);
   m_naviSwitcher->onSwitchByViewType(ViewTypeTool::ViewType::TABLE);

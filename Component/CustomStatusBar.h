@@ -4,7 +4,6 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QStatusBar>
-#include <QToolBar>
 
 enum class STATUS_STR_TYPE { NORMAL = 0, ABNORMAL = 1 };
 
@@ -17,7 +16,7 @@ class CustomStatusBar : public QStatusBar {
     MSG,
     BUTT
   };
-  explicit CustomStatusBar(QToolBar* views, QWidget* parent = nullptr);
+  explicit CustomStatusBar(QWidget* viewsSwitcherTb, QWidget* parent = nullptr);
 
   void pathInfo(const int count, const int index = 0);
   void msg(const QString& text = "", const STATUS_STR_TYPE statusStrType = STATUS_STR_TYPE::NORMAL);
@@ -26,7 +25,6 @@ class CustomStatusBar : public QStatusBar {
   static int GetValidProgressValue(int value);
 
  private:
-  QToolBar* m_viewsSwitcher_;
   QProgressBar* mProcess {nullptr};
   QList<QLabel*> mLabelsLst;
 };
