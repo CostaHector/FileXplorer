@@ -1,5 +1,5 @@
-#ifndef KV_H
-#define KV_H
+#ifndef VALUECHECKER_H
+#define VALUECHECKER_H
 #include <QStringList>
 #include <QVariant>
 #include <QSet>
@@ -57,17 +57,4 @@ class ValueChecker {
   int maxV;
 };
 
-struct KV {
-  explicit KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_);
-  QSet<QString> GetCandidatePool() const { return checker.m_strCandidates; }
-
-  QString valueToString() const;
-  QString valueToString(const QVariant& v_) const;
-
-  QString name;
-  QVariant v;
-  ValueChecker checker;
-};
-
-
-#endif // KV_H
+#endif // VALUECHECKER_H

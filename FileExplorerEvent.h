@@ -8,7 +8,7 @@
 
 class ViewsStackedWidget;
 class CustomStatusBar;
-class AlertSystem;
+class ConfigsTable;
 class AdvanceRenamer;
 class PropertiesWindow;
 class DuplicateVideosFinder;
@@ -108,7 +108,7 @@ private:
   CustomStatusBar* _logger{nullptr};
   QClipboard* m_clipboard{nullptr};
 
-  AlertSystem* m_settingSys{nullptr};
+  ConfigsTable* m_settingSys{nullptr};
   Archiver* m_archivePreview{nullptr};
   DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
   RedundantImageFinder* m_redundantImageFinder{nullptr};
