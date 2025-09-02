@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include "CustomTableView.h"
 #include "TorrDb.h"
+#include <QToolBar>
 
 class TorrentsManagerWidget : public QMainWindow {
  public:
@@ -24,11 +25,12 @@ class TorrentsManagerWidget : public QMainWindow {
   void closeEvent(QCloseEvent* event) override;
   void updateWindowsSize();
 
+private:
   TorrDb mDb;
-  QLineEdit* m_searchLE;
-  CustomTableView* m_torrentsListView;
-  QWidget* m_torrentsCentralWidget;
-  QSqlTableModel* m_torrentsDBModel;
+  QLineEdit* m_searchLE {nullptr};
+  QToolBar* m_searchToobar {nullptr};
+  CustomTableView* m_torrentsListView {nullptr};
+  QSqlTableModel* m_torrentsDBModel {nullptr};
 };
 
 #endif  // TORRENTSMANAGERWIDGET_H

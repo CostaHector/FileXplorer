@@ -2,6 +2,7 @@
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "NotificatorMacro.h"
 #include <QFileDialog>
 #include <QLabel>
 
@@ -64,7 +65,7 @@ void HarTableView::subscribe() {
 
 int HarTableView::SaveSelectionFilesTo() const {
   if (!selectionModel()->hasSelection()) {
-    qDebug("nothing were selected. skip export.");
+    LOG_INFO_NP("[skip] Nothing were selected to export", "return");
     return 0;
   }
   QList<int> selectedRows;
@@ -79,7 +80,11 @@ int HarTableView::SaveSelectionFilesTo() const {
     return -1;
   }
   int exportCount = mHarModel->SaveToLocal(dstFolder, selectedRows);
-  qDebug("%d file(s) were exported", exportCount);
+  if (exportCount != selectedRows.size()) {
+    LOG_WARN_P("[Partially failed] Item(s) exported", "Only %d/%d item(s) to path:\n%s", exportCount, selectedRows.size(), qPrintable(dstFolder));
+    return exportCount;
+  }
+  LOG_GOOD_P("[Ok] Item(s) exported", "all %d/%d item(s) to path:\n%s", exportCount, selectedRows.size(), qPrintable(dstFolder));
   return exportCount;
 }
 

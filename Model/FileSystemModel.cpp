@@ -103,7 +103,5 @@ void FileSystemModel::whenDirectoryLoaded(const QString& path) {
   if (_mPLogger == nullptr) {
     return;
   }
-  QModelIndex currentIndex(index(path));
-  int rowCnt = rowCount(currentIndex);
-  _mPLogger->pathInfo(rowCnt, 0);
+  _mPLogger->pathInfo(rowCount(mRootIndex), 0);
 }
