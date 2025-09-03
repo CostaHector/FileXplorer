@@ -3,8 +3,7 @@
 
 #include <QString>
 
-class NameStandardizer
-{
+class NameStandardizer {
  public:
   QString operator()(QString aFileName);
 };

@@ -13,9 +13,24 @@ class MovieNameStandardizerTest : public MyTestSuite {
   MovieNameStandardizerTest() : MyTestSuite{false} { }
   NameStandardizer ns;
  private slots:
-  void test_removeSpecialChar();
-  void test_RemoveContinuousSpace();
-  void test_RemoveLeadingAndTrailingSpace();
+  void test_remove_nbspInHtml() {
+    QCOMPARE(ns("A B"), "A B");
+  }
+  void test_removeSpecialChar() {
+    QCOMPARE(ns("A#’“”\"/:*?<>|B"), "A '''' B");
+  }
+  void test_RemoveContinuousSpace() {
+    QCOMPARE(ns("A B"), "A B");
+    QCOMPARE(ns("A       B"), "A B");
+  }
+  void test_RemoveLeadingAndTrailingSpace() {
+    QCOMPARE(ns("      A"), "A");
+    QCOMPARE(ns("A      "), "A");
+    QCOMPARE(ns("      A           "), "A");
+  }
+  void test_RemoveSpaceBeforeDot() {
+    QCOMPARE(ns("A .mp4"), "A.mp4");
+  }
   void test_SpaceBeforeOrAfterComma();
   void test_SpaceBeforeOrAfterExclamationMark();
   void test_SpaceBeforeOrAfterHypen();
@@ -29,7 +44,6 @@ class MovieNameStandardizerTest : public MyTestSuite {
   }
   void test_RemoveMultiHypen();
   void test_RemoveBacket();
-  void test_RemoveSpaceBeforeDot();
   void test_BasicFunc() {
     static auto& psm = StudiosManager::getIns();
     decltype(psm.m_prodStudioMap) tempStudios;
@@ -52,21 +66,6 @@ class MovieNameStandardizerTest : public MyTestSuite {
   }
 };
 
-void MovieNameStandardizerTest::test_removeSpecialChar() {
-  QCOMPARE(ns("A#’“”\"/:*?<>|B"), "A '''' B");
-}
-void MovieNameStandardizerTest::test_RemoveContinuousSpace() {
-  QCOMPARE(ns("A B"), "A B");
-  QCOMPARE(ns("A       B"), "A B");
-}
-void MovieNameStandardizerTest::test_RemoveLeadingAndTrailingSpace() {
-  QCOMPARE(ns("      A"), "A");
-  QCOMPARE(ns("A      "), "A");
-  QCOMPARE(ns("      A           "), "A");
-}
-void MovieNameStandardizerTest::test_RemoveSpaceBeforeDot() {
-  QCOMPARE(ns("A .mp4"), "A.mp4");
-}
 void MovieNameStandardizerTest::test_SpaceBeforeOrAfterComma() {
   QCOMPARE(ns("A, B"), "A, B");
   QCOMPARE(ns("A , B"), "A, B");
