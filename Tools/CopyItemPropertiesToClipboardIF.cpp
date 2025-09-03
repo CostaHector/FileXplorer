@@ -1,13 +1,9 @@
 #include "CopyItemPropertiesToClipboardIF.h"
 #include "FdBasedDbModel.h"
-#include "ViewSelection.h"
 
 #include <QFileSystemModel>
-
 #include <QApplication>
 #include <QClipboard>
-
-using ViewSelection::selectedIndexes;
 
 auto CopyItemPropertiesToClipboardIF::PathCopyTriple(const QStringList& lst, const QString& opName) -> bool {
   if (lst.isEmpty()) {
@@ -26,14 +22,14 @@ bool CopyItemPropertiesToClipboardIF::on_copySelectedItemFullPath(const QAbstrac
   QStringList mixed;
   auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       mixed.append(sqlModel->filePath(ind));
     }
     return PathCopyTriple(mixed, "absolute-file-path");
   }
   auto* fsmModel = dynamic_cast<const QFileSystemModel*>(view->model());
   if (fsmModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       mixed.append(fsmModel->filePath(ind));
     }
   }
@@ -45,7 +41,7 @@ auto CopyItemPropertiesToClipboardIF::on_copyFullPathFolderNameAndAppendImageSuf
   QStringList mixed;
   auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       const QFileInfo dirFi = sqlModel->fileInfo(ind);
       const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
       mixed.append(QDir::toNativeSeparators(imagePath));
@@ -54,7 +50,7 @@ auto CopyItemPropertiesToClipboardIF::on_copyFullPathFolderNameAndAppendImageSuf
   }
   auto* fsmModel = dynamic_cast<const QFileSystemModel*>(view->model());
   if (fsmModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       const QFileInfo dirFi = fsmModel->fileInfo(ind);
       const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
       mixed.append(QDir::toNativeSeparators(imagePath));
@@ -67,14 +63,14 @@ auto CopyItemPropertiesToClipboardIF::on_copyDirPath(const QAbstractItemView* vi
   QStringList mixed;
   auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       mixed.append(sqlModel->fileInfo(ind).absolutePath());
     }
     return PathCopyTriple(mixed, "absolute-path");
   }
   auto* fsmModel = dynamic_cast<const QFileSystemModel*>(view->model());
   if (fsmModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       mixed.append(fsmModel->fileInfo(ind).absolutePath());
     }
   }
@@ -85,14 +81,14 @@ auto CopyItemPropertiesToClipboardIF::on_copyName(const QAbstractItemView* view)
   QStringList mixed;
   auto* sqlModel = dynamic_cast<const FdBasedDbModel*>(view->model());
   if (sqlModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       mixed.append(sqlModel->fileName(ind));
     }
     return PathCopyTriple(mixed, "file-name");
   }
   auto* fsmModel = dynamic_cast<const QFileSystemModel*>(view->model());
   if (fsmModel) {
-    for (const QModelIndex ind : selectedIndexes(view)) {
+    for (const QModelIndex ind : view->selectionModel()->selectedRows()) {
       mixed.append(fsmModel->fileName(ind));
     }
   }

@@ -5,7 +5,8 @@
 #include <QObject>
 
 class JsonActions : public QObject {
- public:
+  Q_OBJECT
+public:
   explicit JsonActions(QObject* parent = nullptr);
 
   // **Submit**
