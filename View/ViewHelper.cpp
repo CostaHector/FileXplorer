@@ -109,7 +109,7 @@ void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
   }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
-  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedIndexes().contains(ind))) {
+  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedRows().contains(ind))) {
     qDebug("reject drag and move. not allowed or self drop");
     m_fsm->DragRelease();
     event->ignore();
@@ -132,7 +132,7 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
   // allowed dropped and not contains
-  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedIndexes().contains(ind))) {
+  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedRows().contains(ind))) {
     qDebug("reject drop here. not allowed or self drop");
     event->ignore();
     return;
@@ -157,24 +157,19 @@ void View::dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
 
 void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
   event->accept();
-  const QModelIndexList& rows = View::selectedIndexes(view);
+  const QModelIndexList rows{view->selectionModel()->selectedRows()};
   if (rows.isEmpty()) {
     return;
   }
-  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
-  if (m_fsm == nullptr) {
-    qDebug("[mouseMove] m_fsm is nullptr");
-    return;
-  }
-  event->accept();
+  const FileSystemModel* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
+  CHECK_NULLPTR_RETURN_VOID(m_fsm)
   QList<QUrl> urls;
   urls.reserve(rows.size());
-  for (const auto& ind : rows) {
+  for (const QModelIndex& ind : rows) {
     urls.append(QUrl::fromLocalFile(m_fsm->filePath(ind)));
   }
   qDebug("drags %d rows", urls.size());
-
-  QMimeData* mime = new QMimeData;
+  QMimeData* mime = new (std::nothrow) QMimeData;
   mime->setUrls(urls);
 
   QDrag drag(view);
