@@ -58,6 +58,7 @@ class ViewsStackedWidget : public QStackedWidget {
     return ViewTypeTool::isFSView(vt);
   }
 
+  std::pair<QModelIndex, QModelIndex> getTopLeftAndRightDownRectangleIndex() const;
   QModelIndex getRootIndex() const;
   inline QAbstractItemView* GetCurView() const {  //
     return dynamic_cast<QAbstractItemView*>(currentWidget());
