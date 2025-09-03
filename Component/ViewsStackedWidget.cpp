@@ -522,7 +522,7 @@ QStringList ViewsStackedWidget::getFileNames() const {
       break;
     }
     case ViewType::SCENE: {
-      for (const auto& ind : m_sceneTableView->selectionModel()->selectedIndexes()) {
+      for (const auto& ind : m_sceneTableView->selectionModel()->selectedRows()) {
         names.append(m_scenesModel->fileName(ind));
       }
       break;
@@ -631,7 +631,7 @@ QStringList ViewsStackedWidget::getFilePaths() const {
       break;
     }
     case ViewType::SCENE: {
-      for (const auto& ind : m_sceneTableView->selectionModel()->selectedIndexes()) {
+      for (const auto& ind : m_sceneTableView->selectionModel()->selectedRows()) {
         filePaths.append(m_scenesModel->filePath(ind));
       }
       break;
@@ -696,7 +696,7 @@ QStringList ViewsStackedWidget::getFilePrepaths() const {
       break;
     }
     case ViewType::SCENE: {
-      for (const auto& ind : m_sceneTableView->selectionModel()->selectedIndexes()) {
+      for (const auto& ind : m_sceneTableView->selectionModel()->selectedRows()) {
         prepaths.append(m_scenesModel->absolutePath(ind));
       }
       break;
@@ -960,7 +960,7 @@ int ViewsStackedWidget::getSelectedRowsCount() const {
       return m_advanceSearchView->selectionModel()->selectedRows().size();
     }
     case ViewType::SCENE: {
-      return m_sceneTableView->selectionModel()->selectedIndexes().size();
+      return m_sceneTableView->selectionModel()->selectedRows().size();
     }
     case ViewType::MOVIE: {
       return m_movieView->selectionModel()->selectedRows().size();
