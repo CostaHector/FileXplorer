@@ -8,7 +8,7 @@ RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
 { }
 
 QToolBar* RenameWidget_Replace::InitControlTB() {
-  QToolBar* replaceControl = new (std::nothrow) QToolBar;
+  QToolBar* replaceControl = new (std::nothrow) QToolBar{"replace tb", this};
   CHECK_NULLPTR_RETURN_NULLPTR(replaceControl);
   auto* pOldLabel = new (std::nothrow) QLabel{"Old:", replaceControl};
   CHECK_NULLPTR_RETURN_NULLPTR(pOldLabel);
@@ -35,7 +35,7 @@ void RenameWidget_Replace::extraSubscribe() {
 }
 
 auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
-  m_oldStrCB = new (std::nothrow) QComboBox;
+  m_oldStrCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_oldStrCB)
   m_oldStrCB->addItems(Configuration().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
   m_oldStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
@@ -43,7 +43,7 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
   m_oldStrCB->setEditable(true);
   m_oldStrCB->setCompleter(nullptr);  // block auto complete
 
-  m_newStrCB = new (std::nothrow) QComboBox;
+  m_newStrCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_newStrCB)
   m_newStrCB->addItems(Configuration().value(MemoryKey::RENAMER_NEW_STR_LIST.name, MemoryKey::RENAMER_NEW_STR_LIST.v).toStringList());
   m_newStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
@@ -51,7 +51,7 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
   m_newStrCB->setEditable(true);
   m_newStrCB->setCompleter(nullptr);
 
-  m_regexCB = new (std::nothrow) QCheckBox{"Regex"};
+  m_regexCB = new (std::nothrow) QCheckBox{"Regex", this};
   CHECK_NULLPTR_RETURN_VOID(m_regexCB)
   m_regexCB->setToolTip("Enable regex");
   m_regexCB->setChecked(Configuration().value(MemoryKey::RENAMER_REGEX_ENABLED.name, MemoryKey::RENAMER_REGEX_ENABLED.v).toBool());
