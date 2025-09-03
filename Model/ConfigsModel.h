@@ -42,7 +42,7 @@ public:
 
 private:
   static const QStringList CONFIGS_TABLE_HEADER;
-  static constexpr int VALUE_COLUMN{0};
+  static constexpr int VALUE_COLUMN{1};
 };
 
 #endif  // CONFIGSMODEL_H
