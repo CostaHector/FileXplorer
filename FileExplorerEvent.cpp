@@ -780,7 +780,7 @@ bool FileExplorerEvent::on_deletePermanently() {
   return isAllSucceed;
 }
 
-auto FileExplorerEvent::on_SelectAll() -> void {
+void FileExplorerEvent::on_SelectAll() {
   auto* view = _contentPane->GetCurView();
   if (!view->hasFocus()) {
     return;
@@ -788,7 +788,7 @@ auto FileExplorerEvent::on_SelectAll() -> void {
   view->selectAll();
 }
 
-auto FileExplorerEvent::on_SelectNone() -> void {
+void FileExplorerEvent::on_SelectNone() {
   auto* view = _contentPane->GetCurView();
   if (!view->hasFocus()) {
     return;
@@ -796,23 +796,18 @@ auto FileExplorerEvent::on_SelectNone() -> void {
   view->clearSelection();
 }
 
-auto FileExplorerEvent::on_SelectInvert() -> void {
-  ViewType vt = _contentPane->GetVt();
-  if (!ViewTypeTool::isFSView(vt)) {
-    qDebug("[Skip] Not support select invert", ViewTypeTool::c_str(vt));
+void FileExplorerEvent::on_SelectInvert() {
+  QAbstractItemView* view = _contentPane->GetCurView();
+  if (!view->hasFocus()) {
     return;
   }
-
-  QAbstractItemView* view = _contentPane->GetCurView();
-  const QModelIndex& rootIndex = view->rootIndex();
-  const int row = _fileSysModel->rowCount(rootIndex);
-  const int col = (vt == ViewType::LIST) ? 1 : _fileSysModel->columnCount(rootIndex);
-  _contentPane->disconnectSelectionChanged();  // Avoid lags when selection changed frequently
-  qInfo("Path[%s] Dimension of file system model %d-by-%d", qPrintable(_fileSysModel->rootPath()), row, col);
-  const QModelIndex& topLeft = _fileSysModel->index(0, 0, rootIndex);
-  const QModelIndex& bottomRight = _fileSysModel->index(row - 1, col - 1, rootIndex);
-  view->selectionModel()->select(QItemSelection(topLeft, bottomRight), QItemSelectionModel::Toggle);
-  _contentPane->connectSelectionChanged(vt);
+  QModelIndex leftTop, rightBottom;
+  std::tie(leftTop, rightBottom) = _contentPane->getTopLeftAndRightDownRectangleIndex();
+  if (!leftTop.isValid() || !rightBottom.isValid()) {
+    LOG_INFO_NP("[Skip] invert selection", "rectangle index pair invalid");
+    return;
+  }
+  view->selectionModel()->select(QItemSelection{leftTop, rightBottom}, QItemSelectionModel::Toggle);
 }
 
 bool FileExplorerEvent::on_HarView() {
