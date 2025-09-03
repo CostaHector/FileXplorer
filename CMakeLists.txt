@@ -119,6 +119,9 @@ if(WIN32)
         ${SOURCES}
         ${RESOURCES}
     )
+
+set(QM_FILES Translate/FileXplorer_zh_CN.ts)
+set(README_FILES readme.md)
 else()
     # Linux Platform: Directly generate a GUI application (no terminal displayed by default). No extra flags needed for GUI apps
     add_executable(${PROJECT_NAME}
@@ -129,7 +132,7 @@ endif()
 target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
-)
+    ${README_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SRV_HEADER_PATH})
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -168,7 +171,5 @@ install(TARGETS ${PROJECT_NAME}
 
 # 安装额外文件
 install(FILES
-    "Translate/FileXplorer_zh_CN.ts"
-    "readme.md"
     DESTINATION share/${PROJECT_NAME}
 )
