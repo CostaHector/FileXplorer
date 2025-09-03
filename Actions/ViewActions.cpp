@@ -33,7 +33,7 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
                                          "Play the selected item(s) in default system player.")
                                      .arg(_SYS_VIDEO_PLAYERS->text(), _SYS_VIDEO_PLAYERS->shortcut().toString()));
 
-  _HAR_VIEW = new (std::nothrow) QAction{QIcon(":img/HAR_VIEW"), "Har View"};
+  _HAR_VIEW = new (std::nothrow) QAction{QIcon(":img/HAR_VIEW"), tr("Har View")};
   _HAR_VIEW->setCheckable(true);
   _HAR_VIEW->setChecked(false);
   _HAR_VIEW->setToolTip(QString("<b>%1 (%2)</b><br/>"

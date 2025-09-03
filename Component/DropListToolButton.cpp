@@ -45,6 +45,10 @@ void DropdownToolButton::MemorizeCurrentAction(const QString& memoryKey) {
 bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
   auto* pMenu = menu();
   const auto& actsList = pMenu->actions();
+  if (actsList.isEmpty()) {
+    qWarning("No actions found");
+    return false;
+  }
   foreach(QAction* act, actsList) {
     if (act->text() == memoryValue) {
       setDefaultAction(act);
@@ -53,6 +57,7 @@ bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
   }
   qWarning("default action not find by memoryValue[%s] from %d actions",//
          qPrintable(memoryValue), actsList.size());
+  setDefaultAction(actsList.front());
   return false;
 }
 
@@ -66,4 +71,4 @@ void DropdownToolButton::onToolButtonActTriggered(QAction* pAct) {
     return;
   }
   Configuration().setValue(m_memoryKey, pAct->text());
-};
+}
