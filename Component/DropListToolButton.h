@@ -8,6 +8,7 @@
 #include <QActionGroup>
 
 class DropdownToolButton : public QToolButton {
+Q_OBJECT
  public:
   DropdownToolButton(QList<QAction*> dropdownActions,
                      QToolButton::ToolButtonPopupMode popupMode = QToolButton::ToolButtonPopupMode::InstantPopup,
