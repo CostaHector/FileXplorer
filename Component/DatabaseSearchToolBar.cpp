@@ -61,7 +61,7 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   m_whereCB->lineEdit()->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_whereCB->lineEdit()->setClearButtonEnabled(true);
   using namespace MOVIE_TABLE;
-  m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+  m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(ENUM_2_STR(Name)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
 
   QCompleter* pCompleter = new (std::nothrow) QCompleter{this};
@@ -115,6 +115,8 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   : DatabaseSearchToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
 
+  m_whereCB->addItem(QString{R"(`%1` NAME LIKE "%%" AND `%1` NAME LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
+  m_whereCB->addItem(QString{R"(`%1` NAME LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
@@ -190,6 +192,7 @@ CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidg
   {
     using namespace PERFORMER_DB_HEADER_KEY;
     for (const auto& field: DB_HEADER) {
+      m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(field));
       m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(field));
     }
     m_whereCB->addItem(QString{R"(`%1`="")"}.arg(ENUM_2_STR(Ori)));
