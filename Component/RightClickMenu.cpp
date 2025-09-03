@@ -45,7 +45,7 @@ QMenu* RightClickMenu::GetNewMenu() {
 }
 
 QMenu* RightClickMenu::GetRenameMenu() {
-  auto* renameMenuLevel2 = new QMenu(tr("&Rename"), this);
+  auto* renameMenuLevel2 = new QMenu("&Rename", this);
   renameMenuLevel2->setIcon(QIcon(":img/RENAME"));
   renameMenuLevel2->addActions(g_renameAg().RENAME_RIBBONS->actions());
   return renameMenuLevel2;

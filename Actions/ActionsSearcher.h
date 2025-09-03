@@ -5,6 +5,7 @@
 #include <QStringListModel>
 
 class ActionsSearcher : public QComboBox {
+  Q_OBJECT
  public:
   ActionsSearcher(QWidget* parent = nullptr);
   void subscribe();

@@ -74,8 +74,8 @@ class CustomTableView : public QTableView {
   QString m_columnsShowSwitch;  // 111110000011111
   static constexpr int SWITCHS_BATCH_COUNT = 5;
   QMenu* m_menu = nullptr;
-  QMenu* m_verMenu = new QMenu{tr("vertical header menu"), this};
-  QMenu* m_horMenu = new QMenu{tr("horizontal header menu"), this};
+  QMenu* m_verMenu = new QMenu{"vertical header menu", this};
+  QMenu* m_horMenu = new QMenu{"horizontal header menu", this};
 
   bool m_enableDefaultSectionSize {true};
 
