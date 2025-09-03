@@ -18,16 +18,6 @@ class View {
 
   static void UpdateItemViewFontSizeCore(QAbstractItemView* view);
 
-  static inline QModelIndexList selectedIndexes(QAbstractItemView* view) {  // ignore other column, keep the first column
-    if (view == nullptr) {
-      return {};
-    }
-    if (dynamic_cast<QListView*>(view) != nullptr) {
-      return view->selectionModel()->selectedIndexes();
-    }
-    return view->selectionModel()->selectedRows();
-  }
-
   static bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to);
 
   static void changeDropAction(QDropEvent* event);

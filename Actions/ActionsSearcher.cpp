@@ -8,7 +8,7 @@
 ActionsSearcher::ActionsSearcher(QWidget* parent)  //
     : QComboBox{parent}                            //
 {
-  mLastValidAct = new (std::nothrow) QAction{QIcon(":img/SEARCH"), "Search action by name here", this};
+  mLastValidAct = new (std::nothrow) QAction{QIcon(":img/SEARCH"), tr("Search action by name here"), this};
   CHECK_NULLPTR_RETURN_VOID(mLastValidAct)
 
   actionKeyLineEdit = new (std::nothrow) QLineEdit{this};

@@ -6,7 +6,7 @@ JsonActions::JsonActions(QObject* parent)  //
     : QObject{parent}                                  //
 {
   // **Submit**
-  _SAVE_CURRENT_CHANGES = new (std::nothrow) QAction{QIcon(":img/SUBMIT"), "Submit", this};
+  _SAVE_CURRENT_CHANGES = new (std::nothrow) QAction{QIcon(":img/SUBMIT"), tr("Submit"), this};
   _SAVE_CURRENT_CHANGES->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
   _SAVE_CURRENT_CHANGES->setShortcutVisibleInContextMenu(true);
   _SAVE_CURRENT_CHANGES->setToolTip(QString("<b>%1 (%2)</b><br/> Commit selected row changes")  //
@@ -18,27 +18,27 @@ JsonActions::JsonActions(QObject* parent)  //
   _SYNC_NAME_FIELD_BY_FILENAME->setToolTip(QString("<b>%1 (%2)</b><br/>Sync Name Field from json file base name.")  //
                                                .arg(_SYNC_NAME_FIELD_BY_FILENAME->text(), _SYNC_NAME_FIELD_BY_FILENAME->shortcut().toString()));
 
-  _RELOAD_JSON_FROM_FROM_DISK = new (std::nothrow) QAction(QIcon(":img/RELOAD_FROM_DISK"), "Reload from disk", this);
+  _RELOAD_JSON_FROM_FROM_DISK = new (std::nothrow) QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload from disk"), this);
   _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
   _RELOAD_JSON_FROM_FROM_DISK->setShortcutVisibleInContextMenu(true);
   _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from disk")  //
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())              //
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
-  _EXPORT_CAST_STUDIO_TO_DICTION = new (std::nothrow) QAction(QIcon(":img/AI_LEARN"), "Export to Dictionary", this);
+  _EXPORT_CAST_STUDIO_TO_DICTION = new (std::nothrow) QAction(QIcon(":img/AI_LEARN"), tr("Export to Dictionary"), this);
   _EXPORT_CAST_STUDIO_TO_DICTION->setToolTip(QString("<b>%1 (%2)</b><br/> Export studio/cast from field `Cast` and `Studio` in json file. \n Improve its cast/studio hint capability.")
                                                  .arg(_EXPORT_CAST_STUDIO_TO_DICTION->text())
                                                  .arg(_EXPORT_CAST_STUDIO_TO_DICTION->shortcut().toString()));
 
   // **Case Control**
-  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD = new (std::nothrow) QAction(QIcon{":img/CASE_TITLE"}, "Title", this);
+  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD = new (std::nothrow) QAction(QIcon{":img/CASE_TITLE"}, tr("Title"), this);
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcutVisibleInContextMenu(true);
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setToolTip(QString("<b>%1 (%2)</b><br/> Capitalize first letter of each word in a sentence.")
                                                         .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text())
                                                         .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
 
-  _LOWER_ALL_WORDS = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), "Lower", this);
+  _LOWER_ALL_WORDS = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lower"), this);
   _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
   _LOWER_ALL_WORDS->setShortcutVisibleInContextMenu(true);
   _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentence.")  //
@@ -50,11 +50,11 @@ JsonActions::JsonActions(QObject* parent)  //
   _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
   _OPEN_THIS_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Open this json file in system default app.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
-  _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this);
+  _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"), this);
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
   _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal this json in its parent folder.").arg(_REVEAL_IN_EXPLORER->text()).arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
-  _RENAME_JSON_AND_RELATED_FILES = new (std::nothrow) QAction(QIcon(":img/RENAME"), "Rename json\n(also related files)", this);
+  _RENAME_JSON_AND_RELATED_FILES = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename json\n(also related files)"), this);
   _RENAME_JSON_AND_RELATED_FILES->setShortcut(QKeySequence(Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_F2));
   _RENAME_JSON_AND_RELATED_FILES->setShortcutVisibleInContextMenu(true);
   _RENAME_JSON_AND_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename this json file and its related file(s)")  //
@@ -69,12 +69,12 @@ JsonActions::JsonActions(QObject* parent)  //
   _CLEAR_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_CLEAR"), "Clear Tags");
   _CLEAR_TAGS->setToolTip(QString("<b>%1 (%2)</b><br/>Clear Tags in selected rows.").arg(_CLEAR_TAGS->text(), _CLEAR_TAGS->shortcut().toString()));
 
-  _AI_HINT_CAST_STUDIO = new (std::nothrow) QAction(QIcon(":img/AI_IDEA"), "Cast/Studio Hint", this);
+  _AI_HINT_CAST_STUDIO = new (std::nothrow) QAction(QIcon(":img/AI_IDEA"), tr("Cast/Studio Hint"), this);
   _AI_HINT_CAST_STUDIO->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _AI_HINT_CAST_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/> Give you cast/studio hint")  //
                                        .arg(_AI_HINT_CAST_STUDIO->text())
                                        .arg(_AI_HINT_CAST_STUDIO->shortcut().toString()));
-  _FORMATTER = new (std::nothrow) QAction(QIcon(":img/FORMAT_PAINTER"), "Format Cast/Studio", this);
+  _FORMATTER = new (std::nothrow) QAction(QIcon(":img/FORMAT_PAINTER"), tr("Format Cast/Studio"), this);
   _FORMATTER->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMATTER->setShortcutVisibleInContextMenu(true);
   _FORMATTER->setToolTip(QString("<b>%1 (%2)</b><br/> Format Cast/Studio Field."
@@ -106,13 +106,13 @@ JsonActions::JsonActions(QObject* parent)  //
   _TAGS_FIELD_RMV->setToolTip(QString("<b>%1 (%2)</b><br/>Input a tag used to remove from Tags field")  //
                                   .arg(_TAGS_FIELD_RMV->text(), _TAGS_FIELD_RMV->shortcut().toString()));
 
-  _ADD_SELECTED_CAST_SENTENCE = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_FROM_SENTENCE"), "Cast from sentence", this);
+  _ADD_SELECTED_CAST_SENTENCE = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_FROM_SENTENCE"), tr("Cast from sentence"), this);
   _ADD_SELECTED_CAST_SENTENCE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
   _ADD_SELECTED_CAST_SENTENCE->setShortcutVisibleInContextMenu(true);
   _ADD_SELECTED_CAST_SENTENCE->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected sentence")  //
                                               .arg(_ADD_SELECTED_CAST_SENTENCE->text())                       //
                                               .arg(_ADD_SELECTED_CAST_SENTENCE->shortcut().toString()));
-  _EXTRACT_UPPERCASE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_FROM_UPPERCASE_SENTENCE"), "From uppercase sentence", this);
+  _EXTRACT_UPPERCASE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_FROM_UPPERCASE_SENTENCE"), tr("From uppercase sentence"), this);
   _EXTRACT_UPPERCASE_CAST->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected UPPERCASE sentence")  //
                                           .arg(_EXTRACT_UPPERCASE_CAST->text())                                     //
                                           .arg(_EXTRACT_UPPERCASE_CAST->shortcut().toString()));
