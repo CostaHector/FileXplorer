@@ -37,6 +37,7 @@ private slots:
   }
 
   void testConditionGeneration() {
+    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     dialog->m_Name->setText("Henry Cavill");
     dialog->m_Size->setText(">1000000000");
     emit dialog->m_Size->returnPressed();
@@ -52,9 +53,14 @@ private slots:
     emit dialog->m_Name->returnPressed();
     QCOMPARE(dialog->GetWhereString(),
              R"((INSTR(`Name`,"A")>0 OR INSTR(`Name`,"B")>0) AND `Size`>1000000000)");
+
+    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
+    QCOMPARE(dialog->GetWhereString(),
+             R"((`Name` LIKE "%A%" OR `Name` LIKE "%B%") AND `Size`>1000000000)");
   }
 
   void test_History_Management_add() {
+    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     dialog->newWhereHistsList.clear();
     dialog->onEditHistory();
     QCOMPARE(dialog->mStrListModel->rowCount(), 0);
@@ -71,6 +77,7 @@ private slots:
   }
 
   void test_History_Management_remove() {
+    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     dialog->newWhereHistsList = QStringList{"A", "B"};
     dialog->onEditHistory();
     QCOMPARE(dialog->mStrListModel->rowCount(), 2);
@@ -109,6 +116,7 @@ private slots:
   }
 
   void test_WriteUniqueHistoryToQSetting(){
+    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     const QString beforeCfg = Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
     ON_SCOPE_EXIT {
       Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, beforeCfg);
