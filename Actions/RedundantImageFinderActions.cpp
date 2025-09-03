@@ -13,7 +13,7 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
       "Active: Search duplicates via benchmark library."
       "Inactive: Compare MD5 checksums in current directory.");
 
-  FIND_DUPLICATE_IMGS_IN_A_PATH = new (std::nothrow) QAction{QIcon{":img/DUPLICATE_IMAGES_BY_MD5"}, "By benchmark library", this};
+  FIND_DUPLICATE_IMGS_IN_A_PATH = new (std::nothrow) QAction{QIcon{":img/DUPLICATE_IMAGES_BY_MD5"}, "By MD5", this};
   CHECK_NULLPTR_RETURN_VOID(FIND_DUPLICATE_IMGS_IN_A_PATH);
   FIND_DUPLICATE_IMGS_IN_A_PATH->setCheckable(true);
   FIND_DUPLICATE_IMGS_IN_A_PATH->setShortcutVisibleInContextMenu(true);
