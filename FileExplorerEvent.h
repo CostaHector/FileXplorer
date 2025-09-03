@@ -40,17 +40,7 @@ private:
   bool on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx);
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
 
-  QModelIndexList selectedIndexesProxyToSource() const;
-  QModelIndexList selectedIndexes() const;
-  QStringList selectedItems() const {
-    const auto& inds = selectedIndexes();
-    QStringList filePaths;
-    filePaths.reserve(inds.size());
-    for (const QModelIndex& ind : inds) {
-      filePaths << _fileSysModel->filePath(ind);
-    }
-    return filePaths;
-  }
+  QStringList selectedItems() const;
 
   bool on_searchKeywordInSystemDefaultExplorer() const;
   bool on_calcMD5() const;
