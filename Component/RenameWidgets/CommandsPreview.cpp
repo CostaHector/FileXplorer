@@ -6,17 +6,24 @@
 #include <QApplication>
 #include <QResizeEvent>
 
-CommandsPreview::CommandsPreview(QWidget* parent)  //
-    : QPlainTextEdit{parent}                       //
+CommandsPreview::CommandsPreview(const QString& name, QWidget* parent)  //
+  : QPlainTextEdit{parent}, mName{name}                       //
 {
-  mToolButton = new (std::nothrow) QToolButton{this};
-  CHECK_NULLPTR_RETURN_VOID(mToolButton);
-  COPY_TEXT = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy", mToolButton};
+  COPY_TEXT = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy", this};
   CHECK_NULLPTR_RETURN_VOID(COPY_TEXT);
+  COPY_TEXT->setToolTip("Copy all text in this window to system clipboard");
 
-  mToolButton->setDefaultAction(COPY_TEXT);
-  mToolButton->setCursor(Qt::PointingHandCursor);
-  mToolButton->setFixedSize(QSize{48, 48});
+  STAY_ON_TOP = new (std::nothrow) QAction{QIcon(":img/PIN"), "Stay on Top", this};
+  CHECK_NULLPTR_RETURN_VOID(STAY_ON_TOP);
+  STAY_ON_TOP->setCheckable(true);
+  STAY_ON_TOP->setToolTip("Set this window always stay on top");
+
+  mToolBar = new (std::nothrow) QToolBar{"Floating toolbar", this};
+  CHECK_NULLPTR_RETURN_VOID(mToolBar);
+  mToolBar->addAction(COPY_TEXT);
+  mToolBar->addAction(STAY_ON_TOP);
+  mToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
+  mToolBar->setCursor(Qt::PointingHandCursor);
 
   adjustButtonPosition();
   subscribe();
@@ -29,13 +36,13 @@ void CommandsPreview::showEvent(QShowEvent* event) {
 }
 
 void CommandsPreview::closeEvent(QCloseEvent* event) {
-  Configuration().setValue("COMMANDS_PREVIEW_GEOMETRY", saveGeometry());
+  Configuration().setValue(mName + "_GEOMETRY", saveGeometry());
   QPlainTextEdit::closeEvent(event);
 }
 
 void CommandsPreview::ReadSettings() {
-  if (Configuration().contains("COMMANDS_PREVIEW_GEOMETRY")) {
-    restoreGeometry(Configuration().value("COMMANDS_PREVIEW_GEOMETRY").toByteArray());
+  if (Configuration().contains(mName + "_GEOMETRY")) {
+    restoreGeometry(Configuration().value(mName + "_GEOMETRY").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -50,16 +57,20 @@ void CommandsPreview::resizeEvent(QResizeEvent* event) {
 
 void CommandsPreview::adjustButtonPosition() {
   static constexpr int margin = 5;
-  mToolButton->move(width() - mToolButton->width() - margin, margin);
+  mToolBar->move(width() - mToolBar->width() - margin, margin);
 }
 
 void CommandsPreview::subscribe() {
-  connect(COPY_TEXT, &QAction::triggered, [this]() {
+  connect(COPY_TEXT, &QAction::triggered, this, [this]() {
     QClipboard* clipboard = QApplication::clipboard();
     if (clipboard == nullptr) {
       qWarning("clipboard is nullptr. cannot copy");
       return;
     }
     clipboard->setText(toPlainText());
+  });
+  connect(STAY_ON_TOP, &QAction::toggled, this, [this](const bool checked) {
+    setWindowFlag(Qt::WindowStaysOnTopHint, checked);
+    show();
   });
 }

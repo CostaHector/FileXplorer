@@ -9,6 +9,7 @@
 #include "PublicMacro.h"
 #include "TableFields.h"
 #include "StringTool.h"
+#include "StyleSheet.h"
 
 #include <QKeySequence>
 #include <QInputDialog>
@@ -34,6 +35,15 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
+  double fontPointSize = Configuration().value("CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE", 12).toDouble();
+  auto curFont = font();
+  curFont.setPointSizeF(fontPointSize);
+  setFont(curFont);
+
+  int iconSizeIndexHint = Configuration().value("CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX", mCurIconSizeIndex).toInt();
+  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N-1)); // [0, WHEEL_CANDIDATES_N)
+  mIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
+
   auto& inst = BrowserActions::GetInst();
   mBrowserMenu = inst.GetSearchInDBMenu(this);
   mFloatingTb = inst.GetSearchInDBToolbar(this);
@@ -50,6 +60,36 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 
   AdjustButtonPosition();
+}
+
+ClickableTextBrowser::~ClickableTextBrowser() {
+  Configuration().setValue("CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE", font().pointSizeF());
+  Configuration().setValue("CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX", mCurIconSizeIndex);
+}
+
+void ClickableTextBrowser::wheelEvent(QWheelEvent *event) {
+  if (event->modifiers() == Qt::ControlModifier) {
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numDegrees.isNull()) {
+      int numSteps = numDegrees.y() / 15;
+      int newSizeIndex = mCurIconSizeIndex + (numSteps > 0 ? 1 : -1);
+      if (newSizeIndex < 0) {
+        return;
+      } else if (newSizeIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
+        return;
+      }
+      mCurIconSizeIndex = newSizeIndex;
+      mIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
+
+      QString htmlContents = toHtml();
+      UpdateImagesSizeInHtmlSrc(htmlContents, mIconSize);
+      setHtml(htmlContents);
+      // emit onIconSizeChanged(mIconSize);
+      event->accept();
+      return;
+    }
+  }
+  QTextBrowser::wheelEvent(event);
 }
 
 bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
@@ -302,6 +342,15 @@ QString ClickableTextBrowser::BuildMultiKeywordLikeCondition(const QStringList &
     return "1=1";
   }
   return conditions.join(" AND ");
+}
+
+#include <QRegularExpression>
+QString& ClickableTextBrowser::UpdateImagesSizeInHtmlSrc(QString& htmlSrc, const QSize& newSize) {
+  static const QRegularExpression widthFixedRepRegex("<img(.*?)width=\"(\\d{0,4})\"(.*?)>", QRegularExpression::CaseInsensitiveOption);
+  static const QRegularExpression heightFixedRepRegex("<img(.*?)height=\"(\\d{0,4})\"(.*?)>", QRegularExpression::CaseInsensitiveOption);
+  htmlSrc.replace(widthFixedRepRegex, QString(R"(<img\1width="%1"\3>)").arg(newSize.width()));
+  htmlSrc.replace(heightFixedRepRegex, QString(R"(<img\1height="%1"\3>)").arg(newSize.height()));
+  return htmlSrc;
 }
 
 void ClickableTextBrowser::CopySelectedTextToClipboard() const {

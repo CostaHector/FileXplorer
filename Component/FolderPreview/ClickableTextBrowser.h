@@ -11,8 +11,13 @@
 #include "CastBrowserHelper.h"
 
 class ClickableTextBrowser : public QTextBrowser {
+  Q_OBJECT
 public:
   explicit ClickableTextBrowser(QWidget* parent = nullptr);
+  ~ClickableTextBrowser();
+  void wheelEvent(QWheelEvent *event) override;
+  const QSize& iconSize() const { return mIconSize; }
+
   QStringList GetSelectedTexts() const {
     QStringList texts;
     texts.reserve(mMultiSelections.size());
@@ -40,10 +45,15 @@ public:
   static QString FormatSearchSentence(QString text);
   static QString GetSearchResultParagraphDisplay(const QString& searchText);
   static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
+  static QString& UpdateImagesSizeInHtmlSrc(QString& htmlSrc, const QSize& newSize);
 
-/* for cast preview only below */
+  /* for cast preview only below */
   void SetCastHtmlParts(const CastHtmlParts& castHtmls) {mCastHtmls = castHtmls;}
   void UpdateHtmlContents() { setHtml(mCastHtmls.fullHtml(mCastVideosVisisble, mCastImagesVisisble)); }
+  /* for cast preview only above */
+
+signals:
+  void onIconSizeChanged(QSize newSize);
 
 protected:
   void mouseDoubleClickEvent(QMouseEvent *e) override;
@@ -80,6 +90,9 @@ private:
 
   CastHtmlParts mCastHtmls;
   bool mCastVideosVisisble, mCastImagesVisisble;
+
+  int mCurIconSizeIndex{1};
+  QSize mIconSize;
 };
 
 #endif  // CLICKABLETEXTBROWSER_H

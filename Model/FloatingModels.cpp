@@ -87,7 +87,7 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
     if (mPixCache.find(mDataLst[rw], &pm)) {
       return pm;
     }
-    if (QFile(mDataLst[rw]).size() > 10 * 1024 * 1024) { // 10MB
+    if (QFile{mDataLst[rw]}.size() > 10 * 1024 * 1024) { // 10MB
       return {}; // files too large
     }
     if (!pm.load(mDataLst[rw])) {

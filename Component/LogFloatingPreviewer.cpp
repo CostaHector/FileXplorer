@@ -3,14 +3,16 @@
 #include "LogHandler.h"
 #include <QRect>
 #include <QKeyEvent>
+#include <QAction>
 
 constexpr int LogFloatingPreviewer::SIZE_WIDTH;
 constexpr int LogFloatingPreviewer::SIZE_HEIGHT;
 
-LogFloatingPreviewer::LogFloatingPreviewer(QWidget* parent) : QTextBrowser{parent} {
+LogFloatingPreviewer::LogFloatingPreviewer(const QString& name, QWidget* parent)//
+  : CommandsPreview{name, parent} {
   hide();
   setReadOnly(false);
-  setWindowFlags(Qt::SubWindow | Qt:: WindowStaysOnTopHint | Qt::FramelessWindowHint);
+  setWindowFlags(Qt::SubWindow | Qt::FramelessWindowHint);
 
   static const QFont LOGS_FONT{"Consolas", 13};
   setFont(LOGS_FONT);
@@ -25,23 +27,27 @@ void LogFloatingPreviewer::BindToolButton(QToolButton* tb) {
 }
 
 void LogFloatingPreviewer::keyPressEvent(QKeyEvent *event) {
-  if (event->key() == Qt::Key_F12) {
-    event->accept();
-    if (_logPreviewTb != nullptr) {
-      _logPreviewTb->setChecked(false);
-      onHideShow(false);
+  switch (event->key()) {
+    case Qt::Key_Escape: {
+      if (_logPreviewTb != nullptr) {
+        _logPreviewTb->setChecked(false);
+        onHideShow(false);
+      }
+      event->accept();
+      return;
     }
-    return;
-  } else if (event->key() == Qt::Key_F5) {
-    event->accept();
-    UpdateLogsContents(150, false);
-    return;
+    case Qt::Key_F5:{
+      UpdateLogsContents(150, false);
+      event->accept();
+      return;
+    }
+    default: break;
   }
-  QTextBrowser::keyPressEvent(event);
+  CommandsPreview::keyPressEvent(event);
 }
 
 void LogFloatingPreviewer::resizeEvent(QResizeEvent *event) {
-  QTextBrowser::resizeEvent(event);
+  CommandsPreview::resizeEvent(event);
   MovePosition();
 }
 
