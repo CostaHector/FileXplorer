@@ -8,7 +8,7 @@ using namespace QuickWhereClauseHelper;
 class QuickWhereClauseHelperTest : public MyTestSuite {
   Q_OBJECT
 public:
-  QuickWhereClauseHelperTest() : MyTestSuite{false} {}
+  QuickWhereClauseHelperTest() : MyTestSuite{true} {}
 private slots:
   void test_SearchSpaceString() {
     const QString& sSpace = "  ";
