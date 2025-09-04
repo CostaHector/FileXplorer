@@ -23,6 +23,11 @@ FileSystemTreeView::FileSystemTreeView(FileSystemModel* fsmModel, QWidget* paren
   setDragEnabled(true);
   setDropIndicatorShown(true);
 
+  const int fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
+  QFont defaultFont(font());
+  defaultFont.setPointSize(fontSize);
+  setFont(defaultFont);
+
   FileSystemTreeView::subscribe();
 }
 

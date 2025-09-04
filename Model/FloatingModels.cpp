@@ -1,7 +1,6 @@
 ﻿#include "FloatingModels.h"
 #include "PathTool.h"
 #include "PublicTool.h"
-#include "StyleSheet.h"
 #include "StringTool.h"
 
 #include <QPixmap>
@@ -83,7 +82,7 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   if (isOuterBound(rw)) {
     return {};
   }
-  if (role == Qt::DecorationRole) {  // default image height = 280
+  if (role == Qt::DecorationRole) {
     QPixmap pm;
     if (mPixCache.find(mDataLst[rw], &pm)) {
       return pm;
@@ -91,17 +90,27 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
     if (QFile(mDataLst[rw]).size() > 10 * 1024 * 1024) { // 10MB
       return {}; // files too large
     }
-    pm.load(mDataLst[rw]);
-    // w/h > 480/280 = 48 / 28 = 12 / 7
-    if (pm.width() * IMAGE_SIZE::IMG_HEIGHT >= pm.height() * IMAGE_SIZE::IMG_WIDTH) {
-      pm = pm.scaledToWidth(IMAGE_SIZE::IMG_WIDTH);
+    if (!pm.load(mDataLst[rw])) {
+      return {}; // load failed
+    }
+    if (pm.width() * mHeight >= pm.height() * mWidth) {
+      pm = pm.scaledToWidth(mWidth, Qt::SmoothTransformation);
     } else {
-      pm = pm.scaledToHeight(IMAGE_SIZE::IMG_HEIGHT);
+      pm = pm.scaledToHeight(mHeight, Qt::SmoothTransformation);
     }
     mPixCache.insert(mDataLst[rw], pm);
     return pm;
   }
   return {};
+}
+
+void ImgsModel::onIconSizeChange(const QSize& newSize) {
+  if (newSize.width() == mWidth && newSize.height() == mHeight) {
+    return;
+  }
+  mWidth = newSize.width();
+  mHeight = newSize.height();
+  mPixCache.clear();
 }
 
 // ----------------
