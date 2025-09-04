@@ -2,22 +2,25 @@
 #define COMMANDSPREVIEW_H
 
 #include <QPlainTextEdit>
-#include <QToolButton>
+#include <QToolBar>
 #include <QAction>
+
 class CommandsPreview : public QPlainTextEdit {
- public:
-  explicit CommandsPreview(QWidget *parent = nullptr);
+public:
+  explicit CommandsPreview(const QString& name, QWidget *parent = nullptr);
   void subscribe();
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
   void ReadSettings();
 
- protected:
+protected:
   void resizeEvent(QResizeEvent *event) override;
+  QAction* STAY_ON_TOP{nullptr};
 
- private:
+private:
+  QString mName;
   QAction* COPY_TEXT{nullptr};
-  QToolButton* mToolButton{nullptr};
+  QToolBar* mToolBar{nullptr};
   void adjustButtonPosition();
 };
 

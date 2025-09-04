@@ -9,7 +9,7 @@
 #include <QPixmapCache>
 
 class ScenesListModel : public QAbstractListModelPub {
- public:
+public:
   ScenesListModel(QObject* object = nullptr);
   inline bool IsScnsEmpty() const { return mCurBegin == nullptr || mCurEnd == nullptr || mCurBegin == mCurEnd; }
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mCurEnd - mCurBegin; }
@@ -53,7 +53,10 @@ class ScenesListModel : public QAbstractListModelPub {
   inline int GetEntryListLen() const { return GetEntryList().size(); }
   void setFilterRegularExpression(const QString& pattern);
 
- private:
+public slots:
+  void onIconSizeChange(const QSize& newSize);
+
+private:
   int mPageIndex{0};
   int SCENES_CNT_1_PAGE{12};  // 4-by-3
   bool mFilterEnable{false};
@@ -64,5 +67,6 @@ class ScenesListModel : public QAbstractListModelPub {
   SCENES_TYPE::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
 
   QPixmapCache mPixCache;
+  int mWidth = 404, mHeight = 250;
 };
 #endif  // SCENESLISTMODEL_H

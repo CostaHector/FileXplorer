@@ -15,7 +15,6 @@ class SceneInPageActions : public QObject {
   bool InitWidget();
   QToolBar* GetOrderToolBar();
   QToolBar* GetPagesRowByColumnToolBar();
-  QToolBar* GetImageSizeToolBar();
 
   QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
   QAction* _UPDATE_SCN_ONLY{nullptr};
@@ -44,9 +43,6 @@ class SceneInPageActions : public QObject {
   QLineEdit* mPageDimensionLE{nullptr};
   QLineEdit* mPageIndexInputLE{nullptr};
   QToolBar* mPagesSelectTB{nullptr};
-
-  QLineEdit* mImageSize{nullptr};
-  QToolBar* mImageSizeTB{nullptr};
 };
 
 SceneInPageActions& g_SceneInPageActions();

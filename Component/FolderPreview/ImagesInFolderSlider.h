@@ -36,7 +36,7 @@ public:
 
   bool getImgsPathAndVidsCount(const QString& path);
 
-  auto nxtImgInFolder() -> void;
+  void nxtImgInFolder();
 
 private:
   QList<QLabel*> m_imgLabelsList;
@@ -52,6 +52,7 @@ private:
 
   static constexpr int SLIDE_TO_NEXT_IMG_TIME_INTERVAL = 2 * 1000;  // ms
   static constexpr int MAX_LABEL_CNT = 2;
+  static constexpr int mWidth = 808, mHeight = 500;
 };
 
 #endif  // IMAGESINFOLDERSLIDER_H
