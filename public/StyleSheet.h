@@ -14,16 +14,16 @@ constexpr int ROW_SECTION_HEIGHT = 10;
 static const QFont TEXT_EDIT_FONT{"Consolas", 15};
 
 #define STYLE_ITEMS_MAPPING \
-  STYLE_ITEM(DEFAULT, 0)    \
-  STYLE_ITEM(DARK, 1)
+STYLE_ITEM(DEFAULT, 0)    \
+    STYLE_ITEM(DARK, 1)
 
-enum THEME {
-  THEME_BEGIN = 0,
+    enum THEME {
+      THEME_BEGIN = 0,
 #define STYLE_ITEM(enu, val) enu = val,
-  STYLE_ITEMS_MAPPING
+      STYLE_ITEMS_MAPPING
 #undef STYLE_ITEM
-      THEME_BUTT
-};
+          THEME_BUTT
+    };
 
 const QString THEME_2_STRING[THEME_BUTT]{
 #define STYLE_ITEM(enu, val) ENUM_2_STR(enu),
@@ -57,9 +57,26 @@ struct IMAGE_SIZE {
   static constexpr int TABS_ICON_IN_MENU_16 = 16;
   static constexpr int TABS_ICON_IN_MENU_24 = 24;
   static constexpr int TABS_ICON_IN_MENU_48 = 48;
-  static int IMG_WIDTH;
-  static int IMG_HEIGHT;
-  static constexpr int PORTAIT_IMG_WIDTH {256};
+  static constexpr QSize ICON_SIZE_CANDIDATES[]//
+      {
+          QSize(25, 16),
+          QSize(40, 25),
+          QSize(65, 40),
+          QSize(105, 65),
+          QSize(170, 105),
+          QSize(275, 170),
+          QSize(323, 200),
+          QSize(445, 275),
+          QSize(485, 300),
+          QSize(566, 350),
+          QSize(648, 400),
+          QSize(720, 445),
+          QSize(809, 500),
+          QSize(970, 600),
+          QSize(1165, 720),
+          QSize(1885, 1165),
+      };
+  static constexpr int ICON_SIZE_CANDIDATES_N = sizeof(ICON_SIZE_CANDIDATES) / sizeof(*ICON_SIZE_CANDIDATES);
 };
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);

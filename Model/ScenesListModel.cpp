@@ -8,7 +8,7 @@
 #include <QBrush>
 
 ScenesListModel::ScenesListModel(QObject* object)  //
-    : QAbstractListModelPub(object) {
+  : QAbstractListModelPub(object) {
   int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
   SCENES_CNT_1_PAGE = sceneCnt1Page;
 }
@@ -30,19 +30,20 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
         return {};
       }
       const QString imgAbsPath = mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].imgs.front();
-      if (!QFile::exists(imgAbsPath)) {
-        return {};
-      }
       QPixmap pm;
       if (mPixCache.find(imgAbsPath, &pm)) {
         return pm;
       }
-      pm = QPixmap{imgAbsPath};
-      // w/h > 480/280 = 48 / 28 = 12 / 7
-      if (pm.width() * IMAGE_SIZE::IMG_HEIGHT >= pm.height() * IMAGE_SIZE::IMG_WIDTH) {
-        pm = pm.scaledToWidth(IMAGE_SIZE::IMG_WIDTH);
+      if (QFile{imgAbsPath}.size() > 10 * 1024 * 1024) { // 10MB
+        return {}; // files too large
+      }
+      if (!pm.load(imgAbsPath)) {
+        return {}; // load failed
+      }
+      if (pm.width() * mHeight >= pm.height() * mWidth) {
+        pm = pm.scaledToWidth(mWidth, Qt::SmoothTransformation);
       } else {
-        pm = pm.scaledToHeight(IMAGE_SIZE::IMG_HEIGHT);
+        pm = pm.scaledToHeight(mHeight, Qt::SmoothTransformation);
       }
       mPixCache.insert(imgAbsPath, pm);
       return pm;
@@ -325,4 +326,13 @@ void ScenesListModel::setFilterRegularExpression(const QString& pattern) {
   mCurBegin = mEntryListFiltered.cbegin() + newBegin;
   mCurEnd = mEntryListFiltered.cbegin() + newEnd;
   RowsCountEndChange();
+}
+
+void ScenesListModel::onIconSizeChange(const QSize& newSize) {
+  if (newSize.width() == mWidth && newSize.height() == mHeight) {
+    return;
+  }
+  mWidth = newSize.width();
+  mHeight = newSize.height();
+  mPixCache.clear();
 }

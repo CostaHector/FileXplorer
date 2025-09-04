@@ -8,6 +8,7 @@ const QRegularExpression stdExclamationComp("\\s+!");
 using namespace JSON_RENAME_REGEX;
 QString NameStandardizer::operator()(QString aFileName) {
   // non-standard character
+  aFileName.replace(QChar(0x00A0), QChar(' ')); // &nbsp in html
   QString& noInvalidChar = aFileName.replace(INVALID_CHARS_IN_FILENAME, " ");
   QString& noExtraSpaceComma = noInvalidChar.replace(stdCommaComp, ", ");
   QString& noExtraExclamationComma = noExtraSpaceComma.replace(stdExclamationComp, "! ");
