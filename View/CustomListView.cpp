@@ -8,11 +8,17 @@
 
 QSet<QString> CustomListView::LISTS_SET;
 
-CustomListView::CustomListView(const QString& name, QWidget* parent) : QListView{parent}, m_name{name} {
+CustomListView::CustomListView(const QString& name, QWidget* parent)//
+  : QListView{parent}, m_name{name}, mflowIntAction{this} {
   if (isNameExists(m_name)) {
     qWarning("Instance list name[%s] already exist, memory key will override", qPrintable(m_name));
+    return;
   }
   LISTS_SET.insert(m_name);
+
+
+  int iconSizeIndexHint = Configuration().value(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex).toInt();
+  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N-1)); // [0, WHEEL_CANDIDATES_N)
 
   setAlternatingRowColors(true);
 
@@ -27,22 +33,61 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) : QListView
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
 
-  _FLOW_ORIENTATION_ACT = new (std::nothrow) QAction{m_name + " Flow Orientation", this};
-  _FLOW_ORIENTATION_ACT->setCheckable(true);
-  _FLOW_ORIENTATION_ACT->setToolTip("Toggle ListView Flow Direction LeftToRight/TopToBottom");
-  const bool isFlowLeftToRight = Configuration().value(m_name + "_ORIENTATION_LEFT_TO_RIGHT", true).toBool();
-  _FLOW_ORIENTATION_ACT->setChecked(isFlowLeftToRight);
-  onOrientationChange(isFlowLeftToRight);
+  _FLOW_ORIENTATION_LEFT_TO_RIGHT = new (std::nothrow) QAction{QIcon{":img/ALIGN_HORIZONTAL_LEFT"}, "Left to Right", this};
+  _FLOW_ORIENTATION_LEFT_TO_RIGHT->setCheckable(true);
+  _FLOW_ORIENTATION_LEFT_TO_RIGHT->setToolTip(QString{"Set %1 Flow Orientation Left to Right"}.arg(m_name));
 
-  connect(_FLOW_ORIENTATION_ACT, &QAction::toggled, this, &CustomListView::onOrientationChange);
+  _FLOW_ORIENTATION_TOP_TO_BOTTOM = new (std::nothrow) QAction{QIcon{":img/ALIGN_VERTICAL_TOP"}, "Top to bottom", this};;
+  _FLOW_ORIENTATION_TOP_TO_BOTTOM->setCheckable(true);
+  _FLOW_ORIENTATION_TOP_TO_BOTTOM->setToolTip(QString{"Set %1 Flow Orientation Top to Bottom"}.arg(m_name));
+
+  mflowIntAction.init({{_FLOW_ORIENTATION_LEFT_TO_RIGHT, LeftToRight}, {_FLOW_ORIENTATION_TOP_TO_BOTTOM, TopToBottom}}, LeftToRight, QActionGroup::ExclusionPolicy::Exclusive);
+  int flowInt = Configuration().value(m_name + "_FLOW_ORIENTATION", (int)mflowIntAction.defVal()).toInt();
+  mflowIntAction.setChecked(flowInt);
+
+  _FLOW_ORIENTATION = new (std::nothrow) QMenu{QString{"%1 Flow Orientation"}.arg(m_name), this};
+  _FLOW_ORIENTATION->addActions(mflowIntAction.mActGrp->actions());
+
+
+  InitListView();
+
+  connect(mflowIntAction.mActGrp, &QActionGroup::triggered, this, &CustomListView::onOrientationChange);
+}
+
+CustomListView::~CustomListView() {
+  const auto sz = iconSize();
+  Configuration().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", (int)flow());
+  Configuration().setValue(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex);
 }
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
   if (m_menu != nullptr) {
     m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+    event->accept();
     return;
   }
   QListView::contextMenuEvent(event);
+}
+
+void CustomListView::wheelEvent(QWheelEvent *event) {
+  if (event->modifiers() == Qt::ControlModifier) {
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numDegrees.isNull()) {
+      int numSteps = numDegrees.y() / 15;
+      int newSizeIndex = mCurIconSizeIndex + (numSteps > 0 ? 1 : -1);
+      if (newSizeIndex < 0) {
+        return;
+      } else if (newSizeIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
+        return;
+      }
+      mCurIconSizeIndex = newSizeIndex;
+      setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+      // emit onIconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+      event->accept();
+      return;
+    }
+  }
+  QListView::wheelEvent(event);
 }
 
 void CustomListView::BindMenu(QMenu* menu) {
@@ -56,20 +101,14 @@ void CustomListView::BindMenu(QMenu* menu) {
   }
   m_menu = menu;
   m_menu->addSeparator();
-  m_menu->addAction(_FLOW_ORIENTATION_ACT);
+  m_menu->addMenu(_FLOW_ORIENTATION);
 }
 
-void CustomListView::onOrientationChange(bool isLeftToRight) {
-  setFlow(isLeftToRight ? QListView::Flow::LeftToRight : QListView::Flow::TopToBottom);
-  Configuration().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", isLeftToRight);
-  if (isLeftToRight) {
-    _FLOW_ORIENTATION_ACT->setIcon(QIcon{":img/ALIGN_HORIZONTAL_LEFT"});
-    _FLOW_ORIENTATION_ACT->setText(m_name + " Flow: Left to Right");
-  } else {
-    _FLOW_ORIENTATION_ACT->setIcon(QIcon{":img/ALIGN_VERTICAL_TOP"});
-    _FLOW_ORIENTATION_ACT->setText(m_name + " Flow: Top to Bottom");
-  }
+void CustomListView::onOrientationChange(const QAction* pAct) {
+  const QListView::Flow newEnum = mflowIntAction.act2Enum(pAct);
+  setFlow(newEnum);
 }
 
 void CustomListView::InitListView() {
+  setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
 }

@@ -1,12 +1,12 @@
 #ifndef LOGFLOATINGPREVIEWER_H
 #define LOGFLOATINGPREVIEWER_H
-#include <QTextBrowser>
 #include <QToolButton>
 #include <QSize>
+#include "CommandsPreview.h"
 
-class LogFloatingPreviewer : public QTextBrowser {
+class LogFloatingPreviewer : public CommandsPreview {
 public:
-  explicit LogFloatingPreviewer(QWidget* parent = nullptr);
+  explicit LogFloatingPreviewer(const QString& name, QWidget* parent = nullptr);
 
   void BindToolButton(QToolButton* tb);
   QSize sizeHint() const override {

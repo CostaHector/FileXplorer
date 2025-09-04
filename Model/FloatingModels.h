@@ -6,7 +6,7 @@
 
 class FloatingModels : public QAbstractListModelPub {
  public:
-  explicit FloatingModels(QObject* object = nullptr) : QAbstractListModelPub{object} {}
+  using QAbstractListModelPub::QAbstractListModelPub;
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return m_curLoadedCount; }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   virtual int UpdateData(const QStringList& newDataLst);  // load all in a time
@@ -29,9 +29,11 @@ class FloatingModels : public QAbstractListModelPub {
 class ImgsModel : public FloatingModels {
  public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-
+ public slots:
+  void onIconSizeChange(const QSize& newSize);
  private:
   QPixmapCache mPixCache;
+  int mWidth = 404, mHeight = 250;
 };
 
 class VidsModel : public FloatingModels {

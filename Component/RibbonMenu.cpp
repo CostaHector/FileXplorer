@@ -76,7 +76,7 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   logPrevTb->setShortcut(QKeySequence(Qt::Key::Key_F12));
   logPrevTb->setToolTip(QString{"<b>Logs Contents Viewer(%1)</b><br/> Show last 100 lines of log file"}.arg(logPrevTb->shortcut().toString()));
 
-  m_logPrev = new (std::nothrow) LogFloatingPreviewer{attached};
+  m_logPrev = new (std::nothrow) LogFloatingPreviewer{"LOG_PREVIEW", attached};
   CHECK_NULLPTR_RETURN_NULLPTR(m_logPrev);
   m_logPrev->BindToolButton(logPrevTb);
 
@@ -302,8 +302,6 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addWidget(ag.mOrderTB);
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mEnablePageTB);
-  sceneTB->addSeparator();
-  sceneTB->addWidget(ag.mImageSizeTB);
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }
@@ -359,8 +357,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   archiveVidsTB->addWidget(thumbnailTb);
+  archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   return archiveVidsTB;
 }
 

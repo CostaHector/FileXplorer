@@ -4,7 +4,7 @@
 
 class QAbstractListModelPub : public QAbstractListModel {
  public:
-  QAbstractListModelPub(QObject* parent = nullptr) : QAbstractListModel{parent} {}
+  using QAbstractListModel::QAbstractListModel;
   void RowsCountBeginChange(int beforeRow, int afterRow) {
     m_befRow = beforeRow;
     m_aftRow = afterRow;

@@ -67,11 +67,6 @@ bool SceneInPageActions::InitWidget() {
     qWarning("mEnablePageTB is nullptr");
     return false;
   }
-  mImageSizeTB = GetImageSizeToolBar();
-  if (mImageSizeTB == nullptr) {
-    qWarning("mImageSizeTB is nullptr");
-    return false;
-  }
   return true;
 }
 
@@ -119,48 +114,3 @@ QToolBar* SceneInPageActions::GetPagesRowByColumnToolBar() {
   return enableRowColTB;
 }
 
-void onImageSizeChanged(const QString& newImageSize) {
-  int xIndex = newImageSize.indexOf('x');
-  if (xIndex == -1) {
-    return;
-  }
-  const QString wid = newImageSize.left(xIndex);
-  bool isValueValid = false;
-  int w = wid.toInt(&isValueValid);
-  if (!isValueValid) {
-    qWarning("width str[%s] invalid not a number", qPrintable(wid));
-    return;
-  }
-  const QString height = newImageSize.mid(xIndex + 1);
-  int h = height.toInt(&isValueValid);
-  if (!isValueValid) {
-    qWarning("height str[%s] invalid not a number", qPrintable(height));
-    return;
-  }
-  qDebug("Image size changed to %dx%d pixels", w, h);
-  Configuration().setValue("FLOATING_WINDOW_IMG_WIDTH", w);
-  Configuration().setValue("FLOATING_WINDOW_IMG_HEIGHT", h);
-  IMAGE_SIZE::IMG_WIDTH = w;
-  IMAGE_SIZE::IMG_HEIGHT = h;
-}
-
-QToolBar* SceneInPageActions::GetImageSizeToolBar() {
-  const int width = Configuration().value("FLOATING_WINDOW_IMG_WIDTH", 480).toInt();
-  const int height = Configuration().value("FLOATING_WINDOW_IMG_HEIGHT", 280).toInt();
-  IMAGE_SIZE::IMG_WIDTH = width;
-  IMAGE_SIZE::IMG_HEIGHT = height;
-  const QString& imageSize = QString::number(width) + "x" + QString::number(height);
-
-  mImageSize = new (std::nothrow) QLineEdit(imageSize);
-  mImageSize->setInputMask("0000x0000");
-  mImageSize->setToolTip("Image Size Toolbar");
-  mImageSize->setAlignment(Qt::AlignmentFlag::AlignHCenter);
-  connect(mImageSize, &QLineEdit::textChanged, &onImageSizeChanged);
-
-  QToolBar* imageSizeTB = new (std::nothrow) QToolBar{"Image size toolbar"};
-  imageSizeTB->addWidget(new (std::nothrow) QLabel{"Image width-by-height"});
-  imageSizeTB->addWidget(mImageSize);
-  imageSizeTB->setStyleSheet("QToolBar { max-width: 512px; }");
-  imageSizeTB->setOrientation(Qt::Orientation::Vertical);
-  return imageSizeTB;
-}

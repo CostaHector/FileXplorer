@@ -10,6 +10,8 @@
 #include <QDir>
 #include <QFileIconProvider>
 #include <QSqlField>
+#include <QImageReader>
+
 
 QString CastHtmlParts::fullHtml(bool castVideosVisisble, bool castImagesVisisble) const {
   QString fullHtmlContents;
@@ -28,8 +30,31 @@ QString CastHtmlParts::fullHtml(bool castVideosVisisble, bool castImagesVisisble
 
 namespace CastBrowserHelper {
 const QString HTML_H1_TEMPLATE{R"(<a href="file:///%1">%2</a>)"};
-const QString HTML_IMG_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a>)"};
+const QString HTML_IMG_WIDTH_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" width="%3"></a>)"};
+const QString HTML_IMG_HEIGHT_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" height="%3"></a>)"};
 const QString VID_LINK_TEMPLATE{R"(<a href="file:///%1" title="%1" style="cursor:pointer">&#9654;%2</a>)"};
+
+QSize GetImageSize(const QString& filePath) {
+  QImageReader reader{filePath};
+  if (!reader.canRead()) {
+    return {};
+  }
+  return reader.size();
+}
+
+QString GenerateSingleImageInHtml(const QString& imagePath, const QString& altText, const QSize& ICON_SIZE) {
+  const auto realSize = GetImageSize(imagePath);
+  if (realSize.isNull()) {
+    return HTML_IMG_WIDTH_TEMPLATE.arg("").arg(altText).arg(0);
+  }
+  if (realSize.width() * ICON_SIZE.height() >= realSize.height() * ICON_SIZE.width()) {
+    int actualWidth = ICON_SIZE.width();
+    return HTML_IMG_WIDTH_TEMPLATE.arg(imagePath).arg(altText).arg(actualWidth);
+  } else {
+    int actualHeight = ICON_SIZE.height();
+    return HTML_IMG_HEIGHT_TEMPLATE.arg(imagePath).arg(altText).arg(actualHeight);
+  }
+}
 
 QString GetDetailDescription(const QString& fileAbsPath) {
   QString fileName, extension;
@@ -38,6 +63,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
 
   QString detail;
   detail.reserve(200);
+  detail += QString(R"(<body>)");
   detail += QString(R"(<h1>%1</h1>)").arg(fileName);
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
   const bool isFileAVideo{TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)};
@@ -72,7 +98,6 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   }
   const QFileInfo fi{fileAbsPath};
   detail += QString(R"(<h3><a href="file:///%1">%2</a></h3>)").arg(fileAbsPath, imgStr);
-  detail += QString(R"(<body>)");
   detail += QString(R"(<font size="+2">)");
   detail += QString(R"(Size: %1<br/>)").arg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(fi.size()));
   detail += QString(R"(Date created: %1<br/>)").arg(fi.lastModified().toString(Qt::ISODate));
@@ -83,7 +108,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   return detail;
 }
 
-CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost) {
+CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const QSize& ICON_SIZE) {
   const QString castName {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
   const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
   const QStringList& vidsLst {StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
@@ -128,7 +153,7 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost)
   imgsPartBody.reserve(50 * imgsCnt);
   imgsPartBody += R"(<div style="margin-top:20px;">)" "\n";
   foreach (const QString imgRelPath, imgsLst) {
-    imgsPartBody += HTML_IMG_TEMPLATE.arg(imgDir.absoluteFilePath(imgRelPath)).arg(imgRelPath).arg(IMAGE_SIZE::IMG_WIDTH);
+    imgsPartBody += GenerateSingleImageInHtml(imgDir.absoluteFilePath(imgRelPath), imgRelPath, ICON_SIZE);
   }
   imgsPartBody += "</div>" "\n";
   return {htmlSrc, {vidsPartHead, vidsPartBody}, {imgsPartHead, imgsPartBody}};

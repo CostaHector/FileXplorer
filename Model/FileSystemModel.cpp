@@ -71,7 +71,6 @@ Qt::DropActions FileSystemModel::supportedDragActions() const {
   return Qt::MoveAction | Qt::CopyAction | Qt::LinkAction;
 }
 
-
 QVariant FileSystemModel::data(const QModelIndex &index, int role) const {
   if (role == Qt::DecorationRole && index.column() == 0) {
     if (mCutIndexes.contains(rootPath(), index.row())) {

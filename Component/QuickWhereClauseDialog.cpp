@@ -13,7 +13,8 @@
 
 constexpr char QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR;
 
-QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent) : QDialog{parent} {
+QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent)//
+  : QDialog{parent} {
   AUTO_COMPLETE_AKA_SWITCH = new (std::nothrow) QAction{"Name Alias", this};
   AUTO_COMPLETE_AKA_SWITCH->setCheckable(true);
   AUTO_COMPLETE_AKA_SWITCH->setChecked(false);
@@ -81,16 +82,26 @@ QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent) : QDialog{parent
     m_Ori->setPlaceholderText(R"(Orientations here)");
   }
 
-  m_whereComboBox = new (std::nothrow) QComboBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_whereComboBox)
-  m_whereComboBox->setEditable(false);
-  m_whereComboBox->setInsertPolicy(QComboBox::InsertAtTop);
+  m_strFilterPatternCB = new (std::nothrow) QComboBox{this};
+  CHECK_NULLPTR_RETURN_VOID(m_strFilterPatternCB)
+  m_strFilterPatternCB->setEditable(false);
+  m_strFilterPatternCB->insertItem((int)Qt::CaseSensitivity::CaseInsensitive, QuickWhereClauseHelper::FUZZY_LIKE);
+  m_strFilterPatternCB->insertItem((int)Qt::CaseSensitivity::CaseSensitive, QuickWhereClauseHelper::FUZZY_INSTR);
+
+  m_whereHistComboBox = new (std::nothrow) QComboBox{this};
+  CHECK_NULLPTR_RETURN_VOID(m_whereHistComboBox)
+  m_whereHistComboBox->setEditable(false);
+  m_whereHistComboBox->setInsertPolicy(QComboBox::InsertAtTop);
 
   QString hists {Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString()};
   if (hists.isEmpty()) {
+    hists += R"(`NAME` LIKE "%%")";
+    hists += WHERE_HIST_SPLIT_CHAR;
     hists += R"(INSTR(`NAME`, "")>0)";
     hists += WHERE_HIST_SPLIT_CHAR;
     hists += R"(`Size`>1024000000)";
+    hists += WHERE_HIST_SPLIT_CHAR;
+    hists += R"(`Ori` LIKE "%%")";
     hists += WHERE_HIST_SPLIT_CHAR;
     hists += R"(INSTR(`Ori`, "")>0)";
     hists += WHERE_HIST_SPLIT_CHAR;
@@ -98,7 +109,7 @@ QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent) : QDialog{parent
   }
   mStrListModel = new (std::nothrow) QStringListModel{this};
   mStrListModel->setStringList(hists.split(WHERE_HIST_SPLIT_CHAR));
-  m_whereComboBox->setModel(mStrListModel);
+  m_whereHistComboBox->setModel(mStrListModel);
 
   m_whereLineEdit = new (std::nothrow) QLineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(m_whereLineEdit)
@@ -131,7 +142,8 @@ QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent) : QDialog{parent
   }
   {
     m_Layout->addRow("WHERE clause:", (QWidget*)nullptr);
-    m_Layout->addRow(mWhereClauseHistoryDecTb, m_whereComboBox);
+    m_Layout->addRow("Pattern:", m_strFilterPatternCB);
+    m_Layout->addRow(mWhereClauseHistoryDecTb, m_whereHistComboBox);
     m_Layout->addRow(mWhereClauseHistoryIncTb, m_whereLineEdit);
   }
   m_Layout->addWidget(mDialogButtonBox);
@@ -169,6 +181,8 @@ int QuickWhereClauseDialog::WriteUniqueHistoryToQSetting() {
 }
 
 void QuickWhereClauseDialog::onConditionsChanged() {
+  const QString STR_FILTER_PATTERN{m_strFilterPatternCB->currentText()};
+
   QStringList conditionsLst;
   conditionsLst.reserve(20);
   {
@@ -183,7 +197,7 @@ void QuickWhereClauseDialog::onConditionsChanged() {
     // DB_TABLE::MOVIES
     using namespace MOVIE_TABLE;
     using namespace QuickWhereClauseHelper;
-    const QString& nameClause = InfixNotation2RPN2Value(ENUM_2_STR(Name), m_Name->text(), FUZZY_LIKE, *p2AkaHash);
+    const QString& nameClause = InfixNotation2RPN2Value(ENUM_2_STR(Name), m_Name->text(), STR_FILTER_PATTERN, *p2AkaHash);
     if (!nameClause.isEmpty()) {
       conditionsLst << nameClause;
     }
@@ -195,15 +209,15 @@ void QuickWhereClauseDialog::onConditionsChanged() {
     if (!durationClause.isEmpty()) {
       conditionsLst << durationClause;
     }
-    const QString& studioClause = InfixNotation2RPN2Value(ENUM_2_STR(Studio), m_Studio->text());
+    const QString& studioClause = InfixNotation2RPN2Value(ENUM_2_STR(Studio), m_Studio->text(), STR_FILTER_PATTERN);
     if (!studioClause.isEmpty()) {
       conditionsLst << studioClause;
     }
-    const QString& castClause = InfixNotation2RPN2Value(ENUM_2_STR(Cast), m_Cast->text());
+    const QString& castClause = InfixNotation2RPN2Value(ENUM_2_STR(Cast), m_Cast->text(), STR_FILTER_PATTERN);
     if (!castClause.isEmpty()) {
       conditionsLst << castClause;
     }
-    const QString& tagsClause = InfixNotation2RPN2Value(ENUM_2_STR(Tags), m_Tags->text());
+    const QString& tagsClause = InfixNotation2RPN2Value(ENUM_2_STR(Tags), m_Tags->text(), STR_FILTER_PATTERN);
     if (!tagsClause.isEmpty()) {
       conditionsLst << tagsClause;
     }
@@ -216,7 +230,7 @@ void QuickWhereClauseDialog::onConditionsChanged() {
     if (!rateClause.isEmpty()) {
       conditionsLst << rateClause;
     }
-    const QString& oriClause = InfixNotation2RPN2Value(ENUM_2_STR(Ori), m_Ori->text());
+    const QString& oriClause = InfixNotation2RPN2Value(ENUM_2_STR(Ori), m_Ori->text(), STR_FILTER_PATTERN);
     if (!oriClause.isEmpty()) {
       conditionsLst << oriClause;
     }
@@ -245,6 +259,8 @@ void QuickWhereClauseDialog::subscribe() {
     connect(m_Rate, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
     connect(m_Ori, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
   }
+  connect(m_strFilterPatternCB, &QComboBox::currentTextChanged, this, &QuickWhereClauseDialog::onConditionsChanged);
+
   connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QuickWhereClauseDialog::accept);
   connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &QDialog::reject);
 
@@ -253,7 +269,16 @@ void QuickWhereClauseDialog::subscribe() {
   connect(_ADD_WHERE_CLAUSE_TO_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onAddAHistory);
   connect(_EDIT_WHERE_CLAUSE_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onEditHistory);
 
-  connect(m_whereComboBox, &QComboBox::textActivated, m_whereLineEdit, &QLineEdit::setText);
+  connect(m_whereHistComboBox, &QComboBox::textActivated, m_whereLineEdit, &QLineEdit::setText);
+}
+
+void QuickWhereClauseDialog::SetStrPatternCaseSensitive(Qt::CaseSensitivity caseSen) {
+  const int patternsCnt = m_strFilterPatternCB->count();
+  if (caseSen >= patternsCnt) {
+    qWarning("Name str pattern index[%d] out of range[0, %d)", (int)caseSen, patternsCnt);
+    return;
+  }
+  m_strFilterPatternCB->setCurrentIndex((int)caseSen);
 }
 
 bool QuickWhereClauseDialog::onRemoveAHistory() {
@@ -262,7 +287,7 @@ bool QuickWhereClauseDialog::onRemoveAHistory() {
     qDebug("History already empty, skip delete");
     return true;
   }
-  int index = m_whereComboBox->currentIndex();
+  int index = m_whereHistComboBox->currentIndex();
   if (index >= n) {
     qWarning("index[%d] out of range [0,%d), skip delete", index, n);
     return false;

@@ -8,7 +8,8 @@
 #include <QSqlQuery>
 
 namespace QuickWhereClauseHelper {
-const QString FUZZY_LIKE{R"(INSTR(`%1`,"%2")>0)"}; // `Name%1` like "%Henry%2%". here %1 is field, %2 is value
+const QString FUZZY_INSTR{R"(INSTR(`%1`,"%2")>0)"}; // Case Sensitive Search. %1 is field, %2 is value
+const QString FUZZY_LIKE{R"(`%1` LIKE "%%2%")"}; // Case Insensitive. `Name%1` like "%Henry%2%"
 const QString OPEATOR_RELATION{R"(`%1`%2)"}; // >10 => `Rate%1`>8%2. here %1 is field, %2 is value
 const QHash<QChar, QString> op2Str = {{'&', "AND"}, {'|', "OR"}};
 
@@ -108,7 +109,7 @@ QString GetSelectMovieByCastStatement(const QString& aCastName, const QString& a
     QString castNames{aCastName};
     castNames += LOGIC_OR_CHAR;
     castNames += QString{akas}.replace(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
-    whereClause = InfixNotation2RPN2Value(ENUM_2_STR(Name), castNames);
+    whereClause = InfixNotation2RPN2Value(ENUM_2_STR(Name), castNames, FUZZY_LIKE);
   }
   static const QString SELECT_NAME_TEMPLATE {//
       QString{"SELECT `%1`, `%2`, `%3`"}       //

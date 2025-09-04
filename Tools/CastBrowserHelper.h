@@ -4,6 +4,7 @@
 #include <QSet>
 #include <QString>
 #include <QSqlRecord>
+#include <QSize>
 
 struct CastHtmlParts {
   QString body;
@@ -17,11 +18,12 @@ struct CastHtmlParts {
 
 namespace CastBrowserHelper {
 extern const QString HTML_H1_TEMPLATE;
-extern const QString HTML_IMG_TEMPLATE;
+extern const QString HTML_IMG_WIDTH_TEMPLATE;
+extern const QString HTML_IMG_HEIGHT_TEMPLATE;
 extern const QString VID_LINK_TEMPLATE;
-
+QString GenerateSingleImageInHtml(const QString& imagePath, const QString& altText, const QSize& ICON_SIZE);
 QString GetDetailDescription(const QString& fileAbsPath);
-CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost);
+CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const QSize& ICON_SIZE);
 }
 
 #endif

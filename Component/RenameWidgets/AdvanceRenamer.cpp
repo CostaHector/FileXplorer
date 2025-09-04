@@ -13,81 +13,23 @@
 constexpr char AdvanceRenamer::NAME_SEP;
 
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
-    : QDialog{parent},                           //
-      windowTitleFormat("%1 | %2")               //
+  : QDialog{parent}
 {
-  m_nameExtIndependent = new (std::nothrow) QCheckBox{"Name Ext Independent"};
+  m_nameExtIndependent = new (std::nothrow) QCheckBox{"Name Ext Independent", this};
   CHECK_NULLPTR_RETURN_VOID(m_nameExtIndependent)
   m_nameExtIndependent->setToolTip(
       "Show file base name and extension respectively.\n"
       "So rename rules will work/or not work on extension");
-  m_recursiveCB = new (std::nothrow) QCheckBox{"Recursive"};
+  m_recursiveCB = new (std::nothrow) QCheckBox{"Recursive", this};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
   m_recursiveCB->setToolTip(
       "Recursive rename.\n"
       "Rules will also work on itself and its subdirectories");
-  regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state"};
+  regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state", this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
-  m_relNameTE = new (std::nothrow) QPlainTextEdit;
-  CHECK_NULLPTR_RETURN_VOID(m_relNameTE)
-  m_oBaseTE = new (std::nothrow) QPlainTextEdit;
-  CHECK_NULLPTR_RETURN_VOID(m_oBaseTE)
-  m_oExtTE = new (std::nothrow) QPlainTextEdit;
-  CHECK_NULLPTR_RETURN_VOID(m_oExtTE)
-  m_nBaseTE = new (std::nothrow) QPlainTextEdit;
-  CHECK_NULLPTR_RETURN_VOID(m_nBaseTE)
-  m_nExtTE = new (std::nothrow) QPlainTextEdit;
-  CHECK_NULLPTR_RETURN_VOID(m_nExtTE)
-  m_buttonBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help};
-  CHECK_NULLPTR_RETURN_VOID(m_buttonBox)
 
-  m_buttonBox->setOrientation(Qt::Orientation::Horizontal);
-  auto* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok);
-  pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
-  pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
-                         .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
-  pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
-  m_buttonBox->button(QDialogButtonBox::Help)->setIcon(QIcon(":img/COMMAND_PREVIEW"));
-  m_buttonBox->button(QDialogButtonBox::Help)->setText("See commands...");
-
-  m_mainLayout = new (std::nothrow) QVBoxLayout();
+  m_mainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_mainLayout);
-
-  m_relNameTE->setReadOnly(true);
-  m_relNameTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
-  m_relNameTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_relNameTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
-  m_oBaseTE->setReadOnly(true);
-  m_oBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
-  m_oBaseTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_oBaseTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
-  m_oExtTE->setReadOnly(true);
-  m_oExtTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_oExtTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
-  m_nBaseTE->setReadOnly(false);
-  m_nBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
-  m_nBaseTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  m_nBaseTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
-  m_nExtTE->setReadOnly(false);
-  m_nExtTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_nExtTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
-  m_nameEditLayout = new (std::nothrow) QHBoxLayout;
-  CHECK_NULLPTR_RETURN_VOID(m_nameEditLayout);
-  m_nameEditLayout->addWidget(m_relNameTE);
-  m_nameEditLayout->addWidget(m_oBaseTE);
-  m_nameEditLayout->addWidget(m_oExtTE);
-  m_nameEditLayout->addWidget(m_nBaseTE);
-  m_nameEditLayout->addWidget(m_nExtTE);
-  m_nameEditLayout->setStretch(0, 3);
-  m_nameEditLayout->setStretch(1, 8);
-  m_nameEditLayout->setStretch(2, 1);
-  m_nameEditLayout->setStretch(3, 8);
-  m_nameEditLayout->setStretch(4, 1);
 
   ReadSettings();
   setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
@@ -128,14 +70,73 @@ void AdvanceRenamer::initCommonSetting() {
   m_nExtTE->setVisible(bNameExtIndependent);
 }
 
+QHBoxLayout* AdvanceRenamer::GetNameEditsLayout() {
+  m_relNameTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_relNameTE)
+  m_oBaseTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_oBaseTE)
+  m_oExtTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_oExtTE)
+  m_nBaseTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_nBaseTE)
+  m_nExtTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_nExtTE)
+  m_relNameTE->setReadOnly(true);
+  m_relNameTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+  m_oBaseTE->setReadOnly(true);
+  m_oBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+  m_oExtTE->setReadOnly(true);
+  m_nBaseTE->setReadOnly(false);
+  m_nBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+  m_nExtTE->setReadOnly(false);
+
+  auto* nameEditLayout = new (std::nothrow) QHBoxLayout;
+  CHECK_NULLPTR_RETURN_NULLPTR(nameEditLayout);
+  nameEditLayout->addWidget(m_relNameTE);
+  nameEditLayout->addWidget(m_oBaseTE);
+  nameEditLayout->addWidget(m_oExtTE);
+  nameEditLayout->addWidget(m_nBaseTE);
+  nameEditLayout->addWidget(m_nExtTE);
+  nameEditLayout->setStretch(0, 3);
+  nameEditLayout->setStretch(1, 8);
+  nameEditLayout->setStretch(2, 1);
+  nameEditLayout->setStretch(3, 8);
+  nameEditLayout->setStretch(4, 1);  
+  return nameEditLayout;
+}
+
+QDialogButtonBox* AdvanceRenamer::GetDlgButtonBox() {
+  auto* buttonBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help, this};
+  CHECK_NULLPTR_RETURN_NULLPTR(buttonBox)
+  buttonBox->setOrientation(Qt::Orientation::Horizontal);
+
+  auto* pOkBtn = buttonBox->button(QDialogButtonBox::Ok);
+  pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
+  pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
+                         .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
+  pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
+
+  auto* pHelpBtn = buttonBox->button(QDialogButtonBox::Help);
+  pHelpBtn->setIcon(QIcon(":img/COMMAND_PREVIEW"));
+  pHelpBtn->setText("See commands...");
+  pHelpBtn->setCheckable(true);
+  return buttonBox;
+}
+
 void AdvanceRenamer::init() {
   InitExtraCommonVariable();
   InitExtraMemberWidget();
+
   m_controlBar = InitControlTB();
+  CHECK_NULLPTR_RETURN_VOID(m_controlBar)
+  m_nameEditLayout = GetNameEditsLayout();
+  CHECK_NULLPTR_RETURN_VOID(m_nameEditLayout)
+  m_buttonBox = GetDlgButtonBox();
+  CHECK_NULLPTR_RETURN_VOID(m_buttonBox)
+
   m_mainLayout->addWidget(m_controlBar);
   m_mainLayout->addLayout(m_nameEditLayout);
   m_mainLayout->addWidget(m_buttonBox);
-  setLayout(m_mainLayout);
   m_mainLayout->setSpacing(0);
   m_mainLayout->setContentsMargins(5, 5, 5, 5);
 
@@ -159,12 +160,25 @@ void AdvanceRenamer::Subscribe() {
     m_nExtTE->verticalScrollBar()->setValue(position);
   });
 
-  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, [this]() { onApply(false, true); });
-  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::clicked, this, [this]() { onApply(true, false); });
-  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &AdvanceRenamer::close);
+  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, [this]() {
+    onApply(false);
+    QDialog::accept();
+  });
+  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::toggled, this, [this](const bool checked) {
+    if (m_commandsPreview == nullptr) {
+      m_commandsPreview = new (std::nothrow) CommandsPreview{"COMMANDS_PREVIEW", this};
+      CHECK_NULLPTR_RETURN_VOID(m_commandsPreview);
+      m_mainLayout->insertWidget(m_mainLayout->count() - 1, m_commandsPreview);
+    }
+    m_commandsPreview->setVisible(checked);
+    if (checked) {
+      onApply(true);
+    }
+  });
+  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &QDialog::close);
 }
 
-bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
+bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
   const QStringList& relNameList = m_relNameTE->toPlainText().split(NAME_SEP);
   const QStringList& oldCompleteNameList = m_oBaseTE->toPlainText().split(NAME_SEP);
   const QStringList& oldSuffixList = m_oExtTE->toPlainText().split(NAME_SEP);
@@ -183,29 +197,20 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp, const bool isInterative) {
   using namespace FileOperatorType;
   const BATCH_COMMAND_LIST_TYPE& reversedcmds(renameHelper.getRenameCommands());
   if (isOnlyHelp) {
-    if (m_commandsPreview == nullptr) {
-      m_commandsPreview = new (std::nothrow) CommandsPreview{};
-      CHECK_NULLPTR_RETURN_FALSE(m_commandsPreview);
-    }
-    m_commandsPreview->clear();
+    QString cmds;
     for (const ACMD& cmd : reversedcmds) {
-      m_commandsPreview->appendPlainText(cmd.toStr());
+      cmds += cmd.toStr();
+      cmds += '\n';
     }
-    m_commandsPreview->setWindowTitle(QString("Rename names unique | Total %1 Command(s)").arg(reversedcmds.size()));
-    m_commandsPreview->raise();
-    m_commandsPreview->show();
+    m_commandsPreview->setPlainText(cmds);
     return true;
   }
-  bool isAllSuccess = g_undoRedo.Do(reversedcmds);
-  if (isInterative) {
-    if (isAllSuccess) {
-      LOG_GOOD_P("[Ok]Batch commands rename", "Commands count %d", reversedcmds.size());
-    } else {
-      LOG_BAD_NP("Batch commands partially failed", "See details in log");
-    }
+  if (!g_undoRedo.Do(reversedcmds)) {
+    LOG_BAD_NP("Batch commands partially failed", "See details in log");
+    return false;
   }
-  close();
-  return isAllSuccess;
+  LOG_GOOD_P("[Ok]Batch commands rename", "Commands count %d", reversedcmds.size());
+  return true;
 }
 
 void AdvanceRenamer::onRegex(const int regexState) {
