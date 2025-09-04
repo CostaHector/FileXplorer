@@ -2,6 +2,7 @@
 
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "NotificatorMacro.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>
@@ -11,7 +12,7 @@ QSet<QString> CustomListView::LISTS_SET;
 CustomListView::CustomListView(const QString& name, QWidget* parent)//
   : QListView{parent}, m_name{name}, mflowIntAction{this} {
   if (isNameExists(m_name)) {
-    qWarning("Instance list name[%s] already exist, memory key will override", qPrintable(m_name));
+    LOG_WARN_NP("Instance list name already exist, memory key will override", m_name);
     return;
   }
   LISTS_SET.insert(m_name);
@@ -81,7 +82,9 @@ void CustomListView::wheelEvent(QWheelEvent *event) {
         return;
       }
       mCurIconSizeIndex = newSizeIndex;
-      setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+      const QSize newIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
+      setIconSize(newIconSize);
+      LOG_GOOD_P("[Change] Icon size", "%d x %d", newIconSize.width(), newIconSize.height());
       // emit onIconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
       event->accept();
       return;
