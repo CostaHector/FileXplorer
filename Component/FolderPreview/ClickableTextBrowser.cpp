@@ -80,7 +80,7 @@ void ClickableTextBrowser::wheelEvent(QWheelEvent *event) {
       }
       mCurIconSizeIndex = newSizeIndex;
       mIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
-
+      LOG_GOOD_P("[Change] Icon size", "%d x %d", mIconSize.width(), mIconSize.height());
       QString htmlContents = toHtml();
       UpdateImagesSizeInHtmlSrc(htmlContents, mIconSize);
       setHtml(htmlContents);
