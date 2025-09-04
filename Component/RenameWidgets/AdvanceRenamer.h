@@ -29,10 +29,12 @@ public:
 
   void initCommonSetting();
   virtual void initExclusiveSetting() {}
+  QHBoxLayout* GetNameEditsLayout();
+  QDialogButtonBox* GetDlgButtonBox();
   void init();
 
   void Subscribe();
-  bool onApply(const bool isOnlyHelp = false, const bool isInterative = false);
+  bool onApply(const bool isOnlyHelp = false);
   void onRegex(const int regexState);
   void onIncludingSub(int includingSubState);
   void onNameExtRespective(int includingSuffixState);
@@ -48,7 +50,7 @@ public:
   virtual void extraSubscribe() {}
   virtual QStringList RenameCore(const QStringList& replaceeList) = 0;
 
-  QString windowTitleFormat;
+  QString windowTitleFormat = "%1 | %2";
 
 protected:
   static constexpr char NAME_SEP = '\n';
@@ -73,13 +75,12 @@ protected:
   QPlainTextEdit* m_nExtTE{nullptr};
 
 private:
+  QPlainTextEdit* m_commandsPreview{nullptr};
   QDialogButtonBox* m_buttonBox{nullptr};
 
   QToolBar* m_controlBar{nullptr};
   QHBoxLayout* m_nameEditLayout{nullptr};
   QVBoxLayout* m_mainLayout{nullptr};
-
-  QPlainTextEdit* m_commandsPreview{nullptr};
 };
 
 #endif  // ADVANCERENAMER_H

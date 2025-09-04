@@ -4,27 +4,39 @@
 #include <QAction>
 #include <QListView>
 #include <QMenu>
+#include "EnumIntAction.h"
+
+extern template struct EnumIntAction<QListView::Flow>;
 
 class CustomListView : public QListView {
- public:
+  Q_OBJECT
+public:
   explicit CustomListView(const QString& name, QWidget* parent = nullptr);
-
-  virtual void contextMenuEvent(QContextMenuEvent* event) override;
+  ~CustomListView();
+  void contextMenuEvent(QContextMenuEvent* event) override;
+  void wheelEvent(QWheelEvent *event) override;
 
   void BindMenu(QMenu* menu);
-  void onOrientationChange(bool isLeftToRight);
+  void onOrientationChange(const QAction* pAct);
 
   void InitListView();
 
- protected:
-  QString m_name;
-  QAction *_FLOW_ORIENTATION_ACT{nullptr};
+signals:
+  void onIconSizeChanged(QSize newSize);
 
- private:
-  QMenu* m_menu = nullptr;
+protected:
+  QString m_name;
+  QMenu* _FLOW_ORIENTATION{nullptr};
+  QAction* _FLOW_ORIENTATION_LEFT_TO_RIGHT{nullptr};
+  QAction* _FLOW_ORIENTATION_TOP_TO_BOTTOM{nullptr};
+  EnumIntAction<QListView::Flow> mflowIntAction;
+
+private:
+  QMenu* m_menu {nullptr};
 
   inline bool isNameExists(const QString& name) const { return LISTS_SET.contains(name); }
   static QSet<QString> LISTS_SET;
+  int mCurIconSizeIndex = 1;
 };
 
 #endif  // CUSTOMLISTVIEW_H

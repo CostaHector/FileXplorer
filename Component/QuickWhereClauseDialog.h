@@ -17,7 +17,7 @@ public:
   ~QuickWhereClauseDialog();
   int WriteUniqueHistoryToQSetting();
 
-  QSize sizeHint() const override { return QSize{600, 200}; }
+  QSize sizeHint() const override { return QSize{800, 200}; }
   virtual void accept() override;
 
   void onConditionsChanged();
@@ -25,6 +25,7 @@ public:
   QString GetWhereString() const { return m_whereLineEdit->text(); }
   void subscribe();
 private:
+  void SetStrPatternCaseSensitive(Qt::CaseSensitivity caseSen);
   bool onRemoveAHistory();
   int onClearHistory();
   bool onAddAHistory();
@@ -62,8 +63,8 @@ private:
   QList<QLineEdit*> mLineEditsList;
   QStringList newWhereHistsList;
 #endif
-
-  QComboBox* m_whereComboBox{nullptr};
+  QComboBox* m_strFilterPatternCB{nullptr};
+  QComboBox* m_whereHistComboBox{nullptr};
   QLineEdit* m_whereLineEdit{nullptr};
   QDialogButtonBox* mDialogButtonBox{nullptr};
 

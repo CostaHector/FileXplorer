@@ -145,9 +145,12 @@ void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
     CHECK_NULLPTR_RETURN_VOID(mImgModel)
     mImgTv = new (std::nothrow) ItemView{mMemoryName + "_IMAGE", this};
     CHECK_NULLPTR_RETURN_VOID(mImgTv)
+    mImgTv->setViewMode(QListView::ViewMode::IconMode);
+    mImgModel->onIconSizeChange(mImgTv->iconSize());
     mImgTv->SetCurrentModel(mImgModel);
     mImgTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     mImgVidOtherSplitter->addWidget(mImgTv);
+    connect(mImgTv, &ItemView::iconSizeChanged, mImgModel, &ImgsModel::onIconSizeChange);
   }
   Configuration().setValue("FLOATING_IMAGE_VIEW_SHOW", checked);
   if (mImgTv->isVisible() != checked) {
