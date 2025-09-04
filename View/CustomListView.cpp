@@ -8,9 +8,6 @@
 
 QSet<QString> CustomListView::LISTS_SET;
 
-constexpr QSize CustomListView::ICON_SIZE_CANDIDATES[];
-constexpr int CustomListView::ICON_SIZE_CANDIDATES_N;
-
 CustomListView::CustomListView(const QString& name, QWidget* parent)//
   : QListView{parent}, m_name{name}, mflowIntAction{this} {
   if (isNameExists(m_name)) {
@@ -19,8 +16,9 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)//
   }
   LISTS_SET.insert(m_name);
 
+
   int iconSizeIndexHint = Configuration().value(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex).toInt();
-  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, ICON_SIZE_CANDIDATES_N-1)); // [0, WHEEL_CANDIDATES_N)
+  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N-1)); // [0, WHEEL_CANDIDATES_N)
 
   setAlternatingRowColors(true);
 
@@ -72,19 +70,20 @@ void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
 }
 
 void CustomListView::wheelEvent(QWheelEvent *event) {
-  if (event->modifiers() & Qt::ControlModifier) {
+  if (event->modifiers() == Qt::ControlModifier) {
     QPoint numDegrees = event->angleDelta() / 8;
     if (!numDegrees.isNull()) {
       int numSteps = numDegrees.y() / 15;
       int newSizeIndex = mCurIconSizeIndex + (numSteps > 0 ? 1 : -1);
       if (newSizeIndex < 0) {
         return;
-      } else if (newSizeIndex >= ICON_SIZE_CANDIDATES_N) {
+      } else if (newSizeIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
         return;
       }
       mCurIconSizeIndex = newSizeIndex;
-      setIconSize(ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
-      emit onIconSizeChanged(ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+      setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+      // emit onIconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+      event->accept();
       return;
     }
   }
@@ -111,5 +110,5 @@ void CustomListView::onOrientationChange(const QAction* pAct) {
 }
 
 void CustomListView::InitListView() {
-  setIconSize(ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+  setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
 }

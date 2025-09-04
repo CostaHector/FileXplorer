@@ -18,23 +18,37 @@ ImagesInFolderBrowser::ImagesInFolderBrowser(QWidget* parent)  //
   subscribe();
 }
 
+void ImagesInFolderBrowser::wheelEvent(QWheelEvent *event) {
+  if (event->modifiers() == Qt::NoModifier) {
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numDegrees.isNull()) {
+      if (numDegrees.y() / 15 < 0) {
+        ShowRemainImages(verticalScrollBar()->value());
+      }
+    }
+  }
+  ClickableTextBrowser::wheelEvent(event);
+}
+
 bool ImagesInFolderBrowser::operator()(const QString& path) {
   QPixmapCache::clear(); // release memory occupied before
-
-  m_dirPath = QDir::fromNativeSeparators(path);
   m_curImgCntIndex = 0;
   m_imgsLst.clear();
-
-  const QFileInfo fi{m_dirPath};
+  const QFileInfo fi{path};
+  const QString fileName = fi.fileName();
   if (fi.isDir()) {
-    m_imgsLst = InitImgsList(m_dirPath);
+    m_dirPath = path;
+    m_imgsLst += InitImgsList(m_dirPath);
+  } else if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*." + fi.suffix().toLower())) {
+    m_dirPath = fi.absolutePath();
+    m_imgsLst.push_back(fileName);
   }
 
   QString htmlSrc;
-  htmlSrc += R"(<html><head><title>ImagesInFolderBrowser</title></head>)" "\n";
+  htmlSrc += R"(<html><head><title>Images In Folder Browser</title></head>)" "\n";
   htmlSrc += R"(<body align="center">)" "\n";
   htmlSrc += R"(<h1>)";
-  htmlSrc += CastBrowserHelper::HTML_H1_TEMPLATE.arg(fi.absoluteFilePath()).arg(fi.fileName());
+  htmlSrc += CastBrowserHelper::HTML_H1_TEMPLATE.arg(path).arg(fileName);
   htmlSrc += R"(</h1>)";
   htmlSrc += R"(<br/>)";
   if (hasNextImgs()) {
@@ -64,15 +78,12 @@ bool ImagesInFolderBrowser::hasNextImgs() const {
 }
 
 QString ImagesInFolderBrowser::nextImgsHTMLSrc() {
-  using namespace CastBrowserHelper;
   QString imgSrc;
   const QDir dir{m_dirPath};
+  const auto& ICON_SIZE = iconSize();
   for (int i = SHOW_IMGS_CNT_LIST[m_curImgCntIndex]; i < m_imgsLst.size() and i < SHOW_IMGS_CNT_LIST[m_curImgCntIndex + 1]; ++i) {
     const QString& imgName = m_imgsLst[i];
-    imgSrc += HTML_IMG_TEMPLATE//
-                  .arg(dir.absoluteFilePath(imgName))//
-                  .arg(imgName)//
-                  .arg(IMAGE_SIZE::IMG_WIDTH);//
+    imgSrc += CastBrowserHelper::GenerateSingleImageInHtml(dir.absoluteFilePath(imgName), imgName, ICON_SIZE);
   }
   ++m_curImgCntIndex;
   return imgSrc;

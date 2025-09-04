@@ -5,6 +5,8 @@
 class ImagesInFolderBrowser : public ClickableTextBrowser {
  public:
   explicit ImagesInFolderBrowser(QWidget* parent = nullptr);
+  void wheelEvent(QWheelEvent *event) override;
+
   bool operator()(const QString& path);
   void subscribe();
 
@@ -13,10 +15,10 @@ class ImagesInFolderBrowser : public ClickableTextBrowser {
   QString nextImgsHTMLSrc();
   bool ShowRemainImages(const int val);
 
-  static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 50, INT_MAX};  // never remove last element "INT_MAX"
-  static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(SHOW_IMGS_CNT_LIST[0]);
+private:
+  static constexpr int SHOW_IMGS_CNT_LIST[] = {0, 3, 10, 20, 30, 40, 50, 70, 100, 255, INT_MAX};  // never remove last element "INT_MAX"
+  static constexpr int N_SHOW_IMGS_CNT_LIST = sizeof(SHOW_IMGS_CNT_LIST) / sizeof(*SHOW_IMGS_CNT_LIST);
   int m_curImgCntIndex = 0;
-
   QString m_dirPath;
   QStringList m_imgsLst;
   QWidget* m_parentDocker{nullptr};

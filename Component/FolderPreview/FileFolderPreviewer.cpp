@@ -46,8 +46,8 @@ void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& im
 
   setWindowTitle(mLastName);
   BeforeDisplayAFileDetail();
-  using namespace CastBrowserHelper;
-  const CastHtmlParts castHtmls = GetCastHtmlParts(record, imgHost);
+  QSize ICON_SIZE = mDetailsPane->iconSize();
+  const CastHtmlParts castHtmls = CastBrowserHelper::GetCastHtmlParts(record, imgHost, ICON_SIZE);
   mDetailsPane->SetCastHtmlParts(castHtmls);
   mDetailsPane->UpdateHtmlContents();
 }
@@ -61,7 +61,8 @@ void FileFolderPreviewer::operator()(const QString& pth) {  // file system view
   setWindowTitle(mLastName);
   if (QFileInfo{pth}.isFile()) {  // a file
     BeforeDisplayAFileDetail();
-    mDetailsPane->setHtml(CastBrowserHelper::GetDetailDescription(pth));
+    const QString detailHtmls = CastBrowserHelper::GetDetailDescription(pth);
+    mDetailsPane->setHtml(detailHtmls);
     return;
   }
   BeforeDisplayAFolder();

@@ -26,11 +26,7 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
       "Recursive rename.\n"
       "Rules will also work on itself and its subdirectories");
   regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state", this};
-  CHECK_NULLPTR_RETURN_VOID(regexValidLabel)  
-
-  m_commandsPreview = new (std::nothrow) CommandsPreview{this};
-  CHECK_NULLPTR_RETURN_VOID(m_commandsPreview);
-  m_commandsPreview->setVisible(false);
+  CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
 
   m_mainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_mainLayout);
@@ -87,24 +83,14 @@ QHBoxLayout* AdvanceRenamer::GetNameEditsLayout() {
   CHECK_NULLPTR_RETURN_NULLPTR(m_nExtTE)
   m_relNameTE->setReadOnly(true);
   m_relNameTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
-  m_relNameTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_relNameTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_oBaseTE->setReadOnly(true);
   m_oBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
-  m_oBaseTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_oBaseTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_oExtTE->setReadOnly(true);
-  m_oExtTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_oExtTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_nBaseTE->setReadOnly(false);
   m_nBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
-  m_nBaseTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  m_nBaseTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_nExtTE->setReadOnly(false);
-  m_nExtTE->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_nExtTE->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  auto* nameEditLayout = new (std::nothrow) QHBoxLayout{this};
+  auto* nameEditLayout = new (std::nothrow) QHBoxLayout;
   CHECK_NULLPTR_RETURN_NULLPTR(nameEditLayout);
   nameEditLayout->addWidget(m_relNameTE);
   nameEditLayout->addWidget(m_oBaseTE);
@@ -115,7 +101,7 @@ QHBoxLayout* AdvanceRenamer::GetNameEditsLayout() {
   nameEditLayout->setStretch(1, 8);
   nameEditLayout->setStretch(2, 1);
   nameEditLayout->setStretch(3, 8);
-  nameEditLayout->setStretch(4, 1);
+  nameEditLayout->setStretch(4, 1);  
   return nameEditLayout;
 }
 
@@ -150,9 +136,7 @@ void AdvanceRenamer::init() {
 
   m_mainLayout->addWidget(m_controlBar);
   m_mainLayout->addLayout(m_nameEditLayout);
-  m_mainLayout->addWidget(m_commandsPreview);
   m_mainLayout->addWidget(m_buttonBox);
-  setLayout(m_mainLayout);
   m_mainLayout->setSpacing(0);
   m_mainLayout->setContentsMargins(5, 5, 5, 5);
 
@@ -181,6 +165,11 @@ void AdvanceRenamer::Subscribe() {
     QDialog::accept();
   });
   connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::toggled, this, [this](const bool checked) {
+    if (m_commandsPreview == nullptr) {
+      m_commandsPreview = new (std::nothrow) CommandsPreview{"COMMANDS_PREVIEW", this};
+      CHECK_NULLPTR_RETURN_VOID(m_commandsPreview);
+      m_mainLayout->insertWidget(m_mainLayout->count() - 1, m_commandsPreview);
+    }
     m_commandsPreview->setVisible(checked);
     if (checked) {
       onApply(true);
