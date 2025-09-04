@@ -14,9 +14,6 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent)//
   setMovement(QListView::Movement::Free);
   setWrapping(true);
 
-  setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-  setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-
   _PLAY_ITEM = new (std::nothrow) QAction{"Play", this};
   mItemMenu = new (std::nothrow) QMenu{"Item Menu", this};
   mItemMenu->addAction(_PLAY_ITEM);

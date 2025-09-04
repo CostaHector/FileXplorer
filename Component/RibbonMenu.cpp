@@ -359,8 +359,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   archiveVidsTB->addWidget(thumbnailTb);
+  archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   return archiveVidsTB;
 }
 
