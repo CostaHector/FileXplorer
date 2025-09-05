@@ -26,7 +26,7 @@ signals:
 
 protected:
   QString m_name;
-  QMenu* _FLOW_ORIENTATION{nullptr};
+  QMenu* _FLOW_ORIENTATION_MENU{nullptr};
   QAction* _FLOW_ORIENTATION_LEFT_TO_RIGHT{nullptr};
   QAction* _FLOW_ORIENTATION_TOP_TO_BOTTOM{nullptr};
   EnumIntAction<QListView::Flow> mflowIntAction;
