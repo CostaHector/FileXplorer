@@ -49,8 +49,6 @@ void FileSystemTableView::subscribe() {
   addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
 
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
-
-  addAction(g_folderPreviewActions().LISTS);
 }
 
 void FileSystemTableView::dropEvent(QDropEvent* event) {

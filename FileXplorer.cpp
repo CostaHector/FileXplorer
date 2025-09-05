@@ -108,10 +108,8 @@ void FileXplorer::InitComponentVisibility() {
   if (!showNavi) {
     m_navigationToolBar->setVisible(false);
   }
-
-  const bool showFolderPrev{Configuration().value(MemoryKey::SHOW_FOLDER_PREVIEW.name, MemoryKey::SHOW_FOLDER_PREVIEW.v).toBool()};
-  const bool showPrev{m_fsPanel->IsCurFSView() && showFolderPrev};
-  if (!showPrev) {
+  const int folderPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.v).toInt();
+  if (folderPreviewType == (int)PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
     previewHtmlDock->setVisible(false);
   }
 }
@@ -122,10 +120,12 @@ void FileXplorer::subscribe() {
     Configuration().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
     m_navigationToolBar->setVisible(checked);
   });
-
-  auto& fpAG = g_folderPreviewActions();
-  connect(fpAG.PREVIEW_AG, &QActionGroup::triggered, this, &FileXplorer::onPreviewSwitched);
   connect(vA._VIEWS_AG, &QActionGroup::triggered, this, &FileXplorer::onViewTypeChanged);
+
+  PreviewTypeToolBar* previewToolBar = g_folderPreviewActions().GetPreviewsToolbar(this);
+  connect(previewToolBar, &PreviewTypeToolBar::PreviewTypeChange, this, &FileXplorer::onPreviewSwitched);
+
+  connect(m_previewFolder, &QStackedWidget::windowTitleChanged, previewHtmlDock, &QDockWidget::setWindowTitle);
 }
 
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {
@@ -175,21 +175,13 @@ void FileXplorer::keyPressEvent(QKeyEvent* ev) {
   QMainWindow::keyPressEvent(ev);
 }
 
-void FileXplorer::onPreviewSwitched(const QAction* prevWidAct) {
-  if (prevWidAct == nullptr) {
-    return;
+void FileXplorer::onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum) {
+  if (previewEnum == PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
+    qWarning("Here should hide");
   }
-  const bool checked{prevWidAct->isChecked()};
-  Configuration().setValue(MemoryKey::SHOW_FOLDER_PREVIEW.name, checked);
-  previewHtmlDock->setVisible(checked);
-
-  const QString& previewType = prevWidAct->text();
-  if (!prevWidAct->isChecked()) {  // clear preview type
-    Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, "");
-  } else {
-    Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, previewType);
-  }
-  m_previewSwitcher->onSwitchByViewType(previewType);
+  Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)previewEnum);
+  previewHtmlDock->setVisible(previewEnum != PreviewTypeTool::PREVIEW_TYPE_E::NONE);
+  m_previewSwitcher->onSwitchByViewType(previewEnum);
 }
 
 void FileXplorer::onViewTypeChanged(const QAction* pViewAct) {

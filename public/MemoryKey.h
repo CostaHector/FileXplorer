@@ -37,7 +37,6 @@ struct MemoryKey {
 
   static const KV KEEP_VIDEOS_PLAYLIST_SHOW;
   static const KV AUTO_PLAY_NEXT_VIDEO;
-  static const KV SHOW_FOLDER_PREVIEW;
   static const KV FOLDER_PREVIEW_TYPE;
   static const KV SHOW_FLOATING_PREVIEW;
 

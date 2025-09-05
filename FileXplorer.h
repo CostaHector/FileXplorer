@@ -12,7 +12,7 @@
 #include "RibbonMenu.h"
 
 class FileXplorer : public QMainWindow {
- public:
+public:
   FileXplorer(const QStringList& args, QWidget* parent = nullptr);
   ~FileXplorer() = default;
   void closeEvent(QCloseEvent* event) override;
@@ -39,7 +39,7 @@ class FileXplorer : public QMainWindow {
   RibbonMenu* m_ribbonMenu{nullptr};
   CustomStatusBar* m_statusBar{nullptr};
 private:
-  void onPreviewSwitched(const QAction* prevWidAct);
+  void onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum);
   void onViewTypeChanged(const QAction* pViewAct);
 };
 #endif  // FILEXPLORER_H
