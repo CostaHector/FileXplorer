@@ -17,7 +17,6 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)//
   }
   LISTS_SET.insert(m_name);
 
-
   int iconSizeIndexHint = Configuration().value(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex).toInt();
   mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N-1)); // [0, WHEEL_CANDIDATES_N)
 
@@ -42,13 +41,15 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)//
   _FLOW_ORIENTATION_TOP_TO_BOTTOM->setCheckable(true);
   _FLOW_ORIENTATION_TOP_TO_BOTTOM->setToolTip(QString{"Set %1 Flow Orientation Top to Bottom"}.arg(m_name));
 
-  mflowIntAction.init({{_FLOW_ORIENTATION_LEFT_TO_RIGHT, LeftToRight}, {_FLOW_ORIENTATION_TOP_TO_BOTTOM, TopToBottom}}, LeftToRight, QActionGroup::ExclusionPolicy::Exclusive);
+  mflowIntAction.init({{_FLOW_ORIENTATION_LEFT_TO_RIGHT, LeftToRight},//
+                       {_FLOW_ORIENTATION_TOP_TO_BOTTOM, TopToBottom}},//
+                      LeftToRight, QActionGroup::ExclusionPolicy::Exclusive);
   int flowInt = Configuration().value(m_name + "_FLOW_ORIENTATION", (int)mflowIntAction.defVal()).toInt();
-  mflowIntAction.setChecked(flowInt);
+  mflowIntAction.setCheckedIfActionExist(flowInt);
+  onOrientationChange(mflowIntAction.mActGrp->checkedAction());
 
-  _FLOW_ORIENTATION = new (std::nothrow) QMenu{QString{"%1 Flow Orientation"}.arg(m_name), this};
-  _FLOW_ORIENTATION->addActions(mflowIntAction.mActGrp->actions());
-
+  _FLOW_ORIENTATION_MENU = new (std::nothrow) QMenu{QString{"%1 Flow Orientation"}.arg(m_name), this};
+  _FLOW_ORIENTATION_MENU->addActions(mflowIntAction.mActGrp->actions());
 
   InitListView();
 
@@ -56,8 +57,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)//
 }
 
 CustomListView::~CustomListView() {
-  const auto sz = iconSize();
-  Configuration().setValue(m_name + "_ORIENTATION_LEFT_TO_RIGHT", (int)flow());
+  Configuration().setValue(m_name + "_FLOW_ORIENTATION", (int)flow());
   Configuration().setValue(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex);
 }
 
@@ -104,10 +104,13 @@ void CustomListView::BindMenu(QMenu* menu) {
   }
   m_menu = menu;
   m_menu->addSeparator();
-  m_menu->addMenu(_FLOW_ORIENTATION);
+  m_menu->addMenu(_FLOW_ORIENTATION_MENU);
 }
 
 void CustomListView::onOrientationChange(const QAction* pAct) {
+  if (pAct == nullptr) {
+    return;
+  }
   const QListView::Flow newEnum = mflowIntAction.act2Enum(pAct);
   setFlow(newEnum);
 }

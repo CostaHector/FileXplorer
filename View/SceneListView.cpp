@@ -47,7 +47,6 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   setResizeMode(QListView::ResizeMode::Adjust);
   setMovement(QListView::Movement::Free);
   setWrapping(true);
-  setFlow(QListView::Flow::LeftToRight);
 
   mAlignDelegate = new (std::nothrow) AlignDelegate;
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
