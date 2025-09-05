@@ -27,7 +27,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
   : QMainWindow(parent)                                                            //
 {
   previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this}; //  docker
-  m_previewFolder = new (std::nothrow) SelectionPreviewer{previewHtmlDock}; // previewer in docker
+  m_previewFolder = new (std::nothrow) CurrentRowPreviewer{previewHtmlDock}; // previewer in docker
   m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this}; // previewer switcher
   m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar; // searchToolBar
   m_viewsSwitcher = g_viewActions().GetViewTB(); // right-down corner permanent widget
