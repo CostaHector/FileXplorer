@@ -84,7 +84,7 @@ void ClickableTextBrowser::wheelEvent(QWheelEvent *event) {
       QString htmlContents = toHtml();
       UpdateImagesSizeInHtmlSrc(htmlContents, mIconSize);
       setHtml(htmlContents);
-      // emit onIconSizeChanged(mIconSize);
+      emit iconSizeChanged(mIconSize);
       event->accept();
       return;
     }

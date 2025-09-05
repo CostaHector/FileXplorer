@@ -14,7 +14,7 @@ public:
   int operator()(const QString& harAbsPath);
   void subscribe();
   int SaveSelectionFilesTo() const;
-  bool PreviewImage();
+  bool PreviewImage(const QModelIndex &current, const QModelIndex &/*previous*/);
 
   void updateWindowsSize();
   void showEvent(QShowEvent *event) override;

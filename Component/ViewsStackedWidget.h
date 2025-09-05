@@ -5,7 +5,7 @@
 #include "AdvanceSearchToolBar.h"
 #include "CustomStatusBar.h"
 #include "NavigationAndAddressBar.h"
-#include "SelectionPreviewer.h"
+#include "CurrentRowPreviewer.h"
 
 #include "AdvanceSearchTableView.h"
 #include "FileSystemListView.h"
@@ -26,7 +26,7 @@ class ViewsStackedWidget : public QStackedWidget {
   Q_OBJECT
  public:
   friend class ToolBarAndViewSwitcher;
-  explicit ViewsStackedWidget(SelectionPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
+  explicit ViewsStackedWidget(CurrentRowPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
 
  public slots:
   bool onActionAndViewNavigate(QString newPath, bool isNewPath = true, bool isF5Force = false);
@@ -46,9 +46,17 @@ class ViewsStackedWidget : public QStackedWidget {
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex);
   void connectSelectionChanged(ViewTypeTool::ViewType vt);
   void disconnectSelectionChanged() {
-    ViewsStackedWidget::disconnect(mSelectionChangedConn);
+    if (mSelectionChangedConn) {
+      ViewsStackedWidget::disconnect(mSelectionChangedConn);
+    }
+    if (mCurrentChangedConn) {
+      ViewsStackedWidget::disconnect(mCurrentChangedConn);
+    }
   }
-  bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+
+  void on_searchCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
+  void on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
+  void on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
 
   void keyPressEvent(QKeyEvent* e) override;
@@ -120,7 +128,7 @@ class ViewsStackedWidget : public QStackedWidget {
   JsonTableModel* m_jsonModel{nullptr};
   JsonTableView* m_jsonTableView{nullptr};
 
-  SelectionPreviewer* _previewFolder{nullptr};
+  CurrentRowPreviewer* _previewFolder{nullptr};
 
   CustomStatusBar* _logger{nullptr};
 
@@ -135,7 +143,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
-  QMetaObject::Connection mSelectionChangedConn;
+  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn;
   ViewTypeTool::ViewType mVt{ViewTypeTool::ViewType::TABLE};
 };
 

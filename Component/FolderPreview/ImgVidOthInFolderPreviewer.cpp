@@ -84,11 +84,13 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& pth) {  // file syste
   }
 }
 
-void ImgVidOthInFolderPreviewer::operator()(const QString& /*name*/, const QString& pth) {  // scene view
-  CHECK_NULLPTR_RETURN_VOID(mImgModel)
-  QDir dir{pth, "", QDir::SortFlag::Name, QDir::Filter::Files};
-  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
-  mImgModel->UpdateData(dir.entryList());
+void ImgVidOthInFolderPreviewer::operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
+  if (NeedUpdateImgs()) {
+    UpdateImgs(name, imgPthLst);
+  }
+  if (NeedUpdateVids()) {
+    UpdateVids(vidsLst);
+  }
 }
 
 void ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
@@ -100,12 +102,12 @@ void ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringLi
   mImgModel->UpdateData(imgPthLst);
 }
 
-void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& dataLst) {
+void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& vidsLst) {
   if (!NeedUpdateVids()) {
     return;
   }
   CHECK_NULLPTR_RETURN_VOID(mVidsModel)
-  mVidsModel->UpdateData(dataLst);
+  mVidsModel->UpdateData(vidsLst);
 }
 
 void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) {
