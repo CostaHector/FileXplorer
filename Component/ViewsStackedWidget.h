@@ -46,9 +46,15 @@ class ViewsStackedWidget : public QStackedWidget {
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex);
   void connectSelectionChanged(ViewTypeTool::ViewType vt);
   void disconnectSelectionChanged() {
-    ViewsStackedWidget::disconnect(mSelectionChangedConn);
+    if (mSelectionChangedConn) {
+      ViewsStackedWidget::disconnect(mSelectionChangedConn);
+    }
+    if (mCurrentChangedConn) {
+      ViewsStackedWidget::disconnect(mCurrentChangedConn);
+    }
   }
-  bool on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  void on_currentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
+  void on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
 
   void keyPressEvent(QKeyEvent* e) override;
@@ -135,7 +141,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
-  QMetaObject::Connection mSelectionChangedConn;
+  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn;
   ViewTypeTool::ViewType mVt{ViewTypeTool::ViewType::TABLE};
 };
 

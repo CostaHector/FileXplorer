@@ -254,54 +254,59 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   return true;
 }
 
-bool ViewsStackedWidget::on_selectionChanged(const QItemSelection& /* selected */, const QItemSelection& /* deselected */) {
+void ViewsStackedWidget::on_currentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
   if (!IsCurFSView()) {
-    return false;
-  }
-  const int selectCnt = getSelectedRowsCount();
-  if (_logger != nullptr) {
-    _logger->pathInfo(selectCnt, 1);
-  }
-  if (selectCnt <= 0) {
-    return false;
+    return;
   }
   // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
-  const QModelIndex firstIndex = GetCurView()->currentIndex();
-  if (!firstIndex.isValid()) {
-    return false;
+  if (!current.isValid()) {
+    return;
   }
-  const QFileInfo& firstFileInfo = m_fsModel->fileInfo(firstIndex);
-  if (selectCnt == 1 && firstFileInfo.isFile()) {
-    if (_logger != nullptr) {
-      _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(firstFileInfo.size()));
-    }
+  const QFileInfo& fi = m_fsModel->fileInfo(current);
+  if (_logger != nullptr && fi.isFile()) {
+    _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(fi.size()));
   }
 
-  QString pth = m_fsModel->rootPath();
+  QString parentPth = fi.absolutePath();
 #ifdef _WIN32
-  if (!pth.isEmpty() && pth.back() == ':') {
-    pth += '/';
+  if (!parentPth.isEmpty() && parentPth.back() == ':') {
+    parentPth += '/';
   }
 #endif
-  m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
+  m_anchorTags.insert(parentPth, {current.row(), current.column()});
+
   if (_previewFolder != nullptr && _previewFolder->GetCurrentViewE() != PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
-    _previewFolder->operator()(firstFileInfo.absoluteFilePath());
+    _previewFolder->operator()(fi.absoluteFilePath());
   }
-  return true;
+}
+
+void ViewsStackedWidget::on_selectionChanged(const QItemSelection& selected, const QItemSelection& /* deselected */) {
+  if (!IsCurFSView()) {
+    return;
+  }
+  if (_logger != nullptr) {
+    _logger->pathInfo(getSelectedRowsCount(), 1);
+  }
 }
 
 void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
   disconnectSelectionChanged();
   switch (vt) {
-    case ViewType::TABLE:
-      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-      break;
-    case ViewType::LIST:
+    case ViewType::LIST: {
       mSelectionChangedConn = ViewsStackedWidget::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_fsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_currentRowChanged);
       break;
-    case ViewType::TREE:
+    }
+    case ViewType::TABLE: {
+      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_currentRowChanged);
+      break;
+    }
+    case ViewType::TREE: {
       mSelectionChangedConn = ViewsStackedWidget::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_currentRowChanged);
       break;
+    }
     default:
       qDebug("selection changed signal connect skip. current view type[%d]", (int)vt);
   }
