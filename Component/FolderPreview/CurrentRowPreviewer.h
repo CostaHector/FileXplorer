@@ -1,5 +1,5 @@
-#ifndef SELECTIONPREVIEWER_H
-#define SELECTIONPREVIEWER_H
+#ifndef CURRENTROWPREVIEWER_H
+#define CURRENTROWPREVIEWER_H
 
 #include <QMap>
 #include <QStackedWidget>
@@ -12,13 +12,13 @@
 class FolderPreviewSwitcher;
 class ToolBarAndViewSwitcher;
 
-class SelectionPreviewer : public QStackedWidget {
+class CurrentRowPreviewer : public QStackedWidget {
   Q_OBJECT
 public:
   friend class FolderPreviewSwitcher;
   friend class ToolBarAndViewSwitcher;
-  explicit SelectionPreviewer(QWidget* parent = nullptr);
-  ~SelectionPreviewer();
+  explicit CurrentRowPreviewer(QWidget* parent = nullptr);
+  ~CurrentRowPreviewer();
 
   int AddView(PreviewTypeTool::PREVIEW_TYPE_E viewType, QWidget* w) {  //
     int index = addWidget(w);
@@ -39,7 +39,7 @@ public:
     m_nextFolderTimer.start();
   }
 
-  bool isTimerDisabled() const { return SelectionPreviewer::NEXT_FOLDER_TIME_INTERVAL <= 0; }
+  bool isTimerDisabled() const { return CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL <= 0; }
 
   void UpdatePreview();
 
@@ -61,9 +61,9 @@ private:
 
   QTimer m_nextFolderTimer;
 
-  static constexpr int NEXT_FOLDER_TIME_INTERVAL = 0; // f=26 frame/s T=40ms; 100ms to avoid quick locate by prefix string not work
+  static constexpr int NEXT_FOLDER_TIME_INTERVAL = 150; // f=26 frame/s T=40ms; 100ms to avoid quick locate by prefix string not work
   // ms, when NEXT_FOLDER_TIME_INTERVAL <= 0. update preview imgs imediately(may cause lag).
   PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::PREVIEW_TYPE_E::NONE};
 };
 
-#endif  // SELECTIONPREVIEWER_H
+#endif  // CURRENTROWPREVIEWER_H
