@@ -60,7 +60,7 @@ int HarTableView::operator()(const QString& harAbsPath) {
 void HarTableView::subscribe() {
   connect(mEXPORT_TO, &QAction::triggered, this, &HarTableView::SaveSelectionFilesTo);
   connect(mQUICK_PREVIEW, &QAction::triggered, this, [this](const bool bChecked) { mShowImagePreview = bChecked; });
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &HarTableView::PreviewImage);
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &HarTableView::PreviewImage);
 }
 
 int HarTableView::SaveSelectionFilesTo() const {
@@ -88,11 +88,11 @@ int HarTableView::SaveSelectionFilesTo() const {
   return exportCount;
 }
 
-bool HarTableView::PreviewImage() {
+bool HarTableView::PreviewImage(const QModelIndex &current, const QModelIndex &/*previous*/) {
   if (!mShowImagePreview) {
     return false;
   }
-  const QModelIndex srcIndex = mSortProxyModel->mapToSource(currentIndex());
+  const QModelIndex srcIndex = mSortProxyModel->mapToSource(current);
   const int srcRow = srcIndex.row();
   const auto& entryItem = mHarModel->GetHarEntryItem(srcRow);
   static const QSet<QString> IMAGE_PREVIEW_SUPPORTED {".jpeg", ".jpg", ".png", ".webp", ".gif", "tif", "tiff"};

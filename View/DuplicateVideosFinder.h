@@ -52,7 +52,7 @@ class DuplicateVideosFinder : public QMainWindow {
 
   void onChangeSizeDeviation();
   void onChangeDurationDeviation();
-  void on_selectionChanged();
+  void on_selectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
 
   void UpdateAiMediaTableNames();
 
