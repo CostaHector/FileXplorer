@@ -10,21 +10,23 @@ class QStyledItemDelegate;
 class SceneActionsSubscribe;
 
 class SceneListView : public CustomListView {
- public:
+  Q_OBJECT
+public:
   explicit SceneListView(ScenesListModel* sceneModel, QWidget* parent = nullptr);
-  void setFloatingPreview(FileFolderPreviewer* floatingPreview);
   void setRootPath(const QString& rootPath);
   void subscribe();
   void onCopyBaseName();
   void onOpenCorrespondingFolder();
-  void onClickEvent(const QModelIndex& idx);
+  void onClickEvent(const QModelIndex &idx, const QModelIndex &previous);
 
- private:
+signals:
+  void currentSceneChanged(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst);
+
+private:
   QAction* COPY_BASENAME_FROM_SCENE{nullptr};
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
-  ScenesListModel* _sceneModel;
+  ScenesListModel* _sceneModel{nullptr};
   QStyledItemDelegate* mAlignDelegate{nullptr};
-  FileFolderPreviewer* mPrev_{nullptr};
 };
 
 #endif  // SCENELISTVIEW_H

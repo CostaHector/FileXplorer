@@ -209,14 +209,14 @@ void DuplicateVideosFinder::subscribe() {
   connect(g_dupVidFinderAg().DIFFER_BY, &QActionGroup::triggered, this, &DuplicateVideosFinder::onDifferTypeChanged);
   connect(g_dupVidFinderAg().durationDevLE, &QLineEdit::returnPressed, this, &DuplicateVideosFinder::onChangeDurationDeviation);
   connect(g_dupVidFinderAg().sizeDevLE, &QLineEdit::returnPressed, this, &DuplicateVideosFinder::onChangeSizeDeviation);
-  connect(m_dupList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &DuplicateVideosFinder::on_selectionChanged);
+  connect(m_dupList->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &DuplicateVideosFinder::on_selectionChanged);
 }
 
-void DuplicateVideosFinder::on_selectionChanged() {
-  const auto& proxyIndex = m_dupList->currentIndex();
+void DuplicateVideosFinder::on_selectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
+  const auto& proxyIndex = current;
   const auto& srcIndex = m_dupList->m_sortProxy->mapToSource(proxyIndex);
 
-  if (not srcIndex.isValid()) {
+  if (!srcIndex.isValid()) {
     return;
   }
   m_details->clearSelection();
