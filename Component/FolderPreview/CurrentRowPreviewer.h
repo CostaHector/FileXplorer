@@ -1,8 +1,9 @@
 #ifndef CURRENTROWPREVIEWER_H
 #define CURRENTROWPREVIEWER_H
 
-#include <QMap>
 #include <QStackedWidget>
+#include <QSqlRecord>
+#include <QMap>
 
 #include "ImagesInFolderBrowser.h"
 #include "ImagesInFolderSlider.h"
@@ -30,6 +31,7 @@ public:
   PreviewTypeTool::PREVIEW_TYPE_E GetCurrentViewE() const { return mCurrentPreviewType; }
 
   void operator()(const QString& path) {
+    mCurrentSrcFrom = SRC_FROM::FILE_SYSTEM_VIEW;
     m_curPath = path;
     if (isTimerDisabled()) {
       UpdatePreview();
@@ -38,6 +40,19 @@ public:
     m_nextFolderTimer.stop();
     m_nextFolderTimer.start();
   }
+
+  void operator()(const QSqlRecord& newRecord, const QString imageHostPath) {
+    mCurrentSrcFrom = SRC_FROM::CAST;
+    m_curRecord = newRecord;
+    m_curImageHostPath = imageHostPath;
+    if (isTimerDisabled()) {
+      UpdatePreview();
+      return;
+    }
+    m_nextFolderTimer.stop();
+    m_nextFolderTimer.start();
+  }
+
 
   bool isTimerDisabled() const { return CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL <= 0; }
 
@@ -54,7 +69,12 @@ private:
   QMap<int, PreviewTypeTool::PREVIEW_TYPE_E> m_previewIndex2NameE;
   QWidget* m_parentDocker{nullptr};
 
+  /*For File System View*/
   QString m_curPath;
+  /*For Cast View*/
+  QSqlRecord m_curRecord;
+  QString m_curImageHostPath;
+
   ImagesInFolderBrowser* m_imgInFolderBrowser{nullptr};
   ImagesInFolderSlider* m_imgInFolderLabels{nullptr};
   FileFolderPreviewer* m_fileFolderPreviewStackedWid{nullptr};
@@ -64,6 +84,12 @@ private:
   static constexpr int NEXT_FOLDER_TIME_INTERVAL = 150; // f=26 frame/s T=40ms; 100ms to avoid quick locate by prefix string not work
   // ms, when NEXT_FOLDER_TIME_INTERVAL <= 0. update preview imgs imediately(may cause lag).
   PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::PREVIEW_TYPE_E::NONE};
+
+  enum class SRC_FROM {
+    FILE_SYSTEM_VIEW,
+    CAST,
+  };
+  SRC_FROM mCurrentSrcFrom{SRC_FROM::FILE_SYSTEM_VIEW};
 };
 
 #endif  // CURRENTROWPREVIEWER_H
