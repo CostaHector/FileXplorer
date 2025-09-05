@@ -26,13 +26,11 @@
 
 CastDBView::CastDBView(CastDbModel* castDbModel_,
                        CastDatabaseSearchToolBar* castDbSearchBar_,
-                       FileFolderPreviewer* floatingPreview_,
                        CastBaseDb& castDb_,
                        QWidget* parent)
   : CustomTableView{"PERFORMERS_TABLE", parent},  //
   _castDbSearchBar{castDbSearchBar_},
   _castModel{castDbModel_},
-  _floatingPreview{floatingPreview_},
   _castDb{castDb_},
   mImageHost{castDbModel_->rootPath()}
 {
@@ -82,7 +80,7 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
   connect(this, &CastDBView::doubleClicked, this, &CastDBView::onCastRowDoubleClicked);
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::onCastRowSelectionChanged);
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::onCastRowSelectionChanged);
 }
 
 void CastDBView::onInitATable() {
@@ -250,7 +248,7 @@ int CastDBView::onSyncAllImgsFieldFromImageHost() {
     succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, mImageHost);
     _castModel->setRecord(r, sqlRecord);
   }
-  RefreshHtmlContents();
+  RefreshCurrentRowHtmlContents();
   QString msgTitle{QString("All %1 record(s) imgs field been sync").arg(totalCnt)};
   QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
   if (totalCnt != succeedCnt) {
@@ -276,7 +274,7 @@ int CastDBView::onSyncImgsFieldFromImageHost() {
     succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, mImageHost);
     _castModel->setRecord(r, sqlRecord);
   }
-  RefreshHtmlContents();
+  RefreshCurrentRowHtmlContents();
   QString msgTitle{QString("%1 record(s) selected imgs field been sync").arg(totalCnt)};
   QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
   if (totalCnt != succeedCnt) {
@@ -394,20 +392,17 @@ int CastDBView::onForceRefreshRecordsVids() {
     vidsCnt += curCastVidCnt;
     ++recordsCnt;
   }
-  RefreshHtmlContents();
+  RefreshCurrentRowHtmlContents();
   LOG_GOOD_P("[ok]Videos(s) updated", "%d records selection, total %d videos", recordsCnt, vidsCnt);
   return recordsCnt;
 }
 
-bool CastDBView::onCastRowSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
-  if (_floatingPreview == nullptr) {return true;}
-  const auto& curInd{currentIndex()};
-  if (!curInd.isValid()) {
-    return false;
+void CastDBView::onCastRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
+  if (!current.isValid()) {
+    return;
   }
-  const QSqlRecord& record = _castModel->record(curInd.row());
-  _floatingPreview->operator()(record, mImageHost);
-  return true;
+  const auto& record = _castModel->record(current.row());
+  emit currentRecordChanged(record, mImageHost);
 }
 
 bool CastDBView::onCastRowDoubleClicked(const QModelIndex &index) {
@@ -470,12 +465,13 @@ int CastDBView::onMigrateCastTo() {
   return migrateCastCnt;
 }
 
-void CastDBView::RefreshHtmlContents() {
-  if (_floatingPreview == nullptr || !selectionModel()->hasSelection()) {
+void CastDBView::RefreshCurrentRowHtmlContents() {
+  auto current = currentIndex();
+  if (!current.isValid()) {
     return;
   }
-  const auto& record = _castModel->record(currentIndex().row());
-  _floatingPreview->operator()(record, mImageHost);
+  const auto& record = _castModel->record(current.row());
+  emit currentRecordChanged(record, mImageHost);
 }
 
 

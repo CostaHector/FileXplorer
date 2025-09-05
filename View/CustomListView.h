@@ -22,7 +22,7 @@ public:
   void InitListView();
 
 signals:
-  void onIconSizeChanged(QSize newSize);
+  void iconSizeChanged(QSize newSize);
 
 protected:
   QString m_name;

@@ -3,7 +3,7 @@
 #include "PublicMacro.h"
 #include "PreviewTypeToolBar.h"
 
-FolderPreviewSwitcher::FolderPreviewSwitcher(SelectionPreviewer* folderPreview, QObject* parent)//
+FolderPreviewSwitcher::FolderPreviewSwitcher(CurrentRowPreviewer* folderPreview, QObject* parent)//
   : QObject{parent}, _folderPreview{folderPreview} //
 {
   PreviewTypeToolBar* previewToolbar = g_folderPreviewActions().GetPreviewsToolbar(folderPreview);

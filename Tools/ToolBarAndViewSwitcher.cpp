@@ -108,7 +108,6 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         ViewsStackedWidget::connect(_view->m_fsListView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_fsListView);
       }
-      _view->connectSelectionChanged(viewType);
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
@@ -125,7 +124,6 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         ViewsStackedWidget::connect(_view->m_fsTableView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_fsTableView);
       }
-      _view->connectSelectionChanged(viewType);
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
@@ -142,7 +140,6 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
         ViewsStackedWidget::connect(_view->m_fsTreeView, &QAbstractItemView::doubleClicked, _view, &ViewsStackedWidget::on_cellDoubleClicked);
         _view->AddView(viewType, _view->m_fsTreeView);
       }
-      _view->connectSelectionChanged(viewType);
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
@@ -195,9 +192,6 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
           sceneSub->operator()();
         }
       }
-      auto* fFloatingPrev{_view->_previewFolder != nullptr ? _view->_previewFolder->m_fileFolderPreviewStackedWid : nullptr};
-      _view->m_sceneTableView->setFloatingPreview(fFloatingPrev);
-
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_sceneTableView->setRootPath(newPath);
       viewIndex = _view->m_name2ViewIndex[viewType];
@@ -206,9 +200,8 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
     }
     case ViewType::CAST: {
       if (_view->m_castTableView == nullptr) {
-        auto* pFuncSelectionChangeCallback{_view->_previewFolder != nullptr ? _view->_previewFolder->m_fileFolderPreviewStackedWid : nullptr};
         _view->m_castDbModel = new CastDbModel{_view, _view->mCastDb.GetDb()};
-        _view->m_castTableView = new CastDBView(_view->m_castDbModel, _navigation->m_castSearchBar, pFuncSelectionChangeCallback, _view->mCastDb, _view);
+        _view->m_castTableView = new CastDBView(_view->m_castDbModel, _navigation->m_castSearchBar, _view->mCastDb, _view);
         _view->AddView(viewType, _view->m_castTableView);
       }
       _view->m_castTableView->setWindowTitle("Cast");
@@ -237,4 +230,5 @@ void ToolBarAndViewSwitcher::onSwitchByViewType(ViewTypeTool::ViewType viewType)
   }
   _view->setCurrentIndex(viewIndex);
   _view->SetVt(viewType);
+  _view->connectSelectionChanged(viewType);
 }
