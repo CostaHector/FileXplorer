@@ -53,6 +53,19 @@ public:
     m_nextFolderTimer.start();
   }
 
+  void operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst) {
+    mCurrentSrcFrom = SRC_FROM::SCENE;
+    m_sceneName = name;
+    m_sceneimgPthLst = imgPthLst;
+    m_scenevidsLst = vidsLst;
+    if (isTimerDisabled()) {
+      UpdatePreview();
+      return;
+    }
+    m_nextFolderTimer.stop();
+    m_nextFolderTimer.start();
+  }
+
 
   bool isTimerDisabled() const { return CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL <= 0; }
 
@@ -74,6 +87,10 @@ private:
   /*For Cast View*/
   QSqlRecord m_curRecord;
   QString m_curImageHostPath;
+  /*For Scene View*/
+  QString m_sceneName;
+  QStringList m_sceneimgPthLst;
+  QStringList m_scenevidsLst;
 
   ImagesInFolderBrowser* m_imgInFolderBrowser{nullptr};
   ImagesInFolderSlider* m_imgInFolderLabels{nullptr};
@@ -87,6 +104,7 @@ private:
 
   enum class SRC_FROM {
     FILE_SYSTEM_VIEW,
+    SCENE,
     CAST,
   };
   SRC_FROM mCurrentSrcFrom{SRC_FROM::FILE_SYSTEM_VIEW};

@@ -254,6 +254,13 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   return true;
 }
 
+void ViewsStackedWidget::on_searchCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
+  const QString filePath = getFilePath(current);
+  if (_previewFolder != nullptr && _previewFolder->GetCurrentViewE() != PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
+    _previewFolder->operator()(filePath);
+  }
+}
+
 void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
   // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
   if (!current.isValid()) {
@@ -296,6 +303,16 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
       mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_fsmCurrentRowChanged);
       break;
     }
+    case ViewType::SEARCH: {
+      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_searchCurrentRowChanged);
+      break;
+    }
+    case ViewType::SCENE: {
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_sceneTableView, &SceneListView::currentSceneChanged,
+                                                        _previewFolder, //
+                                                        static_cast<void (CurrentRowPreviewer::*)(const QString&, const QStringList&, const QStringList&)>(&CurrentRowPreviewer::operator()));
+      break;
+    }
     case ViewType::CAST: {
       mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged,
                                                         _previewFolder, //
@@ -303,7 +320,7 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
       break;
     }
     default: {
-      qDebug("current changed signal connect skip. current view type[%d]", (int)vt);
+      qDebug("[Skip] viewType[%s] current row change signal", ViewTypeTool::c_str(vt));
       return;
     }
   }

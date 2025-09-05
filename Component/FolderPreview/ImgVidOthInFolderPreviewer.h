@@ -11,10 +11,10 @@ class ImgVidOthInFolderPreviewer: public QWidget {
 public:
   explicit ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
   void operator()(const QString& pth); // file system view
-  void operator()(const QString& name, const QString& pth); // scene view
+  void operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst); // scene view
 
   void UpdateImgs(const QString& name, const QStringList& imgPthLst);
-  void UpdateVids(const QStringList& dataLst);
+  void UpdateVids(const QStringList& vidsLst);
   void UpdateOthers(const QStringList& dataLst);
 
   inline bool NeedUpdateImgs() const { return m_bImgVisible; }
