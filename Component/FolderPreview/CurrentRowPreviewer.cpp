@@ -21,20 +21,30 @@ CurrentRowPreviewer::~CurrentRowPreviewer() {
 
 void CurrentRowPreviewer::UpdatePreview() {
   using namespace PreviewTypeTool;
-  switch (mCurrentPreviewType) {
-    case PREVIEW_TYPE_E::NONE: // no preview
-      return;
-    case PREVIEW_TYPE_E::STACKS:
-      m_fileFolderPreviewStackedWid->operator()(m_curPath);
-      return;
-    case PREVIEW_TYPE_E::BROWSER:
-      m_imgInFolderBrowser->operator()(m_curPath);
-      return;
-    case PREVIEW_TYPE_E::SLIDERS:
-      m_imgInFolderLabels->operator()(m_curPath);
-      return;
-    default:
-      qWarning("Current previewer[%s] is not supported", c_str(mCurrentPreviewType));
+  if (mCurrentSrcFrom == SRC_FROM::FILE_SYSTEM_VIEW) {
+    switch (mCurrentPreviewType) {
+      case PREVIEW_TYPE_E::NONE: // no preview
+        return;
+      case PREVIEW_TYPE_E::STACKS:
+        m_fileFolderPreviewStackedWid->operator()(m_curPath);
+        return;
+      case PREVIEW_TYPE_E::BROWSER:
+        m_imgInFolderBrowser->operator()(m_curPath);
+        return;
+      case PREVIEW_TYPE_E::SLIDERS:
+        m_imgInFolderLabels->operator()(m_curPath);
+        return;
+      default:
+        qWarning("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
+    }
+  } else if (mCurrentSrcFrom == SRC_FROM::CAST) {
+    switch (mCurrentPreviewType) {
+      case PREVIEW_TYPE_E::STACKS:
+        m_fileFolderPreviewStackedWid->operator()(m_curRecord, m_curImageHostPath);
+        return;
+      default:
+        qWarning("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
+    }
   }
 }
 
