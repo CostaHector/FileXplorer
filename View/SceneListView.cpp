@@ -10,7 +10,7 @@
 #include <QMouseEvent>
 
 class AlignDelegate : public QStyledItemDelegate {
- public:
+public:
   void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override {
     option->decorationPosition = QStyleOptionViewItem::Position::Top;
     option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
@@ -30,29 +30,22 @@ class AlignDelegate : public QStyledItemDelegate {
 };
 
 SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
-    : CustomListView{"SCENES_TABLE", parent},                               //
-      _sceneModel{sceneModel}                                               //
+  : CustomListView{"SCENES_TABLE", parent},                               //
+  _sceneModel{sceneModel}                                               //
 {
-  if (_sceneModel == nullptr) {
-    qCritical("sceneModel is nullptr");
-    return;
-  } else {
-    setModel(_sceneModel);
-  }
+  CHECK_NULLPTR_RETURN_VOID(_sceneModel)
+  setModel(_sceneModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-  setViewMode(QListView::ViewMode::ListMode);
+  setViewMode(QListView::ViewMode::IconMode);
   setTextElideMode(Qt::TextElideMode::ElideMiddle);
-  setUniformItemSizes(false);
-
-  setResizeMode(QListView::ResizeMode::Adjust);
-  setMovement(QListView::Movement::Free);
+  setResizeMode(QListView::ResizeMode::Fixed);
   setWrapping(true);
 
   mAlignDelegate = new (std::nothrow) AlignDelegate;
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  QMenu* m_menu = new (std::nothrow) QMenu{"scene table view menu", this};
+  QMenu* m_menu = new (std::nothrow) QMenu{"Scene list view menu", this};
   CHECK_NULLPTR_RETURN_VOID(m_menu)
   COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{"copy basename", m_menu};
   CHECK_NULLPTR_RETURN_VOID(COPY_BASENAME_FROM_SCENE)
@@ -63,10 +56,6 @@ SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
   BindMenu(m_menu);
   subscribe();
-}
-
-void SceneListView::setFloatingPreview(FileFolderPreviewer* floatingPreview) {
-  mPrev_ = floatingPreview;
 }
 
 void SceneListView::onCopyBaseName() {
@@ -87,7 +76,8 @@ void SceneListView::onOpenCorrespondingFolder() {
 void SceneListView::subscribe() {
   connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneListView::onCopyBaseName);
   connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
-  connect(this, &QListView::clicked, this, &SceneListView::onClickEvent);
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SceneListView::onClickEvent);
+  connect(this, &CustomListView::iconSizeChanged, _sceneModel, &ScenesListModel::onIconSizeChange);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
@@ -102,16 +92,10 @@ void SceneListView::setRootPath(const QString& rootPath) {
   _sceneModel->setRootPath(rootPath);
 }
 
-void SceneListView::onClickEvent(const QModelIndex& idx) {
-  CHECK_NULLPTR_RETURN_VOID(mPrev_)
-  if (!idx.isValid()) {
+void SceneListView::onClickEvent(const QModelIndex &current, const QModelIndex &previous) {
+  if (!current.isValid()) {
     return;
   }
-  const QString& name = _sceneModel->baseName(idx);
-  if (!mPrev_->NeedUpdate(name)) {
-    return;
-  }
-  mPrev_->BeforeDisplayAFolder();
-  mPrev_->UpdateImgs(name, _sceneModel->GetImgs(idx));
-  mPrev_->UpdateVids(_sceneModel->GetVids(idx));
+  const QString& name = _sceneModel->baseName(current);
+  emit currentSceneChanged(name, _sceneModel->GetImgs(current), _sceneModel->GetVids(current));
 }

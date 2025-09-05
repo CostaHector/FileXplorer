@@ -45,6 +45,14 @@ void CurrentRowPreviewer::UpdatePreview() {
       default:
         qWarning("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
     }
+  } else if (mCurrentSrcFrom == SRC_FROM::SCENE) {
+    switch (mCurrentPreviewType) {
+      case PREVIEW_TYPE_E::STACKS:
+        m_fileFolderPreviewStackedWid->operator()(m_sceneName, m_sceneimgPthLst, m_scenevidsLst);
+        return;
+      default:
+        qWarning("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
+    }
   }
 }
 
