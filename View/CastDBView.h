@@ -12,13 +12,16 @@
 class FileFolderPreviewer;
 
 class CastDBView : public CustomTableView {
+  Q_OBJECT
 public:
   explicit CastDBView(CastDbModel* castDbModel_,
                       CastDatabaseSearchToolBar* castDbSearchBar_,
-                      FileFolderPreviewer* floatingPreview_,
                       CastBaseDb& castDb_,
                       QWidget* parent = nullptr);
   void subscribe();
+signals:
+  void currentRecordChanged(const QSqlRecord& newRecord, const QString imageHostPath);
+
 private:
   void onInitATable();
   int onAppendCasts();
@@ -42,17 +45,16 @@ private:
   int onForceRefreshAllRecordsVids();
   int onForceRefreshRecordsVids();
 
-  bool onCastRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
+  void onCastRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
   bool onCastRowDoubleClicked(const QModelIndex &index);
 
   int onMigrateCastTo();
 
 private:
-  void RefreshHtmlContents();
+  void RefreshCurrentRowHtmlContents();
 
   CastDatabaseSearchToolBar* _castDbSearchBar{nullptr};
   CastDbModel* _castModel{nullptr};
-  FileFolderPreviewer* _floatingPreview{nullptr};
 
   const QString mImageHost;
   CastBaseDb& _castDb;

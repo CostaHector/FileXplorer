@@ -53,7 +53,8 @@ class ViewsStackedWidget : public QStackedWidget {
       ViewsStackedWidget::disconnect(mCurrentChangedConn);
     }
   }
-  void on_currentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
+
+  void on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
   void on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
 

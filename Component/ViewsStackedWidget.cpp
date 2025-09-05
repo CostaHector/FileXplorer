@@ -254,10 +254,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   return true;
 }
 
-void ViewsStackedWidget::on_currentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
-  if (!IsCurFSView()) {
-    return;
-  }
+void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
   // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
   if (!current.isValid()) {
     return;
@@ -281,9 +278,6 @@ void ViewsStackedWidget::on_currentRowChanged(const QModelIndex &current, const 
 }
 
 void ViewsStackedWidget::on_selectionChanged(const QItemSelection& selected, const QItemSelection& /* deselected */) {
-  if (!IsCurFSView()) {
-    return;
-  }
   if (_logger != nullptr) {
     _logger->pathInfo(getSelectedRowsCount(), 1);
   }
@@ -291,24 +285,27 @@ void ViewsStackedWidget::on_selectionChanged(const QItemSelection& selected, con
 
 void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
   disconnectSelectionChanged();
+
+  auto* curView = GetCurView();
+  mSelectionChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+
   switch (vt) {
-    case ViewType::LIST: {
-      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsListView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_fsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_currentRowChanged);
-      break;
-    }
-    case ViewType::TABLE: {
-      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_fsTableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_currentRowChanged);
-      break;
-    }
+    case ViewType::LIST:
+    case ViewType::TABLE:
     case ViewType::TREE: {
-      mSelectionChangedConn = ViewsStackedWidget::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_fsTreeView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_currentRowChanged);
+      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_fsmCurrentRowChanged);
       break;
     }
-    default:
-      qDebug("selection changed signal connect skip. current view type[%d]", (int)vt);
+    case ViewType::CAST: {
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged,
+                                                        _previewFolder, //
+                                                        static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(&CurrentRowPreviewer::operator()));
+      break;
+    }
+    default: {
+      qDebug("current changed signal connect skip. current view type[%d]", (int)vt);
+      return;
+    }
   }
 }
 
@@ -950,34 +947,12 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
 }
 
 int ViewsStackedWidget::getSelectedRowsCount() const {
-  auto vt = GetVt();
-  switch (vt) {
-    case ViewType::TABLE: {
-      return m_fsTableView->selectionModel()->selectedRows().size();
-    }
-    case ViewType::LIST: {
-      return m_fsListView->selectionModel()->selectedRows().size();
-    }
-    case ViewType::TREE: {
-      return m_fsTreeView->selectionModel()->selectedRows().size();
-    }
-    case ViewType::SEARCH: {
-      return m_advanceSearchView->selectionModel()->selectedRows().size();
-    }
-    case ViewType::SCENE: {
-      return m_sceneTableView->selectionModel()->selectedRows().size();
-    }
-    case ViewType::MOVIE: {
-      return m_movieView->selectionModel()->selectedRows().size();
-    }
-    case ViewType::JSON: {
-      return m_jsonTableView->selectionModel()->selectedRows().size();
-    }
-    default: {
-      qDebug("No getSelectedRowsCount");
-    }
+  auto* curView = GetCurView();
+  if (curView == nullptr) {
+    qDebug("curView[%s] is nullptr", ViewTypeTool::c_str(GetVt()));
+    return -1;
   }
-  return -1;
+  return curView->selectionModel()->selectedRows().size();
 }
 
 QString ViewsStackedWidget::getCurFilePath() const {
