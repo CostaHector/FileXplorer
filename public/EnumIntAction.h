@@ -2,25 +2,38 @@
 #define ENUMINTACTION_H
 
 #include <QHash>
+#include <QMap>
 #include <QAction>
 #include <QActionGroup>
+
 template<typename TEMP_T>
 struct EnumIntAction : public QObject {
   using QObject::QObject;
   void init(QHash<QAction*, TEMP_T> act2Enum, TEMP_T tempVal, QActionGroup::ExclusionPolicy exclusivePlcy = QActionGroup::ExclusionPolicy::None) {
     DEFAULT_ENUM = tempVal;
     mAct2Enum = act2Enum;
-    mActGrp = new (std::nothrow) QActionGroup{this};
+
     for (auto it = act2Enum.cbegin(); it != act2Enum.cend(); ++it) {
       mVal2Enum[(int)it.value()] = it.value();
-      mActGrp->addAction(it.key());
       mEnum2Act[it.value()] = it.key();
     }
+
+    mActGrp = new (std::nothrow) QActionGroup{this};
     mActGrp->setExclusionPolicy(exclusivePlcy);
+    for (auto it = mEnum2Act.cbegin(); it != mEnum2Act.cend(); ++it) {
+      mActGrp->addAction(it.value());
+    }
   }
 
-  void setChecked(int intValue) {
+  void setCheckedIfActionExist(int intValue) {
     TEMP_T enumValue = val2Enum(intValue);
+    // when QActionGroup::ExclusionPolicy::ExclusiveOptional,
+    // intValue -> defVal() may have no action correspond
+    auto it = mEnum2Act.find(enumValue);
+    if (it == mEnum2Act.cend()) {
+      qDebug("intValue:%d, enumValue:%d have no action", intValue, (int)enumValue);
+      return;
+    }
     mEnum2Act[enumValue]->setChecked(true);
   }
 
@@ -53,7 +66,7 @@ struct EnumIntAction : public QObject {
 private:
   QHash<int, TEMP_T> mVal2Enum;
   QHash<QAction*, TEMP_T> mAct2Enum;
-  QHash<TEMP_T, QAction*> mEnum2Act;
+  QMap<TEMP_T, QAction*> mEnum2Act;
   TEMP_T DEFAULT_ENUM;
 };
 

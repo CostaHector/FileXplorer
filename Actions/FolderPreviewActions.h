@@ -4,18 +4,13 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QToolBar>
-
-#include <QWidget>
+#include "PreviewTypeToolBar.h"
 
 class FolderPreviewActions : public QObject {
  public:
   explicit FolderPreviewActions(QObject* parent = nullptr);
-  QToolBar* GetPreviewsToolbar(QWidget* parent);
-
-  QAction* LISTS{nullptr};
-  QAction* BROWSER{nullptr};
-  QAction* LABELS{nullptr};
-  QActionGroup* PREVIEW_AG{nullptr};
+  PreviewTypeToolBar* GetPreviewsToolbar(QWidget* parent = nullptr);
+  PreviewTypeToolBar* mFolderPreviewToolBar{nullptr};
 };
 
 FolderPreviewActions& g_folderPreviewActions();
