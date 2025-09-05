@@ -284,7 +284,7 @@ bool ViewsStackedWidget::on_selectionChanged(const QItemSelection& /* selected *
   }
 #endif
   m_anchorTags.insert(pth, {firstIndex.row(), firstIndex.column()});
-  if (_previewFolder != nullptr && g_folderPreviewActions().PREVIEW_AG->checkedAction() != nullptr) {
+  if (_previewFolder != nullptr && _previewFolder->GetCurrentViewE() != PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
     _previewFolder->operator()(firstFileInfo.absoluteFilePath());
   }
   return true;
