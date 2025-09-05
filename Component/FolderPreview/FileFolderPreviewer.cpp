@@ -69,9 +69,13 @@ void FileFolderPreviewer::operator()(const QString& pth) {  // file system view
   mImgVidOtherPane->operator()(pth);
 }
 
-void FileFolderPreviewer::operator()(const QString& name, const QString& pth) {  // scene view
+void FileFolderPreviewer::operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
+  if (!NeedUpdate(name)) {
+    return;
+  }
   mLastName = name;
   setWindowTitle(mLastName);
-  mImgVidOtherPane->operator()(name, pth);
+  BeforeDisplayAFolder();
+  mImgVidOtherPane->operator()(name, imgPthLst, vidsLst);
 }
 

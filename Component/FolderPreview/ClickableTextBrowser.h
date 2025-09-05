@@ -53,7 +53,7 @@ public:
   /* for cast preview only above */
 
 signals:
-  void onIconSizeChanged(QSize newSize);
+  void iconSizeChanged(QSize newSize);
 
 protected:
   void mouseDoubleClickEvent(QMouseEvent *e) override;
