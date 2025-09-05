@@ -82,7 +82,7 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
   connect(this, &CastDBView::doubleClicked, this, &CastDBView::onCastRowDoubleClicked);
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &CastDBView::onCastRowSelectionChanged);
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::onCastRowSelectionChanged);
 }
 
 void CastDBView::onInitATable() {
@@ -399,13 +399,12 @@ int CastDBView::onForceRefreshRecordsVids() {
   return recordsCnt;
 }
 
-bool CastDBView::onCastRowSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
+bool CastDBView::onCastRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
   if (_floatingPreview == nullptr) {return true;}
-  const auto& curInd{currentIndex()};
-  if (!curInd.isValid()) {
+  if (!current.isValid()) {
     return false;
   }
-  const QSqlRecord& record = _castModel->record(curInd.row());
+  const QSqlRecord& record = _castModel->record(current.row());
   _floatingPreview->operator()(record, mImageHost);
   return true;
 }

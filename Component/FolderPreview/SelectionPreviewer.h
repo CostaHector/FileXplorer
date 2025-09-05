@@ -61,7 +61,7 @@ private:
 
   QTimer m_nextFolderTimer;
 
-  static constexpr int NEXT_FOLDER_TIME_INTERVAL = 40; // f=26 frame/s T=40ms
+  static constexpr int NEXT_FOLDER_TIME_INTERVAL = 0; // f=26 frame/s T=40ms; 100ms to avoid quick locate by prefix string not work
   // ms, when NEXT_FOLDER_TIME_INTERVAL <= 0. update preview imgs imediately(may cause lag).
   PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::PREVIEW_TYPE_E::NONE};
 };
