@@ -1,25 +1,25 @@
-﻿#include "SelectionPreviewer.h"
+﻿#include "CurrentRowPreviewer.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 
-constexpr int SelectionPreviewer::NEXT_FOLDER_TIME_INTERVAL;  // ms
+constexpr int CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL;  // ms
 
-SelectionPreviewer::SelectionPreviewer(QWidget* parent)  //
+CurrentRowPreviewer::CurrentRowPreviewer(QWidget* parent)  //
   : QStackedWidget{parent},                  //
   m_parentDocker{parent}, m_nextFolderTimer{this}                   //
 {
   if (!isTimerDisabled()) {
-    m_nextFolderTimer.setInterval(SelectionPreviewer::NEXT_FOLDER_TIME_INTERVAL);
+    m_nextFolderTimer.setInterval(CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL);
     m_nextFolderTimer.setSingleShot(true);
-    connect(&m_nextFolderTimer, &QTimer::timeout, this, &SelectionPreviewer::UpdatePreview);
+    connect(&m_nextFolderTimer, &QTimer::timeout, this, &CurrentRowPreviewer::UpdatePreview);
   }
 }
 
-SelectionPreviewer::~SelectionPreviewer() {
+CurrentRowPreviewer::~CurrentRowPreviewer() {
   Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)mCurrentPreviewType);
 }
 
-void SelectionPreviewer::UpdatePreview() {
+void CurrentRowPreviewer::UpdatePreview() {
   using namespace PreviewTypeTool;
   switch (mCurrentPreviewType) {
     case PREVIEW_TYPE_E::NONE: // no preview
@@ -38,12 +38,12 @@ void SelectionPreviewer::UpdatePreview() {
   }
 }
 
-QSize SelectionPreviewer::sizeHint() const {
+QSize CurrentRowPreviewer::sizeHint() const {
   return {Configuration().value("SELECTION_PREVIEWER_WIDTH", DOCKER_DEFAULT_SIZE.width()).toInt(),
           Configuration().value("SELECTION_PREVIEWER_HEIGHT", DOCKER_DEFAULT_SIZE.height()).toInt()};
 }
 
-void SelectionPreviewer::setCurrentIndex(int index) {
+void CurrentRowPreviewer::setCurrentIndex(int index) {
   QStackedWidget::setCurrentIndex(index);
   mCurrentPreviewType = m_previewIndex2NameE[index];
   emit windowTitleChanged(QString{"Preview: %1"}.arg(PreviewTypeTool::c_str(mCurrentPreviewType)));

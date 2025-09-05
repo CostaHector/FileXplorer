@@ -5,7 +5,7 @@
 #include "AdvanceSearchToolBar.h"
 #include "CustomStatusBar.h"
 #include "NavigationAndAddressBar.h"
-#include "SelectionPreviewer.h"
+#include "CurrentRowPreviewer.h"
 
 #include "AdvanceSearchTableView.h"
 #include "FileSystemListView.h"
@@ -26,7 +26,7 @@ class ViewsStackedWidget : public QStackedWidget {
   Q_OBJECT
  public:
   friend class ToolBarAndViewSwitcher;
-  explicit ViewsStackedWidget(SelectionPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
+  explicit ViewsStackedWidget(CurrentRowPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
 
  public slots:
   bool onActionAndViewNavigate(QString newPath, bool isNewPath = true, bool isF5Force = false);
@@ -126,7 +126,7 @@ class ViewsStackedWidget : public QStackedWidget {
   JsonTableModel* m_jsonModel{nullptr};
   JsonTableView* m_jsonTableView{nullptr};
 
-  SelectionPreviewer* _previewFolder{nullptr};
+  CurrentRowPreviewer* _previewFolder{nullptr};
 
   CustomStatusBar* _logger{nullptr};
 

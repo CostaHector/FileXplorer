@@ -5,7 +5,7 @@
 
 #include "CustomStatusBar.h"
 #include "NavigationToolBar.h"
-#include "SelectionPreviewer.h"
+#include "CurrentRowPreviewer.h"
 #include "StackedAddressAndSearchToolBar.h"
 
 #include "ViewsStackedWidget.h"
@@ -26,7 +26,7 @@ public:
 
   QDockWidget* previewHtmlDock{nullptr};
 
-  SelectionPreviewer* m_previewFolder{nullptr};
+  CurrentRowPreviewer* m_previewFolder{nullptr};
   FolderPreviewSwitcher* m_previewSwitcher{nullptr};
 
   ViewsStackedWidget* m_fsPanel{nullptr};
