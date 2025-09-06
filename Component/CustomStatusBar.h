@@ -4,11 +4,13 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QStatusBar>
+#include <QToolBar>
 
-enum class STATUS_STR_TYPE { NORMAL = 0, ABNORMAL = 1 };
+enum class STATUS_ALERT_LEVEL { NORMAL = 0, ABNORMAL = 1 };
 
 class CustomStatusBar : public QStatusBar {
- public:
+  Q_OBJECT
+public:
   enum MSG_INDEX {
     BEGIN,
     ITEMS = BEGIN,
@@ -16,16 +18,15 @@ class CustomStatusBar : public QStatusBar {
     MSG,
     BUTT
   };
-  explicit CustomStatusBar(QWidget* viewsSwitcherTb, QWidget* parent = nullptr);
+  explicit CustomStatusBar(QWidget* parent = nullptr);
 
-  void pathInfo(const int count, const int index = 0);
-  void msg(const QString& text = "", const STATUS_STR_TYPE statusStrType = STATUS_STR_TYPE::NORMAL);
+  void onPathInfoChanged(const int count, const int index = 0);
+  void onMsgChanged(const QString& text = "", const STATUS_ALERT_LEVEL alertLvl = STATUS_ALERT_LEVEL::NORMAL);
   void SetProgressValue(int value = 100);
 
-  static int GetValidProgressValue(int value);
-
- private:
+  QToolBar* m_viewsSwitcher{nullptr};
+private:
   QProgressBar* mProcess {nullptr};
-  QList<QLabel*> mLabelsLst;
+  QList<QLabel*> mLabelsLst; // total count, selected count, message
 };
 #endif  // CUSTOMSTATUSBAR_H

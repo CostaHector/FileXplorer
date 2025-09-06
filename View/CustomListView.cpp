@@ -3,6 +3,7 @@
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
+#include "ViewHelper.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>
@@ -45,8 +46,8 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)//
                        {_FLOW_ORIENTATION_TOP_TO_BOTTOM, TopToBottom}},//
                       LeftToRight, QActionGroup::ExclusionPolicy::Exclusive);
   int flowInt = Configuration().value(m_name + "_FLOW_ORIENTATION", (int)mflowIntAction.defVal()).toInt();
-  mflowIntAction.setCheckedIfActionExist(flowInt);
-  onOrientationChange(mflowIntAction.mActGrp->checkedAction());
+  auto* checkedOriAct = mflowIntAction.setCheckedIfActionExist(flowInt);
+  onOrientationChange(checkedOriAct);
 
   _FLOW_ORIENTATION_MENU = new (std::nothrow) QMenu{QString{"%1 Flow Orientation"}.arg(m_name), this};
   _FLOW_ORIENTATION_MENU->addActions(mflowIntAction.mActGrp->actions());
@@ -108,13 +109,19 @@ void CustomListView::BindMenu(QMenu* menu) {
 }
 
 void CustomListView::onOrientationChange(const QAction* pAct) {
-  if (pAct == nullptr) {
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(pAct);
   const QListView::Flow newEnum = mflowIntAction.act2Enum(pAct);
   setFlow(newEnum);
 }
 
 void CustomListView::InitListView() {
   setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+}
+
+void CustomListView::mousePressEvent(QMouseEvent* event) {
+  if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
+    event->accept();
+    return;
+  }
+  QListView::mousePressEvent(event);
 }

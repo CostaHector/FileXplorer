@@ -11,13 +11,13 @@
 #include "PreviewTypeTool.h"
 
 class FolderPreviewSwitcher;
-class ToolBarAndViewSwitcher;
+class ViewSwitchHelper;
 
 class CurrentRowPreviewer : public QStackedWidget {
   Q_OBJECT
 public:
   friend class FolderPreviewSwitcher;
-  friend class ToolBarAndViewSwitcher;
+  friend class ViewSwitchHelper;
   explicit CurrentRowPreviewer(QWidget* parent = nullptr);
   ~CurrentRowPreviewer();
 
