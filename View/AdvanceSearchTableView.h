@@ -16,14 +16,11 @@ class AdvanceSearchTableView : public CustomTableView {
   void onCopyFiles();
   void onCutFiles();
 
-  void BindLogger(CustomStatusBar* logger);
-
   void keyPressEvent(QKeyEvent* e) override;
 
  private:
   AdvanceSearchModel* _sourceModel;
   SearchProxyModel* _searchProxyModel;
-  CustomStatusBar* _logger{nullptr};
 };
 
 #endif  // ADVANCESEARCHTABLEVIEW_H

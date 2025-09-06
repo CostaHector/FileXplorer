@@ -865,7 +865,7 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
     return false;
   }
   LOG_GOOD_NP("Playing...", playPath);
-  _logger->msg(QString{"Playing... %1"}.arg(playPath), STATUS_STR_TYPE::NORMAL);
+  _logger->onMsgChanged(QString{"Playing... %1"}.arg(playPath), STATUS_ALERT_LEVEL::NORMAL);
   return true;
 }
 
@@ -908,7 +908,7 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
     return false;
   }
   LOG_GOOD_P("[Ok] All merged succeed", "%s\n->\n%s", qPrintable(fromPath), qPrintable(toPath));
-  _logger->msg(QString("Succeed merged folder into %1").arg(toPath), STATUS_STR_TYPE::NORMAL);
+  _logger->onMsgChanged(QString("Succeed merged folder into %1").arg(toPath), STATUS_ALERT_LEVEL::NORMAL);
   return true;
 }
 
@@ -936,7 +936,7 @@ void FileExplorerEvent::on_TsFilesMerge() {
     return;
   }
   LOG_GOOD_P("[Ok] Merge ts file succeed", "%d file(s) to\n%s", mergeResult, qPrintable(largeTsAbsFilePath));
-  _logger->msg(QString("Succeed merged ts file(s) into %1").arg(largeTsAbsFilePath), STATUS_STR_TYPE::NORMAL);
+  _logger->onMsgChanged(QString("Succeed merged ts file(s) into %1").arg(largeTsAbsFilePath), STATUS_ALERT_LEVEL::NORMAL);
 }
 
 bool FileExplorerEvent::on_Copy() {
@@ -952,7 +952,7 @@ bool FileExplorerEvent::on_Copy() {
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
-  _logger->msg(QString("%1 path(s) been copied").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
+  _logger->onMsgChanged(QString("%1 path(s) been copied").arg(absPaths.size()), STATUS_ALERT_LEVEL::NORMAL);
   return true;
 }
 
@@ -968,7 +968,7 @@ bool FileExplorerEvent::on_Cut() {
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
-  _logger->msg(QString("%1 path(s) been cut").arg(absPaths.size()), STATUS_STR_TYPE::NORMAL);
+  _logger->onMsgChanged(QString("%1 path(s) been cut").arg(absPaths.size()), STATUS_ALERT_LEVEL::NORMAL);
   return true;
 }
 

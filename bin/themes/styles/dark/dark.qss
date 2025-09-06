@@ -36,10 +36,24 @@ QLineEdit {
     color: #FFFFFF;
 }
 
-QStatusBar, QLabel, QRadioButton, QCheckBox {
+QStatusBar, QRadioButton, QCheckBox {
     background-color: #4F4B49;
     color: #FFFFFF;
 }
+
+QLabel {
+    background-color: #4F4B49;
+    color: #FFFFFF;
+}
+/* For Custom Status Bar Message Label Only. 0: normal, 1: abnormal */
+QLabel#statusMessageLabel[alertLevel="0"] {
+    font-weight: normal;
+}
+QLabel#statusMessageLabel[alertLevel="1"] {
+    color: red;
+    font-weight: bold;
+}
+
 
 /* 菜单栏 */
 QMenuBar {

@@ -3,6 +3,7 @@
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+#include "ViewHelper.h"
 
 #include <QHeaderView>
 #include <QInputDialog>
@@ -331,4 +332,12 @@ void CustomTableView::SubscribeHeaderActions() {
   connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this, &CustomTableView::onHorizontalHeaderMenuRequest);
   connect(horizontalHeader(), &QHeaderView::sectionResized, this, &CustomTableView::onHorizontalHeaderChanged);
   connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &CustomTableView::onHorizontalHeaderChanged);
+}
+
+void CustomTableView::mousePressEvent(QMouseEvent* event) {
+  if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
+    event->accept();
+    return;
+  }
+  QTableView::mousePressEvent(event);
 }

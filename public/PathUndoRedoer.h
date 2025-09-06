@@ -4,29 +4,28 @@
 #include <QStack>
 
 class PathUndoRedoer {
- public:
+public:
   PathUndoRedoer() = default;
 
-  auto operator()(const QString& pth) -> bool {
+  bool operator()(const QString& pth) {
     undoStack.append(pth);
-
     return true;
   }
 
-  auto undoAvailable() -> bool { return undoStack.size() > 1; }
+  bool undoAvailable() { return undoStack.size() > 1; }
 
-  auto undo() -> QString {
-    if (not undoAvailable()) {
+  QString undo() {
+    if (!undoAvailable()) {
       return "";
     }
     redoStack.append(undoStack.pop());
     return undoStack.top();
   }
 
-  auto redoAvailable() -> bool { return not redoStack.isEmpty(); }
+  bool redoAvailable() { return !redoStack.isEmpty(); }
 
-  auto redo() -> QString {
-    if (not redoAvailable()) {
+  QString redo() {
+    if (!redoAvailable()) {
       return "";
     }
     const QString& redoPath = redoStack.pop();
@@ -34,7 +33,7 @@ class PathUndoRedoer {
     return redoPath;
   }
 
- private:
+private:
   QStack<QString> undoStack;
   QStack<QString> redoStack;
 };

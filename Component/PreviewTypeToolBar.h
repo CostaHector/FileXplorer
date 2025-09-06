@@ -21,7 +21,7 @@ public:
   QAction* BROWSER_PRE{nullptr};
   QAction* SLIDERS_PRE{nullptr};
 signals:
-  void PreviewTypeChange(PreviewTypeTool::PREVIEW_TYPE_E previewType);
+  void previewTypeChanged(PreviewTypeTool::PREVIEW_TYPE_E previewType);
 private:
   void subscribe();
 };

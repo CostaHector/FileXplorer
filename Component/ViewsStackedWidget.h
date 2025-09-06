@@ -20,12 +20,12 @@
 #include "FdBasedDb.h"
 
 
-class ToolBarAndViewSwitcher;
+class ViewSwitchHelper;
 
 class ViewsStackedWidget : public QStackedWidget {
   Q_OBJECT
  public:
-  friend class ToolBarAndViewSwitcher;
+  friend class ViewSwitchHelper;
   explicit ViewsStackedWidget(CurrentRowPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
 
  public slots:
@@ -52,9 +52,11 @@ class ViewsStackedWidget : public QStackedWidget {
     if (mCurrentChangedConn) {
       ViewsStackedWidget::disconnect(mCurrentChangedConn);
     }
+    if (mDoubleClickedConnectConn) {
+      ViewsStackedWidget::disconnect(mDoubleClickedConnectConn);
+    }
   }
 
-  void on_searchCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
   void on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
   void on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
@@ -139,12 +141,14 @@ class ViewsStackedWidget : public QStackedWidget {
   }
   void SetVt(ViewTypeTool::ViewType newVt) {
     mVt = newVt;
+    if (_logger != nullptr) {
+    }
   }
 
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
-  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn;
-  ViewTypeTool::ViewType mVt{ViewTypeTool::ViewType::TABLE};
+  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn, mDoubleClickedConnectConn;
+  ViewTypeTool::ViewType mVt{ViewTypeTool::DEFAULT_VIEW_TYPE};
 };
 
 #endif  // VIEWSSTACKEDWIDGET_H
