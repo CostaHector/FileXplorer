@@ -4,7 +4,7 @@
 #include "NotificatorMacro.h"
 #include "ComplexOperation.h"
 #include "AddressBarActions.h"
-
+#include "ViewActions.h"
 #include <QFileIconProvider>
 #include <QApplication>
 #include <QDrag>
@@ -12,18 +12,36 @@
 
 constexpr int View::START_DRAG_DIST; // QApplication::startDragDistance()
 constexpr int View::START_DRAG_DIST_MIN;
+constexpr Qt::MouseButtons View::MOUSE_NAVI_BTN;
 
-bool View::onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton) {
-  switch (mousebutton) {
-    case Qt::MouseButton::BackButton:
-      g_addressBarActions()._BACK_TO->triggered(false);
-      return true;
-    case Qt::MouseButton::ForwardButton:
-      g_addressBarActions()._FORWARD_TO->triggered(false);
-      return true;
-    default:
-      return false;
+bool View::onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton) {
+  // when return true, event should not be populated to its parent
+  if (mods == Qt::KeyboardModifier::NoModifier) {
+    static auto& addressInst = g_addressBarActions();
+    switch (mousebutton) {
+      case Qt::MouseButton::BackButton:
+        emit addressInst._BACK_TO->triggered(false);
+        return true;
+      case Qt::MouseButton::ForwardButton:
+        emit addressInst._FORWARD_TO->triggered(false);
+        return true;
+      default:
+        return false;
+    }
+  } else if (mods == Qt::KeyboardModifier::ControlModifier) {
+    static auto& viewInst = g_viewActions();
+    switch (mousebutton) {
+      case Qt::MouseButton::BackButton:
+        emit viewInst._VIEW_BACK_TO->triggered(false);
+        return true;
+      case Qt::MouseButton::ForwardButton:
+        emit viewInst._VIEW_FORWARD_TO->triggered(false);
+        return true;
+      default:
+        return false;
+    }
   }
+  return false;
 }
 
 void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {

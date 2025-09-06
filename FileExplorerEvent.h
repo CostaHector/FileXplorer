@@ -16,7 +16,6 @@ class RedundantImageFinder;
 class Archiver;
 
 class FileExplorerEvent : public QObject {
-  Q_OBJECT
 public:
   FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger);
   void subscribe();

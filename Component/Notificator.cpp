@@ -156,37 +156,39 @@ void Notificator::initializeUI() {
 void Notificator::correctPosition() {
   // Вычисляем позицию для отображения уведомления
   // ... сперва сформируем позицию для самой верхней точки
-  QRect notificationGeometry = QGuiApplication::screens()[0]->geometry();
+  static auto rects = QGuiApplication::screens();
+  static QRect ntfRect = rects.isEmpty() ? QRect{0, 0, 1024, 768} : rects.front()->geometry();
   const QSize notificationSize = sizeHint();
 
   if (DISPLAY_NOTIFICATION_DIRECTION_TOP_TO_BOTTOM) {  // Notifications Display From Top to Bottom
-    notificationGeometry.setTop(notificationGeometry.top());
-    notificationGeometry.setLeft(notificationGeometry.right() - notificationSize.width());
+    ntfRect.setTop(ntfRect.top() + notificationSize.height());
+    ntfRect.setLeft(ntfRect.right() - notificationSize.width());
     // ... определяем доступную верхнюю координату
     foreach (Notificator* instance, instances) {
       if (instance != this) {
-        if (instance->geometry().bottom() > notificationGeometry.top()) {
-          notificationGeometry.setTop(instance->geometry().bottom() + NOTIFICATION_MARGIN);
+        if (instance->geometry().bottom() > ntfRect.top()) {
+          ntfRect.setTop(instance->geometry().bottom() + NOTIFICATION_MARGIN);
         }
       }
     }
   } else {  // Notifications Display From Bottom to Top
-    notificationGeometry.setTop(notificationGeometry.bottom() - notificationSize.height());
-    notificationGeometry.setLeft(notificationGeometry.right() - notificationSize.width());
+    ntfRect.setBottom(ntfRect.top() + (ntfRect.height() - notificationSize.height()));
+    ntfRect.setTop(ntfRect.bottom() - notificationSize.height());
+    ntfRect.setLeft(ntfRect.right() - notificationSize.width());
     // ... определяем доступную верхнюю координату
     foreach (Notificator* instance, instances) {
       if (instance != this) {
-        if (instance->geometry().top() < notificationGeometry.bottom()) {
-          notificationGeometry.setTop(instance->geometry().top() - notificationSize.height() - NOTIFICATION_MARGIN);
+        if (instance->geometry().top() < ntfRect.bottom()) {
+          ntfRect.setTop(instance->geometry().top() - notificationSize.height() - NOTIFICATION_MARGIN);
         }
       }
     }
   }
 
   // Устанавливаем размер
-  notificationGeometry.setSize(notificationSize);
+  ntfRect.setSize(notificationSize);
   // Отображаем
-  setGeometry(notificationGeometry);
+  setGeometry(ntfRect);
 }
 
 QList<Notificator*> Notificator::instances;
