@@ -20,9 +20,7 @@ public:
   void onOrientationChange(const QAction* pAct);
 
   void InitListView();
-
-signals:
-  void iconSizeChanged(QSize newSize);
+  void mousePressEvent(QMouseEvent* event) override;
 
 protected:
   QString m_name;

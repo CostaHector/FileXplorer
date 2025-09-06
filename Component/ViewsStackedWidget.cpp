@@ -31,11 +31,10 @@ ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidg
 auto ViewsStackedWidget::onActionAndViewNavigate(QString newPath, bool isNewPath, bool /*isF5Force*/) -> bool {
   // can only be triggered by path action clicked/upTo/backTo/backTo/table view double clicked
   bool ret = onAddressToolbarPathChanged(newPath, isNewPath);
-  if (not ret) {
+  if (!ret) {
     return false;
   }
-
-  if (_addressBar) {
+  if (_addressBar != nullptr) {
     _addressBar->m_addressLine->updateAddressToolBarPathActions(newPath);
   }
   return true;
@@ -236,7 +235,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
 
   if (fi.isFile()) {
     if (ArchiveFiles::isQZFile(fi)) {
-      emit g_AchiveFilesActions().ARCHIVE_PREVIEW->trigger();
+      emit g_AchiveFilesActions().ARCHIVE_PREVIEW->triggered();
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
       emit g_viewActions()._HAR_VIEW->triggered();
@@ -246,7 +245,13 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   }
 
   if (fi.isDir()) {
-    if (IsCurFSView()) {
+    ViewTypeTool::ViewType vt = GetVt();
+    if (ViewTypeTool::isFSView(vt)) {
+      return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
+    }
+    if (ViewTypeTool::IsMatch(vt, (int)ViewTypeTool::ViewTypeMask::CAST)) {
+      g_viewActions()._TABLE_VIEW->setChecked(true);
+      emit g_viewActions()._TABLE_VIEW->triggered(true); // both 2 signals: 1) undo stack+1 and 2) view Switched happen
       return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
     }
     return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
@@ -254,30 +259,26 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   return true;
 }
 
-void ViewsStackedWidget::on_searchCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
-  const QString filePath = getFilePath(current);
-  if (_previewFolder != nullptr && _previewFolder->GetCurrentViewE() != PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
-    _previewFolder->operator()(filePath);
-  }
-}
-
 void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
   // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
   if (!current.isValid()) {
     return;
   }
-  const QFileInfo& fi = m_fsModel->fileInfo(current);
+  const QFileInfo fi = getFileInfo(current);
   if (_logger != nullptr && fi.isFile()) {
-    _logger->msg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(fi.size()));
+    _logger->onMsgChanged(FILE_PROPERTY_DSP::sizeToFileSizeDetail(fi.size()));
   }
 
-  QString parentPth = fi.absolutePath();
+  auto vt = GetVt();
+  if (ViewTypeTool::isFSView(vt)) { // anchorTags only work for file-system
+    QString parentPth = fi.absolutePath();
 #ifdef _WIN32
-  if (!parentPth.isEmpty() && parentPth.back() == ':') {
-    parentPth += '/';
-  }
+    if (!parentPth.isEmpty() && parentPth.back() == ':') {
+      parentPth += '/';
+    }
 #endif
-  m_anchorTags.insert(parentPth, {current.row(), current.column()});
+    m_anchorTags.insert(parentPth, {current.row(), current.column()});
+  }
 
   if (_previewFolder != nullptr && _previewFolder->GetCurrentViewE() != PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
     _previewFolder->operator()(fi.absoluteFilePath());
@@ -286,7 +287,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex &current, con
 
 void ViewsStackedWidget::on_selectionChanged(const QItemSelection& selected, const QItemSelection& /* deselected */) {
   if (_logger != nullptr) {
-    _logger->pathInfo(getSelectedRowsCount(), 1);
+    _logger->onPathInfoChanged(getSelectedRowsCount(), 1);
   }
 }
 
@@ -295,16 +296,13 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
 
   auto* curView = GetCurView();
   mSelectionChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-
+  mDoubleClickedConnectConn = ViewsStackedWidget::connect(curView, &QAbstractItemView::doubleClicked, this, &ViewsStackedWidget::on_cellDoubleClicked);
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:
-    case ViewType::TREE: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_fsmCurrentRowChanged);
-      break;
-    }
+    case ViewType::TREE:
     case ViewType::SEARCH: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_searchCurrentRowChanged);
+      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_fsmCurrentRowChanged);
       break;
     }
     case ViewType::SCENE: {
@@ -1039,7 +1037,7 @@ QString ViewsStackedWidget::getCurFileName() const {
 }
 
 QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind) const {
-  auto vt = GetVt();
+  const auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:
     case ViewType::LIST:
@@ -1049,17 +1047,20 @@ QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind) const {
     case ViewType::SEARCH: {
       return m_searchSrcModel->fileInfo(m_searchProxyModel->mapToSource(ind));
     }
+    case ViewType::MOVIE: {
+      return m_movieDbModel->fileInfo(ind);
+    }
     case ViewType::SCENE: {
       return m_scenesModel->fileInfo(ind);
+    }
+    case ViewType::CAST: {
+      return m_castDbModel->fileInfo(ind);
     }
     case ViewType::JSON: {
       return m_jsonModel->fileInfo(m_jsonProxyModel->mapToSource(ind));
     }
-    case ViewType::MOVIE: {
-      return m_movieDbModel->fileInfo(ind);
-    }
     default: {
-      qWarning("No getFileInfo");
+      qDebug("ViewType[%s] does not support fileInfo", ViewTypeTool::c_str(vt));
       break;
     }
   }

@@ -29,7 +29,7 @@ NotificatorPrivate::~NotificatorPrivate() {
     m_preloader = nullptr;
   }
 
-  if (m_progress != nullptr && m_preloader->parent() == nullptr) {
+  if (m_progress != nullptr && m_progress->parent() == nullptr) {
     delete m_progress;
     m_progress = nullptr;
   }

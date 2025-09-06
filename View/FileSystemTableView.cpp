@@ -32,7 +32,7 @@ void FileSystemTableView::subscribe() {
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
 
-  addActions(g_viewActions()._VIEW_ACTIONS->actions());
+  addActions(g_viewActions()._NAVI_ACTIONS->actions());
   addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
@@ -76,13 +76,10 @@ auto FileSystemTableView::keyPressEvent(QKeyEvent* e) -> void {
 }
 
 void FileSystemTableView::mousePressEvent(QMouseEvent* event) {
-  if (View::onMouseSidekeyBackwardForward(event->button())) {
-    return;
-  }
-  if (event->button() & Qt::LeftButton) {
+  if (event->button() == Qt::LeftButton) {
     mDragStartPosition = event->pos();
   }
-  return QTableView::mousePressEvent(event);
+  CustomTableView::mousePressEvent(event);
 }
 
 void FileSystemTableView::mouseMoveEvent(QMouseEvent* event) {

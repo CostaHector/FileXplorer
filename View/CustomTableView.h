@@ -4,6 +4,7 @@
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QTableView>
+
 class CustomTableView : public QTableView {
  public:
   explicit CustomTableView(const QString& name, QWidget* parent = nullptr);
@@ -40,6 +41,8 @@ class CustomTableView : public QTableView {
 
   void InitTableView(const bool bHideShowCol = true);
   void SubscribeHeaderActions();
+
+  void mousePressEvent(QMouseEvent* event) override;
 
  private:
   QAction* COLUMNS_VISIBILITY = new (std::nothrow) QAction(QIcon{":img/COLUMN_VISIBILITY"}, "column visibility", this);

@@ -25,12 +25,6 @@ AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, 
 }
 
 void AdvanceSearchTableView::subscribe() {
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, [this](const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/) {
-    if (_logger != nullptr) {
-      _logger->pathInfo(selectionModel()->selectedRows().size(), 1);
-    }
-  });
-
   auto& fileOpInst = g_fileBasicOperationsActions();
   connect(fileOpInst._FORCE_RESEARCH, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
 
@@ -39,18 +33,6 @@ void AdvanceSearchTableView::subscribe() {
   addActions(fileOpInst.COPY_PATH_AG->actions());
   addActions(fileOpInst.CUT_COPY_PASTE->actions());
   addActions(fileOpInst.DELETE_ACTIONS->actions());
-}
-
-void AdvanceSearchTableView::BindLogger(CustomStatusBar* logger) {
-  if (logger == nullptr) {
-    qWarning("Don't bind nullptr CustomStatusBar to AdvanceSearchTableView/_sourceModel/_searchProxyModel");
-    return;
-  }
-  if (_logger != nullptr) {
-    qWarning("Don't rebind to _logger");
-    return;
-  }
-  _logger = logger;
 }
 
 void AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) {

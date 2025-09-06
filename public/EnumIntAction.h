@@ -9,6 +9,10 @@
 template<typename TEMP_T>
 struct EnumIntAction : public QObject {
   using QObject::QObject;
+  operator bool() const {
+    return mActGrp != nullptr && !mVal2Enum.isEmpty();
+  }
+
   void init(QHash<QAction*, TEMP_T> act2Enum, TEMP_T tempVal, QActionGroup::ExclusionPolicy exclusivePlcy = QActionGroup::ExclusionPolicy::None) {
     DEFAULT_ENUM = tempVal;
     mAct2Enum = act2Enum;
@@ -25,16 +29,21 @@ struct EnumIntAction : public QObject {
     }
   }
 
-  void setCheckedIfActionExist(int intValue) {
-    TEMP_T enumValue = val2Enum(intValue);
+  QAction* setCheckedIfActionExist(TEMP_T enumValue) {
     // when QActionGroup::ExclusionPolicy::ExclusiveOptional,
     // intValue -> defVal() may have no action correspond
     auto it = mEnum2Act.find(enumValue);
     if (it == mEnum2Act.cend()) {
-      qDebug("intValue:%d, enumValue:%d have no action", intValue, (int)enumValue);
-      return;
+      qDebug("enumValue:%d have no action", (int)enumValue);
+      return nullptr;
     }
     mEnum2Act[enumValue]->setChecked(true);
+    return mEnum2Act[enumValue];
+  }
+
+  QAction* setCheckedIfActionExist(int intValue) {
+    TEMP_T enumValue = val2Enum(intValue);
+    return setCheckedIfActionExist(enumValue);
   }
 
   TEMP_T val2Enum(int intVal) const {
