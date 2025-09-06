@@ -251,20 +251,19 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* leafViewWid = new (std::nothrow) QToolBar("Leaf View");
   CHECK_NULLPTR_RETURN_NULLPTR(leafViewWid);
 
-  auto* fileSystemView = g_viewActions().GetFileSystemViewTB(leafViewWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(fileSystemView);
-
   auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
   CHECK_NULLPTR_RETURN_NULLPTR(folderPreviewToolBar);
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
+  auto& viewInst = g_viewActions();
   leafViewWid->setToolTip("View Leaf");
-  leafViewWid->addAction(g_viewActions().NAVIGATION_PANE);
-  leafViewWid->addWidget(fileSystemView);
-  leafViewWid->addSeparator();
+  leafViewWid->addAction(viewInst.NAVIGATION_PANE);
   leafViewWid->addWidget(folderPreviewToolBar);
   leafViewWid->addSeparator();
-  leafViewWid->addAction(g_viewActions()._HAR_VIEW);
+  leafViewWid->addAction(viewInst._HAR_VIEW);
+  leafViewWid->addSeparator();
+  leafViewWid->addAction(viewInst._VIEW_BACK_TO);
+  leafViewWid->addAction(viewInst._VIEW_FORWARD_TO);
   leafViewWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafViewWid;
 }

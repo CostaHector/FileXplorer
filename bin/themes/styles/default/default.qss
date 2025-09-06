@@ -1,3 +1,13 @@
+/* For Custom Status Bar Message Label Only. 0: normal, 1: abnormal */
+QLabel#statusMessageLabel[alertLevel="0"] {
+    font-weight: normal;
+}
+QLabel#statusMessageLabel[alertLevel="1"] {
+    color: red;
+    font-weight: bold;
+}
+
+
 QMainWindow::separator {
     width: 1px;
     height: 0px;

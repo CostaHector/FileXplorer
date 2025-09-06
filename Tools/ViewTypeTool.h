@@ -1,28 +1,32 @@
 #ifndef TYPEVIEWSTOOL_H
 #define TYPEVIEWSTOOL_H
+#include "PublicMacro.h"
+#include <QString>
 
-#define VIEW_TYPES_ENUM_VALUE_MAPPING \
-VIEW_TYPE_ITEM(LIST,   0)    \
-    VIEW_TYPE_ITEM(TABLE,  1)    \
-    VIEW_TYPE_ITEM(TREE,   2)    \
-    VIEW_TYPE_ITEM(SEARCH, 3)    \
-    VIEW_TYPE_ITEM(MOVIE,  4)    \
-    VIEW_TYPE_ITEM(SCENE,  5)    \
-    VIEW_TYPE_ITEM(CAST,   6)    \
-    VIEW_TYPE_ITEM(JSON,   7)    \
+#define VIEW_TYPES_ENUM_VALUE_MAPPING\
+  VIEW_TYPE_ITEM(LIST,   0)    \
+  VIEW_TYPE_ITEM(TABLE,  1)    \
+  VIEW_TYPE_ITEM(TREE,   2)    \
+  VIEW_TYPE_ITEM(SEARCH, 3)    \
+  VIEW_TYPE_ITEM(MOVIE,  4)    \
+  VIEW_TYPE_ITEM(SCENE,  5)    \
+  VIEW_TYPE_ITEM(CAST,   6)    \
+  VIEW_TYPE_ITEM(JSON,   7)    \
 
-    class QAction;
 
 namespace ViewTypeTool {
+
 enum class ViewType {
   VIEW_TYPE_BEGIN = 0,
-// add after BEGIN
+  // add after BEGIN
 #define VIEW_TYPE_ITEM(enu, val) enu = val,
   VIEW_TYPES_ENUM_VALUE_MAPPING
 #undef VIEW_TYPE_ITEM
-      // add before BUTT
-      VIEW_TYPE_BUTT,
+  // add before BUTT
+  VIEW_TYPE_BUTT,
 };
+
+static constexpr ViewType DEFAULT_VIEW_TYPE = ViewType::TABLE;
 
 enum class ViewTypeMask {
 #define VIEW_TYPE_ITEM(enu, val) enu = 1 << val,
@@ -68,9 +72,26 @@ inline bool IsOpenVideosAvail(ViewType vt) {
   return IsMatch(vt, ViewTypeUtils::PLAY_VIDEOS_MASK);
 }
 
-const char* c_str(ViewType viewType);
+inline const char* c_str(ViewType viewType) {
+  if (viewType < ViewType::VIEW_TYPE_BEGIN || viewType >= ViewType::VIEW_TYPE_BUTT) {
+    return "unknown view type";
+  }
+  static const char ViewType2CharArray[(int)ViewType::VIEW_TYPE_BUTT][10]{
+#define VIEW_TYPE_ITEM(enu, val) ENUM_2_STR(enu),
+    VIEW_TYPES_ENUM_VALUE_MAPPING
+    #undef VIEW_TYPE_ITEM
+  };
+  return ViewType2CharArray[(int)viewType];
+}
 
-ViewType GetViewTypeByActionText(const QAction* pViewAct);
+inline ViewType GetViewTypeByActionText(const QString& viewName) {
+#define VIEW_TYPE_ITEM(enu, val) if(viewName == ENUM_2_STR(enu)) {return ViewType::enu;}
+  VIEW_TYPES_ENUM_VALUE_MAPPING
+    #undef VIEW_TYPE_ITEM
+      return ViewType::VIEW_TYPE_BUTT;
+}
 }  // namespace ViewTypeTool
+
+#undef VIEW_TYPES_ENUM_VALUE_MAPPING
 
 #endif  // TYPEVIEWSTOOL_H

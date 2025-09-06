@@ -14,7 +14,7 @@ class View {
 
   virtual void UpdateItemViewFontSize() = 0;
 
-  static bool onMouseSidekeyBackwardForward(Qt::MouseButton mousebutton);
+  static bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton);
 
   static void UpdateItemViewFontSizeCore(QAbstractItemView* view);
 
@@ -32,6 +32,7 @@ class View {
   static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
   static constexpr int START_DRAG_DIST{32};
   static constexpr int START_DRAG_DIST_MIN{10};
+  static constexpr Qt::MouseButtons MOUSE_NAVI_BTN = Qt::BackButton | Qt::ForwardButton;
 };
 
 #endif  // VIEWHELPER_H

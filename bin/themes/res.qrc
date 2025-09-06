@@ -286,6 +286,8 @@
     <file alias="FLOATING_PREVIEW">View/FLOATING_PREVIEW.svg</file>
     <file alias="ALIGN_HORIZONTAL_LEFT">View/ALIGN_HORIZONTAL_LEFT.svg</file>
     <file alias="ALIGN_VERTICAL_TOP">View/ALIGN_VERTICAL_TOP.svg</file>
+    <file alias="_VIEW_BACK_TO">View/_VIEW_BACK_TO.svg</file>
+    <file alias="_VIEW_FORWARD_TO">View/_VIEW_FORWARD_TO.svg</file>
 
     <!--Database icon here-->
     <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
