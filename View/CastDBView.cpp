@@ -79,8 +79,7 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_ALL_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpAllIntoPsonFile);
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
-  connect(this, &CastDBView::doubleClicked, this, &CastDBView::onCastRowDoubleClicked);
-  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::onCastRowSelectionChanged);
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::emitCastCurrentRowSelectionChanged);
 }
 
 void CastDBView::onInitATable() {
@@ -397,25 +396,12 @@ int CastDBView::onForceRefreshRecordsVids() {
   return recordsCnt;
 }
 
-void CastDBView::onCastRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
+void CastDBView::emitCastCurrentRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
   if (!current.isValid()) {
     return;
   }
   const auto& record = _castModel->record(current.row());
   emit currentRecordChanged(record, mImageHost);
-}
-
-bool CastDBView::onCastRowDoubleClicked(const QModelIndex &index) {
-  if (!index.isValid()) {
-    LOG_INFO_P("index invalid", "(%d, %d)", index.row(), index.column());
-    return false;
-  }
-  const QString castFolderPath = _castModel->filePath(index);
-  if (!QFileInfo{castFolderPath}.isDir()) {
-    LOG_BAD_NP("Folder not exists", castFolderPath);
-    return false;
-  }
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(castFolderPath));
 }
 
 int CastDBView::onMigrateCastTo() {

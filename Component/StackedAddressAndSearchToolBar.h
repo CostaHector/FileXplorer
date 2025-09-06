@@ -10,11 +10,11 @@
 #include <QToolBar>
 #include "ViewTypeTool.h"
 
-class ToolBarAndViewSwitcher;
+class ViewSwitchHelper;
 
 class StackedAddressAndSearchToolBar : public QToolBar {
  public:
-  friend class ToolBarAndViewSwitcher;
+  friend class ViewSwitchHelper;
   explicit StackedAddressAndSearchToolBar(const QString& title = "Stacked Toolbar", QWidget* parent = nullptr);
   int AddToolBar(ViewTypeTool::ViewType vt, QWidget* tb);
 

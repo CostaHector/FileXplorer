@@ -45,9 +45,7 @@ private:
   int onForceRefreshAllRecordsVids();
   int onForceRefreshRecordsVids();
 
-  void onCastRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
-  bool onCastRowDoubleClicked(const QModelIndex &index);
-
+  void emitCastCurrentRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
   int onMigrateCastTo();
 
 private:

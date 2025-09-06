@@ -37,7 +37,7 @@ void FileSystemTreeView::subscribe() {
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
 
-  addActions(g_viewActions()._VIEW_ACTIONS->actions());
+  addActions(g_viewActions()._NAVI_ACTIONS->actions());
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());
@@ -95,10 +95,11 @@ auto FileSystemTreeView::keyPressEvent(QKeyEvent* e) -> void {
 }
 
 void FileSystemTreeView::mousePressEvent(QMouseEvent* event) {
-  if (View::onMouseSidekeyBackwardForward(event->button())) {
+  if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
+    event->accept();
     return;
   }
-  if (event->button() & Qt::LeftButton) {
+  if (event->button() == Qt::LeftButton) {
     mDragStartPosition = event->pos();
   }
   return QTreeView::mousePressEvent(event);

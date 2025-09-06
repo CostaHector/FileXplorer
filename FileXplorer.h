@@ -32,8 +32,7 @@ public:
   ViewsStackedWidget* m_fsPanel{nullptr};
   StackedAddressAndSearchToolBar* m_stackedBar{nullptr};
 
-  ToolBarAndViewSwitcher* m_naviSwitcher{nullptr};
-  QToolBar* m_viewsSwitcher{nullptr};
+  ViewSwitchHelper* m_viewSwitchHelper{nullptr};
 
   NavigationToolBar* m_navigationToolBar{nullptr};
   RibbonMenu* m_ribbonMenu{nullptr};

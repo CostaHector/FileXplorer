@@ -41,6 +41,6 @@ PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
 void PreviewTypeToolBar::subscribe() {
   connect(mPreviewTypeIntAction.mActGrp, &QActionGroup::triggered, this, [this](QAction* pPreview){
     mCurrentPreviewType = mPreviewTypeIntAction.act2Enum(pPreview);
-    emit PreviewTypeChange(mCurrentPreviewType);
+    emit previewTypeChanged(mCurrentPreviewType);
   });
 }
