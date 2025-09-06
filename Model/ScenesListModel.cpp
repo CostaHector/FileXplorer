@@ -41,9 +41,9 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
         return {}; // load failed
       }
       if (pm.width() * mHeight >= pm.height() * mWidth) {
-        pm = pm.scaledToWidth(mWidth, Qt::SmoothTransformation);
+        pm = pm.scaledToWidth(mWidth, Qt::FastTransformation);
       } else {
-        pm = pm.scaledToHeight(mHeight, Qt::SmoothTransformation);
+        pm = pm.scaledToHeight(mHeight, Qt::FastTransformation);
       }
       mPixCache.insert(imgAbsPath, pm);
       return pm;
