@@ -23,10 +23,7 @@ public:
   static void information(const QString& title, const QString& message);
   static void question(const QString& title, const QString& message);
   static void showMessage(const QIcon& icon, const QString& title, const QString& message, int timeLength = 3000);
-  static Notificator* showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal);
-
-public slots:
-  void setProgressValue(int _value);
+  static Notificator* showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender = nullptr, const char* finishedSignal = nullptr);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   void hoverEnterEvent(QHoverEvent* event) override;
@@ -35,9 +32,15 @@ public slots:
   bool event(QEvent* event) override;
 #endif
 
+public slots:
+  void setProgressValue(int _value);
+
+private slots:
+  void whenProgressFinished();
+
 private:
   explicit Notificator(int timeoutLength);
-  void FreeMe();
+  void FreeMe(); // only when in unitest it's a slot
   void notify(const QIcon& icon, const QString& title, const QString& message);
   void initializeLayout();
   void initializeUI();
@@ -51,6 +54,7 @@ private:
   QLabel*       m_preloader {nullptr};
   QProgressBar* m_progress {nullptr};
 
+  static bool   m_isTopToBottom;
   static void freeHiddenInstance();
   static std::list<std::unique_ptr<Notificator>> instances;
 };
