@@ -18,6 +18,7 @@ constexpr int ICON_SIZE = 32;
 constexpr int PRELOADER_SIZE = 20;
 }
 
+bool Notificator::m_isTopToBottom = false;
 std::list<std::unique_ptr<Notificator>> Notificator::instances;
 
 Notificator::Notificator(int timeoutLength)//
@@ -41,28 +42,32 @@ Notificator::Notificator(int timeoutLength)//
   m_message->setOpenExternalLinks(true);
   m_message->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
 
-  m_preloader = new (std::nothrow) QLabel{this};
-  CHECK_NULLPTR_RETURN_VOID(m_preloader);
-  m_preloader->setObjectName("preloader");
-  m_preloader->setMinimumSize(PRELOADER_SIZE, PRELOADER_SIZE);
-  m_preloader->setMaximumSize(PRELOADER_SIZE, PRELOADER_SIZE);
-  m_preloader->setScaledContents(true);
-  // Настройка анимации прелоадера
-  QMovie* preloaderAnimation = new (std::nothrow) QMovie(":img/LOADING", {}, this);
-  CHECK_NULLPTR_RETURN_VOID(preloaderAnimation);
-  preloaderAnimation->setScaledSize(m_preloader->size());
-  m_preloader->setMovie(preloaderAnimation);
-  preloaderAnimation->start();
+  if (mTimeOutLen <= 0) {
+    m_preloader = new (std::nothrow) QLabel{this};
+    CHECK_NULLPTR_RETURN_VOID(m_preloader);
+    m_preloader->setObjectName("preloader");
+    m_preloader->setMinimumSize(PRELOADER_SIZE, PRELOADER_SIZE);
+    m_preloader->setMaximumSize(PRELOADER_SIZE, PRELOADER_SIZE);
+    m_preloader->setScaledContents(true);
+    // Настройка анимации прелоадера
+    QMovie* preloaderAnimation = new (std::nothrow) QMovie(":img/LOADING", {}, this);
+    CHECK_NULLPTR_RETURN_VOID(preloaderAnimation);
+    preloaderAnimation->setScaledSize(m_preloader->size());
+    m_preloader->setMovie(preloaderAnimation);
+    preloaderAnimation->start();
 
-  m_progress = new (std::nothrow) QProgressBar{this};
-  CHECK_NULLPTR_RETURN_VOID(m_progress);
-  m_progress->setObjectName("progress");
+    m_progress = new (std::nothrow) QProgressBar{this};
+    CHECK_NULLPTR_RETURN_VOID(m_progress);
+    m_progress->setObjectName("progress");
+    m_progress->setRange(0, 100);
+    m_progress->setValue(0);
 #ifdef Q_OS_WIN
-  m_progress->setMaximumHeight(20);
+    m_progress->setMaximumHeight(20);
 #else
-  m_progress->setMaximumHeight(26);
+    m_progress->setMaximumHeight(26);
 #endif
-  m_progress->setTextVisible(false);
+    m_progress->setTextVisible(false);
+  }
 
   initializeLayout();
   initializeUI();
@@ -133,14 +138,14 @@ void Notificator::showMessage(const QIcon& icon, const QString& title, const QSt
 }
 
 Notificator* Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
-  if (sender == nullptr) {
-    return nullptr;
-  }
   freeHiddenInstance();
 
   auto pTemp = new (std::nothrow) Notificator{0};
   CHECK_NULLPTR_RETURN_NULLPTR(pTemp);
-  connect(sender, finishedSignal, pTemp, SLOT(FreeMe()));
+  if (sender != nullptr) {
+    // attention if nullptr sender is, this ballon will only be free when progress set to 100
+    connect(sender, finishedSignal, pTemp, SLOT(whenProgressFinished()));
+  }
 
   auto pNty = std::unique_ptr<Notificator>(pTemp);
   pNty->notify(icon, title, message);
@@ -149,8 +154,23 @@ Notificator* Notificator::showMessage(const QIcon& icon, const QString& title, c
 }
 
 void Notificator::setProgressValue(int _value) {
-  m_progress->show();
+  CHECK_NULLPTR_RETURN_VOID(m_progress);
   m_progress->setValue(_value);
+  if (_value >= 100) {
+    whenProgressFinished();
+  }
+}
+
+void Notificator::whenProgressFinished() {
+  if (mTimeOutLen > 0) {
+    qWarning("It should freed by one time timer. not me");
+    return;
+  }
+  QString finishedTitle = "[Finished] " + m_title->text();
+  QString finishedMessage = m_message->text(); // copy it. because free me will release all memebers
+  FreeMe();
+  static const QIcon TASK_FINISHED_ICON{":img/TASK_FINISHED"};
+  Notificator::showMessage(TASK_FINISHED_ICON, finishedTitle, finishedMessage, LONG_MESSAGE_SHOW_TIME);
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -201,8 +221,6 @@ void Notificator::notify(const QIcon& icon, const QString& title, const QString&
     m_title->setVisible(!title.isEmpty());
     m_title->setText(title);
     m_message->setText(message);
-    m_preloader->setVisible(mTimeOutLen <= 0);
-    m_progress->hide();
   }
 
   moveToCorrectPosition();
@@ -214,9 +232,13 @@ void Notificator::initializeLayout() {
   CHECK_NULLPTR_RETURN_VOID(layout);
   layout->addWidget(m_icon, 0, 0, 2, 1, Qt::AlignTop);
   layout->addWidget(m_title, 0, 1);
-  layout->addWidget(m_preloader, 0, 2, 1, 1, Qt::AlignRight);
+  if (mTimeOutLen <= 0) {
+    layout->addWidget(m_preloader, 0, 2, 1, 1, Qt::AlignRight);
+  }
   layout->addWidget(m_message, 1, 1, 1, 2);
-  layout->addWidget(m_progress, 2, 1, 1, 2);
+  if (mTimeOutLen <= 0) {
+    layout->addWidget(m_progress, 2, 1, 1, 2);
+  }
   setLayout(layout);
 }
 
@@ -243,22 +265,22 @@ void Notificator::moveToCorrectPosition() {
   if (screens.isEmpty()) {return;}
 
   QRect ntfRect = screens.front()->geometry();
+  static const int MAX_HEIGHT = ntfRect.height();
   const QSize size = sizeHint();
 
-  static constexpr bool isTopToBottom = false;
   static constexpr int FOR_SYS_UI_MARGIN = 20;
   // set initial (x, y) coordinates
   // isTopToBottom: preserve n pixel space at top for system UI
   // !isTopToBottom: preserve n pixel space at bottom for system UI
   ntfRect.setX(ntfRect.right() - size.width());
-  ntfRect.setY(isTopToBottom ? 0 : ntfRect.bottom() - size.height());
-  ntfRect.translate(0, (isTopToBottom ? FOR_SYS_UI_MARGIN : -FOR_SYS_UI_MARGIN));
+  ntfRect.setY(m_isTopToBottom ? 0 : ntfRect.bottom() - size.height());
+  ntfRect.translate(0, (m_isTopToBottom ? FOR_SYS_UI_MARGIN : -FOR_SYS_UI_MARGIN));
 
   const Notificator* keyInstance = nullptr;
   for (const auto& ptr : instances) {
     if (!ptr || ptr.get() == this) continue;
     const Notificator* curInstance = ptr.get();
-    if (isTopToBottom) { // Track the lowest notification
+    if (m_isTopToBottom) { // Track the lowest notification
       if (keyInstance == nullptr || curInstance->geometry().bottom() > keyInstance->geometry().bottom()) {
         keyInstance = curInstance;
       }
@@ -273,8 +295,10 @@ void Notificator::moveToCorrectPosition() {
     // isTopToBottom: Place below the lowest notification
     // !isTopToBottom: Place above the highest notification
     static constexpr int BETWEEN_NOTIFICATONS_MARGIN = 1;
-    ntfRect.setY(isTopToBottom ? keyInstance->geometry().bottom() + BETWEEN_NOTIFICATONS_MARGIN
-                               : keyInstance->geometry().top() - size.height() - BETWEEN_NOTIFICATONS_MARGIN);
+    const int calculatedY = m_isTopToBottom ? keyInstance->geometry().bottom() + BETWEEN_NOTIFICATONS_MARGIN
+                                            : keyInstance->geometry().top() - size.height() - BETWEEN_NOTIFICATONS_MARGIN;
+    const int modulus = calculatedY % MAX_HEIGHT;
+    ntfRect.setY(modulus >= 0 ?  modulus: modulus + MAX_HEIGHT);
   }
   ntfRect.setSize(size);
   setGeometry(ntfRect);
