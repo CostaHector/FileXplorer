@@ -1,42 +1,82 @@
 #include "Notificator.h"
-
+#include "PublicMacro.h"
 #include <QApplication>
 #include <QGridLayout>
 #include <QLabel>
 #include <QProgressBar>
+#include <QMovie>
 #include <QStyle>
-#include <QtGui>
+#include <QScreen>
 
-namespace NOTIFICATOR_SETTING {
+namespace {
 constexpr int SHORT_MESSAGE_SHOW_TIME = 3000;
 constexpr int LONG_MESSAGE_SHOW_TIME = 5000;
 constexpr float WINDOW_TRANSPARENT_OPACITY = 0.7;
 constexpr float WINDOW_NONTRANSPARENT_OPACITY = 1.0;
-constexpr int NOTIFICATION_MARGIN = 10;
-constexpr int DISPLAY_NOTIFICATION_DIRECTION_TOP_TO_BOTTOM = false;
-}  // namespace NOTIFICATOR_SETTING
-
-using namespace NOTIFICATOR_SETTING;
-
-Notificator::Notificator(bool autohide) : QFrame(0), d(new NotificatorPrivate(autohide)) {
-  hide();
-  initializeLayout();
-  initializeUI();
+constexpr int ICON_SIZE = 32;
+constexpr int PRELOADER_SIZE = 20;
 }
 
-Notificator::~Notificator() {
-  delete d;
+std::list<std::unique_ptr<Notificator>> Notificator::instances;
+
+Notificator::Notificator(int timeoutLength)//
+  : QFrame{nullptr}, mAutoCloser{this}, mTimeOutLen{timeoutLength} {
+  hide();
+  m_icon = new (std::nothrow) QLabel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_icon);
+  m_icon->setObjectName("icon");
+  m_icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+  m_title = new (std::nothrow) QLabel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_title);
+  m_title->setObjectName("title");
+  m_title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+  m_message = new (std::nothrow) QLabel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_message);
+  m_message->setObjectName("message");
+  m_message->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  m_message->setTextFormat(Qt::RichText);
+  m_message->setOpenExternalLinks(true);
+  m_message->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+
+  m_preloader = new (std::nothrow) QLabel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_preloader);
+  m_preloader->setObjectName("preloader");
+  m_preloader->setMinimumSize(PRELOADER_SIZE, PRELOADER_SIZE);
+  m_preloader->setMaximumSize(PRELOADER_SIZE, PRELOADER_SIZE);
+  m_preloader->setScaledContents(true);
+  // Настройка анимации прелоадера
+  QMovie* preloaderAnimation = new (std::nothrow) QMovie(":img/LOADING", {}, this);
+  CHECK_NULLPTR_RETURN_VOID(preloaderAnimation);
+  preloaderAnimation->setScaledSize(m_preloader->size());
+  m_preloader->setMovie(preloaderAnimation);
+  preloaderAnimation->start();
+
+  m_progress = new (std::nothrow) QProgressBar{this};
+  CHECK_NULLPTR_RETURN_VOID(m_progress);
+  m_progress->setObjectName("progress");
+#ifdef Q_OS_WIN
+  m_progress->setMaximumHeight(20);
+#else
+  m_progress->setMaximumHeight(26);
+#endif
+  m_progress->setTextVisible(false);
+
+  initializeLayout();
+  initializeUI();
+  hide();
 }
 
 void Notificator::goodNews(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  showMessage(QIcon(":img/SAVED"), title, message, SHORT_MESSAGE_SHOW_TIME);
+  showMessage(QIcon{":img/CORRECT"}, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::badNews(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  showMessage(QIcon(":img/NOT_SAVED"), title, message, LONG_MESSAGE_SHOW_TIME);
+  showMessage(QIcon{":img/WRONG"}, title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
@@ -68,74 +108,112 @@ void Notificator::question(const QString& title, const QString& message) {
 #endif
 }
 
-void Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, int timeLength) {
-  Notificator* instance = new Notificator;
-  configureInstance(instance);
+void Notificator::FreeMe() {
+  instances.remove_if([this](const std::unique_ptr<Notificator>& ptr) {
+    return ptr != nullptr && ptr.get() == this;
+  });
+}
 
-  instance->notify(icon, title, message);
-  QTimer::singleShot(timeLength, instance, &Notificator::close);
+void Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, int timeLength) {
+  freeHiddenInstance();
+  auto pTemp = new (std::nothrow) Notificator{timeLength};
+  CHECK_NULLPTR_RETURN_VOID(pTemp);
+  if (pTemp->mTimeOutLen > 0) {
+    pTemp->mAutoCloser.setInterval(pTemp->mTimeOutLen);
+    pTemp->mAutoCloser.setSingleShot(true);
+    Notificator::connect(&pTemp->mAutoCloser, &QTimer::timeout, pTemp, &Notificator::FreeMe);
+    pTemp->mAutoCloser.start();
+  }
+  auto pNty = std::unique_ptr<Notificator>(pTemp);
+  pNty->notify(icon, title, message);
+  instances.push_back(std::move(pNty));
 }
 
 Notificator* Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
-  if (sender != 0) {
-    Notificator* instance = new Notificator(false);
-    configureInstance(instance);
-
-    // Запуск уведомления
-    instance->notify(icon, title, message);
-    connect(sender, finishedSignal, instance, SLOT(close()));
-    return instance;
+  if (sender == nullptr) {
+    return nullptr;
   }
-  return nullptr;
-}
+  freeHiddenInstance();
 
-void Notificator::setMessage(const QString& _message) {
-  d->message()->setText(_message);
+  auto pTemp = new (std::nothrow) Notificator{0};
+  CHECK_NULLPTR_RETURN_NULLPTR(pTemp);
+  connect(sender, finishedSignal, pTemp, SLOT(FreeMe()));
+
+  auto pNty = std::unique_ptr<Notificator>(pTemp);
+  pNty->notify(icon, title, message);
+  instances.push_back(std::move(pNty));
+  return pTemp;
 }
 
 void Notificator::setProgressValue(int _value) {
-  d->progress()->show();
-  d->progress()->setValue(_value);
+  m_progress->show();
+  m_progress->setValue(_value);
 }
 
-bool Notificator::event(QEvent* event) {
-  if (event->type() == QEvent::HoverEnter) {
-    setWindowOpacity(WINDOW_NONTRANSPARENT_OPACITY);
-  } else if (event->type() == QEvent::HoverLeave) {
-    setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
-  } else if (event->type() == QEvent::MouseButtonPress && d->autoHide()) {
-    // Если сообщение не отображает информации о выполняющемся действии можно его закрыть.
-    // Т.к. кликом может быть активирована ссылка, то необходимо выждать 100 мсек
-    // перед скрытием уведомления, для открытия её в браузере
-    QTimer::singleShot(200, this, SLOT(hide()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void Notificator::hoverEnterEvent(QHoverEvent* event) {
+  setWindowOpacity(WINDOW_NONTRANSPARENT_OPACITY);
+  if (m_timeOutLen > 0) {
+    mAutoCloser.stop();
   }
-
-  return QFrame::event(event);
+  event->accept(); // prevent parent widget process this event
 }
+void Notificator::hoverLeaveEvent(QHoverEvent* event) {
+  setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
+  if (m_timeOutLen > 0) {
+    mAutoCloser.start();
+  }
+  event->accept();
+}
+#else
+bool Notificator::event(QEvent* event) {
+  switch(event->type()) {
+    case QEvent::HoverEnter:  {
+      setWindowOpacity(WINDOW_NONTRANSPARENT_OPACITY);
+      if (mTimeOutLen > 0) {
+        mAutoCloser.stop();
+      }
+      return true; // all event are finished
+    }
+    case QEvent::HoverLeave: {
+      setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
+      if (mTimeOutLen > 0) {
+        mAutoCloser.start();
+      }
+      return true;
+    }
+    default:
+      return QFrame::event(event);
+  }
+}
+#endif
 
 void Notificator::notify(const QIcon& icon, const QString& title, const QString& message) {
-  hide();
-  d->initialize(icon, title, message);
-  correctPosition();
+  {
+    m_icon->setPixmap(icon.pixmap(ICON_SIZE));
+    m_title->setVisible(!title.isEmpty());
+    m_title->setText(title);
+    m_message->setText(message);
+    m_preloader->setVisible(mTimeOutLen <= 0);
+    m_progress->hide();
+  }
+
+  moveToCorrectPosition();
   show();
 }
 
 void Notificator::initializeLayout() {
-  QGridLayout* layout = new QGridLayout(this);
-  layout->setHorizontalSpacing(12);
-  layout->addWidget(d->icon(), 0, 0, 2, 1, Qt::AlignTop);
-  layout->addWidget(d->title(), 0, 1);
-  layout->addWidget(d->preloader(), 0, 2, 1, 1, Qt::AlignRight);
-  layout->addWidget(d->message(), 1, 1, 1, 2);
-  layout->addWidget(d->progress(), 2, 1, 1, 2);
+  QGridLayout* layout = new (std::nothrow) QGridLayout;
+  CHECK_NULLPTR_RETURN_VOID(layout);
+  layout->addWidget(m_icon, 0, 0, 2, 1, Qt::AlignTop);
+  layout->addWidget(m_title, 0, 1);
+  layout->addWidget(m_preloader, 0, 2, 1, 1, Qt::AlignRight);
+  layout->addWidget(m_message, 1, 1, 1, 2);
+  layout->addWidget(m_progress, 2, 1, 1, 2);
+  setLayout(layout);
 }
 
 void Notificator::initializeUI() {
-  QPalette palette = this->palette();
-  palette.setColor(QPalette::Base, Qt::red);
-  palette.setColor(QPalette::AlternateBase, Qt::green);
-  setPalette(palette);
-
   setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
   setAttribute(Qt::WA_Hover, true);
   setStyleSheet(
@@ -153,82 +231,51 @@ void Notificator::initializeUI() {
   setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
 }
 
-void Notificator::correctPosition() {
-  // Вычисляем позицию для отображения уведомления
-  // ... сперва сформируем позицию для самой верхней точки
-  static auto rects = QGuiApplication::screens();
-  static QRect ntfRect = rects.isEmpty() ? QRect{0, 0, 1024, 768} : rects.front()->geometry();
-  const QSize notificationSize = sizeHint();
+void Notificator::moveToCorrectPosition() {
+  static const auto screens = QGuiApplication::screens();
+  if (screens.isEmpty()) {return;}
 
-  if (DISPLAY_NOTIFICATION_DIRECTION_TOP_TO_BOTTOM) {  // Notifications Display From Top to Bottom
-    ntfRect.setTop(ntfRect.top() + notificationSize.height());
-    ntfRect.setLeft(ntfRect.right() - notificationSize.width());
-    // ... определяем доступную верхнюю координату
-    foreach (Notificator* instance, instances) {
-      if (instance != this) {
-        if (instance->geometry().bottom() > ntfRect.top()) {
-          ntfRect.setTop(instance->geometry().bottom() + NOTIFICATION_MARGIN);
-        }
+  QRect ntfRect = screens.front()->geometry();
+  const QSize size = sizeHint();
+
+  static constexpr bool isTopToBottom = false;
+  static constexpr int FOR_SYS_UI_MARGIN = 20;
+  // set initial (x, y) coordinates
+  // isTopToBottom: preserve n pixel space at top for system UI
+  // !isTopToBottom: preserve n pixel space at bottom for system UI
+  ntfRect.setX(ntfRect.right() - size.width());
+  ntfRect.setY(isTopToBottom ? 0 : ntfRect.bottom() - size.height());
+  ntfRect.translate(0, (isTopToBottom ? FOR_SYS_UI_MARGIN : -FOR_SYS_UI_MARGIN));
+
+  const Notificator* keyInstance = nullptr;
+  for (const auto& ptr : instances) {
+    if (!ptr || ptr.get() == this) continue;
+    const Notificator* curInstance = ptr.get();
+    if (isTopToBottom) { // Track the lowest notification
+      if (keyInstance == nullptr || curInstance->geometry().bottom() > keyInstance->geometry().bottom()) {
+        keyInstance = curInstance;
       }
-    }
-  } else {  // Notifications Display From Bottom to Top
-    ntfRect.setBottom(ntfRect.top() + (ntfRect.height() - notificationSize.height()));
-    ntfRect.setTop(ntfRect.bottom() - notificationSize.height());
-    ntfRect.setLeft(ntfRect.right() - notificationSize.width());
-    // ... определяем доступную верхнюю координату
-    foreach (Notificator* instance, instances) {
-      if (instance != this) {
-        if (instance->geometry().top() < ntfRect.bottom()) {
-          ntfRect.setTop(instance->geometry().top() - notificationSize.height() - NOTIFICATION_MARGIN);
-        }
+    } else { // Track the highest notification
+      if (keyInstance == nullptr || curInstance->geometry().top() < keyInstance->geometry().top()) {
+        keyInstance = curInstance;
       }
     }
   }
-
-  // Устанавливаем размер
-  ntfRect.setSize(notificationSize);
-  // Отображаем
+  if (keyInstance != nullptr) {
+    // adjust y coordinate
+    // isTopToBottom: Place below the lowest notification
+    // !isTopToBottom: Place above the highest notification
+    static constexpr int BETWEEN_NOTIFICATONS_MARGIN = 1;
+    ntfRect.setY(isTopToBottom ? keyInstance->geometry().bottom() + BETWEEN_NOTIFICATONS_MARGIN
+                               : keyInstance->geometry().top() - size.height() - BETWEEN_NOTIFICATONS_MARGIN);
+  }
+  ntfRect.setSize(size);
   setGeometry(ntfRect);
 }
 
-QList<Notificator*> Notificator::instances;
-void Notificator::configureInstance(Notificator* notificator) {
-  // Удаляем уже отработавшие уведомления
-  QMutableListIterator<Notificator*> iter(instances);
-  while (iter.hasNext()) {
-    Notificator* instance = iter.next();
-    if (instance->isHidden()) {
-      iter.remove();
-      instance = 0;
-    }
-  }
-
-  // Добавляем новое уведомление к списку всех уведомлений
-  if (notificator != 0) {
-    instances.append(notificator);
-  }
+void Notificator::freeHiddenInstance() {
+  instances.remove_if([](const std::unique_ptr<Notificator>& ptr) {
+    return ptr == nullptr || ptr->isHidden();
+  });
 }
 
-// #define RUN_MAIN_FILE 1
-#ifdef RUN_MAIN_FILE
-#include <QToolBar>
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  QToolBar w;
-  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
-  static constexpr int BATCH_SIZE = 10;
-  for (int i = QStyle::StandardPixmap::SP_TitleBarMenuButton;  //
-       i <= QStyle::StandardPixmap::SP_RestoreDefaultsButton;  //
-       ++i) {
-    w.addAction(qApp->style()->standardIcon((QStyle::StandardPixmap)i), QString::number(i));
-    if (i % BATCH_SIZE == 0) {
-      w.addSeparator();
-    }
-  }
-  w.setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  w.show();
-  a.exec();
-  return 0;
-}
-
-#endif

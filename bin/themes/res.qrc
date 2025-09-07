@@ -320,5 +320,8 @@
     <file alias="CONFIGURE">ConfigsTable/CONFIGURE.svg</file>
     <file alias="CORRECT">ConfigsTable/CORRECT.svg</file>
     <file alias="WRONG">ConfigsTable/WRONG.svg</file>
+
+    <!--Notification icon here-->
+    <file alias="LOADING">Notification/LOADING.gif</file>
     </qresource>
 </RCC>
