@@ -13,10 +13,10 @@ class LogHandler: QObject {
   static void subscribe();
   static bool AgingLogFiles(const int AGING_FILE_ABOVE_B = 2 * 1024 * 1024, QString* pAgedLogFileName = nullptr);
   static QByteArray GetLastNLinesOfLogs(const int maxLines = 100);
+  static bool OpenLogFile();
 
  private:
   static void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
-  static bool OpenLogFile();
   static bool OpenLogFolder();
   static void SetLogLevelError();
   static void SetLogLevelDebug();
