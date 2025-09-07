@@ -146,7 +146,7 @@ private slots:
     pFirst->setProgressValue(50);
     QCOMPARE(pFirst->m_progress->value(), 50);
 
-    emit btn.clicked(false); // finished -> freeMe then popup finishedBallon
+    emit btn.clicked(false); // finished -> freeMe then popup finishedBalloon
     QCOMPARE(Notificator::instances.size(), 1);
 
     Notificator::instances.clear();
@@ -180,16 +180,16 @@ private slots:
     QCOMPARE(pFirst->m_progress->value(), 50);
     QCOMPARE(Notificator::instances.size(), 1);
 
-    // FreeMe then "finshed hint" ballon pop out
+    // FreeMe then "finshed hint" Balloon pop out
     pFirst->setProgressValue(100);
     QCOMPARE(Notificator::instances.size(), 1);
 
     QVERIFY(Notificator::instances.front() != nullptr);
-    auto* pFinshedBallon = Notificator::instances.front().get();
-    QVERIFY( pFinshedBallon != nullptr);
-    QVERIFY(pFinshedBallon->m_title != nullptr);
-    const QString titleOfBallon = pFinshedBallon->m_title->text();
-    QVERIFY(titleOfBallon.contains("finished", Qt::CaseInsensitive));
+    auto* pFinshedBalloon = Notificator::instances.front().get();
+    QVERIFY( pFinshedBalloon != nullptr);
+    QVERIFY(pFinshedBalloon->m_title != nullptr);
+    const QString titleOfBalloon = pFinshedBalloon->m_title->text();
+    QVERIFY(titleOfBalloon.contains("finished", Qt::CaseInsensitive));
   }
 };
 
