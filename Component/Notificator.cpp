@@ -1,12 +1,13 @@
 #include "Notificator.h"
 #include "PublicMacro.h"
-#include <QApplication>
+#include "LogHandler.h"
+#include <QProgressBar>
 #include <QGridLayout>
 #include <QLabel>
-#include <QProgressBar>
+#include <QIcon>
 #include <QMovie>
-#include <QStyle>
 #include <QScreen>
+#include <QGuiApplication>
 
 namespace {
 constexpr int SHORT_MESSAGE_SHOW_TIME = 3000;
@@ -70,41 +71,43 @@ Notificator::Notificator(int timeoutLength)//
 
 void Notificator::goodNews(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  showMessage(QIcon{":img/CORRECT"}, title, message, SHORT_MESSAGE_SHOW_TIME);
+  static const QIcon CORRECT_ICON{":img/CORRECT"};
+  showMessage(CORRECT_ICON, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::badNews(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  showMessage(QIcon{":img/WRONG"}, title, message, LONG_MESSAGE_SHOW_TIME);
+  static const QIcon WRONG_ICON{":img/WRONG"};
+  showMessage(WRONG_ICON, title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::critical(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
-  showMessage(icon, title, message, LONG_MESSAGE_SHOW_TIME);
+  static const QIcon CRITICAL_ICON{":img/LOG_LEVEL_CRITICAL"};
+  showMessage(CRITICAL_ICON, title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::warning(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
-  showMessage(icon, title, message, LONG_MESSAGE_SHOW_TIME);
+  static const QIcon WARNING_ICON{":img/LOG_LEVEL_WARNING"};
+  showMessage(WARNING_ICON, title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::information(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation);
-  showMessage(icon, title, message, SHORT_MESSAGE_SHOW_TIME);
+  static const QIcon INFO_ICON{":img/LOG_LEVEL_INFO"};
+  showMessage(INFO_ICON, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::question(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  static const QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion);
-  showMessage(icon, title, message, SHORT_MESSAGE_SHOW_TIME);
+  static const QIcon QUESTION_ICON{":img/LOG_LEVEL_QUESTION"};
+  showMessage(QUESTION_ICON, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
@@ -180,6 +183,10 @@ bool Notificator::event(QEvent* event) {
       if (mTimeOutLen > 0) {
         mAutoCloser.start();
       }
+      return true;
+    }
+    case QEvent::MouseButtonDblClick: {
+      LogHandler::OpenLogFile();
       return true;
     }
     default:

@@ -17,6 +17,8 @@
     <file alias="AGING_LOGS">Log/AGING_LOGS.svg</file>
     <file alias="LOG_LEVEL_DEBUG">Log/LOG_LEVEL_DEBUG.svg</file>
     <file alias="LOG_LEVEL_WARNING">Log/LOG_LEVEL_WARNING.svg</file>
+    <file alias="LOG_LEVEL_CRITICAL">Log/LOG_LEVEL_CRITICAL.svg</file>
+    <file alias="LOG_LEVEL_INFO">Log/LOG_LEVEL_INFO.svg</file>
     <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON.svg</file>
     <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF.svg</file>
 
