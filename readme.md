@@ -362,3 +362,14 @@ sequenceDiagram
     UndoRedo->>UndoRedo: redoList.isEmpty()
     UndoRedo-->>User: skip*/
 ```
+
+
+### Table 1.6 Notificator Balloon Function Test Results
+
+| Function Point | Test Case | Test Result |
+|----------------|-----------|-------------|
+| One-shot timer timeout triggers close | `timeoutLenGT0_AutoHideTimerActive_ok` | ✅ PASS |
+| Progress bar completion triggers close | `progress100_drive_FreeMe_ok` | ✅ PASS |
+| Finished signal triggers close | `finished_signal_drive_FreeMe_ok` | ✅ PASS |
+| Multiple notifications layout from top to bottom (with Y-coordinate wrapping) | `cards_tile_from_top_to_bottom_wrapped_ok` | ✅ PASS |
+| Multiple notifications layout from bottom to top (with Y-coordinate wrapping) | `cards_tile_from_bottom_to_top_wrapped_ok` | ✅ PASS |
