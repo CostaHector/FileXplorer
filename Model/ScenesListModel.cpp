@@ -87,7 +87,7 @@ QFileInfo ScenesListModel::fileInfo(const QModelIndex& index) const {
   }
 
   if (mCurBegin[linearInd].vidName.isEmpty()) {
-    qDebug("vidName is empty");
+    LOG_D("vidName is empty");
     return {};
   }
   return QFileInfo(mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].vidName);
@@ -100,7 +100,7 @@ QString ScenesListModel::filePath(const QModelIndex& index) const {
   }
 
   if (mCurBegin[linearInd].vidName.isEmpty()) {
-    qDebug("vidName is empty");
+    LOG_D("vidName is empty");
     return {};
   }
   return mRootPath + mCurBegin[linearInd].rel2scn + mCurBegin[linearInd].vidName;
@@ -112,7 +112,7 @@ QString ScenesListModel::fileName(const QModelIndex& index) const {
     return {};
   }
   if (mCurBegin[linearInd].vidName.isEmpty()) {
-    qDebug("vidName is empty");
+    LOG_D("vidName is empty");
     return {};
   }
   return mCurBegin[linearInd].vidName;
@@ -136,14 +136,14 @@ QString ScenesListModel::absolutePath(const QModelIndex& index) const {
 
 bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
   if (mRootPath == rootPath && !bForce) {
-    qDebug("Scene ignore set same root path");
+    LOG_D("Scene ignore set same root path");
     return true;
   }
   mRootPath = rootPath;
 
   SCENES_TYPE newFilteredList;
   SCENES_TYPE newEntryList = SceneInfoManager::GetScenesFromPath(mRootPath, mFilterEnable, mPattern, &newFilteredList);
-  qDebug("new path[%s], imgs[%d], imgsFiltered[%d]", qPrintable(mRootPath), newEntryList.size(), newFilteredList.size());
+  LOG_D("new path[%s], imgs[%d], imgsFiltered[%d]", qPrintable(mRootPath), newEntryList.size(), newFilteredList.size());
 
   const int ELE_N = mFilterEnable ? newFilteredList.size() : newEntryList.size();
   int newBegin{0}, newEnd{0};
@@ -152,11 +152,11 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
   const int beforeRow = rowCount();
   const int afterRow = newEnd - newBegin;
   if (mFilterEnable) {
-    qDebug("Filtered[%s] elements: %d->%d", qPrintable(mPattern), mEntryListFiltered.size(), newFilteredList.size());
+    LOG_D("Filtered[%s] elements: %d->%d", qPrintable(mPattern), mEntryListFiltered.size(), newFilteredList.size());
   } else {
-    qDebug("Entry elements: %d->%d", mEntryList.size(), newEntryList.size());
+    LOG_D("Entry elements: %d->%d", mEntryList.size(), newEntryList.size());
   }
-  qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
+  LOG_D("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
   RowsCountBeginChange(beforeRow, afterRow);
 
   mEntryList.swap(newEntryList);
@@ -198,7 +198,7 @@ QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
 
 bool ScenesListModel::ChangeItemsCntIn1Page(int scCnt1Page) {
   if (scCnt1Page < 0) {
-    qDebug("Invalid newSc1Page %d", scCnt1Page);
+    LOG_D("Invalid newSc1Page %d", scCnt1Page);
     return true;
   }
 
@@ -208,11 +208,11 @@ bool ScenesListModel::ChangeItemsCntIn1Page(int scCnt1Page) {
   const SCENES_TYPE& lst = GetEntryList();
   const int TOTAL_N = GetEntryListLen();
   if (scCnt1Page == 0) {
-    qDebug("all items in one page");
+    LOG_D("all items in one page");
     startIndex = 0;
     endIndex = TOTAL_N;
   } else {
-    qDebug("%d items in one page", scCnt1Page);
+    LOG_D("%d items in one page", scCnt1Page);
     startIndex = std::min(scCnt1Page * mPageIndex, TOTAL_N);
     endIndex = std::min(scCnt1Page * (mPageIndex + 1), TOTAL_N);
   }
@@ -228,7 +228,7 @@ bool ScenesListModel::ChangeItemsCntIn1Page(int scCnt1Page) {
 
 void ScenesListModel::SortOrder(SceneInfoManager::SceneSortOption sortOption, bool reverse) {
   if (sortOption == SceneInfoManager::SceneSortOption::BUTT) {
-    qDebug("sortOption[%d] is invalid, cannot used to sort", (int)sortOption);
+    LOG_D("sortOption[%d] is invalid, cannot used to sort", (int)sortOption);
     return;
   }
   int newBegin{0}, newEnd{0};
@@ -255,15 +255,15 @@ bool ScenesListModel::ShowAllScenesInOnePage() {
 
 bool ScenesListModel::SetPageIndex(int newPageIndex) {
   if (SCENES_CNT_1_PAGE == 0) {
-    qDebug("display all scenes in 1 page. no need pagination");
+    LOG_D("display all scenes in 1 page. no need pagination");
     return false;
   }
   if (newPageIndex < 0) {
-    qDebug("invalid page index[%d]", newPageIndex);
+    LOG_D("invalid page index[%d]", newPageIndex);
     return false;
   }
   if (newPageIndex == mPageIndex) {
-    qDebug("page index remains[%d]", newPageIndex);
+    LOG_D("page index remains[%d]", newPageIndex);
     return true;
   }
 
@@ -274,7 +274,7 @@ bool ScenesListModel::SetPageIndex(int newPageIndex) {
 
   const int beforeRowCnt = rowCount();
   const int afterRowCnt = endIndex - startIndex;
-  qDebug("SetPageIndex, rowCnt:%d->%d", beforeRowCnt, afterRowCnt);
+  LOG_D("SetPageIndex, rowCnt:%d->%d", beforeRowCnt, afterRowCnt);
   RowsCountBeginChange(beforeRowCnt, afterRowCnt);
   mPageIndex = newPageIndex;
   mCurBegin = lst.cbegin() + startIndex;

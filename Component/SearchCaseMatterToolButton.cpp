@@ -30,10 +30,10 @@ SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolB
 
 void SearchCaseMatterToolButton::BindSearchModel(SearchProxyModel* searchProxyModel) {
   if (searchProxyModel == nullptr) {
-    qDebug("Don't bind nullptr to _searchProxyModel");
+    LOG_D("Don't bind nullptr to _searchProxyModel");
   }
   if (_searchProxyModel != nullptr) {
-    qDebug("Don't rebind to _searchProxyModel");
+    LOG_D("Don't rebind to _searchProxyModel");
   }
   _searchProxyModel = searchProxyModel;
   connect(SEARCH_NAME_CASE_SENSITIVE, &QAction::triggered, _searchProxyModel, &SearchProxyModel::setFileNameFiltersCaseSensitive);

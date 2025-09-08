@@ -2,6 +2,7 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Logger.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFile>
@@ -13,12 +14,12 @@
 bool SysTerminal::operator()(const QString& path) {
   const QFileInfo fi{path};
   if (!fi.exists()) {
-    qDebug("path[%s] not exist", qPrintable(path));
+    LOG_D("path[%s] not exist", qPrintable(path));
     return false;
   }
   const QString pth = QDir::toNativeSeparators(fi.isFile() ? fi.absolutePath() : fi.absoluteFilePath());
 #ifdef _WIN32
-  qWarning("WINDOWS not support now");
+  LOG_W("WINDOWS not support now");
   return false;
 #else
   QProcess process;

@@ -275,7 +275,7 @@ void QuickWhereClauseDialog::subscribe() {
 void QuickWhereClauseDialog::SetStrPatternCaseSensitive(Qt::CaseSensitivity caseSen) {
   const int patternsCnt = m_strFilterPatternCB->count();
   if (caseSen >= patternsCnt) {
-    qWarning("Name str pattern index[%d] out of range[0, %d)", (int)caseSen, patternsCnt);
+    LOG_W("Name str pattern index[%d] out of range[0, %d)", (int)caseSen, patternsCnt);
     return;
   }
   m_strFilterPatternCB->setCurrentIndex((int)caseSen);
@@ -284,12 +284,12 @@ void QuickWhereClauseDialog::SetStrPatternCaseSensitive(Qt::CaseSensitivity case
 bool QuickWhereClauseDialog::onRemoveAHistory() {
   int n = mStrListModel->rowCount();
   if (n <= 0) {
-    qDebug("History already empty, skip delete");
+    LOG_D("History already empty, skip delete");
     return true;
   }
   int index = m_whereHistComboBox->currentIndex();
   if (index >= n) {
-    qWarning("index[%d] out of range [0,%d), skip delete", index, n);
+    LOG_W("index[%d] out of range [0,%d), skip delete", index, n);
     return false;
   }
   mStrListModel->removeRow(index);
@@ -299,7 +299,7 @@ bool QuickWhereClauseDialog::onRemoveAHistory() {
 int QuickWhereClauseDialog::onClearHistory() {
   const int n = mStrListModel->rowCount();
   if (n <= 0) {
-    qDebug("model already empty, skip clear");
+    LOG_D("model already empty, skip clear");
     return 0;
   }
   mStrListModel->removeRows(0, n);
@@ -309,7 +309,7 @@ int QuickWhereClauseDialog::onClearHistory() {
 bool QuickWhereClauseDialog::onAddAHistory() {
   const QString newHistLine{m_whereLineEdit->text().trimmed()};
   if (newHistLine.isEmpty()) {
-    qDebug("Where clause[%s] empty or already exist. skip insert", qPrintable(newHistLine));
+    LOG_D("Where clause[%s] empty or already exist. skip insert", qPrintable(newHistLine));
     return false;
   }
   mStrListModel->insertRow(0);
@@ -324,7 +324,7 @@ int QuickWhereClauseDialog::onEditHistory() {
   curHists = QInputDialog::getMultiLineText(this, "Edit where history Below", QString::number(beforeRowCnt), //
                                             curHists, &editOk);
   if (!editOk) {
-    qDebug("User Cancel edit history");
+    LOG_D("User Cancel edit history");
     return 0;
   }  
   const QStringList newHists{curHists.split(WHERE_HIST_SPLIT_CHAR)};

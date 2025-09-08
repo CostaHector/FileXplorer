@@ -1,4 +1,5 @@
 #include "LineEditInt.h"
+#include "Logger.h"
 
 LineEditInt::LineEditInt(const QString& formName, const QString& text, QWidget* parent) : QLineEdit{text, parent}, mFormName{formName} {}
 
@@ -11,7 +12,7 @@ bool LineEditInt::CheckValueValid() const {
   bool isNumber = false;
   numberStr.toInt(&isNumber);
   if (!isNumber) {
-    qWarning("NumberStr[%s] is not a number", qPrintable(numberStr));
+    LOG_W("NumberStr[%s] is not a number", qPrintable(numberStr));
     return false;
   }
   return true;
@@ -27,7 +28,7 @@ int LineEditInt::GetIntValue() const {
   bool isNumber = false;
   int ansInt = numberStr.toInt(&isNumber);
   if (!isNumber) {
-    qWarning("NumberStr[%s] is not a number", qPrintable(numberStr));
+    LOG_W("NumberStr[%s] is not a number", qPrintable(numberStr));
     return -1;
   }
   return ansInt;

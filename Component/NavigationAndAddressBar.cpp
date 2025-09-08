@@ -85,7 +85,7 @@ void NavigationAndAddressBar::InitEventWhenViewChanged() {
 
 bool NavigationAndAddressBar::onBackward() {
   if (!m_pathRD.undoAvailable()) {
-    qDebug("[Skip] backward paths pool empty");
+    LOG_D("[Skip] backward paths pool empty");
     return false;
   }
   bool backwardRes{true};
@@ -98,7 +98,7 @@ bool NavigationAndAddressBar::onBackward() {
 
 bool NavigationAndAddressBar::onForward() {
   if (!m_pathRD.redoAvailable()) {
-    qDebug("[Skip] Forward paths pool empty");
+    LOG_D("[Skip] Forward paths pool empty");
     return false;
   }
   bool forwardRes{true};
@@ -124,11 +124,11 @@ bool NavigationAndAddressBar::onIteratorToAnotherFolderCore(bool isNext) {
   const QString curDirName = fi.fileName();
   const QString& newDir = isNext ? mFolderNxtLstIt.next(parentPath, curDirName) : mFolderNxtLstIt.last(parentPath, curDirName);
   if (newDir.isEmpty()) {
-    qDebug("skip empty dir[%s]", qPrintable(parentPath));
+    LOG_D("skip empty dir[%s]", qPrintable(parentPath));
     return false;
   }
   if (curDirName == newDir) {
-    qDebug("skip same dir[%s/%s]", qPrintable(parentPath), qPrintable(curDirName));
+    LOG_D("skip same dir[%s/%s]", qPrintable(parentPath), qPrintable(curDirName));
     return false;
   }
   const QString& newPath = parentPath + '/' + newDir;
@@ -136,7 +136,7 @@ bool NavigationAndAddressBar::onIteratorToAnotherFolderCore(bool isNext) {
   if (m_IntoNewPath != nullptr) {
     intoRes = m_IntoNewPath(newPath, true, false);
   } else {
-    qWarning("m_IntoNewPath is nullptr");
+    LOG_W("m_IntoNewPath is nullptr");
     return false;
   }
   return intoRes;
@@ -169,15 +169,15 @@ bool NavigationAndAddressBar::onSearchTextReturnPressed() {
 class IntoNewPathMockClass {
 public:
   bool IntoNewPath(QString a, bool b, bool c) {
-    qDebug("IntoNewPath: %s, %d, %d", qPrintable(a), b, c);
+    LOG_D("IntoNewPath: %s, %d, %d", qPrintable(a), b, c);
     return true;
   }
   bool on_searchTextChanged(QString a) {
-    qDebug("on_searchTextChanged: %s, %d", qPrintable(a));
+    LOG_D("on_searchTextChanged: %s, %d", qPrintable(a));
     return true;
   }
   bool on_searchEnterKey(QString a) {
-    qDebug("on_searchEnterKey: %s, %d", qPrintable(a));
+    LOG_D("on_searchEnterKey: %s, %d", qPrintable(a));
     return true;
   }
 };

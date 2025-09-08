@@ -67,7 +67,7 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
       regexValidLabel->ToSaved();
     } else {
       regexValidLabel->ToNotSaved();
-      qWarning("regular expression invalid[%s]", qPrintable(oldString));
+      LOG_W("regular expression invalid[%s]", qPrintable(oldString));
       return {};
     }
   }

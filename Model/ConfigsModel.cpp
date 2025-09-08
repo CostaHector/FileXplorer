@@ -1,8 +1,9 @@
 ﻿#include "ConfigsModel.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
-#include <QDebug>
+#include "Logger.h"
 #include <QIcon>
+
 const QStringList ConfigsModel::CONFIGS_TABLE_HEADER{"Name", "Current value", "Initial value"};
 constexpr int ConfigsModel::VALUE_COLUMN;
 
@@ -53,7 +54,7 @@ bool ConfigsModel::setData(const QModelIndex& index, const QVariant& value, int 
     // for direct edit, using EditRole
     const KV* record = KV::mEditableKVs[index.row()];
     if (!record->checker(value)) {
-      qDebug() << "Edit keyName[new value] not pass the checker: " << record->name << "[" << value << "]";
+      LOG_D("Edit %s[newValue] not pass the checker", qPrintable(record->name));
       return false;
     }
     static auto& curCfg = Configuration();

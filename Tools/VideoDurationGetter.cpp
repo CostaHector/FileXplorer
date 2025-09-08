@@ -1,4 +1,5 @@
 ﻿#include "VideoDurationGetter.h"
+#include "Logger.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -6,7 +7,7 @@ extern "C" {
 
 void IsFFmpegInstalledOK() {
   avformat_network_init();
-  qWarning("FFmpeg version:%u", avformat_version());
+  LOG_W("FFmpeg version:%u", avformat_version());
 }
 
 constexpr int VideoDurationGetter::MILLISECONDS_PER_SECOND;
@@ -53,7 +54,7 @@ QList<int> VideoDurationGetter::ReadVideos(const QStringList& vidsPath) {
 bool VideoDurationGetter::StartToGet() {
 #ifdef _WIN32
   if (!mi.StartToGet()) {
-    qWarning("Video duration getter is nullptr, cannot get video duration");
+    LOG_W("Video duration getter is nullptr, cannot get video duration");
     return false;
   }
 #endif

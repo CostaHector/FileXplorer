@@ -1,4 +1,5 @@
 #include "MD5Calculator.h"
+#include "Logger.h"
 #include <QCryptographicHash>
 #include <QFile>
 #include <QFileInfo>
@@ -6,11 +7,11 @@
 QString MD5Calculator::GetFileMD5(const QString& filepath, const int onlyFirstByte) {
   QFile file{filepath};
   if (!file.exists()) {
-    qWarning("file[%s] not found", qPrintable(filepath));
+    LOG_W("file[%s] not found", qPrintable(filepath));
     return "";
   }
   if (!file.open(QIODevice::ReadOnly)) {
-    qDebug("file[%s] open failed", qPrintable(filepath));
+    LOG_D("file[%s] open failed", qPrintable(filepath));
     return "";
   }
   if (onlyFirstByte > 0) {
@@ -64,7 +65,7 @@ QString MD5Calculator::MD5PrepathName2Table(const QStringList& md5s, const QStri
 
 QString MD5Calculator::MD5DetailHtmlTable(const QStringList& md5s, const QStringList& fileNames, const QStringList& fileDirs) {
   if (not(md5s.size() == fileNames.size() and fileNames.size() == fileDirs.size())) {
-    qWarning("list length unequal. md5s[%d], fileName[%d], fileDirs[%d]", md5s.size(), fileNames.size(), fileDirs.size());
+    LOG_W("list length unequal. md5s[%d], fileName[%d], fileDirs[%d]", md5s.size(), fileNames.size(), fileDirs.size());
     return "";
   }
   const QString& MD5_TABLE_TEMPLATE{

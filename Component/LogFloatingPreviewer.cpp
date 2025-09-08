@@ -1,6 +1,6 @@
 #include "LogFloatingPreviewer.h"
 #include "PublicMacro.h"
-#include "LogHandler.h"
+#include "Logger.h"
 #include <QRect>
 #include <QKeyEvent>
 #include <QAction>
@@ -52,7 +52,7 @@ void LogFloatingPreviewer::resizeEvent(QResizeEvent *event) {
 }
 
 void LogFloatingPreviewer::UpdateLogsContents(const int maxLines, bool bMoveToEnd) {
-  const QByteArray buffer = LogHandler::GetLastNLinesOfLogs(maxLines);
+  const QByteArray buffer = Logger::GetLastNLinesOfLogs(maxLines);
   setPlainText(QString::fromUtf8(buffer));
   if (bMoveToEnd) {
     moveCursor(QTextCursor::End);

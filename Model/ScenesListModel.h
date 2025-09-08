@@ -21,7 +21,7 @@ public:
       return false;
     }
     if (mCurBegin + index.row() >= mCurEnd) {
-      qWarning("Invalid index(%d) user input", index.row());
+      LOG_W("Invalid index(%d) user input", index.row());
       return false;
     }
     linearInd = index.row();

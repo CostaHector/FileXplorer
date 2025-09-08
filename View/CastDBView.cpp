@@ -85,12 +85,12 @@ void CastDBView::subscribe() {
 void CastDBView::onInitATable() {
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
   if (!_castDb.CreateTable(DB_TABLE::PERFORMERS, CastBaseDb::CREATE_PERF_TABLE_TEMPLATE)) {
-    qWarning("Table[%s] create failed.", qPrintable(DB_TABLE::PERFORMERS));
+    LOG_W("Table[%s] create failed.", qPrintable(DB_TABLE::PERFORMERS));
     return;
   }
   _castModel->setTable(DB_TABLE::PERFORMERS);
   _castModel->submitAll();
-  qDebug("Table[%s] create succeed", qPrintable(DB_TABLE::PERFORMERS));
+  LOG_D("Table[%s] create succeed", qPrintable(DB_TABLE::PERFORMERS));
 }
 
 int CastDBView::onAppendCasts() {
@@ -136,7 +136,7 @@ int CastDBView::onDeleteRecords() {
     int startRow = it->top();  // [top, bottom]
     int curRowsCnt = it->bottom() - startRow + 1;
     bool ret = _castModel->removeRows(startRow, curRowsCnt);
-    qDebug("drop[%d] records [%d, %d] ret: %d", ret, startRow, it->bottom(), ret);
+    LOG_D("drop[%d] records [%d, %d] ret: %d", ret, startRow, it->bottom(), ret);
     if (ret) {
       succeedCnt += curRowsCnt;
     }
@@ -156,7 +156,7 @@ bool CastDBView::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete)
                                      "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
                                      QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
   if (retBtn != QMessageBox::StandardButton::Yes) {
-    qDebug("User cancel drop/delete table[%s]", qPrintable(DB_TABLE::PERFORMERS));
+    LOG_D("User cancel drop/delete table[%s]", qPrintable(DB_TABLE::PERFORMERS));
     return true;
   }
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
@@ -322,7 +322,7 @@ int CastDBView::onDumpIntoPsonFile() {
     const QString castName {record.value(PERFORMER_DB_HEADER_KEY::Name).toString()};
     const QString prepath {ori + '/' + castName};
     if (!imageHostDir.exists(prepath) && !imageHostDir.mkpath(prepath)) {
-      qWarning("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(mImageHost));
+      LOG_W("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(mImageHost));
       continue;
     }
     const QString psonPath {CastPsonFileHelper::PsonPath(mImageHost, ori, castName)};
@@ -355,7 +355,7 @@ int CastDBView::onForceRefreshRecordsVids() {
   FdBasedDb movieDb{SystemPath::VIDS_DATABASE, "SEARCH_MOVIE_BY_PERFORMER"};
   QSqlDatabase con = movieDb.GetDb();  // videos table
   if (!movieDb.CheckValidAndOpen(con)) {
-    qWarning("Open failed:%s", qPrintable(con.lastError().text()));
+    LOG_W("Open failed:%s", qPrintable(con.lastError().text()));
     return -1;
   }
   QSqlQuery qur{con};
@@ -369,7 +369,7 @@ int CastDBView::onForceRefreshRecordsVids() {
     const QString& selectStr {QuickWhereClauseHelper::GetSelectMovieByCastStatement(perfs, akas, DB_TABLE::MOVIES)};
 
     if (!qur.exec(selectStr)) {
-      qWarning("Query[%s] failed: %s", qPrintable(qur.executedQuery()), qPrintable(qur.lastError().text()));
+      LOG_W("Query[%s] failed: %s", qPrintable(qur.executedQuery()), qPrintable(qur.lastError().text()));
       return -1;
     }
 
@@ -383,7 +383,7 @@ int CastDBView::onForceRefreshRecordsVids() {
     if (!vidPaths.isEmpty()) { // remove suffix \n
       vidPaths.chop(1);
     }
-    qDebug("cast[%s] %d records finded", qPrintable(perfs), curCastVidCnt);
+    LOG_D("cast[%s] %d records finded", qPrintable(perfs), curCastVidCnt);
 
     record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidPaths);
     _castModel->setRecord(r, record);  // update back
@@ -428,7 +428,7 @@ int CastDBView::onMigrateCastTo() {
     QSqlRecord record = _castModel->record(r);
     const int ret = CastBaseDb::MigrateToNewOriFolder(record, imageHostDir, newOri);
     if (ret < FD_ERROR_CODE::FD_SKIP) {
-      qWarning("Migrate ErrorCode: %d", ret);
+      LOG_W("Migrate ErrorCode: %d", ret);
       return -1;
     }
     if (ret == FD_ERROR_CODE::FD_SKIP) {

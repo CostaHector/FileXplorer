@@ -2,17 +2,23 @@ cmake_minimum_required(VERSION 3.5)
 
 set(PROJECT_NAME FileXplorer)
 project(${PROJECT_NAME} LANGUAGES CXX)
-add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
-add_definitions(-DUNICODE -D_UNICODE)
+
+string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" PARENT_PATH_LEN)
+add_definitions(
+    -DPROJECT_NAME="${PROJECT_NAME}"
+    -DPARENT_PATH_LEN=${PARENT_PATH_LEN}
+    -DUNICODE
+    -D_UNICODE
+)
 # on windows platform. MediaInfoDLL.h defined a typdef needed
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC_MOC_OPTIONS "-DLOG_MACRO_IS_SAFE")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # Search for Qt libraries in the order of Qt6, Qt5
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Sql Widgets LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets LinguistTools)
@@ -120,8 +126,8 @@ if(WIN32)
         ${RESOURCES}
     )
 
-set(QM_FILES Translate/FileXplorer_zh_CN.ts)
-set(README_FILES readme.md)
+set(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Translate/FileXplorer_zh_CN.ts)
+set(README_FILES ${CMAKE_CURRENT_SOURCE_DIR}/readme.md)
 else()
     # Linux Platform: Directly generate a GUI application (no terminal displayed by default). No extra flags needed for GUI apps
     add_executable(${PROJECT_NAME}

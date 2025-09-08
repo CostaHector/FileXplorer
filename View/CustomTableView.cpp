@@ -30,7 +30,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   m_defaultTableColumnWidth{MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE.v.toInt()},
   m_columnsShowSwitch{QString{50, QChar{'1'}}} {
   if (!SETTING_SHARING_WIDGET.contains(m_name) && isNameExists(m_name)) { // not in sharing list, but name already find
-    qWarning("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
+    LOG_W("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
     return;
   }
   TABLES_SET.insert(m_name);
@@ -131,7 +131,7 @@ void CustomTableView::BindMenu(QMenu* menu) {
 
 void CustomTableView::AppendVerticalHeaderMenuAGS(QActionGroup* extraAgs) {
   if (extraAgs == nullptr or extraAgs->actions().isEmpty()) {
-    qDebug("Skip. nullptr or no actions in ActionGroup.");
+    LOG_D("Skip. nullptr or no actions in ActionGroup.");
     return;
   }
   m_verMenu->addSeparator();
@@ -140,7 +140,7 @@ void CustomTableView::AppendVerticalHeaderMenuAGS(QActionGroup* extraAgs) {
 
 void CustomTableView::AppendHorizontalHeaderMenuAGS(QActionGroup* extraAgs) {
   if (extraAgs == nullptr or extraAgs->actions().isEmpty()) {
-    qDebug("Skip. nullptr or no actions in ActionGroup.");
+    LOG_D("Skip. nullptr or no actions in ActionGroup.");
     return;
   }
   m_horMenu->addSeparator();
@@ -149,14 +149,14 @@ void CustomTableView::AppendHorizontalHeaderMenuAGS(QActionGroup* extraAgs) {
 
 bool CustomTableView::ShowOrHideColumnCore() {
   if (m_columnsShowSwitch.isEmpty()) {
-    qDebug("Skip set visibility of horizontal header. switch batch is empty.");
+    LOG_D("Skip set visibility of horizontal header. switch batch is empty.");
     return false;
   }
   auto* model_ = this->model();
   CHECK_NULLPTR_RETURN_FALSE(model_)
   const int tableColumnsCount = model_->columnCount();
   if (tableColumnsCount > m_columnsShowSwitch.size()) {
-    qWarning("Skip set visibility of horizontal header. switchs count less than columns count.");
+    LOG_W("Skip set visibility of horizontal header. switchs count less than columns count.");
     return false;
   }
   for (int c = 0; c < tableColumnsCount; ++c) {
@@ -188,7 +188,7 @@ bool CustomTableView::onShowHideColumn() {
 
   ColumnVisibilityDialog dialog{m_horHeaderTitles, tempSwitches, m_name, this};
   if (dialog.exec() != QDialog::Accepted) {
-    qInfo("User canceled column visibility change");
+    LOG_I("User canceled column visibility change");
     return false;
   }
   m_columnsShowSwitch = dialog.getSwitches();
@@ -245,18 +245,18 @@ void CustomTableView::onSetRowMaxHeight() {
   static const int INIT_MAX_ROW_HEIGHT = verticalHeader()->maximumSectionSize();
   const int size = QInputDialog::getInt(this, "Set row max height size >=0 ", QString("current max height:%1 px").arg(INIT_MAX_ROW_HEIGHT), m_defaultTableRowHeight, 0, 10000, 20, &setOk);
   if (!setOk) {
-    qWarning("User cancel resize row height");
+    LOG_W("User cancel resize row height");
     return;
   }
   verticalHeader()->setMaximumSectionSize(size);
-  qDebug("Max row height set to %d", size);
+  LOG_D("Max row height set to %d", size);
 }
 
 void CustomTableView::onSetRowDefaultSectionSize() {
   bool setOk{false};
   const int size = QInputDialog::getInt(this, "Set default row section size >=0 ", QString("current row:%1 px").arg(m_defaultTableRowHeight), m_defaultTableRowHeight, 0, 10000, 20, &setOk);
   if (!setOk) {
-    qWarning("User cancel resize row height");
+    LOG_W("User cancel resize row height");
     return;
   }
   m_defaultTableRowHeight = size;
@@ -268,7 +268,7 @@ void CustomTableView::onSetColumnDefaultSectionSize() {
   bool setOk{false};
   const int size = QInputDialog::getInt(this, "Set default column section size >=0 ", QString("current column:%1 px").arg(m_defaultTableRowHeight), m_defaultTableColumnWidth, 0, 10000, 20, &setOk);
   if (!setOk) {
-    qWarning("User cancel resize column height");
+    LOG_W("User cancel resize column height");
     return;
   }
   m_defaultTableColumnWidth = size;

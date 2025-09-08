@@ -3,6 +3,7 @@
 
 #include "CustomStatusBar.h"
 #include "SelectionsRangeHelper.h"
+#include "Logger.h"
 #include <QFileSystemModel>
 #include <QObject>
 
@@ -87,7 +88,7 @@ private:
   void EmitBeforeDecorationRoleRevert(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {
     foreach (auto beRng, beRngLst) {
       if (checkIndex(beRng.first, CheckIndexOption::DoNotUseParent) || checkIndex(beRng.second, CheckIndexOption::DoNotUseParent)) {
-        qDebug("parent model of indexes[(%d,%d), (%d,%d)] is invalid",//
+        LOG_D("parent model of indexes[(%d,%d), (%d,%d)] is invalid",//
                beRng.first.row(), beRng.first.column(),//
                beRng.second.row(), beRng.second.column());//
         break;

@@ -7,6 +7,8 @@
 #include <QSet>
 #include <QString>
 #include <QVariant>
+#include "Logger.h"
+
 class ArchiveImagesRecusive;
 
 class FilesListBase {
@@ -50,7 +52,7 @@ class ArchiveFiles : public FilesListBase {
 
   bool deleteAchieveFile() {
     if (not m_fi.exists()) {
-      qDebug("achieve file[%s] already not exist", qPrintable(m_fi.fileName()));
+      LOG_D("achieve file[%s] already not exist", qPrintable(m_fi.fileName()));
       return false;
     }
     return QFile::moveToTrash(m_fi.fileName());

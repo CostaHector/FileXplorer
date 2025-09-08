@@ -106,19 +106,19 @@ bool ThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseNam
 
 int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const int timePeriod, const bool isJpg) {
   if (!IsDimensionXValid(dimensionX)) {
-    qWarning("Dimension of row[%d] out of range", dimensionX);
+    LOG_W("Dimension of row[%d] out of range", dimensionX);
     return -1;
   }
   if (!IsDimensionYValid(dimensionY)) {
-    qWarning("Dimension of column[%d] out of range", dimensionY);
+    LOG_W("Dimension of column[%d] out of range", dimensionY);
     return -1;
   }
   if (!IsWidthPixelAllowed(widthPx)) {
-    qWarning("images width %d pixel(s) invalid", widthPx);
+    LOG_W("images width %d pixel(s) invalid", widthPx);
     return -1;
   }
   if (!IsSamplePeriodAllowed(timePeriod)) {
-    qWarning("timePeriod: %d second invalid", timePeriod);
+    LOG_W("timePeriod: %d second invalid", timePeriod);
     return -1;
   }
 
@@ -138,7 +138,7 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
     vidPath2ImgBaseName[pth] = pth.left(pth.size() - ext.size() - 1);
   }
   if (vidPath2ImgBaseName.isEmpty()) {
-    qDebug("no videos find need to create thumbnail image(s)");
+    LOG_D("no videos find need to create thumbnail image(s)");
     return 0;
   }
 
@@ -173,7 +173,7 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
     if (result == 0) {
       ++succeedCnt;
     } else {
-      qWarning("Create thumbnail image for video[%s] failed with command: %s", qPrintable(vidPath), qPrintable(ffmpegCmd));
+      LOG_W("Create thumbnail image for video[%s] failed with command: %s", qPrintable(vidPath), qPrintable(ffmpegCmd));
       return succeedCnt;
     }
   }
@@ -194,11 +194,11 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
   mExtractImagesCnt = 0;
   mRewriteImagesCnt = 0;
   if (beg < 0 || beg >= end) {
-    qWarning("image index range [%d, %d) is invalid", beg, end);
+    LOG_W("image index range [%d, %d) is invalid", beg, end);
     return -1;
   }
   if (!QFileInfo(rootPath).isDir()) {
-    qWarning("image rootpath[%s] is not a directory", qPrintable(rootPath));
+    LOG_W("image rootpath[%s] is not a directory", qPrintable(rootPath));
     return -1;
   }
   QDirIterator it{rootPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
@@ -226,7 +226,7 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
     QPixmap pixmap{imgAbsPath};
     const int wPixels = pixmap.width(), hPixels = pixmap.height();
     if (wPixels % row != 0 || hPixels % column != 0) {
-      qDebug("thumbnail[%s] %d-by-%d pixels cannot be seperated into %d x %d screenshot",  //
+      LOG_D("thumbnail[%s] %d-by-%d pixels cannot be seperated into %d x %d screenshot",  //
              qPrintable(imgAbsPath), wPixels, hPixels, row, column);
       continue;
     }
@@ -254,12 +254,12 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
           continue;
         }
         ++mRewriteImagesCnt;
-        qWarning("Rewrite image[%s]", qPrintable(newImgAbsPth));
+        LOG_W("Rewrite image[%s]", qPrintable(newImgAbsPth));
         mErrImg << QString("Rewrite image[%1]\n").arg(newImgAbsPth);
       }
       QPixmap newPixmap = pixmap.copy(x, y, eachImgWidth, eachImgHeight);
       if (!newPixmap.save(newImgAbsPth)) {
-        qCritical("Save image failed[%s]", qPrintable(newImgAbsPth));
+        LOG_C("Save image failed[%s]", qPrintable(newImgAbsPth));
         mErrImg << QString("Save image failed[%1]\n").arg(newImgAbsPth);
         continue;
       }

@@ -73,7 +73,7 @@ class MountHelperTest : public MyTestSuite {
 
   void test_MountVolume() {
     if (!IsAdministrator()) {
-      qCritical("Not in Administrator, volume mount will failed because of ACCESS_DENIED(-5)");
+      qWarning("Not in Administrator, volume mount will failed because of ACCESS_DENIED(-5)");
       return;
     }
 

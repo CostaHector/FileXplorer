@@ -1,10 +1,9 @@
 #include "VideoPlayerWatcher.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Logger.h"
 
-#include <QDebug>
 #include <QMouseEvent>
-
 #include <QTimer>
 
 constexpr int VideoPlayerWatcher::RIGHT_EDGE_WIDTH_PIXEL;
@@ -13,7 +12,7 @@ VideoPlayerWatcher::VideoPlayerWatcher(QObject* parent, QWidget* watched, QListV
     : QObject(parent), m_watched(watched), m_controlled(controlled) {
   m_keepListShow = Configuration().value(MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.name, MemoryKey::KEEP_VIDEOS_PLAYLIST_SHOW.v).toBool();
   if (m_watched == nullptr or m_controlled == nullptr) {
-    qWarning("m_watched or m_controlled nullptr find");
+    LOG_W("m_watched or m_controlled nullptr find");
     return;
   }
   m_watched->setMouseTracking(true);
@@ -24,7 +23,7 @@ bool VideoPlayerWatcher::eventFilter(QObject* watched, QEvent* event) {
   if (event->type() == QEvent::MouseMove and watched == m_watched) {
     auto* me = dynamic_cast<QMouseEvent*>(event);
     if (me == nullptr) {
-      qWarning("cannot dynamic cast to mouse event");
+      LOG_W("cannot dynamic cast to mouse event");
       return true;
     }
     if (m_controlled->isVisible()) {

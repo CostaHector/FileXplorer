@@ -2,6 +2,7 @@
 #include "MD5Calculator.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Logger.h"
 #include <QDirIterator>
 
 QString RedunImgLibs::GetRedunPath() {
@@ -19,7 +20,7 @@ RedunImgLibs& RedunImgLibs::GetInst(const QString& benchMarkPath) {
 }
 
 int RedunImgLibs::LearnSizeAndHashFromRedunImgPath(const QString& folderPath) {
-  qDebug("Benchmark RedundantImage located in [%s]", qPrintable(folderPath));
+  LOG_D("Benchmark RedundantImage located in [%s]", qPrintable(folderPath));
   int filesCnt = 0;
   QDirIterator it{folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
@@ -30,7 +31,7 @@ int RedunImgLibs::LearnSizeAndHashFromRedunImgPath(const QString& folderPath) {
     m_commonFileHash.insert(md5);
     ++filesCnt;
   }
-  qDebug("RedundantImage sizeSet count[%d] and hashSet count[%d]", m_commonFileSizeSet.size(), m_commonFileHash.size());
+  LOG_D("RedundantImage sizeSet count[%d] and hashSet count[%d]", m_commonFileSizeSet.size(), m_commonFileHash.size());
   return filesCnt;
 }
 

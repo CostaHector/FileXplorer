@@ -48,7 +48,7 @@ void NavigationExToolBar::dragEnterEvent(QDragEnterEvent* event) {
   const QMimeData* pMimeData = event->mimeData();
   CHECK_NULLPTR_RETURN_VOID(pMimeData);
   if (pMimeData->hasUrls()) {
-    qDebug("mimeData urls cnt[%d]", pMimeData->urls().size());
+    LOG_D("mimeData urls cnt[%d]", pMimeData->urls().size());
     event->acceptProposedAction();
   } else if (pMimeData->hasText()) {
     ReorderableToolBar::dragEnterEvent(event);
@@ -71,7 +71,7 @@ void NavigationExToolBar::dropEvent(QDropEvent* event) {
       const QString nameShown{fi.isRoot() ? pth : fi.completeBaseName()};
       folderName2AbsPath[nameShown] = fi.absoluteFilePath();
     }
-    qDebug("%d link action(s) dropped here...", folderName2AbsPath.size());
+    LOG_D("%d link action(s) dropped here...", folderName2AbsPath.size());
     AppendExtraActions(folderName2AbsPath);
     SaveName2PathLink();
   } else {

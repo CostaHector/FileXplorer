@@ -1,5 +1,6 @@
 #include "LineEditCSV.h"
 #include "NameTool.h"
+#include "Logger.h"
 #include <QRegularExpression>
 
 LineEditCSV::LineEditCSV(const QString& formName, const QString& text, const bool bNoDuplicate, QWidget* parent)  //
@@ -23,7 +24,7 @@ QVariantList LineEditCSV::GetVariantList() const {  // sort
     bool isInt = false;
     int iVal = s.toInt(&isInt);
     if (!isInt) {
-      qDebug("Not a number[%s]", qPrintable(s));
+      LOG_D("Not a number[%s]", qPrintable(s));
       continue;
     }
     ansSet.append(iVal);
@@ -95,5 +96,5 @@ void LineEditCSV::Format() {
     return;
   }
   setText(formatedLineTxt);
-  qDebug("CSV line updated to %s", qPrintable(formatedLineTxt));
+  LOG_D("CSV line updated to %s", qPrintable(formatedLineTxt));
 }

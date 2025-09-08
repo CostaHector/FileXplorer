@@ -63,14 +63,14 @@ void SceneListView::onCopyBaseName() {
   const QString& copiedStr = _sceneModel->baseName(curInd);
   auto* cb = QApplication::clipboard();
   cb->setText(copiedStr, QClipboard::Mode::Clipboard);
-  qDebug("user copied str: [%s]", qPrintable(copiedStr));
+  LOG_D("user copied str: [%s]", qPrintable(copiedStr));
 }
 
 void SceneListView::onOpenCorrespondingFolder() {
   const QModelIndex& curInd = currentIndex();
   const QString& scenePath = _sceneModel->absolutePath(curInd);
   on_ShiftEnterPlayVideo(scenePath);
-  qDebug("Play path: [%s]", qPrintable(scenePath));
+  LOG_D("Play path: [%s]", qPrintable(scenePath));
 }
 
 void SceneListView::subscribe() {
@@ -82,10 +82,10 @@ void SceneListView::subscribe() {
 
 void SceneListView::setRootPath(const QString& rootPath) {
   if (rootPath.count('/') < 2) {  // large folder
-    qDebug("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
+    LOG_D("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
     const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
-      qDebug("User cancel setRootPath on a large path[%s]", qPrintable(rootPath));
+      LOG_D("User cancel setRootPath on a large path[%s]", qPrintable(rootPath));
       return;
     }
   }

@@ -2,11 +2,21 @@ cmake_minimum_required(VERSION 3.5)
 
 set(PROJECT_NAME FileXplorerTest)
 project(${PROJECT_NAME} LANGUAGES CXX)
-add_definitions(-DPROJECT_NAME="FileXplorer")
-add_definitions(-DRUNNING_UNIT_TESTS=1)
-add_definitions(-DUNICODE -D_UNICODE)
-# on windows platform. MediaInfoDLL.h defined a typdef needed
-add_definitions(-DQT_TEST)
+# on windows platform. MediaInfoDLL.h defined a typdef UNICODE _UNICODE needed
+string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" TEST_PARENT_PATH_LEN)
+string(LENGTH "TestCase/" TEST_PROJECT_FOLDER_LENTH)
+math(EXPR MAIN_PROJECT_NAME_LENGTH "${TEST_PARENT_PATH_LEN} - ${TEST_PROJECT_FOLDER_LENTH}")
+message(STATUS "Test Parent path length: ${TEST_PARENT_PATH_LEN}")
+message(STATUS "Test Project folder length: ${TEST_PROJECT_FOLDER_LENTH}")
+message(STATUS "Main project name length (difference): ${MAIN_PROJECT_NAME_LENGTH}")
+
+add_definitions(
+    -DPROJECT_NAME="FileXplorer"
+    -DPARENT_PATH_LEN=${MAIN_PROJECT_NAME_LENGTH}
+    -DRUNNING_UNIT_TESTS=1
+    -DUNICODE
+    -D_UNICODE
+)
 message("Test CMakelists Start")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

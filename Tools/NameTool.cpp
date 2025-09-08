@@ -1,4 +1,5 @@
 #include "NameTool.h"
+#include "Logger.h"
 #include <QPlainTextEdit>
 #include <QTextEdit>
 #include <QLineEdit>
@@ -95,11 +96,11 @@ QString NameTool::ToggleSentenceCase(const QString& sentence) {
 
 bool NameTool::ReplaceAndUpdateSelection(QPlainTextEdit& te, SentenceProcessorFunc fTrans) {
   if (fTrans == nullptr) {
-    qWarning("fTrans is nullptr");
+    LOG_W("fTrans is nullptr");
     return false;
   }
   if (!te.textCursor().hasSelection()) {
-    qDebug("skip no text selected in QTextEdit");
+    LOG_D("skip no text selected in QTextEdit");
     return true;
   }
 
@@ -118,11 +119,11 @@ bool NameTool::ReplaceAndUpdateSelection(QPlainTextEdit& te, SentenceProcessorFu
 
 bool NameTool::ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fTrans) {
   if (fTrans == nullptr) {
-    qWarning("fTrans is nullptr");
+    LOG_W("fTrans is nullptr");
     return false;
   }
   if (!te.textCursor().hasSelection()) {
-    qDebug("skip no text selected in QTextEdit");
+    LOG_D("skip no text selected in QTextEdit");
     return true;
   }
 
@@ -141,11 +142,11 @@ bool NameTool::ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fT
 
 bool NameTool::ReplaceAndUpdateSelection(QLineEdit& le, SentenceProcessorFunc fTrans) {
   if (fTrans == nullptr) {
-    qWarning("fTrans is nullptr");
+    LOG_W("fTrans is nullptr");
     return false;
   }
   if (!le.hasSelectedText()) {
-    qDebug("skip no text selected in QLineEdit");
+    LOG_D("skip no text selected in QLineEdit");
     return true;
   }
 

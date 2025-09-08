@@ -2,6 +2,7 @@
 #include "QMediaInfo.h"
 #include "MemoryKey.h"
 #include "PathTool.h"
+#include "Logger.h"
 #include <QFileInfo>
 #include <QTime>
 #define QString2MediaInfoc_str(qstr) (qstr).toStdWString().c_str()
@@ -61,26 +62,26 @@ bool QMediaInfo::IsLoaded() const {
 
 bool QMediaInfo::StartToGet() {
   if (IsLoaded()) {
-    qDebug("already loaded skip load");
+    LOG_D("already loaded skip load");
     return true;
   }
   using namespace PathTool::FILE_REL_PATH;
   static const QString libPath = PathTool::GetPathByApplicationDirPath(MEDIA_INFO_DLL);
   if (!QFile::exists(libPath)) {
-    qCritical("lib path[%s] not found", qPrintable(libPath));
+    LOG_C("lib path[%s] not found", qPrintable(libPath));
     return false;
   }
   if (pLib == nullptr) {
     pLib = new (std::nothrow) QLibrary(libPath);
     if (pLib == nullptr) {
-      qCritical("pLib is nullptr");
+      LOG_C("pLib is nullptr");
       return false;
     }
   }
 
   if (!pLib->load()) {
     // if error says: ERROR_BAD_EXE_FORMAT: 0x0x000000c1 use win64 archi
-    qCritical("load lib FAILED, message: %s", qPrintable(pLib->errorString()));
+    LOG_C("load lib FAILED, message: %s", qPrintable(pLib->errorString()));
     delete pLib;
     pLib = nullptr;
     return false;
@@ -97,14 +98,14 @@ bool QMediaInfo::StartToGet() {
   if (m_get == nullptr) {
     m_get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
     if (m_get == nullptr) {
-      qWarning("function named MediaInfo_Get not exist in lib");
+      LOG_W("function named MediaInfo_Get not exist in lib");
       return false;
     }
   }
   if (m_open == nullptr) {
     m_open = (MEDIAINFO_Open)pLib->resolve("MediaInfo_Open");
     if (m_open == nullptr) {
-      qWarning("function named MediaInfo_Open not exist in lib");
+      LOG_W("function named MediaInfo_Open not exist in lib");
       return false;
     }
   }
@@ -121,12 +122,12 @@ int QMediaInfo::VidDurationLengthQuick(const QString& vidAbsPath) const {
 
 int QMediaInfo::VidDurationLength(const QString& vidAbsPath) const {
   if (!IsLoaded()) {
-    qWarning("_lib not loaded");
+    LOG_W("_lib not loaded");
     return -1;
   }
   MEDIAINFO_Get get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
   if (!get) {
-    qWarning("function named MediaInfo_Get not exist in lib");
+    LOG_W("function named MediaInfo_Get not exist in lib");
     return -1;
   }
 
@@ -142,15 +143,15 @@ int QMediaInfo::VidDurationLength(const QString& vidAbsPath) const {
 
 QList<int> QMediaInfo::batchVidsDurationLength(const QStringList& vidsAbsPath) const {
   if (vidsAbsPath.isEmpty()) {
-    qDebug("Input vids abs path list is empty");
+    LOG_D("Input vids abs path list is empty");
     return {};
   }
   if (!IsLoaded()) {
-    qWarning("_lib not loaded");
+    LOG_W("_lib not loaded");
   }
   MEDIAINFO_Get get = (MEDIAINFO_Get)pLib->resolve("MediaInfo_Get");
   if (!get) {
-    qWarning("function named MediaInfo_Get not exist in lib");
+    LOG_W("function named MediaInfo_Get not exist in lib");
     return {};
   }
 

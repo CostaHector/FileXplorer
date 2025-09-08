@@ -96,11 +96,11 @@ void CustomListView::wheelEvent(QWheelEvent *event) {
 
 void CustomListView::BindMenu(QMenu* menu) {
   if (menu == nullptr) {
-    qWarning("Don't bind a nullptr menu");
+    LOG_W("Don't bind a nullptr menu");
     return;
   }
   if (m_menu != nullptr) {
-    qWarning("Don't rebind menu. m_menu is already not nullptr");
+    LOG_W("Don't rebind menu. m_menu is already not nullptr");
     return;
   }
   m_menu = menu;

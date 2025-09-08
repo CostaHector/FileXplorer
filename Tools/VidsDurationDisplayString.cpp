@@ -1,5 +1,6 @@
 #include "VidsDurationDisplayString.h"
 #include "VideoDurationGetter.h"
+#include "Logger.h"
 #include <QTime>
 #include <math.h>
 #include <stdint.h>
@@ -33,7 +34,7 @@ QString VidsDurationDisplayString::VideosDurationDetailHtmlTable(const QList<int
                                                                  const QStringList& fileNames,
                                                                  const QStringList& fileDirs) {
   if (not(durationLst.size() == fileNames.size() and fileNames.size() == fileDirs.size())) {
-    qWarning("list length unequal. duration[%d], fileName[%d], fileDirs[%d]", durationLst.size(), fileNames.size(), fileDirs.size());
+    LOG_W("list length unequal. duration[%d], fileName[%d], fileDirs[%d]", durationLst.size(), fileNames.size(), fileDirs.size());
     return "";
   }
   static const QString& DURATION_TABLE_TEMPLATE{
@@ -78,7 +79,7 @@ int main(int argc, char* argv[]) {
   mi.Open("path_2_a_video_here.mp4");
   QString dur = mi.Duration();
   int len = mi.DurationLength();
-  qDebug("duration: %s, length: %d", qPrintable(dur), len);
+  LOG_D("duration: %s, length: %d", qPrintable(dur), len);
   return 0;
 }
 #endif

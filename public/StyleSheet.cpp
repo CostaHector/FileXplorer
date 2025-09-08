@@ -55,12 +55,12 @@ void setGlobalDarkMode(bool enable) {
 #else
 void setGlobalDarkMode(bool enable) {
   if (enable) {
-    qDebug("Not support dark mode now");
+    LOG_D("Not support dark mode now");
   }
 }
 void setDarkTitleBar(QWidget* widget, bool enable) {
   if (enable) {
-    qDebug("Not support dark mode now");
+    LOG_D("Not support dark mode now");
   }
 }
 #endif

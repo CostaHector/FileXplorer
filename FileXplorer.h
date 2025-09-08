@@ -13,7 +13,7 @@
 
 class FileXplorer : public QMainWindow {
 public:
-  FileXplorer(const QStringList& args, QWidget* parent = nullptr);
+  explicit FileXplorer(const QStringList& args, QWidget* parent = nullptr);
   ~FileXplorer() = default;
   void closeEvent(QCloseEvent* event) override;
   void showEvent(QShowEvent *event) override;

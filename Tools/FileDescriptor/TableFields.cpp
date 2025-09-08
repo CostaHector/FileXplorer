@@ -13,7 +13,7 @@ const char* GetFILEDString(FIELD_E enum_val) {
     CASE_BRANCH_ENUM_TO_STRING(ADT_TIME);
     CASE_BRANCH_ENUM_TO_STRING(FILED_BUTT);
     default: {
-      qWarning("enum_val[%d] out of range", enum_val);
+      LOG_W("enum_val[%d] out of range", enum_val);
       static const char UNKNOWN[]{"Unknown"};
       return UNKNOWN;
     }
@@ -28,7 +28,7 @@ const char* GetFILEDString(FIELD_E enum_val) {
     PERFORMER_TABLE_FIELD_MAPPING
 #undef PERFORMER_TABLE_KEY_ITEM
         default: {
-      qWarning("enum_val[%d] out of range", enum_val);
+      LOG_W("enum_val[%d] out of range", enum_val);
       static const char UNKNOWN[]{"Unknown"};
       return UNKNOWN;
     }

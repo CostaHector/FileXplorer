@@ -8,6 +8,7 @@
 #include <QProgressBar>
 #include <QGuiApplication>
 #include <QScreen>
+#include "Logger.h"
 #include "BeginToExposePrivateMember.h"
 #include "Notificator.h"
 #include "EndToExposePrivateMember.h"
@@ -16,8 +17,7 @@ class NotificatorTest : public MyTestSuite {
   Q_OBJECT
 public:
   NotificatorTest() : MyTestSuite{false} {
-    fprintf(stdout, "NotificatorTest object created\n");
-    std::fflush(stdout);
+    LOG_D("NotificatorTest object created\n");
   }
   const bool mFromToBottomBkp{Notificator::m_isTopToBottom};
 private slots:

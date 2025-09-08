@@ -1,4 +1,5 @@
 #include "RenameHelper.h"
+#include "Logger.h"
 #include <QRegularExpression>
 
 namespace RenameHelper {
@@ -21,7 +22,7 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldStr
   }
   const QRegularExpression repRegex{oldString};
   if (!repRegex.isValid()) {
-    qWarning("regular expression error[%s]", qPrintable(oldString));
+    LOG_W("regular expression error[%s]", qPrintable(oldString));
     return {};
   }
   for (QString& s : replacedLst) {
@@ -39,7 +40,7 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
   }
 
   if (!namePattern.contains("%1")) {
-    qWarning("namePattern[%s] must contain at least one '%%1'", qPrintable(namePattern));
+    LOG_W("namePattern[%s] must contain at least one '%%1'", qPrintable(namePattern));
     return {};
   }
 

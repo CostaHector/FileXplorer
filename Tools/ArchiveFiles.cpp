@@ -49,7 +49,7 @@ bool ArchiveFiles::ReadItemsCount() {
   }
 
   if (not isQZFile(m_fi.fileName())) {
-    qDebug("File[%s]'s is not *.qz", qPrintable(m_fi.fileName()));
+    LOG_D("File[%s]'s is not *.qz", qPrintable(m_fi.fileName()));
     return false;
   }
 
@@ -73,13 +73,13 @@ bool ArchiveFiles::isQZFile(const QString& path) {
 
 bool ArchiveFiles::CompressNow(OPERATION_TYPE type, const QStringList& paths, bool enableAppend) {
   if (m_fi.fileName().isEmpty()) {
-    qDebug("Achieve file name[%s] is invalid.", qPrintable(m_fi.fileName()));
+    LOG_D("Achieve file name[%s] is invalid.", qPrintable(m_fi.fileName()));
     return false;
   }
 
   bool openRes = m_fi.open(QFile::OpenModeFlag::WriteOnly | (enableAppend ? QFile::OpenModeFlag::Append : QFile::OpenModeFlag::NotOpen));
   if (not openRes) {
-    qWarning("Cannot open achieve file[%s] to write into.", qPrintable(m_fi.fileName()));
+    LOG_W("Cannot open achieve file[%s] to write into.", qPrintable(m_fi.fileName()));
     return false;
   }
 
@@ -130,7 +130,7 @@ QStringList ArchiveFiles::GetCompressType() const {
 
 bool ArchiveFiles::AppendAFolder(const QStringList& paths) {
   if (paths.size() > 1) {
-    qWarning("Cannot compress more than 1 folders now. folders count [%u]", paths.size());
+    LOG_W("Cannot compress more than 1 folders now. folders count [%u]", paths.size());
     return false;
   }
 
@@ -144,15 +144,15 @@ bool ArchiveFiles::AppendAFolder(const QStringList& paths) {
     ++compTotalCnt;
     QFile fi{srcDirIt.filePath()};
     if (not fi.open(QFile::OpenModeFlag::ReadOnly)) {
-      qWarning("File[%s] not exist or not a file, cannot compressed", qPrintable(fi.fileName()));
+      LOG_W("File[%s] not exist or not a file, cannot compressed", qPrintable(fi.fileName()));
       continue;
     }
     QByteArray data = compress(fi.readAll());
     WriteIntoFile(fi.fileName().mid(PREPATH_LEN), fi.size(), data);
     ++compSuccCnt;
-    qDebug("File[%s] (%d bytes) compressed ok", qPrintable(fi.fileName()), data.size());
+    LOG_D("File[%s] (%d bytes) compressed ok", qPrintable(fi.fileName()), data.size());
   }
-  qDebug("%d/%d files compressed ok", compSuccCnt, compTotalCnt);
+  LOG_D("%d/%d files compressed ok", compSuccCnt, compTotalCnt);
   return compSuccCnt == compTotalCnt;
 }
 
@@ -161,28 +161,28 @@ bool ArchiveFiles::AppendFiles(const QStringList& filesPath) {
   for (const QString& filePath : filesPath) {
     QFileInfo fi{filePath};
     if (not IsNeedCompress(fi.completeSuffix())) {
-      qDebug("skip file[%s]", qPrintable(filePath));
+      LOG_D("skip file[%s]", qPrintable(filePath));
       continue;
     }
     ++compTotalCnt;
     QFile srcFi{filePath};
     if (not srcFi.open(QFile::OpenModeFlag::ReadOnly)) {
-      qWarning("File[%s] not exist or not a file, cannot compressed", qPrintable(srcFi.fileName()));
+      LOG_W("File[%s] not exist or not a file, cannot compressed", qPrintable(srcFi.fileName()));
       continue;
     }
     ++compSuccCnt;
     QByteArray data = compress(srcFi.readAll());
     WriteIntoFile(fi.fileName(), fi.size(), data);
-    qDebug("File[%s] (%d bytes) compressed ok", qPrintable(fi.fileName()), data.size());
+    LOG_D("File[%s] (%d bytes) compressed ok", qPrintable(fi.fileName()), data.size());
   }
-  qDebug("%d/%d files compressed ok", compSuccCnt, compTotalCnt);
+  LOG_D("%d/%d files compressed ok", compSuccCnt, compTotalCnt);
   return compSuccCnt == compTotalCnt;
 }
 
 bool ArchiveFiles::DecompressToPath(const QString& dstPath) {
   QDir dstDir{dstPath};
   if (!dstDir.exists()) {
-    qWarning("destination path[%s] not exist", qPrintable(dstPath));
+    LOG_W("destination path[%s] not exist", qPrintable(dstPath));
     return false;
   }
 
@@ -199,16 +199,16 @@ bool ArchiveFiles::DecompressToPath(const QString& dstPath) {
     const QByteArray& fileData = m_datas[i].toByteArray();
     const QString& absDstPath = dstDir.absoluteFilePath(relFilePath);
     if (not makePrepath(absDstPath)) {
-      qWarning("Cannot parent folder of[%s]", qPrintable(absDstPath));
+      LOG_W("Cannot parent folder of[%s]", qPrintable(absDstPath));
       return false;
     }
 
     dstFile.setFileName(absDstPath);
     if (not dstFile.open(QFile::OpenModeFlag::WriteOnly)) {
-      qWarning("decompress [%d] bytes to file[%s] failed", fileData.size(), qPrintable(relFilePath));
+      LOG_W("decompress [%d] bytes to file[%s] failed", fileData.size(), qPrintable(relFilePath));
       return false;
     }
-    qDebug("decompress [%d] bytes to file[%s] ok", fileData.size(), qPrintable(relFilePath));
+    LOG_D("decompress [%d] bytes to file[%s] ok", fileData.size(), qPrintable(relFilePath));
     dstFile.write(fileData);
     dstFile.close();
   }
@@ -230,7 +230,7 @@ int ArchiveImagesRecusive::CompressImgRecur(const QString& rootPath) {
     folderSuccCnt += CompressSubfolder(directPath, archiveName);
     ++folderTotalCnt;
   }
-  qWarning("compressed %d/%d folders ok", folderSuccCnt, folderTotalCnt);
+  LOG_W("compressed %d/%d folders ok", folderSuccCnt, folderTotalCnt);
   using namespace FileOperatorType;
   if (m_autoRecycle and folderSuccCnt > 0) {
     BATCH_COMMAND_LIST_TYPE recycleCmds;
@@ -241,9 +241,9 @@ int ArchiveImagesRecusive::CompressImgRecur(const QString& rootPath) {
 
     bool recycleRet = g_undoRedo.Do(recycleCmds);
     if (recycleRet) {
-      qDebug("Recycle succeed. %d files", recycleCmds.size());
+      LOG_D("Recycle succeed. %d files", recycleCmds.size());
     } else {
-      qWarning("Some recycle failed. %d files", recycleCmds.size());
+      LOG_W("Some recycle failed. %d files", recycleCmds.size());
     }
   }
   return folderSuccCnt;
@@ -258,7 +258,7 @@ bool ArchiveImagesRecusive::CompressSubfolder(const QString& path, const QString
     return true;
   }
   if (imgNames.size() > ArchiveFiles::MAX_COMPRESSED_IMG_CNT) {
-    qWarning("Images in folder[%s] counts[%d] > %d. Reject compress", qPrintable(path), imgNames.size(), ArchiveFiles::MAX_COMPRESSED_IMG_CNT);
+    LOG_W("Images in folder[%s] counts[%d] > %d. Reject compress", qPrintable(path), imgNames.size(), ArchiveFiles::MAX_COMPRESSED_IMG_CNT);
     return false;
   }
 

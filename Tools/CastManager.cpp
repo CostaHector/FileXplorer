@@ -1,5 +1,5 @@
 #include "CastManager.h"
-#include "PublicVariable.h"
+#include "JsonRenameRegex.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 #include "PathTool.h"
@@ -29,7 +29,7 @@ CastManager::CastManager(const QString& localFilePath)  //
 }
 
 CastManager& CastManager::getIns() {
-  qDebug("CastManager::getIns()");
+  LOG_D("CastManager::getIns()");
   static CastManager ins;
   return ins;
 }
@@ -37,15 +37,15 @@ CastManager& CastManager::getIns() {
 QSet<QString> CastManager::ReadOutPerformers() const {
   QFile castFi{mLocalFilePath};
   if (!castFi.exists()) {
-    qDebug("Cast list file[%s] not exist", qPrintable(castFi.fileName()));
+    LOG_D("Cast list file[%s] not exist", qPrintable(castFi.fileName()));
     return {};
   }
   if (castFi.size() <= 0) {
-    qDebug("Cast list file[%s] is empty", qPrintable(castFi.fileName()));
+    LOG_D("Cast list file[%s] is empty", qPrintable(castFi.fileName()));
     return {};
   }
   if (!castFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("File[%s] open for read failed", qPrintable(castFi.fileName()));
+    LOG_D("File[%s] open for read failed", qPrintable(castFi.fileName()));
     return {};
   }
 
@@ -62,7 +62,7 @@ QSet<QString> CastManager::ReadOutPerformers() const {
     }
   }
   castFi.close();
-  qDebug("%d performers read out", perfSet.size());
+  LOG_D("%d performers read out", perfSet.size());
   return perfSet;
 }
 
@@ -70,7 +70,7 @@ int CastManager::ForceReloadCast() {
   int beforeStudioNameCnt = m_casts.size();
   m_casts = CastManager::ReadOutPerformers();
   int afterStudioNameCnt = m_casts.size();
-  qDebug("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
+  LOG_D("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
   return afterStudioNameCnt - beforeStudioNameCnt;
 }
 
@@ -80,7 +80,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   }
 
   if (!QDir{path}.exists()) {
-    qWarning("path[%s] not exist", qPrintable(path));
+    LOG_W("path[%s] not exist", qPrintable(path));
     return 0;
   }
   decltype(m_casts) castsIncrement;
@@ -101,7 +101,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
     }
     CastIncrement(castsIncrement, lowerSet);
   }
-  qDebug("Learn extra %d cast from %d valid json files", castsIncrement.size(), jsonFilesCnt);
+  LOG_D("Learn extra %d cast from %d valid json files", castsIncrement.size(), jsonFilesCnt);
   if (castsIncrement.isEmpty()) {
     return 0;
   }
@@ -126,12 +126,12 @@ int CastManager::CastIncrement(QSet<QString>& increments, QSet<QString> delta) {
 
 int CastManager::WriteIntoLocalDictionaryFiles(const QSet<QString>& increments) const {
   if (increments.isEmpty()) {
-    qDebug("Empty increments, skip writing.");
+    LOG_D("Empty increments, skip writing.");
     return 0;
   }
   QFile file{mLocalFilePath};
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-    qWarning("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(file.fileName()));
+    LOG_W("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(file.fileName()));
     return -1;
   }
   QTextStream out(&file);
@@ -144,11 +144,11 @@ int CastManager::WriteIntoLocalDictionaryFiles(const QSet<QString>& increments) 
   }
   out << content;
   if (out.status() != QTextStream::Ok) {
-    qCritical("Write failed: %s", qPrintable(file.errorString()));
+    LOG_C("Write failed: %s", qPrintable(file.errorString()));
     return -2;
   }
   file.close();
-  qDebug("Successfully wrote %d cast items to file %s", increments.size(), qPrintable(mLocalFilePath));
+  LOG_D("Successfully wrote %d cast items to file %s", increments.size(), qPrintable(mLocalFilePath));
   return increments.size();
 }
 

@@ -9,7 +9,7 @@
 int RedundantRmv::operator()(const QString& path) {
   QFileInfo fi(path);
   if (!fi.isDir()) {
-    qWarning("path[%s] is not a directory", qPrintable(path));
+    LOG_W("path[%s] is not a directory", qPrintable(path));
     return 0;
   }
   return CleanEmptyFolderCore(fi.absoluteFilePath());
@@ -17,7 +17,7 @@ int RedundantRmv::operator()(const QString& path) {
 
 bool RedundantRmv::Exec() {
   if (m_cmds.isEmpty()) {
-    qDebug("nothing to remove");
+    LOG_D("nothing to remove");
     return true;
   }
   const bool isAllSucceed = g_undoRedo.Do(m_cmds);
@@ -31,7 +31,7 @@ constexpr int ZeroOrOneItemFolderProc::TOLERANCE_LETTER_CNT;
 auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) -> int {
   m_cmds.clear();
   if (!QFileInfo(folderPath).isDir()) {
-    qDebug("Path[%s] is not a folder", qPrintable(folderPath));
+    LOG_D("Path[%s] is not a folder", qPrintable(folderPath));
     return -1;
   }
   QDir dir{folderPath, "", QDir::SortFlag::NoSort, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
@@ -49,7 +49,7 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
         // 1 file folder and delta(length)>TOLERANCE_LETTER_CNT => no recycle
         const QString& itemName = folders.front();
         if (std::abs(itemName.size() - dirNameLen) > TOLERANCE_LETTER_CNT) {
-          qDebug("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
+          LOG_D("ignore parent folder name len:%d, item name len:%d", itemName.size(), dirNameLen);
           break;
         }
         m_cmds.append(ACMD::GetInstMV(subDir.absolutePath(), itemName, folderPath));

@@ -73,22 +73,22 @@ void FileXplorer::showEvent(QShowEvent* event) {
 }
 
 QString FileXplorer::ReadSettings(const QStringList& args) {
-  qDebug("Program:'" PROJECT_NAME R"(' running with given args["%s"])", qPrintable(args.join(R"(",")")));
+  LOG_I("Program:[" PROJECT_NAME R"(] running with given args["%s"])", qPrintable(args.join(R"(",")")));
   // executing the program with or without command-line arguments
   QString path{(args.size() > 1) ? args[1] : ""};
   // when argv[1] path invalid, use last time path in preference setting
   if (!QFile::exists(path)) {
     QString lastTimePath = Configuration().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
-    qDebug("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
+    LOG_D("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
     path.swap(lastTimePath);
   }
   const QFileInfo fi{path};
   if (!fi.isDir()) {
     QString parentPath = fi.absolutePath();
-    qDebug("path[%s] not exists or is a file. Try using its parent path[%s] instead", qPrintable(path), qPrintable(parentPath));
+    LOG_D("path[%s] not exists or is a file. Try using its parent path[%s] instead", qPrintable(path), qPrintable(parentPath));
     path.swap(parentPath);
   }
-  qDebug("Default path is %s.", qPrintable(path));
+  LOG_D("Default path is %s.", qPrintable(path));
   return path;
 }
 
@@ -177,7 +177,7 @@ void FileXplorer::keyPressEvent(QKeyEvent* ev) {
 
 void FileXplorer::onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum) {
   if (previewEnum == PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
-    qWarning("Here should hide");
+    LOG_W("Here should hide");
   }
   Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)previewEnum);
   previewHtmlDock->setVisible(previewEnum != PreviewTypeTool::PREVIEW_TYPE_E::NONE);
@@ -188,7 +188,7 @@ void FileXplorer::onViewTypeChanged(const QAction* pViewAct) {
   using namespace ViewTypeTool;
   CHECK_NULLPTR_RETURN_VOID(pViewAct);
   ViewType vt = GetViewTypeByActionText(pViewAct->text());
-  qDebug("actionTriggered[%s] in CustomStatusBar/QToolbar", c_str(vt));
+  LOG_D("actionTriggered[%s] in CustomStatusBar/QToolbar", c_str(vt));
   m_viewSwitchHelper->onSwitchByViewType(vt);
   m_ribbonMenu->whenViewTypeChanged(vt);
 }

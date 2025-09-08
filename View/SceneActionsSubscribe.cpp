@@ -9,11 +9,11 @@
 
 bool SceneActionsSubscribe::BindWidget(QListView* tableView, ScenesListModel* model) {
   if (tableView == nullptr) {
-    qWarning("tableView is nullptr");
+    LOG_W("tableView is nullptr");
     return false;
   }
   if (model == nullptr) {
-    qWarning("model is nullptr");
+    LOG_W("model is nullptr");
     return false;
   }
   _tableView = tableView;
@@ -27,7 +27,7 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
   bool isNumber{false};
   int beforePageInd = beforeIndexStr.toInt(&isNumber);
   if (not isNumber) {
-    qDebug("Error before index");
+    LOG_D("Error before index");
     return false;
   }
   int dstPageInd = beforePageInd;
@@ -45,15 +45,15 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
   } else if (pageAct == ags._THE_LAST_PAGE) {
     dstPageInd = maxPage - 1;
   } else {
-    qDebug("nothing triggered");
+    LOG_D("nothing triggered");
     return false;
   }
 
   if (dstPageInd == beforePageInd) {
-    qDebug("Page remains %d, ignore switch page", beforePageInd);
+    LOG_D("Page remains %d, ignore switch page", beforePageInd);
     return true;
   }
-  qDebug("page index changed: %d->%d", beforePageInd, dstPageInd);
+  LOG_D("page index changed: %d->%d", beforePageInd, dstPageInd);
   ags.mPageIndexInputLE->setText(QString::number(dstPageInd));
   emit ags.mPageIndexInputLE->textChanged(ags.mPageIndexInputLE->text());
   return true;
@@ -62,14 +62,14 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
 void SceneActionsSubscribe::SetScenesGroupByPage(bool groupByPageAction) {
   auto& ags = g_SceneInPageActions();
   if (ags.mPagesSelectTB == nullptr) {
-    qCritical("mPagesSelectTB is nullptr");
+    LOG_C("mPagesSelectTB is nullptr");
     return;
   }
   ags.mPageIndexInputLE->setEnabled(groupByPageAction);
   ags.mPagesSelectTB->setEnabled(groupByPageAction);
 
   if (_model == nullptr) {
-    qCritical("_model is nullptr");
+    LOG_C("_model is nullptr");
     return;
   }
 
@@ -86,11 +86,11 @@ void SceneActionsSubscribe::SetPageIndex() {
   bool isNumber{false};
   int pageIndex = pageIndStr.toInt(&isNumber);
   if (not isNumber) {
-    qDebug("Page Index str[%s] invalid", qPrintable(pageIndStr));
+    LOG_D("Page Index str[%s] invalid", qPrintable(pageIndStr));
     return;
   }
   if (_model == nullptr) {
-    qWarning("_model is nullptr");
+    LOG_W("_model is nullptr");
     return;
   }
   _model->SetPageIndex(pageIndex);
@@ -98,7 +98,7 @@ void SceneActionsSubscribe::SetPageIndex() {
 
 bool SceneActionsSubscribe::SetScenesPerColumn() {
   if (_model == nullptr) {
-    qWarning("_model is nullptr");
+    LOG_W("_model is nullptr");
     return false;
   }
 
@@ -107,7 +107,7 @@ bool SceneActionsSubscribe::SetScenesPerColumn() {
   bool isPageScenesCntValid = false;
   const int scenesCnt1Page = scenesCnt1PageStr.toInt(&isPageScenesCntValid);
   if (!isPageScenesCntValid) {
-    qDebug("Page scenes count str[%s] invalid", qPrintable(scenesCnt1PageStr));
+    LOG_D("Page scenes count str[%s] invalid", qPrintable(scenesCnt1PageStr));
     return false;
   }
   Configuration().setValue("SCENES_COUNT_EACH_PAGE", scenesCnt1Page);
@@ -118,33 +118,33 @@ bool SceneActionsSubscribe::SetScenesPerColumn() {
 void SceneActionsSubscribe::SortSceneItems() {
   auto& ags = g_SceneInPageActions();
   if (ags._ORDER_AG == nullptr || ags._REVERSE_SORT == nullptr) {
-    qCritical("_ORDER_AG or _REVERSE_SORT is nullptr");
+    LOG_C("_ORDER_AG or _REVERSE_SORT is nullptr");
     return;
   }
   QAction* triggerAct = ags._ORDER_AG->checkedAction();
   if (triggerAct == nullptr) {
-    qCritical("triggerAct is nullptr, nothing sort option is select");
+    LOG_C("triggerAct is nullptr, nothing sort option is select");
     return;
   }
   const QString sortOptionStr{triggerAct->text()};
   const bool bReverse{ags._REVERSE_SORT->isChecked()};
   SceneInfoManager::SceneSortOption sortOption = SceneInfoManager::GetSortOptionFromStr(sortOptionStr);
-  qDebug("sort option: %s, bReverse: %d", qPrintable(sortOptionStr), bReverse);
+  LOG_D("sort option: %s, bReverse: %d", qPrintable(sortOptionStr), bReverse);
   _model->SortOrder(sortOption, bReverse);
 }
 
 void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
   if (_model == nullptr || _tableView == nullptr) {
-    qDebug("_model or _tableView is nullptr");
+    LOG_D("_model or _tableView is nullptr");
     return;
   }
   const QString& rootPath = _model->rootPath();
   if (rootPath.count('/') < 2) {  // large folder
-    qDebug("Combine Media Info may cause lag. As [%s] contains a large json/vid/img(s)", qPrintable(rootPath));
+    LOG_D("Combine Media Info may cause lag. As [%s] contains a large json/vid/img(s)", qPrintable(rootPath));
     const auto ret =
         QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
-      qDebug("User cancel Combine Media Info on a large path[%s]", qPrintable(rootPath));
+      LOG_D("User cancel Combine Media Info on a large path[%s]", qPrintable(rootPath));
       return;
     }
   }
@@ -169,14 +169,14 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
 
 void SceneActionsSubscribe::UpdateScnFilesOnly() {
   if (_model == nullptr || _tableView == nullptr) {
-    qDebug("_model or _tableView is nullptr");
+    LOG_D("_model or _tableView is nullptr");
     return;
   }
   CHECK_NULLPTR_RETURN_VOID(_model)
   CHECK_NULLPTR_RETURN_VOID(_tableView)
   const QString& rootPath = _model->rootPath();
   if (rootPath.count('/') < 2) {  // large folder
-    qDebug("Update Scn file may cause lag. As [%s] contains a large json(s)", qPrintable(rootPath));
+    LOG_D("Update Scn file may cause lag. As [%s] contains a large json(s)", qPrintable(rootPath));
     const auto ret =
         QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
@@ -200,11 +200,11 @@ void SceneActionsSubscribe::UpdateScnFilesOnly() {
 
 bool SceneActionsSubscribe::operator()() {
   if (_model == nullptr) {
-    qWarning("_model is nullptr");
+    LOG_W("_model is nullptr");
     return false;
   }
   if (_tableView == nullptr) {
-    qWarning("_tableView is nullptr");
+    LOG_W("_tableView is nullptr");
     return false;
   }
 

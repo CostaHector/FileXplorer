@@ -46,7 +46,7 @@ void FolderPreviewSwitcher::onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E v
       return;
     }
     default: {
-      qWarning("previewType[%s] not support now.", c_str(viewType));
+      LOG_W("previewType[%s] not support now.", c_str(viewType));
       return;
     }
   }

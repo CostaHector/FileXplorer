@@ -61,7 +61,7 @@ QString RedundantImageModel::filePath(const QModelIndex& index) const {
   }
   const int r = index.row();
   if (r < 0 || r >= rowCount()) {
-    qWarning("r[%d] out of range[0, %d)", r, rowCount());
+    LOG_W("r[%d] out of range[0, %d)", r, rowCount());
     return "";
   }
   return m_paf->operator[](r).filePath;
@@ -70,7 +70,7 @@ QString RedundantImageModel::filePath(const QModelIndex& index) const {
 void RedundantImageModel::setRootPath(const REDUNDANT_IMG_BUNCH* p_af) {
   int beforeRow = rowCount();
   int afterRow = p_af != nullptr ? p_af->size() : 0;
-  qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
+  LOG_D("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
 
   RowsCountBeginChange(beforeRow, afterRow);
   m_paf = p_af;

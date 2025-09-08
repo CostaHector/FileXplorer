@@ -90,7 +90,7 @@ int VidModel::getNextAvailableVidUrl(const QUrl& startFrom, const QModelIndexLis
   const QString& startStr = startFrom.toLocalFile();
   const int startRow = m_vids.indexOf(startStr);
   if (startRow == -1) {
-    qWarning("Search startFrom url[%s] not found", qPrintable(startStr));
+    LOG_W("Search startFrom url[%s] not found", qPrintable(startStr));
     return -1;
   }
   for (int row = startRow; row < rowCount(); ++row) {
@@ -103,7 +103,7 @@ int VidModel::getNextAvailableVidUrl(const QUrl& startFrom, const QModelIndexLis
     }
     return row;
   }
-  qDebug("Available url not found during index[%d, %d)", startRow, rowCount());
+  LOG_D("Available url not found during index[%d, %d)", startRow, rowCount());
   return -1;
 }
 

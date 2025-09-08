@@ -1,7 +1,36 @@
 #include "ConvertUnicodeCharsetToAscii.h"
+#include "Logger.h"
 
 constexpr QChar ConvertUnicodeCharsetToAscii::UNICODE_FIRST_TWO_BYTE;
 const QHash<QString, char> ConvertUnicodeCharsetToAscii::BOLD_TO_TEXT_DICT = getBoldToTextDict();
+
+QString ConvertUnicodeCharsetToAscii::operator()(const QString& boldStr) const {
+  QString ansStr;
+  ansStr.reserve(boldStr.size());
+
+  int i = 0;
+  while (i < boldStr.size()) {
+    if (QChar(0xD835) == boldStr[i]) {
+      if (i + 1 >= boldStr.size()) {
+        LOG_W("Incomplete char find in byte[%d]", i);
+        return boldStr;
+        break;
+      }
+      const QString& b = boldStr.mid(i, 2);
+      auto it = BOLD_TO_TEXT_DICT.find(b);
+      if (it == BOLD_TO_TEXT_DICT.cend()) {
+        ansStr += b;
+      } else {
+        ansStr += it.value();
+      }
+      i += 2;
+      continue;
+    }
+    ansStr += boldStr[i];
+    ++i;
+  }
+  return ansStr;
+}
 
 QHash<QString, char> ConvertUnicodeCharsetToAscii::getBoldToTextDict() {
   QHash<QString, char> dict;

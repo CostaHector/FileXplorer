@@ -8,6 +8,7 @@
 #include "StringTool.h"
 #include <QSqlField>
 #include <QTextStream>
+#include <QRegularExpression>
 #include <QFile>
 
 PerformersAkaManager& PerformersAkaManager::getIns() {
@@ -22,7 +23,7 @@ QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
   static const QString akaPerfFilePath = PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS);
   QFile file{akaPerfFilePath};
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("File not found: %s.", qPrintable(file.fileName()));
+    LOG_D("File not found: %s.", qPrintable(file.fileName()));
     return {};
   }
 
@@ -38,7 +39,7 @@ QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
     }
   }
   file.close();
-  qDebug("%d aka name(s) read out", akaDict.size());
+  LOG_D("%d aka name(s) read out", akaDict.size());
   return akaDict;
 }
 
@@ -46,7 +47,7 @@ int PerformersAkaManager::ForceReloadAkaName() {
   int beforeAkaNameCnt = m_akaPerf.size();
   m_akaPerf = PerformersAkaManager::ReadOutAkaName();
   int afterAkaNameCnt = m_akaPerf.size();
-  qDebug("%d aka names added/removed", afterAkaNameCnt - beforeAkaNameCnt);
+  LOG_D("%d aka names added/removed", afterAkaNameCnt - beforeAkaNameCnt);
   return afterAkaNameCnt - beforeAkaNameCnt;
 }
 

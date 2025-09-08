@@ -1,4 +1,5 @@
 #include "MyTestSuite.h"
+#include "Logger.h"
 #include <QtTest/QtTest>
 
 #define RUN_UT_MAIN_FILE 1
@@ -9,6 +10,7 @@ int main(int argc, char* argv[]) {
   auto& suite = MyTestSuite::suite();
   int succeedCnt = 0;
   int skipCnt = 0;
+  QVector<MyTestSuite*> failedTests;
   for (auto it = suite.begin(); it != suite.end(); ++it) {
     if (MyTestSuite::bOnlyExecuteExculsive && !(*it)->mExclusive) {
       ++skipCnt;
@@ -16,16 +18,22 @@ int main(int argc, char* argv[]) {
     }
     if (QTest::qExec(*it, argc, argv) == 0) {
       ++succeedCnt;
+    } else {
+      failedTests.push_back(*it);
     }
   }
   const int totalCnt = suite.size();
   const int shouldExecCnt = totalCnt - skipCnt;
-  const int failedCnt = shouldExecCnt - succeedCnt;
-  qWarning("%d/%d testcase passed (total:%d, skipCnt:%d)", succeedCnt, shouldExecCnt, totalCnt, skipCnt);
-  if (failedCnt != 0) {
-    qCritical("ERROR: %d TEST(s) FAILED", failedCnt);
+  if (!failedTests.isEmpty()) {
+    LOG_C("\n---------------ERROR: Following %d/%d TEST(s) FAILED:---------------", failedTests.size(), shouldExecCnt);
+    for (int i = 0; i < failedTests.size(); ++i) {
+      LOG_C("%dth testcase: %s", i+1, failedTests[i]->metaObject()->className());
+    }
+    LOG_C("\n---------------ERROR: Above %d TEST(s) FAILED.---------------", failedTests.size());
+  } else {
+    LOG_W("\n---------------\nAll %d/%d testcase passed (total:%d, skipCnt:%d)\n---------------\n", succeedCnt, shouldExecCnt, totalCnt, skipCnt);
   }
-  return failedCnt;
+  return failedTests.size();
 }
 
 #endif

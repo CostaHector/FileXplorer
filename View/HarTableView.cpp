@@ -76,7 +76,7 @@ int HarTableView::SaveSelectionFilesTo() const {
   const QFileInfo harFi{mHarAbsPath};
   const QString& dstFolder = QFileDialog::getExistingDirectory(nullptr, "Export selection(s) to", harFi.absolutePath());
   if (!QFileInfo{dstFolder}.isDir()) {
-    qWarning("dst folder[%s] not existed", qPrintable(dstFolder));
+    LOG_W("dst folder[%s] not existed", qPrintable(dstFolder));
     return -1;
   }
   int exportCount = mHarModel->SaveToLocal(dstFolder, selectedRows);
@@ -97,14 +97,14 @@ bool HarTableView::PreviewImage(const QModelIndex &current, const QModelIndex &/
   const auto& entryItem = mHarModel->GetHarEntryItem(srcRow);
   static const QSet<QString> IMAGE_PREVIEW_SUPPORTED {".jpeg", ".jpg", ".png", ".webp", ".gif", "tif", "tiff"};
   if (!IMAGE_PREVIEW_SUPPORTED.contains(entryItem.type)) {
-    qDebug("file type[%s] cannot preview", qPrintable(entryItem.type));
+    LOG_D("file type[%s] cannot preview", qPrintable(entryItem.type));
     return true;
   }
 
   QImage image;
   const QString& fileName = entryItem.name;
   if (!image.loadFromData(entryItem.content, fileName.toStdString().c_str())) {
-    qWarning("image[%s] load from data failed", qPrintable(fileName));
+    LOG_W("image[%s] load from data failed", qPrintable(fileName));
     return false;
   }
   if (mPreviewLabel == nullptr) {

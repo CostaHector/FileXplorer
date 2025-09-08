@@ -65,7 +65,7 @@ void JsonPerformersListInputer::uniquePerformers() {
 bool JsonPerformersListInputer::submitPerformersListToJsonFile() {
   const QString& jsonFilePath = windowFilePath();
   if (p_dict == nullptr) {
-    qDebug("Cannot submit. dict is nullptr");
+    LOG_D("Cannot submit. dict is nullptr");
     return false;
   }
   QVariantHash& dict = *p_dict;
@@ -81,13 +81,13 @@ bool JsonPerformersListInputer::reloadPerformersFromJsonFile(const QString& json
   p_dict = &dict;
   if (!QFile::exists(jsonFilePath)) {
     setWindowFilePath("");
-    qWarning("Error path[%s] not exist", qPrintable(jsonFilePath));
+    LOG_W("Error path[%s] not exist", qPrintable(jsonFilePath));
     return false;
   }
   setWindowFilePath(jsonFilePath);
   auto castIt = dict.constFind(ENUM_2_STR(Cast));
   if (castIt == dict.cend()) {
-    qDebug("No cast key in json[%s]", qPrintable(jsonFilePath));
+    LOG_D("No cast key in json[%s]", qPrintable(jsonFilePath));
     return false;
   }
   const QStringList& casts = castIt.value().toStringList();
@@ -99,7 +99,7 @@ void JsonPerformersListInputer::subscribe() {
   connect(m_onePerf, &QLineEdit::editingFinished, this, &JsonPerformersListInputer::appendAPerformer);
   connect(buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, [this]() {
     bool ret = JsonPerformersListInputer::submitPerformersListToJsonFile();
-    qDebug("Save mod performers result: %d", ret);
+    LOG_D("Save mod performers result: %d", ret);
     hide();
   });
   connect(buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &JsonPerformersListInputer::hide);

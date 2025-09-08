@@ -2,19 +2,20 @@
 #include "PathTool.h"
 #include "MemoryKey.h"
 #include "PublicVariable.h"
+#include "Logger.h"
 #include "UndoRedo.h"
+
 #include <QFileInfo>
 #include <QDir>
 #include <QUrl>
 #include <QAction>
-#include <QDebug>
 
 namespace ComplexOperation {
 FILE_STRUCTURE_MODE g_fileStructureMode{FILE_STRUCTURE_MODE::QUERY};
 
 void SetDefaultFileStructMode(const QAction* pDefaultMode) {
   if (pDefaultMode == nullptr) {
-    qWarning("pDefaultMode is nullptr");
+    LOG_W("pDefaultMode is nullptr");
     return;
   }
   g_fileStructureMode = FILE_STRUCTURE_MODE_STR_2_ENUM.value(pDefaultMode->text(), FILE_STRUCTURE_MODE::QUERY);
@@ -36,7 +37,7 @@ QStringList ComplexOperationBase::QUrls2FileAbsPaths(const QList<QUrl>& urls) {
 
 QStringList ComplexOperationBase::MimeData2FileAbsPaths(const QMimeData& mimeData) {
   if (!mimeData.hasUrls()) {
-    qWarning("No urls in mimedata at all");
+    LOG_W("No urls in mimedata at all");
     return {};
   }
   return QUrls2FileAbsPaths(mimeData.urls());
@@ -66,7 +67,7 @@ BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths
       lst.append(ACMD::GetInstMV(rootPath, rel2Section, dest));
     }
   } else {
-    qWarning("File Structure Mode[%d] not support", (int)mode);
+    LOG_W("File Structure Mode[%d] not support", (int)mode);
   }
   return lst;
 }
@@ -95,7 +96,7 @@ BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths
       }
     }
   } else {
-    qWarning("File Structure Mode[%d] not support", (int)mode);
+    LOG_W("File Structure Mode[%d] not support", (int)mode);
   }
   return lst;
 }
@@ -149,19 +150,19 @@ int DoDropAction(Qt::DropAction dropAct, const QList<QUrl>& urls, const QString&
       break;
     }
     default: {
-      qWarning("Drop action[%d] not support now", (int)dropAct);
+      LOG_W("Drop action[%d] not support now", (int)dropAct);
       return 0;
     }
   }
 
   bool bDropResult = g_undoRedo.Do(aBatch);
   if (!bDropResult) {
-    qWarning("Drop[%s] partially failed %d selection(s) %d command(s) drop into path[%s]",  //
-             qPrintable(dropActionStr), urls.size(), aBatch.size(), qPrintable(dest));
+    LOG_W("Drop[%s] partially failed %d selection(s) %d command(s) drop into path[%s]",  //
+          qPrintable(dropActionStr), urls.size(), aBatch.size(), qPrintable(dest));
     return -1;
   }
-  qWarning("Drop[%s] all succeed %d selection(s) %d command(s) drop into path[%s]",  //
-           qPrintable(dropActionStr), urls.size(), aBatch.size(), qPrintable(dest));
+  LOG_W("Drop[%s] all succeed %d selection(s) %d command(s) drop into path[%s]",  //
+        qPrintable(dropActionStr), urls.size(), aBatch.size(), qPrintable(dest));
   return 0;
 }
 
@@ -188,19 +189,19 @@ int DoDropAction(Qt::DropAction dropAct, const QStringList& absPaths, const QStr
       break;
     }
     default: {
-      qWarning("Drop action[%d] not support now", (int)dropAct);
+      LOG_W("Drop action[%d] not support now", (int)dropAct);
       return 0;
     }
   }
 
   bool bDropResult = g_undoRedo.Do(aBatch);
   if (!bDropResult) {
-    qWarning("Drop[%s] partially failed %d selection(s) %d command(s) drop into path[%s]",  //
-             qPrintable(dropActionStr), absPaths.size(), aBatch.size(), qPrintable(dest));
+    LOG_W("Drop[%s] partially failed %d selection(s) %d command(s) drop into path[%s]",  //
+          qPrintable(dropActionStr), absPaths.size(), aBatch.size(), qPrintable(dest));
     return -1;
   }
-  qWarning("Drop[%s] all succeed %d selection(s) %d command(s) drop into path[%s]",  //
-           qPrintable(dropActionStr), absPaths.size(), aBatch.size(), qPrintable(dest));
+  LOG_W("Drop[%s] all succeed %d selection(s) %d command(s) drop into path[%s]",  //
+        qPrintable(dropActionStr), absPaths.size(), aBatch.size(), qPrintable(dest));
   return 0;
 }
 
@@ -213,7 +214,7 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
     } else if (ba[0] == 0x5) {
       return Qt::DropAction::CopyAction;
     }
-    qWarning("Preferred DropEffect value[%d] invalid", (int)ba[0]);
+    LOG_W("Preferred DropEffect value[%d] invalid", (int)ba[0]);
   }
 #else
   if (native.hasFormat("x-special/gnome-copied-files")) {
@@ -224,7 +225,7 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
     } else if (cutOrCopyAction.startsWith("copy")) {
       return Qt::DropAction::CopyAction;
     }
-    qWarning("x-special/gnome-copied-files value[%s] invalid", qPrintable(cutOrCopyAction));
+    LOG_W("x-special/gnome-copied-files value[%s] invalid", qPrintable(cutOrCopyAction));
   } else if (native.hasFormat("XdndAction")) {
     QByteArray ba = native.data("XdndAction");
     const QString cutOrCopyAction = QString::fromUtf8(ba);
@@ -233,10 +234,12 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
     } else if (cutOrCopyAction == "XdndActionCopy") {
       return Qt::DropAction::CopyAction;  // 0x1
     }
-    qWarning("XdndAction value[%s] invalid", qPrintable(cutOrCopyAction));
+    LOG_W("XdndAction value[%s] invalid", qPrintable(cutOrCopyAction));
   }
 #endif
-  qWarning() << "Action not found. Supported Available format:" << native.formats();
+  const QStringList& formats = native.formats();
+  const QString& supportAvails = formats.join(',');
+  qWarning("Action not found. Supported Available format: %s.", qPrintable(supportAvails));
   return Qt::DropAction::IgnoreAction;
 }
 

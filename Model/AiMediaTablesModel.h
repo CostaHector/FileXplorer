@@ -12,13 +12,7 @@ class AiMediaTablesModel : public QAbstractTableModel {
   auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_data.size(); }
   auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return AITABLE_HOR_HEADER.size(); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  QString fileName(const QModelIndex& index) const {
-    if (index.isValid() && 0 <= index.row() and index.row() < rowCount()) {
-      return m_data[index.row()].tableName;
-    }
-    qWarning("invalid index");
-    return {};
-  }
+  QString fileName(const QModelIndex& index) const;
   QStringList fileNames(const QModelIndexList& indx) const {
     QStringList tbls;
     tbls.reserve(indx.size());

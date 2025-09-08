@@ -14,7 +14,7 @@ QMap<QString, QStringList> ItemsUnpacker::GetFolder2ItemsMapByCurPath(const QStr
   for (const QString& subPath : rootPathDir.entryList()) {
     QDir pathDir{path + '/' + subPath, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
     if (!pathDir.isEmpty(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot)) {
-      qDebug("skip, folder existed in path[%s]", qPrintable(pathDir.absolutePath()));
+      LOG_D("skip, folder existed in path[%s]", qPrintable(pathDir.absolutePath()));
       continue;
     }
     folder2PileItems[subPath] = pathDir.entryList();
@@ -67,17 +67,17 @@ int ItemsUnpacker::operator()(const QString& path,                              
     const QStringList& files = it.value();
     if (files.size() < 2) {
       // this folder is not classfied by ItemsClassifier will not process here
-      qDebug("FolderName[%s] only contains %d item(s), skip", qPrintable(folderName), files.size());
+      LOG_D("FolderName[%s] only contains %d item(s), skip", qPrintable(folderName), files.size());
       continue;
     }
     if (!CanExtractOut(files)) {
-      qDebug("path[%s] should not extract out", qPrintable(it.key()));
+      LOG_D("path[%s] should not extract out", qPrintable(it.key()));
       continue;
     }
     int filesExtractedCnt = 0;
     for (const QString& file : files) {
       if (alreadyExistItems.contains(file)) {
-        qDebug("%s/%s already exist outside, move will failed, skip it", qPrintable(path), qPrintable(file));
+        LOG_D("%s/%s already exist outside, move will failed, skip it", qPrintable(path), qPrintable(file));
         continue;
       }
       m_cmds.append(ACMD::GetInstMV(path + '/' + folderName, file, path));
@@ -87,9 +87,9 @@ int ItemsUnpacker::operator()(const QString& path,                              
     // recycle path + '/' + folderName
     m_cmds.append(ACMD::GetInstRMDIR(path, folderName));
     ++foldersNeedExtractCnt;
-    qDebug("Extract %d pile item(s) out of folder[%s]", files.size(), qPrintable(it.key()));
+    LOG_D("Extract %d pile item(s) out of folder[%s]", files.size(), qPrintable(it.key()));
   }
-  qDebug("Extract %d item(s) total from %d folders", itemsExtractedOutCnt, foldersNeedExtractCnt);
+  LOG_D("Extract %d item(s) total from %d folders", itemsExtractedOutCnt, foldersNeedExtractCnt);
   return foldersNeedExtractCnt;
 }
 
@@ -102,6 +102,6 @@ int ItemsUnpacker::operator()(const QString& path) {
 
 bool ItemsUnpacker::StartToRearrange() {
   const bool isAllSuccess = g_undoRedo.Do(m_cmds);
-  qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
+  LOG_D("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;
 }

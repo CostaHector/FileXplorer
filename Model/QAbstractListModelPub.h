@@ -1,6 +1,7 @@
 #ifndef QABSTRACTLISTMODELPUB_H
 #define QABSTRACTLISTMODELPUB_H
 #include <QAbstractListModel>
+#include "Logger.h"
 
 class QAbstractListModelPub : public QAbstractListModel {
  public:
@@ -18,7 +19,7 @@ class QAbstractListModelPub : public QAbstractListModel {
   }
   void RowsCountEndChange() {
     if (!IsRowCntValid()) {
-      qWarning("row count[bef:%d, aft:%d] invalid", m_befRow, m_aftRow);
+      LOG_W("row count[bef:%d, aft:%d] invalid", m_befRow, m_aftRow);
       return;
     }
     if (m_befRow == m_aftRow) {
