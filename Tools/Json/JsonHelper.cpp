@@ -177,7 +177,7 @@ bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth) {
 
 int SyncJsonNameValue(const QString& path) {
   if (!QFileInfo(path).isDir()) {
-    qDebug("path[%s] is not a dir", qPrintable(path));
+    LOG_D("path[%s] is not a dir", qPrintable(path));
     return -1;
   }
   int succeedCnt = 0;
@@ -201,14 +201,14 @@ int SyncJsonNameValue(const QString& path) {
     ++tryConstuctCnt;
   }
   if (tryConstuctCnt != succeedCnt) {
-    qDebug("%d/%d json processed", succeedCnt, tryConstuctCnt);
+    LOG_D("%d/%d json processed", succeedCnt, tryConstuctCnt);
   }
   return succeedCnt;
 }
 
 int JsonFileKeyValueProcess(const QString& path, const DictEditOperator::JSON_DICT_PROCESS_T jDProc) {
   if (!QFileInfo(path).isDir()) {
-    qDebug("path[%s] is not a dir", qPrintable(path));
+    LOG_D("path[%s] is not a dir", qPrintable(path));
     return -1;
   }
   int succeedCnt = 0;
@@ -226,7 +226,7 @@ int JsonFileKeyValueProcess(const QString& path, const DictEditOperator::JSON_DI
     ++tryConstuctCnt;
   }
   if (tryConstuctCnt != succeedCnt) {
-    qDebug("%d/%d json processed", succeedCnt, tryConstuctCnt);
+    LOG_D("%d/%d json processed", succeedCnt, tryConstuctCnt);
   }
   return succeedCnt;
 }
@@ -239,7 +239,7 @@ QVariantHash MovieJsonLoader(const QString& jsonFilePth) {
 QJsonObject GetJsonObject(const QString& filePath) {
   QFile file(filePath);
   if (!file.open(QIODevice::ReadOnly)) {
-    qWarning("Failed to open file: %s", qPrintable(filePath));
+    LOG_W("Failed to open file: %s", qPrintable(filePath));
     return {};
   }
   QByteArray jsonData = file.readAll();
@@ -251,7 +251,7 @@ QJsonObject GetJsonObject(const QString& filePath) {
   QJsonParseError jsonErr;
   QJsonDocument json_doc = QJsonDocument::fromJson(jsonData, &jsonErr);
   if (jsonErr.error != QJsonParseError::NoError) {
-    qWarning("Error parse json string %d char(s): %s", jsonData.size(), qPrintable(jsonErr.errorString()));
+    LOG_W("Error parse json string %d char(s): %s", jsonData.size(), qPrintable(jsonErr.errorString()));
     return {};
   }
   return json_doc.object();
@@ -264,7 +264,7 @@ QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr) {
   QJsonParseError jsonErr;
   QJsonDocument json_doc = QJsonDocument::fromJson(serializedJsonStr.toUtf8(), &jsonErr);
   if (jsonErr.error != QJsonParseError::NoError) {
-    qWarning("Error parse json string %d char(s): %s", serializedJsonStr.size(), qPrintable(jsonErr.errorString()));
+    LOG_W("Error parse json string %d char(s): %s", serializedJsonStr.size(), qPrintable(jsonErr.errorString()));
     return {};
   }
   const QJsonObject& rootObj = json_doc.object();
@@ -318,7 +318,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
     return NOCHANGED_OK;
   }
   if (!DumpJsonDict(dict, jsonPth)) {
-    qWarning("json[%s] dump failed", qPrintable(jsonPth));
+    LOG_W("json[%s] dump failed", qPrintable(jsonPth));
     return CHANGED_WRITE_FILE_FAILED;
   }
   return CHANGED_OK;
@@ -326,7 +326,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
 
 QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
   if (!QFileInfo(path).isDir()) {
-    qDebug("path[%s] is not a dir", qPrintable(path));
+    LOG_D("path[%s] is not a dir", qPrintable(path));
     return {};
   }
 
@@ -350,7 +350,7 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
     }
     fileNameHash2Json[CalcFileHash(jsonPath)] = JsonDict2Table{studio, cast, tags};
   }
-  qDebug("%d file contains Studio&Cast&Tags", fileNameHash2Json.size());
+  LOG_D("%d file contains Studio&Cast&Tags", fileNameHash2Json.size());
   return fileNameHash2Json;
 }
 
@@ -360,7 +360,7 @@ uint CalcFileHash(const QString& vidPth) {
 
 int JsonSyncKeyValueAccordingJsonFileName(const QString& path) {
   if (!QFileInfo(path).isDir()) {
-    qDebug("path[%s] is not a dir", qPrintable(path));
+    LOG_D("path[%s] is not a dir", qPrintable(path));
     return -1;
   }
   int succeedCnt = 0;
@@ -381,7 +381,7 @@ int JsonSyncKeyValueAccordingJsonFileName(const QString& path) {
     ++tryConstuctCnt;
   }
   if (tryConstuctCnt != succeedCnt) {
-    qDebug("%d/%d json processed", succeedCnt, tryConstuctCnt);
+    LOG_D("%d/%d json processed", succeedCnt, tryConstuctCnt);
   }
   return succeedCnt;
 }

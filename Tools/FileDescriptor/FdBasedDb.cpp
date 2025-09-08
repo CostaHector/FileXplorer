@@ -205,7 +205,7 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
   }
 
   if (!QFileInfo(folderAbsPath).isDir()) {
-    qWarning("folderAbsPath[%s] is not a directory", qPrintable(folderAbsPath));
+    LOG_W("folderAbsPath[%s] is not a directory", qPrintable(folderAbsPath));
     return FD_NOT_DIR;
   }
 
@@ -221,7 +221,7 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
   // 1. query fd(s) from table
   QSet<qint64> existedFds;
   if (!QueryPK(tableName, ENUM_2_STR(Fd), existedFds)) {
-    qWarning("Qry fds(s) at table[%s] failed", qPrintable(tableName));
+    LOG_W("Qry fds(s) at table[%s] failed", qPrintable(tableName));
     return FD_QRY_PK_FAILED;
   }
 
@@ -249,11 +249,11 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
   int insertCnt = 0;
   auto ret = Insert(tableName, needInsertFds, newFd2Pth, insertCnt);
   if (ret != FD_OK) {
-    qWarning("Incremental insert failed errorCode:%d", ret);
+    LOG_W("Incremental insert failed errorCode:%d", ret);
     return ret;
   }
 
-  qWarning("%d record(s) commit insert into succeed", insertCnt);
+  LOG_W("%d record(s) commit insert into succeed", insertCnt);
   return insertCnt;
 }
 
@@ -268,13 +268,13 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
   }
   QSqlQuery query{db};
   if (!query.prepare(INSERT_MOVIE_RECORD_TEMPLATE.arg(tableName))) {
-    qWarning("prepare command[%s] failed: %s",  //
+    LOG_W("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
   if (!db.transaction()) {
-    qWarning("start the %dth transaction failed: %s",  //
+    LOG_W("start the %dth transaction failed: %s",  //
              1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
@@ -297,7 +297,7 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
 
     if (!query.exec()) {
       db.rollback();
-      qWarning("replace[%s] failed: %s",  //
+      LOG_W("replace[%s] failed: %s",  //
                qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_EXEC_FAILED;
     }
@@ -307,12 +307,12 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
     if (count % MAX_BATCH_SIZE == 0) {
       if (!db.commit()) {
         db.rollback();
-        qWarning("commit the %dth batch record(s) failed: %s",  //
+        LOG_W("commit the %dth batch record(s) failed: %s",  //
                  count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
-        qWarning("start the %dth transaction failed: %s",  //
+        LOG_W("start the %dth transaction failed: %s",  //
                  count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
@@ -322,12 +322,12 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
   // 提交剩余记录
   if (!db.commit()) {
     db.rollback();
-    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    LOG_W("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
     return FD_COMMIT_FAILED;
   }
   query.finish();
   insertCnt = needInsertFds.size();
-  qDebug("%d record(s) to be inserted...", insertCnt);
+  LOG_D("%d record(s) to be inserted...", insertCnt);
   return FD_OK;
 }
 
@@ -344,7 +344,7 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
                              .arg(placeholders);
   QSqlQuery query{db};
   if (!query.prepare(qryCmd)) {
-    qWarning("prepare command[%s] failed: %s",  //
+    LOG_W("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
@@ -355,13 +355,13 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
 
   if (!query.exec()) {
     db.rollback();
-    qWarning("delete[%s] failed: %s",  //
+    LOG_W("delete[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_INVALID;
   }
   query.finish();
   deleteCnt = needDeleteFds.size();
-  qDebug("%d record(s) to be deleted...", deleteCnt);
+  LOG_D("%d record(s) to be deleted...", deleteCnt);
   return FD_OK;
 }
 
@@ -373,13 +373,13 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
   }
   QSqlQuery query{db};
   if (!query.prepare(UPDATE_PATH_TEMPLATE.arg(tableName))) {
-    qWarning("prepare command[%s] failed: %s",  //
+    LOG_W("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   // 开始事务
   if (!db.transaction()) {
-    qWarning("start the %dth transaction failed: %s",  //
+    LOG_W("start the %dth transaction failed: %s",  //
              1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
@@ -397,7 +397,7 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
     query.bindValue(UPDATE_PATH_FILED_Fd, fdVal);
     if (!query.exec()) {
       db.rollback();
-      qWarning("update[%s] failed: %s",  //
+      LOG_W("update[%s] failed: %s",  //
                qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
@@ -407,12 +407,12 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
     if (count % MAX_BATCH_SIZE == 0) {
       if (!db.commit()) {
         db.rollback();
-        qWarning("commit the %dth batch record(s) failed: %s",  //
+        LOG_W("commit the %dth batch record(s) failed: %s",  //
                  count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
-        qWarning("start the %dth transaction failed: %s",  //
+        LOG_W("start the %dth transaction failed: %s",  //
                  count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
@@ -422,12 +422,12 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
   // 提交剩余记录
   if (!db.commit()) {
     db.rollback();
-    qWarning("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    LOG_W("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
     return FD_COMMIT_FAILED;
   }
   query.finish();
   updateCnt = needUpdateFds.size();
-  qDebug("%d record(s) to be update...", updateCnt);
+  LOG_D("%d record(s) to be update...", updateCnt);
   return FD_OK;
 }
 
@@ -449,7 +449,7 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
   // 1. query fd(s) from table
   QSet<qint64> existedFds;
   if (!QueryPK(tableName, ENUM_2_STR(Fd), existedFds)) {
-    qWarning("Qry fds(s) at table[%s] failed", qPrintable(tableName));
+    LOG_W("Qry fds(s) at table[%s] failed", qPrintable(tableName));
     return FD_QRY_PK_FAILED;
   }
 
@@ -477,27 +477,27 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
   needDeleteFds.subtract(newFds);
   auto needUpdateFds{newFds};
   needUpdateFds.intersect(existedFds);
-  qDebug("Fds insert:%d, delete:%d, update:%d", needInsertFds.size(), needDeleteFds.size(), needUpdateFds.size());
+  LOG_D("Fds insert:%d, delete:%d, update:%d", needInsertFds.size(), needDeleteFds.size(), needUpdateFds.size());
 
   // 3. before insert check if at least 1 guid
   int insertCnt{0};
   auto ret = Insert(tableName, needInsertFds, newFd2Pth, insertCnt);
   if (ret != FD_OK) {
-    qWarning("Insert failed errorCode:%d", ret);
+    LOG_W("Insert failed errorCode:%d", ret);
     return ret;
   }
   // 4. before delete check if at least 1 guid
   int deleteCnt{0};
   ret = Delete(tableName, needDeleteFds, deleteCnt);
   if (ret != FD_OK) {
-    qWarning("Delete failed errorCode:%d", ret);
+    LOG_W("Delete failed errorCode:%d", ret);
     return ret;
   }
   // 5. before update check if at least 1 guid
   int updateCnt{0};
   ret = Update(tableName, needUpdateFds, newFd2Pth, updateCnt);
   if (ret != FD_OK) {
-    qWarning("Delete failed errorCode:%d", ret);
+    LOG_W("Delete failed errorCode:%d", ret);
     return ret;
   }
 
@@ -507,7 +507,7 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
     pAdt->updateCnt = updateCnt;
   }
 
-  qDebug("insert:%d, delete:%d, update:%d record(s) succeed", insertCnt, deleteCnt, updateCnt);
+  LOG_D("insert:%d, delete:%d, update:%d record(s) succeed", insertCnt, deleteCnt, updateCnt);
   return FD_OK;
 }
 
@@ -533,7 +533,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   QSqlQuery query{db};
   query.setForwardOnly(true);
   if (!query.exec(SELECT_DURATION_0_TEMPLATE.arg(tableName))) {
-    qWarning("Query[%s] failed: %s",  //
+    LOG_W("Query[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_EXEC_FAILED;
   }
@@ -550,19 +550,19 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   }
   query.clear();
   if (fd2Duration.isEmpty()) {
-    qDebug("no duration need update at all, skip");
+    LOG_D("no duration need update at all, skip");
     return 0;
   }
 
   // 2. start to update
   if (!query.prepare(UPDATE_DURATION_0_TEMPLATE.arg(tableName))) {
-    qWarning("prepare command[%s] failed: %s",  //
+    LOG_W("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
   if (!db.transaction()) {
-    qWarning("start the %dth transaction failed: %s",  //
+    LOG_W("start the %dth transaction failed: %s",  //
              1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
@@ -573,7 +573,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     query.bindValue(UPDATE_DURATION_0_FILED_Fd, it.key());
     if (!query.exec()) {
       db.rollback();
-      qWarning("replace[%s] failed: %s",  //
+      LOG_W("replace[%s] failed: %s",  //
                qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_EXEC_FAILED;
     }
@@ -583,12 +583,12 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     if (count % MAX_BATCH_SIZE == 0) {
       if (!db.commit()) {
         db.rollback();
-        qWarning("commit the %dth batch record(s) failed: %s",  //
+        LOG_W("commit the %dth batch record(s) failed: %s",  //
                  count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
-        qWarning("start the %dth transaction failed: %s",  //
+        LOG_W("start the %dth transaction failed: %s",  //
                  count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
@@ -598,11 +598,11 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   // 提交剩余记录
   if (!db.commit()) {
     db.rollback();
-    qWarning("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    LOG_W("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
     return FD_COMMIT_FAILED;
   }
   query.finish();
-  qDebug("%d record(s) to be updated", fd2Duration.size());
+  LOG_D("%d record(s) to be updated", fd2Duration.size());
   return fd2Duration.size();
 }
 
@@ -631,12 +631,12 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
 
   QSqlQuery query{db};
   if (!query.prepare(SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
-    qWarning("prepare command[%s] failed: %s",  //
+    LOG_W("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   if (!query.exec()) {
-    qWarning("Query[%s] failed: %s",  //
+    LOG_W("Query[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_EXEC_FAILED;
   }
@@ -659,14 +659,14 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
   }
   query.clear();
   if (pth2Info.isEmpty()) {
-    qDebug("No need export to json, skip");
+    LOG_D("No need export to json, skip");
     return FD_OK;
   }
 
   QDir dir;
   for (const QString& pth : pathJsonsIn) {
     if (!dir.exists(pth)) {
-      qWarning("Json path[%s] not exist, adt first", qPrintable(pth));
+      LOG_W("Json path[%s] not exist, adt first", qPrintable(pth));
       return FD_JSON_PATH_NOT_EXIST;
     }
   }
@@ -686,14 +686,14 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
     }
   }
 
-  qDebug("%d json(s) file updated succeed", jsonFilesCnt);
+  LOG_D("%d json(s) file updated succeed", jsonFilesCnt);
   return jsonFilesCnt;
 }
 
 int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QString& peerPath) const {
   if (CHECK_TABLE_VOLUME_ONLINE) {
     if (!IsTableVolumeOnline(tableName)) {
-      qWarning("Table Volum offline");
+      LOG_W("Table Volum offline");
       return FD_DISK_OFFLINE;
     }
   }
@@ -714,13 +714,13 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
 
   QSqlQuery query{db};
   if (!query.prepare(UPDATE_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
-    qWarning("prepare command[%s] failed: %s",  //
+    LOG_W("prepare command[%s] failed: %s",  //
              qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   // 开始事务
   if (!db.transaction()) {
-    qWarning("start the %dth transaction failed: %s",  //
+    LOG_W("start the %dth transaction failed: %s",  //
              1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
@@ -734,7 +734,7 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
     query.bindValue(UPDATE_STUDIO_CAST_TAGS_PathHash, it.key());
     if (!query.exec()) {
       db.rollback();
-      qWarning("update[%s] failed: %s",  //
+      LOG_W("update[%s] failed: %s",  //
                qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
@@ -744,12 +744,12 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
     if (count % MAX_BATCH_SIZE == 0) {
       if (!db.commit()) {
         db.rollback();
-        qWarning("commit the %dth batch record(s) failed: %s",  //
+        LOG_W("commit the %dth batch record(s) failed: %s",  //
                  count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
-        qWarning("start the %dth transaction failed: %s",  //
+        LOG_W("start the %dth transaction failed: %s",  //
                  count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
@@ -759,11 +759,11 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
   // 提交剩余记录
   if (!db.commit()) {
     db.rollback();
-    qWarning("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
+    LOG_W("remain update record(s) commit failed: %s", qPrintable(db.lastError().text()));
     return FD_COMMIT_FAILED;
   }
   query.finish();
 
-  qDebug("%d record(s) updated succeed", fileNameHash2Dict.size());
+  LOG_D("%d record(s) updated succeed", fileNameHash2Dict.size());
   return fileNameHash2Dict.size();
 }

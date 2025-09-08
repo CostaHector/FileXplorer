@@ -47,7 +47,7 @@ void ActionsSearcher::onActionSearchTextEdit(const QString& text) {
   }
   const auto it = inst.mTextToActionMap.constFind(text);
   if (it == inst.mTextToActionMap.constEnd()) {
-    qDebug("QAction[%s] not exist in map", qPrintable(text));
+    LOG_D("QAction[%s] not exist in map", qPrintable(text));
     return;
   }
   mLastValidAct = it.value();

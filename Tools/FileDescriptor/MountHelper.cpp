@@ -1,4 +1,5 @@
 ﻿#include "MountHelper.h"
+#include "Logger.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QMap>
@@ -49,7 +50,7 @@ QString MountHelper::ExtractGuidFromVolumeName(const QString& volume) {
 QString MountHelper::ExtractGuidFromVolumeName(const wchar_t* p2volume) {
   // R"(\\?\Volume{36 chars}\)"
   if (p2volume == nullptr) {
-    qCritical("p2volume is nullptr");
+    LOG_C("p2volume is nullptr");
     return "";
   }
   const QString volume = QString::fromStdWString(p2volume);
@@ -61,7 +62,7 @@ QString MountHelper::findVolumeGuidByLabel(const QString& label) {
   wchar_t volumeName[MAX_PATH]{0};
   HANDLE hFind = FindFirstVolumeW(volumeName, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
-    qWarning("find first volume failed. label[%s] not exist", qPrintable(label));
+    LOG_W("find first volume failed. label[%s] not exist", qPrintable(label));
     return "";
   }
 
@@ -82,7 +83,7 @@ bool MountHelper::isVolumeAvailable(const QString& dstVolumeGuid) {
   wchar_t volumeName[MAX_PATH]{0};
   HANDLE hFind = FindFirstVolumeW(volumeName, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
-    qWarning("find first volume failed. volumeGuid[%s] not exist", qPrintable(dstVolumeGuid));
+    LOG_W("find first volume failed. volumeGuid[%s] not exist", qPrintable(dstVolumeGuid));
     return false;
   }
 
@@ -121,18 +122,18 @@ bool MountHelper::IsAdministrator() {
 // 修改后的挂载函数
 bool MountHelper::MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) {
   if (volumeGuid.isEmpty() || label.isEmpty()) {
-    qWarning("volumeGuid[%s] and label[%s] cannot empty", qPrintable(volumeGuid), qPrintable(label));
+    LOG_W("volumeGuid[%s] and label[%s] cannot empty", qPrintable(volumeGuid), qPrintable(label));
     return false;
   }
   if (!isVolumeAvailable(volumeGuid)) {
-    qWarning("volumeGuid[%s] not exist at all, skip mount", qPrintable(volumeGuid));
+    LOG_W("volumeGuid[%s] not exist at all, skip mount", qPrintable(volumeGuid));
     return false;
   }
   const QString& MOUNT_POINT_ROOT{"C:/mnt/" + label};
   if (!QFileInfo{MOUNT_POINT_ROOT}.isDir()) {
-    qDebug("path[%s] not exist, create now", qPrintable(MOUNT_POINT_ROOT));
+    LOG_D("path[%s] not exist, create now", qPrintable(MOUNT_POINT_ROOT));
     if (!QDir{}.mkpath(MOUNT_POINT_ROOT)) {
-      qWarning("path[%s] create failed", qPrintable(MOUNT_POINT_ROOT));
+      LOG_W("path[%s] create failed", qPrintable(MOUNT_POINT_ROOT));
       return false;
     }
   }
@@ -143,10 +144,10 @@ bool MountHelper::MountVolume(const QString& volumeGuid, const QString& label, Q
     // #define ERROR_ACCESS_DENIED __MSABI_LONG(5)
     // #define ERROR_INVALID_NAME __MSABI_LONG(123)
     // #define ERROR_DIR_NOT_EMPTY __MSABI_LONG(145)
-    qWarning("volume Name[%s] mount on[%s], resultCode:%lu", qPrintable(volumeName), qPrintable(volMountPoint), GetLastError());
+    LOG_W("volume Name[%s] mount on[%s], resultCode:%lu", qPrintable(volumeName), qPrintable(volMountPoint), GetLastError());
     return false;
   }
-  qDebug("volume Name[%s] mount on[%s] succeed", qPrintable(volumeName), qPrintable(volMountPoint));
+  LOG_D("volume Name[%s] mount on[%s] succeed", qPrintable(volumeName), qPrintable(volMountPoint));
   return true;
 }
 
@@ -160,7 +161,7 @@ QSet<QString> MountHelper::GetMountPointsByVolumeName(const wchar_t* volumeName)
   HANDLE hFind = FindFirstVolumeMountPointW(volumeName, mountPoint, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
     if (GetLastError() == ERROR_NO_MORE_ITEMS) {
-      qDebug("no %ls find at all", volumeName);
+      LOG_D("no %ls find at all", volumeName);
     }
     return {};
   }
@@ -201,7 +202,7 @@ QMap<QString, QString> MountHelper::GetGuid2LabelMap() {
   wchar_t volumeName[MAX_PATH]{0};
   HANDLE hFind = FindFirstVolumeW(volumeName, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
-    qWarning("find first volume failed.");
+    LOG_W("find first volume failed.");
     return {};
   }
 
@@ -215,7 +216,7 @@ QMap<QString, QString> MountHelper::GetGuid2LabelMap() {
       guid2Label[guid] = label;
     }
   } while (FindNextVolumeW(hFind, volumeName, MAX_PATH));
-  qDebug("%d guid find succeed", guid2Label.size());
+  LOG_D("%d guid find succeed", guid2Label.size());
   return guid2Label;
 }
 
@@ -230,7 +231,7 @@ bool MountHelper::GetVolumeInfo(const QString& path, QString& volName) {
                             volumeName, MAX_PATH,                                 //
                             serialNumber, &maxComponentLength, &fileSystemFlags,  //
                             fileSystemName, MAX_PATH)) {
-    qWarning("Failed to retrieve GUID by path[%s] error:%lu", qPrintable(path), GetLastError());
+    LOG_W("Failed to retrieve GUID by path[%s] error:%lu", qPrintable(path), GetLastError());
     return false;
   }
   volName = QString::fromWCharArray(volumeName);

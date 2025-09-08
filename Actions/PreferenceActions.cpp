@@ -56,24 +56,24 @@ PreferenceActions::PreferenceActions(QObject* parent) : QObject{parent} {
 
 bool PreferenceActions::onSetAppStyle(QAction* pAct) {
   if (pAct == nullptr) {
-    qWarning("pAct is nullptr");
+    LOG_W("pAct is nullptr");
     return false;
   }
   static const QStringList styles{"windows", "windowsvista", "fusion", "macos"};
   const QString& styleName = pAct->text();
   if (!styles.contains(styleName)) {
-    qWarning("styleName[%s] is not supported", qPrintable(styleName));
+    LOG_W("styleName[%s] is not supported", qPrintable(styleName));
     return false;
   }
   Configuration().setValue("STYLE_NAME", styleName);
   qApp->setStyle(styleName);
-  qDebug("qApp->setStyle: %s", qPrintable(styleName));
+  LOG_D("qApp->setStyle: %s", qPrintable(styleName));
   return true;
 }
 
 bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   if (pAct == nullptr) {
-    qWarning("pAct is nullptr");
+    LOG_W("pAct is nullptr");
     return false;
   }
   using namespace StyleSheet;
@@ -81,7 +81,7 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
   const THEME theme = GetThemeFromString(themeName);
   CurrentTheme(&theme);
   Configuration().setValue("STYLESHEET_NAME", theme);
-  qDebug("ThemeName[%d]: %s", (int)theme, qPrintable(themeName));
+  LOG_D("ThemeName[%d]: %s", (int)theme, qPrintable(themeName));
 
   static QString theme2QssContent[THEME::THEME_BUTT]{};
   if (theme2QssContent[theme].isEmpty()) {
@@ -92,7 +92,7 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
       qssFile.setFileName(":stylesheet/default.qss");
     }
     if (!qssFile.open(QFile::ReadOnly | QFile::Text)) {
-      qWarning("Unable to set stylesheet, file[%s] not found", qPrintable(qssFile.fileName()));
+      LOG_W("Unable to set stylesheet, file[%s] not found", qPrintable(qssFile.fileName()));
       return false;
     }
     QTextStream ts(&qssFile);
@@ -100,7 +100,7 @@ bool PreferenceActions::onSetStylesheet(QAction* pAct) {
     qssFile.close();
   }
   qApp->setStyleSheet(theme2QssContent[theme]);
-  qDebug("ThemeName Changed to [%d]: %s", (int)theme, qPrintable(themeName));
+  LOG_D("ThemeName Changed to [%d]: %s", (int)theme, qPrintable(themeName));
   return true;
 }
 
@@ -113,7 +113,7 @@ bool PreferenceActions::PostActions() {
   const QString& styleName = Configuration().value("STYLE_NAME", STYLE_WINDOWS_VISTA->text()).toString();
   for (auto* pAct : STYLE_AG->actions()) {
     if (pAct == nullptr) {
-      qWarning("pAct is nullptr");
+      LOG_W("pAct is nullptr");
       continue;
     }
     if (pAct->text() != styleName) {
@@ -121,7 +121,7 @@ bool PreferenceActions::PostActions() {
     }
     pAct->setChecked(true);
     emit pAct->triggered(true);
-    qDebug("last time styleName is %s", qPrintable(styleName));
+    LOG_D("last time styleName is %s", qPrintable(styleName));
     break;
   }
 
@@ -129,7 +129,7 @@ bool PreferenceActions::PostActions() {
   const QString& themeName = StyleSheet::THEME_2_STRING[themeInt];
   for (auto* pAct : STYLESHEET->actions()) {
     if (pAct == nullptr) {
-      qWarning("pAct is nullptr");
+      LOG_W("pAct is nullptr");
       continue;
     }
     if (pAct->text() != themeName) {
@@ -137,7 +137,7 @@ bool PreferenceActions::PostActions() {
     }
     pAct->setChecked(true);
     emit pAct->triggered(true);
-    qDebug("last time themeName is %s", qPrintable(themeName));
+    LOG_D("last time themeName is %s", qPrintable(themeName));
     break;
   }
   return true;

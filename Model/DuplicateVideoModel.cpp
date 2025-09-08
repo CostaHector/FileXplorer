@@ -1,9 +1,11 @@
 #include "DuplicateVideoModel.h"
 
 #include "PublicVariable.h"
+#include "JsonRenameRegex.h"
 #include "MemoryKey.h"
 #include "DisplayEnhancement.h"
 #include "MD5Calculator.h"
+#include "Logger.h"
 
 #include <QDir>
 #include <QDirIterator>
@@ -64,7 +66,7 @@ QVariant DuplicateDetailsModel::data(const QModelIndex& index, int role) const {
 
 auto DuplicateDetailsModel::rowCount(const QModelIndex& /*parent*/) const -> int {
   if (p_classifiedSort == nullptr || m_currentDiffer == nullptr) {
-    qWarning("nullptr");
+    LOG_W("nullptr");
     return 0;
   }
   if (m_leftRow == -1) {
@@ -96,7 +98,7 @@ auto DuplicateDetailsModel::headerData(int section, Qt::Orientation orientation,
 
 void DuplicateDetailsModel::onChangeDetailIndex(int newRow) {
   if (p_classifiedSort == nullptr or m_currentDiffer == nullptr) {
-    qWarning("m_classifiedSort is nullptr. cannot change m_leftRow in left list");
+    LOG_W("m_classifiedSort is nullptr. cannot change m_leftRow in left list");
     return;
   }
   const int beforeRowN = rowCount();
@@ -113,16 +115,16 @@ void DuplicateDetailsModel::onChangeDetailIndex(int newRow) {
   if (afterRowN > 1) {
     emit dataChanged(index(0, 0, {}), index(afterRowN - 1, columnCount() - 1, {}), {Qt::ItemDataRole::DisplayRole});
   }
-  qDebug("details rowCount %d->%d", beforeRowN, afterRowN);
+  LOG_D("details rowCount %d->%d", beforeRowN, afterRowN);
 }
 
 QString DuplicateDetailsModel::fileNameEverything(const QModelIndex& index) const {
   if (not index.isValid()) {
-    qWarning("modelindex is invalid");
+    LOG_W("modelindex is invalid");
     return {};
   }
   if (p_classifiedSort == nullptr or m_currentDiffer == nullptr) {
-    qWarning("shared member is nullptr");
+    LOG_W("shared member is nullptr");
     return {};
   }
   const DUP_INFO& inf = (*p_classifiedSort)[(int)*m_currentDiffer][m_leftRow][index.row()];
@@ -133,11 +135,11 @@ QString DuplicateDetailsModel::fileNameEverything(const QModelIndex& index) cons
 
 QString DuplicateDetailsModel::filePath(const QModelIndex& index) const {
   if (not index.isValid()) {
-    qWarning("modelindex is invalid");
+    LOG_W("modelindex is invalid");
     return {};
   }
   if (p_classifiedSort == nullptr or m_currentDiffer == nullptr) {
-    qWarning("shared member is nullptr");
+    LOG_W("shared member is nullptr");
     return {};
   }
   const DUP_INFO& inf = (*p_classifiedSort)[(int)*m_currentDiffer][m_leftRow][index.row()];
@@ -221,13 +223,13 @@ void VidInfoModel::TryUpdateRowCountAndDisplay() {
     endRemoveRows();
   }
   emit dataChanged(index(0, 0, {}), index(m_afterRow - 1, columnCount() - 1, {}), {Qt::ItemDataRole::DisplayRole});
-  qDebug("dup list rowCount %d->%d", m_beforeRowN, m_afterRow);
+  LOG_D("dup list rowCount %d->%d", m_beforeRowN, m_afterRow);
   resetBeforeAfterRow();
 }
 
 void VidInfoModel::setDifferType(const DIFFER_BY_TYPE& newDifferType) {
   if (m_currentDiffer == newDifferType) {
-    qDebug("no need to update differ type, already[%d]", (int)m_currentDiffer);
+    LOG_D("no need to update differ type, already[%d]", (int)m_currentDiffer);
     return;
   }
 
@@ -269,7 +271,7 @@ bool sortByListSize(const QList<DUP_INFO>& lhsLst, const QList<DUP_INFO>& rhsLst
 
 void VidInfoModel::UpdateMemberList() {
   if (not m_dataChangedFlag[(int)m_currentDiffer]) {
-    qDebug("m_classifiedSort[%d] not changed, no need update member", (int)m_currentDiffer);
+    LOG_D("m_classifiedSort[%d] not changed, no need update member", (int)m_currentDiffer);
     return;
   }
   m_beforeRowN = m_classifiedSort[(int)m_currentDiffer].size();

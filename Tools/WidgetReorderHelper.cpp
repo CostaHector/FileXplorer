@@ -1,5 +1,5 @@
 ﻿#include "WidgetReorderHelper.h"
-#include <QDebug>
+#include "Logger.h"
 #include <set>
 
 bool MoveElementFrontOf(QVector<int>& v, int fromIndex, int destIndex) {
@@ -52,15 +52,15 @@ QString MediaTypeSeqStr(const QVector<int>& result) {
 bool NeedMove(const int fromIndex, const int destIndex, const int N) {
   // out of bound/same index => no need move
   if (fromIndex == destIndex || fromIndex + 1 == destIndex) {
-    qDebug("no need move widget at index[%d] to destination in front of index[%d]", fromIndex, destIndex);
+    LOG_D("no need move widget at index[%d] to destination in front of index[%d]", fromIndex, destIndex);
     return false;
   }
   if (fromIndex < 0 || fromIndex >= N) {
-    qWarning("fromIndex[%d] out of bound[0, %d)", fromIndex, N);
+    LOG_W("fromIndex[%d] out of bound[0, %d)", fromIndex, N);
     return false;
   }
   if (destIndex < 0 || destIndex > N) {
-    qWarning("destIndex[%d] out of bound[0, %d]", destIndex, N);
+    LOG_W("destIndex[%d] out of bound[0, %d]", destIndex, N);
     return false;
   }
   return true;
@@ -74,10 +74,10 @@ bool MoveWidgetAtFromIndexInFrontOfDestIndex(int fromIndex, int destIndex, QTool
   }
   QWidget* widget = toolbar.widgetForAction(oldActs[fromIndex]);
   if (widget == nullptr) {
-    qWarning("Only widget[index:%d] can move", fromIndex);
+    LOG_W("Only widget[index:%d] can move", fromIndex);
     return false;
   }
-  qDebug("move widget(index at %d) in front of %d", fromIndex, destIndex);
+  LOG_D("move widget(index at %d) in front of %d", fromIndex, destIndex);
   if (destIndex >= N) {
     toolbar.addWidget(widget);
   } else {
@@ -94,13 +94,13 @@ bool MoveWidgetAtFromIndexInFrontOfDestIndex(int fromIndex, int destIndex, QSpli
   if (!NeedMove(fromIndex, destIndex, N)) {
     return false;
   }
-  //  qDebug("layout.metaObject().className(): %s", layout->metaObject()->className());
+  //  LOG_D("layout.metaObject().className(): %s", layout->metaObject()->className());
   QWidget* fromWidget = splitter.widget(fromIndex);
   if (fromWidget == nullptr) {
-    qWarning("Only widget[index:%d] can move", fromIndex);
+    LOG_W("Only widget[index:%d] can move", fromIndex);
     return false;
   }
-  qDebug("move widget(index at %d) in front of %d", fromIndex, destIndex);
+  LOG_D("move widget(index at %d) in front of %d", fromIndex, destIndex);
   const int insertIndex{destIndex > fromIndex ? destIndex - 1 : destIndex};
   splitter.insertWidget(insertIndex, fromWidget);
   return true;
@@ -111,13 +111,13 @@ bool MoveWidgetAtFromIndexInFrontOfDestIndex(int fromIndex, int destIndex, QBoxL
   if (!NeedMove(fromIndex, destIndex, N)) {
     return false;
   }
-  //  qDebug("layout.metaObject().className(): %s", layout->metaObject()->className());
+  //  LOG_D("layout.metaObject().className(): %s", layout->metaObject()->className());
   QWidget* fromWidget = layout.takeAt(fromIndex)->widget();
   if (fromWidget == nullptr) {
-    qWarning("Only widget[index:%d] can move", fromIndex);
+    LOG_W("Only widget[index:%d] can move", fromIndex);
     return false;
   }
-  qDebug("move widget(index at %d) in front of %d", fromIndex, destIndex);
+  LOG_D("move widget(index at %d) in front of %d", fromIndex, destIndex);
   const int insertIndex{destIndex > fromIndex ? destIndex - 1 : destIndex};
   layout.insertWidget(insertIndex, fromWidget);
   return true;

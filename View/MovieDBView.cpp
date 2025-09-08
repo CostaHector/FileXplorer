@@ -9,7 +9,7 @@
 #include "TableFields.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
-
+#include "JsonRenameRegex.h"
 #include <QSqlError>
 #include <QSqlQuery>
 
@@ -96,7 +96,7 @@ bool MovieDBView::onSearchDataBase() {
 bool MovieDBView::InitMoviesTables() {
   QSqlDatabase con = _fdBasedDb.GetDb();
   if (!_fdBasedDb.CheckValidAndOpen(con)) {
-    qWarning("Opened db failed:%s", qPrintable(con.lastError().text()));
+    LOG_W("Opened db failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
   _movieDbSearchBar->InitTables(con.tables());
@@ -105,7 +105,7 @@ bool MovieDBView::InitMoviesTables() {
 
 bool MovieDBView::setCurrentMovieTable(const QString& guidJoinRootPath) {
   const QString& newTableName {MountHelper::ChoppedDisplayName(guidJoinRootPath)};
-  qDebug("Set current table[%s] from GuidJoinRooPath[%s]",
+  LOG_D("Set current table[%s] from GuidJoinRooPath[%s]",
          qPrintable(newTableName), qPrintable(guidJoinRootPath));
   InitTableView(false); // restore state must ahead of data load
   Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, guidJoinRootPath);
@@ -139,7 +139,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
 
   Configuration().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
   userSelected.swap(selectPath);
-  qDebug("[%s] User selectPath[%s] PeerPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
+  LOG_D("[%s] User selectPath[%s] PeerPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
   return true;
 }
 
@@ -217,7 +217,7 @@ bool MovieDBView::onInitDataBase() {
 void MovieDBView::onCreateATable() {
   QSqlDatabase con = _fdBasedDb.GetDb();
   if (!_fdBasedDb.CheckValidAndOpen(con)) {
-    qWarning("Open failed:%s", qPrintable(con.lastError().text()));
+    LOG_W("Open failed:%s", qPrintable(con.lastError().text()));
     return;
   }
 
@@ -302,7 +302,7 @@ bool MovieDBView::onDeleteFromTable() {
   if (whereClause.isEmpty()) {
     LOG_INFO_NP("All record(s) in table is to be deleted.", tbl);
   }
-  qDebug("Where clause[%s]", qPrintable(whereClause));
+  LOG_D("Where clause[%s]", qPrintable(whereClause));
   const QString deleteCmd{QString{"DELETE FROM `%1` WHERE [%2];"}.arg(tbl, whereClause)};
   if (QMessageBox::question(this, "CONFIRM DELETE? (OPERATION NOT RECOVERABLE)", deleteCmd,  //
                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //

@@ -1,4 +1,5 @@
 #include "TSFilesMerger.h"
+#include "Logger.h"
 #include <QProcess>
 #include <QTextStream>
 #include <QDir>
@@ -26,13 +27,13 @@ bool checkTsFilesConsistent(const QStringList& tsAbsPathList) {
 
 std::pair<bool, QString> mergeTsFiles(const QString& filesIn, const QStringList& tsNames) {
   if (tsNames.isEmpty()) {
-    qDebug("Empty ts files input");
+    LOG_D("Empty ts files input");
     return {true, ""};
   }
 
   const QDir dir{filesIn};
   if (!dir.exists()) {
-    qDebug("Input path not exist");
+    LOG_D("Input path not exist");
     return {false, ""};
   }
 
@@ -53,21 +54,21 @@ std::pair<bool, QString> mergeTsFiles(const QString& filesIn, const QStringList&
     ++tsFilesCnt;
   }
   if (tsFilesCnt < 2) {
-    qDebug("Only %d ts file input, skip", tsFilesCnt);
+    LOG_D("Only %d ts file input, skip", tsFilesCnt);
     return {false, ""};
   }
 
   const QString parentFolderName{QFileInfo(filesIn).baseName()};
   const QString outputLargeTsFileName{parentFolderName + ".ts"};
   if (dir.exists(outputLargeTsFileName)) {
-    qWarning("Output file already exist, skip merge into[%s]", qPrintable(outputLargeTsFileName));
+    LOG_W("Output file already exist, skip merge into[%s]", qPrintable(outputLargeTsFileName));
     return {false, ""};
   }
 
   const QString tempListFileName{parentFolderName + ".txt"};
   QFile tempListFile(dir.absoluteFilePath(tempListFileName));
   if (!tempListFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qDebug("Open temp list file to write ts files failed", tempListFile.fileName());
+    LOG_D("Open temp list file to write ts files failed", tempListFile.fileName());
     return {false, ""};
   }
   QTextStream stream(&tempListFile);
@@ -82,15 +83,15 @@ std::pair<bool, QString> mergeTsFiles(const QString& filesIn, const QStringList&
   ffmpeg.start("ffmpeg", args);
   const bool mergeRet = ffmpeg.waitForFinished(); // block and wait for finish
   if (!mergeRet) {
-    qDebug("[Failed] Merge %d ts file(s) into a large ts file[%s]", tsNames.size(), qPrintable(outputTsAbsPath));
+    LOG_D("[Failed] Merge %d ts file(s) into a large ts file[%s]", tsNames.size(), qPrintable(outputTsAbsPath));
     return {false, ""};
   }
 
   if (!tempListFile.remove()) {
-    qWarning("Remove temp list file[%s] failed", qPrintable(tempListFile.fileName()));
+    LOG_W("Remove temp list file[%s] failed", qPrintable(tempListFile.fileName()));
     return {true, outputTsAbsPath};
   }
-  qDebug("[Ok] Merge %d ts file(s) into a large ts file[%s]", tsNames.size(), qPrintable(outputTsAbsPath));
+  LOG_D("[Ok] Merge %d ts file(s) into a large ts file[%s]", tsNames.size(), qPrintable(outputTsAbsPath));
   return {true, outputTsAbsPath};
 }
 

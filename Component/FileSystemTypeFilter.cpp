@@ -1,8 +1,7 @@
 #include "FileSystemTypeFilter.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
-
-#include <QDebug>
+#include "Logger.h"
 #include <QSplitter>
 
 const QDir::Filters FileSystemTypeFilter::DEFAULT_FILTER_FLAG{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
@@ -50,9 +49,9 @@ FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
 
   fileTypeFilterMenu->setToolTipsVisible(true);
 
-  qDebug() << "Stored switch on: " << FILTER_SWITCH->isChecked() << ", flags:" << m_flagWhenFilterEnabled;
+  LOG_D("Stored switch on: %d, flags: %d", FILTER_SWITCH->isChecked(), (int)m_flagWhenFilterEnabled);
   // restore Checkable / checked / Enabled;
-  for (QAction* typeAct : m_FILTER_FLAG_AGS->actions()) {
+  foreach (QAction* typeAct, m_FILTER_FLAG_AGS->actions()) {
     typeAct->setCheckable(true);
     typeAct->setChecked(m_text2FilterFlag[typeAct->text()] & m_flagWhenFilterEnabled);
   }
@@ -64,11 +63,11 @@ FileSystemTypeFilter::FileSystemTypeFilter(QWidget* parent)
 
 void FileSystemTypeFilter::BindFileSystemModel(QFileSystemModel* newModel) {
   if (newModel == nullptr) {
-    qWarning("skip. don't try to bind a nullptr");
+    LOG_W("skip. don't try to bind a nullptr");
     return;
   }
   if (_fsmModel != nullptr) {
-    qWarning("skip. don't try to rebind");
+    LOG_W("skip. don't try to rebind");
   }
   m_modelType = MODEL_TYPE::FILE_SYSTEM_MODEL;
   _fsmModel = newModel;
@@ -86,11 +85,11 @@ void FileSystemTypeFilter::BindFileSystemModel(QFileSystemModel* newModel) {
 
 void FileSystemTypeFilter::BindFileSystemModel(AdvanceSearchModel* newModel, SearchProxyModel* newProxyModel) {
   if (newModel == nullptr || newProxyModel == nullptr) {
-    qWarning("skip. newModel is nullptr");
+    LOG_W("skip. newModel is nullptr");
     return;
   }
   if (_searchSourceModel != nullptr || _searchProxyModel != nullptr) {
-    qWarning("Skip. reject rebind.");
+    LOG_W("Skip. reject rebind.");
     return;
   }
   m_modelType = MODEL_TYPE::SEARCH_MODEL;
@@ -121,7 +120,7 @@ void FileSystemTypeFilter::onSwitchChanged(bool isOn) {
   } else {  // recover last flag
     setFilterAgent(m_flagWhenFilterEnabled);
   }
-  qDebug() << "Save switch on: " << isOn << ". Keep flags:" << m_flagWhenFilterEnabled;
+  LOG_D("Save switch on: %d. Keep flags: %d", isOn, (int)m_flagWhenFilterEnabled);
 }
 
 void FileSystemTypeFilter::onGrayOrHideChanged(bool isGray) {
@@ -142,7 +141,7 @@ void FileSystemTypeFilter::onTypeChecked(QAction* act) {
   if (FILTER_SWITCH->isChecked()) {  // take into effect only switch is on. Record changes even switch is off
     setFilterAgent(m_flagWhenFilterEnabled);
   }
-  qDebug() << "Keep switch on: " << FILTER_SWITCH->isChecked() << ". Save flags:" << m_flagWhenFilterEnabled;
+  LOG_D("Keep switch on: %d. Save flags: %d", FILTER_SWITCH->isChecked(), (int)m_flagWhenFilterEnabled);
 }
 
 QDir::Filters FileSystemTypeFilter::filterAgent() const {
@@ -152,7 +151,7 @@ QDir::Filters FileSystemTypeFilter::filterAgent() const {
     case SEARCH_MODEL:
       return _searchSourceModel->filter();
     default:
-      qDebug("invalid Model. return default filter");
+      LOG_D("invalid Model. return default filter");
       return QDir::Filter::NoFilter;
   }
 }
@@ -166,7 +165,7 @@ void FileSystemTypeFilter::setFilterAgent(QDir::Filters filters) {
       _searchSourceModel->setFilter(filters);
       return;
     default:
-      qDebug("invalid Model. not setFilterAgent");
+      LOG_D("invalid Model. not setFilterAgent");
       return;
   }
 }
@@ -181,7 +180,7 @@ void FileSystemTypeFilter::initFilterAgent(QDir::Filters filters) {
       _searchSourceModel->initFilter(filters);
       return;
     default:
-      qDebug("invalid Model. not initFilterAgent");
+      LOG_D("invalid Model. not initFilterAgent");
       return;
   }
 }
@@ -195,7 +194,7 @@ void FileSystemTypeFilter::initNameFilterDisablesAgent(bool enable) {
       _searchProxyModel->initNameFilterDisables(enable);
       return;
     default:
-      qDebug("invalid Model. not setNameFilterDisable");
+      LOG_D("invalid Model. not setNameFilterDisable");
       return;
   }
 }
@@ -209,7 +208,7 @@ void FileSystemTypeFilter::setNameFilterDisablesAgent(bool enable) {
       _searchProxyModel->setNameFilterDisables(enable);
       return;
     default:
-      qDebug("invalid Model. not setNameFilterDisable");
+      LOG_D("invalid Model. not setNameFilterDisable");
       return;
   }
 }

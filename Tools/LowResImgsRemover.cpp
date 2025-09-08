@@ -3,7 +3,7 @@
 #include <QFileInfo>
 #include <QHash>
 #include "PublicTool.h"
-#include "PublicVariable.h"
+#include "JsonRenameRegex.h"
 #include "StringTool.h"
 #include "UndoRedo.h"
 
@@ -38,14 +38,14 @@ QStringList LowResImgsRemover::GetLowResImgsToDel(const QStringList& imgs) const
 
 int LowResImgsRemover::operator()(const QString& imgPath) {
   if (!QFileInfo{imgPath}.isDir()) {
-    qWarning("Path[%s] is not a directory", qPrintable(imgPath));
+    LOG_W("Path[%s] is not a directory", qPrintable(imgPath));
     return -1;
   }
   QDir dir{imgPath};
   dir.setFilter(QDir::Filter::Files);
   const auto& imgsToDel = GetLowResImgsToDel(dir.entryList());
   if (imgsToDel.isEmpty()) {
-    qDebug("No image differ by resolution need delete");
+    LOG_D("No image differ by resolution need delete");
     return 0;
   }
 
@@ -55,7 +55,7 @@ int LowResImgsRemover::operator()(const QString& imgPath) {
     removeCmds.append(ACMD::GetInstMOVETOTRASH(imgPath, nm));
   }
   bool bAllSucceed = g_undoRedo.Do(removeCmds);
-  qDebug("delete %d images items, bAllSucceed[%d]", imgsToDel.size(), bAllSucceed);
+  LOG_D("delete %d images items, bAllSucceed[%d]", imgsToDel.size(), bAllSucceed);
   return imgsToDel.size();
 }
 

@@ -4,6 +4,7 @@
 #include "PublicTool.h"
 #include "PublicVariable.h"
 #include "StringTool.h"
+#include "Logger.h"
 #include <QDir>
 
 using namespace ItemsPileCategory;
@@ -123,7 +124,7 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
     StringTool::ImgsSortNameLengthFirst(imgs);
   }
 
-  qDebug("%d,%d,%d piles of img/vid/json found from %d item(s) given", m_img2Name.size(), m_vid2Name.size(), m_json2Name.size(), files.size());
+  LOG_D("%d,%d,%d piles of img/vid/json found from %d item(s) given", m_img2Name.size(), m_vid2Name.size(), m_json2Name.size(), files.size());
   return batches;
 }
 

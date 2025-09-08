@@ -16,7 +16,7 @@ DropdownToolButton::DropdownToolButton(QList<QAction*> dropdownActions,         
 
   QMenu* pDropdownMenu{new (std::nothrow) QMenu{this}};
   if (pDropdownMenu == nullptr) {
-    qCritical("pDropdownMenu is nullptr");
+    LOG_C("pDropdownMenu is nullptr");
     return;
   }
   for (auto* pAct : dropdownActions) {
@@ -46,7 +46,7 @@ bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
   auto* pMenu = menu();
   const auto& actsList = pMenu->actions();
   if (actsList.isEmpty()) {
-    qWarning("No actions found");
+    LOG_W("No actions found");
     return false;
   }
   foreach(QAction* act, actsList) {
@@ -55,7 +55,7 @@ bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
       return true;
     }
   }
-  qWarning("default action not find by memoryValue[%s] from %d actions",//
+  LOG_W("default action not find by memoryValue[%s] from %d actions",//
          qPrintable(memoryValue), actsList.size());
   setDefaultAction(actsList.front());
   return false;
@@ -63,7 +63,7 @@ bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
 
 void DropdownToolButton::onToolButtonActTriggered(QAction* pAct) {
   if (pAct == nullptr) {
-    qCritical("pAct is nullptr");
+    LOG_C("pAct is nullptr");
     return;
   }
   setDefaultAction(pAct);

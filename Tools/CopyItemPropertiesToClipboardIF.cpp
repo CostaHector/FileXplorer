@@ -1,20 +1,20 @@
 #include "CopyItemPropertiesToClipboardIF.h"
 #include "FdBasedDbModel.h"
-
+#include "Logger.h"
 #include <QFileSystemModel>
 #include <QApplication>
 #include <QClipboard>
 
 auto CopyItemPropertiesToClipboardIF::PathCopyTriple(const QStringList& lst, const QString& opName) -> bool {
   if (lst.isEmpty()) {
-    qDebug("NOTHING %s copied. clipboard state kept.", qPrintable(opName));
+    LOG_D("NOTHING %s copied. clipboard state kept.", qPrintable(opName));
     return true;
   }
   const QString& msg = QString("[%1] letter(s) has been [%2].").arg(lst.size()).arg(opName);
   const QString& copiedStr = lst.join('\n');
   auto* cb = QApplication::clipboard();
   cb->setText(copiedStr, QClipboard::Mode::Clipboard);
-  qDebug("%s", qPrintable(msg));
+  LOG_D("%s", qPrintable(msg));
   return true;
 }
 

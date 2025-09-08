@@ -3,6 +3,7 @@
 #include "SceneMixed.h"
 #include "JsonHelper.h"
 #include "PathTool.h"
+#include "Logger.h"
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
@@ -27,7 +28,7 @@ SceneSortOption GetSortOptionFromStr(const QString& sortOption) {
 
 SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter, const QString& pattern, SCENES_TYPE* pScnFiltered) {
   if (!QFileInfo(path).isDir()) {
-    qDebug("path[%s] is not a directory", qPrintable(path));
+    LOG_D("path[%s] is not a directory", qPrintable(path));
     return {};
   }
   const bool needFilter{enableFilter && pScnFiltered != nullptr && !pattern.isEmpty()};
@@ -48,13 +49,13 @@ SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter, cons
   if (pScnFiltered != nullptr) {
     scnFilteredCnt = pScnFiltered->size();
   }
-  qDebug("%d total, %d filtered scenes get from %d *.scn file(s)", scnTotals.size(), scnFilteredCnt, scnFilesCnt);
+  LOG_D("%d total, %d filtered scenes get from %d *.scn file(s)", scnTotals.size(), scnFilteredCnt, scnFilesCnt);
   return scnTotals;
 }
 
 SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey, const bool reverse) {
   if ((char)sortByKey >= (int)SceneSortOption::BUTT) {
-    qWarning("key[%d] used to sort is out of bound[%d]", (char)sortByKey, (char)SceneSortOption::BUTT);
+    LOG_W("key[%d] used to sort is out of bound[%d]", (char)sortByKey, (char)SceneSortOption::BUTT);
     return scenes;
   }
   static const std::function<bool(const SCENE_INFO&, const SCENE_INFO&)> sortedMap[2][(int)SceneSortOption::BUTT] = {
@@ -71,12 +72,12 @@ SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey, const bool rev
 SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, bool enableFilter, const QString& pattern, SCENES_TYPE* pFilterd) {
   QFile scnFi{scnFileFullPath};
   if (!scnFi.exists()) {
-    qDebug("scn file[%s] not exist", qPrintable(scnFileFullPath));
+    LOG_D("scn file[%s] not exist", qPrintable(scnFileFullPath));
     return {};
   }
 
   if (!scnFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qCritical("Open scn file[%s] to read failed", qPrintable(scnFi.fileName()));
+    LOG_C("Open scn file[%s] to read failed", qPrintable(scnFi.fileName()));
     return {};
   }
   QTextStream stream(&scnFi);
@@ -90,13 +91,13 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, boo
   while (!stream.atEnd()) {
     // name
     if (!stream.readLineInto(&aScene.name, 256)) {
-      qWarning("read name line failed");
+      LOG_W("read name line failed");
       return {};
     }
     // images list: a.jpg|a 2.png|a 4.webp
     QString imgsSeperatedByVerticalBar;
     if (!stream.readLineInto(&imgsSeperatedByVerticalBar)) {
-      qWarning("read imgs line failed");
+      LOG_W("read imgs line failed");
       return {};
     }
     aScene.imgs.clear();
@@ -105,38 +106,38 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, boo
     }
     // Video Name: video.mp4
     if (!stream.readLineInto(&aScene.vidName, 256)) {
-      qWarning("read video name line failed");
+      LOG_W("read video name line failed");
       return {};
     }
     // Video Size: 10240kByte
     QString vidSizeStr;
     if (!stream.readLineInto(&vidSizeStr, 20)) {
-      qWarning("read video size line failed");
+      LOG_W("read video size line failed");
       return {};
     }
     bool isVidSizeStrNum{false};
     aScene.vidSize = vidSizeStr.toLongLong(&isVidSizeStrNum);
     if (!isVidSizeStrNum) {
-      qWarning("Video size string[%s] is not a number.", qPrintable(vidSizeStr));
+      LOG_W("Video size string[%s] is not a number.", qPrintable(vidSizeStr));
       aScene.vidSize = 0;
       return {};
     }
     // Rate: 10'
     QString rateStr;
     if (!stream.readLineInto(&rateStr, 5)) {
-      qWarning("read rate line failed");
+      LOG_W("read rate line failed");
       return {};
     }
     bool isRateStrNum = false;
     aScene.rate = rateStr.toLongLong(&isRateStrNum);
     if (!isRateStrNum) {
-      qWarning("Rate string[%s] is not a number.", qPrintable(rateStr));
+      LOG_W("Rate string[%s] is not a number.", qPrintable(rateStr));
       aScene.rate = 0;
       return {};
     }
     // uploaded time: 2024/12/12 12:50:50
     if (!stream.readLineInto(&aScene.uploaded, 32)) {
-      qWarning("Uploaded time read failed.");
+      LOG_W("Uploaded time read failed.");
       return {};
     }
 
@@ -146,13 +147,13 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, boo
     }
   }
   scnFi.close();
-  qDebug("Read %d scenes out from file[%s] succeed", scenesList.size(), qPrintable(scnFileFullPath));
+  LOG_D("Read %d scenes out from file[%s] succeed", scenesList.size(), qPrintable(scnFileFullPath));
   return scenesList;
 }
 
 std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const QList<QVariantHash>& jsonDicts) {
   if (jsonNames.size() != jsonDicts.size()) {
-    qWarning("json file name count:%d, dict count:%d", jsonNames.size(), jsonDicts.size());
+    LOG_W("json file name count:%d, dict count:%d", jsonNames.size(), jsonDicts.size());
     return std::pair<QString, int>{"", -1};
   }
   int jsonUsedCnt = 0;
@@ -161,7 +162,7 @@ std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const Q
     const QVariantHash& rawJsonDict = jsonDicts[i];
     const QString& jsonFileName = jsonNames[i];
     if (rawJsonDict.isEmpty()) {
-      qDebug("Json dict[%s] may corrupt.", qPrintable(jsonFileName));
+      LOG_D("Json dict[%s] may corrupt.", qPrintable(jsonFileName));
       continue;
     }
     scnContent += rawJsonDict.value("Name", "").toString();
@@ -183,7 +184,7 @@ std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const Q
 
 bool GenerateAScnFile(const QString& aPath) {
   if (!QFileInfo(aPath).isDir()) {
-    qDebug("path[%s] is not a directory", qPrintable(aPath));
+    LOG_D("path[%s] is not a directory", qPrintable(aPath));
     return false;
   }
 
@@ -198,7 +199,7 @@ bool GenerateAScnFile(const QString& aPath) {
   int jsonUsedCnt = 0;
   QString scnContent;
   std::tie(scnContent, jsonUsedCnt) = GetScnFileContents(jsonNames, jsonDicts);
-  qDebug("%d json(s) under[%s] are found to generate a scn file", jsonUsedCnt, qPrintable(aPath));
+  LOG_D("%d json(s) under[%s] are found to generate a scn file", jsonUsedCnt, qPrintable(aPath));
 
   if (jsonUsedCnt == 0 || scnContent.isEmpty()) {
     return false;
@@ -206,7 +207,7 @@ bool GenerateAScnFile(const QString& aPath) {
 
   QFile scnFi{aPath + '/' + PathTool::fileName(aPath) + ".scn"};
   if (!scnFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qCritical("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
+    LOG_C("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
     return false;
   }
 
@@ -219,7 +220,7 @@ bool GenerateAScnFile(const QString& aPath) {
 
 int GenerateScnFilesDirectly(const QString& rootPath) {
   if (!QFileInfo(rootPath).isDir()) {
-    qDebug("path[%s] is not a directory", qPrintable(rootPath));
+    LOG_D("path[%s] is not a directory", qPrintable(rootPath));
     return -1;
   }
 
@@ -233,7 +234,7 @@ int GenerateScnFilesDirectly(const QString& rootPath) {
   if (GenerateAScnFile(rootPath)) {
     ++scnFilesGeneratedCnt;
   }
-  qDebug("%d scn file(s) generated/updated under path[%s]", scnFilesGeneratedCnt, qPrintable(rootPath));
+  LOG_D("%d scn file(s) generated/updated under path[%s]", scnFilesGeneratedCnt, qPrintable(rootPath));
   return scnFilesGeneratedCnt;
 }
 
@@ -250,13 +251,13 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     const QString jPath = path + '/' + jsFileIt.value();
     QVariantHash rawJsonDict = JsonHelper::MovieJsonLoader(jPath);
     if (rawJsonDict.isEmpty()) {
-      qWarning("json file[%s] may corrupt read failed", qPrintable(jPath));
+      LOG_W("json file[%s] may corrupt read failed", qPrintable(jPath));
       continue;
     }
 
     QVariantHash::iterator it = rawJsonDict.find("Name");
     if (it == rawJsonDict.cend()) {
-      qDebug("This json file[%s] is not we want", qPrintable(jPath));
+      LOG_D("This json file[%s] is not we want", qPrintable(jPath));
       continue;
     }
 
@@ -337,7 +338,7 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
 
 int JsonDataRefresher::operator()(const QString& rootPath) {  // will iterate all sub
   if (!QFileInfo(rootPath).isDir()) {
-    qDebug("Not an existed directory[%s]", qPrintable(rootPath));
+    LOG_D("Not an existed directory[%s]", qPrintable(rootPath));
     return -1;
   }
   QDirIterator folderIt{rootPath, {}, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
@@ -345,7 +346,7 @@ int JsonDataRefresher::operator()(const QString& rootPath) {  // will iterate al
     UpdateAFolderItself(folderIt.next());
   }
   UpdateAFolderItself(rootPath);
-  qDebug("%d useful json file(s) founded, %d json file(s) updated from %d folder(s) In path[%s]", m_usefullJsonCnt, m_updatedJsonFilesCnt, m_jsonsDicts.size(), qPrintable(rootPath));
+  LOG_D("%d useful json file(s) founded, %d json file(s) updated from %d folder(s) In path[%s]", m_usefullJsonCnt, m_updatedJsonFilesCnt, m_jsonsDicts.size(), qPrintable(rootPath));
   return m_updatedJsonFilesCnt;
 }
 
@@ -374,7 +375,7 @@ int JsonDataRefresher::GenerateScnFiles() {
       scnContent += '\n';
       ++usefullJsonCnt;
     }
-    qDebug("%d json(s) under[%s] are found to generate a scn file", usefullJsonCnt, qPrintable(path2Jsons));
+    LOG_D("%d json(s) under[%s] are found to generate a scn file", usefullJsonCnt, qPrintable(path2Jsons));
     if (usefullJsonCnt <= 0) {
       return false;
     }
@@ -383,7 +384,7 @@ int JsonDataRefresher::GenerateScnFiles() {
     }
     QFile scnFi{path2Jsons + '/' + PathTool::fileName(path2Jsons) + ".scn"};
     if (!scnFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      qCritical("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
+      LOG_C("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
       return false;
     }
     QTextStream stream(&scnFi);
@@ -392,6 +393,6 @@ int JsonDataRefresher::GenerateScnFiles() {
     scnFi.close();
     ++scnFilesGeneratedCnt;
   }
-  qDebug("%d scn file(s) generated above", scnFilesGeneratedCnt);
+  LOG_D("%d scn file(s) generated above", scnFilesGeneratedCnt);
   return scnFilesGeneratedCnt;
 }

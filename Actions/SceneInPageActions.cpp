@@ -59,12 +59,12 @@ bool SceneInPageActions::InitWidget() {
   }
   mOrderTB = GetOrderToolBar();
   if (mOrderTB == nullptr) {
-    qWarning("mOrderTB is nullptr");
+    LOG_W("mOrderTB is nullptr");
     return false;
   }
   mEnablePageTB = GetPagesRowByColumnToolBar();
   if (mEnablePageTB == nullptr) {
-    qWarning("mEnablePageTB is nullptr");
+    LOG_W("mEnablePageTB is nullptr");
     return false;
   }
   return true;

@@ -44,15 +44,15 @@ DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)                          //
   mDb{SystemPath::DEVICES_AND_DRIVES_DATABASE, "DeviceAndDriverConn"}  //
 {
   if (!mDb.CreateDatabase()) {
-    qWarning("CreateDatabase failed");
+    LOG_W("CreateDatabase failed");
     return;
   }
   if (!mDb.CreateTable(DB_TABLE::DISKS, DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE)) {
-    qWarning("CreateTable failed");
+    LOG_W("CreateTable failed");
     return;
   }
   if (mDb.InitDeviceAndDriver(DB_TABLE::DISKS) < FD_OK) {
-    qWarning("InitDeviceAndDriver failed");
+    LOG_W("InitDeviceAndDriver failed");
     return;
   }
   auto con = mDb.GetDb();
@@ -133,7 +133,7 @@ void DevicesDrivesTV::onMountADriver() {
   LOG_GOOD_P("Mount Volume(s) ok", "guid:%s label:%s, volMountPoint:%s", qPrintable(guid), qPrintable(label), qPrintable(volMountPoint));
   auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), volMountPoint);
   auto submitRet = mDevModel->submitAll();
-  qDebug("setData:%d, submitAll: %d", setRet, submitRet);
+  LOG_D("setData:%d, submitAll: %d", setRet, submitRet);
 }
 
 void DevicesDrivesTV::onUnmountADriver() {
@@ -153,7 +153,7 @@ void DevicesDrivesTV::onUnmountADriver() {
   LOG_GOOD_P("Unmount Ok", "Unmount Volume(s)[%s] from pnt:%s", qPrintable(guid), qPrintable(mountedPnt));
   auto setRet = mDevModel->setData(index.siblingAtColumn(MOUNT_POINT), "");
   auto submitRet = mDevModel->submitAll();
-  qDebug("setData:%d, submitAll: %d", setRet, submitRet);
+  LOG_D("setData:%d, submitAll: %d", setRet, submitRet);
 }
 
 void DevicesDrivesTV::onAdtADriver() {
@@ -166,7 +166,7 @@ void DevicesDrivesTV::onAdtADriver() {
   LOG_BAD_P("Adt Volume(s) FAILED", "guid[%s]\nrootPath[%s]", qPrintable(guid), qPrintable(rootPath));
   auto setRet = mDevModel->setData(index.siblingAtColumn(ADT_TIME), QDateTime::currentMSecsSinceEpoch());
   auto submitRet = mDevModel->submitAll();
-  qDebug("setData:%d, submitAll: %d", setRet, submitRet);
+  LOG_D("setData:%d, submitAll: %d", setRet, submitRet);
 }
 
 void DevicesDrivesTV::subscribe() {

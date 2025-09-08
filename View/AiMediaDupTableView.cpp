@@ -30,7 +30,7 @@ AiMediaDupTableView::AiMediaDupTableView(QWidget* parent) : CustomTableView{"Lef
 
 void AiMediaDupTableView::LoadAiMediaTableNames() {
   if (m_aiMediaTblModel == nullptr) {
-    qWarning("m_aiMediaTblModel is nullptr");
+    LOG_W("m_aiMediaTblModel is nullptr");
     return;
   }
   auto& aimd = AIMediaDuplicate::GetInst();
@@ -74,7 +74,7 @@ void AiMediaDupTableView::subscribe() {
   if (g_dupVidFinderAg().tblKWFilter != nullptr) {
     connect(g_dupVidFinderAg().tblKWFilter, &QLineEdit::textChanged, this, [this](const QString& kw) -> void { m_sortProxy->setFilterWildcard(kw); });
   } else {
-    qWarning("tblKWFilter is nullptr");
+    LOG_W("tblKWFilter is nullptr");
   }
 
   connect(g_dupVidFinderAg().SCAN_A_PATH, &QAction::triggered, this, &AiMediaDupTableView::onScanAPath);
@@ -105,7 +105,7 @@ void AiMediaDupTableView::subscribe() {
         QMessageBox::warning(this, "Drop & Rebuild selected tables?", "If disk is offline, only table fields can rebuild, records cannot",
                              QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
-      qDebug("User has cancel drop&rebuild table");
+      LOG_D("User has cancel drop&rebuild table");
       return;
     }
     const int tblCnt = aimd.RebuildTables(GetSelectedAiTables(), false);
@@ -123,7 +123,7 @@ void AiMediaDupTableView::subscribe() {
     }
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
     if (!openRet) {
-      qWarning("Open path[%s] failed", qPrintable(pth));
+      LOG_W("Open path[%s] failed", qPrintable(pth));
     }
   });
 }

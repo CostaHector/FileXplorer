@@ -2,6 +2,8 @@
 #define ONCHECKEDPOPUPORHIDEAWIDGET_H
 
 #include <QWidget>
+#include "Logger.h"
+
 template <typename WIDGET_TYPE>
 WIDGET_TYPE* PopupHideWidget(WIDGET_TYPE* p, const bool checked, QWidget* parent = nullptr) {
   if (!checked) {
@@ -14,7 +16,7 @@ WIDGET_TYPE* PopupHideWidget(WIDGET_TYPE* p, const bool checked, QWidget* parent
     p = new (std::nothrow) WIDGET_TYPE{parent};
   }
   if (p == nullptr) {
-    qCritical("WIDGET_TYPE* p is nullptr");
+    LOG_C("WIDGET_TYPE* p is nullptr");
     return nullptr;
   }
 

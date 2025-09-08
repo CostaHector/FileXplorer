@@ -46,7 +46,7 @@ bool View::onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseBu
 
 void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
   if (view == nullptr) {
-    qDebug("UpdateItemViewFontSizeCore view* pointer is nullptr");
+    LOG_D("UpdateItemViewFontSizeCore view* pointer is nullptr");
     return;
   }
   const auto fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
@@ -60,7 +60,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
     return true;
   }
   const QList<QUrl>& urls = data->urls();
-  qWarning("DropAction[%d] %d item(s) will be dropped in path[%s].", action, urls.size(), qPrintable(dest));
+  LOG_W("DropAction[%d] %d item(s) will be dropped in path[%s].", action, urls.size(), qPrintable(dest));
   using namespace ComplexOperation;
   int ret = DoDropAction(action, urls, dest, ComplexOperation::FILE_STRUCTURE_MODE::PRESERVE);
   if (ret < 0) {
@@ -103,13 +103,13 @@ void View::changeDropAction(QDropEvent* event) {
 void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
   auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
-    qDebug("m_fsm is nullptr");
+    LOG_D("m_fsm is nullptr");
     return;
   }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
   if (!(m_fsm->canItemsBeDragged(ind) || m_fsm->canItemsDroppedHere(ind))) {
-    qDebug("reject drag/drop not allowed.");
+    LOG_D("reject drag/drop not allowed.");
     m_fsm->DragRelease();
     event->ignore();
     return;
@@ -122,13 +122,13 @@ void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
 void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
   auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
-    qDebug("m_fsm is nullptr");
+    LOG_D("m_fsm is nullptr");
     return;
   }
   const QPoint& pnt = event->pos();
   const QModelIndex& ind = view->indexAt(pnt);
   if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedRows().contains(ind))) {
-    qDebug("reject drag and move. not allowed or self drop");
+    LOG_D("reject drag and move. not allowed or self drop");
     m_fsm->DragRelease();
     event->ignore();
     return;
@@ -143,7 +143,7 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
   // So no need to get from mimedata.data("Preferred DropEffect").
   auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
-    qDebug("m_fsm is nullptr");
+    LOG_D("m_fsm is nullptr");
     return;
   }
   m_fsm->DragRelease();
@@ -151,7 +151,7 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
   const QModelIndex& ind = view->indexAt(pnt);
   // allowed dropped and not contains
   if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedRows().contains(ind))) {
-    qDebug("reject drop here. not allowed or self drop");
+    LOG_D("reject drop here. not allowed or self drop");
     event->ignore();
     return;
   }
@@ -160,13 +160,13 @@ void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
   // otherwise. accept() and True return here
   View::changeDropAction(event);
   onDropMimeData(event->mimeData(), event->dropAction(), ind.isValid() ? m_fsm->filePath(ind) : m_fsm->rootPath());
-  qDebug("DropEvent[%d] finished with %d url(s)", event->dropAction(), event->mimeData()->urls().size());
+  LOG_D("DropEvent[%d] finished with %d url(s)", event->dropAction(), event->mimeData()->urls().size());
 }
 
 void View::dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
   auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
   if (m_fsm == nullptr) {
-    qDebug("m_fsm is nullptr");
+    LOG_D("m_fsm is nullptr");
     return;
   }
   m_fsm->DragRelease();
@@ -186,7 +186,7 @@ void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
   for (const QModelIndex& ind : rows) {
     urls.append(QUrl::fromLocalFile(m_fsm->filePath(ind)));
   }
-  qDebug("drags %d rows", urls.size());
+  LOG_D("drags %d rows", urls.size());
   QMimeData* mime = new (std::nothrow) QMimeData;
   mime->setUrls(urls);
 

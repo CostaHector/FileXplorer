@@ -94,7 +94,7 @@ void DatabaseSearchToolBar::onQuickWhereClause() {
     return;
   }
   const QString& whereClause {m_quickWhereClause->GetWhereString()};
-  qDebug("QuickWhereClause: [%s]", qPrintable(whereClause));
+  LOG_D("QuickWhereClause: [%s]", qPrintable(whereClause));
   SetWhereClause(whereClause);
   emit whereClauseChanged(whereClause);
 }
@@ -106,7 +106,7 @@ void DatabaseSearchToolBar::subscribe() {
 
 void DatabaseSearchToolBar::EmitWhereClauseChangedSignal() {
   const QString& clause = GetCurrentWhereClause();
-  qDebug("WhereClauseChanged signal[%s]", qPrintable(clause));
+  LOG_D("WhereClauseChanged signal[%s]", qPrintable(clause));
   emit whereClauseChanged(clause);
 }
 
@@ -175,7 +175,7 @@ void MovieDBSearchToolBar::InitTables(const QStringList& tbls) {
   for (const QString& tableName : tbls) {  // in underscore
     m_tablesCB->AddItem(tableName, guidTblName2Disp.value(tableName, "displace name NOT FOUND"));
   }
-  qDebug("Tables count:%d", tbls.size());
+  LOG_D("Tables count:%d", tbls.size());
 }
 
 void MovieDBSearchToolBar::InitCurrentIndex() {

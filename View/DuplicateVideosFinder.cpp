@@ -50,7 +50,7 @@ void RightDuplicateDetails::on_effectiveNameCopiedForEverything(const QModelInde
   const QString& name = m_detailsModel->fileNameEverything(srcIndex);
   auto* cb = QApplication::clipboard();
   if (cb == nullptr) {
-    qWarning("cb is nullptr, Copy[%s] failed", qPrintable(name));
+    LOG_W("cb is nullptr, Copy[%s] failed", qPrintable(name));
     return;
   }
   cb->setText(name, QClipboard::Mode::Clipboard);
@@ -70,7 +70,7 @@ void RightDuplicateDetails::setSharedMember(CLASSIFIED_SORT_LIST_2D* pClassified
 void RightDuplicateDetails::onRecycleSelection() {
   const int SELECTED_CNT = selectionModel()->selectedRows().size();
   if (SELECTED_CNT < 1) {
-    qDebug("nothing selected to recycle");
+    LOG_D("nothing selected to recycle");
     return;
   }
   using namespace FileOperatorType;
@@ -81,7 +81,7 @@ void RightDuplicateDetails::onRecycleSelection() {
     recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_detailsModel->filePath(srcInd)));
   }
   auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
-  qDebug("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
+  LOG_D("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
 }
 
 void RightDuplicateDetails::subscribe() {
@@ -154,7 +154,7 @@ void DuplicateVideosFinder::keyPressEvent(QKeyEvent* e) {
   if (e->modifiers() == Qt::KeyboardModifier::ControlModifier && e->key() == Qt::Key_Insert) {
     const QModelIndex& playInd = m_details->currentIndex();
     if (!playInd.isValid()) {
-      qWarning("invalid index ignore copy everything name");
+      LOG_W("invalid index ignore copy everything name");
       return;
     }
     m_details->on_effectiveNameCopiedForEverything(playInd);
@@ -165,7 +165,7 @@ void DuplicateVideosFinder::keyPressEvent(QKeyEvent* e) {
       case Qt::KeyboardModifier::NoModifier: {
         const QModelIndex& playInd = m_details->currentIndex();
         if (!playInd.isValid()) {
-          qWarning("playInd is invalid");
+          LOG_W("playInd is invalid");
           return;
         }
         emit m_details->doubleClicked(m_details->currentIndex());
@@ -174,12 +174,12 @@ void DuplicateVideosFinder::keyPressEvent(QKeyEvent* e) {
       case Qt::KeyboardModifier::ShiftModifier: {
         const QModelIndex& bef = m_dupList->currentIndex();
         if (not bef.isValid()) {
-          qWarning("before index is invalid");
+          LOG_W("before index is invalid");
           return;
         }
         const QModelIndex& aft = m_dupList->model()->index(bef.row() + 1, bef.column());
         if (not aft.isValid()) {
-          qWarning("after index is invalid");
+          LOG_W("after index is invalid");
           return;
         }
         m_dupList->setCurrentIndex(aft);
@@ -195,7 +195,7 @@ void DuplicateVideosFinder::keyPressEvent(QKeyEvent* e) {
 
 bool DuplicateVideosFinder::TablesGroupChangedTo(const QStringList& tbls) {
   if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
-    qWarning("Duplicate list or its model is nullptr");
+    LOG_W("Duplicate list or its model is nullptr");
     return false;
   }
   m_dupList->m_dupListModel->ChangeTableGroups(tbls);
@@ -225,7 +225,7 @@ void DuplicateVideosFinder::on_selectionChanged(const QModelIndex &current, cons
 
 void DuplicateVideosFinder::UpdateAiMediaTableNames() {
   if (m_aiTables == nullptr) {
-    qWarning("m_aiTables is nullptr");
+    LOG_W("m_aiTables is nullptr");
     return;
   }
   m_aiTables->LoadAiMediaTableNames();
@@ -248,7 +248,7 @@ void DuplicateVideosFinder::onCancelAnalyse() {
 
 void DuplicateVideosFinder::onDifferTypeChanged(QAction* newDifferAct) {
   if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
-    qWarning("Duplicate list or its model is nullptr when set differ by duration");
+    LOG_W("Duplicate list or its model is nullptr when set differ by duration");
     return;
   }
   m_dupList->clearSelection();
@@ -267,14 +267,14 @@ void DuplicateVideosFinder::onDifferTypeChanged(QAction* newDifferAct) {
 
 void DuplicateVideosFinder::onChangeSizeDeviation() {
   if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
-    qWarning("Duplicate list or its model is nullptr when onChangeSizeDeviation");
+    LOG_W("Duplicate list or its model is nullptr when onChangeSizeDeviation");
     return;
   }
   const QString& szDevStr = g_dupVidFinderAg().sizeDevLE->text();
   bool isIntValid = false;
   int dev = szDevStr.toInt(&isIntValid);
   if (not isIntValid or dev <= 0) {
-    qWarning("size str[%s] is not valid", qPrintable(szDevStr));
+    LOG_W("size str[%s] is not valid", qPrintable(szDevStr));
     return;
   }
   m_dupList->clearSelection();
@@ -284,14 +284,14 @@ void DuplicateVideosFinder::onChangeSizeDeviation() {
 }
 void DuplicateVideosFinder::onChangeDurationDeviation() {
   if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
-    qWarning("Duplicate list or its model is nullptr when onChangeDurationDeviation");
+    LOG_W("Duplicate list or its model is nullptr when onChangeDurationDeviation");
     return;
   }
   const QString& durDevStr = g_dupVidFinderAg().durationDevLE->text();
   bool isIntValid = false;
   int dev = durDevStr.toInt(&isIntValid);
   if (not isIntValid or dev <= 0) {
-    qWarning("duration str[%s] is not valid", qPrintable(durDevStr));
+    LOG_W("duration str[%s] is not valid", qPrintable(durDevStr));
     return;
   }
   m_dupList->clearSelection();

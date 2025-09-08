@@ -1,6 +1,6 @@
 #include "Notificator.h"
 #include "PublicMacro.h"
-#include "LogHandler.h"
+#include "Logger.h"
 #include <QProgressBar>
 #include <QGridLayout>
 #include <QLabel>
@@ -163,7 +163,7 @@ void Notificator::setProgressValue(int _value) {
 
 void Notificator::whenProgressFinished() {
   if (mTimeOutLen > 0) {
-    qWarning("It should freed by one time timer. not me");
+    LOG_W("It should freed by one time timer. not me");
     return;
   }
   QString finishedTitle = "[Finished] " + m_title->text();
@@ -206,7 +206,7 @@ bool Notificator::event(QEvent* event) {
       return true;
     }
     case QEvent::MouseButtonDblClick: {
-      LogHandler::OpenLogFile();
+      Logger::OpenLogFile();
       return true;
     }
     default:

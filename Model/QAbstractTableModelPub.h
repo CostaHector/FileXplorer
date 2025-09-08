@@ -2,6 +2,7 @@
 #define QABSTRACTTABLEMODELPUB_H
 
 #include <QAbstractTableModel>
+#include "Logger.h"
 
 class QAbstractTableModelPub : public QAbstractTableModel {
  public:
@@ -19,7 +20,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
   }
   void RowsCountEndChange() {
     if (!IsRowCntValid()) {
-      qWarning("row count[bef:%d, aft:%d] invalid", m_befRow, m_aftRow);
+      LOG_W("row count[bef:%d, aft:%d] invalid", m_befRow, m_aftRow);
       return;
     }
     if (m_befRow == m_aftRow) {
@@ -46,7 +47,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
   }
   void ColumnsCountEndChange() {
     if (!IsColCntValid()) {
-      qWarning("col count[bef:%d, aft:%d] invalid", m_befCol, m_aftCol);
+      LOG_W("col count[bef:%d, aft:%d] invalid", m_befCol, m_aftCol);
       return;
     }
     if (m_befCol == m_aftCol) {

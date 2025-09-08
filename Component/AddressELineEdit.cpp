@@ -58,7 +58,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
 auto AddressELineEdit::onPathActionTriggered(const QAction* cursorAt) -> void {
   const QString& rawPath = pathFromCursorAction(cursorAt);
   const QString fullPth {PathTool::StripTrailingSlash(rawPath)};
-  qDebug("Path triggered [%s]", qPrintable(fullPth));
+  LOG_D("Path triggered [%s]", qPrintable(fullPth));
   ChangePath(fullPth);
 }
 
@@ -69,7 +69,7 @@ void AddressELineEdit::onReturnPressed() {
 void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
   const QString& fullpath = PathTool::StripTrailingSlash(PathTool::normPath(newPath));
   pathComboBox->setCurrentText(fullpath);
-  qDebug("set Path [%s]", qPrintable(fullpath));
+  LOG_D("set Path [%s]", qPrintable(fullpath));
   m_pathActionsTB->clear();
 #ifdef WIN32
   m_pathActionsTB->addAction(QIcon{":img/FOLDER_OF_DRIVES"}, "");
@@ -89,7 +89,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
 #endif
     pathComboBox->setCurrentText(pth);
     const QString pathInexist{QString{"Return pressed with inexist path [%1]."}.arg(pth)};
-    qWarning("Into path[%s] failed", qPrintable(pathInexist));
+    LOG_W("Into path[%s] failed", qPrintable(pathInexist));
     QMessageBox::warning(this, "Into path failed", pathInexist);
     return false;
   }
@@ -97,7 +97,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   if (fi.isFile()) {
     pathComboBox->setCurrentText(pth);
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
-    qDebug("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
+    LOG_D("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
   } else {
     updateAddressToolBarPathActions(pth);
     emit pathActionsTriggeredOrLineEditReturnPressed(pth);
@@ -144,7 +144,7 @@ void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
   const QString& draggedEnterPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   View::changeDropAction(event);
   const QString& dragEnterMsg{RELEASE_HINT_MSG + draggedEnterPath};
-  qDebug("%s", qPrintable(dragEnterMsg));
+  LOG_D("%s", qPrintable(dragEnterMsg));
   QToolTip::showText(mapToGlobal(event->pos()), dragEnterMsg);
   event->accept();
 }
@@ -152,14 +152,14 @@ void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
 void AddressELineEdit::dropEvent(QDropEvent* event) {
   setCurrentWidget(m_pathActionsTB);
   const QString& to = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
-  qDebug("Drop items to path[%s]", qPrintable(to));
+  LOG_D("Drop items to path[%s]", qPrintable(to));
   View::onDropMimeData(event->mimeData(), event->dropAction(), to);
   QStackedWidget::dropEvent(event);
 }
 
 void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
   if (!event->mimeData()->hasUrls()) {
-    qDebug("no urls dragMoveEvent");
+    LOG_D("no urls dragMoveEvent");
     return;
   }
   const QString& droppedPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));

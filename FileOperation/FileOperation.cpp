@@ -34,7 +34,7 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
     if (!returnEle) {
       const QString& cmdStr{cmds.toStr(returnEle.ret)};
       if (b_fastFail) {
-        qCritical("[Error] Stop at the %dth cmd: %s", i + 1, qPrintable(cmdStr));
+        LOG_C("[Error] Stop at the %dth cmd: %s", i + 1, qPrintable(cmdStr));
         return {returnEle.ret, allRecoverList};
       }
       failedCmds += QString::number(i);
@@ -47,7 +47,7 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
   }
 
   if (failedCnt > 0) {
-    qCritical("\nFollowing %d command(s) failed:\n%s", failedCnt, qPrintable(failedCmds));
+    LOG_C("\nFollowing %d command(s) failed:\n%s", failedCnt, qPrintable(failedCmds));
     return {ErrorCode::EXEC_PARTIAL_FAILED, allRecoverList};
   }
   return {ErrorCode::OK, allRecoverList};
@@ -66,7 +66,7 @@ RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
   auto ret = file.moveToTrash();
   if (ret) {
     if (file.fileName().isEmpty()) {
-      qCritical("The file[%s] name in trashbin is not accessible", qPrintable(pth));
+      LOG_C("The file[%s] name in trashbin is not accessible", qPrintable(pth));
       return {UNKNOWN_ERROR, revertCmds};
     }
     revertCmds.append(ACMD::GetInstRENAME("", file.fileName(), pth));
@@ -410,7 +410,7 @@ RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
   }
   BATCH_COMMAND_LIST_TYPE revertCmds;
   if (!QDir{to}.mkpath(rel)) {
-    qWarning("Failed QDir(%s).mkpath(%s)", qPrintable(to), qPrintable(rel));
+    LOG_W("Failed QDir(%s).mkpath(%s)", qPrintable(to), qPrintable(rel));
     return {CANNOT_MAKE_PATH, revertCmds};
   }
   revertCmds.append(ACMD::GetInstRMPATH(to, rel));
@@ -430,7 +430,7 @@ RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
       if (dstFile.isDir() && srcFile.isDir()) {
         continue;
       }
-      qWarning("Conflict two item:\nsrc: %lld Byte(s)[%s]\ndst: %lld Byte(s)[%s]",  //
+      LOG_W("Conflict two item:\nsrc: %lld Byte(s)[%s]\ndst: %lld Byte(s)[%s]",  //
                srcFile.size(), qPrintable(fromPth),                                 //
                dstFile.size(), qPrintable(toPath));
       return {DST_FILE_ALREADY_EXIST, revertCmds};
@@ -438,13 +438,13 @@ RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
     if (srcFile.isDir()) {  // dir
       // dir not exist, create it
       if (!QDir{toPth}.mkpath(toRel)) {
-        qWarning("Failed to mkpath[%s]", qPrintable(toPath));
+        LOG_W("Failed to mkpath[%s]", qPrintable(toPath));
         return {CANNOT_MAKE_PATH, revertCmds};
       }
       revertCmds.append(ACMD::GetInstRMPATH(toPth, toRel));
     } else {  // file
       if (!QFile{fromPth}.copy(toPath)) {
-        qWarning("Failed to copy from [%s] to [%s]", qPrintable(fromPth), qPrintable(toPath));
+        LOG_W("Failed to copy from [%s] to [%s]", qPrintable(fromPth), qPrintable(toPath));
         return {CANNOT_COPY_FILE, revertCmds};
       }
       revertCmds.append(ACMD::GetInstRMFILE(toPth, toRel));

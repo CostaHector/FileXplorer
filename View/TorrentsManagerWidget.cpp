@@ -139,7 +139,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     query.bindValue(TORRENTS_DB_HEADER_KEY::PrePath, fi.absolutePath());
     if (!query.exec()) {
       con.rollback();
-      qWarning("Error when[%s] fail: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      LOG_W("Error when[%s] fail: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return 0;
     }
     ++succeedItemCnt;

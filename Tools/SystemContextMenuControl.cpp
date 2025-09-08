@@ -18,11 +18,11 @@ QString GetTempBatFileAbsPathForWrite(const QString& fileName) {
 
 bool RunBatAsAdmin(const QString& batFileAbsPath) {
 #ifndef _WIN32
-  qDebug("Not support on other platform except windows");
+  LOG_D("Not support on other platform except windows");
   return false;
 #endif
   if (!QFile::exists(batFileAbsPath)) {
-    qWarning("[Failed] file[%s] not found", qPrintable(batFileAbsPath));
+    LOG_W("[Failed] file[%s] not found", qPrintable(batFileAbsPath));
     return false;
   }
   const QString batNativePath = PathTool::sysPath(QFileInfo{batFileAbsPath}.absoluteFilePath());
@@ -47,7 +47,7 @@ bool RunBatAsAdmin(const QString& batFileAbsPath) {
 
 bool Add() {
 #ifndef _WIN32
-  qDebug("Not support on other platform except windows");
+  LOG_D("Not support on other platform except windows");
   return false;
 #endif
   static const QString ADD_CONTEXT_MENU_BAT_CONTENT_TEMPLATE {
@@ -66,7 +66,7 @@ pause)"
   const QString batNativeFileAbsPath = GetTempBatFileAbsPathForWrite("AddContextMenuForThisProgram.bat");
   const bool writeResult = TextWriter(batNativeFileAbsPath, addContextMenuBatContent, QIODevice::WriteOnly | QIODevice::Text);
   if (!writeResult) {
-    qWarning("[Failed] When write into file %s", qPrintable(batNativeFileAbsPath));
+    LOG_W("[Failed] When write into file %s", qPrintable(batNativeFileAbsPath));
     return false;
   }
 
@@ -74,7 +74,7 @@ pause)"
 }
 bool Rmv() {
 #ifndef _WIN32
-  qDebug("Not support on other platform except windows");
+  LOG_D("Not support on other platform except windows");
   return false;
 #endif
   static const QString RMV_CONTEXT_MENU_BAT_CONTENT_TEMPLATE {
@@ -90,7 +90,7 @@ pause)"
   const QString batNativeFileAbsPath = GetTempBatFileAbsPathForWrite("RmvContextMenuForThisProgram.bat");
   const bool writeResult = TextWriter(batNativeFileAbsPath, rmvContextMenuBatContent, QIODevice::WriteOnly | QIODevice::Text);
   if (!writeResult) {
-    qWarning("[Failed] When write into file %s", qPrintable(batNativeFileAbsPath));
+    LOG_W("[Failed] When write into file %s", qPrintable(batNativeFileAbsPath));
     return false;
   }
 

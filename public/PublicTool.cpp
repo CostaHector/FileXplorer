@@ -1,6 +1,7 @@
 ﻿#include "PublicTool.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Logger.h"
 
 #include <QAction>
 #include <QFile>
@@ -11,7 +12,7 @@
 
 QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG) {
   if (oldAG == nullptr) {
-    qCritical("oldAG is nullptr");
+    LOG_C("oldAG is nullptr");
     return "";
   }
   QString i_1_path = first_path;              // first and (i-1) path
@@ -35,11 +36,11 @@ QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGrou
 QString TextReader(const QString& textPath) {
   QFile file(textPath);
   if (!file.exists()) {
-    qDebug("File[%s] not found", qPrintable(textPath));
+    LOG_D("File[%s] not found", qPrintable(textPath));
     return "";
   }
   if (!file.open(QIODevice::ReadOnly)) {
-    qDebug("File[%s] open for read failed", qPrintable(textPath));
+    LOG_D("File[%s] open for read failed", qPrintable(textPath));
     return "";
   }
   QTextStream stream(&file);
@@ -52,7 +53,7 @@ QString TextReader(const QString& textPath) {
 bool TextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
   QFile fi{fileName};
   if (!fi.open(openMode)) {
-    qWarning("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int)openMode);
+    LOG_W("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int)openMode);
     return false;
   }
   QTextStream stream(&fi);
@@ -66,7 +67,7 @@ bool TextWriter(const QString& fileName, const QString& content, const QIODevice
 bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
   QFile fi{fileName};
   if (!fi.open(QIODevice::WriteOnly)) {
-    qWarning("Open [%s] to write failed. fill will not update.", qPrintable(fileName));
+    LOG_W("Open [%s] to write failed. fill will not update.", qPrintable(fileName));
     return false;
   }
   QTextStream stream(&fi);
@@ -84,7 +85,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   const auto selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
   QFileInfo dstFi(selectPath);
   if (!dstFi.isDir()) {
-    qDebug("selectPath[%s] is not a directory", qPrintable(selectPath));
+    LOG_D("selectPath[%s] is not a directory", qPrintable(selectPath));
     return "";
   }
   Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
@@ -94,24 +95,24 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
 void LoadCNLanguagePack(QTranslator& translator) {
   const QString baseName = PROJECT_NAME "_zh_CN.qm";
   if (translator.load(baseName)) {
-    qDebug("Load language[%s] pack succeed", qPrintable(baseName));
+    LOG_D("Load language[%s] pack succeed", qPrintable(baseName));
     QCoreApplication::installTranslator(&translator);
   } else {
-    qCritical("Load language[%s] pack failed", qPrintable(baseName));
+    LOG_C("Load language[%s] pack failed", qPrintable(baseName));
   }
 }
 
 void LoadSysLanaguagePack(QTranslator& translator) {
-  qDebug("Load System Language pack");
+  LOG_D("Load System Language pack");
   const QStringList uiLanguages = QLocale::system().uiLanguages();
   for (const QString& locale : uiLanguages) {
     const QString baseName = PROJECT_NAME + QLocale(locale).name() + ".qm";
     if (translator.load(baseName)) {
-      qDebug("Load language pack succeed %s", qPrintable(baseName));
+      LOG_D("Load language pack succeed %s", qPrintable(baseName));
       QCoreApplication::installTranslator(&translator);
       break;
     } else {
-      qDebug("No need to load language pack %s", qPrintable(baseName));
+      LOG_D("No need to load language pack %s", qPrintable(baseName));
     }
   }
 }
@@ -121,7 +122,7 @@ bool CreateUserPath() {
     return true;
   }
   if (!QDir{}.mkpath(SystemPath::WORK_PATH)) {
-    qCritical("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path", qPrintable(SystemPath::WORK_PATH));
+    LOG_C("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path", qPrintable(SystemPath::WORK_PATH));
     return false;
   }
   return true;

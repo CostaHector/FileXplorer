@@ -117,7 +117,7 @@ void ImagesInFolderSlider::nxtImgInFolder() {
     } else if (imgEle.type() == QVariant::ByteArray) {
       pm.loadFromData(imgEle.toByteArray());
     } else {
-      qWarning("imgEle type is invalid %d", int(imgEle.type()));
+      LOG_W("imgEle type is invalid %d", int(imgEle.type()));
       return;
     }
     if (pm.width() * mHeight >= pm.height() * mWidth) {

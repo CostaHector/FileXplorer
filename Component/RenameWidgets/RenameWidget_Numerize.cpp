@@ -39,7 +39,7 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
 
   const int noFormatDefaultIndex = Configuration().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
   if (noFormatDefaultIndex < 0 && noFormatDefaultIndex >= noFormatCandidate.size()) {
-    qWarning("number[%d] pattern out of bound[%d, %d)", noFormatDefaultIndex, 0, noFormatCandidate.size());
+    LOG_W("number[%d] pattern out of bound[%d, %d)", noFormatDefaultIndex, 0, noFormatCandidate.size());
   } else {
     m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
   }

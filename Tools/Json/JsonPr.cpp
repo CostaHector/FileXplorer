@@ -47,7 +47,7 @@ bool JsonPr::operator==(const JsonPr& rhs) const {
 bool JsonPr::Reload() {
   const QString absPth = GetAbsPath();
   if (!QFile::exists(absPth)) {
-    qWarning("file[%s] not exist", qPrintable(absPth));
+    LOG_W("file[%s] not exist", qPrintable(absPth));
     return false;
   }
   const auto& json = JsonHelper::GetJsonObject(absPth);
@@ -100,7 +100,7 @@ int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoR
     return E_JSON_NEW_NAME_OCCUPID;
   }
   if (!dir.rename(jsonFileName, newJsonName)) {
-    qWarning("Rename json failed[%s]->[%s]", qPrintable(jsonFileName), qPrintable(newJsonName));
+    LOG_W("Rename json failed[%s]->[%s]", qPrintable(jsonFileName), qPrintable(newJsonName));
     return E_JSON_FILE_RENAME_FAILED;
   }
   int renameCnt = 1;
@@ -118,7 +118,7 @@ int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoR
     }
     newFileName = newJsonBaseName + oldName.mid(oldJsonBaseName.size());
     if (!dir.rename(oldName, newFileName)) {
-      qWarning("Rename related failed[%s]->[%s]", qPrintable(oldName), qPrintable(newFileName));
+      LOG_W("Rename related failed[%s]->[%s]", qPrintable(oldName), qPrintable(newFileName));
       return E_RELATED_FILE_RENAME_FAILED;
     }
     ++renameCnt;
@@ -190,11 +190,11 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
       p2Lst = &m_Tags;
       break;
     default:
-      qWarning("Field type[%d] invalid", (int)fieldType);
+      LOG_W("Field type[%d] invalid", (int)fieldType);
       return false;
   }
   if (p2Lst == nullptr) {
-    qWarning("Field type[%d] not exist in json dict", (int)fieldType);
+    LOG_W("Field type[%d] not exist in json dict", (int)fieldType);
     return false;
   }
 
@@ -212,7 +212,7 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
       break;
     }
     default:
-      qWarning("Field Operation Mode[%d] invalid", (int)fieldMode);
+      LOG_W("Field Operation Mode[%d] invalid", (int)fieldMode);
       return false;
   }
   return true;

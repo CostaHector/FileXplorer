@@ -2,6 +2,7 @@
 #define VIDMODEL_H
 
 #include "DifferRootFileSystemModel.h"
+#include "Logger.h"
 
 #include <QDebug>
 #include <QItemSelectionModel>
@@ -15,15 +16,15 @@ class VidModel : public DifferRootFileSystemModel {
   int appendRows(const QStringList& lst) override;
 
   QString filePath(const QModelIndex& index) const override {
-    if (not index.isValid()) {
-      qWarning() << "Try to access invalid index" << index;
+    if (!index.isValid()) {
+      LOG_W("Try to access invalid index");
       return "";
     }
     return m_vids[index.row()];
   }
   QString filePath(const int row) const override {
     if (not(0 <= row and row < rowCount())) {
-      qWarning("Try to access row[%d] not in [0, %d)", row, rowCount());
+      LOG_W("Try to access row[%d] not in [0, %d)", row, rowCount());
       return "";
     }
     return m_vids[row];

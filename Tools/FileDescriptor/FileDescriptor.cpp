@@ -1,4 +1,5 @@
 #include "FileDescriptor.h"
+#include "Logger.h"
 #include <QList>
 
 #ifdef _WIN32
@@ -28,7 +29,7 @@ qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
   // Open the file (equivalent to CreateFileW)
   int fd = open(fileAbsPath.toUtf8().constData(), O_RDONLY);
   if (fd == -1) {
-    qWarning("Get fd[%s] error: %d", qPrintable(fileAbsPath), errno);
+    LOG_W("Get fd[%s] error: %d", qPrintable(fileAbsPath), errno);
     return -errno;
   }
 
@@ -54,7 +55,7 @@ qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
 //#define ERROR_PATH_NOT_FOUND __MSABI_LONG(3)
 //#define ERROR_TOO_MANY_OPEN_FILES __MSABI_LONG(4)
     const DWORD errorNo = GetLastError();
-    qWarning("Get fd[%s] error: %lu", qPrintable(fileAbsPath), errorNo);
+    LOG_W("Get fd[%s] error: %lu", qPrintable(fileAbsPath), errorNo);
     return -(qint64)errorNo;
   }
   BY_HANDLE_FILE_INFORMATION fileInfo{0};
@@ -69,7 +70,7 @@ qint64 FileDescriptor::GetFileUniquedId(const QString& fileAbsPath) {
 
 QList<qint64> FileDescriptor::GetFileUniquedIds(const QStringList& files) {
 #ifndef Q_OS_WIN
-  qWarning("only support in windows system");
+  LOG_W("only support in windows system");
   return {};
 #endif
   QList<qint64> fds;

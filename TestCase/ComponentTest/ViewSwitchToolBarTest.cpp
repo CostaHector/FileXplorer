@@ -6,6 +6,7 @@
 #include <QSignalSpy>
 
 #include "MemoryKey.h"
+#include "Logger.h"
 #include "BeginToExposePrivateMember.h"
 #include "ViewActions.h"
 #include "ViewSwitchToolBar.h"
@@ -15,8 +16,7 @@ class ViewSwitchToolBarTest : public MyTestSuite {
   Q_OBJECT
 public:
   ViewSwitchToolBarTest() : MyTestSuite{false} {
-    fprintf(stdout, "ViewSwitchToolBarTest object created\n");
-    std::fflush(stdout);
+    LOG_D("ViewSwitchToolBarTest object created\n");
   }
   ~ViewSwitchToolBarTest() {
     if (mTb != nullptr)

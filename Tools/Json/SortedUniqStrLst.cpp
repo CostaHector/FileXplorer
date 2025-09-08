@@ -1,5 +1,6 @@
 #include "SortedUniqStrLst.h"
 #include "NameTool.h"
+#include "Logger.h"
 
 QStringList SortedUniqStrLst::Sentence2StringList(const QString& sentence) {
   QStringList newItems = sentence.trimmed().split(NameTool::CAST_STR_SPLITTER, Qt::SkipEmptyParts);
@@ -169,7 +170,7 @@ bool SortedUniqStrLst::remove(const QString& target) {
     m_sortedCache.removeOne(target);
     return true;
   }
-  qWarning("[Error] m_set and m_sortedCache not correspond.");
+  LOG_W("[Error] m_set and m_sortedCache not correspond.");
   return false;
 }
 
