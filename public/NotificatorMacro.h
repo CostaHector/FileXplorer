@@ -4,38 +4,6 @@
 #include "Notificator.h"
 #include "Logger.h"
 
-// uniform
-#define LOG_GOOD(title, msgFormat, ...) \
-do { \
-      QString _msg = (sizeof(#__VA_ARGS__) > 1) ? QString::asprintf(msgFormat, ##__VA_ARGS__) : msgFormat; \
-      LOG_D("%s: %s", qPrintable(title), qPrintable(_msg)); \
-      Notificator::goodNews(title, _msg); \
-} while(0)
-#define LOG_BAD(title, msgFormat, ...) \
-do { \
-      QString _msg = (sizeof(#__VA_ARGS__) > 1) ? QString::asprintf(msgFormat, ##__VA_ARGS__) : msgFormat; \
-      LOG_W("%s: %s", qPrintable(title), qPrintable(_msg)); \
-      Notificator::badNews(title, _msg); \
-} while(0)
-#define LOG_WARN(title, msgFormat, ...) \
-do { \
-      QString _msg = (sizeof(#__VA_ARGS__) > 1) ? QString::asprintf(msgFormat, ##__VA_ARGS__) : msgFormat; \
-      LOG_W("%s: %s", qPrintable(title), qPrintable(_msg)); \
-      Notificator::warning(title, _msg); \
-} while(0)
-#define LOG_INFO(title, msgFormat, ...) \
-do { \
-      QString _msg = (sizeof(#__VA_ARGS__) > 1) ? QString::asprintf(msgFormat, ##__VA_ARGS__) : msgFormat; \
-      LOG_I("%s: %s", qPrintable(title), qPrintable(_msg)); \
-      Notificator::information(title, _msg); \
-} while(0)
-#define LOG_CRIT(title, msgFormat, ...) \
-do { \
-      QString _msg = (sizeof(#__VA_ARGS__) > 1) ? QString::asprintf(msgFormat, ##__VA_ARGS__) : msgFormat; \
-      LOG_C("%s: %s", qPrintable(title), qPrintable(_msg)); \
-      Notificator::critical(title, _msg); \
-} while(0)
-
 // with params
 #define LOG_GOOD_P(title, msgFormat, ...) \
 do { \
