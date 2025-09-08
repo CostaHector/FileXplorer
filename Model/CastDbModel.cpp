@@ -12,7 +12,7 @@
 
 QPixmap GetRatePixmap(int r, bool hasBorder = false) {
   if (r < 0 || r > CastDbModel::MAX_RATE) {
-    qDebug("rate[%d] out bound", r);
+    LOG_D("rate[%d] out bound", r);
     return {};
   }
   static constexpr int WIDTH = 100, HEIGHT = (int)(WIDTH * 0.618);
@@ -43,17 +43,17 @@ CastDbModel::CastDbModel(QObject *parent, QSqlDatabase db) : //
                       .toString()}
 {
   if (!QFileInfo{m_imageHostPath}.isDir()) {
-    qWarning("ImageHostPath[%s] is not a directory or not exist. cast view function abnormal", qPrintable(m_imageHostPath));
+    LOG_W("ImageHostPath[%s] is not a directory or not exist. cast view function abnormal", qPrintable(m_imageHostPath));
   }
   mSubmitAllAction = g_castAct().SUBMIT;
   CHECK_NULLPTR_RETURN_VOID(mSubmitAllAction)
 
   if (!db.isValid()) {
-    qWarning("db invalid[%s]", qPrintable(db.lastError().text()));
+    LOG_W("db invalid[%s]", qPrintable(db.lastError().text()));
     return;
   }
   if (!db.isOpen() && db.open()) {
-    qWarning("db opend failed [%s]", qPrintable(db.lastError().text()));
+    LOG_W("db opend failed [%s]", qPrintable(db.lastError().text()));
     return;
   }
   if (db.tables().contains(DB_TABLE::PERFORMERS)) {
@@ -87,7 +87,7 @@ bool CastDbModel::setData(const QModelIndex &index, const QVariant &value, int r
     // rename folder and files
     const QString imgOriPath {oriPath(index)};
     if (CastBaseDb::WhenCastNameRenamed(imgOriPath, oldName, newName) < 0) {
-      qCritical("Rename failed, not write into db");
+      LOG_C("Rename failed, not write into db");
       return false;
     }
   }
@@ -123,18 +123,18 @@ QString CastDbModel::portaitPath(const QModelIndex& curIndex) const {
 bool CastDbModel::submitAll() {
   QSqlDatabase db = database();
   if (!db.transaction()) {
-    qWarning("Begin transaction failed: %s", qPrintable(db.lastError().text()));
+    LOG_W("Begin transaction failed: %s", qPrintable(db.lastError().text()));
     return false;
   }
   if (!QSqlTableModel::submitAll()) {
-    qWarning("SubmitAll failed[%s], rollback now", qPrintable(lastError().text()));
+    LOG_W("SubmitAll failed[%s], rollback now", qPrintable(lastError().text()));
     if (!db.rollback()) {
-      qWarning("Rollback also failed: %s", qPrintable(db.lastError().text()));
+      LOG_W("Rollback also failed: %s", qPrintable(db.lastError().text()));
     }
     return false;
   }
   if (!db.commit()) {
-    qWarning("Commit failed[%s]", qPrintable(db.lastError().text()));
+    LOG_W("Commit failed[%s]", qPrintable(db.lastError().text()));
     return false;
   }
   onUpdateSubmitAllAction();

@@ -2,6 +2,7 @@
 
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "JsonRenameRegex.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
 #include "JsonKey.h"
@@ -33,7 +34,7 @@ QString StudiosManager::GetLocalFilePath(const QString& localFilePath) {
 }
 
 StudiosManager& StudiosManager::getIns() {
-  qDebug("StudiosManager::getIns()");
+  LOG_D("StudiosManager::getIns()");
   static StudiosManager ins;
   return ins;
 }
@@ -47,15 +48,15 @@ StudiosManager::StudiosManager(const QString& localFilePath)  //
 QHash<QString, QString> StudiosManager::ReadOutStdStudioName() const {
   QFile studioFi{mLocalFilePath};
   if (!studioFi.exists()) {
-    qDebug("Studio list file[%s] not exist", qPrintable(studioFi.fileName()));
+    LOG_D("Studio list file[%s] not exist", qPrintable(studioFi.fileName()));
     return {};
   }
   if (studioFi.size() <= 0) {
-    qDebug("Studio list file[%s] is empty", qPrintable(studioFi.fileName()));
+    LOG_D("Studio list file[%s] is empty", qPrintable(studioFi.fileName()));
     return {};
   }
   if (!studioFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug("File[%s] open for read failed", qPrintable(studioFi.fileName()));
+    LOG_D("File[%s] open for read failed", qPrintable(studioFi.fileName()));
     return {};
   }
   QHash<QString, QString> stdStudioNameDict;
@@ -71,13 +72,13 @@ QHash<QString, QString> StudiosManager::ReadOutStdStudioName() const {
     }
     int tabKeyInd = line.indexOf('\t');
     if (tabKeyInd == -1) {
-      qWarning("The %dth line of file[%s] is invalid", lineIndex, qPrintable(studioFi.fileName()));
+      LOG_W("The %dth line of file[%s] is invalid", lineIndex, qPrintable(studioFi.fileName()));
       continue;
     }
     stdStudioNameDict[line.left(tabKeyInd)] = line.mid(tabKeyInd + 1);
   }
   studioFi.close();
-  qDebug("%d studio item(s) read out from %d lines", stdStudioNameDict.size(), lineIndex);
+  LOG_D("%d studio item(s) read out from %d lines", stdStudioNameDict.size(), lineIndex);
   return stdStudioNameDict;
 }
 
@@ -86,7 +87,7 @@ int StudiosManager::ForceReloadStudio() {
   auto newStudioNames = StudiosManager::ReadOutStdStudioName();
   m_prodStudioMap.swap(newStudioNames);
   int aftCnt = m_prodStudioMap.size();
-  qDebug("standard studio names rule from %d to %d", befCnt, aftCnt);
+  LOG_D("standard studio names rule from %d to %d", befCnt, aftCnt);
   return aftCnt - befCnt;
 }
 
@@ -96,7 +97,7 @@ int StudiosManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   }
   using namespace JsonKey;
   if (!QDir{path}.exists()) {
-    qDebug("path[%s] not exist", qPrintable(path));
+    LOG_D("path[%s] not exist", qPrintable(path));
     return 0;
   }
 
@@ -114,7 +115,7 @@ int StudiosManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
     ++jsonFilesCnt;
     StudioIncrement(studiosIncrementMap, studioIt->toString());
   }
-  qDebug("Learn extra %d studios from %d json files", studiosIncrementMap.size(), jsonFilesCnt);
+  LOG_D("Learn extra %d studios from %d json files", studiosIncrementMap.size(), jsonFilesCnt);
   if (studiosIncrementMap.isEmpty()) {
     return 0;
   }
@@ -144,13 +145,13 @@ int StudiosManager::StudioIncrement(QHash<QString, QString>& increments, const Q
 
 int StudiosManager::WriteIntoLocalDictionaryFiles(const QHash<QString, QString>& increments) const {
   if (increments.isEmpty()) {
-    qDebug("Empty increments, skip writing.");
+    LOG_D("Empty increments, skip writing.");
     return 0;
   }
 
   QFile txtFile{mLocalFilePath};
   if (!txtFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-    qWarning("Failed to open file [%s]: %s", qPrintable(txtFile.fileName()), qPrintable(txtFile.errorString()));
+    LOG_W("Failed to open file [%s]: %s", qPrintable(txtFile.fileName()), qPrintable(txtFile.errorString()));
     return -1;
   }
 
@@ -164,11 +165,11 @@ int StudiosManager::WriteIntoLocalDictionaryFiles(const QHash<QString, QString>&
   }
   out << buffer;
   if (out.status() != QTextStream::Ok) {
-    qWarning("Write error occurred: %d", out.status());
+    LOG_W("Write error occurred: %d", out.status());
     return -2;
   }
   txtFile.close();
-  qDebug("Successfully wrote %d studio items to file %s", increments.size(), qPrintable(mLocalFilePath));
+  LOG_D("Successfully wrote %d studio items to file %s", increments.size(), qPrintable(mLocalFilePath));
   return increments.size();
 }
 

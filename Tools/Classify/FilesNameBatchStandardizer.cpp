@@ -17,13 +17,13 @@ bool FilesNameBatchStandardizer::operator()(const QString& rootPath) {
     pathList.append(it.filePath().chopped(oldName.size() + 1));
     const QString& absPath = it.filePath();
     if (uniqueAbsPathSet.contains(absPath)) {
-      qDebug("%s will duplicate", qPrintable(oldName));
+      LOG_D("%s will duplicate", qPrintable(oldName));
       continue;
     }
     uniqueAbsPathSet.insert(it.filePath());
   }
   if (uniqueAbsPathSet.size() < newNmList.size()) {
-    qDebug("%d/%d nms is duplicate. solve now first", newNmList.size() - uniqueAbsPathSet.size(), newNmList.size());
+    LOG_D("%d/%d nms is duplicate. solve now first", newNmList.size() - uniqueAbsPathSet.size(), newNmList.size());
     return false;
   }
   using namespace FileOperatorType;

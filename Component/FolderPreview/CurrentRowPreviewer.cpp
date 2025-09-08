@@ -35,7 +35,7 @@ void CurrentRowPreviewer::UpdatePreview() {
         m_imgInFolderLabels->operator()(m_curPath);
         return;
       default:
-        qWarning("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
+        LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
     }
   } else if (mCurrentSrcFrom == SRC_FROM::CAST) {
     switch (mCurrentPreviewType) {
@@ -43,7 +43,7 @@ void CurrentRowPreviewer::UpdatePreview() {
         m_fileFolderPreviewStackedWid->operator()(m_curRecord, m_curImageHostPath);
         return;
       default:
-        qWarning("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
+        LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
     }
   } else if (mCurrentSrcFrom == SRC_FROM::SCENE) {
     switch (mCurrentPreviewType) {
@@ -51,7 +51,7 @@ void CurrentRowPreviewer::UpdatePreview() {
         m_fileFolderPreviewStackedWid->operator()(m_sceneName, m_sceneimgPthLst, m_scenevidsLst);
         return;
       default:
-        qWarning("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
+        LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
     }
   }
 }

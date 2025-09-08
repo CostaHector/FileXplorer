@@ -1,9 +1,9 @@
 ﻿#include "FileExplorerEvent.h"
 #include "FileXplorer.h"
 #include "ExtraEvents.h"
-#include "LogHandler.h"
 #include "PublicTool.h"
 #include "MemoryKey.h"
+#include "Logger.h"
 #include <QApplication>
 
 #define RUN_MAIN_FILE 1
@@ -15,20 +15,13 @@ int main(int argc, char* argv[]) {
   }
 
   QApplication app{argc, argv};
-#ifdef QT_DEBUG
-  SetQtDebugMessagePattern();
-#else
-  LogHandler logModule;
-  if (!logModule.IsLogModuleOk()) {
-    return -1;
-  }
-  logModule.subscribe();
-#endif
   if (argc > 1) {
-    qInfo("argc[%d]. argv[1]=%s.", argc, argv[1]);
+    LOG_I("argc[%d]. argv[1]=%s.", argc, argv[1]);
   } else {
-    qInfo("argc[%d].", argc);
+    LOG_I("argc[%d].", argc);
   }
+  Logger::subscribe();
+  Logger::SetAutoFlushAllLevel(Configuration().value(MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
 
   const QStringList& args = app.arguments();
   QTranslator translator;  // cannot define in local. will be release.
@@ -45,7 +38,8 @@ int main(int argc, char* argv[]) {
   extraViewVisibility.subscribe();
 
   fileExplorer.show();
-  app.exec();
+  const int exitCode = app.exec();
+  LOG_I("Program:[" PROJECT_NAME "] exit with code[%d].", exitCode);
   return 0;
 }
 #endif

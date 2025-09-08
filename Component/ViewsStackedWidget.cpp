@@ -46,7 +46,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
   // True means newPath would be push into undo.
   // false not
   if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) {
-    qWarning("Path[%s] is empty or existed directory", qPrintable(newPath));
+    LOG_W("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
 
@@ -62,7 +62,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
 
   if (GetVt() == ViewType::SCENE) {
     if (m_sceneTableView == nullptr) {
-      qWarning("m_scenesModel is nullptr");
+      LOG_W("m_scenesModel is nullptr");
       return false;
     }
     m_sceneTableView->setRootPath(newPath);
@@ -118,7 +118,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
         it = exprHash.insert(targetStr, expr);
       }
       if (!it->isValid()) {
-        qDebug("Not a valid regular expression[%s]", qPrintable(targetStr));
+        LOG_D("Not a valid regular expression[%s]", qPrintable(targetStr));
         return false;
       }
 
@@ -127,7 +127,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
       return true;
     }
     default: {
-      qWarning("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
+      LOG_W("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
       return false;
     }
   }
@@ -149,7 +149,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& /*targetStr*/) -> bool
       return true;
     }
     default: {
-      qWarning("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
+      LOG_W("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
       return false;
     }
   }
@@ -188,11 +188,11 @@ void ViewsStackedWidget::BindCastSearchToolBar(CastDatabaseSearchToolBar* castSe
 
 void ViewsStackedWidget::BindLogger(CustomStatusBar* logger) {
   if (logger == nullptr) {
-    qWarning("Bind CustomStatusBar for contentPanel and FileSystemModel failed. nullptr passed here");
+    LOG_W("Bind CustomStatusBar for contentPanel and FileSystemModel failed. nullptr passed here");
     return;
   }
   if (_logger != nullptr) {
-    qWarning("Don't rebind to _logger");
+    LOG_W("Don't rebind to _logger");
     return;
   }
   _logger = logger;
@@ -205,7 +205,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
     return false;
   }
   QFileInfo fi = getFileInfo(clickedIndex);
-  qInfo("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
+  LOG_I("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
     LOG_BAD_NP("path not exist", fi.absoluteFilePath());
     return false;
@@ -221,7 +221,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       LOG_BAD_NP("link not exists double click not work", tarPath);
       return false;
     }
-    qDebug("linked to[%s]", qPrintable(fi.absoluteFilePath()));
+    LOG_D("linked to[%s]", qPrintable(fi.absoluteFilePath()));
   }
 
   // For File
@@ -318,7 +318,7 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
       break;
     }
     default: {
-      qDebug("[Skip] viewType[%s] current row change signal", ViewTypeTool::c_str(vt));
+      LOG_D("[Skip] viewType[%s] current row change signal", ViewTypeTool::c_str(vt));
       return;
     }
   }
@@ -331,7 +331,7 @@ bool ViewsStackedWidget::onAfterDirectoryLoaded(const QString& loadedPath) {
   const QModelIndex rootIndex = m_fsTableView->rootIndex();
   const QModelIndex anchorInd = m_fsModel->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
   if (!anchorInd.isValid()) {
-    qDebug("anchorTags[%s] invalid. cancel scroll", qPrintable(loadedPath));
+    LOG_D("anchorTags[%s] invalid. cancel scroll", qPrintable(loadedPath));
     m_anchorTags.remove(loadedPath);
     return false;
   }
@@ -388,7 +388,7 @@ std::pair<QModelIndex, QModelIndex> ViewsStackedWidget::getTopLeftAndRightDownRe
     case ViewType::JSON:
       return GetterForFsModel(m_jsonProxyModel, m_jsonTableView->rootIndex());
     default:
-      qWarning("No left-top to right-down rectangle index in ViewType[%d]", int(vt));
+      LOG_W("No left-top to right-down rectangle index in ViewType[%d]", int(vt));
       return {};
   }
 }
@@ -428,7 +428,7 @@ bool ViewsStackedWidget::hasSelection() const {
     case ViewType::JSON:
       return m_jsonTableView->selectionModel()->hasSelection();
     default:
-      qWarning("No SelectedRows in ViewType[%d]", int(vt));
+      LOG_W("No SelectedRows in ViewType[%d]", int(vt));
       return false;
   }
 }
@@ -447,7 +447,7 @@ QString ViewsStackedWidget::getRootPath() const {
     case ViewType::CAST:
       return m_castDbModel->rootPath();
     default:
-      qWarning("No rootpath in ViewType[%d]", int(vt));
+      LOG_W("No rootpath in ViewType[%d]", int(vt));
       return "";
   }
 }
@@ -474,7 +474,7 @@ QString ViewsStackedWidget::getFilePath(const QModelIndex& ind) const {
       return m_jsonModel->filePath(srcIndex);
     }
     default:
-      qWarning("No FilePath in ViewType[%d]", int(vt));
+      LOG_W("No FilePath in ViewType[%d]", int(vt));
       return "";
   }
 }
@@ -504,7 +504,7 @@ QModelIndexList ViewsStackedWidget::getSelectedRows() const {
     case ViewType::JSON:
       return m_jsonTableView->selectionModel()->selectedRows();
     default:
-      qWarning("No SelectedRows in ViewType[%d]", int(vt));
+      LOG_W("No SelectedRows in ViewType[%d]", int(vt));
       return {};
   }
 }
@@ -558,7 +558,7 @@ QStringList ViewsStackedWidget::getFileNames() const {
       break;
     }
     default:
-      qWarning("No SelectedRows in ViewType[%d]", int(vt));
+      LOG_W("No SelectedRows in ViewType[%d]", int(vt));
       return {};
   }
   return names;
@@ -594,7 +594,7 @@ QStringList ViewsStackedWidget::getFullRecords() const {
       break;
     }
     case ViewType::SCENE: {
-      qDebug("Todo: getFullRecords is not supported in scene model now");
+      LOG_D("Todo: getFullRecords is not supported in scene model now");
       break;
     }
     case ViewType::MOVIE: {
@@ -611,7 +611,7 @@ QStringList ViewsStackedWidget::getFullRecords() const {
       break;
     }
     default: {
-      qWarning("No getFullRecords ViewType:%d", (int)vt);
+      LOG_W("No getFullRecords ViewType:%d", (int)vt);
       break;
     }
   }
@@ -667,7 +667,7 @@ QStringList ViewsStackedWidget::getFilePaths() const {
       break;
     }
     default: {
-      qDebug("No getFilePaths ViewType:%d", (int)vt);
+      LOG_D("No getFilePaths ViewType:%d", (int)vt);
       break;
     }
   }
@@ -732,7 +732,7 @@ QStringList ViewsStackedWidget::getFilePrepaths() const {
       break;
     }
     default: {
-      qDebug("No getFilePrepaths ViewType:%d", (int)vt);
+      LOG_D("No getFilePrepaths ViewType:%d", (int)vt);
       break;
     }
   }
@@ -777,7 +777,7 @@ QStringList ViewsStackedWidget::getTheJpgFolderPaths() const {
       break;
     }
     case ViewType::SCENE: {
-      qDebug("Todo: need complement");
+      LOG_D("Todo: need complement");
       break;
     }
     case ViewType::MOVIE: {
@@ -798,7 +798,7 @@ QStringList ViewsStackedWidget::getTheJpgFolderPaths() const {
       break;
     }
     default: {
-      qDebug("No getTheJpgFolderPaths");
+      LOG_D("No getTheJpgFolderPaths");
     }
   }
   return prepaths;
@@ -863,7 +863,7 @@ std::pair<QStringList, QList<QUrl>> ViewsStackedWidget::getFilePathsAndUrls(cons
       break;
     }
     case ViewType::SCENE: {
-      qDebug("Todo getFilePathsAndUrls");
+      LOG_D("Todo getFilePathsAndUrls");
       break;
     }
     case ViewType::MOVIE: {
@@ -874,7 +874,7 @@ std::pair<QStringList, QList<QUrl>> ViewsStackedWidget::getFilePathsAndUrls(cons
       break;
     }
     default: {
-      qWarning("No getFilePathsAndUrls ViewType:%d", (int)vt);
+      LOG_W("No getFilePathsAndUrls ViewType:%d", (int)vt);
     }
   }
   return {filePaths, urls};
@@ -928,7 +928,7 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
       break;
     }
     case ViewType::SCENE: {
-      qDebug("Todo getFilePrepathsAndName");
+      LOG_D("Todo getFilePrepathsAndName");
       break;
     }
     case ViewType::MOVIE: {
@@ -949,13 +949,13 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
       break;
     }
     default: {
-      qDebug("No getFilePrepathsAndName");
+      LOG_D("No getFilePrepathsAndName");
       break;
     }
   }
 
   if (prepaths.size() != names.size()) {
-    qWarning("getFilePrepathsAndName size differ");
+    LOG_W("getFilePrepathsAndName size differ");
     return {};
   }
   return {prepaths, names};
@@ -964,7 +964,7 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
 int ViewsStackedWidget::getSelectedRowsCount() const {
   auto* curView = GetCurView();
   if (curView == nullptr) {
-    qDebug("curView[%s] is nullptr", ViewTypeTool::c_str(GetVt()));
+    LOG_D("curView[%s] is nullptr", ViewTypeTool::c_str(GetVt()));
     return -1;
   }
   return curView->selectionModel()->selectedRows().size();
@@ -998,10 +998,10 @@ QString ViewsStackedWidget::getCurFilePath() const {
       return m_jsonModel->filePath(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
     }
     default: {
-      qWarning("No getCurFilePath");
+      LOG_W("No getCurFilePath");
     }
   }
-  qWarning("nothing selected in viewType[%d]", (int)vt);
+  LOG_W("nothing selected in viewType[%d]", (int)vt);
   return "";
 }
 
@@ -1030,7 +1030,7 @@ QString ViewsStackedWidget::getCurFileName() const {
       return m_jsonModel->fileName(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
     }
     default: {
-      qWarning("No getCurFileName");
+      LOG_W("No getCurFileName");
     }
   }
   return "";
@@ -1060,7 +1060,7 @@ QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind) const {
       return m_jsonModel->fileInfo(m_jsonProxyModel->mapToSource(ind));
     }
     default: {
-      qDebug("ViewType[%s] does not support fileInfo", ViewTypeTool::c_str(vt));
+      LOG_D("ViewType[%s] does not support fileInfo", ViewTypeTool::c_str(vt));
       break;
     }
   }

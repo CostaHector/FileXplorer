@@ -109,7 +109,7 @@ bool PropertiesWindow::operator()(const QStringList& items) {
 
 bool PropertiesWindow::operator()(const QSqlTableModel* model, const QTableView* tv) {
   if (model == nullptr || tv == nullptr) {
-    qCritical("model is nullptr");
+    LOG_C("model is nullptr");
     return false;
   }
 

@@ -25,15 +25,15 @@ bool IsCursorPosLessThenWidgetCenter(Qt::Orientation orientation, const int curs
 
 bool IsSourceValid(QObject* source, QWidget* parent) {
   if (source == nullptr) {
-    qWarning("source is nullptr, skip");
+    LOG_W("source is nullptr, skip");
     return false;
   }
   if (source->parent() != parent) {
-    qWarning("parent is not self, skip");
+    LOG_W("parent is not self, skip");
     return false;
   }
   if (!source->isWidgetType()) {
-    qWarning("source is not widget, skip");
+    LOG_W("source is not widget, skip");
     return false;
   }
   return true;
@@ -134,19 +134,19 @@ void ReorderableToolBar::dropEvent(QDropEvent* event) {
   }
   QLayout* layout = this->layout();
   if (layout == nullptr) {
-    qWarning("layout is None, skip");
+    LOG_W("layout is None, skip");
     return;
   }
-  //  qDebug("type(source): %s", source->metaObject()->className());
+  //  LOG_D("type(source): %s", source->metaObject()->className());
   auto* pSrcWidget = qobject_cast<QWidget*>(source);
   if (pSrcWidget == nullptr) {
-    qWarning("pSrcWidget is nullptr, skip");
+    LOG_W("pSrcWidget is nullptr, skip");
     return;
   }
   pSrcWidget->setEnabled(true);
   const int fromIndex{layout->indexOf(pSrcWidget)};
   if (fromIndex == -1) {
-    qDebug("from widget not find at all");
+    LOG_D("from widget not find at all");
     return;
   }
   const QPoint& pos{event->pos()};

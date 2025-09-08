@@ -370,7 +370,7 @@ QActionGroup* FileBasicOperationsActions::FileStructureActions() {
                              .toInt();
   const QList<QAction*> acts = FILE_STRUCTURE_AGS->actions();
   if (fileStructureWay < 0 || fileStructureWay >= acts.size()) {
-    qWarning("FileSystemStructure Way set 0 instead");
+    LOG_W("FileSystemStructure Way set 0 instead");
     fileStructureWay = 0;
   }
   acts[fileStructureWay]->setChecked(true);

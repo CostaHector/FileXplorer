@@ -64,7 +64,7 @@ void CommandsPreview::subscribe() {
   connect(COPY_TEXT, &QAction::triggered, this, [this]() {
     QClipboard* clipboard = QApplication::clipboard();
     if (clipboard == nullptr) {
-      qWarning("clipboard is nullptr. cannot copy");
+      LOG_W("clipboard is nullptr. cannot copy");
       return;
     }
     clipboard->setText(toPlainText());

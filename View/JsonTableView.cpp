@@ -306,7 +306,7 @@ bool JsonTableView::GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_T
   }
   QWidget* editor = indexWidget(curInd);
   if (editor == nullptr) {  // not in edit mode
-    qDebug("Cell not in edit, cannot get selection text in cell");
+    LOG_D("Cell not in edit, cannot get selection text in cell");
     return true;
   }
   if (auto lineEdit = qobject_cast<QLineEdit*>(editor)) {

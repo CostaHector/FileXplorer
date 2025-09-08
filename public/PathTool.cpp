@@ -1,4 +1,5 @@
 ﻿#include "PathTool.h"
+#include "Logger.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QDirIterator>
@@ -353,9 +354,9 @@ bool PathTool::copyDirectoryFiles(const QString& fromDir, const QString& toDir, 
     if (targetDir.exists(fileInfo.fileName())) {
       if (coverFileIfExist) {
         targetDir.remove(fileInfo.fileName());
-        qDebug("%s/%s is covered by file under [%s]", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()), qPrintable(fromDir));
+        LOG_D("%s/%s is covered by file under [%s]", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()), qPrintable(fromDir));
       } else {
-        qDebug("%s/[%s] was kept", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()));
+        LOG_D("%s/[%s] was kept", qPrintable(targetDir.absolutePath()), qPrintable(fileInfo.fileName()));
       }
     }
     // files copy

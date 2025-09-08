@@ -40,7 +40,7 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
     if (!syncCmd.isEmpty()) {
       const auto& syncRetEle = FileOperation::executer(syncCmd);
       if (!syncRetEle) {
-        qWarning("sync commands failed");
+        LOG_W("sync commands failed");
       }
       exeRetEle.ret = (exeRetEle.ret == ErrorCode::OK && syncRetEle.ret == ErrorCode::OK ? ErrorCode::OK : ErrorCode::UNKNOWN_ERROR);
       exeRetEle.cmds += syncRetEle.cmds;
@@ -52,29 +52,29 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
 
 bool UndoRedo::on_Undo() {
   if (!g_undoRedo.undoAvailable()) {
-    qInfo("[skip] Nothing to undo");
+    LOG_I("[skip] Nothing to undo");
     return true;
   }
   const bool isAllSucceed = g_undoRedo.Undo();
   const char* undoMsg = isAllSucceed ? "All undo succeed" : "Some undo failed.";
-  qDebug("%s", undoMsg);
+  LOG_D("%s", undoMsg);
   return isAllSucceed;
 }
 
 bool UndoRedo::on_Redo() {
   if (!g_undoRedo.redoAvailable()) {
-    qInfo("[skip] Nothing to redo");
+    LOG_I("[skip] Nothing to redo");
     return true;
   }
   const bool isAllSucceed = g_undoRedo.Redo();
   const char* redoMsg = isAllSucceed ? "All redo succeed" : "Some redo failed.";
-  qDebug("%s", redoMsg);
+  LOG_D("%s", redoMsg);
   return isAllSucceed;
 }
 
 bool UndoRedo::Undo() {
   if (!undoAvailable()) {
-    qDebug("Skip. Cannot undo");
+    LOG_D("Skip. Cannot undo");
     return true;
   }
   BATCH_COMMAND_LIST_TYPE& undoCmds = mUndoStk.top();
@@ -87,7 +87,7 @@ bool UndoRedo::Undo() {
 
 bool UndoRedo::Redo() {
   if (!redoAvailable()) {
-    qDebug("Skip. Cannot redo");
+    LOG_D("Skip. Cannot redo");
     return true;
   }
   BATCH_COMMAND_LIST_TYPE& redoCmds = mRedoStk.top();

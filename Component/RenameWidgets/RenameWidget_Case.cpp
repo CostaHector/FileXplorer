@@ -27,14 +27,14 @@ QStringList StringCaseOperator::operator()(const QStringList& lst, const QAction
 
   auto funcIt = RULE_OPS_MAP.find(caseAct);
   if (funcIt == RULE_OPS_MAP.cend()) {
-    qWarning("Case rule type not found");
+    LOG_W("Case rule type not found");
     return {};
   }
   QStringList replacedList;
   replacedList.reserve(lst.size());
   const auto pCaseFunc = funcIt.value();
   if (pCaseFunc == nullptr) {
-    qWarning("pCaseFunc is nullptr");
+    LOG_W("pCaseFunc is nullptr");
     return {};
   }
   for (const QString& nm : lst) {
@@ -49,7 +49,7 @@ RenameWidget_Case::RenameWidget_Case(QWidget* parent)  //
 auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
   const QAction* pCaseAct = g_renameAg().NAME_CASE->checkedAction();  // todo checked
   if (pCaseAct == nullptr) {
-    qWarning("pCaseAct is nullptr");
+    LOG_W("pCaseAct is nullptr");
     return replaceeList;
   }
   const StringCaseOperator sco;

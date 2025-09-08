@@ -1,6 +1,6 @@
 #include "NameStandardizer.h"
 #include "StudiosManager.h"
-#include "PublicVariable.h"
+#include "JsonRenameRegex.h"
 
 const QRegularExpression stdCommaComp("\\s+,");
 const QRegularExpression stdExclamationComp("\\s+!");
@@ -40,6 +40,6 @@ QString NameStandardizer::operator()(QString aFileName) {
 #ifdef __NAME__EQ__MAIN__
 int main(int argc, char* argv[]) {
   const auto& mp = NameStandardizer::jsonLoader();
-  qDebug("STANDARD_STUDIO_NAME size=%d", mp.size());
+  LOG_D("STANDARD_STUDIO_NAME size=%d", mp.size());
 }
 #endif

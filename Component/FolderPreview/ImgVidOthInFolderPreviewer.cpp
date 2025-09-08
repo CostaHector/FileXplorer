@@ -121,12 +121,12 @@ void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) {
 bool ImgVidOthInFolderPreviewer::onReorder(int fromIndex, int destIndex) {
   CHECK_NULLPTR_RETURN_FALSE(mImgVidOtherSplitter);
   if (!MoveElementFrontOf(mMediaSequence, fromIndex, destIndex)) {
-    qWarning("failed, move widget at index[%d] in front of widget at[%d]", fromIndex, destIndex);
+    LOG_W("failed, move widget at index[%d] in front of widget at[%d]", fromIndex, destIndex);
     return false;
   }
   const QString& newMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
   Configuration().setValue("FLOATING_MEDIA_TYPE_SEQ", newMediaTypeSeq);
-  qDebug("New media type seq[%s]", qPrintable(newMediaTypeSeq));
+  LOG_D("New media type seq[%s]", qPrintable(newMediaTypeSeq));
   return MoveWidgetAtFromIndexInFrontOfDestIndex(fromIndex, destIndex, *mImgVidOtherSplitter);
 }
 
@@ -200,7 +200,7 @@ void ImgVidOthInFolderPreviewer::onImgVidOthActTriggered(const QAction* pAct) {
   } else if (pAct == _OTH_ACT) {
     onOthBtnClicked(checked);
   } else {
-    qWarning("Action[%s] not supported", qPrintable(pAct->text()));
+    LOG_W("Action[%s] not supported", qPrintable(pAct->text()));
   }
 }
 

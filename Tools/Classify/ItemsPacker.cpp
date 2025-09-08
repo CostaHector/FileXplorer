@@ -14,7 +14,7 @@ int ItemsPacker::operator()(const QString& path, const QMap<QString, QStringList
     const QString& folderName = it.key();
     const QStringList& files = it.value();
     if (files.size() < 2) {
-      qDebug("FolderName[%s] only contains %d item(s), skip", qPrintable(folderName), files.size());
+      LOG_D("FolderName[%s] only contains %d item(s), skip", qPrintable(folderName), files.size());
       continue;
     }
     const QString& underPath = path + '/' + folderName;
@@ -30,7 +30,7 @@ int ItemsPacker::operator()(const QString& path, const QMap<QString, QStringList
         continue;
       }
       if (underDir.exists(file)) {
-        qDebug("%s/%s already exist, move will failed, skip it", qPrintable(underPath), qPrintable(file));
+        LOG_D("%s/%s already exist, move will failed, skip it", qPrintable(underPath), qPrintable(file));
         continue;
       }
       m_cmds.append(ACMD::GetInstMV(path, file, underPath));
@@ -38,14 +38,14 @@ int ItemsPacker::operator()(const QString& path, const QMap<QString, QStringList
     }
   }
 
-  qDebug("%d file(s) rearrange, %d path(s) make under path[%s]", filesRearrangedCnt, pathCreatedCnt, qPrintable(path));
+  LOG_D("%d file(s) rearrange, %d path(s) make under path[%s]", filesRearrangedCnt, pathCreatedCnt, qPrintable(path));
   return filesRearrangedCnt;
 }
 
 int ItemsPacker::operator()(const QString& path) {
   QDir pathdir(path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
   if (!pathdir.exists()) {
-    qDebug("path[%s] is not an existed directory", qPrintable(path));
+    LOG_D("path[%s] is not an existed directory", qPrintable(path));
     return {};
   }
   ScenesMixed sMixed;
@@ -55,6 +55,6 @@ int ItemsPacker::operator()(const QString& path) {
 
 bool ItemsPacker::StartToRearrange() {
   const auto isAllSuccess = g_undoRedo.Do(m_cmds);
-  qDebug("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
+  LOG_D("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;
 }

@@ -91,7 +91,7 @@ bool NewItems(const QString& createIn, const QString& namePattern, int numStartI
   for (int itemIndex = numStartIndex; itemIndex < numEndIndex; ++itemIndex) {
     QString fileNameArray = QString::asprintf(namePatternArray, itemIndex);
     if (createInDir.exists(fileNameArray)) {
-      qInfo("[Skip create]. File/Folder[%s] already exists in folder[%s]", qPrintable(fileNameArray), qPrintable(createIn));
+      LOG_I("[Skip create]. File/Folder[%s] already exists in folder[%s]", qPrintable(fileNameArray), qPrintable(createIn));
       continue;
     }
     if (isFolder) {

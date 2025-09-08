@@ -12,7 +12,7 @@ ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers,
   QDialog{parent}
 {
   if (initSwitches.size() < headers.size()) {
-    qWarning("headers count[%d] out of switches count[%d] bound", headers.size(), headers.size());
+    LOG_W("headers count[%d] out of switches count[%d] bound", headers.size(), headers.size());
     return;
   }
 

@@ -1,7 +1,9 @@
 ﻿#include "AIMediaDuplicate.h"
 #include "PublicVariable.h"
+#include "JsonRenameRegex.h"
 #include "MD5Calculator.h"
 #include "VideoDurationGetter.h"
+#include "Logger.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -51,7 +53,7 @@ AIMediaDuplicate::AIMediaDuplicate() {
   }
 
   if (!db.open()) {
-    qWarning("Open DB[%s] failed[%s]", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE), qPrintable(db.lastError().text()));
+    LOG_W("Open DB[%s] failed[%s]", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE), qPrintable(db.lastError().text()));
   }
 }
 
@@ -65,7 +67,7 @@ AIMediaDuplicate::~AIMediaDuplicate() {
 bool AIMediaDuplicate::IsTableExist(const QString& tableName) const {
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_W("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return false;
   }
   return db.tables().contains(tableName);
@@ -75,36 +77,36 @@ int AIMediaDuplicate::ScanLocations(const QStringList& paths, bool dropFirst, bo
   int succeedCnt = 0;
   for (const QString& path : paths) {
     if (!ScanALocation(path, dropFirst, skipWhenTableExist)) {
-      qWarning("Scan Path[%s] failed", qPrintable(path));
+      LOG_W("Scan Path[%s] failed", qPrintable(path));
       return false;
     }
     ++succeedCnt;
   }
-  qDebug("%d/%d paths has been scanned succeed", succeedCnt, paths.size());
+  LOG_D("%d/%d paths has been scanned succeed", succeedCnt, paths.size());
   return succeedCnt;
 }
 
 bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool skipWhenTableExist) {
   if (!QFileInfo(path).isDir()) {
-    qDebug("location[%s] is not a path", qPrintable(path));
+    LOG_D("location[%s] is not a path", qPrintable(path));
     return false;
   }
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qDebug("DB[%s] not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_D("DB[%s] not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return false;
   }
   QSqlQuery query(db);
   const QString& tableName = GetTableName(path);
   if (IsTableExist(tableName)) {
     if (skipWhenTableExist) {
-      qDebug("Table[%s] already exists", qPrintable(tableName));
+      LOG_D("Table[%s] already exists", qPrintable(tableName));
       return true;
     }
     if (dropFirst) {
       query.prepare(QString("DROP TABLE `%1`;").arg(tableName));
       if (!query.exec()) {
-        qWarning("Drop table failed[%s]", qPrintable(tableName));
+        LOG_W("Drop table failed[%s]", qPrintable(tableName));
         return false;
       }
     }
@@ -122,7 +124,7 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
                         "PRIMARY KEY (`ABSOLUTE_PATH`, `SIZE`))")
                     .arg(tableName));
   if (!query.exec()) {
-    qDebug("create table[%s] error[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
+    LOG_D("create table[%s] error[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
     return false;
   }
   query.prepare(QString("REPLACE INTO `%1` (EFFECTIVE_NAME, SIZE, DURATION, DATE, ABSOLUTE_PATH) VALUES (?, ?, ?, ?, ?)").arg(tableName));
@@ -131,7 +133,7 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
 
   VideoDurationGetter mi;
   if (!mi.StartToGet()) {
-    qWarning("Video duration getter is nullptr");
+    LOG_W("Video duration getter is nullptr");
     return false;
   }
 
@@ -145,7 +147,7 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
     query.bindValue(3, file_info.birthTime().toMSecsSinceEpoch());
     query.bindValue(4, file_path);
     if (!query.exec()) {
-      qDebug("insert error[%s]", qPrintable(query.lastError().text()));
+      LOG_D("insert error[%s]", qPrintable(query.lastError().text()));
     }
   }
   query.clear();
@@ -156,7 +158,7 @@ bool AIMediaDuplicate::ScanALocation(const QString& path, bool dropFirst, bool s
 int AIMediaDuplicate::DropTables(const QStringList& delTables, bool dropAll) {
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_W("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return -1;
   }
   int succeedDropCnt = 0;
@@ -167,16 +169,16 @@ int AIMediaDuplicate::DropTables(const QStringList& delTables, bool dropAll) {
       continue;
     }
     if (!query.exec(QString("DROP TABLE `%1`;").arg(tableName))) {
-      qWarning("Drop table[%s] failed. succeed cnt[%d]", qPrintable(tableName), succeedDropCnt);
+      LOG_W("Drop table[%s] failed. succeed cnt[%d]", qPrintable(tableName), succeedDropCnt);
       return succeedDropCnt;
     }
     ++succeedDropCnt;
-    qDebug("Table[%s] already not exist in DB[%s]", qPrintable(tableName), qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_D("Table[%s] already not exist in DB[%s]", qPrintable(tableName), qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
   }
   if (dropAll) {
-    qDebug("drop table: [%d], succeed[%d]", allTables.size(), succeedDropCnt);
+    LOG_D("drop table: [%d], succeed[%d]", allTables.size(), succeedDropCnt);
   } else {
-    qDebug("drop table: [%d], succeed[%d]", delTables.size(), succeedDropCnt);
+    LOG_D("drop table: [%d], succeed[%d]", delTables.size(), succeedDropCnt);
   }
   return succeedDropCnt;
 }
@@ -184,7 +186,7 @@ int AIMediaDuplicate::DropTables(const QStringList& delTables, bool dropAll) {
 int AIMediaDuplicate::AuditTables(const QStringList& atTables, bool auditAll) {
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_W("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return -1;
   }
   int repairedCnt = 0;
@@ -199,7 +201,7 @@ int AIMediaDuplicate::AuditTables(const QStringList& atTables, bool auditAll) {
 
     const QString& pth = TableName2Path(tableName);
     if (!QFileInfo(pth).isDir()) {
-      qDebug("Driver[%s] of table[%s] is offline, skip audit", qPrintable(pth), qPrintable(tableName));
+      LOG_D("Driver[%s] of table[%s] is offline, skip audit", qPrintable(pth), qPrintable(tableName));
       continue;
     }
     query.prepare(QString("SELECT "
@@ -208,7 +210,7 @@ int AIMediaDuplicate::AuditTables(const QStringList& atTables, bool auditAll) {
                           "	`%1`;")
                       .arg(tableName));
     if (!query.exec()) {
-      qWarning("qry table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
+      LOG_W("qry table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
       continue;
     }
     delQry.prepare(QString("DELETE FROM `%1` "
@@ -221,21 +223,21 @@ int AIMediaDuplicate::AuditTables(const QStringList& atTables, bool auditAll) {
       }
       delQry.bindValue(0, absPath);
       if (!delQry.exec()) {
-        qWarning("repair[%s] failed[%s]", qPrintable(absPath), qPrintable(delQry.lastError().text()));
+        LOG_W("repair[%s] failed[%s]", qPrintable(absPath), qPrintable(delQry.lastError().text()));
         continue;
       }
       ++repairedCnt;
     }
     ++auditTblCnt;
   }
-  qWarning("Audit repaird %d item(s) in %d table(s)", repairedCnt, auditTblCnt);
+  LOG_W("Audit repaird %d item(s) in %d table(s)", repairedCnt, auditTblCnt);
   return repairedCnt;
 }
 
 int AIMediaDuplicate::RebuildTables(const QStringList& rebTables, bool rebuildAll) {
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_W("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return -1;
   }
   int succeedRebuildCnt = 0, ignoreCnt = 0;
@@ -248,7 +250,7 @@ int AIMediaDuplicate::RebuildTables(const QStringList& rebTables, bool rebuildAl
     }
     const QString& path = TableName2Path(tableName);
     if (!ScanALocation(path, true, false)) {
-      qWarning("rebuild table[%s] failed", qPrintable(tableName));
+      LOG_W("rebuild table[%s] failed", qPrintable(tableName));
       continue;
     }
     ++succeedRebuildCnt;
@@ -259,7 +261,7 @@ int AIMediaDuplicate::RebuildTables(const QStringList& rebTables, bool rebuildAl
 int AIMediaDuplicate::GetTablesCnt() const {
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_W("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return -1;
   }
   return db.tables().size();
@@ -282,12 +284,12 @@ int AIMediaDuplicate::FillHashFieldIfSizeConflict(const QString& path) {
   const QString& tableName = GetTableName(path);
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_W("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return -1;
   }
 
   if (!db.tables().contains(tableName)) {
-    qDebug("table[%s] not exist no need to fill hash Field", qPrintable(tableName));
+    LOG_D("table[%s] not exist no need to fill hash Field", qPrintable(tableName));
     return 0;
   }
 
@@ -301,7 +303,7 @@ int AIMediaDuplicate::FillHashFieldIfSizeConflict(const QString& path) {
                         "       `FIRST_1024_HASH` IS NULL;")
                     .arg(tableName));
   if (!query.exec()) {
-    qWarning("qry error[%s]", qPrintable(query.lastError().text()));
+    LOG_W("qry error[%s]", qPrintable(query.lastError().text()));
     return -1;
   }
   QHash<qint64, QStringList> size2absPath;
@@ -328,13 +330,13 @@ int AIMediaDuplicate::FillHashFieldIfSizeConflict(const QString& path) {
       setHash.bindValue(0, GetFileMD5(abspath, 1024));
       setHash.bindValue(1, abspath);
       if (!setHash.exec()) {
-        qWarning("set field md5 of[`%s`] failed", qPrintable(abspath));
+        LOG_W("set field md5 of[`%s`] failed", qPrintable(abspath));
         continue;
       }
       ++cnt;
     }
   }
-  qDebug("Fill %d record(s) on hash fields", cnt);
+  LOG_D("Fill %d record(s) on hash fields", cnt);
   return cnt;
 }
 
@@ -352,7 +354,7 @@ int AIMediaDuplicate::ReadSpecifiedTables2List(const QStringList& tbls, QList<DU
   QSqlQuery query(db);
   for (const QString& tableName : tbls) {
     if (!query.exec(QString("SELECT `EFFECTIVE_NAME`, `SIZE`, `DURATION`, `DATE`, `ABSOLUTE_PATH`, `FIRST_1024_HASH` FROM `%1`;").arg(tableName))) {
-      qWarning("qry table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
+      LOG_W("qry table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
       return succeedTblCnt;
     }
     while (query.next()) {
@@ -361,21 +363,21 @@ int AIMediaDuplicate::ReadSpecifiedTables2List(const QStringList& tbls, QList<DU
     }
     ++succeedTblCnt;
   }
-  qDebug("before %d row(s), now %d row(s), succeed %d table(s)", beforeCnt, vidsInfo.size(), succeedTblCnt);
+  LOG_D("before %d row(s), now %d row(s), succeed %d table(s)", beforeCnt, vidsInfo.size(), succeedTblCnt);
   return true;
 }
 
 QList<DupTableModelData> AIMediaDuplicate::TableName2Cnt() {
   QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
   if (!db.isOpen()) {
-    qWarning("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
+    LOG_W("DB[%s] is not open", qPrintable(SystemPath::AI_MEDIA_DUP_DATABASE));
     return {};
   }
   QList<DupTableModelData> tbl2Cnt;
   QSqlQuery query(db);
   for (const QString& tableName : db.tables()) {
     if (!query.exec(QString("SELECT COUNT(`EFFECTIVE_NAME`) FROM `%1`;").arg(tableName))) {
-      qDebug("count table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
+      LOG_D("count table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
       continue;
     }
     int recordCnt = 0;
@@ -384,7 +386,7 @@ QList<DupTableModelData> AIMediaDuplicate::TableName2Cnt() {
     }
     tbl2Cnt.append({tableName, recordCnt});  // query.record().count();
   }
-  qDebug("Update Tables Count:%d", tbl2Cnt.size());
+  LOG_D("Update Tables Count:%d", tbl2Cnt.size());
   return tbl2Cnt;
 }
 

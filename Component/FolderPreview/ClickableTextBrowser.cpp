@@ -5,6 +5,7 @@
 #include "CastBaseDb.h"
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
+#include "JsonRenameRegex.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "TableFields.h"
@@ -130,7 +131,7 @@ void ClickableTextBrowser::onSearchSelectionReq() {
     LOG_WARN_NP("Skip search, too short searchText:", searchKeyString);
     return;
   }
-  qDebug("Search:[%s]", qPrintable(searchKeyString));
+  LOG_D("Search:[%s]", qPrintable(searchKeyString));
   SearchAndAppendParagraphOfResult(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg(searchKeyString));
 }
 
@@ -150,14 +151,14 @@ void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
                             "There are " + QString::number(candidates.size()) + "candidates you can use as following...", //
                             candidates, 0, true, &bInputOk);
   if (!bInputOk) {
-    qDebug("User cancel search by selection");
+    LOG_D("User cancel search by selection");
     return;
   }
   if (searchKeyString.size() < MIN_SINGLE_SEARCH_PATTERN_LEN) {
     LOG_WARN_P("[Skip search] too short", "searchText[%d] should >= %d chars]", qPrintable(searchKeyString), MIN_SINGLE_SEARCH_PATTERN_LEN);
     return;
   }
-  qDebug("Search:[%s]", qPrintable(searchKeyString));
+  LOG_D("Search:[%s]", qPrintable(searchKeyString));
   SearchAndAppendParagraphOfResult(FdBasedDb::WHERE_NAME_CORE_TEMPLATE.arg(searchKeyString));
 }
 
@@ -174,7 +175,7 @@ void ClickableTextBrowser::onSearchMultiSelectionReq() {
                qPrintable(whereClause), MIN_EACH_KEYWORD_LEN);
     return;
   }
-  qDebug("Search:[%s]", qPrintable(whereClause));
+  LOG_D("Search:[%s]", qPrintable(whereClause));
   SearchAndAppendParagraphOfResult(whereClause);
 }
 

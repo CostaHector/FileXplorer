@@ -14,11 +14,11 @@ class LogActions : public QObject {
   QAction* _LOG_FOLDER{nullptr};
   QAction* _LOG_AGING{nullptr};
 
-  QAction* _LOG_LEVEL_DEBUG{nullptr};
-  QAction* _LOG_LEVEL_WARNING{nullptr};
-  QActionGroup* _LOG_LEVEL_AG{nullptr};
+  QAction* _LOG_PRINT_LEVEL_DEBUG{nullptr};
+  QAction* _LOG_PRINT_LEVEL_WARNING{nullptr};
+  QActionGroup* _LOG_PRINT_LEVEL_AG{nullptr};
 
-  QAction* _FLUSH_INSTANTLY{nullptr};
+  QAction* _AUTO_FLUSH_IGNORE_LEVEL{nullptr};
 
   QList<QAction*> _DROPDOWN_LIST;
 

@@ -22,12 +22,12 @@ RenameNamesUnique::RenameNamesUnique(const QString& pre,
   const QSet<int> inputSizeSet{relNameList.size(), oldCompleteNameList.size(), oldSuffixList.size(), newCompleteNameList.size(), newSuffixList.size()};
   m_isArrLenUnequal = inputSizeSet.size() != 1;
   if (m_isArrLenUnequal) {
-    qCritical("Invalid. Parms with [%d] unequal array lengths.", inputSizeSet.size());
+    LOG_C("Invalid. Parms with [%d] unequal array lengths.", inputSizeSet.size());
     return;
   }
   m_nameLineEmpty = newCompleteNameList.contains("");
   if (m_nameLineEmpty) {
-    qCritical("Invalid. Some complete filename is empty");
+    LOG_C("Invalid. Some complete filename is empty");
     return;
   }
 
@@ -96,7 +96,7 @@ bool RenameNamesUnique::CheckConflict(QSet<QString> occupied, const QStringList&
 
 bool RenameNamesUnique::operator()() {
   if (!isInputValid()) {
-    qCritical("Reject do check. input is invalid");
+    LOG_C("Reject do check. input is invalid");
     return false;
   }
   m_occupiedNames = getOccupiedPostPath(m_pre, m_relNameList, m_leftNames, m_isIncludeSubDir);

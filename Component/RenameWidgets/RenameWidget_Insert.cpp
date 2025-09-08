@@ -36,7 +36,7 @@ QStringList RenameWidget_Insert::RenameCore(const QStringList& replaceeList) {
   bool isnumeric = false;
   int insertAt = insertAtStr.toInt(&isnumeric);
   if (!isnumeric) {
-    qCritical("Insert index[%s] must be a number", qPrintable(insertAtStr));
+    LOG_C("Insert index[%s] must be a number", qPrintable(insertAtStr));
     return replaceeList;
   }
   return RenameHelper::InsertRename(replaceeList, insertString, insertAt);

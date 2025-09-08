@@ -50,6 +50,7 @@
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
 #include "CreateFileFolderHelper.h"
+#include "JsonRenameRegex.h"
 
 #include <QApplication>
 #include <QInputDialog>
@@ -242,7 +243,7 @@ bool FileExplorerEvent::on_calcMD5() const {
   const QStringList& items = selectedItems();
   const int filesCnt = md5W->operator()(items);
   md5W->show();
-  qDebug("%d md5(s) calculate.", filesCnt);
+  LOG_D("%d md5(s) calculate.", filesCnt);
   return true;
 }
 
@@ -277,7 +278,7 @@ void FileExplorerEvent::subscribeThumbnailActions() {
   connect(ins._CREATE_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* createThumbnailAct) {
     auto it = ins.mCreateThumbnailDimension.find(createThumbnailAct);
     if (it == ins.mCreateThumbnailDimension.cend()) {
-      qWarning("create thumbnail action[%p] not support", createThumbnailAct);
+      LOG_W("create thumbnail action[%p] not support", createThumbnailAct);
       return;
     }
     int dimensionX = it->x, dimensionY = it->y, widthPixel = it->width;
@@ -305,7 +306,7 @@ void FileExplorerEvent::subscribeThumbnailActions() {
   connect(ins._EXTRACT_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* extractThumbnailAct) {
     auto it = ins.mExtractThumbnailRange.find(extractThumbnailAct);
     if (it == ins.mExtractThumbnailRange.cend()) {
-      qWarning("extract thumbnail action[%p] not support", extractThumbnailAct);
+      LOG_W("extract thumbnail action[%p] not support", extractThumbnailAct);
       return;
     }
     const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
@@ -518,7 +519,7 @@ bool FileExplorerEvent::__FocusNewItem(const QString& itemPath) {
   auto* view = _contentPane->GetCurView();
   const QModelIndex ind = _fileSysModel->index(itemPath);
   if (!ind.isValid()) {
-    qDebug("target lost, skip focus new one");
+    LOG_D("target lost, skip focus new one");
     return false;
   }
   view->clearSelection();
@@ -555,7 +556,7 @@ bool FileExplorerEvent::on_revealInExplorer() const {
 #endif
   process.setArguments(args);
   process.startDetached();  // Start the process in detached mode instead of start
-  qWarning("on_revealInExplorer with program[%s] parms [%s]", qPrintable(process.program()), qPrintable(args.join(',')));
+  LOG_W("on_revealInExplorer with program[%s] parms [%s]", qPrintable(process.program()), qPrintable(args.join(',')));
   return true;
 }
 
@@ -568,12 +569,12 @@ bool FileExplorerEvent::on_OpenInTerminal() const {
   const QString path = _contentPane->getRootPath();
   const QFileInfo fi{path};
   if (!fi.exists()) {
-    qDebug("path[%s] not exist", qPrintable(path));
+    LOG_D("path[%s] not exist", qPrintable(path));
     return false;
   }
   const QString pth = QDir::toNativeSeparators(path);
 #ifdef _WIN32
-  qWarning("WINDOWS not support now");
+  LOG_W("WINDOWS not support now");
   return false;
 #else
   QProcess process;
@@ -652,7 +653,7 @@ bool FileExplorerEvent::on_deCompress() {
       failsQzFiles << filePath;
     }
   }
-  qInfo("Decompress %d file(s), %d failed", filesPath.size(), failsQzFiles.size());
+  LOG_I("Decompress %d file(s), %d failed", filesPath.size(), failsQzFiles.size());
   if (!failsQzFiles.isEmpty()) {
     LOG_BAD_P("[Partially Failed] Decompress qz", "following %d file(s) failed:\n%s", failsQzFiles.size(), qPrintable(failsQzFiles.join('\n')));
   } else {
@@ -757,7 +758,7 @@ bool FileExplorerEvent::on_deletePermanently() {
     } else if (fi.isFile()) {
       cmds.push_back(ACMD::GetInstRMFILE(pth, fi.fileName()));
     } else {
-      qInfo("Here may some types not removed [%s]", qPrintable(fi.filePath()));
+      LOG_I("Here may some types not removed [%s]", qPrintable(fi.filePath()));
       continue;
     }
     deleteNames.push_back(fi.fileName());
@@ -1233,7 +1234,7 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
     Configuration().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
                              MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
   } else {
-    qDebug("DropAction[%d] is invalid", (int)dropAct);
+    LOG_D("DropAction[%d] is invalid", (int)dropAct);
     return false;
   }
 
@@ -1299,7 +1300,7 @@ bool FileExplorerEvent::SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAc
   } else if (dropAction == Qt::DropAction::CopyAction) {
     preferred[0] = 0x5;
   } else {
-    qWarning("cannot refill base DropEffect");
+    LOG_W("cannot refill base DropEffect");
     return false;
   }
   mimeData.setData("Preferred DropEffect", preferred);
@@ -1309,7 +1310,7 @@ bool FileExplorerEvent::SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAc
   } else if (dropAction == Qt::DropAction::CopyAction) {
     mimeData.setData("XdndAction", "XdndActionCopy");
   } else {
-    qWarning("cannot refill base DropEffect");
+    LOG_W("cannot refill base DropEffect");
     return false;
   }
 #endif

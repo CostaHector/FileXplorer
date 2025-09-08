@@ -1,9 +1,10 @@
 #include "StateLabel.h"
+#include "Logger.h"
 #include <QPixmap>
 
 QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status) {
   if (status < StateLabel::BEGIN || status >= StateLabel::BUTT) {
-    qWarning("status[%d] out of bound", status);
+    LOG_W("status[%d] out of bound", status);
     return {};
   }
   static const QPixmap labelSavedStatusPxp[StateLabel::BUTT]       //

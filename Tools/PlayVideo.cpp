@@ -1,5 +1,6 @@
 #include "PlayVideo.h"
 #include "PublicVariable.h"
+#include "Logger.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFile>
@@ -17,19 +18,19 @@ bool PlayADir(const QString& dirPath) {
 #endif
   process.setArguments({QDir::toNativeSeparators(dirPath)});
   process.startDetached();  // Start the process in detached mode instead of start
-  qWarning("Play folder program[%s], args[%s]...", qPrintable(process.program()), qPrintable(process.arguments().join(',')));
+  LOG_W("Play folder program[%s], args[%s]...", qPrintable(process.program()), qPrintable(process.arguments().join(',')));
   return true;
 }
 
 bool on_ShiftEnterPlayVideo(const QString& path) {
   if (!QFile::exists(path)) {
-    qWarning("path[%s] not exist skip play", qPrintable(path));
+    LOG_W("path[%s] not exist skip play", qPrintable(path));
     return false;
   }
   const QFileInfo fi(path);
   if (fi.isDir()) {
     return PlayADir(path);
   }
-  qWarning("Play file[%s]...", qPrintable(path));
+  LOG_W("Play file[%s]...", qPrintable(path));
   return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 }

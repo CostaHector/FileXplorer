@@ -16,11 +16,11 @@ SearchModeComboBox::SearchModeComboBox(QWidget* parent) : QComboBox{parent} {
 
 void SearchModeComboBox::BindSearchModel(SearchProxyModel* searchProxyModel) {
   if (searchProxyModel == nullptr) {
-    qDebug("Don't try to bind nullptr searchProxyModel to SearchModeComboBox");
+    LOG_D("Don't try to bind nullptr searchProxyModel to SearchModeComboBox");
     return;
   }
   if (_searchProxyModel != nullptr) {
-    qDebug("Don't try to rebind searchProxyModel to SearchModeComboBox");
+    LOG_D("Don't try to rebind searchProxyModel to SearchModeComboBox");
     return;
   }
   _searchProxyModel = searchProxyModel;

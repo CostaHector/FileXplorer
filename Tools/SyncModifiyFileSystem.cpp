@@ -1,7 +1,8 @@
 ﻿#include "SyncModifiyFileSystem.h"
+#include "MemoryKey.h"
+#include "Logger.h"
 #include <QDir>
 #include <QFileInfo>
-#include "MemoryKey.h"
 
 bool SyncModifiyFileSystem::m_syncOperationSw = false;
 bool SyncModifiyFileSystem::m_syncBackSw = true;
@@ -29,7 +30,7 @@ bool SyncModifiyFileSystem::operator()(QString& path) const {
     return false;
   }
   if (m_basicPath == m_syncToPath) {
-    qWarning("Basic path[%s] equals to synchronized to path, no need sync", qPrintable(m_basicPath));
+    LOG_W("Basic path[%s] equals to synchronized to path, no need sync", qPrintable(m_basicPath));
     return false;
   }
   // path can be "m_basicPath" or "m_basicPath/xxx"
@@ -51,7 +52,7 @@ bool SyncModifiyFileSystem::SetBasicPath(const QString& basicPath) {
   Configuration().setValue("SYNC_BASIC_PATH", basicPath);
   const QFileInfo fi{basicPath};
   if (!fi.isDir()) {
-    qWarning("Path[%s] is not a folder", qPrintable(basicPath));
+    LOG_W("Path[%s] is not a folder", qPrintable(basicPath));
     return false;
   }
   m_basicPath = fi.absoluteFilePath();
@@ -62,7 +63,7 @@ bool SyncModifiyFileSystem::SetSynchronizedToPaths(const QString& syncToPath) {
   Configuration().setValue("SYNC_TO_PATH", syncToPath);
   const QFileInfo fi{syncToPath};
   if (!fi.isDir()) {
-    qWarning("Path[%s] is not a folder", qPrintable(syncToPath));
+    LOG_W("Path[%s] is not a folder", qPrintable(syncToPath));
     return false;
   }
   m_syncToPath = fi.absoluteFilePath();

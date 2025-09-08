@@ -59,7 +59,7 @@ bool FileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction acti
 }
 
 bool FileSystemModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& /*parent*/) {
-  qDebug("Action[%d] %d item(s) Drop In FileSystemModel", action, data->urls().size());
+  LOG_D("Action[%d] %d item(s) Drop In FileSystemModel", action, data->urls().size());
   return true;
 }
 

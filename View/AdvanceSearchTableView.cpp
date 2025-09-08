@@ -68,7 +68,7 @@ public:
 
   auto searchInAnotherPath(const QString& newPath) -> bool {
     if (newPath.count('/') <= 2) {
-      qWarning("Path is a huge folder, search will cause lags[%s]", qPrintable(newPath));
+      LOG_W("Path is a huge folder, search will cause lags[%s]", qPrintable(newPath));
       return false;
     }
     m_searchSrcModel->setRootPath(newPath);

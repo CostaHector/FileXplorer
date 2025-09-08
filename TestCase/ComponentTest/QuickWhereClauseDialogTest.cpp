@@ -2,6 +2,7 @@
 #include "MyTestSuite.h"
 #include "OnScopeExit.h"
 #include "MemoryKey.h"
+#include "Logger.h"
 #include "BeginToExposePrivateMember.h"
 #include "QuickWhereClauseDialog.h"
 #include "EndToExposePrivateMember.h"
@@ -10,8 +11,7 @@ class QuickWhereClauseDialogTest : public MyTestSuite {
   Q_OBJECT
 public:
   QuickWhereClauseDialogTest() : MyTestSuite{false} {
-    fprintf(stdout, "QuickWhereClauseDialogTest object created\n");
-    std::fflush(stdout);
+    LOG_D("QuickWhereClauseDialogTest object created\n");
   }
   ~QuickWhereClauseDialogTest() {
     if (dialog != nullptr) delete dialog;

@@ -75,11 +75,11 @@ void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel
 
 void AdvanceSearchToolBar::BindSearchProxyModel(SearchProxyModel* searchProxyModel) {
   if (searchProxyModel == nullptr) {
-    qDebug("don't try bind nullptr SearchProxyModel*");
+    LOG_D("don't try bind nullptr SearchProxyModel*");
     return;
   }
   if (_searchProxyModel != nullptr) {
-    qDebug("don't try rebind SearchProxyModel*");
+    LOG_D("don't try rebind SearchProxyModel*");
     return;
   }
   _searchProxyModel = searchProxyModel;
@@ -95,11 +95,11 @@ void AdvanceSearchToolBar::BindSearchProxyModel(SearchProxyModel* searchProxyMod
 
 void AdvanceSearchToolBar::BindSearchSourceModel(AdvanceSearchModel* searchSourceModel) {
   if (searchSourceModel == nullptr) {
-    qDebug("don't try bind nullptr MySearchModel*");
+    LOG_D("don't try bind nullptr MySearchModel*");
     return;
   }
   if (_searchSourceModel != nullptr) {
-    qDebug("don't try rebind MySearchModel*");
+    LOG_D("don't try rebind MySearchModel*");
     return;
   }
   _searchSourceModel = searchSourceModel;

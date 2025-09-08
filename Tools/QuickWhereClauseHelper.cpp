@@ -6,6 +6,7 @@
 #include "PathTool.h"
 #include <QSet>
 #include <QSqlQuery>
+#include <QVariant>
 
 namespace QuickWhereClauseHelper {
 const QString FUZZY_INSTR{R"(INSTR(`%1`,"%2")>0)"}; // Case Sensitive Search. %1 is field, %2 is value

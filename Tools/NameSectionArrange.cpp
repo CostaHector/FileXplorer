@@ -1,4 +1,5 @@
 #include "NameSectionArrange.h"
+#include "Logger.h"
 #include <QRegularExpression>
 
 bool SubscriptsStr2Int(const QString& subscripts, QList<int>& sortedIndLst) {
@@ -60,7 +61,7 @@ QStringList NameSectionArrange::BatchSwapper(const QStringList& lst) {
 QString NameSectionArrange::operator()(const QString& names) {
   const QStringList& section = names.split('-');
   if (m_seq == INDEX_ARR && m_seq.size() == section.size()) {
-    qDebug("nothing changes");
+    LOG_D("nothing changes");
     return names;
   }
 

@@ -72,12 +72,12 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
   QList<int> sortedSequenceIndex;
   if (_SWAP_SECTION_AT_2_INDEXES->isChecked()) {
     if (!SubscriptsStr2Int(m_swap2Index->currentText(), sortedSequenceIndex)) {
-      qWarning("Swapped 2 indexes[%s] invalid, not number element find", qPrintable(m_sectionsUsedToJoin->currentText()));
+      LOG_W("Swapped 2 indexes[%s] invalid, not number element find", qPrintable(m_sectionsUsedToJoin->currentText()));
       regexValidLabel->ToNotSaved();
       return {};
     }
     if (sortedSequenceIndex.size() != 2) {
-      qWarning("Swapped 2 indexes[%s] invalid must 2 number but [%d] number(s) in factor", qPrintable(m_sectionsUsedToJoin->currentText()), sortedSequenceIndex.size());
+      LOG_W("Swapped 2 indexes[%s] invalid must 2 number but [%d] number(s) in factor", qPrintable(m_sectionsUsedToJoin->currentText()), sortedSequenceIndex.size());
       regexValidLabel->ToNotSaved();
       return {};
     }
@@ -87,13 +87,13 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
     nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), bRecordWasted);
   } else if (_SECTIONS_USED_TO_JOIN->isChecked()) {
     if (!SubscriptsDigitChar2Int(m_sectionsUsedToJoin->currentText(), sortedSequenceIndex)) {
-      qWarning("Sorted arrange indexes[%s] invalid", qPrintable(m_sectionsUsedToJoin->currentText()));
+      LOG_W("Sorted arrange indexes[%s] invalid", qPrintable(m_sectionsUsedToJoin->currentText()));
       regexValidLabel->ToNotSaved();
       return {};
     }
     nsa = NameSectionArrange(sortedSequenceIndex, bRecordWasted);
   } else {
-    qWarning("Section arrange method not found");
+    LOG_W("Section arrange method not found");
     regexValidLabel->ToNotSaved();
     return {};
   }

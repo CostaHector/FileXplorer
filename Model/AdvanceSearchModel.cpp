@@ -34,7 +34,7 @@ void AdvanceSearchModel::updateSearchResultList() {
   }
   // C:/A/B/C
   // C:/A   file
-  qDebug("%d item(s) find out under path [%s] with QDir::Filters[%d]", newPlanetList.size(), qPrintable(m_rootPath), int(m_filters));
+  LOG_D("%d item(s) find out under path [%s] with QDir::Filters[%d]", newPlanetList.size(), qPrintable(m_rootPath), int(m_filters));
   beginResetModel();
   newPlanetList.swap(m_itemsLst);
   endResetModel();
@@ -45,11 +45,11 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
   // queryWhenSearchUnderLargeDirectory is most likely set to be true
   const QString& stdPath = PathTool::GetWinStdPath(path);
   if (stdPath.isEmpty()) {
-    qWarning("reject search under empty path");
+    LOG_W("reject search under empty path");
     return false;
   }
   if (!QFileInfo(stdPath).isDir()) {
-    qWarning("reject search under inexist path[%s]", qPrintable(stdPath));
+    LOG_W("reject search under inexist path[%s]", qPrintable(stdPath));
     return false;
   }
   if (queryWhenSearchUnderLargeDirectory && stdPath.count('/') < 2) {  // C:/A
@@ -74,7 +74,7 @@ void AdvanceSearchModel::initRootPath(const QString& path) {
     return;
   }
   m_rootPath = path;
-  qDebug("init rootPath:%s", qPrintable(m_rootPath));
+  LOG_D("init rootPath:%s", qPrintable(m_rootPath));
 }
 
 void AdvanceSearchModel::setRootPath(const QString& path) {
@@ -83,7 +83,7 @@ void AdvanceSearchModel::setRootPath(const QString& path) {
     return;
   }
   initRootPath(path);
-  qDebug("set rootPath:%s", qPrintable(m_rootPath));
+  LOG_D("set rootPath:%s", qPrintable(m_rootPath));
   updateSearchResultList();
 }
 
@@ -97,7 +97,7 @@ void AdvanceSearchModel::setFilter(QDir::Filters newFilters) {
     return;
   }
   updateSearchResultList();
-  qDebug("setFilter: %d", (int)m_filters);
+  LOG_D("setFilter: %d", (int)m_filters);
 }
 
 void AdvanceSearchModel::setRootPathAndFilter(const QString& path, QDir::Filters filters) {

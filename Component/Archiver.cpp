@@ -55,7 +55,7 @@ class ArchiverModel : public QAbstractTableModelPub {
   void setRootPath(const ArchiveFiles* p_af) {
     int beforeRow = rowCount();
     int afterRow = p_af != nullptr ? p_af->size() : 0;
-    qDebug("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
+    LOG_D("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
 
     RowsCountBeginChange(beforeRow, afterRow);
     m_paf = p_af;
@@ -112,7 +112,7 @@ void Archiver::showEvent(QShowEvent *event) {
 
 void Archiver::closeEvent(QCloseEvent* event) {
   Configuration().setValue("ArchiverGeometry", saveGeometry());
-  qDebug("Archiver geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
+  LOG_D("Archiver geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
   Configuration().setValue("ArchiverSplitterState", m_splitter->saveState());
   QMainWindow::closeEvent(event);
 }
@@ -140,7 +140,7 @@ bool Archiver::onNewRow(const QModelIndex& current, const QModelIndex& /* previo
 
 bool Archiver::operator()(const QString& qzPath) {
   if (not ArchiveFiles::isQZFile(qzPath)) {
-    qWarning("Path[%s] is not a qz file", qPrintable(qzPath));
+    LOG_W("Path[%s] is not a qz file", qPrintable(qzPath));
     setWindowTitle(QString("ArchiveFilesPreview | [%1] not a qz file").arg(qzPath));
     return false;
   }

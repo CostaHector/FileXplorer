@@ -76,7 +76,7 @@ void RenameWidget_LongPath::DropSectionChanged(const QString& newDropSectionStr)
   bool isInt = false;
   int newDropSection = newDropSectionStr.toInt(&isInt);
   if (!isInt) {
-    qWarning("invalid drop section index[%s]", qPrintable(newDropSectionStr));
+    LOG_W("invalid drop section index[%s]", qPrintable(newDropSectionStr));
     return;
   }
   m_lpf.SetDropSectionWhenTooLong(newDropSection);

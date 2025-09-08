@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QAction>
 #include <QActionGroup>
+#include "Logger.h"
 
 template<typename TEMP_T>
 struct EnumIntAction : public QObject {
@@ -34,7 +35,7 @@ struct EnumIntAction : public QObject {
     // intValue -> defVal() may have no action correspond
     auto it = mEnum2Act.find(enumValue);
     if (it == mEnum2Act.cend()) {
-      qDebug("enumValue:%d have no action", (int)enumValue);
+      LOG_D("enumValue:%d have no action", (int)enumValue);
       return nullptr;
     }
     mEnum2Act[enumValue]->setChecked(true);
@@ -49,7 +50,7 @@ struct EnumIntAction : public QObject {
   TEMP_T val2Enum(int intVal) const {
     auto it = mVal2Enum.find(intVal);
     if (it == mVal2Enum.cend()) {
-      qWarning("int[%d] not in val2Enum Hash", intVal);
+      LOG_W("int[%d] not in val2Enum Hash", intVal);
       return defVal();
     }
     return it.value();

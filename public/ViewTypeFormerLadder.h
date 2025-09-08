@@ -12,7 +12,7 @@ public:
 
   bool operator()(const ViewTypeTool::ViewType& vt) {
     if (!undoStack.isEmpty() && undoStack.top() == vt) { // same viewType
-      qDebug("[Skip] Duplicate ViewType[%s]", ViewTypeTool::c_str(vt));
+      LOG_D("[Skip] Duplicate ViewType[%s]", ViewTypeTool::c_str(vt));
       return false;
     }
     undoStack.append(vt);

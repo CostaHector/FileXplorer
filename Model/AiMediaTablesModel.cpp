@@ -1,4 +1,5 @@
 #include "AiMediaTablesModel.h"
+#include "Logger.h"
 
 const QStringList AiMediaTablesModel::AITABLE_HOR_HEADER{"table name", "count"};
 auto AiMediaTablesModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
@@ -36,6 +37,14 @@ QVariant AiMediaTablesModel::data(const QModelIndex& index, int role) const {
   return {};
 }
 
+QString AiMediaTablesModel::fileName(const QModelIndex& index) const {
+  if (index.isValid() && 0 <= index.row() and index.row() < rowCount()) {
+    return m_data[index.row()].tableName;
+  }
+  LOG_W("invalid index");
+  return {};
+}
+
 void AiMediaTablesModel::UpdateData(QList<DupTableModelData> newData) {
   int beforeRow = m_data.size(), afterRow = newData.size();
   if (beforeRow < afterRow) {
@@ -50,5 +59,5 @@ void AiMediaTablesModel::UpdateData(QList<DupTableModelData> newData) {
     m_data.swap(newData);
   }
   emit dataChanged(index(0, 0, {}), index(afterRow - 1, columnCount() - 1, {}), {Qt::ItemDataRole::DisplayRole});
-  qDebug("Ai Media rowCount %d->%d", beforeRow, afterRow);
+  LOG_D("Ai Media rowCount %d->%d", beforeRow, afterRow);
 }

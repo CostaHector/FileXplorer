@@ -32,20 +32,20 @@ void SearchProxyModel::setSearchMode(const QString& searchMode) {
 }
 
 void SearchProxyModel::PrintRegexDebugMessage() const {
-  qDebug("Search Mode: %d, file name raw[%s] caseSentive:%d, file content raw[%s] caseSentive:%d",  //
+  LOG_D("Search Mode: %d, file name raw[%s] caseSentive:%d, file content raw[%s] caseSentive:%d",  //
          (int)m_searchMode,                                                                         //
          qPrintable(m_nameRawString), (int)m_nameFiltersCaseSensitive,                              //
          qPrintable(m_contentRawText), (int)m_fileContentsCaseSensitive);                           //
   const auto& regex = filterRegularExpression();
   const QString& nameFilterPattern = regex.pattern();
   if (!regex.isValid()) {
-    qWarning("Regex[%s] is invalid", qPrintable(nameFilterPattern));
+    LOG_W("Regex[%s] is invalid", qPrintable(nameFilterPattern));
     return;
   }
   if (m_searchMode == SearchTools::SEARCH_MODE::FILE_CONTENTS) {
-    qDebug(R"(grep -iE \"%s\" --include="%s")", qPrintable(m_contentRawText), qPrintable(nameFilterPattern));
+    LOG_D(R"(grep -iE \"%s\" --include="%s")", qPrintable(m_contentRawText), qPrintable(nameFilterPattern));
   } else {
-    qDebug(R"(find ./ -type f -iname "%s")", qPrintable(m_nameRawString));
+    LOG_D(R"(find ./ -type f -iname "%s")", qPrintable(m_nameRawString));
   }
 }
 
@@ -69,7 +69,7 @@ void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const
       setFilterRegularExpression(nameText);
       break;
     default:
-      qWarning("Search mode[%d] not support", (int)m_searchMode);
+      LOG_W("Search mode[%d] not support", (int)m_searchMode);
       break;
   }
 }
@@ -89,7 +89,7 @@ void SearchProxyModel::startFilterWhenTextChanges(const QString& nameText, const
     case SEARCH_MODE::FILE_CONTENTS:
       return;
     default:
-      qWarning("Search mode[%d] not support", (int)m_searchMode);
+      LOG_W("Search mode[%d] not support", (int)m_searchMode);
       break;
   }
 }
@@ -162,7 +162,7 @@ bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const Q
   if (contained.isEmpty()) {
     return true;
   }
-  qDebug("Read file [%s]", qPrintable(filePath));
+  LOG_D("Read file [%s]", qPrintable(filePath));
   const QString& fileContents = TextReader(filePath);
   // Todo: new feature on the way: regex match, parms text is a wildcard
   return fileContents.contains(contained, m_fileContentsCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);

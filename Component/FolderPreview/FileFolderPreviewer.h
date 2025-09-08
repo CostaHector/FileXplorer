@@ -30,7 +30,7 @@ public:
   }
   void setCurrentIndex(int index) {
     if (index < (int)PANE_TYPE::BEGIN || index >= (int)PANE_TYPE::BUTT) {
-      qWarning("Current index[%d] out of bound[%d, %d)", index, (int)PANE_TYPE::BEGIN, (int)PANE_TYPE::BUTT);
+      LOG_W("Current index[%d] out of bound[%d, %d)", index, (int)PANE_TYPE::BEGIN, (int)PANE_TYPE::BUTT);
       return;
     }
     m_curIndex = static_cast<PANE_TYPE>(index);
