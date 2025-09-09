@@ -31,8 +31,7 @@ public:
   static void subscribe();
   static bool OpenLogFile();
   static bool OpenLogFolder();
-  static void SetPrintLevelError();
-  static void SetPrintLevelDebug();
+  static void SetPrintLevel(LOG_LVL_E newLevel);
   static void SetAutoFlushAllLevel(bool allLevelChecked);
 private:
   static FILE* SwitchLogToALocalFile(const QString& logFileAbsPath = "");
