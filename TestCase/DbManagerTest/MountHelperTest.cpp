@@ -1,14 +1,14 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "MountHelper.h"
 
 using namespace MountHelper;
 
-class MountHelperTest : public MyTestSuite {
+class MountHelperTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  MountHelperTest() : MyTestSuite{false} {}
+  MountHelperTest() : PlainTestSuite{} {}
  private slots:
 
 #ifdef WIN32
@@ -156,5 +156,5 @@ class MountHelperTest : public MyTestSuite {
 #endif
 };
 
-MountHelperTest g_MountHelperTest;
 #include "MountHelperTest.moc"
+REGISTER_TEST(MountHelperTest, false)

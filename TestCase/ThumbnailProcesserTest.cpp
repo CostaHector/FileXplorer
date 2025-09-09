@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "PathRelatedTool.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "OnScopeExit.h"
 #include "BeginToExposePrivateMember.h"
@@ -24,10 +24,10 @@ bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int heigh
 
 const QString VIDEOS_DURATION_DIR = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
 
-class ThumbnailProcesserTest : public MyTestSuite {
+class ThumbnailProcesserTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  ThumbnailProcesserTest() : MyTestSuite{false} {}
+  ThumbnailProcesserTest() : PlainTestSuite{} {}
 private slots:
   void cleanupTestCase() {}
 
@@ -145,4 +145,4 @@ private slots:
 };
 
 #include "ThumbnailProcesserTest.moc"
-ThumbnailProcesserTest g_ThumbnailProcesserTest;
+REGISTER_TEST(ThumbnailProcesserTest, false)

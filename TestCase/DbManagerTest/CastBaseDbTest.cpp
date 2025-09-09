@@ -2,7 +2,7 @@
 #include <QtTest>
 #include <QSqlRecord>
 #include <QSqlField>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "CastBaseDb.h"
 #include "TDir.h"
 #include "TableFields.h"
@@ -42,10 +42,10 @@ struct CastStructureProperty {
   int rate;
 };
 
-class CastBaseDbTest : public MyTestSuite {
+class CastBaseDbTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  CastBaseDbTest() : MyTestSuite{false} {}
+  CastBaseDbTest() : PlainTestSuite{} {}
   TDir mDir;
   QString dbName{mDir.itemPath("PERF.db")};
   QString imgHostPath{mDir.path()};
@@ -345,5 +345,5 @@ private slots:
   }
 };
 
-CastBaseDbTest g_CastBaseDbTest;
 #include "CastBaseDbTest.moc"
+REGISTER_TEST(CastBaseDbTest, false)

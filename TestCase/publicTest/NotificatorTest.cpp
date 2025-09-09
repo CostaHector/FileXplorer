@@ -1,5 +1,5 @@
 #include <QtTest/QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "OnScopeExit.h"
 #include <QTestEventList>
 #include <QSignalSpy>
@@ -13,13 +13,14 @@
 #include "Notificator.h"
 #include "EndToExposePrivateMember.h"
 
-class NotificatorTest : public MyTestSuite {
+class NotificatorTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  NotificatorTest() : MyTestSuite{false} {
+  NotificatorTest() : PlainTestSuite{} {
     LOG_D("NotificatorTest object created\n");
   }
   const bool mFromToBottomBkp{Notificator::m_isTopToBottom};
+  static constexpr int DEFAULT_NTY_TIMEOUT{500};
 private slots:
   void init() {
     Notificator::m_isTopToBottom = mFromToBottomBkp;
@@ -30,7 +31,7 @@ private slots:
     Notificator::instances.clear();
   }
 
-  void cards_tile_from_top_to_bottom_wrapped_ok() {
+  void balloons_tile_from_top_to_bottom_wrapped_ok() {
     const auto screens = QGuiApplication::screens();
     QVERIFY(!screens.isEmpty());
     Notificator::m_isTopToBottom = true;
@@ -40,7 +41,7 @@ private slots:
 
     int heightOcuppied = 0;
 
-    Notificator::showMessage(QIcon{}, "first one", "", 1000);
+    Notificator::showMessage(QIcon{}, "first one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() == 1);
 
     // firstNtyRect is in the right-top cornner of current sceen
@@ -53,14 +54,14 @@ private slots:
     for (int cardIndex = 1; cardIndex < 100; ++cardIndex) {
       QString titleStr{"title" + QString::number(cardIndex)};
       QString msgStr{"message" + QString::number(cardIndex)};
-      Notificator::showMessage(QIcon{}, titleStr, msgStr, 1000);
+      Notificator::showMessage(QIcon{}, titleStr, msgStr, DEFAULT_NTY_TIMEOUT);
       QVERIFY2(!Notificator::instances.empty(), qPrintable(titleStr));
       heightOcuppied += Notificator::instances.back()->geometry().height();
       while (heightOcuppied >= CURRENT_SCEEN_HEIGHT) {
         break;
       }
     }
-    Notificator::showMessage(QIcon{}, "wrapped one", "", 1000);
+    Notificator::showMessage(QIcon{}, "wrapped one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() >= 2);
 
     // wrappedNtyRect is also in the right-top cornner of current sceen
@@ -68,11 +69,11 @@ private slots:
     QVERIFY(wrappedNtyRect.top() - screenRect.top() <= 100);
     QVERIFY(screenRect.right() - wrappedNtyRect.right() <= 100);
 
-    QTest::qWait(1000 + 500);  // wait 1.5s until all one time timer timeout
+    QTest::qWait(DEFAULT_NTY_TIMEOUT + 500);  // wait 1.5s until all one time timer timeout
     QVERIFY(Notificator::instances.empty());
   }
 
-  void cards_tile_from_bottom_to_top_wrapped_ok() {
+  void balloons_tile_from_bottom_to_top_wrapped_ok() {
     const auto screens = QGuiApplication::screens();
     QVERIFY(!screens.isEmpty());
     Notificator::m_isTopToBottom = false;
@@ -82,7 +83,7 @@ private slots:
 
     int heightOcuppied = 0;
 
-    Notificator::showMessage(QIcon{}, "first one", "", 1000);
+    Notificator::showMessage(QIcon{}, "first one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() == 1);
 
     // firstNtyRect is in the right-bottom cornner of current sceen
@@ -95,14 +96,14 @@ private slots:
     for (int cardIndex = 1; cardIndex < 100; ++cardIndex) {
       QString titleStr{"title" + QString::number(cardIndex)};
       QString msgStr{"message" + QString::number(cardIndex)};
-      Notificator::showMessage(QIcon{}, titleStr, msgStr, 1000);
+      Notificator::showMessage(QIcon{}, titleStr, msgStr, DEFAULT_NTY_TIMEOUT);
       QVERIFY2(!Notificator::instances.empty(), qPrintable(titleStr));
       heightOcuppied += Notificator::instances.back()->geometry().height();
       while (heightOcuppied >= CURRENT_SCEEN_HEIGHT) {
         break;
       }
     }
-    Notificator::showMessage(QIcon{}, "wrapped one", "", 1000);
+    Notificator::showMessage(QIcon{}, "wrapped one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() >= 2);
 
     // wrappedNtyRect is also in the right-bottom cornner of current sceen
@@ -112,17 +113,17 @@ private slots:
   }
 
   void timeoutLenGT0_AutoHideTimerActive_ok() {
-    Notificator::showMessage(QIcon{}, "Title: Hello", "Message: world", 1000);
+    Notificator::showMessage(QIcon{}, "Title: Hello", "Message: world", DEFAULT_NTY_TIMEOUT);
     QCOMPARE(Notificator::instances.size(), 1);
     QVERIFY(Notificator::instances.front() != nullptr);
     auto* pFirst = Notificator::instances.front().get();
     QVERIFY( pFirst != nullptr);
     QCOMPARE(pFirst->m_title->text(), "Title: Hello");
     QCOMPARE(pFirst->m_message->text(), "Message: world");
-    QCOMPARE(pFirst->mTimeOutLen, 1000);
+    QCOMPARE(pFirst->mTimeOutLen, DEFAULT_NTY_TIMEOUT);
     QCOMPARE(pFirst->mAutoCloser.isActive(), true);
     QCOMPARE(pFirst->mAutoCloser.isSingleShot(), true);
-    QCOMPARE(pFirst->mAutoCloser.interval(), 1000);
+    QCOMPARE(pFirst->mAutoCloser.interval(), DEFAULT_NTY_TIMEOUT);
     QVERIFY(pFirst->m_progress == nullptr);
   }
 
@@ -192,6 +193,7 @@ private slots:
     QVERIFY(titleOfBalloon.contains("finished", Qt::CaseInsensitive));
   }
 };
+constexpr int NotificatorTest::DEFAULT_NTY_TIMEOUT;
 
 #include "NotificatorTest.moc"
-NotificatorTest g_NotificatorTest;
+REGISTER_TEST(NotificatorTest, false)

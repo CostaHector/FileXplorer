@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "PublicMacro.h"
 
 // add necessary includes here
 #include "LineEditCSV.h"
 
-class LineEditCSVTest : public MyTestSuite {
+class LineEditCSVTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  LineEditCSVTest() : MyTestSuite{false} {}
+  LineEditCSVTest() : PlainTestSuite{} {}
  private slots:
   void test_hotSceneSL() {
     LineEditCSV uniqueEleLe{ENUM_2_STR(CAST), "", true};
@@ -71,5 +71,6 @@ class LineEditCSVTest : public MyTestSuite {
   }
 };
 
-LineEditCSVTest g_LineEditCSVTest;
+
 #include "LineEditCSVTest.moc"
+REGISTER_TEST(LineEditCSVTest, false)

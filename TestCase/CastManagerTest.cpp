@@ -5,7 +5,7 @@
 #include "TDir.h"
 #include "JsonKey.h"
 #include "JsonHelper.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
 // add necessary includes here
 #include "BeginToExposePrivateMember.h"
@@ -15,10 +15,10 @@
 
 #include "PublicMacro.h"
 
-class CastManagerTest : public MyTestSuite {
+class CastManagerTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  CastManagerTest() : MyTestSuite{false} {}
+  CastManagerTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString rootpath{mDir.path()};
   const QString gLocalFilePath{rootpath + "/cast_list.txt"};
@@ -239,4 +239,4 @@ private slots:
 };
 
 #include "CastManagerTest.moc"
-CastManagerTest g_CastManagerTest;
+REGISTER_TEST(CastManagerTest, false)

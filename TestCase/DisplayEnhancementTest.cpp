@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "DisplayEnhancement.h"
 
 using namespace FILE_PROPERTY_DSP;
-class DisplayEnhancementTest : public MyTestSuite {
+class DisplayEnhancementTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -47,4 +47,4 @@ class DisplayEnhancementTest : public MyTestSuite {
 };
 
 #include "DisplayEnhancementTest.moc"
-DisplayEnhancementTest g_DisplayEnhancementTest;
+REGISTER_TEST(DisplayEnhancementTest, false)

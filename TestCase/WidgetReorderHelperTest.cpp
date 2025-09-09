@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "WidgetReorderHelper.h"
 #include <QLabel>
 
@@ -35,10 +35,10 @@ QStringList GetLabelTextsFromToolBar(const QToolBar& toolbar) {
   return result;
 }
 
-class WidgetReorderHelperTest : public MyTestSuite {
+class WidgetReorderHelperTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  WidgetReorderHelperTest() : MyTestSuite{false} {}
+  WidgetReorderHelperTest() : PlainTestSuite{} {}
  private slots:
   void test_move_element_index_out_of_bound_skip() {
     QVector<int> vEmpty;
@@ -211,5 +211,5 @@ class WidgetReorderHelperTest : public MyTestSuite {
   }
 };
 
-WidgetReorderHelperTest g_WidgetReorderHelperTest;
 #include "WidgetReorderHelperTest.moc"
+REGISTER_TEST(WidgetReorderHelperTest, false)

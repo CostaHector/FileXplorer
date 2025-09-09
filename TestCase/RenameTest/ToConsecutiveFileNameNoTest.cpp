@@ -1,9 +1,9 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "ToConsecutiveFileNameNo.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
-class ToConsecutiveFileNameNoTest : public MyTestSuite {
+class ToConsecutiveFileNameNoTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -58,4 +58,4 @@ class ToConsecutiveFileNameNoTest : public MyTestSuite {
 };
 
 #include "ToConsecutiveFileNameNoTest.moc"
-ToConsecutiveFileNameNoTest g_ToConsecutiveFileNameNoTest;
+REGISTER_TEST(ToConsecutiveFileNameNoTest, false)

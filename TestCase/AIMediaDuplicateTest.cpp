@@ -9,7 +9,7 @@
 class AIMediaDuplicateTest : public FileSystemTestSuite {
   Q_OBJECT
  public:
-  AIMediaDuplicateTest() : FileSystemTestSuite("TestEnv_AIMediaDuplicate", false, false) {}
+  AIMediaDuplicateTest() : FileSystemTestSuite("TestEnv_AIMediaDuplicate", false) {}
   const FileSystemHelper m_rootHelper{mTestPath};
   const QString AI_MEDIA_DUPLICATE_DIR_EMPTY = mTestPath + "/empty";
   const QString AI_MEDIA_DUPLICATE_DIR_FOLDER_1 = mTestPath + "/folder_1";
@@ -154,4 +154,4 @@ class AIMediaDuplicateTest : public FileSystemTestSuite {
 };
 
 #include "AIMediaDuplicateTest.moc"
-AIMediaDuplicateTest g_AIMediaDuplicateTest;
+REGISTER_TEST(AIMediaDuplicateTest, false)

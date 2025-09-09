@@ -1,16 +1,16 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 // add necessary includes here
 #include "JsonRenameRegex.h"
 #include "DbManager.h"
 
 using namespace JSON_RENAME_REGEX;
-class JsonRenameRegexTest : public MyTestSuite {
+class JsonRenameRegexTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  JsonRenameRegexTest() : MyTestSuite{false} {}
+  JsonRenameRegexTest() : PlainTestSuite{} {}
  private slots:
   void test_toUpper() {
     QString s{"abc123ABC!@#"};
@@ -269,4 +269,4 @@ class JsonRenameRegexTest : public MyTestSuite {
 };
 
 #include "JsonRenameRegexTest.moc"
-JsonRenameRegexTest g_JsonRenameRegexTest;
+REGISTER_TEST(JsonRenameRegexTest, false)

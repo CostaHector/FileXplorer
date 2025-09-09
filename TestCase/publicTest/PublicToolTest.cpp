@@ -1,12 +1,12 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "PublicTool.h"
 
-class PublicToolTest : public MyTestSuite {
+class PublicToolTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  PublicToolTest() : MyTestSuite{false} {}
+  PublicToolTest() : PlainTestSuite{} {}
  private slots:
   void test_mvToANewPath() {
     QString mvToANewPath = "5";
@@ -46,4 +46,4 @@ class PublicToolTest : public MyTestSuite {
 };
 
 #include "PublicToolTest.moc"
-PublicToolTest g_PublicToolTest;
+REGISTER_TEST(PublicToolTest, false)

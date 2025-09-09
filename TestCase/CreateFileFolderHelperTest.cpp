@@ -1,15 +1,15 @@
 #include <QCoreApplication>
 #include <QtTest>
 #include "CreateFileFolderHelper.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "JsonHelper.h"
 #include "JsonKey.h"
 
-class CreateFileFolderHelperTest : public MyTestSuite {
+class CreateFileFolderHelperTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  CreateFileFolderHelperTest() : MyTestSuite{false} {
+  CreateFileFolderHelperTest() : PlainTestSuite{} {
   }
 
 private slots:
@@ -61,4 +61,4 @@ private slots:
 };
 
 #include "CreateFileFolderHelperTest.moc"
-CreateFileFolderHelperTest g_CreateFileFolderHelperTest;
+REGISTER_TEST(CreateFileFolderHelperTest, false)

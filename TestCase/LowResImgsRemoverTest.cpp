@@ -1,13 +1,13 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 // add necessary includes here
 #include "LowResImgsRemover.h"
 
-class LowResImgsRemoverTest : public MyTestSuite {
+class LowResImgsRemoverTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  LowResImgsRemoverTest() : MyTestSuite{false} {}
+  LowResImgsRemoverTest() : PlainTestSuite{} {}
   LowResImgsRemover m_duplicateImagsRemover;
  private slots:
   void test_NoDuplicateImages() {
@@ -33,5 +33,5 @@ class LowResImgsRemoverTest : public MyTestSuite {
   }
 };
 
-LowResImgsRemoverTest g_LowResImgsRemoverTest;
 #include "LowResImgsRemoverTest.moc"
+REGISTER_TEST(LowResImgsRemoverTest, false)

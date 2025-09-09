@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
 #include "ItemsPacker.h"
@@ -9,10 +9,10 @@
 #include "SceneMixed.h"
 #include "SyncModifiyFileSystem.h"
 
-class ItemsPackerTest : public MyTestSuite {
+class ItemsPackerTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  ItemsPackerTest() : MyTestSuite{false} {}
+  ItemsPackerTest() : PlainTestSuite{} {}
 private slots:
   /* create a folder tDir contains
 [file] "H.C..jpg"
@@ -135,4 +135,4 @@ private slots:
 };
 
 #include "ItemsPackerTest.moc"
-ItemsPackerTest g_ItemsPackerTest;
+REGISTER_TEST(ItemsPackerTest, false)

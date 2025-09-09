@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
 // add necessary includes here
 #include "OnScopeExit.h"
 
-class OnScopeExitTest : public MyTestSuite {
+class OnScopeExitTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
   static int EXEC_CNT;
-  OnScopeExitTest() : MyTestSuite{false} {}
+  OnScopeExitTest() : PlainTestSuite{} {}
  private slots:
   void test_auto_exit() {
     EXEC_CNT = 0;
@@ -35,5 +35,6 @@ class OnScopeExitTest : public MyTestSuite {
 };
 
 int OnScopeExitTest::EXEC_CNT = 0;
-OnScopeExitTest g_OnScopeExitTest;
+
 #include "OnScopeExitTest.moc"
+REGISTER_TEST(OnScopeExitTest, false)

@@ -1,10 +1,10 @@
 #include <QtTest>
 #include "FileSystemHelper.h"
-#include "MyTestSuite.h"
-class FileSystemTestSuite : public MyTestSuite {
+#include "PlainTestSuite.h"
+class FileSystemTestSuite : public PlainTestSuite {
   Q_OBJECT
  public:
-  FileSystemTestSuite(const char* testSuiteName, bool autoCleanUp = true, bool bExculsive=false);
+  FileSystemTestSuite(const char* testSuiteName, bool autoCleanUp = true);
   ~FileSystemTestSuite();
  protected:
   const QString mTestPath;

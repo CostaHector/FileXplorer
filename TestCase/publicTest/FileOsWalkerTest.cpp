@@ -1,13 +1,13 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "FileOsWalker.h"
 
-class FileOsWalkerTest : public MyTestSuite {
+class FileOsWalkerTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  FileOsWalkerTest() : MyTestSuite{false}, mRootpath{mDir.path()} {}
+  FileOsWalkerTest() : PlainTestSuite{}, mRootpath{mDir.path()} {}
   TDir mDir;
   const QString mRootpath;
  private slots:
@@ -81,4 +81,4 @@ class FileOsWalkerTest : public MyTestSuite {
 };
 
 #include "FileOsWalkerTest.moc"
-FileOsWalkerTest gFileOsWalkerTest;
+REGISTER_TEST(FileOsWalkerTest, false)
