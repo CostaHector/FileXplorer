@@ -95,7 +95,7 @@ void CastDBView::onInitATable() {
 
 int CastDBView::onAppendCasts() {
   if (_castModel->isDirty()) {
-    LOG_BAD_NP("Table dirty", "submit before load from file-system structure");
+    LOG_ERR_NP("Table dirty", "submit before load from file-system structure");
     return false;
   }
   bool ok = false;
@@ -112,13 +112,13 @@ int CastDBView::onAppendCasts() {
     return 0;
   }
   _castModel->submitAll();
-  LOG_GOOD_P("[Ok] load performer(s)", "perfsText:%s, count: %d", qPrintable(perfsText), succeedCnt);
+  LOG_OK_P("[Ok] load performer(s)", "perfsText:%s, count: %d", qPrintable(perfsText), succeedCnt);
   return succeedCnt;
 }
 
 int CastDBView::onDeleteRecords() {
   if (!selectionModel()->hasSelection()) {
-    LOG_BAD_NP("Nothing was selected", "Select some row(s) to delete");
+    LOG_ERR_NP("Nothing was selected", "Select some row(s) to delete");
     return 0;
   }
   const auto& itemSelection = selectionModel()->selection();
@@ -126,7 +126,7 @@ int CastDBView::onDeleteRecords() {
   if (QMessageBox::question(this, "CONFIRM DELETE? (OPERATION NOT RECOVERABLE)", hintText,  //
                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
       != QMessageBox::Yes) {
-    LOG_GOOD_NP("[Skip] User Cancel delete records", "return");
+    LOG_OK_NP("[Skip] User Cancel delete records", "return");
     return 0;
   }
 
@@ -146,7 +146,7 @@ int CastDBView::onDeleteRecords() {
     return 0;
   }
   bool submitResult = onSubmit();
-  LOG_GOOD_P("[Ok]Delete records", "%d/%d bSubmit[%d]", succeedCnt, totalCnt, submitResult);
+  LOG_OK_P("[Ok]Delete records", "%d/%d bSubmit[%d]", succeedCnt, totalCnt, submitResult);
   return succeedCnt;
 }
 
@@ -161,34 +161,34 @@ bool CastDBView::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete)
   }
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
   if (rmvedTableCnt < 0) {
-    LOG_BAD_P("Drop/Delete failed", "errorCode: %d", rmvedTableCnt);
+    LOG_ERR_P("Drop/Delete failed", "errorCode: %d", rmvedTableCnt);
     return false;
   }
   _castModel->submitAll();
   const QString title = QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(DB_TABLE::PERFORMERS);
   const QString msg = QString("Drop(0)/Delete(1). %1 table removed").arg(rmvedTableCnt);
-  LOG_GOOD_NP(title, msg);
+  LOG_OK_NP(title, msg);
   return rmvedTableCnt >= 0;
 }
 
 int CastDBView::onLoadFromFileSystemStructure() {
   if (_castModel->isDirty()) {
-    LOG_BAD_NP("[Abort] Table dirty", "submit before load from file-system structure");
+    LOG_ERR_NP("[Abort] Table dirty", "submit before load from file-system structure");
     return false;
   }
   int succeedCnt = _castDb.ReadFromImageHost(mImageHost);
   if (succeedCnt < 0) {
-    LOG_BAD_P("[Failed] Load perfs", "errorCode: %d", succeedCnt);
+    LOG_ERR_P("[Failed] Load perfs", "errorCode: %d", succeedCnt);
     return 0;
   }
   _castModel->submitAll();
-  LOG_GOOD_P("Load perf(s) succeed", "count: %d", succeedCnt);
+  LOG_OK_P("Load perf(s) succeed", "count: %d", succeedCnt);
   return succeedCnt;
 }
 
 bool CastDBView::onSubmit() {
   if (!_castModel->isDirty()) {
-    LOG_GOOD_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
+    LOG_OK_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
     return true;
   }
   const QModelIndex oldIndex = currentIndex();
@@ -199,30 +199,30 @@ bool CastDBView::onSubmit() {
   if (oldIndex.isValid() && currentIndex() != oldIndex) {
     setCurrentIndex(oldIndex);
   }
-  LOG_GOOD_NP("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
+  LOG_OK_NP("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
   return true;
 }
 
 bool CastDBView::onRevert() {
   if (!_castModel->isDirty()) {
-    LOG_GOOD_NP("Table not dirty.", "Skip revert");
+    LOG_OK_NP("Table not dirty.", "Skip revert");
     return true;
   }
   _castModel->revertAll();
-  LOG_GOOD_NP("Revert succeed", "All changes revert");
+  LOG_OK_NP("Revert succeed", "All changes revert");
   return true;
 }
 
 int CastDBView::onLoadFromPsonDirectory() {
   if (_castModel->isDirty()) {
-    LOG_BAD_NP("Table dirty", "submit before load pson");
+    LOG_ERR_NP("Table dirty", "submit before load pson");
     return 0;
   }
   const QString hintText{"Risk: records in database will be override if differs from local pson file."};
   if (QMessageBox::question(this, "CONFIRM Load from pson? (OVERRIDE NOT RECOVERABLE)", hintText,  //
                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
       != QMessageBox::Yes) {
-    LOG_GOOD_NP("[Skip] User cancel load records from pson", "return");
+    LOG_OK_NP("[Skip] User cancel load records from pson", "return");
     return 0;
   }
   int succeedCnt = _castDb.LoadFromPsonFile(mImageHost);
@@ -231,7 +231,7 @@ int CastDBView::onLoadFromPsonDirectory() {
     return succeedCnt;
   }
   _castModel->submitAll();
-  LOG_GOOD_P("[Ok] pson file(s) load succeed", "count: %d", succeedCnt);
+  LOG_OK_P("[Ok] pson file(s) load succeed", "count: %d", succeedCnt);
   return succeedCnt;
 }
 
@@ -253,7 +253,7 @@ int CastDBView::onSyncAllImgsFieldFromImageHost() {
   if (totalCnt != succeedCnt) {
     LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    LOG_GOOD_NP(msgTitle, msgDetail);
+    LOG_OK_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
@@ -279,7 +279,7 @@ int CastDBView::onSyncImgsFieldFromImageHost() {
   if (totalCnt != succeedCnt) {
     LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    LOG_GOOD_NP(msgTitle, msgDetail);
+    LOG_OK_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
@@ -301,7 +301,7 @@ int CastDBView::onDumpAllIntoPsonFile() {
   if (totalCnt != succeedCnt) {
     LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    LOG_GOOD_NP(msgTitle, msgDetail);
+    LOG_OK_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
@@ -335,7 +335,7 @@ int CastDBView::onDumpIntoPsonFile() {
   if (totalCnt != succeedCnt) {
     LOG_WARN_NP(msgTitle, msgDetail);
   } else {
-    LOG_GOOD_NP(msgTitle, msgDetail);
+    LOG_OK_NP(msgTitle, msgDetail);
   }
   return succeedCnt;
 }
@@ -348,7 +348,7 @@ int CastDBView::onForceRefreshAllRecordsVids() {
 
 int CastDBView::onForceRefreshRecordsVids() {
   if (!selectionModel()->hasSelection()) {
-    LOG_BAD_NP("Nothing was selected", "Select some row to refresh");
+    LOG_ERR_NP("Nothing was selected", "Select some row to refresh");
     return 0;
   }
 
@@ -392,7 +392,7 @@ int CastDBView::onForceRefreshRecordsVids() {
     ++recordsCnt;
   }
   RefreshCurrentRowHtmlContents();
-  LOG_GOOD_P("[ok]Videos(s) updated", "%d records selection, total %d videos", recordsCnt, vidsCnt);
+  LOG_OK_P("[ok]Videos(s) updated", "%d records selection, total %d videos", recordsCnt, vidsCnt);
   return recordsCnt;
 }
 
@@ -411,12 +411,12 @@ int CastDBView::onMigrateCastTo() {
   }
   const QString destPath = QFileDialog::getExistingDirectory(this, "Migrate to (folder under[" + mImageHost+ "])", mImageHost);
   if (destPath.isEmpty()) {
-    LOG_GOOD_NP("[Skip] User cancel migrate", "return");
+    LOG_OK_NP("[Skip] User cancel migrate", "return");
     return false;
   }
   QString newOri;
   if (!CastBaseDb::IsNewOriFolderPathValid(destPath, mImageHost, newOri)) {
-    LOG_BAD_P("Abort Migrate", "destPath[%s] or newOri[%s] invalid", qPrintable(destPath), qPrintable(newOri));
+    LOG_ERR_P("Abort Migrate", "destPath[%s] or newOri[%s] invalid", qPrintable(destPath), qPrintable(newOri));
     return -1;
   }
 
@@ -438,15 +438,15 @@ int CastDBView::onMigrateCastTo() {
     _castModel->setRecord(r, record);
   }
   if (migrateCastCnt == 0) {
-    LOG_GOOD_P("No need Migrate", "%d/%d Cast(s) to %s", migrateCastCnt, indexes.size(), qPrintable(newOri));
+    LOG_OK_P("No need Migrate", "%d/%d Cast(s) to %s", migrateCastCnt, indexes.size(), qPrintable(newOri));
     return 0;
   }
   if (!_castModel->submitAll()) {
-    LOG_BAD_P("Submit failed", "%d/%d Cast(s) to %s.\nerror[%s]",
+    LOG_ERR_P("Submit failed", "%d/%d Cast(s) to %s.\nerror[%s]",
               migrateCastCnt, indexes.size(), qPrintable(newOri), qPrintable(_castModel->lastError().text()));
     return -1;
   }
-  LOG_GOOD_P("Migrate succeed", "%d/%d Cast(s) to %s",
+  LOG_OK_P("Migrate succeed", "%d/%d Cast(s) to %s",
              migrateCastCnt, indexes.size(), qPrintable(newOri));
   return migrateCastCnt;
 }

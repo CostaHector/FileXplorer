@@ -152,18 +152,18 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
   JsonDataRefresher jdr;
   int jsonUpdatedCnt = jdr(rootPath);
   if (jsonUpdatedCnt >= 0) {
-    LOG_GOOD_P("Json(s) Update succeed", "count: %d, rootpath:%s", jsonUpdatedCnt, qPrintable(rootPath));
+    LOG_OK_P("Json(s) Update succeed", "count: %d, rootpath:%s", jsonUpdatedCnt, qPrintable(rootPath));
   }
   int scnFileCnt = jdr.GenerateScnFiles();
   if (scnFileCnt == -1) {
-    LOG_BAD_NP("Combine scn file failed. May path not exist", rootPath);
+    LOG_ERR_NP("Combine scn file failed. May path not exist", rootPath);
     return;
   }
   if (scnFileCnt == 0) {
-    LOG_GOOD_NP("Skip. No json file find, No need to combine scn file", rootPath);
+    LOG_OK_NP("Skip. No json file find, No need to combine scn file", rootPath);
     return;
   }
-  LOG_GOOD_P("Update scn file(s) succeed", "cnt: %d, rootpath:%s", scnFileCnt, qPrintable(rootPath));
+  LOG_OK_P("Update scn file(s) succeed", "cnt: %d, rootpath:%s", scnFileCnt, qPrintable(rootPath));
   _model->setRootPath(rootPath, true);
 }
 
@@ -187,14 +187,14 @@ void SceneActionsSubscribe::UpdateScnFilesOnly() {
 
   int scnFileCnt = SceneInfoManager::GenerateAScnFile(rootPath);
   if (scnFileCnt == -1) {
-    LOG_BAD_NP("Update scn file failed. May path not exist", rootPath);
+    LOG_ERR_NP("Update scn file failed. May path not exist", rootPath);
     return;
   }
   if (scnFileCnt == 0) {
-    LOG_GOOD_NP("[Skip] No json file find, No need to update scn file at all", rootPath);
+    LOG_OK_NP("[Skip] No json file find, No need to update scn file at all", rootPath);
     return;
   }
-  LOG_GOOD_P("[Ok] Update scn file(s)", "count: %d, rootPath: %s", scnFileCnt, qPrintable(rootPath));
+  LOG_OK_P("[Ok] Update scn file(s)", "count: %d, rootPath: %s", scnFileCnt, qPrintable(rootPath));
   _model->setRootPath(rootPath);
 }
 

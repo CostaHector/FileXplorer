@@ -53,7 +53,7 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
 void TorrentsManagerWidget::subscribe() {
   connect(m_searchLE, &QLineEdit::returnPressed, this, [this]() {
     const QString& searchPattern = m_searchLE->text();
-    LOG_GOOD_NP("[New where clause]", searchPattern);
+    LOG_OK_NP("[New where clause]", searchPattern);
     m_torrentsDBModel->setFilter(searchPattern);
   });
 
@@ -73,12 +73,12 @@ bool TorrentsManagerWidget::onInitDataBase() {
 void TorrentsManagerWidget::onInitATable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    LOG_BAD_NP("Open db failed", con.lastError().text());
+    LOG_ERR_NP("Open db failed", con.lastError().text());
     return;
   }
 
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
-    LOG_GOOD_NP("[Skip] Table already exists", DB_TABLE::TORRENTS);
+    LOG_OK_NP("[Skip] Table already exists", DB_TABLE::TORRENTS);
     return;
   }
 
@@ -86,23 +86,23 @@ void TorrentsManagerWidget::onInitATable() {
 
   QSqlQuery createTableQuery(con);
   if (!createTableQuery.exec(TorrDb::CREATE_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
-    LOG_BAD_NP("[failed] Exec failed", createTableQuery.lastError().text());
+    LOG_ERR_NP("[failed] Exec failed", createTableQuery.lastError().text());
     return;
   }
   m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
   m_torrentsDBModel->submitAll();
-  LOG_GOOD_NP("Table create succeed", DB_TABLE::TORRENTS);
+  LOG_OK_NP("Table create succeed", DB_TABLE::TORRENTS);
 }
 
 bool TorrentsManagerWidget::onInsertIntoTable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    LOG_BAD_NP("Open db failed", con.lastError().text());
+    LOG_ERR_NP("Open db failed", con.lastError().text());
     return false;
   }
 
   if (!con.tables().contains(DB_TABLE::TORRENTS)) {
-    LOG_BAD_NP("[Failed] cannot insert, table not exists", DB_TABLE::TORRENTS);
+    LOG_ERR_NP("[Failed] cannot insert, table not exists", DB_TABLE::TORRENTS);
     return false;
   }
 
@@ -110,19 +110,19 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
   const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Load torrents from", defaultOpenDir);
   QFileInfo loadFromFi(loadFromPath);
   if (!loadFromFi.isDir()) {
-    LOG_BAD_NP("[Failed] not a folder", loadFromPath);
+    LOG_ERR_NP("[Failed] not a folder", loadFromPath);
     return false;
   }
   Configuration().setValue(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, loadFromFi.absoluteFilePath());
 
   QSqlQuery query{con};
   if (!query.prepare(TorrDb::REPLACE_INTO_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
-    LOG_BAD_NP("Prepare failed", query.lastError().text());
+    LOG_ERR_NP("Prepare failed", query.lastError().text());
     return false;
   }
 
   if (!con.transaction()) {
-    LOG_BAD_NP("Failed to start transaction", con.lastError().text());
+    LOG_ERR_NP("Failed to start transaction", con.lastError().text());
     return 0;
   }
 
@@ -146,13 +146,13 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     ++totalItemCnt;
   }
   if (!con.commit()) {
-    LOG_BAD_NP("[Failed] commit failed, all will be rollback", con.lastError().text());
+    LOG_ERR_NP("[Failed] commit failed, all will be rollback", con.lastError().text());
     con.rollback();
     succeedItemCnt = 0;
   }
   query.finish();
   m_torrentsDBModel->submitAll();
-  LOG_GOOD_P("[Ok] Insert into succeed", "%1/%2 item(s) -> Table[%s]", succeedItemCnt, totalItemCnt, qPrintable(DB_TABLE::TORRENTS));
+  LOG_OK_P("[Ok] Insert into succeed", "%1/%2 item(s) -> Table[%s]", succeedItemCnt, totalItemCnt, qPrintable(DB_TABLE::TORRENTS));
   return true;
 }
 
@@ -160,30 +160,30 @@ bool TorrentsManagerWidget::onDropATable() {
   const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(DB_TABLE::TORRENTS);
   auto retBtn = QMessageBox::warning(this, "CONFIRM DROP?", "(NOT recoverable)\n" + sqlCmd, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
   if (retBtn != QMessageBox::StandardButton::Yes) {
-    LOG_GOOD_NP("User Cancel Drop", "return");
+    LOG_OK_NP("User Cancel Drop", "return");
     return true;
   }
 
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    LOG_BAD_NP("Open db failed", con.lastError().text());
+    LOG_ERR_NP("Open db failed", con.lastError().text());
     return false;
   }
 
   if (!con.tables().contains(DB_TABLE::TORRENTS)) {
-    LOG_BAD_NP("[Skip] Table already not exists", DB_TABLE::TORRENTS);
+    LOG_ERR_NP("[Skip] Table already not exists", DB_TABLE::TORRENTS);
     return true;
   }
 
   QSqlQuery dropQry(con);
   const auto dropTableRet = dropQry.exec(sqlCmd);
   if (!dropTableRet) {
-    LOG_BAD_NP("[failed] Drop Table", con.lastError().databaseText());
+    LOG_ERR_NP("[failed] Drop Table", con.lastError().databaseText());
     return false;
   }
   dropQry.finish();
   m_torrentsDBModel->submitAll();
-  LOG_GOOD_NP("Table been Dropped", DB_TABLE::TORRENTS);
+  LOG_OK_NP("Table been Dropped", DB_TABLE::TORRENTS);
   QMessageBox::information(this, "Table been Dropped", DB_TABLE::TORRENTS);
   return dropTableRet;
 }
@@ -191,23 +191,23 @@ bool TorrentsManagerWidget::onDropATable() {
 bool TorrentsManagerWidget::onDeleteFromTable() {
   QSqlDatabase con = mDb.GetDb();
   if (!mDb.CheckValidAndOpen(con)) {
-    LOG_BAD_NP("Open db failed", con.lastError().text());
+    LOG_ERR_NP("Open db failed", con.lastError().text());
     return false;
   }
   const QString& whereClause = QInputDialog::getItem(this, "Where Clause", "Input clause below",  //
                                                      {"Name", "Size"}, 0, true);
   if (whereClause.isEmpty()) {
-    LOG_BAD_NP("Where clause empty", "return");
+    LOG_ERR_NP("Where clause empty", "return");
     return false;
   }
   const QString& deleteCmd = QString("DELETE FROM \"%1\" WHERE %2").arg(DB_TABLE::TORRENTS, whereClause);
   QSqlQuery seleteQry(con);
   const bool deleteRes = seleteQry.exec(deleteCmd);
   if (!deleteRes) {
-    LOG_BAD_NP("[Failed] delete command failed", seleteQry.lastError().text());
+    LOG_ERR_NP("[Failed] delete command failed", seleteQry.lastError().text());
     return false;
   }
-  LOG_GOOD_NP("[Ok] delete command exec ok", deleteCmd);
+  LOG_OK_NP("[Ok] delete command exec ok", deleteCmd);
   m_torrentsDBModel->submitAll();
   return deleteRes;
 }
@@ -216,15 +216,15 @@ bool TorrentsManagerWidget::onSubmit() {
   CHECK_NULLPTR_RETURN_FALSE(m_torrentsDBModel)
 
   if (!m_torrentsDBModel->isDirty()) {
-    LOG_GOOD_NP("[Skip] Table not dirty", DB_TABLE::TORRENTS);
+    LOG_OK_NP("[Skip] Table not dirty", DB_TABLE::TORRENTS);
     return true;
   }
   if (!m_torrentsDBModel->submitAll()) {
-    LOG_BAD_NP("[Submit failed]", m_torrentsDBModel->lastError().text());
+    LOG_ERR_NP("[Submit failed]", m_torrentsDBModel->lastError().text());
     return false;
   }
 
-  LOG_GOOD_NP("Submit succeed", DB_TABLE::TORRENTS);
+  LOG_OK_NP("Submit succeed", DB_TABLE::TORRENTS);
   return true;
 }
 

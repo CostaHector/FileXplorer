@@ -1,10 +1,10 @@
 #include "Notificator.h"
 #include "PublicMacro.h"
-#include "Logger.h"
 #include <QProgressBar>
+#include <QToolButton>
 #include <QGridLayout>
 #include <QLabel>
-#include <QIcon>
+#include <QPixmap>
 #include <QMovie>
 #include <QScreen>
 #include <QGuiApplication>
@@ -12,17 +12,16 @@
 namespace {
 constexpr int SHORT_MESSAGE_SHOW_TIME = 3000;
 constexpr int LONG_MESSAGE_SHOW_TIME = 5000;
-constexpr float WINDOW_TRANSPARENT_OPACITY = 0.7;
+constexpr float WINDOW_TRANSPARENT_OPACITY = 0.85;
 constexpr float WINDOW_NONTRANSPARENT_OPACITY = 1.0;
-constexpr int ICON_SIZE = 32;
-constexpr int PRELOADER_SIZE = 20;
+constexpr int NTY_ICON_SIZE = 20;
 }
 
 bool Notificator::m_isTopToBottom = false;
 std::list<std::unique_ptr<Notificator>> Notificator::instances;
 
-Notificator::Notificator(int timeoutLength)//
-  : QFrame{nullptr}, mAutoCloser{this}, mTimeOutLen{timeoutLength} {
+Notificator::Notificator(LOG_LVL_E lvl, int timeoutLength)//
+  : QFrame{nullptr}, m_lvl{lvl}, mAutoCloser{this}, mTimeOutLen{timeoutLength} {
   hide();
   m_icon = new (std::nothrow) QLabel{this};
   CHECK_NULLPTR_RETURN_VOID(m_icon);
@@ -42,12 +41,16 @@ Notificator::Notificator(int timeoutLength)//
   m_message->setOpenExternalLinks(true);
   m_message->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
 
+  m_closeBtn = new (std::nothrow) QToolButton{this};
+  CHECK_NULLPTR_RETURN_VOID(m_closeBtn);
+  m_closeBtn->setIcon(QIcon{":img/BALLOON_CLOSE"});
+
   if (mTimeOutLen <= 0) {
     m_preloader = new (std::nothrow) QLabel{this};
     CHECK_NULLPTR_RETURN_VOID(m_preloader);
     m_preloader->setObjectName("preloader");
-    m_preloader->setMinimumSize(PRELOADER_SIZE, PRELOADER_SIZE);
-    m_preloader->setMaximumSize(PRELOADER_SIZE, PRELOADER_SIZE);
+    m_preloader->setMinimumSize(NTY_ICON_SIZE, NTY_ICON_SIZE);
+    m_preloader->setMaximumSize(NTY_ICON_SIZE, NTY_ICON_SIZE);
     m_preloader->setScaledContents(true);
     // Настройка анимации прелоадера
     QMovie* preloaderAnimation = new (std::nothrow) QMovie(":img/LOADING", {}, this);
@@ -61,58 +64,65 @@ Notificator::Notificator(int timeoutLength)//
     m_progress->setObjectName("progress");
     m_progress->setRange(0, 100);
     m_progress->setValue(0);
-#ifdef Q_OS_WIN
-    m_progress->setMaximumHeight(20);
-#else
-    m_progress->setMaximumHeight(26);
-#endif
-    m_progress->setTextVisible(false);
   }
 
   initializeLayout();
   initializeUI();
   hide();
+  connect(m_closeBtn, &QToolButton::clicked, this, &Notificator::FreeMe);
 }
 
-void Notificator::goodNews(const QString& title, const QString& message) {
+void Notificator::debug(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  static const QIcon CORRECT_ICON{":img/CORRECT"};
-  showMessage(CORRECT_ICON, title, message, SHORT_MESSAGE_SHOW_TIME);
-#endif
-}
-
-void Notificator::badNews(const QString& title, const QString& message) {
-#ifndef RUNNING_UNIT_TESTS
-  static const QIcon WRONG_ICON{":img/WRONG"};
-  showMessage(WRONG_ICON, title, message, LONG_MESSAGE_SHOW_TIME);
-#endif
-}
-
-void Notificator::critical(const QString& title, const QString& message) {
-#ifndef RUNNING_UNIT_TESTS
-  static const QIcon CRITICAL_ICON{":img/LOG_LEVEL_CRITICAL"};
-  showMessage(CRITICAL_ICON, title, message, LONG_MESSAGE_SHOW_TIME);
-#endif
-}
-
-void Notificator::warning(const QString& title, const QString& message) {
-#ifndef RUNNING_UNIT_TESTS
-  static const QIcon WARNING_ICON{":img/LOG_LEVEL_WARNING"};
-  showMessage(WARNING_ICON, title, message, LONG_MESSAGE_SHOW_TIME);
+  showMessage(LOG_LVL_E::D, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::information(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  static const QIcon INFO_ICON{":img/LOG_LEVEL_INFO"};
-  showMessage(INFO_ICON, title, message, SHORT_MESSAGE_SHOW_TIME);
+  showMessage(LOG_LVL_E::I, title, message, SHORT_MESSAGE_SHOW_TIME);
+#endif
+}
+
+void Notificator::warning(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
+  showMessage(LOG_LVL_E::W, title, message, LONG_MESSAGE_SHOW_TIME);
+#endif
+}
+
+void Notificator::error(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
+  showMessage(LOG_LVL_E::E, title, message, LONG_MESSAGE_SHOW_TIME);
+#endif
+}
+
+void Notificator::critical(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
+  showMessage(LOG_LVL_E::C, title, message, LONG_MESSAGE_SHOW_TIME);
+#endif
+}
+
+void Notificator::fatal(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
+  showMessage(LOG_LVL_E::F, title, message, LONG_MESSAGE_SHOW_TIME);
 #endif
 }
 
 void Notificator::question(const QString& title, const QString& message) {
 #ifndef RUNNING_UNIT_TESTS
-  static const QIcon QUESTION_ICON{":img/LOG_LEVEL_QUESTION"};
-  showMessage(QUESTION_ICON, title, message, SHORT_MESSAGE_SHOW_TIME);
+  showMessage(LOG_LVL_E::Q, title, message, SHORT_MESSAGE_SHOW_TIME);
+#endif
+}
+
+void Notificator::ok(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
+  showMessage(LOG_LVL_E::O, title, message, SHORT_MESSAGE_SHOW_TIME);
+#endif
+}
+
+void Notificator::partialSuccess(const QString& title, const QString& message) {
+#ifndef RUNNING_UNIT_TESTS
+  showMessage(LOG_LVL_E::P, title, message, SHORT_MESSAGE_SHOW_TIME);
 #endif
 }
 
@@ -122,9 +132,9 @@ void Notificator::FreeMe() {
   });
 }
 
-void Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, int timeLength) {
+void Notificator::showMessage(LOG_LVL_E level, const QString& title, const QString& message, int timeLength) {
   freeHiddenInstance();
-  auto pTemp = new (std::nothrow) Notificator{timeLength};
+  auto pTemp = new (std::nothrow) Notificator{level, timeLength};
   CHECK_NULLPTR_RETURN_VOID(pTemp);
   if (pTemp->mTimeOutLen > 0) {
     pTemp->mAutoCloser.setInterval(pTemp->mTimeOutLen);
@@ -133,14 +143,14 @@ void Notificator::showMessage(const QIcon& icon, const QString& title, const QSt
     pTemp->mAutoCloser.start();
   }
   auto pNty = std::unique_ptr<Notificator>(pTemp);
-  pNty->notify(icon, title, message);
+  pNty->notify(title, message);
   instances.push_back(std::move(pNty));
 }
 
-Notificator* Notificator::showMessage(const QIcon& icon, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
+Notificator* Notificator::progress(LOG_LVL_E level, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
   freeHiddenInstance();
 
-  auto pTemp = new (std::nothrow) Notificator{0};
+  auto pTemp = new (std::nothrow) Notificator{level, 0};
   CHECK_NULLPTR_RETURN_NULLPTR(pTemp);
   if (sender != nullptr) {
     // attention if nullptr sender is, this ballon will only be free when progress set to 100
@@ -148,7 +158,7 @@ Notificator* Notificator::showMessage(const QIcon& icon, const QString& title, c
   }
 
   auto pNty = std::unique_ptr<Notificator>(pTemp);
-  pNty->notify(icon, title, message);
+  pNty->notify(title, message);
   instances.push_back(std::move(pNty));
   return pTemp;
 }
@@ -169,8 +179,7 @@ void Notificator::whenProgressFinished() {
   QString finishedTitle = "[Finished] " + m_title->text();
   QString finishedMessage = m_message->text(); // copy it. because free me will release all memebers
   FreeMe();
-  static const QIcon TASK_FINISHED_ICON{":img/TASK_FINISHED"};
-  Notificator::showMessage(TASK_FINISHED_ICON, finishedTitle, finishedMessage, LONG_MESSAGE_SHOW_TIME);
+  Notificator::showMessage(LOG_LVL_E::O, finishedTitle, finishedMessage, LONG_MESSAGE_SHOW_TIME);
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -215,9 +224,21 @@ bool Notificator::event(QEvent* event) {
 }
 #endif
 
-void Notificator::notify(const QIcon& icon, const QString& title, const QString& message) {
+void Notificator::notify(const QString& title, const QString& message) {
   {
-    m_icon->setPixmap(icon.pixmap(ICON_SIZE));
+    static const QPixmap LOG_LEVEL_2_PIXMAP[(int)LOG_LVL_E::BUTT + 1]//
+        {
+         QPixmap{":img/LOG_LEVEL_DEBUG"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/LOG_LEVEL_INFO"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/LOG_LEVEL_WARNING"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/LOG_LEVEL_ERROR"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/LOG_LEVEL_CRITICAL"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/LOG_LEVEL_FATAL"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/LOG_LEVEL_QUESTION"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/LOG_LEVEL_OK"}.scaledToWidth(NTY_ICON_SIZE),
+         QPixmap{":img/PARTIALLY_FAILED"}.scaledToWidth(NTY_ICON_SIZE),
+         };
+    m_icon->setPixmap(LOG_LEVEL_2_PIXMAP[(int)m_lvl]);
     m_title->setVisible(!title.isEmpty());
     m_title->setText(title);
     m_message->setText(message);
@@ -230,32 +251,40 @@ void Notificator::notify(const QIcon& icon, const QString& title, const QString&
 void Notificator::initializeLayout() {
   QGridLayout* layout = new (std::nothrow) QGridLayout;
   CHECK_NULLPTR_RETURN_VOID(layout);
-  layout->addWidget(m_icon, 0, 0, 2, 1, Qt::AlignTop);
-  layout->addWidget(m_title, 0, 1);
+  layout->addWidget(m_icon, 0, 0, 1, 1);
+  layout->addWidget(m_title, 0, 1, 1, 1, Qt::AlignLeft);
+  layout->addWidget(m_closeBtn, 0, 2, 1, 1, Qt::AlignRight);
+  layout->addWidget(m_message, 1, 0, 1, 3, Qt::AlignLeft);
   if (mTimeOutLen <= 0) {
-    layout->addWidget(m_preloader, 0, 2, 1, 1, Qt::AlignRight);
-  }
-  layout->addWidget(m_message, 1, 1, 1, 2);
-  if (mTimeOutLen <= 0) {
-    layout->addWidget(m_progress, 2, 1, 1, 2);
+    layout->addWidget(m_progress, 2, 0, 1, 2, Qt::AlignHCenter);
+    layout->addWidget(m_preloader, 2, 2, 1, 1);
   }
   setLayout(layout);
 }
 
 void Notificator::initializeUI() {
+  const QString styleSheet//
+      {
+       R"(Notificator { border: none; background-color: %1; }
+        QLabel { color: black; }
+        QLabel#title { font-weight: bold; })"};
+  static QString LOG_LEVEL_2_COLOR[(int)LOG_LVL_E::BUTT + 1] {
+      styleSheet.arg("#F5F5F5"), // D
+      styleSheet.arg("#E3F2FD"), // I
+      styleSheet.arg("#FFF3E0"), // W
+      styleSheet.arg("#FFEBEE"), // E
+      styleSheet.arg("#FFEBEE"), // C
+      styleSheet.arg("#FFEBEE"), // F
+      styleSheet.arg("#E3F2FD"), // Q
+      styleSheet.arg("#E8F5E9"), // O
+      styleSheet.arg("#FFF3E0"), // P
+  };
+  setStyleSheet(LOG_LEVEL_2_COLOR[(int)m_lvl]);
+  //     "QProgressBar { border: 1px solid black; text-align: top; background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fff, stop: 0.4999 #eee, stop: 0.5 #ddd, stop: 1 #eee ); }"
+  //     "QProgressBar::chunk { background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #b5e2f9, stop: 0.4999 #68c2f3, stop: 0.5 #67bff0, stop: 1 #1e9bda );  }"
+  //     "QProgressBar::chunk { background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #9bd66d, stop: 0.4999 #81d142, stop: 0.5 #81d143, stop: 1 #58bf08 );  }"
   setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
   setAttribute(Qt::WA_Hover, true);
-  setStyleSheet(
-      "Notificator { background-color: black; border: none; }"
-      "QLabel { color: white; }"
-      "QLabel#title { font-weight: bold; }"
-      "QProgressBar { border: 1px solid black; text-align: top; background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fff, stop: 0.4999 "
-      "#eee, stop: 0.5 #ddd, stop: 1 #eee ); }"
-      "QProgressBar::chunk { background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #b5e2f9, stop: 0.4999 #68c2f3, stop: 0.5 #67bff0, "
-      "stop: 1 #1e9bda );  }"
-      //				"QProgressBar::chunk { background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #9bd66d, stop: 0.4999
-      // #81d142, stop: 0.5 #81d143, stop: 1 #58bf08 );  }"
-      );
   setAutoFillBackground(true);
   setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
 }

@@ -123,9 +123,9 @@ void RedundantImageFinder::RecycleSelection() {
   }
   bool isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
   if (isRenameAllSucceed) {
-    LOG_GOOD_P("Recyle redundant images succeed", "selected count: %d", SELECTED_CNT);
+    LOG_OK_P("Recyle redundant images succeed", "selected count: %d", SELECTED_CNT);
   } else {
-    LOG_BAD_P("Recyle redundant images failed", "selected count: %d", SELECTED_CNT);
+    LOG_ERR_P("Recyle redundant images failed", "selected count: %d", SELECTED_CNT);
   }
   UpdateDisplayWhenRecycled();
 }
@@ -153,7 +153,7 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
 
 void RedundantImageFinder::operator()(const QString& folderPath) {
   if (folderPath.isEmpty() || !QFileInfo{folderPath}.isDir()) {
-    LOG_BAD_P("[Abort] Find redundant image", "Path[%s] not exists", qPrintable(folderPath));
+    LOG_ERR_P("[Abort] Find redundant image", "Path[%s] not exists", qPrintable(folderPath));
     return;
   }
   mCurrentPath = folderPath;
@@ -169,7 +169,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   m_imgsBunch.swap(newImgs);
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(mCurrentPath);
-  LOG_GOOD_P((isByBenchLib ? "By benchmark library" : "MD5 checksums in current directory"),
+  LOG_OK_P((isByBenchLib ? "By benchmark library" : "MD5 checksums in current directory"),
              "%d duplicate images(s) found under path[%s]",
              afterRowCnt, qPrintable(mCurrentPath));
 }

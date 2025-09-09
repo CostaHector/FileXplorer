@@ -16,13 +16,13 @@ bool NewPlainTextFile(const QString& createIn, QString* newTextFileAbsPath) {
 
   const QDir curDir{createIn};
   if (curDir.exists(plainTextFileName)) {
-    LOG_GOOD_NP("Plain text file already exist", plainTextFileName);
+    LOG_OK_NP("Plain text file already exist", plainTextFileName);
     return true;
   }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstTOUCH(curDir.absolutePath(), plainTextFileName)};
   if (!g_undoRedo.Do(cmds)) {
-    LOG_BAD_NP("[Failed] Touch file", plainTextFileName);
+    LOG_ERR_NP("[Failed] Touch file", plainTextFileName);
     return false;
   }
   if (newTextFileAbsPath != nullptr) {
@@ -51,7 +51,7 @@ int NewJsonFile(const QString& createIn, const QStringList& basedOnFileNames) {
       ++crtSucceed;
     }
   }
-  LOG_GOOD_P("[Ok]Json file(s) create", "count: succ:%d/total:%d/selected:%d", crtSucceed, totalNeedCnd, basedOnFileNames.size());
+  LOG_OK_P("[Ok]Json file(s) create", "count: succ:%d/total:%d/selected:%d", crtSucceed, totalNeedCnd, basedOnFileNames.size());
   return crtSucceed;
 }
 

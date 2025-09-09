@@ -16,10 +16,14 @@
     <file alias="LOG_FOLDERS">Log/LOG_FOLDERS.svg</file>
     <file alias="AGING_LOGS">Log/AGING_LOGS.svg</file>
     <file alias="LOG_LEVEL_DEBUG">Log/LOG_LEVEL_DEBUG.svg</file>
-    <file alias="LOG_LEVEL_WARNING">Log/LOG_LEVEL_WARNING.svg</file>
-    <file alias="LOG_LEVEL_CRITICAL">Log/LOG_LEVEL_CRITICAL.svg</file>
     <file alias="LOG_LEVEL_INFO">Log/LOG_LEVEL_INFO.svg</file>
-    <file alias="TASK_FINISHED">Log/TASK_FINISHED.svg</file>
+    <file alias="LOG_LEVEL_WARNING">Log/LOG_LEVEL_WARNING.svg</file>
+    <file alias="LOG_LEVEL_ERROR">Log/LOG_LEVEL_ERROR.svg</file>
+    <file alias="LOG_LEVEL_CRITICAL">Log/LOG_LEVEL_CRITICAL.svg</file>
+    <file alias="LOG_LEVEL_FATAL">Log/LOG_LEVEL_FATAL.svg</file>
+    <file alias="LOG_LEVEL_QUESTION">Log/LOG_LEVEL_QUESTION.svg</file>
+    <file alias="LOG_LEVEL_OK">Log/LOG_LEVEL_OK.svg</file>
+    <file alias="PARTIALLY_FAILED">Log/PARTIALLY_FAILED.svg</file>
     <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON.svg</file>
     <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF.svg</file>
 
@@ -326,5 +330,6 @@
 
     <!--Notification icon here-->
     <file alias="LOADING">Notification/LOADING.gif</file>
+    <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
     </qresource>
 </RCC>

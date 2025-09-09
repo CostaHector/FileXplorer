@@ -156,10 +156,10 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
   }
   const int cnt = ThumbnailProcesser::CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, true);
   if (cnt <= 0) {
-    LOG_BAD_NP("Create thumbnail failed", "see details in log");
+    LOG_ERR_NP("Create thumbnail failed", "see details in log");
     return false;
   }
-  LOG_GOOD_P("Create thumbnail(s) for video(s) succeed", "count: %d", cnt);
+  LOG_OK_P("Create thumbnail(s) for video(s) succeed", "count: %d", cnt);
   return true;
 }
 
@@ -188,9 +188,9 @@ bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool ski
     return false;
   }
   if (extractedOutCnt == 0) {
-    LOG_GOOD_NP("Nothing need extracted out", currentPath);
+    LOG_OK_NP("Nothing need extracted out", currentPath);
   } else {
-    LOG_GOOD_P("[Ok] Extract", "%d image(s) from path[%s]", extractedOutCnt, qPrintable(currentPath));
+    LOG_OK_P("[Ok] Extract", "%d image(s) from path[%s]", extractedOutCnt, qPrintable(currentPath));
   }
   return true;
 }
@@ -230,7 +230,7 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
     LOG_WARN_NP("[Failed] Cannot open URL in default browser:", url);
     return false;
   }
-  LOG_GOOD_NP("[Ok] opened URL in default browser:", url);
+  LOG_OK_NP("[Ok] opened URL in default browser:", url);
   return true;
 }
 
@@ -300,7 +300,7 @@ void FileExplorerEvent::subscribeThumbnailActions() {
       return;
     }
     Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, newSamplePeriod);
-    LOG_GOOD_P("ThumbnailSamplePeriod", "T=%d", newSamplePeriod);
+    LOG_OK_P("ThumbnailSamplePeriod", "T=%d", newSamplePeriod);
   });
 
   connect(ins._EXTRACT_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* extractThumbnailAct) {
@@ -597,7 +597,7 @@ bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
   const QString& path = _fileSysModel->rootPath();
   _fileSysModel->setRootPath("");
   fsView->setRootIndex(_fileSysModel->setRootPath(path));
-  LOG_GOOD_NP("Refresh filesytemmodel of path: ", path);
+  LOG_OK_NP("Refresh filesytemmodel of path: ", path);
   return true;
 }
 
@@ -655,9 +655,9 @@ bool FileExplorerEvent::on_deCompress() {
   }
   LOG_I("Decompress %d file(s), %d failed", filesPath.size(), failsQzFiles.size());
   if (!failsQzFiles.isEmpty()) {
-    LOG_BAD_P("[Partially Failed] Decompress qz", "following %d file(s) failed:\n%s", failsQzFiles.size(), qPrintable(failsQzFiles.join('\n')));
+    LOG_ERR_P("[Partially Failed] Decompress qz", "following %d file(s) failed:\n%s", failsQzFiles.size(), qPrintable(failsQzFiles.join('\n')));
   } else {
-    LOG_GOOD_P("[Ok] Decompress qz", "%d qz files decompressed ok", filesPath.size());
+    LOG_OK_P("[Ok] Decompress qz", "%d qz files decompressed ok", filesPath.size());
   }
   return failsQzFiles.isEmpty();
 }
@@ -724,10 +724,10 @@ bool FileExplorerEvent::on_moveToTrashBin() {
     removeCmds.append(ACMD::GetInstMOVETOTRASH(prepaths[i], names[i]));
   }
   if (!g_undoRedo.Do(removeCmds)) {
-    LOG_BAD_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
+    LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
     return false;
   }
-  LOG_GOOD_P("[MoveToTrash] All succeed", "Commands count %d", removeCmds.size());
+  LOG_OK_P("[MoveToTrash] All succeed", "Commands count %d", removeCmds.size());
   return true;
 }
 
@@ -786,10 +786,10 @@ bool FileExplorerEvent::on_deletePermanently() {
     return true;
   }
   if (!g_undoRedo.Do(cmds)) {
-    LOG_BAD_P("[Failed] Partial item(s) deleted failed", "%d cmds", cmds.size());
+    LOG_ERR_P("[Failed] Partial item(s) deleted failed", "%d cmds", cmds.size());
     return false;
   }
-  LOG_GOOD_P("[Ok] All item(s) deleted succeed", "%d cmds", cmds.size());
+  LOG_OK_P("[Ok] All item(s) deleted succeed", "%d cmds", cmds.size());
   return true;
 }
 
@@ -865,7 +865,7 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
     LOG_INFO_NP("[Failed] Play", playPath);
     return false;
   }
-  LOG_GOOD_NP("Playing...", playPath);
+  LOG_OK_NP("Playing...", playPath);
   _logger->onMsgChanged(QString{"Playing... %1"}.arg(playPath), STATUS_ALERT_LEVEL::NORMAL);
   return true;
 }
@@ -905,10 +905,10 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   ComplexMerge cm;
   BATCH_COMMAND_LIST_TYPE aBatch = cm.Merge(fromPath, toPath);
   if (!g_undoRedo.Do(aBatch)) {
-    LOG_BAD_P("[Failed] Partial merge failed", "%s\n->\n%s", qPrintable(fromPath), qPrintable(toPath));
+    LOG_ERR_P("[Failed] Partial merge failed", "%s\n->\n%s", qPrintable(fromPath), qPrintable(toPath));
     return false;
   }
-  LOG_GOOD_P("[Ok] All merged succeed", "%s\n->\n%s", qPrintable(fromPath), qPrintable(toPath));
+  LOG_OK_P("[Ok] All merged succeed", "%s\n->\n%s", qPrintable(fromPath), qPrintable(toPath));
   _logger->onMsgChanged(QString("Succeed merged folder into %1").arg(toPath), STATUS_ALERT_LEVEL::NORMAL);
   return true;
 }
@@ -933,10 +933,10 @@ void FileExplorerEvent::on_TsFilesMerge() {
   QString largeTsAbsFilePath;
   std::tie(mergeResult, largeTsAbsFilePath) = TSFilesMerger::mergeTsFiles(currentPath, tsNames);
   if (!mergeResult) {
-    LOG_BAD_P("[Failed] Merge ts file failed", "User selected %d file(s)", mergeResult);
+    LOG_ERR_P("[Failed] Merge ts file failed", "User selected %d file(s)", mergeResult);
     return;
   }
-  LOG_GOOD_P("[Ok] Merge ts file succeed", "%d file(s) to\n%s", mergeResult, qPrintable(largeTsAbsFilePath));
+  LOG_OK_P("[Ok] Merge ts file succeed", "%d file(s) to\n%s", mergeResult, qPrintable(largeTsAbsFilePath));
   _logger->onMsgChanged(QString("Succeed merged ts file(s) into %1").arg(largeTsAbsFilePath), STATUS_ALERT_LEVEL::NORMAL);
 }
 
@@ -949,7 +949,7 @@ bool FileExplorerEvent::on_Copy() {
   pMimeData->setText(absPaths.join('\n'));
   pMimeData->setUrls(urls);
   if (!SetMimeDataCutCopy(*pMimeData, Qt::CopyAction)) {
-    LOG_BAD_NP("Set Copy Action in QMimedata failed", "Abort");
+    LOG_ERR_NP("Set Copy Action in QMimedata failed", "Abort");
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
@@ -965,7 +965,7 @@ bool FileExplorerEvent::on_Cut() {
   pMimeData->setText(absPaths.join('\n'));
   pMimeData->setUrls(urls);
   if (!SetMimeDataCutCopy(*pMimeData, Qt::MoveAction)) {
-    LOG_BAD_NP("Set Cut Action in QMimedata failed", "Abort");
+    LOG_ERR_NP("Set Cut Action in QMimedata failed", "Abort");
     return false;
   }
   m_clipboard->setMimeData(pMimeData);
@@ -1000,17 +1000,17 @@ bool FileExplorerEvent::on_Paste() {
   FILE_STRUCTURE_MODE fileStructMode{GetDefaultFileStructMode()};
   if (fileStructMode == FILE_STRUCTURE_MODE::QUERY) {
     if (!QueryKeepStructureOrFlatten(fileStructMode)) {
-      LOG_GOOD_NP("User cancel paste", "neither flatten or keep");
+      LOG_OK_NP("User cancel paste", "neither flatten or keep");
       return true;
     }
   }
   Qt::DropAction dropAction = GetCutCopyModeFromNativeMimeData(*pMimeData);
   int ret = DoDropAction(dropAction, pMimeData->urls(), rTo, fileStructMode);
   if (ret < 0) {
-    LOG_BAD_NP("Paste operation partially failed", rTo);
+    LOG_ERR_NP("Paste operation partially failed", rTo);
     return false;
   }
-  LOG_GOOD_NP("Paste operation all succeed", rTo);
+  LOG_OK_NP("Paste operation all succeed", rTo);
   _fileSysModel->ClearCopyAndCutDict();
   if (_contentPane->m_searchSrcModel != nullptr) {
     _contentPane->m_searchSrcModel->ClearCopyAndCutDict();
@@ -1025,7 +1025,7 @@ bool FileExplorerEvent::on_NameStandardize() {
   }
   const QString currentPath{_fileSysModel->rootPath()};
   if (PathTool::isRootOrEmpty(currentPath)) {
-    LOG_BAD_NP("currentPath is root or empty", currentPath);
+    LOG_ERR_NP("currentPath is root or empty", currentPath);
     return false;
   }
   QMessageBox msgBox;
@@ -1039,13 +1039,14 @@ bool FileExplorerEvent::on_NameStandardize() {
     LOG_INFO_NP("[Skip] User cancel", "return");
     return true;
   }
-  LOG_INFO_NP("Name standardlize", "Start..."); // switch to another path
+  auto* p = Notificator::progress(LOG_LVL_E::I, "Name standardlize", "Start in path" + currentPath);
+  CHECK_NULLPTR_RETURN_FALSE(p);
   FilesNameBatchStandardizer fnbs;
   if (!fnbs(currentPath)) {
-    LOG_BAD_NP("[Failed] Partial item Name standardlize failed", currentPath);
+    LOG_ERR_NP("[Failed] Partial item Name standardlize failed", currentPath);
     return false;
   }
-  LOG_GOOD_NP("[Ok] Name standardlize", "Finshed");
+  p->setProgressValue(100);
   return true;
 }
 
@@ -1056,7 +1057,7 @@ bool FileExplorerEvent::on_FileClassify() {
   }
   const QString currentPath{_fileSysModel->rootPath()};
   if (PathTool::isRootOrEmpty(currentPath)) {
-    LOG_BAD_NP("currentPath is root or empty", currentPath);
+    LOG_ERR_NP("currentPath is root or empty", currentPath);
     return false;
   }
 
@@ -1079,9 +1080,9 @@ bool FileExplorerEvent::on_FileClassify() {
   LOG_INFO_P("File Classify Start...", "cmd count: %d", classfier.CommandsCnt());
   bool classifyResult = classfier.StartToRearrange();
   if (!classifyResult) {
-    LOG_BAD_NP("[Failed] Partial File Classify failed", currentPath);
+    LOG_ERR_NP("[Failed] Partial File Classify failed", currentPath);
   } else {
-    LOG_GOOD_NP("[Ok] All File Classify succeed", currentPath);
+    LOG_OK_NP("[Ok] All File Classify succeed", currentPath);
   }
 
   auto* view = _contentPane->GetCurView();
@@ -1096,7 +1097,7 @@ bool FileExplorerEvent::on_FileUnclassify() {
   }
   const QString currentPath{_fileSysModel->rootPath()};
   if (PathTool::isRootOrEmpty(currentPath)) {
-    LOG_BAD_NP("currentPath is root or empty", currentPath);
+    LOG_ERR_NP("currentPath is root or empty", currentPath);
     return false;
   }
 
@@ -1121,9 +1122,9 @@ bool FileExplorerEvent::on_FileUnclassify() {
 
   bool unclassifyResult = unclassfier.StartToRearrange();
   if (!unclassifyResult) {
-    LOG_BAD_NP("[Failed] Partial File Unclassify failed", currentPath);
+    LOG_ERR_NP("[Failed] Partial File Unclassify failed", currentPath);
   } else {
-    LOG_GOOD_NP("[Ok] All File Unclassify succeed", currentPath);
+    LOG_OK_NP("[Ok] All File Unclassify succeed", currentPath);
   }
 
   auto* view = _contentPane->GetCurView();
@@ -1144,11 +1145,11 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
     return false;
   }
   if (QMessageBox::question(_contentPane, "Confirm remove duplicate images?", "Images that differ in resolution will be delete") != QMessageBox::StandardButton::Yes) {
-    LOG_GOOD_NP("[Skip] User Cancel remove duplicate images", "return");
+    LOG_OK_NP("[Skip] User Cancel remove duplicate images", "return");
     return false;
   }
   int removedCnt = LowResImgsRemover()(currentPath);
-  LOG_GOOD_P("Remove duplicate image(s) Finished", "count: %d", removedCnt);
+  LOG_OK_P("Remove duplicate image(s) Finished", "count: %d", removedCnt);
   return true;
 }
 
@@ -1161,13 +1162,13 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
 
   const QString& currentPath = _fileSysModel->rootPath();
   if (PathTool::isRootOrEmpty(currentPath)) {
-    LOG_BAD_NP("Path is root or empty", currentPath);
+    LOG_ERR_NP("Path is root or empty", currentPath);
     return false;
   }
 
   int cmdCnt = remover(currentPath);
   if (cmdCnt == 0) {
-    LOG_GOOD_NP("Skip", "Nothing to remove");
+    LOG_OK_NP("Skip", "Nothing to remove");
     return true;
   }
   QMessageBox msgBox;
@@ -1183,10 +1184,10 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   }
   bool rmvResult = remover.Exec();
   if (!rmvResult) {
-    LOG_BAD_NP("[Failed] Partial Remove Redundant folder failed", currentPath);
+    LOG_ERR_NP("[Failed] Partial Remove Redundant folder failed", currentPath);
     return false;
   }
-  LOG_GOOD_NP("[Ok] All Remove Redundant folder succeed", currentPath);
+  LOG_OK_NP("[Ok] All Remove Redundant folder succeed", currentPath);
   return true;
 }
 
@@ -1245,10 +1246,10 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
   using namespace ComplexOperation;
   int ret = DoDropAction(dropAction, lRels, dest, FILE_STRUCTURE_MODE::PRESERVE);
   if (ret < 0) {
-    LOG_BAD_P(pOperationNameStr, "Failed. errorCode:%d", ret);
+    LOG_ERR_P(pOperationNameStr, "Failed. errorCode:%d", ret);
     return false;
   }
-  LOG_GOOD_NP(pOperationNameStr, "All succeed");
+  LOG_OK_NP(pOperationNameStr, "All succeed");
   return true;
 }
 
