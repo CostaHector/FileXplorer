@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "PathRelatedTool.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "GlbDataProtect.h"
 #include "OnScopeExit.h"
 #include "FdBasedDb.h"
@@ -19,10 +19,10 @@
 const QString rootpath = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
 const QString dbName = TestCaseRootPath() + "/FD_MOVIE_DB_CONN.db";
 
-class FdBasedDbTest : public MyTestSuite {
+class FdBasedDbTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  FdBasedDbTest() : MyTestSuite{false} {}
+  FdBasedDbTest() : PlainTestSuite{} {}
 private slots:
   void cleanup() {
     if (QFile{dbName}.exists()) {
@@ -372,5 +372,5 @@ private slots:
   }
 };
 
-FdBasedDbTest g_FdBasedDbTest;
 #include "FdBasedDbTest.moc"
+REGISTER_TEST(FdBasedDbTest, false)

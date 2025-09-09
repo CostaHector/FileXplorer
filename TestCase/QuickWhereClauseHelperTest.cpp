@@ -1,14 +1,14 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 // add necessary includes here
 #include "QuickWhereClauseHelper.h"
 
 using namespace QuickWhereClauseHelper;
-class QuickWhereClauseHelperTest : public MyTestSuite {
+class QuickWhereClauseHelperTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  QuickWhereClauseHelperTest() : MyTestSuite{false} {}
+  QuickWhereClauseHelperTest() : PlainTestSuite{} {}
 private slots:
   void test_SearchSpaceString() {
     const QString& sSpace = "  ";
@@ -98,4 +98,4 @@ private slots:
 };
 
 #include "QuickWhereClauseHelperTest.moc"
-QuickWhereClauseHelperTest g_QuickWhereClauseHelperTest;
+REGISTER_TEST(QuickWhereClauseHelperTest, false)

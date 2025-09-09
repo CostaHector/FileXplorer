@@ -4,8 +4,8 @@
 #include <QString>
 #include "PathRelatedTool.h"
 
-FileSystemTestSuite::FileSystemTestSuite(const char* testSuiteName, bool autoCleanUp, bool bExculsive)
-    : MyTestSuite{bExculsive},                                                 //
+FileSystemTestSuite::FileSystemTestSuite(const char* testSuiteName, bool autoCleanUp)
+    : PlainTestSuite{},                                                 //
       mTestPath{TestCaseRootPath() + "/test/" + testSuiteName},  //
       mAutoCleanUp{autoCleanUp},                                 //
       m_rootHelper{mTestPath}                                    //

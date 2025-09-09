@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "PathRelatedTool.h"
 #include "TSFilesMerger.h"
 #include <QFile>
 #include <QDir>
 
-class TSFilesMergerTest : public MyTestSuite {
+class TSFilesMergerTest : public PlainTestSuite {
   Q_OBJECT
 
 public:
-  TSFilesMergerTest() : MyTestSuite{false} {}
+  TSFilesMergerTest() : PlainTestSuite{} {}
   const QString rootpath = TestCaseRootPath() + "/test/TestEnv_TSFilesMerger";
   const QString mOutputLargeTSFileName{"TestEnv_TSFilesMerger.ts"};
   const QString mOutputLargeTSAbsFileName{rootpath + "/" + mOutputLargeTSFileName};
@@ -76,4 +76,4 @@ private slots:
 };
 
 #include "TSFilesMergerTest.moc"
-TSFilesMergerTest g_TSFilesMergerTest;
+REGISTER_TEST(TSFilesMergerTest, false)

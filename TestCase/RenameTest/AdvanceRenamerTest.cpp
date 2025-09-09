@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceRenamer.h"
@@ -17,10 +17,10 @@
 #include "EndToExposePrivateMember.h"
 #include "RenameActions.h"
 
-class AdvanceRenamerTest : public MyTestSuite {
+class AdvanceRenamerTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  AdvanceRenamerTest() : MyTestSuite{false} {}
+  AdvanceRenamerTest() : PlainTestSuite{} {}
   TDir mTDir;
   QString mPath{mTDir.path()};
   QDir mDir{mPath};
@@ -613,4 +613,4 @@ private slots:
 };
 
 #include "AdvanceRenamerTest.moc"
-AdvanceRenamerTest g_AdvanceRenamerTest;
+REGISTER_TEST(AdvanceRenamerTest, false)

@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "FileDescriptor.h"
 #include "PublicTool.h"
@@ -9,10 +9,10 @@
 #include <windows.h>
 #endif
 
-class FileDescriptorTest : public MyTestSuite {
+class FileDescriptorTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  FileDescriptorTest() : MyTestSuite{false} {}
+  FileDescriptorTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   const QString fi5Char{mWorkPath + "/5CharFile.txt"};
@@ -95,5 +95,5 @@ class FileDescriptorTest : public MyTestSuite {
 #endif
 };
 
-FileDescriptorTest g_FileDescriptorTest;
 #include "FileDescriptorTest.moc"
+REGISTER_TEST(FileDescriptorTest, false)

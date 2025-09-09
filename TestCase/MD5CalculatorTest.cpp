@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "MD5Calculator.h"
 using namespace MD5Calculator;
 
-class MD5CalculatorTest : public MyTestSuite {
+class MD5CalculatorTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -36,4 +36,4 @@ class MD5CalculatorTest : public MyTestSuite {
 };
 
 #include "MD5CalculatorTest.moc"
-MD5CalculatorTest g_MD5CalculatorTest;
+REGISTER_TEST(MD5CalculatorTest, false)

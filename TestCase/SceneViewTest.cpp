@@ -3,15 +3,15 @@
 
 #include "PathTool.h"
 #include "SceneInfoManager.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 
 using namespace SceneInfoManager;
 
-class SceneViewTest : public MyTestSuite {
+class SceneViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  SceneViewTest() : MyTestSuite{false} {}
+  SceneViewTest() : PlainTestSuite{} {}
   QList<FsNodeEntry> gEntryNodes;
  private slots:
   void initTestCase() {
@@ -166,4 +166,4 @@ class SceneViewTest : public MyTestSuite {
 };
 
 #include "SceneViewTest.moc"
-SceneViewTest g_SceneViewTest;
+REGISTER_TEST(SceneViewTest, false)

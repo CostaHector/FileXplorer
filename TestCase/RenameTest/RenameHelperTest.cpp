@@ -1,13 +1,13 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "RenameHelper.h"
 using namespace RenameHelper;
 
-class RenameHelperTest : public MyTestSuite {
+class RenameHelperTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  RenameHelperTest() : MyTestSuite{false} {}
+  RenameHelperTest() : PlainTestSuite{} {}
 private slots:
   void test_ReplaceRename_invalid_regex_failed() {
     QStringList replaceeList;
@@ -279,5 +279,5 @@ private slots:
   }
 };
 
-RenameHelperTest g_RenameHelperTest;
 #include "RenameHelperTest.moc"
+REGISTER_TEST(RenameHelperTest, false)

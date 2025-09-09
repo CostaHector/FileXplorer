@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
 // add necessary includes here
 #include "NameTool.h"
@@ -9,11 +9,11 @@
 #include <QPlainTextEdit>
 #include <QTextDocumentFragment>
 
-class NameToolTest : public MyTestSuite {
+class NameToolTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  NameToolTest() : MyTestSuite{false} {}
+  NameToolTest() : PlainTestSuite{} {}
  private slots:
   void test_AndAsSubStringOfNameRatherThanFS() {
     const QStringList& sentenseExamples{"Andrew Tale and Andrew Garfield",  //
@@ -236,5 +236,5 @@ class NameToolTest : public MyTestSuite {
   NameTool m_nameTool;
 };
 
-NameToolTest g_NameToolTest;
 #include "NameToolTest.moc"
+REGISTER_TEST(NameToolTest, false)

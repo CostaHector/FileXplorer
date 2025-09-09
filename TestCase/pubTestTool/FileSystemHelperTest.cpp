@@ -7,7 +7,7 @@
 class FileSystemHelperTest : public FileSystemTestSuite {
   Q_OBJECT
  public:
-  FileSystemHelperTest() : FileSystemTestSuite{"TestEnv_FileSystemHelper", true, false} {}
+  FileSystemHelperTest() : FileSystemTestSuite{"TestEnv_FileSystemHelper", true} {}
 
  private slots:
   void test_FileSystemHelper() {
@@ -35,4 +35,4 @@ class FileSystemHelperTest : public FileSystemTestSuite {
 };
 
 #include "FileSystemHelperTest.moc"
-FileSystemHelperTest g_FileSystemHelperTest;
+REGISTER_TEST(FileSystemHelperTest, false)

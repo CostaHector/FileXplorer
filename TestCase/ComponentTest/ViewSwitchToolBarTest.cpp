@@ -1,5 +1,5 @@
 #include <QtTest/QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "OnScopeExit.h"
 #include <QTestEventList>
 #include <QToolButton>
@@ -12,10 +12,10 @@
 #include "ViewSwitchToolBar.h"
 #include "EndToExposePrivateMember.h"
 
-class ViewSwitchToolBarTest : public MyTestSuite {
+class ViewSwitchToolBarTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  ViewSwitchToolBarTest() : MyTestSuite{false} {
+  ViewSwitchToolBarTest() : PlainTestSuite{} {
     LOG_D("ViewSwitchToolBarTest object created\n");
   }
   ~ViewSwitchToolBarTest() {
@@ -167,4 +167,4 @@ private:
 };
 
 #include "ViewSwitchToolBarTest.moc"
-ViewSwitchToolBarTest g_ViewSwitchToolBarTest;
+REGISTER_TEST(ViewSwitchToolBarTest, false)

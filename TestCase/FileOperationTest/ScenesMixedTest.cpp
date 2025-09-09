@@ -1,12 +1,12 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "SceneMixed.h"
 
-class ScenesMixedTest : public MyTestSuite {
+class ScenesMixedTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  ScenesMixedTest() : MyTestSuite{false} {}
+  ScenesMixedTest() : PlainTestSuite{} {}
  private slots:
   void test_basicFileNames() {
     QStringList files;
@@ -192,5 +192,5 @@ class ScenesMixedTest : public MyTestSuite {
   }
 };
 
-ScenesMixedTest g_ScenesMixedTest;
 #include "ScenesMixedTest.moc"
+REGISTER_TEST(ScenesMixedTest, false)

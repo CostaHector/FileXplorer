@@ -1,9 +1,9 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "ConvertUnicodeCharsetToAscii.h"
 
-class ConvertUnicodeCharsetToAsciiTest : public MyTestSuite {
+class ConvertUnicodeCharsetToAsciiTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -54,5 +54,5 @@ class ConvertUnicodeCharsetToAsciiTest : public MyTestSuite {
   }
 };
 
-ConvertUnicodeCharsetToAsciiTest g_ConvertUnicodeCharsetToAsciiTest;
 #include "ConvertUnicodeCharsetToAsciiTest.moc"
+REGISTER_TEST(ConvertUnicodeCharsetToAsciiTest, false)

@@ -4,7 +4,7 @@
 // add necessary includes here
 #include "GlbDataProtect.h"
 #include "TDir.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "FileOperation.h"
 
 using namespace FileOperatorType;
@@ -13,11 +13,11 @@ namespace FileOperatorType {
 extern bool g_bReturnErrorCodeUponAnyFailure;
 }
 
-class FileOperationTest : public MyTestSuite {
+class FileOperationTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  FileOperationTest() : MyTestSuite{false} {}
+  FileOperationTest() : PlainTestSuite{} {}
  private slots:
   void test_file_remove_not_recoverable() {
     TDir dir;
@@ -839,4 +839,4 @@ class FileOperationTest : public MyTestSuite {
   }
 };
 #include "FileOperationTest.moc"
-FileOperationTest g_FileOperationTest;
+REGISTER_TEST(FileOperationTest, false)

@@ -1,9 +1,9 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "PathTool.h"
 
-class ValueCheckerTest : public MyTestSuite {
+class ValueCheckerTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -24,6 +24,5 @@ class ValueCheckerTest : public MyTestSuite {
   }
 };
 
-ValueCheckerTest g_ValueCheckerTest;
-
 #include "ValueCheckerTest.moc"
+REGISTER_TEST(ValueCheckerTest, false)

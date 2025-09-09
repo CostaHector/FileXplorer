@@ -1,5 +1,5 @@
 #include <QtTest/QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "OnScopeExit.h"
 #include "MemoryKey.h"
 #include "Logger.h"
@@ -7,10 +7,10 @@
 #include "QuickWhereClauseDialog.h"
 #include "EndToExposePrivateMember.h"
 
-class QuickWhereClauseDialogTest : public MyTestSuite {
+class QuickWhereClauseDialogTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  QuickWhereClauseDialogTest() : MyTestSuite{false} {
+  QuickWhereClauseDialogTest() : PlainTestSuite{} {
     LOG_D("QuickWhereClauseDialogTest object created\n");
   }
   ~QuickWhereClauseDialogTest() {
@@ -135,4 +135,4 @@ private:
 };
 
 #include "QuickWhereClauseDialogTest.moc"
-QuickWhereClauseDialogTest g_QuickWhereClauseDialogTest;
+REGISTER_TEST(QuickWhereClauseDialogTest, false)

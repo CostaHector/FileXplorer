@@ -1,16 +1,16 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
 #include "RenameNamesUnique.h"
 #include "EndToExposePrivateMember.h"
 
-class RenameUnqiueCheckTest : public MyTestSuite {
+class RenameUnqiueCheckTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  RenameUnqiueCheckTest() : MyTestSuite{false} {}
+  RenameUnqiueCheckTest() : PlainTestSuite{} {}
   TDir mDir;
   QString mWorkPath{mDir.path()};
  private slots:
@@ -176,4 +176,4 @@ class RenameUnqiueCheckTest : public MyTestSuite {
 };
 
 #include "RenameUnqiueCheckTest.moc"
-RenameUnqiueCheckTest g_RenameUnqiueCheckTest;
+REGISTER_TEST(RenameUnqiueCheckTest, false)

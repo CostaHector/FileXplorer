@@ -9,7 +9,7 @@
 class RedundantItemsRemoverTest : public FileSystemTestSuite {
   Q_OBJECT
  public:
-  RedundantItemsRemoverTest() : FileSystemTestSuite{"TestEnv_RedundantItemRemove", false, false} {}
+  RedundantItemsRemoverTest() : FileSystemTestSuite{"TestEnv_RedundantItemRemove", false} {}
  private slots:
   void cleanupTestCase() {  // after the last test function was executed.
     FileSystemHelper(mTestPath).EraseFileSystemTree(true);
@@ -128,4 +128,4 @@ RedundantParentFolder
 };
 
 #include "RedundantItemsRemoverTest.moc"
-RedundantItemsRemoverTest g_RedundantItemsRemoverTest;
+REGISTER_TEST(RedundantItemsRemoverTest, false)

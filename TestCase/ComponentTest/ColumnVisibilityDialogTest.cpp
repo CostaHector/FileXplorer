@@ -1,14 +1,14 @@
 #include <QtTest/QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "ColumnVisibilityDialog.h"
 #include "EndToExposePrivateMember.h"
 
-class ColumnVisibilityDialogTest : public MyTestSuite {
+class ColumnVisibilityDialogTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  ColumnVisibilityDialogTest() : MyTestSuite{false} {
+  ColumnVisibilityDialogTest() : PlainTestSuite{} {
     fprintf(stdout, "ColumnVisibilityDialogTest object[%d] created\n", objectCnt++);
     std::fflush(stdout);
   }
@@ -103,4 +103,4 @@ int ColumnVisibilityDialogTest::objectCnt{0};
 const QString ColumnVisibilityDialogTest::initSwitches{"10111"}; // 初始开关：冗余最后两列
 
 #include "ColumnVisibilityDialogTest.moc"
-ColumnVisibilityDialogTest g_ColumnVisibilityDialogTest;
+REGISTER_TEST(ColumnVisibilityDialogTest, false)

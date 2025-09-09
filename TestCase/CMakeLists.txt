@@ -3,21 +3,21 @@ cmake_minimum_required(VERSION 3.5)
 set(PROJECT_NAME FileXplorerTest)
 project(${PROJECT_NAME} LANGUAGES CXX)
 # on windows platform. MediaInfoDLL.h defined a typdef UNICODE _UNICODE needed
-string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" TEST_PARENT_PATH_LEN)
-string(LENGTH "TestCase/" TEST_PROJECT_FOLDER_LENTH)
-math(EXPR MAIN_PROJECT_NAME_LENGTH "${TEST_PARENT_PATH_LEN} - ${TEST_PROJECT_FOLDER_LENTH}")
-message(STATUS "Test Parent path length: ${TEST_PARENT_PATH_LEN}")
-message(STATUS "Test Project folder length: ${TEST_PROJECT_FOLDER_LENTH}")
-message(STATUS "Main project name length (difference): ${MAIN_PROJECT_NAME_LENGTH}")
+get_filename_component(PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
+string(LENGTH "${PARENT_DIR}" PARENT_DIR_LENGTH)
+math(EXPR RELATIVE_INDEX_START_AT "${PARENT_DIR_LENGTH} + 1")
+message("absFilePath(CMakeLists.txt)=${CMAKE_CURRENT_SOURCE_DIR}")
+message("absolutePath(CMakeLists.txt)=${PARENT_DIR}")
+message("relativeIndexStartAt=${RELATIVE_INDEX_START_AT}")
 
 add_definitions(
     -DPROJECT_NAME="FileXplorer"
-    -DPARENT_PATH_LEN=${MAIN_PROJECT_NAME_LENGTH}
+    -DPARENT_PATH_LEN=${RELATIVE_INDEX_START_AT}
     -DRUNNING_UNIT_TESTS=1
     -DUNICODE
     -D_UNICODE
 )
-message("Test CMakelists Start")
+message("[${PROJECT_NAME}] Start...")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -31,6 +31,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets
 
 
 file(GLOB SOURCES
+    # service module sources
     ../Actions/*.cpp
     ../Model/*.cpp
     ../View/*.cpp
@@ -47,6 +48,7 @@ file(GLOB SOURCES
     ../Tools/FileDescriptor/*.cpp
     ../Tools/Json/*.cpp
     ../View/*.cpp
+    # test only module sources
     *.cpp
     ComponentTest/*.cpp
     ComponentTest/JsonEditorWidgetTest/*.cpp
@@ -57,8 +59,9 @@ file(GLOB SOURCES
     pubTestTool/*.cpp
     RenameTest/*.cpp
 )
+
 list(LENGTH SOURCES src_cpp_count)
-message("\n> ${src_cpp_count} file(s) in SOURCES, there are:")
+message("\n> ${src_cpp_count} file(s) found in SOURCES, there are as follows:")
 foreach(srv_file ${SOURCES})
     message("${srv_file}")
 endforeach()
@@ -109,7 +112,7 @@ file(GLOB HEADERS
 )
 
 list(LENGTH HEADERS header_cpp_count)
-message("\n> ${header_cpp_count} file(s) in HEADERS, there are:")
+message("\n> ${header_cpp_count} file(s) found in HEADERS, there are as follows:")
 foreach(header_file ${HEADERS})
     message("${header_file}")
 endforeach()
@@ -163,3 +166,4 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     $<$<CONFIG:Debug>:QT_MESSAGELOGCONTEXT>
 )
+message("[${PROJECT_NAME}] Finished...")

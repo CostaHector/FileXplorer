@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "BeginToExposePrivateMember.h"
 #include "SelectionsRangeHelper.h"
 #include "EndToExposePrivateMember.h"
@@ -19,10 +19,10 @@ public:
   QVariant data(const QModelIndex&, int) const override { return {}; }
 };
 
-class SelectionsRangeHelperTest : public MyTestSuite {
+class SelectionsRangeHelperTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  SelectionsRangeHelperTest() : MyTestSuite{false} {}
+  SelectionsRangeHelperTest() : PlainTestSuite{} {}
 private slots:
   void test_1_index_clear_ok() {
     SelectionsRangeHelper rngHelper;
@@ -93,5 +93,5 @@ private slots:
   }
 };
 
-SelectionsRangeHelperTest g_SelectionsRangeHelperTest;
 #include "SelectionsRangeHelperTest.moc"
+REGISTER_TEST(SelectionsRangeHelperTest, false)
