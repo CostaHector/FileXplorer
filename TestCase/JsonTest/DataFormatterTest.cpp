@@ -1,16 +1,16 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "DataFormatter.h"
 #include "JsonKey.h"
 #include "SortedUniqStrLst.h"
 #include <QJsonValue>
 
 using namespace DataFormatter;
-class DataFormatterTest : public MyTestSuite {
+class DataFormatterTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  DataFormatterTest() : MyTestSuite{false} {}
+  DataFormatterTest() : PlainTestSuite{} {}
  private slots:
   void test_formatDefault() {
     QVariant aInt{7};
@@ -286,4 +286,4 @@ class DataFormatterTest : public MyTestSuite {
 };
 
 #include "DataFormatterTest.moc"
-DataFormatterTest gDataFormatterTest;
+REGISTER_TEST(DataFormatterTest, false)

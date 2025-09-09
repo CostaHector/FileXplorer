@@ -1,16 +1,16 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
 #include "SceneInfoManager.h"
 #include "JsonHelper.h"
 using namespace SceneInfoManager;
 
-class SceneInfoManagerTest : public MyTestSuite {
+class SceneInfoManagerTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  SceneInfoManagerTest() : MyTestSuite{false} {}
+  SceneInfoManagerTest() : PlainTestSuite{} {}
  private slots:
   void test_GetSceneFileContents_invalid() {
     QStringList names{"adsafsd.json"};
@@ -90,5 +90,5 @@ class SceneInfoManagerTest : public MyTestSuite {
   }
 };
 
-SceneInfoManagerTest g_SceneInfoManagerTest;
 #include "SceneInfoManagerTest.moc"
+REGISTER_TEST(SceneInfoManagerTest, false)

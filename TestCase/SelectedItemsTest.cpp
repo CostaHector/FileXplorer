@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
 QStringList NeedProcessPath(const QStringList& paths) {
   if (paths.size() < 2) {
@@ -23,10 +23,10 @@ QStringList NeedProcessPath(const QStringList& paths) {
   return output;
 }
 
-class SelectedItemsTest : public MyTestSuite {
+class SelectedItemsTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  SelectedItemsTest() : MyTestSuite{false} {}
+  SelectedItemsTest() : PlainTestSuite{} {}
  private slots:
   void test_zero_or_1_element_only() {
     QCOMPARE(NeedProcessPath({}), (QStringList{}));
@@ -55,5 +55,5 @@ class SelectedItemsTest : public MyTestSuite {
   }
 };
 
-SelectedItemsTest g_SelectedItemsTest;
 #include "SelectedItemsTest.moc"
+REGISTER_TEST(SelectedItemsTest, false)

@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
 #include "UndoRedo.h"
@@ -11,11 +11,11 @@
 
 using namespace FileOperatorType;
 
-class UndoRedoTest : public MyTestSuite {
+class UndoRedoTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  UndoRedoTest() : MyTestSuite{false} {}
+  UndoRedoTest() : PlainTestSuite{} {}
 
  private slots:
   void test_rmFolderForce_cannot_recover() {
@@ -266,4 +266,4 @@ class UndoRedoTest : public MyTestSuite {
 };
 
 #include "UndoRedoTest.moc"
-UndoRedoTest g_UndoRedoTest;
+REGISTER_TEST(UndoRedoTest, false)

@@ -1,14 +1,14 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "StringTool.h"
 #include "TDir.h"
 using namespace StringTool;
 
-class StringToolTest : public MyTestSuite {
+class StringToolTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  StringToolTest() : MyTestSuite{false} {}
+  StringToolTest() : PlainTestSuite{} {}
 private slots:
   void test_ImgsSortFileSizeFirst() {
     // both file not exist.
@@ -70,4 +70,4 @@ private slots:
 };
 
 #include "StringToolTest.moc"
-StringToolTest g_StringToolTest;
+REGISTER_TEST(StringToolTest, false)

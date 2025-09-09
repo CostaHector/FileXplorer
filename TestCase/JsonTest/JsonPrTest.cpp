@@ -1,7 +1,7 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
 #include "OnScopeExit.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "JsonHelper.h"
 #include "JsonPr.h"
@@ -11,10 +11,10 @@
 #include "PathTool.h"
 #include "PublicMacro.h"
 
-class JsonPrTest : public MyTestSuite {
+class JsonPrTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  JsonPrTest() : MyTestSuite{false} {}
+  JsonPrTest() : PlainTestSuite{} {}
   TDir mDir;
   QString rootpath{mDir.path()};
   QList<FsNodeEntry> gNodeEntries;
@@ -426,4 +426,4 @@ class JsonPrTest : public MyTestSuite {
 };
 
 #include "JsonPrTest.moc"
-JsonPrTest gJsonPrTest;
+REGISTER_TEST(JsonPrTest, false)

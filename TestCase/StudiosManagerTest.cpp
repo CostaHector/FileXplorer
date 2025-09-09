@@ -2,16 +2,16 @@
 #include <QtTest>
 #include "OnScopeExit.h"
 #include "TDir.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 // add necessary includes here
 #include "BeginToExposePrivateMember.h"
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
 
-class StudiosManagerTest : public MyTestSuite {
+class StudiosManagerTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  StudiosManagerTest() : MyTestSuite{false} {}
+  StudiosManagerTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString rootpath{mDir.path()};
   const QString gLocalFilePath{rootpath + "/not_exist_studio_list.txt"};
@@ -162,5 +162,5 @@ private slots:
   }
 };
 
-StudiosManagerTest g_StudiosManagerTest;
 #include "StudiosManagerTest.moc"
+REGISTER_TEST(StudiosManagerTest, false)

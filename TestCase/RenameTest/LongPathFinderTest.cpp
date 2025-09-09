@@ -1,14 +1,14 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "BeginToExposePrivateMember.h"
 #include "LongPathFinder.h"
 #include "EndToExposePrivateMember.h"
 
-class LongPathFinderTest : public MyTestSuite {
+class LongPathFinderTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  LongPathFinderTest() : MyTestSuite{false} {}
+  LongPathFinderTest() : PlainTestSuite{} {}
  private slots:
   void test_NoChop() {
     LongPathFinder lpf;
@@ -48,4 +48,4 @@ class LongPathFinderTest : public MyTestSuite {
 };
 
 #include "LongPathFinderTest.moc"
-LongPathFinderTest g_LongPathFinderTest;
+REGISTER_TEST(LongPathFinderTest, false)

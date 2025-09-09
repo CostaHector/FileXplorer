@@ -1,12 +1,12 @@
 #include <QCoreApplication>
 #include <QtTest>
 #include "ClickableTextBrowser.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
-class ClickableTextBrowserTest : public MyTestSuite {
+class ClickableTextBrowserTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  ClickableTextBrowserTest() : MyTestSuite{false} {}
+  ClickableTextBrowserTest() : PlainTestSuite{} {}
 private slots:
   void test_search_a_and_b_ok() {
     QCOMPARE(ClickableTextBrowser::FormatSearchSentence("A and B"), "%A%B%");
@@ -58,4 +58,4 @@ private slots:
 };
 
 #include "ClickableTextBrowserTest.moc"
-ClickableTextBrowserTest g_ClickableTextBrowserTest;
+REGISTER_TEST(ClickableTextBrowserTest, false)

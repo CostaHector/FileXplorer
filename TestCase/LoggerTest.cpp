@@ -3,17 +3,17 @@
 #include "GlbDataProtect.h"
 #include "TDir.h"
 #include "PublicVariable.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "OnScopeExit.h"
 #include "BeginToExposePrivateMember.h"
 #include "Logger.h" // ahead of any other file include this file
 #include "EndToExposePrivateMember.h"
 
 
-class LoggerTest : public MyTestSuite {
+class LoggerTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  LoggerTest() : MyTestSuite{false} {}
+  LoggerTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString LOCAL_LOG{"log_handler_local.log"};
   const QString LOCAL_LOG_ABS_PATH{mDir.itemPath(LOCAL_LOG)};
@@ -90,4 +90,4 @@ private slots:
   }
 };
 #include "LoggerTest.moc"
-LoggerTest g_LoggerTest;
+REGISTER_TEST(LoggerTest, false)

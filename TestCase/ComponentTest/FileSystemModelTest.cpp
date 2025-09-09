@@ -6,13 +6,13 @@
 
 #include "FileSystemModel.h"
 #include "CustomTableView.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 
-class FileSystemModelTest : public MyTestSuite {
+class FileSystemModelTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  FileSystemModelTest(): MyTestSuite{false} {
+  FileSystemModelTest(): PlainTestSuite{} {
   }
   ~FileSystemModelTest() {
     if (view != nullptr) {
@@ -242,4 +242,4 @@ private:
 };
 
 #include "FileSystemModelTest.moc"
-FileSystemModelTest g_FileSystemModelTest;
+REGISTER_TEST(FileSystemModelTest, false)

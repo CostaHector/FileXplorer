@@ -1,16 +1,16 @@
 ﻿#include <QtTest>
 #include <QCoreApplication>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "ComplexOperation.h"
 #include "PathTool.h"
 
 using namespace ComplexOperation;
 
-class ComplexOperationTest : public MyTestSuite {
+class ComplexOperationTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  ComplexOperationTest() : MyTestSuite{false}, rootpath{mDir.path()} {}
+  ComplexOperationTest() : PlainTestSuite{}, rootpath{mDir.path()} {}
   TDir mDir;
   const QString rootpath;
   const QStringList absPaths{
@@ -205,4 +205,4 @@ class ComplexOperationTest : public MyTestSuite {
 };
 
 #include "ComplexOperationTest.moc"
-ComplexOperationTest gComplexOperationTest;
+REGISTER_TEST(ComplexOperationTest, false)

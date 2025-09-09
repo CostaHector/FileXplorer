@@ -1,9 +1,9 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "NameSectionArrange.h"
 
-class NameSectionArrangeTest : public MyTestSuite {
+class NameSectionArrangeTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -61,5 +61,5 @@ class NameSectionArrangeTest : public MyTestSuite {
   }
 };
 
-NameSectionArrangeTest g_NameSectionArrangeTest;
 #include "NameSectionArrangeTest.moc"
+REGISTER_TEST(NameSectionArrangeTest, false)

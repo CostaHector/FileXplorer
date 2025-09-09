@@ -1,12 +1,12 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "SortedUniqStrLst.h"
 
-class SortedUniqStrLstTest : public MyTestSuite {
+class SortedUniqStrLstTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  SortedUniqStrLstTest() : MyTestSuite{false} {}
+  SortedUniqStrLstTest() : PlainTestSuite{} {}
  private slots:
 
   void insertOneElementFromHint() {
@@ -132,4 +132,4 @@ class SortedUniqStrLstTest : public MyTestSuite {
 };
 
 #include "SortedUniqStrLstTest.moc"
-SortedUniqStrLstTest gSortedUniqStrLstTest;
+REGISTER_TEST(SortedUniqStrLstTest, false)

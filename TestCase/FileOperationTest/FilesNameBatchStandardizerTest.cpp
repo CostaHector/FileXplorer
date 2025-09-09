@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 
 #include "FilesNameBatchStandardizer.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 
 /*
@@ -31,11 +31,11 @@
 
  */
 
-class FilesNameBatchStandardizerTest : public MyTestSuite {
+class FilesNameBatchStandardizerTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  FilesNameBatchStandardizerTest() : MyTestSuite{false} {}
+  FilesNameBatchStandardizerTest() : PlainTestSuite{} {}
 
  private slots:
   void test_files_batch_rename() {
@@ -92,4 +92,4 @@ class FilesNameBatchStandardizerTest : public MyTestSuite {
 };
 
 #include "FilesNameBatchStandardizerTest.moc"
-FilesNameBatchStandardizerTest g_FilesNameBatchStandardizerTest;
+REGISTER_TEST(FilesNameBatchStandardizerTest, false)

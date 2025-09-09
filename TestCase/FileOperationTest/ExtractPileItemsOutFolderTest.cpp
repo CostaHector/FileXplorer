@@ -1,12 +1,12 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "FileOperatorPub.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "BeginToExposePrivateMember.h"
 #include "ItemsUnpacker.h"
 #include "EndToExposePrivateMember.h"
 
-class ExtractPileItemsOutFolderTest : public MyTestSuite {
+class ExtractPileItemsOutFolderTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -65,5 +65,5 @@ class ExtractPileItemsOutFolderTest : public MyTestSuite {
   }
 };
 
-ExtractPileItemsOutFolderTest g_ExtractPileItemsOutFolderTest;
 #include "ExtractPileItemsOutFolderTest.moc"
+REGISTER_TEST(ExtractPileItemsOutFolderTest, false)

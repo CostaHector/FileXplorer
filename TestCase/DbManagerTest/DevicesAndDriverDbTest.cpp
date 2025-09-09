@@ -3,7 +3,7 @@
 #include <QSqlRecord>
 #include <QStorageInfo>
 
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "DevicesAndDriverDb.h"
 #include "TableFields.h"
 #include "PublicVariable.h"
@@ -32,10 +32,10 @@ QList<VolumeInfo> MockerGetVolumesInfoCX() {
   return ans;
 }
 
-class DevicesAndDriverDbTest : public MyTestSuite {
+class DevicesAndDriverDbTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  DevicesAndDriverDbTest() : MyTestSuite{false} {}
+  DevicesAndDriverDbTest() : PlainTestSuite{} {}
  private slots:
   void cleanup() {
     // post-condition
@@ -145,7 +145,7 @@ class DevicesAndDriverDbTest : public MyTestSuite {
   }
 };
 
-DevicesAndDriverDbTest g_DevicesAndDriverDbTest;
 #include "DevicesAndDriverDbTest.moc"
+REGISTER_TEST(DevicesAndDriverDbTest, false)
 
 #endif

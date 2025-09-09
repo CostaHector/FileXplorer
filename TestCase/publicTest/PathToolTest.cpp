@@ -1,16 +1,16 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "PathRelatedTool.h"
 #include "PathTool.h"
 
 using namespace ::PathTool;
-class PathToolTest : public MyTestSuite {
+class PathToolTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  PathToolTest() : MyTestSuite{false} {}
+  PathToolTest() : PlainTestSuite{} {}
  private slots:
   void test_project_name_from_marco() {
     QCOMPARE(PROJECT_NAME, QString("FileXplorer"));
@@ -336,4 +336,4 @@ class PathToolTest : public MyTestSuite {
 };
 
 #include "PathToolTest.moc"
-PathToolTest g_pathToolTest;
+REGISTER_TEST(PathToolTest, false)

@@ -2,13 +2,13 @@
 #include <QtTest>
 #include "GlbDataProtect.h"
 #include "TDir.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "SyncModifiyFileSystem.h"
 
-class SyncModifiyFileSystemTest : public MyTestSuite {
+class SyncModifiyFileSystemTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  SyncModifiyFileSystemTest() : MyTestSuite{false} {}
+  SyncModifiyFileSystemTest() : PlainTestSuite{} {}
   SyncModifiyFileSystem syncMod;
   TDir mDir;
   const QString mBasicPath{mDir.path() + "/home"};
@@ -80,4 +80,4 @@ class SyncModifiyFileSystemTest : public MyTestSuite {
 };
 
 #include "SyncModifiyFileSystemTest.moc"
-SyncModifiyFileSystemTest g_SyncModifiyFileSystemTest;
+REGISTER_TEST(SyncModifiyFileSystemTest, false)

@@ -1,15 +1,15 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include <QToolButton>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "BeginToExposePrivateMember.h"
 #include "ActionsRecorder.h"
 #include "EndToExposePrivateMember.h"
 
-class ActionsRecorderTest : public MyTestSuite {
+class ActionsRecorderTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  ActionsRecorderTest() : MyTestSuite{false} {}
+  ActionsRecorderTest() : PlainTestSuite{} {}
  private slots:
   void test_record_actions_from_nullptr_ok() {
     ActionsRecorder actRecorder;
@@ -243,5 +243,5 @@ class ActionsRecorderTest : public MyTestSuite {
   }
 };
 
-ActionsRecorderTest g_ActionsRecorderTest;
 #include "ActionsRecorderTest.moc"
+REGISTER_TEST(ActionsRecorderTest, false)

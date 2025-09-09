@@ -1,9 +1,9 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "FolderNxtAndLastIterator.h"
 
-class FolderNxtAndLastIteratorTest : public MyTestSuite {
+class FolderNxtAndLastIteratorTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -52,5 +52,5 @@ class FolderNxtAndLastIteratorTest : public MyTestSuite {
   }
 };
 
-FolderNxtAndLastIteratorTest g_FolderNxtAndLastIteratorTest;
 #include "FolderNxtAndLastIteratorTest.moc"
+REGISTER_TEST(FolderNxtAndLastIteratorTest, false)

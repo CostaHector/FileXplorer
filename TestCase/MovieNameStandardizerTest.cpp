@@ -3,18 +3,18 @@
 
 // add necessary includes here
 #include "OnScopeExit.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "NameStandardizer.h"
 #include "StudiosManager.h"
 
-class MovieNameStandardizerTest : public MyTestSuite {
+class MovieNameStandardizerTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  MovieNameStandardizerTest() : MyTestSuite{false} { }
+  MovieNameStandardizerTest() : PlainTestSuite{} { }
   NameStandardizer ns;
  private slots:
   void test_remove_nbspInHtml() {
-    QCOMPARE(ns("A B"), "A B");
+    QCOMPARE(ns("A B"), "A B");
   }
   void test_removeSpecialChar() {
     QCOMPARE(ns("A#’“”\"/:*?<>|B"), "A '''' B");
@@ -111,4 +111,4 @@ void MovieNameStandardizerTest::test_RemoveBacket() {
 }
 
 #include "MovieNameStandardizerTest.moc"
-MovieNameStandardizerTest g_MovieNameStandardizerTest;
+REGISTER_TEST(MovieNameStandardizerTest, false)

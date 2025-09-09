@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 
 #include "OnScopeExit.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "JsonKey.h"
 #include "JsonHelper.h"
@@ -12,11 +12,11 @@
 using namespace JsonHelper;
 using namespace JsonKey;
 
-class JsonFileHelperTest : public MyTestSuite {
+class JsonFileHelperTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  JsonFileHelperTest() : MyTestSuite{false} {}
+  JsonFileHelperTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   static const char mJsonContentStr[];
@@ -307,4 +307,4 @@ const char JsonFileHelperTest::mJsonContentStr[] {R"(
 )"};
 
 #include "JsonFileHelperTest.moc"
-JsonFileHelperTest gJsonFileHelperTest;
+REGISTER_TEST(JsonFileHelperTest, false)

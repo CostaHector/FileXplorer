@@ -5,13 +5,13 @@
 #include "BeginToExposePrivateMember.h"
 #include "EndToExposePrivateMember.h"
 #include "VideoDurationGetter.h"
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 
 const QString VIDEOS_DURATION_DIR = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
-class VideosDurationGetterTest : public MyTestSuite {
+class VideosDurationGetterTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  VideosDurationGetterTest() : MyTestSuite{false} {}
+  VideosDurationGetterTest() : PlainTestSuite{} {}
   static constexpr int EPSILON_MILLIONSECOND{1000};  // 1000ms
  private slots:
   void test_GetLengthQuick() {
@@ -151,4 +151,4 @@ class VideosDurationGetterTest : public MyTestSuite {
 constexpr int VideosDurationGetterTest::EPSILON_MILLIONSECOND;
 
 #include "VideosDurationGetterTest.moc"
-VideosDurationGetterTest g_VideosDurationGetterTest;
+REGISTER_TEST(VideosDurationGetterTest, false)

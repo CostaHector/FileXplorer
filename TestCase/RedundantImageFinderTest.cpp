@@ -1,6 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 
 #include "BeginToExposePrivateMember.h"
@@ -16,10 +16,10 @@ const auto GetNames = [](const REDUNDANT_IMG_BUNCH& imgs) -> QStringList {
   return imgNames;
 };
 
-class RedundantImageFinderTest : public MyTestSuite {
+class RedundantImageFinderTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  RedundantImageFinderTest() : MyTestSuite{false} {}
+  RedundantImageFinderTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   const QString mBenchmarkRedunFolder{mWorkPath + "/benchmark"};
@@ -89,5 +89,5 @@ private slots:
   }
 };
 
-RedundantImageFinderTest g_RedundantImageFinderTest;
 #include "RedundantImageFinderTest.moc"
+REGISTER_TEST(RedundantImageFinderTest, false)

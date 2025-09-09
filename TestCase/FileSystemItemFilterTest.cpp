@@ -1,14 +1,14 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include "FileSystemItemFilter.h"
 
 using namespace FileSystemItemFilter;
-class FileSystemItemFilterTest : public MyTestSuite {
+class FileSystemItemFilterTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  FileSystemItemFilterTest() : MyTestSuite{false} {}
+  FileSystemItemFilterTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   const QFile rootFolder{mWorkPath};
@@ -61,4 +61,4 @@ class FileSystemItemFilterTest : public MyTestSuite {
 };
 
 #include "FileSystemItemFilterTest.moc"
-FileSystemItemFilterTest g_FileSystemItemFilterTest;
+REGISTER_TEST(FileSystemItemFilterTest, false)

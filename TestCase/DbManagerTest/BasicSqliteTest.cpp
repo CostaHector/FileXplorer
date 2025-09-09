@@ -4,17 +4,17 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include "MyTestSuite.h"
+#include "PlainTestSuite.h"
 #include "TDir.h"
 #include <QDebug>
 // ok 3e435dc4_72d5_4709_8bea_94da297050a9
 // nok 20ff7c6b_2d89_4fd0_aafe_8db6eb547e79
 #define TABLE_NAME_IN_QUOTE "'20ff7c6b_2d89_4fd0_aafe_8db6eb547e79'"
 
-class BasicSqliteTest : public MyTestSuite {
+class BasicSqliteTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  BasicSqliteTest() : MyTestSuite{false} {}
+  BasicSqliteTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   const QString mConnName{"BASIC_SQLITE_CONN"};
@@ -115,5 +115,5 @@ private slots:
   }
 };
 
-BasicSqliteTest g_BasicSqliteTest;
 #include "BasicSqliteTest.moc"
+REGISTER_TEST(BasicSqliteTest, false)
