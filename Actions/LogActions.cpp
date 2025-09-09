@@ -28,19 +28,23 @@ LogActions::LogActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_DEBUG)
   _LOG_PRINT_LEVEL_DEBUG->setCheckable(true);
   _LOG_PRINT_LEVEL_DEBUG->setChecked(true);
-  _LOG_PRINT_LEVEL_DEBUG->setShortcutVisibleInContextMenu(true);
-  _LOG_PRINT_LEVEL_DEBUG->setToolTip(QString("<b>%1 (%2)</b><br/>log level below debug will get ignored.").arg(_LOG_PRINT_LEVEL_DEBUG->text(), _LOG_PRINT_LEVEL_DEBUG->shortcut().toString()));
+  _LOG_PRINT_LEVEL_DEBUG->setToolTip("Log messages below Debug level will be ignored.");
+
+  _LOG_PRINT_LEVEL_INFO = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_INFO"), "Info", this};
+  CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_INFO)
+  _LOG_PRINT_LEVEL_INFO->setCheckable(true);
+  _LOG_PRINT_LEVEL_INFO->setToolTip("Log messages below Info level will be ignored.");
 
   _LOG_PRINT_LEVEL_WARNING = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_WARNING"), "Warning", this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_WARNING)
   _LOG_PRINT_LEVEL_WARNING->setCheckable(true);
-  _LOG_PRINT_LEVEL_WARNING->setShortcutVisibleInContextMenu(true);
-  _LOG_PRINT_LEVEL_WARNING->setToolTip(QString("<b>%1 (%2)</b><br/>log level below warning will get ignored.").arg(_LOG_PRINT_LEVEL_WARNING->text(), _LOG_PRINT_LEVEL_WARNING->shortcut().toString()));
+  _LOG_PRINT_LEVEL_WARNING->setToolTip("Log messages below Warning level will be ignored.");
 
   _LOG_PRINT_LEVEL_AG = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_AG)
   _LOG_PRINT_LEVEL_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
   _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_DEBUG);
+  _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_INFO);
   _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_WARNING);
 
   _AUTO_FLUSH_IGNORE_LEVEL = new (std::nothrow) QAction{"Auto FFlush ignore level", this};
@@ -50,7 +54,10 @@ LogActions::LogActions(QObject* parent)  //
   _AUTO_FLUSH_IGNORE_LEVEL->setChecked(Configuration().value(MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
   _AUTO_FLUSH_IGNORE_LEVEL->setShortcutVisibleInContextMenu(true);
 
-  _DROPDOWN_LIST << _LOG_FILE << _LOG_FOLDER << nullptr << _LOG_AGING << nullptr << _LOG_PRINT_LEVEL_DEBUG << _LOG_PRINT_LEVEL_WARNING << nullptr << _AUTO_FLUSH_IGNORE_LEVEL;
+  _DROPDOWN_LIST << _LOG_FILE << _LOG_FOLDER << nullptr
+                 << _LOG_AGING << nullptr
+                 << _LOG_PRINT_LEVEL_DEBUG << _LOG_PRINT_LEVEL_INFO << _LOG_PRINT_LEVEL_WARNING << nullptr
+                 << _AUTO_FLUSH_IGNORE_LEVEL;
 }
 
 QToolButton* LogActions::GetLogPreviewerToolButton(QWidget* parent) {

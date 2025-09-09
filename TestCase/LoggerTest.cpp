@@ -33,14 +33,14 @@ private slots:
     QVERIFY(logAbsFilePath.endsWith(Logger::CONSTANT_LOG_FILE_NAME, Qt::CaseInsensitive));
   }
 
-  void close_file_stream_only() {
+  void closeFileStreamOnly() {
     QCOMPARE(Logger::CloseLogFile(nullptr), false);
     QCOMPARE(Logger::CloseLogFile(stdout), false);
     QCOMPARE(Logger::CloseLogFile(stderr), false);
   }
 
-  void test_set_debug_log_also_flush_instantly() {
-    GlbDataProtect<LOG_LVL_E> autoFlushLevelBkp{Logger::m_autoFflushLevel};
+  void setAutoFflushNoMatterWhatLogLevelIs() {
+    GlbDataProtect<LOG_LVL_E> autoFlushBkp{Logger::m_autoFflushLevel};
     ON_SCOPE_EXIT{
       Logger::out() = Logger::GetFILEStream();
     };
@@ -54,6 +54,33 @@ private slots:
     const QList<FsNodeEntry> entries{mDir.getEntries(true, QDir::Filter::Files)};
     QCOMPARE(entries.size(), 1);
     QVERIFY(entries.front().contents.contains("if level under debug not call fflush"));
+  }
+
+  void ignoreLogLevelAboveSpecifiedLevel() {
+    // only >= warning will call fflush automatically
+    GlbDataProtect<LOG_LVL_E> printLevelBkp{Logger::m_printLevel};
+    ON_SCOPE_EXIT{
+      Logger::out() = Logger::GetFILEStream();
+    };
+
+    QCOMPARE(Logger::m_printLevel, LOG_LVL_E::D);
+    // SetPrintLevelError
+    Logger::out() = Logger::SwitchLogToALocalFile(LOCAL_LOG_ABS_PATH);
+    QVERIFY(Logger::out() != stdout);
+    LOG_D("debug>=debug can print out");
+    Logger::SetPrintLevel(LOG_LVL_E::E);
+    LOG_D("debug<error will be ignored");
+    LOG_W("warning<error will be ignored");
+    LOG_E("error>=error can print out");
+
+    QVERIFY(mDir.fileExists(LOCAL_LOG, false));
+    const QList<FsNodeEntry> entries{mDir.getEntries(true, QDir::Filter::Files)};
+    QCOMPARE(entries.size(), 1);
+    const QString contentInLog = entries.front().contents;
+    QVERIFY(contentInLog.contains("debug>=debug can print out"));
+    QVERIFY(!contentInLog.contains("debug<error will be ignored"));
+    QVERIFY(!contentInLog.contains("warning<error will be ignored"));
+    QVERIFY(contentInLog.contains("error>=error can print out"));
   }
 
   void skipAged_if_logFileSize_below_threshold() {

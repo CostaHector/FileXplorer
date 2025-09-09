@@ -30,16 +30,19 @@ int main(int argc, char* argv[]) {
   const int totalCnt = PlainTestSuite::mTotalTestCaseCount;
   const int shouldExecCnt = p2Suite->size();
   const int failedCnt = failedTestCaseNames.size();
+  const int skippedCnt = totalCnt - shouldExecCnt;
   if (failedCnt != 0) {
-    LOG_C("\n---------------ERROR: Following %d/%d TEST(s) FAILED (total:%d):---------------", failedCnt, shouldExecCnt, totalCnt);
+    fprintf(stderr, "\n----------Following %d/%d TEST(s) Failed (%d skipped)----------\n", failedCnt, shouldExecCnt, skippedCnt);
     for (int i = 0; i < failedCnt; ++i) {
-      LOG_C("%3d. %s", i+1, qPrintable(failedTestCaseNames[i]));
+      fprintf(stderr, "%3d. %s", i+1, qPrintable(failedTestCaseNames[i]));
     }
-    LOG_C("\n---------------ERROR: Above %d/%d TEST(s) FAILED (total:%d)---------------", failedCnt, shouldExecCnt, totalCnt);
+    fprintf(stderr, "\n----------Following %d/%d TEST(s) Failed (%d skipped)----------\n", failedCnt, shouldExecCnt, skippedCnt);
+    fflush(stderr);
   } else {
-    LOG_W("\n--OK----------OK----------OK--\n"
-          "All %d/%d TEST(s) PASSED (total:%d)"
-          "\n--OK----------OK----------OK--\n", shouldExecCnt, shouldExecCnt, totalCnt);
+    fprintf(stdout, "\n----------OK----------OK----------OK----------\n"
+                    "All %d TEST(s) PASSED (%d skipped)"
+                    "\n----------OK----------OK----------OK----------\n", shouldExecCnt, skippedCnt);
+    fflush(stdout);
   }
   return failedTestCaseNames.size();
 }
