@@ -190,7 +190,7 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
   renameHelper();
   if (!renameHelper) {
     const QString& rejectMsg = renameHelper.Details();
-    LOG_BAD_NP("Cannot do rename commands", rejectMsg);
+    LOG_ERR_NP("Cannot do rename commands", rejectMsg);
     return false;
   }
   // rename files first, than its folders;
@@ -206,10 +206,10 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
     return true;
   }
   if (!g_undoRedo.Do(reversedcmds)) {
-    LOG_BAD_NP("Batch commands partially failed", "See details in log");
+    LOG_ERR_NP("Batch commands partially failed", "See details in log");
     return false;
   }
-  LOG_GOOD_P("[Ok]Batch commands rename", "Commands count %d", reversedcmds.size());
+  LOG_OK_P("[Ok]Batch commands rename", "Commands count %d", reversedcmds.size());
   return true;
 }
 

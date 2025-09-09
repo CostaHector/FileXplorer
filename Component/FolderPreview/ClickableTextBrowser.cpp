@@ -81,7 +81,7 @@ void ClickableTextBrowser::wheelEvent(QWheelEvent *event) {
       }
       mCurIconSizeIndex = newSizeIndex;
       mIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
-      LOG_GOOD_P("[Change] Icon size", "%d x %d", mIconSize.width(), mIconSize.height());
+      LOG_OK_P("[Change] Icon size", "%d x %d", mIconSize.width(), mIconSize.height());
       QString htmlContents = toHtml();
       UpdateImagesSizeInHtmlSrc(htmlContents, mIconSize);
       setHtml(htmlContents);
@@ -183,7 +183,7 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
   CastBaseDb castDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"};
   const auto db = castDb.GetDb();
   if (!db.tables().contains(DB_TABLE::PERFORMERS)) {
-    LOG_BAD_NP("[Abort] Cast Table not exist", DB_TABLE::PERFORMERS);
+    LOG_ERR_NP("[Abort] Cast Table not exist", DB_TABLE::PERFORMERS);
     return -1;
   }
 
@@ -196,15 +196,15 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
                                      "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine",
                                      rawStringFromSelection, &ok);
   if (!ok) {
-    LOG_GOOD_NP("[skip] User cancel append", "return");
+    LOG_OK_NP("[skip] User cancel append", "return");
     return 0;
   }
   const int insertOrUpdateCnt = castDb.AppendCastFromMultiLineInput(perfsText);
   if (insertOrUpdateCnt < FD_OK) {
-    LOG_BAD_P("[Failed] Cast Inserted/Update", "errorCode: %d", insertOrUpdateCnt);
+    LOG_ERR_P("[Failed] Cast Inserted/Update", "errorCode: %d", insertOrUpdateCnt);
     return insertOrUpdateCnt;
   }
-  LOG_GOOD_P("[Ok]Cast Inserted/Update", "%d casts added as follows:",
+  LOG_OK_P("[Ok]Cast Inserted/Update", "%d casts added as follows:",
              insertOrUpdateCnt, qPrintable(perfsText));
   return insertOrUpdateCnt;
 }
@@ -357,7 +357,7 @@ QString& ClickableTextBrowser::UpdateImagesSizeInHtmlSrc(QString& htmlSrc, const
 void ClickableTextBrowser::CopySelectedTextToClipboard() const {
   QClipboard* pClipboard = QApplication::clipboard();
   if (pClipboard == nullptr) {
-    LOG_BAD_NP("Copy failed", "pClipboard is nullptr");
+    LOG_ERR_NP("Copy failed", "pClipboard is nullptr");
     return;
   }
   pClipboard->setText(GetCurrentSelectedText());

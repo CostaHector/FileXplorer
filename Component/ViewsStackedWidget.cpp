@@ -201,13 +201,13 @@ void ViewsStackedWidget::BindLogger(CustomStatusBar* logger) {
 
 auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool {
   if (!clickedIndex.isValid()) {
-    LOG_BAD_NP("Current Index invalid", "double Click skip");
+    LOG_ERR_NP("Current Index invalid", "double Click skip");
     return false;
   }
   QFileInfo fi = getFileInfo(clickedIndex);
   LOG_I("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
-    LOG_BAD_NP("path not exist", fi.absoluteFilePath());
+    LOG_ERR_NP("path not exist", fi.absoluteFilePath());
     return false;
   }
   if (fi.isSymLink()) {
@@ -218,7 +218,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
 #endif
     fi.setFile(tarPath);
     if (!fi.exists()) {
-      LOG_BAD_NP("link not exists double click not work", tarPath);
+      LOG_ERR_NP("link not exists double click not work", tarPath);
       return false;
     }
     LOG_D("linked to[%s]", qPrintable(fi.absoluteFilePath()));

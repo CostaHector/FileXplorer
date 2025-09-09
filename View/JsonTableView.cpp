@@ -62,10 +62,10 @@ int JsonTableView::onSaveCurrentChanges() {
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
   const int cnt = _JsonModel->SaveCurrentChanges(indexes);
   if (cnt < 0) {
-    LOG_BAD_P("Save failed", "errorCode:%d", cnt);
+    LOG_ERR_P("Save failed", "errorCode:%d", cnt);
     return cnt;
   }
-  LOG_GOOD_P("Changes have been saved", "%d/%d row(s)", cnt, indexes.size());
+  LOG_OK_P("Changes have been saved", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -77,7 +77,7 @@ int JsonTableView::onSyncNameField() {
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
   const int cnt = _JsonModel->SyncFieldNameByJsonBaseName(indexes);
 
-  LOG_GOOD_P("Name field has been sync by json basename", "%d/%d row(s)", cnt, indexes.size());
+  LOG_OK_P("Name field has been sync by json basename", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -90,11 +90,11 @@ int JsonTableView::onExportCastStudioToDictonary() {
   int castCnt{0}, studioCnt{0};
   std::tie(castCnt, studioCnt) = _JsonModel->ExportCastStudioToLocalDictionaryFile(indexes);
   if (castCnt < 0 || studioCnt < 0) {
-    LOG_BAD_NP("Export cast/studio to local dictionary file failed", "see details in log");
+    LOG_ERR_NP("Export cast/studio to local dictionary file failed", "see details in log");
     return -1;
   }
   const QString affectedRowsMsg = QString{"Increment cast:%1/studio:%2\nby %3 selected row(s)"}.arg(castCnt).arg(studioCnt).arg(indexes.size());
-  LOG_GOOD_NP("Export succeed", affectedRowsMsg);
+  LOG_OK_NP("Export succeed", affectedRowsMsg);
   QMessageBox::information(this, "Export succeed", affectedRowsMsg);
   return castCnt + studioCnt;
 }
@@ -110,20 +110,20 @@ int JsonTableView::onRenameJsonAndRelated() {
   const QString& newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
                                                          {oldJsonBaseName}, 0, true, &isInputOk);
   if (!isInputOk) {
-    LOG_GOOD_NP("[skip] User cancel rename json and related files", "return");
+    LOG_OK_NP("[skip] User cancel rename json and related files", "return");
     return 0;
   }
   if (newJsonBaseName.isEmpty()) {
-    LOG_BAD_NP("[skip] New json base name can not be empty", "return");
+    LOG_ERR_NP("[skip] New json base name can not be empty", "return");
     return 0;
   }
   int cnt = _JsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
   const QString msg{QString{"Rename Json\n[%1]\n[%2]\n and it's related file(s). retCode: %3"}.arg(oldJsonBaseName).arg(newJsonBaseName).arg(cnt)};
   if (cnt < JsonPr::E_OK) {
-    LOG_BAD_P(msg, "Failed, errorCode:%d", cnt);
+    LOG_ERR_P(msg, "Failed, errorCode:%d", cnt);
     return cnt;
   }
-  LOG_GOOD_NP(msg, "All succeed");
+  LOG_OK_NP(msg, "All succeed");
   return 0;
 }
 
@@ -150,11 +150,11 @@ int JsonTableView::onSetStudio() {
                                                 defIndex,                               //
                                                 true, &isInputOk);
   if (!isInputOk) {
-    LOG_GOOD_NP("[skip] User cancel set studio", "return");
+    LOG_OK_NP("[skip] User cancel set studio", "return");
     return 0;
   }
   if (studio.isEmpty()) {
-    LOG_BAD_NP("[skip] Studio name can not be empty", "return");
+    LOG_ERR_NP("[skip] Studio name can not be empty", "return");
     return 0;
   }
 
@@ -166,7 +166,7 @@ int JsonTableView::onSetStudio() {
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   const int cnt = _JsonModel->SetStudio(indexes, studio);
 
-  LOG_GOOD_P("studio has been changed", "%d/%d row(s) to %s", cnt, indexes.size(), qPrintable(studio));
+  LOG_OK_P("studio has been changed", "%d/%d row(s) to %s", cnt, indexes.size(), qPrintable(studio));
   return indexes.size();
 }
 
@@ -178,7 +178,7 @@ int JsonTableView::onInitCastAndStudio() {
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   const int cnt = _JsonModel->InitCastAndStudio(indexes);
 
-  LOG_GOOD_P("cast/studio has been inited", "%d/%d row(s)", cnt, indexes.size());
+  LOG_OK_P("cast/studio has been inited", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -203,7 +203,7 @@ int JsonTableView::onHintCastAndStudio() {
 
   const int cnt = _JsonModel->HintCastAndStudio(indexes, userSelection);
 
-  LOG_GOOD_P("cast/studio has been hint", "%d/%d row(s)", cnt, indexes.size());
+  LOG_OK_P("cast/studio has been hint", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -215,7 +215,7 @@ int JsonTableView::onFormatCast() {
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Cast);
   const int cnt = _JsonModel->FormatCast(indexes);
 
-  LOG_GOOD_P("Cast has been format", "%d/%d row(s)", cnt, indexes.size());
+  LOG_OK_P("Cast has been format", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -226,7 +226,7 @@ int JsonTableView::onClearStudio() {
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   const int cnt = _JsonModel->SetStudio(indexes, "");
-  LOG_GOOD_P("studio has been cleared", "%d/%d row(s)", cnt, indexes.size());
+  LOG_OK_P("studio has been cleared", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -249,11 +249,11 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
                                        candidates.size() - 1,          //
                                        true, &isInputOk);
     if (!isInputOk) {
-      LOG_GOOD_NP("[Skip] User cancel", fieldOperation);
+      LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;
     }
     if (tagsOrCast.isEmpty()) {
-      LOG_BAD_NP("[Abort] Input can not be empty", fieldOperation);
+      LOG_ERR_NP("[Abort] Input can not be empty", fieldOperation);
       return 0;
     }
     candidates.push_back(tagsOrCast);
@@ -268,7 +268,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
       fieldColumn = JSON_KEY_E::Tags;
       break;
     default:
-      LOG_BAD_P("Field Type invalid", "field: %d", (int)type);
+      LOG_ERR_P("Field Type invalid", "field: %d", (int)type);
       return -1;
   }
 
@@ -286,10 +286,10 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
       cnt = _JsonModel->RmvCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
     default:
-      LOG_BAD_P("Field Operation invalid", "mode: %d", (int)mode);
+      LOG_ERR_P("Field Operation invalid", "mode: %d", (int)mode);
       return -2;
   }
-  LOG_GOOD_P("SetCastOrTags", "%d/%d row(s) affected by [%s]", cnt, indexes.size(), qPrintable(fieldOperation));
+  LOG_OK_P("SetCastOrTags", "%d/%d row(s) affected by [%s]", cnt, indexes.size(), qPrintable(fieldOperation));
   return indexes.size();
 }
 
@@ -350,10 +350,10 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
   const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   int cnt = _JsonModel->AppendCastFromSentence(srcModelInd, userSelection, isUpperCaseSentence);
   if (cnt < 0) {
-    LOG_BAD_NP("Cast append failed", "see detail in logs");
+    LOG_ERR_NP("Cast append failed", "see detail in logs");
     return -1;
   }
-  LOG_GOOD_P("Cast append succeed", "cnt %d", cnt);
+  LOG_OK_P("Cast append succeed", "cnt %d", cnt);
   return cnt;
 }
 
@@ -407,10 +407,10 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   _JsonModel->setData(srcModelInd, newText);
   if (!ret) {
-    LOG_BAD_NP("Change selection case failed", "see detail in logs");
+    LOG_ERR_NP("Change selection case failed", "see detail in logs");
     return -1;
   }
-  LOG_GOOD_NP("Change selection text case succeed", userSelection);
+  LOG_OK_NP("Change selection text case succeed", userSelection);
   return 0;
 }
 

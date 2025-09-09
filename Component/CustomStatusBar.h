@@ -2,7 +2,6 @@
 #define CUSTOMSTATUSBAR_H
 
 #include <QLabel>
-#include <QProgressBar>
 #include <QStatusBar>
 #include <QToolBar>
 
@@ -22,11 +21,9 @@ public:
 
   void onPathInfoChanged(const int count, const int index = 0);
   void onMsgChanged(const QString& text = "", const STATUS_ALERT_LEVEL alertLvl = STATUS_ALERT_LEVEL::NORMAL);
-  void SetProgressValue(int value = 100);
 
   QToolBar* m_viewsSwitcher{nullptr};
 private:
-  QProgressBar* mProcess {nullptr};
   QList<QLabel*> mLabelsLst; // total count, selected count, message
 };
 #endif  // CUSTOMSTATUSBAR_H

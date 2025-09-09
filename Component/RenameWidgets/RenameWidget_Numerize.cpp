@@ -79,7 +79,7 @@ void RenameWidget_Numerize::extraSubscribe() {
     bool isNumber = false;
     int startNo = startNoStr.toInt(&isNumber);
     if (!isNumber) {
-      LOG_BAD_P("[Abort] Start number str invalid", "[%s] use %d instead", qPrintable(startNoStr), startNo);
+      LOG_ERR_P("[Abort] Start number str invalid", "[%s] use %d instead", qPrintable(startNoStr), startNo);
       return;
     }
     OnlyTriggerRenameCore();

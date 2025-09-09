@@ -41,7 +41,7 @@ private slots:
 
     int heightOcuppied = 0;
 
-    Notificator::showMessage(QIcon{}, "first one", "", DEFAULT_NTY_TIMEOUT);
+    Notificator::showMessage(LOG_LVL_E::I, "first one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() == 1);
 
     // firstNtyRect is in the right-top cornner of current sceen
@@ -54,14 +54,14 @@ private slots:
     for (int cardIndex = 1; cardIndex < 100; ++cardIndex) {
       QString titleStr{"title" + QString::number(cardIndex)};
       QString msgStr{"message" + QString::number(cardIndex)};
-      Notificator::showMessage(QIcon{}, titleStr, msgStr, DEFAULT_NTY_TIMEOUT);
+      Notificator::showMessage(LOG_LVL_E::I, titleStr, msgStr, DEFAULT_NTY_TIMEOUT);
       QVERIFY2(!Notificator::instances.empty(), qPrintable(titleStr));
       heightOcuppied += Notificator::instances.back()->geometry().height();
       while (heightOcuppied >= CURRENT_SCEEN_HEIGHT) {
         break;
       }
     }
-    Notificator::showMessage(QIcon{}, "wrapped one", "", DEFAULT_NTY_TIMEOUT);
+    Notificator::showMessage(LOG_LVL_E::I, "wrapped one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() >= 2);
 
     // wrappedNtyRect is also in the right-top cornner of current sceen
@@ -83,7 +83,7 @@ private slots:
 
     int heightOcuppied = 0;
 
-    Notificator::showMessage(QIcon{}, "first one", "", DEFAULT_NTY_TIMEOUT);
+    Notificator::showMessage(LOG_LVL_E::I, "first one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() == 1);
 
     // firstNtyRect is in the right-bottom cornner of current sceen
@@ -96,14 +96,14 @@ private slots:
     for (int cardIndex = 1; cardIndex < 100; ++cardIndex) {
       QString titleStr{"title" + QString::number(cardIndex)};
       QString msgStr{"message" + QString::number(cardIndex)};
-      Notificator::showMessage(QIcon{}, titleStr, msgStr, DEFAULT_NTY_TIMEOUT);
+      Notificator::showMessage(LOG_LVL_E::I, titleStr, msgStr, DEFAULT_NTY_TIMEOUT);
       QVERIFY2(!Notificator::instances.empty(), qPrintable(titleStr));
       heightOcuppied += Notificator::instances.back()->geometry().height();
       while (heightOcuppied >= CURRENT_SCEEN_HEIGHT) {
         break;
       }
     }
-    Notificator::showMessage(QIcon{}, "wrapped one", "", DEFAULT_NTY_TIMEOUT);
+    Notificator::showMessage(LOG_LVL_E::I, "wrapped one", "", DEFAULT_NTY_TIMEOUT);
     QVERIFY(Notificator::instances.size() >= 2);
 
     // wrappedNtyRect is also in the right-bottom cornner of current sceen
@@ -113,7 +113,7 @@ private slots:
   }
 
   void timeoutLenGT0_AutoHideTimerActive_ok() {
-    Notificator::showMessage(QIcon{}, "Title: Hello", "Message: world", DEFAULT_NTY_TIMEOUT);
+    Notificator::showMessage(LOG_LVL_E::I, "Title: Hello", "Message: world", DEFAULT_NTY_TIMEOUT);
     QCOMPARE(Notificator::instances.size(), 1);
     QVERIFY(Notificator::instances.front() != nullptr);
     auto* pFirst = Notificator::instances.front().get();
@@ -130,8 +130,7 @@ private slots:
   void finished_signal_drive_FreeMe_ok() {
     QPushButton btn;
     btn.setText("Finished btn");
-
-    Notificator::showMessage(QIcon{}, "Title: Hello", "Message: world", &btn, SIGNAL(clicked(bool)));
+    Notificator::progress(LOG_LVL_E::O, "Title: Hello", "Message: world", &btn, SIGNAL(clicked(bool)));
 
     QCOMPARE(Notificator::instances.size(), 1);
     QVERIFY(Notificator::instances.front() != nullptr);
@@ -159,7 +158,7 @@ private slots:
     QPushButton btn;
     btn.setText("Finished btn");
 
-    Notificator::showMessage(QIcon{}, "Title: Hello", "Message: world", nullptr, nullptr);
+    Notificator::progress(LOG_LVL_E::O, "Title: Hello", "Message: world", nullptr, nullptr);
 
     QCOMPARE(Notificator::instances.size(), 1);
     QVERIFY(Notificator::instances.front() != nullptr);

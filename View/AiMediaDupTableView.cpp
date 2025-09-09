@@ -58,7 +58,7 @@ void AiMediaDupTableView::onScanAPath() {
   const bool scanRet = aimd.ScanALocation(absPath, false, true);
   aimd.FillHashFieldIfSizeConflict(absPath);
   LoadAiMediaTableNames();
-  LOG_GOOD_P("Scan path result", "scanRet:%d, Path: %s", scanRet, qPrintable(absPath));
+  LOG_OK_P("Scan path result", "scanRet:%d, Path: %s", scanRet, qPrintable(absPath));
 }
 
 QModelIndexList AiMediaDupTableView::Proxy2Source(const QModelIndexList& proInds) const {
@@ -84,19 +84,19 @@ void AiMediaDupTableView::subscribe() {
     const auto ret = QMessageBox::warning(this, "Drop selected tables?", "Cannot recover",
                                           QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
-      LOG_GOOD_NP("[Skip]User has cancel drop table", "return");
+      LOG_OK_NP("[Skip]User has cancel drop table", "return");
       return;
     }
     const int tblCnt = aimd.DropTables(GetSelectedAiTables(), false);
     LoadAiMediaTableNames();
-    LOG_GOOD_P("Drop Tables succeed", "%d table(s)", tblCnt);
+    LOG_OK_P("Drop Tables succeed", "%d table(s)", tblCnt);
   });
 
   connect(g_dupVidFinderAg().AUDIT_AI_MEDIA_TABLE, &QAction::triggered, this, [this]() {
     auto& aimd = AIMediaDuplicate::GetInst();
     const int tblCnt = aimd.AuditTables(GetSelectedAiTables(), false);
     LoadAiMediaTableNames();
-    LOG_GOOD_P("Audit Tables succeed", "%d records(s)", tblCnt);
+    LOG_OK_P("Audit Tables succeed", "%d records(s)", tblCnt);
   });
 
   connect(g_dupVidFinderAg().DROP_THEN_REBUILD_THIS_TABLE, &QAction::triggered, this, [this]() {
@@ -110,7 +110,7 @@ void AiMediaDupTableView::subscribe() {
     }
     const int tblCnt = aimd.RebuildTables(GetSelectedAiTables(), false);
     LoadAiMediaTableNames();
-    LOG_GOOD_P("Drop & Rebuild succeed", "%d table(s)", tblCnt);
+    LOG_OK_P("Drop & Rebuild succeed", "%d table(s)", tblCnt);
   });
 
   connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& ind) {
@@ -118,7 +118,7 @@ void AiMediaDupTableView::subscribe() {
     const QString& tableName = m_aiMediaTblModel->fileName(srcInd);
     const QString& pth = TableName2Path(tableName);
     if (!QFileInfo(pth).isDir()) {
-      LOG_BAD_P("[Skip open]", "Path[%s] or table[%s] not exist", qPrintable(pth), qPrintable(tableName));
+      LOG_ERR_P("[Skip open]", "Path[%s] or table[%s] not exist", qPrintable(pth), qPrintable(tableName));
       return;
     }
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));

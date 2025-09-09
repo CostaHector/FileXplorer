@@ -88,7 +88,7 @@ int MD5Window::operator()(const QStringList& absPaths) {
   }
 
   setWindowTitle(QString("MD5 | %1 file(s)").arg(fileCnt));
-  LOG_GOOD_P("MD5 calculated ok", "%d file(s)", fileCnt);
+  LOG_OK_P("MD5 calculated ok", "%d file(s)", fileCnt);
   return fileCnt;
 }
 

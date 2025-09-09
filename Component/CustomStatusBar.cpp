@@ -15,12 +15,6 @@ CustomStatusBar::CustomStatusBar(QWidget* parent)  //
   }
   mLabelsLst[MSG]->setObjectName("statusMessageLabel");
 
-  mProcess = new (std::nothrow) QProgressBar{this};
-  CHECK_NULLPTR_RETURN_VOID(mProcess);
-  mProcess->setRange(0, 100);
-  mProcess->setValue(0);
-  addPermanentWidget(mProcess);
-
   m_viewsSwitcher = g_viewActions().GetViewTB(this); // right-down corner permanent widget
   CHECK_NULLPTR_RETURN_VOID(m_viewsSwitcher);
   addPermanentWidget(m_viewsSwitcher);
@@ -48,7 +42,3 @@ void CustomStatusBar::onMsgChanged(const QString& text, const STATUS_ALERT_LEVEL
   mLabelsLst[MSG]->setText(text);
 }
 
-void CustomStatusBar::SetProgressValue(int value) {
-  // std::max<int>(0, std::min<int>(value, 100));
-  mProcess->setValue((value > 100) ? 100 : ((value < 0) ? 0 : value));
-}
