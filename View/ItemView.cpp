@@ -37,8 +37,8 @@ void ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
   const QString& path = mModels->filePath(clickedIndex);
   const bool ret = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
   if (ret) {
-    LOG_GOOD_NP("[Ok] Open", path);
+    LOG_OK_NP("[Ok] Open", path);
   } else {
-    LOG_BAD_NP("[Failed] Open", path);
+    LOG_ERR_NP("[Failed] Open", path);
   }
 }

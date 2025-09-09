@@ -37,11 +37,11 @@ bool RunBatAsAdmin(const QString& batFileAbsPath) {
   // or QProcess::execute("powershell", args) != 0;
   if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
     const QString& stdErr = process.readAllStandardError();
-    LOG_BAD_P("[Failed] Cannot run with admin privileges", "batAbsPath[%s] \n%s",
+    LOG_ERR_P("[Failed] Cannot run with admin privileges", "batAbsPath[%s] \n%s",
               qPrintable(batNativePath), qPrintable(stdErr));
     return false;
   }
-  LOG_GOOD_P("[Ok] Run with admin privileges succeed", "batAbsPath[%s]", qPrintable(batFileAbsPath));
+  LOG_OK_P("[Ok] Run with admin privileges succeed", "batAbsPath[%s]", qPrintable(batFileAbsPath));
   return true;
 }
 

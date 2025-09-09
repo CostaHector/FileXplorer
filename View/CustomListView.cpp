@@ -85,7 +85,7 @@ void CustomListView::wheelEvent(QWheelEvent *event) {
       mCurIconSizeIndex = newSizeIndex;
       const QSize newIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
       setIconSize(newIconSize);
-      LOG_GOOD_P("[Change] Icon size", "%d x %d", newIconSize.width(), newIconSize.height());
+      LOG_OK_P("[Change] Icon size", "%d x %d", newIconSize.width(), newIconSize.height());
       emit iconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
       event->accept();
       return;

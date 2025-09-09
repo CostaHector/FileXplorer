@@ -5,13 +5,20 @@
 #include <memory>
 
 enum class LOG_LVL_E : int {
-  D = 0, // debug
-  I,     // information
-  W,     // warning
-  E,     // error
-  C,     // critical
-  F,     // fatal
+  BEGIN = 0, // begin
+  D = 0,     // debug
+  I,         // information
+  W,         // warning
+  E,         // error
+  C,         // critical
+  F,         // fatal
+  Q,         // question
+  O,         // OK(TASK_FINISHED)
+  P,         // PARTIAL_SUCCESS
+  BUTT,      //
 };
+static const char LVLS_CHAR_ARRAY[] = "DIWECFQOP";
+
 inline bool operator<(LOG_LVL_E a, LOG_LVL_E b) {
   return static_cast<int>(a) < static_cast<int>(b);
 }
@@ -75,7 +82,7 @@ if (level < Logger::m_printLevel) break;\
     char timestamp[LOG_TIME_PATTERN_LEN]{0}; \
     get_timestamp(timestamp, LOG_TIME_PATTERN_LEN); \
     fprintf(Logger::out(), patternCstr, \
-            timestamp, "DIWECF"[(int)level], __func__, \
+            timestamp, LVLS_CHAR_ARRAY[(int)level], __func__, \
             ##__VA_ARGS__,\
                               static_cast<const char*>(__FILE__) + PARENT_PATH_LEN, __LINE__); \
     if (!(level < Logger::m_autoFflushLevel)) fflush(Logger::out()); \
@@ -88,5 +95,8 @@ if (level < Logger::m_printLevel) break;\
 #define LOG_E(fmt, ...) LOG_OUT(LOG_LVL_E::E, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // ERROR
 #define LOG_C(fmt, ...) LOG_OUT(LOG_LVL_E::C, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // CRITICAL
 #define LOG_F(fmt, ...) LOG_OUT(LOG_LVL_E::F, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // FATAL
+#define LOG_Q(fmt, ...) LOG_OUT(LOG_LVL_E::Q, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // QUESTION
+#define LOG_O(fmt, ...) LOG_OUT(LOG_LVL_E::O, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // OK(TASK_FINISHED)
+#define LOG_P(fmt, ...) LOG_OUT(LOG_LVL_E::P, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // PARTIAL_SUCCESS
 
 #endif // LOGGER_H

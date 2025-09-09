@@ -67,7 +67,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
     LOG_WARN_NP("[Failed] Drop into partial", dest);
     return false;
   }
-  LOG_GOOD_NP("[Ok] Drop into all", dest);
+  LOG_OK_NP("[Ok] Drop into all", dest);
   return true;
 }
 

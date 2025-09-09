@@ -153,12 +153,12 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
                                                 false,                                    //
                                                 &okUserSelect);
   if (!okUserSelect) {
-    LOG_GOOD_NP("[skip] Drop table", "User cancel");
+    LOG_OK_NP("[skip] Drop table", "User cancel");
     return "";
   }
   const QString& deleteTbl = MountHelper::ChoppedDisplayName(drpTbl);
   if (deleteTbl.isEmpty()) {
-    LOG_BAD_NP("[Abort] Table name is empty, cannot drop", deleteTbl);
+    LOG_ERR_NP("[Abort] Table name is empty, cannot drop", deleteTbl);
     return "";
   }
   return deleteTbl;

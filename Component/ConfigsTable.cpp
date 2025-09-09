@@ -110,23 +110,23 @@ bool ConfigsTable::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
   }
   const bool ret = QDesktopServices::openUrl(url);
   if (!ret) {
-    LOG_BAD_NP("[Failed] open path failed", path);
+    LOG_ERR_NP("[Failed] open path failed", path);
     return false;
   }
-  LOG_GOOD_NP("[ok] Open path succeed", path);
+  LOG_OK_NP("[ok] Open path succeed", path);
   return true;
 }
 
 void ConfigsTable::onEditPreferenceSetting() const {
   const QString iniFileAbsPath = Configuration().fileName();
   if (!QFile::exists(iniFileAbsPath)) {
-    LOG_BAD_P("[Failed] Cannot edit", ".ini file[%s] not found", qPrintable(iniFileAbsPath));
+    LOG_ERR_P("[Failed] Cannot edit", ".ini file[%s] not found", qPrintable(iniFileAbsPath));
     return;
   }
   bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(iniFileAbsPath));
   if (!openRet) {
-    LOG_BAD_P("[Failed] Cannot edit", ".ini file[%s] has no default editor program set", qPrintable(iniFileAbsPath));
+    LOG_ERR_P("[Failed] Cannot edit", ".ini file[%s] has no default editor program set", qPrintable(iniFileAbsPath));
     return;
   }
-  LOG_GOOD_NP("[Ok] Opened init file succeed", "Changes will take effect until next time reopen");
+  LOG_OK_NP("[Ok] Opened init file succeed", "Changes will take effect until next time reopen");
 }

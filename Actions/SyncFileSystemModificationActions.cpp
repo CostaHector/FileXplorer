@@ -75,9 +75,9 @@ QToolBar* SyncFileSystemModificationActions::GetSyncPathToolbar(QWidget* parent)
       const QString& basicPath{_BASIC_PATH->text()};
       const bool setResult = SyncModifiyFileSystem::SetBasicPath(basicPath);
       if (!setResult) {
-        LOG_BAD_NP("Cannot set basic path:", basicPath);
+        LOG_ERR_NP("Cannot set basic path:", basicPath);
       } else {
-        LOG_GOOD_NP("Set basic path", basicPath);
+        LOG_OK_NP("Set basic path", basicPath);
       }
     });
 
@@ -85,9 +85,9 @@ QToolBar* SyncFileSystemModificationActions::GetSyncPathToolbar(QWidget* parent)
       const QString& syncToPath{_SYNC_TO_PATH->text()};
       const bool setResult = SyncModifiyFileSystem::SetSynchronizedToPaths(syncToPath);
       if (!setResult) {
-        LOG_BAD_NP("Cannot set operation sync to path:", syncToPath);
+        LOG_ERR_NP("Cannot set operation sync to path:", syncToPath);
       } else {
-        LOG_GOOD_NP("Set operation sync to path:", syncToPath);
+        LOG_OK_NP("Set operation sync to path:", syncToPath);
       }
     });
 

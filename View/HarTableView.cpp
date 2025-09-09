@@ -84,7 +84,7 @@ int HarTableView::SaveSelectionFilesTo() const {
     LOG_WARN_P("[Partially failed] Item(s) exported", "Only %d/%d item(s) to path:\n%s", exportCount, selectedRows.size(), qPrintable(dstFolder));
     return exportCount;
   }
-  LOG_GOOD_P("[Ok] Item(s) exported", "all %d/%d item(s) to path:\n%s", exportCount, selectedRows.size(), qPrintable(dstFolder));
+  LOG_OK_P("[Ok] Item(s) exported", "all %d/%d item(s) to path:\n%s", exportCount, selectedRows.size(), qPrintable(dstFolder));
   return exportCount;
 }
 

@@ -74,21 +74,21 @@ void ArrangeActions::subscribe() {
   connect(_RELOAD_STUDIOS, &QAction::triggered, this, []() {
     static auto& psm = StudiosManager::getIns();
     int itemsCntChanged = psm.ForceReloadStudio();
-    LOG_GOOD_P("Reload studios", "delta %d items", itemsCntChanged);
+    LOG_OK_P("Reload studios", "delta %d items", itemsCntChanged);
   });
 
   connect(_EDIT_PERFS, &QAction::triggered, this, &onEditPerformers);
   connect(_RELOAD_PERFS, &QAction::triggered, this, []() {
     static auto& pm = CastManager::getIns();
     int itemsCntChanged = pm.ForceReloadCast();
-    LOG_GOOD_P("Reload performers", "delta %d item(s)", itemsCntChanged);
+    LOG_OK_P("Reload performers", "delta %d item(s)", itemsCntChanged);
   });
 
   connect(_EDIT_PERF_AKA, &QAction::triggered, this, &onEditAkaPerformer);
   connect(_RELOAD_PERF_AKA, &QAction::triggered, this, []() {
     static auto& dbTM = PerformersAkaManager::getIns();
     int itemsCntChanged = dbTM.ForceReloadAkaName();
-    LOG_GOOD_P("Reload performers AKA", "delta %d item(s)", itemsCntChanged);
+    LOG_OK_P("Reload performers AKA", "delta %d item(s)", itemsCntChanged);
   });
 
   connect(_RENAME_RULE_STAT, &QAction::triggered, this, &onShowRenameRuleStatistics);
