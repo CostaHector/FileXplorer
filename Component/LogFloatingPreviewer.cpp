@@ -65,6 +65,7 @@ void LogFloatingPreviewer::onHideShow(bool checked) {
     return;
   }
   MovePosition();
+  std::fflush(Logger::out());
   UpdateLogsContents();
   show();
 }
