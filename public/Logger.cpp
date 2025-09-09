@@ -156,11 +156,9 @@ bool Logger::OpenLogFolder() {
   return true;
 }
 
-void Logger::SetPrintLevelError() {
-  m_printLevel = LOG_LVL_E::E;
-}
-void Logger::SetPrintLevelDebug() {
-  m_printLevel = LOG_LVL_E::D;
+void Logger::SetPrintLevel(LOG_LVL_E newLevel) {
+  LOG_W("Log print level set from [%d] to [%d]", static_cast<int>(m_printLevel), static_cast<int>(newLevel));
+  m_printLevel = newLevel;
 }
 
 void Logger::SetAutoFlushAllLevel(bool allLevelChecked) {
@@ -172,10 +170,20 @@ void Logger::SetAutoFlushAllLevel(bool allLevelChecked) {
 #include "LogActions.h"
 void Logger::subscribe() {
   auto& ins = g_LogActions();
+
   QObject::connect(ins._LOG_FILE, &QAction::triggered, &Logger::OpenLogFile);
   QObject::connect(ins._LOG_FOLDER, &QAction::triggered, &Logger::OpenLogFolder);
   QObject::connect(ins._LOG_AGING, &QAction::triggered, []() { Logger::AgingLogFiles(Logger::GetLogFileAbsPath()); });
-  QObject::connect(ins._LOG_PRINT_LEVEL_DEBUG, &QAction::triggered, &Logger::SetPrintLevelDebug);
-  QObject::connect(ins._LOG_PRINT_LEVEL_WARNING, &QAction::triggered, &Logger::SetPrintLevelError);
+  QObject::connect(ins._LOG_PRINT_LEVEL_AG, &QActionGroup::triggered, [&ins](QAction* pAct) {
+    if (pAct == ins._LOG_PRINT_LEVEL_DEBUG) {
+      Logger::SetPrintLevel(LOG_LVL_E::D);
+    } else if (pAct == ins._LOG_PRINT_LEVEL_INFO) {
+      Logger::SetPrintLevel(LOG_LVL_E::I);
+    } else if (pAct == ins._LOG_PRINT_LEVEL_WARNING) {
+      Logger::SetPrintLevel(LOG_LVL_E::W);
+    } else {
+      Logger::SetPrintLevel(LOG_LVL_E::D);
+    }
+  });
   QObject::connect(ins._AUTO_FLUSH_IGNORE_LEVEL, &QAction::toggled, &Logger::SetAutoFlushAllLevel);
 }

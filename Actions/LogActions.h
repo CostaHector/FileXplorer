@@ -15,6 +15,7 @@ class LogActions : public QObject {
   QAction* _LOG_AGING{nullptr};
 
   QAction* _LOG_PRINT_LEVEL_DEBUG{nullptr};
+  QAction* _LOG_PRINT_LEVEL_INFO{nullptr};
   QAction* _LOG_PRINT_LEVEL_WARNING{nullptr};
   QActionGroup* _LOG_PRINT_LEVEL_AG{nullptr};
 
