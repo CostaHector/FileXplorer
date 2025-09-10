@@ -165,7 +165,6 @@ void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
 void ClickableTextBrowser::onSearchMultiSelectionReq() {
   const QStringList keywords = GetSelectedTexts();
   if (keywords.isEmpty()) {
-    LOG_WARN_NP("Skip search", "Nothing selected");
     return;
   }
   bool bNeedSearchDb{false};
