@@ -20,7 +20,6 @@ int main(int argc, char* argv[]) {
   } else {
     LOG_I("argc[%d].", argc);
   }
-  Logger::subscribe();
   Logger::SetAutoFlushAllLevel(Configuration().value(MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
 
   const QStringList& args = app.arguments();
