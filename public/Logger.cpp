@@ -165,14 +165,3 @@ void Logger::SetAutoFlushAllLevel(bool allLevelChecked) {
   m_autoFflushLevel = allLevelChecked ? LOG_LVL_E::D : LOG_LVL_E::W;
   Configuration().setValue(MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, allLevelChecked);
 }
-
-
-#include "LogActions.h"
-void Logger::subscribe() {
-  auto& ins = g_LogActions();
-
-  QObject::connect(ins._LOG_FILE, &QAction::triggered, &Logger::OpenLogFile);
-  QObject::connect(ins._LOG_FOLDER, &QAction::triggered, &Logger::OpenLogFolder);
-  QObject::connect(ins._LOG_ROTATION, &QAction::triggered, []() { Logger::AgingLogFiles(Logger::GetLogFileAbsPath()); });
-  QObject::connect(ins._AUTO_FLUSH_IGNORE_LEVEL, &QAction::toggled, &Logger::SetAutoFlushAllLevel);
-}

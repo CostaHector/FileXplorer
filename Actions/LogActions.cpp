@@ -66,14 +66,6 @@ LogActions::LogActions(QObject* parent)  //
        {_LOG_PRINT_LEVEL_WARNING, LOG_LVL_E::W},
        {_LOG_PRINT_LEVEL_ERROR, LOG_LVL_E::E},
        };
-  QObject::connect(_LOG_PRINT_LEVEL_AG, &QActionGroup::triggered, this, [](QAction* pAct) {
-    auto it = LOG_PRINT_LVL_ACTION_ENUM.find(pAct);
-    if (it != LOG_PRINT_LVL_ACTION_ENUM.cend()) {
-      Logger::SetPrintLevel(it.value());
-      return;
-    }
-    Logger::SetPrintLevel(LOG_LVL_E::D);
-  });
 
   _AUTO_FLUSH_IGNORE_LEVEL = new (std::nothrow) QAction{"Auto FFlush ignore level", this};
   CHECK_NULLPTR_RETURN_VOID(_AUTO_FLUSH_IGNORE_LEVEL)
@@ -84,6 +76,18 @@ LogActions::LogActions(QObject* parent)  //
   _DROPDOWN_LIST += nullptr;
   _DROPDOWN_LIST += _AUTO_FLUSH_IGNORE_LEVEL;
 
+  connect(_LOG_FILE, &QAction::triggered, &Logger::OpenLogFile);
+  connect(_LOG_FOLDER, &QAction::triggered, &Logger::OpenLogFolder);
+  connect(_LOG_ROTATION, &QAction::triggered, []() { Logger::AgingLogFiles(Logger::GetLogFileAbsPath()); });
+  connect(_LOG_PRINT_LEVEL_AG, &QActionGroup::triggered, this, [](QAction* pAct) {
+    auto it = LOG_PRINT_LVL_ACTION_ENUM.find(pAct);
+    if (it != LOG_PRINT_LVL_ACTION_ENUM.cend()) {
+      Logger::SetPrintLevel(it.value());
+      return;
+    }
+    Logger::SetPrintLevel(LOG_LVL_E::D);
+  });
+  connect(_AUTO_FLUSH_IGNORE_LEVEL, &QAction::toggled, &Logger::SetAutoFlushAllLevel);
 }
 
 QToolButton* LogActions::GetLogPreviewerToolButton(QWidget* parent) {
