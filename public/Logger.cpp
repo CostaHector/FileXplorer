@@ -173,17 +173,6 @@ void Logger::subscribe() {
 
   QObject::connect(ins._LOG_FILE, &QAction::triggered, &Logger::OpenLogFile);
   QObject::connect(ins._LOG_FOLDER, &QAction::triggered, &Logger::OpenLogFolder);
-  QObject::connect(ins._LOG_AGING, &QAction::triggered, []() { Logger::AgingLogFiles(Logger::GetLogFileAbsPath()); });
-  QObject::connect(ins._LOG_PRINT_LEVEL_AG, &QActionGroup::triggered, [&ins](QAction* pAct) {
-    if (pAct == ins._LOG_PRINT_LEVEL_DEBUG) {
-      Logger::SetPrintLevel(LOG_LVL_E::D);
-    } else if (pAct == ins._LOG_PRINT_LEVEL_INFO) {
-      Logger::SetPrintLevel(LOG_LVL_E::I);
-    } else if (pAct == ins._LOG_PRINT_LEVEL_WARNING) {
-      Logger::SetPrintLevel(LOG_LVL_E::W);
-    } else {
-      Logger::SetPrintLevel(LOG_LVL_E::D);
-    }
-  });
+  QObject::connect(ins._LOG_ROTATION, &QAction::triggered, []() { Logger::AgingLogFiles(Logger::GetLogFileAbsPath()); });
   QObject::connect(ins._AUTO_FLUSH_IGNORE_LEVEL, &QAction::toggled, &Logger::SetAutoFlushAllLevel);
 }

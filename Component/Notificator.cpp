@@ -28,7 +28,7 @@ constexpr char NTY_ORANGE_RGB[] = "#FF7D01";
 constexpr char NTY_ORANGE_BG_RGB[] = "#FFF6ED";
 }
 
-bool Notificator::m_isTopToBottom = false;
+bool Notificator::m_isTopToBottom = false; // for unit-test purpose only
 std::list<std::unique_ptr<Notificator>> Notificator::instances;
 
 Notificator::Notificator(int timeoutLength)//
@@ -313,29 +313,16 @@ void Notificator::moveToCorrectPosition() {
 
   QRect ntfRect = screens.front()->geometry();
   static const int MAX_HEIGHT = ntfRect.height();
-  const QSize size = sizeHint();
 
-  static constexpr int FOR_SYS_UI_MARGIN = 20;
-  // set initial (x, y) coordinates
-  // isTopToBottom: preserve n pixel space at top for system UI
-  // !isTopToBottom: preserve n pixel space at bottom for system UI
-  ntfRect.setX(ntfRect.right() - size.width());
-  ntfRect.setY(m_isTopToBottom ? 0 : ntfRect.bottom() - size.height());
-  ntfRect.translate(0, (m_isTopToBottom ? FOR_SYS_UI_MARGIN : -FOR_SYS_UI_MARGIN));
-
-  {
-    // get the correct y coordinate
-    bool isOldBallon = false;
+  // get the correct y coordinate
+  static const auto GetYPosition = [](Notificator* itself, const int ntfRectBottom, const int hintSizeHeight) -> int {
     const Notificator* keyInstance = nullptr;
     for (const auto& ptr : instances) {
-      if (!ptr) continue;
-      if (ptr.get() == this) {
-        // attention: balloons should not exists in instance list.
-        // unless this ballon only need move left to show extra failed message,
-        // and in this situation, move up/down is unnecessary, use former y is totally enough
-        ntfRect.setY(this->geometry().y());
-        isOldBallon = true;
-        break;
+      if (ptr == nullptr) continue;
+      if (ptr.get() == itself) {
+        // 1. balloons usually should not exists in instances pool, unless this ballon is the one only need move left serveral pixels to show extra failed message,
+        // In this situation, move up/down is unnecessary, inherit itself former y and return;
+        return itself->geometry().y();
       }
       const Notificator* curInstance = ptr.get();
       if (m_isTopToBottom) { // Track the lowest notification
@@ -348,20 +335,29 @@ void Notificator::moveToCorrectPosition() {
         }
       }
     }
-    // only new balloons need to adjust y position, old ballon inherit its origin y position
-    if (!isOldBallon && keyInstance != nullptr) {
-      // adjust y coordinate
+    // 2. only new balloons need to adjust its y position, old ballon inherit its origin y position
+    if (keyInstance != nullptr) {
       // isTopToBottom: Place below the lowest notification
       // !isTopToBottom: Place above the highest notification
       static constexpr int BETWEEN_NOTIFICATONS_MARGIN = 1;
-      const int calculatedY = m_isTopToBottom ? keyInstance->geometry().bottom() + BETWEEN_NOTIFICATONS_MARGIN
-                                              : keyInstance->geometry().top() - size.height() - BETWEEN_NOTIFICATONS_MARGIN;
-      const int modulus = calculatedY % MAX_HEIGHT;
-      ntfRect.setY(modulus >= 0 ?  modulus: modulus + MAX_HEIGHT);
+      const int yReferredkeyInstance = m_isTopToBottom ? keyInstance->geometry().bottom() + BETWEEN_NOTIFICATONS_MARGIN
+                                                       : keyInstance->geometry().top() - hintSizeHeight - BETWEEN_NOTIFICATONS_MARGIN;
+      return (yReferredkeyInstance % MAX_HEIGHT + MAX_HEIGHT) % MAX_HEIGHT;
     }
-  }
+    // 3. empty instance pool
+    // isTopToBottom: preserve n pixel space at top for system UI
+    // !isTopToBottom: preserve n pixel space at bottom for system UI
+    static constexpr int FOR_SYS_UI_MARGIN = 20;
+    const int initialY = m_isTopToBottom ? 0 + FOR_SYS_UI_MARGIN: ntfRectBottom- hintSizeHeight - FOR_SYS_UI_MARGIN;
+    return initialY;
+  };
+  const QSize hintSize = sizeHint();
+  const int x = ntfRect.right() - hintSize.width();
+  const int y = GetYPosition(this, ntfRect.bottom(), hintSize.height());
+  ntfRect.setX(x);
+  ntfRect.setY(y);
+  ntfRect.setSize(hintSize);
 
-  ntfRect.setSize(size);
   setGeometry(ntfRect);
 }
 
