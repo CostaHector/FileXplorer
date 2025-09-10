@@ -2,6 +2,7 @@
 #include "MemoryKey.h"
 #include "Logger.h"
 #include "PublicMacro.h"
+#include <QHash>
 
 LogActions::LogActions(QObject* parent)  //
   : QObject{parent}                    //
@@ -11,18 +12,22 @@ LogActions::LogActions(QObject* parent)  //
   _LOG_FILE->setCheckable(false);
   _LOG_FILE->setShortcutVisibleInContextMenu(true);
   _LOG_FILE->setToolTip(QString("<b>%1 (%2)</b><br/>Call FFlush first then open log file in system default editor").arg(_LOG_FILE->text(), _LOG_FILE->shortcut().toString()));
+  _DROPDOWN_LIST += _LOG_FILE;
 
   _LOG_FOLDER = new (std::nothrow) QAction{QIcon{":img/LOG_FOLDERS"}, "Open logs folder", this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_FOLDER)
   _LOG_FOLDER->setCheckable(false);
   _LOG_FOLDER->setShortcutVisibleInContextMenu(true);
   _LOG_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/>Open folder logs where located in.").arg(_LOG_FOLDER->text(), _LOG_FOLDER->shortcut().toString()));
+  _DROPDOWN_LIST += _LOG_FOLDER;
 
-  _LOG_AGING = new (std::nothrow) QAction{QIcon(":img/AGING_LOGS"), "Aging logs", this};
-  CHECK_NULLPTR_RETURN_VOID(_LOG_AGING)
-  _LOG_AGING->setCheckable(false);
-  _LOG_AGING->setShortcutVisibleInContextMenu(true);
-  _LOG_AGING->setToolTip(QString("<b>%1 (%2)</b><br/>Aging log file if file size >= 10MiB.").arg(_LOG_AGING->text(), _LOG_AGING->shortcut().toString()));
+  _LOG_ROTATION = new (std::nothrow) QAction{QIcon(":img/LOG_ROTATION"), "Rotate log file", this};
+  CHECK_NULLPTR_RETURN_VOID(_LOG_ROTATION)
+  _LOG_ROTATION->setCheckable(false);
+  _LOG_ROTATION->setShortcutVisibleInContextMenu(true);
+  _LOG_ROTATION->setToolTip(QString("<b>%1 (%2)</b><br/>Rotate log files if they exceed 10 MB in size").arg(_LOG_ROTATION->text(), _LOG_ROTATION->shortcut().toString()));
+  _DROPDOWN_LIST += nullptr;
+  _DROPDOWN_LIST += _LOG_ROTATION;
 
   _LOG_PRINT_LEVEL_DEBUG = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_DEBUG"), "Debug", this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_DEBUG)
@@ -40,12 +45,35 @@ LogActions::LogActions(QObject* parent)  //
   _LOG_PRINT_LEVEL_WARNING->setCheckable(true);
   _LOG_PRINT_LEVEL_WARNING->setToolTip("Log messages below Warning level will be ignored.");
 
+  _LOG_PRINT_LEVEL_ERROR = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_ERROR"), "Error", this};
+  CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_ERROR)
+  _LOG_PRINT_LEVEL_ERROR->setCheckable(true);
+  _LOG_PRINT_LEVEL_ERROR->setToolTip("Log messages below Error level will be ignored.");
+
   _LOG_PRINT_LEVEL_AG = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_AG)
   _LOG_PRINT_LEVEL_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
   _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_DEBUG);
   _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_INFO);
   _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_WARNING);
+  _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_ERROR);
+  _DROPDOWN_LIST += nullptr;
+  _DROPDOWN_LIST += _LOG_PRINT_LEVEL_AG->actions();
+  static const QHash<QAction*, LOG_LVL_E> LOG_PRINT_LVL_ACTION_ENUM//
+      {
+       {_LOG_PRINT_LEVEL_DEBUG, LOG_LVL_E::D},
+       {_LOG_PRINT_LEVEL_INFO, LOG_LVL_E::I},
+       {_LOG_PRINT_LEVEL_WARNING, LOG_LVL_E::W},
+       {_LOG_PRINT_LEVEL_ERROR, LOG_LVL_E::E},
+       };
+  QObject::connect(_LOG_PRINT_LEVEL_AG, &QActionGroup::triggered, this, [](QAction* pAct) {
+    auto it = LOG_PRINT_LVL_ACTION_ENUM.find(pAct);
+    if (it != LOG_PRINT_LVL_ACTION_ENUM.cend()) {
+      Logger::SetPrintLevel(it.value());
+      return;
+    }
+    Logger::SetPrintLevel(LOG_LVL_E::D);
+  });
 
   _AUTO_FLUSH_IGNORE_LEVEL = new (std::nothrow) QAction{"Auto FFlush ignore level", this};
   CHECK_NULLPTR_RETURN_VOID(_AUTO_FLUSH_IGNORE_LEVEL)
@@ -53,11 +81,9 @@ LogActions::LogActions(QObject* parent)  //
   _AUTO_FLUSH_IGNORE_LEVEL->setCheckable(true);
   _AUTO_FLUSH_IGNORE_LEVEL->setChecked(Configuration().value(MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
   _AUTO_FLUSH_IGNORE_LEVEL->setShortcutVisibleInContextMenu(true);
+  _DROPDOWN_LIST += nullptr;
+  _DROPDOWN_LIST += _AUTO_FLUSH_IGNORE_LEVEL;
 
-  _DROPDOWN_LIST << _LOG_FILE << _LOG_FOLDER << nullptr
-                 << _LOG_AGING << nullptr
-                 << _LOG_PRINT_LEVEL_DEBUG << _LOG_PRINT_LEVEL_INFO << _LOG_PRINT_LEVEL_WARNING << nullptr
-                 << _AUTO_FLUSH_IGNORE_LEVEL;
 }
 
 QToolButton* LogActions::GetLogPreviewerToolButton(QWidget* parent) {

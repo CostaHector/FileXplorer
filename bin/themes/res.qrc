@@ -14,7 +14,7 @@
     <file alias="LOG_FILES_PREVIEW">Log/LOG_FILES_PREVIEW.svg</file>
     <file alias="LOG_FILES">Log/LOG_FILES.svg</file>
     <file alias="LOG_FOLDERS">Log/LOG_FOLDERS.svg</file>
-    <file alias="AGING_LOGS">Log/AGING_LOGS.svg</file>
+    <file alias="LOG_ROTATION">Log/LOG_ROTATION.svg</file>
     <file alias="LOG_LEVEL_DEBUG">Log/LOG_LEVEL_DEBUG.svg</file>
     <file alias="LOG_LEVEL_INFO">Log/LOG_LEVEL_INFO.svg</file>
     <file alias="LOG_LEVEL_WARNING">Log/LOG_LEVEL_WARNING.svg</file>
@@ -24,8 +24,6 @@
     <file alias="LOG_LEVEL_QUESTION">Log/LOG_LEVEL_QUESTION.svg</file>
     <file alias="LOG_LEVEL_OK">Log/LOG_LEVEL_OK.svg</file>
     <file alias="LOG_LEVEL_PARTIAL_FAILED">Log/LOG_LEVEL_PARTIAL_FAILED.svg</file>
-    <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON.svg</file>
-    <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF.svg</file>
 
     <!--Media icon here-->
     <file alias="DUPLICATE_IMAGES_FINDER">Media/DUPLICATE_IMAGES_FINDER.png</file>
