@@ -474,7 +474,7 @@ void FileExplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     return;
   }
   const QString& currentPath {_fileSysModel->rootPath()};
-  if (PathTool::isRootOrEmpty(currentPath)) {
+  if (PathTool::isLinuxRootOrWinEmpty(currentPath)) {
     LOG_WARN_NP("[Abort] Path root or empty", currentPath);
     return;
   }
@@ -874,7 +874,7 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   if (!_contentPane->IsCurFSView()) {
     return false;
   }
-  if (PathTool::isRootOrEmpty(_fileSysModel->rootPath())) {
+  if (PathTool::isLinuxRootOrWinEmpty(_fileSysModel->rootPath())) {
     return false;
   }
 
