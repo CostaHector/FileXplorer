@@ -26,17 +26,19 @@ constexpr char NTY_RED_RGB[] = "#F44336";
 constexpr char NTY_RED_BG_RGB[] = "#FEEAEA";
 constexpr char NTY_ORANGE_RGB[] = "#FF7D01";
 constexpr char NTY_ORANGE_BG_RGB[] = "#FFF6ED";
-}
+} // namespace
 
 bool Notificator::m_isTopToBottom = false; // for unit-test purpose only
 std::list<std::unique_ptr<Notificator>> Notificator::instances;
 
-Notificator::Notificator(int timeoutLength)//
-  : QFrame{nullptr}, mAutoCloser{this}, mTimeOutLen{timeoutLength} {
+Notificator::Notificator(int timeoutLength) //
+  : QFrame{nullptr}
+  , mAutoCloser{this}
+  , mTimeOutLen{timeoutLength} {
   hide();
   m_icon = new (std::nothrow) QLabel{this};
   CHECK_NULLPTR_RETURN_VOID(m_icon);
-  m_icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  m_icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
   m_title = new (std::nothrow) QLabel{this};
   CHECK_NULLPTR_RETURN_VOID(m_title);
@@ -48,12 +50,12 @@ Notificator::Notificator(int timeoutLength)//
   m_message->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   m_message->setOpenExternalLinks(true);
   m_message->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
-  m_message->setStyleSheet(R"(QLabel { color: black; font-family: Arial, Helvetica, sans-serif; })");
+  m_message->setStyleSheet(R"(QLabel { font-family: Arial, Helvetica, sans-serif; })");
 
-  m_closeBtn = new (std::nothrow) QToolButton{this};
+  m_closeBtn = new (std::nothrow) QToolButton{};
   CHECK_NULLPTR_RETURN_VOID(m_closeBtn);
   m_closeBtn->setIcon(QIcon{":img/BALLOON_CLOSE"});
-  m_closeBtn->setStyleSheet(R"(QToolButton { background: transparent; border: none; })");
+  m_closeBtn->setStyleSheet(R"(QToolButton { background: transparent; })");
 
   if (mTimeOutLen <= 0) {
     m_preloader = new (std::nothrow) QLabel{this};
@@ -139,9 +141,7 @@ void Notificator::partialSuccess(const QString& title, const QString& message) {
 }
 
 void Notificator::FreeMe() {
-  instances.remove_if([this](const std::unique_ptr<Notificator>& ptr) {
-    return ptr != nullptr && ptr.get() == this;
-  });
+  instances.remove_if([this](const std::unique_ptr<Notificator>& ptr) { return ptr != nullptr && ptr.get() == this; });
 }
 
 void Notificator::showMessage(LOG_LVL_E level, const QString& title, const QString& message, int timeLength) {
@@ -159,7 +159,8 @@ void Notificator::showMessage(LOG_LVL_E level, const QString& title, const QStri
   instances.push_back(std::move(pNty));
 }
 
-Notificator* Notificator::progress(LOG_LVL_E level, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
+Notificator* Notificator::progress(
+    LOG_LVL_E level, const QString& title, const QString& message, const QObject* sender, const char* finishedSignal) {
   LOG_E(LOG_TITLE_MESSAGE_PATTERN, qPrintable(title), qPrintable(message));
   freeHiddenInstance();
 
@@ -222,63 +223,63 @@ void Notificator::hoverLeaveEvent(QHoverEvent* event) {
 }
 #else
 bool Notificator::event(QEvent* event) {
-  switch(event->type()) {
-    case QEvent::HoverEnter:  {
-      setWindowOpacity(WINDOW_NONTRANSPARENT_OPACITY);
-      if (mTimeOutLen > 0) {
-        mAutoCloser.stop();
-      }
-      return true; // all event are finished
+  switch (event->type()) {
+  case QEvent::HoverEnter: {
+    setWindowOpacity(WINDOW_NONTRANSPARENT_OPACITY);
+    if (mTimeOutLen > 0) {
+      mAutoCloser.stop();
     }
-    case QEvent::HoverLeave: {
-      setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
-      if (mTimeOutLen > 0) {
-        mAutoCloser.start();
-      }
-      return true;
+    return true; // all event are finished
+  }
+  case QEvent::HoverLeave: {
+    setWindowOpacity(WINDOW_TRANSPARENT_OPACITY);
+    if (mTimeOutLen > 0) {
+      mAutoCloser.start();
     }
-    case QEvent::MouseButtonDblClick: {
-      Logger::OpenLogFile();
-      return true;
-    }
-    default:
-      return QFrame::event(event);
+    return true;
+  }
+  case QEvent::MouseButtonDblClick: {
+    Logger::OpenLogFile();
+    return true;
+  }
+  default:
+    return QFrame::event(event);
   }
 }
 #endif
 
 void Notificator::notify(LOG_LVL_E level, const QString& title, const QString& message) {
   {
-    static const QPixmap LOG_LEVEL_2_PIXMAP[(int)LOG_LVL_E::BUTT + 1]//
-        {
-         QPixmap{":img/LOG_LEVEL_DEBUG"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_INFO"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_WARNING"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_ERROR"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_CRITICAL"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_FATAL"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_QUESTION"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_OK"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         QPixmap{":img/LOG_LEVEL_PARTIAL_FAILED"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
-         };
-    m_icon->setPixmap(LOG_LEVEL_2_PIXMAP[(int)level]);
+    static const QPixmap LOG_LEVEL_2_PIXMAP[(int) LOG_LVL_E::BUTT + 1] //
+    {
+      QPixmap{":img/LOG_LEVEL_DEBUG"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_INFO"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_WARNING"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_ERROR"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_CRITICAL"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_FATAL"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_QUESTION"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_OK"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+          QPixmap{":img/LOG_LEVEL_PARTIAL_FAILED"}.scaledToWidth(NTY_ICON_SIZE, Qt::SmoothTransformation),
+    };
+    m_icon->setPixmap(LOG_LEVEL_2_PIXMAP[(int) level]);
     m_title->setText(title);
     m_message->setText(message);
   }
   {
-    static const QString styleSheet {R"(Notificator { background-color: %1; })"};
-    static QString LOG_LEVEL_2_COLOR[(int)LOG_LVL_E::BUTT + 1] {
-        styleSheet.arg(NTY_GREY_BG_RGB),   // D
-        styleSheet.arg(NTY_BLUE_BG_RGB),   // I
-        styleSheet.arg(NTY_ORANGE_BG_RGB), // W
-        styleSheet.arg(NTY_RED_BG_RGB),    // E
-        styleSheet.arg(NTY_RED_BG_RGB),    // C
-        styleSheet.arg(NTY_RED_BG_RGB),    // F
-        styleSheet.arg(NTY_BLUE_BG_RGB),   // Q
-        styleSheet.arg(NTY_GREEN_BG_RGB),  // O
-        styleSheet.arg(NTY_ORANGE_BG_RGB), // P
+    static const QString styleSheet{R"(Notificator { background-color: %1; })"};
+    static QString LOG_LEVEL_2_COLOR[(int) LOG_LVL_E::BUTT + 1]{
+      styleSheet.arg(NTY_GREY_BG_RGB),   // D
+          styleSheet.arg(NTY_BLUE_BG_RGB),   // I
+          styleSheet.arg(NTY_ORANGE_BG_RGB), // W
+          styleSheet.arg(NTY_RED_BG_RGB),    // E
+          styleSheet.arg(NTY_RED_BG_RGB),    // C
+          styleSheet.arg(NTY_RED_BG_RGB),    // F
+          styleSheet.arg(NTY_BLUE_BG_RGB),   // Q
+          styleSheet.arg(NTY_GREEN_BG_RGB),  // O
+          styleSheet.arg(NTY_ORANGE_BG_RGB), // P
     };
-    setStyleSheet(LOG_LEVEL_2_COLOR[(int)level]);
+    setStyleSheet(LOG_LEVEL_2_COLOR[(int) level]);
   }
   moveToCorrectPosition();
   show();
@@ -288,15 +289,15 @@ void Notificator::initializeLayout() {
   QGridLayout* layout = new (std::nothrow) QGridLayout;
   CHECK_NULLPTR_RETURN_VOID(layout);
   layout->addWidget(m_icon, 0, 0, 1, 1);
-  layout->addWidget(m_title, 0, 1, 1, 1, Qt::AlignLeft);
-  layout->addWidget(m_closeBtn, 0, 2, 1, 1, Qt::AlignRight);
-  layout->addWidget(m_message, 1, 0, 1, 3, Qt::AlignLeft);
+  layout->addWidget(m_title, 0, 1, 1, 2);
+  layout->addWidget(m_closeBtn, 0, 2, 1, 1);
+  layout->addWidget(m_message, 1, 0, 1, 3);
   if (mTimeOutLen <= 0) {
-    layout->addWidget(m_progress, 2, 0, 1, 2, Qt::AlignLeft);
+    layout->addWidget(m_progress, 2, 0, 1, 2);
     layout->addWidget(m_preloader, 2, 2, 1, 1);
   }
   layout->setSpacing(0);
-  layout->setContentsMargins(5, 2, 5, 2);
+  layout->setContentsMargins(1, 1, 1, 1);
   setLayout(layout);
 }
 
@@ -309,7 +310,9 @@ void Notificator::initializeUI() {
 
 void Notificator::moveToCorrectPosition() {
   static const auto screens = QGuiApplication::screens();
-  if (screens.isEmpty()) {return;}
+  if (screens.isEmpty()) {
+    return;
+  }
 
   QRect ntfRect = screens.front()->geometry();
   static const int MAX_HEIGHT = ntfRect.height();
@@ -318,7 +321,9 @@ void Notificator::moveToCorrectPosition() {
   static const auto GetYPosition = [](Notificator* itself, const int ntfRectBottom, const int hintSizeHeight) -> int {
     const Notificator* keyInstance = nullptr;
     for (const auto& ptr : instances) {
-      if (ptr == nullptr) continue;
+      if (ptr == nullptr) {
+        continue;
+      }
       if (ptr.get() == itself) {
         // 1. balloons usually should not exists in instances pool, unless this ballon is the one only need move left serveral pixels to show extra failed message,
         // In this situation, move up/down is unnecessary, inherit itself former y and return;
@@ -348,7 +353,7 @@ void Notificator::moveToCorrectPosition() {
     // isTopToBottom: preserve n pixel space at top for system UI
     // !isTopToBottom: preserve n pixel space at bottom for system UI
     static constexpr int FOR_SYS_UI_MARGIN = 20;
-    const int initialY = m_isTopToBottom ? 0 + FOR_SYS_UI_MARGIN: ntfRectBottom- hintSizeHeight - FOR_SYS_UI_MARGIN;
+    const int initialY = m_isTopToBottom ? 0 + FOR_SYS_UI_MARGIN : ntfRectBottom - hintSizeHeight - FOR_SYS_UI_MARGIN;
     return initialY;
   };
   const QSize hintSize = sizeHint();
@@ -366,4 +371,3 @@ void Notificator::freeHiddenInstance() {
     return ptr == nullptr || ptr->isHidden();
   });
 }
-
