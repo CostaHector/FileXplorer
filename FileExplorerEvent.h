@@ -24,7 +24,7 @@ private:
   void subsribeCompress();
   void subscribeThumbnailActions();
 
-  void onRename(AdvanceRenamer& renameWid);
+  void on_Rename(AdvanceRenamer& renameWid);
 
   bool __CanNewItem() const;
 
