@@ -40,14 +40,15 @@ public:
 
 public slots:
   void setProgressValue(int _value);
+  void setProgressFailed();
 
 private slots:
   void whenProgressFinished();
 
 private:
-  explicit Notificator(LOG_LVL_E lvl, int timeoutLength);
+  explicit Notificator(int timeoutLength);
   void FreeMe(); // only when in unitest it's a slot
-  void notify(const QString& title, const QString& message);
+  void notify(LOG_LVL_E level, const QString& title, const QString& message);
   void initializeLayout();
   void initializeUI();
   void moveToCorrectPosition();
@@ -60,7 +61,6 @@ private:
   QToolButton*    m_closeBtn {nullptr};
   QLabel*         m_preloader {nullptr};
   QProgressBar*   m_progress {nullptr};
-  const LOG_LVL_E m_lvl {LOG_LVL_E::D};
 
   static bool   m_isTopToBottom;
   static void freeHiddenInstance();

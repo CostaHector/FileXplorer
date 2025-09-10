@@ -1,6 +1,7 @@
 ﻿#include "CommandsPreview.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "NotificatorMacro.h"
 
 #include <QClipboard>
 #include <QApplication>
@@ -62,12 +63,14 @@ void CommandsPreview::adjustButtonPosition() {
 
 void CommandsPreview::subscribe() {
   connect(COPY_TEXT, &QAction::triggered, this, [this]() {
-    QClipboard* clipboard = QApplication::clipboard();
-    if (clipboard == nullptr) {
-      LOG_W("clipboard is nullptr. cannot copy");
+    QClipboard* pClipboard = QApplication::clipboard();
+    if (pClipboard == nullptr) {
+      LOG_WARN_NP("Cannot copy", "pClipboard copied succeed");
       return;
     }
-    clipboard->setText(toPlainText());
+    const QString text = toPlainText();
+    pClipboard->setText(text);
+    LOG_OK_P("Copied succeed", "%d char(s)", text.size());
   });
   connect(STAY_ON_TOP, &QAction::toggled, this, [this](const bool checked) {
     setWindowFlag(Qt::WindowStaysOnTopHint, checked);

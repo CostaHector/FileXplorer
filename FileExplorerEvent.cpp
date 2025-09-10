@@ -403,7 +403,7 @@ void FileExplorerEvent::subscribe() {
 
     connect(fileOpInst._LONG_PATH_FINDER, &QAction::triggered, this, [this]() -> void {
       RenameWidget_LongPath pToLongPath{_contentPane};
-      onRename(pToLongPath);
+      on_Rename(pToLongPath);
     });
   }
 
@@ -419,43 +419,43 @@ void FileExplorerEvent::subscribe() {
     auto& renameInst = g_renameAg();
     connect(renameInst._NUMERIZER, &QAction::triggered, this, [this]() -> void {
       RenameWidget_Numerize pNumerize{_contentPane};
-      onRename(pNumerize);
+      on_Rename(pNumerize);
     });
     connect(renameInst._SECTIONS_ARRANGE, &QAction::triggered, this, [this]() -> void {
       RenameWidget_ArrangeSection pArrange{_contentPane};
-      onRename(pArrange);
+      on_Rename(pArrange);
     });
     connect(renameInst._REVERSE_NAMES_LIST, &QAction::triggered, this, [this]() -> void {
       RenameWidget_ReverseNames pReverse{_contentPane};
-      onRename(pReverse);
+      on_Rename(pReverse);
     });
     connect(renameInst._CASE_NAME, &QAction::triggered, this, [this]() -> void {
       RenameWidget_Case pCase{_contentPane};
-      onRename(pCase);
+      on_Rename(pCase);
     });
     connect(renameInst._STR_INSERTER, &QAction::triggered, this, [this]() -> void {
       RenameWidget_Insert pInsert{_contentPane};
-      onRename(pInsert);
+      on_Rename(pInsert);
     });
     connect(renameInst._STR_DELETER, &QAction::triggered, this, [this]() -> void {
       RenameWidget_Delete pDelete{_contentPane};
-      onRename(pDelete);
+      on_Rename(pDelete);
     });
     connect(renameInst._STR_REPLACER, &QAction::triggered, this, [this]() -> void {
       RenameWidget_Replace pReplacer{_contentPane};
-      onRename(pReplacer);
+      on_Rename(pReplacer);
     });
     connect(renameInst._CONTINUOUS_NUMBERING, &QAction::triggered, this, [this]() -> void {
       RenameWidget_ConsecutiveFileNo pNoConsecutive{_contentPane};
-      onRename(pNoConsecutive);
+      on_Rename(pNoConsecutive);
     });
     connect(renameInst._CONVERT_UNICODE_TO_ASCII, &QAction::triggered, this, [this]() -> void {
       RenameWidget_ConvertBoldUnicodeCharset2Ascii pToAscii{_contentPane};
-      onRename(pToAscii);
+      on_Rename(pToAscii);
     });
     connect(renameInst._PREPEND_PARENT_FOLDER_NAMES, &QAction::triggered, this, [this]() -> void {
       RenameWidget_PrependParentFolderName pPrependName{_contentPane};
-      onRename(pPrependName);
+      on_Rename(pPrependName);
     });
   }
 
@@ -468,7 +468,7 @@ void FileExplorerEvent::subscribe() {
   g_ArrangeActions().subscribe();
 }
 
-void FileExplorerEvent::onRename(AdvanceRenamer& renameWid) {
+void FileExplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
   if (!_contentPane->IsCurFSView()) {
     LOG_WARN_NP("[Rename] Current view not support rename", _contentPane->GetCurViewName());
     return;
@@ -484,10 +484,10 @@ void FileExplorerEvent::onRename(AdvanceRenamer& renameWid) {
     LOG_WARN_NP("[Skip] Nothing selected", "return");
     return;
   }
-  const bool bDontWatch {preNames.size() > 100};
-  const auto beforeOption = _fileSysModel->options();
-  if (bDontWatch) {
-    _fileSysModel->setOptions(QFileSystemModel::DontWatchForChanges);
+
+  const bool bPathSwichedAwayFirst {preNames.size() > 100};
+  if (bPathSwichedAwayFirst) {
+    _fileSysModel->setRootPath(""); // switch to another path
   }
   renameWid.init();
   renameWid.setModal(true);
@@ -495,8 +495,8 @@ void FileExplorerEvent::onRename(AdvanceRenamer& renameWid) {
   if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
     LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", preNames.size());
   }
-  if (bDontWatch) {
-    _fileSysModel->setOptions(beforeOption);
+  if (bPathSwichedAwayFirst) {
+    _fileSysModel->setRootPath(currentPath); // switch to another path
   }
 }
 
@@ -572,11 +572,11 @@ bool FileExplorerEvent::on_OpenInTerminal() const {
     LOG_D("path[%s] not exist", qPrintable(path));
     return false;
   }
-  const QString pth = QDir::toNativeSeparators(path);
 #ifdef _WIN32
   LOG_W("WINDOWS not support now");
   return false;
 #else
+  const QString pth = QDir::toNativeSeparators(path);
   QProcess process;
   QStringList args;
   process.setProgram("gnome-terminal");
@@ -1039,11 +1039,12 @@ bool FileExplorerEvent::on_NameStandardize() {
     LOG_INFO_NP("[Skip] User cancel", "return");
     return true;
   }
-  auto* p = Notificator::progress(LOG_LVL_E::I, "Name standardlize", "Start in path" + currentPath);
+  auto* p = Notificator::progress(LOG_LVL_E::I, "Name standardlize", QString{"Start in path[%1]"}.arg(currentPath));
   CHECK_NULLPTR_RETURN_FALSE(p);
+
   FilesNameBatchStandardizer fnbs;
   if (!fnbs(currentPath)) {
-    LOG_ERR_NP("[Failed] Partial item Name standardlize failed", currentPath);
+    p->setProgressFailed();
     return false;
   }
   p->setProgressValue(100);
@@ -1073,16 +1074,18 @@ bool FileExplorerEvent::on_FileClassify() {
     return true;
   }
 
-  _fileSysModel->setRootPath(""); // switch to another path
-
   ItemsPacker classfier;
   classfier(currentPath);
-  LOG_INFO_P("File Classify Start...", "cmd count: %d", classfier.CommandsCnt());
+
+  auto* p = Notificator::progress(LOG_LVL_E::I, "File Classify", QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(classfier.CommandsCnt()));
+  CHECK_NULLPTR_RETURN_FALSE(p);
+
+  _fileSysModel->setRootPath(""); // switch to another path
   bool classifyResult = classfier.StartToRearrange();
   if (!classifyResult) {
-    LOG_ERR_NP("[Failed] Partial File Classify failed", currentPath);
+    p->setProgressFailed();
   } else {
-    LOG_OK_NP("[Ok] All File Classify succeed", currentPath);
+    p->setProgressValue(100);
   }
 
   auto* view = _contentPane->GetCurView();
@@ -1118,13 +1121,14 @@ bool FileExplorerEvent::on_FileUnclassify() {
   ItemsUnpacker unclassfier;
   unclassfier(currentPath);
 
-  LOG_INFO_P("File Unclassify Start...", "cmd count: %d", unclassfier.CommandsCnt());
+  auto* p = Notificator::progress(LOG_LVL_E::I, "File Unclassify", QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(unclassfier.CommandsCnt()));
+  CHECK_NULLPTR_RETURN_FALSE(p);
 
   bool unclassifyResult = unclassfier.StartToRearrange();
   if (!unclassifyResult) {
-    LOG_ERR_NP("[Failed] Partial File Unclassify failed", currentPath);
+    p->setProgressFailed();
   } else {
-    LOG_OK_NP("[Ok] All File Unclassify succeed", currentPath);
+    p->setProgressValue(100);
   }
 
   auto* view = _contentPane->GetCurView();
@@ -1235,7 +1239,7 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
     Configuration().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
                              MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
   } else {
-    LOG_D("DropAction[%d] is invalid", (int)dropAct);
+    LOG_D("DropAction[%d] is invalid", static_cast<int>(dropAct));
     return false;
   }
 

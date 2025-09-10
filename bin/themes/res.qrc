@@ -23,7 +23,7 @@
     <file alias="LOG_LEVEL_FATAL">Log/LOG_LEVEL_FATAL.svg</file>
     <file alias="LOG_LEVEL_QUESTION">Log/LOG_LEVEL_QUESTION.svg</file>
     <file alias="LOG_LEVEL_OK">Log/LOG_LEVEL_OK.svg</file>
-    <file alias="PARTIALLY_FAILED">Log/PARTIALLY_FAILED.svg</file>
+    <file alias="LOG_LEVEL_PARTIAL_FAILED">Log/LOG_LEVEL_PARTIAL_FAILED.svg</file>
     <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_ON.svg</file>
     <file alias="VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF">Log/VALIDITY_PERIOD_ERROR_LEVEL_TIMER_OFF.svg</file>
 
