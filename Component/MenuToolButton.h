@@ -1,6 +1,7 @@
 #ifndef MENUTOOLBUTTON_H
 #define MENUTOOLBUTTON_H
 #include "StyleSheet.h"
+#include "MemoryKey.h"
 #include <QToolButton>
 #include <QString>
 #include <QList>
@@ -15,14 +16,8 @@ public:
                           const int iconSize = IMAGE_SIZE::TABS_ICON_IN_MENU_48,
                           QWidget* parent = nullptr);
   void SetCaption(const QIcon& icon = {}, const QString& text = "", const QString& tooltip = "");
-  void MemorizeCurrentAction(const QString& memoryKey);
-  void BindForInstantPop();
-  bool FindAndSetDefaultAction(const QString& memoryValue);
-public Q_SLOTS:
-  void onToolButtonActTriggered(QAction* pAct);
-  void onInstantPopActTriggered(QAction* pAct);
-private:
-  QString m_memoryKey;
+  void InitDefaultActionFromQSetting(const KV& kv, bool enablePersistentBehavior);
+  void UpdateCaptionForInstantPopMode();
 };
 
 #endif  // MENUTOOLBUTTON_H
