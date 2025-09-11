@@ -28,19 +28,6 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _RMV_THIS_PROGRAM_FROM_SYSTEM_CONTEXT_MENU = new (std::nothrow) QAction{QIcon(":img/CONTEXT_MENU_RMV_THIS_PROGRAM"), "Remove"};
   CHECK_NULLPTR_RETURN_VOID(_RMV_THIS_PROGRAM_FROM_SYSTEM_CONTEXT_MENU);
   _RMV_THIS_PROGRAM_FROM_SYSTEM_CONTEXT_MENU->setToolTip("Remove this program from system context menu");
-
-  _LEAF_FILE = GetLeafTabActions();
-  CHECK_NULLPTR_RETURN_VOID(_LEAF_FILE);
-}
-
-QActionGroup* FileLeafActions::GetLeafTabActions() {
-  auto* leafFile{new (std::nothrow) QActionGroup(nullptr)};
-  CHECK_NULLPTR_RETURN_NULLPTR(leafFile)
-  leafFile->addAction(_SETTINGS);
-  leafFile->addAction(_ABOUT_FILE_EXPLORER);
-  leafFile->addAction(_LANUAGE);
-  leafFile->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-  return leafFile;
 }
 
 QToolButton* FileLeafActions::GetSystemContextMenu(QWidget* parent) {

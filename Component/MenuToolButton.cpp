@@ -1,13 +1,14 @@
-﻿#include "DropListToolButton.h"
+﻿#include "MenuToolButton.h"
 #include "MemoryKey.h"
+#include "PublicMacro.h"
 #include <QMenu>
 
-DropdownToolButton::DropdownToolButton(QList<QAction*> dropdownActions,             //
+MenuToolButton::MenuToolButton(QList<QAction*> dropdownActions,             //
                                        QToolButton::ToolButtonPopupMode popupMode,  //
                                        const Qt::ToolButtonStyle toolButtonStyle,   //
                                        const int iconSize,                          //
                                        QWidget* parent)
-    : QToolButton{parent} {
+  : QToolButton{parent} {
   setPopupMode(popupMode);
   setToolButtonStyle(toolButtonStyle);
   setAutoRaise(true);
@@ -15,10 +16,7 @@ DropdownToolButton::DropdownToolButton(QList<QAction*> dropdownActions,         
   setIconSize(QSize{iconSize, iconSize});
 
   QMenu* pDropdownMenu{new (std::nothrow) QMenu{this}};
-  if (pDropdownMenu == nullptr) {
-    LOG_C("pDropdownMenu is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(pDropdownMenu);
   for (auto* pAct : dropdownActions) {
     if (pAct == nullptr) {
       pDropdownMenu->addSeparator();
@@ -30,45 +28,46 @@ DropdownToolButton::DropdownToolButton(QList<QAction*> dropdownActions,         
   setMenu(pDropdownMenu);
 }
 
-void DropdownToolButton::SetCaption(const QIcon& icon, const QString& text, const QString& tooltip) {
+void MenuToolButton::SetCaption(const QIcon& icon, const QString& text, const QString& tooltip) {
   setIcon(icon);
   setText(text);
   setToolTip(tooltip);
 }
 
-void DropdownToolButton::MemorizeCurrentAction(const QString& memoryKey) {
+void MenuToolButton::MemorizeCurrentAction(const QString& memoryKey) {
   m_memoryKey = memoryKey;
-  QToolButton::connect(this, &QToolButton::triggered,  //
-                       this, &DropdownToolButton::onToolButtonActTriggered);
+  connect(this, &QToolButton::triggered,  //
+          this, &MenuToolButton::onToolButtonActTriggered);
 }
 
-bool DropdownToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
-  auto* pMenu = menu();
-  const auto& actsList = pMenu->actions();
-  if (actsList.isEmpty()) {
-    LOG_W("No actions found");
-    return false;
-  }
+void MenuToolButton::BindForInstantPop() {
+  connect(this, &QToolButton::triggered,  //
+          this, &MenuToolButton::onInstantPopActTriggered);
+}
+
+bool MenuToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
+  const auto& actsList = menu()->actions();
   foreach(QAction* act, actsList) {
     if (act->text() == memoryValue) {
       setDefaultAction(act);
       return true;
     }
   }
-  LOG_W("default action not find by memoryValue[%s] from %d actions",//
-         qPrintable(memoryValue), actsList.size());
+  LOG_W("Action[%s] not find by from %d actions in menu", qPrintable(memoryValue), actsList.size());
   setDefaultAction(actsList.front());
   return false;
 }
 
-void DropdownToolButton::onToolButtonActTriggered(QAction* pAct) {
-  if (pAct == nullptr) {
-    LOG_C("pAct is nullptr");
-    return;
-  }
+void MenuToolButton::onToolButtonActTriggered(QAction* pAct) {
+  CHECK_NULLPTR_RETURN_VOID(pAct);
   setDefaultAction(pAct);
   if (m_memoryKey.isEmpty()) {
     return;
   }
   Configuration().setValue(m_memoryKey, pAct->text());
+}
+
+void MenuToolButton::onInstantPopActTriggered(QAction* pAct) {
+  CHECK_NULLPTR_RETURN_VOID(pAct);
+  SetCaption(pAct->icon(), pAct->text(), pAct->toolTip());
 }

@@ -5,6 +5,7 @@
 class RenameWidget_Insert : public AdvanceRenamer {
  public:
   explicit RenameWidget_Insert(QWidget* parent = nullptr);
+  void initExclusiveSetting() override;
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;

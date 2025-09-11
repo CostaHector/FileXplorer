@@ -11,6 +11,7 @@ RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
 void RenameWidget_ArrangeSection::initExclusiveSetting() {
   m_nameExtIndependent->setEnabled(false);
   m_nameExtIndependent->setChecked(false);
+  regexValidLabel->setVisible(true);
 }
 
 auto RenameWidget_ArrangeSection::extraSubscribe() -> void {
