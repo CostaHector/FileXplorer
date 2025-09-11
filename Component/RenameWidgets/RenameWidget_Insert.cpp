@@ -11,6 +11,10 @@ RenameWidget_Insert::RenameWidget_Insert(QWidget* parent)  //
   CHECK_NULLPTR_RETURN_VOID(insertAtCB)
 }
 
+void RenameWidget_Insert::initExclusiveSetting() {
+  regexValidLabel->setVisible(true);
+}
+
 void RenameWidget_Insert::extraSubscribe() {
   connect(insertAtCB, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(insertStrCB, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
