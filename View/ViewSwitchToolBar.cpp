@@ -3,7 +3,7 @@
 #include "NotificatorMacro.h"
 
 void ViewSwitchToolBar::subscribe() {
-  auto* actGrp = mViewTypeIntAction.mActGrp;
+  auto* actGrp = mViewTypeIntAction.getActionGroup();
   connect(actGrp, &QActionGroup::triggered, this, &ViewSwitchToolBar::onPushNewViewIntoUndoStack);
   auto& viewInst = g_viewActions();
   connect(viewInst._VIEW_BACK_TO, &QAction::triggered, this, &ViewSwitchToolBar::onViewNavigateBackward);
