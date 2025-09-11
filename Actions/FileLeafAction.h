@@ -8,8 +8,6 @@ class FileLeafActions : public QObject {
  public:
   explicit FileLeafActions(QObject* parent = nullptr);
 
-  QActionGroup* GetLeafTabActions();
-
   QAction* _SETTINGS{nullptr};
   QAction* _ABOUT_FILE_EXPLORER{nullptr};
   QAction* _LANUAGE{nullptr};

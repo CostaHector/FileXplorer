@@ -11,7 +11,7 @@
     <file alias="CAST_VIEW">AppIcons/CAST_VIEW.svg</file>
 
     <!--LOG icon here-->
-    <file alias="LOG_FILES_PREVIEW">Log/LOG_FILES_PREVIEW.svg</file>
+    <file alias="LOG_SETTINGS">Log/LOG_SETTINGS.svg</file>
     <file alias="LOG_FILES">Log/LOG_FILES.svg</file>
     <file alias="LOG_FOLDERS">Log/LOG_FOLDERS.svg</file>
     <file alias="LOG_ROTATION">Log/LOG_ROTATION.svg</file>
@@ -267,6 +267,8 @@
     <file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
     <file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
     <file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
+    <file alias="STYLE_MACOS">styles/STYLE_MACOS.svg</file>
+    <file alias="STYLESHEET_SETTING">styles/STYLESHEET_SETTING.svg</file>
     <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
     <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
 
