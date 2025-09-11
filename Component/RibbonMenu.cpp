@@ -91,21 +91,21 @@ QToolBar* RibbonMenu::LeafFile() const {
   CHECK_NULLPTR_RETURN_NULLPTR(leafFileWid)
 
   QToolBar* syncSwitchToolBar = g_syncFileSystemModificationActions().GetSyncSwitchToolbar(leafFileWid);
+  CHECK_NULLPTR_RETURN_NULLPTR(syncSwitchToolBar);
+
   QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar(leafFileWid);
-  SetLayoutAlightment(syncPathToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
+  CHECK_NULLPTR_RETURN_NULLPTR(syncPathToolBar);
 
   QToolButton* styleToolButton = g_PreferenceActions().GetStyleToolButton(leafFileWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(styleToolButton)
+  CHECK_NULLPTR_RETURN_NULLPTR(styleToolButton);
 
   QToolButton* styleSheetToolButton = g_PreferenceActions().GetStyleSheetToolButton(leafFileWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(styleSheetToolButton)
-
+  CHECK_NULLPTR_RETURN_NULLPTR(styleSheetToolButton);
 
   QToolButton* logToolButton = g_LogActions().GetLogToolButton(leafFileWid);
   CHECK_NULLPTR_RETURN_NULLPTR(logToolButton);
 
   auto& fileLeafInst = g_fileLeafActions();
-
   auto* systemContextMenuTb = fileLeafInst.GetSystemContextMenu(leafFileWid);
   CHECK_NULLPTR_RETURN_NULLPTR(systemContextMenuTb);
 
@@ -126,11 +126,16 @@ QToolBar* RibbonMenu::LeafFile() const {
 }
 
 QToolBar* RibbonMenu::LeafHome() const {
-  QToolBar* openItemsTB = new (std::nothrow) QToolBar{"Open"};
+  auto& fileOpInst = g_fileBasicOperationsActions();
+
+  QToolBar* leafHomeWid = new (std::nothrow) QToolBar{"LeafHome"};
+  CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
+
+  QToolBar* openItemsTB = new (std::nothrow) QToolBar{"Open", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(openItemsTB);
   {
     openItemsTB->addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
-    openItemsTB->addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
+    openItemsTB->addActions(fileOpInst.OPEN_AG->actions());
     openItemsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     openItemsTB->setOrientation(Qt::Orientation::Vertical);
     openItemsTB->setStyleSheet("QToolBar { max-width: 256px; }");
@@ -138,13 +143,11 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(openItemsTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  auto* copyTB = new MenuToolButton(g_fileBasicOperationsActions().COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  copyTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_COPY_CHOICE.name, MemoryKey::DEFAULT_COPY_CHOICE.v).toString());
-  copyTB->MemorizeCurrentAction(MemoryKey::DEFAULT_COPY_CHOICE.name);
-
-  QToolBar* propertiesTB = new (std::nothrow) QToolBar("Properties");
+  QToolBar* propertiesTB = new (std::nothrow) QToolBar{"Properties", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(propertiesTB);
   {
+    auto* copyTB = new MenuToolButton(fileOpInst.COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16, propertiesTB);
+    copyTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_COPY_CHOICE, true);
     propertiesTB->addWidget(copyTB);
     propertiesTB->addAction(g_rightClickActions()._CALC_MD5_ACT);
     propertiesTB->addAction(g_rightClickActions()._PROPERTIES);
@@ -155,21 +158,20 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  auto* newItemsTB = new (std::nothrow) MenuToolButton(g_fileBasicOperationsActions().NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  newItemsTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_NEW_CHOICE.name, MemoryKey::DEFAULT_NEW_CHOICE.v).toString());
-  newItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_NEW_CHOICE.name);
+  auto* newItemsTB = new (std::nothrow) MenuToolButton(fileOpInst.NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
+  newItemsTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_NEW_CHOICE, true);
 
-  QToolBar* moveCopyItemsToTB = new (std::nothrow) QToolBar("Move/Copy item(s) To ToolBar");
+  QToolBar* moveCopyItemsToTB = new (std::nothrow) QToolBar{"Move/Copy item(s) To ToolBar", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(moveCopyItemsToTB);
   {
-    const auto& _MOVE_TO_HIST_LIST = g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY->actions();
-    const auto& _COPY_TO_HIST_LIST = g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY->actions();
+    const auto& _MOVE_TO_HIST_LIST = fileOpInst.MOVE_TO_PATH_HISTORY->actions();
+    const auto& _COPY_TO_HIST_LIST = fileOpInst.COPY_TO_PATH_HISTORY->actions();
     auto* pMoveToToolButton =
-        new MenuToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24);
-    pMoveToToolButton->setDefaultAction(g_fileBasicOperationsActions()._MOVE_TO);
+        new MenuToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24, moveCopyItemsToTB);
+    pMoveToToolButton->setDefaultAction(fileOpInst._MOVE_TO);
     auto* pCopyToToolButton =
-        new MenuToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24);
-    pCopyToToolButton->setDefaultAction(g_fileBasicOperationsActions()._COPY_TO);
+        new MenuToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24, moveCopyItemsToTB);
+    pCopyToToolButton->setDefaultAction(fileOpInst._COPY_TO);
 
     moveCopyItemsToTB->addWidget(pMoveToToolButton);
     moveCopyItemsToTB->addWidget(pCopyToToolButton);
@@ -177,22 +179,28 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(moveCopyItemsToTB->layout(), Qt::AlignmentFlag::AlignTop);
   }
 
-  QToolBar* cutCopyPasterTb = g_fileBasicOperationsActions().GetCutCopyPasteTb();
-  QToolBar* folderOpModeTb = g_fileBasicOperationsActions().GetFolderOperationModeTb();
+  QToolBar* cutCopyPasterTb = fileOpInst.GetCutCopyPasteTb(leafHomeWid);
+  CHECK_NULLPTR_RETURN_NULLPTR(cutCopyPasterTb);
 
-  QToolButton* recycleItemsTB = new (std::nothrow) MenuToolButton(g_fileBasicOperationsActions().DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup);
-  recycleItemsTB->setDefaultAction(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN);
+  QToolBar* folderOpModeTb = fileOpInst.GetFolderOperationModeTb(leafHomeWid);
+  CHECK_NULLPTR_RETURN_NULLPTR(folderOpModeTb);
 
-  QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar{"ArchievePreview"};
+  QToolButton* recycleItemsTB = new (std::nothrow) MenuToolButton(fileOpInst.DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
+  CHECK_NULLPTR_RETURN_NULLPTR(recycleItemsTB);
+  recycleItemsTB->setDefaultAction(fileOpInst.MOVE_TO_TRASHBIN);
+
+  QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar{"ArchievePreview", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(archievePreviewToolBar);
-  archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
-  archievePreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  archievePreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+  {
+    archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
+    archievePreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+    archievePreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+  }
 
-  QToolBar* selectionToolBar = new (std::nothrow) QToolBar{"Selection"};
+  QToolBar* selectionToolBar = new (std::nothrow) QToolBar{"Selection", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(selectionToolBar);
   {
-    selectionToolBar->addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
+    selectionToolBar->addActions(fileOpInst.SELECTION_RIBBONS->actions());
     selectionToolBar->setOrientation(Qt::Orientation::Vertical);
     selectionToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     selectionToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
@@ -200,7 +208,7 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(selectionToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  QToolBar* compressToolBar = new (std::nothrow) QToolBar{"Compress/Decompress"};
+  QToolBar* compressToolBar = new (std::nothrow) QToolBar{"Compress/Decompress", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(compressToolBar);
   {
     compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_HERE);
@@ -213,17 +221,17 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(compressToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  auto* renameItemsTB = new MenuToolButton(g_renameAg().RENAME_RIBBONS->actions(), QToolButton::MenuButtonPopup);
-  renameItemsTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_RENAME_CHOICE.name, MemoryKey::DEFAULT_RENAME_CHOICE.v).toString());
-  renameItemsTB->MemorizeCurrentAction(MemoryKey::DEFAULT_RENAME_CHOICE.name);
+  auto* renameItemsTB = new MenuToolButton(g_renameAg().RENAME_RIBBONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
+  renameItemsTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_RENAME_CHOICE, true);
+
   QToolBar* advanceSearchToolBar = new (std::nothrow) QToolBar("AdvanceSearch");
   CHECK_NULLPTR_RETURN_NULLPTR(advanceSearchToolBar);
-  advanceSearchToolBar->addAction(g_viewActions()._ADVANCE_SEARCH_VIEW);
-  advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+  {
+    advanceSearchToolBar->addAction(g_viewActions()._ADVANCE_SEARCH_VIEW);
+    advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+    advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
+  }
 
-  QToolBar* leafHomeWid = new (std::nothrow) QToolBar{"LeafHome"};
-  CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
   leafHomeWid->setToolTip("Home Leaf ToolBar");
   leafHomeWid->addWidget(openItemsTB);
   leafHomeWid->addSeparator();

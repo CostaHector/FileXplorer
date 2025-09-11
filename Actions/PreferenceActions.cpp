@@ -107,11 +107,11 @@ void PreferenceActions::Subscribe() {
 }
 
 Style::StyleE PreferenceActions::CurStyle() const {
-  return mStyleIntAction.act2Enum(mStyleIntAction.mActGrp->checkedAction());
+  return mStyleIntAction.curVal();
 }
 
 Style::StyleSheetE PreferenceActions::CurStyleSheet() const {
-  return mStyleSheetIntAction.act2Enum(mStyleSheetIntAction.mActGrp->checkedAction());
+  return mStyleSheetIntAction.curVal();
 }
 
 QToolButton* PreferenceActions::GetStyleToolButton(QWidget* parent) {
@@ -124,7 +124,7 @@ QToolButton* PreferenceActions::GetStyleToolButton(QWidget* parent) {
       parent);
   CHECK_NULLPTR_RETURN_NULLPTR(styleToolButton);
   styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "UI Style", "Change application style (Windows Vista, Windows, Fusion, macOS)");
-  styleToolButton->BindForInstantPop();
+  styleToolButton->UpdateCaptionForInstantPopMode();
   return styleToolButton;
 }
 
@@ -138,7 +138,7 @@ QToolButton* PreferenceActions::GetStyleSheetToolButton(QWidget* parent) {
       parent);
   CHECK_NULLPTR_RETURN_NULLPTR(styleToolButton);
   styleToolButton->SetCaption(QIcon{":img/STYLESHEET_SETTING"}, "Color Theme", "Toggle between Light and Dark color schemes");
-  styleToolButton->BindForInstantPop();
+  styleToolButton->UpdateCaptionForInstantPopMode();
   return styleToolButton;
 }
 

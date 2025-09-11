@@ -1,13 +1,12 @@
 ﻿#include "MenuToolButton.h"
-#include "MemoryKey.h"
 #include "PublicMacro.h"
 #include <QMenu>
 
 MenuToolButton::MenuToolButton(QList<QAction*> dropdownActions,             //
-                                       QToolButton::ToolButtonPopupMode popupMode,  //
-                                       const Qt::ToolButtonStyle toolButtonStyle,   //
-                                       const int iconSize,                          //
-                                       QWidget* parent)
+                               QToolButton::ToolButtonPopupMode popupMode,  //
+                               const Qt::ToolButtonStyle toolButtonStyle,   //
+                               const int iconSize,                          //
+                               QWidget* parent)
   : QToolButton{parent} {
   setPopupMode(popupMode);
   setToolButtonStyle(toolButtonStyle);
@@ -31,43 +30,49 @@ MenuToolButton::MenuToolButton(QList<QAction*> dropdownActions,             //
 void MenuToolButton::SetCaption(const QIcon& icon, const QString& text, const QString& tooltip) {
   setIcon(icon);
   setText(text);
-  setToolTip(tooltip);
-}
-
-void MenuToolButton::MemorizeCurrentAction(const QString& memoryKey) {
-  m_memoryKey = memoryKey;
-  connect(this, &QToolButton::triggered,  //
-          this, &MenuToolButton::onToolButtonActTriggered);
-}
-
-void MenuToolButton::BindForInstantPop() {
-  connect(this, &QToolButton::triggered,  //
-          this, &MenuToolButton::onInstantPopActTriggered);
-}
-
-bool MenuToolButton::FindAndSetDefaultAction(const QString& memoryValue) {
-  const auto& actsList = menu()->actions();
-  foreach(QAction* act, actsList) {
-    if (act->text() == memoryValue) {
-      setDefaultAction(act);
-      return true;
-    }
+  if (!tooltip.isEmpty()) {
+    setToolTip(tooltip);
   }
-  LOG_W("Action[%s] not find by from %d actions in menu", qPrintable(memoryValue), actsList.size());
-  setDefaultAction(actsList.front());
-  return false;
 }
 
-void MenuToolButton::onToolButtonActTriggered(QAction* pAct) {
-  CHECK_NULLPTR_RETURN_VOID(pAct);
-  setDefaultAction(pAct);
-  if (m_memoryKey.isEmpty()) {
+void MenuToolButton::InitDefaultActionFromQSetting(const KV& kv, bool enablePersistentBehavior) {
+  const QString& memoryKey = kv.name;
+  const QString& initalValue = Configuration().value(kv.name, kv.v).toString();
+  if (memoryKey.isEmpty()) {
+    LOG_W("memoryKey[%s]:memoryValue[%s] is Empty", qPrintable(memoryKey), qPrintable(initalValue));
+  }
+
+  auto* pMenu = menu();
+  if (pMenu == nullptr || pMenu->isEmpty()) {
+    LOG_W("No menu attached to tool button or No action attached to Menu");
     return;
   }
-  Configuration().setValue(m_memoryKey, pAct->text());
+  const auto& actsList = pMenu->actions();
+  foreach(QAction* act, actsList) {
+    if (act->text() == initalValue) {
+      setDefaultAction(act);
+      break;
+    }
+  }
+
+  if (defaultAction() == nullptr) {
+    LOG_W("Action[%s] not find from %d actions in menu, use first by default", qPrintable(initalValue), actsList.size());
+    setDefaultAction(actsList.front());
+  }
+
+  if (!enablePersistentBehavior) {
+    return;
+  }
+  connect(this, &QToolButton::triggered, this, [this, memoryKey](QAction* pAct){
+    CHECK_NULLPTR_RETURN_VOID(pAct);
+    setDefaultAction(pAct);
+    Configuration().setValue(memoryKey, pAct->text());
+  });
 }
 
-void MenuToolButton::onInstantPopActTriggered(QAction* pAct) {
-  CHECK_NULLPTR_RETURN_VOID(pAct);
-  SetCaption(pAct->icon(), pAct->text(), pAct->toolTip());
+void MenuToolButton::UpdateCaptionForInstantPopMode() { // for user experience after click one action. update Caption instead of defaultAction
+  connect(this, &QToolButton::triggered, this, [this](const QAction* pAct){
+    CHECK_NULLPTR_RETURN_VOID(pAct);
+    SetCaption(pAct->icon(), pAct->text(), pAct->toolTip());
+  });
 }
