@@ -28,7 +28,7 @@ PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
                              PREVIEW_TYPE_E::NONE, QActionGroup::ExclusionPolicy::ExclusiveOptional);//
   int curPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)mPreviewTypeIntAction.defVal()).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
-  mCurrentPreviewType = mPreviewTypeIntAction.val2Enum(curPreviewType);
+  mCurrentPreviewType = mPreviewTypeIntAction.intVal2Enum(curPreviewType);
 
   addActions(mPreviewTypeIntAction.mActGrp->actions());
   setOrientation(Qt::Orientation::Vertical);

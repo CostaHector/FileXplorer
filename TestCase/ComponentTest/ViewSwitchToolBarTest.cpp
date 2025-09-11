@@ -35,7 +35,7 @@ private slots:
 
     // Purpose: Click on QToolbar will emit 2 signal at 1 time
     // connect(mTb, &QToolBar::actionTriggered, this, [](QAction* pAct){ // service process;})
-    // connect(actGrp, &QActionGroup::triggered, this, ViewSwitchToolBar::onViewActionInActionGroupTriggered);
+    // connect(actGrp, &QActionGroup::triggered, this, ViewSwitchToolBar::onPushNewViewIntoUndoStack);
     connect(mTb, &QToolBar::actionTriggered, this, [this](QAction* /*pAct*/){
       ++serviceLogicFunctionCallTime; // animate service process
     });
