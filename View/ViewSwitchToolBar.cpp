@@ -4,18 +4,18 @@
 
 void ViewSwitchToolBar::subscribe() {
   auto* actGrp = mViewTypeIntAction.mActGrp;
-  connect(actGrp, &QActionGroup::triggered, this, &ViewSwitchToolBar::onViewActionInActionGroupTriggered);
+  connect(actGrp, &QActionGroup::triggered, this, &ViewSwitchToolBar::onPushNewViewIntoUndoStack);
   auto& viewInst = g_viewActions();
-  connect(viewInst._VIEW_BACK_TO, &QAction::triggered, this, &ViewSwitchToolBar::onViewBackward);
-  connect(viewInst._VIEW_FORWARD_TO, &QAction::triggered, this, &ViewSwitchToolBar::onViewForward);
+  connect(viewInst._VIEW_BACK_TO, &QAction::triggered, this, &ViewSwitchToolBar::onViewNavigateBackward);
+  connect(viewInst._VIEW_FORWARD_TO, &QAction::triggered, this, &ViewSwitchToolBar::onViewNavigateForward);
 }
 
-void ViewSwitchToolBar::onViewActionInActionGroupTriggered(QAction* viewAct) {
+void ViewSwitchToolBar::onPushNewViewIntoUndoStack(QAction* viewAct) {
   ViewTypeTool::ViewType newViewType = mViewTypeIntAction.act2Enum(viewAct);
   mViewRD.operator()(newViewType);
 }
 
-bool ViewSwitchToolBar::onViewBackward() {
+bool ViewSwitchToolBar::onViewNavigateBackward() {
   if (!mViewRD.undoAvailable()) {
     LOG_INFO_NP("[Info] Backward view unavailable", "Already at the earliest view in history");
     return false;
@@ -36,7 +36,7 @@ bool ViewSwitchToolBar::onViewBackward() {
   return true;
 }
 
-bool ViewSwitchToolBar::onViewForward() {
+bool ViewSwitchToolBar::onViewNavigateForward() {
   if (!mViewRD.redoAvailable()) {
     LOG_INFO_NP("[Info] Forward view unavailable", "Already at the most recent view in history");
     return false;
