@@ -120,7 +120,7 @@ void FileXplorer::subscribe() {
     m_navigationToolBar->setVisible(checked);
   });
 
-  connect(m_statusBar->m_viewsSwitcher, &QToolBar::actionTriggered, this, &FileXplorer::onViewTypeChanged);
+  connect(m_statusBar->m_viewsSwitcher, &QToolBar::actionTriggered, this, &FileXplorer::onViewWidgetChanged);
 
   PreviewTypeToolBar* previewToolBar = g_folderPreviewActions().GetPreviewsToolbar(this);
   connect(previewToolBar, &PreviewTypeToolBar::previewTypeChanged, this, &FileXplorer::onPreviewSwitched);
@@ -184,7 +184,7 @@ void FileXplorer::onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum)
   m_previewSwitcher->onSwitchByViewType(previewEnum);
 }
 
-void FileXplorer::onViewTypeChanged(const QAction* pViewAct) {
+void FileXplorer::onViewWidgetChanged(const QAction* pViewAct) {
   using namespace ViewTypeTool;
   CHECK_NULLPTR_RETURN_VOID(pViewAct);
   ViewType vt = GetViewTypeByActionText(pViewAct->text());

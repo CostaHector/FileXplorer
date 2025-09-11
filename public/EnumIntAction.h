@@ -43,14 +43,14 @@ struct EnumIntAction : public QObject {
   }
 
   QAction* setCheckedIfActionExist(int intValue) {
-    ENUM_T enumValue = val2Enum(intValue);
+    ENUM_T enumValue = intVal2Enum(intValue);
     return setCheckedIfActionExist(enumValue);
   }
 
-  ENUM_T val2Enum(int intVal) const {
+  ENUM_T intVal2Enum(int intVal) const {
     auto it = mVal2Enum.find(intVal);
     if (it == mVal2Enum.cend()) {
-      LOG_W("int[%d] not in val2Enum Hash", intVal);
+      LOG_W("int[%d] not in intVal2Enum Hash", intVal);
       return defVal();
     }
     return it.value();
@@ -71,6 +71,10 @@ struct EnumIntAction : public QObject {
     return DEFAULT_ENUM;
   }
   ENUM_T curVal() const {
+    if (mActGrp == nullptr || mActGrp->exclusionPolicy() == QActionGroup::ExclusionPolicy::None) {
+      LOG_W("mActGrp is nullptr or ExclusionPolicy=None");
+      return DEFAULT_ENUM;
+    }
     return act2Enum(mActGrp->checkedAction());
   }
 
