@@ -102,8 +102,8 @@ bool PreferenceActions::onSetStylesheet(const QAction* pStyleSheetAct) {
 }
 
 void PreferenceActions::Subscribe() {
-  connect(mStyleIntAction.mActGrp, &QActionGroup::triggered, this, &PreferenceActions::onSetAppStyle);
-  connect(mStyleSheetIntAction.mActGrp, &QActionGroup::triggered, this, &PreferenceActions::onSetStylesheet);
+  connect(mStyleIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onSetAppStyle);
+  connect(mStyleSheetIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onSetStylesheet);
 }
 
 Style::StyleE PreferenceActions::CurStyle() const {
@@ -117,7 +117,7 @@ Style::StyleSheetE PreferenceActions::CurStyleSheet() const {
 QToolButton* PreferenceActions::GetStyleToolButton(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
   MenuToolButton* styleToolButton = new (std::nothrow) MenuToolButton(
-      mStyleIntAction.mActGrp->actions(),
+      mStyleIntAction.getActionEnumAscendingList(),
       QToolButton::InstantPopup,
       Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
       IMAGE_SIZE::TABS_ICON_IN_MENU_16,
@@ -131,7 +131,7 @@ QToolButton* PreferenceActions::GetStyleToolButton(QWidget* parent) {
 QToolButton* PreferenceActions::GetStyleSheetToolButton(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
   MenuToolButton* styleToolButton = new (std::nothrow) MenuToolButton(
-      mStyleSheetIntAction.mActGrp->actions(),
+      mStyleSheetIntAction.getActionEnumAscendingList(),
       QToolButton::InstantPopup,
       Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
       IMAGE_SIZE::TABS_ICON_IN_MENU_16,
