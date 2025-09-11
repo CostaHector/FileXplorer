@@ -66,7 +66,7 @@ private slots:
 
     // Test point 1: 用户点击mTb中的action, 预期同时触发 1)业务逻辑 2)mViewRD undo栈压入新元素, redo栈不变
     QSignalSpy spyActionTriggered(mTb, &QToolBar::actionTriggered);
-    QSignalSpy spyGroupTriggered(mTb->mViewTypeIntAction.mActGrp, &QActionGroup::triggered);
+    QSignalSpy spyGroupTriggered(mTb->mViewTypeIntAction.getActionGroup(), &QActionGroup::triggered);
     QTest::mouseClick(specificButton, Qt::LeftButton);
     QCOMPARE(spyActionTriggered.count(), 1);
     QCOMPARE(spyGroupTriggered.count(), 1);
@@ -102,7 +102,7 @@ private slots:
     viewInst._TABLE_VIEW->setChecked(true);
 
     QSignalSpy spyActionTriggered(mTb, &QToolBar::actionTriggered);
-    QSignalSpy spyGroupTriggered(mTb->mViewTypeIntAction.mActGrp, &QActionGroup::triggered);
+    QSignalSpy spyGroupTriggered(mTb->mViewTypeIntAction.getActionGroup(), &QActionGroup::triggered);
 
     viewInst._LIST_VIEW->setChecked(true);
     emit viewInst._LIST_VIEW->triggered(true); // must

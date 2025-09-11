@@ -9,6 +9,7 @@
 
 template<typename ENUM_T>
 struct EnumIntAction : public QObject {
+public:
   using QObject::QObject;
   operator bool() const {
     return mActGrp != nullptr && !mVal2Enum.isEmpty();
@@ -24,10 +25,15 @@ struct EnumIntAction : public QObject {
     }
 
     mActGrp = new (std::nothrow) QActionGroup{this};
-    mActGrp->setExclusionPolicy(exclusivePlcy);
     for (auto it = mEnum2Act.cbegin(); it != mEnum2Act.cend(); ++it) {
       mActGrp->addAction(it.value());
     }
+    mActGrp->setExclusionPolicy(exclusivePlcy);
+
+    mActionsInNameAscending = mActionsInEnumAscending = mActGrp->actions();
+    std::sort(mActionsInNameAscending.begin(), mActionsInNameAscending.end(), [](const QAction* left, const QAction* right)->bool{
+      return left != nullptr && right != nullptr && left->text() < right->text();
+    });
   }
 
   QAction* setCheckedIfActionExist(ENUM_T enumValue) {
@@ -77,14 +83,24 @@ struct EnumIntAction : public QObject {
     }
     return act2Enum(mActGrp->checkedAction());
   }
-
-  QActionGroup* mActGrp{nullptr};
+  QActionGroup* getActionGroup() const {
+    return mActGrp;
+  }
+  const QList<QAction*>& getActionEnumAscendingList() const {
+    return mActionsInEnumAscending;
+  }
+  const QList<QAction*>& getActionNameAscendingList() const {
+    return mActionsInNameAscending;
+  }
 
 private:
+  QActionGroup* mActGrp{nullptr};
   QHash<int, ENUM_T> mVal2Enum;
   QHash<QAction*, ENUM_T> mAct2Enum;
   QMap<ENUM_T, QAction*> mEnum2Act;
   ENUM_T DEFAULT_ENUM;
+  QList<QAction*> mActionsInEnumAscending;
+  QList<QAction*> mActionsInNameAscending;
 };
 
 #endif // ENUMINTACTION_H

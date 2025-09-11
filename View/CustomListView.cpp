@@ -50,11 +50,11 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)//
   onOrientationChange(checkedOriAct);
 
   _FLOW_ORIENTATION_MENU = new (std::nothrow) QMenu{QString{"%1 Flow Orientation"}.arg(m_name), this};
-  _FLOW_ORIENTATION_MENU->addActions(mflowIntAction.mActGrp->actions());
+  _FLOW_ORIENTATION_MENU->addActions(mflowIntAction.getActionEnumAscendingList());
 
   InitListView();
 
-  connect(mflowIntAction.mActGrp, &QActionGroup::triggered, this, &CustomListView::onOrientationChange);
+  connect(mflowIntAction.getActionGroup(), &QActionGroup::triggered, this, &CustomListView::onOrientationChange);
 }
 
 CustomListView::~CustomListView() {

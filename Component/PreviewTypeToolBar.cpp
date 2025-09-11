@@ -30,7 +30,7 @@ PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
   mCurrentPreviewType = mPreviewTypeIntAction.intVal2Enum(curPreviewType);
 
-  addActions(mPreviewTypeIntAction.mActGrp->actions());
+  addActions(mPreviewTypeIntAction.getActionEnumAscendingList());
   setOrientation(Qt::Orientation::Vertical);
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   setStyleSheet("QToolBar { max-width: 256px; }");
@@ -39,7 +39,7 @@ PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
 }
 
 void PreviewTypeToolBar::subscribe() {
-  connect(mPreviewTypeIntAction.mActGrp, &QActionGroup::triggered, this, [this](QAction* pPreview){
+  connect(mPreviewTypeIntAction.getActionGroup(), &QActionGroup::triggered, this, [this](QAction* pPreview){
     mCurrentPreviewType = mPreviewTypeIntAction.act2Enum(pPreview);
     emit previewTypeChanged(mCurrentPreviewType);
   });
