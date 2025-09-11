@@ -27,6 +27,7 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
       "Rules will also work on itself and its subdirectories");
   regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state", this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
+  regexValidLabel->setVisible(false);
 
   m_mainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_mainLayout);
@@ -36,8 +37,8 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
 }
 
 void AdvanceRenamer::showEvent(QShowEvent* event) {
-  QDialog::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
+  QDialog::showEvent(event);
 }
 
 #include <QApplication>

@@ -22,9 +22,8 @@ class LogActions : public QObject {
 
   QAction* _AUTO_FLUSH_IGNORE_LEVEL{nullptr};
 
+  QToolButton* GetLogToolButton(QWidget* parent);
   QList<QAction*> _DROPDOWN_LIST;
-
-  QToolButton* GetLogPreviewerToolButton(QWidget* parent);
 };
 
 LogActions& g_LogActions();

@@ -22,12 +22,13 @@ class RibbonMenu : public QTabWidget {
   QToolBar* LeafMediaTools() const;
 
   void Subscribe();
+  void AfterSubscribeInitialSettings();
 
-  void on_officeStyleWidgetVisibilityChanged(const bool vis);
+  void on_expandStackedWidget(const bool vis);
   void on_currentTabChangedRecordIndex(const int tabIndex);
   void whenViewTypeChanged(ViewTypeTool::ViewType vt);
  private:
-  LogFloatingPreviewer* m_logPrev{nullptr};
+  QAction* _EXPAND_RIBBONS{nullptr};
   QToolBar* m_corner{nullptr};
 
   QToolBar* m_leafFile{nullptr};

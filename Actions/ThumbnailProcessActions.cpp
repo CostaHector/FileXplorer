@@ -1,5 +1,5 @@
 ﻿#include "ThumbnailProcessActions.h"
-#include "DropListToolButton.h"
+#include "MenuToolButton.h"
 #include "MemoryKey.h"
 
 ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
@@ -52,14 +52,13 @@ QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
   crtThumbnailActions += _CREATE_THUMBNAIL_AG->actions();
   crtThumbnailActions.push_back(nullptr);
   crtThumbnailActions.push_back(_THUMBNAIL_SAMPLE_PERIOD);
-  auto* createTB = new (std::nothrow) DropdownToolButton{crtThumbnailActions,//
+  auto* createTB = new (std::nothrow) MenuToolButton{crtThumbnailActions,//
                                                          QToolButton::MenuButtonPopup,//
                                                          Qt::ToolButtonStyle::ToolButtonTextBesideIcon,//
                                                          IMAGE_SIZE::TABS_ICON_IN_MENU_16,//
                                                          parent};//
   CHECK_NULLPTR_RETURN_NULLPTR(createTB);
-  createTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name, MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.v).toString());
-  createTB->MemorizeCurrentAction(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION.name);
+  createTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION, true);
 
   QList<QAction*> extractThumbnailActions;
   extractThumbnailActions += _EXTRACT_THUMBNAIL_AG->actions();
@@ -67,14 +66,13 @@ QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
   extractThumbnailActions.push_back(_CUSTOM_RANGE_IMGS);
   extractThumbnailActions.push_back(nullptr);
   extractThumbnailActions.push_back(_SKIP_IF_ALREADY_EXIST);
-  auto* extractTB = new (std::nothrow) DropdownToolButton{extractThumbnailActions,//
+  auto* extractTB = new (std::nothrow) MenuToolButton{extractThumbnailActions,//
                                                           QToolButton::MenuButtonPopup,//
                                                           Qt::ToolButtonStyle::ToolButtonTextBesideIcon,//
                                                           IMAGE_SIZE::TABS_ICON_IN_MENU_16,//
                                                           parent};//
   CHECK_NULLPTR_RETURN_NULLPTR(extractTB);
-  extractTB->FindAndSetDefaultAction(Configuration().value(MemoryKey::DEFAULT_EXTRACT_CHOICE.name, MemoryKey::DEFAULT_EXTRACT_CHOICE.v).toString());
-  extractTB->MemorizeCurrentAction(MemoryKey::DEFAULT_EXTRACT_CHOICE.name);
+  extractTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_EXTRACT_CHOICE, true);
 
   QToolBar* thumbnailTB = new (std::nothrow) QToolBar{"Thumbnail", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(thumbnailTB);

@@ -1,34 +1,13 @@
 ﻿#include "StyleSheet.h"
 #include "MemoryKey.h"
+#include "PreferenceActions.h"
 #include <QApplication>
 #include <QWidget>
 #include <QVBoxLayout>
-#include <QMap>
-#include <QString>
 
 namespace StyleSheet {
-THEME CurrentTheme(const THEME* const pNewTheme) {
-  static int themeInt = Configuration().value("STYLESHEET_NAME", THEME::DEFAULT).toInt();
-  if (pNewTheme != nullptr) {
-    themeInt = *pNewTheme;
-  }
-  if (themeInt < THEME_BEGIN || themeInt >= THEME_BUTT) {
-    return THEME_BEGIN;
-  }
-  return (THEME)themeInt;
-}
-
-THEME GetThemeFromString(const QString& themeStr) {
-  static const QMap<QString, THEME> string2Theme{
-#define STYLE_ITEM(enu, val) {ENUM_2_STR(enu), enu},
-      STYLE_ITEMS_MAPPING
-#undef STYLE_ITEM
-  };
-  return string2Theme.value(themeStr, THEME::THEME_BEGIN);
-};
-
 void UpdateTitleBar(QWidget* widget) {
-  if (CurrentTheme() == THEME::DARK) {
+  if (g_PreferenceActions().CurStyleSheet() == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
     setDarkTitleBar(widget, true);
   }
 }

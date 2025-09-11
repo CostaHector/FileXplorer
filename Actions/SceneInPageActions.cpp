@@ -1,5 +1,5 @@
 ﻿#include "SceneInPageActions.h"
-#include "DropListToolButton.h"
+#include "MenuToolButton.h"
 #include "MemoryKey.h"
 #include <QLineEdit>
 #include <QToolBar>
@@ -71,7 +71,7 @@ bool SceneInPageActions::InitWidget() {
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar() {
-  auto* orderToolButton = new (std::nothrow) DropdownToolButton(_ORDER_AG->actions(), QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24);
+  auto* orderToolButton = new (std::nothrow) MenuToolButton(_ORDER_AG->actions(), QToolButton::InstantPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24);
   orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, "Sort");
   auto* orderTB = new (std::nothrow) QToolBar{"Scene Order"};
   orderTB->addWidget(orderToolButton);

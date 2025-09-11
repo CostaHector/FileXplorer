@@ -88,6 +88,7 @@ void RenameWidget_Delete::initExclusiveSetting() {
   m_newStrCB->setCurrentText("");
   m_newStrCB->setEnabled(false);
   m_newStrCB->setToolTip("New str is identically equal to empty str");
+  regexValidLabel->setVisible(true);
 }
 
 void RenameWidget_Delete::InitExtraCommonVariable() {

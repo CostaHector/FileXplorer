@@ -1,7 +1,8 @@
 ﻿#include "LogActions.h"
 #include "MemoryKey.h"
-#include "Logger.h"
+#include "MenuToolButton.h"
 #include "PublicMacro.h"
+#include "Logger.h"
 #include <QHash>
 
 LogActions::LogActions(QObject* parent)  //
@@ -26,7 +27,6 @@ LogActions::LogActions(QObject* parent)  //
   _LOG_ROTATION->setCheckable(false);
   _LOG_ROTATION->setShortcutVisibleInContextMenu(true);
   _LOG_ROTATION->setToolTip(QString("<b>%1 (%2)</b><br/>Rotate log files if they exceed 10 MB in size").arg(_LOG_ROTATION->text(), _LOG_ROTATION->shortcut().toString()));
-  _DROPDOWN_LIST += nullptr;
   _DROPDOWN_LIST += _LOG_ROTATION;
 
   _LOG_PRINT_LEVEL_DEBUG = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_DEBUG"), "Debug", this};
@@ -59,7 +59,7 @@ LogActions::LogActions(QObject* parent)  //
   _LOG_PRINT_LEVEL_AG->addAction(_LOG_PRINT_LEVEL_ERROR);
   _DROPDOWN_LIST += nullptr;
   _DROPDOWN_LIST += _LOG_PRINT_LEVEL_AG->actions();
-  static const QHash<QAction*, LOG_LVL_E> LOG_PRINT_LVL_ACTION_ENUM//
+  static const QHash<QAction*, LOG_LVL_E> LOG_PRINT_LVL_ACTION_2_ENUM//
       {
        {_LOG_PRINT_LEVEL_DEBUG, LOG_LVL_E::D},
        {_LOG_PRINT_LEVEL_INFO, LOG_LVL_E::I},
@@ -80,8 +80,8 @@ LogActions::LogActions(QObject* parent)  //
   connect(_LOG_FOLDER, &QAction::triggered, &Logger::OpenLogFolder);
   connect(_LOG_ROTATION, &QAction::triggered, []() { Logger::AgingLogFiles(Logger::GetLogFileAbsPath()); });
   connect(_LOG_PRINT_LEVEL_AG, &QActionGroup::triggered, this, [](QAction* pAct) {
-    auto it = LOG_PRINT_LVL_ACTION_ENUM.find(pAct);
-    if (it != LOG_PRINT_LVL_ACTION_ENUM.cend()) {
+    auto it = LOG_PRINT_LVL_ACTION_2_ENUM.find(pAct);
+    if (it != LOG_PRINT_LVL_ACTION_2_ENUM.cend()) {
       Logger::SetPrintLevel(it.value());
       return;
     }
@@ -90,12 +90,16 @@ LogActions::LogActions(QObject* parent)  //
   connect(_AUTO_FLUSH_IGNORE_LEVEL, &QAction::toggled, &Logger::SetAutoFlushAllLevel);
 }
 
-QToolButton* LogActions::GetLogPreviewerToolButton(QWidget* parent) {
-  QToolButton* logPreviewerTb = new (std::nothrow) QToolButton{parent};
-  CHECK_NULLPTR_RETURN_NULLPTR(logPreviewerTb)
-  logPreviewerTb->setIcon(QIcon(":img/LOG_FILES_PREVIEW"));
-  logPreviewerTb->setCheckable(true);
-  return logPreviewerTb;
+QToolButton *LogActions::GetLogToolButton(QWidget *parent) {
+  CHECK_NULLPTR_RETURN_NULLPTR(parent);
+  MenuToolButton* logToolButton = new (std::nothrow) MenuToolButton(
+      _DROPDOWN_LIST,
+      QToolButton::InstantPopup,
+      Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
+      IMAGE_SIZE::TABS_ICON_IN_MENU_16,
+      parent);
+  logToolButton->SetCaption(QIcon{":img/LOG_SETTINGS"}, "Log settings", "Open logs/Change Log print level/auto fflush level");
+  return logToolButton;
 }
 
 LogActions& g_LogActions() {
