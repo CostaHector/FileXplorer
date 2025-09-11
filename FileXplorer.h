@@ -39,6 +39,6 @@ public:
   CustomStatusBar* m_statusBar{nullptr};
 private:
   void onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum);
-  void onViewTypeChanged(const QAction* pViewAct);
+  void onViewWidgetChanged(const QAction* pViewAct);
 };
 #endif  // FILEXPLORER_H

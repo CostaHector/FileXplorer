@@ -15,10 +15,10 @@ public:
   void subscribe();
 
 private:
-  void onViewActionInActionGroupTriggered(QAction* viewAct);
+  void onPushNewViewIntoUndoStack(QAction* viewAct);
 
-  bool onViewBackward();
-  bool onViewForward();
+  bool onViewNavigateBackward();
+  bool onViewNavigateForward();
   ViewTypeFormerLadder mViewRD;
 };
 
