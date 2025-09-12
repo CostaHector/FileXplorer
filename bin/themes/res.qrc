@@ -113,7 +113,6 @@
     <file alias="UNPACK_FOLDERS">FileOperation/UNPACK_FOLDERS.svg</file>
     <file alias="ITEMS_ORGANIZER">FileOperation/ITEMS_ORGANIZER.svg</file>
     <file alias="FOLDER_OPEN">FileOperation/FOLDER_OPEN.svg</file>
-    <file alias="CATEGORIZER">FileOperation/CATEGORIZER.svg</file>
     <file alias="SELECT_FOLDER">FileOperation/SELECT_FOLDER.svg</file>
     <file alias="STUDIOS_LIST_FILE">FileOperation/STUDIOS_LIST_FILE.svg</file>
     <file alias="CAST_LIST_FILE">FileOperation/CAST_LIST_FILE.svg</file>
@@ -137,7 +136,6 @@
     <file alias="SQLITE_APP">FileOperation/SQLITE_APP.svg</file>
     <file alias="MOVE_TO_TRASH_BIN">FileOperation/MOVE_TO_TRASH_BIN.svg</file>
     <file alias="DELETE_ITEMS_PERMANENTLY">FileOperation/DELETE_ITEMS_PERMANENTLY.svg</file>
-    <file alias="ARRANGE">FileOperation/ARRANGE.svg</file>
 
     <!--LeftSideToolBarIcons here-->
     <file alias="DISKS">LeftSideToolBarIcons/DISKS.svg</file>
@@ -178,7 +176,7 @@
     <file alias="AI_IDEA">JsonEditor/AI_IDEA.svg</file>
     <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
     <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
-    <file alias="SUBMIT">JsonEditor/SUBMIT.svg</file>
+    <file alias="SAVE_CHANGES">JsonEditor/SAVE_CHANGES.svg</file>
     <file alias="SKIP_IF">JsonEditor/SKIP_IF.svg</file>
     <file alias="JSON_FILE_NEXT">JsonEditor/JSON_FILE_NEXT.png</file>
     <file alias="JSON_FILE_PRECIOUS">JsonEditor/JSON_FILE_PRECIOUS.png</file>
@@ -278,9 +276,9 @@
     <file alias="DISPLAY_DETAIL_INFOMATIONS">View/DISPLAY_DETAIL_INFOMATIONS.svg</file>
     <file alias="DISPLAY_LARGE_THUMBNAILS">View/DISPLAY_LARGE_THUMBNAILS.svg</file>
     <file alias="DISPLAY_TREE_VIEW">View/DISPLAY_TREE_VIEW.svg</file>
-    <file alias="FOLDER_PREVIEW_LABELS">View/FOLDER_PREVIEW_LABELS.svg</file>
-    <file alias="FOLDER_PREVIEW_BROWSER">View/FOLDER_PREVIEW_BROWSER.svg</file>
-    <file alias="FOLDER_PREVIEW_LISTS">View/FOLDER_PREVIEW_LISTS.svg</file>
+    <file alias="FOLDER_PREVIEW_CAROUSEL">View/FOLDER_PREVIEW_CAROUSEL.svg</file>
+    <file alias="FOLDER_PREVIEW_PROGRESSIVE_LOAD">View/FOLDER_PREVIEW_PROGRESSIVE_LOAD.svg</file>
+    <file alias="FOLDER_PREVIEW_CATEGORY">View/FOLDER_PREVIEW_CATEGORY.svg</file>
     <file alias="DEFAULT_COLUMN_WIDTH">View/DEFAULT_COLUMN_WIDTH.svg</file>
     <file alias="DEFAULT_ROW_HEIGHT">View/DEFAULT_ROW_HEIGHT.svg</file>
     <file alias="RESIZE_COLUMN_TO_CONTENTS">View/RESIZE_COLUMN_TO_CONTENTS.svg</file>
@@ -302,6 +300,7 @@
     <file alias="DROP_DATABASE">Database/DROP_DATABASE.svg</file>
     <file alias="DROP_TABLE">Database/DROP_TABLE.svg</file>
     <file alias="DELETE_TABLE">Database/DELETE_TABLE.svg</file>
+    <file alias="MANUAL_SUBMIT">Database/MANUAL_SUBMIT.svg</file>
     <file alias="ANALYSE_AI_MEDIA_TABLES">Database/ANALYSE_AI_MEDIA_TABLES.svg</file>
     <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
     <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>

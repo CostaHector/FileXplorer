@@ -1,6 +1,7 @@
 ﻿#include "AddressELineEdit.h"
 #include "ViewHelper.h"
 #include "PublicMacro.h"
+#include "NotificatorMacro.h"
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
@@ -13,13 +14,11 @@
 
 const QString AddressELineEdit::RELEASE_HINT_MSG = "<b>Drop item(s) to ...?</b>:<br/>";
 
-AddressELineEdit::AddressELineEdit(QWidget* parent)  //
-  : QStackedWidget{parent}                         //
-{
+AddressELineEdit::AddressELineEdit(QWidget* parent) : QStackedWidget{parent} {
   m_pathActionsTB = new (std::nothrow) QToolBar{this};
   CHECK_NULLPTR_RETURN_VOID(m_pathActionsTB);
 
-  pathComboBox = new (std::nothrow) QComboBox{this};
+  pathComboBox = new (std::nothrow) PathComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(pathComboBox);
   pathComboBox->setEditable(true);
   pathComboBox->setInsertPolicy(QComboBox::InsertAtTop);
@@ -37,9 +36,6 @@ AddressELineEdit::AddressELineEdit(QWidget* parent)  //
     pathComboBox->addItem(d.filePath());
   }
 #endif
-
-  pathComboBoxFocusWatcher = new (std::nothrow) FocusEventWatch(pathComboBox);
-  CHECK_NULLPTR_RETURN_VOID(pathComboBoxFocusWatcher);
 
   addWidget(m_pathActionsTB);
   addWidget(pathComboBox);
@@ -76,7 +72,12 @@ void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
 #endif
   for (const QString& pathSec : fullpath.split(PathTool::PATH_SEP_CHAR)) {
     m_pathActionsTB->addAction(pathSec);
-    qobject_cast<QWidget*>(m_pathActionsTB->children().last())->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+  }
+  QList<QWidget*> buttons = m_pathActionsTB->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
+  for (QWidget* widget : buttons) {
+    if (widget != nullptr) {
+      widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    }
   }
 }
 
@@ -88,20 +89,18 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   if (!QFile::exists(pth)) {
 #endif
     pathComboBox->setCurrentText(pth);
-    const QString pathInexist{QString{"Return pressed with inexist path [%1]."}.arg(pth)};
-    LOG_W("Into path[%s] failed", qPrintable(pathInexist));
-    QMessageBox::warning(this, "Into path failed", pathInexist);
+    LOG_ERR_NP("Path not exist", pth);
     return false;
   }
   const QFileInfo fi{pth};
   if (fi.isFile()) {
     pathComboBox->setCurrentText(pth);
-    const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
-    LOG_D("Direct open file [%s]: [%d]", qPrintable(pth), openRet);
+    const bool bRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
+    LOG_INFO_P("Open file", "[%s]: bRet[%d]", qPrintable(pth), bRet);
   } else {
     updateAddressToolBarPathActions(pth);
     emit pathActionsTriggeredOrLineEditReturnPressed(pth);
-    emit pathComboBoxFocusWatcher->focusChanged(false);
+    emit pathComboBox->focusChanged(false);
   }
   return true;
 }
@@ -109,15 +108,11 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
 auto AddressELineEdit::subscribe() -> void {
   connect(m_pathActionsTB, &QToolBar::actionTriggered, this, &AddressELineEdit::onPathActionTriggered);
   connect(pathComboBox->lineEdit(), &QLineEdit::returnPressed, this, &AddressELineEdit::onReturnPressed);
-  connect(pathComboBoxFocusWatcher, &FocusEventWatch::focusChanged, this, &AddressELineEdit::onFocusChange);
+  connect(pathComboBox, &PathComboBox::focusChanged, this, &AddressELineEdit::onFocusChange);
 }
 
 auto AddressELineEdit::onFocusChange(bool hasFocus) -> void {
-  if (hasFocus) {
-    inputMode();
-  } else {
-    clickMode();
-  }
+  hasFocus ? inputMode() : clickMode();
 }
 
 auto AddressELineEdit::clickMode() -> void {
@@ -129,14 +124,15 @@ auto AddressELineEdit::inputMode() -> void {
 }
 
 void AddressELineEdit::mousePressEvent(QMouseEvent* /* event */) {
-  emit pathComboBoxFocusWatcher->focusChanged(true);
+  emit pathComboBox->focusChanged(true);
   pathComboBox->setFocus();
   pathComboBox->lineEdit()->selectAll();
 }
 
 void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
   if (e->key() == Qt::Key_Escape) {
-    emit pathComboBoxFocusWatcher->focusChanged(false);
+    emit pathComboBox->focusChanged(false);
+
   }
 }
 

@@ -18,6 +18,14 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENES_VIEW"), ENUM_2_STR(SCENE), this);
   _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/CAST_VIEW"), ENUM_2_STR(CAST), this);
   _JSON_VIEW = new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), ENUM_2_STR(JSON), this);
+  _ALL_VIEWS += _LIST_VIEW;
+  _ALL_VIEWS += _TABLE_VIEW;
+  _ALL_VIEWS += _TREE_VIEW;
+  _ALL_VIEWS += _MOVIE_VIEW;
+  _ALL_VIEWS += _CAST_VIEW;
+  _ALL_VIEWS += _SCENE_VIEW;
+  _ALL_VIEWS += _JSON_VIEW;
+  _ALL_VIEWS += _ADVANCE_SEARCH_VIEW;
 
   _LIST_VIEW->setShortcutVisibleInContextMenu(true);
   _LIST_VIEW->setToolTip(QString("Displays items by using large thumbnails. (%1)").arg(_LIST_VIEW->shortcut().toString()));
@@ -57,16 +65,17 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _JSON_VIEW->setToolTip(QString("Show Json editor tableview. (%1)").arg(_JSON_VIEW->shortcut().toString()));
   _JSON_VIEW->setCheckable(true);
 
-  _VIEW_BACK_TO = new (std::nothrow) QAction(QIcon(":img/_VIEW_BACK_TO"), "View back", this);
+  _VIEW_BACK_TO = new (std::nothrow) QAction(QIcon{":img/_VIEW_BACK_TO"}, "View back", this);
   _VIEW_BACK_TO->setToolTip(QString("<b>%1 (Ctrl+Mouse BackButton)</b><br/> back to last view type.").arg(_VIEW_BACK_TO->text()));
-  _VIEW_FORWARD_TO = new (std::nothrow) QAction(QIcon(":img/_VIEW_FORWARD_TO"), "View forward", this);
+  _VIEW_FORWARD_TO = new (std::nothrow) QAction(QIcon{":img/_VIEW_FORWARD_TO"}, "View forward", this);
   _VIEW_FORWARD_TO->setToolTip(QString("<b>%1 (Ctrl+Mouse ForwardButton)</b><br/> forward to next view type.").arg(_VIEW_FORWARD_TO->text()));
+  _VIEWS_NAVIGATE += _VIEW_BACK_TO;
+  _VIEWS_NAVIGATE += _VIEW_FORWARD_TO;
 
   NAVIGATION_PANE = new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"), this);
   NAVIGATION_PANE->setToolTip(QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(NAVIGATION_PANE->text(), NAVIGATION_PANE->shortcut().toString()));
   NAVIGATION_PANE->setCheckable(true);
-
-  _NAVI_ACTIONS = Get_NAVIGATION_PANE_Actions();
+  NAVIGATION_PANE->setChecked(Configuration().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
 
   _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/PLAY_BUTTON_ROUND"), tr("Play"), this);
   _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
@@ -83,17 +92,6 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
                             .arg(_HAR_VIEW->text(), _HAR_VIEW->shortcut().toString()));
 }
 
-QActionGroup* ViewActions::Get_NAVIGATION_PANE_Actions() {
-
-  auto* actionGroup = new (std::nothrow) QActionGroup(this);
-  CHECK_NULLPTR_RETURN_NULLPTR(actionGroup);
-  actionGroup->addAction(NAVIGATION_PANE);
-  actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  NAVIGATION_PANE->setChecked(Configuration().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
-  return actionGroup;
-}
-
 QToolBar* ViewActions::GetViewTB(QWidget* parent) {
   auto* pTb = new (std::nothrow) ViewSwitchToolBar{"views switch", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(pTb);
@@ -107,14 +105,7 @@ QToolBar* ViewActions::GetViewTB(QWidget* parent) {
                                 {_ADVANCE_SEARCH_VIEW, ViewTypeTool::ViewType::SEARCH}},
                                ViewTypeTool::DEFAULT_VIEW_TYPE, QActionGroup::ExclusionPolicy::Exclusive);
   pTb->subscribe();
-  pTb->addAction(_LIST_VIEW);
-  pTb->addAction(_TABLE_VIEW);
-  pTb->addAction(_TREE_VIEW);
-  pTb->addAction(_MOVIE_VIEW);
-  pTb->addAction(_CAST_VIEW);
-  pTb->addAction(_SCENE_VIEW);
-  pTb->addAction(_JSON_VIEW);
-  pTb->addAction(_ADVANCE_SEARCH_VIEW);
+  pTb->addActions(_ALL_VIEWS); // action sorted in user specified sequence
   pTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   pTb->setOrientation(Qt::Orientation::Horizontal);
   pTb->setStyleSheet("QToolBar { max-width: 256px; }");

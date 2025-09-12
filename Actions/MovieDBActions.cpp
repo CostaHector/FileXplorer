@@ -9,7 +9,7 @@ MovieDBActions& g_dbAct() {
 MovieDBActions::MovieDBActions(QObject* parent)  //
   : QObject{parent}                            //
 {
-  SUBMIT = new (std::nothrow) QAction(QIcon(":img/SUBMIT"), "Submit", this);
+  SUBMIT = new (std::nothrow) QAction(QIcon(":img/MANUAL_SUBMIT"), "Submit", this);
   CHECK_NULLPTR_RETURN_VOID(SUBMIT);
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
   SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> Manual Submit.").arg(SUBMIT->text(), SUBMIT->shortcut().toString()));

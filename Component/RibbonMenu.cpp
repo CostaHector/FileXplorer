@@ -96,11 +96,8 @@ QToolBar* RibbonMenu::LeafFile() const {
   QToolBar* syncPathToolBar = g_syncFileSystemModificationActions().GetSyncPathToolbar(leafFileWid);
   CHECK_NULLPTR_RETURN_NULLPTR(syncPathToolBar);
 
-  QToolButton* styleToolButton = g_PreferenceActions().GetStyleToolButton(leafFileWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(styleToolButton);
-
-  QToolButton* styleSheetToolButton = g_PreferenceActions().GetStyleSheetToolButton(leafFileWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(styleSheetToolButton);
+  QToolBar* styleAndStylesheetToolBar = g_PreferenceActions().GetStyleAndStyleSheetToolbar(leafFileWid);
+  CHECK_NULLPTR_RETURN_NULLPTR(styleAndStylesheetToolBar);
 
   QToolButton* logToolButton = g_LogActions().GetLogToolButton(leafFileWid);
   CHECK_NULLPTR_RETURN_NULLPTR(logToolButton);
@@ -117,8 +114,7 @@ QToolBar* RibbonMenu::LeafFile() const {
   leafFileWid->addWidget(syncSwitchToolBar);
   leafFileWid->addWidget(syncPathToolBar);
   leafFileWid->addSeparator();
-  leafFileWid->addWidget(styleToolButton);
-  leafFileWid->addWidget(styleSheetToolButton);
+  leafFileWid->addWidget(styleAndStylesheetToolBar);
   leafFileWid->addSeparator();
   leafFileWid->addWidget(logToolButton);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
@@ -258,7 +254,7 @@ QToolBar* RibbonMenu::LeafHome() const {
 }
 
 QToolBar* RibbonMenu::LeafView() const {
-  auto* leafViewWid = new (std::nothrow) QToolBar("Leaf View");
+  auto* leafViewWid = new (std::nothrow) QToolBar{"Leaf View"};
   CHECK_NULLPTR_RETURN_NULLPTR(leafViewWid);
 
   auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
@@ -266,14 +262,16 @@ QToolBar* RibbonMenu::LeafView() const {
   SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto& viewInst = g_viewActions();
+
   leafViewWid->setToolTip("View Leaf");
   leafViewWid->addAction(viewInst.NAVIGATION_PANE);
   leafViewWid->addWidget(folderPreviewToolBar);
   leafViewWid->addSeparator();
-  leafViewWid->addAction(viewInst._HAR_VIEW);
+  leafViewWid->addActions(viewInst._VIEWS_NAVIGATE);
   leafViewWid->addSeparator();
-  leafViewWid->addAction(viewInst._VIEW_BACK_TO);
-  leafViewWid->addAction(viewInst._VIEW_FORWARD_TO);
+  leafViewWid->addActions(viewInst._ALL_VIEWS);
+  leafViewWid->addSeparator();
+  leafViewWid->addAction(viewInst._HAR_VIEW);
   leafViewWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafViewWid;
 }

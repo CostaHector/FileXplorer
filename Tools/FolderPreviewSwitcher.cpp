@@ -14,7 +14,7 @@ void FolderPreviewSwitcher::onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E v
   CHECK_NULLPTR_RETURN_VOID(_folderPreview)
   using namespace PreviewTypeTool;
   switch (viewType) {
-    case PREVIEW_TYPE_E::STACKS: {
+    case PREVIEW_TYPE_E::CATEGORY: {
       if (_folderPreview->m_fileFolderPreviewStackedWid == nullptr) {
         _folderPreview->m_fileFolderPreviewStackedWid = new (std::nothrow) FileFolderPreviewer{"DockerList", _folderPreview};
         CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_fileFolderPreviewStackedWid)
@@ -23,7 +23,7 @@ void FolderPreviewSwitcher::onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E v
       _folderPreview->m_fileFolderPreviewStackedWid->operator()(_folderPreview->GetCurPath());
       break;
     }
-    case PREVIEW_TYPE_E::BROWSER: {
+    case PREVIEW_TYPE_E::PROGRESSIVE_LOAD: {
       if (_folderPreview->m_imgInFolderBrowser == nullptr) {
         _folderPreview->m_imgInFolderBrowser = new (std::nothrow) ImagesInFolderBrowser{_folderPreview};
         CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_imgInFolderBrowser)
@@ -32,7 +32,7 @@ void FolderPreviewSwitcher::onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E v
       _folderPreview->m_imgInFolderBrowser->operator()(_folderPreview->GetCurPath());
       break;
     }
-    case PREVIEW_TYPE_E::SLIDERS: {
+    case PREVIEW_TYPE_E::CAROUSEL: {
       if (_folderPreview->m_imgInFolderLabels == nullptr) {
         _folderPreview->m_imgInFolderLabels = new (std::nothrow) ImagesInFolderSlider{_folderPreview};
         CHECK_NULLPTR_RETURN_VOID(_folderPreview->m_imgInFolderLabels)
