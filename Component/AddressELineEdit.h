@@ -2,7 +2,7 @@
 #define ADDRESSELINEEDIT_H
 
 #include "PathTool.h"
-#include "FocusEventWatch.h"
+#include "PathComboBox.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QToolBar>
@@ -24,7 +24,7 @@ class AddressELineEdit : public QStackedWidget {
   explicit AddressELineEdit(QWidget* parent = nullptr);
 
   inline QString pathFromLineEdit() const {  //
-    return PathTool::StripTrailingSlash(PathTool::normPath(pathComboBox->currentText()));
+    return PathTool::StripTrailingSlash(PathTool::normPath(m_pathComboBox->currentText()));
   }
 
   inline QString pathFromFullActions() const {  //
@@ -46,7 +46,7 @@ class AddressELineEdit : public QStackedWidget {
     }
 #ifdef _WIN32
     if (!path.isEmpty()) {
-      path = path.mid(1);  // in windows 1st action is fixed all drives entrance
+      path = path.mid(1);  // in windows 1st action is a placeholder with icon only
     }
 #endif
     return PathTool::StripTrailingSlash(path);
@@ -80,9 +80,7 @@ class AddressELineEdit : public QStackedWidget {
 
  private:
   QToolBar* m_pathActionsTB{nullptr};
-  QComboBox* pathComboBox{nullptr};
-  FocusEventWatch* pathComboBoxFocusWatcher{nullptr};
-
+  PathComboBox* m_pathComboBox{nullptr};
   static const QString RELEASE_HINT_MSG;
 };
 

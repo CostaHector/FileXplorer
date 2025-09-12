@@ -1,32 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 25.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 800 800" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#231F20;stroke-width:20;stroke-miterlimit:125;stroke-dasharray:50,25;}
-	.st1{fill:none;stroke:#231F20;stroke-width:25;stroke-miterlimit:125;}
-	.st2{fill:none;stroke:#231F20;stroke-width:20;stroke-miterlimit:10;}
-	.st3{fill:#FF7F50;}
-	.st4{fill:none;stroke:#FFFFFF;stroke-width:60;stroke-miterlimit:10;}
-</style>
-<line class="st0" x1="796" y1="294" x2="8.7" y2="294"/>
-<line class="st1" x1="8.7" y1="120.4" x2="796" y2="120.4"/>
-<line class="st1" x1="8.7" y1="660.4" x2="796" y2="660.4"/>
-<line class="st1" x1="15.5" y1="154.8" x2="158.3" y2="264"/>
-<line class="st0" x1="168.8" y1="112" x2="168.8" y2="299"/>
-<line class="st2" x1="296.9" y1="263.7" x2="296.9" y2="150.7"/>
-<line class="st2" x1="425" y1="263.7" x2="425" y2="150.7"/>
-<line class="st2" x1="466.2" y1="263.7" x2="466.2" y2="150.7"/>
-<line class="st2" x1="640.6" y1="263.7" x2="640.6" y2="150.7"/>
-<line class="st2" x1="607" y1="263.7" x2="607" y2="150.7"/>
-<line class="st2" x1="573.5" y1="263.7" x2="573.5" y2="150.7"/>
-<g>
-	<ellipse class="st3" cx="599.5" cy="481" rx="137.3" ry="137.4"/>
-	<g>
-		<path class="st3" d="M599.5,354.2c69.9,0,126.8,56.9,126.8,126.8s-57,126.8-126.8,126.8S472.7,550.9,472.7,481
-			S529.6,354.2,599.5,354.2 M599.5,333c-81.8,0-148,66.3-148,148s66.2,148,148,148s148-66.3,148-148S681.3,333,599.5,333L599.5,333z
-			"/>
-	</g>
-</g>
-<line class="st4" x1="707.8" y1="481" x2="491.2" y2="481"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<path fill="#F44336" d="M15.46,15.88L16.88,14.46L19,16.59L21.12,14.46L22.54,15.88L20.41,18L22.54,20.12L21.12,21.54L19,19.41L16.88,21.54L15.46,20.12L17.59,18L15.46,15.88" />
+<path d="M4,3H18A2,2 0 0,1 20,5V12.08C18.45,11.82 16.92,12.18 15.68,13H12V17H13.08C12.97,17.68 12.97,18.35 13.08,19H4A2,2 0 0,1 2,17V5A2,2 0 0,1 4,3M4,7V11H10V7H4M12,7V11H18V7H12M4,13V17H10V13H4Z" />
 </svg>

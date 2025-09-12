@@ -4,6 +4,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QToolBar>
+#include <QList>
 class ViewActions : public QObject {
   Q_OBJECT
 public:
@@ -18,19 +19,19 @@ public:
   QAction* _SCENE_VIEW{nullptr};
   QAction* _CAST_VIEW{nullptr};
   QAction* _JSON_VIEW{nullptr};
+  QList<QAction*> _ALL_VIEWS;
+
   QAction* _VIEW_BACK_TO{nullptr};
   QAction* _VIEW_FORWARD_TO{nullptr};
+  QList<QAction*> _VIEWS_NAVIGATE;
 
   QAction* NAVIGATION_PANE{nullptr};
-  QActionGroup* _NAVI_ACTIONS{nullptr};
 
   QAction* _SYS_VIDEO_PLAYERS{nullptr};
   QAction* _HAR_VIEW{nullptr};
 
 private:
   explicit ViewActions(QObject* parent = nullptr);
-
-  QActionGroup* Get_NAVIGATION_PANE_Actions();
   QActionGroup* GetPlayersActions();
 };
 

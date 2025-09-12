@@ -5,26 +5,26 @@
 PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
   QToolBar{title, parent}
 {
-  STACKS_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LISTS"), "stacks", this};
-  STACKS_PRE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_P));
-  STACKS_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> IMAGE/VIDEO/OTHER items by type view and single item text-browser view.")  //
-                             .arg(STACKS_PRE->text(), STACKS_PRE->shortcut().toString()));
-  STACKS_PRE->setCheckable(true);
+  CATEGORY_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CATEGORY"), "Category Preview", this};
+  CATEGORY_PRE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_P));
+  CATEGORY_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through 3 QListViews and Items that group file by type(IMAGE/VIDEO/OTHER)")  //
+                               .arg(CATEGORY_PRE->text(), CATEGORY_PRE->shortcut().toString()));
+  CATEGORY_PRE->setCheckable(true);
 
-  BROWSER_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_BROWSER"), "browser", this};
-  BROWSER_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> QTextBrowser(images count dynamic expansion).")  //
-                              .arg(BROWSER_PRE->text(), BROWSER_PRE->shortcut().toString()));
-  BROWSER_PRE->setCheckable(true);
+  PROGRESSIVE_LOAD_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_PROGRESSIVE_LOAD"), "Progressive Load Preview", this};
+  PROGRESSIVE_LOAD_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QTextBrowser(images count dynamic expansion).")  //
+                                       .arg(PROGRESSIVE_LOAD_PRE->text(), PROGRESSIVE_LOAD_PRE->shortcut().toString()));
+  PROGRESSIVE_LOAD_PRE->setCheckable(true);
 
-  SLIDERS_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_LABELS"), "sliders", this};
-  SLIDERS_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> QLabels(Slidershow and Periodic timer).")  //
-                              .arg(SLIDERS_PRE->text(), SLIDERS_PRE->shortcut().toString()));
-  SLIDERS_PRE->setCheckable(true);
+  CAROUSEL_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CAROUSEL"), "Carousel Preview", this};
+  CAROUSEL_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QLabels(Slidershow and a periodic timer).")  //
+                               .arg(CAROUSEL_PRE->text(), CAROUSEL_PRE->shortcut().toString()));
+  CAROUSEL_PRE->setCheckable(true);
 
   using namespace PreviewTypeTool;
-  mPreviewTypeIntAction.init({{STACKS_PRE, PREVIEW_TYPE_E::STACKS},//
-                              {BROWSER_PRE, PREVIEW_TYPE_E::BROWSER},//
-                              {SLIDERS_PRE, PREVIEW_TYPE_E::SLIDERS}},//
+  mPreviewTypeIntAction.init({{CATEGORY_PRE, PREVIEW_TYPE_E::CATEGORY},//
+                              {PROGRESSIVE_LOAD_PRE, PREVIEW_TYPE_E::PROGRESSIVE_LOAD},//
+                              {CAROUSEL_PRE, PREVIEW_TYPE_E::CAROUSEL}},//
                              PREVIEW_TYPE_E::NONE, QActionGroup::ExclusionPolicy::ExclusiveOptional);//
   int curPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)mPreviewTypeIntAction.defVal()).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);

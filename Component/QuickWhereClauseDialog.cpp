@@ -161,7 +161,7 @@ QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent)//
 
   subscribe();
 
-  setWindowIcon(QIcon{":img/FILE_SYSTEM_FILTER"});
+  setWindowIcon(QIcon{":img/QUICK_WHERE_FILTERS"});
   setWindowTitle(QString{"SELECT * FROM `%1|%2` WHERE ?"}.arg(DB_TABLE::MOVIES).arg(DB_TABLE::PERFORMERS));
 
   m_Name->setFocus();

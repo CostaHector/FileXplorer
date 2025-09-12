@@ -25,13 +25,13 @@ void CurrentRowPreviewer::UpdatePreview() {
     switch (mCurrentPreviewType) {
       case PREVIEW_TYPE_E::NONE: // no preview
         return;
-      case PREVIEW_TYPE_E::STACKS:
+      case PREVIEW_TYPE_E::CATEGORY:
         m_fileFolderPreviewStackedWid->operator()(m_curPath);
         return;
-      case PREVIEW_TYPE_E::BROWSER:
+      case PREVIEW_TYPE_E::PROGRESSIVE_LOAD:
         m_imgInFolderBrowser->operator()(m_curPath);
         return;
-      case PREVIEW_TYPE_E::SLIDERS:
+      case PREVIEW_TYPE_E::CAROUSEL:
         m_imgInFolderLabels->operator()(m_curPath);
         return;
       default:
@@ -39,7 +39,7 @@ void CurrentRowPreviewer::UpdatePreview() {
     }
   } else if (mCurrentSrcFrom == SRC_FROM::CAST) {
     switch (mCurrentPreviewType) {
-      case PREVIEW_TYPE_E::STACKS:
+      case PREVIEW_TYPE_E::CATEGORY:
         m_fileFolderPreviewStackedWid->operator()(m_curRecord, m_curImageHostPath);
         return;
       default:
@@ -47,7 +47,7 @@ void CurrentRowPreviewer::UpdatePreview() {
     }
   } else if (mCurrentSrcFrom == SRC_FROM::SCENE) {
     switch (mCurrentPreviewType) {
-      case PREVIEW_TYPE_E::STACKS:
+      case PREVIEW_TYPE_E::CATEGORY:
         m_fileFolderPreviewStackedWid->operator()(m_sceneName, m_sceneimgPthLst, m_scenevidsLst);
         return;
       default:
