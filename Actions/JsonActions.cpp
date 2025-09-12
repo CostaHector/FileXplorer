@@ -6,7 +6,7 @@ JsonActions::JsonActions(QObject* parent)  //
     : QObject{parent}                                  //
 {
   // **Submit**
-  _SAVE_CURRENT_CHANGES = new (std::nothrow) QAction{QIcon(":img/SUBMIT"), tr("Submit"), this};
+  _SAVE_CURRENT_CHANGES = new (std::nothrow) QAction{QIcon(":img/SAVE_CHANGES"), tr("Save"), this};
   _SAVE_CURRENT_CHANGES->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
   _SAVE_CURRENT_CHANGES->setShortcutVisibleInContextMenu(true);
   _SAVE_CURRENT_CHANGES->setToolTip(QString("<b>%1 (%2)</b><br/> Commit selected row changes")  //

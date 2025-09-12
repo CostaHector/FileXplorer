@@ -37,7 +37,7 @@ void FileSystemTreeView::subscribe() {
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
 
-  addActions(g_viewActions()._NAVI_ACTIONS->actions());
+  addAction(g_viewActions().NAVIGATION_PANE);
   addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
 
   addActions(g_fileBasicOperationsActions().NEW->actions());

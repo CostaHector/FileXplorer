@@ -101,6 +101,38 @@ bool PreferenceActions::onSetStylesheet(const QAction* pStyleSheetAct) {
   return true;
 }
 
+QToolBar *PreferenceActions::GetStyleAndStyleSheetToolbar(QWidget *parent) {
+  CHECK_NULLPTR_RETURN_NULLPTR(parent);
+  MenuToolButton* uiStyleToolButton = new (std::nothrow) MenuToolButton(
+      mStyleIntAction.getActionEnumAscendingList(),
+      QToolButton::InstantPopup,
+      Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
+      IMAGE_SIZE::TABS_ICON_IN_MENU_24,
+      parent);
+  CHECK_NULLPTR_RETURN_NULLPTR(uiStyleToolButton);
+  uiStyleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "App UI Style", "Change application style (Windows Vista, Windows, Fusion, macOS)");
+  uiStyleToolButton->UpdateCaptionForInstantPopMode();
+
+  MenuToolButton* colorThemeToolButton = new (std::nothrow) MenuToolButton(
+      mStyleSheetIntAction.getActionEnumAscendingList(),
+      QToolButton::InstantPopup,
+      Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
+      IMAGE_SIZE::TABS_ICON_IN_MENU_24,
+      parent);
+  CHECK_NULLPTR_RETURN_NULLPTR(colorThemeToolButton);
+  colorThemeToolButton->SetCaption(QIcon{":img/STYLESHEET_SETTING"}, "Color Theme", "Toggle between Light and Dark color schemes");
+  colorThemeToolButton->UpdateCaptionForInstantPopMode();
+
+  QToolBar* styleAndStylesheetToolbar = new (std::nothrow) QToolBar{"Style/Stylesheet", parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(styleAndStylesheetToolbar);
+  styleAndStylesheetToolbar->addWidget(uiStyleToolButton);
+  styleAndStylesheetToolbar->addWidget(colorThemeToolButton);
+  styleAndStylesheetToolbar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  styleAndStylesheetToolbar->setOrientation(Qt::Orientation::Vertical);
+  styleAndStylesheetToolbar->setStyleSheet("QToolBar { min-width: 128px;max-width: 128px; }");
+  return styleAndStylesheetToolbar;
+}
+
 void PreferenceActions::Subscribe() {
   connect(mStyleIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onSetAppStyle);
   connect(mStyleSheetIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onSetStylesheet);
@@ -112,34 +144,6 @@ Style::StyleE PreferenceActions::CurStyle() const {
 
 Style::StyleSheetE PreferenceActions::CurStyleSheet() const {
   return mStyleSheetIntAction.curVal();
-}
-
-QToolButton* PreferenceActions::GetStyleToolButton(QWidget* parent) {
-  CHECK_NULLPTR_RETURN_NULLPTR(parent);
-  MenuToolButton* styleToolButton = new (std::nothrow) MenuToolButton(
-      mStyleIntAction.getActionEnumAscendingList(),
-      QToolButton::InstantPopup,
-      Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
-      IMAGE_SIZE::TABS_ICON_IN_MENU_16,
-      parent);
-  CHECK_NULLPTR_RETURN_NULLPTR(styleToolButton);
-  styleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "UI Style", "Change application style (Windows Vista, Windows, Fusion, macOS)");
-  styleToolButton->UpdateCaptionForInstantPopMode();
-  return styleToolButton;
-}
-
-QToolButton* PreferenceActions::GetStyleSheetToolButton(QWidget* parent) {
-  CHECK_NULLPTR_RETURN_NULLPTR(parent);
-  MenuToolButton* styleToolButton = new (std::nothrow) MenuToolButton(
-      mStyleSheetIntAction.getActionEnumAscendingList(),
-      QToolButton::InstantPopup,
-      Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
-      IMAGE_SIZE::TABS_ICON_IN_MENU_16,
-      parent);
-  CHECK_NULLPTR_RETURN_NULLPTR(styleToolButton);
-  styleToolButton->SetCaption(QIcon{":img/STYLESHEET_SETTING"}, "Color Theme", "Toggle between Light and Dark color schemes");
-  styleToolButton->UpdateCaptionForInstantPopMode();
-  return styleToolButton;
 }
 
 PreferenceActions& g_PreferenceActions() {

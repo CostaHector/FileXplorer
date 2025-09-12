@@ -5,9 +5,7 @@
 #include "Logger.h"
 #include <QHash>
 
-LogActions::LogActions(QObject* parent)  //
-  : QObject{parent}                    //
-{
+LogActions::LogActions(QObject* parent) : QObject{parent} {
   _LOG_FILE = new (std::nothrow) QAction{QIcon{":img/LOG_FILES"}, "Open logs file", this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_FILE)
   _LOG_FILE->setCheckable(false);
