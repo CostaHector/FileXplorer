@@ -115,8 +115,8 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   : DatabaseSearchToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
 
-  m_whereCB->addItem(QString{R"(`%1` NAME LIKE "%%" AND `%1` NAME LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
-  m_whereCB->addItem(QString{R"(`%1` NAME LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
+  m_whereCB->addItem(QString{R"(`%1` LIKE "%%" AND `%1` LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
+  m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
