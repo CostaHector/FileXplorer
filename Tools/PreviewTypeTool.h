@@ -5,9 +5,9 @@
 
 #define PREVIEW_TYPES_ENUM_VALUE_MAPPING \
 PREVIEW_TYPE_ITEM(NONE,    0)    \
-    PREVIEW_TYPE_ITEM(STACKS,  1)    \
-    PREVIEW_TYPE_ITEM(BROWSER, 2)    \
-    PREVIEW_TYPE_ITEM(SLIDERS, 3)    \
+    PREVIEW_TYPE_ITEM(CATEGORY,  1)    \
+    PREVIEW_TYPE_ITEM(PROGRESSIVE_LOAD, 2)    \
+    PREVIEW_TYPE_ITEM(CAROUSEL, 3)    \
 
     // PreviewTypeTool begin
     namespace PreviewTypeTool {
@@ -26,7 +26,7 @@ PREVIEW_TYPE_ITEM(NONE,    0)    \
     if (viewType < PREVIEW_TYPE_E::BEGIN_DEFAULT || viewType >= PREVIEW_TYPE_E::END_INVALID) {
       return "unknown preview type";
     }
-    static const char PreviewType2CharArray[(int)PREVIEW_TYPE_E::END_INVALID][10]{
+    static const char PreviewType2CharArray[(int)PREVIEW_TYPE_E::END_INVALID][20]{
 #define PREVIEW_TYPE_ITEM(enu, val) ENUM_2_STR(enu),
         PREVIEW_TYPES_ENUM_VALUE_MAPPING
 #undef PREVIEW_TYPE_ITEM

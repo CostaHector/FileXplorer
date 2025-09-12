@@ -17,7 +17,7 @@ void UpdateTitleBar(QWidget* widget);
 void setDarkTitleBar(QWidget* widget, bool enable);
 void setGlobalDarkMode(bool enable);
 
-const char SUBMIT_BTN_STYLE[] =
+constexpr char SUBMIT_BTN_STYLE[] =
     "QPushButton{"
     "    color: #fff;"
     "    background-color: DodgerBlue;"

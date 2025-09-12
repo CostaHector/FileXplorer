@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QAction>
 #include <QActionGroup>
-#include <QToolButton>
+#include <QToolBar>
 #include "EnumIntAction.h"
 #include "StyleEnum.h"
 
@@ -26,8 +26,7 @@ public:
   QAction *STYLESHEET_DEFAULT_LIGHT{nullptr}, *STYLESHEET_DARK_THEME_MOON_FOG{nullptr};
   QActionGroup *STYLESHEET{nullptr};
 
-  QToolButton* GetStyleToolButton(QWidget* parent);
-  QToolButton* GetStyleSheetToolButton(QWidget* parent);
+  QToolBar* GetStyleAndStyleSheetToolbar(QWidget* parent);
 
   Style::StyleE CurStyle() const;
   Style::StyleSheetE CurStyleSheet() const;

@@ -17,9 +17,9 @@ public:
   PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::PREVIEW_TYPE_E::NONE};
   EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E> mPreviewTypeIntAction;
 
-  QAction* STACKS_PRE{nullptr};
-  QAction* BROWSER_PRE{nullptr};
-  QAction* SLIDERS_PRE{nullptr};
+  QAction* CATEGORY_PRE{nullptr};
+  QAction* PROGRESSIVE_LOAD_PRE{nullptr};
+  QAction* CAROUSEL_PRE{nullptr};
 signals:
   void previewTypeChanged(PreviewTypeTool::PREVIEW_TYPE_E previewType);
 private:

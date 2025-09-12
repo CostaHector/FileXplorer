@@ -2,7 +2,7 @@
 #define ADDRESSELINEEDIT_H
 
 #include "PathTool.h"
-#include "FocusEventWatch.h"
+#include "PathComboBox.h"
 #include <QComboBox>
 #include <QLabel>
 #include <QToolBar>
@@ -80,9 +80,7 @@ class AddressELineEdit : public QStackedWidget {
 
  private:
   QToolBar* m_pathActionsTB{nullptr};
-  QComboBox* pathComboBox{nullptr};
-  FocusEventWatch* pathComboBoxFocusWatcher{nullptr};
-
+  PathComboBox* pathComboBox{nullptr};
   static const QString RELEASE_HINT_MSG;
 };
 
