@@ -83,7 +83,7 @@ public:
     }
     return act2Enum(mActGrp->checkedAction());
   }
-  QActionGroup* getActionGroup() const {
+  QActionGroup* getActionGroup() const { // not only manual click(from user interact), but also emit
     return mActGrp;
   }
   const QList<QAction*>& getActionEnumAscendingList() const {

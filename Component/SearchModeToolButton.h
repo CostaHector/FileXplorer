@@ -5,19 +5,19 @@
 #include "EnumIntAction.h"
 #include "SearchTools.h"
 
-extern template struct EnumIntAction<SearchTools::SEARCH_MODE>;
+extern template struct EnumIntAction<SearchTools::SearchModeE>;
 
 class SearchModeToolButton : public QToolButton{
   Q_OBJECT
 public:
   explicit SearchModeToolButton(QWidget* parent=nullptr);
   ~SearchModeToolButton();
-  SearchTools::SEARCH_MODE curSearchMode() const {
+  SearchTools::SearchModeE curSearchMode() const {
     return mSearchModeIntAction.curVal();
   }
 
 signals:
-  void searchModeChanged(SearchTools::SEARCH_MODE newSearchMode);
+  void searchModeChanged(SearchTools::SearchModeE newSearchMode);
 
 private:
   void EmitSearchModeChanged(QAction* checkedAction);
@@ -25,7 +25,7 @@ private:
   QAction* MATCH_EQUAL{nullptr};
   QAction* MATCH_REGEX{nullptr};
   QAction* SEARCH_SCOPE_CONTENT{nullptr};
-  EnumIntAction<SearchTools::SEARCH_MODE> mSearchModeIntAction;
+  EnumIntAction<SearchTools::SearchModeE> mSearchModeIntAction;
 };
 
 #endif // SEARCHMODETOOLBUTTON_H

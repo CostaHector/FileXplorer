@@ -4,7 +4,7 @@
 #include "PublicTool.h"
 #include "PathTool.h"
 
-void SearchProxyModel::setSearchMode(SearchTools::SEARCH_MODE newSearchMode) {
+void SearchProxyModel::setSearchMode(SearchTools::SearchModeE newSearchMode) {
   initSearchMode(newSearchMode);
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }
@@ -38,7 +38,7 @@ void SearchProxyModel::PrintRegexDebugMessage() const {
     LOG_W("Regex[%s] is invalid", qPrintable(nameFilterPattern));
     return;
   }
-  if (m_searchMode == SearchTools::SEARCH_MODE::FILE_CONTENTS) {
+  if (m_searchMode == SearchTools::SearchModeE::FILE_CONTENTS) {
     LOG_D(R"(grep -iE \"%s\" --include="%s")", qPrintable(m_contentRawText), qPrintable(nameFilterPattern));
   } else {
     LOG_D(R"(find ./ -type f -iname "%s")", qPrintable(m_nameRawString));
@@ -54,13 +54,13 @@ void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const
   m_contentRawText.clear();
   using namespace SearchTools;
   switch (m_searchMode) {
-    case SEARCH_MODE::NORMAL:
+    case SearchModeE::NORMAL:
       setFilterFixedString(nameText);
       break;
-    case SEARCH_MODE::REGEX:
+    case SearchModeE::REGEX:
       setFilterRegularExpression(nameText);
       break;
-    case SEARCH_MODE::FILE_CONTENTS:
+    case SearchModeE::FILE_CONTENTS:
       setContentFilter(contentText);
       setFilterRegularExpression(nameText);
       break;
@@ -76,13 +76,13 @@ void SearchProxyModel::startFilterWhenTextChanges(const QString& nameText, const
   m_contentRawText = contentText;
   using namespace SearchTools;
   switch (m_searchMode) {
-    case SEARCH_MODE::NORMAL:
+    case SearchModeE::NORMAL:
       setFilterFixedString(nameText);
       break;
-    case SEARCH_MODE::REGEX:
+    case SearchModeE::REGEX:
       setFilterRegularExpression(nameText);
       break;
-    case SEARCH_MODE::FILE_CONTENTS:
+    case SearchModeE::FILE_CONTENTS:
       return;
     default:
       LOG_W("Search mode[%d] not support", (int)m_searchMode);
@@ -117,7 +117,7 @@ bool SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
   const QModelIndex nameModelIndex = sourceModel()->index(source_row, NAME_INDEX, source_parent);
   // 1. Check if file name pass the name filter
   const bool isFileNamePass = QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
-  if (m_searchMode != SearchTools::SEARCH_MODE::FILE_CONTENTS) {
+  if (m_searchMode != SearchTools::SearchModeE::FILE_CONTENTS) {
     return ReturnPostOperation(isFileNamePass, nameModelIndex);
   }
   // 2. Check if file content pass the content filter

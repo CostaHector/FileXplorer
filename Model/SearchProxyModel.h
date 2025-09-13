@@ -10,7 +10,7 @@ class SearchProxyModel : public QSortFilterProxyModel {
 public:
   using QSortFilterProxyModel::QSortFilterProxyModel;
   // only set value, no trigger filter
-  void initSearchMode(SearchTools::SEARCH_MODE newSearchMode) { m_searchMode = newSearchMode; }
+  void initSearchMode(SearchTools::SearchModeE newSearchMode) { m_searchMode = newSearchMode; }
   void initNameFilterDisables(bool hide) { m_nameFilterDisableOrHide = hide; }
   inline bool initFileNameFiltersCaseSensitive(Qt::CaseSensitivity sensitive) {
     m_nameFiltersCaseSensitive = sensitive;
@@ -22,7 +22,7 @@ public:
   }
   inline void initFileContentsCaseSensitive(Qt::CaseSensitivity sensitive) { m_fileContentsCaseSensitive = sensitive; }
 
-  void setSearchMode(SearchTools::SEARCH_MODE newSearchMode);
+  void setSearchMode(SearchTools::SearchModeE newSearchMode);
   void setNameFilterDisables(bool hide);
   void setFileContentsCaseSensitive(Qt::CaseSensitivity sensitive);
   void setFileNameFiltersCaseSensitive(Qt::CaseSensitivity sensitive);
@@ -53,7 +53,7 @@ private:
   QString m_nameRawString;
   QString m_contentRawText;
 
-  SearchTools::SEARCH_MODE m_searchMode{SearchTools::SEARCH_MODE::NORMAL};
+  SearchTools::SearchModeE m_searchMode{SearchTools::SearchModeE::NORMAL};
   Qt::CaseSensitivity m_nameFiltersCaseSensitive{Qt::CaseSensitivity::CaseInsensitive};
   Qt::CaseSensitivity m_fileContentsCaseSensitive{Qt::CaseSensitivity::CaseInsensitive};
   bool m_nameFilterDisableOrHide{false};  // true: disable, false: hide
