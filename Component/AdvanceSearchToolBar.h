@@ -1,41 +1,40 @@
 ﻿#ifndef ADVANCESEARCHTOOLBAR_H
 #define ADVANCESEARCHTOOLBAR_H
 
-#include "FileSystemTypeFilter.h"
+#include "TypeFilterButton.h"
+#include "SearchModeToolButton.h"
 #include "SearchCaseMatterToolButton.h"
-#include "SearchModeComboBox.h"
-
 #include "AdvanceSearchModel.h"
 #include "SearchProxyModel.h"
 
 #include <QLineEdit>
 #include <QToolBar>
+#include <QComboBox>
 
 class AdvanceSearchToolBar : public QToolBar {
- public:
+public:
   explicit AdvanceSearchToolBar(const QString& title, QWidget* parent);
-
+  ~AdvanceSearchToolBar();
   void BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel);
 
   void onSearchTextChanges();
   void onSearchEnterAndApply();
-  void onSearchModeChanged(const QString& newSearchModeText);
+  void onSearchModeChanged(SearchTools::SearchModeE searchMode);
 
   void onGetFocus() {
     m_nameFilterCB->setFocus();
     m_nameFilterCB->lineEdit()->selectAll();
   }
 
- private:
+private:
   void BindSearchProxyModel(SearchProxyModel* searchProxyModel);
   void BindSearchSourceModel(AdvanceSearchModel* searchSourceModel);
 
   QComboBox* m_nameFilterCB{nullptr};
-
   QComboBox* m_contentCB{nullptr};  // used for content search
 
-  FileSystemTypeFilter* m_typeFilterButton {nullptr};
-  SearchModeComboBox* m_searchModeComboBox {nullptr};
+  TypeFilterButton* m_searchFilterButton {nullptr};
+  SearchModeToolButton* m_searchModeBtn {nullptr};
   SearchCaseMatterToolButton* m_searchCaseButton {nullptr};
 
   SearchProxyModel* _searchProxyModel = nullptr;

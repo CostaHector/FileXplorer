@@ -4,6 +4,7 @@
 #include <QFuture>
 #include <QSignalSpy>
 
+#include "OnScopeExit.h"
 #include "FileSystemModel.h"
 #include "CustomTableView.h"
 #include "PlainTestSuite.h"
@@ -33,6 +34,7 @@ public:
   QString pathRoot5, pathSub0;
   FileSystemModel* model{nullptr};
   CustomTableView* view{nullptr};
+  const QDir::Filters INITIAL_DIR_FILTERS{QDir::Filter::NoDotAndDotDot | QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Hidden};
 private slots:
   void initTestCase() {
     QVERIFY(tDir.IsValid());
@@ -49,7 +51,7 @@ private slots:
 
     model = new (std::nothrow) FileSystemModel{view};
     QVERIFY(model != nullptr);
-    model->setFilter(QDir::Filter::NoDotAndDotDot | QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Hidden);
+    model->setFilter(INITIAL_DIR_FILTERS);
     model->sort(0, Qt::AscendingOrder);
 
     view->setModel(model);
@@ -64,9 +66,39 @@ private slots:
 
   void test_RowCountAfterPathSwitch() {
     // path switch: pathRoot5 → pathSub0 → pathRoot5
+    auto PathSwitch = [](QFileSystemModel* model, const QString &path){
+      QSignalSpy spy(model, &QFileSystemModel::directoryLoaded);
+      QModelIndex rootIndex = model->setRootPath(path);
+      return spy.wait(1000) ? model->rowCount(rootIndex) : -1;
+    };
     QCOMPARE(PathSwitch(model, pathRoot5), 5);
     QCOMPARE(PathSwitch(model, pathSub0), 0);
     QCOMPARE(PathSwitch(model, pathRoot5), 5);
+  }
+
+  void test_dirFilter_nameFilterDisables_works_ok() {
+    // precodition 1
+    const auto& allItems = mDir.entryList(INITIAL_DIR_FILTERS);
+    QCOMPARE(allItems.size(), 5);
+    // precodition 2
+    const auto& afterHideItems = mDir.entryList(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+    QCOMPARE(afterHideItems.size(), 1);
+
+    // only 1 item with this filter and hide item that don't pass the filter directly
+    QModelIndex rootIndex = model->setRootPath(pathRoot5);
+
+    ON_SCOPE_EXIT{
+      model->setFilter(INITIAL_DIR_FILTERS);
+      model->setNameFilterDisables(true);
+      QTRY_COMPARE(model->rowCount(rootIndex), 5);
+    };
+
+    model->setFilter(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
+    model->setNameFilterDisables(true);
+    QTRY_COMPARE(model->rowCount(rootIndex), 5);
+
+    model->setNameFilterDisables(false);
+    QTRY_COMPARE(model->rowCount(rootIndex), 1);
   }
 
   void test_basic_functions() {
@@ -211,17 +243,8 @@ private slots:
       QCOMPARE(model->rowCount(model->index(pathRoot5)), 5);
     }
   }
-private:
-  int PathSwitch(QFileSystemModel* model, const QString &path) {
-    QSignalSpy spy(model, &QFileSystemModel::directoryLoaded);
-    QModelIndex rootIndex = model->setRootPath(path);
-    bool waitResult{false};
-    if (spy.count() == 0) {
-      waitResult = spy.wait(1000);
-    }
-    return waitResult ? model->rowCount(rootIndex) : -1;
-  }
 
+private:
   bool Select2Files() {
     model->sort(0, Qt::AscendingOrder); // must sort every time rootpath changed
     view->clearSelection();

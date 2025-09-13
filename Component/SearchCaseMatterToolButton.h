@@ -3,20 +3,21 @@
 
 #include <QToolButton>
 #include <QAction>
-#include <QMenu>
-
-#include "SearchProxyModel.h"
 
 class SearchCaseMatterToolButton : public QToolButton {
- public:
+  Q_OBJECT
+public:
   explicit SearchCaseMatterToolButton(QWidget* parent = nullptr);
-  void BindSearchModel(SearchProxyModel* searchProxyModel);
+  ~SearchCaseMatterToolButton();
+  Qt::CaseSensitivity curNameCaseSensitive() const {return SEARCH_NAME_CASE_SENSITIVE->isChecked() ? Qt::CaseSensitivity::CaseSensitive : Qt::CaseSensitivity::CaseInsensitive; }
+  Qt::CaseSensitivity curContentCaseSensitive() const {return SEARCH_CONTENTS_CASE_SENSITIVE->isChecked() ? Qt::CaseSensitivity::CaseSensitive : Qt::CaseSensitivity::CaseInsensitive; }
 
- private:
-  SearchProxyModel* _searchProxyModel = nullptr;
-  QAction* SEARCH_NAME_CASE_SENSITIVE = new (std::nothrow) QAction("Name sensitive", this);
-  QAction* SEARCH_CONTENTS_CASE_SENSITIVE = new (std::nothrow) QAction("Content sensitive", this);
-  QMenu* m_searchCaseMenu = new QMenu{"Search case-sensitive", this};
+signals:
+  void nameCaseSensitiveChanged(Qt::CaseSensitivity newCaseSensitive);
+  void contentCaseSensitiveChanged(Qt::CaseSensitivity newCaseSensitive);
+private:
+  QAction* SEARCH_NAME_CASE_SENSITIVE{nullptr};
+  QAction* SEARCH_CONTENTS_CASE_SENSITIVE{nullptr};
 };
 
 #endif  // SEARCHCASEMATTERTOOLBUTTON_H

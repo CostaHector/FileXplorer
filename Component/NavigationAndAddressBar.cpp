@@ -38,8 +38,8 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
       "For SceneModel(plain) e.g., target\n"
       "For JsonModel(Regex) e.g., target1.*?target2");
 
-  m_fsFilter = new (std::nothrow) FileSystemTypeFilter{this};
-  CHECK_NULLPTR_RETURN_VOID(m_fsFilter)
+  m_fsFilterBtn = new (std::nothrow) TypeFilterButton{ModelFilterE::FILE_SYSTEM, this};
+  CHECK_NULLPTR_RETURN_VOID(m_fsFilterBtn)
 
   mLastNextFolderTb = new (std::nothrow) SplitToolButton{this};
   CHECK_NULLPTR_RETURN_VOID(mLastNextFolderTb)
@@ -55,7 +55,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   addSeparator();
   addWidget(mLastNextFolderTb);
   addSeparator();
-  addWidget(m_fsFilter);
+  addWidget(m_fsFilterBtn);
   addSeparator();
   addWidget(mFsSearchLE);
 
@@ -68,7 +68,14 @@ void NavigationAndAddressBar::BindFileSystemViewCallback(T_IntoNewPath IntoNewPa
   m_IntoNewPath = IntoNewPath;
   m_on_searchTextChanged = on_searchTextChanged;
   m_on_searchEnterKey = on_searchEnterKey;
-  m_fsFilter->BindFileSystemModel(_fsm);
+
+  // initial
+  _fsm->setFilter(m_fsFilterBtn->curDirFilters());
+  _fsm->setNameFilterDisables(m_fsFilterBtn->curGrayOrHideUnpassItem());
+
+  // subscribe
+  connect(m_fsFilterBtn, &TypeFilterButton::filterChanged, _fsm, &QFileSystemModel::setFilter);
+  connect(m_fsFilterBtn, &TypeFilterButton::nameFilterDisablesChanged, _fsm, &QFileSystemModel::setNameFilterDisables);
 }
 
 void NavigationAndAddressBar::InitEventWhenViewChanged() {
