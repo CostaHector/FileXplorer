@@ -11,7 +11,7 @@ public:
   using QSortFilterProxyModel::QSortFilterProxyModel;
   // only set value, no trigger filter
   void initSearchMode(SearchTools::SearchModeE newSearchMode) { m_searchMode = newSearchMode; }
-  void initNameFilterDisables(bool hide) { m_nameFilterDisableOrHide = hide; }
+  void initNameFilterDisables(bool bGrayOrHide) { m_nameFilterDisableOrHide = bGrayOrHide; }
   inline bool initFileNameFiltersCaseSensitive(Qt::CaseSensitivity sensitive) {
     m_nameFiltersCaseSensitive = sensitive;
     if (filterCaseSensitivity() != sensitive) {
@@ -23,7 +23,7 @@ public:
   inline void initFileContentsCaseSensitive(Qt::CaseSensitivity sensitive) { m_fileContentsCaseSensitive = sensitive; }
 
   void setSearchMode(SearchTools::SearchModeE newSearchMode);
-  void setNameFilterDisables(bool hide);
+  void setNameFilterDisables(bool bGrayOrHide);
   void setFileContentsCaseSensitive(Qt::CaseSensitivity sensitive);
   void setFileNameFiltersCaseSensitive(Qt::CaseSensitivity sensitive);
 

@@ -69,11 +69,7 @@ private slots:
     auto PathSwitch = [](QFileSystemModel* model, const QString &path){
       QSignalSpy spy(model, &QFileSystemModel::directoryLoaded);
       QModelIndex rootIndex = model->setRootPath(path);
-      bool waitResult{false};
-      if (spy.count() == 0) {
-        waitResult = spy.wait(1000);
-      }
-      return waitResult ? model->rowCount(rootIndex) : -1;
+      return spy.wait(1000) ? model->rowCount(rootIndex) : -1;
     };
     QCOMPARE(PathSwitch(model, pathRoot5), 5);
     QCOMPARE(PathSwitch(model, pathSub0), 0);
