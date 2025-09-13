@@ -9,7 +9,6 @@ SearchProxyModel::SearchProxyModel(QObject* parent)
 {                                    //
   m_fileContentsCaseSensitive = Configuration().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool();
   m_nameFiltersCaseSensitive = Configuration().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool();
-  m_nameFilterDisableOrHide = Configuration().value(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.v).toBool();
   const QString searchModeStr = Configuration().value(MemoryKey::ADVANCE_SEARCH_MODE.name, MemoryKey::ADVANCE_SEARCH_MODE.v).toString();
   initSearchMode(searchModeStr);
 
@@ -136,7 +135,6 @@ bool SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
 }
 
 void SearchProxyModel::setNameFilterDisables(bool hide) {
-  Configuration().setValue(MemoryKey::DISABLE_ENTRIES_DONT_PASS_FILTER.name, hide);
   initNameFilterDisables(hide);
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }

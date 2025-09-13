@@ -42,4 +42,4 @@ QString GetSearchModeStr(unsigned char searchMode) {
 QString GetDefaultSearchModeStr() {
   return GetSearchModeStr(SEARCH_MODE::REGEX);
 }
-};  // namespace SearchTools
+}  // namespace SearchTools

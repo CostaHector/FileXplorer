@@ -29,11 +29,11 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_nameFilterCB->addItem("\\.pson$");
   m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  m_typeFilterButton = new FileSystemTypeFilter{this};
-  CHECK_NULLPTR_RETURN_VOID(m_typeFilterButton)
-  m_typeFilterButton->setToolTip("Filter file types by extension");
+  m_searchFilterButton = new (std::nothrow) TypeFilterButton{ModelFilterE::ADVANCE_SEARCH, this};
+  CHECK_NULLPTR_RETURN_VOID(m_searchFilterButton)
+  m_searchFilterButton->setToolTip("Filter file types by extension");
 
-  m_searchModeComboBox = new SearchModeComboBox{this};
+  m_searchModeComboBox = new (std::nothrow) SearchModeComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_searchModeComboBox)
   m_searchModeComboBox->setToolTip("Search Mode:\n1. full match\n2. regex\n3. regex+file name");
 
@@ -54,7 +54,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
 
   addWidget(m_nameFilterCB);
   addAction(g_fileBasicOperationsActions()._FORCE_RESEARCH);
-  addWidget(m_typeFilterButton);
+  addWidget(m_searchFilterButton);
   addWidget(m_searchModeComboBox);
   addWidget(m_searchCaseButton);
   addWidget(m_contentCB);
@@ -66,11 +66,21 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
 }
 
 void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel) {
+  CHECK_NULLPTR_RETURN_VOID(searchProxyModel);
+  CHECK_NULLPTR_RETURN_VOID(searchSourceModel);
   // independant bind
   BindSearchProxyModel(searchProxyModel);
   BindSearchSourceModel(searchSourceModel);
-  // interative bind
-  m_typeFilterButton->BindFileSystemModel(_searchSourceModel, _searchProxyModel);
+
+  // initial
+  _searchSourceModel->initFilter(m_searchFilterButton->curDirFilters());
+  _searchProxyModel->initNameFilterDisables(m_searchFilterButton->curGrayOrHideUnpassItem());
+  _searchSourceModel->initIteratorFlag(m_searchFilterButton->curIteratorFlag());
+
+  // subscribe
+  connect(m_searchFilterButton, &TypeFilterButton::filterChanged, _searchSourceModel, &AdvanceSearchModel::setFilter);
+  connect(m_searchFilterButton, &TypeFilterButton::nameFilterDisablesChanged, _searchProxyModel, &SearchProxyModel::setNameFilterDisables);
+  connect(m_searchFilterButton, &TypeFilterButton::includingSubdirectoryChanged, _searchSourceModel, &AdvanceSearchModel::setIteratorFlag);
 }
 
 void AdvanceSearchToolBar::BindSearchProxyModel(SearchProxyModel* searchProxyModel) {

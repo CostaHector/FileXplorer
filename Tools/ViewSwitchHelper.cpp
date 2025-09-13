@@ -162,8 +162,6 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
           _navigation->m_advanceSearchBar->BindSearchAllModel(_view->m_searchProxyModel, _view->m_searchSrcModel);
         }
         _view->AddView(viewType, _view->m_advanceSearchView);
-        _view->m_searchSrcModel->initFilter(QDir::Filters{
-                                                          Configuration().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()});
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_searchSrcModel->setRootPath(newPath);

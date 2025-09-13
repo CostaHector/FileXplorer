@@ -7,11 +7,15 @@
 
 const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"Name", "Size", "Type", "Date", "Relative path"};
 
-AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
-  : QAbstractTableModelPub{parent},
-  m_filters{Configuration().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
-  m_iteratorFlags{bool2IteratorFlag(Configuration().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())}  //
-{
+void AdvanceSearchModel::initRootPath(const QString& path) {
+  if (m_rootPath == path) {
+    return;
+  }
+  if (!checkPathNeed(path, false)) {
+    return;
+  }
+  m_rootPath = path;
+  LOG_D("init rootPath:%s", qPrintable(m_rootPath));
 }
 
 void AdvanceSearchModel::updateSearchResultList() {
@@ -66,17 +70,6 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
   return true;
 }
 
-void AdvanceSearchModel::initRootPath(const QString& path) {
-  if (m_rootPath == path) {
-    return;
-  }
-  if (!checkPathNeed(path, false)) {
-    return;
-  }
-  m_rootPath = path;
-  LOG_D("init rootPath:%s", qPrintable(m_rootPath));
-}
-
 void AdvanceSearchModel::setRootPath(const QString& path) {
   ClearCopyAndCutDict();
   if (!checkPathNeed(path)) {
@@ -85,10 +78,6 @@ void AdvanceSearchModel::setRootPath(const QString& path) {
   initRootPath(path);
   LOG_D("set rootPath:%s", qPrintable(m_rootPath));
   updateSearchResultList();
-}
-
-void AdvanceSearchModel::initFilter(QDir::Filters initialFilters) {
-  m_filters = initialFilters;
 }
 
 void AdvanceSearchModel::setFilter(QDir::Filters newFilters) {
@@ -110,14 +99,6 @@ void AdvanceSearchModel::setRootPathAndFilter(const QString& path, QDir::Filters
   m_rootPath = path;
   m_filters = filters;
   updateSearchResultList();
-}
-
-QDirIterator::IteratorFlag AdvanceSearchModel::bool2IteratorFlag(const bool isIncludeEnabled) const {
-  return isIncludeEnabled ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags;
-}
-
-void AdvanceSearchModel::initIteratorFlag(QDirIterator::IteratorFlag initialFlags) {
-  m_iteratorFlags = initialFlags;
 }
 
 QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
