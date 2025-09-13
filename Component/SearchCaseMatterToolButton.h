@@ -8,6 +8,7 @@ class SearchCaseMatterToolButton : public QToolButton {
   Q_OBJECT
 public:
   explicit SearchCaseMatterToolButton(QWidget* parent = nullptr);
+  ~SearchCaseMatterToolButton();
   Qt::CaseSensitivity curNameCaseSensitive() const {return SEARCH_NAME_CASE_SENSITIVE->isChecked() ? Qt::CaseSensitivity::CaseSensitive : Qt::CaseSensitivity::CaseInsensitive; }
   Qt::CaseSensitivity curContentCaseSensitive() const {return SEARCH_CONTENTS_CASE_SENSITIVE->isChecked() ? Qt::CaseSensitivity::CaseSensitive : Qt::CaseSensitivity::CaseInsensitive; }
 

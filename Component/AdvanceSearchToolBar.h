@@ -20,7 +20,7 @@ class AdvanceSearchToolBar : public QToolBar {
 
   void onSearchTextChanges();
   void onSearchEnterAndApply();
-  void onSearchModeChanged(SearchTools::SEARCH_MODE searchMode);
+  void onSearchModeChanged(SearchTools::SearchModeE searchMode);
 
   void onGetFocus() {
     m_nameFilterCB->setFocus();

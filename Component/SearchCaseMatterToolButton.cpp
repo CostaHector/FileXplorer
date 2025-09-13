@@ -33,3 +33,8 @@ SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolB
     emit contentCaseSensitiveChanged(bContentCaseSenstive ? Qt::CaseSensitivity::CaseSensitive : Qt::CaseSensitivity::CaseInsensitive);
   });
 }
+
+SearchCaseMatterToolButton::~SearchCaseMatterToolButton() {
+  Configuration().setValue(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, curNameCaseSensitive() == Qt::CaseSensitivity::CaseSensitive);
+  Configuration().setValue(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, curContentCaseSensitive() == Qt::CaseSensitivity::CaseSensitive);
+}

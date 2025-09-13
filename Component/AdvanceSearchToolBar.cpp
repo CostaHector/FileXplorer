@@ -136,8 +136,8 @@ void AdvanceSearchToolBar::onSearchEnterAndApply() {
   _searchProxyModel->PrintRegexDebugMessage();
 }
 
-void AdvanceSearchToolBar::onSearchModeChanged(SearchTools::SEARCH_MODE newSearchMode) {
-  m_contentCB->setEnabled(newSearchMode == SearchTools::SEARCH_MODE::FILE_CONTENTS);
+void AdvanceSearchToolBar::onSearchModeChanged(SearchTools::SearchModeE newSearchMode) {
+  m_contentCB->setEnabled(newSearchMode == SearchTools::SearchModeE::FILE_CONTENTS);
   if (_searchProxyModel != nullptr) {
     _searchProxyModel->setSearchMode(newSearchMode);
   }

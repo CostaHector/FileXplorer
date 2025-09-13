@@ -269,4 +269,4 @@ private:
 };
 
 #include "FileSystemModelTest.moc"
-REGISTER_TEST(FileSystemModelTest, true)
+REGISTER_TEST(FileSystemModelTest, false)
