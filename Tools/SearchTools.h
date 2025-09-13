@@ -19,6 +19,6 @@ SEARCH_MODE GetSearchModeEnum(unsigned char searchMode);
 QString GetSearchModeStr(SEARCH_MODE searchMode);
 QString GetSearchModeStr(unsigned char searchMode);
 QString GetDefaultSearchModeStr();
-};  // namespace SearchTools
+}  // namespace SearchTools
 
 #endif  // SEARCHTOOLS_H
