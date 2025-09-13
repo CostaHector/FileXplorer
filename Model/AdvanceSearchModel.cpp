@@ -1,7 +1,6 @@
 ﻿#include "AdvanceSearchModel.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
-#include "MemoryKey.h"
 #include "PublicVariable.h"
 #include <QMessageBox>
 

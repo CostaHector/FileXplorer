@@ -3,8 +3,8 @@
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "FileBasicOperationsActions.h"
+#include <QCompleter>
 #include <QLayout>
-
 
 AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent)  //
   : QToolBar{title, parent}                                                      //
@@ -14,10 +14,12 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
 
   m_nameFilterCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_nameFilterCB)
-  m_nameFilterCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_nameFilterCB->setEditable(true);
   m_nameFilterCB->lineEdit()->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
   m_nameFilterCB->lineEdit()->setClearButtonEnabled(true);
+  m_nameFilterCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
+  m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+
   m_nameFilterCB->addItem(Configuration().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
   m_nameFilterCB->addItem("\\.xltd$");
   m_nameFilterCB->addItem("\\.torrent$");
@@ -28,7 +30,11 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_nameFilterCB->addItem("\\.scn$");
   m_nameFilterCB->addItem("\\.md$");
   m_nameFilterCB->addItem("\\.pson$");
-  m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+
+  QCompleter* pNameCompleter = new (std::nothrow) QCompleter{this};
+  CHECK_NULLPTR_RETURN_VOID(pNameCompleter);
+  pNameCompleter->setCaseSensitivity(Qt::CaseSensitive);
+  m_nameFilterCB->setCompleter(pNameCompleter);
 
   m_searchFilterButton = new (std::nothrow) TypeFilterButton{ModelFilterE::ADVANCE_SEARCH, this};
   CHECK_NULLPTR_RETURN_VOID(m_searchFilterButton)
@@ -43,13 +49,19 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_contentCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_contentCB)
   m_contentCB->setEditable(true);
-  m_contentCB->addItem("nonporn");
-  m_contentCB->addItem(QString{50, QChar{' '}});
-  m_contentCB->addItem(Configuration().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
   m_contentCB->lineEdit()->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
   m_contentCB->lineEdit()->setClearButtonEnabled(true);
+  m_contentCB->addItem("nonporn");
+  m_contentCB->addItem(Configuration().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
+  m_contentCB->addItem(QString{50, QChar{' '}});
+  m_contentCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_contentCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   m_contentCB->setToolTip("Search plain text file contents here");
+
+  QCompleter* pContentCompleter = new (std::nothrow) QCompleter{this};
+  CHECK_NULLPTR_RETURN_VOID(pContentCompleter);
+  pContentCompleter->setCaseSensitivity(Qt::CaseSensitive);
+  m_contentCB->setCompleter(pContentCompleter);
 
   addWidget(m_nameFilterCB);
   addAction(g_fileBasicOperationsActions()._FORCE_RESEARCH);
@@ -62,6 +74,11 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
+}
+
+AdvanceSearchToolBar::~AdvanceSearchToolBar() {
+  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, m_nameFilterCB->currentText());
+  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, m_contentCB->currentText());
 }
 
 void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel) {
@@ -77,8 +94,8 @@ void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel
 
   _searchProxyModel->initNameFilterDisables(m_searchFilterButton->curGrayOrHideUnpassItem());
   _searchProxyModel->initSearchMode(m_searchModeBtn->curSearchMode());
-  _searchProxyModel->initFileContentsCaseSensitive(m_searchCaseButton->curNameCaseSensitive());
-  _searchProxyModel->initFileNameFiltersCaseSensitive(m_searchCaseButton->curContentCaseSensitive());
+  _searchProxyModel->initFileNameFiltersCaseSensitive(m_searchCaseButton->curNameCaseSensitive());
+  _searchProxyModel->initFileContentsCaseSensitive(m_searchCaseButton->curContentCaseSensitive());
 
   // subscribe
   connect(m_searchFilterButton, &TypeFilterButton::filterChanged, _searchSourceModel, &AdvanceSearchModel::setFilter);
@@ -127,8 +144,6 @@ void AdvanceSearchToolBar::onSearchTextChanges() {
 }
 
 void AdvanceSearchToolBar::onSearchEnterAndApply() {
-  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, m_nameFilterCB->currentText());
-  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, m_contentCB->currentText());
   if (_searchProxyModel == nullptr) {
     return;
   }

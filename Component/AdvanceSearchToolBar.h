@@ -2,9 +2,8 @@
 #define ADVANCESEARCHTOOLBAR_H
 
 #include "TypeFilterButton.h"
-#include "SearchCaseMatterToolButton.h"
 #include "SearchModeToolButton.h"
-
+#include "SearchCaseMatterToolButton.h"
 #include "AdvanceSearchModel.h"
 #include "SearchProxyModel.h"
 
@@ -13,9 +12,9 @@
 #include <QComboBox>
 
 class AdvanceSearchToolBar : public QToolBar {
- public:
+public:
   explicit AdvanceSearchToolBar(const QString& title, QWidget* parent);
-
+  ~AdvanceSearchToolBar();
   void BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel);
 
   void onSearchTextChanges();
@@ -27,13 +26,11 @@ class AdvanceSearchToolBar : public QToolBar {
     m_nameFilterCB->lineEdit()->selectAll();
   }
 
-
- private:
+private:
   void BindSearchProxyModel(SearchProxyModel* searchProxyModel);
   void BindSearchSourceModel(AdvanceSearchModel* searchSourceModel);
 
   QComboBox* m_nameFilterCB{nullptr};
-
   QComboBox* m_contentCB{nullptr};  // used for content search
 
   TypeFilterButton* m_searchFilterButton {nullptr};

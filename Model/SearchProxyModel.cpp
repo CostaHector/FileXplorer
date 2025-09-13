@@ -9,8 +9,8 @@ void SearchProxyModel::setSearchMode(SearchTools::SearchModeE newSearchMode) {
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }
 
-void SearchProxyModel::setNameFilterDisables(bool hide) {
-  initNameFilterDisables(hide);
+void SearchProxyModel::setNameFilterDisables(bool bGrayOrHide) {
+  initNameFilterDisables(bGrayOrHide);
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }
 
