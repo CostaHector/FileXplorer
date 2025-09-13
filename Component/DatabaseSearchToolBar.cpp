@@ -115,8 +115,8 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   : DatabaseSearchToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
 
-  m_whereCB->addItem(QString{R"(`%1` NAME LIKE "%%" AND `%1` NAME LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
-  m_whereCB->addItem(QString{R"(`%1` NAME LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
+  m_whereCB->addItem(QString{R"(`%1` LIKE "%%" AND `%1` LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
+  m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0 AND INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(PrePathRight)));
   m_whereCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
@@ -128,6 +128,7 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   CHECK_NULLPTR_RETURN_VOID(m_tablesCB);
   m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom); // not editable
   m_tablesCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  m_tablesCB->setMaxVisibleItems(15);
   auto* tblAct = insertWidget(_QUICK_WHERE_CLAUSE_ACT, m_tablesCB);
   insertSeparator(tblAct);
   MovieDBSearchToolBar::extraSignalSubscribe();
@@ -146,11 +147,9 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
   const int defaultDropIndex = m_tablesCB->currentIndex();
   const auto msgs {QString{"There are %1 table(s) as following:\n%2"}.arg(candidates.size()).arg(candidates.join('\n'))};
   bool okUserSelect = false;
-  const QString& drpTbl = QInputDialog::getItem(this, "CONFIRM DROP? (NOT RECOVERABLE)",  //
-                                                msgs,                                     //
-                                                candidates,                               //
-                                                defaultDropIndex,                         //
-                                                false,                                    //
+  const QString& drpTbl = QInputDialog::getItem(this, "CONFIRM DROP? (NOT RECOVERABLE)", msgs, //
+                                                candidates, defaultDropIndex,                  //
+                                                false,                                         //
                                                 &okUserSelect);
   if (!okUserSelect) {
     LOG_OK_NP("[skip] Drop table", "User cancel");

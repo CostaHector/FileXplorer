@@ -5,7 +5,11 @@
 #include <QSettings>
 
 static inline QSettings& Configuration() {
+#ifndef RUNNING_UNIT_TESTS
   static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Costa", PROJECT_NAME);
+#else
+  static QSettings settings(QSettings::IniFormat, QSettings::UserScope, "TestOnly", PROJECT_NAME);
+#endif
   return settings;
 }
 
@@ -77,7 +81,7 @@ struct MemoryKey {
   static const KV SEARCH_CONTENTS_CASE_SENSITIVE;
   static const KV ADVANCE_SEARCH_LINEEDIT_VALUE;
   static const KV ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE;
-  static const KV DISABLE_ENTRIES_DONT_PASS_FILTER;
+  static const KV GRAY_ENTRIES_DONT_PASS_FILTER;
   static const KV ADVANCE_SEARCH_MODE;
 
   static const KV RENAMER_NAME_EXT_INDEPENDENT;

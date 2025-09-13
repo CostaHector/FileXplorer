@@ -1,10 +1,11 @@
 ﻿#ifndef NAVIGATIONANDADDRESSBAR_H
 #define NAVIGATIONANDADDRESSBAR_H
 
+#include <QFileSystemModel>
 #include "AddressELineEdit.h"
 #include "PathUndoRedoer.h"
 #include "PublicVariable.h"
-#include "FileSystemTypeFilter.h"
+#include "TypeFilterButton.h"
 #include "FolderNxtAndLastIterator.h"
 
 #include <QLineEdit>
@@ -64,7 +65,7 @@ public:
   PathUndoRedoer m_pathRD;
   FolderNxtAndLastIterator mFolderNxtLstIt;
   QLineEdit* mFsSearchLE{nullptr};
-  FileSystemTypeFilter* m_fsFilter{nullptr};
+  TypeFilterButton* m_fsFilterBtn{nullptr};
 
 private:
   bool onIteratorToAnotherFolderCore(bool isNext);

@@ -1,22 +1,14 @@
 ﻿#include "AdvanceSearchModel.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
-#include "MemoryKey.h"
 #include "PublicVariable.h"
 #include <QMessageBox>
 
 const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"Name", "Size", "Type", "Date", "Relative path"};
 
-AdvanceSearchModel::AdvanceSearchModel(QObject* parent)
-  : QAbstractTableModelPub{parent},
-  m_filters{Configuration().value(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()},
-  m_iteratorFlags{bool2IteratorFlag(Configuration().value(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool())}  //
-{
-}
-
 void AdvanceSearchModel::updateSearchResultList() {
   ClearRecycle();
-  decltype(m_itemsLst) newPlanetList;
+  decltype(m_itemsLst) allItemsUnderThisPath;
   QDirIterator it{m_rootPath, m_filters, m_iteratorFlags};
   QString fileName;
   const int ROOT_PATH_N = m_rootPath.size() + 1;
@@ -25,19 +17,24 @@ void AdvanceSearchModel::updateSearchResultList() {
     it.next();
     QFileInfo fi{it.fileInfo()};
     fileName = fi.fileName();
-    newPlanetList.append(FileProperty{
-        fileName, fi.size(),                                            //
-        GetFileExtension(fileName),                                     //
-        fi.lastModified(),                                              //
+    allItemsUnderThisPath.append(FileProperty{fileName, fi.size(),                                            //
+        GetFileExtension(fileName), fi.lastModified(),                  //
         RelativePath2File(ROOT_PATH_N, fi.filePath(), fileName.size())  //
     });
   }
   // C:/A/B/C
   // C:/A   file
-  LOG_D("%d item(s) find out under path [%s] with QDir::Filters[%d]", newPlanetList.size(), qPrintable(m_rootPath), int(m_filters));
+  LOG_D("%d item(s) find out under path [%s] with QDir::Filters[%d]", allItemsUnderThisPath.size(), qPrintable(m_rootPath), int(m_filters));
   beginResetModel();
-  newPlanetList.swap(m_itemsLst);
+  allItemsUnderThisPath.swap(m_itemsLst);
   endResetModel();
+}
+
+void AdvanceSearchModel::forceRefresh() {
+  if (!checkPathNeed(m_rootPath, true)) {
+    return;
+  }
+  updateSearchResultList();
 }
 
 bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory) {
@@ -45,79 +42,45 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
   // queryWhenSearchUnderLargeDirectory is most likely set to be true
   const QString& stdPath = PathTool::GetWinStdPath(path);
   if (stdPath.isEmpty()) {
-    LOG_W("reject search under empty path");
+    LOG_WARN_NP("[Abort]Search under empty path", stdPath);
     return false;
   }
   if (!QFileInfo(stdPath).isDir()) {
-    LOG_W("reject search under inexist path[%s]", qPrintable(stdPath));
+    LOG_WARN_NP("[Abort]Search under inexist path", stdPath);
     return false;
   }
   if (queryWhenSearchUnderLargeDirectory && stdPath.count('/') < 2) {  // C:/A
-    auto retBtn = QMessageBox::warning(nullptr,
-                                       "Confirm search?",              //
-                                       "large directory: " + stdPath,  //
+    auto retBtn = QMessageBox::warning(nullptr, "Confirm search(May cause lag)?",              //
+                                       "A Large Directory: " + stdPath,  //
                                        QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
-    if (retBtn == QMessageBox::StandardButton::Yes) {
-      return true;
+    if (retBtn != QMessageBox::StandardButton::Yes) {
+      LOG_INFO_NP("User cancel search under large directory(may lag)", stdPath);
+      return false;
     }
-    LOG_INFO_NP("User cancel search under large directory(may lag)", stdPath);
-    return false;
   }
   return true;
 }
 
-void AdvanceSearchModel::initRootPath(const QString& path) {
+void AdvanceSearchModel::setRootPath(const QString& path) {
+  ClearCopyAndCutDict();
+  if (!checkPathNeed(path, true)) { // first time
+    return;
+  }
   if (m_rootPath == path) {
     return;
   }
-  if (!checkPathNeed(path, false)) {
-    return;
-  }
   m_rootPath = path;
-  LOG_D("init rootPath:%s", qPrintable(m_rootPath));
-}
-
-void AdvanceSearchModel::setRootPath(const QString& path) {
-  ClearCopyAndCutDict();
-  if (!checkPathNeed(path)) {
-    return;
-  }
-  initRootPath(path);
   LOG_D("set rootPath:%s", qPrintable(m_rootPath));
   updateSearchResultList();
 }
 
-void AdvanceSearchModel::initFilter(QDir::Filters initialFilters) {
-  m_filters = initialFilters;
-}
-
 void AdvanceSearchModel::setFilter(QDir::Filters newFilters) {
   initFilter(newFilters);
-  if (!checkPathNeed(m_rootPath)) {
+  if (!checkPathNeed(m_rootPath, true)) {
     return;
   }
   updateSearchResultList();
   LOG_D("setFilter: %d", (int)m_filters);
-}
-
-void AdvanceSearchModel::setRootPathAndFilter(const QString& path, QDir::Filters filters) {
-  if (m_rootPath == path && m_filters == filters) {
-    return;
-  }
-  if (!checkPathNeed(path)) {
-    return;
-  }
-  m_rootPath = path;
-  m_filters = filters;
-  updateSearchResultList();
-}
-
-QDirIterator::IteratorFlag AdvanceSearchModel::bool2IteratorFlag(const bool isIncludeEnabled) const {
-  return isIncludeEnabled ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags;
-}
-
-void AdvanceSearchModel::initIteratorFlag(QDirIterator::IteratorFlag initialFlags) {
-  m_iteratorFlags = initialFlags;
 }
 
 QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
