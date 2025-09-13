@@ -3,13 +3,14 @@
 
 #include "TypeFilterButton.h"
 #include "SearchCaseMatterToolButton.h"
-#include "SearchModeComboBox.h"
+#include "SearchModeToolButton.h"
 
 #include "AdvanceSearchModel.h"
 #include "SearchProxyModel.h"
 
 #include <QLineEdit>
 #include <QToolBar>
+#include <QComboBox>
 
 class AdvanceSearchToolBar : public QToolBar {
  public:
@@ -19,7 +20,7 @@ class AdvanceSearchToolBar : public QToolBar {
 
   void onSearchTextChanges();
   void onSearchEnterAndApply();
-  void onSearchModeChanged(const QString& newSearchModeText);
+  void onSearchModeChanged(SearchTools::SEARCH_MODE searchMode);
 
   void onGetFocus() {
     m_nameFilterCB->setFocus();
@@ -36,7 +37,7 @@ class AdvanceSearchToolBar : public QToolBar {
   QComboBox* m_contentCB{nullptr};  // used for content search
 
   TypeFilterButton* m_searchFilterButton {nullptr};
-  SearchModeComboBox* m_searchModeComboBox {nullptr};
+  SearchModeToolButton* m_searchModeBtn {nullptr};
   SearchCaseMatterToolButton* m_searchCaseButton {nullptr};
 
   SearchProxyModel* _searchProxyModel = nullptr;
