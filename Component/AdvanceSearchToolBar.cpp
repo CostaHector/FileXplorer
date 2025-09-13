@@ -5,6 +5,7 @@
 #include "FileBasicOperationsActions.h"
 #include <QLayout>
 
+
 AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent)  //
   : QToolBar{title, parent}                                                      //
 {
@@ -33,13 +34,11 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   CHECK_NULLPTR_RETURN_VOID(m_searchFilterButton)
   m_searchFilterButton->setToolTip("Filter file types by extension");
 
-  m_searchModeComboBox = new (std::nothrow) SearchModeComboBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_searchModeComboBox)
-  m_searchModeComboBox->setToolTip("Search Mode:\n1. full match\n2. regex\n3. regex+file name");
+  m_searchModeBtn = new (std::nothrow) SearchModeToolButton{this};
+  CHECK_NULLPTR_RETURN_VOID(m_searchModeBtn)
 
   m_searchCaseButton = new SearchCaseMatterToolButton{this};
   CHECK_NULLPTR_RETURN_VOID(m_searchCaseButton)
-  m_searchCaseButton->setToolTip("Match Case Switch");
 
   m_contentCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_contentCB)
@@ -55,11 +54,11 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   addWidget(m_nameFilterCB);
   addAction(g_fileBasicOperationsActions()._FORCE_RESEARCH);
   addWidget(m_searchFilterButton);
-  addWidget(m_searchModeComboBox);
+  addWidget(m_searchModeBtn);
   addWidget(m_searchCaseButton);
   addWidget(m_contentCB);
 
-  onSearchModeChanged(m_searchModeComboBox->currentText());
+  onSearchModeChanged(m_searchModeBtn->curSearchMode());
 
   layout()->setSpacing(0);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -74,8 +73,12 @@ void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel
 
   // initial
   _searchSourceModel->initFilter(m_searchFilterButton->curDirFilters());
-  _searchProxyModel->initNameFilterDisables(m_searchFilterButton->curGrayOrHideUnpassItem());
   _searchSourceModel->initIteratorFlag(m_searchFilterButton->curIteratorFlag());
+
+  _searchProxyModel->initNameFilterDisables(m_searchFilterButton->curGrayOrHideUnpassItem());
+  _searchProxyModel->initSearchMode(m_searchModeBtn->curSearchMode());
+  _searchProxyModel->initFileContentsCaseSensitive(m_searchCaseButton->curNameCaseSensitive());
+  _searchProxyModel->initFileNameFiltersCaseSensitive(m_searchCaseButton->curContentCaseSensitive());
 
   // subscribe
   connect(m_searchFilterButton, &TypeFilterButton::filterChanged, _searchSourceModel, &AdvanceSearchModel::setFilter);
@@ -97,10 +100,11 @@ void AdvanceSearchToolBar::BindSearchProxyModel(SearchProxyModel* searchProxyMod
   connect(m_nameFilterCB->lineEdit(), &QLineEdit::returnPressed, this, &AdvanceSearchToolBar::onSearchEnterAndApply);
   connect(m_contentCB, &QComboBox::currentTextChanged, this, &AdvanceSearchToolBar::onSearchTextChanges);
   connect(m_contentCB->lineEdit(), &QLineEdit::returnPressed, this, &AdvanceSearchToolBar::onSearchEnterAndApply);
-  connect(m_searchModeComboBox, &QComboBox::currentTextChanged, this, &AdvanceSearchToolBar::onSearchModeChanged);
 
-  m_searchModeComboBox->BindSearchModel(_searchProxyModel);
-  m_searchCaseButton->BindSearchModel(_searchProxyModel);
+  connect(m_searchModeBtn, &SearchModeToolButton::searchModeChanged, this, &AdvanceSearchToolBar::onSearchModeChanged);
+
+  connect(m_searchCaseButton, &SearchCaseMatterToolButton::nameCaseSensitiveChanged, _searchProxyModel, &SearchProxyModel::setFileNameFiltersCaseSensitive);
+  connect(m_searchCaseButton, &SearchCaseMatterToolButton::contentCaseSensitiveChanged, _searchProxyModel, &SearchProxyModel::setFileContentsCaseSensitive);
 }
 
 void AdvanceSearchToolBar::BindSearchSourceModel(AdvanceSearchModel* searchSourceModel) {
@@ -132,8 +136,9 @@ void AdvanceSearchToolBar::onSearchEnterAndApply() {
   _searchProxyModel->PrintRegexDebugMessage();
 }
 
-void AdvanceSearchToolBar::onSearchModeChanged(const QString& newSearchModeText) {
-  using namespace SearchTools;
-  SEARCH_MODE newSearchMode = GetSearchModeEnum(newSearchModeText);
-  m_contentCB->setEnabled(newSearchMode == SEARCH_MODE::FILE_CONTENTS);
+void AdvanceSearchToolBar::onSearchModeChanged(SearchTools::SEARCH_MODE newSearchMode) {
+  m_contentCB->setEnabled(newSearchMode == SearchTools::SEARCH_MODE::FILE_CONTENTS);
+  if (_searchProxyModel != nullptr) {
+    _searchProxyModel->setSearchMode(newSearchMode);
+  }
 }

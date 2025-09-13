@@ -4,37 +4,34 @@
 #include "PublicTool.h"
 #include "PathTool.h"
 
-SearchProxyModel::SearchProxyModel(QObject* parent)
-  : QSortFilterProxyModel{parent}  //
-{                                    //
-  m_fileContentsCaseSensitive = Configuration().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v).toBool();
-  m_nameFiltersCaseSensitive = Configuration().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v).toBool();
-  const QString searchModeStr = Configuration().value(MemoryKey::ADVANCE_SEARCH_MODE.name, MemoryKey::ADVANCE_SEARCH_MODE.v).toString();
-  initSearchMode(searchModeStr);
+void SearchProxyModel::setSearchMode(SearchTools::SEARCH_MODE newSearchMode) {
+  initSearchMode(newSearchMode);
+  startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
+}
 
-  static const Qt::CaseSensitivity CASE_SENSITIVE_BOOL_2_ENUM[2] = {Qt::CaseInsensitive, Qt::CaseSensitive};
-  const Qt::CaseSensitivity nameCaseSensitive = CASE_SENSITIVE_BOOL_2_ENUM[(int)m_nameFiltersCaseSensitive];
-  if (filterCaseSensitivity() != nameCaseSensitive) {
-    setFilterCaseSensitivity(nameCaseSensitive);
+void SearchProxyModel::setNameFilterDisables(bool hide) {
+  initNameFilterDisables(hide);
+  startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
+}
+
+void SearchProxyModel::setFileContentsCaseSensitive(Qt::CaseSensitivity sensitive) {
+  initFileContentsCaseSensitive(sensitive);
+  startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
+}
+
+void SearchProxyModel::setFileNameFiltersCaseSensitive(Qt::CaseSensitivity sensitive) {
+  if (!initFileNameFiltersCaseSensitive(sensitive)) {
+    // already auto search started
+    return;
   }
-}
-
-void SearchProxyModel::initSearchMode(const QString& searchMode) {
-  using namespace SearchTools;
-  m_searchMode = GetSearchModeEnum(searchMode);
-}
-
-void SearchProxyModel::setSearchMode(const QString& searchMode) {
-  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_MODE.name, searchMode);
-  initSearchMode(searchMode);
   startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
 }
 
 void SearchProxyModel::PrintRegexDebugMessage() const {
   LOG_D("Search Mode: %d, file name raw[%s] caseSentive:%d, file content raw[%s] caseSentive:%d",  //
-         (int)m_searchMode,                                                                         //
-         qPrintable(m_nameRawString), (int)m_nameFiltersCaseSensitive,                              //
-         qPrintable(m_contentRawText), (int)m_fileContentsCaseSensitive);                           //
+        (int)m_searchMode,                                                                         //
+        qPrintable(m_nameRawString), (int)m_nameFiltersCaseSensitive,                              //
+        qPrintable(m_contentRawText), (int)m_fileContentsCaseSensitive);                           //
   const auto& regex = filterRegularExpression();
   const QString& nameFilterPattern = regex.pattern();
   if (!regex.isValid()) {
@@ -134,28 +131,6 @@ bool SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
   return ReturnPostOperation(false, nameModelIndex);
 }
 
-void SearchProxyModel::setNameFilterDisables(bool hide) {
-  initNameFilterDisables(hide);
-  startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
-}
-
-void SearchProxyModel::setFileContentsCaseSensitive(bool sensitive) {
-  Configuration().setValue(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, sensitive);
-  initFileContentsCaseSensitive(sensitive);
-  startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
-}
-
-void SearchProxyModel::setFileNameFiltersCaseSensitive(bool sensitive) {
-  Configuration().setValue(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, sensitive);
-  initFileNameFiltersCaseSensitive(sensitive);
-  const auto nameCaseSensitive = sensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
-  if (filterCaseSensitivity() != nameCaseSensitive) {
-    setFilterCaseSensitivity(nameCaseSensitive);
-    return;
-  }
-  startFilterWhenTextChanged(m_nameRawString, m_contentRawText);
-}
-
 bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const QString& contained) const {
   if (contained.isEmpty()) {
     return true;
@@ -163,5 +138,5 @@ bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const Q
   LOG_D("Read file [%s]", qPrintable(filePath));
   const QString& fileContents = TextReader(filePath);
   // Todo: new feature on the way: regex match, parms text is a wildcard
-  return fileContents.contains(contained, m_fileContentsCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
+  return fileContents.contains(contained, m_fileContentsCaseSensitive);
 }

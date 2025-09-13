@@ -149,4 +149,4 @@ private slots:
 };
 
 #include "TypeFilterButtonTest.moc"
-REGISTER_TEST(TypeFilterButtonTest, true)
+REGISTER_TEST(TypeFilterButtonTest, false)

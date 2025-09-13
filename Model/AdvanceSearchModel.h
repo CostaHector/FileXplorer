@@ -33,20 +33,18 @@ struct FileProperty {
 class AdvanceSearchModel : public QAbstractTableModelPub {
 public:
   using QAbstractTableModelPub::QAbstractTableModelPub;
-  void initFilter(QDir::Filters initialFilters) {m_filters = initialFilters;} // must called before initRootPath
-  void initIteratorFlag(QDirIterator::IteratorFlag initialFlags) {m_iteratorFlags = initialFlags;}  // must called before initRootPath
-  void initRootPath(const QString& path);
+  void initFilter(QDir::Filters initialFilters) {m_filters = initialFilters;} // must called before setRootPath
+  void initIteratorFlag(QDirIterator::IteratorFlag initialFlags) {m_iteratorFlags = initialFlags;}  // must called before setRootPath
+  void setRootPath(const QString& path);
 
   QDir::Filters filter() const { return m_filters; }
   const QString& rootPath() const { return m_rootPath; }
   QDir rootDirectory(const QString& /*placeHolder*/ = "") const { return QDir{rootPath()}; }
 
   void updateSearchResultList();
-  void setRootPath(const QString& path);
-  void forceRefresh() { setRootPath(m_rootPath); }
+  void forceRefresh();
 
   void setFilter(QDir::Filters newFilters);
-  void setRootPathAndFilter(const QString& path, QDir::Filters filters = QDir::Files);
 
   void setIteratorFlag(QDirIterator::IteratorFlag newFlags) {
     initIteratorFlag(newFlags);
