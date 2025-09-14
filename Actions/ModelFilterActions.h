@@ -27,7 +27,7 @@ struct ModelFilterActions: public QObject {
   QDir::Filters getCurDirFilters() const;
 
   QAction* GRAY_ENTRIES_DONT_PASS_FILTER   {nullptr};
-
+  bool getCurGrayOrHideUpassItem() const;
   QAction* INCLUDING_SUBDIRECTORIES        {nullptr};
   QDirIterator::IteratorFlag getCurIteratorFlag() const;
 

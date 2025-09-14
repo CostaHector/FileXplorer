@@ -100,7 +100,7 @@ void DatabaseSearchToolBar::onQuickWhereClause() {
 }
 
 void DatabaseSearchToolBar::subscribe() {
-  connect(m_whereCB->lineEdit(), &QLineEdit::returnPressed, this, MovieDBSearchToolBar::EmitWhereClauseChangedSignal);
+  connect(m_whereCB->lineEdit(), &QLineEdit::returnPressed, this, &MovieDBSearchToolBar::EmitWhereClauseChangedSignal);
   connect(_QUICK_WHERE_CLAUSE_ACT, &QAction::triggered, this, &MovieDBSearchToolBar::onQuickWhereClause);
 }
 

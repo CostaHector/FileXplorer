@@ -19,7 +19,6 @@ class FileOsWalker {
   const int N;
 
  private:
-  void FillByFileInfo(const QFileInfo& fi);
   const bool mSufInside;
 };
 #endif // FILEOSWALKER_H

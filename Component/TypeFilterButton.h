@@ -15,7 +15,7 @@ public:
   void EmitIncludingSubdirectoryChanged(const bool bInclude);
 
   QDir::Filters curDirFilters() const {return mFilterHelper.getCurDirFilters();}
-  bool curGrayOrHideUnpassItem() const {return mFilterHelper.GRAY_ENTRIES_DONT_PASS_FILTER->isChecked();}
+  bool curGrayOrHideUnpassItem() const {return mFilterHelper.getCurGrayOrHideUpassItem();}
   QDirIterator::IteratorFlag curIteratorFlag() const {return mFilterHelper.getCurIteratorFlag();}
 
 signals:
