@@ -7,7 +7,6 @@ class ReorderableToolBar : public QToolBar {
   Q_OBJECT
  public:
   explicit ReorderableToolBar(const QString &title, QWidget *parent = nullptr);
-  explicit ReorderableToolBar(QWidget *parent = nullptr);
   void addDraggableAction(QAction* act);
   QActionGroup* mCollectPathAgs{nullptr};
 
