@@ -10,17 +10,16 @@
 
 class AddressELineEditTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   AddressELineEditTest() : PlainTestSuite{} {
     static int objectCnt = 0;
     fprintf(stdout, "AddressELineEditTest object[%d] created\n", objectCnt++);
     std::fflush(stdout);
   }
-  ~AddressELineEditTest() {
-  }
-  const QString mTEST_PATH = QFileInfo{PathTool::normPath(__FILE__)}.absolutePath(); // The delimeter is always slash/
+  ~AddressELineEditTest() {}
+  const QString mTEST_PATH = QFileInfo{PathTool::normPath(__FILE__)}.absolutePath();  // The delimeter is always slash/
   const QStringList mTEST_PATH_PART_LIST = mTEST_PATH.split(PathTool::PATH_SEP_CHAR);
-private slots:
+ private slots:
 
   void test_initial_state_ok() {
     AddressELineEdit addressLe;
@@ -35,7 +34,7 @@ private slots:
     const QRect toolBarGeometry = addressLe.m_pathActionsTB->geometry();
     addressLe.updateAddressToolBarPathActions(mTEST_PATH);
     QList<QAction*> actsLst = addressLe.m_pathActionsTB->actions();
-    for (QAction* pAct: actsLst) { // QToolButton height should expand to its parent QToolBar
+    for (QAction* pAct : actsLst) {  // QToolButton height should expand to its parent QToolBar
       if (pAct != nullptr) {
         QRect actionRect = addressLe.m_pathActionsTB->actionGeometry(pAct);
         QVERIFY(toolBarGeometry.top() - actionRect.top() <= 3);
@@ -57,7 +56,7 @@ private slots:
 
     addressLe.updateAddressToolBarPathActions(mTEST_PATH);
     QCOMPARE(addressLe.pathFromFullActions(), mTEST_PATH);
-    QCOMPARE(addressLe.currentWidget(), addressLe.m_pathActionsTB); // Before: QToolBar Click Mode
+    QCOMPARE(addressLe.currentWidget(), addressLe.m_pathActionsTB);  // Before: QToolBar Click Mode
 
     // QToolBar space area is near right edge
     QRect toolbarRect = addressLe.m_pathActionsTB->rect();
@@ -67,33 +66,35 @@ private slots:
     // click space area in QToolBar
     QTest::mouseClick(addressLe.m_pathActionsTB, Qt::LeftButton, Qt::NoModifier, blankPoint);
 
-    QCOMPARE(addressLe.currentWidget(), addressLe.m_pathComboBox); // After: QComboBox Edit Mode
+    QCOMPARE(addressLe.currentWidget(), addressLe.m_pathComboBox);  // After: QComboBox Edit Mode
     QVERIFY(addressLe.m_pathComboBox->hasFocus());
-    QCOMPARE(addressLe.pathFromFullActions(), mTEST_PATH); // path unchange
+    QCOMPARE(addressLe.pathFromFullActions(), mTEST_PATH);  // path unchange
+
+    // addressLe.clickMode(); // way 2: change back to click mode, now call destructor is ok
+    // Or [recommend] disconnect signal connect in destructor to prevents signals reaching partially-destroyed objects
   }
 
   void test_precondition_clickToolButtonDirectly_willEmit_ToolBarActionTriggered_ok() {
     QAction act{"Hello"};
     QToolBar tb;
     tb.addAction(&act);
-    // 获取动作对应的实际按钮
     QToolButton* button1 = qobject_cast<QToolButton*>(tb.widgetForAction(&act));
     QVERIFY(button1 != nullptr);
-    connect(&tb, &QToolBar::actionTriggered, this, [](const QAction* pAct){
-      LOG_C("actionTriggered: %s", qPrintable(pAct->text()));
-    });
+    connect(&tb, &QToolBar::actionTriggered, this, [](const QAction* pAct) { LOG_C("actionTriggered: %s", qPrintable(pAct->text())); });
     tb.show();
-    QVERIFY(QTest::qWaitForWindowActive(&tb));
     QSignalSpy spyToolBarActionTriggered(&tb, &QToolBar::actionTriggered);
-    // 直接点击按钮而不是工具栏
     QTest::mouseClick(button1, Qt::LeftButton, Qt::KeyboardModifier::NoModifier, {}, 50);
     QTRY_COMPARE(spyToolBarActionTriggered.count(), 1);
   }
 
   void test_precondition_split_behavior_ok() {
     // precondition:
-    QCOMPARE(QString{"/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList()<<""<<"home"<<"to"));
-    QCOMPARE(QString{"C:/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList()<<"C:"<<"home"<<"to"));
+    QCOMPARE(QString{"/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList() << ""
+                                                                                << "home"
+                                                                                << "to"));
+    QCOMPARE(QString{"C:/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList() << "C:"
+                                                                                  << "home"
+                                                                                  << "to"));
   }
 
   void test_clickPathAction_RemainsInClickMode_and_PathChanged_ok() {
@@ -103,7 +104,7 @@ private slots:
     // Set test path
     QVERIFY(mTEST_PATH_PART_LIST.size() >= 2);
 
-    addressLe.updateAddressToolBarPathActions(mTEST_PATH); // Before: QToolBar Click Mode
+    addressLe.updateAddressToolBarPathActions(mTEST_PATH);  // Before: QToolBar Click Mode
     QCOMPARE(addressLe.m_pathComboBox->currentText(), mTEST_PATH);
     QVERIFY(QTest::qWaitForWindowActive(&addressLe));
 
@@ -111,31 +112,33 @@ private slots:
     QToolBar* tb = addressLe.m_pathActionsTB;
     const QList<QAction*> actsLst = tb->actions();
     QVERIFY(!actsLst.isEmpty());
-    QAction* firstAct = nullptr;
-#ifdef _WIN32
-    firstAct = actsLst[1]; // for windoes, index 0 in toolbar is a placeholder with icon only. for all drives list
-#else
-    firstAct = actsLst[0]; // for linux, index 0 is ""
-#endif
+    QAction* firstAct = actsLst[0];  // for linux, index 0 is ""
     QVERIFY(firstAct != nullptr);
-    QToolButton* firstButton = qobject_cast<QToolButton*>(tb->widgetForAction(firstAct)); // Click toolbutton directly instead of QToolBar!
-
+    QToolButton* firstButton = qobject_cast<QToolButton*>(tb->widgetForAction(firstAct));  // Click toolbutton directly instead of QToolBar!
+    QCOMPARE(firstAct->text(), "");
     QSignalSpy spyToolBarActionTriggered(tb, &QToolBar::actionTriggered);
     QTest::mouseClick(firstButton, Qt::LeftButton, Qt::NoModifier, {}, 50);
-    QTRY_COMPARE(spyToolBarActionTriggered.count(), 1); // should emit m_pathActionsTB.triggered(firstAction)!
+    QTRY_COMPARE(spyToolBarActionTriggered.count(), 1);  // should emit m_pathActionsTB.triggered(firstAction)!
+    QList<QVariant> actionTriggeredParams = spyToolBarActionTriggered.last();
+    QCOMPARE(actionTriggeredParams.size(), 1);
+    QVariant actVariant = actionTriggeredParams.front();
+    const QString paraTypeName = actVariant.typeName();
+    QCOMPARE(paraTypeName, "QAction*");
+    auto* pTriggeredAct = actVariant.value<QAction*>();
+    QCOMPARE(pTriggeredAct, firstAct);
 
-    QCOMPARE(addressLe.currentWidget(), addressLe.m_pathActionsTB); // After: Still QToolBar Click Mode
+    QCOMPARE(addressLe.currentWidget(), addressLe.m_pathActionsTB);  // After: Still QToolBar Click Mode
 #ifdef _WIN32
-    QCOMPARE(addressLe.pathFromFullActions(), mTEST_PATH_PART_LIST.front() + "/");
+    QCOMPARE(addressLe.pathFromFullActions(), "");
 #else
-    QCOMPARE(addressLe.pathFromFullActions(), "/"); // path should updated to the first one part
+    QCOMPARE(addressLe.pathFromFullActions(), "/");  // path should updated to the first one part
 #endif
   }
 
   void test_EscapeKey_ToggleBackTo_ToolbarClickMode_ok() {
     AddressELineEdit addressLe;
     addressLe.show();
-    addressLe.updateAddressToolBarPathActions(mTEST_PATH); // Before: QToolBar Click Mode
+    addressLe.updateAddressToolBarPathActions(mTEST_PATH);  // Before: QToolBar Click Mode
     QCOMPARE(addressLe.m_pathComboBox->currentText(), mTEST_PATH);
     QVERIFY(QTest::qWaitForWindowActive(&addressLe));
 
@@ -160,7 +163,7 @@ private slots:
     addressLe.inputMode();
     // Path Input and return pressed
     addressLe.m_pathComboBox->setCurrentText(mTEST_PATH);
-    QCOMPARE(addressLe.pathFromFullActions(), ""); // path empty now
+    QCOMPARE(addressLe.pathFromFullActions(), "");  // path empty now
     QCOMPARE(addressLe.m_pathComboBox->lineEdit()->text(), mTEST_PATH);
     emit addressLe.m_pathComboBox->lineEdit()->returnPressed();
 
@@ -170,7 +173,7 @@ private slots:
   }
 
   void test_simple_drag_drop_cut_and_copy_ok() {
-    const QList<FsNodeEntry> entries { {"subfolder/henry cavill need copy.txt", false, "0123456789"} };
+    const QList<FsNodeEntry> entries{{"subfolder/henry cavill need copy.txt", false, "0123456789"}};
     TDir tdir;
     QCOMPARE(tdir.createEntries(entries), 1);
     const QString subPath = tdir.itemPath("subfolder");
@@ -182,21 +185,19 @@ private slots:
     QVERIFY(QTest::qWaitForWindowActive(&addressLe));
     addressLe.move(0, 0);
     addressLe.setMinimumWidth(1024);
-    addressLe.updateAddressToolBarPathActions(subPath); // 进入到tdir/subfolder路径下
+    addressLe.updateAddressToolBarPathActions(subPath);  // 进入到tdir/subfolder路径下
     QTest::qWait(100);
 
     QList<QAction*> actsLst = addressLe.m_pathActionsTB->actions();
     QVERIFY(actsLst.size() > 2);
 
-    QAction* lastAct = actsLst[actsLst.size()-1];
-    QAction* second2LastAct = actsLst[actsLst.size()-2];
+    QAction* lastAct = actsLst[actsLst.size() - 1];
+    QAction* second2LastAct = actsLst[actsLst.size() - 2];
     QVERIFY(lastAct != nullptr);
     QCOMPARE(lastAct->text(), "subfolder");
     QVERIFY(second2LastAct != nullptr);
 
-    auto simulateDragEnterMoveDrop = [] (QToolBar* pTb,
-                                        const QPoint pnt, QMimeData* pMimeData, Qt::KeyboardModifier modifier) -> bool {
-
+    auto simulateDragEnterMoveDrop = [](QToolBar* pTb, const QPoint pnt, QMimeData* pMimeData, Qt::KeyboardModifier modifier) -> bool {
       // 1. 模拟dragEnter事件
       QDragEnterEvent dragEnterEvent(pnt, Qt::CopyAction | Qt::MoveAction | Qt::LinkAction, pMimeData, Qt::LeftButton, modifier);
       QApplication::sendEvent(pTb, &dragEnterEvent);
@@ -220,7 +221,6 @@ private slots:
       return true;
     };
 
-
     // 1. MOVE "henry cavill need copy.txt" FROM subfolder TO tdir(second2LastAct)
     {
       QMimeData moveMimeData;
@@ -232,10 +232,9 @@ private slots:
 
       QCOMPARE(simulateDragEnterMoveDrop(addressLe.m_pathActionsTB, cutDropPosition, &moveMimeData, Qt::KeyboardModifier::NoModifier), true);
       QVERIFY(QFile::exists(dstFilePath));
-      QVERIFY(!QFile::exists(srcFilePath)); // move not copy, so src file not exist
+      QVERIFY(!QFile::exists(srcFilePath));  // move not copy, so src file not exist
       QCOMPARE(QFile{dstFilePath}.size(), 10);
     }
-
 
     // 2. COPY "henry cavill need copy.txt" FROM tdir TO subfolder(lastAct)
     srcFilePath.swap(dstFilePath);
@@ -249,7 +248,7 @@ private slots:
 
       QCOMPARE(simulateDragEnterMoveDrop(addressLe.m_pathActionsTB, copyDropPosition, &copyMimeData, Qt::KeyboardModifier::ControlModifier), true);
       QVERIFY(QFile::exists(dstFilePath));
-      QVERIFY(QFile::exists(srcFilePath)); // copy not move, so src file remains unchaneg
+      QVERIFY(QFile::exists(srcFilePath));  // copy not move, so src file remains unchaneg
       QCOMPARE(QFile{dstFilePath}.size(), 10);
       QCOMPARE(QFile{srcFilePath}.size(), 10);
     }

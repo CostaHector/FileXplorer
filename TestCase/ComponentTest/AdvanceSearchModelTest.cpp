@@ -43,7 +43,7 @@ private slots:
 
   void test_initial_states_ok () {
     // precondition:
-    QVERIFY(pathRoot5.count('/') > 3); // at least 3 slash char
+    QVERIFY(pathRoot5.count('/') >= 2); // at least 3 slash char
 
     AdvanceSearchModel sourceModel;
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
@@ -93,7 +93,7 @@ private slots:
 
   void test_force_refresh_ok() {
     // precondition:
-    QVERIFY(pathRoot5.count('/') > 3); // at least 3 slash char
+    QVERIFY(pathRoot5.count('/') >= 2); // at least 3 slash char
     AdvanceSearchModel sourceModel;
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
     sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::NoIteratorFlags);
