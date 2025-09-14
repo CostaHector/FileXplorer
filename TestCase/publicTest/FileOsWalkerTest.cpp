@@ -1,8 +1,8 @@
-﻿#include <QtTest>
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
+#include <QtTest>
+#include "FileOsWalker.h"
 #include "PlainTestSuite.h"
 #include "TDir.h"
-#include "FileOsWalker.h"
 
 class FileOsWalkerTest : public PlainTestSuite {
   Q_OBJECT
@@ -77,6 +77,23 @@ class FileOsWalkerTest : public PlainTestSuite {
     QCOMPARE(fow.completeNames, completeNames);
     QCOMPARE(fow.suffixs, suffixs);
     QCOMPARE(fow.isFiles, isFiles);
+  }
+
+  void sort_by_ascii_ascending_casesensitive_platform_independent_ok() {
+    const QList<FsNodeEntry> lst{{"Z/abc.txt", false, "2"}, //
+                                 {"Z/Ability Dictionary.txt", false, "1"}, //
+                                 {"a", true, ""}};
+    TDir tempDir;
+    QCOMPARE(tempDir.createEntries(lst), 3);
+    bool sufInside = true;
+    FileOsWalker fow{tempDir.path(), sufInside};
+    bool includingSub = true;
+    fow({"Z", "a"}, includingSub);
+
+    QCOMPARE(fow.relToNames, (QStringList{"", "Z", "Z", ""}));
+    QCOMPARE(fow.completeNames, (QStringList{"Z", "Ability Dictionary.txt", "abc.txt", "a"}));
+    QCOMPARE(fow.suffixs, (QStringList{"", "", "", ""}));
+    QCOMPARE(fow.isFiles, (QList<bool>{false, true, true, false}));
   }
 };
 

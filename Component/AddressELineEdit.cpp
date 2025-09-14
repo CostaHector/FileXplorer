@@ -51,6 +51,12 @@ AddressELineEdit::AddressELineEdit(QWidget* parent) : QStackedWidget{parent} {
   setAcceptDrops(true);
 }
 
+AddressELineEdit::~AddressELineEdit() {
+  if (mFocusChangedConn) {
+    QStackedWidget::disconnect(mFocusChangedConn);
+  }
+}
+
 auto AddressELineEdit::onPathActionTriggered(const QAction* cursorAt) -> void {
   const QString& rawPath = pathFromCursorAction(cursorAt);
   const QString fullPth {PathTool::StripTrailingSlash(rawPath)};
@@ -83,13 +89,9 @@ void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
 
 auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   const QString& pth = QDir::fromNativeSeparators(path);
-#ifdef WIN32
   if (!pth.isEmpty() && !QFile::exists(pth)) {
-#else
-  if (!QFile::exists(pth)) {
-#endif
     m_pathComboBox->setCurrentText(pth);
-    LOG_ERR_NP("Path not exist", pth);
+    LOG_ERR_NP("Path not empty but not exist", pth);
     return false;
   }
   const QFileInfo fi{pth};
@@ -108,7 +110,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
 auto AddressELineEdit::subscribe() -> void {
   connect(m_pathActionsTB, &QToolBar::actionTriggered, this, &AddressELineEdit::onPathActionTriggered);
   connect(m_pathComboBox->lineEdit(), &QLineEdit::returnPressed, this, &AddressELineEdit::onReturnPressed);
-  connect(m_pathComboBox, &PathComboBox::focusChanged, this, &AddressELineEdit::onFocusChange);
+  mFocusChangedConn = connect(m_pathComboBox, &PathComboBox::focusChanged, this, &AddressELineEdit::onFocusChange);
 }
 
 auto AddressELineEdit::onFocusChange(bool hasFocus) -> void {
@@ -120,11 +122,11 @@ auto AddressELineEdit::onFocusChange(bool hasFocus) -> void {
 }
 
 auto AddressELineEdit::clickMode() -> void {
-  setCurrentWidget(m_pathActionsTB);
+    setCurrentWidget(m_pathActionsTB);
 }
 
 auto AddressELineEdit::inputMode() -> void {
-  setCurrentWidget(m_pathComboBox);
+    setCurrentWidget(m_pathComboBox);
 }
 
 void AddressELineEdit::mousePressEvent(QMouseEvent* event) {

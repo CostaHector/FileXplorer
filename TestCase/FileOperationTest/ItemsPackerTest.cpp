@@ -41,7 +41,9 @@ private slots:
 
     QVERIFY(packer.StartToRearrange());
     QVERIFY(tDir.exists("H.C."));
+#ifdef _WIN32
     QVERIFY(tDir.exists("H.C")); // file-system thought that trailing dot can be chopped
+#endif
     QVERIFY(tDir.exists("H.C./H.C..json"));
     QVERIFY(tDir.exists("H.C./H.C..jpg"));
 
