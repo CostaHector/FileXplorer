@@ -144,7 +144,7 @@ private slots:
     QCOMPARE(pTriggeredAct, firstAct);
 
     QCOMPARE(addressLe.currentWidget(), addressLe.m_pathActionsTB);  // After: Still QToolBar Click Mode
-    QCOMPARE(addressLe.m_pathComboBox->currentText(), ""); // pathFromFullActions will get "//"=>"/"
+    QCOMPARE(addressLe.m_pathComboBox->currentText(), "");
     QCOMPARE(addressLe.pathFromFullActions(), "");
   }
 
