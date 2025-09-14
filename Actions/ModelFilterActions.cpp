@@ -98,6 +98,10 @@ QDir::Filters ModelFilterActions::getCurDirFilters() const {
   return ansFilterFlags;
 }
 
+bool ModelFilterActions::getCurGrayOrHideUpassItem() const  {
+  return GRAY_ENTRIES_DONT_PASS_FILTER->isChecked();
+}
+
 QDirIterator::IteratorFlag ModelFilterActions::getCurIteratorFlag() const {
   if (mModelE != ModelFilterE::ADVANCE_SEARCH) {
     LOG_W("%s not support iterator flag", c_str());

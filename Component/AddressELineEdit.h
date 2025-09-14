@@ -22,6 +22,7 @@ class AddressELineEdit : public QStackedWidget {
   Q_OBJECT
  public:
   explicit AddressELineEdit(QWidget* parent = nullptr);
+  ~AddressELineEdit();
 
   inline QString pathFromLineEdit() const {  //
     return PathTool::StripTrailingSlash(PathTool::normPath(m_pathComboBox->currentText()));
@@ -79,6 +80,7 @@ class AddressELineEdit : public QStackedWidget {
   void updateAddressToolBarPathActions(const QString& newPath);
 
  private:
+  QMetaObject::Connection mFocusChangedConn;
   QToolBar* m_pathActionsTB{nullptr};
   PathComboBox* m_pathComboBox{nullptr};
   static const QString RELEASE_HINT_MSG;

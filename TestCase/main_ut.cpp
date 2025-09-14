@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
   if (failedCnt != 0) {
     fprintf(stderr, "\n----------Following %d/%d TEST(s) Failed (%d skipped)----------\n", failedCnt, shouldExecCnt, skippedCnt);
     for (int i = 0; i < failedCnt; ++i) {
-      fprintf(stderr, "%3d. %s", i+1, qPrintable(failedTestCaseNames[i]));
+      fprintf(stderr, "%3d. %s\n", i+1, qPrintable(failedTestCaseNames[i]));
     }
     fprintf(stderr, "\n----------Following %d/%d TEST(s) Failed (%d skipped)----------\n", failedCnt, shouldExecCnt, skippedCnt);
     fflush(stderr);
