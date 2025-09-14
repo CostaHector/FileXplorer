@@ -47,15 +47,6 @@ ReorderableToolBar::ReorderableToolBar(const QString& title, QWidget* parent)  /
   mCollectPathAgs->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 }
 
-ReorderableToolBar::ReorderableToolBar(QWidget* parent)  //
-    : QToolBar{parent}                                   //
-{
-  setAcceptDrops(true);
-  mCollectPathAgs = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(mCollectPathAgs);
-  mCollectPathAgs->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-}
-
 void ReorderableToolBar::actionEvent(QActionEvent* event) {
   QToolBar::actionEvent(event);
   if (event->type() != QEvent::ActionAdded) {

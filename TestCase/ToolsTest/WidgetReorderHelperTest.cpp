@@ -1,4 +1,4 @@
-﻿#include <QCoreApplication>
+#include <QCoreApplication>
 #include <QtTest>
 #include "PlainTestSuite.h"
 #include "WidgetReorderHelper.h"
@@ -37,9 +37,9 @@ QStringList GetLabelTextsFromToolBar(const QToolBar& toolbar) {
 
 class WidgetReorderHelperTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   WidgetReorderHelperTest() : PlainTestSuite{} {}
- private slots:
+private slots:
   void test_move_element_index_out_of_bound_skip() {
     QVector<int> vEmpty;
     const QVector<int> expectEmptyVec{vEmpty};          // should remains
@@ -157,6 +157,12 @@ class WidgetReorderHelperTest : public PlainTestSuite {
 
       QCOMPARE(MoveWidgetAtFromIndexInFrontOfDestIndex(2, 0, layout), true);  // move to the first (push front)
       QCOMPARE(GetLabelTextsFromBoxLayout(layout), (QStringList{"1", "2", "0"}));
+
+      // extra test: out of bound
+      QCOMPARE(MoveWidgetAtFromIndexInFrontOfDestIndex(-1, 0, layout), false);   // fromIndex
+      QCOMPARE(MoveWidgetAtFromIndexInFrontOfDestIndex(3, 0, layout), false);    // fromIndex
+      QCOMPARE(MoveWidgetAtFromIndexInFrontOfDestIndex(0, -1, layout), false);   // destIndex
+      QCOMPARE(MoveWidgetAtFromIndexInFrontOfDestIndex(0, 4, layout), false);    // destIndex
     }
   }
 
@@ -212,4 +218,4 @@ class WidgetReorderHelperTest : public PlainTestSuite {
 };
 
 #include "WidgetReorderHelperTest.moc"
-REGISTER_TEST(WidgetReorderHelperTest, false)
+REGISTER_TEST(WidgetReorderHelperTest, true)

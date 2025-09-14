@@ -58,6 +58,7 @@ file(GLOB SOURCES
     publicTest/*.cpp
     pubTestTool/*.cpp
     RenameTest/*.cpp
+    ToolsTest/*.cpp
 )
 
 list(LENGTH SOURCES src_cpp_count)
@@ -65,7 +66,6 @@ message("\n> ${src_cpp_count} file(s) found in SOURCES, there are as follows:")
 foreach(srv_file ${SOURCES})
     message("${srv_file}")
 endforeach()
-
 
 set(SRV_HEADER_PATH
     ../Actions
