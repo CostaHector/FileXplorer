@@ -13,18 +13,6 @@ QString PathTool::GetPathByApplicationDirPath(const QString& relativePath) {
   return QDir::cleanPath(appDir.absoluteFilePath(relativePath));
 }
 
-QString PathTool::StripTrailingSlash(QString path) {
-  // drive letter will be kept while trailing path seperator will be trunc
-  // i.e.,
-  // "XX:/A/"  -> "XX:/A" and "XX:/" -> same
-  // "/home/user/" ->"/home/user" and "/" -> same
-#ifdef WIN32
-  return (path.size() > 2 and path[path.size() - 2] != ':' and path.back() == PATH_SEP_CHAR) ? path.chopped(1) : path;
-#else
-  return (path.size() > 1 and path.back() == PATH_SEP_CHAR) ? path.chopped(1) : path;
-#endif
-}
-
 QString PathTool::linkPath(const QString& localPath) {
 #ifdef _WIN32
   return "file:///" + localPath;  // file:///C:/to/path
@@ -63,7 +51,7 @@ QString PathTool::absolutePath(const QString& fullPath) {
   if (fullPath.size() > 1 && fullPath.back() == '/') {
     noSingleTrailingSlash.chop(1);
   }
-#ifdef WIN32
+#ifdef _WIN32
   int end = noSingleTrailingSlash.lastIndexOf('/');
   return end == -1 ? "" : noSingleTrailingSlash.left(end);
 #else

@@ -7,7 +7,7 @@
 #include <QStorageInfo>
 #include <QProcess>
 
-#ifndef WIN32
+#ifndef _WIN32
 namespace MountHelper{
 
 QString ExtractGuidFromVolumeName(const QString& volume) { return {}; }
