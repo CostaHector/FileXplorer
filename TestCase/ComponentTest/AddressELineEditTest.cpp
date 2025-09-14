@@ -10,7 +10,7 @@
 
 class AddressELineEditTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   AddressELineEditTest() : PlainTestSuite{} {
     static int objectCnt = 0;
     fprintf(stdout, "AddressELineEditTest object[%d] created\n", objectCnt++);
@@ -19,7 +19,23 @@ class AddressELineEditTest : public PlainTestSuite {
   ~AddressELineEditTest() {}
   const QString mTEST_PATH = QFileInfo{PathTool::normPath(__FILE__)}.absolutePath();  // The delimeter is always slash/
   const QStringList mTEST_PATH_PART_LIST = mTEST_PATH.split(PathTool::PATH_SEP_CHAR);
- private slots:
+private slots:
+
+  void test_NormToolBarActionPath_ok() {
+#ifdef _WIN32
+    // Disk A to Disk Z
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/A:"),  "A:");
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/C:"),  "C:");
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/Z:"),  "Z:");
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/XX:"), "XX:");
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath(""), ""); // "" in windows is root
+#else
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath(""), "");
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/"), "/");
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/home"), "/home");
+    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/home/user"), "/home/user");
+#endif
+  }
 
   void test_initial_state_ok() {
     AddressELineEdit addressLe;
@@ -128,11 +144,8 @@ class AddressELineEditTest : public PlainTestSuite {
     QCOMPARE(pTriggeredAct, firstAct);
 
     QCOMPARE(addressLe.currentWidget(), addressLe.m_pathActionsTB);  // After: Still QToolBar Click Mode
-#ifdef _WIN32
+    QCOMPARE(addressLe.m_pathComboBox->currentText(), "");
     QCOMPARE(addressLe.pathFromFullActions(), "");
-#else
-    QCOMPARE(addressLe.pathFromFullActions(), "/");  // path should updated to the first one part
-#endif
   }
 
   void test_EscapeKey_ToggleBackTo_ToolbarClickMode_ok() {

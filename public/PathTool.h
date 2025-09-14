@@ -49,7 +49,6 @@ inline QString GetWinStdPath(const QString& path) {
 }
 QString GetPathByApplicationDirPath(const QString& relativePath);
 
-QString StripTrailingSlash(QString path);
 QString linkPath(const QString& localPath);
 QString localPath(const QString& linkPath);
 QString sysPath(QString fullPath);

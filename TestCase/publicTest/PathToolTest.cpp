@@ -35,7 +35,7 @@ class PathToolTest : public PlainTestSuite {
   }
 
   void test_GetWinStdPath() {
-#ifdef WIN32
+#ifdef _WIN32
     QCOMPARE(GetWinStdPath("C:"), "C:/");
     QCOMPARE(GetWinStdPath("X:"), "X:/");
     QCOMPARE(GetWinStdPath("F1:"), "F1:/");
@@ -43,20 +43,6 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE(GetWinStdPath("/"), "/");
     QCOMPARE(GetWinStdPath("/home"), "/home");
 #endif
-  }
-  void test_StripTrailingSlash() {
-#ifdef _WIN32
-    // Disk A to Disk Z
-    QCOMPARE(StripTrailingSlash("A:/"), "A:/");
-    QCOMPARE(StripTrailingSlash("C:/"), "C:/");
-    QCOMPARE(StripTrailingSlash("Z:/"), "Z:/");
-    QCOMPARE(StripTrailingSlash("XX:/A/"), "XX:/A");
-    QCOMPARE(StripTrailingSlash("XX:/"), "XX:/");
-    QCOMPARE(StripTrailingSlash("XX:"), "XX:");
-#endif
-    QCOMPARE(StripTrailingSlash("/home/user/"), "/home/user");
-    QCOMPARE(StripTrailingSlash("/home/user"), "/home/user");
-    QCOMPARE(StripTrailingSlash("/"), "/");
   }
 
   void test_linkAndLocalPath() {
@@ -268,14 +254,14 @@ class PathToolTest : public PlainTestSuite {
   }
 
   void test_isLinuxRootOrWinEmpty() {
-#ifdef WIN32
+#ifdef _WIN32
     QVERIFY(isLinuxRootOrWinEmpty(""));
 #else
     QVERIFY(isLinuxRootOrWinEmpty("/"));
 #endif
   }
   void test_isRootOrEmpty() {
-#ifdef WIN32
+#ifdef _WIN32
     QVERIFY(isRootOrEmpty(""));
     QVERIFY(isRootOrEmpty("C:/"));
     QVERIFY(!isRootOrEmpty("C:/home"));

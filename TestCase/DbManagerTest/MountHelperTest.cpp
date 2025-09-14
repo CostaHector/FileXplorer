@@ -11,7 +11,7 @@ class MountHelperTest : public PlainTestSuite {
   MountHelperTest() : PlainTestSuite{} {}
  private slots:
 
-#ifdef WIN32
+#ifdef _WIN32
   void test_getGuid2Label() {
     const auto& guid2Label = GetGuid2LabelMap();
     QVERIFY2(guid2Label.size() > 0, "at least 1 volume find");
