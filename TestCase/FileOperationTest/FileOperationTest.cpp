@@ -379,7 +379,7 @@ class FileOperationTest : public PlainTestSuite {
     const QString fileNameATXTDifferInCase = "A.TXT";
     RETURN_TYPE retEle = FileOperation::rename(workPath, "b.txt", fileNameATXTDifferInCase);
 
-#ifdef WIN32
+#ifdef _WIN32
     QCOMPARE(retEle.ret, ErrorCode::DST_FILE_OR_PATH_ALREADY_EXIST);
     QCOMPARE(retEle.isRecoverable(), false);
     QCOMPARE(dir.entryList(QDir::Filter::Files, QDir::SortFlag::Name), (QStringList{"a.txt", "b.txt"}));
@@ -468,7 +468,7 @@ class FileOperationTest : public PlainTestSuite {
 
     const QString workPath{dir.path()};
     RETURN_TYPE retEle = FileOperation::rename(workPath, "a", "b");
-#ifdef WIN32
+#ifdef _WIN32
     QCOMPARE(retEle.ret, ErrorCode::DST_FILE_OR_PATH_ALREADY_EXIST);
     QCOMPARE(dir.entryList(QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name), (QStringList{"B", "a"}));
 #else
@@ -485,7 +485,7 @@ class FileOperationTest : public PlainTestSuite {
 
     const QString workPath{dir.path()};
     RETURN_TYPE retEle = FileOperation::rename(workPath, "a", "B");
-#ifdef WIN32
+#ifdef _WIN32
     QCOMPARE(retEle.ret, ErrorCode::DST_FILE_OR_PATH_ALREADY_EXIST);
     QCOMPARE(dir.entryList(QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name), (QStringList{"a", "b"}));
 #else
