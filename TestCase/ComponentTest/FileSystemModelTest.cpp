@@ -13,8 +13,6 @@
 class FileSystemModelTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  FileSystemModelTest(): PlainTestSuite{} {
-  }
   ~FileSystemModelTest() {
     if (view != nullptr) {
       delete view;
@@ -38,13 +36,12 @@ public:
 private slots:
   void initTestCase() {
     QVERIFY(tDir.IsValid());
-
     pathRoot5 = tDir.path();
+    QCOMPARE(tDir.createEntries(nodeEntries), nodeEntries.size());
+
     mDir = QDir{pathRoot5};
     QVERIFY(mDir.exists());
     pathSub0 = mDir.absoluteFilePath("Chris Hemsworth");
-
-    QCOMPARE(tDir.createEntries(nodeEntries), nodeEntries.size());
 
     view = new (std::nothrow) CustomTableView{"FileSystemTableView"};
     QVERIFY(view != nullptr);
@@ -64,16 +61,51 @@ private slots:
     tDir.remove();
   }
 
-  void test_RowCountAfterPathSwitch() {
+  void test_ToggleBetweenUniquePath_RowCountCorrect() {
     // path switch: pathRoot5 → pathSub0 → pathRoot5
     auto PathSwitch = [](QFileSystemModel* model, const QString &path){
       QSignalSpy spy(model, &QFileSystemModel::directoryLoaded);
       QModelIndex rootIndex = model->setRootPath(path);
       return spy.wait(1000) ? model->rowCount(rootIndex) : -1;
     };
+    // precondition
+    QVERIFY(model->rootPath() != pathRoot5);
+
     QCOMPARE(PathSwitch(model, pathRoot5), 5);
+    QCOMPARE(model->rootPath(), pathRoot5);
+
     QCOMPARE(PathSwitch(model, pathSub0), 0);
+    QCOMPARE(model->rootPath(), pathSub0);
+
     QCOMPARE(PathSwitch(model, pathRoot5), 5);
+    QCOMPARE(model->rootPath(), pathRoot5);
+  }
+
+  void reenterSamePathTwice_RowCountCorrect() {
+    // precondition
+    QString currentValidPath = model->rootPath();
+    QVERIFY(currentValidPath != "");
+    QVERIFY(QFileInfo{currentValidPath}.isDir());
+    QModelIndex rootIndex;
+
+    QSignalSpy renterSpy(model, &QFileSystemModel::directoryLoaded);
+    rootIndex = model->setRootPath(currentValidPath);
+    QCOMPARE(renterSpy.wait(1000), false); // reenter(path unchange) directoryLoaded signal should not be emit
+    QCOMPARE(renterSpy.count(), 0);
+
+    QSignalSpy uniqueSpy(model, &QFileSystemModel::directoryLoaded);
+    rootIndex = model->setRootPath("");
+    rootIndex = model->setRootPath(currentValidPath);
+    QCOMPARE(uniqueSpy.wait(1000), true); // path changed directoryLoaded signal should not be emit
+    QVERIFY(uniqueSpy.count() >= 1);
+
+    QList<QVariant> dirloadedParams = uniqueSpy.last();
+    QCOMPARE(dirloadedParams.size(), 1);
+    QCOMPARE(dirloadedParams[0].toString(), currentValidPath);
+
+    QDir curDir{currentValidPath, "", QDir::SortFlag::NoSort, model->filter()};
+    QStringList itemsLst = curDir.entryList();
+    QCOMPARE(itemsLst.size(), model->rowCount(rootIndex));
   }
 
   void test_dirFilter_nameFilterDisables_works_ok() {
@@ -216,9 +248,7 @@ private slots:
       QSignalSpy spy(model, &QFileSystemModel::directoryLoaded);
       QModelIndex rootIndex = model->setRootPath(pathRoot5);
       view->setRootIndex(rootIndex);
-      if (spy.count() == 0) {
-        QVERIFY(spy.wait(1000));
-      }
+      QVERIFY(spy.wait(1000));
       QCOMPARE(model->rowCount(rootIndex), 3);
     }
     // cut/copy in pathRoot5 ok
