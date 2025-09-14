@@ -24,33 +24,32 @@ class AddressELineEdit : public QStackedWidget {
   explicit AddressELineEdit(QWidget* parent = nullptr);
   ~AddressELineEdit();
 
+  static QString NormToolBarActionPath(QString actionPath);
+
   inline QString pathFromLineEdit() const {  //
-    return PathTool::StripTrailingSlash(PathTool::normPath(m_pathComboBox->currentText()));
+    return PathTool::normPath(m_pathComboBox->currentText());
   }
 
   inline QString pathFromFullActions() const {  //
-    return pathFromCursorAction(nullptr);
+    const QList<QAction*>& actList = m_pathActionsTB->actions();
+    const QAction* pLastAct = actList.isEmpty() ? nullptr : actList.back();
+    return pathFromCursorAction(pLastAct);
   }
 
   inline QString pathFromCursorAction(const QAction* cursorAtAction) const {  //
-    // if cursor at NOTHING, should return the full path
-    QString path;
-    for (const QAction* pAct : m_pathActionsTB->actions()) {
+    // split with parameter skip empty part
+    QString caursePath;
+    foreach (const QAction* pAct, m_pathActionsTB->actions()) {
       if (pAct == nullptr) {
         continue;
       }
-      path += pAct->text();
+      caursePath += pAct->text();
       if (pAct == cursorAtAction) {
         break;
       }
-      path += PathTool::PATH_SEP_CHAR;
+      caursePath += PathTool::PATH_SEP_CHAR;
     }
-#ifdef _WIN32
-    if (!path.isEmpty()) {
-      path = path.mid(1);  // in windows 1st action is a placeholder with icon only
-    }
-#endif
-    return PathTool::StripTrailingSlash(path);
+    return NormToolBarActionPath(caursePath);
   }
 
   inline QString dirname() const {  //

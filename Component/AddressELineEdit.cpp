@@ -57,9 +57,19 @@ AddressELineEdit::~AddressELineEdit() {
   }
 }
 
+QString AddressELineEdit::NormToolBarActionPath(QString actionPath) {
+#ifdef _WIN32
+  QString pth = actionPath.mid(1);
+  int n = pth.size();
+  if (n >=2 && pth[n-2] != ':' && pth[n-1] == '/') return pth.left(n-1);
+  return pth;
+#else
+  return actionPath.size() > 1 && actionPath.back() == '/' ? actionPath.left(actionPath.size() - 1) : actionPath;
+#endif
+}
+
 auto AddressELineEdit::onPathActionTriggered(const QAction* cursorAt) -> void {
-  const QString& rawPath = pathFromCursorAction(cursorAt);
-  const QString fullPth {PathTool::StripTrailingSlash(rawPath)};
+  const QString fullPth = pathFromCursorAction(cursorAt);
   LOG_D("Path triggered [%s]", qPrintable(fullPth));
   ChangePath(fullPth);
 }
@@ -69,21 +79,15 @@ void AddressELineEdit::onReturnPressed() {
 }
 
 void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
-  const QString& fullpath = PathTool::StripTrailingSlash(PathTool::normPath(newPath));
+  const QString& fullpath = PathTool::normPath(newPath);
   m_pathComboBox->setCurrentText(fullpath);
   LOG_D("set Path [%s]", qPrintable(fullpath));
   m_pathActionsTB->clear();
-#ifdef WIN32
   m_pathActionsTB->addAction(QIcon{":img/FOLDER_OF_DRIVES"}, "");
-#endif
-  for (const QString& pathSec : fullpath.split(PathTool::PATH_SEP_CHAR)) {
-    m_pathActionsTB->addAction(pathSec);
-  }
-  QList<QWidget*> buttons = m_pathActionsTB->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
-  for (QWidget* widget : buttons) {
-    if (widget != nullptr) {
-      widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    }
+  for (const QString& pathSec : fullpath.split(PathTool::PATH_SEP_CHAR, Qt::SkipEmptyParts)) {
+    auto* pAct = m_pathActionsTB->addAction(pathSec);
+    auto* pWid = m_pathActionsTB->widgetForAction(pAct);
+    pWid->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
   }
 }
 
@@ -122,11 +126,11 @@ auto AddressELineEdit::onFocusChange(bool hasFocus) -> void {
 }
 
 auto AddressELineEdit::clickMode() -> void {
-    setCurrentWidget(m_pathActionsTB);
+  setCurrentWidget(m_pathActionsTB);
 }
 
 auto AddressELineEdit::inputMode() -> void {
-    setCurrentWidget(m_pathComboBox);
+  setCurrentWidget(m_pathComboBox);
 }
 
 void AddressELineEdit::mousePressEvent(QMouseEvent* event) {
