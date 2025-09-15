@@ -47,7 +47,6 @@ public:
   TDir mTDir;
   QDir mDir {mTDir.path()};
   QString itemsFolderPath {mDir.absoluteFilePath("path")};
-  void ChangeIconSize();
 
 private slots:
   void initTestCase() {
