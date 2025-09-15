@@ -26,6 +26,12 @@ public:
 
   void getImgsPathAndVidsCount(const QString& path);
   void nxtImgInFolder();
+  bool hasNextImgs() const;
+  void disableTimer() {
+    if (m_nextImgTimer != nullptr && m_nextImgTimer->isActive()) {
+      m_nextImgTimer->stop();
+    }
+  }
 
 private:
   QList<QLabel*> m_imgLabelsList;

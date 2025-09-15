@@ -32,22 +32,22 @@ ImagesInFolderSlider::ImagesInFolderSlider(QWidget* parent)
   CHECK_NULLPTR_RETURN_VOID(m_nextImgTimer);
   m_nextImgTimer->setInterval(SLIDE_TO_NEXT_IMG_TIME_INTERVAL);
   m_nextImgTimer->setSingleShot(false);
+
+#ifndef RUNNING_UNIT_TESTS
   connect(m_nextImgTimer, &QTimer::timeout, this, &ImagesInFolderSlider::nxtImgInFolder);
+#endif
 }
 
 void ImagesInFolderSlider::operator()(const QString& folderPath) {
-  if (m_nextImgTimer->isActive()) {
-    m_nextImgTimer->stop();
-  }
+  disableTimer();
   m_inFolderImgIndex = 0;
   getImgsPathAndVidsCount(folderPath);
-  if (m_imgsUnderAPath != nullptr && m_imgsUnderAPath->isEmpty()) {
+  if (m_imgsUnderAPath == nullptr || m_imgsUnderAPath->isEmpty()) {
     clearLabelContents();
     return;
   }
-
   nxtImgInFolder();
-  if (m_imgsUnderAPath != nullptr && m_imgsUnderAPath->size() > MAX_LABEL_CNT) {
+  if (hasNextImgs()) {
     m_nextImgTimer->start();
   }
 }
@@ -72,8 +72,9 @@ void ImagesInFolderSlider::getImgsPathAndVidsCount(const QString& path) {
       ResetImgsList(new PlainStringList(QStringList{path}));
     } else if (TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET.contains(suffix)) {
       ResetImgsList(new ArchiveFiles{path});
+    } else {
+      ResetImgsList(nullptr);
     }
-    ResetImgsList(nullptr);
     return;
   }
   if (pathFi.isDir()) {
@@ -93,7 +94,7 @@ void ImagesInFolderSlider::getImgsPathAndVidsCount(const QString& path) {
 }
 
 void ImagesInFolderSlider::nxtImgInFolder() {
-  if (m_imgsUnderAPath == nullptr) {
+  if (!hasNextImgs()) {
     return;
   }
 
@@ -102,12 +103,10 @@ void ImagesInFolderSlider::nxtImgInFolder() {
 
   for (int labelCnt = 0; labelCnt < MAX_LABEL_CNT; ++labelCnt) {
     if (m_inFolderImgIndex >= m_imgsUnderAPath->size()) {
-      if (m_nextImgTimer->isActive()) {
-        m_nextImgTimer->stop();
-      }
       m_imgLabelsList[labelCnt]->clear();
-      continue;
+      break;
     }
+
     const QVariant& imgEle = (*m_imgsUnderAPath)[m_inFolderImgIndex];
     ++m_inFolderImgIndex;
 
@@ -120,11 +119,21 @@ void ImagesInFolderSlider::nxtImgInFolder() {
       LOG_W("imgEle type is invalid %d", int(imgEle.type()));
       return;
     }
+
     if (pm.width() * mHeight >= pm.height() * mWidth) {
       pm = pm.scaledToWidth(mWidth, Qt::FastTransformation);
     } else {
       pm = pm.scaledToHeight(mHeight, Qt::FastTransformation);
     }
+
     m_imgLabelsList[labelCnt]->setPixmap(pm);
   }
+
+  if (m_inFolderImgIndex >= m_imgsUnderAPath->size()) {
+    disableTimer();
+  }
+}
+
+bool ImagesInFolderSlider::hasNextImgs() const {
+  return m_imgsUnderAPath != nullptr && m_inFolderImgIndex < m_imgsUnderAPath->size();
 }
