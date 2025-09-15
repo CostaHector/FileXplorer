@@ -8,18 +8,18 @@
 #include <QToolTip>
 #include <QWidgetAction>
 
-int GetStartPos(Qt::Orientation orientation, const QPoint& pos) {
+int GetDropPos(Qt::Orientation orientation, const QPoint& pos) {
   if (orientation == Qt::Orientation::Vertical) {
     return pos.y();
   }
   return pos.x();
 }
 
-bool IsCursorPosLessThenWidgetCenter(Qt::Orientation orientation, const int cursorPos, const QWidget& widget) {
+bool IsCursorPosLessThenWidgetCenter(Qt::Orientation orientation, const int dropPos, const QPoint& widgetCenterPnt) {
   if (orientation == Qt::Orientation::Vertical) {
-    return cursorPos <= widget.y() + widget.height() / 2;
+    return dropPos < widgetCenterPnt.y();
   } else {
-    return cursorPos <= widget.x() + widget.width() / 2;
+    return dropPos < widgetCenterPnt.x();
   }
 }
 
@@ -40,16 +40,7 @@ bool IsSourceValid(QObject* source, QWidget* parent) {
 }
 
 ReorderableToolBar::ReorderableToolBar(const QString& title, QWidget* parent)  //
-    : QToolBar{title, parent} {                                                //
-  setAcceptDrops(true);
-  mCollectPathAgs = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(mCollectPathAgs);
-  mCollectPathAgs->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-}
-
-ReorderableToolBar::ReorderableToolBar(QWidget* parent)  //
-    : QToolBar{parent}                                   //
-{
+  : QToolBar{title, parent} {                                                //
   setAcceptDrops(true);
   mCollectPathAgs = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(mCollectPathAgs);
@@ -63,29 +54,24 @@ void ReorderableToolBar::actionEvent(QActionEvent* event) {
   }
   auto* pAct = event->action();
   CHECK_NULLPTR_RETURN_VOID(pAct);
-  mCollectPathAgs->addAction(pAct);
   QWidgetAction* widgetAction = qobject_cast<QWidgetAction*>(pAct);
   if (widgetAction != nullptr) {
     return;
   }
   // event action must be a simple action, not a QToolButton
+  addDraggableAction(pAct);
+  removeAction(pAct);
+}
+
+void ReorderableToolBar::addDraggableAction(QAction* pAct) {
+  if (pAct == nullptr) {
+    return;
+  }
+  mCollectPathAgs->addAction(pAct);
   DraggableToolButton* btn = new (std::nothrow) DraggableToolButton{this};
   CHECK_NULLPTR_RETURN_VOID(btn)
   btn->setDefaultAction(pAct);
   btn->setToolButtonStyle(toolButtonStyle());
-
-  removeAction(pAct);
-  addWidget(btn);
-}
-
-void ReorderableToolBar::addDraggableAction(QAction* act) {
-  if (act == nullptr) {
-    return;
-  }
-  act->setCheckable(true);
-  auto* btn = new (std::nothrow) DraggableToolButton(this);
-  CHECK_NULLPTR_RETURN_VOID(btn)
-  btn->setDefaultAction(act);
   addWidget(btn);
 }
 
@@ -96,7 +82,7 @@ void ReorderableToolBar::dragMoveEvent(QDragMoveEvent* event) {
   }
   const QPoint& pos{event->pos()};
   static const auto orien{orientation()};
-  const int fromPos{GetStartPos(orien, pos)};
+  const int dropPos{GetDropPos(orien, pos)};
   const QPoint glbPos{mapToGlobal(pos)};
   const QString fromBtnText = event->mimeData()->text();
   bool isAppend = true;
@@ -109,7 +95,7 @@ void ReorderableToolBar::dragMoveEvent(QDragMoveEvent* event) {
     if (tb == nullptr) {
       continue;
     }
-    if (IsCursorPosLessThenWidgetCenter(orien, fromPos, *widget)) {
+    if (IsCursorPosLessThenWidgetCenter(orien, dropPos, widget->geometry().center())) {
       isAppend = false;
       QToolTip::showText(glbPos, QString("Move btn[%1] in front of[%2]?").arg(fromBtnText, tb->text()));
       break;
@@ -128,7 +114,11 @@ void ReorderableToolBar::dragEnterEvent(QDragEnterEvent* event) {
 }
 
 void ReorderableToolBar::dropEvent(QDropEvent* event) {
+#ifdef RUNNING_UNIT_TESTS
+  QObject* source = mSourceObject;
+#else
   QObject* source = event->source();
+#endif
   if (!IsSourceValid(source, this)) {
     return;
   }
@@ -137,7 +127,6 @@ void ReorderableToolBar::dropEvent(QDropEvent* event) {
     LOG_W("layout is None, skip");
     return;
   }
-  //  LOG_D("type(source): %s", source->metaObject()->className());
   auto* pSrcWidget = qobject_cast<QWidget*>(source);
   if (pSrcWidget == nullptr) {
     LOG_W("pSrcWidget is nullptr, skip");
@@ -151,15 +140,15 @@ void ReorderableToolBar::dropEvent(QDropEvent* event) {
   }
   const QPoint& pos{event->pos()};
   static const auto orien = orientation();
-  const int fromPos{GetStartPos(orien, pos)};
+  const int dropPos{GetDropPos(orien, pos)};
   int destIndex = 0;
   while (destIndex < layout->count()) {
     QWidget* widget = layout->itemAt(destIndex)->widget();
-    if (!widget) {
+    if (widget == nullptr) {
       ++destIndex;
       continue;
     }
-    if (IsCursorPosLessThenWidgetCenter(orien, fromPos, *widget)) {
+    if (IsCursorPosLessThenWidgetCenter(orien, dropPos, widget->geometry().center())) {
       break;
     }
     ++destIndex;

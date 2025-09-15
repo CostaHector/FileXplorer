@@ -30,18 +30,19 @@ constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;
 
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
   : QTextBrowser{parent},//
-  mCastVideosVisisble{Configuration().value(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.v).toBool()},
-  mCastImagesVisisble{Configuration().value(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.v).toBool()}
+  mCastVideosVisisble{Configuration().value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.v).toBool()},
+  mCastImagesVisisble{Configuration().value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.v).toBool()},
+  mCurIconSizeIndex{BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.v.toInt()}
 {
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
-  double fontPointSize = Configuration().value("CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE", 12).toDouble();
+  double fontPointSize = Configuration().value(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.v).toDouble();
   auto curFont = font();
   curFont.setPointSizeF(fontPointSize);
   setFont(curFont);
 
-  int iconSizeIndexHint = Configuration().value("CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX", mCurIconSizeIndex).toInt();
+  int iconSizeIndexHint = Configuration().value(BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.name, BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.v).toInt();
   mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N-1)); // [0, WHEEL_CANDIDATES_N)
   mIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
 
@@ -64,8 +65,8 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
 }
 
 ClickableTextBrowser::~ClickableTextBrowser() {
-  Configuration().setValue("CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE", font().pointSizeF());
-  Configuration().setValue("CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX", mCurIconSizeIndex);
+  Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, font().pointSizeF());
+  Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.name, mCurIconSizeIndex);
 }
 
 void ClickableTextBrowser::wheelEvent(QWheelEvent *event) {
@@ -101,11 +102,11 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
   if (url.toString() == "hideRelatedVideos") {
     hideOrShowRelated = true;
     mCastVideosVisisble = !mCastVideosVisisble;
-    Configuration().setValue(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, mCastVideosVisisble);
+    Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, mCastVideosVisisble);
   } else if (url.toString() == "hideRelatedImages") {
     hideOrShowRelated = true;
     mCastImagesVisisble = !mCastImagesVisisble;
-    Configuration().setValue(MemoryKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, mCastImagesVisisble);
+    Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, mCastImagesVisisble);
   }
   if (hideOrShowRelated) {
     UpdateHtmlContents();
@@ -204,7 +205,7 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
     return insertOrUpdateCnt;
   }
   LOG_OK_P("[Ok]Cast Inserted/Update", "%d casts added as follows:",
-             insertOrUpdateCnt, qPrintable(perfsText));
+           insertOrUpdateCnt, qPrintable(perfsText));
   return insertOrUpdateCnt;
 }
 
