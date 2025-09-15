@@ -1,12 +1,12 @@
-#ifndef VIEWTYPEFORMERLADDER_H
-#define VIEWTYPEFORMERLADDER_H
+#ifndef VIEWTYPEHISTORY_H
+#define VIEWTYPEHISTORY_H
 
 #include <QStack>
 #include "ViewTypeTool.h"
 
-class ViewTypeFormerLadder {
+class ViewTypeHistory {
 public:
-  ViewTypeFormerLadder() {
+  ViewTypeHistory() {
     operator()(ViewTypeTool::DEFAULT_VIEW_TYPE);
   }
 
@@ -35,7 +35,7 @@ public:
     if (!redoAvailable()) {
       return ViewTypeTool::DEFAULT_VIEW_TYPE;
     }
-    const ViewTypeTool::ViewType& redoPath = redoStack.pop();
+    ViewTypeTool::ViewType redoPath = redoStack.pop();
     undoStack.append(redoPath);
     return redoPath;
   }
@@ -45,4 +45,4 @@ private:
   QStack<ViewTypeTool::ViewType> redoStack;
 };
 
-#endif // VIEWTYPEFORMERLADDER_H
+#endif // VIEWTYPEHISTORY_H
