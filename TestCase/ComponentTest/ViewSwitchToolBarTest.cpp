@@ -51,7 +51,7 @@ private slots:
   void init() {
     serviceLogicFunctionCallTime = 0;
     QVERIFY(mTb != nullptr);
-    mTb->mViewRD = ViewTypeFormerLadder{};
+    mTb->mViewRD = ViewTypeHistory{};
   }
 
   void test_action_clicked_will_emit_2_signals_at_one_time_normal() {

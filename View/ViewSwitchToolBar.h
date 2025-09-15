@@ -4,7 +4,7 @@
 #include <QToolBar>
 #include "EnumIntAction.h"
 #include "ViewTypeTool.h"
-#include "ViewTypeFormerLadder.h"
+#include "ViewTypeHistory.h"
 
 extern template struct EnumIntAction<ViewTypeTool::ViewType>;
 
@@ -19,7 +19,7 @@ private:
 
   bool onViewNavigateBackward();
   bool onViewNavigateForward();
-  ViewTypeFormerLadder mViewRD;
+  ViewTypeHistory mViewRD;
 };
 
 #endif // VIEWSWITCHTOOLBAR_H

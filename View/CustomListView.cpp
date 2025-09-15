@@ -13,8 +13,11 @@ QSet<QString> CustomListView::LISTS_SET;
 CustomListView::CustomListView(const QString& name, QWidget* parent)//
   : QListView{parent}, m_name{name}, mflowIntAction{this} {
   if (isNameExists(m_name)) {
-    LOG_WARN_NP("Instance list name already exist, memory key will override", m_name);
-    return;
+#ifdef RUNNING_UNIT_TESTS
+    LOG_D("Instance list name[%s] already exist, memory key will override", qPrintable(m_name));
+#else
+    LOG_W("Instance list name[%s] already exist, memory key will override", qPrintable(m_name));
+#endif
   }
   LISTS_SET.insert(m_name);
 
@@ -105,6 +108,7 @@ void CustomListView::BindMenu(QMenu* menu) {
   }
   m_menu = menu;
   m_menu->addSeparator();
+  CHECK_NULLPTR_RETURN_VOID(_FLOW_ORIENTATION_MENU);
   m_menu->addMenu(_FLOW_ORIENTATION_MENU);
 }
 

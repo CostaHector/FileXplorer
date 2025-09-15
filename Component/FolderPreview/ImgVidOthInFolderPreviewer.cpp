@@ -12,13 +12,12 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   CHECK_NULLPTR_RETURN_VOID(mImgVidOtherSplitter)
   mImgVidOtherSplitter->setOrientation(Qt::Orientation::Vertical);
 
-  m_bImgVisible = Configuration().value("FLOATING_IMAGE_VIEW_SHOW", true).toBool();
-  m_bVidVisible = Configuration().value("FLOATING_VIDEO_VIEW_SHOW", false).toBool();
-  m_bOthVisible = Configuration().value("FLOATING_OTHER_VIEW_SHOW", false).toBool();
+  m_bImgVisible = Configuration().value(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, BrowserKey::FLOATING_IMAGE_VIEW_SHOW.v).toBool();
+  m_bVidVisible = Configuration().value(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, BrowserKey::FLOATING_VIDEO_VIEW_SHOW.v).toBool();
+  m_bOthVisible = Configuration().value(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, BrowserKey::FLOATING_OTHER_VIEW_SHOW.v).toBool();
 
   // init for mImgVidOtherSplitter
-  const QString& defaultMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
-  const QString& seqStr = Configuration().value("FLOATING_MEDIA_TYPE_SEQ", defaultMediaTypeSeq).toString();
+  const QString& seqStr = Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, BrowserKey::FLOATING_MEDIA_TYPE_SEQ.v).toString();
   decltype(mMediaSequence) mediaSequenceMemory;
   if (IsValidMediaTypeSeq(seqStr, mediaSequenceMemory) && mediaSequenceMemory.size() == mMediaSequence.size()) {
     mMediaSequence.swap(mediaSequenceMemory);
@@ -53,13 +52,13 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   CHECK_NULLPTR_RETURN_VOID(mTypeToDisplayTB)
   mTypeToDisplayTB->setOrientation(Qt::Orientation::Vertical);
   mTypeToDisplayTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  static QAction* MEDIA_TYPE_2_ACTS[(int)PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
+  QAction* MEDIA_TYPE_2_ACTS[(int)PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
   for (int mediaTypeInd : mMediaSequence) {
     mTypeToDisplayTB->addAction(MEDIA_TYPE_2_ACTS[mediaTypeInd]);
   }
   mTypeToDisplayTB->adjustSize();
 
-  mLo = new (std::nothrow)QVBoxLayout{this};
+  mLo = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(mLo)
   mLo->addWidget(mImgVidOtherSplitter);
   mLo->setSpacing(0);
@@ -125,7 +124,7 @@ bool ImgVidOthInFolderPreviewer::onReorder(int fromIndex, int destIndex) {
     return false;
   }
   const QString& newMediaTypeSeq = MediaTypeSeqStr(mMediaSequence);
-  Configuration().setValue("FLOATING_MEDIA_TYPE_SEQ", newMediaTypeSeq);
+  Configuration().setValue(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, newMediaTypeSeq);
   LOG_D("New media type seq[%s]", qPrintable(newMediaTypeSeq));
   return MoveWidgetAtFromIndexInFrontOfDestIndex(fromIndex, destIndex, *mImgVidOtherSplitter);
 }
@@ -154,7 +153,7 @@ void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
     mImgVidOtherSplitter->addWidget(mImgTv);
     connect(mImgTv, &ItemView::iconSizeChanged, mImgModel, &ImgsModel::onIconSizeChange);
   }
-  Configuration().setValue("FLOATING_IMAGE_VIEW_SHOW", checked);
+  Configuration().setValue(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, checked);
   if (mImgTv->isVisible() != checked) {
     mImgTv->setVisible(checked);
   }
@@ -171,7 +170,7 @@ void ImgVidOthInFolderPreviewer::onVidBtnClicked(bool checked) {
     mVidTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     mImgVidOtherSplitter->addWidget(mVidTv);
   }
-  Configuration().setValue("FLOATING_VIDEO_VIEW_SHOW", checked);
+  Configuration().setValue(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, checked);
   mVidTv->setVisible(checked);
 }
 
@@ -186,7 +185,7 @@ void ImgVidOthInFolderPreviewer::onOthBtnClicked(bool checked) {
     mOthTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     mImgVidOtherSplitter->addWidget(mOthTv);
   }
-  Configuration().setValue("FLOATING_OTHER_VIEW_SHOW", checked);
+  Configuration().setValue(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, checked);
   mOthTv->setVisible(checked);
 }
 
@@ -203,16 +202,3 @@ void ImgVidOthInFolderPreviewer::onImgVidOthActTriggered(const QAction* pAct) {
     LOG_W("Action[%s] not supported", qPrintable(pAct->text()));
   }
 }
-
-// #define RUN_MAIN_FILE 1
-// #ifdef RUN_MAIN_FILE
-// #include <QApplication>
-// int main(int argc, char* argv[]) {
-//   QApplication a(argc, argv);
-//   ImgVidOthWid w{"DockerList"};
-//   w.show();
-//   w("");
-//   a.exec();
-//   return 0;
-// }
-// #endif
