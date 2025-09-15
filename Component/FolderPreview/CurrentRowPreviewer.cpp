@@ -57,12 +57,65 @@ void CurrentRowPreviewer::UpdatePreview() {
 }
 
 QSize CurrentRowPreviewer::sizeHint() const {
-  return {Configuration().value("SELECTION_PREVIEWER_WIDTH", DOCKER_DEFAULT_SIZE.width()).toInt(),
-          Configuration().value("SELECTION_PREVIEWER_HEIGHT", DOCKER_DEFAULT_SIZE.height()).toInt()};
+  static const int w = Configuration().value("SELECTION_PREVIEWER_WIDTH", DOCKER_DEFAULT_SIZE.width()).toInt();
+  static const int h = Configuration().value("SELECTION_PREVIEWER_WIDTH", DOCKER_DEFAULT_SIZE.height()).toInt();
+  return {w, h};
 }
 
-void CurrentRowPreviewer::setCurrentIndex(int index) {
-  QStackedWidget::setCurrentIndex(index);
-  mCurrentPreviewType = m_previewIndex2NameE[index];
-  emit windowTitleChanged(QString{"Preview: %1"}.arg(PreviewTypeTool::c_str(mCurrentPreviewType)));
+bool CurrentRowPreviewer::NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E previewType) const {
+  switch (previewType) {
+    case PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY: {
+      return m_fileFolderPreviewStackedWid == nullptr;
+    }
+    case PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD: {
+      return m_imgInFolderBrowser == nullptr;
+    }
+    case PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL: {
+      return m_imgInFolderLabels == nullptr;
+    }
+    default:
+      LOG_E("previewType[%s] not support", PreviewTypeTool::c_str(previewType));
+      return false;
+  }
+  return false;
+}
+
+bool CurrentRowPreviewer::InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E previewType) {
+  switch (previewType) {
+    case PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY: {
+      m_fileFolderPreviewStackedWid = new (std::nothrow) FileFolderPreviewer{"DockerList", this};
+      CHECK_NULLPTR_RETURN_FALSE(m_fileFolderPreviewStackedWid)
+      AddView(previewType, m_fileFolderPreviewStackedWid);
+      break;
+    }
+    case PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD: {
+      m_imgInFolderBrowser = new (std::nothrow) ImagesInFolderBrowser{this};
+      CHECK_NULLPTR_RETURN_FALSE(m_imgInFolderBrowser)
+      AddView(previewType, m_imgInFolderBrowser);
+      break;
+    }
+    case PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL: {
+      m_imgInFolderLabels = new (std::nothrow) ImagesInFolderSlider{this};
+      CHECK_NULLPTR_RETURN_FALSE(m_imgInFolderLabels)
+      AddView(previewType, m_imgInFolderLabels);
+      break;
+    }
+    default:
+      LOG_E("previewType[%s] not support", PreviewTypeTool::c_str(previewType));
+      return false;
+  }
+  return true;
+}
+
+bool CurrentRowPreviewer::setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E previewType) {
+  auto prevIt = m_name2PreviewIndex.find(previewType);
+  if (prevIt == m_name2PreviewIndex.end()) {
+    LOG_E("previewType[%s] not in map", PreviewTypeTool::c_str(previewType));
+    return false;
+  }
+  mCurrentPreviewType = previewType;
+  int viewIndex = prevIt.value();
+  QStackedWidget::setCurrentIndex(viewIndex);
+  emit windowTitleChanged(QString{"Preview: %1"}.arg(PreviewTypeTool::c_str(previewType)));
+  return true;
 }
