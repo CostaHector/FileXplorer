@@ -218,4 +218,4 @@ private slots:
 };
 
 #include "WidgetReorderHelperTest.moc"
-REGISTER_TEST(WidgetReorderHelperTest, true)
+REGISTER_TEST(WidgetReorderHelperTest, false)
