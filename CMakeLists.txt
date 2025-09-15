@@ -138,7 +138,9 @@ endif()
 target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
-    ${README_FILES})
+    ${README_FILES}
+    ./covagelnk
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SRV_HEADER_PATH})
 target_link_libraries(${PROJECT_NAME} PRIVATE

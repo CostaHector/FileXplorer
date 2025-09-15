@@ -29,7 +29,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets)
 
-
 file(GLOB SOURCES
     # service module sources
     ../Actions/*.cpp
@@ -168,3 +167,8 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:Debug>:QT_MESSAGELOGCONTEXT>
 )
 message("[${PROJECT_NAME}] Finished...")
+
+if(UNIX AND NOT APPLE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov")
+endif()
