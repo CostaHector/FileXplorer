@@ -42,6 +42,8 @@ bool ImagesInFolderBrowser::operator()(const QString& path) {
   } else if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*." + fi.suffix().toLower())) {
     m_dirPath = fi.absolutePath();
     m_imgsLst.push_back(fileName);
+  } else {
+    m_dirPath = "";
   }
 
   QString htmlSrc;
@@ -74,16 +76,19 @@ QStringList ImagesInFolderBrowser::InitImgsList(const QString& dirPath) const {
 }
 
 bool ImagesInFolderBrowser::hasNextImgs() const {
-  return (!m_imgsLst.isEmpty()) && m_curImgCntIndex + 1 < N_SHOW_IMGS_CNT_LIST;
+  return (!m_imgsLst.isEmpty()) //
+         && m_curImgCntIndex + 1 < N_SHOW_IMGS_CNT_LIST //
+         && m_imgsLst.size() > SHOW_IMGS_CNT_LIST[m_curImgCntIndex]; //
 }
 
 QString ImagesInFolderBrowser::nextImgsHTMLSrc() {
   QString imgSrc;
   const QDir dir{m_dirPath};
   const auto& ICON_SIZE = iconSize();
-  for (int i = SHOW_IMGS_CNT_LIST[m_curImgCntIndex]; i < m_imgsLst.size() and i < SHOW_IMGS_CNT_LIST[m_curImgCntIndex + 1]; ++i) {
+  for (int i = SHOW_IMGS_CNT_LIST[m_curImgCntIndex]; i < m_imgsLst.size() && i < SHOW_IMGS_CNT_LIST[m_curImgCntIndex + 1]; ++i) {
     const QString& imgName = m_imgsLst[i];
     imgSrc += CastBrowserHelper::GenerateSingleImageInHtml(dir.absoluteFilePath(imgName), imgName, ICON_SIZE);
+    imgSrc += '\n';
   }
   ++m_curImgCntIndex;
   return imgSrc;

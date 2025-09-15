@@ -140,4 +140,4 @@ private slots:
 };
 
 #include "ReorderableToolBarTest.moc"
-REGISTER_TEST(ReorderableToolBarTest, true)
+REGISTER_TEST(ReorderableToolBarTest, false)

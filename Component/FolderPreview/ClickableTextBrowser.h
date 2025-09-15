@@ -91,7 +91,7 @@ private:
   CastHtmlParts mCastHtmls;
   bool mCastVideosVisisble, mCastImagesVisisble;
 
-  int mCurIconSizeIndex{1};
+  int mCurIconSizeIndex;
   QSize mIconSize;
 };
 
