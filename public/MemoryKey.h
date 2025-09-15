@@ -110,6 +110,10 @@ struct BrowserKey {
   static const KV CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS;
   static const KV CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE;
   static const KV CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX;
+  static const KV FLOATING_IMAGE_VIEW_SHOW;
+  static const KV FLOATING_VIDEO_VIEW_SHOW;
+  static const KV FLOATING_OTHER_VIEW_SHOW;
+  static const KV FLOATING_MEDIA_TYPE_SEQ;
 };
 
 struct RedunImgFinderKey {

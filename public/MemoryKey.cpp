@@ -111,6 +111,11 @@ const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES{"Cast/PreviewBrows
 const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS{"Cast/PreviewBrowser/ShowImagesImages", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE{"Cast/PreviewBrowser/FontPointSize", 12, ValueChecker{PLAIN_INT}};
 const KV BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX{"Cast/PreviewBrowser/IconSizeIndex", 1, ValueChecker{PLAIN_INT}};
+const KV BrowserKey::FLOATING_IMAGE_VIEW_SHOW{"FLOATING_IMAGE_VIEW_SHOW", true, ValueChecker{PLAIN_BOOL}};
+const KV BrowserKey::FLOATING_VIDEO_VIEW_SHOW{"FLOATING_VIDEO_VIEW_SHOW", true, ValueChecker{PLAIN_BOOL}};
+const KV BrowserKey::FLOATING_OTHER_VIEW_SHOW{"FLOATING_OTHER_VIEW_SHOW", true, ValueChecker{PLAIN_BOOL}};
+const KV BrowserKey::FLOATING_MEDIA_TYPE_SEQ{"FLOATING_MEDIA_TYPE_SEQ", "012", ValueChecker{PLAIN_STR}};
+
 
 const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
 const KV RedunImgFinderKey::RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH}, true);

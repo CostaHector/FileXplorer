@@ -105,6 +105,7 @@ void CustomListView::BindMenu(QMenu* menu) {
   }
   m_menu = menu;
   m_menu->addSeparator();
+  CHECK_NULLPTR_RETURN_VOID(_FLOW_ORIENTATION_MENU);
   m_menu->addMenu(_FLOW_ORIENTATION_MENU);
 }
 
