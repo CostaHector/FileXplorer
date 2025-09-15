@@ -22,7 +22,7 @@ void ImagesInFolderBrowser::wheelEvent(QWheelEvent *event) {
   if (event->modifiers() == Qt::NoModifier) {
     QPoint numDegrees = event->angleDelta() / 8;
     if (!numDegrees.isNull()) {
-      if (numDegrees.y() / 15 < 0) {
+      if (numDegrees.y() / 15 < 0) { // < 0: show below contents
         ShowRemainImages(verticalScrollBar()->value());
       }
     }
