@@ -370,7 +370,7 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
 }
 
 void RibbonMenu::Subscribe() {
-  connect(_EXPAND_RIBBONS, &QAction::triggered, this, &RibbonMenu::on_expandStackedWidget);
+  connect(_EXPAND_RIBBONS, &QAction::toggled, this, &RibbonMenu::on_expandStackedWidget);
   connect(this, &QTabWidget::currentChanged, this, &RibbonMenu::on_currentTabChangedRecordIndex);
 }
 
@@ -382,6 +382,9 @@ void RibbonMenu::AfterSubscribeInitialSettings() {
 #include <QPropertyAnimation>
 void RibbonMenu::on_expandStackedWidget(const bool vis) {
   Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
+#ifdef RUNNING_UNIT_TESTS // no need animation in testcase
+  setMaximumHeight(vis ? sizeHint().height() : tabBar()->height());
+#else
   QPropertyAnimation *animation = new (std::nothrow) QPropertyAnimation{this, "maximumHeight", this};
   if (animation == nullptr) {
     setMaximumHeight(vis ? sizeHint().height() : tabBar()->height());
@@ -391,6 +394,7 @@ void RibbonMenu::on_expandStackedWidget(const bool vis) {
   animation->setStartValue(maximumHeight());
   animation->setEndValue(vis ? sizeHint().height() : tabBar()->height());
   animation->start(QAbstractAnimation::DeleteWhenStopped);
+#endif
 }
 
 void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
@@ -404,34 +408,3 @@ void RibbonMenu::whenViewTypeChanged(ViewTypeTool::ViewType vt) {
   }
   setCurrentIndex(destLeafTabIndex);
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-
-#include <QMainWindow>
-#include <QToolBar>
-
-class RibbonMenuIllu : public QMainWindow {
-public:
-  explicit RibbonMenuIllu(QWidget* parent = nullptr) : QMainWindow(parent) {
-    setWindowFlag(Qt::WindowType::WindowStaysOnTopHint);
-
-    RibbonMenu* osm = new RibbonMenu;
-    setMenuWidget(osm);
-    QToolBar* tb = new QToolBar("tb");
-    tb->addAction("Here is Toolbar");
-
-    addToolBar(Qt::ToolBarArea::TopToolBarArea, tb);
-    setWindowTitle("Ribbon Menu");
-    setMinimumWidth(1024);
-  }
-};
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  RibbonMenuIllu ribbonMenuExample(nullptr);
-  ribbonMenuExample.show();
-  return a.exec();
-}
-#endif
