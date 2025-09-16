@@ -135,10 +135,10 @@ void MD5Window::dragEnterEvent(QDragEnterEvent* event) {
     return;
   }
   if (!pMimedata->hasUrls()) {
-    event->accept();
+    event->ignore();
     return;
   }
-  QDialog::dragEnterEvent(event);
+  event->accept();
 }
 
 void MD5Window::subscribe() {
