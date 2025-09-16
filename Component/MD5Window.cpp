@@ -119,10 +119,10 @@ void MD5Window::dragEnterEvent(QDragEnterEvent* event) {
     return;
   }
   if (!pMimedata->hasUrls()) {
-    QDialog::dragEnterEvent(event);
+    event->accept();
     return;
   }
-  event->accept();
+  QDialog::dragEnterEvent(event);
 }
 
 void MD5Window::subscribe() {
@@ -146,17 +146,3 @@ int MD5Window::GetBytesRange() const {
 void MD5Window::Recalculate() {
   operator()(mPathsList);
 }
-
-//#define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  MD5Window md5Window;
-  md5Window.show();
-  md5Window({__FILE__});
-  a.exec();
-  return 0;
-}
-#endif
