@@ -60,6 +60,7 @@ bool ConfigsModel::setData(const QModelIndex& index, const QVariant& value, int 
     static auto& curCfg = Configuration();
     curCfg.setValue(record->name, value);
     emit dataChanged(index, index, {Qt::DisplayRole});
+    return true;
   }
   return QAbstractItemModel::setData(index, value, role);
 }
