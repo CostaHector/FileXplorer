@@ -9,15 +9,6 @@
 
 using namespace ItemsPileCategory;
 
-void SetElementIndexFirstIfValueFirst(QStringList& lst) {
-  if (lst.size() < 2) {
-    return;
-  }
-  auto minIt = std::min_element(lst.begin(), lst.end(), [](const QString& l, const QString& r) -> bool { return l.size() < r.size() || (l.size() == r.size() && l < r); });
-  if (minIt != lst.begin()) {
-    lst.front().swap(*minIt);
-  }
-}
 // Used for Floating Preview
 QMap<QString, QStringList> ScenesMixed::operator()(const QString& path) {
   QDir mediaDir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
@@ -126,15 +117,6 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
 
   LOG_D("%d,%d,%d piles of img/vid/json found from %d item(s) given", m_img2Name.size(), m_vid2Name.size(), m_json2Name.size(), files.size());
   return batches;
-}
-
-const QString& ScenesMixed::GetFirstImg(const QString& baseName) const {
-  auto it = m_img2Name.find(baseName);
-  if (it == m_img2Name.cend()) {
-    static QString imgNoExist;
-    return imgNoExist;
-  }
-  return it.value().first();
 }
 
 const QStringList& ScenesMixed::GetAllImgs(const QString& baseName) const {

@@ -8,7 +8,6 @@ class ScenesMixed {
  public:
   QMap<QString, QStringList> operator()(const QString& path);
   QMap<QString, QStringList> operator()(const QStringList& files);
-  const QString& GetFirstImg(const QString& baseName) const;
   const QStringList& GetAllImgs(const QString& baseName) const;
   const QString& GetFirstVid(const QString& baseName) const;
 
