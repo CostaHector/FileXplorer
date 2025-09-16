@@ -2,8 +2,6 @@
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
 #include <QTestEventList>
-#include <QToolButton>
-#include <QSignalSpy>
 
 #include "Logger.h"
 #include "BeginToExposePrivateMember.h"
@@ -18,14 +16,8 @@ class ConfigsTableTest : public PlainTestSuite {
   ConfigsTableTest() : PlainTestSuite{} { LOG_D("ConfigsTableTest object created\n"); }
 
  private slots:
-  void test_f() {
+  void test_configs_table_fail_count_ok() {
     Configuration().clear();
-    /*
-const KV MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE("PATH_PERFORMER_IMAGEHOST_LOCATE", "./", ValueChecker{FOLDER_PATH}, true);
-const KV MemoryKey::WHERE_CLAUSE_HISTORY("WHERE_CLAUSE_HISTORY", "A\nA&B\nA|B", ValueChecker{PLAIN_STR}, true);
-const KV MemoryKey::VIDS_LAST_TABLE_NAME("VIDS_LAST_TABLE_NAME", "", ValueChecker{PLAIN_STR}, true);
-const KV RedunImgFinderKey::RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH}, true);
-     */
     static constexpr int USER_CFG_COUNT = 4;
     QCOMPARE(KV::mEditableKVs.size(), USER_CFG_COUNT);
 
