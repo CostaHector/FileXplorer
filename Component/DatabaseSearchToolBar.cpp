@@ -145,9 +145,13 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
     return "";
   }
   const int defaultDropIndex = m_tablesCB->currentIndex();
+  QString drpTbl;
+#ifdef RUNNING_UNIT_TESTS
+  drpTbl = candidates[defaultDropIndex];
+#else
   const auto msgs {QString{"There are %1 table(s) as following:\n%2"}.arg(candidates.size()).arg(candidates.join('\n'))};
   bool okUserSelect = false;
-  const QString& drpTbl = QInputDialog::getItem(this, "CONFIRM DROP? (NOT RECOVERABLE)", msgs, //
+  drpTbl = QInputDialog::getItem(this, "CONFIRM DROP? (NOT RECOVERABLE)", msgs, //
                                                 candidates, defaultDropIndex,                  //
                                                 false,                                         //
                                                 &okUserSelect);
@@ -155,6 +159,7 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
     LOG_OK_NP("[skip] Drop table", "User cancel");
     return "";
   }
+#endif
   const QString& deleteTbl = MountHelper::ChoppedDisplayName(drpTbl);
   if (deleteTbl.isEmpty()) {
     LOG_ERR_NP("[Abort] Table name is empty, cannot drop", deleteTbl);

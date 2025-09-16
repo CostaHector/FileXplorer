@@ -34,8 +34,8 @@ public:
   explicit MD5Window(QWidget* parent = nullptr);
   int operator()(const QStringList& absPaths);
 
-  void dropEvent(QDropEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
+  void dropEvent(QDropEvent* event) override;
   void ReadSetting();
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
