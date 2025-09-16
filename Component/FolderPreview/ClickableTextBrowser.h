@@ -89,9 +89,9 @@ private:
   static constexpr int MIN_EACH_KEYWORD_LEN{4};       // "%" + "keyword" + "%"
 
   CastHtmlParts mCastHtmls;
-  bool mCastVideosVisisble, mCastImagesVisisble;
+  bool mCastVideosVisisble{true}, mCastImagesVisisble{true};
 
-  int mCurIconSizeIndex;
+  int mCurIconSizeIndex{14};
   QSize mIconSize;
 };
 

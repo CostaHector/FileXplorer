@@ -226,8 +226,8 @@ void AdvanceRenamer::onIncludingSub(int includingSubState) {
   InitTextEditContent(mWorkPath, mSelectedNames);
 }
 
-void AdvanceRenamer::onNameExtRespective(int includingSuffixState) {
-  const bool bNameExtIndependent{includingSuffixState == Qt::Checked};
+void AdvanceRenamer::onNameExtRespective(int bStateIndependent) {
+  const bool bNameExtIndependent{bStateIndependent == Qt::Checked};
   Configuration().setValue(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, bNameExtIndependent);
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);

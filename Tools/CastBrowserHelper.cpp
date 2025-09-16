@@ -12,7 +12,6 @@
 #include <QSqlField>
 #include <QImageReader>
 
-
 QString CastHtmlParts::fullHtml(bool castVideosVisisble, bool castImagesVisisble) const {
   QString fullHtmlContents;
   fullHtmlContents.reserve(12 + length() + 14);
