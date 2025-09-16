@@ -145,14 +145,14 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
   vidsPartBody += R"(</div>)" "\n";
 
   // Images here
-  const QDir imgDir {imgHost + '/' + orientation + '/' + castName};
+  const QString imgPrePath {imgHost + '/' + orientation + '/' + castName};
   const int imgsCnt{imgsLst.size()};
   QString imgsPartHead {R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedImages"> %1 )" + QString::number(imgsCnt) + R"( Related Images</a></h3>)" "\n"};
   QString imgsPartBody;
   imgsPartBody.reserve(50 * imgsCnt);
   imgsPartBody += R"(<div style="margin-top:20px;">)" "\n";
   foreach (const QString imgRelPath, imgsLst) {
-    imgsPartBody += GenerateSingleImageInHtml(imgDir.absoluteFilePath(imgRelPath), imgRelPath, ICON_SIZE);
+    imgsPartBody += GenerateSingleImageInHtml(imgPrePath + '/' + imgRelPath, imgRelPath, ICON_SIZE);
   }
   imgsPartBody += "</div>" "\n";
   return {htmlSrc, {vidsPartHead, vidsPartBody}, {imgsPartHead, imgsPartBody}};
