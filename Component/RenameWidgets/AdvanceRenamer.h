@@ -37,7 +37,7 @@ public:
   bool onApply(const bool isOnlyHelp = false);
   void onRegex(const int regexState);
   void onIncludingSub(int includingSubState);
-  void onNameExtRespective(int includingSuffixState);
+  void onNameExtRespective(int bStateIndependent);
 
   virtual void FilterNames(FileOsWalker& /*walker*/) const {}
   void UpdateNameAndExt();

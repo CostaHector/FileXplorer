@@ -134,6 +134,19 @@ private slots:
     QVERIFY(unpacker.StartToRearrange());
     QCOMPARE(tDir.getEntries(), expectsUnpackerEntries);
   }
+
+  void test_path_as_parameter() {
+    TDir tDir;
+    const QString tPath{tDir.path()};
+    const QList<FsNodeEntry> envNodeEntries {
+        {"A quick fox jump into", true, {}},       //
+        {"A quick fox jump into.jpg", false, {}},  //
+    };
+    QCOMPARE(tDir.createEntries(envNodeEntries), 2);
+    ItemsPacker ipacker;
+    ipacker(tPath);
+    QCOMPARE(ipacker.m_cmds.size(), 1); // only 1 command
+  }
 };
 
 #include "ItemsPackerTest.moc"

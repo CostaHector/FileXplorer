@@ -96,7 +96,6 @@ QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 
 QString GetFileExtension(const QString& path);
-bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist = false);
 
 }  // namespace PathTool
 #endif  // PATHTOOL_H

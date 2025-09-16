@@ -29,11 +29,12 @@ constexpr int ClickableTextBrowser::MIN_SINGLE_SEARCH_PATTERN_LEN;
 constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;
 
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
-  : QTextBrowser{parent},//
-  mCastVideosVisisble{Configuration().value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.v).toBool()},
-  mCastImagesVisisble{Configuration().value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.v).toBool()},
-  mCurIconSizeIndex{BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.v.toInt()}
+  : QTextBrowser{parent}
 {
+  mCastVideosVisisble = Configuration().value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.v).toBool();
+  mCastImagesVisisble = Configuration().value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.v).toBool();
+  mCurIconSizeIndex = BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.v.toInt();
+
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
@@ -67,6 +68,8 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)//
 ClickableTextBrowser::~ClickableTextBrowser() {
   Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, font().pointSizeF());
   Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.name, mCurIconSizeIndex);
+  Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, mCastVideosVisisble);
+  Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, mCastImagesVisisble);
 }
 
 void ClickableTextBrowser::wheelEvent(QWheelEvent *event) {
@@ -102,11 +105,9 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
   if (url.toString() == "hideRelatedVideos") {
     hideOrShowRelated = true;
     mCastVideosVisisble = !mCastVideosVisisble;
-    Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, mCastVideosVisisble);
   } else if (url.toString() == "hideRelatedImages") {
     hideOrShowRelated = true;
     mCastImagesVisisble = !mCastImagesVisisble;
-    Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, mCastImagesVisisble);
   }
   if (hideOrShowRelated) {
     UpdateHtmlContents();

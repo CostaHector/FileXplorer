@@ -15,6 +15,8 @@ private slots:
   void toggle_preview_widget_ok() {
     CurrentRowPreviewer previewer;
     QVERIFY(previewer.isTimerDisabled()); // in test case timer is disabled
+    const QSize initalSizeHint = previewer.sizeHint();
+    QVERIFY(initalSizeHint.isValid());
 
     QVERIFY(previewer.m_fileFolderPreviewStackedWid == nullptr);
     QVERIFY(previewer.m_imgInFolderBrowser == nullptr);
@@ -76,14 +78,25 @@ private slots:
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::SCENE);
 
     // 4. multi toggle ok
-    previewer("/another/path");
-    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::FILE_SYSTEM_VIEW);
-
     previewer(record, "another_host_path");
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::CAST);
 
     previewer("Scene2", {}, {});
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::SCENE);
+
+    QCOMPARE(previewer.NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD), true);
+    QCOMPARE(previewer.InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD), true);
+    QCOMPARE(previewer.setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD), true);
+    QVERIFY(previewer.m_imgInFolderBrowser != nullptr);
+    previewer("/another/pathProgressiveLoad");
+    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::FILE_SYSTEM_VIEW);
+
+    QCOMPARE(previewer.NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL), true);
+    QCOMPARE(previewer.InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL), true);
+    QCOMPARE(previewer.setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL), true);
+    QVERIFY(previewer.m_imgInFolderLabels != nullptr);
+    previewer("/another/pathCarousel");
+    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::FILE_SYSTEM_VIEW);
   }
 };
 

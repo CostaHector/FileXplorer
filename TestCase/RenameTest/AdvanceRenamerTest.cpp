@@ -35,8 +35,18 @@ private slots:
          {"reverser/Henry Cavill 1.jpg", false, ""},
 
          {"arrange/Part A - Part B/Img A - Img B - Img C - Img D.jpg", false, ""},
-         {"arrange/Part A - Part B/json A - json B - json C - json D.json", false, ""}};
-    QCOMPARE(mTDir.createEntries(nodesEntries), 3 + 2 + 2);
+         {"arrange/Part A - Part B/json A - json B - json C - json D.json", false, ""},
+
+         {"consecutive/Chris Pine 0.jpg", false, ""},
+         {"consecutive/Chris Pine 5.jpg", false, ""},
+         {"consecutive/Chris Pine 11.jpg", false, ""},
+         {"consecutive/Chris Hemsworth 13.jpg", false, ""},
+
+         {"nameContainUnicode/𝗔𝗕𝗖.txt", false, ""},
+         {"nameContainUnicode/𝘅𝘆𝘇.txt", false, ""},
+         {"nameContainUnicode/def.txt", false, ""},
+         };
+    QCOMPARE(mTDir.createEntries(nodesEntries), nodesEntries.size());
   }
 
   void test_Numerize() {
@@ -609,6 +619,74 @@ private slots:
       QCOMPARE(sNewName, "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
       QCOMPARE(sNewExt,  "\n.jpg\n.json");
     }
+  }
+
+  void test_ConsecutiveFileNo () {
+    const QString consecutivePath{mDir.absoluteFilePath("consecutive")};
+    const QStringList selectFileNames {"Chris Pine 0.jpg", "Chris Pine 5.jpg", "Chris Pine 11.jpg", "Chris Hemsworth 13.jpg"};
+    RenameWidget_ConsecutiveFileNo pConse;
+    pConse.init();
+    pConse.setModal(true);
+
+            // m_nameExtIndependent set indepentent in InitExtraMemberWidget
+    pConse.m_fileNoStartIndex->setText("1");
+    QCOMPARE(pConse.m_nameExtIndependent->checkState(), Qt::CheckState::Unchecked);
+
+    pConse.InitTextEditContent(consecutivePath, selectFileNames);
+    QCOMPARE(pConse.mSelectedNames, (QStringList{"Chris Pine 0.jpg", "Chris Pine 5.jpg", "Chris Pine 11.jpg", "Chris Hemsworth 13.jpg"}));
+    QCOMPARE(pConse.mRelToNameWithNoRoot, (QStringList{"", "", "", ""}));
+    QCOMPARE(pConse.mNames, (QStringList{"Chris Pine 0.jpg", "Chris Pine 5.jpg", "Chris Pine 11.jpg", "Chris Hemsworth 13.jpg"}));
+    QCOMPARE(pConse.mExts, (QStringList{"", "", "", ""}));
+
+    const QString& sNewName = pConse.m_nBaseTE->toPlainText();
+    const QString& sNewExt = pConse.m_nExtTE->toPlainText();
+    QCOMPARE(sNewName, "Chris Pine 1.jpg\nChris Pine 2.jpg\nChris Pine 3.jpg\nChris Hemsworth 4.jpg");
+    QCOMPARE(sNewExt, "\n\n\n");
+  }
+
+  void test_ConvertBoldUnicodeCharset2Ascii() {
+    const QString unicodePath{mDir.absoluteFilePath("nameContainUnicode")};
+    const QStringList selectFileNames {"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"};
+    RenameWidget_ConvertBoldUnicodeCharset2Ascii pCovert;
+    pCovert.init();
+    pCovert.setModal(true);
+    pCovert.m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
+    pCovert.show();
+
+    pCovert.InitTextEditContent(unicodePath, selectFileNames);
+    QCOMPARE(pCovert.mSelectedNames, (QStringList{"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"}));
+    QCOMPARE(pCovert.mRelToNameWithNoRoot, (QStringList{"", "", ""}));
+    QCOMPARE(pCovert.mNames, (QStringList{"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"}));
+    QCOMPARE(pCovert.mExts, (QStringList{"", "", ""}));
+
+    const QString& sNewName = pCovert.m_nBaseTE->toPlainText();
+    const QString& sNewExt = pCovert.m_nExtTE->toPlainText();
+    QCOMPARE(sNewName, "ABC.txt\nxyz.txt\ndef.txt");
+    QCOMPARE(sNewExt, "\n\n");
+
+    // 1. show command preview ok
+    QVERIFY(pCovert.m_commandsPreview == nullptr);
+    auto* pHelpBtn = pCovert.m_buttonBox->button(QDialogButtonBox::StandardButton::Help);
+    QVERIFY(pHelpBtn != nullptr);
+    pHelpBtn->setChecked(true);
+    emit pHelpBtn->toggled(true);
+    QVERIFY(pCovert.m_commandsPreview != nullptr);
+    QVERIFY(pCovert.m_commandsPreview->isVisible());
+
+    // 2. hide command preview ok
+    pHelpBtn->setChecked(false);
+    emit pHelpBtn->toggled(false);
+    QVERIFY(pCovert.m_commandsPreview != nullptr);
+    QVERIFY(!pCovert.m_commandsPreview->isVisible());
+
+    // 3. Apply rename ok
+    auto* pOkBtn = pCovert.m_buttonBox->button(QDialogButtonBox::StandardButton::Ok);
+    QVERIFY(pOkBtn != nullptr);
+    emit pOkBtn->clicked();
+
+    QDir unicodeDir{unicodePath, "", QDir::SortFlag::Name, QDir::Filter::Files};
+    QStringList actualNames = unicodeDir.entryList();
+    QCOMPARE(actualNames, (QStringList{"ABC.txt", "def.txt", "xyz.txt"}));
   }
 };
 
