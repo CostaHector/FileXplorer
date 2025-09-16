@@ -8,9 +8,9 @@ class CustomStatusBarTest : public PlainTestSuite {
   Q_OBJECT
 public:
 private slots:
-  void test_custom_statusbar() {
+  void test_custom_statusbar_label_contents_ok() {
     CustomStatusBar statusBar;
-    QCOMPARE(statusBar.mLabelsLst.size(), 4);
+    QCOMPARE(statusBar.mLabelsLst.size(), 3);
     QVERIFY(statusBar.m_viewsSwitcher != nullptr);
 
     // onPathInfoChanged - ITEMS

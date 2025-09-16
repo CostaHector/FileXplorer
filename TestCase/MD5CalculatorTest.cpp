@@ -4,14 +4,11 @@
 #include "MD5Calculator.h"
 using namespace MD5Calculator;
 
+
 class MD5CalculatorTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
-  void initTestCase() {}
-  void cleanupTestCase() {}
-  void init() {}
-  void cleanup() {}
+public:
+private slots:
 
   void test_First16ByteHash() {
     const QString& s1 = GetByteArrayMD5(QByteArray{});
@@ -32,6 +29,16 @@ class MD5CalculatorTest : public PlainTestSuite {
     QVERIFY(s1 != s4);
     QVERIFY(s2 != s1);
     QVERIFY(s2 != s4);
+  }
+
+  void calculation_correctness() {
+    const QString fileAbsPath{__FILE__};
+    // precondition:
+    const QString expectHash = GetHashPlatformDependent(fileAbsPath);
+    QVERIFY(!expectHash.isEmpty());
+
+    const QString actualHash = GetFileMD5(fileAbsPath, -1, QCryptographicHash::Algorithm::Md5);
+    QCOMPARE(actualHash, expectHash);
   }
 };
 
