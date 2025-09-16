@@ -8,7 +8,10 @@ RenameWidget_ConsecutiveFileNo::RenameWidget_ConsecutiveFileNo(QWidget* parent) 
 { }
 
 void RenameWidget_ConsecutiveFileNo::initExclusiveSetting() {
+  m_nameExtIndependent->setEnabled(false);
+  m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
   m_recursiveCB->setEnabled(false);
+  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 }
 
 QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replaceeList) {
@@ -28,8 +31,6 @@ QStringList RenameWidget_ConsecutiveFileNo::RenameCore(const QStringList& replac
 void RenameWidget_ConsecutiveFileNo::InitExtraMemberWidget() {
   m_fileNoStartIndex = new (std::nothrow) QLineEdit{"0", this};
   CHECK_NULLPTR_RETURN_VOID(m_fileNoStartIndex)
-  m_nameExtIndependent->setCheckState(Qt::CheckState::Checked);
-  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 }
 
 void RenameWidget_ConsecutiveFileNo::InitExtraCommonVariable() {
