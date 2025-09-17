@@ -285,8 +285,8 @@ const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
   return guid2MntPnts;
 }
 
-QString MountHelper::GetDisplayNameByGuidTableName(QString guidTableName) {
-  if (guidTableName.size() != MountHelper::GUID_LEN) {
+QString GetDisplayNameByGuidTableName(QString guidTableName) {
+  if (guidTableName.size() != GUID_LEN) {
     return guidTableName;
   }
   const QString& stdVolumeName = VOLUME_NAME_TEMPLATE.arg(guidTableName.replace(TABLE_UNDERSCORE, GUID_HYPEN));
@@ -301,7 +301,7 @@ QString MountHelper::GetDisplayNameByGuidTableName(QString guidTableName) {
 }
 
 // GUID in underscore -> RootPath
-QMap<QString, QString> MountHelper::GetGuidTableName2DisplayName() {
+QMap<QString, QString> GetGuidTableName2DisplayName() {
   QMap<QString, QString> guidTblName2Disp;
   const auto& mountedVolLst = QStorageInfo::mountedVolumes();
   for (const auto& si : mountedVolLst) {
@@ -312,7 +312,7 @@ QMap<QString, QString> MountHelper::GetGuidTableName2DisplayName() {
   return guidTblName2Disp;
 }
 
-QStringList MountHelper::GetGuidJoinDisplayName() {
+QStringList GetGuidJoinDisplayName() {
   QStringList guidDispLst;
   const auto& mountedVolLst = QStorageInfo::mountedVolumes();
   for (const auto& si : mountedVolLst) {
@@ -327,10 +327,12 @@ QStringList MountHelper::GetGuidJoinDisplayName() {
 }
 #endif
 
-QString MountHelper::ChoppedDisplayName(const QString& guidJoinDisplayName) {
+namespace MountHelper { // platform independent
+QString ChoppedDisplayName(const QString& guidJoinDisplayName) {
   const int colonIndex = guidJoinDisplayName.indexOf(JOINER_STR);
   if (colonIndex == -1) {
     return guidJoinDisplayName;
   }
   return guidJoinDisplayName.left(colonIndex);
 }
+} // MountHelper platform independent
