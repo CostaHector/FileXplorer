@@ -11,8 +11,12 @@
 #include <QMouseEvent>
 
 FileSystemTreeView::FileSystemTreeView(FileSystemModel* fsmModel, QWidget* parent)  //
-    : QTreeView{parent}                                                                //
+    : QTreeView{parent}, _fsModel{fsmModel}                                         //
 {
+  CHECK_NULLPTR_RETURN_VOID(_fsModel);
+  m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
+  CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
+
   setModel(fsmModel);
   InitViewSettings();
 
@@ -71,19 +75,19 @@ auto FileSystemTreeView::UpdateItemViewFontSize() -> void {
 }
 
 void FileSystemTreeView::dropEvent(QDropEvent* event) {
-  View::dropEventCore(this, event);
+  View::dropEventCore(this, _fsModel, event);
 }
 
 void FileSystemTreeView::dragEnterEvent(QDragEnterEvent* event) {
-  View::dragEnterEventCore(this, event);
+  View::dragEnterEventCore(this, _fsModel, event);
 }
 
 void FileSystemTreeView::dragMoveEvent(QDragMoveEvent* event) {
-  View::dragMoveEventCore(this, event);
+  View::dragMoveEventCore(this, _fsModel, event);
 }
 
 void FileSystemTreeView::dragLeaveEvent(QDragLeaveEvent* event) {
-  View::dragLeaveEventCore(this, event);
+  View::dragLeaveEventCore(_fsModel, event);
 }
 
 auto FileSystemTreeView::keyPressEvent(QKeyEvent* e) -> void {

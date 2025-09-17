@@ -14,7 +14,7 @@
 
 class FileSystemTableView : public CustomTableView {
  public:
-  FileSystemTableView(FileSystemModel* fsmModel, QWidget* parent = nullptr);
+  explicit FileSystemTableView(FileSystemModel* fsmModel, QWidget* parent = nullptr);
 
   void subscribe();
 
@@ -33,7 +33,8 @@ class FileSystemTableView : public CustomTableView {
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
  private:
-  QMenu* m_fsMenu = new RightClickMenu("Right click menu", this);
+  FileSystemModel* _fsModel {nullptr};
+  QMenu* m_fsMenu {nullptr};
   QPoint mDragStartPosition;
 };
 

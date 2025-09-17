@@ -59,6 +59,7 @@ file(GLOB SOURCES
     pubTestTool/*.cpp
     RenameTest/*.cpp
     ToolsTest/*.cpp
+    ViewTest/*.cpp
 )
 
 list(LENGTH SOURCES src_cpp_count)

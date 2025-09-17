@@ -101,7 +101,6 @@ private:
   RedundantImageFinder* m_redundantImageFinder{nullptr};
 private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten
-  static bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction);
 };
 
 #endif  // FILEEXPLOREREVENT_H

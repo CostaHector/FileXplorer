@@ -1,38 +1,34 @@
 ﻿#ifndef VIEWHELPER_H
 #define VIEWHELPER_H
 
-#include <QFileSystemModel>
-#include <QListView>
+#include <QAbstractItemView>
+#include <QDragEnterEvent>
 #include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QMimeData>
 
-class View {
- public:
-  virtual void subscribe() = 0;
+class FileSystemModel;
 
-  virtual void InitViewSettings() = 0;
+namespace View {
+bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton);
 
-  virtual void UpdateItemViewFontSize() = 0;
+void UpdateItemViewFontSizeCore(QAbstractItemView* view);
 
-  static bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton);
+bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to);
 
-  static void UpdateItemViewFontSizeCore(QAbstractItemView* view);
+void changeDropAction(QDropEvent* event);
 
-  static bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to);
+void dragEnterEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDragEnterEvent* event);
+void dragMoveEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDragMoveEvent* event);
+void dropEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDropEvent* event);
+void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event);
 
-  static void changeDropAction(QDropEvent* event);
+void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
 
-  static void dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event);
-  static void dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event);
-  static void dropEventCore(QAbstractItemView* view, QDropEvent* event);
-  static void dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event);
-
-  static void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
-
-  static QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
-  static constexpr int START_DRAG_DIST{32};
-  static constexpr int START_DRAG_DIST_MIN{10};
-  static constexpr Qt::MouseButtons MOUSE_NAVI_BTN = Qt::BackButton | Qt::ForwardButton;
-};
+QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
+constexpr int START_DRAG_DIST{32};  // QApplication::startDragDistance()
+constexpr int START_DRAG_DIST_MIN{10};
+constexpr Qt::MouseButtons MOUSE_NAVI_BTN = Qt::BackButton | Qt::ForwardButton;
+}  // namespace View
 
 #endif  // VIEWHELPER_H

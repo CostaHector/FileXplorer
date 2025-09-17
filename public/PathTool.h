@@ -87,7 +87,15 @@ int GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& ou
 QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
 QString StrCommonPrefix(const QString& path1, const QString& path2);
-bool isLinuxRootOrWinEmpty(const QString& path);  // loose
+
+inline bool isLinuxRootOrWinEmpty(const QString& path) {
+#ifdef _WIN32
+  return path.isEmpty();
+#else
+  return path.isEmpty() || path == "/";
+#endif
+}
+
 bool isRootOrEmpty(const QString& path);          // strict
 
 QString longestCommonPrefix(const QStringList& strs);
