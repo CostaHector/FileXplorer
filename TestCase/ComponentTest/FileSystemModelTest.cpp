@@ -153,11 +153,11 @@ private slots:
     QVERIFY(fileFullInfo.startsWith(nodeEntries[1].relativePathToNode + '\t' + "3"));
     QVERIFY(fileFullInfo.endsWith('\t' + model->rootPath()));
 
-    QVERIFY(model->canItemsDroppedHere(folderIndex));
-    QVERIFY(!model->canItemsDroppedHere(fileIndex));
+    QVERIFY(model->flags(folderIndex).testFlag(Qt::ItemFlag::ItemIsDropEnabled));
+    QVERIFY(!model->flags(fileIndex).testFlag(Qt::ItemFlag::ItemIsDropEnabled));
 
-    QVERIFY(model->canItemsBeDragged(folderIndex));
-    QVERIFY(model->canItemsBeDragged(fileIndex));
+    QVERIFY(model->flags(folderIndex).testFlag(Qt::ItemFlag::ItemIsDragEnabled));
+    QVERIFY(model->flags(fileIndex).testFlag(Qt::ItemFlag::ItemIsDragEnabled));
 
     QMimeData emptyData;
     QVERIFY(!model->canDropMimeData(&emptyData, Qt::DropAction::MoveAction, folderIndex.row(), folderIndex.column(), rootIndex));

@@ -18,7 +18,7 @@
 
 #include "ViewTypeTool.h"
 #include "FdBasedDb.h"
-
+#include "MimeDataHelper.h"
 
 class ViewSwitchHelper;
 
@@ -87,7 +87,7 @@ class ViewsStackedWidget : public QStackedWidget {
   QStringList getTheJpgFolderPaths() const;
   QStringList getFullRecords() const;
 
-  std::pair<QStringList, QList<QUrl>> getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
+  MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false) const;
 
   int getSelectedRowsCount() const;

@@ -1,5 +1,5 @@
 ﻿#include "FileSystemListView.h"
-
+#include "PublicMacro.h"
 #include "FileBasicOperationsActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
@@ -12,8 +12,12 @@
 #include <QMouseEvent>
 
 FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* parent)  //
-    : CustomListView{"FILE_SYSTEM_LIST", parent}                                       //
+    : CustomListView{"FILE_SYSTEM_LIST", parent}, _fsModel{fsmModel}                                       //
 {
+  CHECK_NULLPTR_RETURN_VOID(_fsModel);
+  m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
+  CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
+
   BindMenu(m_fsMenu);
   setModel(fsmModel);
 
@@ -49,19 +53,19 @@ void FileSystemListView::subscribe() {
 }
 
 void FileSystemListView::dropEvent(QDropEvent* event) {
-  View::dropEventCore(this, event);
+  View::dropEventCore(this, _fsModel, event);
 }
 
 void FileSystemListView::dragEnterEvent(QDragEnterEvent* event) {
-  View::dragEnterEventCore(this, event);
+  View::dragEnterEventCore(this, _fsModel, event);
 }
 
 void FileSystemListView::dragMoveEvent(QDragMoveEvent* event) {
-  View::dragMoveEventCore(this, event);
+  View::dragMoveEventCore(this, _fsModel, event);
 }
 
 void FileSystemListView::dragLeaveEvent(QDragLeaveEvent* event) {
-  View::dragLeaveEventCore(this, event);
+  View::dragLeaveEventCore(_fsModel, event);
 }
 
 auto FileSystemListView::keyPressEvent(QKeyEvent* e) -> void {

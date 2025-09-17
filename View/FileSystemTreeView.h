@@ -39,7 +39,8 @@ class FileSystemTreeView : public QTreeView {
   }
 
  private:
-  QMenu* m_fsMenu = new RightClickMenu("Right click menu", this);
+  FileSystemModel* _fsModel {nullptr};
+  QMenu* m_fsMenu {nullptr};
   QPoint mDragStartPosition;
 };
 
