@@ -76,6 +76,11 @@ QString FileXplorer::ReadSettings(const QStringList& args) {
   LOG_I("Program:[" PROJECT_NAME R"(] running with given args["%s"])", qPrintable(args.join(R"(",")")));
   // executing the program with or without command-line arguments
   QString path{(args.size() > 1) ? args[1] : ""};
+#ifdef _WIN32
+  if (path.endsWith(":\"")) { // e.g. "E:\"" => "E:/"
+    path.back() = '/';
+  }
+#endif
   // when argv[1] path invalid, use last time path in preference setting
   if (!QFile::exists(path)) {
     QString lastTimePath = Configuration().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
