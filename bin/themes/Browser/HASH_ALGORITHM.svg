@@ -1,0 +1,43 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="256" height="256" fill="#f5f5f5" />
+  
+  <!-- 输入数据（不同长度） -->
+  <g id="inputs">
+    <!-- 短输入 -->
+    <rect x="20" y="30" width="40" height="40" fill="#FF5252" rx="4" />
+    <text x="35" y="53" font-family="Arial" font-size="12" fill="white" text-anchor="left">A</text>
+    
+    <!-- 中等输入 -->
+    <rect x="20" y="110" width="70" height="40" fill="#4CAF50" rx="4" />
+    <text x="35" y="133" font-family="Arial" font-size="12" fill="white" text-anchor="left">BC</text>
+    
+    <!-- 长输入 -->
+    <rect x="20" y="190" width="100" height="40" fill="#2196F3" rx="4" />
+    <text x="35" y="213" font-family="Arial" font-size="12" fill="white" text-anchor="left">DEFGHI</text>
+  </g>
+  
+  <!-- 哈希函数（箭头表示转换过程） -->
+  <g id="hash-function">
+    <!-- 箭头主体 -->
+    <path d="M 140 125 L 170 125 L 170 110 L 190 125 L 170 140 L 170 125 Z" fill="#9C27B0" />
+    
+    <!-- 函数符号 -->
+    <text x="140" y="130" font-family="Arial" font-size="20" fill="#9C27B0" text-anchor="middle" font-weight="bold">hash</text>
+  </g>
+  
+  <!-- 输出哈希值（固定长度） -->
+  <g id="outputs">
+    <!-- 哈希值1 -->
+    <rect x="200" y="30" width="40" height="40" fill="#1976D2" rx="4" />
+    <text x="220" y="53" font-family="Arial" font-size="12" fill="white" text-anchor="middle">H1</text>
+    
+    <!-- 哈希值2 -->
+    <rect x="200" y="110" width="40" height="40" fill="#1976D2" rx="4" />
+    <text x="220" y="133" font-family="Arial" font-size="12" fill="white" text-anchor="middle">H2</text>
+    
+    <!-- 哈希值3 -->
+    <rect x="200" y="190" width="40" height="40" fill="#1976D2" rx="4" />
+    <text x="220" y="213" font-family="Arial" font-size="12" fill="white" text-anchor="middle">H3</text>
+  </g>
+</svg>

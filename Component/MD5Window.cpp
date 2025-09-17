@@ -3,9 +3,8 @@
 #include "MD5Calculator.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include <QMenu>
 #include <QFileInfo>
-#include <QDir>
-#include <QTextStream>
 #include <QIcon>
 #include <QMimeData>
 
@@ -18,7 +17,6 @@ MD5Window::MD5Window(QWidget* parent) : QDialog{parent} {
 
   _ONLY_ENTIRE_FILE_BYTES = new (std::nothrow) QAction{QIcon{":img/ONLY_EVERY_BYTES"}, "Every Bytes", this};
   _ONLY_ENTIRE_FILE_BYTES->setCheckable(true);
-
   {
     using namespace BytesRangeTool;
     mBytesRangeIntAct.init({{_ONLY_FIRST_8_BYTES,     BytesRangeE::FIRST_8},      //
@@ -36,21 +34,28 @@ MD5Window::MD5Window(QWidget* parent) : QDialog{parent} {
   _SHA256->setCheckable(true);
   _SHA512 = new (std::nothrow) QAction{"Sha512", this};
   _SHA512->setCheckable(true);
-
   {
     mHashAlgIntAct.init({{_MD5,    QCryptographicHash::Algorithm::Md5   },  //
                          {_SHA1,   QCryptographicHash::Algorithm::Sha1  },  //
                          {_SHA256, QCryptographicHash::Algorithm::Sha256},  //
                          {_SHA512, QCryptographicHash::Algorithm::Sha512}}, //
                         QCryptographicHash::Algorithm::Md5, QActionGroup::ExclusionPolicy::Exclusive);
-    mHashAlgIntAct.setCheckedIfActionExist(QCryptographicHash::Algorithm::Md5);
+    mHashAlgIntAct.setCheckedIfActionExist(QCryptographicHash::Algorithm::Md5);    
   }
+  auto* pHashAlgorithmMenu = new (std::nothrow) QMenu{"Algorithm Menu", this};
+  pHashAlgorithmMenu->addActions(mHashAlgIntAct.getActionEnumAscendingList());
+  _HASH_ALGORITHM_TOOLBUTTON = new (std::nothrow) QToolButton{this};
+  _HASH_ALGORITHM_TOOLBUTTON->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  _HASH_ALGORITHM_TOOLBUTTON->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
+  _HASH_ALGORITHM_TOOLBUTTON->setIcon(QIcon{":img/HASH_ALGORITHM"});
+  _HASH_ALGORITHM_TOOLBUTTON->setText("Hash Algorithm");
+  _HASH_ALGORITHM_TOOLBUTTON->setMenu(pHashAlgorithmMenu);
 
   m_md5InfoTB = new (std::nothrow) QToolBar{"Calculate MD5 Parms", this};
   m_md5InfoTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  m_md5InfoTB->addActions(mBytesRangeIntAct.getActionEnumAscendingList());
+  m_md5InfoTB->addWidget(_HASH_ALGORITHM_TOOLBUTTON);
   m_md5InfoTB->addSeparator();
-  m_md5InfoTB->addActions(mHashAlgIntAct.getActionEnumAscendingList());
+  m_md5InfoTB->addActions(mBytesRangeIntAct.getActionEnumAscendingList());
 
   m_md5TextEdit = new (std::nothrow) QPlainTextEdit{this};
 
@@ -135,10 +140,10 @@ void MD5Window::dragEnterEvent(QDragEnterEvent* event) {
     return;
   }
   if (!pMimedata->hasUrls()) {
-    event->accept();
+    event->ignore();
     return;
   }
-  QDialog::dragEnterEvent(event);
+  event->accept();
 }
 
 void MD5Window::subscribe() {

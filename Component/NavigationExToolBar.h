@@ -5,7 +5,6 @@
 #include "ReorderableToolBar.h"
 
 class NavigationExToolBar : public ReorderableToolBar {
-  Q_OBJECT
  public:
   explicit NavigationExToolBar(const QString& title, QWidget* parent = nullptr);
 
@@ -22,7 +21,6 @@ class NavigationExToolBar : public ReorderableToolBar {
 
   void CustomContextMenuEvent(const QPoint& pnt);
 
-  void AlighLeft();
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
   static void BindIntoNewPath(T_IntoNewPath IntoNewPath) { m_IntoNewPath = IntoNewPath; }
   static bool onPathActionTriggered(const QAction* pAct);
@@ -34,6 +32,9 @@ class NavigationExToolBar : public ReorderableToolBar {
   QPoint mDragStartPosition;
   QAction *UNPIN_THIS{nullptr}, *UNPIN_ALL{nullptr};
   QMenu* mMenu{nullptr};
-};
 
+  static constexpr char EXTRA_NAVI_DICT[] {"ExtraNavigationDict"};
+  static constexpr char EXTRA_NAVI_DICT_KEY[] {"folderName"};
+  static constexpr char EXTRA_NAVI_DICT_VALUE[] {"absPath"};
+};
 #endif  // NAVIGATIONEXTOOLBAR_H
