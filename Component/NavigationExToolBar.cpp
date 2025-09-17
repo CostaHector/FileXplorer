@@ -1,6 +1,7 @@
 ﻿#include "NavigationExToolBar.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "StyleSheet.h"
 
 #include <QDragEnterEvent>
 #include <QToolTip>
@@ -14,7 +15,10 @@
 #include <QLayout>
 #include <QStyle>
 
-T_IntoNewPath NavigationExToolBar::m_IntoNewPath;
+T_IntoNewPath NavigationExToolBar::m_IntoNewPath {nullptr};
+constexpr char NavigationExToolBar::EXTRA_NAVI_DICT[];
+constexpr char NavigationExToolBar::EXTRA_NAVI_DICT_KEY[];
+constexpr char NavigationExToolBar::EXTRA_NAVI_DICT_VALUE[];
 
 // toolbar
 NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent)  //
@@ -49,12 +53,10 @@ void NavigationExToolBar::dragEnterEvent(QDragEnterEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(pMimeData);
   if (pMimeData->hasUrls()) {
     LOG_D("mimeData urls cnt[%d]", pMimeData->urls().size());
-    event->acceptProposedAction();
-  } else if (pMimeData->hasText()) {
-    ReorderableToolBar::dragEnterEvent(event);
+    event->accept();
     return;
   }
-  event->accept();
+  ReorderableToolBar::dragEnterEvent(event);
 }
 
 void NavigationExToolBar::dropEvent(QDropEvent* event) {
@@ -74,28 +76,24 @@ void NavigationExToolBar::dropEvent(QDropEvent* event) {
     LOG_D("%d link action(s) dropped here...", folderName2AbsPath.size());
     AppendExtraActions(folderName2AbsPath);
     SaveName2PathLink();
-  } else {
-    ReorderableToolBar::dropEvent(event);
+    event->accept();
     return;
   }
-  QToolBar::dropEvent(event);
+  ReorderableToolBar::dropEvent(event);
 }
 
 // accept drag movements only if the target supports drops
 void NavigationExToolBar::dragMoveEvent(QDragMoveEvent* event) {
-  if (event->mimeData()->hasText()) {
-    ReorderableToolBar::dragMoveEvent(event);
+  if (event->mimeData()->hasUrls()) {
+    event->accept();
     return;
-  } else if (event->mimeData()->hasUrls()) {
-    // no text has url?
-    event->acceptProposedAction();
-    QToolBar::dragMoveEvent(event);
   }
+  ReorderableToolBar::dragMoveEvent(event);
 }
 
 void NavigationExToolBar::SaveName2PathLink() {
   const QList<QAction*>& actsList = actions();
-  Configuration().beginWriteArray("ExtraNavigationDict", actsList.size());
+  Configuration().beginWriteArray(EXTRA_NAVI_DICT, actsList.size());
   int extraIndex = 0;
 
   foreach (QAction* pAct, actsList) {
@@ -112,20 +110,20 @@ void NavigationExToolBar::SaveName2PathLink() {
       continue;
     }
     Configuration().setArrayIndex(extraIndex);
-    Configuration().setValue("folderName", pPathAct->text());
-    Configuration().setValue("absPath", pPathAct->toolTip());
+    Configuration().setValue(EXTRA_NAVI_DICT_KEY, pPathAct->text());
+    Configuration().setValue(EXTRA_NAVI_DICT_VALUE, pPathAct->toolTip());
     ++extraIndex;
   }
   Configuration().endArray();
 }
 
 void NavigationExToolBar::ReadSettings() {
-  int lnkCnt = Configuration().beginReadArray("ExtraNavigationDict");
+  int lnkCnt = Configuration().beginReadArray(EXTRA_NAVI_DICT);
   QMap<QString, QString> folderName2AbsPath;
   for (int extraIndex = 0; extraIndex < lnkCnt; ++extraIndex) {
     Configuration().setArrayIndex(extraIndex);
-    folderName2AbsPath[Configuration().value("folderName").toString()]  //
-        = Configuration().value("absPath").toString();
+    folderName2AbsPath[Configuration().value(EXTRA_NAVI_DICT_KEY).toString()]  //
+        = Configuration().value(EXTRA_NAVI_DICT_VALUE).toString();
   }
   Configuration().endArray();
   AppendExtraActions(folderName2AbsPath);
@@ -159,14 +157,8 @@ void NavigationExToolBar::CustomContextMenuEvent(const QPoint& pnt) {
   mRightClickAtPnt = pnt;
 }
 
-void NavigationExToolBar::AlighLeft() {
-  for (int i = 0; i < layout()->count(); ++i) {
-    layout()->itemAt(i)->setAlignment(Qt::AlignmentFlag::AlignLeft);
-  }
-}
-
 void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
-  static const auto dirIcon = QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon);
+  static const QIcon dirIcon = QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon);
   for (auto it = folderName2AbsPath.cbegin(); it != folderName2AbsPath.cend(); ++it) {
     const QString& folderName = it.key();
     const QString& absPath = it.value();
@@ -174,11 +166,8 @@ void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folde
     CHECK_NULLPTR_RETURN_VOID(pCollectionAct)
     pCollectionAct->setToolTip(absPath);
     addAction(pCollectionAct);
-    //    connect(pCollectionAct, &QAction::triggered, [pCollectionAct]() {  //
-    //      NavigationExToolBar::onPathActionTriggered(pCollectionAct);      //
-    //    });
   }
-  AlighLeft();
+  SetLayoutAlightment(layout(), Qt::AlignmentFlag::AlignLeft);
 }
 
 bool NavigationExToolBar::onPathActionTriggered(const QAction* pAct) {

@@ -2,6 +2,7 @@
 #define MD5WINDOW_H
 #include <QDialog>
 #include <QToolBar>
+#include <QToolButton>
 #include <QPlainTextEdit>
 #include <QStringList>
 #include <QMap>
@@ -34,8 +35,8 @@ public:
   explicit MD5Window(QWidget* parent = nullptr);
   int operator()(const QStringList& absPaths);
 
-  void dropEvent(QDropEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
+  void dropEvent(QDropEvent* event) override;
   void ReadSetting();
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
@@ -54,6 +55,7 @@ private:
   QAction* _SHA1 {nullptr};
   QAction* _SHA256 {nullptr};
   QAction* _SHA512 {nullptr};
+  QToolButton* _HASH_ALGORITHM_TOOLBUTTON{nullptr};
   EnumIntAction<QCryptographicHash::Algorithm> mHashAlgIntAct;
 
   QToolBar* m_md5InfoTB{nullptr};

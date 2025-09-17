@@ -57,17 +57,31 @@ private slots:
   void test_drop_event_ok() {
     MD5Window mw;
     const QPoint dropPos = mw.geometry().center();
+    const QPoint dragEnterPos = dropPos;
 
     QMimeData emptyMimeData;
+    emptyMimeData.setText("No urls");
+
+    QMimeData urlsMimeData;
+    urlsMimeData.setText("2 urls");
+    QList<QUrl> urlsList{QUrl::fromLocalFile(__FILE__), QUrl::fromLocalFile(__FILE__)};
+    urlsMimeData.setUrls(urlsList);
+
+    QDragEnterEvent ignoreDragEnter(dragEnterPos, Qt::IgnoreAction, &emptyMimeData, Qt::LeftButton, Qt::NoModifier);
+    mw.dragEnterEvent(&ignoreDragEnter);
+    QCOMPARE(ignoreDragEnter.isAccepted(), false); // no urls, refuse drag enter
+
+    QDragEnterEvent acceptDragEnter(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+    mw.dragEnterEvent(&acceptDragEnter);
+    QCOMPARE(acceptDragEnter.isAccepted(), true); // has urls, accpet drag enter
+
+
     QDropEvent ignoreDropEvent(dropPos, Qt::IgnoreAction, &emptyMimeData, Qt::LeftButton, Qt::NoModifier);
     mw.dropEvent(&ignoreDropEvent); // invalid mimedata no need drop
     QCOMPARE(ignoreDropEvent.isAccepted(), false);
     QCOMPARE(mw.mPathsList.size(), 0);
 
-    QMimeData mimeData;
-    QList<QUrl> urlsList{QUrl::fromLocalFile(__FILE__), QUrl::fromLocalFile(__FILE__)};
-    mimeData.setUrls(urlsList);
-    QDropEvent drop1stEvent(dropPos, Qt::IgnoreAction, &mimeData, Qt::LeftButton, Qt::NoModifier);
+    QDropEvent drop1stEvent(dropPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
     mw.dropEvent(&drop1stEvent); // first time drop
     QCOMPARE(drop1stEvent.isAccepted(), true);
     QCOMPARE(mw.mPathsList.size(), 1);
@@ -76,7 +90,7 @@ private slots:
     const QString contents1 = mw.m_md5TextEdit->toPlainText();
     QCOMPARE(nonEmptyLineCount(contents1), 2);
 
-    QDropEvent drop2ndEvent(dropPos, Qt::IgnoreAction, &mimeData, Qt::LeftButton, Qt::NoModifier);
+    QDropEvent drop2ndEvent(dropPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
     mw.dropEvent(&drop2ndEvent); // again drop
     QCOMPARE(drop2ndEvent.isAccepted(), true);
     QCOMPARE(mw.mPathsList.size(), 1);
