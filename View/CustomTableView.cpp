@@ -30,8 +30,12 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   m_defaultTableColumnWidth{MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE.v.toInt()},
   m_columnsShowSwitch{QString{50, QChar{'1'}}} {
   if (!SETTING_SHARING_WIDGET.contains(m_name) && isNameExists(m_name)) { // not in sharing list, but name already find
+#ifdef RUNNING_UNIT_TESTS
+    LOG_D("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
+#else
     LOG_W("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
     return;
+#endif
   }
   TABLES_SET.insert(m_name);
   if (Configuration().contains(m_DEFAULT_SECTION_SIZE_KEY)) {

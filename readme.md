@@ -227,6 +227,16 @@ Define a new action
 
 save the items tree
 
+## Coverage report
+```bash
+cmake --build /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug --target all
+cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug;/usr/bin/lcov --capture --directory . --output-file coverage.info --exclude "/home/ariel/Qt/*" --exclude "/usr/include/*" --exclude "/usr/local/include/*" --exclude "*/TestCase/*" --exclude "*/unittest/*"        --exclude "*/build/*"
+cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug;genhtml coverage.info --output-directory coverage_report
+cd /home/ariel/code/FileXplorer
+
+
+```bash
+
 
 ## Testcase
 ### Table 1.0 Expected Behavior of rename Functions

@@ -15,11 +15,11 @@
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
-  : QStackedWidget(parent),  //
-  mMovieDb{SystemPath::VIDS_DATABASE, "DBMOVIE_CONNECT"},
-  mCastDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"},
-  _previewFolder{previewFolder},  //
-  m_parent(parent)                //
+    : QStackedWidget(parent),  //
+      mMovieDb{SystemPath::VIDS_DATABASE, "DBMOVIE_CONNECT"},
+      mCastDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"},
+      _previewFolder{previewFolder},  //
+      m_parent(parent)                //
 {
   m_fsModel = new (std::nothrow) FileSystemModel(this);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -168,7 +168,7 @@ void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addre
           [this](const QString& newPath) {                                                             //
             onAddressToolbarPathChanged(newPath, true);                                                //
           }                                                                                            //
-          );
+  );
 }
 
 void ViewsStackedWidget::BindDatabaseSearchToolBar(MovieDBSearchToolBar* dbSearchBar) {
@@ -251,7 +251,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
     }
     if (ViewTypeTool::IsMatch(vt, (int)ViewTypeTool::ViewTypeMask::CAST)) {
       g_viewActions()._TABLE_VIEW->setChecked(true);
-      emit g_viewActions()._TABLE_VIEW->triggered(true); // both 2 signals: 1) undo stack+1 and 2) view Switched happen
+      emit g_viewActions()._TABLE_VIEW->triggered(true);  // both 2 signals: 1) undo stack+1 and 2) view Switched happen
       return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
     }
     return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
@@ -259,7 +259,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   return true;
 }
 
-void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
+void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, const QModelIndex& /*previous*/) {
   // don't use reference here, indexes() -> QModelIndexList, front() -> const T&
   if (!current.isValid()) {
     return;
@@ -270,7 +270,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex &current, con
   }
 
   auto vt = GetVt();
-  if (ViewTypeTool::isFSView(vt)) { // anchorTags only work for file-system
+  if (ViewTypeTool::isFSView(vt)) {  // anchorTags only work for file-system
     QString parentPth = fi.absolutePath();
 #ifdef _WIN32
     if (!parentPth.isEmpty() && parentPth.back() == ':') {
@@ -295,26 +295,31 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
   disconnectSelectionChanged();
 
   auto* curView = GetCurView();
-  mSelectionChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-  mDoubleClickedConnectConn = ViewsStackedWidget::connect(curView, &QAbstractItemView::doubleClicked, this, &ViewsStackedWidget::on_cellDoubleClicked);
+  mSelectionChangedConn =
+      ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+  mDoubleClickedConnectConn =
+      ViewsStackedWidget::connect(curView, &QAbstractItemView::doubleClicked, this, &ViewsStackedWidget::on_cellDoubleClicked);
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:
     case ViewType::TREE:
     case ViewType::SEARCH: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_fsmCurrentRowChanged);
+      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+                                                        &ViewsStackedWidget::on_fsmCurrentRowChanged);
       break;
     }
     case ViewType::SCENE: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_sceneTableView, &SceneListView::currentSceneChanged,
-                                                        _previewFolder, //
-                                                        static_cast<void (CurrentRowPreviewer::*)(const QString&, const QStringList&, const QStringList&)>(&CurrentRowPreviewer::operator()));
+      mCurrentChangedConn = ViewsStackedWidget::connect(
+          m_sceneTableView, &SceneListView::currentSceneChanged,
+          _previewFolder,  //
+          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QStringList&, const QStringList&)>(&CurrentRowPreviewer::operator()));
       break;
     }
     case ViewType::CAST: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged,
-                                                        _previewFolder, //
-                                                        static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(&CurrentRowPreviewer::operator()));
+      mCurrentChangedConn =
+          ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged,
+                                      _previewFolder,  //
+                                      static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(&CurrentRowPreviewer::operator()));
       break;
     }
     default: {
@@ -361,11 +366,9 @@ auto ViewsStackedWidget::keyPressEvent(QKeyEvent* e) -> void {
 }
 
 std::pair<QModelIndex, QModelIndex> ViewsStackedWidget::getTopLeftAndRightDownRectangleIndex() const {
-  static const auto GetterForFsModel = [] (const QAbstractItemModel* model, const QModelIndex& rootIndex) -> decltype(getTopLeftAndRightDownRectangleIndex()) {
-    return {model->index(0, 0, rootIndex),
-            model->index(model->rowCount(rootIndex) - 1,
-                         model->columnCount(rootIndex) - 1,
-                         rootIndex)};
+  static const auto GetterForFsModel = [](const QAbstractItemModel* model,
+                                          const QModelIndex& rootIndex) -> decltype(getTopLeftAndRightDownRectangleIndex()) {
+    return {model->index(0, 0, rootIndex), model->index(model->rowCount(rootIndex) - 1, model->columnCount(rootIndex) - 1, rootIndex)};
   };
   // attention here we get the proxy rectangle index, not the source model index. for display it is ok.
   // but for records contents, mapToSource Needed Here
@@ -804,80 +807,42 @@ QStringList ViewsStackedWidget::getTheJpgFolderPaths() const {
   return prepaths;
 }
 
-std::pair<QStringList, QList<QUrl>> ViewsStackedWidget::getFilePathsAndUrls(const Qt::DropAction dropAct) const {
-  QStringList filePaths;
-  QList<QUrl> urls;
-
-  const auto Fill = [&filePaths, &urls](FileSystemModel* fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct) {
-    filePaths.reserve(indexes.size());
-    urls.reserve(indexes.size());
-    for (const auto& ind : indexes) {
-      filePaths.append(fsModel->filePath(ind));
-      urls.append(QUrl::fromLocalFile(filePaths.back()));
-    }
-    if (dropAct == Qt::CopyAction) {
-      fsModel->CopiedSomething(indexes);
-    } else if (dropAct == Qt::MoveAction) {
-      fsModel->CutSomething(indexes);
-    }
-  };
-
-  const auto FillInSearchModel = [&filePaths, &urls](
-                                     AdvanceSearchModel* searchSrcModel, SearchProxyModel* searchProxyModel,
-                                     const QModelIndexList& proIndexes, const Qt::DropAction dropAct) {
-
-    QModelIndexList srcIndexes;
-    srcIndexes.reserve(proIndexes.size());
-    filePaths.reserve(proIndexes.size());
-    urls.reserve(proIndexes.size());
-    for (const auto& proInd : proIndexes) {
-      const auto& srcind = searchProxyModel->mapToSource(proInd);
-      srcIndexes.append(srcind);
-      filePaths.append(searchSrcModel->filePath(srcind));
-      urls.append(QUrl::fromLocalFile(filePaths.back()));
-    }
-    if (dropAct == Qt::CopyAction) {
-      searchSrcModel->CopiedSomething(srcIndexes);
-    } else if (dropAct == Qt::MoveAction) {
-      searchSrcModel->CutSomething(srcIndexes);
-    }
-  };
-
-
+MimeDataHelper::MimeDataMember ViewsStackedWidget::getFilePathsAndUrls(const Qt::DropAction dropAct) const {
+  using namespace MimeDataHelper;
   auto vt = GetVt();
   switch (vt) {
     case ViewType::LIST: {
-      Fill(m_fsModel, m_fsListView->selectionModel()->selectedRows(), dropAct);
-      break;
+      MimeDataMember ret = GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsListView->selectionModel()->selectedRows());
+      FillCutCopySomething<FileSystemModel>(*m_fsModel, ret.srcIndexes, dropAct);
+      return ret;
     }
     case ViewType::TABLE: {
-      Fill(m_fsModel, m_fsTableView->selectionModel()->selectedRows(), dropAct);
-      break;
+      MimeDataMember ret = GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsTableView->selectionModel()->selectedRows());
+      FillCutCopySomething<FileSystemModel>(*m_fsModel, ret.srcIndexes, dropAct);
+      return ret;
     }
     case ViewType::TREE: {
-      Fill(m_fsModel, m_fsTreeView->selectionModel()->selectedRows(), dropAct);
-      break;
+      MimeDataMember ret = GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsTreeView->selectionModel()->selectedRows());
+      FillCutCopySomething<FileSystemModel>(*m_fsModel, ret.srcIndexes, dropAct);
+      return ret;
     }
     case ViewType::SEARCH: {
-      FillInSearchModel(m_searchSrcModel, m_searchProxyModel, m_advanceSearchView->selectionModel()->selectedRows(), dropAct);
-      break;
+      MimeDataMember ret = GetMimeDataMemberFromSearchModel(*m_searchSrcModel, *m_searchProxyModel, m_advanceSearchView->selectionModel()->selectedRows());
+      FillCutCopySomething<AdvanceSearchModel>(*m_searchSrcModel, ret.srcIndexes, dropAct);
+      return ret;
     }
     case ViewType::SCENE: {
-      LOG_D("Todo getFilePathsAndUrls");
-      break;
+      LOG_D("SCENE type not support getFilePathsAndUrls");
+      return {};
     }
     case ViewType::MOVIE: {
-      for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        filePaths.append(m_movieDbModel->filePath(ind));
-        urls.append(QUrl::fromLocalFile(filePaths.back()));
-      }
-      break;
+      return GetMimeDataMemberFromSourceModel<FdBasedDbModel>(*m_movieDbModel, m_movieView->selectionModel()->selectedRows());
     }
     default: {
-      LOG_W("No getFilePathsAndUrls ViewType:%d", (int)vt);
+      LOG_W("ViewType:%s not support getFilePathsAndUrls", c_str(vt));
+      return {};
     }
   }
-  return {filePaths, urls};
 }
 
 std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(const bool isSearchRecycle) const {
