@@ -2,6 +2,7 @@
 #define MD5WINDOW_H
 #include <QDialog>
 #include <QToolBar>
+#include <QToolButton>
 #include <QPlainTextEdit>
 #include <QStringList>
 #include <QMap>
@@ -54,6 +55,7 @@ private:
   QAction* _SHA1 {nullptr};
   QAction* _SHA256 {nullptr};
   QAction* _SHA512 {nullptr};
+  QToolButton* _HASH_ALGORITHM_TOOLBUTTON{nullptr};
   EnumIntAction<QCryptographicHash::Algorithm> mHashAlgIntAct;
 
   QToolBar* m_md5InfoTB{nullptr};
