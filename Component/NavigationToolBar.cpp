@@ -49,7 +49,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
   }
   addSeparator();
   // 4. all collections
-  m_extraAppendTB = new (std::nothrow) NavigationExToolBar{"ExtraNavigation"};
+  m_extraAppendTB = new (std::nothrow) NavigationExToolBar{"ExtraNavigation", this};
   CHECK_NULLPTR_RETURN_VOID(m_extraAppendTB);
   addWidget(m_extraAppendTB);
 
@@ -70,14 +70,3 @@ void NavigationToolBar::subscribe() {
   });
   connect(this, &QToolBar::actionTriggered, &NavigationExToolBar::onPathActionTriggered);
 }
-
-// #define __MAIN__EQ__NAME__ 1
-#ifdef __MAIN__EQ__NAME__
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  NavigationToolBar naviTB{"nvTB", true};
-  naviTB.show();
-  // try drag a folder into NavigationExToolBar, it should create a link
-  return a.exec();
-}
-#endif

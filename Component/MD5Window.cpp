@@ -42,9 +42,9 @@ MD5Window::MD5Window(QWidget* parent) : QDialog{parent} {
                         QCryptographicHash::Algorithm::Md5, QActionGroup::ExclusionPolicy::Exclusive);
     mHashAlgIntAct.setCheckedIfActionExist(QCryptographicHash::Algorithm::Md5);    
   }
-  auto* pHashAlgorithmMenu = new QMenu{"Algorithm Menu", this};
+  auto* pHashAlgorithmMenu = new (std::nothrow) QMenu{"Algorithm Menu", this};
   pHashAlgorithmMenu->addActions(mHashAlgIntAct.getActionEnumAscendingList());
-  _HASH_ALGORITHM_TOOLBUTTON = new QToolButton{this};
+  _HASH_ALGORITHM_TOOLBUTTON = new (std::nothrow) QToolButton{this};
   _HASH_ALGORITHM_TOOLBUTTON->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   _HASH_ALGORITHM_TOOLBUTTON->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
   _HASH_ALGORITHM_TOOLBUTTON->setIcon(QIcon{":img/HASH_ALGORITHM"});
