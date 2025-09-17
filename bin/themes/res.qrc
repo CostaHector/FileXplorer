@@ -236,6 +236,7 @@
     <file alias="SEARCH_MULTI_KEYWORDS">Browser/SEARCH_MULTI_KEYWORDS.svg</file>
     <file alias="SEARCH_CHOICE">Browser/SEARCH_CHOICE.svg</file>
     <file alias="EDITOR_MODE">Browser/EDITOR_MODE.svg</file>
+    <file alias="HASH_ALGORITHM">Browser/HASH_ALGORITHM.svg</file>
 
     <!--PreferenceIcons icon here-->
     <file alias="BACKGROUND_IMAGE_PATH">PreferenceIcons/BACKGROUND_IMAGE_PATH.ico</file>
