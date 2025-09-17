@@ -46,15 +46,22 @@ private slots:
     QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), ""); // no drop table
 
     QSignalSpy movieTableChangedSpy(&mdbSearchBar, &MovieDBSearchToolBar::movieTableChanged);
-    tableCB->AddItem("Disk_GUID", "Directory Path");
+    mdbSearchBar.AddATable("Disk_GUID"); // in linux rootpath=""
     tableCB->setCurrentIndex(0);
-    emit tableCB->currentTextChanged("Disk_GUID|Directory Path");
+    QCOMPARE(mdbSearchBar.m_tablesCB->count(), 1);
+
+    const QString fullPath = tableCB->currentText(); // guid|rootpath
+    emit tableCB->currentTextChanged(fullPath);
     QList<QVariant> movieTableParams = movieTableChangedSpy.back();
     QCOMPARE(movieTableParams.size(), 1);
-    QCOMPARE(movieTableParams[0].toString(), "Disk_GUID|Directory Path");
+    QCOMPARE(movieTableParams[0].toString(), fullPath);
 
-    QCOMPARE(tableCB->currentText(), "Disk_GUID|Directory Path");
+    QCOMPARE(tableCB->currentText(), fullPath);
     QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), "Disk_GUID"); // drop current text table by default
+
+    QStringList invalidGuids{"xxx_invalid_guid", "yyy_invalid_guid", "zzz_invalid_guid"};
+    mdbSearchBar.InitTables(invalidGuids);
+    QCOMPARE(mdbSearchBar.m_tablesCB->count(), 3); // the former 1 table name in combobox will be cleared
   }
 
   void CastDatabaseSearchToolBar_emitSignal_ok() {

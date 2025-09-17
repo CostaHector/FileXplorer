@@ -35,19 +35,17 @@ const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
 QString GetDisplayNameByGuidTableName(QString guidTableName) { return {}; }
 QMap<QString, QString> GetGuidTableName2DisplayName() { return {}; }
 QStringList GetGuidJoinDisplayName() { return {}; }
-QString ChoppedDisplayName(const QString& guidJoinDisplayName) { return {}; }
 }
 #else
-
 #include <windows.h>
 #include "fileapi.h"
-
-QString MountHelper::ExtractGuidFromVolumeName(const QString& volume) {
+namespace MountHelper {
+QString ExtractGuidFromVolumeName(const QString& volume) {
   // R"(\\?\Volume{36 chars}\)"
   return volume.mid(START_INT, GUID_LEN);
 }
 
-QString MountHelper::ExtractGuidFromVolumeName(const wchar_t* p2volume) {
+QString ExtractGuidFromVolumeName(const wchar_t* p2volume) {
   // R"(\\?\Volume{36 chars}\)"
   if (p2volume == nullptr) {
     LOG_C("p2volume is nullptr");
@@ -58,7 +56,7 @@ QString MountHelper::ExtractGuidFromVolumeName(const wchar_t* p2volume) {
 }
 
 // 动态获取GUID（示例：通过卷标匹配）
-QString MountHelper::findVolumeGuidByLabel(const QString& label) {
+QString findVolumeGuidByLabel(const QString& label) {
   wchar_t volumeName[MAX_PATH]{0};
   HANDLE hFind = FindFirstVolumeW(volumeName, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
@@ -79,7 +77,7 @@ QString MountHelper::findVolumeGuidByLabel(const QString& label) {
 }
 
 // 枚举系统中所有已连接的卷，检查目标GUID是否存在
-bool MountHelper::isVolumeAvailable(const QString& dstVolumeGuid) {
+bool isVolumeAvailable(const QString& dstVolumeGuid) {
   wchar_t volumeName[MAX_PATH]{0};
   HANDLE hFind = FindFirstVolumeW(volumeName, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
@@ -99,14 +97,14 @@ bool MountHelper::isVolumeAvailable(const QString& dstVolumeGuid) {
   return false;
 }
 
-bool MountHelper::RunAsAdmin() {
+bool RunAsAdmin() {
   const QString& program = "path\\to\\yourapp.exe";  // 替换为你的应用程序路径
   QString runas{"runas"};
   QStringList cmds{"/user:administrator", QString(R"(%1)").arg(program)};
   return QProcess::startDetached(runas, cmds);  // 使用startDetached来异步启动进程
 }
 
-bool MountHelper::IsAdministrator() {
+bool IsAdministrator() {
   BOOL isAdmin = FALSE;
   SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
   PSID AdministratorsGroup;
@@ -120,7 +118,7 @@ bool MountHelper::IsAdministrator() {
 }
 
 // 修改后的挂载函数
-bool MountHelper::MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) {
+bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) {
   if (volumeGuid.isEmpty() || label.isEmpty()) {
     LOG_W("volumeGuid[%s] and label[%s] cannot empty", qPrintable(volumeGuid), qPrintable(label));
     return false;
@@ -151,12 +149,12 @@ bool MountHelper::MountVolume(const QString& volumeGuid, const QString& label, Q
   return true;
 }
 
-bool MountHelper::UnmountVolume(const QString& volMountPoint) {
+bool UnmountVolume(const QString& volMountPoint) {
   return DeleteVolumeMountPointA(volMountPoint.toStdString().c_str()) == true;
 }
 
 // 枚举指定卷的所有挂载点
-QSet<QString> MountHelper::GetMountPointsByVolumeName(const wchar_t* volumeName) {
+QSet<QString> GetMountPointsByVolumeName(const wchar_t* volumeName) {
   WCHAR mountPoint[MAX_PATH] = {0};
   HANDLE hFind = FindFirstVolumeMountPointW(volumeName, mountPoint, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
@@ -175,7 +173,7 @@ QSet<QString> MountHelper::GetMountPointsByVolumeName(const wchar_t* volumeName)
 }
 
 // 主调用逻辑
-QMap<QString, QSet<QString> > MountHelper::Volumes2ContainedMountPnts() {
+QMap<QString, QSet<QString> > Volumes2ContainedMountPnts() {
   WCHAR volumeName[MAX_PATH] = {0};
   HANDLE hVol = FindFirstVolumeW(volumeName, ARRAYSIZE(volumeName));
   QMap<QString, QSet<QString> > vol2Pnts;
@@ -198,7 +196,7 @@ QMap<QString, QSet<QString> > MountHelper::Volumes2ContainedMountPnts() {
   return vol2Pnts;
 }
 
-QMap<QString, QString> MountHelper::GetGuid2LabelMap() {
+QMap<QString, QString> GetGuid2LabelMap() {
   wchar_t volumeName[MAX_PATH]{0};
   HANDLE hFind = FindFirstVolumeW(volumeName, MAX_PATH);
   if (hFind == INVALID_HANDLE_VALUE) {
@@ -220,7 +218,7 @@ QMap<QString, QString> MountHelper::GetGuid2LabelMap() {
   return guid2Label;
 }
 
-bool MountHelper::GetVolumeInfo(const QString& path, QString& volName) {
+bool GetVolumeInfo(const QString& path, QString& volName) {
   TCHAR volumeName[MAX_PATH] = {0};
   TCHAR fileSystemName[MAX_PATH] = {0};
   DWORD serialNumber[3]{0};  // serialNumber 128位
@@ -238,7 +236,7 @@ bool MountHelper::GetVolumeInfo(const QString& path, QString& volName) {
   return true;
 }
 
-bool MountHelper::GetGuidByDrive(const QString& driveStr, QString& guid) {
+bool GetGuidByDrive(const QString& driveStr, QString& guid) {
   const QString& drvPath = QDir::toNativeSeparators(driveStr);
   TCHAR volumeName[MAX_PATH] = {0};
   if (!GetVolumeNameForVolumeMountPoint(drvPath.toStdWString().c_str(), volumeName, MAX_PATH)) {
@@ -248,7 +246,7 @@ bool MountHelper::GetGuidByDrive(const QString& driveStr, QString& guid) {
   return true;
 }
 
-QString MountHelper::FindRootByGUIDWin(const QString& targetGuid) {
+QString FindRootByGUIDWin(const QString& targetGuid) {
   WCHAR volumePathNames[MAX_PATH] = {0};
   DWORD bufferSize = MAX_PATH;
   QString rootPath;
@@ -273,7 +271,7 @@ QString MountHelper::FindRootByGUIDWin(const QString& targetGuid) {
   return rootPath;
 }
 
-const MountHelper::GUID_2_PNTS_SET& MountHelper::Guids2MntPntSet(bool forceRefresh) {
+const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
   static GUID_2_PNTS_SET guid2MntPnts;
   if (forceRefresh || guid2MntPnts.isEmpty()) {
     const QList<QStorageInfo>& silst = QStorageInfo::mountedVolumes();
@@ -326,6 +324,9 @@ QStringList MountHelper::GetGuidJoinDisplayName() {
   return guidDispLst;
 }
 
+}
+#endif
+
 QString MountHelper::ChoppedDisplayName(const QString& guidJoinDisplayName) {
   const int colonIndex = guidJoinDisplayName.indexOf(JOINER_STR);
   if (colonIndex == -1) {
@@ -333,5 +334,3 @@ QString MountHelper::ChoppedDisplayName(const QString& guidJoinDisplayName) {
   }
   return guidJoinDisplayName.left(colonIndex);
 }
-
-#endif

@@ -254,10 +254,6 @@ QString PathTool::StrCommonPrefix(const QString& path1, const QString& path2) {
   return path1.left(index);
 }
 
-bool PathTool::isLinuxRootOrWinEmpty(const QString& path) {
-  return path.isEmpty() || path == "/";
-}
-
 bool PathTool::isRootOrEmpty(const QString& path) {
   return path.isEmpty() || path == "/" || QDir(path).isRoot();
 }

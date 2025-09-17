@@ -23,6 +23,16 @@ private slots:
     Configuration().clear();
   }
 
+  void menu_popup_ok() {
+    NavigationExToolBar naviExToolBar{"navi extra toolbar menu pop up ok"};
+    const QPoint point = naviExToolBar.geometry().center();
+    naviExToolBar.CustomContextMenuEvent(point);
+    QCOMPARE(naviExToolBar.mRightClickAtPnt, point);
+
+    QVERIFY(naviExToolBar.mMenu != nullptr);
+    QVERIFY2(naviExToolBar.mMenu, "Menu should be active after right-click");
+  }
+
   void dragEnter_drop_event_ok() {
     Configuration().clear();
     NavigationExToolBar naviExToolBar{"navi extra toolbar dragMove/dragEnter/drop"};

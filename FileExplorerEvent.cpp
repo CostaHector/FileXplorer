@@ -941,36 +941,21 @@ void FileExplorerEvent::on_TsFilesMerge() {
 }
 
 bool FileExplorerEvent::on_Copy() {
-  QStringList absPaths;
-  QList<QUrl> urls;
-  std::tie(absPaths, urls) = _contentPane->getFilePathsAndUrls(Qt::CopyAction);
-  QMimeData* pMimeData = new (std::nothrow) QMimeData;
-  CHECK_NULLPTR_RETURN_FALSE(pMimeData)
-  pMimeData->setText(absPaths.join('\n'));
-  pMimeData->setUrls(urls);
-  if (!SetMimeDataCutCopy(*pMimeData, Qt::CopyAction)) {
-    LOG_ERR_NP("Set Copy Action in QMimedata failed", "Abort");
-    return false;
-  }
-  m_clipboard->setMimeData(pMimeData);
-  _logger->onMsgChanged(QString("%1 path(s) been copied").arg(absPaths.size()), STATUS_ALERT_LEVEL::NORMAL);
-  return true;
+  using namespace MimeDataHelper;
+  MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::CopyAction);
+  const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::CopyAction);
+  _logger->onMsgChanged(QString("%1 path(s) been copied").arg(pathCnt),
+                        (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
+  return pathCnt >= 0;
 }
 
 bool FileExplorerEvent::on_Cut() {
-  QStringList absPaths;
-  QList<QUrl> urls;
-  std::tie(absPaths, urls) = _contentPane->getFilePathsAndUrls(Qt::MoveAction);
-  QMimeData* pMimeData = new (std::nothrow) QMimeData;
-  pMimeData->setText(absPaths.join('\n'));
-  pMimeData->setUrls(urls);
-  if (!SetMimeDataCutCopy(*pMimeData, Qt::MoveAction)) {
-    LOG_ERR_NP("Set Cut Action in QMimedata failed", "Abort");
-    return false;
-  }
-  m_clipboard->setMimeData(pMimeData);
-  _logger->onMsgChanged(QString("%1 path(s) been cut").arg(absPaths.size()), STATUS_ALERT_LEVEL::NORMAL);
-  return true;
+  using namespace MimeDataHelper;
+  MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::MoveAction);
+  const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::MoveAction);
+  _logger->onMsgChanged(QString("%1 path(s) been cut").arg(pathCnt),
+                        (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
+  return pathCnt >= 0;
 }
 
 bool FileExplorerEvent::on_Paste() {
@@ -1294,30 +1279,5 @@ bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUC
     default:
       return false;
   }
-  return true;
-}
-
-bool FileExplorerEvent::SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction) {
-#ifdef _WIN32
-  QByteArray preferred(4, 0x0);
-  if (dropAction == Qt::DropAction::MoveAction) {  // # 2 for cut and 5 for copy
-    preferred[0] = 0x2;
-  } else if (dropAction == Qt::DropAction::CopyAction) {
-    preferred[0] = 0x5;
-  } else {
-    LOG_W("cannot refill base DropEffect");
-    return false;
-  }
-  mimeData.setData("Preferred DropEffect", preferred);
-#else
-  if (dropAction == Qt::DropAction::MoveAction) {
-    mimeData.setData("XdndAction", "XdndActionMove");
-  } else if (dropAction == Qt::DropAction::CopyAction) {
-    mimeData.setData("XdndAction", "XdndActionCopy");
-  } else {
-    LOG_W("cannot refill base DropEffect");
-    return false;
-  }
-#endif
   return true;
 }

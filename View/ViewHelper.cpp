@@ -10,11 +10,8 @@
 #include <QDrag>
 #include <QPainter>
 
-constexpr int View::START_DRAG_DIST; // QApplication::startDragDistance()
-constexpr int View::START_DRAG_DIST_MIN;
-constexpr Qt::MouseButtons View::MOUSE_NAVI_BTN;
-
-bool View::onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton) {
+namespace View {
+bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton) {
   // when return true, event should not be populated to its parent
   if (mods == Qt::KeyboardModifier::NoModifier) {
     static auto& addressInst = g_addressBarActions();
@@ -44,7 +41,7 @@ bool View::onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseBu
   return false;
 }
 
-void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
+void UpdateItemViewFontSizeCore(QAbstractItemView* view) {
   if (view == nullptr) {
     LOG_D("UpdateItemViewFontSizeCore view* pointer is nullptr");
     return;
@@ -55,7 +52,7 @@ void View::UpdateItemViewFontSizeCore(QAbstractItemView* view) {
   view->setFont(defaultFont);
 }
 
-bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& dest) {
+bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& dest) {
   if (!data->hasUrls()) {
     return true;
   }
@@ -71,7 +68,7 @@ bool View::onDropMimeData(const QMimeData* data, const Qt::DropAction action, co
   return true;
 }
 
-QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt) {
+QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt) {
   static QFileIconProvider iconPro;
   QIcon ico = iconPro.icon(firstSelectedAbsPath);
   constexpr int DRGA_PIXMAP_SIDE_LEN = 128;
@@ -81,7 +78,8 @@ QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, cons
     static QFont font("arial", 18, QFont::Weight::ExtraBold, true);
     painter.setFont(font);
 #ifdef _WIN32
-    painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN * 2, DRGA_PIXMAP_SIDE_LEN * 2), Qt::AlignRight | Qt::AlignBottom, QString("x%1").arg(selectedCnt));
+    painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN * 2, DRGA_PIXMAP_SIDE_LEN * 2), Qt::AlignRight | Qt::AlignBottom,
+                     QString("x%1").arg(selectedCnt));
 #else
     painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN), Qt::AlignRight | Qt::AlignBottom, QString("x%1").arg(selectedCnt));
 #endif
@@ -90,7 +88,7 @@ QPixmap View::PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, cons
   return pixmap;
 }
 
-void View::changeDropAction(QDropEvent* event) {
+void changeDropAction(QDropEvent* event) {
   if (event->keyboardModifiers().testFlag(Qt::AltModifier)) {
     event->setDropAction(Qt::DropAction::LinkAction);
   } else if (event->keyboardModifiers() & Qt::ControlModifier) {
@@ -100,80 +98,79 @@ void View::changeDropAction(QDropEvent* event) {
   }
 }
 
-void View::dragEnterEventCore(QAbstractItemView* view, QDragEnterEvent* event) {
-  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
-  if (m_fsm == nullptr) {
-    LOG_D("m_fsm is nullptr");
-    return;
+bool validateDrop(QAbstractItemView* view,
+                  FileSystemModel* m_fsm,
+                  const QMimeData* mimeData,
+                  Qt::DropAction action,
+                  const QPoint& pos,
+                  QModelIndex& outIndex) {
+  outIndex = view->indexAt(pos);
+  if (!m_fsm->canDropMimeData(mimeData, action, -1, -1, outIndex)) {
+    LOG_D("[reject] drop at event position index not allowed");
+    return false;
   }
-  const QPoint& pnt = event->pos();
-  const QModelIndex& ind = view->indexAt(pnt);
-  if (!(m_fsm->canItemsBeDragged(ind) || m_fsm->canItemsDroppedHere(ind))) {
-    LOG_D("reject drag/drop not allowed.");
+
+  const QModelIndexList& selectedRows = view->selectionModel()->selectedRows();
+  if (selectedRows.contains(outIndex)) {
+    LOG_D("[reject] self drop not allowed");
+    return false;
+  }
+  return true;
+}
+
+void dragEnterEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDragEnterEvent* event) {
+  const auto* pMimeData = event->mimeData();
+  CHECK_NULLPTR_RETURN_VOID(pMimeData);
+  if (!pMimeData->hasUrls()) {
+    LOG_D("[reject] no urls not allowed to drag");
     m_fsm->DragRelease();
     event->ignore();
     return;
   }
+  const QPoint& pnt = event->pos();
+  const QModelIndex& ind = view->indexAt(pnt);
   m_fsm->DragHover(ind);
-  View::changeDropAction(event);
+  changeDropAction(event);
   event->accept();
 }
 
-void View::dragMoveEventCore(QAbstractItemView* view, QDragMoveEvent* event) {
-  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
-  if (m_fsm == nullptr) {
-    LOG_D("m_fsm is nullptr");
-    return;
-  }
-  const QPoint& pnt = event->pos();
-  const QModelIndex& ind = view->indexAt(pnt);
-  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedRows().contains(ind))) {
-    LOG_D("reject drag and move. not allowed or self drop");
-    m_fsm->DragRelease();
+void dragMoveEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDragMoveEvent* event) {
+  const auto* pMimeData = event->mimeData();
+  CHECK_NULLPTR_RETURN_VOID(pMimeData);
+
+  QModelIndex ind;
+  if (!validateDrop(view, m_fsm, pMimeData, event->proposedAction(), event->pos(), ind)) {
     event->ignore();
     return;
   }
   m_fsm->DragHover(ind);
-  View::changeDropAction(event);
+  changeDropAction(event);
   event->accept();
 }
 
-void View::dropEventCore(QAbstractItemView* view, QDropEvent* event) {
-  // In mouse drag and move event, we can get DropAction directly.
-  // So no need to get from mimedata.data("Preferred DropEffect").
-  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
-  if (m_fsm == nullptr) {
-    LOG_D("m_fsm is nullptr");
-    return;
-  }
+void dropEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDropEvent* event) {
+  const auto* pMimeData = event->mimeData();
+  CHECK_NULLPTR_RETURN_VOID(pMimeData);
+
   m_fsm->DragRelease();
-  const QPoint& pnt = event->pos();
-  const QModelIndex& ind = view->indexAt(pnt);
-  // allowed dropped and not contains
-  if (!(m_fsm->canItemsDroppedHere(ind) && !view->selectionModel()->selectedRows().contains(ind))) {
-    LOG_D("reject drop here. not allowed or self drop");
+  QModelIndex ind;
+  if (!validateDrop(view, m_fsm, pMimeData, event->proposedAction(), event->pos(), ind)) {
     event->ignore();
     return;
   }
-  event->accept();
-  // ignore here and False return here to allow further processing
-  // otherwise. accept() and True return here
-  View::changeDropAction(event);
-  onDropMimeData(event->mimeData(), event->dropAction(), ind.isValid() ? m_fsm->filePath(ind) : m_fsm->rootPath());
+  changeDropAction(event);
+  const QString dropToDestPath{ind.isValid() ? m_fsm->filePath(ind) : m_fsm->rootPath()};
+  onDropMimeData(event->mimeData(), event->dropAction(), dropToDestPath);
   LOG_D("DropEvent[%d] finished with %d url(s)", event->dropAction(), event->mimeData()->urls().size());
+  event->accept();
 }
 
-void View::dragLeaveEventCore(QAbstractItemView* view, QDragLeaveEvent* event) {
-  auto* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
-  if (m_fsm == nullptr) {
-    LOG_D("m_fsm is nullptr");
-    return;
-  }
+void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event) {
   m_fsm->DragRelease();
   event->accept();
 }
 
-void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
+void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
   event->accept();
   const QModelIndexList rows{view->selectionModel()->selectedRows()};
   if (rows.isEmpty()) {
@@ -192,7 +189,9 @@ void View::mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
 
   QDrag drag(view);
   drag.setMimeData(mime);
-  const QPixmap dragPixmap = View::PaintDraggedFilesFolders(urls[0].toLocalFile(), urls.size());
+  const QPixmap dragPixmap = PaintDraggedFilesFolders(urls[0].toLocalFile(), urls.size());
   drag.setPixmap(dragPixmap);
   drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
 }
+
+}  // namespace View

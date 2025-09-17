@@ -19,43 +19,45 @@ void FileSystemModel::BindLogger(CustomStatusBar* pLogger) const {
 }
 
 QString FileSystemModel::fullInfo(const QModelIndex& curIndex) const {
-  return data(curIndex.siblingAtColumn(MainKey::Name)).toString()//
-         + '\t'//
-         + data(curIndex.siblingAtColumn(MainKey::Size)).toString()//
-         + '\t'//
+  return data(curIndex.siblingAtColumn(MainKey::Name)).toString()    //
+         + '\t'                                                      //
+         + data(curIndex.siblingAtColumn(MainKey::Size)).toString()  //
+         + '\t'                                                      //
          + rootPath();
+}
+
+bool FileSystemModel::canDrop(const QModelIndex& targetDropIndex) const {
+  return targetDropIndex.isValid() ? fileInfo(targetDropIndex).isDir() : !PathTool::isLinuxRootOrWinEmpty(rootPath());
 }
 
 Qt::ItemFlags FileSystemModel::flags(const QModelIndex& index) const {
   Qt::ItemFlags defaultFlags = QFileSystemModel::flags(index);
-  if (canItemsBeDragged(index)) {
-    defaultFlags |= Qt::ItemFlag::ItemIsDragEnabled;
-  } else {
-    defaultFlags &= ~Qt::ItemFlag::ItemIsDragEnabled;
-  }
-  if (canItemsDroppedHere(index)) {
-    defaultFlags |= Qt::ItemFlag::ItemIsDropEnabled;
-  } else {
-    defaultFlags &= ~Qt::ItemFlag::ItemIsDropEnabled;
+  defaultFlags |= Qt::ItemIsDragEnabled;
+  if (fileInfo(index).isDir()) {
+    defaultFlags |= Qt::ItemIsDropEnabled;
   }
   return defaultFlags;
 }
 
-bool FileSystemModel::canItemsBeDragged(const QModelIndex& index) const {
-  // can dragged: valid and not root item
-  return index.isValid() && !PathTool::isLinuxRootOrWinEmpty(filePath(index));
-}
-
-bool FileSystemModel::canItemsDroppedHere(const QModelIndex& index) const {
-  // can dropped: valid and dir | invalid and not empty
-  return (index.isValid() && QFileInfo{filePath(index)}.isDir()) || (!index.isValid() && !rootPath().isEmpty());
-}
-
-bool FileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& /*parent*/) const {
-  if ((action & supportedDropActions()) && data->hasUrls()) {
-    return true;
+bool FileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) const {
+  if (!supportedDropActions().testFlag(action)) {
+    return false;
   }
-  return false;
+  if (!data->hasUrls()) {
+    return false;
+  }
+  // model does not know its view type, we need to find targetDropIndex manually
+  QModelIndex targetDropIndex;  // by default: drop in parent
+  if (parent.isValid()) {
+    if (row >= 0 && column >= 0) {  // table view: parent as root,row/column
+      targetDropIndex = index(row, column, parent);
+    } else {  // list/tree view:
+      targetDropIndex = parent;
+    }
+  }
+  // Only when event position is just at an item, targetDropIndex will be valid. Otherwise targetDropIndex invalid
+  // For the former, allowed if item is a directory. and for the latter allowed if rootPath() is "non-empty" (i.e., windows !="" in linux !="/")
+  return canDrop(targetDropIndex);
 }
 
 bool FileSystemModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& /*parent*/) {
@@ -71,7 +73,7 @@ Qt::DropActions FileSystemModel::supportedDragActions() const {
   return Qt::MoveAction | Qt::CopyAction | Qt::LinkAction;
 }
 
-QVariant FileSystemModel::data(const QModelIndex &index, int role) const {
+QVariant FileSystemModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DecorationRole && index.column() == 0) {
     if (mCutIndexes.contains(rootPath(), index.row())) {
       static const QIcon CUT_ICON{":img/CUT_ITEM"};
