@@ -10,6 +10,7 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QPlainTextEdit>
+#include <QHeaderView>
 
 class MultiLineEditDelegateTest : public PlainTestSuite {
   Q_OBJECT
@@ -32,9 +33,7 @@ private slots:
     tableView.setModel(&model);
     tableView.setItemDelegateForColumn(0, &delegate);
     tableView.setEditTriggers(QAbstractItemView::EditKeyPressed);
-
-    tableView.show();
-    QVERIFY(QTest::qWaitForWindowActive(&tableView));
+    tableView.setColumnWidth(0, 200);
 
     // select cell (0, 0)
     QModelIndex frontIndex = model.index(0, 0);
@@ -80,4 +79,4 @@ private slots:
 };
 
 #include "MultiLineEditDelegateTest.moc"
-REGISTER_TEST(MultiLineEditDelegateTest, false)
+REGISTER_TEST(MultiLineEditDelegateTest, true)
