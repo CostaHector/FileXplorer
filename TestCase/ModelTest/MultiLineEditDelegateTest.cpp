@@ -1,11 +1,8 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 #include <QTestEventList>
-#include <QSignalSpy>
 
 #include "Logger.h"
-#include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "MultiLineEditDelegate.h"
 #include "EndToExposePrivateMember.h"
@@ -18,15 +15,7 @@ class MultiLineEditDelegateTest : public PlainTestSuite {
   Q_OBJECT
 public:
 private slots:
-  void initTestCase() {
-    qRegisterMetaType<QDir::Filters>("QDir::Filters");
-    qRegisterMetaType<QDirIterator::IteratorFlag>("QDirIterator::IteratorFlag");
-    Configuration().clear();
-  }
-
-  void cleanupTestCase() { Configuration().clear(); }
-
-  void firstColumnEditor_ok() {
+  void firstColumn_PlainTextEditor_ok() {
     QStandardItemModel model;
     model.setRowCount(3);
     model.setColumnCount(2);
