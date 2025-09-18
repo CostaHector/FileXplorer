@@ -139,7 +139,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
     ${README_FILES}
-    ./covagelnk
+    ${CMAKE_CURRENT_SOURCE_DIR}/covagelnk
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SRV_HEADER_PATH})
