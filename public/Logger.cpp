@@ -38,7 +38,7 @@ FILE* Logger::SwitchLogToALocalFile(const QString& logFileAbsPath) {
 }
 
 FILE* Logger::GetFILEStream() {
-#ifndef QT_DEBUG // in debug mode, output to std flow
+#ifdef QT_DEBUG // in debug mode, output to std flow
   return stdout;
 #else // otherwise, output to append to local file
   return SwitchLogToALocalFile(GetLogFileAbsPath());

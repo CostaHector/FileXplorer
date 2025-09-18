@@ -65,10 +65,12 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_)  //
 }
 
 void NavigationToolBar::subscribe() {
+  connect(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES, &QAction::toggled, [this](bool checked) {
+    mDevDriveTV = PopupHideWidget<DevicesDrivesTV>(mDevDriveTV, checked, nullptr);
+  });
+
   connect(this, &QToolBar::actionTriggered, this, [this](QAction* pAct) {
     if (pAct == DevicesDrivesActions::Inst().DEVICES_AND_DRIVES) {
-      bool checked = pAct->isChecked();
-      mDevDriveTV = PopupHideWidget<DevicesDrivesTV>(mDevDriveTV, checked, nullptr);
       return;
     }
     NavigationExToolBar::onPathActionTriggered(pAct);

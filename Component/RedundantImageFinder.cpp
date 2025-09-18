@@ -95,7 +95,7 @@ void RedundantImageFinder::ChangeWindowTitle(const QString& rootPath) {
 void RedundantImageFinder::subscribe() {
   auto& inst = g_redunImgFinderAg();
   connect(inst.RECYLE_NOW, &QAction::triggered, this, &RedundantImageFinder::RecycleSelection);
-  connect(inst.ALSO_EMPTY_IMAGE, &QAction::triggered, this, &RedundantImageFinder::setResultAlsoContainEmptyImage);
+  connect(inst.ALSO_EMPTY_IMAGE, &QAction::toggled, this, &RedundantImageFinder::setResultAlsoContainEmptyImage);
   connect(inst.mDecideByIntAction.getActionGroup(), &QActionGroup::triggered, this, &RedundantImageFinder::whenModeChanged);
   connect(inst.OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered, this, []() {
     const QString benchmarkPath{RedunImgLibs::GetRedunPath()};
