@@ -31,22 +31,22 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets
 
 file(GLOB SOURCES
     # service module sources
-    ../Actions/*.cpp
-    ../Model/*.cpp
-    ../View/*.cpp
-    ../Component/*.cpp
-    ../Component/FolderPreview/*.cpp
-    ../Component/JsonEditorWidget/*.cpp
-    ../Component/RenameWidgets/*.cpp
-    ../FileOperation/*.cpp
-    ../Model/*.cpp
-    ../public/*.cpp
-    ../public/Memory/*.cpp
-    ../Tools/*.cpp
-    ../Tools/Classify/*.cpp
-    ../Tools/FileDescriptor/*.cpp
-    ../Tools/Json/*.cpp
-    ../View/*.cpp
+    ${PARENT_DIR}/Actions/*.cpp
+    ${PARENT_DIR}/Model/*.cpp
+    ${PARENT_DIR}/View/*.cpp
+    ${PARENT_DIR}/Component/*.cpp
+    ${PARENT_DIR}/Component/FolderPreview/*.cpp
+    ${PARENT_DIR}/Component/JsonEditorWidget/*.cpp
+    ${PARENT_DIR}/Component/RenameWidgets/*.cpp
+    ${PARENT_DIR}/FileOperation/*.cpp
+    ${PARENT_DIR}/Model/*.cpp
+    ${PARENT_DIR}/public/*.cpp
+    ${PARENT_DIR}/public/Memory/*.cpp
+    ${PARENT_DIR}/Tools/*.cpp
+    ${PARENT_DIR}/Tools/Classify/*.cpp
+    ${PARENT_DIR}/Tools/FileDescriptor/*.cpp
+    ${PARENT_DIR}/Tools/Json/*.cpp
+    ${PARENT_DIR}/View/*.cpp
     # test only module sources
     *.cpp
     ComponentTest/*.cpp
@@ -55,6 +55,7 @@ file(GLOB SOURCES
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
     JsonTest/*.cpp
+    ModelTest/*.cpp
     publicTest/*.cpp
     pubTestTool/*.cpp
     RenameTest/*.cpp
@@ -69,45 +70,45 @@ foreach(srv_file ${SOURCES})
 endforeach()
 
 set(SRV_HEADER_PATH
-    ../Actions
-    ../Model
-    ../View
-    ../Component
-    ../Component/FolderPreview
-    ../Component/JsonEditorWidget
-    ../Component/RenameWidgets
-    ../FileOperation
-    ../lib
-    ../Model
-    ../public
-    ../public/Memory
-    ../Tools
-    ../Tools/Classify
-    ../Tools/FileDescriptor
-    ../Tools/Json
-    ../View
+    ${PARENT_DIR}/Actions
+    ${PARENT_DIR}/Model
+    ${PARENT_DIR}/View
+    ${PARENT_DIR}/Component
+    ${PARENT_DIR}/Component/FolderPreview
+    ${PARENT_DIR}/Component/JsonEditorWidget
+    ${PARENT_DIR}/Component/RenameWidgets
+    ${PARENT_DIR}/FileOperation
+    ${PARENT_DIR}/lib
+    ${PARENT_DIR}/Model
+    ${PARENT_DIR}/public
+    ${PARENT_DIR}/public/Memory
+    ${PARENT_DIR}/Tools
+    ${PARENT_DIR}/Tools/Classify
+    ${PARENT_DIR}/Tools/FileDescriptor
+    ${PARENT_DIR}/Tools/Json
+    ${PARENT_DIR}/View
     ./
     pubTestTool
 )
 
 file(GLOB HEADERS
-    ../Actions/*.h
-    ../Model/*.h
-    ../View/*.h
-    ../Component/*.h
-    ../Component/FolderPreview/*.h
-    ../Component/JsonEditorWidget/*.h
-    ../Component/RenameWidgets/*.h
-    ../FileOperation/*.h
-    ../lib/*.h
-    ../Model/*.h
-    ../public/*.h
-    ../public/Memory/*.h
-    ../Tools/*.h
-    ../Tools/Classify/*.h
-    ../Tools/FileDescriptor/*.h
-    ../Tools/Json/*.h
-    ../View/*.h
+    ${PARENT_DIR}/Actions/*.h
+    ${PARENT_DIR}/Model/*.h
+    ${PARENT_DIR}/View/*.h
+    ${PARENT_DIR}/Component/*.h
+    ${PARENT_DIR}/Component/FolderPreview/*.h
+    ${PARENT_DIR}/Component/JsonEditorWidget/*.h
+    ${PARENT_DIR}/Component/RenameWidgets/*.h
+    ${PARENT_DIR}/FileOperation/*.h
+    ${PARENT_DIR}/lib/*.h
+    ${PARENT_DIR}/Model/*.h
+    ${PARENT_DIR}/public/*.h
+    ${PARENT_DIR}/public/Memory/*.h
+    ${PARENT_DIR}/Tools/*.h
+    ${PARENT_DIR}/Tools/Classify/*.h
+    ${PARENT_DIR}/Tools/FileDescriptor/*.h
+    ${PARENT_DIR}/Tools/Json/*.h
+    ${PARENT_DIR}/View/*.h
     *.h
     pubTestTool/*.h
 )

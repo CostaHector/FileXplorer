@@ -227,15 +227,64 @@ Define a new action
 
 save the items tree
 
-## Coverage report
+## Coverage report in linux
 ```bash
 cmake --build /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug --target all
 cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug;/usr/bin/lcov --capture --directory . --output-file coverage.info --exclude "/home/ariel/Qt/*" --exclude "/usr/include/*" --exclude "/usr/local/include/*" --exclude "*/TestCase/*" --exclude "*/unittest/*"        --exclude "*/build/*"
 cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug;genhtml coverage.info --output-directory coverage_report
 cd /home/ariel/code/FileXplorer
 
+```
 
-```bash
+
+## Snippets
+Edir/Preference/TextEditor/Snippets
+Add and fill contents below
+
+`Trigger`: StdTestCase
+
+`Trigger Variant`: widget
+
+```cpp
+#include <QtTest/QtTest>
+#include "PlainTestSuite.h"
+#include "OnScopeExit.h"
+#include <QTestEventList>
+#include <QSignalSpy>
+
+#include "Logger.h"
+#include "MemoryKey.h"
+#include "BeginToExposePrivateMember.h"
+#include "$ClassName$.h"
+#include "EndToExposePrivateMember.h"
+
+#include <QDir>
+#include <QDirIterator>
+
+Q_DECLARE_METATYPE(QDir::Filters)
+Q_DECLARE_METATYPE(QDirIterator::IteratorFlag)
+
+class $ClassName$Test : public PlainTestSuite {
+  Q_OBJECT
+ public:
+ private slots:
+  void initTestCase() {
+    qRegisterMetaType<QDir::Filters>("QDir::Filters");
+    qRegisterMetaType<QDirIterator::IteratorFlag>("QDirIterator::IteratorFlag");
+    Configuration().clear();
+  }
+
+  void cleanupTestCase() { Configuration().clear(); }
+
+  void test_1() {
+    $$
+  }
+};
+
+#include "$ClassName$Test.moc"
+REGISTER_TEST($ClassName$Test, false)
+```
+
 
 
 ## Testcase
