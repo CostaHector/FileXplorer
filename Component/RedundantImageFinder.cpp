@@ -8,6 +8,7 @@
 #include "UndoRedo.h"
 #include "PublicMacro.h"
 #include "SpacerWidget.h"
+#include "PathTool.h"
 
 #include <QDirIterator>
 #include <QFileInfo>
@@ -18,18 +19,15 @@
 constexpr char RedundantImageFinder::GEOMETRY_KEY[];
 
 RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
-  : QMainWindow{parent},
-  mResultAlsoContainEmptyImage{//
-      Configuration().value(//
-                         RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, //
-                         RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool() //
-  } //
+    : QMainWindow{parent}                                    //
 {
+  mResultAlsoContainEmptyImage =
+      Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
+
   auto& redunInst = g_redunImgFinderAg();
   QMenu* findByMenu = new (std::nothrow) QMenu{"Find by Menu", this};
   CHECK_NULLPTR_RETURN_VOID(findByMenu);
-  findByMenu->addAction(redunInst.FIND_DUPLICATE_IMGS_BY_LIBRARY);
-  findByMenu->addAction(redunInst.FIND_DUPLICATE_IMGS_IN_A_PATH);
+  findByMenu->addActions(redunInst.mDecideByIntAction.getActionEnumAscendingList());
 
   mFindImgByTb = new (std::nothrow) QToolButton{this};
   CHECK_NULLPTR_RETURN_VOID(mFindImgByTb);
@@ -98,13 +96,13 @@ void RedundantImageFinder::subscribe() {
   auto& inst = g_redunImgFinderAg();
   connect(inst.RECYLE_NOW, &QAction::triggered, this, &RedundantImageFinder::RecycleSelection);
   connect(inst.ALSO_EMPTY_IMAGE, &QAction::triggered, this, &RedundantImageFinder::setResultAlsoContainEmptyImage);
-  connect(inst.FIND_DUPLICATE_IMGS_AG, &QActionGroup::triggered, this, &RedundantImageFinder::whenModeChanged);
+  connect(inst.mDecideByIntAction.getActionGroup(), &QActionGroup::triggered, this, &RedundantImageFinder::whenModeChanged);
   connect(inst.OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered, this, []() {
-    const QString benchmarkPath {RedunImgLibs::GetRedunPath()};
+    const QString benchmarkPath{RedunImgLibs::GetRedunPath()};
     QDesktopServices::openUrl(QUrl::fromLocalFile(benchmarkPath));
   });
   connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& clickedIndex) {
-    const QString imgPath {m_imgModel->filePath(clickedIndex)};
+    const QString imgPath{m_imgModel->filePath(clickedIndex)};
     QDesktopServices::openUrl(QUrl::fromLocalFile(imgPath));
   });
 }
@@ -152,24 +150,36 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
 }
 
 void RedundantImageFinder::operator()(const QString& folderPath) {
-  if (folderPath.isEmpty() || !QFileInfo{folderPath}.isDir()) {
+  if (PathTool::isRootOrEmpty(folderPath) || !QFileInfo{folderPath}.isDir()) {
     LOG_ERR_P("[Abort] Find redundant image", "Path[%s] not exists", qPrintable(folderPath));
     return;
   }
   mCurrentPath = folderPath;
-  const bool isByBenchLib {g_redunImgFinderAg().FIND_DUPLICATE_IMGS_BY_LIBRARY->isChecked()};
-  static auto& redunLibsInst = RedunImgLibs::GetInst(RedunImgLibs::GetRedunPath());
-  REDUNDANT_IMG_BUNCH newImgs {
-      isByBenchLib ? redunLibsInst.FindRedunImgs(mCurrentPath, mResultAlsoContainEmptyImage)
-                   : RedunImgLibs::FindDuplicateImgs(mCurrentPath, mResultAlsoContainEmptyImage)
-  };
+  using namespace RedundantImageTool;
+  const DecideByE decideBy = g_redunImgFinderAg().GetCurFindDupBy();
+  const QString path = RedunImgLibs::GetRedunPath();
+  static auto& redunLibsInst = RedunImgLibs::GetInst(path);
+  REDUNDANT_IMG_BUNCH newImgs;
+  switch (decideBy) {
+    case DecideByE::LIBRARY: {
+      newImgs = redunLibsInst.FindRedunImgs(mCurrentPath, mResultAlsoContainEmptyImage);
+      break;
+    }
+    case DecideByE::MD5: {
+      newImgs = RedunImgLibs::FindDuplicateImgs(mCurrentPath, mResultAlsoContainEmptyImage);
+      break;
+    }
+    default: {
+      LOG_W("DecideBy Enum[%s] not support", RedundantImageTool::c_str(decideBy));
+      break;
+    }
+  }
+
   int beforeRowCnt = m_imgsBunch.size();
   int afterRowCnt = newImgs.size();
   m_imgModel->RowsCountBeginChange(beforeRowCnt, afterRowCnt);
   m_imgsBunch.swap(newImgs);
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(mCurrentPath);
-  LOG_OK_P((isByBenchLib ? "By benchmark library" : "MD5 checksums in current directory"),
-             "%d duplicate images(s) found under path[%s]",
-             afterRowCnt, qPrintable(mCurrentPath));
+  LOG_OK_P(c_str(decideBy), "%d duplicate images(s) found under path[%s]", afterRowCnt, qPrintable(mCurrentPath));
 }

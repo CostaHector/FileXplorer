@@ -3,6 +3,10 @@
 
 #include <QAction>
 #include <QActionGroup>
+#include "EnumIntAction.h"
+#include "RedundantImageTool.h"
+
+extern template struct EnumIntAction<RedundantImageTool::DecideByE>;
 
 class RedundantImageFinderActions : public QObject {
  public:
@@ -10,7 +14,8 @@ class RedundantImageFinderActions : public QObject {
 
   QAction* FIND_DUPLICATE_IMGS_BY_LIBRARY{nullptr};
   QAction* FIND_DUPLICATE_IMGS_IN_A_PATH{nullptr};
-  QActionGroup* FIND_DUPLICATE_IMGS_AG{nullptr};
+  RedundantImageTool::DecideByE GetCurFindDupBy() const { return mDecideByIntAction.curVal(); }
+  EnumIntAction<RedundantImageTool::DecideByE> mDecideByIntAction;
 
   QAction* RECYLE_NOW{nullptr};
   QAction* ALSO_EMPTY_IMAGE{nullptr};

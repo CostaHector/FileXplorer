@@ -33,7 +33,7 @@ private:
   CustomTableView* m_table{nullptr};
   QString mCurrentPath;
   void setResultAlsoContainEmptyImage(bool alsoContain) { mResultAlsoContainEmptyImage = alsoContain; }
-  bool mResultAlsoContainEmptyImage;
+  bool mResultAlsoContainEmptyImage {true};
   static constexpr char GEOMETRY_KEY[]{"RedunImgFinderKey/GEOMETRY"};
 };
 

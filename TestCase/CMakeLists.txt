@@ -111,7 +111,6 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/Json/*.h
     ${PARENT_DIR}/View/*.h
     *.h
-    pubTestTool/*.h
 )
 
 list(LENGTH HEADERS header_cpp_count)
@@ -136,7 +135,6 @@ endif()
 target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
-    pubTestTool/QtProgramGuard.sh
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SRV_HEADER_PATH})

@@ -3,7 +3,7 @@
 #include "MemoryKey.h"
 
 RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
-  : QObject{parent} {
+    : QObject{parent} {
   FIND_DUPLICATE_IMGS_BY_LIBRARY = new (std::nothrow) QAction{QIcon{":img/DUPLICATE_IMAGES_BY_BENCHMARK_DICTIONARY"}, "By benchmark library", this};
   CHECK_NULLPTR_RETURN_VOID(FIND_DUPLICATE_IMGS_BY_LIBRARY);
   FIND_DUPLICATE_IMGS_BY_LIBRARY->setCheckable(true);
@@ -19,11 +19,11 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
   FIND_DUPLICATE_IMGS_IN_A_PATH->setShortcutVisibleInContextMenu(true);
   FIND_DUPLICATE_IMGS_IN_A_PATH->setToolTip("Search duplicates in a folder");
 
-  FIND_DUPLICATE_IMGS_AG = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(FIND_DUPLICATE_IMGS_AG);
-  FIND_DUPLICATE_IMGS_AG->addAction(FIND_DUPLICATE_IMGS_BY_LIBRARY);
-  FIND_DUPLICATE_IMGS_AG->addAction(FIND_DUPLICATE_IMGS_IN_A_PATH);
-  FIND_DUPLICATE_IMGS_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+  using namespace RedundantImageTool;
+  mDecideByIntAction.init({{FIND_DUPLICATE_IMGS_BY_LIBRARY, DecideByE::LIBRARY},  //
+                           {FIND_DUPLICATE_IMGS_IN_A_PATH, DecideByE::MD5}},      //
+                          DEFAULT_DECIDE_BY, QActionGroup::ExclusionPolicy::Exclusive);
+  mDecideByIntAction.setCheckedIfActionExist(DEFAULT_DECIDE_BY);
 
   RECYLE_NOW = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this};
   CHECK_NULLPTR_RETURN_VOID(RECYLE_NOW);
@@ -34,7 +34,8 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
   ALSO_EMPTY_IMAGE = new (std::nothrow) QAction{QIcon{":img/FILE"}, "Also empty image", this};
   CHECK_NULLPTR_RETURN_VOID(ALSO_EMPTY_IMAGE);
   ALSO_EMPTY_IMAGE->setCheckable(true);
-  ALSO_EMPTY_IMAGE->setChecked(Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool());
+  ALSO_EMPTY_IMAGE->setChecked(
+      Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool());
   ALSO_EMPTY_IMAGE->setToolTip(QString("<b>%1 (%2)</b><br/> Blank images (with a file size of 0Byte) will also be considered redundant images.")  //
                                    .arg(ALSO_EMPTY_IMAGE->text(), ALSO_EMPTY_IMAGE->shortcut().toString()));
 
