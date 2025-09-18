@@ -16,10 +16,10 @@ class NavigationExToolBar : public ReorderableToolBar {
   void Subscribe();
 
   void SaveName2PathLink();
-  void UnpinThis();
-  void UnpinAll();
+  bool UnpinThis();
+  int UnpinAll();
 
-  void CustomContextMenuEvent(const QPoint& pnt);
+  void contextMenuEvent(QContextMenuEvent* event) override;
 
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
   static void BindIntoNewPath(T_IntoNewPath IntoNewPath) { m_IntoNewPath = IntoNewPath; }
@@ -28,9 +28,9 @@ class NavigationExToolBar : public ReorderableToolBar {
  private:
   static T_IntoNewPath m_IntoNewPath;
 
-  QPoint mRightClickAtPnt;
   QPoint mDragStartPosition;
   QAction *UNPIN_THIS{nullptr}, *UNPIN_ALL{nullptr};
+  QAction *mRightClickAtAction{nullptr};
   QMenu* mMenu{nullptr};
 
   static constexpr char EXTRA_NAVI_DICT[] {"ExtraNavigationDict"};

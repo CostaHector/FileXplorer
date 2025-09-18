@@ -12,6 +12,7 @@ message("relativeIndexStartAt=${RELATIVE_INDEX_START_AT}")
 
 add_definitions(
     -DPROJECT_NAME="FileXplorer"
+    -DTESTCASE_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}"
     -DPARENT_PATH_LEN=${RELATIVE_INDEX_START_AT}
     -DRUNNING_UNIT_TESTS=1
     -DUNICODE
@@ -135,6 +136,7 @@ endif()
 target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
+    pubTestTool/QtProgramGuard.sh
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SRV_HEADER_PATH})

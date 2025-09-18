@@ -67,7 +67,9 @@ CustomListView::~CustomListView() {
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
   if (m_menu != nullptr) {
+#ifndef RUNNING_UNIT_TESTS
     m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+#endif
     event->accept();
     return;
   }

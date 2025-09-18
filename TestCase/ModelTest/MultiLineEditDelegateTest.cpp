@@ -33,7 +33,7 @@ private slots:
     tableView.setModel(&model);
     tableView.setItemDelegateForColumn(0, &delegate);
     tableView.setEditTriggers(QAbstractItemView::EditKeyPressed);
-    tableView.setColumnWidth(0, 200);
+    tableView.setColumnWidth(0, 200); // ensure first column can show the first without wrap
 
     // select cell (0, 0)
     QModelIndex frontIndex = model.index(0, 0);
@@ -79,4 +79,4 @@ private slots:
 };
 
 #include "MultiLineEditDelegateTest.moc"
-REGISTER_TEST(MultiLineEditDelegateTest, true)
+REGISTER_TEST(MultiLineEditDelegateTest, false)
