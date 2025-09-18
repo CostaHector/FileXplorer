@@ -1,0 +1,94 @@
+#include <QtTest/QtTest>
+#include "PlainTestSuite.h"
+#include "OnScopeExit.h"
+#include <QTestEventList>
+#include <QSignalSpy>
+
+#include "Logger.h"
+#include "MemoryKey.h"
+#include "BeginToExposePrivateMember.h"
+#include "MultiLineEditDelegate.h"
+#include "EndToExposePrivateMember.h"
+
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QPlainTextEdit>
+
+class MultiLineEditDelegateTest : public PlainTestSuite {
+  Q_OBJECT
+public:
+private slots:
+  void initTestCase() {
+    qRegisterMetaType<QDir::Filters>("QDir::Filters");
+    qRegisterMetaType<QDirIterator::IteratorFlag>("QDirIterator::IteratorFlag");
+    Configuration().clear();
+  }
+
+  void cleanupTestCase() { Configuration().clear(); }
+
+  void firstColumnEditor_ok() {
+    QStandardItemModel model;
+    model.setRowCount(3);
+    model.setColumnCount(2);
+    for (int row = 0; row < model.rowCount(); ++row) {
+      for (int col = 0; col < model.columnCount(); ++col) {
+        QModelIndex idx = model.index(row, col);
+        model.setData(idx, QString("Item At (%1, %2)\nSecondLine").arg(row).arg(col));
+      }
+    }
+
+    MultiLineEditDelegate delegate;
+
+    QTableView tableView;
+    tableView.setModel(&model);
+    tableView.setItemDelegateForColumn(0, &delegate);
+    tableView.setEditTriggers(QAbstractItemView::EditKeyPressed);
+
+    tableView.show();
+    QVERIFY(QTest::qWaitForWindowActive(&tableView));
+
+    // select cell (0, 0)
+    QModelIndex frontIndex = model.index(0, 0);
+    tableView.setCurrentIndex(frontIndex);
+    tableView.setFocus();
+
+    // 0. not in edit mode. editor no available
+    QTRY_VERIFY(tableView.findChild<QPlainTextEdit*>("MultiLineEditor") == nullptr);
+
+    // 1. into edit mode, editor available
+    QTest::keyClick(&tableView, Qt::Key_F2);
+    QPlainTextEdit* plainTextEdit = nullptr;
+    QTRY_VERIFY((plainTextEdit = tableView.findChild<QPlainTextEdit*>("MultiLineEditor")) != nullptr);
+
+    // contents at cell (0, 0) is correct
+    QCOMPARE(plainTextEdit->toPlainText(), "Item At (0, 0)\nSecondLine");
+
+    // new line insert after first line ok
+    plainTextEdit->moveCursor(QTextCursor::MoveOperation::EndOfLine);
+    QTest::keyClick(plainTextEdit, Qt::Key_Enter);
+    QTRY_VERIFY(tableView.findChild<QPlainTextEdit*>("MultiLineEditor") != nullptr);
+    QCOMPARE(plainTextEdit->toPlainText(), "Item At (0, 0)\n\nSecondLine");
+
+    // cancel edit, editor not available, content at cell unchanged
+    QTest::keyClick(plainTextEdit, Qt::Key_Escape);
+    QTRY_VERIFY((plainTextEdit = tableView.findChild<QPlainTextEdit*>("MultiLineEditor")) == nullptr);
+    QCOMPARE(model.itemFromIndex(frontIndex)->text(), "Item At (0, 0)\nSecondLine");
+
+    // 2. into edit mode again
+    QTest::keyClick(&tableView, Qt::Key_F2);
+    QTRY_VERIFY((plainTextEdit = tableView.findChild<QPlainTextEdit*>("MultiLineEditor")) != nullptr);
+
+    // delete all contents
+    plainTextEdit->selectAll();
+    QTest::keyClick(plainTextEdit, Qt::Key::Key_Backspace);
+    QCOMPARE(plainTextEdit->toPlainText(), "");
+
+    // save, editor not at front row
+    QTest::keyClick(&tableView, Qt::Key::Key_Tab);
+    QVERIFY(tableView.currentIndex() != frontIndex);
+    QCOMPARE(model.itemFromIndex(frontIndex)->text(), "");
+  }
+};
+
+#include "MultiLineEditDelegateTest.moc"
+REGISTER_TEST(MultiLineEditDelegateTest, false)
