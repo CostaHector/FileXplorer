@@ -130,6 +130,11 @@ else()
     add_executable(${PROJECT_NAME}
         ${SOURCES}
         ${RESOURCES}
+        ViewTest/MovieDBViewTest.cpp
+        ViewTest/DuplicateVideosFinderTest.cpp
+        ViewTest/JsonTableViewTest.cpp
+        ViewTest/CastDBViewTest.cpp
+        ViewTest/SceneListViewTest.cpp
     )
 endif()
 target_sources(${PROJECT_NAME} PUBLIC
