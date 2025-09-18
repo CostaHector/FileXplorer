@@ -15,7 +15,7 @@
 #include <QLayout>
 #include <QStyle>
 
-T_IntoNewPath NavigationExToolBar::m_IntoNewPath {nullptr};
+T_IntoNewPath NavigationExToolBar::m_IntoNewPath{nullptr};
 constexpr char NavigationExToolBar::EXTRA_NAVI_DICT[];
 constexpr char NavigationExToolBar::EXTRA_NAVI_DICT_KEY[];
 constexpr char NavigationExToolBar::EXTRA_NAVI_DICT_VALUE[];
@@ -41,7 +41,9 @@ NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent) 
   setOrientation(Qt::Vertical);
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
-  setContextMenuPolicy(Qt::CustomContextMenu);
+  // setContextMenuPolicy(Qt::CustomContextMenu);
+  // connect(this, &QToolBar::customContextMenuRequested, this, &NavigationExToolBar::CustomContextMenuEvent);
+
   setAcceptDrops(true);
 
   ReadSettings();
@@ -130,31 +132,42 @@ void NavigationExToolBar::ReadSettings() {
 }
 
 void NavigationExToolBar::Subscribe() {
-  connect(this, &QToolBar::customContextMenuRequested, this, &NavigationExToolBar::CustomContextMenuEvent);
   connect(UNPIN_THIS, &QAction::triggered, this, &NavigationExToolBar::UnpinThis);
   connect(UNPIN_ALL, &QAction::triggered, this, &NavigationExToolBar::UnpinAll);
   connect(mCollectPathAgs, &QActionGroup::triggered, this, &NavigationExToolBar::onPathActionTriggered);
 }
 
-void NavigationExToolBar::UnpinThis() {
-  QAction* act = actionAt(mRightClickAtPnt);
-  if (actions().contains(act)) {
+bool NavigationExToolBar::UnpinThis() {
+  if (mRightClickAtAction == nullptr) {
+    return false;
+  }
+  if (!actions().contains(mRightClickAtAction)) {
+    return false;
+  }
+  removeAction(mRightClickAtAction);
+  SaveName2PathLink();
+  mRightClickAtAction = nullptr;
+  return true;
+}
+
+int NavigationExToolBar::UnpinAll() {
+  QList<QAction*> actLst = actions();
+  foreach (QAction* act, actLst) {
     removeAction(act);
   }
   SaveName2PathLink();
+  mRightClickAtAction = nullptr;
+  return actLst.size();
 }
 
-void NavigationExToolBar::UnpinAll() {
-  foreach (QAction* act, actions()) {
-    removeAction(act);
-  }
-  SaveName2PathLink();
-}
-
-void NavigationExToolBar::CustomContextMenuEvent(const QPoint& pnt) {
+void NavigationExToolBar::contextMenuEvent(QContextMenuEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  event->accept();
   CHECK_NULLPTR_RETURN_VOID(mMenu);
-  mMenu->popup(mapToGlobal(pnt));
-  mRightClickAtPnt = pnt;
+  mRightClickAtAction = actionAt(event->pos());
+#ifndef RUNNING_UNIT_TESTS
+  mMenu->popup(event->globalPos());
+#endif
 }
 
 void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {

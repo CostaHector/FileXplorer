@@ -2,7 +2,6 @@
 #include <QtTest>
 
 #include "PlainTestSuite.h"
-#include "PathRelatedTool.h"
 #include "PathTool.h"
 
 using namespace ::PathTool;
@@ -20,7 +19,7 @@ class PathToolTest : public PlainTestSuite {
     QString libPath = GetPathByApplicationDirPath(FILE_REL_PATH::MEDIA_INFO_DLL);
     QVERIFY(QFile::exists(libPath));
 
-    QString testRootDir = TestCaseRootPath();
+    QString testRootDir = TESTCASE_ROOT_PATH;
     QString libPath2 = QDir::cleanPath(QDir(testRootDir).absoluteFilePath("../lib/MediaInfo.dll"));
     QCOMPARE(libPath, libPath2);
   }

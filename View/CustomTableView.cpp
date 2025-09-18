@@ -122,7 +122,9 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
 
 void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
   if (m_menu != nullptr) {
+#ifndef RUNNING_UNIT_TESTS
     m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+#endif
     return;
   }
   QTableView::contextMenuEvent(event);
@@ -312,10 +314,14 @@ void CustomTableView::InitTableView(const bool bHideShowCol) {
 
 void CustomTableView::onHorizontalHeaderMenuRequest(const QPoint& pnt) {
   m_horizontalHeaderSectionClicked = horizontalHeader()->logicalIndexAt(pnt);
+#ifndef RUNNING_UNIT_TESTS
   m_horMenu->popup(viewport()->mapToGlobal(pnt));
+#endif
 }
 void CustomTableView::onVerticalHeaderMenuRequest(const QPoint& pnt) {
+#ifndef RUNNING_UNIT_TESTS
   m_verMenu->popup(viewport()->mapToGlobal(pnt));
+#endif
 }
 
 void CustomTableView::SubscribeHeaderActions() {

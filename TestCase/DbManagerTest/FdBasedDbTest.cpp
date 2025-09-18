@@ -1,6 +1,5 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "PathRelatedTool.h"
 #include "PlainTestSuite.h"
 #include "GlbDataProtect.h"
 #include "OnScopeExit.h"
@@ -16,8 +15,8 @@
 #include <QSqlError>
 #include <QSqlDriver>
 
-const QString rootpath = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
-const QString dbName = TestCaseRootPath() + "/FD_MOVIE_DB_CONN.db";
+const QString rootpath = TESTCASE_ROOT_PATH "/test/TestEnv_VideosDurationGetter";
+const QString dbName = TESTCASE_ROOT_PATH "/FD_MOVIE_DB_CONN.db";
 
 class FdBasedDbTest : public PlainTestSuite {
   Q_OBJECT

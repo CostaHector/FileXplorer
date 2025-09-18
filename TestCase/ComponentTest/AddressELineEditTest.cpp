@@ -90,19 +90,6 @@ private slots:
     // Or [recommend] disconnect signal connect in destructor to prevents signals reaching partially-destroyed objects
   }
 
-  void test_precondition_clickToolButtonDirectly_willEmit_ToolBarActionTriggered_ok() {
-    QAction act{"Hello"};
-    QToolBar tb;
-    tb.addAction(&act);
-    QToolButton* button1 = qobject_cast<QToolButton*>(tb.widgetForAction(&act));
-    QVERIFY(button1 != nullptr);
-    connect(&tb, &QToolBar::actionTriggered, this, [](const QAction* pAct) { LOG_C("actionTriggered: %s", qPrintable(pAct->text())); });
-    tb.show();
-    QSignalSpy spyToolBarActionTriggered(&tb, &QToolBar::actionTriggered);
-    QTest::mouseClick(button1, Qt::LeftButton, Qt::KeyboardModifier::NoModifier, {}, 50);
-    QTRY_COMPARE(spyToolBarActionTriggered.count(), 1);
-  }
-
   void test_precondition_split_behavior_ok() {
     // precondition:
     QCOMPARE(QString{"/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList() << ""

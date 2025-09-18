@@ -2,11 +2,10 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QString>
-#include "PathRelatedTool.h"
 
 FileSystemTestSuite::FileSystemTestSuite(const char* testSuiteName, bool autoCleanUp)
     : PlainTestSuite{},                                                 //
-      mTestPath{TestCaseRootPath() + "/test/" + testSuiteName},  //
+      mTestPath{QString{""} + TESTCASE_ROOT_PATH "/test/" + testSuiteName},  //
       mAutoCleanUp{autoCleanUp},                                 //
       m_rootHelper{mTestPath}                                    //
 {

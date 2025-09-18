@@ -1,6 +1,5 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "PathRelatedTool.h"
 #include "PlainTestSuite.h"
 #include "TDir.h"
 #include "OnScopeExit.h"
@@ -22,7 +21,7 @@ bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int heigh
   return true;
 }
 
-const QString VIDEOS_DURATION_DIR = TestCaseRootPath() + "/test/TestEnv_VideosDurationGetter";
+const QString VIDEOS_DURATION_DIR = TESTCASE_ROOT_PATH "/test/TestEnv_VideosDurationGetter";
 
 class ThumbnailProcesserTest : public PlainTestSuite {
   Q_OBJECT
