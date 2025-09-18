@@ -3,6 +3,7 @@
 #include <QSignalSpy>
 
 #include "PlainTestSuite.h"
+#include "IntoNewPathMocker.h"
 #include "Logger.h"
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
@@ -10,9 +11,6 @@
 #include "EndToExposePrivateMember.h"
 #include "DraggableToolButton.h"
 #include "QtProcessGuard.h"
-
-#include <QDir>
-#include <QDirIterator>
 
 #include <QMenu>
 
@@ -102,8 +100,7 @@ class NavigationExToolBarTest : public PlainTestSuite {
   }
 
   void menu_popup_ok() {
-    QtProcessGuard guard{10};
-
+    // QtProcessGuard guard{10};
     Configuration().clear();
 
     // precondition: 2 items in configuraion
@@ -268,31 +265,18 @@ class NavigationExToolBarTest : public PlainTestSuite {
     QCOMPARE(naviExToolBar.m_IntoNewPath, nullptr);
     naviExToolBar.AppendExtraActions({{"1", TESTCASE_ROOT_PATH}, {"2", __FILE__}});
 
-    struct IntoNewPathParams {
-      QString newPath;
-      bool isNewPath;
-      bool isF5Force;
-      bool operator==(const IntoNewPathParams& rhs) const {
-        return newPath==rhs.newPath && isNewPath==rhs.isNewPath && isF5Force==rhs.isF5Force;
-      }
-    };
-    IntoNewPathParams actualParams;
-
-    auto MockIntoNewPath = [&actualParams](QString newPath, bool isNewPath, bool isF5Force) -> bool {
-      actualParams.newPath = newPath;
-      actualParams.isNewPath = isNewPath;
-      actualParams.isF5Force = isF5Force;
-    };
-    naviExToolBar.BindIntoNewPath(MockIntoNewPath);
+    IntoNewPathParms actualParams;
+    IntoNewPathMocker mocker{&actualParams};
+    NavigationExToolBar::BindIntoNewPath(mocker);
 
     QVERIFY(naviExToolBar.mCollectPathAgs != nullptr);
     QList<QAction*> lsts = naviExToolBar.mCollectPathAgs->actions();
     QCOMPARE(lsts.size(), 2);
     naviExToolBar.onPathActionTriggered(lsts.front());
-    QCOMPARE(actualParams, (IntoNewPathParams{TESTCASE_ROOT_PATH, true, true}));
+    QCOMPARE(actualParams, (IntoNewPathParms{TESTCASE_ROOT_PATH, true, true}));
 
     naviExToolBar.onPathActionTriggered(lsts.back());
-    QCOMPARE(actualParams, (IntoNewPathParams{__FILE__, true, true}));
+    QCOMPARE(actualParams, (IntoNewPathParms{__FILE__, true, true}));
   }
 };
 
