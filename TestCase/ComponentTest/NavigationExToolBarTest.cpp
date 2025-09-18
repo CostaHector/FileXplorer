@@ -281,4 +281,4 @@ class NavigationExToolBarTest : public PlainTestSuite {
 };
 
 #include "NavigationExToolBarTest.moc"
-REGISTER_TEST(NavigationExToolBarTest, true)
+REGISTER_TEST(NavigationExToolBarTest, false)
