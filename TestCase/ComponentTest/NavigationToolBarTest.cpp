@@ -6,12 +6,7 @@
 #include "NavigationToolBar.h"
 #include "EndToExposePrivateMember.h"
 #include "DevicesDrivesActions.h"
-
-
-void triggerFirstLevelActions(QToolBar& toolbar) {
-  QList<QAction*> actions = toolbar.actions();
-
-}
+#include "DevicesDrivesTV.h"
 
 class NavigationToolBarTest : public PlainTestSuite {
   Q_OBJECT
@@ -26,13 +21,19 @@ class NavigationToolBarTest : public PlainTestSuite {
     QList<QAction*> plainActLsts = naviTooBar.actions();
     QVERIFY(!plainActLsts.isEmpty());
     QAction* pFirstAct = plainActLsts[0];
-
     QCOMPARE(pFirstAct, DevicesDrivesActions::Inst().DEVICES_AND_DRIVES);
 
     // Special Action: will not call Into New Path
+    QVERIFY(naviTooBar.mDevDriveTV == nullptr);
     pFirstAct->setChecked(true);
-    emit naviTooBar.actionTriggered(pFirstAct);
+    emit pFirstAct->toggled(true);
+    QVERIFY(naviTooBar.mDevDriveTV != nullptr);
     QCOMPARE(actualParams.m_newPath, "");
+    QCOMPARE(naviTooBar.mDevDriveTV->isVisible(), true);
+    pFirstAct->setChecked(false);
+    emit pFirstAct->toggled(false);
+    QVERIFY(naviTooBar.mDevDriveTV != nullptr);
+    QCOMPARE(naviTooBar.mDevDriveTV->isVisible(), false);
 
     QList<QAction*> otherActLst = plainActLsts.mid(1);
     for (QAction* action : otherActLst) {

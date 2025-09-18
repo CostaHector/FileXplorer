@@ -9,18 +9,24 @@ QString RedunImgLibs::GetRedunPath() {
   return Configuration().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.v).toString();
 }
 
-bool RedunImgLibs::mBInited{false};
-RedunImgLibs& RedunImgLibs::GetInst(const QString& benchMarkPath) {
+bool RedunImgLibs::s_initialized{false};
+const RedunImgLibs& RedunImgLibs::GetInst(const QString& benchMarkPath) {
   static RedunImgLibs redunLibs;
-  if (!mBInited) {
+  if (!s_initialized) {
     redunLibs.LearnSizeAndHashFromRedunImgPath(benchMarkPath);
-    mBInited = true;
+    s_initialized = true;
   }
   return redunLibs;
 }
 
 int RedunImgLibs::LearnSizeAndHashFromRedunImgPath(const QString& folderPath) {
   LOG_D("Benchmark RedundantImage located in [%s]", qPrintable(folderPath));
+  m_commonFileSizeSet.clear();
+  m_commonFileHash.clear();
+  if (folderPath.isEmpty()) {
+    return 0;
+  }
+
   int filesCnt = 0;
   QDirIterator it{folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
@@ -35,7 +41,7 @@ int RedunImgLibs::LearnSizeAndHashFromRedunImgPath(const QString& folderPath) {
   return filesCnt;
 }
 
-REDUNDANT_IMG_BUNCH RedunImgLibs::FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty) {
+REDUNDANT_IMG_BUNCH RedunImgLibs::FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty) const {
   QDirIterator it{folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   REDUNDANT_IMG_BUNCH redundantImgs;
   while (it.hasNext()) {
