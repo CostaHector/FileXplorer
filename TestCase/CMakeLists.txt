@@ -106,7 +106,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
     ${PARENT_DIR}/View/*.h
-    *.h
+    pubTestTool/*.h
 )
 
 set(READ_TR_FROM_SOURCE

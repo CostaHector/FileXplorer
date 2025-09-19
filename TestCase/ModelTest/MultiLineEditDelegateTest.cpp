@@ -6,6 +6,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "MultiLineEditDelegate.h"
 #include "EndToExposePrivateMember.h"
+#include "ModelTestHelper.h"
 
 #include <QTableView>
 #include <QStandardItemModel>
@@ -18,14 +19,7 @@ public:
 private slots:
   void firstColumn_PlainTextEditor_ok() {
     QStandardItemModel model;
-    model.setRowCount(3);
-    model.setColumnCount(2);
-    for (int row = 0; row < model.rowCount(); ++row) {
-      for (int col = 0; col < model.columnCount(); ++col) {
-        QModelIndex idx = model.index(row, col);
-        model.setData(idx, QString("Item At (%1, %2)\nSecondLine").arg(row).arg(col));
-      }
-    }
+    ModelTestHelper::InitStdItemModel(model, "Item At (%1, %2)\nSecondLine", 3, 2);
 
     MultiLineEditDelegate delegate;
 

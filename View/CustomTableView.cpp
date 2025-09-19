@@ -13,6 +13,7 @@
 QSet<QString> CustomTableView::TABLES_SET;
 // a bunch of widget with same model should share the only one setting. e.g., HAR_TABLEVIEW
 QSet<QString> CustomTableView::SETTING_SHARING_WIDGET {"HAR_TABLEVIEW"};
+constexpr int CustomTableView::INVALID_SECTION_INDEX;
 
 CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   : QTableView(parent),
@@ -121,10 +122,12 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
 }
 
 void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (m_menu != nullptr) {
-#ifndef RUNNING_UNIT_TESTS
+// #ifndef RUNNING_UNIT_TESTS
     m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
-#endif
+// #endif
+    event->accept();
     return;
   }
   QTableView::contextMenuEvent(event);
@@ -172,7 +175,7 @@ bool CustomTableView::ShowOrHideColumnCore() {
   return true;
 }
 
-bool CustomTableView::onShowHideColumn() {
+bool CustomTableView::onColumnVisibilityAdjust() {
   auto* model_ = this->model();
   CHECK_NULLPTR_RETURN_FALSE(model_)
 
@@ -198,12 +201,14 @@ bool CustomTableView::onShowHideColumn() {
     return false;
   }
   m_columnsShowSwitch = dialog.getSwitches();
+
   ShowOrHideColumnCore();
   return true;
 }
 
 bool CustomTableView::onHideThisColumn() {
   const int c = GetClickedHorIndex();
+  invalidHoricontalHeaderSectionClicked();
   if (!(0 <= c && c < m_columnsShowSwitch.size())) {
     LOG_WARN_P("[Skip] HideThisColumn", "Invalid column index[%d]", c);
     return false;
@@ -325,7 +330,7 @@ void CustomTableView::onVerticalHeaderMenuRequest(const QPoint& pnt) {
 }
 
 void CustomTableView::SubscribeHeaderActions() {
-  connect(COLUMNS_VISIBILITY, &QAction::triggered, this, &CustomTableView::onShowHideColumn);
+  connect(COLUMNS_VISIBILITY, &QAction::triggered, this, &CustomTableView::onColumnVisibilityAdjust);
   connect(HIDE_THIS_COLUMN, &QAction::triggered, this, &CustomTableView::onHideThisColumn);
   connect(STRETCH_DETAIL_SECTION, &QAction::triggered, this, &CustomTableView::onStretchLastSection);
   connect(ENABLE_COLUMN_SORT, &QAction::triggered, this, &CustomTableView::onEnableColumnSort);
