@@ -17,7 +17,7 @@ class CustomTableView : public QTableView {
   inline int GetClickedHorIndex() const { return m_horizontalHeaderSectionClicked; }
 
   bool ShowOrHideColumnCore();
-  bool onShowHideColumn();
+  bool onColumnVisibilityAdjust();
   bool onHideThisColumn();
 
   void onStretchLastSection(const bool checked);
@@ -58,7 +58,6 @@ class CustomTableView : public QTableView {
   QAction* SET_ROWS_DEFAULT_SECTION_SIZE = new (std::nothrow) QAction(QIcon(":img/DEFAULT_ROW_HEIGHT"), "set default rows section size", this);
   QAction* SET_MAX_ROWS_SECTION_SIZE = new (std::nothrow) QAction("set max row section size", this);
 
-  int m_horizontalHeaderSectionClicked = -1;
   QString m_name;
   QString m_columnVisibiltyKey;
   QString m_stretchLastSectionKey;
@@ -85,6 +84,12 @@ class CustomTableView : public QTableView {
   inline bool isNameExists(const QString& name) const { return TABLES_SET.contains(name); }
   static QSet<QString> TABLES_SET;
   static QSet<QString> SETTING_SHARING_WIDGET;
+
+  static constexpr int INVALID_SECTION_INDEX{-1};
+  inline void invalidHoricontalHeaderSectionClicked() {
+    m_horizontalHeaderSectionClicked = INVALID_SECTION_INDEX;
+  }
+  int m_horizontalHeaderSectionClicked = INVALID_SECTION_INDEX;
 };
 
 #endif  // CUSTOMTABLEVIEW_H

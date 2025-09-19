@@ -13,7 +13,7 @@ class VidsPlayListView : public CustomListView {
   void subscribe();
 
   int currentRow() const { return currentIndex().row(); }
-  int count() const { return m_vidModel->rowCount(); };
+  int count() const { return m_vidModel->rowCount(); }
   void setCurrentRow(int r) { setCurrentIndex(m_vidModel->index(r, 0)); }
 
   QString filePath(int row) const { return m_vidModel->filePath(row); }
