@@ -41,6 +41,7 @@ class FileSystemTableViewTest : public PlainTestSuite {
     fsModel.setFilter(currentDir.filter());  // need call manually
     FileSystemTableView fsView{&fsModel};
     fsView.show();
+    fsView.activateWindow();
     QVERIFY(QTest::qWaitForWindowActive(&fsView));
 
     auto checkAfterCopyMimeData = [&]() {

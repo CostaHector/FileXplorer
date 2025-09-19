@@ -101,41 +101,6 @@ bool Logger::AgingLogFiles(const QString& logFileAbsPath, const int AGING_FILE_A
   return true;
 }
 
-
-QByteArray Logger::GetLastNLinesOfLogs(const int maxLines) {
-  QFile logFile{SystemPath::WORK_PATH + "/logs_info.log"};
-  if (!logFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    LOG_W("Cannot Open LogFile[%s]: %s", qPrintable(logFile.fileName()), qPrintable(logFile.errorString()));
-    return "Cannot Open LogFile";
-  }
-
-  qint64 fileSize = logFile.size();
-  qint64 pos = fileSize - 1;
-  int lineCount = 0;
-  QByteArray buffer;
-
-  while (pos >= 0 && lineCount <= maxLines) {
-    logFile.seek(pos);
-    char ch;
-    if (!logFile.getChar(&ch)) {
-      break;
-    }
-    if (ch == '\n') {
-      lineCount++;
-      if (lineCount == maxLines) {
-        break;
-      }
-    }
-    pos--;
-  }
-
-  // 定位到目标行的起始位置（跳过最后找到的换行符）
-  logFile.seek(pos + 1);
-  buffer = logFile.readAll();
-  logFile.close();
-  return buffer;
-}
-
 bool Logger::OpenLogFile() {
   fflush(Logger::out());
   const QString& logAbsPath = GetLogFileAbsPath();
