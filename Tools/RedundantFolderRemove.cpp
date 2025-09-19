@@ -20,7 +20,7 @@ bool RedundantRmv::Exec() {
     LOG_D("nothing to remove");
     return true;
   }
-  const bool isAllSucceed = g_undoRedo.Do(m_cmds);
+  const bool isAllSucceed = UndoRedo::GetInst().Do(m_cmds);
   m_cmds.clear();
   return isAllSucceed;
 }

@@ -67,7 +67,7 @@ QString RedundantImageModel::filePath(const QModelIndex& index) const {
   return m_paf->operator[](r).filePath;
 }
 
-void RedundantImageModel::setRootPath(const REDUNDANT_IMG_BUNCH* p_af) {
+void RedundantImageModel::setRootPath(const RedundantImagesList* p_af) {
   int beforeRow = rowCount();
   int afterRow = p_af != nullptr ? p_af->size() : 0;
   LOG_D("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);

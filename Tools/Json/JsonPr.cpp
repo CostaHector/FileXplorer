@@ -46,7 +46,7 @@ bool JsonPr::operator==(const JsonPr& rhs) const {
 
 bool JsonPr::Reload() {
   const QString absPth = GetAbsPath();
-  if (!QFile::exists(absPth)) {
+  if (!QFileInfo(absPth).isFile()) {
     LOG_W("file[%s] not exist", qPrintable(absPth));
     return false;
   }
@@ -141,7 +141,7 @@ bool JsonPr::ConstructCastStudioValue() {
   }
   bool changed = false;
   if (m_Cast.isEmpty()) {
-    static const auto& pm = CastManager::getIns();
+    static const auto& pm = CastManager::getInst();
     QStringList newCastLst = pm(m_Name);
     if (!newCastLst.isEmpty()) {
       m_Cast.setBatch(newCastLst);
@@ -149,7 +149,7 @@ bool JsonPr::ConstructCastStudioValue() {
     }
   }
   if (m_Studio.isEmpty()) {
-    static const auto& psm = StudiosManager::getIns();
+    static const auto& psm = StudiosManager::getInst();
     QString newStudio = psm(m_Name);
     if (!newStudio.isEmpty()) {
       m_Studio.swap(newStudio);
@@ -219,7 +219,7 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
 }
 
 void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const {
-  static StudiosManager& psm = StudiosManager::getIns();
+  static StudiosManager& psm = StudiosManager::getInst();
   hintStudio = psm(m_Name);
   if (m_Studio != hintStudio) {
     studioChanged = true;
@@ -228,7 +228,7 @@ void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged,
     hintStudio.clear();
   }
 
-  static CastManager& pm = CastManager::getIns();
+  static CastManager& pm = CastManager::getInst();
   const QStringList& hintPerfsList = pm(m_Name + " " + selectedText);
   QSet<QString> elseCastSet{hintPerfsList.cbegin(), hintPerfsList.cend()};
   elseCastSet.subtract(m_Cast.m_set);

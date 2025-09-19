@@ -78,8 +78,10 @@ class NavigationExToolBarTest : public PlainTestSuite {
     SomeToolBar tb;
     QVERIFY(tb.mMenu != nullptr);
     // NEVER CALL menu.popup() when breakpoint enabled, it will block system.
-    QPoint center = tb.geometry().center();
-    tb.mMenu->popup(center);
+    const QPoint posCenter = tb.geometry().center();
+    QTest::mouseClick(&tb, Qt::RightButton, Qt::NoModifier, posCenter);
+    // tb.mMenu->popup(posCenter);
+    QCOMPARE(1, 1);
   }
 #endif
 

@@ -19,7 +19,8 @@ public:
   QList<FsNodeEntry> gNodeEntries;
 private slots:
   void initTestCase() {
-    static StudiosManager inst{gLocalFilePath};
+    static StudiosManager inst;
+    inst.ResetStateForTestImpl(gLocalFilePath);
     smInLLT = &inst;
   }
 
@@ -29,22 +30,22 @@ private slots:
   }
 
   void test_studio_list_not_empty_in_service() {
-    const StudiosManager& psm{StudiosManager::getIns()};
+    const StudiosManager& psm{StudiosManager::getInst()};
     QVERIFY2(psm.count() >= 0, "studio list should not be empty");
   }
 
   void test_studio_name_in_last_section_ok() {
     // precondition
-    decltype(smInLLT->m_prodStudioMap) tempStudioHash;
+    STUDIO_MGR_DATA_T tempStudioHash;
     tempStudioHash["realmadridcf"] = "RealMadridCF";
     tempStudioHash["real madrid cf"] = "RealMadridCF";
     tempStudioHash["juventus"] = "Juventus";
 
-    smInLLT->m_prodStudioMap.swap(tempStudioHash);
+    smInLLT->ProStudioMap().swap(tempStudioHash);
     ON_SCOPE_EXIT {
-      smInLLT->m_prodStudioMap.swap(tempStudioHash);
+      smInLLT->ProStudioMap().swap(tempStudioHash);
     };
-    QVERIFY(!smInLLT->m_prodStudioMap.isEmpty());
+    QVERIFY(!smInLLT->ProStudioMap().isEmpty());
 
     QCOMPARE((*smInLLT)("Raphaël Varane, Kaka - RealMadridCF"), "RealMadridCF");
     QCOMPARE((*smInLLT)("Raphaël Varane, Cristiano Ronaldo - Real Madrid CF"), "RealMadridCF");
@@ -58,7 +59,7 @@ private slots:
 
   void test_standardStudioNameFrom_ok() {
     // precondition
-    decltype(smInLLT->m_prodStudioMap) tempStudioHash;
+    STUDIO_MGR_DATA_T tempStudioHash;
     // FC Bayern Munich here not support
     // FC Barcelona here not support
     tempStudioHash["realmadridcf"] = "RealMadridCF";
@@ -69,11 +70,11 @@ private slots:
     tempStudioHash["my 3 gifts"] = "My3Gifts";
     tempStudioHash["my3gifts"] = "My3Gifts";
 
-    smInLLT->m_prodStudioMap.swap(tempStudioHash);
+    smInLLT->ProStudioMap().swap(tempStudioHash);
     ON_SCOPE_EXIT {
-      smInLLT->m_prodStudioMap.swap(tempStudioHash);
+      smInLLT->ProStudioMap().swap(tempStudioHash);
     };
-    QVERIFY(!smInLLT->m_prodStudioMap.isEmpty());
+    QVERIFY(!smInLLT->ProStudioMap().isEmpty());
 
     QSet<QString> fromList;
     QSet<QString> expectStudiosName;

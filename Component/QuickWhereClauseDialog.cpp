@@ -1,6 +1,6 @@
 ﻿#include "QuickWhereClauseDialog.h"
 #include "QuickWhereClauseHelper.h"
-#include "PerformersAkaManager.h"
+#include "CastAkasManager.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
@@ -190,8 +190,8 @@ void QuickWhereClauseDialog::onConditionsChanged() {
     static QHash<QString, QString> EMPTY_HASH;
     const auto* p2AkaHash = &EMPTY_HASH;
     if (bAutoCompleteAka) {
-      static auto& dbTM = PerformersAkaManager::getIns();
-      p2AkaHash = &dbTM.m_akaPerf;
+      static auto& dbTM = CastAkasManager::getInst();
+      p2AkaHash = &dbTM.CastAkaMap();
     }
 
     // DB_TABLE::MOVIES

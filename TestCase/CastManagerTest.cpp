@@ -28,10 +28,12 @@ public:
   StudiosManager* smInLLT{nullptr};
 private slots:
   void initTestCase() {
-    static CastManager instCast{gLocalFilePath};
+    CastManager& instCast = CastManager::getInst();
+    instCast.InitializeImpl(gLocalFilePath);
     cmInLLT = &instCast;
 
-    static StudiosManager instStudio{gStudioLocalFilePath};
+    StudiosManager& instStudio = StudiosManager::getInst();
+    instStudio.ResetStateForTestImpl(gStudioLocalFilePath);
     smInLLT = &instStudio;
 
     static const char JSON_CONTENTS[]{R"({
@@ -87,7 +89,7 @@ private slots:
   }
 
   void test_cast_list_not_empty_in_service() {
-    const CastManager& pmInsService{CastManager::getIns()};
+    const CastManager& pmInsService{CastManager::getInst()};
     QVERIFY2(pmInsService.count() >= 0, "Cast count in service should greater than 0");
   }
 
@@ -199,9 +201,9 @@ private slots:
 
     // procedure
     QHash<QString, QString> emptyStudioSet;
-    smInLLT->m_prodStudioMap.swap(emptyStudioSet);
+    smInLLT->ProStudioMap().swap(emptyStudioSet);
     ON_SCOPE_EXIT {
-      smInLLT->m_prodStudioMap.swap(emptyStudioSet);
+      smInLLT->ProStudioMap().swap(emptyStudioSet);
     };
 
     QSet<QString> emptyCastSet;
@@ -213,7 +215,7 @@ private slots:
     // cached should updated, local file should not write
     bool studioLocalFileWrite{false};
     QCOMPARE(smInLLT->LearningFromAPath(rootpath, &studioLocalFileWrite), 2);
-    QCOMPARE(smInLLT->m_prodStudioMap, expectStudioSet);
+    QCOMPARE(smInLLT->ProStudioMap(), expectStudioSet);
     QCOMPARE(studioLocalFileWrite, true);
     const QFile fiStudio{gStudioLocalFilePath};
     QVERIFY(fiStudio.size() > 0);
@@ -228,7 +230,7 @@ private slots:
     // do it again, nothing new should append
     studioLocalFileWrite = true;
     QCOMPARE(smInLLT->LearningFromAPath(rootpath, &studioLocalFileWrite), 0);
-    QCOMPARE(smInLLT->m_prodStudioMap, expectStudioSet);
+    QCOMPARE(smInLLT->ProStudioMap(), expectStudioSet);
     QCOMPARE(studioLocalFileWrite, false);  // skipped, no write
 
     castLocalFileWrite = true;

@@ -5,7 +5,10 @@
 #include "OnScopeExit.h"
 #include "PlainTestSuite.h"
 #include "NameStandardizer.h"
+
+#include "BeginToExposePrivateMember.h"
 #include "StudiosManager.h"
+#include "EndToExposePrivateMember.h"
 
 class MovieNameStandardizerTest : public PlainTestSuite {
   Q_OBJECT
@@ -45,15 +48,15 @@ class MovieNameStandardizerTest : public PlainTestSuite {
   void test_RemoveMultiHypen();
   void test_RemoveBacket();
   void test_BasicFunc() {
-    static auto& psm = StudiosManager::getIns();
-    decltype(psm.m_prodStudioMap) tempStudios;
+    static auto& psm = StudiosManager::getInst();
+    STUDIO_MGR_DATA_T tempStudios;
     tempStudios["marvelfilms"] = "MarvelFilms";
     tempStudios["marvel films"] = "MarvelFilms";
     tempStudios["realmadrid"] = "ReadMadrid";
     tempStudios["real madrid"] = "ReadMadrid";
-    psm.m_prodStudioMap.swap(tempStudios);
+    psm.ProStudioMap().swap(tempStudios);
     ON_SCOPE_EXIT {
-      psm.m_prodStudioMap.swap(tempStudios);
+      psm.ProStudioMap().swap(tempStudios);
     };
     QCOMPARE(ns("marvelfilms-1.mp4"), "MarvelFilms - 1.mp4");
     QCOMPARE(ns("marvel films-1.mp4"), "MarvelFilms - 1.mp4");

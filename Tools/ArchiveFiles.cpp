@@ -239,7 +239,7 @@ int ArchiveImagesRecusive::CompressImgRecur(const QString& rootPath) {
       recycleCmds.append(ACMD::GetInstMOVETOTRASH(m_allPres[i], m_allNames[i]));
     }
 
-    bool recycleRet = g_undoRedo.Do(recycleCmds);
+    bool recycleRet = UndoRedo::GetInst().Do(recycleCmds);
     if (recycleRet) {
       LOG_D("Recycle succeed. %d files", recycleCmds.size());
     } else {

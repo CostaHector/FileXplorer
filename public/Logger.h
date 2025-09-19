@@ -34,7 +34,6 @@ public:
   static LOG_LVL_E m_autoFflushLevel; // log which level not below this will flush into file instantly
 
   static bool AgingLogFiles(const QString& logFileAbsPath, const int AGING_FILE_ABOVE_B = 104857600 /*100MB*/, QString* pAgedLogFileName = nullptr);
-  static QByteArray GetLastNLinesOfLogs(const int maxLines = 100);
   static bool OpenLogFile();
   static bool OpenLogFolder();
   static void SetPrintLevel(LOG_LVL_E newLevel);

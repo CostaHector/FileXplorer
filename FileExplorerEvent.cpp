@@ -5,7 +5,6 @@
 #include "FileBasicOperationsActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
-#include "VideoPlayerActions.h"
 #include "ViewActions.h"
 #include "ThumbnailProcessActions.h"
 #include "TSFilesMerger.h"
@@ -723,7 +722,7 @@ bool FileExplorerEvent::on_moveToTrashBin() {
   for (int i = 0; i < prepaths.size(); ++i) {
     removeCmds.append(ACMD::GetInstMOVETOTRASH(prepaths[i], names[i]));
   }
-  if (!g_undoRedo.Do(removeCmds)) {
+  if (!UndoRedo::GetInst().Do(removeCmds)) {
     LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
     return false;
   }
@@ -785,7 +784,7 @@ bool FileExplorerEvent::on_deletePermanently() {
     LOG_INFO_P("[Cancel] User cancel delete", "%d item(s) no change", cmds.size());
     return true;
   }
-  if (!g_undoRedo.Do(cmds)) {
+  if (!UndoRedo::GetInst().Do(cmds)) {
     LOG_ERR_P("[Failed] Partial item(s) deleted failed", "%d cmds", cmds.size());
     return false;
   }
@@ -904,7 +903,7 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   using namespace ComplexOperation;
   ComplexMerge cm;
   BATCH_COMMAND_LIST_TYPE aBatch = cm.Merge(fromPath, toPath);
-  if (!g_undoRedo.Do(aBatch)) {
+  if (!UndoRedo::GetInst().Do(aBatch)) {
     LOG_ERR_P("[Failed] Partial merge failed", "%s\n->\n%s", qPrintable(fromPath), qPrintable(toPath));
     return false;
   }

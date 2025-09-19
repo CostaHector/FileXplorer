@@ -235,8 +235,17 @@ cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bi
 cd /home/ariel/code/FileXplorer
 
 
+# if some file was removed. remove its related files like {*.gcda, *.gcno, *.o, *.html}
+find ./ -name "RemovedFileName*" -print
+find ./ -name "RemovedFileName*" -delete
 ```
 
+## Update translate files is needed
+
+```bash
+/home/ariel/Qt/5.15.2/gcc_64/bin/lupdate ../publicTest/PublicToolTest.cpp -ts test_zh_CN.ts
+/home/ariel/Qt/5.15.2/gcc_64/bin/lrelease test_zh_CN.ts -qm test_zh_CN.qm
+```
 
 ## Snippets
 Edir/Preference/TextEditor/Snippets

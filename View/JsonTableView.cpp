@@ -135,7 +135,7 @@ int JsonTableView::onSetStudio() {
   const auto& curInd = CurrentIndexSource();
   const QString& fileBaseName = _JsonModel->fileBaseName(curInd);
 
-  static StudiosManager& sm = StudiosManager::getIns();
+  StudiosManager& sm = StudiosManager::getInst();
   const QString defStudio = sm(fileBaseName);
   int defIndex = m_studioCandidates.indexOf(defStudio);
   if (defIndex == -1) {
