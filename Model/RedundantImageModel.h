@@ -2,7 +2,7 @@
 #define REDUNDANTIMAGEMODEL_H
 
 #include "QAbstractTableModelPub.h"
-#include "RedunImgLibs.h"
+#include "ImagesInfoManager.h"
 
 class RedundantImageFinder;
 class RedundantImageModel : public QAbstractTableModelPub {
@@ -15,10 +15,10 @@ class RedundantImageModel : public QAbstractTableModelPub {
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   QString filePath(const QModelIndex& index) const;
-  void setRootPath(const REDUNDANT_IMG_BUNCH* p_af);
+  void setRootPath(const RedundantImagesList* p_af);
 
  private:
-  const REDUNDANT_IMG_BUNCH* m_paf{nullptr};
+  const RedundantImagesList* m_paf{nullptr};
   static const QStringList HORIZONTAL_HEADER;
 };
 

@@ -6,7 +6,11 @@
 #include "JsonHelper.h"
 #include "JsonPr.h"
 #include "CastManager.h"
+
+#include "BeginToExposePrivateMember.h"
 #include "StudiosManager.h"
+#include "EndToExposePrivateMember.h"
+
 #include "NameTool.h"
 #include "PathTool.h"
 #include "PublicMacro.h"
@@ -74,17 +78,17 @@ class JsonPrTest : public PlainTestSuite {
     QCOMPARE(studioChange, false);
     QCOMPARE(castChanged, false);
 
-    auto& psm = StudiosManager::getIns();
-    decltype(psm.m_prodStudioMap) tempStudios;
+    auto& psm = StudiosManager::getInst();
+    STUDIO_MGR_DATA_T tempStudios;
     tempStudios["marvelfilms"] = "MarvelFilms";
     tempStudios["marvel films"] = "MarvelFilms";
     tempStudios["realmadrid"] = "ReadMadrid";
     tempStudios["real madrid"] = "ReadMadrid";
-    psm.m_prodStudioMap.swap(tempStudios);
+    psm.ProStudioMap().swap(tempStudios);
     ON_SCOPE_EXIT {
-      psm.m_prodStudioMap.swap(tempStudios);
+      psm.ProStudioMap().swap(tempStudios);
     };
-    auto& pm = CastManager::getIns();
+    auto& pm = CastManager::getInst();
     decltype(pm.m_casts) tempCast{"a1 c1", "b1 d1", "a1 b1"};
     pm.m_casts.swap(tempCast);
     ON_SCOPE_EXIT {
@@ -296,15 +300,15 @@ class JsonPrTest : public PlainTestSuite {
   }
 
   void test_Construct_Clear_CastStudioValue() {
-    auto& pm = CastManager::getIns();
-    auto& psm = StudiosManager::getIns();
+    auto& pm = CastManager::getInst();
+    auto& psm = StudiosManager::getInst();
     decltype(pm.m_casts) tempCastsList{"chris hemsworth", "keanu reeves", "chris evans"};
-    decltype(psm.m_prodStudioMap) tempStudiosMap{{"paramount pictures", "Paramount Pictures"}};
+    STUDIO_MGR_DATA_T tempStudiosMap{{"paramount pictures", "Paramount Pictures"}};
     pm.m_casts.swap(tempCastsList);
-    psm.m_prodStudioMap.swap(tempStudiosMap);
+    psm.ProStudioMap().swap(tempStudiosMap);
     ON_SCOPE_EXIT {
       pm.m_casts.swap(tempCastsList);
-      psm.m_prodStudioMap.swap(tempStudiosMap);
+      psm.ProStudioMap().swap(tempStudiosMap);
     };
 
     JsonPr jr{""};

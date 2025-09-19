@@ -1,4 +1,4 @@
-﻿#include "PerformersAkaManager.h"
+﻿#include "CastAkasManager.h"
 #include "CastPsonFileHelper.h"
 #include "TableFields.h"
 #include "MemoryKey.h"
@@ -6,22 +6,28 @@
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "StringTool.h"
-#include <QSqlField>
 #include <QTextStream>
 #include <QRegularExpression>
 #include <QFile>
 
-PerformersAkaManager& PerformersAkaManager::getIns() {
-  static PerformersAkaManager ins;
-  return ins;
+template class SingletonManager<CastAkasManager, CAST_AKA_MGR_DATA_T>;
+
+
+CastAkasManager::CastAkasManager() {
+#ifndef RUNNING_UNIT_TESTS
+  using namespace PathTool::FILE_REL_PATH;
+  const QString defaultPath = PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS);
+  InitializeImpl(defaultPath);
+
+#endif
+}
+void CastAkasManager::InitializeImpl(const QString& path) {
+  mLocalFilePath = path;
+  CastAkaMap() = ReadOutCastAkas();
 }
 
-PerformersAkaManager::PerformersAkaManager() : m_akaPerf(ReadOutAkaName()) {}
-
-QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
-  using namespace PathTool::FILE_REL_PATH;
-  static const QString akaPerfFilePath = PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS);
-  QFile file{akaPerfFilePath};
+QHash<QString, QString> CastAkasManager::ReadOutCastAkas() const {
+  QFile file{mLocalFilePath};
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     LOG_D("File not found: %s.", qPrintable(file.fileName()));
     return {};
@@ -43,11 +49,17 @@ QHash<QString, QString> PerformersAkaManager::ReadOutAkaName() {
   return akaDict;
 }
 
-int PerformersAkaManager::ForceReloadAkaName() {
-  int beforeAkaNameCnt = m_akaPerf.size();
-  m_akaPerf = PerformersAkaManager::ReadOutAkaName();
-  int afterAkaNameCnt = m_akaPerf.size();
+int CastAkasManager::ForceReloadImpl() {
+  int beforeAkaNameCnt = CastAkaMap().size();
+  CAST_AKA_MGR_DATA_T tmp = CastAkasManager::ReadOutCastAkas();
+  CastAkaMap().swap(tmp);
+  int afterAkaNameCnt = CastAkaMap().size();
   LOG_D("%d aka names added/removed", afterAkaNameCnt - beforeAkaNameCnt);
   return afterAkaNameCnt - beforeAkaNameCnt;
 }
 
+#ifdef RUNNING_UNIT_TESTS
+int CastAkasManager::ResetStateForTestImpl(const QString& localFilePath) {
+  InitializeImpl(localFilePath);
+}
+#endif

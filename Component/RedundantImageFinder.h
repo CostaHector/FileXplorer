@@ -27,7 +27,7 @@ private:
   void UpdateDisplayWhenRecycled();
   QToolButton* mFindImgByTb{nullptr};
   QToolBar* m_toolBar{nullptr};
-  REDUNDANT_IMG_BUNCH m_imgsBunch;
+  RedundantImagesList m_imgsBunch;
 
   RedundantImageModel* m_imgModel{nullptr};
   CustomTableView* m_table{nullptr};

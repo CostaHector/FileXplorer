@@ -2,7 +2,7 @@
 #include "NotificatorMacro.h"
 #include "CastManager.h"
 #include "StudiosManager.h"
-#include "PerformersAkaManager.h"
+#include "CastAkasManager.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
@@ -59,35 +59,35 @@ ArrangeActions::ArrangeActions(QObject* parent) : QObject{parent} {
 void onShowRenameRuleStatistics() {
   QString statictsContent;
   statictsContent += "Studios number\t";
-  statictsContent += QString::number(StudiosManager::getIns().count());
+  statictsContent += QString::number(StudiosManager::getInst().count());
   statictsContent += '\n';
   statictsContent += "Cast number\t";
-  statictsContent += QString::number(CastManager::getIns().count());
+  statictsContent += QString::number(CastManager::getInst().count());
   statictsContent += '\n';
   statictsContent += "AKA number\t";
-  statictsContent += QString::number(PerformersAkaManager::getIns().count());
+  statictsContent += QString::number(CastAkasManager::getInst().count());
   LOG_INFO_NP("Rename rule statistics", statictsContent);
 }
 
 void ArrangeActions::subscribe() {
   connect(_EDIT_STUDIOS, &QAction::triggered, this, &onEditStudios);
   connect(_RELOAD_STUDIOS, &QAction::triggered, this, []() {
-    static auto& psm = StudiosManager::getIns();
-    int itemsCntChanged = psm.ForceReloadStudio();
+    StudiosManager& psm = StudiosManager::getInst();
+    int itemsCntChanged = psm.ForceReloadImpl();
     LOG_OK_P("Reload studios", "delta %d items", itemsCntChanged);
   });
 
   connect(_EDIT_PERFS, &QAction::triggered, this, &onEditPerformers);
   connect(_RELOAD_PERFS, &QAction::triggered, this, []() {
-    static auto& pm = CastManager::getIns();
-    int itemsCntChanged = pm.ForceReloadCast();
+    CastManager& pm = CastManager::getInst();
+    int itemsCntChanged = pm.ForceReloadImpl();
     LOG_OK_P("Reload performers", "delta %d item(s)", itemsCntChanged);
   });
 
   connect(_EDIT_PERF_AKA, &QAction::triggered, this, &onEditAkaPerformer);
   connect(_RELOAD_PERF_AKA, &QAction::triggered, this, []() {
-    static auto& dbTM = PerformersAkaManager::getIns();
-    int itemsCntChanged = dbTM.ForceReloadAkaName();
+    static auto& dbTM = CastAkasManager::getInst();
+    int itemsCntChanged = dbTM.ForceReloadImpl();
     LOG_OK_P("Reload performers AKA", "delta %d item(s)", itemsCntChanged);
   });
 

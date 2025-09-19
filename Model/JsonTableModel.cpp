@@ -591,11 +591,11 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
 std::pair<int, int> JsonTableModel::ExportCastStudioToLocalDictionaryFile(const QModelIndexList& rowIndexes) const {
   int row{-1};
   int cnt{0};
-  static CastManager& pm = CastManager::getIns();
-  decltype(pm.m_casts) castIncrements;
+  CastManager& pm = CastManager::getInst();
+  CAST_MGR_DATA_T castIncrements;
 
-  static StudiosManager& psm = StudiosManager::getIns();
-  decltype(psm.m_prodStudioMap) studioIncrements;
+  StudiosManager& psm = StudiosManager::getInst();
+  STUDIO_MGR_DATA_T studioIncrements;
 
   for (const QModelIndex& ind : rowIndexes) {
     row = ind.row();

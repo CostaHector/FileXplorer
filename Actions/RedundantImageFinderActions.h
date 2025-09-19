@@ -18,8 +18,9 @@ class RedundantImageFinderActions : public QObject {
   EnumIntAction<RedundantImageTool::DecideByE> mDecideByIntAction;
 
   QAction* RECYLE_NOW{nullptr};
-  QAction* ALSO_EMPTY_IMAGE{nullptr};
-  QAction* OPEN_REDUNDANT_IMAGES_FOLDER{nullptr};
+  QAction* INCLUDING_EMPTY_IMAGES{nullptr};
+  QAction* OPEN_BENCHMARK_FOLDER{nullptr};
+  QAction* RELOAD_BENCHMARK_LIB{nullptr};
 };
 
 RedundantImageFinderActions& g_redunImgFinderAg();

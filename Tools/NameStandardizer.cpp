@@ -31,7 +31,7 @@ QString NameStandardizer::operator()(QString aFileName) {
   if (barIndex == -1 || barIndex == 0) {
     return fileName;
   }
-  static auto& psm = StudiosManager::getIns();
+  static auto& psm = StudiosManager::getInst();
   const QString& studioName = fileName.left(barIndex - 1);
   return psm[studioName] + fileName.mid(barIndex - 1);
 }

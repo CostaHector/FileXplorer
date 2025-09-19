@@ -517,7 +517,7 @@ int MovieDBView::onSetStudio() {
   const auto& curInd = currentIndex();
   const QString& fileName = _dbModel->fileName(curInd);
 
-  static StudiosManager& sm = StudiosManager::getIns();
+  StudiosManager& sm = StudiosManager::getInst();
   const QString defStudio = sm(fileName);
   int defIndex = m_studioCandidates.indexOf(defStudio);
   if (defIndex == -1) {
