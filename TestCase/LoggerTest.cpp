@@ -115,6 +115,8 @@ private slots:
     QVERIFY(mDir.fileExists(agedFileName, false));
     QVERIFY(mDir.fileExists(LOCAL_LOG, false));
   }
+
+
 };
 #include "LoggerTest.moc"
 REGISTER_TEST(LoggerTest, false)

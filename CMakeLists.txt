@@ -112,9 +112,7 @@ foreach(ts_file ${TS_FILES})
     message("${ts_file}")
 endforeach()
 
-qt_add_translation(QM_FILES
-    ${TS_FILES}
-)
+qt_add_translation(QM_FILES ${TS_FILES})
 
 if(WIN32)
     # Windows-specific platform: Use the WIN32 option to hide the console
@@ -122,9 +120,6 @@ if(WIN32)
         ${SOURCES}
         ${RESOURCES}
     )
-
-set(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Translate/FileXplorer_zh_CN.ts)
-set(README_FILES ${CMAKE_CURRENT_SOURCE_DIR}/readme.md)
 else()
     # Linux Platform: Directly generate a GUI application (no terminal displayed by default). No extra flags needed for GUI apps
     add_executable(${PROJECT_NAME}
@@ -132,11 +127,12 @@ else()
         ${RESOURCES}
     )
 endif()
+
 target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
-    ${README_FILES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/covagelnk
+    ${CMAKE_CURRENT_SOURCE_DIR}/readme.md
+    ${CMAKE_CURRENT_SOURCE_DIR}/gencov.sh
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SRV_HEADER_PATH})
