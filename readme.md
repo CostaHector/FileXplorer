@@ -237,6 +237,12 @@ cd /home/ariel/code/FileXplorer
 
 ```
 
+## Update translate files is needed
+
+```bash
+/home/ariel/Qt/5.15.2/gcc_64/bin/lupdate ../publicTest/PublicToolTest.cpp -ts test_zh_CN.ts
+/home/ariel/Qt/5.15.2/gcc_64/bin/lrelease test_zh_CN.ts -qm test_zh_CN.qm
+```
 
 ## Snippets
 Edir/Preference/TextEditor/Snippets

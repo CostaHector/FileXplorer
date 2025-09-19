@@ -92,6 +92,8 @@ class PublicToolTest : public PlainTestSuite {
     QCOMPARE(oldCancelButton.text(), "Cancel");
 
     QTranslator translator;
+    QCOMPARE(LoadCNLanguagePack(translator, "inexist qm file path"), false);
+
     QString qmFileInqrc = ":/translations/test_zh_CN.qm";
     bool loaded = LoadCNLanguagePack(translator, qmFileInqrc);
     QVERIFY2(loaded, "Failed to load Chinese translation file");
