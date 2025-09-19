@@ -9,18 +9,12 @@
 class AdvanceSearchTableView : public CustomTableView {
  public:
   AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent = nullptr);
-
   void subscribe();
-
-  void onCopyNamesStr() const;
-  void onCopyFiles();
-  void onCutFiles();
-
   void keyPressEvent(QKeyEvent* e) override;
 
  private:
-  AdvanceSearchModel* _sourceModel;
-  SearchProxyModel* _searchProxyModel;
+  AdvanceSearchModel* _sourceModel {nullptr};
+  SearchProxyModel* _searchProxyModel {nullptr};
 };
 
 #endif  // ADVANCESEARCHTABLEVIEW_H

@@ -3,12 +3,15 @@
 #include "ViewActions.h"
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
-  : CustomTableView{"ADVANCE_SEARCH_SYSTEM", parent},
-  _sourceModel(sourceModel),
-  _searchProxyModel(searchProxyModel) {
+    : CustomTableView{"ADVANCE_SEARCH_SYSTEM", parent} {
+  CHECK_NULLPTR_RETURN_VOID(sourceModel);
+  CHECK_NULLPTR_RETURN_VOID(searchProxyModel);
+  _sourceModel = sourceModel;
 
+  _searchProxyModel = searchProxyModel;
   _searchProxyModel->setSourceModel(_sourceModel);
   setModel(_searchProxyModel);
+
   setDragDropMode(QAbstractItemView::DragDrop);
   setAcceptDrops(true);
   setDragEnabled(true);
@@ -35,8 +38,12 @@ void AdvanceSearchTableView::subscribe() {
 }
 
 void AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) {
+  CHECK_NULLPTR_RETURN_VOID(e);
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
-    emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
+    if (this->selectionModel()->hasSelection()) {
+      emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
+    }
+    e->accept();
     return;
   }
   QTableView::keyPressEvent(e);
