@@ -66,10 +66,10 @@ fi
 # Clean coverage data
 if [ "$ACTION" = "force_rebuild" ]; then
   log "Cleaning previous coverage data..."
-  find . -name "*.gcda" -delete
-  # never remove gcno file. otherwise recompile need
+  # do following when remove some file, clean and compile again
+  # find . -name "*.gcda" -delete
   # find . -name "*.gcno" -delete
-  lcov --zerocounters --directory . > /dev/null
+  # lcov --zerocounters --directory . > /dev/null
 
   log "Running tests to generate coverage data..."
   ./FileXplorerTest || error "Test execution failed"
