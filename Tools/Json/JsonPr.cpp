@@ -46,7 +46,7 @@ bool JsonPr::operator==(const JsonPr& rhs) const {
 
 bool JsonPr::Reload() {
   const QString absPth = GetAbsPath();
-  if (!QFile::exists(absPth)) {
+  if (!QFileInfo(absPth).isFile()) {
     LOG_W("file[%s] not exist", qPrintable(absPth));
     return false;
   }

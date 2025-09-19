@@ -119,7 +119,7 @@ void RedundantImageFinder::RecycleSelection() {
   for (const auto& srcInd : sel) {
     recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_imgModel->filePath(srcInd)));
   }
-  bool isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
+  bool isRenameAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
   if (isRenameAllSucceed) {
     LOG_OK_P("Recyle redundant images succeed", "selected count: %d", SELECTED_CNT);
   } else {

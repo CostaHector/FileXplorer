@@ -168,10 +168,11 @@ QString formatRateAnnual(const QList<char>& rates) {
 }
 
 bool writeRateAnnual(QList<char>& dst, const QVariant& src) {
-  QStringList lstStrValue = src.toString().split(',');
+  QStringList lstStrValue = src.toString().split(',', Qt::SplitBehaviorFlags::SkipEmptyParts);
   QList<char> lstValue;
   lstValue.reserve(lstStrValue.size());
-  for (const auto& s : lstStrValue) {
+  for (QString& s : lstStrValue) {
+    s = s.trimmed();
     if (s.isEmpty()) {
       continue;
     }
@@ -203,7 +204,7 @@ QString formatBool(bool value) {  //
 }
 
 bool writeBool(bool& dst, const QVariant& src) {  //
-  QString srcStr{src.toString()};
+  QString srcStr{src.toString().toLower()};
   bool srcValue{false};
   if (srcStr == "true") {
     srcValue = true;

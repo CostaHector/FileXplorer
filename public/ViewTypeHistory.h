@@ -5,13 +5,11 @@
 #include "ViewTypeTool.h"
 
 class ViewTypeHistory {
-public:
-  ViewTypeHistory() {
-    operator()(ViewTypeTool::DEFAULT_VIEW_TYPE);
-  }
+ public:
+  ViewTypeHistory() { operator()(ViewTypeTool::DEFAULT_VIEW_TYPE); }
 
   bool operator()(const ViewTypeTool::ViewType& vt) {
-    if (!undoStack.isEmpty() && undoStack.top() == vt) { // same viewType
+    if (!undoStack.isEmpty() && undoStack.top() == vt) {  // same viewType
       LOG_D("[Skip] Duplicate ViewType[%s]", ViewTypeTool::c_str(vt));
       return false;
     }
@@ -19,20 +17,19 @@ public:
     return true;
   }
 
-  bool undoAvailable() { return undoStack.size() > 1; }
+  bool undoViewAvailable() { return undoStack.size() > 1; }
+  bool redoViewAvailable() { return !redoStack.isEmpty(); }
 
   ViewTypeTool::ViewType undo() {
-    if (!undoAvailable()) {
+    if (!undoViewAvailable()) {
       return ViewTypeTool::DEFAULT_VIEW_TYPE;
     }
     redoStack.append(undoStack.pop());
     return undoStack.top();
   }
 
-  bool redoAvailable() { return !redoStack.isEmpty(); }
-
   ViewTypeTool::ViewType redo() {
-    if (!redoAvailable()) {
+    if (!redoViewAvailable()) {
       return ViewTypeTool::DEFAULT_VIEW_TYPE;
     }
     ViewTypeTool::ViewType redoPath = redoStack.pop();
@@ -40,9 +37,9 @@ public:
     return redoPath;
   }
 
-private:
+ private:
   QStack<ViewTypeTool::ViewType> undoStack;
   QStack<ViewTypeTool::ViewType> redoStack;
 };
 
-#endif // VIEWTYPEHISTORY_H
+#endif  // VIEWTYPEHISTORY_H

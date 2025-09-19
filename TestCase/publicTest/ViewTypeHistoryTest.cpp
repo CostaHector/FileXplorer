@@ -11,8 +11,8 @@ public:
 private slots:
   void testAddNewViewTypes() {
     ViewTypeHistory ladder;
-    QVERIFY(!ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable());
+    QVERIFY(!ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable());
 
     // skip same
     bool result = ladder(ViewTypeTool::ViewType::TABLE);
@@ -20,21 +20,21 @@ private slots:
 
     result = ladder(ViewTypeTool::ViewType::LIST);
     QVERIFY(result);
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable());
 
     result = ladder(ViewTypeTool::ViewType::TREE);
     QVERIFY(result);
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable());
 
     result = ladder(ViewTypeTool::ViewType::TREE);
     QVERIFY(!result);
 
     result = ladder(ViewTypeTool::ViewType::SEARCH);
     QVERIFY(result);
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable());
   }
 
   void testUndoOperations() {
@@ -43,19 +43,19 @@ private slots:
     ladder(ViewTypeTool::ViewType::LIST);
     ladder(ViewTypeTool::ViewType::TREE);
     ladder(ViewTypeTool::ViewType::SEARCH);
-    QVERIFY(ladder.undoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
 
     ViewTypeTool::ViewType result = ladder.undo();
     QCOMPARE(result, ViewTypeTool::ViewType::TREE);
-    QVERIFY(ladder.undoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
 
     result = ladder.undo();
     QCOMPARE(result, ViewTypeTool::ViewType::LIST);
-    QVERIFY(ladder.undoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
 
     result = ladder.undo();
     QCOMPARE(result, ViewTypeTool::ViewType::TABLE);
-    QVERIFY(!ladder.undoAvailable()); // stack unchange when operation not available
+    QVERIFY(!ladder.undoViewAvailable()); // stack unchange when operation not available
     auto beforeUndo = ladder.undoStack;
     auto beforeRedo = ladder.redoStack;
 
@@ -74,15 +74,15 @@ private slots:
     ladder.undo();
     ladder.undo();
 
-    QVERIFY(ladder.redoAvailable());
+    QVERIFY(ladder.redoViewAvailable());
 
     ViewTypeTool::ViewType result = ladder.redo();
     QCOMPARE(result, ViewTypeTool::ViewType::TREE);
-    QVERIFY(ladder.redoAvailable());
+    QVERIFY(ladder.redoViewAvailable());
 
     result = ladder.redo();
     QCOMPARE(result, ViewTypeTool::ViewType::SEARCH);
-    QVERIFY(!ladder.redoAvailable()); // stack unchange when operation not available
+    QVERIFY(!ladder.redoViewAvailable()); // stack unchange when operation not available
     auto beforeUndo = ladder.undoStack;
     auto beforeRedo = ladder.redoStack;
 
@@ -94,35 +94,35 @@ private slots:
 
   void testAlternatingOperations() {
     ViewTypeHistory ladder;
-    QVERIFY(!ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable());
+    QVERIFY(!ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable());
 
     // add LIST
     ladder(ViewTypeTool::ViewType::LIST); // undo[table, list], redo:[]
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable());
 
     // add TREE
     ladder(ViewTypeTool::ViewType::TREE); // undo[table, list, tree], redo:[]
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable());
 
     // undo->LIST
     ViewTypeTool::ViewType result = ladder.undo(); // undo: [table, list], redo:[tree]
     QCOMPARE(result, ViewTypeTool::ViewType::LIST);
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(ladder.redoViewAvailable());
 
     // add SEARCH
     ladder(ViewTypeTool::ViewType::SEARCH); // undo: [table, list, search], redo:[tree]
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(ladder.redoViewAvailable());
 
     // redo -> tree
     result = ladder.redo();
     QCOMPARE(result, ViewTypeTool::ViewType::TREE); // undo: [table, list, search, tree], redo:[]
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(!ladder.redoAvailable()); // cannot redo
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(!ladder.redoViewAvailable()); // cannot redo
     auto beforeUndo = ladder.undoStack;
     auto beforeRedo = ladder.redoStack;
 
@@ -135,8 +135,8 @@ private slots:
     // undo -> search
     result = ladder.undo();
     QCOMPARE(result, ViewTypeTool::ViewType::SEARCH); // undo: [table, list, search], redo:[tree]
-    QVERIFY(ladder.undoAvailable());
-    QVERIFY(ladder.redoAvailable());
+    QVERIFY(ladder.undoViewAvailable());
+    QVERIFY(ladder.redoViewAvailable());
     QCOMPARE(ladder.undoStack.size(), 3);
     QCOMPARE(ladder.redoStack.size(), 1);
   }

@@ -36,6 +36,6 @@ bool FilesNameBatchStandardizer::operator()(const QString& rootPath) {
     }
     cmds.append(ACMD::GetInstRENAME(pathList[i], oldNm, newNm));
   }
-  auto isAllSuccess = g_undoRedo.Do(cmds);
+  auto isAllSuccess = UndoRedo::GetInst().Do(cmds);
   return isAllSuccess;
 }

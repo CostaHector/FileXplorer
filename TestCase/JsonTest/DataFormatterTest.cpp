@@ -246,19 +246,58 @@ class DataFormatterTest : public PlainTestSuite {
   void test_formatGender() {  //
     QCOMPARE(formatGender(Gender::male), "male");
     QCOMPARE(formatGender(Gender::female), "female");
+
+    Gender current = Gender::female;
+    QVERIFY(writeGender(current, "male"));
+    QCOMPARE(current, Gender::male);
+    QVERIFY(writeGender(current, "female"));
+    QCOMPARE(current, Gender::female);
+    QVERIFY(!writeGender(current, "female"));  // unchange
+
+    // invalid value
+    Gender prev = Gender::male;
+    QVERIFY(writeGender(prev, "invalid"));
+    QCOMPARE(prev, Gender::female);
   }
 
-  void test_writeGender() {  // not sure
-  }
   void test_formatPhoneNumber() {  //
     QCOMPARE(formatPhoneNumber("8617788886666"), "86-177-8888-6666");
+
+    QString current;
+    QVERIFY(writePhoneNumber(current, "86-177-8888-6666"));
+    QCOMPARE(current, QString("8617788886666"));
+
+    QVERIFY(writePhoneNumber(current, "8617788887777"));
+    QCOMPARE(current, QString("8617788887777"));
+
+    QVERIFY(!writePhoneNumber(current, "86-177-8888-7777"));  // unchange
+
+    QVERIFY(writePhoneNumber(current, ""));  // empty
+    QCOMPARE(current, "");
   }
-  void test_writePhoneNumber() {  // not sure
-  }
+
   void test_formatFloat() {  //
     QCOMPARE(formatFloat2Prec(3.14f), QString{"3.14"});
   }
   void test_writeRateAnnual() {  // not sure
+    QList<char> current = {'A', 'B'};
+    QVERIFY(writeRateAnnual(current, "X,Y,Z"));
+    QCOMPARE(current, QList<char>({'X', 'Y', 'Z'}));
+
+    QVERIFY(!writeRateAnnual(current, "X,Y,Z"));  // unchange
+
+    QVERIFY(writeRateAnnual(current, ""));  // empty
+    QVERIFY(current.isEmpty());
+
+    QVERIFY(writeRateAnnual(current, " A, B , C "));  // skip blank char
+    QCOMPARE(current, QList<char>({'A', 'B', 'C'}));
+
+    QVERIFY(writeRateAnnual(current, "P,,Q,,"));  // skip empty
+    QCOMPARE(current, QList<char>({'P', 'Q'}));
+
+    // multi word, only first char keep
+    QVERIFY(writeRateAnnual(current, "Hello,World"));
+    QCOMPARE(current, QList<char>({'H', 'W'}));
   }
   void test_formatRateAnnual() {  //
     QList<char> emptyAnnual;
@@ -280,8 +319,26 @@ class DataFormatterTest : public PlainTestSuite {
   void test_formatBool() {  //
     QCOMPARE(formatBool(false), QString{"false"});
     QCOMPARE(formatBool(true), QString{"true"});
-  }
-  void test_writeBool() {  // not sure
+
+    bool current = false;
+    QVERIFY(writeBool(current, "true"));
+    QVERIFY(current);
+    QVERIFY(writeBool(current, "false"));
+    QVERIFY(!current);
+    QVERIFY(!writeBool(current, "false"));
+
+    QVERIFY(writeBool(current, "TRUE"));
+    QVERIFY(current);
+    QVERIFY(writeBool(current, "FALSE"));
+    QVERIFY(!current);
+
+    bool prev = true;
+    QVERIFY(writeBool(prev, "invalid"));  // invalid to false by default
+    QVERIFY(!prev);
+
+    prev = true;
+    QVERIFY(writeBool(prev, "1"));  // invalid to false by default
+    QVERIFY(!prev);
   }
 };
 

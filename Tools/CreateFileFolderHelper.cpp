@@ -21,7 +21,7 @@ bool NewPlainTextFile(const QString& createIn, QString* newTextFileAbsPath) {
   }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstTOUCH(curDir.absolutePath(), plainTextFileName)};
-  if (!g_undoRedo.Do(cmds)) {
+  if (!UndoRedo::GetInst().Do(cmds)) {
     LOG_ERR_NP("[Failed] Touch file", plainTextFileName);
     return false;
   }
@@ -64,7 +64,7 @@ bool NewFolder(const QString& createIn, QString* folderAbsPath) {
   }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds{ACMD::GetInstMKPATH(createIn, newFolderName)};
-  if (!g_undoRedo.Do(cmds)) {
+  if (!UndoRedo::GetInst().Do(cmds)) {
     LOG_WARN_P("[Error] Make path failed", "%s/%s", qPrintable(createIn), qPrintable(newFolderName));
     return false;
   }
@@ -100,7 +100,7 @@ bool NewItems(const QString& createIn, const QString& namePattern, int numStartI
       cmds.append(ACMD::GetInstTOUCH(createIn, fileNameArray));
     }
   }
-  if (!g_undoRedo.Do(cmds)) {
+  if (!UndoRedo::GetInst().Do(cmds)) {
     LOG_WARN_P("[Error] Some commands failed",  "commands count: %d", cmds.size());
     return false;
   }

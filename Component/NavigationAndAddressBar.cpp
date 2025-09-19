@@ -91,12 +91,12 @@ void NavigationAndAddressBar::InitEventWhenViewChanged() {
 }
 
 bool NavigationAndAddressBar::onBackward() {
-  if (!m_pathRD.undoAvailable()) {
+  if (!m_pathRD.undoPathAvailable()) {
     LOG_D("[Skip] backward paths pool empty");
     return false;
   }
   bool backwardRes{true};
-  const QString& undoPath = m_pathRD.undo();
+  const QString& undoPath = m_pathRD.onUndoPath();
   if (m_IntoNewPath != nullptr) {
     backwardRes = m_IntoNewPath(undoPath, false, false);
   }
@@ -104,12 +104,12 @@ bool NavigationAndAddressBar::onBackward() {
 }
 
 bool NavigationAndAddressBar::onForward() {
-  if (!m_pathRD.redoAvailable()) {
+  if (!m_pathRD.redoPathAvailable()) {
     LOG_D("[Skip] Forward paths pool empty");
     return false;
   }
   bool forwardRes{true};
-  const QString& redoPath = m_pathRD.redo();
+  const QString& redoPath = m_pathRD.onRedoPath();
   if (m_IntoNewPath != nullptr) {
     forwardRes = m_IntoNewPath(redoPath, false, false);
   }

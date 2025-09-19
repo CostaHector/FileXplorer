@@ -54,7 +54,7 @@ int LowResImgsRemover::operator()(const QString& imgPath) {
   for (const auto& nm : imgsToDel) {
     removeCmds.append(ACMD::GetInstMOVETOTRASH(imgPath, nm));
   }
-  bool bAllSucceed = g_undoRedo.Do(removeCmds);
+  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
   LOG_D("delete %d images items, bAllSucceed[%d]", imgsToDel.size(), bAllSucceed);
   return imgsToDel.size();
 }
