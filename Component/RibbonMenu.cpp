@@ -5,7 +5,7 @@
 #include "ActionsRecorder.h"
 #include "ActionsSearcher.h"
 #include "ArchiveFilesActions.h"
-#include "ArrangeActions.h"
+#include "FileRenameRulerActions.h"
 #include "FileBasicOperationsActions.h"
 #include "FileLeafAction.h"
 #include "FolderPreviewActions.h"

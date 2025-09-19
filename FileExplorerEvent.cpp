@@ -1,7 +1,7 @@
 ﻿#include "FileExplorerEvent.h"
 
 #include "ArchiveFilesActions.h"
-#include "ArrangeActions.h"
+#include "FileRenameRulerActions.h"
 #include "FileBasicOperationsActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
