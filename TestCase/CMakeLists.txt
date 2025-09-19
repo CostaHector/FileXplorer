@@ -27,8 +27,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Search for Qt libraries in the order of Qt6, Qt5
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets LinguistTools)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets LinguistTools)
 
 file(GLOB SOURCES
     # service module sources
@@ -37,7 +37,6 @@ file(GLOB SOURCES
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/Component/*.cpp
     ${PARENT_DIR}/Component/FolderPreview/*.cpp
-    ${PARENT_DIR}/Component/JsonEditorWidget/*.cpp
     ${PARENT_DIR}/Component/RenameWidgets/*.cpp
     ${PARENT_DIR}/FileOperation/*.cpp
     ${PARENT_DIR}/Model/*.cpp
@@ -51,7 +50,6 @@ file(GLOB SOURCES
     # test only module sources
     *.cpp
     ComponentTest/*.cpp
-    ComponentTest/JsonEditorWidgetTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
@@ -76,7 +74,6 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/View
     ${PARENT_DIR}/Component
     ${PARENT_DIR}/Component/FolderPreview
-    ${PARENT_DIR}/Component/JsonEditorWidget
     ${PARENT_DIR}/Component/RenameWidgets
     ${PARENT_DIR}/FileOperation
     ${PARENT_DIR}/lib
@@ -98,7 +95,6 @@ file(GLOB HEADERS
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/Component/*.h
     ${PARENT_DIR}/Component/FolderPreview/*.h
-    ${PARENT_DIR}/Component/JsonEditorWidget/*.h
     ${PARENT_DIR}/Component/RenameWidgets/*.h
     ${PARENT_DIR}/FileOperation/*.h
     ${PARENT_DIR}/lib/*.h
@@ -110,7 +106,11 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
     ${PARENT_DIR}/View/*.h
-    *.h
+    pubTestTool/*.h
+)
+
+set(READ_TR_FROM_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/publicTest/PublicToolTest.cpp
 )
 
 list(LENGTH HEADERS header_cpp_count)
@@ -118,6 +118,10 @@ message("\n> ${header_cpp_count} file(s) found in HEADERS, there are as follows:
 foreach(header_file ${HEADERS})
     message("${header_file}")
 endforeach()
+
+set(RESOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/translations.qrc
+)
 
 if(WIN32)
     # Windows-specific platform: Use the WIN32 option to hide the console
@@ -132,6 +136,16 @@ else()
         ${RESOURCES}
     )
 endif()
+
+
+set(QM_FILE_IN_QRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_zh_CN.qm
+)
+set(TS_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_zh_CN.ts
+)
+qt_add_translation(QM_FILES ${TS_FILES})
+
 target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
@@ -173,4 +187,12 @@ message("[${PROJECT_NAME}] Finished...")
 if(UNIX AND NOT APPLE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov")
+add_compile_options(-fprofile-update=atomic)
 endif()
+
+set(LUPDATE_EXECUTABLE "/home/ariel/Qt/5.15.2/gcc_64/bin/lupdate")
+set(LRELEASE_EXECUTABLE "/home/ariel/Qt/5.15.2/gcc_64/bin/lrelease")
+message(STATUS "Run following command in terminal if translation need update")
+message("${LUPDATE_EXECUTABLE} ${READ_TR_FROM_SOURCE} -ts ${TS_FILES}")
+message("${LRELEASE_EXECUTABLE} ${TS_FILES} -qm ${QM_FILE_IN_QRC}")
+message(STATUS "The End")

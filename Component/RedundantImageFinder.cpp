@@ -43,8 +43,9 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
   m_toolBar = new (std::nothrow) QToolBar{"Redun toolbar", this};
   CHECK_NULLPTR_RETURN_VOID(m_toolBar);
   m_toolBar->addWidget(mFindImgByTb);
-  m_toolBar->addAction(redunInst.ALSO_EMPTY_IMAGE);
-  m_toolBar->addAction(redunInst.OPEN_REDUNDANT_IMAGES_FOLDER);
+  m_toolBar->addAction(redunInst.INCLUDING_EMPTY_IMAGES);
+  m_toolBar->addAction(redunInst.OPEN_BENCHMARK_FOLDER);
+  m_toolBar->addAction(redunInst.RELOAD_BENCHMARK_LIB);
   m_toolBar->addSeparator();
   m_toolBar->addAction(redunInst.RECYLE_NOW);
   m_toolBar->addWidget(pSpacer);
@@ -95,11 +96,16 @@ void RedundantImageFinder::ChangeWindowTitle(const QString& rootPath) {
 void RedundantImageFinder::subscribe() {
   auto& inst = g_redunImgFinderAg();
   connect(inst.RECYLE_NOW, &QAction::triggered, this, &RedundantImageFinder::RecycleSelection);
-  connect(inst.ALSO_EMPTY_IMAGE, &QAction::toggled, this, &RedundantImageFinder::setResultAlsoContainEmptyImage);
+  connect(inst.INCLUDING_EMPTY_IMAGES, &QAction::toggled, this, &RedundantImageFinder::setResultAlsoContainEmptyImage);
   connect(inst.mDecideByIntAction.getActionGroup(), &QActionGroup::triggered, this, &RedundantImageFinder::whenModeChanged);
-  connect(inst.OPEN_REDUNDANT_IMAGES_FOLDER, &QAction::triggered, this, []() {
-    const QString benchmarkPath{RedunImgLibs::GetRedunPath()};
+
+  ImagesInfoManager& redunImgLibInst = ImagesInfoManager::getInst();
+  connect(inst.OPEN_BENCHMARK_FOLDER, &QAction::triggered, this, [&redunImgLibInst]() {
+    const QString benchmarkPath = redunImgLibInst.GetDynRedunPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(benchmarkPath));
+  });
+  connect(inst.RELOAD_BENCHMARK_LIB, &QAction::triggered, [&redunImgLibInst]() {
+    redunImgLibInst.ForceReloadImpl();
   });
   connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& clickedIndex) {
     const QString imgPath{m_imgModel->filePath(clickedIndex)};
@@ -119,7 +125,7 @@ void RedundantImageFinder::RecycleSelection() {
   for (const auto& srcInd : sel) {
     recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_imgModel->filePath(srcInd)));
   }
-  bool isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
+  bool isRenameAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
   if (isRenameAllSucceed) {
     LOG_OK_P("Recyle redundant images succeed", "selected count: %d", SELECTED_CNT);
   } else {
@@ -157,16 +163,16 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   mCurrentPath = folderPath;
   using namespace RedundantImageTool;
   const DecideByE decideBy = g_redunImgFinderAg().GetCurFindDupBy();
-  const QString path = RedunImgLibs::GetRedunPath();
-  static auto& redunLibsInst = RedunImgLibs::GetInst(path);
-  REDUNDANT_IMG_BUNCH newImgs;
+  ImagesInfoManager& redunLibsInst = ImagesInfoManager::getInst();
+
+  RedundantImagesList newImgs;
   switch (decideBy) {
     case DecideByE::LIBRARY: {
       newImgs = redunLibsInst.FindRedunImgs(mCurrentPath, mResultAlsoContainEmptyImage);
       break;
     }
     case DecideByE::MD5: {
-      newImgs = RedunImgLibs::FindDuplicateImgs(mCurrentPath, mResultAlsoContainEmptyImage);
+      newImgs = FindDuplicateImgs(mCurrentPath, mResultAlsoContainEmptyImage);
       break;
     }
     default: {
@@ -181,5 +187,5 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   m_imgsBunch.swap(newImgs);
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(mCurrentPath);
-  LOG_OK_P(c_str(decideBy), "%d duplicate images(s) found under path[%s]", afterRowCnt, qPrintable(mCurrentPath));
+  LOG_OK_P(mCurrentPath, "%d images(s) found according to[%s]", afterRowCnt, c_str(decideBy));
 }

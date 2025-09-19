@@ -33,6 +33,44 @@ QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGrou
   return actionList.join('\n');
 }
 
+QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
+  if (maxLines <= 0) {
+    return "";
+  }
+
+  QFile logFile{logFilePath};
+  if (!logFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    LOG_W("Cannot Open file[%s]: %s", qPrintable(logFile.fileName()), qPrintable(logFile.errorString()));
+    return "";
+  }
+
+  qint64 fileSize = logFile.size();
+  qint64 pos = fileSize - 1;
+  int lineCount = 0;
+  QByteArray buffer;
+
+  while (pos >= 0 && lineCount <= maxLines) {
+    logFile.seek(pos);
+    char ch;
+    if (!logFile.getChar(&ch)) {
+      break;
+    }
+    if (ch == '\n') {
+      lineCount++;
+      if (lineCount == maxLines) {
+        break;
+      }
+    }
+    pos--;
+  }
+
+  // 定位到目标行的起始位置（跳过最后找到的换行符）
+  logFile.seek(pos + 1);
+  buffer = logFile.readAll();
+  logFile.close();
+  return buffer;
+}
+
 QString TextReader(const QString& textPath) {
   QFile file(textPath);
   if (!file.exists()) {
@@ -71,7 +109,7 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
     return false;
   }
   QTextStream stream(&fi);
-  stream.setCodec("UTF-8"); // must set here
+  stream.setCodec("UTF-8");  // must set here
   stream << ba;
   stream.flush();
   fi.close();
@@ -92,29 +130,17 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   return dstFi.absoluteFilePath();
 }
 
-void LoadCNLanguagePack(QTranslator& translator) {
-  const QString baseName = PROJECT_NAME "_zh_CN.qm";
-  if (translator.load(baseName)) {
-    LOG_D("Load language[%s] pack succeed", qPrintable(baseName));
-    QCoreApplication::installTranslator(&translator);
-  } else {
-    LOG_C("Load language[%s] pack failed", qPrintable(baseName));
+bool LoadCNLanguagePack(QTranslator& translator, QString qmName) {
+#ifndef RUNNING_UNIT_TESTS
+  qmName = PROJECT_NAME "_zh_CN.qm";
+#endif
+  if (!translator.load(qmName)) {
+    LOG_C("Load language[%s] pack failed", qPrintable(qmName));
+    return false;
   }
-}
-
-void LoadSysLanaguagePack(QTranslator& translator) {
-  LOG_D("Load System Language pack");
-  const QStringList uiLanguages = QLocale::system().uiLanguages();
-  for (const QString& locale : uiLanguages) {
-    const QString baseName = PROJECT_NAME + QLocale(locale).name() + ".qm";
-    if (translator.load(baseName)) {
-      LOG_D("Load language pack succeed %s", qPrintable(baseName));
-      QCoreApplication::installTranslator(&translator);
-      break;
-    } else {
-      LOG_D("No need to load language pack %s", qPrintable(baseName));
-    }
-  }
+  LOG_D("Load language[%s] pack succeed", qPrintable(qmName));
+  QCoreApplication::installTranslator(&translator);
+  return true;
 }
 
 bool CreateUserPath() {

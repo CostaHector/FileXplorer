@@ -12,40 +12,34 @@
 #include <QDirIterator>
 #include <QTextStream>
 
+template class SingletonManager<StudiosManager, STUDIO_MGR_DATA_T>;
+
 constexpr int StudiosManager::STUDIO_HYPEN_MAX_INDEX;
 bool StudiosManager::isHypenIndexValid(const QString& sentence, int& hypenIndex) {
   hypenIndex = sentence.indexOf('-');
   return hypenIndex > 0 && (hypenIndex <= STUDIO_HYPEN_MAX_INDEX);
 }
 
-bool StudiosManager::isHypenIndexValidReverse(const QString& sentence, int& hypenIndex){
+bool StudiosManager::isHypenIndexValidReverse(const QString& sentence, int& hypenIndex) {
   hypenIndex = sentence.lastIndexOf('-');
   // sentence.size() - hypenIndex <= STUDIO_HYPEN_MAX_INDEX
   return (hypenIndex < sentence.size() - 1) && (hypenIndex >= sentence.size() - STUDIO_HYPEN_MAX_INDEX);
 }
 
-QString StudiosManager::GetLocalFilePath(const QString& localFilePath) {
-  if (!localFilePath.isEmpty()) { /* only used in LLT test */
-    return localFilePath;
-  }
+StudiosManager::StudiosManager() {
+#ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  static const QString stdStudiosFilePath = PathTool::GetPathByApplicationDirPath(STANDARD_STUDIO_NAME);
-  return stdStudiosFilePath;
+  const QString defaultPath = PathTool::GetPathByApplicationDirPath(STANDARD_STUDIO_NAME);
+  InitializeImpl(defaultPath);
+#endif
 }
 
-StudiosManager& StudiosManager::getIns() {
-  LOG_D("StudiosManager::getIns()");
-  static StudiosManager ins;
-  return ins;
+void StudiosManager::InitializeImpl(const QString& path) {
+  mLocalFilePath = path;
+  ProStudioMap() = ReadOutStdStudioName();
 }
 
-StudiosManager::StudiosManager(const QString& localFilePath)  //
-  : mLocalFilePath{GetLocalFilePath(localFilePath)}         //
-{
-  ForceReloadStudio();
-}
-
-QHash<QString, QString> StudiosManager::ReadOutStdStudioName() const {
+STUDIO_MGR_DATA_T StudiosManager::ReadOutStdStudioName() const {
   QFile studioFi{mLocalFilePath};
   if (!studioFi.exists()) {
     LOG_D("Studio list file[%s] not exist", qPrintable(studioFi.fileName()));
@@ -59,7 +53,7 @@ QHash<QString, QString> StudiosManager::ReadOutStdStudioName() const {
     LOG_D("File[%s] open for read failed", qPrintable(studioFi.fileName()));
     return {};
   }
-  QHash<QString, QString> stdStudioNameDict;
+  STUDIO_MGR_DATA_T stdStudioNameDict;
 
   QTextStream in(&studioFi);
   in.setCodec("UTF-8");
@@ -82,11 +76,13 @@ QHash<QString, QString> StudiosManager::ReadOutStdStudioName() const {
   return stdStudioNameDict;
 }
 
-int StudiosManager::ForceReloadStudio() {
-  int befCnt = m_prodStudioMap.size();
-  auto newStudioNames = StudiosManager::ReadOutStdStudioName();
-  m_prodStudioMap.swap(newStudioNames);
-  int aftCnt = m_prodStudioMap.size();
+int StudiosManager::ForceReloadImpl() {
+  int befCnt = ProStudioMap().size();
+
+  STUDIO_MGR_DATA_T newStudioNames = StudiosManager::ReadOutStdStudioName();
+  ProStudioMap().swap(newStudioNames);
+
+  int aftCnt = ProStudioMap().size();
   LOG_D("standard studio names rule from %d to %d", befCnt, aftCnt);
   return aftCnt - befCnt;
 }
@@ -101,7 +97,7 @@ int StudiosManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
     return 0;
   }
 
-  decltype(m_prodStudioMap) studiosIncrementMap;
+  STUDIO_MGR_DATA_T studiosIncrementMap;
   QDirIterator it{path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   int jsonFilesCnt{0};
   while (it.hasNext()) {
@@ -129,21 +125,21 @@ int StudiosManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   return cnt;
 }
 
-int StudiosManager::StudioIncrement(QHash<QString, QString>& increments, const QString& newStudio) {
+int StudiosManager::StudioIncrement(STUDIO_MGR_DATA_T& increments, const QString& newStudio) {
   int cnt{0};
   for (const QString& coarseStudioName : GetCoarseStudioNames(newStudio)) {
-    auto it = m_prodStudioMap.find(coarseStudioName);
-    if (coarseStudioName.isEmpty() || it != m_prodStudioMap.cend()) {
+    auto it = ProStudioMap().find(coarseStudioName);
+    if (coarseStudioName.isEmpty() || it != ProStudioMap().cend()) {
       continue;
     }
     increments[coarseStudioName] = newStudio;
-    m_prodStudioMap[coarseStudioName] = newStudio;
+    ProStudioMap()[coarseStudioName] = newStudio;
     ++cnt;
   }
   return cnt;
 }
 
-int StudiosManager::WriteIntoLocalDictionaryFiles(const QHash<QString, QString>& increments) const {
+int StudiosManager::WriteIntoLocalDictionaryFiles(const STUDIO_MGR_DATA_T& increments) const {
   if (increments.isEmpty()) {
     LOG_D("Empty increments, skip writing.");
     return 0;
@@ -182,9 +178,9 @@ QSet<QString> StudiosManager::GetCoarseStudioNames(QString standardPs) const {
   // real madrid fc => psWithSpaceLower
   const QString& pslower = standardPs.toLower();
   const QString& psWithSpaceLower = standardPs                                         //
-      .replace(SPLIT_BY_UPPERCASE_COMP1, "\\1 \\2")  //
-      .replace(SPLIT_BY_UPPERCASE_COMP2, "\\1 \\2")  //
-      .toLower();                                    //
+                                        .replace(SPLIT_BY_UPPERCASE_COMP1, "\\1 \\2")  //
+                                        .replace(SPLIT_BY_UPPERCASE_COMP2, "\\1 \\2")  //
+                                        .toLower();                                    //
   return {pslower, psWithSpaceLower};
 }
 
@@ -216,14 +212,21 @@ QString StudiosManager::FileNameLastSection2StudioNameSection(QString sentence) 
 
 auto StudiosManager::operator()(const QString& sentence) const -> QString {
   const QString studioNameFrontSection = FileName2StudioNameSection(sentence);
-  auto itFront = m_prodStudioMap.find(studioNameFrontSection.toLower());
-  if (itFront != m_prodStudioMap.cend()) {
+  auto itFront = ProStudioMap().find(studioNameFrontSection.toLower());
+  if (itFront != ProStudioMap().cend()) {
     return itFront.value();
   }
   const QString studioNameBackSection = FileNameLastSection2StudioNameSection(sentence);
-  auto itBack = m_prodStudioMap.find(studioNameBackSection.toLower());
-  if (itBack != m_prodStudioMap.cend()) {
+  auto itBack = ProStudioMap().find(studioNameBackSection.toLower());
+  if (itBack != ProStudioMap().cend()) {
     return itBack.value();
   }
   return studioNameFrontSection;
 }
+
+#ifdef RUNNING_UNIT_TESTS
+int StudiosManager::ResetStateForTestImpl(const QString& localFilePath) {
+  InitializeImpl(localFilePath);
+  return 0;
+}
+#endif

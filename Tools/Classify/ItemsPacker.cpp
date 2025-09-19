@@ -54,7 +54,7 @@ int ItemsPacker::operator()(const QString& path) {
 }
 
 bool ItemsPacker::StartToRearrange() {
-  const auto isAllSuccess = g_undoRedo.Do(m_cmds);
+  const auto isAllSuccess = UndoRedo::GetInst().Do(m_cmds);
   LOG_D("%d rearrange cmd(s) execute result: bool[%d]", m_cmds.size(), isAllSuccess);
   return isAllSuccess;
 }

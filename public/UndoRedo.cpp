@@ -3,7 +3,10 @@
 #include "FileOperation.h"
 using namespace FileOperatorType;
 
-UndoRedo g_undoRedo;
+UndoRedo& UndoRedo::GetInst() {
+  static UndoRedo undoRedo;
+  return undoRedo;
+}
 
 BATCH_COMMAND_LIST_TYPE syncExecuterconst(const BATCH_COMMAND_LIST_TYPE& aBatch) {
   if (!SyncModifiyFileSystem::m_syncOperationSw) {
@@ -50,23 +53,23 @@ bool UndoRedo::Do(const BATCH_COMMAND_LIST_TYPE& cmd) {
   return (bool)exeRetEle;
 }
 
-bool UndoRedo::on_Undo() {
-  if (!g_undoRedo.undoAvailable()) {
+bool UndoRedo::on_Undo() { // for undo action
+  if (!GetInst().undoAvailable()) {
     LOG_I("[skip] Nothing to undo");
     return true;
   }
-  const bool isAllSucceed = g_undoRedo.Undo();
+  const bool isAllSucceed = GetInst().Undo();
   const char* undoMsg = isAllSucceed ? "All undo succeed" : "Some undo failed.";
   LOG_D("%s", undoMsg);
   return isAllSucceed;
 }
 
-bool UndoRedo::on_Redo() {
-  if (!g_undoRedo.redoAvailable()) {
+bool UndoRedo::on_Redo() {  // for undo action
+  if (!GetInst().redoAvailable()) {
     LOG_I("[skip] Nothing to redo");
     return true;
   }
-  const bool isAllSucceed = g_undoRedo.Redo();
+  const bool isAllSucceed = GetInst().Redo();
   const char* redoMsg = isAllSucceed ? "All redo succeed" : "Some redo failed.";
   LOG_D("%s", redoMsg);
   return isAllSucceed;

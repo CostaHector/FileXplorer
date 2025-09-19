@@ -16,7 +16,7 @@ void ViewSwitchToolBar::onPushNewViewIntoUndoStack(QAction* viewAct) {
 }
 
 bool ViewSwitchToolBar::onViewNavigateBackward() {
-  if (!mViewRD.undoAvailable()) {
+  if (!mViewRD.undoViewAvailable()) {
     LOG_INFO_NP("[Info] Backward view unavailable", "Already at the earliest view in history");
     return false;
   }
@@ -37,7 +37,7 @@ bool ViewSwitchToolBar::onViewNavigateBackward() {
 }
 
 bool ViewSwitchToolBar::onViewNavigateForward() {
-  if (!mViewRD.redoAvailable()) {
+  if (!mViewRD.redoViewAvailable()) {
     LOG_INFO_NP("[Info] Forward view unavailable", "Already at the most recent view in history");
     return false;
   }

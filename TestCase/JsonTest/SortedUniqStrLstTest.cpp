@@ -60,7 +60,7 @@ class SortedUniqStrLstTest : public PlainTestSuite {
     QCOMPARE(s.join(), "");
   }
 
-  void test_contruct() {
+  void test_contruct_and_copy_construct() {
     SortedUniqStrLst lst0;
     QCOMPARE(lst0.isEmpty(), true);
     QCOMPARE(lst0.count(), 0);
@@ -98,6 +98,15 @@ class SortedUniqStrLstTest : public PlainTestSuite {
     QCOMPARE(lst10.join(), "0,1,2,3,4,5,6,7,8,9");
     QCOMPARE(lst10.toSortedList(), expect10);
     QCOMPARE(lst10, lst10Also);
+
+    SortedUniqStrLst lst10Copy{lst10};
+    QCOMPARE(lst10Copy, lst10);
+    QVERIFY(!(lst10Copy != lst10));
+  }
+
+  void test_toLowerSets() {
+    SortedUniqStrLst randomLst{"hello world, HELLO WORLD"};
+    QCOMPARE(randomLst.toLowerSets(), (QSet<QString>{"hello world"}));
   }
 
   void test_remove() {

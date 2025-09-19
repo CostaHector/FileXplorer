@@ -9,32 +9,25 @@
 #include <QDirIterator>
 #include <QTextStream>
 
+template class SingletonManager<CastManager, CAST_MGR_DATA_T>;
+
 const QRegularExpression CastManager::EFFECTIVE_CAST_NAME{R"([@ _])"};
 constexpr int CastManager::EFFECTIVE_CAST_NAME_LEN;
 
-QString CastManager::GetLocalFilePath(const QString& localFilePath)  //
-{
-  if (!localFilePath.isEmpty()) { /* only used in LLT test */
-    return localFilePath;
-  }
+CastManager::CastManager() {
+#ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  static const QString perfFilePath = PathTool::GetPathByApplicationDirPath(PERFORMERS_TABLE);
-  return perfFilePath;
+  const QString defaultPath = PathTool::GetPathByApplicationDirPath(PERFORMERS_TABLE);
+  InitializeImpl(defaultPath);
+#endif
 }
 
-CastManager::CastManager(const QString& localFilePath)  //
-    : mLocalFilePath{GetLocalFilePath(localFilePath)}   //
-{
-  ForceReloadCast();
+void CastManager::InitializeImpl(const QString& path) {
+  mLocalFilePath = path;
+  CastSet() = ReadOutCasts();
 }
 
-CastManager& CastManager::getIns() {
-  LOG_D("CastManager::getIns()");
-  static CastManager ins;
-  return ins;
-}
-
-QSet<QString> CastManager::ReadOutPerformers() const {
+CAST_MGR_DATA_T CastManager::ReadOutCasts() const {
   QFile castFi{mLocalFilePath};
   if (!castFi.exists()) {
     LOG_D("Cast list file[%s] not exist", qPrintable(castFi.fileName()));
@@ -66,9 +59,9 @@ QSet<QString> CastManager::ReadOutPerformers() const {
   return perfSet;
 }
 
-int CastManager::ForceReloadCast() {
+int CastManager::ForceReloadImpl() {
   int beforeStudioNameCnt = m_casts.size();
-  m_casts = CastManager::ReadOutPerformers();
+  m_casts = ReadOutCasts();
   int afterStudioNameCnt = m_casts.size();
   LOG_D("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
   return afterStudioNameCnt - beforeStudioNameCnt;
@@ -95,7 +88,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
       continue;
     }
     ++jsonFilesCnt;
-    QSet<QString> lowerSet;
+    CAST_MGR_DATA_T lowerSet;
     for (const auto& str : perfIt->toStringList()) {
       lowerSet.insert(str.toLower());
     }
@@ -117,14 +110,14 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   return cnt;
 }
 
-int CastManager::CastIncrement(QSet<QString>& increments, QSet<QString> delta) {
+int CastManager::CastIncrement(CAST_MGR_DATA_T& increments, CAST_MGR_DATA_T delta) {
   delta -= m_casts;
   increments += delta;
   m_casts += delta;
   return delta.size();
 }
 
-int CastManager::WriteIntoLocalDictionaryFiles(const QSet<QString>& increments) const {
+int CastManager::WriteIntoLocalDictionaryFiles(const CAST_MGR_DATA_T& increments) const {
   if (increments.isEmpty()) {
     LOG_D("Empty increments, skip writing.");
     return 0;
@@ -213,7 +206,13 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
   return performersList;
 }
 
-QStringList CastManager::operator()(const QString& sentence) const  //
-{
+QStringList CastManager::operator()(const QString& sentence) const {
   return FilterPerformersOut(SplitSentence(sentence));
 }
+
+#ifdef RUNNING_UNIT_TESTS
+int CastManager::ResetStateForTestImpl(const QString& localFilePath) {
+  InitializeImpl(localFilePath);
+  return 0;
+}
+#endif

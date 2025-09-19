@@ -31,18 +31,24 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
   RECYLE_NOW->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.")  //
                              .arg(RECYLE_NOW->text(), RECYLE_NOW->shortcut().toString()));
 
-  ALSO_EMPTY_IMAGE = new (std::nothrow) QAction{QIcon{":img/FILE"}, "Also empty image", this};
-  CHECK_NULLPTR_RETURN_VOID(ALSO_EMPTY_IMAGE);
-  ALSO_EMPTY_IMAGE->setCheckable(true);
-  ALSO_EMPTY_IMAGE->setChecked(
+  INCLUDING_EMPTY_IMAGES = new (std::nothrow) QAction{QIcon{":img/FILE"}, "Include empty", this};
+  CHECK_NULLPTR_RETURN_VOID(INCLUDING_EMPTY_IMAGES);
+  INCLUDING_EMPTY_IMAGES->setCheckable(true);
+  INCLUDING_EMPTY_IMAGES->setChecked(
       Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool());
-  ALSO_EMPTY_IMAGE->setToolTip(QString("<b>%1 (%2)</b><br/> Blank images (with a file size of 0Byte) will also be considered redundant images.")  //
-                                   .arg(ALSO_EMPTY_IMAGE->text(), ALSO_EMPTY_IMAGE->shortcut().toString()));
+  INCLUDING_EMPTY_IMAGES->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Blank images (with a file size of 0Byte) will also be considered redundant images.")  //
+          .arg(INCLUDING_EMPTY_IMAGES->text(), INCLUDING_EMPTY_IMAGES->shortcut().toString()));
 
-  OPEN_REDUNDANT_IMAGES_FOLDER = new (std::nothrow) QAction{QIcon(":img/FOLDER_OPEN"), "Open Redundant library", this};
-  CHECK_NULLPTR_RETURN_VOID(OPEN_REDUNDANT_IMAGES_FOLDER);
-  OPEN_REDUNDANT_IMAGES_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Open the path where the redundant image library(benchmark) is located.")  //
-                                               .arg(OPEN_REDUNDANT_IMAGES_FOLDER->text(), OPEN_REDUNDANT_IMAGES_FOLDER->shortcut().toString()));
+  OPEN_BENCHMARK_FOLDER = new (std::nothrow) QAction{QIcon(":img/FOLDER_OPEN"), "Open library", this};
+  CHECK_NULLPTR_RETURN_VOID(OPEN_BENCHMARK_FOLDER);
+  OPEN_BENCHMARK_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Open the path where the redundant image library(benchmark) is located.")  //
+                                        .arg(OPEN_BENCHMARK_FOLDER->text(), OPEN_BENCHMARK_FOLDER->shortcut().toString()));
+
+  RELOAD_BENCHMARK_LIB = new (std::nothrow) QAction{QIcon{":img/RELOAD_FROM_DISK"}, "Reload library", this};
+  CHECK_NULLPTR_RETURN_VOID(RELOAD_BENCHMARK_LIB);
+  RELOAD_BENCHMARK_LIB->setToolTip(QString("<b>%1 (%2)</b><br/> Reload the path where the redundant image library(benchmark) is located again")  //
+                                       .arg(RELOAD_BENCHMARK_LIB->text(), RELOAD_BENCHMARK_LIB->shortcut().toString()));
 }
 
 RedundantImageFinderActions& g_redunImgFinderAg() {

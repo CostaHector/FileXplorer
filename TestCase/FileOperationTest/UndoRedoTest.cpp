@@ -263,6 +263,15 @@ class UndoRedoTest : public PlainTestSuite {
     QCOMPARE(ur.mRedoStk.size(), 1);
     QCOMPARE(ur.mRedoStk.top(), (BATCH_COMMAND_LIST_TYPE{renameCmd, syncRenameCmd}));
   }
+
+  void global_undoRedo_inst_ok() {
+    auto& inst = UndoRedo::GetInst();
+    inst.clear();
+    QCOMPARE(inst.undoAvailable(), false);
+    QCOMPARE(inst.on_Undo(), true); // just skip
+    QCOMPARE(inst.redoAvailable(), false);
+    QCOMPARE(inst.on_Redo(), true); // just skip
+  }
 };
 
 #include "UndoRedoTest.moc"

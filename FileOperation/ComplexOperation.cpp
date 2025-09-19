@@ -155,7 +155,7 @@ int DoDropAction(Qt::DropAction dropAct, const QList<QUrl>& urls, const QString&
     }
   }
 
-  bool bDropResult = g_undoRedo.Do(aBatch);
+  bool bDropResult = UndoRedo::GetInst().Do(aBatch);
   if (!bDropResult) {
     LOG_W("Drop[%s] partially failed %d selection(s) %d command(s) drop into path[%s]",  //
           qPrintable(dropActionStr), urls.size(), aBatch.size(), qPrintable(dest));
@@ -194,7 +194,7 @@ int DoDropAction(Qt::DropAction dropAct, const QStringList& absPaths, const QStr
     }
   }
 
-  bool bDropResult = g_undoRedo.Do(aBatch);
+  bool bDropResult = UndoRedo::GetInst().Do(aBatch);
   if (!bDropResult) {
     LOG_W("Drop[%s] partially failed %d selection(s) %d command(s) drop into path[%s]",  //
           qPrintable(dropActionStr), absPaths.size(), aBatch.size(), qPrintable(dest));

@@ -80,7 +80,7 @@ void RightDuplicateDetails::onRecycleSelection() {
     const auto& srcInd = m_sortProxy->mapToSource(proInd);
     recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_detailsModel->filePath(srcInd)));
   }
-  auto isRenameAllSucceed = g_undoRedo.Do(recycleCmds);
+  auto isRenameAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
   LOG_D("Recycle %d item(s) %d.", SELECTED_CNT, isRenameAllSucceed);
 }
 
