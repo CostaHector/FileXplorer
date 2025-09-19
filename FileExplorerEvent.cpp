@@ -5,7 +5,6 @@
 #include "FileBasicOperationsActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
-#include "VideoPlayerActions.h"
 #include "ViewActions.h"
 #include "ThumbnailProcessActions.h"
 #include "TSFilesMerger.h"
