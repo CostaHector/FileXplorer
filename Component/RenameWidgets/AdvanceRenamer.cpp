@@ -206,7 +206,7 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
     m_commandsPreview->setPlainText(cmds);
     return true;
   }
-  if (!g_undoRedo.Do(reversedcmds)) {
+  if (!UndoRedo::GetInst().Do(reversedcmds)) {
     LOG_ERR_NP("Batch commands partially failed", "See details in log");
     return false;
   }

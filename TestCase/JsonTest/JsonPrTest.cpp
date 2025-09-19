@@ -103,8 +103,13 @@ class JsonPrTest : public PlainTestSuite {
     QSet<QString> expectHintCast{"A1 C1", "A1 B1", "B1 D1"};
     QStringList actualHintCastLst{jpr.hintCast.split(NameTool::CSV_COMMA)};
     QSet<QString> actualHintCast{actualHintCastLst.begin(), actualHintCastLst.end()};
-    QCOMPARE(jpr.hintStudio, "MarvelFilms");
     QCOMPARE(expectHintCast, actualHintCast);  // hint cast no need sorted
+    jpr.RejectCastHint();
+    QCOMPARE(jpr.hintCast, "");
+
+    QCOMPARE(jpr.hintStudio, "MarvelFilms");
+    jpr.RejectStudioHint();
+    QCOMPARE(jpr.hintStudio, "");
 
     QCOMPARE(jpr.m_Name, "Marvel Films- Read Madrid - A1 C1, G1, A1 B1");  // name not change
     QVERIFY(jpr.m_Studio.isEmpty());                                       // studio not fill automatically
@@ -357,6 +362,10 @@ class JsonPrTest : public PlainTestSuite {
   }
 
   void test_SetCastOrTags_ok() {
+    JsonPr jrDefaultConstuct;
+    QCOMPARE(jrDefaultConstuct.m_Name, "");
+    QCOMPARE(jrDefaultConstuct.jsonFileName, "");
+
     JsonPr jr{""};
     QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::BUTT, FIELD_OP_MODE::BUTT));
     QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::BUTT, FIELD_OP_MODE::SET));

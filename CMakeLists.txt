@@ -30,7 +30,6 @@ file(GLOB SOURCES
     View/*.cpp
     Component/*.cpp
     Component/FolderPreview/*.cpp
-    Component/JsonEditorWidget/*.cpp
     Component/RenameWidgets/*.cpp
     FileOperation/*.cpp
     Model/*.cpp
@@ -56,7 +55,6 @@ set(SRV_HEADER_PATH
     View
     Component
     Component/FolderPreview
-    Component/JsonEditorWidget
     Component/RenameWidgets
     FileOperation
     lib
@@ -77,7 +75,6 @@ file(GLOB HEADERS
     View/*.h
     Component/*.h
     Component/FolderPreview/*.h
-    Component/JsonEditorWidget/*.h
     Component/RenameWidgets/*.h
     FileOperation/*.h
     lib/*.h

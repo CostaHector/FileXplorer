@@ -12,20 +12,19 @@ public:
     return true;
   }
 
-  bool undoAvailable() { return undoStack.size() > 1; }
+  bool undoPathAvailable() { return undoStack.size() > 1; }
+  bool redoPathAvailable() { return !redoStack.isEmpty(); }
 
-  QString undo() {
-    if (!undoAvailable()) {
+  QString onUndoPath() {
+    if (!undoPathAvailable()) {
       return "";
     }
     redoStack.append(undoStack.pop());
     return undoStack.top();
   }
 
-  bool redoAvailable() { return !redoStack.isEmpty(); }
-
-  QString redo() {
-    if (!redoAvailable()) {
+  QString onRedoPath() {
+    if (!redoPathAvailable()) {
       return "";
     }
     const QString& redoPath = redoStack.pop();
