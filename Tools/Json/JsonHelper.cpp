@@ -35,7 +35,7 @@ bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth) {
 }
 
 QVariantHash MovieJsonLoader(const QString& jsonFilePth) {
-  const QString& json_string = TextReader(jsonFilePth);
+  const QString& json_string = FileTool::TextReader(jsonFilePth);
   return DeserializedJsonStr2Dict(json_string);
 }
 
