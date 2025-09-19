@@ -11,7 +11,6 @@
 #include "EndToExposePrivateMember.h"
 #include "ModelTestHelper.h"
 #include <QHeaderView>
-#include "QtProcessGuard.h"
 
 class CustomTableViewTest : public PlainTestSuite {
   Q_OBJECT

@@ -5,12 +5,12 @@
 #include "MemoryKey.h"
 
 #include "BeginToExposePrivateMember.h"
-#include "RedunImgLibs.h"
+#include "ImagesInfoManager.h"
 #include "RedundantImageFinder.h"
 #include "EndToExposePrivateMember.h"
 #include "RedundantImageFinderActions.h"
 
-const QStringList GetNames(const REDUNDANT_IMG_BUNCH& imgs) {
+const QStringList GetNames(const RedundantImagesList& imgs) {
   QStringList imgNames;
   for (const auto& img : imgs) {
     imgNames.append(img.filePath);
@@ -42,20 +42,20 @@ class RedundantImageFinderTest : public PlainTestSuite {
   }
 
   void test_md5_duplicate_images_find_ok() {
-    const REDUNDANT_IMG_BUNCH benchFolderDups = RedunImgLibs::FindDuplicateImgs(mBenchmarkRedunFolder);
+    const RedundantImagesList benchFolderDups = FindDuplicateImgs(mBenchmarkRedunFolder);
     QCOMPARE(GetNames(benchFolderDups),  //
              (QStringList{
                  mBenchmarkRedunFolder + "/a.jpg",           //
                  mBenchmarkRedunFolder + "/aDuplicate.png",  //
              }));
 
-    const REDUNDANT_IMG_BUNCH toFindFolderDups = RedunImgLibs::FindDuplicateImgs(mFolderToFindRedun);
+    const RedundantImagesList toFindFolderDups = FindDuplicateImgs(mFolderToFindRedun);
     QCOMPARE(GetNames(toFindFolderDups),  //
              (QStringList{
                  mFolderToFindRedun + "/cEmpty.webp",  //
              }));
 
-    const REDUNDANT_IMG_BUNCH workFolderDups = RedunImgLibs::FindDuplicateImgs(mWorkPath);
+    const RedundantImagesList workFolderDups = FindDuplicateImgs(mWorkPath);
     QCOMPARE(GetNames(workFolderDups),  //
              (QStringList{
                  mFolderToFindRedun + "/aRedun.jpg",         //
@@ -69,9 +69,10 @@ class RedundantImageFinderTest : public PlainTestSuite {
 
   void test_redundant_images_in_library_find_ok() {
     // procedure
-    const RedunImgLibs& redunImgLib = RedunImgLibs::GetInst(mBenchmarkRedunFolder);
-    QCOMPARE(redunImgLib.m_commonFileHash.size(), 2);     // hash {hash1, hash1, hash2}
-    QCOMPARE(redunImgLib.m_commonFileSizeSet.size(), 1);  // size {3,3,3}
+    ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
+    redunImgLib.ResetStateForTestImpl(mBenchmarkRedunFolder);
+    QCOMPARE(redunImgLib.count(), 2 + 1);
+    // hash {hash1, hash1, hash2}, // size {3,3,3} = 2+1 = 3
 
     const auto& itemsEmptyAlsoRedun = redunImgLib.FindRedunImgs(mFolderToFindRedun, true);
     QCOMPARE(GetNames(itemsEmptyAlsoRedun),  //
@@ -93,7 +94,8 @@ class RedundantImageFinderTest : public PlainTestSuite {
 
   // the above testcase set library to mBenchmarkRedunFolder already
   void find_redun_decide_by_Lib() {
-    const RedunImgLibs& redunImgLib = RedunImgLibs::GetInst(mBenchmarkRedunFolder);
+    ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
+    redunImgLib.ResetStateForTestImpl(mBenchmarkRedunFolder);
 
     Configuration().clear();
     Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, true);
@@ -114,13 +116,13 @@ class RedundantImageFinderTest : public PlainTestSuite {
 
   void find_redun_decide_by_md5_dup() {
     // clear libs
-    RedunImgLibs::ResetForInitStateForTest();
-    RedunImgLibs::GetInst("");  // has nothing to do with a library
+    ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
+    redunImgLib.ResetStateForTestImpl("");  // has nothing to do with a library
 
-    Configuration().clear(); //
+    Configuration().clear();  //
     QCOMPARE(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v.toBool(), true);
     auto& inst = g_redunImgFinderAg();
-    QCOMPARE(inst.ALSO_EMPTY_IMAGE->isChecked(), true);
+    QCOMPARE(inst.INCLUDING_EMPTY_IMAGES->isChecked(), true);
 
     using namespace RedundantImageTool;
     auto& redunInst = g_redunImgFinderAg();
@@ -132,45 +134,52 @@ class RedundantImageFinderTest : public PlainTestSuite {
 
     // 1.1 also empty image regard as redundant
     rif(mFolderToFindRedun);
-    QCOMPARE(rif.m_imgModel->rowCount(), 1); // only 1 empty file
+    QCOMPARE(rif.m_imgModel->rowCount(), 1);  // only 1 empty file
     rif(mBenchmarkRedunFolder);
-    QCOMPARE(rif.m_imgModel->rowCount(), 2); // a.jpg, aDuplicate.png
+    QCOMPARE(rif.m_imgModel->rowCount(), 2);  // a.jpg, aDuplicate.png
 
     // 1.2 empty image not regard ...
-    inst.ALSO_EMPTY_IMAGE->setChecked(false);
-    emit inst.ALSO_EMPTY_IMAGE->toggled(false);
+    inst.INCLUDING_EMPTY_IMAGES->setChecked(false);
+    emit inst.INCLUDING_EMPTY_IMAGES->toggled(false);
     rif(mFolderToFindRedun);
-    QCOMPARE(rif.m_imgModel->rowCount(), 0); // nothing
+    QCOMPARE(rif.m_imgModel->rowCount(), 0);  // nothing
     rif(mBenchmarkRedunFolder);
-    QCOMPARE(rif.m_imgModel->rowCount(), 2); // a.jpg, aDuplicate.png
+    QCOMPARE(rif.m_imgModel->rowCount(), 2);  // a.jpg, aDuplicate.png
 
     // now lib is still empty, result will always be empty
     inst.FIND_DUPLICATE_IMGS_BY_LIBRARY->setChecked(true);
     emit inst.mDecideByIntAction.getActionGroup()->triggered(inst.FIND_DUPLICATE_IMGS_BY_LIBRARY);
     rif(mFolderToFindRedun);
-    QCOMPARE(rif.m_imgModel->rowCount(), 0); // nothing
+    QCOMPARE(rif.m_imgModel->rowCount(), 0);  // nothing
     rif(mBenchmarkRedunFolder);
-    QCOMPARE(rif.m_imgModel->rowCount(), 0); // nothing
+    QCOMPARE(rif.m_imgModel->rowCount(), 0);  // nothing
   }
 
   void last_test_current_file_recycle_all_ok() {
-    RedunImgLibs::ResetForInitStateForTest();
-    RedunImgLibs::GetInst(mBenchmarkRedunFolder);
+    ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
+    redunImgLib.ResetStateForTestImpl(mBenchmarkRedunFolder);  // has nothing to do with a library
 
     auto& inst = g_redunImgFinderAg();
-    inst.ALSO_EMPTY_IMAGE->setChecked(true);
-    QCOMPARE(inst.ALSO_EMPTY_IMAGE->isChecked(), true);
+    inst.INCLUDING_EMPTY_IMAGES->setChecked(true);
+    QCOMPARE(inst.INCLUDING_EMPTY_IMAGES->isChecked(), true);
 
     RedundantImageFinder rif;
     rif(mBenchmarkRedunFolder);
-    QCOMPARE(rif.m_imgModel->rowCount(), 3); // all 3 under folder itself
+    QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all 3 under folder itself
 
     rif.m_table->selectAll();
     emit inst.RECYLE_NOW->triggered();
 
-    QDir dir{mBenchmarkRedunFolder, "", QDir::SortFlag::NoSort, QDir::Filter::Files | QDir::Filter::Dirs| QDir::Filter::NoDotAndDotDot};
+    QDir dir{mBenchmarkRedunFolder, "", QDir::SortFlag::NoSort, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
     const QStringList items = dir.entryList();
     QVERIFY(items.isEmpty());
+
+    emit inst.RELOAD_BENCHMARK_LIB->triggered();      // force reload from an no items path
+    QCOMPARE(redunImgLib.ImgDataStruct().size(), 0);  // 0+0
+
+    Configuration().setValue(RedunImgFinderKey::RUND_IMG_PATH.name, mFolderToFindRedun);
+    emit inst.RELOAD_BENCHMARK_LIB->triggered();      // force reload from mFolderToFindRedun path
+    QCOMPARE(redunImgLib.ImgDataStruct().size(), 3 + 2);  // 3 different hash + 2 different size
 
     rif.close();
   }

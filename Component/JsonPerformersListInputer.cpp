@@ -13,7 +13,7 @@
 
 JsonPerformersListInputer::JsonPerformersListInputer(QWidget* parent, Qt::WindowFlags f)  //
     : QDialog{parent, f},                                                                 //
-      mPerfsCompleter{CastManager::getIns().m_casts.values()}                        //
+      mPerfsCompleter{CastManager::getInst().m_casts.values()}                        //
 {
   m_onePerf = new (std::nothrow) QLineEdit;
   CHECK_NULLPTR_RETURN_VOID(m_onePerf);

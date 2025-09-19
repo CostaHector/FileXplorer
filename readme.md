@@ -235,6 +235,9 @@ cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bi
 cd /home/ariel/code/FileXplorer
 
 
+# if some file was removed. remove its related files like {*.gcda, *.gcno, *.o, *.html}
+find ./ -name "RemovedFileName*" -print
+find ./ -name "RemovedFileName*" -delete
 ```
 
 ## Update translate files is needed

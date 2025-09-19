@@ -3,43 +3,51 @@
 
 #include <QHash>
 #include <QString>
+#include "SingletonManager.h"
 
-class StudiosManager {
+// coarse studio name -> std studio name
+// warner bros. => WarnerBros.
+// warnerbros. => WarnerBros.
+using STUDIO_MGR_DATA_T = QHash<QString, QString>;
+class StudiosManager;
+extern template class SingletonManager<StudiosManager, STUDIO_MGR_DATA_T>;
+
+class StudiosManager final : public SingletonManager<StudiosManager, STUDIO_MGR_DATA_T> {
  public:
-  static StudiosManager& getIns();
-  StudiosManager(const StudiosManager& rhs) noexcept = delete;
+  friend class SingletonManager<StudiosManager, STUDIO_MGR_DATA_T>;
 
-  QHash<QString, QString> ReadOutStdStudioName() const;
-  int ForceReloadStudio();
+  STUDIO_MGR_DATA_T& ProStudioMap() { return data(); }
+  const STUDIO_MGR_DATA_T& ProStudioMap() const { return data(); }
+
+  STUDIO_MGR_DATA_T ReadOutStdStudioName() const;
+
+  int ForceReloadImpl();
 
   int LearningFromAPath(const QString& path, bool* bHasWrite = nullptr);
-  int StudioIncrement(QHash<QString, QString>& increments, const QString& newStudio);
-  int WriteIntoLocalDictionaryFiles(const QHash<QString, QString>& increments) const;
+  int StudioIncrement(STUDIO_MGR_DATA_T& increments, const QString& newStudio);
+  int WriteIntoLocalDictionaryFiles(const STUDIO_MGR_DATA_T& increments) const;
 
   QString ProductionStudioFilterOut(const QString& words) const;
   QSet<QString> GetCoarseStudioNames(QString standardPs) const;
 
   QString operator()(const QString& sentence) const;  // from a file name
-  QString operator[](const QString& nm) const { // name standardlize not change sequence
-    return m_prodStudioMap.value(nm.toLower(), nm);
+  QString operator[](const QString& nm) const {       // name standardlize not change sequence
+    return ProStudioMap().value(nm.toLower(), nm);
   }
-
-  inline int count() const { return m_prodStudioMap.size(); }
-
-  // coarse studio name -> std studio name
-  // warner bros. => WarnerBros.
-  // warnerbros. => WarnerBros.
-  QHash<QString, QString> m_prodStudioMap;
 
   static bool isHypenIndexValid(const QString& sentence, int& hypenIndex);
   static bool isHypenIndexValidReverse(const QString& sentence, int& hypenIndex);
   static constexpr int STUDIO_HYPEN_MAX_INDEX = 22;  // hypen index can be no greater then 22 char
  private:
+  StudiosManager();  // valid localFilePath only used in llt
+  StudiosManager(const StudiosManager& rhs) noexcept = delete;
+  void InitializeImpl(const QString& path);
+#ifdef RUNNING_UNIT_TESTS
+  int ResetStateForTestImpl(const QString& localFilePath);
+#endif
+
   QString FileName2StudioNameSection(QString sentence) const;
   QString FileNameLastSection2StudioNameSection(QString sentence) const;
-
-  static QString GetLocalFilePath(const QString& localFilePath);
-  StudiosManager(const QString& localFilePath = ""); // valid localFilePath only used in llt
   QString mLocalFilePath;
 };
 
