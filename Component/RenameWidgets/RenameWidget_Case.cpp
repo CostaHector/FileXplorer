@@ -47,7 +47,7 @@ RenameWidget_Case::RenameWidget_Case(QWidget* parent)  //
     : AdvanceRenamer(parent) {}
 
 auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
-  const QAction* pCaseAct = g_renameAg().NAME_CASE->checkedAction();  // todo checked
+  const QAction* pCaseAct = g_renameAg().NAME_CASE->checkedAction();
   if (pCaseAct == nullptr) {
     LOG_W("pCaseAct is nullptr");
     return replaceeList;

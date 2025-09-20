@@ -204,7 +204,7 @@ QVariant VidInfoModel::data(const QModelIndex& index, int role) const {
 
 void VidInfoModel::ChangeTableGroups(const QStringList& tbls) {
   setDataChangedFlag();
-  auto& aimd = AIMediaDuplicate::GetInst();
+  auto& aimd = DupVidsManager::GetInst();
   aimd.ReadSpecifiedTables2List(tbls, m_vidsInfo);
   UpdateMemberList();
   TryUpdateRowCountAndDisplay();
@@ -270,7 +270,7 @@ bool sortByListSize(const QList<DUP_INFO>& lhsLst, const QList<DUP_INFO>& rhsLst
 }
 
 void VidInfoModel::UpdateMemberList() {
-  if (not m_dataChangedFlag[(int)m_currentDiffer]) {
+  if (!m_dataChangedFlag[(int)m_currentDiffer]) {
     LOG_D("m_classifiedSort[%d] not changed, no need update member", (int)m_currentDiffer);
     return;
   }

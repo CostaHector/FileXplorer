@@ -18,7 +18,7 @@ class QSortFilterProxyModel;
 class LeftDuplicateList : public CustomTableView {
  public:
   friend class DuplicateVideosFinder;
-  LeftDuplicateList(QWidget* parent = nullptr);
+  explicit LeftDuplicateList(QWidget* parent = nullptr);
 
  private:
   void subscribe();
@@ -29,7 +29,7 @@ class LeftDuplicateList : public CustomTableView {
 class RightDuplicateDetails : public CustomTableView {
  public:
   friend class DuplicateVideosFinder;
-  RightDuplicateDetails(QWidget* parent = nullptr);
+  explicit RightDuplicateDetails(QWidget* parent = nullptr);
   void on_effectiveNameCopiedForEverything(const QModelIndex& ind) const;
   void on_cellDoubleClicked(const QModelIndex& ind) const;
   void setSharedMember(CLASSIFIED_SORT_LIST_2D* pClassifiedSort, DIFFER_BY_TYPE* pCurDifferType);
@@ -43,7 +43,7 @@ class RightDuplicateDetails : public CustomTableView {
 // -------------------------------------------------------------------------------------------------
 class DuplicateVideosFinder : public QMainWindow {
  public:
-  DuplicateVideosFinder(QWidget* parent = nullptr);
+  explicit DuplicateVideosFinder(QWidget* parent = nullptr);
   bool TablesGroupChangedTo(const QStringList& tbls);
   
   void onAnalyseAiMediaTableChanged();
@@ -56,7 +56,7 @@ class DuplicateVideosFinder : public QMainWindow {
 
   void UpdateAiMediaTableNames();
 
-  void UpdateWindowsTitle();
+  void UpdateWindowsTitle(int tablesInAnalyseCnt = 0);
 
   void updateWindowsSize();
 
@@ -73,12 +73,12 @@ class DuplicateVideosFinder : public QMainWindow {
   LeftDuplicateList* m_dupList{nullptr};
   RightDuplicateDetails* m_details{nullptr};
 
-  QToolBar* m_aiTablesTB{nullptr};
   AiMediaDupTableView* m_aiTables{nullptr};
 
-  QSplitter* m_mainWidget{nullptr};
+  QSplitter* m_detail_left_right{nullptr};
+  QSplitter* m_tbl_detail_ver{nullptr};
 
-  static const QString DUPLICATE_FINDER_TEMPLATE;
+  static const QString DUPLICATE_FINDER_TITLE_TEMPLATE;
 };
 
 #endif  // DUPLICATEVIDEOSFINDER_H

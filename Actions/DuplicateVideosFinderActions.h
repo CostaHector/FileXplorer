@@ -22,6 +22,7 @@ class DuplicateVideosFinderActions : public QObject {
   QAction* DIFFER_BY_SIZE{new (std::nothrow) QAction{QIcon{":img/FILE_SIZE"}, "Size Deviation(B)", this}};
   QActionGroup* DIFFER_BY{new (std::nothrow) QActionGroup{this}};
 
+  QAction* OPEN_DATABASE{new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "&Open Database", this}};
   QAction* RECYCLE_ONE_FILE{new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this}};
 
   QAction* CANCEL_ANALYSE{new (std::nothrow) QAction{"Cancel Analyse", this}};

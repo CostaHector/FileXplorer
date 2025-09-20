@@ -10,7 +10,7 @@ class AiMediaDupTableView : public CustomTableView {
   friend class DuplicateVideosFinder;
   AiMediaDupTableView(QWidget* parent = nullptr);
   void LoadAiMediaTableNames();
-  void onScanAPath();
+  bool onScanAPath(const QString& testUserSpecifiedPath = ""); // para testUserSpecifiedPath for test user only
   QStringList GetSelectedAiTables() const;
  private:
   QModelIndexList Proxy2Source(const QModelIndexList& proInds) const;

@@ -4,16 +4,18 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QSet>
+namespace PathTool{
 
-QString PathTool::GetPathByApplicationDirPath(const QString& relativePath) {
-  static const QDir appDir {QCoreApplication::applicationDirPath()};
+QString GetPathByApplicationDirPath(const QString& relativePath) {
+  static const QDir appDir{QCoreApplication::applicationDirPath()};
   // QFileInfo{"."}.absoluteFilePath() may be same as appDir.
   // "." can be modified by QDir::setCurrent("newpwd"),
   // while appDir is not influenced by setCurrent. it reamins exe file path.
   return QDir::cleanPath(appDir.absoluteFilePath(relativePath));
 }
 
-QString PathTool::linkPath(const QString& localPath) {
+QString linkPath(const QString& localPath) {
 #ifdef _WIN32
   return "file:///" + localPath;  // file:///C:/to/path
 #else
@@ -21,7 +23,7 @@ QString PathTool::linkPath(const QString& localPath) {
 #endif
 }
 
-QString PathTool::localPath(const QString& linkPath) {
+QString localPath(const QString& linkPath) {
 #ifdef _WIN32
   return linkPath.mid(8);
 #else
@@ -29,17 +31,17 @@ QString PathTool::localPath(const QString& linkPath) {
 #endif
 }
 
-QString PathTool::sysPath(QString fullPath) {
+QString sysPath(QString fullPath) {
 #ifdef _WIN32
   return fullPath.replace('/', '\\');
 #else
   return fullPath.replace('\\', '/');
 #endif
 }
-QString PathTool::normPath(QString fullPath) {
+QString normPath(QString fullPath) {
   return fullPath.replace('\\', '/');
 }
-QString PathTool::absolutePath(const QString& fullPath) {
+QString absolutePath(const QString& fullPath) {
   // "C:/A/" => "C:/" => ""
   // same as "C:/A"
   // "/home/to/" => "/home" => "/" => ""
@@ -60,10 +62,10 @@ QString PathTool::absolutePath(const QString& fullPath) {
 
 #endif
 }
-QString PathTool::relativePath(const QString& fullPath, const int rootpathLen) {
+QString relativePath(const QString& fullPath, const int rootpathLen) {
   return fullPath.mid(rootpathLen + 1);
 }
-QString PathTool::forSearchPath(const QString& fullPath) {
+QString forSearchPath(const QString& fullPath) {
   // get QString for database index last three sectors
   int forwardSlashLetterCnt = 0;
   for (int i = fullPath.size() - 1; i > -1; --i) {
@@ -73,7 +75,7 @@ QString PathTool::forSearchPath(const QString& fullPath) {
   }
   return fullPath;
 }
-QString PathTool::dirName(const QString& fullPath) {
+QString dirName(const QString& fullPath) {
   int first = 0, end = 0;
   for (int i = fullPath.size() - 1; i > -1; --i) {
     if (fullPath[i] == '/') {
@@ -87,12 +89,12 @@ QString PathTool::dirName(const QString& fullPath) {
   }
   return fullPath.mid(first + 1, end - (first + 1));
 }
-QString PathTool::fileName(const QString& fullPath) {
+QString fileName(const QString& fullPath) {
   int forwardSlashIndex = fullPath.lastIndexOf('/');
   return forwardSlashIndex == -1 ? fullPath : fullPath.mid(forwardSlashIndex + 1);
 }
 
-QString PathTool::RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen) {
+QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen) {
   if (fileNameLen > 0) {
     return fullPath.mid(rootPathLen, fullPath.size() - fileNameLen - rootPathLen);
   }
@@ -116,7 +118,7 @@ bool HasLetter(const QString& fullpath, int startIdx) {
   return false;
 }
 
-std::pair<QString, QString> PathTool::GetBaseNameExt(const QString& fullpath) {
+std::pair<QString, QString> GetBaseNameExt(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
   if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
@@ -131,7 +133,7 @@ std::pair<QString, QString> PathTool::GetBaseNameExt(const QString& fullpath) {
                         fullpath.mid(lastIndexOfExtDot));                                              // extension
 }
 
-QString PathTool::GetBaseName(const QString& fullpath) {
+QString GetBaseName(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
   if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
@@ -145,7 +147,7 @@ QString PathTool::GetBaseName(const QString& fullpath) {
   return fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1);
 }
 
-QString PathTool::GetFileNameExtRemoved(const QString& fileName) {
+QString GetFileNameExtRemoved(const QString& fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
   if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
     return fileName;
@@ -153,7 +155,7 @@ QString PathTool::GetFileNameExtRemoved(const QString& fileName) {
   return fileName.left(lastIndexOfExtDot);
 }
 
-QString PathTool::GetFileNameExtRemoved(QString&& fileName) {
+QString GetFileNameExtRemoved(QString&& fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
   if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
     return fileName;
@@ -161,7 +163,7 @@ QString PathTool::GetFileNameExtRemoved(QString&& fileName) {
   return fileName.left(lastIndexOfExtDot);
 }
 
-QString PathTool::FileExtReplacedWithJson(QString fileName) {
+QString FileExtReplacedWithJson(QString fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
   if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
     fileName += ".json";
@@ -171,13 +173,13 @@ QString PathTool::FileExtReplacedWithJson(QString fileName) {
   return fileName.replace(lastIndexOfExtDot + 1, JSON_EXT_SIZE, "json");
 }
 
-QString PathTool::GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
+QString GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   prepath = fullpath.left(lastIndexOfSlash);
   return fullpath.mid(lastIndexOfSlash + 1);
 }
 
-QString PathTool::Path2Join(const QString& a, const QString& b) {
+QString Path2Join(const QString& a, const QString& b) {
   QString ans;
   ans.reserve(a.size() + 1 + b.size());
   if (!a.isEmpty()) {
@@ -187,7 +189,7 @@ QString PathTool::Path2Join(const QString& a, const QString& b) {
   return ans += b;
 }
 
-QString PathTool::Path3Join(const QString& a, const QString& b, const QString& c) {
+QString Path3Join(const QString& a, const QString& b, const QString& c) {
   QString ans;
   ans.reserve(a.size() + 1 + b.size() + 1 + c.size());
   if (!a.isEmpty()) {
@@ -201,30 +203,46 @@ QString PathTool::Path3Join(const QString& a, const QString& b, const QString& c
   return ans += c;
 }
 
-int PathTool::GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight) {
+int GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight) {
   outPrePathLeft.clear();
   outPrePathRight.clear();
-  const int lastHashIndex = absPath.lastIndexOf('/');  // 找到最后一个/的位置
-  if (lastHashIndex == -1) {                           // C.mp4
-    return lastHashIndex;
+  const int lastSlashIndex = absPath.lastIndexOf('/');  // 找到最后一个/的位置
+  if (lastSlashIndex == -1) {                           // C.mp4
+    return lastSlashIndex;
   }
-  const int secondLastHashIndex = absPath.lastIndexOf('/', lastHashIndex - 1);  // 找到倒数第二个/的位置
-  if (secondLastHashIndex == -1) {                                              // C:/C.mp4
-    outPrePathRight = absPath.left(lastHashIndex);                              // C:
-    return lastHashIndex;
+  const int secondlastSlashIndex = absPath.lastIndexOf('/', lastSlashIndex - 1);  // 找到倒数第二个/的位置
+  if (secondlastSlashIndex == -1) {                                               // C:/C.mp4
+    outPrePathRight = absPath.left(lastSlashIndex);                               // C:
+    return lastSlashIndex;
   }
-  const int thirdLastHashIndex = absPath.lastIndexOf('/', secondLastHashIndex - 1);  // 找到倒数第三个/的位置
-  if (thirdLastHashIndex == -1) {                                                    // C:/A/B.mp4
-    outPrePathRight = absPath.left(lastHashIndex);                                   // C:/A
-    return lastHashIndex;
+  const int thirdlastSlashIndex = absPath.lastIndexOf('/', secondlastSlashIndex - 1);  // 找到倒数第三个/的位置
+  if (thirdlastSlashIndex == -1) {                                                     // C:/A/B.mp4
+    outPrePathRight = absPath.left(lastSlashIndex);                                    // C:/A
+    return lastSlashIndex;
   }
   // C:/A/B/C.mp4
-  outPrePathLeft = absPath.left(thirdLastHashIndex);                                              // C:
-  outPrePathRight = absPath.mid(thirdLastHashIndex + 1, lastHashIndex - thirdLastHashIndex - 1);  // A/B
-  return lastHashIndex;
+  outPrePathLeft = absPath.left(thirdlastSlashIndex);                                                // C:
+  outPrePathRight = absPath.mid(thirdlastSlashIndex + 1, lastSlashIndex - thirdlastSlashIndex - 1);  // A/B
+  return lastSlashIndex;
 }
 
-QString PathTool::join(const QString& prefix, const QString& relative) {
+// get last 3 part of a file abs path
+QString GetEffectiveName(const QString& itemPath) {
+  // input string => output string, for example:
+  // C:/A/B/C.ext => B/C.ext
+  // C:/A/Videos/C.ext => A/Videos/C.ext
+  // C:/A/Video/C.ext => A/Video/C.ext
+  // C:/A/Vid/C.ext => A/Vid/C.ext
+  // C:/A/VIDEO_TS/C.ext => A/VIDEO_TS/C.ext
+  static const QSet<QString> specialSegments{"videos", "video", "vid", "video_ts"};
+  const QString segment = itemPath.section('/', -2, -2).toLower();
+  if (specialSegments.contains(segment)) {
+    return itemPath.section('/', -3, -1);
+  }
+  return itemPath.section('/', -2, -1);
+}
+
+QString join(const QString& prefix, const QString& relative) {
   if (prefix.isEmpty()) {
     return relative;
   }
@@ -237,7 +255,7 @@ QString PathTool::join(const QString& prefix, const QString& relative) {
   }
   return prefix + '/' + relative;
 }
-QString PathTool::driver(const QString& fullPath) {
+QString driver(const QString& fullPath) {
 #ifdef _WIN32
   int colonIndex = fullPath.indexOf(':');
   return colonIndex != -1 ? fullPath.left(colonIndex) : "";
@@ -245,7 +263,7 @@ QString PathTool::driver(const QString& fullPath) {
   return "";
 #endif
 }
-QString PathTool::StrCommonPrefix(const QString& path1, const QString& path2) {
+QString StrCommonPrefix(const QString& path1, const QString& path2) {
   const int length = std::min(path1.size(), path2.size());
   int index = 0;
   while (index < length && path1[index] == path2[index]) {
@@ -254,11 +272,11 @@ QString PathTool::StrCommonPrefix(const QString& path1, const QString& path2) {
   return path1.left(index);
 }
 
-bool PathTool::isRootOrEmpty(const QString& path) {
+bool isRootOrEmpty(const QString& path) {
   return path.isEmpty() || path == "/" || QDir(path).isRoot();
 }
 
-QStringList PathTool::GetRels(int prefixLen, const QStringList& lAbsPathList) {
+QStringList GetRels(int prefixLen, const QStringList& lAbsPathList) {
   // "/home/rel2entry", "/home", prefixLen = 4
   const int rel2EntryN = prefixLen + 1;
   QStringList lRels;
@@ -268,7 +286,7 @@ QStringList PathTool::GetRels(int prefixLen, const QStringList& lAbsPathList) {
   return lRels;
 }
 
-std::pair<QString, QStringList> PathTool::GetLAndRels(const QStringList& lAbsPathList) {
+std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList) {
   if (lAbsPathList.isEmpty()) {
     return {"", lAbsPathList};
   }
@@ -279,7 +297,7 @@ std::pair<QString, QStringList> PathTool::GetLAndRels(const QStringList& lAbsPat
   return {prefixPath, lRels};
 }
 
-QString PathTool::longestCommonPrefix(const QStringList& strs) {
+QString longestCommonPrefix(const QStringList& strs) {
   if (strs.isEmpty()) {
     return "";
   }
@@ -306,10 +324,12 @@ QString PathTool::longestCommonPrefix(const QStringList& strs) {
 }
 
 // contains dot itself
-QString PathTool::GetFileExtension(const QString& path) {
+QString GetFileExtension(const QString& path) {
   const int lastIndexOfDot = path.lastIndexOf('.');
   if (lastIndexOfDot == -1) {
     return {};
   }
   return path.mid(lastIndexOfDot);
+}
+
 }

@@ -183,7 +183,7 @@ bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool ski
   ThumbnailProcesser tp{skipIfExist};
   int extractedOutCnt = tp(currentPath, beg, end);
   if (!tp.mErrImg.isEmpty()) {
-    LOG_INFO_P("Extract Failed", "%d images, as follows:\n", extractedOutCnt, qPrintable(tp.mErrImg.join('\n')));
+    LOG_INFO_P("Extract Failed", "%d images, as follows:\n%s", extractedOutCnt, qPrintable(tp.mErrImg.join('\n')));
     return false;
   }
   if (extractedOutCnt == 0) {

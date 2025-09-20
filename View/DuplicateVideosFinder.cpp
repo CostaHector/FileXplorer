@@ -4,6 +4,9 @@
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
+#include "PublicTool.h"
+#include "PublicVariable.h"
+#include "NotificatorMacro.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -86,48 +89,72 @@ void RightDuplicateDetails::onRecycleSelection() {
 
 void RightDuplicateDetails::subscribe() {
   connect(this, &QTableView::doubleClicked, this, &RightDuplicateDetails::on_cellDoubleClicked);
+  connect(g_dupVidFinderAg().OPEN_DATABASE, &QAction::triggered, []() {
+    const QString vidDupDbPath = DupVidsManager::GetAiDupVidDbPath();
+    bool openResult = FileTool::OpenLocalFileUsingDesktopService(vidDupDbPath);
+    if (!openResult) {
+      LOG_ERR_NP("Open database failed", vidDupDbPath);
+    } else {
+      LOG_OK_NP("Open database succeed", vidDupDbPath);
+    }
+  });
   connect(g_dupVidFinderAg().RECYCLE_ONE_FILE, &QAction::triggered, this, &RightDuplicateDetails::onRecycleSelection);
 }
 
 // -------------------------------------------------------------------------------------------------
-const QString DuplicateVideosFinder::DUPLICATE_FINDER_TEMPLATE = "Duplicate Videos Finder(Differ by %1) | %2 batch(es) | total %3 video(s)";
+const QString DuplicateVideosFinder::DUPLICATE_FINDER_TITLE_TEMPLATE  //
+    {"Duplicate Videos Finder: Analyzing %1 table(s) | Differ by %2 | %3 batch(es) | total %4 video(s)"};
 
 DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{parent} {
   m_tb = g_dupVidFinderAg().GetAiMediaToolBar(this);
+  CHECK_NULLPTR_RETURN_VOID(m_tb);
   m_tb->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
-  m_aiTables = new AiMediaDupTableView{this};
-  m_aiTablesTB = new QToolBar{"Ai Media Tables", this};
-  m_aiTablesTB->addWidget(m_aiTables);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_tb);
-  addToolBarBreak(Qt::ToolBarArea::TopToolBarArea);
-  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_aiTablesTB);
 
-  m_dupList = new LeftDuplicateList{this};
-  m_details = new RightDuplicateDetails{this};
-  m_mainWidget = new QSplitter{Qt::Orientation::Horizontal, this};
+  m_aiTables = new (std::nothrow) AiMediaDupTableView{this};
+  CHECK_NULLPTR_RETURN_VOID(m_aiTables);
 
-  m_mainWidget->addWidget(m_dupList);
-  m_mainWidget->addWidget(m_details);
+  m_dupList = new (std::nothrow) LeftDuplicateList{this};
+  CHECK_NULLPTR_RETURN_VOID(m_dupList);
+  m_details = new (std::nothrow) RightDuplicateDetails{this};
+  CHECK_NULLPTR_RETURN_VOID(m_details);
+  m_details->setSharedMember(&m_dupList->m_dupListModel->m_classifiedSort,  //
+                             &m_dupList->m_dupListModel->m_currentDiffer);  //
 
-  setCentralWidget(m_mainWidget);
+  m_detail_left_right = new (std::nothrow) QSplitter{Qt::Orientation::Horizontal, this};
+  CHECK_NULLPTR_RETURN_VOID(m_detail_left_right);
+  m_detail_left_right->addWidget(m_dupList);
+  m_detail_left_right->addWidget(m_details);
 
-  m_details->setSharedMember(&m_dupList->m_dupListModel->m_classifiedSort, &m_dupList->m_dupListModel->m_currentDiffer);
+  m_tbl_detail_ver = new (std::nothrow) QSplitter{Qt::Orientation::Vertical, this};
+  m_tbl_detail_ver->addWidget(m_aiTables);
+  m_tbl_detail_ver->addWidget(m_detail_left_right);
+
+  setCentralWidget(m_tbl_detail_ver);
+
   subscribe();
 
   updateWindowsSize();
-  UpdateWindowsTitle();
+  UpdateWindowsTitle(0);
   setWindowIcon(QIcon(":img/DUPLICATE_VIDEOS_FINDER"));
 
   UpdateAiMediaTableNames();
 }
 
-void DuplicateVideosFinder::UpdateWindowsTitle() {
+void DuplicateVideosFinder::UpdateWindowsTitle(int tablesInAnalyseCnt) {
   if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
     return;
   }
+  static int lastTimeTablesInAnalyseCnt = 0;
+  if (tablesInAnalyseCnt >= 0) { // -1 input will keep last time tables count value
+    lastTimeTablesInAnalyseCnt = tablesInAnalyseCnt;
+  }
   auto* pDupListModel = m_dupList->m_dupListModel;
-  setWindowTitle(
-      DUPLICATE_FINDER_TEMPLATE.arg(pDupListModel->getDifferTypeStr()).arg(pDupListModel->rowCount()).arg(pDupListModel->getReadVidsCount()));
+  setWindowTitle(DUPLICATE_FINDER_TITLE_TEMPLATE
+                     .arg(lastTimeTablesInAnalyseCnt)           //
+                     .arg(pDupListModel->getDifferTypeStr())    //
+                     .arg(pDupListModel->rowCount())            //
+                     .arg(pDupListModel->getReadVidsCount()));  //
 }
 
 void DuplicateVideosFinder::updateWindowsSize() {
@@ -136,17 +163,17 @@ void DuplicateVideosFinder::updateWindowsSize() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_mainWidget->restoreState(Configuration().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
+  m_tbl_detail_ver->restoreState(Configuration().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
 }
 
-void DuplicateVideosFinder::showEvent(QShowEvent *event) {
+void DuplicateVideosFinder::showEvent(QShowEvent* event) {
   QMainWindow::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
 
 void DuplicateVideosFinder::closeEvent(QCloseEvent* event) {
   Configuration().setValue("DuplicateVideosFinderGeometry", saveGeometry());
-  Configuration().setValue("DuplicateVideosFinderSplitterState", m_mainWidget->saveState());
+  Configuration().setValue("DuplicateVideosFinderSplitterState", m_tbl_detail_ver->saveState());
   QMainWindow::closeEvent(event);
 }
 
@@ -171,21 +198,6 @@ void DuplicateVideosFinder::keyPressEvent(QKeyEvent* e) {
         emit m_details->doubleClicked(m_details->currentIndex());
         return;
       }
-      case Qt::KeyboardModifier::ShiftModifier: {
-        const QModelIndex& bef = m_dupList->currentIndex();
-        if (not bef.isValid()) {
-          LOG_W("before index is invalid");
-          return;
-        }
-        const QModelIndex& aft = m_dupList->model()->index(bef.row() + 1, bef.column());
-        if (not aft.isValid()) {
-          LOG_W("after index is invalid");
-          return;
-        }
-        m_dupList->setCurrentIndex(aft);
-        emit m_dupList->currentChanged(aft, bef);
-        return;
-      }
       default:
         break;
     }
@@ -194,12 +206,12 @@ void DuplicateVideosFinder::keyPressEvent(QKeyEvent* e) {
 }
 
 bool DuplicateVideosFinder::TablesGroupChangedTo(const QStringList& tbls) {
-  if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
+  if (m_dupList == nullptr || m_dupList->m_dupListModel == nullptr) {
     LOG_W("Duplicate list or its model is nullptr");
     return false;
   }
   m_dupList->m_dupListModel->ChangeTableGroups(tbls);
-  UpdateWindowsTitle();
+  UpdateWindowsTitle(tbls.size());
   return true;
 }
 
@@ -212,7 +224,7 @@ void DuplicateVideosFinder::subscribe() {
   connect(m_dupList->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &DuplicateVideosFinder::on_selectionChanged);
 }
 
-void DuplicateVideosFinder::on_selectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
+void DuplicateVideosFinder::on_selectionChanged(const QModelIndex& current, const QModelIndex& /*previous*/) {
   const auto& proxyIndex = current;
   const auto& srcIndex = m_dupList->m_sortProxy->mapToSource(proxyIndex);
 
@@ -236,18 +248,18 @@ void DuplicateVideosFinder::onAnalyseAiMediaTableChanged() {
   m_details->m_detailsModel->whenDifferTypeAboutToChanged();
   const QStringList& tbls = m_aiTables->GetSelectedAiTables();
   TablesGroupChangedTo(tbls);
-  UpdateWindowsTitle();
+  UpdateWindowsTitle(tbls.size());
 }
 
 void DuplicateVideosFinder::onCancelAnalyse() {
   m_dupList->clearSelection();
   m_details->m_detailsModel->whenDifferTypeAboutToChanged();
   TablesGroupChangedTo({});
-  UpdateWindowsTitle();
+  UpdateWindowsTitle(0);
 }
 
 void DuplicateVideosFinder::onDifferTypeChanged(QAction* newDifferAct) {
-  if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
+  if (m_dupList == nullptr || m_dupList->m_dupListModel == nullptr) {
     LOG_W("Duplicate list or its model is nullptr when set differ by duration");
     return;
   }
@@ -256,13 +268,9 @@ void DuplicateVideosFinder::onDifferTypeChanged(QAction* newDifferAct) {
   if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_SIZE) {
     m_dupList->m_dupListModel->setDifferType(DIFFER_BY_TYPE::SIZE);
   } else if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_DURATION) {
-#ifdef _WIN32
     m_dupList->m_dupListModel->setDifferType(DIFFER_BY_TYPE::DURATION);
-#else
-    QMessageBox::warning(this, "Cannot differ by type", "MediaInfo lib is not lib");
-#endif
   }
-  UpdateWindowsTitle();
+  UpdateWindowsTitle(-1);  // unchange
 }
 
 void DuplicateVideosFinder::onChangeSizeDeviation() {
@@ -280,7 +288,7 @@ void DuplicateVideosFinder::onChangeSizeDeviation() {
   m_dupList->clearSelection();
   m_details->m_detailsModel->whenDifferTypeAboutToChanged();
   m_dupList->m_dupListModel->setDeviationSize(dev);
-  UpdateWindowsTitle();
+  UpdateWindowsTitle(-1);  // unchange
 }
 void DuplicateVideosFinder::onChangeDurationDeviation() {
   if (m_dupList == nullptr or m_dupList->m_dupListModel == nullptr) {
@@ -297,18 +305,5 @@ void DuplicateVideosFinder::onChangeDurationDeviation() {
   m_dupList->clearSelection();
   m_details->m_detailsModel->whenDifferTypeAboutToChanged();
   m_dupList->m_dupListModel->setDeviationDuration(dev);
-  UpdateWindowsTitle();
+  UpdateWindowsTitle(-1);  // unchange
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  DuplicateVideosFinder mainWindow;
-  mainWindow.show();
-  a.exec();
-  return 0;
-}
-#endif
