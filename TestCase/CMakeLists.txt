@@ -49,6 +49,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/View/*.cpp
     # test only module sources
     *.cpp
+    ActionsTest/*.cpp
     ComponentTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
     DbManagerTest/*.cpp

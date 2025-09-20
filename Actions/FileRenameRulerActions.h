@@ -8,8 +8,9 @@
 class FileRenameRulerActions : public QObject {
  public:
   explicit FileRenameRulerActions(QObject* parent = nullptr);
-
   void subscribe();
+
+  QAction* _NAME_RULER{nullptr};
 
   QAction* _EDIT_STUDIOS{nullptr};
   QAction* _RELOAD_STUDIOS{nullptr};
@@ -22,11 +23,13 @@ class FileRenameRulerActions : public QObject {
 
   QAction* _RENAME_RULE_STAT{nullptr};
 
+  QList<QAction*> NAME_RULES_ACTIONS_LIST;
  private:
   void onEditLocalFile(const QString& rel2File);
-  std::pair<bool, QString> mLastTimeEditFileInfo;
+  std::pair<bool, QString> mLastTimeEditFileInfo{false, ""};
+  int mLastTimeCntDelta{-1};
 };
 
-FileRenameRulerActions& g_ArrangeActions();
+FileRenameRulerActions& g_NameRulerActions();
 
 #endif  // FILERENAMERULERACTIONS_H
