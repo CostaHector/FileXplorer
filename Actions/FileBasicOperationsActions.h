@@ -35,7 +35,6 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* FolderMergeActions();
 
   void FolderFileCategoryProcess();
-  QAction* _NAME_RULER{nullptr};
   QAction* _PACK_FOLDERS{nullptr};
   QAction* _UNPACK_FOLDERS{nullptr};
   QAction* _RETURN_ERROR_CODE_UPON_ANY_FAILURE{nullptr};
