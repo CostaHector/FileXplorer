@@ -33,7 +33,7 @@ void AiMediaDupTableView::LoadAiMediaTableNames() {
     LOG_W("m_aiMediaTblModel is nullptr");
     return;
   }
-  auto& aimd = AIMediaDuplicate::GetInst();
+  auto& aimd = DupVidsManager::GetInst();
   const auto& tbl2Cnt = aimd.TableName2Cnt();
   m_aiMediaTblModel->UpdateData(tbl2Cnt);
 }
@@ -43,22 +43,27 @@ QStringList AiMediaDupTableView::GetSelectedAiTables() const {
   return m_aiMediaTblModel->fileNames(indx);
 }
 
-void AiMediaDupTableView::onScanAPath() {
-  const QString& defaultOpenDir = Configuration().value("DUPLICATE_VIDEOS_SELECT_FROM", ".").toString();
-  const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
-
+bool AiMediaDupTableView::onScanAPath(const QString& testUserSpecifiedPath) {
+  QString loadFromPath;
+  if (testUserSpecifiedPath.isEmpty()) {  // ask user to select
+    const QString& defaultOpenDir = Configuration().value("DUPLICATE_VIDEOS_SELECT_FROM", ".").toString();
+    loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
+  } else {  // from input directly
+    loadFromPath = testUserSpecifiedPath;
+  }
   QFileInfo loadFromFi(loadFromPath);
   const QString& absPath = loadFromFi.absoluteFilePath();
   if (!loadFromFi.isDir()) {
     LOG_WARN_P("[Abort] ScanAPath", "Not a folder:%s", qPrintable(absPath));
-    return;
+    return false;
   }
   Configuration().setValue("DUPLICATE_VIDEOS_SELECT_FROM", absPath);
-  auto& aimd = AIMediaDuplicate::GetInst();
-  const bool scanRet = aimd.ScanALocation(absPath, false, true);
+  auto& aimd = DupVidsManager::GetInst();
+  const bool scanRet = aimd.ScanALocation(absPath);
   aimd.FillHashFieldIfSizeConflict(absPath);
   LoadAiMediaTableNames();
   LOG_OK_P("Scan path result", "scanRet:%d, Path: %s", scanRet, qPrintable(absPath));
+  return scanRet;
 }
 
 QModelIndexList AiMediaDupTableView::Proxy2Source(const QModelIndexList& proInds) const {
@@ -77,30 +82,30 @@ void AiMediaDupTableView::subscribe() {
     LOG_W("tblKWFilter is nullptr");
   }
 
-  connect(g_dupVidFinderAg().SCAN_A_PATH, &QAction::triggered, this, &AiMediaDupTableView::onScanAPath);
+  connect(g_dupVidFinderAg().SCAN_A_PATH, &QAction::triggered, this, [this]() { onScanAPath(); });
 
   connect(g_dupVidFinderAg().DROP_TABLE, &QAction::triggered, this, [this]() {
-    auto& aimd = AIMediaDuplicate::GetInst();
+    auto& aimd = DupVidsManager::GetInst();
     const auto ret = QMessageBox::warning(this, "Drop selected tables?", "Cannot recover",
                                           QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
       LOG_OK_NP("[Skip]User has cancel drop table", "return");
       return;
     }
-    const int tblCnt = aimd.DropTables(GetSelectedAiTables(), false);
+    const int tblCnt = aimd.DropTables(GetSelectedAiTables());
     LoadAiMediaTableNames();
     LOG_OK_P("Drop Tables succeed", "%d table(s)", tblCnt);
   });
 
   connect(g_dupVidFinderAg().AUDIT_AI_MEDIA_TABLE, &QAction::triggered, this, [this]() {
-    auto& aimd = AIMediaDuplicate::GetInst();
+    auto& aimd = DupVidsManager::GetInst();
     const int tblCnt = aimd.AuditTables(GetSelectedAiTables(), false);
     LoadAiMediaTableNames();
     LOG_OK_P("Audit Tables succeed", "%d records(s)", tblCnt);
   });
 
   connect(g_dupVidFinderAg().DROP_THEN_REBUILD_THIS_TABLE, &QAction::triggered, this, [this]() {
-    auto& aimd = AIMediaDuplicate::GetInst();
+    auto& aimd = DupVidsManager::GetInst();
     const auto ret =
         QMessageBox::warning(this, "Drop & Rebuild selected tables?", "If disk is offline, only table fields can rebuild, records cannot",
                              QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
@@ -108,7 +113,7 @@ void AiMediaDupTableView::subscribe() {
       LOG_D("User has cancel drop&rebuild table");
       return;
     }
-    const int tblCnt = aimd.RebuildTables(GetSelectedAiTables(), false);
+    const int tblCnt = aimd.RebuildTables(GetSelectedAiTables());
     LoadAiMediaTableNames();
     LOG_OK_P("Drop & Rebuild succeed", "%d table(s)", tblCnt);
   });
@@ -118,7 +123,7 @@ void AiMediaDupTableView::subscribe() {
     const QString& tableName = m_aiMediaTblModel->fileName(srcInd);
     const QString& pth = TableName2Path(tableName);
     if (!QFileInfo(pth).isDir()) {
-      LOG_ERR_P("[Skip open]", "Path[%s] or table[%s] not exist", qPrintable(pth), qPrintable(tableName));
+      LOG_ERR_P("[Path not exist]", "[%s]\nderived from:[%s]", qPrintable(pth), qPrintable(tableName));
       return;
     }
     const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));

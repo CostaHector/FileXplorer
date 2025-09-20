@@ -2,65 +2,39 @@
 #include <QtTest>
 
 #include "BeginToExposePrivateMember.h"
-#include "AIMediaDuplicate.h"
+#include "DupVidsManager.h"
 #include "EndToExposePrivateMember.h"
 #include "FileSystemTestSuite.h"
 
-class AIMediaDuplicateTest : public FileSystemTestSuite {
+class DupVidsManagerTest : public FileSystemTestSuite {
   Q_OBJECT
  public:
-  AIMediaDuplicateTest() : FileSystemTestSuite("TestEnv_AIMediaDuplicate", false) {}
+  DupVidsManagerTest() : FileSystemTestSuite("TestEnv_AIMediaDuplicate", false) {}
   const FileSystemHelper m_rootHelper{mTestPath};
   const QString AI_MEDIA_DUPLICATE_DIR_EMPTY = mTestPath + "/empty";
   const QString AI_MEDIA_DUPLICATE_DIR_FOLDER_1 = mTestPath + "/folder_1";
   const QString AI_MEDIA_DUPLICATE_DIR_NO_MEDIA = mTestPath + "/no_media";
 
+  const QString DUP_VID_DB{DupVidsManager::GetAiDupVidDbPath()};
+  const QString DUP_VID_CONN = DupVidsManager::CONNECTION_NAME;
  private slots:
-  void cleanupTestCase() {  //
-    m_rootHelper.EraseFileSystemTree(true);
-  }
-
   void initTestCase() {
-    // empty, folder_1{movie 1 duplicate.mp4, movie 2 duplicate.mp4, movie 3 unique.mkv}, no_media{any text.txt}
+    QCOMPARE(DupVidsManager::DropDatabaseForTest(DUP_VID_DB, false), true);
+    // empty
+    // folder_1{movie 1 duplicate.mp4, movie 2 duplicate.mp4, movie 3 unique.mkv},
+    // no_media{any text.txt}
     std::string size102Str(102, '0');
     QString s102{size102Str.c_str()};
     m_rootHelper << FileSystemNode{"empty"} << FileSystemNode{"folder_1"} << FileSystemNode{"no_media"};
-    m_rootHelper.GetSubHelper("folder_1") << FileSystemNode{"movie 1 duplicate.mp4", false, "012345678901234567890123"} << FileSystemNode{"movie 2 duplicate.mp4", false, "012345678901234567890123"}
+    m_rootHelper.GetSubHelper("folder_1") << FileSystemNode{"movie 1 duplicate.mp4", false, "012345678901234567890123"}
+                                          << FileSystemNode{"movie 2 duplicate.mp4", false, "012345678901234567890123"}
                                           << FileSystemNode{"movie 3 unique.mkv", false, s102};
     m_rootHelper.GetSubHelper("no_media").GetSubHelper("folder") << FileSystemNode{"any text.txt", false, ""};
   }
-  void init() {
-    AIMediaDuplicate::SKIP_GETTER_DURATION = true;
-    AIMediaDuplicate::IS_TEST = true;
-  }
 
-  void test_Basic() {  //
-    QCOMPARE("123", GetEffectiveName("123"));
-  }
-
-  void test_SimplePath() {  //
-    QCOMPARE("B/C.ext", GetEffectiveName("C:/A/B/C.ext"));
-  }
-
-  void test_VideosPath() {  //
-    QCOMPARE("A/Videos/C.ext", GetEffectiveName("C:/A/Videos/C.ext"));
-  }
-
-  void test_VideoPath() {  //
-    QCOMPARE("A/Video/C.ext", GetEffectiveName("C:/A/Video/C.ext"));
-  }
-
-  void test_VidPath() {  //
-    QCOMPARE("A/Vid/C.ext", GetEffectiveName("C:/A/Vid/C.ext"));
-  }
-
-  void test_VIDEO_TSPath() {  //
-    QCOMPARE("A/VIDEO_TS/C.ext", GetEffectiveName("C:/A/VIDEO_TS/C.ext"));
-  }
-
-  void test_ignoreCasePath() {
-    QCOMPARE("A/VID/C.ext", GetEffectiveName("C:/A/VID/C.ext"));
-    QCOMPARE("A/video_ts/C.ext", GetEffectiveName("C:/A/video_ts/C.ext"));
+  void cleanupTestCase() {  //
+    m_rootHelper.EraseFileSystemTree(true);
+    DupVidsManager::DropDatabaseForTest(DUP_VID_DB, false);
   }
 
   void test_C_DISK_DRIVER_NAME_2_TableName() {
@@ -68,9 +42,11 @@ class AIMediaDuplicateTest : public FileSystemTestSuite {
     QCOMPARE(GetTableName("C:/DISK/LDBKP"), "C__DISK_LDBKP");
     QCOMPARE(GetTableName("C:/DISK/F24BKP"), "C__DISK_F24BKP");
 
+#ifdef _WIN32
     QCOMPARE(TableName2Path("C__DISK_LD2"), "C:/DISK/LD2");
     QCOMPARE(TableName2Path("C__DISK_LDBKP"), "C:/DISK/LDBKP");
     QCOMPARE(TableName2Path("C__DISK_F24BKP"), "C:/DISK/F24BKP");
+#endif
   }
 
   void test_DRIVER_LETTER_2_TableName() {
@@ -78,46 +54,44 @@ class AIMediaDuplicateTest : public FileSystemTestSuite {
     QCOMPARE(GetTableName("C:/"), "C__");
     QCOMPARE(GetTableName("C:/A"), "C__A");
     QCOMPARE(GetTableName("E:/P/Hetero/jerk"), "E__P_Hetero_jerk");
-  }
 
-  void test_noDriverLetter_TableName() {
     QCOMPARE(GetTableName("/home"), "_home");
     QCOMPARE(GetTableName("/home/costa/Document"), "_home_costa_Document");
   }
 
   void test_DropAllTables_ok() {
-    auto& aid = AIMediaDuplicate::GetInst();
-    QVERIFY(aid.DropTables({}, true) != -1);
+    DupVidsManager::DropAllTablesForTest(DUP_VID_CONN);
+    auto& aid = DupVidsManager::GetInst();
     QCOMPARE(aid.GetTablesCnt(), 0);
   }
 
   void test_ScanAnEmptyPath_ok() {
-    auto& aid = AIMediaDuplicate::GetInst();
-    QVERIFY(aid.DropTables({}, true) != -1);
-    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_EMPTY, true);
+    DupVidsManager::DropAllTablesForTest(DUP_VID_CONN);
+    auto& aid = DupVidsManager::GetInst();
+    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_EMPTY);
     QVERIFY(scanRet);
     QCOMPARE(aid.GetTablesCnt(), 1);
   }
 
   void test_ScanAPaths_ok() {
-    auto& aid = AIMediaDuplicate::GetInst();
-    QVERIFY(aid.DropTables({}, true) != -1);
-    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_FOLDER_1, true);
+    DupVidsManager::DropAllTablesForTest(DUP_VID_CONN);
+    auto& aid = DupVidsManager::GetInst();
+    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_FOLDER_1);
     QVERIFY(scanRet);
     QCOMPARE(aid.GetTablesCnt(), 1);
   }
 
   void test_ScanPathContainDuplicates_ok() {
-    auto& aid = AIMediaDuplicate::GetInst();
-    QVERIFY(aid.DropTables({}, true) != -1);
-    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_FOLDER_1, true);
+    DupVidsManager::DropAllTablesForTest(DUP_VID_CONN);
+    auto& aid = DupVidsManager::GetInst();
+    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_FOLDER_1);
     QVERIFY(scanRet);
     QCOMPARE(aid.GetTablesCnt(), 1);
     const QString& tableName = GetTableName(AI_MEDIA_DUPLICATE_DIR_FOLDER_1);
     const int fillCnt = aid.FillHashFieldIfSizeConflict(AI_MEDIA_DUPLICATE_DIR_FOLDER_1);
     QCOMPARE(fillCnt, 2);
 
-    QSqlDatabase db = QSqlDatabase::database(AIMediaDuplicate::CONNECTION_NAME);
+    QSqlDatabase db = QSqlDatabase::database(DupVidsManager::CONNECTION_NAME);
     QSqlQuery query(db);
     const bool qryRet = query.exec(QString("SELECT `FIRST_1024_HASH`, `SIZE` FROM `%1` WHERE `FIRST_1024_HASH` IS NOT NULL").arg(tableName));
     int cnt = 0;
@@ -133,25 +107,25 @@ class AIMediaDuplicateTest : public FileSystemTestSuite {
   }
 
   void test_ScanNoMediaPaths_ok() {
-    auto& aid = AIMediaDuplicate::GetInst();
-    QVERIFY(aid.DropTables({}, true) != -1);
-    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_NO_MEDIA, true);
+    DupVidsManager::DropAllTablesForTest(DUP_VID_CONN);
+    auto& aid = DupVidsManager::GetInst();
+    bool scanRet = aid.ScanALocation(AI_MEDIA_DUPLICATE_DIR_NO_MEDIA);
     QVERIFY(scanRet);
     QCOMPARE(aid.GetTablesCnt(), 1);
   }
 
   void test_ScanLocations_DropATable_ok() {
-    auto& aid = AIMediaDuplicate::GetInst();
-    QVERIFY(aid.DropTables({}, true) != -1);
-    const int scansRet = aid.ScanLocations({AI_MEDIA_DUPLICATE_DIR_EMPTY, AI_MEDIA_DUPLICATE_DIR_FOLDER_1, AI_MEDIA_DUPLICATE_DIR_NO_MEDIA}, true);
+    DupVidsManager::DropAllTablesForTest(DUP_VID_CONN);
+    auto& aid = DupVidsManager::GetInst();
+    const int scansRet = aid.ScanLocations({AI_MEDIA_DUPLICATE_DIR_EMPTY, AI_MEDIA_DUPLICATE_DIR_FOLDER_1, AI_MEDIA_DUPLICATE_DIR_NO_MEDIA});
     QCOMPARE(scansRet, 3);
     QCOMPARE(aid.GetTablesCnt(), 3);
 
     const QString delTableName = GetTableName(AI_MEDIA_DUPLICATE_DIR_EMPTY);
-    QCOMPARE(aid.DropTables({delTableName}, false), 1);
+    QCOMPARE(aid.DropTables({delTableName}), 1);
     QCOMPARE(aid.GetTablesCnt(), 2);
   }
 };
 
-#include "AIMediaDuplicateTest.moc"
-REGISTER_TEST(AIMediaDuplicateTest, false)
+#include "DupVidsManagerTest.moc"
+REGISTER_TEST(DupVidsManagerTest, false)

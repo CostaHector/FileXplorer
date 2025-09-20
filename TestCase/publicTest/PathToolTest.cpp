@@ -11,9 +11,7 @@ class PathToolTest : public PlainTestSuite {
  public:
   PathToolTest() : PlainTestSuite{} {}
  private slots:
-  void test_project_name_from_marco() {
-    QCOMPARE(PROJECT_NAME, QString("FileXplorer"));
-  }
+  void test_project_name_from_marco() { QCOMPARE(PROJECT_NAME, QString("FileXplorer")); }
 
   void test_lib_files_path_correct() {
     QString libPath = GetPathByApplicationDirPath(FILE_REL_PATH::MEDIA_INFO_DLL);
@@ -317,6 +315,17 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE(join("C:", "home/to/path"), "C:/home/to/path");
     QCOMPARE(join("C:", ""), "C:");
     QCOMPARE(join("", "/home/to/path"), "/home/to/path");
+  }
+
+  void test_Basic() {  //
+    QCOMPARE("123", PathTool::GetEffectiveName("123"));
+    QCOMPARE("B/C.ext", PathTool::GetEffectiveName("C:/A/B/C.ext"));
+    QCOMPARE("A/Videos/C.ext", PathTool::GetEffectiveName("C:/A/Videos/C.ext"));
+    QCOMPARE("A/Video/C.ext", PathTool::GetEffectiveName("C:/A/Video/C.ext"));
+    QCOMPARE("A/Vid/C.ext", PathTool::GetEffectiveName("C:/A/Vid/C.ext"));
+    QCOMPARE("A/VIDEO_TS/C.ext", PathTool::GetEffectiveName("C:/A/VIDEO_TS/C.ext"));
+    QCOMPARE("A/VID/C.ext", PathTool::GetEffectiveName("C:/A/VID/C.ext"));
+    QCOMPARE("A/video_ts/C.ext", PathTool::GetEffectiveName("C:/A/video_ts/C.ext"));
   }
 };
 

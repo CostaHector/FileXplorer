@@ -9,27 +9,37 @@
 #include "BeginToExposePrivateMember.h"
 #include "DuplicateVideosFinder.h"
 #include "EndToExposePrivateMember.h"
-
+#include "DupVidsManager.h"
 #include <QDir>
-#include <QDirIterator>
-
-Q_DECLARE_METATYPE(QDir::Filters)
-Q_DECLARE_METATYPE(QDirIterator::IteratorFlag)
 
 class DuplicateVideosFinderTest : public PlainTestSuite {
   Q_OBJECT
  public:
+  const QString VID_DUR_GETTER_SAMPLE_PATH = TESTCASE_ROOT_PATH "/test/TestEnv_VideosDurationGetter";
+  const QString TS_FILE_MERGER_SAMPLE_PATH = TESTCASE_ROOT_PATH "/test/TestEnv_TSFilesMerger";
+  DuplicateVideosFinder dvf;
+  const QString DUP_VID_DB{DupVidsManager::GetAiDupVidDbPath()};
+  const QString DUP_VID_CONN = DupVidsManager::CONNECTION_NAME;
  private slots:
   void initTestCase() {
-    qRegisterMetaType<QDir::Filters>("QDir::Filters");
-    qRegisterMetaType<QDirIterator::IteratorFlag>("QDirIterator::IteratorFlag");
-    Configuration().clear();
+    // precondition: db should not exists
+    QCOMPARE(DupVidsManager::DropDatabaseForTest(DUP_VID_DB, false), true);
+
+    QVERIFY(QFileInfo{VID_DUR_GETTER_SAMPLE_PATH}.isDir());
+    QVERIFY(QFileInfo{TS_FILE_MERGER_SAMPLE_PATH}.isDir());
+
+    QVERIFY(dvf.m_aiTables != nullptr);
+    dvf.m_aiTables->LoadAiMediaTableNames(); // update
+    QVERIFY(dvf.m_aiTables->m_aiMediaTblModel != nullptr);
+    QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 0);
+    QVERIFY(dvf.m_aiTables->onScanAPath(VID_DUR_GETTER_SAMPLE_PATH));
+    QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 1);
+    QVERIFY(dvf.m_aiTables->onScanAPath(TS_FILE_MERGER_SAMPLE_PATH));
+    QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 2);
   }
 
-  void cleanupTestCase() { Configuration().clear(); }
-
-  void test_1() {
-
+  void cleanupTestCase() {
+    DupVidsManager::DropDatabaseForTest(DUP_VID_DB, false);
   }
 };
 

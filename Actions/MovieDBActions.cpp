@@ -7,7 +7,7 @@ MovieDBActions& g_dbAct() {
 }
 
 MovieDBActions::MovieDBActions(QObject* parent)  //
-  : QObject{parent}                            //
+    : QObject{parent}                            //
 {
   SUBMIT = new (std::nothrow) QAction(QIcon(":img/MANUAL_SUBMIT"), "Submit", this);
   CHECK_NULLPTR_RETURN_VOID(SUBMIT);
@@ -84,6 +84,9 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
 
   _OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "&Open with local app", this};
   CHECK_NULLPTR_RETURN_VOID(_OPEN_DB_WITH_LOCAL_APP);
+  _OPEN_DB_WITH_LOCAL_APP->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
+          .arg(_OPEN_DB_WITH_LOCAL_APP->text(), _OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
 
   SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), "Set Studio", this);
 

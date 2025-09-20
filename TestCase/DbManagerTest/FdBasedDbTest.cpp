@@ -16,7 +16,7 @@
 #include <QSqlDriver>
 
 const QString rootpath = TESTCASE_ROOT_PATH "/test/TestEnv_VideosDurationGetter";
-const QString dbName = TESTCASE_ROOT_PATH "/FD_MOVIE_DB_CONN.db";
+const QString dbName = TESTCASE_ROOT_PATH "/test/FD_MOVIE_DB_CONN.db";
 
 class FdBasedDbTest : public PlainTestSuite {
   Q_OBJECT
@@ -39,7 +39,7 @@ private slots:
     QCOMPARE(dbManager.DropTable("AGED"), 1);
     QCOMPARE(dbManager.DropTable("VOLUME_E"), 0);
     QCOMPARE(dbManager.DropTable("AGED"), 0);
-    QVERIFY(dbManager.DeleteDatabase(false));
+    QVERIFY(dbManager.DeleteDatabaseIselfForTest(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 
@@ -127,7 +127,7 @@ private slots:
     QVERIFY(!QFileInfo{inexistPath}.isDir());
     QCOMPARE(dbManager.ReadADirectory(inexistTableName, rootpath), FD_TABLE_INEXIST);
 
-    QVERIFY(dbManager.DeleteDatabase(false));
+    QVERIFY(dbManager.DeleteDatabaseIselfForTest(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 
@@ -164,7 +164,7 @@ private slots:
     QCOMPARE(dbManager.DeleteByWhereClause("VOLUME_E", qryWhereClause), 5);
     QCOMPARE(dbManager.CountRow("VOLUME_E"), 1);  // 1 *.mkv left
 
-    QVERIFY(dbManager.DeleteDatabase(false));
+    QVERIFY(dbManager.DeleteDatabaseIselfForTest(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 
@@ -251,7 +251,7 @@ private slots:
     QCOMPARE(dbManager.SetDuration("VOLUME_E"), vids.size());
     QCOMPARE(dbManager.SetDuration("VOLUME_E"), 0);  // 0 duration need update
 
-    QVERIFY(dbManager.DeleteDatabase(false));
+    QVERIFY(dbManager.DeleteDatabaseIselfForTest(false));
     QVERIFY(!QFile{dbName}.exists());
   }
 

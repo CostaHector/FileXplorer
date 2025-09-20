@@ -14,7 +14,7 @@
 using namespace MOVIE_TABLE;
 
 QStringList FdBasedDb::VIDEOS_FILTER = TYPE_FILTER::VIDEO_TYPE_SET;
-bool FdBasedDb::SKIP_GETTER_DURATION{false};
+bool FdBasedDb::mSkipGetDuration{false};
 bool FdBasedDb::CHECK_TABLE_VOLUME_ONLINE{true};
 
 const QString FdBasedDb::CREATE_TABLE_TEMPLATE  //
@@ -512,7 +512,7 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
 }
 
 int FdBasedDb::SetDuration(const QString& tableName) {
-  if (SKIP_GETTER_DURATION) {
+  if (mSkipGetDuration) {
     return FD_OK;
   }
   auto db = GetDb();
@@ -546,7 +546,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
                                       query.value(QUERY_DURATION_0_FILED_PrePathRight).toString(),  //
                                       query.value(QUERY_DURATION_0_FILED_Name).toString());
     fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toLongLong();
-    fd2Duration[fdVal] = SKIP_GETTER_DURATION ? 0 : mi.GetLengthQuick(absFilePath);
+    fd2Duration[fdVal] = mSkipGetDuration ? 0 : mi.GetLengthQuick(absFilePath);
   }
   query.clear();
   if (fd2Duration.isEmpty()) {

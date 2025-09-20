@@ -58,6 +58,7 @@ bool VideoDurationGetter::StartToGet() {
     return false;
   }
 #endif
+  // for linux there is not need to set start to get
   return true;
 }
 

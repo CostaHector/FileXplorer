@@ -2,7 +2,7 @@
 #define AIMEDIATABLESMODEL_H
 
 #include <QAbstractTableModel>
-#include "AIMediaDuplicate.h"
+#include "DupVidsManager.h"
 
 class AiMediaTablesModel : public QAbstractTableModel {
  public:

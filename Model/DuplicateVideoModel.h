@@ -6,7 +6,7 @@
 #include <QMap>
 #include <QSet>
 #include <QString>
-#include "AIMediaDuplicate.h"
+#include "DupVidsManager.h"
 
 enum class DIFFER_BY_TYPE {
   DURATION = 0,
@@ -105,7 +105,7 @@ class VidInfoModel : public QAbstractTableModel {
 
  private:
   void resetBeforeAfterRow() { m_beforeRowN = m_afterRow = -1; }
-  void setDataChangedFlag() { memset(m_dataChangedFlag, true, (int)DIFFER_BY_TYPE::BOTTOM); }
+  inline void setDataChangedFlag() { std::fill(m_dataChangedFlag, m_dataChangedFlag + (int)DIFFER_BY_TYPE::BOTTOM, true); }
 
   int m_beforeRowN = -1, m_afterRow = -1;
   bool m_dataChangedFlag[(int)DIFFER_BY_TYPE::BOTTOM] = {0};

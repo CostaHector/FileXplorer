@@ -19,6 +19,9 @@ DuplicateVideosFinderActions::DuplicateVideosFinderActions(QObject* parent) : QO
   DIFFER_BY->addAction(DIFFER_BY_SIZE);
   DIFFER_BY->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
+  OPEN_DATABASE->setToolTip(QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
+                                .arg(OPEN_DATABASE->text(), OPEN_DATABASE->shortcut().toString()));
+
   RECYCLE_ONE_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key_Delete));
   RECYCLE_ONE_FILE->setToolTip(QString("(%1) Can Only Record 1 item at a time").arg(RECYCLE_ONE_FILE->shortcut().toString()));
 
@@ -39,19 +42,19 @@ QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
   m_tb->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   m_tb->addAction(DIFFER_BY_DURATION);
   if (durationDevLE == nullptr) {
-    int durDev =
-        Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
+    int durDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
     durationDevLE = new QLineEdit{QString::number(durDev), m_tb};
   }
   m_tb->addWidget(durationDevLE);
   m_tb->addSeparator();
   m_tb->addAction(DIFFER_BY_SIZE);
   if (sizeDevLE == nullptr) {
-    int szDev =
-        Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
+    int szDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
     sizeDevLE = new QLineEdit{QString::number(szDev), m_tb};
   }
   m_tb->addWidget(sizeDevLE);
+  m_tb->addSeparator();
+  m_tb->addAction(OPEN_DATABASE);
   m_tb->addSeparator();
   m_tb->addAction(RECYCLE_ONE_FILE);
   m_tb->addSeparator();
