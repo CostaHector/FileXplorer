@@ -2,6 +2,7 @@
 #include "PathTool.h"
 #include <QTextStream>
 #include <QDirIterator>
+#include "Logger.h"
 
 bool FsNodeEntry::operator==(const FsNodeEntry& rhs) const {
   return relativePathToNode == rhs.relativePathToNode && isDir == rhs.isDir && (isDir || contents == rhs.contents);
@@ -56,7 +57,7 @@ bool EntryExistsWindowsCaseSensitive(const QString& path, QDir::Filters filter =
 TDir::TDir() : mTempPath{mTempDir.path()}, mDir{mTempPath} {
   if (!IsValid()) {
     // dir.path() returns the unique directory path
-    qWarning("mTempDir is invalid");
+    LOG_W("mTempDir is invalid");
     return;
   }
 }
@@ -76,7 +77,7 @@ int TDir::createEntries(const QList<FsNodeEntry>& entries) {
       filesCreatedSucceedCnt += touch(entry.relativePathToNode, entry.contents);
     }
   }
-  qDebug("Files:%d/%d, Folders:%d/%d created succeed", filesEntryCnt, filesCreatedSucceedCnt, foldersEntryCnt, folderCreatedSucceedCnt);
+  LOG_D("Files:%d/%d, Folders:%d/%d created succeed", filesEntryCnt, filesCreatedSucceedCnt, foldersEntryCnt, folderCreatedSucceedCnt);
   return filesCreatedSucceedCnt + folderCreatedSucceedCnt;
 }
 
@@ -102,23 +103,23 @@ QList<FsNodeEntry> TDir::getEntries(bool bFileContentMatter, const QDir::Filters
 
 bool TDir::touch(const QString& relativePathToFile, const QByteArray& contents) const {
   if (relativePathToFile.isEmpty()) {
-    qWarning("Relative Path to File cannot be empty");
+    LOG_W("Relative Path to File cannot be empty");
     return false;
   }
   if (!IsValid()) {
-    qWarning("mTempDir is invalid, cannot touch file[%s]", qPrintable(relativePathToFile));
+    LOG_W("mTempDir is invalid, cannot touch file[%s]", qPrintable(relativePathToFile));
     return false;
   }
   const QString fileAbsPath = mTempDir.filePath(relativePathToFile);
   const QString prepath = PathTool::absolutePath(fileAbsPath);
   if (QFile::exists(prepath)) {
     if (!QFileInfo{prepath}.isDir()) {
-      qWarning("path[%s] should be a directory but it is occupied by a file", qPrintable(prepath));
+      LOG_W("path[%s] should be a directory but it is occupied by a file", qPrintable(prepath));
       return false;
     }
   } else {
     if (!QDir{}.mkpath(prepath)) {
-      qWarning("mkpath[%s] failed cannot write", qPrintable(prepath));
+      LOG_W("mkpath[%s] failed cannot write", qPrintable(prepath));
       return false;
     }
   }
@@ -157,4 +158,43 @@ bool TDir::dirExists(const QString& folder, bool bWinCaseSensitive) const {
 
 QStringList TDir::entryList(const QDir::Filters filters, const QDir::SortFlags sort) const {
   return mDir.entryList(filters, sort);
+}
+
+AutoRollbackRename::AutoRollbackRename(QString srcPath, QString dstPath) //
+    : mSrcAbsFilePath(std::move(srcPath)) , mDstAbsFilePath(std::move(dstPath)) {}
+
+bool AutoRollbackRename::Execute() {
+  mNeedRollback = StartToRename("Rename to");
+  if (mNeedRollback) {
+    LOG_D("Rename ok. in rollback src is dst here and dst is src here");
+    mSrcAbsFilePath.swap(mDstAbsFilePath);
+  }
+  return mNeedRollback;
+}
+
+bool AutoRollbackRename::StartToRename(const QString& hintMsg) {
+  if (!QFile::exists(mSrcAbsFilePath)) {
+    mNeedRollback = false;
+    LOG_W("[%s] src file[%s] not exist. no need process", qPrintable(hintMsg), qPrintable(mSrcAbsFilePath));
+    return false;
+  }
+  if (QFile::exists(mDstAbsFilePath)) {
+    mNeedRollback = false;
+    LOG_W("[%s] dst file name[%s] already occupied. no need process", qPrintable(hintMsg), qPrintable(mDstAbsFilePath));
+    return false;
+  }
+  if (!QFile::rename(mSrcAbsFilePath, mDstAbsFilePath)) {
+    LOG_W("[%s] Rename[%s]->[%s] to failed. no need process", qPrintable(hintMsg), qPrintable(mSrcAbsFilePath), qPrintable(mDstAbsFilePath));
+    mNeedRollback = false;
+    return false;
+  }
+  return true;
+}
+
+AutoRollbackRename::~AutoRollbackRename() {
+  if (!mNeedRollback) {
+    LOG_D("Before rename failed or not execute, no need rollback here");
+    return;
+  }
+  StartToRename("Rename Rollback");
 }

@@ -247,6 +247,10 @@ find ./ -name "RemovedFileName*" -delete
 /home/ariel/Qt/5.15.2/gcc_64/bin/lrelease test_zh_CN.ts -qm test_zh_CN.qm
 ```
 
+## sqlite db browser recommend
+sudo apt update
+sudo apt install sqlitebrowser
+
 ## Snippets
 Edir/Preference/TextEditor/Snippets
 Add and fill contents below
@@ -442,3 +446,9 @@ sequenceDiagram
 | Finished signal triggers close | `finished_signal_drive_FreeMe_ok` | ✅ PASS |
 | Multiple notifications layout from top to bottom (with Y-coordinate wrapping) | `cards_tile_from_top_to_bottom_wrapped_ok` | ✅ PASS |
 | Multiple notifications layout from bottom to top (with Y-coordinate wrapping) | `cards_tile_from_bottom_to_top_wrapped_ok` | ✅ PASS |
+
+## Acknowledgments
+
+The database-related icons used in this application are sourced from the [DB Browser for SQLite](https://github.com/sqlitebrowser/sqlitebrowser) project. These icons are licensed under the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.html) (GPLv3).
+
+We extend our sincere thanks to the DB Browser for SQLite development team and contributor community for their excellent work.

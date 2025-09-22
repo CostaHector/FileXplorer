@@ -1,7 +1,7 @@
 ﻿#include "FileExplorerEvent.h"
 
 #include "ArchiveFilesActions.h"
-#include "ArrangeActions.h"
+#include "FileRenameRulerActions.h"
 #include "FileBasicOperationsActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
@@ -183,7 +183,7 @@ bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool ski
   ThumbnailProcesser tp{skipIfExist};
   int extractedOutCnt = tp(currentPath, beg, end);
   if (!tp.mErrImg.isEmpty()) {
-    LOG_INFO_P("Extract Failed", "%d images, as follows:\n", extractedOutCnt, qPrintable(tp.mErrImg.join('\n')));
+    LOG_INFO_P("Extract Failed", "%d images, as follows:\n%s", extractedOutCnt, qPrintable(tp.mErrImg.join('\n')));
     return false;
   }
   if (extractedOutCnt == 0) {
@@ -380,7 +380,6 @@ void FileExplorerEvent::subscribe() {
     connect(fileOpInst.COPY, &QAction::triggered, this, &FileExplorerEvent::on_Copy);
     connect(fileOpInst.PASTE, &QAction::triggered, this, &FileExplorerEvent::on_Paste);
 
-    connect(fileOpInst._NAME_RULER, &QAction::triggered, this, &FileExplorerEvent::on_NameStandardize);
     connect(fileOpInst._PACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileClassify);
     connect(fileOpInst._UNPACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileUnclassify);
     connect(fileOpInst._LOW_RESOLUTION_IMGS_RMV, &QAction::triggered, this, &FileExplorerEvent::on_RemoveDuplicateImages);
@@ -404,6 +403,11 @@ void FileExplorerEvent::subscribe() {
       RenameWidget_LongPath pToLongPath{_contentPane};
       on_Rename(pToLongPath);
     });
+  }
+
+  {
+    auto& rulerInst = g_NameRulerActions();
+    connect(rulerInst._NAME_RULER, &QAction::triggered, this, &FileExplorerEvent::on_NameStandardize);
   }
 
   {
@@ -463,8 +467,6 @@ void FileExplorerEvent::subscribe() {
     connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileExplorerEvent::on_HarView);
     connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileExplorerEvent::on_PlayVideo);
   }
-
-  g_ArrangeActions().subscribe();
 }
 
 void FileExplorerEvent::on_Rename(AdvanceRenamer& renameWid) {

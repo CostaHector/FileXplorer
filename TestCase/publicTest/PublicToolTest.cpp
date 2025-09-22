@@ -50,33 +50,33 @@ class PublicToolTest : public PlainTestSuite {
 
   void file_read_write_ok() {
     const QString inexistFileTextPath{"any random inexists path.txt"};
-    QCOMPARE(GetLastNLinesOfFile(inexistFileTextPath, 10), "");
-    QCOMPARE(TextReader(inexistFileTextPath), "");
+    QCOMPARE(FileTool::GetLastNLinesOfFile(inexistFileTextPath, 10), "");
+    QCOMPARE(FileTool::TextReader(inexistFileTextPath), "");
 
     TDir tDir;
     tDir.touch("randomTextFile.txt", "0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
     const QString textFileAbsPath = tDir.itemPath("randomTextFile.txt");
 
-    QByteArray last0ba = GetLastNLinesOfFile(textFileAbsPath, 0);
+    QByteArray last0ba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 0);
     QCOMPARE(last0ba, "");
 
-    QByteArray last1ba = GetLastNLinesOfFile(textFileAbsPath, 1);
+    QByteArray last1ba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 1);
     QCOMPARE(last1ba, "9");
 
-    QByteArray last5ba = GetLastNLinesOfFile(textFileAbsPath, 5);
+    QByteArray last5ba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 5);
     QCOMPARE(last5ba, "5\n6\n7\n8\n9");
 
     QCOMPARE(QFile::exists(textFileAbsPath), true);          // file already exist. not override with OpenModeFlag::NewOnly
-    QCOMPARE(TextWriter(textFileAbsPath, "Cannot override",  //
+    QCOMPARE(FileTool::TextWriter(textFileAbsPath, "Cannot override",  //
                         QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::NewOnly),
              false);
-    QByteArray lastAllba = GetLastNLinesOfFile(textFileAbsPath, 100);
+    QByteArray lastAllba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 100);
     QCOMPARE(lastAllba, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
 
-    QCOMPARE(TextWriter(textFileAbsPath, "Can only override",  //
+    QCOMPARE(FileTool::TextWriter(textFileAbsPath, "Can only override",  //
                         QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::ExistingOnly),
              true);
-    QCOMPARE(TextReader(textFileAbsPath), "Can only override");
+    QCOMPARE(FileTool::TextReader(textFileAbsPath), "Can only override");
   }
 
   void CreateUserPath_ok() {  // UserPath is Service Running Precondition

@@ -244,7 +244,7 @@ class NavigationExToolBarTest : public PlainTestSuite {
     naviExToolBar.UnpinAll();
     QList<QAction*> actList2FromAG = naviExToolBar.mCollectPathAgs->actions();
     QCOMPARE(actList2FromAG.size(), valuesCount);                      // ag not cleared until parent destructed
-    emit naviExToolBar.mCollectPathAgs->triggered(actList1FromAG[0]);  // emit not crack down
+    emit naviExToolBar.mCollectPathAgs->triggered(actList1FromAG[0]);  // emit not crash down
     QList<QAction*> actList2DirectFromTb = naviExToolBar.actions();
     QCOMPARE(actList2DirectFromTb.size(), 0);  // action directly from toolbar empty
 

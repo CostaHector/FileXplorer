@@ -136,7 +136,7 @@ bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const Q
     return true;
   }
   LOG_D("Read file [%s]", qPrintable(filePath));
-  const QString& fileContents = TextReader(filePath);
+  const QString& fileContents = FileTool::TextReader(filePath);
   // Todo: new feature on the way: regex match, parms text is a wildcard
   return fileContents.contains(contained, m_fileContentsCaseSensitive);
 }

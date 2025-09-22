@@ -7,32 +7,11 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QCoreApplication>
+#include <QDesktopServices>
 #include <QDir>
 #include <QTextStream>
 
-QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG) {
-  if (oldAG == nullptr) {
-    LOG_C("oldAG is nullptr");
-    return "";
-  }
-  QString i_1_path = first_path;              // first and (i-1) path
-  foreach (QAction* act, oldAG->actions()) {  // i path
-    QString i_path = act->text();
-    if (i_path == first_path) {
-      act->setText(i_1_path);  // finish
-      break;
-    }
-    act->setText(i_1_path);
-    i_1_path = i_path;
-  }
-  QStringList actionList;
-  actionList.reserve(oldAG->actions().size());
-  foreach (const QAction* act, oldAG->actions()) {
-    actionList += act->text();
-  }
-  return actionList.join('\n');
-}
-
+namespace FileTool {
 QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
   if (maxLines <= 0) {
     return "";
@@ -116,6 +95,20 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
   return true;
 }
 
+bool OpenLocalFileUsingDesktopService(const QString& localFilePath) {
+  if (!QFile::exists(localFilePath)) {
+    LOG_W("Cannot open. File [%s] not exist.", qPrintable(localFilePath));
+    return false;
+  }
+#ifndef RUNNING_UNIT_TESTS
+  return QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
+#else
+  return true;
+#endif
+}
+
+}  // namespace FileTool
+
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   if (!QFileInfo(defaultPath).isDir()) {
     defaultPath = Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
@@ -128,6 +121,29 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   }
   Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
   return dstFi.absoluteFilePath();
+}
+
+QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG) {
+  if (oldAG == nullptr) {
+    LOG_C("oldAG is nullptr");
+    return "";
+  }
+  QString i_1_path = first_path;              // first and (i-1) path
+  foreach (QAction* act, oldAG->actions()) {  // i path
+    QString i_path = act->text();
+    if (i_path == first_path) {
+      act->setText(i_1_path);  // finish
+      break;
+    }
+    act->setText(i_1_path);
+    i_1_path = i_path;
+  }
+  QStringList actionList;
+  actionList.reserve(oldAG->actions().size());
+  foreach (const QAction* act, oldAG->actions()) {
+    actionList += act->text();
+  }
+  return actionList.join('\n');
 }
 
 bool LoadCNLanguagePack(QTranslator& translator, QString qmName) {

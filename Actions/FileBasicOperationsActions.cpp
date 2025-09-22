@@ -69,7 +69,6 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   SELECT_INVERT = new (std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), "Invert selection");
   SELECTION_RIBBONS = Get_SELECTION_RIBBON_Action();
 
-  _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), "Name Ruler");
   _PACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/PACK_FOLDERS"), "Packer");
   _UNPACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), "Unpacker");
   _RETURN_ERROR_CODE_UPON_ANY_FAILURE = new (std::nothrow) QAction(QIcon(":img/FAIL_FAST"), "Fail fast");
@@ -295,10 +294,6 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
 }
 
 void FileBasicOperationsActions::FolderFileCategoryProcess() {
-  _NAME_RULER->setToolTip(
-      "<b>Standardized Files/Folders Name under current view path</b><br/>"
-      "Given: [A..mp4, A (1).jpg, A -- 2.json]<br/>"
-      "Result: [A.mp4, A - 1.jpg, A - 2.json]");
   _PACK_FOLDERS->setToolTip(
       "<b>Category Files/Folders Name under current view path</b><br/>"
       "Move [A.mp4, A.jpg, A.json]<br/>"

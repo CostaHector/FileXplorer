@@ -59,7 +59,7 @@ bool HarFiles::operator()(const QString& harAbsPath) {
   LOG_D("parse har file[%s] start...", qPrintable(harAbsPath));
   init();
   mHarFilePath = harAbsPath;
-  const QString& jsonStr = TextReader(harAbsPath);
+  const QString& jsonStr = FileTool::TextReader(harAbsPath);
   if (jsonStr.isEmpty()) {
     return false;
   }

@@ -64,7 +64,7 @@ pause)"
   const QString addContextMenuBatContent = ADD_CONTEXT_MENU_BAT_CONTENT_TEMPLATE.arg(PROJECT_NAME).arg(exeNativePath);
 
   const QString batNativeFileAbsPath = GetTempBatFileAbsPathForWrite("AddContextMenuForThisProgram.bat");
-  const bool writeResult = TextWriter(batNativeFileAbsPath, addContextMenuBatContent, QIODevice::WriteOnly | QIODevice::Text);
+  const bool writeResult = FileTool::TextWriter(batNativeFileAbsPath, addContextMenuBatContent, QIODevice::WriteOnly | QIODevice::Text);
   if (!writeResult) {
     LOG_W("[Failed] When write into file %s", qPrintable(batNativeFileAbsPath));
     return false;
@@ -88,7 +88,7 @@ pause)"
   const QString rmvContextMenuBatContent = RMV_CONTEXT_MENU_BAT_CONTENT_TEMPLATE.arg(PROJECT_NAME);
 
   const QString batNativeFileAbsPath = GetTempBatFileAbsPathForWrite("RmvContextMenuForThisProgram.bat");
-  const bool writeResult = TextWriter(batNativeFileAbsPath, rmvContextMenuBatContent, QIODevice::WriteOnly | QIODevice::Text);
+  const bool writeResult = FileTool::TextWriter(batNativeFileAbsPath, rmvContextMenuBatContent, QIODevice::WriteOnly | QIODevice::Text);
   if (!writeResult) {
     LOG_W("[Failed] When write into file %s", qPrintable(batNativeFileAbsPath));
     return false;
