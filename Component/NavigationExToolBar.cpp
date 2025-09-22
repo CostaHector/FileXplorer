@@ -15,7 +15,7 @@
 #include <QLayout>
 #include <QStyle>
 
-T_IntoNewPath NavigationExToolBar::m_IntoNewPath{nullptr};
+T_IntoNewPath NavigationExToolBar::m_IntoNewPathNavi{nullptr};
 constexpr char NavigationExToolBar::EXTRA_NAVI_DICT[];
 constexpr char NavigationExToolBar::EXTRA_NAVI_DICT_KEY[];
 constexpr char NavigationExToolBar::EXTRA_NAVI_DICT_VALUE[];
@@ -134,7 +134,7 @@ void NavigationExToolBar::ReadSettings() {
 void NavigationExToolBar::Subscribe() {
   connect(UNPIN_THIS, &QAction::triggered, this, &NavigationExToolBar::UnpinThis);
   connect(UNPIN_ALL, &QAction::triggered, this, &NavigationExToolBar::UnpinAll);
-  connect(mCollectPathAgs, &QActionGroup::triggered, this, &NavigationExToolBar::onPathActionTriggered);
+  connect(mCollectPathAgs, &QActionGroup::triggered, &NavigationExToolBar::onPathActionTriggeredNavi);
 }
 
 bool NavigationExToolBar::UnpinThis() {
@@ -183,8 +183,8 @@ void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folde
   SetLayoutAlightment(layout(), Qt::AlignmentFlag::AlignLeft);
 }
 
-bool NavigationExToolBar::onPathActionTriggered(const QAction* pAct) {
-  CHECK_NULLPTR_RETURN_FALSE(m_IntoNewPath);
+bool NavigationExToolBar::onPathActionTriggeredNavi(const QAction* pAct) {
+  CHECK_NULLPTR_RETURN_FALSE(m_IntoNewPathNavi);
   CHECK_NULLPTR_RETURN_FALSE(pAct);
-  return m_IntoNewPath(pAct->toolTip(), true, true);
+  return m_IntoNewPathNavi(pAct->toolTip(), true, true);
 }

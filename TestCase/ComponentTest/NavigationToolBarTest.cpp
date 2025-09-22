@@ -7,16 +7,16 @@
 #include "EndToExposePrivateMember.h"
 #include "DevicesDrivesActions.h"
 #include "DevicesDrivesTV.h"
+#include "Logger.h"
 
 class NavigationToolBarTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
   void uers_fixed_folder_actions_into_new_path_correct() {
-    IntoNewPathParms actualParams;
-    IntoNewPathMocker mocker{&actualParams};
-    NavigationExToolBar::BindIntoNewPath(mocker);
-
+    IntoNewPathParms::GetInst().clear();
+    IntoNewPathMocker mocker;
+    NavigationExToolBar::BindIntoNewPathNavi(mocker);
     NavigationToolBar naviTooBar{"Navi toolbar"};
     QList<QAction*> plainActLsts = naviTooBar.actions();
     QVERIFY(!plainActLsts.isEmpty());
@@ -28,7 +28,7 @@ class NavigationToolBarTest : public PlainTestSuite {
     pFirstAct->setChecked(true);
     emit pFirstAct->toggled(true);
     QVERIFY(naviTooBar.mDevDriveTV != nullptr);
-    QCOMPARE(actualParams.m_newPath, "");
+    QCOMPARE(IntoNewPathParms::GetInst().m_newPath, "");
     QCOMPARE(naviTooBar.mDevDriveTV->isVisible(), true);
     pFirstAct->setChecked(false);
     emit pFirstAct->toggled(false);
@@ -52,8 +52,8 @@ class NavigationToolBarTest : public PlainTestSuite {
         continue;
       }
       emit naviTooBar.actionTriggered(action);
-      QVERIFY(!actualParams.m_newPath.isEmpty());
-      QVERIFY(QFile::exists(actualParams.m_newPath));
+      QVERIFY(!IntoNewPathParms::GetInst().m_newPath.isEmpty());
+      QVERIFY(QFile::exists(IntoNewPathParms::GetInst().m_newPath));
     }
   }
 };

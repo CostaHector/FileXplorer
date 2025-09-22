@@ -73,6 +73,6 @@ void NavigationToolBar::subscribe() {
     if (pAct == DevicesDrivesActions::Inst().DEVICES_AND_DRIVES) {
       return;
     }
-    NavigationExToolBar::onPathActionTriggered(pAct);
+    NavigationExToolBar::onPathActionTriggeredNavi(pAct);
   });
 }

@@ -22,11 +22,11 @@ class NavigationExToolBar : public ReorderableToolBar {
   void contextMenuEvent(QContextMenuEvent* event) override;
 
   void AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath);
-  static void BindIntoNewPath(T_IntoNewPath IntoNewPath) { m_IntoNewPath = IntoNewPath; }
-  static bool onPathActionTriggered(const QAction* pAct);
+  static void BindIntoNewPathNavi(T_IntoNewPath IntoNewPath) { m_IntoNewPathNavi = IntoNewPath; }
+  static bool onPathActionTriggeredNavi(const QAction* pAct);
 
  private:
-  static T_IntoNewPath m_IntoNewPath;
+  static T_IntoNewPath m_IntoNewPathNavi;
 
   QPoint mDragStartPosition;
   QAction *UNPIN_THIS{nullptr}, *UNPIN_ALL{nullptr};
