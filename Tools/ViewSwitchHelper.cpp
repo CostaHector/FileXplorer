@@ -48,7 +48,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
                 } //
             };
         _navigation->m_addressBar->BindFileSystemViewCallback(fIntoNewPath, fSearchTextChanged, fSearchEnterKey, _view->m_fsModel);
-        NavigationExToolBar::BindIntoNewPath(fIntoNewPath);
+        NavigationExToolBar::BindIntoNewPathNavi(fIntoNewPath);
       }
       naviIndex = _navigation->m_name2StackIndex[ViewType::TABLE];
       break;

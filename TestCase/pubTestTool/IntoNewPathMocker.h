@@ -10,22 +10,25 @@ struct IntoNewPathParms {
   bool operator==(const IntoNewPathParms& rhs) const {
     return m_newPath == rhs.m_newPath && m_isNewPath == rhs.m_isNewPath && m_isF5Force == rhs.m_isF5Force;
   }
+
+  static IntoNewPathParms& GetInst() {
+    static IntoNewPathParms inst;
+    return inst;
+  }
+
+  void clear() {
+    m_newPath.clear();
+    m_isNewPath = m_isF5Force = false;
+  }
 };
 
 struct IntoNewPathMocker {
-  explicit IntoNewPathMocker(IntoNewPathParms* pOutPara) { mOutPara = pOutPara; }
   bool operator()(QString newPath, bool isNewPath, bool isF5Force) const {
-    if (mOutPara == nullptr) {
-      return false;
-    }
-    mOutPara->m_newPath = newPath;
-    mOutPara->m_isNewPath = isNewPath;
-    mOutPara->m_isF5Force = isF5Force;
+    IntoNewPathParms::GetInst().m_newPath = newPath;
+    IntoNewPathParms::GetInst().m_isNewPath = isNewPath;
+    IntoNewPathParms::GetInst().m_isF5Force = isF5Force;
     return true;
   }
-
-  IntoNewPathParms* mOutPara{nullptr};
-  mutable int callCount = 0;
 };
 
 #endif  // INTONEWPATHMOCKER_H
