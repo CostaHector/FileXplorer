@@ -15,7 +15,7 @@
 #include <QSqlError>
 #include <QSqlDriver>
 
-const QString rootpath = TESTCASE_ROOT_PATH "/test/TestEnv_VideosDurationGetter";
+const QString rootpath = TESTCASE_ROOT_PATH "/test/TestEnvVideosDurationGetter";
 const QString dbName = TESTCASE_ROOT_PATH "/test/FD_MOVIE_DB_CONN.db";
 
 class FdBasedDbTest : public PlainTestSuite {

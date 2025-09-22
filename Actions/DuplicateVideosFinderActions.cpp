@@ -1,84 +1,105 @@
 #include "DuplicateVideosFinderActions.h"
-
+#include "PublicVariable.h"
+#include "PublicMacro.h"
+#include "MemoryKey.h"
 #include <QLineEdit>
 #include <QMenu>
 #include <QLabel>
-#include "PublicVariable.h"
-#include "MemoryKey.h"
-
-DuplicateVideosFinderActions& g_dupVidFinderAg() {
-  static DuplicateVideosFinderActions ins;
-  return ins;
-}
 
 DuplicateVideosFinderActions::DuplicateVideosFinderActions(QObject* parent) : QObject{parent} {
-  DIFFER_BY_DURATION->setToolTip("Value in [a-dev/2, a+dev/2) will be classified to a\nUnit: ms");
-  DIFFER_BY_SIZE->setToolTip("Value in [a-dev/2, a+dev/2) will be classified to a\nUnit: Byte");
+  DIFFER_BY_DURATION = new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, "Duration Tolerance (ms)", this};
+  CHECK_NULLPTR_RETURN_VOID(DIFFER_BY_DURATION);
+  DIFFER_BY_DURATION->setToolTip("Values within [reference - tolerance/2, reference + tolerance/2) are grouped together\nUnit: milliseconds");
+  DIFFER_BY_DURATION->setCheckable(true);
 
+  DIFFER_BY_SIZE = new (std::nothrow) QAction{QIcon{":img/FILE_SIZE"}, "Size Tolerance (B)", this};
+  CHECK_NULLPTR_RETURN_VOID(DIFFER_BY_SIZE);
+  DIFFER_BY_SIZE->setToolTip("Values within [reference - tolerance/2, reference + tolerance/2) are grouped together\nUnit: bytes");
+  DIFFER_BY_SIZE->setCheckable(true);
+  DIFFER_BY_SIZE->setChecked(true);
+
+  DIFFER_BY = new (std::nothrow) QActionGroup{this};
+  CHECK_NULLPTR_RETURN_VOID(DIFFER_BY);
   DIFFER_BY->addAction(DIFFER_BY_DURATION);
   DIFFER_BY->addAction(DIFFER_BY_SIZE);
   DIFFER_BY->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
-  OPEN_DATABASE->setToolTip(QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
+  OPEN_DATABASE = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "&Open Database", this};
+  CHECK_NULLPTR_RETURN_VOID(OPEN_DATABASE);
+  OPEN_DATABASE->setToolTip(QString("<b>%1 (%2)</b><br/>Open SQLite database files (*.db)<br/>Requires DB Browser for SQLite to be installed and set "
+                                    "as the default application")
                                 .arg(OPEN_DATABASE->text(), OPEN_DATABASE->shortcut().toString()));
 
-  RECYCLE_ONE_FILE->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key_Delete));
-  RECYCLE_ONE_FILE->setToolTip(QString("(%1) Can Only Record 1 item at a time").arg(RECYCLE_ONE_FILE->shortcut().toString()));
+  RECYCLE_SELECTIONS = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this};
+  CHECK_NULLPTR_RETURN_VOID(RECYCLE_SELECTIONS);
+  RECYCLE_SELECTIONS->setShortcut(QKeySequence(Qt::Key_Delete));
+  RECYCLE_SELECTIONS->setToolTip(QString("(%1) Move selected items to recycle bin").arg(RECYCLE_SELECTIONS->shortcut().toString()));
 
-  for (auto* act : DIFFER_BY->actions()) {
-    act->setCheckable(true);
-  }
-  DIFFER_BY_SIZE->setChecked(true);
+  CLEAR_ANALYSIS_LIST = new (std::nothrow) QAction{"Clear Analyse", this};
+  CHECK_NULLPTR_RETURN_VOID(CLEAR_ANALYSIS_LIST);
+  CLEAR_ANALYSIS_LIST->setToolTip("Clear current analyse list");
 
-  SCAN_A_PATH->setToolTip("Skip if table already exist. Create a table then insert records into it.");
-  ANALYSE_THESE_TABLES->setToolTip("Analyse this tables");
-  AUDIT_AI_MEDIA_TABLE->setToolTip("Will delete record if driver online and abspath item is no longer exist.");
-  DROP_TABLE->setToolTip("Will drop a table.");
-  DROP_THEN_REBUILD_THIS_TABLE->setToolTip("Will drop a table then rebuild it.");
+  ANALYSE_THESE_TABLES = new (std::nothrow) QAction{QIcon(":img/ANALYSE_AI_MEDIA_TABLES"), "Analyse", this};
+  CHECK_NULLPTR_RETURN_VOID(ANALYSE_THESE_TABLES);
+  ANALYSE_THESE_TABLES->setToolTip("Append records from selected tables to the current analysis list");
+
+  SCAN_A_PATH = new (std::nothrow) QAction{QIcon(":img/LOAD_A_PATH"), "Scan a path", this};
+  CHECK_NULLPTR_RETURN_VOID(SCAN_A_PATH);
+  SCAN_A_PATH->setToolTip("Scan videos from a directory and populate the table with their information");
+
+  AUDIT_THESE_TABLES = new (std::nothrow) QAction{QIcon{":img/AUDIT_AI_MEDIA_DUP"}, "Audit", this};
+  CHECK_NULLPTR_RETURN_VOID(AUDIT_THESE_TABLES);
+  AUDIT_THESE_TABLES->setToolTip("Validate table records and update if corresponding files are missing");
+
+  DROP_THESE_TABLES = new (std::nothrow) QAction{QIcon{":img/DROP_TABLE"}, "Drop Tables", this};
+  CHECK_NULLPTR_RETURN_VOID(DROP_THESE_TABLES);
+  DROP_THESE_TABLES->setToolTip("Delete selected table(s)");
+
+  FORCE_RELOAD_TABLES = new (std::nothrow) QAction{QIcon{":img/REFRESH_THIS_PATH"}, "Force reload", this};
+  CHECK_NULLPTR_RETURN_VOID(FORCE_RELOAD_TABLES);
+  FORCE_RELOAD_TABLES->setToolTip("Delete selected table(s) and reload them from source");
 }
 
-QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QWidget* parent) {
-  QToolBar* m_tb{new QToolBar{"Duplicator finder toolbar", parent}};
+QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QLineEdit* tableNameFilterLE, QLineEdit* sizeDevLE, QLineEdit* durationDevLE, QWidget* parent) {
+  CHECK_NULLPTR_RETURN_NULLPTR(tableNameFilterLE);
+  CHECK_NULLPTR_RETURN_NULLPTR(sizeDevLE);
+  CHECK_NULLPTR_RETURN_NULLPTR(durationDevLE);
+
+  QToolBar* m_tb = new (std::nothrow) QToolBar{"Duplicator finder toolbar", parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_tb);
+
   m_tb->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   m_tb->addAction(DIFFER_BY_DURATION);
-  if (durationDevLE == nullptr) {
-    int durDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
-    durationDevLE = new QLineEdit{QString::number(durDev), m_tb};
-  }
   m_tb->addWidget(durationDevLE);
   m_tb->addSeparator();
   m_tb->addAction(DIFFER_BY_SIZE);
-  if (sizeDevLE == nullptr) {
-    int szDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
-    sizeDevLE = new QLineEdit{QString::number(szDev), m_tb};
-  }
   m_tb->addWidget(sizeDevLE);
   m_tb->addSeparator();
   m_tb->addAction(OPEN_DATABASE);
   m_tb->addSeparator();
-  m_tb->addAction(RECYCLE_ONE_FILE);
+  m_tb->addAction(RECYCLE_SELECTIONS);
   m_tb->addSeparator();
-  m_tb->addWidget(new QLabel{"Filter:", m_tb});
-  if (tblKWFilter == nullptr) {
-    tblKWFilter = new QLineEdit{"", m_tb};
-    tblKWFilter->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
-  }
-  m_tb->addWidget(tblKWFilter);
+  m_tb->addWidget(tableNameFilterLE);
   m_tb->addSeparator();
   return m_tb;
 }
 
 QMenu* DuplicateVideosFinderActions::GetMenu(QWidget* parent) {
-  auto* menu = new QMenu{"Ai Media Duplicate Menu", parent};
+  auto* menu = new (std::nothrow) QMenu{"Ai Media Duplicate Menu", parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(menu);
   menu->addAction(ANALYSE_THESE_TABLES);
   menu->addSeparator();
   menu->addAction(SCAN_A_PATH);
+  menu->addAction(FORCE_RELOAD_TABLES);
+  menu->addAction(AUDIT_THESE_TABLES);
   menu->addSeparator();
-  menu->addAction(AUDIT_AI_MEDIA_TABLE);
+  menu->addAction(DROP_THESE_TABLES);
   menu->addSeparator();
-  menu->addAction(DROP_TABLE);
-  menu->addAction(DROP_THEN_REBUILD_THIS_TABLE);
-  menu->addSeparator();
-  menu->addAction(CANCEL_ANALYSE);
+  menu->addAction(CLEAR_ANALYSIS_LIST);
   return menu;
+}
+
+DuplicateVideosFinderActions& g_dupVidFinderAg() {
+  static DuplicateVideosFinderActions ins;
+  return ins;
 }

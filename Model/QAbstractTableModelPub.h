@@ -7,6 +7,7 @@
 class QAbstractTableModelPub : public QAbstractTableModel {
  public:
   QAbstractTableModelPub(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
+
   void RowsCountBeginChange(int beforeRow, int afterRow) {
     m_befRow = beforeRow;
     m_aftRow = afterRow;
@@ -33,6 +34,9 @@ class QAbstractTableModelPub : public QAbstractTableModel {
       endRemoveRows();
     }
   }
+
+  template<typename SwappableContainerDataType>
+  void RowsCountChange(SwappableContainerDataType& lhs, SwappableContainerDataType& rhs);
 
   void ColumnsCountBeginChange(int beforeColumnCnt, int afterColumnCnt) {
     m_befCol = beforeColumnCnt;
@@ -67,5 +71,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
   int m_befRow{-1}, m_aftRow{-1};
   int m_befCol{-1}, m_aftCol{-1};
 };
+
+extern template void QAbstractTableModelPub::RowsCountChange<QStringList>(QStringList&, QStringList&);
 
 #endif  // QABSTRACTTABLEMODELPUB_H

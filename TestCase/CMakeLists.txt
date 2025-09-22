@@ -47,6 +47,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Tools/FileDescriptor/*.cpp
     ${PARENT_DIR}/Tools/Json/*.cpp
     ${PARENT_DIR}/View/*.cpp
+    ${PARENT_DIR}/View/DupVideos/*.cpp
     # test only module sources
     *.cpp
     ActionsTest/*.cpp
@@ -61,6 +62,7 @@ file(GLOB SOURCES
     RenameTest/*.cpp
     ToolsTest/*.cpp
     ViewTest/*.cpp
+    ViewTest/DupVideosTest/*.cpp
 )
 
 list(LENGTH SOURCES src_cpp_count)
@@ -86,6 +88,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/FileDescriptor
     ${PARENT_DIR}/Tools/Json
     ${PARENT_DIR}/View
+    ${PARENT_DIR}/View/DupVideos
     ./
     pubTestTool
 )
@@ -107,6 +110,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
     ${PARENT_DIR}/View/*.h
+    ${PARENT_DIR}/View/DupVideos/*.h
     pubTestTool/*.h
 )
 

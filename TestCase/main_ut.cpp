@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     p2Suite = &exclusiveSuite;
   }
   QStringList failedTestCaseNames;
-  for (const auto& testHelper: *p2Suite) {
+  for (const TestCaseHelper& testHelper: *p2Suite) {
     std::unique_ptr<QObject> pTestObj(testHelper.pCreater());
     if (pTestObj == nullptr) {
       failedTestCaseNames.push_back("new testcase but return a nullptr:" + testHelper.locatedIn);
@@ -44,6 +44,10 @@ int main(int argc, char* argv[]) {
                     "\n----------OK----------OK----------OK----------\n", shouldExecCnt, skippedCnt);
     fflush(stdout);
   }
+
+  // explicit clear two testcase lambdas vector
+  sharedSuite.clear();
+  exclusiveSuite.clear();
   return failedTestCaseNames.size();
 }
 

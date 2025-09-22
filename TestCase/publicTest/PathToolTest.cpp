@@ -318,8 +318,12 @@ class PathToolTest : public PlainTestSuite {
   }
 
   void test_Basic() {  //
+    // not contains special word, last 3 part
     QCOMPARE("123", PathTool::GetEffectiveName("123"));
     QCOMPARE("B/C.ext", PathTool::GetEffectiveName("C:/A/B/C.ext"));
+    QCOMPARE("SampleVideos/C.ext", PathTool::GetEffectiveName("C:/A/SampleVideos/C.ext"));
+
+    // contains special word, last 3 part
     QCOMPARE("A/Videos/C.ext", PathTool::GetEffectiveName("C:/A/Videos/C.ext"));
     QCOMPARE("A/Video/C.ext", PathTool::GetEffectiveName("C:/A/Video/C.ext"));
     QCOMPARE("A/Vid/C.ext", PathTool::GetEffectiveName("C:/A/Vid/C.ext"));

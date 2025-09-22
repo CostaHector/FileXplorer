@@ -6,7 +6,7 @@
 #include "VideoDurationGetter.h"
 #include "PlainTestSuite.h"
 
-const QString VIDEOS_DURATION_DIR = TESTCASE_ROOT_PATH "/test/TestEnv_VideosDurationGetter";
+const QString VIDEOS_DURATION_DIR = TESTCASE_ROOT_PATH "/test/TestEnvVideosDurationGetter";
 class VideosDurationGetterTest : public PlainTestSuite {
   Q_OBJECT
  public:
