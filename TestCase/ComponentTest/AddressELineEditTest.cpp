@@ -102,14 +102,12 @@ private slots:
 
   void test_clickPathAction_RemainsInClickMode_and_PathChanged_ok() {
     AddressELineEdit addressLe;
-    addressLe.show();
 
     // Set test path
     QVERIFY(mTEST_PATH_PART_LIST.size() >= 2);
 
     addressLe.updateAddressToolBarPathActions(mTEST_PATH);  // Before: QToolBar Click Mode
     QCOMPARE(addressLe.m_pathComboBox->currentText(), mTEST_PATH);
-    QVERIFY(QTest::qWaitForWindowActive(&addressLe));
 
     // Ensure toolbar has actions
     QToolBar* tb = addressLe.m_pathActionsTB;
@@ -117,11 +115,19 @@ private slots:
     QVERIFY(!actsLst.isEmpty());
     QAction* firstAct = actsLst[0];  // for linux, index 0 is ""
     QVERIFY(firstAct != nullptr);
-    QToolButton* firstButton = qobject_cast<QToolButton*>(tb->widgetForAction(firstAct));  // Click toolbutton directly instead of QToolBar!
     QCOMPARE(firstAct->text(), "");
+
+    QToolButton* firstButton = qobject_cast<QToolButton*>(tb->widgetForAction(firstAct));  // Click toolbutton directly instead of QToolBar!
+    QVERIFY(firstButton != nullptr);
+
+    addressLe.show();
+    addressLe.activateWindow();
+    QVERIFY(QTest::qWaitForWindowActive(&addressLe));
+
     QSignalSpy spyToolBarActionTriggered(tb, &QToolBar::actionTriggered);
     QTest::mouseClick(firstButton, Qt::LeftButton, Qt::NoModifier, {}, 50);
     QTRY_COMPARE(spyToolBarActionTriggered.count(), 1);  // should emit m_pathActionsTB.triggered(firstAction)!
+
     QList<QVariant> actionTriggeredParams = spyToolBarActionTriggered.last();
     QCOMPARE(actionTriggeredParams.size(), 1);
     QVariant actVariant = actionTriggeredParams.front();
@@ -181,12 +187,12 @@ private slots:
     QString dstFilePath = tdir.itemPath("henry cavill need copy.txt");
 
     AddressELineEdit addressLe;
-    addressLe.show();
-    QVERIFY(QTest::qWaitForWindowActive(&addressLe));
-    addressLe.move(0, 0);
-    addressLe.setMinimumWidth(1024);
     addressLe.updateAddressToolBarPathActions(subPath);  // 进入到tdir/subfolder路径下
-    QTest::qWait(100);
+    addressLe.move(0, 0);
+    addressLe.adjustSize();
+    addressLe.show();
+    addressLe.activateWindow();
+    QTRY_VERIFY(QTest::qWaitForWindowActive(&addressLe));
 
     QList<QAction*> actsLst = addressLe.m_pathActionsTB->actions();
     QVERIFY(actsLst.size() > 2);

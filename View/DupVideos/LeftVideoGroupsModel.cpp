@@ -151,7 +151,7 @@ int LeftVideoGroupsModel::setDeviationSize(qint64 newSize) {
   }
   Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, newSize);
 
-  const int oldSize{newSize};
+  const qint64 oldSize{newSize};
   const int beforeRowCnt = rowCount();
   GroupedDupVidList newSizeGroupedLst = getSizeLst(m_plainDupVidLst, newSize);
   const int afterRowCnt = rowCountHelper(newSizeGroupedLst);

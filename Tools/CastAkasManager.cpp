@@ -61,5 +61,6 @@ int CastAkasManager::ForceReloadImpl() {
 #ifdef RUNNING_UNIT_TESTS
 int CastAkasManager::ResetStateForTestImpl(const QString& localFilePath) {
   InitializeImpl(localFilePath);
+  return 0;
 }
 #endif

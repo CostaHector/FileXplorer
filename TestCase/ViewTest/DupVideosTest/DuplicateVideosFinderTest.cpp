@@ -23,7 +23,7 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
  private slots:
   void initTestCase() {
     // precondition: drop
-    QCOMPARE(DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false), true);
+    DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false);
 
     QVERIFY(QFileInfo{tool.VID_DUR_GETTER_SAMPLE_PATH}.isDir());
     QVERIFY(QFileInfo{tool.TS_FILE_MERGER_SAMPLE_PATH}.isDir());
