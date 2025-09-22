@@ -40,6 +40,7 @@ file(GLOB SOURCES
     Tools/FileDescriptor/*.cpp
     Tools/Json/*.cpp
     View/*.cpp
+    View/DupVideos/*.cpp
     *.cpp
 )
 list(LENGTH SOURCES src_cpp_count)
@@ -66,6 +67,7 @@ set(SRV_HEADER_PATH
     Tools/FileDescriptor
     Tools/Json
     View
+    View/DupVideos
     ./
 )
 
@@ -86,6 +88,7 @@ file(GLOB HEADERS
     Tools/FileDescriptor/*.h
     Tools/Json/*.h
     View/*.h
+    View/DupVideos/*.h
     *.h
 )
 

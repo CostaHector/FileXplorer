@@ -5,7 +5,7 @@
 #include "ActionsRecorder.h"
 #include "ActionsSearcher.h"
 #include "ArchiveFilesActions.h"
-#include "ArrangeActions.h"
+#include "FileRenameRulerActions.h"
 #include "FileBasicOperationsActions.h"
 #include "FileLeafAction.h"
 #include "FolderPreviewActions.h"
@@ -25,7 +25,7 @@
 #include "PublicMacro.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
-  : QTabWidget{parent}  //
+    : QTabWidget{parent}  //
 {
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
@@ -56,7 +56,8 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   _EXPAND_RIBBONS = new (std::nothrow) QAction{QIcon{":img/EXPAND_RIBBON"}, "Expand or Hide Ribbon Menu", this};
   CHECK_NULLPTR_RETURN_VOID(_EXPAND_RIBBONS)
   _EXPAND_RIBBONS->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_1));
-  _EXPAND_RIBBONS->setToolTip(QString("<b>%1 (%2)</b><br/>Displays the Ribbon Menu when enabled, or hides it when disabled.").arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
+  _EXPAND_RIBBONS->setToolTip(QString("<b>%1 (%2)</b><br/>Displays the Ribbon Menu when enabled, or hides it when disabled.")
+                                  .arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
   _EXPAND_RIBBONS->setCheckable(true);
   _EXPAND_RIBBONS->setChecked(Configuration().value(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.v).toBool());
   m_corner = GetMenuRibbonCornerWid();
@@ -142,7 +143,8 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolBar* propertiesTB = new (std::nothrow) QToolBar{"Properties", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(propertiesTB);
   {
-    auto* copyTB = new MenuToolButton(fileOpInst.COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16, propertiesTB);
+    auto* copyTB = new MenuToolButton(fileOpInst.COPY_PATH_AG->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
+                                      IMAGE_SIZE::TABS_ICON_IN_MENU_16, propertiesTB);
     copyTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_COPY_CHOICE, true);
     propertiesTB->addWidget(copyTB);
     propertiesTB->addAction(g_rightClickActions()._CALC_MD5_ACT);
@@ -154,7 +156,8 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  auto* newItemsTB = new (std::nothrow) MenuToolButton(fileOpInst.NEW->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
+  auto* newItemsTB = new (std::nothrow) MenuToolButton(fileOpInst.NEW->actions(), QToolButton::MenuButtonPopup,
+                                                       Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
   newItemsTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_NEW_CHOICE, true);
 
   QToolBar* moveCopyItemsToTB = new (std::nothrow) QToolBar{"Move/Copy item(s) To ToolBar", leafHomeWid};
@@ -162,11 +165,11 @@ QToolBar* RibbonMenu::LeafHome() const {
   {
     const auto& _MOVE_TO_HIST_LIST = fileOpInst.MOVE_TO_PATH_HISTORY->actions();
     const auto& _COPY_TO_HIST_LIST = fileOpInst.COPY_TO_PATH_HISTORY->actions();
-    auto* pMoveToToolButton =
-        new MenuToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24, moveCopyItemsToTB);
+    auto* pMoveToToolButton = new MenuToolButton(_MOVE_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup,
+                                                 Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24, moveCopyItemsToTB);
     pMoveToToolButton->setDefaultAction(fileOpInst._MOVE_TO);
-    auto* pCopyToToolButton =
-        new MenuToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24, moveCopyItemsToTB);
+    auto* pCopyToToolButton = new MenuToolButton(_COPY_TO_HIST_LIST, QToolButton::ToolButtonPopupMode::MenuButtonPopup,
+                                                 Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_24, moveCopyItemsToTB);
     pCopyToToolButton->setDefaultAction(fileOpInst._COPY_TO);
 
     moveCopyItemsToTB->addWidget(pMoveToToolButton);
@@ -181,7 +184,9 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolBar* folderOpModeTb = fileOpInst.GetFolderOperationModeTb(leafHomeWid);
   CHECK_NULLPTR_RETURN_NULLPTR(folderOpModeTb);
 
-  QToolButton* recycleItemsTB = new (std::nothrow) MenuToolButton(fileOpInst.DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
+  QToolButton* recycleItemsTB =
+      new (std::nothrow) MenuToolButton(fileOpInst.DELETE_ACTIONS->actions(), QToolButton::MenuButtonPopup,
+                                        Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
   CHECK_NULLPTR_RETURN_NULLPTR(recycleItemsTB);
   recycleItemsTB->setDefaultAction(fileOpInst.MOVE_TO_TRASHBIN);
 
@@ -217,7 +222,8 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(compressToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  auto* renameItemsTB = new MenuToolButton(g_renameAg().RENAME_RIBBONS->actions(), QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
+  auto* renameItemsTB = new MenuToolButton(g_renameAg().RENAME_RIBBONS->actions(), QToolButton::MenuButtonPopup,
+                                           Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_48, leafHomeWid);
   renameItemsTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_RENAME_CHOICE, true);
 
   QToolBar* advanceSearchToolBar = new (std::nothrow) QToolBar("AdvanceSearch");
@@ -338,13 +344,12 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   mediaDupFinder->addAction(fileOpAgInst._DUPLICATE_VIDEOS_FINDER);
   SetLayoutAlightment(mediaDupFinder->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  auto& arrangeIns = g_ArrangeActions();
-  QList<QAction*> studiosActions{arrangeIns._EDIT_STUDIOS,  arrangeIns._RELOAD_STUDIOS,  nullptr, arrangeIns._EDIT_PERFS,      arrangeIns._RELOAD_PERFS, nullptr,
-                                 arrangeIns._EDIT_PERF_AKA, arrangeIns._RELOAD_PERF_AKA, nullptr, arrangeIns._RENAME_RULE_STAT};
+  auto& arrangeIns = g_NameRulerActions();
   QToolButton* nameRulerToolButton =
-      new (std::nothrow) MenuToolButton(studiosActions, QToolButton::MenuButtonPopup, Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
+      new (std::nothrow) MenuToolButton(arrangeIns.NAME_RULES_ACTIONS_LIST, QToolButton::MenuButtonPopup,
+                                        Qt::ToolButtonStyle::ToolButtonTextUnderIcon, IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
-  nameRulerToolButton->setDefaultAction(fileOpAgInst._NAME_RULER);
+  nameRulerToolButton->setDefaultAction(arrangeIns._NAME_RULER);
 
   auto& thumbInst = g_ThumbnailProcessActions();
   auto* thumbnailTb = thumbInst.GetThumbnailToolbar();
@@ -382,10 +387,10 @@ void RibbonMenu::AfterSubscribeInitialSettings() {
 #include <QPropertyAnimation>
 void RibbonMenu::on_expandStackedWidget(const bool vis) {
   Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
-#ifdef RUNNING_UNIT_TESTS // no need animation in testcase
+#ifdef RUNNING_UNIT_TESTS  // no need animation in testcase
   setMaximumHeight(vis ? sizeHint().height() : tabBar()->height());
 #else
-  QPropertyAnimation *animation = new (std::nothrow) QPropertyAnimation{this, "maximumHeight", this};
+  QPropertyAnimation* animation = new (std::nothrow) QPropertyAnimation{this, "maximumHeight", this};
   if (animation == nullptr) {
     setMaximumHeight(vis ? sizeHint().height() : tabBar()->height());
     return;

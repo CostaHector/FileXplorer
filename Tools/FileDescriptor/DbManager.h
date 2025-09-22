@@ -48,7 +48,14 @@ class DbManager : public QObject {
     DROP = 0,
     DELETE = 1,
   };
-  static QString GetRmvCmd(DROP_OR_DELETE dropOrDelete);
+
+  static QString GetRmvCmdTemplate(DROP_OR_DELETE dropOrDelete);
+#ifdef RUNNING_UNIT_TESTS
+  static bool DropAllTablesForTest(const QString& connName);
+  static bool DropDatabaseForTest(const QString& dbFullName, const bool bRecycle = true);
+  bool DeleteDatabaseIselfForTest(bool bRecyle = true);
+#endif
+
   bool IsValid() const { return mIsValid; }
   DbManager(const QString& dbName, const QString& connName, QObject* parent = nullptr);
   ~DbManager();
@@ -64,7 +71,7 @@ class DbManager : public QObject {
     // Deletes specific records (rows) from the table but retains the table structure and its associated objects (such as indexes, triggers, etc.).
     return RmvTable(tableNameRegexPattern, DROP_OR_DELETE::DELETE);
   }
-  bool DeleteDatabase(bool bRecyle = true);
+
   QSqlDatabase GetDb(bool open = true) const;
   QString GetCfgDebug() const { return "table:" + mDbName + "| conn:" + mConnName; }
   bool CheckValidAndOpen(QSqlDatabase& db) const;
@@ -83,8 +90,12 @@ class DbManager : public QObject {
   int DeleteByWhereClause(const QString& tableName, const QString& whereClause);
 
   bool IsTableVolumeOnline(const QString& tableName) const;
-public slots:
+
+  void setSkipGetVideosDuration(bool bSkip) {mSkipGetVideosDuration = bSkip;}
+  bool isSkipGetVideosDuration() const { return mSkipGetVideosDuration;}
+
   bool onShowInFileSystemView() const;
+
  protected:
   static QString GetDeleteInPlaceholders(int n);
   void ReleaseConnection();
@@ -92,6 +103,12 @@ public slots:
   const QString mDbName;
   const QString mConnName;
   static constexpr int MAX_BATCH_SIZE = 100;  // 每100条提交一次
+
+  bool mSkipGetVideosDuration = false;
+
+ private:
+  DbManager(const DbManager&) = delete;
+  DbManager& operator=(const DbManager&) = delete;
 };
 
 #endif  // DBMANAGER_H

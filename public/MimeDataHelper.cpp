@@ -73,5 +73,4 @@ int WriteIntoSystemClipboard(const MimeDataMember& mimeDataMember, Qt::DropActio
   return mimeDataMember.texts.size();
 }
 
-
 }  // namespace MimeDataHelper

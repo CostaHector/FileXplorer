@@ -36,6 +36,10 @@ class ClipboardGuard {
     return mClipboard;
   }
 
+  QString getCurText() const {
+    return mClipboard == nullptr ? "" : mClipboard->text();
+  }
+
  private:
   QClipboard* mClipboard {nullptr};
   std::unique_ptr<QMimeData> savedMimeData {nullptr};
