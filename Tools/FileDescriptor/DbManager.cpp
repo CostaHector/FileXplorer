@@ -115,7 +115,8 @@ void DbManager::ReleaseConnection() {
     db.close();
     LOG_D("Database connection closed: %s", qPrintable(mConnName));
   }
-  QSqlDatabase::removeDatabase(mConnName);
+  // Todo:
+  // QSqlDatabase::removeDatabase(mConnName); // QSqlDatabasePrivate::removeDatabase: connection 'AI_MEDIA_DUP_CONNECT' is still in use, all queries will cease to work.
 }
 
 DbManager::~DbManager() {

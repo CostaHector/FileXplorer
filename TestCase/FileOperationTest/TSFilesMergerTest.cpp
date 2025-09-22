@@ -10,8 +10,8 @@ class TSFilesMergerTest : public PlainTestSuite {
 
 public:
   TSFilesMergerTest() : PlainTestSuite{} {}
-  const QString rootpath = TESTCASE_ROOT_PATH "/test/TestEnv_TSFilesMerger";
-  const QString mOutputLargeTSFileName{"TestEnv_TSFilesMerger.ts"};
+  const QString rootpath = TESTCASE_ROOT_PATH "/test/TestEnvTSFilesMerger";
+  const QString mOutputLargeTSFileName{"TestEnvTSFilesMerger.ts"};
   const QString mOutputLargeTSAbsFileName{rootpath + "/" + mOutputLargeTSFileName};
 private slots:
   void cleanup() {

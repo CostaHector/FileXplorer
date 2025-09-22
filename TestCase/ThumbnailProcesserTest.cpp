@@ -21,7 +21,7 @@ bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int heigh
   return true;
 }
 
-const QString VIDEOS_DURATION_DIR = TESTCASE_ROOT_PATH "/test/TestEnv_VideosDurationGetter";
+const QString VIDEOS_DURATION_DIR = TESTCASE_ROOT_PATH "/test/TestEnvVideosDurationGetter";
 
 class ThumbnailProcesserTest : public PlainTestSuite {
   Q_OBJECT

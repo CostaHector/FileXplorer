@@ -1,9 +1,8 @@
 ﻿#include "DupVidsManager.h"
 #include "PublicVariable.h"
-#include "JsonRenameRegex.h"
 #include "MD5Calculator.h"
 #include "VideoDurationGetter.h"
-#include "Logger.h"
+#include "NotificatorMacro.h"
 #include "PathTool.h"
 
 #include <QDebug>
@@ -13,33 +12,14 @@
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QUuid>
-
-QString GetTableName(const QString& pathName) {
-  QString tableName{pathName};
-  tableName.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, "_");  // onlt support path with [0-9a-z_]
-  return tableName;
-}
-
-QString TableName2Path(const QString& tableName) {
-  QString ans{tableName};
-#ifdef _WIN32
-  if (ans.size() >= 3 && ans[1] == '_' && ans[2] == '_') {
-    ans[1] = ':';
-  }
-#endif
-  ans.replace('_', '/');
-  return ans;
-}
-
-constexpr char DupVidsManager::CONNECTION_NAME[];
-
 #include "TableFields.h"
 #include "PublicMacro.h"
 
 using namespace VidDupHelper;
 
+constexpr char DupVidsManager::VID_DUP_CONNECTION_NAME[];
 const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
-    {"CREATE TABLE IF NOT EXISTS `%1`"                         //
+    {"CREATE TABLE IF NOT EXISTS `%1`"                       //
      + QString(R"((
       `%1` NCHAR(512) NOT NULL,
       `%2` INTEGER NOT NULL,
@@ -60,13 +40,8 @@ const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
            .arg(ENUM_2_STR(FIRST_8192_HASH))
            .arg(ENUM_2_STR(FULL_SIZE_HASH))};
 
-DupVidsManager::DupVidsManager(const QString& dbName, const QString& connName, QObject* parent)  //
-    : DbManager{dbName, connName, parent} {}
-
-DupVidsManager& DupVidsManager::GetInst() {
-  static DupVidsManager inst{DupVidsManager::GetAiDupVidDbPath(), CONNECTION_NAME, nullptr};
-  return inst;
-}
+DupVidsManager::DupVidsManager(QObject* parent)  //
+    : DbManager{GetAiDupVidDbPath(), VID_DUP_CONNECTION_NAME, parent} {}
 
 QString DupVidsManager::GetAiDupVidDbPath() {
 #ifdef RUNNING_UNIT_TESTS
@@ -77,7 +52,7 @@ QString DupVidsManager::GetAiDupVidDbPath() {
 }
 
 bool DupVidsManager::IsTableExist(const QString& tableName) const {
-  QSqlDatabase db = QSqlDatabase::database(CONNECTION_NAME);
+  QSqlDatabase db = QSqlDatabase::database(VID_DUP_CONNECTION_NAME);
   if (!db.isOpen()) {
     LOG_W("DB[%s] is not open", qPrintable(GetAiDupVidDbPath()));
     return false;
@@ -90,7 +65,7 @@ int DupVidsManager::ScanLocations(const QStringList& paths) {
   for (const QString& path : paths) {
     if (!ScanALocation(path)) {
       LOG_W("Scan Path[%s] failed", qPrintable(path));
-      return false;
+      return -1;
     }
     ++succeedCnt;
   }
@@ -99,7 +74,7 @@ int DupVidsManager::ScanLocations(const QStringList& paths) {
 }
 
 const QString DupVidsManager::INSERT_DUP_VID_TEMPLATE  //
-    {"REPLACE INTO `%1` "                                //
+    {"REPLACE INTO `%1` "                              //
      + QString{R"((`%1`,`%2`,`%3`,`%4`,`%5`) VALUES(:1, :2, :3, :4, :5);)"}
            .arg(ENUM_2_STR(EFFECTIVE_NAME))
            .arg(ENUM_2_STR(SIZE))
@@ -125,11 +100,6 @@ bool DupVidsManager::ScanALocation(const QString& path) {
     LOG_W("Table[%s] create failed.", qPrintable(tableName));
     return false;
   }
-  VideoDurationGetter mi;
-  if (!mi.StartToGet()) {
-    LOG_W("Video duration getter start failed");
-    return false;
-  }
 
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
@@ -144,6 +114,14 @@ bool DupVidsManager::ScanALocation(const QString& path) {
   if (!query.prepare(INSERT_DUP_VID_TEMPLATE.arg(tableName))) {
     return FD_PREPARE_FAILED;
   }
+
+  const bool bSkipDuration = isSkipGetVideosDuration();
+  VideoDurationGetter mi;
+  if (!bSkipDuration && !mi.StartToGet()) {
+    LOG_W("Video duration getter start failed");
+    return false;
+  }
+
   int suceedCnt = 0;
   QDirIterator it{path, TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   while (it.hasNext()) {
@@ -151,7 +129,7 @@ bool DupVidsManager::ScanALocation(const QString& path) {
     const QFileInfo file_info{file_path};
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_EFFECTIVE_NAME, PathTool::GetEffectiveName(file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_SIZE, file_info.size());
-    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DURATION, mi.GetLengthQuick(file_path));
+    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DURATION, bSkipDuration ? 0 : mi.GetLengthQuick(file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DATE, file_info.birthTime().toMSecsSinceEpoch());
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_ABSOLUTE_PATH, file_path);
     if (!query.exec()) {
@@ -179,13 +157,17 @@ int DupVidsManager::DropTables(const QStringList& delTables) {
     if (!allTablesSet.contains(toDel)) {
       continue;
     }
-    succeedDropCnt += (RmvTable(toDel, DROP_OR_DELETE::DROP, true) >= FD_OK);
+    if (RmvTable(toDel, DROP_OR_DELETE::DROP, true) < FD_SKIP) {
+      LOG_E("Drop table[%s] failed", qPrintable(toDel));
+      return -1;
+    }
+    ++succeedDropCnt;
   }
   LOG_D("drop %d/%d/%d table succeed", succeedDropCnt, delTables.size(), allTablesSet.size());
   return succeedDropCnt;
 }
 
-int DupVidsManager::AuditTables(const QStringList& atTables, bool auditAll) {
+int DupVidsManager::AuditTables(const QStringList& atTables) {
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return FD_DB_OPEN_FAILED;
@@ -195,7 +177,7 @@ int DupVidsManager::AuditTables(const QStringList& atTables, bool auditAll) {
   int ignoreCnt = 0;
   QSqlQuery query(db), delQry(db);
   for (const QString& tableName : db.tables()) {
-    if (!auditAll && !atTables.contains(tableName)) {
+    if (!atTables.contains(tableName)) {
       ++ignoreCnt;
       continue;
     }
@@ -212,7 +194,7 @@ int DupVidsManager::AuditTables(const QStringList& atTables, bool auditAll) {
     }
     delQry.prepare(QString("DELETE FROM `%1` WHERE `ABSOLUTE_PATH` == (?)").arg(tableName));
     while (query.next()) {
-      const QString& absPath = query.record().value(0).toString();
+      const QString& absPath = query.value(0).toString();
       if (QFile::exists(absPath)) {
         continue;
       }
@@ -230,26 +212,23 @@ int DupVidsManager::AuditTables(const QStringList& atTables, bool auditAll) {
 }
 
 int DupVidsManager::RebuildTables(const QStringList& rebTables) {
-  auto db = GetDb();
-  if (!CheckValidAndOpen(db)) {
-    return FD_DB_OPEN_FAILED;
-  }
-  int succeedRebuildCnt = 0;
-  const QStringList& allTables = db.tables();
-  const QStringList& allTablesSet{allTables.begin(), allTables.end()};
+  QStringList tableAbsPaths;
   for (const QString& tableName : rebTables) {
-    if (allTablesSet.contains(tableName)) {
-      continue;
-    }
-    const QString& path = TableName2Path(tableName);
-    if (!ScanALocation(path)) {
-      LOG_W("rebuild table[%s] failed", qPrintable(tableName));
-      continue;
-    }
-    ++succeedRebuildCnt;
+    const QString path = TableName2Path(tableName);
+    tableAbsPaths.push_back(path);
   }
-  LOG_D("%d/%d/%d rebuild", succeedRebuildCnt, rebTables.size(), allTablesSet.size());
-  return succeedRebuildCnt;
+  int drpCnt = DropTables(rebTables);
+  if (drpCnt < 0) {
+    LOG_ERR_P("Drop tables failed", "errorCode:%d", drpCnt);
+    return -1;
+  }
+  int reloadCnt = ScanLocations(tableAbsPaths);
+  if (reloadCnt < 0) {
+    LOG_ERR_P("Scan tables failed", "errorCode:%d", reloadCnt);
+    return -1;
+  }
+  LOG_OK_P("Reload ok", "%d/%d", reloadCnt, rebTables.size());
+  return reloadCnt;
 }
 
 int DupVidsManager::GetTablesCnt() const {
@@ -261,38 +240,39 @@ int DupVidsManager::GetTablesCnt() const {
   return tbs.size();
 }
 
-const QString DupVidsManager::READ_DUP_VID_TABLE_META_INFO  //
-    {
-        QString("SELECT `%1`, `%2` FROM ")  //
-            .arg(ENUM_2_STR(SIZE))          //
-            .arg(ENUM_2_STR(EFFECTIVE_NAME)) +
-        "`%1`"  //
-    };
-enum READ_DUP_VID_TABLE_META_INFO_FIELD {  //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
-  READ_DUP_VID_TABLE_META_INFO_FIELD_SIZE = 0,
-  READ_DUP_VID_TABLE_META_INFO_FIELD_EFFECTIVE_NAME = 1,
+const QString DupVidsManager::TABLE_NAME_2_VIDEOS_COUNT  //
+    {"SELECT COUNT(*) FROM `%1`;"};
+
+enum TABLE_NAME_2_VIDEOS_COUNT_FIELD {  //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
+  TABLE_NAME_2_VIDEOS_COUNT_FIELD_NAME = 0,
 };
 
-QHash<qint64, QString> DupVidsManager::ReadATable(const QString& tableName) {
+DupVidTableName2RecordCountList DupVidsManager::TableName2Cnt() {
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
-    LOG_W("Read a table meta info failed");
     return {};
   }
+
+  DupVidTableName2RecordCountList tbl2Cnt;
   QSqlQuery query(db);
-  query.exec(READ_DUP_VID_TABLE_META_INFO.arg(tableName));
-  QHash<qint64, QString> result;
-  while (query.next()) {
-    qint64 size = query.value(READ_DUP_VID_TABLE_META_INFO_FIELD_SIZE).toLongLong();
-    QString file_name = query.value(READ_DUP_VID_TABLE_META_INFO_FIELD_EFFECTIVE_NAME).toString();
-    result[size] = file_name;
+  for (const QString& tableName : db.tables()) {
+    if (!query.exec(TABLE_NAME_2_VIDEOS_COUNT.arg(tableName))) {
+      LOG_D("count table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
+      continue;
+    }
+    int recordCnt = 0;
+    if (query.first()) {
+      recordCnt = query.value(TABLE_NAME_2_VIDEOS_COUNT_FIELD_NAME).toInt();
+    }
+    tbl2Cnt.append({tableName, recordCnt});  // query.record().count();
   }
-  return result;
+  LOG_D("Update Tables Count: %d", tbl2Cnt.size());
+  return tbl2Cnt;
 }
 
 const QString DupVidsManager::FIND_SAME_SIZE_VID  //
-    {QString("SELECT `%1`, `%2` FROM ")             //
-         .arg(ENUM_2_STR(ABSOLUTE_PATH))            //
+    {QString("SELECT `%1`, `%2` FROM ")           //
+         .arg(ENUM_2_STR(ABSOLUTE_PATH))          //
          .arg(ENUM_2_STR(SIZE)) +
      QString{" `%1` "}                  //
      + QString(" WHERE `%1` IS NULL;")  //
@@ -366,7 +346,7 @@ int DupVidsManager::FillHashFieldIfSizeConflict(const QString& path) {
   return cnt;
 }
 
-const QString DupVidsManager::READ_DUP_INFO_FROM_TABLES  //
+const QString DupVidsManager::READ_DUP_INFO_FROM_TABLES    //
     {QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`"}  //
          .arg(ENUM_2_STR(EFFECTIVE_NAME))                  //
          .arg(ENUM_2_STR(SIZE))                            //
@@ -385,13 +365,13 @@ enum READ_DUP_INFO_FROM_TABLES_FIELD {
   READ_DUP_INFO_FROM_TABLES_FIELD_FIRST_1024_HASH,
 };
 
-int DupVidsManager::ReadSpecifiedTables2List(const QStringList& tbls, QList<DUP_INFO>& vidsInfo) {
+int DupVidsManager::ReadSpecifiedTables2List(const QStringList& tbls, DupVidMetaInfoList& vidInfoList) {
   if (tbls.isEmpty()) {
-    vidsInfo.clear();
+    vidInfoList.clear();
     return 0;
   }
 
-  const int beforeCnt = vidsInfo.size();
+  const int beforeCnt = vidInfoList.size();
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return FD_DB_OPEN_FAILED;
@@ -405,38 +385,15 @@ int DupVidsManager::ReadSpecifiedTables2List(const QStringList& tbls, QList<DUP_
       return succeedTblCnt;
     }
     while (query.next()) {
-      vidsInfo.append(DUP_INFO{query.value(0).toString(),    //
-                               query.value(1).toLongLong(),  //
-                               query.value(2).toInt(),       //
-                               query.value(3).toLongLong(),  //
-                               query.value(4).toString(),    //
-                               query.value(5).toString(), true});
+      vidInfoList.append(DupVidMetaInfo{query.value(0).toString(),    //
+                                        query.value(1).toLongLong(),  //
+                                        query.value(2).toInt(),       //
+                                        query.value(3).toLongLong(),  //
+                                        query.value(4).toString(),    //
+                                        query.value(5).toString(), true});
     }
     ++succeedTblCnt;
   }
-  LOG_D("before %d row(s), now %d row(s), succeed %d table(s)", beforeCnt, vidsInfo.size(), succeedTblCnt);
+  LOG_D("before %d row(s), now %d row(s), succeed %d table(s)", beforeCnt, vidInfoList.size(), succeedTblCnt);
   return true;
-}
-
-QList<DupTableModelData> DupVidsManager::TableName2Cnt() {
-  auto db = GetDb();
-  if (!CheckValidAndOpen(db)) {
-    return {};
-  }
-
-  QList<DupTableModelData> tbl2Cnt;
-  QSqlQuery query(db);
-  for (const QString& tableName : db.tables()) {
-    if (!query.exec(QString("SELECT COUNT(`EFFECTIVE_NAME`) FROM `%1`;").arg(tableName))) {
-      LOG_D("count table[%s] failed[%s]", qPrintable(tableName), qPrintable(query.lastError().text()));
-      continue;
-    }
-    int recordCnt = 0;
-    while (query.next()) {
-      recordCnt = query.record().value(0).toInt();
-    }
-    tbl2Cnt.append({tableName, recordCnt});  // query.record().count();
-  }
-  LOG_D("Update Tables Count:%d", tbl2Cnt.size());
-  return tbl2Cnt;
 }

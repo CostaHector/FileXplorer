@@ -52,7 +52,7 @@ class DbManager : public QObject {
   static QString GetRmvCmdTemplate(DROP_OR_DELETE dropOrDelete);
 #ifdef RUNNING_UNIT_TESTS
   static bool DropAllTablesForTest(const QString& connName);
-  static bool DropDatabaseForTest(const QString& dbFullName, const bool bRecycle=true);
+  static bool DropDatabaseForTest(const QString& dbFullName, const bool bRecycle = true);
   bool DeleteDatabaseIselfForTest(bool bRecyle = true);
 #endif
 
@@ -90,8 +90,12 @@ class DbManager : public QObject {
   int DeleteByWhereClause(const QString& tableName, const QString& whereClause);
 
   bool IsTableVolumeOnline(const QString& tableName) const;
-public slots:
+
+  void setSkipGetVideosDuration(bool bSkip) {mSkipGetVideosDuration = bSkip;}
+  bool isSkipGetVideosDuration() const { return mSkipGetVideosDuration;}
+
   bool onShowInFileSystemView() const;
+
  protected:
   static QString GetDeleteInPlaceholders(int n);
   void ReleaseConnection();
@@ -99,6 +103,9 @@ public slots:
   const QString mDbName;
   const QString mConnName;
   static constexpr int MAX_BATCH_SIZE = 100;  // 每100条提交一次
+
+  bool mSkipGetVideosDuration = false;
+
  private:
   DbManager(const DbManager&) = delete;
   DbManager& operator=(const DbManager&) = delete;
