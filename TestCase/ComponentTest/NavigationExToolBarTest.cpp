@@ -214,6 +214,7 @@ class NavigationExToolBarTest : public PlainTestSuite {
   }
 
   void unpin_ok() {
+    Configuration().remove(NavigationExToolBar::EXTRA_NAVI_DICT);
     // precondition: 3 items in configuraion
     QMap<QString, QString> folderName2AbsPath;
     QStringList folderNames{"1", "2", "3"};
@@ -244,7 +245,7 @@ class NavigationExToolBarTest : public PlainTestSuite {
     naviExToolBar.UnpinAll();
     QList<QAction*> actList2FromAG = naviExToolBar.mCollectPathAgs->actions();
     QCOMPARE(actList2FromAG.size(), valuesCount);                      // ag not cleared until parent destructed
-    emit naviExToolBar.mCollectPathAgs->triggered(actList1FromAG[0]);  // emit not crash down
+    emit naviExToolBar.mCollectPathAgs->triggered(actList1FromAG[0]);  // emit should not crash down
     QList<QAction*> actList2DirectFromTb = naviExToolBar.actions();
     QCOMPARE(actList2DirectFromTb.size(), 0);  // action directly from toolbar empty
 
@@ -263,22 +264,23 @@ class NavigationExToolBarTest : public PlainTestSuite {
   }
 
   void action_triggered_call_into_new_path_ok() {  //
+    Configuration().remove(NavigationExToolBar::EXTRA_NAVI_DICT);
+
     NavigationExToolBar naviExToolBar{"navi extra toolbar accpet enter urls exists"};
-    QCOMPARE(naviExToolBar.m_IntoNewPath, nullptr);
     naviExToolBar.AppendExtraActions({{"1", TESTCASE_ROOT_PATH}, {"2", __FILE__}});
 
-    IntoNewPathParms actualParams;
-    IntoNewPathMocker mocker{&actualParams};
-    NavigationExToolBar::BindIntoNewPath(mocker);
+    IntoNewPathParms::GetInst().clear();
+    IntoNewPathMocker mocker;
+    NavigationExToolBar::BindIntoNewPathNavi(mocker);
 
     QVERIFY(naviExToolBar.mCollectPathAgs != nullptr);
     QList<QAction*> lsts = naviExToolBar.mCollectPathAgs->actions();
     QCOMPARE(lsts.size(), 2);
-    naviExToolBar.onPathActionTriggered(lsts.front());
-    QCOMPARE(actualParams, (IntoNewPathParms{TESTCASE_ROOT_PATH, true, true}));
+    naviExToolBar.onPathActionTriggeredNavi(lsts.front());
+    QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{TESTCASE_ROOT_PATH, true, true}));
 
-    naviExToolBar.onPathActionTriggered(lsts.back());
-    QCOMPARE(actualParams, (IntoNewPathParms{__FILE__, true, true}));
+    naviExToolBar.onPathActionTriggeredNavi(lsts.back());
+    QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{__FILE__, true, true}));
   }
 };
 

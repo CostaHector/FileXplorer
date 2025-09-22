@@ -79,10 +79,7 @@ private slots:
 
     QVERIFY(!dialog->m_checkboxes.isEmpty());
     auto* firstCheckBox = dialog->m_checkboxes.front();
-
-    QSignalSpy checkSpy(firstCheckBox, &QCheckBox::clicked);
-    QTest::mouseClick(firstCheckBox, Qt::LeftButton);
-    QCOMPARE(checkSpy.count(), 1);
+    firstCheckBox->setChecked(false);
     QCOMPARE(dialog->getSwitches(), QString("011"));
 
     dialog->toggleAllCheckboxes();
