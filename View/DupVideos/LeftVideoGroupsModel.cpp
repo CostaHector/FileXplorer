@@ -1,7 +1,7 @@
 #include "LeftVideoGroupsModel.h"
 #include "MemoryKey.h"
 
-using namespace RedundantVideoTool;
+using namespace DuplicateVideoDetectionCriteria;
 
 const QStringList LeftVideoGroupsModel::DUPLICATE_LIST_HEADER{"Count", "Value"};
 
@@ -32,11 +32,11 @@ QVariant LeftVideoGroupsModel::data(const QModelIndex& index, int role) const {
       return grpsList.size();
     case 1: {
       switch (m_currentDiffer) {
-        case DIFFER_BY_TYPE::DURATION: {
-          return grpsList.front().dur;
+        case DVCriteriaE::DURATION: {
+          return grpsList.front().m_Duration;
         }
-        case DIFFER_BY_TYPE::SIZE: {
-          return grpsList.front().sz;
+        case DVCriteriaE::SIZE: {
+          return grpsList.front().m_Size;
         }
         default: {
           return c_str(m_currentDiffer);
@@ -54,24 +54,24 @@ int LeftVideoGroupsModel::onDuplicateVideosListChanged(DupVidMetaInfoList needAn
   int afterRowCnt = 0;
   {
     GroupedDupVidList newSizeGroupedLst = getSizeLst(needAnalyzeVidLst, m_deviationSz);
-    if (m_currentDiffer == DIFFER_BY_TYPE::SIZE) {
+    if (m_currentDiffer == DVCriteriaE::SIZE) {
       afterRowCnt = rowCountHelper(newSizeGroupedLst);
       RowsCountBeginChange(beforeRowCnt, afterRowCnt);
     }
-    SwapGroupedVidLstArr(DIFFER_BY_TYPE::SIZE, newSizeGroupedLst);
-    if (m_currentDiffer == DIFFER_BY_TYPE::SIZE) {
+    SwapGroupedVidLstArr(DVCriteriaE::SIZE, newSizeGroupedLst);
+    if (m_currentDiffer == DVCriteriaE::SIZE) {
       RowsCountEndChange();
     }
   }
 
   {
     GroupedDupVidList newDurationGroupedLst = getDurationsLst(needAnalyzeVidLst, m_deviationDur);
-    if (m_currentDiffer == DIFFER_BY_TYPE::DURATION) {
+    if (m_currentDiffer == DVCriteriaE::DURATION) {
       afterRowCnt = rowCountHelper(newDurationGroupedLst);
       RowsCountBeginChange(beforeRowCnt, afterRowCnt);
     }
-    SwapGroupedVidLstArr(DIFFER_BY_TYPE::DURATION, newDurationGroupedLst);
-    if (m_currentDiffer == DIFFER_BY_TYPE::DURATION) {
+    SwapGroupedVidLstArr(DVCriteriaE::DURATION, newDurationGroupedLst);
+    if (m_currentDiffer == DVCriteriaE::DURATION) {
       RowsCountEndChange();
     }
   }
@@ -80,7 +80,7 @@ int LeftVideoGroupsModel::onDuplicateVideosListChanged(DupVidMetaInfoList needAn
   return afterRowCnt - beforeRowCnt;
 }
 
-int LeftVideoGroupsModel::setDifferType(const DIFFER_BY_TYPE& newDifferType) {
+int LeftVideoGroupsModel::setDifferType(const DVCriteriaE& newDifferType) {
   if (newDifferType == m_currentDiffer) {
     LOG_D("no need to update differ type, already[%s]", getCurDifferTypeStr());
     return 0;
@@ -89,14 +89,14 @@ int LeftVideoGroupsModel::setDifferType(const DIFFER_BY_TYPE& newDifferType) {
   const int beforeRowCnt = rowCount();
   int afterRowCnt = 0;
   switch (newDifferType) {
-    case DIFFER_BY_TYPE::SIZE: {
+    case DVCriteriaE::SIZE: {
       auto newSizeGroupedLst = getSizeLst(m_plainDupVidLst, m_deviationSz);
       afterRowCnt = rowCountHelper(newSizeGroupedLst);
       RowsCountBeginChange(beforeRowCnt, afterRowCnt);
       SwapGroupedVidLstArr(newDifferType, newSizeGroupedLst);
       break;
     }
-    case DIFFER_BY_TYPE::DURATION: {
+    case DVCriteriaE::DURATION: {
       auto newDurationGroupedLst = getDurationsLst(m_plainDupVidLst, m_deviationDur);
       afterRowCnt = rowCountHelper(newDurationGroupedLst);
       RowsCountBeginChange(beforeRowCnt, afterRowCnt);
@@ -117,8 +117,8 @@ int LeftVideoGroupsModel::setDifferType(const DIFFER_BY_TYPE& newDifferType) {
 }
 
 int LeftVideoGroupsModel::setDeviationDuration(int newDuration) {
-  if (m_currentDiffer != DIFFER_BY_TYPE::DURATION) {
-    LOG_D("Skip, current differ by is not [%s]", c_str(DIFFER_BY_TYPE::DURATION));
+  if (m_currentDiffer != DVCriteriaE::DURATION) {
+    LOG_D("Skip, current differ by is not [%s]", c_str(m_currentDiffer));
     return 0;
   }
   if (newDuration == m_deviationDur) {
@@ -133,7 +133,7 @@ int LeftVideoGroupsModel::setDeviationDuration(int newDuration) {
   const int afterRowCnt = rowCountHelper(newDurationGroupedLst);
 
   RowsCountBeginChange(beforeRowCnt, afterRowCnt);
-  SwapGroupedVidLstArr(DIFFER_BY_TYPE::DURATION, newDurationGroupedLst);
+  SwapGroupedVidLstArr(DVCriteriaE::DURATION, newDurationGroupedLst);
   std::swap(m_deviationDur, newDuration);
   RowsCountEndChange();
   LOG_D("Deviation duration changed from %d to %d leading groups count changed from %d->%d", oldDuration, newDuration, beforeRowCnt, afterRowCnt);
@@ -141,8 +141,8 @@ int LeftVideoGroupsModel::setDeviationDuration(int newDuration) {
 }
 
 int LeftVideoGroupsModel::setDeviationSize(qint64 newSize) {
-  if (m_currentDiffer != DIFFER_BY_TYPE::SIZE) {
-    LOG_D("Skip, current differ by is not [%s]", c_str(DIFFER_BY_TYPE::SIZE));
+  if (m_currentDiffer != DVCriteriaE::SIZE) {
+    LOG_D("Skip, current differ by is not [%s]", c_str(m_currentDiffer));
     return 0;
   }
   if (newSize == m_deviationSz) {
@@ -157,7 +157,7 @@ int LeftVideoGroupsModel::setDeviationSize(qint64 newSize) {
   const int afterRowCnt = rowCountHelper(newSizeGroupedLst);
 
   RowsCountBeginChange(beforeRowCnt, afterRowCnt);
-  SwapGroupedVidLstArr(DIFFER_BY_TYPE::SIZE, newSizeGroupedLst);
+  SwapGroupedVidLstArr(DVCriteriaE::SIZE, newSizeGroupedLst);
   std::swap(m_deviationSz, newSize);
   RowsCountEndChange();
   LOG_D("Deviation size changed from %d to %d leading groups count changed from %d->%d", oldSize, newSize, beforeRowCnt, afterRowCnt);
@@ -172,7 +172,7 @@ GroupedDupVidList LeftVideoGroupsModel::getDurationsLst(const DupVidMetaInfoList
   const auto getFuzzyDur = [dev](int dur) -> int { return dev == 0 ? dur : (dur + dev / 2) / dev; };
   QMap<int, DupVidMetaInfoList> curMap;
   for (auto it = plainList.cbegin(); it != plainList.cend(); ++it) {
-    auto fuzzyDur = getFuzzyDur(it->dur);
+    auto fuzzyDur = getFuzzyDur(it->m_Duration);
     auto durIt = curMap.find(fuzzyDur);
     if (durIt == curMap.end()) {
       curMap.insert(fuzzyDur, {*it});
@@ -196,7 +196,7 @@ GroupedDupVidList LeftVideoGroupsModel::getSizeLst(const DupVidMetaInfoList& pla
   const auto getFuzzySz = [dev](qint64 sz) -> qint64 { return dev == 0 ? sz : (sz + dev / 2) / dev; };
   QMap<qint64, DupVidMetaInfoList> curMap;
   for (auto it = plainList.cbegin(); it != plainList.cend(); ++it) {
-    auto fuzzySz = getFuzzySz(it->sz);
+    auto fuzzySz = getFuzzySz(it->m_Size);
     auto szIt = curMap.find(fuzzySz);
     if (szIt == curMap.end()) {
       curMap.insert(fuzzySz, {*it});

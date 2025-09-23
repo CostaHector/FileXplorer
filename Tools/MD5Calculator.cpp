@@ -7,7 +7,7 @@
 
 namespace MD5Calculator {
 
-QString GetFileMD5(const QString& filepath, const int onlyFirstByte, QCryptographicHash::Algorithm alg) {
+QString GetFileMD5(const QString& filepath, const int firstBytesRangeInt, QCryptographicHash::Algorithm alg) {
   QFile file{filepath};
   if (!file.exists()) {
     LOG_W("file[%s] not found", qPrintable(filepath));
@@ -17,14 +17,14 @@ QString GetFileMD5(const QString& filepath, const int onlyFirstByte, QCryptograp
     LOG_D("file[%s] open failed", qPrintable(filepath));
     return "";
   }
-  if (onlyFirstByte > 0) {
-    const QString ans = GetByteArrayMD5(file.read(onlyFirstByte), alg);
+  if (firstBytesRangeInt > 0) {
+    const QString ans = GetByteArrayMD5(file.read(firstBytesRangeInt), alg);
     file.close();
     return ans;
   }
   QCryptographicHash md5(alg);
   while (!file.atEnd()) {
-    md5.addData(file.read(8192));
+    md5.addData(file.read(BYTE_8));
   }
   file.close();
   return md5.result().toHex();
@@ -36,7 +36,7 @@ QString GetByteArrayMD5(const QByteArray& ba, QCryptographicHash::Algorithm alg)
   return md5.result().toHex();
 }
 
-QStringList GetBatchFileMD5(const QStringList& filepaths, const int onlyFirstByte, QCryptographicHash::Algorithm alg) {
+QStringList GetBatchFileMD5(const QStringList& filepaths, const int firstBytesRangeInt, QCryptographicHash::Algorithm alg) {
   QStringList md5Lst;
   md5Lst.reserve(filepaths.size());
   for (const auto& path : filepaths) {
@@ -44,7 +44,7 @@ QStringList GetBatchFileMD5(const QStringList& filepaths, const int onlyFirstByt
     if (!fi.exists() || !fi.isFile()) {
       continue;
     }
-    md5Lst << GetFileMD5(path, onlyFirstByte, alg);
+    md5Lst << GetFileMD5(path, firstBytesRangeInt, alg);
   }
   return md5Lst;
 }

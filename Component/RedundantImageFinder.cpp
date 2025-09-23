@@ -161,22 +161,22 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
     return;
   }
   mCurrentPath = folderPath;
-  using namespace RedundantImageTool;
-  const DecideByE decideBy = g_redunImgFinderAg().GetCurFindDupBy();
+  using namespace DuplicateImageDetectionCriteria;
+  const DICriteriaE decideBy = g_redunImgFinderAg().GetCurFindDupBy();
   ImagesInfoManager& redunLibsInst = ImagesInfoManager::getInst();
 
   RedundantImagesList newImgs;
   switch (decideBy) {
-    case DecideByE::LIBRARY: {
+    case DICriteriaE::LIBRARY: {
       newImgs = redunLibsInst.FindRedunImgs(mCurrentPath, mResultAlsoContainEmptyImage);
       break;
     }
-    case DecideByE::MD5: {
+    case DICriteriaE::MD5: {
       newImgs = FindDuplicateImgs(mCurrentPath, mResultAlsoContainEmptyImage);
       break;
     }
     default: {
-      LOG_W("DecideBy Enum[%s] not support", RedundantImageTool::c_str(decideBy));
+      LOG_W("DecideBy Enum[%s] not support", DuplicateImageDetectionCriteria::c_str(decideBy));
       break;
     }
   }

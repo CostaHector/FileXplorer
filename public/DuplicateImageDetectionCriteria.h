@@ -1,5 +1,5 @@
-#ifndef REDUNDANT_IMAGE_TYPE_H
-#define REDUNDANT_IMAGE_TYPE_H
+#ifndef DUPLICATE_IMAGE_DETECTION_CRITERIA_H
+#define DUPLICATE_IMAGE_DETECTION_CRITERIA_H
 
 #include "PublicMacro.h"
 
@@ -7,8 +7,8 @@
   DECIDE_BY_ITEM(LIBRARY, 0)               \
   DECIDE_BY_ITEM(MD5, 1)
 
-namespace RedundantImageTool {
-enum class DecideByE {
+namespace DuplicateImageDetectionCriteria {
+enum class DICriteriaE {
   // add after BEGIN
   BEGIN = 0,
 #define DECIDE_BY_ITEM(enu, val) enu = val,
@@ -17,19 +17,19 @@ enum class DecideByE {
       // add before BUTT
       END_INVALID,
 };
-static constexpr DecideByE DEFAULT_DECIDE_BY = DecideByE::LIBRARY;
+static constexpr DICriteriaE DEFAULT_DI_CRITERIA_E = DICriteriaE::LIBRARY;
 
-inline const char* c_str(DecideByE decideBy) {
-  if (decideBy < DecideByE::BEGIN || decideBy >= DecideByE::END_INVALID) {
-    return "unknown decideBy";
+inline const char* c_str(DICriteriaE diCriteriaE) {
+  if (diCriteriaE < DICriteriaE::BEGIN || diCriteriaE >= DICriteriaE::END_INVALID) {
+    return "unknown di criteria";
   }
-  static const char decideBy2CharArray[(int)DecideByE::END_INVALID][20]{
+  static constexpr const char* DI_CRITERIA_E_2_CHAR_ARRAY[(int)DICriteriaE::END_INVALID]{
 #define DECIDE_BY_ITEM(enu, val) ENUM_2_STR(enu),
       REDUNDANT_IMAGE_ENUM_VALUE_MAPPING
 #undef DECIDE_BY_ITEM
   };
-  return decideBy2CharArray[(int)decideBy];
+  return DI_CRITERIA_E_2_CHAR_ARRAY[(int)diCriteriaE];
 }
-}  // namespace RedundantImageTool
+}  // namespace DuplicateImageDetectionCriteria
 
-#endif  // REDUNDANT_IMAGE_TYPE_H
+#endif  // DUPLICATE_IMAGE_DETECTION_CRITERIA_H

@@ -1,5 +1,5 @@
 #include "HarModel.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 
 const QStringList HarModel::HAR_VERTICAL_HEAD {"Name", "Size(Byte)", "Type", "Url"};
 
@@ -18,7 +18,7 @@ QVariant HarModel::data(const QModelIndex& index, int role) const {
       case 0:
         return mHarParser[index.row()].name;
       case 1:
-        return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mHarParser[index.row()].content.size());
+        return DataFormatter::formatFileSizeGMKB(mHarParser[index.row()].content.size());
       case 2:
         return mHarParser[index.row()].type;
       case 3:

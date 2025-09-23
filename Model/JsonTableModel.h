@@ -9,7 +9,7 @@ class JsonTableModel : public QAbstractTableModelPub {
  public:
   explicit JsonTableModel(QObject* object = nullptr);
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mCachedJsons.size(); }
-  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return JsonKey::JSON_KEY_E::JSON_KEY_BUTT; }
+  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return JsonKey::JSON_TABLE_HEADERS_COUNT; }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;

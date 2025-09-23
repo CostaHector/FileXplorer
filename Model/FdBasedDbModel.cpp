@@ -1,5 +1,5 @@
 #include "FdBasedDbModel.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include "PathTool.h"
 #include "NameTool.h"
 #include "MountHelper.h"
@@ -25,11 +25,11 @@ QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {
     return QVariant();
   }
   if (role == Qt::DisplayRole) {
-    using namespace FILE_PROPERTY_DSP;
+    using namespace DataFormatter;
     if (idx.column() == MOVIE_TABLE::Size) {
-      return sizeToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
+      return formatFileSizeGMKB(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
     } else if (idx.column() == MOVIE_TABLE::Duration) {
-      return durationToHumanReadFriendly(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
+      return formatDurationISOMs(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
     }
   }
   return QSqlTableModel::data(idx, role);

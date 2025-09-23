@@ -52,9 +52,14 @@ enum JSON_KEY_E {
 JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
 
+// DV_TABLE_HEADERS_COUNT
+
+constexpr const char* JSON_TABLE_HEADERS[]{
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) ENUM_2_STR(enu),
-const QString JSON_KEY_IND_2_NAME[JSON_KEY_E::JSON_KEY_BUTT]{JSON_MODEL_FIELD_MAPPING};
+  JSON_MODEL_FIELD_MAPPING
 #undef JSON_KEY_ITEM
+};
+constexpr int JSON_TABLE_HEADERS_COUNT = sizeof(JSON_TABLE_HEADERS) / sizeof(JSON_TABLE_HEADERS[0]);
 
 QVariantHash GetJsonDictDefault(const QString& jsonBaseName = "");
 }  // namespace JsonKey

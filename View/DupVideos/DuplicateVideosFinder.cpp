@@ -11,7 +11,7 @@
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
 
-using namespace RedundantVideoTool;
+using namespace DuplicateVideoDetectionCriteria;
 
 DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{parent} {
   tableNameFilterLE = new (std::nothrow) QLineEdit{"", parent};
@@ -141,9 +141,9 @@ void DuplicateVideosFinder::onAnalyzeDuplicatesInVideosList(const DupVidMetaInfo
 void DuplicateVideosFinder::onDifferTypeChanged(QAction* newDifferAct) {
   invalidateLeftGrpTblData();
   if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_SIZE) {
-    m_leftGrpsTbl->setDifferType(DIFFER_BY_TYPE::SIZE);
+    m_leftGrpsTbl->setDifferType(DVCriteriaE::SIZE);
   } else if (newDifferAct == g_dupVidFinderAg().DIFFER_BY_DURATION) {
-    m_leftGrpsTbl->setDifferType(DIFFER_BY_TYPE::DURATION);
+    m_leftGrpsTbl->setDifferType(DVCriteriaE::DURATION);
   }
 }
 

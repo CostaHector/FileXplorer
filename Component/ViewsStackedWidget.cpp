@@ -6,7 +6,7 @@
 #include "NotificatorMacro.h"
 #include "HarFiles.h"
 #include "ViewTypeTool.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include "ScenesListModel.h"
 
 #include <QDesktopServices>
@@ -266,7 +266,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
   }
   const QFileInfo fi = getFileInfo(current);
   if (_logger != nullptr && fi.isFile()) {
-    _logger->onMsgChanged(FILE_PROPERTY_DSP::sizeToFileSizeDetail(fi.size()));
+    _logger->onMsgChanged(DataFormatter::formatFileSizeWithBytes(fi.size()));
   }
 
   auto vt = GetVt();

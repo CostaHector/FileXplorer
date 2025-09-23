@@ -2,7 +2,7 @@
 #define LEFTVIDEOGROUPSTABLE_H
 
 #include "CustomTableView.h"
-#include "DupVideosHelper.h"
+#include "DuplicateVideosHelper.h"
 #include "LeftVideoGroupsModel.h"
 #include <QSortFilterProxyModel>
 
@@ -13,7 +13,7 @@ class LeftVideoGroupsTable : public CustomTableView {
   explicit LeftVideoGroupsTable(QWidget* parent = nullptr);
   const QString GetCurrentDupVideoGroupInfo() const;
 
-  void setDifferType(const RedundantVideoTool::DIFFER_BY_TYPE& newDifferType);
+  void setDifferType(const DuplicateVideoDetectionCriteria::DVCriteriaE& newDifferType);
   void setDeviationDuration(int newDuration);
   void setDeviationSize(qint64 newSize);
   int GetCurSrcIndexRow(const QItemSelection& selected) const;
