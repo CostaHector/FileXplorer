@@ -18,40 +18,40 @@ void createTestData(GroupedDupVidListArr& data) {
   GroupedDupVidList szGrp{
       DupVidMetaInfoList{
           // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
-          {"sz - v1.mp4", 1000, 4000, 0, "notExist/sz - v1.mp4", "", true},  //
-          {"sz_v2.mp4", 1000, 4000, 0, __FILE__, "h2", true},                  //
-          {"sz_v3.mp4", 1000, 4000, 0, "/sz_v3.mp4", "h3", true},              //
-          {"sz_v4.mp4", 1000, 4000, 0, "/sz_v4.mp4", "h4", true},              //
+          {"sz - v1.mp4", 1000, 4000, 0, "notExist/sz - v1.mp4", ""},  //
+          {"sz_v2.mp4", 1000, 4000, 0, __FILE__, "h2"},                  //
+          {"sz_v3.mp4", 1000, 4000, 0, "/sz_v3.mp4", "h3"},              //
+          {"sz_v4.mp4", 1000, 4000, 0, "/sz_v4.mp4", "h4"},              //
       },                                                                       //
       DupVidMetaInfoList{
           //
-          {"sz_v5.mp4", 2000, 10000, 0, "/sz_v5.mp4", "h5", true},  //
-          {"sz_v6.mp4", 2000, 10000, 0, "/sz_v6.mp4", "h6", true},  //
-          {"sz_v7.mp4", 2000, 10000, 0, "/sz_v7.mp4", "h7", true},  //
+          {"sz_v5.mp4", 2000, 10000, 0, "/sz_v5.mp4", "h5"},  //
+          {"sz_v6.mp4", 2000, 10000, 0, "/sz_v6.mp4", "h6"},  //
+          {"sz_v7.mp4", 2000, 10000, 0, "/sz_v7.mp4", "h7"},  //
       },                                                            //
       DupVidMetaInfoList{
           //
-          {"sz_v8.mp4", 4000, 55555, 0, "/sz_v8.mp4", "h8", true},  //
-          {"sz_v9.mp4", 4000, 55555, 0, "/sz_v9.mp4", "h9", true},  //
+          {"sz_v8.mp4", 4000, 55555, 0, "/sz_v8.mp4", "h8"},  //
+          {"sz_v9.mp4", 4000, 55555, 0, "/sz_v9.mp4", "h9"},  //
       },                                                            //
   };
-  data[(int)RedundantVideoTool::DIFFER_BY_TYPE::SIZE] = szGrp;
+  data[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE] = szGrp;
   // DURATION
   GroupedDupVidList durGrp{
       DupVidMetaInfoList{
-          {"sz - v1.mp4", 1000, 4000, 0, "notExist/sz - v1.mp4", "h1", true},  //
-          {"sz_v2.mp4", 1000, 4000, 0, __FILE__, "h2", true},                  //
-          {"sz_v3.mp4", 1000, 4000, 0, "/sz_v3.mp4", "h3", true},              //
-          {"sz_v4.mp4", 1000, 4000, 0, "/sz_v4.mp4", "h4", true},              //
+          {"sz - v1.mp4", 1000, 4000, 0, "notExist/sz - v1.mp4", "h1"},  //
+          {"sz_v2.mp4", 1000, 4000, 0, __FILE__, "h2"},                  //
+          {"sz_v3.mp4", 1000, 4000, 0, "/sz_v3.mp4", "h3"},              //
+          {"sz_v4.mp4", 1000, 4000, 0, "/sz_v4.mp4", "h4"},              //
       },                                                                       //
       DupVidMetaInfoList{
           //
-          {"sz_v5.mp4", 2000, 10000, 0, "/sz_v5.mp4", "h5", true},  //
-          {"sz_v6.mp4", 2000, 10000, 0, "/sz_v6.mp4", "h6", true},  //
-          {"sz_v7.mp4", 2000, 10000, 0, "/sz_v7.mp4", "h7", true},  //
+          {"sz_v5.mp4", 2000, 10000, 0, "/sz_v5.mp4", "h5"},  //
+          {"sz_v6.mp4", 2000, 10000, 0, "/sz_v6.mp4", "h6"},  //
+          {"sz_v7.mp4", 2000, 10000, 0, "/sz_v7.mp4", "h7"},  //
       },                                                            //
   };
-  data[(int)RedundantVideoTool::DIFFER_BY_TYPE::DURATION] = durGrp;
+  data[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION] = durGrp;
 }
 
 class RightVideoDuplicatesModelTest : public PlainTestSuite {
@@ -61,15 +61,15 @@ class RightVideoDuplicatesModelTest : public PlainTestSuite {
   void initialization_ok() {
     RightVideoDuplicatesModel model;
     QCOMPARE(model.rowCount(), 0);
-    QCOMPARE(model.columnCount(), RightVideoDuplicatesModel::VIDS_DETAIL_HEADER.size());
+    QCOMPARE(model.columnCount(), DuplicateVideoMetaInfo::DV_TABLE_HEADERS_COUNT);
     QCOMPARE(model.getLeftSelectedRow(), INVALID_LEFT_SELECTED_ROW);
     // here not bind these 2 memeber are nullptr
     QVERIFY(model._pGroupedVidsList == nullptr);
     QVERIFY(model._pCurrentDiffer == nullptr);
 
-    for (int col = 0; col < RightVideoDuplicatesModel::VIDS_DETAIL_HEADER.size(); ++col) {
+    for (int col = 0; col < DuplicateVideoMetaInfo::DV_TABLE_HEADERS_COUNT; ++col) {
       QCOMPARE(model.headerData(col, Qt::Horizontal, Qt::DisplayRole).toString(),  //
-               RightVideoDuplicatesModel::VIDS_DETAIL_HEADER[col]);
+               DuplicateVideoMetaInfo::DV_TABLE_HEADERS[col]);
     }
     QCOMPARE(model.headerData(0, Qt::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), ((int)Qt::AlignRight));
 
@@ -85,7 +85,7 @@ class RightVideoDuplicatesModelTest : public PlainTestSuite {
 
     GroupedDupVidListArr testData;
     createTestData(testData);
-    RedundantVideoTool::DIFFER_BY_TYPE differ = RedundantVideoTool::DIFFER_BY_TYPE::SIZE;
+    DuplicateVideoDetectionCriteria::DVCriteriaE differ = DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE;
 
     // when initialize, no row
     QCOMPARE(model.rowCount(), 0);
@@ -105,36 +105,36 @@ class RightVideoDuplicatesModelTest : public PlainTestSuite {
         // {"Name", "Date", "Size", "Duration", "Hash", "FullPath"};
         QCOMPARE(model.data(QModelIndex{}).isNull(), true);
 
-        QCOMPARE(model.data(model.index(0, 0)).toString(), "sz - v1.mp4");
-        QCOMPARE(model.data(model.index(0, 1)).toDateTime().isNull(), false);
-        QCOMPARE(model.data(model.index(0, 2)).toString().isEmpty(), false);
-        QCOMPARE(model.data(model.index(0, 3)).toString().isEmpty(), false);
-        QCOMPARE(model.data(model.index(0, 4)).toString(), ""); // calculate md5 instantly, but file not exist
-        QString notExistAbsFullPath = model.data(model.index(0, 5)).toString();
-        QCOMPARE(model.filePath(model.index(0, 0)), notExistAbsFullPath);
-        QCOMPARE(model.fileNameUsedForToolEverything(model.index(0, 0)), "sz   v1 mp4");  // only [0-9a-zA-Z_ ] in ans
+        QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Name)).toString(), "sz - v1.mp4");
+        QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Size)).toString().isEmpty(), false);
+        QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Duration)).toString().isEmpty(), false);
+        QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::ModifiedDate)).toDateTime().isNull(), false);
+        QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Hash)).toString(), ""); // calculate md5 instantly, but file not exist
+        QString notExistAbsFullPath = model.data(model.index(0, DuplicateVideoMetaInfo::AbsPath)).toString();
+        QCOMPARE(model.filePath(model.index(0, DuplicateVideoMetaInfo::Name)), notExistAbsFullPath);
+        QCOMPARE(model.fileNameUsedForToolEverything(model.index(0, DuplicateVideoMetaInfo::Name)), "sz   v1 mp4");  // only [0-9a-zA-Z_ ] in ans
 
         {  // line1 file not exist line color: gray
           QCOMPARE(QFile::exists(notExistAbsFullPath), false);
-          QVariant inexistsRedForeground = model.data(model.index(0, 0), Qt::ForegroundRole);
+          QVariant inexistsRedForeground = model.data(model.index(0, DuplicateVideoMetaInfo::Name), Qt::ForegroundRole);
           QVERIFY(inexistsRedForeground.isValid());
           QVERIFY(inexistsRedForeground.canConvert<QBrush>());
           QBrush brush = inexistsRedForeground.value<QBrush>();
           QCOMPARE(brush.color(), QColor(Qt::gray));
         }
 
-        QString existAbsFullPath = model.data(model.index(1, 5)).toString();
+        QString existAbsFullPath = model.data(model.index(1, DuplicateVideoMetaInfo::AbsPath)).toString();
         QCOMPARE(existAbsFullPath.isEmpty(), false);
         {  // line2 fileexist line color: black
           QCOMPARE(QFile::exists(existAbsFullPath), true);
-          QVariant inexistsRedForeground = model.data(model.index(1, 0), Qt::ForegroundRole);
+          QVariant inexistsRedForeground = model.data(model.index(1, DuplicateVideoMetaInfo::Name), Qt::ForegroundRole);
           QVERIFY(inexistsRedForeground.isValid());
           QVERIFY(inexistsRedForeground.canConvert<QBrush>());
           QBrush brush = inexistsRedForeground.value<QBrush>();
           QCOMPARE(brush.color(), QColor(Qt::black));
         }
         // Icon not null
-        QCOMPARE(model.data(model.index(0, 0), Qt::DecorationRole).isNull(), false);
+        QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Name), Qt::DecorationRole).isNull(), false);
         // out of bound protection;
         model.onChangeDetailIndex(999);
         QCOMPARE(model.data(QModelIndex{}, Qt::DecorationRole).isNull(), true);
@@ -157,7 +157,7 @@ class RightVideoDuplicatesModelTest : public PlainTestSuite {
       QCOMPARE(model.rowCount(), 0);
     }
 
-    differ = RedundantVideoTool::DIFFER_BY_TYPE::DURATION;
+    differ = DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION;
     model.onInvalidateLeftSelection();
     QCOMPARE(model.rowCount(), 0);
     QCOMPARE(model.isLeftSelectedRowValid(), false);

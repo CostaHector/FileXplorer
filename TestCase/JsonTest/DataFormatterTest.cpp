@@ -9,9 +9,9 @@
 using namespace DataFormatter;
 class DataFormatterTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   DataFormatterTest() : PlainTestSuite{} {}
- private slots:
+private slots:
   void test_formatDefault() {
     QVariant aInt{7};
     const auto& ansInt = formatDefault(aInt);
@@ -339,6 +339,43 @@ class DataFormatterTest : public PlainTestSuite {
     prev = true;
     QVERIFY(writeBool(prev, "1"));  // invalid to false by default
     QVERIFY(!prev);
+  }
+
+  void test_fileSizeGMKB_ok() {
+    QCOMPARE(formatFileSizeGMKB(1 * 1024 * 1024 * 1024  //
+                                + 1 * 1024 * 1024       //
+                                + 1 * 1024              //
+                                + 1),                   //
+             "1'1'1'1");                                     // 1G 1M 1K 1B
+    QCOMPARE(formatFileSizeGMKB(0 * 1024 * 1024 * 1024  //
+                                + 99 * 1024 * 1024      //
+                                + 1023 * 1024           //
+                                + 1),                   //
+             "0'99'1023'1");                                 // 99M 1023K 1B
+  }
+  void test_sizeToFileSizeDetail_ok() {
+    QCOMPARE(formatFileSizeWithBytes(0 * 1024 * 1024 * 1024  //
+                                     + 1 * 1024 * 1024       //
+                                     + 0 * 1024              //
+                                     + 1),                   //
+             "0'1'0'1 (1048577 Bytes)");                  // 1M 1B
+  }
+  void test_durationToHumanReadFriendly() {
+    QCOMPARE(formatDurationISOMs((1 * 60 * 60   //
+                                + 1 * 60      //
+                                + 1)          //
+                               * 1000),       //
+             "01:01:01.000");                           // 01h01m01s
+    QCOMPARE(formatDurationISOMs((23 * 60 * 60  //
+                                + 0 * 60      //
+                                + 59)         //
+                               * 1000),       //
+             "23:00:59.000");                           // 23h00m59s
+    QCOMPARE(formatDurationISOMs((25 * 60 * 60  //
+                                + 0 * 60      //
+                                + 0)          //
+                               * 1000),       //
+             "");                                       // 25h > max 24h
   }
 };
 

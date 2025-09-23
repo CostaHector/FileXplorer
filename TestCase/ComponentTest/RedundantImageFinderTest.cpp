@@ -100,13 +100,13 @@ class RedundantImageFinderTest : public PlainTestSuite {
     Configuration().clear();
     Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, true);
 
-    using namespace RedundantImageTool;
+    using namespace DuplicateImageDetectionCriteria;
     auto& redunInst = g_redunImgFinderAg();
-    QCOMPARE(redunInst.GetCurFindDupBy(), DEFAULT_DECIDE_BY);
+    QCOMPARE(redunInst.GetCurFindDupBy(), DEFAULT_DI_CRITERIA_E);
 
     RedundantImageFinder rif;
 
-    QCOMPARE(DEFAULT_DECIDE_BY, DecideByE::LIBRARY);
+    QCOMPARE(DEFAULT_DI_CRITERIA_E, DICriteriaE::LIBRARY);
     rif(mFolderToFindRedun);
     QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all under mFolderToFindRedun
 
@@ -124,12 +124,12 @@ class RedundantImageFinderTest : public PlainTestSuite {
     auto& inst = g_redunImgFinderAg();
     QCOMPARE(inst.INCLUDING_EMPTY_IMAGES->isChecked(), true);
 
-    using namespace RedundantImageTool;
+    using namespace DuplicateImageDetectionCriteria;
     auto& redunInst = g_redunImgFinderAg();
     redunInst.FIND_DUPLICATE_IMGS_IN_A_PATH->setChecked(true);
     emit redunInst.mDecideByIntAction.getActionGroup()->triggered(redunInst.FIND_DUPLICATE_IMGS_IN_A_PATH);
 
-    QCOMPARE(redunInst.GetCurFindDupBy(), DecideByE::MD5);
+    QCOMPARE(redunInst.GetCurFindDupBy(), DICriteriaE::MD5);
     RedundantImageFinder rif;
 
     // 1.1 also empty image regard as redundant
