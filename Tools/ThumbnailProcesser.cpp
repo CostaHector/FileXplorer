@@ -161,10 +161,14 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
   // imgThumbnailSuffix e.g., " 33.png", " 24.jpg"
   const QString imgThumbnailSuffix{" " + QString::number(dimensionX) + QString::number(dimensionY) + imgthumbnailImgExt};
   for (auto it = vidPath2ImgBaseName.cbegin(); it != vidPath2ImgBaseName.cend(); ++it) {
-    const QString ffmpegCmdTemplate = ffmpegExePath     // executable path
-                                      + R"( -i "%1" )"  // input path
-                                      + config          //
-                                      + R"( "%2")";     // output path
+    QString ffmpegCmdTemplate;
+    ffmpegCmdTemplate += ffmpegExePath;
+    ffmpegCmdTemplate += R"( -loglevel error )";
+    // ffmpegCmdTemplate += R"( -loglevel warning )";
+    // ffmpegCmdTemplate += R"( -loglevel info )";
+    ffmpegCmdTemplate += R"( -i "%1" )";  // input path
+    ffmpegCmdTemplate += config;
+    ffmpegCmdTemplate += R"( "%2")";     // output path
     const QString vidPath = PathTool::sysPath(it.key());
     const QString& path2imgBaseName = PathTool::sysPath(it.value()) + imgThumbnailSuffix;
     const QString ffmpegCmd{ffmpegCmdTemplate.arg(vidPath, path2imgBaseName)};

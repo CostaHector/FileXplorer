@@ -58,7 +58,7 @@ FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent
 
 void onShowRenameRuleStatistics() {
   QString statictsContent;
-  statictsContent += "Studios number\t";
+  statictsContent += "\nStudios number\t";
   statictsContent += QString::number(StudiosManager::getInst().count());
   statictsContent += '\n';
   statictsContent += "Cast number\t";

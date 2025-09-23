@@ -79,6 +79,7 @@ private slots:
 
     QVERIFY(!dialog->m_checkboxes.isEmpty());
     auto* firstCheckBox = dialog->m_checkboxes.front();
+    QVERIFY(firstCheckBox != nullptr);
     firstCheckBox->setChecked(false);
     QCOMPARE(dialog->getSwitches(), QString("011"));
 
@@ -87,7 +88,9 @@ private slots:
   }
 
   void cleanupTestCase() {
-    if (dialog != nullptr) delete dialog;
+    if (dialog != nullptr) {
+      delete dialog;
+    }
     dialog = nullptr;
   }
 
