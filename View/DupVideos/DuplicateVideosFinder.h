@@ -4,7 +4,7 @@
 #include "DuplicateVideosMetaInfoTable.h"
 #include "LeftVideoGroupsTable.h"
 #include "RightVideoDuplicatesDetails.h"
-#include "DupVideosHelper.h"
+#include "DuplicateVideosHelper.h"
 #include <QMainWindow>
 #include <QSplitter>
 #include <QToolBar>

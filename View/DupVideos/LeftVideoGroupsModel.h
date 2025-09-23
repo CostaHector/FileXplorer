@@ -2,7 +2,7 @@
 #define LEFTVIDEOGROUPSMODEL_H
 
 #include "QAbstractTableModelPub.h"
-#include "DupVideosHelper.h"
+#include "DuplicateVideosHelper.h"
 
 class LeftVideoGroupsModel : public QAbstractTableModelPub {
  public:
@@ -23,7 +23,7 @@ class LeftVideoGroupsModel : public QAbstractTableModelPub {
         if (section == 0) {
           return DUPLICATE_LIST_HEADER[0];
         } else if (section == 1) {
-          return RedundantVideoTool::c_str(m_currentDiffer);
+          return DuplicateVideoDetectionCriteria::c_str(m_currentDiffer);
         }
       }
       return section + 1;
@@ -36,17 +36,17 @@ class LeftVideoGroupsModel : public QAbstractTableModelPub {
   static GroupedDupVidList getDurationsLst(const DupVidMetaInfoList& plainList, int dev);
   static GroupedDupVidList getSizeLst(const DupVidMetaInfoList& plainList, qint64 dev);
 
-  int setDifferType(const RedundantVideoTool::DIFFER_BY_TYPE& newDifferType);
+  int setDifferType(const DuplicateVideoDetectionCriteria::DVCriteriaE& newDifferType);
   int setDeviationDuration(int newDuration);
   int setDeviationSize(qint64 newSize);
 
-  const char* getCurDifferTypeStr() const { return RedundantVideoTool::c_str(m_currentDiffer); }
+  const char* getCurDifferTypeStr() const { return DuplicateVideoDetectionCriteria::c_str(m_currentDiffer); }
 
-  RedundantVideoTool::DIFFER_BY_TYPE m_currentDiffer = RedundantVideoTool::DEFAULT_VID_DECIDE_BY;  // also shared with right detail view
+  DuplicateVideoDetectionCriteria::DVCriteriaE m_currentDiffer = DuplicateVideoDetectionCriteria::DEFAULT_VD_CRITERIA_E;  // also shared with right detail view
   GroupedDupVidListArr m_groupedVidLstArr;
 
  private:
-  void changeDifferByTo(RedundantVideoTool::DIFFER_BY_TYPE newDiffBy) { m_currentDiffer = newDiffBy; }
+  void changeDifferByTo(DuplicateVideoDetectionCriteria::DVCriteriaE newDiffBy) { m_currentDiffer = newDiffBy; }
   void changeDurTo(int newDur) { m_deviationDur = newDur; }
   void changeSzTo(int newSz) { m_deviationSz = newSz; }
   int rowCountHelper(const GroupedDupVidList& plainLst) const { return plainLst.size(); }
@@ -58,7 +58,7 @@ class LeftVideoGroupsModel : public QAbstractTableModelPub {
 
   static const QStringList DUPLICATE_LIST_HEADER;
 
-  void SwapGroupedVidLstArr(RedundantVideoTool::DIFFER_BY_TYPE differBy, GroupedDupVidList& newList) {
+  void SwapGroupedVidLstArr(DuplicateVideoDetectionCriteria::DVCriteriaE differBy, GroupedDupVidList& newList) {
     m_groupedVidLstArr[(int)differBy].swap(newList);
 #ifdef RUNNING_UNIT_TESTS
     ++m_groupedVidLstArrChangedTimesInTestCase;

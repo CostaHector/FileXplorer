@@ -23,7 +23,7 @@ const QString LeftVideoGroupsTable::GetCurrentDupVideoGroupInfo() const {
       ;                                                     //
 }
 
-void LeftVideoGroupsTable::setDifferType(const RedundantVideoTool::DIFFER_BY_TYPE& newDifferType) {
+void LeftVideoGroupsTable::setDifferType(const DuplicateVideoDetectionCriteria::DVCriteriaE& newDifferType) {
   m_leftGrpModel->setDifferType(newDifferType);
   emit windowTitleChanged(GetCurrentDupVideoGroupInfo());
 }

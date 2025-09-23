@@ -1,20 +1,40 @@
-#ifndef DUPVIDEOSHELPER_H
-#define DUPVIDEOSHELPER_H
+#ifndef DUPLICATEVIDEOSHELPER_H
+#define DUPLICATEVIDEOSHELPER_H
 
 #include <QString>
 #include "PublicMacro.h"
 
-struct DupVidMetaInfo {
-  QString name;
-  qint64 sz;
-  int dur;
-  qint64 modifiedDate;
-  QString abspath;
-  QString hash;
-  bool exist;
-  bool operator==(const DupVidMetaInfo& rhs) const { return abspath == rhs.abspath && hash == rhs.hash && sz == rhs.sz && dur == rhs.dur && name == rhs.name && modifiedDate == rhs.modifiedDate && exist == rhs.exist; }
+#define DUP_VIDEO_META_INFO_KEY_MAPPING \
+  DUP_VIDEO_META_INFO_KEY_ITEM(Name, 0, QString, DataFormatter::formatDefault) \
+  DUP_VIDEO_META_INFO_KEY_ITEM(Size, 1, qint64, DataFormatter::formatFileSizeGMKB) \
+  DUP_VIDEO_META_INFO_KEY_ITEM(Duration, 2, int, DataFormatter::formatDateIsoMs) \
+  DUP_VIDEO_META_INFO_KEY_ITEM(ModifiedDate, 3, qint64, DataFormatter::formatDateIso) \
+  DUP_VIDEO_META_INFO_KEY_ITEM(AbsPath, 4, QString, DataFormatter::formatDefault) \
+  DUP_VIDEO_META_INFO_KEY_ITEM(Hash, 5, QString, DataFormatter::formatDefault) \
+
+namespace DuplicateVideoMetaInfo {
+enum DVColumnE {
+#define DUP_VIDEO_META_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) enu = enumVal,
+  DUP_VIDEO_META_INFO_KEY_MAPPING
+#undef DUP_VIDEO_META_INFO_KEY_ITEM
 };
-using DupVidMetaInfoList = QList<DupVidMetaInfo>;
+
+constexpr const char* DV_TABLE_HEADERS[] {
+#define DUP_VIDEO_META_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) #enu,
+  DUP_VIDEO_META_INFO_KEY_MAPPING
+    #undef DUP_VIDEO_META_INFO_KEY_ITEM
+};
+constexpr int DV_TABLE_HEADERS_COUNT = sizeof(DV_TABLE_HEADERS) / sizeof(DV_TABLE_HEADERS[0]);
+
+struct DVInfo {
+#define DUP_VIDEO_META_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) VariableType m_##enu;
+  DUP_VIDEO_META_INFO_KEY_MAPPING
+#undef DUP_VIDEO_META_INFO_KEY_ITEM
+  bool operator==(const DVInfo& rhs) const { return m_Name == rhs.m_Name && m_Size == rhs.m_Size && m_Duration == rhs.m_Duration && m_ModifiedDate == rhs.m_ModifiedDate && m_AbsPath == rhs.m_AbsPath; }
+};
+
+}
+using DupVidMetaInfoList = QList<DuplicateVideoMetaInfo::DVInfo>;
 
 // C:/DISK/F24 => C__DISK_F24
 // /home/costa/Document => _HOME_COSTA_DOCUMENT
@@ -35,34 +55,34 @@ using DupVidTableName2RecordCountList = QList<DupVidTableName2RecordCount>;
   DECIDE_BY_ITEM(DURATION, 0)              \
   DECIDE_BY_ITEM(SIZE, 1)
 
-namespace RedundantVideoTool {
-enum class DIFFER_BY_TYPE {
+namespace DuplicateVideoDetectionCriteria {
+enum class DVCriteriaE {
   // add after BEGIN
   BEGIN = 0,
 #define DECIDE_BY_ITEM(enu, val) enu = val,
   REDUNDANT_VIDEO_ENUM_VALUE_MAPPING
 #undef DECIDE_BY_ITEM
-      // add before BUTT
-      BOTTOM_SIZE_INVALID,
+  // add before BUTT
+  BOTTOM_SIZE_INVALID,
 };
-static constexpr DIFFER_BY_TYPE DEFAULT_VID_DECIDE_BY = DIFFER_BY_TYPE::SIZE;
+static constexpr DVCriteriaE DEFAULT_VD_CRITERIA_E = DVCriteriaE::SIZE;
 
-inline const char* c_str(DIFFER_BY_TYPE decideBy) {
-  if (decideBy < DIFFER_BY_TYPE::BEGIN || decideBy >= DIFFER_BY_TYPE::BOTTOM_SIZE_INVALID) {
-    return "unknown decideBy";
+inline const char* c_str(DVCriteriaE dvCriteria) {
+  if (dvCriteria < DVCriteriaE::BEGIN || dvCriteria >= DVCriteriaE::BOTTOM_SIZE_INVALID) {
+    return "unknown dv criteria";
   }
-  static const char decideBy2CharArray[(int)DIFFER_BY_TYPE::BOTTOM_SIZE_INVALID][20]{
+  static constexpr const char* DV_CRITERIA_E_2_CHAR_ARRAY[(int)DVCriteriaE::BOTTOM_SIZE_INVALID] {
 #define DECIDE_BY_ITEM(enu, val) ENUM_2_STR(enu),
-      REDUNDANT_VIDEO_ENUM_VALUE_MAPPING
-#undef DECIDE_BY_ITEM
+    REDUNDANT_VIDEO_ENUM_VALUE_MAPPING
+    #undef DECIDE_BY_ITEM
   };
-  return decideBy2CharArray[(int)decideBy];
+  return DV_CRITERIA_E_2_CHAR_ARRAY[(int)dvCriteria];
 }
-}  // namespace RedundantVideoTool
+}  // namespace DuplicateVideoDetectionCriteria
 
 constexpr int INVALID_LEFT_SELECTED_ROW = -1;
 
 using GroupedDupVidList = QList<DupVidMetaInfoList>;
-using GroupedDupVidListArr = GroupedDupVidList[(int)RedundantVideoTool::DIFFER_BY_TYPE::BOTTOM_SIZE_INVALID];
+using GroupedDupVidListArr = GroupedDupVidList[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::BOTTOM_SIZE_INVALID];
 
-#endif  // DUPVIDEOSHELPER_H
+#endif  // DUPLICATEVIDEOSHELPER_H

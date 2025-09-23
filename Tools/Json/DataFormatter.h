@@ -57,6 +57,43 @@ bool writeHobbies(QStringList& dst, const QVariant& src);
 
 QString formatBool(bool value);
 bool writeBool(bool& dst, const QVariant& src);
+
+
+// const qint64 xGiB = total / (1 << 30);
+// const qint64 xMiB = total % (1 << 30) / (1 << 20);
+// const qint64 xkiB = total % (1 << 30) % (1 << 20) / (1 << 10);
+// const qint64 xB = total % (1 << 30) % (1 << 20) % (1 << 10);
+inline QString formatFileSizeGMKB(const qint64 total) {
+  static constexpr qint64 GiB = 1 << 30;
+  static constexpr qint64 MiB = 1 << 20;
+  static constexpr qint64 KiB = 1 << 10;
+
+  const qint64 xGiB = total >> 30;
+  const qint64 remGiB = total & (GiB - 1);
+
+  const qint64 xMiB = remGiB >> 20;
+  const qint64 remMiB = remGiB & (MiB - 1);
+
+  const qint64 xkiB = remMiB >> 10;
+  const qint64 xB = remMiB & (KiB - 1);
+
+  static const QString FILE_SIZE_GMKB_TEMPLATE{"%1'%2'%3'%4"};
+  return FILE_SIZE_GMKB_TEMPLATE.arg(xGiB).arg(xMiB).arg(xkiB).arg(xB);
+}
+inline QString formatFileSizeWithBytes(const qint64 total) {
+  const QString FILE_SIZE_DETAIL_TEMPLATE{"%1 (%2 Bytes)"};
+  return FILE_SIZE_DETAIL_TEMPLATE.arg(formatFileSizeGMKB(total)).arg(total);
+}
+
+QString formatDateIsoMs(const qint64 ms);
+QString formatDateIso(const qint64 ms);
+
+QString formatDurationISOMs(const qint64 ms);
+QString formatDurationISO(const qint64 ms);
+
+QString formatMd5ByPathFirst8Byte(const QString& fileAbspath);
+QString formatMd5ByPathFirst1MillionByte(const QString& fileAbspath);
+QString formatMd5ByPath(const QString& fileAbspath);
 };  // namespace DataFormatter
 
 #endif  // DATAFORMATTER_H

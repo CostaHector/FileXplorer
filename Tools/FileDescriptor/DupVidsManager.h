@@ -6,7 +6,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include "DbManager.h"
-#include "DupVideosHelper.h"
+#include "DuplicateVideosHelper.h"
 
 class DupVidsManager : public DbManager {
  public:

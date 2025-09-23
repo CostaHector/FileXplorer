@@ -4,9 +4,9 @@
 #include <QAction>
 #include <QActionGroup>
 #include "EnumIntAction.h"
-#include "RedundantImageTool.h"
+#include "DuplicateImageDetectionCriteria.h"
 
-extern template struct EnumIntAction<RedundantImageTool::DecideByE>;
+extern template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 
 class RedundantImageFinderActions : public QObject {
  public:
@@ -14,8 +14,8 @@ class RedundantImageFinderActions : public QObject {
 
   QAction* FIND_DUPLICATE_IMGS_BY_LIBRARY{nullptr};
   QAction* FIND_DUPLICATE_IMGS_IN_A_PATH{nullptr};
-  RedundantImageTool::DecideByE GetCurFindDupBy() const { return mDecideByIntAction.curVal(); }
-  EnumIntAction<RedundantImageTool::DecideByE> mDecideByIntAction;
+  DuplicateImageDetectionCriteria::DICriteriaE GetCurFindDupBy() const { return mDecideByIntAction.curVal(); }
+  EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE> mDecideByIntAction;
 
   QAction* RECYLE_NOW{nullptr};
   QAction* INCLUDING_EMPTY_IMAGES{nullptr};
