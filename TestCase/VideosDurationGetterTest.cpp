@@ -5,8 +5,8 @@
 #include "EndToExposePrivateMember.h"
 #include "VideoDurationGetter.h"
 #include "PlainTestSuite.h"
+#include "VideoTestPrecoditionTools.h"
 
-const QString VIDEOS_DURATION_DIR = TESTCASE_ROOT_PATH "/test/TestEnvVideosDurationGetter";
 class VideosDurationGetterTest : public PlainTestSuite {
   Q_OBJECT
  public:
@@ -16,7 +16,7 @@ class VideosDurationGetterTest : public PlainTestSuite {
   void test_GetLengthQuick() {
     const QString vidName = "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 144p 33s.mp4";
     const int expectDuration = 33000;
-    const QDir mp4Dir{VIDEOS_DURATION_DIR};
+    const QDir mp4Dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
     QVERIFY(mp4Dir.exists(vidName));
 
     VideoDurationGetter mi;
@@ -30,7 +30,7 @@ class VideosDurationGetterTest : public PlainTestSuite {
                                "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 360p 33s.mp4"};
     QStringList vidsAbsPath;
     const QList<int> expectDurations{33000, 33000};
-    const QDir mp4Dir{VIDEOS_DURATION_DIR};
+    const QDir mp4Dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
     for (const QString& vidName : vidsName) {
       QVERIFY(mp4Dir.exists(vidName));
       vidsAbsPath.append(mp4Dir.absoluteFilePath(vidName));
@@ -59,7 +59,7 @@ class VideosDurationGetterTest : public PlainTestSuite {
     QCOMPARE(mp4VidsLst.size(), 5);
 
     // precondition 2: "video file(s) should exist"
-    const QDir mp4Dir{VIDEOS_DURATION_DIR};
+    const QDir mp4Dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
     foreach (const QString mp4FileName, mp4VidsLst) {
       QVERIFY2(mp4Dir.exists(mp4FileName), qPrintable(mp4FileName));
       mp4AbsPath.append(mp4Dir.absoluteFilePath(mp4FileName));
@@ -99,7 +99,7 @@ class VideosDurationGetterTest : public PlainTestSuite {
     QCOMPARE(mp4VidsLst.size(), 4);
     QCOMPARE(expectDurationsLst.size(), 4);
     // precondition 2: "video file(s) should all exist"
-    const QDir mp4Dir{VIDEOS_DURATION_DIR};
+    const QDir mp4Dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
     foreach (const QString mp4FileName, mp4VidsLst) {
       QVERIFY2(mp4Dir.exists(mp4FileName), qPrintable(mp4FileName));
       mp4AbsPath.append(mp4Dir.absoluteFilePath(mp4FileName));
@@ -126,7 +126,7 @@ class VideosDurationGetterTest : public PlainTestSuite {
   }
 
   void test_compareSpeed() {
-    QDir dir{VIDEOS_DURATION_DIR};
+    QDir dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
     auto traditionWay = [&dir]() -> int {
       std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
       const QStringList& names = dir.entryList();

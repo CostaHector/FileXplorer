@@ -22,57 +22,84 @@
 
 class FileSystemTableViewTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+  static bool checkAfterCopyMimeData(const FileSystemModel& fsModel, FileSystemTableView& fsView, QClipboard* pClip, const int expectItemCnt) {
+    pClip->clear(); // prevent COM error 0x800401D in windows platform error message
+
+    // select all
+    auto& fileOpActsInst = g_fileBasicOperationsActions();
+    fsView.selectAll();
+    auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSourceModel<FileSystemModel>(fsModel,  //
+                                                                                            fsView.selectionModel()->selectedRows());
+    const QString expectPaths = mimeDataMember.texts.join('\n');
+
+    // 1. copy
+    emit fileOpActsInst.COPY->triggered();  // this signal not connected to any slot yet
+    MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::CopyAction);
+    auto* afterCopyMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
+    if (afterCopyMimeData == nullptr) {
+      LOG_E("afterCopyMimeData is nullptr");
+      return false;
+    }
+    const QList<QUrl>& actualCopySelectedUrls = afterCopyMimeData->urls();
+    if (actualCopySelectedUrls.size() != expectItemCnt) {
+      LOG_E("after copy urls count inequal, actual[%d], expectd[%d]", actualCopySelectedUrls.size(), expectItemCnt);
+      return false;
+    }
+    const QString& actualCopyPaths = afterCopyMimeData->text();
+    if (actualCopyPaths != expectPaths) {
+      LOG_E("after copy texts inequal, actual[%s], expectd[%s]", qPrintable(actualCopyPaths), qPrintable(expectPaths));
+      return false;
+    }
+    pClip->clear();
+
+    // 2. cut
+    emit fileOpActsInst.CUT->triggered();  // this signal not connected to any slot yet
+    MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::MoveAction);
+    auto* afterCutMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
+    if (afterCutMimeData == nullptr) {
+      LOG_E("afterCutMimeData is nullptr");
+      return false;
+    }
+    const QList<QUrl>& actualCutSelectedUrls = afterCutMimeData->urls();
+    if (actualCutSelectedUrls.size() != expectItemCnt) {
+      LOG_E("after cut urls count inequal, actual[%d], expectd[%d]", actualCutSelectedUrls.size(), expectItemCnt);
+      return false;
+    }
+    const QString& actualCutPaths = afterCutMimeData->text();
+    if (actualCutPaths != expectPaths) {
+      LOG_E("after cut texts inequal, actual[%s], expectd[%s]", qPrintable(actualCutPaths), qPrintable(expectPaths));
+      return false;
+    }
+    pClip->clear();
+    return true;
+  }
+
+private slots:
   void cut_copy_in_view_mimedata_correct() {
-    // enviroment auto clean
+    // auto clean clipboard
     ClipboardGuard clipboardGuard;
     QVERIFY(clipboardGuard);
     auto* pClip = clipboardGuard.clipBoard();
+    QVERIFY(pClip != nullptr);
+    pClip->clear();
 
     // precondition
     const QDir::Filters defaultFilters{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
     QString currentPath = QFileInfo(__FILE__).absolutePath();
     QDir currentDir{currentPath, "", QDir::SortFlag::NoSort, defaultFilters};
     QStringList itemsInCurrentDir = currentDir.entryList();
-    QVERIFY(itemsInCurrentDir.size() > 0);
+    const int expectItemCnt = itemsInCurrentDir.size();
+    QVERIFY(expectItemCnt > 0);
 
     FileSystemModel fsModel;
     fsModel.setFilter(currentDir.filter());  // need call manually
     FileSystemTableView fsView{&fsModel};
-    fsView.show();
-    fsView.activateWindow();
-    QVERIFY(QTest::qWaitForWindowActive(&fsView));
 
-    auto checkAfterCopyMimeData = [&]() {
-      // select all and copy
-      auto& fileOpActsInst = g_fileBasicOperationsActions();
-      fsView.selectAll();
-      auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSourceModel<FileSystemModel>(fsModel,  //
-                                                                                              fsView.selectionModel()->selectedRows());
-      const QString expectPaths = mimeDataMember.texts.join('\n');
-
-      // 1. copy
-      emit fileOpActsInst.COPY->triggered();  // this signal not connected to any slot yet
-      MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::CopyAction);
-      auto* afterCopyMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
-      QVERIFY(afterCopyMimeData != nullptr);
-      const QList<QUrl>& actualCopySelectedUrls = afterCopyMimeData->urls();
-      QCOMPARE(actualCopySelectedUrls.size(), itemsInCurrentDir.size());
-      const QString actualCopyPaths = afterCopyMimeData->text();
-      QCOMPARE(actualCopyPaths, expectPaths);
-
-      // 2. cut
-      emit fileOpActsInst.CUT->triggered();  // this signal not connected to any slot yet
-      MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::MoveAction);
-      auto* afterCutMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
-      QVERIFY(afterCutMimeData != nullptr);
-      const QList<QUrl>& actualCutSelectedUrls = afterCutMimeData->urls();
-      QCOMPARE(actualCutSelectedUrls.size(), itemsInCurrentDir.size());
-      const QString actualCutPaths = afterCutMimeData->text();
-      QCOMPARE(actualCutPaths, expectPaths);
-    };
-    QObject::connect(&fsModel, &QFileSystemModel::directoryLoaded, checkAfterCopyMimeData);
+    QObject::connect(&fsModel, &QFileSystemModel::directoryLoaded, this, [&](const QString& path){
+      bool checkResult = checkAfterCopyMimeData(fsModel, fsView, pClip, expectItemCnt);
+      QVERIFY2(checkResult, qPrintable(path));
+    });
 
     // wait till directory loaded ok
     QSignalSpy directoyLoadedSigSpy(&fsModel, &QFileSystemModel::directoryLoaded);
@@ -98,8 +125,8 @@ class FileSystemTableViewTest : public PlainTestSuite {
     // prepare environment for cut or copy
     TDir tDir;
     QList<FsNodeEntry> nodes{
-        {"folder", true, ""},
-        {"file.txt", false, "hello"},
+      {"folder", true, ""},
+      {"file.txt", false, "hello"},
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
     const QString rootPath = tDir.path();
@@ -207,8 +234,8 @@ class FileSystemTableViewTest : public PlainTestSuite {
     // prepare environment for cut or copy
     TDir tDir;
     QList<FsNodeEntry> nodes{
-        {"subfolder/folder", true, ""},
-        {"subfolder/file.txt", false, "hello"},
+      {"subfolder/folder", true, ""},
+      {"subfolder/file.txt", false, "hello"},
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
     const QString rootPath = tDir.path();
