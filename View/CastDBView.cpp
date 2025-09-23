@@ -352,7 +352,7 @@ int CastDBView::onForceRefreshRecordsVids() {
     return 0;
   }
 
-  FdBasedDb movieDb{SystemPath::VIDS_DATABASE, "SEARCH_MOVIE_BY_PERFORMER"};
+  FdBasedDb movieDb{SystemPath::VIDS_DATABASE(), "SEARCH_MOVIE_BY_PERFORMER"};
   QSqlDatabase con = movieDb.GetDb();  // videos table
   if (!movieDb.CheckValidAndOpen(con)) {
     LOG_W("Open failed:%s", qPrintable(con.lastError().text()));

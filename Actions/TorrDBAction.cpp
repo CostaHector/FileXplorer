@@ -5,7 +5,7 @@
 TorrDBAction::TorrDBAction(QObject* parent)
     : QObject{parent},
       OPEN_DB_WITH_LOCAL_APP{new (std::nothrow) QAction(QIcon(":img/SQLITE_APP"), tr("&Open with local app"), this)},
-      INIT_DATABASE{new (std::nothrow) QAction(QString("init Database [%1]").arg(SystemPath::TORRENTS_DATABASE), this)},
+      INIT_DATABASE{new (std::nothrow) QAction(QString("init Database [%1]").arg(SystemPath::TORRENTS_DATABASE()), this)},
       INIT_TABLE{new (std::nothrow) QAction(QString("&Create table [%1]").arg(DB_TABLE::TORRENTS), this)},
       INSERT_INTO_TABLE{new (std::nothrow) QAction(QString("&insert into table [%1]").arg(DB_TABLE::TORRENTS), this)},
       DELETE_FROM_TABLE{new (std::nothrow) QAction(tr("&Delete from table"), this)},

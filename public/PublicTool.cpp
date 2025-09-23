@@ -160,11 +160,11 @@ bool LoadCNLanguagePack(QTranslator& translator, QString qmName) {
 }
 
 bool CreateUserPath() {
-  if (QFile::exists(SystemPath::WORK_PATH)) {
+  if (QFile::exists(SystemPath::WORK_PATH())) {
     return true;
   }
-  if (!QDir{}.mkpath(SystemPath::WORK_PATH)) {
-    LOG_C("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path", qPrintable(SystemPath::WORK_PATH));
+  if (!QDir{}.mkpath(SystemPath::WORK_PATH())) {
+    LOG_C("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path", qPrintable(SystemPath::WORK_PATH()));
     return false;
   }
   return true;
