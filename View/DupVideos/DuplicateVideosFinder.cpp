@@ -17,14 +17,17 @@ DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{pare
   tableNameFilterLE = new (std::nothrow) QLineEdit{"", parent};
   CHECK_NULLPTR_RETURN_VOID(tableNameFilterLE);
   tableNameFilterLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
+  tableNameFilterLE->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 
   int szDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
   sizeDevLE = new (std::nothrow) QLineEdit{QString::number(szDev), parent};
   CHECK_NULLPTR_RETURN_VOID(sizeDevLE);
+  sizeDevLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
   int durDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
   durationDevLE = new (std::nothrow) QLineEdit{QString::number(durDev), parent};
   CHECK_NULLPTR_RETURN_VOID(durationDevLE);
+  durationDevLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
   m_tb = g_dupVidFinderAg().GetAiMediaToolBar(tableNameFilterLE, sizeDevLE, durationDevLE, this);
   CHECK_NULLPTR_RETURN_VOID(m_tb);
