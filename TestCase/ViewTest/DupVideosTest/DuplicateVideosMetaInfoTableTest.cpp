@@ -3,22 +3,25 @@
 #include <QTestEventList>
 #include <QSignalSpy>
 
-#include "Logger.h"
 #include "BeginToExposePrivateMember.h"
 #include "DuplicateVideosMetaInfoTable.h"
 #include "EndToExposePrivateMember.h"
 #include "DuplicateVideosFinderActions.h"
 #include "VideoTestPrecoditionTools.h"
 #include "PublicVariable.h"
+#include "VidDupTabFields.h"
 
 class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  VideoTestPrecoditionTools& tool{VideoTestPrecoditionTools::getInst()};
  private slots:
-  void initTestCase() { QCOMPARE(DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false), true); }
+  void initTestCase() { //
+    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
+  }
 
-  void cleanupTestCase() { DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false); }
+  void cleanupTestCase() { //
+    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
+  }
 
   void dragMoveDropEvent_dropTable_ok() {
     // precondition
@@ -46,7 +49,7 @@ class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
     // with url event get accept
     QMimeData urlsMimeData;
     urlsMimeData.setText("2 urls");
-    QList<QUrl> urlsList{QUrl::fromLocalFile(tool.VID_DUR_GETTER_SAMPLE_PATH), QUrl::fromLocalFile(tool.TS_FILE_MERGER_SAMPLE_PATH)};
+    QList<QUrl> urlsList{QUrl::fromLocalFile(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH), QUrl::fromLocalFile(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH)};
     urlsMimeData.setUrls(urlsList);
     QDragEnterEvent acceptDragEnter(dragEnterPos, Qt::DropAction::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
     QDragMoveEvent acceptMoveEnter(dragEnterPos, Qt::DropAction::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::KeyboardModifier::NoModifier);
@@ -86,7 +89,7 @@ class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
 
     DuplicateVideosMetaInfoTable dupTv;
     QCOMPARE(dupTv.onScanAPath(__FILE__), false); // scan a file, skip
-    QCOMPARE(dupTv.onScanAPath(tool.VID_DUR_GETTER_SAMPLE_PATH), true);
+    QCOMPARE(dupTv.onScanAPath(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH), true);
     QCOMPARE(dupTv.m_aiMediaTblModel->rowCount(), 1);
 
     // no selection below:
@@ -100,7 +103,7 @@ class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
 
     // has only 1 table, select all is also select one
     dupTv.selectRow(0);
-    QDir dir(tool.VID_DUR_GETTER_SAMPLE_PATH, "", QDir::SortFlag::Name, QDir::Filter::Files);
+    QDir dir(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH, "", QDir::SortFlag::Name, QDir::Filter::Files);
     const QStringList vidNames = dir.entryList(TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET);
 
     // 1. anaylze emit title changed signal

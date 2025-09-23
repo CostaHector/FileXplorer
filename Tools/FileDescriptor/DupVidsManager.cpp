@@ -12,12 +12,11 @@
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QUuid>
-#include "TableFields.h"
 #include "PublicMacro.h"
+#include "VidDupTabFields.h"
 
 using namespace VidDupHelper;
 
-constexpr char DupVidsManager::VID_DUP_CONNECTION_NAME[];
 const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
     {"CREATE TABLE IF NOT EXISTS `%1`"                       //
      + QString(R"((
@@ -42,14 +41,6 @@ const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
 
 DupVidsManager::DupVidsManager(QObject* parent)  //
     : DbManager{GetAiDupVidDbPath(), VID_DUP_CONNECTION_NAME, parent} {}
-
-QString DupVidsManager::GetAiDupVidDbPath() {
-#ifdef RUNNING_UNIT_TESTS
-  return TESTCASE_ROOT_PATH "/test/DUPLICATES_DB_TEST.db";
-#else
-  return SystemPath::AI_MEDIA_DUP_DATABASE;
-#endif
-}
 
 bool DupVidsManager::IsTableExist(const QString& tableName) const {
   QSqlDatabase db = QSqlDatabase::database(VID_DUP_CONNECTION_NAME);

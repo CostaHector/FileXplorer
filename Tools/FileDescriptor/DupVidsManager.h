@@ -33,12 +33,10 @@ class DupVidsManager : public DbManager {
 
   static const QString READ_DUP_INFO_FROM_TABLES;
   int ReadSpecifiedTables2List(const QStringList& tbls, DupVidMetaInfoList& vidInfoList);
-  static QString GetAiDupVidDbPath();
 
  private:
   static DupVidsManager& GetInst() = delete; // singleton is forbidden
 
-  static constexpr char VID_DUP_CONNECTION_NAME[]{"AI_MEDIA_DUP_CONNECT"};
   QHash<QString, QString> mEscapePairPath{{"C:/DISK/F24", "C:/DISK/F24BKP"}, {"C:/DISK/LD2", "C:/DISK/LDBKPP"}};
 };
 

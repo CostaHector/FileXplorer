@@ -14,32 +14,32 @@
 #include "DuplicateVideosFinderActions.h"
 #include <QDir>
 #include "ClipboardGuard.h"
+#include "VidDupTabFields.h"
 
 class DuplicateVideosFinderTest : public PlainTestSuite {
   Q_OBJECT
  public:
   DuplicateVideosFinder dvf;
-  VideoTestPrecoditionTools& tool = VideoTestPrecoditionTools::getInst();
  private slots:
   void initTestCase() {
     // precondition: drop
-    DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false);
+    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
 
-    QVERIFY(QFileInfo{tool.VID_DUR_GETTER_SAMPLE_PATH}.isDir());
-    QVERIFY(QFileInfo{tool.TS_FILE_MERGER_SAMPLE_PATH}.isDir());
+    QVERIFY(QFileInfo{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH}.isDir());
+    QVERIFY(QFileInfo{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.isDir());
 
     QVERIFY(dvf.m_aiTables != nullptr);
     dvf.m_aiTables->LoadAiMediaTableNames();  // update
     QVERIFY(dvf.m_aiTables->m_aiMediaTblModel != nullptr);
     QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 0);
-    QVERIFY(dvf.m_aiTables->onScanAPath(tool.VID_DUR_GETTER_SAMPLE_PATH));
+    QVERIFY(dvf.m_aiTables->onScanAPath(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH));
     QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 1);
-    QVERIFY(dvf.m_aiTables->onScanAPath(tool.TS_FILE_MERGER_SAMPLE_PATH));
+    QVERIFY(dvf.m_aiTables->onScanAPath(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH));
     QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 2);
   }
 
   void cleanupTestCase() {                                        //
-    DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false);  //
+    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);  //
   }
 
   void dup_vid_tables_drop_available() {
