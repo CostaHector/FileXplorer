@@ -18,6 +18,11 @@
 
 #include <QStackedWidget>
 
+namespace PathActionHelper {
+bool Path2Actions(QToolBar& outTb, const QString& fullpath);
+QString PathFromActions(const QList<QAction*>& actions, const QAction* cursorAtAction, bool bStandalize = true);
+}  // namespace PathActionHelper
+
 class AddressELineEdit : public QStackedWidget {
   Q_OBJECT
  public:
@@ -31,25 +36,11 @@ class AddressELineEdit : public QStackedWidget {
   }
 
   inline QString pathFromFullActions() const {  //
-    const QList<QAction*>& actList = m_pathActionsTB->actions();
-    const QAction* pLastAct = actList.isEmpty() ? nullptr : actList.back();
-    return pathFromCursorAction(pLastAct);
+    return PathActionHelper::PathFromActions(m_pathActionsTB->actions(), nullptr, true);
   }
 
   inline QString pathFromCursorAction(const QAction* cursorAtAction) const {  //
-    // split with parameter skip empty part
-    QString caursePath;
-    foreach (const QAction* pAct, m_pathActionsTB->actions()) {
-      if (pAct == nullptr) {
-        continue;
-      }
-      caursePath += pAct->text();
-      if (pAct == cursorAtAction) {
-        break;
-      }
-      caursePath += PathTool::PATH_SEP_CHAR;
-    }
-    return NormToolBarActionPath(caursePath);
+    return PathActionHelper::PathFromActions(m_pathActionsTB->actions(), cursorAtAction, true);
   }
 
   inline QString dirname() const {  //
