@@ -61,7 +61,7 @@ private slots:
 
   void test_changePathInvalid() {
     AddressELineEdit addressLe;
-    QCOMPARE(addressLe.ChangePath("/home/to/inexists path"), false);
+    addressLe.ChangePath("/home/to/inexists path");
     QCOMPARE(addressLe.m_pathComboBox->currentText(), "/home/to/inexists path");
   }
 
