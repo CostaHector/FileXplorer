@@ -41,7 +41,7 @@ public:
 
 DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)                          //
   : CustomTableView{"DevicesAndDrives", parent},                         //
-  mDb{SystemPath::DEVICES_AND_DRIVES_DATABASE, "DeviceAndDriverConn"}  //
+  mDb{SystemPath::DEVICES_AND_DRIVES_DATABASE(), "DeviceAndDriverConn"}  //
 {
   if (!mDb.CreateDatabase()) {
     LOG_W("CreateDatabase failed");

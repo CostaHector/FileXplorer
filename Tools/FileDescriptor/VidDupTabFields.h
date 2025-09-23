@@ -21,13 +21,7 @@ enum FIELD_E {
 #undef VID_DUP_TABLE_KEY_ITEM
 };
 
-inline QString GetAiDupVidDbPath() {
-#ifdef RUNNING_UNIT_TESTS
-    return TESTCASE_ROOT_PATH "/test/DUPLICATES_DB_TEST.db";
-#else
-    return SystemPath::AI_MEDIA_DUP_DATABASE;
-#endif
-}
+QString GetAiDupVidDbPath();
 constexpr char VID_DUP_CONNECTION_NAME[]{"AI_MEDIA_DUP_CONNECT"};
 }
 

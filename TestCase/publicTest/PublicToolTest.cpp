@@ -81,7 +81,7 @@ class PublicToolTest : public PlainTestSuite {
 
   void CreateUserPath_ok() {  // UserPath is Service Running Precondition
     QCOMPARE(CreateUserPath(), true);
-    QFile::exists(SystemPath::WORK_PATH);
+    QFile::exists(SystemPath::WORK_PATH());
   }
 
   void load_and_remove_language_pack_ok() {

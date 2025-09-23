@@ -20,14 +20,14 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     LeftVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     QVERIFY(lvgt.m_leftSortProxy != nullptr);
-    QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, RedundantVideoTool::DEFAULT_VID_DECIDE_BY);
+    QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, DuplicateVideoDetectionCriteria::DEFAULT_VD_CRITERIA_E);
     DupVidMetaInfoList duplicaVideosListNeedAnalyze = {
         //
-        {"v1.mp4", 2048, 999, 0, "/v1.mp4", "hash1", true},   //
-        {"v2.mp4", 2048, 999, 0, "/v2.mp4", "hash2", true},   //
-        {"v3.mp4", 2048, 999, 0, "/v3.mp4", "hash3", true},   //
-        {"v4.mp4", 10240, 999, 0, "/v3.mp4", "hash3", true},  //
-        {"v5.mp4", 10240, 999, 0, "/v3.mp4", "hash3", true},  //
+        {"v1.mp4", 2048, 999, 0, "/v1.mp4",  "hash1"},   //
+        {"v2.mp4", 2048, 999, 0, "/v2.mp4",  "hash2"},   //
+        {"v3.mp4", 2048, 999, 0, "/v3.mp4",  "hash3"},   //
+        {"v4.mp4", 10240, 999, 0, "/v3.mp4", "hash3"},  //
+        {"v5.mp4", 10240, 999, 0, "/v3.mp4", "hash3"},  //
     };
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     // [2048,2048,2048] round 2048=1, [10240,10240] round 2048=5
@@ -73,18 +73,18 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     LeftVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     QVERIFY(lvgt.m_leftSortProxy != nullptr);
-    QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, RedundantVideoTool::DEFAULT_VID_DECIDE_BY);
+    QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, DuplicateVideoDetectionCriteria::DEFAULT_VD_CRITERIA_E);
 
     const QString defaultTitleMessage = lvgt.GetCurrentDupVideoGroupInfo();
     QVERIFY(isTitleMessageInExpect(defaultTitleMessage, 0, "SIZE"));
 
     DupVidMetaInfoList duplicaVideosListNeedAnalyze = {
         //
-        {"v1.mp4", 2048, 10000, 0, "/v1.mp4", "hash1", true},  //
-        {"v2.mp4", 2048, 10000, 0, "/v2.mp4", "hash2", true},  //
-        {"v3.mp4", 2048, 2000, 0, "/v3.mp4", "hash3", true},   //
-        {"v4.mp4", 10240, 2000, 0, "/v3.mp4", "hash3", true},  //
-        {"v5.mp4", 10240, 2000, 0, "/v3.mp4", "hash3", true},  //
+        {"v1.mp4", 2048, 10000, 0, "/v1.mp4", "hash1"},  //
+        {"v2.mp4", 2048, 10000, 0, "/v2.mp4", "hash2"},  //
+        {"v3.mp4", 2048, 2000, 0, "/v3.mp4",  "hash3"},   //
+        {"v4.mp4", 10240, 2000, 0, "/v3.mp4", "hash3"},  //
+        {"v5.mp4", 10240, 2000, 0, "/v3.mp4", "hash3"},  //
     };
 
     QSignalSpy winTitleSpy(&lvgt, &LeftVideoGroupsTable::windowTitleChanged);
@@ -111,7 +111,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     QVERIFY(isTitleMessageInExpect(titleMessage2, 1, "SIZE"));
 
     // 3. setDifferType changes windowTitle
-    lvgt.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION);
+    lvgt.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
     // [2000,2000,2000] round 2000=1, [10000,10000] round 2000=5
     QCOMPARE(lvgt.m_leftGrpModel->rowCount(), 2);  // rowCount=2
     QCOMPARE(winTitleSpy.count(), 3);
@@ -137,14 +137,14 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     LeftVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     QVERIFY(lvgt.m_leftSortProxy != nullptr);
-    QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, RedundantVideoTool::DEFAULT_VID_DECIDE_BY);
+    QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, DuplicateVideoDetectionCriteria::DEFAULT_VD_CRITERIA_E);
     DupVidMetaInfoList duplicaVideosListNeedAnalyze = {
         //
-        {"v1.mp4", 2048, 999, 0, "/v1.mp4", "hash1", true},   //
-        {"v2.mp4", 2048, 999, 0, "/v2.mp4", "hash2", true},   //
-        {"v3.mp4", 2048, 999, 0, "/v3.mp4", "hash3", true},   //
-        {"v4.mp4", 10240, 999, 0, "/v3.mp4", "hash3", true},  //
-        {"v5.mp4", 10240, 999, 0, "/v3.mp4", "hash3", true},  //
+        {"v1.mp4", 2048, 999, 0, "/v1.mp4",  "hash1"},   //
+        {"v2.mp4", 2048, 999, 0, "/v2.mp4",  "hash2"},   //
+        {"v3.mp4", 2048, 999, 0, "/v3.mp4",  "hash3"},   //
+        {"v4.mp4", 10240, 999, 0, "/v3.mp4", "hash3"},  //
+        {"v5.mp4", 10240, 999, 0, "/v3.mp4", "hash3"},  //
     };
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     // [2048,2048,2048] round 2048=1, [10240,10240] round 2048=5

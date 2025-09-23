@@ -19,7 +19,7 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
       LeftVideoGroupsModel model;
       QCOMPARE(model.rowCount(), 0);
       QCOMPARE(model.columnCount(), 2);
-      QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
+      QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
       QCOMPARE(model.m_deviationDur, 1 * 1000);
       QCOMPARE(model.m_deviationSz, 1 * 1024);
       QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole).toString(), "Count");
@@ -37,37 +37,37 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
 
   void differTypeChangeOnly_ok() {
     LeftVideoGroupsModel model;
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
 
     DupVidMetaInfoList testData = {
         //
-        {"v1.mp4", 1024, 10000, 0, "/v1.mp4", "hash1", true},  //
-        {"v2.mp4", 2048, 20000, 0, "/v2.mp4", "hash2", true},  //
+        {"v1.mp4", 1024, 10000, 0, "/v1.mp4", "hash1"},  //
+        {"v2.mp4", 2048, 20000, 0, "/v2.mp4", "hash2"},  //
     };                                                         //
     model.onDuplicateVideosListChanged(testData);
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), "SIZE");
 
-    model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION);
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::DURATION);
+    model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
 
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), "DURATION");
 
-    model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
+    model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
   }
 
   void DeviationSizeChangeOnly_ok() {
     Configuration().clear();
 
     LeftVideoGroupsModel model;
-    model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
+    model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
 
     DupVidMetaInfoList testData = {
-        {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "hash1", true},  //
-        {"v2.mp4", 1000, 1000, 0, "/v2.mp4", "hash2", true},  //
-        {"v3.mp4", 1001, 1000, 0, "/v3.mp4", "hash3", true},  //
-        {"v4.mp4", 2000, 2000, 0, "/v4.mp4", "hash4", true},  //
-        {"v5.mp4", 2000, 2000, 0, "/v5.mp4", "hash5", true},  //
+        {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "hash1"},  //
+        {"v2.mp4", 1000, 1000, 0, "/v2.mp4", "hash2"},  //
+        {"v3.mp4", 1001, 1000, 0, "/v3.mp4", "hash3"},  //
+        {"v4.mp4", 2000, 2000, 0, "/v4.mp4", "hash4"},  //
+        {"v5.mp4", 2000, 2000, 0, "/v5.mp4", "hash5"},  //
     };
 
     model.onDuplicateVideosListChanged(testData);
@@ -85,15 +85,15 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
     Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1050);  // 1050ms
 
     LeftVideoGroupsModel model;
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION), 0);
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 0);
     QCOMPARE(model.rowCount(), 0);
 
     DupVidMetaInfoList testData = {
-        {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "hash1", true},  //
-        {"v2.mp4", 1000, 1000, 0, "/v2.mp4", "hash2", true},  //
-        {"v3.mp4", 1000, 1001, 0, "/v3.mp4", "hash3", true},  //
-        {"v4.mp4", 1000, 2000, 0, "/v4.mp4", "hash4", true},  //
-        {"v5.mp4", 1000, 2001, 0, "/v5.mp4", "hash5", true},  //
+        {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "hash1"},  //
+        {"v2.mp4", 1000, 1000, 0, "/v2.mp4", "hash2"},  //
+        {"v3.mp4", 1000, 1001, 0, "/v3.mp4", "hash3"},  //
+        {"v4.mp4", 1000, 2000, 0, "/v4.mp4", "hash4"},  //
+        {"v5.mp4", 1000, 2001, 0, "/v5.mp4", "hash5"},  //
     };
     // [1000, 1000, 1001]/1050=1, [2000, 2001]/1050=2
     QCOMPARE(model.onDuplicateVideosListChanged(testData), 2 - 0);
@@ -113,12 +113,12 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
 
     LeftVideoGroupsModel model;
     QCOMPARE(model.rowCount(), 0);
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
 
     // 1th
     DupVidMetaInfoList testData1 = {
-        {"v1.mp4", 1024, 10000, 0, "/v1.mp4", "hash1", true},             //
-        {"v1_dup.mp4", 1024, 10000, 0, "/v1_dup.mp4", "hash1_dup", true}  //
+        {"v1.mp4", 1024, 10000, 0, "/v1.mp4", "hash1"},             //
+        {"v1_dup.mp4", 1024, 10000, 0, "/v1_dup.mp4", "hash1_dup"}  //
     };
     // [1024, 1024] round 2048=1
     model.onDuplicateVideosListChanged(testData1);
@@ -126,10 +126,10 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
 
     // 2nd
     DupVidMetaInfoList testData2 = {
-        {"v1.mp4", 1024, 10000, 0, "/v1.mp4", "hash1", true},                 //
-        {"v1_dup.mp4", 1024, 10000, 0, "/v1_dup.mp4", "hash1_dup", true},     //
-        {"v2.mp4", 4096 - 1, 20000, 0, "/v2.mp4", "hash2", true},             //
-        {"v2_dup.mp4", 4096 - 1, 20000, 0, "/v2_dup.mp4", "hash2_dup", true}  //
+        {"v1.mp4", 1024, 10000, 0, "/v1.mp4", "hash1"},                 //
+        {"v1_dup.mp4", 1024, 10000, 0, "/v1_dup.mp4", "hash1_dup"},     //
+        {"v2.mp4", 4096 - 1, 20000, 0, "/v2.mp4", "hash2"},             //
+        {"v2_dup.mp4", 4096 - 1, 20000, 0, "/v2_dup.mp4", "hash2_dup"}  //
     };
     // [1024, 1024] round 2048=1, [4096-1, 4096-1] round 2048=2
     model.onDuplicateVideosListChanged(testData2);
@@ -138,8 +138,8 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
     // 3rd
     DupVidMetaInfoList testData3 = {
         //
-        {"v2.mp4", 2048, 20000, 0, "/v2.mp4", "hash2", true},             //
-        {"v2_dup.mp4", 2048, 20000, 0, "/v2_dup.mp4", "hash2_dup", true}  //
+        {"v2.mp4", 2048, 20000, 0, "/v2.mp4", "hash2"},             //
+        {"v2_dup.mp4", 2048, 20000, 0, "/v2_dup.mp4", "hash2_dup"}  //
     };
     model.onDuplicateVideosListChanged(testData3);
     QCOMPARE(model.rowCount(), 1);
@@ -152,15 +152,15 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
   void mismatch_devUnchange_willNotModifyGrouped_ok() {
     LeftVideoGroupsModel model;
     QCOMPARE(model.m_groupedVidLstArrChangedTimesInTestCase, 0);
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::SIZE), 0);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE), 0);
     QCOMPARE(model.setDeviationDuration(model.m_deviationDur), 0);
     QCOMPARE(model.setDeviationSize(model.m_deviationSz), 0);
     QCOMPARE(model.m_groupedVidLstArrChangedTimesInTestCase, 0);
 
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION), 0); // here modify grouped list once
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 0); // here modify grouped list once
     QCOMPARE(model.m_groupedVidLstArrChangedTimesInTestCase, 1);
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION), 0);
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 0);
     QCOMPARE(model.setDeviationSize(model.m_deviationSz), 0);
     QCOMPARE(model.setDeviationDuration(model.m_deviationDur), 0);
     QCOMPARE(model.m_groupedVidLstArrChangedTimesInTestCase, 1);
@@ -170,7 +170,7 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
     Configuration().clear();
 
     LeftVideoGroupsModel model;
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
     QCOMPARE(model.m_deviationDur, 2 * 1000);  // 2s
     QCOMPARE(model.m_deviationSz, 2 * 1024);   // 2kB
 
@@ -178,48 +178,48 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
     // sz rounding group:  [1k, 1k, 2k, 2k]/2048=1, [3k]/2048=2 => only 1 group
     // dur rounding group: [10s, 10s]/2s=2, [20s, 20s]/2s=10, [30s]/2s=15 => 2 groups
     DupVidMetaInfoList testData = {
-        {"video1.mp4", 1024, 10000, 0, "/path/video1.mp4", "hash1", true},  //
-        {"video2.mp4", 1024, 10000, 0, "/path/video2.mp4", "hash2", true},  //
-        {"video3.mp4", 2048, 20000, 0, "/path/video3.mp4", "hash3", true},  //
-        {"video4.mp4", 2048, 20000, 0, "/path/video4.mp4", "hash4", true},  //
-        {"video5.mp4", 3072, 30000, 0, "/path/video5.mp4", "hash5", true},  //
+        {"video1.mp4", 1024, 10000, 0, "/path/video1.mp4", "hash1"},  //
+        {"video2.mp4", 1024, 10000, 0, "/path/video2.mp4", "hash2"},  //
+        {"video3.mp4", 2048, 20000, 0, "/path/video3.mp4", "hash3"},  //
+        {"video4.mp4", 2048, 20000, 0, "/path/video4.mp4", "hash4"},  //
+        {"video5.mp4", 3072, 30000, 0, "/path/video5.mp4", "hash5"},  //
     };
     // 1 by default size group
     QCOMPARE(model.onDuplicateVideosListChanged(testData), 1);
     QCOMPARE(model.rowCount(), 1);  // now row=1
 
-    QCOMPARE(model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::SIZE].size(), 1);
-    QCOMPARE(model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::DURATION].size(), 2);
+    QCOMPARE(model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE].size(), 1);
+    QCOMPARE(model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION].size(), 2);
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), "SIZE");
     QCOMPARE(model.data(model.index(0, 0)).toInt(), 4);                          // count=4, [1k, 1k, 2k, 2k]
     QCOMPARE(model.data(model.index(0, 1)).toInt(), 1024);                       // SIZE of first element
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::SIZE), 0);  // already group by size, skip
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE), 0);  // already group by size, skip
     decltype(model.m_groupedVidLstArr[0]) groupedVidLstBySizeBkp                 //
-        = model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::SIZE];
+        = model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE];
 
     // 2 switch to duration group
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION), 2 - 1);  // now row=2, differ=2-1
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::DURATION);
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 2 - 1);  // now row=2, differ=2-1
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
     QCOMPARE(model.rowCount(), 2);
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), "DURATION");
 
     QCOMPARE(model.data(model.index(0, 0)).toInt(), 2);                              // count=2, [10s, 10s]
     QCOMPARE(model.data(model.index(0, 1)).toInt(), 10000);                          // DURATION of first element
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION), 0);  // already group by duration, skip
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 0);  // already group by duration, skip
     decltype(model.m_groupedVidLstArr[0]) groupedVidLstByDurationBkp                 //
-        = model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::DURATION];
+        = model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION];
 
     // 3 switch back to size group
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::SIZE), -1);  // now row=1, differ=1-2
-    QCOMPARE(model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::SIZE], groupedVidLstBySizeBkp);
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::SIZE);
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE), -1);  // now row=1, differ=1-2
+    QCOMPARE(model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE], groupedVidLstBySizeBkp);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
 
     {
       // 4. Deviation Size changed/unchange behavior ok
       QCOMPARE(model.setDeviationDuration(60 * 1000), 0);  // current differ by mismatch duration, dev duration will not changed to 60s
       QVERIFY(model.m_deviationDur != 60 * 1000);
       QCOMPARE(model.setDeviationSize(model.m_deviationSz), 0);  // dev size unchange at all
-      QCOMPARE(model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::SIZE], groupedVidLstBySizeBkp);
+      QCOMPARE(model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE], groupedVidLstBySizeBkp);
 
       // 4.1 deviation large enough all elements in one group
       // sz rounding group:  [1k, 1k, 2k, 2k, 3k]/10M=0 => 1 group
@@ -238,18 +238,18 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
       QCOMPARE(model.data(model.index(1, 1)).toInt(), 1024);
 
       decltype(model.m_groupedVidLstArr[0]) beforeTwiceUpdate  //
-          = model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::SIZE];
+          = model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE];
       // 4.3 data update twice ok
       QCOMPARE(model.onDuplicateVideosListChanged(testData), 0);
-      QCOMPARE(model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::SIZE], beforeTwiceUpdate);
+      QCOMPARE(model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE], beforeTwiceUpdate);
     }
 
     // 5 switch back to duration group
     // dur rounding group: [10s, 10s]/2s=2, [20s, 20s]/2s=10, [30s]/2s=15 => 2 groups
-    QCOMPARE(model.setDifferType(RedundantVideoTool::DIFFER_BY_TYPE::DURATION), 2 - 2);  // rowCount = 2
+    QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 2 - 2);  // rowCount = 2
     QCOMPARE(model.rowCount(), 2);
-    QCOMPARE(model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::DURATION], groupedVidLstByDurationBkp);
-    QCOMPARE(model.m_currentDiffer, RedundantVideoTool::DIFFER_BY_TYPE::DURATION);
+    QCOMPARE(model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION], groupedVidLstByDurationBkp);
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
     {
       // 5.1 Deviation Duration changed and unchange ok
       QCOMPARE(model.setDeviationSize(1000 * 1024 * 1024), 0);  // current differ by mismatch size, dev size will not changed to 100MiB
@@ -263,11 +263,11 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
       QCOMPARE(model.data(model.index(0, 0)).toInt(), 5);  // count = 5
       QCOMPARE(model.data(model.index(0, 1)).toInt(), 10 * 1000);
       decltype(model.m_groupedVidLstArr[0]) beforeTwiceUpdate  //
-          = model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::DURATION];
+          = model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION];
 
       // 5.3 data update twice ok
       QCOMPARE(model.onDuplicateVideosListChanged(testData), 0);  // rowCount = 1
-      QCOMPARE(model.m_groupedVidLstArr[(int)RedundantVideoTool::DIFFER_BY_TYPE::DURATION], beforeTwiceUpdate);
+      QCOMPARE(model.m_groupedVidLstArr[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION], beforeTwiceUpdate);
     }
 
     // 6 data update to empty ok
@@ -276,33 +276,33 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
   }
 
   void groupingAlgorithms_ok() {
-    DupVidMetaInfoList testData = {{"v1.mp4", 1000, 1000, 0, "/v1.mp4", "h1", true},
-                                   {"v2.mp4", 1004, 1003, 0, "/v2.mp4", "h2", true},
-                                   {"v3.mp4", 2000, 2000, 0, "/v3.mp4", "h3", true},
-                                   {"v4.mp4", 2002, 2001, 0, "/v4.mp4", "h4", true},
-                                   {"v5.mp4", 3000, 3000, 0, "/v5.mp4", "h5", true}};
+    DupVidMetaInfoList testData = {{"v1.mp4", 1000, 1000, 0, "/v1.mp4", "h1"},
+                                   {"v2.mp4", 1004, 1003, 0, "/v2.mp4", "h2"},
+                                   {"v3.mp4", 2000, 2000, 0, "/v3.mp4", "h3"},
+                                   {"v4.mp4", 2002, 2001, 0, "/v4.mp4", "h4"},
+                                   {"v5.mp4", 3000, 3000, 0, "/v5.mp4", "h5"}};
 
     GroupedDupVidList groupBySizeLst = LeftVideoGroupsModel::getSizeLst(testData, 10);  // 10 byte
     GroupedDupVidList expectGroupedBySizeLst{
         DupVidMetaInfoList{
-            {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "h1", true},
-            {"v2.mp4", 1004, 1003, 0, "/v2.mp4", "h2", true},
+            {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "h1"},
+            {"v2.mp4", 1004, 1003, 0, "/v2.mp4", "h2"},
         },
         DupVidMetaInfoList{
-            {"v3.mp4", 2000, 2000, 0, "/v3.mp4", "h3", true},
-            {"v4.mp4", 2002, 2001, 0, "/v4.mp4", "h4", true},
+            {"v3.mp4", 2000, 2000, 0, "/v3.mp4", "h3"},
+            {"v4.mp4", 2002, 2001, 0, "/v4.mp4", "h4"},
         },
     };
     QCOMPARE(groupBySizeLst, expectGroupedBySizeLst);
 
     GroupedDupVidList groupByDurationLst = LeftVideoGroupsModel::getDurationsLst(testData, 10);  // 10ms
     GroupedDupVidList expectGroupedByDurationLst{DupVidMetaInfoList{
-                                                     {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "h1", true},
-                                                     {"v2.mp4", 1004, 1003, 0, "/v2.mp4", "h2", true},
+                                                     {"v1.mp4", 1000, 1000, 0, "/v1.mp4", "h1"},
+                                                     {"v2.mp4", 1004, 1003, 0, "/v2.mp4", "h2"},
                                                  },
                                                  DupVidMetaInfoList{
-                                                     {"v3.mp4", 2000, 2000, 0, "/v3.mp4", "h3", true},
-                                                     {"v4.mp4", 2002, 2001, 0, "/v4.mp4", "h4", true},
+                                                     {"v3.mp4", 2000, 2000, 0, "/v3.mp4", "h3"},
+                                                     {"v4.mp4", 2002, 2001, 0, "/v4.mp4", "h4"},
                                                  }};
     QCOMPARE(groupByDurationLst, expectGroupedByDurationLst);
   }

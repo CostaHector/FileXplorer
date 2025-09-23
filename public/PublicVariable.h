@@ -9,18 +9,54 @@ typedef std::function<bool(QString, bool, bool)> T_IntoNewPath;
 typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
 
-struct SystemPath {
-  static const QString HOME_PATH;
-  static const QString WORK_PATH;
-  static const QString STARRED_PATH;
-  static const QString VIDS_DATABASE;
-  static const QString DEVICES_AND_DRIVES_DATABASE;
-  static const QString AI_MEDIA_DUP_DATABASE;
-  static const QString RECYCLE_BIN_DATABASE;
-  static const QString PEFORMERS_DATABASE;
-  static const QString TORRENTS_DATABASE;
-  static const QString PRODUCTION_STUDIOS_DATABASE;
-};
+namespace SystemPath {
+const QString& HOME_PATH();
+
+inline const QString& WORK_PATH() {
+  static const QString path = HOME_PATH() + "/" + PROJECT_NAME;
+  return path;
+}
+
+inline const QString& STARRED_PATH() {
+  static const QString path = HOME_PATH() + "/Documents";
+  return path;
+}
+
+inline const QString& VIDS_DATABASE() {
+  static const QString path = WORK_PATH() + "/VIDS_DATABASE.db";
+  return path;
+}
+
+inline const QString& DEVICES_AND_DRIVES_DATABASE() {
+  static const QString path = WORK_PATH() + "/DEVICES_AND_DRIVES.db";
+  return path;
+}
+
+inline const QString& AI_MEDIA_DUP_DATABASE() {
+  static const QString path = WORK_PATH() + "/DUPLICATES_DB.db";
+  return path;
+}
+
+inline const QString& RECYCLE_BIN_DATABASE() {
+  static const QString path = WORK_PATH() + "/RECYCLE_BIN_DATABASE.db";
+  return path;
+}
+
+inline const QString& PEFORMERS_DATABASE() {
+  static const QString path = WORK_PATH() + "/PERFORMERS_DATABASE.db";
+  return path;
+}
+
+inline const QString& TORRENTS_DATABASE() {
+  static const QString path = WORK_PATH() + "/TORRENTS_DATABASE.db";
+  return path;
+}
+
+inline const QString& PRODUCTION_STUDIOS_DATABASE() {
+  static const QString path = WORK_PATH() + "/PRODUCTION_STUDIOS_DATABASE.db";
+  return path;
+}
+}
 
 namespace DB_TABLE {
 const QString MOVIES = "MOVIES";

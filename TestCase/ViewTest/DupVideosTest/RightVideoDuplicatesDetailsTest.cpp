@@ -50,15 +50,15 @@ class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
     GroupedDupVidList szGrp{
         DupVidMetaInfoList{
             // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
-            {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1", true},      //
-            {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2", true},            //
-            {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3", false},  // a remain
+            {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"),    "h1"},      //
+            {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"),          "h2"},            //
+            {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"},  // a remain
         },
     };
     GroupedDupVidList durGrp = szGrp;  // for simplicity. two of them are equal
     GroupedDupVidListArr groupedVidsLists{szGrp, durGrp};
 
-    RedundantVideoTool::DIFFER_BY_TYPE differBy = RedundantVideoTool::DIFFER_BY_TYPE::SIZE;
+    DuplicateVideoDetectionCriteria::DVCriteriaE differBy = DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE;
 
     RightVideoDuplicatesDetails rvdd;
     QCOMPARE(rvdd.setSharedMember(&groupedVidsLists, &differBy), true);

@@ -93,11 +93,7 @@ void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
 
 auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   const QString& pth = QDir::fromNativeSeparators(path);
-  if (!pth.isEmpty() && !QFile::exists(pth)) {
-    m_pathComboBox->setCurrentText(pth);
-    LOG_ERR_NP("Path not empty but not exist", pth);
-    return false;
-  }
+  // for cross device sharing folder: QFile::exist return false
   const QFileInfo fi{pth};
   if (fi.isFile()) {
     m_pathComboBox->setCurrentText(pth);
