@@ -643,7 +643,7 @@ public:
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   //  QWidget widget;
-  //  QMessageBox::warning(&widget, "VIDS_DATABASE path", SystemPath::VIDS_DATABASE);
+  //  QMessageBox::warning(&widget, "VIDS_DATABASE path", SystemPath::VIDS_DATABASE());
   //  widget.show();
   MoviesDatabase win;
   win.show();

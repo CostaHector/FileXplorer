@@ -181,7 +181,7 @@ void ClickableTextBrowser::onSearchMultiSelectionReq() {
 }
 
 int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
-  CastBaseDb castDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"};
+  CastBaseDb castDb{SystemPath::PEFORMERS_DATABASE(), "CAST_CONNECTION"};
   const auto db = castDb.GetDb();
   if (!db.tables().contains(DB_TABLE::PERFORMERS)) {
     LOG_ERR_NP("[Abort] Cast Table not exist", DB_TABLE::PERFORMERS);
@@ -212,7 +212,7 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
 
 
 QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whereText) {
-  FdBasedDb movieDbManager{SystemPath::VIDS_DATABASE, "EXIST_THEN_QRY_MOVIE_DB"};
+  FdBasedDb movieDbManager{SystemPath::VIDS_DATABASE(), "EXIST_THEN_QRY_MOVIE_DB"};
   QString qryCmd = FdBasedDb::QUERY_KEY_INFO_TEMPLATE.arg(DB_TABLE::MOVIES, whereText);
   QList<QSqlRecord> records;
   if (!movieDbManager.QueryForTest(qryCmd, records)) {

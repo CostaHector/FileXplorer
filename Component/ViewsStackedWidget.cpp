@@ -16,8 +16,8 @@
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
     : QStackedWidget(parent),  //
-      mMovieDb{SystemPath::VIDS_DATABASE, "DBMOVIE_CONNECT"},
-      mCastDb{SystemPath::PEFORMERS_DATABASE, "CAST_CONNECTION"},
+      mMovieDb{SystemPath::VIDS_DATABASE(), "DBMOVIE_CONNECT"},
+      mCastDb{SystemPath::PEFORMERS_DATABASE(), "CAST_CONNECTION"},
       _previewFolder{previewFolder},  //
       m_parent(parent)                //
 {

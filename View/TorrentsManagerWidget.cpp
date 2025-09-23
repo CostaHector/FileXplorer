@@ -18,7 +18,7 @@
 
 TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   : QMainWindow{parent},
-  mDb{SystemPath::TORRENTS_DATABASE, "torrent_connection"} {
+  mDb{SystemPath::TORRENTS_DATABASE(), "torrent_connection"} {
   CHECK_NULLPTR_RETURN_VOID(parent);
 
   setMenuBar(g_torrActions().GetMenuBar());
