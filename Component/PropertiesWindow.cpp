@@ -12,7 +12,7 @@
 #include "VidsDurationDisplayString.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 
 const QString PropertiesWindow::STRING_SPLITTER{60, '-'};
 
@@ -65,7 +65,7 @@ bool PropertiesWindow::UpdateMessage() {
 
 void PropertiesWindow::InitCommonInfo() {
   const auto& itemStatic = FileSystemItemFilter::ItemCounter(m_items);
-  const QString sizeMsg = FILE_PROPERTY_DSP::sizeToFileSizeDetail(itemStatic.fileSize);
+  const QString sizeMsg = DataFormatter::formatFileSizeWithBytes(itemStatic.fileSize);
   m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(itemStatic.fileCnt).arg(itemStatic.folderCnt);
   m_commonInfomation += QString("Size: %3").arg(sizeMsg);
 }
@@ -126,7 +126,7 @@ bool PropertiesWindow::operator()(const QSqlTableModel* model, const QTableView*
       totalSz += model->QSqlTableModel::data(szInd, Qt::ItemDataRole::DisplayRole).toLongLong();
     }
     m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(selIdxs.size()).arg(0);
-    const QString sizeMsg = FILE_PROPERTY_DSP::sizeToFileSizeDetail(totalSz);
+    const QString sizeMsg = DataFormatter::formatFileSizeWithBytes(totalSz);
     m_commonInfomation += QString("Size: %3").arg(sizeMsg);
   }
 

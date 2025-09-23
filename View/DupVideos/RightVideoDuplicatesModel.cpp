@@ -1,14 +1,12 @@
 #include "RightVideoDuplicatesModel.h"
-#include "MD5Calculator.h"
 #include "JsonRenameRegex.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include "PublicMacro.h"
 
 #include <QBrush>
 #include <QFileInfo>
 #include <QFileIconProvider>
 
-const QStringList RightVideoDuplicatesModel::VIDS_DETAIL_HEADER{"Name", "Date", "Size", "Duration", "Hash", "FullPath"};
 QVariant RightVideoDuplicatesModel::data(const QModelIndex& index, int role) const {
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pGroupedVidsList);
   if (!isLeftSelectedRowValid()) {
@@ -21,37 +19,23 @@ QVariant RightVideoDuplicatesModel::data(const QModelIndex& index, int role) con
   }
   const int row = index.row();
   const int column = index.column();
-  const DupVidMetaInfo& inf = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()][row];
+  const DuplicateVideoMetaInfo::DVInfo& inf = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()][row];
   switch (role) {
     case Qt::DisplayRole: {
       switch (column) {
-        case 0:
-          return inf.name;
-        case 1:
-          return QDateTime::fromMSecsSinceEpoch(inf.modifiedDate);
-        case 2:
-          return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(inf.sz);
-        case 3:
-          return FILE_PROPERTY_DSP::durationToHumanReadFriendly(inf.dur);
-        case 4: {
-          if (inf.hash.isEmpty() && rowCount() <= 10) {
-            return MD5Calculator::GetFileMD5(inf.abspath, 1024);
-          }
-          return inf.hash;
-        }
-        case 5:
-          return inf.abspath;
-        default:
-          return {};
+#define DUP_VIDEO_META_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) case DuplicateVideoMetaInfo::enu: return formatter(inf.m_##enu);   //
+      DUP_VIDEO_META_INFO_KEY_MAPPING    //
+#undef DUP_VIDEO_META_INFO_KEY_ITEM      //
+        default : return {};
       }
     }
     case Qt::ForegroundRole: {
-      return QFile::exists(inf.abspath) ? QBrush(Qt::GlobalColor::black) : QBrush(Qt::GlobalColor::gray);
+      return QFile::exists(inf.m_AbsPath) ? QBrush(Qt::GlobalColor::black) : QBrush(Qt::GlobalColor::gray);
     }
     case Qt::DecorationRole: {
       if (column == 0) {
         static QFileIconProvider fip;
-        return fip.icon(QFileInfo(inf.abspath));
+        return fip.icon(QFileInfo(inf.m_AbsPath));
       }
       return {};
     }
@@ -82,14 +66,14 @@ auto RightVideoDuplicatesModel::headerData(int section, Qt::Orientation orientat
   }
   if (role == Qt::DisplayRole) {
     if (orientation == Qt::Orientation::Horizontal) {
-      return VIDS_DETAIL_HEADER[section];
+      return DuplicateVideoMetaInfo::DV_TABLE_HEADERS[section];
     }
     return section + 1;
   }
   return QAbstractTableModel::headerData(section, orientation, role);
 }
 
-bool RightVideoDuplicatesModel::SyncFrom(const GroupedDupVidListArr* _groupedVidsListArr, const RedundantVideoTool::DIFFER_BY_TYPE* _currentDiffer) {
+bool RightVideoDuplicatesModel::SyncFrom(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer) {
   CHECK_NULLPTR_RETURN_FALSE(_groupedVidsListArr);
   CHECK_NULLPTR_RETURN_FALSE(_currentDiffer);
   _pGroupedVidsList = _groupedVidsListArr;
@@ -135,8 +119,8 @@ QString RightVideoDuplicatesModel::filePath(const QModelIndex& index) const {
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pGroupedVidsList);
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pCurrentDiffer);
 
-  const DupVidMetaInfo& inf = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()][index.row()];
-  return inf.abspath;
+  const DuplicateVideoMetaInfo::DVInfo& inf = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()][index.row()];
+  return inf.m_AbsPath;
 }
 
 QString RightVideoDuplicatesModel::fileName(const QModelIndex& index) const {
@@ -151,8 +135,8 @@ QString RightVideoDuplicatesModel::fileName(const QModelIndex& index) const {
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pGroupedVidsList);
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pCurrentDiffer);
 
-  const DupVidMetaInfo& inf = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()][index.row()];
-  return inf.name;
+  const DuplicateVideoMetaInfo::DVInfo& inf = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()][index.row()];
+  return inf.m_Name;
 }
 
 // operation like scanANewPath/AppendToCurrenAnalyzeList/SizeDeviation/DurationDeviation changed will invalidate left selection

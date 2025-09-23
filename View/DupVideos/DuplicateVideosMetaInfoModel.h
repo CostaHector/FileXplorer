@@ -2,8 +2,7 @@
 #define DUPLICATEVIDEOSMETAINFOMODEL_H
 
 #include "QAbstractTableModelPub.h"
-#include "DupVidsManager.h"
-#include "DupVideosHelper.h"
+#include "DuplicateVideosHelper.h"
 
 class DuplicateVideosMetaInfoModel : public QAbstractTableModelPub {
  public:

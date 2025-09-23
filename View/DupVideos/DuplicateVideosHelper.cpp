@@ -1,4 +1,4 @@
-#include "DupVideosHelper.h"
+#include "DuplicateVideosHelper.h"
 #include "JsonRenameRegex.h"
 
 QString GetTableName(const QString& pathName) {

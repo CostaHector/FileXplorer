@@ -3,7 +3,7 @@
 #include "ArchiveFiles.h"
 #include "QAbstractTableModelPub.h"
 #include "CustomTableView.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include "StyleSheet.h"
 
 #include <QAbstractTableModel>
@@ -25,9 +25,9 @@ class ArchiverModel : public QAbstractTableModelPub {
           case 0:
             return m_paf->key(index.row());
           case 1:
-            return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->beforeSize(index.row()));
+            return DataFormatter::formatFileSizeGMKB(m_paf->beforeSize(index.row()));
           case 2:
-            return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(m_paf->afterSize(index.row()));
+            return DataFormatter::formatFileSizeGMKB(m_paf->afterSize(index.row()));
           default:
             return QVariant();
         }
@@ -93,7 +93,7 @@ Archiver::Archiver(QWidget* parent)
 }
 
 void Archiver::ChangeWindowTitle(const QString& name, const int& Bytes) {
-  setWindowTitle(QString("QZ Archive | %1 | %2").arg(name).arg(FILE_PROPERTY_DSP::sizeToHumanReadFriendly(Bytes)));
+  setWindowTitle(QString("QZ Archive | %1 | %2").arg(name).arg(DataFormatter::formatFileSizeGMKB(Bytes)));
 }
 
 void Archiver::UpdateWindowsSize() {

@@ -1,6 +1,6 @@
 #include "DevicesDriveModel.h"
 #include "TableFields.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include "Logger.h"
 #include <QApplication>
 #include <QStyle>
@@ -24,7 +24,7 @@ QVariant DevicesDriveModel::data(const QModelIndex& idx, int role) const {
   } else if (role == Qt::DisplayRole) {
     if (col == FIELD_E::TOTAL_BYTES || col == FIELD_E::AVAIL_BYTES) {
       const qint64& sz = QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong();
-      return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(sz);
+      return DataFormatter::formatFileSizeGMKB(sz);
     }
   }
   return QSqlTableModel::data(idx, role);

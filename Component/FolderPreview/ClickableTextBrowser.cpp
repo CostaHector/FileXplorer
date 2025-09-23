@@ -1,6 +1,6 @@
 #include "ClickableTextBrowser.h"
 #include "BrowserActions.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include "FdBasedDb.h"
 #include "CastBaseDb.h"
 #include "MemoryKey.h"
@@ -236,7 +236,7 @@ QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whe
   for (const QSqlRecord& record: records) {
     const qint64 sz = record.field(SIZE_FILED_IND).value().toLongLong();
     searchResult += "<tr>";
-    searchResult += QString{"<td>%1</td>"}.arg(FILE_PROPERTY_DSP::sizeToHumanReadFriendly(sz));
+    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKB(sz));
     searchResult += QString{"<td>%1</td>"}.arg(record.field(NAME_FILED_IND).value().toString());
     searchResult += QString{"<td>%1</td>"}.arg(record.field(PREPATH_R_FILED_IND).value().toString());
     searchResult += "</tr>";

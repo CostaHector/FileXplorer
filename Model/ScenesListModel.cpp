@@ -57,7 +57,7 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
       //    case Qt::ItemDataRole::ToolTipRole: {
       //      static const QString TOOLTIP_TEMPLATE = R"(<b>%1</b><br/>%2<br/>%3)";
       //      return TOOLTIP_TEMPLATE.arg(mCurBegin[linearInd].name,                                                 // name
-      //                                  FILE_PROPERTY_DSP::sizeToHumanReadFriendly(mCurBegin[linearInd].vidSize),  // size
+      //                                  DataFormatter::formatFileSizeGMKB(mCurBegin[linearInd].vidSize),  // size
       //                                  mCurBegin[linearInd].GetFirstKImagesLabel(mRootPath));                     // images
       //    }
     default:

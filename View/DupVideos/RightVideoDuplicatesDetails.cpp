@@ -1,8 +1,6 @@
 #include "RightVideoDuplicatesDetails.h"
 #include "FileOperatorPub.h"
 #include "DuplicateVideosFinderActions.h"
-#include "DupVidsManager.h"
-#include "PublicTool.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
@@ -11,10 +9,14 @@
 #include <QClipboard>
 #include <QDesktopServices>
 
-RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent) : CustomTableView{"RightVideoDuplicatesDetails", parent} {
-  m_detailsModel = new RightVideoDuplicatesModel{this};
+RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent)//
+  : CustomTableView{"RightVideoDuplicatesDetails", parent} {
+  m_detailsModel = new (std::nothrow) RightVideoDuplicatesModel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_detailsModel);
 
-  m_rightSortProxy = new QSortFilterProxyModel;
+  m_rightSortProxy = new (std::nothrow) QSortFilterProxyModel {this};
+  CHECK_NULLPTR_RETURN_VOID(m_rightSortProxy);
+
   m_rightSortProxy->setSourceModel(m_detailsModel);
   setModel(m_rightSortProxy);
 
@@ -57,7 +59,7 @@ bool RightVideoDuplicatesDetails::on_cellDoubleClicked(const QModelIndex& ind) c
   return QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
 }
 
-bool RightVideoDuplicatesDetails::setSharedMember(GroupedDupVidListArr* pGroupedVidsList, RedundantVideoTool::DIFFER_BY_TYPE* pCurDifferType) {
+bool RightVideoDuplicatesDetails::setSharedMember(GroupedDupVidListArr* pGroupedVidsList, DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType) {
   CHECK_NULLPTR_RETURN_FALSE(pGroupedVidsList);
   CHECK_NULLPTR_RETURN_FALSE(pCurDifferType);
   return m_detailsModel->SyncFrom(pGroupedVidsList, pCurDifferType);
