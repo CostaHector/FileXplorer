@@ -12,6 +12,53 @@
 #include <QApplication>
 #include <QStyle>
 
+namespace PathActionHelper {
+bool Path2Actions(QToolBar& outTb, const QString& fullpath) {
+  outTb.clear();
+  auto* ACT_DRIVE_LETTERS = outTb.addAction(QIcon{":img/FOLDER_OF_DRIVES"}, "");
+  CHECK_NULLPTR_RETURN_FALSE(ACT_DRIVE_LETTERS);
+  for (const QString& pathSec : fullpath.split(PathTool::PATH_SEP_CHAR, Qt::SplitBehaviorFlags::KeepEmptyParts)) {
+    QAction* pAct = outTb.addAction(pathSec);
+    CHECK_NULLPTR_RETURN_FALSE(pAct);
+    auto* pWid = outTb.widgetForAction(pAct);
+    CHECK_NULLPTR_RETURN_FALSE(pWid);
+    pWid->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+  }
+  return false;
+}
+
+QString PathFromActions(const QList<QAction*>& actions, const QAction* cursorAtAction, bool bStandalize) {  //
+  int actIndexindex = 0;
+  QString caursePath;
+  foreach (const QAction* pAct, actions) {
+    if (pAct == nullptr) {
+      continue;
+    }
+    caursePath += pAct->text();
+    if (pAct == cursorAtAction) {
+      break;
+    }
+    ++actIndexindex;
+    caursePath += PathTool::PATH_SEP_CHAR;
+  }
+  if (!bStandalize) {
+    return caursePath;
+  }
+
+  if (caursePath == "" || caursePath == "/" || caursePath == "//") {
+    return caursePath;
+  }
+  if (cursorAtAction == nullptr) {
+    caursePath.chop(1);
+  }
+  QString firstExtraSlashChopped = caursePath.mid(1);
+  if (firstExtraSlashChopped.endsWith(':')) {  // for drive letter exist
+    firstExtraSlashChopped += '/';
+  }
+  return firstExtraSlashChopped;
+}
+}  // namespace PathActionHelper
+
 const QString AddressELineEdit::RELEASE_HINT_MSG = "<b>Drop item(s) to ...?</b>:<br/>";
 
 AddressELineEdit::AddressELineEdit(QWidget* parent) : QStackedWidget{parent} {
@@ -22,7 +69,8 @@ AddressELineEdit::AddressELineEdit(QWidget* parent) : QStackedWidget{parent} {
   CHECK_NULLPTR_RETURN_VOID(m_pathComboBox);
   m_pathComboBox->setEditable(true);
   m_pathComboBox->setInsertPolicy(QComboBox::InsertAtTop);
-  m_pathComboBox->lineEdit()->addAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirOpenIcon), QLineEdit::ActionPosition::LeadingPosition);
+  m_pathComboBox->lineEdit()->addAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirOpenIcon),
+                                        QLineEdit::ActionPosition::LeadingPosition);
   m_pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   QCompleter* pCompleter = new QCompleter{this};
@@ -61,7 +109,8 @@ QString AddressELineEdit::NormToolBarActionPath(QString actionPath) {
 #ifdef _WIN32
   QString pth = actionPath.mid(1);
   int n = pth.size();
-  if (n >=2 && pth[n-2] != ':' && pth[n-1] == '/') return pth.left(n-1);
+  if (n >= 2 && pth[n - 2] != ':' && pth[n - 1] == '/')
+    return pth.left(n - 1);
   return pth;
 #else
   return actionPath.size() > 1 && actionPath.back() == '/' ? actionPath.left(actionPath.size() - 1) : actionPath;
@@ -81,14 +130,8 @@ void AddressELineEdit::onReturnPressed() {
 void AddressELineEdit::updateAddressToolBarPathActions(const QString& newPath) {
   const QString& fullpath = PathTool::normPath(newPath);
   m_pathComboBox->setCurrentText(fullpath);
-  LOG_D("set Path [%s]", qPrintable(fullpath));
-  m_pathActionsTB->clear();
-  m_pathActionsTB->addAction(QIcon{":img/FOLDER_OF_DRIVES"}, "");
-  for (const QString& pathSec : fullpath.split(PathTool::PATH_SEP_CHAR, Qt::SkipEmptyParts)) {
-    auto* pAct = m_pathActionsTB->addAction(pathSec);
-    auto* pWid = m_pathActionsTB->widgetForAction(pAct);
-    pWid->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-  }
+  bool bResult = PathActionHelper::Path2Actions(*m_pathActionsTB, fullpath);
+  LOG_D("set Path[%s] bResult:%d", qPrintable(fullpath), bResult);
 }
 
 auto AddressELineEdit::ChangePath(const QString& path) -> bool {
@@ -98,7 +141,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   if (fi.isFile()) {
     m_pathComboBox->setCurrentText(pth);
     const bool bRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
-    LOG_INFO_P("Open file", "[%s]: bRet[%d]", qPrintable(pth), bRet);
+    LOG_OE_P(bRet, "Open file [%s]: bRet[%d]", qPrintable(pth), bRet);
   } else {
     updateAddressToolBarPathActions(pth);
     emit pathActionsTriggeredOrLineEditReturnPressed(pth);
@@ -132,7 +175,7 @@ auto AddressELineEdit::inputMode() -> void {
 void AddressELineEdit::mousePressEvent(QMouseEvent* event) {
   if (currentWidget() == m_pathActionsTB) {
     QAction* action = m_pathActionsTB->actionAt(event->pos());
-    if (action == nullptr) { // click at blank area. no action correspond
+    if (action == nullptr) {  // click at blank area. no action correspond
       emit m_pathComboBox->focusChanged(true);
       m_pathComboBox->setFocus();
       m_pathComboBox->lineEdit()->selectAll();

@@ -43,9 +43,8 @@ auto ViewsStackedWidget::onActionAndViewNavigate(QString newPath, bool isNewPath
 bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNewPath) {
   // can only be triggered by lineedit return pressed
   // isNewPath: bool Only differs in undo and redo operation.
-  // True means newPath would be push into undo.
-  // false not
-  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) {
+  // True means newPath would be push into undo otherwise not
+  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) { // may be an shared folder cross platform
     LOG_W("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }

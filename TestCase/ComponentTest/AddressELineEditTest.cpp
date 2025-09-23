@@ -8,33 +8,119 @@
 #include "EndToExposePrivateMember.h"
 #include <QToolButton>
 
+using namespace PathActionHelper;
+
 class AddressELineEditTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   AddressELineEditTest() : PlainTestSuite{} {
     static int objectCnt = 0;
     fprintf(stdout, "AddressELineEditTest object[%d] created\n", objectCnt++);
     std::fflush(stdout);
   }
-  ~AddressELineEditTest() {}
   const QString mTEST_PATH = QFileInfo{PathTool::normPath(__FILE__)}.absolutePath();  // The delimeter is always slash/
   const QStringList mTEST_PATH_PART_LIST = mTEST_PATH.split(PathTool::PATH_SEP_CHAR);
-private slots:
+ private slots:
+  void precondition_split_behavior_ok() {
+    // precondition:
+    QCOMPARE(QString{"/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList{"", "home", "to"}));
+    QCOMPARE(QString{"C:/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList{"C:", "home", "to"}));
+    // UNC path(Network shared folder)
+    QCOMPARE(QString{"//DESKTOP-HM3GIPD/aria"}.split(PathTool::PATH_SEP_CHAR), (QStringList{"", "", "DESKTOP-HM3GIPD", "aria"}));
+  }
 
-  void test_NormToolBarActionPath_ok() {
-#ifdef _WIN32
-    // Disk A to Disk Z
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/A:"),  "A:");
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/C:"),  "C:");
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/Z:"),  "Z:");
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/XX:"), "XX:");
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath(""), ""); // "" in windows is root
-#else
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath(""), "");
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/"), "/");
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/home"), "/home");
-    QCOMPARE(AddressELineEdit::NormToolBarActionPath("/home/user"), "/home/user");
-#endif
+  void path2Actions_linux_std_path_ok() {
+    QToolBar outTb;
+    Path2Actions(outTb, "/home/to/path");
+    QList<QAction*> actions = outTb.actions();
+    QVERIFY(actions.size() >= 4);
+    QCOMPARE(PathFromActions(actions, actions[0], false), "");
+    QCOMPARE(PathFromActions(actions, actions[1], false), "/");
+    QCOMPARE(PathFromActions(actions, actions[2], false), "//home");
+    QCOMPARE(PathFromActions(actions, actions[3], false), "//home/to");
+    QCOMPARE(PathFromActions(actions, actions[4], false), "//home/to/path");
+
+    QCOMPARE(PathFromActions(actions, actions[0], true), "");
+    QCOMPARE(PathFromActions(actions, actions[1], true), "/");
+    QCOMPARE(PathFromActions(actions, actions[2], true), "/home");
+    QCOMPARE(PathFromActions(actions, actions[3], true), "/home/to");
+    QCOMPARE(PathFromActions(actions, actions[4], true), "/home/to/path");
+    QCOMPARE(PathFromActions(actions, nullptr, true), "/home/to/path");
+
+    {  // bounder test
+      Path2Actions(outTb, "/");
+      QList<QAction*> actions2 = outTb.actions();
+      QVERIFY(actions2.size() >= 2);
+      QCOMPARE(PathFromActions(actions2, actions2[0], false), "");
+      QCOMPARE(PathFromActions(actions2, actions2[1], false), "/");
+      QCOMPARE(PathFromActions(actions2, actions2[0], true), "");
+      QCOMPARE(PathFromActions(actions2, actions2[1], true), "/");
+    }
+  }
+
+  void path2Actions_windows_ok() {
+    QToolBar outTb;
+    Path2Actions(outTb, "C:/home/to/path");
+    QList<QAction*> actions = outTb.actions();
+    QVERIFY(actions.size() >= 5);
+    QCOMPARE(PathFromActions(actions, actions[0], false), "");
+    QCOMPARE(PathFromActions(actions, actions[1], false), "/C:");
+    QCOMPARE(PathFromActions(actions, actions[2], false), "/C:/home");
+    QCOMPARE(PathFromActions(actions, actions[3], false), "/C:/home/to");
+    QCOMPARE(PathFromActions(actions, actions[4], false), "/C:/home/to/path");
+
+    QCOMPARE(PathFromActions(actions, actions[0], true), "");
+    QCOMPARE(PathFromActions(actions, actions[1], true), "C:/");
+    QCOMPARE(PathFromActions(actions, actions[2], true), "C:/home");
+    QCOMPARE(PathFromActions(actions, actions[3], true), "C:/home/to");
+    QCOMPARE(PathFromActions(actions, actions[4], true), "C:/home/to/path");
+    QCOMPARE(PathFromActions(actions, nullptr, true), "C:/home/to/path");
+
+    {  // bounder test
+      Path2Actions(outTb, "C:/");
+      QList<QAction*> actions2 = outTb.actions();
+      QVERIFY(actions2.size() >= 2);
+      QCOMPARE(PathFromActions(actions2, actions2[0], false), "");
+      QCOMPARE(PathFromActions(actions2, actions2[1], false), "/C:");
+      QCOMPARE(PathFromActions(actions2, actions2[0], true), "");
+      QCOMPARE(PathFromActions(actions2, actions2[1], true), "C:/");
+      QCOMPARE(PathFromActions(actions2, nullptr, true), "C:/");
+    }
+  }
+
+  void path2Actions_unc_netword_shared_folder_ok() {
+    QToolBar outTb;
+    Path2Actions(outTb, "//DESKTOP-HM3GIPD/aria");
+    QList<QAction*> actions = outTb.actions();
+    QVERIFY(actions.size() >= 5);
+    QCOMPARE(PathFromActions(actions, actions[0], false), "");
+    QCOMPARE(PathFromActions(actions, actions[1], false), "/");
+    QCOMPARE(PathFromActions(actions, actions[2], false), "//");
+    QCOMPARE(PathFromActions(actions, actions[3], false), "///DESKTOP-HM3GIPD");
+    QCOMPARE(PathFromActions(actions, actions[4], false), "///DESKTOP-HM3GIPD/aria");
+
+    QCOMPARE(PathFromActions(actions, actions[0], true), "");
+    QCOMPARE(PathFromActions(actions, actions[1], true), "/");
+    QCOMPARE(PathFromActions(actions, actions[2], true), "//");
+    QCOMPARE(PathFromActions(actions, actions[3], true), "//DESKTOP-HM3GIPD");
+    QCOMPARE(PathFromActions(actions, actions[4], true), "//DESKTOP-HM3GIPD/aria");
+    QCOMPARE(PathFromActions(actions, nullptr, true), "//DESKTOP-HM3GIPD/aria");
+
+    {  // bounder test 1
+      Path2Actions(outTb, "//DESKTOP-HM3GIPD");
+      QList<QAction*> actions4 = outTb.actions();
+      QVERIFY(actions4.size() >= 4);
+      QCOMPARE(PathFromActions(actions4, actions4[0], false), "");
+      QCOMPARE(PathFromActions(actions4, actions4[1], false), "/");
+      QCOMPARE(PathFromActions(actions4, actions4[2], false), "//");
+      QCOMPARE(PathFromActions(actions4, actions4[3], false), "///DESKTOP-HM3GIPD");
+      QCOMPARE(PathFromActions(actions4, actions4[0], true), "");
+      QCOMPARE(PathFromActions(actions4, actions4[1], true), "/");
+      QCOMPARE(PathFromActions(actions4, actions4[2], true), "//");
+      QCOMPARE(PathFromActions(actions4, actions4[3], true), "//DESKTOP-HM3GIPD");
+      QCOMPARE(PathFromActions(actions4, nullptr, true), "//DESKTOP-HM3GIPD");
+    }
+    // path "//" not valid in windows. here we don't expect what its behavior should be
   }
 
   void test_initial_state_ok() {
@@ -90,16 +176,6 @@ private slots:
     // Or [recommend] disconnect signal connect in destructor to prevents signals reaching partially-destroyed objects
   }
 
-  void test_precondition_split_behavior_ok() {
-    // precondition:
-    QCOMPARE(QString{"/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList() << ""
-                                                                                << "home"
-                                                                                << "to"));
-    QCOMPARE(QString{"C:/home/to"}.split(PathTool::PATH_SEP_CHAR), (QStringList() << "C:"
-                                                                                  << "home"
-                                                                                  << "to"));
-  }
-
   void test_clickPathAction_RemainsInClickMode_and_PathChanged_ok() {
     AddressELineEdit addressLe;
 
@@ -123,11 +199,9 @@ private slots:
     addressLe.show();
     addressLe.activateWindow();
     QVERIFY(QTest::qWaitForWindowActive(&addressLe));
-
     QSignalSpy spyToolBarActionTriggered(tb, &QToolBar::actionTriggered);
     QTest::mouseClick(firstButton, Qt::LeftButton, Qt::NoModifier, {}, 50);
     QTRY_COMPARE(spyToolBarActionTriggered.count(), 1);  // should emit m_pathActionsTB.triggered(firstAction)!
-
     QList<QVariant> actionTriggeredParams = spyToolBarActionTriggered.last();
     QCOMPARE(actionTriggeredParams.size(), 1);
     QVariant actVariant = actionTriggeredParams.front();
@@ -138,7 +212,9 @@ private slots:
 
     QCOMPARE(addressLe.currentWidget(), addressLe.m_pathActionsTB);  // After: Still QToolBar Click Mode
     QCOMPARE(addressLe.m_pathComboBox->currentText(), "");
-    QCOMPARE(addressLe.pathFromFullActions(), "");
+    // for linux. click at first action. there will be 2 empty action "", one for empty, one for root
+    // for linux. click at first action. there will be 2 empty action "", one for all disk letter, one for nothing
+    QCOMPARE(addressLe.pathFromFullActions(), "//");
   }
 
   void test_EscapeKey_ToggleBackTo_ToolbarClickMode_ok() {

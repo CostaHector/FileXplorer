@@ -205,16 +205,19 @@ int DoDropAction(Qt::DropAction dropAct, const QStringList& absPaths, const QStr
   return 0;
 }
 
-Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
+Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) { // todo: testcase need added with SetMimeDataCutCopy
 #ifdef _WIN32
   if (native.hasFormat("Preferred DropEffect")) {
     const QByteArray& ba = native.data("Preferred DropEffect");
     if (ba[0] == 0x2) {  // # 2 for cut and 5 for copy
       return Qt::DropAction::MoveAction;
-    } else if (ba[0] == 0x5) {
+    } else if (ba[0] == 0x1) {
       return Qt::DropAction::CopyAction;
+    } else if (ba[0] == 0x4) {
+      return Qt::DropAction::LinkAction;
+    } else {
+      LOG_W("Preferred DropEffect value[%d] invalid", (int)ba[0]);
     }
-    LOG_W("Preferred DropEffect value[%d] invalid", (int)ba[0]);
   }
 #else
   if (native.hasFormat("x-special/gnome-copied-files")) {
@@ -224,6 +227,8 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
       return Qt::DropAction::MoveAction;
     } else if (cutOrCopyAction.startsWith("copy")) {
       return Qt::DropAction::CopyAction;
+    } else if (cutOrCopyAction.startsWith("link")) {
+      return Qt::DropAction::LinkAction;
     }
     LOG_W("x-special/gnome-copied-files value[%s] invalid", qPrintable(cutOrCopyAction));
   } else if (native.hasFormat("XdndAction")) {
@@ -233,6 +238,8 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
       return Qt::DropAction::MoveAction;
     } else if (cutOrCopyAction == "XdndActionCopy") {
       return Qt::DropAction::CopyAction;  // 0x1
+    } else if (cutOrCopyAction == "XdndActionLink") {
+      return Qt::DropAction::LinkAction;  // 0x1
     }
     LOG_W("XdndAction value[%s] invalid", qPrintable(cutOrCopyAction));
   }
