@@ -19,11 +19,11 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
   FIND_DUPLICATE_IMGS_IN_A_PATH->setShortcutVisibleInContextMenu(true);
   FIND_DUPLICATE_IMGS_IN_A_PATH->setToolTip("Search duplicates in a folder");
 
-  using namespace RedundantImageTool;
-  mDecideByIntAction.init({{FIND_DUPLICATE_IMGS_BY_LIBRARY, DecideByE::LIBRARY},  //
-                           {FIND_DUPLICATE_IMGS_IN_A_PATH, DecideByE::MD5}},      //
-                          DEFAULT_DECIDE_BY, QActionGroup::ExclusionPolicy::Exclusive);
-  mDecideByIntAction.setCheckedIfActionExist(DEFAULT_DECIDE_BY);
+  using namespace DuplicateImageDetectionCriteria;
+  mDecideByIntAction.init({{FIND_DUPLICATE_IMGS_BY_LIBRARY, DICriteriaE::LIBRARY},  //
+                           {FIND_DUPLICATE_IMGS_IN_A_PATH, DICriteriaE::MD5}},      //
+                          DEFAULT_DI_CRITERIA_E, QActionGroup::ExclusionPolicy::Exclusive);
+  mDecideByIntAction.setCheckedIfActionExist(DEFAULT_DI_CRITERIA_E);
 
   RECYLE_NOW = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this};
   CHECK_NULLPTR_RETURN_VOID(RECYLE_NOW);

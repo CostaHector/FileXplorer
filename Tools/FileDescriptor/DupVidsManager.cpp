@@ -18,8 +18,8 @@
 using namespace VidDupHelper;
 
 const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
-    {"CREATE TABLE IF NOT EXISTS `%1`"                       //
-     + QString(R"((
+{"CREATE TABLE IF NOT EXISTS `%1`"                       //
+  + QString(R"((
       `%1` NCHAR(512) NOT NULL,
       `%2` INTEGER NOT NULL,
       `%3` INTEGER DEFAULT 0,
@@ -30,17 +30,17 @@ const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
       `%8` NCHAR(32) DEFAULT NULL,
       PRIMARY KEY (`%5`, `%2`)
 );)")
-           .arg(ENUM_2_STR(EFFECTIVE_NAME))
-           .arg(ENUM_2_STR(SIZE))
-           .arg(ENUM_2_STR(DURATION))
-           .arg(ENUM_2_STR(DATE))
-           .arg(ENUM_2_STR(ABSOLUTE_PATH))
-           .arg(ENUM_2_STR(FIRST_1024_HASH))
-           .arg(ENUM_2_STR(FIRST_8192_HASH))
-           .arg(ENUM_2_STR(FULL_SIZE_HASH))};
+      .arg(ENUM_2_STR(EFFECTIVE_NAME))
+      .arg(ENUM_2_STR(SIZE))
+      .arg(ENUM_2_STR(DURATION))
+      .arg(ENUM_2_STR(DATE))
+      .arg(ENUM_2_STR(ABSOLUTE_PATH))
+      .arg(ENUM_2_STR(FIRST_1024_HASH))
+      .arg(ENUM_2_STR(FIRST_8192_HASH))
+      .arg(ENUM_2_STR(FULL_SIZE_HASH))};
 
 DupVidsManager::DupVidsManager(QObject* parent)  //
-    : DbManager{GetAiDupVidDbPath(), VID_DUP_CONNECTION_NAME, parent} {}
+  : DbManager{GetAiDupVidDbPath(), VID_DUP_CONNECTION_NAME, parent} {}
 
 bool DupVidsManager::IsTableExist(const QString& tableName) const {
   QSqlDatabase db = QSqlDatabase::database(VID_DUP_CONNECTION_NAME);
@@ -65,13 +65,13 @@ int DupVidsManager::ScanLocations(const QStringList& paths) {
 }
 
 const QString DupVidsManager::INSERT_DUP_VID_TEMPLATE  //
-    {"REPLACE INTO `%1` "                              //
-     + QString{R"((`%1`,`%2`,`%3`,`%4`,`%5`) VALUES(:1, :2, :3, :4, :5);)"}
-           .arg(ENUM_2_STR(EFFECTIVE_NAME))
-           .arg(ENUM_2_STR(SIZE))
-           .arg(ENUM_2_STR(DURATION))
-           .arg(ENUM_2_STR(DATE))
-           .arg(ENUM_2_STR(ABSOLUTE_PATH))};
+{"REPLACE INTO `%1` "                              //
+  + QString{R"((`%1`,`%2`,`%3`,`%4`,`%5`) VALUES(:1, :2, :3, :4, :5);)"}
+  .arg(ENUM_2_STR(EFFECTIVE_NAME))
+      .arg(ENUM_2_STR(SIZE))
+      .arg(ENUM_2_STR(DURATION))
+      .arg(ENUM_2_STR(DATE))
+      .arg(ENUM_2_STR(ABSOLUTE_PATH))};
 
 enum INSERT_DUP_VID_TEMPLATE_FIELD {  //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
   INSERT_DUP_VID_TEMPLATE_FIELD_EFFECTIVE_NAME = 0,
@@ -232,7 +232,7 @@ int DupVidsManager::GetTablesCnt() const {
 }
 
 const QString DupVidsManager::TABLE_NAME_2_VIDEOS_COUNT  //
-    {"SELECT COUNT(*) FROM `%1`;"};
+{"SELECT COUNT(*) FROM `%1`;"};
 
 enum TABLE_NAME_2_VIDEOS_COUNT_FIELD {  //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
   TABLE_NAME_2_VIDEOS_COUNT_FIELD_NAME = 0,
@@ -262,12 +262,12 @@ DupVidTableName2RecordCountList DupVidsManager::TableName2Cnt() {
 }
 
 const QString DupVidsManager::FIND_SAME_SIZE_VID  //
-    {QString("SELECT `%1`, `%2` FROM ")           //
-         .arg(ENUM_2_STR(ABSOLUTE_PATH))          //
-         .arg(ENUM_2_STR(SIZE)) +
-     QString{" `%1` "}                  //
-     + QString(" WHERE `%1` IS NULL;")  //
-           .arg(ENUM_2_STR(FIRST_1024_HASH))};
+{QString("SELECT `%1`, `%2` FROM ")           //
+      .arg(ENUM_2_STR(ABSOLUTE_PATH))          //
+      .arg(ENUM_2_STR(SIZE)) +
+      QString{" `%1` "}                  //
+  + QString(" WHERE `%1` IS NULL;")  //
+      .arg(ENUM_2_STR(FIRST_1024_HASH))};
 
 enum FIND_SAME_SIZE_VID_FIELD {                //
   FIND_SAME_SIZE_VID_FIELD_ABSOLUTE_PATH = 0,  //
@@ -276,12 +276,12 @@ enum FIND_SAME_SIZE_VID_FIELD {                //
 };
 
 const QString DupVidsManager::UPDATE_HASH_BY_PRIMARY_KEY  //
-    {
-        QString{"UPDATE `%1` "}  //
-        + QString(" SET `%1` = (:1) WHERE `%2` == (:2);")
-              .arg(ENUM_2_STR(FIRST_1024_HASH))  //
-              .arg(ENUM_2_STR(ABSOLUTE_PATH))    //
-    };
+{
+  QString{"UPDATE `%1` "}  //
+  + QString(" SET `%1` = (:1) WHERE `%2` == (:2);")
+      .arg(ENUM_2_STR(FIRST_1024_HASH))  //
+      .arg(ENUM_2_STR(ABSOLUTE_PATH))    //
+};
 
 enum UPDATE_HASH_BY_PRIMARY_KEY_FIELD {
   UPDATE_HASH_BY_PRIMARY_KEY_FIELD_FIRST_1024_HASH = 0,
@@ -338,14 +338,14 @@ int DupVidsManager::FillHashFieldIfSizeConflict(const QString& path) {
 }
 
 const QString DupVidsManager::READ_DUP_INFO_FROM_TABLES    //
-    {QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`"}  //
-         .arg(ENUM_2_STR(EFFECTIVE_NAME))                  //
-         .arg(ENUM_2_STR(SIZE))                            //
-         .arg(ENUM_2_STR(DURATION))                        //
-         .arg(ENUM_2_STR(DATE))                            //
-         .arg(ENUM_2_STR(ABSOLUTE_PATH))                   //
-         .arg(ENUM_2_STR(FIRST_1024_HASH))                 //
-     + " FROM `%1`;"};
+{QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`"}  //
+  .arg(ENUM_2_STR(EFFECTIVE_NAME))                  //
+      .arg(ENUM_2_STR(SIZE))                            //
+      .arg(ENUM_2_STR(DURATION))                        //
+      .arg(ENUM_2_STR(DATE))                            //
+      .arg(ENUM_2_STR(ABSOLUTE_PATH))                   //
+      .arg(ENUM_2_STR(FIRST_1024_HASH))                 //
+      + " FROM `%1`;"};
 
 enum READ_DUP_INFO_FROM_TABLES_FIELD {
   READ_DUP_INFO_FROM_TABLES_FIELD_EFFECTIVE_NAME = 0,
@@ -376,12 +376,12 @@ int DupVidsManager::ReadSpecifiedTables2List(const QStringList& tbls, DupVidMeta
       return succeedTblCnt;
     }
     while (query.next()) {
-      vidInfoList.append(DupVidMetaInfo{query.value(0).toString(),    //
-                                        query.value(1).toLongLong(),  //
-                                        query.value(2).toInt(),       //
-                                        query.value(3).toLongLong(),  //
-                                        query.value(4).toString(),    //
-                                        query.value(5).toString(), true});
+      vidInfoList.append(DuplicateVideoMetaInfo::DVInfo{query.value(0).toString(),    //
+                                                  query.value(1).toLongLong(),  //
+                                                  query.value(2).toInt(),       //
+                                                  query.value(3).toLongLong(),  //
+                                                  query.value(4).toString(),    //
+                                                  query.value(5).toString()});
     }
     ++succeedTblCnt;
   }

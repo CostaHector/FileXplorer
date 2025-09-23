@@ -1,5 +1,5 @@
 #include "CastBrowserHelper.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include "TableFields.h"
 #include "VideoDurationGetter.h"
 #include "PathTool.h"
@@ -72,7 +72,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
       return {};
     }
     int dur = mi.GetLengthQuick(fileAbsPath);
-    detail += QString(R"(<h3>Length: %1</h3>)").arg(FILE_PROPERTY_DSP::durationToHumanReadFriendly(dur));
+    detail += QString(R"(<h3>Length: %1</h3>)").arg(DataFormatter::formatDurationISOMs(dur));
   }
 
   QString imgStr;
@@ -98,7 +98,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
   const QFileInfo fi{fileAbsPath};
   detail += QString(R"(<h3><a href="file:///%1">%2</a></h3>)").arg(fileAbsPath, imgStr);
   detail += QString(R"(<font size="+2">)");
-  detail += QString(R"(Size: %1<br/>)").arg(FILE_PROPERTY_DSP::sizeToFileSizeDetail(fi.size()));
+  detail += QString(R"(Size: %1<br/>)").arg(DataFormatter::formatFileSizeWithBytes(fi.size()));
   detail += QString(R"(Date created: %1<br/>)").arg(fi.lastModified().toString(Qt::ISODate));
   detail += QString(R"(Date modified: %1<br/>)").arg(fi.birthTime().toString(Qt::ISODate));
   detail += QString(R"(Full path: %1<br/>)").arg(fileAbsPath);

@@ -1,6 +1,6 @@
 ﻿#include "RedundantImageModel.h"
 #include "PathTool.h"
-#include "DisplayEnhancement.h"
+#include "DataFormatter.h"
 #include <QPixmap>
 
 const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview", "absPath"};
@@ -19,7 +19,7 @@ QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
         case 0:
           return PathTool::fileName(item.filePath);
         case 1:
-          return FILE_PROPERTY_DSP::sizeToHumanReadFriendly(item.size);
+          return DataFormatter::formatFileSizeGMKB(item.size);
         case 2:
           return item.md5;
         case 4:

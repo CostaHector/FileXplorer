@@ -1,9 +1,11 @@
 #include "DataFormatter.h"
 #include "SortedUniqStrLst.h"
+#include "MD5Calculator.h"
 #include "NameTool.h"
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QTime>
 
 namespace DataFormatter {
 
@@ -253,4 +255,25 @@ void writeJsonObjectSortedStrLst(QJsonObject& json, const QString& key, const So
   json[key] = QJsonArray::fromStringList(val.toSortedList());
 }
 
+QString formatDateIsoMs(const qint64 ms) {
+  return  QDateTime::fromMSecsSinceEpoch(ms).toString(Qt::ISODateWithMs);
+}
+QString formatDateIso(const qint64 ms) {
+  return  QDateTime::fromMSecsSinceEpoch(ms).toString(Qt::ISODate);
+}
+QString formatDurationISOMs(const qint64 ms) {
+  return QTime::fromMSecsSinceStartOfDay(ms).toString(Qt::ISODateWithMs);
+}
+QString formatDurationISO(const qint64 ms) {
+  return QTime::fromMSecsSinceStartOfDay(ms).toString(Qt::ISODate);
+}
+QString formatMd5ByPathFirst8Byte(const QString& fileAbspath) {
+  return MD5Calculator::GetFileMD5(fileAbspath, MD5Calculator::BYTE_8);
+}
+QString formatMd5ByPathFirst1MillionByte(const QString& fileAbspath) {
+  return MD5Calculator::GetFileMD5(fileAbspath, MD5Calculator::BYTE_1024);
+}
+QString formatMd5ByPath(const QString& fileAbspath) {
+  return MD5Calculator::GetFileMD5(fileAbspath, -1); // entire file
+}
 };  // namespace DataFormatter

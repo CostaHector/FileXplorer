@@ -3,7 +3,7 @@
 
 #include "CustomTableView.h"
 #include "RightVideoDuplicatesModel.h"
-#include "DupVideosHelper.h"
+#include "DuplicateVideosHelper.h"
 #include <QSortFilterProxyModel>
 
 class RightVideoDuplicatesDetails : public CustomTableView {
@@ -12,7 +12,7 @@ class RightVideoDuplicatesDetails : public CustomTableView {
   explicit RightVideoDuplicatesDetails(QWidget* parent = nullptr);
   bool on_effectiveNameCopiedForEverything(const QModelIndex& ind) const;
   bool on_cellDoubleClicked(const QModelIndex& ind) const;
-  bool setSharedMember(GroupedDupVidListArr* pGroupedVidsList, RedundantVideoTool::DIFFER_BY_TYPE* pCurDifferType);
+  bool setSharedMember(GroupedDupVidListArr* pGroupedVidsList, DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType);
   bool onRecycleSelection();
   int onLeftVideoGroupsTableSelectionChanged(int newRow);
 

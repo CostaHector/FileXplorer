@@ -58,7 +58,7 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
       if (orientation == Qt::Orientation::Vertical) {
         return section + 1;
       }
-      return JsonKey::JSON_KEY_IND_2_NAME[section];
+      return JsonKey::JSON_TABLE_HEADERS[section];
     }
     case Qt::TextAlignmentRole: {
       if (orientation == Qt::Vertical) {
