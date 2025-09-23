@@ -10,6 +10,7 @@
 #include "TDir.h"
 #include "VideoTestPrecoditionTools.h"
 #include <QSqlRecord>
+#include "VidDupTabFields.h"
 
 class DupVidsManagerTest : public PlainTestSuite {
   Q_OBJECT
@@ -24,10 +25,9 @@ class DupVidsManagerTest : public PlainTestSuite {
   const QString tb2{GetTableName(AI_MEDIA_DUPLICATE_DIR_FOLDER_1)};
   const QString tb3{GetTableName(AI_MEDIA_DUPLICATE_DIR_NO_MEDIA)};
 
-  const VideoTestPrecoditionTools& tool{VideoTestPrecoditionTools::getInst()};
  private slots:
   void initTestCase() {
-    QCOMPARE(DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false), true);
+    QCOMPARE(DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false), true);
     // empty
     // folder_1{movie 1 duplicate.mp4, movie 2 duplicate.mp4, movie 3 unique.mkv},
     // no_media{any text.txt}
@@ -47,7 +47,7 @@ class DupVidsManagerTest : public PlainTestSuite {
   }
 
   void cleanupTestCase() {  //
-    DupVidsManager::DropDatabaseForTest(tool.DUP_VID_DB, false);
+    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
   }
 
   void test_C_DISK_DRIVER_NAME_2_TableName() {
@@ -73,7 +73,7 @@ class DupVidsManagerTest : public PlainTestSuite {
   }
 
   void test_ScanPath_DropTable_ok() {
-    DupVidsManager::DropAllTablesForTest(tool.DUP_VID_CONN);
+    DupVidsManager::DropAllTablesForTest(VidDupHelper::VID_DUP_CONNECTION_NAME);
 
     DupVidsManager aid;
     aid.setSkipGetVideosDuration(true);
@@ -135,12 +135,12 @@ class DupVidsManagerTest : public PlainTestSuite {
     QCOMPARE(aid.GetTablesCnt(), 0);
 
     {  // bidirectional conversion between table names and file paths ok
-      const QString tableNameTsPath = GetTableName(tool.TS_FILE_MERGER_SAMPLE_PATH);
+      const QString tableNameTsPath = GetTableName(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH);
       const QString pathFromTable = TableName2Path(tableNameTsPath);
-      QCOMPARE(pathFromTable, tool.TS_FILE_MERGER_SAMPLE_PATH);
+      QCOMPARE(pathFromTable, VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH);
 
       const QString qryAll = QString{"SELECT * from `%1`;"}.arg(tableNameTsPath);
-      bool bScanTs = aid.ScanALocation(tool.TS_FILE_MERGER_SAMPLE_PATH);
+      bool bScanTs = aid.ScanALocation(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH);
       QCOMPARE(bScanTs, true);
 
       QList<QSqlRecord> expectAllRecords;
@@ -161,11 +161,11 @@ class DupVidsManagerTest : public PlainTestSuite {
 
       {  // 5. AuditTables ok. videos not exist will be removed from database
         // 1 file get renamed, audit repair 1 one (delete this record in table directly)
-        QCOMPARE(QDir{tool.TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
-        AutoRollbackRename oneVideoGetRenamed{tool.TS_FILE_MERGER_SAMPLE_PATH, "File need to merge seg-1-v1-a1.ts",
+        QCOMPARE(QDir{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
+        AutoRollbackRename oneVideoGetRenamed{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH, "File need to merge seg-1-v1-a1.ts",
                                               "File need to merge seg-1-v1-a1 renamed to.ts"};
         QCOMPARE(oneVideoGetRenamed.Execute(), true);
-        QCOMPARE(QDir{tool.TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), false);
+        QCOMPARE(QDir{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), false);
         QCOMPARE(aid.AuditTables({tableNameTsPath}), 1);
 
         QList<QSqlRecord> allRecordsAfterAudit;
@@ -173,11 +173,11 @@ class DupVidsManagerTest : public PlainTestSuite {
         QCOMPARE(allRecordsAfterAudit.size(), expectAllRecords.size() - 1);  // get delete one record
       }
     }
-    QCOMPARE(QDir{tool.TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
+    QCOMPARE(QDir{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
   }
 
   void test_ScanPathContainDuplicates_ok() {
-    DupVidsManager::DropAllTablesForTest(tool.DUP_VID_CONN);
+    DupVidsManager::DropAllTablesForTest(VidDupHelper::VID_DUP_CONNECTION_NAME);
 
     DupVidsManager aid;
     aid.setSkipGetVideosDuration(true);

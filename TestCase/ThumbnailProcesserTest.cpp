@@ -7,13 +7,12 @@
 #include "ThumbnailProcesser.h"
 #include "EndToExposePrivateMember.h"
 #include "MemoryKey.h"
+#include "VideoTestPrecoditionTools.h"
 
 #include <QImage>
 bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int height = 1080) {
-  // 创建指定大小的白色图像（ARGB32格式）
-  QImage image{width, height, QImage::Format_ARGB32};
-  // 填充白色（RGBA：255,255,255,255）
-  image.fill(Qt::white);
+  QImage image{width, height, QImage::Format_ARGB32}; // ARGB32
+  image.fill(Qt::white); // RGBA：255,255,255,255
   if (!image.save(filePath)) {
     qWarning("Failed to save image to file[%s]", qPrintable(filePath));
     return false;
@@ -21,15 +20,11 @@ bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int heigh
   return true;
 }
 
-const QString VIDEOS_DURATION_DIR = TESTCASE_ROOT_PATH "/test/TestEnvVideosDurationGetter";
-
 class ThumbnailProcesserTest : public PlainTestSuite {
   Q_OBJECT
 public:
   ThumbnailProcesserTest() : PlainTestSuite{} {}
 private slots:
-  void cleanupTestCase() {}
-
   void test_CheckParameters() {
     int backupValue = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, //
                                             MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
@@ -65,7 +60,7 @@ private slots:
   }
 
   void test_2_videos_need_to_create_thumbnail_imgs() {
-    QDir dir{VIDEOS_DURATION_DIR};
+    QDir dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
     QVERIFY(dir.exists("Big Buck Bunny SampleVideo_360x240_1mb 9s.mkv"));
     QVERIFY(dir.exists("Big Buck Bunny SampleVideo_360x240_1mb 10s.flv"));
     ON_SCOPE_EXIT {

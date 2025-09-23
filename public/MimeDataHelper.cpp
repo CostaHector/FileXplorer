@@ -40,9 +40,11 @@ bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction) {
   if (dropAction == Qt::DropAction::MoveAction) {  // # 2 for cut and 5 for copy
     preferred[0] = 0x2;
   } else if (dropAction == Qt::DropAction::CopyAction) {
-    preferred[0] = 0x5;
+    preferred[0] = 0x1;
+  } else if (dropAction == Qt::DropAction::LinkAction) {
+    preferred[0] = 0x4;
   } else {
-    LOG_W("cannot refill base DropEffect");
+    LOG_W("Unsupport DropEffect[%d]", (int)dropAction);
     return false;
   }
   mimeData.setData("Preferred DropEffect", preferred);
@@ -51,8 +53,10 @@ bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction) {
     mimeData.setData("XdndAction", "XdndActionMove");
   } else if (dropAction == Qt::DropAction::CopyAction) {
     mimeData.setData("XdndAction", "XdndActionCopy");
+  } else if (dropAction == Qt::DropAction::LinkAction) {
+    mimeData.setData("XdndAction", "XdndActionLink");
   } else {
-    LOG_W("cannot refill base DropEffect");
+    LOG_W("Unsupport DropEffect[%d]", (int)dropAction);
     return false;
   }
 #endif
@@ -61,7 +65,8 @@ bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction) {
 
 int WriteIntoSystemClipboard(const MimeDataMember& mimeDataMember, Qt::DropAction dropAct) {
   QMimeData* pMimeData = new (std::nothrow) QMimeData;
-  CHECK_NULLPTR_RETURN_FALSE(pMimeData)
+  CHECK_NULLPTR_RETURN_FALSE(pMimeData);
+  const int itemsCnt = mimeDataMember.texts.size();
   pMimeData->setText(mimeDataMember.texts.join('\n'));
   pMimeData->setUrls(mimeDataMember.urls);
   if (!SetMimeDataCutCopy(*pMimeData, dropAct)) {
@@ -69,8 +74,10 @@ int WriteIntoSystemClipboard(const MimeDataMember& mimeDataMember, Qt::DropActio
     return -1;
   }
   QClipboard* pClipboard = QApplication::clipboard();
+  CHECK_NULLPTR_RETURN_INT(pClipboard, -2);
   pClipboard->setMimeData(pMimeData);
-  return mimeDataMember.texts.size();
+  LOG_D("setMimeData with %d item(s) finished", itemsCnt);
+  return itemsCnt;
 }
 
 }  // namespace MimeDataHelper
