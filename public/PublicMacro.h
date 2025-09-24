@@ -45,6 +45,10 @@
   case enum_val:                             \
     return #enum_val
 
+#define STRINGIFY__LINE__CORE(lineNoLiteral) #lineNoLiteral
+#define STRINGIFY__LINE__(lineNoMarco) STRINGIFY__LINE__CORE(lineNoMarco)
+#define CSTRING_WITH__LINE__(specifiedCString, lineNoMarco) specifiedCString STRINGIFY__LINE__(lineNoMarco)
+
 inline bool isIndexInrange(int begin, int val, int end) {
   return begin <= val && val < end;
 }

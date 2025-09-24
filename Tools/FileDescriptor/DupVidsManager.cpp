@@ -40,12 +40,11 @@ const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
       .arg(ENUM_2_STR(FULL_SIZE_HASH))};
 
 DupVidsManager::DupVidsManager(QObject* parent)  //
-  : DbManager{GetAiDupVidDbPath(), VID_DUP_CONNECTION_NAME, parent} {}
+  : DbManager{GetAiDupVidDbPath(), GetAiDupVidDbConnectionName(), parent} {}
 
 bool DupVidsManager::IsTableExist(const QString& tableName) const {
-  QSqlDatabase db = QSqlDatabase::database(VID_DUP_CONNECTION_NAME);
-  if (!db.isOpen()) {
-    LOG_W("DB[%s] is not open", qPrintable(GetAiDupVidDbPath()));
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
     return false;
   }
   return db.tables().contains(tableName);
