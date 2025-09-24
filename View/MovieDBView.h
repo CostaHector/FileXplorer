@@ -3,7 +3,6 @@
 
 #include "DatabaseSearchToolBar.h"
 #include "MovieDatabaseMenu.h"
-#include "QuickWhereClauseDialog.h"
 
 #include "FdBasedDb.h"
 #include "FdBasedDbModel.h"

@@ -195,7 +195,7 @@ CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidg
   : DatabaseSearchToolBar{title, parent} {
   {
     using namespace PERFORMER_DB_HEADER_KEY;
-    for (const auto& field: DB_HEADER) {
+    for (const auto& field: CAST_TABLE_HEADERS) {
       m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(field));
       m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(field));
     }
