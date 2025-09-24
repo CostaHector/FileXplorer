@@ -5,7 +5,7 @@
 #include "StyleEnum.h"
 #include "SearchTools.h"
 #include "BytesRangeTool.h"
-#include "DuplicateImageDetectionCriteria.h"
+#include "DuplicateImagesHelper.h"
 #include <QCryptographicHash>
 
 template struct EnumIntAction<QListView::Flow>;
