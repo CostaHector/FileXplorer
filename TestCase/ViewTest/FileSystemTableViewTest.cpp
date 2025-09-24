@@ -23,7 +23,7 @@
 class FileSystemTableViewTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  static bool checkAfterCopyMimeData(const FileSystemModel& fsModel, FileSystemTableView& fsView, QClipboard* pClip, const int expectItemCnt) {
+  static bool checkAfterCopyMimeData(FileSystemModel& fsModel, FileSystemTableView& fsView, QClipboard* pClip, const int expectItemCnt) {
     pClip->clear(); // prevent COM error 0x800401D in windows platform error message
 
     // select all
@@ -32,6 +32,15 @@ public:
     auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSourceModel<FileSystemModel>(fsModel,  //
                                                                                             fsView.selectionModel()->selectedRows());
     const QString expectPaths = mimeDataMember.texts.join('\n');
+    { // here would modify fsModel header decoration role return value
+      if (!MimeDataHelper::FillCutCopySomething<FileSystemModel>(fsModel, mimeDataMember.srcIndexes, Qt::DropAction::MoveAction)) {
+        return false;
+      }
+      SelectionsRangeHelper::ROW_RANGES_LST rowRangeList = fsModel.mCutIndexes.GetTopBottomRange();
+      if (rowRangeList.isEmpty()) {
+        return false;
+      }
+    }
 
     // 1. copy
     emit fileOpActsInst.COPY->triggered();  // this signal not connected to any slot yet
@@ -412,4 +421,4 @@ private slots:
 };
 
 #include "FileSystemTableViewTest.moc"
-REGISTER_TEST(FileSystemTableViewTest, false)
+REGISTER_TEST(FileSystemTableViewTest, true)
