@@ -3,10 +3,7 @@
 #include "DataFormatter.h"
 #include <QPixmap>
 
-const QStringList RedundantImageModel::HORIZONTAL_HEADER{"Name", "Size(B)", "MD5", "Preview", "absPath"};
-
-RedundantImageModel:: RedundantImageModel(QObject* parent) //
-  : QAbstractTableModelPub{parent} { }
+using namespace DuplicateImageMetaInfo;
 
 QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
   if (m_paf == nullptr || !index.isValid()) {
@@ -16,22 +13,18 @@ QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
   switch (role) {
     case Qt::DisplayRole: {
       switch (index.column()) {
-        case 0:
-          return PathTool::fileName(item.filePath);
-        case 1:
-          return DataFormatter::formatFileSizeGMKB(item.size);
-        case 2:
-          return item.md5;
-        case 4:
-          return PathTool::absolutePath(item.filePath);
-        default:
-          return {};
+#define DUP_IMAGE_META_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) \
+  case DuplicateImageMetaInfo::enu: \
+    return formatter(item.m_##enu);     //
+        DUP_IMAGE_META_INFO_KEY_MAPPING //
+#undef DUP_IMAGE_META_INFO_KEY_ITEM     //
+            default : return {};
       }
       break;
     }
     case Qt::DecorationRole: {
-      if (index.column() == HORIZONTAL_HEADER.size() - 1) {
-        return QPixmap{item.filePath}.scaledToWidth(128);
+      if (index.column() == DI_TABLE_HEADERS_COUNT - 1) {
+        return QPixmap{item.m_AbsPath}.scaledToWidth(128);
       }
       break;
     }
@@ -48,7 +41,7 @@ QVariant RedundantImageModel::headerData(int section, Qt::Orientation orientatio
     }
   } else if (role == Qt::DisplayRole) {
     if (orientation == Qt::Orientation::Horizontal) {
-      return HORIZONTAL_HEADER[section];
+      return DI_TABLE_HEADERS[section];
     }
     return section + 1;
   }
@@ -64,7 +57,7 @@ QString RedundantImageModel::filePath(const QModelIndex& index) const {
     LOG_W("r[%d] out of range[0, %d)", r, rowCount());
     return "";
   }
-  return m_paf->operator[](r).filePath;
+  return m_paf->operator[](r).m_AbsPath;
 }
 
 void RedundantImageModel::setRootPath(const RedundantImagesList* p_af) {

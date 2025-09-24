@@ -141,8 +141,8 @@ void RedundantImageFinder::whenModeChanged() {
 void RedundantImageFinder::UpdateDisplayWhenRecycled() {
   decltype(m_imgsBunch) redundantImgs;
   redundantImgs.reserve(m_imgsBunch.size());
-  foreach (const REDUNDANT_IMG_INFO& info, m_imgsBunch) {
-    if (!QFile::exists(info.filePath)) {
+  foreach (const DuplicateImageMetaInfo::REDUNDANT_IMG_INFO& info, m_imgsBunch) {
+    if (!QFile::exists(info.m_AbsPath)) {
       continue;
     }
     redundantImgs.append(info);
@@ -165,7 +165,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   const DICriteriaE decideBy = g_redunImgFinderAg().GetCurFindDupBy();
   ImagesInfoManager& redunLibsInst = ImagesInfoManager::getInst();
 
-  RedundantImagesList newImgs;
+  DuplicateImageMetaInfo::RedundantImagesList newImgs;
   switch (decideBy) {
     case DICriteriaE::LIBRARY: {
       newImgs = redunLibsInst.FindRedunImgs(mCurrentPath, mResultAlsoContainEmptyImage);

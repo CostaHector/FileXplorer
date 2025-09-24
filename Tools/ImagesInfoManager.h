@@ -3,14 +3,7 @@
 #include <QSet>
 #include <QString>
 #include "SingletonManager.h"
-
-struct REDUNDANT_IMG_INFO {
-  QString filePath;
-  qint64 size;
-  QString md5;
-};
-
-using RedundantImagesList = QList<REDUNDANT_IMG_INFO>;
+#include "DuplicateImagesHelper.h"
 
 struct IMG_INFO_DATA_T {
   int countHash() const { return m_commonFileHash.size(); }
@@ -43,7 +36,7 @@ class ImagesInfoManager final : public SingletonManager<ImagesInfoManager, IMG_I
   int ForceReloadImpl();
 
   // only used in decide by Benchmark library
-  RedundantImagesList FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty = true) const;
+  DuplicateImageMetaInfo::RedundantImagesList FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty = true) const;
   QString GetDynRedunPath() const;
 
  private:
@@ -56,5 +49,5 @@ class ImagesInfoManager final : public SingletonManager<ImagesInfoManager, IMG_I
 };
 
 // only used in decide by MD5
-RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty = true);
+DuplicateImageMetaInfo::RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty = true);
 #endif  // IMAGESINFOMANAGER_H
