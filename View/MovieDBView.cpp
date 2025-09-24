@@ -4,7 +4,6 @@
 #include "MemoryKey.h"
 #include "MountHelper.h"
 #include "NotificatorMacro.h"
-#include "QuickWhereClauseDialog.h"
 #include "StudiosManager.h"
 #include "TableFields.h"
 #include "PublicMacro.h"

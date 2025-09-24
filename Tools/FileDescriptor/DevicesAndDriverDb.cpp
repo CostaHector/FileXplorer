@@ -20,13 +20,13 @@ const QString DevicesAndDriverDb::CREATE_DEV_DRV_TEMPLATE  //
                "   `%7` INTEGER DEFAULT 0,"                // ADT_TIME
                "    PRIMARY KEY (%5)"
                "    );")
-           .arg(GetFILEDString(ROOT_PATH))     //
-           .arg(GetFILEDString(VOLUME_LABEL))  //
-           .arg(GetFILEDString(TOTAL_BYTES))   //
-           .arg(GetFILEDString(AVAIL_BYTES))   //
-           .arg(GetFILEDString(GUID))          //
-           .arg(GetFILEDString(MOUNT_POINT))   //
-           .arg(GetFILEDString(ADT_TIME))};    //
+           .arg(c_str(ROOT_PATH))     //
+           .arg(c_str(VOLUME_LABEL))  //
+           .arg(c_str(TOTAL_BYTES))   //
+           .arg(c_str(AVAIL_BYTES))   //
+           .arg(c_str(GUID))          //
+           .arg(c_str(MOUNT_POINT))   //
+           .arg(c_str(ADT_TIME))};    //
 
 const QString DevicesAndDriverDb::INSERT_DEV_DRV_FULL_TEMPLATE  //
     {
@@ -34,13 +34,13 @@ const QString DevicesAndDriverDb::INSERT_DEV_DRV_FULL_TEMPLATE  //
         + QString(R"(
 (`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`)
 VALUES(:%1, :%2, :%3, :%4, :%5, :%6, :%7);)")
-              .arg(GetFILEDString(ROOT_PATH))     //
-              .arg(GetFILEDString(VOLUME_LABEL))  //
-              .arg(GetFILEDString(TOTAL_BYTES))   //
-              .arg(GetFILEDString(AVAIL_BYTES))   //
-              .arg(GetFILEDString(GUID))          //
-              .arg(GetFILEDString(MOUNT_POINT))   //
-              .arg(GetFILEDString(ADT_TIME))      //
+              .arg(c_str(ROOT_PATH))     //
+              .arg(c_str(VOLUME_LABEL))  //
+              .arg(c_str(TOTAL_BYTES))   //
+              .arg(c_str(AVAIL_BYTES))   //
+              .arg(c_str(GUID))          //
+              .arg(c_str(MOUNT_POINT))   //
+              .arg(c_str(ADT_TIME))      //
     };                                            //
 
 const QString DevicesAndDriverDb::INSERT_DEV_DRV_TEMPLATE  //
@@ -49,12 +49,12 @@ const QString DevicesAndDriverDb::INSERT_DEV_DRV_TEMPLATE  //
         + QString(R"(
 (`%1`, `%2`, `%3`, `%4`, `%5`, `%6`)
 VALUES(:%1, :%2, :%3, :%4, :%5, :%6);)")
-              .arg(GetFILEDString(ROOT_PATH))     //
-              .arg(GetFILEDString(VOLUME_LABEL))  //
-              .arg(GetFILEDString(TOTAL_BYTES))   //
-              .arg(GetFILEDString(AVAIL_BYTES))   //
-              .arg(GetFILEDString(GUID))          //
-              .arg(GetFILEDString(MOUNT_POINT))   //
+              .arg(c_str(ROOT_PATH))     //
+              .arg(c_str(VOLUME_LABEL))  //
+              .arg(c_str(TOTAL_BYTES))   //
+              .arg(c_str(AVAIL_BYTES))   //
+              .arg(c_str(GUID))          //
+              .arg(c_str(MOUNT_POINT))   //
     };                                            //
 
 const QString DevicesAndDriverDb::UPDATE_SIZE_TEMPLATE  //
@@ -63,12 +63,12 @@ const QString DevicesAndDriverDb::UPDATE_SIZE_TEMPLATE  //
         + QString(R"(
 SET `%1` = :%1, `%2` = :%2, `%3` = :%3, `%4` = :%4, `%5` = :%5
 WHERE `%6` = :%6;)")
-              .arg(GetFILEDString(ROOT_PATH))     //
-              .arg(GetFILEDString(VOLUME_LABEL))  //
-              .arg(GetFILEDString(TOTAL_BYTES))   //
-              .arg(GetFILEDString(AVAIL_BYTES))   //
-              .arg(GetFILEDString(MOUNT_POINT))   //
-              .arg(GetFILEDString(GUID))          //
+              .arg(c_str(ROOT_PATH))     //
+              .arg(c_str(VOLUME_LABEL))  //
+              .arg(c_str(TOTAL_BYTES))   //
+              .arg(c_str(AVAIL_BYTES))   //
+              .arg(c_str(MOUNT_POINT))   //
+              .arg(c_str(GUID))          //
     };
 
 enum UPDATE_SIZE_FIELD {
@@ -83,14 +83,14 @@ enum UPDATE_SIZE_FIELD {
 const QString DevicesAndDriverDb::UPDATE_ADT_TIME_TEMPLATE  //
     {"UPDATE %1 "                                           //
      + QString{"SET `%1` = :%1 WHERE `%2` = :%2;"}          //
-           .arg(GetFILEDString(ADT_TIME))                   //
-           .arg(GetFILEDString(GUID))};
+           .arg(c_str(ADT_TIME))                   //
+           .arg(c_str(GUID))};
 
 const QString DevicesAndDriverDb::UPDATE_MOUNT_POINT_TEMPLATE  //
     {"UPDATE %1 "                                              //
      + QString{"SET `%1` = :%1 WHERE `%2` = :%2;"}             //
-           .arg(GetFILEDString(MOUNT_POINT))                   //
-           .arg(GetFILEDString(GUID))};
+           .arg(c_str(MOUNT_POINT))                   //
+           .arg(c_str(GUID))};
 
 QList<VolumeInfo> GetVolumesInfo() {
   QList<VolumeInfo> ans;
