@@ -1,8 +1,8 @@
 #ifndef ONSCOPEEXIT_H
 #define ONSCOPEEXIT_H
 
-#define LAMBDA_OBJECT_NAME(name, lineNum) name##lineNum
-#define CONCAT(x, y) LAMBDA_OBJECT_NAME(x, y)  // 中间层，用于展开参数
+#define CONCAT_VARIABLE_NAME_AND_LINE_NO_CORE(name, lineNum) name##lineNum // ## require literal direcyly
+#define CONCAT_VARIABLE_NAME_AND_LINE_NO(exitor_guard_, lineNumberInt) CONCAT_VARIABLE_NAME_AND_LINE_NO_CORE(exitor_guard_, lineNumberInt)  // let __LINE__ became a number
 
 template <typename Func>
 class OnScopeExit {
@@ -21,6 +21,6 @@ OnScopeExit<Func> operator+(PLACEHOLDER_E, Func func) {
   return OnScopeExit<Func>{func};
 }
 
-#define ON_SCOPE_EXIT auto CONCAT(exitor, __LINE__) = PLACEHOLDER_E{} + [&]()
+#define ON_SCOPE_EXIT auto CONCAT_VARIABLE_NAME_AND_LINE_NO(exitor, __LINE__) = PLACEHOLDER_E{} + [&]()
 
 #endif  // ONSCOPEEXIT_H

@@ -1,8 +1,6 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 #include <QTestEventList>
-#include <QSignalSpy>
 
 #include "Logger.h"
 #include "MemoryKey.h"
@@ -12,18 +10,27 @@
 #include "DupVidsManager.h"
 #include "VideoTestPrecoditionTools.h"
 #include "DuplicateVideosFinderActions.h"
-#include <QDir>
 #include "ClipboardGuard.h"
-#include "VidDupTabFields.h"
+#include "TDir.h"
+
+using namespace VideoTestPrecoditionTools;
 
 class DuplicateVideosFinderTest : public PlainTestSuite {
   Q_OBJECT
  public:
+  TDir tdir;
+  QString aNewDupVidPrePath = tdir.path();
+  SetDatabaseParmRetType dbNameSetResult = setDupVidDbAbsFilePath(aNewDupVidPrePath);
+  SetDatabaseParmRetType connNameSetResult = setDupVidDbConnectionName("DUP_VID_FINDER_CONN_TEST", __LINE__);
+  // must initialize databaseName and connectionName in front of instance DupVidsManager.
+  // this testcase file share a same connection name
   DuplicateVideosFinder dvf;
  private slots:
   void initTestCase() {
     // precondition: drop
-    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
+    QVERIFY(tdir.IsValid());
+    QVERIFY2(dbNameSetResult.first, qPrintable(dbNameSetResult.second));
+    QVERIFY2(connNameSetResult.first, qPrintable(connNameSetResult.second));
 
     QVERIFY(QFileInfo{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH}.isDir());
     QVERIFY(QFileInfo{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.isDir());
@@ -36,10 +43,6 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
     QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 1);
     QVERIFY(dvf.m_aiTables->onScanAPath(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH));
     QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 2);
-  }
-
-  void cleanupTestCase() {                                        //
-    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);  //
   }
 
   void dup_vid_tables_drop_available() {
@@ -57,13 +60,13 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
 
     QVERIFY(dvf.durationDevLE != nullptr);
     dvf.durationDevLE->setText("-999");  // Negative number
-    dvf.onChangeSizeDeviation();
+    dvf.onChangeDurationDeviation();
     dvf.durationDevLE->setText("1000000");  // 1000s a large enough value => all videos will be grouped into one
     emit dvf.durationDevLE->returnPressed();
 
     QVERIFY(dvf.sizeDevLE != nullptr);
     dvf.sizeDevLE->setText("-999");  // Negative number
-    dvf.onChangeDurationDeviation();
+    dvf.onChangeSizeDeviation();
     dvf.sizeDevLE->setText("10000000");  // 10*1024*1024=10MB a large enough value =>  all videos will be grouped into one
     emit dvf.sizeDevLE->returnPressed();
 
@@ -117,6 +120,7 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
       }
     }
     dvf.hide();
+    dvf.close();
   }
 };
 
