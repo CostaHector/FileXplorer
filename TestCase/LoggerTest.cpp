@@ -27,10 +27,21 @@ private slots:
     QVERIFY(Logger::GetFILEStream() != stdout);
     QVERIFY(Logger::mLogFILEStreamUniquePtr != nullptr);
 #endif
+    // open succeed
     const QString logAbsFilePath = Logger::GetLogFileAbsPath();
-    QVERIFY(QFile::exists(logAbsFilePath));
-
     QVERIFY(logAbsFilePath.endsWith(Logger::CONSTANT_LOG_FILE_NAME, Qt::CaseInsensitive));
+    QVERIFY(QFile::exists(logAbsFilePath));
+    QVERIFY(Logger::OpenLogFile());
+    QVERIFY(Logger::OpenLogFolder());
+
+    // open log file failed, and open it's parent ok
+    QVERIFY(QFile::rename(logAbsFilePath, logAbsFilePath+"Renamed"));
+    ON_SCOPE_EXIT {
+      QVERIFY(QFile::rename(logAbsFilePath+"Renamed", logAbsFilePath));
+    };
+    QVERIFY(!QFile::exists(logAbsFilePath));
+    QVERIFY(!Logger::OpenLogFile());
+    QVERIFY(Logger::OpenLogFolder());
   }
 
   void closeFileStreamOnly() {
@@ -119,4 +130,4 @@ private slots:
 
 };
 #include "LoggerTest.moc"
-REGISTER_TEST(LoggerTest, false)
+REGISTER_TEST(LoggerTest, true)
