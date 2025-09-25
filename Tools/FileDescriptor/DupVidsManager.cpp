@@ -139,7 +139,7 @@ int DupVidsManager::DropTables(const QStringList& delTables) {
     if (!allTablesSet.contains(toDel)) {
       continue;
     }
-    if (RmvTable(toDel, DROP_OR_DELETE::DROP) < FD_SKIP) {
+    if (RmvTable(toDel, DbManagerHelper::DropOrDeleteE::DROP) < FD_SKIP) {
       LOG_E("Drop table[%s] failed", qPrintable(toDel));
       return -1;
     }
