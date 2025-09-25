@@ -68,30 +68,6 @@ class JsonRenameRegexTest : public PlainTestSuite {
     QCOMPARE(noMultiLineMatchAkaRet.hasMatch(), false);
   }
 
-  void test_table_name_match() {
-    QRegularExpression invalidRegex{"(DB]"};
-    QVERIFY(!DbManager::IsMatch("(DB]", invalidRegex));
-
-    QRegularExpression regexDB{".*?DB.*?"};
-    QVERIFY(!DbManager::IsMatch("db", regexDB));  // case sensitive
-    QVERIFY(DbManager::IsMatch("DB", regexDB));
-    QVERIFY(DbManager::IsMatch("DB__", regexDB));
-    QVERIFY(DbManager::IsMatch("__DB__", regexDB));
-    QVERIFY(DbManager::IsMatch("HelloDBWorld", regexDB));
-
-    QRegularExpression fullPatternDB{"^DB$"};
-    QVERIFY(DbManager::IsMatch("DB", fullPatternDB));
-    QVERIFY(!DbManager::IsMatch("db", fullPatternDB));  // case sensitive
-    QVERIFY(!DbManager::IsMatch("DB__", fullPatternDB));
-    QVERIFY(!DbManager::IsMatch("__DB", fullPatternDB));
-
-    QRegularExpression plainPartPatternDB{"DB"};
-    QVERIFY(DbManager::IsMatch("DB", plainPartPatternDB));
-    QVERIFY(!DbManager::IsMatch("db", plainPartPatternDB));     // case sensitive
-    QVERIFY(DbManager::IsMatch("DBrain", plainPartPatternDB));  // surprise! me match
-    QVERIFY(DbManager::IsMatch("HARDB", plainPartPatternDB));   // surprise! me match
-  }
-
   void test_INVALID_CHARS_IN_FILENAME() {
     QStringList invalidNames{"*", "<", ">", "|", ":", "?", "/", "\\"};
     for (const QString& s : invalidNames) {

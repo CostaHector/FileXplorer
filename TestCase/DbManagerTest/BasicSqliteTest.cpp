@@ -51,8 +51,8 @@ private slots:
     auto db = GetSqlDataBase();
     QVERIFY(db.isValid());
     QVERIFY(db.isValid());
-    QSqlQuery query{CREATE_SCORE_TABLE_TEMPLATE, db};
-    bool createTblRet = query.exec();
+    QSqlQuery query{db};
+    bool createTblRet = query.exec(CREATE_SCORE_TABLE_TEMPLATE);
     qDebug() << query.executedQuery();
     qDebug() << query.lastError();
     qDebug() << db.tables();

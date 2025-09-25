@@ -16,7 +16,6 @@ class DupVidsManager : public DbManager {
   static const QString INSERT_DUP_VID_TEMPLATE;
   int ScanLocations(const QStringList& paths);
   bool ScanALocation(const QString& path);
-  bool IsTableExist(const QString& tableName) const;
 
   int DropTables(const QStringList& delTables);
   int AuditTables(const QStringList& atTables);

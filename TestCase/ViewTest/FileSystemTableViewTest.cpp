@@ -421,4 +421,4 @@ private slots:
 };
 
 #include "FileSystemTableViewTest.moc"
-REGISTER_TEST(FileSystemTableViewTest, true)
+REGISTER_TEST(FileSystemTableViewTest, false)

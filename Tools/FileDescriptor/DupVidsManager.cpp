@@ -42,14 +42,6 @@ const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
 DupVidsManager::DupVidsManager(QObject* parent)  //
   : DbManager{GetAiDupVidDbPath(), GetAiDupVidDbConnectionName(), parent} {}
 
-bool DupVidsManager::IsTableExist(const QString& tableName) const {
-  auto db = GetDb();
-  if (!CheckValidAndOpen(db)) {
-    return false;
-  }
-  return db.tables().contains(tableName);
-}
-
 int DupVidsManager::ScanLocations(const QStringList& paths) {
   int succeedCnt = 0;
   for (const QString& path : paths) {
@@ -147,7 +139,7 @@ int DupVidsManager::DropTables(const QStringList& delTables) {
     if (!allTablesSet.contains(toDel)) {
       continue;
     }
-    if (RmvTable(toDel, DROP_OR_DELETE::DROP, true) < FD_SKIP) {
+    if (RmvTable(toDel, DROP_OR_DELETE::DROP) < FD_SKIP) {
       LOG_E("Drop table[%s] failed", qPrintable(toDel));
       return -1;
     }
