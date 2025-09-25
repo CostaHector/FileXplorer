@@ -159,4 +159,4 @@ private slots:
 };
 
 #include "PublicToolTest.moc"
-REGISTER_TEST(PublicToolTest, true)
+REGISTER_TEST(PublicToolTest, false)
