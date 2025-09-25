@@ -38,6 +38,12 @@
     return val;                                 \
   }
 
+#define CHECK_FALSE_RETURN_VOID(bCondition) \
+  if (!bCondition) {                        \
+    LOG_E("Condition failed");              \
+    return;                                 \
+  }
+
 #define ENUM_2_STR(enum_val) #enum_val
 #define CLASSNAME_2_STR(className) #className
 

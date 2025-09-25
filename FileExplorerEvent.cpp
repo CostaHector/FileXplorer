@@ -9,7 +9,6 @@
 #include "ThumbnailProcessActions.h"
 #include "TSFilesMerger.h"
 
-#include "ConfigsTable.h"
 #include "Archiver.h"
 #include "CustomStatusBar.h"
 #include "MD5Window.h"
@@ -36,13 +35,11 @@
 #include "CopyItemPropertiesToClipboardIF.h"
 #include "LowResImgsRemover.h"
 #include "FilesNameBatchStandardizer.h"
-#include "JsonHelper.h"
 #include "PlayVideo.h"
-#include "SysTerminal.h"
 #include "ViewTypeTool.h"
 #include "ThumbnailProcesser.h"
 
-#include "OnCheckedPopupOrHideAWidget.h"
+#include "PopupWidgetManager.h"
 #include "PublicTool.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
@@ -392,8 +389,11 @@ void FileExplorerEvent::subscribe() {
       FileExplorerEvent::on_RemoveRedundantItem(efr);
     });
     connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
-    connect(fileOpInst._DUPLICATE_VIDEOS_FINDER, &QAction::toggled, this, &FileExplorerEvent::on_DUPLICATE_VIDEOS_FINDER);
-    connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileExplorerEvent::on_DUPLICATE_IMAGES_FINDER);
+
+    m_duplicateVideosFinder = new (std::nothrow) PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "DuplicateVideosFinderGeometry"};
+    CHECK_NULLPTR_RETURN_VOID(m_duplicateVideosFinder);
+    m_redundantImageFinder = new (std::nothrow) PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "RedundantImageFinderGeometry"};
+    CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
 
     connect(fileOpInst.SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
     connect(fileOpInst.SELECT_NONE, &QAction::triggered, this, &FileExplorerEvent::on_SelectNone);
@@ -1179,20 +1179,6 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   }
   LOG_OK_NP("[Ok] All Remove Redundant folder succeed", currentPath);
   return true;
-}
-
-void FileExplorerEvent::on_DUPLICATE_VIDEOS_FINDER(const bool checked) {
-  m_duplicateVideosFinder = PopupHideWidget<DuplicateVideosFinder>(m_duplicateVideosFinder, checked, _contentPane);  //
-  if (checked) {                                                                                                     //
-    (*m_duplicateVideosFinder)(_contentPane->getRootPath());                                                         //
-  }
-}
-
-void FileExplorerEvent::on_DUPLICATE_IMAGES_FINDER(const bool checked) {
-  m_redundantImageFinder = PopupHideWidget<RedundantImageFinder>(m_redundantImageFinder, checked, _contentPane);  //
-  if (checked) {                                                                                                  //
-    (*m_redundantImageFinder)(_contentPane->getRootPath());                                                       //
-  }
 }
 
 bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString dest) {

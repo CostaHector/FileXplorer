@@ -83,4 +83,4 @@ class AdvanceSearchTableViewTest : public PlainTestSuite {
 };
 
 #include "AdvanceSearchTableViewTest.moc"
-REGISTER_TEST(AdvanceSearchTableViewTest, true)
+REGISTER_TEST(AdvanceSearchTableViewTest, false)

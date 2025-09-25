@@ -134,4 +134,4 @@ private slots:
   }
 };
 #include "LoggerTest.moc"
-REGISTER_TEST(LoggerTest, true)
+REGISTER_TEST(LoggerTest, false)

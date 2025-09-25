@@ -113,8 +113,11 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   if (!QFileInfo(defaultPath).isDir()) {
     defaultPath = Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
   }
-  const auto selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
-  QFileInfo dstFi(selectPath);
+  QString selectPath = defaultPath;
+#ifndef _WIN32
+  selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
+#endif
+  QFileInfo dstFi(selectPath); // system may return back slash seperated path
   if (!dstFi.isDir()) {
     LOG_D("selectPath[%s] is not a directory", qPrintable(selectPath));
     return "";

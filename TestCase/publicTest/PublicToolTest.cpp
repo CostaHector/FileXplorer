@@ -5,13 +5,13 @@
 #include "TDir.h"
 #include "PublicVariable.h"
 #include "OnScopeExit.h"
+#include "MemoryKey.h"
 #include <QPushButton>
 
 class PublicToolTest : public PlainTestSuite {
   Q_OBJECT
- public:
-  PublicToolTest() : PlainTestSuite{} {}
- private slots:
+public:
+private slots:
   void test_mvToANewPath() {
     QString mvToANewPath = "5";
     QAction act1{"1", this};
@@ -66,22 +66,94 @@ class PublicToolTest : public PlainTestSuite {
     QByteArray last5ba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 5);
     QCOMPARE(last5ba, "5\n6\n7\n8\n9");
 
-    QCOMPARE(QFile::exists(textFileAbsPath), true);          // file already exist. not override with OpenModeFlag::NewOnly
-    QCOMPARE(FileTool::TextWriter(textFileAbsPath, "Cannot override",  //
-                        QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::NewOnly),
+    QCOMPARE(QFile::exists(textFileAbsPath), true); // file already exist. not override with OpenModeFlag::NewOnly
+    QCOMPARE(FileTool::TextWriter(textFileAbsPath,
+                                  "Cannot override", //
+                                  QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::NewOnly),
              false);
     QByteArray lastAllba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 100);
     QCOMPARE(lastAllba, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
 
-    QCOMPARE(FileTool::TextWriter(textFileAbsPath, "Can only override",  //
-                        QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::ExistingOnly),
+    QCOMPARE(FileTool::TextWriter(textFileAbsPath,
+                                  "Can only override", //
+                                  QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::ExistingOnly),
              true);
     QCOMPARE(FileTool::TextReader(textFileAbsPath), "Can only override");
   }
 
-  void CreateUserPath_ok() {  // UserPath is Service Running Precondition
+  void CreateUserPath_ok() { // UserPath is Service Running Precondition
     QCOMPARE(CreateUserPath(), true);
-    QFile::exists(SystemPath::WORK_PATH());
+
+
+    QCOMPARE(QFile::exists(SystemPath::WORK_PATH()), true);
+
+
+    // namespace SystemPath {
+    // const QString& HOME_PATH();
+    // inline const QString& WORK_PATH() {
+    //   static const QString path = HOME_PATH() + "/" + PROJECT_NAME;
+    //   return path;
+    // }
+    // inline const QString& STARRED_PATH() {
+    //   static const QString path = HOME_PATH() + "/Documents";
+    //   return path;
+    // }
+    // inline const QString& VIDS_DATABASE() {
+    //   static const QString path = WORK_PATH() + "/VIDS_DATABASE.db";
+    //   return path;
+    // }
+
+    // inline const QString& DEVICES_AND_DRIVES_DATABASE() {
+    //   static const QString path = WORK_PATH() + "/DEVICES_AND_DRIVES.db";
+    //   return path;
+    // }
+
+    // inline const QString& AI_MEDIA_DUP_DATABASE() {
+    //   static const QString path = WORK_PATH() + "/DUPLICATES_DB.db";
+    //   return path;
+    // }
+
+    // inline const QString& RECYCLE_BIN_DATABASE() {
+    //   static const QString path = WORK_PATH() + "/RECYCLE_BIN_DATABASE.db";
+    //   return path;
+    // }
+
+    // inline const QString& PEFORMERS_DATABASE() {
+    //   static const QString path = WORK_PATH() + "/PERFORMERS_DATABASE.db";
+    //   return path;
+    // }
+
+    // inline const QString& TORRENTS_DATABASE() {
+    //   static const QString path = WORK_PATH() + "/TORRENTS_DATABASE.db";
+    //   return path;
+    // }
+
+    // inline const QString& PRODUCTION_STUDIOS_DATABASE() {
+    //   static const QString path = WORK_PATH() + "/PRODUCTION_STUDIOS_DATABASE.db";
+    //   return path;
+    // }
+    // }
+
+  }
+
+  void ChooseCopyDestination_ok() {
+    // precondition
+    const QFileInfo currentFile{__FILE__};
+    const QString fileParentFolder{currentFile.absolutePath()};
+    QCOMPARE(QFileInfo{fileParentFolder}.isDir(), true);
+    const QString fileParentParentFolder{QFileInfo(fileParentFolder).absolutePath()};
+    QCOMPARE(QFileInfo{fileParentParentFolder}.isDir(), true);
+
+    Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, fileParentParentFolder);
+
+    // user specified
+    QCOMPARE(ChooseCopyDestination(fileParentFolder, nullptr), fileParentFolder);
+    QCOMPARE(Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString(), fileParentFolder);
+
+    // from Configs file
+    Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, fileParentParentFolder);
+    QCOMPARE(ChooseCopyDestination("", nullptr), fileParentParentFolder);
+    QCOMPARE(Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString(), fileParentParentFolder);
   }
 
   void load_and_remove_language_pack_ok() {

@@ -3,8 +3,8 @@
 #include <QClipboard>
 #include "ComplexOperation.h"
 #include "RedundantFolderRemove.h"
-#include "PublicVariable.h"
 #include "FileSystemModel.h"
+#include "PopupWidgetManager.h"
 
 class ViewsStackedWidget;
 class CustomStatusBar;
@@ -80,8 +80,6 @@ private:
   bool on_FileUnclassify();
   bool on_RemoveDuplicateImages();
   bool on_RemoveRedundantItem(RedundantRmv& remover);
-  void on_DUPLICATE_VIDEOS_FINDER(const bool checked);
-  void on_DUPLICATE_IMAGES_FINDER(const bool checked);
 
   bool on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString r);
   bool on_MoveTo(const QString& r = "") { return on_MoveCopyEventSkeleton(Qt::DropAction::MoveAction, r); }
@@ -95,10 +93,9 @@ private:
   CustomStatusBar* _logger{nullptr};
   QClipboard* m_clipboard{nullptr};
 
-  ConfigsTable* m_settingSys{nullptr};
   Archiver* m_archivePreview{nullptr};
-  DuplicateVideosFinder* m_duplicateVideosFinder{nullptr};
-  RedundantImageFinder* m_redundantImageFinder{nullptr};
+  PopupWidgetManager<DuplicateVideosFinder>* m_duplicateVideosFinder{nullptr};
+  PopupWidgetManager<RedundantImageFinder>* m_redundantImageFinder{nullptr};
 private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten
 };
