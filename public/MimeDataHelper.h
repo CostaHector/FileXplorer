@@ -20,35 +20,13 @@ struct MimeDataMember {
 };
 
 template <typename TSrcModel>
-MimeDataMember GetMimeDataMemberFromSourceModel(const TSrcModel& srcModel, const QModelIndexList& indexes) {
-  QStringList filePaths;
-  filePaths.reserve(indexes.size());
-
-  QList<QUrl> urls;
-  urls.reserve(indexes.size());
-
-  for (const auto& ind : indexes) {
-    QString absFilePath{srcModel.filePath(ind)};
-    filePaths.append(absFilePath);
-    urls.append(QUrl::fromLocalFile(absFilePath));
-  }
-  return {filePaths, urls, indexes};
-}
+MimeDataMember GetMimeDataMemberFromSourceModel(const TSrcModel& srcModel, const QModelIndexList& indexes);
 
 MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& searchSrcModel, const SearchProxyModel& searchProxyModel, const QModelIndexList& proIndexes);
 
 
 template <typename TSrcModel>
-bool FillCutCopySomething(TSrcModel& fsModel, const QModelIndexList& srcIndexes, const Qt::DropAction dropAct) {
-  if (dropAct == Qt::CopyAction) {
-    fsModel.CopiedSomething(srcIndexes);
-  } else if (dropAct == Qt::MoveAction) {
-    fsModel.CutSomething(srcIndexes);
-  } else {
-    return false;
-  }
-  return true;
-}
+bool FillCutCopySomething(TSrcModel& fsModel, const QModelIndexList& srcIndexes, const Qt::DropAction dropAct);
 
 bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction);
 int WriteIntoSystemClipboard(const MimeDataMember& mimeDataMember, Qt::DropAction dropAct);

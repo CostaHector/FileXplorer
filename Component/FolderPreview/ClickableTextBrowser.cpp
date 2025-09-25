@@ -157,7 +157,7 @@ void ClickableTextBrowser::onSearchSelectionAdvanceReq() {
     return;
   }
   if (searchKeyString.size() < MIN_SINGLE_SEARCH_PATTERN_LEN) {
-    LOG_WARN_P("[Skip search] too short", "searchText[%d] should >= %d chars]", qPrintable(searchKeyString), MIN_SINGLE_SEARCH_PATTERN_LEN);
+    LOG_WARN_P("[Skip search] too short", "searchText[%s] should >= %d chars]", qPrintable(searchKeyString), MIN_SINGLE_SEARCH_PATTERN_LEN);
     return;
   }
   LOG_D("Search:[%s]", qPrintable(searchKeyString));
@@ -205,7 +205,7 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
     LOG_ERR_P("[Failed] Cast Inserted/Update", "errorCode: %d", insertOrUpdateCnt);
     return insertOrUpdateCnt;
   }
-  LOG_OK_P("[Ok]Cast Inserted/Update", "%d casts added as follows:",
+  LOG_OK_P("[Ok]Cast Inserted/Update", "%d casts added as follows:%s",
            insertOrUpdateCnt, qPrintable(perfsText));
   return insertOrUpdateCnt;
 }

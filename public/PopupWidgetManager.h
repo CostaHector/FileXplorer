@@ -13,7 +13,7 @@ public:
   void setWidgetCreator(std::function<WidgetType*(QWidget*)> creator) { m_widgetCreator = creator; }
 
   void setOnCloseCallback(std::function<void()> callback) { m_onCloseCallback = callback; }
-  bool isVisible() const { return m_widget != nullptr && m_widget->isVisible(); }
+  bool isVisible() const { return widget() != nullptr && widget()->isVisible(); }
   const QWidget* widget() const { return m_widget; }
   QWidget* widget() { return m_widget; }
 

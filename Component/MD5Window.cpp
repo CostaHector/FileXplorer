@@ -80,7 +80,7 @@ int MD5Window::operator()(const QStringList& absPaths) {
   const int bytesRange = BytesRangeTool::toBytesValue(curBytesRangeE);
 
   const QCryptographicHash::Algorithm alg = mHashAlgIntAct.curVal();
-  const QString bytesRangeAndAlgorithmStr{QString::asprintf("[%03d|%-03d]", bytesRange, (int)alg)};
+  const QString bytesRangeAndAlgorithmStr{QString::asprintf("[%03d|%03d]", bytesRange, (int)alg)};
 
   int newCalculatedFileCnt{0}, validFilesCnt{0};
   for (const QString& absPath : absPaths) {

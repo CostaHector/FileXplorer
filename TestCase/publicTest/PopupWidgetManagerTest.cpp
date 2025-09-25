@@ -43,6 +43,7 @@ public:
 
       PopupWidgetManager<WIDGET_TYPE> wid{&widAct, &parentWidget, widgetGeometryKey};
       wid.setOnCloseCallback(fCloseCallback);
+      wid.setWidgetCreator(nullptr); // we usually don't need this. Default constructor is enough now
       QVERIFY(wid.widget() == nullptr);
       QCOMPARE(wid.isVisible(), false);
       QCOMPARE(widAct.isChecked(), false);

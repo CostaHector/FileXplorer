@@ -18,6 +18,19 @@ class UndoRedoTest : public PlainTestSuite {
   UndoRedoTest() : PlainTestSuite{} {}
 
  private slots:
+  void initial_states_cannot_undo_redo() {
+    // will not crash down
+    UndoRedo ur;
+    QCOMPARE(ur.mUndoStk.isEmpty(), true);
+    QCOMPARE(ur.mRedoStk.isEmpty(), true);
+
+    QVERIFY(!ur.undoAvailable());
+    QVERIFY(ur.Undo());
+
+    QVERIFY(!ur.redoAvailable());
+    QVERIFY(ur.Redo());
+  }
+
   void test_rmFolderForce_cannot_recover() {
     TDir mDir;
     QVERIFY(mDir.IsValid());

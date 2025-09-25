@@ -25,7 +25,6 @@ class CastManager final : public SingletonManager<CastManager, CAST_MGR_DATA_T> 
   static QStringList SplitSentence(QString sentence);
   QStringList FilterPerformersOut(const QStringList& words) const;
   QStringList operator()(const QString& sentence) const;
-  CAST_MGR_DATA_T m_casts;
 
  private:
   CastManager();

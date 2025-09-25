@@ -6,7 +6,7 @@
 #include "DbManager.h"
 #include "EndToExposePrivateMember.h"
 #include <QSqlRecord>
-#include "tDir.h"
+#include "TDir.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include "DbManagerHelper.h"
