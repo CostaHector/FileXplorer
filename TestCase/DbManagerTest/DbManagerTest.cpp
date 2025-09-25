@@ -289,4 +289,4 @@ const QString DbManagerTest::INSERT_RECORDS_STR{
 )"};
 
 #include "DbManagerTest.moc"
-REGISTER_TEST(DbManagerTest, false)
+REGISTER_TEST(DbManagerTest, true)

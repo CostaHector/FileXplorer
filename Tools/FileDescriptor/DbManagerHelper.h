@@ -9,7 +9,7 @@
   SQL_TABLE_DROP_OR_DELETE_ITEM(DELETE, 1, "DELETE FROM `%1`;")
 
 namespace DbManagerHelper {
-enum DropOrDeleteE {
+enum class DropOrDeleteE {
 #define SQL_TABLE_DROP_OR_DELETE_ITEM(enu, val, cmds) enu = val,
   SQL_TABLE_DROP_OR_DELETE_MAPPING
 #undef SQL_TABLE_DROP_OR_DELETE_ITEM
