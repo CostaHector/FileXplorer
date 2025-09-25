@@ -14,6 +14,7 @@
 #include "NameTool.h"
 #include "PathTool.h"
 #include "PublicMacro.h"
+#include "JsonTestPrecoditionTools.h"
 
 class JsonPrTest : public PlainTestSuite {
   Q_OBJECT
@@ -29,32 +30,11 @@ class JsonPrTest : public PlainTestSuite {
   const QString fixedAbsPath{rootpath + '/' + fixedJsonName};
  private slots:
   void initTestCase() {
-    static const char JSON_CONTENTS[]{R"({
-    "Bitrate": "",
-    "Cast": [
-        "Cast1NotExist",
-        "Cast2NotExist"
-    ],
-    "Detail": "This is just a json example.",
-    "Duration": 0,
-    "Hot": [
-    ],
-    "Name": "My Good Boy",
-    "Rate": 4,
-    "Resolution": "720p",
-    "Size": "126113854",
-    "Studio": "StudioNotExist",
-    "Tags": [
-        "nonporn"
-    ],
-    "Uploaded": "20231022"
-}
-)"};
     QVERIFY(mDir.IsValid());
     gNodeEntries = QList<FsNodeEntry>  //
         {
             FsNodeEntry{"cast_list.txt", false, {}},                    //
-            FsNodeEntry{"My Good Boy.json", false, JSON_CONTENTS},      //
+            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS},      //
             FsNodeEntry{"studio_list.txt", false, {}},                  //
             FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},    //
             FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},  //
@@ -89,10 +69,10 @@ class JsonPrTest : public PlainTestSuite {
       psm.ProStudioMap().swap(tempStudios);
     };
     auto& pm = CastManager::getInst();
-    decltype(pm.m_casts) tempCast{"a1 c1", "b1 d1", "a1 b1"};
-    pm.m_casts.swap(tempCast);
+    CAST_MGR_DATA_T tempCast{"a1 c1", "b1 d1", "a1 b1"};
+    pm.CastSet().swap(tempCast);
     ON_SCOPE_EXIT {
-      pm.m_casts.swap(tempCast);
+      pm.CastSet().swap(tempCast);
     };
 
     QString sentence{"A1 C1, G1, A1 B1, B1 D1.mp4"};
@@ -302,12 +282,12 @@ class JsonPrTest : public PlainTestSuite {
   void test_Construct_Clear_CastStudioValue() {
     auto& pm = CastManager::getInst();
     auto& psm = StudiosManager::getInst();
-    decltype(pm.m_casts) tempCastsList{"chris hemsworth", "keanu reeves", "chris evans"};
+    CAST_MGR_DATA_T tempCastsList{"chris hemsworth", "keanu reeves", "chris evans"};
     STUDIO_MGR_DATA_T tempStudiosMap{{"paramount pictures", "Paramount Pictures"}};
-    pm.m_casts.swap(tempCastsList);
+    pm.CastSet().swap(tempCastsList);
     psm.ProStudioMap().swap(tempStudiosMap);
     ON_SCOPE_EXIT {
-      pm.m_casts.swap(tempCastsList);
+      pm.CastSet().swap(tempCastsList);
       psm.ProStudioMap().swap(tempStudiosMap);
     };
 
@@ -317,8 +297,8 @@ class JsonPrTest : public PlainTestSuite {
     QVERIFY(!jr.ConstructCastStudioValue());
     // 2.0 when inited studio/cast are empty, return false
     jr.m_Name = "Marvil Films X Men HughX JackmanX, MichaelX FassbenderX";
-    QCOMPARE(pm.m_casts.contains(QString("HughX JackmanX").toLower()), false);
-    QCOMPARE(pm.m_casts.contains(QString("MichaelX FassbenderX").toLower()), false);
+    QCOMPARE(pm.CastSet().contains(QString("HughX JackmanX").toLower()), false);
+    QCOMPARE(pm.CastSet().contains(QString("MichaelX FassbenderX").toLower()), false);
     int isHypenIndexInvalid{-1};
     QCOMPARE(StudiosManager::isHypenIndexValid(jr.m_Name, isHypenIndexInvalid), false);
     QCOMPARE(isHypenIndexInvalid, -1);

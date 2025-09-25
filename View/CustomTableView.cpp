@@ -187,6 +187,11 @@ bool CustomTableView::onColumnVisibilityAdjust() {
     tempSwitches += m_columnsShowSwitch;
     tempSwitches += QString{tableColumnsCount - m_columnsShowSwitch.size(), QChar{'1'}};
   }
+  if (tempSwitches.size() != tableColumnsCount) {
+    LOG_W("switches count[%d] should equal to column cnt[%d]", tempSwitches.size(), tableColumnsCount);
+    return false;
+  }
+
   // get column title(s)
   if (m_horHeaderTitles.size() != tableColumnsCount) {
     m_horHeaderTitles.clear();
@@ -195,12 +200,16 @@ bool CustomTableView::onColumnVisibilityAdjust() {
     }
   }
 
+#ifdef RUNNING_UNIT_TESTS
+  m_columnsShowSwitch = UserSpecifiedIntValueMock::mockColumnsShowSwitch();
+#else
   ColumnVisibilityDialog dialog{m_horHeaderTitles, tempSwitches, m_name, this};
   if (dialog.exec() != QDialog::Accepted) {
     LOG_I("User canceled column visibility change");
     return false;
   }
   m_columnsShowSwitch = dialog.getSwitches();
+#endif
 
   ShowOrHideColumnCore();
   return true;
@@ -251,40 +260,61 @@ void CustomTableView::onResizeColumnToContents(const bool checked) {
   }
 }
 
-void CustomTableView::onSetRowMaxHeight() {
-  bool setOk{false};
+bool CustomTableView::onSetRowMaxHeight() {
   static const int INIT_MAX_ROW_HEIGHT = verticalHeader()->maximumSectionSize();
-  const int size = QInputDialog::getInt(this, "Set row max height size >=0 ", QString("current max height:%1 px").arg(INIT_MAX_ROW_HEIGHT), m_defaultTableRowHeight, 0, 10000, 20, &setOk);
+  bool setOk{false};
+  int height = INIT_MAX_ROW_HEIGHT;
+#ifdef RUNNING_UNIT_TESTS
+  setOk = UserSpecifiedIntValueMock::mockBoolOk();
+  height = UserSpecifiedIntValueMock::mockIntValue();
+#else
+  height = QInputDialog::getInt(this, "Set row max height size >=0 ", QString("current max height:%1 px").arg(height), height, 0, 10000, 20, &setOk);
+#endif
   if (!setOk) {
     LOG_W("User cancel resize row height");
-    return;
+    return false;
   }
-  verticalHeader()->setMaximumSectionSize(size);
-  LOG_D("Max row height set to %d", size);
+  verticalHeader()->setMaximumSectionSize(height);
+  LOG_D("Max row height set to %d", height);
+  return true;
 }
 
-void CustomTableView::onSetRowDefaultSectionSize() {
+bool CustomTableView::onSetRowDefaultSectionSize() {
   bool setOk{false};
-  const int size = QInputDialog::getInt(this, "Set default row section size >=0 ", QString("current row:%1 px").arg(m_defaultTableRowHeight), m_defaultTableRowHeight, 0, 10000, 20, &setOk);
+  int size = m_defaultTableRowHeight;
+#ifdef RUNNING_UNIT_TESTS
+  setOk = UserSpecifiedIntValueMock::mockBoolOk();
+  size = UserSpecifiedIntValueMock::mockIntValue();
+#else
+  size = QInputDialog::getInt(this, "Set default row section size >=0 ", QString("current row:%1 px").arg(size), size, 0, 10000, 20, &setOk);
+#endif
   if (!setOk) {
     LOG_W("User cancel resize row height");
-    return;
+    return false;
   }
   m_defaultTableRowHeight = size;
   verticalHeader()->setDefaultSectionSize(size);
   Configuration().setValue(m_DEFAULT_SECTION_SIZE_KEY, size);
+  return true;
 }
 
-void CustomTableView::onSetColumnDefaultSectionSize() {
+bool CustomTableView::onSetColumnDefaultSectionSize() {
   bool setOk{false};
-  const int size = QInputDialog::getInt(this, "Set default column section size >=0 ", QString("current column:%1 px").arg(m_defaultTableRowHeight), m_defaultTableColumnWidth, 0, 10000, 20, &setOk);
+  int size = m_defaultTableColumnWidth;
+#ifdef RUNNING_UNIT_TESTS
+  setOk = UserSpecifiedIntValueMock::mockBoolOk();
+  size = UserSpecifiedIntValueMock::mockIntValue();
+#else
+  size = QInputDialog::getInt(this, "Set default column section size >=0 ", QString("current column:%1 px").arg(size), size, 0, 10000, 20, &setOk);
+#endif
   if (!setOk) {
     LOG_W("User cancel resize column height");
-    return;
+    return false;
   }
   m_defaultTableColumnWidth = size;
   horizontalHeader()->setDefaultSectionSize(size);
   Configuration().setValue(m_DEFAULT_COLUMN_SECTION_SIZE_KEY, size);
+  return true;
 }
 
 void CustomTableView::onShowHorizontalHeader(bool showChecked) {

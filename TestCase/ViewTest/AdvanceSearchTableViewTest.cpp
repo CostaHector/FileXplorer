@@ -45,10 +45,10 @@ class AdvanceSearchTableViewTest : public PlainTestSuite {
 
     // 1. filter ok
     searchProxyModel.startFilterWhenTextChanged("files", "HENRY");
-    QCOMPARE(searchProxyModel.rowCount(), 2);
+    QCOMPARE(searchProxyModel.rowCount(), 2); // here we filter out 2 items.
 
-    { // 2. copy selections ok(first half procedure)
-      advSearch.selectAll();
+    { // 2. copy/cut selections ok (first half procedure)
+      advSearch.selectAll(); // the index of selection is discrete
       QModelIndexList rowsSelected2 = advSearch.selectionModel()->selectedRows(0); // the name row
       QCOMPARE(rowsSelected2.size(), 2);
       auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSearchModel(sourceModel, searchProxyModel, rowsSelected2);
@@ -61,9 +61,20 @@ class AdvanceSearchTableViewTest : public PlainTestSuite {
       QCOMPARE(expectPaths.count("files 2.txt"), 1);
       QCOMPARE(expectPaths.count("\n"), 1);
 
+      // cut
       QVERIFY(MimeDataHelper::FillCutCopySomething<AdvanceSearchModel>(sourceModel, mimeDataMember.srcIndexes, Qt::DropAction::MoveAction));
-      SelectionsRangeHelper::ROW_RANGES_LST rowRangeList = sourceModel.mCutIndexes.GetTopBottomRange();
-      QCOMPARE(rowRangeList.isEmpty(), false);
+      QCOMPARE(sourceModel.mCutIndexes.isEmpty(), false);
+      QCOMPARE(sourceModel.mCopyIndexes.isEmpty(), true);
+
+      // copy
+      QVERIFY(MimeDataHelper::FillCutCopySomething<AdvanceSearchModel>(sourceModel, mimeDataMember.srcIndexes, Qt::DropAction::CopyAction));
+      QCOMPARE(sourceModel.mCutIndexes.isEmpty(), true);
+      QCOMPARE(sourceModel.mCopyIndexes.isEmpty(), false);
+
+      // not support actions. cut/copy index unchange
+      QVERIFY(!MimeDataHelper::FillCutCopySomething<AdvanceSearchModel>(sourceModel, mimeDataMember.srcIndexes, Qt::DropAction::LinkAction));
+      QCOMPARE(sourceModel.mCutIndexes.isEmpty(), true);
+      QCOMPARE(sourceModel.mCopyIndexes.isEmpty(), false);
     }
 
     // 3. remove selections ok

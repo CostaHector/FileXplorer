@@ -45,7 +45,7 @@ CAST_MGR_DATA_T CastManager::ReadOutCasts() const {
   QTextStream stream(&castFi);
   stream.setCodec("UTF-8");
 
-  decltype(m_casts) perfSet;
+  CAST_MGR_DATA_T perfSet;
   QString name;
   while (!stream.atEnd()) {
     name = stream.readLine().toLower();
@@ -60,9 +60,9 @@ CAST_MGR_DATA_T CastManager::ReadOutCasts() const {
 }
 
 int CastManager::ForceReloadImpl() {
-  int beforeStudioNameCnt = m_casts.size();
-  m_casts = ReadOutCasts();
-  int afterStudioNameCnt = m_casts.size();
+  int beforeStudioNameCnt = CastSet().size();
+  CastSet() = ReadOutCasts();
+  int afterStudioNameCnt = CastSet().size();
   LOG_D("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
   return afterStudioNameCnt - beforeStudioNameCnt;
 }
@@ -76,7 +76,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
     LOG_W("path[%s] not exist", qPrintable(path));
     return 0;
   }
-  decltype(m_casts) castsIncrement;
+  CAST_MGR_DATA_T castsIncrement;
   QDirIterator it{path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   int jsonFilesCnt{0};
   while (it.hasNext()) {
@@ -98,7 +98,7 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   if (castsIncrement.isEmpty()) {
     return 0;
   }
-  m_casts.unite(castsIncrement);
+  CastSet().unite(castsIncrement);
 
   int cnt = WriteIntoLocalDictionaryFiles(castsIncrement);
   if (cnt < 0) {
@@ -111,9 +111,9 @@ int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
 }
 
 int CastManager::CastIncrement(CAST_MGR_DATA_T& increments, CAST_MGR_DATA_T delta) {
-  delta -= m_casts;
+  delta -= CastSet();
   increments += delta;
-  m_casts += delta;
+  CastSet() += delta;
   return delta.size();
 }
 
@@ -176,7 +176,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
   while (i < N) {
     if (i < N - 2) {
       const QString& w3 = words[i] + " " + words[i + 1] + " " + RmvBelongLetter(words[i + 2]);
-      if (m_casts.contains(w3.toLower())) {
+      if (CastSet().contains(w3.toLower())) {
         if (!performersList.contains(w3))
           performersList.append(w3);
         i += 3;
@@ -185,7 +185,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
     }
     if (i < N - 1) {
       const QString& w2 = words[i] + " " + RmvBelongLetter(words[i + 1]);
-      if (m_casts.contains(w2.toLower())) {
+      if (CastSet().contains(w2.toLower())) {
         if (!performersList.contains(w2)) {
           performersList.append(w2);
         }
@@ -194,7 +194,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
       }
     }
     const QString& w1 = RmvBelongLetter(words[i]);
-    if (!w1.isEmpty() && m_casts.contains(w1.toLower())) {
+    if (!w1.isEmpty() && CastSet().contains(w1.toLower())) {
       if (!performersList.contains(w1))
         performersList.append(w1);
       i += 1;

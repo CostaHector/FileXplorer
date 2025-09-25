@@ -160,8 +160,8 @@ QStringList TDir::entryList(const QDir::Filters filters, const QDir::SortFlags s
   return mDir.entryList(filters, sort);
 }
 
-AutoRollbackRename::AutoRollbackRename(QString srcPath, QString dstPath) //
-    : mSrcAbsFilePath(std::move(srcPath)) , mDstAbsFilePath(std::move(dstPath)) {}
+AutoRollbackRename::AutoRollbackRename(QString srcPath, QString dstPath)  //
+    : mSrcAbsFilePath(std::move(srcPath)), mDstAbsFilePath(std::move(dstPath)) {}
 
 bool AutoRollbackRename::Execute() {
   mNeedRollback = StartToRename("Rename to");
@@ -197,4 +197,60 @@ AutoRollbackRename::~AutoRollbackRename() {
     return;
   }
   StartToRename("Rename Rollback");
+}
+
+#include "PublicTool.h"
+AutoRollbackFileContentModify::AutoRollbackFileContentModify(const QString& absFilePath, const QString& replaceeStr, const QString& replacerStr)
+    : mAbsFilePath(absFilePath), mReplaceeStr(replaceeStr), mReplacerStr(replacerStr), mMode(Mode::ReplaceMode) {}
+
+AutoRollbackFileContentModify::AutoRollbackFileContentModify(const QString& absFilePath, const QString& newContents)
+    : mAbsFilePath(absFilePath), mNewContents(newContents), mMode(Mode::FullReplaceMode) {}
+
+AutoRollbackFileContentModify::~AutoRollbackFileContentModify() {
+  if (!mNeedRollback) {
+    return;
+  }
+  const bool bRollbackResult = FileTool::TextWriter(mAbsFilePath, mOriginContents, QIODevice::WriteOnly | QIODevice::Text);
+  if (!bRollbackResult) {
+    LOG_W("Rollback file[%s] contents failed", qPrintable(mAbsFilePath));
+  }
+}
+
+bool AutoRollbackFileContentModify::Execute() {
+  if (mNeedRollback) {
+    LOG_W("Already executed. Prevent modify it again");
+    return false;
+  }
+  bool bReadOk = false;
+  QString content = FileTool::TextReader(mAbsFilePath, &bReadOk);
+  if (!bReadOk) {
+    LOG_W("Read Content from file[%s] failed", qPrintable(mAbsFilePath));
+    return false;
+  }
+  mOriginContents.swap(content);
+
+  bool bSuccess = false;
+  switch (mMode) {
+    case Mode::ReplaceMode: {
+      QString tempStr = mOriginContents;
+      tempStr.replace(mReplaceeStr, mReplacerStr);
+      bSuccess = FileTool::TextWriter(mAbsFilePath, tempStr, QIODevice::WriteOnly | QIODevice::Text);
+      break;
+    }
+    case Mode::FullReplaceMode: {
+      bSuccess = FileTool::TextWriter(mAbsFilePath, mNewContents, QIODevice::WriteOnly | QIODevice::Text);
+      break;
+    }
+    default:
+      LOG_W("mMode[%d] invalid", (int)mMode);
+      return false;
+  }
+
+  if (!bSuccess) {
+    LOG_W("File Content[%s] Modify Operation[%d] failed", qPrintable(mAbsFilePath), (int)mMode);
+    return false;
+  }
+
+  mNeedRollback = true;
+  return true;
 }

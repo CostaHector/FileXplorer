@@ -20,6 +20,8 @@ public:
     mSelectedRowBits.reset();
   }
 
+  bool isEmpty() const {return mRowRangeList.isEmpty(); }
+
   void Set(const QString& rootpath, const QModelIndexList& selectedRows) {
     clear();
     currentPath = rootpath;

@@ -14,6 +14,22 @@ template MimeDataMember GetMimeDataMemberFromSourceModel(const FdBasedDbModel& s
 template bool FillCutCopySomething(FileSystemModel& fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct);
 template bool FillCutCopySomething(AdvanceSearchModel& fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct);
 
+template <typename TSrcModel>
+MimeDataMember GetMimeDataMemberFromSourceModel(const TSrcModel& srcModel, const QModelIndexList& indexes) {
+  QStringList filePaths;
+  filePaths.reserve(indexes.size());
+
+  QList<QUrl> urls;
+  urls.reserve(indexes.size());
+
+  for (const auto& ind : indexes) {
+    QString absFilePath{srcModel.filePath(ind)};
+    filePaths.append(absFilePath);
+    urls.append(QUrl::fromLocalFile(absFilePath));
+  }
+  return {filePaths, urls, indexes};
+}
+
 MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& searchSrcModel, const SearchProxyModel& searchProxyModel, const QModelIndexList& proIndexes) {
   QStringList filePaths;
   filePaths.reserve(proIndexes.size());
@@ -32,6 +48,19 @@ MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& search
     urls.append(QUrl::fromLocalFile(absFilePath));
   }
   return {filePaths, urls, srcIndexes};
+}
+
+template <typename TSrcModel>
+bool FillCutCopySomething(TSrcModel& fsModel, const QModelIndexList& srcIndexes, const Qt::DropAction dropAct) {
+  if (dropAct == Qt::CopyAction) {
+    fsModel.CopiedSomething(srcIndexes);
+  } else if (dropAct == Qt::MoveAction) {
+    fsModel.CutSomething(srcIndexes);
+  } else {
+    LOG_D("dropAct[%d] not support", (int)dropAct);
+    return false;
+  }
+  return true;
 }
 
 bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction) {

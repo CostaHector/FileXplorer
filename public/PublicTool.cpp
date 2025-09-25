@@ -50,20 +50,23 @@ QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
   return buffer;
 }
 
-QString TextReader(const QString& textPath) {
+QString TextReader(const QString& textPath, bool* bReadOk) {
   QFile file(textPath);
   if (!file.exists()) {
     LOG_D("File[%s] not found", qPrintable(textPath));
+    if (bReadOk != nullptr) *bReadOk = false;
     return "";
   }
   if (!file.open(QIODevice::ReadOnly)) {
     LOG_D("File[%s] open for read failed", qPrintable(textPath));
+    if (bReadOk != nullptr) *bReadOk = false;
     return "";
   }
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
   QString contents(stream.readAll());
   file.close();
+  if (bReadOk != nullptr) *bReadOk = true;
   return contents;
 }
 
@@ -114,7 +117,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
     defaultPath = Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
   }
   QString selectPath = defaultPath;
-#ifndef _WIN32
+#ifndef RUNNING_UNIT_TESTS
   selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
 #endif
   QFileInfo dstFi(selectPath); // system may return back slash seperated path

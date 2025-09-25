@@ -43,44 +43,69 @@ public:
     }
 
     // 1. copy
-    emit fileOpActsInst.COPY->triggered();  // this signal not connected to any slot yet
-    MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::CopyAction);
-    auto* afterCopyMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
-    if (afterCopyMimeData == nullptr) {
-      LOG_E("afterCopyMimeData is nullptr");
-      return false;
+    {
+      emit fileOpActsInst.COPY->triggered();  // this signal not connected to any slot yet
+      MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::CopyAction);
+      auto* afterCopyMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
+      if (afterCopyMimeData == nullptr) {
+        LOG_E("afterCopyMimeData is nullptr");
+        return false;
+      }
+      const QList<QUrl>& actualCopySelectedUrls = afterCopyMimeData->urls();
+      if (actualCopySelectedUrls.size() != expectItemCnt) {
+        LOG_E("after copy urls count inequal, actual[%d], expectd[%d]", actualCopySelectedUrls.size(), expectItemCnt);
+        return false;
+      }
+      const QString& actualCopyPaths = afterCopyMimeData->text();
+      if (actualCopyPaths != expectPaths) {
+        LOG_E("after copy texts inequal, actual[%s], expectd[%s]", qPrintable(actualCopyPaths), qPrintable(expectPaths));
+        return false;
+      }
+      pClip->clear();
     }
-    const QList<QUrl>& actualCopySelectedUrls = afterCopyMimeData->urls();
-    if (actualCopySelectedUrls.size() != expectItemCnt) {
-      LOG_E("after copy urls count inequal, actual[%d], expectd[%d]", actualCopySelectedUrls.size(), expectItemCnt);
-      return false;
-    }
-    const QString& actualCopyPaths = afterCopyMimeData->text();
-    if (actualCopyPaths != expectPaths) {
-      LOG_E("after copy texts inequal, actual[%s], expectd[%s]", qPrintable(actualCopyPaths), qPrintable(expectPaths));
-      return false;
-    }
-    pClip->clear();
 
     // 2. cut
-    emit fileOpActsInst.CUT->triggered();  // this signal not connected to any slot yet
-    MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::MoveAction);
-    auto* afterCutMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
-    if (afterCutMimeData == nullptr) {
-      LOG_E("afterCutMimeData is nullptr");
-      return false;
+    {
+      emit fileOpActsInst.CUT->triggered();  // this signal not connected to any slot yet
+      MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::MoveAction);
+      auto* afterCutMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
+      if (afterCutMimeData == nullptr) {
+        LOG_E("afterCutMimeData is nullptr");
+        return false;
+      }
+      const QList<QUrl>& actualCutSelectedUrls = afterCutMimeData->urls();
+      if (actualCutSelectedUrls.size() != expectItemCnt) {
+        LOG_E("after cut urls count inequal, actual[%d], expectd[%d]", actualCutSelectedUrls.size(), expectItemCnt);
+        return false;
+      }
+      const QString& actualCutPaths = afterCutMimeData->text();
+      if (actualCutPaths != expectPaths) {
+        LOG_E("after cut texts inequal, actual[%s], expectd[%s]", qPrintable(actualCutPaths), qPrintable(expectPaths));
+        return false;
+      }
+      pClip->clear();
     }
-    const QList<QUrl>& actualCutSelectedUrls = afterCutMimeData->urls();
-    if (actualCutSelectedUrls.size() != expectItemCnt) {
-      LOG_E("after cut urls count inequal, actual[%d], expectd[%d]", actualCutSelectedUrls.size(), expectItemCnt);
-      return false;
+
+    // 3. link
+    {
+      MimeDataHelper::WriteIntoSystemClipboard(mimeDataMember, Qt::DropAction::LinkAction);
+      auto* afterLinkMimeData = pClip->mimeData();  // check to see if system clipboard is ok;
+      if (afterLinkMimeData == nullptr) {
+        LOG_E("afterLinkMimeData is nullptr");
+        return false;
+      }
+      const QList<QUrl>& actualLinkSelectedUrls = afterLinkMimeData->urls();
+      if (actualLinkSelectedUrls.size() != expectItemCnt) {
+        LOG_E("after link urls count inequal, actual[%d], expectd[%d]", actualLinkSelectedUrls.size(), expectItemCnt);
+        return false;
+      }
+      const QString& actualLinkPaths = afterLinkMimeData->text();
+      if (actualLinkPaths != expectPaths) {
+        LOG_E("after link texts inequal, actual[%s], expectd[%s]", qPrintable(actualLinkPaths), qPrintable(expectPaths));
+        return false;
+      }
+      pClip->clear();
     }
-    const QString& actualCutPaths = afterCutMimeData->text();
-    if (actualCutPaths != expectPaths) {
-      LOG_E("after cut texts inequal, actual[%s], expectd[%s]", qPrintable(actualCutPaths), qPrintable(expectPaths));
-      return false;
-    }
-    pClip->clear();
     return true;
   }
 
