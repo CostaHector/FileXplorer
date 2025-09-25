@@ -12,21 +12,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-const QString DbManager::DROP_TABLE_TEMPLATE{"DROP TABLE `%1`;"};
-const QString DbManager::DELETE_TABLE_TEMPLATE{"DELETE FROM `%1`;"};
 constexpr int DbManager::MAX_BATCH_SIZE;
-
-QString DbManager::GetRmvTableCmdTemplate(DROP_OR_DELETE dropOrDelete) {
-  switch (dropOrDelete) {
-    case DROP_OR_DELETE::DROP:
-      return DROP_TABLE_TEMPLATE;
-    case DROP_OR_DELETE::DELETE:
-      return DELETE_TABLE_TEMPLATE;
-    default:
-      assert(false); // should never running into here
-      return "";
-  }
-}
 
 #ifdef RUNNING_UNIT_TESTS
 bool DbManager::DropAllTablesForTest(const QString& connName) {
@@ -49,7 +35,7 @@ bool DbManager::DropAllTablesForTest(const QString& connName) {
   }
 
   for (const QString& table : tables) {
-    if (!query.exec(GetRmvTableCmdTemplate(DROP_OR_DELETE::DROP).arg(table))) {
+    if (!query.exec(DbManagerHelper::command(DbManagerHelper::DropOrDeleteE::DROP).arg(table))) {
       LOG_W("Drop failed table[%s]: %s", qPrintable(table), qPrintable(query.lastError().text()));
       db.rollback();
       return false;
@@ -412,7 +398,7 @@ bool DbManager::CreateTable(const QString& tableName, const QString& tableDefini
   return true;
 }
 
-int DbManager::RmvTable(const QString& tableName, DROP_OR_DELETE dropOrDelete) {
+int DbManager::RmvTable(const QString& tableName, DbManagerHelper::DropOrDeleteE dropOrDelete) {
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return FD_DB_OPEN_FAILED;
@@ -423,7 +409,7 @@ int DbManager::RmvTable(const QString& tableName, DROP_OR_DELETE dropOrDelete) {
     return 0;
   }
 
-  const QString rmvCmdTemplate{GetRmvTableCmdTemplate(dropOrDelete)};
+  const QString rmvCmdTemplate{DbManagerHelper::command(dropOrDelete)};
   if (rmvCmdTemplate.isEmpty()) {
     LOG_W("rmvCmdTemplate empty. mode[%d] invalid", (int) dropOrDelete);
     return FD_DB_INVALID;

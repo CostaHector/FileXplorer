@@ -104,7 +104,7 @@ void PopupWidgetManager<WidgetType>::createWidget() {
   // window flag must ahead of event filter; setWindowFlags must ahead of setWindowFlag
   m_widget->setWindowFlags(m_widget->windowFlags() | Qt::Window);
   m_widget->setWindowModality(Qt::NonModal);
-  m_widget->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
+  // m_widget->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
 
   if (Configuration().contains(m_geometryCfgKey)) {
     m_widget->restoreGeometry(Configuration().value(m_geometryCfgKey).toByteArray());

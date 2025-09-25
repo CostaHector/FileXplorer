@@ -9,6 +9,7 @@
 #include "tDir.h"
 #include <QSqlQuery>
 #include <QSqlError>
+#include "DbManagerHelper.h"
 
 class DbManagerTest : public PlainTestSuite {
   Q_OBJECT
@@ -262,11 +263,11 @@ private slots:
     auto db = mDBMgr.GetDb();
     QCOMPARE(db.tables(), (QStringList{"logs_2023", "logs_2024", "users"}));
 
-    int tableAlreadyNotExists = mDBMgr.RmvTable("logs_.*", DbManager::DROP_OR_DELETE::DROP);
+    int tableAlreadyNotExists = mDBMgr.RmvTable("logs_.*", DbManagerHelper::DropOrDeleteE::DROP);
     QCOMPARE(tableAlreadyNotExists, 0);
     QCOMPARE(db.tables(), (QStringList{"logs_2023", "logs_2024", "users"}));
 
-    int oneTableDropped = mDBMgr.RmvTable("logs_2023", DbManager::DROP_OR_DELETE::DROP);
+    int oneTableDropped = mDBMgr.RmvTable("logs_2023", DbManagerHelper::DropOrDeleteE::DROP);
     QCOMPARE(db.tables(), (QStringList{"logs_2024", "users"}));
     QCOMPARE(oneTableDropped, 1);
   }
