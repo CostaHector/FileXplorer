@@ -47,6 +47,7 @@ class ValueChecker {
   QVariant strToQVariant(const QString& v) const;
 
  private:
+  ValueChecker() = delete;
   VALUE_CHECKER_TYPE::VALUE_TYPE valueType;
 
   QSet<QString> m_strCandidates;  // e.g. extension candidates

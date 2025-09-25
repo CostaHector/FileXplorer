@@ -2,36 +2,83 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QHash>
-#include "PublicTool.h"
 #include "JsonRenameRegex.h"
-#include "StringTool.h"
+#include "PublicVariable.h"
 #include "UndoRedo.h"
 
 using namespace FileOperatorType;
 
-QStringList LowResImgsRemover::GetLowResImgsToDel(const QStringList& imgs) const {
-  QHash<QString, QStringList> imgsResGrp;
-  QString stdName;
-  for (const auto& imgName : imgs) {
-    stdName = imgName;
-    stdName.remove(JSON_RENAME_REGEX::RESOLUTION_COMP);
-    auto it = imgsResGrp.find(stdName);
-    if (it != imgsResGrp.end()) {
-      it->push_back(imgName);
-    } else {
-      imgsResGrp[stdName] = QStringList{imgName};
+using FULL_NAME_2_RESOLUTION = std::pair<QString, QString>;
+using FULL_NAME_2_RESOLUTION_LIST = QList<FULL_NAME_2_RESOLUTION>;
+
+QStringList removeClearestResolution(const FULL_NAME_2_RESOLUTION_LIST& tobeDelete) {
+  if (tobeDelete.size() <= 1) {
+    return {};
+  }
+
+  // 查找最清晰元素
+  QString clearest;
+  int maxRank = -1;
+
+  static const QMap<QString, int> resolutionRank = {
+      // 定义清晰度到权重的映射（权重越高越清晰）
+      {"2160p", 10}, // 最高清晰度
+      {"4K", 10},    // 等同于2160p
+      {"1080p", 9},
+      {"FHD", 9}, // 等同于1080p
+      {"810p", 8},
+      {"720p", 7},
+      {"HD", 7}, // 等同于720p
+      {"480p", 6},
+      {"360p", 5},
+      {"SD", 5} // 等同于360p
+  };
+
+  QStringList tobeDeleteTemp;
+  tobeDeleteTemp.reserve(tobeDelete.size());
+  for (const FULL_NAME_2_RESOLUTION& res2Name : tobeDelete) {
+    tobeDeleteTemp.push_back(res2Name.first);
+    if (resolutionRank.contains(res2Name.second)) {
+      int rank = resolutionRank[res2Name.second];
+      if (rank > maxRank) {
+        maxRank = rank;
+        clearest = res2Name.first;
+      }
     }
   }
 
-  using namespace StringTool;
-  QStringList imgsToBeDel;
-  for (auto& imgs : imgsResGrp.values()) {
-    if (imgs.size() < 2) {  // only 1 image; no other resolution images
+  if (!clearest.isEmpty()) {
+    tobeDeleteTemp.removeAll(clearest);
+  }
+  return tobeDeleteTemp;
+}
+
+QStringList LowResImgsRemover::GetLowResImgsToDel(const QStringList& imgs) const {
+  QHash<QString, FULL_NAME_2_RESOLUTION_LIST> imgsResGrp; // extension to AbsPath
+
+  for (const auto& imgName : imgs) {
+    QRegularExpressionMatch match = JSON_RENAME_REGEX::RESOLUTION_COMP.match(imgName);
+    if (!match.hasMatch()) {
       continue;
     }
-    ImgsSortFileSizeFirst(imgs);  // last image size is largest should keep, so skip
-    imgs.pop_back();
-    imgsToBeDel += imgs;
+    const QString resolutionStr = match.captured(0);
+    const int startIndex = match.capturedStart(0);
+    const int length = match.capturedLength(0);
+    QString stdName = imgName;
+    stdName.remove(startIndex, length);
+
+    FULL_NAME_2_RESOLUTION name2Res{imgName, resolutionStr};
+    auto it = imgsResGrp.find(stdName);
+    if (it != imgsResGrp.end()) {
+      it->push_back(name2Res);
+    } else {
+      imgsResGrp[stdName] = FULL_NAME_2_RESOLUTION_LIST{name2Res};
+    }
+  }
+
+  QStringList imgsToBeDel;
+  for (const FULL_NAME_2_RESOLUTION_LIST& fullname2ResList : imgsResGrp.values()) {
+    imgsToBeDel += removeClearestResolution(fullname2ResList);
   }
   return imgsToBeDel;
 }
@@ -41,8 +88,8 @@ int LowResImgsRemover::operator()(const QString& imgPath) {
     LOG_W("Path[%s] is not a directory", qPrintable(imgPath));
     return -1;
   }
-  QDir dir{imgPath};
-  dir.setFilter(QDir::Filter::Files);
+  QDir dir{imgPath, "", QDir::SortFlag::Name, QDir::Filter::Files};
+  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
   const auto& imgsToDel = GetLowResImgsToDel(dir.entryList());
   if (imgsToDel.isEmpty()) {
     LOG_D("No image differ by resolution need delete");
@@ -58,11 +105,3 @@ int LowResImgsRemover::operator()(const QString& imgPath) {
   LOG_D("delete %d images items, bAllSucceed[%d]", imgsToDel.size(), bAllSucceed);
   return imgsToDel.size();
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-int main(int argc, char* argv[]) {
-  LowResImgsRemover dIR;
-  const auto& cmds = dIR("D:/MEN Pages/P3000");
-}
-#endif
