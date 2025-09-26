@@ -59,6 +59,8 @@ private slots:
     previewer(emptyStrPath);
     QCOMPARE(previewer.currentIndex(), static_cast<int>(FileFolderPreviewer::PANE_TYPE::IMG_VID_OTH));
     QCOMPARE(previewer.currentWidget(), previewer.mImgVidOtherPane);
+
+    // 5. todo mock a CastBrowserHelper::GetCastHtmlParts
   }
 };
 
