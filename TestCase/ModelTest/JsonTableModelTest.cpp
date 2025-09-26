@@ -63,9 +63,14 @@ class JsonTableModelTest : public PlainTestSuite {
     JsonTableModel jtm;
     QCOMPARE(jtm.rowCount(), 0);
     QCOMPARE(jtm.columnCount(), JsonKey::JSON_TABLE_HEADERS_COUNT);
+    QVERIFY(1 <= JsonKey::JSON_TABLE_HEADERS_COUNT && JsonKey::JSON_TABLE_HEADERS_COUNT <= 999);
     QCOMPARE(jtm.headerData(0, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(), JsonKey::JSON_TABLE_HEADERS[0]);
+    QCOMPARE(jtm.headerData(999, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toInt(), 999 + 1);
+    QCOMPARE(jtm.headerData(0, Qt::Horizontal, Qt::ItemDataRole::TextAlignmentRole).isNull(), true);
+
     QCOMPARE(jtm.headerData(3, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 3 + 1);  // not depend on array, never out of
     QCOMPARE(jtm.headerData(0, Qt::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), ((int)Qt::AlignRight));
+    QCOMPARE(jtm.headerData(102400000, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole).isNull(), true);
 
     {  // should not crash down
       QCOMPARE(jtm.setModified(102400, true), false);
@@ -75,9 +80,6 @@ class JsonTableModelTest : public PlainTestSuite {
       QModelIndex invalidIndex;
       QModelIndexList invalidIndexes{invalidIndex, invalidIndex};
       QCOMPARE(jtm.data(invalidIndex, Qt::ItemDataRole::DisplayRole).isNull(), true);
-      QCOMPARE(jtm.headerData(1024, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).isNull(), true);
-      QCOMPARE(jtm.headerData(0, Qt::Horizontal, Qt::ItemDataRole::TextAlignmentRole).isNull(), true);
-      QCOMPARE(jtm.headerData(102400000, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole).isNull(), true);
 
       jtm.setData(invalidIndex, "123", Qt::ItemDataRole::DisplayRole);
       jtm.forceReloadPath();

@@ -49,13 +49,10 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
 QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
   switch (role) {
     case Qt::DisplayRole: {
-      if (orientation == Qt::Orientation::Vertical) {
-        return section + 1;
-      }
-      if (0 <= section && section < columnCount()) {
+      if (0 <= section && section < columnCount() && orientation == Qt::Orientation::Horizontal) {
         return JsonKey::JSON_TABLE_HEADERS[section];
       }
-      return {};
+      return section + 1;
     }
     case Qt::TextAlignmentRole: {
       if (orientation == Qt::Vertical) {

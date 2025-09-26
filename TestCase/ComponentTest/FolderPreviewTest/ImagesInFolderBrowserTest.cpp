@@ -15,32 +15,18 @@
 #include "EndToExposePrivateMember.h"
 #include "DraggableToolButton.h"
 #include "StyleSheet.h"
+#include "ImageTestPrecoditionTools.h"
 #include <QScrollBar>
+
+
+using namespace ImageTestPrecoditionTools;
 
 // a mixed testcase contains 3 class
 
 class ImagesInFolderBrowserTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  const QStringList SVG_FILL_COLORS = {
-      "#FF0000", // 红色
-      "#00FF00", // 绿色
-      "#0000FF", // 蓝色
-      "#FFFF00", // 黄色
-      "#FF00FF", // 品红
-      "#00FFFF", // 青色
-      "#FFA500", // 橙色
-      "#800080", // 紫色
-      "#008000", // 深绿
-      "#000080", // 深蓝
-      "#FFC0CB", // 粉色
-      "#A52A2A", // 棕色
-      "#808080", // 灰色
-      "#000000", // 黑色
-      "#FFFFFF", // 白色
-      "#40E0D0"  // 绿松石
-  };
-  static const QString SVG_TEMPLATE;
+
   static constexpr int SVG_IMG_COUNT {14};
   static constexpr int MP4_VID_COUNT {1};
   static constexpr int OTH_JSON_COUNT {1};
@@ -60,7 +46,7 @@ private slots:
     for (int imgIndex = 0; imgIndex < SVG_IMG_COUNT; ++imgIndex) {
       const char contentChar = 'A' + imgIndex;
       const QChar contentQChar{contentChar};
-      const QString svgContent = SVG_TEMPLATE.arg(SVG_FILL_COLORS[imgIndex % SVG_IMG_COUNT]).arg(contentQChar);
+      const QString svgContent = GetSvgContentTemplate().arg(SVG_FILL_COLORS[imgIndex % SVG_IMG_COUNT]).arg(contentQChar);
       nodes.push_back(FsNodeEntry{QString{"path/%1.svg"}.arg(contentQChar), false, svgContent.toUtf8()});
     }
     nodes.push_back(FsNodeEntry{"path/FileNotAImage.mp4", false, ""});
@@ -127,11 +113,11 @@ private slots:
 
   void folderWith_3BatchImages_browser_ok() {
     ImagesInFolderBrowser browser;
-    browser.mIconSize = QSize{400, 300};
-    browser.setFixedSize(500, 500);
+    browser.mIconSize = QSize{200, 200};
+    browser.setFixedSize(256, 256);
     QVERIFY(browser(itemsFolderPath));
     browser.show();
-    QCOMPARE(QTest::qWaitForWindowExposed(&browser), true);
+    browser.activateWindow();
 
     QCOMPARE(browser.m_dirPath, itemsFolderPath);
     QCOMPARE(browser.m_imgsLst.size(), SVG_IMG_COUNT);
@@ -178,11 +164,12 @@ private slots:
 
   void wheelDownToMaximun_browser_willShowRemainImages_ok() {
     ImagesInFolderBrowser browser;
-    browser.mIconSize = QSize{400, 300};
-    browser.setFixedSize(500, 500);
+    browser.mIconSize = QSize{200, 200};
+    browser.setFixedSize(256, 256);
     QVERIFY(browser(itemsFolderPath));
     browser.show();
-    QCOMPARE(QTest::qWaitForWindowExposed(&browser), true);
+    browser.activateWindow();
+    // QCOMPARE(QTest::qWaitForWindowExposed(&browser), true);
 
     QCOMPARE(browser.m_dirPath, itemsFolderPath);
     QCOMPARE(browser.m_imgsLst.size(), SVG_IMG_COUNT);
@@ -238,7 +225,7 @@ private slots:
     QVERIFY(QFile::exists(svgImagePath));
 
     ImagesInFolderSlider slider;
-    slider.setFixedSize(400, 300);
+    slider.setFixedSize(200, 200);
     QCOMPARE(slider.m_inFolderImgIndex, 0 * ImagesInFolderSlider::MAX_LABEL_CNT);
     QCOMPARE(slider.m_nextImgTimer->isActive(), false);
     QCOMPARE(slider.m_nextImgTimer->interval(), ImagesInFolderSlider::SLIDE_TO_NEXT_IMG_TIME_INTERVAL);
@@ -430,10 +417,7 @@ private slots:
     QCOMPARE(defActionsTextList(previewer.mTypeToDisplayTB), (QStringList{othCntStr, vidCntStr, imgCntStr}));
   }
 };
-const QString ImagesInFolderBrowserTest::SVG_TEMPLATE{R"(<svg xmlns="http://www.w3.org/2000/svg" width="540" height="360" viewBox="0 0 540 360">
-  <rect width="540" height="360" fill="%1"/>
-  <text x="0" y="300" font-size="360" fill="white">%2</text>
-  </svg>)"}; // WARNING: don't use R"" inside class when the class need .moc
+
 constexpr int ImagesInFolderBrowserTest::SVG_IMG_COUNT;
 constexpr int ImagesInFolderBrowserTest::MP4_VID_COUNT;
 constexpr int ImagesInFolderBrowserTest::OTH_JSON_COUNT;

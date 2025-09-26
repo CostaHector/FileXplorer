@@ -10,6 +10,8 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QTextStream>
+#include <QPixmap>
+#include <QPainter>
 
 namespace FileTool {
 QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
@@ -108,6 +110,30 @@ bool OpenLocalFileUsingDesktopService(const QString& localFilePath) {
 #else
   return true;
 #endif
+}
+
+QPixmap GetRatePixmap(const int r, const int sliceCount, const bool hasBorder) {
+  if (r < 0 || r > sliceCount) {
+    LOG_D("rate[%d] out bound", r);
+    return {};
+  }
+  static constexpr int WIDTH = 100, HEIGHT = (int)(WIDTH * 0.618);
+  QPixmap mp{WIDTH, HEIGHT};
+  int orangeWidth = WIDTH * r / sliceCount;
+  static constexpr QColor OPAGUE{0, 0, 0, 0};
+  static constexpr QColor STD_ORANGE{255, 165, 0, 255};
+  mp.fill(OPAGUE); // opague
+  QPainter painter{&mp};
+  painter.setPen(STD_ORANGE); // standard orange
+  painter.setBrush(STD_ORANGE);
+  painter.drawRect(0, 0, orangeWidth, HEIGHT);
+  if (hasBorder) {
+    painter.setPen(QColor{0, 0, 0, 255}); // standard black
+    painter.setBrush(OPAGUE);
+    painter.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
+  }
+  painter.end();
+  return mp;
 }
 
 }  // namespace FileTool
