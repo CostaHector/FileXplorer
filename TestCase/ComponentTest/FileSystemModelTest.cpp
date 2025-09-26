@@ -5,51 +5,52 @@
 #include <QSignalSpy>
 
 #include "OnScopeExit.h"
+
+#include "BeginToExposePrivateMember.h"
 #include "FileSystemModel.h"
 #include "CustomTableView.h"
+#include "EndToExposePrivateMember.h"
+
 #include "PlainTestSuite.h"
 #include "TDir.h"
 
 class FileSystemModelTest : public PlainTestSuite {
   Q_OBJECT
-public:
-  ~FileSystemModelTest() {
-    if (view != nullptr) {
-      delete view;
-      view = nullptr;
-    }
-  }
+ public:
   TDir tDir;
-  QDir mDir;
-  const QList<FsNodeEntry> nodeEntries//
+  QDir mDir{tDir.path()};
+  const QList<FsNodeEntry> nodeEntries  //
       {
-          FsNodeEntry{"Chris Hemsworth", true, ""}, //
-          FsNodeEntry{"Chris Hemsworth Introduction.txt", false, "txt"}, //
-          FsNodeEntry{"Chris Hemsworth Suit.png", false, "png"}, //
-          FsNodeEntry{"Chris Hemsworth Wallpaper.jpg", false, "jpg"}, //
-          FsNodeEntry{"Chris Hemsworth X.jpg", false, "jpg"}, //
+          FsNodeEntry{"Chris Hemsworth", true, ""},                       //
+          FsNodeEntry{"Chris Hemsworth Introduction.txt", false, "txt"},  //
+          FsNodeEntry{"Chris Hemsworth Suit.png", false, "png"},          //
+          FsNodeEntry{"Chris Hemsworth Wallpaper.jpg", false, "jpg"},     //
+          FsNodeEntry{"Chris Hemsworth X.jpg", false, "jpg"},             //
       };
-  QString pathRoot5, pathSub0;
+  QString pathRoot5{tDir.path()};
+  QString pathSub0{tDir.itemPath("Chris Hemsworth")};
+
   FileSystemModel* model{nullptr};
   CustomTableView* view{nullptr};
   const QDir::Filters INITIAL_DIR_FILTERS{QDir::Filter::NoDotAndDotDot | QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Hidden};
-private slots:
+ private slots:
   void initTestCase() {
     QVERIFY(tDir.IsValid());
-    pathRoot5 = tDir.path();
     QCOMPARE(tDir.createEntries(nodeEntries), nodeEntries.size());
-
-    mDir = QDir{pathRoot5};
-    QVERIFY(mDir.exists());
-    pathSub0 = mDir.absoluteFilePath("Chris Hemsworth");
 
     view = new (std::nothrow) CustomTableView{"FileSystemTableView"};
     QVERIFY(view != nullptr);
 
     model = new (std::nothrow) FileSystemModel{view};
     QVERIFY(model != nullptr);
+
     model->setFilter(INITIAL_DIR_FILTERS);
     model->sort(0, Qt::AscendingOrder);
+    QVERIFY(model->_mPLogger == nullptr);
+    QCOMPARE(model->supportedDropActions(), (Qt::MoveAction | Qt::CopyAction | Qt::LinkAction));
+    QCOMPARE(model->supportedDragActions(), (Qt::MoveAction | Qt::CopyAction | Qt::LinkAction));
+    model->BindLogger(nullptr);  // should not crash down
+    QVERIFY(model->_mPLogger == nullptr);
 
     view->setModel(model);
     view->setSortingEnabled(true);
@@ -59,11 +60,16 @@ private slots:
 
   void cleanupTestCase() {
     tDir.remove();
+
+    if (view != nullptr) {
+      delete view;
+      view = nullptr;
+    }
   }
 
   void test_ToggleBetweenUniquePath_RowCountCorrect() {
     // path switch: pathRoot5 → pathSub0 → pathRoot5
-    auto PathSwitch = [](QFileSystemModel* model, const QString &path){
+    auto PathSwitch = [](QFileSystemModel* model, const QString& path) {
       QSignalSpy spy(model, &QFileSystemModel::directoryLoaded);
       QModelIndex rootIndex = model->setRootPath(path);
       return spy.wait(1000) ? model->rowCount(rootIndex) : -1;
@@ -90,13 +96,13 @@ private slots:
 
     QSignalSpy renterSpy(model, &QFileSystemModel::directoryLoaded);
     rootIndex = model->setRootPath(currentValidPath);
-    QCOMPARE(renterSpy.wait(1000), false); // reenter(path unchange) directoryLoaded signal should not be emit
+    QCOMPARE(renterSpy.wait(1000), false);  // reenter(path unchange) directoryLoaded signal should not be emit
     QCOMPARE(renterSpy.count(), 0);
 
     QSignalSpy uniqueSpy(model, &QFileSystemModel::directoryLoaded);
     rootIndex = model->setRootPath("");
     rootIndex = model->setRootPath(currentValidPath);
-    QCOMPARE(uniqueSpy.wait(1000), true); // path changed directoryLoaded signal should not be emit
+    QCOMPARE(uniqueSpy.wait(1000), true);  // path changed directoryLoaded signal should not be emit
     QVERIFY(uniqueSpy.count() >= 1);
 
     QList<QVariant> dirloadedParams = uniqueSpy.last();
@@ -119,7 +125,7 @@ private slots:
     // only 1 item with this filter and hide item that don't pass the filter directly
     QModelIndex rootIndex = model->setRootPath(pathRoot5);
 
-    ON_SCOPE_EXIT{
+    ON_SCOPE_EXIT {
       model->setFilter(INITIAL_DIR_FILTERS);
       model->setNameFilterDisables(true);
       QTRY_COMPARE(model->rowCount(rootIndex), 5);
@@ -204,7 +210,7 @@ private slots:
       }
       QCOMPARE(model->rowCount(model->index(pathRoot5)), 5);
     }
-    { // cut / copy / cut switch
+    {  // cut / copy / cut switch
       view->selectAll();
       QModelIndexList inds{view->selectionModel()->selectedRows()};
       QCOMPARE(inds.size(), 5);
@@ -274,9 +280,56 @@ private slots:
     }
   }
 
-private:
+  void data_retrieve_correct() {
+    CustomStatusBar customStatusBar;
+
+    FileSystemModel fsModel;
+    QVERIFY(fsModel._mPLogger == nullptr);
+    fsModel.BindLogger(&customStatusBar);
+
+    QCOMPARE(fsModel.headerData(0, Qt::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
+
+    fsModel.m_draggedHoverIndex = fsModel.index(0, 0);
+    QCOMPARE(fsModel.headerData(0, Qt::Vertical, Qt::ItemDataRole::DecorationRole).isNull(), false);  // drag icon
+    fsModel.m_draggedHoverIndex = QModelIndex{};
+
+    // empty ModelIndex should not crash down
+    QCOMPARE(fsModel.data(QModelIndex(), Qt::ItemDataRole::DisplayRole).isNull(), true);
+
+    // dropMimeData do nothing now
+    QCOMPARE(fsModel.dropMimeData(nullptr, Qt::DropAction::LinkAction, 0, 0, {}), false);
+    QMimeData emptyMimeData;
+    QCOMPARE(fsModel.dropMimeData(&emptyMimeData, Qt::DropAction::LinkAction, 0, 0, {}), true);
+
+    // directory loaded ok
+    QSignalSpy spy(&fsModel, &QFileSystemModel::directoryLoaded);
+    QModelIndex rootIndex = fsModel.setRootPath(pathRoot5);
+    if (spy.count() == 0) {
+      QVERIFY(spy.wait(1000));
+    }
+    QCOMPARE(fsModel.rowCount(rootIndex), 5);
+    QModelIndex firstInd = fsModel.index(0, 0, rootIndex);
+
+    // cut decoration icon ok
+    QCOMPARE(fsModel.mCutIndexes.isEmpty(), true);
+    fsModel.data(firstInd, Qt::ItemDataRole::DecorationRole);
+    fsModel.CutSomething({firstInd});
+    QCOMPARE(fsModel.mCutIndexes.isEmpty(), false);
+    fsModel.data(firstInd, Qt::ItemDataRole::DecorationRole);
+    fsModel.ClearCutDict();
+
+    // copy decoration icon ok
+    QCOMPARE(fsModel.mCopyIndexes.isEmpty(), true);
+    fsModel.data(firstInd, Qt::ItemDataRole::DecorationRole);
+    fsModel.CopiedSomething({firstInd});
+    QCOMPARE(fsModel.mCopyIndexes.isEmpty(), false);
+    fsModel.data(firstInd, Qt::ItemDataRole::DecorationRole);
+    fsModel.ClearCopiedDict();
+  }
+
+ private:
   bool Select2Files() {
-    model->sort(0, Qt::AscendingOrder); // must sort every time rootpath changed
+    model->sort(0, Qt::AscendingOrder);  // must sort every time rootpath changed
     view->clearSelection();
     const QModelIndex rootIndex{model->index(pathRoot5)};
     QModelIndex index2 = model->index(2, 0, rootIndex);

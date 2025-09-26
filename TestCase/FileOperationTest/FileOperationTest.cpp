@@ -6,6 +6,8 @@
 #include "TDir.h"
 #include "PlainTestSuite.h"
 #include "FileOperation.h"
+#include "OnScopeExit.h"
+#include "MemoryKey.h"
 
 using namespace FileOperatorType;
 
@@ -561,7 +563,7 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(!dir.fileExists("home/a.txt", false));
 
     QDir binDir{dir.itemPath("bin")};
-    QCOMPARE(binDir.entryList(QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name), //
+    QCOMPARE(binDir.entryList(QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name),  //
              (QStringList{"A.TXT", "a.txt"}));
 #endif
   }
@@ -836,6 +838,25 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(!dir.dirExists("nfilea", false));
     QVERIFY(!dir.fileExists(existFile, false));
     QVERIFY(dir.fileExists("nfileb", false));
+  }
+
+  void returnErrorCodeUponAnyFailureSw_ok() {
+    using namespace FileOperatorType;
+    bool bkpUp = IsReturnErrorCodeUponAnyFailureSw();
+    ON_SCOPE_EXIT {
+      SetReturnErrorCodeUponAnyFailureSw(bkpUp);
+    };
+
+    Configuration().setValue(MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, false);
+    InitReturnErrorCodeUponAnyFailureSw();
+    QVERIFY(!IsReturnErrorCodeUponAnyFailureSw());
+
+    Configuration().setValue(MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, true);
+    InitReturnErrorCodeUponAnyFailureSw();
+    QVERIFY(IsReturnErrorCodeUponAnyFailureSw());
+
+    SetReturnErrorCodeUponAnyFailureSw(false);
+    QVERIFY(!IsReturnErrorCodeUponAnyFailureSw());
   }
 };
 #include "FileOperationTest.moc"

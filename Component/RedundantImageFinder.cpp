@@ -1,6 +1,6 @@
 ﻿#include "RedundantImageFinder.h"
 
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "RedundantImageFinderActions.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
@@ -49,7 +49,7 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
   m_toolBar->addSeparator();
   m_toolBar->addAction(redunInst.RECYLE_NOW);
   m_toolBar->addWidget(pSpacer);
-  m_toolBar->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  m_toolBar->addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
   m_toolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   addToolBar(m_toolBar);
 
@@ -83,7 +83,7 @@ void RedundantImageFinder::showEvent(QShowEvent* event) {
 }
 
 void RedundantImageFinder::closeEvent(QCloseEvent* event) {
-  g_fileBasicOperationsActions()._DUPLICATE_IMAGES_FINDER->setChecked(false);
+  FileOpActs::GetInst()._DUPLICATE_IMAGES_FINDER->setChecked(false);
   Configuration().setValue(GEOMETRY_KEY, saveGeometry());
   Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, mResultAlsoContainEmptyImage);
   QMainWindow::closeEvent(event);

@@ -10,6 +10,7 @@
 class ImgVidOthInFolderPreviewer: public QWidget {
 public:
   explicit ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
+  ~ImgVidOthInFolderPreviewer();
   void operator()(const QString& pth); // file system view
   void operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst); // scene view
 

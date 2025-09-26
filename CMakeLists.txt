@@ -128,6 +128,8 @@ else()
     add_executable(${PROJECT_NAME}
         ${SOURCES}
         ${RESOURCES}
+        FileOperation/FileStructurePolicy.h
+        public/FilePropertyMetaInfo.h
     )
 endif()
 

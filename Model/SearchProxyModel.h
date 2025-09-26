@@ -36,15 +36,13 @@ public:
     QSortFilterProxyModel::setSourceModel(sourceModel);
   }
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override { return sourceModel()->headerData(section, orientation, role); }
-
   void setContentFilter(const QString& contentText);
   void PrintRegexDebugMessage() const;
   void startFilterWhenTextChanged(const QString& nameText, const QString& contentText);
-  void startFilterWhenTextChanges(const QString& nameText, const QString& contentText);
   bool ReturnPostOperation(const bool isPass, const QModelIndex& index) const;
 
   bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
+  void ForceStartFilterInTest();
 
 private:
   bool CheckIfContentsContained(const QString& filePath, const QString& contained) const;

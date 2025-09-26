@@ -61,6 +61,7 @@ bool FileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction acti
 }
 
 bool FileSystemModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& /*parent*/) {
+  CHECK_NULLPTR_RETURN_FALSE(data);
   LOG_D("Action[%d] %d item(s) Drop In FileSystemModel", action, data->urls().size());
   return true;
 }
@@ -74,6 +75,9 @@ Qt::DropActions FileSystemModel::supportedDragActions() const {
 }
 
 QVariant FileSystemModel::data(const QModelIndex& index, int role) const {
+  if (!index.isValid()) {
+    return {};
+  }
   if (role == Qt::DecorationRole && index.column() == 0) {
     if (mCutIndexes.contains(rootPath(), index.row())) {
       static const QIcon CUT_ICON{":img/CUT_ITEM"};

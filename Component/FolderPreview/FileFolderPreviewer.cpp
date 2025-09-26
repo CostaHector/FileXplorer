@@ -25,6 +25,10 @@ FileFolderPreviewer::FileFolderPreviewer(const QString& memoryName, QWidget* par
   setWindowIcon(QIcon(":img/FLOATING_PREVIEW"));
 }
 
+FileFolderPreviewer::~FileFolderPreviewer() {
+  SaveSettings();
+}
+
 void FileFolderPreviewer::ReadSettings() {
   if (Configuration().contains("FLOATING_PREVIEW_GEOMETRY")) {
     restoreGeometry(Configuration().value("FLOATING_PREVIEW_GEOMETRY").toByteArray());

@@ -1,6 +1,6 @@
 ﻿#include "FileSystemListView.h"
 #include "PublicMacro.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
 #include "ViewActions.h"
@@ -37,18 +37,18 @@ void FileSystemListView::subscribe() {
   addAction(g_rightClickActions()._PROPERTIES);
 
   addAction(g_viewActions().NAVIGATION_PANE);
-  addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
+  addActions(FileOpActs::GetInst().OPEN_AG->actions());
 
-  addActions(g_fileBasicOperationsActions().NEW->actions());
-  addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
-  addActions(g_fileBasicOperationsActions().FOLDER_MERGE->actions());
-  addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
-  addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  addActions(FileOpActs::GetInst().NEW->actions());
+  addActions(FileOpActs::GetInst().CUT_COPY_PASTE->actions());
+  addActions(FileOpActs::GetInst().FOLDER_MERGE->actions());
+  addActions(FileOpActs::GetInst().MOVE_COPY_TO->actions());
+  addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
 
   addActions(g_renameAg().RENAME_RIBBONS->actions());
 
-  addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
-  addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
+  addActions(FileOpActs::GetInst().SELECTION_RIBBONS->actions());
+  addActions(FileOpActs::GetInst().DELETE_ACTIONS->actions());
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 }
 
@@ -70,7 +70,7 @@ void FileSystemListView::dragLeaveEvent(QDragLeaveEvent* event) {
 
 auto FileSystemListView::keyPressEvent(QKeyEvent* e) -> void {
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
-    emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
+    emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
     return;
   }
   QListView::keyPressEvent(e);

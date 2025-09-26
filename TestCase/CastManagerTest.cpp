@@ -17,7 +17,7 @@
 
 class CastManagerTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   CastManagerTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString rootpath{mDir.path()};
@@ -26,50 +26,44 @@ public:
   QList<FsNodeEntry> gNodeEntries;
   CastManager* cmInLLT{nullptr};
   StudiosManager* smInLLT{nullptr};
-private slots:
+ private slots:
   void initTestCase() {
+    // 1. at first cast_list.txt and studio_list.txt file not exist
     CastManager& instCast = CastManager::getInst();
-    instCast.InitializeImpl(gLocalFilePath);
-    cmInLLT = &instCast;
-
+    {
+      instCast.InitializeImpl(gLocalFilePath);
+      QVERIFY(instCast.CastSet().isEmpty());
+    }
     StudiosManager& instStudio = StudiosManager::getInst();
-    instStudio.ResetStateForTestImpl(gStudioLocalFilePath);
-    smInLLT = &instStudio;
+    {
+      instStudio.InitializeImpl(gStudioLocalFilePath);
+      QVERIFY(instStudio.ProStudioMap().isEmpty());
+    }
 
     QVERIFY(mDir.IsValid());
     gNodeEntries = QList<FsNodeEntry>  //
         {
-         FsNodeEntry{"cast_list.txt", false, {}},                    //
-         FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS},      //
-         FsNodeEntry{"studio_list.txt", false, {}},                  //
-         FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},    //
-         FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},  //
-         FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},      //
-         FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
-         };
-    mDir.createEntries(gNodeEntries);
-  }
-  void cleanup() {
-    QFile fiCast{gLocalFilePath};
-    if (fiCast.size() > 0) {  // clear file
-      fiCast.resize(0);
-    }
-    QFile fiStudio{gStudioLocalFilePath};
-    if (fiStudio.size() > 0) {  // clear file
-      fiStudio.resize(0);
-    }
-  }
+            FsNodeEntry{"cast_list.txt", false, "any random cast1\nanother random cast2"},    //
+            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS},  //
+            FsNodeEntry{"studio_list.txt", false, "any random studio\tAnyRandomStudio"},      //
+            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},                          //
+            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},                        //
+            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},                            //
+            FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
+        };
+    QCOMPARE(mDir.createEntries(gNodeEntries), gNodeEntries.size());
 
-  void test_cast_list_file_empty_nothing_read_out() {
-    const QFile castListFi{gLocalFilePath};
-    QVERIFY2(castListFi.exists(), qPrintable(gLocalFilePath));  // file exist
-    QCOMPARE(castListFi.size(), 0);                             // empty file
-    QVERIFY2(cmInLLT->count() == 0, "Cast count in llt should be empty");
-  }
-
-  void test_cast_list_not_empty_in_service() {
-    const CastManager& pmInsService{CastManager::getInst()};
-    QVERIFY2(pmInsService.count() >= 0, "Cast count in service should greater than 0");
+    // 2. ResetStateForTestImpl ok
+    {
+      instCast.ResetStateForTestImpl(gLocalFilePath);
+      QCOMPARE(instCast.CastSet().size(), 2); // 2 elements
+      cmInLLT = &instCast;
+    }
+    {
+      instStudio.ResetStateForTestImpl(gStudioLocalFilePath);
+      QCOMPARE(instStudio.ProStudioMap().size(), 1); // 1 element
+      smInLLT = &instStudio;
+    }
   }
 
   void test_sentenceSplit() {
@@ -111,9 +105,12 @@ private slots:
     const QString sentence{"Jean le Rond d'Alembert AND Frenkie de Jong///L Hospital\\\\James"};
     const QStringList& expectWordSection{"Jean", "le", "Rond", "d'Alembert", "Frenkie", "de", "Jong", "L", "Hospital", "James"};
 
+    QCOMPARE(cmInLLT->SplitSentence(""), (QStringList{})); // empty string in empty list out
+
     const auto& actualWordsList = cmInLLT->SplitSentence(sentence);
     QCOMPARE(actualWordsList, expectWordSection);
 
+    QCOMPARE(cmInLLT->FilterPerformersOut({}), (QStringList{})); // empty string in empty list out
     const auto& actualCast1 = cmInLLT->FilterPerformersOut(actualWordsList);
     const auto& actualCast2 = (*cmInLLT)(sentence);
     QCOMPARE(actualCast1, actualCast2);

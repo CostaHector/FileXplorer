@@ -8,23 +8,8 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QUrl>
-#include <QAction>
 
 namespace ComplexOperation {
-FILE_STRUCTURE_MODE g_fileStructureMode{FILE_STRUCTURE_MODE::QUERY};
-
-void SetDefaultFileStructMode(const QAction* pDefaultMode) {
-  if (pDefaultMode == nullptr) {
-    LOG_W("pDefaultMode is nullptr");
-    return;
-  }
-  g_fileStructureMode = FILE_STRUCTURE_MODE_STR_2_ENUM.value(pDefaultMode->text(), FILE_STRUCTURE_MODE::QUERY);
-  Configuration().setValue(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name, (int)g_fileStructureMode);
-}
-
-FILE_STRUCTURE_MODE GetDefaultFileStructMode() {
-  return g_fileStructureMode;
-}
 
 QStringList ComplexOperationBase::QUrls2FileAbsPaths(const QList<QUrl>& urls) {
   QStringList lAbsPathList;
@@ -43,23 +28,19 @@ QStringList ComplexOperationBase::MimeData2FileAbsPaths(const QMimeData& mimeDat
   return QUrls2FileAbsPaths(mimeData.urls());
 }
 
-BATCH_COMMAND_LIST_TYPE ComplexOperationBase::FromQUrls(const QList<QUrl>& urls, const QString& dest, FILE_STRUCTURE_MODE mode) {
+BATCH_COMMAND_LIST_TYPE ComplexOperationBase::FromQUrls(const QList<QUrl>& urls, const QString& dest, FileStuctureModeE mode) {
   return To(QUrls2FileAbsPaths(urls), dest, mode);
 }
 
-BATCH_COMMAND_LIST_TYPE ComplexOperationBase::FromMimeDataTo(const QMimeData& mimeData, const QString& dest, FILE_STRUCTURE_MODE mode) {  //
-  return To(MimeData2FileAbsPaths(mimeData), dest, mode);
-}
-
-BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths, const QString& dest, FILE_STRUCTURE_MODE mode) {
+BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths, const QString& dest, FileStuctureModeE mode) {
   BATCH_COMMAND_LIST_TYPE lst;
-  if (mode == FILE_STRUCTURE_MODE::FLATTEN) {
+  if (mode == FileStuctureModeE::FLATTEN) {
     QString prepath;
     for (const QString& pth : selectionAbsFilePaths) {
       QString name = PathTool::GetPrepathAndFileName(pth, prepath);
       lst.append(ACMD::GetInstMV(prepath, name, dest));
     }
-  } else if (mode == FILE_STRUCTURE_MODE::PRESERVE) {
+  } else if (mode == FileStuctureModeE::PRESERVE) {
     QString rootPath;
     QStringList rel2Selections;  // indirect or direct
     std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
@@ -67,14 +48,14 @@ BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths
       lst.append(ACMD::GetInstMV(rootPath, rel2Section, dest));
     }
   } else {
-    LOG_W("File Structure Mode[%d] not support", (int)mode);
+    LOG_W("File Structure Mode[%s] not support", c_str(mode));
   }
   return lst;
 }
 
-BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths, const QString& dest, FILE_STRUCTURE_MODE mode) {
+BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths, const QString& dest, FileStuctureModeE mode) {
   BATCH_COMMAND_LIST_TYPE lst;
-  if (mode == FILE_STRUCTURE_MODE::FLATTEN) {
+  if (mode == FileStuctureModeE::FLATTEN) {
     QString prepath;
     for (const QString& pth : selectionAbsFilePaths) {
       QString name = PathTool::GetPrepathAndFileName(pth, prepath);
@@ -84,7 +65,7 @@ BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths
         lst.append(ACMD::GetInstCPFILE(prepath, name, dest));
       }
     }
-  } else if (mode == FILE_STRUCTURE_MODE::PRESERVE) {
+  } else if (mode == FileStuctureModeE::PRESERVE) {
     QString rootPath;
     QStringList rel2Selections;  // indirect or direct
     std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
@@ -96,38 +77,50 @@ BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths
       }
     }
   } else {
-    LOG_W("File Structure Mode[%d] not support", (int)mode);
+    LOG_W("File Structure Mode[%s] not support", c_str(mode));
   }
   return lst;
 }
 
-BATCH_COMMAND_LIST_TYPE ComplexLink::To(const QStringList& selectionAbsFilePaths, const QString& dest, FILE_STRUCTURE_MODE /*mode*/) {
+BATCH_COMMAND_LIST_TYPE ComplexLink::To(const QStringList& selectionAbsFilePaths, const QString& dest, FileStuctureModeE mode) {
   BATCH_COMMAND_LIST_TYPE lst;
-  QString rootPath;
-  QStringList rel2Selections;  // indirect or direct
-  std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
-  for (const QString& rel2Section : rel2Selections) {
-    lst.append(ACMD::GetInstLINK(rootPath, rel2Section, dest));
+  if (mode == FileStuctureModeE::FLATTEN) {
+    QString prepath;
+    for (const QString& pth : selectionAbsFilePaths) {
+      QString name = PathTool::GetPrepathAndFileName(pth, prepath);
+      lst.append(ACMD::GetInstLINK(prepath, name, dest));
+    }
+  } else if (mode == FileStuctureModeE::PRESERVE) {
+    QString rootPath;
+    QStringList rel2Selections;  // indirect or direct
+    std::tie(rootPath, rel2Selections) = PathTool::GetLAndRels(selectionAbsFilePaths);
+    for (const QString& rel2Section : rel2Selections) {
+      lst.append(ACMD::GetInstLINK(rootPath, rel2Section, dest));
+    }
+  } else {
+    LOG_W("File Structure Mode[%s] not support", c_str(mode));
   }
+
   return lst;
 }
 
 BATCH_COMMAND_LIST_TYPE ComplexMerge::Merge(const QString& src, const QString& dest) {
   ComplexMove cm;
-  const QStringList files{QDir{src}.entryList({}, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsLast | QDir::SortFlag::Name)};
+  const QStringList files{
+      QDir{src}.entryList({}, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsLast | QDir::SortFlag::Name)};
   QStringList selectionAbsFilePaths;
   selectionAbsFilePaths.reserve(files.size());
   for (const QString& fileName : files) {
     selectionAbsFilePaths.append(src + '/' + fileName);
   }
-  auto ans = cm.To(selectionAbsFilePaths, dest, FILE_STRUCTURE_MODE::FLATTEN);
+  auto ans = cm.To(selectionAbsFilePaths, dest, FileStuctureModeE::FLATTEN);
   QString prepath;
   QString srcFileName = PathTool::GetPrepathAndFileName(src, prepath);
   ans.append(ACMD::GetInstRMDIR(prepath, srcFileName));
   return ans;
 }
 
-int DoDropAction(Qt::DropAction dropAct, const QList<QUrl>& urls, const QString& dest, FILE_STRUCTURE_MODE mode) {
+int DoDropAction(Qt::DropAction dropAct, const QList<QUrl>& urls, const QString& dest, FileStuctureModeE mode) {
   BATCH_COMMAND_LIST_TYPE aBatch;
   QString dropActionStr;
   switch (dropAct) {
@@ -166,7 +159,7 @@ int DoDropAction(Qt::DropAction dropAct, const QList<QUrl>& urls, const QString&
   return 0;
 }
 
-int DoDropAction(Qt::DropAction dropAct, const QStringList& absPaths, const QString& dest, FILE_STRUCTURE_MODE mode) {
+int DoDropAction(Qt::DropAction dropAct, const QStringList& absPaths, const QString& dest, FileStuctureModeE mode) {
   BATCH_COMMAND_LIST_TYPE aBatch;
   QString dropActionStr;
   switch (dropAct) {
@@ -205,7 +198,7 @@ int DoDropAction(Qt::DropAction dropAct, const QStringList& absPaths, const QStr
   return 0;
 }
 
-Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) { // todo: testcase need added with SetMimeDataCutCopy
+Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
 #ifdef _WIN32
   if (native.hasFormat("Preferred DropEffect")) {
     const QByteArray& ba = native.data("Preferred DropEffect");

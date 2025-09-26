@@ -1,16 +1,22 @@
-﻿#ifndef FILEBASICOPERATIONSACTIONS_H
-#define FILEBASICOPERATIONSACTIONS_H
+#ifndef FILEOPACTS_H
+#define FILEOPACTS_H
 
 #include <QAction>
 #include <QActionGroup>
 #include <QObject>
+#include "EnumIntAction.h"
+#include "FileStructurePolicy.h"
 
 struct KV;
 class QToolBar;
 
-class FileBasicOperationsActions : public QObject {
+extern template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
+
+class FileOpActs : public QObject {
  public:
-  explicit FileBasicOperationsActions(QObject* parent = nullptr);
+  static FileOpActs& GetInst();
+  explicit FileOpActs(QObject* parent = nullptr);
+  FileStructurePolicy::FileStuctureModeE GetCurFileStructurePolicy() const { return mFileStructureIntAction.curVal(); }
 
   QActionGroup* GetDeleteActions();
   QActionGroup* GetMOVE_COPY_TOActions();
@@ -51,10 +57,9 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* MOVE_TO_PATH_HISTORY{nullptr};
   QActionGroup* COPY_TO_PATH_HISTORY{nullptr};
 
-  QToolBar* GetFolderOperationModeTb(QWidget* parent=nullptr);
+  QToolBar* GetFolderOperationModeTb(QWidget* parent = nullptr);
   QAction *FILE_STRUCTURE_QRY_BEFORE_PASTE{nullptr}, *FILE_STRUCTURE_PRESERVE{nullptr}, *FILE_STRUCTURE_FLATTEN{nullptr};
-  QActionGroup* FILE_STRUCTURE_AGS{nullptr};
-  QActionGroup* FileStructureActions();
+  void InitFileStructureActions();
 
   QAction *MOVE_TO_TRASHBIN{nullptr}, *DELETE_PERMANENTLY{nullptr};
   QActionGroup* DELETE_ACTIONS{nullptr};
@@ -62,7 +67,7 @@ class FileBasicOperationsActions : public QObject {
   QAction *UNDO_OPERATION{nullptr}, *REDO_OPERATION{nullptr};
   QActionGroup* UNDO_REDO_RIBBONS{nullptr};
 
-  QToolBar* GetCutCopyPasteTb(QWidget* parent=nullptr);
+  QToolBar* GetCutCopyPasteTb(QWidget* parent = nullptr);
   QAction *CUT{nullptr}, *COPY{nullptr}, *PASTE{nullptr};
   QActionGroup* CUT_COPY_PASTE{nullptr};
 
@@ -75,9 +80,9 @@ class FileBasicOperationsActions : public QObject {
   QActionGroup* SELECTION_RIBBONS{nullptr};
 
   QAction* _FORCE_RESEARCH{nullptr};
+
+ private:
+  EnumIntAction<FileStructurePolicy::FileStuctureModeE> mFileStructureIntAction;
 };
 
-FileBasicOperationsActions& g_fileBasicOperationsActions();
-bool IsNeedQueryBeforePaste();
-
-#endif  // FILEBASICOPERATIONSACTIONS_H
+#endif  // FILEOPACTS_H
