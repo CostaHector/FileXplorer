@@ -15,7 +15,7 @@ class RedundantImageModel : public QAbstractTableModelPub {
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   QString filePath(const QModelIndex& index) const;
-  void setRootPath(const DuplicateImageMetaInfo::RedundantImagesList* p_af);
+  int setRootPath(const DuplicateImageMetaInfo::RedundantImagesList* p_af);
 
  private:
   const DuplicateImageMetaInfo::RedundantImagesList* m_paf{nullptr};
