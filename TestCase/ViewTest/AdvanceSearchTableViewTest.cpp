@@ -10,7 +10,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceSearchTableView.h"
 #include "EndToExposePrivateMember.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "MimeDataHelper.h"
 #include <QDir>
 
@@ -79,7 +79,7 @@ class AdvanceSearchTableViewTest : public PlainTestSuite {
 
     // 3. remove selections ok
     advSearch.clearSelection();
-    QSignalSpy removeSignalSpy(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN,
+    QSignalSpy removeSignalSpy(FileOpActs::GetInst().MOVE_TO_TRASHBIN,
                                &QAction::triggered);
     // nothing selected
     QKeyEvent deleteEvent{QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier, QString(), false, 1};

@@ -2,7 +2,7 @@
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include <QCompleter>
 #include <QLayout>
 
@@ -64,7 +64,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_contentCB->setCompleter(pContentCompleter);
 
   addWidget(m_nameFilterCB);
-  addAction(g_fileBasicOperationsActions()._FORCE_RESEARCH);
+  addAction(FileOpActs::GetInst()._FORCE_RESEARCH);
   addWidget(m_searchFilterButton);
   addWidget(m_searchModeBtn);
   addWidget(m_searchCaseButton);

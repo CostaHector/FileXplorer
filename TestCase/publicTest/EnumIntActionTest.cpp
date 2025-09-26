@@ -17,6 +17,7 @@
 #include "SearchTools.h"
 #include "BytesRangeTool.h"
 #include "DuplicateImagesHelper.h"
+#include "FileStructurePolicy.h"
 #include <QCryptographicHash>
 
 extern template struct EnumIntAction<QListView::Flow>;
@@ -28,6 +29,7 @@ extern template struct EnumIntAction<SearchTools::SearchModeE>;
 extern template struct EnumIntAction<BytesRangeTool::BytesRangeE>;
 extern template struct EnumIntAction<QCryptographicHash::Algorithm>;
 extern template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
+extern template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 
 class EnumIntActionTest : public PlainTestSuite {
   Q_OBJECT
@@ -124,6 +126,12 @@ private slots:
         DuplicateImageDetectionCriteria::DICriteriaE::MD5,              //
         DuplicateImageDetectionCriteria::DICriteriaE::LIBRARY,          //
         QActionGroup::ExclusionPolicy::Exclusive);
+
+    EnumIntActionChecker<FileStructurePolicy::FileStuctureModeE>( //
+        FileStructurePolicy::FileStuctureModeE::PRESERVE,          //
+        FileStructurePolicy::FileStuctureModeE::FLATTEN,              //
+        FileStructurePolicy::FileStuctureModeE::QUERY,          //
+        QActionGroup::ExclusionPolicy::Exclusive);
   }
 
   void enum_in_action_exclusive_optional() {
@@ -136,4 +144,4 @@ private slots:
 };
 
 #include "EnumIntActionTest.moc"
-REGISTER_TEST(EnumIntActionTest, false);
+REGISTER_TEST(EnumIntActionTest, false)

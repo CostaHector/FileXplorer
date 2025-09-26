@@ -344,9 +344,18 @@ private slots:
     QCOMPARE(previewer._VID_ACT->text(), vidCntStr);
     QCOMPARE(previewer._OTH_ACT->text(), othCntStr);
 
+    QVERIFY(previewer._IMG_ACT->isChecked());
+    QVERIFY(previewer._VID_ACT->isChecked());
+    QVERIFY(previewer._OTH_ACT->isChecked());
+
     QVERIFY(previewer.mImgTv != nullptr);
     QVERIFY(previewer.mVidTv != nullptr);
     QVERIFY(previewer.mOthTv != nullptr);
+
+    previewer.onImgVidOthActTriggered(nullptr); // should not crash down
+    previewer.onImgVidOthActTriggered(previewer._IMG_ACT);
+    previewer.onImgVidOthActTriggered(previewer._VID_ACT);
+    previewer.onImgVidOthActTriggered(previewer._OTH_ACT);
 
     // before 012
     QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "012");

@@ -160,6 +160,31 @@ QStringList TDir::entryList(const QDir::Filters filters, const QDir::SortFlags s
   return mDir.entryList(filters, sort);
 }
 
+QSet<QString> TDir::SnapshotAtPath(const QString& path, const QDir::Filters filters, QDirIterator::IteratorFlag iterFlag) {  //
+  QSet<QString> snapshots;
+  const int reletivePathStardIndex = path.size() + 1;
+  QDirIterator it(path, filters, iterFlag);
+  while (it.hasNext()) {
+    QString absolutePath = it.next();
+    QString relativePath = absolutePath.mid(reletivePathStardIndex);
+    snapshots.insert(relativePath);
+  }
+  return snapshots;
+}
+
+bool TDir::ClearAll() {
+  bool success = true;
+  for (const QFileInfo &info : mDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System)) {
+    if (info.isDir()) {
+      QDir subDir(info.absoluteFilePath());
+      success = success && subDir.removeRecursively();
+    } else {
+      success = success && QFile::remove(info.absoluteFilePath());
+    }
+  }
+  return success;
+}
+
 AutoRollbackRename::AutoRollbackRename(QString srcPath, QString dstPath)  //
     : mSrcAbsFilePath(std::move(srcPath)), mDstAbsFilePath(std::move(dstPath)) {}
 

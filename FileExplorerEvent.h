@@ -97,7 +97,7 @@ private:
   PopupWidgetManager<DuplicateVideosFinder>* m_duplicateVideosFinder{nullptr};
   PopupWidgetManager<RedundantImageFinder>* m_redundantImageFinder{nullptr};
 private:
-  bool QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode); // true: keep, false: flatten
+  bool QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode); // true: keep, false: flatten
 };
 
 #endif  // FILEEXPLOREREVENT_H

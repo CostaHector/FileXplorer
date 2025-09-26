@@ -126,7 +126,7 @@ class ViewsStackedWidget : public QStackedWidget {
   CastDbModel* m_castDbModel{nullptr};
   CastDBView* m_castTableView{nullptr};
 
-  JsonProxyModel* m_jsonProxyModel{nullptr};
+  QSortFilterProxyModel* m_jsonProxyModel{nullptr};
   JsonTableModel* m_jsonModel{nullptr};
   JsonTableView* m_jsonTableView{nullptr};
 

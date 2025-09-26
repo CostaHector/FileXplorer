@@ -2,7 +2,7 @@
 
 #include "ArchiveFilesActions.h"
 #include "FileRenameRulerActions.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
 #include "ViewActions.h"
@@ -341,7 +341,7 @@ void FileExplorerEvent::subscribe() {
   subscribeThumbnailActions();
 
   {
-    auto& fileOpInst = g_fileBasicOperationsActions();
+    auto& fileOpInst = FileOpActs::GetInst();
     connect(fileOpInst.NEW_FOLDER, &QAction::triggered, this, &FileExplorerEvent::on_NewFolder);
     connect(fileOpInst.NEW_TEXT_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewTextFile);
     connect(fileOpInst.NEW_JSON_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewJsonFile);
@@ -982,9 +982,11 @@ bool FileExplorerEvent::on_Paste() {
     LOG_CRIT_NP("[Paste Skip] no urls in Clipboard", "Cannot paste here");
     return false;
   }
+
   using namespace ComplexOperation;
-  FILE_STRUCTURE_MODE fileStructMode{GetDefaultFileStructMode()};
-  if (fileStructMode == FILE_STRUCTURE_MODE::QUERY) {
+  using namespace FileStructurePolicy;
+  FileStuctureModeE fileStructMode{FileOpActs::GetInst().GetCurFileStructurePolicy()};
+  if (fileStructMode == FileStuctureModeE::QUERY) {
     if (!QueryKeepStructureOrFlatten(fileStructMode)) {
       LOG_OK_NP("User cancel paste", "neither flatten or keep");
       return true;
@@ -1206,10 +1208,10 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
   Qt::DropAction dropAction{Qt::DropAction::IgnoreAction};
   if (dropAct == Qt::DropAction::MoveAction) {
     Configuration().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name,  //
-                             MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().MOVE_TO_PATH_HISTORY));
+                             MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().MOVE_TO_PATH_HISTORY));
   } else if (dropAct == Qt::DropAction::CopyAction) {
     Configuration().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name,  //
-                             MoveToNewPathAutoUpdateActionText(dest, g_fileBasicOperationsActions().COPY_TO_PATH_HISTORY));
+                             MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().COPY_TO_PATH_HISTORY));
   } else {
     LOG_D("DropAction[%d] is invalid", static_cast<int>(dropAct));
     return false;
@@ -1220,7 +1222,7 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
     lRels.append(_fileSysModel->filePath(ind));
   }
   using namespace ComplexOperation;
-  int ret = DoDropAction(dropAction, lRels, dest, FILE_STRUCTURE_MODE::PRESERVE);
+  int ret = DoDropAction(dropAction, lRels, dest, FileStuctureModeE::PRESERVE);
   if (ret < 0) {
     LOG_ERR_P(pOperationNameStr, "Failed. errorCode:%d", ret);
     return false;
@@ -1239,7 +1241,7 @@ void FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD() {
   FileExplorerEvent::on_RemoveRedundantItem(rirbk);
 }
 
-bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUCTURE_MODE& mode) {
+bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode) {
   auto* msgBox = new (std::nothrow) QMessageBox(QMessageBox::Icon::Information, QString("Keep or Flatten System Structure?"), "Keep file system structure or flatten");
   msgBox->setWindowIcon(QIcon(":img/PASTE_ITEM"));
   msgBox->setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Apply);
@@ -1256,11 +1258,11 @@ bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FILE_STRUC
   const auto ret = msgBox->exec();
   switch (ret) {
     case QMessageBox::StandardButton::Apply: {
-      mode = ComplexOperation::FILE_STRUCTURE_MODE::PRESERVE;
+      mode = ComplexOperation::FileStuctureModeE::PRESERVE;
       break;
     }
     case QMessageBox::StandardButton::Yes: {
-      mode = ComplexOperation::FILE_STRUCTURE_MODE::FLATTEN;
+      mode = ComplexOperation::FileStuctureModeE::FLATTEN;
       break;
     }
     default:

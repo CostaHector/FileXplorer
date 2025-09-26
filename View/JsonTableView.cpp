@@ -10,7 +10,7 @@
 #include <QPlainTextEdit>
 #include <QStyleOptionViewItem>
 
-JsonTableView::JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProxyModel, QWidget* parent)  //
+JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent)  //
   : CustomTableView{"JSON_TABLE_VIEW", parent}                                                          //
 {
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
@@ -19,7 +19,7 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProx
   _JsonProxyModel = jsonProxyModel;
 
   _JsonProxyModel->setSourceModel(_JsonModel);
-  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name);
+  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name); // only filter the specified name row; set -1 to filter all column if needed
 
   setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);

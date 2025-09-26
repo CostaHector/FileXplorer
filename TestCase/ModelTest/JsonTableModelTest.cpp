@@ -15,6 +15,7 @@
 #include "PublicVariable.h"
 #include "PublicTool.h"
 #include "StudiosManager.h"
+#include "ModelTestHelper.h"
 
 using namespace JsonTestPrecoditionTools;
 
@@ -501,11 +502,47 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.m_modifiedRows.any(), false);
 
     QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QCOMPARE(jtm.RenameJsonAndItsRelated(firstLineIndex, "GameTurbo - A rank - GGG YYYYY"), 2); // two file renamed
+    QCOMPARE(jtm.RenameJsonAndItsRelated(firstLineIndex, "GameTurbo - A rank - GGG YYYYY"), 2);  // two file renamed
 
     const QStringList actualFileList = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
     const QStringList expectFileList = {"GameTurbo - A rank - GGG YYYYY.json", "GameTurbo - A rank - GGG YYYYY.mp4", "b.json", "jazz .txt"};
     QCOMPARE(expectFileList, actualFileList);
+  }
+
+  void proxy_model_works() {
+    QStandardItemModel sourceModel;
+    ModelTestHelper::InitStdItemModel(sourceModel, "row%1-col%2", 3, 2); // 3-by-2 matrix
+    // rc00 rc01
+    // rc10 rc11
+    // rc20 rc21
+
+    QSortFilterProxyModel proxyModel;
+    proxyModel.setSourceModel(&sourceModel);
+    proxyModel.setFilterKeyColumn(-1); // all column
+
+    proxyModel.setFilterFixedString(""); // empty filter. all pass
+    QCOMPARE(proxyModel.rowCount(), 3);
+
+    proxyModel.setFilterFixedString("row1"); // only one row contains row1
+    QCOMPARE(proxyModel.rowCount(), 1);
+    QModelIndex proxyIndex = proxyModel.index(0, 0);
+    QString data = proxyModel.data(proxyIndex).toString();
+    QVERIFY(data.startsWith("row1"));
+
+    proxyModel.setFilterFixedString("col1"); // all 3 row contains col1 in first column
+    QCOMPARE(proxyModel.rowCount(), 3);
+
+    proxyModel.setFilterFixedString("ROW0"); // case sensitive
+    QCOMPARE(proxyModel.rowCount(), 0);
+
+    proxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive); // case sensitive
+    proxyModel.setFilterFixedString("ROW0");
+    QCOMPARE(proxyModel.rowCount(), 1);
+
+    proxyModel.setFilterCaseSensitivity(Qt::CaseSensitive);
+    proxyModel.setFilterKeyColumn(1); // only filter for second column
+    proxyModel.setFilterFixedString("col0"); // col0 not in second column at all
+    QCOMPARE(proxyModel.rowCount(), 0); // no row match
   }
 };
 

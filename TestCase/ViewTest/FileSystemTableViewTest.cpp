@@ -12,7 +12,7 @@
 #include "FileSystemModel.h"
 #include "FileSystemTableView.h"
 #include "EndToExposePrivateMember.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "MimeDataHelper.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
@@ -27,7 +27,7 @@ public:
     pClip->clear(); // prevent COM error 0x800401D in windows platform error message
 
     // select all
-    auto& fileOpActsInst = g_fileBasicOperationsActions();
+    auto& fileOpActsInst = FileOpActs::GetInst();
     fsView.selectAll();
     auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSourceModel<FileSystemModel>(fsModel,  //
                                                                                             fsView.selectionModel()->selectedRows());
