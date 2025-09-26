@@ -9,6 +9,24 @@
 #include <QMenu>
 #include <QToolBar>
 #include "CastBrowserHelper.h"
+#include <QSqlRecord>
+
+#ifdef RUNNING_UNIT_TESTS
+namespace UserSpecifiedBrowerInteractMock {
+inline QList<QSqlRecord>& mockSqlRecordList() {
+  static QList<QSqlRecord> sqlRecordsList;
+  return sqlRecordsList;
+}
+inline std::pair<bool, QString>& mockMultiLinePerfsText() {
+  static std::pair<bool, QString> acceptAndPerfTextSentencePair;
+  return acceptAndPerfTextSentencePair;
+}
+inline std::pair<bool, QString>& mockSearchKeyString() {
+  static std::pair<bool, QString> acceptAndSearchKeyStringPair;
+  return acceptAndSearchKeyStringPair;
+}
+}
+#endif
 
 class ClickableTextBrowser : public QTextBrowser {
   Q_OBJECT
@@ -18,7 +36,7 @@ public:
   void wheelEvent(QWheelEvent *event) override;
   const QSize& iconSize() const { return mIconSize; }
 
-  QStringList GetSelectedTexts() const {
+  QStringList GetMultiSelectedTexts() const {
     QStringList texts;
     texts.reserve(mMultiSelections.size());
     for (const auto& sel : mMultiSelections) {
@@ -31,11 +49,7 @@ public:
     return textCursor().selectedText();
   }
 
-  void contextMenuEvent(QContextMenuEvent *event) override {
-    if (mBrowserMenu != nullptr) {
-      mBrowserMenu->exec(event->globalPos());
-    }
-  }
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
   void onSearchSelectionReq(); // search selection in DB_TABLE::MOVIES
   void onSearchSelectionAdvanceReq(); // search selection(editable) in DB_TABLE::MOVIES
@@ -60,10 +74,7 @@ protected:
   void mousePressEvent(QMouseEvent *e) override;
   void mouseMoveEvent(QMouseEvent *e) override;
   void mouseReleaseEvent(QMouseEvent *e) override;
-  void resizeEvent(QResizeEvent *event) override {
-    QTextBrowser::resizeEvent(event);
-    AdjustButtonPosition();
-  }
+  void resizeEvent(QResizeEvent *event) override;
 
   void AdjustButtonPosition() {
     if (mFloatingTb == nullptr) {return;}
@@ -87,7 +98,7 @@ private:
   QList<QTextEdit::ExtraSelection> mMultiSelections;  // 存储多个选区
   static constexpr int MIN_SINGLE_SEARCH_PATTERN_LEN{2 + 4}; // "%keyword%"
   static constexpr int MIN_EACH_KEYWORD_LEN{4};       // "%" + "keyword" + "%"
-
+  static const QString WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT;
   CastHtmlParts mCastHtmls;
   bool mCastVideosVisisble{true}, mCastImagesVisisble{true};
 
