@@ -10,7 +10,8 @@
 
 class SceneActionsSubscribe : public QObject {
  public:
-  explicit SceneActionsSubscribe(QObject* parent = nullptr) : QObject{parent} {};
+  using QObject::QObject;
+
   bool BindWidget(QListView* tableView, ScenesListModel* model);
   bool operator()();
 
@@ -18,11 +19,11 @@ class SceneActionsSubscribe : public QObject {
   void SetScenesGroupByPage(bool groupByPageAction);
 
   void SetPageIndex();
-  bool SetScenesPerColumn();
+  bool SetScenesCountPerPage();
 
   void SortSceneItems();
 
-  void CombineMediaInfoIntoJson();
+  int CombineMediaInfoIntoJson();
   void UpdateScnFilesOnly();
  private:
   ScenesListModel* _model{nullptr};

@@ -1,8 +1,10 @@
 ﻿#include "TDir.h"
 #include "PathTool.h"
+#include "PublicTool.h"
+#include "Logger.h"
 #include <QTextStream>
 #include <QDirIterator>
-#include "Logger.h"
+#include <QRegularExpression>
 
 bool FsNodeEntry::operator==(const FsNodeEntry& rhs) const {
   return relativePathToNode == rhs.relativePathToNode && isDir == rhs.isDir && (isDir || contents == rhs.contents);
@@ -53,6 +55,8 @@ bool EntryExistsWindowsCaseSensitive(const QString& path, QDir::Filters filter =
   return inputName == actualName;
 }
 #endif
+
+constexpr QDir::Filters TDir::DEFAULT_QDIR_FILTER;
 
 TDir::TDir() : mTempPath{mTempDir.path()}, mDir{mTempPath} {
   if (!IsValid()) {
@@ -172,9 +176,68 @@ QSet<QString> TDir::SnapshotAtPath(const QString& path, const QDir::Filters filt
   return snapshots;
 }
 
+bool TDir::checkFileContentsAtPath(const QString& absFilePath, const QSet<QString>& containsSet, const QSet<QString>& notContainsSet) {
+  if (containsSet.isEmpty() && notContainsSet.isEmpty()) {
+    LOG_W("No content check conditions specified for file[%s]", qPrintable(absFilePath));
+    return true;
+  }
+
+  const QFile textFile{absFilePath};
+  const qint64 fileSize = textFile.size();
+  if (fileSize >= 100 * 1024 * 1024) {
+    LOG_W("File[%s] size[%lld] exceeds 100MiB. Skipping content check.", qPrintable(absFilePath), fileSize);
+    return false;
+  }
+
+  if (fileSize < 0) {
+    LOG_W("File[%s] does not exist or cannot be accessed", qPrintable(absFilePath));
+    return false;
+  }
+
+  bool isReadOk = false;
+  const QString contents = FileTool::TextReader(absFilePath, &isReadOk);
+  if (!isReadOk) {
+    LOG_E("Read file[%s] failed", qPrintable(absFilePath));
+    return false;
+  }
+
+  // 检查所有必须包含的文本
+  for (const QString& pattern : containsSet) {
+    QRegularExpression regex(pattern);
+    if (!regex.match(contents).hasMatch()) {
+      LOG_D("Pattern '%s' not found in file[%s]", qPrintable(pattern), qPrintable(absFilePath));
+      return false;
+    }
+  }
+
+  // 检查所有必须不包含的文本
+  for (const QString& pattern : notContainsSet) {
+    QRegularExpression regex(pattern);
+    if (regex.match(contents).hasMatch()) {
+      LOG_D("Pattern '%s' found in file[%s] but should not be", qPrintable(pattern), qPrintable(absFilePath));
+      return false;
+    }
+  }
+  return true;
+}
+
+QStringList TDir::FilesContentsSnapshotAtPath(const QStringList& filesAbsPath) {
+  QStringList contentsList;
+  contentsList.reserve(filesAbsPath.size());
+  for (const QString& absFilePath : filesAbsPath) {
+    bool isReadOk = false;
+    const QString contents = FileTool::TextReader(absFilePath, &isReadOk);
+    if (!isReadOk) {
+      LOG_E("Read file[%s] failed", qPrintable(absFilePath));
+    }
+    contentsList.push_back(contents);
+  }
+  return contentsList;
+}
+
 bool TDir::ClearAll() {
   bool success = true;
-  for (const QFileInfo &info : mDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System)) {
+  for (const QFileInfo& info : mDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System)) {
     if (info.isDir()) {
       QDir subDir(info.absoluteFilePath());
       success = success && subDir.removeRecursively();

@@ -1,5 +1,6 @@
 ﻿#include "SceneInfoManager.h"
 #include "PublicVariable.h"
+#include "PublicTool.h"
 #include "SceneMixed.h"
 #include "JsonHelper.h"
 #include "PathTool.h"
@@ -10,80 +11,43 @@
 #include <QTextStream>
 #include <QDateTime>
 
-QString SCENE_INFO::GetFirstKImagesLabel(const QString& rootPath, const int k) const {
-  static const QString IMAGE_LABEL_TEMPLATE = R"(<img alt="%1" height="360" src="%1"/>)";
-  QString imgLabels;
-  for (int i = 0; i < k && i < imgs.size(); ++i) {
-    imgLabels += IMAGE_LABEL_TEMPLATE.arg(rootPath + rel2scn + imgs[i]);
-  }
-  return imgLabels;
-}
-
 namespace SceneInfoManager {
-SceneSortOption GetSortOptionFromStr(const QString& sortOption) {
-  static const QMap<QString, SceneSortOption> option2SortEnum{
-      {"Movie Name", SceneSortOption::NAME}, {"Movie Size", SceneSortOption::SIZE}, {"Rate", SceneSortOption::RATE}, {"Uploaded Time", SceneSortOption::UPLOADED}};
-  return option2SortEnum.value(sortOption, SceneSortOption::BUTT);
-}
-
-SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter, const QString& pattern, SCENES_TYPE* pScnFiltered) {
+SCENE_INFO_LIST GetScnsLstFromPath(const QString& path) {
   if (!QFileInfo(path).isDir()) {
     LOG_D("path[%s] is not a directory", qPrintable(path));
     return {};
   }
-  const bool needFilter{enableFilter && pScnFiltered != nullptr && !pattern.isEmpty()};
   const int PATH_N = path.size();
 
-  SCENES_TYPE scnTotals;
-  int scnFilesCnt = 0, scnFilteredCnt = -1;
+  SCENE_INFO_LIST scnTotals;
+  int scnFilesCnt = 0;
   QDirIterator jsonIt(path, {"*.scn"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (jsonIt.hasNext()) {
     const QString& scnFullPath{jsonIt.next()};
     const QString& rel2JsonFile = PathTool::RelativePath2File(PATH_N, scnFullPath);
-    scnTotals += ScnFileParser(scnFullPath, rel2JsonFile, needFilter, pattern, pScnFiltered);
+    scnTotals += ParseAScnFile(scnFullPath, rel2JsonFile);
     ++scnFilesCnt;
   }
-  if (enableFilter && pScnFiltered != nullptr && pattern.isEmpty()) {
-    *pScnFiltered = scnTotals;
-  }
-  if (pScnFiltered != nullptr) {
-    scnFilteredCnt = pScnFiltered->size();
-  }
-  LOG_D("%d total, %d filtered scenes get from %d *.scn file(s)", scnTotals.size(), scnFilteredCnt, scnFilesCnt);
+  std::sort(scnTotals.begin(), scnTotals.end());
+  LOG_D("total %d scenes get from %d *.scn file(s)", scnTotals.size(), scnFilesCnt);
   return scnTotals;
 }
 
-SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey, const bool reverse) {
-  if ((char)sortByKey >= (int)SceneSortOption::BUTT) {
-    LOG_W("key[%d] used to sort is out of bound[%d]", (char)sortByKey, (char)SceneSortOption::BUTT);
-    return scenes;
-  }
-  static const std::function<bool(const SCENE_INFO&, const SCENE_INFO&)> sortedMap[2][(int)SceneSortOption::BUTT] = {
-      // < operator here
-      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name < rhs.name; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize < rhs.vidSize; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate < rhs.rate; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded < rhs.uploaded; }},
-      // > operator here
-      {[](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.name > rhs.name; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.vidSize > rhs.vidSize; },
-       [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.rate > rhs.rate; }, [](const SCENE_INFO& lhs, const SCENE_INFO& rhs) -> bool { return lhs.uploaded > rhs.uploaded; }}};
-  std::sort(scenes.begin(), scenes.end(), sortedMap[(int)reverse][(int)sortByKey]);
-  return scenes;
-}
-
-SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, bool enableFilter, const QString& pattern, SCENES_TYPE* pFilterd) {
+SCENE_INFO_LIST ParseAScnFile(const QString& scnFileFullPath, const QString rel) {
   QFile scnFi{scnFileFullPath};
   if (!scnFi.exists()) {
     LOG_D("scn file[%s] not exist", qPrintable(scnFileFullPath));
     return {};
   }
-
   if (!scnFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
     LOG_C("Open scn file[%s] to read failed", qPrintable(scnFi.fileName()));
     return {};
   }
+
   QTextStream stream(&scnFi);
   stream.setCodec("UTF-8");
 
-  SCENES_TYPE scenesList;
+  SCENE_INFO_LIST scenesList;
 
   SCENE_INFO aScene;
   aScene.rel2scn = rel;
@@ -142,106 +106,18 @@ SCENES_TYPE ScnFileParser(const QString& scnFileFullPath, const QString rel, boo
     }
 
     scenesList.append(aScene);
-    if (enableFilter && aScene.name.contains(pattern, Qt::CaseSensitivity::CaseInsensitive)) {
-      pFilterd->append(aScene);
-    }
   }
   scnFi.close();
   LOG_D("Read %d scenes out from file[%s] succeed", scenesList.size(), qPrintable(scnFileFullPath));
   return scenesList;
 }
 
-std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const QList<QVariantHash>& jsonDicts) {
-  if (jsonNames.size() != jsonDicts.size()) {
-    LOG_W("json file name count:%d, dict count:%d", jsonNames.size(), jsonDicts.size());
-    return std::pair<QString, int>{"", -1};
+Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
+  if (!QFileInfo(path).isDir()) {
+    return {};
   }
-  int jsonUsedCnt = 0;
-  QString scnContent;
-  for (int i = 0; i < jsonNames.size(); ++i) {
-    const QVariantHash& rawJsonDict = jsonDicts[i];
-    const QString& jsonFileName = jsonNames[i];
-    if (rawJsonDict.isEmpty()) {
-      LOG_D("Json dict[%s] may corrupt.", qPrintable(jsonFileName));
-      continue;
-    }
-    scnContent += rawJsonDict.value("Name", "").toString();
-    scnContent += '\n';
-    scnContent += rawJsonDict.value("ImgName", "").toString();
-    scnContent += '\n';
-    scnContent += rawJsonDict.value("VidName", "").toString();
-    scnContent += '\n';
-    scnContent += QString::number(rawJsonDict.value("Size", 0).toULongLong());
-    scnContent += '\n';
-    scnContent += QString::number(rawJsonDict.value("Rate", 0).toInt());
-    scnContent += '\n';
-    scnContent += rawJsonDict.value("Uploaded", "").toString();
-    scnContent += '\n';
-    ++jsonUsedCnt;
-  }
-  return std::pair<QString, int>(scnContent, jsonUsedCnt);
-}
-
-bool GenerateAScnFile(const QString& aPath) {
-  if (!QFileInfo(aPath).isDir()) {
-    LOG_D("path[%s] is not a directory", qPrintable(aPath));
-    return false;
-  }
-
-  QDir jsonDir{aPath, {}, QDir::SortFlag::Name, QDir::Filter::Files};
-  jsonDir.setNameFilters(TYPE_FILTER::JSON_TYPE_SET);
-  const QStringList& jsonNames = jsonDir.entryList();
-  QList<QVariantHash> jsonDicts;
-  jsonDicts.reserve(jsonNames.size());
-  for (const QString& jsonFileName : jsonNames) {
-    jsonDicts << JsonHelper::MovieJsonLoader(jsonDir.absoluteFilePath(jsonFileName));
-  }
-  int jsonUsedCnt = 0;
-  QString scnContent;
-  std::tie(scnContent, jsonUsedCnt) = GetScnFileContents(jsonNames, jsonDicts);
-  LOG_D("%d json(s) under[%s] are found to generate a scn file", jsonUsedCnt, qPrintable(aPath));
-
-  if (jsonUsedCnt == 0 || scnContent.isEmpty()) {
-    return false;
-  }
-
-  QFile scnFi{aPath + '/' + PathTool::fileName(aPath) + ".scn"};
-  if (!scnFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    LOG_C("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
-    return false;
-  }
-
-  QTextStream stream(&scnFi);
-  stream.setCodec("UTF-8");
-  stream << scnContent;
-  scnFi.close();
-  return true;
-}
-
-int GenerateScnFilesDirectly(const QString& rootPath) {
-  if (!QFileInfo(rootPath).isDir()) {
-    LOG_D("path[%s] is not a directory", qPrintable(rootPath));
-    return -1;
-  }
-
-  int scnFilesGeneratedCnt = 0;
-  QDirIterator folderIt{rootPath, {}, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
-  while (folderIt.hasNext()) {
-    if (GenerateAScnFile(folderIt.next())) {
-      ++scnFilesGeneratedCnt;
-    }
-  }
-  if (GenerateAScnFile(rootPath)) {
-    ++scnFilesGeneratedCnt;
-  }
-  LOG_D("%d scn file(s) generated/updated under path[%s]", scnFilesGeneratedCnt, qPrintable(rootPath));
-  return scnFilesGeneratedCnt;
-}
-
-}  // namespace SceneInfoManager
-
-int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
-  int updatedJsonFilesCnt = 0, usefullJsonCnt = 0;
+  int jsonUpdatedCnt = 0, jsonUsedCnt = 0;
+  int imgNameKeyFieldUpdatedCnt = 0, vidNameKeyFieldUpdatedCnt = 0;
 
   ScenesMixed sMixed;
   sMixed(path);
@@ -272,9 +148,11 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     if (it == rawJsonDict.cend()) {
       rawJsonDict.insert("ImgName", imgsLst);
       jsonNeedUpdate = true;
+      ++imgNameKeyFieldUpdatedCnt;
     } else if (it.value().toStringList() != imgsLst) {
       it->setValue(imgsLst);
       jsonNeedUpdate = true;
+      ++imgNameKeyFieldUpdatedCnt;
     }
 
     const QString& vidFileName = sMixed.GetFirstVid(baseName);
@@ -282,9 +160,11 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
     if (it == rawJsonDict.end()) {
       rawJsonDict.insert("VidName", vidFileName);
       jsonNeedUpdate = true;
+      ++vidNameKeyFieldUpdatedCnt;
     } else if (it.value().toString() != vidFileName) {
       it->setValue(vidFileName);
       jsonNeedUpdate = true;
+      ++vidNameKeyFieldUpdatedCnt;
     }
 
     if (!vidFileName.isEmpty()) {
@@ -307,11 +187,12 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
       }
 
       it = rawJsonDict.find("Size");
+      qint64 newVidSize = vidFi.size();
       if (it == rawJsonDict.end()) {
         // construct Size
-        rawJsonDict.insert("Size", vidFi.size());
+        rawJsonDict.insert("Size", newVidSize);
         jsonNeedUpdate = true;
-      } else if (it.value().toLongLong() != 0) {
+      } else if (it.value().toLongLong() != newVidSize) {
         // first set Size
         it->setValue(vidFi.size());
         jsonNeedUpdate = true;
@@ -325,37 +206,44 @@ int JsonDataRefresher::UpdateAFolderItself(const QString& path) {
 
     if (jsonNeedUpdate) {
       JsonHelper::DumpJsonDict(rawJsonDict, jPath);
-      ++updatedJsonFilesCnt;
+      ++jsonUpdatedCnt;
     }
-    ++usefullJsonCnt;
+    ++jsonUsedCnt;
 
     m_jsonsDicts[path].append(rawJsonDict);
   }
-  m_updatedJsonFilesCnt += updatedJsonFilesCnt;
-  m_usefullJsonCnt += usefullJsonCnt;
-  return updatedJsonFilesCnt;
+  return {jsonUpdatedCnt, jsonUsedCnt, imgNameKeyFieldUpdatedCnt, vidNameKeyFieldUpdatedCnt};
 }
 
-int JsonDataRefresher::operator()(const QString& rootPath) {  // will iterate all sub
+Counter ScnMgr::operator()(const QString& rootPath) {  // will iterate all sub
   if (!QFileInfo(rootPath).isDir()) {
     LOG_D("Not an existed directory[%s]", qPrintable(rootPath));
-    return -1;
+    return {};
   }
+  Counter cnt{0, 0, 0, 0};
   QDirIterator folderIt{rootPath, {}, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
   while (folderIt.hasNext()) {
-    UpdateAFolderItself(folderIt.next());
+    cnt += UpdateJsonUnderAPath(folderIt.next());
   }
-  UpdateAFolderItself(rootPath);
-  LOG_D("%d useful json file(s) founded, %d json file(s) updated from %d folder(s) In path[%s]", m_usefullJsonCnt, m_updatedJsonFilesCnt, m_jsonsDicts.size(), qPrintable(rootPath));
-  return m_updatedJsonFilesCnt;
+  cnt += UpdateJsonUnderAPath(rootPath);
+  LOG_D("%d useful json file(s) founded and %d get updated(imgUpdate:%d, vidUpdate:%d) In path[%s]",  //
+        cnt.m_jsonUsedCnt, cnt.m_jsonUpdatedCnt,                                                      //
+        cnt.m_ImgNameKeyFieldUpdatedCnt, cnt.m_VidNameKeyFieldUpdatedCnt,                             //
+        qPrintable(rootPath));                                                                        //
+  return cnt;
 }
 
-int JsonDataRefresher::GenerateScnFiles() {
+int ScnMgr::WriteDictIntoScnFiles() {
+  if (m_jsonsDicts.isEmpty()) {
+    LOG_D("json dicts not exist, skip write");
+    return 0;
+  }
   int scnFilesGeneratedCnt = 0;
   for (auto it = m_jsonsDicts.cbegin(); it != m_jsonsDicts.cend(); ++it) {
     const QString& path2Jsons = it.key();
     const QList<QVariantHash>& dicts = it.value();
-    int usefullJsonCnt = 0;
+
+    int jsonUsedCnt = 0;
     QString scnContent;
     for (const QVariantHash& rawJsonDict : dicts) {
       if (rawJsonDict.isEmpty()) {
@@ -373,26 +261,22 @@ int JsonDataRefresher::GenerateScnFiles() {
       scnContent += '\n';
       scnContent += rawJsonDict.value("Uploaded", "").toString();
       scnContent += '\n';
-      ++usefullJsonCnt;
+      ++jsonUsedCnt;
     }
-    LOG_D("%d json(s) under[%s] are found to generate a scn file", usefullJsonCnt, qPrintable(path2Jsons));
-    if (usefullJsonCnt <= 0) {
-      return false;
+    LOG_D("%d json(s) under[%s] are found to generate a scn file", jsonUsedCnt, qPrintable(path2Jsons));
+    if (jsonUsedCnt == 0) {
+      continue;
     }
-    if (scnContent.isEmpty()) {
-      return false;
+    const QString scnAbsFilePath = path2Jsons + '/' + PathTool::fileName(path2Jsons) + ".scn";
+    if (!FileTool::TextWriter(scnAbsFilePath, scnContent, QIODevice::WriteOnly | QIODevice::Text)) {
+      LOG_W("Write %d char(s) contents into file[%s] failed", scnContent.size(), qPrintable(scnAbsFilePath));
+      return scnFilesGeneratedCnt;
     }
-    QFile scnFi{path2Jsons + '/' + PathTool::fileName(path2Jsons) + ".scn"};
-    if (!scnFi.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      LOG_C("Open scn file[%s] to write failed.", qPrintable(scnFi.fileName()));
-      return false;
-    }
-    QTextStream stream(&scnFi);
-    stream.setCodec("UTF-8");
-    stream << scnContent;
-    scnFi.close();
     ++scnFilesGeneratedCnt;
   }
+  m_jsonsDicts.clear();
   LOG_D("%d scn file(s) generated above", scnFilesGeneratedCnt);
   return scnFilesGeneratedCnt;
 }
+
+}  // namespace SceneInfoManager

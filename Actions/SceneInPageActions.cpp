@@ -19,11 +19,6 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                                "json file(s). This operation may update json file contents")
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
 
-  _UPDATE_SCN_ONLY = new (std::nothrow) QAction(QIcon(":img/UPDATE_SCN_FILE"), "Update Scn", this);
-  _UPDATE_SCN_ONLY->setShortcutVisibleInContextMenu(true);
-  _UPDATE_SCN_ONLY->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Only update scn file from valid json file(s). This operation will not update json file(s)").arg(_UPDATE_SCN_ONLY->text(), _UPDATE_SCN_ONLY->shortcut().toString()));
-
   _BY_MOVIE_NAME = new (std::nothrow) QAction(QIcon(":img/SORTING_FILE_FOLDER"), "Movie Name", this);
   _BY_MOVIE_NAME->setCheckable(true);
   _BY_MOVIE_SIZE = new (std::nothrow) QAction("Movie Size", this);
