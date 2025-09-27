@@ -54,7 +54,7 @@ QString HarTableView::GetWinTitleStr(const QString& harFile) const {
 int HarTableView::operator()(const QString& harAbsPath) {
   mHarAbsPath = harAbsPath;
   setWindowTitle(GetWinTitleStr(mHarAbsPath));
-  return mHarModel->SetHarFileAbsPath(harAbsPath);
+  return mHarModel->setRootPath(harAbsPath);
 }
 
 void HarTableView::subscribe() {

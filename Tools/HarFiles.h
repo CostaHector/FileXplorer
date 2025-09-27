@@ -24,6 +24,7 @@ public:
   bool operator()(const QString& harAbsPath);
   int SaveToLocal(QString dstRootpath = "", const QList<int>& selectedRows = {});
   static bool IsHarFile(const QFileInfo& fi);
+  void clear() {mHarItems.clear();}
 private:
   QString mHarFilePath;
   QList<HAR_FILE_ITEM> mHarItems;
