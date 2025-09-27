@@ -2,9 +2,8 @@
 #include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "DataFormatter.h"
 #include <QMessageBox>
-
-const QStringList AdvanceSearchModel::HORIZONTAL_HEADER_NAMES = {"Name", "Size", "Type", "Date", "Relative path"};
 
 void AdvanceSearchModel::updateSearchResultList() {
   ClearRecycle();
@@ -17,7 +16,8 @@ void AdvanceSearchModel::updateSearchResultList() {
     it.next();
     QFileInfo fi{it.fileInfo()};
     fileName = fi.fileName();
-    allItemsUnderThisPath.append(FileProperty{fileName, fi.size(),                                            //
+    allItemsUnderThisPath.append(FilePropertyHelper::FilePropertyInfo{
+        fileName, fi.size(),                                            //
         GetFileExtension(fileName), fi.lastModified(),                  //
         RelativePath2File(ROOT_PATH_N, fi.filePath(), fileName.size())  //
     });
@@ -49,9 +49,9 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
     LOG_WARN_NP("[Abort]Search under inexist path", stdPath);
     return false;
   }
-  if (queryWhenSearchUnderLargeDirectory && stdPath.count('/') < 2) {  // C:/A
-    auto retBtn = QMessageBox::warning(nullptr, "Confirm search(May cause lag)?",              //
-                                       "A Large Directory: " + stdPath,  //
+  if (queryWhenSearchUnderLargeDirectory && stdPath.count('/') < 2) {              // C:/A
+    auto retBtn = QMessageBox::warning(nullptr, "Confirm search(May cause lag)?",  //
+                                       "A Large Directory: " + stdPath,            //
                                        QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
     if (retBtn != QMessageBox::StandardButton::Yes) {
       LOG_INFO_NP("User cancel search under large directory(may lag)", stdPath);
@@ -63,7 +63,7 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
 
 void AdvanceSearchModel::setRootPath(const QString& path) {
   ClearCopyAndCutDict();
-  if (!checkPathNeed(path, true)) { // first time
+  if (!checkPathNeed(path, true)) {  // first time
     return;
   }
   if (m_rootPath == path) {
@@ -91,22 +91,18 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   if (r < 0 || r >= rowCount()) {
     return {};
   }
+  using namespace FilePropertyHelper;
+  const auto& item = m_itemsLst[r];
   if (role == Qt::DisplayRole) {
     switch (index.column()) {
-      case 0:
-        return m_itemsLst[r].name;
-      case 1:
-        return m_itemsLst[r].size;
-      case 2:
-        return m_itemsLst[r].type;
-      case 3:
-        return m_itemsLst[r].modifiedDate;
-      case 4:
-        return m_itemsLst[r].relPath;
-      default:
-        return {};
+#define SEARCH_OUT_FILE_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) \
+  case FilePropertyHelper::enu:                                         \
+    return formatter(item.m_##enu);     //
+      SEARCH_OUT_FILE_INFO_KEY_MAPPING_MAIN  //
+#undef SEARCH_OUT_FILE_INFO_KEY_ITEM       //
+          default : return {};
     }
-  } else if (role == Qt::DecorationRole && index.column() == 0) {
+  } else if (role == Qt::DecorationRole && index.column() == PropColumnE::Name) {
     if (mCutIndexes.contains(rootPath(), r)) {
       static const QIcon CUT_ICON{":img/CUT_ITEM"};
       return CUT_ICON;
@@ -115,7 +111,7 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
       return COPY_ICON;
     } else {
       static QHash<QString, QIcon> ext2Icon{{"", m_iconProvider.icon(QFileIconProvider::IconType::Folder)}};
-      const QString& extExtDot{m_itemsLst[r].type};
+      const QString& extExtDot{item.m_Type};
       auto it = ext2Icon.constFind(extExtDot);
       if (it == ext2Icon.constEnd()) {
         return ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo{extExtDot});
@@ -123,8 +119,7 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
       return it.value();
     }
   } else if (role == Qt::TextAlignmentRole) {
-    if (index.column() == 1) {
-      // Todo  | Qt::AlignVCenter
+    if (index.column() == PropColumnE::Size) {
       return Qt::AlignRight;
     }
     return int(Qt::AlignLeft | Qt::AlignTop);
@@ -139,18 +134,16 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   }
   return {};
 }
-
+// headerData Template use me
 QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation, int role) const {
-  if (orientation == Qt::Orientation::Horizontal) {
+  if (orientation == Qt::Vertical) {
     if (role == Qt::DisplayRole) {
-      return HORIZONTAL_HEADER_NAMES[section];
-    }
-  } else if (orientation == Qt::Vertical) {
-    if (role == Qt::TextAlignmentRole) {
-      return Qt::AlignRight;
-    } else if (role == Qt::DisplayRole){
       return section + 1;
+    } else if (role == Qt::TextAlignmentRole) {
+      return Qt::AlignRight;
     }
+  } else if (0 <= section && section < columnCount() && role == Qt::DisplayRole) {
+    return FilePropertyHelper::SEARCH_TABLE_HEADERS[section];
   }
   return QAbstractTableModel::headerData(section, orientation, role);
 }
@@ -172,7 +165,6 @@ void AdvanceSearchModel::removeDisable(const QModelIndex& ind) {
 void AdvanceSearchModel::clearDisables() {
   decltype(m_disableList) tmp;
   tmp.swap(m_disableList);
-  m_disableList.clear();
   foreach (const QModelIndex& ind, tmp) {
     emit dataChanged(ind, ind, {Qt::ForegroundRole});
   }

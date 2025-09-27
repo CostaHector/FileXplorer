@@ -6,9 +6,18 @@
 #include <QItemSelectionModel>
 #include <QFileIconProvider>
 
+namespace HarFilesMocker {
+inline HarFiles& mockHarFiles() {
+  static HarFiles harFiles;
+  return harFiles;
+}
+}  // namespace HarFilesMocker
+
 class HarModel : public QAbstractTableModelPub {
  public:
-  explicit HarModel(QObject* parent = nullptr);
+  using QAbstractTableModelPub::QAbstractTableModelPub;
+
+  int setRootPath(const QString& harFileAbsPath);
 
   auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return mHarParser.size(); }
   auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return HAR_VERTICAL_HEAD.size(); }
@@ -22,29 +31,25 @@ class HarModel : public QAbstractTableModelPub {
       }
     }
     if (role == Qt::DisplayRole) {
-      if (orientation == Qt::Orientation::Vertical) {
-        return section + 1;
-      } else {
+      if (0 <= section && section < columnCount() && orientation == Qt::Orientation::Horizontal) {
         return HAR_VERTICAL_HEAD[section];
       }
+      return section + 1;
     }
     return QAbstractTableModel::headerData(section, orientation, role);
   }
 
-  Qt::ItemFlags flags(const QModelIndex& index) const override {
-    if (index.column() == 2) {
-      return Qt::ItemFlag::ItemIsEditable | Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
-    }
+  Qt::ItemFlags flags(const QModelIndex& /*index*/) const override {
     return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
   }
 
-  int SetHarFileAbsPath(const QString& harFileAbsPath);
   int SaveToLocal(QString dstRootpath = "", const QList<int>& selectedRows = {});
   const HAR_FILE_ITEM& GetHarEntryItem(const int rowIndex) const;
+
  private:
   HarFiles mHarParser;
   QFileIconProvider m_iconProvider;
   static const QStringList HAR_VERTICAL_HEAD;
 };
 
-#endif // HARMODEL_H
+#endif  // HARMODEL_H

@@ -10,10 +10,11 @@
 #include "EndToExposePrivateMember.h"
 #include "RedundantImageFinderActions.h"
 
+using namespace DuplicateImageMetaInfo;
 const QStringList GetNames(const RedundantImagesList& imgs) {
   QStringList imgNames;
   for (const auto& img : imgs) {
-    imgNames.append(img.filePath);
+    imgNames.append(img.m_AbsPath);
   }
   imgNames.sort();
   return imgNames;

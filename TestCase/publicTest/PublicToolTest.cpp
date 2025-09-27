@@ -5,13 +5,13 @@
 #include "TDir.h"
 #include "PublicVariable.h"
 #include "OnScopeExit.h"
+#include "MemoryKey.h"
 #include <QPushButton>
 
 class PublicToolTest : public PlainTestSuite {
   Q_OBJECT
- public:
-  PublicToolTest() : PlainTestSuite{} {}
- private slots:
+public:
+private slots:
   void test_mvToANewPath() {
     QString mvToANewPath = "5";
     QAction act1{"1", this};
@@ -66,22 +66,62 @@ class PublicToolTest : public PlainTestSuite {
     QByteArray last5ba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 5);
     QCOMPARE(last5ba, "5\n6\n7\n8\n9");
 
-    QCOMPARE(QFile::exists(textFileAbsPath), true);          // file already exist. not override with OpenModeFlag::NewOnly
-    QCOMPARE(FileTool::TextWriter(textFileAbsPath, "Cannot override",  //
-                        QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::NewOnly),
+    QCOMPARE(QFile::exists(textFileAbsPath), true); // file already exist. not override with OpenModeFlag::NewOnly
+    QCOMPARE(FileTool::TextWriter(textFileAbsPath,
+                                  "Cannot override", //
+                                  QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::NewOnly),
              false);
     QByteArray lastAllba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 100);
     QCOMPARE(lastAllba, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
 
-    QCOMPARE(FileTool::TextWriter(textFileAbsPath, "Can only override",  //
-                        QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::ExistingOnly),
+    QCOMPARE(FileTool::TextWriter(textFileAbsPath,
+                                  "Can only override", //
+                                  QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::ExistingOnly),
              true);
     QCOMPARE(FileTool::TextReader(textFileAbsPath), "Can only override");
   }
 
-  void CreateUserPath_ok() {  // UserPath is Service Running Precondition
+  void CreateUserPath_ok() { // UserPath is Service Running Precondition
     QCOMPARE(CreateUserPath(), true);
-    QFile::exists(SystemPath::WORK_PATH());
+
+    const QString homePath = SystemPath::HOME_PATH();
+    QCOMPARE(QFileInfo{homePath}.isDir(), true);
+
+    const QString workPath = SystemPath::WORK_PATH();
+    QCOMPARE(QFileInfo{workPath}.isDir(), true);
+
+    // cross-compile unit protection test: should not crash down
+    auto IsPathStringValid = [homePath](const QString& path) { // we do not assume path existence here
+      return path.startsWith(homePath) && path.size() > homePath.size();
+    };
+    QVERIFY(IsPathStringValid(SystemPath::STARRED_PATH()));
+    QVERIFY(IsPathStringValid(SystemPath::VIDS_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::DEVICES_AND_DRIVES_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::AI_MEDIA_DUP_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::RECYCLE_BIN_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::PEFORMERS_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::TORRENTS_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::PRODUCTION_STUDIOS_DATABASE()));
+  }
+
+  void ChooseCopyDestination_ok() {
+    // precondition
+    const QFileInfo currentFile{__FILE__};
+    const QString fileParentFolder{currentFile.absolutePath()};
+    QCOMPARE(QFileInfo{fileParentFolder}.isDir(), true);
+    const QString fileParentParentFolder{QFileInfo(fileParentFolder).absolutePath()};
+    QCOMPARE(QFileInfo{fileParentParentFolder}.isDir(), true);
+
+    Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, fileParentParentFolder);
+
+    // user specified
+    QCOMPARE(ChooseCopyDestination(fileParentFolder, nullptr), fileParentFolder);
+    QCOMPARE(Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString(), fileParentFolder);
+
+    // from Configs file
+    Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, fileParentParentFolder);
+    QCOMPARE(ChooseCopyDestination("", nullptr), fileParentParentFolder);
+    QCOMPARE(Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString(), fileParentParentFolder);
   }
 
   void load_and_remove_language_pack_ok() {

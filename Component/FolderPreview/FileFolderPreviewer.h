@@ -9,7 +9,8 @@
 class FileFolderPreviewer : public QStackedWidget {
 public:
   enum class PANE_TYPE : int { BEGIN = 0, DETAIL = BEGIN, IMG_VID_OTH, BUTT };
-  FileFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
+  explicit FileFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
+  ~FileFolderPreviewer();
 
   void ReadSettings();
   void SaveSettings();

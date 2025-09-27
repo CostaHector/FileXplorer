@@ -1,8 +1,10 @@
 ﻿#include "TDir.h"
 #include "PathTool.h"
+#include "PublicTool.h"
+#include "Logger.h"
 #include <QTextStream>
 #include <QDirIterator>
-#include "Logger.h"
+#include <QRegularExpression>
 
 bool FsNodeEntry::operator==(const FsNodeEntry& rhs) const {
   return relativePathToNode == rhs.relativePathToNode && isDir == rhs.isDir && (isDir || contents == rhs.contents);
@@ -53,6 +55,8 @@ bool EntryExistsWindowsCaseSensitive(const QString& path, QDir::Filters filter =
   return inputName == actualName;
 }
 #endif
+
+constexpr QDir::Filters TDir::DEFAULT_QDIR_FILTER;
 
 TDir::TDir() : mTempPath{mTempDir.path()}, mDir{mTempPath} {
   if (!IsValid()) {
@@ -160,8 +164,92 @@ QStringList TDir::entryList(const QDir::Filters filters, const QDir::SortFlags s
   return mDir.entryList(filters, sort);
 }
 
-AutoRollbackRename::AutoRollbackRename(QString srcPath, QString dstPath) //
-    : mSrcAbsFilePath(std::move(srcPath)) , mDstAbsFilePath(std::move(dstPath)) {}
+QSet<QString> TDir::SnapshotAtPath(const QString& path, const QDir::Filters filters, QDirIterator::IteratorFlag iterFlag) {  //
+  QSet<QString> snapshots;
+  const int reletivePathStardIndex = path.size() + 1;
+  QDirIterator it(path, filters, iterFlag);
+  while (it.hasNext()) {
+    QString absolutePath = it.next();
+    QString relativePath = absolutePath.mid(reletivePathStardIndex);
+    snapshots.insert(relativePath);
+  }
+  return snapshots;
+}
+
+bool TDir::checkFileContentsAtPath(const QString& absFilePath, const QSet<QString>& containsSet, const QSet<QString>& notContainsSet) {
+  if (containsSet.isEmpty() && notContainsSet.isEmpty()) {
+    LOG_W("No content check conditions specified for file[%s]", qPrintable(absFilePath));
+    return true;
+  }
+
+  const QFile textFile{absFilePath};
+  const qint64 fileSize = textFile.size();
+  if (fileSize >= 100 * 1024 * 1024) {
+    LOG_W("File[%s] size[%lld] exceeds 100MiB. Skipping content check.", qPrintable(absFilePath), fileSize);
+    return false;
+  }
+
+  if (fileSize < 0) {
+    LOG_W("File[%s] does not exist or cannot be accessed", qPrintable(absFilePath));
+    return false;
+  }
+
+  bool isReadOk = false;
+  const QString contents = FileTool::TextReader(absFilePath, &isReadOk);
+  if (!isReadOk) {
+    LOG_E("Read file[%s] failed", qPrintable(absFilePath));
+    return false;
+  }
+
+  // 检查所有必须包含的文本
+  for (const QString& pattern : containsSet) {
+    QRegularExpression regex(pattern);
+    if (!regex.match(contents).hasMatch()) {
+      LOG_D("Pattern '%s' not found in file[%s]", qPrintable(pattern), qPrintable(absFilePath));
+      return false;
+    }
+  }
+
+  // 检查所有必须不包含的文本
+  for (const QString& pattern : notContainsSet) {
+    QRegularExpression regex(pattern);
+    if (regex.match(contents).hasMatch()) {
+      LOG_D("Pattern '%s' found in file[%s] but should not be", qPrintable(pattern), qPrintable(absFilePath));
+      return false;
+    }
+  }
+  return true;
+}
+
+QStringList TDir::FilesContentsSnapshotAtPath(const QStringList& filesAbsPath) {
+  QStringList contentsList;
+  contentsList.reserve(filesAbsPath.size());
+  for (const QString& absFilePath : filesAbsPath) {
+    bool isReadOk = false;
+    const QString contents = FileTool::TextReader(absFilePath, &isReadOk);
+    if (!isReadOk) {
+      LOG_E("Read file[%s] failed", qPrintable(absFilePath));
+    }
+    contentsList.push_back(contents);
+  }
+  return contentsList;
+}
+
+bool TDir::ClearAll() {
+  bool success = true;
+  for (const QFileInfo& info : mDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System)) {
+    if (info.isDir()) {
+      QDir subDir(info.absoluteFilePath());
+      success = success && subDir.removeRecursively();
+    } else {
+      success = success && QFile::remove(info.absoluteFilePath());
+    }
+  }
+  return success;
+}
+
+AutoRollbackRename::AutoRollbackRename(QString srcPath, QString dstPath)  //
+    : mSrcAbsFilePath(std::move(srcPath)), mDstAbsFilePath(std::move(dstPath)) {}
 
 bool AutoRollbackRename::Execute() {
   mNeedRollback = StartToRename("Rename to");
@@ -197,4 +285,60 @@ AutoRollbackRename::~AutoRollbackRename() {
     return;
   }
   StartToRename("Rename Rollback");
+}
+
+#include "PublicTool.h"
+AutoRollbackFileContentModify::AutoRollbackFileContentModify(const QString& absFilePath, const QString& replaceeStr, const QString& replacerStr)
+    : mAbsFilePath(absFilePath), mReplaceeStr(replaceeStr), mReplacerStr(replacerStr), mMode(Mode::ReplaceMode) {}
+
+AutoRollbackFileContentModify::AutoRollbackFileContentModify(const QString& absFilePath, const QString& newContents)
+    : mAbsFilePath(absFilePath), mNewContents(newContents), mMode(Mode::FullReplaceMode) {}
+
+AutoRollbackFileContentModify::~AutoRollbackFileContentModify() {
+  if (!mNeedRollback) {
+    return;
+  }
+  const bool bRollbackResult = FileTool::TextWriter(mAbsFilePath, mOriginContents, QIODevice::WriteOnly | QIODevice::Text);
+  if (!bRollbackResult) {
+    LOG_W("Rollback file[%s] contents failed", qPrintable(mAbsFilePath));
+  }
+}
+
+bool AutoRollbackFileContentModify::Execute() {
+  if (mNeedRollback) {
+    LOG_W("Already executed. Prevent modify it again");
+    return false;
+  }
+  bool bReadOk = false;
+  QString content = FileTool::TextReader(mAbsFilePath, &bReadOk);
+  if (!bReadOk) {
+    LOG_W("Read Content from file[%s] failed", qPrintable(mAbsFilePath));
+    return false;
+  }
+  mOriginContents.swap(content);
+
+  bool bSuccess = false;
+  switch (mMode) {
+    case Mode::ReplaceMode: {
+      QString tempStr = mOriginContents;
+      tempStr.replace(mReplaceeStr, mReplacerStr);
+      bSuccess = FileTool::TextWriter(mAbsFilePath, tempStr, QIODevice::WriteOnly | QIODevice::Text);
+      break;
+    }
+    case Mode::FullReplaceMode: {
+      bSuccess = FileTool::TextWriter(mAbsFilePath, mNewContents, QIODevice::WriteOnly | QIODevice::Text);
+      break;
+    }
+    default:
+      LOG_W("mMode[%d] invalid", (int)mMode);
+      return false;
+  }
+
+  if (!bSuccess) {
+    LOG_W("File Content[%s] Modify Operation[%d] failed", qPrintable(mAbsFilePath), (int)mMode);
+    return false;
+  }
+
+  mNeedRollback = true;
+  return true;
 }

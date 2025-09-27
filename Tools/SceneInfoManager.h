@@ -7,49 +7,75 @@
 #include <QVariantHash>
 
 struct SCENE_INFO {
-  QString rel2scn;   // jsonFullPath = mRootPath + rel2scn + jsonFileName, rel2scn can be '/' or '/any thing/'
-  QString name;      // name, key"Name"
-  QStringList imgs;   // img, key"ImgName"
+  QString rel2scn;   // jsonFullPath = mRootPath + relative2scnFile + jsonFileName, rel2scn can be '/' or '/any thing/'
+  QString name;      // name, key"Name" from json file baseName
+  QStringList imgs;  // img, key"ImgName"
   QString vidName;   // video, key"VidName"
   qint64 vidSize;    // video size, from json file, key"Size"
   int rate;          // video rate, from json file, key"Rate"
   QString uploaded;  // from json file, key"Uploaded"
 
-  QString GetFirstKImagesLabel(const QString& rootPath, const int k = 2) const;
+  QString GetAbsolutePath(const QString& rootPath) const;
+  QString GetFirstImageAbsPath(const QString& rootPath) const;
+  QStringList GetImagesAbsPathList(const QString& rootPath) const;
+  QString GetVideoAbsPath(const QString& rootPath) const;
+  bool operator<(const SCENE_INFO& other) const;
 };
 
-typedef QList<SCENE_INFO> SCENES_TYPE;
+typedef QList<SCENE_INFO> SCENE_INFO_LIST;
 
 namespace SceneInfoManager {
-enum class SceneSortOption : char { NAME = 0, SIZE, RATE, UPLOADED, BUTT };
-SceneSortOption GetSortOptionFromStr(const QString& sortOption);
-SCENES_TYPE ScnFileParser(const QString& scnFileFullPath,
-                          const QString rel,
-                          bool enableFilter,
-                          const QString& pattern,
-                          SCENES_TYPE* pFilterd = nullptr);
+SCENE_INFO_LIST ParseAScnFile(const QString& scnFileFullPath, const QString rel);
+SCENE_INFO_LIST GetScnsLstFromPath(const QString& path);
 
-// json file will not updated, read json then generate scn file directly
-std::pair<QString, int> GetScnFileContents(const QStringList& jsonNames, const QList<QVariantHash>& jsonDicts);
-bool GenerateAScnFile(const QString& aPath);
-int GenerateScnFilesDirectly(const QString& rootPath);
+#ifdef RUNNING_UNIT_TESTS
+inline SCENE_INFO_LIST& mockScenesInfoList() {
+  static SCENE_INFO_LIST staticSceneInfoList;
+  return staticSceneInfoList;
+}
+#endif
 
-SCENES_TYPE GetScenesFromPath(const QString& path, const bool enableFilter = false, const QString& pattern = {}, SCENES_TYPE* pFiltered = nullptr);
-
-SCENES_TYPE& sort(SCENES_TYPE& scenes, SceneSortOption sortByKey = SceneSortOption::NAME, const bool reverse = false);
-}  // namespace SceneInfoManager
-
-class JsonDataRefresher {
- public:
-  int UpdateAFolderItself(const QString& path);
-  // call operator() to refresh json, than generated scn from refreshed jsons
-  int operator()(const QString& rootPath);
-  int GenerateScnFiles();
-  QMap<QString, QList<QVariantHash>> m_jsonsDicts; // relativePathToJsonFile -> Jsons
- private:
-  int m_updatedJsonFilesCnt = 0, m_usefullJsonCnt = 0;
+struct Counter {
+  Counter(int jsonUpdatedCnt = 0, int jsonUsedCnt = 0, int vidNameKeyFieldUpdatedCnt = 0, int imgNameKeyFieldUpdatedCnt = 0)
+      : m_jsonUpdatedCnt{jsonUpdatedCnt},
+        m_jsonUsedCnt{jsonUsedCnt},
+        m_VidNameKeyFieldUpdatedCnt{vidNameKeyFieldUpdatedCnt},
+        m_ImgNameKeyFieldUpdatedCnt{imgNameKeyFieldUpdatedCnt} {}
+  int m_jsonUpdatedCnt;
+  int m_jsonUsedCnt;
+  int m_VidNameKeyFieldUpdatedCnt;
+  int m_ImgNameKeyFieldUpdatedCnt;
+  Counter& operator+=(const Counter& rhs) {
+    m_jsonUpdatedCnt += rhs.m_jsonUpdatedCnt;
+    m_jsonUsedCnt += rhs.m_jsonUsedCnt;
+    m_VidNameKeyFieldUpdatedCnt += rhs.m_VidNameKeyFieldUpdatedCnt;
+    m_ImgNameKeyFieldUpdatedCnt += rhs.m_ImgNameKeyFieldUpdatedCnt;
+    return *this;
+  }
+  bool operator==(const Counter& rhs) const {
+    return m_jsonUpdatedCnt == rhs.m_jsonUpdatedCnt                           //
+           && m_jsonUsedCnt == rhs.m_jsonUsedCnt                              //
+           && m_VidNameKeyFieldUpdatedCnt == rhs.m_VidNameKeyFieldUpdatedCnt  //
+           && m_ImgNameKeyFieldUpdatedCnt == rhs.m_ImgNameKeyFieldUpdatedCnt;
+  }
+  bool isEmpty() const { return m_jsonUpdatedCnt == 0 && m_jsonUsedCnt == 0; }
 };
 
+class ScnMgr {
+ public:
+  using PATH_2_JSON_DICTS = QMap<QString, QList<QVariantHash>>;
+  Counter operator()(const QString& rootPath);  // will update json contents, than generated scn from refreshed jsons
+  int WriteDictIntoScnFiles();
+ private:
+  Counter UpdateJsonUnderAPath(const QString& path);
+#ifdef RUNNING_UNIT_TESTS
+  void mockJsonDictForTest(const PATH_2_JSON_DICTS& newValue) {
+    m_jsonsDicts = newValue;
+  }
+#endif
+  PATH_2_JSON_DICTS m_jsonsDicts;  // relativePathToJsonFile -> Jsons
+};
 
+}  // namespace SceneInfoManager
 
 #endif  // SCENEINFOMANAGER_H

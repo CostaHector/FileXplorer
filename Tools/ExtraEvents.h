@@ -2,21 +2,18 @@
 #define EXTRAEVENTS_H
 #include <QObject>
 #include <QWidget>
+#include "PopupWidgetManager.h"
 
 class TorrentsManagerWidget;
 class ConfigsTable;
 class ExtraEvents : public QObject {
 public:
-  explicit ExtraEvents(QWidget* parent = nullptr);
+  explicit ExtraEvents(QWidget* parent);
   void subscribe();
+
 private:
-  QWidget* parentWidget{nullptr};
-
-  void on_showTorrentsManager(const bool checked);
-  TorrentsManagerWidget* mTorrentsManager{nullptr};
-
-  void on_settings(const bool checked);
-  ConfigsTable* m_settingSys{nullptr};
+  PopupWidgetManager<TorrentsManagerWidget>* mTorrentsManager{nullptr};
+  PopupWidgetManager<ConfigsTable>* m_settingSys{nullptr};
 };
 
 #endif  // EXTRAEVENTS_H

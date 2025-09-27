@@ -18,6 +18,14 @@ public:
   const QString LOCAL_LOG{"log_handler_local.log"};
   const QString LOCAL_LOG_ABS_PATH{mDir.itemPath(LOCAL_LOG)};
 private slots:
+  void cleanupTestCase() {
+    if (Logger::mLogFILEStreamUniquePtr != nullptr) {
+      // avoid the pointer open("log_handler_local.log")  block QTemporaryDir from delete temp directory
+      Logger::mLogFILEStreamUniquePtr.reset(nullptr);
+      Logger::out() = stdout;
+    }
+  }
+
   void test_log_skip_log_file_not_exist() {
     // in debug mode, it should always return stdout;
 #ifdef QT_DEBUG
@@ -27,10 +35,21 @@ private slots:
     QVERIFY(Logger::GetFILEStream() != stdout);
     QVERIFY(Logger::mLogFILEStreamUniquePtr != nullptr);
 #endif
+    // open succeed
     const QString logAbsFilePath = Logger::GetLogFileAbsPath();
-    QVERIFY(QFile::exists(logAbsFilePath));
-
     QVERIFY(logAbsFilePath.endsWith(Logger::CONSTANT_LOG_FILE_NAME, Qt::CaseInsensitive));
+    QVERIFY(QFile::exists(logAbsFilePath));
+    QVERIFY(Logger::OpenLogFile());
+    QVERIFY(Logger::OpenLogFolder());
+
+    // open log file failed, and open it's parent ok
+    QVERIFY(QFile::rename(logAbsFilePath, logAbsFilePath+"Renamed"));
+    ON_SCOPE_EXIT {
+      QVERIFY(QFile::rename(logAbsFilePath+"Renamed", logAbsFilePath));
+    };
+    QVERIFY(!QFile::exists(logAbsFilePath));
+    QVERIFY(!Logger::OpenLogFile());
+    QVERIFY(Logger::OpenLogFolder());
   }
 
   void closeFileStreamOnly() {
@@ -100,23 +119,19 @@ private slots:
   }
 
   void agedOk_if_logFileSize_above_threshold() {
-    ON_SCOPE_EXIT{
-      Logger::out() = Logger::SwitchLogToALocalFile();
-    };
-
     const QByteArray contents{"0123456789"};
     QVERIFY(mDir.touch(LOCAL_LOG, contents));
     QVERIFY(contents.size() > 8);
 
     QString agedFileName;
     QVERIFY(Logger::AgingLogFiles(LOCAL_LOG_ABS_PATH, 8, &agedFileName));
+    auto* pNewFileStream = Logger::out(); // after aged. filestream is the close and reopen one
+    QVERIFY(pNewFileStream != stdout);
     QVERIFY(agedFileName.endsWith(LOCAL_LOG));
     QVERIFY(agedFileName.size() > LOCAL_LOG.size() + 8 + 6); // at least yyyy-MM-dd_hh_mm_ss_
     QVERIFY(mDir.fileExists(agedFileName, false));
     QVERIFY(mDir.fileExists(LOCAL_LOG, false));
   }
-
-
 };
 #include "LoggerTest.moc"
 REGISTER_TEST(LoggerTest, false)

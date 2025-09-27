@@ -8,6 +8,8 @@
 
 template class SingletonManager<ImagesInfoManager, IMG_INFO_DATA_T>;
 
+using namespace DuplicateImageMetaInfo;
+
 QString ImagesInfoManager::GetDynRedunPath() const {
   return Configuration().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.v).toString();
 }
@@ -45,8 +47,11 @@ IMG_INFO_DATA_T ImagesInfoManager::ReadOutImgsInfo() const {
     hashSet.insert(md5);
     ++filesCnt;
   }
-  LOG_D("benchmarkPath[%s] sizeSet count[%d] and hashSet count[%d] from %d file(s)",  //
-        qPrintable(benchmarkPath), sizeSet.size(), hashSet.size(), filesCnt);
+  LOG_D("benchmarkPath[%s] sizeSet count[%d] and hashSet count[%d] from %d file(s)", //
+        qPrintable(benchmarkPath),
+        sizeSet.size(),
+        hashSet.size(),
+        filesCnt);
   imgMgrData.m_commonFileHash.swap(hashSet);
   imgMgrData.m_commonFileSizeSet.swap(sizeSet);
   return imgMgrData;
@@ -63,8 +68,12 @@ int ImagesInfoManager::ForceReloadImpl() {
   before.swap(after);
 
   const QString benchmarkPath = GetDynRedunPath();
-  LOG_OK_P(benchmarkPath, "sizeSet count[%d->%d] and hashSet count delta[%d->%d]",  //
-        beforeSzCnt, afterSzCnt, beforeHashCnt, afterHashCnt);
+  LOG_OK_P(benchmarkPath,
+           "sizeSet count[%d->%d] and hashSet count delta[%d->%d]", //
+           beforeSzCnt,
+           afterSzCnt,
+           beforeHashCnt,
+           afterHashCnt);
   return afterSzCnt + afterHashCnt - beforeSzCnt - beforeHashCnt;
 }
 
@@ -77,7 +86,7 @@ RedundantImagesList ImagesInfoManager::FindRedunImgs(const QString& folderPath, 
     const qint64 sz = imgFi.size();
     if (sz == 0) {
       if (bAlsoFindEmpty) {
-        redundantImgs.append(REDUNDANT_IMG_INFO{fileAbsPath, 0, ""});
+        redundantImgs.append(REDUNDANT_IMG_INFO{imgFi.fileName(), 0, "", fileAbsPath});
       }
       continue;
     }
@@ -88,7 +97,7 @@ RedundantImagesList ImagesInfoManager::FindRedunImgs(const QString& folderPath, 
     if (!ImgDataStruct().contains(md5)) {
       continue;
     }
-    redundantImgs.append(REDUNDANT_IMG_INFO{fileAbsPath, sz, md5});
+    redundantImgs.append(REDUNDANT_IMG_INFO{imgFi.fileName(), sz, md5, fileAbsPath});
   }
   return redundantImgs;
 }
@@ -113,7 +122,7 @@ RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAls
     if (it.key() == 0) {
       if (bAlsoFindEmpty) {
         for (const auto& absPath : it.value()) {
-          dupImgs.append(REDUNDANT_IMG_INFO{absPath, 0, ""});
+          dupImgs.append(REDUNDANT_IMG_INFO{PathTool::fileName(absPath), 0, "", absPath});
         }
       }
       continue;
@@ -128,10 +137,11 @@ RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAls
       auto sameMd5It = hash2FirstDuplicateFile.find(md5);
       if (sameMd5It != hash2FirstDuplicateFile.cend()) {
         if (firstDuplicateFileMd5.find(md5) == firstDuplicateFileMd5.end()) {
-          dupImgs.append(REDUNDANT_IMG_INFO{sameMd5It.value(), QFile{sameMd5It.value()}.size(), md5});
+          QString fileAbsPath = sameMd5It.value();
+          dupImgs.append(REDUNDANT_IMG_INFO{PathTool::fileName(fileAbsPath), QFile{fileAbsPath}.size(), md5, fileAbsPath});
           firstDuplicateFileMd5.insert(md5);
         }
-        dupImgs.append(REDUNDANT_IMG_INFO{absPath, QFile{absPath}.size(), md5});
+        dupImgs.append(REDUNDANT_IMG_INFO{PathTool::fileName(absPath), QFile{absPath}.size(), md5, absPath});
       } else {
         hash2FirstDuplicateFile[md5] = absPath;
       }

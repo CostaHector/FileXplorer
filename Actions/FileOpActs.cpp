@@ -1,4 +1,4 @@
-﻿#include "FileBasicOperationsActions.h"
+﻿#include "FileOpActs.h"
 #include "FileOperatorPub.h"
 #include "ComplexOperation.h"
 #include "MemoryKey.h"
@@ -7,8 +7,13 @@
 #include <QApplication>
 #include <QStyle>
 
-FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
-  : QObject(parent)  //
+FileOpActs& FileOpActs::GetInst() {
+  static FileOpActs fileOpIns;
+  return fileOpIns;
+}
+
+FileOpActs::FileOpActs(QObject* parent)
+    : QObject(parent)  //
 {
   _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), "Reveal in explorer", this);
   _OPEN_IN_TERMINAL = new (std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), "Open in terminal", this);
@@ -37,11 +42,7 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   MOVE_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY);
   COPY_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY);
 
-  using namespace ComplexOperation;
-  FILE_STRUCTURE_QRY_BEFORE_PASTE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_QUERY"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::QUERY]};
-  FILE_STRUCTURE_PRESERVE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_PRESERVE"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::PRESERVE]};
-  FILE_STRUCTURE_FLATTEN = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_FLATTEN"), FILE_STRUCTURE_MODE_STR[(int)FILE_STRUCTURE_MODE::FLATTEN]};
-  FILE_STRUCTURE_AGS = FileStructureActions();
+  InitFileStructureActions();
 
   MOVE_TO_TRASHBIN = new (std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), "Recycle");
   DELETE_PERMANENTLY = new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), "Delete permanently");
@@ -61,8 +62,9 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   FOLDER_MERGE = FolderMergeActions();
 
   _TS_FILES_MERGE = new (std::nothrow) QAction(QIcon(":img/TS_FILES_MERGE"), "Merged ts files");
-  _TS_FILES_MERGE->setToolTip("Merges selected TS files in your chosen order (minimum 2 files).<br/>"
-                              "<b>Warning: Output sequence in merged file matches your selection order.</b>");
+  _TS_FILES_MERGE->setToolTip(
+      "Merges selected TS files in your chosen order (minimum 2 files).<br/>"
+      "<b>Warning: Output sequence in merged file matches your selection order.</b>");
 
   SELECT_ALL = new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), "Select all");
   SELECT_NONE = new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), "Select none");
@@ -84,14 +86,16 @@ FileBasicOperationsActions::FileBasicOperationsActions(QObject* parent)
   _FORCE_RESEARCH = new (std::nothrow) QAction{QIcon{":img/FORCE_RESEARCH"}, "Force Research"};
 }
 
-QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
+QActionGroup* FileOpActs::GetDeleteActions() {
   MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
   MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
-  MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.").arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
+  MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.")
+                                   .arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
 
   DELETE_PERMANENTLY->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Delete));
   DELETE_PERMANENTLY->setShortcutVisibleInContextMenu(true);
-  DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently").arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
+  DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
+                                     .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(MOVE_TO_TRASHBIN);
@@ -99,11 +103,13 @@ QActionGroup* FileBasicOperationsActions::GetDeleteActions() {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
+QActionGroup* FileOpActs::GetMOVE_COPY_TOActions() {
   _MOVE_TO->setShortcutVisibleInContextMenu(true);
-  _MOVE_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location one specified later").arg(_MOVE_TO->text(), _MOVE_TO->shortcut().toString()));
+  _MOVE_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the location one specified later")
+                           .arg(_MOVE_TO->text(), _MOVE_TO->shortcut().toString()));
   _COPY_TO->setShortcutVisibleInContextMenu(true);
-  _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later").arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
+  _COPY_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the location one specified later")
+                           .arg(_COPY_TO->text(), _COPY_TO->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_MOVE_TO);
@@ -111,7 +117,7 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TOActions() {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey) {
+QActionGroup* FileOpActs::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey) {
   QString historyStr = Configuration().value(memoryKey.name, memoryKey.v).toString();
   QStringList historyList = historyStr.split('\n');
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
@@ -123,7 +129,7 @@ QActionGroup* FileBasicOperationsActions::GetMOVE_COPY_TO_PATH_HistoryActions(co
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::Get_CUT_COPY_PASTE_OPERATIONS_Actions() {
+QActionGroup* FileOpActs::Get_CUT_COPY_PASTE_OPERATIONS_Actions() {
   CUT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_X));
   CUT->setShortcutVisibleInContextMenu(true);
   CUT->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected item(s) to the clipboard.").arg(CUT->text(), CUT->shortcut().toString()));
@@ -134,7 +140,8 @@ QActionGroup* FileBasicOperationsActions::Get_CUT_COPY_PASTE_OPERATIONS_Actions(
 
   PASTE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_V));
   PASTE->setShortcutVisibleInContextMenu(true);
-  PASTE->setToolTip(QString("<b>%1 (%2)</b><br/> Paste the contents of clipboard to the current location.").arg(PASTE->text(), PASTE->shortcut().toString()));
+  PASTE->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Paste the contents of clipboard to the current location.").arg(PASTE->text(), PASTE->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(CUT);
@@ -143,7 +150,7 @@ QActionGroup* FileBasicOperationsActions::Get_CUT_COPY_PASTE_OPERATIONS_Actions(
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::Get_UNDO_REDO_OPERATIONS_Actions() {
+QActionGroup* FileOpActs::Get_UNDO_REDO_OPERATIONS_Actions() {
   UNDO_OPERATION->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Z));
   UNDO_OPERATION->setShortcutVisibleInContextMenu(true);
   UNDO_OPERATION->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(UNDO_OPERATION->text(), UNDO_OPERATION->shortcut().toString()));
@@ -162,7 +169,7 @@ QActionGroup* FileBasicOperationsActions::Get_UNDO_REDO_OPERATIONS_Actions() {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::Get_SELECTION_RIBBON_Action() {
+QActionGroup* FileOpActs::Get_SELECTION_RIBBON_Action() {
   //        SELECT_ALL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_A));
   SELECT_ALL->setShortcutVisibleInContextMenu(true);
   SELECT_ALL->setToolTip(QString("<b>%1 (%2)</b><br/> Select all item(s) in this view.").arg(SELECT_ALL->text(), SELECT_ALL->shortcut().toString()));
@@ -184,10 +191,11 @@ QActionGroup* FileBasicOperationsActions::Get_SELECTION_RIBBON_Action() {
   return actionGroup;
 }
 
-auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
+auto FileOpActs::GetOPENActions() -> QActionGroup* {
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
-  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer").arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
+  _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal items in system file explorer")
+                                      .arg(_REVEAL_IN_EXPLORER->text(), _REVEAL_IN_EXPLORER->shortcut().toString()));
 
   _OPEN_IN_TERMINAL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::AltModifier | Qt::Key_T));
   _OPEN_IN_TERMINAL->setShortcutVisibleInContextMenu(true);
@@ -206,17 +214,20 @@ auto FileBasicOperationsActions::GetOPENActions() -> QActionGroup* {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
+QActionGroup* FileOpActs::GetCOPY_PATHActions() {
   COPY_FULL_PATH->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_Insert));
   COPY_FULL_PATH->setToolTip(
-      QString("<b>%1 (%2)</b><br/>. <b>path/name</b> <br/>Copy the absolute file name of the selected item(s) to the clipboard.").arg(COPY_FULL_PATH->text(), COPY_FULL_PATH->shortcut().toString()));
+      QString("<b>%1 (%2)</b><br/>. <b>path/name</b> <br/>Copy the absolute file name of the selected item(s) to the clipboard.")
+          .arg(COPY_FULL_PATH->text(), COPY_FULL_PATH->shortcut().toString()));
   COPY_FULL_PATH->setShortcutVisibleInContextMenu(true);
 
-  COPY_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>path</b>/name <br/>Copy the directory of the selected item(s) to the clipboard.").arg(COPY_PATH->text(), COPY_PATH->shortcut().toString()));
+  COPY_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>path</b>/name <br/>Copy the directory of the selected item(s) to the clipboard.")
+                            .arg(COPY_PATH->text(), COPY_PATH->shortcut().toString()));
   COPY_PATH->setShortcutVisibleInContextMenu(true);
 
   COPY_NAME->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_Insert));
-  COPY_NAME->setToolTip(QString("<b>%1 (%2)</b><br/> path/<b>name</b> <br/>Copy the name of the selected item(s) to the clipboard.").arg(COPY_NAME->text(), COPY_NAME->shortcut().toString()));
+  COPY_NAME->setToolTip(QString("<b>%1 (%2)</b><br/> path/<b>name</b> <br/>Copy the name of the selected item(s) to the clipboard.")
+                            .arg(COPY_NAME->text(), COPY_NAME->shortcut().toString()));
   COPY_NAME->setShortcutVisibleInContextMenu(true);
 
   COPY_THE_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>pth/itemName.jpg</b> <br/>Given current selected item named 'itemName' and its path "
@@ -225,7 +236,8 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
   COPY_THE_PATH->setShortcutVisibleInContextMenu(true);
 
   COPY_RECORDS->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_C));
-  COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected records, especially name, size, and prepath").arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
+  COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected records, especially name, size, and prepath")
+                               .arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
   COPY_RECORDS->setShortcutVisibleInContextMenu(true);
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
@@ -242,20 +254,23 @@ QActionGroup* FileBasicOperationsActions::GetCOPY_PATHActions() {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::GetNEWActions() {
+QActionGroup* FileOpActs::GetNEWActions() {
   NEW_FOLDER->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_N));
   NEW_FOLDER->setShortcutVisibleInContextMenu(true);
-  NEW_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/> Create a new folder in current view.").arg(NEW_FOLDER->text(), NEW_FOLDER->shortcut().toString()));
+  NEW_FOLDER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Create a new folder in current view.").arg(NEW_FOLDER->text(), NEW_FOLDER->shortcut().toString()));
   NEW_FOLDER->setCheckable(false);
 
   NEW_TEXT_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_T));
   NEW_TEXT_FILE->setShortcutVisibleInContextMenu(true);
-  NEW_TEXT_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Create a new text document in current view.").arg(NEW_TEXT_FILE->text(), NEW_TEXT_FILE->shortcut().toString()));
+  NEW_TEXT_FILE->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Create a new text document in current view.").arg(NEW_TEXT_FILE->text(), NEW_TEXT_FILE->shortcut().toString()));
   NEW_TEXT_FILE->setCheckable(false);
 
   NEW_JSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_J));
   NEW_JSON_FILE->setShortcutVisibleInContextMenu(true);
-  NEW_JSON_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
+  NEW_JSON_FILE->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Create a new json file in current view.").arg(NEW_JSON_FILE->text(), NEW_JSON_FILE->shortcut().toString()));
   NEW_JSON_FILE->setCheckable(false);
 
   BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
@@ -278,14 +293,15 @@ QActionGroup* FileBasicOperationsActions::GetNEWActions() {
   return actionGroup;
 }
 
-QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
+QActionGroup* FileOpActs::FolderMergeActions() {
   MERGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_M));
   MERGE->setShortcutVisibleInContextMenu(true);
   MERGE->setToolTip(QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE->text(), MERGE->shortcut().toString()));
 
   MERGE_REVERSE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_M));
   MERGE_REVERSE->setShortcutVisibleInContextMenu(true);
-  MERGE_REVERSE->setToolTip(QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE_REVERSE->text(), MERGE_REVERSE->shortcut().toString()));
+  MERGE_REVERSE->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE_REVERSE->text(), MERGE_REVERSE->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(MERGE);
@@ -293,7 +309,7 @@ QActionGroup* FileBasicOperationsActions::FolderMergeActions() {
   return actionGroup;
 }
 
-void FileBasicOperationsActions::FolderFileCategoryProcess() {
+void FileOpActs::FolderFileCategoryProcess() {
   _PACK_FOLDERS->setToolTip(
       "<b>Category Files/Folders Name under current view path</b><br/>"
       "Move [A.mp4, A.jpg, A.json]<br/>"
@@ -345,41 +361,34 @@ void FileBasicOperationsActions::FolderFileCategoryProcess() {
   connect(_RETURN_ERROR_CODE_UPON_ANY_FAILURE, &QAction::toggled, &FileOperatorType::SetReturnErrorCodeUponAnyFailureSw);
 }
 
-QActionGroup* FileBasicOperationsActions::FileStructureActions() {
+void FileOpActs::InitFileStructureActions() {
+  using namespace FileStructurePolicy;
+  FILE_STRUCTURE_QRY_BEFORE_PASTE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_QUERY"), c_str(FileStuctureModeE::QUERY)};
   FILE_STRUCTURE_QRY_BEFORE_PASTE->setToolTip("Query file structure before procceed each paste operation.");
   FILE_STRUCTURE_QRY_BEFORE_PASTE->setCheckable(true);
+
+  FILE_STRUCTURE_PRESERVE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_PRESERVE"), c_str(FileStuctureModeE::PRESERVE)};
   FILE_STRUCTURE_PRESERVE->setToolTip("Set preserve file structure by default");
   FILE_STRUCTURE_PRESERVE->setCheckable(true);
+
+  FILE_STRUCTURE_FLATTEN = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_FLATTEN"), c_str(FileStuctureModeE::FLATTEN)};
   FILE_STRUCTURE_FLATTEN->setToolTip("Set flatten file structure by default");
   FILE_STRUCTURE_FLATTEN->setCheckable(true);
 
-  auto* FILE_STRUCTURE_AGS = new (std::nothrow) QActionGroup{this};
-  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_QRY_BEFORE_PASTE);
-  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_PRESERVE);
-  FILE_STRUCTURE_AGS->addAction(FILE_STRUCTURE_FLATTEN);
-  FILE_STRUCTURE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
-
-  int fileStructureWay = Configuration()
-                             .value(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name,  //
-                                    MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.v)
-                             .toInt();
-  const QList<QAction*> acts = FILE_STRUCTURE_AGS->actions();
-  if (fileStructureWay < 0 || fileStructureWay >= acts.size()) {
-    LOG_W("FileSystemStructure Way set 0 instead");
-    fileStructureWay = 0;
-  }
-  acts[fileStructureWay]->setChecked(true);
-  ComplexOperation::SetDefaultFileStructMode(acts[fileStructureWay]);
-
-  connect(FILE_STRUCTURE_AGS, &QActionGroup::triggered, &ComplexOperation::SetDefaultFileStructMode);
-  return FILE_STRUCTURE_AGS;
+  mFileStructureIntAction.init({{FILE_STRUCTURE_QRY_BEFORE_PASTE, FileStuctureModeE::QUERY},  //
+                                {FILE_STRUCTURE_PRESERVE, FileStuctureModeE::PRESERVE},       //
+                                {FILE_STRUCTURE_FLATTEN, FileStuctureModeE::FLATTEN}},
+                               DEFAULT_FILE_STRUCTURE_MODE, QActionGroup::ExclusionPolicy::Exclusive);
+  const int fileStructureModeInt = Configuration().value(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name, MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.v).toInt();
+  FileStuctureModeE fileStructureMode = mFileStructureIntAction.intVal2Enum(fileStructureModeInt);
+  mFileStructureIntAction.setCheckedIfActionExist(fileStructureMode);
 }
 
-QToolBar* FileBasicOperationsActions::GetFolderOperationModeTb(QWidget* parent) {
+QToolBar* FileOpActs::GetFolderOperationModeTb(QWidget* parent) {
   auto* folderOperationModeTB = new (std::nothrow) QToolBar{"File System Structure Mode", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(folderOperationModeTB);
   folderOperationModeTB->setOrientation(Qt::Orientation::Vertical);
-  folderOperationModeTB->addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
+  folderOperationModeTB->addActions(CUT_COPY_PASTE->actions());
   folderOperationModeTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderOperationModeTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   folderOperationModeTB->setStyleSheet("QToolBar { max-width: 256px; }");
@@ -387,45 +396,14 @@ QToolBar* FileBasicOperationsActions::GetFolderOperationModeTb(QWidget* parent) 
   return folderOperationModeTB;
 }
 
-QToolBar* FileBasicOperationsActions::GetCutCopyPasteTb(QWidget* parent) {
+QToolBar* FileOpActs::GetCutCopyPasteTb(QWidget* parent) {
   auto* cutCopyPaste = new (std::nothrow) QToolBar{"Copy/Cut/Paste", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(cutCopyPaste);
   cutCopyPaste->setOrientation(Qt::Orientation::Vertical);
-  cutCopyPaste->addActions(g_fileBasicOperationsActions().FILE_STRUCTURE_AGS->actions());
+  cutCopyPaste->addActions(mFileStructureIntAction.getActionEnumAscendingList());
   cutCopyPaste->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   cutCopyPaste->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   cutCopyPaste->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(cutCopyPaste->layout(), Qt::AlignmentFlag::AlignLeft);
   return cutCopyPaste;
 }
-
-FileBasicOperationsActions& g_fileBasicOperationsActions() {
-  static FileBasicOperationsActions fileOpIns;
-  return fileOpIns;
-}
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-#include <QToolBar>
-
-class FileOperationActionIllustration : public QToolBar {
-public:
-  explicit FileOperationActionIllustration(const QString& title, QWidget* parent = nullptr) : QToolBar(title, parent) {
-    addActions(g_fileBasicOperationsActions().OPEN_AG->actions());
-    addActions(g_fileBasicOperationsActions().CUT_COPY_PASTE->actions());
-    addActions(g_fileBasicOperationsActions().COPY_PATH_AG->actions());
-    addActions(g_fileBasicOperationsActions().NEW->actions());
-    addActions(g_fileBasicOperationsActions().DELETE_ACTIONS->actions());
-    addActions(g_fileBasicOperationsActions().MOVE_COPY_TO->actions());
-    addActions(g_fileBasicOperationsActions().SELECTION_RIBBONS->actions());
-  }
-};
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  FileOperationActionIllustration renameIllustration("Rename Items", nullptr);
-  renameIllustration.show();
-  return a.exec();
-}
-#endif

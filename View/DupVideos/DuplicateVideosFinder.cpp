@@ -2,7 +2,7 @@
 #include "RightVideoDuplicatesModel.h"
 
 #include "DuplicateVideosFinderActions.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 
 #include "MemoryKey.h"
 #include "StyleSheet.h"
@@ -31,7 +31,7 @@ DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{pare
 
   m_tb = g_dupVidFinderAg().GetAiMediaToolBar(tableNameFilterLE, sizeDevLE, durationDevLE, this);
   CHECK_NULLPTR_RETURN_VOID(m_tb);
-  m_tb->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  m_tb->addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_tb);
 
   m_aiTables = new (std::nothrow) DuplicateVideosMetaInfoTable{this};

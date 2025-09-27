@@ -62,6 +62,21 @@ constexpr const char* JSON_TABLE_HEADERS[]{
 constexpr int JSON_TABLE_HEADERS_COUNT = sizeof(JSON_TABLE_HEADERS) / sizeof(JSON_TABLE_HEADERS[0]);
 
 QVariantHash GetJsonDictDefault(const QString& jsonBaseName = "");
+
+QVariantHash ConstructJsonDict (
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) decltype(def) _##enu = def,
+    JSON_FILE_KEY_MAPPING
+#undef JSON_KEY_ITEM
+    void* P_DONT_USE_ME = nullptr
+    );
+
+QByteArray ConstructJsonByteArray (
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) decltype(def) _##enu = def,
+    JSON_FILE_KEY_MAPPING
+#undef JSON_KEY_ITEM
+    void* P_DONT_USE_ME = nullptr
+    );
+
 }  // namespace JsonKey
 
 enum class FIELD_OP_TYPE { CAST = 0, TAGS = 1, BUTT };

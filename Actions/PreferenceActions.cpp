@@ -69,7 +69,7 @@ bool PreferenceActions::onSetAppStyle(const QAction* pStyleAct) {
   CHECK_NULLPTR_RETURN_FALSE(pStyleAct);
   const QString& styleName = pStyleAct->text().toLower();
   qApp->setStyle(styleName);
-  LOG_OK_NP("setStyle", styleName);
+  LOG_D("setStyle to %s", qPrintable(styleName));
   return true;
 }
 
@@ -97,7 +97,7 @@ bool PreferenceActions::onSetStylesheet(const QAction* pStyleSheetAct) {
     qssFile.close();
   }
   qApp->setStyleSheet(theme2QssContent[(int)stylesheetEnum]);
-  LOG_OK_NP("Style Changed to", pStyleSheetAct->text());
+  LOG_D("Style Changed to %s", qPrintable(pStyleSheetAct->text()));
   return true;
 }
 

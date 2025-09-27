@@ -58,6 +58,5 @@ struct IMAGE_SIZE {
       };
   static constexpr int ICON_SIZE_CANDIDATES_N = sizeof(ICON_SIZE_CANDIDATES) / sizeof(*ICON_SIZE_CANDIDATES);
 };
-
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 #endif  // STYLESHEET_H

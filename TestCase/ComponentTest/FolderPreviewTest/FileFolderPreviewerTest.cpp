@@ -8,6 +8,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "FileFolderPreviewer.h"
 #include "EndToExposePrivateMember.h"
+#include "SqlRecordTestHelper.h"
 
 class FileFolderPreviewerTest : public PlainTestSuite {
   Q_OBJECT
@@ -59,6 +60,24 @@ private slots:
     previewer(emptyStrPath);
     QCOMPARE(previewer.currentIndex(), static_cast<int>(FileFolderPreviewer::PANE_TYPE::IMG_VID_OTH));
     QCOMPARE(previewer.currentWidget(), previewer.mImgVidOtherPane);
+
+    // 5. show cast record in detail view
+    const QSqlRecord validRecord = SqlRecordTestHelper::GetACastRecordLine("Michael Fassbender", "X-Man", {});
+    const QString imgHostNotExist;
+    previewer(validRecord, imgHostNotExist);
+    QCOMPARE(previewer.currentIndex(), static_cast<int>(FileFolderPreviewer::PANE_TYPE::DETAIL));
+    QCOMPARE(previewer.currentWidget(), previewer.mDetailsPane);
+  }
+
+  void test_configuration_saved() {
+    QVERIFY(Configuration().contains("FLOATING_PREVIEW_GEOMETRY"));
+    FileFolderPreviewer previewer{"TestFileFolderPreviewer secondtime"};
+
+    QVERIFY(previewer.mImgVidOtherPane != nullptr);
+    const QStringList othersLst;
+    previewer.UpdateImgs("random images", othersLst); // should not crash down
+    previewer.UpdateVids(othersLst); // should not crash down
+    previewer.UpdateOthers(othersLst); // should not crash down
   }
 };
 

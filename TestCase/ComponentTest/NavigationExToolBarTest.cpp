@@ -10,7 +10,6 @@
 #include "NavigationExToolBar.h"
 #include "EndToExposePrivateMember.h"
 #include "DraggableToolButton.h"
-#include "QtProcessGuard.h"
 
 #include <QMenu>
 

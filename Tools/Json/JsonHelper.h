@@ -24,9 +24,15 @@ uint CalcFileHash(const QString& vidPth);
 
 QVariantHash MovieJsonLoader(const QString& jsonFilePth);
 QJsonObject GetJsonObject(const QString& jsonFilePath);
-QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr);
+
 RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int duration, const QString& studio, const QString& cast, const QString& tags);
+
+QByteArray SerializedJsonDict2ByteArray(const QVariantHash& dict);
+QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr, bool* bParseOk = nullptr);
+QVariantHash DeserializedJsonByteArray2Dict(const QByteArray& jsonBa, bool* bParseOk = nullptr);
+
 bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth);
+
 QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path);
 }  // namespace JsonHelper
 

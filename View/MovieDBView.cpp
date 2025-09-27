@@ -1,10 +1,9 @@
 #include "MovieDBView.h"
 #include "MovieDBActions.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "MemoryKey.h"
 #include "MountHelper.h"
 #include "NotificatorMacro.h"
-#include "QuickWhereClauseDialog.h"
 #include "StudiosManager.h"
 #include "TableFields.h"
 #include "PublicMacro.h"
@@ -75,7 +74,7 @@ void MovieDBView::subscribe() {
   connect(inst.APPEND_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND); });
   connect(inst.REMOVE_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE); });
 
-  auto& fileOpInst = g_fileBasicOperationsActions();
+  auto& fileOpInst = FileOpActs::GetInst();
   addAction(fileOpInst.COPY_FULL_PATH);
   addAction(fileOpInst.COPY_NAME);
   addAction(fileOpInst.COPY_RECORDS);

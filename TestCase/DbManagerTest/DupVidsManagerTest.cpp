@@ -11,12 +11,17 @@
 #include "VideoTestPrecoditionTools.h"
 #include <QSqlRecord>
 #include "VidDupTabFields.h"
+using namespace VideoTestPrecoditionTools;
 
 class DupVidsManagerTest : public PlainTestSuite {
   Q_OBJECT
  public:
   TDir tDir;
   QDir mDir{tDir.path()};
+  QString aNewDupVidPrePath = tDir.path();
+  SetDatabaseParmRetType dbNameSetResult = setDupVidDbAbsFilePath(aNewDupVidPrePath);
+  SetDatabaseParmRetType connNameSetResult = setDupVidDbConnectionName("DUP_VID_MANAGER_CONN_TEST", __LINE__);
+
   const QString AI_MEDIA_DUPLICATE_DIR_EMPTY = tDir.itemPath("/empty");
   const QString AI_MEDIA_DUPLICATE_DIR_FOLDER_1 = tDir.itemPath("/folder_1");
   const QString AI_MEDIA_DUPLICATE_DIR_NO_MEDIA = tDir.itemPath("/no_media");
@@ -27,7 +32,11 @@ class DupVidsManagerTest : public PlainTestSuite {
 
  private slots:
   void initTestCase() {
-    QCOMPARE(DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false), true);
+    // precondition
+    QVERIFY(tDir.IsValid());
+    QVERIFY2(dbNameSetResult.first, qPrintable(dbNameSetResult.second));
+    QVERIFY2(connNameSetResult.first, qPrintable(connNameSetResult.second));
+
     // empty
     // folder_1{movie 1 duplicate.mp4, movie 2 duplicate.mp4, movie 3 unique.mkv},
     // no_media{any text.txt}
@@ -44,10 +53,6 @@ class DupVidsManagerTest : public PlainTestSuite {
         {"no_media/folder/any text.txt", false, ""},
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
-  }
-
-  void cleanupTestCase() {  //
-    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
   }
 
   void test_C_DISK_DRIVER_NAME_2_TableName() {
@@ -73,9 +78,9 @@ class DupVidsManagerTest : public PlainTestSuite {
   }
 
   void test_ScanPath_DropTable_ok() {
-    DupVidsManager::DropAllTablesForTest(VidDupHelper::VID_DUP_CONNECTION_NAME);
-
     DupVidsManager aid;
+    QVERIFY(aid.GetCfgDebug().contains(dbNameSetResult.second));
+    QVERIFY(aid.GetCfgDebug().contains(connNameSetResult.second));
     aid.setSkipGetVideosDuration(true);
     QCOMPARE(aid.GetTablesCnt(), 0);  // no tables
 
@@ -135,12 +140,12 @@ class DupVidsManagerTest : public PlainTestSuite {
     QCOMPARE(aid.GetTablesCnt(), 0);
 
     {  // bidirectional conversion between table names and file paths ok
-      const QString tableNameTsPath = GetTableName(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH);
+      const QString tableNameTsPath = GetTableName(TS_FILE_MERGER_SAMPLE_PATH);
       const QString pathFromTable = TableName2Path(tableNameTsPath);
-      QCOMPARE(pathFromTable, VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH);
+      QCOMPARE(pathFromTable, TS_FILE_MERGER_SAMPLE_PATH);
 
       const QString qryAll = QString{"SELECT * from `%1`;"}.arg(tableNameTsPath);
-      bool bScanTs = aid.ScanALocation(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH);
+      bool bScanTs = aid.ScanALocation(TS_FILE_MERGER_SAMPLE_PATH);
       QCOMPARE(bScanTs, true);
 
       QList<QSqlRecord> expectAllRecords;
@@ -161,11 +166,11 @@ class DupVidsManagerTest : public PlainTestSuite {
 
       {  // 5. AuditTables ok. videos not exist will be removed from database
         // 1 file get renamed, audit repair 1 one (delete this record in table directly)
-        QCOMPARE(QDir{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
-        AutoRollbackRename oneVideoGetRenamed{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH, "File need to merge seg-1-v1-a1.ts",
+        QCOMPARE(QDir{TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
+        AutoRollbackRename oneVideoGetRenamed{TS_FILE_MERGER_SAMPLE_PATH, "File need to merge seg-1-v1-a1.ts",
                                               "File need to merge seg-1-v1-a1 renamed to.ts"};
         QCOMPARE(oneVideoGetRenamed.Execute(), true);
-        QCOMPARE(QDir{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), false);
+        QCOMPARE(QDir{TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), false);
         QCOMPARE(aid.AuditTables({tableNameTsPath}), 1);
 
         QList<QSqlRecord> allRecordsAfterAudit;
@@ -173,11 +178,11 @@ class DupVidsManagerTest : public PlainTestSuite {
         QCOMPARE(allRecordsAfterAudit.size(), expectAllRecords.size() - 1);  // get delete one record
       }
     }
-    QCOMPARE(QDir{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
+    QCOMPARE(QDir{TS_FILE_MERGER_SAMPLE_PATH}.exists("File need to merge seg-1-v1-a1.ts"), true);
   }
 
   void test_ScanPathContainDuplicates_ok() {
-    DupVidsManager::DropAllTablesForTest(VidDupHelper::VID_DUP_CONNECTION_NAME);
+    DupVidsManager::DropAllTablesForTest(VidDupHelper::GetAiDupVidDbConnectionName());
 
     DupVidsManager aid;
     aid.setSkipGetVideosDuration(true);

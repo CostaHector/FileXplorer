@@ -16,6 +16,8 @@ class CustomTableViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void cleanupTestCase() { Configuration().clear(); }
+
   void column_width_adjust_ok() {
     Configuration().clear();
 
@@ -32,9 +34,11 @@ class CustomTableViewTest : public PlainTestSuite {
     ctv.onEnableColumnSort(true);
     QCOMPARE(ctv.isSortingEnabled(), true);
 
+    ctv.onResizeRowToContents(false);
     ctv.onResizeRowToContents(true);
     QCOMPARE(ctv.verticalHeader()->sectionResizeMode(0), QHeaderView::ResizeMode::ResizeToContents);
 
+    ctv.onResizeColumnToContents(false);
     ctv.onResizeColumnToContents(true);
     QCOMPARE(ctv.horizontalHeader()->sectionResizeMode(0), QHeaderView::ResizeMode::ResizeToContents);
 
@@ -78,6 +82,7 @@ class CustomTableViewTest : public PlainTestSuite {
     extraVerAg.addAction(&vExtraAct2);
     QVERIFY(ctv.m_verMenu != nullptr);
     int beforeVCount = ctv.m_verMenu->actions().size();
+    ctv.AppendVerticalHeaderMenuAGS(nullptr); // not crash down
     ctv.AppendVerticalHeaderMenuAGS(&extraVerAg);
     QCOMPARE(ctv.m_verMenu->actions().size(), beforeVCount + 1 + 2);
 
@@ -88,9 +93,9 @@ class CustomTableViewTest : public PlainTestSuite {
     extraHorAg.addAction(&hExtraAct2);
     QVERIFY(ctv.m_horMenu != nullptr);
     int beforeHCount = ctv.m_horMenu->actions().size();
+    ctv.AppendHorizontalHeaderMenuAGS(nullptr); // not crash down
     ctv.AppendHorizontalHeaderMenuAGS(&extraHorAg);
     QCOMPARE(ctv.m_horMenu->actions().size(), beforeHCount + 1 + 2);
-
 
     QAction act{"act1", &ctv};
     QMenu menu{&ctv};
@@ -103,6 +108,80 @@ class CustomTableViewTest : public PlainTestSuite {
     QContextMenuEvent rghContextEvent(QContextMenuEvent::Mouse, posCenter, ctv.mapToGlobal(posCenter));
     ctv.contextMenuEvent(&rghContextEvent);
     QCOMPARE(rghContextEvent.isAccepted(), true);
+  }
+
+  void set_section_size_ok() {
+    using namespace UserSpecifiedIntValueMock;
+    static const int EXPECT_ROW_DEFAULT_SECTION_SIZE = 51;
+    static const int EXPECT_ROW_MAX_SECTION_SIZE = 71;
+    static const int EXPECT_COLUMN_DEFAULT_SECTION_SIZE = 121;
+    {
+      CustomTableView ctv{"ctv set section size ok"};
+      {
+        MockQInputDialogGetInt(false, 40);
+        QCOMPARE(ctv.onSetRowMaxHeight(), false);
+        QCOMPARE(ctv.onSetRowDefaultSectionSize(), false);
+        QCOMPARE(ctv.onSetColumnDefaultSectionSize(), false);
+      }
+      // precondition
+      QVERIFY(ctv.verticalHeader()->maximumSectionSize() != EXPECT_ROW_MAX_SECTION_SIZE);
+      QVERIFY(ctv.verticalHeader()->defaultSectionSize() != EXPECT_ROW_DEFAULT_SECTION_SIZE);
+      QVERIFY(ctv.horizontalHeader()->maximumSectionSize() != EXPECT_COLUMN_DEFAULT_SECTION_SIZE);
+      // change section size
+      {
+        MockQInputDialogGetInt(true, EXPECT_ROW_MAX_SECTION_SIZE);
+        QCOMPARE(ctv.onSetRowMaxHeight(), true);
+      }
+      {
+        MockQInputDialogGetInt(true, EXPECT_ROW_DEFAULT_SECTION_SIZE);
+        QCOMPARE(ctv.onSetRowDefaultSectionSize(), true);
+      }
+      {
+        MockQInputDialogGetInt(true, EXPECT_COLUMN_DEFAULT_SECTION_SIZE);
+        QCOMPARE(ctv.onSetColumnDefaultSectionSize(), true);
+      }
+      QCOMPARE(ctv.verticalHeader()->maximumSectionSize(), EXPECT_ROW_MAX_SECTION_SIZE);
+      QCOMPARE(ctv.verticalHeader()->defaultSectionSize(), EXPECT_ROW_DEFAULT_SECTION_SIZE);
+      QCOMPARE(ctv.horizontalHeader()->defaultSectionSize(), EXPECT_COLUMN_DEFAULT_SECTION_SIZE);
+      QCOMPARE(ctv.m_defaultTableRowHeight, EXPECT_ROW_DEFAULT_SECTION_SIZE);
+      QCOMPARE(ctv.m_defaultTableColumnWidth, EXPECT_COLUMN_DEFAULT_SECTION_SIZE);
+
+      ctv.onVerticalHeaderChanged();
+    }
+    // QCOMPARE(ctv2.verticalHeader()->maximumSectionSize(), EXPECT_ROW_MAX_SECTION_SIZE); //  max row size here not record in service
+    // QCOMPARE(ctv2.verticalHeader()->defaultSectionSize(), EXPECT_ROW_DEFAULT_SECTION_SIZE); // this two may be ovewrite by header()->restore
+    // QCOMPARE(ctv1.horizontalHeader()->defaultSectionSize(), EXPECT_COLUMN_DEFAULT_SECTION_SIZE);
+  }
+
+  void column_visibility_set_ok() {
+    static constexpr int COLUMN_CNT = 4;
+    QStandardItemModel stdModel;
+    ModelTestHelper::InitStdItemModel(stdModel, "cell (%1, %2)", 2, COLUMN_CNT);
+    ModelTestHelper::InitHorizontalHeaderLabels(stdModel);
+
+    CustomTableView ctv1{"ctv column visibility set ok"};
+    ctv1.setModel(&stdModel);
+
+    using namespace UserSpecifiedIntValueMock;
+    mockColumnsShowSwitch() = std::string(COLUMN_CNT, '0').c_str();  // all hide
+    QCOMPARE(ctv1.onColumnVisibilityAdjust(), true);
+    QCOMPARE(ctv1.m_columnsShowSwitch, "0000");
+
+    mockColumnsShowSwitch() = std::string(COLUMN_CNT, '1').c_str();  // all shown
+    QCOMPARE(ctv1.onColumnVisibilityAdjust(), true);
+    QCOMPARE(ctv1.m_columnsShowSwitch, "1111");
+
+    {  // bounder test
+      static constexpr int COLUMN_CNT_100 = 100;
+      QVERIFY(ctv1.m_columnsShowSwitch.size() < COLUMN_CNT_100);
+      QStandardItemModel std100ColumnModel;
+      ModelTestHelper::InitStdItemModel(std100ColumnModel, "cell (%1, %2)", 1, COLUMN_CNT_100);
+      ctv1.setModel(&std100ColumnModel);  // model switched
+
+      mockColumnsShowSwitch() = std::string(COLUMN_CNT_100, '0').c_str();  // all hide
+      QCOMPARE(ctv1.onColumnVisibilityAdjust(), true);
+      QCOMPARE(ctv1.m_columnsShowSwitch, std::string(COLUMN_CNT_100, '0').c_str());
+    }
   }
 };
 

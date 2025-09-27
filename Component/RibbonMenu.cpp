@@ -6,7 +6,7 @@
 #include "ActionsSearcher.h"
 #include "ArchiveFilesActions.h"
 #include "FileRenameRulerActions.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "FileLeafAction.h"
 #include "FolderPreviewActions.h"
 #include "PreferenceActions.h"
@@ -80,7 +80,7 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_LogActions()._LOG_FILE);
   menuRibbonCornerWid->addSeparator();
-  menuRibbonCornerWid->addActions(g_fileBasicOperationsActions().UNDO_REDO_RIBBONS->actions());
+  menuRibbonCornerWid->addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(_EXPAND_RIBBONS);
   menuRibbonCornerWid->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16});
@@ -123,7 +123,7 @@ QToolBar* RibbonMenu::LeafFile() const {
 }
 
 QToolBar* RibbonMenu::LeafHome() const {
-  auto& fileOpInst = g_fileBasicOperationsActions();
+  auto& fileOpInst = FileOpActs::GetInst();
 
   QToolBar* leafHomeWid = new (std::nothrow) QToolBar{"LeafHome"};
   CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
@@ -310,7 +310,6 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addAction(g_viewActions()._SCENE_VIEW);
   sceneTB->addSeparator();
   sceneTB->addAction(ag._COMBINE_MEDIAINFOS_JSON);
-  sceneTB->addAction(ag._UPDATE_SCN_ONLY);
   sceneTB->addSeparator();
   sceneTB->addWidget(ag.mOrderTB);
   sceneTB->addSeparator();
@@ -320,7 +319,7 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
 }
 
 QToolBar* RibbonMenu::LeafMediaTools() const {
-  const auto& fileOpAgInst = g_fileBasicOperationsActions();
+  const auto& fileOpAgInst = FileOpActs::GetInst();
 
   QToolBar* folderRmv{new (std::nothrow) QToolBar{"Folder Remover"}};
   CHECK_NULLPTR_RETURN_NULLPTR(folderRmv);

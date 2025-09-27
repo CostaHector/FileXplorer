@@ -195,7 +195,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     case ViewType::JSON: {
       if (_view->m_jsonTableView == nullptr) {
         _view->m_jsonModel = new JsonTableModel{_view};
-        _view->m_jsonProxyModel = new JsonProxyModel{_view};
+        _view->m_jsonProxyModel = new QSortFilterProxyModel{_view};
         _view->m_jsonTableView = new JsonTableView(_view->m_jsonModel, _view->m_jsonProxyModel, _view);
         _view->AddView(viewType, _view->m_jsonTableView);
       }

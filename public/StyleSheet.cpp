@@ -7,6 +7,7 @@
 
 namespace StyleSheet {
 void UpdateTitleBar(QWidget* widget) {
+  CHECK_NULLPTR_RETURN_VOID(widget);
   if (g_PreferenceActions().CurStyleSheet() == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
     setDarkTitleBar(widget, true);
   }
@@ -57,6 +58,11 @@ void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
   }
   // Only QToolBar and QToolButton need to set alignment. (QWidget like QSeperator not need)
   for (int i = 0; i < lay->count(); ++i) {
-    lay->itemAt(i)->setAlignment(align);
+    QLayoutItem* item = lay->itemAt(i);
+    if (item == nullptr || item->widget() == nullptr) { continue; }
+    if (item->widget()->metaObject()->className() == QLatin1String("QToolBarSeparator")) {
+      continue;
+    }
+    item->setAlignment(align);
   }
 }

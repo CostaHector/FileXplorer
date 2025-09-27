@@ -152,7 +152,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
   }
   query.finish();
   m_torrentsDBModel->submitAll();
-  LOG_OK_P("[Ok] Insert into succeed", "%1/%2 item(s) -> Table[%s]", succeedItemCnt, totalItemCnt, qPrintable(DB_TABLE::TORRENTS));
+  LOG_OK_P("[Ok] Insert into succeed", "%1 / %2 item(s) -> Table[%s]", succeedItemCnt, totalItemCnt, qPrintable(DB_TABLE::TORRENTS));
   return true;
 }
 

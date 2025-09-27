@@ -10,25 +10,8 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QSet>
-#include <QDataStream>
+#include "FilePropertyMetaInfo.h"
 
-struct FileProperty {
-  QString name;
-  qint64 size;
-  QString type;
-  QDateTime modifiedDate;
-  QString relPath;
-  static QString mRootPath;
-};
-
-// QDataStream& operator<<(QDataStream& dsIn, const FileProperty& fp) {
-//   dsIn << fp.name << fp.size << fp.type << fp.modifiedDate << fp.relPath;
-//   return dsIn;
-// }
-// QDataStream& operator>>(QDataStream& dsOut, FileProperty& fp) {
-//   dsOut >> fp.name >> fp.size >> fp.type >> fp.modifiedDate >> fp.relPath;
-//   return dsOut;
-// }
 
 class AdvanceSearchModel : public QAbstractTableModelPub {
 public:
@@ -52,7 +35,7 @@ public:
   }
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return m_itemsLst.size(); }
-  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return HORIZONTAL_HEADER_NAMES.size(); }
+  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return FilePropertyHelper::SEARCH_TABLE_HEADERS_COUNT; }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -96,7 +79,7 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_rootPath + '/' + m_itemsLst[row].relPath;
+    return m_rootPath + '/' + m_itemsLst[row].m_RelPath;
   }
 
   QString fileName(const QModelIndex& curIndex) const {  //
@@ -104,7 +87,7 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_itemsLst[row].name;
+    return m_itemsLst[row].m_Name;
   }
 
   QString filePath(const QModelIndex& curIndex) const {  //
@@ -112,7 +95,7 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_rootPath + '/' + m_itemsLst[row].relPath + m_itemsLst[row].name;
+    return m_rootPath + '/' + m_itemsLst[row].m_RelPath + m_itemsLst[row].m_Name;
   }
 
   QFileInfo fileInfo(const QModelIndex& curIndex) const {  //
@@ -124,11 +107,11 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_itemsLst[row].name                                 //
+    return m_itemsLst[row].m_Name                                 //
            + '\t'                                               //
-           + QString::number(m_itemsLst[row].size) + "Byte(s)"  //
+           + QString::number(m_itemsLst[row].m_Size) + "Byte(s)"  //
            + '\t'                                               //
-           + m_rootPath + '/' + m_itemsLst[row].relPath;
+           + m_rootPath + '/' + m_itemsLst[row].m_RelPath;
   }
 
   QString GetARelSelection(const int& row) const {
@@ -136,19 +119,19 @@ public:
       return {};
     }
     const auto& item = m_itemsLst[row];
-    return item.relPath + item.name;
+    return item.m_RelPath + item.m_Name;
   }
   QString GetARootPath(const int& row) const {
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_rootPath + '/' + m_itemsLst[row].relPath;
+    return m_rootPath + '/' + m_itemsLst[row].m_RelPath;
   }
   QString GetASelection(const int& row) const {
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_itemsLst[row].name;
+    return m_itemsLst[row].m_Name;
   }
 
 private:
@@ -162,7 +145,7 @@ private:
   bool checkPathNeed(const QString& path, const bool queryWhenSearchUnderLargeDirectory = true);
 
   QString m_rootPath;
-  QList<FileProperty> m_itemsLst;
+  FilePropertyHelper::FilePropertyInfoList m_itemsLst;
   QFileIconProvider m_iconProvider;
 
   QDir::Filters m_filters;
@@ -172,7 +155,6 @@ private:
   QSet<QModelIndex> m_disableList;  // QFileSystemModel: only setNameFilter will effect this
   // SearchModel: both setNameFilter and contents will effect this
   QSet<QModelIndex> m_recycleSet;
-  static const QStringList HORIZONTAL_HEADER_NAMES;
 };
 
 #endif  // ADVANCESEARCHMODEL_H

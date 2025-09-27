@@ -68,6 +68,10 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   AdjustButtonPosition();
 }
 
+ImgVidOthInFolderPreviewer::~ImgVidOthInFolderPreviewer() {
+  SaveState();
+}
+
 void ImgVidOthInFolderPreviewer::operator()(const QString& pth) {  // file system view
   if (NeedUpdateImgs()) {
     const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
@@ -109,7 +113,7 @@ void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& vidsLst) {
   mVidsModel->UpdateData(vidsLst);
 }
 
-void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) {
+void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) { // no usage now
   if (!NeedUpdateOthers()) {
     return;
   }

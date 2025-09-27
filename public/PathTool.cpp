@@ -118,7 +118,7 @@ bool HasLetter(const QString& fullpath, int startIdx) {
   return false;
 }
 
-std::pair<QString, QString> GetBaseNameExt(const QString& fullpath) {
+BASE_NAME_2_DOT_EXT GetBaseNameExt(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
   if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes

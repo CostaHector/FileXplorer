@@ -4,7 +4,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include "EnumIntAction.h"
-#include "DuplicateImageDetectionCriteria.h"
+#include "DuplicateImagesHelper.h"
 
 extern template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 

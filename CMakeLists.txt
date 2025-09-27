@@ -11,6 +11,7 @@ add_definitions(
     -D_UNICODE
 )
 # on windows platform. MediaInfoDLL.h defined a typdef needed
+message("[${PROJECT_NAME}] Start...")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -128,6 +129,7 @@ else()
     add_executable(${PROJECT_NAME}
         ${SOURCES}
         ${RESOURCES}
+        Model/FloatingModelsTest.cpp
     )
 endif()
 
