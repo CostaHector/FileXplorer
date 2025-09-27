@@ -1,5 +1,5 @@
 ﻿#include "AdvanceSearchTableView.h"
-#include "FileBasicOperationsActions.h"
+#include "FileOpActs.h"
 #include "ViewActions.h"
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
@@ -27,7 +27,7 @@ AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, 
 }
 
 void AdvanceSearchTableView::subscribe() {
-  auto& fileOpInst = g_fileBasicOperationsActions();
+  auto& fileOpInst = FileOpActs::GetInst();
   connect(fileOpInst._FORCE_RESEARCH, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
 
   addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
@@ -41,7 +41,7 @@ void AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
     if (this->selectionModel()->hasSelection()) {
-      emit g_fileBasicOperationsActions().MOVE_TO_TRASHBIN->triggered();
+      emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
     }
     e->accept();
     return;

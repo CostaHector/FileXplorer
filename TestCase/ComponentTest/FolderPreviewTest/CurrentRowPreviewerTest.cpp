@@ -63,6 +63,7 @@ private slots:
     QString testPath = "/test/path";
     previewer(testPath);
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::FILE_SYSTEM_VIEW);
+    QCOMPARE(previewer.GetCurPath(), testPath);
 
     // 2. CAST
     QSqlRecord record;

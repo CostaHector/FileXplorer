@@ -8,14 +8,8 @@
 #include <QMessageBox>
 
 bool SceneActionsSubscribe::BindWidget(QListView* tableView, ScenesListModel* model) {
-  if (tableView == nullptr) {
-    LOG_W("tableView is nullptr");
-    return false;
-  }
-  if (model == nullptr) {
-    LOG_W("model is nullptr");
-    return false;
-  }
+  CHECK_NULLPTR_RETURN_FALSE(tableView);
+  CHECK_NULLPTR_RETURN_FALSE(model);
   _tableView = tableView;
   _model = model;
   return true;
@@ -26,7 +20,7 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
   QString beforeIndexStr = ags.mPageIndexInputLE->text();
   bool isNumber{false};
   int beforePageInd = beforeIndexStr.toInt(&isNumber);
-  if (not isNumber) {
+  if (!isNumber) {
     LOG_D("Error before index");
     return false;
   }
@@ -55,61 +49,52 @@ bool SceneActionsSubscribe::PageIndexIncDec(const QAction* pageAct) {
   }
   LOG_D("page index changed: %d->%d", beforePageInd, dstPageInd);
   ags.mPageIndexInputLE->setText(QString::number(dstPageInd));
-  emit ags.mPageIndexInputLE->textChanged(ags.mPageIndexInputLE->text());
+  SetPageIndex();
   return true;
 }
 
 void SceneActionsSubscribe::SetScenesGroupByPage(bool groupByPageAction) {
   auto& ags = g_SceneInPageActions();
-  if (ags.mPagesSelectTB == nullptr) {
-    LOG_C("mPagesSelectTB is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(ags.mPageIndexInputLE)
+  CHECK_NULLPTR_RETURN_VOID(ags.mPagesSelectTB)
+
   ags.mPageIndexInputLE->setEnabled(groupByPageAction);
   ags.mPagesSelectTB->setEnabled(groupByPageAction);
 
-  if (_model == nullptr) {
-    LOG_C("_model is nullptr");
-    return;
-  }
-
-  if (groupByPageAction) {
-    SetScenesPerColumn();
-  } else {
-    _model->ShowAllScenesInOnePage();
-  }
+  CHECK_NULLPTR_RETURN_VOID(_model)
+  SetScenesCountPerPage();
 }
 
 void SceneActionsSubscribe::SetPageIndex() {
+  CHECK_NULLPTR_RETURN_VOID(_model);
+
   auto& ags = g_SceneInPageActions();
   const QString& pageIndStr = ags.mPageIndexInputLE->text();
   bool isNumber{false};
   int pageIndex = pageIndStr.toInt(&isNumber);
-  if (not isNumber) {
+  if (!isNumber) {
     LOG_D("Page Index str[%s] invalid", qPrintable(pageIndStr));
-    return;
-  }
-  if (_model == nullptr) {
-    LOG_W("_model is nullptr");
     return;
   }
   _model->SetPageIndex(pageIndex);
 }
 
-bool SceneActionsSubscribe::SetScenesPerColumn() {
-  if (_model == nullptr) {
-    LOG_W("_model is nullptr");
-    return false;
-  }
+bool SceneActionsSubscribe::SetScenesCountPerPage() {
+  CHECK_NULLPTR_RETURN_FALSE(_model);
 
   auto& ags = g_SceneInPageActions();
-  const QString& scenesCnt1PageStr = ags.mPageDimensionLE->text();
-  bool isPageScenesCntValid = false;
-  const int scenesCnt1Page = scenesCnt1PageStr.toInt(&isPageScenesCntValid);
-  if (!isPageScenesCntValid) {
-    LOG_D("Page scenes count str[%s] invalid", qPrintable(scenesCnt1PageStr));
-    return false;
+
+  int scenesCnt1Page = -1;
+  if (ags._GROUP_BY_PAGE->isChecked()) {
+    const QString& scenesCnt1PageStr = ags.mPageDimensionLE->text();
+    bool isPageScenesCntValid = false;
+    scenesCnt1Page = scenesCnt1PageStr.toInt(&isPageScenesCntValid);
+    if (!isPageScenesCntValid) {
+      LOG_D("Page scenes count str[%s] invalid", qPrintable(scenesCnt1PageStr));
+      return false;
+    }
   }
+
   Configuration().setValue("SCENES_COUNT_EACH_PAGE", scenesCnt1Page);
   _model->ChangeItemsCntIn1Page(scenesCnt1Page);
   return true;
@@ -117,27 +102,19 @@ bool SceneActionsSubscribe::SetScenesPerColumn() {
 
 void SceneActionsSubscribe::SortSceneItems() {
   auto& ags = g_SceneInPageActions();
-  if (ags._ORDER_AG == nullptr || ags._REVERSE_SORT == nullptr) {
-    LOG_C("_ORDER_AG or _REVERSE_SORT is nullptr");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(ags._ORDER_AG);
+  CHECK_NULLPTR_RETURN_VOID(ags._REVERSE_SORT);
   QAction* triggerAct = ags._ORDER_AG->checkedAction();
-  if (triggerAct == nullptr) {
-    LOG_C("triggerAct is nullptr, nothing sort option is select");
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(triggerAct)
   const QString sortOptionStr{triggerAct->text()};
   const bool bReverse{ags._REVERSE_SORT->isChecked()};
-  SceneInfoManager::SceneSortOption sortOption = SceneInfoManager::GetSortOptionFromStr(sortOptionStr);
-  LOG_D("sort option: %s, bReverse: %d", qPrintable(sortOptionStr), bReverse);
-  _model->SortOrder(sortOption, bReverse);
+  // LOG_D("sort option: %s, bReverse: %d", qPrintable(sortOptionStr), bReverse);
+  // todo:
 }
 
-void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
-  if (_model == nullptr || _tableView == nullptr) {
-    LOG_D("_model or _tableView is nullptr");
-    return;
-  }
+int SceneActionsSubscribe::CombineMediaInfoIntoJson() {
+  CHECK_NULLPTR_RETURN_FALSE(_model);
+  CHECK_NULLPTR_RETURN_FALSE(_tableView);
   const QString& rootPath = _model->rootPath();
   if (rootPath.count('/') < 2) {  // large folder
     LOG_D("Combine Media Info may cause lag. As [%s] contains a large json/vid/img(s)", qPrintable(rootPath));
@@ -145,57 +122,28 @@ void SceneActionsSubscribe::CombineMediaInfoIntoJson() {
         QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
       LOG_D("User cancel Combine Media Info on a large path[%s]", qPrintable(rootPath));
-      return;
+      return 0;
     }
   }
 
-  JsonDataRefresher jdr;
-  int jsonUpdatedCnt = jdr(rootPath);
+  SceneInfoManager::ScnMgr jdr;
+  int jsonUpdatedCnt = jdr(rootPath).m_jsonUpdatedCnt;
   if (jsonUpdatedCnt >= 0) {
     LOG_OK_P("Json(s) Update succeed", "count: %d, rootpath:%s", jsonUpdatedCnt, qPrintable(rootPath));
   }
-  int scnFileCnt = jdr.GenerateScnFiles();
+
+  int scnFileCnt = jdr.WriteDictIntoScnFiles();
   if (scnFileCnt == -1) {
     LOG_ERR_NP("Combine scn file failed. May path not exist", rootPath);
-    return;
+    return scnFileCnt;
   }
   if (scnFileCnt == 0) {
     LOG_OK_NP("Skip. No json file find, No need to combine scn file", rootPath);
-    return;
+    return scnFileCnt;
   }
   LOG_OK_P("Update scn file(s) succeed", "cnt: %d, rootpath:%s", scnFileCnt, qPrintable(rootPath));
   _model->setRootPath(rootPath, true);
-}
-
-void SceneActionsSubscribe::UpdateScnFilesOnly() {
-  if (_model == nullptr || _tableView == nullptr) {
-    LOG_D("_model or _tableView is nullptr");
-    return;
-  }
-  CHECK_NULLPTR_RETURN_VOID(_model)
-  CHECK_NULLPTR_RETURN_VOID(_tableView)
-  const QString& rootPath = _model->rootPath();
-  if (rootPath.count('/') < 2) {  // large folder
-    LOG_D("Update Scn file may cause lag. As [%s] contains a large json(s)", qPrintable(rootPath));
-    const auto ret =
-        QMessageBox::warning(_tableView, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
-    if (ret != QMessageBox::StandardButton::Yes) {
-      LOG_INFO_NP("User cancel Update Scn file on a large path", rootPath);
-      return;
-    }
-  }
-
-  int scnFileCnt = SceneInfoManager::GenerateAScnFile(rootPath);
-  if (scnFileCnt == -1) {
-    LOG_ERR_NP("Update scn file failed. May path not exist", rootPath);
-    return;
-  }
-  if (scnFileCnt == 0) {
-    LOG_OK_NP("[Skip] No json file find, No need to update scn file at all", rootPath);
-    return;
-  }
-  LOG_OK_P("[Ok] Update scn file(s)", "count: %d, rootPath: %s", scnFileCnt, qPrintable(rootPath));
-  _model->setRootPath(rootPath);
+  return scnFileCnt;
 }
 
 bool SceneActionsSubscribe::operator()() {
@@ -210,11 +158,10 @@ bool SceneActionsSubscribe::operator()() {
 
   auto& ags = g_SceneInPageActions();
   connect(ags._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneActionsSubscribe::CombineMediaInfoIntoJson);
-  connect(ags._UPDATE_SCN_ONLY, &QAction::triggered, this, &SceneActionsSubscribe::UpdateScnFilesOnly);
   connect(ags._ORDER_AG, &QActionGroup::triggered, this, &SceneActionsSubscribe::SortSceneItems);
   connect(ags._REVERSE_SORT, &QAction::triggered, this, &SceneActionsSubscribe::SortSceneItems);
-  connect(ags._GROUP_BY_PAGE, &QAction::triggered, this, &SceneActionsSubscribe::SetScenesGroupByPage);
-  connect(ags.mPageDimensionLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesPerColumn);
+  connect(ags._GROUP_BY_PAGE, &QAction::toggled, this, &SceneActionsSubscribe::SetScenesGroupByPage);
+  connect(ags.mPageDimensionLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetScenesCountPerPage);
   connect(ags.mPageIndexInputLE, &QLineEdit::textChanged, this, &SceneActionsSubscribe::SetPageIndex);
   connect(ags.mPagesSelectTB, &QToolBar::actionTriggered, this, &SceneActionsSubscribe::PageIndexIncDec);
   return true;

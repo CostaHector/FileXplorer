@@ -47,7 +47,7 @@ void SearchProxyModel::PrintRegexDebugMessage() const {
 
 void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const QString& contentText) {
   // triggered by enter key
-  if (_searchSourceModel) {
+  if (_searchSourceModel != nullptr) {
     _searchSourceModel->clearDisables();
   }
   m_nameRawString = nameText;
@@ -70,26 +70,6 @@ void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const
   }
 }
 
-void SearchProxyModel::startFilterWhenTextChanges(const QString& nameText, const QString& contentText) {
-  // triggered by text changed
-  m_nameRawString = nameText;
-  m_contentRawText = contentText;
-  using namespace SearchTools;
-  switch (m_searchMode) {
-    case SearchModeE::NORMAL:
-      setFilterFixedString(nameText);
-      break;
-    case SearchModeE::REGEX:
-      setFilterRegularExpression(nameText);
-      break;
-    case SearchModeE::FILE_CONTENTS:
-      return;
-    default:
-      LOG_W("Search mode[%d] not support", (int)m_searchMode);
-      break;
-  }
-}
-
 void SearchProxyModel::setContentFilter(const QString& contentText) {
   m_contentRawText = contentText;  // file contents full match m_fileContFilter
 }
@@ -104,7 +84,7 @@ bool SearchProxyModel::ReturnPostOperation(const bool isPass, const QModelIndex&
   if (!m_nameFilterDisableOrHide) {  // true: disable, false: hide
     return false;                    // hidden and normal
   }
-  if (_searchSourceModel) {
+  if (_searchSourceModel != nullptr) {
     _searchSourceModel->appendDisable(index);
   }
   return true;  // show and gray/disable
@@ -113,8 +93,7 @@ bool SearchProxyModel::ReturnPostOperation(const bool isPass, const QModelIndex&
 bool SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const {
   // when m_nameFilterDisablesOrHidden is true,  and not pass => hidden,         pass => show
   // when m_nameFilterDisablesOrHidden is false, and not pass => grayAndDisable, pass => show
-  static constexpr int NAME_INDEX = 0;
-  const QModelIndex nameModelIndex = sourceModel()->index(source_row, NAME_INDEX, source_parent);
+  const QModelIndex nameModelIndex = sourceModel()->index(source_row, FilePropertyHelper::Name, source_parent);
   // 1. Check if file name pass the name filter
   const bool isFileNamePass = QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
   if (m_searchMode != SearchTools::SearchModeE::FILE_CONTENTS) {
@@ -139,4 +118,12 @@ bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const Q
   const QString& fileContents = FileTool::TextReader(filePath);
   // Todo: new feature on the way: regex match, parms text is a wildcard
   return fileContents.contains(contained, m_fileContentsCaseSensitive);
+}
+
+void SearchProxyModel::ForceStartFilterInTest() {
+  const int rowCount = sourceModel()->rowCount();
+  for (int i = 0; i < rowCount; ++i) {
+    filterAcceptsRow(i, QModelIndex());
+  }
+  LOG_D("Force start filter [0, %d)", rowCount);
 }

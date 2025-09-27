@@ -3,12 +3,12 @@
 
 #include "CustomTableView.h"
 #include "JsonTableModel.h"
-#include "JsonProxyModel.h"
 #include "MultiLineEditDelegate.h"
+#include <QSortFilterProxyModel>
 
 class JsonTableView : public CustomTableView {
  public:
-  explicit JsonTableView(JsonTableModel* jsonModel, JsonProxyModel* jsonProxyModel, QWidget* parent = nullptr);
+  explicit JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent = nullptr);
   QModelIndex CurrentIndexSource() const;
   QModelIndexList selectedRowsSource(JSON_KEY_E column = JSON_KEY_E::Name) const;
 
@@ -40,7 +40,7 @@ class JsonTableView : public CustomTableView {
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};
-  JsonProxyModel* _JsonProxyModel{nullptr};
+  QSortFilterProxyModel* _JsonProxyModel{nullptr};
   MultiLineEditDelegate* m_DetailEdit{nullptr};
 };
 

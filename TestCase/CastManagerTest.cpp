@@ -12,12 +12,12 @@
 #include "CastManager.h"
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
-
+#include "JsonTestPrecoditionTools.h"
 #include "PublicMacro.h"
 
 class CastManagerTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   CastManagerTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString rootpath{mDir.path()};
@@ -26,85 +26,58 @@ public:
   QList<FsNodeEntry> gNodeEntries;
   CastManager* cmInLLT{nullptr};
   StudiosManager* smInLLT{nullptr};
-private slots:
+ private slots:
   void initTestCase() {
+    // 1. at first cast_list.txt and studio_list.txt file not exist
     CastManager& instCast = CastManager::getInst();
-    instCast.InitializeImpl(gLocalFilePath);
-    cmInLLT = &instCast;
-
+    {
+      instCast.InitializeImpl(gLocalFilePath);
+      QVERIFY(instCast.CastSet().isEmpty());
+    }
     StudiosManager& instStudio = StudiosManager::getInst();
-    instStudio.ResetStateForTestImpl(gStudioLocalFilePath);
-    smInLLT = &instStudio;
+    {
+      instStudio.InitializeImpl(gStudioLocalFilePath);
+      QVERIFY(instStudio.ProStudioMap().isEmpty());
+    }
 
-    static const char JSON_CONTENTS[]{R"({
-    "Bitrate": "",
-    "Cast": [
-        "Cast1NotExist",
-        "Cast2NotExist"
-    ],
-    "Detail": "This is just a json example.",
-    "Duration": 0,
-    "Hot": [
-    ],
-    "Name": "My Good Boy",
-    "Rate": 4,
-    "Resolution": "720p",
-    "Size": "126113854",
-    "Studio": "StudioNotExist",
-    "Tags": [
-        "nonporn"
-    ],
-    "Uploaded": "20231022"
-}
-)"};
     QVERIFY(mDir.IsValid());
     gNodeEntries = QList<FsNodeEntry>  //
         {
-         FsNodeEntry{"cast_list.txt", false, {}},                    //
-         FsNodeEntry{"My Good Boy.json", false, JSON_CONTENTS},      //
-         FsNodeEntry{"studio_list.txt", false, {}},                  //
-         FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},    //
-         FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},  //
-         FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},      //
-         FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
-         };
-    mDir.createEntries(gNodeEntries);
-  }
-  void cleanup() {
-    QFile fiCast{gLocalFilePath};
-    if (fiCast.size() > 0) {  // clear file
-      fiCast.resize(0);
-    }
-    QFile fiStudio{gStudioLocalFilePath};
-    if (fiStudio.size() > 0) {  // clear file
-      fiStudio.resize(0);
-    }
-  }
+            FsNodeEntry{"cast_list.txt", false, "any random cast1\nanother random cast2"},    //
+            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS},  //
+            FsNodeEntry{"studio_list.txt", false, "any random studio\tAnyRandomStudio"},      //
+            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},                          //
+            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},                        //
+            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},                            //
+            FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
+        };
+    QCOMPARE(mDir.createEntries(gNodeEntries), gNodeEntries.size());
 
-  void test_cast_list_file_empty_nothing_read_out() {
-    const QFile castListFi{gLocalFilePath};
-    QVERIFY2(castListFi.exists(), qPrintable(gLocalFilePath));  // file exist
-    QCOMPARE(castListFi.size(), 0);                             // empty file
-    QVERIFY2(cmInLLT->count() == 0, "Cast count in llt should be empty");
-  }
-
-  void test_cast_list_not_empty_in_service() {
-    const CastManager& pmInsService{CastManager::getInst()};
-    QVERIFY2(pmInsService.count() >= 0, "Cast count in service should greater than 0");
+    // 2. ResetStateForTestImpl ok
+    {
+      instCast.ResetStateForTestImpl(gLocalFilePath);
+      QCOMPARE(instCast.CastSet().size(), 2); // 2 elements
+      cmInLLT = &instCast;
+    }
+    {
+      instStudio.ResetStateForTestImpl(gStudioLocalFilePath);
+      QCOMPARE(instStudio.ProStudioMap().size(), 1); // 1 element
+      smInLLT = &instStudio;
+    }
   }
 
   void test_sentenceSplit() {
     // precondition
     const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    decltype(cmInLLT->m_casts) tempPerfs;
+    CAST_MGR_DATA_T tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT->m_casts.swap(tempPerfs);
+    cmInLLT->CastSet().swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT->m_casts.swap(tempPerfs);
+      cmInLLT->CastSet().swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT->m_casts.isEmpty());
+    QVERIFY(!cmInLLT->CastSet().isEmpty());
 
     // procedure
     const QStringList& actualCastList = (*cmInLLT)("Matt Dallas - Chris Pine and Jensen Ackles.");
@@ -116,15 +89,15 @@ private slots:
     const QStringList allCastList{"Jean le Rond d'Alembert", "Frenkie de Jong", "L Hospital", "James"};
     // 4 word(not support now), 3 word, 2 word, 1 word
     const QStringList expectCastList{"Frenkie de Jong", "L Hospital", "James"};
-    decltype(cmInLLT->m_casts) tempPerfs;
+    CAST_MGR_DATA_T tempPerfs;
     for (const QString& star : allCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT->m_casts.swap(tempPerfs);
+    cmInLLT->CastSet().swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT->m_casts.swap(tempPerfs);
+      cmInLLT->CastSet().swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT->m_casts.isEmpty());
+    QVERIFY(!cmInLLT->CastSet().isEmpty());
 
     // single quote not used to split
     // and/And(insensitive) used to split
@@ -132,9 +105,12 @@ private slots:
     const QString sentence{"Jean le Rond d'Alembert AND Frenkie de Jong///L Hospital\\\\James"};
     const QStringList& expectWordSection{"Jean", "le", "Rond", "d'Alembert", "Frenkie", "de", "Jong", "L", "Hospital", "James"};
 
+    QCOMPARE(cmInLLT->SplitSentence(""), (QStringList{})); // empty string in empty list out
+
     const auto& actualWordsList = cmInLLT->SplitSentence(sentence);
     QCOMPARE(actualWordsList, expectWordSection);
 
+    QCOMPARE(cmInLLT->FilterPerformersOut({}), (QStringList{})); // empty string in empty list out
     const auto& actualCast1 = cmInLLT->FilterPerformersOut(actualWordsList);
     const auto& actualCast2 = (*cmInLLT)(sentence);
     QCOMPARE(actualCast1, actualCast2);
@@ -145,15 +121,15 @@ private slots:
   void test_one_char_seperator() {
     // precondition
     const QStringList expectCastList{"U", "V", "W", "X", "Y", "Z"};
-    decltype(cmInLLT->m_casts) tempPerfs;
+    CAST_MGR_DATA_T tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT->m_casts.swap(tempPerfs);
+    cmInLLT->CastSet().swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT->m_casts.swap(tempPerfs);
+      cmInLLT->CastSet().swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT->m_casts.isEmpty());
+    QVERIFY(!cmInLLT->CastSet().isEmpty());
 
     const auto& perfsList = (*cmInLLT)("U! + V; / W. \\\\ X & Y and Z?");
     QCOMPARE(perfsList, expectCastList);
@@ -162,15 +138,15 @@ private slots:
   void test_with_new_line_seperator() {
     // precondition
     const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    decltype(cmInLLT->m_casts) tempPerfs;
+    CAST_MGR_DATA_T tempPerfs;
     for (const QString& star : expectCastList) {
       tempPerfs.insert(star.toLower());
     }
-    cmInLLT->m_casts.swap(tempPerfs);
+    cmInLLT->CastSet().swap(tempPerfs);
     ON_SCOPE_EXIT {
-      cmInLLT->m_casts.swap(tempPerfs);
+      cmInLLT->CastSet().swap(tempPerfs);
     };
-    QVERIFY(!cmInLLT->m_casts.isEmpty());
+    QVERIFY(!cmInLLT->CastSet().isEmpty());
 
     const auto& perfsList = (*cmInLLT)("Matt Dallas \n Chris Pine \r\n Jensen Ackles");
     QCOMPARE(perfsList, expectCastList);
@@ -207,9 +183,9 @@ private slots:
     };
 
     QSet<QString> emptyCastSet;
-    cmInLLT->m_casts.swap(emptyCastSet);
+    cmInLLT->CastSet().swap(emptyCastSet);
     ON_SCOPE_EXIT {
-      cmInLLT->m_casts.swap(emptyCastSet);
+      cmInLLT->CastSet().swap(emptyCastSet);
     };
 
     // cached should updated, local file should not write
@@ -222,7 +198,7 @@ private slots:
 
     bool castLocalFileWrite{false};
     QCOMPARE(cmInLLT->LearningFromAPath(rootpath, &castLocalFileWrite), 2);
-    QCOMPARE(cmInLLT->m_casts, expectCastSet);
+    QCOMPARE(cmInLLT->CastSet(), expectCastSet);
     QCOMPARE(castLocalFileWrite, true);
     const QFile fiCast{gLocalFilePath};
     QVERIFY(fiCast.size() > 0);
@@ -235,7 +211,7 @@ private slots:
 
     castLocalFileWrite = true;
     QCOMPARE(cmInLLT->LearningFromAPath(rootpath, &castLocalFileWrite), 0);
-    QCOMPARE(cmInLLT->m_casts, expectCastSet);
+    QCOMPARE(cmInLLT->CastSet(), expectCastSet);
     QCOMPARE(castLocalFileWrite, false);  // skipped, no write
   }
 };

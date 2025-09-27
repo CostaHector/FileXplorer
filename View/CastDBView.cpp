@@ -2,11 +2,8 @@
 
 #include "CastDBActions.h"
 #include "FdBasedDb.h"
-#include "FileFolderPreviewer.h"
 #include "JsonHelper.h"
-#include "MemoryKey.h"
 #include "NotificatorMacro.h"
-#include "PathTool.h"
 #include "CastPsonFileHelper.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
@@ -62,8 +59,8 @@ void CastDBView::subscribe() {
   connect(castInst.DELETE_RECORDS, &QAction::triggered, this, &CastDBView::onDeleteRecords);
   connect(castInst.INIT_DATABASE, &QAction::triggered, &_castDb, &DbManager::CreateDatabase);
   connect(castInst.INIT_TABLE, &QAction::triggered, this, &CastDBView::onInitATable);
-  connect(castInst.DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DROP); });
-  connect(castInst.DELETE_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManager::DROP_OR_DELETE::DELETE); });
+  connect(castInst.DROP_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManagerHelper::DropOrDeleteE::DROP); });
+  connect(castInst.DELETE_TABLE, &QAction::triggered, this, [this]() { onDropDeleteTable(DbManagerHelper::DropOrDeleteE::DELETE); });
 
   connect(castInst.SYNC_SELECTED_RECORDS_IMGS_FROM_DISK, &QAction::triggered, this, &CastDBView::onSyncImgsFieldFromImageHost);
   connect(castInst.SYNC_ALL_RECORDS_IMGS_FROM_DISK, &QAction::triggered, this, &CastDBView::onSyncAllImgsFieldFromImageHost);
@@ -150,7 +147,7 @@ int CastDBView::onDeleteRecords() {
   return succeedCnt;
 }
 
-bool CastDBView::onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete) {
+bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDelete) {
   auto retBtn = QMessageBox::warning(this,                                                                          //
                                      QString("Confirm %1?").arg((int)dropOrDelete),                                 //
                                      "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //

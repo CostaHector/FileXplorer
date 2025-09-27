@@ -17,6 +17,22 @@ inline void InitStdItemModel(QStandardItemModel& model, const QString& cellConte
   }
 }
 
+inline void InitHorizontalHeaderLabels(QStandardItemModel& model, const QString& horizontalHeaderContent = "column %1 th") {
+  QStringList horHeaders;
+  horHeaders.reserve(model.columnCount());
+  for (int horIndex = 0; horIndex < model.columnCount(); ++horIndex) {
+    horHeaders.push_back(horizontalHeaderContent.arg(horIndex));
+  }
+  model.setHorizontalHeaderLabels(horHeaders);
+
+  QStringList verHeaders;
+  verHeaders.reserve(model.rowCount());
+  for (int verIndex = 0; verIndex < model.rowCount(); ++verIndex) {
+    verHeaders.push_back(QString{"row %1 th"}.arg(verIndex));
+  }
+  model.setVerticalHeaderLabels(verHeaders);
+}
+
 }  // namespace ModelTestHelper
 
 namespace HeaderRectHelper {

@@ -9,23 +9,31 @@
 #include "DuplicateVideosFinderActions.h"
 #include "VideoTestPrecoditionTools.h"
 #include "PublicVariable.h"
-#include "VidDupTabFields.h"
+#include "PublicMacro.h"
+#include "TDir.h"
+
+using namespace VideoTestPrecoditionTools;
 
 class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
-  void initTestCase() { //
-    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
-  }
+public:
+  TDir tdir;
+  QString aNewDupVidPrePath = tdir.path();
+  SetDatabaseParmRetType dbNameSetResult = setDupVidDbAbsFilePath(aNewDupVidPrePath);
+  SetDatabaseParmRetType connNameSetResult = setDupVidDbConnectionName("DUP_VID_FINDER_CONN_TEST", __LINE__);
 
-  void cleanupTestCase() { //
-    DupVidsManager::DropDatabaseForTest(VidDupHelper::GetAiDupVidDbPath(), false);
+private slots:
+  void initTestCase() { //
+    QVERIFY(tdir.IsValid());
+    QVERIFY2(dbNameSetResult.first, qPrintable(dbNameSetResult.second));
+    QVERIFY2(connNameSetResult.first, qPrintable(connNameSetResult.second));
   }
 
   void dragMoveDropEvent_dropTable_ok() {
     // precondition
     DuplicateVideosMetaInfoTable dupTv;
+    QVERIFY(dupTv.mDupVidMngr.GetCfgDebug().contains(dbNameSetResult.second)); // db file is in a temporary directory
+    QVERIFY(dupTv.mDupVidMngr.GetCfgDebug().contains(connNameSetResult.second)); // db file is in a temporary directory
     QVERIFY(dupTv.m_aiMediaTblModel != nullptr);
     dupTv.LoadAiMediaTableNames();
     QCOMPARE(dupTv.m_aiMediaTblModel->rowCount(), 0);
@@ -36,8 +44,16 @@ class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
     QMimeData emptyMimeData;
     emptyMimeData.setText("No urls");
     QDragEnterEvent ignoreDragEnter(dragEnterPos, Qt::DropAction::IgnoreAction, &emptyMimeData, Qt::LeftButton, Qt::NoModifier);
-    QDragMoveEvent ignoreMoveEnter(dragEnterPos, Qt::DropAction::IgnoreAction, &emptyMimeData, Qt::LeftButton, Qt::KeyboardModifier::NoModifier);
-    QDropEvent dropOnFileIgnoredEvent(dragEnterPos, Qt::DropAction::IgnoreAction, &emptyMimeData, Qt::LeftButton, Qt::KeyboardModifier::NoModifier);
+    QDragMoveEvent ignoreMoveEnter(dragEnterPos,
+                                   Qt::DropAction::IgnoreAction,
+                                   &emptyMimeData,
+                                   Qt::LeftButton,
+                                   Qt::KeyboardModifier::NoModifier);
+    QDropEvent dropOnFileIgnoredEvent(dragEnterPos,
+                                      Qt::DropAction::IgnoreAction,
+                                      &emptyMimeData,
+                                      Qt::LeftButton,
+                                      Qt::KeyboardModifier::NoModifier);
     dupTv.dragEnterEvent(&ignoreDragEnter);
     QCOMPARE(ignoreDragEnter.isAccepted(), false);
     dupTv.dragMoveEvent(&ignoreMoveEnter);
@@ -49,11 +65,20 @@ class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
     // with url event get accept
     QMimeData urlsMimeData;
     urlsMimeData.setText("2 urls");
-    QList<QUrl> urlsList{QUrl::fromLocalFile(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH), QUrl::fromLocalFile(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH)};
+    QList<QUrl> urlsList{QUrl::fromLocalFile(VID_DUR_GETTER_SAMPLE_PATH),
+                         QUrl::fromLocalFile(TS_FILE_MERGER_SAMPLE_PATH)};
     urlsMimeData.setUrls(urlsList);
     QDragEnterEvent acceptDragEnter(dragEnterPos, Qt::DropAction::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
-    QDragMoveEvent acceptMoveEnter(dragEnterPos, Qt::DropAction::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::KeyboardModifier::NoModifier);
-    QDropEvent dropOnFileAcceptEvent(dragEnterPos, Qt::DropAction::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::KeyboardModifier::NoModifier);
+    QDragMoveEvent acceptMoveEnter(dragEnterPos,
+                                   Qt::DropAction::IgnoreAction,
+                                   &urlsMimeData,
+                                   Qt::LeftButton,
+                                   Qt::KeyboardModifier::NoModifier);
+    QDropEvent dropOnFileAcceptEvent(dragEnterPos,
+                                     Qt::DropAction::IgnoreAction,
+                                     &urlsMimeData,
+                                     Qt::LeftButton,
+                                     Qt::KeyboardModifier::NoModifier);
     dupTv.dragEnterEvent(&acceptDragEnter);
     QCOMPARE(acceptDragEnter.isAccepted(), true);
     dupTv.dragMoveEvent(&acceptMoveEnter);
@@ -69,13 +94,13 @@ class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
 
     dupTv.clearSelection();
     QCOMPARE(dupTv.selectionModel()->hasSelection(), false);
-    emit dupVidActsInst.DROP_THESE_TABLES->triggered();     // nothing select, skip
-    QCOMPARE(dupTv.m_aiMediaTblModel->m_data, beforeData);  // unchange
+    emit dupVidActsInst.DROP_THESE_TABLES->triggered();    // nothing select, skip
+    QCOMPARE(dupTv.m_aiMediaTblModel->m_data, beforeData); // unchange
 
     dupTv.selectAll();
     QCOMPARE(dupTv.selectionModel()->hasSelection(), true);
-    emit dupVidActsInst.DROP_THESE_TABLES->triggered();      // all select, nothing left
-    QVERIFY(dupTv.m_aiMediaTblModel->m_data != beforeData);  // changed
+    emit dupVidActsInst.DROP_THESE_TABLES->triggered();     // all select, nothing left
+    QVERIFY(dupTv.m_aiMediaTblModel->m_data != beforeData); // changed
     QVERIFY(dupTv.m_aiMediaTblModel->m_data.isEmpty());
   }
 
@@ -84,32 +109,32 @@ class DuplicateVideosMetaInfoTableTest : public PlainTestSuite {
     auto& dupVidAgInst = g_dupVidFinderAg();
     // %1 videos in %2 tables
     static auto isTitleMessageInExpect = [](const QString& title, const int videosCount, const int tablesCount) -> bool {
-      return title.contains(QString("%1 videos in %2 tables").arg(videosCount).arg(tablesCount), Qt::CaseInsensitive);  //
+      return title.contains(QString("%1 videos in %2 tables").arg(videosCount).arg(tablesCount), Qt::CaseInsensitive); //
     };
 
     DuplicateVideosMetaInfoTable dupTv;
     QCOMPARE(dupTv.onScanAPath(__FILE__), false); // scan a file, skip
-    QCOMPARE(dupTv.onScanAPath(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH), true);
+    QCOMPARE(dupTv.onScanAPath(VID_DUR_GETTER_SAMPLE_PATH), true);
     QCOMPARE(dupTv.m_aiMediaTblModel->rowCount(), 1);
 
     // no selection below:
     QCOMPARE(dupTv.onAnalyzeTheseSelectedTables(), 0);
-    QCOMPARE(dupTv.startAnalyzeNewTables({}), 0);  // no videos need analyse
+    QCOMPARE(dupTv.startAnalyzeNewTables({}), 0); // no videos need analyse
     QCOMPARE(dupTv.onClearAnalyzeList(), 0);
     QCOMPARE(dupTv.onAuditSelectedTables(), true);
     QCOMPARE(dupTv.onForceReloadTables(), true);
     QCOMPARE(dupTv.onDropSelectedTables(), true);
-    QCOMPARE(dupTv.onOpenTableAssociatedPath(QModelIndex{}), false);  // invalid index
+    QCOMPARE(dupTv.onOpenTableAssociatedPath(QModelIndex{}), false); // invalid index
 
     // has only 1 table, select all is also select one
     dupTv.selectRow(0);
-    QDir dir(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH, "", QDir::SortFlag::Name, QDir::Filter::Files);
+    QDir dir(VID_DUR_GETTER_SAMPLE_PATH, "", QDir::SortFlag::Name, QDir::Filter::Files);
     const QStringList vidNames = dir.entryList(TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET);
 
     // 1. anaylze emit title changed signal
     QSignalSpy windowTitleChangedSpy(&dupTv, &DuplicateVideosMetaInfoTable::windowTitleChanged);
     QSignalSpy analzedTableFinishedSpy(&dupTv, &DuplicateVideosMetaInfoTable::analyzeTablesFinished);
-    emit dupVidAgInst.ANALYSE_THESE_TABLES->triggered();  // trigger onAnalyzeTheseSelectedTables
+    emit dupVidAgInst.ANALYSE_THESE_TABLES->triggered(); // trigger onAnalyzeTheseSelectedTables
     QCOMPARE(dupTv.mVideosListNeedAnalyse.size(), vidNames.size());
     QCOMPARE(analzedTableFinishedSpy.count(), 1);
     QCOMPARE(windowTitleChangedSpy.count(), 1);

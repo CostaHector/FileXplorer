@@ -27,7 +27,7 @@ private:
   int onAppendCasts();
   int onDeleteRecords();
 
-  bool onDropDeleteTable(const DbManager::DROP_OR_DELETE dropOrDelete);
+  bool onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDelete);
   bool DropSqlDatabase();
 
   bool onSubmit();

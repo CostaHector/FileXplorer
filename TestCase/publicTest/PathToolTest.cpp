@@ -331,6 +331,22 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE("A/VID/C.ext", PathTool::GetEffectiveName("C:/A/VID/C.ext"));
     QCOMPARE("A/video_ts/C.ext", PathTool::GetEffectiveName("C:/A/video_ts/C.ext"));
   }
+
+  void fileExtensionBasic_test() {
+    QCOMPARE(PathTool::GetFileExtension("AAA.mp4"), ".mp4");
+    QCOMPARE(PathTool::GetFileExtension("AAA.json"), ".json");
+    QCOMPARE(PathTool::GetFileExtension("AAA.z01"), ".z01");
+  }
+
+  void fileExtension_1Char_test() {
+    QCOMPARE(PathTool::GetFileExtension("AAA.h"), ".h");
+    QCOMPARE(PathTool::GetFileExtension("AAA.m"), ".m");
+  }
+
+  void fileExtension_NoExtension_test() {
+    QCOMPARE(PathTool::GetFileExtension("AAA.5"), ".5");
+    QCOMPARE(PathTool::GetFileExtension("AAA.51"), ".51");
+  }
 };
 
 #include "PathToolTest.moc"

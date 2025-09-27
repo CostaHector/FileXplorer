@@ -4,6 +4,7 @@
 #include <QString>
 #include <QFileInfo>
 #include <QSqlDatabase>
+#include "DbManagerHelper.h"
 
 struct VolumeUpdateResult {
   void Init() {
@@ -40,16 +41,8 @@ enum FD_ERROR_CODE {
   FD_OK = 0,
 };
 
-// DROP DATABASE `DB_NAME`;
-
 class DbManager : public QObject {
  public:
-  enum class DROP_OR_DELETE {
-    DROP = 0,
-    DELETE = 1,
-  };
-
-  static QString GetRmvCmdTemplate(DROP_OR_DELETE dropOrDelete);
 #ifdef RUNNING_UNIT_TESTS
   static bool DropAllTablesForTest(const QString& connName);
   static bool DropDatabaseForTest(const QString& dbFullName, const bool bRecycle = true);
@@ -62,22 +55,18 @@ class DbManager : public QObject {
 
   bool CreateDatabase();
   bool CreateTable(const QString& tableName, const QString& tableDefinitionTemplate);
-  int RmvTable(const QString& tableNameRegexPattern, DROP_OR_DELETE dropOrDelete, bool isFullMatch = true);
-  int DropTable(const QString& tableNameRegexPattern) {
-    // Deletes the entire table along with its structure, indexes, triggers, and all associated objects.
-    return RmvTable(tableNameRegexPattern, DROP_OR_DELETE::DROP);
-  }
-  int ClearTable(const QString& tableNameRegexPattern) {
-    // Deletes specific records (rows) from the table but retains the table structure and its associated objects (such as indexes, triggers, etc.).
-    return RmvTable(tableNameRegexPattern, DROP_OR_DELETE::DELETE);
-  }
+
+  int RmvTable(const QString& tableName, DbManagerHelper::DropOrDeleteE dropOrDelete);
+   // Deletes the entire table along with its structure, indexes, triggers, and all associated objects.
+  int DropTable(const QString& tableName) { return RmvTable(tableName, DbManagerHelper::DropOrDeleteE::DROP); }
+   // Deletes specific records (rows) from the table but retains the table structure and its associated objects (such as indexes, triggers, etc.).
+  int ClearTable(const QString& tableName) { return RmvTable(tableName, DbManagerHelper::DropOrDeleteE::DELETE);}
+
+  bool IsTableExist(const QString& tableName) const;
 
   QSqlDatabase GetDb(bool open = true) const;
   QString GetCfgDebug() const { return "table:" + mDbName + "| conn:" + mConnName; }
   bool CheckValidAndOpen(QSqlDatabase& db) const;
-  static bool IsMatch(const QString& s, const QRegularExpression& regex);
-  static const QString DROP_TABLE_TEMPLATE;
-  static const QString DELETE_TABLE_TEMPLATE;
 
   bool QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) const;
   int UpdateForTest(const QString& qryCmd) const;

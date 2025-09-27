@@ -221,7 +221,7 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
 void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const {
   static StudiosManager& psm = StudiosManager::getInst();
   hintStudio = psm(m_Name);
-  if (m_Studio != hintStudio) {
+  if (m_Studio != hintStudio) { // not equal update
     studioChanged = true;
   } else {
     studioChanged = false;
@@ -231,7 +231,7 @@ void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged,
   static CastManager& pm = CastManager::getInst();
   const QStringList& hintPerfsList = pm(m_Name + " " + selectedText);
   QSet<QString> elseCastSet{hintPerfsList.cbegin(), hintPerfsList.cend()};
-  elseCastSet.subtract(m_Cast.m_set);
+  elseCastSet.subtract(m_Cast.m_set); // has increasing update
   hintCast = elseCastSet.values().join(NameTool::CSV_COMMA);
   if (!elseCastSet.isEmpty()) {
     castChanged = true;

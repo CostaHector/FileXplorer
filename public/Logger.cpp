@@ -104,20 +104,32 @@ bool Logger::AgingLogFiles(const QString& logFileAbsPath, const int AGING_FILE_A
 bool Logger::OpenLogFile() {
   fflush(Logger::out());
   const QString& logAbsPath = GetLogFileAbsPath();
+  if (!QFile::exists(logAbsPath)) {
+    LOG_W("log file[%s] not exist", qPrintable(logAbsPath));
+    return false;
+  }
+#ifndef RUNNING_UNIT_TESTS
   if (!QDesktopServices::openUrl(QUrl::fromLocalFile(logAbsPath))) {
     LOG_W("Open log file[%s] failed", qPrintable(logAbsPath));
     return false;
   }
+#endif
   return true;
 }
 
 bool Logger::OpenLogFolder() {
   const QString& logAbsPath = GetLogFileAbsPath();
   const QString logsFolderPath = QFileInfo{logAbsPath}.absolutePath();
+  if (!QFile::exists(logsFolderPath)) {
+    LOG_W("log file located in folder[%s] not exist", qPrintable(logsFolderPath));
+    return false;
+  }
+#ifndef RUNNING_UNIT_TESTS
   if (!QDesktopServices::openUrl(QUrl::fromLocalFile(logsFolderPath))) {
     LOG_W("Open log folder[%s] failed", qPrintable(logsFolderPath));
     return false;
   }
+#endif
   return true;
 }
 

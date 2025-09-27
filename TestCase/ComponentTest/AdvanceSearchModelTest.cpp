@@ -2,7 +2,6 @@
 #include <QTestEventList>
 #include "PlainTestSuite.h"
 
-#include "Logger.h"
 #include "MemoryKey.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
@@ -12,38 +11,29 @@
 
 class AdvanceSearchModelTest : public PlainTestSuite {
   Q_OBJECT
-public:
-  AdvanceSearchModelTest() : PlainTestSuite{} {
-    LOG_D("AdvanceSearchModelTest object created\n");
-  }
-
+ public:
   TDir tDir;
-  QDir mDir;
-  const QList<FsNodeEntry> nodeEntries//
+  const QString pathRoot5{tDir.path()};
+  const QString pathSub1{tDir.itemPath("Cristiano Ronaldo")};
+  const QList<FsNodeEntry> nodeEntries  //
       {
-          FsNodeEntry{"Cristiano Ronaldo/Kaka.txt",                 false, "My Eyes Never Lie.txt"}, //
-          FsNodeEntry{"Cristiano Ronaldo vs Goalkeeper record.txt", false, "Cristiano Ronaldo.txt"}, //
-          FsNodeEntry{"Cristiano Ronaldo Tuxedo.svg",               false, "Cristiano Ronaldo.svg"}, //
-          FsNodeEntry{"Cristiano Ronaldo Wallpaper.jpg",            false, "Wallpaper.jpg"}, //
-          FsNodeEntry{"Cristiano Ronaldo Football.jpg",             false, "Football.jpg"}, //
+          FsNodeEntry{"Cristiano Ronaldo/Kaka.txt", false, "My Eyes Never Lie.txt"},                  //
+          FsNodeEntry{"Cristiano Ronaldo vs Goalkeeper record.txt", false, "Cristiano Ronaldo.txt"},  //
+          FsNodeEntry{"Cristiano Ronaldo Tuxedo.svg", false, "Cristiano Ronaldo.svg"},                //
+          FsNodeEntry{"Cristiano Ronaldo Wallpaper.jpg", false, "Wallpaper.jpg"},                     //
+          FsNodeEntry{"Cristiano Ronaldo Football.jpg", false, "Football.jpg"},                       //
       };
-  QString pathRoot5, pathSub1;
   const QDir::Filters DEFAULT_DIR_FILTERS{QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
 
-private slots:
+ private slots:
   void initTestCase() {
     QVERIFY(tDir.IsValid());
-    pathRoot5 = tDir.path();
     QCOMPARE(tDir.createEntries(nodeEntries), nodeEntries.size());
-
-    mDir = QDir{pathRoot5};
-    QVERIFY(mDir.exists());
-    pathSub1 = mDir.absoluteFilePath("Cristiano Ronaldo");
   }
 
-  void test_initial_states_ok () {
+  void test_initial_states_ok() {
     // precondition:
-    QVERIFY(pathRoot5.count('/') >= 2); // at least 3 slash char
+    QVERIFY(pathRoot5.count('/') >= 2);  // at least 3 slash char
 
     AdvanceSearchModel sourceModel;
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
@@ -80,7 +70,6 @@ private slots:
     QCOMPARE(sourceModel.m_filters, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
     QCOMPARE(sourceModel.m_iteratorFlags, QDirIterator::IteratorFlag::NoIteratorFlags);
 
-
     // 2. in subdirectory
     sourceModel.setRootPath(pathSub1);
     // no iterator, Dir|NotDotAndDotDot
@@ -93,7 +82,7 @@ private slots:
 
   void test_force_refresh_ok() {
     // precondition:
-    QVERIFY(pathRoot5.count('/') >= 2); // at least 3 slash char
+    QVERIFY(pathRoot5.count('/') >= 2);  // at least 3 slash char
     AdvanceSearchModel sourceModel;
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
     sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::NoIteratorFlags);
@@ -102,10 +91,10 @@ private slots:
     QCOMPARE(sourceModel.checkPathNeed(""), false);
     QCOMPARE(sourceModel.rowCount(), 0);
     sourceModel.m_rootPath = pathRoot5;
-    sourceModel.setRootPath(pathRoot5); // already here, skip into this path
+    sourceModel.setRootPath(pathRoot5);  // already here, skip into this path
     QCOMPARE(sourceModel.rowCount(), 0);
     sourceModel.forceRefresh();
-    QCOMPARE(sourceModel.rowCount(), 5); // forece into this path. no iterator
+    QCOMPARE(sourceModel.rowCount(), 5);  // forece into this path. no iterator
   }
 
   void test_search_name_normal_only() {
@@ -113,27 +102,27 @@ private slots:
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
     sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
     sourceModel.setRootPath(pathRoot5);
-    QCOMPARE(sourceModel.rowCount(), 5+1);
+    QCOMPARE(sourceModel.rowCount(), 5 + 1);
 
     SearchProxyModel searchProxyModel;
     searchProxyModel.setSourceModel(&sourceModel);
 
     searchProxyModel.initSearchMode(SearchTools::SearchModeE::NORMAL);
-    searchProxyModel.initNameFilterDisables(false); // bDisableOrHide: false (Hide directly)
+    searchProxyModel.initNameFilterDisables(false);  // bDisableOrHide: false (Hide directly)
     // 1. case sensitive
     searchProxyModel.initFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     searchProxyModel.initFileContentsCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
 
-    searchProxyModel.startFilterWhenTextChanged("jpg", "no use content string now");//
+    searchProxyModel.startFilterWhenTextChanged("jpg", "no use content string now");  //
     QCOMPARE(searchProxyModel.rowCount(), 2);
 
-    searchProxyModel.startFilterWhenTextChanged("svg", "no use content string now");//
+    searchProxyModel.startFilterWhenTextChanged("svg", "no use content string now");  //
     QCOMPARE(searchProxyModel.rowCount(), 1);
 
-    searchProxyModel.startFilterWhenTextChanged("Cristiano Ronaldo", "no use content string now");//
+    searchProxyModel.startFilterWhenTextChanged("Cristiano Ronaldo", "no use content string now");  //
     QCOMPARE(searchProxyModel.rowCount(), 5);
 
-    searchProxyModel.startFilterWhenTextChanged("Kaka", "no use content string now");//
+    searchProxyModel.startFilterWhenTextChanged("Kaka", "no use content string now");  //
     QCOMPARE(searchProxyModel.rowCount(), 1);
 
     searchProxyModel.startFilterWhenTextChanged("KAKA", "no use content string now");
@@ -154,27 +143,27 @@ private slots:
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
     sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
     sourceModel.setRootPath(pathRoot5);
-    QCOMPARE(sourceModel.rowCount(), 5+1);
+    QCOMPARE(sourceModel.rowCount(), 5 + 1);
 
     SearchProxyModel searchProxyModel;
     searchProxyModel.setSourceModel(&sourceModel);
 
     searchProxyModel.initSearchMode(SearchTools::SearchModeE::REGEX);
-    searchProxyModel.initNameFilterDisables(false); // bDisableOrHide: false (Hide directly)
+    searchProxyModel.initNameFilterDisables(false);  // bDisableOrHide: false (Hide directly)
     // 1. case sensitive
     searchProxyModel.initFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     searchProxyModel.initFileContentsCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
 
-    searchProxyModel.startFilterWhenTextChanged("g$", "no use content string now");//
-    QCOMPARE(searchProxyModel.rowCount(), 3); // 2xjpg and 1xsvg
-    searchProxyModel.startFilterWhenTextChanged("G$", "no use content string now");//
+    searchProxyModel.startFilterWhenTextChanged("g$", "no use content string now");  //
+    QCOMPARE(searchProxyModel.rowCount(), 3);                                        // 2xjpg and 1xsvg
+    searchProxyModel.startFilterWhenTextChanged("G$", "no use content string now");  //
     QCOMPARE(searchProxyModel.rowCount(), 0);
 
     // 2. case insensitive
     searchProxyModel.initFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
     searchProxyModel.initFileContentsCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
     searchProxyModel.startFilterWhenTextChanged("^c", "no use content string now");
-    QCOMPARE(searchProxyModel.rowCount(), 5); // 5xCristiano
+    QCOMPARE(searchProxyModel.rowCount(), 5);  // 5xCristiano
   }
 
   void test_search_name_regex_and_contents_contains_only() {
@@ -182,27 +171,151 @@ private slots:
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
     sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
     sourceModel.setRootPath(pathRoot5);
-    QCOMPARE(sourceModel.rowCount(), 5+1);
+    QCOMPARE(sourceModel.rowCount(), 5 + 1); // and 1 under subfolder
 
     SearchProxyModel searchProxyModel;
     searchProxyModel.setSourceModel(&sourceModel);
 
     searchProxyModel.initSearchMode(SearchTools::SearchModeE::FILE_CONTENTS);
-    searchProxyModel.initNameFilterDisables(false); // bDisableOrHide: false (Hide directly)
+    searchProxyModel.initNameFilterDisables(false);  // bDisableOrHide: false (Hide directly)
     // 1. name regex, contents contain, case sensitive
     searchProxyModel.initFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     searchProxyModel.initFileContentsCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
 
-    searchProxyModel.startFilterWhenTextChanged("g$", "Cristiano Ronaldo");//
-    QCOMPARE(searchProxyModel.rowCount(), 1); // 2xjpg and 1xsvg | then only 1
-    searchProxyModel.startFilterWhenTextChanged("G$", "Cristiano Ronaldo");//
-    QCOMPARE(searchProxyModel.rowCount(), 0); // 0
+    searchProxyModel.startFilterWhenTextChanged("g$", "Cristiano Ronaldo");  //
+    QCOMPARE(searchProxyModel.rowCount(), 1);                                // 2xjpg and 1xsvg | then only 1
+    searchProxyModel.startFilterWhenTextChanged("G$", "Cristiano Ronaldo");  //
+    QCOMPARE(searchProxyModel.rowCount(), 0);                                // 0
 
     // 2. name regex, contents contain, case insensitive
     searchProxyModel.initFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
     searchProxyModel.initFileContentsCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
     searchProxyModel.startFilterWhenTextChanged("^c", "TXT");
-    QCOMPARE(searchProxyModel.rowCount(), 1); // 5xCristiano| then only "Kaka.txt"
+    QCOMPARE(searchProxyModel.rowCount(), 1);  // 5xCristiano| then only "Kaka.txt"
+  }
+
+  void source_model_data_retrieve_ok() {
+    AdvanceSearchModel sourceModel;
+    using namespace FilePropertyHelper;
+    {  // when root path not set
+      QCOMPARE(sourceModel.columnCount(), SEARCH_TABLE_HEADERS_COUNT);
+      QCOMPARE(sourceModel.rowCount(), 0);
+      QVERIFY(SEARCH_TABLE_HEADERS_COUNT >= 2);
+
+      QCOMPARE(sourceModel.headerData(PropColumnE::Name, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(),
+               SEARCH_TABLE_HEADERS[PropColumnE::Name]);
+      QCOMPARE(sourceModel.headerData(PropColumnE::Size, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(),
+               SEARCH_TABLE_HEADERS[PropColumnE::Size]);
+      sourceModel.headerData(1999, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole);  // will not crash down
+
+      QCOMPARE(sourceModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 0 + 1);
+      sourceModel.headerData(999, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt();  // will not crash down
+
+      QCOMPARE(sourceModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
+
+      QCOMPARE(sourceModel.data(QModelIndex{}, Qt::ItemDataRole::DisplayRole).isNull(), true);
+    }
+
+    sourceModel.initFilter(DEFAULT_DIR_FILTERS);
+    sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::NoIteratorFlags);
+    sourceModel.setRootPath(pathRoot5);
+    QCOMPARE(sourceModel.rowCount(), 5);
+
+    const QModelIndex firstInd = sourceModel.index(0, PropColumnE::Name);
+
+    QCOMPARE(sourceModel.fileName(firstInd), "Cristiano Ronaldo");
+    QCOMPARE(sourceModel.data(firstInd, Qt::ItemDataRole::DisplayRole).toString(), "Cristiano Ronaldo");
+
+    QString firstFileAbsFilePath = sourceModel.m_rootPath + "/" +
+                                   sourceModel.data(sourceModel.index(0, PropColumnE::RelPath), Qt::ItemDataRole::DisplayRole).toString() +
+                                   "Cristiano Ronaldo";
+    QCOMPARE(firstFileAbsFilePath, tDir.itemPath("Cristiano Ronaldo"));
+    QCOMPARE(sourceModel.filePath(firstInd), tDir.itemPath("Cristiano Ronaldo"));
+
+    const QString actualAbsPath = sourceModel.absolutePath(firstInd);
+    QCOMPARE(actualAbsPath + "Cristiano Ronaldo", tDir.itemPath("Cristiano Ronaldo"));
+
+    QCOMPARE(sourceModel.fullInfo(firstInd).contains("Cristiano Ronaldo"), true);
+    QFileInfo fi(sourceModel.fileInfo(firstInd));
+    QCOMPARE(fi.absoluteFilePath(), tDir.itemPath("Cristiano Ronaldo"));
+
+    QCOMPARE(sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole).isValid(), true);  // from icon provider
+    sourceModel.CutSomething({firstInd});
+    sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole);  // from inexist svg file
+    sourceModel.CopiedSomething({firstInd});
+    sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole);
+    QCOMPARE(sourceModel.data(firstInd.siblingAtColumn(PropColumnE::Size), Qt::ItemDataRole::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
+
+    QVERIFY(sourceModel.m_disableList.isEmpty());
+    QVERIFY(sourceModel.m_recycleSet.isEmpty());
+    QVERIFY(sourceModel.data(firstInd, Qt::ItemDataRole::ForegroundRole).isNull()); // should be null
+
+    {  // invalid index should not crash down
+      QModelIndex invalidIndex;
+      sourceModel.fileInfo(invalidIndex);
+      QCOMPARE(sourceModel.fileName(invalidIndex), "");
+      QCOMPARE(sourceModel.filePath(invalidIndex), "");
+      QCOMPARE(sourceModel.absolutePath(invalidIndex), "");
+    }
+  }
+
+  void mix_model_recycleSomething_proxy_disable_somthing_ok() {
+    AdvanceSearchModel sourceModel;
+    sourceModel.initFilter(DEFAULT_DIR_FILTERS);
+    sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::NoIteratorFlags);
+    sourceModel.setRootPath(pathRoot5);
+    QCOMPARE(sourceModel.rowCount(), 5);
+
+    SearchProxyModel searchProxyModel;
+    searchProxyModel.setSourceModel(nullptr);  // not crash down
+    searchProxyModel.setSourceModel(&sourceModel);
+    searchProxyModel.setFilterKeyColumn(FilePropertyHelper::Name);
+
+    searchProxyModel.initNameFilterDisables(false);  // hide
+    searchProxyModel.initSearchMode(SearchTools::SearchModeE::FILE_CONTENTS);
+
+    const QModelIndex firstIndex = sourceModel.index(0, FilePropertyHelper::Name);
+
+    {  // 1. recycle => red
+      QVERIFY(sourceModel.m_disableList.isEmpty());
+      QVERIFY(sourceModel.m_recycleSet.isEmpty());
+      sourceModel.RecycleSomething({firstIndex});
+      QCOMPARE(sourceModel.m_recycleSet.isEmpty(), false);
+
+      QVariant recycleColorVar = sourceModel.data(firstIndex, Qt::ItemDataRole::ForegroundRole);
+      QVERIFY(recycleColorVar.isValid());
+      QVERIFY(recycleColorVar.canConvert<QColor>());
+      QCOMPARE(recycleColorVar.value<QColor>(), QColor(Qt::GlobalColor::red));
+
+      sourceModel.ClearRecycle();
+      QCOMPARE(sourceModel.m_recycleSet.isEmpty(), true);
+    }
+
+    {  // 2. disable => gray
+      searchProxyModel.setSearchMode(SearchTools::SearchModeE::NORMAL);
+      searchProxyModel.setNameFilterDisables(true);  // gray
+
+      searchProxyModel.setFileContentsCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
+      searchProxyModel.setFileContentsCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
+
+      searchProxyModel.setFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
+      searchProxyModel.setFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
+
+      QVERIFY(sourceModel.m_disableList.isEmpty());
+      searchProxyModel.startFilterWhenTextChanged("not exist name", "");
+      searchProxyModel.ForceStartFilterInTest();
+      QCOMPARE(sourceModel.m_disableList.size(), 5);
+
+      QCOMPARE(sourceModel.rowCount(), 5);       //
+      QCOMPARE(searchProxyModel.rowCount(), 5);  // all items grayed
+
+      QVariant disgrayedColorVar = sourceModel.data(firstIndex, Qt::ItemDataRole::ForegroundRole);
+      QVERIFY(disgrayedColorVar.isValid());
+      QVERIFY(disgrayedColorVar.canConvert<QColor>());
+      QCOMPARE(disgrayedColorVar.value<QColor>(), QColor(Qt::GlobalColor::lightGray));
+
+      sourceModel.clearDisables();
+    }
   }
 };
 

@@ -10,8 +10,8 @@
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceSearchTableView.h"
 #include "EndToExposePrivateMember.h"
-#include "FileBasicOperationsActions.h"
-
+#include "FileOpActs.h"
+#include "MimeDataHelper.h"
 #include <QDir>
 
 class AdvanceSearchTableViewTest : public PlainTestSuite {
@@ -43,12 +43,44 @@ class AdvanceSearchTableViewTest : public PlainTestSuite {
     AdvanceSearchTableView advSearch{&sourceModel, &searchProxyModel};
     sourceModel.setRootPath(rootPath);
 
+    // 1. filter ok
     searchProxyModel.startFilterWhenTextChanged("files", "HENRY");
-    QCOMPARE(searchProxyModel.rowCount(), 2);
+    QCOMPARE(searchProxyModel.rowCount(), 2); // here we filter out 2 items.
 
-    QSignalSpy removeSignalSpy(g_fileBasicOperationsActions().MOVE_TO_TRASHBIN,
+    { // 2. copy/cut selections ok (first half procedure)
+      advSearch.selectAll(); // the index of selection is discrete
+      QModelIndexList rowsSelected2 = advSearch.selectionModel()->selectedRows(0); // the name row
+      QCOMPARE(rowsSelected2.size(), 2);
+      auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSearchModel(sourceModel, searchProxyModel, rowsSelected2);
+      QCOMPARE(mimeDataMember.texts.size(), 2);
+      QCOMPARE(mimeDataMember.urls.size(), 2);
+      QCOMPARE(mimeDataMember.srcIndexes.size(), 2);
+
+      const QString expectPaths = mimeDataMember.texts.join('\n');
+      QCOMPARE(expectPaths.count("files 1.txt"), 1);
+      QCOMPARE(expectPaths.count("files 2.txt"), 1);
+      QCOMPARE(expectPaths.count("\n"), 1);
+
+      // cut
+      QVERIFY(MimeDataHelper::FillCutCopySomething<AdvanceSearchModel>(sourceModel, mimeDataMember.srcIndexes, Qt::DropAction::MoveAction));
+      QCOMPARE(sourceModel.mCutIndexes.isEmpty(), false);
+      QCOMPARE(sourceModel.mCopyIndexes.isEmpty(), true);
+
+      // copy
+      QVERIFY(MimeDataHelper::FillCutCopySomething<AdvanceSearchModel>(sourceModel, mimeDataMember.srcIndexes, Qt::DropAction::CopyAction));
+      QCOMPARE(sourceModel.mCutIndexes.isEmpty(), true);
+      QCOMPARE(sourceModel.mCopyIndexes.isEmpty(), false);
+
+      // not support actions. cut/copy index unchange
+      QVERIFY(!MimeDataHelper::FillCutCopySomething<AdvanceSearchModel>(sourceModel, mimeDataMember.srcIndexes, Qt::DropAction::LinkAction));
+      QCOMPARE(sourceModel.mCutIndexes.isEmpty(), true);
+      QCOMPARE(sourceModel.mCopyIndexes.isEmpty(), false);
+    }
+
+    // 3. remove selections ok
+    advSearch.clearSelection();
+    QSignalSpy removeSignalSpy(FileOpActs::GetInst().MOVE_TO_TRASHBIN,
                                &QAction::triggered);
-
     // nothing selected
     QKeyEvent deleteEvent{QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier, QString(), false, 1};
     advSearch.keyPressEvent(&deleteEvent);

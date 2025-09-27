@@ -5,6 +5,27 @@
 #include <QMenu>
 #include <QTableView>
 
+#ifdef RUNNING_UNIT_TESTS
+namespace UserSpecifiedIntValueMock {
+inline bool& mockBoolOk() {
+  static bool bOk = false;
+  return bOk;
+}
+inline int& mockIntValue() {
+  static int intValue = 0;
+  return intValue;
+}
+inline void MockQInputDialogGetInt(bool bOk, int iValue) {
+  mockBoolOk() = bOk;
+  mockIntValue() = iValue;
+}
+inline QString& mockColumnsShowSwitch() {
+  static QString columnsShowSwitch01Chars = ""; // e.g. "010101" means even column hide. odd columns is show
+  return columnsShowSwitch01Chars;
+}
+}
+#endif
+
 class CustomTableView : public QTableView {
  public:
   explicit CustomTableView(const QString& name, QWidget* parent = nullptr);
@@ -28,9 +49,9 @@ class CustomTableView : public QTableView {
   void onHorizontalHeaderMenuRequest(const QPoint& pnt);
   void onVerticalHeaderMenuRequest(const QPoint& pnt);
 
-  void onSetRowMaxHeight();
-  void onSetRowDefaultSectionSize();
-  void onSetColumnDefaultSectionSize();
+  bool onSetRowMaxHeight();
+  bool onSetRowDefaultSectionSize();
+  bool onSetColumnDefaultSectionSize();
 
   void onShowHorizontalHeader(bool showChecked);
   void onShowVerticalHeader(bool showChecked);

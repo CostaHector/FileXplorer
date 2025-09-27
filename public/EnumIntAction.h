@@ -15,8 +15,8 @@ public:
     return mActGrp != nullptr && !mVal2Enum.isEmpty();
   }
 
-  void init(QHash<QAction*, ENUM_T> act2Enum, ENUM_T tempVal, QActionGroup::ExclusionPolicy exclusivePlcy = QActionGroup::ExclusionPolicy::None) {
-    DEFAULT_ENUM = tempVal;
+  void init(QHash<QAction*, ENUM_T> act2Enum, ENUM_T whenInvalidEnum, QActionGroup::ExclusionPolicy exclusivePlcy = QActionGroup::ExclusionPolicy::None) {
+    DEFAULT_ENUM = whenInvalidEnum;
     mAct2Enum = act2Enum;
 
     for (auto it = act2Enum.cbegin(); it != act2Enum.cend(); ++it) {

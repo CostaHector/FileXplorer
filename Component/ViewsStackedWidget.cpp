@@ -106,7 +106,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
     }
     case ViewType::SCENE: {
       CHECK_NULLPTR_RETURN_FALSE(m_scenesModel);
-      m_scenesModel->setFilterRegularExpression(targetStr);
+      // todo: set filter in its proxyModel
       return true;
     }
     case ViewType::JSON: {
