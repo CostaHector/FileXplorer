@@ -17,7 +17,6 @@ class SceneInPageActions : public QObject {
   QToolBar* GetPagesRowByColumnToolBar();
 
   QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
-  QAction* _UPDATE_SCN_ONLY{nullptr};
 
   QAction* _BY_MOVIE_NAME{nullptr};
   QAction* _BY_MOVIE_SIZE{nullptr};

@@ -12,11 +12,11 @@
 using namespace JsonHelper;
 using namespace JsonKey;
 
-class JsonFileHelperTest : public PlainTestSuite {
+class JsonHelperTest : public PlainTestSuite {
   Q_OBJECT
 
  public:
-  JsonFileHelperTest() : PlainTestSuite{} {}
+  JsonHelperTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   static const char mJsonContentStr[];
@@ -40,14 +40,44 @@ class JsonFileHelperTest : public PlainTestSuite {
     QCOMPARE(dict[ENUM_2_STR(Detail)].toString(), JSON_DEF_VAL_Detail);
   }
 
-  void test_JsonStr2Dict() {
-    const char jsonStrArray[] = R"({"Henry Cavill": ["tall",  "muscle"], "Chris Evans": 192})";
-    const QVariantHash actualDict = DeserializedJsonStr2Dict(jsonStrArray);
+  void test_JsonStr2Dict_JsonDict2ByteArray() {
+    const char jsonStr[] = R"({"Henry Cavill": ["tall",  "muscle"], "Chris Evans": 192})";
     const QVariantHash expectDict{
         {"Henry Cavill", QStringList{"tall", "muscle"}},  //
         {"Chris Evans", 192}                              //
     };
-    QCOMPARE(actualDict, expectDict);
+    bool bParseStrOk = false;
+    const QVariantHash dictFromStr = DeserializedJsonStr2Dict(jsonStr, &bParseStrOk);
+    QVERIFY(bParseStrOk);
+    QCOMPARE(dictFromStr, expectDict);
+
+    const QByteArray jsonByteArray = SerializedJsonDict2ByteArray(dictFromStr);
+    bool bParseBaOk = false;
+    const QVariantHash dictFromBa = DeserializedJsonByteArray2Dict(jsonByteArray, &bParseBaOk);
+    QVERIFY(bParseBaOk);
+    QCOMPARE(dictFromBa, expectDict);
+
+    { // bounder test
+      // 1.0 empty dict
+      const char emptyJsonStr[] = R"({})";
+      bool bParseEmptyStr = false;
+      const QVariantHash dictFromEmptyStr = DeserializedJsonStr2Dict(emptyJsonStr, &bParseEmptyStr);
+      QVERIFY(bParseEmptyStr);
+      QVERIFY(dictFromEmptyStr.isEmpty());
+
+      const QByteArray emptyJsonByteArray = SerializedJsonDict2ByteArray(dictFromEmptyStr);
+      bool bParseEmptyBaOk = false;
+      const QVariantHash dictFromEmptyBa = DeserializedJsonByteArray2Dict(emptyJsonByteArray, &bParseEmptyBaOk);
+      QVERIFY(bParseEmptyBaOk);
+      QVERIFY(dictFromEmptyBa.isEmpty());
+
+      // 2.0 invalid extra comma at the end
+      const char invalidJsonStr[] = R"({"Name": "Chris Evans",})";
+      bool bParseInvalidStr = false;
+      const QVariantHash dictFromInvalidStr = DeserializedJsonStr2Dict(invalidJsonStr, &bParseInvalidStr);
+      QVERIFY(!bParseInvalidStr);
+      QVERIFY(dictFromInvalidStr.isEmpty());
+    }
   }
 
   void invalid_json_parse_failed() {
@@ -165,7 +195,7 @@ class JsonFileHelperTest : public PlainTestSuite {
   }
 };
 
-const char JsonFileHelperTest::mJsonContentStr[] {R"(
+const char JsonHelperTest::mJsonContentStr[]{R"(
 {
     "Name": "Frank - 1",
     "Cast": [],
@@ -182,7 +212,7 @@ const char JsonFileHelperTest::mJsonContentStr[] {R"(
     "Detail": "Frank boy’s adventure."
 }
 )"};
-const char JsonFileHelperTest::mInvalidJsonContentStr[] {R"({"Name": "Henry Canvill", })"}; // error: extra trailing comma here
+const char JsonHelperTest::mInvalidJsonContentStr[]{R"({"Name": "Henry Canvill", })"};  // error: extra trailing comma here
 
-#include "JsonFileHelperTest.moc"
-REGISTER_TEST(JsonFileHelperTest, false)
+#include "JsonHelperTest.moc"
+REGISTER_TEST(JsonHelperTest, false)

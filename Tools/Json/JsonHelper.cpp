@@ -17,21 +17,44 @@
 #include <QFile>
 
 namespace JsonHelper {
-bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth) {
-  const auto& jsonObject{QJsonObject::fromVariantHash(dict)};
+QByteArray SerializedJsonDict2ByteArray(const QVariantHash& dict) {
+  if (dict.isEmpty()) {return "{}";}   // JSON标准兼容性——RFC7159
+  const QJsonObject& jsonObject{QJsonObject::fromVariantHash(dict)};
   QJsonDocument document;
   document.setObject(jsonObject);
-  const auto& byteArray = document.toJson(QJsonDocument::JsonFormat::Indented);
-  QFile jsonFile{jsonFilePth};
-  if (!jsonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    jsonFile.close();
-    return false;
+  return document.toJson(QJsonDocument::JsonFormat::Indented);
+}
+
+QVariantHash DeserializedJsonByteArray2Dict(const QByteArray& jsonBa, bool* bParseOk) {
+  if (jsonBa.isEmpty()) { // JSON标准兼容性——RFC7159
+    if (bParseOk) *bParseOk = false;
+    LOG_W("Deserialized empty ByteArray failed");
+    return {};
   }
-  QTextStream out(&jsonFile);
-  out.setCodec("UTF-8");
-  out << byteArray;
-  jsonFile.close();
-  return true;
+  if (jsonBa.simplified() == "{}") {   // 尝试解析最小化形式（无空白）的空对象
+    if (bParseOk) *bParseOk = true;
+    return {};
+  }
+  QJsonParseError jsonErr;
+  const QJsonDocument json_doc = QJsonDocument::fromJson(jsonBa, &jsonErr);
+  if (bParseOk != nullptr) {
+    *bParseOk = jsonErr.error == QJsonParseError::NoError;
+  }
+  if (jsonErr.error != QJsonParseError::NoError) {
+    LOG_W("Deserialized %d ByteArray failed. [code:%d, msg: %s]", jsonBa.size(), (int)jsonErr.error, qPrintable(jsonErr.errorString()));
+    return {};
+  }
+  QJsonObject jsonObject = json_doc.object();
+  return jsonObject.toVariantHash();
+}
+
+QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr, bool* bParseOk) {
+  return DeserializedJsonByteArray2Dict(serializedJsonStr.toUtf8(), bParseOk);
+}
+
+bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth) {
+  const QByteArray& byteArray = SerializedJsonDict2ByteArray(dict);
+  return FileTool::ByteArrayWriter(jsonFilePth, byteArray);
 }
 
 QVariantHash MovieJsonLoader(const QString& jsonFilePth) {
@@ -58,20 +81,6 @@ QJsonObject GetJsonObject(const QString& filePath) {
     return {};
   }
   return json_doc.object();
-}
-
-QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr) {
-  if (serializedJsonStr.isEmpty()) {
-    return {};
-  }
-  QJsonParseError jsonErr;
-  QJsonDocument json_doc = QJsonDocument::fromJson(serializedJsonStr.toUtf8(), &jsonErr);
-  if (jsonErr.error != QJsonParseError::NoError) {
-    LOG_W("Error parse json string %d char(s): %s", serializedJsonStr.size(), qPrintable(jsonErr.errorString()));
-    return {};
-  }
-  const QJsonObject& rootObj = json_doc.object();
-  return rootObj.toVariantHash();
 }
 
 RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int duration, const QString& studio, const QString& cast, const QString& tags) {
