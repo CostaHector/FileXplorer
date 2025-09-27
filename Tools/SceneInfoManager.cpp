@@ -11,6 +11,31 @@
 #include <QTextStream>
 #include <QDateTime>
 
+QString SCENE_INFO::GetAbsolutePath(const QString& rootPath) const {
+  return rootPath + rel2scn;
+}
+
+QString SCENE_INFO::GetFirstImageAbsPath(const QString& rootPath) const {
+  return rootPath + rel2scn + (imgs.isEmpty() ? "" : imgs.front());
+}
+
+QStringList SCENE_INFO::GetImagesAbsPathList(const QString& rootPath) const {
+  QStringList imgsAbsPathList;
+  imgsAbsPathList.reserve(imgs.size());
+  for (const QString& imgName : imgs) {
+    imgsAbsPathList.append(rootPath + rel2scn + imgName);
+  }
+  return imgsAbsPathList;
+}
+
+QString SCENE_INFO::GetVideoAbsPath(const QString& rootPath) const {
+  return vidName.isEmpty() ? "" : rootPath + rel2scn + vidName;
+}
+
+bool SCENE_INFO::operator<(const SCENE_INFO& other) const {
+  return rel2scn != other.rel2scn ? rel2scn < other.rel2scn : name < other.name;
+}
+
 namespace SceneInfoManager {
 SCENE_INFO_LIST GetScnsLstFromPath(const QString& path) {
   if (!QFileInfo(path).isDir()) {
@@ -212,7 +237,7 @@ Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
 
     m_jsonsDicts[path].append(rawJsonDict);
   }
-  return {jsonUpdatedCnt, jsonUsedCnt, imgNameKeyFieldUpdatedCnt, vidNameKeyFieldUpdatedCnt};
+  return Counter{jsonUpdatedCnt, jsonUsedCnt, vidNameKeyFieldUpdatedCnt, imgNameKeyFieldUpdatedCnt};
 }
 
 Counter ScnMgr::operator()(const QString& rootPath) {  // will iterate all sub

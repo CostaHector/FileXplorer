@@ -8,16 +8,18 @@
 
 struct SCENE_INFO {
   QString rel2scn;   // jsonFullPath = mRootPath + relative2scnFile + jsonFileName, rel2scn can be '/' or '/any thing/'
-  QString name;      // name, key"Name"
+  QString name;      // name, key"Name" from json file baseName
   QStringList imgs;  // img, key"ImgName"
   QString vidName;   // video, key"VidName"
   qint64 vidSize;    // video size, from json file, key"Size"
   int rate;          // video rate, from json file, key"Rate"
   QString uploaded;  // from json file, key"Uploaded"
 
-  bool operator<(const SCENE_INFO& other) const {
-    return rel2scn != other.rel2scn ? rel2scn < other.rel2scn : name < other.name;
-  }
+  QString GetAbsolutePath(const QString& rootPath) const;
+  QString GetFirstImageAbsPath(const QString& rootPath) const;
+  QStringList GetImagesAbsPathList(const QString& rootPath) const;
+  QString GetVideoAbsPath(const QString& rootPath) const;
+  bool operator<(const SCENE_INFO& other) const;
 };
 
 typedef QList<SCENE_INFO> SCENE_INFO_LIST;
@@ -25,6 +27,13 @@ typedef QList<SCENE_INFO> SCENE_INFO_LIST;
 namespace SceneInfoManager {
 SCENE_INFO_LIST ParseAScnFile(const QString& scnFileFullPath, const QString rel);
 SCENE_INFO_LIST GetScnsLstFromPath(const QString& path);
+
+#ifdef RUNNING_UNIT_TESTS
+inline SCENE_INFO_LIST& mockScenesInfoList() {
+  static SCENE_INFO_LIST staticSceneInfoList;
+  return staticSceneInfoList;
+}
+#endif
 
 struct Counter {
   Counter(int jsonUpdatedCnt = 0, int jsonUsedCnt = 0, int vidNameKeyFieldUpdatedCnt = 0, int imgNameKeyFieldUpdatedCnt = 0)
@@ -54,17 +63,17 @@ struct Counter {
 
 class ScnMgr {
  public:
-  using PATH_JSON_DICT_LIST = QMap<QString, QList<QVariantHash>>;
+  using PATH_2_JSON_DICTS = QMap<QString, QList<QVariantHash>>;
   Counter operator()(const QString& rootPath);  // will update json contents, than generated scn from refreshed jsons
   int WriteDictIntoScnFiles();
  private:
   Counter UpdateJsonUnderAPath(const QString& path);
 #ifdef RUNNING_UNIT_TESTS
-  void mockJsonDictForTest(const PATH_JSON_DICT_LIST& newValue) {
+  void mockJsonDictForTest(const PATH_2_JSON_DICTS& newValue) {
     m_jsonsDicts = newValue;
   }
 #endif
-  PATH_JSON_DICT_LIST m_jsonsDicts;  // relativePathToJsonFile -> Jsons
+  PATH_2_JSON_DICTS m_jsonsDicts;  // relativePathToJsonFile -> Jsons
 };
 
 }  // namespace SceneInfoManager

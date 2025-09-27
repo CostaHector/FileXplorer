@@ -9,6 +9,7 @@
 #include "JsonHelper.h"
 #include "TDir.h"
 #include "JsonKey.h"
+#include "JsonTestPrecoditionTools.h"
 
 using namespace SceneInfoManager;
 
@@ -76,7 +77,7 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QCOMPARE(tDir.createEntries(jsonAndImgNodes), 2);
       QVERIFY(tDir.checkFileContents("Xander.json", {}, {"Xander.jpg"}));
       ScnMgr scnMgr;
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(1, 1, 1, 0));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(1, 1, 0, 1));
       QVERIFY(tDir.checkFileContents("Xander.json", {"Xander.jpg"}));
       QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
       tDir.ClearAll();
@@ -92,7 +93,7 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QCOMPARE(tDir.createEntries(jsonAndVidNodes), 2);
       QVERIFY(tDir.checkFileContents("Xander.json", {}, {"Xander.mp4"}));
       ScnMgr scnMgr;
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(1, 1, 0, 1));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(1, 1, 1, 0));
       QVERIFY(tDir.checkFileContents("Xander.json", {"Xander.mp4", "22"}));  // Size changed to 22
       QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
       tDir.ClearAll();
@@ -168,7 +169,7 @@ Precondition: Xander.json value of key ImgName, VidName is empty
           };
 
       ScnMgr scnMgr;
-      const ScnMgr::PATH_JSON_DICT_LIST tempPath2Dicts{
+      const ScnMgr::PATH_2_JSON_DICTS tempPath2Dicts{
           {tDir.itemPath("SuperHero"), dictsUnderSuperHero},  //
       };                                                      //
       scnMgr.mockJsonDictForTest(tempPath2Dicts);
@@ -203,7 +204,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       };
 
       ScnMgr scnMgr;
-      const ScnMgr::PATH_JSON_DICT_LIST tempPath2Dicts{
+      const ScnMgr::PATH_2_JSON_DICTS tempPath2Dicts{
           {tDir.itemPath("SuperHero"), dictsUnderSuperHero},  //
           {tDir.itemPath("XMen"), dictsUnderXMen},            //
       };
@@ -229,7 +230,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
 
     {  // 4. 边界情况测试：空场景列表
       ScnMgr scnMgr;
-      ScnMgr::PATH_JSON_DICT_LIST testData;
+      ScnMgr::PATH_2_JSON_DICTS testData;
 
       QVERIFY(tDir.mkpath("Empty"));  // 创建空目录
       testData[tDir.itemPath("Empty")] = {};
@@ -275,7 +276,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       // 第一次调用：应处理所有层级的JSON文件
       Counter result = scnMgr(tDir.path());
 
-      QCOMPARE(result, Counter(3, 3, 2, 3));  // 预期：更新3个JSON，使用3个JSON，更新2个图片字段，更新3个视频字段
+      QCOMPARE(result, Counter(3, 3, 3, 2));  // 预期：更新3个JSON，使用3个JSON，更新3个视频字段, 更新2个图片字段
 
       // 验证文件更新
       // 根目录：Disney.json
@@ -315,7 +316,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       // 创建目录并设置 ScnMgr
       QVERIFY(tDir.mkpath("Marvel"));
       ScnMgr scnMgr;
-      ScnMgr::PATH_JSON_DICT_LIST testData{{tDir.itemPath("Marvel"), scenes}};
+      ScnMgr::PATH_2_JSON_DICTS testData{{tDir.itemPath("Marvel"), scenes}};
       scnMgr.mockJsonDictForTest(testData);
 
       // 生成 .scn 文件
@@ -341,8 +342,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       QCOMPARE(parsedScene.rate, 85);
       QCOMPARE(parsedScene.uploaded, "20241212 12:50:50");
 
-
-      { // bounder test
+      {  // bounder test
         QVERIFY(ParseAScnFile("/home/to/inexist path", "").isEmpty());
       }
 
@@ -379,7 +379,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       // 创建目录并设置 ScnMgr
       QVERIFY(tDir.mkpath("Avengers"));
       ScnMgr scnMgr;
-      ScnMgr::PATH_JSON_DICT_LIST testData{{tDir.itemPath("Avengers"), scenes}};
+      ScnMgr::PATH_2_JSON_DICTS testData{{tDir.itemPath("Avengers"), scenes}};
       scnMgr.mockJsonDictForTest(testData);
 
       // 生成 .scn 文件
@@ -425,34 +425,21 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
   }
 
   void GetScnsLstFromPath_correct() {
+    QVariantHash scene0;
     QVariantHash scene1;
-    scene1["Name"] = "The Last Fight";
-    scene1["ImgName"] = QStringList{"The Last Fight 1.jpg", "The Last Fight 2.jpg"};
-    scene1["VidName"] = "The Last Fight.mp4";
-    scene1["Size"] = 1024 * 1024 * 500;
-    scene1["Rate"] = 10;  // 10 in 10
-    scene1["Uploaded"] = "20221212 13:00:00";
-    QList<QVariantHash> scenesUnderRoot{scene1};
+    QString name0 = "The Last Fight", name1 = "Iron Man";
+    QString scenesUnderRootPath = tDir.path(), scenesUnderSubPath = tDir.itemPath("Avengers");
 
-    QVariantHash scene2;
-    scene2["Name"] = "Iron Man";
-    scene2["ImgName"] = QStringList{"iron1.jpg"};
-    scene2["VidName"] = "iron_man.mp4";
-    scene2["Size"] = 1024 * 1024 * 700;
-    scene2["Rate"] = 9;  // 9 in 10
-    scene2["Uploaded"] = "20241212 13:00:00";
-    QList<QVariantHash> scenesUnderAvengers{scene2};
-
-    const QString scene1BaseName = tDir.baseName();
+    QString scene0ScnFileBaseName = tDir.baseName(); // aka scn file located in folder name
     QVERIFY(tDir.mkpath("Avengers"));
+
+    ScnMgr::PATH_2_JSON_DICTS testData =
+        JsonTestPrecoditionTools::GetPathJsonDictList(name0, scenesUnderRootPath, scene0, name1, scenesUnderSubPath, scene1);
+
     ScnMgr scnMgr;
-    ScnMgr::PATH_JSON_DICT_LIST testData{
-        {tDir.path(), {scenesUnderRoot}},
-        {tDir.itemPath("Avengers"), {scenesUnderAvengers}},
-    };
     scnMgr.mockJsonDictForTest(testData);
     QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 2);  // 2 scn files
-    const QString expect1stScnFileAbsPath = tDir.itemPath(scene1BaseName + ".scn");
+    const QString expect1stScnFileAbsPath = tDir.itemPath(scene0ScnFileBaseName + ".scn");
     const QString expect2ndScnFileAbsPath = tDir.itemPath("Avengers/Avengers.scn");
     QVERIFY(QFile::exists(expect1stScnFileAbsPath));
     QVERIFY(QFile::exists(expect2ndScnFileAbsPath));
@@ -460,27 +447,28 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     SCENE_INFO_LIST scenesFromScn = GetScnsLstFromPath(tDir.path());
     QCOMPARE(scenesFromScn.size(), 2);
 
+    QCOMPARE(scenesFromScn[0].rel2scn, "/");           // be the first
+    QCOMPARE(scenesFromScn[1].rel2scn, "/Avengers/");  // be the second
+
+    QCOMPARE(scenesFromScn[0].name, "The Last Fight");
+    QCOMPARE(scenesFromScn[1].name, "Iron Man");
+
     // start check;
-    // when traverse a directory to read scn file. it use sort by relName ascii QDirIterator. so ascii least means read first
-    SCENE_INFO parsedLastFightScene = scenesFromScn[0];  // scene1BaseName  "Filexxxx"  "The Last Fight"
-    SCENE_INFO parsedIconMen = scenesFromScn[1];         //                 "Avengers"  "Iron Man"
-    if (parsedLastFightScene.name != "The Last Fight") {
-      std::swap(parsedLastFightScene, parsedIconMen);
-    }
+    // when traverse a directory to read scn file. it use sort by rel2scn. so ascii least means read first
 
     // check key `Name`, `ImgName`, `VidName`, `Size` field value should same as QVariantHash
-    QCOMPARE(parsedLastFightScene.name, "The Last Fight");  // The Last Fight
-    QCOMPARE(parsedLastFightScene.imgs, scene1["ImgName"].toStringList());
-    QCOMPARE(parsedLastFightScene.vidName, scene1["VidName"].toString());
-    QCOMPARE(parsedLastFightScene.vidSize, scene1["Size"].toLongLong());
-    const QString LastFightSceneScnFileAbsPath = tDir.path() + parsedLastFightScene.rel2scn + (scene1BaseName + ".scn");
+    QCOMPARE(scenesFromScn[0].name, "The Last Fight");  // The Last Fight
+    QCOMPARE(scenesFromScn[0].imgs, scene0["ImgName"].toStringList());
+    QCOMPARE(scenesFromScn[0].vidName, scene0["VidName"].toString());
+    QCOMPARE(scenesFromScn[0].vidSize, scene0["Size"].toLongLong());
+    const QString LastFightSceneScnFileAbsPath = tDir.path() + scenesFromScn[0].rel2scn + (scene0ScnFileBaseName + ".scn");
     QCOMPARE(LastFightSceneScnFileAbsPath, expect1stScnFileAbsPath);
 
-    QCOMPARE(parsedIconMen.name, "Iron Man");  //
-    QCOMPARE(parsedIconMen.imgs, scene2["ImgName"].toStringList());
-    QCOMPARE(parsedIconMen.vidName, scene2["VidName"].toString());
-    QCOMPARE(parsedIconMen.vidSize, scene2["Size"].toLongLong());
-    const QString IconMenScnFileAbsPath = tDir.path() + parsedIconMen.rel2scn + "Avengers.scn";
+    QCOMPARE(scenesFromScn[1].name, "Iron Man");  //
+    QCOMPARE(scenesFromScn[1].imgs, scene1["ImgName"].toStringList());
+    QCOMPARE(scenesFromScn[1].vidName, scene1["VidName"].toString());
+    QCOMPARE(scenesFromScn[1].vidSize, scene1["Size"].toLongLong());
+    const QString IconMenScnFileAbsPath = tDir.path() + scenesFromScn[1].rel2scn + "Avengers.scn";
     QCOMPARE(IconMenScnFileAbsPath, expect2ndScnFileAbsPath);
   }
 };
