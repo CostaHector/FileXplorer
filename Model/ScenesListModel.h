@@ -15,21 +15,11 @@ public:
  bool setRootPath(const QString& rootPath, const bool bForce = false);
  inline QString rootPath() const { return mRootPath; }
 
-  inline bool IsScnsEmpty() const { return mCurBegin == nullptr || mCurEnd == nullptr || mCurBegin == mCurEnd; }
+  inline bool IsScnsEmpty() const { return mCurBegin == nullptr || mCurEnd == nullptr; }
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return IsScnsEmpty() ? 0 : mCurEnd - mCurBegin; }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-  inline bool isIndexValid(const QModelIndex& index, int& linearInd) const {
-    if (!index.isValid()) {
-      return false;
-    }
-    if (mCurBegin + index.row() >= mCurEnd) {
-      LOG_W("Invalid index(%d) user input", index.row());
-      return false;
-    }
-    linearInd = index.row();
-    return true;
-  }
+  bool isIndexValid(const QModelIndex& index, int& linearInd) const;
   QFileInfo fileInfo(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
@@ -44,6 +34,7 @@ public:
   std::pair<int, int> GetEntryIndexBE(int totalLen) const;
 
   inline int GetPageCnt() const {
+    if (IsScnsEmpty()) {return 0;}
     int N = GetEntryListLen();
     return N / SCENES_CNT_1_PAGE + int(N % SCENES_CNT_1_PAGE != 0);
   }

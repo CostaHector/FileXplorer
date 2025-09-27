@@ -1,5 +1,6 @@
 #ifndef JSONTESTPRECODITIONTOOLS_H
 #define JSONTESTPRECODITIONTOOLS_H
+#include "SceneInfoManager.h"
 
 namespace JsonTestPrecoditionTools {
 constexpr char JSON_CONTENTS[] {R"({
@@ -76,6 +77,9 @@ constexpr char JSON_CONTENTS_B_RANK_IN_MODEL[] {R"({
 })"
 };
 
+SceneInfoManager::ScnMgr::PATH_2_JSON_DICTS GetPathJsonDictList(//
+    const QString& name1, const QString& scenesUnderRootPath, QVariantHash& scene1,//
+    const QString& name2, const QString& scenesUnderSubPath, QVariantHash& scene2);//
 }
 
 #endif  // JSONTESTPRECODITIONTOOLS_H

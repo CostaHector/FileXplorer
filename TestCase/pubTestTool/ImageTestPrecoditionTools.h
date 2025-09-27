@@ -21,6 +21,7 @@ constexpr const char* SVG_FILL_COLORS[]{
     "#FFFFFF",  // 白色
     "#40E0D0"   // 绿松石
 };
+constexpr int SVG_FILL_COLORS_COUNT = sizeof(SVG_FILL_COLORS)/sizeof(*SVG_FILL_COLORS);
 
 inline const QString& GetSvgContentTemplate() {
   static const QString svg = R"(<svg xmlns="http://www.w3.org/2000/svg" width="540" height="360" viewBox="0 0 540 360">
