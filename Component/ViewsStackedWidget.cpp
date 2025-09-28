@@ -44,7 +44,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
   // can only be triggered by lineedit return pressed
   // isNewPath: bool Only differs in undo and redo operation.
   // True means newPath would be push into undo otherwise not
-  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) { // may be an shared folder cross platform
+  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) {  // may be an shared folder cross platform
     LOG_W("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
@@ -105,8 +105,8 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
       return true;
     }
     case ViewType::SCENE: {
-      CHECK_NULLPTR_RETURN_FALSE(m_scenesModel);
-      // todo: set filter in its proxyModel
+      CHECK_NULLPTR_RETURN_FALSE(m_sceneProxyModel);
+      m_sceneProxyModel->setFilterRegExp(targetStr);
       return true;
     }
     case ViewType::JSON: {
@@ -826,7 +826,8 @@ MimeDataHelper::MimeDataMember ViewsStackedWidget::getFilePathsAndUrls(const Qt:
       return ret;
     }
     case ViewType::SEARCH: {
-      MimeDataMember ret = GetMimeDataMemberFromSearchModel(*m_searchSrcModel, *m_searchProxyModel, m_advanceSearchView->selectionModel()->selectedRows());
+      MimeDataMember ret =
+          GetMimeDataMemberFromSearchModel(*m_searchSrcModel, *m_searchProxyModel, m_advanceSearchView->selectionModel()->selectedRows());
       FillCutCopySomething<AdvanceSearchModel>(*m_searchSrcModel, ret.srcIndexes, dropAct);
       return ret;
     }
