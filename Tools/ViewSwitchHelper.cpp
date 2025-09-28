@@ -2,18 +2,22 @@
 #include "CastDBView.h"
 #include "MemoryKey.h"
 #include "NavigationToolBar.h"
-#include "SceneActionsSubscribe.h"
 #include "SceneListView.h"
 #include "ScenesListModel.h"
 #include "ViewTypeTool.h"
 using namespace ViewTypeTool;
 
-ViewSwitchHelper::ViewSwitchHelper(StackedAddressAndSearchToolBar* navigation, ViewsStackedWidget* view, QObject* parent) //
-  : QObject{parent}
-  , _navigation{navigation}
-  , _view{view} { //
+ViewSwitchHelper::ViewSwitchHelper(StackedAddressAndSearchToolBar* navigation,
+                                   ViewsStackedWidget* view,
+                                   ScenePageControl* scenePageControl,
+                                   QObject* parent)  //
+    : QObject{parent},                               //
+      _navigation{navigation},                       //
+      _view{view},                                   //
+      _scenePageControl{scenePageControl} {          //
   CHECK_NULLPTR_RETURN_VOID(_navigation)
   CHECK_NULLPTR_RETURN_VOID(_view)
+  CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
 }
 
 void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
@@ -29,23 +33,23 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
         _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
-        static T_IntoNewPath fIntoNewPath //
+        static T_IntoNewPath fIntoNewPath  //
             {
-                [this](QString newPath, bool isNewPath, bool isF5Force) -> bool {       //
-                  return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force); //
-                } //
+                [this](QString newPath, bool isNewPath, bool isF5Force) -> bool {        //
+                  return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force);  //
+                }                                                                        //
             };
-        static T_on_searchTextChanged fSearchTextChanged //
+        static T_on_searchTextChanged fSearchTextChanged  //
             {
-                [this](const QString& targetStr) -> bool {       //
-                  return _view->on_searchTextChanged(targetStr); //
-                } //
+                [this](const QString& targetStr) -> bool {        //
+                  return _view->on_searchTextChanged(targetStr);  //
+                }                                                 //
             };
-        static T_on_searchEnterKey fSearchEnterKey //
+        static T_on_searchEnterKey fSearchEnterKey  //
             {
-                [this](const QString& targetStr) -> bool {    //
-                  return _view->on_searchEnterKey(targetStr); //
-                } //
+                [this](const QString& targetStr) -> bool {     //
+                  return _view->on_searchEnterKey(targetStr);  //
+                }                                              //
             };
         _navigation->m_addressBar->BindFileSystemViewCallback(fIntoNewPath, fSearchTextChanged, fSearchEnterKey, _view->m_fsModel);
         NavigationExToolBar::BindIntoNewPathNavi(fIntoNewPath);
@@ -105,8 +109,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _view->AddView(viewType, _view->m_fsListView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex()
-                                                                              : _view->m_fsModel->setRootPath(newPath)};
+      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
         // sync root index from last valid file-system model root index
         _view->m_fsListView->setRootIndex(newRootIndex);
@@ -120,8 +123,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _view->AddView(viewType, _view->m_fsTableView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex()
-                                                                              : _view->m_fsModel->setRootPath(newPath)};
+      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
         // sync root index from last valid file-system model root index
         _view->m_fsTableView->setRootIndex(newRootIndex);
@@ -135,8 +137,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _view->AddView(viewType, _view->m_fsTreeView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex()
-                                                                              : _view->m_fsModel->setRootPath(newPath)};
+      const QModelIndex& newRootIndex{newPath == _view->m_fsModel->rootPath() ? _view->getRootIndex() : _view->m_fsModel->setRootPath(newPath)};
       if (newRootIndex.isValid()) {
         // sync root index from last valid file-system model root index
         _view->m_fsTreeView->setRootIndex(newRootIndex);
@@ -171,12 +172,8 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     case ViewType::SCENE: {
       if (_view->m_sceneTableView == nullptr) {
         _view->m_scenesModel = new ScenesListModel;
-        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view);
+        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _scenePageControl, _view);
         _view->AddView(viewType, _view->m_sceneTableView);
-        auto* sceneSub = new (std::nothrow) SceneActionsSubscribe{_view->m_sceneTableView};
-        if (sceneSub->BindWidget(_view->m_sceneTableView, _view->m_scenesModel)) {
-          sceneSub->operator()();
-        }
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_sceneTableView->setRootPath(newPath);

@@ -9,7 +9,8 @@
 #include <QPixmapCache>
 
 class ScenesListModel : public QAbstractListModelPub {
-public:
+  Q_OBJECT
+ public:
   explicit ScenesListModel(QObject* object = nullptr);
 
   bool setRootPath(const QString& rootPath, const bool bForce = false);
@@ -27,9 +28,6 @@ public:
   QStringList GetImgs(const QModelIndex& index) const;
   QStringList GetVids(const QModelIndex& index) const;
 
-  bool ChangeItemsCntIn1Page(int scenesCntInAPage);
-
-  bool SetPageIndex(int newPageIndex);
   std::pair<int, int> GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const;
 
   inline int GetPageCnt() const {
@@ -40,10 +38,15 @@ public:
   inline const SCENE_INFO_LIST& GetEntryList() const { return mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
 
-public slots:
-  void onIconSizeChange(const QSize& newSize);
+ signals:
+  void pagesCountChanged(int newPagesCount);
 
-private:
+ public slots:
+  void onIconSizeChange(const QSize& newSize);
+  bool onScenesCountsPerPageChanged(int scenesCntInAPage);
+  bool onPageIndexChanged(int newPageIndex);
+
+ private:
   int mPageIndex{0};
   int mScenesCountPerPage{12};  // 4-by-3
   QString mPattern;

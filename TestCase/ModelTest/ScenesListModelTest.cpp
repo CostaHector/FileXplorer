@@ -105,13 +105,13 @@ class ScenesListModelTest : public PlainTestSuite {
     QVERIFY(defaultConstruct.GetVids(invalidIndex).isEmpty());
 
     // 测试分页功能
-    QVERIFY(defaultConstruct.ChangeItemsCntIn1Page(10));
+    QVERIFY(defaultConstruct.onScenesCountsPerPageChanged(10));
     QCOMPARE(defaultConstruct.mScenesCountPerPage, 10);
     QCOMPARE(defaultConstruct.rowCount(), 0);
     QCOMPARE(defaultConstruct.mCurBegin, defaultConstruct.mEntryList.cbegin());
     QCOMPARE(defaultConstruct.mCurEnd, defaultConstruct.mEntryList.cend());
 
-    QVERIFY(defaultConstruct.SetPageIndex(1));
+    QVERIFY(defaultConstruct.onPageIndexChanged(1));
     QCOMPARE(defaultConstruct.mPageIndex, 1);
     QCOMPARE(defaultConstruct.GetEntryListLen(), 0);
 
@@ -241,32 +241,32 @@ class ScenesListModelTest : public PlainTestSuite {
     {  // 4. Show by page works fine 每页显示3个场景
       QCOMPARE(slm.rowCount(), 8);
 
-      QVERIFY(slm.ChangeItemsCntIn1Page(3));
+      QVERIFY(slm.onScenesCountsPerPageChanged(3));
       QCOMPARE(slm.rowCount(), 3);    // 第一页显示3个
       QCOMPARE(slm.GetPageCnt(), 3);  // 总共8个场景，共3页, 3+3+2
 
-      QVERIFY(slm.SetPageIndex(1));
+      QVERIFY(slm.onPageIndexChanged(1));
       QCOMPARE(slm.mPageIndex, 1);
       QCOMPARE(slm.rowCount(), 3);  // 第二页显示3个
 
-      QVERIFY(slm.SetPageIndex(2));
-      QVERIFY(slm.SetPageIndex(2));
+      QVERIFY(slm.onPageIndexChanged(2));
+      QVERIFY(slm.onPageIndexChanged(2));
       QCOMPARE(slm.mPageIndex, 2);  // already there
       QCOMPARE(slm.rowCount(), 2);  // 第三页显示2个
 
-      QVERIFY(slm.SetPageIndex(3));  // rowCount() == 0, show nothing
+      QVERIFY(slm.onPageIndexChanged(3));  // rowCount() == 0, show nothing
       QCOMPARE(slm.rowCount(), 0);   // 保持当前页
 
       {
-        QVERIFY(!slm.SetPageIndex(-1));  // not crash down
+        QVERIFY(!slm.onPageIndexChanged(-1));  // not crash down
         QVERIFY(slm.mPageIndex != -1);
       }
 
       // 设置显示所有场景
-      QVERIFY(slm.ChangeItemsCntIn1Page(-1));
+      QVERIFY(slm.onScenesCountsPerPageChanged(-1));
       QCOMPARE(slm.mScenesCountPerPage, -1);
       QCOMPARE(slm.rowCount(), 8);   // 显示所有场景
-      QVERIFY(slm.SetPageIndex(0));  // no need setting
+      QVERIFY(slm.onPageIndexChanged(0));  // no need setting
       QCOMPARE(slm.GetEntryIndexBE(-1, 8), (std::pair<int, int>(0, 8)));
     }
   }
