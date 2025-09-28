@@ -14,6 +14,9 @@ void SceneSortProxyModel::setSourceModel(QAbstractItemModel* sourceModel) {
 }
 
 void SceneSortProxyModel::sort(int newColumn, Qt::SortOrder newOrder) {
+  if (sourceModel() == nullptr) {
+    return;
+  }
   bool anyChange = false;
   if (newColumn != (int)m_sortDimension) {  // need update mComparator when dimension changed
     m_sortDimension = SceneSortOrderHelper::toEnum(newColumn);
@@ -24,11 +27,14 @@ void SceneSortProxyModel::sort(int newColumn, Qt::SortOrder newOrder) {
     anyChange = true;
   }
   if (!anyChange) {
-    LOG_D("Sort Policy Unchange at all remains[dimension:%s, order:%d]", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
+    LOG_D("Sort policy unchange at all remains[dimension:%s, order:%d]", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
     return;
   }
   LOG_D("Sort dimension changed to[%s] order: %d", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
   QSortFilterProxyModel::sort(0, newOrder);
+#ifdef RUNNING_UNIT_TESTS
+  ForceCompleteSort();
+#endif
 }
 
 void SceneSortProxyModel::sortByFieldDimension(SceneSortOrderHelper::SortDimE newSortDimension, bool bReverse) {
@@ -47,7 +53,13 @@ bool SceneSortProxyModel::lessThan(const QModelIndex& source_left, const QModelI
   if (!m_sourceModel->isIndexValid(source_right, rightRow)) {
     return false;
   }
-  SCENE_INFO_LIST::const_iterator iter = m_sourceModel->GetFirstIterator();
-
-  return (iter[leftRow].*mComparator)(iter[rightRow]);
+  const SCENE_INFO_LIST::const_iterator iter = m_sourceModel->GetFirstIterator();
+  return (iter[leftRow].*mComparator)(iter[rightRow]);;
 }
+
+#ifdef RUNNING_UNIT_TESTS
+void SceneSortProxyModel::ForceCompleteSort() {
+  LOG_D("Force complete sort rows");
+  invalidate();
+}
+#endif

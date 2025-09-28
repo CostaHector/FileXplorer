@@ -17,19 +17,20 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                                "This operation may modify json file contents")
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
 
-  _BY_MOVIE_NAME = new (std::nothrow) QAction(QIcon(":img/SORTING_FILE_FOLDER"), "Movie Name", this);
-  CHECK_NULLPTR_RETURN_VOID(_BY_MOVIE_NAME);
-  _BY_MOVIE_NAME->setCheckable(true);
+  using namespace SceneSortOrderHelper;
+  _BY_MOVIE_PATH = new (std::nothrow) QAction(QIcon(":img/SORTING_FILE_FOLDER"), c_str(SortDimE::MOVIE_PATH), this);
+  CHECK_NULLPTR_RETURN_VOID(_BY_MOVIE_PATH);
+  _BY_MOVIE_PATH->setCheckable(true);
 
-  _BY_MOVIE_SIZE = new (std::nothrow) QAction("Movie Size", this);
+  _BY_MOVIE_SIZE = new (std::nothrow) QAction(c_str(SortDimE::MOVIE_SIZE), this);
   CHECK_NULLPTR_RETURN_VOID(_BY_MOVIE_SIZE);
   _BY_MOVIE_SIZE->setCheckable(true);
 
-  _BY_RATE = new (std::nothrow) QAction("Rate", this);
+  _BY_RATE = new (std::nothrow) QAction(c_str(SortDimE::RATE), this);
   CHECK_NULLPTR_RETURN_VOID(_BY_RATE);
   _BY_RATE->setCheckable(true);
 
-  _BY_UPLOADED_TIME = new (std::nothrow) QAction("Uploaded Time", this);
+  _BY_UPLOADED_TIME = new (std::nothrow) QAction(c_str(SortDimE::UPLOADED_TIME), this);
   CHECK_NULLPTR_RETURN_VOID(_BY_UPLOADED_TIME);
   _BY_UPLOADED_TIME->setCheckable(true);
 
@@ -37,15 +38,12 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   CHECK_NULLPTR_RETURN_VOID(_REVERSE_SORT);
   _REVERSE_SORT->setCheckable(true);
 
-  {
-    using namespace SceneSortOrderHelper;
-    mSortOrderIntAction.init({{_BY_MOVIE_NAME, SortDimE::MOVIE_NAME},
-                              {_BY_MOVIE_SIZE, SortDimE::MOVIE_SIZE},
-                              {_BY_RATE, SortDimE::RATE},
-                              {_BY_UPLOADED_TIME, SortDimE::UPLOADED_TIME}},
-                             DEFAULT_SCENE_SORT_ORDER, QActionGroup::ExclusionPolicy::Exclusive);
-    mSortOrderIntAction.setCheckedIfActionExist(DEFAULT_SCENE_SORT_ORDER);
-  }
+  mSortOrderIntAction.init({{_BY_MOVIE_PATH, SortDimE::MOVIE_PATH},
+                            {_BY_MOVIE_SIZE, SortDimE::MOVIE_SIZE},
+                            {_BY_RATE, SortDimE::RATE},
+                            {_BY_UPLOADED_TIME, SortDimE::UPLOADED_TIME}},
+                           DEFAULT_SCENE_SORT_ORDER, QActionGroup::ExclusionPolicy::Exclusive);
+  mSortOrderIntAction.setCheckedIfActionExist(DEFAULT_SCENE_SORT_ORDER);
 
   subscribe();
 }

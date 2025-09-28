@@ -32,7 +32,8 @@ class ScenesListModel : public QAbstractListModelPub {
 
   inline int GetPageCnt() const {
     int N = GetEntryListLen();
-    return N / mScenesCountPerPage + int(N % mScenesCountPerPage != 0);
+    if (mScenesCountPerPage <= 0) return 0;
+    return (N + mScenesCountPerPage - 1) / mScenesCountPerPage;
   }
 
   inline const SCENE_INFO_LIST& GetEntryList() const { return mEntryList; }

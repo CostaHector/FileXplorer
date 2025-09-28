@@ -33,7 +33,7 @@ inline const char* c_str(PageNaviE pageNavi) {
 }  // namespace ScenePageNaviHelper
 
 #define SCENE_SORT_ORDER_KEY_MAPPING       \
-  SCENE_SORT_ORDER_KEY_ITEM(MOVIE_NAME, 0) \
+  SCENE_SORT_ORDER_KEY_ITEM(MOVIE_PATH, 0) \
   SCENE_SORT_ORDER_KEY_ITEM(MOVIE_SIZE, 1) \
   SCENE_SORT_ORDER_KEY_ITEM(RATE, 2)       \
   SCENE_SORT_ORDER_KEY_ITEM(UPLOADED_TIME, 3)
@@ -47,7 +47,7 @@ enum class SortDimE : int {
       END_INVALID
 };
 
-constexpr SortDimE DEFAULT_SCENE_SORT_ORDER = SortDimE::MOVIE_NAME;
+constexpr SortDimE DEFAULT_SCENE_SORT_ORDER = SortDimE::MOVIE_PATH;
 
 inline const char* c_str(SortDimE sortOrder) {
   if (sortOrder < SortDimE::BEGIN_DEFAULT || sortOrder >= SortDimE::END_INVALID) {

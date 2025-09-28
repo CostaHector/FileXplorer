@@ -16,8 +16,8 @@ SearchModeToolButton::SearchModeToolButton(QWidget* parent) : QToolButton{parent
   mSearchModeIntAction.init({{MATCH_EQUAL, SearchModeE::NORMAL},
                              {MATCH_REGEX, SearchModeE::REGEX},
                              {SEARCH_SCOPE_CONTENT, SearchModeE::FILE_CONTENTS}},//
-                            SearchModeE::NORMAL, QActionGroup::ExclusionPolicy::Exclusive);
-  int searchModeInt = Configuration().value(MemoryKey::ADVANCE_SEARCH_MODE.name, (int)mSearchModeIntAction.defVal()).toInt();
+                            SearchTools::DEFAULT_SEARCH_MODE, QActionGroup::ExclusionPolicy::Exclusive);
+  int searchModeInt = Configuration().value(MemoryKey::ADVANCE_SEARCH_MODE.name, (int)SearchTools::DEFAULT_SEARCH_MODE).toInt();
   QAction* defaultModeAct = mSearchModeIntAction.setCheckedIfActionExist(searchModeInt);
   if (defaultModeAct != nullptr) {
     setDefaultAction(defaultModeAct); //

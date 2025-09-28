@@ -35,7 +35,7 @@ QString SCENE_INFO::GetVideoAbsPath(const QString& rootPath) const {
 SCENE_INFO::CompareFunc SCENE_INFO::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
   using namespace SceneSortOrderHelper;
   switch (dim) {
-    case SortDimE::MOVIE_NAME:
+    case SortDimE::MOVIE_PATH:
       return &SCENE_INFO::operator<;
     case SortDimE::MOVIE_SIZE:
       return &SCENE_INFO::lessThanVidSize;
