@@ -69,7 +69,15 @@ QString fileName(const QString& fullPath);
 // "rootPath", rootPath/Any/Relative/Path/File = > /Any/Relative/Path/
 // "rootPath", rootPath/Relative/File = > /Relative/
 // "rootPath", rootPath/File = > /
-QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen = -1);
+QString GetRelPathFromRootRelName(int rootPathLen, const QString& fullPath, int fileNameLen = -1);
+inline QString GetAbsFilePathFromRootRelName(const QString& root, const QString& rel, const QString& name) {
+  QString ans;
+  ans.reserve(root.size() + rel.size() + name.size());
+  ans += root;
+  ans += rel;
+  ans += name;
+  return ans;
+}
 
 // Get "baseName, extension with prefix dot" from fullpath
 // a.txt => ("a", ".txt")

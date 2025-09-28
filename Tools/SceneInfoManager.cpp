@@ -16,20 +16,20 @@ QString SCENE_INFO::GetAbsolutePath(const QString& rootPath) const {
 }
 
 QString SCENE_INFO::GetFirstImageAbsPath(const QString& rootPath) const {
-  return rootPath + rel2scn + (imgs.isEmpty() ? "" : imgs.front());
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (imgs.isEmpty() ? "" : imgs.front()));
 }
 
 QStringList SCENE_INFO::GetImagesAbsPathList(const QString& rootPath) const {
   QStringList imgsAbsPathList;
   imgsAbsPathList.reserve(imgs.size());
   for (const QString& imgName : imgs) {
-    imgsAbsPathList.append(rootPath + rel2scn + imgName);
+    imgsAbsPathList.append(PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, imgName));
   }
   return imgsAbsPathList;
 }
 
 QString SCENE_INFO::GetVideoAbsPath(const QString& rootPath) const {
-  return vidName.isEmpty() ? "" : rootPath + rel2scn + vidName;
+  return vidName.isEmpty() ? "" : PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName);
 }
 
 bool SCENE_INFO::operator<(const SCENE_INFO& other) const {
@@ -49,7 +49,7 @@ SCENE_INFO_LIST GetScnsLstFromPath(const QString& path) {
   QDirIterator jsonIt(path, {"*.scn"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (jsonIt.hasNext()) {
     const QString& scnFullPath{jsonIt.next()};
-    const QString& rel2JsonFile = PathTool::RelativePath2File(PATH_N, scnFullPath);
+    const QString& rel2JsonFile = PathTool::GetRelPathFromRootRelName(PATH_N, scnFullPath);
     scnTotals += ParseAScnFile(scnFullPath, rel2JsonFile);
     ++scnFilesCnt;
   }

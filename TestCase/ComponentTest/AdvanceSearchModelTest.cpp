@@ -226,7 +226,7 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     QCOMPARE(sourceModel.fileName(firstInd), "Cristiano Ronaldo");
     QCOMPARE(sourceModel.data(firstInd, Qt::ItemDataRole::DisplayRole).toString(), "Cristiano Ronaldo");
 
-    QString firstFileAbsFilePath = sourceModel.m_rootPath + "/" +
+    QString firstFileAbsFilePath = sourceModel.m_rootPath +
                                    sourceModel.data(sourceModel.index(0, PropColumnE::RelPath), Qt::ItemDataRole::DisplayRole).toString() +
                                    "Cristiano Ronaldo";
     QCOMPARE(firstFileAbsFilePath, tDir.itemPath("Cristiano Ronaldo"));
@@ -249,6 +249,17 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     QVERIFY(sourceModel.m_disableList.isEmpty());
     QVERIFY(sourceModel.m_recycleSet.isEmpty());
     QVERIFY(sourceModel.data(firstInd, Qt::ItemDataRole::ForegroundRole).isNull()); // should be null
+
+
+    { // iteratorFlag=Subdirectories, files only
+      sourceModel.setFilter(QDir::Filter::Files);
+      sourceModel.setIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
+      QCOMPARE(sourceModel.rowCount(), 5);
+      QModelIndex firstIndexKaka = sourceModel.index(0, 0);
+      QCOMPARE(sourceModel.fileName(firstIndexKaka), "Kaka.txt");
+      const QString kakaTxtFileAbsFilePath = sourceModel.filePath(firstIndexKaka);
+      QCOMPARE(kakaTxtFileAbsFilePath, tDir.itemPath("Cristiano Ronaldo/Kaka.txt"));
+    }
 
     {  // invalid index should not crash down
       QModelIndex invalidIndex;

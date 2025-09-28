@@ -94,16 +94,14 @@ QString fileName(const QString& fullPath) {
   return forwardSlashIndex == -1 ? fullPath : fullPath.mid(forwardSlashIndex + 1);
 }
 
-QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen) {
+QString GetRelPathFromRootRelName(int rootPathLen, const QString& fullPath, int fileNameLen) {
   if (fileNameLen > 0) {
     return fullPath.mid(rootPathLen, fullPath.size() - fileNameLen - rootPathLen);
   }
-
+  // f(2, "C:/home/to/dest", 4) => "/home/to"
+  // f(2, "C:/dest", 4) => "/"
   int lastSlashIndex = fullPath.lastIndexOf('/');
-  if (lastSlashIndex == -1) {
-    return {};
-  }
-  if (lastSlashIndex - rootPathLen + 1 < 1) {
+  if (lastSlashIndex == -1 || lastSlashIndex < rootPathLen) {
     return {};
   }
   return fullPath.mid(rootPathLen, lastSlashIndex - rootPathLen + 1);
