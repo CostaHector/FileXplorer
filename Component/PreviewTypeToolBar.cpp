@@ -25,8 +25,8 @@ PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
   mPreviewTypeIntAction.init({{CATEGORY_PRE, PREVIEW_TYPE_E::CATEGORY},//
                               {PROGRESSIVE_LOAD_PRE, PREVIEW_TYPE_E::PROGRESSIVE_LOAD},//
                               {CAROUSEL_PRE, PREVIEW_TYPE_E::CAROUSEL}},//
-                             PREVIEW_TYPE_E::NONE, QActionGroup::ExclusionPolicy::ExclusiveOptional);//
-  int curPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)mPreviewTypeIntAction.defVal()).toInt();
+                             DEFULT_PREVIEW_TYPE_E, QActionGroup::ExclusionPolicy::ExclusiveOptional);//
+  int curPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)DEFULT_PREVIEW_TYPE_E).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
   mCurrentPreviewType = mPreviewTypeIntAction.intVal2Enum(curPreviewType);
 

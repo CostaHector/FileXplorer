@@ -314,7 +314,6 @@ class AdvanceSearchModelTest : public PlainTestSuite {
 
       QVERIFY(sourceModel.m_disableList.isEmpty());
       searchProxyModel.startFilterWhenTextChanged("not exist name", "");
-      searchProxyModel.ForceStartFilterInTest();
       QCOMPARE(sourceModel.m_disableList.size(), 5);
 
       QCOMPARE(sourceModel.rowCount(), 5);       //

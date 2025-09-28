@@ -11,7 +11,7 @@
 ScenesListModel::ScenesListModel(QObject* object)  //
     : QAbstractListModelPub(object) {
   int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
-  mScenesCountPerPage = 0 < sceneCnt1Page ? mScenesCountPerPage : 1000;
+  mScenesCountPerPage = sceneCnt1Page > 0 ? sceneCnt1Page : 1000;
 }
 
 bool ScenesListModel::isIndexValid(const QModelIndex& index, int& linearInd) const {
