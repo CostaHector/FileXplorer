@@ -87,10 +87,10 @@ class ScenesListModelTest : public PlainTestSuite {
 
     ScenesListModel defaultConstruct;
     QVERIFY(defaultConstruct.data(QModelIndex{}, Qt::DisplayRole).isNull());
-    // todo: 补充其他检查, 例如如下函数都不能造成崩溃
-    // rowCount
+    // will not crash down
     QCOMPARE(defaultConstruct.rowCount(), 0);
-    QVERIFY(defaultConstruct.IsScnsEmpty());
+    QCOMPARE(defaultConstruct.mCurBegin, defaultConstruct.mEntryList.cbegin());
+    QCOMPARE(defaultConstruct.mCurBegin, defaultConstruct.mEntryList.cend());
     QModelIndex invalidIndex;
     int linearInd = -1;
     QVERIFY(!defaultConstruct.isIndexValid(invalidIndex, linearInd));
@@ -105,8 +105,16 @@ class ScenesListModelTest : public PlainTestSuite {
     QVERIFY(defaultConstruct.GetVids(invalidIndex).isEmpty());
 
     // 测试分页功能
-    QVERIFY(!defaultConstruct.ChangeItemsCntIn1Page(10));
-    QVERIFY(!defaultConstruct.SetPageIndex(1));
+    QVERIFY(defaultConstruct.ChangeItemsCntIn1Page(10));
+    QCOMPARE(defaultConstruct.mScenesCountPerPage, 10);
+    QCOMPARE(defaultConstruct.rowCount(), 0);
+    QCOMPARE(defaultConstruct.mCurBegin, defaultConstruct.mEntryList.cbegin());
+    QCOMPARE(defaultConstruct.mCurEnd, defaultConstruct.mEntryList.cend());
+
+    QVERIFY(defaultConstruct.SetPageIndex(1));
+    QCOMPARE(defaultConstruct.mPageIndex, 1);
+    QCOMPARE(defaultConstruct.GetEntryListLen(), 0);
+
     QCOMPARE(defaultConstruct.GetPageCnt(), 0);
     QCOMPARE(defaultConstruct.GetEntryListLen(), 0);
   }
@@ -120,7 +128,6 @@ class ScenesListModelTest : public PlainTestSuite {
       QVERIFY(slm.setRootPath(bambooPath, false));
       QCOMPARE(slm.rootPath(), tDir.itemPath("Bamboo"));
       QCOMPARE(slm.rowCount(), 3);
-      QVERIFY(!slm.IsScnsEmpty());
 
       // data retrieve ok
       // rel2Scn of the first 3 row is "/", "/Avengers/", "/Avengers/" respectively.
@@ -257,12 +264,14 @@ class ScenesListModelTest : public PlainTestSuite {
 
       // 设置显示所有场景
       QVERIFY(slm.ChangeItemsCntIn1Page(-1));
+      QCOMPARE(slm.mScenesCountPerPage, -1);
       QCOMPARE(slm.rowCount(), 8);   // 显示所有场景
       QVERIFY(slm.SetPageIndex(0));  // no need setting
-      QCOMPARE(slm.GetEntryIndexBE(8), (std::pair<int, int>(0, 8)));
+      QCOMPARE(slm.GetEntryIndexBE(-1, 8), (std::pair<int, int>(0, 8)));
     }
   }
 };
 
 #include "ScenesListModelTest.moc"
 REGISTER_TEST(ScenesListModelTest, false)
+

@@ -175,9 +175,9 @@ class PathToolTest : public PlainTestSuite {
 
   void test_RelativePath2File_InvalidInput() {
     // path without slash
-    QCOMPARE(RelativePath2File(0, "path with no slash"), "");
+    QCOMPARE(GetRelPathFromRootRelName(0, "path with no slash"), "");
     // rootPathLen too large
-    QCOMPARE(RelativePath2File(225, "C:/home/Huge Jackman"), "");
+    QCOMPARE(GetRelPathFromRootRelName(225, "C:/home/Huge Jackman"), "");
   }
 
   void test_RelativePath2File_ok() {
@@ -186,15 +186,24 @@ class PathToolTest : public PlainTestSuite {
     // "rootPath", rootPath/Any/Relative/Path/File = > /Any/Relative/Path/
     // "rootPath", rootPath/Relative/File = > /Relative/
     // "rootPath", rootPath/File = > /
-    QCOMPARE(RelativePath2File(strlen("C:"), "C:/home/file.txt"), "/home/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Any/Relative/Path/File"), "/Any/Relative/Path/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Relative/File"), "/Relative/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/File"), "/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/home/file.txt"), "/home/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Any/Relative/Path/File"), "/Any/Relative/Path/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Relative/File"), "/Relative/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/File"), "/");
 
-    QCOMPARE(RelativePath2File(strlen("C:"), "C:/home/file.txt", strlen("file.txt")), "/home/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Any/Relative/Path/File", 4), "/Any/Relative/Path/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Relative/File", 4), "/Relative/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/File", 4), "/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/home/file.txt", strlen("file.txt")), "/home/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/home/", "file.txt"), "C:/home/file.txt");
+
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/home/to/dest", strlen("dest")), "/home/to/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/home/to/", "dest"), "C:/home/to/dest");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/dest", strlen("dest")), "/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/", "dest"), "C:/dest");
+
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Any/Relative/Path/File", 4), "/Any/Relative/Path/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Relative/File", 4), "/Relative/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/File", 4), "/");
+    QCOMPARE(GetRelPathFromRootRelName(2, "C:/projects/src/main.cpp", 8), "/projects/src/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/projects/src/", "main.cpp"), "C:/projects/src/main.cpp");
   }
 
   void test_GetBaseName_folder() {
