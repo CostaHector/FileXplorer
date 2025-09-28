@@ -7,6 +7,7 @@
 #include "BytesRangeTool.h"
 #include "DuplicateImagesHelper.h"
 #include "FileStructurePolicy.h"
+#include "ScenePageNaviHelper.h"
 #include <QCryptographicHash>
 
 template struct EnumIntAction<QListView::Flow>;
@@ -19,3 +20,4 @@ template struct EnumIntAction<BytesRangeTool::BytesRangeE>;
 template struct EnumIntAction<QCryptographicHash::Algorithm>;
 template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
+template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;

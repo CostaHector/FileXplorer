@@ -4,6 +4,7 @@
 #include <QTabWidget>
 #include <QToolBar>
 #include "ViewTypeTool.h"
+#include "ScenePageControl.h"
 
 class LogFloatingPreviewer;
 
@@ -27,9 +28,14 @@ class RibbonMenu : public QTabWidget {
   void on_expandStackedWidget(const bool vis);
   void on_currentTabChangedRecordIndex(const int tabIndex);
   void whenViewTypeChanged(ViewTypeTool::ViewType vt);
+
+  ScenePageControl* GetScenePageControlWidget() {return m_scenePageControl;}
+
  private:
   QAction* _EXPAND_RIBBONS{nullptr};
   QToolBar* m_corner{nullptr};
+
+  ScenePageControl* m_scenePageControl{nullptr};
 
   QToolBar* m_leafFile{nullptr};
   QToolBar* m_leafHome{nullptr};

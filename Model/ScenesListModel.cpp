@@ -1,6 +1,7 @@
 ﻿#include "ScenesListModel.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "NotificatorMacro.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -117,9 +118,9 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
   mRootPath = rootPath;
 
   SCENE_INFO_LIST newEntryList = SceneInfoManager::GetScnsLstFromPath(mRootPath);
-  #ifdef RUNNING_UNIT_TESTS
-    newEntryList += SceneInfoManager::mockScenesInfoList();
-  #endif
+#ifdef RUNNING_UNIT_TESTS
+  newEntryList += SceneInfoManager::mockScenesInfoList();
+#endif
 
   LOG_D("new path[%s], imgs[%d]", qPrintable(mRootPath), newEntryList.size());
 
@@ -138,6 +139,9 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
   mCurEnd = mEntryList.cbegin() + newEnd;
 
   RowsCountEndChange();
+
+  emit pagesCountChanged(GetPageCnt());
+
   return true;
 }
 
@@ -161,8 +165,26 @@ QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
   return {vidAbsPath};
 }
 
-bool ScenesListModel::ChangeItemsCntIn1Page(int scenesCntInAPage) {  // -1 means all, > 0 means count
-  int beforeRowCnt = rowCount();
+std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const {
+  if (scenesCountPerPage < 0) {
+    return std::make_pair(0, maxLen);
+  }
+  const int begin = scenesCountPerPage * mPageIndex;
+  const int end = scenesCountPerPage * (mPageIndex + 1);
+  return std::make_pair(std::min(begin, maxLen), std::min(end, maxLen));
+}
+
+void ScenesListModel::onIconSizeChange(const QSize& newSize) {
+  if (newSize.width() == mWidth && newSize.height() == mHeight) {
+    return;
+  }
+  mWidth = newSize.width();
+  mHeight = newSize.height();
+  mPixCache.clear();
+}
+
+bool ScenesListModel::onScenesCountsPerPageChanged(int scenesCntInAPage) {  // -1 means all, > 0 means count
+  const int beforeRowCnt = rowCount();
   int startIndex{-1}, endIndex{-1};
 
   const SCENE_INFO_LIST& lst = GetEntryList();
@@ -179,18 +201,21 @@ bool ScenesListModel::ChangeItemsCntIn1Page(int scenesCntInAPage) {  // -1 means
     LOG_D("%d items in one page", scenesCntInAPage);
     std::tie(startIndex, endIndex) = GetEntryIndexBE(scenesCntInAPage, totalScenesCount);
   }
-
-  RowsCountBeginChange(beforeRowCnt, endIndex - startIndex);
+  const int afterRowCnt = endIndex - startIndex;
+  LOG_OK_P("Scenes Count per Page Changed", "%d scenes/Page. rowCnt:%d->%d", scenesCntInAPage, beforeRowCnt, afterRowCnt);
+  RowsCountBeginChange(beforeRowCnt, afterRowCnt);
 
   mScenesCountPerPage = scenesCntInAPage;
   mCurBegin = lst.cbegin() + startIndex;
   mCurEnd = lst.cbegin() + endIndex;
 
   RowsCountEndChange();
+
+  emit pagesCountChanged(GetPageCnt());
   return true;
 }
 
-bool ScenesListModel::SetPageIndex(int newPageIndex) {
+bool ScenesListModel::onPageIndexChanged(int newPageIndex) {
   if (mScenesCountPerPage < 0) {
     LOG_D("display all scenes in 1 page. no need pagination");
     return true;
@@ -211,7 +236,7 @@ bool ScenesListModel::SetPageIndex(int newPageIndex) {
 
   const int beforeRowCnt = rowCount();
   const int afterRowCnt = endIndex - startIndex;
-  LOG_D("SetPageIndex, rowCnt:%d->%d", beforeRowCnt, afterRowCnt);
+  LOG_OK_P("Page Changed", "Now page:%d rowCnt:%d->%d", newPageIndex, beforeRowCnt, afterRowCnt);
   RowsCountBeginChange(beforeRowCnt, afterRowCnt);
   mPageIndex = newPageIndex;
   mCurBegin = lst.cbegin() + startIndex;
@@ -221,22 +246,4 @@ bool ScenesListModel::SetPageIndex(int newPageIndex) {
   emit dataChanged(index(0, 0), index(beforeRowCnt),
                    {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
   return true;
-}
-
-std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const {
-  if (scenesCountPerPage < 0) {
-    return std::make_pair(0, maxLen);
-  }
-  const int begin = scenesCountPerPage * mPageIndex;
-  const int end = scenesCountPerPage * (mPageIndex + 1);
-  return std::make_pair(std::min(begin, maxLen), std::min(end, maxLen));
-}
-
-void ScenesListModel::onIconSizeChange(const QSize& newSize) {
-  if (newSize.width() == mWidth && newSize.height() == mHeight) {
-    return;
-  }
-  mWidth = newSize.width();
-  mHeight = newSize.height();
-  mPixCache.clear();
 }
