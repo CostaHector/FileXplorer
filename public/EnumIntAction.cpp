@@ -21,3 +21,4 @@ template struct EnumIntAction<QCryptographicHash::Algorithm>;
 template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
+template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;

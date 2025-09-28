@@ -2,7 +2,6 @@
 #include "MenuToolButton.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
-#include <QToolBar>
 
 SceneInPageActions& g_SceneInPageActions() {
   static SceneInPageActions ins;
@@ -13,8 +12,9 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   _COMBINE_MEDIAINFOS_JSON = new (std::nothrow) QAction(QIcon(":img/UPDATE_JSON_THEN_SCN"), "Update infos", this);
   _COMBINE_MEDIAINFOS_JSON->setShortcut(QKeySequence(Qt::Key_F5));
   _COMBINE_MEDIAINFOS_JSON->setShortcutVisibleInContextMenu(true);
-  _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Combine Videos/Images infos Into json files. Then generate scn file from valid "
-                                               "json file(s). This operation may update json file contents")
+  _COMBINE_MEDIAINFOS_JSON->setToolTip(QString("<b>%1 (%2)</b><br/> Update Value of Videos/Images Field in json files."
+                                               "Generate .scn file from usefull json file(s)."
+                                               "This operation may modify json file contents")
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
 
   _BY_MOVIE_NAME = new (std::nothrow) QAction(QIcon(":img/SORTING_FILE_FOLDER"), "Movie Name", this);
@@ -37,23 +37,39 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   CHECK_NULLPTR_RETURN_VOID(_REVERSE_SORT);
   _REVERSE_SORT->setCheckable(true);
 
-  _ORDER_AG = new (std::nothrow) QActionGroup(this);
-  CHECK_NULLPTR_RETURN_VOID(_ORDER_AG);
-  _ORDER_AG->addAction(_BY_MOVIE_NAME);
-  _ORDER_AG->addAction(_BY_MOVIE_SIZE);
-  _ORDER_AG->addAction(_BY_RATE);
-  _ORDER_AG->addAction(_BY_UPLOADED_TIME);
-  _ORDER_AG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
+  {
+    using namespace SceneSortOrderHelper;
+    mSortOrderIntAction.init({{_BY_MOVIE_NAME, SortDimE::MOVIE_NAME},
+                              {_BY_MOVIE_SIZE, SortDimE::MOVIE_SIZE},
+                              {_BY_RATE, SortDimE::RATE},
+                              {_BY_UPLOADED_TIME, SortDimE::UPLOADED_TIME}},
+                             DEFAULT_SCENE_SORT_ORDER, QActionGroup::ExclusionPolicy::Exclusive);
+    mSortOrderIntAction.setCheckedIfActionExist(DEFAULT_SCENE_SORT_ORDER);
+  }
+
+  subscribe();
+}
+
+void SceneInPageActions::subscribe() {
+  connect(_REVERSE_SORT, &QAction::toggled, this, &SceneInPageActions::EmitScenesSortPolicyChangedSignal);
+  connect(mSortOrderIntAction.getActionGroup(), &QActionGroup::triggered, this, &SceneInPageActions::EmitScenesSortPolicyChangedSignal);
+}
+
+void SceneInPageActions::EmitScenesSortPolicyChangedSignal() {
+  SceneSortOrderHelper::SortDimE sortDimension = mSortOrderIntAction.curVal();
+  Qt::SortOrder sortOrder = _REVERSE_SORT->isChecked() ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;
+  LOG_D("Signal emit with parms sortDim[%s] order:%d", SceneSortOrderHelper::c_str(sortDimension), (int)sortOrder);
+  emit scenesSortPolicyChanged(sortDimension, sortOrder);
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
-  auto* orderToolButton = new (std::nothrow) MenuToolButton(_ORDER_AG->actions(),                           //
-                                                            QToolButton::InstantPopup,                      //
-                                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon,  //
-                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_48,               //
+  auto* orderToolButton = new (std::nothrow) MenuToolButton(mSortOrderIntAction.getActionEnumAscendingList(),  //
+                                                            QToolButton::InstantPopup,                         //
+                                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon,     //
+                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_48,                  //
                                                             parent);
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
-  orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, "Sort");
+  orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, "Sort Dimension");
 
   auto* orderTB = new (std::nothrow) QToolBar{"Scene Order", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(orderTB);

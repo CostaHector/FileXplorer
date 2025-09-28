@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMap>
 #include <QVariantHash>
+#include "ScenePageNaviHelper.h"
 
 struct SCENE_INFO {
   QString rel2scn;   // jsonFullPath = mRootPath + relative2scnFile + jsonFileName, rel2scn can be '/' or '/any thing/'
@@ -19,7 +20,15 @@ struct SCENE_INFO {
   QString GetFirstImageAbsPath(const QString& rootPath) const;
   QStringList GetImagesAbsPathList(const QString& rootPath) const;
   QString GetVideoAbsPath(const QString& rootPath) const;
+
+  using CompareFunc = bool (SCENE_INFO::*)(const SCENE_INFO&) const;
+  static CompareFunc getCompareFunc(SceneSortOrderHelper::SortDimE dim);
+
   bool operator<(const SCENE_INFO& other) const;
+  bool lessThanName(const SCENE_INFO& other) const;
+  bool lessThanVidSize(const SCENE_INFO& other) const;
+  bool lessThanRate(const SCENE_INFO& other) const;
+  bool lessThanUploaded(const SCENE_INFO& other) const;
 };
 
 typedef QList<SCENE_INFO> SCENE_INFO_LIST;

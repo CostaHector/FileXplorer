@@ -32,8 +32,41 @@ QString SCENE_INFO::GetVideoAbsPath(const QString& rootPath) const {
   return vidName.isEmpty() ? "" : PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName);
 }
 
+SCENE_INFO::CompareFunc SCENE_INFO::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
+  using namespace SceneSortOrderHelper;
+  switch (dim) {
+    case SortDimE::MOVIE_NAME:
+      return &SCENE_INFO::operator<;
+    case SortDimE::MOVIE_SIZE:
+      return &SCENE_INFO::lessThanVidSize;
+    case SortDimE::RATE:
+      return &SCENE_INFO::lessThanRate;
+    case SortDimE::UPLOADED_TIME:
+      return &SCENE_INFO::lessThanUploaded;
+    default:
+      LOG_D("Sort Dimension[%s] not support", c_str(dim));
+      return &SCENE_INFO::lessThanName;
+  }
+}
+
 bool SCENE_INFO::operator<(const SCENE_INFO& other) const {
   return rel2scn != other.rel2scn ? rel2scn < other.rel2scn : name < other.name;
+}
+
+bool SCENE_INFO::lessThanName(const SCENE_INFO& other) const {
+  return name < other.name;
+}
+
+bool SCENE_INFO::lessThanVidSize(const SCENE_INFO& other) const {
+  return vidSize < other.vidSize;
+}
+
+bool SCENE_INFO::lessThanRate(const SCENE_INFO& other) const {
+  return rate < other.rate;
+}
+
+bool SCENE_INFO::lessThanUploaded(const SCENE_INFO& other) const {
+  return uploaded < other.uploaded;
 }
 
 namespace SceneInfoManager {
