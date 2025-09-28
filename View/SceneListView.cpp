@@ -30,14 +30,22 @@ class AlignDelegate : public QStyledItemDelegate {
   }
 };
 
-SceneListView::SceneListView(ScenesListModel* sceneModel, ScenePageControl* scenePageControl, QWidget* parent)  //
-    : CustomListView{"SCENES_TABLE", parent},                                                                   //
-      _sceneModel{sceneModel},                                                                                  //
-      _scenePageControl{scenePageControl}                                                                       //
+SceneListView::SceneListView(ScenesListModel* sceneModel,
+                             QSortFilterProxyModel* sceneSortProxyModel,
+                             ScenePageControl* scenePageControl,
+                             QWidget* parent)     //
+    : CustomListView{"SCENES_TABLE", parent},     //
+      _sceneModel{sceneModel},                    //
+      _sceneSortProxyModel{sceneSortProxyModel},  //
+      _scenePageControl{scenePageControl}         //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
+  CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
   CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
-  setModel(_sceneModel);
+
+  _sceneSortProxyModel->setSourceModel(_sceneModel);
+
+  setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
   setViewMode(QListView::ViewMode::IconMode);
   setTextElideMode(Qt::TextElideMode::ElideMiddle);

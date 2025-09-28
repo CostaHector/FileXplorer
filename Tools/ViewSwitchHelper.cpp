@@ -27,7 +27,8 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     case ViewType::LIST:
     case ViewType::TABLE:
     case ViewType::TREE:
-    case ViewType::JSON: {
+    case ViewType::JSON:
+    case ViewType::SCENE: {
       if (_navigation->m_addressBar == nullptr) {
         _navigation->m_addressBar = new (std::nothrow) NavigationAndAddressBar{"FileSystem Address/Search", _navigation};
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
@@ -73,14 +74,6 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _navigation->AddToolBar(viewType, _navigation->m_advanceSearchBar);
 
         _view->BindAdvanceSearchToolBar(_navigation->m_advanceSearchBar);
-      }
-      naviIndex = _navigation->m_name2StackIndex[viewType];
-      break;
-    }
-    case ViewType::SCENE: {
-      if (_navigation->m_addressBar == nullptr) {
-        _navigation->m_addressBar = new (std::nothrow) NavigationAndAddressBar{"FileSystem Address/Search", _navigation};
-        _navigation->AddToolBar(viewType, _navigation->m_addressBar);
       }
       naviIndex = _navigation->m_name2StackIndex[viewType];
       break;
@@ -172,7 +165,8 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     case ViewType::SCENE: {
       if (_view->m_sceneTableView == nullptr) {
         _view->m_scenesModel = new ScenesListModel;
-        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _scenePageControl, _view);
+        _view->m_sceneProxyModel = new QSortFilterProxyModel;
+        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view->m_sceneProxyModel, _scenePageControl, _view);
         _view->AddView(viewType, _view->m_sceneTableView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
