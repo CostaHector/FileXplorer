@@ -119,7 +119,7 @@ class ViewsStackedWidget : public QStackedWidget {
   AdvanceSearchTableView* m_advanceSearchView{nullptr};
 
   ScenesListModel* m_scenesModel{nullptr};
-  QSortFilterProxyModel* m_sceneProxyModel{nullptr};
+  SceneSortProxyModel* m_sceneProxyModel{nullptr};
   SceneListView* m_sceneTableView{nullptr};
 
   CastDatabaseSearchToolBar* _castSearchBar{nullptr}; // Only for F3 to get focus

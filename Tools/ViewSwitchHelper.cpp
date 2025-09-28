@@ -165,7 +165,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     case ViewType::SCENE: {
       if (_view->m_sceneTableView == nullptr) {
         _view->m_scenesModel = new ScenesListModel;
-        _view->m_sceneProxyModel = new QSortFilterProxyModel;
+        _view->m_sceneProxyModel = new SceneSortProxyModel;
         _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view->m_sceneProxyModel, _scenePageControl, _view);
         _view->AddView(viewType, _view->m_sceneTableView);
       }

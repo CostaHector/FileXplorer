@@ -31,7 +31,7 @@ class AlignDelegate : public QStyledItemDelegate {
 };
 
 SceneListView::SceneListView(ScenesListModel* sceneModel,
-                             QSortFilterProxyModel* sceneSortProxyModel,
+                             SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
                              QWidget* parent)     //
     : CustomListView{"SCENES_TABLE", parent},     //
@@ -93,6 +93,9 @@ void SceneListView::subscribe() {
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
   connect(_sceneModel, &ScenesListModel::pagesCountChanged, _scenePageControl, &ScenePageControl::onPagesCountChanged);
+
+  SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  connect(&sceneActInst, &SceneInPageActions::scenesSortPolicyChanged, _sceneSortProxyModel, &SceneSortProxyModel::sortByFieldDimension);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {

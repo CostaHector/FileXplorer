@@ -4,10 +4,14 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QObject>
+#include <QToolBar>
+#include "EnumIntAction.h"
+#include "ScenePageNaviHelper.h"
 
-class QToolBar;
+extern template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
 
 class SceneInPageActions : public QObject {
+  Q_OBJECT
  public:
   explicit SceneInPageActions(QObject* parent = nullptr);
 
@@ -20,13 +24,13 @@ class SceneInPageActions : public QObject {
   QAction* _BY_RATE{nullptr};
   QAction* _BY_UPLOADED_TIME{nullptr};
   QAction* _REVERSE_SORT{nullptr};
-  QActionGroup* _ORDER_AG{nullptr};
 
-  // order | page action
-  // order | ----------
-  // order | line edit
-  // order | ----------
-  // order | page select
+ signals:
+  void scenesSortPolicyChanged(SceneSortOrderHelper::SortDimE sortDimension, Qt::SortOrder order); // sortDimension is type of SceneSortOrderHelper::SortDimE
+ private:
+  void EmitScenesSortPolicyChangedSignal();
+  void subscribe();
+  EnumIntAction<SceneSortOrderHelper::SortDimE> mSortOrderIntAction;
 };
 
 SceneInPageActions& g_SceneInPageActions();

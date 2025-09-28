@@ -3,8 +3,8 @@
 
 #include "CustomListView.h"
 #include "FileFolderPreviewer.h"
+#include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
-#include <QSortFilterProxyModel>
 #include <QMenu>
 
 class ScenesListModel;
@@ -13,7 +13,7 @@ class QStyledItemDelegate;
 class SceneListView : public CustomListView {
   Q_OBJECT
 public:
-  explicit SceneListView(ScenesListModel* sceneModel, QSortFilterProxyModel* sceneSortProxyModel, ScenePageControl* scenePageControl, QWidget* parent = nullptr);
+  explicit SceneListView(ScenesListModel* sceneModel, SceneSortProxyModel* sceneSortProxyModel, ScenePageControl* scenePageControl, QWidget* parent = nullptr);
   void setRootPath(const QString& rootPath);
   void subscribe();
   void onCopyBaseName();
@@ -29,7 +29,7 @@ private:
   QAction* COPY_BASENAME_FROM_SCENE{nullptr};
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
   ScenesListModel* _sceneModel{nullptr};
-  QSortFilterProxyModel* _sceneSortProxyModel{nullptr};
+  SceneSortProxyModel* _sceneSortProxyModel{nullptr};
   QStyledItemDelegate* mAlignDelegate{nullptr};
   ScenePageControl* _scenePageControl{nullptr};
 };

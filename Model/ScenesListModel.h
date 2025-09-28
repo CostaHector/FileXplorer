@@ -37,6 +37,7 @@ class ScenesListModel : public QAbstractListModelPub {
 
   inline const SCENE_INFO_LIST& GetEntryList() const { return mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
+  inline SCENE_INFO_LIST::const_iterator GetFirstIterator() const { return mCurBegin; }
 
  signals:
   void pagesCountChanged(int newPagesCount);
