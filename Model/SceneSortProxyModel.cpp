@@ -20,7 +20,7 @@ void SceneSortProxyModel::sort(int newColumn, Qt::SortOrder newOrder) {
   bool anyChange = false;
   if (newColumn != (int)m_sortDimension) {  // need update mComparator when dimension changed
     m_sortDimension = SceneSortOrderHelper::toEnum(newColumn);
-    mComparator = SCENE_INFO::getCompareFunc(m_sortDimension);
+    mComparator = SceneInfo::getCompareFunc(m_sortDimension);
     anyChange = true;
   }
   if (newOrder != sortOrder()) {
@@ -53,7 +53,7 @@ bool SceneSortProxyModel::lessThan(const QModelIndex& source_left, const QModelI
   if (!m_sourceModel->isIndexValid(source_right, rightRow)) {
     return false;
   }
-  const SCENE_INFO_LIST::const_iterator iter = m_sourceModel->GetFirstIterator();
+  const SceneInfoList::const_iterator iter = m_sourceModel->GetFirstIterator();
   return (iter[leftRow].*mComparator)(iter[rightRow]);;
 }
 

@@ -117,7 +117,7 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
   }
   mRootPath = rootPath;
 
-  SCENE_INFO_LIST newEntryList = SceneInfoManager::GetScnsLstFromPath(mRootPath);
+  SceneInfoList newEntryList = SceneInfoManager::GetScnsLstFromPath(mRootPath);
 #ifdef RUNNING_UNIT_TESTS
   newEntryList += SceneInfoManager::mockScenesInfoList();
 #endif
@@ -187,7 +187,7 @@ bool ScenesListModel::onScenesCountsPerPageChanged(int scenesCntInAPage) {  // -
   const int beforeRowCnt = rowCount();
   int startIndex{-1}, endIndex{-1};
 
-  const SCENE_INFO_LIST& lst = GetEntryList();
+  const SceneInfoList& lst = GetEntryList();
   const int totalScenesCount = GetEntryListLen();
   if (scenesCntInAPage == 0) {
     LOG_W("none in one page");
@@ -229,7 +229,7 @@ bool ScenesListModel::onPageIndexChanged(int newPageIndex) {
     return true;
   }
 
-  const SCENE_INFO_LIST& lst = GetEntryList();
+  const SceneInfoList& lst = GetEntryList();
   const int TOTAL_N = GetEntryListLen();
   const int startIndex = std::min(mScenesCountPerPage * newPageIndex, TOTAL_N);
   const int endIndex = std::min(mScenesCountPerPage * (newPageIndex + 1), TOTAL_N);

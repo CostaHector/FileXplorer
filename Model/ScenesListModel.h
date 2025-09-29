@@ -36,9 +36,9 @@ class ScenesListModel : public QAbstractListModelPub {
     return (N + mScenesCountPerPage - 1) / mScenesCountPerPage;
   }
 
-  inline const SCENE_INFO_LIST& GetEntryList() const { return mEntryList; }
+  inline const SceneInfoList& GetEntryList() const { return mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
-  inline SCENE_INFO_LIST::const_iterator GetFirstIterator() const { return mCurBegin; }
+  inline SceneInfoList::const_iterator GetFirstIterator() const { return mCurBegin; }
 
  signals:
   void pagesCountChanged(int newPagesCount);
@@ -53,8 +53,8 @@ class ScenesListModel : public QAbstractListModelPub {
   int mScenesCountPerPage{12};  // 4-by-3
   QString mPattern;
   QString mRootPath;
-  SCENE_INFO_LIST mEntryList;
-  SCENE_INFO_LIST::const_iterator mCurBegin{mEntryList.cbegin()}, mCurEnd{mEntryList.cend()};
+  SceneInfoList mEntryList;
+  SceneInfoList::const_iterator mCurBegin{mEntryList.cbegin()}, mCurEnd{mEntryList.cend()};
 
   QPixmapCache mPixCache;
   int mWidth = 404, mHeight = 250;
