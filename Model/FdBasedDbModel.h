@@ -30,10 +30,16 @@ public:
   QString fileName(const QModelIndex& curIndex) const;
 
   QString filePath(const QModelIndex& curIndex) const {  //
+    if (!curIndex.isValid()) {
+      return {};
+    }
     return QDir{absolutePath(curIndex)}.absoluteFilePath(fileName(curIndex));
   }
 
   QFileInfo fileInfo(const QModelIndex& curIndex) const {  //
+    if (!curIndex.isValid()) {
+      return {};
+    }
     return QFileInfo{filePath(curIndex)};
   }
 

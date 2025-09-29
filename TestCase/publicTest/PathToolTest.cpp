@@ -277,31 +277,36 @@ class PathToolTest : public PlainTestSuite {
 #endif
   }
 
-  void test_path_part_split() {
-    QString preLeft, preRight;
-    int lastSlashIndex = GetPrepathParts("C:/A/B/C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C:/A/B/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "C:");
-    QCOMPARE(preRight, "A/B");
-    QCOMPARE(Path3Join("C:", "A/B", "C.mp4"), "C:/A/B/C.mp4");
+  void test_RMFComponent_and_Decompose() {
+    RMFComponent median;
 
-    lastSlashIndex = GetPrepathParts("C:/A/C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C:/A/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "");
-    QCOMPARE(preRight, "C:/A");
-    QCOMPARE(Path3Join("", "C:/A", "C.mp4"), "C:/A/C.mp4");
+    median = RMFComponent::FromPath("D.mp4");  // 0 slash 无需不考虑, 因为不会有"a.mp4", 这样的绝对路径
+    QCOMPARE(median.joinItself(), "D.mp4");
+    QCOMPARE(median.joinParentPathItself(), "");
 
-    lastSlashIndex = GetPrepathParts("C:/C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C:/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "");
-    QCOMPARE(preRight, "C:");
-    QCOMPARE(Path3Join("", "C:", "C.mp4"), "C:/C.mp4");
+    median = RMFComponent::FromPath("C:/D.mp4");  // 1 slash
+    QCOMPARE(median.joinItself(), "C:/D.mp4");
+    QCOMPARE(median.joinParentPathItself(), "C:/");
 
-    lastSlashIndex = GetPrepathParts("C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "");
-    QCOMPARE(preRight, "");
-    QCOMPARE(Path3Join("", "", "C.mp4"), "C.mp4");
+    median = RMFComponent::FromPath("C:/A/C.mp4");  // 2 slash
+    QCOMPARE(median.joinItself(), "C:/A/C.mp4");
+    QCOMPARE(median.joinParentPathItself(), "C:/A");
+
+    median = RMFComponent::FromPath("C:/long/enough/a.mp4");  // 3 slash
+    QCOMPARE(median.joinItself(), "C:/long/enough/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "C:/long/enough");
+
+    median = RMFComponent::FromPath("/a.mp4");  // 1 slash
+    QCOMPARE(median.joinItself(), "/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "/");
+
+    median = RMFComponent::FromPath("/tmp/a.mp4");  // 2 slash
+    QCOMPARE(median.joinItself(), "/tmp/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "/tmp");
+
+    median = RMFComponent::FromPath("/tmp/FileXplorer-xxxx/a.mp4");
+    QCOMPARE(median.joinItself(), "/tmp/FileXplorer-xxxx/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "/tmp/FileXplorer-xxxx");
   }
 
   void test_GetPrepathAndFileName() {

@@ -191,7 +191,17 @@ QSet<QString> SortedUniqStrLst::toLowerSets() const {
 const QString& SortedUniqStrLst::join() const {
   if (!mJoinCalled) {
     mAnsCSV = m_sortedCache.join(NameTool::CSV_COMMA);
+    mAnsCell = m_sortedCache.join(NameTool::CELL_NEW_LINE);
     mJoinCalled = true;
   }
   return mAnsCSV;
+}
+
+const QString& SortedUniqStrLst::joinToShowInACell() const {
+  if (!mJoinCalled) {
+    mAnsCSV = m_sortedCache.join(NameTool::CSV_COMMA);
+    mAnsCell = m_sortedCache.join(NameTool::CELL_NEW_LINE);
+    mJoinCalled = true;
+  }
+  return mAnsCell;
 }

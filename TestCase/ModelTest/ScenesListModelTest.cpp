@@ -211,8 +211,12 @@ class ScenesListModelTest : public PlainTestSuite {
         QVERIFY(slm.mPixCache.find(firstImagePath, nullptr));
         slm.data(slm.index(0), Qt::DecorationRole);
 
-        QSize newSize(200, 150);
-        slm.onIconSizeChange(newSize);  // change to new icon size. cache cleared
+        QSize widthSize(1000, 10);
+        slm.onIconSizeChange(widthSize);  // change to new icon size. cache cleared
+        QVERIFY(!slm.mPixCache.find(firstImagePath, nullptr));
+
+        QSize heightSize(10, 1000);
+        slm.onIconSizeChange(heightSize);  // change to new icon size. cache cleared
         QVERIFY(!slm.mPixCache.find(firstImagePath, nullptr));
       }
 

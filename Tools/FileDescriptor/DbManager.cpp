@@ -366,6 +366,11 @@ bool DbManager::CreateDatabase() {
 }
 
 bool DbManager::CreateTable(const QString& tableName, const QString& tableDefinitionTemplate) {
+  if (IsTableExist(tableName)) {
+    LOG_D("table[%s] already exist. skip create", qPrintable(tableName));
+    return true;
+  }
+
   if (tableName.isEmpty()) {
     LOG_W("table name[%s] cannot be empty", qPrintable(tableName));
     return false;
@@ -378,11 +383,6 @@ bool DbManager::CreateTable(const QString& tableName, const QString& tableDefini
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return false;
-  }
-
-  if (db.tables().contains(tableName)) {
-    LOG_D("table[%s] already exist. skip create", qPrintable(tableName));
-    return true;
   }
 
   // 启用外键支持和WAL模式提升性能

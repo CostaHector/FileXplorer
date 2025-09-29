@@ -148,16 +148,24 @@ QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation
 }
 
 void AdvanceSearchModel::appendDisable(const QModelIndex& ind) {
-  if (m_disableList.contains(ind))
+  if (!ind.isValid()) {
     return;
+  }
+  if (m_disableList.contains(ind)) {
+    return;
+  }
   m_disableList.insert(ind);
   emit dataChanged(ind, ind, {Qt::ForegroundRole});
 }
 
 void AdvanceSearchModel::removeDisable(const QModelIndex& ind) {
-  if (!m_disableList.contains(ind))
+  if (!m_disableList.contains(ind)) {
     return;
+  }
   m_disableList.remove(ind);
+  if (!ind.isValid()) {
+    return;
+  }
   emit dataChanged(ind, ind, {Qt::ForegroundRole});
 }
 

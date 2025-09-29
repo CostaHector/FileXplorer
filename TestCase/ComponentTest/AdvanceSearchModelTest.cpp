@@ -39,6 +39,11 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
     sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
 
+    // 0. empty path/inexist path skip
+    sourceModel.setRootPath("");
+    sourceModel.setRootPath("path/to/inexist");
+    QCOMPARE(sourceModel.rowCount(), 0);
+
     // 1. in root directory
     sourceModel.setRootPath(pathRoot5);
     QCOMPARE(sourceModel.m_rootPath, pathRoot5);
@@ -78,6 +83,28 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     // no iterator, Files
     sourceModel.setFilter(QDir::Filter::Files);
     QCOMPARE(sourceModel.m_itemsLst.size(), 1);
+
+    // will not crash down
+    {
+      sourceModel.appendDisable(QModelIndex());
+      sourceModel.appendDisable(QModelIndex());
+      sourceModel.removeDisable(QModelIndex());
+      sourceModel.removeDisable(QModelIndex());
+      QVERIFY(sourceModel.m_disableList.isEmpty());
+
+      QModelIndex firstInd = sourceModel.index(0, 0);
+      QVERIFY(firstInd.isValid());
+      sourceModel.removeDisable(firstInd);
+      QCOMPARE(sourceModel.m_disableList.size(), 0);
+
+      sourceModel.appendDisable(firstInd);
+      sourceModel.appendDisable(firstInd);
+      QCOMPARE(sourceModel.m_disableList.size(), 1);
+
+      sourceModel.removeDisable(firstInd);
+      QCOMPARE(sourceModel.m_disableList.size(), 0);
+      sourceModel.removeDisable(firstInd);
+    }
   }
 
   void test_force_refresh_ok() {
@@ -171,7 +198,7 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     sourceModel.initFilter(DEFAULT_DIR_FILTERS);
     sourceModel.initIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
     sourceModel.setRootPath(pathRoot5);
-    QCOMPARE(sourceModel.rowCount(), 5 + 1); // and 1 under subfolder
+    QCOMPARE(sourceModel.rowCount(), 5 + 1);  // and 1 under subfolder
 
     SearchProxyModel searchProxyModel;
     searchProxyModel.setSourceModel(&sourceModel);
@@ -186,6 +213,7 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     QCOMPARE(searchProxyModel.rowCount(), 1);                                // 2xjpg and 1xsvg | then only 1
     searchProxyModel.startFilterWhenTextChanged("G$", "Cristiano Ronaldo");  //
     QCOMPARE(searchProxyModel.rowCount(), 0);                                // 0
+    searchProxyModel.PrintRegexDebugMessage();
 
     // 2. name regex, contents contain, case insensitive
     searchProxyModel.initFileNameFiltersCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
@@ -222,9 +250,13 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     QCOMPARE(sourceModel.rowCount(), 5);
 
     const QModelIndex firstInd = sourceModel.index(0, PropColumnE::Name);
+    const QModelIndex secondInd = sourceModel.index(1, PropColumnE::Name);
 
     QCOMPARE(sourceModel.fileName(firstInd), "Cristiano Ronaldo");
     QCOMPARE(sourceModel.data(firstInd, Qt::ItemDataRole::DisplayRole).toString(), "Cristiano Ronaldo");
+    QCOMPARE(sourceModel.fileName(secondInd), "Cristiano Ronaldo vs Goalkeeper record.txt");
+    QCOMPARE(sourceModel.data(secondInd, Qt::ItemDataRole::DisplayRole).toString(), "Cristiano Ronaldo vs Goalkeeper record.txt");
+    QVERIFY(sourceModel.fileInfo(secondInd).isFile());
 
     QString firstFileAbsFilePath = sourceModel.m_rootPath +
                                    sourceModel.data(sourceModel.index(0, PropColumnE::RelPath), Qt::ItemDataRole::DisplayRole).toString() +
@@ -239,19 +271,22 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     QFileInfo fi(sourceModel.fileInfo(firstInd));
     QCOMPARE(fi.absoluteFilePath(), tDir.itemPath("Cristiano Ronaldo"));
 
-    QCOMPARE(sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole).isValid(), true);  // from icon provider
+    QCOMPARE(sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole).isValid(), true);  // folder from icon provider
+    QCOMPARE(sourceModel.data(secondInd, Qt::ItemDataRole::DecorationRole).isValid(), true); // from QIconProvider
+    QCOMPARE(sourceModel.data(secondInd, Qt::ItemDataRole::DecorationRole).isValid(), true); // from pixmapcache ok
+
     sourceModel.CutSomething({firstInd});
     sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole);  // from inexist svg file
     sourceModel.CopiedSomething({firstInd});
     sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole);
     QCOMPARE(sourceModel.data(firstInd.siblingAtColumn(PropColumnE::Size), Qt::ItemDataRole::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
+    QCOMPARE(sourceModel.data(firstInd.siblingAtColumn(PropColumnE::Name), Qt::ItemDataRole::TextAlignmentRole).toInt(), int(Qt::AlignLeft | Qt::AlignTop));
 
     QVERIFY(sourceModel.m_disableList.isEmpty());
     QVERIFY(sourceModel.m_recycleSet.isEmpty());
-    QVERIFY(sourceModel.data(firstInd, Qt::ItemDataRole::ForegroundRole).isNull()); // should be null
+    QVERIFY(sourceModel.data(firstInd, Qt::ItemDataRole::ForegroundRole).isNull());  // should be null
 
-
-    { // iteratorFlag=Subdirectories, files only
+    {  // iteratorFlag=Subdirectories, files only
       sourceModel.setFilter(QDir::Filter::Files);
       sourceModel.setIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
       QCOMPARE(sourceModel.rowCount(), 5);

@@ -9,13 +9,13 @@
 #include <QVariant>
 
 namespace QuickWhereClauseHelper {
-const QString FUZZY_INSTR{R"(INSTR(`%1`,"%2")>0)"}; // Case Sensitive Search. %1 is field, %2 is value
-const QString FUZZY_LIKE{R"(`%1` LIKE "%%2%")"}; // Case Insensitive. `Name%1` like "%Henry%2%"
-const QString OPEATOR_RELATION{R"(`%1`%2)"}; // >10 => `Rate%1`>8%2. here %1 is field, %2 is value
+const QString FUZZY_INSTR{R"(INSTR(`%1`,"%2")>0)"};  // Case Sensitive Search. %1 is field, %2 is value
+const QString FUZZY_LIKE{R"(`%1` LIKE "%%2%")"};     // Case Insensitive. `Name%1` like "%Henry%2%"
+const QString OPEATOR_RELATION{R"(`%1`%2)"};         // >10 => `Rate%1`>8%2. here %1 is field, %2 is value
 const QHash<QChar, QString> op2Str = {{'&', "AND"}, {'|', "OR"}};
 
-QString InfixNotation2RPN2Value(const QString& fieldName,          //
-                                const QString& infixNot,           //
+QString InfixNotation2RPN2Value(const QString& fieldName,        //
+                                const QString& infixNot,         //
                                 const QString& binaryCondition,  //
                                 const QHash<QString, QString>& ALIAS_MAP) {
   if (fieldName.isEmpty() || infixNot.isEmpty()) {
@@ -112,20 +112,19 @@ QString GetSelectMovieByCastStatement(const QString& aCastName, const QString& a
     castNames += QString{akas}.replace(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
     whereClause = InfixNotation2RPN2Value(ENUM_2_STR(Name), castNames, FUZZY_LIKE);
   }
-  static const QString SELECT_NAME_TEMPLATE {//
-      QString{"SELECT `%1`, `%2`, `%3`"}       //
-          .arg(ENUM_2_STR(PrePathLeft))   //
-          .arg(ENUM_2_STR(PrePathRight))  //
-          .arg(ENUM_2_STR(Name))
-  };
-  return SELECT_NAME_TEMPLATE + " FROM `" + tableName + "` WHERE "+ whereClause;
+  static const QString SELECT_NAME_TEMPLATE{                                    //
+                                            QString{"SELECT `%1`, `%2`, `%3`"}  //
+                                                .arg(ENUM_2_STR(PrePathLeft))   //
+                                                .arg(ENUM_2_STR(PrePathRight))  //
+                                                .arg(ENUM_2_STR(Name))};
+  return SELECT_NAME_TEMPLATE + " FROM `" + tableName + "` WHERE " + whereClause;
 }
 
 QString GetMovieFullPathFromSqlQry(QSqlQuery& query) {
   using namespace MOVIE_TABLE;
-  return PathTool::Path3Join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
-                             query.value(ENUM_2_STR(PrePathRight)).toString(),  //
-                             query.value(ENUM_2_STR(Name)).toString());
+  return PathTool::RMFComponent::join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
+                                                  query.value(ENUM_2_STR(PrePathRight)).toString(),  //
+                                                  query.value(ENUM_2_STR(Name)).toString());
 }
 
-}
+}  // namespace QuickWhereClauseHelper

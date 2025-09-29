@@ -129,6 +129,7 @@ class MountHelperTest : public PlainTestSuite {
   }
 
   void test_Guids2MountPoint() {
+    // todo: mock by MockGuids2MntPntSet()=
     const auto& gui2Pnts = Guids2MntPntSet(true);
     QVERIFY2(!gui2Pnts.isEmpty(), "Recheck if no volumes at all");
   }
