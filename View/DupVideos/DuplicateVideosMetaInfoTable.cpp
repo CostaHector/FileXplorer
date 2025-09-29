@@ -66,7 +66,7 @@ int DuplicateVideosMetaInfoTable::onClearAnalyzeList() {
   return startAnalyzeNewTables({});
 }
 
-int DuplicateVideosMetaInfoTable::startAnalyzeNewTables(const QStringList& tablesNeedAnalyze) {  // todo: same table analyze twice mat happened
+int DuplicateVideosMetaInfoTable::startAnalyzeNewTables(const QStringList& tablesNeedAnalyze) {
   mDupVidMngr.ReadSpecifiedTables2List(tablesNeedAnalyze, mVideosListNeedAnalyse);
   emit analyzeTablesFinished(mVideosListNeedAnalyse);
 

@@ -57,11 +57,11 @@ private slots:
 
     const QList<QStringList> items//
         { // PrePathLeft, PrePathRight, Name, PathHash
-         {"C:", "home/to/Cpath", "Kaka - Real Madrid"},
-         {"D:", "home/to/Dpath", "Kaka Leite - Real Madrid"},
-         {"E:", "home/to/Epath", "Chris Evans - Captain"},
-         {"F:", "home/to/Fpath", "Captain America 2022"},
-         {"G:", "home/to/Gpath", "Chris Hemsworth - Thor"},
+         {"C:/", "home/to/Cpath/", "Kaka - Real Madrid"},
+         {"D:/", "home/to/Dpath/", "Kaka Leite - Real Madrid"},
+         {"E:/", "home/to/Epath/", "Chris Evans - Captain"},
+         {"F:/", "home/to/Fpath/", "Captain America 2022"},
+         {"G:/", "home/to/Gpath/", "Chris Hemsworth - Thor"},
          };
 
     const QSet<QString> expectMovieNameSet {

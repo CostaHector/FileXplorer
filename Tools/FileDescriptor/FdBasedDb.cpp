@@ -50,16 +50,16 @@ const QString FdBasedDb::INSERT_MOVIE_RECORD_FULL_TEMPLATE  //
         + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`) "  //
                   "VALUES "                                                         //
                   "(:%1, :%2, :%3, :%4, :%5, :%6, :%7, :%8, :%9, :%10);"}           //
-              .arg(ENUM_2_STR(Fd))                                       //
-              .arg(ENUM_2_STR(PrePathLeft))                              //
-              .arg(ENUM_2_STR(PrePathRight))                             //
-              .arg(ENUM_2_STR(Name))                                     //
-              .arg(ENUM_2_STR(Size))                                     //
-              .arg(ENUM_2_STR(Duration))                                 //
-              .arg(ENUM_2_STR(Studio))                                   //
-              .arg(ENUM_2_STR(Cast))                                     //
-              .arg(ENUM_2_STR(Tags))                                     //
-              .arg(ENUM_2_STR(PathHash))                                 //
+              .arg(ENUM_2_STR(Fd))                                                  //
+              .arg(ENUM_2_STR(PrePathLeft))                                         //
+              .arg(ENUM_2_STR(PrePathRight))                                        //
+              .arg(ENUM_2_STR(Name))                                                //
+              .arg(ENUM_2_STR(Size))                                                //
+              .arg(ENUM_2_STR(Duration))                                            //
+              .arg(ENUM_2_STR(Studio))                                              //
+              .arg(ENUM_2_STR(Cast))                                                //
+              .arg(ENUM_2_STR(Tags))                                                //
+              .arg(ENUM_2_STR(PathHash))                                            //
     };
 
 const QString FdBasedDb::INSERT_MOVIE_RECORD_TEMPLATE  //
@@ -68,12 +68,12 @@ const QString FdBasedDb::INSERT_MOVIE_RECORD_TEMPLATE  //
         + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`) "  //
                   "VALUES "                                //
                   "(:%1, :%2, :%3, :%4, :%5, :%6);"}       //
-              .arg(ENUM_2_STR(Fd))              //
-              .arg(ENUM_2_STR(PrePathLeft))     //
-              .arg(ENUM_2_STR(PrePathRight))    //
-              .arg(ENUM_2_STR(Name))            //
-              .arg(ENUM_2_STR(Size))            //
-              .arg(ENUM_2_STR(PathHash))        //
+              .arg(ENUM_2_STR(Fd))                         //
+              .arg(ENUM_2_STR(PrePathLeft))                //
+              .arg(ENUM_2_STR(PrePathRight))               //
+              .arg(ENUM_2_STR(Name))                       //
+              .arg(ENUM_2_STR(Size))                       //
+              .arg(ENUM_2_STR(PathHash))                   //
     };
 
 enum INSERT_FIELD {
@@ -115,13 +115,13 @@ enum QUERY_DURATION_0_FILED {
 const QString FdBasedDb::SELECT_DURATION_0_TEMPLATE  //
     {
         QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM"}  //
-            .arg(ENUM_2_STR(PrePathLeft))    //
-            .arg(ENUM_2_STR(PrePathRight))   //
-            .arg(ENUM_2_STR(Name))           //
-            .arg(ENUM_2_STR(Fd))             //
-        + " `%1` "                                       //
-        + QString{"WHERE `%1` = 0;"}                    //
-              .arg(ENUM_2_STR(Duration))     //
+            .arg(ENUM_2_STR(PrePathLeft))              //
+            .arg(ENUM_2_STR(PrePathRight))             //
+            .arg(ENUM_2_STR(Name))                     //
+            .arg(ENUM_2_STR(Fd))                       //
+        + " `%1` "                                     //
+        + QString{"WHERE `%1` = 0;"}                   //
+              .arg(ENUM_2_STR(Duration))               //
     };
 
 enum UPDATE_DURATION_0_FILED {
@@ -140,20 +140,20 @@ const QString FdBasedDb::UPDATE_DURATION_0_TEMPLATE  //
 
 const QString FdBasedDb::SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE  //
     {
-        QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7` FROM"}            //
-            .arg(ENUM_2_STR(PrePathLeft))                                //
-            .arg(ENUM_2_STR(PrePathRight))                               //
-            .arg(ENUM_2_STR(Name))                                       //
-            .arg(ENUM_2_STR(Duration))                                   //
-            .arg(ENUM_2_STR(Studio))                                     //
-            .arg(ENUM_2_STR(Cast))                                       //
-            .arg(ENUM_2_STR(Tags))                                       //
-        + " `%1` "                                                                   //
+        QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7` FROM"}             //
+            .arg(ENUM_2_STR(PrePathLeft))                                           //
+            .arg(ENUM_2_STR(PrePathRight))                                          //
+            .arg(ENUM_2_STR(Name))                                                  //
+            .arg(ENUM_2_STR(Duration))                                              //
+            .arg(ENUM_2_STR(Studio))                                                //
+            .arg(ENUM_2_STR(Cast))                                                  //
+            .arg(ENUM_2_STR(Tags))                                                  //
+        + " `%1` "                                                                  //
         + QString{R"(WHERE `%1` != 0 OR `%2` != '' OR `%3` != '' OR `%4` != '';)"}  //
-              .arg(ENUM_2_STR(Duration))                                 //
-              .arg(ENUM_2_STR(Studio))                                   //
-              .arg(ENUM_2_STR(Cast))                                     //
-              .arg(ENUM_2_STR(Tags))                                     //
+              .arg(ENUM_2_STR(Duration))                                            //
+              .arg(ENUM_2_STR(Studio))                                              //
+              .arg(ENUM_2_STR(Cast))                                                //
+              .arg(ENUM_2_STR(Tags))                                                //
     };
 
 enum UPDATE_STUDIO_CAST_TAGS_FIELED {
@@ -168,10 +168,10 @@ const QString FdBasedDb::UPDATE_STUDIO_CAST_TAGS_TEMPLATE  //
         "UPDATE `%1` "                                       //
         + QString("SET `%1` = :%1, `%2` = :%2, `%3` = :%3 "  //
                   "WHERE `%4` = :%4;")                       //
-              .arg(ENUM_2_STR(Studio))            //
-              .arg(ENUM_2_STR(Cast))              //
-              .arg(ENUM_2_STR(Tags))              //
-              .arg(ENUM_2_STR(PathHash))          //
+              .arg(ENUM_2_STR(Studio))                       //
+              .arg(ENUM_2_STR(Cast))                         //
+              .arg(ENUM_2_STR(Tags))                         //
+              .arg(ENUM_2_STR(PathHash))                     //
     };
 
 enum EXPORT_TO_JSON {
@@ -184,19 +184,18 @@ enum EXPORT_TO_JSON {
   EXPORT_TO_JSON_FIELD_Tags,             //
 };
 
-const QString FdBasedDb::QUERY_KEY_INFO_TEMPLATE//
+const QString FdBasedDb::QUERY_KEY_INFO_TEMPLATE  //
     {
-        QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM"}//
-            .arg(ENUM_2_STR(PrePathLeft))                      //
-            .arg(ENUM_2_STR(PrePathRight))                 //
-            .arg(ENUM_2_STR(Name))                         //
-            .arg(ENUM_2_STR(Size))                         //
-        + " `%1` WHERE %2"                                     //
+        QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM"}  //
+            .arg(ENUM_2_STR(PrePathLeft))              //
+            .arg(ENUM_2_STR(PrePathRight))             //
+            .arg(ENUM_2_STR(Name))                     //
+            .arg(ENUM_2_STR(Size))                     //
+        + " `%1` WHERE %2"                             //
     };
 
 const QString FdBasedDb::WHERE_NAME_CORE_TEMPLATE{//
-    QString{R"(`%1` LIKE )"}.arg(ENUM_2_STR(Name)) + R"("%1")"
-};
+                                                  QString{R"(`%1` LIKE )"}.arg(ENUM_2_STR(Name)) + R"("%1")"};
 
 // Incremental
 int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbsPath) {
@@ -269,36 +268,33 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
   QSqlQuery query{db};
   if (!query.prepare(INSERT_MOVIE_RECORD_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
   if (!db.transaction()) {
     LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+          1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
   int count = 0;
-  int lastSlashIndex{-1};
-  QString absFilePath, prePathLeft, prePathRight, vidName;
-  for (const qint64& fdVal : needInsertFds) {
+  QString absFilePath;
+  for (const qint64 fdVal : needInsertFds) {
     absFilePath = newFd2Pth[fdVal];
-    lastSlashIndex = PathTool::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
-    vidName = absFilePath.mid(lastSlashIndex + 1);
-
+    const PathTool::RMFComponent& rmf = PathTool::RMFComponent::FromPath(absFilePath);
     // 绑定参数
     query.bindValue(INSERT_FIELD_Fd, fdVal);
-    query.bindValue(INSERT_FIELD_PrePathLeft, prePathLeft);
-    query.bindValue(INSERT_FIELD_PrePathRight, prePathRight);
-    query.bindValue(INSERT_FIELD_Name, vidName);
+    query.bindValue(INSERT_FIELD_PrePathLeft, rmf.rootPart);
+    query.bindValue(INSERT_FIELD_PrePathRight, rmf.middlePart);
+    query.bindValue(INSERT_FIELD_Name, rmf.fileName);
     query.bindValue(INSERT_FIELD_Size, QFile{absFilePath}.size());
     query.bindValue(INSERT_FIELD_PathHash, JsonHelper::CalcFileHash(absFilePath));
 
     if (!query.exec()) {
       db.rollback();
       LOG_W("replace[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_EXEC_FAILED;
     }
 
@@ -308,12 +304,12 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
       if (!db.commit()) {
         db.rollback();
         LOG_W("commit the %dth batch record(s) failed: %s",  //
-                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
         LOG_W("start the %dth transaction failed: %s",  //
-                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
     }
@@ -339,13 +335,13 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
   }
   const QString& placeholders = GetDeleteInPlaceholders(needDeleteFds.size());
   const QString qryCmd = QString{R"(DELETE FROM `%1` WHERE `%2` IN (%3);)"}
-                             .arg(tableName)                  //
+                             .arg(tableName)       //
                              .arg(ENUM_2_STR(Fd))  //
                              .arg(placeholders);
   QSqlQuery query{db};
   if (!query.prepare(qryCmd)) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
@@ -356,7 +352,7 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
   if (!query.exec()) {
     db.rollback();
     LOG_W("delete[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_INVALID;
   }
   query.finish();
@@ -365,7 +361,10 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
   return FD_OK;
 }
 
-FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& needUpdateFds, const QHash<qint64, QString>& newFd2Pth, int& updateCnt) {
+FD_ERROR_CODE FdBasedDb::Update(const QString& tableName,
+                                const QSet<qint64>& needUpdateFds,
+                                const QHash<qint64, QString>& newFd2Pth,
+                                int& updateCnt) {
   auto db = GetDb();
   updateCnt = 0;
   if (needUpdateFds.isEmpty()) {
@@ -374,31 +373,29 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
   QSqlQuery query{db};
   if (!query.prepare(UPDATE_PATH_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   // 开始事务
   if (!db.transaction()) {
     LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+          1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
   int count = 0;
-  int lastSlashIndex{-1};
-  QString absFilePath, prePathLeft, prePathRight, vidName;
+  QString absFilePath;
   for (const qint64& fdVal : needUpdateFds) {
     absFilePath = newFd2Pth[fdVal];
-    lastSlashIndex = PathTool::GetPrepathParts(absFilePath, prePathLeft, prePathRight);
-    vidName = absFilePath.mid(lastSlashIndex + 1);
-    query.bindValue(UPDATE_PATH_FILED_PrePathLeft, prePathLeft);
-    query.bindValue(UPDATE_PATH_FILED_PrePathRight, prePathRight);
-    query.bindValue(UPDATE_PATH_FILED_Name, vidName);
+    const PathTool::RMFComponent& rmf = PathTool::RMFComponent::FromPath(absFilePath);
+    query.bindValue(UPDATE_PATH_FILED_PrePathLeft, rmf.rootPart);
+    query.bindValue(UPDATE_PATH_FILED_PrePathRight, rmf.middlePart);
+    query.bindValue(UPDATE_PATH_FILED_Name, rmf.fileName);
     query.bindValue(UPDATE_PATH_FILED_PathHash, JsonHelper::CalcFileHash(absFilePath));
     query.bindValue(UPDATE_PATH_FILED_Fd, fdVal);
     if (!query.exec()) {
       db.rollback();
       LOG_W("update[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
 
@@ -408,12 +405,12 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName, const QSet<qint64>& ne
       if (!db.commit()) {
         db.rollback();
         LOG_W("commit the %dth batch record(s) failed: %s",  //
-                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
         LOG_W("start the %dth transaction failed: %s",  //
-                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
     }
@@ -534,7 +531,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   query.setForwardOnly(true);
   if (!query.exec(SELECT_DURATION_0_TEMPLATE.arg(tableName))) {
     LOG_W("Query[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_EXEC_FAILED;
   }
 
@@ -542,9 +539,9 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   QString absFilePath;
   qint64 fdVal{0};
   while (query.next()) {
-    absFilePath = PathTool::Path3Join(query.value(QUERY_DURATION_0_FILED_PrePathLeft).toString(),   //
-                                      query.value(QUERY_DURATION_0_FILED_PrePathRight).toString(),  //
-                                      query.value(QUERY_DURATION_0_FILED_Name).toString());
+    absFilePath = PathTool::RMFComponent::join(query.value(QUERY_DURATION_0_FILED_PrePathLeft).toString(),   //
+                                               query.value(QUERY_DURATION_0_FILED_PrePathRight).toString(),  //
+                                               query.value(QUERY_DURATION_0_FILED_Name).toString());
     fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toLongLong();
     fd2Duration[fdVal] = mSkipGetDuration ? 0 : mi.GetLengthQuick(absFilePath);
   }
@@ -557,13 +554,13 @@ int FdBasedDb::SetDuration(const QString& tableName) {
   // 2. start to update
   if (!query.prepare(UPDATE_DURATION_0_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
   if (!db.transaction()) {
     LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+          1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
@@ -574,7 +571,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     if (!query.exec()) {
       db.rollback();
       LOG_W("replace[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_EXEC_FAILED;
     }
 
@@ -584,12 +581,12 @@ int FdBasedDb::SetDuration(const QString& tableName) {
       if (!db.commit()) {
         db.rollback();
         LOG_W("commit the %dth batch record(s) failed: %s",  //
-                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
         LOG_W("start the %dth transaction failed: %s",  //
-                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
     }
@@ -632,26 +629,23 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
   QSqlQuery query{db};
   if (!query.prepare(SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   if (!query.exec()) {
     LOG_W("Query[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_EXEC_FAILED;
   }
 
   QMap<QString, DurStudioCastTags> pth2Info;
-  QSet<QString> pathJsonsIn;
   QString jsonAbsFilePath;
   QString jsonFileName;
-  QString jsonPrepath;
   while (query.next()) {
-    jsonFileName = PathTool::FileExtReplacedWithJson(query.value(EXPORT_TO_JSON_FIELD_Name).toString());  //
-    jsonPrepath = PathTool::Path2Join(query.value(EXPORT_TO_JSON_FIELD_PrePathLeft).toString(),           //
-                                      query.value(EXPORT_TO_JSON_FIELD_PrePathRight).toString());         //
-    pathJsonsIn << jsonPrepath;
-    jsonAbsFilePath = PathTool::Path2Join(jsonPrepath, jsonFileName);
+    jsonFileName = PathTool::FileExtReplacedWithJson(query.value(EXPORT_TO_JSON_FIELD_Name).toString());       //
+    jsonAbsFilePath = PathTool::RMFComponent::join(query.value(EXPORT_TO_JSON_FIELD_PrePathLeft).toString(),   //
+                                                   query.value(EXPORT_TO_JSON_FIELD_PrePathRight).toString(),  //
+                                                   jsonFileName);
     pth2Info[jsonAbsFilePath] = DurStudioCastTags{query.value(EXPORT_TO_JSON_FIELD_Duration).toInt(),   //
                                                   query.value(EXPORT_TO_JSON_FIELD_Studio).toString(),  //
                                                   query.value(EXPORT_TO_JSON_FIELD_Cast).toString(),    //
@@ -661,14 +655,6 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
   if (pth2Info.isEmpty()) {
     LOG_D("No need export to json, skip");
     return FD_OK;
-  }
-
-  QDir dir;
-  for (const QString& pth : pathJsonsIn) {
-    if (!dir.exists(pth)) {
-      LOG_W("Json path[%s] not exist, adt first", qPrintable(pth));
-      return FD_JSON_PATH_NOT_EXIST;
-    }
   }
 
   int jsonFilesCnt = 0;
@@ -715,13 +701,13 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
   QSqlQuery query{db};
   if (!query.prepare(UPDATE_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   // 开始事务
   if (!db.transaction()) {
     LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+          1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
@@ -735,7 +721,7 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
     if (!query.exec()) {
       db.rollback();
       LOG_W("update[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
 
@@ -745,12 +731,12 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
       if (!db.commit()) {
         db.rollback();
         LOG_W("commit the %dth batch record(s) failed: %s",  //
-                 count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
         LOG_W("start the %dth transaction failed: %s",  //
-                 count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
     }
