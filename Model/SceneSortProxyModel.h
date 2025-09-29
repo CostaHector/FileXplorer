@@ -21,7 +21,7 @@ class SceneSortProxyModel : public QSortFilterProxyModel {
 
  private:
   SceneSortOrderHelper::SortDimE m_sortDimension = SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER;
-  SCENE_INFO::CompareFunc mComparator = SCENE_INFO::getCompareFunc(m_sortDimension);
+  SceneInfo::CompareFunc mComparator = SceneInfo::getCompareFunc(m_sortDimension);
   ScenesListModel* m_sourceModel = nullptr;
 
 #ifdef RUNNING_UNIT_TESTS

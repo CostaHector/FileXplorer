@@ -2,76 +2,33 @@
 #define QABSTRACTTABLEMODELPUB_H
 
 #include <QAbstractTableModel>
-#include "Logger.h"
-
+#include <stack>
 class QAbstractTableModelPub : public QAbstractTableModel {
  public:
-  QAbstractTableModelPub(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
+  using QAbstractTableModel::QAbstractTableModel;
 
-  void RowsCountBeginChange(int beforeRow, int afterRow) {
-    m_befRow = beforeRow;
-    m_aftRow = afterRow;
-    if (m_befRow == m_aftRow) {
-      return;
-    } else if (m_befRow < m_aftRow) {
-      beginInsertRows(QModelIndex(), m_befRow, m_aftRow - 1);
-    } else {
-      beginRemoveRows(QModelIndex(), m_aftRow, m_befRow - 1);
-    }
-  }
-  void RowsCountEndChange() {
-    if (!IsRowCntValid()) {
-      LOG_W("row count[bef:%d, aft:%d] invalid", m_befRow, m_aftRow);
-      return;
-    }
-    if (m_befRow == m_aftRow) {
-      if (m_aftRow > 0 && columnCount() > 0) {
-        emit dataChanged(index(0, 0), index(m_aftRow - 1, columnCount() - 1), {Qt::ItemDataRole::DisplayRole | Qt::ItemDataRole::DecorationRole});
-      }
-    } else if (m_befRow < m_aftRow) {
-      endInsertRows();
-    } else {
-      endRemoveRows();
-    }
-  }
+  bool RowsCountBeginChange(int beforeRow, int afterRow);
+  bool RowsCountEndChange(); // must call me after RowsCountBeginChange called and data change finished
+  bool ColumnsCountBeginChange(int beforeColumnCnt, int afterColumnCnt);
+  bool ColumnsCountEndChange(); // must call me after ColumnsCountBeginChange called and data change finished
 
-  template<typename SwappableContainerDataType>
-  void RowsCountChange(SwappableContainerDataType& lhs, SwappableContainerDataType& rhs);
-
-  void ColumnsCountBeginChange(int beforeColumnCnt, int afterColumnCnt) {
-    m_befCol = beforeColumnCnt;
-    m_aftCol = afterColumnCnt;
-    if (m_befCol == m_aftCol) {
-      return;
-    } else if (m_befCol < m_aftCol) {
-      beginInsertColumns(QModelIndex(), m_befCol, m_aftCol - 1);
-    } else {
-      beginRemoveColumns(QModelIndex(), m_aftCol, m_befCol - 1);
-    }
-  }
-  void ColumnsCountEndChange() {
-    if (!IsColCntValid()) {
-      LOG_W("col count[bef:%d, aft:%d] invalid", m_befCol, m_aftCol);
-      return;
-    }
-    if (m_befCol == m_aftCol) {
-      if (m_aftCol > 0 && rowCount() > 0) {
-        emit dataChanged(index(0, 0), index(rowCount() - 1, m_aftCol - 1), {Qt::ItemDataRole::DisplayRole | Qt::ItemDataRole::DecorationRole});
-      }
-    } else if (m_befCol < m_aftCol) {
-      endInsertColumns();
-    } else {
-      endRemoveColumns();
-    }
-  }
+  enum class DataChangeRangeE {
+    ROW = 0x1 << 0,
+    COLUMN = 0x1 << 1,
+    BOTH_ROW_AND_COLUMN = (int)DataChangeRangeE::ROW | (int)DataChangeRangeE::COLUMN,
+  };
+  template <typename Swappable2DimContainerDataType>
+  void DimensionCountChange(Swappable2DimContainerDataType& lhs, Swappable2DimContainerDataType& rhs, const DataChangeRangeE changeRangeE=DataChangeRangeE::ROW);
 
  private:
-  bool IsRowCntValid() const { return m_befRow >= 0 || m_aftRow >= 0; }
-  bool IsColCntValid() const { return m_befCol >= 0 || m_aftCol >= 0; }
-  int m_befRow{-1}, m_aftRow{-1};
-  int m_befCol{-1}, m_aftCol{-1};
+  struct DimensionRange {
+    DimensionRange() = delete;
+    DimensionRange(int bef, int aft) : m_bef{bef}, m_aft{aft} {}
+    int m_bef;
+    int m_aft;
+  };
+  static bool IsDimensionCntValid(int bef, int aft) { return bef >= 0 && aft >= 0; }
+  std::stack<DimensionRange> mRowChangeStack, mColumnChangeStack;
 };
-
-extern template void QAbstractTableModelPub::RowsCountChange<QStringList>(QStringList&, QStringList&);
 
 #endif  // QABSTRACTTABLEMODELPUB_H
