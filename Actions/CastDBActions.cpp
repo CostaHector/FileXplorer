@@ -7,20 +7,30 @@
 #include <QActionGroup>
 
 CastDBActions::CastDBActions(QObject* parent)  //
-  : QObject{parent}                          //
+    : QObject{parent}                          //
 {
-  SUBMIT = new (std::nothrow) QAction{QIcon(":img/MANUAL_SUBMIT"), "Submit", this};
-  CHECK_NULLPTR_RETURN_VOID(SUBMIT);
-  SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
-  SUBMIT->setShortcutVisibleInContextMenu(true);
+  _MODEL_SUBMIT_ALL = new (std::nothrow) QAction{QIcon(":img/MANUAL_SUBMIT"), "Submit All", this};
+  CHECK_NULLPTR_RETURN_VOID(_MODEL_SUBMIT_ALL);
+  _MODEL_SUBMIT_ALL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
+  _MODEL_SUBMIT_ALL->setShortcutVisibleInContextMenu(true);
+  _MODEL_SUBMIT_ALL->setToolTip(QString{"<b>%1 (%2)</b><br/>Submits all pending changes. Model will be repopulated. Any views presenting it will lose their selections"}.arg(
+      _MODEL_SUBMIT_ALL->text(), _MODEL_SUBMIT_ALL->shortcut().toString()));
+
+  _MODEL_REPOPULATE = new (std::nothrow) QAction{QIcon(":img/REFRESH_THIS_PATH"), "Repopulate", this};
+  CHECK_NULLPTR_RETURN_VOID(_MODEL_REPOPULATE);
+  _MODEL_REPOPULATE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_R)); // todo
+  _MODEL_REPOPULATE->setShortcutVisibleInContextMenu(true);
+  _MODEL_REPOPULATE->setToolTip(QString{"<b>%1 (%2)</b><br/>Repopulates the model with data from the table via setTable"}.arg(
+      _MODEL_REPOPULATE->text(), _MODEL_REPOPULATE->shortcut().toString()));
 
   APPEND_FROM_MULTILINES_INPUT = new (std::nothrow) QAction{QIcon(":img/INSERT_INTO_TABLE"), "Append Casts", this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_MULTILINES_INPUT);
   APPEND_FROM_MULTILINES_INPUT->setToolTip("Append casts records from user input multi-lines");
   APPEND_FROM_PSON_FILES = new (std::nothrow) QAction{"Append from pson files", this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_PSON_FILES);
-  APPEND_FROM_PSON_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>Append casts records from *.pson files under ${ImageHost}. Override if primary key conflict")
-                                         .arg(APPEND_FROM_PSON_FILES->text(), APPEND_FROM_PSON_FILES->shortcut().toString()));
+  APPEND_FROM_PSON_FILES->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Append casts records from *.pson files under ${ImageHost}. Override if primary key conflict")
+          .arg(APPEND_FROM_PSON_FILES->text(), APPEND_FROM_PSON_FILES->shortcut().toString()));
   APPEND_FROM_FILE_SYSTEM_STRUCTURE = new (std::nothrow) QAction{"Append from file-system structure", this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_FILE_SYSTEM_STRUCTURE);
   APPEND_FROM_FILE_SYSTEM_STRUCTURE->setToolTip("Append casts records from file-system structure under ${ImageHost}");
@@ -46,8 +56,9 @@ CastDBActions::CastDBActions(QObject* parent)  //
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK = new (std::nothrow) QAction{QIcon{":img/SYNC_FROM_DISK"}, "Sync imgs field", this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setShortcut(QKeySequence(Qt::Key::Key_F5));
-  SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setToolTip(QString{"<b>%1 (%2)</b><br/> Sync selected record(s) Imgs field from disk"}//
-                                                       .arg(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->text(), SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->shortcut().toString()));
+  SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setToolTip(
+      QString{"<b>%1 (%2)</b><br/> Sync selected record(s) Imgs field from disk"}  //
+          .arg(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->text(), SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->shortcut().toString()));
   SYNC_ALL_RECORDS_IMGS_FROM_DISK = new (std::nothrow) QAction{"Sync all imgs field", this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_ALL_RECORDS_IMGS_FROM_DISK);
   SYNC_ALL_RECORDS_IMGS_FROM_DISK->setToolTip("Sync all record(s) Imgs field from disk");
@@ -74,8 +85,9 @@ CastDBActions::CastDBActions(QObject* parent)  //
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "Open Database", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
-  OPEN_DB_WITH_LOCAL_APP->setToolTip(QString("<b>%1 (%2)</b><br/> Open *.db file in local app(DB Browser sqlite). Precondition: It has been set as default app")
-                                         .arg(OPEN_DB_WITH_LOCAL_APP->text(), OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
+  OPEN_DB_WITH_LOCAL_APP->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Open *.db file in local app(DB Browser sqlite). Precondition: It has been set as default app")
+          .arg(OPEN_DB_WITH_LOCAL_APP->text(), OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
   FILE_SYSTEM_OP = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(FILE_SYSTEM_OP);
   FILE_SYSTEM_OP->addAction(MIGRATE_CAST_TO);
@@ -84,8 +96,9 @@ CastDBActions::CastDBActions(QObject* parent)  //
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{QIcon{":img/DUMP_INTO_PSON_FILE"}, "Dump records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_S));
-  DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setToolTip(QString{"<b>%1 (%2)</b><br/> Dump selected records to its pson file"}//
-                                                       .arg(DUMP_SELECTED_RECORDS_INTO_PSON_FILE->text(), DUMP_SELECTED_RECORDS_INTO_PSON_FILE->shortcut().toString()));
+  DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setToolTip(
+      QString{"<b>%1 (%2)</b><br/> Dump selected records to its pson file"}  //
+          .arg(DUMP_SELECTED_RECORDS_INTO_PSON_FILE->text(), DUMP_SELECTED_RECORDS_INTO_PSON_FILE->shortcut().toString()));
   DUMP_ALL_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{"Dump all records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_ALL_RECORDS_INTO_PSON_FILE);
   DUMP_ALL_RECORDS_INTO_PSON_FILE->setToolTip("Dump all records to its pson file");
