@@ -7,11 +7,11 @@ class CastBaseDb : public DbManager {
  public:
   typedef QMap<QString, std::pair<QString, QStringList>> TCast2OriImgs;
 
-  CastBaseDb(const QString& dbName, const QString& connName, QObject* parent = nullptr)  //
-      : DbManager{dbName, connName, parent} {}
+  using DbManager::DbManager;
   int ReadFromImageHost(const QString& imgsHostPath);
   int AppendCastFromMultiLineInput(const QString& perfsText);
   int LoadFromPsonFile(const QString& imgsHostPath);
+
   static const QString CREATE_PERF_TABLE_TEMPLATE;
 
   static QMap<QString, QString> GetFreqName2AkaNames(const QStringList& perfsList);

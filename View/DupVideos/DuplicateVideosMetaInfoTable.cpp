@@ -236,6 +236,6 @@ bool DuplicateVideosMetaInfoTable::onOpenTableAssociatedPath(const QModelIndex& 
   return true;
 #endif
   const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
-  LOG_OE_NP(openRet, "Open Directory", pth);
+  LOG_OE_P(openRet, "Open Table Associated path", "%s", pth);
   return openRet;
 }

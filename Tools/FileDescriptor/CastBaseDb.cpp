@@ -7,6 +7,7 @@
 #include "PublicMacro.h"
 #include "StringTool.h"
 #include "TableFields.h"
+#include "JsonRenameRegex.h"
 
 #include <QSqlQuery>
 #include <QSqlField>
@@ -68,16 +69,18 @@ enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
  * INSERT INTO `TABLE` (`%1`, `%2`, `%3`) VALUES (:%1, :%2, :%3) ON CONFLICT(%1) DO UPDATE SET `%2`=:%2, `%3`=:%3;
  * is same as follows. Otherwise field not specified will be null or default(replace into: delete and insert) */
 const QString INSERT_NAME_ORI_IMGS_TEMPLATE  //
-    {"INSERT INTO `%1`" + QString{R"((`%1`, `%2`, `%3`) VALUES (?1, ?2, ?3) ON CONFLICT(`%1`) DO UPDATE SET `%2`=?4, `%3`=?5;)"}
-                              .arg(ENUM_2_STR(Name), ENUM_2_STR(Ori), ENUM_2_STR(Imgs))};
+    {"INSERT INTO `%1`" +
+     QString{R"((`%1`, `%2`, `%3`) VALUES (?1, ?2, ?3) ON CONFLICT(`%1`) DO UPDATE SET `%2`=?4, `%3`=?5;)"}.arg(ENUM_2_STR(Name),
+                                                                                                                ENUM_2_STR(Ori),
+                                                                                                                ENUM_2_STR(Imgs))};
 
-enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD { //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
+enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD {  //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name = 0,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE,
-  };
+};
 
 // 数值参数占位符即便要填入的值一样也不可重用, 例如:1, :2, :2, 有两个:2会出错, 需要改占位符:1, :2, :3
 /* INSERT INTO `%1` (`%1`,`%2`) VALUES (:1, :2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:3; */
@@ -108,14 +111,14 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
   }
   if (!db.transaction()) {
     LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+          1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
   QSqlQuery qry{db};
   if (!qry.prepare(INSERT_NAME_ORI_IMGS_TEMPLATE.arg(DB_TABLE::PERFORMERS))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+          qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
@@ -125,7 +128,7 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
   for (auto mpIt = cast2OriImgs.cbegin(); mpIt != cast2OriImgs.cend(); ++mpIt) {
     const QString& perf = mpIt.key();
     const QString& ori = mpIt.value().first;
-    const QString& imgsStr = mpIt.value().second.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);   // img seperated by \n
+    const QString& imgsStr = mpIt.value().second.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name, perf);
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation, ori);
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs, imgsStr);
@@ -133,7 +136,7 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE, imgsStr);
     if (!qry.exec()) {
       LOG_W("replace[%s] failed: %s",  //
-               qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+            qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
       db.rollback();
       return FD_EXEC_FAILED;
     }
@@ -162,14 +165,14 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
   }
   if (!db.transaction()) {
     LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+          1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
   QSqlQuery qry{db};
   if (!qry.prepare(INSERT_FULL_FIELDS_TEMPLATE.arg(DB_TABLE::PERFORMERS))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+          qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
@@ -183,18 +186,18 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
       LOG_D("psonPath[%s] is empty", qPrintable(psonPath));
       continue;
     }
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name,        pson[ENUM_2_STR(Name)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate,        pson[ENUM_2_STR(Rate)].toInt());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,         pson[ENUM_2_STR(AKA)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags,        pson[ENUM_2_STR(Tags)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name, pson[ENUM_2_STR(Name)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate, pson[ENUM_2_STR(Rate)].toInt());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA, pson[ENUM_2_STR(AKA)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags, pson[ENUM_2_STR(Tags)].toString());
     qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation, pson[ENUM_2_STR(Ori)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids,        pson[ENUM_2_STR(Vids)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs,        pson[ENUM_2_STR(Imgs)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail,      pson[ENUM_2_STR(Detail)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids, pson[ENUM_2_STR(Vids)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, pson[ENUM_2_STR(Imgs)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail, pson[ENUM_2_STR(Detail)].toString());
 
     if (!qry.exec()) {
       LOG_W("replace[%s] failed: %s",  //
-               qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+            qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
       db.rollback();
       return FD_EXEC_FAILED;
     }
@@ -254,7 +257,7 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
   QSqlQuery qry{db};
   if (!qry.prepare(INSERT_PERF_AND_AKA_TEMPLATE.arg(DB_TABLE::PERFORMERS))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+          qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   int succeedCnt = 0;
@@ -265,7 +268,7 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
     qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE, it.value());
     if (!qry.exec()) {
       LOG_W("Insert[%s] failed: %s",  //
-               qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+            qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
       db.rollback();
       return FD_EXEC_FAILED;
     }
@@ -282,26 +285,29 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
 }
 
 bool CastBaseDb::UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& imageHostPath) {
-  QDir castDir{GetCastPath(sqlRecord, imageHostPath)};
-  castDir.setFilter(QDir::Filter::Files);
-  castDir.setSorting(QDir::SortFlag::Name);
+  QDir castDir{GetCastPath(sqlRecord, imageHostPath), "", QDir::SortFlag::Name, QDir::Filter::Files};
   castDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
   if (!castDir.exists()) {
-    return false;
+    LOG_D("cast path[%s] not exist", qPrintable(castDir.absolutePath()));
+    return false;  // no need update
   }
-  sqlRecord.setValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, castDir.entryList().join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR));
+  const QString newImages = castDir.entryList().join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
+  if (sqlRecord.value(PERFORMER_DB_HEADER_KEY::Imgs).toString() == newImages) {
+    return false;  // no need update
+  }
+  sqlRecord.setValue(PERFORMER_DB_HEADER_KEY::Imgs, newImages);
   return true;
 }
 
 QString CastBaseDb::GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
-  return imageHostPath + '/'//
-         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation).value().toString() + '/'//
-         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString();//
+  return imageHostPath + '/'                                                                        //
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation).value().toString() + '/'  //
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString();              //
 }
 
 QString CastBaseDb::GetCastFilePath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
-  return GetCastPath(sqlRecord, imageHostPath) + '/'//
-         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString()//
+  return GetCastPath(sqlRecord, imageHostPath) + '/'                                   //
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString()  //
          + ".pson";
 }
 
@@ -315,7 +321,7 @@ bool CastBaseDb::IsNewOriFolderPathValid(const QString& destPath, const QString&
     return false;
   }
   QString newOriFolder = destPath.mid(imageHost.size() + 1);
-  if (newOriFolder.isEmpty() || newOriFolder.contains('/')) {
+  if (newOriFolder.contains(JSON_RENAME_REGEX::INVALID_CHARS_IN_FILENAME)) {
     LOG_W("Abort Migrate, Ori Folder Name[%s] invalid", qPrintable(newOriFolder));
     return false;
   }
@@ -323,14 +329,14 @@ bool CastBaseDb::IsNewOriFolderPathValid(const QString& destPath, const QString&
   return true;
 }
 
-int CastBaseDb::MigrateToNewOriFolder(QSqlRecord &sqlRecord, QDir& imageoriDir, const QString &newOri) {
-  const QString oldOri {sqlRecord.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
+int CastBaseDb::MigrateToNewOriFolder(QSqlRecord& sqlRecord, QDir& imageoriDir, const QString& newOri) {
+  const QString oldOri{sqlRecord.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
   if (newOri == oldOri) {
     return FD_ERROR_CODE::FD_SKIP;
   }
   // Migrate old folder from oldOri to newOri
-  const QString castName {sqlRecord.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-  if (imageoriDir.exists(oldOri + '/' + castName)) { // folder oldOri not exist
+  const QString castName{sqlRecord.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
+  if (imageoriDir.exists(oldOri + '/' + castName)) {                              // folder oldOri not exist
     if (!imageoriDir.rename(oldOri + '/' + castName, newOri + '/' + castName)) {
       LOG_W("Migrate folder failed, castName[%s] from oldOri[%s] to newOri[%s]", qPrintable(castName), qPrintable(oldOri), qPrintable(newOri));
       return FD_ERROR_CODE::FD_RENAME_FAILED;
@@ -342,12 +348,12 @@ int CastBaseDb::MigrateToNewOriFolder(QSqlRecord &sqlRecord, QDir& imageoriDir, 
 
 auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostOriPath) -> TCast2OriImgs {
   TCast2OriImgs cast2OriImgs;
-  const int IMG_RELPATH_START_INDEX = imgsHostOriPath.size() + 1; // "C:/home/to/imageHost/"   "ori/cast/cast.jpg"
+  const int IMG_RELPATH_START_INDEX = imgsHostOriPath.size() + 1;  // "C:/home/to/imageHost/"   "ori/cast/cast.jpg"
   QDirIterator it{imgsHostOriPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     const QString imgRelativePath = it.filePath().mid(IMG_RELPATH_START_INDEX);
-    const QStringList& imgPathParts = imgRelativePath.split('/'); // ori/cast/img
+    const QStringList& imgPathParts = imgRelativePath.split('/');  // ori/cast/img
     const int pathSectionSize = imgPathParts.size();
     if (pathSectionSize != 3) {
       LOG_D("Relative2ImagePath[%s] sections count[%d] != 3", qPrintable(imgRelativePath), pathSectionSize);
@@ -379,33 +385,45 @@ int CastBaseDb::WhenCastNameRenamed(const QString& imgsHostOriPath, const QStrin
     LOG_W("New name[%s] invalid", qPrintable(newName));
     return -1;
   }
-  if (newName.contains('/') || newName.contains('\\')) {
-    LOG_W("New name[%s] invalid should not contain slash", qPrintable(newName));
+
+  if (newName.contains(JSON_RENAME_REGEX::INVALID_CHARS_IN_FILENAME)) {
+    LOG_W("New name[%s] invalid should not contain invalid chars", qPrintable(newName));
     return -1;
   }
+
   QDir oriDir{imgsHostOriPath};
   if (!oriDir.exists()) {
     LOG_D("Host Image Path[%s] does not exist.", qPrintable(imgsHostOriPath));
     return -1;
   }
-
-  int renameCount = 0;
-  // 1. imgsHostOriPath/oldName -> imgsHostOriPath/newName
-  if (!oriDir.rename(oldName, newName)) {
-    LOG_W("Renamed directory from %s->%s failed.", qPrintable(oldName), qPrintable(newName));
+  if (oriDir.exists(newName)) {
+    LOG_D("New Name[%s] already been occupied.", qPrintable(newName));
     return -1;
   }
-  ++renameCount;
-  // 2. imgsHostOriPath/newName/oldNameXX -> imgsHostOriPath/newName/newNameXX
-  QDir newDir{imgsHostOriPath + "/" + newName, oldName+"*", QDir::SortFlag::Name, QDir::Filter::Files};
-  int OLD_NAME_LENGTH = oldName.size();
-  for (QString oldFileName: newDir.entryList()) {
-    QString newFileName = newName + oldFileName.mid(OLD_NAME_LENGTH);
-    if (!newDir.rename(oldFileName, newFileName)) {
+  int renameCount = 0;
+
+  // 1. rename files under ori. imgsHostOriPath/oldName/oldNameXX -> imgsHostOriPath/oldName/newNameXX
+  QDir oldir{imgsHostOriPath + "/" + oldName, "", QDir::SortFlag::Name, QDir::Filter::Files};  // oldName + "*", QDir::SortFlag::Name
+  oldir.setNameFilters({oldName + "*"});
+  for (const QString& oldFileName : oldir.entryList()) {
+    QString newFileName = oldFileName;
+    newFileName.replace(oldName, newName);
+    if (newFileName == oldFileName) {
+      continue;
+    }
+    if (!oldir.rename(oldFileName, newFileName)) {
       LOG_W("Rename file from %s->%s failed.", qPrintable(oldFileName), qPrintable(newFileName));
       return -1;
     }
     ++renameCount;
   }
+
+  // 2. rename ori itself,  imgsHostOriPath/oldName -> imgsHostOriPath/newName
+  if (!oriDir.rename(oldName, newName)) {
+    LOG_W("Renamed directory from %s->%s failed.", qPrintable(oldName), qPrintable(newName));
+    return -1;
+  }
+  ++renameCount;
+
   return renameCount;
 }

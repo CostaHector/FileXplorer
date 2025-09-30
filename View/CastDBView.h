@@ -30,7 +30,7 @@ private:
   bool onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDelete);
   bool DropSqlDatabase();
 
-  bool onSubmit();
+  bool onModelRepopulate();
   bool onRevert();
 
   int onLoadFromFileSystemStructure();
@@ -38,14 +38,17 @@ private:
 
   int onSyncAllImgsFieldFromImageHost();
   int onSyncImgsFieldFromImageHost();
+  int onSyncImgsFieldCore(const QModelIndexList& selectedRowsIndexes);
 
   int onDumpAllIntoPsonFile();
   int onDumpIntoPsonFile();
+  int onDumpIntoCore(const QModelIndexList& selectedRowsIndexes);
 
-  int onForceRefreshAllRecordsVids();
-  int onForceRefreshRecordsVids();
+  int onRefreshAllVidsField();
+  int onRefreshVidsField();
+  int onRefreshVidsFieldCore(const QModelIndexList& selectedRowsIndexes);
 
-  void emitCastCurrentRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
+  void EmitCurrentCastRecordChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
   int onMigrateCastTo();
 
 private:
@@ -56,6 +59,7 @@ private:
 
   const QString mImageHost;
   CastBaseDb& _castDb;
+  static int QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE;
 };
 
 #endif  // CASTDBVIEW_H

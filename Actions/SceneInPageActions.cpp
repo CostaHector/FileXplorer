@@ -18,7 +18,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                            .arg(_COMBINE_MEDIAINFOS_JSON->text(), _COMBINE_MEDIAINFOS_JSON->shortcut().toString()));
 
   using namespace SceneSortOrderHelper;
-  _BY_MOVIE_PATH = new (std::nothrow) QAction(QIcon(":img/SORTING_FILE_FOLDER"), c_str(SortDimE::MOVIE_PATH), this);
+  _BY_MOVIE_PATH = new (std::nothrow) QAction(c_str(SortDimE::MOVIE_PATH), this);
   CHECK_NULLPTR_RETURN_VOID(_BY_MOVIE_PATH);
   _BY_MOVIE_PATH->setCheckable(true);
 
