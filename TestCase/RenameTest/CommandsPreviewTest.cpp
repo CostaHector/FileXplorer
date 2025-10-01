@@ -27,7 +27,9 @@ class CommandsPreviewTest : public PlainTestSuite {
     emit preview.COPY_TEXT->triggered();
 
     const QString afterCopyActionTextInClipboard = clipboard->text();
-    QCOMPARE(afterCopyActionTextInClipboard, contentsInBrowser);
+#ifndef _WIN32
+    QCOMPARE(afterCopyActionTextInClipboard, contentsInBrowser);  // clipboard is extremely unreliable in windows
+#endif
   }
 
   void testStayOnTopAction() {

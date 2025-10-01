@@ -94,10 +94,8 @@ const QString DevicesAndDriverDb::UPDATE_MOUNT_POINT_TEMPLATE  //
            .arg(c_str(GUID))};
 
 QList<VolumeInfo> GetVolumesInfo() {
-#ifdef RUNNING_UNIT_TESTS
-  return MockGetVolumesInfo();
-#endif
   QList<VolumeInfo> ans;
+#ifdef _WIN32
   const auto& mountedVolLst = QStorageInfo::mountedVolumes();
   for (const auto& storageInfo : mountedVolLst) {
     const QString& drvPath{storageInfo.rootPath()};
@@ -108,6 +106,11 @@ QList<VolumeInfo> GetVolumesInfo() {
     }
     ans << VolumeInfo{drvPath, storageInfo.name(), storageInfo.bytesTotal(), storageInfo.bytesAvailable(), guid};
   }
+#else
+#ifdef RUNNING_UNIT_TESTS
+  return MockGetVolumesInfo();
+#endif
+#endif
   return ans;
 }
 
@@ -323,7 +326,6 @@ FD_ERROR_CODE DevicesAndDriverDb::AdtDeviceAndDriver(const QString& tableName, V
   needUpdateGuids.intersect(existedGuids);
   LOG_D("guids insert:%d, delete:%d, update:%d", needInsertGuids.size(), needDeleteGuids.size(), needUpdateGuids.size());
 
-  MountHelper::Guids2MntPntSet(true);
   // before insert check if at least 1 guid
   int insertCnt{0};
   auto ret = Insert(tableName, needInsertGuids, volumeInfos, insertCnt);
