@@ -129,6 +129,11 @@ class HarModelTest : public PlainTestSuite {
     QVERIFY(tDir.checkFileContents("file1.txt", {"Content in file1"}));
     QVERIFY(tDir.checkFileContents("image.png", {"Content in image"}));
 
+    { // 非法路径
+      QCOMPARE(hm.SaveToLocal("path/to/inexists/path", selectedRows), -1);
+      QCOMPARE(hm.SaveToLocal("path/to/inexists/path", {}), 0); // empty set<int>
+    }
+
     // 清理模拟数据
     mockFiles.mHarItems.clear();
   }

@@ -10,6 +10,9 @@
 #include <QUrl>
 
 bool PlayADir(const QString& dirPath) {
+#ifdef RUNNING_UNIT_TESTS
+  return true;
+#endif
   QProcess process;
 #ifdef _WIN32
   process.setProgram("C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe");
@@ -32,5 +35,8 @@ bool on_ShiftEnterPlayVideo(const QString& path) {
     return PlayADir(path);
   }
   LOG_W("Play file[%s]...", qPrintable(path));
+#ifdef RUNNING_UNIT_TESTS
+  return true;
+#endif
   return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 }

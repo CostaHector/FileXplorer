@@ -23,6 +23,7 @@ void AdvanceSearchModel::updateSearchResultList() {
   }
   // C:/A/B/C
   // C:/A   file
+  std::sort(allItemsUnderThisPath.begin(), allItemsUnderThisPath.end());
   LOG_D("%d item(s) find out under path [%s] with QDir::Filters[%d]", allItemsUnderThisPath.size(), qPrintable(m_rootPath), int(m_filters));
   beginResetModel();
   allItemsUnderThisPath.swap(m_itemsLst);

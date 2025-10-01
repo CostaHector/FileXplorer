@@ -1,16 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
-#include <QTestEventList>
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "JsonTableModel.h"
 #include "CastManager.h"
 #include "EndToExposePrivateMember.h"
 #include "TDir.h"
+#include "AutoRollbackFileContentModify.h"
 #include "JsonTestPrecoditionTools.h"
 #include "PublicVariable.h"
 #include "PublicTool.h"
@@ -38,7 +34,8 @@ class JsonTableModelTest : public PlainTestSuite {
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
     QVERIFY(tDir.IsValid());
-
+    bool readAok = false;
+    QCOMPARE(FileTool::TextReader(tDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
     mDir.setNameFilters(TYPE_FILTER::JSON_TYPE_SET);
     mJsonsFileCountInitial = mDir.entryList().size();
     QVERIFY(mJsonsFileCountInitial >= 2);  // at least two json file exist here
@@ -135,6 +132,9 @@ class JsonTableModelTest : public PlainTestSuite {
                                                            "GameTurbo - A rank - GGG YYYYY",   //
                                                            "GAMETURBO - A RANK - GGG YYYYY");  //
       QCOMPARE(autoRollbackContentMod.Execute(), true);
+      bool bReadOk = false;
+      QString afterReplace = FileTool::TextReader(tDir.itemPath("a.json"), &bReadOk);
+      QVERIFY(!afterReplace.contains("\r\n")); // "a.json" should never have \r\n at all
 
       // 1.2 path unchange, skip directly, will not reload from file
       QCOMPARE(jtm.setRootPath(mWorkPath), 0);
@@ -149,6 +149,12 @@ class JsonTableModelTest : public PlainTestSuite {
 
       QCOMPARE(jtm.data(jtm.index(0, JsonKey::Name), Qt::DisplayRole).toString(), "GAMETURBO - A RANK - GGG YYYYY");
       // 1.4 json contents rollback
+    }
+
+    { // AutoRollbackFileContentModify rollback should be ok
+      bool bReadOk = false;
+      QString afterReplace = FileTool::TextReader(tDir.itemPath("a.json"), &bReadOk);
+      QCOMPARE(afterReplace, JSON_CONTENTS_A_RANK_IN_MODEL); // "a.json" should never have \r\n at all
     }
 
     {

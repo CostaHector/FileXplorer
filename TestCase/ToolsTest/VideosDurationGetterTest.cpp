@@ -1,8 +1,6 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include <chrono>
-#include "BeginToExposePrivateMember.h"
-#include "EndToExposePrivateMember.h"
 #include "VideoDurationGetter.h"
 #include "PlainTestSuite.h"
 #include "VideoTestPrecoditionTools.h"
@@ -10,7 +8,6 @@
 class VideosDurationGetterTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  VideosDurationGetterTest() : PlainTestSuite{} {}
   static constexpr int EPSILON_MILLIONSECOND{1000};  // 1000ms
  private slots:
   void test_GetLengthQuick() {

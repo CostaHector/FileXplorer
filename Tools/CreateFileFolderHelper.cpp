@@ -104,7 +104,7 @@ bool NewItems(const QString& createIn, const QString& namePattern, int numStartI
     LOG_WARN_P("[Error] Some commands failed",  "commands count: %d", cmds.size());
     return false;
   }
-  return true;;
+  return true;
 }
 
 
