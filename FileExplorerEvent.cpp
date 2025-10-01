@@ -32,7 +32,7 @@
 #include "ItemsUnpacker.h"
 #include "ArchiveFiles.h"
 #include "ItemsPacker.h"
-#include "CopyItemPropertiesToClipboardIF.h"
+#include "CopyStringListToClipboard.h"
 #include "LowResImgsRemover.h"
 #include "FilesNameBatchStandardizer.h"
 #include "PlayVideo.h"
@@ -354,11 +354,11 @@ void FileExplorerEvent::subscribe() {
     connect(fileOpInst.UNDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Undo);
     connect(fileOpInst.REDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Redo);
 
-    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFilePaths(), "absolute-file-path"); });
-    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFilePrepaths(), "absolute-path"); });
-    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFileNames(), "file-name"); });
-    connect(fileOpInst.COPY_THE_PATH, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getTheJpgFolderPaths(), "absolute-file-path+folderName+.jpg(in local seperator)"); });
-    connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane, [this]() { CopyItemPropertiesToClipboardIF::PathCopyTriple(_contentPane->getFullRecords(), "full-record"); });
+    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePaths(), "absolute-file-path"); });
+    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePrepaths(), "absolute-path"); });
+    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNames(), "file-name"); });
+    connect(fileOpInst.COPY_THE_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getTheJpgFolderPaths(), "absolute-file-path+folderName+.jpg(in local seperator)"); });
+    connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record"); });
 
     connect(fileOpInst.MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileExplorerEvent::on_moveToTrashBin);
     connect(fileOpInst.DELETE_PERMANENTLY, &QAction::triggered, this, &FileExplorerEvent::on_deletePermanently);

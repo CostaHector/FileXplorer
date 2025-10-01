@@ -77,6 +77,20 @@ class SyncModifiyFileSystemTest : public PlainTestSuite {
     QVERIFY(!syncMod(path));
     QCOMPARE(path, "C:/Program Files (x86)");
   }
+
+  void test_f() {
+    GlbDataProtect<bool> opSwBkp{syncMod.m_syncOperationSw};
+    GlbDataProtect<bool> syncBackSwbkp{syncMod.m_syncBackSw};
+    GlbDataProtect<QString> basicPathbkp{syncMod.m_basicPath};
+    GlbDataProtect<QString> syncToPathbkp{syncMod.m_syncToPath};
+
+    SyncModifiyFileSystem::SetSyncOperationSwitch(true);
+    SyncModifiyFileSystem::SetSyncReverseBackSwitch(true);
+    QVERIFY(SyncModifiyFileSystem::SetBasicPath(mDir.path())); // same
+    QVERIFY(SyncModifiyFileSystem::SetSynchronizedToPaths(mDir.path()));  // same
+    QString notExistPath = "inexist/path";
+    QVERIFY(!syncMod.operator()(notExistPath));
+  }
 };
 
 #include "SyncModifiyFileSystemTest.moc"

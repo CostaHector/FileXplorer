@@ -13,6 +13,7 @@ struct HAR_FILE_ITEM {
   QString url;
 };
 
+QString GetPathStem(const QString& url);
 class HarFiles {
 public:
   HarFiles();

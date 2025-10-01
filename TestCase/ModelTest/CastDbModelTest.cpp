@@ -37,6 +37,7 @@ class CastDbModelTest : public PlainTestSuite {
     {  // basic setting and property
       QCOMPARE(castModel.editStrategy(), QSqlTableModel::EditStrategy::OnManualSubmit);
       QCOMPARE(castModel.m_imageHostPath, "Path/to/inexists/path");
+      QCOMPARE(castModel.rootPath(), "Path/to/inexists/path");
       QCOMPARE(castModel.rowCount(), 0);
       QCOMPARE(castModel.columnCount(), 0);
       QVERIFY(castModel.GetAllRowsIndexes().isEmpty());
