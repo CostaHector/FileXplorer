@@ -109,9 +109,8 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
   if (!CheckValidAndOpen(db)) {
     return FD_DB_OPEN_FAILED;
   }
-  if (!db.transaction()) {
-    LOG_W("start the %dth transaction failed: %s",  //
-          1, qPrintable(db.lastError().text()));
+  SafeTransaction safeTrans{db};
+  if (!safeTrans) {
     return FD_TRANSACTION_FAILED;
   }
 
@@ -123,7 +122,6 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
   }
 
   const TCast2OriImgs& cast2OriImgs = FromFileSystemStructure(imgsHostOriPath);
-
   int succeedCnt = 0;
   for (auto mpIt = cast2OriImgs.cbegin(); mpIt != cast2OriImgs.cend(); ++mpIt) {
     const QString& perf = mpIt.key();
@@ -137,15 +135,12 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
     if (!qry.exec()) {
       LOG_W("replace[%s] failed: %s",  //
             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-      db.rollback();
       return FD_EXEC_FAILED;
     }
     ++succeedCnt;
   }
 
-  if (!db.commit()) {
-    LOG_W("commit failed: %s", qPrintable(db.lastError().text()));
-    db.rollback();
+  if (!safeTrans.commit()) {
     return FD_COMMIT_FAILED;
   }
   qry.finish();
@@ -163,9 +158,8 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
   if (!CheckValidAndOpen(db)) {
     return FD_DB_OPEN_FAILED;
   }
-  if (!db.transaction()) {
-    LOG_W("start the %dth transaction failed: %s",  //
-          1, qPrintable(db.lastError().text()));
+  SafeTransaction safeTrans{db};
+  if (!safeTrans) {
     return FD_TRANSACTION_FAILED;
   }
 
@@ -198,15 +192,12 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
     if (!qry.exec()) {
       LOG_W("replace[%s] failed: %s",  //
             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
-      db.rollback();
       return FD_EXEC_FAILED;
     }
     ++succeedCnt;
   }
 
-  if (!db.commit()) {
-    LOG_W("commit failed: %s", qPrintable(db.lastError().text()));
-    db.rollback();
+  if (!safeTrans.commit()) {
     return FD_COMMIT_FAILED;
   }
   qry.finish();
@@ -336,7 +327,7 @@ int CastBaseDb::MigrateToNewOriFolder(QSqlRecord& sqlRecord, QDir& imageoriDir, 
   }
   // Migrate old folder from oldOri to newOri
   const QString castName{sqlRecord.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-  if (imageoriDir.exists(oldOri + '/' + castName)) {                              // folder oldOri not exist
+  if (imageoriDir.exists(oldOri + '/' + castName)) {  // folder oldOri not exist
     if (!imageoriDir.rename(oldOri + '/' + castName, newOri + '/' + castName)) {
       LOG_W("Migrate folder failed, castName[%s] from oldOri[%s] to newOri[%s]", qPrintable(castName), qPrintable(oldOri), qPrintable(newOri));
       return FD_ERROR_CODE::FD_RENAME_FAILED;

@@ -43,6 +43,7 @@ public:
 
   bool submitSaveAllChanges();
   bool repopulate();
+  bool onRevert();
 
   static constexpr int MAX_RATE{10};
 private:  

@@ -81,6 +81,7 @@ class CastDbModelTest : public PlainTestSuite {
     }
     {  // call me in the view, not in the model itself
       QVERIFY(!castModel.repopulate());
+      QVERIFY(!castModel.onRevert());  // no need
     }
   }
 
@@ -114,17 +115,8 @@ class CastDbModelTest : public PlainTestSuite {
     QCOMPARE(castModel.m_imageHostPath, tDir.path());
 
     // prepare folder precondition
-    // imageHostPath/ori/name/name.pson
-    // tDir.path()/.../.../...
-    const QList<FsNodeEntry> nodes{
-        {"SuperHero/Chris Evans/Chris Evans 1.jpg", false, "Chris Evans 1"},
-        {"SuperHero/Chris Evans/Chris Evans 2.jpg", false, "Chris Evans 2"},
-        {"SuperHero/Chris Hemsworth/Chris Hemsworth.jpg", false, "Chris Hemsworth"},
-        {"SuperHero/Chris Pine/Chris Pine.jpg", false, "Chris Pine"},
-        {"X-MEN/Michael Fassbender/Michael Fassbender.jpg", false, "Michael Fassbender"},
-        {"Football/Cristiano Ronaldo/Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
-    };
-    QCOMPARE(tDir.createEntries(nodes), 6);              // 6 files in total
+    QVERIFY(CreateFileStructure(tDir));
+
     QCOMPARE(castDb.ReadFromImageHost(tDir.path()), 5);  // 5 cast in total
 
     QCOMPARE(castModel.rowCount(), 0);
@@ -167,6 +159,10 @@ class CastDbModelTest : public PlainTestSuite {
       QVERIFY(castModel.setData(castModel.index(4, PERFORMER_DB_HEADER_KEY::Rate), 5, Qt::EditRole));   // rate: 5
       QVERIFY(castModel.isDirty());
       QVERIFY(castModel.submitSaveAllChanges());
+      QVERIFY(!castModel.isDirty());
+      QVERIFY(castModel.setData(castModel.index(4, PERFORMER_DB_HEADER_KEY::Rate), 79, Qt::EditRole));  // rate: 79
+      QVERIFY(castModel.isDirty());
+      QVERIFY(castModel.onRevert());  // onRevert ok
       QVERIFY(!castModel.isDirty());
       QModelIndexList indexesRatesEditRole{GetIndexessAtOneRow(castModel, 0, 5, PERFORMER_DB_HEADER_KEY::Rate)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesRatesEditRole,  //
@@ -332,4 +328,4 @@ class CastDbModelTest : public PlainTestSuite {
 };
 
 #include "CastDbModelTest.moc"
-REGISTER_TEST(CastDbModelTest, true)
+REGISTER_TEST(CastDbModelTest, false)

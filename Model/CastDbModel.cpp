@@ -364,3 +364,14 @@ bool CastDbModel::submitSaveAllChanges() {
 bool CastDbModel::repopulate() {
   return select();
 }
+
+bool CastDbModel::onRevert() {
+  if (!isDirty()) {
+    LOG_D("Table not dirty.", "Skip revert");
+    return false;
+  }
+  revertAll();
+  select();
+  LOG_D("Revert succeed", "All changes revert");
+  return true;
+}
