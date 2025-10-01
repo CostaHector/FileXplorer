@@ -68,6 +68,9 @@ void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const
       LOG_W("Search mode[%d] not support", (int)m_searchMode);
       break;
   }
+#ifdef RUNNING_UNIT_TESTS
+  ForceCompleteFilter();
+#endif
 }
 
 void SearchProxyModel::setContentFilter(const QString& contentText) {
@@ -120,10 +123,15 @@ bool SearchProxyModel::CheckIfContentsContained(const QString& filePath, const Q
   return fileContents.contains(contained, m_fileContentsCaseSensitive);
 }
 
-void SearchProxyModel::ForceStartFilterInTest() {
-  const int rowCount = sourceModel()->rowCount();
-  for (int i = 0; i < rowCount; ++i) {
-    filterAcceptsRow(i, QModelIndex());
-  }
-  LOG_D("Force start filter [0, %d)", rowCount);
+void SearchProxyModel::ForceCompleteFilter() {
+  LOG_D("Force complete filter for rows");
+  invalidateFilter();
+  rowCount();
+  return;
+  // or below
+  // CHECK_NULLPTR_RETURN_VOID(_searchSourceModel);
+  // const int rc = _searchSourceModel->rowCount();
+  // for (int i = 0; i < rc; ++i) {
+  //   filterAcceptsRow(i, QModelIndex());
+  // }
 }

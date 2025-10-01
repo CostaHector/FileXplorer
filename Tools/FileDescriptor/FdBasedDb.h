@@ -5,7 +5,7 @@
 
 class FdBasedDb : public DbManager {
  public:
-  FdBasedDb(const QString& dbName, const QString& connName, QObject* parent = nullptr) : DbManager{dbName, connName, parent} {}
+  using DbManager::DbManager;
   int ReadADirectory(const QString& tableName, const QString& folderAbsPath);
   FD_ERROR_CODE Adt(const QString& tableName, const QString& peerPath, VolumeUpdateResult* pAdt = nullptr);
   int SetDuration(const QString& tableName);

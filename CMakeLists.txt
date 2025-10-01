@@ -129,7 +129,6 @@ else()
     add_executable(${PROJECT_NAME}
         ${SOURCES}
         ${RESOURCES}
-        Model/FloatingModelsTest.cpp
     )
 endif()
 

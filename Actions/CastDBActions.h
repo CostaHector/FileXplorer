@@ -11,7 +11,8 @@ class CastDBActions : public QObject {
  public:
   explicit CastDBActions(QObject* parent = nullptr);
 
-  QAction* SUBMIT{nullptr};
+  QAction* _MODEL_SUBMIT_ALL{nullptr};
+  QAction* _MODEL_REPOPULATE{nullptr};
 
   QToolButton* GetAppendCastToolButton(QWidget* parent);
 

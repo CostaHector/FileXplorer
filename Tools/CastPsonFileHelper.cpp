@@ -31,6 +31,19 @@ QVariantHash PerformerJsonJoiner(const QString& name,
                                  const QString& vids,
                                  const QString& imgs,
                                  const QString& detail) {
+  /* Ori can be
+  Science Fiction/Sci-Fi
+  Adventure Movie
+  Drama/Feature Movie
+  Documentary
+  Superhero Movie
+  Horror Movie
+  Action Movie
+  Comedy
+  Thriller
+  Fantasy
+  */
+
   using namespace PERFORMER_DB_HEADER_KEY;
   return {
       {ENUM_2_STR(Name), name}, //

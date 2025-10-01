@@ -14,6 +14,7 @@ const QRegularExpression NameTool::NAME_COMP(FREQUENT_NAME_PATTER);
 const QString NameTool::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
 
+constexpr char NameTool::CELL_NEW_LINE;
 constexpr char NameTool::CSV_COMMA;
 const QRegularExpression NameTool::CAST_STR_SPLITTER{R"( & |&|\s*,\s*|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 

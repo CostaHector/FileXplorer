@@ -13,8 +13,7 @@ FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
 }
 
 void FdBasedDbModel::setTable(const QString& tableName) {
-  const QString validTableName = tableName;
-  QSqlTableModel::setTable(validTableName);
+  QSqlTableModel::setTable(tableName);
   const QString& guidFromTableName = GUID();
   m_rootPath = MountHelper::FindRootByGUIDWin(guidFromTableName);
   LOG_D("tableName:%s, GUID:%s, m_rootPath:%s", qPrintable(this->tableName()), qPrintable(guidFromTableName), qPrintable(m_rootPath));
@@ -36,18 +35,26 @@ QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {
 }
 
 QString FdBasedDbModel::absolutePath(const QModelIndex& curIndex) const {
+  if (!curIndex.isValid()) {
+    return {};
+  }
   const QModelIndex& preLeft = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathLeft);
   const QModelIndex& preRight = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight);
-  return PathTool::Path2Join(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(),  //
-                             data(preRight, Qt::ItemDataRole::DisplayRole).toString());
+  return PathTool::RMFComponent::joinParentPath(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(), data(preRight, Qt::ItemDataRole::DisplayRole).toString());
 }
 
 QString FdBasedDbModel::fileName(const QModelIndex& curIndex) const {
+  if (!curIndex.isValid()) {
+    return {};
+  }
   const QModelIndex& nameIndex = curIndex.siblingAtColumn(MOVIE_TABLE::Name);
   return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
 }
 
 QString FdBasedDbModel::fullInfo(const QModelIndex& curIndex) const {
+  if (!curIndex.isValid()) {
+    return {};
+  }
   return data(curIndex.siblingAtColumn(MOVIE_TABLE::Name)).toString()    //
          + '\t'                                                          //
          + data(curIndex.siblingAtColumn(MOVIE_TABLE::Size)).toString()  //

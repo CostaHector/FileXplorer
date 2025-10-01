@@ -42,7 +42,7 @@ public:
   bool ReturnPostOperation(const bool isPass, const QModelIndex& index) const;
 
   bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
-  void ForceStartFilterInTest();
+  void ForceCompleteFilter();
 
 private:
   bool CheckIfContentsContained(const QString& filePath, const QString& contained) const;

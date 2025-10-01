@@ -43,6 +43,7 @@ class NameTool {
   static QString CastTagSentenceRmvEle2Str(const QString& sentense, const QString& cast);
 
   static constexpr char CSV_COMMA = ',';
+  static constexpr char CELL_NEW_LINE = '\n';
   static const QRegularExpression CAST_STR_SPLITTER;
  private:
   static const QString INVALID_CHARS;

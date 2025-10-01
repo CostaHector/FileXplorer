@@ -193,6 +193,7 @@ void MovieDBSearchToolBar::InitCurrentIndex() {
 // -------------------------------- CastDatabaseSearchToolBar --------------------------------
 CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent)//
   : DatabaseSearchToolBar{title, parent} {
+  CHECK_NULLPTR_RETURN_VOID(m_whereCB)
   {
     using namespace PERFORMER_DB_HEADER_KEY;
     for (const auto& field: CAST_TABLE_HEADERS) {

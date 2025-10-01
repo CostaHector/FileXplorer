@@ -50,8 +50,8 @@ do { \
 } while(0)
 #define LOG_OE_P(bOk, title, msgFormat, ...) \
 do { \
-      if(bOk) {LOG_OK_P(title, msgFormat, ##__VA_ARGS__);}\
-      else {LOG_ERR_P(title, msgFormat, ##__VA_ARGS__);}\
+      if(bOk) {LOG_OK_P("[success]" title, msgFormat, ##__VA_ARGS__);}\
+      else {LOG_ERR_P("[failure]" title, msgFormat, ##__VA_ARGS__);}\
 } while(0)
 
 // with no params
@@ -82,7 +82,7 @@ do { \
 } while(0)
 #define LOG_OE_NP(bOk, title, msg) \
 do { \
-      if(bOk) {LOG_OK_NP(title, msg);}\
-      else {LOG_ERR_NP(title, msg);}\
+      if(bOk) {LOG_OK_NP("[success]" title, msg);}\
+      else {LOG_ERR_NP("[failure]" title, msg);}\
 } while(0)
 #endif // NOTIFICATORMACRO_H

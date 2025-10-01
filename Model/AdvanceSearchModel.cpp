@@ -6,21 +6,20 @@
 #include <QMessageBox>
 
 void AdvanceSearchModel::updateSearchResultList() {
+  using namespace FilePropertyHelper;
   ClearRecycle();
-  decltype(m_itemsLst) allItemsUnderThisPath;
+  FilePropertyInfoList allItemsUnderThisPath;
   QDirIterator it{m_rootPath, m_filters, m_iteratorFlags};
+  QString rel2searchItem;
   QString fileName;
-  const int ROOT_PATH_N = m_rootPath.size() + 1;
+  const int ROOT_PATH_N_WITH_NO_TRAILING_SLASH = m_rootPath.size();
   using namespace PathTool;
   while (it.hasNext()) {
     it.next();
     QFileInfo fi{it.fileInfo()};
     fileName = fi.fileName();
-    allItemsUnderThisPath.append(FilePropertyHelper::FilePropertyInfo{
-        fileName, fi.size(),                                            //
-        GetFileExtension(fileName), fi.lastModified(),                  //
-        RelativePath2File(ROOT_PATH_N, fi.filePath(), fileName.size())  //
-    });
+    rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
+    allItemsUnderThisPath.append(FilePropertyInfo{fileName, fi.size(), GetFileExtension(fileName), fi.lastModified(), rel2searchItem});
   }
   // C:/A/B/C
   // C:/A   file
@@ -96,10 +95,10 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole) {
     switch (index.column()) {
 #define SEARCH_OUT_FILE_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) \
-  case FilePropertyHelper::enu:                                         \
-    return formatter(item.m_##enu);     //
+  case FilePropertyHelper::enu:                                              \
+    return formatter(item.m_##enu);          //
       SEARCH_OUT_FILE_INFO_KEY_MAPPING_MAIN  //
-#undef SEARCH_OUT_FILE_INFO_KEY_ITEM       //
+#undef SEARCH_OUT_FILE_INFO_KEY_ITEM         //
           default : return {};
     }
   } else if (role == Qt::DecorationRole && index.column() == PropColumnE::Name) {
@@ -149,16 +148,24 @@ QVariant AdvanceSearchModel::headerData(int section, Qt::Orientation orientation
 }
 
 void AdvanceSearchModel::appendDisable(const QModelIndex& ind) {
-  if (m_disableList.contains(ind))
+  if (!ind.isValid()) {
     return;
+  }
+  if (m_disableList.contains(ind)) {
+    return;
+  }
   m_disableList.insert(ind);
   emit dataChanged(ind, ind, {Qt::ForegroundRole});
 }
 
 void AdvanceSearchModel::removeDisable(const QModelIndex& ind) {
-  if (!m_disableList.contains(ind))
+  if (!m_disableList.contains(ind)) {
     return;
+  }
   m_disableList.remove(ind);
+  if (!ind.isValid()) {
+    return;
+  }
   emit dataChanged(ind, ind, {Qt::ForegroundRole});
 }
 

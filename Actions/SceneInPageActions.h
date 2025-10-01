@@ -4,44 +4,33 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QObject>
+#include <QToolBar>
+#include "EnumIntAction.h"
+#include "ScenePageNaviHelper.h"
 
-class QLineEdit;
-class QToolBar;
+extern template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
 
 class SceneInPageActions : public QObject {
+  Q_OBJECT
  public:
   explicit SceneInPageActions(QObject* parent = nullptr);
 
-  bool InitWidget();
-  QToolBar* GetOrderToolBar();
-  QToolBar* GetPagesRowByColumnToolBar();
+  QToolBar* GetOrderToolBar(QWidget* parent);
 
   QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
 
-  QAction* _BY_MOVIE_NAME{nullptr};
+  QAction* _BY_MOVIE_PATH{nullptr};
   QAction* _BY_MOVIE_SIZE{nullptr};
   QAction* _BY_RATE{nullptr};
   QAction* _BY_UPLOADED_TIME{nullptr};
   QAction* _REVERSE_SORT{nullptr};
-  QActionGroup* _ORDER_AG{nullptr};
 
-  QAction* _GROUP_BY_PAGE{nullptr};
-  QAction* _THE_FIRST_PAGE{nullptr};
-  QAction* _LAST_PAGE{nullptr};
-  QAction* _NEXT_PAGE{nullptr};
-  QAction* _THE_LAST_PAGE{nullptr};
-
-  // order | page action
-  // order | ----------
-  // order | line edit
-  // order | ----------
-  // order | page select
-  QToolBar* mOrderTB{nullptr};
-  QToolBar* mEnablePageTB{nullptr};
-
-  QLineEdit* mPageDimensionLE{nullptr};
-  QLineEdit* mPageIndexInputLE{nullptr};
-  QToolBar* mPagesSelectTB{nullptr};
+ signals:
+  void scenesSortPolicyChanged(SceneSortOrderHelper::SortDimE sortDimension, Qt::SortOrder order); // sortDimension is type of SceneSortOrderHelper::SortDimE
+ private:
+  void EmitScenesSortPolicyChangedSignal();
+  void subscribe();
+  EnumIntAction<SceneSortOrderHelper::SortDimE> mSortOrderIntAction;
 };
 
 SceneInPageActions& g_SceneInPageActions();

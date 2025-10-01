@@ -22,8 +22,10 @@ QVariant FloatingModels::data(const QModelIndex& index, int role) const {
 
 int FloatingModels::UpdateData(const QStringList& newDataLst) {  // dont use newImgsLst after
   RowsCountBeginChange(mDataLst.size(), newDataLst.size());
+
   mDataLst = newDataLst;
   m_curLoadedCount = mDataLst.size();
+
   RowsCountEndChange();
   return mDataLst.size();
 }

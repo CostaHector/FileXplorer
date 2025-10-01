@@ -66,7 +66,7 @@ int DuplicateVideosMetaInfoTable::onClearAnalyzeList() {
   return startAnalyzeNewTables({});
 }
 
-int DuplicateVideosMetaInfoTable::startAnalyzeNewTables(const QStringList& tablesNeedAnalyze) {  // todo: same table analyze twice mat happened
+int DuplicateVideosMetaInfoTable::startAnalyzeNewTables(const QStringList& tablesNeedAnalyze) {
   mDupVidMngr.ReadSpecifiedTables2List(tablesNeedAnalyze, mVideosListNeedAnalyse);
   emit analyzeTablesFinished(mVideosListNeedAnalyse);
 
@@ -236,6 +236,6 @@ bool DuplicateVideosMetaInfoTable::onOpenTableAssociatedPath(const QModelIndex& 
   return true;
 #endif
   const bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
-  LOG_OE_NP(openRet, "Open Directory", pth);
+  LOG_OE_P(openRet, "Open Table Associated path", "%s", pth);
   return openRet;
 }

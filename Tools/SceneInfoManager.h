@@ -5,8 +5,9 @@
 #include <QList>
 #include <QMap>
 #include <QVariantHash>
+#include "ScenePageNaviHelper.h"
 
-struct SCENE_INFO {
+struct SceneInfo {
   QString rel2scn;   // jsonFullPath = mRootPath + relative2scnFile + jsonFileName, rel2scn can be '/' or '/any thing/'
   QString name;      // name, key"Name" from json file baseName
   QStringList imgs;  // img, key"ImgName"
@@ -19,18 +20,28 @@ struct SCENE_INFO {
   QString GetFirstImageAbsPath(const QString& rootPath) const;
   QStringList GetImagesAbsPathList(const QString& rootPath) const;
   QString GetVideoAbsPath(const QString& rootPath) const;
-  bool operator<(const SCENE_INFO& other) const;
+
+  using CompareFunc = bool (SceneInfo::*)(const SceneInfo&) const;
+  static CompareFunc getCompareFunc(SceneSortOrderHelper::SortDimE dim);
+
+  bool operator<(const SceneInfo& other) const;
+  bool lessThanName(const SceneInfo& other) const;
+  bool lessThanVidSize(const SceneInfo& other) const;
+  bool lessThanRate(const SceneInfo& other) const;
+  bool lessThanUploaded(const SceneInfo& other) const;
+
+  bool operator==(const SceneInfo& rhs) const;
 };
 
-typedef QList<SCENE_INFO> SCENE_INFO_LIST;
+typedef QList<SceneInfo> SceneInfoList;
 
 namespace SceneInfoManager {
-SCENE_INFO_LIST ParseAScnFile(const QString& scnFileFullPath, const QString rel);
-SCENE_INFO_LIST GetScnsLstFromPath(const QString& path);
+SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString rel);
+SceneInfoList GetScnsLstFromPath(const QString& path);
 
 #ifdef RUNNING_UNIT_TESTS
-inline SCENE_INFO_LIST& mockScenesInfoList() {
-  static SCENE_INFO_LIST staticSceneInfoList;
+inline SceneInfoList& mockScenesInfoList() {
+  static SceneInfoList staticSceneInfoList;
   return staticSceneInfoList;
 }
 #endif

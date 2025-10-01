@@ -94,16 +94,14 @@ QString fileName(const QString& fullPath) {
   return forwardSlashIndex == -1 ? fullPath : fullPath.mid(forwardSlashIndex + 1);
 }
 
-QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen) {
+QString GetRelPathFromRootRelName(int rootPathLen, const QString& fullPath, int fileNameLen) {
   if (fileNameLen > 0) {
     return fullPath.mid(rootPathLen, fullPath.size() - fileNameLen - rootPathLen);
   }
-
+  // f(2, "C:/home/to/dest", 4) => "/home/to"
+  // f(2, "C:/dest", 4) => "/"
   int lastSlashIndex = fullPath.lastIndexOf('/');
-  if (lastSlashIndex == -1) {
-    return {};
-  }
-  if (lastSlashIndex - rootPathLen + 1 < 1) {
+  if (lastSlashIndex == -1 || lastSlashIndex < rootPathLen) {
     return {};
   }
   return fullPath.mid(rootPathLen, lastSlashIndex - rootPathLen + 1);
@@ -189,43 +187,31 @@ QString Path2Join(const QString& a, const QString& b) {
   return ans += b;
 }
 
-QString Path3Join(const QString& a, const QString& b, const QString& c) {
-  QString ans;
-  ans.reserve(a.size() + 1 + b.size() + 1 + c.size());
-  if (!a.isEmpty()) {
-    ans += a;
-    ans += '/';
+RMFComponent RMFComponent::FromPath(const QString& input) {
+  const int lastSlashIndex = input.lastIndexOf('/');  // 找到最后一个/的位置
+  if (lastSlashIndex == -1) {
+    // C.mp4 => "", "", "C.mp4"
+    return {"", "", input};
   }
-  if (!b.isEmpty()) {
-    ans += b;
-    ans += '/';
+  const int secondTolastSlashIndex = input.lastIndexOf('/', lastSlashIndex - 1);  // 找到倒数第二个/的位置
+  if (secondTolastSlashIndex == -1) {
+    // C:/C.mp4 => "", "C:/", "C.mp4"
+    return {"", input.left(lastSlashIndex + 1), input.mid(lastSlashIndex + 1)};
   }
-  return ans += c;
+  const int thirdToLastSlashIndex = input.lastIndexOf('/', secondTolastSlashIndex - 1);  // 找到倒数第三个/的位置
+  if (thirdToLastSlashIndex == -1) {
+    // C:/A/B.mp4 => "", "C:/A/", "B.mp4"
+    return {"", input.left(lastSlashIndex + 1), input.mid(lastSlashIndex + 1)};
+  }
+  // C:/A/B/C.mp4 => "C:/", "A/B/", "C.mp4"
+  // [thirdToLastSlashIndex + 1, lastSlashIndex + 1)
+  // start = thirdToLastSlashIndex + 1, length = lastSlashIndex + 1 - (thirdToLastSlashIndex + 1) = lastSlashIndex - thirdToLastSlashIndex
+  return {
+      input.left(thirdToLastSlashIndex + 1),                                         //
+      input.mid(thirdToLastSlashIndex + 1, lastSlashIndex - thirdToLastSlashIndex),  //
+      input.mid(lastSlashIndex + 1)                                                  //
+  };
 }
-
-int GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight) {
-  outPrePathLeft.clear();
-  outPrePathRight.clear();
-  const int lastSlashIndex = absPath.lastIndexOf('/');  // 找到最后一个/的位置
-  if (lastSlashIndex == -1) {                           // C.mp4
-    return lastSlashIndex;
-  }
-  const int secondlastSlashIndex = absPath.lastIndexOf('/', lastSlashIndex - 1);  // 找到倒数第二个/的位置
-  if (secondlastSlashIndex == -1) {                                               // C:/C.mp4
-    outPrePathRight = absPath.left(lastSlashIndex);                               // C:
-    return lastSlashIndex;
-  }
-  const int thirdlastSlashIndex = absPath.lastIndexOf('/', secondlastSlashIndex - 1);  // 找到倒数第三个/的位置
-  if (thirdlastSlashIndex == -1) {                                                     // C:/A/B.mp4
-    outPrePathRight = absPath.left(lastSlashIndex);                                    // C:/A
-    return lastSlashIndex;
-  }
-  // C:/A/B/C.mp4
-  outPrePathLeft = absPath.left(thirdlastSlashIndex);                                                // C:
-  outPrePathRight = absPath.mid(thirdlastSlashIndex + 1, lastSlashIndex - thirdlastSlashIndex - 1);  // A/B
-  return lastSlashIndex;
-}
-
 // get last 3 part of a file abs path
 QString GetEffectiveName(const QString& itemPath) {
   // input string => output string, for example:

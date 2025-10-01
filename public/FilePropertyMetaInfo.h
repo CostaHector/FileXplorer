@@ -2,6 +2,7 @@
 #define FILEPROPERTYMETAINFO_H
 
 #include "PublicMacro.h"
+#include <QDateTime>
 
 #define SEARCH_OUT_FILE_INFO_KEY_MAPPING_MAIN                                               \
   SEARCH_OUT_FILE_INFO_KEY_ITEM(Name, 0, QString, DataFormatter::formatDefault)           \
@@ -30,6 +31,8 @@ struct FilePropertyInfo {
 #define SEARCH_OUT_FILE_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) VariableType m_##enu;
   SEARCH_OUT_FILE_INFO_KEY_MAPPING_MAIN
 #undef SEARCH_OUT_FILE_INFO_KEY_ITEM
+  QString GetAbsolutePath(const QString& rootPath) const;
+  QString GetAbsoluteFilePath(const QString& rootPath) const;
   bool operator==(const FilePropertyInfo& rhs) const { return m_Name == rhs.m_Name && m_RelPath == rhs.m_RelPath; }
 };
 

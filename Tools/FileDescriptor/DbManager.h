@@ -23,22 +23,55 @@ enum FD_ERROR_CODE {
   FD_NOT_INITED,
   FD_TABLE_NAME_INVALID,
   FD_TABLE_NAME_PATTERN_INVALID,
-  FD_TABLE_INEXIST,
+  FD_TABLE_INEXIST = -1000 + 5,
   FD_FIELD_VALUE_INVALID,
   FD_DB_INVALID,
   FD_DB_OPEN_FAILED,
   FD_CONNECT_NAME_NOT_EXIST,
-  FD_PREPARE_FAILED,
+  FD_PREPARE_FAILED = -1000 + 10,
   FD_TRANSACTION_FAILED,
   FD_REPLACE_INTO_FAILED,
   FD_EXEC_FAILED,
   FD_COMMIT_FAILED,
-  FD_QRY_PK_FAILED,
+  FD_QRY_PK_FAILED = -1000 + 15,
   FD_JSON_PATH_NOT_EXIST,
   FD_RENAME_FAILED,
+  FD_CAST_NEW_ORI_PATH_INVALID,
+  FD_SET_RECORDS_FAILED,
+  FD_CAST_PSON_PREPATH_MAKE_FAILED = -1000 + 20,
   FD_INVALID,
   FD_SKIP,
   FD_OK = 0,
+};
+
+class SafeTransaction {
+ public:
+  explicit SafeTransaction(QSqlDatabase db);
+  ~SafeTransaction();
+  explicit operator bool() const {
+    /*
+     before:
+      if (!db.transaction()) {
+        db.rollback();
+        return ERROR_CODE;
+      }
+     now:
+      SafeTransaction safeTransaction;
+      if (!safeTransaction) {
+        return ERROR_CODE;
+        // here in destructor will auto roll back
+      }
+     */
+    return mIsDbValid;
+  }
+  bool commit();
+ private:
+  SafeTransaction(const SafeTransaction&) = delete;
+  SafeTransaction& operator=(const SafeTransaction&) = delete;
+
+  QSqlDatabase m_db;
+  bool mIsDbValid{false};
+  bool mIsAlreadyCommitted{false};
 };
 
 class DbManager : public QObject {
@@ -49,24 +82,26 @@ class DbManager : public QObject {
   bool DeleteDatabaseIselfForTest(bool bRecyle = true);
 #endif
 
-  bool IsValid() const { return mIsValid; }
   DbManager(const QString& dbName, const QString& connName, QObject* parent = nullptr);
   ~DbManager();
+
+  bool IsValid() const { return mIsValid; }
+  static bool CheckValidAndOpen(QSqlDatabase& db);
 
   bool CreateDatabase();
   bool CreateTable(const QString& tableName, const QString& tableDefinitionTemplate);
 
   int RmvTable(const QString& tableName, DbManagerHelper::DropOrDeleteE dropOrDelete);
-   // Deletes the entire table along with its structure, indexes, triggers, and all associated objects.
+  // Deletes the entire table along with its structure, indexes, triggers, and all associated objects.
   int DropTable(const QString& tableName) { return RmvTable(tableName, DbManagerHelper::DropOrDeleteE::DROP); }
-   // Deletes specific records (rows) from the table but retains the table structure and its associated objects (such as indexes, triggers, etc.).
-  int ClearTable(const QString& tableName) { return RmvTable(tableName, DbManagerHelper::DropOrDeleteE::DELETE);}
+  // Deletes specific records (rows) from the table but retains the table structure and its associated objects (such as indexes, triggers, etc.).
+  int ClearTable(const QString& tableName) { return RmvTable(tableName, DbManagerHelper::DropOrDeleteE::DELETE); }
 
   bool IsTableExist(const QString& tableName) const;
+  bool IsTableEmpty(const QString& tableName) const;
 
   QSqlDatabase GetDb(bool open = true) const;
   QString GetCfgDebug() const { return "table:" + mDbName + "| conn:" + mConnName; }
-  bool CheckValidAndOpen(QSqlDatabase& db) const;
 
   bool QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) const;
   int UpdateForTest(const QString& qryCmd) const;
@@ -75,13 +110,12 @@ class DbManager : public QObject {
   bool QueryPK(const QString& tableName, const QString& pk, QSet<qint64>& vals) const;
 
   int CountRow(const QString& tableName, const QString& whereClause = "");
-  bool IsTableEmpty(const QString& tableName) const;
   int DeleteByWhereClause(const QString& tableName, const QString& whereClause);
 
   bool IsTableVolumeOnline(const QString& tableName) const;
 
-  void setSkipGetVideosDuration(bool bSkip) {mSkipGetVideosDuration = bSkip;}
-  bool isSkipGetVideosDuration() const { return mSkipGetVideosDuration;}
+  void setSkipGetVideosDuration(bool bSkip) { mSkipGetVideosDuration = bSkip; }
+  bool isSkipGetVideosDuration() const { return mSkipGetVideosDuration; }
 
   bool onShowInFileSystemView() const;
 
