@@ -2,7 +2,6 @@
 #define SCENELISTVIEW_H
 
 #include "CustomListView.h"
-#include "FileFolderPreviewer.h"
 #include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
 #include <QMenu>
@@ -15,17 +14,17 @@ class SceneListView : public CustomListView {
 public:
   explicit SceneListView(ScenesListModel* sceneModel, SceneSortProxyModel* sceneSortProxyModel, ScenePageControl* scenePageControl, QWidget* parent = nullptr);
   void setRootPath(const QString& rootPath);
+  int onUpdateScnFiles();
   void subscribe();
   void onCopyBaseName();
   void onOpenCorrespondingFolder();
   void onClickEvent(const QModelIndex &idx, const QModelIndex &previous);
 
-  bool PageIndexIncDec(const QAction* pageAct);
-
 signals:
   void currentSceneChanged(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst);
 
 private:
+  static bool IsPathAtShallowDepth(const QString& path);
   QAction* COPY_BASENAME_FROM_SCENE{nullptr};
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
   ScenesListModel* _sceneModel{nullptr};

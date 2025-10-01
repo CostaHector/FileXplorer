@@ -1,8 +1,10 @@
 ﻿#include "SceneListView.h"
+#include "NotificatorMacro.h"
 #include "ScenesListModel.h"
 #include "PlayVideo.h"
 #include "PublicMacro.h"
 #include "SceneInPageActions.h"
+#include "SceneInfoManager.h"
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -11,7 +13,7 @@
 #include <QMouseEvent>
 
 class AlignDelegate : public QStyledItemDelegate {
- public:
+public:
   void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override {
     option->decorationPosition = QStyleOptionViewItem::Position::Top;
     option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
@@ -33,11 +35,11 @@ class AlignDelegate : public QStyledItemDelegate {
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
-                             QWidget* parent)     //
-    : CustomListView{"SCENES_TABLE", parent},     //
-      _sceneModel{sceneModel},                    //
-      _sceneSortProxyModel{sceneSortProxyModel},  //
-      _scenePageControl{scenePageControl}         //
+                             QWidget* parent) //
+  : CustomListView{"SCENES_TABLE", parent} , //
+  _sceneModel{sceneModel}, //
+  _sceneSortProxyModel{sceneSortProxyModel}, //
+  _scenePageControl{scenePageControl} //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
@@ -96,19 +98,50 @@ void SceneListView::subscribe() {
 
   SceneInPageActions& sceneActInst = g_SceneInPageActions();
   connect(&sceneActInst, &SceneInPageActions::scenesSortPolicyChanged, _sceneSortProxyModel, &SceneSortProxyModel::sortByFieldDimension);
+  connect(sceneActInst._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  if (rootPath.count('/') < 2) {  // large folder
-    LOG_D("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
-    const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath,
-                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
-    if (ret != QMessageBox::StandardButton::Yes) {
-      LOG_D("User cancel setRootPath on a large path[%s]", qPrintable(rootPath));
+  if (IsPathAtShallowDepth(rootPath)) { // Potential large directory
+    LOG_D("Root path[%s] may contain a large number of items", qPrintable(rootPath));
+    const QString cfmTitle = "Large Directory Warning - Performance Impact";
+    const QString hintMsg = "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
+                            "Loading it could cause performance issues.\n\n"
+                            "Directory: "
+                            + rootPath + "\n\n Do you want to proceed?";
+    const QMessageBox::StandardButton retBtn = QMessageBox::warning(this,
+                                                                    cfmTitle,
+                                                                    hintMsg,
+                                                                    QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
+                                                                    QMessageBox::StandardButton::No);
+    if (retBtn != QMessageBox::StandardButton::Yes) {
+      LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
       return;
     }
   }
   _sceneModel->setRootPath(rootPath);
+}
+
+int SceneListView::onUpdateScnFiles() {
+  const QString workPath = _sceneModel->rootPath();
+  if (IsPathAtShallowDepth(workPath)) {
+    LOG_ERR_P("Update aborted",
+               "Path [%s] is too close to root directory. "
+               "System files may get accidentally modified at this level.",
+               qPrintable(workPath));
+    return -1;
+  }
+  using namespace SceneInfoManager;
+  ScnMgr scnMgr;
+  Counter cnter = scnMgr(workPath);
+  if (cnter.m_jsonUpdatedCnt == 0) {
+    LOG_INFO_NP("No scene file need updated", "0 json(s) updated");
+    return 0;
+  }
+  int scnFileCnt = scnMgr.WriteDictIntoScnFiles();
+  LOG_OE_P(scnFileCnt >= 0, "Scn file updated", "count: %d, workPath[%s]", scnFileCnt, qPrintable(workPath));
+  _sceneModel->setRootPath(workPath, true);
+  return scnFileCnt;
 }
 
 void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& previous) {
@@ -117,4 +150,13 @@ void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& 
   }
   const QString& name = _sceneModel->baseName(current);
   emit currentSceneChanged(name, _sceneModel->GetImgs(current), _sceneModel->GetVids(current));
+}
+
+bool SceneListView::IsPathAtShallowDepth(const QString& path) {
+#ifdef _WIN32
+ static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // windows path start with disk letter
+#else
+ static constexpr int NEAR_ROOT_PATH_LIMIT = 3; // linux path start with '/'
+#endif
+  return path.count('/') < NEAR_ROOT_PATH_LIMIT;
 }
