@@ -10,10 +10,9 @@
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
 
-class MovieNameStandardizerTest : public PlainTestSuite {
+class NameStandardizerTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  MovieNameStandardizerTest() : PlainTestSuite{} { }
   NameStandardizer ns;
  private slots:
   void test_remove_nbspInHtml() {
@@ -69,25 +68,25 @@ class MovieNameStandardizerTest : public PlainTestSuite {
   }
 };
 
-void MovieNameStandardizerTest::test_SpaceBeforeOrAfterComma() {
+void NameStandardizerTest::test_SpaceBeforeOrAfterComma() {
   QCOMPARE(ns("A, B"), "A, B");
   QCOMPARE(ns("A , B"), "A, B");
   QCOMPARE(ns("A ,B"), "A, B");
   QCOMPARE(ns("A,  B"), "A, B");
 }
-void MovieNameStandardizerTest::test_SpaceBeforeOrAfterExclamationMark() {
+void NameStandardizerTest::test_SpaceBeforeOrAfterExclamationMark() {
   QCOMPARE(ns("A! B"), "A! B");
   QCOMPARE(ns("A ! B"), "A! B");
   QCOMPARE(ns("A !B"), "A! B");
   QCOMPARE(ns("A!  B"), "A! B");
 }
-void MovieNameStandardizerTest::test_SpaceBeforeOrAfterHypen() {
+void NameStandardizerTest::test_SpaceBeforeOrAfterHypen() {
   QCOMPARE(ns("A - B"), "A - B");
   QCOMPARE(ns("A  - B"), "A - B");
   QCOMPARE(ns("A -  B"), "A - B");
 }
 
-void MovieNameStandardizerTest::test_RemoveMultiHypen() {
+void NameStandardizerTest::test_RemoveMultiHypen() {
   // "---" -> " - ";
   QCOMPARE(ns("A---C"), "A - C");
   // "- " -> " - ";
@@ -102,7 +101,7 @@ void MovieNameStandardizerTest::test_RemoveMultiHypen() {
   QCOMPARE(ns("A - .C"), "A.C");
   QCOMPARE(ns("A - "), "A");
 }
-void MovieNameStandardizerTest::test_RemoveBacket() {
+void NameStandardizerTest::test_RemoveBacket() {
   // leading open brackets {[( delete;
   QCOMPARE(ns("C [A"), "C - A");
   QCOMPARE(ns("C (A"), "C - A");
@@ -113,5 +112,5 @@ void MovieNameStandardizerTest::test_RemoveBacket() {
   QCOMPARE(ns("C A}E"), "C A - E");
 }
 
-#include "MovieNameStandardizerTest.moc"
-REGISTER_TEST(MovieNameStandardizerTest, false)
+#include "NameStandardizerTest.moc"
+REGISTER_TEST(NameStandardizerTest, false)

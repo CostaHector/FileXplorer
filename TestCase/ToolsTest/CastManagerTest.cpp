@@ -21,13 +21,14 @@ class CastManagerTest : public PlainTestSuite {
   CastManagerTest() : PlainTestSuite{} {}
   TDir mDir;
   const QString rootpath{mDir.path()};
-  const QString gLocalFilePath{rootpath + "/cast_list.txt"};
-  const QString gStudioLocalFilePath{rootpath + "/studio_list.txt"};
+  const QString gLocalFilePath{mDir.itemPath("cast_list.txt")};
+  const QString gStudioLocalFilePath{mDir.itemPath("studio_list.txt")};
   QList<FsNodeEntry> gNodeEntries;
   CastManager* cmInLLT{nullptr};
   StudiosManager* smInLLT{nullptr};
  private slots:
   void initTestCase() {
+    QVERIFY(mDir.IsValid());
     // 1. at first cast_list.txt and studio_list.txt file not exist
     CastManager& instCast = CastManager::getInst();
     {
@@ -40,7 +41,6 @@ class CastManagerTest : public PlainTestSuite {
       QVERIFY(instStudio.ProStudioMap().isEmpty());
     }
 
-    QVERIFY(mDir.IsValid());
     gNodeEntries = QList<FsNodeEntry>  //
         {
             FsNodeEntry{"cast_list.txt", false, "any random cast1\nanother random cast2"},    //
