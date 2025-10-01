@@ -13,6 +13,33 @@
 
 #include "PlainTestSuite.h"
 #include "TDir.h"
+#include <QDebug>
+
+Q_DECLARE_METATYPE(Qt::Orientation)
+
+bool headerDataChangedSignalParameterCheck(const QVariantList& actualParms, Qt::Orientation expectOri, int expectRow) {
+  if (QMetaType::type("Qt::Orientation") == 0) {
+    LOG_W("Type not registered");
+    return false;
+  }
+  QVariantList expectParams{
+      QVariant::fromValue<Qt::Orientation>(expectOri),
+      QVariant::fromValue<int>(expectRow),
+      QVariant::fromValue<int>(expectRow),
+  };
+  if (actualParms == expectParams) {
+    return true;
+  }
+  qDebug() << "actual: ";
+  for (auto& var : actualParms) {
+    qDebug() << "[" << var << "],";
+  }
+  qDebug() << "expect: ";
+  for (auto& var : expectParams) {
+    qDebug() << "[" << var << "],";
+  }
+  return false;
+}
 
 class FileSystemModelTest : public PlainTestSuite {
   Q_OBJECT
@@ -35,6 +62,8 @@ class FileSystemModelTest : public PlainTestSuite {
   const QDir::Filters INITIAL_DIR_FILTERS{QDir::Filter::NoDotAndDotDot | QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Hidden};
  private slots:
   void initTestCase() {
+    qRegisterMetaType<Qt::Orientation>("Qt::Orientation");
+
     QVERIFY(tDir.IsValid());
     QCOMPARE(tDir.createEntries(nodeEntries), nodeEntries.size());
 
@@ -167,6 +196,29 @@ class FileSystemModelTest : public PlainTestSuite {
 
     QMimeData emptyData;
     QVERIFY(!model->canDropMimeData(&emptyData, Qt::DropAction::MoveAction, folderIndex.row(), folderIndex.column(), rootIndex));
+
+    // nothing happend
+    model->DragRelease();
+    QSignalSpy headerDataChangedSpy(model, &QFileSystemModel::headerDataChanged);
+    model->DragHover(fileIndex);
+    {
+      QCOMPARE(headerDataChangedSpy.count(), 2);
+      QVERIFY(headerDataChangedSignalParameterCheck(headerDataChangedSpy[0], Qt::Orientation::Vertical, -1));  // release the former one
+      QVERIFY(headerDataChangedSignalParameterCheck(headerDataChangedSpy[1], Qt::Orientation::Vertical, fileIndex.row()));
+    }
+    model->DragHover(folderIndex);
+    model->DragHover(folderIndex);  // still, folderIndex not changed
+    {
+      QCOMPARE(headerDataChangedSpy.count(), 2 + 2 + 0);
+      QVERIFY(headerDataChangedSignalParameterCheck(headerDataChangedSpy[2], Qt::Orientation::Vertical, fileIndex.row()));  // release the former one
+      QVERIFY(headerDataChangedSignalParameterCheck(headerDataChangedSpy[3], Qt::Orientation::Vertical, folderIndex.row()));
+    }
+    model->DragRelease();
+    model->DragRelease();  // already released
+    {
+      QCOMPARE(headerDataChangedSpy.count(), 2 + 2 + 0 + 1 + 0);
+      QVERIFY(headerDataChangedSignalParameterCheck(headerDataChangedSpy[4], Qt::Orientation::Vertical, folderIndex.row()));
+    }
   }
 
   void test_CutSomething_BuiltInPaste() {

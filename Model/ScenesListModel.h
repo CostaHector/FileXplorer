@@ -9,14 +9,14 @@
 #include <QPixmapCache>
 
 class ScenesListModel : public QAbstractListModelPub {
-public:
+  Q_OBJECT
+ public:
   explicit ScenesListModel(QObject* object = nullptr);
 
- bool setRootPath(const QString& rootPath, const bool bForce = false);
- inline QString rootPath() const { return mRootPath; }
+  bool setRootPath(const QString& rootPath, const bool bForce = false);
+  inline QString rootPath() const { return mRootPath; }
 
-  inline bool IsScnsEmpty() const { return mCurBegin == nullptr || mCurEnd == nullptr; }
-  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return IsScnsEmpty() ? 0 : mCurEnd - mCurBegin; }
+  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mCurEnd - mCurBegin; }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   bool isIndexValid(const QModelIndex& index, int& linearInd) const;
@@ -28,30 +28,33 @@ public:
   QStringList GetImgs(const QModelIndex& index) const;
   QStringList GetVids(const QModelIndex& index) const;
 
-  bool ChangeItemsCntIn1Page(int scCnt1Page);
-
-  bool SetPageIndex(int newPageIndex);
-  std::pair<int, int> GetEntryIndexBE(int totalLen) const;
+  std::pair<int, int> GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const;
 
   inline int GetPageCnt() const {
-    if (IsScnsEmpty()) {return 0;}
     int N = GetEntryListLen();
-    return N / SCENES_CNT_1_PAGE + int(N % SCENES_CNT_1_PAGE != 0);
+    if (mScenesCountPerPage <= 0) return 0;
+    return (N + mScenesCountPerPage - 1) / mScenesCountPerPage;
   }
 
-  inline const SCENE_INFO_LIST& GetEntryList() const { return mEntryList; }
+  inline const SceneInfoList& GetEntryList() const { return mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
+  inline SceneInfoList::const_iterator GetFirstIterator() const { return mCurBegin; }
 
-public slots:
+ signals:
+  void pagesCountChanged(int newPagesCount);
+
+ public slots:
   void onIconSizeChange(const QSize& newSize);
+  bool onScenesCountsPerPageChanged(int scenesCntInAPage);
+  bool onPageIndexChanged(int newPageIndex);
 
-private:
+ private:
   int mPageIndex{0};
-  int SCENES_CNT_1_PAGE{12};  // 4-by-3
+  int mScenesCountPerPage{12};  // 4-by-3
   QString mPattern;
   QString mRootPath;
-  SCENE_INFO_LIST mEntryList;
-  SCENE_INFO_LIST::const_iterator mCurBegin{nullptr}, mCurEnd{nullptr};
+  SceneInfoList mEntryList;
+  SceneInfoList::const_iterator mCurBegin{mEntryList.cbegin()}, mCurEnd{mEntryList.cend()};
 
   QPixmapCache mPixCache;
   int mWidth = 404, mHeight = 250;

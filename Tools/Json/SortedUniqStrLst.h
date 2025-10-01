@@ -58,6 +58,7 @@ class SortedUniqStrLst {
   QSet<QString> toLowerSets() const;
   const QStringList& toSortedList() const { return m_sortedCache; }
   const QString& join() const;
+  const QString& joinToShowInACell() const;
 
   int count() const { return m_set.size(); }
   bool isEmpty() const { return m_set.isEmpty(); }
@@ -66,6 +67,7 @@ class SortedUniqStrLst {
   QSet<QString> m_set;
   QStringList m_sortedCache;
   mutable QString mAnsCSV;
+  mutable QString mAnsCell;
   mutable bool mJoinCalled{false};
 };
 

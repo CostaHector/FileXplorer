@@ -34,7 +34,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
   m_ribbonMenu = new (std::nothrow) RibbonMenu{this}; // ribbon menu
   m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
   m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
-  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel}; // view/searchToolBar switcher
+  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget()}; // view/searchToolBar switcher
 
   m_fsPanel->BindLogger(m_statusBar);
   m_viewSwitchHelper->onSwitchByViewType(ViewTypeTool::DEFAULT_VIEW_TYPE);

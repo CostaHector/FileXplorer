@@ -2,6 +2,7 @@
 #include "MountHelper.h"
 #include "TableFields.h"
 #include "PublicMacro.h"
+#include "SortedUniqStrLst.h"
 #include <QStorageInfo>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -41,7 +42,7 @@ VALUES(:%1, :%2, :%3, :%4, :%5, :%6, :%7);)")
               .arg(c_str(GUID))          //
               .arg(c_str(MOUNT_POINT))   //
               .arg(c_str(ADT_TIME))      //
-    };                                            //
+    };                                   //
 
 const QString DevicesAndDriverDb::INSERT_DEV_DRV_TEMPLATE  //
     {
@@ -55,7 +56,7 @@ VALUES(:%1, :%2, :%3, :%4, :%5, :%6);)")
               .arg(c_str(AVAIL_BYTES))   //
               .arg(c_str(GUID))          //
               .arg(c_str(MOUNT_POINT))   //
-    };                                            //
+    };                                   //
 
 const QString DevicesAndDriverDb::UPDATE_SIZE_TEMPLATE  //
     {
@@ -83,16 +84,19 @@ enum UPDATE_SIZE_FIELD {
 const QString DevicesAndDriverDb::UPDATE_ADT_TIME_TEMPLATE  //
     {"UPDATE %1 "                                           //
      + QString{"SET `%1` = :%1 WHERE `%2` = :%2;"}          //
-           .arg(c_str(ADT_TIME))                   //
+           .arg(c_str(ADT_TIME))                            //
            .arg(c_str(GUID))};
 
 const QString DevicesAndDriverDb::UPDATE_MOUNT_POINT_TEMPLATE  //
     {"UPDATE %1 "                                              //
      + QString{"SET `%1` = :%1 WHERE `%2` = :%2;"}             //
-           .arg(c_str(MOUNT_POINT))                   //
+           .arg(c_str(MOUNT_POINT))                            //
            .arg(c_str(GUID))};
 
 QList<VolumeInfo> GetVolumesInfo() {
+#ifdef RUNNING_UNIT_TESTS
+  return MockGetVolumesInfo();
+#endif
   QList<VolumeInfo> ans;
   const auto& mountedVolLst = QStorageInfo::mountedVolumes();
   for (const auto& storageInfo : mountedVolLst) {
@@ -126,36 +130,40 @@ int DevicesAndDriverDb::InitDeviceAndDriver(const QString& tableName) {
   QSqlQuery query{db};
   if (!query.prepare(INSERT_DEV_DRV_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
   const auto& guid2Pnts = MountHelper::Guids2MntPntSet(true);
-  const auto& vols = GetVolumesInfo();
-  for (const auto& vol : vols) {
+  const auto& volumes = GetVolumesInfo();
+  for (const auto& vol : volumes) {
     // no known conversion from QString to QVariant. Causes: header QVariant not include
     const QSet<QString>& pntsSet = guid2Pnts.value(vol.guid, {});
-    const QStringList pntsLst{pntsSet.cbegin(), pntsSet.cend()};
+    const SortedUniqStrLst sortedLst{QStringList(pntsSet.cbegin(), pntsSet.cend())};
+
     query.bindValue(ROOT_PATH, vol.rootPath);
     query.bindValue(VOLUME_LABEL, vol.volumeLabel);
     query.bindValue(TOTAL_BYTES, vol.totalBytes);
     query.bindValue(AVAIL_BYTES, vol.availBytes);
     query.bindValue(GUID, vol.guid);
-    query.bindValue(MOUNT_POINT, pntsLst.join('\n'));
+    query.bindValue(MOUNT_POINT, sortedLst.joinToShowInACell());
     if (!query.exec()) {
       db.rollback();
       LOG_W("Insert[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
   }
 
   query.finish();
-  LOG_W("%d record(s) commit insert into succeed", vols.size());
-  return vols.size();
+  LOG_W("%d record(s) commit insert into succeed", volumes.size());
+  return volumes.size();
 }
 
-FD_ERROR_CODE DevicesAndDriverDb::Insert(const QString& tableName, QSet<QString> needInsertGuids, const QList<VolumeInfo>& volumeInfos, int& insertCnt) {
+FD_ERROR_CODE DevicesAndDriverDb::Insert(const QString& tableName,
+                                         const QSet<QString>& needInsertGuids,
+                                         const QList<VolumeInfo>& volumeInfos,
+                                         int& insertCnt) {
   insertCnt = 0;
   if (needInsertGuids.isEmpty()) {
     return FD_OK;
@@ -164,14 +172,12 @@ FD_ERROR_CODE DevicesAndDriverDb::Insert(const QString& tableName, QSet<QString>
   auto db = GetDb();
   QSqlQuery query{db};
   if (!query.prepare(INSERT_DEV_DRV_TEMPLATE.arg(tableName))) {
-    LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    LOG_W("prepare command[%s] failed: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
   if (!db.transaction()) {
-    LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+    LOG_W("start the %dth transaction failed: %s", 1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
@@ -191,7 +197,7 @@ FD_ERROR_CODE DevicesAndDriverDb::Insert(const QString& tableName, QSet<QString>
     if (!query.exec()) {
       db.rollback();
       LOG_W("replace[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
   }
@@ -220,7 +226,7 @@ FD_ERROR_CODE DevicesAndDriverDb::Delete(const QString& tableName, const QSet<QS
   if (!query.exec(qryCmd)) {
     db.rollback();
     LOG_W("delete[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_INVALID;
   }
   query.finish();
@@ -228,7 +234,10 @@ FD_ERROR_CODE DevicesAndDriverDb::Delete(const QString& tableName, const QSet<QS
   LOG_D("%d record(s) to be deleted...", deleteCnt);
   return FD_OK;
 }
-FD_ERROR_CODE DevicesAndDriverDb::Update(const QString& tableName, const QSet<QString>& needUpdateGuids, const QList<VolumeInfo>& volumeInfos, int& updateCnt) {
+FD_ERROR_CODE DevicesAndDriverDb::Update(const QString& tableName,
+                                         const QSet<QString>& needUpdateGuids,
+                                         const QList<VolumeInfo>& volumeInfos,
+                                         int& updateCnt) {
   auto db = GetDb();
   updateCnt = 0;
   if (needUpdateGuids.isEmpty()) {
@@ -237,13 +246,13 @@ FD_ERROR_CODE DevicesAndDriverDb::Update(const QString& tableName, const QSet<QS
   QSqlQuery query{db};
   if (!query.prepare(UPDATE_SIZE_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   // 开始事务
   if (!db.transaction()) {
     LOG_W("start the %dth transaction failed: %s",  //
-             1, qPrintable(db.lastError().text()));
+          1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
   const auto& guid2Pnts = MountHelper::Guids2MntPntSet(false);
@@ -262,7 +271,7 @@ FD_ERROR_CODE DevicesAndDriverDb::Update(const QString& tableName, const QSet<QS
     if (!query.exec()) {
       db.rollback();
       LOG_W("update[%s] failed: %s",  //
-               qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       return FD_INVALID;
     }
   }
@@ -366,7 +375,7 @@ int DevicesAndDriverDb::UpdateAdtTime(const QString& tableName, const QString& g
   QSqlQuery query(db);
   if (!query.prepare(UPDATE_ADT_TIME_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   // bindValue(int depend on `?` or `:XXX` sequence
@@ -375,7 +384,7 @@ int DevicesAndDriverDb::UpdateAdtTime(const QString& tableName, const QString& g
   if (!query.exec()) {
     db.rollback();
     LOG_W("replace[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_INVALID;
   }
   const QString& qryStr = query.lastQuery();
@@ -404,7 +413,7 @@ int DevicesAndDriverDb::UpdateMountedPath(const QString& tableName, const QStrin
   QSqlQuery query(db);
   if (!query.prepare(UPDATE_MOUNT_POINT_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
@@ -414,7 +423,7 @@ int DevicesAndDriverDb::UpdateMountedPath(const QString& tableName, const QStrin
   if (!query.exec()) {
     db.rollback();
     LOG_W("update[%s] failed: %s",  //
-             qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_INVALID;
   }
 

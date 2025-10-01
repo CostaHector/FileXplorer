@@ -175,9 +175,9 @@ class PathToolTest : public PlainTestSuite {
 
   void test_RelativePath2File_InvalidInput() {
     // path without slash
-    QCOMPARE(RelativePath2File(0, "path with no slash"), "");
+    QCOMPARE(GetRelPathFromRootRelName(0, "path with no slash"), "");
     // rootPathLen too large
-    QCOMPARE(RelativePath2File(225, "C:/home/Huge Jackman"), "");
+    QCOMPARE(GetRelPathFromRootRelName(225, "C:/home/Huge Jackman"), "");
   }
 
   void test_RelativePath2File_ok() {
@@ -186,15 +186,24 @@ class PathToolTest : public PlainTestSuite {
     // "rootPath", rootPath/Any/Relative/Path/File = > /Any/Relative/Path/
     // "rootPath", rootPath/Relative/File = > /Relative/
     // "rootPath", rootPath/File = > /
-    QCOMPARE(RelativePath2File(strlen("C:"), "C:/home/file.txt"), "/home/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Any/Relative/Path/File"), "/Any/Relative/Path/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Relative/File"), "/Relative/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/File"), "/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/home/file.txt"), "/home/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Any/Relative/Path/File"), "/Any/Relative/Path/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Relative/File"), "/Relative/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/File"), "/");
 
-    QCOMPARE(RelativePath2File(strlen("C:"), "C:/home/file.txt", strlen("file.txt")), "/home/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Any/Relative/Path/File", 4), "/Any/Relative/Path/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/Relative/File", 4), "/Relative/");
-    QCOMPARE(RelativePath2File(strlen("rootPath"), "rootPath/File", 4), "/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/home/file.txt", strlen("file.txt")), "/home/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/home/", "file.txt"), "C:/home/file.txt");
+
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/home/to/dest", strlen("dest")), "/home/to/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/home/to/", "dest"), "C:/home/to/dest");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("C:"), "C:/dest", strlen("dest")), "/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/", "dest"), "C:/dest");
+
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Any/Relative/Path/File", 4), "/Any/Relative/Path/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/Relative/File", 4), "/Relative/");
+    QCOMPARE(GetRelPathFromRootRelName(strlen("rootPath"), "rootPath/File", 4), "/");
+    QCOMPARE(GetRelPathFromRootRelName(2, "C:/projects/src/main.cpp", 8), "/projects/src/");
+    QCOMPARE(GetAbsFilePathFromRootRelName("C:", "/projects/src/", "main.cpp"), "C:/projects/src/main.cpp");
   }
 
   void test_GetBaseName_folder() {
@@ -268,31 +277,36 @@ class PathToolTest : public PlainTestSuite {
 #endif
   }
 
-  void test_path_part_split() {
-    QString preLeft, preRight;
-    int lastSlashIndex = GetPrepathParts("C:/A/B/C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C:/A/B/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "C:");
-    QCOMPARE(preRight, "A/B");
-    QCOMPARE(Path3Join("C:", "A/B", "C.mp4"), "C:/A/B/C.mp4");
+  void test_RMFComponent_and_Decompose() {
+    RMFComponent median;
 
-    lastSlashIndex = GetPrepathParts("C:/A/C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C:/A/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "");
-    QCOMPARE(preRight, "C:/A");
-    QCOMPARE(Path3Join("", "C:/A", "C.mp4"), "C:/A/C.mp4");
+    median = RMFComponent::FromPath("D.mp4");  // 0 slash 无需不考虑, 因为不会有"a.mp4", 这样的绝对路径
+    QCOMPARE(median.joinItself(), "D.mp4");
+    QCOMPARE(median.joinParentPathItself(), "");
 
-    lastSlashIndex = GetPrepathParts("C:/C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C:/C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "");
-    QCOMPARE(preRight, "C:");
-    QCOMPARE(Path3Join("", "C:", "C.mp4"), "C:/C.mp4");
+    median = RMFComponent::FromPath("C:/D.mp4");  // 1 slash
+    QCOMPARE(median.joinItself(), "C:/D.mp4");
+    QCOMPARE(median.joinParentPathItself(), "C:/");
 
-    lastSlashIndex = GetPrepathParts("C.mp4", preLeft, preRight);
-    QCOMPARE(QString{"C.mp4"}.mid(lastSlashIndex + 1), "C.mp4");
-    QCOMPARE(preLeft, "");
-    QCOMPARE(preRight, "");
-    QCOMPARE(Path3Join("", "", "C.mp4"), "C.mp4");
+    median = RMFComponent::FromPath("C:/A/C.mp4");  // 2 slash
+    QCOMPARE(median.joinItself(), "C:/A/C.mp4");
+    QCOMPARE(median.joinParentPathItself(), "C:/A");
+
+    median = RMFComponent::FromPath("C:/long/enough/a.mp4");  // 3 slash
+    QCOMPARE(median.joinItself(), "C:/long/enough/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "C:/long/enough");
+
+    median = RMFComponent::FromPath("/a.mp4");  // 1 slash
+    QCOMPARE(median.joinItself(), "/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "/");
+
+    median = RMFComponent::FromPath("/tmp/a.mp4");  // 2 slash
+    QCOMPARE(median.joinItself(), "/tmp/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "/tmp");
+
+    median = RMFComponent::FromPath("/tmp/FileXplorer-xxxx/a.mp4");
+    QCOMPARE(median.joinItself(), "/tmp/FileXplorer-xxxx/a.mp4");
+    QCOMPARE(median.joinParentPathItself(), "/tmp/FileXplorer-xxxx");
   }
 
   void test_GetPrepathAndFileName() {

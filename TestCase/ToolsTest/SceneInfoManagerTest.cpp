@@ -21,6 +21,43 @@ class SceneInfoManagerTest : public PlainTestSuite {
   void initTestCase() { QVERIFY(tDir.IsValid()); }
   void init() { tDir.ClearAll(); }
 
+  void sort_function_ok() {
+    SceneInfo si1{"/", "The U.S.", {}, {}, 100 * 1024, 98, "1980"};
+    SceneInfo si2{"/", "France", {}, {}, 200 * 1024, 95, "1960"};
+    SceneInfo si3{"/Asia", "Singapore", {}, {}, 150 * 1024, 96, "2000"};
+
+    SceneInfoList siList{si1, si2, si3};
+
+    // / and France(2) < / and The U.S.(1) < /Asia and Singapore(3)
+
+    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
+      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_PATH);
+      return (lhs.*pComparator)(rhs);
+    });
+    QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
+
+    // 100k(1) < 150k(3) < 200k(2)
+    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
+      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_SIZE);
+      return (lhs.*pComparator)(rhs);
+    });
+    QCOMPARE(siList, (SceneInfoList{si1, si3, si2}));
+
+    // 95(2) < 96(3) < 98(1)
+    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
+      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::RATE);
+      return (lhs.*pComparator)(rhs);
+    });
+    QCOMPARE(siList, (SceneInfoList{si2, si3, si1}));
+
+    // 1960(2) < 1980(1) < 2000(3)
+    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
+      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::UPLOADED_TIME);
+      return (lhs.*pComparator)(rhs);
+    });
+    QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
+  }
+
   void UpdateJsonUnderAPath_correct() {
     /*
 Precondition: Xander.json value of key ImgName, VidName is empty
@@ -327,13 +364,13 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       QVERIFY(QFile::exists(scnFilePath));
 
       // 解析 .scn 文件
-      SCENE_INFO_LIST parsedScenes =
+      SceneInfoList parsedScenes =
           ParseAScnFile(scnFilePath, "/Marvel/");  //  here mRootPath=tDir.path(); tDir.path() + "/Marvel/" + Marvel.scn=the json scn
 
       // 验证解析结果
       QCOMPARE(parsedScenes.size(), 1);
 
-      const SCENE_INFO& parsedScene = parsedScenes.first();
+      const SceneInfo& parsedScene = parsedScenes.first();
       QCOMPARE(parsedScene.rel2scn, "/Marvel/");
       QCOMPARE(parsedScene.name, "Captain America");
       QCOMPARE(parsedScene.imgs, QStringList({"cap1.jpg", "cap2.jpg"}));
@@ -387,7 +424,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
 
       // 解析 .scn 文件
       QString scnFilePath = tDir.itemPath("Avengers/Avengers.scn");
-      SCENE_INFO_LIST parsedScenes = ParseAScnFile(scnFilePath, "/Avengers/");
+      SceneInfoList parsedScenes = ParseAScnFile(scnFilePath, "/Avengers/");
 
       // 验证解析结果
       QCOMPARE(parsedScenes.size(), 3);
@@ -417,7 +454,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       // 创建格式错误的 .scn 文件, 写入不完整的数据（缺少某些行）,只有名称，缺少其他字段
       tDir.touch("Corrupted/Corrupted.scn", "Scene Name\n");
       // 应该返回空列表或部分数据（根据 ParseAScnFile 的错误处理）
-      SCENE_INFO_LIST result = ParseAScnFile(tDir.path(), "/Corrupted/");
+      SceneInfoList result = ParseAScnFile(tDir.path(), "/Corrupted/");
       // 根据当前实现，遇到错误会返回空列表
       QVERIFY(result.isEmpty());
       tDir.ClearAll();
@@ -430,7 +467,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     QString name0 = "The Last Fight", name1 = "Iron Man";
     QString scenesUnderRootPath = tDir.path(), scenesUnderSubPath = tDir.itemPath("Avengers");
 
-    QString scene0ScnFileBaseName = tDir.baseName(); // aka scn file located in folder name
+    QString scene0ScnFileBaseName = tDir.baseName();  // aka scn file located in folder name
     QVERIFY(tDir.mkpath("Avengers"));
 
     ScnMgr::PATH_2_JSON_DICTS testData =
@@ -444,7 +481,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     QVERIFY(QFile::exists(expect1stScnFileAbsPath));
     QVERIFY(QFile::exists(expect2ndScnFileAbsPath));
 
-    SCENE_INFO_LIST scenesFromScn = GetScnsLstFromPath(tDir.path());
+    SceneInfoList scenesFromScn = GetScnsLstFromPath(tDir.path());
     QCOMPARE(scenesFromScn.size(), 2);
 
     QCOMPARE(scenesFromScn[0].rel2scn, "/");           // be the first

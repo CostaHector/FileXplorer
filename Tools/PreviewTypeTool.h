@@ -22,6 +22,8 @@ enum class PREVIEW_TYPE_E {
       END_INVALID,
 };
 
+constexpr PREVIEW_TYPE_E DEFULT_PREVIEW_TYPE_E = PREVIEW_TYPE_E::NONE;
+
 inline const char* c_str(PREVIEW_TYPE_E viewType) {
   if (viewType < PREVIEW_TYPE_E::BEGIN_DEFAULT || viewType >= PREVIEW_TYPE_E::END_INVALID) {
     return "unknown preview type";

@@ -14,7 +14,7 @@ struct PreviewTypeToolBar : public QToolBar {
 public:
   explicit PreviewTypeToolBar(const QString &title, QWidget *parent = nullptr);
 
-  PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::PREVIEW_TYPE_E::NONE};
+  PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::DEFULT_PREVIEW_TYPE_E};
   EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E> mPreviewTypeIntAction;
 
   QAction* CATEGORY_PRE{nullptr};

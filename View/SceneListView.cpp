@@ -2,6 +2,7 @@
 #include "ScenesListModel.h"
 #include "PlayVideo.h"
 #include "PublicMacro.h"
+#include "SceneInPageActions.h"
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -10,7 +11,7 @@
 #include <QMouseEvent>
 
 class AlignDelegate : public QStyledItemDelegate {
-public:
+ public:
   void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override {
     option->decorationPosition = QStyleOptionViewItem::Position::Top;
     option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
@@ -29,12 +30,22 @@ public:
   }
 };
 
-SceneListView::SceneListView(ScenesListModel* sceneModel, QWidget* parent)  //
-  : CustomListView{"SCENES_TABLE", parent},                               //
-  _sceneModel{sceneModel}                                               //
+SceneListView::SceneListView(ScenesListModel* sceneModel,
+                             SceneSortProxyModel* sceneSortProxyModel,
+                             ScenePageControl* scenePageControl,
+                             QWidget* parent)     //
+    : CustomListView{"SCENES_TABLE", parent},     //
+      _sceneModel{sceneModel},                    //
+      _sceneSortProxyModel{sceneSortProxyModel},  //
+      _scenePageControl{scenePageControl}         //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
-  setModel(_sceneModel);
+  CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
+  CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
+
+  _sceneSortProxyModel->setSourceModel(_sceneModel);
+
+  setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
   setViewMode(QListView::ViewMode::IconMode);
   setTextElideMode(Qt::TextElideMode::ElideMiddle);
@@ -78,12 +89,20 @@ void SceneListView::subscribe() {
   connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SceneListView::onClickEvent);
   connect(this, &CustomListView::iconSizeChanged, _sceneModel, &ScenesListModel::onIconSizeChange);
+
+  connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
+  connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
+  connect(_sceneModel, &ScenesListModel::pagesCountChanged, _scenePageControl, &ScenePageControl::onPagesCountChanged);
+
+  SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  connect(&sceneActInst, &SceneInPageActions::scenesSortPolicyChanged, _sceneSortProxyModel, &SceneSortProxyModel::sortByFieldDimension);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
   if (rootPath.count('/') < 2) {  // large folder
     LOG_D("rootPath[%s] may contains a large item(s)", qPrintable(rootPath));
-    const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
+    const auto ret = QMessageBox::warning(this, "Large folder alert(May cause LAG)", rootPath,
+                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
     if (ret != QMessageBox::StandardButton::Yes) {
       LOG_D("User cancel setRootPath on a large path[%s]", qPrintable(rootPath));
       return;
@@ -92,7 +111,7 @@ void SceneListView::setRootPath(const QString& rootPath) {
   _sceneModel->setRootPath(rootPath);
 }
 
-void SceneListView::onClickEvent(const QModelIndex &current, const QModelIndex &previous) {
+void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& previous) {
   if (!current.isValid()) {
     return;
   }

@@ -3,6 +3,7 @@
 
 #include "QAbstractTableModelPub.h"
 #include "SelectionsRangeHelper.h"
+#include "FilePropertyMetaInfo.h"
 
 #include <QDateTime>
 #include <QDir>
@@ -10,7 +11,6 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QSet>
-#include "FilePropertyMetaInfo.h"
 
 
 class AdvanceSearchModel : public QAbstractTableModelPub {
@@ -79,7 +79,7 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_rootPath + '/' + m_itemsLst[row].m_RelPath;
+    return m_itemsLst[row].GetAbsolutePath(m_rootPath);
   }
 
   QString fileName(const QModelIndex& curIndex) const {  //
@@ -95,7 +95,7 @@ public:
     if (row < 0 || row >= m_itemsLst.size()) {
       return {};
     }
-    return m_rootPath + '/' + m_itemsLst[row].m_RelPath + m_itemsLst[row].m_Name;
+    return m_itemsLst[row].GetAbsoluteFilePath(m_rootPath);
   }
 
   QFileInfo fileInfo(const QModelIndex& curIndex) const {  //
@@ -111,27 +111,7 @@ public:
            + '\t'                                               //
            + QString::number(m_itemsLst[row].m_Size) + "Byte(s)"  //
            + '\t'                                               //
-           + m_rootPath + '/' + m_itemsLst[row].m_RelPath;
-  }
-
-  QString GetARelSelection(const int& row) const {
-    if (row < 0 || row >= m_itemsLst.size()) {
-      return {};
-    }
-    const auto& item = m_itemsLst[row];
-    return item.m_RelPath + item.m_Name;
-  }
-  QString GetARootPath(const int& row) const {
-    if (row < 0 || row >= m_itemsLst.size()) {
-      return {};
-    }
-    return m_rootPath + '/' + m_itemsLst[row].m_RelPath;
-  }
-  QString GetASelection(const int& row) const {
-    if (row < 0 || row >= m_itemsLst.size()) {
-      return {};
-    }
-    return m_itemsLst[row].m_Name;
+           + m_itemsLst[row].GetAbsolutePath(m_rootPath);
   }
 
 private:

@@ -21,16 +21,17 @@
 #include <QSqlRecord>
 #include <QFileDialog>
 
-CastDBView::CastDBView(CastDbModel* castDbModel_,
-                       CastDatabaseSearchToolBar* castDbSearchBar_,
-                       CastBaseDb& castDb_,
-                       QWidget* parent)
-  : CustomTableView{"PERFORMERS_TABLE", parent},  //
-  _castDbSearchBar{castDbSearchBar_},
-  _castModel{castDbModel_},
-  _castDb{castDb_},
-  mImageHost{castDbModel_->rootPath()}
-{
+int CastDBView::QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE = 100;
+void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int newValue) {
+  QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE = newValue;
+}
+
+CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* castDbSearchBar_, CastBaseDb& castDb_, QWidget* parent)
+    : CustomTableView{"PERFORMERS_TABLE", parent},  //
+      _castDbSearchBar{castDbSearchBar_},
+      _castModel{castDbModel_},
+      _castDb{castDb_},
+      mImageHost{castDbModel_->rootPath()} {
   if (!QFileInfo{mImageHost}.isDir()) {
     QString titleMsg{QString{"ImageHostPath[%1] not exist"}.arg(mImageHost)};
     LOG_CRIT_NP(titleMsg, mImageHost);
@@ -54,7 +55,8 @@ void CastDBView::subscribe() {
   connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, _castModel, &QSqlTableModel::setFilter);
 
   static auto& castInst = g_castAct();
-  connect(castInst.SUBMIT, &QAction::triggered, this, &CastDBView::onSubmit);
+  connect(castInst._MODEL_SUBMIT_ALL, &QAction::triggered, this, &CastDBView::onModelSubmitAll);
+  connect(castInst._MODEL_REPOPULATE, &QAction::triggered, this, &CastDBView::onModelRepopulate);
   connect(castInst.APPEND_FROM_MULTILINES_INPUT, &QAction::triggered, this, &CastDBView::onAppendCasts);
   connect(castInst.DELETE_RECORDS, &QAction::triggered, this, &CastDBView::onDeleteRecords);
   connect(castInst.INIT_DATABASE, &QAction::triggered, &_castDb, &DbManager::CreateDatabase);
@@ -64,8 +66,8 @@ void CastDBView::subscribe() {
 
   connect(castInst.SYNC_SELECTED_RECORDS_IMGS_FROM_DISK, &QAction::triggered, this, &CastDBView::onSyncImgsFieldFromImageHost);
   connect(castInst.SYNC_ALL_RECORDS_IMGS_FROM_DISK, &QAction::triggered, this, &CastDBView::onSyncAllImgsFieldFromImageHost);
-  connect(castInst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshRecordsVids);
-  connect(castInst.SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onForceRefreshAllRecordsVids);
+  connect(castInst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onRefreshVidsField);
+  connect(castInst.SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onRefreshAllVidsField);
 
   connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::onShowInFileSystemView);
   connect(castInst.MIGRATE_CAST_TO, &QAction::triggered, this, &CastDBView::onMigrateCastTo);
@@ -76,7 +78,7 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_ALL_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpAllIntoPsonFile);
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
-  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::emitCastCurrentRowSelectionChanged);
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::EmitCurrentCastRecordChanged);
 }
 
 void CastDBView::onInitATable() {
@@ -86,7 +88,7 @@ void CastDBView::onInitATable() {
     return;
   }
   _castModel->setTable(DB_TABLE::PERFORMERS);
-  _castModel->submitAll();
+  _castModel->select();
   LOG_D("Table[%s] create succeed", qPrintable(DB_TABLE::PERFORMERS));
 }
 
@@ -95,10 +97,14 @@ int CastDBView::onAppendCasts() {
     LOG_ERR_NP("Table dirty", "submit before load from file-system structure");
     return false;
   }
+  const QString exampleText = "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine";
   bool ok = false;
-  const QString& perfsText =                             //
-      QInputDialog::getMultiLineText(this, "Input 'Casts, aka'",  //
-                                     "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine", "", &ok);
+  QString perfsText;
+#ifdef RUNNING_UNIT_TESTS
+  std::tie(ok, perfsText) = CastDbViewMocker::MockMultiLineInput();
+#else
+  perfsText = QInputDialog::getMultiLineText(this, "Input 'Casts, aka'", exampleText, "", &ok);
+#endif
   if (!ok) {
     LOG_INFO_NP("[skip] User cancel", "return");
     return 0;
@@ -108,106 +114,85 @@ int CastDBView::onAppendCasts() {
     LOG_WARN_P("Load perfs from text failed", "perfsText:%s, errorCode: %d", qPrintable(perfsText), succeedCnt);
     return 0;
   }
-  _castModel->submitAll();
+  onModelRepopulate();
   LOG_OK_P("[Ok] load performer(s)", "perfsText:%s, count: %d", qPrintable(perfsText), succeedCnt);
   return succeedCnt;
 }
 
 int CastDBView::onDeleteRecords() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_ERR_NP("Nothing was selected", "Select some row(s) to delete");
-    return 0;
-  }
   const auto& itemSelection = selectionModel()->selection();
-  QString hintText{QString{"Risk: %1 record(s) are about to removed! (Attention: Not recoverable)"}};
-  if (QMessageBox::question(this, "CONFIRM DELETE? (OPERATION NOT RECOVERABLE)", hintText,  //
-                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
-      != QMessageBox::Yes) {
-    LOG_OK_NP("[Skip] User Cancel delete records", "return");
+  if (itemSelection.isEmpty()) {
+    LOG_INFO_NP("Nothing was selected", "Select some row(s) to delete");
     return 0;
   }
-
-  int totalCnt = 0;
-  int succeedCnt = 0;
-  for (auto it = itemSelection.crbegin(); it != itemSelection.crend(); ++it) {
-    int startRow = it->top();  // [top, bottom]
-    int curRowsCnt = it->bottom() - startRow + 1;
-    bool ret = _castModel->removeRows(startRow, curRowsCnt);
-    LOG_D("drop[%d] records [%d, %d] ret: %d", ret, startRow, it->bottom(), ret);
-    if (ret) {
-      succeedCnt += curRowsCnt;
-    }
-    totalCnt += curRowsCnt;
-  }
-  if (totalCnt == 0) {
+  const QString cfmTitleText{"Confirm Delete selection rows? (OPERATION NOT RECOVERABLE)"};
+  const QString hintText = QString::asprintf("Risk: %d ranges are about to removed! (Attention: Not recoverable)", itemSelection.size());
+  QMessageBox::StandardButton stdCfmDeleteBtn = QMessageBox::StandardButton::No;
+#ifdef RUNNING_UNIT_TESTS
+  stdCfmDeleteBtn = CastDbViewMocker::MockDeleteRecord() ? QMessageBox::Yes : QMessageBox::No;
+#else
+  stdCfmDeleteBtn = QMessageBox::question(this, cfmTitleText, hintText, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+#endif
+  if (stdCfmDeleteBtn != QMessageBox::Yes) {
+    LOG_INFO_NP("[Skip] User Cancel delete records", "return");
     return 0;
   }
-  bool submitResult = onSubmit();
-  LOG_OK_P("[Ok]Delete records", "%d/%d bSubmit[%d]", succeedCnt, totalCnt, submitResult);
+  int succeedCnt = _castModel->DeleteSelectionRange(itemSelection);
+  LOG_OE_NP(succeedCnt >= 0, "Delete records:", QString::number(succeedCnt));
   return succeedCnt;
 }
 
 bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDelete) {
-  auto retBtn = QMessageBox::warning(this,                                                                          //
-                                     QString("Confirm %1?").arg((int)dropOrDelete),                                 //
-                                     "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
-                                     QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
-  if (retBtn != QMessageBox::StandardButton::Yes) {
+  QMessageBox::StandardButton stdCfmDeleteBtn = QMessageBox::StandardButton::No;
+  const QString cfmTitleText{QString::asprintf("Confirm %s?", DbManagerHelper::c_str(dropOrDelete))};
+  const QString hintText{QString::asprintf("Operation[%s] on Table[%s] is not recoverable",  //
+                                           DbManagerHelper::c_str(dropOrDelete), qPrintable(DB_TABLE::PERFORMERS))};
+#ifdef RUNNING_UNIT_TESTS
+  stdCfmDeleteBtn = CastDbViewMocker::MockDropDeleteTable() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
+#else
+  stdCfmDeleteBtn = QMessageBox::warning(this,                                                                          //
+                                         cfmTitleText,                                                                  //
+                                         "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
+                                         QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
+#endif
+  if (stdCfmDeleteBtn != QMessageBox::StandardButton::Yes) {
     LOG_D("User cancel drop/delete table[%s]", qPrintable(DB_TABLE::PERFORMERS));
     return true;
   }
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
-  if (rmvedTableCnt < 0) {
-    LOG_ERR_P("Drop/Delete failed", "errorCode: %d", rmvedTableCnt);
-    return false;
-  }
-  _castModel->submitAll();
-  const QString title = QString("Operation: %1 on [%2]").arg((int)dropOrDelete).arg(DB_TABLE::PERFORMERS);
-  const QString msg = QString("Drop(0)/Delete(1). %1 table removed").arg(rmvedTableCnt);
-  LOG_OK_NP(title, msg);
+  LOG_OE_P(rmvedTableCnt >= 0, "Drop/Delete", "Table[%s] %s count:%d", qPrintable(DB_TABLE::PERFORMERS), DbManagerHelper::c_str(dropOrDelete),
+           rmvedTableCnt);
+  onModelRepopulate();
   return rmvedTableCnt >= 0;
 }
 
 int CastDBView::onLoadFromFileSystemStructure() {
   if (_castModel->isDirty()) {
     LOG_ERR_NP("[Abort] Table dirty", "submit before load from file-system structure");
-    return false;
-  }
-  int succeedCnt = _castDb.ReadFromImageHost(mImageHost);
-  if (succeedCnt < 0) {
-    LOG_ERR_P("[Failed] Load perfs", "errorCode: %d", succeedCnt);
     return 0;
   }
-  _castModel->submitAll();
-  LOG_OK_P("Load perf(s) succeed", "count: %d", succeedCnt);
+  int succeedCnt = _castDb.ReadFromImageHost(mImageHost);
+  LOG_OE_P(succeedCnt >= 0, "Load Performers", "count: %d", succeedCnt);
+  if (succeedCnt >= 0) {
+    onModelRepopulate();
+  }
   return succeedCnt;
 }
 
-bool CastDBView::onSubmit() {
-  if (!_castModel->isDirty()) {
-    LOG_OK_NP("[Skip submit] Table not dirty", DB_TABLE::PERFORMERS);
-    return true;
-  }
+bool CastDBView::onModelRepopulate() {
   const QModelIndex oldIndex = currentIndex();
-  if (!_castModel->submitAll()) {
-    LOG_WARN_NP("Submit failed", _castModel->lastError().text());
-    return false;
-  }
+  bool bRepopulateRet = _castModel->repopulate();
   if (oldIndex.isValid() && currentIndex() != oldIndex) {
     setCurrentIndex(oldIndex);
   }
-  LOG_OK_NP("Submit succeed. Following .db has been saved", DB_TABLE::PERFORMERS);
-  return true;
+  LOG_OE_P(bRepopulateRet, "Repopulate", "Table: %s", qPrintable(DB_TABLE::PERFORMERS));
+  return bRepopulateRet;
 }
 
-bool CastDBView::onRevert() {
-  if (!_castModel->isDirty()) {
-    LOG_OK_NP("Table not dirty.", "Skip revert");
-    return true;
-  }
-  _castModel->revertAll();
-  LOG_OK_NP("Revert succeed", "All changes revert");
-  return true;
+bool CastDBView::onModelSubmitAll() {
+  bool submitRet = _castModel->submitSaveAllChanges();
+  LOG_OE_P(submitRet, "Model submit", "Table: %s", qPrintable(DB_TABLE::PERFORMERS));
+  return submitRet;
 }
 
 int CastDBView::onLoadFromPsonDirectory() {
@@ -215,185 +200,120 @@ int CastDBView::onLoadFromPsonDirectory() {
     LOG_ERR_NP("Table dirty", "submit before load pson");
     return 0;
   }
+
+  QMessageBox::StandardButton stdCfmLoadFromPson = QMessageBox::StandardButton::No;
+  const QString cfmTitleText{"CONFIRM Load from pson? (OVERRIDE NOT RECOVERABLE)"};
   const QString hintText{"Risk: records in database will be override if differs from local pson file."};
-  if (QMessageBox::question(this, "CONFIRM Load from pson? (OVERRIDE NOT RECOVERABLE)", hintText,  //
-                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No)             //
-      != QMessageBox::Yes) {
-    LOG_OK_NP("[Skip] User cancel load records from pson", "return");
+#ifdef RUNNING_UNIT_TESTS
+  stdCfmLoadFromPson = CastDbViewMocker::MockLoadFromPsonDirectory() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
+#else
+  stdCfmLoadFromPson = QMessageBox::question(this, cfmTitleText, hintText, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+#endif
+  if (stdCfmLoadFromPson != QMessageBox::Yes) {
+    LOG_INFO_NP("[Skip] User cancel load records from pson", "return");
     return 0;
   }
   int succeedCnt = _castDb.LoadFromPsonFile(mImageHost);
-  if (succeedCnt < 0) {
-    LOG_WARN_P("[Failed] Load perfs from pJson", "[%s/*.pson] errorCode:%d", qPrintable(mImageHost), succeedCnt);
-    return succeedCnt;
-  }
-  _castModel->submitAll();
-  LOG_OK_P("[Ok] pson file(s) load succeed", "count: %d", succeedCnt);
+  LOG_OE_P(succeedCnt >= 0, "Load perfs from pJson", "[%s/*.pson] count:%d", qPrintable(mImageHost), succeedCnt);
+  onModelRepopulate();
   return succeedCnt;
 }
 
 int CastDBView::onSyncAllImgsFieldFromImageHost() {
-  const int totalCnt{_castModel->rowCount()};
-  if (totalCnt == 0) {
-    LOG_INFO_NP("[skip] No records at all skip", "No need sync");
-    return 0;
-  }
-  int succeedCnt = 0;
-  for (int r = 0; r < _castModel->rowCount(); ++r) {
-    QSqlRecord sqlRecord = _castModel->record(r);
-    succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, mImageHost);
-    _castModel->setRecord(r, sqlRecord);
-  }
-  RefreshCurrentRowHtmlContents();
-  QString msgTitle{QString("All %1 record(s) imgs field been sync").arg(totalCnt)};
-  QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
-  if (totalCnt != succeedCnt) {
-    LOG_WARN_NP(msgTitle, msgDetail);
-  } else {
-    LOG_OK_NP(msgTitle, msgDetail);
-  }
-  return succeedCnt;
+  QModelIndexList allIndexes = _castModel->GetAllRowsIndexes();
+  return onSyncImgsFieldCore(allIndexes);
 }
 
 int CastDBView::onSyncImgsFieldFromImageHost() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("Nothing was selected", "Select some row to sync imgs fields");
+  const QModelIndexList& selectedRowsIndexes = selectionModel()->selectedRows();
+  return onSyncImgsFieldCore(selectedRowsIndexes);
+}
+
+int CastDBView::onSyncImgsFieldCore(const QModelIndexList& selectedRowsIndexes) {
+  const int totalCnt{selectedRowsIndexes.size()};
+  if (totalCnt == 0) {
+    LOG_INFO_NP("No record need Sync", "Empty table or nothing row was selected");
     return 0;
   }
-  currentIndex();
-
-  const int totalCnt{selectionModel()->selectedRows().size()};
-  int succeedCnt = 0;
-  for (const auto& indr : selectionModel()->selectedRows()) {
-    const int r = indr.row();
-    QSqlRecord sqlRecord = _castModel->record(r);
-    succeedCnt += CastBaseDb::UpdateRecordImgsField(sqlRecord, mImageHost);
-    _castModel->setRecord(r, sqlRecord);
-  }
-  RefreshCurrentRowHtmlContents();
-  QString msgTitle{QString("%1 record(s) selected imgs field been sync").arg(totalCnt)};
-  QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
-  if (totalCnt != succeedCnt) {
-    LOG_WARN_NP(msgTitle, msgDetail);
-  } else {
-    LOG_OK_NP(msgTitle, msgDetail);
+  const QModelIndex oldIndex = currentIndex();
+  int succeedCnt = _castModel->SyncImageFieldsFromImageHost(selectedRowsIndexes);
+  LOG_OE_P(succeedCnt >= 0, "Image fields sync", "%d/%d updated", succeedCnt, totalCnt);
+  if (oldIndex.isValid()) {
+    currentIndex() != oldIndex ? setCurrentIndex(oldIndex) : RefreshCurrentRowHtmlContents();
   }
   return succeedCnt;
 }
 
 int CastDBView::onDumpAllIntoPsonFile() {
-  const int totalCnt{_castModel->rowCount()};
-  if (totalCnt == 0) {
-    LOG_INFO_NP("[Skip] No records at all skip", "No need dump");
-    return 0;
-  }
-  int succeedCnt = 0;
-  for (int r = 0; r < _castModel->rowCount(); ++r) {
-    const auto& pson = CastPsonFileHelper::PerformerJsonJoiner(_castModel->record(r));
-    const QString& psonPath = CastPsonFileHelper::PsonPath(mImageHost, pson);
-    succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
-  }
-  QString msgTitle{QString("All %1 record(s) dumped result").arg(totalCnt)};
-  QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
-  if (totalCnt != succeedCnt) {
-    LOG_WARN_NP(msgTitle, msgDetail);
-  } else {
-    LOG_OK_NP(msgTitle, msgDetail);
-  }
-  return succeedCnt;
+  QModelIndexList allIndexes = _castModel->GetAllRowsIndexes();
+  return onDumpIntoCore(allIndexes);
 }
 
 int CastDBView::onDumpIntoPsonFile() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("Nothing was selected", "Select some row to dump");
+  const QModelIndexList& selectedRowsIndexes = selectionModel()->selectedRows();
+  return onDumpIntoCore(selectedRowsIndexes);
+}
+
+int CastDBView::onDumpIntoCore(const QModelIndexList& selectedRowsIndexes) {
+  const int totalCnt{selectedRowsIndexes.size()};
+  if (totalCnt == 0) {
+    LOG_INFO_NP("No record need dump", "Empty table or nothing row was selected");
+    return 0;
+  }
+  int succeedCnt = _castModel->DumpRecordsIntoPsonFile(selectedRowsIndexes);
+  LOG_OE_P(succeedCnt >= 0, "Dump records into pson", "%d succeed", succeedCnt);
+  return succeedCnt;
+}
+
+int CastDBView::onRefreshAllVidsField() {
+  QModelIndexList allIndexes = _castModel->GetAllRowsIndexes();
+  return onRefreshVidsFieldCore(allIndexes);
+}
+
+int CastDBView::onRefreshVidsField() {
+  const QModelIndexList& selectedRowsIndexes = selectionModel()->selectedRows();
+  return onRefreshVidsFieldCore(selectedRowsIndexes);
+}
+
+int CastDBView::onRefreshVidsFieldCore(const QModelIndexList& selectedRowsIndexes) {
+  const int totalCnt{selectedRowsIndexes.size()};
+  if (totalCnt == 0) {
+    LOG_INFO_NP("No record need refresh", "Empty table or nothing row was selected");
     return 0;
   }
 
-  QDir imageHostDir{mImageHost};
-  int totalCnt {selectionModel()->selectedRows().size()};
-  int succeedCnt = 0;
-  for (const auto& indr : selectionModel()->selectedRows()) {
-    const int r = indr.row();
-    const auto& record = _castModel->record(r);
-    const QString ori {record.value(PERFORMER_DB_HEADER_KEY::Ori).toString()};
-    const QString castName {record.value(PERFORMER_DB_HEADER_KEY::Name).toString()};
-    const QString prepath {ori + '/' + castName};
-    if (!imageHostDir.exists(prepath) && !imageHostDir.mkpath(prepath)) {
-      LOG_W("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(mImageHost));
-      continue;
+  if (totalCnt > QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE) {
+    const QString cfmTitleText{"CONFIRM refresh `Vids` Field of the selected %d rows?"};
+    const QString hintText{QString::asprintf("%d rows selected(>%d). May lag", totalCnt, QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE)};
+    QMessageBox::StandardButton stdCfmRefreshVidFields = QMessageBox::StandardButton::No;
+#ifdef RUNNING_UNIT_TESTS
+    stdCfmRefreshVidFields = CastDbViewMocker::MockRefreshVidsField() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
+#else
+    stdCfmRefreshVidFields = QMessageBox::question(this, cfmTitleText, hintText, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+#endif
+    if (stdCfmRefreshVidFields != QMessageBox::StandardButton::Yes) {
+      LOG_INFO_NP("[Skip] User cancel load records from pson", "return");
+      return 0;
     }
-    const QString psonPath {CastPsonFileHelper::PsonPath(mImageHost, ori, castName)};
-    const QVariantHash pson = CastPsonFileHelper::PerformerJsonJoiner(record);
-    succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
 
-  QString msgTitle{QString("Selected %1 record(s) dumped result").arg(totalCnt)};
-  QString msgDetail{QString("%1/%2 succeed").arg(succeedCnt).arg(totalCnt)};
-  if (totalCnt != succeedCnt) {
-    LOG_WARN_NP(msgTitle, msgDetail);
-  } else {
-    LOG_OK_NP(msgTitle, msgDetail);
+  QString movieDbFileAbsPath = SystemPath::VIDS_DATABASE();
+  QString movieDbConnName = "SEARCH_MOVIE_BY_PERFORMER";
+#ifdef RUNNING_UNIT_TESTS
+  std::tie(movieDbFileAbsPath, movieDbConnName) = CastDbViewMocker::MockMovieDbAbsFilePath2ConnName();
+#endif
+  FdBasedDb movieDb{movieDbFileAbsPath, movieDbConnName};
+
+  const QModelIndex oldIndex = currentIndex();
+  int succeedCnt = _castModel->RefreshVidsForRecords(selectedRowsIndexes, movieDb.GetDb());
+  LOG_OE_P(succeedCnt >= 0, "Force refresh `VidName` Field", "%d/%d succeed", succeedCnt, totalCnt);
+  if (oldIndex.isValid()) {
+    currentIndex() != oldIndex ? setCurrentIndex(oldIndex) : RefreshCurrentRowHtmlContents();
   }
   return succeedCnt;
 }
 
-int CastDBView::onForceRefreshAllRecordsVids() {
-  selectAll();
-  LOG_INFO_NP("Refresh all records may lag", "Click Refresh Selected action if you are sure");
-  return 0;
-}
-
-int CastDBView::onForceRefreshRecordsVids() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_ERR_NP("Nothing was selected", "Select some row to refresh");
-    return 0;
-  }
-
-  FdBasedDb movieDb{SystemPath::VIDS_DATABASE(), "SEARCH_MOVIE_BY_PERFORMER"};
-  QSqlDatabase con = movieDb.GetDb();  // videos table
-  if (!movieDb.CheckValidAndOpen(con)) {
-    LOG_W("Open failed:%s", qPrintable(con.lastError().text()));
-    return -1;
-  }
-  QSqlQuery qur{con};
-  int recordsCnt = 0;
-  int vidsCnt = 0;
-  for (const auto& indr : selectionModel()->selectedRows()) {
-    const int r = indr.row();
-    QSqlRecord record = _castModel->record(r);
-    const QString& perfs {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-    const QString& akas {record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString()};
-    const QString& selectStr {QuickWhereClauseHelper::GetSelectMovieByCastStatement(perfs, akas, DB_TABLE::MOVIES)};
-
-    if (!qur.exec(selectStr)) {
-      LOG_W("Query[%s] failed: %s", qPrintable(qur.executedQuery()), qPrintable(qur.lastError().text()));
-      return -1;
-    }
-
-    int curCastVidCnt{0};
-    QString vidPaths;
-    while (qur.next()) {
-      vidPaths += QuickWhereClauseHelper::GetMovieFullPathFromSqlQry(qur);
-      vidPaths += StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR;
-      ++curCastVidCnt;
-    }
-    if (!vidPaths.isEmpty()) { // remove suffix \n
-      vidPaths.chop(1);
-    }
-    LOG_D("cast[%s] %d records finded", qPrintable(perfs), curCastVidCnt);
-
-    record.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidPaths);
-    _castModel->setRecord(r, record);  // update back
-
-    vidsCnt += curCastVidCnt;
-    ++recordsCnt;
-  }
-  RefreshCurrentRowHtmlContents();
-  LOG_OK_P("[ok]Videos(s) updated", "%d records selection, total %d videos", recordsCnt, vidsCnt);
-  return recordsCnt;
-}
-
-void CastDBView::emitCastCurrentRowSelectionChanged(const QModelIndex &current, const QModelIndex &/*previous*/) {
+void CastDBView::EmitCurrentCastRecordChanged(const QModelIndex& current, const QModelIndex& /*previous*/) {
   if (!current.isValid()) {
     return;
   }
@@ -402,49 +322,24 @@ void CastDBView::emitCastCurrentRowSelectionChanged(const QModelIndex &current, 
 }
 
 int CastDBView::onMigrateCastTo() {
-  if (!selectionModel()->hasSelection()) {
+  const QModelIndexList& selectedRowIndexes = selectionModel()->selectedRows();
+  if (selectedRowIndexes.isEmpty()) {
     LOG_INFO_NP("Nothing was selected.", "Select at least one row before migrate");
     return 0;
   }
-  const QString destPath = QFileDialog::getExistingDirectory(this, "Migrate to (folder under[" + mImageHost+ "])", mImageHost);
+  const QString cfmTitleText{"Migrate to (folder under[" + mImageHost + "])"};
+  QString destPath;
+#ifdef RUNNING_UNIT_TESTS:
+  destPath = CastDbViewMocker::MockMigrateToPath();
+#else
+  destPath = QFileDialog::getExistingDirectory(this, cfmTitleText, mImageHost);
+#endif
   if (destPath.isEmpty()) {
     LOG_OK_NP("[Skip] User cancel migrate", "return");
-    return false;
-  }
-  QString newOri;
-  if (!CastBaseDb::IsNewOriFolderPathValid(destPath, mImageHost, newOri)) {
-    LOG_ERR_P("Abort Migrate", "destPath[%s] or newOri[%s] invalid", qPrintable(destPath), qPrintable(newOri));
-    return -1;
-  }
-
-  const QModelIndexList indexes{selectionModel()->selectedRows()};
-  QDir imageHostDir{mImageHost};
-  int migrateCastCnt{0};
-  for (const auto& indr : indexes) {
-    const int r = indr.row();
-    QSqlRecord record = _castModel->record(r);
-    const int ret = CastBaseDb::MigrateToNewOriFolder(record, imageHostDir, newOri);
-    if (ret < FD_ERROR_CODE::FD_SKIP) {
-      LOG_W("Migrate ErrorCode: %d", ret);
-      return -1;
-    }
-    if (ret == FD_ERROR_CODE::FD_SKIP) {
-      continue;
-    }
-    ++migrateCastCnt;
-    _castModel->setRecord(r, record);
-  }
-  if (migrateCastCnt == 0) {
-    LOG_OK_P("No need Migrate", "%d/%d Cast(s) to %s", migrateCastCnt, indexes.size(), qPrintable(newOri));
     return 0;
   }
-  if (!_castModel->submitAll()) {
-    LOG_ERR_P("Submit failed", "%d/%d Cast(s) to %s.\nerror[%s]",
-              migrateCastCnt, indexes.size(), qPrintable(newOri), qPrintable(_castModel->lastError().text()));
-    return -1;
-  }
-  LOG_OK_P("Migrate succeed", "%d/%d Cast(s) to %s",
-             migrateCastCnt, indexes.size(), qPrintable(newOri));
+  int migrateCastCnt = _castModel->MigrateCastsTo(selectedRowIndexes, destPath);
+  LOG_OE_P(migrateCastCnt >= 0, "Migrate cast", "%d casts from to %s", selectedRowIndexes.size(), qPrintable(destPath));
   return migrateCastCnt;
 }
 
@@ -456,16 +351,3 @@ void CastDBView::RefreshCurrentRowHtmlContents() {
   const auto& record = _castModel->record(current.row());
   emit currentRecordChanged(record, mImageHost);
 }
-
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  CastDBView perfManaWid;
-  perfManaWid.show();
-  a.exec();
-  return 0;
-}
-#endif

@@ -31,13 +31,17 @@ bool GetVolumeInfo(const QString& path, QString& volName);
 bool GetGuidByDrive(const QString& driveStr, QString& guid);
 bool IsAdministrator();
 bool RunAsAdmin();
-
 QString FindRootByGUIDWin(const QString& targetGuid);
-const GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh = false);
 QString GetDisplayNameByGuidTableName(QString guidTableName);
 QMap<QString, QString> GetGuidTableName2DisplayName();
 QStringList GetGuidJoinDisplayName();
 QString ChoppedDisplayName(const QString& guidJoinDisplayName);
+
+GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh = false);
+#ifdef RUNNING_UNIT_TESTS
+GUID_2_PNTS_SET& MockGuids2MntPntSet();
+#endif
+
 }  // namespace MountHelper
 
 #endif  // MOUNTHELPER_H

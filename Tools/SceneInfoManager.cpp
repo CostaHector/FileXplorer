@@ -11,45 +11,83 @@
 #include <QTextStream>
 #include <QDateTime>
 
-QString SCENE_INFO::GetAbsolutePath(const QString& rootPath) const {
+QString SceneInfo::GetAbsolutePath(const QString& rootPath) const {
   return rootPath + rel2scn;
 }
 
-QString SCENE_INFO::GetFirstImageAbsPath(const QString& rootPath) const {
-  return rootPath + rel2scn + (imgs.isEmpty() ? "" : imgs.front());
+QString SceneInfo::GetFirstImageAbsPath(const QString& rootPath) const {
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (imgs.isEmpty() ? "" : imgs.front()));
 }
 
-QStringList SCENE_INFO::GetImagesAbsPathList(const QString& rootPath) const {
+QStringList SceneInfo::GetImagesAbsPathList(const QString& rootPath) const {
   QStringList imgsAbsPathList;
   imgsAbsPathList.reserve(imgs.size());
   for (const QString& imgName : imgs) {
-    imgsAbsPathList.append(rootPath + rel2scn + imgName);
+    imgsAbsPathList.append(PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, imgName));
   }
   return imgsAbsPathList;
 }
 
-QString SCENE_INFO::GetVideoAbsPath(const QString& rootPath) const {
-  return vidName.isEmpty() ? "" : rootPath + rel2scn + vidName;
+QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
+  return vidName.isEmpty() ? "" : PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName);
 }
 
-bool SCENE_INFO::operator<(const SCENE_INFO& other) const {
+SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
+  using namespace SceneSortOrderHelper;
+  switch (dim) {
+    case SortDimE::MOVIE_PATH:
+      return &SceneInfo::operator<;
+    case SortDimE::MOVIE_SIZE:
+      return &SceneInfo::lessThanVidSize;
+    case SortDimE::RATE:
+      return &SceneInfo::lessThanRate;
+    case SortDimE::UPLOADED_TIME:
+      return &SceneInfo::lessThanUploaded;
+    default:
+      LOG_D("Sort Dimension[%s] not support", c_str(dim));
+      return &SceneInfo::lessThanName;
+  }
+}
+
+bool SceneInfo::operator<(const SceneInfo& other) const {
   return rel2scn != other.rel2scn ? rel2scn < other.rel2scn : name < other.name;
 }
 
+bool SceneInfo::lessThanName(const SceneInfo& other) const {
+  return name < other.name;
+}
+
+bool SceneInfo::lessThanVidSize(const SceneInfo& other) const {
+  return vidSize < other.vidSize;
+}
+
+bool SceneInfo::lessThanRate(const SceneInfo& other) const {
+  return rate < other.rate;
+}
+
+bool SceneInfo::lessThanUploaded(const SceneInfo& other) const {
+  return uploaded < other.uploaded;
+}
+
+bool SceneInfo::operator==(const SceneInfo& rhs) const {
+  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize && rate == rhs.rate &&
+         uploaded == rhs.uploaded;
+}
+
 namespace SceneInfoManager {
-SCENE_INFO_LIST GetScnsLstFromPath(const QString& path) {
+SceneInfoList GetScnsLstFromPath(const QString& path) {
   if (!QFileInfo(path).isDir()) {
     LOG_D("path[%s] is not a directory", qPrintable(path));
     return {};
   }
   const int PATH_N = path.size();
 
-  SCENE_INFO_LIST scnTotals;
+  SceneInfoList scnTotals;
   int scnFilesCnt = 0;
   QDirIterator jsonIt(path, {"*.scn"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (jsonIt.hasNext()) {
     const QString& scnFullPath{jsonIt.next()};
-    const QString& rel2JsonFile = PathTool::RelativePath2File(PATH_N, scnFullPath);
+    const QString& rel2JsonFile = PathTool::GetRelPathFromRootRelName(PATH_N, scnFullPath);
     scnTotals += ParseAScnFile(scnFullPath, rel2JsonFile);
     ++scnFilesCnt;
   }
@@ -58,7 +96,7 @@ SCENE_INFO_LIST GetScnsLstFromPath(const QString& path) {
   return scnTotals;
 }
 
-SCENE_INFO_LIST ParseAScnFile(const QString& scnFileFullPath, const QString rel) {
+SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString rel) {
   QFile scnFi{scnFileFullPath};
   if (!scnFi.exists()) {
     LOG_D("scn file[%s] not exist", qPrintable(scnFileFullPath));
@@ -72,9 +110,9 @@ SCENE_INFO_LIST ParseAScnFile(const QString& scnFileFullPath, const QString rel)
   QTextStream stream(&scnFi);
   stream.setCodec("UTF-8");
 
-  SCENE_INFO_LIST scenesList;
+  SceneInfoList scenesList;
 
-  SCENE_INFO aScene;
+  SceneInfo aScene;
   aScene.rel2scn = rel;
 
   while (!stream.atEnd()) {

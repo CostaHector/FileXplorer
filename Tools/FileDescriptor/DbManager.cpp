@@ -12,6 +12,49 @@
 #include <QDesktopServices>
 #include <QUrl>
 
+SafeTransaction::SafeTransaction(QSqlDatabase db) : m_db(db) {
+  if (!DbManager::CheckValidAndOpen(m_db)) {
+    LOG_W("invalid QSqlDatabase invalid or closed");
+    mIsDbValid = false;
+    return;
+  }
+  if (!m_db.transaction()) {
+    LOG_W("Start transaction failed(Database may already in transaction): %s", qPrintable(m_db.lastError().text()));
+    mIsDbValid = false;
+    return;
+  }
+  mIsDbValid = true;
+}
+
+SafeTransaction::~SafeTransaction() {
+  if (!mIsDbValid) {  // invalid database
+    return;
+  }
+  if (mIsAlreadyCommitted) {  // transaction already commit no need
+    return;
+  }
+  if (m_db.rollback()) {
+    LOG_D("Transaction auto-rolled back succeed");
+  } else {
+    LOG_W("Auto rollback failed: %s", qPrintable(m_db.lastError().text()));
+  }
+}
+
+bool SafeTransaction::commit() {
+  if (!mIsDbValid) {
+    LOG_W("invalid QSqlDatabase invalid or closed. cannot commit");
+    return false;
+  }
+
+  if (m_db.commit()) {
+    mIsAlreadyCommitted = true;
+    return true;
+  }
+
+  LOG_W("Commit failed: %s", qPrintable(m_db.lastError().text()));
+  return false;
+}
+
 constexpr int DbManager::MAX_BATCH_SIZE;
 
 #ifdef RUNNING_UNIT_TESTS
@@ -83,10 +126,8 @@ bool DbManager::DeleteDatabaseIselfForTest(bool bRecyle) {
 }
 #endif
 
-DbManager::DbManager(const QString& dbName, const QString& connName, QObject* parent) //
-  : QObject{parent}
-  , mDbName{dbName}
-  , mConnName{connName} { //
+DbManager::DbManager(const QString& dbName, const QString& connName, QObject* parent)  //
+    : QObject{parent}, mDbName{dbName}, mConnName{connName} {                          //
   if (dbName.isEmpty() || connName.isEmpty()) {
     LOG_W("dbName[%s] or connName[%s] is empty", qPrintable(dbName), qPrintable(connName));
     return;
@@ -101,20 +142,21 @@ void DbManager::ReleaseConnection() {
     LOG_D("Connection[%s] already not found in connection pool", qPrintable(mConnName));
     return;
   }
-  QSqlDatabase db = QSqlDatabase::database(mConnName, false); // by default close
+  QSqlDatabase db = QSqlDatabase::database(mConnName, false);  // by default close
   if (db.isOpen()) {
     db.close();
     LOG_D("Database connection closed: %s", qPrintable(mConnName));
   }
   // Todo:
-  // QSqlDatabase::removeDatabase(mConnName); // QSqlDatabasePrivate::removeDatabase: connection 'AI_MEDIA_DUP_CONNECT' is still in use, all queries will cease to work.
+  // QSqlDatabase::removeDatabase(mConnName); // QSqlDatabasePrivate::removeDatabase: connection 'AI_MEDIA_DUP_CONNECT' is still in use, all queries
+  // will cease to work.
 }
 
 DbManager::~DbManager() {
   if (!mIsValid) {
     return;
   }
-  ReleaseConnection(); // todo
+  ReleaseConnection();  // todo
 }
 
 bool DbManager::IsTableExist(const QString& tableName) const {
@@ -123,6 +165,21 @@ bool DbManager::IsTableExist(const QString& tableName) const {
     return false;
   }
   return db.tables().contains(tableName);
+}
+
+bool DbManager::IsTableEmpty(const QString& tableName) const {
+  QSqlDatabase db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    LOG_W("Open failed:%s", qPrintable(db.lastError().text()));
+    return true;
+  }
+  QSqlQuery qry{db};
+  qry.prepare(QString{"SELECT * FROM `%1`"}.arg(tableName));
+  if (!qry.exec()) {
+    LOG_W("select[%s] failed: %s",  //
+          qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
+  }
+  return !qry.next();
 }
 
 QSqlDatabase DbManager::GetDb(bool open) const {
@@ -143,22 +200,6 @@ QSqlDatabase DbManager::GetDb(bool open) const {
     }
   }
   return db;
-}
-
-bool DbManager::CheckValidAndOpen(QSqlDatabase& db) const {
-  if (!IsValid()) {
-    LOG_W("Not initialized yet");
-    return false;
-  }
-  if (!db.isValid()) {
-    LOG_W("db[%s] is invalid", qPrintable(db.connectionName()));
-    return false;
-  }
-  if (!db.isOpen()) {
-    LOG_W("db[%s] not opened %s", qPrintable(db.connectionName()), qPrintable(db.lastError().text()));
-    return false;
-  }
-  return true;
 }
 
 bool DbManager::QueryForTest(const QString& qryCmd, QList<QSqlRecord>& records) const {
@@ -189,7 +230,7 @@ int DbManager::UpdateForTest(const QString& qryCmd) const {
   if (!CheckValidAndOpen(db)) {
     return FD_DB_INVALID;
   }
-  QSqlQuery qry{db}; // command in constructor call right now
+  QSqlQuery qry{db};  // command in constructor call right now
   if (!qry.exec(qryCmd)) {
     QSqlError error = qry.lastError();
     LOG_W("cmd[%s] failed", qPrintable(qry.executedQuery()));
@@ -277,29 +318,12 @@ int DbManager::CountRow(const QString& tableName, const QString& whereClause) {
 
   QSqlQuery qry{db};
   if (!qry.exec(countCmd)) {
-    LOG_W("count[%s] failed: %s", //
-          qPrintable(qry.executedQuery()),
-          qPrintable(qry.lastError().text()));
+    LOG_W("count[%s] failed: %s",  //
+          qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
     return FD_EXEC_FAILED;
   }
   qry.next();
   return qry.value(0).toInt();
-}
-
-bool DbManager::IsTableEmpty(const QString& tableName) const {
-  QSqlDatabase db = GetDb();
-  if (!CheckValidAndOpen(db)) {
-    LOG_W("Open failed:%s", qPrintable(db.lastError().text()));
-    return true;
-  }
-  QSqlQuery qry{db};
-  qry.prepare(QString{"SELECT * FROM `%1`"}.arg(tableName));
-  if (!qry.exec()) {
-    LOG_W("select[%s] failed: %s", //
-          qPrintable(qry.executedQuery()),
-          qPrintable(qry.lastError().text()));
-  }
-  return !qry.next();
 }
 
 int DbManager::DeleteByWhereClause(const QString& tableName, const QString& whereClause) {
@@ -310,7 +334,7 @@ int DbManager::DeleteByWhereClause(const QString& tableName, const QString& wher
   }
 
   QString deleteCmd{QString(R"(DELETE FROM "%1")").arg(tableName)};
-  if (!whereClause.isEmpty()) { // empty means delete all records
+  if (!whereClause.isEmpty()) {  // empty means delete all records
     deleteCmd += " WHERE ";
     deleteCmd += whereClause;
   }
@@ -319,9 +343,8 @@ int DbManager::DeleteByWhereClause(const QString& tableName, const QString& wher
   QSqlQuery qry{db};
   if (!qry.exec(deleteCmd)) {
     db.rollback();
-    LOG_W("delete cmd[%s] failed: %s", //
-          qPrintable(qry.executedQuery()),
-          qPrintable(qry.lastError().text()));
+    LOG_W("delete cmd[%s] failed: %s",  //
+          qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
     return FD_EXEC_FAILED;
   }
   const int affectedRows = qry.numRowsAffected();
@@ -353,11 +376,23 @@ QString DbManager::GetDeleteInPlaceholders(int n) {
   for (int i = 0; i < n; ++i) {
     placeholders += "?,";
   }
-  if (!placeholders.isEmpty()) { // chop last 1 char(s) ","
+  if (!placeholders.isEmpty()) {  // chop last 1 char(s) ","
     static constexpr int LAST_CHARS_CNT = 1;
     placeholders.chop(LAST_CHARS_CNT);
   }
   return placeholders;
+}
+
+bool DbManager::CheckValidAndOpen(QSqlDatabase& db) {
+  if (!db.isValid()) {
+    LOG_W("db[%s] is invalid", qPrintable(db.connectionName()));
+    return false;
+  }
+  if (!db.isOpen()) {
+    LOG_W("db[%s] not opened %s", qPrintable(db.connectionName()), qPrintable(db.lastError().text()));
+    return false;
+  }
+  return true;
 }
 
 bool DbManager::CreateDatabase() {
@@ -366,6 +401,11 @@ bool DbManager::CreateDatabase() {
 }
 
 bool DbManager::CreateTable(const QString& tableName, const QString& tableDefinitionTemplate) {
+  if (IsTableExist(tableName)) {
+    LOG_D("table[%s] already exist. skip create", qPrintable(tableName));
+    return true;
+  }
+
   if (tableName.isEmpty()) {
     LOG_W("table name[%s] cannot be empty", qPrintable(tableName));
     return false;
@@ -380,19 +420,14 @@ bool DbManager::CreateTable(const QString& tableName, const QString& tableDefini
     return false;
   }
 
-  if (db.tables().contains(tableName)) {
-    LOG_D("table[%s] already exist. skip create", qPrintable(tableName));
-    return true;
-  }
-
   // 启用外键支持和WAL模式提升性能
   QSqlQuery query(db);
-  query.exec("PRAGMA journal_mode = WAL"); // WAL/DELETE, the former may generate .db-wal file
+  query.exec("PRAGMA journal_mode = WAL");  // WAL/DELETE, the former may generate .db-wal file
   query.exec("PRAGMA foreign_keys = ON");
   query.exec("PRAGMA synchronous = NORMAL");
   if (!query.exec(tableDefinition)) {
     LOG_W("Create table[%s] failed: %s", qPrintable(tableDefinition), qPrintable(query.lastError().text()));
-    return false; // db and query will destroyed when out of scope
+    return false;  // db and query will destroyed when out of scope
   }
   LOG_D("Table[%s] create succeed", qPrintable(tableName));
   return true;
@@ -411,15 +446,14 @@ int DbManager::RmvTable(const QString& tableName, DbManagerHelper::DropOrDeleteE
 
   const QString rmvCmdTemplate{DbManagerHelper::command(dropOrDelete)};
   if (rmvCmdTemplate.isEmpty()) {
-    LOG_W("rmvCmdTemplate empty. mode[%d] invalid", (int) dropOrDelete);
+    LOG_W("rmvCmdTemplate empty. mode[%d] invalid", (int)dropOrDelete);
     return FD_DB_INVALID;
   }
 
   QSqlQuery query(db);
   if (!query.exec(rmvCmdTemplate.arg(tableName))) {
-    LOG_W("Drop table[%s] failed: %s", //
-          qPrintable(tableName),
-          qPrintable(query.lastError().text()));
+    LOG_W("Drop table[%s] failed: %s",  //
+          qPrintable(tableName), qPrintable(query.lastError().text()));
     db.rollback();
     return FD_EXEC_FAILED;
   }

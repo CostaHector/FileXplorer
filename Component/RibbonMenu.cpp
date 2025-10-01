@@ -27,6 +27,8 @@
 RibbonMenu::RibbonMenu(QWidget* parent)
     : QTabWidget{parent}  //
 {
+  m_scenePageControl = new (std::nothrow) ScenePageControl{"Pagination display", this};
+
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
   m_leafView = LeafView();
@@ -302,18 +304,20 @@ QToolBar* RibbonMenu::LeafJson() const {
 
 QToolBar* RibbonMenu::LeafScenesTools() const {
   auto& ag = g_SceneInPageActions();
-  if (!ag.InitWidget()) {
-    return nullptr;
-  }
 
   auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
+  CHECK_NULLPTR_RETURN_NULLPTR(sceneTB);
+
+  QToolBar* orderTB = ag.GetOrderToolBar(sceneTB);
+  CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
+
   sceneTB->addAction(g_viewActions()._SCENE_VIEW);
   sceneTB->addSeparator();
   sceneTB->addAction(ag._COMBINE_MEDIAINFOS_JSON);
   sceneTB->addSeparator();
-  sceneTB->addWidget(ag.mOrderTB);
+  sceneTB->addWidget(orderTB);
   sceneTB->addSeparator();
-  sceneTB->addWidget(ag.mEnablePageTB);
+  sceneTB->addWidget(m_scenePageControl);
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }

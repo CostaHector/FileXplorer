@@ -52,7 +52,8 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
 
   addAction(g_viewActions()._CAST_VIEW);
   addSeparator();
-  addAction(inst.SUBMIT);
+  addAction(inst._MODEL_SUBMIT_ALL);
+  addAction(inst._MODEL_REPOPULATE);
   addSeparator();
   addWidget(castAppendToolbutton);
   addWidget(m_BasicTableOp);

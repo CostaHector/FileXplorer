@@ -29,6 +29,43 @@ C:/home/to/path           folder1				------------------ignore
   QStringList selections;
 };
 
+struct RMFComponent {
+  /* Used in movie table `PrePathLeft`, `PrePathRight`, `Name` field
+   * Root+Middle+fileName                       <=> AbsFilePath
+   * ["",     "",                      "C.mp4"] <=> C.mp4
+   * ["",     "C:/",                   "C.mp4"] <=> C:/C.mp4
+   * ["",     "C:/A/",                 "B.mp4"] <=> C:/A/B.mp4
+   * ["C:/",  "A/B/",                  "C.mp4"] <=> C:/A/B/C.mp4
+   * ["/",    "tmp/FileXplorer-xxxx/", "a.mp4"] <=> /tmp/FileXplorer-xxxx/a.mp4
+   */
+  QString rootPart;
+  QString middlePart;
+  QString fileName;
+
+  QString joinItself() const {
+    return join(rootPart, middlePart, fileName);
+  }
+  QString joinParentPathItself() const {
+    return joinParentPath(rootPart, middlePart);
+  }
+  static QString join(QString root, const QString& middle, const QString& file) {
+    root.reserve(root.size() + middle.size() + file.size());
+    root += middle;
+    root += file;
+    return root;
+  }
+  static QString joinParentPath(QString root, const QString& middle) {
+    root += middle;
+    int n = root.size();
+    if (n > 2 && root[n-1] == '/' && root[n-2] != ':') {
+      root.chop(1);
+    }
+    return root;
+  }
+  static QString stdStyleSubstring(const QString& str, int start, int end) { return str.mid(start, end - start); }
+  static RMFComponent FromPath(const QString& input);
+};
+
 namespace FILE_REL_PATH{
 constexpr char MEDIA_INFO_DLL[] {"../../lib/MediaInfo.dll"};
 constexpr char PERFORMERS_TABLE[]{"../../../CastStudioList/PERFORMERS_TABLE.txt"};
@@ -69,7 +106,15 @@ QString fileName(const QString& fullPath);
 // "rootPath", rootPath/Any/Relative/Path/File = > /Any/Relative/Path/
 // "rootPath", rootPath/Relative/File = > /Relative/
 // "rootPath", rootPath/File = > /
-QString RelativePath2File(int rootPathLen, const QString& fullPath, int fileNameLen = -1);
+QString GetRelPathFromRootRelName(int rootPathLen, const QString& fullPath, int fileNameLen = -1);
+inline QString GetAbsFilePathFromRootRelName(const QString& root, const QString& rel, const QString& name) {
+  QString ans;
+  ans.reserve(root.size() + rel.size() + name.size());
+  ans += root;
+  ans += rel;
+  ans += name;
+  return ans;
+}
 
 // Get "baseName, extension with prefix dot" from fullpath
 // a.txt => ("a", ".txt")
@@ -82,8 +127,6 @@ QString FileExtReplacedWithJson(QString fileName);
 QString GetPrepathAndFileName(const QString& fullpath, QString& prepath);
 
 QString Path2Join(const QString& a, const QString& b);
-QString Path3Join(const QString& a, const QString& b, const QString& c);
-int GetPrepathParts(const QString& absPath, QString& outPrePathLeft, QString& outPrePathRight);
 QString GetEffectiveName(const QString& itemPath);
 
 QString join(const QString& prefix, const QString& relative);
