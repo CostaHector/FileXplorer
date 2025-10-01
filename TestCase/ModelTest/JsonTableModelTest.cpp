@@ -1,16 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
-#include <QTestEventList>
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "JsonTableModel.h"
 #include "CastManager.h"
 #include "EndToExposePrivateMember.h"
 #include "TDir.h"
+#include "AutoRollbackFileContentModify.h"
 #include "JsonTestPrecoditionTools.h"
 #include "PublicVariable.h"
 #include "PublicTool.h"
