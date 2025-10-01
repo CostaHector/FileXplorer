@@ -8,6 +8,7 @@
 #include "TableFields.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
+#include "MountHelper.h"
 
 #ifdef _WIN32
 const QString rootpath = QFileInfo(__FILE__).absolutePath();
@@ -49,6 +50,7 @@ class DevicesAndDriverDbTest : public PlainTestSuite {
     QVERIFY(!QFile{dbName}.exists());
     const QList<QStorageInfo>& siLst = QStorageInfo::mountedVolumes();
     QVERIFY(siLst.size() > 0);
+    QVERIFY(siLst.size() < 10);
     // procedure
     DevicesAndDriverDb mDb{dbName, "CONN_DEVICE_DRIVER_DB_TEST"};
     QVERIFY(mDb.CreateDatabase());

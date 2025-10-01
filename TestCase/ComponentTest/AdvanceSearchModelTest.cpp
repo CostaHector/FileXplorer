@@ -18,10 +18,10 @@ class AdvanceSearchModelTest : public PlainTestSuite {
   const QList<FsNodeEntry> nodeEntries  //
       {
           FsNodeEntry{"Cristiano Ronaldo/Kaka.txt", false, "My Eyes Never Lie.txt"},                  //
-          FsNodeEntry{"Cristiano Ronaldo vs Goalkeeper record.txt", false, "Cristiano Ronaldo.txt"},  //
+          FsNodeEntry{"Cristiano Ronaldo Football.jpg", false, "Football.jpg"},                       //
           FsNodeEntry{"Cristiano Ronaldo Tuxedo.svg", false, "Cristiano Ronaldo.svg"},                //
           FsNodeEntry{"Cristiano Ronaldo Wallpaper.jpg", false, "Wallpaper.jpg"},                     //
-          FsNodeEntry{"Cristiano Ronaldo Football.jpg", false, "Football.jpg"},                       //
+          FsNodeEntry{"Cristiano Ronaldo vs Goalkeeper record.txt", false, "Cristiano Ronaldo.txt"},  //
       };
   const QDir::Filters DEFAULT_DIR_FILTERS{QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
 
@@ -254,8 +254,8 @@ class AdvanceSearchModelTest : public PlainTestSuite {
 
     QCOMPARE(sourceModel.fileName(firstInd), "Cristiano Ronaldo");
     QCOMPARE(sourceModel.data(firstInd, Qt::ItemDataRole::DisplayRole).toString(), "Cristiano Ronaldo");
-    QCOMPARE(sourceModel.fileName(secondInd), "Cristiano Ronaldo vs Goalkeeper record.txt");
-    QCOMPARE(sourceModel.data(secondInd, Qt::ItemDataRole::DisplayRole).toString(), "Cristiano Ronaldo vs Goalkeeper record.txt");
+    QCOMPARE(sourceModel.fileName(secondInd), "Cristiano Ronaldo Football.jpg");
+    QCOMPARE(sourceModel.data(secondInd, Qt::ItemDataRole::DisplayRole).toString(), "Cristiano Ronaldo Football.jpg");
     QVERIFY(sourceModel.fileInfo(secondInd).isFile());
 
     QString firstFileAbsFilePath = sourceModel.m_rootPath +
@@ -290,9 +290,9 @@ class AdvanceSearchModelTest : public PlainTestSuite {
       sourceModel.setFilter(QDir::Filter::Files);
       sourceModel.setIteratorFlag(QDirIterator::IteratorFlag::Subdirectories);
       QCOMPARE(sourceModel.rowCount(), 5);
-      QModelIndex firstIndexKaka = sourceModel.index(0, 0);
-      QCOMPARE(sourceModel.fileName(firstIndexKaka), "Kaka.txt");
-      const QString kakaTxtFileAbsFilePath = sourceModel.filePath(firstIndexKaka);
+      QModelIndex fouthIndexKaka = sourceModel.index(4, 0); // last one is kaka, because kaka is in the second level
+      QCOMPARE(sourceModel.fileName(fouthIndexKaka), "Kaka.txt");
+      const QString kakaTxtFileAbsFilePath = sourceModel.filePath(fouthIndexKaka);
       QCOMPARE(kakaTxtFileAbsFilePath, tDir.itemPath("Cristiano Ronaldo/Kaka.txt"));
     }
 

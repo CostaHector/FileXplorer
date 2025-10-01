@@ -34,6 +34,7 @@ struct FilePropertyInfo {
   QString GetAbsolutePath(const QString& rootPath) const;
   QString GetAbsoluteFilePath(const QString& rootPath) const;
   bool operator==(const FilePropertyInfo& rhs) const { return m_Name == rhs.m_Name && m_RelPath == rhs.m_RelPath; }
+  bool operator<(const FilePropertyInfo& rhs) const { return m_RelPath < rhs.m_RelPath || (m_RelPath == rhs.m_RelPath && m_Name < rhs.m_Name);}
 };
 
 using FilePropertyInfoList = QList<FilePropertyInfo>;

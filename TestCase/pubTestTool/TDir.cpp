@@ -298,7 +298,7 @@ AutoRollbackFileContentModify::~AutoRollbackFileContentModify() {
   if (!mNeedRollback) {
     return;
   }
-  const bool bRollbackResult = FileTool::TextWriter(mAbsFilePath, mOriginContents, QIODevice::WriteOnly | QIODevice::Text);
+  const bool bRollbackResult = FileTool::ByteArrayWriter(mAbsFilePath, mOriginContents.toUtf8());
   if (!bRollbackResult) {
     LOG_W("Rollback file[%s] contents failed", qPrintable(mAbsFilePath));
   }
@@ -322,11 +322,11 @@ bool AutoRollbackFileContentModify::Execute() {
     case Mode::ReplaceMode: {
       QString tempStr = mOriginContents;
       tempStr.replace(mReplaceeStr, mReplacerStr);
-      bSuccess = FileTool::TextWriter(mAbsFilePath, tempStr, QIODevice::WriteOnly | QIODevice::Text);
+      bSuccess = FileTool::ByteArrayWriter(mAbsFilePath, tempStr.toUtf8());
       break;
     }
     case Mode::FullReplaceMode: {
-      bSuccess = FileTool::TextWriter(mAbsFilePath, mNewContents, QIODevice::WriteOnly | QIODevice::Text);
+      bSuccess = FileTool::ByteArrayWriter(mAbsFilePath, mNewContents.toUtf8());
       break;
     }
     default:
