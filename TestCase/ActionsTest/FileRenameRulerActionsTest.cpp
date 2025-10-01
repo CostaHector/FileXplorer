@@ -4,11 +4,23 @@
 #include "FileRenameRulerActions.h"
 #include "EndToExposePrivateMember.h"
 #include "PathTool.h"
+#include "StudiosManager.h"
+#include "CastManager.h"
+#include "CastAkasManager.h"
 
 class FileRenameRulerActionsTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
+  void initTestCase() {
+    StudiosManager& psm = StudiosManager::getInst();
+    CastManager& pm = CastManager::getInst();
+    CastAkasManager& dbTM = CastAkasManager::getInst();
+    psm.ProStudioMap().clear();
+    pm.CastSet().clear();
+    dbTM.CastAkaMap().clear();
+  }
+
   void name_ruler_edit_dependent_file_open_ok() {
     FileRenameRulerActions& ruleInst = g_NameRulerActions();
     QVERIFY(ruleInst.NAME_RULES_ACTIONS_LIST.size() > 0);

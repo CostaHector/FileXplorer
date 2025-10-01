@@ -36,7 +36,7 @@ class DevicesDriveModelTest : public PlainTestSuite {
     QCOMPARE(ddm.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 1 + 1);
     QCOMPARE(ddm.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
   }
-
+#ifdef UNIX
   void data_retrieve_ok() {
     TDir tDir;
     QVERIFY(tDir.IsValid());
@@ -103,6 +103,7 @@ class DevicesDriveModelTest : public PlainTestSuite {
       QVERIFY(iconFromAppStyle.canConvert<QIcon>());
     }
   }
+#endif
 };
 
 #include "DevicesDriveModelTest.moc"

@@ -1,18 +1,38 @@
-#include <QCoreApplication>
-#include <QtTest>
-#include "CreateFileFolderHelper.h"
+#include <QtTest/QtTest>
 #include "PlainTestSuite.h"
+
 #include "TDir.h"
+#include "CreateFileFolderHelper.h"
 #include "JsonHelper.h"
 #include "JsonKey.h"
 
 class CreateFileFolderHelperTest : public PlainTestSuite {
   Q_OBJECT
-public:
-  CreateFileFolderHelperTest() : PlainTestSuite{} {
+ public:
+ private slots:
+  void invalid_input_params() {
+    // 测试 NewPlainTextFile 的异常分支
+    QString invalidDir = "/non/existent/path";
+    QString resultPath;
+    QVERIFY(!CreateFileFolderHelper::NewPlainTextFile(invalidDir, &resultPath));
+    QVERIFY(resultPath.isEmpty());
+
+    // 测试 NewJsonFile 的异常分支
+    QStringList emptyList;
+    int result = CreateFileFolderHelper::NewJsonFile(invalidDir, emptyList);
+    QCOMPARE(result, 0);
+
+    // 测试 NewFolder 的异常分支
+    QVERIFY(!CreateFileFolderHelper::NewFolder(invalidDir));
+
+    // 测试 NewItems 的异常分支
+    // 无效范围测试
+    QVERIFY(!CreateFileFolderHelper::NewItems(invalidDir, "test_%d.txt", 10, 5));  // start > end
+
+    // 空操作测试
+    QVERIFY(!CreateFileFolderHelper::NewItems(invalidDir, "test.txt", 1, 1));  // start == end
   }
 
-private slots:
   void test_NewPlainTextFile_ok() {
     TDir mDir;
     QString tPath{mDir.path()};

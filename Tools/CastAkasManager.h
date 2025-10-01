@@ -18,8 +18,6 @@ class CastAkasManager final : public SingletonManager<CastAkasManager, CAST_AKA_
   QHash<QString, QString> ReadOutCastAkas() const;
   int ForceReloadImpl();
 
-  static int UpdateAKAHash(const bool isForce = false);
-
  private:
   CastAkasManager();
   CastAkasManager(const CastAkasManager& rhs) noexcept = delete;

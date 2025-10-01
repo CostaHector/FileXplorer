@@ -78,7 +78,8 @@ bool TextWriter(const QString& fileName, const QString& content, const QIODevice
     LOG_W("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int)openMode);
     return false;
   }
-  QTextStream stream(&fi);
+
+  QTextStream stream(&fi); // "\n" will be replace with "\r\n"
   stream.setCodec("UTF-8");
   stream << content;
   stream.flush();

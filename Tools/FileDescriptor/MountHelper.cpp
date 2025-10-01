@@ -360,9 +360,6 @@ GUID_2_PNTS_SET& MockGuids2MntPntSet() {
 }
 
 GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
-#ifdef RUNNING_UNIT_TESTS
-  return MockGuids2MntPntSet();
-#endif
   static GUID_2_PNTS_SET guid2MntPnts;
 #ifdef _WIN32
   if (forceRefresh || guid2MntPnts.isEmpty()) {
@@ -376,8 +373,11 @@ GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
   }
   return guid2MntPnts;
 #else
-  return guid2MntPnts;
+#ifdef RUNNING_UNIT_TESTS
+  return MockGuids2MntPntSet();
 #endif
+#endif
+  return guid2MntPnts;
 }
 
 }  // namespace MountHelper
