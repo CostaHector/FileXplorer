@@ -8,6 +8,7 @@
 
 #include "PlainTestSuite.h"
 #include "TDir.h"
+#include "AutoRollbackRename.h"
 #include "VideoTestPrecoditionTools.h"
 #include <QSqlRecord>
 #include "VidDupTabFields.h"

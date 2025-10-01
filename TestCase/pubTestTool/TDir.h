@@ -69,35 +69,4 @@ class TDir {
   QDir mDir;
 };
 
-struct AutoRollbackRename final {
- public:
-  AutoRollbackRename(QString srcPath, QString dstPath);
-  AutoRollbackRename(const QString& prepath, const QString& relSrc1, const QString& relDst2)  //
-      : AutoRollbackRename{QDir{prepath}.absoluteFilePath(relSrc1), QDir{prepath}.absoluteFilePath(relDst2)} {}
-  ~AutoRollbackRename();
-  bool Execute();
-
- private:
-  bool StartToRename(const QString& hintMsg);
-  QString mSrcAbsFilePath, mDstAbsFilePath;
-  bool mNeedRollback{false};
-};
-
-struct AutoRollbackFileContentModify final {
- public:
-  AutoRollbackFileContentModify(const QString& absFilePath, const QString& replaceeStr, const QString& replacerStr);
-  AutoRollbackFileContentModify(const QString& absFilePath, const QString& newContents);
-  ~AutoRollbackFileContentModify();
-  bool Execute();
-
- private:
-  enum class Mode { ReplaceMode, FullReplaceMode };
-  bool StartToModify(const QString& hintMsg);
-  const QString mAbsFilePath;
-  const QString mReplaceeStr, mReplacerStr;  // replacee->replacer
-  const QString mNewContents;                // full replace
-  const Mode mMode;
-  QString mOriginContents;
-  bool mNeedRollback{false};
-};
 #endif  // TDIR_H
