@@ -18,7 +18,7 @@
 Q_DECLARE_METATYPE(Qt::Orientation)
 
 bool headerDataChangedSignalParameterCheck(const QVariantList& actualParms, Qt::Orientation expectOri, int expectRow) {
-  if (QMetaType::type("Qt::Orientation") == 0) {
+  if (QMetaType::type("Qt::Orientation") == 0) { // check if type is registered
     LOG_W("Type not registered");
     return false;
   }

@@ -137,6 +137,10 @@ class ScenesListModelTest : public PlainTestSuite {
     }
   }
 
+  void cleanupTestCase() {
+    SceneInfoManager::mockScenesInfoList().clear();
+  }
+
   void initalized_ok() {
     Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);  //
 

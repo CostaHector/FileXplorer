@@ -66,6 +66,7 @@ CustomListView::~CustomListView() {
 }
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (m_menu != nullptr) {
 #ifndef RUNNING_UNIT_TESTS
     m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
@@ -82,15 +83,12 @@ void CustomListView::wheelEvent(QWheelEvent *event) {
     if (!numDegrees.isNull()) {
       int numSteps = numDegrees.y() / 15;
       int newSizeIndex = mCurIconSizeIndex + (numSteps > 0 ? 1 : -1);
-      if (newSizeIndex < 0) {
-        return;
-      } else if (newSizeIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
+      if (!setIconSizeScaledIndex(newSizeIndex)) {
         return;
       }
-      mCurIconSizeIndex = newSizeIndex;
       const QSize newIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
       setIconSize(newIconSize);
-      LOG_OK_P("[Change] Icon size", "%d x %d", newIconSize.width(), newIconSize.height());
+      LOG_OK_P("[Change] Icon size", "[%d] %d x %d", mCurIconSizeIndex, newIconSize.width(), newIconSize.height());
       emit iconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
       event->accept();
       return;
@@ -125,9 +123,18 @@ void CustomListView::InitListView() {
 }
 
 void CustomListView::mousePressEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event)
   if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
     event->accept();
     return;
   }
   QListView::mousePressEvent(event);
+}
+
+bool CustomListView::setIconSizeScaledIndex(int newScaledIndex) {
+  if (newScaledIndex < 0 || newScaledIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
+    return false;
+  }
+  mCurIconSizeIndex = newScaledIndex;
+  return true;
 }

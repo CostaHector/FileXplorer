@@ -4,10 +4,23 @@
 #include "CustomListView.h"
 #include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
+#include <QStyledItemDelegate>
 #include <QMenu>
 
 class ScenesListModel;
-class QStyledItemDelegate;
+
+namespace SceneListViewMocker{
+inline bool& MockSetRootPathQuery() {
+  static bool bConfirm = false;
+  return bConfirm;
+}
+}
+
+class AlignDelegate : public QStyledItemDelegate {
+ public:
+  void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
+  QString displayText(const QVariant& value, const QLocale& /**/) const override;
+};
 
 class SceneListView : public CustomListView {
   Q_OBJECT
