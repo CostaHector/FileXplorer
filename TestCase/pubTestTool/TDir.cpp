@@ -235,6 +235,20 @@ QStringList TDir::FilesContentsSnapshotAtPath(const QStringList& filesAbsPath) {
   return contentsList;
 }
 
+QByteArray TDir::readByteArrayAtPath(const QString& path, bool* isValid) {
+  QFile fi{path};
+  if (!fi.open(QFile::OpenModeFlag::ReadOnly)) {
+    if (isValid != nullptr) {
+      *isValid = false;
+    }
+    return {};
+  }
+  if (isValid != nullptr) {
+    *isValid = true;
+  }
+  return fi.readAll();
+}
+
 bool TDir::ClearAll() {
   bool success = true;
   for (const QFileInfo& info : mDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System)) {
