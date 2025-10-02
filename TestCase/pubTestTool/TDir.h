@@ -26,6 +26,7 @@ class TDir {
                                       QDirIterator::IteratorFlag iterFlag = QDirIterator::IteratorFlag::Subdirectories);
   static bool checkFileContentsAtPath(const QString& absFilePath, const QSet<QString>& containsSet = {}, const QSet<QString>& notContainsSet = {});
   static QStringList FilesContentsSnapshotAtPath(const QStringList& filesAbsPath);
+  static QByteArray readByteArrayAtPath(const QString& path, bool* isValid);
 
   operator QDir() const { return mDir; }
   bool IsValid() const { return mTempDir.isValid(); }
@@ -56,6 +57,9 @@ class TDir {
   }
   bool checkFileContents(const QString& relativePath2File, const QSet<QString>& containsSet = {}, const QSet<QString>& notContainsSet = {}) const {
     return checkFileContentsAtPath(itemPath(relativePath2File), containsSet, notContainsSet);
+  }
+  QByteArray readByteArray(const QString& relativePath2File, bool* isValid) const {
+    return readByteArrayAtPath(itemPath(relativePath2File), isValid);
   }
 
   bool ClearAll();

@@ -11,6 +11,8 @@ class VideosDurationGetterTest : public PlainTestSuite {
   static constexpr int EPSILON_MILLIONSECOND{1000};  // 1000ms
  private slots:
   void test_GetLengthQuick() {
+    IsFFmpegInstalledOK();
+
     const QString vidName = "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 144p 33s.mp4";
     const int expectDuration = 33000;
     const QDir mp4Dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};

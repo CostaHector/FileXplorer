@@ -84,6 +84,10 @@ bool ArchiveFilesReader::DecompressToPath(const QString& dstPath) const {
     LOG_W("destination path[%s] not exist", qPrintable(dstPath));
     return false;
   }
+  // dstPath = "home/to"
+  // relFilePath = "decompressed/to/a.jpg", finalFileName="a.jpg"
+  // to get "decompressed/to/"
+  // relFilePath.left(relFilePath.size() - finalFileName.size()) or just chop(finalFileName.size())
 
   for (int i = 0; i < size(); ++i) {
     const QString& relFilePath = key(i);
@@ -92,12 +96,12 @@ bool ArchiveFilesReader::DecompressToPath(const QString& dstPath) const {
       LOG_W("File[%s] already exist, skip overwrite", qPrintable(destAbsFilePath));
       continue;
     }
-
-    QString prePath;
-    QString fileName = PathTool::GetPrepathAndFileName(destAbsFilePath, prePath);
-    if (!QFileInfo(prePath).isDir()) {
-      if (QDir().mkpath(prePath)) {
-        LOG_W("Cannot mkpath[%s]", qPrintable(prePath));
+    const QString finalFileName = PathTool::fileName(relFilePath);
+    QString prePath = relFilePath;
+    prePath.chop(finalFileName.size());
+    if (!prePath.isEmpty() && !dstDir.exists(prePath)) {
+      if (!dstDir.mkpath(prePath)) {
+        LOG_W("Cannot mkpath[%s] under[%s]", qPrintable(prePath), qPrintable(dstPath));
         continue;
       }
     }
@@ -116,11 +120,18 @@ bool ArchiveFilesReader::DecompressToPath(const QString& dstPath) const {
   return true;
 }
 
-bool ArchiveFilesWriter::CompressNow(const QString& workPath, const QStringList& fileNames, const QString& destArchiveFileName, bool enableAppend) {
+int ArchiveFilesWriter::CompressNow(const QString& workPath, const QStringList& fileNames, const QString& destArchiveFileName, bool enableAppend) {
   if (fileNames.isEmpty()) {
     LOG_D("no files need to compress");
-    return true;
+    return 0;
   }
+
+  QDir workDir{workPath};
+  if (!workDir.exists()) {
+    LOG_D("source directory[%s] not exist", qPrintable(workPath));
+    return -1;
+  }
+
   QFile::OpenMode openMde = QFile::OpenModeFlag::WriteOnly;
   if (enableAppend) {
     openMde.setFlag(QFile::OpenModeFlag::Append);  // append
@@ -132,19 +143,19 @@ bool ArchiveFilesWriter::CompressNow(const QString& workPath, const QStringList&
   m_fi.setFileName(destArchiveFileName);
   if (!m_fi.open(openMde)) {
     LOG_W("Cannot open achive file[%s] to write into.", qPrintable(destArchiveFileName));
-    return false;
+    return -1;
   }
   m_ds.setDevice(&m_fi);
   m_ds.resetStatus();
 
-  auto cleanupAndReturn = [this](bool returnValue) -> bool {
+  auto cleanupAndReturn = [this](int returnValue) -> int {
     m_fi.close();
     m_ds.setDevice(nullptr);
     return returnValue;
   };
 
   int compressItemsCount = 0;
-  QDir workDir{workPath};
+
   for (const QString& name : fileNames) {
     QFileInfo fileNeedToCompressFi{workDir, name};
     if (!fileNeedToCompressFi.exists()) {
@@ -152,23 +163,24 @@ bool ArchiveFilesWriter::CompressNow(const QString& workPath, const QStringList&
       continue;
     }
     if (fileNeedToCompressFi.isFile()) {
-      int result = AddOneFile(workPath, name);
-      if (!result) {
-        return cleanupAndReturn(false);
+      int cnt = AddOneFile(workPath, name);
+      if (cnt < 0) {
+        return cleanupAndReturn(-1);
       }
+      compressItemsCount += cnt;
       continue;
     }
     if (fileNeedToCompressFi.isDir()) {
       int cnt = AddOneFolder(workPath, name);
       if (cnt < 0) {
-        return cleanupAndReturn(false);
+        return cleanupAndReturn(-1);
       }
       compressItemsCount += cnt;
       continue;
     }
   }
   LOG_D("%d item(s) compressed ok [from %d selected under %s]", compressItemsCount, fileNames.size(), qPrintable(workPath));
-  return cleanupAndReturn(true);
+  return cleanupAndReturn(compressItemsCount);
 }
 
 bool ArchiveFilesWriter::IsNeedCompress(const QFile& fi) {
@@ -192,18 +204,8 @@ int ArchiveFilesWriter::AddOneFolder(const QString& workPath, const QString& rel
   QDirIterator srcDirIt(absFolderPath, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
   while (srcDirIt.hasNext()) {
     const QString fileToBeCompressed = srcDirIt.next();
-    QFile fi{fileToBeCompressed};
-    if (!IsNeedCompress(fi)) {
-      continue;
-    }
-    if (!fi.open(QFile::OpenModeFlag::ReadOnly)) {
-      LOG_W("File[%s] not exist or not a file, cannot compressed", qPrintable(fi.fileName()));
-      return -1;
-    }
-    QByteArray data = fi.readAll();
-    WriteIntoFile(fileToBeCompressed.mid(PREPATH_LEN), fi.size(), data);
-    if (m_ds.status() != QDataStream::Ok) {
-      LOG_W("File[%s] write into qz file failed", qPrintable(fileToBeCompressed));
+    const QString rel2FileName = fileToBeCompressed.mid(PREPATH_LEN);
+    if (AddOneFile(workPath, rel2FileName) < 0) {
       return -1;
     }
     ++compSuccCnt;
@@ -212,30 +214,30 @@ int ArchiveFilesWriter::AddOneFolder(const QString& workPath, const QString& rel
   return compSuccCnt;
 }
 
-bool ArchiveFilesWriter::AddOneFile(const QString& workPath, const QString& rel2FileName) {
+int ArchiveFilesWriter::AddOneFile(const QString& workPath, const QString& rel2FileName) {
   if (m_ds.device() == nullptr) {
     return -1;
   }
   QFile srcFi{workPath + '/' + rel2FileName};
   if (!IsNeedCompress(srcFi)) {
     LOG_D("skip file[%s]", qPrintable(srcFi.fileName()));
-    return true;
+    return 0;
   }
   if (!srcFi.open(QFile::OpenModeFlag::ReadOnly)) {
     LOG_W("File[%s] not exist or not a file, cannot compressed", qPrintable(srcFi.fileName()));
-    return false;
+    return -1;
   }
   const QByteArray& srcData = srcFi.readAll();
   WriteIntoFile(rel2FileName, srcFi.size(), srcData);
   QDataStream::Status dataStreamCode = m_ds.status();
   if (dataStreamCode != QDataStream::Ok) {
     LOG_W("File[%s] write into qz file failed", qPrintable(srcFi.fileName()));
-    return false;
+    return -1;
   }
-  return true;
+  return 1;
 }
 
-constexpr int ArchiveImagesRecusive::MAX_COMPRESSED_IMG_CNT;
+int ArchiveImagesRecusive::MAX_COMPRESSED_IMG_CNT = 30;
 int ArchiveImagesRecusive::CompressImgRecur(const QString& rootPath) {
   QDir rootDir{rootPath, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
   QStringList paths{rootDir.entryList()};  // all direct subfolders only
@@ -271,9 +273,9 @@ bool ArchiveImagesRecusive::CompressSubfolder(const QString& path, const QString
   qzPrepathDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
   const QStringList& imgNames = qzPrepathDir.entryList();
   if (imgNames.isEmpty()) {
-    return true;
+    return false; // no need compress
   }
-  if (imgNames.size() > MAX_COMPRESSED_IMG_CNT) {
+  if (imgNames.size() >= MAX_COMPRESSED_IMG_CNT) {
     LOG_W("Images in folder[%s] counts[%d] > %d. Reject compress", qPrintable(path), imgNames.size(), MAX_COMPRESSED_IMG_CNT);
     return false;
   }
@@ -281,25 +283,12 @@ bool ArchiveImagesRecusive::CompressSubfolder(const QString& path, const QString
   const QString& qzFilePath = qzPrepathDir.absoluteFilePath(qzBaseName + ".qz");
 
   ArchiveFilesWriter af;
-  bool compRet = af.CompressNow(path, imgNames, qzFilePath, false);
-  if (m_autoRecycle && !compRet) {
+  int fileCompressedOkCnt = af.CompressNow(path, imgNames, qzFilePath, false);
+  if (m_autoRecycle && fileCompressedOkCnt > 0) {
     for (int i = 0; i < imgNames.size(); ++i) {
       m_allPres.append(path);
     }
     m_allNames += imgNames;
   }
-  return compRet;
+  return fileCompressedOkCnt > 0;
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-int main(int argc, char* argv[]) {
-  ArchiveFiles af{"E:/py/1/achieve.qz"};
-
-  af.CompressDelegate(ArchiveFilesWriter::FILES, {"E:/py/1/testImage.jpg"}, false);
-  if (af.CompressDelegate(ArchiveFilesWriter::A_FOLDER, {"E:/py/1/nostructure"}, true)) {
-    af.DecompressToPath("E:/py/1/dst");
-  }
-  return 0;
-}
-#endif

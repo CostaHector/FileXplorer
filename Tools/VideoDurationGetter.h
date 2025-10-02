@@ -5,6 +5,7 @@
 #ifdef _WIN32
 #include "QMediaInfo.h"
 #endif
+void IsFFmpegInstalledOK();
 
 class VideoDurationGetter {
  public:

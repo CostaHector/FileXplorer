@@ -80,7 +80,7 @@ class ArchiveFilesWriter {
   ArchiveFilesWriter() = default;
   ~ArchiveFilesWriter() = default;
 
-  bool CompressNow(const QString& workPath, const QStringList& fileNames, const QString& destArchiveFileName, bool enableAppend = true);
+  int CompressNow(const QString& workPath, const QStringList& fileNames, const QString& destArchiveFileName, bool enableAppend = true);
 
  private:
   inline void WriteIntoFile(const QString& name, const qint64& beforeSize, const QByteArray& fileData) {
@@ -92,7 +92,7 @@ class ArchiveFilesWriter {
   QDataStream m_ds{nullptr};
 
   int AddOneFolder(const QString& workPath, const QString& rel2FolderName);
-  bool AddOneFile(const QString& workPath, const QString& rel2FileName);
+  int AddOneFile(const QString& workPath, const QString& rel2FileName);
 };
 
 class ArchiveImagesRecusive {
@@ -103,8 +103,9 @@ class ArchiveImagesRecusive {
 
  private:
   QStringList m_allPres, m_allNames;
-  bool m_autoRecycle;
-  static constexpr int MAX_COMPRESSED_IMG_CNT = 30;
+  const bool m_autoRecycle;
+  static void setMaxCompressImageCnt(int newImgLimitCnt) {MAX_COMPRESSED_IMG_CNT = newImgLimitCnt;}
+  static int MAX_COMPRESSED_IMG_CNT;
 };
 
 #endif  // ARCHIVEFILES_H

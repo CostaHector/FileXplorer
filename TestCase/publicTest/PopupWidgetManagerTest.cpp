@@ -12,6 +12,7 @@
 #include "DuplicateVideosFinder.h"
 #include "TorrentsManagerWidget.h"
 #include "ConfigsTable.h"
+#include "Archiver.h"
 
 class PopupWidgetManagerTest : public PlainTestSuite {
   Q_OBJECT
@@ -79,6 +80,7 @@ private slots:
     PopupWidgetManagerTestTemplate<RedundantImageFinder>("RedundantImageFinder", true);
     PopupWidgetManagerTestTemplate<TorrentsManagerWidget>("TorrentsManagerWidget", true);
     PopupWidgetManagerTestTemplate<ConfigsTable>("ConfigsTable", true);
+    PopupWidgetManagerTestTemplate<Archiver>("Archiver", true);
   }
 
   void not_checkable_popup_widget_geometry_state_ok() { //
