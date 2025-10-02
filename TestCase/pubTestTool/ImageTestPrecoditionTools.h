@@ -1,6 +1,8 @@
 #ifndef IMAGETESTPRECODITIONTOOLS_H
 #define IMAGETESTPRECODITIONTOOLS_H
 #include <QStringList>
+#include <QBuffer>
+#include <QImage>
 
 namespace ImageTestPrecoditionTools {
 constexpr const char* SVG_FILL_COLORS[]{
@@ -30,5 +32,16 @@ inline const QString& GetSvgContentTemplate() {
   </svg>)";  // WARNING: don't use R"" inside class when the class need .moc
   return svg;
 }
+
+inline QByteArray GetPNGImage(int width = 100, int height = 80, const QString& imgType = "PNG") {
+  QByteArray imageData;
+  QImage img(width, height, QImage::Format_RGB32);
+  img.fill(Qt::green);
+  QBuffer buffer(&imageData);
+  buffer.open(QIODevice::WriteOnly);
+  img.save(&buffer, imgType.toUtf8().constData());
+  return imageData;
+}
+
 }
 #endif  // IMAGETESTPRECODITIONTOOLS_H

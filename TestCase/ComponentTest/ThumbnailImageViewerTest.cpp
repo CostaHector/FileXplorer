@@ -9,22 +9,16 @@
 #include "EndToExposePrivateMember.h"
 #include "StyleSheet.h"
 #include "MouseKeyboardEventHelper.h"
+#include "ImageTestPrecoditionTools.h"
 using namespace MouseKeyboardEventHelper;
+using namespace ImageTestPrecoditionTools;
 
 class ThumbnailImageViewerTest : public PlainTestSuite {
   Q_OBJECT
  public:
   const QString THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME = "ThumbnailImageViewer";
 
-  static QByteArray GetPNGImage(int width = 100, int height = 80, const QString& imgType = "PNG") {
-    QByteArray imageData;
-    QImage img(width, height, QImage::Format_RGB32);
-    img.fill(Qt::green);
-    QBuffer buffer(&imageData);
-    buffer.open(QIODevice::WriteOnly);
-    img.save(&buffer, imgType.toUtf8().constData());
-    return imageData;
-  }
+
 
  private slots:
   void default_constructor_ok() {  //
