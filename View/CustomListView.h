@@ -22,6 +22,8 @@ public:
   void InitListView();
   void mousePressEvent(QMouseEvent* event) override;
 
+  int GetCurImageSizeScale() const {return mCurIconSizeIndex;}
+  bool setIconSizeScaledIndex(int newScaledIndex);
 protected:
   QString m_name;
   QMenu* _FLOW_ORIENTATION_MENU{nullptr};

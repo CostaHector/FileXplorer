@@ -5,41 +5,37 @@
 #include "PublicMacro.h"
 #include "SceneInPageActions.h"
 #include "SceneInfoManager.h"
-#include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
 #include <QMouseEvent>
 
-class AlignDelegate : public QStyledItemDelegate {
-public:
-  void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override {
-    option->decorationPosition = QStyleOptionViewItem::Position::Top;
-    option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
-    option->textElideMode = Qt::TextElideMode::ElideLeft;
-    option->displayAlignment = Qt::AlignmentFlag::AlignVCenter;
-    QStyledItemDelegate::initStyleOption(option, index);
-  }
+void AlignDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
+  option->decorationPosition = QStyleOptionViewItem::Position::Top;
+  option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
+  option->textElideMode = Qt::TextElideMode::ElideLeft;
+  option->displayAlignment = Qt::AlignmentFlag::AlignVCenter;
+  QStyledItemDelegate::initStyleOption(option, index);
+}
 
-  QString displayText(const QVariant& value, const QLocale& /**/) const override {
-    const QString& text = value.toString();
-    static constexpr int CHAR_LETTER_CNT = 40;
-    if (text.size() <= CHAR_LETTER_CNT) {
-      return text;
-    }
-    return text.left(CHAR_LETTER_CNT / 2) + "\n" + text.right(CHAR_LETTER_CNT / 2);
+QString AlignDelegate::displayText(const QVariant& value, const QLocale& /**/) const {
+  const QString& text = value.toString();
+  static constexpr int CHAR_LETTER_CNT = 40;
+  if (text.size() <= CHAR_LETTER_CNT) {
+    return text;
   }
-};
+  return text.left(CHAR_LETTER_CNT / 2) + "\n" + text.right(CHAR_LETTER_CNT / 2);
+}
 
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
-                             QWidget* parent) //
-  : CustomListView{"SCENES_TABLE", parent} , //
-  _sceneModel{sceneModel}, //
-  _sceneSortProxyModel{sceneSortProxyModel}, //
-  _scenePageControl{scenePageControl} //
+                             QWidget* parent)     //
+    : CustomListView{"SCENES_TABLE", parent},     //
+      _sceneModel{sceneModel},                    //
+      _sceneSortProxyModel{sceneSortProxyModel},  //
+      _scenePageControl{scenePageControl}         //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
@@ -102,18 +98,21 @@ void SceneListView::subscribe() {
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  if (IsPathAtShallowDepth(rootPath)) { // Potential large directory
+  if (IsPathAtShallowDepth(rootPath)) {  // Potential large directory
     LOG_D("Root path[%s] may contain a large number of items", qPrintable(rootPath));
     const QString cfmTitle = "Large Directory Warning - Performance Impact";
-    const QString hintMsg = "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
-                            "Loading it could cause performance issues.\n\n"
-                            "Directory: "
-                            + rootPath + "\n\n Do you want to proceed?";
-    const QMessageBox::StandardButton retBtn = QMessageBox::warning(this,
-                                                                    cfmTitle,
-                                                                    hintMsg,
-                                                                    QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
-                                                                    QMessageBox::StandardButton::No);
+    const QString hintMsg =
+        "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
+        "Loading it could cause performance issues.\n\n"
+        "Directory: " +
+        rootPath + "\n\n Do you want to proceed?";
+    QMessageBox::StandardButton retBtn;
+#ifdef RUNNING_UNIT_TESTS
+    retBtn = SceneListViewMocker::MockSetRootPathQuery() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
+#else
+    retBtn = QMessageBox::warning(this, cfmTitle, hintMsg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
+                                  QMessageBox::StandardButton::No);
+#endif
     if (retBtn != QMessageBox::StandardButton::Yes) {
       LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
       return;
@@ -126,9 +125,9 @@ int SceneListView::onUpdateScnFiles() {
   const QString workPath = _sceneModel->rootPath();
   if (IsPathAtShallowDepth(workPath)) {
     LOG_ERR_P("Update aborted",
-               "Path [%s] is too close to root directory. "
-               "System files may get accidentally modified at this level.",
-               qPrintable(workPath));
+              "Path [%s] is too close to root directory. "
+              "System files may get accidentally modified at this level.",
+              qPrintable(workPath));
     return -1;
   }
   using namespace SceneInfoManager;
@@ -154,9 +153,9 @@ void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& 
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 #ifdef _WIN32
- static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // windows path start with disk letter
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter
 #else
- static constexpr int NEAR_ROOT_PATH_LIMIT = 3; // linux path start with '/'
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
 #endif
   return path.count('/') < NEAR_ROOT_PATH_LIMIT;
 }
