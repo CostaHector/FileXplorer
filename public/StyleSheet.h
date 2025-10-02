@@ -57,6 +57,7 @@ struct IMAGE_SIZE {
           QSize(1885, 1165),
       };
   static constexpr int ICON_SIZE_CANDIDATES_N = sizeof(ICON_SIZE_CANDIDATES) / sizeof(*ICON_SIZE_CANDIDATES);
+  static QString HumanReadFriendlySize(int scaleIndex, bool* isValidScaledIndex=nullptr);
 };
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);
 #endif  // STYLESHEET_H

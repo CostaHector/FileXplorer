@@ -14,8 +14,8 @@ public:
 
   void setOnCloseCallback(std::function<void()> callback) { m_onCloseCallback = callback; }
   bool isVisible() const { return widget() != nullptr && widget()->isVisible(); }
-  const QWidget* widget() const { return m_widget; }
-  QWidget* widget() { return m_widget; }
+  const WidgetType* widget() const { return m_widget; }
+  WidgetType* widget() { return m_widget; }
 
 private slots:
   void onActionToggled(bool checked);
@@ -40,6 +40,7 @@ class DuplicateVideosFinder;
 class RedundantImageFinder;
 class TorrentsManagerWidget;
 class ConfigsTable;
+class Archiver;
 
 extern template class PopupWidgetManager<QWidget>;
 extern template class PopupWidgetManager<DevicesDrivesTV>;
@@ -47,4 +48,5 @@ extern template class PopupWidgetManager<DuplicateVideosFinder>;
 extern template class PopupWidgetManager<RedundantImageFinder>;
 extern template class PopupWidgetManager<TorrentsManagerWidget>;
 extern template class PopupWidgetManager<ConfigsTable>;
+extern template class PopupWidgetManager<Archiver>;
 #endif // POPUPWIDGETMANAGER_H

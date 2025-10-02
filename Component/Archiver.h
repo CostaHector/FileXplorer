@@ -1,41 +1,38 @@
 #ifndef ArchiveFilesPreview_H
 #define ArchiveFilesPreview_H
 #include "ArchiveFiles.h"
-class QLabel;
-class CustomTableView;
-class ArchiverModel;
-class QSplitter;
-class QCheckBox;
-class QMenu;
-class QSlider;
-
+#include "ArchiverModel.h"
+#include "CustomTableView.h"
+#include "ThumbnailImageViewer.h"
 #include <QMainWindow>
+#include <QSplitter>
+#include <QSlider>
 
 class Archiver : public QMainWindow {
  public:
   explicit Archiver(QWidget* parent = nullptr);
   bool operator()(const QString& qzPath);
 
-  bool onNewRow(const QModelIndex &current, const QModelIndex &previous);
+  bool onSelectNewItemRow(const QModelIndex& current, const QModelIndex& previous);
 
   void ChangeWindowTitle(const QString& name, const int& Bytes);
 
   void UpdateWindowsSize();
-  void showEvent(QShowEvent *event) override;
+  void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
+  void onSilderChangedUpdateImageScaledIndex(int scaleIndex);
+  void setSliderValueAndLabelDisplayText(int scaleIndex);
 
  private:
   void subscribe();
 
-  QCheckBox* m_showFullListAnyway;
-  QSlider* m_archiveSizeScale;
-  QMenu* m_archiveMenu;
-  QSplitter* m_splitter;
-  CustomTableView* m_itemsTable;
-  ArchiverModel* m_archiverModel;
-  QLabel* m_thumbnailViewer;
+  QSplitter* m_splitter{nullptr};
+  CustomTableView* m_itemsTable{nullptr};
+  ArchiverModel* m_archiverModel{nullptr};
+  ThumbnailImageViewer* m_thumbnailViewer{nullptr};
 
-  ArchiveFiles m_af;
+  QLabel* m_ImageSizeHint{nullptr};
+  QSlider* m_ImageSizeScale{nullptr};
 };
 
 #endif  // ArchiveFilesPreview_H

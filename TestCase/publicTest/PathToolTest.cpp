@@ -347,19 +347,19 @@ class PathToolTest : public PlainTestSuite {
   }
 
   void fileExtensionBasic_test() {
-    QCOMPARE(PathTool::GetFileExtension("AAA.mp4"), ".mp4");
-    QCOMPARE(PathTool::GetFileExtension("AAA.json"), ".json");
-    QCOMPARE(PathTool::GetFileExtension("AAA.z01"), ".z01");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.mp4"), ".mp4");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.json"), ".json");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.z01"), ".z01");
   }
 
   void fileExtension_1Char_test() {
-    QCOMPARE(PathTool::GetFileExtension("AAA.h"), ".h");
-    QCOMPARE(PathTool::GetFileExtension("AAA.m"), ".m");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.h"), ".h");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.m"), ".m");
   }
 
   void fileExtension_NoExtension_test() {
-    QCOMPARE(PathTool::GetFileExtension("AAA.5"), ".5");
-    QCOMPARE(PathTool::GetFileExtension("AAA.51"), ".51");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.5"), ".5");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.51"), ".51");
   }
 };
 

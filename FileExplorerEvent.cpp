@@ -58,8 +58,7 @@
 
 using namespace ViewTypeTool;
 
-FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger)
-  : QObject{view} {  //
+FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger) : QObject{view} {  //
 
   CHECK_NULLPTR_RETURN_VOID(fsm)
   CHECK_NULLPTR_RETURN_VOID(view)
@@ -115,26 +114,29 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
 
   QString title{"Create Batch "};
   title += (isFolder ? "Folders" : "Files");
-  const QString defNamePattern { isFolder ? //
-                                   Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v).toString()
-                                        : Configuration().value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v).toString()};
-  const QString userInputRule = QInputDialog::getText(_contentPane, title,
-                                                      "Rule Pattern: C-style Format String$StartIndex$EndIndex",
-                                                      QLineEdit::Normal, defNamePattern);
+  const QString defNamePattern{
+      isFolder ?  //
+          Configuration()
+              .value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v)
+              .toString()
+               : Configuration()
+                     .value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v)
+                     .toString()};
+  const QString userInputRule =
+      QInputDialog::getText(_contentPane, title, "Rule Pattern: C-style Format String$StartIndex$EndIndex", QLineEdit::Normal, defNamePattern);
   const QStringList& userInputLst = userInputRule.split('$');
   if (userInputLst.size() != 3) {
-    LOG_WARN_P("[Error] Invalid Rule pattern",
-               "Rule pattern[%s] should contains 3 parts seperated by '$', but there are %d parts",
+    LOG_WARN_P("[Error] Invalid Rule pattern", "Rule pattern[%s] should contains 3 parts seperated by '$', but there are %d parts",
                qPrintable(userInputRule), userInputLst.size());
     return false;
   }
   const QString& namePattern = userInputLst[0];
   const int startIndex = userInputLst[1].toInt();
   const int endIndex = userInputLst[2].toInt();
-  Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name//
-                                    : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name,//
+  Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name  //
+                                    : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name,   //
                            userInputRule);
-  const QString createIn {_fileSysModel->rootPath()};
+  const QString createIn{_fileSysModel->rootPath()};
   return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
 }
 
@@ -266,7 +268,9 @@ void FileExplorerEvent::subsribeCompress() {
   connect(g_AchiveFilesActions().COMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_compress);
   connect(g_AchiveFilesActions().DECOMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_deCompress);
   connect(g_AchiveFilesActions().COMPRESSED_IMAGES, &QAction::triggered, this, &FileExplorerEvent::on_compressImgsByGroup);
-  connect(g_AchiveFilesActions().ARCHIVE_PREVIEW, &QAction::triggered, this, &FileExplorerEvent::on_archivePreview);
+
+  m_archivePreview = new (std::nothrow) PopupWidgetManager<Archiver>{g_AchiveFilesActions().ARCHIVE_PREVIEW, _contentPane, "AchiveViewerGeometry"};
+  connect(g_AchiveFilesActions().ARCHIVE_PREVIEW, &QAction::toggled, this, &FileExplorerEvent::on_archivePreview);
 }
 
 void FileExplorerEvent::subscribeThumbnailActions() {
@@ -283,9 +287,10 @@ void FileExplorerEvent::subscribeThumbnailActions() {
 
   connect(ins._THUMBNAIL_SAMPLE_PERIOD, &QAction::triggered, this, [this]() {
     bool bok = false;
-    const int curSamplePeriod = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
-    const int newSamplePeriod = QInputDialog::getInt(this->_contentPane, "Thumbnail Sample Period(seconds)",                              //
-                                                     "Set thumbnail image sample period to:", curSamplePeriod,             //
+    const int curSamplePeriod =
+        Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
+    const int newSamplePeriod = QInputDialog::getInt(this->_contentPane, "Thumbnail Sample Period(seconds)",                           //
+                                                     "Set thumbnail image sample period to:", curSamplePeriod,                         //
                                                      ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX, 1,  //
                                                      &bok);
     if (!bok) {
@@ -354,11 +359,17 @@ void FileExplorerEvent::subscribe() {
     connect(fileOpInst.UNDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Undo);
     connect(fileOpInst.REDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Redo);
 
-    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePaths(), "absolute-file-path"); });
-    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePrepaths(), "absolute-path"); });
-    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNames(), "file-name"); });
-    connect(fileOpInst.COPY_THE_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getTheJpgFolderPaths(), "absolute-file-path+folderName+.jpg(in local seperator)"); });
-    connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record"); });
+    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane,
+            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePaths(), "absolute-file-path"); });
+    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane,
+            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePrepaths(), "absolute-path"); });
+    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane,
+            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNames(), "file-name"); });
+    connect(fileOpInst.COPY_THE_PATH, &QAction::triggered, _contentPane, [this]() {
+      CopyStringListToClipboard::PathStringListCopy(_contentPane->getTheJpgFolderPaths(), "absolute-file-path+folderName+.jpg(in local seperator)");
+    });
+    connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane,
+            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record"); });
 
     connect(fileOpInst.MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileExplorerEvent::on_moveToTrashBin);
     connect(fileOpInst.DELETE_PERMANENTLY, &QAction::triggered, this, &FileExplorerEvent::on_deletePermanently);
@@ -390,9 +401,11 @@ void FileExplorerEvent::subscribe() {
     });
     connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
 
-    m_duplicateVideosFinder = new (std::nothrow) PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "DuplicateVideosFinderGeometry"};
+    m_duplicateVideosFinder = new (std::nothrow)
+        PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "DuplicateVideosFinderGeometry"};
     CHECK_NULLPTR_RETURN_VOID(m_duplicateVideosFinder);
-    m_redundantImageFinder = new (std::nothrow) PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "RedundantImageFinderGeometry"};
+    m_redundantImageFinder = new (std::nothrow)
+        PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "RedundantImageFinderGeometry"};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
 
     connect(fileOpInst.SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
@@ -474,7 +487,7 @@ void FileExplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     LOG_WARN_NP("[Rename] Current view not support rename", _contentPane->GetCurViewName());
     return;
   }
-  const QString& currentPath {_fileSysModel->rootPath()};
+  const QString& currentPath{_fileSysModel->rootPath()};
   if (PathTool::isLinuxRootOrWinEmpty(currentPath)) {
     LOG_WARN_NP("[Abort] Path root or empty", currentPath);
     return;
@@ -486,18 +499,18 @@ void FileExplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     return;
   }
 
-  const bool bPathSwichedAwayFirst {preNames.size() > 100};
+  const bool bPathSwichedAwayFirst{preNames.size() > 100};
   if (bPathSwichedAwayFirst) {
-    _fileSysModel->setRootPath(""); // switch to another path
+    _fileSysModel->setRootPath("");  // switch to another path
   }
   renameWid.init();
   renameWid.setModal(true);
   renameWid.InitTextEditContent(currentPath, preNames);
-  if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
+  if (renameWid.exec() != QDialog::Accepted) {  // don't mixed with renameWid.show(); (even it can operate on former widget)
     LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", preNames.size());
   }
   if (bPathSwichedAwayFirst) {
-    _fileSysModel->setRootPath(currentPath); // switch to another path
+    _fileSysModel->setRootPath(currentPath);  // switch to another path
   }
 }
 
@@ -608,24 +621,22 @@ bool FileExplorerEvent::on_compress() {
     LOG_INFO_P("[Skip] Compress", "viewName:%s", _contentPane->GetCurViewName());
     return false;
   }
-  const QString rootPath{_contentPane->getRootPath()};
-  if (PathTool::isLinuxRootOrWinEmpty(rootPath)) {
-    LOG_WARN_P("[Skip] Invalid Rootpath", "rootPath:%s", qPrintable(rootPath));
+  const QString workPath{_contentPane->getRootPath()};
+  if (PathTool::isLinuxRootOrWinEmpty(workPath)) {
+    LOG_WARN_P("[Skip] Invalid workPath", "workPath:%s", qPrintable(workPath));
     return false;
   }
-
-  const QStringList& filesPath = _contentPane->getFilePaths();
-  if (filesPath.isEmpty()) {
+  const QStringList& fileNames = _contentPane->getFileNames();
+  if (fileNames.isEmpty()) {
     LOG_INFO_NP("[Skip] Compress", "nothing selected");
     return false;
   }
-  const QString& compressedTo = _contentPane->getRootPath();
-  const QString& archieveName = QFileInfo(compressedTo).completeBaseName() + ".qz";
-  const QString& archievePath = QDir(compressedTo).absoluteFilePath(archieveName);
-  ArchiveFiles af{archievePath, ArchiveFiles::NO_FILTER};
-  bool compressedResult = af.CompressNow(ArchiveFiles::OPERATION_TYPE::FILES, filesPath, false);
-  LOG_INFO_P("Compressed:", "bResult: %d", compressedResult);
-  return compressedResult;
+  const QString archiveFileName{PathTool::GetBaseName(workPath) + ".qz"};
+  const QString archiveAbsFilePath{PathTool::join(workPath, archiveFileName)};
+  ArchiveFilesWriter af;
+  bool comRet = af.CompressNow(workPath, fileNames, archiveAbsFilePath, false);
+  LOG_OE_P(comRet, "Compressed result", "%d items into %s", fileNames.size(), qPrintable(archiveAbsFilePath));
+  return comRet;
 }
 
 bool FileExplorerEvent::on_deCompress() {
@@ -634,9 +645,9 @@ bool FileExplorerEvent::on_deCompress() {
     LOG_INFO_P("[Skip] Decompress", "viewName:%s", _contentPane->GetCurViewName());
     return false;
   }
-  const QString rootPath{_contentPane->getRootPath()};
-  if (PathTool::isLinuxRootOrWinEmpty(rootPath)) {
-    LOG_WARN_P("[Skip] Invalid Rootpath", "rootPath:%s", qPrintable(rootPath));
+  const QString workPath{_contentPane->getRootPath()};
+  if (PathTool::isLinuxRootOrWinEmpty(workPath)) {
+    LOG_WARN_P("[Skip] Invalid workPath", "workPath:%s", qPrintable(workPath));
     return false;
   }
 
@@ -645,22 +656,22 @@ bool FileExplorerEvent::on_deCompress() {
     LOG_INFO_P("Skip Decompress", "Nothing selected");
     return true;
   }
-  QStringList failsQzFiles;
   for (const QString& filePath : filesPath) {
+    ArchiveFilesReader af;
+    bool bReadResult = af.ReadAchiveFile(filePath);
+    if (!bReadResult) {
+      LOG_ERR_P("Cannot read this qz file[%s]", qPrintable(filePath));
+      return false;
+    }
     const QString& decompressedTo = QFileInfo(filePath).absolutePath();
-    ArchiveFiles af{filePath};
     bool decompressedResult = af.DecompressToPath(decompressedTo);
     if (!decompressedResult) {
-      failsQzFiles << filePath;
+      LOG_ERR_P("Cannot decompress this qz file[%s] to path[%s]", qPrintable(filePath), qPrintable(decompressedTo));
+      return false;
     }
   }
-  LOG_I("Decompress %d file(s), %d failed", filesPath.size(), failsQzFiles.size());
-  if (!failsQzFiles.isEmpty()) {
-    LOG_ERR_P("[Partially Failed] Decompress qz", "following %d file(s) failed:\n%s", failsQzFiles.size(), qPrintable(failsQzFiles.join('\n')));
-  } else {
-    LOG_OK_P("[Ok] Decompress qz", "%d qz files decompressed ok", filesPath.size());
-  }
-  return failsQzFiles.isEmpty();
+  LOG_OK_P("Decompress ok", "%d file(s) under %s", filesPath.size(), qPrintable(workPath));
+  return true;
 }
 
 bool FileExplorerEvent::on_compressImgsByGroup() {
@@ -668,30 +679,30 @@ bool FileExplorerEvent::on_compressImgsByGroup() {
     LOG_INFO_P("[Skip] Compress images", "viewName:%s", _contentPane->GetCurViewName());
     return false;
   }
-  const QString pth {_contentPane->getRootPath()};
+  const QString pth{_contentPane->getRootPath()};
   ArchiveImagesRecusive air{true};
   int compressFolderCnt = air.CompressImgRecur(pth);
   LOG_INFO_P("[Ok] Compress images", "count: %d", compressFolderCnt);
   return true;
 }
 
-bool FileExplorerEvent::on_archivePreview() {
+bool FileExplorerEvent::on_archivePreview(bool bChecked) {
+  if (!bChecked) {
+    return true;
+  }
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
     return false;
   }
   const QString filePath = _contentPane->getCurFilePath();
   if (filePath.isEmpty()) {
-    LOG_WARN_NP("[Abort ArchivePreivew]", "path empty");
+    LOG_INFO_NP("[Abort ArchivePreivew]", "nothing selected. empty path");
     return false;
   }
-  if (m_archivePreview == nullptr) {
-    m_archivePreview = new (std::nothrow) Archiver;
-  }
-  bool previewRet = m_archivePreview->operator()(filePath);
-  m_archivePreview->show();
-  m_archivePreview->activateWindow();
-  m_archivePreview->raise();
+  bool previewRet = true;
+  CHECK_NULLPTR_RETURN_FALSE(m_archivePreview);
+  Archiver* pArchiverTemp = m_archivePreview->widget();
+  previewRet = pArchiverTemp->operator()(filePath);
   return previewRet;
 }
 
@@ -879,7 +890,8 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
     return false;
   }
 
-  static const auto GetMergeFromToPath = [] (const QFileSystemModel* fsm, QModelIndex ind1, QModelIndex ind2, bool isReverse) -> std::pair<QString, QString> {
+  static const auto GetMergeFromToPath = [](const QFileSystemModel* fsm, QModelIndex ind1, QModelIndex ind2,
+                                            bool isReverse) -> std::pair<QString, QString> {
     QString fromPath{fsm->filePath(ind1)};
     QString toPath{fsm->filePath(ind2)};
     const bool shouldSwap = (ind1.row() < ind2.row()) ? isReverse : !isReverse;
@@ -945,8 +957,7 @@ bool FileExplorerEvent::on_Copy() {
   using namespace MimeDataHelper;
   MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::CopyAction);
   const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::CopyAction);
-  _logger->onMsgChanged(QString("%1 path(s) been copied").arg(pathCnt),
-                        (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
+  _logger->onMsgChanged(QString("%1 path(s) been copied").arg(pathCnt), (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
   return pathCnt >= 0;
 }
 
@@ -954,8 +965,7 @@ bool FileExplorerEvent::on_Cut() {
   using namespace MimeDataHelper;
   MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::MoveAction);
   const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::MoveAction);
-  _logger->onMsgChanged(QString("%1 path(s) been cut").arg(pathCnt),
-                        (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
+  _logger->onMsgChanged(QString("%1 path(s) been cut").arg(pathCnt), (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
   return pathCnt >= 0;
 }
 
@@ -1065,10 +1075,11 @@ bool FileExplorerEvent::on_FileClassify() {
   ItemsPacker classfier;
   classfier(currentPath);
 
-  auto* p = Notificator::progress(LOG_LVL_E::I, "File Classify", QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(classfier.CommandsCnt()));
+  auto* p = Notificator::progress(LOG_LVL_E::I, "File Classify",
+                                  QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(classfier.CommandsCnt()));
   CHECK_NULLPTR_RETURN_FALSE(p);
 
-  _fileSysModel->setRootPath(""); // switch to another path
+  _fileSysModel->setRootPath("");  // switch to another path
   bool classifyResult = classfier.StartToRearrange();
   if (!classifyResult) {
     p->setProgressFailed();
@@ -1109,7 +1120,8 @@ bool FileExplorerEvent::on_FileUnclassify() {
   ItemsUnpacker unclassfier;
   unclassfier(currentPath);
 
-  auto* p = Notificator::progress(LOG_LVL_E::I, "File Unclassify", QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(unclassfier.CommandsCnt()));
+  auto* p = Notificator::progress(LOG_LVL_E::I, "File Unclassify",
+                                  QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(unclassfier.CommandsCnt()));
   CHECK_NULLPTR_RETURN_FALSE(p);
 
   bool unclassifyResult = unclassfier.StartToRearrange();
@@ -1136,7 +1148,8 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
     LOG_WARN_NP("[Abort] Path root or empty", currentPath);
     return false;
   }
-  if (QMessageBox::question(_contentPane, "Confirm remove duplicate images?", "Images that differ in resolution will be delete") != QMessageBox::StandardButton::Yes) {
+  if (QMessageBox::question(_contentPane, "Confirm remove duplicate images?", "Images that differ in resolution will be delete") !=
+      QMessageBox::StandardButton::Yes) {
     LOG_OK_NP("[Skip] User Cancel remove duplicate images", "return");
     return false;
   }
@@ -1189,7 +1202,8 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
     LOG_WARN_NP("[Abort] Current View type not support Move/Copy to", ViewTypeTool::c_str(vt));
     return false;
   }
-  static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{{Qt::DropAction::CopyAction, "COPY"}, {Qt::DropAction::MoveAction, "MOVE"}, {Qt::DropAction::IgnoreAction, "IGNORE"}};
+  static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{
+      {Qt::DropAction::CopyAction, "COPY"}, {Qt::DropAction::MoveAction, "MOVE"}, {Qt::DropAction::IgnoreAction, "IGNORE"}};
   const QString& pOperationNameStr = DROP_ACTION_2_STR.value(dropAct, "IGNORE");
   auto* view = _contentPane->GetCurView();
   if (!view->selectionModel()->hasSelection()) {
@@ -1242,7 +1256,8 @@ void FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD() {
 }
 
 bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode) {
-  auto* msgBox = new (std::nothrow) QMessageBox(QMessageBox::Icon::Information, QString("Keep or Flatten System Structure?"), "Keep file system structure or flatten");
+  auto* msgBox = new (std::nothrow)
+      QMessageBox(QMessageBox::Icon::Information, QString("Keep or Flatten System Structure?"), "Keep file system structure or flatten");
   msgBox->setWindowIcon(QIcon(":img/PASTE_ITEM"));
   msgBox->setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Apply);
 

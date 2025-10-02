@@ -19,7 +19,7 @@ void AdvanceSearchModel::updateSearchResultList() {
     QFileInfo fi{it.fileInfo()};
     fileName = fi.fileName();
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
-    allItemsUnderThisPath.append(FilePropertyInfo{fileName, fi.size(), GetFileExtension(fileName), fi.lastModified(), rel2searchItem});
+    allItemsUnderThisPath.append(FilePropertyInfo{fileName, fi.size(), GetDotFileExtension(fileName), fi.lastModified(), rel2searchItem});
   }
   // C:/A/B/C
   // C:/A   file

@@ -1,95 +1,57 @@
 ﻿#include "Archiver.h"
 #include "MemoryKey.h"
-#include "ArchiveFiles.h"
-#include "QAbstractTableModelPub.h"
-#include "CustomTableView.h"
 #include "DataFormatter.h"
 #include "StyleSheet.h"
+#include "PublicVariable.h"
+#include "PathTool.h"
+#include <QToolBar>
 
-#include <QAbstractTableModel>
-#include <QLabel>
-#include <QSplitter>
+Archiver::Archiver(QWidget* parent) : QMainWindow{parent} {
+  m_splitter = new (std::nothrow) QSplitter{this};
+  CHECK_NULLPTR_RETURN_VOID(m_splitter);
+  m_itemsTable = new (std::nothrow) CustomTableView{"ArchiverItemsTable", this};
+  CHECK_NULLPTR_RETURN_VOID(m_itemsTable);
+  m_archiverModel = new (std::nothrow) ArchiverModel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_archiverModel);
+  m_thumbnailViewer = new (std::nothrow) ThumbnailImageViewer{"AchiveImagePreview", this};
+  CHECK_NULLPTR_RETURN_VOID(m_thumbnailViewer);
 
-class ArchiverModel : public QAbstractTableModelPub {
- public:
-  explicit ArchiverModel(QObject* parent = nullptr) : QAbstractTableModelPub{parent} {}
-  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return m_paf != nullptr ? m_paf->size() : 0; }
-  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return ARCHIVE_HORIZONTAL_HEADER.size(); }
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
-    if (m_paf == nullptr or not index.isValid()) {
-      return QVariant();
-    }
-    switch (role) {
-      case Qt::DisplayRole: {
-        switch (index.column()) {
-          case 0:
-            return m_paf->key(index.row());
-          case 1:
-            return DataFormatter::formatFileSizeGMKB(m_paf->beforeSize(index.row()));
-          case 2:
-            return DataFormatter::formatFileSizeGMKB(m_paf->afterSize(index.row()));
-          default:
-            return QVariant();
-        }
-      }
-      default:
-        return QVariant();
-    }
-    return QVariant();
-  }
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-    if (role == Qt::TextAlignmentRole) {
-      if (orientation == Qt::Vertical) {
-        return Qt::AlignRight;
-      }
-    }
-    if (role == Qt::DisplayRole) {
-      if (orientation == Qt::Orientation::Horizontal) {
-        return ARCHIVE_HORIZONTAL_HEADER[section];
-      }
-      return section + 1;
-    }
-    return QAbstractTableModel::headerData(section, orientation, role);
-  }
-
-  void setRootPath(const ArchiveFiles* p_af) {
-    int beforeRow = rowCount();
-    int afterRow = p_af != nullptr ? p_af->size() : 0;
-    LOG_D("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
-
-    RowsCountBeginChange(beforeRow, afterRow);
-    m_paf = p_af;
-    RowsCountEndChange();
-  }
-
- private:
-  const ArchiveFiles* m_paf{nullptr};
-  static const QStringList ARCHIVE_HORIZONTAL_HEADER;
-};
-const QStringList ArchiverModel::ARCHIVE_HORIZONTAL_HEADER{"Name", "Compressed(B)", "Original(B)"};
-
-Archiver::Archiver(QWidget* parent)
-    : QMainWindow{parent},
-      m_splitter{new QSplitter{this}},
-      m_itemsTable{new CustomTableView{"ArchiverItemsTable", this}},
-      m_archiverModel{new ArchiverModel{this}},
-      m_thumbnailViewer{new QLabel{"Preview here", this}},
-      m_af{"", ArchiveFiles::ONLY_IMAGE} {
   m_itemsTable->setModel(m_archiverModel);
-
   m_splitter->addWidget(m_itemsTable);
   m_splitter->addWidget(m_thumbnailViewer);
   setCentralWidget(m_splitter);
 
-  subscribe();
+  m_ImageSizeHint = new (std::nothrow) QLabel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_ImageSizeHint);
+
+  m_ImageSizeScale = new (std::nothrow) QSlider{Qt::Orientation::Horizontal, this};
+  CHECK_NULLPTR_RETURN_VOID(m_ImageSizeScale);
+  m_ImageSizeScale->setRange(0, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
+  m_ImageSizeScale->setValue(m_thumbnailViewer->GetCurImageSizeScale());
+
+  QToolBar* tb = new (std::nothrow) QToolBar("Image adjuster toolbar", this);
+  CHECK_NULLPTR_RETURN_VOID(tb);
+  tb->addWidget(m_ImageSizeScale);
+  tb->addWidget(m_ImageSizeHint);
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, tb);
 
   m_itemsTable->InitTableView();
-
-  m_archiverModel->setRootPath(&m_af);
-
   UpdateWindowsSize();
   setWindowTitle("QZ Archive");
   setWindowIcon(QIcon(":img/COMPRESS_ITEM"));
+
+  subscribe();
+}
+
+bool Archiver::operator()(const QString& qzPath) {
+  if (!ArchiveFilesReader::isQZFile(qzPath)) {
+    LOG_W("Path[%s] is not a qz file", qPrintable(qzPath));
+    setWindowTitle(QString("ArchiveFilesPreview | [%1] not a qz file").arg(qzPath));
+    return false;
+  }
+
+  m_archiverModel->setRootPath(qzPath);
+  return true;
 }
 
 void Archiver::ChangeWindowTitle(const QString& name, const int& Bytes) {
@@ -97,61 +59,54 @@ void Archiver::ChangeWindowTitle(const QString& name, const int& Bytes) {
 }
 
 void Archiver::UpdateWindowsSize() {
-  if (Configuration().contains("ArchiverGeometry")) {
-    restoreGeometry(Configuration().value("ArchiverGeometry").toByteArray());
-  } else {
-    setGeometry(DEFAULT_GEOMETRY);
-  }
   m_splitter->restoreState(Configuration().value("ArchiverSplitterState", QByteArray()).toByteArray());
 }
 
-void Archiver::showEvent(QShowEvent *event) {
+void Archiver::showEvent(QShowEvent* event) {
   QMainWindow::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
 
 void Archiver::closeEvent(QCloseEvent* event) {
-  Configuration().setValue("ArchiverGeometry", saveGeometry());
-  LOG_D("Archiver geometry was resize to (%d, %d, %d, %d)", geometry().x(), geometry().y(), geometry().width(), geometry().height());
   Configuration().setValue("ArchiverSplitterState", m_splitter->saveState());
   QMainWindow::closeEvent(event);
 }
 
 void Archiver::subscribe() {
-  connect(m_itemsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &Archiver::onNewRow);
+  connect(m_itemsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &Archiver::onSelectNewItemRow);
+  connect(m_ImageSizeScale, &QSlider::valueChanged, this, &Archiver::onSilderChangedUpdateImageScaledIndex);
+  connect(m_thumbnailViewer, &ThumbnailImageViewer::onImageScaledIndexChanged, this, &Archiver::setSliderValueAndLabelDisplayText);
 }
 
-bool Archiver::onNewRow(const QModelIndex& current, const QModelIndex& /* previous */) {
-  if (not current.isValid()) {
-    m_thumbnailViewer->clear();
+bool Archiver::onSelectNewItemRow(const QModelIndex& current, const QModelIndex& /* previous */) {
+  if (!current.isValid()) {
+    m_thumbnailViewer->clearPixmap();
     return false;
   }
   int newRow = current.row();
-  const QString& name = m_af.key(newRow);
-  const QByteArray& img = m_af.value(newRow);
-
-  QPixmap pm;
-  pm.loadFromData(img);
-  m_thumbnailViewer->setPixmap(pm.scaledToWidth(m_thumbnailViewer->width()));
-
-  ChangeWindowTitle(name, img.size());
+  const QString& name = m_archiverModel->GetRelativeName(newRow);
+  const QByteArray& dataByteArray = m_archiverModel->GetByteArrayData(newRow);
+  ChangeWindowTitle(name, dataByteArray.size());
+  if (TYPE_FILTER::VIDEO_TYPE_SET.contains(PathTool::GetAsteriskDotFileExtension(name))) {
+    m_thumbnailViewer->clearPixmap();
+    return true;
+  }
+  m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray);
   return true;
 }
 
-bool Archiver::operator()(const QString& qzPath) {
-  if (not ArchiveFiles::isQZFile(qzPath)) {
-    LOG_W("Path[%s] is not a qz file", qPrintable(qzPath));
-    setWindowTitle(QString("ArchiveFilesPreview | [%1] not a qz file").arg(qzPath));
-    return false;
-  }
+void Archiver::setSliderValueAndLabelDisplayText(int scaleIndex) {
+  m_ImageSizeScale->setValue(scaleIndex);
+  m_ImageSizeHint->setText(IMAGE_SIZE::HumanReadFriendlySize(scaleIndex));
+}
 
-  decltype(m_af) temp{qzPath, ArchiveFiles::ONLY_IMAGE};
-  int beforeRowCount = m_af.size();
-  int afterRowCount = temp.size();
-  m_archiverModel->RowsCountBeginChange(beforeRowCount, afterRowCount);
-  m_af.swap(temp);
-  m_archiverModel->RowsCountEndChange();
-  return true;
+void Archiver::onSilderChangedUpdateImageScaledIndex(int scaleIndex) {
+  if (!m_thumbnailViewer->setIconSizeScaledIndex(scaleIndex)) { // to label updata size index
+    LOG_D("Invalid image scaled index[%d]", scaleIndex);
+    return;
+  }
+  setSliderValueAndLabelDisplayText(scaleIndex); // to qslider and label display
+  m_thumbnailViewer->refreshPixmapSize(); // to label let it refresh
 }
 
 // #define __NAME__EQ__MAIN__ 1

@@ -310,12 +310,20 @@ QString longestCommonPrefix(const QStringList& strs) {
 }
 
 // contains dot itself
-QString GetFileExtension(const QString& path) {
+QString GetDotFileExtension(const QString& path) {
   const int lastIndexOfDot = path.lastIndexOf('.');
   if (lastIndexOfDot == -1) {
     return {};
   }
   return path.mid(lastIndexOfDot);
+}
+
+QString GetAsteriskDotFileExtension(const QString& path) {
+  const int lastIndexOfDot = path.lastIndexOf('.');
+  if (lastIndexOfDot == -1) {
+    return {};
+  }
+  return '*' + path.mid(lastIndexOfDot);
 }
 
 }

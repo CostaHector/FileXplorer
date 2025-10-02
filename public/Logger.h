@@ -96,5 +96,5 @@ if (level < Logger::m_printLevel) break;\
 #define LOG_Q(fmt, ...) LOG_OUT(LOG_LVL_E::Q, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // QUESTION
 #define LOG_O(fmt, ...) LOG_OUT(LOG_LVL_E::O, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // OK(TASK_FINISHED)
 #define LOG_P(fmt, ...) LOG_OUT(LOG_LVL_E::P, "%s %c [%s] " fmt " [%s:%d]\n", ##__VA_ARGS__)  // PARTIAL_SUCCESS
-
+#define LOG_OE(bOk, fmt, ...) if(bOk) {LOG_O(fmt, ##__VA_ARGS__);} else {LOG_E(fmt, ##__VA_ARGS__);}  // OK(TASK_FINISHED)
 #endif // LOGGER_H
