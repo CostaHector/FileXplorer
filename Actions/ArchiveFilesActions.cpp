@@ -7,6 +7,7 @@ ArchiveFilesActions::ArchiveFilesActions(QObject* parent) : QObject{parent} {
   DECOMPRESSED_HERE->setToolTip("Decompressed one selected .qz files to current path.");
   COMPRESSED_IMAGES->setToolTip("Compress images in current folder and its directly sub folder.");
   ARCHIVE_PREVIEW->setToolTip("Open the selected .qz file");
+  ARCHIVE_PREVIEW->setCheckable(true);
 }
 
 QToolBar* GetArchiveTooBar() {

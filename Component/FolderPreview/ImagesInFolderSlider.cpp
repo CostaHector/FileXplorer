@@ -71,7 +71,9 @@ void ImagesInFolderSlider::getImgsPathAndVidsCount(const QString& path) {
     if (TYPE_FILTER::IMAGE_TYPE_SET.contains(suffix)) {
       ResetImgsList(new PlainStringList(QStringList{path}));
     } else if (TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET.contains(suffix)) {
-      ResetImgsList(new ArchiveFiles{path});
+      auto* pArchiveReader = new ArchiveFilesReader;
+      pArchiveReader->ReadAchiveFile(path);
+      ResetImgsList(pArchiveReader);
     } else {
       ResetImgsList(nullptr);
     }

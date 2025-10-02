@@ -233,8 +233,8 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   // Non-FileSystemView: open in QDesktopService;
 
   if (fi.isFile()) {
-    if (ArchiveFiles::isQZFile(fi)) {
-      emit g_AchiveFilesActions().ARCHIVE_PREVIEW->triggered();
+    if (ArchiveFilesReader::isQZFile(fi)) {
+      emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
       emit g_viewActions()._HAR_VIEW->triggered();

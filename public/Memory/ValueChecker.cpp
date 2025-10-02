@@ -25,7 +25,7 @@ bool ValueChecker::isStrInCandidate(const QString& str) const {
 }
 
 bool ValueChecker::isSpecifiedExtensionFileExist(const QString& path) const {
-  const QString& ext = PathTool::GetFileExtension(path);
+  const QString& ext = PathTool::GetDotFileExtension(path);
   return isFileExist(path) && !ext.isEmpty() && isStrInCandidate(ext);
 }
 

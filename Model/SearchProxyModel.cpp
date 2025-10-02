@@ -105,7 +105,7 @@ bool SearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex& sourc
   // 2. Check if file content pass the content filter
   if (isFileNamePass) {
     const QString filePath = _searchSourceModel->filePath(nameModelIndex);
-    const bool isFilePlainText{TYPE_FILTER::NON_BINARY_SET.contains('*' + PathTool::GetFileExtension(filePath))};
+    const bool isFilePlainText{TYPE_FILTER::NON_BINARY_SET.contains('*' + PathTool::GetDotFileExtension(filePath))};
     // if search content is empty. always pass
     const bool isContentPass = isFilePlainText && (m_contentRawText.isEmpty() || CheckIfContentsContained(filePath, m_contentRawText));
     return ReturnPostOperation(isContentPass, nameModelIndex);

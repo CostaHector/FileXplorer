@@ -54,7 +54,7 @@ private:
   bool on_compress();
   bool on_deCompress();
   bool on_compressImgsByGroup();
-  bool on_archivePreview();
+  bool on_archivePreview(bool bChecked);
 
   bool on_moveToTrashBin();
 
@@ -93,7 +93,7 @@ private:
   CustomStatusBar* _logger{nullptr};
   QClipboard* m_clipboard{nullptr};
 
-  Archiver* m_archivePreview{nullptr};
+  PopupWidgetManager<Archiver>* m_archivePreview{nullptr};
   PopupWidgetManager<DuplicateVideosFinder>* m_duplicateVideosFinder{nullptr};
   PopupWidgetManager<RedundantImageFinder>* m_redundantImageFinder{nullptr};
 private:
