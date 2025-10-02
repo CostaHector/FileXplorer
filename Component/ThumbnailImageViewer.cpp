@@ -45,6 +45,7 @@ void ThumbnailImageViewer::clearPixmap() {
 }
 
 void ThumbnailImageViewer::wheelEvent(QWheelEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (event->modifiers() == Qt::ControlModifier) {
     QPoint numDegrees = event->angleDelta() / 8;
     if (!numDegrees.isNull()) {
@@ -60,5 +61,5 @@ void ThumbnailImageViewer::wheelEvent(QWheelEvent* event) {
       return;
     }
   }
-  ThumbnailImageViewer::wheelEvent(event);
+  event->accept();
 }

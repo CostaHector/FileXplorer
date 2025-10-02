@@ -10,6 +10,9 @@
 #include "MemoryKey.h"
 #include "ClipboardGuard.h"
 #include "SqlRecordTestHelper.h"
+#include "MouseKeyboardEventHelper.h"
+using namespace MouseKeyboardEventHelper;
+
 
 QString setCurSelection(ClickableTextBrowser& browser, const int selectBegIndex, const int selectEndIndex) {
   QTextCursor cursor = browser.textCursor();
@@ -97,14 +100,6 @@ class ClickableTextBrowserTest : public PlainTestSuite {
     QString expected3 = R"(<img id="myImg" class="photo" src="image.png" alt="altText" width="350" style="border:1px">)";
     ClickableTextBrowser::UpdateImagesSizeInHtmlSrc(html3, QSize{350, 100});
     QCOMPARE(html3, expected3);
-  }
-
-  static bool SendWheelEvent(ClickableTextBrowser& browser, const QPoint& angelDelta, Qt::KeyboardModifiers modifiers, bool bNeedAccepted) {
-    QPoint widCenterPnt = browser.geometry().center();
-    QPoint widCenterPntGlb = browser.mapToGlobal(widCenterPnt);
-    QWheelEvent event(widCenterPnt, widCenterPntGlb, angelDelta, angelDelta, Qt::NoButton, modifiers, Qt::NoScrollPhase, false);
-    browser.wheelEvent(&event);
-    return event.isAccepted() == bNeedAccepted;
   }
 
   void ctrlshift_WheelEventChangesfontSize_browserDefaultBehavior_ok() {
