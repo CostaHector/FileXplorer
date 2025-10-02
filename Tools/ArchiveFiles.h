@@ -71,7 +71,11 @@ class ArchiveFilesReader : public FilesListBase {
     QByteArray m_datas;
   };
   QList<CompressedItem> m_items;
-
+#ifdef RUNNING_UNIT_TESTS
+  void mockCompressedItem(QList<CompressedItem> newCompressedItems) {
+    m_items = newCompressedItems;
+  }
+#endif
   static constexpr int INFO_ITEMS_CNT = 4;
 };
 
