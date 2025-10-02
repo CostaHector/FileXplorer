@@ -87,11 +87,9 @@ bool Archiver::onSelectNewItemRow(const QModelIndex& current, const QModelIndex&
   const QString& name = m_archiverModel->GetRelativeName(newRow);
   const QByteArray& dataByteArray = m_archiverModel->GetByteArrayData(newRow);
   ChangeWindowTitle(name, dataByteArray.size());
-  if (TYPE_FILTER::VIDEO_TYPE_SET.contains(PathTool::GetAsteriskDotFileExtension(name))) {
-    m_thumbnailViewer->clearPixmap();
-    return true;
+  if (TYPE_FILTER::IMAGE_TYPE_SET.contains(PathTool::GetAsteriskDotFileExtension(name))) {
+    m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray); // only update for images
   }
-  m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray);
   return true;
 }
 
