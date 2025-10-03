@@ -8,6 +8,21 @@
 #include "TorrDb.h"
 #include <QToolBar>
 
+namespace TorrentsManagerWidgetMock {
+inline std::pair<QString, QString>& MockTorrDatabase() {
+  static std::pair<QString, QString> torrDataBase2ConnPair;
+  return torrDataBase2ConnPair;
+}
+inline QString& MockDeleteTorrWhereClause() {
+  static QString deleteTorrWhereClause;
+  return deleteTorrWhereClause;
+}
+inline bool& MockQryBeforeDropTable() {
+  static bool confirmDrop = false;
+  return confirmDrop;
+}
+}
+
 class TorrentsManagerWidget : public QMainWindow {
  public:
   explicit TorrentsManagerWidget(QWidget* parent = nullptr);

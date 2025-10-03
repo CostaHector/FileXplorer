@@ -18,6 +18,12 @@ class HarModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void initTestCase() {
+    HarFilesMocker::mockHarFiles().clear();
+  }
+  void cleanupTestCase() {
+    HarFilesMocker::mockHarFiles().clear();
+  }
 
   void initialize_ok() {
     HarModel hm;

@@ -7,6 +7,13 @@
 #include <QMenu>
 #include <QLabel>
 
+namespace HarTableViewMock{
+inline QString& mockExportToPath() {
+  static QString exportToPath;
+  return exportToPath;
+}
+}
+
 class HarTableView : public CustomTableView {
 public:
   explicit HarTableView(QWidget* parent = nullptr);

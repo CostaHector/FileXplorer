@@ -59,7 +59,7 @@ int HarTableView::operator()(const QString& harAbsPath) {
 
 void HarTableView::subscribe() {
   connect(mEXPORT_TO, &QAction::triggered, this, &HarTableView::SaveSelectionFilesTo);
-  connect(mQUICK_PREVIEW, &QAction::triggered, this, [this](const bool bChecked) { mShowImagePreview = bChecked; });
+  connect(mQUICK_PREVIEW, &QAction::toggled, this, [this](const bool bChecked) { mShowImagePreview = bChecked; });
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &HarTableView::PreviewImage);
 }
 
@@ -73,8 +73,12 @@ int HarTableView::SaveSelectionFilesTo() const {
     const auto& srcIndex = mSortProxyModel->mapToSource(rowIndex);
     selectedRows.append(srcIndex.row());
   }
-  const QFileInfo harFi{mHarAbsPath};
-  const QString& dstFolder = QFileDialog::getExistingDirectory(nullptr, "Export selection(s) to", harFi.absolutePath());
+  QString dstFolder;
+#ifdef RUNNING_UNIT_TESTS:
+  dstFolder = HarTableViewMock::mockExportToPath();
+#else
+  dstFolder = QFileDialog::getExistingDirectory(nullptr, "Export selection(s) to", mHarAbsPath);
+#endif
   if (!QFileInfo{dstFolder}.isDir()) {
     LOG_W("dst folder[%s] not existed", qPrintable(dstFolder));
     return -1;
@@ -94,11 +98,10 @@ bool HarTableView::PreviewImage(const QModelIndex &current, const QModelIndex &/
   }
   const QModelIndex srcIndex = mSortProxyModel->mapToSource(current);
   const int srcRow = srcIndex.row();
-  const auto& entryItem = mHarModel->GetHarEntryItem(srcRow);
-  static const QSet<QString> IMAGE_PREVIEW_SUPPORTED {".jpeg", ".jpg", ".png", ".webp", ".gif", "tif", "tiff"};
+  const HAR_FILE_ITEM& entryItem = mHarModel->GetHarEntryItem(srcRow);
+  static const QSet<QString> IMAGE_PREVIEW_SUPPORTED {"image/jpg", "image/svg", "image/png", ".jpeg", ".jpg", ".png", ".webp", ".gif", "tif", "tiff"};
   if (!IMAGE_PREVIEW_SUPPORTED.contains(entryItem.type)) {
-    LOG_D("file type[%s] cannot preview", qPrintable(entryItem.type));
-    return true;
+    return false;
   }
 
   QImage image;
@@ -130,11 +133,13 @@ void HarTableView::updateWindowsSize() {
 }
 
 void HarTableView::showEvent(QShowEvent *event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   CustomTableView::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
 
 void HarTableView::closeEvent(QCloseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   Configuration().setValue("HAR_TABLEVIEW_GEOMETRY", saveGeometry());
   Configuration().setValue(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, mShowImagePreview);
   CustomTableView::closeEvent(event);

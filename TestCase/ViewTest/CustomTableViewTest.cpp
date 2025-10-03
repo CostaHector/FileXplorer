@@ -11,6 +11,13 @@
 #include "EndToExposePrivateMember.h"
 #include "ModelTestHelper.h"
 #include <QHeaderView>
+#include "AddressBarActions.h"
+#include "ViewHelper.h"
+#include "AddressBarActions.h"
+#include "ViewActions.h"
+
+#include "MouseKeyboardEventHelper.h"
+using namespace MouseKeyboardEventHelper;
 
 class CustomTableViewTest : public PlainTestSuite {
   Q_OBJECT
@@ -182,6 +189,57 @@ class CustomTableViewTest : public PlainTestSuite {
       QCOMPARE(ctv1.onColumnVisibilityAdjust(), true);
       QCOMPARE(ctv1.m_columnsShowSwitch, std::string(COLUMN_CNT_100, '0').c_str());
     }
+  }
+
+  void mouseSideClick_NavigationSignals() {
+    CustomTableView view("CustomTableViewMouseSideKey");
+
+    auto& addressInst = g_addressBarActions();
+    auto& viewInst = g_viewActions();
+
+    QSignalSpy backAddressSpy(addressInst._BACK_TO, &QAction::triggered);
+    QSignalSpy forwardAddressSpy(addressInst._FORWARD_TO, &QAction::triggered);
+    QSignalSpy backViewSpy(viewInst._VIEW_BACK_TO, &QAction::triggered);
+    QSignalSpy forwardViewSpy(viewInst._VIEW_FORWARD_TO, &QAction::triggered);
+
+    {  // accepted events
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::NoModifier));
+      QCOMPARE(backAddressSpy.count(), 1);
+
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::ForwardButton, Qt::NoModifier));
+      QCOMPARE(forwardAddressSpy.count(), 1);
+
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::ControlModifier));
+      QCOMPARE(backViewSpy.count(), 1);
+
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::ForwardButton, Qt::ControlModifier));
+      QCOMPARE(forwardViewSpy.count(), 1);
+    }
+
+            // Alt+back: nothing happen
+    {
+      SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::AltModifier);
+      QCOMPARE(backViewSpy.count(), 1);
+      QCOMPARE(backAddressSpy.count(), 1);
+    }
+
+            // left click: nothing happen
+    {
+      SendMousePressEvent<CustomTableView>(view, Qt::LeftButton, Qt::NoModifier);
+      QCOMPARE(backAddressSpy.count(), 1);
+      QCOMPARE(forwardViewSpy.count(), 1);
+    }
+
+            // all signal params ok
+    QVERIFY(backAddressSpy.count() > 0);
+    QVERIFY(forwardAddressSpy.count() > 0);
+    QVERIFY(backViewSpy.count() > 0);
+    QVERIFY(forwardViewSpy.count() > 0);
+
+    QCOMPARE(backAddressSpy.back()[0].toBool(), false);
+    QCOMPARE(forwardAddressSpy.back()[0].toBool(), false);
+    QCOMPARE(backViewSpy.back()[0].toBool(), false);
+    QCOMPARE(forwardViewSpy.back()[0].toBool(), false);
   }
 };
 

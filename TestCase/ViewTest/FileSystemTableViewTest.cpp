@@ -16,11 +16,9 @@
 #include "MimeDataHelper.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
-#include "MouseKeyboardEventHelper.h"
+#include "ViewHelper.h"
 #include <QDir>
 #include <QDirIterator>
-
-using namespace MouseKeyboardEventHelper;
 
 class FileSystemTableViewTest : public PlainTestSuite {
   Q_OBJECT
@@ -386,55 +384,69 @@ private slots:
     QVERIFY(tDir.exists("file.txt.lnk"));
   }
 
-  void mouseSideClick_NavigationSignals() {
-    CustomTableView view("CustomTableViewMouseSideKey");
 
-    auto& addressInst = g_addressBarActions();
-    auto& viewInst = g_viewActions();
+  void event_ok() {
+    const QDir::Filters defaultFilters{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    FileSystemModel fsModel;
+    fsModel.setFilter(defaultFilters);
+    FileSystemTableView fsView{&fsModel};
 
-    QSignalSpy backAddressSpy(addressInst._BACK_TO, &QAction::triggered);
-    QSignalSpy forwardAddressSpy(addressInst._FORWARD_TO, &QAction::triggered);
-    QSignalSpy backViewSpy(viewInst._VIEW_BACK_TO, &QAction::triggered);
-    QSignalSpy forwardViewSpy(viewInst._VIEW_FORWARD_TO, &QAction::triggered);
+    /******************** 测试 keyPressEvent ********************/
+    QSignalSpy moveToTrashSpy(FileOpActs::GetInst().MOVE_TO_TRASHBIN, &QAction::triggered);
 
-    {  // accepted events
-      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::NoModifier));
-      QCOMPARE(backAddressSpy.count(), 1);
+    // 测试 Delete 键触发
+    QKeyEvent deleteEvent(QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier);
+    fsView.keyPressEvent(&deleteEvent);
+    QVERIFY(deleteEvent.isAccepted());
+    QCOMPARE(moveToTrashSpy.count(), 1);
 
-      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::ForwardButton, Qt::NoModifier));
-      QCOMPARE(forwardAddressSpy.count(), 1);
+    // 测试 Delete + Shift 不触发（传递到基类）
+    moveToTrashSpy.clear();
+    QKeyEvent shiftDeleteEvent(QEvent::KeyPress, Qt::Key_Delete, Qt::ShiftModifier);
+    fsView.keyPressEvent(&shiftDeleteEvent);
+    QCOMPARE(moveToTrashSpy.count(), 0);
 
-      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::ControlModifier));
-      QCOMPARE(backViewSpy.count(), 1);
+    // 测试其他键不触发
+    QKeyEvent enterEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+    fsView.keyPressEvent(&enterEvent);
+    QCOMPARE(moveToTrashSpy.count(), 0);
 
-      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::ForwardButton, Qt::ControlModifier));
-      QCOMPARE(forwardViewSpy.count(), 1);
-    }
+    /******************** 测试 mousePressEvent ********************/
+    // 测试左键按下设置拖拽起始位置
+    const QPoint testPos(50, 60);
+    QMouseEvent leftPressEvent(QEvent::MouseButtonPress, testPos,
+                               Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    fsView.mousePressEvent(&leftPressEvent);
+    QCOMPARE(fsView.mDragStartPosition, testPos);
 
-    // Alt+back: nothing happen
-    {
-      SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::AltModifier);
-      QCOMPARE(backViewSpy.count(), 1);
-      QCOMPARE(backAddressSpy.count(), 1);
-    }
+    // 测试其他按钮不设置拖拽起始位置
+    const QPoint originalPos = fsView.mDragStartPosition;
+    QMouseEvent rightPressEvent(QEvent::MouseButtonPress, QPoint(100, 120),
+                                Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    fsView.mousePressEvent(&rightPressEvent);
+    QCOMPARE(fsView.mDragStartPosition, originalPos);
 
-    // left click: nothing happen
-    {
-      SendMousePressEvent<CustomTableView>(view, Qt::LeftButton, Qt::NoModifier);
-      QCOMPARE(backAddressSpy.count(), 1);
-      QCOMPARE(forwardViewSpy.count(), 1);
-    }
+    /******************** 测试 mouseMoveEvent ********************/
+    // 设置起始位置
+    const QPoint startPos(50, 50);
+    fsView.mDragStartPosition = startPos;
 
-    // all signal params ok
-    QVERIFY(backAddressSpy.count() > 0);
-    QVERIFY(forwardAddressSpy.count() > 0);
-    QVERIFY(backViewSpy.count() > 0);
-    QVERIFY(forwardViewSpy.count() > 0);
+    // 测试未达到拖拽阈值 - 不触发拖拽
+    QMouseEvent smallMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST_MIN-1, 0),
+                               Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+    fsView.mouseMoveEvent(&smallMoveEvent);
+    QVERIFY(!smallMoveEvent.isAccepted());
 
-    QCOMPARE(backAddressSpy.back()[0].toBool(), false);
-    QCOMPARE(forwardAddressSpy.back()[0].toBool(), false);
-    QCOMPARE(backViewSpy.back()[0].toBool(), false);
-    QCOMPARE(forwardViewSpy.back()[0].toBool(), false);
+    // 测试达到拖拽阈值 - 触发拖拽
+    QMouseEvent largeMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0),
+                               Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+    fsView.mouseMoveEvent(&largeMoveEvent);
+    QVERIFY(largeMoveEvent.isAccepted());
+
+    // 测试非左键移动不触发拖拽
+    QMouseEvent rightMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0),
+                               Qt::NoButton, Qt::RightButton, Qt::NoModifier);
+    fsView.mouseMoveEvent(&rightMoveEvent);
   }
 };
 
