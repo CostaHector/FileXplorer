@@ -4,15 +4,19 @@
 #include "VideoDurationGetter.h"
 #include "PlainTestSuite.h"
 #include "VideoTestPrecoditionTools.h"
+#include "TDir.h"
 
 class VideosDurationGetterTest : public PlainTestSuite {
   Q_OBJECT
  public:
   static constexpr int EPSILON_MILLIONSECOND{1000};  // 1000ms
  private slots:
-  void test_GetLengthQuick() {
+  void initTestCase() {
+    QVERIFY2(VideoTestPrecoditionTools::IsFFmpegAvailable(), "FFmpeg not available, skipping all video tests");
     IsFFmpegInstalledOK();
+  }
 
+  void test_GetLengthQuick() {
     const QString vidName = "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 144p 33s.mp4";
     const int expectDuration = 33000;
     const QDir mp4Dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
@@ -124,26 +128,22 @@ class VideosDurationGetterTest : public PlainTestSuite {
     }
   }
 
-  void test_compareSpeed() {
-    QDir dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
-    auto traditionWay = [&dir]() -> int {
-      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-      const QStringList& names = dir.entryList();
+  void test_generated_video_length_correct() {
+    TDir tDir;
+    QVERIFY(tDir.IsValid());
 
-      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-      return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    };
-    auto quickWay = [&dir]() -> int {
-      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-      const QStringList& names = dir.entryList();
+    const int expectDurationMs = 5000;
+    const QString generatedVidPath = tDir.itemPath("GenratedVideos5second.mp4");
+    bool bGenOk = false;
+    QByteArray ba = VideoTestPrecoditionTools::CreateVideoContentNormal(generatedVidPath, expectDurationMs, &bGenOk);
+    QVERIFY(bGenOk);
+    QVERIFY(tDir.exists("GenratedVideos5second.mp4"));
+    QVERIFY(!ba.isEmpty());
 
-      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-      return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    };
-    int tradCost = traditionWay();
-    int quickCost = quickWay();
-    QVERIFY(tradCost >= 0);
-    QVERIFY(quickCost >= 0);
+    VideoDurationGetter mi;
+    QVERIFY(mi.StartToGet());
+    int actualDuration = mi.GetLengthQuick(generatedVidPath);
+    QVERIFY2((std::abs(actualDuration - expectDurationMs) < EPSILON_MILLIONSECOND), qPrintable(generatedVidPath));
   }
 };
 constexpr int VideosDurationGetterTest::EPSILON_MILLIONSECOND;

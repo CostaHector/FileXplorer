@@ -14,9 +14,12 @@ FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
 
 void FdBasedDbModel::setTable(const QString& tableName) {
   QSqlTableModel::setTable(tableName);
-  const QString& guidFromTableName = GUID();
-  m_rootPath = MountHelper::FindRootByGUIDWin(guidFromTableName);
-  LOG_D("tableName:%s, GUID:%s, m_rootPath:%s", qPrintable(this->tableName()), qPrintable(guidFromTableName), qPrintable(m_rootPath));
+#ifdef RUNNING_UNIT_TESTS
+  m_rootPath = MountPathTableNameMapper::toMountPathMock(tableName);
+#else
+  m_rootPath = MountPathTableNameMapper::toMountPath(tableName);
+#endif
+  LOG_D("tableName:%s, m_rootPath:%s", qPrintable(tableName), qPrintable(m_rootPath));
 }
 
 QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {

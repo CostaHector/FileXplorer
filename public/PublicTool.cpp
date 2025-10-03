@@ -56,20 +56,48 @@ QString TextReader(const QString& textPath, bool* bReadOk) {
   QFile file(textPath);
   if (!file.exists()) {
     LOG_D("File[%s] not found", qPrintable(textPath));
-    if (bReadOk != nullptr) *bReadOk = false;
+    if (bReadOk != nullptr) {
+      *bReadOk = false;
+    }
     return "";
   }
   if (!file.open(QIODevice::ReadOnly)) {
     LOG_D("File[%s] open for read failed", qPrintable(textPath));
-    if (bReadOk != nullptr) *bReadOk = false;
+    if (bReadOk != nullptr) {
+      *bReadOk = false;
+    }
     return "";
   }
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
   QString contents(stream.readAll());
   file.close();
-  if (bReadOk != nullptr) *bReadOk = true;
+  if (bReadOk != nullptr) {
+    *bReadOk = true;
+  }
   return contents;
+}
+
+QByteArray ByteArrayReader(const QString& baFilePath, bool* bReadOk) {
+  QFile baFile(baFilePath);
+  if (!baFile.exists()) {
+    LOG_D("File[%s] not found", qPrintable(baFilePath));
+    if (bReadOk != nullptr) {
+      *bReadOk = false;
+    }
+    return "";
+  }
+  if (!baFile.open(QIODevice::ReadOnly)) {
+    LOG_D("File[%s] open for read failed", qPrintable(baFilePath));
+    if (bReadOk != nullptr) {
+      *bReadOk = false;
+    }
+    return "";
+  }
+  if (bReadOk != nullptr) {
+    *bReadOk = true;
+  }
+  return baFile.readAll();
 }
 
 bool TextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
@@ -79,7 +107,7 @@ bool TextWriter(const QString& fileName, const QString& content, const QIODevice
     return false;
   }
 
-  QTextStream stream(&fi); // "\n" will be replace with "\r\n"
+  QTextStream stream(&fi);  // "\n" will be replace with "\r\n"
   stream.setCodec("UTF-8");
   stream << content;
   stream.flush();
@@ -123,13 +151,13 @@ QPixmap GetRatePixmap(const int r, const int sliceCount, const bool hasBorder) {
   int orangeWidth = WIDTH * r / sliceCount;
   static constexpr QColor OPAGUE{0, 0, 0, 0};
   static constexpr QColor STD_ORANGE{255, 165, 0, 255};
-  mp.fill(OPAGUE); // opague
+  mp.fill(OPAGUE);  // opague
   QPainter painter{&mp};
-  painter.setPen(STD_ORANGE); // standard orange
+  painter.setPen(STD_ORANGE);  // standard orange
   painter.setBrush(STD_ORANGE);
   painter.drawRect(0, 0, orangeWidth, HEIGHT);
   if (hasBorder) {
-    painter.setPen(QColor{0, 0, 0, 255}); // standard black
+    painter.setPen(QColor{0, 0, 0, 255});  // standard black
     painter.setBrush(OPAGUE);
     painter.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
   }
@@ -147,7 +175,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
 #ifndef RUNNING_UNIT_TESTS
   selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
 #endif
-  QFileInfo dstFi(selectPath); // system may return back slash seperated path
+  QFileInfo dstFi(selectPath);  // system may return back slash seperated path
   if (!dstFi.isDir()) {
     LOG_D("selectPath[%s] is not a directory", qPrintable(selectPath));
     return "";

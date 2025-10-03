@@ -381,3 +381,66 @@ GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
 }
 
 }  // namespace MountHelper
+
+#include <QRegularExpression>
+namespace MountPathTableNameMapper {
+
+QString toTableName(const QString& mountPath, bool* bConversionOk) {
+  static const QRegularExpression validMountPath{"^(C:/home|/mnt)/DISKS/[a-zA-Z0-9]+$"};
+  if (!validMountPath.match(mountPath).hasMatch()) {
+    if (bConversionOk != nullptr) {
+      *bConversionOk = false;
+    }
+    return "";
+  }
+  if (bConversionOk != nullptr) {
+    *bConversionOk = true;
+  }
+  QString tableName = mountPath;
+  return tableName.replace('/', '_').replace(':', '_');
+}
+
+QString toMountPath(const QString& tableName, bool* bConversionOk) {
+  static const QRegularExpression validTableName{"^(C__home|_mnt)_DISKS_[a-zA-Z0-9]+$"};
+  if (!validTableName.match(tableName).hasMatch()) {
+    if (bConversionOk != nullptr) {
+      *bConversionOk = false;
+    }
+    return "";
+  }
+  if (bConversionOk != nullptr) {
+    *bConversionOk = true;
+  }
+  QString mountPath = tableName;
+  if (mountPath.size() >= 3 && mountPath[0] == 'C' && mountPath[1] == '_' && mountPath[2] == '_') {
+    mountPath[1] = ':';
+  }
+  mountPath.replace('_', '/');
+  return mountPath;
+}
+
+QStringList CandidateTableNamesList() {
+  QString mountPointRoot;
+#ifdef _WIN32
+  mountPointRoot = "C:/home/DISKS";
+#else
+  mountPointRoot = "/mnt/DISKS";
+#endif
+
+  const QDir mountPntRootDir(mountPointRoot, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot | QDir::Filter::Hidden);
+  const QStringList mountPntFolderCandidates{mountPntRootDir.entryList()};
+
+  QStringList tableNamesCandidates;
+  tableNamesCandidates.reserve(mountPntFolderCandidates.size());
+  for (const QString& mountPntFolder : mountPntFolderCandidates) {
+    bool isOk = false;
+    const QString mountPntFullPath = mountPntRootDir.absoluteFilePath(mountPntFolder);
+    QString validTableName = toTableName(mountPntFullPath, &isOk);
+    if (isOk) {
+      tableNamesCandidates.push_back(validTableName);
+    }
+  }
+  return tableNamesCandidates;
+}
+
+}  // namespace MountPathTableNameMapper

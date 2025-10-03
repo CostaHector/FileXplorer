@@ -74,7 +74,7 @@ int HarTableView::SaveSelectionFilesTo() const {
     selectedRows.append(srcIndex.row());
   }
   QString dstFolder;
-#ifdef RUNNING_UNIT_TESTS:
+#ifdef RUNNING_UNIT_TESTS
   dstFolder = HarTableViewMock::mockExportToPath();
 #else
   dstFolder = QFileDialog::getExistingDirectory(nullptr, "Export selection(s) to", mHarAbsPath);

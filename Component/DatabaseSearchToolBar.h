@@ -7,17 +7,6 @@
 #include <QAction>
 #include "QuickWhereClauseDialog.h"
 
-// GUID_IN_UNDERSCORE | ROOTPATH
-class Guid2RootPathComboxBox : public QComboBox {
-public:
-  explicit Guid2RootPathComboxBox(QWidget* parent = nullptr);
-  void AddItem(const QString& guidUnderscore, const QString& rootPath);
-  QString CurrentTableName() const;
-  QString CurrentGuid() const;
-  QString CurrentRootPath() const;
-  QStringList ToQStringList() const;
-};
-
 class DatabaseSearchToolBar: public QToolBar{
   Q_OBJECT
 public:
@@ -45,28 +34,34 @@ private:
   void EmitWhereClauseChangedSignal();
 };
 
+namespace MovieDBSearchToolBarMock {
+inline std::pair<bool, QString>& QryDropWhichTableMock() {
+  static std::pair<bool, QString> accept2TableNamePair;
+  return accept2TableNamePair;
+}
+}
+
 class MovieDBSearchToolBar : public DatabaseSearchToolBar {
   Q_OBJECT
 public:
   explicit MovieDBSearchToolBar(const QString& title, QWidget* parent);
   inline QString GetCurrentTableName() const {
-    return m_tablesCB->CurrentTableName();
+    return m_tablesCB->currentText();
   }
-  inline QString GetMovieTableRootPath() const {
-    return m_tablesCB->CurrentRootPath();
-  }
+  QString GetMovieTableMountPath() const;
   QString AskUserDropWhichTable();
   void AddATable(const QString& newTableName);
   void InitTables(const QStringList& tbls);
   void InitCurrentIndex();
+  QStringList toMovieTableCandidates() const;
 signals:
   void movieTableChanged(const QString& newTable);
 private:
   void extraSignalSubscribe() override;
-  Guid2RootPathComboxBox* m_tablesCB{nullptr};
+  QComboBox* m_tablesCB{nullptr};
 };
 
-class CastDatabaseSearchToolBar : public DatabaseSearchToolBar {
+class CastDatabaseSearchToolBar: public DatabaseSearchToolBar {
 public:
   explicit CastDatabaseSearchToolBar(const QString& title, QWidget* parent);
 private:
