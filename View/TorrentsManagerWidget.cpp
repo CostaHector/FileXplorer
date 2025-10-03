@@ -17,10 +17,13 @@
 #include <QInputDialog>
 
 TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
-  : QMainWindow{parent},
-  mDb{SystemPath::TORRENTS_DATABASE(), "torrent_connection"} {
-  CHECK_NULLPTR_RETURN_VOID(parent);
-
+    : QMainWindow{parent},
+#ifdef RUNNING_UNIT_TESTS
+      mDb{TorrentsManagerWidgetMock::MockTorrDatabase().first, TorrentsManagerWidgetMock::MockTorrDatabase().second}
+#else
+      mDb{SystemPath::TORRENTS_DATABASE(), "torrent_connection"}
+#endif
+{
   setMenuBar(g_torrActions().GetMenuBar());
 
   m_searchToobar = new (std::nothrow) QToolBar{"search toolbar", this};
@@ -32,17 +35,16 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   QSqlDatabase con = mDb.GetDb();
   m_torrentsDBModel = new (std::nothrow) QSqlTableModel{this, con};
   CHECK_NULLPTR_RETURN_VOID(m_torrentsDBModel);
+  m_torrentsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
     m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
+    m_torrentsDBModel->select();
   }
-  m_torrentsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
-  m_torrentsDBModel->submitAll();
 
   m_torrentsListView = new (std::nothrow) CustomTableView{"TORRENT_TABLE", this};
   m_torrentsListView->setModel(m_torrentsDBModel);
   setCentralWidget(m_torrentsListView);
   m_torrentsListView->InitTableView();
-
 
   subscribe();
   updateWindowsSize();
@@ -83,14 +85,13 @@ void TorrentsManagerWidget::onInitATable() {
   }
 
   // UTF-8 each char takes 1 to 4 byte, 256 chars means 256~1024 bytes
-
   QSqlQuery createTableQuery(con);
   if (!createTableQuery.exec(TorrDb::CREATE_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
     LOG_ERR_NP("[failed] Exec failed", createTableQuery.lastError().text());
     return;
   }
   m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
-  m_torrentsDBModel->submitAll();
+  m_torrentsDBModel->select();
   LOG_OK_NP("Table create succeed", DB_TABLE::TORRENTS);
 }
 
@@ -106,8 +107,14 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     return false;
   }
 
-  const QString& defaultOpenDir = Configuration().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
-  const QString& loadFromPath = QFileDialog::getExistingDirectory(this, "Load torrents from", defaultOpenDir);
+  const QString& defaultOpenDir =
+      Configuration().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
+  QString loadFromPath;
+#ifdef RUNNING_UNIT_TESTS
+  loadFromPath = defaultOpenDir;
+#else
+  loadFromPath = QFileDialog::getExistingDirectory(this, "Load torrents from", defaultOpenDir);
+#endif
   QFileInfo loadFromFi(loadFromPath);
   if (!loadFromFi.isDir()) {
     LOG_ERR_NP("[Failed] not a folder", loadFromPath);
@@ -151,17 +158,24 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     succeedItemCnt = 0;
   }
   query.finish();
-  m_torrentsDBModel->submitAll();
+  m_torrentsDBModel->select();
   LOG_OK_P("[Ok] Insert into succeed", "%d/%d item(s)->Table[%s]", succeedItemCnt, totalItemCnt, qPrintable(DB_TABLE::TORRENTS));
   return true;
 }
 
 bool TorrentsManagerWidget::onDropATable() {
   const QString& sqlCmd = QString("DROP TABLE `%1`;").arg(DB_TABLE::TORRENTS);
-  auto retBtn = QMessageBox::warning(this, "CONFIRM DROP?", "(NOT recoverable)\n" + sqlCmd, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
+  const QString dropTitle = "CONFIRM DROP?" + DB_TABLE::TORRENTS;
+  const QString dropHintMessage = "(NOT recoverable)\n" + sqlCmd;
+  QMessageBox::StandardButton retBtn = QMessageBox::StandardButton::No;
+#ifdef RUNNING_UNIT_TESTS
+  retBtn = TorrentsManagerWidgetMock::MockQryBeforeDropTable() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
+#else
+  retBtn = QMessageBox::warning(this, dropTitle, dropHintMessage, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
+#endif
   if (retBtn != QMessageBox::StandardButton::Yes) {
     LOG_OK_NP("User Cancel Drop", "return");
-    return true;
+    return false;
   }
 
   QSqlDatabase con = mDb.GetDb();
@@ -182,9 +196,8 @@ bool TorrentsManagerWidget::onDropATable() {
     return false;
   }
   dropQry.finish();
-  m_torrentsDBModel->submitAll();
+  m_torrentsDBModel->select();
   LOG_OK_NP("Table been Dropped", DB_TABLE::TORRENTS);
-  QMessageBox::information(this, "Table been Dropped", DB_TABLE::TORRENTS);
   return dropTableRet;
 }
 
@@ -194,8 +207,15 @@ bool TorrentsManagerWidget::onDeleteFromTable() {
     LOG_ERR_NP("Open db failed", con.lastError().text());
     return false;
   }
-  const QString& whereClause = QInputDialog::getItem(this, "Where Clause", "Input clause below",  //
-                                                     {"Name", "Size"}, 0, true);
+  const QString deleteTitle = "Delete Where Clause" + DB_TABLE::TORRENTS;
+  const QString deleteHintMessage = "Input clause below";
+  QStringList deleteCandidatesItems{"`Name`", "`Size`"};
+  QString whereClause;
+#ifdef RUNNING_UNIT_TESTS
+  whereClause = TorrentsManagerWidgetMock::MockDeleteTorrWhereClause();
+#else
+  whereClause = QInputDialog::getItem(this, deleteTitle, deleteHintMessage, deleteCandidatesItems, 0, true);
+#endif
   if (whereClause.isEmpty()) {
     LOG_ERR_NP("Where clause empty", "return");
     return false;
@@ -208,7 +228,7 @@ bool TorrentsManagerWidget::onDeleteFromTable() {
     return false;
   }
   LOG_OK_NP("[Ok] delete command exec ok", deleteCmd);
-  m_torrentsDBModel->submitAll();
+  m_torrentsDBModel->select();
   return deleteRes;
 }
 
@@ -229,6 +249,7 @@ bool TorrentsManagerWidget::onSubmit() {
 }
 
 void TorrentsManagerWidget::showEvent(QShowEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QMainWindow::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }

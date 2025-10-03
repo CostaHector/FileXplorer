@@ -71,14 +71,17 @@ void FileSystemTableView::dragLeaveEvent(QDragLeaveEvent* event) {
 }
 
 auto FileSystemTableView::keyPressEvent(QKeyEvent* e) -> void {
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
+  CHECK_NULLPTR_RETURN_VOID(e);
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
     emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
+    e->accept();
     return;
   }
   QTableView::keyPressEvent(e);
 }
 
 void FileSystemTableView::mousePressEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (event->button() == Qt::LeftButton) {
     mDragStartPosition = event->pos();
   }
@@ -86,13 +89,16 @@ void FileSystemTableView::mousePressEvent(QMouseEvent* event) {
 }
 
 void FileSystemTableView::mouseMoveEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (event->buttons() == Qt::MouseButton::LeftButton) {
     // ‌To prevent accidental drag operations that move files/folders, a drag threshold is added.
     // The drag event triggers only when the drag distance exceeds [specified number] pixels.
     if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST) {
+      event->ignore();
       return;
     }
     View::mouseMoveEventCore(this, event);
+    event->accept();
     return;
   }
   return QTableView::mouseMoveEvent(event);
