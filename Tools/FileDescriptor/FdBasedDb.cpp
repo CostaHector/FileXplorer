@@ -252,7 +252,7 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
     return ret;
   }
 
-  LOG_W("%d record(s) commit insert into succeed", insertCnt);
+  LOG_O("%d record(s) commit insert into succeed", insertCnt);
   return insertCnt;
 }
 

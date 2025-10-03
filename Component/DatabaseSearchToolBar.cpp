@@ -12,46 +12,8 @@
 #include <QInputDialog>
 #include <QLayout>
 
-// -------------------------------- Guid2RootPathComboxBox --------------------------------
-Guid2RootPathComboxBox::Guid2RootPathComboxBox(QWidget* parent) : QComboBox{parent} {
-  setEditable(false);
-}
-
-void Guid2RootPathComboxBox::AddItem(const QString& guidUnderscore, const QString& rootPath) {
-  const int index = count();
-  addItem(guidUnderscore + MountHelper::JOINER_STR + rootPath);
-  QString toolHint;
-  toolHint.reserve(50);
-  toolHint += "GUID:<br/>";
-  toolHint += "<b>" + guidUnderscore + "</b><br/>";
-  toolHint += "Path:<br/>";
-  toolHint += "<b>" + rootPath + "</b>";
-  setItemData(index, toolHint, Qt::ToolTipRole);
-}
-
-QString Guid2RootPathComboxBox::CurrentTableName() const {
-  return MountHelper::ChoppedDisplayName(currentText());
-}
-QString Guid2RootPathComboxBox::CurrentGuid() const {
-  return CurrentTableName().replace(MountHelper::TABLE_UNDERSCORE, MountHelper::GUID_HYPEN);
-}
-QString Guid2RootPathComboxBox::CurrentRootPath() const {
-  return currentText().contains(MountHelper::JOINER_STR) ? currentText().mid(MountHelper::ROOTPATH_START) : "";
-}
-QStringList Guid2RootPathComboxBox::ToQStringList() const {
-  const int cnt = count();
-  QStringList ans;
-  ans.reserve(cnt);
-  for (int index = 0; index < cnt; ++index) {
-    ans << itemText(index);
-  }
-  return ans;
-}
-
-
 // -------------------------------- DatabaseSearchToolBar --------------------------------
-DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent) :
-  QToolBar{title, parent} {
+DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
   m_whereCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_whereCB);
@@ -72,8 +34,8 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   _QUICK_WHERE_CLAUSE_ACT = new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_FILTERS"), "Where clause", this);
   CHECK_NULLPTR_RETURN_VOID(_QUICK_WHERE_CLAUSE_ACT);
   _QUICK_WHERE_CLAUSE_ACT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_H));
-  _QUICK_WHERE_CLAUSE_ACT->setToolTip(QString{"<b>%1 (%2)</b><br/> Construct where clause quickly for `MOVIE/CAST` table;"}
-                                          .arg(_QUICK_WHERE_CLAUSE_ACT->text(), _QUICK_WHERE_CLAUSE_ACT->shortcut().toString()));
+  _QUICK_WHERE_CLAUSE_ACT->setToolTip(QString{"<b>%1 (%2)</b><br/> Construct where clause quickly for `MOVIE/CAST` table;"}.arg(
+      _QUICK_WHERE_CLAUSE_ACT->text(), _QUICK_WHERE_CLAUSE_ACT->shortcut().toString()));
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   addWidget(m_whereCB);
@@ -93,7 +55,7 @@ void DatabaseSearchToolBar::onQuickWhereClause() {
     LOG_INFO_P("[Skip] User cancel quick where clause", "dialogCode:%d", retCode);
     return;
   }
-  const QString& whereClause {m_quickWhereClause->GetWhereString()};
+  const QString& whereClause{m_quickWhereClause->GetWhereString()};
   LOG_D("QuickWhereClause: [%s]", qPrintable(whereClause));
   SetWhereClause(whereClause);
   emit whereClauseChanged(whereClause);
@@ -112,7 +74,7 @@ void DatabaseSearchToolBar::EmitWhereClauseChangedSignal() {
 
 // -------------------------------- MovieDBSearchToolBar --------------------------------
 MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent)  //
-  : DatabaseSearchToolBar{title, parent} {
+    : DatabaseSearchToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
 
   m_whereCB->addItem(QString{R"(`%1` LIKE "%%" AND `%1` LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
@@ -122,11 +84,12 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   m_whereCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
   m_whereCB->addItem(QString{R"(`%1` = "E:/")"}.arg(ENUM_2_STR(Driver)));
   m_whereCB->addItem(QString{R"(`%1` IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
-  m_whereCB->addItem(QString{R"(`%1` LIKES "Chris Evans%")"}.arg(ENUM_2_STR(Cast))); // Don't use leading wildcard!
+  m_whereCB->addItem(QString{R"(`%1` LIKES "Chris Evans%")"}.arg(ENUM_2_STR(Cast)));  // Don't use leading wildcard!
 
-  m_tablesCB = new (std::nothrow) Guid2RootPathComboxBox;
+  m_tablesCB = new (std::nothrow) QComboBox;
   CHECK_NULLPTR_RETURN_VOID(m_tablesCB);
-  m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom); // not editable
+  m_tablesCB->setEditable(false);
+  m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom);  // not editable
   m_tablesCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   m_tablesCB->setMaxVisibleItems(15);
   auto* tblAct = insertWidget(_QUICK_WHERE_CLAUSE_ACT, m_tablesCB);
@@ -138,65 +101,81 @@ void MovieDBSearchToolBar::extraSignalSubscribe() {
   connect(m_tablesCB, &QComboBox::currentTextChanged, this, &MovieDBSearchToolBar::movieTableChanged);
 }
 
+QString MovieDBSearchToolBar::GetMovieTableMountPath() const {
+#ifdef RUNNING_UNIT_TESTS
+  return MountPathTableNameMapper::toMountPathMock(m_tablesCB->currentText());
+#else
+  return MountPathTableNameMapper::toMountPath(m_tablesCB->currentText());
+#endif
+}
+
 QString MovieDBSearchToolBar::AskUserDropWhichTable() {
-  const QStringList& candidates = m_tablesCB->ToQStringList();
+  const QStringList& candidates = toMovieTableCandidates();
   if (candidates.isEmpty()) {
     LOG_INFO_NP("There is no table exists", "skip drop");
     return "";
   }
+  const QString dropWhichTableTitle = "CONFIRM DROP? (NOT RECOVERABLE)";
+  const QString dropWhichTableMsgs{QString{"There are %1 table(s) as following:\n%2"}.arg(candidates.size()).arg(candidates.join('\n'))};
   const int defaultDropIndex = m_tablesCB->currentIndex();
+
   QString drpTbl;
-#ifdef RUNNING_UNIT_TESTS
-  drpTbl = candidates[defaultDropIndex];
-#else
-  const auto msgs {QString{"There are %1 table(s) as following:\n%2"}.arg(candidates.size()).arg(candidates.join('\n'))};
   bool okUserSelect = false;
-  drpTbl = QInputDialog::getItem(this, "CONFIRM DROP? (NOT RECOVERABLE)", msgs, //
-                                                candidates, defaultDropIndex,                  //
-                                                false,                                         //
-                                                &okUserSelect);
+
+#ifdef RUNNING_UNIT_TESTS
+  std::tie(okUserSelect, drpTbl) = MovieDBSearchToolBarMock::QryDropWhichTableMock();
+#else
+  drpTbl = QInputDialog::getItem(this, dropWhichTableTitle, dropWhichTableMsgs, candidates, defaultDropIndex,  //
+                                 false, &okUserSelect);
+#endif
   if (!okUserSelect) {
     LOG_OK_NP("[skip] Drop table", "User cancel");
     return "";
   }
-#endif
-  const QString& deleteTbl = MountHelper::ChoppedDisplayName(drpTbl);
-  if (deleteTbl.isEmpty()) {
-    LOG_ERR_NP("[Abort] Table name is empty, cannot drop", deleteTbl);
+  if (drpTbl.isEmpty()) {
+    LOG_ERR_NP("[Abort] Table name is empty, cannot drop", drpTbl);
     return "";
   }
-  return deleteTbl;
+  return drpTbl;
 }
 
 void MovieDBSearchToolBar::AddATable(const QString& newTableName) {
-  m_tablesCB->AddItem(newTableName, MountHelper::GetDisplayNameByGuidTableName(newTableName));
-  m_tablesCB->setCurrentIndex(m_tablesCB->count() - 1);
+  m_tablesCB->addItem(newTableName);
+  m_tablesCB->setCurrentIndex(m_tablesCB->count() - 1);  // todo this line mat can be removed
 }
 
 void MovieDBSearchToolBar::InitTables(const QStringList& tbls) {
   m_tablesCB->clear();
-  const auto& guidTblName2Disp = MountHelper::GetGuidTableName2DisplayName();
   for (const QString& tableName : tbls) {  // in underscore
-    m_tablesCB->AddItem(tableName, guidTblName2Disp.value(tableName, "displace name NOT FOUND"));
+    m_tablesCB->addItem(tableName);
   }
   LOG_D("Tables count:%d", tbls.size());
 }
 
 void MovieDBSearchToolBar::InitCurrentIndex() {
-  const QString defaultTableName {Configuration().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString()};
+  const QString defaultTableName{Configuration().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString()};
   const int defaultDisplayIndex = m_tablesCB->findText(defaultTableName, Qt::MatchStartsWith);
   if (defaultDisplayIndex != -1) {
     m_tablesCB->setCurrentIndex(defaultDisplayIndex);
   }
 }
 
+QStringList MovieDBSearchToolBar::toMovieTableCandidates() const {
+  const int cnt = m_tablesCB->count();
+  QStringList ans;
+  ans.reserve(cnt);
+  for (int index = 0; index < cnt; ++index) {
+    ans << m_tablesCB->itemText(index);
+  }
+  return ans;
+}
+
 // -------------------------------- CastDatabaseSearchToolBar --------------------------------
-CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent)//
-  : DatabaseSearchToolBar{title, parent} {
-  CHECK_NULLPTR_RETURN_VOID(m_whereCB)
-  {
+CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent)  //
+    : DatabaseSearchToolBar{title, parent} {
+  CHECK_NULLPTR_RETURN_VOID(m_whereCB) {
     using namespace PERFORMER_DB_HEADER_KEY;
-    for (const auto& field: CAST_TABLE_HEADERS) {
+    for (const auto& field : CAST_TABLE_HEADERS) {
       m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(field));
       m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(field));
     }

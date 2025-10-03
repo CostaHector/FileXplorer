@@ -354,9 +354,13 @@ int DbManager::DeleteByWhereClause(const QString& tableName, const QString& wher
 }
 
 bool DbManager::IsTableVolumeOnline(const QString& tableName) const {
-  QString stdGuidPart{tableName};
-  stdGuidPart.replace(MountHelper::TABLE_UNDERSCORE, MountHelper::GUID_HYPEN);
-  return MountHelper::isVolumeAvailable(stdGuidPart);
+  QString mountPath;
+#ifdef RUNNING_UNIT_TESTS
+  mountPath = MountPathTableNameMapper::toMountPathMock(tableName);
+#else
+  mountPath = MountPathTableNameMapper::toMountPath(tableName);
+#endif
+  return QFileInfo(mountPath).isDir();
 }
 
 bool DbManager::onShowInFileSystemView() const {

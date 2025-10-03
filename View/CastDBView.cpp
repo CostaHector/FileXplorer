@@ -329,7 +329,7 @@ int CastDBView::onMigrateCastTo() {
   }
   const QString cfmTitleText{"Migrate to (folder under[" + mImageHost + "])"};
   QString destPath;
-#ifdef RUNNING_UNIT_TESTS:
+#ifdef RUNNING_UNIT_TESTS
   destPath = CastDbViewMocker::MockMigrateToPath();
 #else
   destPath = QFileDialog::getExistingDirectory(this, cfmTitleText, mImageHost);

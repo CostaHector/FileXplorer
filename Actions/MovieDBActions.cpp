@@ -17,7 +17,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   REVERT = new (std::nothrow) QAction(QIcon(":img/REVERT"), "Revert", this);
   CHECK_NULLPTR_RETURN_VOID(REVERT);
 
-  INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), "Create Database", this);
+  INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), "Init Database", this);
   CHECK_NULLPTR_RETURN_VOID(INIT_A_DATABASE);
   INIT_A_DATABASE->setToolTip("CREATE DATABASE `DB_NAME`;");
 
@@ -49,10 +49,10 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(DB_CONTROL_ACTIONS);
   DB_CONTROL_ACTIONS->addAction(SUBMIT);
   DB_CONTROL_ACTIONS->addAction(REVERT);
+  DB_CONTROL_ACTIONS->addAction(INIT_A_TABLE);
   DB_CONTROL_ACTIONS->addAction(INSERT_A_PATH);
   DB_CONTROL_ACTIONS->addAction(DELETE_FROM_TABLE);
   DB_CONTROL_ACTIONS->addAction(INIT_A_DATABASE);
-  DB_CONTROL_ACTIONS->addAction(INIT_A_TABLE);
   DB_CONTROL_ACTIONS->addAction(DROP_A_TABLE);
   DB_CONTROL_ACTIONS->addAction(UNION_TABLE);
   DB_CONTROL_ACTIONS->addAction(AUDIT_A_TABLE);
