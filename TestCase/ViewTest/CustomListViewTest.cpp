@@ -30,78 +30,67 @@ class CustomListViewTest : public PlainTestSuite {
   void test_contextMenuEvent() {
     const QString keyMemoryName = "CustomListViewTest";
     Configuration().setValue(keyMemoryName + "_ICON_SIZE_INDEX", 5);
-    CustomListView viewer(keyMemoryName);
+    CustomListView view(keyMemoryName);
 
     QMenu menu;
-    viewer.BindMenu(nullptr);
-    viewer.BindMenu(&menu);
-    viewer.BindMenu(&menu);
+    view.BindMenu(nullptr);
+    view.BindMenu(&menu);
+    view.BindMenu(&menu);
 
-    viewer.contextMenuEvent(nullptr);
+    view.contextMenuEvent(nullptr);
 
-    const QPoint posCenter = viewer.geometry().center();
-    QContextMenuEvent rghContextEvent(QContextMenuEvent::Mouse, posCenter, viewer.mapToGlobal(posCenter));
-    viewer.contextMenuEvent(&rghContextEvent);
+    const QPoint posCenter = view.geometry().center();
+    QContextMenuEvent rghContextEvent(QContextMenuEvent::Mouse, posCenter, view.mapToGlobal(posCenter));
+    view.contextMenuEvent(&rghContextEvent);
     QCOMPARE(rghContextEvent.isAccepted(), true);
 
-    {  // todo: here can be rafactor with mouseSideClick_NavigationSignals
+    {
       auto& addressInst = g_addressBarActions();
       auto& viewInst = g_viewActions();
 
-      viewer.mousePressEvent(nullptr);
       QSignalSpy backAddressSpy(addressInst._BACK_TO, &QAction::triggered);
       QSignalSpy forwardAddressSpy(addressInst._FORWARD_TO, &QAction::triggered);
       QSignalSpy backViewSpy(viewInst._VIEW_BACK_TO, &QAction::triggered);
       QSignalSpy forwardViewSpy(viewInst._VIEW_FORWARD_TO, &QAction::triggered);
-      {
-        QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::BackButton, Qt::BackButton, Qt::NoModifier);
-        viewer.mousePressEvent(&event);
+
+      {  // accepted events
+        QVERIFY(SendMousePressEvent<CustomListView>(view, Qt::BackButton, Qt::NoModifier));
         QCOMPARE(backAddressSpy.count(), 1);
-        QCOMPARE(event.isAccepted(), true);
-      }
 
-      {
-        QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::ForwardButton, Qt::ForwardButton, Qt::NoModifier);
-        viewer.mousePressEvent(&event);
+        QVERIFY(SendMousePressEvent<CustomListView>(view, Qt::ForwardButton, Qt::NoModifier));
         QCOMPARE(forwardAddressSpy.count(), 1);
-        QCOMPARE(event.isAccepted(), true);
-      }
 
-      {
-        QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::BackButton, Qt::BackButton, Qt::ControlModifier);
-        viewer.mousePressEvent(&event);
+        QVERIFY(SendMousePressEvent<CustomListView>(view, Qt::BackButton, Qt::ControlModifier));
         QCOMPARE(backViewSpy.count(), 1);
-        QCOMPARE(event.isAccepted(), true);
-      }
 
-      {
-        QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::ForwardButton, Qt::ForwardButton, Qt::ControlModifier);
-        viewer.mousePressEvent(&event);
+        QVERIFY(SendMousePressEvent<CustomListView>(view, Qt::ForwardButton, Qt::ControlModifier));
         QCOMPARE(forwardViewSpy.count(), 1);
-        QCOMPARE(event.isAccepted(), true);
       }
 
       // Alt+back: nothing happen
       {
-        QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::BackButton, Qt::BackButton, Qt::AltModifier);
-        viewer.mousePressEvent(&event);
-        QCOMPARE(backAddressSpy.count(), 1);
+        SendMousePressEvent<CustomListView>(view, Qt::BackButton, Qt::AltModifier);
         QCOMPARE(backViewSpy.count(), 1);
+        QCOMPARE(backAddressSpy.count(), 1);
       }
 
       // left click: nothing happen
       {
-        QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-        viewer.mousePressEvent(&event);
+        SendMousePressEvent<CustomListView>(view, Qt::LeftButton, Qt::NoModifier);
         QCOMPARE(backAddressSpy.count(), 1);
         QCOMPARE(forwardViewSpy.count(), 1);
       }
 
       // all signal params ok
-      QCOMPARE(backAddressSpy.first()[0].toBool(), false);
-      QCOMPARE(forwardAddressSpy.first()[0].toBool(), false);
-      QCOMPARE(backViewSpy.first()[0].toBool(), false);
-      QCOMPARE(forwardViewSpy.first()[0].toBool(), false);
+      QVERIFY(backAddressSpy.count() > 0);
+      QVERIFY(forwardAddressSpy.count() > 0);
+      QVERIFY(backViewSpy.count() > 0);
+      QVERIFY(forwardViewSpy.count() > 0);
+
+      QCOMPARE(backAddressSpy.back()[0].toBool(), false);
+      QCOMPARE(forwardAddressSpy.back()[0].toBool(), false);
+      QCOMPARE(backViewSpy.back()[0].toBool(), false);
+      QCOMPARE(forwardViewSpy.back()[0].toBool(), false);
     }
   }
 

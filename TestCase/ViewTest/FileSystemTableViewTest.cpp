@@ -16,9 +16,11 @@
 #include "MimeDataHelper.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
-
+#include "MouseKeyboardEventHelper.h"
 #include <QDir>
 #include <QDirIterator>
+
+using namespace MouseKeyboardEventHelper;
 
 class FileSystemTableViewTest : public PlainTestSuite {
   Q_OBJECT
@@ -395,55 +397,44 @@ private slots:
     QSignalSpy backViewSpy(viewInst._VIEW_BACK_TO, &QAction::triggered);
     QSignalSpy forwardViewSpy(viewInst._VIEW_FORWARD_TO, &QAction::triggered);
 
-    {
-      QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::BackButton, Qt::BackButton, Qt::NoModifier);
-      view.mousePressEvent(&event);
+    {  // accepted events
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::NoModifier));
       QCOMPARE(backAddressSpy.count(), 1);
-      QCOMPARE(event.isAccepted(), true);
-    }
 
-    {
-      QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::ForwardButton, Qt::ForwardButton, Qt::NoModifier);
-      view.mousePressEvent(&event);
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::ForwardButton, Qt::NoModifier));
       QCOMPARE(forwardAddressSpy.count(), 1);
-      QCOMPARE(event.isAccepted(), true);
-    }
 
-    {
-      QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::BackButton, Qt::BackButton, Qt::ControlModifier);
-      view.mousePressEvent(&event);
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::ControlModifier));
       QCOMPARE(backViewSpy.count(), 1);
-      QCOMPARE(event.isAccepted(), true);
-    }
 
-    {
-      QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::ForwardButton, Qt::ForwardButton, Qt::ControlModifier);
-      view.mousePressEvent(&event);
+      QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::ForwardButton, Qt::ControlModifier));
       QCOMPARE(forwardViewSpy.count(), 1);
-      QCOMPARE(event.isAccepted(), true);
     }
 
     // Alt+back: nothing happen
     {
-      QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::BackButton, Qt::BackButton, Qt::AltModifier);
-      view.mousePressEvent(&event);
-      QCOMPARE(backAddressSpy.count(), 1);
+      SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::AltModifier);
       QCOMPARE(backViewSpy.count(), 1);
+      QCOMPARE(backAddressSpy.count(), 1);
     }
 
     // left click: nothing happen
     {
-      QMouseEvent event(QEvent::MouseButtonPress, QPointF(0, 0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-      view.mousePressEvent(&event);
+      SendMousePressEvent<CustomTableView>(view, Qt::LeftButton, Qt::NoModifier);
       QCOMPARE(backAddressSpy.count(), 1);
       QCOMPARE(forwardViewSpy.count(), 1);
     }
 
     // all signal params ok
-    QCOMPARE(backAddressSpy.first()[0].toBool(), false);
-    QCOMPARE(forwardAddressSpy.first()[0].toBool(), false);
-    QCOMPARE(backViewSpy.first()[0].toBool(), false);
-    QCOMPARE(forwardViewSpy.first()[0].toBool(), false);
+    QVERIFY(backAddressSpy.count() > 0);
+    QVERIFY(forwardAddressSpy.count() > 0);
+    QVERIFY(backViewSpy.count() > 0);
+    QVERIFY(forwardViewSpy.count() > 0);
+
+    QCOMPARE(backAddressSpy.back()[0].toBool(), false);
+    QCOMPARE(forwardAddressSpy.back()[0].toBool(), false);
+    QCOMPARE(backViewSpy.back()[0].toBool(), false);
+    QCOMPARE(forwardViewSpy.back()[0].toBool(), false);
   }
 };
 
