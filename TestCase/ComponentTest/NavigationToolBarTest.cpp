@@ -5,7 +5,6 @@
 #include "BeginToExposePrivateMember.h"
 #include "NavigationToolBar.h"
 #include "EndToExposePrivateMember.h"
-#include "DevicesDrivesActions.h"
 
 class NavigationToolBarTest : public PlainTestSuite {
   Q_OBJECT
@@ -46,7 +45,7 @@ private slots:
     QList<QAction*> plainActLsts = naviTooBar.actions();
     QVERIFY(!plainActLsts.isEmpty());
     QAction* pFirstAct = plainActLsts[0];
-    QCOMPARE(pFirstAct, DevicesDrivesActions::Inst().DEVICES_AND_DRIVES);
+    QCOMPARE(pFirstAct, naviTooBar.DEVICES_AND_DRIVES);
 
     // Special Action: will not call Into New Path
     QVERIFY(naviTooBar.mDevDriveTV != nullptr); // connect only but widget not create yet

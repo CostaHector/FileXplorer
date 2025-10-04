@@ -2,27 +2,48 @@
 #define DEVICESDRIVESTV_H
 
 #include "CustomTableView.h"
-#include "DevicesAndDriverDb.h"
-#include "DevicesDriveModel.h"
 #include <QStyledItemDelegate>
+#include <QStandardItemModel>
+
+struct DiskInfo {
+  QString diskName;      // 磁盘名称（Windows 为盘符，Linux 为挂载点）
+  qint64 totalSpace;     // 总容量（字节）
+  qint64 occupiedSpace;  // 已使用空间（字节）
+};
+using DiskInfoList = QList<DiskInfo>;
+DiskInfoList GetDiskInfoList();
+
+namespace DevicesDrivesTVMock {
+inline DiskInfoList& DiskInfoListMock() {
+  static DiskInfoList diskInfoLst;
+  return diskInfoLst;
+}
+inline void clear() {
+  DiskInfoListMock().clear();
+}
+}  // namespace DevicesDrivesTVMock
+
+class ProgressDelegate : public QStyledItemDelegate {
+ public:
+  explicit ProgressDelegate(QStandardItemModel* model, QObject* parent = nullptr);
+  float GetUsedPercentage(const QModelIndex& index) const;
+  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+
+ private:
+  QStandardItemModel* mModel{nullptr};
+};
 
 class DevicesDrivesTV : public CustomTableView {
  public:
   explicit DevicesDrivesTV(QWidget* parent = nullptr);
   void closeEvent(QCloseEvent* event) override;
   void ReadSettings();
-  void contextMenuEvent(QContextMenuEvent* event) override;
-  void onUpdateVolumes();
-  void onMountADriver();
-  void onUnmountADriver();
-  void onAdtADriver();
-  void subscribe();
+  void showEvent(QShowEvent* event) override;
+
  private:
-  QAction* _DEVICE_AND_DRIVES{nullptr};
-  DevicesAndDriverDb mDb;
-  DevicesDriveModel* mDevModel{nullptr};
+  DiskInfoList mDisks;
+  QStandardItemModel* mDevModel{nullptr};
   QStyledItemDelegate* mProgressStyleDelegate{nullptr};
-  QMenu* mMenu{nullptr};
 };
 
 #endif  // DEVICESDRIVESTV_H

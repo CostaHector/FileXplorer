@@ -21,6 +21,10 @@ class HarTableViewTest : public PlainTestSuite {
     HarFilesMocker::mockHarFiles().clear();  //
     HarTableViewMock::mockExportToPath().clear();
     QVERIFY(tDir.IsValid());
+
+    auto* pHarView = new (std::nothrow) HarFiles;
+    QVERIFY(pHarView != nullptr);
+    delete pHarView;
   }
 
   void cleanupTestCase() {

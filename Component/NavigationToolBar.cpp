@@ -1,5 +1,4 @@
 ﻿#include "NavigationToolBar.h"
-#include "DevicesDrivesActions.h"
 #include "PopupWidgetManager.h"
 #include "PublicMacro.h"
 #include <QApplication>
@@ -11,7 +10,10 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_) //
 {
   setObjectName(title);
   // 1. devices and drives
-  addAction(DevicesDrivesActions::Inst().DEVICES_AND_DRIVES);
+  DEVICES_AND_DRIVES = new (std::nothrow) QAction{QIcon(":img/DISKS"), "Devices and Drives", this};
+  CHECK_NULLPTR_RETURN_VOID(DEVICES_AND_DRIVES);
+  DEVICES_AND_DRIVES->setCheckable(true);
+  addAction(DEVICES_AND_DRIVES);
   addSeparator();
   // 2. all home links
   auto* desktop = new (std::nothrow) QAction{QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), "Desktop", this};
@@ -64,12 +66,11 @@ NavigationToolBar::NavigationToolBar(const QString& title, bool isShow_) //
 }
 
 void NavigationToolBar::subscribe() {
-  auto* pDeviceAndDrivesAct = DevicesDrivesActions::Inst().DEVICES_AND_DRIVES;
-  mDevDriveTV = new (std::nothrow) PopupWidgetManager<DevicesDrivesTV>{pDeviceAndDrivesAct, this, "DevicesDrivesTVGeometry"};
+  mDevDriveTV = new (std::nothrow) PopupWidgetManager<DevicesDrivesTV>{DEVICES_AND_DRIVES, this, "DevicesDrivesTVGeometry"};
   CHECK_NULLPTR_RETURN_VOID(mDevDriveTV);
 
-  connect(this, &QToolBar::actionTriggered, this, [this, pDeviceAndDrivesAct](QAction* pAct) {
-    if (pAct == pDeviceAndDrivesAct) {
+  connect(this, &QToolBar::actionTriggered, this, [this](QAction* pAct) {
+    if (pAct == DEVICES_AND_DRIVES) {
       return;
     }
     NavigationExToolBar::onPathActionTriggeredNavi(pAct);

@@ -27,11 +27,6 @@ inline const QString& VIDS_DATABASE() {
   return path;
 }
 
-inline const QString& DEVICES_AND_DRIVES_DATABASE() {
-  static const QString path = WORK_PATH() + "/DEVICES_AND_DRIVES.db";
-  return path;
-}
-
 inline const QString& AI_MEDIA_DUP_DATABASE() {
   static const QString path = WORK_PATH() + "/DUPLICATES_DB.db";
   return path;

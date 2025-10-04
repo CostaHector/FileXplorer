@@ -96,7 +96,6 @@ private slots:
     };
     QVERIFY(IsPathStringValid(SystemPath::STARRED_PATH()));
     QVERIFY(IsPathStringValid(SystemPath::VIDS_DATABASE()));
-    QVERIFY(IsPathStringValid(SystemPath::DEVICES_AND_DRIVES_DATABASE()));
     QVERIFY(IsPathStringValid(SystemPath::AI_MEDIA_DUP_DATABASE()));
     QVERIFY(IsPathStringValid(SystemPath::RECYCLE_BIN_DATABASE()));
     QVERIFY(IsPathStringValid(SystemPath::PEFORMERS_DATABASE()));
