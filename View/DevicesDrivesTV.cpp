@@ -56,8 +56,8 @@ void ProgressDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
   const float percentage{GetUsedPercentage(index)};
   painter->save();
   painter->fillRect(opt.rect.left(), opt.rect.top(),                         //
-                    opt.rect.width() * (1 - percentage), opt.rect.height(),  //
-                    QColor::fromHsv(percentage * 120, 255, 255));
+                    opt.rect.width() * percentage, opt.rect.height(),  //
+                    QColor::fromHsv((1 - percentage) * 120, 255, 255));
   painter->restore();
   QStyledItemDelegate::paint(painter, opt, index);
 }
