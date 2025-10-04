@@ -11,7 +11,7 @@ class ItemView : public CustomListView {
     mModels = mdl;
   }
   void subscribe();
-  void onCellDoubleClicked(const QModelIndex& clickedIndex) const;
+  bool onCellDoubleClicked(const QModelIndex& clickedIndex) const;
 
  private:
   FloatingModels* mModels{nullptr};
