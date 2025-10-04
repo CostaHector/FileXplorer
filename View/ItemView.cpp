@@ -1,10 +1,12 @@
 #include "ItemView.h"
+#include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include <QActionGroup>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QFile>
 
-ItemView::ItemView(const QString& itemViewName, QWidget* parent)//
+ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
     : CustomListView{itemViewName, parent} {
   setViewMode(QListView::ViewMode::ListMode);
   setTextElideMode(Qt::TextElideMode::ElideMiddle);
@@ -27,18 +29,19 @@ void ItemView::subscribe() {
   connect(_PLAY_ITEM, &QAction::triggered, this, [this]() { onCellDoubleClicked(currentIndex()); });
 }
 
-void ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
-  if (mModels == nullptr) {
-    return;
-  }
+bool ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
+  CHECK_NULLPTR_RETURN_FALSE(mModels);
   if (!clickedIndex.isValid()) {
-    return;
+    return false;
   }
   const QString& path = mModels->filePath(clickedIndex);
-  const bool ret = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
-  if (ret) {
-    LOG_OK_NP("[Ok] Open", path);
-  } else {
-    LOG_ERR_NP("[Failed] Open", path);
+  if (!QFile::exists(path)) {
+    return false;
   }
+#ifdef RUNNING_UNIT_TESTS
+  return true;
+#endif
+  const bool ret = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+  LOG_OE_P(ret, "Double click open", "path:%s", qPrintable(path));
+  return ret;
 }
