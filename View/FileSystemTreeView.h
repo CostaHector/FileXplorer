@@ -34,11 +34,7 @@ class FileSystemTreeView : public QTreeView {
 
   auto keyPressEvent(QKeyEvent* event) -> void override;
 
-  void contextMenuEvent(QContextMenuEvent* event) override {
-#ifndef RUNNING_UNIT_TESTS
-    m_fsMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
-#endif
-  }
+  void contextMenuEvent(QContextMenuEvent* event) override;
 
  private:
   FileSystemModel* _fsModel {nullptr};

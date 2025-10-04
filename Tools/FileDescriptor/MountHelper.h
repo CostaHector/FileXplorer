@@ -21,8 +21,6 @@ QString ExtractGuidFromVolumeName(const wchar_t* p2volume);
 
 QString findVolumeGuidByLabel(const QString& label);
 bool isVolumeAvailable(const QString& volumeGuid);
-bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint);
-bool UnmountVolume(const QString& volMountPoint);
 QSet<QString> GetMountPointsByVolumeName(const wchar_t* volumeName);
 QMap<QString, QSet<QString>> Volumes2ContainedMountPnts();
 
@@ -30,8 +28,6 @@ QString resolveFilePath(const QString& relativePath, const QString& volumeGuid);
 QMap<QString, QString> GetGuid2LabelMap();
 bool GetVolumeInfo(const QString& path, QString& volName);
 bool GetGuidByDrive(const QString& driveStr, QString& guid);
-bool IsAdministrator();
-bool RunAsAdmin();
 QString FindRootByGUIDWin(const QString& targetGuid);
 QString GetDisplayNameByGuidTableName(QString guidTableName);
 QMap<QString, QString> GetGuidTableName2DisplayName();

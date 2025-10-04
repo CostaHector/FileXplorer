@@ -98,6 +98,14 @@ auto FileSystemTreeView::keyPressEvent(QKeyEvent* e) -> void {
   QTreeView::keyPressEvent(e);
 }
 
+void FileSystemTreeView::contextMenuEvent(QContextMenuEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
+#ifndef RUNNING_UNIT_TESTS
+  m_fsMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+#endif
+}
+
 void FileSystemTreeView::mousePressEvent(QMouseEvent* event) {
   if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
     event->accept();

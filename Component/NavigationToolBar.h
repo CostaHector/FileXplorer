@@ -10,6 +10,7 @@ class NavigationToolBar : public QToolBar {
   explicit NavigationToolBar(const QString& title = "NavigationToolBar", bool isShow_ = true);
   void subscribe();
  private:
+  QAction* DEVICES_AND_DRIVES{nullptr};
   NavigationExToolBar* m_extraAppendTB{nullptr};
   PopupWidgetManager<DevicesDrivesTV>* mDevDriveTV{nullptr};
 };

@@ -6,12 +6,8 @@
 
 #define DEV_DRV_TABLE_ENUM_VALUE_MAPPING \
   DEV_DRV_TABLE_ENUM_ITEM(ROOT_PATH, 0) \
-  DEV_DRV_TABLE_ENUM_ITEM(VOLUME_LABEL, 1) \
-  DEV_DRV_TABLE_ENUM_ITEM(TOTAL_BYTES, 2) \
-  DEV_DRV_TABLE_ENUM_ITEM(AVAIL_BYTES, 3) \
-  DEV_DRV_TABLE_ENUM_ITEM(GUID, 4) \
-  DEV_DRV_TABLE_ENUM_ITEM(MOUNT_POINT, 5) \
-  DEV_DRV_TABLE_ENUM_ITEM(ADT_TIME, 6)
+  DEV_DRV_TABLE_ENUM_ITEM(TOTAL_BYTES, 1) \
+  DEV_DRV_TABLE_ENUM_ITEM(USED_BYTES, 2) \
 
 namespace DEV_DRV_TABLE {
 enum FIELD_E {
@@ -34,6 +30,15 @@ inline const char* c_str(FIELD_E devDrvFieldE) {
 #undef DEV_DRV_TABLE_ENUM_ITEM
   };
   return DEV_DRV_TABLE_E_2_CHAR_ARRAY[(int) devDrvFieldE];
+}
+
+inline const QStringList& GetDevDrvTableHeaders() {
+  static const QStringList DevDrvTableHeaders {
+#define DEV_DRV_TABLE_ENUM_ITEM(enu, val) ENUM_2_STR(enu),
+    DEV_DRV_TABLE_ENUM_VALUE_MAPPING
+#undef DEV_DRV_TABLE_ENUM_ITEM
+  };
+  return DevDrvTableHeaders;
 }
 
 } // namespace DEV_DRV_TABLE

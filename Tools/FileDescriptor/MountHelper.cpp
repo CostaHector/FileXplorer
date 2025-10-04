@@ -23,12 +23,6 @@ QString findVolumeGuidByLabel(const QString& label) {
 bool isVolumeAvailable(const QString& volumeGuid) {
   return false;
 }
-bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) {
-  return false;
-}
-bool UnmountVolume(const QString& volMountPoint) {
-  return false;
-}
 QSet<QString> GetMountPointsByVolumeName(const wchar_t* volumeName) {
   return {};
 }
@@ -46,12 +40,6 @@ bool GetVolumeInfo(const QString& path, QString& volName) {
   return false;
 }
 bool GetGuidByDrive(const QString& driveStr, QString& guid) {
-  return false;
-}
-bool IsAdministrator() {
-  return false;
-}
-bool RunAsAdmin() {
   return false;
 }
 
@@ -127,62 +115,6 @@ bool isVolumeAvailable(const QString& dstVolumeGuid) {
 
   FindVolumeClose(hFind);
   return false;
-}
-
-bool RunAsAdmin() {
-  const QString& program = "path\\to\\yourapp.exe";  // 替换为你的应用程序路径
-  QString runas{"runas"};
-  QStringList cmds{"/user:administrator", QString(R"(%1)").arg(program)};
-  return QProcess::startDetached(runas, cmds);  // 使用startDetached来异步启动进程
-}
-
-bool IsAdministrator() {
-  BOOL isAdmin = FALSE;
-  SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-  PSID AdministratorsGroup;
-  if (AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &AdministratorsGroup)) {
-    if (!CheckTokenMembership(NULL, AdministratorsGroup, &isAdmin)) {
-      isAdmin = FALSE;
-    }
-    FreeSid(AdministratorsGroup);
-  }
-  return isAdmin == TRUE;
-}
-
-// 修改后的挂载函数
-bool MountVolume(const QString& volumeGuid, const QString& label, QString& volMountPoint) {
-  if (volumeGuid.isEmpty() || label.isEmpty()) {
-    LOG_W("volumeGuid[%s] and label[%s] cannot empty", qPrintable(volumeGuid), qPrintable(label));
-    return false;
-  }
-  if (!isVolumeAvailable(volumeGuid)) {
-    LOG_W("volumeGuid[%s] not exist at all, skip mount", qPrintable(volumeGuid));
-    return false;
-  }
-  const QString& MOUNT_POINT_ROOT{"C:/mnt/" + label};
-  if (!QFileInfo{MOUNT_POINT_ROOT}.isDir()) {
-    LOG_D("path[%s] not exist, create now", qPrintable(MOUNT_POINT_ROOT));
-    if (!QDir{}.mkpath(MOUNT_POINT_ROOT)) {
-      LOG_W("path[%s] create failed", qPrintable(MOUNT_POINT_ROOT));
-      return false;
-    }
-  }
-  //  "\\?\Volume{GUID}\"
-  volMountPoint = QDir::toNativeSeparators(MOUNT_POINT_ROOT) + R"(\)";
-  const QString volumeName{VOLUME_NAME_TEMPLATE.arg(volumeGuid)};
-  if (!SetVolumeMountPointW(volMountPoint.toStdWString().c_str(), volumeName.toStdWString().c_str())) {
-    // #define ERROR_ACCESS_DENIED __MSABI_LONG(5)
-    // #define ERROR_INVALID_NAME __MSABI_LONG(123)
-    // #define ERROR_DIR_NOT_EMPTY __MSABI_LONG(145)
-    LOG_W("volume Name[%s] mount on[%s], resultCode:%lu", qPrintable(volumeName), qPrintable(volMountPoint), GetLastError());
-    return false;
-  }
-  LOG_D("volume Name[%s] mount on[%s] succeed", qPrintable(volumeName), qPrintable(volMountPoint));
-  return true;
-}
-
-bool UnmountVolume(const QString& volMountPoint) {
-  return DeleteVolumeMountPointA(volMountPoint.toStdString().c_str()) == true;
 }
 
 // 枚举指定卷的所有挂载点
