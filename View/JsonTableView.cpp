@@ -11,7 +11,7 @@
 #include <QStyleOptionViewItem>
 
 JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent)  //
-  : CustomTableView{"JSON_TABLE_VIEW", parent}                                                          //
+    : CustomTableView{"JSON_TABLE_VIEW", parent}                                                                 //
 {
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
   _JsonModel = jsonModel;
@@ -19,7 +19,7 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   _JsonProxyModel = jsonProxyModel;
 
   _JsonProxyModel->setSourceModel(_JsonModel);
-  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name); // only filter the specified name row; set -1 to filter all column if needed
+  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name);  // only filter the specified name row; set -1 to filter all column if needed
 
   setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
@@ -76,9 +76,8 @@ int JsonTableView::onSyncNameField() {
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
   const int cnt = _JsonModel->SyncFieldNameByJsonBaseName(indexes);
-
   LOG_OK_P("Name field has been sync by json basename", "%d/%d row(s)", cnt, indexes.size());
-  return indexes.size();
+  return cnt;
 }
 
 int JsonTableView::onExportCastStudioToDictonary() {
@@ -93,9 +92,7 @@ int JsonTableView::onExportCastStudioToDictonary() {
     LOG_ERR_NP("Export cast/studio to local dictionary file failed", "see details in log");
     return -1;
   }
-  const QString affectedRowsMsg = QString{"Increment cast:%1/studio:%2\nby %3 selected row(s)"}.arg(castCnt).arg(studioCnt).arg(indexes.size());
-  LOG_OK_NP("Export succeed", affectedRowsMsg);
-  QMessageBox::information(this, "Export succeed", affectedRowsMsg);
+  LOG_OK_P("Export succeed", "Increment cast:%d/studio:%d\nby %d selected row(s)", castCnt, studioCnt, indexes.size());
   return castCnt + studioCnt;
 }
 
@@ -106,25 +103,27 @@ int JsonTableView::onRenameJsonAndRelated() {
   }
   const QModelIndex& ind = CurrentIndexSource();
   const QString oldJsonBaseName = _JsonModel->fileBaseName(ind);
+
   bool isInputOk{false};
-  const QString& newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
-                                                         {oldJsonBaseName}, 0, true, &isInputOk);
+  QString newJsonBaseName;
+#ifdef RUNNING_UNIT_TESTS
+  std::tie(isInputOk, newJsonBaseName) = JsonTableViewMock::QryNewJsonBaseNameMock();
+#else
+  newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
+                                          {oldJsonBaseName}, 0, true, &isInputOk);
+#endif
   if (!isInputOk) {
     LOG_OK_NP("[skip] User cancel rename json and related files", "return");
     return 0;
   }
   if (newJsonBaseName.isEmpty()) {
     LOG_ERR_NP("[skip] New json base name can not be empty", "return");
-    return 0;
+    return -1;
   }
   int cnt = _JsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
-  const QString msg{QString{"Rename Json\n[%1]\n[%2]\n and it's related file(s). retCode: %3"}.arg(oldJsonBaseName).arg(newJsonBaseName).arg(cnt)};
-  if (cnt < JsonPr::E_OK) {
-    LOG_ERR_P(msg, "Failed, errorCode:%d", cnt);
-    return cnt;
-  }
-  LOG_OK_NP(msg, "All succeed");
-  return 0;
+  LOG_OE_P(cnt >= 0, "Rename Json", "[%s]\n[%s]\n and it's related file(s). retCode: %d",  //
+           qPrintable(oldJsonBaseName), qPrintable(newJsonBaseName), cnt);
+  return cnt;
 }
 
 int JsonTableView::onSetStudio() {
@@ -144,11 +143,15 @@ int JsonTableView::onSetStudio() {
   }
 
   bool isInputOk{false};
-  QString hintMsg{"Choose or select studio from drop down list"};
-  const QString& studio = QInputDialog::getItem(this, "Input an studio name", hintMsg,  //
-                                                m_studioCandidates,                     //
-                                                defIndex,                               //
-                                                true, &isInputOk);
+  QString studio;
+  QString inputStudioTitle{"Choose or select studio from drop down list"};
+  QString inputStudioHintMsg{"Choose or select studio from drop down list"};
+#ifdef RUNNING_UNIT_TESTS
+  std::tie(isInputOk, studio) = JsonTableViewMock::InputStudioNameMock();
+#else
+  studio = QInputDialog::getItem(this, inputStudioTitle, inputStudioHintMsg, m_studioCandidates, defIndex, true, &isInputOk);
+#endif
+
   if (!isInputOk) {
     LOG_OK_NP("[skip] User cancel set studio", "return");
     return 0;
@@ -227,7 +230,7 @@ int JsonTableView::onClearStudio() {
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
   const int cnt = _JsonModel->SetStudio(indexes, "");
   LOG_OK_P("studio has been cleared", "%d/%d row(s)", cnt, indexes.size());
-  return indexes.size();
+  return cnt;
 }
 
 int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode) {
@@ -240,15 +243,31 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
   QString tagsOrCast;
   if (mode == FIELD_OP_MODE::CLEAR) {
     tagsOrCast = "";
+    const QString clearQryCfm{"Confirm " + fieldOperation};
+    const QString clearTagsCastsHintMsg{"Clear text?"};
+    QMessageBox::StandardButton cfmClearBtn = QMessageBox::StandardButton::No;
+#ifdef RUNNING_UNIT_TESTS
+    cfmClearBtn = JsonTableViewMock::clearTagsOrCastsMock() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
+#else
+    cfmClearBtn = QMessageBox::question(this, clearQryCfm, clearTagsCastsHintMsg, QMessageBox::Yes | QMessageBox::No);
+#endif
+    if (cfmClearBtn != QMessageBox::Yes) {
+      LOG_OK_NP("[Skip] User cancel", fieldOperation);
+      return 0;
+    }
   } else {
     QStringList& candidates = m_candidatesLst[(int)type];
-    bool isInputOk{false};
-    const QString hintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
-    tagsOrCast = QInputDialog::getItem(this, fieldOperation, hintMsg,  //
-                                       candidates,                     //
-                                       candidates.size() - 1,          //
-                                       true, &isInputOk);
-    if (!isInputOk) {
+
+    bool bIsAccept{false};
+    QString inputTagsCastsHintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
+#ifdef RUNNING_UNIT_TESTS
+    std::tie(bIsAccept, tagsOrCast) = JsonTableViewMock::InputTagsOrCastsMock();
+#else
+    tagsOrCast = QInputDialog::getItem(this, fieldOperation, inputTagsCastsHintMsg,  //
+                                       candidates, candidates.size() - 1,            //
+                                       true, &bIsAccept);
+#endif
+    if (!bIsAccept) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;
     }
@@ -304,7 +323,12 @@ bool JsonTableView::GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_T
     LOG_WARN_NP("Current Index is invalid", "select a line first");
     return false;
   }
-  QWidget* editor = indexWidget(curInd);
+  QWidget* editor = nullptr;
+#ifdef RUNNING_UNIT_TESTS
+  editor = pWidgetInCellMock;
+#else
+  editor = indexWidget(curInd);
+#endif
   if (editor == nullptr) {  // not in edit mode
     LOG_D("Cell not in edit, cannot get selection text in cell");
     return true;
@@ -349,16 +373,15 @@ int JsonTableView::onAppendFromSelection(bool isUpperCaseSentence) {
 
   const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(curInd);
   int cnt = _JsonModel->AppendCastFromSentence(srcModelInd, userSelection, isUpperCaseSentence);
-  if (cnt < 0) {
-    LOG_ERR_NP("Cast append failed", "see detail in logs");
-    return -1;
-  }
-  LOG_OK_P("Cast append succeed", "cnt %d", cnt);
+  LOG_OE_P(cnt >= 0, "Cast append", "return count: %d", cnt);
   return cnt;
 }
 
 int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   const QModelIndex& curInd = currentIndex();
+  if (!curInd.isValid()) {
+    return -1;
+  }
 
   QString userSelection;
   EDITOR_WIDGET_TYPE edtWidType{EDITOR_WIDGET_TYPE::BUTT};
@@ -371,7 +394,12 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
     return -1;
   }
 
-  QWidget* editor = indexWidget(curInd);
+  QWidget* editor = nullptr;
+#ifdef RUNNING_UNIT_TESTS
+  editor = pWidgetInCellMock;
+#else
+  editor = indexWidget(curInd);
+#endif
   if (editor == nullptr) {
     LOG_WARN_NP("Cell not in edit", "Cannot change case of selection text");
     return -1;
@@ -387,13 +415,13 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
       newText = lineEdit->text();
       break;
     }
-    case EDITOR_WIDGET_TYPE::PLAIN_TEXT_EDIT:{
+    case EDITOR_WIDGET_TYPE::PLAIN_TEXT_EDIT: {
       auto* plainTextEdit = qobject_cast<QPlainTextEdit*>(editor);
       ret = NameTool::ReplaceAndUpdateSelection(*plainTextEdit, pCaseFunc);
       newText = plainTextEdit->toPlainText();
       break;
     }
-    case EDITOR_WIDGET_TYPE::TEXT_EDIT:{
+    case EDITOR_WIDGET_TYPE::TEXT_EDIT: {
       auto* textEdit = qobject_cast<QTextEdit*>(editor);
       ret = NameTool::ReplaceAndUpdateSelection(*textEdit, pCaseFunc);
       newText = textEdit->toPlainText();
@@ -449,17 +477,3 @@ void JsonTableView::subscribe() {
   connect(inst._ADD_SELECTED_CAST_SENTENCE, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._EXTRACT_UPPERCASE_CAST, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
 }
-
-// #define RUN_MAIN_FILE 1
-#ifdef RUN_MAIN_FILE
-
-#include <QApplication>
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  JsonTableView jtv;
-  jtv.show();
-  jtv.ReadADirectory("E:/MenPreview");
-  a.exec();
-  return 0;
-}
-#endif

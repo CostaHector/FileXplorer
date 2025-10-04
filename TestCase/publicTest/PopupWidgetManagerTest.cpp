@@ -16,13 +16,21 @@
 
 class PopupWidgetManagerTest : public PlainTestSuite {
   Q_OBJECT
-public:
-  template<typename WIDGET_TYPE>
+ public:
+  template <typename WIDGET_TYPE>
   void PopupWidgetManagerTestTemplate(const QString& configsBaseName, bool isCheckable = true) {
+    {
+      auto* pDynCreate = new (std::nothrow) PopupWidgetManager<WIDGET_TYPE>(nullptr, nullptr, "");
+      if (pDynCreate != nullptr) {
+        delete pDynCreate;
+        pDynCreate = nullptr;
+      }
+    }
+
     const QString widgetGeometryKey = configsBaseName + "Geometry";
     QVERIFY(!Configuration().contains(widgetGeometryKey));
     {
-      { // invalid input. shoud not crash down
+      {  // invalid input. shoud not crash down
         QWidget parentWidget;
         QAction randomAct{configsBaseName, &parentWidget};
         randomAct.setCheckable(isCheckable);
@@ -44,7 +52,7 @@ public:
 
       PopupWidgetManager<WIDGET_TYPE> wid{&widAct, &parentWidget, widgetGeometryKey};
       wid.setOnCloseCallback(fCloseCallback);
-      wid.setWidgetCreator(nullptr); // we usually don't need this. Default constructor is enough now
+      wid.setWidgetCreator(nullptr);  // we usually don't need this. Default constructor is enough now
       QVERIFY(wid.widget() == nullptr);
       QCOMPARE(wid.isVisible(), false);
       QCOMPARE(widAct.isChecked(), false);
@@ -69,7 +77,7 @@ public:
     QVERIFY(Configuration().contains(widgetGeometryKey));
   }
 
-private slots:
+ private slots:
   void initTestCase() { Configuration().clear(); }
 
   void cleanupTestCase() { Configuration().clear(); }
@@ -83,7 +91,7 @@ private slots:
     PopupWidgetManagerTestTemplate<Archiver>("Archiver", true);
   }
 
-  void not_checkable_popup_widget_geometry_state_ok() { //
+  void not_checkable_popup_widget_geometry_state_ok() {  //
     PopupWidgetManagerTestTemplate<QWidget>("QWidget", false);
   }
 };

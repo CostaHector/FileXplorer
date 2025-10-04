@@ -44,6 +44,10 @@ bool JsonPr::operator==(const JsonPr& rhs) const {
           jsonFileName == rhs.jsonFileName;
 }
 
+bool JsonPr::operator<(const JsonPr& rhs) const {
+  return jsonFileName < rhs.jsonFileName;
+}
+
 bool JsonPr::Reload() {
   const QString absPth = GetAbsPath();
   if (!QFileInfo(absPth).isFile()) {
@@ -128,7 +132,7 @@ int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoR
 
 bool JsonPr::SyncNameValueFromFileBaseName() {
   const QString newbaseName{PathTool::GetBaseName(jsonFileName)};
-  if (newbaseName == m_Name) {
+  if (newbaseName == m_Name) { // no need update
     return false;
   }
   m_Name = newbaseName;

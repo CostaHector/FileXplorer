@@ -13,6 +13,7 @@ struct JsonPr {
   explicit JsonPr(const QString& jsonAbsFile);
   explicit JsonPr(const QString& filePrePath, const QString& fileName, const QJsonObject& json);
   bool operator==(const JsonPr& rhs) const;
+  bool operator<(const JsonPr& rhs) const;
 
   bool Reload();
   bool WriteIntoFiles() const;

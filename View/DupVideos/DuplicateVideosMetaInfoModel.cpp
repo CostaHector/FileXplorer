@@ -47,7 +47,7 @@ QString DuplicateVideosMetaInfoModel::fileName(const QModelIndex& index) const {
     return {};
   }
   int row = index.row();
-  if (!isIndexInrange(0, row, rowCount())) {
+  if (row < 0 || row >= rowCount()) {
     LOG_W("row[%d] out of range[0, %d)", row, rowCount());
     return {};
   }

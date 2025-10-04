@@ -8,9 +8,9 @@
 #include "TorrentsManagerWidget.h"
 #include "ConfigsTable.h"
 #include "Archiver.h"
-
 #include "MemoryKey.h"
 #include "Logger.h"
+
 #include <QEvent>
 
 template class PopupWidgetManager<QWidget>;
@@ -23,7 +23,7 @@ template class PopupWidgetManager<Archiver>;
 
 template<typename WidgetType>
 PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent, const QString& geometryCfgKey)
-  : QObject{notNullptrParent}, m_geometryCfgKey{geometryCfgKey} {
+    : QObject{notNullptrParent}, m_geometryCfgKey{geometryCfgKey} {
   CHECK_NULLPTR_RETURN_VOID(notNullptrParent);
   CHECK_NULLPTR_RETURN_VOID(pAction);
   CHECK_FALSE_RETURN_VOID(!geometryCfgKey.isEmpty());
