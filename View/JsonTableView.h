@@ -6,6 +6,31 @@
 #include "MultiLineEditDelegate.h"
 #include <QSortFilterProxyModel>
 
+namespace JsonTableViewMock {
+inline std::pair<bool, QString>& QryNewJsonBaseNameMock() {
+  static std::pair<bool, QString> acceptJsonBaseNamePair;
+  return acceptJsonBaseNamePair;
+}
+inline std::pair<bool, QString>& InputStudioNameMock() {
+  static std::pair<bool, QString> accept2StudioName;
+  return accept2StudioName;
+}
+inline bool& clearTagsOrCastsMock() {
+  static bool bClearTagsOrCasts;
+  return bClearTagsOrCasts;
+}
+inline std::pair<bool, QString>& InputTagsOrCastsMock() {
+  static std::pair<bool, QString> accept2TagsOrCasts;
+  return accept2TagsOrCasts;
+}
+inline void clear() {
+  QryNewJsonBaseNameMock() = std::pair<bool, QString>(false, "");
+  InputStudioNameMock() = std::pair<bool, QString>(false, "");
+  clearTagsOrCastsMock() = false;
+  InputTagsOrCastsMock() = std::pair<bool, QString>(false, "");
+}
+}  // namespace JsonTableViewMock
+
 class JsonTableView : public CustomTableView {
  public:
   explicit JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent = nullptr);
@@ -42,6 +67,9 @@ class JsonTableView : public CustomTableView {
   JsonTableModel* _JsonModel{nullptr};
   QSortFilterProxyModel* _JsonProxyModel{nullptr};
   MultiLineEditDelegate* m_DetailEdit{nullptr};
+#ifdef RUNNING_UNIT_TESTS
+  QWidget* pWidgetInCellMock{nullptr};
+#endif
 };
 
 #endif  // JSONVIEW_H

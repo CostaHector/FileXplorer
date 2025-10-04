@@ -110,12 +110,13 @@ int JsonTableModel::setRootPath(const QString& path, bool isForce) {
     return -1;
   }
 
-  decltype(mCachedJsons) tempCachedJsons;
+  QVector<JsonPr> tempCachedJsons;
   QDirIterator it{path, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     tempCachedJsons.append(JsonPr::fromJsonFile(it.filePath()));
   }
+  std::sort(tempCachedJsons.begin(), tempCachedJsons.end());
 
   const int befRowCnt = mCachedJsons.size();
   const int afterRowCnt = tempCachedJsons.size();

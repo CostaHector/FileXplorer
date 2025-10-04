@@ -48,7 +48,7 @@ int RightVideoDuplicatesModel::rowCountHelper(int leftSelectedRow) const {
   CHECK_NULLPTR_RETURN_INT(_pGroupedVidsList, 0);
   CHECK_NULLPTR_RETURN_INT(_pCurrentDiffer, 0);
   const auto& grpLst = (*_pGroupedVidsList)[(int)*_pCurrentDiffer];
-  if (!isIndexInrange(0, leftSelectedRow, grpLst.size())) {
+  if (leftSelectedRow < 0 || leftSelectedRow >= grpLst.size()) {
     return 0;
   }
   return grpLst[leftSelectedRow].size();
