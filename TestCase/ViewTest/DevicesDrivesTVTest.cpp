@@ -23,7 +23,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     DevicesDrivesTVMock::clear();  //
   }
 
-  void testConstructor() {
+  void constructor_ok() {
     DevicesDrivesTVMock::DiskInfoListMock() = {{"C:", 50000000000, 30000000000},  //
                                                {"D:", 100000000000, 60000000000}};
     QCOMPARE(DevicesDrivesTVMock::DiskInfoListMock().size(), 2);
@@ -39,7 +39,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QVERIFY(devicesDrivesTV.mProgressStyleDelegate != nullptr);
   }
 
-  void testModelPopulation() {
+  void modelPopulation_ok() {
     DevicesDrivesTV devicesDrivesTV;
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
 
@@ -54,7 +54,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QCOMPARE(model->data(usedBytesIndex).toLongLong(), 30000000000LL);
   }
 
-  void testProgressDelegate() {
+  void progressDelegate_ok() {
     DevicesDrivesTV devicesDrivesTV;
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
     ProgressDelegate delegate(model);
@@ -76,7 +76,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QVERIFY(!image.isNull());
   }
 
-  void testSettingsPersistence() {
+  void settingsPersistence_ok() {
     DevicesDrivesTV devicesDrivesTV;
 
     QCloseEvent closeEvent;
@@ -85,7 +85,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     Configuration().contains("DevicesDriveTableViewGeometry");
   }
 
-  void testMockDataHandling() {
+  void data_retrieve_ok() {
     DevicesDrivesTVMock::clear();
     DevicesDrivesTVMock::DiskInfoListMock().append({"/", 200000000000, 150000000000});
     DevicesDrivesTV devicesDrivesTV;
@@ -96,8 +96,12 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QCOMPARE(model->data(rootPathIndex).toString(), QString("/"));
   }
 
-  void testCloseEvent() {
+  void show_close_Event_ok() {
     DevicesDrivesTV devicesDrivesTV;
+    QShowEvent showEvent;
+    devicesDrivesTV.showEvent(&showEvent);
+
+    // will not crash down
     QByteArray originalGeometry = devicesDrivesTV.saveGeometry();
 
     QCloseEvent closeEvent;
@@ -105,15 +109,6 @@ class DevicesDrivesTVTest : public PlainTestSuite {
 
     QByteArray savedGeometry = Configuration().value("DevicesDriveTableViewGeometry").toByteArray();
     QCOMPARE(savedGeometry, originalGeometry);
-  }
-
-  void testShowEvent() {
-    DevicesDrivesTV devicesDrivesTV;
-    QShowEvent showEvent;
-    devicesDrivesTV.showEvent(&showEvent);
-
-    // will not crash down
-    QVERIFY(true);
   }
 };
 
