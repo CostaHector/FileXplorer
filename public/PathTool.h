@@ -90,7 +90,7 @@ QString linkPath(const QString& localPath);
 QString localPath(const QString& linkPath);
 QString sysPath(QString fullPath);
 QString normPath(QString fullPath);
-QString absolutePath(const QString& fullPath);
+QString absolutePath(QString fullPath);
 QString relativePath(const QString& fullPath, const int rootpathLen = 0);
 QString forSearchPath(const QString& fullPath);  // get QString for database index last three sectors
 

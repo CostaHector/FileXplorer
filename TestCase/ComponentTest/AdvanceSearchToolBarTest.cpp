@@ -1,28 +1,32 @@
 #include <QtTest/QtTest>
-#include <QTestEventList>
-#include <QSignalSpy>
 
 #include "PlainTestSuite.h"
-#include "Logger.h"
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceSearchToolBar.h"
 #include "EndToExposePrivateMember.h"
 
+#include "OnScopeExit.h"
+
 #include <QDir>
 #include <QDirIterator>
 
-
 class AdvanceSearchToolBarTest : public PlainTestSuite {
   Q_OBJECT
-private slots:
+ private slots:
   void initTestCase() {
     Configuration().clear();
+    QWidget* parent = new (std::nothrow) QWidget;
+    QVERIFY(parent != nullptr);
+    ON_SCOPE_EXIT {
+      delete parent;
+      parent = nullptr;
+    };
+    auto* pTmp = new (std::nothrow) AdvanceSearchToolBar{"advance search toolbar", parent};
+    QVERIFY(pTmp != nullptr);
   }
 
-  void cleanupTestCase() {
-    Configuration().clear();
-  }
+  void cleanupTestCase() { Configuration().clear(); }
 
   void test_initial_State() {
     // precondition
@@ -48,12 +52,20 @@ private slots:
     QVERIFY(advanceSearchToolbar.m_searchCaseButton != nullptr);
     QVERIFY(advanceSearchToolbar._searchProxyModel == nullptr);
     QVERIFY(advanceSearchToolbar._searchSourceModel == nullptr);
+    // should not crash down
+    {
+      advanceSearchToolbar.onSearchTextChanges();
+      advanceSearchToolbar.onSearchEnterAndApply();
+      advanceSearchToolbar.BindSearchProxyModel(nullptr);
+      advanceSearchToolbar.BindSearchSourceModel(nullptr);
+      advanceSearchToolbar.onSearchModeChanged(SearchTools::SearchModeE::FILE_CONTENTS);
+    }
 
     AdvanceSearchModel searchSourceModel;
     SearchProxyModel searchProxyModel;
     searchProxyModel.setSourceModel(&searchSourceModel);
-
     advanceSearchToolbar.BindSearchAllModel(&searchProxyModel, &searchSourceModel);
+    advanceSearchToolbar.BindSearchAllModel(&searchProxyModel, &searchSourceModel);  // rebind
     // all initial state should set ok right after bind
     QCOMPARE(searchSourceModel.m_filters, QDir::Filter::Files);
     QCOMPARE(searchSourceModel.m_iteratorFlags, QDirIterator::IteratorFlag::Subdirectories);
@@ -62,6 +74,12 @@ private slots:
     QCOMPARE(searchProxyModel.m_searchMode, SearchTools::SearchModeE::FILE_CONTENTS);
     QCOMPARE(searchProxyModel.m_nameFiltersCaseSensitive, Qt::CaseSensitivity::CaseSensitive);
     QCOMPARE(searchProxyModel.m_fileContentsCaseSensitive, Qt::CaseSensitivity::CaseSensitive);
+
+    advanceSearchToolbar.onSearchModeChanged(SearchTools::SearchModeE::NORMAL);
+    QCOMPARE(searchProxyModel.m_searchMode, SearchTools::SearchModeE::NORMAL);
+    advanceSearchToolbar.onSearchModeChanged(SearchTools::SearchModeE::FILE_CONTENTS);
+    QCOMPARE(searchProxyModel.m_searchMode, SearchTools::SearchModeE::FILE_CONTENTS);
+    advanceSearchToolbar.onSearchEnterAndApply();
   }
 
   void comboBoxCompleter_case_sensitive() {
@@ -72,7 +90,7 @@ private slots:
     QCOMPARE(advanceSearchToolbar.m_searchModeBtn->isEnabled(), true);
 
     QList<QComboBox*> comboxList{advanceSearchToolbar.m_nameFilterCB, advanceSearchToolbar.m_contentCB};
-    for (QComboBox* comboBox: comboxList) {
+    for (QComboBox* comboBox : comboxList) {
       comboBox->setCurrentText("abc");
       QTest::keyClick(comboBox, Qt::Key_Enter);
 
@@ -80,7 +98,7 @@ private slots:
       QTest::keyClick(comboBox, Qt::Key_Enter);
 
       QCOMPARE(comboBox->currentText(), QString("ABC"));
-      QCOMPARE(comboBox->itemText(0), QString("ABC")); // AtTop
+      QCOMPARE(comboBox->itemText(0), QString("ABC"));  // AtTop
       QCOMPARE(comboBox->itemText(1), QString("abc"));
     }
   }

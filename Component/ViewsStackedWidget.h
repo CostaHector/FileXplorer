@@ -142,8 +142,6 @@ class ViewsStackedWidget : public QStackedWidget {
   }
   void SetVt(ViewTypeTool::ViewType newVt) {
     mVt = newVt;
-    if (_logger != nullptr) {
-    }
   }
 
  private:

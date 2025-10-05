@@ -40,6 +40,7 @@ file(GLOB SOURCES
     Tools/Classify/*.cpp
     Tools/FileDescriptor/*.cpp
     Tools/Json/*.cpp
+    Tools/PasswordTable/*.cpp
     View/*.cpp
     View/DupVideos/*.cpp
     *.cpp
@@ -67,6 +68,7 @@ set(SRV_HEADER_PATH
     Tools/Classify
     Tools/FileDescriptor
     Tools/Json
+    Tools/PasswordTable
     View
     View/DupVideos
     ./
@@ -88,6 +90,7 @@ file(GLOB HEADERS
     Tools/Classify/*.h
     Tools/FileDescriptor/*.h
     Tools/Json/*.h
+    Tools/PasswordTable/*.h
     View/*.h
     View/DupVideos/*.h
     *.h
@@ -160,6 +163,10 @@ if(WIN32)
         "${ffmpegpath}/lib/swscale.lib")
 elseif(UNIX AND NOT APPLE)  # Linux
     target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
+
+    find_package(OpenSSL REQUIRED)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 endif()
 
 target_compile_definitions(${PROJECT_NAME}

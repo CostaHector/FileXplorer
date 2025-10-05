@@ -17,20 +17,13 @@ class SplitToolButton : public QToolButton {
   Q_OBJECT
 public:
   explicit SplitToolButton(QWidget *parent = nullptr);
-  QString GetShortcutString(const QString& topAction, const QString& bottomAction) const;
+  QString GetToolTipString(const QString& topAction, const QString& bottomAction) const;
 signals:
   void topHalfClicked();
   void bottomHalfClicked();
 
 protected:
-  void mousePressEvent(QMouseEvent *event) override {
-    if (event->y() < height() / 2) {
-      emit topHalfClicked();
-    } else {
-      emit bottomHalfClicked();
-    }
-    QToolButton::mousePressEvent(event);
-  }
+  void mousePressEvent(QMouseEvent *event) override;
 private:
   QShortcut* topShortcut{nullptr}, *bottomShortcut{nullptr};
 };

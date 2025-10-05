@@ -1,6 +1,5 @@
 #include "StateLabel.h"
 #include "Logger.h"
-#include <QPixmap>
 
 QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status) {
   if (status < StateLabel::BEGIN || status >= StateLabel::BUTT) {

@@ -2,6 +2,7 @@
 #define STATELABEL_H
 
 #include <QLabel>
+#include <QPixmap>
 
 class StateLabel : public QLabel {
  public:
@@ -21,4 +22,5 @@ class StateLabel : public QLabel {
   LABEL_STATUS_E m_currentState{SAVED};
 };
 
+QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status);
 #endif  // STATELABEL_H

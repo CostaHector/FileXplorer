@@ -24,6 +24,8 @@ class ScenePageControlTest : public PlainTestSuite {
     QVERIFY(spc._THE_BACK_PAGE != nullptr);
     QVERIFY(spc.mPageDimensionLE != nullptr);
     QVERIFY(spc.mPageIndexInputLE != nullptr);
+    spc.onPagesCountChanged(99);
+    QCOMPARE(spc.mPagesCount, 99);
   }
 
   void navigation_front_back_ok() {
