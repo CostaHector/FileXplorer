@@ -361,6 +361,20 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE(PathTool::GetDotFileExtension("AAA.5"), ".5");
     QCOMPARE(PathTool::GetDotFileExtension("AAA.51"), ".51");
   }
+
+  void absolutePath_ok() {
+    QCOMPARE(PathTool::absolutePath("C:/home/"), "C:/");
+    QCOMPARE(PathTool::absolutePath("C:/home"), "C:/");
+    QCOMPARE(PathTool::absolutePath("C:/"), "");
+    QCOMPARE(PathTool::absolutePath("D:/home/"), "D:/");
+    QCOMPARE(PathTool::absolutePath("D:/home"), "D:/");
+    QCOMPARE(PathTool::absolutePath("D:/"), "");
+    QCOMPARE(PathTool::absolutePath("/home/to/"), "/home");
+    QCOMPARE(PathTool::absolutePath("/home/to"), "/home");
+    QCOMPARE(PathTool::absolutePath("/home/"), "/");
+    QCOMPARE(PathTool::absolutePath("/home"), "/");
+    QCOMPARE(PathTool::absolutePath("/"), "");
+  }
 };
 
 #include "PathToolTest.moc"

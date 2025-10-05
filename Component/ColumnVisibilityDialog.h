@@ -6,6 +6,7 @@
 #include <QFormLayout>
 #include <QDialogButtonBox>
 #include <QToolButton>
+#include <QAction>
 
 class ColumnVisibilityDialog : public QDialog {
 public:
@@ -24,6 +25,10 @@ private:
   QFormLayout *m_layout{nullptr};
   QDialogButtonBox* buttons{nullptr};
   QList<QCheckBox*> m_checkboxes;
+  QAction *mSelectAll{nullptr};
+  QAction *mDeselectAll{nullptr};
+  QAction *mInvertSelect{nullptr};
+  QAction *mRevertChange{nullptr};
 };
 
 #endif // COLUMNVISIBILITYDIALOG_H

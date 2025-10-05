@@ -263,7 +263,7 @@ class MovieDBViewTest : public PlainTestSuite {
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Name).toString(), "Morata.mp4");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Name).toString(), "Michael Fassbender.mp4");
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Duration).toInt(), 5000);
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Duration).toInt(), -1);  // invalid video file return -1
+      QVERIFY(dbModel.record(1).value(MOVIE_TABLE::Duration).toInt() <= 0);  // invalid video file linux return -1, windows return 0
     }
 
     auto& inst = g_dbAct();

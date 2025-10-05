@@ -106,15 +106,3 @@ void Archiver::onSilderChangedUpdateImageScaledIndex(int scaleIndex) {
   setSliderValueAndLabelDisplayText(scaleIndex); // to qslider and label display
   m_thumbnailViewer->refreshPixmapSize(); // to label let it refresh
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  Archiver afPreview;
-  afPreview.show();
-  afPreview.operator()("E:/Brazzers/Page400/Page400/Page400.qz");
-  return a.exec();
-}
-#endif

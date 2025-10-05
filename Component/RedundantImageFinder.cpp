@@ -37,7 +37,7 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
   mFindImgByTb->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
   mFindImgByTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
 
-  auto* pSpacer = GetSpacerWidget(this, Qt::Orientation::Horizontal);
+  auto* pSpacer = SpacerWidget::GetSpacerWidget(this, Qt::Orientation::Horizontal);
   CHECK_NULLPTR_RETURN_VOID(pSpacer);
 
   m_toolBar = new (std::nothrow) QToolBar{"Redun toolbar", this};

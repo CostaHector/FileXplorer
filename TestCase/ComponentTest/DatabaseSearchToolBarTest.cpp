@@ -25,14 +25,16 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
   }
 
   void MovieDBSearchToolBar_emitsignal_ok() {
+    Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, "InexistTableName");
+
     QWidget parent;
     MovieDBSearchToolBar mdbSearchBar{"MovieSearchToolBarTest", &parent};
-
     QVERIFY(mdbSearchBar.m_whereCB != nullptr);
     QVERIFY(mdbSearchBar.m_whereCB->count() >= 2);  // at least 2 where clause
-
     auto* lineEdit = mdbSearchBar.m_whereCB->lineEdit();
     QVERIFY(lineEdit != nullptr);
+    mdbSearchBar.InitCurrentIndex();
+    QVERIFY(mdbSearchBar.GetCurrentTableName() != "InexistTableName");
 
     QSignalSpy whereClauseChangedSpy(&mdbSearchBar, &MovieDBSearchToolBar::whereClauseChanged);
     lineEdit->setText("New where Clause return pressed");
@@ -67,9 +69,17 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
     MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(true, "Disk_GUID");
     QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), "Disk_GUID");  // drop current text table by default
 
-    QStringList invalidGuids{"xxx_invalid_guid", "yyy_invalid_guid", "zzz_invalid_guid"};
-    mdbSearchBar.InitTables(invalidGuids);
-    QCOMPARE(mdbSearchBar.m_tablesCB->count(), 3);  // the former 1 table name in combobox will be cleared
+    QStringList validTableNames{"_mnt_DISKS_DD2", "C__home_DISKS_DD2"};
+    mdbSearchBar.InitTables(validTableNames);
+    QCOMPARE(mdbSearchBar.m_tablesCB->count(), validTableNames.size());  // the former 1 table name in combobox will be cleared
+    mdbSearchBar.m_tablesCB->setCurrentText("_mnt_DISKS_DD2");
+    QCOMPARE(mdbSearchBar.GetMovieTableMountPath(), "/mnt/DISKS/DD2");
+    mdbSearchBar.m_tablesCB->setCurrentText("C__home_DISKS_DD2");
+    QCOMPARE(mdbSearchBar.GetMovieTableMountPath(), "C:/home/DISKS/DD2");
+
+    Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, "_mnt_DISKS_DD2");
+    mdbSearchBar.InitCurrentIndex();
+    QCOMPARE(mdbSearchBar.GetCurrentTableName(), "_mnt_DISKS_DD2");
   }
 
   void CastDatabaseSearchToolBar_emitSignal_ok() {
@@ -83,12 +93,25 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
     QVERIFY(lineEdit != nullptr);
 
     QSignalSpy whereClauseChangedSpy(&mCastSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged);
-    lineEdit->setText("New where Cast Clause return pressed");
+    mCastSearchBar.SetWhereClause("New where Cast Clause return pressed");
+    QCOMPARE(lineEdit->text(), "New where Cast Clause return pressed");
     emit lineEdit->returnPressed();
     QCOMPARE(whereClauseChangedSpy.count(), 1);
-    QList<QVariant> whereClauseParams = whereClauseChangedSpy.back();
-    QCOMPARE(whereClauseParams.size(), 1);
-    QCOMPARE(whereClauseParams[0].toString(), "New where Cast Clause return pressed");
+    QList<QVariant> whereClauseParams1 = whereClauseChangedSpy.back();
+    QCOMPARE(whereClauseParams1.size(), 1);
+    QCOMPARE(whereClauseParams1[0].toString(), "New where Cast Clause return pressed");
+
+    mCastSearchBar.onQuickWhereClause();
+    QCOMPARE(whereClauseChangedSpy.count(), 2);
+    QVERIFY(mCastSearchBar.m_quickWhereClause != nullptr);
+
+    mCastSearchBar.m_quickWhereClause->m_whereLineEdit->setText("Chris Evans");
+    mCastSearchBar.onQuickWhereClause();
+    QCOMPARE(whereClauseChangedSpy.count(), 3);
+    QCOMPARE(lineEdit->text(), "Chris Evans");
+    QList<QVariant> whereClauseParams3 = whereClauseChangedSpy.back();
+    QCOMPARE(whereClauseParams3.size(), 1);
+    QCOMPARE(whereClauseParams3[0].toString(), "Chris Evans");
   }
 };
 

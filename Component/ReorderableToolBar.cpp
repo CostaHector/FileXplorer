@@ -76,10 +76,12 @@ void ReorderableToolBar::addDraggableAction(QAction* pAct) {
 }
 
 void ReorderableToolBar::dragMoveEvent(QDragMoveEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+#ifdef RUNNING_UNIT_TESTS
+  QObject* source = mSourceObject;
+#else
   QObject* source = event->source();
-  if (!IsSourceValid(source, this)) {
-    return;
-  }
+#endif
   const QPoint& pos{event->pos()};
   static const auto orien{orientation()};
   const int dropPos{GetDropPos(orien, pos)};
@@ -108,12 +110,14 @@ void ReorderableToolBar::dragMoveEvent(QDragMoveEvent* event) {
 }
 
 void ReorderableToolBar::dragEnterEvent(QDragEnterEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (event->mimeData()->hasText()) {
     event->acceptProposedAction();
   }
 }
 
 void ReorderableToolBar::dropEvent(QDropEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
 #ifdef RUNNING_UNIT_TESTS
   QObject* source = mSourceObject;
 #else

@@ -7,22 +7,32 @@
 
 class ColumnVisibilityDialogTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   ColumnVisibilityDialogTest() : PlainTestSuite{} {
     fprintf(stdout, "ColumnVisibilityDialogTest object[%d] created\n", objectCnt++);
     std::fflush(stdout);
   }
+
   ~ColumnVisibilityDialogTest() {
-    if (dialog != nullptr) delete dialog;
+    if (dialog != nullptr)
+      delete dialog;
     dialog = nullptr;
   }
-private slots:
+ private slots:
   // constuctor, initTestCase, {{init, test_XXX,cleanup}_i}, cleanupTestCase, destructor
   void initTestCase() {
-    // so follows can be moved to constructor if ColumnVisibilityDialogTest inst is not global variable(because of widget must create after QApplication)
+    // so follows can be moved to constructor if ColumnVisibilityDialogTest inst is not global variable(because of widget must create after
+    // QApplication)
     const QStringList headers{"Name", "Age", "Score"};
     dialog = new (std::nothrow) ColumnVisibilityDialog(headers, initSwitches, "TestDialog");
     QVERIFY(dialog != nullptr);
+  }
+
+  void cleanupTestCase() {
+    if (dialog != nullptr) {
+      delete dialog;
+    }
+    dialog = nullptr;
   }
 
   void test_switches_count_less_then_columns() {
@@ -85,22 +95,25 @@ private slots:
 
     dialog->toggleAllCheckboxes();
     QCOMPARE(dialog->getSwitches(), QString("100"));
+
+    emit dialog->mSelectAll->triggered();
+    emit dialog->mDeselectAll->triggered();
+    emit dialog->mInvertSelect->triggered();
+    emit dialog->mRevertChange->triggered();
+
+    dialog->showEvent(nullptr);
+    QShowEvent defaultShowEvent;
+    dialog->showEvent(&defaultShowEvent);
+    dialog->close();
   }
 
-  void cleanupTestCase() {
-    if (dialog != nullptr) {
-      delete dialog;
-    }
-    dialog = nullptr;
-  }
-
-private:
-  ColumnVisibilityDialog* dialog {nullptr};
+ private:
+  ColumnVisibilityDialog* dialog{nullptr};
   static const QString initSwitches;
   static int objectCnt;
 };
 int ColumnVisibilityDialogTest::objectCnt{0};
-const QString ColumnVisibilityDialogTest::initSwitches{"10111"}; // 初始开关：冗余最后两列
+const QString ColumnVisibilityDialogTest::initSwitches{"10111"};  // 初始开关：冗余最后两列
 
 #include "ColumnVisibilityDialogTest.moc"
 REGISTER_TEST(ColumnVisibilityDialogTest, false)

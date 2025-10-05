@@ -159,20 +159,3 @@ void PropertiesWindow::subscribe() {
   connect(g_propertiesWindowAct().SHOW_FILES_MD5, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
 }
 
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  // PropertiesWindow propertiesWindow({__FILE__});
-  PropertiesWindow propertiesWindow;
-  propertiesWindow.show();
-  //  propertiesWindow({QFileInfo(__FILE__).absolutePath()});
-  propertiesWindow({"E:/P/Leaked And Loaded/After taking 12 loads, Gage thanks his with a hot suck - XVIDEOS.COM.ts",
-                    "E:/P/Leaked And Loaded/Billy Santoro adds load number 6 to Gage's welcome to DC - XVIDEOS.COM.ts",
-                    "E:/P/Leaked And Loaded/Gage Billy Santoro is pretty sensitive after his foreskin removal surgery - XVIDEOS.COM.ts"});
-  a.exec();
-  return 0;
-}
-#endif

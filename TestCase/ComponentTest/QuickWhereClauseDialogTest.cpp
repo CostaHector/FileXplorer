@@ -34,6 +34,7 @@ private slots:
   void init() {
     QVERIFY(dialog != nullptr);
     dialog->ClearLineEditsListText();
+    dialog->sizeHint();
   }
 
   void testConditionGeneration() {

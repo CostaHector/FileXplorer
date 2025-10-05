@@ -5,21 +5,21 @@
 #include <QAction>
 #include <QMenu>
 
-ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers,
-                                               const QString& initSwitches,
-                                               const QString& name,
-                                               QWidget* parent) :
-  QDialog{parent}
-{
+ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers, const QString& initSwitches, const QString& name, QWidget* parent)
+    : QDialog{parent} {
   if (initSwitches.size() < headers.size()) {
     LOG_W("headers count[%d] out of switches count[%d] bound", headers.size(), headers.size());
     return;
   }
 
-  QAction *mSelectAll{new (std::nothrow) QAction{QIcon(":img/SELECT_ALL"), "All", this}};
-  QAction *mDeselectAll{new (std::nothrow) QAction{QIcon(":img/SELECT_NONE"), "None", this}};
-  QAction *mInvertSelect{new (std::nothrow) QAction{QIcon(":img/SELECT_INVERT"), "Invert", this}};
-  QAction *mRevertChange{new (std::nothrow) QAction{QIcon(":img/REVERT"), "Revert", this}};
+  mSelectAll = new (std::nothrow) QAction{QIcon(":img/SELECT_ALL"), "All", this};
+  CHECK_NULLPTR_RETURN_VOID(mSelectAll);
+  mDeselectAll = new (std::nothrow) QAction{QIcon(":img/SELECT_NONE"), "None", this};
+  CHECK_NULLPTR_RETURN_VOID(mDeselectAll);
+  mInvertSelect = new (std::nothrow) QAction{QIcon(":img/SELECT_INVERT"), "Invert", this};
+  CHECK_NULLPTR_RETURN_VOID(mInvertSelect);
+  mRevertChange = new (std::nothrow) QAction{QIcon(":img/REVERT"), "Revert", this};
+  CHECK_NULLPTR_RETURN_VOID(mRevertChange);
 
   QMenu* mSelectMenu{new (std::nothrow) QMenu{"Select Menu", this}};
   CHECK_NULLPTR_RETURN_VOID(mSelectMenu)
@@ -43,7 +43,6 @@ ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers,
   CHECK_NULLPTR_RETURN_VOID(m_layout)
   m_layout->addWidget(mSelectToolButton);
 
-
   m_layout->addRow("ID", new QLabel{"Column Name", this});
   m_checkboxes.reserve(headers.size());
   for (int i = 0; i < headers.size(); ++i) {
@@ -57,32 +56,31 @@ ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers,
 
   connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-  connect(mSelectAll, &QAction::triggered, this, [this](){ setAllCheckboxes(true); });
-  connect(mDeselectAll, &QAction::triggered, this, [this](){ setAllCheckboxes(false); });
+  connect(mSelectAll, &QAction::triggered, this, [this]() { setAllCheckboxes(true); });
+  connect(mDeselectAll, &QAction::triggered, this, [this]() { setAllCheckboxes(false); });
   connect(mInvertSelect, &QAction::triggered, this, &ColumnVisibilityDialog::toggleAllCheckboxes);
-  connect(mRevertChange, &QAction::triggered, this, [this, initSwitches](){revertCheckboxes(initSwitches);});
+  connect(mRevertChange, &QAction::triggered, this, [this, initSwitches]() { revertCheckboxes(initSwitches); });
 
   setMinimumWidth(400);
   setWindowIcon(QIcon(":img/COLUMN_VISIBILITY"));
   setWindowTitle(QString{"Column Visibility[%1]"}.arg(name));
 }
 
-void ColumnVisibilityDialog::setAllCheckboxes(bool checked)
-{
+void ColumnVisibilityDialog::setAllCheckboxes(bool checked) {
   for (auto* checkbox : m_checkboxes) {
-    if (checkbox != nullptr) checkbox->setChecked(checked);
+    if (checkbox != nullptr)
+      checkbox->setChecked(checked);
   }
 }
 
-void ColumnVisibilityDialog::toggleAllCheckboxes()
-{
+void ColumnVisibilityDialog::toggleAllCheckboxes() {
   for (auto* checkbox : m_checkboxes) {
-    if (checkbox != nullptr) checkbox->setChecked(!checkbox->isChecked());
+    if (checkbox != nullptr)
+      checkbox->setChecked(!checkbox->isChecked());
   }
 }
 
-void ColumnVisibilityDialog::revertCheckboxes(const QString& initSwitches)
-{
+void ColumnVisibilityDialog::revertCheckboxes(const QString& initSwitches) {
   for (int i = 0; i < m_checkboxes.size(); ++i) {
     if (m_checkboxes[i] != nullptr) {
       m_checkboxes[i]->setChecked(initSwitches[i] == '1');
@@ -100,6 +98,7 @@ QString ColumnVisibilityDialog::getSwitches() const {
 }
 
 void ColumnVisibilityDialog::showEvent(QShowEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QDialog::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }

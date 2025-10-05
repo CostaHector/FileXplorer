@@ -46,6 +46,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Tools/Classify/*.cpp
     ${PARENT_DIR}/Tools/FileDescriptor/*.cpp
     ${PARENT_DIR}/Tools/Json/*.cpp
+    ${PARENT_DIR}/Tools/PasswordTable/*.cpp
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/View/DupVideos/*.cpp
     # test only module sources
@@ -61,6 +62,7 @@ file(GLOB SOURCES
     pubTestTool/*.cpp
     RenameTest/*.cpp
     ToolsTest/*.cpp
+    ToolsTest/PasswordTableTest/*.cpp
     ViewTest/*.cpp
     ViewTest/DupVideosTest/*.cpp
 )
@@ -87,6 +89,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Classify
     ${PARENT_DIR}/Tools/FileDescriptor
     ${PARENT_DIR}/Tools/Json
+    ${PARENT_DIR}/Tools/PasswordTable
     ${PARENT_DIR}/View
     ${PARENT_DIR}/View/DupVideos
     ./
@@ -109,6 +112,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/Classify/*.h
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
+    ${PARENT_DIR}/Tools/PasswordTable/*.h
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/View/DupVideos/*.h
     pubTestTool/*.h
@@ -166,6 +170,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
+
 if(WIN32)
     find_library(DWMWAPI_LIBRARY dwmapi)
     find_library(SHLWAPI_LIBRARY shlwapi)
@@ -179,8 +184,38 @@ if(WIN32)
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
         "${ffmpegpath}/lib/swscale.lib")
+
+    # OpenSSL configuration for Windows
+    # Set OpenSSL paths
+    set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+
+    # Include directories
+    include_directories("${OPENSSL_ROOT_DIR}/include")
+
+    # Library paths
+    link_directories("${OPENSSL_ROOT_DIR}/lib")
+    link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
+
+    # Debug vs Release library selection
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
+        )
+        message(STATUS "Linking with OpenSSL Debug libraries")
+    else()
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
+        )
+        message(STATUS "Linking with OpenSSL Release libraries")
+    endif()
 elseif(UNIX AND NOT APPLE)  # Linux
     target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
+
+    find_package(OpenSSL REQUIRED)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 endif()
 
 target_compile_definitions(${PROJECT_NAME}

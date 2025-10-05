@@ -43,8 +43,13 @@ class AddressELineEdit : public QStackedWidget {
     return PathActionHelper::PathFromActions(m_pathActionsTB->actions(), cursorAtAction, true);
   }
 
-  inline QString dirname() const {  //
-    return PathTool::absolutePath(pathFromLineEdit());
+  inline QString parentPath(bool* isSame=nullptr) const {  //
+    const QString& curPath = pathFromLineEdit();
+    const QString& parPath = PathTool::absolutePath(curPath);
+    if (isSame != nullptr) {
+      *isSame = (parPath == curPath);
+    }
+    return parPath;
   }
 
   void onPathActionTriggered(const QAction* cursorAt);

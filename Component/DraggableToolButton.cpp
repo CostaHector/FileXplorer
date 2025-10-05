@@ -1,6 +1,7 @@
 ﻿#include "DraggableToolButton.h"
 #include "PublicMacro.h"
 #include "ViewHelper.h"
+#include <QAction>
 #include <QMimeData>
 #include <QDrag>
 #include <QPainter>
@@ -12,6 +13,7 @@ DraggableToolButton::DraggableToolButton(QWidget* parent)  //
 }
 
 void DraggableToolButton::mousePressEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (event->button() & Qt::LeftButton) {
     mDragStartPosition = event->pos();
   }
@@ -19,6 +21,7 @@ void DraggableToolButton::mousePressEvent(QMouseEvent* event) {
 }
 
 void DraggableToolButton::mouseMoveEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (!(event->buttons().testFlag(Qt::LeftButton)))
     return;
   if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST_MIN) {
@@ -42,7 +45,12 @@ void DraggableToolButton::mouseMoveEvent(QMouseEvent* event) {
 
   pDrag->setPixmap(transparent_pixmap);
   pDrag->setHotSpot(event->pos());
+#ifdef RUNNING_UNIT_TESTS
+  setEnabled(true);
+#else
   if (pDrag->exec(Qt::MoveAction) == Qt::IgnoreAction) {
     setEnabled(true);
   }
+#endif
+  event->accept();
 }

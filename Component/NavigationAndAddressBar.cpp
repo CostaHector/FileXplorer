@@ -4,7 +4,7 @@
 #include "PublicMacro.h"
 #include <QKeySequence>
 
-SplitToolButton::SplitToolButton(QWidget *parent) : QToolButton{parent} {
+SplitToolButton::SplitToolButton(QWidget* parent) : QToolButton{parent} {
   topShortcut = new (std::nothrow) QShortcut{QKeySequence{Qt::ControlModifier | Qt::Key_BracketLeft}, this};
   CHECK_NULLPTR_RETURN_VOID(topShortcut)
   connect(topShortcut, &QShortcut::activated, this, &SplitToolButton::topHalfClicked);
@@ -14,14 +14,33 @@ SplitToolButton::SplitToolButton(QWidget *parent) : QToolButton{parent} {
   connect(bottomShortcut, &QShortcut::activated, this, &SplitToolButton::bottomHalfClicked);
 }
 
-QString SplitToolButton::GetShortcutString(const QString& topAction, const QString& bottomAction) const {
-  return QString{"%1(%2)<br/>%3(%4)"}//
-      .arg(topAction).arg(topShortcut->key().toString())//
-      .arg(bottomAction).arg(bottomShortcut->key().toString());
+QString SplitToolButton::GetToolTipString(const QString& topAction, const QString& bottomAction) const {
+  QString shortCutString;
+  shortCutString.reserve(topAction.size() + bottomAction.size() + 30);
+  shortCutString += topAction;
+  shortCutString += "(";
+  shortCutString += topShortcut->key().toString();
+  shortCutString += ")";
+  shortCutString += "<br/>";
+  shortCutString += bottomAction;
+  shortCutString += "(";
+  shortCutString += bottomShortcut->key().toString();
+  shortCutString += ")";
+  return shortCutString;
 }
 
-NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)//
-  : QToolBar{title, parent} {
+void SplitToolButton::mousePressEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  if (event->y() < height() / 2) {
+    emit topHalfClicked();
+  } else {
+    emit bottomHalfClicked();
+  }
+  event->accept();
+}
+
+NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)  //
+    : QToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent)
 
   m_addressLine = new (std::nothrow) AddressELineEdit{this};
@@ -45,7 +64,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   CHECK_NULLPTR_RETURN_VOID(mLastNextFolderTb)
   mLastNextFolderTb->setIcon(QIcon(":img/NEXT_OR_LAST_FOLDER"));
   QString iteratorToolbuttonTooltip = "Into ";
-  iteratorToolbuttonTooltip += mLastNextFolderTb->GetShortcutString("Last folder", "Next Folder");
+  iteratorToolbuttonTooltip += mLastNextFolderTb->GetToolTipString("Last folder", "Next Folder");
   mLastNextFolderTb->setToolTip(iteratorToolbuttonTooltip);
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
@@ -64,7 +83,10 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   InitEventWhenViewChanged();
 }
 
-void NavigationAndAddressBar::BindFileSystemViewCallback(T_IntoNewPath IntoNewPath, T_on_searchTextChanged on_searchTextChanged, T_on_searchEnterKey on_searchEnterKey, QFileSystemModel* _fsm) {
+void NavigationAndAddressBar::BindFileSystemViewCallback(T_IntoNewPath IntoNewPath,
+                                                         T_on_searchTextChanged on_searchTextChanged,
+                                                         T_on_searchEnterKey on_searchEnterKey,
+                                                         QFileSystemModel* _fsm) {
   m_IntoNewPath = IntoNewPath;
   m_on_searchTextChanged = on_searchTextChanged;
   m_on_searchEnterKey = on_searchEnterKey;
@@ -95,7 +117,7 @@ bool NavigationAndAddressBar::onBackward() {
     LOG_D("[Skip] backward paths pool empty");
     return false;
   }
-  bool backwardRes{true};
+  bool backwardRes{false};
   const QString& undoPath = m_pathRD.onUndoPath();
   if (m_IntoNewPath != nullptr) {
     backwardRes = m_IntoNewPath(undoPath, false, false);
@@ -108,7 +130,7 @@ bool NavigationAndAddressBar::onForward() {
     LOG_D("[Skip] Forward paths pool empty");
     return false;
   }
-  bool forwardRes{true};
+  bool forwardRes{false};
   const QString& redoPath = m_pathRD.onRedoPath();
   if (m_IntoNewPath != nullptr) {
     forwardRes = m_IntoNewPath(redoPath, false, false);
@@ -117,10 +139,15 @@ bool NavigationAndAddressBar::onForward() {
 }
 
 bool NavigationAndAddressBar::onUpTo() {
-  const QString& upPath = m_addressLine->dirname();
-  bool upRes{true};
+  bool isParentSameAsCurrent = false;
+  const QString& parentPath = m_addressLine->parentPath(&isParentSameAsCurrent);
+  if (isParentSameAsCurrent) {
+    return false;
+  }
+
+  bool upRes{false};
   if (m_IntoNewPath != nullptr) {
-    upRes = m_IntoNewPath(upPath, true, false);
+    upRes = m_IntoNewPath(parentPath, true, false);
   }
   return upRes;
 }
@@ -139,7 +166,7 @@ bool NavigationAndAddressBar::onIteratorToAnotherFolderCore(bool isNext) {
     return false;
   }
   const QString& newPath = parentPath + '/' + newDir;
-  bool intoRes{true};
+  bool intoRes{false};
   if (m_IntoNewPath != nullptr) {
     intoRes = m_IntoNewPath(newPath, true, false);
   } else {
@@ -168,47 +195,3 @@ bool NavigationAndAddressBar::onSearchTextReturnPressed() {
   }
   return true;
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-
-class IntoNewPathMockClass {
-public:
-  bool IntoNewPath(QString a, bool b, bool c) {
-    LOG_D("IntoNewPath: %s, %d, %d", qPrintable(a), b, c);
-    return true;
-  }
-  bool on_searchTextChanged(QString a) {
-    LOG_D("on_searchTextChanged: %s, %d", qPrintable(a));
-    return true;
-  }
-  bool on_searchEnterKey(QString a) {
-    LOG_D("on_searchEnterKey: %s, %d", qPrintable(a));
-    return true;
-  }
-};
-
-int main(int argc, char* argv[]) {
-  using std::placeholders::_1;
-  using std::placeholders::_2;
-  using std::placeholders::_3;
-
-  QApplication a(argc, argv);
-
-  IntoNewPathMockClass printer;
-  auto f1 = std::bind(&IntoNewPathMockClass::IntoNewPath, &printer, _1, _2, _3);
-  auto f2 = std::bind(&IntoNewPathMockClass::on_searchTextChanged, &printer, _1);
-  auto f3 = std::bind(&IntoNewPathMockClass::on_searchEnterKey, &printer, _1);
-
-  NavigationAndAddressBar lo(f1, f2, f3);
-
-  QWidget w;
-  w.setLayour(lo);
-
-  w.show();
-  w.winAddress->UpdatePath(QFileInfo(__FILE__).absolutePath());
-  return a.exec();
-  ;
-}
-#endif

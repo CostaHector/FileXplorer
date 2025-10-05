@@ -20,7 +20,7 @@ void RenameWidget_PrependParentFolderName::InitExtraCommonVariable() {
 QToolBar* RenameWidget_PrependParentFolderName::InitControlTB() {
   QToolBar* prependTb{new (std::nothrow) QToolBar{"PrependParentFolderNamesTB", this}};
   CHECK_NULLPTR_RETURN_NULLPTR(prependTb);
-  auto* pSpacer = GetSpacerWidget(prependTb, Qt::Orientation::Horizontal);
+  auto* pSpacer = SpacerWidget::GetSpacerWidget(prependTb, Qt::Orientation::Horizontal);
   prependTb->addWidget(pSpacer);
   prependTb->addWidget(m_recursiveCB);
   return prependTb;

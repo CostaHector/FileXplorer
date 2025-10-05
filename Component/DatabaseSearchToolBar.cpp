@@ -50,9 +50,14 @@ void DatabaseSearchToolBar::onQuickWhereClause() {
     m_quickWhereClause = new (std::nothrow) QuickWhereClauseDialog{this};
     CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
   }
-  auto retCode = m_quickWhereClause->exec();
-  if (retCode != QDialog::DialogCode::Accepted) {
-    LOG_INFO_P("[Skip] User cancel quick where clause", "dialogCode:%d", retCode);
+  int dlgRetCode = QDialog::DialogCode::Rejected;
+#ifdef RUNNING_UNIT_TESTS
+  dlgRetCode = QDialog::DialogCode::Accepted;
+#else
+  dlgRetCode = m_quickWhereClause->exec();
+#endif
+  if (dlgRetCode != QDialog::DialogCode::Accepted) {
+    LOG_INFO_P("[Skip] User cancel quick where clause", "dialogCode:%d", dlgRetCode);
     return;
   }
   const QString& whereClause{m_quickWhereClause->GetWhereString()};

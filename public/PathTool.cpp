@@ -41,26 +41,31 @@ QString sysPath(QString fullPath) {
 QString normPath(QString fullPath) {
   return fullPath.replace('\\', '/');
 }
-QString absolutePath(const QString& fullPath) {
-  // "C:/A/" => "C:/" => ""
-  // same as "C:/A"
-  // "/home/to/" => "/home" => "/" => ""
-  // same as "/home/to"
-  if (fullPath.isEmpty()) {
-    return fullPath;
+QString absolutePath(QString input) {
+  const int n = input.size();
+  if (n == 0) {
+    return input;
   }
-  QString noSingleTrailingSlash = fullPath;
-  if (fullPath.size() > 1 && fullPath.back() == '/') {
-    noSingleTrailingSlash.chop(1);
+  if (n > 2 && input[n - 2] == ':' && input[n - 1] == '/') {
+    // any path endsWith(":/") return "". e.g.
+    // "C:/", "D:/", "E:/"
+    return "";
   }
-#ifdef _WIN32
-  int end = noSingleTrailingSlash.lastIndexOf('/');
-  return end == -1 ? "" : noSingleTrailingSlash.left(end);
-#else
-  int end = noSingleTrailingSlash.lastIndexOf('/');
-  return end == 0 or end == -1 ? "/" : noSingleTrailingSlash.left(end);
-
-#endif
+  if (n >= 1 && input[n - 1] == '/') {
+    // remove trailing. e.g.
+    // "C:/home/" => "C:/home"
+    // "/home/" => "/home"
+    // "/" => ""
+    input.chop(1);
+  }
+  const int lastIndexOfSlash = input.lastIndexOf('/');
+  // /home => /. for unix rootPath lastIndexOfSlash == 0
+  // C:/home => C:/. for windows driver lastIndexOfSlash >= 1 and [lastIndexOfSlash-1]=':'
+  // home/to => plain path
+  const int parentPathEndIndex{(lastIndexOfSlash == 0 || (lastIndexOfSlash >= 1 && input[lastIndexOfSlash - 1] == ':'))  //
+                                   ? lastIndexOfSlash + 1
+                                   : lastIndexOfSlash};
+  return input.left(parentPathEndIndex);
 }
 QString relativePath(const QString& fullPath, const int rootpathLen) {
   return fullPath.mid(rootpathLen + 1);

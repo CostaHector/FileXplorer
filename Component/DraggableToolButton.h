@@ -2,12 +2,11 @@
 #define DRAGGABLETOOLBUTTON_H
 
 #include <QToolButton>
-#include <QAction>
 #include <QMouseEvent>
 
 class DraggableToolButton : public QToolButton {
  public:
-  DraggableToolButton(QWidget* parent = nullptr);
+  explicit DraggableToolButton(QWidget* parent = nullptr);
 
  protected:
   void mousePressEvent(QMouseEvent* event) override;
