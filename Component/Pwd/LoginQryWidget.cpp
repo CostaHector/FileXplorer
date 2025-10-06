@@ -60,20 +60,20 @@ QWidget* LoginQryWidget::CreateLoginPage() {
   QLineEdit* inputKeyLe = CreateKeyLineEdit();
   inputKeyLe->setPlaceholderText("Enter AES decryption key");
 
-  QCheckBox* remeberKey = new (std::nothrow) QCheckBox{"Remember key"};
+  QCheckBox* remeberKey = new (std::nothrow) QCheckBox{"Remember key", this};
   CHECK_NULLPTR_RETURN_NULLPTR(remeberKey);
   remeberKey->setTristate(false);
   const int rememberState = Configuration().value("REMEMBER_KEY", Qt::CheckState::Unchecked).toInt();
   remeberKey->setCheckState(rememberState == Qt::CheckState::Checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
-  QCheckBox* autoLogin = new (std::nothrow) QCheckBox{"Log in automatically"};
+  QCheckBox* autoLogin = new (std::nothrow) QCheckBox{"Log in automatically", this};
   CHECK_NULLPTR_RETURN_NULLPTR(autoLogin);
   autoLogin->setTristate(false);
   const int autoLoginState = Configuration().value("LOG_IN_AUTOMATICALLY", Qt::CheckState::Unchecked).toInt();
   autoLogin->setCheckState(autoLoginState == Qt::CheckState::Checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
   QLabel* messageLabel = CreateMessageLabel();
 
-  QDialogButtonBox* loginButtonBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  QDialogButtonBox* loginButtonBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   CHECK_NULLPTR_RETURN_NULLPTR(loginButtonBox);
   loginButtonBox->button(QDialogButtonBox::Ok)->setText("Login");
 
@@ -84,7 +84,7 @@ QWidget* LoginQryWidget::CreateLoginPage() {
   loginLo->addWidget(messageLabel);
   loginLo->addWidget(loginButtonBox);
 
-  QWidget* loginWid = new (std::nothrow) QWidget;
+  QWidget* loginWid = new (std::nothrow) QWidget{this};
   CHECK_NULLPTR_RETURN_NULLPTR(loginWid);
   loginWid->setLayout(loginLo);
 
@@ -93,12 +93,12 @@ QWidget* LoginQryWidget::CreateLoginPage() {
     accept();
   });
 
-  connect(remeberKey, &QCheckBox::stateChanged, this, [inputKeyLe](int state) {
+  const CredentialUtil& credUtil = CredentialUtil::GetInst();
+  connect(remeberKey, &QCheckBox::stateChanged, this, [inputKeyLe, credUtil](int state) {
     Configuration().setValue("REMEMBER_KEY", state);
-    const CredentialUtil& credUtil = CredentialUtil::GetInst();
     if (state == Qt::Checked && !inputKeyLe->text().isEmpty()) {
       if (!credUtil.savePassword("PASSWORD_MANAGER_AES_KEY", inputKeyLe->text())) {
-        LOG_WARN_NP("Failed to save password", "Credential Manager");
+        LOG_WARN_P("Failed to save password", "Credential Manager[%s]", qPrintable(inputKeyLe->text()));
       }
     } else {
       credUtil.deletePassword("PASSWORD_MANAGER_AES_KEY");
@@ -112,25 +112,28 @@ QWidget* LoginQryWidget::CreateLoginPage() {
   connect(loginButtonBox, &QDialogButtonBox::rejected, this, &QDialog::close);
 
   if (AccountStorage::IsAccountCSVFileInexistOrEmpty()) {
-    // login widget disable, must register at first
+    // login widget disable, must register at first, invalidate password in credential needed/remember key/AutoLogin
+    credUtil.deletePassword("PASSWORD_MANAGER_AES_KEY");
+    remeberKey->setChecked(false);
+    autoLogin->setChecked(false);
+
     loginWid->setEnabled(false);
     static const QString msg{"File [" + AccountStorage::GetFullEncCsvFilePath() + "] not exists."};
     messageLabel->setText("Register first! " + msg);
     LOG_WARN_NP("Register first!", qPrintable(msg));
   } else {
     // allowed login
-    const CredentialUtil& credUtil = CredentialUtil::GetInst();
-
     if (rememberState == Qt::CheckState::Checked) {
       const QString aesKey = credUtil.readPassword("PASSWORD_MANAGER_AES_KEY");
       if (!aesKey.isEmpty()) {
         inputKeyLe->setText(aesKey);
+        mKey = aesKey;
       }
     }
-    if (autoLoginState == Qt::CheckState::Checked) {
+    if (autoLoginState == Qt::CheckState::Checked && !mKey.isEmpty()) { // empty key. skip right now
       static constexpr int TIMER_LENGTH_MS = 2000;  // time count down
       loginButtonBox->setEnabled(false);
-      messageLabel->setText("Auto login in " + QString::number(TIMER_LENGTH_MS / 1000) + " seconds");
+      messageLabel->setText("Auto login in " + QString::number(TIMER_LENGTH_MS) + " ms");
 
       QTimer* autoLoginTimer = new QTimer(this);
       autoLoginTimer->setInterval(TIMER_LENGTH_MS);

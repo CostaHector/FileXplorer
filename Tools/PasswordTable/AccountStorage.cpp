@@ -88,7 +88,7 @@ bool AccountStorage::LoadAccounts() {
   QString plainContents;
   bool decryptResult = SimpleAES::decrypt_GCM(encryptedContents, plainContents);
   if (!decryptResult) {
-    qCritical("Decrypt file[%s] failed! Skip load", qPrintable(encCsvFilePath));
+    LOG_C("Decrypt file[%s] failed! Skip load", qPrintable(encCsvFilePath));
     return false;
   }
   int nonEmptyLine{0};
