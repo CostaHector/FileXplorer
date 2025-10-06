@@ -38,6 +38,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/*.cpp
     ${PARENT_DIR}/Component/FolderPreview/*.cpp
     ${PARENT_DIR}/Component/RenameWidgets/*.cpp
+    ${PARENT_DIR}/Component/Pwd/*.cpp
     ${PARENT_DIR}/FileOperation/*.cpp
     ${PARENT_DIR}/Model/*.cpp
     ${PARENT_DIR}/public/*.cpp
@@ -54,6 +55,7 @@ file(GLOB SOURCES
     ActionsTest/*.cpp
     ComponentTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
+    ComponentTest/PwdTest/*.cpp
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
     JsonTest/*.cpp
@@ -80,6 +82,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component
     ${PARENT_DIR}/Component/FolderPreview
     ${PARENT_DIR}/Component/RenameWidgets
+    ${PARENT_DIR}/Component/Pwd
     ${PARENT_DIR}/FileOperation
     ${PARENT_DIR}/lib
     ${PARENT_DIR}/Model
@@ -103,6 +106,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/*.h
     ${PARENT_DIR}/Component/FolderPreview/*.h
     ${PARENT_DIR}/Component/RenameWidgets/*.h
+    ${PARENT_DIR}/Component/Pwd/*.h
     ${PARENT_DIR}/FileOperation/*.h
     ${PARENT_DIR}/lib/*.h
     ${PARENT_DIR}/Model/*.h

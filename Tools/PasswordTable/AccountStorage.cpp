@@ -37,6 +37,9 @@ QString AccountStorage::GetExportCSVRecords() const {
     fullPlainCSVContents += acc.toCsvLine();
     fullPlainCSVContents += '\n';
   }
+  if (!fullPlainCSVContents.isEmpty()) {
+    fullPlainCSVContents.chop(1); // remove extra `\n` at the back
+  }
   return fullPlainCSVContents;
 }
 

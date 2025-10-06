@@ -1,7 +1,6 @@
 #include "AccountInfo.h"
 #include <QStringList>
 #include <QRegularExpression>
-const QStringList AccountInfo::HORIZONTAL_HEAD{"Index", "Type", "Name", "Account"};
 
 QString AccountInfo::toCsvLine() const {
   // in others fields there are "comma, new line"
