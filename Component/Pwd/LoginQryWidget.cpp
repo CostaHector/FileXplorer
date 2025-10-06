@@ -10,29 +10,28 @@
 #include <QTimer>
 
 LoginQryWidget::LoginQryWidget(QWidget* parent) : QDialog{parent} {
-  setFont(StyleSheet::TEXT_EDIT_FONT);
-
-  mLoginRegisterTab = new (std::nothrow) QTabBar;
+  mLoginRegisterTab = new (std::nothrow) QTabBar{this};
   CHECK_NULLPTR_RETURN_VOID(mLoginRegisterTab);
   mLoginRegisterTab->addTab(QIcon(":/LOGIN"), ENUM_2_STR(LOGIN));
   mLoginRegisterTab->addTab(QIcon(":/REGISTER"), ENUM_2_STR(REGISTER));
   mLoginRegisterTab->setShape(QTabBar::RoundedNorth);
 
-  mLoginRegisterStkLo = new (std::nothrow) QStackedLayout;
-  CHECK_NULLPTR_RETURN_VOID(mLoginRegisterStkLo);
   mLoginWid = CreateLoginPage();
+  CHECK_NULLPTR_RETURN_VOID(mLoginWid);
   mRegisterWid = CreateRegisterPage();
+  CHECK_NULLPTR_RETURN_VOID(mRegisterWid);
+
+  mLoginRegisterStkLo = new (std::nothrow) QStackedWidget{this};
+  CHECK_NULLPTR_RETURN_VOID(mLoginRegisterStkLo);
   mLoginRegisterStkLo->insertWidget(LOGIN, mLoginWid);
   mLoginRegisterStkLo->insertWidget(REGISTER, mRegisterWid);
 
-  mMainLayout = new (std::nothrow) QVBoxLayout;
+  mMainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(mMainLayout);
   mMainLayout->addWidget(mLoginRegisterTab);
-  mMainLayout->addLayout(mLoginRegisterStkLo);
-  setLayout(mMainLayout);
+  mMainLayout->addWidget(mLoginRegisterStkLo);
 
   Subscribe();
-  setMinimumWidth(720);
   setWindowIcon(QIcon(":/AES_KEY"));
   setWindowTitle("Pre-Login Security Check");
 }
@@ -205,5 +204,5 @@ QWidget* LoginQryWidget::CreateRegisterPage() {
 }
 
 void LoginQryWidget::Subscribe() {
-  connect(mLoginRegisterTab, &QTabBar::currentChanged, mLoginRegisterStkLo, &QStackedLayout::setCurrentIndex);
+  connect(mLoginRegisterTab, &QTabBar::currentChanged, mLoginRegisterStkLo, &QStackedWidget::setCurrentIndex);
 }

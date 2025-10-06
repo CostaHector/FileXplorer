@@ -163,6 +163,32 @@ if(WIN32)
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
         "${ffmpegpath}/lib/swscale.lib")
+
+    # OpenSSL configuration for Windows
+    # Set OpenSSL paths
+    set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+
+    # Include directories
+    include_directories("${OPENSSL_ROOT_DIR}/include")
+
+    # Library paths
+    link_directories("${OPENSSL_ROOT_DIR}/lib")
+    link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
+
+    # Debug vs Release library selection
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
+        )
+        message(STATUS "Linking with OpenSSL Debug libraries")
+    else()
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
+            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
+        )
+        message(STATUS "Linking with OpenSSL Release libraries")
+    endif()
 elseif(UNIX AND NOT APPLE)  # Linux
     target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
 

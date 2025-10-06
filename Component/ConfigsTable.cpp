@@ -62,11 +62,6 @@ ConfigsTable::ConfigsTable(QWidget* parent)
 }
 
 void ConfigsTable::ReadSettings() {
-  if (Configuration().contains("CONFIGS_TABLE_GEOMETRY")) {
-    restoreGeometry(Configuration().value("CONFIGS_TABLE_GEOMETRY").toByteArray());
-  } else {
-    setGeometry(DEFAULT_GEOMETRY);
-  }
   m_alertsTable->InitTableView();
 }
 
@@ -81,7 +76,6 @@ void ConfigsTable::hideEvent(QHideEvent* event) {
 }
 
 void ConfigsTable::closeEvent(QCloseEvent* event) {
-  Configuration().setValue("CONFIGS_TABLE_GEOMETRY", saveGeometry());
   return QDialog::closeEvent(event);
 }
 

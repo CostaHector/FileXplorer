@@ -13,6 +13,7 @@
 #include "TorrentsManagerWidget.h"
 #include "ConfigsTable.h"
 #include "Archiver.h"
+#include "LoginQryWidget.h"
 
 class PopupWidgetManagerTest : public PlainTestSuite {
   Q_OBJECT
@@ -89,6 +90,7 @@ class PopupWidgetManagerTest : public PlainTestSuite {
     PopupWidgetManagerTestTemplate<TorrentsManagerWidget>("TorrentsManagerWidget", true);
     PopupWidgetManagerTestTemplate<ConfigsTable>("ConfigsTable", true);
     PopupWidgetManagerTestTemplate<Archiver>("Archiver", true);
+    PopupWidgetManagerTestTemplate<LoginQryWidget>("LoginQryWidget", true);
   }
 
   void not_checkable_popup_widget_geometry_state_ok() {  //

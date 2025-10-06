@@ -7,7 +7,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QStackedLayout>
+#include <QStackedWidget>
 #include <QVBoxLayout>
 
 #ifdef RUNNING_UNIT_TESTS
@@ -44,7 +44,7 @@ private:
 
   QWidget *mLoginWid{nullptr}, *mRegisterWid{nullptr};
   QTabBar *mLoginRegisterTab{nullptr};
-  QStackedLayout *mLoginRegisterStkLo{nullptr};
+  QStackedWidget *mLoginRegisterStkLo{nullptr};
 
   QVBoxLayout *mMainLayout{nullptr};
 

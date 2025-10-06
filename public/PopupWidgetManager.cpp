@@ -98,23 +98,23 @@ void PopupWidgetManager<WidgetType>::createWidget() {
   }
 
   if (m_widget == nullptr) {
-    LOG_E("Failed to create widget of type: %s", typeid(WidgetType).name());
+    LOG_E("Failed to create widget of type: %s", qPrintable(m_geometryCfgKey));
     if (m_action->isCheckable()) {
       m_action->setChecked(false);
     }
     return;
   }
 
-  // window flag must ahead of event filter; setWindowFlags must ahead of setWindowFlag
-  m_widget->setWindowFlags(m_widget->windowFlags() | Qt::Window);
-  m_widget->setWindowModality(Qt::NonModal);
-  // m_widget->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
-
   if (Configuration().contains(m_geometryCfgKey)) {
     m_widget->restoreGeometry(Configuration().value(m_geometryCfgKey).toByteArray());
   } else {
     m_widget->setGeometry(DEFAULT_GEOMETRY);
   }
+
+  // window flag must ahead of event filter; setWindowFlags must ahead of setWindowFlag
+  m_widget->setWindowFlags(m_widget->windowFlags() | Qt::Window);
+  m_widget->setWindowModality(Qt::NonModal);
+  // m_widget->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
 
   m_widget->installEventFilter(this);
   m_widget->setAttribute(Qt::WA_DeleteOnClose, false);
