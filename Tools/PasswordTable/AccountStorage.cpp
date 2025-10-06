@@ -1,11 +1,12 @@
 #include "AccountStorage.h"
+#include "SimpleAES.h"
+#include "PublicVariable.h"
+#include "PublicTool.h"
+#include "Logger.h"
 #include <QFile>
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QDir>
-#include "SimpleAES.h"
-#include "PublicVariable.h"
-#include "PublicTool.h"
 
 const QString& AccountStorage::GetFullEncCsvFilePath() {
   static constexpr char ENC_CSV_FILE[]{"accounts.csv"};
@@ -25,7 +26,7 @@ const QString& AccountStorage::GetFullPlainCsvFilePath() {
   return absPlainFilePath;
 }
 
-const bool AccountStorage::IsAccountCSVFileInExistOrEmpty() {
+const bool AccountStorage::IsAccountCSVFileInexistOrEmpty() {
   QFile csvFile{GetFullEncCsvFilePath()};
   return !csvFile.exists() || csvFile.size() == 0;
 }
@@ -36,6 +37,9 @@ QString AccountStorage::GetExportCSVRecords() const {
   for (const AccountInfo& acc : mAccounts) {
     fullPlainCSVContents += acc.toCsvLine();
     fullPlainCSVContents += '\n';
+  }
+  if (!fullPlainCSVContents.isEmpty()) {
+    fullPlainCSVContents.chop(1); // remove extra `\n` at the back
   }
   return fullPlainCSVContents;
 }
@@ -71,11 +75,14 @@ bool AccountStorage::SaveAccounts(bool bEncrypt) const {
 
 // when start on, data is from plain or encrypted is determined
 bool AccountStorage::LoadAccounts() {
+  if (IsAccountCSVFileInexistOrEmpty()) {
+    return true; // first time used
+  }
   const QString encCsvFilePath = GetFullEncCsvFilePath();
   bool bReadOk{false};
   QString encryptedContents = FileTool::TextReader(encCsvFilePath, &bReadOk);
   if (!bReadOk) {
-    qWarning("Open file[%s] to read failed", qPrintable(encCsvFilePath));
+    LOG_W("Open file to read failed", qPrintable(encCsvFilePath));
     return false;
   }
   QString plainContents;

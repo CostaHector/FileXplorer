@@ -332,4 +332,38 @@
     <file alias="LOADING">Notification/LOADING.gif</file>
     <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
     </qresource>
+
+    <qresource prefix="/">
+        <file alias="PASSWORD_MANAGER">pwd/password_manager.ico</file>
+        <file alias="PASSWORD_TABLE">pwd/PASSWORD_TABLE.png</file>
+        <file alias="AES_KEY">pwd/aes_key.png</file>
+        <file alias="WARNING">pwd/warning.png</file>
+        <file alias="LOGIN">pwd/LOGIN.svg</file>
+        <file alias="REGISTER">pwd/REGISTER.svg</file>
+        <file alias="OPEN_DIRECTORY">pwd/OPEN_DIRECTORY.svg</file>
+    </qresource>
+    <qresource prefix="/bankcard">
+        <file alias="AMEX">pwd/amex.png</file>
+        <file alias="MASTERCARD">pwd/mastercard.png</file>
+        <file alias="UNIONPAY">pwd/unionpay.png</file>
+        <file alias="VISA">pwd/visa.png</file>
+        <file alias="MASTER_CARD_TEMPLATE">pwd/MASTER_CARD_TEMPLATE.svg</file>
+        <file alias="UNION_CARD_TEMPLATE">pwd/UNION_CARD_TEMPLATE.svg</file>
+        <file alias="VISA_CARD_TEMPLATE">pwd/VISA_CARD_TEMPLATE.svg</file>
+    </qresource>
+    <qresource prefix="/edit">
+        <file alias="DELETE_ROWS">pwd/DELETE_ROWS.svg</file>
+        <file alias="INSERT_ROW_BEFORE">pwd/INSERT_ROW_BEFORE.svg</file>
+        <file alias="APPEND_ROWS">pwd/APPEND_ROWS.svg</file>
+        <file alias="INSERT_ROWS">pwd/INSERT_ROWS.svg</file>
+        <file alias="LOAD_FROM_INPUT">pwd/LOAD_FROM_INPUT.svg</file>
+        <file alias="SAVE_CHANGES">pwd/SAVE_CHANGES.svg</file>
+        <file alias="SEARCH_BY">pwd/SEARCH_BY.svg</file>
+        <file alias="SHOW_CSV_CONTENTS">pwd/SHOW_CSV_CONTENTS.svg</file>
+        <file alias="EXPORT">pwd/EXPORT.svg</file>
+    </qresource>
+    <qresource prefix="/img">
+        <file alias="SAVED">pwd/SUCCESS.svg</file>
+        <file alias="NOT_SAVED">pwd/FAILURE.svg</file>
+    </qresource>
 </RCC>

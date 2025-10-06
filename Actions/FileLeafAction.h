@@ -9,6 +9,7 @@ class FileLeafActions : public QObject {
   explicit FileLeafActions(QObject* parent = nullptr);
 
   QAction* _SETTINGS{nullptr};
+  QAction* _PWD_BOOK{nullptr};
   QAction* _ABOUT_FILE_EXPLORER{nullptr};
   QAction* _LANUAGE{nullptr};
 

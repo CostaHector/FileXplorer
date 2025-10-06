@@ -14,6 +14,7 @@ public:
 private:
   PopupWidgetManager<TorrentsManagerWidget>* mTorrentsManager{nullptr};
   PopupWidgetManager<ConfigsTable>* m_settingSys{nullptr};
+  PopupWidgetManager<LoginQryWidget>* m_pwdEntrance{nullptr};
 };
 
 #endif  // EXTRAEVENTS_H

@@ -27,7 +27,7 @@ class AccountStorageTest : public PlainTestSuite {
 
     AccountStorageMock::GetFullEncCsvFilePathMock() = mEncCsvFilePath;
     AccountStorageMock::GetFullPlainCsvFilePathMock() = mPlainCsvFilePath;
-    QVERIFY(AccountStorage::IsAccountCSVFileInExistOrEmpty());
+    QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
 
     // 初始化 AES 密钥
     SimpleAES::setKey("TestKey1234567890");  // 16字符密钥
@@ -44,9 +44,11 @@ class AccountStorageTest : public PlainTestSuite {
   void test_account_storage_operations() {
     // 1. 创建初始账户数据
     AccountStorage storage;
-    QVector<AccountInfo> initialAccounts = {{"Email", "Personal", "user@example.com", "pass123", "Additional info"},
-                                            {"Social", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline"},
-                                            {"Bank", "Savings", "bank_user", "bank_pass", ""}};
+    QVector<AccountInfo> initialAccounts{
+        {"Email", "Personal", "user@example.com", "pass123", "Additional info"},         //
+        {"Social", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline"},  //
+        {"Bank", "Savings", "bank_user", "bank_pass", ""}                                //
+    };
     storage.mAccounts = initialAccounts;
 
     // 2. 验证初始状态
@@ -71,8 +73,7 @@ class AccountStorageTest : public PlainTestSuite {
     QCOMPARE((*pLoadedStorage)[0].typeStr, "Email");
     QCOMPARE((*pLoadedStorage)[1].accountStr, "fb_user");
     QCOMPARE((*pLoadedStorage)[2].othersStr, "");
-    (*pLoadedStorage)[-999]; // will not crash down
-
+    (*pLoadedStorage)[-999];  // will not crash down
 
     // 4. 测试保存和加载（明文）
     QVERIFY(storage.SaveAccounts(false));  // 明文保存
@@ -108,7 +109,7 @@ class AccountStorageTest : public PlainTestSuite {
     QCOMPARE(storage.size(), 4);
     QCOMPARE(storage[3].typeStr, "");  // 新账户为空
 
-    std::set<int> rowsToRemove = {1, 3};  // 删除第1和第3行
+    std::set<int> rowsToRemove = {1, 3, 999};  // 删除第1和第3行, 999行为无效行
     int removedCount = storage.RemoveIndexes(rowsToRemove);
     QCOMPARE(removedCount, 2);
     QCOMPARE(storage.size(), 2);
@@ -135,6 +136,15 @@ class AccountStorageTest : public PlainTestSuite {
     QString exportContent = storage.GetExportCSVRecords();
     QVERIFY(exportContent.contains("Email,Personal,user@example.com,pass123,Additional info"));
     QVERIFY(exportContent.contains("Bank,Savings,bank_user,bank_pass,"));
+
+    {
+      // insert at -1 =>insert at front
+      QVERIFY(storage.InsertNRows(-1, 1));
+      QCOMPARE(storage.size(), 5);
+      // insert at 999 => insert at back
+      QVERIFY(storage.InsertNRows(999, 1));
+      QCOMPARE(storage.size(), 6);
+    }
 
     // 11. 测试从字符串加载账户
     int nonEmptyLines = 0;

@@ -1,9 +1,27 @@
 #include "SimpleAES.h"
 
-QString SimpleAES::KEY = "";
+constexpr int SimpleAES::MAX_KEY_BYTES_LENGTH;
+unsigned char SimpleAES::KEY_BYTES_UNSIGNED_ARRAY[]{0};
 bool SimpleAES::B_USE_RANDOM_IV = true;  // all 0 is only for debug
 
-bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) {
+void SimpleAES::setKey(const QString& userInputKey) {
+  QString keyString;
+  if (userInputKey.length() > 16) {
+    keyString = userInputKey.left(16);
+  } else if (userInputKey.length() < 16) {
+    int zerosToAdd = 16 - userInputKey.length();
+    keyString = userInputKey + QString(zerosToAdd, '0');  // 补全16-length个'0'
+  } else {
+    keyString = userInputKey;
+  }
+
+  QByteArray keyBytes = keyString.toUtf8();
+  const int validLen = static_cast<size_t>(std::min(keyBytes.size(), MAX_KEY_BYTES_LENGTH));
+  memcpy(KEY_BYTES_UNSIGNED_ARRAY, keyBytes.constData(), validLen);
+  KEY_BYTES_UNSIGNED_ARRAY[validLen] = '\0';
+}
+
+bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encryptedResult) {
   encryptedResult.clear();
   if (input.isEmpty()) {
     return true;  // 空串无需解密
@@ -20,15 +38,14 @@ bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) {
 
   // 2. 初始化加密器
   EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-  EVP_EncryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, reinterpret_cast<const unsigned char*>(KEY.toUtf8().constData()), iv);
+  EVP_EncryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, KEY_BYTES_UNSIGNED_ARRAY, iv);
 
   // 3. 加密数据
-  QByteArray plaintext = input.toUtf8();
-  int ciphertext_len = plaintext.size() + EVP_CIPHER_block_size(EVP_aes_128_gcm());
+  int ciphertext_len = input.size() + EVP_CIPHER_block_size(EVP_aes_128_gcm());
   unsigned char* ciphertext = new unsigned char[ciphertext_len];
 
   int len, total_len = 0;
-  EVP_EncryptUpdate(ctx, ciphertext, &len, reinterpret_cast<const unsigned char*>(plaintext.constData()), plaintext.size());
+  EVP_EncryptUpdate(ctx, ciphertext, &len, reinterpret_cast<const unsigned char*>(input.constData()), input.size());
   total_len = len;
 
   // 4. 最终加密（生成标签）
@@ -40,27 +57,35 @@ bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) {
   EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, tag);
 
   // 6. 组合 IV + 密文 + 标签
-  QByteArray combined;
-  combined.append(reinterpret_cast<char*>(iv), 12);
-  combined.append(reinterpret_cast<char*>(ciphertext), total_len);
-  combined.append(reinterpret_cast<char*>(tag), 16);
-
-  // 7. Base64编码（关键修改：保留填充符）
-  encryptedResult = combined.toBase64(QByteArray::KeepTrailingEquals);  // 保留末尾填充符号
+  encryptedResult.append(reinterpret_cast<char*>(iv), 12);
+  encryptedResult.append(reinterpret_cast<char*>(ciphertext), total_len);
+  encryptedResult.append(reinterpret_cast<char*>(tag), 16);
 
   delete[] ciphertext;
   EVP_CIPHER_CTX_free(ctx);
   return true;
 }
 
-bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) {
+bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) {
+  QByteArray inputByteArray = input.toUtf8();
+  QByteArray outputByteArray;
+  if (!encrypt_GCM_ByteArray(inputByteArray, outputByteArray)) {
+    return false;
+  }
+  if (!outputByteArray.isEmpty()) {
+    encryptedResult = outputByteArray.toBase64(QByteArray::KeepTrailingEquals);  // 保留末尾填充符号
+  }
+  return true;
+}
+
+bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decryptedResult) {
   decryptedResult.clear();
   if (input.isEmpty()) {
     return true;  // 无需解密
   }
 
   // 1. Base64 解码
-  QByteArray combined = QByteArray::fromBase64(input.toUtf8());
+  QByteArray combined = QByteArray::fromBase64(input);
   if (combined.size() < 12 + 16) {  // 至少包含 IV (12) + 标签 (16)
     qWarning("Ciphertext too short: %d bytes (min 28 required)", combined.size());
     return false;
@@ -82,10 +107,7 @@ bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) {
     return false;
   }
 
-  QByteArray keyBytes = KEY.toUtf8();
-  const unsigned char* key = reinterpret_cast<const unsigned char*>(keyBytes.constData());
-
-  if (EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, key, iv) != 1) {
+  if (EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, KEY_BYTES_UNSIGNED_ARRAY, iv) != 1) {
     qWarning("Failed to initialize decryption");
     EVP_CIPHER_CTX_free(ctx);
     return false;
@@ -118,7 +140,8 @@ bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) {
   total_len += len;
 
   // 6. 转换为QString
-  decryptedResult = QString::fromUtf8(reinterpret_cast<const char*>(plaintext), total_len);
+  QByteArray tmpBA(reinterpret_cast<const char*>(plaintext), total_len);
+  decryptedResult.swap(tmpBA);
 
   // 7. 清理资源
   delete[] plaintext;
@@ -130,5 +153,18 @@ bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) {
     return false;
   }
 
+  return true;
+}
+
+bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) {
+  QByteArray inputBa = input.toUtf8();
+  QByteArray outputBa;
+  decryptedResult.clear();
+  if (!decrypt_GCM_ByteArray(inputBa, outputBa)) {
+    return false;
+  }
+  if (!outputBa.isEmpty()) {
+    decryptedResult = QString::fromUtf8(outputBa);
+  }
   return true;
 }
