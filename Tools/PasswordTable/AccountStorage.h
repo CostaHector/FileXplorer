@@ -25,7 +25,7 @@ struct AccountStorage {
  public:
   static const QString& GetFullEncCsvFilePath();
   static const QString& GetFullPlainCsvFilePath();
-  static const bool IsAccountCSVFileInExistOrEmpty();
+  static const bool IsAccountCSVFileInexistOrEmpty();
 
   // plain Utf8 -> list<Account>
   static QVector<AccountInfo> GetAccountsFromPlainString(const QString& contents, int* pNonEmptyLine = nullptr);

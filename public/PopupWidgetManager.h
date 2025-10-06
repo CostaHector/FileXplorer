@@ -41,6 +41,7 @@ class RedundantImageFinder;
 class TorrentsManagerWidget;
 class ConfigsTable;
 class Archiver;
+class LoginQryWidget;
 
 extern template class PopupWidgetManager<QWidget>;
 extern template class PopupWidgetManager<DevicesDrivesTV>;
@@ -49,4 +50,5 @@ extern template class PopupWidgetManager<RedundantImageFinder>;
 extern template class PopupWidgetManager<TorrentsManagerWidget>;
 extern template class PopupWidgetManager<ConfigsTable>;
 extern template class PopupWidgetManager<Archiver>;
+extern template class PopupWidgetManager<LoginQryWidget>;
 #endif // POPUPWIDGETMANAGER_H

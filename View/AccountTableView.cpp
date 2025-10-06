@@ -37,7 +37,7 @@ int AccountTableView::GetRowsCountFromUserInput(const QString& method) {
   userInputCount = QInputDialog::getInt(this, method + " Rows Count", "number", 1, 0, 255, 1, &isOk);
 #endif
   if (!isOk) {
-    qWarning("User input row count[%d] invalid", userInputCount);
+    LOG_W("User input invalid row count[%d]", userInputCount);
     return 0;
   }
   return userInputCount;
@@ -66,7 +66,7 @@ void AccountTableView::Subscribe() {
 
 int AccountTableView::RemoveSelectedRows() {
   if (!selectionModel()->hasSelection()) {
-    qDebug("Nothing were selected. skip remove.");
+    LOG_INFO_NP("Nothing were selected", "skip remove");
     return 0;
   }
   const int nSelectedRowsCnt = selectionModel()->selectedRows().size();
@@ -86,7 +86,7 @@ int AccountTableView::RemoveSelectedRows() {
   deleteCfmBtn = deleteConfirm.exec();
 #endif
   if (deleteCfmBtn != QMessageBox::StandardButton::Ok) {
-    LOG_INFO_NP("User cancel delete. skip remove records.", "return");
+    LOG_INFO_NP("User cancel delete", "Skip remove records");
     return 0;
   }
   std::set<int> selectedRows;
@@ -106,17 +106,17 @@ int AccountTableView::RemoveSelectedRows() {
 void AccountTableView::InsertNRows(int rowCnt) {
   const QModelIndex verHeaderIndex = verticalHeader()->currentIndex();
   if (!verHeaderIndex.isValid()) {
-    qDebug("no row selected");
+    LOG_WARN_NP("No row selected", "Select a row at first");
     return;
   }
   int insertIndexBefore = verHeaderIndex.row();
-  qDebug("insert at index %d with %d row", insertIndexBefore, rowCnt);
+  LOG_INFO_P("Insert at", "Index %d with %d row(s)", insertIndexBefore, rowCnt);
   mPwdModel->InsertNRows(insertIndexBefore, rowCnt);
 }
 
 void AccountTableView::AppendNRows(int rowCnt) {
   int lastRowIndex = verticalHeader()->count();
-  qDebug("insert at index %d with %d row", lastRowIndex, rowCnt);
+  LOG_INFO_P("Append", "Index %d with %d row(s)", lastRowIndex, rowCnt);
   mPwdModel->InsertNRows(lastRowIndex, rowCnt);
 }
 
@@ -147,7 +147,7 @@ bool AccountTableView::ExportPlainCSV() {
   exportButton->setIcon(QIcon(":/edit/EXPORT"));
   confirmDialog.setDefaultButton(QMessageBox::StandardButton::Cancel);
 
-  QPushButton* pBtn{nullptr};
+  QAbstractButton* pBtn{nullptr};
 #ifdef RUNNING_UNIT_TESTS
   pBtn = AccountTableViewMock::cfmExportPlainCSVMock() ? exportButton : nullptr;
 #else
@@ -155,7 +155,7 @@ bool AccountTableView::ExportPlainCSV() {
   pBtn = confirmDialog.clickedButton();
 #endif
   if (pBtn != exportButton) {
-    LOG_INFO_NP("User canceled plaintext export", "return");
+    LOG_INFO_NP("User cancelled plaintext export", "return");
     return false;
   }
   const QString timeStr = QDateTime::currentDateTime().toString();

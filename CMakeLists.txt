@@ -32,6 +32,7 @@ file(GLOB SOURCES
     Component/*.cpp
     Component/FolderPreview/*.cpp
     Component/RenameWidgets/*.cpp
+    Component/Pwd/*.cpp
     FileOperation/*.cpp
     Model/*.cpp
     public/*.cpp
@@ -59,6 +60,7 @@ set(SRV_HEADER_PATH
     Component
     Component/FolderPreview
     Component/RenameWidgets
+    Component/Pwd
     FileOperation
     lib
     Model
@@ -167,6 +169,11 @@ elseif(UNIX AND NOT APPLE)  # Linux
     find_package(OpenSSL REQUIRED)
     target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
+    include_directories(${LIBSECRET_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBSECRET_LIBRARIES})
 endif()
 
 target_compile_definitions(${PROJECT_NAME}

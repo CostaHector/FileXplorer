@@ -17,15 +17,6 @@ class PasswordManagerTest : public PlainTestSuite {
   TDir tDir;
   QString mEncCsvFilePath{tDir.itemPath("accounts_test.csv")};
 
-  void prepareTestData(AccountStorage& storage) {
-    QVector<AccountInfo> initialAccounts{
-        {"Email", "Henry", "Henry@example.com", "pass123", "Additional info"},                 //
-        {"Social Media", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline"},  //
-        {"Bank", "Chris", "bank_user_chris", "bank_pass", ""},                                 //
-    };
-    storage.mAccounts = initialAccounts;
-  }
-
  private slots:
   void initTestCase() {
     QVERIFY(tDir.IsValid());  //
@@ -38,7 +29,7 @@ class PasswordManagerTest : public PlainTestSuite {
     OpenSSL_add_all_algorithms();
 
     AccountStorageMock::GetFullEncCsvFilePathMock() = mEncCsvFilePath;
-    QVERIFY(AccountStorage::IsAccountCSVFileInExistOrEmpty());
+    QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
 
     // 初始化 AES 密钥
     SimpleAES::setKey("TestKey1234567890");  // 16字符密钥
@@ -110,6 +101,7 @@ class PasswordManagerTest : public PlainTestSuite {
       QCOMPARE(pwdMgr.mCsvInputDialog->tempAccounts.size(), 2);
       emit pwdMgr.mCsvInputDialog->pOkBtn->clicked();
       QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);  // 2 row exist
+      QVERIFY(pwdMgr.mCsvInputDialog->close());
     }
 
     {
@@ -135,6 +127,7 @@ class PasswordManagerTest : public PlainTestSuite {
       pwdMgr.mPlainCSVContentWid->setPlainText("");  // clear it manually
       pwdMgr.ShowPlainCSVContents();                 // show correct contents ok
       QCOMPARE(pwdMgr.mPlainCSVContentWid->toPlainText(), expectPlainCsvContentShow);
+      QVERIFY(pwdMgr.mPlainCSVContentWid->close());
     }
 
     {  // signal currentRowChanged connect correct

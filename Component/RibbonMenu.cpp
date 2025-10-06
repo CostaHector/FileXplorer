@@ -110,6 +110,7 @@ QToolBar* RibbonMenu::LeafFile() const {
   CHECK_NULLPTR_RETURN_NULLPTR(systemContextMenuTb);
 
   leafFileWid->addAction(fileLeafInst._SETTINGS);
+  leafFileWid->addAction(fileLeafInst._PWD_BOOK);
   leafFileWid->addAction(fileLeafInst._ABOUT_FILE_EXPLORER);
   leafFileWid->addAction(fileLeafInst._LANUAGE);
   leafFileWid->addWidget(systemContextMenuTb);

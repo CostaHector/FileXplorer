@@ -27,7 +27,7 @@ class AccountStorageTest : public PlainTestSuite {
 
     AccountStorageMock::GetFullEncCsvFilePathMock() = mEncCsvFilePath;
     AccountStorageMock::GetFullPlainCsvFilePathMock() = mPlainCsvFilePath;
-    QVERIFY(AccountStorage::IsAccountCSVFileInExistOrEmpty());
+    QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
 
     // 初始化 AES 密钥
     SimpleAES::setKey("TestKey1234567890");  // 16字符密钥
