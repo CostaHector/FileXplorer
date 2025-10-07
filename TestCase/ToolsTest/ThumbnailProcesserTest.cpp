@@ -2,6 +2,7 @@
 #include <QtTest>
 #include "PlainTestSuite.h"
 #include "TDir.h"
+#include "Logger.h"
 #include "OnScopeExit.h"
 #include "BeginToExposePrivateMember.h"
 #include "ThumbnailProcesser.h"
@@ -14,7 +15,7 @@ bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int heigh
   QImage image{width, height, QImage::Format_ARGB32}; // ARGB32
   image.fill(Qt::white); // RGBA：255,255,255,255
   if (!image.save(filePath)) {
-    qWarning("Failed to save image to file[%s]", qPrintable(filePath));
+    LOG_W("Failed to save image to file[%s]", qPrintable(filePath));
     return false;
   }
   return true;

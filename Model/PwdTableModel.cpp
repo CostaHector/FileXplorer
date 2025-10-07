@@ -91,26 +91,26 @@ Qt::ItemFlags PwdTableModel::flags(const QModelIndex& index) const {
 
 int PwdTableModel::RemoveIndexes(const std::set<int>& rows) {
   if (rows.empty()) {
-    qDebug("no row need to be delete");
+    LOG_D("no row need to be delete");
     return 0;
   }
   const int cnt = rows.size();
   const int before = rowCount();
   if (cnt > before) {
-    qWarning("delete row(s) count %d > total count %d", cnt, before);
+    LOG_W("delete row(s) count %d > total count %d", cnt, before);
     return -1;
   }
   const int after = before - cnt;
   RowsCountBeginChange(before, after);
   int rowsDeleted = mAccountsList.RemoveIndexes(rows);
-  qDebug("%d/%d row(s) were deleted", rowsDeleted, cnt);
+  LOG_D("%d/%d row(s) were deleted", rowsDeleted, cnt);
   RowsCountEndChange();
   return rowsDeleted;
 }
 
 int PwdTableModel::InsertNRows(int indexBefore, int cnt) {
   if (cnt == 0) {
-    qDebug("No row to insert");
+    LOG_D("No row to insert");
     return 0;
   }
   if (indexBefore < 0) {
@@ -123,7 +123,7 @@ int PwdTableModel::InsertNRows(int indexBefore, int cnt) {
   const int after = before + cnt;
   RowsCountBeginChange(before, after);
   if (!mAccountsList.InsertNRows(indexBefore, cnt)) {
-    qDebug("insert before index[%d] %d rows failed", indexBefore, cnt);
+    LOG_D("insert before index[%d] %d rows failed", indexBefore, cnt);
     return -1;
   }
   RowsCountEndChange();
@@ -133,7 +133,7 @@ int PwdTableModel::InsertNRows(int indexBefore, int cnt) {
 int PwdTableModel::AppendAccountRecords(const QVector<AccountInfo>& tempAccounts) {
   int cnt = tempAccounts.size();
   if (cnt == 0) {
-    qDebug("No records to insert");
+    LOG_D("No records to insert");
     return 0;
   }
 
@@ -153,19 +153,19 @@ bool PwdTableModel::ExportToPlainCSV() const {
 PwdPublicVariable::SAVE_RESULT PwdTableModel::onSave(QString* detailMessage) {
   using namespace PwdPublicVariable;
   if (!IsDirty()) {
-    qDebug("Nothing changed. No need to save at all");
+    LOG_D("Nothing changed. No need to save at all");
     return SAVE_RESULT::SKIP;
   }
   QString detailMsg = mAccountsList.GetRowChangeDetailMessage();
   bool saveResult = mAccountsList.SaveAccounts(true);
   if (!saveResult) {
-    qWarning("Save record(s) failed");
+    LOG_W("Save record(s) failed");
     return SAVE_RESULT::FAILED;
   }
   if (detailMessage != nullptr) {
     *detailMessage = detailMsg;
   }
-  qDebug("Save [%s] succeed.", qPrintable(detailMsg));
+  LOG_D("Save [%s] succeed.", qPrintable(detailMsg));
   return SAVE_RESULT::OK;
 }
 

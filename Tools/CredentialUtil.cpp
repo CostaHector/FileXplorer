@@ -1,4 +1,5 @@
 #include "CredentialUtil.h"
+#include "Logger.h"
 
 const CredentialUtil& CredentialUtil::GetInst() {
 #ifdef _WIN32
@@ -12,6 +13,23 @@ const CredentialUtil& CredentialUtil::GetInst() {
   static CredentialUtil defCredUtil;
   return defCredUtil;
 #endif
+}
+
+bool CredentialUtil::savePassword(const QString& key, const QString& password) const {
+  LOG_C("Should never call me");
+  return false;
+}
+QString CredentialUtil::readPassword(const QString& key) const {
+  LOG_C("Should never call me");
+  return "";
+}
+bool CredentialUtil::deletePassword(const QString& key) const {
+  LOG_C("Should never call me");
+  return false;
+}
+bool CredentialUtil::credentialExists(const QString& key) const {
+  LOG_C("Should never call me");
+  return false;
 }
 
 #ifdef _WIN32
@@ -39,7 +57,7 @@ bool WinCredUtil::savePassword(const QString& key, const QString& password) cons
   if (credentialExists(key)) {
     // 如果已存在则先删除
     if (!CredDeleteW(wkey.c_str(), CRED_TYPE_GENERIC, 0)) {
-      qWarning("Failed to delete existing credential");
+      LOG_W("Failed to delete existing credential");
       return false;
     }
   }
@@ -93,7 +111,7 @@ bool LinuxCredUtil::savePassword(const QString& key, const QString& password) co
       );
 
   if (error) {
-    qWarning("Failed to save credential: %s", error->message);
+    LOG_E("Failed to save credential: %s", error->message);
     g_error_free(error);
     return false;
   }
@@ -111,12 +129,12 @@ QString LinuxCredUtil::readPassword(const QString& key) const {
       );
 
   if (error) {
-    qWarning("Failed to read credential: %s", error->message);
+    LOG_E("Failed to read credential: %s", error->message);
     g_error_free(error);
     return QString();
   }
 
-  if (!password) return QString();
+  if (!password) return "";
 
   QString result = QString::fromUtf8(password);
   secret_password_free(password);
@@ -134,7 +152,7 @@ bool LinuxCredUtil::deletePassword(const QString& key) const {
       );
 
   if (error) {
-    qWarning("Failed to delete credential: %s", error->message);
+    LOG_E("Failed to delete credential: %s", error->message);
     g_error_free(error);
     return false;
   }

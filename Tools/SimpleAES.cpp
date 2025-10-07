@@ -1,4 +1,5 @@
 #include "SimpleAES.h"
+#include "Logger.h"
 
 constexpr int SimpleAES::MAX_KEY_BYTES_LENGTH;
 unsigned char SimpleAES::KEY_BYTES_UNSIGNED_ARRAY[]{0};
@@ -31,7 +32,7 @@ bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encry
   unsigned char iv[12]{0};
   if (B_USE_RANDOM_IV) {
     if (RAND_bytes(iv, sizeof(iv)) != 1) {
-      qWarning("Failed to generate IV");
+      LOG_W("Failed to generate IV");
       return false;
     }
   }
@@ -87,7 +88,7 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
   // 1. Base64 解码
   QByteArray combined = QByteArray::fromBase64(input);
   if (combined.size() < 12 + 16) {  // 至少包含 IV (12) + 标签 (16)
-    qWarning("Ciphertext too short: %d bytes (min 28 required)", combined.size());
+    LOG_W("Ciphertext too short: %d bytes (min 28 required)", combined.size());
     return false;
   }
 
@@ -103,12 +104,12 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
   // 3. 初始化解密器
   EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
   if (!ctx) {
-    qWarning("Failed to create cipher context");
+    LOG_W("Failed to create cipher context");
     return false;
   }
 
   if (EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, KEY_BYTES_UNSIGNED_ARRAY, iv) != 1) {
-    qWarning("Failed to initialize decryption");
+    LOG_W("Failed to initialize decryption");
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
@@ -123,7 +124,7 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
 
   // 5.1 解密主体数据
   if (EVP_DecryptUpdate(ctx, plaintext, &len, reinterpret_cast<const unsigned char*>(ciphertext.constData()), ciphertext.size()) != 1) {
-    qWarning("Failed to decrypt data");
+    LOG_W("Failed to decrypt data");
     delete[] plaintext;
     EVP_CIPHER_CTX_free(ctx);
     return false;
@@ -132,7 +133,7 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
 
   // 5.2 验证标签（如果失败会返回0）
   if (EVP_DecryptFinal_ex(ctx, plaintext + total_len, &len) != 1) {
-    qWarning("GCM tag verification failed");
+    LOG_W("GCM tag verification failed");
     delete[] plaintext;
     EVP_CIPHER_CTX_free(ctx);
     return false;
@@ -149,7 +150,7 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
 
   // 8. 验证结果
   if (decryptedResult.isEmpty()) {
-    qWarning("Decrypted content is empty");
+    LOG_W("Decrypted content is empty");
     return false;
   }
 
