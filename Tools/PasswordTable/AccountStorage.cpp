@@ -69,7 +69,7 @@ bool AccountStorage::SaveAccounts(bool bEncrypt) const {
   }
 
   AfterSave();
-  qDebug("%d byte(s) of %d record(s) dumped into %s succced", fullPlainCSVContents.size(), size(), qPrintable(writeIntoPath));
+  LOG_D("%d byte(s) of %d record(s) dumped into %s succced", fullPlainCSVContents.size(), size(), qPrintable(writeIntoPath));
   return true;
 }
 
@@ -95,7 +95,7 @@ bool AccountStorage::LoadAccounts() {
   decltype(mAccounts) tempAccounts = GetAccountsFromPlainString(plainContents, &nonEmptyLine);
   mAccounts.swap(tempAccounts);
   // SetListModified(); here mAccounts is same as file contents, we consider it has no modification
-  qDebug("%d account record(s) was loaded from %d non empty lines", mAccounts.size(), nonEmptyLine);
+  LOG_D("%d account record(s) was loaded from %d non empty lines", mAccounts.size(), nonEmptyLine);
   return true;
 }
 
@@ -128,7 +128,7 @@ int AccountStorage::RemoveIndexes(const std::set<int>& rows) {
     }
     mAccounts.removeAt(*rit);
   }
-  qDebug("row size changed from %d->%d(given %lu row indexes)", beforeRowCnt, size(), rows.size());
+  LOG_D("row size changed from %d->%d(given %lu row indexes)", beforeRowCnt, size(), rows.size());
   const int rmvedRowCnt{beforeRowCnt - size()};
   SetListModified(rmvedRowCnt);
   return rmvedRowCnt;
@@ -136,7 +136,7 @@ int AccountStorage::RemoveIndexes(const std::set<int>& rows) {
 
 bool AccountStorage::InsertNRows(int indexBefore, int cnt) {
   if (cnt <= 0) {
-    qDebug("no row need to insert into");
+    LOG_D("no row need to insert into");
     return false;
   }
   if (indexBefore < 0) {

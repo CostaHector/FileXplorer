@@ -4,6 +4,7 @@
 #include "TDir.h"
 #include "FileDescriptor.h"
 #include "PublicTool.h"
+#include "Logger.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -90,7 +91,7 @@ class FileDescriptorTest : public PlainTestSuite {
 #else
   void test_fd_not_in_windows() {
     QCOMPARE(1, 1);
-    qWarning("Not in windows, Fd will not support");
+    LOG_W("Not in windows, Fd will not support");
   }
 #endif
 };

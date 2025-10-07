@@ -22,10 +22,58 @@ inline void clear() {
 }
 #endif
 
+class LoginWid : public QWidget {
+  Q_OBJECT
+ public:
+  explicit LoginWid(QWidget* parent = nullptr);
+
+  QString GetKey() const { return inputKeyLe->text(); }
+
+  void subscribe();
+
+  bool onRemeberKeyStateChanged(int rememberState);
+  void onAutoLoginSwitchChanged(int autoLoginState);
+
+  void InitState();
+
+  void AutoLoginTimeoutCallback();
+
+ signals:
+  void timeoutAccepted();
+
+ private:
+  QLineEdit* inputKeyLe{nullptr};
+  QCheckBox* remeberKey{nullptr};
+  QCheckBox* autoLogin{nullptr};
+  QFormLayout* loginLo{nullptr};
+  QTimer* autoLoginTimer{nullptr};
+};
+
+class RegisterWid : public QWidget {
+  Q_OBJECT
+ public:
+  explicit RegisterWid(QWidget* parent = nullptr);
+  void InitState();
+
+  QString GetKey() const { return inputKeyLe->text(); }
+
+ signals:
+  void registerAccepted();
+
+ public slots:
+  void onTryRegisterButtonClicked();
+
+ private:
+  QLineEdit* inputKeyLe{nullptr};
+  QLineEdit* inputKeyAgainLe{nullptr};
+  QFormLayout* registerLo{nullptr};
+};
+
 class LoginQryWidget : public QDialog {
+  Q_OBJECT
 public:
   explicit LoginQryWidget(QWidget *parent = nullptr);
-  QString getAESKey() const { return mKey; }
+  QString getAESKey() const;
   void Subscribe();
 
   enum TAB_TYPE {
@@ -33,21 +81,18 @@ public:
     REGISTER = 1,
   };
 
+ public slots:
+  void onOkButtonClicked();
+
 private:
-  QLineEdit *CreateKeyLineEdit() const;
-  QLabel *CreateMessageLabel() const;
-
-  QWidget *CreateLoginPage();
-  QWidget *CreateRegisterPage();
-
-  QString mKey;
-
-  QWidget *mLoginWid{nullptr}, *mRegisterWid{nullptr};
   QTabBar *mLoginRegisterTab{nullptr};
-  QStackedWidget *mLoginRegisterStkLo{nullptr};
+
+  LoginWid *mLoginWid{nullptr};
+  RegisterWid *mRegisterWid{nullptr};
+  QStackedWidget *mLoginRegisterStk{nullptr};
+
+  QDialogButtonBox* mDlgBtnBox{nullptr};
 
   QVBoxLayout *mMainLayout{nullptr};
-
-  std::function<void(void)> mAutoLoginTimeoutFunc{nullptr};
 };
 #endif

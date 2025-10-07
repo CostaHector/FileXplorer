@@ -239,7 +239,7 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
 #endif
   const QStringList& formats = native.formats();
   const QString& supportAvails = formats.join(',');
-  qWarning("Action not found. Supported Available format: %s.", qPrintable(supportAvails));
+  LOG_W("Action not found. Supported Available format: %s.", qPrintable(supportAvails));
   return Qt::DropAction::IgnoreAction;
 }
 

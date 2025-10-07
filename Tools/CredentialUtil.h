@@ -22,12 +22,12 @@ class CredentialUtil {
  public:
   static const CredentialUtil& GetInst();
   virtual ~CredentialUtil() = default;
-  virtual bool savePassword(const QString& key, const QString& password) const {return false;}
-  virtual QString readPassword(const QString& key) const {return "";}
-  virtual bool deletePassword(const QString& key) const {return false;}
+  virtual bool savePassword(const QString& key, const QString& password) const;
+  virtual QString readPassword(const QString& key) const;
+  virtual bool deletePassword(const QString& key) const;
 
  protected:
-  virtual bool credentialExists(const QString& key) const {return false;}
+  virtual bool credentialExists(const QString& key) const;
 };
 
 #ifdef _WIN32
