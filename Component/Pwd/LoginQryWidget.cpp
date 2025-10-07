@@ -5,6 +5,7 @@
 #include "PublicMacro.h"
 #include "StyleSheet.h"
 #include "MemoryKey.h"
+#include "FileLeafAction.h"
 #include <QLabel>
 #include <QPushButton>
 #include <QTimer>
@@ -203,6 +204,12 @@ LoginQryWidget::LoginQryWidget(QWidget* parent) : QDialog{parent} {
   Subscribe();
   setWindowIcon(QIcon(":/AES_KEY"));
   setWindowTitle("Pre-Login Security Check");
+}
+
+void LoginQryWidget::hideEvent(QHideEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  g_fileLeafActions()._PWD_BOOK->setChecked(false);
+  QDialog::hideEvent(event);
 }
 
 QString LoginQryWidget::getAESKey() const {

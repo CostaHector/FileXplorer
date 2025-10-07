@@ -12,7 +12,6 @@
 
 QSet<QString> CustomTableView::TABLES_SET;
 // a bunch of widget with same model should share the only one setting. e.g., HAR_TABLEVIEW
-QSet<QString> CustomTableView::SETTING_SHARING_WIDGET {"HAR_TABLEVIEW"};
 constexpr int CustomTableView::INVALID_SECTION_INDEX;
 
 CustomTableView::CustomTableView(const QString& name, QWidget* parent)
@@ -30,13 +29,8 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   m_defaultTableRowHeight{MemoryKey::TABLE_DEFAULT_SECTION_SIZE.v.toInt()},
   m_defaultTableColumnWidth{MemoryKey::TABLE_DEFAULT_COLUMN_SECTION_SIZE.v.toInt()},
   m_columnsShowSwitch{QString{50, QChar{'1'}}} {
-  if (!SETTING_SHARING_WIDGET.contains(m_name) && isNameExists(m_name)) { // not in sharing list, but name already find
-#ifdef RUNNING_UNIT_TESTS
+  if (isNameExists(m_name)) { // not in sharing list, but name already find
     LOG_D("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
-#else
-    LOG_W("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
-    return;
-#endif
   }
   TABLES_SET.insert(m_name);
   if (Configuration().contains(m_DEFAULT_SECTION_SIZE_KEY)) {
