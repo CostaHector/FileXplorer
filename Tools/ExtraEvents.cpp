@@ -39,7 +39,7 @@ void ExtraEvents::subscribe() {
 
   m_pwdEntrance = new (std::nothrow) PopupWidgetManager<LoginQryWidget>{leafInst._PWD_BOOK, pParentWidget, "PwdEntranceGeometry"};
   CHECK_NULLPTR_RETURN_VOID(m_pwdEntrance);
-  auto createPwdEntanceFunc = [](QWidget* parent) -> LoginQryWidget* {
+  auto createPwdEntranceFunc = [](QWidget* parent) -> LoginQryWidget* {
     auto* pLoginQryWidget = new (std::nothrow) LoginQryWidget{parent};
     CHECK_NULLPTR_RETURN_NULLPTR(pLoginQryWidget);
     connect(pLoginQryWidget, &LoginQryWidget::accepted, pLoginQryWidget, [pLoginQryWidget, parent]() {
@@ -52,7 +52,7 @@ void ExtraEvents::subscribe() {
     });
     return pLoginQryWidget;
   };
-  m_pwdEntrance->setWidgetCreator(createPwdEntanceFunc);
+  m_pwdEntrance->setWidgetCreator(createPwdEntranceFunc);
 
   connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::triggered, this, [pParentWidget]() {
     QMessageBox::about(pParentWidget, "FileExplorer",

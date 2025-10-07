@@ -55,6 +55,7 @@ private:
   bool on_deCompress();
   bool on_compressImgsByGroup();
   bool on_archivePreview(bool bChecked);
+  bool on_RedunImageFinder(bool bChecked);
 
   bool on_moveToTrashBin();
 

@@ -155,10 +155,10 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
   m_imgModel->RowsCountEndChange();
 }
 
-void RedundantImageFinder::operator()(const QString& folderPath) {
+bool RedundantImageFinder::operator()(const QString& folderPath) {
   if (PathTool::isRootOrEmpty(folderPath) || !QFileInfo{folderPath}.isDir()) {
     LOG_ERR_P("[Abort] Find redundant image", "Path[%s] not exists", qPrintable(folderPath));
-    return;
+    return false;
   }
   mCurrentPath = folderPath;
   using namespace DuplicateImageDetectionCriteria;
@@ -177,7 +177,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
     }
     default: {
       LOG_W("DecideBy Enum[%s] not support", DuplicateImageDetectionCriteria::c_str(decideBy));
-      break;
+      return false;
     }
   }
 
@@ -188,4 +188,5 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(mCurrentPath);
   LOG_OK_P(mCurrentPath, "%d images(s) found according to[%s]", afterRowCnt, c_str(decideBy));
+  return true;
 }

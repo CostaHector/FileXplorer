@@ -407,6 +407,7 @@ void FileExplorerEvent::subscribe() {
     m_redundantImageFinder = new (std::nothrow)
         PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "RedundantImageFinderGeometry"};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
+    connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileExplorerEvent::on_RedunImageFinder);
 
     connect(fileOpInst.SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
     connect(fileOpInst.SELECT_NONE, &QAction::triggered, this, &FileExplorerEvent::on_SelectNone);
@@ -704,6 +705,16 @@ bool FileExplorerEvent::on_archivePreview(bool bChecked) {
   Archiver* pArchiverTemp = m_archivePreview->widget();
   previewRet = pArchiverTemp->operator()(filePath);
   return previewRet;
+}
+
+bool FileExplorerEvent::on_RedunImageFinder(bool bChecked) {
+  if (!bChecked) {
+    return true;
+  }
+  const QString pth = _contentPane->getRootPath();
+  RedundantImageFinder* pRedunImgTemp = m_redundantImageFinder->widget();
+  bool finderRet = pRedunImgTemp->operator()(pth);
+  return finderRet;
 }
 
 bool FileExplorerEvent::on_moveToTrashBin() {

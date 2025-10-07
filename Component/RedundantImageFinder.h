@@ -14,7 +14,7 @@ public:
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
-  void operator()(const QString& folderPath);
+  bool operator()(const QString& folderPath);
 
   void subscribe();
 
