@@ -159,10 +159,7 @@ QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
     return {};
   }
   const QString vidAbsPath = mCurBegin[linearInd].GetVideoAbsPath(mRootPath);
-  if (vidAbsPath.isEmpty()) {
-    return {};
-  }
-  return {vidAbsPath};
+  return {vidAbsPath}; // may return an inexist video
 }
 
 std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const {

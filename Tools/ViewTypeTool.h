@@ -38,7 +38,7 @@ typedef int ViewTypeMaskInt;
 namespace ViewTypeUtils {
 constexpr ViewTypeMaskInt FS_VIEWS_MASK {(1 << (int)ViewType::LIST) | (1 << (int)ViewType::TABLE) | (1 << (int)ViewType::TREE)};
 constexpr ViewTypeMaskInt VIEWS_USE_FILE_SYSTEM_SEARCHBAR { FS_VIEWS_MASK | (1 << (int)ViewType::SCENE) | (1 << (int)ViewType::JSON)};
-constexpr ViewTypeMaskInt CHROME_SEARCH_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::CAST) | (1 << (int)ViewType::JSON)};
+constexpr ViewTypeMaskInt CHROME_SEARCH_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SCENE) | (1 << (int)ViewType::CAST) | (1 << (int)ViewType::JSON)};
 constexpr ViewTypeMaskInt OPEN_IN_TERMINAL_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH) | (1 << (int)ViewType::CAST)};
 constexpr ViewTypeMaskInt DECOMPRESS_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH)};
 constexpr ViewTypeMaskInt PLAY_VIDEOS_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH)| (1 << (int)ViewType::MOVIE)};

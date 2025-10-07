@@ -296,7 +296,7 @@ class ScenesListModelTest : public PlainTestSuite {
       const QVariant& imgAtRow0NotExist = slm.data(slm.index(0), Qt::DecorationRole);
       QVERIFY(!isValidPixmap(imgAtRow0NotExist));
 
-      QCOMPARE(slm.GetVids(slm.index(0)).size(), 0);  // no vid, QBrush been set
+      QCOMPARE(slm.GetVids(slm.index(0)).size(), 1);  // no vid, return a placeholder vidName
       const QVariant& vidBgAtRow0 = slm.data(slm.index(0), Qt::BackgroundRole);
       QVERIFY(!vidBgAtRow0.isNull());
     }
