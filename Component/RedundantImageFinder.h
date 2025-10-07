@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QToolButton>
 #include <QToolBar>
+#include <QSortFilterProxyModel>
 
 class RedundantImageFinder : public QMainWindow {
 public:
@@ -30,6 +31,7 @@ private:
   DuplicateImageMetaInfo::RedundantImagesList m_imgsBunch;
 
   RedundantImageModel* m_imgModel{nullptr};
+  QSortFilterProxyModel* m_imgProxy{nullptr};
   CustomTableView* m_table{nullptr};
   QString mCurrentPath;
   void setResultAlsoContainEmptyImage(bool alsoContain) { mResultAlsoContainEmptyImage = alsoContain; }
