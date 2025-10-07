@@ -73,6 +73,7 @@ class LoginQryWidget : public QDialog {
   Q_OBJECT
 public:
   explicit LoginQryWidget(QWidget *parent = nullptr);
+  void hideEvent(QHideEvent* event) override;
   QString getAESKey() const;
   void Subscribe();
 

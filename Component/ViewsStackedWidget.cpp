@@ -15,11 +15,8 @@
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
-    : QStackedWidget(parent),  //
-      mMovieDb{SystemPath::VIDS_DATABASE(), "DBMOVIE_CONNECT"},
-      mCastDb{SystemPath::PEFORMERS_DATABASE(), "CAST_CONNECTION"},
-      _previewFolder{previewFolder},  //
-      m_parent(parent)                //
+    : QStackedWidget{parent},  //
+      _previewFolder{previewFolder}  //
 {
   m_fsModel = new (std::nothrow) FileSystemModel(this);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -49,8 +46,8 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
     return false;
   }
 
-  if (m_parent != nullptr) {
-    m_parent->setWindowTitle(newPath);
+  if (parentWidget() != nullptr) {
+    parentWidget()->setWindowTitle(newPath);
   }
 
   if (isNewPath) {

@@ -109,7 +109,7 @@ class ViewsStackedWidget : public QStackedWidget {
   FileSystemTreeView* m_fsTreeView{nullptr};
 
   MovieDBSearchToolBar* _movieSearchBar{nullptr};
-  FdBasedDb mMovieDb;
+  FdBasedDb* mMovieDb{nullptr};
   FdBasedDbModel* m_movieDbModel{nullptr};
   MovieDBView* m_movieView{nullptr};
 
@@ -123,7 +123,7 @@ class ViewsStackedWidget : public QStackedWidget {
   SceneListView* m_sceneTableView{nullptr};
 
   CastDatabaseSearchToolBar* _castSearchBar{nullptr}; // Only for F3 to get focus
-  CastBaseDb mCastDb;
+  CastBaseDb* mCastDb{nullptr};
   CastDbModel* m_castDbModel{nullptr};
   CastDBView* m_castTableView{nullptr};
 
@@ -134,8 +134,6 @@ class ViewsStackedWidget : public QStackedWidget {
   CurrentRowPreviewer* _previewFolder{nullptr};
 
   CustomStatusBar* _logger{nullptr};
-
-  QWidget* m_parent{nullptr};
 
   ViewTypeTool::ViewType GetVt() const {
     return mVt;
