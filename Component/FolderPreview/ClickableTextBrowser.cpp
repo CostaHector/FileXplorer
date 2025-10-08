@@ -26,7 +26,7 @@
 
 constexpr int ClickableTextBrowser::MIN_SINGLE_SEARCH_PATTERN_LEN;
 constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;
-const QString ClickableTextBrowser::WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT = "[%s] Not in database";
+const QString ClickableTextBrowser::WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT = "[%1] Not in database";
 
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
     : QTextBrowser{parent} {
