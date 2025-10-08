@@ -38,6 +38,10 @@ class JsonTableModel : public QAbstractTableModelPub {
   int SaveCurrentChanges(const QModelIndexList& rowIndexes);
   std::pair<int, int> ExportCastStudioToLocalDictionaryFile(const QModelIndexList& rowIndexes) const;
 
+  Qt::ItemFlags flags(const QModelIndex& /*index*/) const override {
+    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsEditable;
+  }
+
  private:
   bool setModified(int row, bool modified = true);
   bool setModifiedNoEmit(int row, bool modified = true);

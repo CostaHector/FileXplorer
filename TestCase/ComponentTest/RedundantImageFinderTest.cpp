@@ -108,10 +108,10 @@ class RedundantImageFinderTest : public PlainTestSuite {
     RedundantImageFinder rif;
 
     QCOMPARE(DEFAULT_DI_CRITERIA_E, DICriteriaE::LIBRARY);
-    rif(mFolderToFindRedun);
+    QVERIFY(rif(mFolderToFindRedun));
     QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all under mFolderToFindRedun
 
-    rif(mBenchmarkRedunFolder);
+    QVERIFY(rif(mBenchmarkRedunFolder));
     QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all mBenchmarkRedunFolder itself
   }
 
@@ -134,9 +134,9 @@ class RedundantImageFinderTest : public PlainTestSuite {
     RedundantImageFinder rif;
 
     // 1.1 also empty image regard as redundant
-    rif(mFolderToFindRedun);
+    QVERIFY(rif(mFolderToFindRedun));
     QCOMPARE(rif.m_imgModel->rowCount(), 1);  // only 1 empty file
-    rif(mBenchmarkRedunFolder);
+    QVERIFY(rif(mBenchmarkRedunFolder));
     QCOMPARE(rif.m_imgModel->rowCount(), 2);  // a.jpg, aDuplicate.png
 
     // 1.2 empty image not regard ...
@@ -165,7 +165,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
     QCOMPARE(inst.INCLUDING_EMPTY_IMAGES->isChecked(), true);
 
     RedundantImageFinder rif;
-    rif(mBenchmarkRedunFolder);
+    QVERIFY(rif(mBenchmarkRedunFolder));
     QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all 3 under folder itself
 
     rif.m_table->selectAll();

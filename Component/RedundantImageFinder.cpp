@@ -55,9 +55,13 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
 
   m_imgModel = new (std::nothrow) RedundantImageModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_imgModel);
+  m_imgProxy = new (std::nothrow) QSortFilterProxyModel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_imgProxy);
+  m_imgProxy->setSourceModel(m_imgModel);
+
   m_table = new (std::nothrow) CustomTableView{"RedundantImageTable", this};
   CHECK_NULLPTR_RETURN_VOID(m_table);
-  m_table->setModel(m_imgModel);
+  m_table->setModel(m_imgProxy);
   setCentralWidget(m_table);
 
   subscribe();
@@ -107,8 +111,9 @@ void RedundantImageFinder::subscribe() {
   connect(inst.RELOAD_BENCHMARK_LIB, &QAction::triggered, [&redunImgLibInst]() {
     redunImgLibInst.ForceReloadImpl();
   });
-  connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& clickedIndex) {
-    const QString imgPath{m_imgModel->filePath(clickedIndex)};
+  connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& proxyClickedIndex) {
+    const QModelIndex srcClickedInd = m_imgProxy->mapToSource(proxyClickedIndex);
+    const QString imgPath{m_imgModel->filePath(srcClickedInd)};
     QDesktopServices::openUrl(QUrl::fromLocalFile(imgPath));
   });
 }
@@ -122,15 +127,12 @@ void RedundantImageFinder::RecycleSelection() {
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE recycleCmds;
   recycleCmds.reserve(SELECTED_CNT);
-  for (const auto& srcInd : sel) {
+  for (const auto& proxyInd : sel) {
+    const QModelIndex srcInd = m_imgProxy->mapToSource(proxyInd);
     recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_imgModel->filePath(srcInd)));
   }
   bool isRenameAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
-  if (isRenameAllSucceed) {
-    LOG_OK_P("Recyle redundant images succeed", "selected count: %d", SELECTED_CNT);
-  } else {
-    LOG_ERR_P("Recyle redundant images failed", "selected count: %d", SELECTED_CNT);
-  }
+  LOG_OE_P(isRenameAllSucceed, "Recyle redundant images", "selected count: %d", SELECTED_CNT);
   UpdateDisplayWhenRecycled();
 }
 
@@ -155,10 +157,10 @@ void RedundantImageFinder::UpdateDisplayWhenRecycled() {
   m_imgModel->RowsCountEndChange();
 }
 
-void RedundantImageFinder::operator()(const QString& folderPath) {
+bool RedundantImageFinder::operator()(const QString& folderPath) {
   if (PathTool::isRootOrEmpty(folderPath) || !QFileInfo{folderPath}.isDir()) {
     LOG_ERR_P("[Abort] Find redundant image", "Path[%s] not exists", qPrintable(folderPath));
-    return;
+    return false;
   }
   mCurrentPath = folderPath;
   using namespace DuplicateImageDetectionCriteria;
@@ -177,7 +179,7 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
     }
     default: {
       LOG_W("DecideBy Enum[%s] not support", DuplicateImageDetectionCriteria::c_str(decideBy));
-      break;
+      return false;
     }
   }
 
@@ -188,4 +190,5 @@ void RedundantImageFinder::operator()(const QString& folderPath) {
   m_imgModel->RowsCountEndChange();
   ChangeWindowTitle(mCurrentPath);
   LOG_OK_P(mCurrentPath, "%d images(s) found according to[%s]", afterRowCnt, c_str(decideBy));
+  return true;
 }

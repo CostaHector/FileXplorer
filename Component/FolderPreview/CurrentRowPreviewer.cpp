@@ -73,6 +73,9 @@ bool CurrentRowPreviewer::NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E 
     case PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL: {
       return m_imgInFolderLabels == nullptr;
     }
+    case PreviewTypeTool::PREVIEW_TYPE_E::NONE: {
+      return false;
+    }
     default:
       LOG_E("previewType[%s] not support", PreviewTypeTool::c_str(previewType));
       return false;
@@ -109,11 +112,11 @@ bool CurrentRowPreviewer::InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E 
 
 bool CurrentRowPreviewer::setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E previewType) {
   auto prevIt = m_name2PreviewIndex.find(previewType);
+  mCurrentPreviewType = previewType;
   if (prevIt == m_name2PreviewIndex.end()) {
-    LOG_E("previewType[%s] not in map", PreviewTypeTool::c_str(previewType));
+    LOG_D("previewType[%s] not in map", PreviewTypeTool::c_str(previewType));
     return false;
   }
-  mCurrentPreviewType = previewType;
   int viewIndex = prevIt.value();
   QStackedWidget::setCurrentIndex(viewIndex);
   emit windowTitleChanged(QString{"Preview: %1"}.arg(PreviewTypeTool::c_str(previewType)));

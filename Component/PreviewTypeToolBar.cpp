@@ -38,9 +38,16 @@ PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
   subscribe();
 }
 
-void PreviewTypeToolBar::subscribe() {
-  connect(mPreviewTypeIntAction.getActionGroup(), &QActionGroup::triggered, this, [this](QAction* pPreview){
+void PreviewTypeToolBar::onPreviewTypeActionToggled(QAction* pPreview) {
+  CHECK_NULLPTR_RETURN_VOID(pPreview);
+  if (pPreview->isChecked()) {
     mCurrentPreviewType = mPreviewTypeIntAction.act2Enum(pPreview);
-    emit previewTypeChanged(mCurrentPreviewType);
-  });
+  } else {
+    mCurrentPreviewType = PreviewTypeTool::PREVIEW_TYPE_E::NONE;
+  }
+  emit previewTypeChanged(mCurrentPreviewType);
+}
+
+void PreviewTypeToolBar::subscribe() {
+  connect(mPreviewTypeIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreviewTypeToolBar::onPreviewTypeActionToggled);
 }

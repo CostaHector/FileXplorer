@@ -24,6 +24,7 @@ signals:
   void previewTypeChanged(PreviewTypeTool::PREVIEW_TYPE_E previewType);
 private:
   void subscribe();
+  void onPreviewTypeActionToggled(QAction* pPreview);
 };
 
 #endif // PREVIEWTYPETOOLBAR_H

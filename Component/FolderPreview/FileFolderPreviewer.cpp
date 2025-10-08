@@ -66,6 +66,7 @@ void FileFolderPreviewer::operator()(const QString& pth) {  // file system view
   if (QFileInfo{pth}.isFile()) {  // a file
     BeforeDisplayAFileDetail();
     const QString detailHtmls = CastBrowserHelper::GetDetailDescription(pth);
+    mDetailsPane->setHtml("");
     mDetailsPane->setHtml(detailHtmls);
     return;
   }

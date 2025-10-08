@@ -33,6 +33,7 @@ class ClickableTextBrowser : public QTextBrowser {
 public:
   explicit ClickableTextBrowser(QWidget* parent = nullptr);
   ~ClickableTextBrowser();
+
   void wheelEvent(QWheelEvent *event) override;
   const QSize& iconSize() const { return mIconSize; }
 

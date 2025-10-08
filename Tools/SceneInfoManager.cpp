@@ -29,7 +29,7 @@ QStringList SceneInfo::GetImagesAbsPathList(const QString& rootPath) const {
 }
 
 QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
-  return vidName.isEmpty() ? "" : PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName);
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (vidName.isEmpty() ? name : vidName));
 }
 
 SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
