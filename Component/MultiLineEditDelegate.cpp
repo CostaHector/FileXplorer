@@ -1,15 +1,9 @@
 #include "MultiLineEditDelegate.h"
 #include <QPlainTextEdit>
 
-MultiLineEditDelegate::MultiLineEditDelegate(QWidget *parent)
-    : QStyledItemDelegate(parent)
-{
-
-}
-
 QWidget *MultiLineEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/, const QModelIndex &/*index*/) const
 {
-  QPlainTextEdit *editor = new QPlainTextEdit(parent);
+  QPlainTextEdit *editor = new (std::nothrow) QPlainTextEdit(parent);
   return editor;
 }
 
