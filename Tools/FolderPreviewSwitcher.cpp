@@ -21,6 +21,6 @@ void FolderPreviewSwitcher::onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E v
     }
   }
   _folderPreview->operator()(_folderPreview->GetCurPath());
-  _folderPreview->setVisible(true);
+  _folderPreview->setVisible(viewType != PreviewTypeTool::PREVIEW_TYPE_E::NONE);
   _folderPreview->setCurrentPreviewType(viewType);
 }
