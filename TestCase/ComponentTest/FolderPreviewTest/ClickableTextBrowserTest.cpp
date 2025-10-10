@@ -197,10 +197,9 @@ class ClickableTextBrowserTest : public PlainTestSuite {
 
     {
       QCOMPARE(setCurSelection(browser, 0, 11), "Hello world");
-      const QString whereClause = "%Hello world%";  // %all text selected%
-      const QString textWhenNothing = ClickableTextBrowser::WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT.arg(whereClause);
+      const QString textWhenNothing = "Not in database";
 
-      // let search reture empty list, search result will append simply
+      // let search return empty list, search result will append simply
       UserSpecifiedBrowerInteractMock::mockSqlRecordList().clear();
       browser.onSearchSelectionReq();
       QCOMPARE(browser.toPlainText().count(textWhenNothing), 1);
@@ -258,8 +257,7 @@ class ClickableTextBrowserTest : public PlainTestSuite {
       UserSpecifiedBrowerInteractMock::mockSearchKeyString() = chars10KeyWords;
 
       QCOMPARE(setCurSelection(browser, 0, 11), "Hello world");
-      const QString whereClause = "%Hello world%";  // %all text selected%
-      const QString textWhenNothing = ClickableTextBrowser::WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT.arg(whereClause);
+      const QString textWhenNothing = "Not in database";
 
       QCOMPARE(browser.toPlainText().count(textWhenNothing), 0);  // let search reture empty list, search result will append simply
       UserSpecifiedBrowerInteractMock::mockSqlRecordList().clear();

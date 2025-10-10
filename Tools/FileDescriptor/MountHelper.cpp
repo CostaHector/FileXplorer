@@ -318,7 +318,7 @@ GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
 namespace MountPathTableNameMapper {
 
 QString toTableName(const QString& mountPath, bool* bConversionOk) {
-  static const QRegularExpression validMountPath{"^(C:/home|/mnt)/DISKS/[a-zA-Z0-9]+$"};
+  static const QRegularExpression validMountPath{"^(C:|/mnt)/DISKS/[a-zA-Z0-9]+$"};
   if (!validMountPath.match(mountPath).hasMatch()) {
     if (bConversionOk != nullptr) {
       *bConversionOk = false;
@@ -333,7 +333,7 @@ QString toTableName(const QString& mountPath, bool* bConversionOk) {
 }
 
 QString toMountPath(const QString& tableName, bool* bConversionOk) {
-  static const QRegularExpression validTableName{"^(C__home|_mnt)_DISKS_[a-zA-Z0-9]+$"};
+  static const QRegularExpression validTableName{"^(C_|_mnt)_DISKS_[a-zA-Z0-9]+$"};
   if (!validTableName.match(tableName).hasMatch()) {
     if (bConversionOk != nullptr) {
       *bConversionOk = false;
@@ -354,7 +354,7 @@ QString toMountPath(const QString& tableName, bool* bConversionOk) {
 QStringList CandidateTableNamesList() {
   QString mountPointRoot;
 #ifdef _WIN32
-  mountPointRoot = "C:/home/DISKS";
+  mountPointRoot = "C:/DISKS";
 #else
   mountPointRoot = "/mnt/DISKS";
 #endif

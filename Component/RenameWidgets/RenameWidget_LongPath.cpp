@@ -22,6 +22,7 @@ QToolBar* RenameWidget_LongPath::InitControlTB() {
   chopSectionTb->addWidget(m_maxPathLengthLE);
   chopSectionTb->addSeparator();
   chopSectionTb->addWidget(m_recursiveCB);
+  chopSectionTb->addWidget(m_nameExtIndependent);
   return chopSectionTb;
 }
 
