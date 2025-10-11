@@ -169,10 +169,9 @@ void PasswordManager::onLoadRecordsFromCSVInput() {
 
 void PasswordManager::ShowPlainCSVContents() {
   if (mPlainCSVContentWid == nullptr) {
-    mPlainCSVContentWid = new (std::nothrow) QTextEdit;
+    mPlainCSVContentWid = new (std::nothrow) QTextEdit{this};
     CHECK_NULLPTR_RETURN_VOID(mPlainCSVContentWid);
-    mPlainCSVContentWid->setAttribute(Qt::WA_DeleteOnClose);
-    mPlainCSVContentWid->setWindowFlags(Qt::Window);
+    mPlainCSVContentWid->setWindowFlags(Qt::Dialog);
     mPlainCSVContentWid->setWindowTitle("Show plain CSV Contents");
     mPlainCSVContentWid->setWindowIcon(QIcon{":/edit/SHOW_CSV_CONTENTS"});
     mPlainCSVContentWid->setReadOnly(true);
