@@ -118,6 +118,7 @@ QuickWhereClauseDialog::QuickWhereClauseDialog(QWidget* parent)//
   mDialogButtonBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
   CHECK_NULLPTR_RETURN_VOID(mDialogButtonBox)
   auto* pOkBtn = mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok);
+  pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply where clause right now.")  //
                          .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
   pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
@@ -261,8 +262,8 @@ void QuickWhereClauseDialog::subscribe() {
   }
   connect(m_strFilterPatternCB, &QComboBox::currentTextChanged, this, &QuickWhereClauseDialog::onConditionsChanged);
 
-  connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, &QuickWhereClauseDialog::accept);
-  connect(mDialogButtonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &QDialog::reject);
+  connect(mDialogButtonBox, &QDialogButtonBox::accepted, this, &QuickWhereClauseDialog::accept);
+  connect(mDialogButtonBox, &QDialogButtonBox::rejected, this, &QuickWhereClauseDialog::reject);
 
   connect(_RMV_WHERE_CLAUSE_FROM_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onRemoveAHistory);
   connect(_CLEAR_WHERE_CLAUSE_FROM_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onClearHistory);
