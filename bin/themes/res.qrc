@@ -75,6 +75,7 @@
     <file alias="CONTEXT_MENU_SYSTEM">TopSideToolBarIcons/CONTEXT_MENU_SYSTEM.svg</file>
     <file alias="CONTEXT_MENU_ADD_THIS_PROGRAM">TopSideToolBarIcons/CONTEXT_MENU_ADD_THIS_PROGRAM.svg</file>
     <file alias="CONTEXT_MENU_RMV_THIS_PROGRAM">TopSideToolBarIcons/CONTEXT_MENU_RMV_THIS_PROGRAM.svg</file>
+    <file alias="USAGE_MONITOR">TopSideToolBarIcons/USAGE_MONITOR.svg</file>
 
     <!--AddressControl icon here-->
     <file alias="PATH_UP_TO">AddressControl/PATH_UP_TO.svg</file>

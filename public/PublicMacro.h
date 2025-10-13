@@ -33,13 +33,13 @@
   }
 
 #define CHECK_FALSE_RETURN_VAL(bCondition, val) \
-  if (!bCondition) {                            \
+  if (!(bCondition)) {                          \
     LOG_E("Condition failed");                  \
     return val;                                 \
   }
 
 #define CHECK_FALSE_RETURN_VOID(bCondition) \
-  if (!bCondition) {                        \
+  if (!(bCondition)) {                      \
     LOG_E("Condition failed");              \
     return;                                 \
   }

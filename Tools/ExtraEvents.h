@@ -11,6 +11,7 @@ public:
   explicit ExtraEvents(QWidget* parent);
   void subscribe();
 
+  void onMonitorUsage(bool bMonitorChecked);
 private:
   PopupWidgetManager<TorrentsManagerWidget>* mTorrentsManager{nullptr};
   PopupWidgetManager<ConfigsTable>* m_settingSys{nullptr};

@@ -12,6 +12,7 @@ class FileLeafActions : public QObject {
   QAction* _PWD_BOOK{nullptr};
   QAction* _ABOUT_FILE_EXPLORER{nullptr};
   QAction* _LANUAGE{nullptr};
+  QAction* _CPU_MEMORY_USAGE_MONITOR{nullptr};
 
   QAction* _ADD_THIS_PROGRAM_TO_SYSTEM_CONTEXT_MENU{nullptr};
   QAction* _RMV_THIS_PROGRAM_FROM_SYSTEM_CONTEXT_MENU{nullptr};

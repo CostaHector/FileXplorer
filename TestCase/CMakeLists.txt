@@ -176,6 +176,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
 
 if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi)
+
     find_library(DWMWAPI_LIBRARY dwmapi)
     find_library(SHLWAPI_LIBRARY shlwapi)
 
