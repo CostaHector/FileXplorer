@@ -1,11 +1,11 @@
 #ifndef FDBASEDDBMODEL_H
 #define FDBASEDDBMODEL_H
 
+#include "SqlTableModelPub.h"
 #include <QFileInfo>
-#include <QSqlTableModel>
 #include <QDir>
 
-class FdBasedDbModel : public QSqlTableModel {
+class FdBasedDbModel : public SqlTableModelPub {
 public:
   explicit FdBasedDbModel(QObject* parent = nullptr, QSqlDatabase con = QSqlDatabase());
 

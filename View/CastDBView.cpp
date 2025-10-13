@@ -52,7 +52,7 @@ CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* cas
 }
 
 void CastDBView::subscribe() {
-  connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, _castModel, &QSqlTableModel::setFilter);
+  connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, _castModel, &CastDbModel::SetFilterAndSelect);
 
   static auto& castInst = g_castAct();
   connect(castInst._MODEL_SUBMIT_ALL, &QAction::triggered, this, &CastDBView::onModelSubmitAll);

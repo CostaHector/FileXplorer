@@ -8,7 +8,7 @@
 #include "TableFields.h"
 
 FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
-    : QSqlTableModel{parent, con} {
+    : SqlTableModelPub{parent, con} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 }
 

@@ -73,7 +73,6 @@ void DatabaseSearchToolBar::subscribe() {
 
 void DatabaseSearchToolBar::EmitWhereClauseChangedSignal() {
   const QString& clause = GetCurrentWhereClause();
-  LOG_D("WhereClauseChanged signal[%s]", qPrintable(clause));
   emit whereClauseChanged(clause);
 }
 

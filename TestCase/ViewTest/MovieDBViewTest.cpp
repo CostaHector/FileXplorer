@@ -207,24 +207,24 @@ class MovieDBViewTest : public PlainTestSuite {
 
     using namespace MOVIE_TABLE;
     {
-      // onSearchDataBase filter should works ok
+      // SetFilterAndSelect(dbToolBar.GetCurrentWhereClause()) filter should works ok
       // "path2/Michael Fassbender.mp4"
       // "path2/Morata.mp4"
       QCOMPARE(dbModel.tableName(), tableName2);
       QCOMPARE(dbModel.rowCount(), 2);
       dbToolBar.m_whereCB->setCurrentText(QString(R"(`%1` like "Michael%")").arg(ENUM_2_STR(Name)));
-      movieView.onSearchDataBase();
+      dbModel.SetFilterAndSelect(dbToolBar.GetCurrentWhereClause());
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Name).toString(), "Michael Fassbender.mp4");
 
       QCOMPARE(dbModel.rowCount(), 1);
       dbToolBar.m_whereCB->setCurrentText(QString(R"(`%1` like "%mp4")").arg(ENUM_2_STR(Name)));
-      movieView.onSearchDataBase();
+      dbModel.SetFilterAndSelect(dbToolBar.GetCurrentWhereClause());
       QCOMPARE(dbModel.rowCount(), 2);
       dbToolBar.m_whereCB->setCurrentText(QString(R"(`%1` like "%all rows not contains me%")").arg(ENUM_2_STR(Name)));
-      movieView.onSearchDataBase();
+      dbModel.SetFilterAndSelect(dbToolBar.GetCurrentWhereClause());
       QCOMPARE(dbModel.rowCount(), 0);
       dbToolBar.m_whereCB->setCurrentText(R"(`Name` LIKE "%")");  // all
-      movieView.onSearchDataBase();
+      dbModel.SetFilterAndSelect(dbToolBar.GetCurrentWhereClause());
       QCOMPARE(dbModel.rowCount(), 2);
     }
 

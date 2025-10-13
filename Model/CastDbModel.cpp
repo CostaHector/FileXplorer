@@ -6,6 +6,7 @@
 #include "PublicTool.h"
 #include "TableFields.h"
 #include "PublicMacro.h"
+#include "NotificatorMacro.h"
 #include "JsonHelper.h"
 #include "CastPsonFileHelper.h"
 #include "QuickWhereClauseHelper.h"
@@ -19,11 +20,11 @@
 constexpr int CastDbModel::MAX_RATE;
 
 CastDbModel::CastDbModel(QObject* parent, QSqlDatabase db)
-    : QSqlTableModel{parent, db},
-      m_imageHostPath{Configuration()                                              //
-                          .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
-                                 MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)     //
-                          .toString()} {
+  : SqlTableModelPub{parent, db},
+  m_imageHostPath{Configuration()                                              //
+                      .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
+                             MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)     //
+                      .toString()} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 
   if (isDbValidAndOpened(db)) {
