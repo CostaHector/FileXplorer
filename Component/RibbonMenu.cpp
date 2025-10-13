@@ -25,7 +25,7 @@
 #include "PublicMacro.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
-    : QTabWidget{parent}  //
+  : QTabWidget{parent}  //
 {
   m_scenePageControl = new (std::nothrow) ScenePageControl{"Pagination display", this};
 
@@ -109,17 +109,28 @@ QToolBar* RibbonMenu::LeafFile() const {
   auto* systemContextMenuTb = fileLeafInst.GetSystemContextMenu(leafFileWid);
   CHECK_NULLPTR_RETURN_NULLPTR(systemContextMenuTb);
 
+  // Setting
   leafFileWid->addAction(fileLeafInst._SETTINGS);
-  leafFileWid->addAction(fileLeafInst._PWD_BOOK);
   leafFileWid->addAction(fileLeafInst._ABOUT_FILE_EXPLORER);
   leafFileWid->addAction(fileLeafInst._LANUAGE);
+  leafFileWid->addSeparator();
+
+  // System
   leafFileWid->addWidget(systemContextMenuTb);
   leafFileWid->addSeparator();
+
+  // Style/Stylesheet
+  leafFileWid->addWidget(styleAndStylesheetToolBar);
+  leafFileWid->addSeparator();
+
+  // Sync
   leafFileWid->addWidget(syncSwitchToolBar);
   leafFileWid->addWidget(syncPathToolBar);
   leafFileWid->addSeparator();
-  leafFileWid->addWidget(styleAndStylesheetToolBar);
-  leafFileWid->addSeparator();
+
+  // Advance
+  leafFileWid->addAction(fileLeafInst._PWD_BOOK);
+  leafFileWid->addAction(fileLeafInst._CPU_MEMORY_USAGE_MONITOR);
   leafFileWid->addWidget(logToolButton);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafFileWid;

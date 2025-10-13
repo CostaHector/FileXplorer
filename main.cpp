@@ -39,6 +39,6 @@ int main(int argc, char* argv[]) {
   fileExplorer.show();
   const int exitCode = app.exec();
   LOG_I("Program:[" PROJECT_NAME "] exit with code[%d].", exitCode);
-  return 0;
+  return exitCode;
 }
 #endif

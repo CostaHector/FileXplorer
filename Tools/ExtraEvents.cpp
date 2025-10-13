@@ -10,10 +10,12 @@
 #include "SimpleAES.h"
 #include "PasswordManager.h"
 #include "LoginQryWidget.h"
+#include "ResourceMonitor.h"
 
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
+#include "PublicVariable.h"
 #include <QMessageBox>
 
 ExtraEvents::ExtraEvents(QWidget* parent) : QObject{parent} {
@@ -54,12 +56,14 @@ void ExtraEvents::subscribe() {
   };
   m_pwdEntrance->setWidgetCreator(createPwdEntranceFunc);
 
-  connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::triggered, this, [pParentWidget]() {
+  connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::toggled, this, [pParentWidget]() {
     QMessageBox::about(pParentWidget, "FileExplorer",
-                       "Version: 46.0\n"
+                       "Version: 62.5.6\n"
                        "Introduction: A minimalism app for image/video/json/folder explorer\n"
                        "Platform-supported: Linux and Win");
   });
+  connect(leafInst._CPU_MEMORY_USAGE_MONITOR, &QAction::toggled, this, &ExtraEvents::onMonitorUsage);
+
   connect(leafInst._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
     Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);
     LOG_INFO_NP("Language switch", "work after reopen");
@@ -67,4 +71,22 @@ void ExtraEvents::subscribe() {
 
   connect(leafInst._ADD_THIS_PROGRAM_TO_SYSTEM_CONTEXT_MENU, &QAction::triggered, &SystemContextMenuControl::Add);
   connect(leafInst._RMV_THIS_PROGRAM_FROM_SYSTEM_CONTEXT_MENU, &QAction::triggered, &SystemContextMenuControl::Rmv);
+}
+
+void ExtraEvents::onMonitorUsage(bool bMonitorChecked) {
+  QWidget* pParentWidget = static_cast<QWidget*>(parent());
+  CHECK_NULLPTR_RETURN_VOID(pParentWidget);
+
+  static ResourceMonitor resMoniterInst{SystemPath::WORK_PATH(), pParentWidget};
+  if (!resMoniterInst) {
+    LOG_ERR_NP("Cannot Monitor Usage", "Monitor CPU/Memory Failed");
+    return;
+  }
+  if (bMonitorChecked) {
+    resMoniterInst.onStart();
+    LOG_OK_NP("Start Monitor Usage", "CPU/Memory ok");
+  } else {
+    resMoniterInst.onStop();
+    LOG_OK_NP("End Monitor Usage", "CPU/Memory ok");
+  }
 }

@@ -20,11 +20,17 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
 
   _ABOUT_FILE_EXPLORER = new (std::nothrow) QAction{QIcon(":img/ABOUT"), "About"};
   CHECK_NULLPTR_RETURN_VOID(_ABOUT_FILE_EXPLORER);
+  _ABOUT_FILE_EXPLORER->setCheckable(true);
 
   _LANUAGE = new (std::nothrow) QAction{QIcon(":img/LANGUAGE"), "Language"};
   CHECK_NULLPTR_RETURN_VOID(_LANUAGE);
   _LANUAGE->setCheckable(true);
   _LANUAGE->setChecked(Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
+
+  _CPU_MEMORY_USAGE_MONITOR = new (std::nothrow) QAction{QIcon(":img/USAGE_MONITOR"), "Usage Monitor"};
+  CHECK_NULLPTR_RETURN_VOID(_CPU_MEMORY_USAGE_MONITOR);
+  _CPU_MEMORY_USAGE_MONITOR->setCheckable(true);
+  _CPU_MEMORY_USAGE_MONITOR->setChecked(false);
 
   _ADD_THIS_PROGRAM_TO_SYSTEM_CONTEXT_MENU = new (std::nothrow) QAction{QIcon(":img/CONTEXT_MENU_ADD_THIS_PROGRAM"), "Add"};
   CHECK_NULLPTR_RETURN_VOID(_ADD_THIS_PROGRAM_TO_SYSTEM_CONTEXT_MENU);
