@@ -43,7 +43,7 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,              //
 }
 
 void MovieDBView::subscribe() {
-  connect(_movieDbSearchBar, &MovieDBSearchToolBar::whereClauseChanged, this, &MovieDBView::onSearchDataBase);
+  connect(_movieDbSearchBar, &MovieDBSearchToolBar::whereClauseChanged, _dbModel, &SqlTableModelPub::SetFilterAndSelect);
   connect(_movieDbSearchBar, &MovieDBSearchToolBar::movieTableChanged, this, &MovieDBView::setCurrentMovieTable);
 
   auto& inst = g_dbAct();
@@ -88,18 +88,6 @@ void MovieDBView::subscribe() {
   addAction(fileOpInst.COPY_FULL_PATH);
   addAction(fileOpInst.COPY_NAME);
   addAction(fileOpInst.COPY_RECORDS);
-}
-
-bool MovieDBView::onSearchDataBase() {
-  const QString& searchPattern{_movieDbSearchBar->GetCurrentWhereClause()};
-  _dbModel->setFilter(searchPattern);
-  if (!_dbModel->select()) {
-    const QString title{QString{"[FAIL] Search[%1] from table[%2]"}.arg(searchPattern).arg(_dbModel->tableName())};
-    LOG_ERR_NP(title, _dbModel->lastError().text());
-    return false;
-  }
-  LOG_OK_NP("Succeed Search", searchPattern);
-  return true;
 }
 
 bool MovieDBView::InitMoviesTables() {

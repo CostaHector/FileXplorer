@@ -12,6 +12,7 @@
 #include <QDesktopServices>
 #include <QRegularExpression>
 #include <QUrl>
+#include <QCache>
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
@@ -90,6 +91,23 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
   return true;
 }
 
+const QRegularExpression* GetRegularExpression(const QString& targetStr, const int MAX_REGEX_CACHE_COUNT = 100) {
+  static QCache<QString, const QRegularExpression> exprCache(MAX_REGEX_CACHE_COUNT);
+  const QRegularExpression* pExpr = exprCache[targetStr];
+  if (pExpr != nullptr) {
+    return pExpr;
+  }
+  pExpr = new (std::nothrow) QRegularExpression(targetStr);
+  CHECK_NULLPTR_RETURN_NULLPTR(pExpr);
+  if (!pExpr->isValid()) {
+    LOG_D("Invalid regular expression: %s", qPrintable(targetStr));
+    delete pExpr;
+    return nullptr;
+  }
+  exprCache.insert(targetStr, pExpr);
+  return pExpr;
+}
+
 auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool {
   const ViewTypeTool::ViewType vt{GetVt()};
 
@@ -102,24 +120,13 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
       return true;
     }
     case ViewType::SCENE: {
-      CHECK_NULLPTR_RETURN_FALSE(m_sceneProxyModel);
-      m_sceneProxyModel->setFilterRegExp(targetStr);
       return true;
     }
     case ViewType::JSON: {
-      static QHash<QString, QRegularExpression> exprHash;
-      auto it = exprHash.constFind(targetStr);
-      if (it == exprHash.cend()) {
-        QRegularExpression expr{targetStr};
-        it = exprHash.insert(targetStr, expr);
-      }
-      if (!it->isValid()) {
-        LOG_D("Not a valid regular expression[%s]", qPrintable(targetStr));
-        return false;
-      }
-
       CHECK_NULLPTR_RETURN_FALSE(m_jsonProxyModel);
-      m_jsonProxyModel->setFilterRegularExpression(it.value());
+      const QRegularExpression* pRegex = GetRegularExpression(targetStr);
+      CHECK_NULLPTR_RETURN_FALSE(pRegex);
+      m_jsonProxyModel->setFilterRegularExpression(*pRegex);
       return true;
     }
     default: {
@@ -130,19 +137,21 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
   return true;
 }
 
-auto ViewsStackedWidget::on_searchEnterKey(const QString& /*targetStr*/) -> bool {
+auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
   const ViewTypeTool::ViewType vt{GetVt()};
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:
     case ViewType::TREE:
     case ViewType::JSON: {
-      // ignore
-      return true;
+      break;
     }
-    case ViewType::SCENE: {
-      // ignore
-      return true;
+    case ViewType::SCENE: { // avoid lag when text changed frequently
+      CHECK_NULLPTR_RETURN_FALSE(m_sceneProxyModel);
+      const QRegularExpression* pRegex = GetRegularExpression(targetStr);
+      CHECK_NULLPTR_RETURN_FALSE(pRegex);
+      m_sceneProxyModel->setFilterRegularExpression(*pRegex);
+      break;
     }
     default: {
       LOG_W("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));

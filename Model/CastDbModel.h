@@ -1,12 +1,12 @@
 #ifndef CASTDBMODEL_H
 #define CASTDBMODEL_H
 
+#include "SqlTableModelPub.h"
 #include <QFileInfo>
-#include <QSqlTableModel>
 #include <QDir>
 #include <QItemSelectionModel>
 
-class CastDbModel : public QSqlTableModel {
+class CastDbModel : public SqlTableModelPub {
 public:
   explicit CastDbModel(QObject *parent = nullptr, QSqlDatabase db = QSqlDatabase());
   static bool isDbValidAndOpened(const QSqlDatabase& db);

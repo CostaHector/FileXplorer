@@ -66,8 +66,6 @@ public:
 
   void subscribe();
 
-  bool onSearchDataBase();
-
   bool InitMoviesTables();
   bool setCurrentMovieTable(const QString& movieTableName);
 
