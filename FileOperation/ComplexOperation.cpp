@@ -202,11 +202,11 @@ Qt::DropAction GetCutCopyModeFromNativeMimeData(const QMimeData& native) {
 #ifdef _WIN32
   if (native.hasFormat("Preferred DropEffect")) {
     const QByteArray& ba = native.data("Preferred DropEffect");
-    if (ba[0] == 0x2) {  // # 2 for cut and 5 for copy
+    if (ba[0] & Qt::DropAction::MoveAction) {  // # 1 for copy, 2 for cut, 4 for link, 1+4 for copy
       return Qt::DropAction::MoveAction;
-    } else if (ba[0] == 0x1) {
+    } else if (ba[0] & Qt::DropAction::CopyAction) {
       return Qt::DropAction::CopyAction;
-    } else if (ba[0] == 0x4) {
+    } else if (ba[0] & Qt::DropAction::LinkAction) {
       return Qt::DropAction::LinkAction;
     } else {
       LOG_W("Preferred DropEffect value[%d] invalid", (int)ba[0]);

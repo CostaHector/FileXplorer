@@ -266,13 +266,18 @@ class ComplexOperationTest : public PlainTestSuite {
     copyData.setData("Preferred DropEffect", copyEffect);
     QCOMPARE(GetCutCopyModeFromNativeMimeData(copyData), Qt::CopyAction);
 
+    QMimeData copyLinkData;
+    QByteArray copyLinkEffect(1, '\x05');  // 0x1+0x4 is also for copy
+    copyLinkData.setData("Preferred DropEffect", copyLinkEffect);
+    QCOMPARE(GetCutCopyModeFromNativeMimeData(copyLinkData), Qt::CopyAction);
+
     QMimeData linkData;
     QByteArray linkEffect(1, '\x04');  // 0x4 for link
     linkData.setData("Preferred DropEffect", linkEffect);
     QCOMPARE(GetCutCopyModeFromNativeMimeData(linkData), Qt::LinkAction);
 
     QMimeData invalidData;
-    QByteArray invalidEffect(1, '\x99');  // 无效值
+    QByteArray invalidEffect(1, '\x08');  // 无效值
     invalidData.setData("Preferred DropEffect", invalidEffect);
     QCOMPARE(GetCutCopyModeFromNativeMimeData(invalidData), Qt::IgnoreAction);
 
