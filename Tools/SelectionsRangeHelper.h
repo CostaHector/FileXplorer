@@ -10,8 +10,8 @@ public:
 
   QString GetCurrentPath() const {return currentPath;}
 
-  bool contains(const QString& rootpath, unsigned row) const {
-    return currentPath == rootpath && row < MAX_INDEX_CNT && mSelectedRowBits.test(row);
+  bool contains(const QString& rootpath, unsigned uRow) const {
+    return currentPath == rootpath && uRow < MAX_INDEX_CNT && mSelectedRowBits.test(uRow);
   }
 
   void clear() {
@@ -28,7 +28,10 @@ public:
 
     if (selectedRows.isEmpty()) {return;}
     for (const QModelIndex& ind: selectedRows) {
-      mSelectedRowBits.set(ind.row());
+      const unsigned uRow = ind.row();
+      if (uRow < MAX_INDEX_CNT) {
+        mSelectedRowBits.set(uRow);
+      }
     }
     if (selectedRows.size() == selectedRows.back().row() - selectedRows.front().row() + 1) { // [topRow, bottomRow]
       mRowRangeList.append({selectedRows.front(), selectedRows.back()});

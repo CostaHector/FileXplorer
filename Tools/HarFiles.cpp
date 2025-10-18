@@ -16,7 +16,9 @@ const QMap<QString, QString> HarFiles::SUPPORTED_MIMETYPES = {{"image/webp", ".w
                                                               {"image/bmp", ".bmp"},   {"image/gif", ".gif"},     {"image/vnd.microsoft.icon", ".ico"},
                                                               {"image/tiff", ".tif"},   // *.tiff files have two possible extensions
                                                               {"image/tiff", ".tiff"},  //   (but .tiff is what I know and prefer)
-                                                              {"video/mp2t", ".ts"}};
+                                                              {"video/mp2t", ".ts"}, //
+                                                              {"video/mp4", ".mp4"}, //
+                                                              };
 
 HarFiles::HarFiles() {}
 
