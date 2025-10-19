@@ -67,11 +67,11 @@ bool SetMimeDataCutCopy(QMimeData& mimeData, const Qt::DropAction dropAction) {
 #ifdef _WIN32
   QByteArray preferred(4, 0x0);
   if (dropAction == Qt::DropAction::MoveAction) {  // # 2 for cut and 5 for copy
-    preferred[0] = 0x2;
+    preferred[0] = Qt::DropAction::MoveAction;
   } else if (dropAction == Qt::DropAction::CopyAction) {
-    preferred[0] = 0x1;
+    preferred[0] = Qt::DropAction::CopyAction;
   } else if (dropAction == Qt::DropAction::LinkAction) {
-    preferred[0] = 0x4;
+    preferred[0] = Qt::DropAction::LinkAction;
   } else {
     LOG_W("Unsupport DropEffect[%d]", (int)dropAction);
     return false;

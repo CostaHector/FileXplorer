@@ -347,7 +347,6 @@ auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostOriPath) -> TCas
     const QStringList& imgPathParts = imgRelativePath.split('/');  // ori/cast/img
     const int pathSectionSize = imgPathParts.size();
     if (pathSectionSize != 3) {
-      LOG_D("Relative2ImagePath[%s] sections count[%d] != 3", qPrintable(imgRelativePath), pathSectionSize);
       continue;
     }
     const QString& ori{imgPathParts[0]};

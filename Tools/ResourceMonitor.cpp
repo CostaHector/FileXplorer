@@ -120,13 +120,18 @@ double ResourceMonitor::getMemoryUsage() {
   //   return pmc.PrivateUsage / 1024.0; // 专用工作集 KB
   // }
 #elif defined(Q_OS_LINUX)
-  static const QRegExp MEMORY_PATTERN("\\d+");
   QFile file("/proc/self/status");
   if (file.open(QIODevice::ReadOnly)) {
     while (!file.atEnd()) {
       QByteArray line = file.readLine();
       if (line.startsWith("VmRSS:")) {
-        return line.split(' ').filter(MEMORY_PATTERN).first().toDouble();
+        // 手动过滤数字部分
+        QList<QByteArray> parts = line.split(' ');
+        for (const QByteArray &part : parts) {
+          if (!part.isEmpty() && part[0] >= '0' && part[0] <= '9') {
+            return part.toDouble(); // 直接返回数字部分（单位 kB）
+          }
+        }
       }
     }
   }

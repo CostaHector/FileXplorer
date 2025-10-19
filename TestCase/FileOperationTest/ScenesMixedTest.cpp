@@ -5,9 +5,9 @@
 
 class ScenesMixedTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   ScenesMixedTest() : PlainTestSuite{} {}
- private slots:
+private slots:
   void test_basicFileNames() {
     QStringList files;
     files << "X-Man - The Last Stand.mp4"
@@ -182,13 +182,52 @@ class ScenesMixedTest : public PlainTestSuite {
          << "Fox - Sporty - Chris Evans, Henry - 2.png";  // Fox - Sporty - Chris Evans, Henry
     ScenesMixed sMixed;
     const auto& folder2Items = sMixed(imgs);
-    QCOMPARE(folder2Items.size(), 2);
+    QCOMPARE(folder2Items.size(), 4);
+    const QMap<QString, QStringList>& expectsFolder2Items //
+        {
+         {"Name", {"Name 1.png", "Name - 1.png"}},
+         {"Name 1", {"Name 1 - 1.png"}},
+         {"Name - 1", {"Name - 1 - 1.png"}},
+         {"Fox - Sporty - Chris Evans, Henry",
+          {"Fox - Sporty - Chris Evans, Henry.png",
+           "Fox - Sporty - Chris Evans, Henry - 1.png",
+           "Fox - Sporty - Chris Evans, Henry - 2.png"}},
+         };
+    QCOMPARE(folder2Items, expectsFolder2Items);
+  }
 
-    QVERIFY(folder2Items.contains("Name"));
-    QCOMPARE(folder2Items["Name"].size(), 4);
-
-    QVERIFY(folder2Items.contains("Fox - Sporty - Chris Evans, Henry"));
-    QCOMPARE(folder2Items["Fox - Sporty - Chris Evans, Henry"].size(), 3);
+  void test_special_scenario_group_test() {
+    // folder also in stringlist
+    const QStringList items {
+        "H",                          // situation 1 file with a json need group
+        "H.C.jpg",                    //
+        "H.C.json",                   //
+        "Michael",                    // situation 2 file without json need group
+        "Michael Fassbender.jpg",     //
+        "Michael Fassbender.mp4",     //
+#ifdef _WIN32
+        "C.R",                        // situation 3 file without json and baseName endswith dot need group
+#else
+        "C.R.",                       //
+#endif
+        "C.R..jpg",
+    };
+    ScenesMixed sMixed;
+    const QMap<QString, QStringList>& folder2Items = sMixed(items);
+    const QMap<QString, QStringList>& expectsFolder2Items {
+        {"H", {"H"}},
+        {"H.C", {"H.C.json", "H.C.jpg"}}, // image append behind json, behind videos
+        {"Michael", {"Michael"}},
+        {"Michael Fassbender", {"Michael Fassbender.mp4", "Michael Fassbender.jpg"}},
+#ifdef _WIN32
+        {"C", {"C.R"}},
+        {"C.R.", {"C.R..jpg"}},
+#else
+        {"C.R.", {"C.R.", "C.R..jpg"}},
+#endif
+    };
+    QCOMPARE(folder2Items.size(), expectsFolder2Items.size());
+    QCOMPARE(folder2Items, expectsFolder2Items);
   }
 };
 

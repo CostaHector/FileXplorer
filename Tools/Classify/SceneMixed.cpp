@@ -3,10 +3,11 @@
 #include "PathTool.h"
 #include "PublicTool.h"
 #include "PublicVariable.h"
+#include "JsonRenameRegex.h"
 #include "StringTool.h"
 #include "Logger.h"
 #include <QDir>
-
+#include <QSet>
 using namespace ItemsPileCategory;
 
 // Used for Floating Preview
@@ -17,8 +18,19 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QString& path) {
 }
 
 bool ScenesMixed::NeedCombine2Folder(const QString& srcGrpName, const QString& dstGrpName) const {
-  // srcGrpName: movie
-  // dstGrpName: movie part 2. and contains no json file
+  // srcGrpName: "movie", dstGrpName: "movie part 2" and without "movie part 2.json"
+  // combine "movie part 2" into movie
+  static const QSet<QString> ignoreDifferenceSet {
+      "",//
+      "part1","part2","part3","part4","part5",//
+      "partI","partII",//
+      "pt1","pt2","pt3","pt4","pt5", //
+      "scene1","scene2","scene3","scene4","scene5", //
+      "sceneI","sceneII",//
+      "sc1","sc2","sc3","sc4","sc5", //
+      "2160p", "1080p","360p","480p","720p","810p",//
+      "4k","fhd","hd","sd", //
+  };
   if (dstGrpName.size() >= srcGrpName.size()) {
     return false;
   }
@@ -30,8 +42,9 @@ bool ScenesMixed::NeedCombine2Folder(const QString& srcGrpName, const QString& d
   if (m_json2Name.contains(srcGrpName)) {
     return false;
   }
-
-  return true;
+  QString differenceStr = srcGrpName.mid(dstGrpName.size()).toLower();
+  differenceStr.replace(JSON_RENAME_REGEX::INVALID_GOOGLE_SEARCH_LETTER, "");
+  return ignoreDifferenceSet.contains(differenceStr);
 }
 // Used for Name Ruler
 QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {

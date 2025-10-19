@@ -144,6 +144,9 @@ int CastDbModel::SyncImageFieldsFromImageHost(const QModelIndexList& selectedRow
     LOG_D("No need to Sync. nothing selected");
     return 0;
   }
+  if (isDirty()) {
+    submitSaveAllChanges();
+  }
   int succeedCnt = 0;
   for (const auto& indr : selectedRowsIndexes) {
     const int r = indr.row();

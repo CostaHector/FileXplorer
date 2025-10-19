@@ -12,26 +12,36 @@
 class ItemsPackerTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  ItemsPackerTest() : PlainTestSuite{} {}
+  TDir tDir;
+  QString tPath{tDir.path()};
 private slots:
+  void initTestCase() {
+    QVERIFY(tDir.IsValid());
+  }
+
   /* create a folder tDir contains
 [file] "H.C..jpg"
 [file] "H.C..json"
    */
+#define FILE_BASE_NAME_ENDS_WITH_DOT "H.C."
+#define FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX FILE_BASE_NAME_ENDS_WITH_DOT
+#define FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS "H.C"
   void test_group_folder_endwith_dot() {
+    QVERIFY(tDir.ClearAll());
     const QList<FsNodeEntry> baseNameWithDotNodes // already sort name ascending
         {
          FsNodeEntry{"H.C..jpg", false, ""},
          FsNodeEntry{"H.C..json", false, ""},
          };
-    TDir tDir;
     QCOMPARE(tDir.createEntries(baseNameWithDotNodes), baseNameWithDotNodes.size());
-    QString tPath{tDir.path()};
+
     ScenesMixed sMixed;
     const QMap<QString, QStringList>& actualGrps = sMixed(tPath);
     const QMap<QString, QStringList> expectGrps{
-        {"H.C.", {"H.C..json", "H.C..jpg"}} // ImgsSortNameLengthFirst used
+        //
+        {FILE_BASE_NAME_ENDS_WITH_DOT, {"H.C..json", "H.C..jpg"}} // ImgsSortNameLengthFirst used
     };
+
     QCOMPARE(actualGrps, expectGrps);
 
     ItemsPacker packer;
@@ -40,13 +50,19 @@ private slots:
     QCOMPARE(filesRearrangedCnt, 2);
 
     QVERIFY(packer.StartToRearrange());
-    QVERIFY(tDir.exists("H.C."));
-#ifdef _WIN32
-    QVERIFY(tDir.exists("H.C")); // file-system thought that trailing dot can be chopped
-#endif
-    QVERIFY(tDir.exists("H.C./H.C..json"));
-    QVERIFY(tDir.exists("H.C./H.C..jpg"));
 
+    const QSet<QString> expectSnapShots{
+#ifdef _WIN32
+        FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS, // windows platform will chop the trailing dot
+        FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS "/H.C..json",
+        FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS "/H.C..jpg",
+#else
+        FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX, // unix platform will keep the trailing dot
+        FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX "/H.C..json",
+        FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX "/H.C..jpg",
+#endif
+    };
+    QCOMPARE(tDir.Snapshot(), expectSnapShots);
     // unpacker
     ItemsUnpacker unpacker;
     int upackedFoldersCnt = unpacker(tPath);
@@ -57,6 +73,9 @@ private slots:
     std::sort(actualNodes.begin(), actualNodes.end());
     QCOMPARE(actualNodes, baseNameWithDotNodes);
   }
+#undef FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS
+#undef FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX
+#undef FOLDER_NAME_ENDS_WITH_DOT
 
   /* create a folder mDir contains
 [folder] Forbes - Movie Name - Chris Evans, John Reese
@@ -70,8 +89,7 @@ private slots:
   void test_imgs_vids_isolated_existed_folder_pack_and_unpack_ok() {
     SyncModifiyFileSystem::m_syncOperationSw = false;
 
-    TDir tDir;
-    const QString tPath{tDir.path()};
+    QVERIFY(tDir.ClearAll());
     const QList<FsNodeEntry> envNodeEntries {
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese", true, {}},         //
         FsNodeEntry{"Forbes - Movie Name - Chris Evans, John Reese 1.jpg", false, {}},  //
@@ -136,8 +154,7 @@ private slots:
   }
 
   void test_path_as_parameter() {
-    TDir tDir;
-    const QString tPath{tDir.path()};
+    QVERIFY(tDir.ClearAll());
     const QList<FsNodeEntry> envNodeEntries {
         {"A quick fox jump into", true, {}},       //
         {"A quick fox jump into.jpg", false, {}},  //
