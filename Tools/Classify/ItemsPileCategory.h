@@ -14,7 +14,7 @@ const QMap<QString, SCENE_COMPONENT_TYPE> DOT_EXT_2_TYPE{
     {".jfif", IMG},                                //
     {".webp", IMG},                                //
     {".gif", IMG},                                 //
-    {".mp4", VID},  {".mkv", VID}, {".avi", VID},  //
+    {".mp4", VID},  {".mkv", VID}, {".avi", VID}, {".wmv", VID}, {".webm", VID},  //
     {".wmv", VID},  {".ts", VID},                  //
     {".json", JSON}                                //
 };

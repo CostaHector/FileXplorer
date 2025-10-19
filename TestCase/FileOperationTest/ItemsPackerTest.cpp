@@ -23,6 +23,9 @@ private slots:
 [file] "H.C..jpg"
 [file] "H.C..json"
    */
+#define FILE_BASE_NAME_ENDS_WITH_DOT "H.C."
+#define FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX FILE_BASE_NAME_ENDS_WITH_DOT
+#define FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS "H.C"
   void test_group_folder_endwith_dot() {
     QVERIFY(tDir.ClearAll());
     const QList<FsNodeEntry> baseNameWithDotNodes // already sort name ascending
@@ -35,8 +38,10 @@ private slots:
     ScenesMixed sMixed;
     const QMap<QString, QStringList>& actualGrps = sMixed(tPath);
     const QMap<QString, QStringList> expectGrps{
-        {"H.C.", {"H.C..json", "H.C..jpg"}} // ImgsSortNameLengthFirst used
+        //
+        {FILE_BASE_NAME_ENDS_WITH_DOT, {"H.C..json", "H.C..jpg"}} // ImgsSortNameLengthFirst used
     };
+
     QCOMPARE(actualGrps, expectGrps);
 
     ItemsPacker packer;
@@ -48,13 +53,13 @@ private slots:
 
     const QSet<QString> expectSnapShots{
 #ifdef _WIN32
-        "H.C", // file-system thought that trailing dot can be chopped
-        "H.C/H.C..json",
-        "H.C/H.C..jpg",
+        FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS, // windows platform will chop the trailing dot
+        FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS "/H.C..json",
+        FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS "/H.C..jpg",
 #else
-        "H.C.",
-        "H.C./H.C..json",
-        "H.C./H.C..jpg",
+        FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX, // unix platform will keep the trailing dot
+        FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX "/H.C..json",
+        FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX "/H.C..jpg",
 #endif
     };
     QCOMPARE(tDir.Snapshot(), expectSnapShots);
@@ -68,6 +73,9 @@ private slots:
     std::sort(actualNodes.begin(), actualNodes.end());
     QCOMPARE(actualNodes, baseNameWithDotNodes);
   }
+#undef FOLDER_NAME_ENDS_WITH_DOT_IN_WINDOWS
+#undef FOLDER_NAME_ENDS_WITH_DOT_IN_UNIX
+#undef FOLDER_NAME_ENDS_WITH_DOT
 
   /* create a folder mDir contains
 [folder] Forbes - Movie Name - Chris Evans, John Reese
