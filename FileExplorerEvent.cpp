@@ -220,7 +220,7 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   if (!forSearch.isEmpty()) {
     static const QString HTML_URL_TEMPLATE{"https://www.google.com/search?&q=%1&udm=2"};
     static const QString HTML_URL_TEMPLATE_YANDEX{"https://yandex.ru/images/search?text=%1"};
-    url = HTML_URL_TEMPLATE_YANDEX.arg(forSearch);
+    url = HTML_URL_TEMPLATE.arg(forSearch);
   } else {
     url = "https://www.google.com/";
   }
