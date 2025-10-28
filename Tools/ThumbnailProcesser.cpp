@@ -3,6 +3,9 @@
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
 #include "VideoDurationGetter.h"
+#include "UndoRedo.h"
+#include "CastBrowserHelper.h"
+#include <QDirIterator>
 #include <QRegularExpression>
 #include <utility>
 #include <QDirIterator>
@@ -101,6 +104,56 @@ bool ThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseNam
   return false;
 }
 
+bool ThumbnailProcesser::RenameThumbnailGeneratedByPotPlayer(const QString& path) const {
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE cmds;
+
+  QDirIterator it{path, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  const static QSet<QString> VID_TYPE_HASH{TYPE_FILTER::VIDEO_TYPE_SET.cbegin(), TYPE_FILTER::VIDEO_TYPE_SET.cend()};
+
+  QString directFolderPath;
+  QString oldImgPath, oldImgName;
+  QString correspondFile, imgDotExt;
+  QString vidBaseName, vidDotext;
+  while (it.hasNext()) {
+    oldImgPath = it.next();
+    std::tie(correspondFile, imgDotExt) = PathTool::GetBaseNameExt(oldImgPath);
+    std::tie(vidBaseName, vidDotext) = PathTool::GetBaseNameExt(correspondFile);
+    directFolderPath = oldImgPath.chopped(1 + correspondFile.size() + imgDotExt.size());
+    oldImgName = oldImgPath.mid(directFolderPath.size() + 1);
+    if (!VID_TYPE_HASH.contains("*" + vidDotext)) {
+      continue;
+    }
+
+    const int imgWidth = CastBrowserHelper::GetImageSize(oldImgPath).width();
+    if (imgWidth % 360 != 0 && imgWidth % 480 != 0) { // width invalid
+      continue;
+    }
+    const int gridCnt{ imgWidth % 480 == 0 ? imgWidth / 480 : imgWidth / 360 };
+
+    QDir dir{directFolderPath};
+    if (!dir.exists(correspondFile)) {
+      continue;
+    }
+    // newImageName = vidBaseName + " 33" + imgDotExt
+    vidBaseName += QString::asprintf(" %d%d", gridCnt, gridCnt);
+    vidBaseName += imgDotExt;
+    if (dir.exists(vidBaseName)) {
+      if (mSkipImageIfAlreadyExist) {
+        LOG_D("newImageName occupied[%s] skip it", qPrintable(vidBaseName));
+        continue;
+      }
+      cmds.push_back(ACMD::GetInstMOVETOTRASH(directFolderPath, vidBaseName));
+    }
+    cmds.push_back(ACMD::GetInstRENAME(directFolderPath, oldImgName, vidBaseName));
+  }
+  if (cmds.isEmpty()) {
+    return true;
+  }
+  auto& undoRedo = UndoRedo::GetInst();
+  return undoRedo.Do(cmds);
+}
+
 int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const bool isJpg) const {
   if (files.isEmpty()) {
     return 0;
@@ -142,12 +195,12 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
       continue;
     }
 
-    const int dur = mi.GetLengthQuick(pth);                      // unit: ms
+    const int dur = mi.GetLengthQuick(pth);                // unit: ms
     int timePeriod = dur / dimensionX / dimensionY / 1000; // unit: second
 #ifdef RUNNING_UNIT_TESTS
     const double startTime = 0;
 #else
-    if (!IsSamplePeriodAllowed(timePeriod)) {                    // skip: if duration under 1 second
+    if (!IsSamplePeriodAllowed(timePeriod)) { // skip: if duration under 1 second
       LOG_D("Skip file[%s] duration under threshold", qPrintable(pth));
       continue;
     }
@@ -162,22 +215,20 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
     ffmpegArgs.reserve(20);
     ffmpegArgs << "-y" << "-loglevel" << "error";
     ffmpegArgs << "-threads" << QString::number(threadCount);
-    ffmpegArgs << "-hwaccel" << "auto" << "-noaccurate_seek";
-    ffmpegArgs << "-ss" << QString::number(startTime); // 智能定位
-    ffmpegArgs << "-i" << vidPath; // 输入文件
+    ffmpegArgs << "-hwaccel" << "auto" << "-noaccurate_seek"; // best coverage
+    ffmpegArgs << "-ss" << QString::number(startTime);        // 智能定位
+    ffmpegArgs << "-i" << vidPath;                            // 输入文件
 
     // 构建滤镜参数
-    QString filter = QString("select='key',fps=1/%1,scale=%2:-1,tile=%3x%4:margin=0:padding=0")
+    QString filter = QString("select='key',fps=1/%1,scale=%2:-1,tile=%3x%4:margin=0:padding=0") // best key frame
                          .arg(timePeriod)
                          .arg(widthPx)
                          .arg(dimensionY)
                          .arg(dimensionX);
     ffmpegArgs << "-vf" << filter;
-
     ffmpegArgs << "-frames:v" << "1";
-
     if (isJpg) {
-      ffmpegArgs << "-q:v" << "2";
+      ffmpegArgs << "-q:v" << "3";
     }
 
     ffmpegArgs << path2imgBaseName; // 输出文件
@@ -196,7 +247,9 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
     if (ffmpegProcess.exitCode() != 0) {
       const QString errorOutput = QString::fromLocal8Bit(ffmpegProcess.readAllStandardError());
       LOG_W("Create thumbnail image for video[%s] failed with command: %s\nError: %s",
-            qPrintable(vidPath), qPrintable(ffmpegExePath + " " + ffmpegArgs.join(" ")), qPrintable(errorOutput));
+            qPrintable(vidPath),
+            qPrintable(ffmpegExePath + " " + ffmpegArgs.join(" ")),
+            qPrintable(errorOutput));
       continue;
     }
     ++succeedCnt;
