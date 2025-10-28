@@ -6,7 +6,7 @@
 class ThumbnailProcesser {
  public:
   static const QList<int> mAllowedPixelList;
-  static constexpr int SAMPLE_PERIOD_MIN{1}, SAMPLE_PERIOD_MAX{300 + 1};  // [1, 300+1)
+  static constexpr int SAMPLE_PERIOD_MIN{1};  // [1, +\infty)
   static bool IsDimensionXValid(int dimensionX);
   static bool IsDimensionYValid(int dimensionY);
   static bool IsWidthPixelAllowed(int widthPixel);
@@ -15,7 +15,7 @@ class ThumbnailProcesser {
 
   static bool IsImageAnThumbnail(const QString& imgAbsPath);
   static bool IsImageNameLooksLikeThumbnail(const QString& imgBaseName);
-  static int CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const int timePeriod = 20, const bool isJpg = true);
+  int CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const bool isJpg = true) const;
 
   explicit ThumbnailProcesser(bool skipIfImgAlreadyExist = true);
   int operator()(const QString& rootPath, int beg = 0, int end = 1);

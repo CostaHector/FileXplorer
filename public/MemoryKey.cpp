@@ -47,7 +47,6 @@ const KV MemoryKey::DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
                                           "Rename (ith)",
                                           ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"}, CANDIDATE_STRING});
 const KV MemoryKey::DEFAULT_THUMBNAILS_DIMENSION("DEFAULT_THUMBNAILS_DIMENSION", "Create 2x2 thumbnail", ValueChecker{PLAIN_STR});
-const KV MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD{"DEFAULT_THUMBNAIL_SAMPLE_PERIOD", 20, ValueChecker{1, 300}};
 const KV MemoryKey::DEFAULT_EXTRACT_CHOICE("DEFAULT_EXTRACT_CHOICE",
                                            "Extract [0, 2) imgs",
                                            ValueChecker{{"Thumbnail Extractor", "Extract [0, 2) imgs", "Extract [0, 4) imgs", "Extract [b, e) imgs"}, CANDIDATE_STRING});

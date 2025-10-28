@@ -26,7 +26,6 @@ class ThumbnailProcessActions : public QObject {
   QAction* _CREATE_4_BY_4_THUMBNAIL{nullptr};
   QActionGroup* _CREATE_THUMBNAIL_AG{nullptr};
   QMap<QAction*, ThumbnailDimension> mCreateThumbnailDimension;
-  QAction* _THUMBNAIL_SAMPLE_PERIOD{nullptr};
 
   QAction* _EXTRACT_1ST_IMG{nullptr};
   QAction* _EXTRACT_2ND_IMGS{nullptr};
