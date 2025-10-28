@@ -34,12 +34,14 @@ class ThumbnailProcesserTest : public PlainTestSuite {
   Q_OBJECT
 public:
   QDir dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
+  TDir tDir;
   static constexpr int MKV_WIDTH = 480;
   static constexpr int MKV_HEIGHT = 360;
 private slots:
   void initTestCase() {
     QVERIFY(dir.exists(MP4_33_VID_BASE_NAME ".mp4"));
     QVERIFY(dir.exists(FLV_10_VID_BASE_NAME ".flv"));
+    QVERIFY(tDir.IsValid());
   }
 
   void cleanupTestCase() {
@@ -92,6 +94,36 @@ private slots:
     }
   }
 
+#define MKV_SEGEMENTS_BASE_NAME "Big Buck Bunny 5secondx3_RedGreenBlue"
+  void screeshot_sample_time_correct() {
+    tDir.ClearAll();
+
+    const QString mkvPath = tDir.itemPath(MKV_SEGEMENTS_BASE_NAME ".mkv");
+    bool bGenOk = false;
+    QByteArray vidBa = VideoTestPrecoditionTools::CreateVideoFile(mkvPath,
+                                                                  {0xFF0000, 0x00FF00, 0x0000FF},
+                                                                  {5000, 5000, 5000},
+                                                                  &bGenOk,
+                                                                  MKV_WIDTH,
+                                                                  MKV_HEIGHT);
+    QVERIFY(bGenOk);
+    QVERIFY(vidBa.size() > 0);
+
+    ThumbnailProcesser itp4{true};
+    QCOMPARE(itp4.CreateThumbnailImages(QStringList{mkvPath}, 3, 1, MKV_WIDTH, false), 1);
+    const QString thumbnailImgPath = tDir.itemPath(MKV_SEGEMENTS_BASE_NAME " 31.png");
+    const QImage thumbnailImg{thumbnailImgPath};
+    QVERIFY(!thumbnailImg.isNull());
+    QCOMPARE(thumbnailImg.width(), MKV_WIDTH * 1);
+    QCOMPARE(thumbnailImg.height(), MKV_HEIGHT * 3);
+
+    quint32 redRgb = ImageTestPrecoditionTools::GetPixelColorFromImage(thumbnailImg, 10, 10 + 0 * MKV_HEIGHT);
+    quint32 blueRgb = ImageTestPrecoditionTools::GetPixelColorFromImage(thumbnailImg, 10, 10 + 2 * MKV_HEIGHT);
+    QVERIFY(ColorsApproximatelyEqual(redRgb, 0xFF0000));
+    QVERIFY(ColorsApproximatelyEqual(blueRgb, 0x0000FF));
+  }
+#undef MKV_SEGEMENTS_BASE_NAME
+
   void test_IsImageNameLooksLikeThumbnail_ok() {
     QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 22"));
     QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 33"));
@@ -118,10 +150,11 @@ private slots:
   }
 
   void test_CutThumbnails9ImgsOk() {
-    TDir mDir;
-    const QString rootpath{mDir.path()};
+    tDir.ClearAll();
+
+    const QString rootpath{tDir.path()};
     QVERIFY(ImageTestPrecoditionTools::CreateAndSaveAWhitePng(rootpath + "/Images 33.png"));
-    QVERIFY(mDir.fileExists("Images 33.png"));
+    QVERIFY(tDir.fileExists("Images 33.png"));
 
     {
       ThumbnailProcesser itp{true};
@@ -143,34 +176,51 @@ private slots:
       QCOMPARE(itp3.mRewriteImagesCnt, 4);
       QCOMPARE(itp3.mErrImg.size(), 4); // 4 rewrite msg
     }
+  }
 
-#define MKV_SEGEMENTS_BASE_NAME "Big Buck Bunny 5secondx3_RedGreenBlue"
-    {
-      const QString mkvPath = mDir.itemPath(MKV_SEGEMENTS_BASE_NAME ".mkv");
-      bool bGenOk = false;
-      QByteArray vidBa = VideoTestPrecoditionTools::CreateVideoFile(mkvPath,
-                                                                    {0xFF0000, 0x00FF00, 0x0000FF},
-                                                                    {5000, 5000, 5000},
-                                                                    &bGenOk,
-                                                                    MKV_WIDTH,
-                                                                    MKV_HEIGHT);
-      QVERIFY(bGenOk);
-      QVERIFY(vidBa.size() > 0);
+  void rename_thubnaim_image_generate_by_potplayer_ok() {
+    tDir.ClearAll();
 
-      ThumbnailProcesser itp4{true};
-      QCOMPARE(itp4.CreateThumbnailImages(QStringList{mkvPath}, 3, 1, MKV_WIDTH, false), 1);
-      const QString thumbnailImgPath = mDir.itemPath(MKV_SEGEMENTS_BASE_NAME " 31.png");
-      const QImage thumbnailImg{thumbnailImgPath};
-      QVERIFY(!thumbnailImg.isNull());
-      QCOMPARE(thumbnailImg.width(), MKV_WIDTH * 1);
-      QCOMPARE(thumbnailImg.height(), MKV_HEIGHT * 3);
+    const QByteArray widthNotAllowedImg = ImageTestPrecoditionTools::GetPNGImage(99, 79, "png");
+    const QByteArray widthAllowedImg = ImageTestPrecoditionTools::GetPNGImage(720, 360, "png");
 
-      quint32 redRgb = ImageTestPrecoditionTools::GetPixelColorFromImage(thumbnailImg, 10, 10 + 0 * MKV_HEIGHT);
-      quint32 blueRgb = ImageTestPrecoditionTools::GetPixelColorFromImage(thumbnailImg, 10, 10 + 2 * MKV_HEIGHT);
-      QVERIFY(ColorsApproximatelyEqual(redRgb, 0xFF0000));
-      QVERIFY(ColorsApproximatelyEqual(blueRgb, 0x0000FF));
-    }
-#undef MKV_SEGEMENTS_BASE_NAME
+    const QList<FsNodeEntry> nodes{
+        {"a need.mp4", false, ""},                                          //
+        {"a need.mp4.jpg", false, widthAllowedImg},                         // 1
+        {"b no need img.mp4.jpg", false, widthAllowedImg},                  //
+        {"c no need vid.mp4", false, ""},                                   //
+        {"d no need width invalid vid.mp4", false, ""},                     //
+        {"d no need width invalid vid.mp4.png", false, widthNotAllowedImg}, //
+        {"folder/need.mp4", false, ""},                                     //
+        {"folder/need.mp4.png", false, widthAllowedImg},                    // 1
+        {"folder/condition_need_occupied.mp4", false, ""},                  //
+        {"folder/condition_need_occupied 22.jpg", false, widthAllowedImg},     // when skip 0, when not skip 1
+        {"folder/condition_need_occupied.mp4.jpg", false, widthAllowedImg}, //
+        {"folder/no_need_vid.mp4", false, ""},                              //
+        {"folder/no_need_img.mp4.jpg", false, widthAllowedImg},             //
+    };
+    QCOMPARE(tDir.createEntries(nodes), nodes.size());
+
+    // not skip
+    ThumbnailProcesser it{false};
+    QVERIFY(it.RenameThumbnailGeneratedByPotPlayer(tDir.path()));
+
+    const QSet<QString> expectSnapShots{
+        "a need.mp4",
+        "a need 22.jpg",
+        "b no need img.mp4.jpg",
+        "c no need vid.mp4",
+        "d no need width invalid vid.mp4",
+        "d no need width invalid vid.mp4.png",
+        "folder/need.mp4",
+        "folder/need 22.png",
+        "folder/condition_need_occupied.mp4",
+        "folder/condition_need_occupied 22.jpg",
+        "folder/no_need_vid.mp4",
+        "folder/no_need_img.mp4.jpg",
+    };
+    const QSet<QString> actualSnapshot = tDir.Snapshot(QDir::Filter::Files);
+    QCOMPARE(actualSnapshot, expectSnapShots);
   }
 };
 

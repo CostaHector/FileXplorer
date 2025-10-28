@@ -15,6 +15,7 @@ class ThumbnailProcesser {
 
   static bool IsImageAnThumbnail(const QString& imgAbsPath);
   static bool IsImageNameLooksLikeThumbnail(const QString& imgBaseName);
+  bool RenameThumbnailGeneratedByPotPlayer(const QString& path) const;
   int CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const bool isJpg = true) const;
 
   explicit ThumbnailProcesser(bool skipIfImgAlreadyExist = true);

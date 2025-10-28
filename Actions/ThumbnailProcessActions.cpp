@@ -22,6 +22,9 @@ ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
   mCreateThumbnailDimension[_CREATE_3_BY_3_THUMBNAIL] = {3, 3, 720};
   mCreateThumbnailDimension[_CREATE_4_BY_4_THUMBNAIL] = {4, 4, 480};
 
+  _RENAME_THUMBNAILS_FROM_POT_PLAYER = new (std::nothrow) QAction(QIcon{":img/NAME_RULER"}, "Rename thumbnails");
+  _RENAME_THUMBNAILS_FROM_POT_PLAYER->setToolTip("Rename thumbnails generated from potplayer");
+
   _EXTRACT_1ST_IMG = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_1"), "Thumbnail Extractor");
   _EXTRACT_1ST_IMG->setToolTip("Extract the 1st image from thumbnails under current view path");
   _EXTRACT_2ND_IMGS = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_2"), "Extract [0, 2) imgs");
@@ -45,7 +48,10 @@ ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
 }
 
 QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
-  QList<QAction*> crtThumbnailActions = _CREATE_THUMBNAIL_AG->actions();
+  QList<QAction*> crtThumbnailActions;
+  crtThumbnailActions += _CREATE_THUMBNAIL_AG->actions();
+  crtThumbnailActions += nullptr;
+  crtThumbnailActions += _RENAME_THUMBNAILS_FROM_POT_PLAYER;
   auto* createTB = new (std::nothrow) MenuToolButton{crtThumbnailActions,//
                                                          QToolButton::MenuButtonPopup,//
                                                          Qt::ToolButtonStyle::ToolButtonTextBesideIcon,//
