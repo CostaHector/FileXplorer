@@ -2,7 +2,7 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
-#include "MemoryKey.h"
+#include "VideoDurationGetter.h"
 #include <QRegularExpression>
 #include <utility>
 #include <QDirIterator>
@@ -10,17 +10,19 @@
 #include <QDir>
 #include <QPixmap>
 #include <QSet>
+#include <QProcess>
+#include <QThread>
 
 const QList<int> ThumbnailProcesser::mAllowedPixelList{360, 480, 720, 1080};
-constexpr int ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX;  // [1, 300)
+constexpr int ThumbnailProcesser::SAMPLE_PERIOD_MIN; // [1, 300)
 
 bool ThumbnailProcesser::IsDimensionXValid(int dimensionX) {
-  static constexpr int DIMENSION_X_MIN{1}, DIMENSION_X_MAX{10+1};  // [1, 10+1)
+  static constexpr int DIMENSION_X_MIN{1}, DIMENSION_X_MAX{10 + 1}; // [1, 10+1)
   return DIMENSION_X_MIN <= dimensionX && dimensionX <= DIMENSION_X_MAX;
 }
 
 bool ThumbnailProcesser::IsDimensionYValid(int dimensionY) {
-  static constexpr int DIMENSION_Y_MIN{1}, DIMENSION_Y_MAX{10+1};  // [1, 10+1)
+  static constexpr int DIMENSION_Y_MIN{1}, DIMENSION_Y_MAX{10 + 1}; // [1, 10+1)
   return DIMENSION_Y_MIN <= dimensionY && dimensionY <= DIMENSION_Y_MAX;
 }
 
@@ -30,7 +32,7 @@ bool ThumbnailProcesser::IsWidthPixelAllowed(int widthPixel) {
 }
 
 bool ThumbnailProcesser::IsSamplePeriodAllowed(int samplePeriod) {
-  return SAMPLE_PERIOD_MIN <= samplePeriod && samplePeriod < SAMPLE_PERIOD_MAX;
+  return samplePeriod >= SAMPLE_PERIOD_MIN;
 }
 
 bool ThumbnailProcesser::CheckParameters(int dimensionX, int dimensionY, int widthPixel) {
@@ -46,34 +48,29 @@ bool ThumbnailProcesser::CheckParameters(int dimensionX, int dimensionY, int wid
     LOG_INFO_P("images width invalid", "%d", widthPixel);
     return false;
   }
-  const int samplePeriod = Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
-  if (!IsSamplePeriodAllowed(samplePeriod)) {
-    LOG_INFO_P("Sample period not allowed", "%d", samplePeriod);
-    return false;
-  }
   return true;
 }
 
-ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist)  //
-    : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist}               //
+ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist) //
+  : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist}                //
 {}
 
 bool ThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
   QString imgBaseName;
   QString ext;
   std::tie(imgBaseName, ext) = PathTool::GetBaseNameExt(imgAbsPath);
-  if (!TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + ext)) {  // not an image
+  if (!TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + ext)) { // not an image
     return false;
   }
-  if (!IsImageNameLooksLikeThumbnail(imgBaseName)) {  // name not like
+  if (!IsImageNameLooksLikeThumbnail(imgBaseName)) { // name not like
     return false;
   }
   QFileInfo fi{imgAbsPath};
   if (!fi.isFile()) {
     return false;
   }
-  static constexpr int IMG_LARGEST_SIZE = 5 * 1024 * 1024;  // 5MiB
-  if (fi.size() > IMG_LARGEST_SIZE) {                       // images too large
+  static constexpr int IMG_LARGEST_SIZE = 5 * 1024 * 1024; // 5MiB
+  if (fi.size() > IMG_LARGEST_SIZE) {                      // images too large
     return false;
   }
   return true;
@@ -89,97 +86,120 @@ bool ThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseNam
   int row = -1;
   int column = -1;
   std::tie(row, column) = GetThumbnailDimension(imgBaseName);
-  if (!IsDimensionXValid(row) || !IsDimensionXValid(column)) {  // 0x, x0, row>=9 or column>=9
+  if (!IsDimensionXValid(row) || !IsDimensionXValid(column)) { // 0x, x0, row>=9 or column>=9
     return false;
   }
-  if (row == 1) {  // 1x -> false
+  if (row == 1) { // 1x -> false
     return false;
   }
-  if (column == 1) {  // 21, 31, 41, 51, ..., 81 -> true
+  if (column == 1) { // 21, 31, 41, 51, ..., 81 -> true
     return true;
   }
-  if (row == column) {  // square 22,33,44,55,66,77,88
+  if (row == column) { // square 22,33,44,55,66,77,88
     return true;
   }
   return false;
 }
 
-int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const int timePeriod, const bool isJpg) {
-  if (!IsDimensionXValid(dimensionX)) {
-    LOG_W("Dimension of row[%d] out of range", dimensionX);
+int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const bool isJpg) const {
+  if (files.isEmpty()) {
+    return 0;
+  }
+  if (!CheckParameters(dimensionX, dimensionY, widthPx)) {
     return -1;
   }
-  if (!IsDimensionYValid(dimensionY)) {
-    LOG_W("Dimension of column[%d] out of range", dimensionY);
-    return -1;
-  }
-  if (!IsWidthPixelAllowed(widthPx)) {
-    LOG_W("images width %d pixel(s) invalid", widthPx);
-    return -1;
-  }
-  if (!IsSamplePeriodAllowed(timePeriod)) {
-    LOG_W("timePeriod: %d second invalid", timePeriod);
+  VideoDurationGetter mi;
+  if (!mi.StartToGet()) {
     return -1;
   }
 
-  QMap<QString, QString> vidPath2ImgBaseName;
+  const QString imgThumbnailSuffix{QString::asprintf(" %d%d.%s", dimensionX, dimensionY, (isJpg ? "jpg" : "png"))};
+  const QString ffmpegExePath{"ffmpeg"};
+
+  int succeedCnt{0};
+  const int threadCount = QThread::idealThreadCount(); // 获取CPU核心数
+
   for (const QString& pth : files) {
     const QFileInfo fi{pth};
     if (!fi.isFile()) {
-      continue;
-    }
-    if (fi.size() < 10 * 1024) {  // skip file size under 10k byte(s)
       continue;
     }
     const QString& ext = fi.suffix();
     if (!TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + ext)) {
       continue;
     }
-    vidPath2ImgBaseName[pth] = pth.left(pth.size() - ext.size() - 1);
-  }
-  if (vidPath2ImgBaseName.isEmpty()) {
-    LOG_D("no videos find need to create thumbnail image(s)");
-    return 0;
-  }
-
-  int succeedCnt{0};
-  const QString ffmpegExePath = "ffmpeg";
-  // ffmpeg.exe -i "aa.mp4" -vf "select=key,scale=1080:-1,tile=2x2:margin=0:padding=0" -frames:v 1 -q:v 2 "aa 22.jpg"
-  // for key frame: select=key
-  // for time axis: fps=1/T
-  QString config;
-  config += QString{R"( -y -vf "fps=1/%1,)"}.arg(timePeriod);
-  config += QString{R"(scale=%1:-1,tile=%2x%3:margin=0:padding=0" -frames:v 1 )"}  //
-                .arg(widthPx)
-                .arg(dimensionX)
-                .arg(dimensionY);
-  // for jpg add this one quality value 2: -q:v 2
-  if (isJpg) {
-    config += " -q:v 2";
-  }
-  const QString imgthumbnailImgExt{isJpg ? ".jpg" : ".png"};
-  // imgThumbnailSuffix e.g., " 33.png", " 24.jpg"
-  const QString imgThumbnailSuffix{" " + QString::number(dimensionX) + QString::number(dimensionY) + imgthumbnailImgExt};
-  for (auto it = vidPath2ImgBaseName.cbegin(); it != vidPath2ImgBaseName.cend(); ++it) {
-    QString ffmpegCmdTemplate;
-    ffmpegCmdTemplate += ffmpegExePath;
-    ffmpegCmdTemplate += R"( -loglevel error )";
-    // ffmpegCmdTemplate += R"( -loglevel warning )";
-    // ffmpegCmdTemplate += R"( -loglevel info )";
-    ffmpegCmdTemplate += R"( -i "%1" )";  // input path
-    ffmpegCmdTemplate += config;
-    ffmpegCmdTemplate += R"( "%2")";     // output path
-    const QString vidPath = PathTool::sysPath(it.key());
-    const QString& path2imgBaseName = PathTool::sysPath(it.value()) + imgThumbnailSuffix;
-    const QString ffmpegCmd{ffmpegCmdTemplate.arg(vidPath, path2imgBaseName)};
-    QByteArray cmdBytes = ffmpegCmd.toLocal8Bit();
-    int result = system(cmdBytes.constData());
-    if (result == 0) {
-      ++succeedCnt;
-    } else {
-      LOG_W("Create thumbnail image for video[%s] failed with command: %s", qPrintable(vidPath), qPrintable(ffmpegCmd));
-      return succeedCnt;
+#ifndef RUNNING_UNIT_TESTS
+    if (fi.size() < 50 * 1024 * 1024) { // skip: if file size under 50 MiB
+      LOG_D("Skip file[%s] size under threshold", qPrintable(pth));
+      continue;
     }
+#endif
+    const QString vidPath = PathTool::sysPath(pth);
+    const QString vidBaseName = pth.left(pth.size() - ext.size() - 1);
+    const QString path2imgBaseName = PathTool::sysPath(vidBaseName) + imgThumbnailSuffix;
+    if (mSkipImageIfAlreadyExist && QFile::exists(path2imgBaseName)) { // skip if name xx.jpg already exist
+      LOG_D("Skip file[%s] thumbnail already exist", qPrintable(pth));
+      continue;
+    }
+
+    const int dur = mi.GetLengthQuick(pth);                      // unit: ms
+    int timePeriod = dur / dimensionX / dimensionY / 1000; // unit: second
+#ifdef RUNNING_UNIT_TESTS
+    const double startTime = 0;
+#else
+    if (!IsSamplePeriodAllowed(timePeriod)) {                    // skip: if duration under 1 second
+      LOG_D("Skip file[%s] duration under threshold", qPrintable(pth));
+      continue;
+    }
+    if (dimensionX == dimensionY && dimensionX == 1 && timePeriod > 5) {
+      timePeriod = 5; // speed up
+    }
+    const double startTime = std::max(5.0, dur / 1000.0 * 0.01); // skip first 5 seconds, or 1%
+#endif
+
+    // 构建FFmpeg命令参数列表
+    QStringList ffmpegArgs;
+    ffmpegArgs.reserve(20);
+    ffmpegArgs << "-y" << "-loglevel" << "error";
+    ffmpegArgs << "-threads" << QString::number(threadCount);
+    ffmpegArgs << "-hwaccel" << "auto" << "-noaccurate_seek";
+    ffmpegArgs << "-ss" << QString::number(startTime); // 智能定位
+    ffmpegArgs << "-i" << vidPath; // 输入文件
+
+    // 构建滤镜参数
+    QString filter = QString("select='key',fps=1/%1,scale=%2:-1,tile=%3x%4:margin=0:padding=0")
+                         .arg(timePeriod)
+                         .arg(widthPx)
+                         .arg(dimensionY)
+                         .arg(dimensionX);
+    ffmpegArgs << "-vf" << filter;
+
+    ffmpegArgs << "-frames:v" << "1";
+
+    if (isJpg) {
+      ffmpegArgs << "-q:v" << "2";
+    }
+
+    ffmpegArgs << path2imgBaseName; // 输出文件
+
+    // 使用推荐的start()重载
+    QProcess ffmpegProcess;
+    ffmpegProcess.start(ffmpegExePath, ffmpegArgs);
+
+    // 智能超时设置
+    const int timeoutMs = std::min(dur + 30000, 300000);
+    if (!ffmpegProcess.waitForFinished(timeoutMs)) {
+      LOG_W("FFmpeg timeout for video[%s] after %d ms", qPrintable(vidPath), timeoutMs);
+      ffmpegProcess.kill();
+      continue;
+    }
+    if (ffmpegProcess.exitCode() != 0) {
+      const QString errorOutput = QString::fromLocal8Bit(ffmpegProcess.readAllStandardError());
+      LOG_W("Create thumbnail image for video[%s] failed with command: %s\nError: %s",
+            qPrintable(vidPath), qPrintable(ffmpegExePath + " " + ffmpegArgs.join(" ")), qPrintable(errorOutput));
+      continue;
+    }
+    ++succeedCnt;
   }
   return succeedCnt;
 }
@@ -217,7 +237,7 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
     // e.g., imgAbsPath="an image 44.jpeg"
     // thumbnailImgBaseName = "an image 44", ext=".jpeg", ImgBaseName = "an image"
     std::tie(thumbnailImgBaseName, ext) = PathTool::GetBaseNameExt(imgAbsPath);
-    const QString ImgBaseName = thumbnailImgBaseName.chopped(3);  // "an image"
+    const QString ImgBaseName = thumbnailImgBaseName.chopped(3); // "an image"
 
     // get thumbnail dimension by file name last 3 charactor
     int row{-1}, column{-1};
@@ -230,8 +250,12 @@ int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
     QPixmap pixmap{imgAbsPath};
     const int wPixels = pixmap.width(), hPixels = pixmap.height();
     if (wPixels % row != 0 || hPixels % column != 0) {
-      LOG_D("thumbnail[%s] %d-by-%d pixels cannot be seperated into %d x %d screenshot",  //
-             qPrintable(imgAbsPath), wPixels, hPixels, row, column);
+      LOG_D("thumbnail[%s] %d-by-%d pixels cannot be seperated into %d x %d screenshot", //
+            qPrintable(imgAbsPath),
+            wPixels,
+            hPixels,
+            row,
+            column);
       continue;
     }
     const int eachImgWidth{wPixels / row}, eachImgHeight{hPixels / column};

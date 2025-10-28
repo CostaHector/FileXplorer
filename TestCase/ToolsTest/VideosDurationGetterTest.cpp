@@ -131,19 +131,35 @@ class VideosDurationGetterTest : public PlainTestSuite {
   void test_generated_video_length_correct() {
     TDir tDir;
     QVERIFY(tDir.IsValid());
-
-    const int expectDurationMs = 5000;
-    const QString generatedVidPath = tDir.itemPath("GenratedVideos5second.mp4");
-    bool bGenOk = false;
-    QByteArray ba = VideoTestPrecoditionTools::CreateVideoContentNormal(generatedVidPath, expectDurationMs, &bGenOk);
-    QVERIFY(bGenOk);
-    QVERIFY(tDir.exists("GenratedVideos5second.mp4"));
-    QVERIFY(!ba.isEmpty());
-
     VideoDurationGetter mi;
     QVERIFY(mi.StartToGet());
-    int actualDuration = mi.GetLengthQuick(generatedVidPath);
-    QVERIFY2((std::abs(actualDuration - expectDurationMs) < EPSILON_MILLIONSECOND), qPrintable(generatedVidPath));
+
+    bool bGenOk = false;
+    {
+      const int expectDurationMs = 5000;
+      const QString generatedVidPath = tDir.itemPath("GenratedVideos5second.mp4");
+      QByteArray ba = VideoTestPrecoditionTools::CreateVideoContentNormal(generatedVidPath, expectDurationMs, &bGenOk);
+      QVERIFY(bGenOk);
+      QVERIFY(tDir.exists("GenratedVideos5second.mp4"));
+      QVERIFY(!ba.isEmpty());
+
+      int actualDuration = mi.GetLengthQuick(generatedVidPath);
+      QVERIFY2((std::abs(actualDuration - expectDurationMs) < EPSILON_MILLIONSECOND), qPrintable(generatedVidPath));
+    }
+
+    {
+      const QString generatedDifferVidPath = tDir.itemPath("GenratedDifferVideos20second.mp4");
+      bGenOk = false;
+      QByteArray differVidBA = VideoTestPrecoditionTools::CreateVideoFile(generatedDifferVidPath, //
+                                                                          {0xFF0000, 0x00FF00, 0x0000FF}, {5000, 10000, 5000}, &bGenOk);
+      QVERIFY(bGenOk);
+      QVERIFY(!differVidBA.isEmpty());
+
+      const int expectDifferVidDurationMs = 5000+10000+5000;
+      int actualDifferVidDuration = mi.GetLengthQuick(generatedDifferVidPath);
+      QVERIFY2((std::abs(actualDifferVidDuration - expectDifferVidDurationMs) < EPSILON_MILLIONSECOND),
+               qPrintable(generatedDifferVidPath));
+    }
   }
 };
 constexpr int VideosDurationGetterTest::EPSILON_MILLIONSECOND;

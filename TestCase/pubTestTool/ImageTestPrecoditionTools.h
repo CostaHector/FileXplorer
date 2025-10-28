@@ -2,6 +2,7 @@
 #define IMAGETESTPRECODITIONTOOLS_H
 #include <QString>
 #include <QByteArray>
+#include <QImage>
 
 namespace ImageTestPrecoditionTools {
 constexpr const char* SVG_FILL_COLORS[]{
@@ -25,7 +26,13 @@ constexpr const char* SVG_FILL_COLORS[]{
 constexpr int SVG_FILL_COLORS_COUNT = sizeof(SVG_FILL_COLORS)/sizeof(*SVG_FILL_COLORS);
 
 const QString& GetSvgContentTemplate();
+bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int height = 1080);
 
 QByteArray GetPNGImage(int width = 100, int height = 80, const QString& imgType = "PNG");
+
+quint32 GetPixelColorFromImage(const QImage& image, int x, int y);
+quint32 GetPixelColorFromData(const QByteArray& imageData, const char* format, int x, int y);
+quint32 GetPixelColorFromImagePath(const QString& filePath, int x, int y);
+
 }
 #endif  // IMAGETESTPRECODITIONTOOLS_H

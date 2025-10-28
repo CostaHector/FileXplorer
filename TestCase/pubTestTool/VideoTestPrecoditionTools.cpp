@@ -3,6 +3,7 @@
 #include "PublicTool.h"
 #include <QProcess>
 #include <QBuffer>
+#include <QDebug>
 
 namespace VideoTestPrecoditionTools {
 SetDatabaseParmRetType setDupVidDbAbsFilePath(const QString& placeDbFileLocation) {
@@ -38,16 +39,16 @@ QByteArray GetVideoContentFFMPEGReadableOnly(int durationMs) {
 
   // 简单的视频容器头部（模拟5秒视频）
   buffer.write("RIFF");
-  buffer.write(QByteArray::fromHex("00000000"));  // 文件大小占位符
+  buffer.write(QByteArray::fromHex("00000000")); // 文件大小占位符
   buffer.write("AVI ");
 
   // 添加时长信息
   buffer.write("LIST");
-  buffer.write(QByteArray::fromHex("00000000"));  // 列表大小占位符
+  buffer.write(QByteArray::fromHex("00000000")); // 列表大小占位符
   buffer.write("hdrl");
   buffer.write("avih");
-  buffer.write(QByteArray::fromHex("38000000"));                               // avih块大小
-  buffer.write(QByteArray::number(durationMs).rightJustified(8, '\0', true));  // 时长
+  buffer.write(QByteArray::fromHex("38000000"));                              // avih块大小
+  buffer.write(QByteArray::number(durationMs).rightJustified(8, '\0', true)); // 时长
 
   // 填充文件大小
   qint64 fileSize = buffer.size();
@@ -63,7 +64,7 @@ QByteArray CreateVideoContentNormal(const QString& videoGeneratedIn, int duratio
   // 使用 FFmpeg 生成视频
   QProcess ffmpeg;
   QStringList args;
-  args << "-y"  // 覆盖输出文件
+  args << "-y" // 覆盖输出文件
        << "-f"
        << "lavfi"
        << "-i" << QString("color=c=red:s=100x80:d=%1").arg(durationSeconds) << "-c:v"
@@ -76,4 +77,48 @@ QByteArray CreateVideoContentNormal(const QString& videoGeneratedIn, int duratio
   // 读取生成的视频文件
   return FileTool::ByteArrayReader(videoGeneratedIn, bGenOk);
 }
-}  // namespace VideoTestPrecoditionTools
+
+QByteArray CreateVideoFile(const QString& videoGeneratedIn, const QList<quint32>& colorRGBs, const QList<int>& durationMss, bool* bGenOk, const int widthPx, const int heightPx) {
+  if (colorRGBs.size() != durationMss.size() || colorRGBs.isEmpty()) {
+    if (bGenOk != nullptr) {
+      *bGenOk = false;
+    }
+    return {};
+  }
+
+  // 准备FFmpeg命令
+  QProcess ffmpeg;
+  QStringList args;
+  args << "-y"; // 移除"-f lavfi"，让FFmpeg自动确定输出格式
+
+  // 构建filter graph
+  QStringList colorFilters;
+  QStringList concatInputs;
+  for (int i = 0; i < colorRGBs.size(); ++i) {
+    const double segmentDuration = durationMss[i] / 1000.0;
+    // 为每个颜色源创建独立的输入
+    colorFilters << QString::asprintf("color=c=0x%06x:s=%dx%d:d=%f,trim=duration=%f[v%d]", //
+                                      (colorRGBs[i] & 0xFFFFFF), widthPx, heightPx, segmentDuration, segmentDuration, i); //
+    concatInputs << QString("[v%1]").arg(i);
+  }
+
+  // 构建完整的filter_complex
+  QString filter = QString("%1;%2concat=n=%3:v=1:a=0[out]").arg(colorFilters.join(";")).arg(concatInputs.join("")).arg(colorRGBs.size());
+
+  args << "-filter_complex" << filter << "-map" << "[out]"
+       << "-c:v" << "libx264"
+       << "-pix_fmt" << "yuv420p" << videoGeneratedIn;
+
+  // // 设置FFmpeg输出捕获
+  ffmpeg.setProcessChannelMode(QProcess::MergedChannels);
+  QObject::connect(&ffmpeg, &QProcess::readyReadStandardOutput, [&]() {
+    qDebug() << ffmpeg.readAllStandardOutput();
+  });
+
+  ffmpeg.start("ffmpeg", args);
+  ffmpeg.waitForFinished();
+
+  return FileTool::ByteArrayReader(videoGeneratedIn, bGenOk);
+}
+
+} // namespace VideoTestPrecoditionTools

@@ -140,7 +140,7 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
 }
 
-bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx) {
+bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx, bool skipIfExist) {
   if (!__CanNewItem()) {
     return false;
   }
@@ -149,10 +149,8 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
     LOG_INFO_NP("Skip nothing selected", "selected some video(s) first");
     return true;
   }
-  if (!ThumbnailProcesser::CheckParameters(dimensionX, dimensionY, widthPx)) {
-    return false;
-  }
-  const int cnt = ThumbnailProcesser::CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, true);
+  ThumbnailProcesser tp{skipIfExist};
+  const int cnt = tp.CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, true);
   if (cnt <= 0) {
     LOG_ERR_NP("Create thumbnail failed", "see details in log");
     return false;
@@ -219,6 +217,7 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   QString url;
   if (!forSearch.isEmpty()) {
     static const QString HTML_URL_TEMPLATE{"https://www.google.com/search?&q=%1&udm=2"};
+    static const QString HTML_URL_TEMPLATE_YANDEX{"https://yandex.ru/images/search?text=%1"};
     url = HTML_URL_TEMPLATE.arg(forSearch);
   } else {
     url = "https://www.google.com/";
@@ -281,27 +280,9 @@ void FileExplorerEvent::subscribeThumbnailActions() {
       LOG_W("create thumbnail action[%p] not support", createThumbnailAct);
       return;
     }
+    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
     int dimensionX = it->x, dimensionY = it->y, widthPixel = it->width;
-    on_CreateThumbnailImages(dimensionX, dimensionY, widthPixel);
-  });
-
-  connect(ins._THUMBNAIL_SAMPLE_PERIOD, &QAction::triggered, this, [this]() {
-    bool bok = false;
-    const int curSamplePeriod =
-        Configuration().value(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.v).toInt();
-    const int newSamplePeriod = QInputDialog::getInt(this->_contentPane, "Thumbnail Sample Period(seconds)",                           //
-                                                     "Set thumbnail image sample period to:", curSamplePeriod,                         //
-                                                     ThumbnailProcesser::SAMPLE_PERIOD_MIN, ThumbnailProcesser::SAMPLE_PERIOD_MAX, 1,  //
-                                                     &bok);
-    if (!bok) {
-      LOG_INFO_NP("[Skip] User cancel set sample period", "return");
-      return;
-    }
-    if (newSamplePeriod == curSamplePeriod) {
-      return;
-    }
-    Configuration().setValue(MemoryKey::DEFAULT_THUMBNAIL_SAMPLE_PERIOD.name, newSamplePeriod);
-    LOG_OK_P("ThumbnailSamplePeriod", "T=%d", newSamplePeriod);
+    on_CreateThumbnailImages(dimensionX, dimensionY, widthPixel, bSkipExist);
   });
 
   connect(ins._EXTRACT_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* extractThumbnailAct) {

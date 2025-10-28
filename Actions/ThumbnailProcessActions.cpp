@@ -20,10 +20,7 @@ ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
   mCreateThumbnailDimension[_CREATE_1_BY_1_THUMBNAIL] = {1, 1, 720};
   mCreateThumbnailDimension[_CREATE_2_BY_2_THUMBNAIL] = {2, 2, 720};
   mCreateThumbnailDimension[_CREATE_3_BY_3_THUMBNAIL] = {3, 3, 720};
-  mCreateThumbnailDimension[_CREATE_3_BY_3_THUMBNAIL] = {4, 4, 480};
-
-  _THUMBNAIL_SAMPLE_PERIOD = new (std::nothrow) QAction("Sample period");
-  _THUMBNAIL_SAMPLE_PERIOD->setToolTip("Set thumbnail image sample period(20 second by default)");
+  mCreateThumbnailDimension[_CREATE_4_BY_4_THUMBNAIL] = {4, 4, 480};
 
   _EXTRACT_1ST_IMG = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_1"), "Thumbnail Extractor");
   _EXTRACT_1ST_IMG->setToolTip("Extract the 1st image from thumbnails under current view path");
@@ -48,10 +45,7 @@ ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
 }
 
 QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
-  QList<QAction*> crtThumbnailActions;
-  crtThumbnailActions += _CREATE_THUMBNAIL_AG->actions();
-  crtThumbnailActions.push_back(nullptr);
-  crtThumbnailActions.push_back(_THUMBNAIL_SAMPLE_PERIOD);
+  QList<QAction*> crtThumbnailActions = _CREATE_THUMBNAIL_AG->actions();
   auto* createTB = new (std::nothrow) MenuToolButton{crtThumbnailActions,//
                                                          QToolButton::MenuButtonPopup,//
                                                          Qt::ToolButtonStyle::ToolButtonTextBesideIcon,//

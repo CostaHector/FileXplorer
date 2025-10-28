@@ -4,7 +4,6 @@
 #include "VideoDurationGetter.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
-#include "StyleSheet.h"
 #include "StringTool.h"
 #include <QBuffer>
 #include <QDir>
