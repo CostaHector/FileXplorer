@@ -57,7 +57,6 @@ RibbonMenu::RibbonMenu(QWidget* parent)
 
   _EXPAND_RIBBONS = new (std::nothrow) QAction{QIcon{":img/EXPAND_RIBBON"}, "Expand or Hide Ribbon Menu", this};
   CHECK_NULLPTR_RETURN_VOID(_EXPAND_RIBBONS)
-  _EXPAND_RIBBONS->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_1));
   _EXPAND_RIBBONS->setToolTip(QString("<b>%1 (%2)</b><br/>Displays the Ribbon Menu when enabled, or hides it when disabled.")
                                   .arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
   _EXPAND_RIBBONS->setCheckable(true);

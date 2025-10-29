@@ -5,12 +5,14 @@
 #include "RightClickMenuActions.h"
 #include "ViewActions.h"
 #include "ViewHelper.h"
-
+#include "RateHelper.h"
+#include "NotificatorMacro.h"
 #include <QHeaderView>
 #include <QMouseEvent>
 
 FileSystemTableView::FileSystemTableView(FileSystemModel* fsmModel, QWidget* parent) //
-    : CustomTableView{"FILE_SYSTEM", parent}, _fsModel{fsmModel} { //
+  : CustomTableView{"FILE_SYSTEM", parent}
+  , _fsModel{fsmModel} { //
   CHECK_NULLPTR_RETURN_VOID(_fsModel)
   m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
   CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
@@ -72,10 +74,34 @@ void FileSystemTableView::dragLeaveEvent(QDragLeaveEvent* event) {
 
 auto FileSystemTableView::keyPressEvent(QKeyEvent* e) -> void {
   CHECK_NULLPTR_RETURN_VOID(e);
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
+  const int ky = e->key();
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && ky == Qt::Key_Delete) {
     emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
     e->accept();
     return;
+  }
+  if (e->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier)) {
+    int newRate = -1;
+    if (ky >= Qt::Key_0  && ky <= Qt::Key_9) {
+      newRate = ky - Qt::Key_0;
+    } else if (ky == Qt::Key_Plus) {
+      newRate = 10;
+    }
+    if (newRate >= 0) {
+      const QModelIndexList rows = selectionModel()->selectedRows();
+      if (!rows.isEmpty()) {
+        int succeedCnt = 0;
+        for (const QModelIndex ind : rows) {
+          if (!ind.isValid()) {
+            continue;
+          }
+          succeedCnt += (int) RateHelper::RateMovie(_fsModel->filePath(ind), newRate);
+        }
+        LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
+      }
+      e->accept();
+      return;
+    }
   }
   QTableView::keyPressEvent(e);
 }

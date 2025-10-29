@@ -194,7 +194,7 @@ private slots:
         {"folder/need.mp4", false, ""},                                     //
         {"folder/need.mp4.png", false, widthAllowedImg},                    // 1
         {"folder/condition_need_occupied.mp4", false, ""},                  //
-        {"folder/condition_need_occupied 22.jpg", false, widthAllowedImg},     // when skip 0, when not skip 1
+        {"folder/condition_need_occupied 11.jpg", false, widthAllowedImg},     // when skip 0, when not skip 1
         {"folder/condition_need_occupied.mp4.jpg", false, widthAllowedImg}, //
         {"folder/no_need_vid.mp4", false, ""},                              //
         {"folder/no_need_img.mp4.jpg", false, widthAllowedImg},             //
@@ -207,15 +207,15 @@ private slots:
 
     const QSet<QString> expectSnapShots{
         "a need.mp4",
-        "a need 22.jpg",
+        "a need 11.jpg",
         "b no need img.mp4.jpg",
         "c no need vid.mp4",
         "d no need width invalid vid.mp4",
         "d no need width invalid vid.mp4.png",
         "folder/need.mp4",
-        "folder/need 22.png",
+        "folder/need 11.png",
         "folder/condition_need_occupied.mp4",
-        "folder/condition_need_occupied 22.jpg",
+        "folder/condition_need_occupied 11.jpg",
         "folder/no_need_vid.mp4",
         "folder/no_need_img.mp4.jpg",
     };
