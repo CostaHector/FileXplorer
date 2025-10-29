@@ -129,7 +129,7 @@ bool ThumbnailProcesser::RenameThumbnailGeneratedByPotPlayer(const QString& path
     if (imgWidth % 360 != 0 && imgWidth % 480 != 0) { // width invalid
       continue;
     }
-    const int gridCnt{ imgWidth % 480 == 0 ? imgWidth / 480 : imgWidth / 360 };
+    const int gridCnt{ imgWidth % 720 == 0 ? imgWidth / 720 : (imgWidth % 480 == 0 ? imgWidth / 480 : imgWidth / 360) };
 
     QDir dir{directFolderPath};
     if (!dir.exists(correspondFile)) {
@@ -215,16 +215,17 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
     ffmpegArgs.reserve(20);
     ffmpegArgs << "-y" << "-loglevel" << "error";
     ffmpegArgs << "-threads" << QString::number(threadCount);
-    ffmpegArgs << "-hwaccel" << "auto" << "-noaccurate_seek"; // best coverage
+    // ffmpegArgs << "-hwaccel" << "auto" << "-noaccurate_seek"; // best coverage
     ffmpegArgs << "-ss" << QString::number(startTime);        // 智能定位
     ffmpegArgs << "-i" << vidPath;                            // 输入文件
 
     // 构建滤镜参数
-    QString filter = QString("select='key',fps=1/%1,scale=%2:-1,tile=%3x%4:margin=0:padding=0") // best key frame
-                         .arg(timePeriod)
-                         .arg(widthPx)
-                         .arg(dimensionY)
-                         .arg(dimensionX);
+    QString filter{QString::asprintf(
+        // "select='key',"
+        "fps=1/%d,"
+        "scale=%d:-1,"
+        "tile=%dx%d:margin=0:padding=0",
+        timePeriod, widthPx, dimensionY, dimensionX)};
     ffmpegArgs << "-vf" << filter;
     ffmpegArgs << "-frames:v" << "1";
     if (isJpg) {
@@ -232,7 +233,6 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
     }
 
     ffmpegArgs << path2imgBaseName; // 输出文件
-
     // 使用推荐的start()重载
     QProcess ffmpegProcess;
     ffmpegProcess.start(ffmpegExePath, ffmpegArgs);
