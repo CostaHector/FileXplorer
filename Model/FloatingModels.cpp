@@ -20,7 +20,7 @@ QVariant FloatingModels::data(const QModelIndex& index, int role) const {
   return {};
 }
 
-int FloatingModels::UpdateData(const QStringList& newDataLst) {  // dont use newImgsLst after
+int FloatingModels::UpdateData(const QStringList& newDataLst) { // dont use newImgsLst after
   RowsCountBeginChange(mDataLst.size(), newDataLst.size());
 
   mDataLst = newDataLst;
@@ -90,7 +90,7 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
       return pm;
     }
     if (QFile{mDataLst[rw]}.size() > 10 * 1024 * 1024) { // 10MB
-      return {}; // files too large
+      return {};                        // files too large
     }
     if (!pm.load(mDataLst[rw])) {
       return {}; // load failed

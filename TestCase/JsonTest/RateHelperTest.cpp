@@ -26,11 +26,12 @@ private slots:
         {"rate failed.json", false, R"({"random":""})"}, // no json["Name"] correspond in current folder, rate failed
         {"rate failed 2.json", false, R"({"Name":""})"},
         {"subfolder/rate failed.json", false, R"({"Name":""})"},
+        {"subfolder/subfolder.json", false, R"({"Name":""})"},
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
   }
 
-  void test_invalid_scenario() {
+  void invalid_scenario() {
     // Missing JSON test
     {
       QVERIFY(!RateHelper::RateMovie(tDir.itemPath("rate failed.mp4"), 5));
@@ -43,7 +44,7 @@ private slots:
     }
   }
 
-  void test_rate_helper_comprehensive() {
+  void rate_helper_comprehensive() {
     // WEBP rating test passed
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok.webp"), 9));
@@ -66,11 +67,18 @@ private slots:
       QCOMPARE(data["Rate"].toInt(), 7);
     }
 
-    // Direct JSON
+    // Direct JSON test passed
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok.json"), 6));
       QVariantHash data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
       QCOMPARE(data["Rate"].toInt(), 6);
+    }
+
+    // Folder test passed
+    {
+      QVERIFY(RateHelper::RateMovie(tDir.itemPath("subfolder"), 1));
+      QVariantHash data = MovieJsonLoader(tDir.itemPath("subfolder/subfolder.json"));
+      QCOMPARE(data["Rate"].toInt(), 1);
     }
 
     // Boundary
@@ -91,6 +99,23 @@ private slots:
       data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
       QCOMPARE(data["Rate"].toInt(), 0); // 应该被钳制到0
     }
+  }
+
+  void rate_recursively_ok() {
+    QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 3), 4);
+
+    QVariantHash data;
+    data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+    QCOMPARE(data["Rate"].toInt(), 3);
+
+    data = MovieJsonLoader(tDir.itemPath("rate failed 2.json"));
+    QCOMPARE(data["Rate"].toInt(), 3);
+
+    data = MovieJsonLoader(tDir.itemPath("subfolder/rate failed.json"));
+    QCOMPARE(data["Rate"].toInt(), 3);
+
+    data = MovieJsonLoader(tDir.itemPath("subfolder/subfolder.json"));
+    QCOMPARE(data["Rate"].toInt(), 3);
   }
 };
 

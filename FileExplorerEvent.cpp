@@ -47,6 +47,8 @@
 #include "ComplexOperation.h"
 #include "CreateFileFolderHelper.h"
 #include "JsonRenameRegex.h"
+#include "RateActions.h"
+#include "RateHelper.h"
 
 #include <QApplication>
 #include <QInputDialog>
@@ -206,6 +208,41 @@ bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool ski
     LOG_OK_P("[Ok] Extract", "%d image(s) from path[%s]", extractedOutCnt, qPrintable(currentPath));
   }
   return true;
+}
+
+bool FileExplorerEvent::onRateMovie(int newRate) const {
+  const QStringList& paths = selectedItems();
+
+  if (paths.isEmpty()) {
+    return true; // selection some row first
+  }
+  int succeedCnt = 0;
+  for (const QString& path : paths) {
+    succeedCnt += (int) RateHelper::RateMovie(path, newRate);
+  }
+
+  LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
+  return succeedCnt > 0;
+}
+
+bool FileExplorerEvent::onRateMoviesRecursively() const {
+  const QString rootPath = _contentPane->getRootPath();
+  bool bOk = false;
+  int newRate = QInputDialog::getInt(nullptr,
+                                     "Input a rate",                      //
+                                     "Rate all movies under " + rootPath, //
+                                     10,
+                                     0,
+                                     10,
+                                     1, //
+                                     &bOk);
+  if (!bOk) {
+    LOG_INFO_NP("User cancel rate recursively", rootPath);
+    return true;
+  }
+  int succeedCnt = RateHelper::RateMovieRecursively(rootPath, newRate);
+  LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
+  return succeedCnt > 0;
 }
 
 QStringList FileExplorerEvent::selectedItems() const {
@@ -498,6 +535,12 @@ void FileExplorerEvent::subscribe() {
     auto& viewInst = g_viewActions();
     connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileExplorerEvent::on_HarView);
     connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileExplorerEvent::on_PlayVideo);
+  }
+
+  {
+    auto& rateInst = RateActions::GetInst();
+    connect(&rateInst, &RateActions::MovieRateChanged, this, &FileExplorerEvent::onRateMovie);
+    connect(&rateInst, &RateActions::MovieRateRecursivelyChanged, this, &FileExplorerEvent::onRateMoviesRecursively);
   }
 }
 
