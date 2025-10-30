@@ -80,7 +80,7 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   auto& rateInst = RateActions::GetInst();
   auto* rateToolButton = new (std::nothrow) MenuToolButton(rateInst.GetRateActionsList(),                 //
                                                            QToolButton::InstantPopup,                     //
-                                                           Qt::ToolButtonStyle::ToolButtonTextBesideIcon, //
+                                                           Qt::ToolButtonStyle::ToolButtonIconOnly, //
                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_16,
                                                            menuRibbonCornerWid);
   CHECK_NULLPTR_RETURN_NULLPTR(rateToolButton);
