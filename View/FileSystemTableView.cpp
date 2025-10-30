@@ -80,29 +80,6 @@ auto FileSystemTableView::keyPressEvent(QKeyEvent* e) -> void {
     e->accept();
     return;
   }
-  if (e->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier)) {
-    int newRate = -1;
-    if (ky >= Qt::Key_0  && ky <= Qt::Key_9) {
-      newRate = ky - Qt::Key_0;
-    } else if (ky == Qt::Key_Plus) {
-      newRate = 10;
-    }
-    if (newRate >= 0) {
-      const QModelIndexList rows = selectionModel()->selectedRows();
-      if (!rows.isEmpty()) {
-        int succeedCnt = 0;
-        for (const QModelIndex ind : rows) {
-          if (!ind.isValid()) {
-            continue;
-          }
-          succeedCnt += (int) RateHelper::RateMovie(_fsModel->filePath(ind), newRate);
-        }
-        LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
-      }
-      e->accept();
-      return;
-    }
-  }
   QTableView::keyPressEvent(e);
 }
 

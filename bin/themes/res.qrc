@@ -45,6 +45,8 @@
     <file alias="PLAY_BUTTON_ROUND">Media/PLAY_BUTTON_ROUND.svg</file>
     <file alias="FAIL_FAST">Media/FAIL_FAST.svg</file>
     <file alias="PLAY_ALL_VIDEO">Media/PLAY_ALL_VIDEO.ico</file>
+    <file alias="LIKE">Media/LIKE.svg</file>
+    <file alias="LIKE_RECURSIVELY">Media/LIKE_RECURSIVELY.svg</file>
 
     <!--FramelessWindow Icon here-->
     <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>

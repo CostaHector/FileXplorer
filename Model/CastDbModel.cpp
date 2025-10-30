@@ -3,7 +3,6 @@
 #include "CastDBActions.h"
 #include "MemoryKey.h"
 #include "PublicVariable.h"
-#include "PublicTool.h"
 #include "TableFields.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
@@ -11,6 +10,7 @@
 #include "CastPsonFileHelper.h"
 #include "QuickWhereClauseHelper.h"
 #include "StringTool.h"
+#include "RateHelper.h"
 #include <QPainter>
 #include <QPixmap>
 #include <QSqlError>
@@ -58,23 +58,9 @@ QVariant CastDbModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
     return {};
   }
-  static const QPixmap PERFORMER_SCORE_BOARD[MAX_RATE + 1]  //
-      {
-          FileTool::GetRatePixmap(0, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(1, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(2, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(3, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(4, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(5, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(6, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(7, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(8, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(9, CastDbModel::MAX_RATE),   //
-          FileTool::GetRatePixmap(10, CastDbModel::MAX_RATE),  //
-      };                                                       //
   if (role == Qt::DecorationRole && index.column() == PERFORMER_DB_HEADER_KEY::Rate) {
     const int sc = QSqlTableModel::data(index, Qt::DisplayRole).toInt();
-    return PERFORMER_SCORE_BOARD[(sc > MAX_RATE) ? MAX_RATE : (sc < 0 ? 0 : sc)];
+    return RateHelper::GetRatePixmap(sc);
   }
 
   return QSqlTableModel::data(index, role);

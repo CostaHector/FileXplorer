@@ -40,6 +40,9 @@ private:
   bool on_RenameThumbnailImages(bool skipIfExist);
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
 
+  bool onRateMovie(int newRate) const;
+  bool onRateMoviesRecursively() const;
+
   QStringList selectedItems() const;
 
   bool on_searchKeywordInSystemDefaultExplorer() const;
