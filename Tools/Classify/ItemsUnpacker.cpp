@@ -27,11 +27,12 @@ bool ItemsUnpacker::CanExtractOut(const QStringList& items) {
 
   QString noNumberName;
   QRegularExpressionMatch result;
+  static const T_DOT_EXT_2_TYPE& dotExt2TypeHash = GetTypeFromDotExtension();
   for (const QString& medName : items) {
     QString baseName, ext;
     std::tie(baseName, ext) = PathTool::GetBaseNameExt(medName);
     noNumberName = baseName;
-    auto typeEnum = DOT_EXT_2_TYPE.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
+    auto typeEnum = dotExt2TypeHash.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
     switch (typeEnum) {
       case IMG: {
         if ((result = IMG_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {

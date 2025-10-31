@@ -71,7 +71,8 @@ bool RateHelper::getJsonPathForFile(const QString& fileAbsPath, QString& jsonPat
   };
 
   using namespace ItemsPileCategory;
-  SCENE_COMPONENT_TYPE fileType = DOT_EXT_2_TYPE.value(ext.toLower(), OTHER);
+  static const T_DOT_EXT_2_TYPE& dotExt2TypeHash = GetTypeFromDotExtension();
+  SCENE_COMPONENT_TYPE fileType = dotExt2TypeHash.value(ext.toLower(), OTHER);
 
   bool bFindJson{false};
   QString tempJsonPath;
