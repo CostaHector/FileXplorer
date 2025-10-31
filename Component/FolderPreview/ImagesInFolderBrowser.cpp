@@ -39,7 +39,7 @@ bool ImagesInFolderBrowser::operator()(const QString& path) {
   if (fi.isDir()) {
     m_dirPath = path;
     m_imgsLst += InitImgsList(m_dirPath);
-  } else if (TYPE_FILTER::IMAGE_TYPE_SET.contains("*." + fi.suffix().toLower())) {
+  } else if (TYPE_FILTER::isDotExtImage("." + fi.suffix().toLower())) {
     m_dirPath = fi.absolutePath();
     m_imgsLst.push_back(fileName);
   } else {

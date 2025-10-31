@@ -69,6 +69,9 @@ const QStringList TEXT_TYPE_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat"}
 const QStringList NON_BINARY_SET = {"*.json", "*.txt", "*.html", "*.md", "*.dat", "*.svg"};
 const QStringList BUILTIN_COMPRESSED_TYPE_SET = {"*.qz"};
 const QStringList HAR_TYPE_SET = {"*.har"};
+bool isDotExtVideo(const QString& dotExt);
+bool isDotExtImage(const QString& dotExt);
+bool isDotExtCompressed(const QString& dotExt);
 }  // namespace TYPE_FILTER
 
 #endif  // PUBLICVARIABLE_H

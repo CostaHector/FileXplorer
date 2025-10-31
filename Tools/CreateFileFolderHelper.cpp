@@ -5,6 +5,7 @@
 #include "JsonHelper.h"
 #include "JsonKey.h"
 #include "PathTool.h"
+#include "PublicVariable.h"
 
 #include <QDateTime>
 #include <QDir>
@@ -41,6 +42,9 @@ int NewJsonFile(const QString& createIn, const QStringList& basedOnFileNames) {
   QString jsonBaseName, ext;
   for (const QString& fileItem : basedOnFileNames) {
     std::tie(jsonBaseName, ext) = PathTool::GetBaseNameExt(fileItem);
+    if (!TYPE_FILTER::isDotExtVideo(ext)) {
+      continue;
+    }
     const QString jPath = createIn + '/' + jsonBaseName + ".json";
     if (QFile::exists(jPath)) {
       continue;

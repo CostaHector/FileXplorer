@@ -62,7 +62,7 @@ bool ThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
   QString imgBaseName;
   QString ext;
   std::tie(imgBaseName, ext) = PathTool::GetBaseNameExt(imgAbsPath);
-  if (!TYPE_FILTER::IMAGE_TYPE_SET.contains("*" + ext)) { // not an image
+  if (!TYPE_FILTER::isDotExtImage(ext)) { // not an image
     return false;
   }
   if (!IsImageNameLooksLikeThumbnail(imgBaseName)) { // name not like
@@ -178,7 +178,7 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
       continue;
     }
     const QString& ext = fi.suffix();
-    if (!TYPE_FILTER::VIDEO_TYPE_SET.contains("*." + ext)) {
+    if (!TYPE_FILTER::isDotExtVideo("." + ext)) {
       continue;
     }
 #ifndef RUNNING_UNIT_TESTS

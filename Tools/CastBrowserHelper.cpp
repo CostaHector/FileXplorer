@@ -57,14 +57,14 @@ QString GenerateSingleImageInHtml(const QString& imagePath, const QString& altTe
 QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE) {
   QString fileName, extension;
   std::tie(fileName, extension) = PathTool::GetBaseNameExt(fileAbsPath);
-  QString starDotExtensionLowerCase = '*' + extension.toLower();
+  extension = extension.toLower();
 
   QString detail;
   detail.reserve(200);
   detail += QString(R"(<body>)");
   detail += QString(R"(<h1>%1</h1>)").arg(fileName);
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
-  const bool isFileAVideo{TYPE_FILTER::VIDEO_TYPE_SET.contains("*" + extension)};
+  const bool isFileAVideo{TYPE_FILTER::isDotExtVideo(extension)};
   if (isFileAVideo) {
     VideoDurationGetter mi;
     if (!mi.StartToGet()) {
@@ -75,9 +75,10 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
   }
 
   QString imgStr;
-  if (TYPE_FILTER::IMAGE_TYPE_SET.contains(starDotExtensionLowerCase)) {
+  if (TYPE_FILTER::isDotExtImage(extension)) {
     imgStr = QString(R"(<img src="%1" width="%2" alt="%1" />)").arg(fileAbsPath).arg(ICON_SIZE.width());
   } else {
+    const QString starDotExtensionLowerCase = '*' + extension;
     static QMap<QString, QString> fileTypeImgIcons;
     auto it = fileTypeImgIcons.find(starDotExtensionLowerCase);
     if (it == fileTypeImgIcons.end()) {

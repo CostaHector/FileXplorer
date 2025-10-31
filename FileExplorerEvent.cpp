@@ -92,7 +92,7 @@ bool FileExplorerEvent::on_NewJsonFile() {
     return false;
   }
   const QString& createIn = _fileSysModel->rootPath();
-  const QStringList& basedOnFileNames = selectedItems();
+  const QStringList& basedOnFileNames = FsmSelectedItems();
   return CreateFileFolderHelper::NewJsonFile(createIn, basedOnFileNames) >= 0;
 }
 
@@ -152,7 +152,7 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
   if (!__CanNewItem()) {
     return false;
   }
-  const QStringList& selectedFiles = selectedItems();
+  const QStringList& selectedFiles = FsmSelectedItems();
   if (selectedFiles.isEmpty()) {
     LOG_INFO_NP("Skip nothing selected", "selected some video(s) first");
     return true;
@@ -211,7 +211,7 @@ bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool ski
 }
 
 bool FileExplorerEvent::onRateMovie(int newRate) const {
-  const QStringList& paths = selectedItems();
+  const QStringList& paths = _contentPane->getFilePaths();
 
   if (paths.isEmpty()) {
     return true; // selection some row first
@@ -245,7 +245,11 @@ bool FileExplorerEvent::onRateMoviesRecursively() const {
   return succeedCnt > 0;
 }
 
-QStringList FileExplorerEvent::selectedItems() const {
+QStringList FileExplorerEvent::FsmSelectedItems() const { // for file-systemmodel only
+  ViewTypeTool::ViewType vt = _contentPane->GetVt();
+  if (!ViewTypeTool::isFSView(vt)) {
+    return {};
+  }
   const QModelIndexList& inds = _contentPane->GetCurView()->selectionModel()->selectedRows();
   QStringList filePaths;
   filePaths.reserve(inds.size());
@@ -291,7 +295,7 @@ bool FileExplorerEvent::on_calcMD5() const {
     return true;
   }
   auto* md5W = new MD5Window{this->_contentPane};
-  const QStringList& items = selectedItems();
+  const QStringList& items = FsmSelectedItems();
   const int filesCnt = md5W->operator()(items);
   md5W->show();
   LOG_D("%d md5(s) calculate.", filesCnt);
@@ -302,7 +306,7 @@ bool FileExplorerEvent::on_properties() const {
   PropertiesWindow* pW = nullptr;
   auto vt = _contentPane->GetVt();
   if (ViewTypeTool::isFSView(vt)) {
-    const QStringList& items = selectedItems();
+    const QStringList& items = FsmSelectedItems();
     pW = new PropertiesWindow(this->_contentPane);
     pW->show();
     pW->operator()(items);

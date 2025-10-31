@@ -43,7 +43,7 @@ private:
   bool onRateMovie(int newRate) const;
   bool onRateMoviesRecursively() const;
 
-  QStringList selectedItems() const;
+  QStringList FsmSelectedItems() const;
 
   bool on_searchKeywordInSystemDefaultExplorer() const;
   bool on_calcMD5() const;

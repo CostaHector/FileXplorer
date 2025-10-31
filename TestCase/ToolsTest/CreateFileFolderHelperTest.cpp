@@ -8,8 +8,14 @@
 
 class CreateFileFolderHelperTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+  TDir mDir;
+  const QString tPath{mDir.path()};
+private slots:
+  void initTestCase() {
+    QVERIFY(mDir.IsValid());
+  }
+
   void invalid_input_params() {
     // 测试 NewPlainTextFile 的异常分支
     QString invalidDir = "/non/existent/path";
@@ -27,56 +33,51 @@ class CreateFileFolderHelperTest : public PlainTestSuite {
 
     // 测试 NewItems 的异常分支
     // 无效范围测试
-    QVERIFY(!CreateFileFolderHelper::NewItems(invalidDir, "test_%d.txt", 10, 5));  // start > end
+    QVERIFY(!CreateFileFolderHelper::NewItems(invalidDir, "test_%d.txt", 10, 5)); // start > end
 
     // 空操作测试
-    QVERIFY(!CreateFileFolderHelper::NewItems(invalidDir, "test.txt", 1, 1));  // start == end
+    QVERIFY(!CreateFileFolderHelper::NewItems(invalidDir, "test.txt", 1, 1)); // start == end
   }
 
   void test_NewPlainTextFile_ok() {
-    TDir mDir;
-    QString tPath{mDir.path()};
     QString textAbsPath;
     QVERIFY(CreateFileFolderHelper::NewPlainTextFile(tPath, &textAbsPath));
     QVERIFY(textAbsPath.startsWith(tPath + "/New Text Document"));
     QVERIFY(textAbsPath.endsWith(".txt"));
   }
   void test_NewJsonFile_ok() {
-    TDir mDir;
-    QString tPath{mDir.path()};
-    QStringList basedOnFileNames{"0.txt", "1.jpeg", "2.torrent", "3.mp4", "4.pson", "5.json"};
-    QStringList expectFileNames {
-        "0.json", "1.json", "2.torrent.json", "3.json", "4.json", "5.json"
-    };
-    QCOMPARE(CreateFileFolderHelper::NewJsonFile(tPath, basedOnFileNames), 6); // 6
-    QStringList acutalList = mDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
-    QCOMPARE(acutalList, expectFileNames);
+    QVERIFY(mDir.ClearAll());
 
-    QString jsonAbsPath = mDir.itemPath("2.torrent.json");
+    QStringList basedOnFileNames{"0.mp4", "1.mkv", "3.jpg", "4.json"};
+    const QSet<QString> expectSnapShot{
+        "0.json",
+        "1.json",
+    };
+    QCOMPARE(CreateFileFolderHelper::NewJsonFile(tPath, basedOnFileNames), 2); // json are only for 2 videos file
+    QCOMPARE(mDir.Snapshot(), expectSnapShot);
+
+    QString jsonAbsPath = mDir.itemPath("0.json");
     QVariantHash json0 = JsonHelper::MovieJsonLoader(jsonAbsPath);
     using namespace JsonKey;
-    QCOMPARE(json0.value(ENUM_2_STR(Name), "").toString(), "2.torrent");
+    QCOMPARE(json0.value(ENUM_2_STR(Name), "").toString(), "0");
   }
   void test_NewFolder_ok() {
-    TDir mDir;
-    QString tPath{mDir.path()};
+    QVERIFY(mDir.ClearAll());
+
     QString folderAbsPath;
     QVERIFY(CreateFileFolderHelper::NewFolder(tPath, &folderAbsPath));
     QVERIFY(folderAbsPath.startsWith(tPath + "/New Folder"));
   }
   void test_NewItems_ok() {
-    TDir mDir;
-    QString tPath{mDir.path()};
+    QVERIFY(mDir.ClearAll());
+
     QVERIFY(!CreateFileFolderHelper::NewItems(tPath, "Page %03d", 1, 1, true));
     QVERIFY(CreateFileFolderHelper::NewItems(tPath, "Page %03d.txt", 1, 3, false));
     QVERIFY(CreateFileFolderHelper::NewItems(tPath, "Page %03d.txt", 2, 4, false));
     QVERIFY(CreateFileFolderHelper::NewItems(tPath, "Page %03d", 1, 3, true));
-    QStringList expectFileNames {
-        "Page 001", "Page 002", "Page 001.txt", "Page 002.txt", "Page 003.txt"
-    };
-    QStringList acutalList = mDir.entryList(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot | QDir::Filter::Files,
-                                            QDir::SortFlag::DirsFirst | QDir::SortFlag::Name);
-    QCOMPARE(acutalList, expectFileNames);
+
+    const QSet<QString> expectSnapshots{"Page 001", "Page 002", "Page 001.txt", "Page 002.txt", "Page 003.txt"};
+    QCOMPARE(mDir.Snapshot(), expectSnapshots);
   }
 };
 

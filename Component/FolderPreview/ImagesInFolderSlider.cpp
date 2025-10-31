@@ -67,10 +67,10 @@ void ImagesInFolderSlider::getImgsPathAndVidsCount(const QString& path) {
   }
   const QFileInfo pathFi{path};
   if (pathFi.isFile()) {
-    const QString& suffix = "*." + pathFi.suffix().toLower();
-    if (TYPE_FILTER::IMAGE_TYPE_SET.contains(suffix)) {
+    const QString& dotExt = "." + pathFi.suffix().toLower();
+    if (TYPE_FILTER::isDotExtImage(dotExt)) {
       ResetImgsList(new PlainStringList(QStringList{path}));
-    } else if (TYPE_FILTER::BUILTIN_COMPRESSED_TYPE_SET.contains(suffix)) {
+    } else if (TYPE_FILTER::isDotExtCompressed(dotExt)) {
       auto* pArchiveReader = new ArchiveFilesReader;
       pArchiveReader->ReadAchiveFile(path);
       ResetImgsList(pArchiveReader);
