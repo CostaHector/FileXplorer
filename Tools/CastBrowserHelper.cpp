@@ -54,7 +54,7 @@ QString GenerateSingleImageInHtml(const QString& imagePath, const QString& altTe
   }
 }
 
-QString GetDetailDescription(const QString& fileAbsPath) {
+QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE) {
   QString fileName, extension;
   std::tie(fileName, extension) = PathTool::GetBaseNameExt(fileAbsPath);
   QString starDotExtensionLowerCase = '*' + extension.toLower();
@@ -76,7 +76,7 @@ QString GetDetailDescription(const QString& fileAbsPath) {
 
   QString imgStr;
   if (TYPE_FILTER::IMAGE_TYPE_SET.contains(starDotExtensionLowerCase)) {
-    imgStr = QString(R"(<img src="%1" width="480" alt="%1" />)").arg(fileAbsPath);
+    imgStr = QString(R"(<img src="%1" width="%2" alt="%1" />)").arg(fileAbsPath).arg(ICON_SIZE.width());
   } else {
     static QMap<QString, QString> fileTypeImgIcons;
     auto it = fileTypeImgIcons.find(starDotExtensionLowerCase);
