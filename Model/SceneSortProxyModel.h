@@ -13,10 +13,10 @@ class SceneSortProxyModel : public QSortFilterProxyModel {
 
   void setSourceModel(QAbstractItemModel* sourceModel) override;
 
-  void sort(int column, Qt::SortOrder newOrder = Qt::AscendingOrder) override;
-  void sortByFieldDimension(SceneSortOrderHelper::SortDimE newSortDimension, bool bReverse);
+  void sortByFieldDimension(SceneSortOrderHelper::SortDimE newSortDimension, Qt::SortOrder newOrder);
 
  protected:
+  void sort(int column, Qt::SortOrder newOrder = Qt::AscendingOrder) override;
   bool lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const override;
 
  private:

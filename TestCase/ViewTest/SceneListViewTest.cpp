@@ -17,9 +17,9 @@
 
 class SceneListViewTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir tDir;
- private slots:
+private slots:
   void initTestCase() {
     // recondition here
     QVERIFY(QMetaType::type("QString") != 0);
@@ -27,22 +27,19 @@ class SceneListViewTest : public PlainTestSuite {
     QVERIFY(tDir.IsValid());
 
     QList<FsNodeEntry> nodes{
-        {"Chris Evans.json", false, JsonKey::ConstructJsonByteArray("Chris Evans")},    // batch 1
-        {"Chris Evans.jpg", false, ""},                                                 //
-        {"Chris Evans.mp4", false, ""},                                                 //
-        {"Henry Cavill.json", false, JsonKey::ConstructJsonByteArray("Henry Cavill")},  // batch 1
-        {"Henry Cavill.png", false, ""},                                                //
-        {"Henry Cavill.mp4", false, ""},                                                //
+        {"Chris Evans.json", false, JsonKey::ConstructJsonByteArray("Chris Evans")},   // batch 1
+        {"Chris Evans.jpg", false, ""},                                                //
+        {"Chris Evans.mp4", false, ""},                                                //
+        {"Henry Cavill.json", false, JsonKey::ConstructJsonByteArray("Henry Cavill")}, // batch 1
+        {"Henry Cavill.png", false, ""},                                               //
+        {"Henry Cavill.mp4", false, ""},                                               //
     };
     QCOMPARE(tDir.createEntries(nodes), 6);
 
     Configuration().clear();
   }
 
-
-  void cleanupTestCase() {
-    SceneListViewMocker::MockSetRootPathQuery() = true;
-  }
+  void cleanupTestCase() { SceneListViewMocker::MockSetRootPathQuery() = true; }
 
   void default_constructor_ok() {
     SceneListView sceneView{nullptr, nullptr, nullptr, nullptr};
@@ -82,7 +79,7 @@ class SceneListViewTest : public PlainTestSuite {
       QVERIFY(sceneModel.rootPath() != "C:/home");
     }
 
-    {  // 2. setRootPath on a test directory ok
+    { // 2. setRootPath on a test directory ok
       SceneListViewMocker::MockSetRootPathQuery() = true;
       sceneView.setRootPath(tDir.path());
       QCOMPARE(sceneModel.rootPath(), tDir.path());
@@ -92,11 +89,11 @@ class SceneListViewTest : public PlainTestSuite {
     const QDir mDir = QDir(tDir);
     const QStringList emptyScnList = mDir.entryList({"*.scn"}, QDir::Filter::Files);
     QVERIFY(emptyScnList.isEmpty());
-    {  // generate pson file ok
+    { // generate pson file ok
       // update on a shallow depth get rejected
-      sceneModel.mRootPath = "/";  // force set this path to be root
+      sceneModel.mRootPath = "/"; // force set this path to be root
       QCOMPARE(sceneView.onUpdateScnFiles(), -1);
-      sceneModel.mRootPath = "C:/";  // force set this path to be root
+      sceneModel.mRootPath = "C:/"; // force set this path to be root
       QCOMPARE(sceneView.onUpdateScnFiles(), -1);
 
       sceneModel.setRootPath(tDir.path());
@@ -105,9 +102,13 @@ class SceneListViewTest : public PlainTestSuite {
 
       QStringList scn2FileList = mDir.entryList({"*.scn"}, QDir::Filter::Files);
       QCOMPARE(scn2FileList.size(), 1);
-      QCOMPARE(sceneModel.rowCount(), 2);  // 2 json one for chris evans, another for henry cavill
+      QCOMPARE(sceneModel.rowCount(), 2); // 2 json one for chris evans, another for henry cavill
 
-      QCOMPARE(sceneView.onUpdateScnFiles(), 0);  // already updated. no need again
+      QCOMPARE(sceneView.onUpdateScnFiles(), 0); // already updated. no need again
+
+      QVERIFY(sceneView.onClearScnFiles() > 0); // clear scn files
+      QVERIFY(sceneView.onUpdateScnFiles() > 0);
+      QCOMPARE(sceneView.onUpdateScnFiles(), 0);
     }
 
     // check signal currentSceneChanged emit ok
@@ -165,7 +166,7 @@ class SceneListViewTest : public PlainTestSuite {
       QString shortText = "Short text";
       QCOMPARE(delegate->displayText(shortText, QLocale()), shortText);
 
-      QString longText(50, 'a');  // 50个'a'
+      QString longText(50, 'a'); // 50个'a'
       QString expected = QString(20, 'a') + "\n" + QString(20, 'a');
       QCOMPARE(delegate->displayText(longText, QLocale()), expected);
     }

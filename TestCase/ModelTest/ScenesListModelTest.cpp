@@ -347,13 +347,13 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.setRootPath("any/inexists/path1"), true);
       QCOMPARE(slm.rowCount(), 10);
       // 升
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, false);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);
       checkIndexMatch(slm, 0, sspm, 0);
       checkIndexMatch(slm, 1, sspm, 1);
       checkIndexMatch(slm, 8, sspm, 8);
       checkIndexMatch(slm, 9, sspm, 9);
       // 降
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::DescendingOrder);
       checkIndexMatch(slm, 0, sspm, 9);
       checkIndexMatch(slm, 1, sspm, 8);
       checkIndexMatch(slm, 8, sspm, 1);
@@ -369,14 +369,14 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.rowCount(), 10);
 
       // 降序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
 
       // 升序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, false);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 9));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 1));
@@ -390,14 +390,14 @@ class ScenesListModelTest : public PlainTestSuite {
       SceneInfoManager::mockScenesInfoList() = mockRateAscendingList;
       QCOMPARE(slm.setRootPath("any/inexists/path3"), true);
       // 升序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, false);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::AscendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
 
       // 降序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 9));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 1));
@@ -412,14 +412,14 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.setRootPath("any/inexists/path4"), true);
       QCOMPARE(slm.rowCount(), 11);
       // 降序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
 
       // 升序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, false);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::AscendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 10));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 9));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 2));
@@ -456,7 +456,7 @@ class ScenesListModelTest : public PlainTestSuite {
     ScenesListModel slm;
     SceneSortProxyModel sspm;
     {
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, false);  // nothing happend
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);  // nothing happend
       sspm.setSourceModel(nullptr);                                                  // ignored
       sspm.setSourceModel(&slm);
       sspm.setSourceModel(&slm);  // ignored
@@ -491,43 +491,43 @@ class ScenesListModelTest : public PlainTestSuite {
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 15 - 0 - 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 15 - 1 - 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - (15 - 1) - 1));
     }
 
     {  //
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, false);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 15 - 0 - 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 15 - 1 - 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - (15 - 1) - 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - 1));
     }
 
     {
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, false);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::AscendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 15 - 0 - 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 15 - 1 - 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - (15 - 1) - 1));
     }
 
     {  //
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, false);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::AscendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 15 - 0 - 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 15 - 1 - 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - (15 - 1) - 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 15 - 1, sspm, 15 - 1));
@@ -546,24 +546,24 @@ class ScenesListModelTest : public PlainTestSuite {
 
     {
       // 本就是MOVIE_PATH 升序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, false); // ascending
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder); // ascending
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 4, sspm, 4));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 4));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 3));
       QVERIFY(checkIndexMatch(slm, 4, sspm, 0));
     }
     {
       // 本就是MOVIE_SIZE 降序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, false); // ascending
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder); // ascending
       QVERIFY(checkIndexMatch(slm, 0, sspm, 4));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 3));
       QVERIFY(checkIndexMatch(slm, 4, sspm, 0));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, true);
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::DescendingOrder);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 4, sspm, 4));
@@ -572,4 +572,4 @@ class ScenesListModelTest : public PlainTestSuite {
 };
 
 #include "ScenesListModelTest.moc"
-REGISTER_TEST(ScenesListModelTest, false);
+REGISTER_TEST(ScenesListModelTest, false)

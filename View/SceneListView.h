@@ -28,6 +28,7 @@ public:
   explicit SceneListView(ScenesListModel* sceneModel, SceneSortProxyModel* sceneSortProxyModel, ScenePageControl* scenePageControl, QWidget* parent = nullptr);
   void setRootPath(const QString& rootPath);
   int onUpdateScnFiles();
+  int onClearScnFiles();
   void subscribe();
   void onCopyBaseName();
   void onOpenCorrespondingFolder();

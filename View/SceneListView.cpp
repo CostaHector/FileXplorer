@@ -46,6 +46,9 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
 
   _sceneSortProxyModel->setSourceModel(_sceneModel);
+  const SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  const auto& sortPr = sceneActInst.GetSortSetting();
+  _sceneSortProxyModel->sortByFieldDimension(sortPr.first, sortPr.second);
 
   setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
@@ -101,6 +104,7 @@ void SceneListView::subscribe() {
   SceneInPageActions& sceneActInst = g_SceneInPageActions();
   connect(&sceneActInst, &SceneInPageActions::scenesSortPolicyChanged, _sceneSortProxyModel, &SceneSortProxyModel::sortByFieldDimension);
   connect(sceneActInst._COMBINE_MEDIAINFOS_JSON, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);
+  connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
@@ -153,6 +157,14 @@ int SceneListView::onUpdateScnFiles() {
   LOG_OE_P(scnFileCnt >= 0, "Scn file updated", "count: %d, workPath[%s]", scnFileCnt, qPrintable(workPath));
   _sceneModel->setRootPath(workPath, true);
   return scnFileCnt;
+}
+
+int SceneListView::onClearScnFiles() {
+  const QString workPath = _sceneModel->rootPath();
+  using namespace SceneInfoManager;
+  int deleteCnt = ScnMgr::ClearScnFiles(workPath);
+  LOG_OK_P("Delete scn file", "cnt: %d under[%s]", deleteCnt, qPrintable(workPath));
+  return deleteCnt;
 }
 
 void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& previous) {

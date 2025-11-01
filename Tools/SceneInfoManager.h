@@ -77,6 +77,7 @@ class ScnMgr {
   using PATH_2_JSON_DICTS = QMap<QString, QList<QVariantHash>>;
   Counter operator()(const QString& rootPath);  // will update json contents, than generated scn from refreshed jsons
   int WriteDictIntoScnFiles();
+  static int ClearScnFiles(const QString& rootPath);
  private:
   Counter UpdateJsonUnderAPath(const QString& path);
 #ifdef RUNNING_UNIT_TESTS

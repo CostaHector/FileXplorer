@@ -70,8 +70,8 @@ bool SceneInfo::lessThanUploaded(const SceneInfo& other) const {
 }
 
 bool SceneInfo::operator==(const SceneInfo& rhs) const {
-  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize && rate == rhs.rate &&
-         uploaded == rhs.uploaded;
+  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize
+         && rate == rhs.rate && uploaded == rhs.uploaded;
 }
 
 namespace SceneInfoManager {
@@ -278,7 +278,7 @@ Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
   return Counter{jsonUpdatedCnt, jsonUsedCnt, vidNameKeyFieldUpdatedCnt, imgNameKeyFieldUpdatedCnt};
 }
 
-Counter ScnMgr::operator()(const QString& rootPath) {  // will iterate all sub
+Counter ScnMgr::operator()(const QString& rootPath) { // will iterate all sub
   if (!QFileInfo(rootPath).isDir()) {
     LOG_D("Not an existed directory[%s]", qPrintable(rootPath));
     return {};
@@ -289,10 +289,12 @@ Counter ScnMgr::operator()(const QString& rootPath) {  // will iterate all sub
     cnt += UpdateJsonUnderAPath(folderIt.next());
   }
   cnt += UpdateJsonUnderAPath(rootPath);
-  LOG_D("%d useful json file(s) founded and %d get updated(imgUpdate:%d, vidUpdate:%d) In path[%s]",  //
-        cnt.m_jsonUsedCnt, cnt.m_jsonUpdatedCnt,                                                      //
-        cnt.m_ImgNameKeyFieldUpdatedCnt, cnt.m_VidNameKeyFieldUpdatedCnt,                             //
-        qPrintable(rootPath));                                                                        //
+  LOG_D("%d useful json file(s) founded and %d get updated(imgUpdate:%d, vidUpdate:%d) In path[%s]", //
+        cnt.m_jsonUsedCnt,
+        cnt.m_jsonUpdatedCnt, //
+        cnt.m_ImgNameKeyFieldUpdatedCnt,
+        cnt.m_VidNameKeyFieldUpdatedCnt, //
+        qPrintable(rootPath));           //
   return cnt;
 }
 
@@ -342,4 +344,15 @@ int ScnMgr::WriteDictIntoScnFiles() {
   return scnFilesGeneratedCnt;
 }
 
-}  // namespace SceneInfoManager
+int ScnMgr::ClearScnFiles(const QString& rootPath) {
+  QDirIterator folderIt{rootPath, {"*.scn"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  int scnTotalCnt = 0, deleteOkCnt = 0;
+  while (folderIt.hasNext()) {
+    deleteOkCnt += QFile::remove(folderIt.next());
+    ++scnTotalCnt;
+  }
+  LOG_D("%d/%d scn file under[%s] delete succeed", deleteOkCnt, scnTotalCnt, qPrintable(rootPath));
+  return deleteOkCnt;
+}
+
+} // namespace SceneInfoManager

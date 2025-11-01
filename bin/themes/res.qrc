@@ -33,6 +33,7 @@
     <file alias="DUPLICATE_VIDEOS_FINDER">Media/DUPLICATE_VIDEOS_FINDER.png</file>
     <file alias="UPDATE_JSON_THEN_SCN">Media/UPDATE_JSON_THEN_SCN.svg</file>
     <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
+    <file alias="CLEAR_SCN_FILES">Media/CLEAR_SCN_FILES.svg</file>
     <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
     <file alias="THUMBNAILS_1_BY_1">Media/THUMBNAILS_1_BY_1.svg</file>
     <file alias="THUMBNAILS_2_BY_2">Media/THUMBNAILS_2_BY_2.svg</file>
