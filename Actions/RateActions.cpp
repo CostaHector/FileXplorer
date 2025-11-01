@@ -15,7 +15,7 @@ RateActions::RateActions(QObject* parent)
 
   for (int rate = RateHelper::MIN_V; rate < RateHelper::BUTT_V; ++rate) {
     QAction* pAct = new (std::nothrow) QAction{QIcon(RateHelper::GetRatePixmap(rate)), //
-                                               QString::asprintf("Rate %d", rate),                 //
+                                               QString::asprintf("Rate %d", rate),     //
                                                this};
     CHECK_NULLPTR_RETURN_VOID(pAct);
     pAct->setData(rate);
@@ -29,14 +29,21 @@ RateActions::RateActions(QObject* parent)
 
   _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, "Rate Recusively", this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY);
+  _RATE_RECURSIVELY->setToolTip("Rate only unrated movies in selected folder and its subfolders");
   RATE_ACTIONS_LIST += _RATE_RECURSIVELY;
+
+  _RATE_RECURSIVELY_OVERRIDE = new (std::nothrow) QAction{"Rate Recusively(Force)", this};
+  CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY_OVERRIDE);
+  _RATE_RECURSIVELY_OVERRIDE->setToolTip("Rate all movies, overwriting existing ratings");
+  RATE_ACTIONS_LIST += _RATE_RECURSIVELY_OVERRIDE;
 
   subscribe();
 }
 
 void RateActions::subscribe() {
   connect(RATE_AGS, &QActionGroup::triggered, this, &RateActions::onRateActionTriggered);
-  connect(_RATE_RECURSIVELY, &QAction::triggered, this, &RateActions::MovieRateRecursivelyChanged);
+  connect(_RATE_RECURSIVELY, &QAction::triggered, this, [this]() { emit MovieRateRecursivelyChanged(false); });
+  connect(_RATE_RECURSIVELY_OVERRIDE, &QAction::triggered, this, [this]() { emit MovieRateRecursivelyChanged(true); });
 }
 
 void RateActions::onRateActionTriggered(QAction* pActTriggered) {

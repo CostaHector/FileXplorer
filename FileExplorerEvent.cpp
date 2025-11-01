@@ -225,23 +225,25 @@ bool FileExplorerEvent::onRateMovie(int newRate) const {
   return succeedCnt > 0;
 }
 
-bool FileExplorerEvent::onRateMoviesRecursively() const {
-  const QString rootPath = _contentPane->getRootPath();
+bool FileExplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
+  const QString rootPath{_contentPane->getRootPath()};
+  const QString title{bOverrideForce ? "Rate All Movies - Overwrite Existing" : "Rate Unrated Movies Only"};
+  QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
+  message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings will be affected.";
+
+  const int defaultRate = Configuration().value(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, MemoryKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
+
   bool bOk = false;
-  int newRate = QInputDialog::getInt(nullptr,
-                                     "Input a rate",                      //
-                                     "Rate all movies under " + rootPath, //
-                                     10,
-                                     0,
-                                     10,
-                                     1, //
-                                     &bOk);
+  const int newRate = QInputDialog::getInt(_contentPane, title, message, defaultRate, RateHelper::MIN_V, RateHelper::MAX_V, 1, &bOk);
   if (!bOk) {
     LOG_INFO_NP("User cancel rate recursively", rootPath);
     return true;
   }
-  int succeedCnt = RateHelper::RateMovieRecursively(rootPath, newRate);
-  LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
+  if (newRate != defaultRate) {
+    Configuration().setValue(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, newRate);
+  }
+  const int succeedCnt = RateHelper::RateMovieRecursively(rootPath, newRate, bOverrideForce);
+  LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRate, bOverrideForce);
   return succeedCnt > 0;
 }
 

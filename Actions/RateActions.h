@@ -11,11 +11,12 @@ public:
   static RateActions& GetInst();
   QActionGroup* RATE_AGS {nullptr};
   QAction* _RATE_RECURSIVELY{nullptr};
+  QAction* _RATE_RECURSIVELY_OVERRIDE{nullptr};
   QList<QAction*> GetRateActionsList() const {return RATE_ACTIONS_LIST;}
 
 signals:
   void MovieRateChanged(int newRate);
-  void MovieRateRecursivelyChanged();
+  void MovieRateRecursivelyChanged(bool bOverrideForce);
 
 private:
   explicit RateActions(QObject* parent = nullptr);

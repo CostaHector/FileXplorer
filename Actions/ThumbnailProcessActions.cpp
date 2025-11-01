@@ -9,7 +9,7 @@ ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
   _CREATE_2_BY_2_THUMBNAIL->setToolTip("Create a 2x2 thumbnails for video(s), each image width:720px");
   _CREATE_3_BY_3_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_3_BY_3"), "Create 3x3 thumbnail");
   _CREATE_3_BY_3_THUMBNAIL->setToolTip("Create a 3x3 thumbnails for video(s), each image width:720px");
-  _CREATE_4_BY_4_THUMBNAIL = new (std::nothrow) QAction("Create 4x4 thumbnail");
+  _CREATE_4_BY_4_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_4_BY_4"), "Create 4x4 thumbnail");
   _CREATE_4_BY_4_THUMBNAIL->setToolTip("Create a 4x4 thumbnails for video(s), each image width:480px");
 
   _CREATE_THUMBNAIL_AG = new (std::nothrow) QActionGroup{this};
@@ -22,7 +22,7 @@ ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
   mCreateThumbnailDimension[_CREATE_3_BY_3_THUMBNAIL] = {3, 3, 720};
   mCreateThumbnailDimension[_CREATE_4_BY_4_THUMBNAIL] = {4, 4, 480};
 
-  _RENAME_THUMBNAILS_FROM_POT_PLAYER = new (std::nothrow) QAction(QIcon{":img/NAME_RULER"}, "Rename thumbnails");
+  _RENAME_THUMBNAILS_FROM_POT_PLAYER = new (std::nothrow) QAction(QIcon{":img/RENAME_THUMBNAILS"}, "Rename thumbnails");
   _RENAME_THUMBNAILS_FROM_POT_PLAYER->setToolTip("Rename thumbnails generated from potplayer");
 
   _EXTRACT_1ST_IMG = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL_EXTRACTOR_0_1"), "Thumbnail Extractor");
@@ -52,11 +52,11 @@ QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
   crtThumbnailActions += _CREATE_THUMBNAIL_AG->actions();
   crtThumbnailActions += nullptr;
   crtThumbnailActions += _RENAME_THUMBNAILS_FROM_POT_PLAYER;
-  auto* createTB = new (std::nothrow) MenuToolButton{crtThumbnailActions,//
-                                                         QToolButton::MenuButtonPopup,//
-                                                         Qt::ToolButtonStyle::ToolButtonTextBesideIcon,//
-                                                         IMAGE_SIZE::TABS_ICON_IN_MENU_16,//
-                                                         parent};//
+  auto* createTB = new (std::nothrow) MenuToolButton{crtThumbnailActions,                           //
+                                                     QToolButton::MenuButtonPopup,                  //
+                                                     Qt::ToolButtonStyle::ToolButtonTextBesideIcon, //
+                                                     IMAGE_SIZE::TABS_ICON_IN_MENU_16,              //
+                                                     parent};                                       //
   CHECK_NULLPTR_RETURN_NULLPTR(createTB);
   createTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION, true);
 
@@ -66,11 +66,11 @@ QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
   extractThumbnailActions.push_back(_CUSTOM_RANGE_IMGS);
   extractThumbnailActions.push_back(nullptr);
   extractThumbnailActions.push_back(_SKIP_IF_ALREADY_EXIST);
-  auto* extractTB = new (std::nothrow) MenuToolButton{extractThumbnailActions,//
-                                                          QToolButton::MenuButtonPopup,//
-                                                          Qt::ToolButtonStyle::ToolButtonTextBesideIcon,//
-                                                          IMAGE_SIZE::TABS_ICON_IN_MENU_16,//
-                                                          parent};//
+  auto* extractTB = new (std::nothrow) MenuToolButton{extractThumbnailActions,                       //
+                                                      QToolButton::MenuButtonPopup,                  //
+                                                      Qt::ToolButtonStyle::ToolButtonTextBesideIcon, //
+                                                      IMAGE_SIZE::TABS_ICON_IN_MENU_16,              //
+                                                      parent};                                       //
   CHECK_NULLPTR_RETURN_NULLPTR(extractTB);
   extractTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_EXTRACT_CHOICE, true);
 

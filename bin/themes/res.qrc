@@ -37,6 +37,7 @@
     <file alias="THUMBNAILS_1_BY_1">Media/THUMBNAILS_1_BY_1.svg</file>
     <file alias="THUMBNAILS_2_BY_2">Media/THUMBNAILS_2_BY_2.svg</file>
     <file alias="THUMBNAILS_3_BY_3">Media/THUMBNAILS_3_BY_3.svg</file>
+    <file alias="THUMBNAILS_4_BY_4">Media/THUMBNAILS_4_BY_4.svg</file>
     <file alias="THUMBNAIL_EXTRACTOR_0_1">Media/THUMBNAIL_EXTRACTOR_0_1.svg</file>
     <file alias="THUMBNAIL_EXTRACTOR_0_2">Media/THUMBNAIL_EXTRACTOR_0_2.svg</file>
     <file alias="THUMBNAIL_EXTRACTOR_0_4">Media/THUMBNAIL_EXTRACTOR_0_4.svg</file>
@@ -47,6 +48,7 @@
     <file alias="PLAY_ALL_VIDEO">Media/PLAY_ALL_VIDEO.ico</file>
     <file alias="LIKE">Media/LIKE.svg</file>
     <file alias="LIKE_RECURSIVELY">Media/LIKE_RECURSIVELY.svg</file>
+    <file alias="RENAME_THUMBNAILS">Media/RENAME_THUMBNAILS.svg</file>
 
     <!--FramelessWindow Icon here-->
     <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>

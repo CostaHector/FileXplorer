@@ -13,13 +13,13 @@ public:
   };
 
   static bool RateMovie(const QString& fileAbsPath, int rate);
-  static int RateMovieRecursively(const QString& folderAbsPath, int rate);
+  static int RateMovieRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce=true);
   static const QPixmap& GetRatePixmap(int rate);
 
 private:
   static inline int clampRate(int rate) { return std::max(std::min(rate, (int) MAX_V), (int) MIN_V); }
 
-  static bool RateMovieCore(const QString& jsonPath, int rate);
+  static bool RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
 
   static bool getJsonPathForFile(const QString& fileAbsPath, QString& jsonPath);
   static QString getBaseNameForImage(const QString& imagePath);

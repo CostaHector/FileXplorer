@@ -10,7 +10,7 @@
 #include <QDirIterator>
 #include <QRegularExpression>
 
-bool RateHelper::RateMovieCore(const QString& jsonPath, int rate) {
+bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce) {
   using namespace JsonHelper;
   using namespace MOVIE_TABLE;
   QVariantHash data = MovieJsonLoader(jsonPath);
@@ -19,12 +19,23 @@ bool RateHelper::RateMovieCore(const QString& jsonPath, int rate) {
     return false;
   }
 
-  int beforeValue = data.value("Rate", -1).toInt();
-  int afterValue = clampRate(rate);
-  if (afterValue == beforeValue) {
-    return true;
+  const int afterValue = clampRate(newRateVal);
+
+  using namespace PERFORMER_DB_HEADER_KEY;
+  auto itRate = data.find(ENUM_2_STR(Rate));
+  if (itRate != data.cend()) { // Rate already exist
+    if (!bOverrideForce) {
+      return true; // no need override Rate
+    }
+
+    int beforeValue = itRate.value().toInt();
+    if (afterValue == beforeValue) { // same, skip
+      return true;
+    }
+    itRate->setValue(afterValue);
+  } else {
+    data[ENUM_2_STR(Rate)] = afterValue;
   }
-  data["Rate"] = afterValue;
 
   if (!DumpJsonDict(data, jsonPath)) {
     LOG_E("Failed to save JSON data to: %s", qPrintable(jsonPath));
@@ -39,14 +50,14 @@ bool RateHelper::RateMovie(const QString& fileAbsPath, int rate) {
     LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
     return false;
   }
-  return RateMovieCore(jsonPath, rate);
+  return RateMovieCore(jsonPath, rate, true);
 }
 
-int RateHelper::RateMovieRecursively(const QString& folderAbsPath, int rate) {
+int RateHelper::RateMovieRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce) {
   QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   int succeedCnt{0}, totalCnt{0};
   while (it.hasNext()) {
-    succeedCnt += RateMovieCore(it.next(), rate);
+    succeedCnt += RateMovieCore(it.next(), rate, bOverrideForce);
     ++totalCnt;
   }
   LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) have been updated to rate %d", succeedCnt, totalCnt, rate);
