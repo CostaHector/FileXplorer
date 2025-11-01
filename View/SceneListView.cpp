@@ -73,7 +73,8 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
 
 void SceneListView::onCopyBaseName() {
   const QModelIndex& curInd = currentIndex();
-  const QString& copiedStr = _sceneModel->baseName(curInd);
+  const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(curInd);
+  const QString& copiedStr = _sceneModel->baseName(srcInd);
   auto* cb = QApplication::clipboard();
   cb->setText(copiedStr, QClipboard::Mode::Clipboard);
   LOG_D("user copied str: [%s]", qPrintable(copiedStr));
@@ -81,7 +82,8 @@ void SceneListView::onCopyBaseName() {
 
 void SceneListView::onOpenCorrespondingFolder() {
   const QModelIndex& curInd = currentIndex();
-  const QString& scenePath = _sceneModel->absolutePath(curInd);
+  const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(curInd);
+  const QString& scenePath = _sceneModel->absolutePath(srcInd);
   on_ShiftEnterPlayVideo(scenePath);
   LOG_D("Play path: [%s]", qPrintable(scenePath));
 }
