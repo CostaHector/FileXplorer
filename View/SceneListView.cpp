@@ -3,6 +3,7 @@
 #include "ScenesListModel.h"
 #include "PlayVideo.h"
 #include "PublicMacro.h"
+#include "PathTool.h"
 #include "SceneInPageActions.h"
 #include "SceneInfoManager.h"
 #include <QHeaderView>
@@ -31,11 +32,14 @@ QString AlignDelegate::displayText(const QVariant& value, const QLocale& /**/) c
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
-                             QWidget* parent)     //
-    : CustomListView{"SCENES_TABLE", parent},     //
-      _sceneModel{sceneModel},                    //
-      _sceneSortProxyModel{sceneSortProxyModel},  //
-      _scenePageControl{scenePageControl}         //
+                             QWidget* parent) //
+  : CustomListView{"SCENES_TABLE", parent}
+  , //
+  _sceneModel{sceneModel}
+  , //
+  _sceneSortProxyModel{sceneSortProxyModel}
+  ,                                   //
+  _scenePageControl{scenePageControl} //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
@@ -98,19 +102,21 @@ void SceneListView::subscribe() {
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  if (IsPathAtShallowDepth(rootPath)) {  // Potential large directory
+  if (IsPathAtShallowDepth(rootPath)) { // Potential large directory
     LOG_D("Root path[%s] may contain a large number of items", qPrintable(rootPath));
     const QString cfmTitle = "Large Directory Warning - Performance Impact";
-    const QString hintMsg =
-        "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
-        "Loading it could cause performance issues.\n\n"
-        "Directory: " +
-        rootPath + "\n\n Do you want to proceed?";
+    const QString hintMsg = "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
+                            "Loading it could cause performance issues.\n\n"
+                            "Directory: "
+                            + rootPath + "\n\n Do you want to proceed?";
     QMessageBox::StandardButton retBtn;
 #ifdef RUNNING_UNIT_TESTS
     retBtn = SceneListViewMocker::MockSetRootPathQuery() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
 #else
-    retBtn = QMessageBox::warning(this, cfmTitle, hintMsg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
+    retBtn = QMessageBox::warning(this,
+                                  cfmTitle,
+                                  hintMsg,
+                                  QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
                                   QMessageBox::StandardButton::No);
 #endif
     if (retBtn != QMessageBox::StandardButton::Yes) {
@@ -132,10 +138,14 @@ int SceneListView::onUpdateScnFiles() {
   }
   using namespace SceneInfoManager;
   ScnMgr scnMgr;
+
   Counter cnter = scnMgr(workPath);
   if (cnter.m_jsonUpdatedCnt == 0) {
-    LOG_INFO_NP("No scene file need updated", "0 json(s) updated");
-    return 0;
+    const QString basicScnFilAbsPath = workPath + '/' + PathTool::fileName(workPath) + ".scn";
+    if (QFile::exists(basicScnFilAbsPath)) { // already exist
+      LOG_INFO_NP("No scene file need updated", "0 json(s) updated");
+      return 0;
+    }
   }
   int scnFileCnt = scnMgr.WriteDictIntoScnFiles();
   LOG_OE_P(scnFileCnt >= 0, "Scn file updated", "count: %d, workPath[%s]", scnFileCnt, qPrintable(workPath));
@@ -153,9 +163,9 @@ void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& 
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 #ifdef _WIN32
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // windows path start with disk letter
 #else
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // linux path start with '/'
 #endif
   return path.count('/') < NEAR_ROOT_PATH_LIMIT;
 }
