@@ -157,8 +157,9 @@ void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& 
   if (!current.isValid()) {
     return;
   }
-  const QString& name = _sceneModel->baseName(current);
-  emit currentSceneChanged(name, _sceneModel->GetImgs(current), _sceneModel->GetVids(current));
+  const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(current);
+  const QString& name = _sceneModel->baseName(srcInd);
+  emit currentSceneChanged(name, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
 }
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
