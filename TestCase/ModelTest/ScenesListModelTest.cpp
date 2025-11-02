@@ -115,7 +115,7 @@ class ScenesListModelTest : public PlainTestSuite {
     {
       ScnMgr scnMgr1;
       QCOMPARE(scnMgr1(bambooPath), Counter(3, 3, 3, 2));  // 3updated, 3used,3VidUpdated,2ImgNameUpdated
-      QCOMPARE(scnMgr1.WriteDictIntoScnFiles(), 2);        // 2 scn file writed ok
+      QCOMPARE(ScnMgr::UpdateScnFiles(bambooPath), 2);        // 2 scn file writed ok
     }
 
     nodeGrapes =  //                                                                                       //
@@ -133,7 +133,7 @@ class ScenesListModelTest : public PlainTestSuite {
     {
       ScnMgr scnMgr2;
       QCOMPARE(scnMgr2(grapePath), Counter(0, 8, 0, 0));  // 3updated, 3used,3VidUpdated,2ImgNameUpdated
-      QCOMPARE(scnMgr2.WriteDictIntoScnFiles(), 2);       // 2 scn file writed ok
+      QCOMPARE(ScnMgr::UpdateScnFiles(grapePath), 2);       // 2 scn file writed ok
     }
   }
 

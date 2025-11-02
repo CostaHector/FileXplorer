@@ -85,34 +85,41 @@ class SceneListViewTest : public PlainTestSuite {
       QCOMPARE(sceneModel.rootPath(), tDir.path());
       QCOMPARE(sceneModel.rowCount(), 0);
     }
+
     // no scn files now
     const QDir mDir = QDir(tDir);
     const QStringList emptyScnList = mDir.entryList({"*.scn"}, QDir::Filter::Files);
     QVERIFY(emptyScnList.isEmpty());
-    {  // generate scn file ok
+    {
+      // generate scn file ok
       // update on a shallow depth get rejected
       sceneModel.mRootPath = "/";  // force set this path to be root
-      QCOMPARE(sceneView.onUpdateScnFiles(), -1);
+      QCOMPARE(sceneView.onUpdateJsonFiles(), -1);
       sceneModel.mRootPath = "C:/";  // force set this path to be root
-      QCOMPARE(sceneView.onUpdateScnFiles(), -1);
+      QCOMPARE(sceneView.onUpdateJsonFiles(), -1);
 
       sceneModel.setRootPath(tDir.path());
       {
         SceneInPageActions& sceneActInst = g_SceneInPageActions();
-        emit sceneActInst._COMBINE_MEDIAINFOS_JSON->triggered();
+        emit sceneActInst._UPDATE_JSON->triggered();
+        emit sceneActInst._UPDATE_SCN->triggered();
         QStringList scn2FileList = mDir.entryList({"*.scn"}, QDir::Filter::Files);
         QCOMPARE(scn2FileList.size(), 1);
       }
       QCOMPARE(sceneModel.rowCount(), 2);  // 2 json one for chris evans, another for henry cavill
 
-      QCOMPARE(sceneView.onUpdateScnFiles(), 0);  // already updated. no need again
+      QCOMPARE(sceneView.onUpdateJsonFiles(), 0);  // already updated. no need again
+      QCOMPARE(sceneView.onUpdateScnFiles(), 1);   // ignore whether json changed. update scn using json updated
       {
         QVERIFY(sceneView.onClearScnFiles() > 0);  // clear scn files
         QStringList scn2FileList = mDir.entryList({"*.scn"}, QDir::Filter::Files);
         QCOMPARE(scn2FileList.size(), 0);
       }
-      QVERIFY(sceneView.onUpdateScnFiles() > 0);
-      QCOMPARE(sceneView.onUpdateScnFiles(), 0);
+      {
+        QVERIFY(sceneView.onUpdateScnFiles() > 0);  // update/generated scn files
+        QStringList scn2FileList = mDir.entryList({"*.scn"}, QDir::Filter::Files);
+        QVERIFY(scn2FileList.size() > 0);
+      }
     }
 
     // check signal currentSceneChanged emit ok

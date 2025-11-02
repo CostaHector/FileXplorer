@@ -31,8 +31,8 @@
     <file alias="DUPLICATE_IMAGES_BY_MD5">Media/DUPLICATE_IMAGES_BY_MD5.svg</file>
     <file alias="LOW_RESOLUTION_IMGS_RMV">Media/LOW_RESOLUTION_IMGS_RMV.svg</file>
     <file alias="DUPLICATE_VIDEOS_FINDER">Media/DUPLICATE_VIDEOS_FINDER.png</file>
-    <file alias="UPDATE_JSON_THEN_SCN">Media/UPDATE_JSON_THEN_SCN.svg</file>
     <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
+    <file alias="UPDATE_JSON">Media/UPDATE_JSON.svg</file>
     <file alias="CLEAR_SCN_FILES">Media/CLEAR_SCN_FILES.svg</file>
     <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
     <file alias="THUMBNAILS_1_BY_1">Media/THUMBNAILS_1_BY_1.svg</file>

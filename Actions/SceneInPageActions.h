@@ -18,7 +18,8 @@ class SceneInPageActions : public QObject {
 
   QToolBar* GetOrderToolBar(QWidget* parent);
 
-  QAction* _COMBINE_MEDIAINFOS_JSON{nullptr};
+  QAction* _UPDATE_JSON{nullptr};
+  QAction* _UPDATE_SCN{nullptr};
   QAction* _CLEAR_SCN_FILE{nullptr};
 
   QAction* _BY_MOVIE_PATH{nullptr};

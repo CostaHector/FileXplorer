@@ -117,7 +117,7 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
   }
   mRootPath = rootPath;
 
-  SceneInfoList newEntryList = SceneInfoManager::GetScnsLstFromPath(mRootPath);
+  SceneInfoList newEntryList = SceneHelper::GetScnsLstFromPath(mRootPath);
 #ifdef RUNNING_UNIT_TESTS
   newEntryList += SceneInfoManager::mockScenesInfoList();
 #endif

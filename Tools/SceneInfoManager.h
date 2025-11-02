@@ -1,43 +1,11 @@
 #ifndef SCENEINFOMANAGER_H
 #define SCENEINFOMANAGER_H
 
-#include <QString>
-#include <QList>
+#include "SceneInfo.h"
 #include <QMap>
 #include <QVariantHash>
-#include "ScenePageNaviHelper.h"
-
-struct SceneInfo {
-  QString rel2scn;   // jsonFullPath = mRootPath + relative2scnFile + jsonFileName, rel2scn can be '/' or '/any thing/'
-  QString name;      // name, key"Name" from json file baseName
-  QStringList imgs;  // img, key"ImgName"
-  QString vidName;   // video, key"VidName"
-  qint64 vidSize;    // video size, from json file, key"Size"
-  int rate;          // video rate, from json file, key"Rate"
-  QString uploaded;  // from json file, key"Uploaded"
-
-  QString GetAbsolutePath(const QString& rootPath) const;
-  QString GetFirstImageAbsPath(const QString& rootPath) const;
-  QStringList GetImagesAbsPathList(const QString& rootPath) const;
-  QString GetVideoAbsPath(const QString& rootPath) const;
-
-  using CompareFunc = bool (SceneInfo::*)(const SceneInfo&) const;
-  static CompareFunc getCompareFunc(SceneSortOrderHelper::SortDimE dim);
-
-  bool operator<(const SceneInfo& other) const;
-  bool lessThanName(const SceneInfo& other) const;
-  bool lessThanVidSize(const SceneInfo& other) const;
-  bool lessThanRate(const SceneInfo& other) const;
-  bool lessThanUploaded(const SceneInfo& other) const;
-
-  bool operator==(const SceneInfo& rhs) const;
-};
-
-typedef QList<SceneInfo> SceneInfoList;
 
 namespace SceneInfoManager {
-SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString rel);
-SceneInfoList GetScnsLstFromPath(const QString& path);
 
 #ifdef RUNNING_UNIT_TESTS
 inline SceneInfoList& mockScenesInfoList() {
@@ -75,17 +43,12 @@ struct Counter {
 class ScnMgr {
  public:
   using PATH_2_JSON_DICTS = QMap<QString, QList<QVariantHash>>;
+  static QString GetScnAbsFilePath(const QString& folderPath);
   Counter operator()(const QString& rootPath);  // will update json contents, than generated scn from refreshed jsons
-  int WriteDictIntoScnFiles();
+  static int UpdateScnFiles(const QString& rootPath);
   static int ClearScnFiles(const QString& rootPath);
  private:
   Counter UpdateJsonUnderAPath(const QString& path);
-#ifdef RUNNING_UNIT_TESTS
-  void mockJsonDictForTest(const PATH_2_JSON_DICTS& newValue) {
-    m_jsonsDicts = newValue;
-  }
-#endif
-  PATH_2_JSON_DICTS m_jsonsDicts;  // relativePathToJsonFile -> Jsons
 };
 
 }  // namespace SceneInfoManager
