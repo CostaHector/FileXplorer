@@ -172,6 +172,8 @@ class RenameUnqiueCheckTest : public PlainTestSuite {
     QCOMPARE(invalidInputLengthRnu.m_isArrLenUnequal, true);
     QCOMPARE(invalidInputLengthRnu.isInputValid(), false);
     QCOMPARE((bool)invalidInputLengthRnu, false);
+    const QString detailMessage = invalidInputLengthRnu.Details();
+    QVERIFY(detailMessage.contains("bLenUnequal:[1]"));
   }
 };
 

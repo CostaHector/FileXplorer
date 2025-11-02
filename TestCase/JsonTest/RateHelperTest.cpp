@@ -31,6 +31,16 @@ private slots:
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
   }
 
+  void rate_pixmap_ok() {
+    static constexpr int SLICE_COUNT = 100;
+    QPixmap rate0Pix = RateHelper::GenerateRatePixmap(0, SLICE_COUNT, false); // no border
+    QVERIFY(!rate0Pix.isNull());
+    QPixmap rate100Pix = RateHelper::GenerateRatePixmap(100, SLICE_COUNT, true);
+    QVERIFY(!rate100Pix.isNull());
+    QPixmap rateInvalidPix = RateHelper::GenerateRatePixmap(101, SLICE_COUNT, true);
+    QVERIFY(rateInvalidPix.isNull());
+  }
+
   void invalid_scenario() {
     // Missing JSON test
     {
