@@ -187,11 +187,8 @@ bool ArchiveFilesWriter::IsNeedCompress(const QFile& fi) {
   if (fi.size() > 10 * 1024 * 1024) {
     return false;
   }
-  const QString asteriskDotExt = PathTool::GetAsteriskDotFileExtension(fi.fileName());
-  if (TYPE_FILTER::VIDEO_TYPE_SET.contains(asteriskDotExt)) {
-    return false;
-  }
-  return true;
+  const QString dotExt = PathTool::GetDotFileExtension(fi.fileName());
+  return !TYPE_FILTER::isDotExtVideo(dotExt);
 }
 
 int ArchiveFilesWriter::AddOneFolder(const QString& workPath, const QString& rel2FolderName) {

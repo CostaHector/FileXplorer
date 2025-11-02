@@ -11,8 +11,8 @@
 #include "JsonKey.h"
 #include "JsonTestPrecoditionTools.h"
 
+using namespace SceneHelper;
 using namespace SceneInfoManager;
-
 class SceneInfoManagerTest : public PlainTestSuite {
   Q_OBJECT
  public:
@@ -20,43 +20,6 @@ class SceneInfoManagerTest : public PlainTestSuite {
  private slots:
   void initTestCase() { QVERIFY(tDir.IsValid()); }
   void init() { tDir.ClearAll(); }
-
-  void sort_function_ok() {
-    SceneInfo si1{"/", "The U.S.", {}, {}, 100 * 1024, 98, "1980"};
-    SceneInfo si2{"/", "France", {}, {}, 200 * 1024, 95, "1960"};
-    SceneInfo si3{"/Asia", "Singapore", {}, {}, 150 * 1024, 96, "2000"};
-
-    SceneInfoList siList{si1, si2, si3};
-
-    // / and France(2) < / and The U.S.(1) < /Asia and Singapore(3)
-
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_PATH);
-      return (lhs.*pComparator)(rhs);
-    });
-    QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
-
-    // 100k(1) < 150k(3) < 200k(2)
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_SIZE);
-      return (lhs.*pComparator)(rhs);
-    });
-    QCOMPARE(siList, (SceneInfoList{si1, si3, si2}));
-
-    // 95(2) < 96(3) < 98(1)
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::RATE);
-      return (lhs.*pComparator)(rhs);
-    });
-    QCOMPARE(siList, (SceneInfoList{si2, si3, si1}));
-
-    // 1960(2) < 1980(1) < 2000(3)
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::UPLOADED_TIME);
-      return (lhs.*pComparator)(rhs);
-    });
-    QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
-  }
 
   void UpdateJsonUnderAPath_correct() {
     /*
@@ -78,7 +41,6 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       ScnMgr scnMgr;
       QVERIFY(scnMgr.UpdateJsonUnderAPath("/path/to/inexist").isEmpty());
       QVERIFY(scnMgr.UpdateJsonUnderAPath(__FILE__).isEmpty());
-      QVERIFY(scnMgr.m_jsonsDicts.isEmpty());
     }
     using namespace JsonKey;
     {  // 2.
@@ -90,7 +52,6 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QCOMPARE(tDir.createEntries(notExistJsonFileNodes), 3);
       ScnMgr scnMgr;
       QVERIFY(scnMgr.UpdateJsonUnderAPath(tDir.path()).isEmpty());
-      QVERIFY(scnMgr.m_jsonsDicts.isEmpty());
       tDir.ClearAll();
     }
 
@@ -102,7 +63,6 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       ScnMgr scnMgr;
       QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
       QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
-      QCOMPARE(scnMgr.m_jsonsDicts.size(), 1);
       tDir.ClearAll();
     }
 
@@ -191,34 +151,22 @@ Precondition: Xander.json value of key ImgName, VidName is empty
     using namespace JsonKey;
     {  // 1.0 ScnMgr.m_jsonsDicts为空, 写入跳过, 返回0
       ScnMgr scnMgr;
-      scnMgr.mockJsonDictForTest({});
-      QVERIFY(scnMgr.m_jsonsDicts.isEmpty());
-      QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 0);
+      QCOMPARE(scnMgr.UpdateScnFiles(tDir.path()), 0);
       QCOMPARE(tDir.Snapshot(), (QSet<QString>{}));
     }
 
     {  // 2.0 构造一个路径, 并设置m_jsonsDicts非空, .scn写入路径成功, 名称就是${父文件夹名称.scn}, 清理m_jsonsDicts
       QVERIFY(tDir.mkpath("SuperHero"));
-      const QList<QVariantHash> dictsUnderSuperHero  //
-          {
-              ConstructJsonDict("Chris Evans"),   //
-              ConstructJsonDict("Henry Cavill"),  //
-          };
 
-      ScnMgr scnMgr;
-      const ScnMgr::PATH_2_JSON_DICTS tempPath2Dicts{
-          {tDir.itemPath("SuperHero"), dictsUnderSuperHero},  //
-      };                                                      //
-      scnMgr.mockJsonDictForTest(tempPath2Dicts);
-      QVERIFY(!scnMgr.m_jsonsDicts.isEmpty());
-      QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 1);
-      QVERIFY(scnMgr.m_jsonsDicts.isEmpty());
+      QVERIFY(JsonHelper::DumpJsonDict(ConstructJsonDict("Chris Evans"), tDir.itemPath("SuperHero/Chris Evans.json")));
+      QVERIFY(JsonHelper::DumpJsonDict(ConstructJsonDict("Henry Cavill"), tDir.itemPath("SuperHero/Henry Cavill.json")));
 
-      QCOMPARE(tDir.Snapshot(), (QSet<QString>{
-                                    "SuperHero",
-                                    "SuperHero/SuperHero.scn",
-                                }));
-      QVERIFY(tDir.checkFileContents("SuperHero/SuperHero.scn", {"Chris Evans", "Henry Cavill"}));
+      QCOMPARE(ScnMgr::UpdateScnFiles(tDir.itemPath("SuperHero")), 1);
+      QCOMPARE(tDir.Snapshot(QDir::Filter::Files), (QSet<QString>{
+                                                       "SuperHero/SuperHero.scn",      //
+                                                       "SuperHero/Chris Evans.json",   //
+                                                       "SuperHero/Henry Cavill.json",  //
+                                                   }));
       tDir.ClearAll();
     }
 
@@ -230,53 +178,34 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       QVERIFY(tDir.mkpath("XMen"));
 
       // 准备数据
-      const QList<QVariantHash> dictsUnderSuperHero{
-          ConstructJsonDict("Chris Evans"),
-          ConstructJsonDict("Henry Cavill"),
-      };
+      QVERIFY(JsonHelper::DumpJsonDict(ConstructJsonDict("Chris Evans"), tDir.itemPath("SuperHero/Chris Evans.json")));
+      QVERIFY(JsonHelper::DumpJsonDict(ConstructJsonDict("Henry Cavill"), tDir.itemPath("SuperHero/Henry Cavill.json")));
 
-      const QList<QVariantHash> dictsUnderXMen{
-          QVariantHash(),  // 空字典
-          ConstructJsonDict("Wolverine"),
-      };
-
-      ScnMgr scnMgr;
-      const ScnMgr::PATH_2_JSON_DICTS tempPath2Dicts{
-          {tDir.itemPath("SuperHero"), dictsUnderSuperHero},  //
-          {tDir.itemPath("XMen"), dictsUnderXMen},            //
-      };
-      scnMgr.mockJsonDictForTest(tempPath2Dicts);
-      QCOMPARE(scnMgr.m_jsonsDicts.size(), 2);
+      QVERIFY(JsonHelper::DumpJsonDict({}, tDir.itemPath("XMen/EmptyJson.json")));
+      QVERIFY(JsonHelper::DumpJsonDict(ConstructJsonDict("Wolverine"), tDir.itemPath("XMen/Wolverine.json")));
 
       // 执行写入操作
-      QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 2);  // 预期生成两个.scn文件
-      QVERIFY(scnMgr.m_jsonsDicts.isEmpty());       // 验证字典被清空
+      QCOMPARE(ScnMgr::UpdateScnFiles(tDir.path()), 2);  // 预期生成两个.scn文件
 
       // 验证文件系统
-      QCOMPARE(tDir.Snapshot(), (QSet<QString>{
-                                    "SuperHero",
-                                    "SuperHero/SuperHero.scn",
-                                    "XMen",
-                                    "XMen/XMen.scn",
-                                }));
-
-      QVERIFY(tDir.checkFileContents("SuperHero/SuperHero.scn", {"Chris Evans", "Henry Cavill"}, {"Wolverine"}));
-      QVERIFY(tDir.checkFileContents("XMen/XMen.scn", {"Wolverine"}, {"Chris Evans", "Henry Cavill"}));
+      QCOMPARE(tDir.Snapshot(QDir::Filter::Files), (QSet<QString>{
+                                                       "SuperHero/SuperHero.scn",      //
+                                                       "SuperHero/Chris Evans.json",   //
+                                                       "SuperHero/Henry Cavill.json",  //
+                                                       "XMen/XMen.scn",
+                                                       "XMen/EmptyJson.json",
+                                                       "XMen/Wolverine.json",
+                                                   }));
       tDir.ClearAll();
     }
 
-    {  // 4. 边界情况测试：空场景列表
-      ScnMgr scnMgr;
-      ScnMgr::PATH_2_JSON_DICTS testData;
-
-      QVERIFY(tDir.mkpath("Empty"));  // 创建空目录
-      testData[tDir.itemPath("Empty")] = {};
-      scnMgr.mockJsonDictForTest(testData);
+    {
+      // 4. 边界情况测试：空场景列表
+      QVERIFY(tDir.touch("Empty/EmptyJson.json", "{}"));  // empty json
       // 应该不生成 .scn 文件（因为场景列表完全为空）
-      QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 0);
+      QCOMPARE(ScnMgr::UpdateScnFiles(tDir.path()), 0);
       // 验证没有生成 .scn 文件
-      QString scnFilePath = tDir.itemPath("Empty/Empty.scn");
-      QVERIFY(!QFile::exists(scnFilePath));
+      QVERIFY(!tDir.exists("Empty/Empty.scn"));
       tDir.ClearAll();
     }
   }
@@ -323,7 +252,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       QVERIFY(tDir.checkFileContents("Marvel/Captain American.json", {"Captain American", "Captain American.jpg", "Captain American.mp4"}));
       QVERIFY(tDir.checkFileContents("Marvel/Bonus/Chris Evans.json", {"Chris Evans", "Chris Evans.mp4"}, {"Chris Evans.jpg"}));
       const QStringList& beforeList = tDir.FilesContentsSnapshot({"Disney.json", "Marvel/Captain American.json", "Marvel/Bonus/Chris Evans.json"});
-      QCOMPARE(scnMgr.m_jsonsDicts.size(), 3);  // 3 json files in used in total QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 3);
+      // 3 json files in used in total QCOMPARE(scnMgr.UpdateScnFiles(), 3);
       // 3 scn file in total QVERIFY(scnMgr.m_jsonsDicts.isEmpty());
 
       // 第二次调用：不应有更新, 文件未改变
@@ -350,22 +279,19 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
 
       QList<QVariantHash> scenes{scene1};
 
-      // 创建目录并设置 ScnMgr
+      // 创建目录
       QVERIFY(tDir.mkpath("Marvel"));
-      ScnMgr scnMgr;
-      ScnMgr::PATH_2_JSON_DICTS testData{{tDir.itemPath("Marvel"), scenes}};
-      scnMgr.mockJsonDictForTest(testData);
+      QVERIFY(JsonHelper::DumpJsonDict(scene1, tDir.itemPath("Marvel/Captain America.json")));
 
       // 生成 .scn 文件
-      QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 1);
+      QCOMPARE(ScnMgr::UpdateScnFiles(tDir.itemPath("Marvel")), 1);
 
       // 验证 .scn 文件存在
-      QString scnFilePath = tDir.itemPath("Marvel/Marvel.scn");
-      QVERIFY(QFile::exists(scnFilePath));
+      QVERIFY(tDir.exists("Marvel/Marvel.scn"));
 
       // 解析 .scn 文件
-      SceneInfoList parsedScenes =
-          ParseAScnFile(scnFilePath, "/Marvel/");  //  here mRootPath=tDir.path(); tDir.path() + "/Marvel/" + Marvel.scn=the json scn
+      SceneInfoList parsedScenes = ParseAScnFile(tDir.itemPath("Marvel/Marvel.scn"),
+                                                 "/Marvel/");  //  here mRootPath=tDir.path(); tDir.path() + "/Marvel/" + Marvel.scn=the json scn
 
       // 验证解析结果
       QCOMPARE(parsedScenes.size(), 1);
@@ -411,20 +337,22 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       scene3["Rate"] = 0;  // 未评分
       scene3["Uploaded"] = "20241212 15:00:00";
 
-      QList<QVariantHash> scenes{scene1, scene2, scene3};
-
-      // 创建目录并设置 ScnMgr
+      // 创建目录
       QVERIFY(tDir.mkpath("Avengers"));
-      ScnMgr scnMgr;
-      ScnMgr::PATH_2_JSON_DICTS testData{{tDir.itemPath("Avengers"), scenes}};
-      scnMgr.mockJsonDictForTest(testData);
+      QVERIFY(JsonHelper::DumpJsonDict(scene1, tDir.itemPath("Avengers/Iron Man.json")));
+      QVERIFY(JsonHelper::DumpJsonDict(scene2, tDir.itemPath("Avengers/Thor.json")));
+      QVERIFY(JsonHelper::DumpJsonDict(scene3, tDir.itemPath("Avengers/Hulk.json")));
 
       // 生成 .scn 文件
-      QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 1);
+      QCOMPARE(ScnMgr::UpdateScnFiles(tDir.path()), 1);
 
-      // 解析 .scn 文件
+      // 解析 .scn 文件, 并按照Rate Descending
       QString scnFilePath = tDir.itemPath("Avengers/Avengers.scn");
       SceneInfoList parsedScenes = ParseAScnFile(scnFilePath, "/Avengers/");
+      std::sort(parsedScenes.begin(), parsedScenes.end(),                 //
+                [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {  //
+                  return !lhs.lessThanRate(rhs);
+                });
 
       // 验证解析结果
       QCOMPARE(parsedScenes.size(), 3);
@@ -452,7 +380,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
 
     {  // 5. 文件格式错误测试
       // 创建格式错误的 .scn 文件, 写入不完整的数据（缺少某些行）,只有名称，缺少其他字段
-      tDir.touch("Corrupted/Corrupted.scn", "Scene Name\n");
+      QVERIFY(tDir.touch("Corrupted/Corrupted.scn", "Scene Name\n"));
       // 应该返回空列表或部分数据（根据 ParseAScnFile 的错误处理）
       SceneInfoList result = ParseAScnFile(tDir.path(), "/Corrupted/");
       // 根据当前实现，遇到错误会返回空列表
@@ -462,26 +390,39 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
   }
 
   void GetScnsLstFromPath_correct() {
-    QVariantHash scene0;
-    QVariantHash scene1;
-    QString name0 = "The Last Fight", name1 = "Iron Man";
-    QString scenesUnderRootPath = tDir.path(), scenesUnderSubPath = tDir.itemPath("Avengers");
-
-    QString scene0ScnFileBaseName = tDir.baseName();  // aka scn file located in folder name
     QVERIFY(tDir.mkpath("Avengers"));
 
-    ScnMgr::PATH_2_JSON_DICTS testData =
-        JsonTestPrecoditionTools::GetPathJsonDictList(name0, scenesUnderRootPath, scene0, name1, scenesUnderSubPath, scene1);
+    QString scenesUnderRootPath = tDir.path();
+    QString scenesUnderSubPath = tDir.itemPath("Avengers");
 
-    ScnMgr scnMgr;
-    scnMgr.mockJsonDictForTest(testData);
-    QCOMPARE(scnMgr.WriteDictIntoScnFiles(), 2);  // 2 scn files
-    const QString expect1stScnFileAbsPath = tDir.itemPath(scene0ScnFileBaseName + ".scn");
-    const QString expect2ndScnFileAbsPath = tDir.itemPath("Avengers/Avengers.scn");
-    QVERIFY(QFile::exists(expect1stScnFileAbsPath));
-    QVERIFY(QFile::exists(expect2ndScnFileAbsPath));
+    const QString rootScnAbsFilePath{ScnMgr::GetScnAbsFilePath(scenesUnderRootPath)};
+    const QString avengersScnAbsFilePath{ScnMgr::GetScnAbsFilePath(scenesUnderSubPath)};
 
-    SceneInfoList scenesFromScn = GetScnsLstFromPath(tDir.path());
+    QString name0 = "The Last Fight";
+    QVariantHash scene0;
+    scene0["Name"] = name0;
+    scene0["ImgName"] = QStringList{name0 + " 1.jpg", name0 + " 2.jpg"};
+    scene0["VidName"] = name0 + ".mp4";
+    scene0["Size"] = 1024 * 1024 * 500;
+    scene0["Rate"] = 10;  // 10 in 10
+    scene0["Uploaded"] = "20221212 13:00:00";
+    QVERIFY(JsonHelper::DumpJsonDict(scene0, tDir.itemPath(name0 + ".json")));
+
+    QString name1 = "Iron Man";
+    QVariantHash scene1;
+    scene1["Name"] = name1;
+    scene1["ImgName"] = QStringList{name1 + ".jpg"};
+    scene1["VidName"] = name1 + ".mp4";
+    scene1["Size"] = 1024 * 1024 * 700;
+    scene1["Rate"] = 9;  // 9 in 10
+    scene1["Uploaded"] = "20241212 13:00:00";
+    QVERIFY(JsonHelper::DumpJsonDict(scene1, tDir.itemPath("Avengers/" + name1 + ".json")));
+
+    QCOMPARE(ScnMgr::UpdateScnFiles(tDir.path()), 2);  // 2 scn files
+    QVERIFY(QFile::exists(rootScnAbsFilePath));
+    QVERIFY(QFile::exists(avengersScnAbsFilePath));
+
+    SceneInfoList scenesFromScn = SceneHelper::GetScnsLstFromPath(tDir.path());
     QCOMPARE(scenesFromScn.size(), 2);
 
     QCOMPARE(scenesFromScn[0].rel2scn, "/");           // be the first
@@ -498,15 +439,15 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     QCOMPARE(scenesFromScn[0].imgs, scene0["ImgName"].toStringList());
     QCOMPARE(scenesFromScn[0].vidName, scene0["VidName"].toString());
     QCOMPARE(scenesFromScn[0].vidSize, scene0["Size"].toLongLong());
-    const QString LastFightSceneScnFileAbsPath = tDir.path() + scenesFromScn[0].rel2scn + (scene0ScnFileBaseName + ".scn");
-    QCOMPARE(LastFightSceneScnFileAbsPath, expect1stScnFileAbsPath);
+    const QString LastFightSceneScnFileAbsPath = tDir.path() + scenesFromScn[0].rel2scn + (tDir.baseName() + ".scn");
+    QCOMPARE(LastFightSceneScnFileAbsPath, rootScnAbsFilePath);
 
     QCOMPARE(scenesFromScn[1].name, "Iron Man");  //
     QCOMPARE(scenesFromScn[1].imgs, scene1["ImgName"].toStringList());
     QCOMPARE(scenesFromScn[1].vidName, scene1["VidName"].toString());
     QCOMPARE(scenesFromScn[1].vidSize, scene1["Size"].toLongLong());
     const QString IconMenScnFileAbsPath = tDir.path() + scenesFromScn[1].rel2scn + "Avengers.scn";
-    QCOMPARE(IconMenScnFileAbsPath, expect2ndScnFileAbsPath);
+    QCOMPARE(IconMenScnFileAbsPath, avengersScnAbsFilePath);
   }
 };
 

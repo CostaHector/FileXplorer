@@ -37,8 +37,7 @@ void SceneSortProxyModel::sort(int newColumn, Qt::SortOrder newOrder) {
 #endif
 }
 
-void SceneSortProxyModel::sortByFieldDimension(SceneSortOrderHelper::SortDimE newSortDimension, bool bReverse) {
-  const Qt::SortOrder newOrder = bReverse ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;
+void SceneSortProxyModel::sortByFieldDimension(SceneSortOrderHelper::SortDimE newSortDimension, Qt::SortOrder newOrder) {
   SceneSortProxyModel::sort((int)newSortDimension, newOrder);
 }
 

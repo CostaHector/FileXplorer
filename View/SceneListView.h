@@ -27,7 +27,9 @@ class SceneListView : public CustomListView {
 public:
   explicit SceneListView(ScenesListModel* sceneModel, SceneSortProxyModel* sceneSortProxyModel, ScenePageControl* scenePageControl, QWidget* parent = nullptr);
   void setRootPath(const QString& rootPath);
+  int onUpdateJsonFiles();
   int onUpdateScnFiles();
+  int onClearScnFiles();
   void subscribe();
   void onCopyBaseName();
   void onOpenCorrespondingFolder();

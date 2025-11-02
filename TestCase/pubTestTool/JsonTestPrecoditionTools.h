@@ -76,10 +76,5 @@ constexpr char JSON_CONTENTS_B_RANK_IN_MODEL[] {R"({
     "Uploaded": "20231022"
 })"
 };
-
-SceneInfoManager::ScnMgr::PATH_2_JSON_DICTS GetPathJsonDictList(//
-    const QString& name1, const QString& scenesUnderRootPath, QVariantHash& scene1,//
-    const QString& name2, const QString& scenesUnderSubPath, QVariantHash& scene2);//
 }
-
 #endif  // JSONTESTPRECODITIONTOOLS_H

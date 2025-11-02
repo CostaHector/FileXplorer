@@ -106,6 +106,10 @@ const KV MemoryKey::SHOW_HAR_IMAGE_PREVIEW{"SHOW_HAR_IMAGE_PREVIEW", false, Valu
 
 const KV MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE{"RETURN_ERRORCODE_UPON_ANY_FAILURE", true, ValueChecker{PLAIN_BOOL}};
 
+const KV MemoryKey::RATE_MOVIE_DEFAULT_VALUE{"RATE_MOVIE_DEFAULT_VALUE", 10, ValueChecker{0, 11}};
+const KV MemoryKey::SCENE_SORT_ORDER{"SCENE_SORT_ORDER", 0, ValueChecker{0, 2}};
+const KV MemoryKey::SCENE_SORT_BY_DIMENSION{"SCENE_SORT_BY_DIMENSION", 0, ValueChecker{0, 4}};
+
 const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES{"Cast/PreviewBrowser/ShowRelatedImages", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS{"Cast/PreviewBrowser/ShowImagesImages", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE{"Cast/PreviewBrowser/FontPointSize", 12, ValueChecker{PLAIN_INT}};

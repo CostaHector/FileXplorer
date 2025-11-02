@@ -41,9 +41,9 @@ private:
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
 
   bool onRateMovie(int newRate) const;
-  bool onRateMoviesRecursively() const;
+  bool onRateMoviesRecursively(bool bOverrideForce) const;
 
-  QStringList selectedItems() const;
+  QStringList FsmSelectedItems() const;
 
   bool on_searchKeywordInSystemDefaultExplorer() const;
   bool on_calcMD5() const;

@@ -56,10 +56,11 @@ QMap<QString, QStringList> ScenesMixed::operator()(const QStringList& files) {
 
   QMap<QString, QStringList> batches;
 
+  static const T_DOT_EXT_2_TYPE& dotExt2TypeHash = GetTypeFromDotExtension();
   for (const QString& medName : files) {
     QString baseName, ext;
     std::tie(baseName, ext) = PathTool::GetBaseNameExt(medName);
-    SCENE_COMPONENT_TYPE typeEnum = DOT_EXT_2_TYPE.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
+    SCENE_COMPONENT_TYPE typeEnum = dotExt2TypeHash.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
     switch (typeEnum) {
       case IMG: {
         imageNames.append({baseName, medName});

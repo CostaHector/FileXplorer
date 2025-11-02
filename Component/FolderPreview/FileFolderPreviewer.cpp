@@ -65,7 +65,8 @@ void FileFolderPreviewer::operator()(const QString& pth) {  // file system view
   setWindowTitle(mLastName);
   if (QFileInfo{pth}.isFile()) {  // a file
     BeforeDisplayAFileDetail();
-    const QString detailHtmls = CastBrowserHelper::GetDetailDescription(pth);
+    QSize ICON_SIZE = mDetailsPane->iconSize();
+    const QString detailHtmls = CastBrowserHelper::GetDetailDescription(pth, ICON_SIZE);
     mDetailsPane->setHtml("");
     mDetailsPane->setHtml(detailHtmls);
     return;

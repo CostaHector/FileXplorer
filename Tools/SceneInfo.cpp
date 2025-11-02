@@ -1,0 +1,196 @@
+#include "SceneInfo.h"
+#include "PathTool.h"
+#include <QFileInfo>
+#include <QFile>
+#include <QDirIterator>
+#include <QSaveFile>
+#include <QVariantHash>
+
+constexpr quint32 SceneInfo::MAGIC_NUMBER;  // "LMSC" = "Local Media Scene Cache"
+constexpr quint16 SceneInfo::CURRENT_VERSION;
+constexpr quint16 SceneInfo::MIN_SUPPORTED_VERSION;
+
+SceneInfo SceneInfo::fromJsonVariantHash(const QVariantHash& varHash) {
+  return {
+      "",                                           //
+      varHash.value("Name", "").toString(),         //
+      varHash.value("ImgName", "").toStringList(),  //
+      varHash.value("VidName", "").toString(),      //
+      varHash.value("Size", 0).toULongLong(),       //
+      varHash.value("Rate", 0).toInt(),             //
+      varHash.value("Uploaded", "").toString(),     //
+  };
+}
+
+QString SceneInfo::GetAbsolutePath(const QString& rootPath) const {
+  return rootPath + rel2scn;
+}
+
+QString SceneInfo::GetFirstImageAbsPath(const QString& rootPath) const {
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (imgs.isEmpty() ? "" : imgs.front()));
+}
+
+QStringList SceneInfo::GetImagesAbsPathList(const QString& rootPath) const {
+  QStringList imgsAbsPathList;
+  imgsAbsPathList.reserve(imgs.size());
+  for (const QString& imgName : imgs) {
+    imgsAbsPathList.append(PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, imgName));
+  }
+  return imgsAbsPathList;
+}
+
+QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (vidName.isEmpty() ? name : vidName));
+}
+
+SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
+  using namespace SceneSortOrderHelper;
+  switch (dim) {
+    case SortDimE::MOVIE_PATH:
+      return &SceneInfo::operator<;
+    case SortDimE::MOVIE_SIZE:
+      return &SceneInfo::lessThanVidSize;
+    case SortDimE::RATE:
+      return &SceneInfo::lessThanRate;
+    case SortDimE::UPLOADED_TIME:
+      return &SceneInfo::lessThanUploaded;
+    default:
+      LOG_D("Sort Dimension[%s] not support", c_str(dim));
+      return &SceneInfo::lessThanName;
+  }
+}
+
+bool SceneInfo::operator<(const SceneInfo& other) const {
+  return rel2scn != other.rel2scn ? rel2scn < other.rel2scn : name < other.name;
+}
+
+bool SceneInfo::operator==(const SceneInfo& rhs) const {
+  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize && rate == rhs.rate &&
+         uploaded == rhs.uploaded;
+}
+
+bool SceneInfo::lessThanName(const SceneInfo& other) const {
+  return name < other.name;
+}
+
+bool SceneInfo::lessThanVidSize(const SceneInfo& other) const {
+  return vidSize < other.vidSize;
+}
+
+bool SceneInfo::lessThanRate(const SceneInfo& other) const {
+  return rate < other.rate;
+}
+
+bool SceneInfo::lessThanUploaded(const SceneInfo& other) const {
+  return uploaded < other.uploaded;
+}
+
+namespace SceneHelper {
+SceneInfoList GetScnsLstFromPath(const QString& path) {
+  if (!QFileInfo(path).isDir()) {
+    LOG_D("path[%s] is not a directory", qPrintable(path));
+    return {};
+  }
+  const int PATH_N = path.size();
+
+  SceneInfoList scnTotals;
+  int scnFilesCnt = 0;
+  QDirIterator jsonIt(path, {"*.scn"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+  while (jsonIt.hasNext()) {
+    const QString& scnFullPath{jsonIt.next()};
+    const QString& rel2JsonFile = PathTool::GetRelPathFromRootRelName(PATH_N, scnFullPath);
+    scnTotals += ParseAScnFile(scnFullPath, rel2JsonFile);
+    ++scnFilesCnt;
+  }
+  std::sort(scnTotals.begin(), scnTotals.end());
+  LOG_D("total %d scenes get from %d *.scn file(s)", scnTotals.size(), scnFilesCnt);
+  return scnTotals;
+}
+
+SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString& rel) {
+  QFile scnFi{scnFileFullPath};
+  if (!scnFi.exists()) {
+    LOG_D("scn file[%s] not exist", qPrintable(scnFileFullPath));
+    return {};
+  }
+  if (!scnFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    LOG_C("Open scn file[%s] to read failed", qPrintable(scnFi.fileName()));
+    return {};
+  }
+
+  QDataStream stream(&scnFi);
+  stream.setVersion(QDataStream::Qt_5_15);
+
+  // 检查文件头
+  quint32 magicNumberInFileHeader{0};
+  stream >> magicNumberInFileHeader;
+  if (magicNumberInFileHeader != SceneInfo::MAGIC_NUMBER) {
+    LOG_W("Invalid file format or corrupted file[%s]", qPrintable(scnFileFullPath));
+    return {};
+  }
+
+  quint16 fileVersion{0};
+  stream >> fileVersion;
+  if (fileVersion < SceneInfo::MIN_SUPPORTED_VERSION) {
+    LOG_W("Unsupported file version[%d] at least[%d] needed in file[%s]", fileVersion, SceneInfo::MIN_SUPPORTED_VERSION, qPrintable(scnFileFullPath));
+    return {};
+  }
+
+  quint32 scenesCount{0};
+  stream >> scenesCount;
+
+  if (scenesCount == 0) {
+    return {};
+  }
+
+  SceneInfoList scenesList;
+  scenesList.reserve(scenesCount);
+
+  for (int i = 0; i < scenesCount && !stream.atEnd(); ++i) {
+    SceneInfo scene;
+    stream >> scene;
+    scene.rel2scn = rel;
+
+    if (stream.status() != QDataStream::Ok) {
+      LOG_W("Error reading scene data at index %d from file[%s]", i, qPrintable(scnFileFullPath));
+      break;
+    }
+
+    scenesList.append(scene);
+  }
+
+  scnFi.close();
+  LOG_D("Read %d scenes out from file[%s] succeed", scenesList.size(), qPrintable(scnFileFullPath));
+  return scenesList;
+}
+
+bool SaveScenesListToBinaryFile(const QString& scnAbsFilePath, const SceneInfoList& scenes) {
+  QSaveFile saveFi(scnAbsFilePath);  // QSaveFile提供原子写入
+  if (!saveFi.open(QIODevice::WriteOnly)) {
+    LOG_W("Open file[%s] for writing failed: %s", qPrintable(scnAbsFilePath), qPrintable(saveFi.errorString()));
+    return false;
+  }
+  QDataStream iStream{&saveFi};
+  iStream.setVersion(QDataStream::Qt_5_15);  // 设置版本保证兼容性
+  // 写入文件头：魔数和版本
+  iStream << SceneInfo::MAGIC_NUMBER;     // "LMSC" magic
+  iStream << SceneInfo::CURRENT_VERSION;  //
+  // 写入记录数量
+  iStream << quint32(scenes.size());
+  for (const SceneInfo& scene : scenes) {
+    iStream << scene;
+  }
+
+  if (iStream.status() != QDataStream::Status::Ok) {
+    LOG_W("DataStream Status[%d] invalid", iStream.status());
+    return false;
+  }
+
+  if (!saveFi.commit()) {
+    LOG_W("Commit file[%s] failed: %s", qPrintable(scnAbsFilePath), qPrintable(saveFi.errorString()));
+    return false;
+  }
+  return true;
+}
+
+}  // namespace SceneHelper

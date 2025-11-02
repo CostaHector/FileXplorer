@@ -23,7 +23,7 @@ extern const QString HTML_IMG_HEIGHT_TEMPLATE;
 extern const QString VID_LINK_TEMPLATE;
 QSize GetImageSize(const QString& filePath);
 QString GenerateSingleImageInHtml(const QString& imagePath, const QString& altText, const QSize& ICON_SIZE);
-QString GetDetailDescription(const QString& fileAbsPath);
+QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE={480, 360});
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const QSize& ICON_SIZE);
 }
 

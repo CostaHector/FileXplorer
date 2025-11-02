@@ -1,14 +1,7 @@
 #include "SysTerminal.h"
-#include "PathTool.h"
-#include "PublicVariable.h"
-#include "MemoryKey.h"
 #include "Logger.h"
-#include <QDesktopServices>
-#include <QDir>
-#include <QFile>
 #include <QFileInfo>
-#include <QTextStream>
-#include <QUrl>
+#include <QDir>
 #include <QProcess>
 
 bool SysTerminal::operator()(const QString& path) {
@@ -18,15 +11,17 @@ bool SysTerminal::operator()(const QString& path) {
     return false;
   }
   const QString pth = QDir::toNativeSeparators(fi.isFile() ? fi.absolutePath() : fi.absoluteFilePath());
+  QStringList args;
+  args << QString("--working-directory=%1").arg(pth);
+#ifdef RUNNING_UNIT_TESTS
+  return true;
+#endif
 #ifdef _WIN32
   LOG_W("WINDOWS not support now");
   return false;
-#else
+#endif
   QProcess process;
-  QStringList args;
   process.setProgram("gnome-terminal");
-  args << QString("--working-directory=%1").arg(pth);
   process.setArguments(args);
   return process.startDetached();  // Start the process in detached mode instead of start
-#endif
 }

@@ -1,0 +1,13 @@
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#f0f0f0" rx="2"/>
+  
+  <rect x="6" y="5" width="12" height="14" fill="#e0e0e0" rx="1"/>
+  <rect x="8" y="7" width="8" height="2" fill="#9e9e9e"/>
+  <rect x="8" y="10" width="6" height="1" fill="#9e9e9e"/>
+  <rect x="8" y="12" width="7" height="1" fill="#9e9e9e"/>
+  
+  <line x1="16" y1="7" x2="19" y2="4" stroke="#d32f2f" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="19" y1="7" x2="16" y2="4" stroke="#d32f2f" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <text x="12" y="20" font-family="Arial, sans-serif" font-size="6" font-weight="bold" text-anchor="middle" fill="#d32f2f">SCN</text>
+</svg>

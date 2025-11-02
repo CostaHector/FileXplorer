@@ -102,6 +102,10 @@ struct MemoryKey {
 
   static const KV SHOW_HAR_IMAGE_PREVIEW;
   static const KV RETURN_ERRORCODE_UPON_ANY_FAILURE;
+
+  static const KV RATE_MOVIE_DEFAULT_VALUE;
+  static const KV SCENE_SORT_ORDER;
+  static const KV SCENE_SORT_BY_DIMENSION;
 };
 
 struct BrowserKey {

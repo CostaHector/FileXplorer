@@ -473,8 +473,10 @@ QString ViewsStackedWidget::getFilePath(const QModelIndex& ind) const {
     }
     case ViewType::MOVIE:
       return m_movieDbModel->filePath(ind);
-    case ViewType::SCENE:
-      return m_scenesModel->filePath(ind);
+    case ViewType::SCENE: {
+      const auto srcIndex = m_sceneProxyModel->mapToSource(ind);
+      return m_scenesModel->filePath(srcIndex);
+    }
     case ViewType::CAST:
       return m_castDbModel->filePath(ind);
     case ViewType::JSON: {
@@ -548,7 +550,8 @@ QStringList ViewsStackedWidget::getFileNames() const {
     }
     case ViewType::SCENE: {
       for (const auto& ind : m_sceneTableView->selectionModel()->selectedRows()) {
-        names.append(m_scenesModel->fileName(ind));
+        const auto& srcIndex = m_sceneProxyModel->mapToSource(ind);
+        names.append(m_scenesModel->fileName(srcIndex));
       }
       break;
     }
@@ -657,7 +660,8 @@ QStringList ViewsStackedWidget::getFilePaths() const {
     }
     case ViewType::SCENE: {
       for (const auto& ind : m_sceneTableView->selectionModel()->selectedRows()) {
-        filePaths.append(m_scenesModel->filePath(ind));
+        const auto& srcIndex = m_sceneProxyModel->mapToSource(ind);
+        filePaths.append(m_scenesModel->filePath(srcIndex));
       }
       break;
     }
@@ -722,7 +726,8 @@ QStringList ViewsStackedWidget::getFilePrepaths() const {
     }
     case ViewType::SCENE: {
       for (const auto& ind : m_sceneTableView->selectionModel()->selectedRows()) {
-        prepaths.append(m_scenesModel->absolutePath(ind));
+        const auto& srcIndex = m_sceneProxyModel->mapToSource(ind);
+        prepaths.append(m_scenesModel->absolutePath(srcIndex));
       }
       break;
     }
@@ -957,7 +962,7 @@ QString ViewsStackedWidget::getCurFilePath() const {
       return m_searchSrcModel->filePath(m_searchProxyModel->mapToSource(m_advanceSearchView->currentIndex()));
     }
     case ViewType::SCENE: {
-      return m_scenesModel->filePath(m_sceneTableView->currentIndex());
+      return m_scenesModel->filePath(m_sceneProxyModel->mapToSource(m_sceneTableView->currentIndex()));
     }
     case ViewType::CAST: {
       return m_castDbModel->filePath(m_castTableView->currentIndex());
@@ -995,7 +1000,7 @@ QString ViewsStackedWidget::getCurFileName() const {
       return m_movieDbModel->fileName(m_movieView->currentIndex());
     }
     case ViewType::SCENE: {
-      return m_scenesModel->fileName(m_sceneTableView->currentIndex());
+      return m_scenesModel->fileName(m_sceneProxyModel->mapToSource(m_sceneTableView->currentIndex()));
     }
     case ViewType::JSON: {
       return m_jsonModel->fileName(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
@@ -1022,7 +1027,7 @@ QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind) const {
       return m_movieDbModel->fileInfo(ind);
     }
     case ViewType::SCENE: {
-      return m_scenesModel->fileInfo(ind);
+      return m_scenesModel->fileInfo(m_sceneProxyModel->mapToSource(ind));
     }
     case ViewType::CAST: {
       return m_castDbModel->fileInfo(ind);

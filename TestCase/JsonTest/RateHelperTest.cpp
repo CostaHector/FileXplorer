@@ -31,6 +31,16 @@ private slots:
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
   }
 
+  void rate_pixmap_ok() {
+    static constexpr int SLICE_COUNT = 100;
+    QPixmap rate0Pix = RateHelper::GenerateRatePixmap(0, SLICE_COUNT, false); // no border
+    QVERIFY(!rate0Pix.isNull());
+    QPixmap rate100Pix = RateHelper::GenerateRatePixmap(100, SLICE_COUNT, true);
+    QVERIFY(!rate100Pix.isNull());
+    QPixmap rateInvalidPix = RateHelper::GenerateRatePixmap(101, SLICE_COUNT, true);
+    QVERIFY(rateInvalidPix.isNull());
+  }
+
   void invalid_scenario() {
     // Missing JSON test
     {
@@ -102,20 +112,38 @@ private slots:
   }
 
   void rate_recursively_ok() {
-    QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 3), 4);
+    static constexpr int RATE_VALUE_WHEN_KEY_NONEXIST = -1;
+    const QStringList jsonsPath{
+        tDir.itemPath("rate ok.json"),               // 0
+        tDir.itemPath("rate failed 2.json"),         // RATE_VALUE_WHEN_KEY_NONEXIST
+        tDir.itemPath("subfolder/rate failed.json"), // RATE_VALUE_WHEN_KEY_NONEXIST
+        tDir.itemPath("subfolder/subfolder.json"),   // 1
+    };
 
-    QVariantHash data;
-    data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
-    QCOMPARE(data["Rate"].toInt(), 3);
+    static const auto GetRatesFromJson = [](const QStringList& jsonsPath) -> QList<int> {
+      QVariantHash data;
+      QList<int> beforeRateList;
+      beforeRateList.reserve(jsonsPath.size());
+      for (const QString& jsonPath : jsonsPath) {
+        data = MovieJsonLoader(jsonPath);
+        beforeRateList.push_back(data.value("Rate", RATE_VALUE_WHEN_KEY_NONEXIST).toInt());
+      }
+      return beforeRateList;
+    };
 
-    data = MovieJsonLoader(tDir.itemPath("rate failed 2.json"));
-    QCOMPARE(data["Rate"].toInt(), 3);
+    {
+      QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 10, false), 4); // non override
+      const QList<int> expectsRates{0, 10, 10, 1};
+      QList<int> actualRates = GetRatesFromJson(jsonsPath);
+      QCOMPARE(actualRates, expectsRates);
+    }
 
-    data = MovieJsonLoader(tDir.itemPath("subfolder/rate failed.json"));
-    QCOMPARE(data["Rate"].toInt(), 3);
-
-    data = MovieJsonLoader(tDir.itemPath("subfolder/subfolder.json"));
-    QCOMPARE(data["Rate"].toInt(), 3);
+    {
+      QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 3, true), 4); // force override
+      const QList<int> expectsRates{3, 3, 3, 3};
+      QList<int> actualRates = GetRatesFromJson(jsonsPath);
+      QCOMPARE(actualRates, expectsRates);
+    }
   }
 };
 
