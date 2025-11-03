@@ -43,6 +43,10 @@ QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
   return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (vidName.isEmpty() ? name : vidName));
 }
 
+QString SceneInfo::GetJsonAbsPath(const QString& rootPath) const {
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, name + ".json");
+}
+
 SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
   using namespace SceneSortOrderHelper;
   switch (dim) {
@@ -176,7 +180,7 @@ bool SaveScenesListToBinaryFile(const QString& scnAbsFilePath, const SceneInfoLi
   iStream << SceneInfo::MAGIC_NUMBER;     // "LMSC" magic
   iStream << SceneInfo::CURRENT_VERSION;  //
   // 写入记录数量
-  iStream << int(scenes.size());
+  iStream << (SceneInfo::ELEMENT_COUNT_TYPE)scenes.size();
   for (const SceneInfo& scene : scenes) {
     iStream << scene;
   }

@@ -5,9 +5,9 @@
 
 class ScenesMixedTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   ScenesMixedTest() : PlainTestSuite{} {}
-private slots:
+ private slots:
   void test_basicFileNames() {
     QStringList files;
     files << "X-Man - The Last Stand.mp4"
@@ -95,8 +95,10 @@ private slots:
     QCOMPARE(sMixed.m_img2Name.size(), 2);
     QVERIFY(sMixed.m_img2Name.contains("Superman - The Inked Meat Part 1"));
     QVERIFY(sMixed.m_img2Name.contains("Superman - The Inked Meat Part 2"));
-    QStringList part1SortedLst{"Superman - The Inked Meat Part 1.jpg", "Superman - The Inked Meat Part 1 0.jpg", "Superman - The Inked Meat Part 1 33.jpg"};
-    QStringList part2SortedLst{"Superman - The Inked Meat Part 2.jpg", "Superman - The Inked Meat Part 2 - 0.jpg", "Superman - The Inked Meat Part 2 - 33.jpg"};
+    QStringList part1SortedLst{"Superman - The Inked Meat Part 1.jpg", "Superman - The Inked Meat Part 1 0.jpg",
+                               "Superman - The Inked Meat Part 1 33.jpg"};
+    QStringList part2SortedLst{"Superman - The Inked Meat Part 2.jpg", "Superman - The Inked Meat Part 2 - 0.jpg",
+                               "Superman - The Inked Meat Part 2 - 33.jpg"};
     QCOMPARE(sMixed.m_img2Name["Superman - The Inked Meat Part 1"], part1SortedLst);
     QCOMPARE(sMixed.m_img2Name["Superman - The Inked Meat Part 2"], part2SortedLst);
   }
@@ -183,45 +185,45 @@ private slots:
     ScenesMixed sMixed;
     const auto& folder2Items = sMixed(imgs);
     QCOMPARE(folder2Items.size(), 4);
-    const QMap<QString, QStringList>& expectsFolder2Items //
+    const ScenesMixed::GROUP_MAP_TYPE& expectsFolder2Items  //
         {
-         {"Name", {"Name 1.png", "Name - 1.png"}},
-         {"Name 1", {"Name 1 - 1.png"}},
-         {"Name - 1", {"Name - 1 - 1.png"}},
-         {"Fox - Sporty - Chris Evans, Henry",
-          {"Fox - Sporty - Chris Evans, Henry.png",
-           "Fox - Sporty - Chris Evans, Henry - 1.png",
-           "Fox - Sporty - Chris Evans, Henry - 2.png"}},
-         };
+            {"Name", {"Name 1.png", "Name - 1.png"}},
+            {"Name 1", {"Name 1 - 1.png"}},
+            {"Name - 1", {"Name - 1 - 1.png"}},
+            {"Fox - Sporty - Chris Evans, Henry",
+             {"Fox - Sporty - Chris Evans, Henry.png", "Fox - Sporty - Chris Evans, Henry - 1.png", "Fox - Sporty - Chris Evans, Henry - 2.png"}},
+        };
     QCOMPARE(folder2Items, expectsFolder2Items);
   }
 
   void test_special_scenario_group_test() {
     // folder also in stringlist
-    const QStringList items {
-        "H",                          // situation 1 file with a json need group
-        "H.C.jpg",                    //
-        "H.C.json",                   //
-        "Michael",                    // situation 2 file without json need group
-        "Michael Fassbender.jpg",     //
-        "Michael Fassbender.mp4",     //
+    const QStringList items{
+        "H",                       // situation 1 file with a json need group
+        "H.C.jpg",                 //
+        "H.C.json",                //
+        "Michael",                 // situation 2 file without json need group
+        "Michael Fassbender.jpg",  //
+        "Michael Fassbender.mp4",  //
 #ifdef _WIN32
-        "C.R",                        // situation 3 file without json and baseName endswith dot need group
+        "C.R",  // situation 3 file without json and baseName endswith dot need group
 #else
-        "C.R.",                       //
+        "C.R.",  //
 #endif
         "C.R..jpg",
     };
     ScenesMixed sMixed;
-    const QMap<QString, QStringList>& folder2Items = sMixed(items);
-    const QMap<QString, QStringList>& expectsFolder2Items {
+    const ScenesMixed::GROUP_MAP_TYPE& folder2Items = sMixed(items);
+    const ScenesMixed::GROUP_MAP_TYPE& expectsFolder2Items{
         {"H", {"H"}},
-        {"H.C", {"H.C.json", "H.C.jpg"}}, // image append behind json, behind videos
+        {"H.C", {"H.C.json", "H.C.jpg"}},  // image append behind json, behind videos
         {"Michael", {"Michael"}},
         {"Michael Fassbender", {"Michael Fassbender.mp4", "Michael Fassbender.jpg"}},
 #ifdef _WIN32
-        {"C", {"C.R"}},
-        {"C.R.", {"C.R..jpg"}},
+        {"C",
+         { "C.R" }},
+        {"C.R.",
+         { "C.R..jpg" }},
 #else
         {"C.R.", {"C.R.", "C.R..jpg"}},
 #endif

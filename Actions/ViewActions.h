@@ -16,8 +16,8 @@ public:
   QAction* _TREE_VIEW{nullptr};
   QAction* _ADVANCE_SEARCH_VIEW{nullptr};
   QAction* _MOVIE_VIEW{nullptr};
-  QAction* _SCENE_VIEW{nullptr};
   QAction* _CAST_VIEW{nullptr};
+  QAction* _SCENE_VIEW{nullptr};
   QAction* _JSON_VIEW{nullptr};
   QList<QAction*> _ALL_VIEWS;
 

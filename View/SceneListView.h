@@ -36,7 +36,7 @@ public:
   void onClickEvent(const QModelIndex &idx, const QModelIndex &previous);
 
 signals:
-  void currentSceneChanged(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst);
+  void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
 
 private:
   static bool IsPathAtShallowDepth(const QString& path);

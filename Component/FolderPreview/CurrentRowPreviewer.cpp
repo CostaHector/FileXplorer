@@ -48,7 +48,7 @@ void CurrentRowPreviewer::UpdatePreview() {
   } else if (mCurrentSrcFrom == SRC_FROM::SCENE) {
     switch (mCurrentPreviewType) {
       case PREVIEW_TYPE_E::CATEGORY:
-        m_fileFolderPreviewStackedWid->operator()(m_sceneName, m_sceneimgPthLst, m_scenevidsLst);
+        m_fileFolderPreviewStackedWid->operator()(m_sceneName, m_sceneJsonAbsFilePath, m_sceneimgPthLst, m_scenevidsLst);
         return;
       default:
         LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));

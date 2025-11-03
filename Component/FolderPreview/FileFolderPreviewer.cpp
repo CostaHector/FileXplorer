@@ -75,13 +75,13 @@ void FileFolderPreviewer::operator()(const QString& pth) {  // file system view
   mImgVidOtherPane->operator()(pth);
 }
 
-void FileFolderPreviewer::operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
+void FileFolderPreviewer::operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
   if (!NeedUpdate(name)) {
     return;
   }
   mLastName = name;
   setWindowTitle(mLastName);
   BeforeDisplayAFolder();
-  mImgVidOtherPane->operator()(name, imgPthLst, vidsLst);
+  mImgVidOtherPane->operator()(name, jsonAbsFilePath, imgPthLst, vidsLst);
 }
 

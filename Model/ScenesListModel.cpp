@@ -162,6 +162,14 @@ QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
   return {vidAbsPath}; // may return an inexist video
 }
 
+QString ScenesListModel::GetJson(const QModelIndex& index) const {
+  int linearInd{-1};
+  if (!isIndexValid(index, linearInd)) {
+    return {};
+  }
+  return mCurBegin[linearInd].GetJsonAbsPath(mRootPath);
+}
+
 std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const {
   if (scenesCountPerPage < 0) {
     return std::make_pair(0, maxLen);

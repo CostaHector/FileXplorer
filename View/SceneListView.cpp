@@ -180,7 +180,8 @@ void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& 
   }
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(current);
   const QString& name = _sceneModel->baseName(srcInd);
-  emit currentSceneChanged(name, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
+  const QString& jsonPath = _sceneModel->GetJson(srcInd);
+  emit currentSceneChanged(name, jsonPath, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
 }
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
