@@ -18,7 +18,7 @@ ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QString& path) {
 }
 
 bool ScenesMixed::NeedCombine2Folder(const QString& srcGrpName, const QString& dstGrpName) const {
-  // srcGrpName: "movie", dstGrpName: "movie part 2" and without "movie part 2.json"
+  // dstGrpName: "movie", srcGrpName: "movie part 2" and without "movie part 2.json"
   // combine "movie part 2" into movie
   static const QSet<QString> ignoreDifferenceSet{
       "",                                                         //

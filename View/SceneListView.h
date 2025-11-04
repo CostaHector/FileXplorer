@@ -19,7 +19,7 @@ inline bool& MockSetRootPathQuery() {
 class AlignDelegate : public QStyledItemDelegate {
  public:
   void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
-  QString displayText(const QVariant& value, const QLocale& /**/) const override;
+   QString displayText(const QVariant& value, const QLocale& loc) const override;
 };
 
 class SceneListView : public CustomListView {

@@ -164,14 +164,14 @@ QListView {
 }
 QListView::item:alternate {
 }
-QListView::item:selected {
+QListView:!icon-mode::item:selected {
     border-bottom: 1px inherit #FFFFFF;
 }
-QListView::item:selected:!active {
+QListView:!icon-mode::item:selected:!active {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EEEEEE, stop: 1 #999999);
     color: #000000;
 }
-QListView::item:selected:active {
+QListView:!icon-mode::item:selected:active {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #99D1FF, stop: 1 #99D1FF);
     color: #000000;
     border-top: 2px solid #CCEBFF;
