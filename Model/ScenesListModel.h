@@ -27,6 +27,7 @@ class ScenesListModel : public QAbstractListModelPub {
   QString absolutePath(const QModelIndex& index) const;
   QStringList GetImgs(const QModelIndex& index) const;
   QStringList GetVids(const QModelIndex& index) const;
+  QString GetJson(const QModelIndex& index) const;
 
   std::pair<int, int> GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const;
 

@@ -51,16 +51,17 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _MOVIE_VIEW->setToolTip(QString("Movie dictionary view aka Database view. (%1)").arg(_MOVIE_VIEW->shortcut().toString()));
   _MOVIE_VIEW->setCheckable(true);
 
-  _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
-  _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
-  _SCENE_VIEW->setCheckable(true);
-
   _CAST_VIEW->setShortcutVisibleInContextMenu(true);
   _CAST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
   _CAST_VIEW->setToolTip(QString("Show Cast database. (%1)").arg(_CAST_VIEW->shortcut().toString()));
   _CAST_VIEW->setCheckable(true);
 
-  _JSON_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_9));
+  _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
+  _SCENE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_9));
+  _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
+  _SCENE_VIEW->setCheckable(true);
+
+  _JSON_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_0));
   _JSON_VIEW->setShortcutVisibleInContextMenu(true);
   _JSON_VIEW->setToolTip(QString("Show Json editor tableview. (%1)").arg(_JSON_VIEW->shortcut().toString()));
   _JSON_VIEW->setCheckable(true);

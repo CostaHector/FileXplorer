@@ -6,13 +6,14 @@
 
 class ScenesMixed {
  public:
-  QMap<QString, QStringList> operator()(const QString& path);
-  QMap<QString, QStringList> operator()(const QStringList& files);
+  using GROUP_MAP_TYPE = QMap<QString, QStringList>;
+  GROUP_MAP_TYPE operator()(const QString& path);
+  GROUP_MAP_TYPE operator()(const QStringList& files);
   const QStringList& GetAllImgs(const QString& baseName) const;
   const QString& GetFirstVid(const QString& baseName) const;
 
-  QMap<QString, QStringList> m_img2Name;  // images baseName, extension with prefix dot
-  QMap<QString, QStringList> m_vid2Name;
+  GROUP_MAP_TYPE m_img2Name;  // images baseName, extension with prefix dot
+  GROUP_MAP_TYPE m_vid2Name;
   QMap<QString, QString> m_json2Name;
  private:
   bool NeedCombine2Folder(const QString& folderNameLhs, const QString& folderNameRhs) const;

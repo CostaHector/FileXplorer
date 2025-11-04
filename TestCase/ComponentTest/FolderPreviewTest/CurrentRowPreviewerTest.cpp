@@ -73,16 +73,17 @@ private slots:
 
     // 3. SCENE
     QString name = "Scene1";
+    QString jsonAbsPath = name + ".json";
     QStringList imgPthLst;
     QStringList vidsLst;
-    previewer(name, imgPthLst, vidsLst);
+    previewer(name, jsonAbsPath, imgPthLst, vidsLst);
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::SCENE);
 
     // 4. multi toggle ok
     previewer(record, "another_host_path");
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::CAST);
 
-    previewer("Scene2", {}, {});
+    previewer("Scene2", jsonAbsPath, {}, {});
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::SCENE);
 
     QCOMPARE(previewer.NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD), true);

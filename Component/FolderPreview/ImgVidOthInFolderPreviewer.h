@@ -12,7 +12,7 @@ public:
   explicit ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
   ~ImgVidOthInFolderPreviewer();
   void operator()(const QString& pth); // file system view
-  void operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst); // scene view
+  void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst); // scene view
 
   void UpdateImgs(const QString& name, const QStringList& imgPthLst);
   void UpdateVids(const QStringList& vidsLst);

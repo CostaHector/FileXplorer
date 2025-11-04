@@ -43,6 +43,10 @@ QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
   return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (vidName.isEmpty() ? name : vidName));
 }
 
+QString SceneInfo::GetJsonAbsPath(const QString& rootPath) const {
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, name + ".json");
+}
+
 SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
   using namespace SceneSortOrderHelper;
   switch (dim) {
@@ -113,7 +117,7 @@ SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString& rel) 
     LOG_D("scn file[%s] not exist", qPrintable(scnFileFullPath));
     return {};
   }
-  if (!scnFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+  if (!scnFi.open(QIODevice::ReadOnly)) {
     LOG_C("Open scn file[%s] to read failed", qPrintable(scnFi.fileName()));
     return {};
   }
@@ -122,21 +126,21 @@ SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString& rel) 
   stream.setVersion(QDataStream::Qt_5_15);
 
   // 检查文件头
-  quint32 magicNumberInFileHeader{0};
+  auto magicNumberInFileHeader = SceneInfo::MAGIC_NUMBER;
   stream >> magicNumberInFileHeader;
   if (magicNumberInFileHeader != SceneInfo::MAGIC_NUMBER) {
     LOG_W("Invalid file format or corrupted file[%s]", qPrintable(scnFileFullPath));
     return {};
   }
 
-  quint16 fileVersion{0};
+  auto fileVersion = SceneInfo::MIN_SUPPORTED_VERSION;
   stream >> fileVersion;
   if (fileVersion < SceneInfo::MIN_SUPPORTED_VERSION) {
     LOG_W("Unsupported file version[%d] at least[%d] needed in file[%s]", fileVersion, SceneInfo::MIN_SUPPORTED_VERSION, qPrintable(scnFileFullPath));
     return {};
   }
 
-  quint32 scenesCount{0};
+  int scenesCount{0};
   stream >> scenesCount;
 
   if (scenesCount == 0) {
@@ -152,7 +156,7 @@ SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString& rel) 
     scene.rel2scn = rel;
 
     if (stream.status() != QDataStream::Ok) {
-      LOG_W("Error reading scene data at index %d from file[%s]", i, qPrintable(scnFileFullPath));
+      LOG_W("Error reading scene data at index %d from file[%s], status:%d", i, qPrintable(scnFileFullPath), stream.status());
       break;
     }
 
@@ -176,7 +180,7 @@ bool SaveScenesListToBinaryFile(const QString& scnAbsFilePath, const SceneInfoLi
   iStream << SceneInfo::MAGIC_NUMBER;     // "LMSC" magic
   iStream << SceneInfo::CURRENT_VERSION;  //
   // 写入记录数量
-  iStream << quint32(scenes.size());
+  iStream << (SceneInfo::ELEMENT_COUNT_TYPE)scenes.size();
   for (const SceneInfo& scene : scenes) {
     iStream << scene;
   }

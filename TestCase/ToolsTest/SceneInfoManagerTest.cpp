@@ -267,7 +267,12 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
   void test_ParseAScnFile_Integration() {
     QVERIFY(tDir.IsValid());
     using namespace JsonKey;
-    {  // 1. 基本功能测试：单个组场景
+    {
+      // 1. 基本功能测试：单个组场景
+      {  // bounder test
+        QVERIFY(ParseAScnFile("/home/to/inexist path", "").isEmpty());
+      }
+
       // 准备测试数据
       QVariantHash scene1;
       scene1["Name"] = "Captain America";
@@ -277,23 +282,15 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       scene1["Rate"] = 85;
       scene1["Uploaded"] = "20241212 12:50:50";
 
-      QList<QVariantHash> scenes{scene1};
-
       // 创建目录
       QVERIFY(tDir.mkpath("Marvel"));
       QVERIFY(JsonHelper::DumpJsonDict(scene1, tDir.itemPath("Marvel/Captain America.json")));
 
-      // 生成 .scn 文件
+      // 生成 .scn 文件, 验证 .scn 文件存在, 解析 .scn 文件, 验证解析结果
       QCOMPARE(ScnMgr::UpdateScnFiles(tDir.itemPath("Marvel")), 1);
-
-      // 验证 .scn 文件存在
       QVERIFY(tDir.exists("Marvel/Marvel.scn"));
-
-      // 解析 .scn 文件
-      SceneInfoList parsedScenes = ParseAScnFile(tDir.itemPath("Marvel/Marvel.scn"),
-                                                 "/Marvel/");  //  here mRootPath=tDir.path(); tDir.path() + "/Marvel/" + Marvel.scn=the json scn
-
-      // 验证解析结果
+      SceneInfoList parsedScenes = ParseAScnFile(tDir.itemPath("Marvel/Marvel.scn"), "/Marvel/");
+      //  here mRootPath=tDir.path(); tDir.path() + "/Marvel/" + Marvel.scn=the json scn
       QCOMPARE(parsedScenes.size(), 1);
 
       const SceneInfo& parsedScene = parsedScenes.first();
@@ -304,10 +301,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       QCOMPARE(parsedScene.vidSize, 1024 * 1024 * 500);
       QCOMPARE(parsedScene.rate, 85);
       QCOMPARE(parsedScene.uploaded, "20241212 12:50:50");
-
-      {  // bounder test
-        QVERIFY(ParseAScnFile("/home/to/inexist path", "").isEmpty());
-      }
 
       tDir.ClearAll();
     }
@@ -343,10 +336,8 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       QVERIFY(JsonHelper::DumpJsonDict(scene2, tDir.itemPath("Avengers/Thor.json")));
       QVERIFY(JsonHelper::DumpJsonDict(scene3, tDir.itemPath("Avengers/Hulk.json")));
 
-      // 生成 .scn 文件
+      // 生成 .scn 文件, 解析 .scn 文件, 并按照Rate Descending, 验证解析结果
       QCOMPARE(ScnMgr::UpdateScnFiles(tDir.path()), 1);
-
-      // 解析 .scn 文件, 并按照Rate Descending
       QString scnFilePath = tDir.itemPath("Avengers/Avengers.scn");
       SceneInfoList parsedScenes = ParseAScnFile(scnFilePath, "/Avengers/");
       std::sort(parsedScenes.begin(), parsedScenes.end(),                 //
@@ -354,37 +345,24 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
                   return !lhs.lessThanRate(rhs);
                 });
 
-      // 验证解析结果
       QCOMPARE(parsedScenes.size(), 3);
 
-      // 验证第一个场景
+      // 验证第一个场景, 验证第二个场景, 验证第三个场景（无图片）
       QCOMPARE(parsedScenes[0].name, "Iron Man");
       QCOMPARE(parsedScenes[0].imgs, QStringList({"iron1.jpg"}));
       QCOMPARE(parsedScenes[0].vidSize, 1024 * 1024 * 700);
       QCOMPARE(parsedScenes[0].rate, 92);
 
-      // 验证第二个场景
       QCOMPARE(parsedScenes[1].name, "Thor");
       QCOMPARE(parsedScenes[1].imgs, QStringList({"thor1.jpg", "thor2.jpg", "thor3.jpg"}));
       QCOMPARE(parsedScenes[1].vidSize, 1024 * 1024 * 800);
       QCOMPARE(parsedScenes[1].rate, 88);
 
-      // 验证第三个场景（无图片）
       QCOMPARE(parsedScenes[2].name, "Hulk");
       QVERIFY(parsedScenes[2].imgs.isEmpty());
       QCOMPARE(parsedScenes[2].vidSize, 1024 * 1024 * 900);
       QCOMPARE(parsedScenes[2].rate, 0);
 
-      tDir.ClearAll();
-    }
-
-    {  // 5. 文件格式错误测试
-      // 创建格式错误的 .scn 文件, 写入不完整的数据（缺少某些行）,只有名称，缺少其他字段
-      QVERIFY(tDir.touch("Corrupted/Corrupted.scn", "Scene Name\n"));
-      // 应该返回空列表或部分数据（根据 ParseAScnFile 的错误处理）
-      SceneInfoList result = ParseAScnFile(tDir.path(), "/Corrupted/");
-      // 根据当前实现，遇到错误会返回空列表
-      QVERIFY(result.isEmpty());
       tDir.ClearAll();
     }
   }

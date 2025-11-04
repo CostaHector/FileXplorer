@@ -317,7 +317,7 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
       mCurrentChangedConn = ViewsStackedWidget::connect(
           m_sceneTableView, &SceneListView::currentSceneChanged,
           _previewFolder,  //
-          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QStringList&, const QStringList&)>(&CurrentRowPreviewer::operator()));
+          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(&CurrentRowPreviewer::operator()));
       break;
     }
     case ViewType::CAST: {

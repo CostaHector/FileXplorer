@@ -17,7 +17,7 @@ public:
 
   void operator()(const QSqlRecord& record, const QString& imgHost);  // cast view
   void operator()(const QString& pth);                                // file system view
-  void operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst);           // scene view
+  void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);           // scene view
 
   inline void BeforeDisplayAFileDetail() {
     if (m_curIndex != PANE_TYPE::DETAIL) {

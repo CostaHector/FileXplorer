@@ -17,16 +17,18 @@ void AlignDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIn
   option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
   option->textElideMode = Qt::TextElideMode::ElideLeft;
   option->displayAlignment = Qt::AlignmentFlag::AlignVCenter;
+  option->features |= QStyleOptionViewItem::WrapText;
   QStyledItemDelegate::initStyleOption(option, index);
 }
 
-QString AlignDelegate::displayText(const QVariant& value, const QLocale& /**/) const {
+QString AlignDelegate::displayText(const QVariant& value, const QLocale& loc) const {
+  return QStyledItemDelegate::displayText(value, loc);
   const QString& text = value.toString();
   static constexpr int CHAR_LETTER_CNT = 40;
   if (text.size() <= CHAR_LETTER_CNT) {
     return text;
   }
-  return text.left(CHAR_LETTER_CNT / 2) + "\n" + text.right(CHAR_LETTER_CNT / 2);
+  return text.left(CHAR_LETTER_CNT / 2) + "..." + text.right(CHAR_LETTER_CNT / 2);
 }
 
 SceneListView::SceneListView(ScenesListModel* sceneModel,
@@ -180,7 +182,8 @@ void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& 
   }
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(current);
   const QString& name = _sceneModel->baseName(srcInd);
-  emit currentSceneChanged(name, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
+  const QString& jsonPath = _sceneModel->GetJson(srcInd);
+  emit currentSceneChanged(name, jsonPath, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
 }
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {

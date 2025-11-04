@@ -49,9 +49,10 @@ private slots:
 
     // 3. scene view: folder->mImgVidOtherPane
     const QString name = "AnyFile";
+    const QString jsonAbsPath = name + ".json";
     const QStringList imgPthLst {mDir.absoluteFilePath("AnyPath/AnyFile.json")};
     const QStringList vidsLst;
-    previewer(name, imgPthLst, vidsLst);
+    previewer(name, jsonAbsPath, imgPthLst, vidsLst);
     QCOMPARE(previewer.currentIndex(), static_cast<int>(FileFolderPreviewer::PANE_TYPE::IMG_VID_OTH));
     QCOMPARE(previewer.currentWidget(), previewer.mImgVidOtherPane);
 
