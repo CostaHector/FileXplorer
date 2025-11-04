@@ -46,9 +46,10 @@ public:
     m_nextFolderTimer.start();
   }
 
-  void operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst) {
+  void operator()(const QString& name, const QString& jsonAbsPath, const QStringList& imgPthLst, const QStringList& vidsLst) {
     mCurrentSrcFrom = SRC_FROM::SCENE;
     m_sceneName = name;
+    m_sceneJsonAbsFilePath = jsonAbsPath;
     m_sceneimgPthLst = imgPthLst;
     m_scenevidsLst = vidsLst;
     if (isTimerDisabled()) {
@@ -91,6 +92,7 @@ private:
   QString m_curImageHostPath;
   /*For Scene View*/
   QString m_sceneName;
+  QString m_sceneJsonAbsFilePath;
   QStringList m_sceneimgPthLst;
   QStringList m_scenevidsLst;
 

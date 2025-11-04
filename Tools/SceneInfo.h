@@ -22,6 +22,7 @@ struct SceneInfo {
   QString GetFirstImageAbsPath(const QString& rootPath) const;
   QStringList GetImagesAbsPathList(const QString& rootPath) const;
   QString GetVideoAbsPath(const QString& rootPath) const;
+  QString GetJsonAbsPath(const QString& rootPath) const;
 
   using CompareFunc = bool (SceneInfo::*)(const SceneInfo&) const;
   static CompareFunc getCompareFunc(SceneSortOrderHelper::SortDimE dim);
@@ -37,6 +38,7 @@ struct SceneInfo {
   static constexpr quint32 MAGIC_NUMBER = 0x4C4D5343;  // "LMSC" = "Local Media Scene Cache"
   static constexpr quint16 CURRENT_VERSION = 1;
   static constexpr quint16 MIN_SUPPORTED_VERSION = 1;
+  using ELEMENT_COUNT_TYPE = int;
 };
 typedef QList<SceneInfo> SceneInfoList;
 inline QDataStream& operator<<(QDataStream& os, const SceneInfo& item) {

@@ -6,8 +6,10 @@
 
 constexpr ImgVidOthInFolderPreviewer::MediaBtnHandlerFunc ImgVidOthInFolderPreviewer::MEDIA_HANDLERS_MAP[];
 
-ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent)://
-  QWidget{parent}, mMemoryName{memoryName} {
+ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent)
+    :  //
+      QWidget{parent},
+      mMemoryName{memoryName} {
   mImgVidOtherSplitter = new (std::nothrow) QSplitter{this};
   CHECK_NULLPTR_RETURN_VOID(mImgVidOtherSplitter)
   mImgVidOtherSplitter->setOrientation(Qt::Orientation::Vertical);
@@ -23,7 +25,7 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
     mMediaSequence.swap(mediaSequenceMemory);
   }
   const bool visibility[(int)PREVIEW_ITEM_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
-  for (int mediaTypeInd : mMediaSequence) { // hide or show each widget in splitter
+  for (int mediaTypeInd : mMediaSequence) {  // hide or show each widget in splitter
     (this->*MEDIA_HANDLERS_MAP[mediaTypeInd])(visibility[mediaTypeInd]);
   }
   mImgVidOtherSplitter->restoreState(Configuration().value("FLOATING_PREVIEW_STATE").toByteArray());
@@ -87,12 +89,15 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& pth) {  // file syste
   }
 }
 
-void ImgVidOthInFolderPreviewer::operator()(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
+void ImgVidOthInFolderPreviewer::operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
   if (NeedUpdateImgs()) {
     UpdateImgs(name, imgPthLst);
   }
   if (NeedUpdateVids()) {
     UpdateVids(vidsLst);
+  }
+  if (NeedUpdateOthers()) {
+    UpdateOthers({jsonAbsFilePath});
   }
 }
 
@@ -113,7 +118,7 @@ void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& vidsLst) {
   mVidsModel->UpdateData(vidsLst);
 }
 
-void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) { // no usage now
+void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) {  // no usage now
   if (!NeedUpdateOthers()) {
     return;
   }

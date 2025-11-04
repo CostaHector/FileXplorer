@@ -19,7 +19,7 @@ inline bool& MockSetRootPathQuery() {
 class AlignDelegate : public QStyledItemDelegate {
  public:
   void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
-  QString displayText(const QVariant& value, const QLocale& /**/) const override;
+   QString displayText(const QVariant& value, const QLocale& loc) const override;
 };
 
 class SceneListView : public CustomListView {
@@ -36,7 +36,7 @@ public:
   void onClickEvent(const QModelIndex &idx, const QModelIndex &previous);
 
 signals:
-  void currentSceneChanged(const QString& name, const QStringList& imgPthLst, const QStringList& vidsLst);
+  void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
 
 private:
   static bool IsPathAtShallowDepth(const QString& path);

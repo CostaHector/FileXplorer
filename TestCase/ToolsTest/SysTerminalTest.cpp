@@ -15,9 +15,6 @@ class SysTerminalTest : public PlainTestSuite {
     QVERIFY(!sysTerm("inexist path"));
 
     bool expectReturnValue = true;
-#ifdef _WIN32
-    expectReturnValue = false;
-#endif
     QCOMPARE(sysTerm(__FILE__), expectReturnValue);
     QCOMPARE(sysTerm(QFileInfo(__FILE__).absolutePath()), expectReturnValue);
   }
