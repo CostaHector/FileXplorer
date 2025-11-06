@@ -15,7 +15,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QDebug>
 
 MovieDBView::MovieDBView(FdBasedDbModel* model_,              //
                          MovieDBSearchToolBar* dbSearchBar_,  //

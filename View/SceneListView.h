@@ -4,7 +4,7 @@
 #include "CustomListView.h"
 #include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
-#include <QStyledItemDelegate>
+#include "SceneStyleDelegate.h"
 #include <QMenu>
 
 class ScenesListModel;
@@ -16,12 +16,6 @@ inline bool& MockSetRootPathQuery() {
 }
 }
 
-class AlignDelegate : public QStyledItemDelegate {
- public:
-  void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
-   QString displayText(const QVariant& value, const QLocale& loc) const override;
-};
-
 class SceneListView : public CustomListView {
   Q_OBJECT
 public:
@@ -31,12 +25,19 @@ public:
   int onUpdateScnFiles();
   int onClearScnFiles();
   void subscribe();
-  void onCopyBaseName();
-  void onOpenCorrespondingFolder();
-  void onClickEvent(const QModelIndex &idx, const QModelIndex &previous);
+  bool onCopyBaseName();
+  bool onOpenCorrespondingFolder();
+  bool onClickEvent(const QModelIndex &idx, const QModelIndex &previous);
 
 signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
+  void sceneGridClicked(const QModelIndex& ind, const QRect& vRect, const QPoint& clickedPnt);
+
+ public slots:
+  void onCellVisualUpdateRequested(const QModelIndex& ind);
+
+protected:
+  void mousePressEvent(QMouseEvent* event) override;
 
 private:
   static bool IsPathAtShallowDepth(const QString& path);
@@ -44,7 +45,7 @@ private:
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
   ScenesListModel* _sceneModel{nullptr};
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};
-  QStyledItemDelegate* mAlignDelegate{nullptr};
+  SceneStyleDelegate* mAlignDelegate{nullptr};
   ScenePageControl* _scenePageControl{nullptr};
 };
 

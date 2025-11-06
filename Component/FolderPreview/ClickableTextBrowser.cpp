@@ -22,7 +22,6 @@
 #include <QMimeData>
 #include <QApplication>
 #include <QClipboard>
-#include <QDebug>
 
 constexpr int ClickableTextBrowser::MIN_SINGLE_SEARCH_PATTERN_LEN;
 constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;

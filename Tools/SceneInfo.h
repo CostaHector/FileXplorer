@@ -35,6 +35,9 @@ struct SceneInfo {
   bool lessThanRate(const SceneInfo& other) const;
   bool lessThanUploaded(const SceneInfo& other) const;
 
+  bool GetNameFromStream(QDataStream& stream);
+  bool DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, int newRate);
+
   static constexpr quint32 MAGIC_NUMBER = 0x4C4D5343;  // "LMSC" = "Local Media Scene Cache"
   static constexpr quint16 CURRENT_VERSION = 1;
   static constexpr quint16 MIN_SUPPORTED_VERSION = 1;
@@ -53,6 +56,8 @@ namespace SceneHelper {
 SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString& rel);
 SceneInfoList GetScnsLstFromPath(const QString& path);
 bool SaveScenesListToBinaryFile(const QString& scnAbsFilePath, const SceneInfoList& scenes);
+
+bool UpdateNameWithNewRate(const QString& scnFilePath, const QString& specifiedName, int newRate);
 }  // namespace SceneHelper
 
 #endif  // SCENEINFO_H

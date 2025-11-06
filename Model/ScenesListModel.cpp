@@ -2,6 +2,7 @@
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
+#include "RateHelper.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -64,10 +65,50 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
       }
       break;
     }
+    case CustomRoles::RatingRole: {
+      return mCurBegin[linearInd].rate;
+    }
     default:
       break;
   }
   return {};
+}
+
+bool ScenesListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (role == CustomRoles::RatingRole) {
+    return ModifySceneInfoRateValue(index, value.toInt());
+  }
+  return QAbstractListModel::setData(index, value, role);
+}
+
+bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int newRate) {
+  int linearInd = -1;
+  if (!isIndexValid(index, linearInd)) {
+    return false;
+  }
+  int beginIndex = std::distance(mEntryList.cbegin(), mCurBegin);
+  int sourceDev = beginIndex + linearInd;
+  const int beforeRate = mEntryList[sourceDev].rate;
+  if (beforeRate == newRate) {
+    LOG_INFO_P("Rate no need change", "value remains %d", beforeRate);
+    return true;
+  }
+  mEntryList[sourceDev].rate = newRate;
+  emit dataChanged(index, index, {CustomRoles::RatingRole});
+
+  const QString scnAbsFilePath = GetScn(index);
+  const QString eleRel2Scn = mEntryList[sourceDev].rel2scn;
+  const QString eleBaseName = mEntryList[sourceDev].name;
+
+  const bool bScnUpdatedOk = SceneHelper::UpdateNameWithNewRate(scnAbsFilePath, eleBaseName, newRate);
+  const QString jsonAbsFilePath = GetJson(index);
+  const bool bJsonUpdatedOk = RateHelper::RateMovie(jsonAbsFilePath, newRate);
+  const bool bothUpdatedOk{bScnUpdatedOk && bJsonUpdatedOk};
+
+  LOG_OE_P(bothUpdatedOk, "Rate Modify", "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]",  //
+           qPrintable(eleRel2Scn), qPrintable(eleBaseName),                                 //
+           beforeRate, newRate, bScnUpdatedOk, bJsonUpdatedOk);
+  return bothUpdatedOk;
 }
 
 QFileInfo ScenesListModel::fileInfo(const QModelIndex& index) const {
@@ -159,7 +200,7 @@ QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
     return {};
   }
   const QString vidAbsPath = mCurBegin[linearInd].GetVideoAbsPath(mRootPath);
-  return {vidAbsPath}; // may return an inexist video
+  return {vidAbsPath};  // may return an inexist video
 }
 
 QString ScenesListModel::GetJson(const QModelIndex& index) const {
@@ -168,6 +209,15 @@ QString ScenesListModel::GetJson(const QModelIndex& index) const {
     return {};
   }
   return mCurBegin[linearInd].GetJsonAbsPath(mRootPath);
+}
+
+QString ScenesListModel::GetScn(const QModelIndex& index) const {
+  QString folderPath = absolutePath(index);
+  if (folderPath.isEmpty()) {
+    return {};
+  }
+  folderPath.chop(1);
+  return SceneInfoManager::ScnMgr::GetScnAbsFilePath(folderPath);
 }
 
 std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const {

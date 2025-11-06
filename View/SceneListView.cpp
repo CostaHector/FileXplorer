@@ -12,25 +12,6 @@
 #include <QClipboard>
 #include <QMouseEvent>
 
-void AlignDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
-  option->decorationPosition = QStyleOptionViewItem::Position::Top;
-  option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
-  option->textElideMode = Qt::TextElideMode::ElideLeft;
-  option->displayAlignment = Qt::AlignmentFlag::AlignVCenter;
-  option->features |= QStyleOptionViewItem::WrapText;
-  QStyledItemDelegate::initStyleOption(option, index);
-}
-
-QString AlignDelegate::displayText(const QVariant& value, const QLocale& loc) const {
-  return QStyledItemDelegate::displayText(value, loc);
-  const QString& text = value.toString();
-  static constexpr int CHAR_LETTER_CNT = 40;
-  if (text.size() <= CHAR_LETTER_CNT) {
-    return text;
-  }
-  return text.left(CHAR_LETTER_CNT / 2) + "..." + text.right(CHAR_LETTER_CNT / 2);
-}
-
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
@@ -52,11 +33,11 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
   setViewMode(QListView::ViewMode::IconMode);
-  setTextElideMode(Qt::TextElideMode::ElideMiddle);
+  setTextElideMode(Qt::TextElideMode::ElideLeft);
   setResizeMode(QListView::ResizeMode::Fixed);
   setWrapping(true);
 
-  mAlignDelegate = new (std::nothrow) AlignDelegate;
+  mAlignDelegate = new (std::nothrow) SceneStyleDelegate{this};
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
@@ -71,23 +52,35 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
   BindMenu(m_menu);
   subscribe();
+
+  // setMouseTracking(true);
+  // setAttribute(Qt::WA_Hover, true);
+  // viewport()->setMouseTracking(true);
 }
 
-void SceneListView::onCopyBaseName() {
+bool SceneListView::onCopyBaseName() {
   const QModelIndex& curInd = currentIndex();
+  if (!curInd.isValid()) {
+    return false;
+  }
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(curInd);
   const QString& copiedStr = _sceneModel->baseName(srcInd);
   auto* cb = QApplication::clipboard();
   cb->setText(copiedStr, QClipboard::Mode::Clipboard);
   LOG_D("user copied str: [%s]", qPrintable(copiedStr));
+  return true;
 }
 
-void SceneListView::onOpenCorrespondingFolder() {
+bool SceneListView::onOpenCorrespondingFolder() {
   const QModelIndex& curInd = currentIndex();
+  if (!curInd.isValid()) {
+    return false;
+  }
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(curInd);
   const QString& scenePath = _sceneModel->absolutePath(srcInd);
-  on_ShiftEnterPlayVideo(scenePath);
+  bool openResult = on_ShiftEnterPlayVideo(scenePath);
   LOG_D("Play path: [%s]", qPrintable(scenePath));
+  return openResult;
 }
 
 void SceneListView::subscribe() {
@@ -105,6 +98,9 @@ void SceneListView::subscribe() {
   connect(sceneActInst._UPDATE_JSON, &QAction::triggered, this, &SceneListView::onUpdateJsonFiles);
   connect(sceneActInst._UPDATE_SCN, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);
   connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
+
+  connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
+  connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
@@ -145,8 +141,8 @@ int SceneListView::onUpdateJsonFiles() {
   ScnMgr scnMgr;
   Counter cnt = scnMgr(workPath);
   LOG_OK_P("Json file K-V updated", "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]",  //
-           cnt.m_jsonUpdatedCnt, cnt.m_jsonUsedCnt,                                       //
-           cnt.m_ImgNameKeyFieldUpdatedCnt, cnt.m_VidNameKeyFieldUpdatedCnt,              //
+           cnt.m_jsonUpdatedCnt, cnt.m_jsonUsedCnt,                                                     //
+           cnt.m_ImgNameKeyFieldUpdatedCnt, cnt.m_VidNameKeyFieldUpdatedCnt,                            //
            qPrintable(workPath));
   return cnt.m_jsonUpdatedCnt;
 }
@@ -176,14 +172,15 @@ int SceneListView::onClearScnFiles() {
   return deleteCnt;
 }
 
-void SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& previous) {
+bool SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& previous) {
   if (!current.isValid()) {
-    return;
+    return false;
   }
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(current);
   const QString& name = _sceneModel->baseName(srcInd);
   const QString& jsonPath = _sceneModel->GetJson(srcInd);
   emit currentSceneChanged(name, jsonPath, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
+  return true;
 }
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
@@ -193,4 +190,24 @@ bool SceneListView::IsPathAtShallowDepth(const QString& path) {
   static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
 #endif
   return path.count('/') < NEAR_ROOT_PATH_LIMIT;
+}
+
+void SceneListView::mousePressEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  const QPoint pos = event->pos();
+  const QModelIndex proIndex = indexAt(pos);
+  const QModelIndex srcIndex = _sceneSortProxyModel->mapToSource(proIndex);
+
+  const QRect imageRect{mAlignDelegate->GetRealImageVisualRect(proIndex, visualRect(proIndex))};
+
+  emit sceneGridClicked(proIndex, imageRect, pos);
+  QListView::mousePressEvent(event);
+}
+
+void SceneListView::onCellVisualUpdateRequested(const QModelIndex& ind) {
+  if (!ind.isValid()) {
+    LOG_W("index invalid, no need visual update at all");
+    return;
+  }
+  update(ind);
 }

@@ -5,10 +5,9 @@
 
 class ScenesMixedTest : public PlainTestSuite {
   Q_OBJECT
-public:
-  ScenesMixedTest()
-    : PlainTestSuite{} {}
-private slots:
+ public:
+  ScenesMixedTest() : PlainTestSuite{} {}
+ private slots:
   void test_basicFileNames() {
     const QStringList files{
         // 1 vid + 1 json + 5 imgs
@@ -224,12 +223,14 @@ private slots:
     const ScenesMixed::GROUP_MAP_TYPE& folder2Items = sMixed(items);
     const ScenesMixed::GROUP_MAP_TYPE& expectsFolder2Items{
         {"H", {"H"}},
-        {"H.C", {"H.C.json", "H.C.jpg"}}, // image append behind json, behind videos
+        {"H.C", {"H.C.json", "H.C.jpg"}},  // image append behind json, behind videos
         {"Michael", {"Michael"}},
         {"Michael Fassbender", {"Michael Fassbender.mp4", "Michael Fassbender.jpg"}},
 #ifdef _WIN32
-        {"C", {"C.R"}},
-        {"C.R.", {"C.R..jpg"}},
+        {"C",
+         { "C.R" }},
+        {"C.R.",
+         { "C.R..jpg" }},
 #else
         {"C.R.", {"C.R.", "C.R..jpg"}},
 #endif

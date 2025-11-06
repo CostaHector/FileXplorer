@@ -5,13 +5,14 @@
 #include "NotificatorMacro.h"
 #include "PathTool.h"
 
-#include <QDebug>
 #include <QDirIterator>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QUuid>
+#include <QSet>
+#include <QVariant>
 #include "PublicMacro.h"
 #include "VidDupTabFields.h"
 

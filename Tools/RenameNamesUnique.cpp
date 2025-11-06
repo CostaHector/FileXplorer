@@ -1,7 +1,6 @@
 ﻿#include "RenameNamesUnique.h"
 #include "PathTool.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 

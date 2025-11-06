@@ -89,6 +89,20 @@ bool SceneInfo::lessThanUploaded(const SceneInfo& other) const {
   return uploaded < other.uploaded;
 }
 
+bool SceneInfo::GetNameFromStream(QDataStream& stream) {
+  stream >> rel2scn >> name;
+  return stream.status() == QDataStream::Ok;
+}
+bool SceneInfo::DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, int newRate) {
+  stream >> imgs >> vidName >> vidSize;
+  if (stream.status() != QDataStream::Ok) {
+    LOG_W("Deviate pointer from name to rate failed");
+    return false;
+  }
+  stream << newRate;
+  return stream.status() == QDataStream::Ok;
+}
+
 namespace SceneHelper {
 SceneInfoList GetScnsLstFromPath(const QString& path) {
   if (!QFileInfo(path).isDir()) {
@@ -195,6 +209,64 @@ bool SaveScenesListToBinaryFile(const QString& scnAbsFilePath, const SceneInfoLi
     return false;
   }
   return true;
+}
+
+bool UpdateNameWithNewRate(const QString& scnFilePath, const QString& specifiedName, int newRate) {
+  QFile file{scnFilePath};
+  if (!file.open(QIODevice::ReadWrite)) {
+    LOG_D("cannot open file for ReadWrite. %s", qPrintable(file.errorString()));
+    return false;
+  }
+
+  QDataStream stream(&file);
+  stream.setVersion(QDataStream::Qt_5_15);
+
+  // 读取文件头
+  auto magic = SceneInfo::MAGIC_NUMBER;
+  auto version = SceneInfo::CURRENT_VERSION;
+  SceneInfo::ELEMENT_COUNT_TYPE recordCount;
+
+  stream >> magic >> version >> recordCount;
+
+  if (magic != SceneInfo::MAGIC_NUMBER) {
+    file.close();
+    LOG_W("magic[%d] not match", magic);
+    return false;
+  }
+
+  if (version < SceneInfo::MIN_SUPPORTED_VERSION) {
+    file.close();
+    LOG_W("version[%d] too low", version);
+    return false;
+  }
+
+  SceneInfo temp;
+  for (int i = 0; i < recordCount; ++i) {
+    const qint64 recordStart = file.pos();
+    if (!temp.GetNameFromStream(stream)) {
+      LOG_W("Read name of element:%d failed", i);
+      break;
+    }
+
+    if (temp.name != specifiedName) {  // 不匹配，跳过整个记录
+      file.seek(recordStart);          // 回到记录开始位置
+      stream >> temp;                  // 读取并丢弃整个记录
+      continue;
+    }
+
+    // 找到匹配记录，现在需要跳过imgs, vidName, vidSize字段到达rate字段, 写入新值
+    bool reWrite = temp.DeviateStreamFromNameToRateAndOverrideRate(stream, newRate);
+    file.close();
+    if (!reWrite) {
+      LOG_W("Write new rate[%d] to element:%d failed", newRate, i);
+      return false;
+    }
+    return true;
+  }
+
+  file.close();
+  LOG_W("Scene Name '%s' not found", qPrintable(specifiedName));
+  return false;
 }
 
 }  // namespace SceneHelper
