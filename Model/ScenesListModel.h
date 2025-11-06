@@ -17,7 +17,11 @@ class ScenesListModel : public QAbstractListModelPub {
   inline QString rootPath() const { return mRootPath; }
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mCurEnd - mCurBegin; }
+  enum CustomRoles {
+    RatingRole = Qt::UserRole + 100  // 使用一个较大的偏移量避免冲突
+  };
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
   bool isIndexValid(const QModelIndex& index, int& linearInd) const;
   QFileInfo fileInfo(const QModelIndex& index) const;
@@ -28,6 +32,7 @@ class ScenesListModel : public QAbstractListModelPub {
   QStringList GetImgs(const QModelIndex& index) const;
   QStringList GetVids(const QModelIndex& index) const;
   QString GetJson(const QModelIndex& index) const;
+  QString GetScn(const QModelIndex& index) const;
 
   std::pair<int, int> GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const;
 
@@ -50,6 +55,8 @@ class ScenesListModel : public QAbstractListModelPub {
   bool onPageIndexChanged(int newPageIndex);
 
  private:
+  bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);
+
   int mPageIndex{0};
   int mScenesCountPerPage{12};  // 4-by-3
   QString mPattern;

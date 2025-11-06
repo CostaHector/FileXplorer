@@ -2,7 +2,6 @@
 #include "PathTool.h"
 #include "TableFields.h"
 #include "PublicMacro.h"
-#include <QDebug>
 #include <QMimeData>
 #include <QUrl>
 #include <QApplication>

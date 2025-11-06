@@ -10,6 +10,8 @@
 #include <QDirIterator>
 #include <QRegularExpression>
 
+constexpr int RateHelper::RATING_BAR_HEIGHT;
+
 bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce) {
   using namespace JsonHelper;
   using namespace MOVIE_TABLE;
@@ -23,13 +25,13 @@ bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOv
 
   using namespace PERFORMER_DB_HEADER_KEY;
   auto itRate = data.find(ENUM_2_STR(Rate));
-  if (itRate != data.cend()) { // Rate already exist
+  if (itRate != data.cend()) {  // Rate already exist
     if (!bOverrideForce) {
-      return true; // no need override Rate
+      return true;  // no need override Rate
     }
 
     int beforeValue = itRate.value().toInt();
-    if (afterValue == beforeValue) { // same, skip
+    if (afterValue == beforeValue) {  // same, skip
       return true;
     }
     itRate->setValue(afterValue);
@@ -141,18 +143,18 @@ QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool h
     LOG_D("rate[%d] out bound", r);
     return {};
   }
-  static constexpr int WIDTH = 100, HEIGHT = (int) (WIDTH * 0.618);
+  static constexpr int WIDTH = 100, HEIGHT = (int)(WIDTH * 0.618);
   QPixmap mp{WIDTH, HEIGHT};
   int orangeWidth = WIDTH * r / sliceCount;
   static constexpr QColor OPAGUE{0, 0, 0, 0};
   static constexpr QColor STD_ORANGE{255, 165, 0, 255};
-  mp.fill(OPAGUE); // opague
+  mp.fill(OPAGUE);  // opague
   QPainter painter{&mp};
-  painter.setPen(STD_ORANGE); // standard orange
+  painter.setPen(STD_ORANGE);  // standard orange
   painter.setBrush(STD_ORANGE);
   painter.drawRect(0, 0, orangeWidth, HEIGHT);
   if (hasBorder) {
-    painter.setPen(QColor{0, 0, 0, 255}); // standard black
+    painter.setPen(QColor{0, 0, 0, 255});  // standard black
     painter.setBrush(OPAGUE);
     painter.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
   }
@@ -163,19 +165,36 @@ QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool h
 const QPixmap& RateHelper::GetRatePixmap(int rate) {
   static_assert(MIN_V == 0, "Minumum rate value should be 0");
   static_assert(MAX_V == 10, "Maximum rate value should be 10");
-  static const QPixmap SCORE_BOARD[BUTT_V] //
+  static const QPixmap SCORE_BOARD[BUTT_V]  //
       {
-          GenerateRatePixmap(0, MAX_V),  //
-          GenerateRatePixmap(1, MAX_V),  //
-          GenerateRatePixmap(2, MAX_V),  //
-          GenerateRatePixmap(3, MAX_V),  //
-          GenerateRatePixmap(4, MAX_V),  //
-          GenerateRatePixmap(5, MAX_V),  //
-          GenerateRatePixmap(6, MAX_V),  //
-          GenerateRatePixmap(7, MAX_V),  //
-          GenerateRatePixmap(8, MAX_V),  //
-          GenerateRatePixmap(9, MAX_V),  //
-          GenerateRatePixmap(10, MAX_V), //
+          GenerateRatePixmap(0, MAX_V),   //
+          GenerateRatePixmap(1, MAX_V),   //
+          GenerateRatePixmap(2, MAX_V),   //
+          GenerateRatePixmap(3, MAX_V),   //
+          GenerateRatePixmap(4, MAX_V),   //
+          GenerateRatePixmap(5, MAX_V),   //
+          GenerateRatePixmap(6, MAX_V),   //
+          GenerateRatePixmap(7, MAX_V),   //
+          GenerateRatePixmap(8, MAX_V),   //
+          GenerateRatePixmap(9, MAX_V),   //
+          GenerateRatePixmap(10, MAX_V),  //
       };
   return SCORE_BOARD[clampRate(rate)];
+}
+
+bool RateHelper::isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect& visualRect) {
+  return getRatingRect(visualRect).contains(clickPnt);
+}
+
+QRect RateHelper::getRatingRect(QRect visualRect) {
+  visualRect.setTop(visualRect.bottom() + 1 - RATING_BAR_HEIGHT);
+  visualRect.setHeight(RATING_BAR_HEIGHT);
+  return visualRect;
+}
+
+int RateHelper::ratingAtPosition(const QPoint& pos, const QRect& visualRect) {
+  int delta = pos.x() - visualRect.x();
+  int nomindator = visualRect.width();
+  int rate = RateHelper::MOVIE_RATE_VALUE::MAX_V * delta / nomindator + 1;
+  return RateHelper::clampRate(rate);
 }

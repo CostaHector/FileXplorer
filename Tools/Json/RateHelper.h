@@ -5,7 +5,7 @@
 #include <QPixmap>
 
 class RateHelper {
-public:
+ public:
   enum MOVIE_RATE_VALUE {
     MIN_V = 0,
     MAX_V = 10,
@@ -13,18 +13,23 @@ public:
   };
 
   static bool RateMovie(const QString& fileAbsPath, int rate);
-  static int RateMovieRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce=true);
+  static int RateMovieRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce = true);
   static const QPixmap& GetRatePixmap(int rate);
+  static inline int clampRate(int rate) { return std::max(std::min(rate, (int)MAX_V), (int)MIN_V); }
 
-private:
-  static inline int clampRate(int rate) { return std::max(std::min(rate, (int) MAX_V), (int) MIN_V); }
+  static bool isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect& vRect);
+  static QRect getRatingRect(QRect visualRect);
+  static int ratingAtPosition(const QPoint& pos, const QRect& visualRect);
 
+ private:
   static bool RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
 
   static bool getJsonPathForFile(const QString& fileAbsPath, QString& jsonPath);
   static QString getBaseNameForImage(const QString& imagePath);
 
   static QPixmap GenerateRatePixmap(int r, const int sliceCount = MAX_V, const bool hasBorder = false);
+
+  static constexpr int RATING_BAR_HEIGHT = 50;
 };
 
-#endif // RATEHELPER_H
+#endif  // RATEHELPER_H

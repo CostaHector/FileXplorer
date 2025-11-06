@@ -305,6 +305,7 @@ class SceneInfoTest : public PlainTestSuite {
     expectAllScenes += forbesXMenPathScenes;
     QCOMPARE(allScenesInRoot, expectAllScenes);
   }
+  // todo: add exception for rewrite rate value
 };
 
 #include "SceneInfoTest.moc"
