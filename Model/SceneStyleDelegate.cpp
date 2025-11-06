@@ -40,7 +40,7 @@ void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, in
   painter->save();
 
   // 绘制半透明背景层
-  painter->fillRect(rect, QColor{0, 0, 0, 150});  // gray and half transparent
+  painter->fillRect(rect, QColor{0, 0, 0, 150}); // gray and half transparent
 
   int gridHeight = rect.height() - 10;
   int gridTop = rect.top() + 5;
@@ -49,10 +49,32 @@ void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, in
   const QRect beforeHoverRect(rect.left(), gridTop, hoverRateWidth, gridHeight);
 
   // 悬浮点对应评分条
-  const QColor beforeHoverGridColor{QColor{255, 200, 0, 220}};  // yellow
+  const QColor beforeHoverGridColor{QColor{255, 200, 0, 220}}; // yellow
   painter->setBrush(beforeHoverGridColor);
   painter->setPen(QPen(Qt::darkGray, 1));
   painter->drawRect(beforeHoverRect);
+
+  // 均匀分布9条垂直线，从左侧开始
+  const int leftOfRect = rect.left();
+  const int rectWidth = rect.width();
+
+  painter->setPen(Qt::lightGray);
+  painter->drawLines(QVector<QLine>{QLine(leftOfRect + rectWidth * 1 / 10, gridTop, leftOfRect + rectWidth * 1 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 2 / 10, gridTop, leftOfRect + rectWidth * 2 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 3 / 10, gridTop, leftOfRect + rectWidth * 3 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 4 / 10, gridTop, leftOfRect + rectWidth * 4 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 5 / 10, gridTop, leftOfRect + rectWidth * 5 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 6 / 10, gridTop, leftOfRect + rectWidth * 6 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 7 / 10, gridTop, leftOfRect + rectWidth * 7 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 8 / 10, gridTop, leftOfRect + rectWidth * 8 / 10, gridTop + gridHeight),
+                                    QLine(leftOfRect + rectWidth * 9 / 10, gridTop, leftOfRect + rectWidth * 9 / 10, gridTop + gridHeight)});
+  // 绘制数字
+  const int EACH_LINE_DISTANCE = rect.width() / 10;
+  painter->drawText(QRect(leftOfRect + rectWidth * 1 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "2");
+  painter->drawText(QRect(leftOfRect + rectWidth * 3 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "4");
+  painter->drawText(QRect(leftOfRect + rectWidth * 5 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "6");
+  painter->drawText(QRect(leftOfRect + rectWidth * 7 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "8");
+
   painter->setPen(Qt::white);
   painter->drawText(beforeHoverRect, Qt::AlignCenter, QString::asprintf("%d(%d)", hoverRating, rating));
 
