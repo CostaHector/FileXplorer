@@ -2,24 +2,38 @@
 #define FOLDERNXTANDLASTITERATOR_H
 
 #include <QString>
-#include <QMap>
+#include <QDir>
 
 class FolderNxtAndLastIterator {
  public:
-  FolderNxtAndLastIterator() = default;
-  bool operator()(const QString& parentPath);
-  bool operator()(const QString& parentPath, const QStringList& pathList);
+  enum class NaviDirection {
+    PREV,
+    NEXT,
+  };
 
-  QString next(const QString& parentPath, const QString& curDirName) {
-    return lastNextCore(parentPath, curDirName, true);
-  }
-  QString last(const QString& parentPath, const QString& curDirName) {
-    return lastNextCore(parentPath, curDirName, false);
-  }
+  explicit FolderNxtAndLastIterator(const QStringList& nameFilters = {},
+                                    QDir::Filters dirFilters = QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot,
+                                    bool bIncludingSubDir = false);
+  static FolderNxtAndLastIterator GetInstsNaviFolders();
+  static FolderNxtAndLastIterator GetInstsNaviImages(bool bIncludingSubDir);
+
+  bool operator()(const QString& parentPath, bool bFalse = false);
+  bool operator()(const QString& parentPath, const QStringList& itemsList);
+
+  QString next(const QString& parentPath, const QString& curItemName) { return lastNextCore(parentPath, curItemName, NaviDirection::NEXT); }
+  QString last(const QString& parentPath, const QString& curItemName) { return lastNextCore(parentPath, curItemName, NaviDirection::PREV); }
+
+  void setIncludingSubDirectory(bool bInclude) { mIncludingSubDirectory = bInclude; }
+  bool IsIncludingSubDirectory() const {return mIncludingSubDirectory;}
+
  private:
-  QString lastNextCore(const QString& parentPath, const QString& curDirName, bool isNext = true);
+  QString lastNextCore(const QString& parentPath, const QString& curItemName, NaviDirection direction = NaviDirection::NEXT);
   QString m_lastTimeParentPath;
   QStringList sameLevelPaths;
+
+  const QStringList mNameFilters;
+  const QDir::Filters mDirFilters;
+  bool mIncludingSubDirectory;
 };
 
-#endif // FOLDERNXTANDLASTITERATOR_H
+#endif  // FOLDERNXTANDLASTITERATOR_H

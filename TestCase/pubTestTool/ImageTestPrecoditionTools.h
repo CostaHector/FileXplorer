@@ -29,6 +29,7 @@ const QString& GetSvgContentTemplate();
 bool CreateAndSaveAWhitePng(const QString& filePath, int width = 1440, int height = 1080);
 
 QByteArray GetPNGImage(int width = 100, int height = 80, const QString& imgType = "PNG");
+QByteArray GetTestGif();
 
 quint32 GetPixelColorFromImage(const QImage& image, int x, int y);
 quint32 GetPixelColorFromData(const QByteArray& imageData, const char* format, int x, int y);

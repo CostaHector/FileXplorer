@@ -87,7 +87,7 @@ bool Archiver::onSelectNewItemRow(const QModelIndex& current, const QModelIndex&
   const QString& name = m_archiverModel->GetRelativeName(newRow);
   const QByteArray& dataByteArray = m_archiverModel->GetByteArrayData(newRow);
   ChangeWindowTitle(name, dataByteArray.size());
-  if (TYPE_FILTER::isDotExtImage(PathTool::GetDotFileExtension(name))) {
+  if (ThumbnailImageViewer::IsFileImage(name)) {
     m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray); // only update for images
   }
   return true;

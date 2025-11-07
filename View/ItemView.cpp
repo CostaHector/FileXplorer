@@ -1,10 +1,12 @@
 #include "ItemView.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+#include "ThumbnailImageViewer.h"
 #include <QActionGroup>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFile>
+#include <QFileInfo>
 
 ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
     : CustomListView{itemViewName, parent} {
@@ -41,6 +43,13 @@ bool ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
 #ifdef RUNNING_UNIT_TESTS
   return true;
 #endif
+  if (ThumbnailImageViewer::IsFileAbsPathImage(path)) {
+    QFileInfo fi{path};
+    auto* pImageViewer = new (std::nothrow) ThumbnailImageViewer{"IMAGE_VIEWER"};
+    pImageViewer->setPixmapByAbsFilePath(fi.absolutePath(), fi.fileName());
+    pImageViewer->show();
+    return true;
+  }
   const bool ret = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
   LOG_OE_P(ret, "Double click open", "path:%s", qPrintable(path));
   return ret;

@@ -94,6 +94,6 @@ QString formatDurationISO(const qint64 ms);
 QString formatMd5ByPathFirst8Byte(const QString& fileAbspath);
 QString formatMd5ByPathFirst1MillionByte(const QString& fileAbspath);
 QString formatMd5ByPath(const QString& fileAbspath);
-};  // namespace DataFormatter
+}  // namespace DataFormatter
 
 #endif  // DATAFORMATTER_H
