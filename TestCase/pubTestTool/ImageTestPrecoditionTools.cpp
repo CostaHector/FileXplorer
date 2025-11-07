@@ -8,13 +8,13 @@ const QString& GetSvgContentTemplate() {
   static const QString svg = R"(<svg xmlns="http://www.w3.org/2000/svg" width="540" height="360" viewBox="0 0 540 360">
   <rect width="540" height="360" fill="%1"/>
   <text x="0" y="300" font-size="360" fill="white">%2</text>
-  </svg>)"; // WARNING: don't use R"" inside class when the class need .moc
+  </svg>)";  // WARNING: don't use R"" inside class when the class need .moc
   return svg;
 }
 
 bool CreateAndSaveAWhitePng(const QString& filePath, int width, int height) {
-  QImage image{width, height, QImage::Format_ARGB32}; // ARGB32
-  image.fill(Qt::white);                              // RGBA：255,255,255,255
+  QImage image{width, height, QImage::Format_ARGB32};  // ARGB32
+  image.fill(Qt::white);                               // RGBA：255,255,255,255
   if (!image.save(filePath)) {
     LOG_W("Failed to save image to file[%s]", qPrintable(filePath));
     return false;
@@ -30,6 +30,14 @@ QByteArray GetPNGImage(int width, int height, const QString& imgType) {
   buffer.open(QIODevice::WriteOnly);
   img.save(&buffer, imgType.toUtf8().constData());
   return imageData;
+}
+
+QByteArray GetTestGif() {
+  // 预制: 简单的 2x2 像素 GIF 动画的 Base64 编码数据, 包含两帧：红色和蓝色交替
+  static const char* simpleGifBase64 =
+      "R0lGODlhAgACAPABAAAAAP///yH5BAAAAAAALAAAAAACAAIAAAICRA5WKQUAOw==";
+  QByteArray gifData = QByteArray::fromBase64(simpleGifBase64);
+  return gifData;
 }
 
 quint32 GetPixelColorFromImage(const QImage& image, int x, int y) {
@@ -60,4 +68,4 @@ quint32 GetPixelColorFromImagePath(const QString& filePath, int x, int y) {
   return GetPixelColorFromImage(image, x, y);
 }
 
-} // namespace ImageTestPrecoditionTools
+}  // namespace ImageTestPrecoditionTools

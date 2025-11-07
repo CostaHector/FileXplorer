@@ -1,37 +1,59 @@
 #include "ScenePageControl.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "NotificatorMacro.h"
 #include <QIntValidator>
+#include <QLabel>
 
-ScenePageControl::ScenePageControl(const QString& title, QWidget* parent) : QToolBar{title, parent} {
-  _THE_FRONT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_START"), "The Front Page", this);
+ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
+  : QToolBar{title, parent} {
+  _THE_FRONT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_START"), "First Page", this);
+  CHECK_NULLPTR_RETURN_VOID(_THE_FRONT_PAGE);
+  _THE_FRONT_PAGE->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Go to first page").arg(_THE_FRONT_PAGE->text(), _THE_FRONT_PAGE->shortcut().toString()));
+
   _PREVIOUS_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_LAST"), "Previous Page", this);
-  _NEXT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_NEXT"), "Next Page", this);
-  _THE_BACK_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_END"), "The Back Page", this);
+  CHECK_NULLPTR_RETURN_VOID(_PREVIOUS_PAGE);
+  _PREVIOUS_PAGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Comma));
+  _PREVIOUS_PAGE->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Go to previous page").arg(_PREVIOUS_PAGE->text(), _PREVIOUS_PAGE->shortcut().toString()));
 
+  _NEXT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_NEXT"), "Next Page", this);
+  CHECK_NULLPTR_RETURN_VOID(_NEXT_PAGE);
+  _NEXT_PAGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Period));
+  _NEXT_PAGE->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next page").arg(_NEXT_PAGE->text(), _NEXT_PAGE->shortcut().toString()));
+
+  _THE_BACK_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_END"), "Last Page", this);
+  CHECK_NULLPTR_RETURN_VOID(_THE_BACK_PAGE);
+  _THE_BACK_PAGE->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Go to last page").arg(_THE_BACK_PAGE->text(), _THE_BACK_PAGE->shortcut().toString()));
   {
     using namespace ScenePageNaviHelper;
-    mPageNaviIntAction.init(                                           //
-        {{_THE_FRONT_PAGE, PageNaviE::FRONT},                          //
-         {_PREVIOUS_PAGE, PageNaviE::PREVIOUS},                            //
-         {_NEXT_PAGE, PageNaviE::NEXT},                                //
-         {_THE_BACK_PAGE, PageNaviE::BACK}},                           //
-        PageNaviE::END_INVALID, QActionGroup::ExclusionPolicy::None);  //
+    mPageNaviIntAction.init(                    //
+        {{_THE_FRONT_PAGE, PageNaviE::FRONT},   //
+         {_PREVIOUS_PAGE, PageNaviE::PREVIOUS}, //
+         {_NEXT_PAGE, PageNaviE::NEXT},         //
+         {_THE_BACK_PAGE, PageNaviE::BACK}},    //
+        PageNaviE::END_INVALID,
+        QActionGroup::ExclusionPolicy::None); //
   }
 
   const int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 999).toInt();
-  mPageDimensionLE = new (std::nothrow) QLineEdit(QString::number(sceneCnt1Page));
+  mPageDimensionLE = new (std::nothrow) QLineEdit(QString::number(sceneCnt1Page), this);
+  CHECK_NULLPTR_RETURN_VOID(mPageDimensionLE);
   mPageDimensionLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
   mPageDimensionLE->setToolTip("Scenes count each page");
-  mPageDimensionLE->setMaximumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_24);
+  mPageDimensionLE->setMinimumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_24);
 
-  mPageIndexInputLE = new (std::nothrow) QLineEdit("0");
-  mPageIndexInputLE->setValidator(new QIntValidator{-1, 10000});
+  mPageIndexInputLE = new (std::nothrow) QLineEdit("0", this);
+  CHECK_NULLPTR_RETURN_VOID(mPageIndexInputLE);
+  mPageIndexInputLE->setValidator(new (std::nothrow) QIntValidator{-1, 10000});
   mPageIndexInputLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
-  mPageIndexInputLE->setToolTip("Page index");
-  mPageIndexInputLE->setMaximumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_24);
+  mPageIndexInputLE->setToolTip("Jump to the nth page");
+  mPageIndexInputLE->setMinimumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_24);
 
-  mPagesSelectTB = new (std::nothrow) QToolBar("Page Select");
+  mPagesSelectTB = new (std::nothrow) QToolBar("Page Select", this);
+  CHECK_NULLPTR_RETURN_VOID(mPagesSelectTB);
   mPagesSelectTB->addActions({_THE_FRONT_PAGE, _PREVIOUS_PAGE});
   mPagesSelectTB->addSeparator();
   mPagesSelectTB->addWidget(mPageIndexInputLE);
@@ -40,6 +62,11 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent) : QToo
   mPagesSelectTB->setStyleSheet("QToolBar { max-width: 512px; }");
   mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
 
+  QLabel* pPageNavi = new (std::nothrow) QLabel{"Page Navigation", this};
+  CHECK_NULLPTR_RETURN_VOID(pPageNavi);
+  pPageNavi->setAlignment(Qt::AlignmentFlag::AlignHCenter);
+
+  addWidget(pPageNavi);
   addWidget(mPageDimensionLE);
   addWidget(mPagesSelectTB);
   setOrientation(Qt::Orientation::Vertical);

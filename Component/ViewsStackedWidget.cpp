@@ -5,6 +5,7 @@
 #include "FolderPreviewActions.h"
 #include "NotificatorMacro.h"
 #include "HarFiles.h"
+#include "ThumbnailImageViewer.h"
 #include "ViewTypeTool.h"
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
@@ -16,7 +17,7 @@
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
-    : QStackedWidget{parent},  //
+    : QStackedWidget{parent},        //
       _previewFolder{previewFolder}  //
 {
   m_fsModel = new (std::nothrow) FileSystemModel(this);
@@ -146,7 +147,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
     case ViewType::JSON: {
       break;
     }
-    case ViewType::SCENE: { // avoid lag when text changed frequently
+    case ViewType::SCENE: {  // avoid lag when text changed frequently
       CHECK_NULLPTR_RETURN_FALSE(m_sceneProxyModel);
       const QRegularExpression* pRegex = GetRegularExpression(targetStr);
       CHECK_NULLPTR_RETURN_FALSE(pRegex);
@@ -239,7 +240,12 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   // Non-FileSystemView: open in QDesktopService;
 
   if (fi.isFile()) {
-    if (ArchiveFilesReader::isQZFile(fi)) {
+    if (ThumbnailImageViewer::IsFileImage(fi)) {
+      auto* pImageViewer = new (std::nothrow) ThumbnailImageViewer{"IMAGE_VIEWER"};
+      pImageViewer->setPixmapByAbsFilePath(fi.absolutePath(), fi.fileName());
+      pImageViewer->show();
+      return true;
+    } else if (ArchiveFilesReader::isQZFile(fi)) {
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
@@ -317,7 +323,8 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
       mCurrentChangedConn = ViewsStackedWidget::connect(
           m_sceneTableView, &SceneListView::currentSceneChanged,
           _previewFolder,  //
-          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(&CurrentRowPreviewer::operator()));
+          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
+              &CurrentRowPreviewer::operator()));
       break;
     }
     case ViewType::CAST: {

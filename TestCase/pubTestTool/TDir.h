@@ -40,9 +40,10 @@ class TDir {
   bool fileExists(const QString& file, bool bWinCaseSensitive = false) const;
   bool dirExists(const QString& folder, bool bWinCaseSensitive = false) const;
   QStringList entryList(const QDir::Filters filters = DEFAULT_QDIR_FILTER, const QDir::SortFlags sort = QDir::NoSort) const;
-  QString baseName() const {return QFileInfo(path()).baseName(); }
+  QString baseName() const { return QFileInfo(path()).baseName(); }
   QString path() const { return mTempPath; }
   QString itemPath(const QString& itemName) const { return mTempPath + '/' + itemName; }
+  qint64 fileSize(const QString& itemName) const { return QFile{itemPath(itemName)}.size(); }
   QSet<QString> Snapshot(const QDir::Filters filters = DEFAULT_QDIR_FILTER,
                          QDirIterator::IteratorFlag iterFlag = QDirIterator::IteratorFlag::Subdirectories) const {
     return SnapshotAtPath(path(), filters, iterFlag);
@@ -50,7 +51,7 @@ class TDir {
   QStringList FilesContentsSnapshot(const QStringList& relfilesAbsPath) const {
     QStringList filesAbsPath;
     filesAbsPath.reserve(relfilesAbsPath.size());
-    for (const QString& relPath: relfilesAbsPath) {
+    for (const QString& relPath : relfilesAbsPath) {
       filesAbsPath.push_back(itemPath(relPath));
     }
     return FilesContentsSnapshotAtPath(filesAbsPath);
