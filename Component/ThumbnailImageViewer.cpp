@@ -70,6 +70,7 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
 
   ReadSetting();
   adjustButtonPosition();
+  setWindowIcon(QIcon{":img/IMAGE"});
 }
 
 ThumbnailImageViewer::~ThumbnailImageViewer() {
